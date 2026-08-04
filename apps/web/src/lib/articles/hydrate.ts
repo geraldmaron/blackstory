@@ -189,7 +189,10 @@ function blockProvenance(
 export function buildArticleReferences(
   doc: PublicArticleProjectionDoc,
   packetsById: ReadonlyMap<string, ThemeImpactPacketView>,
-): { readonly references: readonly ArticleReferenceEntry[]; readonly refNumberById: Map<string, number> } {
+): {
+  readonly references: readonly ArticleReferenceEntry[];
+  readonly refNumberById: Map<string, number>;
+} {
   const referenceById = new Map<string, ArticleReferenceDoc>(
     doc.references.map((ref) => [ref.id, ref]),
   );
@@ -207,7 +210,9 @@ export function buildArticleReferences(
     if (existing !== undefined) return existing;
     const number = entries.length + 1;
     numberByUrl.set(url, number);
-    entries.push(locator ? { number, key: url, label, url, locator } : { number, key: url, label, url });
+    entries.push(
+      locator ? { number, key: url, label, url, locator } : { number, key: url, label, url },
+    );
     return number;
   };
 
@@ -306,9 +311,7 @@ function hydrateBlock(
         return undefined;
       }
       const observations = block.metricIds
-        ? packet.observations.filter(
-            (o) => o.metricId && block.metricIds!.includes(o.metricId),
-          )
+        ? packet.observations.filter((o) => o.metricId && block.metricIds!.includes(o.metricId))
         : packet.observations;
       if (observations.length === 0) {
         warn(`figure on packet "${block.packetId}" in "${slug}" has no observations — dropping`);
@@ -328,7 +331,9 @@ function hydrateBlock(
           ? packet?.observations.find((o) => o.id === block.refId)
           : packet?.derived.find((d) => d.id === block.refId);
       if (!packet || !row) {
-        warn(`stat references unknown ${block.kind} "${block.refId}" in "${slug}" — dropping block`);
+        warn(
+          `stat references unknown ${block.kind} "${block.refId}" in "${slug}" — dropping block`,
+        );
         return undefined;
       }
       return {
@@ -345,7 +350,9 @@ function hydrateBlock(
       const packet = packetsById.get(block.packetId);
       const artifact = packet?.artifacts.find((a) => a.id === block.refId);
       if (!packet || !artifact) {
-        warn(`primaryDocument references unknown artifact "${block.refId}" in "${slug}" — dropping`);
+        warn(
+          `primaryDocument references unknown artifact "${block.refId}" in "${slug}" — dropping`,
+        );
         return undefined;
       }
       return {

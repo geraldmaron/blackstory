@@ -24,14 +24,15 @@
  * it leaves this module, so the response-redaction guarantee (no internal/ranking/precise-geo
  * fields — ADR-021 §3) holds regardless of adapter: the zod parse strips any unknown field.
  */
-import { runPublicSearch, type PublicSearchIndexDoc, type SearchExecutionResult } from '@repo/domain';
+import {
+  runPublicSearch,
+  type PublicSearchIndexDoc,
+  type SearchExecutionResult,
+} from '@repo/domain';
 import type { CanonicalSearchQuery } from '@repo/security';
 import { normalizeSearchText } from '@repo/security';
 import { entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
-import {
-  type SearchFacetCountsV1,
-  type SearchResultV1,
-} from '@repo/public-contracts/v1/search';
+import { type SearchFacetCountsV1, type SearchResultV1 } from '@repo/public-contracts/v1/search';
 import type { RevisionMetadataV1 } from '@repo/public-contracts/v1/revision';
 
 export type ReleasePointer = {
@@ -67,7 +68,10 @@ export interface PublicDataAccess {
    */
   listEntities(releaseId: string): Promise<readonly EntityV1[]>;
   /** A bounded search page over the active release for an already-validated canonical query. */
-  search(canonical: CanonicalSearchQuery, options: { readonly releaseId: string }): Promise<SearchPage>;
+  search(
+    canonical: CanonicalSearchQuery,
+    options: { readonly releaseId: string },
+  ): Promise<SearchPage>;
 }
 
 export const EMPTY_FACETS: SearchFacetCountsV1 = {
@@ -103,7 +107,9 @@ export type InMemoryPublicDataOptions = {
   readonly unpublishedIds?: readonly string[];
 };
 
-export function createInMemoryPublicDataAccess(options: InMemoryPublicDataOptions): PublicDataAccess {
+export function createInMemoryPublicDataAccess(
+  options: InMemoryPublicDataOptions,
+): PublicDataAccess {
   // Validate on construction so a malformed fixture can never leak an unredacted field at read time.
   const byId = new Map<string, EntityV1>();
   for (const entity of options.entities) {
@@ -252,7 +258,9 @@ export type PublicDataAccessReaders = {
   ) => Promise<SearchPage>;
 };
 
-export function createPublicDataAccessFromReaders(readers: PublicDataAccessReaders): PublicDataAccess {
+export function createPublicDataAccessFromReaders(
+  readers: PublicDataAccessReaders,
+): PublicDataAccess {
   return {
     async getReleasePointer() {
       return readers.readReleasePointer();

@@ -1,3 +1,5 @@
+> **SUPERSEDED.** This document is superseded by the v9 chapters surface. Route today: /stories 308-redirects to /chapters; app/stories does not exist. It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
+
 # BlackStory design direction v6 — stories edition
 
 **Status:** binding layout pattern for `/stories` and `/stories/*` (2026-07-23).  

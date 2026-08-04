@@ -62,7 +62,11 @@ function pickTileForPlacement(seedKey: string, index: number): AtmosphereTileCre
   return pool[tileIndex]!;
 }
 
-function rotatedBounds(width: number, height: number, rotationDeg: number): {
+function rotatedBounds(
+  width: number,
+  height: number,
+  rotationDeg: number,
+): {
   width: number;
   height: number;
 } {

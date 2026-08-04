@@ -170,12 +170,14 @@ function parseAcsCsv(csvText: string): Array<{
   return result;
 }
 
-function buildDecennialObservations(rows: Array<{
-  readonly decade: number;
-  readonly race: string;
-  readonly homeownershipRate: number;
-  readonly sourceUrl: string;
-}>): NationalHomeownershipObservation[] {
+function buildDecennialObservations(
+  rows: Array<{
+    readonly decade: number;
+    readonly race: string;
+    readonly homeownershipRate: number;
+    readonly sourceUrl: string;
+  }>,
+): NationalHomeownershipObservation[] {
   const observations: NationalHomeownershipObservation[] = [];
 
   for (const row of rows) {
@@ -207,13 +209,15 @@ function buildDecennialObservations(rows: Array<{
   return observations;
 }
 
-function buildAcsObservations(rows: Array<{
-  readonly year: number;
-  readonly race: string;
-  readonly homeownershipRate: number;
-  readonly marginOfError: number;
-  readonly sourceUrl: string;
-}>): NationalHomeownershipObservation[] {
+function buildAcsObservations(
+  rows: Array<{
+    readonly year: number;
+    readonly race: string;
+    readonly homeownershipRate: number;
+    readonly marginOfError: number;
+    readonly sourceUrl: string;
+  }>,
+): NationalHomeownershipObservation[] {
   const observations: NationalHomeownershipObservation[] = [];
 
   for (const row of rows) {
@@ -250,7 +254,8 @@ function buildSeriesDefinitions(): SeriesDefinition[] {
   return [
     {
       metricId: 'census-decennial-homeownership-black-nation',
-      metricDefinition: 'Homeownership rate for Black householders (decennial Census historical tables)',
+      metricDefinition:
+        'Homeownership rate for Black householders (decennial Census historical tables)',
       universe: 'occupied housing units with Black householder',
       unit: 'percent',
       sourceDataset: 'Census Bureau Historical Census of Housing Tables',
@@ -265,7 +270,8 @@ function buildSeriesDefinitions(): SeriesDefinition[] {
     },
     {
       metricId: 'census-decennial-homeownership-white_nh-nation',
-      metricDefinition: 'Homeownership rate for White Non-Hispanic householders (decennial Census historical tables)',
+      metricDefinition:
+        'Homeownership rate for White Non-Hispanic householders (decennial Census historical tables)',
       universe: 'occupied housing units with White Non-Hispanic householder',
       unit: 'percent',
       sourceDataset: 'Census Bureau Historical Census of Housing Tables',
@@ -280,7 +286,8 @@ function buildSeriesDefinitions(): SeriesDefinition[] {
     },
     {
       metricId: 'acs-homeownership-rate-black-nation',
-      metricDefinition: 'Homeownership rate for Black or African American alone householders (ACS 1-Year)',
+      metricDefinition:
+        'Homeownership rate for Black or African American alone householders (ACS 1-Year)',
       universe: 'occupied housing units',
       unit: 'percent',
       sourceDataset: 'ACS 1-Year Detailed Tables',
@@ -361,7 +368,8 @@ async function applyObservations(
           JSON.stringify({
             raceEthnicitySlice: series.raceEthnicitySlice,
             methodologyNote: 'National homeownership rate by race, 1900-2024 spine.',
-            sourceNote: 'Decennial 1900-2000 from Census Bureau historical tables; ACS 1-Year 2005-2024 (no 2020 standard release).',
+            sourceNote:
+              'Decennial 1900-2000 from Census Bureau historical tables; ACS 1-Year 2005-2024 (no 2020 standard release).',
           }),
         ],
       );
@@ -412,7 +420,8 @@ async function applyObservations(
 }
 
 async function main(): Promise<void> {
-  const apply = process.env.INGEST_NATIONAL_HOMEOWNERSHIP_APPLY === '1' && process.env.DRY_RUN !== '1';
+  const apply =
+    process.env.INGEST_NATIONAL_HOMEOWNERSHIP_APPLY === '1' && process.env.DRY_RUN !== '1';
   const decennialFixturePath = DEFAULT_DECENNIAL_FIXTURE;
   const acsFixturePath = DEFAULT_ACS_FIXTURE;
 

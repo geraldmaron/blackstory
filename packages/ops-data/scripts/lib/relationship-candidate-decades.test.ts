@@ -9,7 +9,9 @@ test('deriveEntityDecades unions eraBuckets, statusHistory decades, and kind_det
   const decades = deriveEntityDecades({
     kind: 'person',
     eraBuckets: ['1960s'],
-    statusHistory: [{ status: 'active', validFrom: '1963-01-01', datePrecision: 'year', basisClaimIds: [] }],
+    statusHistory: [
+      { status: 'active', validFrom: '1963-01-01', datePrecision: 'year', basisClaimIds: [] },
+    ],
     kindDetail: { birth_edtf: '1929', death_edtf: '1968' },
     referenceDate: '2026-07-01',
   });

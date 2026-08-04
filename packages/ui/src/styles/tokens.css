@@ -198,6 +198,74 @@
   --ds-grid-max: 72rem;
   --ds-content-max: 38rem;
   --ds-gutter: var(--ds-space-4);
+
+  /*
+   * z-index ladder (repo-92n2.7). One ladder replacing the three informal numeric bands raw
+   * literals had converged on: local/component stacking (0-6), route-level fixed chrome
+   * (20-30), and shell/portal overlay chrome (40-1000). This is a value-preserving refactor —
+   * every tier below is set to the exact number the selector it names already used; nothing
+   * was reordered or resolved. Declared in strictly ascending (non-decreasing) order; tiers
+   * that share a value intentionally sit adjacent so the collision stays visible.
+   *
+   * repo-nwij (2026-08-04) resolved the four collisions the refactor above deliberately left
+   * flagged, by checking each pair's actual render conditions rather than guessing:
+   *   - Atlas instruments (camera console, time panel, lens panel, results rail, dock) render
+   *     only in `mode === 'atlas'`; Story Mode renders only in `mode === 'story'` — the two
+   *     clusters are already mutually exclusive by mode and keep sharing --ds-z-atlas-instruments
+   *     (20). The one real co-occurrence is the shell's typeahead search dropdown, which is
+   *     mounted independently of `mode` and can legitimately open over either — it gets its own
+   *     --ds-z-typeahead (22) so it always wins.
+   *   - --ds-z-atlas-pill (21, the camera readout) is deliberately above the instrument band —
+   *     its own selector comment already says "above the time panel" — and --ds-z-atlas-search
+   *     (30, the top status notice) is deliberately above that; both confirmed, not re-tiered.
+   *   - --ds-z-modal-sheet (90): the shortcuts sheet and the saved/collections drawer are a
+   *     single conceptual overlay layer, not two independent ones — the Escape handler in
+   *     use-command-context.ts already treats `shortcutsOpen || savedOpen` as one "overlay" layer
+   *     and closes both together. Confirmed mutually exclusive by design; kept at one value.
+   *   - --ds-z-scrim-toast (95) split: a toast firing while the shell drawer scrim is up is a
+   *     real scenario (drawer open, background fetch completes), and a toast should always be
+   *     legible above a scrim. Toast gets --ds-z-toast (96); the scrim keeps --ds-z-scrim (95).
+   */
+
+  /* Band A — local/component stacking (route content, page decoration, panel internals). */
+  --ds-z-decoration: 0; /* shell.css .ds-page-field: decorative motif behind page content */
+  --ds-z-map-plate: 0; /* persistent MapLibre plate baseline (map-surfaces.css, entity-page) */
+  --ds-z-content: 1; /* route/page content sitting one level above a local plate or decoration */
+  --ds-z-map-scrim: 1; /* Cinematic Map Backdrop legibility scrim over the plate */
+  --ds-z-map-plate-engaged: 1; /* map plate raised to scrim tier while Cinematic is Engaged */
+  --ds-z-restore-dock: 2; /* explore stage's collapsed-panel restore chips */
+  --ds-z-memorial-jump: 2; /* memorial edition's sticky jump rail */
+  --ds-z-cinematic-content: 2; /* Cinematic Map Backdrop route-owned content wrapper */
+  --ds-z-instrument-panel: 3; /* explore stage's fixed notice/instruments/results panels */
+  --ds-z-cinematic-rail: 3; /* Cinematic Map Backdrop Explore/Close rail controls */
+  --ds-z-spotlight: 4; /* explore stage's native-dialog spotlight */
+  --ds-z-cinematic-rail-engaged: 5; /* cinematic rail pinned above the header while Engaged */
+  --ds-z-annotation: 5; /* map-experience annotation overlay */
+  --ds-z-decade-dock: 6; /* explore edition's persistent decade scrub dock */
+  --ds-z-atlas-modal: 6; /* Atlas spotlight dialog */
+
+  /* Band B — route-level fixed chrome. */
+  --ds-z-atlas-instruments: 20; /* camera console, time panel, lens panel, results rail, Atlas
+                                    dock — mode==='atlas' only, mutually exclusive with Story Mode */
+  --ds-z-story-mode: 20; /* full-screen story surface — mode==='story' only */
+  --ds-z-atlas-pill: 21; /* camera readout, deliberately above the instrument band */
+  --ds-z-typeahead: 22; /* shell search dropdown; mounted independent of atlas/story mode, must
+                            outrank both (e.g. open while Story Mode is running) */
+  --ds-z-atlas-search: 30; /* top status notice, deliberately above the readout pill */
+
+  /* Band C — shell/portal overlay chrome. */
+  --ds-z-record-sheet: 40;
+  --ds-z-command-bar: 50;
+  --ds-z-command-overlay: 60; /* command bar's own dropdown and the command palette */
+  --ds-z-shell-header: 80;
+  --ds-z-header-menu: 90; /* shell header's "more" overflow panel */
+  --ds-z-modal-sheet: 90; /* shortcut sheet and saved/collections drawer: one overlay layer,
+                              confirmed mutually exclusive by the shared Escape handler */
+  --ds-z-scrim: 95; /* shell drawer scrim */
+  --ds-z-toast: 96; /* toast stack; must always outrank the scrim (a toast can fire while the
+                        shell drawer is open) */
+  --ds-z-nav-drawer: 100;
+  --ds-z-a11y-escape: 1000; /* skip-link and visually-hidden focus escape hatches */
 }
 
 @media (prefers-reduced-motion: reduce) {

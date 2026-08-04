@@ -1,3 +1,5 @@
+> **SUPERSEDED.** This document is superseded by the v9 Atlas (design-direction-v9-atlas.md). Route today: /search redirects. It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
+
 # BlackStory design direction v6 — search edition
 
 **Status:** **SUPERSEDED** (2026-07-23) — merged into [`design-direction-v6-history.md`](./design-direction-v6-history.md). `/search` redirects to `/history`; rip-list and facet patterns live on the unified **Find in time** surface.  

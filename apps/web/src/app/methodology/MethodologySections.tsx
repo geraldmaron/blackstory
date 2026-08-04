@@ -64,7 +64,10 @@ const LIMITATION_RULES = [
 
 const INTERNAL_FACT_STATUSES = new Set<FactStatus>(['draft', 'under_review']);
 
-function summarizeDefinition(text: string, maxLength = 128): { readonly summary: string; readonly hasMore: boolean } {
+function summarizeDefinition(
+  text: string,
+  maxLength = 128,
+): { readonly summary: string; readonly hasMore: boolean } {
   const trimmed = text.trim();
   const sentenceMatch = trimmed.match(/^[^.!?]+[.!?]/);
   const firstSentence = sentenceMatch?.[0]?.trim() ?? trimmed;
@@ -271,13 +274,19 @@ export function MethodologySections() {
     definition: NOTABILITY_RUBRIC[criterion],
   }));
 
-  const lifecycleItems = Object.entries(FACT_STATUS_LIFECYCLE_DEFINITIONS).map(([status, definition]) => ({
-    id: status,
-    term: humanizeToken(status),
-    definition,
-    meta: INTERNAL_FACT_STATUSES.has(status as FactStatus) ? 'Off public surfaces' : 'Public projection',
-    termVariant: INTERNAL_FACT_STATUSES.has(status as FactStatus) ? ('internal' as const) : ('public' as const),
-  }));
+  const lifecycleItems = Object.entries(FACT_STATUS_LIFECYCLE_DEFINITIONS).map(
+    ([status, definition]) => ({
+      id: status,
+      term: humanizeToken(status),
+      definition,
+      meta: INTERNAL_FACT_STATUSES.has(status as FactStatus)
+        ? 'Off public surfaces'
+        : 'Public projection',
+      termVariant: INTERNAL_FACT_STATUSES.has(status as FactStatus)
+        ? ('internal' as const)
+        : ('public' as const),
+    }),
+  );
 
   const entityStatusItems = [
     ...ENTITY_STATUS_VOCABULARY.place_like.map((entry) => ({
@@ -342,7 +351,7 @@ export function MethodologySections() {
               </Link>
             </p>
             <p className="ds-methodology-edition__credit">
-              Archive texture · symbolic atmosphere. {' '}
+              Archive texture · symbolic atmosphere.{' '}
               <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
             </p>
           </div>
@@ -484,7 +493,11 @@ export function MethodologySections() {
         </Notice>
 
         <h3 className="ds-methodology-edition__subhead">Fact record status lifecycle</h3>
-        <Notice className="ds-methodology-edition__callout" tone="warning" title="Public projection gate">
+        <Notice
+          className="ds-methodology-edition__callout"
+          tone="warning"
+          title="Public projection gate"
+        >
           Only published (and later corrected, superseded, or deprecated) facts appear on public
           surfaces. Draft and under-review work stay off the public projection and search index.
         </Notice>
@@ -571,8 +584,8 @@ export function MethodologySections() {
             Known limitations & gaps
           </h3>
           <p className="ds-methodology-edition__policy-lede">
-            An archive of sourced facts will contain errors. Every correction is logged publicly
-            and preserved in the record&apos;s history; nothing is silently edited.
+            An archive of sourced facts will contain errors. Every correction is logged publicly and
+            preserved in the record&apos;s history; nothing is silently edited.
           </p>
           <RuleStrip label="Known limitations" rules={LIMITATION_RULES} />
         </div>
@@ -636,8 +649,8 @@ export function MethodologySections() {
               Named accountability
             </h3>
             <p className="ds-methodology-edition__operations-body">
-              Editorial accountability is named by role, not hidden behind an anonymous brand
-              voice. Public bios link here as the team publishes them.
+              Editorial accountability is named by role, not hidden behind an anonymous brand voice.
+              Public bios link here as the team publishes them.
             </p>
             <ul className="ds-methodology-edition__operations-list">
               <li>Editorial lead: methodology, corrections policy, and publish gate</li>

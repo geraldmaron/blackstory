@@ -81,7 +81,6 @@ export const ENDPOINT_ROUTES: readonly string[] = [
   '/explore',
   '/history',
   '/explore/api',
-  '/history/api',
   '/search/api',
   '/locate/api',
   '/submit/api',

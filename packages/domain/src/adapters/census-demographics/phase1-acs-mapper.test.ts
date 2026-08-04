@@ -4,10 +4,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { PHASE1_ACS5_2024_VINTAGE } from './phase1-acs-variables.js';
-import {
-  mapPhase1AcsRowToObservations,
-  parsePhase1AcsResponse,
-} from './phase1-acs-mapper.js';
+import { mapPhase1AcsRowToObservations, parsePhase1AcsResponse } from './phase1-acs-mapper.js';
 
 const VINTAGE = PHASE1_ACS5_2024_VINTAGE;
 const RETRIEVED_AT = '2026-07-22T00:00:00.000Z';
@@ -84,7 +81,11 @@ function stateRow(
   stateFips: string,
   overrides: Record<string, string | null> = {},
 ): readonly (string | null)[] {
-  return [name, ...VARIABLE_IDS.map((id) => (id in overrides ? overrides[id]! : '1000')), stateFips];
+  return [
+    name,
+    ...VARIABLE_IDS.map((id) => (id in overrides ? overrides[id]! : '1000')),
+    stateFips,
+  ];
 }
 
 test('parsePhase1AcsResponse maps Montgomery County MD county row', () => {
@@ -125,7 +126,9 @@ test('parsePhase1AcsResponse maps Montgomery County MD county row', () => {
   assert.equal(byMetric.get('acs-ba-attainment-black-county')!.estimate, 35.7);
   assert.equal(byMetric.get('acs-black-population-share-county')!.referencePeriod, '2020-2024');
   assert.equal(byMetric.get('acs-black-population-share-county')!.source, 'acs-census-api');
-  assert.ok(!byMetric.get('acs-black-population-share-county')!.sourceUrl.includes('api.census.gov'));
+  assert.ok(
+    !byMetric.get('acs-black-population-share-county')!.sourceUrl.includes('api.census.gov'),
+  );
 });
 
 test('mapPhase1AcsRowToObservations computes Maryland state unemployment', () => {

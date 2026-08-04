@@ -40,13 +40,20 @@ export {
   isCorrectionTargetType,
 } from './corrections/categories.js';
 export type { CorrectionCategory, CorrectionTargetType } from './corrections/categories.js';
-export { createReceiptCode, digestReceiptCode, receiptCodesMatch } from './corrections/receipt-code.js';
+export {
+  createReceiptCode,
+  digestReceiptCode,
+  receiptCodesMatch,
+} from './corrections/receipt-code.js';
 export { validateCorrectionSubmission } from './corrections/correction-intake.js';
 export type {
   CorrectionFieldIssue,
   CorrectionSubmissionInput,
 } from './corrections/correction-intake.js';
-export { buildPublicCorrectionStatus, mapModerationToPublicPhase } from './corrections/public-status.js';
+export {
+  buildPublicCorrectionStatus,
+  mapModerationToPublicPhase,
+} from './corrections/public-status.js';
 export type { PublicCorrectionPhase, PublicCorrectionStatus } from './corrections/public-status.js';
 export { createCorrectionReceiptStore } from './corrections/store.js';
 export type { CorrectionReceiptStore, StoredCorrectionReceipt } from './corrections/store.js';

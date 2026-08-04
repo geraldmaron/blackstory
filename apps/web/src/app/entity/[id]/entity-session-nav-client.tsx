@@ -39,10 +39,7 @@ export function EntitySessionNavClient({ currentId, orderedIds }: EntitySessionN
   const [randomEnabled, setRandomEnabled] = useState(() => readEntitySessionRandomEnabled());
 
   const canGoBack = canBack(stack);
-  const canGoNext = useMemo(
-    () => canPickNext({ currentId, orderedIds }),
-    [currentId, orderedIds],
-  );
+  const canGoNext = useMemo(() => canPickNext({ currentId, orderedIds }), [currentId, orderedIds]);
 
   const handleBack = useCallback(() => {
     const result = back(stack);

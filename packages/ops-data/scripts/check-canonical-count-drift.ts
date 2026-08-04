@@ -29,9 +29,7 @@ const REPO_ROOT = join(SCRIPT_DIR, '../../..');
 
 const MARKER_RE = /<!--\s*canonical-count:\s*(\d+)[^>]*-->/g;
 
-const TRACKED_DOCS = [
-  'docs/data/entity-count-metric.md',
-];
+const TRACKED_DOCS = ['docs/data/entity-count-metric.md'];
 
 async function main() {
   const connectionString = process.env.DATABASE_URL;

@@ -21,20 +21,14 @@ import {
 const boundaries = buildStateBoundaryIndex(FIXTURE_STATE_BOUNDARIES);
 
 test('MA point tagged MA passes containment', () => {
-  assert.equal(
-    pointContainedInDeclaredState(FIXTURE_POINT_BOSTON_MA, 'MA', boundaries),
-    true,
-  );
+  assert.equal(pointContainedInDeclaredState(FIXTURE_POINT_BOSTON_MA, 'MA', boundaries), true);
   const result = evaluateStateContainment(FIXTURE_POINT_BOSTON_MA, 'ma', boundaries);
   assert.equal(result.ok, true);
   if (result.ok) assert.equal(result.stateCode, 'MA');
 });
 
 test('Harlem-ish NY point tagged NJ fails containment', () => {
-  assert.equal(
-    pointContainedInDeclaredState(FIXTURE_POINT_HARLEM_NY, 'NJ', boundaries),
-    false,
-  );
+  assert.equal(pointContainedInDeclaredState(FIXTURE_POINT_HARLEM_NY, 'NJ', boundaries), false);
   const result = evaluateStateContainment(FIXTURE_POINT_HARLEM_NY, 'NJ', boundaries);
   assert.equal(result.ok, false);
   if (!result.ok) {
@@ -44,10 +38,7 @@ test('Harlem-ish NY point tagged NJ fails containment', () => {
 });
 
 test('Harlem-ish NY point tagged NY passes containment', () => {
-  assert.equal(
-    pointContainedInDeclaredState(FIXTURE_POINT_HARLEM_NY, 'NY', boundaries),
-    true,
-  );
+  assert.equal(pointContainedInDeclaredState(FIXTURE_POINT_HARLEM_NY, 'NY', boundaries), true);
 });
 
 test('unknown declared state code fails closed', () => {
@@ -63,7 +54,10 @@ test('empty declared state code fails closed as unknown', () => {
 });
 
 test('pointInPolygonRings rejects coordinates outside simplified MA', () => {
-  assert.equal(pointInPolygonRings({ lat: 39.0, lng: -75.0 }, FIXTURE_STATE_BOUNDARIES[0]!.rings), false);
+  assert.equal(
+    pointInPolygonRings({ lat: 39.0, lng: -75.0 }, FIXTURE_STATE_BOUNDARIES[0]!.rings),
+    false,
+  );
 });
 
 test('auditEntityStateContainment returns mismatches without mutating input', () => {

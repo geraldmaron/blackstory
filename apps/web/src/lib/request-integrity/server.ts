@@ -10,10 +10,7 @@ import { CSRF_COOKIE_NAME, CSRF_HEADER_NAME, validateCsrfToken } from '../web-se
 
 export type RequestIntegrityMode = 'monitor' | 'enforce';
 export type RequestIntegrityHeaders = Headers | Readonly<Record<string, string | undefined>>;
-export type RequestIntegrityReason =
-  | 'missing_token'
-  | 'token_mismatch'
-  | 'cross_site_request';
+export type RequestIntegrityReason = 'missing_token' | 'token_mismatch' | 'cross_site_request';
 
 export type RequestIntegrityDecision =
   | { readonly allowed: true; readonly verified: boolean; readonly mode: RequestIntegrityMode }
@@ -95,7 +92,8 @@ export function createRequestIntegrityGuard(
   } = {},
 ): RequestIntegrityGuard {
   const environment = options.environment ?? process.env;
-  const mode = options.mode ?? parseRequestIntegrityMode(environment.REQUEST_INTEGRITY_MODE, environment);
+  const mode =
+    options.mode ?? parseRequestIntegrityMode(environment.REQUEST_INTEGRITY_MODE, environment);
   const telemetry = options.telemetry ?? {
     record(event: RequestIntegrityTelemetryEvent) {
       console.info(JSON.stringify(event));
@@ -109,7 +107,12 @@ export function createRequestIntegrityGuard(
       return { allowed: true, verified: true, mode };
     }
     if (mode === 'monitor') {
-      telemetry.record({ control: 'request_integrity', mode, outcome: 'monitored_failure', reason });
+      telemetry.record({
+        control: 'request_integrity',
+        mode,
+        outcome: 'monitored_failure',
+        reason,
+      });
       return { allowed: true, verified: false, mode };
     }
     telemetry.record({ control: 'request_integrity', mode, outcome: 'denied', reason });

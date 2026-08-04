@@ -6,22 +6,20 @@
 
 import { useAdminAuth } from './AdminAuthProvider';
 import type { AdminPermission } from './server-authorization';
+import { permissionsForStaffRole } from './staff-permissions';
 
 export type AdminUiRole = 'admin' | 'research' | 'publication' | 'security' | 'operator';
 
+/**
+ * Derived from the server's table so hidden affordances and enforced permissions cannot drift.
+ * `operator` is the local stand-in for a signed-in user whose claims have not been decoded yet;
+ * it is deliberately the narrowest set, and the server re-checks the real role regardless.
+ */
 const PERMISSION_BY_ROLE: Readonly<Record<AdminUiRole, ReadonlySet<AdminPermission>>> = {
-  admin: new Set([
-    'research:write',
-    'publication:publish',
-    'publication:retract',
-    'rights:change',
-    'policy:change',
-    'export:privileged',
-    'roles:change',
-  ]),
-  research: new Set(['research:write']),
-  publication: new Set(['publication:publish', 'publication:retract']),
-  security: new Set(['rights:change', 'export:privileged']),
+  admin: new Set(permissionsForStaffRole('admin')),
+  research: new Set(permissionsForStaffRole('research')),
+  publication: new Set(permissionsForStaffRole('publication')),
+  security: new Set(permissionsForStaffRole('security')),
   operator: new Set(['research:write']),
 };
 

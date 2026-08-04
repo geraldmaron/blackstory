@@ -145,6 +145,7 @@ export default function AboutPage() {
         title="No account required"
         actions={[
           { label: 'Explore the map', href: '/', emphasis: 'copper' },
+          { label: 'Search the archive', href: '/records' },
           { label: 'Read chapters', href: '/chapters' },
         ]}
       >

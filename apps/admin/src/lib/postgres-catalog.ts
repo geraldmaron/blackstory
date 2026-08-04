@@ -109,7 +109,11 @@ function matchesSearch(item: CatalogEntityListItem, search: string): boolean {
 function parseLocation(row: LocationRow): CatalogEntityLocation {
   let lat = row.lat ?? undefined;
   let lng = row.lng ?? undefined;
-  if ((lat === undefined || lng === undefined) && row.geometry && typeof row.geometry === 'object') {
+  if (
+    (lat === undefined || lng === undefined) &&
+    row.geometry &&
+    typeof row.geometry === 'object'
+  ) {
     const geometry = row.geometry as { type?: unknown; coordinates?: unknown };
     if (geometry.type === 'Point' && Array.isArray(geometry.coordinates)) {
       const coords = geometry.coordinates;

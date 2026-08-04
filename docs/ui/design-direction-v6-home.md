@@ -1,3 +1,5 @@
+> **SUPERSEDED.** This document is superseded by the v9 Atlas (design-direction-v9-atlas.md). Route today: / is the Atlas. It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
+
 # BlackStory design direction v6 — home edition
 
 **Status:** binding layout pattern for `/` only (2026-07-23).  

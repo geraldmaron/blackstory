@@ -44,7 +44,7 @@ Do not send a Sonnet package to Haiku. Packages are marked; the mark is binding.
 >
 > **Code rules:**
 > - CSS uses `--ds-*` tokens. No raw hex in component CSS. New tokens go in `packages/ui/src/styles/tokens.css` and are mirrored in `packages/ui/src/tokens/colors.ts`.
-> - Tests are `node:test` + `node:assert/strict`, colocated as `<name>.test.ts`. Follow `apps/web/src/app/(map)/explore/explore-panel-chrome.test.ts` for style.
+> - Tests are `node:test` + `node:assert/strict`, colocated as `<name>.test.ts`. Follow `apps/web/src/app/explore/explore-panel-chrome.test.ts` for style.
 > - TypeScript is strict with `exactOptionalPropertyTypes`. Build conditional object properties with spread (`...(x ? { k: x } : {})`), not `k: x | undefined`.
 > - No em dashes in user-facing copy. Use "to" for ranges, middle dots for compound labels.
 >
@@ -354,7 +354,7 @@ The 14-destination nav collapses. Destinations that leave the bar (Data, Law, Ba
 ### WP-11 · Lens panel — **Sonnet**
 
 **Depends on:** WP-01.
-**Touches:** `apps/web/src/components/map-experience/LensPanel.tsx` (new), `lens-panel.css` (new). Reads existing facet state from `app/(map)/explore/explore-view-model.ts` — **do not fork the view model.**
+**Touches:** `apps/web/src/components/map-experience/LensPanel.tsx` (new), `lens-panel.css` (new). Reads existing facet state from `app/explore/explore-view-model.ts` — **do not fork the view model.**
 
 Per design doc §5.2. Six groups in one scrolling panel; the v6 Filters/Color-key tabs are removed.
 
@@ -554,9 +554,9 @@ Cold open: `History happened here.` split into word spans with 130ms stagger, `t
 ### WP-23 · Decompose `ExploreMapExperience.tsx` — **Sonnet**
 
 **Depends on:** nothing. This package no longer waits on the chrome packages — see below.
-**Touches:** `apps/web/src/app/(map)/explore/ExploreMapExperience.tsx` and new sibling modules.
+**Touches:** `apps/web/src/app/explore/ExploreMapExperience.tsx` and new sibling modules.
 
-2,207 lines to an orchestrator under 400. Extract state into hooks under `app/(map)/explore/hooks/`.
+2,207 lines to an orchestrator under 400. Extract state into hooks under `app/explore/hooks/`.
 
 **Decomposition only. Do not mount anything new.** This package reorganises the code that is
 already there and nothing else. It does not import `LensPanel`, `ResultsRail`, `TimePanel`,
@@ -573,7 +573,7 @@ because this package adds no features, which is why its dependency list is now e
 ### WP-24 · Decompose `MapStage.tsx` — **Sonnet**
 
 **Depends on:** WP-23.
-**Touches:** `apps/web/src/app/(map)/MapStage.tsx` and new sibling modules.
+**Touches:** `apps/web/src/components/map-stage/MapStage.tsx` and new sibling modules.
 
 2,087 lines. Split along: style building, source syncing, lifecycle (`map-libre-lifecycle.ts` already exists — use it), camera, event wiring. Same behaviour-preserving constraint as WP-23.
 
@@ -582,7 +582,7 @@ because this package adds no features, which is why its dependency list is now e
 ### WP-25 · Route consolidation — **Sonnet**
 
 **Depends on:** WP-10, WP-27. (Was WP-23; WP-27 is what actually makes `/` an Atlas.)
-**Touches:** `apps/web/src/app/(map)/page.tsx`, `app/(map)/explore/page.tsx`, redirects.
+**Touches:** `apps/web/src/app/page.tsx`, `app/explore/page.tsx`, redirects.
 
 `/` becomes the Atlas. `/explore` 308s to `/`. Story is a mode on `/`, not a route.
 
@@ -612,7 +612,7 @@ that is still the old surface loses a working route and gains nothing.
 ### WP-27 · Atlas composition — **Sonnet**
 
 **Depends on:** WP-05, WP-06, WP-07, WP-09, WP-10, WP-11, WP-12, WP-13, WP-14, WP-15, WP-16, WP-17, WP-18, WP-23, WP-24.
-**Touches:** `apps/web/src/app/(map)/explore/ExploreMapExperience.tsx`, `app/(map)/explore/hooks/`, `app/(map)/MapStage.tsx` (props only), and the tests those changes break.
+**Touches:** `apps/web/src/app/explore/ExploreMapExperience.tsx`, `app/explore/hooks/`, `components/map-stage/MapStage.tsx` (props only), and the tests those changes break.
 
 The package that makes the archive reachable. Everything P0 to P4 built is inert until this runs:
 the modules exist, typecheck and have tests, but nothing renders a time panel, constructs a camera

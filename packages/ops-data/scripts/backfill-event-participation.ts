@@ -255,9 +255,7 @@ async function main(): Promise<void> {
     if (draftList.length > 12) console.log(`  ...and ${draftList.length - 12} more`);
 
     if (DRY_RUN || !APPLY) {
-      console.log(
-        '\nDry run only. Set DRY_RUN=0 BACKFILL_EVENT_PARTICIPATION_APPLY=1 to apply.',
-      );
+      console.log('\nDry run only. Set DRY_RUN=0 BACKFILL_EVENT_PARTICIPATION_APPLY=1 to apply.');
       return;
     }
 

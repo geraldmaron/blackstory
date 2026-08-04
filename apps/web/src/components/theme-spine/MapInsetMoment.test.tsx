@@ -25,10 +25,7 @@ describe('MapInsetMoment', () => {
   it('renders the place label and reuses EntityLocationMap (its aria-label present)', () => {
     const html = renderToStaticMarkup(<MapInsetMoment {...baseProps} />);
     assert.match(html, /Fifteenth Street Presbyterian Church/);
-    assert.match(
-      html,
-      /aria-label="Street map centered on Fifteenth Street Presbyterian Church"/,
-    );
+    assert.match(html, /aria-label="Street map centered on Fifteenth Street Presbyterian Church"/);
   });
 
   it('links into /explore with the entity pre-selected via the shared selected= convention', () => {

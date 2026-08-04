@@ -101,6 +101,7 @@ export type ReleaseSourceEntity = {
   readonly lng: number;
   readonly claims?: readonly ReleaseSourceClaim[];
   readonly historicalContext?: string;
+  readonly impactStatement?: string;
   readonly sensitivityClass?: string;
   readonly status?: string;
   readonly statusHistory?: readonly {
@@ -235,6 +236,7 @@ export type ReleaseEntityProjectionFields = {
   readonly notabilityBasis: readonly NotabilityBasisRecord[];
   readonly researchCoverage: ReleaseResearchCoverage;
   readonly historicalContext?: string;
+  readonly impactStatement?: string;
   /** Typed related entries from graph adjacency (or catalog bootstrap fallback). */
   readonly related?: readonly PublicRelatedEntry[];
   /** Real release-build-time timestamps (see module doc comment). */
@@ -558,7 +560,9 @@ export function resolveReleaseEntityStateCode(
   return '';
 }
 
-function resolveReleaseStateBoundaries(context: ReleaseBuildContext): StateBoundaryIndex | undefined {
+function resolveReleaseStateBoundaries(
+  context: ReleaseBuildContext,
+): StateBoundaryIndex | undefined {
   return context.geoIntegrity?.stateBoundaries ?? context.stateBoundaries;
 }
 
@@ -571,8 +575,7 @@ function resolveReleaseGeoIntegrityOptions(
 }
 
 export type ReleaseGeoIntegrityGateResult =
-  | { readonly ok: true }
-  | { readonly ok: false; readonly message: string };
+  { readonly ok: true } | { readonly ok: false; readonly message: string };
 
 /**
  * Pre-check for the release builder: when boundaries are supplied on context, verifies that
@@ -636,7 +639,9 @@ function resolveRelatedEntries(
   return validated;
 }
 
-function personPublicStatusFromLiving(livingStatus: LivingStatus): 'living' | 'deceased' | 'unknown' {
+function personPublicStatusFromLiving(
+  livingStatus: LivingStatus,
+): 'living' | 'deceased' | 'unknown' {
   if (livingStatus === 'deceased') return 'deceased';
   if (livingStatus === 'living') return 'living';
   return 'unknown';
@@ -684,7 +689,9 @@ export function resolveReleaseProjectionStatus(
     const status = currentStatus(statusHistory) ?? entry.status;
     return {
       statusHistory,
-      ...(status !== undefined ? { status: status as EntityStatusValue | 'living' | 'deceased' | 'unknown' } : {}),
+      ...(status !== undefined
+        ? { status: status as EntityStatusValue | 'living' | 'deceased' | 'unknown' }
+        : {}),
       statusProvenance: 'derived_heuristic',
     };
   }
@@ -697,6 +704,7 @@ export function resolveReleaseProjectionStatus(
     ...(entry.historicalContext !== undefined
       ? { historicalContext: entry.historicalContext }
       : {}),
+    ...(entry.impactStatement !== undefined ? { impactStatement: entry.impactStatement } : {}),
     ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
     ...(entry.claims !== undefined ? { claims: entry.claims } : {}),
     ...(entry.statusHistory !== undefined ? { statusHistory: entry.statusHistory as never } : {}),
@@ -706,7 +714,10 @@ export function resolveReleaseProjectionStatus(
 
   return {
     ...(derived.status !== undefined
-      ? { status: derived.status as EntityStatusValue | 'living' | 'deceased' | 'unknown' | 'presumed_deceased' }
+      ? {
+          status: derived.status as
+            EntityStatusValue | 'living' | 'deceased' | 'unknown' | 'presumed_deceased',
+        }
       : {}),
     ...(derived.statusHistory !== undefined ? { statusHistory: derived.statusHistory } : {}),
     ...(derived.livingStatus !== undefined
@@ -830,7 +841,9 @@ export function buildReleaseEntityArtifacts(
     ...(publicStatusHistory !== undefined && publicStatusHistory.length > 0
       ? { statusHistory: publicStatusHistory }
       : {}),
-    ...(resolvedStatus.livingStatus !== undefined ? { livingStatus: resolvedStatus.livingStatus } : {}),
+    ...(resolvedStatus.livingStatus !== undefined
+      ? { livingStatus: resolvedStatus.livingStatus }
+      : {}),
     ...(resolvedStatus.statusProvenance !== undefined
       ? { statusProvenance: resolvedStatus.statusProvenance }
       : {}),
@@ -846,6 +859,7 @@ export function buildReleaseEntityArtifacts(
     ...(entry.historicalContext !== undefined
       ? { historicalContext: entry.historicalContext }
       : {}),
+    ...(entry.impactStatement !== undefined ? { impactStatement: entry.impactStatement } : {}),
     ...(related.length > 0 ? { related } : {}),
     generatedAt: context.generatedAt,
     recordUpdatedAt: context.generatedAt,

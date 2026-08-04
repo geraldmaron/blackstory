@@ -4,10 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  blackSharePercent,
-  bucketBlackShareTier,
-} from '@repo/domain/map/county-population';
+import { blackSharePercent, bucketBlackShareTier } from '@repo/domain/map/county-population';
 import {
   parseCountyPopulationIndexFile,
   type CountyPopulationIndexFile,

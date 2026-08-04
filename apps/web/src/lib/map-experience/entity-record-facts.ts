@@ -17,10 +17,7 @@ export function searchKindLabelFor(kind: string): string {
 }
 
 /** Era label + optional explore href from era buckets or legacy era text. */
-export function searchEraFactFor(
-  eraBuckets: readonly string[],
-  era?: string,
-): SearchRipFactEra {
+export function searchEraFactFor(eraBuckets: readonly string[], era?: string): SearchRipFactEra {
   return entityEraFact({
     eraBuckets,
     ...(era !== undefined ? { era } : {}),

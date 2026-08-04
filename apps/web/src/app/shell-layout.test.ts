@@ -65,7 +65,7 @@ describe('surface class is the only shell switch', () => {
 });
 
 describe('explore decade dock hit target', () => {
-  const exploreEditionCss = readFileSync(join(here, '(map)/explore/explore-edition.css'), 'utf8');
+  const exploreEditionCss = readFileSync(join(here, 'explore/explore-edition.css'), 'utf8');
   const cinematicMapCss = readFileSync(
     join(here, '../components/patterns/cinematic-map/cinematic-map.css'),
     'utf8',
@@ -76,7 +76,10 @@ describe('explore decade dock hit target', () => {
       exploreEditionCss,
       /\.ds-explore-stage__decade-dock\s*\{[^}]*pointer-events:\s*auto/s,
     );
-    assert.match(exploreEditionCss, /\.ds-explore-stage__decade-dock\s*\{[^}]*z-index:\s*6/s);
+    assert.match(
+      exploreEditionCss,
+      /\.ds-explore-stage__decade-dock\s*\{[^}]*z-index:\s*var\(--ds-z-decade-dock\)/s,
+    );
     assert.match(
       exploreEditionCss,
       /\.ds-explore-stage__decade-dock\s*\{[^}]*touch-action:\s*none/s,
@@ -106,7 +109,7 @@ describe('instrument shell layout', () => {
     );
     assert.match(
       shellCss,
-      /\.ds-shell:has\(\[data-surface='instrument'\]\)\s+\.ds-shell-page-transition,[\s\S]*?\.ds-map-surface\s*\{[^}]*height:\s*100%/s,
+      /\.ds-shell:has\(\[data-surface='instrument'\]\)\s+\.ds-shell-page-transition,[\s\S]*?\.ds-shell-page-transition__content\s*\{[^}]*height:\s*100%/s,
     );
   });
 
@@ -138,7 +141,7 @@ describe('shell header theme tokens', () => {
 
 describe('horizontal overflow guards', () => {
   const baseCss = readFileSync(join(here, '../../../../packages/ui/src/styles/base.css'), 'utf8');
-  const mapSurfacesCss = readFileSync(join(here, '(map)/map-surfaces.css'), 'utf8');
+  const mapSurfacesCss = readFileSync(join(here, 'explore/explore.css'), 'utf8');
 
   it('clips document and shell sideways overflow without orphaning overflow-y', () => {
     assert.match(baseCss, /html\s*\{[^}]*overflow-x:\s*clip/s);
@@ -219,16 +222,69 @@ describe('maker credit theme marks', () => {
   });
 });
 
-describe('home how-this-works pipeline sketch', () => {
-  it('keeps theme tokens — no fixed-ink remapping on the homepage sketch', () => {
-    assert.match(shellCss, /\.ds-home-how__sketch\s+\.ds-pipeline-sketch\s*\{[^}]*margin:\s*0/s);
+describe('the plate is styled globally, not from the route group', () => {
+  const mapSurfacesCss = readFileSync(join(here, 'explore/explore.css'), 'utf8');
+
+  it('styles the plate from the sheet the root layout loads on every route', () => {
+    // The provider was hoisted to the root shell, so `.ds-map-stage` renders as a sibling of
+    // `.ds-shell`, not a descendant of the group's `.ds-map-surface`. Every plate rule left in
+    // the group's sheet was a rule that had silently stopped matching.
+    assert.match(shellCss, /\.ds-map-stage\s*\{[^}]*position:\s*fixed/s);
+    assert.match(shellCss, /\.ds-map-stage__canvas\s*\{/);
+    assert.doesNotMatch(mapSurfacesCss, /\.ds-map-stage\b/);
+  });
+
+  it('covers the plate on every surface class but the Instrument', () => {
+    // Regression: the plate is fixed on every route and the room sheets set no background, so
+    // once the Instrument built MapLibre the live map stayed lit under every subsequent route
+    // and state labels read through the prose column. Only reproduces after visiting the Atlas
+    // first, which is why a cold load of /library looked fine.
+    assert.match(
+      shellCss,
+      /body:not\(:has\(\[data-surface='instrument'\]\)\)\s+\.ds-map-stage::after\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
+    );
+    // Covered, not hidden: ADR-017 keeps the MapLibre instance alive across navigation.
     assert.doesNotMatch(
       shellCss,
-      /\.ds-home-how__sketch\s+\.ds-pipeline-sketch\s*\{[^}]*--ds-fixed-/s,
+      /body:not\(:has\(\[data-surface='instrument'\]\)\)\s+\.ds-map-stage\s*\{[^}]*display:\s*none/s,
     );
-    assert.doesNotMatch(
+  });
+
+  it('never scopes a plate rule under .ds-map-surface, which is not its ancestor', () => {
+    assert.doesNotMatch(shellCss, /\.ds-map-surface[^{,]*\s\.ds-map-stage/);
+    assert.doesNotMatch(shellCss, /\.ds-map-surface[^{,]*\s\.maplibregl-/);
+  });
+
+  it('gates plate chrome on data-surface, never on a marker class', () => {
+    // `.ds-explore-stage` is route content. Whether the zoom control parks bottom-right is a
+    // question about the surface class, so it reads the attribute; whether it clears an open
+    // panel is runtime state, so those rules keep the stage's own [data-*] attributes.
+    assert.match(
       shellCss,
-      /\.ds-home-how__sketch\s+\.ds-pipeline-sketch\s*\{[^}]*--ds-ink:\s*var\(--ds-fixed-/s,
+      /body:has\(\[data-surface='instrument'\]\)\s+\.ds-map-stage\s+\.maplibregl-ctrl-top-right\s*\{/,
     );
+    assert.doesNotMatch(shellCss, /:has\(\.ds-explore-stage\)/);
+  });
+
+  it('leaves the fixed plate no containing block but the viewport', () => {
+    // transform/filter/perspective/backdrop-filter/contain and will-change on any of them make
+    // an ancestor the containing block for a fixed descendant — the plate would then scroll
+    // with the document instead of holding the viewport. `.ds-shell` and `body` are the only
+    // ancestors the plate has, so no rule targeting either may declare one.
+    const trapping = /(transform|filter|perspective|backdrop-filter|contain|will-change)\s*:/;
+    for (const selector of ['body', '.ds-shell']) {
+      const pattern = new RegExp(
+        `(^|\\n)${selector.replace('.', '\\.')}\\s*(:has\\([^)]*\\))?\\s*\\{([^}]*)\\}`,
+        'g',
+      );
+      for (const match of shellCss.matchAll(pattern)) {
+        const body = match[3] ?? '';
+        assert.doesNotMatch(
+          body.replace(/text-transform\s*:/g, ''),
+          trapping,
+          `${selector} must not establish a containing block for the fixed plate`,
+        );
+      }
+    }
   });
 });

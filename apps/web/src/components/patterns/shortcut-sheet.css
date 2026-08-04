@@ -8,7 +8,7 @@
 .ds-shortcuts {
   position: fixed;
   inset: 0;
-  z-index: 90;
+  z-index: var(--ds-z-modal-sheet);
   display: grid;
   align-content: center;
   justify-items: center;
@@ -65,6 +65,40 @@
   font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
   color: var(--ds-ink-muted);
+}
+
+/*
+ * The single-key setting, in the sheet header beside the hint. It reads as part of the keyboard's
+ * own description rather than as a preferences panel bolted on, which is the point: the reader
+ * arrives here because a key did something, and the switch that governs that is right there.
+ */
+.ds-shortcuts__setting {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-height: 44px;
+  font-size: 0.75rem;
+  color: var(--ds-ink);
+  cursor: pointer;
+}
+
+.ds-shortcuts__setting input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--ds-accent);
+  cursor: pointer;
+}
+
+.ds-shortcuts__settinghint {
+  display: block;
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  color: var(--ds-ink-muted);
+}
+
+/* The hint pushed the close button right; now the setting sits between them and does that job. */
+.ds-shortcuts__hint {
+  margin-left: auto;
 }
 
 .ds-shortcuts__close {

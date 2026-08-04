@@ -96,7 +96,9 @@ test('the attribute allowlist drops every dangerous attribute shape', () => {
 });
 
 test('a safe link keeps exactly its allowlisted attributes', () => {
-  const out = sanitizeRichText('<a href="https://example.org" title="T" rel="noreferrer" id="x">L</a>');
+  const out = sanitizeRichText(
+    '<a href="https://example.org" title="T" rel="noreferrer" id="x">L</a>',
+  );
   assert.match(out, /href="https:\/\/example\.org"/);
   assert.match(out, /title="T"/);
   assert.match(out, /rel="noreferrer"/);

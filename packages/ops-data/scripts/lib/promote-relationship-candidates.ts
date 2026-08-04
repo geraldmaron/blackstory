@@ -53,8 +53,17 @@ export type PromoteSkipReason =
   | 'NOT_DETERMINISTIC';
 
 export type PromoteDecision =
-  | { readonly action: 'insert'; readonly candidate: ParsedRelationshipCandidate; readonly relationshipId: string }
-  | { readonly action: 'skip'; readonly candidateId: string; readonly reason: PromoteSkipReason; readonly detail?: string };
+  | {
+      readonly action: 'insert';
+      readonly candidate: ParsedRelationshipCandidate;
+      readonly relationshipId: string;
+    }
+  | {
+      readonly action: 'skip';
+      readonly candidateId: string;
+      readonly reason: PromoteSkipReason;
+      readonly detail?: string;
+    };
 
 export function inferredRelationshipId(
   fromEntityId: string,
@@ -67,7 +76,9 @@ export function inferredRelationshipId(
   return `rel_inf_${digest.slice(0, 24)}`;
 }
 
-export function parseRelationshipCandidate(row: LandscapeCandidateRow): ParsedRelationshipCandidate | null {
+export function parseRelationshipCandidate(
+  row: LandscapeCandidateRow,
+): ParsedRelationshipCandidate | null {
   if (row.lane !== RELATIONSHIP_INFERENCE_LANE) return null;
   const fromEntityId = row.payload.from_entity_id?.trim();
   const toEntityId = row.payload.to_entity_id?.trim();
@@ -127,7 +138,11 @@ export function edgeExistsEitherDirection(
 }
 
 export function buildExistingEdgeKeySet(
-  rows: readonly { readonly fromEntityId: string; readonly toEntityId: string; readonly relationshipType: string }[],
+  rows: readonly {
+    readonly fromEntityId: string;
+    readonly toEntityId: string;
+    readonly relationshipType: string;
+  }[],
 ): ReadonlySet<ExistingEdgeKey> {
   const keys = new Set<ExistingEdgeKey>();
   for (const row of rows) {
@@ -189,12 +204,14 @@ export function planRelationshipPromotion(
       decisions.push({ action: 'skip', candidateId: row.id, reason: 'SKIP_LIVING_REVIEW' });
       continue;
     }
-    if (edgeExistsEitherDirection(
-      candidate.fromEntityId,
-      candidate.toEntityId,
-      candidate.relationshipType,
-      existingEdges,
-    )) {
+    if (
+      edgeExistsEitherDirection(
+        candidate.fromEntityId,
+        candidate.toEntityId,
+        candidate.relationshipType,
+        existingEdges,
+      )
+    ) {
       decisions.push({ action: 'skip', candidateId: row.id, reason: 'EDGE_EXISTS' });
       continue;
     }

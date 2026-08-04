@@ -412,18 +412,12 @@ test('buildReleaseEntityArtifacts sanitizes prose links in search index and clai
   assert.equal(result.ok, true);
   if (!result.ok) return;
 
-  assert.equal(
-    result.searchIndex.summary,
-    'The U.S. Supreme Court, established in 1789.',
-  );
+  assert.equal(result.searchIndex.summary, 'The U.S. Supreme Court, established in 1789.');
   assert.equal(
     result.projection.summary,
     'The U.S. [[gap_supreme_court|Supreme Court]], established in 1789.',
   );
-  assert.equal(
-    result.projection.claims[0]?.object,
-    'The Supreme Court began operations in 1789.',
-  );
+  assert.equal(result.projection.claims[0]?.object, 'The Supreme Court began operations in 1789.');
   assert.equal(sanitizePublicProseText('[[gap_supreme_court|Supreme Court]]'), 'Supreme Court');
 });
 
@@ -450,8 +444,7 @@ test('buildReleaseEntityArtifacts derives status when entry has no status field'
 test('canonical living_status deceased wins over source hints that would imply living', () => {
   const entry = baseEntry({
     kind: 'person',
-    summary:
-      'A'.repeat(130),
+    summary: 'A'.repeat(130),
     livingStatus: 'living',
   });
   const result = buildReleaseEntityArtifacts(entry, {
@@ -502,7 +495,8 @@ test('person projection carries livingStatus and statusProvenance from heuristic
   const entry = baseEntry({
     kind: 'person',
     summary:
-      'A'.repeat(120) + ' She died in 1972 after decades of community leadership in Atlanta, Georgia.',
+      'A'.repeat(120) +
+      ' She died in 1972 after decades of community leadership in Atlanta, Georgia.',
     livingStatus: 'deceased',
   });
   const result = buildReleaseEntityArtifacts(entry, CONTEXT);

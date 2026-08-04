@@ -76,7 +76,13 @@ test('derivePersonLivingStatusDeterministic blocks BDP when recent life evidence
   });
   assert.equal(result.status, 'unknown');
   assert.equal(result.signal, 'no_signal');
-  assert.equal(hasRecentLifeEvidenceFromClaims([{ claimId: 'c3', predicate: 'honored', object: '2025' }], 2026), true);
+  assert.equal(
+    hasRecentLifeEvidenceFromClaims(
+      [{ claimId: 'c3', predicate: 'honored', object: '2025' }],
+      2026,
+    ),
+    true,
+  );
 });
 
 test('buildTerminalStatusHistory closes open-ended prior entry', () => {
@@ -133,7 +139,9 @@ test('applyStatusFix uses replace mode for Fourteenth Amendment fix', () => {
 });
 
 test('applyStatusFix uses terminal mode for Louisiana Separate Car Act', () => {
-  const fix = LAW_STATUS_FIXES.find((row) => row.entityId === 'ent_law_louisiana_separate_car_act_1890');
+  const fix = LAW_STATUS_FIXES.find(
+    (row) => row.entityId === 'ent_law_louisiana_separate_car_act_1890',
+  );
   assert.ok(fix);
   const prior = [
     {

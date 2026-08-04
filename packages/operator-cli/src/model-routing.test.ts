@@ -93,10 +93,7 @@ test('editorial-enrichment escalates on disagreement even with high confidence',
 });
 
 test('lanes without an escalation threshold never escalate', () => {
-  assert.equal(
-    shouldEscalateToPaid('story-craft', { confidence: 0.01, decision: 'keep' }),
-    false,
-  );
+  assert.equal(shouldEscalateToPaid('story-craft', { confidence: 0.01, decision: 'keep' }), false);
 });
 
 test('pickIndependentVerifierModel rejects the producer family', () => {

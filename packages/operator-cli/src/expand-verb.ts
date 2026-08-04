@@ -140,7 +140,15 @@ export async function ensureSourceProgramRun(
        candidate_count = EXCLUDED.candidate_count,
        summary = EXCLUDED.summary,
        updated_at = now()`,
-    [runId, lane, sourceProgramId, sourceProgramName, candidateCount, candidateCount, JSON.stringify(summary)],
+    [
+      runId,
+      lane,
+      sourceProgramId,
+      sourceProgramName,
+      candidateCount,
+      candidateCount,
+      JSON.stringify(summary),
+    ],
   );
 }
 

@@ -49,7 +49,11 @@ const ok = (hash: string): SafeFetchResult => ({
 
 test('dry-run inventories all surfaces, dedupes, and writes nothing', async () => {
   const db = fakeDb();
-  const report = await runCaptureBackfill(db, { commit: false }, deps(async () => ok('a'.repeat(64))));
+  const report = await runCaptureBackfill(
+    db,
+    { commit: false },
+    deps(async () => ok('a'.repeat(64))),
+  );
   assert.equal(report.mode, 'dry-run');
   assert.equal(report.totalUnique, 2); // census.gov/a (packet+article dup) + bls.gov/b
   assert.equal(report.inventory.packet.cited, 1);
@@ -82,7 +86,15 @@ test('commit records failures as retrieval events without a capture row', async 
   const report = await runCaptureBackfill(
     db,
     { commit: true },
-    deps(async () => ({ ok: false, reason: 'transport_failed', quarantineState: 'rejected', publicationAllowed: false }) as SafeFetchResult),
+    deps(
+      async () =>
+        ({
+          ok: false,
+          reason: 'transport_failed',
+          quarantineState: 'rejected',
+          publicationAllowed: false,
+        }) as SafeFetchResult,
+    ),
   );
   assert.equal(report.captured, 0);
   assert.equal(report.failed, 2); // both unique URLs fail

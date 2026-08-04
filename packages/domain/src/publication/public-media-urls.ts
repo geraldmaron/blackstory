@@ -31,10 +31,7 @@ export function supabasePublicMediaUrl(
 /**
  * Legacy GCS HTTPS URL for the same object path (dual-serve / rollback).
  */
-export function gcsPublicMediaUrl(
-  objectPath: string,
-  options: PublicMediaUrlOptions = {},
-): string {
+export function gcsPublicMediaUrl(objectPath: string, options: PublicMediaUrlOptions = {}): string {
   const bucket = options.gcsBucket ?? DEFAULT_GCS_PUBLIC_MEDIA_BUCKET;
   const key = objectPath.replace(/^\/+/, '');
   return `https://storage.googleapis.com/${bucket}/${key}`;

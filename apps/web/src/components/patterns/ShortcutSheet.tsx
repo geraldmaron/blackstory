@@ -9,7 +9,7 @@
  */
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import { cx } from '@repo/ui';
 import {
   COMMAND_SECTIONS,
@@ -17,7 +17,14 @@ import {
   type CommandSection,
   type KeyChord,
 } from './command-palette/command-registry';
-import { GLOBAL_BINDINGS } from '../../lib/keyboard/bindings';
+import {
+  getServerSingleKeyEnabled,
+  GLOBAL_BINDINGS,
+  isSingleKeyEnabled,
+  setSingleKeyEnabled,
+  subscribeToSingleKey,
+} from '../../lib/keyboard/bindings';
+import { useFocusTrap } from '../../lib/keyboard/use-focus-trap';
 import './shortcut-sheet.css';
 
 void React;
@@ -52,19 +59,28 @@ function Keys({ keys }: { readonly keys: KeyChord }) {
 
 export function ShortcutSheet({ open, onClose, className }: ShortcutSheetProps) {
   const dialogRef = useRef<HTMLDivElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
   const restoreTo = useRef<HTMLElement | null>(null);
+  const singleKey = useSyncExternalStore(
+    subscribeToSingleKey,
+    isSingleKeyEnabled,
+    getServerSingleKeyEnabled,
+  );
+  useFocusTrap(dialogRef, open, { overlayRef });
   const columns = useMemo(
     () => COMMAND_SECTIONS.map((section) => [section, rowsFor(section)] as const),
     [],
   );
 
-  const close = useCallback(() => {
-    onClose();
-    // Focus goes back where it came from. A reader who opened the sheet from the bar and lands on
-    // <body> afterwards has lost their place in the tab order.
-    restoreTo.current?.focus();
-    restoreTo.current = null;
-  }, [onClose]);
+  const close = useCallback(() => onClose(), [onClose]);
+
+  /**
+   * See the matching note in `CollectionsDrawer`: `onClose` arrives as an inline arrow, so an
+   * effect that depends on `close` re-runs every render and re-captures `restoreTo` from inside
+   * the open sheet. Depending on `open` alone makes opening and closing the only focus moves.
+   */
+  const closeRef = useRef(close);
+  closeRef.current = close;
 
   useEffect(() => {
     if (!open) return;
@@ -75,17 +91,23 @@ export function ShortcutSheet({ open, onClose, className }: ShortcutSheetProps) 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' || event.key === 'Esc') {
         event.preventDefault();
-        close();
+        closeRef.current();
       }
     };
     window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [close, open]);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      // Focus goes back where it came from, in cleanup so it survives the unmount. A reader who
+      // opened the sheet from the bar and lands on <body> has lost their place in the tab order.
+      restoreTo.current?.focus();
+      restoreTo.current = null;
+    };
+  }, [open]);
 
   if (!open) return null;
 
   return (
-    <div className={cx('ds-shortcuts', className)}>
+    <div className={cx('ds-shortcuts', className)} ref={overlayRef}>
       <button
         type="button"
         className="ds-shortcuts__scrim"
@@ -107,6 +129,22 @@ export function ShortcutSheet({ open, onClose, className }: ShortcutSheetProps) 
           <span className="ds-shortcuts__hint">
             Press <kbd className="ds-kbd">?</kbd> anytime
           </span>
+          {/* The setting lives in the sheet `?` opens because that is the one place a reader looks
+              when the keyboard is doing something they did not ask for. Turning it off leaves every
+              chorded binding working, which the label says rather than leaving the reader to test. */}
+          <label className="ds-shortcuts__setting">
+            <input
+              type="checkbox"
+              checked={singleKey}
+              onChange={(event) => setSingleKeyEnabled(event.target.checked)}
+            />
+            <span>
+              Single-key shortcuts
+              <span className="ds-shortcuts__settinghint">
+                Off leaves ⌘ and ⌥ chords working
+              </span>
+            </span>
+          </label>
           <button
             type="button"
             className="ds-shortcuts__close"

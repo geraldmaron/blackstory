@@ -358,10 +358,7 @@ export type {
   StoredArtifact,
   StoredRelease,
 } from './release-activation.js';
-export {
-  buildMobileBootstrapManifest,
-  bootstrapManifestToJson,
-} from './mobile-bootstrap.js';
+export { buildMobileBootstrapManifest, bootstrapManifestToJson } from './mobile-bootstrap.js';
 export type {
   BuildMobileBootstrapManifestInput,
   MobileArtifactHashRef,

@@ -7,6 +7,7 @@ import { test } from 'node:test';
 
 import {
   dismissToast,
+  latestActionableToast,
   pushToast,
   TOAST_ACTION_DURATION_MS,
   TOAST_DURATION_MS,
@@ -22,10 +23,12 @@ const actionable: ToastSpec = {
   action: { label: 'Undo', run: () => {} },
 };
 
-test('an actionable toast stays longer than a report-only toast', () => {
+test('a report-only toast leaves on its own; an actionable one waits for the reader', () => {
   assert.equal(toastDurationMs(plain), TOAST_DURATION_MS);
-  assert.equal(toastDurationMs(actionable), TOAST_ACTION_DURATION_MS);
-  assert.ok(TOAST_ACTION_DURATION_MS > TOAST_DURATION_MS);
+  // Null, not a longer number. Undo behind a timer is a race the reader did not agree to enter,
+  // and the readers who need the longest to reach the button are the ones a timer excludes.
+  assert.equal(TOAST_ACTION_DURATION_MS, null);
+  assert.equal(toastDurationMs(actionable), null);
 });
 
 test('newest toast lands last', () => {
@@ -50,6 +53,28 @@ test('stack is capped and drops the oldest', () => {
   assert.equal(stack.length, TOAST_STACK_LIMIT);
   assert.equal(stack[0]?.id, 't2');
   assert.equal(stack.at(-1)?.id, `t${TOAST_STACK_LIMIT + 1}`);
+});
+
+test('the undo chord acts on the newest toast that offers an action', () => {
+  // Report-only toasts are skipped rather than blocking the chord: a "Citations copied." landing
+  // on top of an Undo must not make ⌘Z do nothing.
+  const stack = pushToast(pushToast(pushToast([], actionable), plain), {
+    id: 'copied',
+    message: 'Citations copied.',
+  });
+  assert.equal(latestActionableToast(stack)?.id, 'lens-reset');
+
+  const twoActions = pushToast(stack, {
+    id: 'saved-undo',
+    message: 'Saved.',
+    action: { label: 'Undo', run: () => {} },
+  });
+  assert.equal(latestActionableToast(twoActions)?.id, 'saved-undo', 'newest wins');
+});
+
+test('the undo chord is a no-op when nothing is offering an action', () => {
+  assert.equal(latestActionableToast([]), null);
+  assert.equal(latestActionableToast(pushToast([], plain)), null);
 });
 
 test('dismiss removes only the named toast', () => {

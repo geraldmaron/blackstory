@@ -134,7 +134,11 @@ function toCandidateEntity(row: EntityRow): RelationshipCandidateEntity {
 }
 
 function coParticipationCandidates(
-  participations: readonly { readonly event_id: string; readonly participant_id: string; readonly role: string }[],
+  participations: readonly {
+    readonly event_id: string;
+    readonly participant_id: string;
+    readonly role: string;
+  }[],
   existingRelationships: readonly ExistingRelationshipRef[],
 ): readonly CoParticipationCandidate[] {
   const links = buildCoParticipationLinks(
@@ -148,8 +152,10 @@ function coParticipationCandidates(
   for (const link of links) {
     const hasEdge = existingRelationships.some(
       (relationship) =>
-        (relationship.fromEntityId === link.entityAId && relationship.toEntityId === link.entityBId) ||
-        (relationship.fromEntityId === link.entityBId && relationship.toEntityId === link.entityAId),
+        (relationship.fromEntityId === link.entityAId &&
+          relationship.toEntityId === link.entityBId) ||
+        (relationship.fromEntityId === link.entityBId &&
+          relationship.toEntityId === link.entityAId),
     );
     if (hasEdge) continue;
     candidates.push({
@@ -199,14 +205,19 @@ async function main(): Promise<void> {
       maxCandidates: Number.isFinite(MAX_CANDIDATES) && MAX_CANDIDATES > 0 ? MAX_CANDIDATES : 0,
     });
 
-    const coParticipation = coParticipationCandidates(participationResult.rows, existingRelationships);
+    const coParticipation = coParticipationCandidates(
+      participationResult.rows,
+      existingRelationships,
+    );
     const ranked = rankRelationshipCandidates({
       proposed,
       coParticipation,
       entities,
     });
 
-    const deterministicCount = ranked.filter((candidate) => candidate.tier === 'deterministic').length;
+    const deterministicCount = ranked.filter(
+      (candidate) => candidate.tier === 'deterministic',
+    ).length;
     const inferredCount = ranked.length - deterministicCount;
     const reasonCounts = ranked.reduce<Record<string, number>>((counts, candidate) => {
       counts[candidate.primaryReason] = (counts[candidate.primaryReason] ?? 0) + 1;
@@ -230,8 +241,12 @@ async function main(): Promise<void> {
     }
 
     if (DRY_RUN || !APPLY) {
-      console.log('\nDry run only. Set DRY_RUN=0 GENERATE_RELATIONSHIP_CANDIDATES_APPLY=1 to stage rows.');
-      console.log('Optional: STAGE_TIER=deterministic (or inferred) to limit apply; STAGE_LIMIT=N caps rows.');
+      console.log(
+        '\nDry run only. Set DRY_RUN=0 GENERATE_RELATIONSHIP_CANDIDATES_APPLY=1 to stage rows.',
+      );
+      console.log(
+        'Optional: STAGE_TIER=deterministic (or inferred) to limit apply; STAGE_LIMIT=N caps rows.',
+      );
       return;
     }
 
@@ -244,7 +259,9 @@ async function main(): Promise<void> {
     if (Number.isFinite(stageLimitRaw) && stageLimitRaw > 0) {
       toStage = toStage.slice(0, stageLimitRaw);
     }
-    console.log(`Staging ${toStage.length} candidates (STAGE_TIER=${stageTier}, STAGE_LIMIT=${stageLimitRaw || 'none'})`);
+    console.log(
+      `Staging ${toStage.length} candidates (STAGE_TIER=${stageTier}, STAGE_LIMIT=${stageLimitRaw || 'none'})`,
+    );
 
     const runId = `relationship-inference-${new Date().toISOString().slice(0, 10)}`;
     const entityNamesById = new Map(entityResult.rows.map((row) => [row.id, row.display_name]));
@@ -298,7 +315,9 @@ async function main(): Promise<void> {
       inserted += result.rowCount ?? 0;
     }
     await client.query('COMMIT');
-    console.log(`\nStaged ${inserted} new rows to bb_research.landscape_candidates (lane='${RELATIONSHIP_INFERENCE_LANE}').`);
+    console.log(
+      `\nStaged ${inserted} new rows to bb_research.landscape_candidates (lane='${RELATIONSHIP_INFERENCE_LANE}').`,
+    );
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
     throw error;

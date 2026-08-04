@@ -27,7 +27,7 @@ function lensProps(overrides: Partial<LensPanelProps> = {}): LensPanelProps {
     onKindFamilyChange: () => {},
     evidenceFloor: 'any',
     onEvidenceFloorChange: () => {},
-    layers: { pins: true, routes: false, labels: true },
+    layers: { pins: true, routes: false, labels: true, satellite: false },
     onLayerToggle: () => {},
     presence: [
       { postalCode: 'DC', name: 'District of Columbia', count: 372 },
@@ -72,11 +72,15 @@ test('evidence floor chips read as and-up and carry a grade dot', () => {
 
 test('layer chips report their own on/off state', () => {
   const html = renderToStaticMarkup(
-    createElement(LensPanel, lensProps({ layers: { pins: true, routes: true, labels: false } })),
+    createElement(
+      LensPanel,
+      lensProps({ layers: { pins: true, routes: true, labels: false, satellite: false } }),
+    ),
   );
   assert.match(html, /Archive pins/);
   assert.match(html, /Migration routes/);
   assert.match(html, /Place labels/);
+  assert.match(html, /Satellite imagery/);
 });
 
 test('presence bars name the state in words, not only as a bar', () => {

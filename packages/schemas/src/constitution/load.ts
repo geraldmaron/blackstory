@@ -26,6 +26,9 @@ function resolveSchemasPackageRoot(): string {
   }
 
   try {
+    // `./package.json` is exported explicitly by this package. Without that entry the specifier
+    // is not resolvable under `exports`, and webpack reports it as an unresolved module on every
+    // build of the web app even though the failure is caught here and recovered from below.
     return dirname(require.resolve('@repo/schemas/package.json'));
   } catch {
     // Bundlers may erase the package entry; fall through.

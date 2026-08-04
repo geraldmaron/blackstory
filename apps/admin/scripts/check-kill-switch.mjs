@@ -21,9 +21,7 @@ if (!connectionString) {
 
 const pool = new pg.Pool({
   connectionString,
-  ssl: connectionString.includes('sslmode=require')
-    ? { rejectUnauthorized: false }
-    : undefined,
+  ssl: connectionString.includes('sslmode=require') ? { rejectUnauthorized: false } : undefined,
 });
 
 try {

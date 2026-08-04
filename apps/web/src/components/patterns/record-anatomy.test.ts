@@ -23,7 +23,10 @@ test('record anatomy CSS keeps fact rows on one horizontal line', () => {
   assert.match(recordAnatomyCss, /\.ds-record-anatomy__fact-label[\s\S]*?white-space:\s*nowrap/);
   assert.match(recordAnatomyCss, /\.ds-record-anatomy__fact-value[\s\S]*?min-width:\s*0/);
   assert.doesNotMatch(recordAnatomyCss, /\.ds-record-anatomy__fact[\s\S]*?flex-flow:\s*row\s+wrap/);
-  assert.doesNotMatch(recordAnatomyCss, /\.ds-record-anatomy__fact-value[\s\S]*?flex:\s*1\s+1\s+12rem/);
+  assert.doesNotMatch(
+    recordAnatomyCss,
+    /\.ds-record-anatomy__fact-value[\s\S]*?flex:\s*1\s+1\s+12rem/,
+  );
 });
 
 test('renders inline fact rows without legacy column strip classes', () => {
@@ -74,7 +77,10 @@ test('renders inline fact rows without legacy column strip classes', () => {
   assert.match(html, /ds-edition-fact-icon--evidence-high/);
   assert.match(html, /Record at a glance/);
   assert.match(html, /not an exact address/);
-  assert.match(html, /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=38\.9098%2C-77\.0143"/);
+  assert.match(
+    html,
+    /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=38\.9098%2C-77\.0143"/,
+  );
   assert.match(html, /aria-label="Open Washington, D\.C\. in maps"/);
   assert.match(html, /ds-record-anatomy__place-link/);
   assert.match(html, /rel="noopener noreferrer"/);

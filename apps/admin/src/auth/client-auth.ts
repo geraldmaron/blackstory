@@ -13,7 +13,10 @@ export function subscribeAdminAuth(listener: (user: AdminSessionUser | null) => 
   return subscribeSupabaseAdminAuth(listener);
 }
 
-export async function signInAdminWithEmailPassword(email: string, password: string): Promise<AdminSessionUser> {
+export async function signInAdminWithEmailPassword(
+  email: string,
+  password: string,
+): Promise<AdminSessionUser> {
   return signInSupabaseAdminWithEmailPassword(email, password);
 }
 

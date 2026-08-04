@@ -19,9 +19,7 @@ import {
 const CONTEXT = { releaseId: 'release-2026-07-18', generatedAt: '2026-07-18T00:00:00.000Z' };
 const boundaries = buildStateBoundaryIndex(FIXTURE_STATE_BOUNDARIES);
 
-function geoEntry(
-  overrides: Partial<ReleaseSourceEntity> = {},
-): ReleaseSourceEntity {
+function geoEntry(overrides: Partial<ReleaseSourceEntity> = {}): ReleaseSourceEntity {
   return {
     id: 'ent_geo_001',
     kind: 'place',
@@ -57,17 +55,11 @@ test('resolveReleaseEntityStateCode prefers explicit jurisdictionStateCode', () 
 });
 
 test('resolveReleaseEntityStateCode parses a trailing two-letter postal code', () => {
-  assert.equal(
-    resolveReleaseEntityStateCode({ jurisdictionLabel: 'Harlem, NY' }),
-    'NY',
-  );
+  assert.equal(resolveReleaseEntityStateCode({ jurisdictionLabel: 'Harlem, NY' }), 'NY');
 });
 
 test('resolveReleaseEntityStateCode parses a trailing full state name', () => {
-  assert.equal(
-    resolveReleaseEntityStateCode({ jurisdictionLabel: 'Boston, Massachusetts' }),
-    'MA',
-  );
+  assert.equal(resolveReleaseEntityStateCode({ jurisdictionLabel: 'Boston, Massachusetts' }), 'MA');
 });
 
 test('evaluateReleaseGeoIntegrityGate is a no-op when boundaries are omitted', () => {

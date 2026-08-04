@@ -32,9 +32,10 @@ function asRawRecords(raw: unknown): NrhpMplRawRecord[] {
   });
 }
 
-function stripForbiddenKeys(
-  record: NrhpMplRawRecord,
-): { readonly payload: Record<string, unknown>; readonly strippedKeys: readonly string[] } {
+function stripForbiddenKeys(record: NrhpMplRawRecord): {
+  readonly payload: Record<string, unknown>;
+  readonly strippedKeys: readonly string[];
+} {
   const payload: Record<string, unknown> = { ...record };
   const strippedKeys: string[] = [];
   for (const key of NRHP_MPL_FORBIDDEN_PAYLOAD_KEYS) {

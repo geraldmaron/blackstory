@@ -127,7 +127,7 @@ async function applyObservations(
             raceEthnicitySlice: series.raceEthnicitySlice ?? null,
             methodologyNote:
               'DKKS (2024) QJE "Wealth of Two Nations" benchmark-year series transcribed from the ' +
-              'authors\' own final-dataset workbook; not annual, not interpolated by us.',
+              "authors' own final-dataset workbook; not annual, not interpolated by us.",
           }),
         ],
       );
@@ -163,8 +163,7 @@ async function applyObservations(
             valuationYear: 2019,
             tableSource: DKKS_WEALTH_GAP_SOURCE_URL,
             sourceFile: 'WealthGapFinal18602020.xlsx',
-            sourceFileSha256:
-              'f929e2a0ec070c86fa4f74085021c59b847b75352ddea8da51e0401d260b6987',
+            sourceFileSha256: 'f929e2a0ec070c86fa4f74085021c59b847b75352ddea8da51e0401d260b6987',
           }),
         ],
       );
@@ -183,8 +182,7 @@ async function applyObservations(
 }
 
 async function main(): Promise<void> {
-  const apply =
-    process.env.INGEST_PHASE2_DKKS_WEALTH_APPLY === '1' && process.env.DRY_RUN !== '1';
+  const apply = process.env.INGEST_PHASE2_DKKS_WEALTH_APPLY === '1' && process.env.DRY_RUN !== '1';
   const fixturePath = arg('dkks-fixture-csv') ?? DEFAULT_FIXTURE;
 
   if (!existsSync(fixturePath)) {

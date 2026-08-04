@@ -8,7 +8,7 @@
  */
 
 import type { ReactNode } from 'react';
-import { MapStageProvider } from '../app/(map)/MapStage';
+import { MapStageProvider } from './map-stage/MapStage';
 import { OfflineNotice } from './OfflineNotice';
 import { SiteShellFooter } from './SiteShellFooter';
 import { SiteShellHeader } from './SiteShellHeader';

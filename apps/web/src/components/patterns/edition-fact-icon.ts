@@ -3,12 +3,7 @@
  * kind glyphs and confidence tiers so home beats do not invent a second icon language.
  */
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import {
-  faCalendarDay,
-  faLocationDot,
-  faMap,
-  faScroll,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCalendarDay, faLocationDot, faMap, faScroll } from '@fortawesome/free-solid-svg-icons';
 import {
   confidenceIconFor,
   type ConfidenceTierKey,
@@ -28,7 +23,10 @@ export function entryStepIconFor(step: EntryStepKey): IconDefinition {
   return ENTRY_STEP_ICONS[step];
 }
 
-export function recordKindIconFor(kind: string, mapTone?: string): {
+export function recordKindIconFor(
+  kind: string,
+  mapTone?: string,
+): {
   readonly icon: IconDefinition;
   readonly shade: string;
 } {

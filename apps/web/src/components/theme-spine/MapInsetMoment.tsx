@@ -22,10 +22,7 @@ import React from 'react';
 import Link from 'next/link';
 import { EntityLocationMap } from '../entity/EntityLocationMap';
 import { DEFAULT_EXPLORE_FILTERS } from '../../lib/map-experience/filters';
-import {
-  buildExploreHref,
-  defaultExploreOverlayState,
-} from '../../lib/map-experience/url-state';
+import { buildExploreHref, defaultExploreOverlayState } from '../../lib/map-experience/url-state';
 
 void React;
 

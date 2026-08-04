@@ -184,14 +184,16 @@ export const chicagoRedliningPilotPackets = [
         dated: '1938',
         citation:
           'Federal Housing Administration Underwriting Manual (period editions); cited in secondary historical syntheses of mortgage redlining.',
-        uncertaintyLabel: 'Manual editions changed; quote from a specific edition when advancing a claim.',
+        uncertaintyLabel:
+          'Manual editions changed; quote from a specific edition when advancing a claim.',
       },
       {
         artifactId: 'art_fair_housing_1968',
         artifactClass: 'primary_government_document',
         title: 'Fair Housing Act (1968)',
         dated: '1968-04-11',
-        citation: 'Civil Rights Act of 1968, Title VIII — Fair Housing Act, 42 U.S.C. §§ 3601 et seq.',
+        citation:
+          'Civil Rights Act of 1968, Title VIII — Fair Housing Act, 42 U.S.C. §§ 3601 et seq.',
         sourceUrl: 'https://www.justice.gov/crt/fair-housing-act-1',
       },
     ],
@@ -280,8 +282,7 @@ export const chicagoRedliningPilotPackets = [
           source: ACS_SOURCE,
           sourceUrl: ACS_URL,
           retrievedAt: ACS_RETRIEVED,
-          contentHash:
-            'sha256:derived-cook-income-gap-64d710dd502f77b3-a5ba0cb4f6fd2695',
+          contentHash: 'sha256:derived-cook-income-gap-64d710dd502f77b3-a5ba0cb4f6fd2695',
           humanCitation:
             'Derived from ACS 2020–2024 5-Year B19013B and B19013A for Cook County, IL.',
         },
@@ -320,7 +321,8 @@ export const chicagoRedliningPilotPackets = [
         citation:
           'Nelson, Winling, et al., Mapping Inequality. University of Richmond DSL. https://dsl.richmond.edu/panorama/redlining/',
         sourceUrl: 'https://dsl.richmond.edu/panorama/redlining/',
-        uncertaintyLabel: 'Cite-only on public surfaces pending NC rights review for polygon product.',
+        uncertaintyLabel:
+          'Cite-only on public surfaces pending NC rights review for polygon product.',
       },
     ],
     gap_states: ['insufficient_evidence'],

@@ -95,3 +95,42 @@ follow-up.
   boundary admin already has, for no benefit.
 - Reusing `evaluatePromotionGate` as-is — rejected, requires data (contradiction search,
   evidence-lineage reputation) this pipeline doesn't produce; would need those fields faked.
+
+## Admin edits canonical records directly, under a role gate and a mandatory audit row (repo-gyq6.11, 2026-08-04)
+
+**What changed.** The console's operating rule used to be that admin never mutates canonical: an
+operator staged decisions, and only a release build reading those decisions — behind
+signed-manifest verification — made anything change. The entity workbench reverses that for the
+record itself. An operator with `canonical:write` now edits `bb_canonical.entities` in place, and
+merge and bulk kind reassignment write across a whole filtered set.
+
+**Why.** `bb_canonical.entities` is already the declared system of record for entity creation,
+promotion, merge, and edit (see the 2026-07-24 addendum above). The console was the only surface
+where a human could see the 4,097 rows and the only one forbidden from correcting them, so
+corrections were happening through ad hoc scripts with no role check and no audit trail. Moving
+the write into the console does not add a mutation path; it replaces unaudited ones.
+
+**What did not change.** The publication invariant stands unchanged: admin still never edits an
+active public projection, a release snapshot, or `/api/public/**` in place (ADR-004, above).
+Publishing is still preview → promote → release activation behind the signed manifest. What is now
+directly editable is the canonical record, not what the public site is currently serving.
+
+**The controls that make the reversal acceptable:**
+
+- Every canonical write goes through `commitCanonicalWrite`
+  (`apps/admin/src/lib/canonical-write.ts`). There is no second path, and the state change is
+  handed to `commitWithAuditPostgres` — domain state, audit event, and outbox message are one
+  transaction, so an unaudited canonical write cannot exist.
+- The verb decides the permission, and the permission table
+  (`apps/admin/src/auth/staff-permissions.ts`) is the single source both the server gate and the
+  client's affordance-hiding hook read. Field edit needs `canonical:write` (admin, research);
+  merge needs `canonical:merge` and bulk reassign needs `canonical:bulk_write` (admin only,
+  because their blast radius is a filtered set rather than one field).
+- The audit actor is the verified session identity from `readVerifiedAdminIdentity`, never an
+  operator id submitted with the form.
+- A non-empty reason is required; a canonical edit with no stated justification is rejected before
+  any state work.
+
+**Residual risk, not yet closed:** the cookie-session path has no `auth_time`, so
+`assertRecentReauth` is not enforced on canonical merges and bulk edits the way it is specified for
+publish/retract/rights/policy/role changes. Tracked as a follow-up on repo-qv9h.

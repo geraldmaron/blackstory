@@ -105,11 +105,7 @@ function Block({
       );
     case 'paragraph':
       return (
-        <ArticleProse
-          className="ds-article__p"
-          text={block.text}
-          refNumberById={refNumberById}
-        />
+        <ArticleProse className="ds-article__p" text={block.text} refNumberById={refNumberById} />
       );
     case 'pullquote':
       return (
@@ -160,10 +156,7 @@ function Block({
       );
     case 'timeline':
       return (
-        <ArtifactDrawer
-          kind="Timeline"
-          lead={`${block.events.length} dated documents, in order`}
-        >
+        <ArtifactDrawer kind="Timeline" lead={`${block.events.length} dated documents, in order`}>
           <div className="ds-article__timeline">
             <EraTimeline events={block.events} policyEras={block.policyEras} />
           </div>

@@ -34,9 +34,7 @@ export const PHASE1_NHGIS_DATASET_VINTAGE =
   'IPUMS NHGIS decennial county race counts (curated fixture; Cook County IL 1970–2010)';
 
 /** Minimum decennial vintages for theme-impact Q3/Q7 fair-housing / CRA era spine. */
-export const PHASE1_NHGIS_THEME_IMPACT_DECADES = [
-  1970, 1980, 1990, 2000, 2010,
-] as const;
+export const PHASE1_NHGIS_THEME_IMPACT_DECADES = [1970, 1980, 1990, 2000, 2010] as const;
 
 export const NHGIS_COOK_RACE_POPULATION_SHARE_FIXTURE_FILENAME =
   'nhgis-cook-county-17031-race-population-share-1970-2010.csv';

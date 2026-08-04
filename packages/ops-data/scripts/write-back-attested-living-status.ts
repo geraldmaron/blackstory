@@ -93,7 +93,10 @@ async function main(): Promise<void> {
         '\nDry run only — no writes. Set DRY_RUN=0 WRITE_BACK_ATTESTED_LIVING_STATUS_APPLY=1 to apply.',
       );
       console.log(
-        `\nAfter apply, republish with:\n  node --conditions development --import tsx \\\n    packages/ops-data/scripts/publish-release-entities-incremental.ts \\\n    --ids=${toUpdate.map((r) => r.candidate_id).concat(alreadyDeceased.map((r) => r.candidate_id)).join(',')}`,
+        `\nAfter apply, republish with:\n  node --conditions development --import tsx \\\n    packages/ops-data/scripts/publish-release-entities-incremental.ts \\\n    --ids=${toUpdate
+          .map((r) => r.candidate_id)
+          .concat(alreadyDeceased.map((r) => r.candidate_id))
+          .join(',')}`,
       );
       return;
     }

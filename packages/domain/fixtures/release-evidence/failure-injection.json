@@ -8,13 +8,8 @@
   {
     "case": "gc_one_deep",
     "gc": {
-      "deleted": [
-        "rel_mob005_b"
-      ],
-      "retained": [
-        "rel_mob005_c",
-        "rel_mob005_a"
-      ]
+      "deleted": ["rel_mob005_b"],
+      "retained": ["rel_mob005_c", "rel_mob005_a"]
     }
   }
 ]

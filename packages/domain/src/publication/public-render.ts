@@ -6,7 +6,4 @@
  * Implementation lives in `../editorial/prose-links` so web clients can import a crypto-free
  * path (`@repo/domain/editorial`) without evaluating `publication/index` (node:crypto).
  */
-export {
-  sanitizePublicProseField,
-  sanitizePublicProseText,
-} from '../editorial/prose-links.js';
+export { sanitizePublicProseField, sanitizePublicProseText } from '../editorial/prose-links.js';

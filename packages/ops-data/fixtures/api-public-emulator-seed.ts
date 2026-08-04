@@ -3,11 +3,7 @@
  * Demo-repo / emulator only — never import from production runtime code.
  */
 import type { PublicActiveReleaseDoc, PublicEntityProjectionDoc } from '../src/firestore/types.js';
-import {
-  seedPublicEntity,
-  seedPublicSchoolEntity,
-  type SeedDocument,
-} from './firestore-seed.js';
+import { seedPublicEntity, seedPublicSchoolEntity, type SeedDocument } from './firestore-seed.js';
 
 export type ApiPublicEmulatorScenario = {
   readonly releaseId: string;

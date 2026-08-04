@@ -24,60 +24,55 @@ export type ConfidenceLevelV1 = (typeof CONFIDENCE_LEVELS)[number];
 
 export const DISPUTE_ALTERNATE_KINDS = ['contradicting', 'alternative'] as const;
 
-export const claimDisputeAlternateV1Schema = z
-  .object({
-    value: nonEmptyText(2000),
-    credible: z.boolean(),
-    kind: z.enum(DISPUTE_ALTERNATE_KINDS),
-  });
+export const claimDisputeAlternateV1Schema = z.object({
+  value: nonEmptyText(2000),
+  credible: z.boolean(),
+  kind: z.enum(DISPUTE_ALTERNATE_KINDS),
+});
 
-export const claimDisputeV1Schema = z
-  .object({
-    hasDispute: z.boolean(),
-    primaryValue: nonEmptyText(2000),
-    note: z.string().max(2000).optional(),
-    alternates: boundedArray(claimDisputeAlternateV1Schema, 50),
-  });
+export const claimDisputeV1Schema = z.object({
+  hasDispute: z.boolean(),
+  primaryValue: nonEmptyText(2000),
+  note: z.string().max(2000).optional(),
+  alternates: boundedArray(claimDisputeAlternateV1Schema, 50),
+});
 
 export type ClaimDisputeV1 = z.infer<typeof claimDisputeV1Schema>;
 
 export const REVISION_CHANGE_KINDS = ['created', 'revised', 'corrected', 'retracted'] as const;
 
-export const claimRevisionEntryV1Schema = z
-  .object({
-    id: idString(200),
-    changedAt: z.string().max(64),
-    changeKind: z.enum(REVISION_CHANGE_KINDS),
-    summary: nonEmptyText(2000),
-    policyVersion: z.string().max(100).optional(),
-  });
+export const claimRevisionEntryV1Schema = z.object({
+  id: idString(200),
+  changedAt: z.string().max(64),
+  changeKind: z.enum(REVISION_CHANGE_KINDS),
+  summary: nonEmptyText(2000),
+  policyVersion: z.string().max(100).optional(),
+});
 
 export type ClaimRevisionEntryV1 = z.infer<typeof claimRevisionEntryV1Schema>;
 
-export const claimRetractionV1Schema = z
-  .object({
-    retractedAt: z.string().max(64),
-    reason: nonEmptyText(2000),
-    supersededByClaimId: idString(200).optional(),
-  });
+export const claimRetractionV1Schema = z.object({
+  retractedAt: z.string().max(64),
+  reason: nonEmptyText(2000),
+  supersededByClaimId: idString(200).optional(),
+});
 
 export type ClaimRetractionV1 = z.infer<typeof claimRetractionV1Schema>;
 
-export const claimV1Schema = z
-  .object({
-    id: idString(200),
-    predicate: nonEmptyText(300),
-    object: nonEmptyText(4000),
-    confidenceScore: z.number().min(0).max(1),
-    confidenceLevel: confidenceLevelSchema,
-    citation: citationV1Schema,
-    /** Independent-lineage count only — never the full internal `EvidenceSourceLineageInput`
-     * rollup (no supporting/contradicting-evidence counts, those are ranking-adjacent internal
-     * signals). Matches `PublicClaimView.independentLineageCount`. */
-    independentLineageCount: z.number().int().min(0).max(100_000).optional(),
-    dispute: claimDisputeV1Schema.optional(),
-    revisionHistory: boundedArray(claimRevisionEntryV1Schema, 200).optional(),
-    retraction: claimRetractionV1Schema.optional(),
-  });
+export const claimV1Schema = z.object({
+  id: idString(200),
+  predicate: nonEmptyText(300),
+  object: nonEmptyText(4000),
+  confidenceScore: z.number().min(0).max(1),
+  confidenceLevel: confidenceLevelSchema,
+  citation: citationV1Schema,
+  /** Independent-lineage count only — never the full internal `EvidenceSourceLineageInput`
+   * rollup (no supporting/contradicting-evidence counts, those are ranking-adjacent internal
+   * signals). Matches `PublicClaimView.independentLineageCount`. */
+  independentLineageCount: z.number().int().min(0).max(100_000).optional(),
+  dispute: claimDisputeV1Schema.optional(),
+  revisionHistory: boundedArray(claimRevisionEntryV1Schema, 200).optional(),
+  retraction: claimRetractionV1Schema.optional(),
+});
 
 export type ClaimV1 = z.infer<typeof claimV1Schema>;

@@ -160,9 +160,7 @@ export function themeImpactPacketToView(
   // Prefer researched finding titles (EPI chartbook pattern) over canonical
   // question prompts for public arc and packet headlines.
   const question =
-    packet.title.trim() ||
-    getThemeImpactQuestion(packet.questionId)?.question ||
-    packet.questionId;
+    packet.title.trim() || getThemeImpactQuestion(packet.questionId)?.question || packet.questionId;
 
   return {
     ...(options?.dataSource !== undefined ? { dataSource: options.dataSource } : {}),
@@ -212,8 +210,7 @@ export function parseThemeImpactPacketRow(row: {
   readonly updated_at: string | Date;
 }): ThemeImpactPacket {
   const geography = row.geography as ThemeImpactPacketGeography;
-  const toIso = (value: string | Date) =>
-    value instanceof Date ? value.toISOString() : value;
+  const toIso = (value: string | Date) => (value instanceof Date ? value.toISOString() : value);
   const causalClaimIds = row.causal_claim_ids?.filter((id) => id.trim()) ?? [];
   const bindingPurpose = THEME_IMPACT_BINDING_PURPOSES.includes(
     row.binding_purpose as ThemeImpactBindingPurpose,

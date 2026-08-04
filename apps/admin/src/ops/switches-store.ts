@@ -12,7 +12,9 @@ export async function listKillSwitches(limit = 100): Promise<readonly KillSwitch
   return listKillSwitchesPostgres(limit);
 }
 
-export async function tryListKillSwitches(limit?: number): Promise<readonly KillSwitchListItem[] | null> {
+export async function tryListKillSwitches(
+  limit?: number,
+): Promise<readonly KillSwitchListItem[] | null> {
   try {
     return await listKillSwitches(limit);
   } catch (error) {

@@ -16,9 +16,7 @@ export type LawTimelineEntry = {
   readonly confidenceLabel: string;
 };
 
-export async function getLawTimeline(
-  input: GetLawTimelineInput,
-): Promise<{
+export async function getLawTimeline(input: GetLawTimelineInput): Promise<{
   readonly timeline: readonly LawTimelineEntry[];
   readonly status: 'stub';
   readonly message: string;
@@ -26,10 +24,7 @@ export async function getLawTimeline(
   assertNoForbiddenCausalRequest(input as unknown as Record<string, unknown>);
 
   if (!input.entityId && !(input.topicId && input.stateFips)) {
-    throw new OperatorMcpError(
-      'invalid_input',
-      'Provide entityId or both topicId and stateFips',
-    );
+    throw new OperatorMcpError('invalid_input', 'Provide entityId or both topicId and stateFips');
   }
 
   return {

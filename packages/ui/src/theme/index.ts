@@ -6,4 +6,5 @@ export {
   resolvePreferredTheme,
   THEME_BOOTSTRAP_SCRIPT,
   THEME_STORAGE_KEY,
+  toggleDocumentTheme,
 } from './document-theme.js';

@@ -98,12 +98,7 @@ export const bannedBookChallengeSchema = z.object({
   state: uspsStateCodeSchema,
   jurisdictionLabel: z.string().min(1).optional(),
   schoolYear: z.string().min(1).optional(),
-  challengeYear: z
-    .number()
-    .int()
-    .gte(1900)
-    .lte(new Date().getFullYear())
-    .optional(),
+  challengeYear: z.number().int().gte(1900).lte(new Date().getFullYear()).optional(),
   titleAtChallenge: z.string().min(1).optional(),
   status: z.enum(['reported', 'rescinded', 'unknown']),
   citation: bannedBookCitationSchema,

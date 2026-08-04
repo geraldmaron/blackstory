@@ -13,11 +13,7 @@ import {
 } from './research-source-gather.js';
 
 export type ResearchDirectiveKind =
-  | 'gap_fill'
-  | 'targeted_brief'
-  | 'relationship_chain'
-  | 'story_research'
-  | 'autonomous_discovery';
+  'gap_fill' | 'targeted_brief' | 'relationship_chain' | 'story_research' | 'autonomous_discovery';
 
 export type ResearchDirectivePlan<TSubject = unknown> = {
   readonly kind: ResearchDirectiveKind;
@@ -40,11 +36,7 @@ export type ResearchDirectiveContext = {
   readonly nowIso?: string;
 };
 
-export type ResearchDirectiveHandlers<
-  TSubject,
-  TExtracted,
-  TDecision,
-> = {
+export type ResearchDirectiveHandlers<TSubject, TExtracted, TDecision> = {
   readonly plan: (
     subject: TSubject,
     context: ResearchDirectiveContext,
@@ -87,9 +79,7 @@ export async function defaultDirectiveGather(
   const seedUrls = plan.seedUrls ?? [];
   const sources = await gatherSourceSnippetsFromUrls(seedUrls, {
     ...(context.dependencies ? { dependencies: context.dependencies } : {}),
-    ...(context.gatherConcurrency !== undefined
-      ? { concurrency: context.gatherConcurrency }
-      : {}),
+    ...(context.gatherConcurrency !== undefined ? { concurrency: context.gatherConcurrency } : {}),
   });
   return {
     sources,
@@ -336,7 +326,11 @@ export async function runSundownTownCountyBrief(
   geojsonFeatures: readonly TougalooGeoFeature[],
   context: ResearchDirectiveContext = {},
 ): Promise<
-  ResearchDirectiveRunResult<SundownTownCountyBrief, SundownTownCountyExtracted, SundownTownCountyDecision>
+  ResearchDirectiveRunResult<
+    SundownTownCountyBrief,
+    SundownTownCountyExtracted,
+    SundownTownCountyDecision
+  >
 > {
   return runResearchDirective(brief, createSundownTownCountyHandlers(geojsonFeatures), context);
 }

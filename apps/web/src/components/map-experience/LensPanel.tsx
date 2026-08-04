@@ -37,6 +37,7 @@ export type LensLayers = {
   readonly pins: boolean;
   readonly routes: boolean;
   readonly labels: boolean;
+  readonly satellite: boolean;
 };
 
 export type LensLayerKey = keyof LensLayers;
@@ -45,6 +46,7 @@ const LAYER_LABELS: Readonly<Record<LensLayerKey, string>> = {
   pins: 'Archive pins',
   routes: 'Migration routes',
   labels: 'Place labels',
+  satellite: 'Satellite imagery',
 };
 
 export type PresenceRow = {

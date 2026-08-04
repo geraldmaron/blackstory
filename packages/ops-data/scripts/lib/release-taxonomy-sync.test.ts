@@ -10,7 +10,12 @@ type Row = {
 };
 
 function fakeClient(rows: readonly Row[]) {
-  const updates: Array<{ topicIds: string[]; topicTags: string[]; releaseId: string; entityId: string }> = [];
+  const updates: Array<{
+    topicIds: string[];
+    topicTags: string[];
+    releaseId: string;
+    entityId: string;
+  }> = [];
   return {
     updates,
     query: async (sql: string, params?: readonly unknown[]) => {
@@ -18,7 +23,12 @@ function fakeClient(rows: readonly Row[]) {
         return { rows };
       }
       // UPDATE ... SET taxonomy = ... WHERE release_id = $3 AND entity_id = $4
-      const [topicIds, topicTags, releaseId, entityId] = params as [string[], string[], string, string];
+      const [topicIds, topicTags, releaseId, entityId] = params as [
+        string[],
+        string[],
+        string,
+        string,
+      ];
       updates.push({ topicIds, topicTags, releaseId, entityId });
       return { rows: [] };
     },
@@ -31,7 +41,10 @@ test('planReleaseTaxonomySync proposes topics for a row with real canonical clas
     {
       entity_id: 'ent_a',
       taxonomy: {},
-      classification: { topicIds: ['civil-rights', 'education'], topicTags: ['civil-rights', 'education'] },
+      classification: {
+        topicIds: ['civil-rights', 'education'],
+        topicTags: ['civil-rights', 'education'],
+      },
     },
   ]);
   const plan = await planReleaseTaxonomySync(client, 'rel_1');
@@ -47,7 +60,10 @@ test('planReleaseTaxonomySync drops topicIds not in TOPIC_REGISTRY rather than f
     {
       entity_id: 'ent_b',
       taxonomy: {},
-      classification: { topicIds: ['civil-rights', 'not-a-real-topic'], topicTags: ['civil-rights', 'freeform-tag'] },
+      classification: {
+        topicIds: ['civil-rights', 'not-a-real-topic'],
+        topicTags: ['civil-rights', 'freeform-tag'],
+      },
     },
   ]);
   const plan = await planReleaseTaxonomySync(client, 'rel_1');

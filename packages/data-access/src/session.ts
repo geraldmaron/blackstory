@@ -21,6 +21,18 @@ export function allowedSearchPath(role: DatabaseRole): ApplicationSchema[] {
     .map(([schema]) => schema);
 }
 
+/** Postgres unquoted identifiers only — defense in depth against interpolating an unvalidated
+ * value into SET ROLE / search_path if the DatabaseRole/ApplicationSchema types are ever
+ * bypassed at runtime (e.g. an `any`-typed caller). */
+const SAFE_IDENTIFIER = /^[a-z_][a-z0-9_]*$/;
+
+function assertSafeIdentifier(value: string): string {
+  if (!SAFE_IDENTIFIER.test(value)) {
+    throw new Error(`Unsafe identifier: ${value}`);
+  }
+  return value;
+}
+
 export function buildSessionSetupSql(options: SessionGuardOptions): string[] {
   assertServerOnly('buildSessionSetupSql');
   const path = options.schemas ?? allowedSearchPath(options.role);
@@ -32,7 +44,9 @@ export function buildSessionSetupSql(options: SessionGuardOptions): string[] {
       throw new Error(`Role ${options.role} cannot use schema ${schema}`);
     }
   }
-  return [`SET ROLE ${options.role}`, `SET search_path TO ${path.join(', ')}`];
+  const role = assertSafeIdentifier(options.role);
+  const schemas = path.map(assertSafeIdentifier);
+  return [`SET ROLE ${role}`, `SET search_path TO ${schemas.join(', ')}`];
 }
 
 export function assertWriteAllowed(role: DatabaseRole, schema: ApplicationSchema): void {

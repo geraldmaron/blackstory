@@ -4,11 +4,19 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { SafeHttpRequest, SafeHttpResponse } from '../adapters/internet-archive/shared/http-port.js';
+import type {
+  SafeHttpRequest,
+  SafeHttpResponse,
+} from '../adapters/internet-archive/shared/http-port.js';
 import { checkDoiCitation, normalizeDoi, type StoredCitation } from './doi-resolution.js';
 
 function jsonResponse(body: unknown, status = 200): SafeHttpResponse {
-  return { status, headers: { 'content-type': 'application/json' }, bodyText: JSON.stringify(body), finalUrl: '' };
+  return {
+    status,
+    headers: { 'content-type': 'application/json' },
+    bodyText: JSON.stringify(body),
+    finalUrl: '',
+  };
 }
 
 const CROSSREF_WORK = {
@@ -135,7 +143,9 @@ test('a resolver 500 status is treated as a lookup failure, not a silent not_fou
 
 test('a missing venue in the resolved record is not itself flagged as a mismatch', async () => {
   const client = async () =>
-    jsonResponse({ message: { title: ['The Wages of Whiteness'], author: [{ family: 'Roediger' }] } });
+    jsonResponse({
+      message: { title: ['The Wages of Whiteness'], author: [{ family: 'Roediger' }] },
+    });
   const result = await checkDoiCitation(client, '10.1234/abc', STORED);
   assert.equal(result.outcome, 'match');
 });

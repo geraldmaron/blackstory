@@ -27,7 +27,8 @@ export function makeEntity(overrides: Partial<EntityV1> = {}): EntityV1 {
     locationPrecision: 'city',
     locationLabel: 'Washington, D.C.',
     relevanceExplanation: 'Nationally significant in the history of Black public education.',
-    historicalContext: 'Founded 1870 during Reconstruction; a center of Black academic achievement.',
+    historicalContext:
+      'Founded 1870 during Reconstruction; a center of Black academic achievement.',
     recordMaturity: 'published',
     researchCoverage: 'substantial',
     eraBuckets: ['1870s', '1880s'],

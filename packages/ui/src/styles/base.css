@@ -94,7 +94,7 @@ svg {
   position: fixed;
   top: var(--ds-space-2);
   left: var(--ds-space-2);
-  z-index: 1000;
+  z-index: var(--ds-z-a11y-escape);
   width: auto;
   height: auto;
   margin: 0;

@@ -29,13 +29,11 @@ export type PublishStatusLintReport = {
 const DECEASED_LEXICON_RE =
   /\b(died|death|deceased|passed away|killed|assassinated|d\.\s*\d{4}|death date|hanged|executed|murdered|martyred|slain|posthumous(ly)?|buried at|laid to rest)\b/i;
 
-const LYNCHING_DECEASED_RE =
-  /\b(was\s+lynched|lynched\s+(on|in|by)|lynching\s+of)\b/i;
+const LYNCHING_DECEASED_RE = /\b(was\s+lynched|lynched\s+(on|in|by)|lynching\s+of)\b/i;
 
 const LIFE_RANGE_RE = /\((1[6-9]\d{2})\s*[–—-]\s*(1[6-9]\d{2}|20[0-2]\d)\)/;
 
-const LAW_SELF_DEMISE_RE =
-  /\b(repealed|struck down|overturned|ruled unconstitutional|enjoined)\b/i;
+const LAW_SELF_DEMISE_RE = /\b(repealed|struck down|overturned|ruled unconstitutional|enjoined)\b/i;
 
 function deceasedLexiconMatches(text: string): boolean {
   if (DECEASED_LEXICON_RE.test(text) || LYNCHING_DECEASED_RE.test(text)) return true;
@@ -55,7 +53,9 @@ export function lintPublishStatus(input: PublishStatusLintInput): PublishStatusL
   if (input.kind === 'person') {
     const outgoingLiving =
       input.status === 'living' ||
-      (input.status === undefined && input.livingStatus !== 'deceased' && input.livingStatus !== 'unknown');
+      (input.status === undefined &&
+        input.livingStatus !== 'deceased' &&
+        input.livingStatus !== 'unknown');
     if (outgoingLiving && deceasedLexiconMatches(text)) {
       findings.push({
         entityId: input.entityId,

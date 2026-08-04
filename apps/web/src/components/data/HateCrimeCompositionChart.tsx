@@ -1,6 +1,9 @@
 /**
  * Two-part horizontal composition of FBI hate crime reporting for one year — anti-Black
  * vs all other reported bias categories. Framed as reporting composition, not danger heat.
+ *
+ * Not currently rendered — see the note in HateCrimeYearSeriesChart.tsx. Awaiting the typed
+ * `statistical_series` hate-crime metric (repo-zxjz.10, repo-a03ca83f).
  */
 import React from 'react';
 import type { HateCrimeYearSummary } from '@repo/domain/statistics/public-data-summaries';
@@ -39,9 +42,10 @@ export function HateCrimeCompositionChart({ summary }: HateCrimeCompositionChart
       caption={
         <>
           How {summary.year} hate crime reports break down by bias type (agencies that chose to
-          report). Anti-Black or African American bias: {formatChartCount(summary.antiBlackIncidents)}{' '}
-          ({pct(summary.antiBlackIncidents, total)}). All other reported bias categories:{' '}
-          {formatChartCount(otherIncidents)} ({pct(otherIncidents, total)}).
+          report). Anti-Black or African American bias:{' '}
+          {formatChartCount(summary.antiBlackIncidents)} ({pct(summary.antiBlackIncidents, total)}).
+          All other reported bias categories: {formatChartCount(otherIncidents)} (
+          {pct(otherIncidents, total)}).
           {participationNote}
         </>
       }

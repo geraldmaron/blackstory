@@ -41,7 +41,10 @@ test('mineDeathWordNearYear uses lynching verb forms only', () => {
 });
 
 test('isLynchSurnameFalsePositive flags Loretta Lynch prose without lynching verbs', () => {
-  assert.equal(isLynchSurnameFalsePositive('Loretta Lynch argued the case before the Court.'), true);
+  assert.equal(
+    isLynchSurnameFalsePositive('Loretta Lynch argued the case before the Court.'),
+    true,
+  );
   assert.equal(
     isLynchSurnameFalsePositive('Isaac McGhie was lynched by a white mob in Duluth in 1920.'),
     false,

@@ -1,0 +1,436 @@
+/**
+ * Operator workbench primitives: DataTable, FacetRail, SelectionBar, Pagination.
+ *
+ * Follows the brand pack v3 language already set in components.css — hairline rules carry all
+ * separation, no shadows, IBM Plex Mono for data registers. Density is tighter than the public
+ * site on purpose: these surfaces are read as a grid of values, not as prose.
+ */
+
+/* ---------------------------------------------------------------- DataTable */
+
+.ds-datatable {
+  /* The table, not the page, scrolls sideways — the shell must never shift under it. */
+  overflow-x: auto;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-raised);
+}
+
+.ds-datatable__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.ds-datatable__caption {
+  /* Present for screen readers; the visible heading is the page title. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ds-datatable__head th {
+  position: sticky;
+  top: var(--ds-shell-header-height, 0px);
+  z-index: 1; /* local: lifts the sticky header row above its own scrolling rows, not above the page */
+  background: var(--ds-surface);
+  border-bottom: var(--ds-border-width) solid var(--ds-border-strong);
+  padding: var(--ds-space-2) var(--ds-space-3);
+  text-align: start;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+  white-space: nowrap;
+}
+
+.ds-datatable__sort {
+  display: inline-flex;
+  gap: var(--ds-space-1);
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-datatable__sort:hover {
+  color: var(--ds-ink);
+  text-decoration: underline;
+}
+
+.ds-datatable__sort-glyph {
+  opacity: 0.45;
+}
+
+.ds-datatable__row {
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-datatable__row:last-child {
+  border-bottom: 0;
+}
+
+.ds-datatable__row td {
+  padding: var(--ds-space-2) var(--ds-space-3);
+  vertical-align: middle;
+}
+
+.ds-datatable--compact .ds-datatable__row td {
+  padding-block: calc(var(--ds-space-1) + 1px);
+}
+
+.ds-datatable__row:hover {
+  background: var(--ds-canvas);
+}
+
+.ds-datatable__row--selected {
+  background: var(--ds-canvas);
+}
+
+/* The cursor row is marked with a border, not colour alone, so it survives greyscale and
+   high-contrast modes where a tint would vanish. */
+.ds-datatable__row--cursor {
+  box-shadow: inset 3px 0 0 0 var(--ds-accent);
+}
+
+.ds-datatable__row:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: -2px;
+}
+
+.ds-datatable__select-cell {
+  width: 2.5rem;
+  padding-inline: var(--ds-space-3);
+}
+
+.ds-datatable__cell--end {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-datatable__empty {
+  border: var(--ds-border-width) dashed var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-6);
+  text-align: center;
+}
+
+@media (max-width: 60rem) {
+  .ds-datatable__cell--secondary {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------- FacetRail */
+
+.ds-facet-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-5);
+}
+
+.ds-facet-rail__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+}
+
+.ds-facet-rail__title {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-facet-rail__clear {
+  font-size: 0.75rem;
+}
+
+.ds-facet__title {
+  margin: 0 0 var(--ds-space-2);
+  font-size: 0.8125rem;
+  font-weight: 650;
+}
+
+.ds-facet__options {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-facet__option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+  padding: calc(var(--ds-space-1) + 1px) var(--ds-space-2);
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-ink);
+  font-size: 0.8125rem;
+  text-decoration: none;
+}
+
+.ds-facet__option:hover {
+  background: var(--ds-canvas);
+}
+
+/* Active facets are marked by weight and a rule, not colour alone. */
+.ds-facet__option--active {
+  background: var(--ds-canvas);
+  box-shadow: inset 2px 0 0 0 var(--ds-accent);
+  font-weight: 650;
+}
+
+.ds-facet__option-count {
+  font-size: 0.6875rem;
+  color: var(--ds-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-facet__empty,
+.ds-facet__more summary {
+  font-size: 0.75rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-facet__more summary {
+  cursor: pointer;
+  padding: var(--ds-space-1) var(--ds-space-2);
+}
+
+/* ------------------------------------------------------------ SelectionBar */
+
+.ds-selection-bar {
+  position: sticky;
+  bottom: var(--ds-space-4);
+  z-index: 2; /* local: sits over the table it acts on, including that table's sticky head */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-inverse);
+  color: var(--ds-inverse-ink);
+}
+
+.ds-selection-bar__count {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.ds-selection-bar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin-inline-start: auto;
+}
+
+.ds-selection-bar__escalate,
+.ds-selection-bar__clear {
+  border: var(--ds-border-width) solid currentColor;
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: inherit;
+  padding: var(--ds-space-1) var(--ds-space-3);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.ds-selection-bar__escalate:hover,
+.ds-selection-bar__clear:hover {
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+/* ------------------------------------------------------------- Pagination */
+
+.ds-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+}
+
+.ds-pagination__range {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-pagination__pages {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-pagination__page,
+.ds-pagination__step {
+  display: inline-block;
+  min-width: 2rem;
+  padding: var(--ds-space-1) var(--ds-space-2);
+  border: var(--ds-border-width) solid transparent;
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-ink);
+  font-size: 0.8125rem;
+  text-align: center;
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-pagination__page:hover,
+.ds-pagination__step:hover {
+  border-color: var(--ds-border);
+}
+
+.ds-pagination__page--current {
+  border-color: var(--ds-border-strong);
+  font-weight: 650;
+}
+
+.ds-pagination__step[aria-disabled='true'] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.ds-pagination__gap {
+  color: var(--ds-ink-muted);
+}
+
+/* -------------------------------------------------------- Workbench layout */
+
+.ds-workbench {
+  display: grid;
+  grid-template-columns: minmax(12rem, 15rem) minmax(0, 1fr);
+  gap: var(--ds-space-6);
+  align-items: start;
+}
+
+.ds-workbench__rail {
+  position: sticky;
+  top: calc(var(--ds-shell-header-height, 0px) + var(--ds-space-4));
+}
+
+.ds-workbench__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-4);
+  /* Without this, a wide table stretches the grid column and the page scrolls sideways. */
+  min-width: 0;
+}
+
+@media (max-width: 60rem) {
+  .ds-workbench {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ds-workbench__rail {
+    position: static;
+  }
+}
+
+/* ------------------------------------------------------- Command palette */
+
+.ds-command-palette::backdrop {
+  background: var(--ds-overlay);
+}
+
+.ds-command-palette {
+  width: min(100% - 2rem, 36rem);
+  /* Anchored high rather than centred: the eye is already at the top of the shell when ⌘K
+     fires, and a centred panel makes every invocation a saccade down and back. */
+  margin: min(12vh, 6rem) auto auto;
+  padding: 0;
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+}
+
+.ds-command-palette__panel {
+  display: flex;
+  flex-direction: column;
+  max-height: min(60vh, 30rem);
+}
+
+.ds-command-palette__input {
+  padding: var(--ds-space-4);
+  border: 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 1rem;
+}
+
+.ds-command-palette__input:focus-visible {
+  outline: none;
+  border-bottom-color: var(--ds-border-strong);
+}
+
+.ds-command-palette__list {
+  margin: 0;
+  padding: var(--ds-space-2) 0;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.ds-command-palette__group-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-command-palette__group {
+  margin: 0;
+  padding: var(--ds-space-2) var(--ds-space-4) var(--ds-space-1);
+  color: var(--ds-ink-muted);
+  font-size: 0.6875rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ds-command-palette__option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
+  padding: var(--ds-space-2) var(--ds-space-4);
+  cursor: pointer;
+  font-size: 0.9375rem;
+}
+
+/* The highlighted row carries a rule as well as a tint, so it survives greyscale and
+   high-contrast modes where the fill alone would vanish. */
+.ds-command-palette__option.is-active {
+  background: var(--ds-canvas);
+  box-shadow: inset 2px 0 0 var(--ds-border-strong);
+}
+
+.ds-command-palette__option-hint {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.ds-command-palette__empty {
+  padding: var(--ds-space-4);
+  color: var(--ds-ink-muted);
+  font-size: 0.875rem;
+}

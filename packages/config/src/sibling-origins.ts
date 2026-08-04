@@ -14,7 +14,6 @@ export type SiblingOriginEnv = {
   readonly NODE_ENV?: string;
 };
 
-
 function isDevelopment(env: SiblingOriginEnv): boolean {
   const appEnv = (env.NEXT_PUBLIC_APP_ENV ?? env.NODE_ENV ?? '').trim().toLowerCase();
   return appEnv === 'development' || appEnv === 'dev' || appEnv === 'test';

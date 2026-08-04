@@ -61,53 +61,55 @@ export type LaneRoutingPolicy = {
  * roster (see `rosterForTier`), but *which tier a lane gets* is decided here, not by whatever
  * happens to be set in the shell.
  */
-export const LANE_ROUTING_POLICY: Readonly<Record<ResearchLane, LaneRoutingPolicy>> = Object.freeze({
-  'research-intake': {
-    lane: 'research-intake',
-    tier: 'local-triage',
-    rationale:
-      'Mechanical extraction/dedup of a submitted URL/topic into a proposal — free roster ' +
-      'with local Ollama failover is sufficient; no editorial judgment is made here.',
+export const LANE_ROUTING_POLICY: Readonly<Record<ResearchLane, LaneRoutingPolicy>> = Object.freeze(
+  {
+    'research-intake': {
+      lane: 'research-intake',
+      tier: 'local-triage',
+      rationale:
+        'Mechanical extraction/dedup of a submitted URL/topic into a proposal — free roster ' +
+        'with local Ollama failover is sufficient; no editorial judgment is made here.',
+    },
+    'discovery-run': {
+      lane: 'discovery-run',
+      tier: 'local-triage',
+      rationale:
+        'Bounded adapter-candidate classification against an existing batch — mechanical, ' +
+        'free roster + Ollama failover; escalation is unnecessary because BB-039 bounds are ' +
+        'deterministic regardless of model quality.',
+    },
+    'editorial-enrichment': {
+      lane: 'editorial-enrichment',
+      tier: 'free-batch',
+      rationale:
+        'Editorial judge (keep/weed + draft prose) runs on the free roster by default; a low ' +
+        'confidence score or a disagreement between two free-roster passes escalates the same ' +
+        'item to paid-research rather than accepting a shaky free verdict.',
+      escalateBelowConfidence: 0.6,
+    },
+    'story-craft': {
+      lane: 'story-craft',
+      tier: 'quality-prose',
+      rationale:
+        'Multi-page, methodology-cited longform prose (900-1500 words, citation-gated) needs ' +
+        'the strongest paid roster; free models were not built for this length/quality bar.',
+    },
+    'theme-study': {
+      lane: 'theme-study',
+      tier: 'quality-prose',
+      rationale:
+        'Theme-impact narrative synthesis across a multi-source evidence graph is deep research ' +
+        'synthesis, not mechanical classification — paid roster.',
+    },
+    'case-drafting': {
+      lane: 'case-drafting',
+      tier: 'deterministic',
+      rationale:
+        'evaluateEvidenceChecklist/buildResearchCasePreview (packages/domain/src/research-case/' +
+        'workflow.ts) are pure deterministic functions today; no model call exists on this lane.',
+    },
   },
-  'discovery-run': {
-    lane: 'discovery-run',
-    tier: 'local-triage',
-    rationale:
-      'Bounded adapter-candidate classification against an existing batch — mechanical, ' +
-      'free roster + Ollama failover; escalation is unnecessary because BB-039 bounds are ' +
-      'deterministic regardless of model quality.',
-  },
-  'editorial-enrichment': {
-    lane: 'editorial-enrichment',
-    tier: 'free-batch',
-    rationale:
-      'Editorial judge (keep/weed + draft prose) runs on the free roster by default; a low ' +
-      'confidence score or a disagreement between two free-roster passes escalates the same ' +
-      'item to paid-research rather than accepting a shaky free verdict.',
-    escalateBelowConfidence: 0.6,
-  },
-  'story-craft': {
-    lane: 'story-craft',
-    tier: 'quality-prose',
-    rationale:
-      'Multi-page, methodology-cited longform prose (900-1500 words, citation-gated) needs ' +
-      'the strongest paid roster; free models were not built for this length/quality bar.',
-  },
-  'theme-study': {
-    lane: 'theme-study',
-    tier: 'quality-prose',
-    rationale:
-      'Theme-impact narrative synthesis across a multi-source evidence graph is deep research ' +
-      'synthesis, not mechanical classification — paid roster.',
-  },
-  'case-drafting': {
-    lane: 'case-drafting',
-    tier: 'deterministic',
-    rationale:
-      'evaluateEvidenceChecklist/buildResearchCasePreview (packages/domain/src/research-case/' +
-      'workflow.ts) are pure deterministic functions today; no model call exists on this lane.',
-  },
-});
+);
 
 /**
  * Free roster + local Ollama failover. `OPENROUTER_MODELS` is the source of truth for which
@@ -115,7 +117,10 @@ export const LANE_ROUTING_POLICY: Readonly<Record<ResearchLane, LaneRoutingPolic
  */
 export function rosterForTier(
   tier: RoutingTier,
-  options: { readonly paidRoster?: readonly string[]; readonly freeRoster?: readonly string[] } = {},
+  options: {
+    readonly paidRoster?: readonly string[];
+    readonly freeRoster?: readonly string[];
+  } = {},
 ): readonly string[] {
   switch (tier) {
     case 'local-triage':

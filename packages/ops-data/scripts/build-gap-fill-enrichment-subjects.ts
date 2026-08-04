@@ -123,8 +123,12 @@ async function main(): Promise<void> {
       concurrency,
       onItemComplete: (result, _index, total) => {
         completedCount += 1;
-        const src = (result as { corroboratingSourceUrl?: string }).corroboratingSourceUrl ? 'tier1' : 'source-only';
-        console.error(`[subjects ${completedCount}/${total}] ${(result as { title: string }).title} (${src})`);
+        const src = (result as { corroboratingSourceUrl?: string }).corroboratingSourceUrl
+          ? 'tier1'
+          : 'source-only';
+        console.error(
+          `[subjects ${completedCount}/${total}] ${(result as { title: string }).title} (${src})`,
+        );
       },
     },
   );

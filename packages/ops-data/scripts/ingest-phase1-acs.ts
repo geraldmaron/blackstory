@@ -263,8 +263,7 @@ async function main(): Promise<void> {
       countyStates,
       countyRowsParsed: countyResult.rowsParsed,
       stateRowsParsed: stateResult.rowsParsed,
-      note:
-        'County pull bounded to PHASE1_ACS_COUNTY_STATES (default: 12 high Black-population states). State unemployment is all states + territories.',
+      note: 'County pull bounded to PHASE1_ACS_COUNTY_STATES (default: 12 high Black-population states). State unemployment is all states + territories.',
     },
     fetchedObservations: allObservations.length,
     observationsByMetric: Object.fromEntries([...byMetric.entries()].sort()),
@@ -278,9 +277,7 @@ async function main(): Promise<void> {
 
   if (!apply) {
     console.log(JSON.stringify(summary, null, 2));
-    console.log(
-      'Dry-run only. Set INGEST_PHASE1_ACS_APPLY=1 DRY_RUN=0 DATABASE_URL=… to upsert.',
-    );
+    console.log('Dry-run only. Set INGEST_PHASE1_ACS_APPLY=1 DRY_RUN=0 DATABASE_URL=… to upsert.');
     return;
   }
 

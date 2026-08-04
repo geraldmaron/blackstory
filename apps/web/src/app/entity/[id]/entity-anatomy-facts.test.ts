@@ -4,10 +4,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { getPublicEntity } from '../../../data/public-seed';
-import {
-  buildEntityAnatomyInputs,
-  buildEntityAnatomyPlace,
-} from './entity-anatomy-facts';
+import { buildEntityAnatomyInputs, buildEntityAnatomyPlace } from './entity-anatomy-facts';
 
 function requireEntity(id: string) {
   const entity = getPublicEntity(id);
@@ -24,10 +21,7 @@ test('buildEntityAnatomyInputs resolves era from structured buckets before Undat
 
 test('buildEntityAnatomyInputs falls back to Place withheld when jurisdiction unknown', () => {
   const entity = requireEntity('ent_15th_st_church_001');
-  const inputs = buildEntityAnatomyInputs(
-    { ...entity, jurisdictionLabel: 'Unknown' },
-    undefined,
-  );
+  const inputs = buildEntityAnatomyInputs({ ...entity, jurisdictionLabel: 'Unknown' }, undefined);
   assert.equal(inputs.whereLabel, entity.locationLabel);
 });
 

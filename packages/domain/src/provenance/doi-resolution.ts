@@ -40,7 +40,11 @@ export type DoiFieldMismatch = {
 
 export type DoiResolutionResult =
   | { readonly outcome: 'match'; readonly resolved: ResolvedCitation }
-  | { readonly outcome: 'mismatch'; readonly resolved: ResolvedCitation; readonly mismatches: readonly DoiFieldMismatch[] }
+  | {
+      readonly outcome: 'mismatch';
+      readonly resolved: ResolvedCitation;
+      readonly mismatches: readonly DoiFieldMismatch[];
+    }
   | { readonly outcome: 'unresolved'; readonly doi: string; readonly reason: string };
 
 /** Case/punctuation-insensitive comparison: strips everything but letters/digits, lowercases. */
@@ -120,15 +124,17 @@ function parseOpenAlexWork(body: Record<string, unknown>): ResolvedCitation | nu
         ? firstString((author as Record<string, unknown>).display_name)
         : null;
     // OpenAlex gives a full display name, not a structured surname; take the last token.
-    firstAuthorSurname = displayName ? displayName.trim().split(/\s+/).pop() ?? null : null;
+    firstAuthorSurname = displayName ? (displayName.trim().split(/\s+/).pop() ?? null) : null;
   }
 
   const primaryLocation = body.primary_location;
   const venue =
     primaryLocation && typeof primaryLocation === 'object'
       ? firstString(
-          ((primaryLocation as Record<string, unknown>).source as Record<string, unknown> | undefined)
-            ?.display_name,
+          (
+            (primaryLocation as Record<string, unknown>).source as
+              Record<string, unknown> | undefined
+          )?.display_name,
         )
       : null;
 

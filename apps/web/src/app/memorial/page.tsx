@@ -28,11 +28,13 @@ import { MEMORIAL_NAMES } from '../../components/patterns/memorial-wall/memorial
 import { listPublicEntityViews } from '../../lib/public-data/source';
 import { OffRamp, Room, RoomHeader } from '../../components/room';
 import { MemorialSections } from './MemorialSections';
+import { MemorialScrollCue } from './MemorialScrollCue';
 import {
   MEMORIAL_HELD_MESSAGE_LINES,
   MEMORIAL_KICKER,
   MEMORIAL_PAGE_DESCRIPTION,
   MEMORIAL_PAGE_TITLE,
+  MEMORIAL_QUIET_LIST_LINK_A11Y_LABEL,
   MEMORIAL_QUIET_LIST_LINK_LABEL,
 } from './memorial-copy';
 import { MEMORIAL_EDITION_WALL_SEED, memorialEditionRootClassName } from './memorial-panel-chrome';
@@ -65,6 +67,17 @@ export default async function MemorialPage() {
         messageLines={MEMORIAL_HELD_MESSAGE_LINES}
         entityLinksByName={entityLinksByName}
       />
+      {/* Positioned by MemorialWallAtmosphere at runtime, anchored to the held
+          message's actual measured bottom edge — a sibling of the wall (not
+          nested in the opening column) so it shares the wall's coordinate
+          frame. Kept as a real, keyboard-reachable link; the wall itself
+          stays aria-hidden. */}
+      <MemorialScrollCue
+        targetId="memorial-names"
+        label={MEMORIAL_QUIET_LIST_LINK_LABEL}
+        accessibleLabel={MEMORIAL_QUIET_LIST_LINK_A11Y_LABEL}
+        className="ds-memorial-edition__scroll-cue"
+      />
       <Room>
         <div className="ds-memorial-edition__opening">
           <RoomHeader
@@ -73,9 +86,6 @@ export default async function MemorialPage() {
             title={MEMORIAL_PAGE_TITLE}
             showPath={false}
           />
-          <p className="ds-memorial-edition__scroll-cue">
-            <a href="#memorial-names">{MEMORIAL_QUIET_LIST_LINK_LABEL}</a>
-          </p>
         </div>
 
         <MemorialSections entityLinksByName={entityLinksByName} />

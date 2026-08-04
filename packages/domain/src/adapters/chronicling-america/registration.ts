@@ -2,10 +2,7 @@
  * Disabled-by-default registry registration for the Chronicling America adapter.
  */
 import type { EvidenceSource } from '../../provenance/source.js';
-import {
-  registerSource,
-  type SourceRegistryStore,
-} from '../registry.js';
+import { registerSource, type SourceRegistryStore } from '../registry.js';
 import type { SourceRegistryEntry } from '../types.js';
 import { createChroniclingAmericaAdapterContract } from './contract.js';
 import { chroniclingAmericaAdapterDefinition } from './definition.js';

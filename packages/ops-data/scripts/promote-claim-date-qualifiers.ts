@@ -51,7 +51,9 @@ function connectionString(): string {
 }
 
 function qualifierId(claimVersionId: string, property: string): string {
-  const digest = createHash('sha256').update(`${claimVersionId}|temporal|${property}`).digest('hex');
+  const digest = createHash('sha256')
+    .update(`${claimVersionId}|temporal|${property}`)
+    .digest('hex');
   return `cq_${digest.slice(0, 24)}`;
 }
 
@@ -115,7 +117,10 @@ function planPromotions(
   return planned;
 }
 
-async function applyPromotions(client: pg.PoolClient, rows: readonly PromotionPlanRow[]): Promise<number> {
+async function applyPromotions(
+  client: pg.PoolClient,
+  rows: readonly PromotionPlanRow[],
+): Promise<number> {
   let inserted = 0;
   for (const row of rows) {
     const result = await client.query(

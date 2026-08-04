@@ -76,7 +76,9 @@ async function fetchAndMap(
   }
   const payload = (await response.json()) as readonly (readonly (string | null)[])[];
   const { rows, rejected } = parsePhase1AcsResponse(vintage, payload, geography);
-  const observations = rows.flatMap((row) => mapPhase1AcsRowToObservations(row, vintage, retrievedAt));
+  const observations = rows.flatMap((row) =>
+    mapPhase1AcsRowToObservations(row, vintage, retrievedAt),
+  );
   return { vintage, geography, observations, rejected, rowsParsed: rows.length };
 }
 

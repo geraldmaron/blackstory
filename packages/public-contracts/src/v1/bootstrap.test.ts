@@ -10,7 +10,11 @@ test('round-trips a valid bootstrap response', () => {
 
 test('accepts a bootstrap response with searchIndexVersion/contentVersion absent (N-1 shape)', () => {
   const fixture = loadFixture<Record<string, unknown>>('bootstrap.v1.current.json');
-  const { searchIndexVersion: _searchIndexVersion, contentVersion: _contentVersion, ...legacyShape } = fixture;
+  const {
+    searchIndexVersion: _searchIndexVersion,
+    contentVersion: _contentVersion,
+    ...legacyShape
+  } = fixture;
   assert.deepEqual(bootstrapResponseV1Schema.parse(legacyShape), legacyShape);
 });
 

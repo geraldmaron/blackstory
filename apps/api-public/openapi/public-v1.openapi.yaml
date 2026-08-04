@@ -294,7 +294,13 @@ components:
     CompatibilityCheckV1:
       type: object
       required:
-        [supported, currentApiVersion, minSupportedApiVersion, deprecationWindowDays, softDeprecated]
+        [
+          supported,
+          currentApiVersion,
+          minSupportedApiVersion,
+          deprecationWindowDays,
+          softDeprecated,
+        ]
       properties:
         supported: { type: boolean }
         currentApiVersion: { type: string, example: v1 }

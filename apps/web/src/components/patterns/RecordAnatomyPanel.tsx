@@ -48,9 +48,7 @@ function whereFactValue(
   }
 
   const placeLabel =
-    typeof fact.value === 'string' && fact.value.trim().length > 0
-      ? fact.value
-      : place.label;
+    typeof fact.value === 'string' && fact.value.trim().length > 0 ? fact.value : place.label;
 
   return (
     <MapsExternalLink
@@ -109,9 +107,7 @@ export function RecordAnatomyPanel({
                 />
                 {fact.label}
               </dt>
-              <dd className="ds-record-anatomy__fact-value">
-                {whereFactValue(fact, place)}
-              </dd>
+              <dd className="ds-record-anatomy__fact-value">{whereFactValue(fact, place)}</dd>
             </div>
           ))}
         </dl>

@@ -406,9 +406,7 @@ export type RunNetworkTraversalCampaignInput = {
    * Optional injected reader (fixtures in tests; a safe-fetch/DB-backed reader in production).
    * When provided it wins over `relationships`. This module performs no I/O itself.
    */
-  readonly readRelationships?: (
-    seedEntityId: string,
-  ) => readonly NetworkRelationshipRecord[];
+  readonly readRelationships?: (seedEntityId: string) => readonly NetworkRelationshipRecord[];
   readonly catalogProfiles: readonly ResolutionProfile[];
   readonly catalogContext?: ResolutionContext;
   /** Reference titles for the obscurity IDF corpus. */
@@ -464,12 +462,8 @@ export function runNetworkTraversalCampaign(
   );
   const classifications = classifyNetworkTargets(targets, catalogMatchFn);
 
-  const proposedMatchCount = classifications.filter(
-    (c) => c.outcome === 'proposed_match',
-  ).length;
-  const reviewRequiredCount = classifications.filter(
-    (c) => c.outcome === 'review_required',
-  ).length;
+  const proposedMatchCount = classifications.filter((c) => c.outcome === 'proposed_match').length;
+  const reviewRequiredCount = classifications.filter((c) => c.outcome === 'review_required').length;
 
   const unknownTargetsAll = classifications
     .filter((c) => c.outcome === 'no_match')

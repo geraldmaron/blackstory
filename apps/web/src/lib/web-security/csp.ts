@@ -21,6 +21,16 @@ export type CspBuildOptions = {
 /** MapLibre demo tiles (fallback) + OpenFreeMap streets/fonts for the archive basemap. */
 const MAP_TILE_SRC = ['https://demotiles.maplibre.org', 'https://tiles.openfreemap.org'];
 
+/**
+ * USGS National Map aerial imagery — the satellite basemap (`?sat=1`).
+ *
+ * Kept out of `MAP_TILE_SRC` deliberately: that list also feeds `font-src`, and this host serves
+ * raster tiles only. MapLibre fetches raster tiles through the image pipeline, so this needs
+ * img-src; it is in connect-src too because the WebGL path reads some tiles via fetch rather
+ * than an `Image`, and a miss there fails as a silently blank basemap rather than an error.
+ */
+const SATELLITE_TILE_SRC = ['https://basemap.nationalmap.gov'];
+
 /** Public entity/media objects (GCS dual-serve + Supabase Storage public-media). */
 const PUBLIC_MEDIA_IMG_SRC = [
   'https://storage.googleapis.com',
@@ -52,11 +62,12 @@ const DEFAULT_IMG_SRC = [
   'data:',
   'blob:',
   ...MAP_TILE_SRC,
+  ...SATELLITE_TILE_SRC,
   ...PUBLIC_MEDIA_IMG_SRC,
   ...ARTICLE_MEDIA_IMG_SRC,
   ...BOOK_COVER_IMG_SRC,
 ];
-const DEFAULT_CONNECT_SRC = ["'self'", ...MAP_TILE_SRC];
+const DEFAULT_CONNECT_SRC = ["'self'", ...MAP_TILE_SRC, ...SATELLITE_TILE_SRC];
 const DEFAULT_FONT_SRC = ["'self'", ...MAP_TILE_SRC];
 
 /** Build a semicolon-delimited CSP header value.  */
@@ -73,7 +84,9 @@ export function buildContentSecurityPolicy(options: CspBuildOptions = {}): strin
   // Next.js App Router ships RSC flight data in inline <script> tags without nonces.
   // Production must allow 'unsafe-inline' until a per-request nonce pipeline lands
   // (see tracker follow-up for nonce + strict-dynamic). Dev still needs 'unsafe-eval' for HMR.
-  const scriptSrc = isDev ? ["'self'", "'unsafe-inline'", "'unsafe-eval'"] : ["'self'", "'unsafe-inline'"];
+  const scriptSrc = isDev
+    ? ["'self'", "'unsafe-inline'", "'unsafe-eval'"]
+    : ["'self'", "'unsafe-inline'"];
   const workerSrc = ["'self'", 'blob:'];
   const resolvedConnectSrc = isDev ? [...connectSrc, 'ws:', 'wss:'] : connectSrc;
 

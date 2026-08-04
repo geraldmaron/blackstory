@@ -233,11 +233,7 @@ export function markerRadiusExpression(): ExpressionSpecification {
  * Offset is multiplied by the zoom scale so national frames do not grow a fixed px wash
  * around every shrunk disc (that read as a mass lit/refresh state). */
 export function markerRadiusPlusExpression(offset: number): ExpressionSpecification {
-  return zoomScaledRadiusExpression((dataRadius, scale) => [
-    '*',
-    ['+', dataRadius, offset],
-    scale,
-  ]);
+  return zoomScaledRadiusExpression((dataRadius, scale) => ['*', ['+', dataRadius, offset], scale]);
 }
 
 /** `markerRadiusPlusExpression()` with an additional flat `extraScale` multiplier baked into

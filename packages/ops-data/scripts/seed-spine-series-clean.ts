@@ -457,8 +457,7 @@ async function main() {
             value_from: 1377,
             value_to: 1818,
             divergence_pct: Number((((1818 - 1377) / 1377) * 100).toFixed(2)),
-            note:
-              'Possible all-ages vs adults-18+ basis mismatch between two legitimate BJS tables; not yet reconciled. Also: 1978-2009 is a real, unfilled gap (repo-77sl).',
+            note: 'Possible all-ages vs adults-18+ basis mismatch between two legitimate BJS tables; not yet reconciled. Also: 1978-2009 is a real, unfilled gap (repo-77sl).',
           },
         },
       ],
@@ -614,7 +613,16 @@ async function main() {
         `INSERT INTO bb_reference.spine_series
            (spine_id, title, outcome, race_ethnicity_slice, geography_type, unit, definition, comparability_note, theme, status)
          VALUES ($1,$2,$3,$4,'nation',$5,$6,$7,$8,'review')`,
-        [s.spineId, s.title, s.outcome, s.raceSlice, s.unit, s.definition, s.comparabilityNote, s.theme],
+        [
+          s.spineId,
+          s.title,
+          s.outcome,
+          s.raceSlice,
+          s.unit,
+          s.definition,
+          s.comparabilityNote,
+          s.theme,
+        ],
       );
       let i = 0;
       for (const seg of s.segments) {
@@ -638,7 +646,9 @@ async function main() {
     }
 
     await client.query('COMMIT');
-    console.log(`\nApplied: SCF ratio (${scfRatio.length} obs + derived), ${spines.length} spines, ${plan.segmentCount} segments.`);
+    console.log(
+      `\nApplied: SCF ratio (${scfRatio.length} obs + derived), ${spines.length} spines, ${plan.segmentCount} segments.`,
+    );
   } catch (e) {
     await client.query('ROLLBACK');
     throw e;

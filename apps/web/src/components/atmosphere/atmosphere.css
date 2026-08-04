@@ -61,12 +61,12 @@
 }
 
 .ds-story-mast__plane {
-  z-index: 0;
+  z-index: 0; /* local: masthead paint order, not a global tier */
 }
 
 .ds-story-mast__inner {
   position: relative;
-  z-index: 1;
+  z-index: 1; /* local: masthead paint order, not a global tier */
 }
 
 .ds-story-mast .ds-page__eyebrow {
@@ -200,7 +200,7 @@
 .ds-atmosphere__cell--link:focus-visible {
   outline: 2px solid var(--ds-fixed-accent);
   outline-offset: -2px;
-  z-index: 2;
+  z-index: 2; /* local: pops the focused cell above its unfocused siblings, not a global tier */
 }
 
 .ds-atmosphere__tile-layer {
@@ -221,12 +221,12 @@
 
 .ds-atmosphere__tile-layer--over {
   opacity: 1;
-  z-index: 1;
+  z-index: 1; /* local: crossfade paint order between the two tile layers, not a global tier */
 }
 
 .ds-atmosphere__tile-layer--under {
   opacity: 0;
-  z-index: 0;
+  z-index: 0; /* local: crossfade paint order between the two tile layers, not a global tier */
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -261,7 +261,7 @@
 }
 
 .ds-about-mast__plane {
-  z-index: 0;
+  z-index: 0; /* local: masthead paint order, not a global tier */
 }
 
 .ds-about-mast .ds-atmosphere__mosaic--living {
@@ -278,7 +278,7 @@
 
 .ds-about-mast__inner {
   position: relative;
-  z-index: 2;
+  z-index: 2; /* local: masthead paint order, not a global tier */
   width: 100%;
   /* Let mosaic tiles remain clickable beside the thesis plate. */
   pointer-events: none;
@@ -727,7 +727,7 @@
 .ds-map-names-wall {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 0; /* local: paints strictly under the MapLibre canvas, not a global tier */
   overflow: hidden;
   pointer-events: none;
   user-select: none;
@@ -764,12 +764,12 @@
 
 .ds-map-names-wall__layer--over {
   opacity: 1;
-  z-index: 1;
+  z-index: 1; /* local: crossfade paint order between the two name layers, not a global tier */
 }
 
 .ds-map-names-wall__layer--under {
   opacity: 0;
-  z-index: 0;
+  z-index: 0; /* local: crossfade paint order between the two name layers, not a global tier */
 }
 
 .ds-map-names-wall__name {

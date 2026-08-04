@@ -41,11 +41,10 @@ const REDLINING_LINKED_STATUTES: readonly ThemeImpactLinkedStatuteView[] = [
   },
 ] as const;
 
-const LINKED_STATUTES_BY_THEME: Readonly<
-  Record<string, readonly ThemeImpactLinkedStatuteView[]>
-> = {
-  redlining: REDLINING_LINKED_STATUTES,
-};
+const LINKED_STATUTES_BY_THEME: Readonly<Record<string, readonly ThemeImpactLinkedStatuteView[]>> =
+  {
+    redlining: REDLINING_LINKED_STATUTES,
+  };
 
 export function listThemeImpactLinkedStatutes(
   themeId: string,

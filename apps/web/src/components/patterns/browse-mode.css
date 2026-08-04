@@ -46,7 +46,7 @@
 .ds-browse-mode-toggle__option:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
   outline-offset: -2px;
-  z-index: 1;
+  z-index: 1; /* local: pops the focused option above its unfocused siblings, not a global tier */
 }
 
 .ds-record-browse {

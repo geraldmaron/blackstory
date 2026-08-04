@@ -67,8 +67,7 @@ export function lintKindHygiene(input: KindHygieneLintInput): KindHygieneLintRep
         entityId: input.entityId,
         severity: 'error',
         code: 'person_as_event',
-        message:
-          'Entity is kind=event but matches person-shaped discovery or lifecycle signals.',
+        message: 'Entity is kind=event but matches person-shaped discovery or lifecycle signals.',
       });
     }
   }

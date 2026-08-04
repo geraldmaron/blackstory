@@ -22,7 +22,7 @@ Readers should be able to walk a release set sequentially or sample it randomly 
 | `apps/web/src/components/patterns/browse-mode.css` | `ds-browse-mode-toggle*` and `ds-record-browse*` tokens |
 | `apps/web/src/components/patterns/home-featured-set.ts` | Home-only release set builder (curated ids first, then full release) |
 
-Import `browse-mode.css` once per route bundle that renders the controls (home imports it from `app/(map)/page.tsx`).
+Import `browse-mode.css` once per route bundle that renders the controls (home imports it from `app/page.tsx`).
 
 ---
 

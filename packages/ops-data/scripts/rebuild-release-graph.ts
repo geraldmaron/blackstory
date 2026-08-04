@@ -26,7 +26,10 @@ import {
   formatReleaseGraphAuditLog,
   rebuildReleaseGraphForRelease,
 } from './lib/release-graph-publish.ts';
-import { runPublishRegressionGates, publishRegressionFailureMessage } from './lib/publish-regression-gates.ts';
+import {
+  runPublishRegressionGates,
+  publishRegressionFailureMessage,
+} from './lib/publish-regression-gates.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(SCRIPT_DIR, '../../..');
@@ -98,7 +101,9 @@ async function main(): Promise<void> {
     console.log(`Report: ${REPORT_PATH}`);
 
     if (DRY_RUN) {
-      console.log('DRY_RUN=1 (default): no database writes. Set DRY_RUN=0 RELEASE_GRAPH_APPLY=1 to apply.');
+      console.log(
+        'DRY_RUN=1 (default): no database writes. Set DRY_RUN=0 RELEASE_GRAPH_APPLY=1 to apply.',
+      );
       return;
     }
     if (!APPLY) {

@@ -53,12 +53,18 @@ const VALID_RECORD: CanonicalPromotionRecord = {
   topicIds: ['reconstruction'],
   topicTags: ['mutual-aid'],
   eraBuckets: ['1880s', '2000s'],
-  location: { lat: 39.06, lng: -76.87, label: 'Test Hall', precision: 'block', matchMethod: 'test' },
+  location: {
+    lat: 39.06,
+    lng: -76.87,
+    label: 'Test Hall',
+    precision: 'block',
+    matchMethod: 'test',
+  },
   sources: [
     {
       title: 'Source A',
       url: 'https://a.example.gov/test-hall',
-      excerpt: 'A' .repeat(80),
+      excerpt: 'A'.repeat(80),
       fitness: 'authoritative',
     },
     {
@@ -103,7 +109,10 @@ test('validateCanonicalPromotionRecord rejects two sources from the same host', 
 test('validateCanonicalPromotionRecord rejects a non-https source', () => {
   const result = validateCanonicalPromotionRecord({
     ...VALID_RECORD,
-    sources: [{ ...VALID_RECORD.sources[0]!, url: 'http://a.example.gov/test-hall' }, VALID_RECORD.sources[1]!],
+    sources: [
+      { ...VALID_RECORD.sources[0]!, url: 'http://a.example.gov/test-hall' },
+      VALID_RECORD.sources[1]!,
+    ],
   });
   assert.ok(result.reasons.includes('invalid_source'));
 });
@@ -135,7 +144,13 @@ test('validateCanonicalPromotionRecord ignores location-only sources for the ind
     sources: [
       VALID_RECORD.sources[0]!,
       VALID_RECORD.sources[1]!,
-      { title: 'Map', url: 'https://maps.example.net/pin', excerpt: 'D'.repeat(80), fitness: 'weak', locationOnly: true },
+      {
+        title: 'Map',
+        url: 'https://maps.example.net/pin',
+        excerpt: 'D'.repeat(80),
+        fitness: 'weak',
+        locationOnly: true,
+      },
     ],
   });
   assert.deepEqual(result, { valid: true, reasons: [] });

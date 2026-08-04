@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { API_VERSION, DEPRECATION_WINDOW_DAYS, MIN_SUPPORTED_API_VERSION, isKnownApiVersion } from './version.js';
+import {
+  API_VERSION,
+  DEPRECATION_WINDOW_DAYS,
+  MIN_SUPPORTED_API_VERSION,
+  isKnownApiVersion,
+} from './version.js';
 
 test('API_VERSION and MIN_SUPPORTED_API_VERSION are both v1 today', () => {
   assert.equal(API_VERSION, 'v1');

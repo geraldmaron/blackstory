@@ -27,10 +27,7 @@ import {
 import { bootstrapResponseV1Schema } from '@repo/public-contracts/v1/bootstrap';
 import { entityV1Schema } from '@repo/public-contracts/v1/entity';
 import { mapSourceV1Schema } from '@repo/public-contracts/v1/map';
-import {
-  searchResponseV1Schema,
-  type SearchResponseV1,
-} from '@repo/public-contracts/v1/search';
+import { searchResponseV1Schema, type SearchResponseV1 } from '@repo/public-contracts/v1/search';
 import { evaluateCompatibility } from '@repo/public-contracts/v1/compatibility';
 import {
   API_VERSION,
@@ -39,7 +36,7 @@ import {
 } from '@repo/public-contracts/version';
 import { health } from '../index.js';
 import type { createPublicRateLimitGuard } from '../rate-limits.js';
-import type { createPublicSearchGuard} from '../search-guardrails.js';
+import type { createPublicSearchGuard } from '../search-guardrails.js';
 import { type PublicSearchHttpQuery } from '../search-guardrails.js';
 import { buildMapSourceV1 } from './build-map-source-v1.js';
 import type { PublicDataAccess } from './data-access.js';
@@ -59,9 +56,9 @@ export type ApiRequest = {
 
 export type HandlerDeps = {
   readonly dataAccess: PublicDataAccess;
-  readonly clientAttestationGuard: (
-    request: { readonly headers: ClientAttestationHeaders },
-  ) => Promise<ClientAttestationDecision>;
+  readonly clientAttestationGuard: (request: {
+    readonly headers: ClientAttestationHeaders;
+  }) => Promise<ClientAttestationDecision>;
   readonly rateLimitGuard: ReturnType<typeof createPublicRateLimitGuard>;
   readonly searchGuard: ReturnType<typeof createPublicSearchGuard>;
 };
@@ -95,7 +92,10 @@ function enforceClientFloor(request: ApiRequest): ApiResponse | null {
     'This app version is no longer supported. Please update to continue.',
     {
       requestId: request.requestId,
-      details: { minSupportedApiVersion: MIN_SUPPORTED_API_VERSION, currentApiVersion: API_VERSION },
+      details: {
+        minSupportedApiVersion: MIN_SUPPORTED_API_VERSION,
+        currentApiVersion: API_VERSION,
+      },
     },
   );
 }
@@ -159,7 +159,10 @@ export function handleCompatibility(request: ApiRequest): ApiResponse {
 // GET /v1/bootstrap
 // ---------------------------------------------------------------------------
 
-export async function handleBootstrap(request: ApiRequest, deps: HandlerDeps): Promise<ApiResponse> {
+export async function handleBootstrap(
+  request: ApiRequest,
+  deps: HandlerDeps,
+): Promise<ApiResponse> {
   const floor = enforceClientFloor(request);
   if (floor) return floor;
 

@@ -41,7 +41,7 @@ test('the Atlas must not request the ambient morph on patchData', () => {
   // decade-transition.ts; the ambient morph belongs to surfaces that move the camera on their
   // own. The helpers below stay exercised by the unit tests in this file.
   const atlasSource = readFileSync(
-    new URL('../(map)/explore/AtlasExperience.tsx', import.meta.url),
+    new URL('../explore/AtlasExperience.tsx', import.meta.url),
     'utf8',
   );
   assert.doesNotMatch(atlasSource, /from ['"][^'"]*decade-layer-transition['"]/);

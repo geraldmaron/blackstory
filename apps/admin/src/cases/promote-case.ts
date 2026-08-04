@@ -109,7 +109,13 @@ async function insertSourceAndEvidence(
     `INSERT INTO bb_evidence.source_items (id, source_id, stable_identifier, title, url, metadata)
      VALUES ($1, $2, $3, $4, $3, $5::jsonb)
      ON CONFLICT (id) DO NOTHING`,
-    [itemId, sourceId, source.url, source.title, JSON.stringify({ validatedAt: nowIso, validatedBy: approverUid })],
+    [
+      itemId,
+      sourceId,
+      source.url,
+      source.title,
+      JSON.stringify({ validatedAt: nowIso, validatedBy: approverUid }),
+    ],
   );
   await client.query(
     `INSERT INTO bb_evidence.evidence_records (id, source_item_id, rights_status, excerpt, lineage_root_id, metadata)
@@ -139,9 +145,13 @@ async function insertCanonicalRecord(
   nowIso: string,
 ): Promise<PromoteCaseResult> {
   const { record, caseId, approverUid } = input;
-  const evidence: { evidenceId: string; source: CanonicalPromotionRecord['sources'][number] }[] = [];
+  const evidence: { evidenceId: string; source: CanonicalPromotionRecord['sources'][number] }[] =
+    [];
   for (const source of record.sources) {
-    evidence.push({ ...(await insertSourceAndEvidence(client, source, approverUid, nowIso)), source });
+    evidence.push({
+      ...(await insertSourceAndEvidence(client, source, approverUid, nowIso)),
+      source,
+    });
   }
   const supportingEvidence = evidence.filter(({ source }) => !source.locationOnly);
   const allEvidenceIds = evidence.map((item) => item.evidenceId);
@@ -275,7 +285,11 @@ async function insertCanonicalRecord(
           source: new URL(source.url).hostname,
           role: source.locationOnly ? 'contextual' : 'supporting',
         })),
-        provenance: { method: 'admin_case_promotion', validatedAt: nowIso, validatedBy: approverUid },
+        provenance: {
+          method: 'admin_case_promotion',
+          validatedAt: nowIso,
+          validatedBy: approverUid,
+        },
         limitations: {
           sourceCapturePresent: false,
           supportingExcerptPresent: true,
@@ -399,7 +413,13 @@ export async function promoteCaseToCanonical(input: PromoteCaseInput): Promise<P
   return withPostgresTransaction(async (client) => {
     await ensureNoCatalogDuplicate(client, input.record);
     const inserted = await insertCanonicalRecord(client, input, nowIso);
-    const auditEventId = await recordCaseHistoryAndAudit(client, input, detail.state, inserted, nowIso);
+    const auditEventId = await recordCaseHistoryAndAudit(
+      client,
+      input,
+      detail.state,
+      inserted,
+      nowIso,
+    );
     return { ...inserted, auditEventId };
   });
 }

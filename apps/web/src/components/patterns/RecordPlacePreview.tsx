@@ -33,9 +33,7 @@ export function RecordPlacePreview(props: RecordPlacePreviewProps) {
   const { caption: _caption, lat, lng, label, ...mapProps } = props;
   void _caption;
   const mapsHref = buildExternalMapsSearchUrl({ lat, lng });
-  const map = (
-    <EntityLocationMap lat={lat} lng={lng} label={label} {...mapProps} />
-  );
+  const map = <EntityLocationMap lat={lat} lng={lng} label={label} {...mapProps} />;
 
   return (
     <figure className="ds-record-anatomy__place">

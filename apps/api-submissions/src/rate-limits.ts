@@ -104,9 +104,7 @@ export function createSubmissionsRateLimitGuard(options: SubmissionsRateLimitGua
         ...(request.appCheckVerified !== undefined
           ? { appCheckVerified: request.appCheckVerified }
           : {}),
-        ...(request.clientAttested !== undefined
-          ? { clientAttested: request.clientAttested }
-          : {}),
+        ...(request.clientAttested !== undefined ? { clientAttested: request.clientAttested } : {}),
         ...(request.riskSignals ? { riskSignals: request.riskSignals } : {}),
       });
 

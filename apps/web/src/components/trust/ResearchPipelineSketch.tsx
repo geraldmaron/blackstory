@@ -642,35 +642,35 @@ export function ResearchPipelineSketch({ compact = false }: ResearchPipelineSket
       </svg>
 
       <ol className="ds-pipeline-sketch__legend">
-          <li>
-            <span className="ds-pipeline-sketch__legend-mark">01</span>
-            <span>
-              Curated sources are registered and rights-checked; broad-net leads (including community
-              forums) only surface candidates.
-            </span>
-          </li>
-          <li>
-            <span className="ds-pipeline-sketch__legend-mark">02</span>
-            <span>
-              Fragments assemble like puzzle pieces — citations, place, and claims — through dedup
-              and quarantine, not a single scrape dump.
-            </span>
-          </li>
-          <li>
-            <span className="ds-pipeline-sketch__legend-mark">03</span>
-            <span>
-              Local models on a private home server run a first pass; paid models deepen research.
-              Both stage drafts for people — they never write the public projection.
-            </span>
-          </li>
-          <li>
-            <span className="ds-pipeline-sketch__legend-mark">04</span>
-            <span>
-              Vectors help search and near-duplicate screening; provenance travels with every claim.
-              Human verification and the publish gate decide what readers see.
-            </span>
-          </li>
-        </ol>
+        <li>
+          <span className="ds-pipeline-sketch__legend-mark">01</span>
+          <span>
+            Curated sources are registered and rights-checked; broad-net leads (including community
+            forums) only surface candidates.
+          </span>
+        </li>
+        <li>
+          <span className="ds-pipeline-sketch__legend-mark">02</span>
+          <span>
+            Fragments assemble like puzzle pieces — citations, place, and claims — through dedup and
+            quarantine, not a single scrape dump.
+          </span>
+        </li>
+        <li>
+          <span className="ds-pipeline-sketch__legend-mark">03</span>
+          <span>
+            Local models on a private home server run a first pass; paid models deepen research.
+            Both stage drafts for people — they never write the public projection.
+          </span>
+        </li>
+        <li>
+          <span className="ds-pipeline-sketch__legend-mark">04</span>
+          <span>
+            Vectors help search and near-duplicate screening; provenance travels with every claim.
+            Human verification and the publish gate decide what readers see.
+          </span>
+        </li>
+      </ol>
     </figure>
   );
 }
@@ -686,10 +686,10 @@ export function SourceTypesSketch() {
         Source types (sketch) — proximity to the event, not volume
       </figcaption>
       <p className="ds-visually-hidden" id={descId}>
-        Authority sources include government records, archives, museums, libraries, and peer-reviewed
-        scholarship. Discovery sources include news reportage, encyclopedias, web search hits,
-        Reddit and forums, and self-published community feeds. Discovery never outranks primary
-        evidence on disputed facts.
+        Authority sources include government records, archives, museums, libraries, and
+        peer-reviewed scholarship. Discovery sources include news reportage, encyclopedias, web
+        search hits, Reddit and forums, and self-published community feeds. Discovery never outranks
+        primary evidence on disputed facts.
       </p>
       <svg
         className="ds-pipeline-sketch__svg"
@@ -783,7 +783,11 @@ export function SourceTypesSketch() {
              C 444 126, 424 118, 428 104
              C 414 98, 418 82, 430 78 Z"
         />
-        <text className="ds-pipeline-sketch__label ds-pipeline-sketch__label--center" x="458" y="96">
+        <text
+          className="ds-pipeline-sketch__label ds-pipeline-sketch__label--center"
+          x="458"
+          y="96"
+        >
           Reddit
         </text>
 
@@ -797,7 +801,11 @@ export function SourceTypesSketch() {
              C 552 120, 532 112, 536 98
              C 522 92, 526 76, 540 70 Z"
         />
-        <text className="ds-pipeline-sketch__label ds-pipeline-sketch__label--center" x="566" y="88">
+        <text
+          className="ds-pipeline-sketch__label ds-pipeline-sketch__label--center"
+          x="566"
+          y="88"
+        >
           Forums
         </text>
 
@@ -811,7 +819,11 @@ export function SourceTypesSketch() {
              C 444 200, 424 192, 428 178
              C 414 172, 418 156, 430 150 Z"
         />
-        <text className="ds-pipeline-sketch__label ds-pipeline-sketch__label--center" x="458" y="168">
+        <text
+          className="ds-pipeline-sketch__label ds-pipeline-sketch__label--center"
+          x="458"
+          y="168"
+        >
           Web search
         </text>
 
@@ -825,7 +837,11 @@ export function SourceTypesSketch() {
              C 552 192, 532 184, 536 170
              C 522 164, 526 148, 540 142 Z"
         />
-        <text className="ds-pipeline-sketch__label ds-pipeline-sketch__label--center" x="566" y="160">
+        <text
+          className="ds-pipeline-sketch__label ds-pipeline-sketch__label--center"
+          x="566"
+          y="160"
+        >
           RSS · oral
         </text>
 

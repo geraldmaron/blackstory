@@ -3,6 +3,7 @@
  * rules, optional location, client integrity, corrections intake, and owner placeholders.
  */
 import React from 'react';
+import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import Link from 'next/link';
 import './privacy.css';
 
@@ -85,7 +86,11 @@ function InventoryLedger({
   items,
   label,
 }: {
-  readonly items: readonly { readonly id: string; readonly term: string; readonly definition: string }[];
+  readonly items: readonly {
+    readonly id: string;
+    readonly term: string;
+    readonly definition: string;
+  }[];
   readonly label: string;
 }) {
   return (
@@ -147,11 +152,7 @@ export function PrivacySections() {
           <p className="ds-privacy__meta">Last updated: July 2026</p>
         </section>
 
-        <section
-          className="ds-section ds-record-section"
-          aria-labelledby="privacy-web"
-          id="web"
-        >
+        <section className="ds-section ds-record-section" aria-labelledby="privacy-web" id="web">
           <p className="ds-section__kicker">
             <span className="ds-kicker-index" aria-hidden="true" />
             Website
@@ -229,9 +230,9 @@ export function PrivacySections() {
             Location is never required
           </h2>
           <p className="ds-section__lede">
-            On the website, location lookup starts only after you press a labeled control; the
-            page never requests device location automatically. You can always browse by state,
-            search by place name, or enter an address manually instead.
+            On the website, location lookup starts only after you press a labeled control; the page
+            never requests device location automatically. You can always browse by state, search by
+            place name, or enter an address manually instead.
           </p>
           <p className="ds-privacy__follow">
             The mobile app at launch does not request location permissions. Map and record reading
@@ -253,8 +254,8 @@ export function PrivacySections() {
           </h2>
           <p className="ds-section__lede">
             Public APIs that could be abused at scale sit behind rate limits and client integrity
-            checks. On the web, integrity uses same-origin tokens. In the mobile app, integrity
-            uses the X-BlackStory-Client header validated server-side. Neither mechanism builds a
+            checks. On the web, integrity uses same-origin tokens. In the mobile app, integrity uses
+            the X-BlackStory-Client header validated server-side. Neither mechanism builds a
             marketing profile.
           </p>
         </section>
@@ -300,7 +301,7 @@ export function PrivacySections() {
           <p className="ds-section__lede">
             Material changes to this policy will be posted on this page with an updated date. For
             product questions or privacy requests, contact{' '}
-            <a href="mailto:me@geralddagher.com">me@geralddagher.com</a> or use the{' '}
+            <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> or use the{' '}
             <Link href="/support">support page</Link>.
           </p>
         </section>

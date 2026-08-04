@@ -373,15 +373,17 @@ test('/corrections keeps the CorrectionForm prefill (target, targetType)', () =>
 });
 
 test('API paths are not normalized: an endpoint receives its own query', () => {
-  // These are no longer in the middleware matcher, so nothing strips them. Asserted here as the
+  // These are no longer in the proxy matcher, so nothing strips them. Asserted here as the
   // contract: an empty allowlist plus a matcher entry is what broke them.
   for (const path of ['/history/api', '/submit/api', '/explore/api', '/search/api']) {
     assert.deepEqual(getAllowedQueryParamsForPath(path), []);
   }
-  const matcher = readFileSync(new URL('../../middleware.ts', import.meta.url), 'utf8');
+  // `proxy.ts` — Next 16 renamed the `middleware` file convention. Read by path rather than
+  // imported because the assertion is about the matcher literal, which is the thing Next reads.
+  const matcher = readFileSync(new URL('../../proxy.ts', import.meta.url), 'utf8');
   assert.ok(!/'\/history\/api'/.test(matcher), '/history/api must not be in the matcher');
   assert.ok(!/'\/submit\/api'/.test(matcher), '/submit/api must not be in the matcher');
-  assert.ok(!/'\/[a-z-]+\/api'/.test(matcher), 'no API path belongs in the middleware matcher');
+  assert.ok(!/'\/[a-z-]+\/api'/.test(matcher), 'no API path belongs in the proxy matcher');
 });
 
 test('preserves _vercel_share on redirects so Vercel Authentication cannot loop', () => {

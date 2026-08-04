@@ -51,9 +51,7 @@ export function geoPrecisionTierForPublicPrecision(precision: string): GeoPrecis
   }
 }
 
-export function highestConfidence(
-  claims: EntityV1['claims'],
-): ConfidenceTierV1 {
+export function highestConfidence(claims: EntityV1['claims']): ConfidenceTierV1 {
   if (claims.some((claim) => claim.confidenceLevel === 'high')) return 'high';
   if (claims.some((claim) => claim.confidenceLevel === 'medium')) return 'medium';
   if (claims.some((claim) => claim.confidenceLevel === 'low')) return 'low';

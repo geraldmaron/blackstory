@@ -41,7 +41,12 @@ function readArgFlag(name: string): string | undefined {
 }
 
 async function fetchWikitext(title: string): Promise<string> {
-  const params = new URLSearchParams({ action: 'parse', page: title, prop: 'wikitext', format: 'json' });
+  const params = new URLSearchParams({
+    action: 'parse',
+    page: title,
+    prop: 'wikitext',
+    format: 'json',
+  });
   const response = await fetch(`${WIKIPEDIA_API}?${params.toString()}`, {
     headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
     signal: AbortSignal.timeout(30_000),
@@ -111,7 +116,10 @@ function extractTowns(wikitext: string, sourceUrl: string): readonly GapCandidat
       gapFill: {
         mentionedByEntityIds: [],
         mentionContexts: [
-          `Documented sundown town${currentState ? ` (${currentState})` : ''}: ${evidence}`.slice(0, 500),
+          `Documented sundown town${currentState ? ` (${currentState})` : ''}: ${evidence}`.slice(
+            0,
+            500,
+          ),
         ],
         candidateSourceHrefs: [sourceUrl],
       },
@@ -164,7 +172,13 @@ async function main(): Promise<void> {
   const deduped = candidates.filter((c) => (seen.has(c.id) ? false : (seen.add(c.id), true)));
 
   writeFileSync(outPath, `${JSON.stringify({ candidates: deduped }, null, 2)}\n`);
-  console.log(JSON.stringify({ totalExtracted: candidates.length, uniqueCandidates: deduped.length, outPath }));
+  console.log(
+    JSON.stringify({
+      totalExtracted: candidates.length,
+      uniqueCandidates: deduped.length,
+      outPath,
+    }),
+  );
 }
 
 main().catch((error) => {

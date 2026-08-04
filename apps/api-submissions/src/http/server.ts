@@ -129,7 +129,10 @@ export function createSubmissionsApiServer(
     try {
       if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
         rawBody = await readBodyWithLimit(req, limits.maxBodyBytes);
-      } else if (req.headers['content-length'] && Number(req.headers['content-length']) > limits.maxBodyBytes) {
+      } else if (
+        req.headers['content-length'] &&
+        Number(req.headers['content-length']) > limits.maxBodyBytes
+      ) {
         throw new RangeError('body_too_large');
       }
     } catch {

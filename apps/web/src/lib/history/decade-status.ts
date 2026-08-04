@@ -52,7 +52,11 @@ export function resolveDecadeStatusLabel(
     readonly StatusHistoryEntry<EntityStatusValue>[] | undefined;
   if (!history || history.length === 0) {
     if (entity.status) {
-      return { kind: 'status', label: humanizeToken(entity.status), asOf: decadeRepresentativeYear(decade) };
+      return {
+        kind: 'status',
+        label: humanizeToken(entity.status),
+        asOf: decadeRepresentativeYear(decade),
+      };
     }
     return { kind: 'undated', label: 'Status not yet published for this record' };
   }

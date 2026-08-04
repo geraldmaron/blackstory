@@ -30,10 +30,8 @@ export function extractOutboundLinks(html: string, baseUrl: string): readonly st
   return [...links];
 }
 
-const INLINE_URL_PATTERN =
-  /https?:\/\/[^\s"'<>()[\]{}]+(?:\/[^\s"'<>()[\]{}]*)?/giu;
-const BARE_GOV_HOST_PATTERN =
-  /(?:[a-z0-9-]+\.)+(?:gov|mil)(?:\/[^\s"'<>()[\]{}]*)?/giu;
+const INLINE_URL_PATTERN = /https?:\/\/[^\s"'<>()[\]{}]+(?:\/[^\s"'<>()[\]{}]*)?/giu;
+const BARE_GOV_HOST_PATTERN = /(?:[a-z0-9-]+\.)+(?:gov|mil)(?:\/[^\s"'<>()[\]{}]*)?/giu;
 
 function normalizeDiscoveredUrl(raw: string): string | undefined {
   const trimmed = raw.replace(/[.,;:)]+$/u, '');

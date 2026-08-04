@@ -67,8 +67,5 @@ export interface IndicatorDbReader {
   jurisdictionExists(jurisdictionId: string): Promise<boolean>;
   listObservations(filters: ListObservationsFilters): Promise<readonly ObservationRow[]>;
   resolveObservation(filters: ResolveObservationFilters): Promise<ObservationRow | null>;
-  listEntityBindings(
-    entityId: string,
-    purpose?: string,
-  ): Promise<readonly EntityBindingRow[]>;
+  listEntityBindings(entityId: string, purpose?: string): Promise<readonly EntityBindingRow[]>;
 }

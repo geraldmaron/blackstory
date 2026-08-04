@@ -130,8 +130,7 @@ function resolveCountyFipsFromPayload(
   expectedCountyFips?: string,
 ): string | undefined {
   const fromParams =
-    payload.parameters?.counties?.split(',')[0]?.trim() ||
-    payload.parameters?.county?.trim();
+    payload.parameters?.counties?.split(',')[0]?.trim() || payload.parameters?.county?.trim();
   return fromParams || expectedCountyFips;
 }
 
@@ -177,19 +176,12 @@ export function parseHmdaCountyAggregationResponse(
       continue;
     }
 
-    if (
-      slice.races !== HMDA_DERIVED_RACE_WHITE &&
-      slice.races !== HMDA_DERIVED_RACE_BLACK
-    ) {
+    if (slice.races !== HMDA_DERIVED_RACE_WHITE && slice.races !== HMDA_DERIVED_RACE_BLACK) {
       rejected.push(`unsupported race slice: ${JSON.stringify(slice.races)}`);
       continue;
     }
 
-    if (
-      !HMDA_DENIAL_RATE_ACTIONS_TAKEN.includes(
-        String(slice.actions_taken) as '1' | '2' | '3',
-      )
-    ) {
+    if (!HMDA_DENIAL_RATE_ACTIONS_TAKEN.includes(String(slice.actions_taken) as '1' | '2' | '3')) {
       rejected.push(
         `unsupported actions_taken=${JSON.stringify(slice.actions_taken)} for race=${slice.races}`,
       );
@@ -211,8 +203,7 @@ export function parseHmdaCountyAggregationResponse(
     };
 
     const applications = existing.applications + slice.count;
-    const denials =
-      existing.denials + (String(slice.actions_taken) === '3' ? slice.count : 0);
+    const denials = existing.denials + (String(slice.actions_taken) === '3' ? slice.count : 0);
     grouped.set(key, {
       ...existing,
       applications,
@@ -260,7 +251,9 @@ function buildDraft(input: {
       boundaryVersion,
     }),
     methodologyNote: HMDA_AGGREGATE_STRATEGY_NOTE,
-    ...(input.raceEthnicitySlice !== undefined ? { raceEthnicitySlice: input.raceEthnicitySlice } : {}),
+    ...(input.raceEthnicitySlice !== undefined
+      ? { raceEthnicitySlice: input.raceEthnicitySlice }
+      : {}),
     ...(input.applicationCount !== undefined ? { applicationCount: input.applicationCount } : {}),
     ...(input.denialCount !== undefined ? { denialCount: input.denialCount } : {}),
   };
@@ -376,9 +369,7 @@ function parseAggregationYearForNation(parameters?: Record<string, string>): num
 }
 
 /** Parses one FFIEC national aggregations JSON payload into race-year application/denial counts. */
-export function parseHmdaNationAggregationResponse(
-  payload: HmdaAggregationsResponse,
-): {
+export function parseHmdaNationAggregationResponse(payload: HmdaAggregationsResponse): {
   readonly rows: readonly NationRaceYearCounts[];
   readonly rejected: readonly string[];
 } {
@@ -393,19 +384,12 @@ export function parseHmdaNationAggregationResponse(
       continue;
     }
 
-    if (
-      slice.races !== HMDA_DERIVED_RACE_WHITE &&
-      slice.races !== HMDA_DERIVED_RACE_BLACK
-    ) {
+    if (slice.races !== HMDA_DERIVED_RACE_WHITE && slice.races !== HMDA_DERIVED_RACE_BLACK) {
       rejected.push(`unsupported race slice: ${JSON.stringify(slice.races)}`);
       continue;
     }
 
-    if (
-      !HMDA_DENIAL_RATE_ACTIONS_TAKEN.includes(
-        String(slice.actions_taken) as '1' | '2' | '3',
-      )
-    ) {
+    if (!HMDA_DENIAL_RATE_ACTIONS_TAKEN.includes(String(slice.actions_taken) as '1' | '2' | '3')) {
       rejected.push(
         `unsupported actions_taken=${JSON.stringify(slice.actions_taken)} for race=${slice.races}`,
       );
@@ -426,8 +410,7 @@ export function parseHmdaNationAggregationResponse(
     };
 
     const applications = existing.applications + slice.count;
-    const denials =
-      existing.denials + (String(slice.actions_taken) === '3' ? slice.count : 0);
+    const denials = existing.denials + (String(slice.actions_taken) === '3' ? slice.count : 0);
     grouped.set(key, {
       ...existing,
       applications,
@@ -473,7 +456,9 @@ function buildNationDraft(input: {
       boundaryVersion,
     }),
     methodologyNote: HMDA_NATION_AGGREGATE_STRATEGY_NOTE,
-    ...(input.raceEthnicitySlice !== undefined ? { raceEthnicitySlice: input.raceEthnicitySlice } : {}),
+    ...(input.raceEthnicitySlice !== undefined
+      ? { raceEthnicitySlice: input.raceEthnicitySlice }
+      : {}),
     ...(input.applicationCount !== undefined ? { applicationCount: input.applicationCount } : {}),
     ...(input.denialCount !== undefined ? { denialCount: input.denialCount } : {}),
   };

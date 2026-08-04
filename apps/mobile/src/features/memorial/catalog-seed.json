@@ -1,6 +1,6 @@
 {
   "version": "memorial-seed-2026-07-24",
-  "generatedAt": "2026-07-28T14:40:19.876Z",
+  "generatedAt": "2026-08-03T23:44:07.204Z",
   "incompleteByDesign": true,
   "names": [
     {
@@ -2023,13 +2023,7 @@
       "name": "George Buddington"
     },
     {
-      "name": "George Bush III",
-      "entityId": "west_george_washington_bush_q5545944",
-      "locationLabel": "Bush Prairie Farm settlement site",
-      "placeLabel": "Tumwater, Washington",
-      "lat": 46.74722222,
-      "lng": -123.00277778,
-      "locationPrecision": "site"
+      "name": "George Bush III"
     },
     {
       "name": "George Carter"
@@ -4363,13 +4357,7 @@
       "name": "Robert Henson Hilliard"
     },
     {
-      "name": "Robert Johnson",
-      "entityId": "ent_robert_l_johnson_001",
-      "locationLabel": "Former BET Networks headquarters, 1235 W Street NE, Washington, D.C.",
-      "placeLabel": "Washington, District of Columbia",
-      "lat": 38.9188,
-      "lng": -76.9888,
-      "locationPrecision": "institution"
+      "name": "Robert Johnson"
     },
     {
       "name": "Robert Jones"

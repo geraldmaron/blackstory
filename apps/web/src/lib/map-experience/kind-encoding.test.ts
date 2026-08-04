@@ -76,11 +76,7 @@ test('no two kind families share both shade and glyph (color is never the sole s
 
 test('every kind family has a distinct shade', () => {
   const shades = KIND_FAMILY_ENTRIES.map(([, entry]) => entry.shade);
-  assert.equal(
-    new Set(shades).size,
-    shades.length,
-    'family shades must be mutually distinct',
-  );
+  assert.equal(new Set(shades).size, shades.length, 'family shades must be mutually distinct');
 });
 
 test('every glyph value is one of the four documented glyph identifiers', () => {
@@ -156,10 +152,7 @@ test('resolveMapTone prefers topics then careful display-name cues', () => {
     resolveMapTone({ topicIds: ['museum'], displayName: 'Whitney Plantation' }),
     'plantation',
   );
-  assert.equal(
-    resolveMapTone({ topicTags: [], displayName: 'Greenwood District' }),
-    'epicenter',
-  );
+  assert.equal(resolveMapTone({ topicTags: [], displayName: 'Greenwood District' }), 'epicenter');
   assert.equal(
     resolveMapTone({
       topicTags: ['civil-rights'],

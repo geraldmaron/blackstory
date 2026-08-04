@@ -84,6 +84,22 @@ export const STORY_COPY: readonly ChapterCopy[] = [
     cite: `Six million is the standard figure for the Great Migration, 1910 to 1970 (Isabel Wilkerson, The Warmth of Other Suns, 2010). ${CORRIDOR_HONESTY_LINE}`,
   },
   {
+    /*
+     * The second context chapter. Its body is always a drawn fact carrying its own citation, so
+     * the heading and kicker stay deliberately general: they have to sit correctly above any of
+     * the twenty entries, which rules out naming a place or a figure here. The prose and cite
+     * below are the fallback for a draw that failed to resolve, and they claim nothing the rest
+     * of the page does not already establish.
+     */
+    id: 'second-context',
+    kicker: 'And one more thing',
+    heading: 'The record keeps {accent}.',
+    accent: 'talking',
+    prose:
+      'The same archive answers more than one question. Where people went, what they built when they arrived, and which of it somebody thought to write down.',
+    cite: 'Every figure on this card carries its own source, named on the card itself.',
+  },
+  {
     id: 'four-centuries',
     kicker: 'Four centuries in ten seconds',
     heading: 'Watch the record {accent}.',

@@ -73,7 +73,10 @@ function makeRequest(path: string, query = ''): ApiRequest {
 }
 
 test('entity response contains NONE of the forbidden internal/ranking/geo/collection fields', async () => {
-  const res = await dispatch(makeRequest('/v1/entity/ent_dunbar_school_001'), makeDeps(leakyEntity()));
+  const res = await dispatch(
+    makeRequest('/v1/entity/ent_dunbar_school_001'),
+    makeDeps(leakyEntity()),
+  );
   assert.equal(res.status, 200);
   const body = res.body as Record<string, unknown>;
   for (const key of FORBIDDEN_KEYS) {
@@ -91,7 +94,10 @@ test('search result carries no numeric ranking/evidence score and no internal fi
 });
 
 test('locationPrecision on a served entity is one of the four public tiers (never address/exact)', async () => {
-  const res = await dispatch(makeRequest('/v1/entity/ent_dunbar_school_001'), makeDeps(makeEntity()));
+  const res = await dispatch(
+    makeRequest('/v1/entity/ent_dunbar_school_001'),
+    makeDeps(makeEntity()),
+  );
   const body = res.body as { locationPrecision: string };
   assert.ok(['city', 'neighborhood', 'campus', 'institution'].includes(body.locationPrecision));
 });
@@ -117,10 +123,8 @@ test('citation internal-only fields are stripped before the entity payload is se
   const entity = makeEntity({ claims: [VALID_CLAIM as never] });
   const res = await dispatch(makeRequest('/v1/entity/ent_dunbar_school_001'), makeDeps(entity));
   assert.equal(res.status, 200);
-  const citation = (res.body as { claims: Record<string, unknown>[] }).claims[0]?.citation as Record<
-    string,
-    unknown
-  >;
+  const citation = (res.body as { claims: Record<string, unknown>[] }).claims[0]
+    ?.citation as Record<string, unknown>;
   assert.equal(citation.source, VALID_CLAIM.citation.source);
   assert.equal(citation.withheldReason, VALID_CLAIM.citation.withheldReason);
   for (const forbidden of ['protectedFromPublicLink', 'protectedReason', 'internalDocumentId']) {
@@ -142,7 +146,10 @@ test('served media URLs are http(s) pass-through only — no gs:// bucket ARNs o
   const res = await dispatch(makeRequest('/v1/entity/ent_dunbar_school_001'), makeDeps(entity));
   assert.equal(res.status, 200);
   const image = (res.body as { primaryImage: Record<string, unknown> }).primaryImage;
-  assert.equal(image.url, 'https://storage.googleapis.com/black-book-media/entities/ent_dunbar_school_001/primary.jpg');
+  assert.equal(
+    image.url,
+    'https://storage.googleapis.com/black-book-media/entities/ent_dunbar_school_001/primary.jpg',
+  );
   assert.equal(image.objectPath, 'entities/ent_dunbar_school_001/primary.jpg');
   assert.ok(!('gsUri' in image), 'internal gs:// references must not appear on the wire');
 });

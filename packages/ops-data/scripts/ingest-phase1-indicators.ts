@@ -118,7 +118,9 @@ function validateFixture(fixture: Phase1Fixture): void {
       throw new Error(`Unknown metricId (not in Phase 1 catalog): ${obs.metricId}`);
     }
     if (!jurisdictionIds.has(obs.jurisdictionId)) {
-      throw new Error(`Observation ${obs.id} references missing jurisdiction ${obs.jurisdictionId}`);
+      throw new Error(
+        `Observation ${obs.id} references missing jurisdiction ${obs.jurisdictionId}`,
+      );
     }
     const hash = contentHash({
       metricId: obs.metricId,
@@ -286,8 +288,7 @@ async function main(): Promise<void> {
   const fixturePath =
     process.argv.find((a) => a.startsWith('--fixture='))?.slice('--fixture='.length) ??
     DEFAULT_FIXTURE;
-  const apply =
-    process.env.INGEST_PHASE1_INDICATORS_APPLY === '1' && process.env.DRY_RUN !== '1';
+  const apply = process.env.INGEST_PHASE1_INDICATORS_APPLY === '1' && process.env.DRY_RUN !== '1';
   const fixture = loadFixture(fixturePath);
   validateFixture(fixture);
 
@@ -309,7 +310,9 @@ async function main(): Promise<void> {
   );
 
   if (!apply) {
-    console.log('Dry-run only. Set INGEST_PHASE1_INDICATORS_APPLY=1 DRY_RUN=0 DATABASE_URL=… to upsert.');
+    console.log(
+      'Dry-run only. Set INGEST_PHASE1_INDICATORS_APPLY=1 DRY_RUN=0 DATABASE_URL=… to upsert.',
+    );
     return;
   }
 

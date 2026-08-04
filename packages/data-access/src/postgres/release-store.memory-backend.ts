@@ -27,9 +27,7 @@ export class MemoryPostgresReleaseStoreBackend implements PostgresReleaseStoreBa
   }
 
   listKeys(prefix: string): Promise<readonly string[]> {
-    return Promise.resolve(
-      [...this.rows.keys()].filter((key) => key.startsWith(prefix)).sort(),
-    );
+    return Promise.resolve([...this.rows.keys()].filter((key) => key.startsWith(prefix)).sort());
   }
 
   delete(key: string): Promise<void> {

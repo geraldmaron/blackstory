@@ -2,6 +2,8 @@
  * Admin home — operations desk with actionable queue cards and env posture.
  */
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { readVerifiedAdminIdentity } from '../auth/supabase-server';
 import { AdminHomeSessionCta } from '../ops/AdminHomeSessionCta';
 import { loadOpsEnvironment, loadOpsQueueSummary } from '../ops/ops-summary';
 
@@ -17,6 +19,13 @@ function formatQueueMetric(
 }
 
 export default async function AdminHomePage() {
+  // Gate before the reads, not after: queue counts and env posture are staff-only, and
+  // loadOpsQueueSummary() hits Postgres. This route sits outside every route-group layout,
+  // so it has no RequireAdminAuth wrapper of its own.
+  if (!(await readVerifiedAdminIdentity())) {
+    redirect('/login');
+  }
+
   const [queues, env] = await Promise.all([
     loadOpsQueueSummary(),
     Promise.resolve(loadOpsEnvironment()),

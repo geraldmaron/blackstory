@@ -20,7 +20,8 @@ export const PHASE1_NATIONAL_HOMEOWNERSHIP_INDICATOR_DEFINITIONS: readonly Phase
   [
     series({
       metricId: 'census-decennial-homeownership-black-nation',
-      metricDefinition: 'Homeownership rate for Black householders (decennial Census historical tables)',
+      metricDefinition:
+        'Homeownership rate for Black householders (decennial Census historical tables)',
       universe: 'occupied housing units with Black householder',
       unit: 'percent',
       sourceDataset: 'Census Bureau Historical Census of Housing Tables',
@@ -35,7 +36,8 @@ export const PHASE1_NATIONAL_HOMEOWNERSHIP_INDICATOR_DEFINITIONS: readonly Phase
     }),
     series({
       metricId: 'census-decennial-homeownership-white-nh-nation',
-      metricDefinition: 'Homeownership rate for White Non-Hispanic householders (decennial Census historical tables)',
+      metricDefinition:
+        'Homeownership rate for White Non-Hispanic householders (decennial Census historical tables)',
       universe: 'occupied housing units with White Non-Hispanic householder',
       unit: 'percent',
       sourceDataset: 'Census Bureau Historical Census of Housing Tables',
@@ -50,7 +52,8 @@ export const PHASE1_NATIONAL_HOMEOWNERSHIP_INDICATOR_DEFINITIONS: readonly Phase
     }),
     series({
       metricId: 'acs-homeownership-rate-black-nation',
-      metricDefinition: 'Homeownership rate for Black or African American alone householders (ACS 1-Year)',
+      metricDefinition:
+        'Homeownership rate for Black or African American alone householders (ACS 1-Year)',
       universe: 'occupied housing units',
       unit: 'percent',
       sourceDataset: 'ACS 1-Year Detailed Tables',

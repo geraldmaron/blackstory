@@ -13,12 +13,7 @@ import type {
   GetObservationsInput,
   LookupSeriesInput,
 } from './types.js';
-import {
-  getEntityContext,
-  getLawTimeline,
-  getObservations,
-  lookupSeries,
-} from './tools/index.js';
+import { getEntityContext, getLawTimeline, getObservations, lookupSeries } from './tools/index.js';
 
 function toolErrorResult(error: unknown): {
   readonly content: [{ readonly type: 'text'; readonly text: string }];

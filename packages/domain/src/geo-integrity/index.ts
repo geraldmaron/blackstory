@@ -33,10 +33,7 @@ export type { StateContainmentResult } from './containment.js';
 export { auditEntityStateContainment } from './audit.js';
 export type { GeoIntegrityAuditOptions } from './audit.js';
 
-export {
-  evaluateGeoIntegrityPublishGate,
-  assertGeoIntegrityPublishGate,
-} from './publish-gate.js';
+export { evaluateGeoIntegrityPublishGate, assertGeoIntegrityPublishGate } from './publish-gate.js';
 
 export {
   FIXTURE_POINT_BOSTON_MA,

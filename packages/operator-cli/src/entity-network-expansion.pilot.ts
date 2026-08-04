@@ -9,7 +9,11 @@
  * `stageNetworkCandidates` row shapes it would emit so a human can review before any real staging
  * write happens.
  */
-import { expandEntityNetwork, stageNetworkCandidates, type ExpansionSeed } from './entity-network-expansion.js';
+import {
+  expandEntityNetwork,
+  stageNetworkCandidates,
+  type ExpansionSeed,
+} from './entity-network-expansion.js';
 
 const AUDRE_LORDE: ExpansionSeed = {
   qid: 'Q463319',
@@ -47,12 +51,21 @@ async function main() {
   console.log('\n--- Named-target coverage check ---');
   for (const target of NAMED_TARGETS) {
     const hit = candidates.find((c) => c.label.toLowerCase().includes(target.toLowerCase()));
-    console.log(`${hit ? 'FOUND' : 'MISSING'}: ${target}${hit ? ` -> ${hit.label} (${hit.qid})` : ''}`);
+    console.log(
+      `${hit ? 'FOUND' : 'MISSING'}: ${target}${hit ? ` -> ${hit.label} (${hit.qid})` : ''}`,
+    );
   }
 
-  const staged = await stageNetworkCandidates(AUDRE_LORDE, candidates, 'run_pilot_audre_lorde', async (rows) => {
-    console.log(`\n(dry run — not written) Would stage ${rows.length} row(s) to bb_research.landscape_candidates`);
-  });
+  const staged = await stageNetworkCandidates(
+    AUDRE_LORDE,
+    candidates,
+    'run_pilot_audre_lorde',
+    async (rows) => {
+      console.log(
+        `\n(dry run — not written) Would stage ${rows.length} row(s) to bb_research.landscape_candidates`,
+      );
+    },
+  );
   console.log(`\nSample staged row shape:\n${JSON.stringify(staged[0], null, 2)}`);
 }
 

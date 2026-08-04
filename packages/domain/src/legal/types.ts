@@ -17,6 +17,7 @@ export function isLegalLicenseTag(value: string): value is LegalLicenseTag {
 export const LEGAL_SNAPSHOT_KINDS = [
   'federal-statute',
   'federal-regulation',
+  'constitutional-amendment',
   'landmark-case',
   'state-statute',
 ] as const;
@@ -77,6 +78,12 @@ export type LegalSnapshot = {
   readonly externalIds: readonly LegalExternalId[];
   /** Optional link to a `FactRecord` permalink when the snapshot is also a published fact. */
   readonly factId?: string;
+  /**
+   * Year the law took effect (enactment, ratification, or decision), for chronological
+   * browse ordering. Optional: parsing it out of `canonicalCitation` is unreliable across
+   * citation formats, so it is recorded explicitly or not at all.
+   */
+  readonly effectiveYear?: number;
 };
 
 function isNonEmpty(value: string | undefined): value is string {

@@ -266,9 +266,7 @@ function ocrTextByOutlet(
 ): ReadonlyMap<string, string> {
   const byOutlet = new Map<string, string>();
   for (const [outletId, issues] of issueOcrByOutletId) {
-    const text = issues
-      .flatMap((issue) => issue.pages.map((page) => page.text))
-      .join('\n\n');
+    const text = issues.flatMap((issue) => issue.pages.map((page) => page.text)).join('\n\n');
     byOutlet.set(outletId, text);
   }
   return byOutlet;
@@ -285,8 +283,7 @@ export async function runBlackPressCampaign(
 
   const theme: BlackPressCampaignTheme = input.theme ?? 'redlining';
   const pack = input.pack ?? buildBlackPressQueryPack(theme, input.stampedAt);
-  const adapter =
-    input.adapter ?? createFixtureBlackPressAdapter({});
+  const adapter = input.adapter ?? createFixtureBlackPressAdapter({});
   const sourceRegistry = input.sourceRegistry ?? createInMemorySourceRegistry();
   const registryEntry = ensureApprovedBlackPressRegistry(sourceRegistry, input.stampedAt);
   const runId = input.runId ?? `run_black_press_${input.stampedAt}`;

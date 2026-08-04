@@ -42,20 +42,56 @@ const PACKAGE_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const SRC_ROOT = join(PACKAGE_ROOT, 'src');
 
 const NODE_BUILTIN_MODULES = new Set([
-  'assert', 'async_hooks', 'buffer', 'child_process', 'cluster', 'console', 'constants',
-  'crypto', 'dgram', 'diagnostics_channel', 'dns', 'domain', 'events', 'fs', 'http', 'http2',
-  'https', 'inspector', 'module', 'net', 'os', 'path', 'perf_hooks', 'process', 'punycode',
-  'querystring', 'readline', 'repl', 'stream', 'string_decoder', 'sys', 'timers', 'tls',
-  'trace_events', 'tty', 'url', 'util', 'v8', 'vm', 'wasi', 'worker_threads', 'zlib',
+  'assert',
+  'async_hooks',
+  'buffer',
+  'child_process',
+  'cluster',
+  'console',
+  'constants',
+  'crypto',
+  'dgram',
+  'diagnostics_channel',
+  'dns',
+  'domain',
+  'events',
+  'fs',
+  'http',
+  'http2',
+  'https',
+  'inspector',
+  'module',
+  'net',
+  'os',
+  'path',
+  'perf_hooks',
+  'process',
+  'punycode',
+  'querystring',
+  'readline',
+  'repl',
+  'stream',
+  'string_decoder',
+  'sys',
+  'timers',
+  'tls',
+  'trace_events',
+  'tty',
+  'url',
+  'util',
+  'v8',
+  'vm',
+  'wasi',
+  'worker_threads',
+  'zlib',
 ]);
 
+// Named explicitly so a violation reports the offending server-only package rather than the
+// generic "not on the allowlist" message. `ALLOWED_EXTERNAL_SPECIFIERS` below is the real gate.
+// (An earlier revision listed each of these twice: the pre-rename scope was rewritten to `@repo`
+// alongside the current one, leaving identical pairs. The workspace is single-scope now.)
 const FORBIDDEN_PACKAGE_SPECIFIERS = [
   'firebase-admin',
-  '@repo/domain',
-  '@repo/security',
-  '@repo/ops-data',
-  // Legacy/current scope kept during the @repo -> @repo rename (see MOB-003 evidence
-  // report) so the gate does not go blind if a file is copy-pasted from an @repo-scoped module.
   '@repo/domain',
   '@repo/security',
   '@repo/ops-data',
@@ -67,7 +103,8 @@ const FORBIDDEN_PACKAGE_SPECIFIERS = [
  * therefore safer gate. */
 const ALLOWED_EXTERNAL_SPECIFIERS = new Set(['zod']);
 
-const IMPORT_SPECIFIER_PATTERN = /(?:from|import)\s*\(?\s*['"]([^'"]+)['"]|require\(\s*['"]([^'"]+)['"]\s*\)/g;
+const IMPORT_SPECIFIER_PATTERN =
+  /(?:from|import)\s*\(?\s*['"]([^'"]+)['"]|require\(\s*['"]([^'"]+)['"]\s*\)/g;
 
 function listTsFiles(dir) {
   const out = [];
@@ -173,7 +210,9 @@ function scanEntrypointGraph() {
     try {
       contents = readFileSync(file, 'utf8');
     } catch {
-      violations.push(`entrypoint graph: could not read "${relative(PACKAGE_ROOT, file)}" (broken exports entry)`);
+      violations.push(
+        `entrypoint graph: could not read "${relative(PACKAGE_ROOT, file)}" (broken exports entry)`,
+      );
       continue;
     }
     for (const specifier of extractSpecifiers(contents)) {
@@ -185,7 +224,9 @@ function scanEntrypointGraph() {
       if (specifier.startsWith('.') || specifier.startsWith('/')) {
         const resolved = resolveRelativeSpecifier(specifier, file);
         if (!resolved) {
-          violations.push(`${relative(PACKAGE_ROOT, file)}: could not resolve relative import "${specifier}"`);
+          violations.push(
+            `${relative(PACKAGE_ROOT, file)}: could not resolve relative import "${specifier}"`,
+          );
           continue;
         }
         queue.push(resolved);
@@ -203,7 +244,9 @@ function scanEntrypointGraph() {
     try {
       externalPkgJsonPath = require.resolve(`${external}/package.json`, { paths: [PACKAGE_ROOT] });
     } catch {
-      violations.push(`entrypoint graph: could not resolve "${external}" from ${PACKAGE_ROOT} to inspect its dependency graph`);
+      violations.push(
+        `entrypoint graph: could not resolve "${external}" from ${PACKAGE_ROOT} to inspect its dependency graph`,
+      );
       continue;
     }
     const externalPkg = JSON.parse(readFileSync(externalPkgJsonPath, 'utf8'));
@@ -236,4 +279,6 @@ if (allViolations.length > 0) {
   process.exit(1);
 }
 
-console.log('[check-boundary] PASSED — no node:* built-ins, no forbidden server-only imports, no unlisted external dependencies.');
+console.log(
+  '[check-boundary] PASSED — no node:* built-ins, no forbidden server-only imports, no unlisted external dependencies.',
+);

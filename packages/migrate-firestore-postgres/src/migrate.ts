@@ -132,7 +132,8 @@ export async function migratePolicyVersions(
   for await (const doc of iterateCollection(options.db, 'policyVersions')) {
     result.read += 1;
     rows.push(mapPolicyVersion(doc.id, doc.data));
-    if (rows.length >= 100) await flushUpsert(options, 'bb_ops.policy_versions', rows, ['id'], result);
+    if (rows.length >= 100)
+      await flushUpsert(options, 'bb_ops.policy_versions', rows, ['id'], result);
   }
   await flushUpsert(options, 'bb_ops.policy_versions', rows, ['id'], result);
   return result;
@@ -329,13 +330,7 @@ export async function migrateResearchCases(
                complete = EXCLUDED.complete,
                evidence_ids = EXCLUDED.evidence_ids,
                note = EXCLUDED.note`,
-            [
-              row.case_id,
-              row.key,
-              row.complete,
-              row.evidence_ids ?? [],
-              row.note ?? null,
-            ],
+            [row.case_id, row.key, row.complete, row.evidence_ids ?? [], row.note ?? null],
           );
         }
         result.written += checklistRows.length;
@@ -417,7 +412,12 @@ export async function migratePublicReleaseProjections(
   const releaseRefs = await options.db.collection('publicReleases').listDocuments();
   const entityRows: Record<string, unknown>[] = [];
   for (const ref of releaseRefs) {
-    for await (const doc of iterateSubcollection(options.db, 'publicReleases', ref.id, 'entities')) {
+    for await (const doc of iterateSubcollection(
+      options.db,
+      'publicReleases',
+      ref.id,
+      'entities',
+    )) {
       result.read += 1;
       entityRows.push(mapReleaseEntity(ref.id, doc.id, doc.data));
     }
@@ -451,7 +451,8 @@ export async function migrateOutbox(options: MigrateOptions): Promise<Collection
   for await (const doc of iterateCollection(options.db, 'outboxMessages')) {
     result.read += 1;
     rows.push(mapOutboxMessage(doc.id, doc.data));
-    if (rows.length >= 100) await flushUpsert(options, 'bb_ops.outbox_messages', rows, ['id'], result);
+    if (rows.length >= 100)
+      await flushUpsert(options, 'bb_ops.outbox_messages', rows, ['id'], result);
   }
   await flushUpsert(options, 'bb_ops.outbox_messages', rows, ['id'], result);
   return result;
@@ -468,7 +469,8 @@ export async function migrateIdempotencyKeys(
   for await (const doc of iterateCollection(options.db, 'idempotencyKeys')) {
     result.read += 1;
     rows.push(mapIdempotencyKey(doc.id, doc.data));
-    if (rows.length >= 100) await flushUpsert(options, 'bb_ops.idempotency_keys', rows, ['key'], result);
+    if (rows.length >= 100)
+      await flushUpsert(options, 'bb_ops.idempotency_keys', rows, ['key'], result);
   }
   await flushUpsert(options, 'bb_ops.idempotency_keys', rows, ['key'], result);
   return result;
@@ -487,8 +489,9 @@ export async function migrateSubmissions(
     const mapped = mapSubmission(doc.id, doc.data);
     // created_by is uuid in Postgres — coerce invalid to nil uuid
     const createdBy = String(mapped.created_by);
-    const uuidOk =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(createdBy);
+    const uuidOk = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      createdBy,
+    );
     rows.push({
       ...mapped,
       created_by: uuidOk ? createdBy : '00000000-0000-0000-0000-000000000000',
@@ -590,7 +593,13 @@ export async function migratePublicReleaseGraph(
     ['release_id', 'decade'],
     result,
   );
-  await flushUpsert(options, 'bb_public.release_graph_all_time', allTimeRows, ['release_id'], result);
+  await flushUpsert(
+    options,
+    'bb_public.release_graph_all_time',
+    allTimeRows,
+    ['release_id'],
+    result,
+  );
   return result;
 }
 
@@ -697,7 +706,9 @@ async function migrateProvenanceCollection(
       await flushUpsert(options, table, rows, conflict, result);
       processed += batchSize;
       if (processed % 5000 === 0) {
-        console.error(JSON.stringify({ progress: collection, read: result.read, written: result.written }));
+        console.error(
+          JSON.stringify({ progress: collection, read: result.read, written: result.written }),
+        );
       }
     }
     if (options.limit !== undefined && result.read >= options.limit) break;
@@ -718,9 +729,7 @@ export async function migrateCensusCounty(
   );
 }
 
-export async function migrateAcsCounty(
-  options: MigrateOptions,
-): Promise<CollectionMigrateResult> {
+export async function migrateAcsCounty(options: MigrateOptions): Promise<CollectionMigrateResult> {
   return migrateProvenanceCollection(
     options,
     'acsCountyProfiles',
@@ -730,9 +739,7 @@ export async function migrateAcsCounty(
   );
 }
 
-export async function migrateAcsTracts(
-  options: MigrateOptions,
-): Promise<CollectionMigrateResult> {
+export async function migrateAcsTracts(options: MigrateOptions): Promise<CollectionMigrateResult> {
   return migrateProvenanceCollection(
     options,
     'acsTractProfiles',
@@ -780,9 +787,7 @@ export async function migrateOpportunityAtlas(
   );
 }
 
-export async function migrateHateCrime(
-  options: MigrateOptions,
-): Promise<CollectionMigrateResult> {
+export async function migrateHateCrime(options: MigrateOptions): Promise<CollectionMigrateResult> {
   return migrateProvenanceCollection(
     options,
     'hateCrimeCountyYears',
@@ -792,9 +797,7 @@ export async function migrateHateCrime(
   );
 }
 
-export async function migrateHolcAreas(
-  options: MigrateOptions,
-): Promise<CollectionMigrateResult> {
+export async function migrateHolcAreas(options: MigrateOptions): Promise<CollectionMigrateResult> {
   return migrateProvenanceCollection(
     options,
     'holcAreas',
@@ -848,9 +851,9 @@ export const LARGE_MIGRANTS: readonly {
 
 export const ALL_MIGRANTS = [...HIGH_VALUE_MIGRANTS, ...LARGE_MIGRANTS] as const;
 
-export async function runCensus(db: Firestore): Promise<
-  readonly { readonly name: string; readonly count: number }[]
-> {
+export async function runCensus(
+  db: Firestore,
+): Promise<readonly { readonly name: string; readonly count: number }[]> {
   const { allKnownFirestoreCollections } = await import('./catalog.js');
   const names = allKnownFirestoreCollections();
   const rows: { name: string; count: number }[] = [];

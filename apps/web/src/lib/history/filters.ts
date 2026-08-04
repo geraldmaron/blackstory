@@ -170,13 +170,13 @@ export function buildHistoryKindCategoryFacetOptions(
     if (!categoryId) continue;
     counts.set(categoryId, (counts.get(categoryId) ?? 0) + 1);
   }
-  const options = HISTORY_KIND_CATEGORIES.filter((category) => (counts.get(category.id) ?? 0) > 0).map(
-    (category) => ({
-      value: category.id,
-      label: category.label,
-      count: counts.get(category.id) ?? 0,
-    }),
-  );
+  const options = HISTORY_KIND_CATEGORIES.filter(
+    (category) => (counts.get(category.id) ?? 0) > 0,
+  ).map((category) => ({
+    value: category.id,
+    label: category.label,
+    count: counts.get(category.id) ?? 0,
+  }));
   return [{ value: 'all', label: 'All kinds' }, ...options];
 }
 

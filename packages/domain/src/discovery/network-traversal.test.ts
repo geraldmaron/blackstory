@@ -223,7 +223,10 @@ test('runNetworkTraversalCampaign attaches obscurity and reports match counts', 
 
   // Unknown local neighbors (no catalog match, no trusted id) should read as obscure.
   const scores = result.ranked.map((lead) => lead.obscurity.score);
-  assert.ok(Math.max(...scores) >= 0.55, `expected an obscure lead, got scores ${scores.join(', ')}`);
+  assert.ok(
+    Math.max(...scores) >= 0.55,
+    `expected an obscure lead, got scores ${scores.join(', ')}`,
+  );
 });
 
 test('injected readRelationships is honored over inline relationships', () => {

@@ -16,7 +16,7 @@
 // `node:crypto` at module scope. This module is imported by MapStage.tsx ('use client'), so
 // barrel-importing here would drag a Node-only module into the browser bundle.
 import { US_STATES, type UsStateInfo } from '@repo/domain/map/geography';
-import { brandPalette, darkTheme } from '@repo/ui';
+import { brandPalette, darkTheme, mapPalettes } from '@repo/ui';
 import { type MapColorScheme } from './dignity-style';
 
 export type StateLabelPoint = {
@@ -181,5 +181,19 @@ export function buildStateLabelElement(
   el.style.fontWeight = '500';
   const colors = stateLabelColors(options?.colorScheme);
   el.style.color = descriptor.selected ? colors.selected : colors.default;
+  // These sit directly on the canvas with no MapLibre `text-halo-*` to fall back on (DOM
+  // markers, not a symbol layer — see the module doc comment). Ink alone reads fine against the
+  // flat `background` fill but washes out over the satellite basemap and the state-density-fill
+  // overlay, both of which vary in luminance under a fixed-position label. `mapPalettes[...].halo`
+  // is the same token symbol-layer labels use for `text-halo-color`; replicated here as a
+  // multi-directional text-shadow, the DOM equivalent of a paint-time halo.
+  const halo = mapPalettes[resolveStateLabelColorScheme(options?.colorScheme)].halo;
+  el.style.textShadow = [
+    `0 0 3px ${halo}`,
+    `1px 1px 1px ${halo}`,
+    `-1px -1px 1px ${halo}`,
+    `1px -1px 1px ${halo}`,
+    `-1px 1px 1px ${halo}`,
+  ].join(', ');
   return el;
 }

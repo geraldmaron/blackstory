@@ -107,7 +107,10 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
           },
         ];
         entityPlacePanel = (
-          <article className={booksEditionPanelClassName('place')} aria-labelledby="books-place-heading">
+          <article
+            className={booksEditionPanelClassName('place')}
+            aria-labelledby="books-place-heading"
+          >
             <p className="ds-books-edition__panel-title">Place</p>
             <h2 className="ds-books-edition__panel-heading" id="books-place-heading">
               Archive record on the map
@@ -115,7 +118,11 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
             <p className="ds-books-edition__footnote">
               <Link href={`/entity/${entity.id}`}>Open {entity.displayName}</Link>
             </p>
-            <RecordAnatomyPanel facts={facts} place={anatomyPlace} aria-label="Related archive record at a glance" />
+            <RecordAnatomyPanel
+              facts={facts}
+              place={anatomyPlace}
+              aria-label="Related archive record at a glance"
+            />
           </article>
         );
       }
@@ -186,7 +193,11 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
             </header>
           </article>
 
-          <BooksDetailSections view={view} relatedItems={relatedItems} placePanel={entityPlacePanel} />
+          <BooksDetailSections
+            view={view}
+            relatedItems={relatedItems}
+            placePanel={entityPlacePanel}
+          />
         </div>
       </main>
     </div>

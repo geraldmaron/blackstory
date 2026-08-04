@@ -39,7 +39,14 @@ test('fixture parser rejects wrong schema and malformed eras', () => {
     () =>
       parseTemporalEraTermsFixture({
         schemaVersion: 'temporal-era-terms.v1',
-        eras: [{ id: 'x', decadeStart: '1900', decadeEnd: '1860', terms: [{ text: 'a', termClass: 'historical' }] }],
+        eras: [
+          {
+            id: 'x',
+            decadeStart: '1900',
+            decadeEnd: '1860',
+            terms: [{ text: 'a', termClass: 'historical' }],
+          },
+        ],
       }),
     /decadeStart after decadeEnd/u,
   );
@@ -107,7 +114,10 @@ test('researchOnlyOffensive historical terms are retained for research, stripped
   assert.ok(researchTexts.includes('Negro'));
   assert.ok(
     eraPack.researchTerms.every(
-      (term) => term.termClass !== 'historical' || term.researchOnlyOffensive === true || term.text.length > 0,
+      (term) =>
+        term.termClass !== 'historical' ||
+        term.researchOnlyOffensive === true ||
+        term.text.length > 0,
     ),
   );
 
@@ -139,7 +149,10 @@ test('1860s freedmen-era pack has no research-only redactions', () => {
 });
 
 test('unmapped decades and bad inputs are explicit errors, never silent empty packs', () => {
-  assert.throws(() => buildEraQueryPack('1990', 'historical_place'), /No temporal era terms registered/u);
+  assert.throws(
+    () => buildEraQueryPack('1990', 'historical_place'),
+    /No temporal era terms registered/u,
+  );
   assert.throws(() => buildEraQueryPack('1865', 'historical_place'), /Invalid decade key/u);
   assert.throws(
     () => buildEraQueryPack('1890', 'not_a_theme' as never),

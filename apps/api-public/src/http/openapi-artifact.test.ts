@@ -106,7 +106,11 @@ test('error envelope examples match publicApiErrorEnvelopeSchema', () => {
     'error-client-version-426.json',
   ]) {
     const parsed = publicApiErrorEnvelopeSchema.safeParse(readJson(file));
-    assert.equal(parsed.success, true, `${file}: ${parsed.success ? '' : JSON.stringify(parsed.error.issues)}`);
+    assert.equal(
+      parsed.success,
+      true,
+      `${file}: ${parsed.success ? '' : JSON.stringify(parsed.error.issues)}`,
+    );
   }
 });
 
@@ -127,6 +131,9 @@ test('health example exposes surface posture without secrets', () => {
   assert.equal(body.status, 'ok');
   assert.ok(Array.isArray(body.allowedOperations));
   for (const key of Object.keys(body)) {
-    assert.ok(!/secret|token|password|database/i.test(key), `health example must not expose ${key}`);
+    assert.ok(
+      !/secret|token|password|database/i.test(key),
+      `health example must not expose ${key}`,
+    );
   }
 });

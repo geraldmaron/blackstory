@@ -44,15 +44,13 @@ const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../.
  * render components now that /history is a redirect endpoint.
  */
 const LEGACY_EDITION_CHROME: readonly string[] = [
-  '(map)/explore/explore-edition.css',
-  '(map)/explore/explore-panel-chrome.ts',
+  'explore/explore-edition.css',
+  'explore/explore-panel-chrome.ts',
   'about/about-edition.css',
   'about/about-panel-chrome.ts',
   'books/books-edition.css',
   'books/books-panel-chrome.ts',
   'chapters/articles-edition.css',
-  'chapters/mosaic-credits/stories-edition.css',
-  'chapters/mosaic-credits/stories-panel-chrome.ts',
   'data/data-edition.css',
   'data/data-panel-chrome.ts',
   'law/law-edition.css',
@@ -82,7 +80,11 @@ describe('room kit · a title is JSX, never a string of markup', () => {
       .filter((file) => /title="[^"]*<[a-z]/i.test(readFileSync(file, 'utf8')))
       .map((file) => path.relative(APP_DIR, file));
 
-    assert.deepEqual(offenders, [], 'pass the title as JSX: title={<>Civil rights <em>law</em></>}');
+    assert.deepEqual(
+      offenders,
+      [],
+      'pass the title as JSX: title={<>Civil rights <em>law</em></>}',
+    );
   });
 });
 

@@ -26,7 +26,10 @@ function isbn10ToIsbn13(isbn10: string): string {
   return `${base}${checkDigit}`;
 }
 
-function resolveIsbnVariants(isbn: string): { readonly retailerIsbn: string; readonly openLibraryIsbn: string } {
+function resolveIsbnVariants(isbn: string): {
+  readonly retailerIsbn: string;
+  readonly openLibraryIsbn: string;
+} {
   const normalized = normalizeIsbn(isbn);
   if (normalized.length === 13) {
     return { retailerIsbn: normalized, openLibraryIsbn: normalized };

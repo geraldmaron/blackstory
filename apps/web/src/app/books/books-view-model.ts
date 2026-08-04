@@ -70,7 +70,11 @@ export type BooksBrowsePagination = {
   readonly rangeEnd: number;
   readonly previousHref: string | undefined;
   readonly nextHref: string | undefined;
-  readonly pageHrefs: readonly { readonly page: number; readonly href: string; readonly current: boolean }[];
+  readonly pageHrefs: readonly {
+    readonly page: number;
+    readonly href: string;
+    readonly current: boolean;
+  }[];
 };
 
 export type BooksBrowseViewModel = {

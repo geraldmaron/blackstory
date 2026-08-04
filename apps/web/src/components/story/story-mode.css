@@ -6,22 +6,43 @@
  * is the entire reason the story is over a live map rather than over screenshots.
  */
 
+/*
+ * No `scroll-behavior: smooth` here, deliberately.
+ *
+ * On a scroll-snap container it applies to *every* scroll, wheel and trackpad
+ * included, so each input event starts its own animation while the snap engine
+ * is also trying to settle the container on a chapter. The two run against each
+ * other and the result is the stuttering, rubbery travel between sections. The
+ * two places that genuinely want an animated scroll — the Begin button and the
+ * chapter jumps — ask for it per call with `scrollIntoView({ behavior:
+ * 'smooth' })`, which is unaffected by this and still animates.
+ */
 .ds-story {
   position: fixed;
   inset: 0;
-  z-index: 20;
+  z-index: var(--ds-z-story-mode);
   overflow-y: auto;
   overscroll-behavior-y: contain;
-  scroll-behavior: smooth;
   scroll-snap-type: y proximity;
 }
 
 .ds-story__chapter {
   display: grid;
   align-content: center;
-  min-height: 100dvh;
+  /*
+   * `100%` of the container, not `100dvh`. The container is `position: fixed;
+   * inset: 0`, so it already *is* the viewport, and it does not resize as the
+   * mobile URL bar collapses. `dvh` does: every chapter's height changed mid
+   * scroll, which moved every snap point under the reader and made the snap
+   * engine re-target on a gesture already in flight.
+   */
+  min-height: 100%;
   padding: calc(56px + var(--ds-space-8)) var(--ds-space-6) var(--ds-space-8);
   scroll-snap-align: start;
+  /* Keeps a chapter from being split across a snap when its content runs long
+     on a short window; the snap engine skips past an unstoppable box instead
+     of jerking back to it. */
+  scroll-snap-stop: normal;
 }
 
 /* Alternating sides. Odd chapters sit left, even chapters right. */

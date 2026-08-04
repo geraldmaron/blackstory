@@ -48,9 +48,10 @@ const listLivePacketsByTheme = cache(
   },
 );
 
-export async function listThemeImpactPacketViews(
-  themeId: string,
-): Promise<{ readonly packets: readonly ThemeImpactPacketView[]; readonly source: ThemeImpactReadSource }> {
+export async function listThemeImpactPacketViews(themeId: string): Promise<{
+  readonly packets: readonly ThemeImpactPacketView[];
+  readonly source: ThemeImpactReadSource;
+}> {
   const { packets, source } = await listLivePacketsByTheme(themeId);
   return { packets: packets.map(liveToView), source };
 }
@@ -85,7 +86,8 @@ export async function resolveEntityCrossReferences(
 ): Promise<readonly EntityCrossReferenceSurface[]> {
   const listPackets = deps?.listPackets ?? listThemeImpactPacketViews;
   const themeIds = deps?.themeIds ?? THEME_IMPACT_THEME_IDS;
-  const getThemeTitle = deps?.getThemeTitle ?? ((themeId: string) => getThemeCatalogEntry(themeId)?.title);
+  const getThemeTitle =
+    deps?.getThemeTitle ?? ((themeId: string) => getThemeCatalogEntry(themeId)?.title);
 
   const surfaces: EntityCrossReferenceSurface[] = [];
 

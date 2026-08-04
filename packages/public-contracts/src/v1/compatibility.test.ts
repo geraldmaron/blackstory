@@ -42,7 +42,11 @@ test('evaluateCompatibility: below-floor major is unsupported', () => {
 });
 
 test('evaluateCompatibility: supported-but-not-current major is soft-deprecated, not hard-unsupported', () => {
-  const result = evaluateCompatibility({ clientApiVersion: 'v1', floor: 'v1', isCurrentMajor: false });
+  const result = evaluateCompatibility({
+    clientApiVersion: 'v1',
+    floor: 'v1',
+    isCurrentMajor: false,
+  });
   assert.equal(result.supported, true);
   assert.equal(result.softDeprecated, true);
 });

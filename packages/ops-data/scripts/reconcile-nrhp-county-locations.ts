@@ -38,7 +38,10 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
-import { parseGazetteerCountyFile, type GazetteerCountyRow } from '../src/jurisdictions/tiger-gazetteer.ts';
+import {
+  parseGazetteerCountyFile,
+  type GazetteerCountyRow,
+} from '../src/jurisdictions/tiger-gazetteer.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
   CENSUS_COUNTY_GAZETTEER_URL,
@@ -56,22 +59,65 @@ const LANE = 'nrhp-black-heritage';
 const GEOCODE_METHOD = 'census-gazetteer-county-centroid';
 
 const US_STATE_ABBREVIATIONS: Readonly<Record<string, string>> = {
-  Alabama: 'AL', Alaska: 'AK', Arizona: 'AZ', Arkansas: 'AR', California: 'CA', Colorado: 'CO',
-  Connecticut: 'CT', Delaware: 'DE', Florida: 'FL', Georgia: 'GA', Hawaii: 'HI', Idaho: 'ID',
-  Illinois: 'IL', Indiana: 'IN', Iowa: 'IA', Kansas: 'KS', Kentucky: 'KY', Louisiana: 'LA',
-  Maine: 'ME', Maryland: 'MD', Massachusetts: 'MA', Michigan: 'MI', Minnesota: 'MN',
-  Mississippi: 'MS', Missouri: 'MO', Montana: 'MT', Nebraska: 'NE', Nevada: 'NV',
-  'New Hampshire': 'NH', 'New Jersey': 'NJ', 'New Mexico': 'NM', 'New York': 'NY',
-  'North Carolina': 'NC', 'North Dakota': 'ND', Ohio: 'OH', Oklahoma: 'OK', Oregon: 'OR',
-  Pennsylvania: 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC', 'South Dakota': 'SD',
-  Tennessee: 'TN', Texas: 'TX', Utah: 'UT', Vermont: 'VT', Virginia: 'VA', Washington: 'WA',
-  'West Virginia': 'WV', Wisconsin: 'WI', Wyoming: 'WY', 'District of Columbia': 'DC',
+  Alabama: 'AL',
+  Alaska: 'AK',
+  Arizona: 'AZ',
+  Arkansas: 'AR',
+  California: 'CA',
+  Colorado: 'CO',
+  Connecticut: 'CT',
+  Delaware: 'DE',
+  Florida: 'FL',
+  Georgia: 'GA',
+  Hawaii: 'HI',
+  Idaho: 'ID',
+  Illinois: 'IL',
+  Indiana: 'IN',
+  Iowa: 'IA',
+  Kansas: 'KS',
+  Kentucky: 'KY',
+  Louisiana: 'LA',
+  Maine: 'ME',
+  Maryland: 'MD',
+  Massachusetts: 'MA',
+  Michigan: 'MI',
+  Minnesota: 'MN',
+  Mississippi: 'MS',
+  Missouri: 'MO',
+  Montana: 'MT',
+  Nebraska: 'NE',
+  Nevada: 'NV',
+  'New Hampshire': 'NH',
+  'New Jersey': 'NJ',
+  'New Mexico': 'NM',
+  'New York': 'NY',
+  'North Carolina': 'NC',
+  'North Dakota': 'ND',
+  Ohio: 'OH',
+  Oklahoma: 'OK',
+  Oregon: 'OR',
+  Pennsylvania: 'PA',
+  'Rhode Island': 'RI',
+  'South Carolina': 'SC',
+  'South Dakota': 'SD',
+  Tennessee: 'TN',
+  Texas: 'TX',
+  Utah: 'UT',
+  Vermont: 'VT',
+  Virginia: 'VA',
+  Washington: 'WA',
+  'West Virginia': 'WV',
+  Wisconsin: 'WI',
+  Wyoming: 'WY',
+  'District of Columbia': 'DC',
 };
 
 /** Case-insensitive lookup: the NPS dataset's own title-caser capitalizes "Of" ("District Of Columbia"). */
 function stateAbbreviation(state: string): string | undefined {
   const lower = state.toLowerCase();
-  const entry = Object.entries(US_STATE_ABBREVIATIONS).find(([name]) => name.toLowerCase() === lower);
+  const entry = Object.entries(US_STATE_ABBREVIATIONS).find(
+    ([name]) => name.toLowerCase() === lower,
+  );
   return entry?.[1];
 }
 
@@ -97,9 +143,10 @@ function normalizeCountyNameCompact(raw: string): string {
   return normalizeCountyName(raw).replace(/\s+/gu, '');
 }
 
-export function buildCountyCentroidIndex(
-  rows: readonly GazetteerCountyRow[],
-): { readonly byKey: Map<string, GazetteerCountyRow>; readonly byCompactKey: Map<string, GazetteerCountyRow> } {
+export function buildCountyCentroidIndex(rows: readonly GazetteerCountyRow[]): {
+  readonly byKey: Map<string, GazetteerCountyRow>;
+  readonly byCompactKey: Map<string, GazetteerCountyRow>;
+} {
   const byKey = new Map<string, GazetteerCountyRow>();
   const byCompactKey = new Map<string, GazetteerCountyRow>();
   for (const row of rows) {
@@ -132,7 +179,9 @@ async function main(): Promise<void> {
   }
 
   const parsed = parseGazetteerCountyFile(gazetteerText);
-  console.log(`Gazetteer counties parsed: ${parsed.rows.length} (rejected: ${parsed.rejected.length})`);
+  console.log(
+    `Gazetteer counties parsed: ${parsed.rows.length} (rejected: ${parsed.rejected.length})`,
+  );
   const { byKey, byCompactKey } = buildCountyCentroidIndex(parsed.rows);
 
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
@@ -144,7 +193,13 @@ async function main(): Promise<void> {
   );
   console.log(`Rows missing coordinates (lane='${LANE}'): ${res.rows.length}`);
 
-  const matched: { id: string; lat: number; lng: number; countyGeoid: string; countyName: string }[] = [];
+  const matched: {
+    id: string;
+    lat: number;
+    lng: number;
+    countyGeoid: string;
+    countyName: string;
+  }[] = [];
   const unmatched: { id: string; state: string | undefined; county: string | undefined }[] = [];
   for (const row of res.rows) {
     const state = row.payload.state;
@@ -152,9 +207,16 @@ async function main(): Promise<void> {
     const usps = state ? stateAbbreviation(state) : undefined;
     const key = usps && county ? `${usps}|${normalizeCountyName(county)}` : undefined;
     const compactKey = usps && county ? `${usps}|${normalizeCountyNameCompact(county)}` : undefined;
-    const hit = (key ? byKey.get(key) : undefined) ?? (compactKey ? byCompactKey.get(compactKey) : undefined);
+    const hit =
+      (key ? byKey.get(key) : undefined) ?? (compactKey ? byCompactKey.get(compactKey) : undefined);
     if (hit) {
-      matched.push({ id: row.id, lat: hit.intptlat, lng: hit.intptlong, countyGeoid: hit.geoid, countyName: hit.name });
+      matched.push({
+        id: row.id,
+        lat: hit.intptlat,
+        lng: hit.intptlong,
+        countyGeoid: hit.geoid,
+        countyName: hit.name,
+      });
     } else {
       unmatched.push({ id: row.id, state, county });
     }
@@ -164,17 +226,27 @@ async function main(): Promise<void> {
   console.log('\nSample matches:');
   console.table(matched.slice(0, 5));
   if (unmatched.length > 0) {
-    console.log('\nUnmatched sample (state/county spelling likely diverges from Census Gazetteer NAME):');
+    console.log(
+      '\nUnmatched sample (state/county spelling likely diverges from Census Gazetteer NAME):',
+    );
     console.table(unmatched.slice(0, 10));
   }
 
   const generatedAt = new Date().toISOString();
-  const reportPath = join(CACHE_DIR, `nrhp-county-reconcile-${generatedAt.replace(/[:.]/gu, '-')}.json`);
-  writeFileSync(reportPath, JSON.stringify({ generatedAt, dryRun: DRY_RUN || !APPLY, matched, unmatched }, null, 2));
+  const reportPath = join(
+    CACHE_DIR,
+    `nrhp-county-reconcile-${generatedAt.replace(/[:.]/gu, '-')}.json`,
+  );
+  writeFileSync(
+    reportPath,
+    JSON.stringify({ generatedAt, dryRun: DRY_RUN || !APPLY, matched, unmatched }, null, 2),
+  );
   console.log(`\nReport written to ${reportPath}`);
 
   if (DRY_RUN || !APPLY) {
-    console.log('\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 NRHP_COUNTY_RECONCILE_APPLY=1 to apply.');
+    console.log(
+      '\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 NRHP_COUNTY_RECONCILE_APPLY=1 to apply.',
+    );
     await pool.end();
     return;
   }
@@ -204,7 +276,9 @@ async function main(): Promise<void> {
       );
     }
     await client.query('COMMIT');
-    console.log(`Applied: set county-centroid lat/lng + payload.geocode on ${matched.length} row(s).`);
+    console.log(
+      `Applied: set county-centroid lat/lng + payload.geocode on ${matched.length} row(s).`,
+    );
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
     throw error;

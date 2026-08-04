@@ -91,7 +91,10 @@ function assertCountyFipsList(countyFips: readonly string[]): void {
 function filterIlTractCsvText(nationalCsvText: string): string {
   const parsed = parseEjiTractCsv(nationalCsvText);
   const ilRows = parsed.rows.filter((row) => isIllinoisCountyFips(row.countyFips));
-  const lines = ['GEOID,RPL_EBM', ...ilRows.map((row) => `${row.geoid},${row.environmentalBurdenRank}`)];
+  const lines = [
+    'GEOID,RPL_EBM',
+    ...ilRows.map((row) => `${row.geoid},${row.environmentalBurdenRank}`),
+  ];
   return `${lines.join('\n')}\n`;
 }
 
@@ -106,7 +109,11 @@ async function fetchText(url: string, fetchImpl: FetchLike): Promise<string> {
 async function resolveLiveIllinoisTractCsv(
   referenceYear: number,
   fetchImpl: FetchLike,
-): Promise<{ readonly text: string; readonly mode: Phase1EjiFetchMode; readonly cachePath?: string }> {
+): Promise<{
+  readonly text: string;
+  readonly mode: Phase1EjiFetchMode;
+  readonly cachePath?: string;
+}> {
   ensurePhase1EjiTriCacheDir();
   const ilCachePath = phase1EjiTriCachePath(CDC_EJI_IL_TRACT_CACHE_FILENAME);
   const cachedIl = readCacheTextIfPresent(ilCachePath);
@@ -139,9 +146,7 @@ async function resolveLiveIllinoisTractCsv(
   return { text: rereadIl ?? ilText, mode: 'cache', cachePath: ilCachePath };
 }
 
-function resolveCountyFilter(
-  options: FetchOptions,
-): readonly string[] | undefined {
+function resolveCountyFilter(options: FetchOptions): readonly string[] | undefined {
   if (options.allIllinoisCounties === true) {
     return undefined;
   }

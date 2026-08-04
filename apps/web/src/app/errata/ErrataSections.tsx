@@ -131,8 +131,7 @@ export function ErrataSections({ entries }: { readonly entries: readonly ErrataE
           </p>
           <TaxonomyLedger />
           <p className="ds-errata__policy-link">
-            Report a new issue through the{' '}
-            <Link href="/corrections">corrections lane</Link>.
+            Report a new issue through the <Link href="/corrections">corrections lane</Link>.
           </p>
         </section>
 
@@ -155,11 +154,7 @@ export function ErrataSections({ entries }: { readonly entries: readonly ErrataE
           <ChangeLog entries={entries} />
         </section>
 
-        <section
-          className="ds-section ds-record-section"
-          aria-labelledby="errata-feeds"
-          id="feeds"
-        >
+        <section className="ds-section ds-record-section" aria-labelledby="errata-feeds" id="feeds">
           <p className="ds-section__kicker">
             <span className="ds-kicker-index" aria-hidden="true" />
             Subscribe
@@ -170,8 +165,7 @@ export function ErrataSections({ entries }: { readonly entries: readonly ErrataE
           <div className="ds-errata__feeds">
             <p className="ds-errata__feeds-kicker">Stay current</p>
             <p className="ds-errata__feeds-body">
-              Follow errata updates via{' '}
-              <Link href="/errata/feed.json">JSON Feed</Link> or{' '}
+              Follow errata updates via <Link href="/errata/feed.json">JSON Feed</Link> or{' '}
               <Link href="/errata/feed.xml">RSS</Link>. Feeds include change type, headline, and
               summary for each entry.
             </p>

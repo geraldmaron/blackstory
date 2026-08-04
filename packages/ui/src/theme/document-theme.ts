@@ -37,3 +37,18 @@ export const THEME_BOOTSTRAP_SCRIPT = `(function(){try{var k='ds-theme';var s=lo
  */
 const assertBootstrapKeyMatches: typeof THEME_STORAGE_KEY = 'ds-theme';
 void assertBootstrapKeyMatches;
+
+/**
+ * Flip `<html data-theme>` and persist the choice to THEME_STORAGE_KEY, so the next page load's
+ * bootstrap script (which only reads storage, not the DOM) picks up what was just chosen instead
+ * of reverting to the system preference. The single call site every "toggle theme" control
+ * (CommandBar's `onToggleTheme`, ThemeToggle) should share — a toggle that only flips the DOM
+ * attribute looks like it worked until the reader navigates and it snaps back.
+ */
+export function toggleDocumentTheme(): ThemeName {
+  const root = document.documentElement;
+  const next: ThemeName = root.dataset.theme === 'dark' ? 'light' : 'dark';
+  root.dataset.theme = next;
+  window.localStorage.setItem(THEME_STORAGE_KEY, next);
+  return next;
+}

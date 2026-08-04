@@ -54,7 +54,10 @@ function bookId(slug) {
 function formatCitation(citation) {
   const alias = CITATION_ALIASES.get(citation.href);
   if (alias) return alias;
-  const parts = [`label: ${JSON.stringify(citation.label)}`, `href: ${JSON.stringify(citation.href)}`];
+  const parts = [
+    `label: ${JSON.stringify(citation.label)}`,
+    `href: ${JSON.stringify(citation.href)}`,
+  ];
   if (citation.publisher) parts.push(`publisher: ${JSON.stringify(citation.publisher)}`);
   if (citation.publishedAt) parts.push(`publishedAt: ${JSON.stringify(citation.publishedAt)}`);
   return `{ ${parts.join(', ')} }`;
@@ -72,8 +75,10 @@ function formatChallenges(challenges) {
         `status: '${c.status ?? 'reported'}'`,
         `citation: ${formatCitation(c.citation)}`,
       ];
-      if (c.jurisdictionLabel) parts.splice(1, 0, `jurisdictionLabel: ${JSON.stringify(c.jurisdictionLabel)}`);
-      if (c.schoolYear) parts.splice(c.jurisdictionLabel ? 2 : 1, 0, `schoolYear: ${JSON.stringify(c.schoolYear)}`);
+      if (c.jurisdictionLabel)
+        parts.splice(1, 0, `jurisdictionLabel: ${JSON.stringify(c.jurisdictionLabel)}`);
+      if (c.schoolYear)
+        parts.splice(c.jurisdictionLabel ? 2 : 1, 0, `schoolYear: ${JSON.stringify(c.schoolYear)}`);
       if (c.challengeYear) parts.push(`challengeYear: ${c.challengeYear}`);
       return `{ ${parts.join(', ')} }`;
     })
@@ -82,7 +87,9 @@ function formatChallenges(challenges) {
 
 function toRecord(raw) {
   const id = bookId(raw.slug);
-  const purchaseLinks = buildIsbnPurchaseLinks(raw.isbn13, { bookshopAffiliateId: BOOKSHOP_AFFILIATE_ID });
+  const purchaseLinks = buildIsbnPurchaseLinks(raw.isbn13, {
+    bookshopAffiliateId: BOOKSHOP_AFFILIATE_ID,
+  });
   return {
     id,
     slug: raw.slug,
@@ -155,7 +162,10 @@ for (const file of files) {
       seenSlugs.add(raw.slug);
       seenIsbns.add(raw.isbn13);
     } catch (error) {
-      skipped.push({ title: raw.title, reason: error instanceof Error ? error.message : String(error) });
+      skipped.push({
+        title: raw.title,
+        reason: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 }

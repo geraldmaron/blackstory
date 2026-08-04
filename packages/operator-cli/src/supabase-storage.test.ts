@@ -28,7 +28,10 @@ test('stores the snapshot text content-addressed under captures/<sha256>.txt', a
     text: 'extracted text',
   });
   assert.equal(calls.length, 1);
-  assert.equal(calls[0]?.url, `https://ref.supabase.co/storage/v1/object/raw-sources/captures/${SHA}.txt`);
+  assert.equal(
+    calls[0]?.url,
+    `https://ref.supabase.co/storage/v1/object/raw-sources/captures/${SHA}.txt`,
+  );
   const headers = calls[0]?.init.headers as Record<string, string>;
   assert.equal(headers.authorization, 'Bearer test-secret');
   assert.equal(headers['x-upsert'], 'false');
@@ -82,7 +85,10 @@ test('a non-409 error throws with status, never the secret', async () => {
 
 test('env config: present, aliased key, and absent', () => {
   assert.deepEqual(
-    supabaseStorageConfigFromEnv({ SUPABASE_URL: 'https://r.supabase.co', SUPABASE_SECRET_KEY: 'k' }),
+    supabaseStorageConfigFromEnv({
+      SUPABASE_URL: 'https://r.supabase.co',
+      SUPABASE_SECRET_KEY: 'k',
+    }),
     { url: 'https://r.supabase.co', secretKey: 'k', bucket: 'raw-sources' },
   );
   assert.equal(

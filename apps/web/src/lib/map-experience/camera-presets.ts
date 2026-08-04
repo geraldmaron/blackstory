@@ -6,7 +6,7 @@
  * national -> state -> locality -> point descent as motion tokens: `duration`, `curve`,
  * `speed`, an authored slow-out `easing` function, and `padding` (screen-space clearance so a
  * flight's landing point never sits directly under floating chrome). `MapStage`
- * (`apps/web/src/app/(map)/MapStage.tsx`) is the only caller that turns these into real
+ * (`apps/web/src/components/map-stage/MapStage.tsx`) is the only caller that turns these into real
  * `maplibre-gl` camera calls (`flyPreset`); this module has zero `maplibre-gl` runtime import so
  * it stays unit-testable in plain Node — the same split this repo already uses for
  * `marker-size.ts` / `kind-encoding.ts` / `state-labels.ts`.

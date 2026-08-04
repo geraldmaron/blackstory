@@ -202,7 +202,8 @@ async function main(): Promise<void> {
   const apply = process.env.INGEST_PHASE1_VERA_JAIL_APPLY === '1' && process.env.DRY_RUN !== '1';
   const countyStates = parseCountyStateFips();
   const referenceYear = parseReferenceYear();
-  const latestPerCounty = process.env.PHASE1_VERA_ALL_COUNTIES === '1' && referenceYear === undefined;
+  const latestPerCounty =
+    process.env.PHASE1_VERA_ALL_COUNTIES === '1' && referenceYear === undefined;
   const csvPath = arg('vera-csv');
 
   const fetchResult = await fetchPhase1VeraJailCountyObservations({
@@ -220,7 +221,8 @@ async function main(): Promise<void> {
     sourceUrl: fetchResult.sourceUrl,
     bound: {
       countyStates: countyStates ?? 'all',
-      referenceYear: referenceYear ?? (latestPerCounty ? 'latest-per-county' : 'all-years-in-filter'),
+      referenceYear:
+        referenceYear ?? (latestPerCounty ? 'latest-per-county' : 'all-years-in-filter'),
       rowsParsed: fetchResult.rowsParsed,
       rowsSelected: fetchResult.rowsSelected,
     },

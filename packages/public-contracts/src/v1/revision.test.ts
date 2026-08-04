@@ -3,7 +3,11 @@ import { test } from 'node:test';
 import { revisionMetadataV1Schema } from './revision.js';
 
 test('round-trips full revision metadata', () => {
-  const input = { releaseId: 'release-2026-07-19', generatedAt: '2026-07-19T00:00:00.000Z', recordUpdatedAt: '2026-07-19T00:00:00.000Z' };
+  const input = {
+    releaseId: 'release-2026-07-19',
+    generatedAt: '2026-07-19T00:00:00.000Z',
+    recordUpdatedAt: '2026-07-19T00:00:00.000Z',
+  };
   assert.deepEqual(revisionMetadataV1Schema.parse(input), input);
 });
 

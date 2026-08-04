@@ -25,10 +25,7 @@ import {
   DATA_PAGE_SECTIONS,
   DATA_SECTION_COPY,
 } from './data-copy';
-import {
-  dataEditionPanelClassName,
-  dataEditionStackClassName,
-} from './data-panel-chrome';
+import { dataEditionPanelClassName, dataEditionStackClassName } from './data-panel-chrome';
 import './data-edition.css';
 
 export type DataStatStripItem = {
@@ -61,9 +58,8 @@ function formatDecadeRange(min: string, max: string): string {
 function DataUnavailable({ topic }: { readonly topic: string }) {
   return (
     <p className="ds-data-edition__empty">
-      {topic} is not available on this release yet.{' '}
-      <Link href="/">Open the map</Link> for place layers, or check back after the next
-      update.
+      {topic} is not available on this release yet. <Link href="/">Open the map</Link> for place
+      layers, or check back after the next update.
     </p>
   );
 }
@@ -138,7 +134,7 @@ export function DataSections({
           </Link>
         </p>
         <p className="ds-data-edition__credit">
-          Archive texture · symbolic atmosphere. {' '}
+          Archive texture · symbolic atmosphere.{' '}
           <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
         </p>
       </article>

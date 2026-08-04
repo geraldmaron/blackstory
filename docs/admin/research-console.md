@@ -39,6 +39,94 @@ Browser state, route visibility, hidden buttons, and IAP alone are not authoriza
 roles cannot publish or retract. Publication roles cannot mutate research workflow state.
 `useAdminPermissions` is display-only.
 
+## Canonical writes
+
+The entity workbench edits `bb_canonical.entities` directly. That reverses the console's earlier
+"admin never mutates canonical" rule for the record itself; see the 2026-08-04 entry in
+[`docs/decisions-carryover.md`](../decisions-carryover.md) for why and what did not change.
+
+Every canonical write goes through `commitCanonicalWrite`
+(`apps/admin/src/lib/canonical-write.ts`) — there is no second path. It resolves the verified
+staff identity from the session, checks the role against the verb's permission, and hands the
+state change to `commitWithAuditPostgres`, which writes domain state, the audit event, and the
+outbox message in one transaction. A canonical write without an audit row cannot exist.
+
+| Verb | Permission | Roles |
+|------|-----------|-------|
+| `entity.field_edit` | `canonical:write` | admin, research |
+| `entity.merge` | `canonical:merge` | admin |
+| `entity.merge_reverse` | `canonical:merge` | admin |
+| `entity.bulk_kind_reassign` | `canonical:bulk_write` | admin |
+| `entity.bulk_field_edit` | `canonical:bulk_write` | admin |
+
+`apps/admin/src/auth/staff-permissions.ts` is the single role→permission table; the server gate
+and `useAdminPermissions` both read it, so a hidden button and an enforced permission cannot
+drift apart. Every write requires a non-empty operator reason, and the audit actor is always the
+verified session identity — never an operator id submitted with the form.
+
+## Bulk field edits
+
+Select rows (or Select all matching, which resolves every id under the current filter) and the
+bulk panel applies `kind`, `living_status`, or `sensitivity` to the whole set. Above 250 records
+it takes a review click before the apply click, naming the exact count and the exact change.
+
+The set is **pinned to explicit ids**, not re-derived from the filter at apply time. The operator
+confirmed a count against a specific set; re-running the filter would quietly include rows that
+drifted into it since, which is the surprise the confirm step exists to prevent.
+
+A kind change writes `entity_class` in the same statement. The two are 1:1 across all 4,097 live
+rows, and every class facet reads `entity_class`, so splitting them would file the whole set under
+its old class permanently. The derivation is `entityClassForKind`
+(`apps/admin/src/lib/entity-vocabulary.ts`), which is also what the single-record editor uses.
+
+Absorbed records are skipped: they are merge tombstones pointing at a survivor, and editing one
+changes nothing anyone reads. The skipped count is reported back.
+
+The values being overwritten are read first and recorded on the audit event **grouped by prior
+value** — a thousand rows moving from `institution` to `organization` is one group holding a
+thousand ids, not a thousand before/after pairs. That keeps the event a readable size while still
+carrying what an un-do needs.
+
+One statement, one transaction, one audit event, so 5 rows and 5,000 cost the same and either all
+land or none do. This is why the bulk field-edit path has no 50-row cap: the separate
+bulk-*decision* path (`/api/catalog/bulk-decision`) commits once per entity, which is what that
+cap is protecting against, and it is unchanged.
+
+## Merging entities
+
+Select two or more records in the workbench and choose Merge (`/catalog/merge?ids=…`). The
+survivor keeps its own name, kind, and sensitivity; everything the absorbed records own moves to
+it, and the absorbed records stay in the archive marked `merge_state.status = 'absorbed'`.
+
+**A merge moves rows and never deletes them.** A row that cannot move cleanly stays with the
+absorbed record and is reported on the survivor's page. The live schema produces exactly three
+such cases: an `entity_relationships` edge or an `event_participation` row whose endpoints would
+both become the survivor (a self-loop is not a fact about anything), a participation row that
+would violate `UNIQUE (event_id, participant_id, role)`, and the single-row-per-entity tables
+`entity_embeddings` and `entity_reconciliation_status`, where the survivor's own row wins.
+
+Because nothing is destroyed, the merge is reversible in the literal sense: `applyState` returns
+the id of every row it moved and where it came from, that record is written onto the merge's audit
+event, and Reverse this merge (on the survivor's page) reads it back and repoints each row.
+Merges made before this existed — including the two from
+`packages/ops-data/scripts/merge-duplicate-hubs.ts`, which resolves collisions by deleting the
+losing rows — have no reversal record and are shown as not reversible rather than offering a
+button that would fail.
+
+A merge is a canonical decision and does not touch `bb_public.release_entities` or
+`bb_public.search_index`. The next release build reads canonical; the signed manifest is still the
+only thing that changes what is live.
+
+## Query timeouts
+
+Desks are server components, so first byte blocks on Postgres. The pool carries a connect
+timeout, a `statement_timeout`, and a client-side query timeout
+(`apps/admin/src/lib/postgres-client.ts`, overridable via `DATABASE_CONNECT_TIMEOUT_MS`,
+`DATABASE_STATEMENT_TIMEOUT_MS`, `DATABASE_QUERY_TIMEOUT_MS`). Page reads wrap in
+`readPostgresOrDegrade`, which turns an unreachable database into a banner in about five seconds
+instead of a render that hangs for minutes. Genuine query errors still throw — degradation must
+not hide broken SQL.
+
 ## Publication safety
 
 Console and release actions may target canonical drafts or immutable release candidates. They must

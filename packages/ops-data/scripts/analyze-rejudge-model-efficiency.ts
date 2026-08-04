@@ -57,8 +57,17 @@ function loadSubjects(): Map<string, SubjectMeta> {
   return new Map(data.subjects.map((s) => [s.subjectId, s]));
 }
 
-function isJsonError(decision: string, error?: string, validationIssues?: readonly string[]): boolean {
-  if (error && /json|JSON|Unterminated|Unexpected end|double-quoted property|empty completion|timeout|SIGTERM/i.test(error)) {
+function isJsonError(
+  decision: string,
+  error?: string,
+  validationIssues?: readonly string[],
+): boolean {
+  if (
+    error &&
+    /json|JSON|Unterminated|Unexpected end|double-quoted property|empty completion|timeout|SIGTERM/i.test(
+      error,
+    )
+  ) {
     return true;
   }
   if (validationIssues?.some((v) => v.includes('completion_error'))) return true;
@@ -93,11 +102,14 @@ function evaluatePromoteEligible(
   if (packet.confidence < AUTO_PROMOTE_CONFIDENCE_FLOOR) return false;
   if (packet.validationIssues.length > 0) return false;
   if (!subject || subject.kind === 'person') return false;
-  if (!subject.jurisdictionLabel || !subject.locationLabel || !subject.locationPrecision) return false;
+  if (!subject.jurisdictionLabel || !subject.locationLabel || !subject.locationPrecision)
+    return false;
   if (packet.claims.length === 0) return false;
   for (const [index, claim] of packet.claims.entries()) {
     if (!claim.citationHref) return false;
-    const sources: SourceForConfidence[] = [{ url: claim.citationHref, textContainsSubjectName: true }];
+    const sources: SourceForConfidence[] = [
+      { url: claim.citationHref, textContainsSubjectName: true },
+    ];
     if (subject.corroboratingSourceUrl && subject.corroboratingSourceUrl !== claim.citationHref) {
       sources.push({ url: subject.corroboratingSourceUrl, textContainsSubjectName: true });
     }
@@ -108,10 +120,13 @@ function evaluatePromoteEligible(
     predicate: claim.predicate ?? 'documented_site',
     object: claim.object ?? '',
     confidenceLevel:
-      claim.confidenceLevel === 'high' || claim.confidenceLevel === 'medium' || claim.confidenceLevel === 'low'
+      claim.confidenceLevel === 'high' ||
+      claim.confidenceLevel === 'medium' ||
+      claim.confidenceLevel === 'low'
         ? claim.confidenceLevel
         : 'medium',
-    citationSource: claim.citationSource ?? new URL(claim.citationHref ?? 'https://unknown').hostname,
+    citationSource:
+      claim.citationSource ?? new URL(claim.citationHref ?? 'https://unknown').hostname,
     citationHref: claim.citationHref,
     citationLabel: claim.citationLabel ?? claim.citationSource ?? 'Source',
   }));
@@ -148,7 +163,12 @@ function evaluatePromoteEligible(
   return build.ok;
 }
 
-function ingestProgressNdjson(path: string, source: string, judgments: Judgment[], _subjects: Map<string, SubjectMeta>): void {
+function ingestProgressNdjson(
+  path: string,
+  source: string,
+  judgments: Judgment[],
+  _subjects: Map<string, SubjectMeta>,
+): void {
   if (!existsSync(path)) return;
   for (const line of readFileSync(path, 'utf8').split('\n')) {
     if (!line.trim()) continue;
@@ -162,9 +182,7 @@ function ingestProgressNdjson(path: string, source: string, judgments: Judgment[
       const jsonError = isJsonError(decision, error);
       const confidence = typeof row.confidence === 'number' ? row.confidence : 0;
       const promoteEligible =
-        typeof row.promoteEligible === 'boolean'
-          ? row.promoteEligible
-          : false;
+        typeof row.promoteEligible === 'boolean' ? row.promoteEligible : false;
       judgments.push({
         subjectId,
         model,
@@ -180,7 +198,12 @@ function ingestProgressNdjson(path: string, source: string, judgments: Judgment[
   }
 }
 
-function ingestEnrichmentRun(path: string, source: string, judgments: Judgment[], subjects: Map<string, SubjectMeta>): void {
+function ingestEnrichmentRun(
+  path: string,
+  source: string,
+  judgments: Judgment[],
+  subjects: Map<string, SubjectMeta>,
+): void {
   if (!existsSync(path)) return;
   let parsed: unknown;
   try {
@@ -222,7 +245,11 @@ function ingestEnrichmentRun(path: string, source: string, judgments: Judgment[]
   for (const item of run.items) {
     const { packet } = item;
     const model = packet.model?.modelId ?? 'unknown';
-    const jsonError = isJsonError(item.error ? 'error' : packet.decision, item.error, packet.validationIssues);
+    const jsonError = isJsonError(
+      item.error ? 'error' : packet.decision,
+      item.error,
+      packet.validationIssues,
+    );
     const subject = subjects.get(packet.subjectId);
     const promoteEligible = evaluatePromoteEligible(subject, {
       decision: packet.decision,
@@ -269,7 +296,12 @@ function main(): void {
   const judgments: Judgment[] = [];
 
   // Canonical progress with promote flags
-  ingestProgressNdjson(join(cacheDir, 'rejudge-progress.ndjson'), 'rejudge-progress', judgments, subjects);
+  ingestProgressNdjson(
+    join(cacheDir, 'rejudge-progress.ndjson'),
+    'rejudge-progress',
+    judgments,
+    subjects,
+  );
 
   // All progress streams
   for (const file of readdirSync(cacheDir, { recursive: true })) {
@@ -279,7 +311,10 @@ function main(): void {
 
   // Full enrichment runs (richer promote computation)
   const runFiles = readdirSync(cacheDir).filter(
-    (f) => f.endsWith('-enrichment-run.json') || f.endsWith('-run.json') || f === 'rejudge-merged-enrichment-run.json',
+    (f) =>
+      f.endsWith('-enrichment-run.json') ||
+      f.endsWith('-run.json') ||
+      f === 'rejudge-merged-enrichment-run.json',
   );
   for (const file of runFiles) {
     if (file.includes('commit-summary')) continue;
@@ -287,7 +322,12 @@ function main(): void {
   }
   for (const file of readdirSync(join(cacheDir, 'rejudge-one'))) {
     if (file.endsWith('-run.json')) {
-      ingestEnrichmentRun(join(cacheDir, 'rejudge-one', file), `rejudge-one/${file}`, judgments, subjects);
+      ingestEnrichmentRun(
+        join(cacheDir, 'rejudge-one', file),
+        `rejudge-one/${file}`,
+        judgments,
+        subjects,
+      );
     }
   }
 
@@ -340,7 +380,8 @@ function main(): void {
       agg.keep += 1;
       agg.confSum += j.confidence;
       agg.keepCount += 1;
-    } else if (j.decision === 'needs_evidence' || j.decision === 'json_error') agg.needsEvidence += 1;
+    } else if (j.decision === 'needs_evidence' || j.decision === 'json_error')
+      agg.needsEvidence += 1;
     else if (j.decision === 'reject') agg.reject += 1;
     if (j.jsonError) agg.jsonError += 1;
     if (j.promoteEligible) agg.promoteEligible += 1;
@@ -387,7 +428,8 @@ function main(): void {
       avgKeepConf: Math.round(avgKeepConf * 1000) / 1000,
       costBallpark: cost,
       efficiencyScore: Math.round(efficiencyScore * 100) / 100,
-      avgLatencySec: agg.latencyN > 0 ? Math.round((agg.latencySum / agg.latencyN / 1000) * 10) / 10 : null,
+      avgLatencySec:
+        agg.latencyN > 0 ? Math.round((agg.latencySum / agg.latencyN / 1000) * 10) / 10 : null,
     });
   }
 
@@ -403,13 +445,19 @@ function main(): void {
       // skip
     }
   }
-  const queue = (JSON.parse(readFileSync(join(cacheDir, 'rejudge-queue.json'), 'utf8')) as { ids: string[] }).ids;
+  const queue = (
+    JSON.parse(readFileSync(join(cacheDir, 'rejudge-queue.json'), 'utf8')) as { ids: string[] }
+  ).ids;
   const remaining = queue.filter((id) => !oneByOneDone.has(id)).length;
 
   const recommendation = {
     primary: 'qwen/qwen3-32b',
     retry: 'qwen/qwen3-32b (same-model re-run on JSON/error)',
-    avoid: ['qwen/qwen-2.5-72b-instruct', 'qwen/qwen-2.5-7b-instruct', 'z-ai/glm-4.5-air as primary/retry'],
+    avoid: [
+      'qwen/qwen-2.5-72b-instruct',
+      'qwen/qwen-2.5-7b-instruct',
+      'z-ai/glm-4.5-air as primary/retry',
+    ],
     rationale:
       'Pass2 qwen3-32b: 91.5% keep, 4.7% JSON errors (~$0.08/1M). GLM pass1: 78.3% JSON fail. 72b retry: 31.2% JSON fail on 77 items. 122b n=2 only — thin-margin claim-conf escalation only. Zero promote-eligible across all passes (claim-confidence gate).',
     remainingAtStart: remaining,
@@ -418,12 +466,16 @@ function main(): void {
   const out = {
     ranked,
     recommendation,
-    costNote: 'OpenRouter $/1M token ballparks — verify live pricing; used for relative scoring only.',
+    costNote:
+      'OpenRouter $/1M token ballparks — verify live pricing; used for relative scoring only.',
     totalJudgmentsDeduped: rows.length,
   };
 
   console.log(JSON.stringify(out, null, 2));
-  writeFileSync(join(cacheDir, 'rejudge-model-efficiency-analysis.json'), `${JSON.stringify(out, null, 2)}\n`);
+  writeFileSync(
+    join(cacheDir, 'rejudge-model-efficiency-analysis.json'),
+    `${JSON.stringify(out, null, 2)}\n`,
+  );
 }
 
 main();

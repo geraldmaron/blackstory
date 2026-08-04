@@ -5,7 +5,7 @@
   top: var(--ds-space-2);
   left: var(--ds-space-2);
   right: var(--ds-space-2);
-  z-index: 50;
+  z-index: var(--ds-z-command-bar);
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -25,22 +25,55 @@
  * only sets the bar's own spacing and the height cap for a 64px bar. The lockup reads as the
  * site's signature, not a favicon parked beside the search field, so it takes most of that bar
  * height rather than sitting two steps below the controls next to it.
+ *
+ * Both brand PNGs ship with a wide transparent margin baked into the file, so sizing the *image*
+ * to the bar sized mostly empty pixels: at the old 3.25rem the lockup drew 52px of image holding
+ * 19.5px of visible wordmark, which is why the brand read as undersized next to a 38px search
+ * pill. The sizes below are the image box; the negative margins pull the layout box in to the
+ * artwork's own edges, so `--ds-bar-lockup-size` / `--ds-bar-symbol-size` set how big the mark
+ * actually *looks* and the bar lays out around the ink rather than around the padding.
+ *
+ * Trim ratios are measured from the assets' alpha bounds and must be re-measured if the artwork
+ * is re-exported (see repo issue on cropping the source PNGs):
+ *   lockup 800x450 — ink x 114..712, y 136..304  (L .1425  R .1087  T .3022  B .3222)
+ *   symbol 512x512 — ink 33%/57% of the box      (L .3281  R .3184  T .1699  B .2598)
+ * The inline ratios below fold in the lockup's 800/450 aspect, since its margins scale with the
+ * rendered width while `--ds-bar-lockup-size` names the height.
  */
 .ds-bar__brand {
+  --ds-bar-lockup-size: 5rem;
+  --ds-bar-symbol-size: 3rem;
   display: inline-flex;
   align-items: center;
   gap: var(--ds-space-2);
   color: var(--ds-ink);
   text-decoration: none;
+  /* Clips the trimmed-away transparent overhang so it cannot sit over — and swallow clicks
+     meant for — the search trigger next to it. Nothing visible is cropped: the negative
+     margins land the box exactly on the artwork's alpha bounds. */
+  overflow: hidden;
 }
 
+/* `max-width: none` and `flex: none` on both: the negative margins deliberately make each image's
+   outer box narrower than its own border box, and the global `img { max-width: 100% }` reset then
+   caps the image at that narrower box while `object-fit: fill` squashes the artwork ~25% to match.
+   The overhang is meant to hang out and be clipped by the anchor's `overflow: hidden`, not to
+   resize the image. `flex: none` stops the flex algorithm reaching the same wrong conclusion. */
 .ds-bar__brand .ds-shell-wordmark__img--lockup {
-  height: 3.25rem;
+  flex: none;
+  max-width: none;
+  height: var(--ds-bar-lockup-size);
+  margin-block: calc(var(--ds-bar-lockup-size) * -0.3022) calc(var(--ds-bar-lockup-size) * -0.3222);
+  margin-inline: calc(var(--ds-bar-lockup-size) * -0.2533) calc(var(--ds-bar-lockup-size) * -0.1932);
 }
 
 .ds-bar__brand .ds-shell-wordmark__img--symbol {
-  width: 2.125rem;
-  height: 2.125rem;
+  flex: none;
+  max-width: none;
+  width: var(--ds-bar-symbol-size);
+  height: var(--ds-bar-symbol-size);
+  margin-block: calc(var(--ds-bar-symbol-size) * -0.1699) calc(var(--ds-bar-symbol-size) * -0.2598);
+  margin-inline: calc(var(--ds-bar-symbol-size) * -0.3281) calc(var(--ds-bar-symbol-size) * -0.3184);
 }
 
 /* ---- search trigger ------------------------------------------------------ */
@@ -116,7 +149,7 @@
   top: calc(100% + var(--ds-space-2));
   left: 0;
   right: 0;
-  z-index: 60;
+  z-index: var(--ds-z-command-overlay);
   margin: 0;
   padding: var(--ds-space-1);
   list-style: none;
@@ -193,19 +226,36 @@
   cursor: pointer;
 }
 
-/* The Library link is an anchor in a row of buttons, so it needs the line box the others get
-   from being buttons. Separated from the toggles by a hairline: it leaves the surface. */
+/* An anchor in a row of buttons, so it needs the line box the others get from being buttons. */
 .ds-bar__mode-link {
   display: inline-flex;
   align-items: center;
   margin-left: 2px;
+  text-decoration: none;
+  transition:
+    background var(--ds-duration-fast, 0.15s) var(--ds-easing, ease),
+    color var(--ds-duration-fast, 0.15s) var(--ds-easing, ease);
+}
+
+/*
+ * The hairline marks one specific boundary: the point where the group stops being toggles for the
+ * current surface and starts being a link off it. It therefore belongs only to a link that follows
+ * a button, not to `.ds-bar__mode-link` as such.
+ *
+ * On every room the bar renders without mode toggles, so Atlas, Story and Library are all three
+ * mode-links — the old blanket `border-left` drew a rule before each of them, including one on
+ * Atlas that sat a couple of pixels inside the group's own border and read as a stray line. The
+ * sibling selector keeps the separator on the Atlas surface (where Library really does follow two
+ * buttons) and leaves the room bar as three evenly spaced peers.
+ */
+.ds-bar__modes button + .ds-bar__mode-link {
   border-left: var(--ds-border-width) solid var(--ds-border);
   border-radius: 0 var(--ds-radius-full) var(--ds-radius-full) 0;
-  text-decoration: none;
 }
 
 .ds-bar__mode-link:hover,
 .ds-bar__mode-link:focus-visible {
+  background: var(--ds-surface);
   color: var(--ds-ink);
 }
 

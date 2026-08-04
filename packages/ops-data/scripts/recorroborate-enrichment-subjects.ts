@@ -76,7 +76,10 @@ async function main(): Promise<void> {
   const concurrency = Number(readArgFlag('--concurrency') ?? '2');
   const onlyMissing = hasFlag('--only-missing');
   const dryRun = hasFlag('--dry-run');
-  const idsFilter = readArgFlag('--ids')?.split(',').map((id) => id.trim()).filter(Boolean);
+  const idsFilter = readArgFlag('--ids')
+    ?.split(',')
+    .map((id) => id.trim())
+    .filter(Boolean);
 
   if (!subjectsPath || !outPath) {
     console.error(

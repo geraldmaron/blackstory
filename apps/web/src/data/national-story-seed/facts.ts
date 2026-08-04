@@ -87,7 +87,9 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
       'Boley was founded in 1903 on Creek Nation land in Okfuskee County and incorporated in 1905, growing from a Black railroad construction camp into one of the largest all-Black towns in the United States.',
     shortStatement: 'Boley founded, 1903; incorporated 1905',
     claimType: 'event',
-    subjects: [{ entityId: 'ent_boley_historic_district_001', kind: 'place', role: 'primary-subject' }],
+    subjects: [
+      { entityId: 'ent_boley_historic_district_001', kind: 'place', role: 'primary-subject' },
+    ],
     geo: { lat: 35.4956, lng: -96.4828, geoPrecision: 'locality' },
     when: { validFrom: '1903', datePrecision: 'year' },
     qualifiers: [],
@@ -131,7 +133,9 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
       'The Boley Historic District is listed in the National Register of Historic Places (NR 75001568) and designated a National Historic Landmark, recognizing one of the nation’s most significant surviving all-Black towns.',
     shortStatement: 'Boley Historic District NHL, NR 75001568',
     claimType: 'place-designation',
-    subjects: [{ entityId: 'ent_boley_historic_district_001', kind: 'place', role: 'designated-place' }],
+    subjects: [
+      { entityId: 'ent_boley_historic_district_001', kind: 'place', role: 'designated-place' },
+    ],
     geo: { lat: 35.4956, lng: -96.4828, geoPrecision: 'locality' },
     when: { validFrom: '1975', datePrecision: 'year' },
     qualifiers: [],
@@ -230,7 +234,13 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
       'Harriet Tubman Underground Railroad National Historical Park preserves the Dorchester County, Maryland, landscape where Harriet Tubman was born and later conducted Underground Railroad work.',
     shortStatement: 'Tubman park preserves Eastern Shore landscape',
     claimType: 'place-designation',
-    subjects: [{ entityId: 'ent_tubman_underground_railroad_md_001', kind: 'place', role: 'designated-place' }],
+    subjects: [
+      {
+        entityId: 'ent_tubman_underground_railroad_md_001',
+        kind: 'place',
+        role: 'designated-place',
+      },
+    ],
     geo: { lat: 38.4483, lng: -76.1387, geoPrecision: 'block' },
     when: { validFrom: '2013', datePrecision: 'year' },
     qualifiers: [],
@@ -263,7 +273,13 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
       'Congress redesignated the Harriet Tubman Underground Railroad National Monument as Harriet Tubman Underground Railroad National Historical Park on December 19, 2014.',
     shortStatement: 'Tubman park redesignated, Dec. 19, 2014',
     claimType: 'event',
-    subjects: [{ entityId: 'ent_tubman_underground_railroad_md_001', kind: 'place', role: 'primary-subject' }],
+    subjects: [
+      {
+        entityId: 'ent_tubman_underground_railroad_md_001',
+        kind: 'place',
+        role: 'primary-subject',
+      },
+    ],
     geo: { lat: 38.4483, lng: -76.1387, geoPrecision: 'block' },
     when: { validFrom: '2014-12-19', datePrecision: 'day' },
     qualifiers: [],
@@ -329,7 +345,9 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
       'Cheyney University is documented as the oldest historically Black institution of higher learning in the United States.',
     shortStatement: 'Oldest HBCU in the United States',
     claimType: 'place-designation',
-    subjects: [{ entityId: 'ent_cheyney_university_001', kind: 'school', role: 'designated-place' }],
+    subjects: [
+      { entityId: 'ent_cheyney_university_001', kind: 'school', role: 'designated-place' },
+    ],
     geo: { lat: 39.932, lng: -75.529, geoPrecision: 'block' },
     when: { validFrom: '1837', datePrecision: 'year' },
     qualifiers: [],
@@ -373,7 +391,9 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
       'Lincoln University was chartered April 29, 1854, as Ashmun Institute by John Miller Dickey and Sarah Emlen Cresson in Chester County, Pennsylvania.',
     shortStatement: 'Ashmun Institute chartered, Apr. 29, 1854',
     claimType: 'event',
-    subjects: [{ entityId: 'ent_lincoln_university_pa_001', kind: 'school', role: 'primary-subject' }],
+    subjects: [
+      { entityId: 'ent_lincoln_university_pa_001', kind: 'school', role: 'primary-subject' },
+    ],
     geo: { lat: 39.8083, lng: -75.9278, geoPrecision: 'block' },
     when: { validFrom: '1854-04-29', datePrecision: 'day' },
     qualifiers: [],
@@ -406,7 +426,9 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
       'Lincoln University is documented as the nation’s first degree-granting historically Black college and university.',
     shortStatement: 'First degree-granting HBCU',
     claimType: 'place-designation',
-    subjects: [{ entityId: 'ent_lincoln_university_pa_001', kind: 'school', role: 'designated-place' }],
+    subjects: [
+      { entityId: 'ent_lincoln_university_pa_001', kind: 'school', role: 'designated-place' },
+    ],
     geo: { lat: 39.8083, lng: -75.9278, geoPrecision: 'block' },
     when: { validFrom: '1854', datePrecision: 'year' },
     qualifiers: [],
@@ -585,10 +607,10 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
         {
           id: 'csl-nmaahc-hbcu-hampton',
           type: 'webpage',
-          title: 'Education Steeped in African American Culture: Historically Black Colleges and Universities',
+          title:
+            'Education Steeped in African American Culture: Historically Black Colleges and Universities',
           publisher: 'National Museum of African American History and Culture',
-          URL:
-            'https://nmaahc.si.edu/explore/stories/education-steeped-african-american-culture-historically-black-colleges-and',
+          URL: 'https://nmaahc.si.edu/explore/stories/education-steeped-african-american-culture-historically-black-colleges-and',
         },
         'NMAAHC HBCU feature documents Hampton’s 1868 founding as Hampton Normal and Agricultural Institute.',
       ),
@@ -604,7 +626,13 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
       'The Brotherhood of Sleeping Car Porters organized in 1925 under A. Philip Randolph to represent African American railroad porters employed by the Pullman Company.',
     shortStatement: 'BSCP organized, 1925',
     claimType: 'event',
-    subjects: [{ entityId: 'ent_brotherhood_sleeping_car_porters_001', kind: 'institution', role: 'primary-subject' }],
+    subjects: [
+      {
+        entityId: 'ent_brotherhood_sleeping_car_porters_001',
+        kind: 'institution',
+        role: 'primary-subject',
+      },
+    ],
     geo: { lat: 40.8147, lng: -73.9419, geoPrecision: 'locality' },
     when: { validFrom: '1925', datePrecision: 'year' },
     qualifiers: [],
@@ -637,7 +665,13 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
       'The Brotherhood of Sleeping Car Porters won collective bargaining recognition from the Pullman Company in 1937 — the first major African American labor union to do so.',
     shortStatement: 'BSCP Pullman contract, 1937',
     claimType: 'event',
-    subjects: [{ entityId: 'ent_brotherhood_sleeping_car_porters_001', kind: 'institution', role: 'primary-subject' }],
+    subjects: [
+      {
+        entityId: 'ent_brotherhood_sleeping_car_porters_001',
+        kind: 'institution',
+        role: 'primary-subject',
+      },
+    ],
     geo: { lat: 40.8147, lng: -73.9419, geoPrecision: 'locality' },
     when: { validFrom: '1937', datePrecision: 'year' },
     qualifiers: [],
@@ -670,7 +704,9 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
       'The Schomburg Center for Research in Black Culture is a New York Public Library research division in Harlem built around Arturo Schomburg’s collection documenting the global African diaspora.',
     shortStatement: 'Schomburg Center, NYPL research division',
     claimType: 'place-designation',
-    subjects: [{ entityId: 'ent_schomburg_center_001', kind: 'institution', role: 'designated-place' }],
+    subjects: [
+      { entityId: 'ent_schomburg_center_001', kind: 'institution', role: 'designated-place' },
+    ],
     geo: { lat: 40.8144, lng: -73.9411, geoPrecision: 'block' },
     when: { validFrom: '1925', datePrecision: 'year' },
     qualifiers: [],
@@ -801,7 +837,9 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
       'Digitized runs of the Richmond Planet survive in the Library of Virginia’s Virginia Chronicle newspaper collections.',
     shortStatement: 'Richmond Planet digitized in Virginia Chronicle',
     claimType: 'place-designation',
-    subjects: [{ entityId: 'ent_richmond_planet_001', kind: 'institution', role: 'artifact-context' }],
+    subjects: [
+      { entityId: 'ent_richmond_planet_001', kind: 'institution', role: 'artifact-context' },
+    ],
     geo: { lat: 37.5407, lng: -77.436, geoPrecision: 'locality' },
     when: { validFrom: '1883', datePrecision: 'year' },
     qualifiers: [],
@@ -849,7 +887,8 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
         {
           id: 'csl-sia-nmaahc-act',
           type: 'webpage',
-          title: 'National Museum of African American History and Culture — Smithsonian Institution Archives',
+          title:
+            'National Museum of African American History and Culture — Smithsonian Institution Archives',
           URL: 'https://siarchives.si.edu/history/national-museum-african-american-history-and-culture',
         },
         'Smithsonian Archives history documents the 2003 congressional act establishing NMAAHC.',
@@ -881,7 +920,8 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
         {
           id: 'csl-sia-nmaahc-opening',
           type: 'webpage',
-          title: 'National Museum of African American History and Culture — Smithsonian Institution Archives',
+          title:
+            'National Museum of African American History and Culture — Smithsonian Institution Archives',
           URL: 'https://siarchives.si.edu/history/national-museum-african-american-history-and-culture',
         },
         'Archives history records the museum’s September 24, 2016 public opening.',
@@ -898,7 +938,9 @@ export const NATIONAL_STORY_FACTS: readonly FactRecord[] = [
       'Little Rock Central High School National Historic Site was established November 6, 1998 (P.L. 105-356), preserving an operating high school campus.',
     shortStatement: 'Central High NHS established, Nov. 6, 1998',
     claimType: 'place-designation',
-    subjects: [{ entityId: 'ent_little_rock_central_high_001', kind: 'school', role: 'designated-place' }],
+    subjects: [
+      { entityId: 'ent_little_rock_central_high_001', kind: 'school', role: 'designated-place' },
+    ],
     geo: { lat: 34.7367, lng: -92.2978, geoPrecision: 'block' },
     when: { validFrom: '1998-11-06', datePrecision: 'day' },
     qualifiers: [],

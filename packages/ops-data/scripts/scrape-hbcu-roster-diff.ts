@@ -189,12 +189,28 @@ function slugify(name: string): string {
 
 /** Low-signal tokens common to institution names — excluded from the overlap check. */
 const NAME_STOPWORDS = new Set([
-  'university', 'college', 'the', 'of', 'and', 'a', 'm', 'state', 'institute',
-  'school', 'at', 'campus', 'community', 'technical',
+  'university',
+  'college',
+  'the',
+  'of',
+  'and',
+  'a',
+  'm',
+  'state',
+  'institute',
+  'school',
+  'at',
+  'campus',
+  'community',
+  'technical',
 ]);
 
 function nameTokens(name: string): Set<string> {
-  return new Set(normalizeNameForDiff(name).split(' ').filter((t) => t && !NAME_STOPWORDS.has(t)));
+  return new Set(
+    normalizeNameForDiff(name)
+      .split(' ')
+      .filter((t) => t && !NAME_STOPWORDS.has(t)),
+  );
 }
 
 /**
@@ -242,7 +258,10 @@ type Report = {
     readonly canonicalUrl: string;
     readonly sourceItemId: string;
   }[];
-  readonly urlFailedRows: readonly { readonly displayName: string; readonly canonicalUrl: string }[];
+  readonly urlFailedRows: readonly {
+    readonly displayName: string;
+    readonly canonicalUrl: string;
+  }[];
   readonly dedupedOutLandscapeLaneNames: readonly string[];
   readonly dedupedOutCanonicalEntityNames: readonly string[];
   readonly likelyNameVariantWarnings: readonly {
@@ -304,10 +323,16 @@ async function main(): Promise<void> {
     }
     const verified = await fetchPage(institution.websiteUrl);
     if (!verified) {
-      urlFailedRows.push({ displayName: institution.displayName, canonicalUrl: institution.websiteUrl });
+      urlFailedRows.push({
+        displayName: institution.displayName,
+        canonicalUrl: institution.websiteUrl,
+      });
       continue;
     }
-    const variantMatch = findLikelyNameVariant(institution.displayName, existingLandscapeDisplayNames);
+    const variantMatch = findLikelyNameVariant(
+      institution.displayName,
+      existingLandscapeDisplayNames,
+    );
     if (variantMatch) {
       likelyNameVariantWarnings.push({
         candidateName: institution.displayName,
@@ -344,7 +369,11 @@ async function main(): Promise<void> {
 
   console.log('\nWould-be-staged rows (net-new):');
   console.table(
-    netNewRows.map((row) => ({ name: row.displayName, kind: row.kind, canonical_url: row.canonicalUrl })),
+    netNewRows.map((row) => ({
+      name: row.displayName,
+      kind: row.kind,
+      canonical_url: row.canonicalUrl,
+    })),
   );
   console.log(
     `\nCounts: scraped=${report.counts.scraped} ` +
@@ -360,20 +389,28 @@ async function main(): Promise<void> {
   if (likelyNameVariantWarnings.length > 0) {
     console.log(
       `\nWARNING: ${likelyNameVariantWarnings.length} net-new row(s) look like name variants of an ` +
-        'existing lane=\'hbcu\' row (token overlap >= 60%). Staged as net-new but flagged for manual review:',
+        "existing lane='hbcu' row (token overlap >= 60%). Staged as net-new but flagged for manual review:",
     );
     console.table(
-      likelyNameVariantWarnings.map((w) => ({ candidate: w.candidateName, existing: w.matchesExisting })),
+      likelyNameVariantWarnings.map((w) => ({
+        candidate: w.candidateName,
+        existing: w.matchesExisting,
+      })),
     );
   }
 
   mkdirSync(REPORT_DIR, { recursive: true });
-  const reportPath = join(REPORT_DIR, `hbcu-roster-diff-${report.generatedAt.replace(/[:.]/gu, '-')}.json`);
+  const reportPath = join(
+    REPORT_DIR,
+    `hbcu-roster-diff-${report.generatedAt.replace(/[:.]/gu, '-')}.json`,
+  );
   writeFileSync(reportPath, JSON.stringify(report, null, 2));
   console.log(`\nReport written to ${reportPath}`);
 
   if (DRY_RUN || !APPLY) {
-    console.log("\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 HBCU_ROSTER_DIFF_APPLY=1 to apply.");
+    console.log(
+      '\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 HBCU_ROSTER_DIFF_APPLY=1 to apply.',
+    );
     await pool.end();
     return;
   }
@@ -426,14 +463,20 @@ async function main(): Promise<void> {
           null,
           null,
           row.canonicalUrl,
-          JSON.stringify({ sourceId: SOURCE_PROGRAM_ID, sourceUrl: SOURCE_URL, capturedAt: report.generatedAt }),
+          JSON.stringify({
+            sourceId: SOURCE_PROGRAM_ID,
+            sourceUrl: SOURCE_URL,
+            capturedAt: report.generatedAt,
+          }),
           JSON.stringify(row),
           report.generatedAt,
         ],
       );
     }
     await client.query('COMMIT');
-    console.log(`Applied: upserted run ${runId}, inserted up to ${netNewRows.length} candidate row(s) (ON CONFLICT DO NOTHING on (lane, source_item_id)).`);
+    console.log(
+      `Applied: upserted run ${runId}, inserted up to ${netNewRows.length} candidate row(s) (ON CONFLICT DO NOTHING on (lane, source_item_id)).`,
+    );
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
     throw error;

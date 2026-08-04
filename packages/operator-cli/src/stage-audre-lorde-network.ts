@@ -12,7 +12,11 @@
  *   node --conditions development --import tsx packages/operator-cli/src/stage-audre-lorde-network.ts
  */
 import { getOpsPostgresPool } from '@repo/data-access';
-import { expandEntityNetwork, stageNetworkCandidates, type ExpansionSeed } from './entity-network-expansion.js';
+import {
+  expandEntityNetwork,
+  stageNetworkCandidates,
+  type ExpansionSeed,
+} from './entity-network-expansion.js';
 
 const AUDRE_LORDE: ExpansionSeed = {
   qid: 'Q463319',
@@ -60,9 +64,13 @@ async function main() {
       },
     );
 
-    console.log(`Staged ${staged.length} rows to bb_research.landscape_candidates (lane='wikidata').`);
+    console.log(
+      `Staged ${staged.length} rows to bb_research.landscape_candidates (lane='wikidata').`,
+    );
     for (const row of staged) {
-      console.log(`  ${row.display_name} (${row.source_item_id}): ${row.payload.relationship_type} (${row.payload.direction})`);
+      console.log(
+        `  ${row.display_name} (${row.source_item_id}): ${row.payload.relationship_type} (${row.payload.direction})`,
+      );
     }
   } finally {
     client.release();

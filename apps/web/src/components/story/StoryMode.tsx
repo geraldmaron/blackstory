@@ -14,11 +14,7 @@
 
 import React, { useCallback, useEffect, useRef } from 'react';
 import { cx } from '@repo/ui';
-import {
-  CHAPTER_INTERSECTION_THRESHOLD,
-  STORY_CHAPTERS,
-  type StoryChapter,
-} from '../../lib/story/chapters';
+import { CHAPTER_INTERSECTION_THRESHOLD, type StoryChapter } from '../../lib/story/chapters';
 import { COLD_OPEN_WORDS, copyFor, headingParts } from './story-copy';
 import type { StoryRecordSpotlight } from '../../lib/story/pick-story-record';
 import type { StoryFact } from '../../lib/story/story-facts';
@@ -28,25 +24,29 @@ void React;
 
 export type StoryModeProps = {
   readonly active: boolean;
+  /**
+   * The running order for this visit, from `pickStoryChapters`. Passed in rather than read from
+   * `STORY_CHAPTERS` here: which chapters run varies per visit, and the surface has to roll once
+   * and give the same answer to the renderer, the observer and the camera.
+   */
+  readonly chapters: readonly StoryChapter[];
   /** Runs when a chapter comes into view. The surface owns camera, routes, sweep and spotlight. */
   readonly onChapter: (chapter: StoryChapter) => void;
   readonly onOpenAtlas: () => void;
   readonly onNearMe?: () => void;
   readonly reducedMotion?: boolean;
   /**
-   * The record chapter 2 drew this visit. Absent when the release yielded no eligible record, in
-   * which case the chapter falls back to its written copy rather than rendering a gap.
+   * The record the evidence chapter drew this visit. Absent when the release yielded no eligible
+   * record, in which case the chapter falls back to its written copy rather than rendering a gap.
    */
   readonly recordSpotlight?: StoryRecordSpotlight | undefined;
-  /** The fact chapter 3 drew this visit. Absent falls back the same way. */
-  readonly fact?: StoryFact | undefined;
+  /** The fact each rotating-fact chapter drew this visit, by chapter id. Absent falls back. */
+  readonly factByChapterId?: Readonly<Record<string, StoryFact>> | undefined;
   readonly className?: string;
 };
 
 /** The chapter whose body is a drawn record rather than written prose. */
 const RECORD_CHAPTER_ID = 'one-record';
-/** The chapter whose body is one of the twenty cited facts. */
-const FACT_CHAPTER_ID = 'migration';
 
 type ChapterBody = {
   readonly prose: string;
@@ -87,7 +87,7 @@ function chapterBody(
     };
   }
 
-  if (chapter.id === FACT_CHAPTER_ID && fact) {
+  if (chapter.rotatingFact && fact) {
     return { prose: fact.prose, figures: fact.figures, cite: fact.source };
   }
 
@@ -108,17 +108,22 @@ function ColdOpenHeading({ kinetic }: { readonly kinetic: boolean }) {
 
 export function StoryMode({
   active,
+  chapters,
   onChapter,
   onOpenAtlas,
   onNearMe,
   reducedMotion = false,
   recordSpotlight,
-  fact,
+  factByChapterId,
   className,
 }: StoryModeProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const onChapterRef = useRef(onChapter);
   onChapterRef.current = onChapter;
+  // The observer resolves an index back to a chapter, so it has to read the same running order the
+  // renderer used rather than the authored pool.
+  const chaptersRef = useRef(chapters);
+  chaptersRef.current = chapters;
 
   useEffect(() => {
     const root = rootRef.current;
@@ -133,7 +138,7 @@ export function StoryMode({
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
         if (!winner) return;
         const index = Number((winner.target as HTMLElement).dataset.chapter);
-        const chapter = STORY_CHAPTERS[index];
+        const chapter = chaptersRef.current[index];
         if (chapter) onChapterRef.current(chapter);
       },
       { root, threshold: CHAPTER_INTERSECTION_THRESHOLD },
@@ -141,7 +146,8 @@ export function StoryMode({
 
     for (const section of root.querySelectorAll('[data-chapter]')) observer.observe(section);
     return () => observer.disconnect();
-  }, [active]);
+    // Re-observes when the running order changes: the sections themselves are different elements.
+  }, [active, chapters]);
 
   const scrollToChapter = useCallback(
     (index: number) => {
@@ -156,11 +162,11 @@ export function StoryMode({
 
   return (
     <div className={cx('ds-story', className)} ref={rootRef} id="ds-story">
-      {STORY_CHAPTERS.map((chapter) => {
+      {chapters.map((chapter) => {
         const copy = copyFor(chapter.id);
         if (!copy) return null;
         const { before, accent, after } = headingParts(copy);
-        const body = chapterBody(chapter, copy, recordSpotlight, fact);
+        const body = chapterBody(chapter, copy, recordSpotlight, factByChapterId?.[chapter.id]);
 
         return (
           <section
@@ -223,7 +229,7 @@ export function StoryMode({
                 </div>
               ) : null}
 
-              {chapter.index === STORY_CHAPTERS.length - 1 ? (
+              {chapter.index === chapters.length - 1 ? (
                 <div className="ds-story__actions">
                   <button
                     type="button"

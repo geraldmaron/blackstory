@@ -40,6 +40,13 @@ export type PackMemorialNamesOptions = {
   readonly maxAttempts?: number;
   /** Inclusive [min, max] font size in px; defaults to [14, 28]. */
   readonly fontSizeRange?: readonly [number, number];
+  /**
+   * Total spread of the random tilt applied to each name, in degrees: an angle
+   * is drawn from [-range/2, +range/2]. Defaults to 14. Too narrow a spread
+   * leaves every name near-horizontal, which reads as ruled rows rather than a
+   * scattered wall.
+   */
+  readonly rotationRangeDeg?: number;
   /** Permanently occupied regions (e.g. the held message) names must never land in. */
   readonly avoidBoxes?: readonly MemorialAvoidBox[] | undefined;
 };
@@ -68,7 +75,11 @@ function shuffle<T>(list: readonly T[], rng: () => number): T[] {
   return copy;
 }
 
-function rotatedBounds(width: number, height: number, rotationDeg: number): {
+function rotatedBounds(
+  width: number,
+  height: number,
+  rotationDeg: number,
+): {
   width: number;
   height: number;
 } {
@@ -165,7 +176,9 @@ class SpatialGrid {
  * Pack unique names across the canvas with random positions and no overlaps.
  * Longer names are attempted first. Names that cannot fit are skipped.
  */
-export function packMemorialNames(options: PackMemorialNamesOptions): readonly PlacedMemorialName[] {
+export function packMemorialNames(
+  options: PackMemorialNamesOptions,
+): readonly PlacedMemorialName[] {
   const cycleSeconds = options.cycleSeconds ?? 20;
   const boxGap = options.boxGap ?? 10;
   const edgePad = options.edgePad ?? 14;
@@ -174,6 +187,7 @@ export function packMemorialNames(options: PackMemorialNamesOptions): readonly P
   // packing quality at a fraction of the cost.
   const maxAttempts = options.maxAttempts ?? 60;
   const [minFontSize, maxFontSize] = options.fontSizeRange ?? [14, 28];
+  const rotationRangeDeg = options.rotationRangeDeg ?? 14;
   const fonts = options.fonts;
   if (fonts.length === 0 || options.canvasWidth <= 0 || options.canvasHeight <= 0) {
     return [];
@@ -193,9 +207,8 @@ export function packMemorialNames(options: PackMemorialNamesOptions): readonly P
 
   ordered.forEach((name, index) => {
     const fontFamily = fonts[Math.floor(rng() * fonts.length)]!;
-    const fontSizePx =
-      minFontSize + Math.floor(rng() * Math.max(1, maxFontSize - minFontSize + 1));
-    const rotationDeg = (rng() - 0.5) * 14;
+    const fontSizePx = minFontSize + Math.floor(rng() * Math.max(1, maxFontSize - minFontSize + 1));
+    const rotationDeg = (rng() - 0.5) * rotationRangeDeg;
     const measured = options.measure(name, fontFamily, fontSizePx);
     const bounds = rotatedBounds(measured.width, measured.height, rotationDeg);
     const halfW = bounds.width / 2;

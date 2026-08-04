@@ -4,7 +4,11 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { formatLaneSpendReport, loadLaneModelSpend, logModelInvocation } from './model-invocation-log.ts';
+import {
+  formatLaneSpendReport,
+  loadLaneModelSpend,
+  logModelInvocation,
+} from './model-invocation-log.ts';
 import type { RoutedCompletion } from './model-routing.ts';
 
 function fakePool(recordedQueries: { text: string; values: unknown[] }[]) {

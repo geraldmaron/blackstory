@@ -23,10 +23,7 @@ import {
   PHASE1_TRI_DEFAULT_COUNTY_FIPS,
   PHASE1_TRI_DEFAULT_REPORTING_YEARS,
 } from './constants.js';
-import {
-  buildTriFacilityCountyMap,
-  triRowsFromReportingForms,
-} from './live-tri-illinois.js';
+import { buildTriFacilityCountyMap, triRowsFromReportingForms } from './live-tri-illinois.js';
 import {
   aggregateTriFacilityCounts,
   mapTriFacilityCountsToObservations,
@@ -100,7 +97,10 @@ function assertReportingYears(years: readonly number[]): void {
   }
 }
 
-async function fetchJson(url: string, fetchImpl: FetchLike): Promise<readonly Record<string, unknown>[]> {
+async function fetchJson(
+  url: string,
+  fetchImpl: FetchLike,
+): Promise<readonly Record<string, unknown>[]> {
   const response = await fetchImpl(url);
   if (!response.ok) {
     throw new Error(`EPA TRI live fetch failed (${response.status}) from ${url}`);

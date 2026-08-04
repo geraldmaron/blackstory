@@ -66,7 +66,9 @@ export function censusPepDatasetVintageForBjsReferenceYear(referenceYear: number
   return referenceYear;
 }
 
-export function censusPepFetchAttemptsForBjsReferenceYear(referenceYear: number): readonly PepFetchAttempt[] {
+export function censusPepFetchAttemptsForBjsReferenceYear(
+  referenceYear: number,
+): readonly PepFetchAttempt[] {
   const januaryYear = censusPepEstimateYearForBjsReferenceYear(referenceYear);
   return [
     { month: 1, year: januaryYear },

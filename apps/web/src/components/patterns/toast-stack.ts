@@ -26,13 +26,25 @@ export type ToastSpec = {
 /** Report-only toast. Long enough to read a short sentence. */
 export const TOAST_DURATION_MS = 2600;
 
-/** Actionable toast. Long enough to read, decide and reach the button. */
-export const TOAST_ACTION_DURATION_MS = 6000;
+/**
+ * Actionable toast: `null`, meaning it never expires on its own.
+ *
+ * A timed action toast is a deadline the reader did not agree to. Six seconds is enough for
+ * someone who was already looking at that corner of the screen and reading at speed; it is not
+ * enough for a reader using a screen reader, a switch, or a magnifier, all of whom need longer to
+ * find the button than a sighted mouse user needs to click it. Undo in particular cannot be a race
+ * — losing it means the reader's own list is wrong with no way back.
+ *
+ * The toast still leaves: acting on it dismisses it, so does the close button, and the stack limit
+ * drops the oldest when a fourth arrives. What it will not do is disappear while being read.
+ */
+export const TOAST_ACTION_DURATION_MS: number | null = null;
 
 /** Older toasts are dropped rather than stacked past this depth. */
 export const TOAST_STACK_LIMIT = 3;
 
-export function toastDurationMs(toast: Pick<ToastSpec, 'action'>): number {
+/** How long this toast lives, or `null` when it persists until acted on or dismissed. */
+export function toastDurationMs(toast: Pick<ToastSpec, 'action'>): number | null {
   return toast.action ? TOAST_ACTION_DURATION_MS : TOAST_DURATION_MS;
 }
 
@@ -47,4 +59,19 @@ export function pushToast(stack: readonly ToastSpec[], toast: ToastSpec): readon
 
 export function dismissToast(stack: readonly ToastSpec[], id: string): readonly ToastSpec[] {
   return stack.filter((entry) => entry.id !== id);
+}
+
+/**
+ * The newest toast carrying an action, or null. What the undo chord acts on.
+ *
+ * Newest rather than oldest: the reader's chord means "undo what just happened", and the stack is
+ * ordered oldest-first. Nothing else in the stack is a candidate — a report-only toast has nothing
+ * to run, so it is skipped rather than blocking the chord.
+ */
+export function latestActionableToast(stack: readonly ToastSpec[]): ToastSpec | null {
+  for (let index = stack.length - 1; index >= 0; index -= 1) {
+    const toast = stack[index];
+    if (toast?.action) return toast;
+  }
+  return null;
 }

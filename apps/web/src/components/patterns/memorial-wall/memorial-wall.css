@@ -19,7 +19,7 @@
      to breathe past the fold before the readable list starts. */
   height: 125vh;
   height: 125svh;
-  z-index: 0;
+  z-index: 0; /* local: paints under the room content that follows it, not a global tier */
   overflow: hidden;
   pointer-events: none;
 }
@@ -100,18 +100,22 @@
    handwriting mechanic, then rests as one paragraph, permanently. Does not
    fade with scroll (unlike ambient names — no --memorial-wall-fade here). */
 .ds-memorial-wall__message-field {
-  /* 50svh, not 50%: centers within the actual opening viewport regardless of
-     the taller .ds-memorial-wall container it's absolutely placed in. The
-     wall's own top edge is already pulled up to the viewport top, so no
-     header-offset subtraction is needed here. svh keeps the mobile URL bar
-     out of the math; vh line kept as fallback for browsers without svh. */
+  /* Anchored a fixed gap below the RoomHeader (see --memorial-message-top,
+     set in MemorialWallAtmosphere.tsx) rather than centered at 50% of the
+     viewport height: a viewport-percentage position drifts the message
+     toward mid-screen on a tall monitor, opening a dead gap under the title.
+     The 34svh fallback covers the brief window before JS has measured the
+     header (or if JS never runs); svh keeps the mobile URL bar out of the
+     math, vh kept as fallback for browsers without svh. Left-aligned to the
+     header's own left edge (--memorial-content-left) rather than centered,
+     matching the title's alignment — no X- or Y-translate needed since both
+     edges are anchored directly. */
   position: absolute;
-  top: 50vh;
-  top: 50svh;
-  left: 50%;
-  z-index: 1;
+  top: var(--memorial-message-top, 34vh);
+  top: var(--memorial-message-top, 34svh);
+  left: var(--memorial-content-left, 3vw);
+  z-index: 1; /* local: paints over the wall behind it, not a global tier */
   width: min(94vw, 46rem);
-  transform: translate(-50%, -50%);
   pointer-events: none;
 }
 
@@ -128,12 +132,12 @@
 .ds-memorial-wall__message {
   position: relative;
   margin: 0;
-  padding: 1.5rem 1.75rem;
+  padding: 1.5rem 1.75rem 1.5rem 0;
   font-family: var(--ds-font-hand-caveat, cursive);
   font-size: clamp(1.05rem, 0.85rem + 1vw, 1.6rem);
   line-height: 1.5;
   color: var(--ds-ink);
-  text-align: center;
+  text-align: left;
 }
 
 .ds-memorial-wall__message-clause {

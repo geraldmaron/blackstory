@@ -56,16 +56,23 @@ async function main(): Promise<void> {
   const outPath = readArgFlag('--out');
   const concurrency = Number(readArgFlag('--concurrency') ?? '4');
   if (!runPath || !subjectsPath || !outPath) {
-    console.error('Usage: --run <run.json> --subjects <subjects.json> --out <augmented-subjects.json>');
+    console.error(
+      'Usage: --run <run.json> --subjects <subjects.json> --out <augmented-subjects.json>',
+    );
     process.exit(2);
   }
 
   const runData = JSON.parse(readFileSync(runPath, 'utf8')) as { items: readonly EnrichmentItem[] };
-  const subjectsData = JSON.parse(readFileSync(subjectsPath, 'utf8')) as { subjects: readonly SubjectMeta[] };
+  const subjectsData = JSON.parse(readFileSync(subjectsPath, 'utf8')) as {
+    subjects: readonly SubjectMeta[];
+  };
   const locationBySubjectId = new Map(
     runData.items
       .filter((item) => item.packet.decision === 'keep' && item.packet.drafts.location)
-      .map((item) => [item.packet.subjectId, item.packet.drafts.location as NonNullable<typeof item.packet.drafts.location>]),
+      .map((item) => [
+        item.packet.subjectId,
+        item.packet.drafts.location as NonNullable<typeof item.packet.drafts.location>,
+      ]),
   );
 
   let attempted = 0;
@@ -91,7 +98,9 @@ async function main(): Promise<void> {
   );
 
   writeFileSync(outPath, `${JSON.stringify({ subjects: augmented }, null, 2)}\n`);
-  console.log(JSON.stringify({ totalSubjects: subjectsData.subjects.length, attempted, resolved, outPath }));
+  console.log(
+    JSON.stringify({ totalSubjects: subjectsData.subjects.length, attempted, resolved, outPath }),
+  );
 }
 
 main().catch((error) => {

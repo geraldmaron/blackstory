@@ -39,33 +39,30 @@ export type CorrectionCategoryV1 = (typeof CORRECTION_CATEGORIES)[number];
 const MIN_STATEMENT_LENGTH = 20;
 const MAX_STATEMENT_LENGTH = 4_000;
 
-export const correctionSubmissionRequestV1Schema = z
-  .object({
-    targetType: correctionTargetTypeSchema,
-    targetRecordId: nonEmptyText(128),
-    category: correctionCategorySchema,
-    statement: z.string().min(MIN_STATEMENT_LENGTH).max(MAX_STATEMENT_LENGTH),
-    sourceUrl: httpUrl(2000).optional(),
-    privacyConsent: z.literal(true),
-    contact: z.string().max(320).optional(),
-  });
+export const correctionSubmissionRequestV1Schema = z.object({
+  targetType: correctionTargetTypeSchema,
+  targetRecordId: nonEmptyText(128),
+  category: correctionCategorySchema,
+  statement: z.string().min(MIN_STATEMENT_LENGTH).max(MAX_STATEMENT_LENGTH),
+  sourceUrl: httpUrl(2000).optional(),
+  privacyConsent: z.literal(true),
+  contact: z.string().max(320).optional(),
+});
 
 export type CorrectionSubmissionRequestV1 = z.infer<typeof correctionSubmissionRequestV1Schema>;
 
 /** Opaque receipt returned once, at acceptance time. There is no browse/enumerate API — status
  * lookup requires the exact code (see `correctionStatusRequestV1Schema`). */
-export const correctionSubmissionReceiptV1Schema = z
-  .object({
-    receiptCode: nonEmptyText(64),
-    submittedAt: z.string().max(64),
-  });
+export const correctionSubmissionReceiptV1Schema = z.object({
+  receiptCode: nonEmptyText(64),
+  submittedAt: z.string().max(64),
+});
 
 export type CorrectionSubmissionReceiptV1 = z.infer<typeof correctionSubmissionReceiptV1Schema>;
 
-export const correctionStatusRequestV1Schema = z
-  .object({
-    receiptCode: nonEmptyText(64),
-  });
+export const correctionStatusRequestV1Schema = z.object({
+  receiptCode: nonEmptyText(64),
+});
 
 export type CorrectionStatusRequestV1 = z.infer<typeof correctionStatusRequestV1Schema>;
 
@@ -75,14 +72,13 @@ export type CorrectionPhaseV1 = (typeof CORRECTION_PHASES)[number];
 
 /** Public correction status — never carries spam scores, campaign-detection flags, duplicate
  * lists, or any other moderation-internal signal (see module doc). */
-export const correctionStatusV1Schema = z
-  .object({
-    phase: correctionPhaseSchema,
-    receiptCode: nonEmptyText(64),
-    submittedAt: z.string().max(64),
-    updatedAt: z.string().max(64),
-    appealAvailable: z.boolean(),
-    classificationDispute: z.boolean(),
-  });
+export const correctionStatusV1Schema = z.object({
+  phase: correctionPhaseSchema,
+  receiptCode: nonEmptyText(64),
+  submittedAt: z.string().max(64),
+  updatedAt: z.string().max(64),
+  appealAvailable: z.boolean(),
+  classificationDispute: z.boolean(),
+});
 
 export type CorrectionStatusV1 = z.infer<typeof correctionStatusV1Schema>;

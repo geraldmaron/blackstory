@@ -20,9 +20,7 @@ export function mapPublicSearchProjection(doc: PublicSearchProjectionDoc): Publi
     displayName: doc.displayName,
     nameLower: doc.nameLower,
     aliases: doc.aliases,
-    ...(doc.summary !== undefined
-      ? { summary: sanitizePublicProseText(doc.summary) }
-      : {}),
+    ...(doc.summary !== undefined ? { summary: sanitizePublicProseText(doc.summary) } : {}),
     topicTags: doc.topicTags,
     ...(doc.topicIds.length > 0 ? { topicIds: doc.topicIds } : {}),
     ...(doc.jurisdictionState !== undefined ? { jurisdictionState: doc.jurisdictionState } : {}),

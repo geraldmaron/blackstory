@@ -3,10 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {
-  classifyLandscapeWeed,
-  type LandscapeWeedRow,
-} from './landscape-intake-weed.ts';
+import { classifyLandscapeWeed, type LandscapeWeedRow } from './landscape-intake-weed.ts';
 
 const baseRow = (overrides: Partial<LandscapeWeedRow> = {}): LandscapeWeedRow => ({
   id: 'dc-black-history-sites-b1',

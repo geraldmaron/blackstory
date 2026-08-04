@@ -36,7 +36,8 @@ const DEFAULT_FIXTURE = join(
   '../fixtures/reference-indicators/cps-a1-presidential-citizen-turnout-by-race-1964-2020.csv',
 );
 
-const CPS_A1_URL = 'https://www2.census.gov/programs-surveys/cps/tables/time-series/voting-historical-time-series/a1.xlsx';
+const CPS_A1_URL =
+  'https://www2.census.gov/programs-surveys/cps/tables/time-series/voting-historical-time-series/a1.xlsx';
 const CPS_A1_RETRIEVED = '2026-07-24T05:02:00.000Z';
 const NATION_JURISDICTION = 'nation:US';
 
@@ -135,8 +136,10 @@ function fetchCpsA1Observations(options: {
   const turnoutSeries: Record<string, CpsSeriesDraft> = {
     'cps-a1-turnout-black-nation': {
       metricId: 'cps-a1-turnout-black-nation',
-      metricDefinition: 'Black citizen voter turnout (presidential elections, reported voting rate)',
-      universe: 'Black citizen voting-age population (Universe varies by year: VAP pre-1990, CVP 1990+)',
+      metricDefinition:
+        'Black citizen voter turnout (presidential elections, reported voting rate)',
+      universe:
+        'Black citizen voting-age population (Universe varies by year: VAP pre-1990, CVP 1990+)',
       unit: 'percent',
       sourceDataset: 'Census CPS Historical Reported Voting Rates',
       sourceTable: 'Table A-1',
@@ -152,7 +155,8 @@ function fetchCpsA1Observations(options: {
       metricId: 'cps-a1-turnout-white-nation',
       metricDefinition:
         'White non-Hispanic citizen voter turnout (presidential elections, reported voting rate)',
-      universe: 'White non-Hispanic citizen voting-age population (Universe varies by year: VAP pre-1990, CVP 1990+)',
+      universe:
+        'White non-Hispanic citizen voting-age population (Universe varies by year: VAP pre-1990, CVP 1990+)',
       unit: 'percent',
       sourceDataset: 'Census CPS Historical Reported Voting Rates',
       sourceTable: 'Table A-1',
@@ -166,8 +170,10 @@ function fetchCpsA1Observations(options: {
     },
     'cps-a1-turnout-hispanic-nation': {
       metricId: 'cps-a1-turnout-hispanic-nation',
-      metricDefinition: 'Hispanic citizen voter turnout (presidential elections, reported voting rate)',
-      universe: 'Hispanic citizen voting-age population (Universe varies by year: VAP pre-1990, CVP 1990+)',
+      metricDefinition:
+        'Hispanic citizen voter turnout (presidential elections, reported voting rate)',
+      universe:
+        'Hispanic citizen voting-age population (Universe varies by year: VAP pre-1990, CVP 1990+)',
       unit: 'percent',
       sourceDataset: 'Census CPS Historical Reported Voting Rates',
       sourceTable: 'Table A-1',
@@ -181,8 +187,10 @@ function fetchCpsA1Observations(options: {
     },
     'cps-a1-turnout-asian-nation': {
       metricId: 'cps-a1-turnout-asian-nation',
-      metricDefinition: 'Asian citizen voter turnout (presidential elections, reported voting rate)',
-      universe: 'Asian citizen voting-age population (Universe varies by year: VAP pre-1990, CVP 1990+)',
+      metricDefinition:
+        'Asian citizen voter turnout (presidential elections, reported voting rate)',
+      universe:
+        'Asian citizen voting-age population (Universe varies by year: VAP pre-1990, CVP 1990+)',
       unit: 'percent',
       sourceDataset: 'Census CPS Historical Reported Voting Rates',
       sourceTable: 'Table A-1',
@@ -259,7 +267,9 @@ function fetchCpsA1Observations(options: {
       }
 
       // Hispanic turnout
-      const hispanicTurnout = row.hispanic_citizen_pct ? parseFloat(row.hispanic_citizen_pct) : null;
+      const hispanicTurnout = row.hispanic_citizen_pct
+        ? parseFloat(row.hispanic_citizen_pct)
+        : null;
       if (hispanicTurnout !== null && !isNaN(hispanicTurnout)) {
         const obsId = `obs:cps-a1-turnout-hispanic-nation:${NATION_JURISDICTION}:${period}`;
         observations.push({
@@ -394,7 +404,8 @@ async function applyObservations(
           s.theme,
           JSON.stringify({
             raceEthnicitySlice: s.raceEthnicitySlice ?? null,
-            methodologyNote: 'Census CPS Historical Reported Voting Rates Table A-1; citizen voting-age population.',
+            methodologyNote:
+              'Census CPS Historical Reported Voting Rates Table A-1; citizen voting-age population.',
           }),
         ],
       );

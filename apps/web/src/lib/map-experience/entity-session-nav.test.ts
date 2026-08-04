@@ -34,21 +34,12 @@ test('session stack push and back walk in order', () => {
 });
 
 test('pickNext sequential advances and wraps excluding the current id', () => {
-  assert.equal(
-    pickNext({ random: false, currentId: 'b', orderedIds: ORDERED }),
-    'c',
-  );
-  assert.equal(
-    pickNext({ random: false, currentId: 'd', orderedIds: ORDERED }),
-    'a',
-  );
+  assert.equal(pickNext({ random: false, currentId: 'b', orderedIds: ORDERED }), 'c');
+  assert.equal(pickNext({ random: false, currentId: 'd', orderedIds: ORDERED }), 'a');
 });
 
 test('pickNext sequential falls back when current id is absent from the catalog', () => {
-  assert.equal(
-    pickNext({ random: false, currentId: 'z', orderedIds: ORDERED }),
-    'a',
-  );
+  assert.equal(pickNext({ random: false, currentId: 'z', orderedIds: ORDERED }), 'a');
 });
 
 test('pickNext random chooses among other ids only', () => {
@@ -62,9 +53,6 @@ test('pickNext random chooses among other ids only', () => {
 });
 
 test('pickNext returns undefined when no other entities exist', () => {
-  assert.equal(
-    pickNext({ random: false, currentId: 'solo', orderedIds: ['solo'] }),
-    undefined,
-  );
+  assert.equal(pickNext({ random: false, currentId: 'solo', orderedIds: ['solo'] }), undefined);
   assert.equal(canPickNext({ currentId: 'solo', orderedIds: ['solo'] }), false);
 });

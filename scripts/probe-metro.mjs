@@ -56,9 +56,7 @@ function assertLocalProbeHost(probeHost) {
   const host = String(probeHost).toLowerCase();
   const isLoopback = host === 'localhost' || host === '127.0.0.1' || host === '::1';
   const isPrivateV4 =
-    /^10\./.test(host) ||
-    /^192\.168\./.test(host) ||
-    /^172\.(1[6-9]|2\d|3[01])\./.test(host);
+    /^10\./.test(host) || /^192\.168\./.test(host) || /^172\.(1[6-9]|2\d|3[01])\./.test(host);
   if (!isLoopback && !isPrivateV4) {
     throw new Error(`refusing to probe a non-local Metro host: ${probeHost}`);
   }

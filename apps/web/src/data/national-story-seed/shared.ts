@@ -27,7 +27,10 @@ export function revisionFor(recordUpdatedAt: string): RevisionMetadata {
   };
 }
 
-export function mapPinFromGeo(lat: number, lng: number): { readonly x: number; readonly y: number } {
+export function mapPinFromGeo(
+  lat: number,
+  lng: number,
+): { readonly x: number; readonly y: number } {
   return {
     x: Math.min(1, Math.max(0, (lng + 125) / 60)),
     y: Math.min(1, Math.max(0, (50 - lat) / 25)),
@@ -63,13 +66,11 @@ export const CONFIRMED_WAYBACK: Readonly<
     archivedAt: '2011-02-18T16:41:44.000Z',
   },
   'https://www.lincoln.edu/about/history.html': {
-    archivedUrl:
-      'https://web.archive.org/web/20190531043729/http://www.lincoln.edu/about/history',
+    archivedUrl: 'https://web.archive.org/web/20190531043729/http://www.lincoln.edu/about/history',
     archivedAt: '2019-05-31T04:37:29.000Z',
   },
   'https://www2.howard.edu/about/history': {
-    archivedUrl:
-      'https://web.archive.org/web/20190502190931/https://www2.howard.edu/about/history',
+    archivedUrl: 'https://web.archive.org/web/20190502190931/https://www2.howard.edu/about/history',
     archivedAt: '2019-05-02T19:09:31.000Z',
   },
   'https://siarchives.si.edu/history/national-museum-african-american-history-and-culture': {
@@ -77,11 +78,12 @@ export const CONFIRMED_WAYBACK: Readonly<
       'https://web.archive.org/web/20190312005930/https://siarchives.si.edu/history/national-museum-african-american-history-and-culture',
     archivedAt: '2019-03-12T00:59:30.000Z',
   },
-  'https://nmaahc.si.edu/explore/stories/education-steeped-african-american-culture-historically-black-colleges-and': {
-    archivedUrl:
-      'https://web.archive.org/web/20240907030444/https://nmaahc.si.edu/explore/stories/education-steeped-african-american-culture-historically-black-colleges-and',
-    archivedAt: '2024-09-07T03:04:44.000Z',
-  },
+  'https://nmaahc.si.edu/explore/stories/education-steeped-african-american-culture-historically-black-colleges-and':
+    {
+      archivedUrl:
+        'https://web.archive.org/web/20240907030444/https://nmaahc.si.edu/explore/stories/education-steeped-african-american-culture-historically-black-colleges-and',
+      archivedAt: '2024-09-07T03:04:44.000Z',
+    },
   'http://www.nps.gov/archive/casa/home/ftmose.htm': {
     archivedUrl:
       'https://web.archive.org/web/20080405200938/http://www.nps.gov/archive/casa/home/ftmose.htm',
@@ -98,8 +100,7 @@ export const CONFIRMED_WAYBACK: Readonly<
     archivedAt: '2006-01-15T19:04:47.000Z',
   },
   'http://nypl.org/research/sc/sc.html': {
-    archivedUrl:
-      'https://web.archive.org/web/20090207083811/http://nypl.org/research/sc/sc.html',
+    archivedUrl: 'https://web.archive.org/web/20090207083811/http://nypl.org/research/sc/sc.html',
     archivedAt: '2009-02-07T08:38:11.000Z',
   },
   'http://www.motownmuseum.com/mtmpages/index.html': {
@@ -118,8 +119,7 @@ export const CONFIRMED_WAYBACK: Readonly<
     archivedAt: '2022-03-08T12:40:09.000Z',
   },
   'http://www.virginiamemory.com/': {
-    archivedUrl:
-      'https://web.archive.org/web/20210511181139/http://www.virginiamemory.com/',
+    archivedUrl: 'https://web.archive.org/web/20210511181139/http://www.virginiamemory.com/',
     archivedAt: '2021-05-11T18:11:39.000Z',
   },
   'https://armyhistory.org/the-black-immune-regiments-in-the-spanish-american-war/': {
@@ -128,13 +128,11 @@ export const CONFIRMED_WAYBACK: Readonly<
     archivedAt: '2015-10-18T02:50:24.000Z',
   },
   'http://www.jbhe.com/timeline.html': {
-    archivedUrl:
-      'https://web.archive.org/web/20121031101217/http://www.jbhe.com/timeline.html',
+    archivedUrl: 'https://web.archive.org/web/20121031101217/http://www.jbhe.com/timeline.html',
     archivedAt: '2012-10-31T10:12:17.000Z',
   },
   'http://www.csrmf.org/doc.asp?id=280': {
-    archivedUrl:
-      'https://web.archive.org/web/20050330200926/http://www.csrmf.org/doc.asp?id=280',
+    archivedUrl: 'https://web.archive.org/web/20050330200926/http://www.csrmf.org/doc.asp?id=280',
     archivedAt: '2005-03-30T20:09:26.000Z',
   },
   'http://www.centralhigh57.org/1957-58.htm': {
@@ -214,7 +212,11 @@ export function seedRevision(summary: string) {
     {
       revisionNumber: 1,
       timestamp: '2026-07-19T00:00:00.000Z',
-      agent: { id: 'national-story-seed', type: 'system' as const, displayName: 'National story seed' },
+      agent: {
+        id: 'national-story-seed',
+        type: 'system' as const,
+        displayName: 'National story seed',
+      },
       changeType: 'update' as const,
       summary,
       diff: [],

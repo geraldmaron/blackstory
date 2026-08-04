@@ -3,10 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {
-  deriveGraphActiveSpans,
-  deriveGraphDecadeBucketInput,
-} from './decade-spans.js';
+import { deriveGraphActiveSpans, deriveGraphDecadeBucketInput } from './decade-spans.js';
 import { deriveActiveDecadeBuckets } from './decades.js';
 
 test('deriveGraphActiveSpans unions eraBuckets, statusHistory, and kind_detail EDTF', () => {

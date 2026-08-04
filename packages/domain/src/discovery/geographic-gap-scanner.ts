@@ -194,9 +194,8 @@ export function buildPriorityDiscoveryZones(
         ? [{ text: worst.stateName, kind: 'state' as const, confidence: 0.8 }]
         : []),
     ];
-    const placeQuery = worst.stateName && worst.countyName
-      ? `${worst.countyName} ${worst.stateName}`
-      : label;
+    const placeQuery =
+      worst.stateName && worst.countyName ? `${worst.countyName} ${worst.stateName}` : label;
     zones.push({
       methodologyVersion: GAP_SCANNER_METHODOLOGY_VERSION,
       fips5: worst.fips5,
@@ -217,7 +216,6 @@ export function buildPriorityDiscoveryZones(
 
   return zones.sort(
     (left, right) =>
-      left.worstCoverageRatio - right.worstCoverageRatio ||
-      left.fips5.localeCompare(right.fips5),
+      left.worstCoverageRatio - right.worstCoverageRatio || left.fips5.localeCompare(right.fips5),
   );
 }

@@ -14,11 +14,7 @@ const EntityLocationMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <MapFrame
-        title="Map loading"
-        caption="Loading public-precision street context…"
-        pins={[]}
-      />
+      <MapFrame title="Map loading" caption="Loading public-precision street context…" pins={[]} />
     ),
   },
 );

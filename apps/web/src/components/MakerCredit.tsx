@@ -26,7 +26,9 @@ export function MakerCredit({ variant, className }: MakerCreditProps) {
     <p className={rootClass}>
       <a
         className={
-          variant === 'footer' ? 'ds-maker-credit__link ds-shell-footer__operator' : 'ds-maker-credit__link'
+          variant === 'footer'
+            ? 'ds-maker-credit__link ds-shell-footer__operator'
+            : 'ds-maker-credit__link'
         }
         href={MAKER.url}
         rel="noopener noreferrer"

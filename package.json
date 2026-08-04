@@ -56,7 +56,6 @@
     "test:db:integration": "pnpm --filter @repo/data-access test:integration"
   },
   "devDependencies": {
-    "@geraldmaron/construct": "^2.0.1",
     "@repo/eslint-config": "workspace:^",
     "@repo/typescript-config": "workspace:^",
     "firebase-tools": "^15.24.0",
@@ -64,19 +63,19 @@
     "tsx": "^4.23.1",
     "typescript": "^5.8.3"
   },
-  "pnnm": {
-    "overrides": {
-      "uuid": ">=14.0.0",
-      "@hono/node-server": ">=2.0.0"
-    }
-  },
   "pnpm": {
     "overrides": {
       "uuid": ">=14.0.0",
       "@hono/node-server": ">=2.0.0",
-      "postcss": ">=8.5.0",
+      "postcss": ">=8.5.23",
       "sharp": ">=0.35.0",
-      "fast-uri": ">=4.0.0"
+      "fast-uri": ">=4.1.2",
+      "hono": ">=4.12.34",
+      "ip-address": ">=10.3.1",
+      "tar": ">=7.5.21",
+      "@opentelemetry/core": ">=2.8.0",
+      "undici": ">=8.9.0",
+      "brace-expansion": ">=5.0.9"
     }
   }
 }

@@ -3,10 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {
-  buildDecadeEntitiesForGraph,
-  buildReleaseGraphArtifact,
-} from './release-graph-publish.ts';
+import { buildDecadeEntitiesForGraph, buildReleaseGraphArtifact } from './release-graph-publish.ts';
 
 test('buildDecadeEntitiesForGraph unions projection eraBuckets and canonical status_history', () => {
   const decadeEntities = buildDecadeEntitiesForGraph({

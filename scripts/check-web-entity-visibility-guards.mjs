@@ -33,8 +33,8 @@ function relativeAppPath(filePath) {
 }
 
 /**
- * `export const dynamic = …` must appear after every top-level import.
- * Placing it between imports previously broke the entity RSC module.
+ * `export const dynamic = …` must appear after every top-level import: placed between
+ * imports, it breaks the entity RSC module.
  * @param {string} source
  * @param {string} label
  */
@@ -48,9 +48,7 @@ function assertDynamicAfterImports(source, label) {
     const line = lines[i] ?? '';
     const trimmed = line.trimStart();
     const isImport =
-      /^import\s/.test(trimmed) ||
-      /^import["']/.test(trimmed) ||
-      /^import\{/.test(trimmed);
+      /^import\s/.test(trimmed) || /^import["']/.test(trimmed) || /^import\{/.test(trimmed);
     const isDynamic = /^export\s+const\s+dynamic\s*=/.test(trimmed);
 
     if (isImport) {
@@ -82,60 +80,53 @@ function assertDynamicAfterImports(source, label) {
 function main() {
   const errors = [];
 
-  // --- Route ownership: at most one explore page, and only under (map) ---
+  // --- Route ownership: no explore page, and it owns /explore/api ---
   //
-  // SP-07 slice 2 (f9f9fcc8) promoted `/` to the Atlas and folded `/explore` into it, deleting
-  // `(map)/explore/page.tsx`. The guard still demanded exactly one and had been failing `pnpm
-  // validate` ever since. What it is actually protecting is route ownership: the Atlas must not
-  // sprout a second explore page, and never one outside the `(map)` group. Zero is now a valid
-  // answer to that; two, or one in the wrong place, still is not.
+  // `/` is the Atlas, at `app/page.tsx`, carrying its own `force-dynamic` (RUNTIME
+  // DATABASE_URL — no group layout owns it). `/explore` is a plain redirect route with no page
+  // of its own; `/explore/api` is the live JSON refine endpoint at `app/explore/api/route.ts`.
+  // Route ownership stays exclusive: the Atlas must not sprout a second explore page, a stale
+  // duplicate homepage, or a competing `app/explore/page.tsx`.
   const explorePages = walkFiles(APP_DIR).filter((f) =>
     /(^|\/)explore\/page\.tsx$/.test(relativeAppPath(f)),
   );
-  if (explorePages.length > 1) {
+  if (explorePages.length > 0) {
     errors.push(
-      `Expected at most one explore/page.tsx under apps/web/src/app; found ${explorePages.length}: ` +
-        explorePages.map(relativeAppPath).join(', '),
-    );
-  } else if (explorePages.length === 1 && relativeAppPath(explorePages[0]) !== '(map)/explore/page.tsx') {
-    errors.push(
-      `Explore page must live at (map)/explore/page.tsx (ADR-017); found ${relativeAppPath(explorePages[0])}`,
+      `Expected no explore/page.tsx under apps/web/src/app (/explore only redirects to / — the ` +
+        `Atlas page lives at app/page.tsx); found: ${explorePages.map(relativeAppPath).join(', ')}`,
     );
   }
 
-  const staleExploreDir = path.join(APP_DIR, 'explore');
+  const staleMapGroup = path.join(APP_DIR, '(map)');
   try {
-    if (statSync(staleExploreDir).isDirectory()) {
+    if (statSync(staleMapGroup).isDirectory()) {
       errors.push(
-        'Stale apps/web/src/app/explore/ directory present — conflicts with (map)/explore (delete it)',
+        'Stale apps/web/src/app/(map)/ route group present — the Atlas and /explore/api live ' +
+          'directly under apps/web/src/app (delete the group)',
       );
     }
   } catch {
     // absent is correct
   }
 
-  const staleHome = path.join(APP_DIR, 'page.tsx');
+  const home = path.join(APP_DIR, 'page.tsx');
   try {
-    if (statSync(staleHome).isFile()) {
-      errors.push(
-        'Stale apps/web/src/app/page.tsx present — homepage must be (map)/page.tsx only (ADR-017)',
-      );
-    }
+    statSync(home);
   } catch {
-    // absent is correct
+    errors.push('Missing apps/web/src/app/page.tsx (the Atlas homepage)');
   }
 
-  const mapHome = path.join(APP_DIR, '(map)', 'page.tsx');
+  const exploreApiRoute = path.join(APP_DIR, 'explore', 'api', 'route.ts');
   try {
-    statSync(mapHome);
+    statSync(exploreApiRoute);
   } catch {
-    errors.push('Missing apps/web/src/app/(map)/page.tsx (map-owned homepage)');
+    errors.push('Missing apps/web/src/app/explore/api/route.ts (live JSON refine endpoint)');
   }
 
   // --- force-dynamic module shape (RUNTIME DATABASE_URL / no seed bake) ---
   const dynamicGuarded = [
     path.join(APP_DIR, 'entity', '[id]', 'page.tsx'),
-    path.join(APP_DIR, '(map)', 'layout.tsx'),
+    path.join(APP_DIR, 'page.tsx'),
   ];
   for (const file of dynamicGuarded) {
     try {
@@ -153,7 +144,7 @@ function main() {
   }
 
   console.log(
-    'check-web-entity-visibility-guards: ok (single (map)/explore, no stale routes, force-dynamic after imports)',
+    'check-web-entity-visibility-guards: ok (no stray explore page, / and /explore/api owned, force-dynamic after imports)',
   );
 }
 

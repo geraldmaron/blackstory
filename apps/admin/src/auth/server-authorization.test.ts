@@ -66,7 +66,8 @@ test('server authorization requires both edge and administrator credentials', as
       'x-goog-iap-jwt-assertion': 'signed-iap-jwt',
     }),
     (error: unknown) =>
-      error instanceof ServerAdminAuthorizationError && error.code === 'ADMIN_BEARER_TOKEN_REQUIRED',
+      error instanceof ServerAdminAuthorizationError &&
+      error.code === 'ADMIN_BEARER_TOKEN_REQUIRED',
   );
 });
 

@@ -184,8 +184,7 @@ async function ensureSeriesDefined(databaseUrl: string): Promise<void> {
           'justice',
           JSON.stringify({
             raceEthnicitySlice: 'black',
-            note:
-              'Historical admissions share data 1926-1986. These are shares of total admissions, not population rates.',
+            note: 'Historical admissions share data 1926-1986. These are shares of total admissions, not population rates.',
           }),
         ],
       );

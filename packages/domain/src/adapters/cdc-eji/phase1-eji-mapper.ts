@@ -113,7 +113,10 @@ function metricById(metricId: string): Phase1IndicatorDefinition {
   return metric;
 }
 
-function pickColumn(header: Map<string, number>, candidates: readonly string[]): string | undefined {
+function pickColumn(
+  header: Map<string, number>,
+  candidates: readonly string[],
+): string | undefined {
   for (const name of candidates) {
     if (header.has(name)) return name;
   }
@@ -154,7 +157,9 @@ export function parseEjiTractCsv(
   if (!geoidColumn) {
     return {
       rows: [],
-      rejected: [`missing tract GEOID column (expected one of ${CDC_EJI_TRACT_GEOID_COLUMNS.join(', ')})`],
+      rejected: [
+        `missing tract GEOID column (expected one of ${CDC_EJI_TRACT_GEOID_COLUMNS.join(', ')})`,
+      ],
     };
   }
   if (!rankColumn) {

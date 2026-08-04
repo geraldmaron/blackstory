@@ -52,11 +52,67 @@ const PREFERRED_TIER1_SITES = [
 type WikipediaSearchHit = { readonly title: string };
 
 const STOP_WORDS = new Set([
-  'the', 'a', 'an', 'and', 'or', 'of', 'in', 'on', 'at', 'to', 'for', 'with', 'by', 'was', 'were',
-  'is', 'are', 'that', 'this', 'from', 'as', 'its', 'it', 'be', 'been', 'his', 'her', 'their',
-  'also', 'over', 'into', 'after', 'before', 'which', 'who', 'whom', 'has', 'have', 'had', 'not',
-  'but', 'than', 'then', 'when', 'where', 'while', 'during', 'about', 'between', 'through',
-  'under', 'above', 'both', 'more', 'most', 'some', 'such', 'only', 'own', 'same', 'because',
+  'the',
+  'a',
+  'an',
+  'and',
+  'or',
+  'of',
+  'in',
+  'on',
+  'at',
+  'to',
+  'for',
+  'with',
+  'by',
+  'was',
+  'were',
+  'is',
+  'are',
+  'that',
+  'this',
+  'from',
+  'as',
+  'its',
+  'it',
+  'be',
+  'been',
+  'his',
+  'her',
+  'their',
+  'also',
+  'over',
+  'into',
+  'after',
+  'before',
+  'which',
+  'who',
+  'whom',
+  'has',
+  'have',
+  'had',
+  'not',
+  'but',
+  'than',
+  'then',
+  'when',
+  'where',
+  'while',
+  'during',
+  'about',
+  'between',
+  'through',
+  'under',
+  'above',
+  'both',
+  'more',
+  'most',
+  'some',
+  'such',
+  'only',
+  'own',
+  'same',
+  'because',
 ]);
 
 function extractSignificantTerms(text: string): ReadonlySet<string> {
@@ -69,7 +125,8 @@ function extractSignificantTerms(text: string): ReadonlySet<string> {
   );
 }
 
-const SETTLEMENT_SIGNATURE_RE = /\b(is a city in|is a town in|is a village in|county seat of|is an unincorporated|is a populated place|is a census-designated place)\b/iu;
+const SETTLEMENT_SIGNATURE_RE =
+  /\b(is a city in|is a town in|is a village in|county seat of|is an unincorporated|is a populated place|is a census-designated place)\b/iu;
 
 export function looksLikeSettlementArticle(text: string): boolean {
   return SETTLEMENT_SIGNATURE_RE.test(text);
@@ -103,9 +160,16 @@ export function isPlausibleMatch(
   return matched.length >= required;
 }
 
-async function fetchWikipediaCoordinates(title: string): Promise<{ lat: number; lng: number } | undefined> {
+async function fetchWikipediaCoordinates(
+  title: string,
+): Promise<{ lat: number; lng: number } | undefined> {
   try {
-    const params = new URLSearchParams({ action: 'query', prop: 'coordinates', titles: title, format: 'json' });
+    const params = new URLSearchParams({
+      action: 'query',
+      prop: 'coordinates',
+      titles: title,
+      format: 'json',
+    });
     const response = await fetch(`${WIKIPEDIA_SEARCH_API}?${params.toString()}`, {
       headers: { 'User-Agent': WIKIPEDIA_USER_AGENT, Accept: 'application/json' },
       signal: AbortSignal.timeout(15_000),
@@ -153,8 +217,17 @@ async function resolveViaSearchThenCoordinates(
 }
 
 const GENERIC_LOCATION_LABELS = new Set([
-  'headquarters', 'corporate headquarters', 'site', 'location', 'campus', 'building',
-  'office', 'offices', 'institution', 'address', 'facility',
+  'headquarters',
+  'corporate headquarters',
+  'site',
+  'location',
+  'campus',
+  'building',
+  'office',
+  'offices',
+  'institution',
+  'address',
+  'facility',
 ]);
 
 const LOCATION_STOP_WORDS = new Set(['of', 'the', 'and', 'at', 'in', 'a', 'an', 'for', 'later']);
@@ -183,15 +256,25 @@ export function isUsableLocationLabel(label: string): boolean {
 }
 
 const DESCRIPTIVE_CLAUSE_MARKERS = [
-  'site of', 'home of', 'birthplace of', 'location of', 'headquarters of',
-  'founding of', 'founding site', 'where ', 'now part of',
+  'site of',
+  'home of',
+  'birthplace of',
+  'location of',
+  'headquarters of',
+  'founding of',
+  'founding site',
+  'where ',
+  'now part of',
 ];
 
 /** Drops a trailing descriptive clause after a comma, keeping a real "City, State"-style qualifier intact. */
 export function stripDescriptiveLocationClause(label: string): string {
   const commaIndex = label.indexOf(',');
   if (commaIndex === -1) return label;
-  const after = label.slice(commaIndex + 1).trim().toLowerCase();
+  const after = label
+    .slice(commaIndex + 1)
+    .trim()
+    .toLowerCase();
   if (DESCRIPTIVE_CLAUSE_MARKERS.some((marker) => after.includes(marker))) {
     return label.slice(0, commaIndex).trim();
   }
@@ -208,9 +291,21 @@ export async function resolveGovernmentCenterCoordinates(
     ? stripDescriptiveLocationClause(locationLabel)
     : undefined;
   const SITE_PRECISIONS = new Set([
-    'institution', 'site', 'address', 'campus', 'building', 'stadium', 'airport', 'museum', 'district',
+    'institution',
+    'site',
+    'address',
+    'campus',
+    'building',
+    'stadium',
+    'airport',
+    'museum',
+    'district',
   ]);
-  if (usableLocationLabel && usableLocationLabel !== jurisdictionLabel && SITE_PRECISIONS.has(locationPrecision)) {
+  if (
+    usableLocationLabel &&
+    usableLocationLabel !== jurisdictionLabel &&
+    SITE_PRECISIONS.has(locationPrecision)
+  ) {
     const bySite = await resolveViaSearchThenCoordinates(usableLocationLabel, disambiguator);
     if (bySite) return bySite;
     // The specific site was too obscure to have its own Wikipedia article/
@@ -218,14 +313,19 @@ export async function resolveGovernmentCenterCoordinates(
     // sporting ground) — fall back to the surrounding jurisdiction instead of
     // falling through to the generic final line below, which would just
     // retry this exact same failed query again.
-    const byJurisdiction = await resolveViaSearchThenCoordinates(normalizeJurisdictionQuery(jurisdictionLabel), disambiguator);
+    const byJurisdiction = await resolveViaSearchThenCoordinates(
+      normalizeJurisdictionQuery(jurisdictionLabel),
+      disambiguator,
+    );
     if (byJurisdiction) return byJurisdiction;
   }
 
   if (locationPrecision === 'state') {
     const state = extractBareUsState(jurisdictionLabel);
     if (state) {
-      const byCapitol = await resolveViaSearchThenCoordinates(STATE_CAPITOL_QUERY[state] ?? `${state} State Capitol`);
+      const byCapitol = await resolveViaSearchThenCoordinates(
+        STATE_CAPITOL_QUERY[state] ?? `${state} State Capitol`,
+      );
       if (byCapitol) return byCapitol;
     }
   } else if (locationPrecision === 'country') {
@@ -233,7 +333,10 @@ export async function resolveGovernmentCenterCoordinates(
     if (byCapitol) return byCapitol;
   }
 
-  return resolveViaSearchThenCoordinates(usableLocationLabel || normalizeJurisdictionQuery(jurisdictionLabel), disambiguator);
+  return resolveViaSearchThenCoordinates(
+    usableLocationLabel || normalizeJurisdictionQuery(jurisdictionLabel),
+    disambiguator,
+  );
 }
 
 export type CorroboratingSource = {
@@ -242,11 +345,7 @@ export type CorroboratingSource = {
   readonly text: string;
   readonly coordinates?: { readonly lat: number; readonly lng: number };
   readonly method:
-    | 'wikipedia_api'
-    | 'citation_trail'
-    | 'search'
-    | 'tier2_citation_trail'
-    | 'tier2_search';
+    'wikipedia_api' | 'citation_trail' | 'search' | 'tier2_citation_trail' | 'tier2_search';
   /** Raw HTML, when available, so a caller can citation-trail-follow this source too. */
   readonly html?: string;
 };
@@ -387,7 +486,10 @@ async function findViaCitationTrail(
   excludeUrls: readonly string[] = [],
   text?: string,
 ): Promise<CorroboratingSource | undefined> {
-  const tier1Links = collectTier1TrailLinks(html, baseUrl, { excludeUrls, ...(text ? { text } : {}) });
+  const tier1Links = collectTier1TrailLinks(html, baseUrl, {
+    excludeUrls,
+    ...(text ? { text } : {}),
+  });
   return fetchFirstReachableLink(tier1Links, 'citation_trail', subjectName);
 }
 
@@ -399,7 +501,10 @@ async function findViaTier2CitationTrail(
   excludeUrls: readonly string[] = [],
   text?: string,
 ): Promise<CorroboratingSource | undefined> {
-  const tier2Links = collectTier2TrailLinks(html, baseUrl, { excludeUrls, ...(text ? { text } : {}) });
+  const tier2Links = collectTier2TrailLinks(html, baseUrl, {
+    excludeUrls,
+    ...(text ? { text } : {}),
+  });
   return fetchFirstReachableLink(tier2Links, 'tier2_citation_trail', subjectName);
 }
 
@@ -531,7 +636,11 @@ async function findViaTier2Search(
  */
 export async function findAnySource(
   subjectName: string,
-  options: { readonly searxngBaseUrl?: string; readonly context?: string; readonly kind?: string } = {},
+  options: {
+    readonly searxngBaseUrl?: string;
+    readonly context?: string;
+    readonly kind?: string;
+  } = {},
 ): Promise<CorroboratingSource | undefined> {
   const viaWikipedia = await findViaWikipediaApi(subjectName, options.context, options.kind);
   if (viaWikipedia) return viaWikipedia;

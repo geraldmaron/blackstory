@@ -2,10 +2,7 @@
  * Derive inclusive decade buckets for WS4 relationship inference from release projection,
  * status history, kind_detail EDTF, and location EDTF spans.
  */
-import {
-  currentStatus,
-  type StatusHistoryEntry,
-} from '../../../domain/src/entity-status.ts';
+import { currentStatus, type StatusHistoryEntry } from '../../../domain/src/entity-status.ts';
 import {
   deriveEraBuckets,
   filterDecadesAtOrBeforeCurrent,
@@ -32,7 +29,10 @@ function decadeFromIsoDate(iso: string | undefined): string | undefined {
   return `${Math.floor(year / 10) * 10}s`;
 }
 
-function decadesFromEdtfBounds(fromEdtf?: string | null, toEdtf?: string | null): readonly string[] {
+function decadesFromEdtfBounds(
+  fromEdtf?: string | null,
+  toEdtf?: string | null,
+): readonly string[] {
   const fromBounds = fromEdtf?.trim() ? parseEdtfLevel1(fromEdtf.trim())?.bounds : undefined;
   const toBounds = toEdtf?.trim() ? parseEdtfLevel1(toEdtf.trim())?.bounds : undefined;
   if (!fromBounds && !toBounds) return [];
@@ -43,7 +43,10 @@ function decadesFromEdtfBounds(fromEdtf?: string | null, toEdtf?: string | null)
   });
 }
 
-function decadesFromKindDetail(kind: string, detail: Readonly<Record<string, unknown>> | undefined): readonly string[] {
+function decadesFromKindDetail(
+  kind: string,
+  detail: Readonly<Record<string, unknown>> | undefined,
+): readonly string[] {
   if (!detail) return [];
   if (kind === 'person') {
     const birth = typeof detail.birth_edtf === 'string' ? detail.birth_edtf : undefined;
@@ -94,9 +97,15 @@ export function deriveEntityDecades(input: EntityDecadeInput): readonly string[]
     buckets.add(decade);
   }
 
-  for (const decade of decadesFromEdtfBounds(input.locationValidFromEdtf, input.locationValidToEdtf)) {
+  for (const decade of decadesFromEdtfBounds(
+    input.locationValidFromEdtf,
+    input.locationValidToEdtf,
+  )) {
     buckets.add(decade);
   }
 
-  return filterDecadesAtOrBeforeCurrent([...buckets].sort((a, b) => a.localeCompare(b)), referenceDate);
+  return filterDecadesAtOrBeforeCurrent(
+    [...buckets].sort((a, b) => a.localeCompare(b)),
+    referenceDate,
+  );
 }

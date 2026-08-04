@@ -16,26 +16,12 @@ export type {
   GetEntityContextInput,
   GetLawTimelineInput,
 } from './types.js';
-export type {
-  IndicatorDbReader,
-  SeriesRow,
-  ObservationRow,
-  EntityBindingRow,
-} from './db/types.js';
+export type { IndicatorDbReader, SeriesRow, ObservationRow, EntityBindingRow } from './db/types.js';
 export {
   createOperatorPgPool,
   createPgIndicatorDbReader,
   PgIndicatorDbReader,
   resolveOperatorDatabaseUrl,
 } from './db/pg-reader.js';
-export {
-  lookupSeries,
-  getObservations,
-  getEntityContext,
-  getLawTimeline,
-} from './tools/index.js';
-export {
-  createOperatorMcpServer,
-  registerIndicatorTools,
-  runOperatorMcpServer,
-} from './server.js';
+export { lookupSeries, getObservations, getEntityContext, getLawTimeline } from './tools/index.js';
+export { createOperatorMcpServer, registerIndicatorTools, runOperatorMcpServer } from './server.js';

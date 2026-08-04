@@ -1,3 +1,5 @@
+> **SUPERSEDED.** This document is superseded by v5, then the v9 design law. Route today: Historical. It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
+
 # blap design direction v4 — the whole experience
 
 Status: canonical UX/UI pattern reference (supersedes design-direction-v3, which code comments

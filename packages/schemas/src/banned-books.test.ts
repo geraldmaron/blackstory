@@ -42,7 +42,11 @@ const sampleRecord = {
       citation: sampleCitation,
     },
   ],
-  citations: [sampleCitation, { ...sampleCitation, label: 'District board minutes' }, { ...sampleCitation, label: 'Local news report' }],
+  citations: [
+    sampleCitation,
+    { ...sampleCitation, label: 'District board minutes' },
+    { ...sampleCitation, label: 'Local news report' },
+  ],
   purchaseLinks: [
     {
       retailer: 'bookshop' as const,
@@ -80,9 +84,7 @@ test('bannedBookRecordSchema accepts YYYY-MM-DD publishedDate', () => {
 });
 
 test('bannedBookRecordSchema rejects invalid slug, state, and description bounds', () => {
-  assert.throws(() =>
-    bannedBookRecordSchema.parse({ ...sampleRecord, slug: 'Beloved_Title' }),
-  );
+  assert.throws(() => bannedBookRecordSchema.parse({ ...sampleRecord, slug: 'Beloved_Title' }));
   assert.throws(() =>
     bannedBookRecordSchema.parse({
       ...sampleRecord,

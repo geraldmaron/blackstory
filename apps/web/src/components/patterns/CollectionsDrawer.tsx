@@ -12,6 +12,7 @@
 
 import React, { useCallback, useEffect, useRef } from 'react';
 import { cx } from '@repo/ui';
+import { useFocusTrap } from '../../lib/keyboard/use-focus-trap';
 import {
   toGeoJson,
   unmappableCount,
@@ -51,13 +52,21 @@ export function CollectionsDrawer({
   className,
 }: CollectionsDrawerProps) {
   const dialogRef = useRef<HTMLDivElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
   const restoreTo = useRef<HTMLElement | null>(null);
+  useFocusTrap(dialogRef, open, { overlayRef });
 
-  const close = useCallback(() => {
-    onClose();
-    restoreTo.current?.focus();
-    restoreTo.current = null;
-  }, [onClose]);
+  const close = useCallback(() => onClose(), [onClose]);
+
+  /**
+   * Callers pass `onClose` as an inline arrow, so `close` is a new function every render. Keeping
+   * it in the effect's dependency list made the effect re-run on every render — re-capturing
+   * `restoreTo` from whatever was focused *inside* the open drawer, and pulling focus back to the
+   * dialog container mid-interaction. The listener therefore reads the callback through a ref and
+   * the effect depends on `open` alone, so open and close are the only two things that move focus.
+   */
+  const closeRef = useRef(close);
+  closeRef.current = close;
 
   useEffect(() => {
     if (!open) return;
@@ -68,12 +77,18 @@ export function CollectionsDrawer({
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' || event.key === 'Esc') {
         event.preventDefault();
-        close();
+        closeRef.current();
       }
     };
     window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [close, open]);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      // Restored in cleanup, not in the click handler: at click time the drawer is still mounted
+      // and React unmounts it immediately after, which drops focus to <body> and undoes the move.
+      restoreTo.current?.focus();
+      restoreTo.current = null;
+    };
+  }, [open]);
 
   if (!open) return null;
 
@@ -81,7 +96,7 @@ export function CollectionsDrawer({
   const unmappable = unmappableCount(collection);
 
   return (
-    <div className={cx('ds-saved', className)}>
+    <div className={cx('ds-saved', className)} ref={overlayRef}>
       <button type="button" className="ds-saved__scrim" aria-label="Close saved" onClick={close} />
       <div
         className="ds-saved__dialog"

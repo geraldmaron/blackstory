@@ -57,7 +57,9 @@ type KillSwitchRow = {
   readonly updated_at: Date | string;
 };
 
-export async function listKillSwitchesPostgres(limit: number): Promise<readonly KillSwitchListItem[]> {
+export async function listKillSwitchesPostgres(
+  limit: number,
+): Promise<readonly KillSwitchListItem[]> {
   const cappedLimit = Math.min(200, Math.max(1, limit));
   const rows = await queryPostgres<KillSwitchRow>(
     `SELECT id, enabled, reason, updated_at

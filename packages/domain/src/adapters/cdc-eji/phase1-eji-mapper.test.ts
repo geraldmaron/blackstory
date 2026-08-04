@@ -41,7 +41,11 @@ test('rollupEjiTractsToCounties computes unweighted county means', () => {
 test('mapEjiCountyRollupsToObservations emits dignity-safe county drafts', () => {
   const parsed = parseEjiTractCsv(readFileSync(FIXTURE_PATH, 'utf8'), ['17031']);
   const rollups = rollupEjiTractsToCounties(parsed.rows);
-  const observations = mapEjiCountyRollupsToObservations(rollups, '2024', '2026-01-01T00:00:00.000Z');
+  const observations = mapEjiCountyRollupsToObservations(
+    rollups,
+    '2024',
+    '2026-01-01T00:00:00.000Z',
+  );
   const cook = observations[0];
   assert.ok(cook);
   assert.equal(cook.metricId, PHASE1_EJI_ENVIRONMENTAL_BURDEN_SCORE_COUNTY_METRIC_ID);

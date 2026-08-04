@@ -68,7 +68,8 @@ export function runMcGhieClassRegression(): PublishRegressionFinding[] {
         code: 'mcghie_class_linter_regression',
         severity: 'error',
         entityId: MCGHIE_CLASS_FIXTURE.entityId,
-        message: 'McGhie-class linter must hard-fail when summary is deceased but status is living.',
+        message:
+          'McGhie-class linter must hard-fail when summary is deceased but status is living.',
       },
     ];
   }
@@ -87,7 +88,8 @@ export function runLawSelfDemiseRegression(): PublishRegressionFinding[] {
       {
         code: 'law_self_demise_linter_regression',
         severity: 'error',
-        message: 'Law self-demise linter must warn when summary describes struck-down but status is in_force.',
+        message:
+          'Law self-demise linter must warn when summary describes struck-down but status is in_force.',
       },
     ];
   }

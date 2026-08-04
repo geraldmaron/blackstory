@@ -21,8 +21,7 @@ const MIN_DESCRIPTION_LENGTH = 40;
 const MAX_DESCRIPTION_LENGTH = 600;
 
 export type BannedBookValidationResult =
-  | { readonly ok: true }
-  | { readonly ok: false; readonly errors: readonly string[] };
+  { readonly ok: true } | { readonly ok: false; readonly errors: readonly string[] };
 
 function isNonEmpty(value: string | undefined): value is string {
   return typeof value === 'string' && value.trim().length > 0;
@@ -79,7 +78,10 @@ function collectBannedBookRecordErrors(book: BannedBookRecord): string[] {
     errors.push('BannedBookRecord.slug must be kebab-case (lowercase letters, digits, hyphens)');
   }
 
-  if (book.description.length < MIN_DESCRIPTION_LENGTH || book.description.length > MAX_DESCRIPTION_LENGTH) {
+  if (
+    book.description.length < MIN_DESCRIPTION_LENGTH ||
+    book.description.length > MAX_DESCRIPTION_LENGTH
+  ) {
     errors.push(
       `BannedBookRecord.description must be between ${MIN_DESCRIPTION_LENGTH} and ${MAX_DESCRIPTION_LENGTH} characters`,
     );

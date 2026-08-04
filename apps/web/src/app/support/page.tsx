@@ -10,6 +10,7 @@ import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { Room, RoomHeader, Prose, CardGrid, RoomCard, UtilityCard } from '../../components/room';
+import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import '../utility.css';
 import './support.css';
 
@@ -85,7 +86,7 @@ export default function SupportPage() {
         <div className="ds-support__contact">
           <p className="ds-support__contact-label">Support contact</p>
           <p className="ds-support__contact-value">
-            <a href="mailto:me@geralddagher.com">me@geralddagher.com</a>
+            <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a>
           </p>
         </div>
 

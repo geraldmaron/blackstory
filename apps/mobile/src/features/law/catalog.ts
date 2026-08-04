@@ -27,6 +27,7 @@ function isKind(value: unknown): value is LawSnapshotKind {
   return (
     value === 'federal-statute' ||
     value === 'federal-regulation' ||
+    value === 'constitutional-amendment' ||
     value === 'landmark-case' ||
     value === 'state-statute'
   );

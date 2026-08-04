@@ -5,10 +5,7 @@
  */
 import { ACS_PROGRAM_HOMEPAGE_URL } from './acs-url-builder.js';
 import type { AcsProfileRow, AcsVintage } from './acs-types.js';
-import {
-  phase1AcsDatasetVintageLabel,
-  phase1AcsReferencePeriod,
-} from './phase1-acs-variables.js';
+import { phase1AcsDatasetVintageLabel, phase1AcsReferencePeriod } from './phase1-acs-variables.js';
 import { assertPublishedStatisticProvenance } from '../../public-numeric-policy.js';
 import { sha256Json } from '../../publication/index.js';
 import type { Phase1IndicatorDefinition } from '../../statistics/phase1-indicator-catalog.js';
@@ -73,11 +70,7 @@ function boundaryVersion(geography: Phase1AcsGeography): string {
   return geography === 'county' ? 'county-2020' : 'state-2020';
 }
 
-function observationId(
-  metricId: string,
-  jurisdictionId: string,
-  referencePeriod: string,
-): string {
+function observationId(metricId: string, jurisdictionId: string, referencePeriod: string): string {
   return `obs:${metricId}:${jurisdictionId}:${referencePeriod}`;
 }
 

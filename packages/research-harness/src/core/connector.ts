@@ -41,14 +41,13 @@ export function splitCsvLine(line: string): string[] {
 }
 
 /** Parses a simulated NPS Network to Freedom CSV record row. */
-export function parseNpsNetworkToFreedomRow(
-  row: Record<string, string>,
-): HarnessRawSubject {
+export function parseNpsNetworkToFreedomRow(row: Record<string, string>): HarnessRawSubject {
   const latitude = row.latitude ? parseFloat(row.latitude) : undefined;
   const longitude = row.longitude ? parseFloat(row.longitude) : undefined;
-  const coords = latitude !== undefined && longitude !== undefined && !isNaN(latitude) && !isNaN(longitude)
-    ? { latitude, longitude }
-    : undefined;
+  const coords =
+    latitude !== undefined && longitude !== undefined && !isNaN(latitude) && !isNaN(longitude)
+      ? { latitude, longitude }
+      : undefined;
 
   return {
     id: `nps-ntf:${row.id || row.name}`,
@@ -69,7 +68,10 @@ export function fetchNpsNetworkToFreedom(
   csvData: string,
   options: ConnectorFetchOptions = {},
 ): readonly HarnessRawSubject[] {
-  const lines = csvData.split('\n').map((line) => line.trim()).filter(Boolean);
+  const lines = csvData
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
   if (lines.length < 2) return [];
 
   const firstLine = lines[0];
@@ -112,9 +114,9 @@ export function fetchDplaItems(
       const description = Array.isArray(sourceResource.description)
         ? sourceResource.description.join(' ')
         : sourceResource.description || '';
-      
+
       const isShownAt = item.isShownAt ? [String(item.isShownAt)] : [];
-      
+
       return {
         id: `dpla:${item.id || item.ingestDate || Math.random().toString()}`,
         connectorKind: 'dpla' as const,

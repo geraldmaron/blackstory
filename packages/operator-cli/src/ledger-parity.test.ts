@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { assertPostgresOpsDataSource, editorialCatalogFromError } from './ops-data-source-gate.ts';
 import {
-  assertPostgresOpsDataSource,
-  editorialCatalogFromError,
-} from './ops-data-source-gate.ts';
-import { DEFAULT_PARITY_CYCLES, LEDGER_PARITY_CHECKLIST, parityChecklistMarkdown } from './ledger-parity.ts';
+  DEFAULT_PARITY_CYCLES,
+  LEDGER_PARITY_CHECKLIST,
+  parityChecklistMarkdown,
+} from './ledger-parity.ts';
 
 test('assertPostgresOpsDataSource requires explicit postgres selector', () => {
   assert.throws(

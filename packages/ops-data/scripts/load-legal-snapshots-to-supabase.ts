@@ -74,6 +74,7 @@ const rows = snapshots.map((snapshot) => {
     citation: snapshot.citation,
     ...(catalog?.explainer ? { explainer: catalog.explainer } : {}),
     ...(snapshot.factId ? { factId: snapshot.factId } : {}),
+    ...(snapshot.effectiveYear ? { effectiveYear: snapshot.effectiveYear } : {}),
     ...(CANONICAL_ENTITY_BY_SLUG[snapshot.slug]
       ? { canonicalEntityId: CANONICAL_ENTITY_BY_SLUG[snapshot.slug] }
       : {}),

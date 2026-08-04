@@ -107,11 +107,10 @@ function parseArgs(argv) {
  * @returns {string[]}
  */
 function listGcsObjects(bucket, prefix) {
-  const result = spawnSync(
-    'gsutil',
-    ['ls', '-r', `gs://${bucket}/${prefix}`],
-    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
-  );
+  const result = spawnSync('gsutil', ['ls', '-r', `gs://${bucket}/${prefix}`], {
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
+  });
   if (result.status !== 0) {
     throw new Error(`gsutil ls failed: ${result.stderr || result.stdout}`);
   }
@@ -255,7 +254,9 @@ async function main() {
       console.log(`  would copy ${uri}`);
     }
     if (objects.length > 20) console.log(`  … and ${objects.length - 20} more`);
-    console.log('\nDry-run complete. Re-run with SUPABASE_STORAGE_COPY=1 and SUPABASE_SERVICE_ROLE_KEY set for live upload.');
+    console.log(
+      '\nDry-run complete. Re-run with SUPABASE_STORAGE_COPY=1 and SUPABASE_SERVICE_ROLE_KEY set for live upload.',
+    );
     return;
   }
 

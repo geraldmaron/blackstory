@@ -134,7 +134,8 @@ export async function judgeQuarantineItem(options: {
   if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) {
     throw new Error(`quarantine-triage: model returned an invalid confidence for ${item.id}`);
   }
-  const title = typeof record.title === 'string' && record.title.trim() ? record.title.trim() : undefined;
+  const title =
+    typeof record.title === 'string' && record.title.trim() ? record.title.trim() : undefined;
   return {
     decision: record.decision,
     rationale: record.rationale.trim(),
@@ -191,7 +192,9 @@ function deriveTitle(item: QuarantineIntakeItem, judgment: QuarantineTriageJudgm
     (typeof normalized?.statement === 'string' && normalized.statement) ||
     (typeof payload?.statement === 'string' && payload.statement) ||
     `Quarantined submission ${item.id}`;
-  return truncate(candidate.trim().replace(/\s+/gu, ' '), 200) || `Quarantined submission ${item.id}`;
+  return (
+    truncate(candidate.trim().replace(/\s+/gu, ' '), 200) || `Quarantined submission ${item.id}`
+  );
 }
 
 /**
@@ -278,7 +281,14 @@ export async function commitQuarantineTriagePlans(
         await client.query(
           `INSERT INTO bb_research.cases (id, state, candidate_id, title, created_at, updated_at)
            VALUES ($1, $2, $3, $4, $5, $6)`,
-          [record.id, record.state, record.candidateId, record.title, record.createdAt, record.updatedAt],
+          [
+            record.id,
+            record.state,
+            record.candidateId,
+            record.title,
+            record.createdAt,
+            record.updatedAt,
+          ],
         );
       }
       await client.query(

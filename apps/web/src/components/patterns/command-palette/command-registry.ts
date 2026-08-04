@@ -32,6 +32,8 @@ export type CommandContext = {
   readonly focusSearch: () => void;
   readonly nearMe: () => void;
   readonly resetLens: () => void;
+  /** Runs the newest action toast's action. A no-op when nothing is offering one. */
+  readonly undoLastAction: () => void;
 
   /* Camera. Typed against the real API so a rename in WP-05 breaks this list. */
   readonly camera: Pick<CameraApi, 'wide' | 'push' | 'orbit' | 'tilt' | 'spotlight' | 'trace'>;
@@ -91,6 +93,18 @@ export const COMMANDS: readonly Command[] = [
     section: 'Find',
     keys: ['⌘', '⌫'],
     run: (context) => context.resetLens(),
+  },
+  {
+    /*
+     * The keyboard route to whatever an action toast is offering — today that is Undo after a lens
+     * reset. Without it the toast persists but is reachable only by pointing at a small button in
+     * a corner, which leaves out exactly the readers the persistence was added for.
+     */
+    id: 'find.undo',
+    title: 'Undo the last action',
+    section: 'Find',
+    keys: ['⌘', 'Z'],
+    run: (context) => context.undoLastAction(),
   },
 
   /* ---- Camera ---- */

@@ -4,21 +4,26 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  classifySourceForConfidence,
-  computeClaimConfidence,
-} from './confidence.ts';
+import { classifySourceForConfidence, computeClaimConfidence } from './confidence.ts';
 
-const DC_PRESERVATION =
-  'https://historicsites.dcpreservation.org/site/123-example-historic-place';
+const DC_PRESERVATION = 'https://historicsites.dcpreservation.org/site/123-example-historic-place';
 const NPS_GOV = 'https://www.nps.gov/places/example-historic-site.htm';
 const WIKIPEDIA = 'https://en.wikipedia.org/wiki/Example_Historic_Site';
 
 test('classifySourceForConfidence maps curated heritage hosts to reputable_secondary', () => {
   assert.equal(classifySourceForConfidence(DC_PRESERVATION), 'reputable_secondary');
-  assert.equal(classifySourceForConfidence('https://www.hmdb.org/m.asp?m=12345'), 'reputable_secondary');
-  assert.equal(classifySourceForConfidence('https://digdc.dclibrary.org/islandora/object/pdc%3A123'), 'reputable_secondary');
-  assert.equal(classifySourceForConfidence('https://www.blackpast.org/african-american-history/example/'), 'reputable_secondary');
+  assert.equal(
+    classifySourceForConfidence('https://www.hmdb.org/m.asp?m=12345'),
+    'reputable_secondary',
+  );
+  assert.equal(
+    classifySourceForConfidence('https://digdc.dclibrary.org/islandora/object/pdc%3A123'),
+    'reputable_secondary',
+  );
+  assert.equal(
+    classifySourceForConfidence('https://www.blackpast.org/african-american-history/example/'),
+    'reputable_secondary',
+  );
 });
 
 test('classifySourceForConfidence keeps gov and wikipedia behavior', () => {

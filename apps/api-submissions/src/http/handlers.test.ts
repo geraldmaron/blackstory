@@ -30,7 +30,8 @@ const VALID_CORRECTION = {
   targetType: 'entity',
   targetRecordId: 'entity-rosewood',
   category: 'factual_error',
-  statement: 'The published opening year should be 1924 according to the county superintendent ledger.',
+  statement:
+    'The published opening year should be 1924 according to the county superintendent ledger.',
   sourceUrl: 'https://example.org/ledger',
   privacyConsent: true,
 } as const;

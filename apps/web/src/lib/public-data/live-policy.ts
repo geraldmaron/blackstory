@@ -12,7 +12,9 @@ export type PublicDataSource = 'seed' | 'postgres';
 
 type EnvironmentLike = Readonly<Record<string, string | undefined>>;
 
-export function resolvePublicDataSource(env: EnvironmentLike = process.env): PublicDataSource | undefined {
+export function resolvePublicDataSource(
+  env: EnvironmentLike = process.env,
+): PublicDataSource | undefined {
   const raw = env.PUBLIC_DATA_SOURCE?.trim().toLowerCase();
   if (raw === 'seed' || raw === 'postgres') {
     return raw;

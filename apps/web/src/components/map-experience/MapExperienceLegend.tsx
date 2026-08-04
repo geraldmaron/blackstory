@@ -303,8 +303,8 @@ function MapColorKey(props: {
         ))}
       </div>
       <p className="ds-explore-legend__note">
-        Larger discs mean more accepted claims on that record ({MARKER_RADIUS_MIN} to {MARKER_RADIUS_MAX}px
-        at locality zoom). Confidence is separate below.
+        Larger discs mean more accepted claims on that record ({MARKER_RADIUS_MIN} to{' '}
+        {MARKER_RADIUS_MAX}px at locality zoom). Confidence is separate below.
       </p>
       <p className="ds-explore-legend__note">Cluster size (Group nearby on)</p>
       <ul className="ds-explore-legend__kind-list">
@@ -505,15 +505,15 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
                   </>
                 ) : layerMode === 'blackShare' ? (
                   <>
-                    {popGeo === 'state' ? 'States' : 'Counties'} are shaded by Black share of
-                    total population for the selected Census decennial vintage (published decennial
+                    {popGeo === 'state' ? 'States' : 'Counties'} are shaded by Black share of total
+                    population for the selected Census decennial vintage (published decennial
                     counts, not modeled story density).
                   </>
                 ) : (
                   <>
-                    {popGeo === 'state' ? 'States' : 'Counties'} are shaded by change in Black
-                    share between the selected decades; copper tones mark gain, stone tones mark
-                    loss. Arrows in the tier list are a second signal; color is never the only cue.
+                    {popGeo === 'state' ? 'States' : 'Counties'} are shaded by change in Black share
+                    between the selected decades; copper tones mark gain, stone tones mark loss.
+                    Arrows in the tier list are a second signal; color is never the only cue.
                   </>
                 )}
               </dd>
@@ -522,8 +522,8 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
               <div>
                 <dt>Record presence shading</dt>
                 <dd>
-                  Darker copper means more documented records in a state, never more danger, never
-                  a claim that a lighter state lacks history. See the color key above for the three
+                  Darker copper means more documented records in a state, never more danger, never a
+                  claim that a lighter state lacks history. See the color key above for the three
                   presence tiers.
                 </dd>
               </div>

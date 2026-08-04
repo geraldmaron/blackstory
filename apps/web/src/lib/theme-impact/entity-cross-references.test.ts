@@ -53,10 +53,16 @@ test('resolveEntityCrossReferences returns nothing for an entity with zero cross
 });
 
 test('resolveEntityCrossReferences resolves a single bound packet', async () => {
-  const surfaces = await resolveEntityCrossReferences('ent_solo', stubbedPacketDeps({
-    redlining: [packetView('redlining', 'Q1', 'ent_solo'), packetView('redlining', 'Q2', undefined)],
-    urban_renewal: [],
-  }));
+  const surfaces = await resolveEntityCrossReferences(
+    'ent_solo',
+    stubbedPacketDeps({
+      redlining: [
+        packetView('redlining', 'Q1', 'ent_solo'),
+        packetView('redlining', 'Q2', undefined),
+      ],
+      urban_renewal: [],
+    }),
+  );
   assert.equal(surfaces.length, 1);
   const [surface] = surfaces;
   assert.ok(surface);
@@ -67,10 +73,13 @@ test('resolveEntityCrossReferences resolves a single bound packet', async () => 
 });
 
 test('resolveEntityCrossReferences resolves bound packets across multiple themes', async () => {
-  const surfaces = await resolveEntityCrossReferences('ent_shared', stubbedPacketDeps({
-    redlining: [packetView('redlining', 'Q1', 'ent_shared')],
-    urban_renewal: [packetView('urban_renewal', 'Q4', 'ent_shared')],
-  }));
+  const surfaces = await resolveEntityCrossReferences(
+    'ent_shared',
+    stubbedPacketDeps({
+      redlining: [packetView('redlining', 'Q1', 'ent_shared')],
+      urban_renewal: [packetView('urban_renewal', 'Q4', 'ent_shared')],
+    }),
+  );
 
   assert.equal(surfaces.length, 2);
   for (const surface of surfaces) {

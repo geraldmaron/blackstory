@@ -73,7 +73,9 @@ async function stageReviewCandidates(
 
   for (const candidate of candidates) {
     const sourceItemId = candidate.id;
-    const landscapeId = `landcand_status_${candidate.id}`.replace(/[^a-zA-Z0-9_]+/g, '_').slice(0, 180);
+    const landscapeId = `landcand_status_${candidate.id}`
+      .replace(/[^a-zA-Z0-9_]+/g, '_')
+      .slice(0, 180);
     console.log(
       `  STAGE ${candidate.id} (${candidate.display_name}) -> lane=${STATUS_REVIEW_LANE}`,
     );

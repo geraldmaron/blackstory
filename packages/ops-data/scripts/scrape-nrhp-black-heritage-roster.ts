@@ -236,10 +236,12 @@ async function main(): Promise<void> {
   const downloadsHtml = await (
     await fetch(DOWNLOADS_PAGE, { headers: { 'user-agent': BROWSER_UA } })
   ).text();
-  const xlsxPath = /href="(\/subjects\/nationalregister\/upload\/national-register-listed_[\d]+\.xlsx)"/u.exec(
-    downloadsHtml,
-  )?.[1];
-  if (!xlsxPath) throw new Error('could not find national-register-listed_*.xlsx link on data-downloads page');
+  const xlsxPath =
+    /href="(\/subjects\/nationalregister\/upload\/national-register-listed_[\d]+\.xlsx)"/u.exec(
+      downloadsHtml,
+    )?.[1];
+  if (!xlsxPath)
+    throw new Error('could not find national-register-listed_*.xlsx link on data-downloads page');
   const xlsxUrl = `https://www.nps.gov${xlsxPath}`;
   mkdirSync(CACHE_DIR, { recursive: true });
   // The cache filename comes from a link on a page we fetched, so it is remote input deciding
@@ -271,17 +273,26 @@ async function main(): Promise<void> {
   // 2. Parse the two inner XML parts.
   const maxBuffer = 512 * 1024 * 1024;
   const sharedStrings = parseSharedStrings(
-    execFileSync('unzip', ['-p', localXlsx, 'xl/sharedStrings.xml'], { maxBuffer }).toString('utf8'),
+    execFileSync('unzip', ['-p', localXlsx, 'xl/sharedStrings.xml'], { maxBuffer }).toString(
+      'utf8',
+    ),
   );
   const rows = parseSheetRows(
-    execFileSync('unzip', ['-p', localXlsx, 'xl/worksheets/sheet1.xml'], { maxBuffer }).toString('utf8'),
+    execFileSync('unzip', ['-p', localXlsx, 'xl/worksheets/sheet1.xml'], { maxBuffer }).toString(
+      'utf8',
+    ),
     sharedStrings,
   );
   const header = rows[0];
   if (!header) throw new Error('empty sheet');
   const colOf = (label: string): string => {
-    const entry = Object.entries(header).find(([, v]) => v.trim().toLowerCase() === label.toLowerCase());
-    if (!entry) throw new Error(`header column not found: ${label} (have: ${Object.values(header).join(', ')})`);
+    const entry = Object.entries(header).find(
+      ([, v]) => v.trim().toLowerCase() === label.toLowerCase(),
+    );
+    if (!entry)
+      throw new Error(
+        `header column not found: ${label} (have: ${Object.values(header).join(', ')})`,
+      );
     return entry[0];
   };
   const COL = {
@@ -328,7 +339,9 @@ async function main(): Promise<void> {
   const listings: Listing[] = [...byBaseKey.values()].map((row) => {
     const refnum = (row[COL.refnum] ?? '').trim();
     const externalRaw = (row[COL.externalLink] ?? '').trim();
-    const externalLink = /^https:\/\/(?:catalog\.archives\.gov|npgallery\.nps\.gov)\//u.test(externalRaw)
+    const externalLink = /^https:\/\/(?:catalog\.archives\.gov|npgallery\.nps\.gov)\//u.test(
+      externalRaw,
+    )
       ? externalRaw
       : null;
     return {
@@ -347,7 +360,9 @@ async function main(): Promise<void> {
       lng: null,
     };
   });
-  console.log(`Distinct properties after collapsing ${collapsedRelistings} re-listing row(s): ${listings.length}.`);
+  console.log(
+    `Distinct properties after collapsing ${collapsedRelistings} re-listing row(s): ${listings.length}.`,
+  );
 
   // 5. Geo join via NPS ArcGIS points layer (batches of 100 refnums).
   let geoMatched = 0;
@@ -362,20 +377,32 @@ async function main(): Promise<void> {
       f: 'json',
     });
     const data = (await fetchJson(ARCGIS_POINTS_LAYER, { method: 'POST', body })) as {
-      features?: readonly { attributes?: { NRIS_Refnum?: string }; geometry?: { x?: number; y?: number } }[];
+      features?: readonly {
+        attributes?: { NRIS_Refnum?: string };
+        geometry?: { x?: number; y?: number };
+      }[];
     } | null;
     for (const feature of data?.features ?? []) {
       const ref = feature.attributes?.NRIS_Refnum;
       const listing = batch.find((l) => l.refnum === ref);
-      if (listing && typeof feature.geometry?.x === 'number' && typeof feature.geometry?.y === 'number') {
+      if (
+        listing &&
+        typeof feature.geometry?.x === 'number' &&
+        typeof feature.geometry?.y === 'number'
+      ) {
         if (listing.lat === null) geoMatched += 1;
         listing.lat = feature.geometry.y;
         listing.lng = feature.geometry.x;
       }
     }
-    if (i % 1000 === 0) console.log(`  geo join: ${Math.min(i + 100, listings.length)}/${listings.length} (matched so far: ${geoMatched})`);
+    if (i % 1000 === 0)
+      console.log(
+        `  geo join: ${Math.min(i + 100, listings.length)}/${listings.length} (matched so far: ${geoMatched})`,
+      );
   }
-  console.log(`Geo join complete: ${geoMatched}/${listings.length} listings matched to ArcGIS points.`);
+  console.log(
+    `Geo join complete: ${geoMatched}/${listings.length} listings matched to ArcGIS points.`,
+  );
 
   // 6. Dedup vs existing landscape candidates (all lanes) and canonical entities.
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
@@ -413,15 +440,24 @@ async function main(): Promise<void> {
   }
 
   // 7. Sample URL verification: N random net-new canonical URLs must fetch 200.
-  const sampleFailures: { displayName: string; canonicalUrl: string; status: number | string }[] = [];
+  const sampleFailures: { displayName: string; canonicalUrl: string; status: number | string }[] =
+    [];
   const sampled: { displayName: string; canonicalUrl: string }[] = [];
   const stride = Math.max(1, Math.floor(netNewRows.length / Math.max(1, SAMPLE_SIZE)));
   for (let i = 0; i < netNewRows.length && sampled.length < SAMPLE_SIZE; i += stride) {
     const row = netNewRows[i]!;
     sampled.push({ displayName: row.displayName, canonicalUrl: row.canonicalUrl });
     try {
-      const res = await fetch(row.canonicalUrl, { headers: { 'user-agent': BROWSER_UA }, redirect: 'follow' });
-      if (!res.ok) sampleFailures.push({ displayName: row.displayName, canonicalUrl: row.canonicalUrl, status: res.status });
+      const res = await fetch(row.canonicalUrl, {
+        headers: { 'user-agent': BROWSER_UA },
+        redirect: 'follow',
+      });
+      if (!res.ok)
+        sampleFailures.push({
+          displayName: row.displayName,
+          canonicalUrl: row.canonicalUrl,
+          status: res.status,
+        });
     } catch (error) {
       sampleFailures.push({
         displayName: row.displayName,
@@ -430,10 +466,14 @@ async function main(): Promise<void> {
       });
     }
   }
-  console.log(`URL sample verification: ${sampled.length} sampled, ${sampleFailures.length} failure(s).`);
+  console.log(
+    `URL sample verification: ${sampled.length} sampled, ${sampleFailures.length} failure(s).`,
+  );
   if (sampleFailures.length > 0) {
     console.table(sampleFailures);
-    throw new Error('sample URL verification failed — refusing to stage; inspect canonical URL construction');
+    throw new Error(
+      'sample URL verification failed — refusing to stage; inspect canonical URL construction',
+    );
   }
 
   const generatedAt = new Date().toISOString();
@@ -478,14 +518,13 @@ async function main(): Promise<void> {
 
   mkdirSync(REPORT_DIR, { recursive: true });
   const reportPath = join(REPORT_DIR, safeReportFilename('nrhp-black-heritage', generatedAt));
-  writeFileSync(
-    reportPath,
-    JSON.stringify({ ...report, netNewRows }, null, 2),
-  );
+  writeFileSync(reportPath, JSON.stringify({ ...report, netNewRows }, null, 2));
   console.log(`\nReport written to ${reportPath}`);
 
   if (DRY_RUN || !APPLY) {
-    console.log('\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 NRHP_BLACK_HERITAGE_APPLY=1 to apply.');
+    console.log(
+      '\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 NRHP_BLACK_HERITAGE_APPLY=1 to apply.',
+    );
     await pool.end();
     return;
   }

@@ -243,21 +243,19 @@ async function runCatalogEnrichPhase(client: pg.PoolClient): Promise<{
   skipped: number;
   leftPending: number;
 }> {
-  const pairPayload = Object.entries(CATALOG_ENRICH_PAIRS).map(([candidateId, releaseEntityId]) => ({
-    candidate_id: candidateId,
-    release_entity_id: releaseEntityId,
-  }));
+  const pairPayload = Object.entries(CATALOG_ENRICH_PAIRS).map(
+    ([candidateId, releaseEntityId]) => ({
+      candidate_id: candidateId,
+      release_entity_id: releaseEntityId,
+    }),
+  );
 
   const { rows } = await client.query<CatalogEnrichRow>(CATALOG_ENRICH_VALIDATE_SQL, [
     JSON.stringify(pairPayload),
   ]);
 
-  const toMerge = rows.filter(
-    (row) => row.candidate_status === 'pending' && row.release_exists,
-  );
-  const skipped = rows.filter(
-    (row) => row.candidate_status !== 'pending' || !row.release_exists,
-  );
+  const toMerge = rows.filter((row) => row.candidate_status === 'pending' && row.release_exists);
+  const skipped = rows.filter((row) => row.candidate_status !== 'pending' || !row.release_exists);
 
   const pendingCount = await client.query<{ n: string }>(
     `SELECT COUNT(*)::text AS n FROM bb_research.landscape_candidates WHERE status = 'pending'`,
@@ -274,9 +272,7 @@ async function runCatalogEnrichPhase(client: pg.PoolClient): Promise<{
   if (toMerge.length > 0) {
     console.log('Merge/link (intake → release entity, no new pin):');
     for (const row of toMerge) {
-      console.log(
-        `  ${row.candidate_id} "${row.candidate_name}" → ${row.release_entity_id}`,
-      );
+      console.log(`  ${row.candidate_id} "${row.candidate_name}" → ${row.release_entity_id}`);
     }
   }
   if (skipped.length > 0) {
@@ -435,7 +431,9 @@ async function main(): Promise<void> {
     console.log(`Report: ${REPORT_PATH}`);
 
     if (DRY_RUN) {
-      console.log('DRY_RUN=1 (default): no database writes. Set DRY_RUN=0 DEDUP_LANDSCAPE_APPLY=1 to apply.');
+      console.log(
+        'DRY_RUN=1 (default): no database writes. Set DRY_RUN=0 DEDUP_LANDSCAPE_APPLY=1 to apply.',
+      );
       return;
     }
     if (!APPLY_DEDUP) {

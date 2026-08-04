@@ -23,7 +23,8 @@
  * p23stat01 → 2023). Prefer a fixed ACS denominator vintage across years and keep labels
  * distinct from BJS-published national Table 6 rates.
  */
-import { createWriteStream, existsSync, readFileSync } from 'node:fs';import { mkdtemp, rm } from 'node:fs/promises';
+import { createWriteStream, existsSync, readFileSync } from 'node:fs';
+import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { execFileSync } from 'node:child_process';

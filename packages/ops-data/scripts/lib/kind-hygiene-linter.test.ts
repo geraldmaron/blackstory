@@ -35,7 +35,10 @@ test('lintKindHygiene errors on duplicate topicTags', () => {
     topicTags: ['abolition', 'bobsled', 'bobsled'],
   });
   assert.equal(report.hasErrors, true);
-  assert.equal(report.findings.some((f) => f.code === 'duplicate_topic_tags'), true);
+  assert.equal(
+    report.findings.some((f) => f.code === 'duplicate_topic_tags'),
+    true,
+  );
 });
 
 test('mergeKindHygieneLintReports combines findings', () => {

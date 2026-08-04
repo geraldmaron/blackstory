@@ -30,7 +30,9 @@ function quoteIdent(ident: string): string {
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Date);
+  return (
+    value !== null && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Date)
+  );
 }
 
 function needsJsonb(value: unknown): boolean {
@@ -67,9 +69,7 @@ export function normalizePgConnectionString(connectionString: string): {
     url.searchParams.set('sslmode', 'require');
     normalized = url.toString();
   } catch {
-    normalized = connectionString
-      .replace(/([?&])sslmode=[^&]*/g, '$1')
-      .replace(/[?&]$/, '');
+    normalized = connectionString.replace(/([?&])sslmode=[^&]*/g, '$1').replace(/[?&]$/, '');
     const join = normalized.includes('?') ? '&' : '?';
     normalized = `${normalized}${join}uselibpqcompat=true&sslmode=require`;
   }

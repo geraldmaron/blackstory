@@ -428,15 +428,15 @@ export const wealthGapArticle = {
     {
       type: 'figure',
       packetId: 'tip_wealth_gap_gap_that_never_closed',
-      metricIds: [
-        'dkks-wealth-ratio-white-black-nation',
-        'scf-wealth-ratio-white-black-nation',
-      ],
+      metricIds: ['dkks-wealth-ratio-white-black-nation', 'scf-wealth-ratio-white-black-nation'],
       caption:
         'White-to-Black wealth ratio, United States, 1860–2022. Two distinct series, kept apart rather than spliced: the per-capita mean (1860–2019) and the household median (2022 shown; SCF runs triennially from 1989). The fall halts around 1980.',
     },
     {
-      type: 'heading', level: 3 as const, text: 'What the two series measure, and don’t' },
+      type: 'heading',
+      level: 3 as const,
+      text: 'What the two series measure, and don’t',
+    },
     {
       type: 'paragraph',
       text: 'Two different wealth series run through this chapter, and they’re never averaged into one line. The per-capita mean ratio sits on benchmark years from 1860 to 2019, and the 1860 and 1870 readings in particular sit over a denominator near zero for the newly freed population, so they’re single benchmark points rather than annual figures. The household-median ratio runs triennially from 1989 onward and measures something else entirely: median household net worth, not per-capita mean wealth [ref:dkks-wealth-of-two-nations][ref:scf-2022]. They’re placed side by side because they cover different spans and different constructs, and the fact that both show a stall after about 1980 is context rather than proof that either one explains the other.',

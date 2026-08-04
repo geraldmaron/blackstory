@@ -1,0 +1,192 @@
+/**
+ * Pure class-name / data-attribute helpers for Explore panel chrome: the left instrument
+ * chassis (Filters | Color key tabs), the records rail/sheet, and stage data hooks that keep
+ * MapLibre zoom clear of open panels. Keeps the explore surface JSX readable and gives tests
+ * a stable contract for CSS and a11y. Also formats the records-rail count line.
+ */
+
+export type ExploreLeftTab = 'filters' | 'key';
+
+/** Root class on `/explore` stage — pairs with explore-edition.css tokens. */
+export const EXPLORE_EDITION_STAGE_CLASS = 'ds-explore-edition';
+
+/** Segmented tab list aligned with browse-mode toggle (v6 explore edition). */
+export const EXPLORE_EDITION_TABS_CLASS = 'ds-explore-edition__tabs';
+
+/** Individual instrument tab segment. */
+export const EXPLORE_EDITION_TAB_CLASS = 'ds-explore-edition__tab';
+
+export function exploreStageRootClassName(options: { readonly entering: boolean }): string {
+  const parts = ['ds-explore-stage', EXPLORE_EDITION_STAGE_CLASS];
+  if (options.entering) {
+    parts.push('ds-explore-stage--entering');
+  }
+  return parts.join(' ');
+}
+
+export function exploreEditionTabClassName(): string {
+  return EXPLORE_EDITION_TAB_CLASS;
+}
+
+export function exploreEditionTabsClassName(): string {
+  return EXPLORE_EDITION_TABS_CLASS;
+}
+
+export function exploreInstrumentsPanelClassName(options: { readonly visible: boolean }): string {
+  return options.visible
+    ? 'ds-explore-stage__instruments'
+    : 'ds-explore-stage__instruments ds-explore-stage__instruments--hidden';
+}
+
+export function exploreResultsPanelClassName(options: {
+  readonly visible: boolean;
+  readonly dimmed: boolean;
+}): string {
+  const parts = ['ds-explore-stage__results'];
+  if (!options.visible) parts.push('ds-explore-stage__results--hidden');
+  if (options.dimmed) parts.push('ds-explore-stage__results--dimmed');
+  return parts.join(' ');
+}
+
+/**
+ * Resolves which left-tab content is active. Chassis is closed when both sections are hidden.
+ * When only one section is visible, that tab wins; when both are visible, `preferredTab`
+ * selects (default Filters).
+ */
+export function resolveExploreLeftTab(options: {
+  readonly showFilters: boolean;
+  readonly showKey: boolean;
+  readonly preferredTab?: ExploreLeftTab | null;
+}): ExploreLeftTab | null {
+  const { showFilters, showKey, preferredTab = null } = options;
+  if (!showFilters && !showKey) return null;
+  if (showFilters && !showKey) return 'filters';
+  if (!showFilters && showKey) return 'key';
+  return preferredTab === 'key' ? 'key' : 'filters';
+}
+
+export type ExploreStageChromeAttrs = {
+  readonly 'data-instruments': 'open' | 'closed';
+  readonly 'data-instruments-tab': ExploreLeftTab | 'none';
+  readonly 'data-results': 'open' | 'closed';
+};
+
+/**
+ * Stage data attributes drive layout + MapLibre zoom safe-zones via attribute selectors
+ * on the explore stage (sibling of the canvas plate).
+ */
+export function exploreStageChromeAttrs(options: {
+  readonly instrumentsVisible: boolean;
+  readonly leftTab: ExploreLeftTab | null;
+  readonly resultsVisible: boolean;
+}): ExploreStageChromeAttrs {
+  return {
+    'data-instruments': options.instrumentsVisible ? 'open' : 'closed',
+    'data-instruments-tab': options.leftTab ?? 'none',
+    'data-results': options.resultsVisible ? 'open' : 'closed',
+  };
+}
+
+/** Narrow / tablet breakpoint where only one primary panel should occupy the map. */
+export const EXPLORE_SINGLE_PANEL_MEDIA = '(max-width: 64rem)';
+
+/**
+ * When opening the instrument chassis or records on a narrow viewport, collapse the
+ * competing primary panel so sheets never stack over the map/zoom control.
+ */
+export function exploreNarrowExclusivePatch(options: {
+  readonly opening: 'instruments' | 'results';
+}):
+  { readonly showResults: boolean } | { readonly showFilters: boolean; readonly showKey: boolean } {
+  if (options.opening === 'instruments') {
+    return { showResults: false };
+  }
+  return { showFilters: false, showKey: false };
+}
+
+/**
+ * Whether a server-supplied explore viewState should replace client chrome.
+ *
+ * `history.replaceState` updates the address bar without updating Next's router
+ * searchParams. A later RSC refresh can therefore re-supply a *stale* `initial`
+ * (panels closed) while the live URL still has `panels=filters`. Prefer the
+ * address bar / last client push over that echo so open/close cannot thrash.
+ */
+export function shouldAcceptExploreServerViewState(options: {
+  readonly incomingHref: string;
+  readonly lastPushedHref: string | null;
+  /** Normalized shareable href from `window.location` (optional; client only). */
+  readonly liveHref?: string | null;
+}): boolean {
+  const { incomingHref, lastPushedHref, liveHref = null } = options;
+  if (lastPushedHref !== null && lastPushedHref === incomingHref) {
+    return false;
+  }
+  // Stale Next RSC: address bar still matches what we wrote, server does not.
+  if (
+    lastPushedHref !== null &&
+    liveHref !== null &&
+    liveHref === lastPushedHref &&
+    incomingHref !== lastPushedHref
+  ) {
+    return false;
+  }
+  return true;
+}
+
+export type ExploreResultsCountLineInput = {
+  readonly listCount: number;
+  readonly releaseCount: number;
+  readonly connectionCount: number;
+  readonly showConnections: boolean;
+  readonly selectedStateName: string | null | undefined;
+  readonly placeFocus: null | {
+    readonly radiusLabel: string;
+    readonly placeLabel: string;
+    /** True when a radius is set and zero records match. */
+    readonly empty: boolean;
+  };
+};
+
+function recordWord(count: number): string {
+  return count === 1 ? 'record' : 'records';
+}
+
+/**
+ * Mono count line for the records rail header: in-view (or place radius) scope,
+ * optional release total when the camera list is a subset, connections, sort hint.
+ */
+export function formatExploreResultsCountLine(input: ExploreResultsCountLineInput): string {
+  const { placeFocus } = input;
+
+  if (placeFocus?.empty) {
+    return `No documented records within ${placeFocus.radiusLabel} of ${placeFocus.placeLabel}`;
+  }
+
+  let primary: string;
+  if (placeFocus) {
+    primary = `${input.listCount} documented ${recordWord(input.listCount)} within ${placeFocus.radiusLabel} of ${placeFocus.placeLabel}`;
+  } else if (input.selectedStateName) {
+    primary = `${input.listCount} documented ${recordWord(input.listCount)} in ${input.selectedStateName}`;
+  } else {
+    primary = `${input.listCount} documented ${recordWord(input.listCount)} in view`;
+  }
+
+  const parts = [primary];
+
+  if (
+    !placeFocus &&
+    !input.selectedStateName &&
+    input.releaseCount > 0 &&
+    input.releaseCount !== input.listCount
+  ) {
+    parts.push(`${input.releaseCount.toLocaleString('en-US')} in release`);
+  }
+
+  if (input.showConnections) {
+    parts.push(`${input.connectionCount} connection${input.connectionCount === 1 ? '' : 's'}`);
+  }
+
+  parts.push('oldest first');
+  return parts.join(' · ');
+}

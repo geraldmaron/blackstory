@@ -50,7 +50,10 @@ test('buildReleaseSourceFromLandscape produces claims from canonical_url', () =>
   const entry = buildReleaseSourceFromLandscape(baseRow());
   assert.ok(entry);
   assert.equal(entry?.claims?.length, 1);
-  assert.equal(entry?.claims?.[0]?.citationHref, 'https://historicsites.dcpreservation.org/items/show/1055');
+  assert.equal(
+    entry?.claims?.[0]?.citationHref,
+    'https://historicsites.dcpreservation.org/items/show/1055',
+  );
 });
 
 test('gateLandscapePublishCandidate rejects person privacy holds', () => {
@@ -112,6 +115,63 @@ test('gateLandscapePublishCandidate rejects already-in-public rows', () => {
   });
   assert.equal(result.eligible, false);
   if (!result.eligible) assert.equal(result.reason, 'already_in_public');
+});
+
+test('gateLandscapePublishCandidate allowRepublish lets an already-published row past already_in_public', () => {
+  const result = gateLandscapePublishCandidate({
+    row: baseRow({ exact_in_release: true }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    allowRepublish: true,
+  });
+  if (!result.eligible) assert.notEqual(result.reason, 'already_in_public');
+});
+
+const nrhpRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublishRow =>
+  baseRow({
+    id: 'nrhp-black-heritage-71000836',
+    lane: 'nrhp-black-heritage',
+    display_name: 'Tri-State Bank',
+    summary:
+      'Tri-State Bank is a building in Memphis, Shelby County, Tennessee listed on the National ' +
+      'Register of Historic Places on July 30, 1971 for its significance in Black heritage and ' +
+      "performing arts. The National Park Service's National Register program recognizes it as " +
+      'a documented site of African American historical importance.',
+    canonical_url: 'https://npgallery.nps.gov/AssetDetail/NRIS/71000836',
+    payload: {
+      refnum: '71000836',
+      listedDateSerial: '26146',
+      areaOfSignificance: 'BLACK; PERFORMING ARTS',
+    },
+    ...overrides,
+  });
+
+test('buildReleaseSourceFromLandscape gives the NRHP lane a distinct listing-fact claim and a distinct significance claim', () => {
+  const entry = buildReleaseSourceFromLandscape(nrhpRow());
+  assert.ok(entry);
+  assert.equal(entry?.claims?.length, 2);
+
+  const [listing, significance] = entry!.claims!;
+  // claims[0].object is the listing FACT — never a copy of `summary`.
+  assert.notEqual(listing!.object, entry!.summary);
+  // Fragment, not a full sentence — see buildNrhpListingFactObject's doc comment: a full
+  // "Listed on..." sentence collides with formatClaimInclusionNote's own "Listing" lead when
+  // the claim renders as prose ("Listing Listed on...").
+  assert.match(listing!.object, /^on the National Register of Historic Places/);
+  assert.match(listing!.object, /reference #71000836/);
+
+  // The significance claim is distinct prose from both the summary and the listing-fact object,
+  // and the raw NPS code never leaks through as "(Black)" or similar.
+  assert.notEqual(significance!.object, entry!.summary);
+  assert.notEqual(significance!.object, listing!.object);
+  assert.doesNotMatch(significance!.object, /\(black/i);
+  assert.match(significance!.object, /Black heritage/);
+});
+
+test('buildReleaseSourceFromLandscape keeps the single-claim shape for non-NRHP lanes', () => {
+  const entry = buildReleaseSourceFromLandscape(baseRow());
+  assert.equal(entry?.claims?.length, 1);
+  assert.equal(entry?.claims?.[0]?.object, entry?.summary);
 });
 
 test('gateLandscapePublishCandidate accepts tier-1 DC site stub', () => {

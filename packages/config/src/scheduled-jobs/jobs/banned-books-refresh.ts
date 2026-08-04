@@ -168,17 +168,11 @@ export async function runBannedBooksRefreshJob(
         input.checkUrl,
         input.completedAt,
       );
-      const citationOutcome = await checkCitationUrls(
-        collectCitationUrls(book),
-        input.checkUrl,
-      );
+      const citationOutcome = await checkCitationUrls(collectCitationUrls(book), input.checkUrl);
       const provenanceOutcome = await input.checkUrl(book.provenance.sourceUrl);
-      linksChecked +=
-        purchaseOutcome.linksChecked + citationOutcome.linksChecked + 1;
+      linksChecked += purchaseOutcome.linksChecked + citationOutcome.linksChecked + 1;
       linksValid +=
-        purchaseOutcome.linksValid +
-        citationOutcome.linksValid +
-        (provenanceOutcome.ok ? 1 : 0);
+        purchaseOutcome.linksValid + citationOutcome.linksValid + (provenanceOutcome.ok ? 1 : 0);
       linksInvalid +=
         purchaseOutcome.linksInvalid +
         citationOutcome.linksInvalid +

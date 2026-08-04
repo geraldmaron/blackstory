@@ -15,14 +15,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const DEFAULT_INPUT = path.join(
-  ROOT,
-  'scripts/fixtures/capture-remediation-sample-citations.json',
-);
-const DOMAIN_CAPTURE_MODULE = path.join(
-  ROOT,
-  'packages/domain/src/capture-completeness/index.ts',
-);
+const DEFAULT_INPUT = path.join(ROOT, 'scripts/fixtures/capture-remediation-sample-citations.json');
+const DOMAIN_CAPTURE_MODULE = path.join(ROOT, 'packages/domain/src/capture-completeness/index.ts');
 
 const DEFAULT_SUBMIT_LIMIT = 20;
 
@@ -217,13 +211,17 @@ async function planSpnSubmissions(missingCitations, options) {
   const liveSpn = process.env.CAPTURE_REMEDIATION_SPN === '1';
   if (!liveSpn) {
     console.log('');
-    console.log('Dry-run only: no live Wayback SPN calls (set CAPTURE_REMEDIATION_SPN=1 to enable stub).');
+    console.log(
+      'Dry-run only: no live Wayback SPN calls (set CAPTURE_REMEDIATION_SPN=1 to enable stub).',
+    );
     return { submitted: 0, stubbed: false };
   }
 
   console.log('');
   console.log('CAPTURE_REMEDIATION_SPN=1: live SPN path is intentionally stubbed in this script.');
-  console.log('Route captures through captureUrlToEvidencePointer + operator review — see runbook.');
+  console.log(
+    'Route captures through captureUrlToEvidencePointer + operator review — see runbook.',
+  );
   return { submitted: 0, stubbed: true };
 }
 

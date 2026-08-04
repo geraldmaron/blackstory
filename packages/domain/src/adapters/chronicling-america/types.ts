@@ -12,8 +12,7 @@ import type { AdapterCandidateRecord, SourceAdapterContract } from '../types.js'
 export const CHRONICLING_AMERICA_ADAPTER_ID = 'chronicling-america-v1' as const;
 export const CHRONICLING_AMERICA_PARSER_VERSION = 'chronicling-america-parser-1.0.0' as const;
 export const CHRONICLING_AMERICA_STABLE_ID_SCHEME = 'ca-lccn-resource' as const;
-export const CHRONICLING_AMERICA_PAYLOAD_SCHEMA_VERSION =
-  'chronicling-america-payload.v1' as const;
+export const CHRONICLING_AMERICA_PAYLOAD_SCHEMA_VERSION = 'chronicling-america-payload.v1' as const;
 
 /** NDNP digitized newspapers are government-funded primary archival material. */
 export const CHRONICLING_AMERICA_DEFAULT_CLASSIFICATION = 'primary_archival' as const;

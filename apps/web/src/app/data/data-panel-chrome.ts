@@ -16,14 +16,7 @@ export const DATA_EDITION_ROOT_CLASS = 'ds-data-edition';
 export const DATA_EDITION_PANEL_CLASS = 'ds-data-edition__panel';
 
 export type DataEditionPanelVariant =
-  | 'intro'
-  | 'orientation'
-  | 'population'
-  | 'wealth'
-  | 'housing'
-  | 'justice'
-  | 'themes'
-  | 'next';
+  'intro' | 'orientation' | 'population' | 'wealth' | 'housing' | 'justice' | 'themes' | 'next';
 
 export function dataEditionRootClassName(): string {
   return `${DATA_EDITION_ROOT_CLASS} ${editionAtmosphereCanvasClassName()}`;

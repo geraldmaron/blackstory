@@ -4,10 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  buildIsbnPurchaseLinks,
-  type BannedBookRecord,
-} from '@repo/domain';
+import { buildIsbnPurchaseLinks, type BannedBookRecord } from '@repo/domain';
 import { runBannedBooksRefreshJob } from './banned-books-refresh.ts';
 
 const CITATION = {
@@ -36,7 +33,11 @@ const VALID_BOOK: BannedBookRecord = {
       citation: CITATION,
     },
   ],
-  citations: [CITATION, { ...CITATION, label: 'NCAC Report' }, { ...CITATION, label: 'ALA Office' }],
+  citations: [
+    CITATION,
+    { ...CITATION, label: 'NCAC Report' },
+    { ...CITATION, label: 'ALA Office' },
+  ],
   purchaseLinks: buildIsbnPurchaseLinks('9780307278449'),
   provenance: {
     source: 'PEN America',

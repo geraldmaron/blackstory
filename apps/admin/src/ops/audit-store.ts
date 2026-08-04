@@ -20,7 +20,9 @@ export async function listRecentAuditEvents(limit = 100): Promise<readonly Audit
   return listRecentAuditEventsPostgres(limit);
 }
 
-export async function tryListRecentAuditEvents(limit?: number): Promise<readonly AuditEventListItem[] | null> {
+export async function tryListRecentAuditEvents(
+  limit?: number,
+): Promise<readonly AuditEventListItem[] | null> {
   try {
     return await listRecentAuditEvents(limit);
   } catch (error) {

@@ -1,7 +1,13 @@
+# Keep in step with the ignore list in packages/eslint-config/index.js. Prettier does not read
+# .gitignore, so every build output has to be named here or `pnpm format:check` fails on
+# generated files no author can act on.
+
 node_modules
 dist
 build
+out
 .next
+.deploy
 coverage
 pnpm-lock.yaml
 uv.lock
@@ -11,3 +17,34 @@ docs/bb-001
 .beads/backup
 .beads/export-state.json
 .beads/**/*.darc
+
+# Published GitHub Pages output, committed on purpose. These are exactly the paths
+# scripts/publish-docs-pages.sh rm -rf's and re-copies from apps/docs/out on every publish;
+# everything else under docs/ is hand-written operating documentation and stays formatted.
+docs/_next
+docs/guides
+docs/brand
+docs/404
+docs/404.html
+docs/_not-found
+docs/index.html
+
+# Generated type surfaces.
+**/next-env.d.ts
+packages/data-access/generated
+
+# Isolated npm app outside the pnpm workspace; formatted via its own scripts.
+apps/mobile
+
+# Captured artifacts, not source: design reference mocks and scratch proof output. Reformatting
+# these would churn a reference away from the rendering it records.
+.design-mocks
+.tmp-hero-proof
+docs/ui/mobile-polish-mockups.html
+docs/ui/prototypes
+
+# Generated geometry fixture — reformatting rewrites every coordinate line.
+scripts/fixtures
+
+# Generated brand QA reports (checksums, transparency report).
+brand/qa

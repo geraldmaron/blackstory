@@ -14,7 +14,7 @@
    handwritten names run straight through the header and the list. */
 .ds-memorial-edition .ds-room {
   position: relative;
-  z-index: 1;
+  z-index: var(--ds-z-content);
 }
 
 /* First screen reads as wall plus title only: the opening block reserves the
@@ -24,39 +24,95 @@
    subtraction is the room's offset from the top of the viewport, which keeps
    the list's top edge landing at the end of the field rather than past it. */
 .ds-memorial-edition__opening {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--ds-space-6);
+  /* The scroll cue used to live here and get pushed to the foot of the
+     screen via `justify-content: space-between`; it now renders as a sibling
+     of the wall, positioned to the message's actual bottom edge (see
+     page.tsx and MemorialWallAtmosphere.tsx), so this block just needs to
+     reserve the opening viewport for the header. */
   min-block-size: calc(100vh - 7rem);
   min-block-size: calc(100svh - 7rem);
-  /* Clears the shell's floating bottom-left control, which the cue otherwise
-     sits directly underneath at the foot of the opening screen. */
-  padding-block-end: 5.5rem;
   /* The remaining quarter screen of wall (MEMORIAL_OPENING_SCREENS = 1.25):
-     open field between the scroll cue and the list. Kept as margin rather
-     than min-height so the cue still lands on the first screen. */
+     open field past the cue before the list. Kept as margin rather than
+     min-height so the cue still lands on the first screen. */
   margin-block-end: 25vh;
   margin-block-end: 25svh;
 }
 
+/* Positioned via inline style (top, in px) set by MemorialWallAtmosphere
+   once it measures the held message's actual rendered footprint; the 60vh
+   fallback below only covers the brief window before that measurement runs.
+   A sibling of the wall rather than a flex child of `__opening` so both
+   share the same coordinate frame (see page.tsx). Left-aligned to the same
+   `--memorial-content-left` the header and held message use, so all three
+   share one left edge. Row layout with `nowrap` — icon and label never
+   stack or break mid-label, per usual button convention; the icon renders
+   after the label in markup so it sits to the label's right. */
 .ds-memorial-edition__scroll-cue {
-  margin: 0;
+  position: absolute;
+  left: var(--memorial-content-left, 3vw);
+  top: 60vh;
+  top: 60svh;
+  z-index: var(--ds-z-content);
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.125rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: 999px;
+  /* Fully opaque, not a tint: the packer already keeps handwritten names out
+     of the cue's footprint, and this is the second guarantee that none ever
+     shows through the button — a translucent fill let a name sitting behind
+     it read faintly through the pill. */
+  background: var(--ds-canvas);
   font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
   letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
   color: var(--ds-ink-muted);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color var(--ds-duration-fast, 0.15s) var(--ds-easing, ease),
+    background var(--ds-duration-fast, 0.15s) var(--ds-easing, ease),
+    color var(--ds-duration-fast, 0.15s) var(--ds-easing, ease);
 }
 
-.ds-memorial-edition__scroll-cue a {
-  color: inherit;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.15em;
+.ds-memorial-edition__scroll-cue:hover {
+  color: var(--ds-ink);
+  border-color: var(--ds-accent-graphic);
+  background: var(--ds-surface-raised);
 }
 
-.ds-memorial-edition__scroll-cue a:focus-visible {
+.ds-memorial-edition__scroll-cue:focus-visible {
   outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
   outline-offset: 2px;
+}
+
+.ds-memorial-edition__scroll-cue-icon {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  animation: ds-memorial-scroll-cue-bounce 1.6s ease-in-out infinite;
+}
+
+@keyframes ds-memorial-scroll-cue-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(5px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-memorial-edition__scroll-cue-icon {
+    animation: none;
+  }
 }
 
 .ds-memorial-edition__panel {
@@ -158,12 +214,116 @@
   color: var(--ds-ink-muted);
 }
 
+/* ---- alphabetical groups + jump rail ------------------------------------- */
+
+/*
+ * The list runs past a thousand names. As one flat `<ul>` that is tens of
+ * screens with nothing to scroll against: no way to tell how far in you are,
+ * and no way to reach a name without dragging the scrollbar and guessing. The
+ * rail and the letter headings give the same list a spine — the names all stay
+ * on one page, which for a memorial is the point.
+ */
+.ds-memorial-edition__jump {
+  position: sticky;
+  /* Clears the shell's floating bar so the rail is reachable at any depth. */
+  top: calc(var(--ds-island-clearance) + var(--ds-space-2));
+  z-index: var(--ds-z-memorial-jump);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-block: var(--ds-space-4);
+  padding: 0.5rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  /* Opaque: the rail sits over the names as it sticks. */
+  background: var(--ds-canvas);
+}
+
+.ds-memorial-edition__jump-link {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  border-radius: var(--ds-radius-sm);
+  font-family: var(--ds-font-mono);
+  font-size: 0.8125rem;
+  color: var(--ds-ink-muted);
+  text-decoration: none;
+  transition:
+    background var(--ds-duration-fast, 0.15s) var(--ds-easing, ease),
+    color var(--ds-duration-fast, 0.15s) var(--ds-easing, ease);
+}
+
+.ds-memorial-edition__jump-link:hover {
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+}
+
+.ds-memorial-edition__jump-link:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
+  outline-offset: 2px;
+}
+
+/* On a phone the wrapped rail is four rows and roughly a fifth of the screen,
+   which is a lot of permanently-stuck chrome over a memorial. One row that
+   scrolls sideways instead keeps every letter reachable at ~44px tall. */
+@media (max-width: 640px) {
+  .ds-memorial-edition__jump {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+  }
+
+  .ds-memorial-edition__jump::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ds-memorial-edition__jump-link {
+    flex: none;
+  }
+}
+
+.ds-memorial-edition__group + .ds-memorial-edition__group {
+  margin-block-start: var(--ds-space-6);
+}
+
+.ds-memorial-edition__group-letter {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-2);
+  margin: 0 0 var(--ds-space-2);
+  padding-block-end: 0.35rem;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-mono);
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  color: var(--ds-accent);
+}
+
+.ds-memorial-edition__group-count {
+  font-size: 0.75rem;
+  color: var(--ds-ink-muted);
+}
+
+/*
+ * Scroll target, offset from the heading it sits in rather than the heading
+ * carrying `scroll-margin-top` itself: the sticky rail above would otherwise
+ * cover the letter the reader just jumped to.
+ */
+.ds-memorial-edition__group-anchor {
+  display: block;
+  scroll-margin-top: calc(var(--ds-island-clearance) + 5rem);
+}
+
 .ds-memorial-edition__name-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  /* Narrower track than the old 14rem: a name is short, and at 14rem a desktop
+     fitted four columns and the list ran to some 16,000px. */
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
   gap: var(--ds-space-2) var(--ds-space-4);
 }
 
@@ -201,8 +361,26 @@
    ambient names have faded out behind it by this point (scroll fade), so
    this replaces that atmosphere with a legibility boost rather than
    competing with it. No full theme toggle, just this zone's own background. */
+/*
+ * Widened out of `.ds-room__doc`'s prose measure. That measure is right for the
+ * room's paragraphs and wrong for this: an index of 1,672 names held to a 760px
+ * column fits three narrow tracks and runs to some 28,000px, so the reader pays
+ * for a line length the content never uses. Breaking the zone (and only the
+ * zone) out to the room's full width fits roughly twice the columns and roughly
+ * halves the scroll, with the surrounding prose untouched.
+ *
+ * `50% - 50vw` is the standard full-bleed escape (half the zone's own width less
+ * half the viewport), plus a 2rem gutter so it never touches the window edge.
+ * The clamp bounds it at both ends: -14rem stops it sprawling on an ultrawide,
+ * and 0px makes it a no-op on narrow screens, where the doc has no side margin
+ * left to give back and the value would otherwise go positive and indent the
+ * list.
+ */
 .ds-memorial-edition__list-zone {
-  transition: background-color 0.4s ease-out, padding 0.4s ease-out;
+  margin-inline: clamp(-14rem, calc(50% - 50vw + 2rem), 0px);
+  transition:
+    background-color 0.4s ease-out,
+    padding 0.4s ease-out;
   border-radius: var(--ds-radius-md);
 }
 
@@ -222,7 +400,9 @@
   background: color-mix(in srgb, var(--ds-canvas) 70%, black 30%);
 }
 
-[data-theme='dark'] .ds-memorial-edition__list-zone[data-contrast='boosted'] .ds-memorial-edition__panel {
+[data-theme='dark']
+  .ds-memorial-edition__list-zone[data-contrast='boosted']
+  .ds-memorial-edition__panel {
   background: color-mix(in srgb, var(--ds-surface-raised) 82%, black 18%);
 }
 
@@ -257,3 +437,10 @@
   scroll-margin-top: var(--ds-island-clearance);
 }
 
+/* The scroll cue moves focus here itself after scrolling (see
+   MemorialScrollCue.tsx) so keyboard/AT users land where the click just
+   took them; `tabindex="-1"` makes that possible without adding it to the
+   normal tab order, so no visible focus ring is needed for it. */
+#memorial-names:focus {
+  outline: none;
+}

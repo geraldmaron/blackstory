@@ -122,7 +122,9 @@ function parseStatusHistory(value: unknown): readonly StatusHistoryEntry<string>
       ...(typeof record.validFrom === 'string' ? { validFrom: record.validFrom } : {}),
       ...(record.validTo !== undefined ? { validTo: record.validTo as string | null } : {}),
       datePrecision:
-        typeof record.datePrecision === 'string' ? (record.datePrecision as StatusHistoryEntry<string>['datePrecision']) : 'year',
+        typeof record.datePrecision === 'string'
+          ? (record.datePrecision as StatusHistoryEntry<string>['datePrecision'])
+          : 'year',
       basisClaimIds: asStringArray(record.basisClaimIds),
     });
   }
@@ -289,13 +291,15 @@ export async function loadReleaseGraphInputs(
 }> {
   const releaseRes = await client.query<ReleaseGraphEntityRow>(RELEASE_ENTITIES_SQL, [releaseId]);
   const entityIds = releaseRes.rows.map((row) => row.entity_id);
-  const canonicalRes = await client.query<CanonicalGraphEntityRow>(CANONICAL_ENTITIES_FOR_GRAPH_SQL, [
-    entityIds,
-  ]);
+  const canonicalRes = await client.query<CanonicalGraphEntityRow>(
+    CANONICAL_ENTITIES_FOR_GRAPH_SQL,
+    [entityIds],
+  );
   const canonicalById = new Map(canonicalRes.rows.map((row) => [row.id, row]));
-  const relationshipRes = await client.query<CanonicalRelationshipRow>(CANONICAL_RELATIONSHIPS_SQL, [
-    entityIds,
-  ]);
+  const relationshipRes = await client.query<CanonicalRelationshipRow>(
+    CANONICAL_RELATIONSHIPS_SQL,
+    [entityIds],
+  );
   return {
     releaseRows: releaseRes.rows,
     canonicalById,
@@ -308,9 +312,15 @@ export async function persistReleaseGraphArtifact(
   releaseId: string,
   artifact: GraphReleaseArtifact,
 ): Promise<{ readonly adjacencyRows: number; readonly decadeRows: number }> {
-  await client.query(`DELETE FROM bb_public.release_graph_adjacency WHERE release_id = $1`, [releaseId]);
-  await client.query(`DELETE FROM bb_public.release_graph_decades WHERE release_id = $1`, [releaseId]);
-  await client.query(`DELETE FROM bb_public.release_graph_all_time WHERE release_id = $1`, [releaseId]);
+  await client.query(`DELETE FROM bb_public.release_graph_adjacency WHERE release_id = $1`, [
+    releaseId,
+  ]);
+  await client.query(`DELETE FROM bb_public.release_graph_decades WHERE release_id = $1`, [
+    releaseId,
+  ]);
+  await client.query(`DELETE FROM bb_public.release_graph_all_time WHERE release_id = $1`, [
+    releaseId,
+  ]);
 
   for (const [, adjacency] of artifact.adjacencyByEntityId) {
     await client.query(
@@ -333,7 +343,10 @@ export async function persistReleaseGraphArtifact(
   await client.query(
     `INSERT INTO bb_public.release_graph_all_time (release_id, payload)
      VALUES ($1, $2::jsonb)`,
-    [releaseId, JSON.stringify(serializeGraphAllTimeView(artifact.allTimeView, artifact.contentHash))],
+    [
+      releaseId,
+      JSON.stringify(serializeGraphAllTimeView(artifact.allTimeView, artifact.contentHash)),
+    ],
   );
 
   return {
@@ -342,9 +355,7 @@ export async function persistReleaseGraphArtifact(
   };
 }
 
-export function formatReleaseGraphAuditLog(
-  audit: GraphPublishAuditReport,
-): readonly string[] {
+export function formatReleaseGraphAuditLog(audit: GraphPublishAuditReport): readonly string[] {
   const lines = [
     `Graph content hash: ${audit.contentHash}`,
     `Canonical edges: ${audit.canonicalEdgeCount}`,
@@ -389,7 +400,11 @@ export async function rebuildReleaseGraphForRelease(
     readonly enforceCoverage?: boolean;
     readonly dryRun?: boolean;
   },
-): Promise<BuildReleaseGraphResult & { readonly persisted?: { readonly adjacencyRows: number; readonly decadeRows: number } }> {
+): Promise<
+  BuildReleaseGraphResult & {
+    readonly persisted?: { readonly adjacencyRows: number; readonly decadeRows: number };
+  }
+> {
   const loaded = await loadReleaseGraphInputs(client, input.releaseId);
   const built = buildReleaseGraphArtifact({
     releaseId: input.releaseId,

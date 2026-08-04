@@ -80,10 +80,10 @@ export default function HomePage() {
       <aside className="callout" aria-label="From the maker">
         <p className="callout-label">From the maker</p>
         <p>
-          I wanted a place where local Black history does not evaporate into a broken outbound
-          link. BlackStory is being built in the open for that: entity records on a map, evidence
-          you can still open, and gates strong enough that research never quietly becomes
-          publication. Expect unfinished edges. Prefer careful corrections over hype.
+          I wanted a place where local Black history does not evaporate into a broken outbound link.
+          BlackStory is being built in the open for that: entity records on a map, evidence you can
+          still open, and gates strong enough that research never quietly becomes publication.
+          Expect unfinished edges. Prefer careful corrections over hype.
         </p>
       </aside>
 
@@ -98,8 +98,8 @@ export default function HomePage() {
         <div className="section-body">
           <p className="section-tldr">
             <strong>TL;DR</strong> A map-first archive of people, places, and events, with
-            citations, confidence, and honest geographic precision. Not a search box that only
-            sends you elsewhere.
+            citations, confidence, and honest geographic precision. Not a search box that only sends
+            you elsewhere.
           </p>
           <p>
             From the outside it feels like an archive you can walk. Under the hood it is a full

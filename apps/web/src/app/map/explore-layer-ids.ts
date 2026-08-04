@@ -14,19 +14,9 @@ export const EXPLORE_JURISDICTION_AREAS_SOURCE_ID = 'explore-jurisdiction-areas'
 export const EXPLORE_HISTORY_EDGES_SOURCE_ID = 'explore-history-edges';
 /** Dual-buffer incoming relationship lines for decade crossdissolve. */
 export const EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID = 'explore-history-edges-incoming';
-/** Memorial names typographic field (ocean-fringe GeoJSON; under land fills). */
-export const EXPLORE_MEMORIAL_NAMES_SOURCE_ID = 'explore-memorial-names';
-
-/**
- * Live plate memorial name field — off for now. Dataset, builders, and the
- * symbol layer stay in-repo; flip to `true` to restore ocean-fringe labels.
- */
-export const MEMORIAL_NAMES_MAP_LAYER_ENABLED = false;
 
 export const EXPLORE_CLUSTER_LAYER_ID = 'explore-clusters';
 export const EXPLORE_CLUSTER_INCOMING_LAYER_ID = 'explore-clusters-incoming';
-/** Plate memorial name labels — above background, below state/land fills and markers. */
-export const EXPLORE_MEMORIAL_NAMES_LAYER_ID = 'explore-memorial-names-label';
 
 export const EXPLORE_CLUSTER_COUNT_LAYER_ID = 'explore-cluster-count';
 export const EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID = 'explore-cluster-count-incoming';
@@ -55,3 +45,6 @@ export const EXPLORE_JURISDICTION_AREA_LAYER_ID = 'explore-jurisdiction-area-fil
 export const EXPLORE_HISTORY_EDGES_LAYER_ID = 'explore-history-edges-line';
 export const EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID = 'explore-history-edges-line-incoming';
 export const EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID = 'explore-history-edges-selected';
+
+/** Aerial imagery basemap (`?sat=1`) — directly above `background`, below all cartography. */
+export const SATELLITE_LAYER_ID = 'plate-satellite';

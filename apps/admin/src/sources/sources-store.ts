@@ -10,10 +10,14 @@ export type SourceOrganizationListItem = {
   readonly updatedAt: string;
 };
 
-export async function listSourceOrganizations(limit = 100): Promise<readonly SourceOrganizationListItem[]> {
+export async function listSourceOrganizations(
+  limit = 100,
+): Promise<readonly SourceOrganizationListItem[]> {
   return listSourceOrganizationsPostgres(limit);
 }
-export async function tryListSourceOrganizations(limit?: number): Promise<readonly SourceOrganizationListItem[] | null> {
+export async function tryListSourceOrganizations(
+  limit?: number,
+): Promise<readonly SourceOrganizationListItem[] | null> {
   try {
     return await listSourceOrganizations(limit);
   } catch (error) {

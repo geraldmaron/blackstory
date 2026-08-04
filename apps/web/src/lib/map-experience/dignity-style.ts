@@ -31,6 +31,26 @@ export const OPENFREEMAP_TILE_SOURCE_URL = 'https://tiles.openfreemap.org/planet
 export const OPENFREEMAP_GLYPHS_URL = 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf';
 export const OPENFREEMAP_SOURCE_ID = 'openfreemap';
 
+/**
+ * Satellite imagery — USGS National Map, `USGSImageryOnly`.
+ *
+ * Chosen over Esri World Imagery and MapTiler because it needs no API key, no account and no
+ * billing, and because it is US federal work: public domain, so nothing here depends on a
+ * commercial licence that could change under the archive. Coverage is the United States only,
+ * which is exactly the extent this atlas flies over (`US_CONUS_BOUNDS` bounds the camera).
+ *
+ * The service is an ArcGIS MapServer tile endpoint, so the path is `{z}/{y}/{x}` — row before
+ * column, the reverse of the XYZ convention. Getting that backwards yields tiles that load
+ * without error and show the wrong place, which is worse than a blank plate.
+ */
+export const USGS_IMAGERY_SOURCE_ID = 'usgs-imagery';
+export const USGS_IMAGERY_HOST = 'https://basemap.nationalmap.gov';
+export const USGS_IMAGERY_TILE_URL = `${USGS_IMAGERY_HOST}/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}`;
+/** The service stops serving imagery above this zoom; past it MapLibre overzooms the last tile. */
+export const USGS_IMAGERY_MAX_ZOOM = 16;
+export const USGS_IMAGERY_ATTRIBUTION =
+  'Imagery: <a href="https://www.usgs.gov/programs/national-geospatial-program/national-map" target="_blank" rel="noreferrer">USGS The National Map</a>';
+
 export type MapColorScheme = 'light' | 'dark';
 
 export const DIGNITY_PALETTE = {
@@ -244,4 +264,128 @@ export function plateForScheme(scheme: MapColorScheme) {
     historyEdge: brandPalette.copperDark,
     historyEdgeSelected: DIGNITY_PALETTE.point,
   } as const;
+}
+
+/**
+ * The plate's roles, with values widened to `string`.
+ *
+ * `plateForScheme` returns `as const`, so its own return type is a union of two objects whose
+ * every value is a literal hex — which is useful for reading the table and useless for building
+ * one. Anything that derives a plate (the satellite overrides below) or accepts one as a
+ * parameter takes this instead. The keys still come from `plateForScheme`, so a role added there
+ * is a role required here.
+ */
+export type MapPlate = { readonly [K in keyof ReturnType<typeof plateForScheme>]: string };
+
+/* ---------------------------------------------------------------------------------------------
+ * Satellite contrast
+ *
+ * The plate's ink was contrast-held against two flat fills (`land`, `water`) — that is what
+ * design law §3's ΔL* contract measures against, and `map-contrast.test.ts` enforces. Aerial
+ * imagery has no such fill: one label can cross a white roof, a black shadow and a green field
+ * inside its own bounding box, so no ink colour is safe against it on its own.
+ *
+ * Two mechanisms, in this order:
+ *
+ * 1. Knock the imagery back before anything is drawn on it. The raster layer sits ABOVE the
+ *    existing `background` layer and is deliberately not opaque, so the plate colour underneath
+ *    shows through as a scrim: on dark it pulls the imagery toward the archive's near-black, on
+ *    light toward white. That compresses the imagery's luminance range from both ends, which is
+ *    what makes a fixed ink colour viable at all. Desaturating does the same job in the colour
+ *    channel and buys something else besides — kind shade is an ENCODING channel on this map, and
+ *    a fully saturated aerial competes with the copper pins for the eye.
+ *
+ * 2. Re-ink the cartography for what is left, and widen every halo. Overrides below, per scheme.
+ * ------------------------------------------------------------------------------------------- */
+
+/**
+ * Raster paint for the imagery layer. Tuned per scheme — see `plateOverImagery`.
+ *
+ * Both schemes declare every channel, including the ones they leave at the MapLibre default.
+ * A theme toggle re-pushes this table onto a layer that is already mounted (`syncSingleLayerPaint`
+ * sets only the keys the new style names), so a channel present in one scheme and absent in the
+ * other would survive the switch and darken the light plate with the dark plate's ceiling.
+ */
+export const SATELLITE_RASTER_PAINT = {
+  light: {
+    // Lower opacity on light: the white beneath has to lift the imagery far enough that the
+    // plate's dark ink still clears it, and shadowed terrain is what threatens legibility here.
+    'raster-opacity': 0.62,
+    'raster-saturation': -0.32,
+    'raster-contrast': -0.12,
+    // Lifts the deepest shadows, which is where black ink would otherwise disappear.
+    'raster-brightness-min': 0.18,
+    'raster-brightness-max': 1,
+  },
+  dark: {
+    'raster-opacity': 0.76,
+    'raster-saturation': -0.28,
+    'raster-contrast': -0.08,
+    'raster-brightness-min': 0,
+    // Caps snow, sand and bare roofs, which are what blow out under paper-coloured labels.
+    'raster-brightness-max': 0.88,
+  },
+} as const;
+
+/**
+ * Halo width for symbol layers over imagery. The plate's own 1–1.5px halo is sized for a flat
+ * fill; over aerial texture it leaves the label chewed at the edges.
+ */
+export const SATELLITE_HALO_WIDTH = 2.2;
+
+/**
+ * Presence/choropleth fill opacity while imagery is on.
+ *
+ * The flat-plate value (`PLATE_STATE_FILL_OPACITY`, 0.82) is nearly opaque — correct over a flat
+ * plate and self-defeating over imagery: turning satellite on and getting a wash of density tint
+ * is not satellite. Low enough to read the ground through, high enough to keep the tier ramp
+ * ordered.
+ */
+export const SATELLITE_STATE_FILL_OPACITY = 0.45;
+
+/**
+ * Plate ink re-tuned for the scrimmed imagery.
+ *
+ * Only cartography ink moves. Pin, cluster and density encoding are untouched: they are the
+ * archive's data, they already sit above everything, and changing them by basemap would mean the
+ * same record read as a different colour depending on a toggle.
+ */
+export function plateOverImagery(scheme: MapColorScheme): MapPlate {
+  const base = plateForScheme(scheme);
+  if (scheme === 'light') {
+    return {
+      ...base,
+      // Imagery is lifted toward white, so ink stays dark — but goes to full black rather than
+      // the plate's softer greys, which disappear into mid-tone terrain.
+      placeLabel: brandPalette.blackInk,
+      placeLabelHi: brandPalette.blackInk,
+      placeLabelHalo: LIGHT_PLATE_OCEAN,
+      streetLabel: brandPalette.blackInk,
+      countyLabel: brandPalette.blackInk,
+      countyLabelHalo: LIGHT_PLATE_OCEAN,
+      // Boundaries have no halo to hide behind, so they carry their own contrast.
+      countryBounds: brandPalette.blackInk,
+      stateBounds: brandPalette.blackInk,
+      countyLine: brandPalette.blackInk,
+      clusterText: brandPalette.blackInk,
+    } as const;
+  }
+  return {
+    ...base,
+    placeLabel: brandPalette.archivePaper,
+    placeLabelHi: brandPalette.archivePaper,
+    placeLabelHalo: brandPalette.blackInk,
+    streetLabel: brandPalette.archivePaper,
+    countyLabel: brandPalette.archivePaper,
+    countyLabelHalo: brandPalette.blackInk,
+    countryBounds: brandPalette.archivePaper,
+    stateBounds: brandPalette.archivePaper,
+    countyLine: brandPalette.archivePaper,
+    clusterText: brandPalette.archivePaper,
+  } as const;
+}
+
+/** The plate a style should paint with, given the basemap the reader chose. */
+export function plateFor(scheme: MapColorScheme, satellite: boolean): MapPlate {
+  return satellite ? plateOverImagery(scheme) : plateForScheme(scheme);
 }

@@ -11,7 +11,10 @@ import {
   type GeneratedArtifact,
   type StoredRelease,
 } from '@repo/domain';
-import { POSTGRES_MOBILE_RELEASE_POINTER_KEY, createPostgresReleaseStore } from './release-store.js';
+import {
+  POSTGRES_MOBILE_RELEASE_POINTER_KEY,
+  createPostgresReleaseStore,
+} from './release-store.js';
 import { MemoryPostgresReleaseStoreBackend } from './release-store.memory-backend.js';
 
 const ARTIFACT_PATH = 'public/releases/rel_a/bootstrap.json';

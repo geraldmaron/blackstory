@@ -107,7 +107,9 @@ function round4(value: number): number {
  * every decade reports densityRatio 0 and temporalDensityFactor 0 with an explicit
  * rationale, rather than claiming everything is maximally thin.
  */
-export function computeDecadeCoverage(entityCountByDecade: EntityCountByDecade): DecadeCoverageReport {
+export function computeDecadeCoverage(
+  entityCountByDecade: EntityCountByDecade,
+): DecadeCoverageReport {
   const entries = Object.entries(entityCountByDecade);
   if (entries.length === 0) {
     throw new Error('computeDecadeCoverage requires at least one decade count');
@@ -115,7 +117,9 @@ export function computeDecadeCoverage(entityCountByDecade: EntityCountByDecade):
   for (const [decade, count] of entries) {
     assertDecadeKeyValid(decade);
     if (!Number.isInteger(count) || !Number.isFinite(count) || count < 0) {
-      throw new Error(`Entity count for decade ${decade} must be a non-negative integer, got ${count}`);
+      throw new Error(
+        `Entity count for decade ${decade} must be a non-negative integer, got ${count}`,
+      );
     }
   }
 

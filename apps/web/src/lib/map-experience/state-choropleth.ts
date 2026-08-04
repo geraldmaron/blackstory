@@ -11,10 +11,7 @@ import {
   type BlackShareTier,
 } from '@repo/domain/map/county-population';
 import { US_STATES } from '@repo/domain/map/geography';
-import {
-  readStatePopulation,
-  type StatePopulationIndex,
-} from '@repo/domain/map/state-population';
+import { readStatePopulation, type StatePopulationIndex } from '@repo/domain/map/state-population';
 import type { ExploreLayerMode } from './url-state';
 
 export type StateChoroplethLevel = {

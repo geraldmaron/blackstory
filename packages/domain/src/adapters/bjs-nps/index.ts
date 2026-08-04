@@ -14,7 +14,8 @@ export {
   PHASE1_BJS_NPS_DATASET_VINTAGE,
   PHASE1_IMPRISONMENT_RATE_BLACK_STATE_METRIC_ID,
   PHASE1_IMPRISONMENT_RATE_WHITE_STATE_METRIC_ID,
-} from './constants.js';export {
+} from './constants.js';
+export {
   parseBjsNpsStat01Csv,
   mapBjsNpsRowsToObservations,
   listPhase1BjsNpsIndicators,

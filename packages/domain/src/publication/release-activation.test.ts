@@ -57,7 +57,11 @@ function input(
   return {
     releaseId,
     generatedAt: '2026-07-19T00:00:00.000Z',
-    mapEntities: [PLACE_HARLEM_NY_FIXTURE, INSTITUTION_ATLANTA_GA_SENSITIVE_FIXTURE, DECEASED_RESIDENCE_FIXTURE],
+    mapEntities: [
+      PLACE_HARLEM_NY_FIXTURE,
+      INSTITUTION_ATLANTA_GA_SENSITIVE_FIXTURE,
+      DECEASED_RESIDENCE_FIXTURE,
+    ],
     redactLocation: redactLocationForPublic,
     contentIndex: [{ id: 'story-1', kind: 'story', title: 'A Story', version: 'v1' }],
     entitiesList: { schemaVersion: 1, entities: [{ id: 'ent_a', displayName: 'A' }] },
@@ -105,9 +109,7 @@ test('corrupted artifact is rejected before activation; previous pointer untouch
   const bad = generateReleaseArtifacts(input('rel_bad'));
   const tampered: GeneratedRelease = {
     ...bad,
-    artifacts: bad.artifacts.map((a, i) =>
-      i === 0 ? { ...a, json: { tampered: true } } : a,
-    ),
+    artifacts: bad.artifacts.map((a, i) => (i === 0 ? { ...a, json: { tampered: true } } : a)),
   };
   assert.throws(
     () => activateRelease(store, tampered),
@@ -188,11 +190,14 @@ test('immutability: re-activating a release id with different content is refused
   activateRelease(store, generateReleaseArtifacts(input('rel_x')));
   // Same id, different content (different feature flags -> different bootstrap, but same paths).
   const conflicting = generateReleaseArtifacts(
-    input('rel_x', { contentIndex: [{ id: 'other', kind: 'story', title: 'Other', version: 'v9' }] }),
+    input('rel_x', {
+      contentIndex: [{ id: 'other', kind: 'story', title: 'Other', version: 'v9' }],
+    }),
   );
   assert.throws(
     () => activateRelease(store, conflicting, { expectedPointerVersion: 1 }),
-    (e: unknown) => e instanceof ReleaseActivationError && e.code === 'IMMUTABLE_ARTIFACT_VIOLATION',
+    (e: unknown) =>
+      e instanceof ReleaseActivationError && e.code === 'IMMUTABLE_ARTIFACT_VIOLATION',
   );
 });
 
@@ -223,7 +228,8 @@ test('rollback after schema migration is refused when the target schema range is
 
   assert.throws(
     () => rollbackTo(store, 'rel_a', { platformSchemaVersion: 2 }),
-    (e: unknown) => e instanceof ReleaseActivationError && e.code === 'ROLLBACK_SCHEMA_INCOMPATIBLE',
+    (e: unknown) =>
+      e instanceof ReleaseActivationError && e.code === 'ROLLBACK_SCHEMA_INCOMPATIBLE',
   );
   // A rollback within the covered schema range still works.
   const ok = rollbackTo(store, 'rel_a', { platformSchemaVersion: 1 });
@@ -272,7 +278,10 @@ test('oversized bounded-point flat GeoJSON is rejected by the size/gzip budget',
     many.push({ ...PLACE_HARLEM_NY_FIXTURE, entityId: `ent_bulk_${i}` });
   }
   assert.throws(
-    () => generateReleaseArtifacts(input('rel_big', { mapEntities: many, budget: { maxBytes: 200, maxGzipBytes: 200 } })),
+    () =>
+      generateReleaseArtifacts(
+        input('rel_big', { mapEntities: many, budget: { maxBytes: 200, maxGzipBytes: 200 } }),
+      ),
     (e: unknown) => e instanceof ReleaseActivationError && e.code === 'BUDGET_EXCEEDED',
   );
   // Under a generous budget the same input generates fine.
@@ -285,7 +294,9 @@ test('CRITICAL: map redaction stays transitive from raw input to the generated a
   assert.ok(raw?.lat !== undefined && raw.lng !== undefined);
 
   const gen = generateReleaseArtifacts(
-    input('rel_redaction', { mapEntities: [LIVING_PERSON_RESIDENCE_FIXTURE, ...MAP_SOURCE_DEMO_FIXTURES] }),
+    input('rel_redaction', {
+      mapEntities: [LIVING_PERSON_RESIDENCE_FIXTURE, ...MAP_SOURCE_DEMO_FIXTURES],
+    }),
   );
 
   const mapArtifact = gen.artifacts.find((a) => a.kind === 'map-source');
@@ -301,13 +312,19 @@ test('CRITICAL: map redaction stays transitive from raw input to the generated a
   }
 
   // The entity still appears, but only at the coarsened city-level coordinate the constitution allows.
-  const feature = (mapArtifact.json as { featureCollection: { features: { id: string; geometry: { coordinates: [number, number] } }[] } })
-    .featureCollection.features.find((f) => f.id === LIVING_PERSON_RESIDENCE_FIXTURE.entityId);
+  const feature = (
+    mapArtifact.json as {
+      featureCollection: {
+        features: { id: string; geometry: { coordinates: [number, number] } }[];
+      };
+    }
+  ).featureCollection.features.find((f) => f.id === LIVING_PERSON_RESIDENCE_FIXTURE.entityId);
   assert.ok(feature, 'living-person entity should appear at reduced precision, not be dropped');
   assert.deepEqual(feature.geometry.coordinates, [-95.37, 29.76]);
 
-  const boundedPoint = (boundedArtifact.json as { features: { id: string; c: [number, number] }[] })
-    .features.find((f) => f.id === LIVING_PERSON_RESIDENCE_FIXTURE.entityId);
+  const boundedPoint = (
+    boundedArtifact.json as { features: { id: string; c: [number, number] }[] }
+  ).features.find((f) => f.id === LIVING_PERSON_RESIDENCE_FIXTURE.entityId);
   assert.ok(boundedPoint);
   assert.deepEqual(boundedPoint.c, [-95.37, 29.76]);
 });

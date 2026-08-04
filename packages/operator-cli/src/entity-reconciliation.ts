@@ -80,20 +80,78 @@ export const WIKIDATA_PROPERTY_MAP: Record<IdentifierHit['namespace'], string> =
  */
 const KIND_CONFLICTS: Record<EntityKind, readonly string[]> = {
   person: [
-    'museum', 'university', 'college', 'newspaper', 'magazine', 'organization', 'company',
-    'building', 'river', 'mountain', 'song', 'film', 'album', 'novel', 'church', 'school',
-    'tram stop', 'train station', 'metro station', 'railway station', 'street', 'square', 'park',
-    'painting', 'sculpture', 'artwork', 'portrait', 'photograph', 'statue', 'library', 'archive',
-    'presidency of', 'administration', 'series in the national archives',
+    'museum',
+    'university',
+    'college',
+    'newspaper',
+    'magazine',
+    'organization',
+    'company',
+    'building',
+    'river',
+    'mountain',
+    'song',
+    'film',
+    'album',
+    'novel',
+    'church',
+    'school',
+    'tram stop',
+    'train station',
+    'metro station',
+    'railway station',
+    'street',
+    'square',
+    'park',
+    'painting',
+    'sculpture',
+    'artwork',
+    'portrait',
+    'photograph',
+    'statue',
+    'library',
+    'archive',
+    'presidency of',
+    'administration',
+    'series in the national archives',
   ],
   place: ['human', 'given name', 'surname'],
   event: ['human', 'given name', 'surname'],
-  institution: ['human', 'given name', 'surname', 'river', 'mountain', 'song', 'film', 'album', 'novel'],
+  institution: [
+    'human',
+    'given name',
+    'surname',
+    'river',
+    'mountain',
+    'song',
+    'film',
+    'album',
+    'novel',
+  ],
   school: ['human', 'given name', 'surname', 'river', 'mountain'],
-  organization: ['human', 'given name', 'surname', 'river', 'mountain', 'song', 'film', 'album', 'novel'],
+  organization: [
+    'human',
+    'given name',
+    'surname',
+    'river',
+    'mountain',
+    'song',
+    'film',
+    'album',
+    'novel',
+  ],
   case: ['human', 'given name', 'surname'],
   law: ['human', 'given name', 'surname'],
-  publication: ['human', 'given name', 'surname', 'organization', 'museum', 'university', 'river', 'mountain'],
+  publication: [
+    'human',
+    'given name',
+    'surname',
+    'organization',
+    'museum',
+    'university',
+    'river',
+    'mountain',
+  ],
   movement: ['human', 'given name', 'surname'],
   other: [],
 };
@@ -132,7 +190,12 @@ export async function searchWikidata(
     name,
   )}&language=en&format=json&type=item&limit=6`;
   const data = (await fetcher(url)) as {
-    search?: Array<{ id: string; label?: string; display?: { label?: { value?: string } }; description?: string }>;
+    search?: Array<{
+      id: string;
+      label?: string;
+      display?: { label?: { value?: string } };
+      description?: string;
+    }>;
   };
   return (data.search ?? []).map((entry) => ({
     qid: entry.id,
@@ -147,7 +210,10 @@ export async function fetchWikidataIdentifiers(
 ): Promise<IdentifierHit[]> {
   const url = `https://www.wikidata.org/wiki/Special:EntityData/${qid}.json`;
   const data = (await fetcher(url)) as {
-    entities?: Record<string, { claims?: Record<string, Array<{ mainsnak?: { datavalue?: { value?: unknown } } }>> }>;
+    entities?: Record<
+      string,
+      { claims?: Record<string, Array<{ mainsnak?: { datavalue?: { value?: unknown } } }>> }
+    >;
   };
   const claims = data.entities?.[qid]?.claims ?? {};
   const hits: IdentifierHit[] = [];
@@ -175,12 +241,16 @@ export async function fetchWikidataIdentifiers(
 export function classifyCandidates(
   input: ReconciliationInput,
   candidates: readonly WikidataCandidate[],
-): { decision: 'accept'; candidate: WikidataCandidate } | { decision: 'no_match' } | { decision: 'ambiguous' } {
+):
+  | { decision: 'accept'; candidate: WikidataCandidate }
+  | { decision: 'no_match' }
+  | { decision: 'ambiguous' } {
   if (candidates.length === 0) return { decision: 'no_match' };
 
   const targetName = normalize(input.displayName);
   const exactCompatible = candidates.filter(
-    (c) => normalize(c.label) === targetName && descriptionLooksCompatible(input.kind, c.description),
+    (c) =>
+      normalize(c.label) === targetName && descriptionLooksCompatible(input.kind, c.description),
   );
 
   const [onlyExactCompatible] = exactCompatible;

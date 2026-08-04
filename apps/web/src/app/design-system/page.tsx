@@ -19,6 +19,7 @@ import {
   ThemeToggle,
   Timeline,
 } from '@repo/ui';
+import { Room, RoomHeader } from '../../components/room';
 import { DialogFixture } from './DialogFixture';
 import { RoomKitGallery } from './RoomKitGallery';
 // /design-system is a Utility surface, and Utility is one of the three room stylesheets.
@@ -33,22 +34,19 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function DesignSystemPage() {
   return (
-    <main className="ds-container" id="main">
-      <header className="ds-gallery-section" style={{ paddingTop: 'var(--ds-space-10)' }}>
-        <p className="ds-page__eyebrow">Design direction v5</p>
-        <h1 className="ds-page__title">Design system</h1>
-        <p>
-          Archive Paper / Black Ink foundation, copper as the orientation signal, hairline
-          separation, visible focus, reduced-motion support. This route is the component fixture
-          gallery (Storybook equivalent).
-        </p>
-        <div className="ds-row">
-          <ThemeToggle />
-          <Link className="ds-sans" href="/">
-            Back to home
-          </Link>
-        </div>
-      </header>
+    <Room>
+      <RoomHeader
+        pathname="/design-system"
+        title="Design system"
+        lede="Archive Paper / Black Ink foundation, copper as the orientation signal, hairline separation, visible focus, reduced-motion support. This route is the component fixture gallery (Storybook equivalent)."
+      />
+
+      <div className="ds-row" style={{ paddingTop: 'var(--ds-space-5)' }}>
+        <ThemeToggle />
+        <Link className="ds-sans" href="/">
+          Back to home
+        </Link>
+      </div>
 
       <section className="ds-gallery-section" aria-labelledby="actions-heading">
         <h2 id="actions-heading">Actions</h2>
@@ -105,8 +103,8 @@ export default function DesignSystemPage() {
               <span className="ds-story-link__meta">School / Washington, D.C.</span>
               <h3 className="ds-story-link__title">Story link entry</h3>
               <p className="ds-story-link__summary">
-                Mono slug, display title, serif one-line story — the shared anatomy for rails, related
-                lists, and browse paths.
+                Mono slug, display title, serif one-line story — the shared anatomy for rails,
+                related lists, and browse paths.
               </p>
             </Link>
           </li>
@@ -291,6 +289,6 @@ export default function DesignSystemPage() {
       </section>
 
       <RoomKitGallery />
-    </main>
+    </Room>
   );
 }

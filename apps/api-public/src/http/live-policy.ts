@@ -36,10 +36,7 @@ function hasPostgresConnection(environment: EnvironmentLike): boolean {
 export function shouldUsePublicPostgresDataAccess(
   environment: EnvironmentLike = process.env,
 ): boolean {
-  if (
-    environment.PUBLIC_DATA_SOURCE === 'fixtures' ||
-    environment.PUBLIC_DATA_SOURCE === 'seed'
-  ) {
+  if (environment.PUBLIC_DATA_SOURCE === 'fixtures' || environment.PUBLIC_DATA_SOURCE === 'seed') {
     return false;
   }
   if (hasEmulatorSignals(environment)) {

@@ -11,7 +11,7 @@ import {
 import { listErrataEntries } from '../../lib/trust/errata-seed';
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
 import { ErrataSections } from './ErrataSections';
-import { Room, RoomHeader } from '../../components/room';
+import { OffRamp, Room, RoomHeader } from '../../components/room';
 import '../reading-room.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
@@ -35,6 +35,16 @@ export default function ErrataPage() {
         lede="Errors are fixed fully, quickly, and ungrudgingly. Every change is timestamped, categorized, and preserved — nothing is silently edited."
       />
       <ErrataSections entries={entries} />
+
+      <OffRamp
+        title="Verify in the archive"
+        actions={[
+          { label: 'Open the Atlas', href: '/', emphasis: 'copper' },
+          { label: 'Search the archive', href: '/records' },
+        ]}
+      >
+        Every change documented here can be found in the live archive.
+      </OffRamp>
     </Room>
   );
 }

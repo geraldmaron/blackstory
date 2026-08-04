@@ -1,5 +1,8 @@
 /** Read-only Postgres canonical entity catalog access for the management portal. */
-import { getCanonicalEntityDetailPostgres, listCanonicalEntitiesPostgres } from '@/lib/postgres-catalog';
+import {
+  getCanonicalEntityDetailPostgres,
+  listCanonicalEntitiesPostgres,
+} from '@/lib/postgres-catalog';
 
 export type CatalogEntityListItem = {
   readonly id: string;
@@ -18,18 +21,28 @@ export type CatalogEntityLocation = {
 };
 export type CatalogEntityDetail = CatalogEntityListItem & {
   readonly aliases: readonly { readonly value: string; readonly kind?: string }[];
-  readonly identifiers: readonly { readonly system: string; readonly value: string; readonly note?: string }[];
+  readonly identifiers: readonly {
+    readonly system: string;
+    readonly value: string;
+    readonly note?: string;
+  }[];
   readonly locations: readonly CatalogEntityLocation[];
   readonly claimCount?: number;
 };
 
-export async function listCanonicalEntities(limit = 100, search?: string): Promise<readonly CatalogEntityListItem[]> {
+export async function listCanonicalEntities(
+  limit = 100,
+  search?: string,
+): Promise<readonly CatalogEntityListItem[]> {
   return listCanonicalEntitiesPostgres(limit, search);
 }
 export async function getCanonicalEntityDetail(id: string): Promise<CatalogEntityDetail | null> {
   return getCanonicalEntityDetailPostgres(id);
 }
-export async function tryListCanonicalEntities(limit?: number, search?: string): Promise<readonly CatalogEntityListItem[] | null> {
+export async function tryListCanonicalEntities(
+  limit?: number,
+  search?: string,
+): Promise<readonly CatalogEntityListItem[] | null> {
   try {
     return await listCanonicalEntities(limit, search);
   } catch (error) {

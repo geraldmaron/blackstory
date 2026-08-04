@@ -11,9 +11,7 @@ export function normalizeStateCode(stateCode: string): string {
   return stateCode.trim().toUpperCase();
 }
 
-export function buildStateBoundaryIndex(
-  boundaries: readonly StateBoundary[],
-): StateBoundaryIndex {
+export function buildStateBoundaryIndex(boundaries: readonly StateBoundary[]): StateBoundaryIndex {
   const index = new Map<string, StateBoundary>();
   for (const boundary of boundaries) {
     index.set(normalizeStateCode(boundary.stateCode), boundary);

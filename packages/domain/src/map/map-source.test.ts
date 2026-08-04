@@ -156,7 +156,10 @@ test('buildMapSource prefers jurisdictionLabel over bbox state attribution', () 
   assert.equal(feature?.properties.statePostalCode, 'NY');
   assert.equal(feature?.properties.stateName, 'New York');
   assert.equal(result.stateAggregates.find((s) => s.statePostalCode === 'NY')?.count, 1);
-  assert.equal(result.stateAggregates.find((s) => s.statePostalCode === 'NJ'), undefined);
+  assert.equal(
+    result.stateAggregates.find((s) => s.statePostalCode === 'NJ'),
+    undefined,
+  );
 });
 
 test('result is deterministic JSON-serializable output with schemaVersion 1', () => {

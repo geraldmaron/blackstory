@@ -1,3 +1,5 @@
+> **SUPERSEDED.** This document is superseded by the v9 chapters surface. Route today: /themes 308-redirects to /chapters; app/themes does not exist. It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
+
 # BlackStory design direction v6 — themes edition
 
 **Status:** binding layout pattern for `/themes` and `/themes/*` (2026-07-23).  

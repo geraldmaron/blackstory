@@ -192,8 +192,7 @@ function WhyThisAppearsBody({
           </h3>
           <p className="ds-sans ds-why-appears__coverage">
             {WHY_THIS_APPEARS_COPY.missingPerspectiveLead}{' '}
-            {result.missingPerspectiveIndicators.map((indicator) => indicator.label).join(', ')}.
-            {' '}
+            {result.missingPerspectiveIndicators.map((indicator) => indicator.label).join(', ')}.{' '}
             {WHY_THIS_APPEARS_COPY.missingPerspectiveClose}
           </p>
         </section>

@@ -61,7 +61,10 @@ test('remapCandidateEndpoints applies hub merge survivors', () => {
 
 test('planRelationshipPromotion inserts safe edges and skips living review', () => {
   const profiles = new Map([
-    ['ent_sncc_org_001', { id: 'ent_sncc_org_001', kind: 'organization', livingStatus: 'not_applicable' }],
+    [
+      'ent_sncc_org_001',
+      { id: 'ent_sncc_org_001', kind: 'organization', livingStatus: 'not_applicable' },
+    ],
     ['ent_place_1', { id: 'ent_place_1', kind: 'place', livingStatus: 'not_applicable' }],
     ['p-living', { id: 'p-living', kind: 'person', livingStatus: 'living' }],
     ['p-deceased', { id: 'p-deceased', kind: 'person', livingStatus: 'deceased' }],

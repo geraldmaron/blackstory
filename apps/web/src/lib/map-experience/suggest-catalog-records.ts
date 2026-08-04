@@ -65,7 +65,10 @@ export function suggestCatalogRecords(
   }
 
   ranked.sort(
-    (a, b) => b.tier - a.tier || a.name.localeCompare(b.name) || a.suggestion.entityId.localeCompare(b.suggestion.entityId),
+    (a, b) =>
+      b.tier - a.tier ||
+      a.name.localeCompare(b.name) ||
+      a.suggestion.entityId.localeCompare(b.suggestion.entityId),
   );
 
   return ranked.slice(0, limit).map((row) => row.suggestion);

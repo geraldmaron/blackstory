@@ -140,33 +140,37 @@ async function main(): Promise<void> {
   const client = await pool.connect();
   try {
     const { rows } = await client.query<DbRow>(SELECT_CANDIDATES);
-    const classified = rows.map((row) => {
-      const classification = classifyLandscapeWeed({
-        row: toLandscapeRow(row),
-        catalogDuplicate: row.catalog_duplicate,
-      });
-      return classification ? { id: row.id, classification } : null;
-    }).filter((entry): entry is { id: string; classification: WeedClassification } => entry !== null);
+    const classified = rows
+      .map((row) => {
+        const classification = classifyLandscapeWeed({
+          row: toLandscapeRow(row),
+          catalogDuplicate: row.catalog_duplicate,
+        });
+        return classification ? { id: row.id, classification } : null;
+      })
+      .filter(
+        (entry): entry is { id: string; classification: WeedClassification } => entry !== null,
+      );
 
     const buckets = bucketWeedClassifications(classified);
-    const actionable = classified.filter(
-      (entry) => entry.classification.action !== 'leave',
-    );
+    const actionable = classified.filter((entry) => entry.classification.action !== 'leave');
     const weeded = actionable.filter((entry) => entry.classification.action === 'dead_letter');
     const parked = actionable.filter((entry) => entry.classification.action === 'park');
     const leftForTrackB = classified.filter((entry) => entry.classification.action === 'leave');
     const untouched = rows.length - classified.length;
 
-    const quarantineCount = (
-      await client.query<{ n: string }>(
-        `SELECT COUNT(*)::text AS n FROM bb_research.model_output_quarantine`,
-      )
-    ).rows[0]?.n ?? '0';
-    const graylistCount = (
-      await client.query<{ n: string }>(
-        `SELECT COUNT(*)::text AS n FROM bb_ops.discovery_graylist`,
-      )
-    ).rows[0]?.n ?? '0';
+    const quarantineCount =
+      (
+        await client.query<{ n: string }>(
+          `SELECT COUNT(*)::text AS n FROM bb_research.model_output_quarantine`,
+        )
+      ).rows[0]?.n ?? '0';
+    const graylistCount =
+      (
+        await client.query<{ n: string }>(
+          `SELECT COUNT(*)::text AS n FROM bb_ops.discovery_graylist`,
+        )
+      ).rows[0]?.n ?? '0';
 
     const report = {
       generatedAt: new Date().toISOString(),
@@ -198,7 +202,9 @@ async function main(): Promise<void> {
     console.log(`Report: ${REPORT_PATH}`);
 
     if (DRY_RUN) {
-      console.log('DRY_RUN=1 (default): no database writes. Set DRY_RUN=0 WEED_LANDSCAPE_APPLY=1 to apply.');
+      console.log(
+        'DRY_RUN=1 (default): no database writes. Set DRY_RUN=0 WEED_LANDSCAPE_APPLY=1 to apply.',
+      );
       return;
     }
     if (!APPLY) {

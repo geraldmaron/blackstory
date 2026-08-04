@@ -9,7 +9,7 @@
 .ds-palette {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  z-index: var(--ds-z-command-overlay);
   display: grid;
   /* Above centre. A dialog pinned to the exact middle reads as an alert, not a tool. */
   align-content: start;

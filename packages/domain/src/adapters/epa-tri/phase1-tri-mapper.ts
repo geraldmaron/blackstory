@@ -101,7 +101,10 @@ function metricById(metricId: string): Phase1IndicatorDefinition {
   return metric;
 }
 
-function pickColumn(header: Map<string, number>, candidates: readonly string[]): string | undefined {
+function pickColumn(
+  header: Map<string, number>,
+  candidates: readonly string[],
+): string | undefined {
   for (const name of candidates) {
     if (header.has(name)) return name;
   }
@@ -109,7 +112,10 @@ function pickColumn(header: Map<string, number>, candidates: readonly string[]):
 }
 
 function normalizeHeaderName(name: string): string {
-  return name.trim().replace(/^\d+\.\s*/, '').toUpperCase();
+  return name
+    .trim()
+    .replace(/^\d+\.\s*/, '')
+    .toUpperCase();
 }
 
 function buildHeaderMap(headerLine: string): Map<string, number> {
@@ -120,7 +126,11 @@ function buildHeaderMap(headerLine: string): Map<string, number> {
   return header;
 }
 
-function cell(header: Map<string, number>, row: readonly string[], column: string): string | undefined {
+function cell(
+  header: Map<string, number>,
+  row: readonly string[],
+  column: string,
+): string | undefined {
   const index = header.get(column);
   if (index === undefined) return undefined;
   return row[index]?.trim();
@@ -132,7 +142,10 @@ function assertValidCountyFips(countyFips: string): void {
   }
 }
 
-function countyFipsFromStateAndCounty(stateAbbr: string, countyFipsSuffix: string): string | undefined {
+function countyFipsFromStateAndCounty(
+  stateAbbr: string,
+  countyFipsSuffix: string,
+): string | undefined {
   const stateMap: Readonly<Record<string, string>> = { IL: '17' };
   const stateFips = stateMap[stateAbbr.toUpperCase()];
   if (!stateFips) return undefined;
@@ -141,11 +154,7 @@ function countyFipsFromStateAndCounty(stateAbbr: string, countyFipsSuffix: strin
   return `${stateFips}${suffix}`;
 }
 
-const TRI_CSV_COUNTY_FIPS_COLUMNS = [
-  'COUNTY_FIPS',
-  'STATE_COUNTY_FIPS_CODE',
-  'FIPS',
-] as const;
+const TRI_CSV_COUNTY_FIPS_COLUMNS = ['COUNTY_FIPS', 'STATE_COUNTY_FIPS_CODE', 'FIPS'] as const;
 
 const TRI_CSV_FACILITY_ID_COLUMNS = [
   'TRI_FACILITY_ID',
@@ -182,7 +191,9 @@ export function parseTriFacilityCsv(
   if (!facilityColumn) {
     return {
       rows: [],
-      rejected: [`missing facility id column (expected one of ${TRI_CSV_FACILITY_ID_COLUMNS.join(', ')})`],
+      rejected: [
+        `missing facility id column (expected one of ${TRI_CSV_FACILITY_ID_COLUMNS.join(', ')})`,
+      ],
     };
   }
   if (!yearColumn) {
@@ -226,7 +237,9 @@ export function parseTriFacilityCsv(
     }
 
     if (!countyFips || !/^\d{5}$/.test(countyFips)) {
-      rejected.push(`line=${lineIndex + 1} missing or invalid county FIPS for facility=${facilityId}`);
+      rejected.push(
+        `line=${lineIndex + 1} missing or invalid county FIPS for facility=${facilityId}`,
+      );
       continue;
     }
     if (expected && !expected.has(countyFips)) {
@@ -353,7 +366,9 @@ export function parseTriFacilityJsonPayload(
     const row = payload[index]!;
     const facilityId =
       String(row.tri_facility_id ?? row.TRI_FACILITY_ID ?? row.trifid ?? '').trim() || undefined;
-    const countyFips = String(row.state_county_fips_code ?? row.STATE_COUNTY_FIPS_CODE ?? '').trim();
+    const countyFips = String(
+      row.state_county_fips_code ?? row.STATE_COUNTY_FIPS_CODE ?? '',
+    ).trim();
     const reportingYear = parseNumber(String(row.reporting_year ?? row.REPORTING_YEAR ?? ''));
 
     if (!facilityId) {

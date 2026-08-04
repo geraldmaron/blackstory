@@ -187,9 +187,7 @@ async function main(): Promise<void> {
     }
 
     if (DRY_RUN || !APPLY) {
-      console.log(
-        '\nDry run only. Set DRY_RUN=0 BACKFILL_PERSON_LIVING_STATUS_APPLY=1 to apply.',
-      );
+      console.log('\nDry run only. Set DRY_RUN=0 BACKFILL_PERSON_LIVING_STATUS_APPLY=1 to apply.');
       return;
     }
 

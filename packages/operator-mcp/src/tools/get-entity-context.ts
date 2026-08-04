@@ -23,10 +23,7 @@ export async function getEntityContext(
     throw new OperatorMcpError('invalid_input', 'entityId is required');
   }
 
-  const bindingRows = await reader.listEntityBindings(
-    entityId,
-    input.purpose?.trim() || undefined,
-  );
+  const bindingRows = await reader.listEntityBindings(entityId, input.purpose?.trim() || undefined);
 
   const bindings: EntityContextBinding[] = [];
   for (const row of bindingRows) {

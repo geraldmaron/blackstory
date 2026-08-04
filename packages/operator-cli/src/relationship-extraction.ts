@@ -78,24 +78,120 @@ type PredicatePattern = {
  * `founded` before a looser fallback would.
  */
 const PREDICATE_PATTERNS: readonly PredicatePattern[] = [
-  { name: 'authored', test: /\bauthored\b|\bwrote\b|\bwas the author of\b|\bedited\b|\bpublished\b/, relationshipType: 'authored', orientation: 'entity_to_mention', personOriented: true },
-  { name: 'founded', test: /\bfounded\b|\bco-founded\b|\bestablished\b|\borganized\b|\bfounded_by\b|\bfounded_year\b|\bfounded_in\b/, relationshipType: 'founded', orientation: 'entity_to_mention', personOriented: true },
-  { name: 'employed_by', test: /\bemployed by\b|\bemployed_by\b|\bworked (for|at)\b|\bwas (a |an )?staff (writer|member) at\b|\bwas hired by\b|\bserved_as\b|\bserved as\b|\bserved in\b|\bserved_in\b|\bled\b/, relationshipType: 'employed_by', orientation: 'entity_to_mention', personOriented: true },
-  { name: 'member_of', test: /\bmember of\b|\bmember_of\b|\bjoined\b|\bbelonged to\b|\bwas_part_of\b/, relationshipType: 'member_of', orientation: 'entity_to_mention', personOriented: true },
-  { name: 'attended', test: /\battended\b/, relationshipType: 'attended', orientation: 'entity_to_mention', personOriented: true },
-  { name: 'participated_in', test: /\bparticipated in\b|\btook part in\b|\brepresented\b/, relationshipType: 'participated_in', orientation: 'entity_to_mention', personOriented: true },
-  { name: 'occurred_at', test: /\boccurred (at|in)\b|\btook place (at|in)\b|\bhappened (at|in)\b|\bheld\b|\bhosted\b|\bsite_of\b/, relationshipType: 'occurred_at', orientation: 'entity_to_mention' },
-  { name: 'located_at', test: /\blocated (at|in)\b|\blocated_at\b|\bwas based (at|in)\b|\bwas situated (at|in)\b|\blocation\b|\bburied_at\b/, relationshipType: 'located_at', orientation: 'entity_to_mention' },
-  { name: 'part_of', test: /\bpart of\b|\bpart_of\b|\bwas_part_of\b|\bis a neighborhood of\b|\bis a district of\b/, relationshipType: 'part_of', orientation: 'entity_to_mention' },
-  { name: 'governed_by', test: /\bgoverned by\b|\bsubject to\b|\benfranchised by\b|\bwas protected by\b/, relationshipType: 'governed_by', orientation: 'entity_to_mention' },
-  { name: 'overturned', test: /\boverturned\b|\bsuperseded\b|\bstruck down\b/, relationshipType: 'overturned', orientation: 'entity_to_mention' },
-  { name: 'successor_of', test: /\bsuccessor of\b|\bsucceeded\b/, relationshipType: 'successor_of', orientation: 'entity_to_mention' },
-  { name: 'commemorates', test: /\bcommemorates\b|\bmemorializes\b|\bdedicated to\b/, relationshipType: 'commemorates', orientation: 'entity_to_mention' },
-  { name: 'depicts', test: /\bdepicts\b|\bportrays\b|\bprofiles\b/, relationshipType: 'depicts', orientation: 'entity_to_mention' },
-  { name: 'influenced', test: /\binfluenced\b|\binspired\b/, relationshipType: 'influenced', orientation: 'entity_to_mention' },
-  { name: 'caused', test: /\bcaused\b|\bled to\b|\bresulted_in\b|\bresulted in\b/, relationshipType: 'caused', orientation: 'entity_to_mention' },
-  { name: 'enabled', test: /\benabled\b|\bmade possible\b/, relationshipType: 'enabled', orientation: 'entity_to_mention' },
-  { name: 'cites', test: /\bcites\b|\breferences\b|\bdocuments\b|\bdocumented_by\b|\bdocumented_site\b/, relationshipType: 'cites', orientation: 'entity_to_mention' },
+  {
+    name: 'authored',
+    test: /\bauthored\b|\bwrote\b|\bwas the author of\b|\bedited\b|\bpublished\b/,
+    relationshipType: 'authored',
+    orientation: 'entity_to_mention',
+    personOriented: true,
+  },
+  {
+    name: 'founded',
+    test: /\bfounded\b|\bco-founded\b|\bestablished\b|\borganized\b|\bfounded_by\b|\bfounded_year\b|\bfounded_in\b/,
+    relationshipType: 'founded',
+    orientation: 'entity_to_mention',
+    personOriented: true,
+  },
+  {
+    name: 'employed_by',
+    test: /\bemployed by\b|\bemployed_by\b|\bworked (for|at)\b|\bwas (a |an )?staff (writer|member) at\b|\bwas hired by\b|\bserved_as\b|\bserved as\b|\bserved in\b|\bserved_in\b|\bled\b/,
+    relationshipType: 'employed_by',
+    orientation: 'entity_to_mention',
+    personOriented: true,
+  },
+  {
+    name: 'member_of',
+    test: /\bmember of\b|\bmember_of\b|\bjoined\b|\bbelonged to\b|\bwas_part_of\b/,
+    relationshipType: 'member_of',
+    orientation: 'entity_to_mention',
+    personOriented: true,
+  },
+  {
+    name: 'attended',
+    test: /\battended\b/,
+    relationshipType: 'attended',
+    orientation: 'entity_to_mention',
+    personOriented: true,
+  },
+  {
+    name: 'participated_in',
+    test: /\bparticipated in\b|\btook part in\b|\brepresented\b/,
+    relationshipType: 'participated_in',
+    orientation: 'entity_to_mention',
+    personOriented: true,
+  },
+  {
+    name: 'occurred_at',
+    test: /\boccurred (at|in)\b|\btook place (at|in)\b|\bhappened (at|in)\b|\bheld\b|\bhosted\b|\bsite_of\b/,
+    relationshipType: 'occurred_at',
+    orientation: 'entity_to_mention',
+  },
+  {
+    name: 'located_at',
+    test: /\blocated (at|in)\b|\blocated_at\b|\bwas based (at|in)\b|\bwas situated (at|in)\b|\blocation\b|\bburied_at\b/,
+    relationshipType: 'located_at',
+    orientation: 'entity_to_mention',
+  },
+  {
+    name: 'part_of',
+    test: /\bpart of\b|\bpart_of\b|\bwas_part_of\b|\bis a neighborhood of\b|\bis a district of\b/,
+    relationshipType: 'part_of',
+    orientation: 'entity_to_mention',
+  },
+  {
+    name: 'governed_by',
+    test: /\bgoverned by\b|\bsubject to\b|\benfranchised by\b|\bwas protected by\b/,
+    relationshipType: 'governed_by',
+    orientation: 'entity_to_mention',
+  },
+  {
+    name: 'overturned',
+    test: /\boverturned\b|\bsuperseded\b|\bstruck down\b/,
+    relationshipType: 'overturned',
+    orientation: 'entity_to_mention',
+  },
+  {
+    name: 'successor_of',
+    test: /\bsuccessor of\b|\bsucceeded\b/,
+    relationshipType: 'successor_of',
+    orientation: 'entity_to_mention',
+  },
+  {
+    name: 'commemorates',
+    test: /\bcommemorates\b|\bmemorializes\b|\bdedicated to\b/,
+    relationshipType: 'commemorates',
+    orientation: 'entity_to_mention',
+  },
+  {
+    name: 'depicts',
+    test: /\bdepicts\b|\bportrays\b|\bprofiles\b/,
+    relationshipType: 'depicts',
+    orientation: 'entity_to_mention',
+  },
+  {
+    name: 'influenced',
+    test: /\binfluenced\b|\binspired\b/,
+    relationshipType: 'influenced',
+    orientation: 'entity_to_mention',
+  },
+  {
+    name: 'caused',
+    test: /\bcaused\b|\bled to\b|\bresulted_in\b|\bresulted in\b/,
+    relationshipType: 'caused',
+    orientation: 'entity_to_mention',
+  },
+  {
+    name: 'enabled',
+    test: /\benabled\b|\bmade possible\b/,
+    relationshipType: 'enabled',
+    orientation: 'entity_to_mention',
+  },
+  {
+    name: 'cites',
+    test: /\bcites\b|\breferences\b|\bdocuments\b|\bdocumented_by\b|\bdocumented_site\b/,
+    relationshipType: 'cites',
+    orientation: 'entity_to_mention',
+  },
   // Reverse-oriented: "was father of X" means the *mention* (X) is the object of a family/parent
   // fact about a person, which the taxonomy has no dedicated type for; staged as `related_to`
   // only if no stronger pattern above matched (see extractCandidate's fallback).
@@ -171,10 +267,7 @@ const KIND_PAIR_MATRIX: ReadonlySet<string> = new Set<string>([
 export type EvidenceRef = { readonly claimId: string };
 
 export type RejectionReason =
-  | 'no_entity_mention'
-  | 'kind_pair_not_in_matrix'
-  | 'needs_temporal_context'
-  | 'no_pattern_match';
+  'no_entity_mention' | 'kind_pair_not_in_matrix' | 'needs_temporal_context' | 'no_pattern_match';
 
 export type RelationshipCandidate = {
   readonly fromEntityId: string;
@@ -199,11 +292,7 @@ export type ExtractionResult = {
 };
 
 function normalize(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
-    .trim();
+  return text.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').trim();
 }
 
 /** A four-digit year (1600-2099), the only temporal signal we trust from free claim text —
@@ -252,7 +341,11 @@ function kindPairKey(fromKind: EntityKind, toKind: EntityKind, type: Relationshi
   return `${fromKind}|${toKind}|${type}`;
 }
 
-export function isKindPairValid(fromKind: EntityKind, toKind: EntityKind, type: RelationshipType): boolean {
+export function isKindPairValid(
+  fromKind: EntityKind,
+  toKind: EntityKind,
+  type: RelationshipType,
+): boolean {
   return KIND_PAIR_MATRIX.has(kindPairKey(fromKind, toKind, type));
 }
 
@@ -271,7 +364,11 @@ export function extractCandidate(
   const predicateNormalized = normalize(claim.predicate);
   const pattern = PREDICATE_PATTERNS.find((p) => p.test.test(predicateNormalized));
   if (!pattern) {
-    return { claimId: claim.claimId, reason: 'no_pattern_match', detail: `predicate "${claim.predicate}" matched no known pattern` };
+    return {
+      claimId: claim.claimId,
+      reason: 'no_pattern_match',
+      detail: `predicate "${claim.predicate}" matched no known pattern`,
+    };
   }
 
   const mention = findEntityMention(claim.object, allEntities, claim.entity.id);
@@ -302,7 +399,9 @@ export function extractCandidate(
   // who founded a newspaper/magazine is its author/creator, not its institutional founder in the
   // org/institution/school sense. Remap rather than reject a real, well-evidenced connection.
   const relationshipType: RelationshipType =
-    pattern.relationshipType === 'founded' && fromEntity.kind === 'person' && toEntity.kind === 'publication'
+    pattern.relationshipType === 'founded' &&
+    fromEntity.kind === 'person' &&
+    toEntity.kind === 'publication'
       ? 'authored'
       : pattern.relationshipType;
 
@@ -339,7 +438,10 @@ export function extractCandidate(
   };
 }
 
-export function extractCandidates(claims: readonly ClaimRow[], allEntities: readonly ClaimEntity[]): ExtractionResult {
+export function extractCandidates(
+  claims: readonly ClaimRow[],
+  allEntities: readonly ClaimEntity[],
+): ExtractionResult {
   const candidates: RelationshipCandidate[] = [];
   const rejected: RejectedCandidate[] = [];
   for (const claim of claims) {

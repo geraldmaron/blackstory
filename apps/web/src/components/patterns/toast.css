@@ -7,7 +7,7 @@
   position: fixed;
   left: 50%;
   bottom: calc(var(--ds-space-4) + 148px);
-  z-index: 95;
+  z-index: var(--ds-z-toast);
   display: flex;
   flex-direction: column;
   gap: var(--ds-space-2);

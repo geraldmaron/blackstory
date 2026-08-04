@@ -26,9 +26,7 @@ export const DEFAULT_HUB_MERGE_PAIRS: readonly HubMergePair[] = [
 
 export type AbsorbedToSurvivorMap = ReadonlyMap<string, string>;
 
-export function buildAbsorbedToSurvivorMap(
-  pairs: readonly HubMergePair[],
-): AbsorbedToSurvivorMap {
+export function buildAbsorbedToSurvivorMap(pairs: readonly HubMergePair[]): AbsorbedToSurvivorMap {
   return new Map(pairs.map((pair) => [pair.absorbedId, pair.survivorId]));
 }
 
@@ -77,7 +75,9 @@ export type RelationshipRewritePlan = {
   readonly dropDuplicate: readonly RewrittenRelationshipRow[];
 };
 
-function relationshipDedupKey(row: Pick<RewrittenRelationshipRow, 'fromEntityId' | 'toEntityId' | 'relationshipType'>): string {
+function relationshipDedupKey(
+  row: Pick<RewrittenRelationshipRow, 'fromEntityId' | 'toEntityId' | 'relationshipType'>,
+): string {
   return `${row.fromEntityId}|${row.toEntityId}|${row.relationshipType}`;
 }
 

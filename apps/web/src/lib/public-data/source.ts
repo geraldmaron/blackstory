@@ -69,22 +69,24 @@ const getCachedActiveRelease = cache(fetchActiveRelease);
 /**
  * Thin active-release meta for sitemap / cache keys — one pointer read, no catalog load.
  */
-export const getPublicActiveReleaseMeta = cache(async function getPublicActiveReleaseMeta(): Promise<
-  | {
-      readonly releaseId: string;
-      readonly activatedAt: string;
+export const getPublicActiveReleaseMeta = cache(
+  async function getPublicActiveReleaseMeta(): Promise<
+    | {
+        readonly releaseId: string;
+        readonly activatedAt: string;
+      }
+    | undefined
+  > {
+    if (!shouldUseLivePublicProjections()) return undefined;
+    try {
+      const active = await getCachedActiveRelease();
+      if (!active) return undefined;
+      return { releaseId: active.releaseId, activatedAt: active.activatedAt };
+    } catch {
+      return undefined;
     }
-  | undefined
-> {
-  if (!shouldUseLivePublicProjections()) return undefined;
-  try {
-    const active = await getCachedActiveRelease();
-    if (!active) return undefined;
-    return { releaseId: active.releaseId, activatedAt: active.activatedAt };
-  } catch {
-    return undefined;
-  }
-});
+  },
+);
 
 function toNeighborLookup(entity: PublicEntityView): NeighborLookup {
   return {
@@ -440,15 +442,11 @@ const listPublicEntityViewsByIdsCached = cache(async function listPublicEntityVi
   return { byId, source: 'live' };
 });
 
-export async function listPublicEntityViewsByIds(
-  entityIds: readonly string[],
-): Promise<{
+export async function listPublicEntityViewsByIds(entityIds: readonly string[]): Promise<{
   readonly data: readonly PublicEntityView[];
   readonly source: PublicReadSource;
 }> {
-  const requestOrder = [
-    ...new Set(entityIds.map((id) => id.trim()).filter((id) => id.length > 0)),
-  ];
+  const requestOrder = [...new Set(entityIds.map((id) => id.trim()).filter((id) => id.length > 0))];
   if (requestOrder.length === 0) {
     return { data: [], source: 'none' };
   }

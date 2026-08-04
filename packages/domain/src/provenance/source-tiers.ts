@@ -58,12 +58,20 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
 
   // ---- T2: working papers, presses, archives, research libraries ----
   { domain: 'nber.org', tier: 'T2', rationale: 'NBER working papers (pre-peer-review)' },
-  { domain: 'doi.org', tier: 'T2', rationale: 'DOI resolver — tier confirmed by DOI check, not host' },
+  {
+    domain: 'doi.org',
+    tier: 'T2',
+    rationale: 'DOI resolver — tier confirmed by DOI check, not host',
+  },
   { domain: 'nara.gov', tier: 'T2', rationale: 'National Archives' },
   { domain: 'archives.gov', tier: 'T2', rationale: 'National Archives' },
   { domain: 'loc.gov', tier: 'T2', rationale: 'Library of Congress' },
   { domain: 'si.edu', tier: 'T2', rationale: 'Smithsonian Institution' },
-  { domain: 'dataverse.harvard.edu', tier: 'T2', rationale: 'Harvard Dataverse (deposited replication data)' },
+  {
+    domain: 'dataverse.harvard.edu',
+    tier: 'T2',
+    rationale: 'Harvard Dataverse (deposited replication data)',
+  },
   { domain: 'openicpsr.org', tier: 'T2', rationale: 'openICPSR replication archive' },
   { domain: 'icpsr.umich.edu', tier: 'T2', rationale: 'ICPSR data archive' },
   {
@@ -72,15 +80,27 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
     rationale:
       'Author-hosted replication data for Derenoncourt, Kim, Kuhn & Schularick, "Wealth of Two Nations" (QJE 2024); mirrors the Harvard Dataverse (doi:10.7910/DVN/H6NXUH) and openICPSR 194203 deposits',
   },
-  { domain: 'fraser.stlouisfed.org', tier: 'T2', rationale: "FRASER — St. Louis Fed's federal document/economic history archive" },
+  {
+    domain: 'fraser.stlouisfed.org',
+    tier: 'T2',
+    rationale: "FRASER — St. Louis Fed's federal document/economic history archive",
+  },
   {
     domain: 'okhistory.org',
     tier: 'T2',
     rationale:
       'Oklahoma Historical Society — state agency archive of record; publisher of the 2001 Tulsa Race Riot Commission report',
   },
-  { domain: 'supreme.justia.com', tier: 'T2', rationale: 'Justia Supreme Court — primary case-text archive' },
-  { domain: 'aeaweb.org', tier: 'T1', rationale: 'American Economic Association — peer-reviewed journal host' },
+  {
+    domain: 'supreme.justia.com',
+    tier: 'T2',
+    rationale: 'Justia Supreme Court — primary case-text archive',
+  },
+  {
+    domain: 'aeaweb.org',
+    tier: 'T1',
+    rationale: 'American Economic Association — peer-reviewed journal host',
+  },
 
   // ---- T3: established nonprofits / journalism with named methodology ----
   { domain: 'vera.org', tier: 'T3', rationale: 'Vera Institute of Justice' },
@@ -90,8 +110,16 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
   { domain: 'propublica.org', tier: 'T3', rationale: 'ProPublica (documented methodology)' },
   { domain: 'pewresearch.org', tier: 'T3', rationale: 'Pew Research Center' },
   { domain: 'urban.org', tier: 'T3', rationale: 'Urban Institute' },
-  { domain: 'crmvet.org', tier: 'T3', rationale: 'Civil Rights Movement Archive (primary-document archive)' },
-  { domain: 'tulsahistory.org', tier: 'T3', rationale: 'Tulsa Historical Society & Museum (named collections, primary-document archive)' },
+  {
+    domain: 'crmvet.org',
+    tier: 'T3',
+    rationale: 'Civil Rights Movement Archive (primary-document archive)',
+  },
+  {
+    domain: 'tulsahistory.org',
+    tier: 'T3',
+    rationale: 'Tulsa Historical Society & Museum (named collections, primary-document archive)',
+  },
 
   // ---- generic fallbacks (least specific; longest-match keeps these last) ----
   { domain: 'gov', tier: 'T2', rationale: 'U.S. government host (unspecified agency)' },

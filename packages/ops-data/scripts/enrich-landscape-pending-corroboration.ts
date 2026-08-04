@@ -98,7 +98,10 @@ function readLimit(): number | undefined {
 function readLanes(): readonly string[] | undefined {
   const raw = readArg('--lanes=');
   if (!raw) return undefined;
-  const lanes = raw.split(',').map((entry) => entry.trim()).filter(Boolean);
+  const lanes = raw
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
   return lanes.length > 0 ? lanes : undefined;
 }
 
@@ -119,9 +122,7 @@ const PROGRAM_SOURCE_HOSTS = [
 function isProgramSourceUrl(url: string): boolean {
   try {
     const hostname = new URL(url).hostname.toLowerCase();
-    return PROGRAM_SOURCE_HOSTS.some(
-      (host) => hostname === host || hostname.endsWith(`.${host}`),
-    );
+    return PROGRAM_SOURCE_HOSTS.some((host) => hostname === host || hostname.endsWith(`.${host}`));
   } catch {
     return false;
   }
@@ -183,7 +184,9 @@ async function main(): Promise<void> {
        FROM bb_public.release_entities re
        JOIN bb_public.active_release ar ON ar.release_id = re.release_id`,
     );
-    const activeRelease = await client.query(`SELECT release_id FROM bb_public.active_release LIMIT 1`);
+    const activeRelease = await client.query(
+      `SELECT release_id FROM bb_public.active_release LIMIT 1`,
+    );
     const releaseId = activeRelease.rows[0]?.release_id as string | undefined;
     if (!releaseId) {
       console.error('No active release');
@@ -361,7 +364,9 @@ async function main(): Promise<void> {
     console.log(`Would clear 0.75 gate: ${wouldClearGate}`);
     console.log(`Report: ${REPORT_PATH}`);
     if (DRY_RUN || !APPLY) {
-      console.log('DRY_RUN=1 (default): no database writes. Set DRY_RUN=0 LANDSCAPE_ENRICH_APPLY=1 to apply.');
+      console.log(
+        'DRY_RUN=1 (default): no database writes. Set DRY_RUN=0 LANDSCAPE_ENRICH_APPLY=1 to apply.',
+      );
     }
   } finally {
     client.release();

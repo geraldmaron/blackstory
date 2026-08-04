@@ -122,7 +122,9 @@ function buildListItem(
   };
 }
 
-export async function listStoryPacketsPostgres(limit: number): Promise<readonly StoryPacketListItem[]> {
+export async function listStoryPacketsPostgres(
+  limit: number,
+): Promise<readonly StoryPacketListItem[]> {
   const capped = Math.min(200, Math.max(1, limit));
   const [intakeRows, reviewRows] = await Promise.all([
     queryPostgres<IntakeRow>(
@@ -155,7 +157,9 @@ export async function listStoryPacketsPostgres(limit: number): Promise<readonly 
   return Object.freeze(items);
 }
 
-export async function getStoryPacketPostgres(submissionId: string): Promise<StoryPacketListItem | null> {
+export async function getStoryPacketPostgres(
+  submissionId: string,
+): Promise<StoryPacketListItem | null> {
   const intakeRows = await queryPostgres<IntakeRow>(
     `SELECT id, created_by, payload, created_at
      FROM bb_submissions.intake_items

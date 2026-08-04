@@ -69,6 +69,43 @@ else
   echo "  Continuing with seed so UI work still boots; set PUBLIC_DATA_SOURCE=seed to silence this." >&2
 fi
 
+# The admin console is a sibling deployable on its own port, but locally it is part of
+# "run the site": the public footer links to it, and testing a handoff with only one of the
+# two running just yields a connection refused. Set DEV_NO_ADMIN=1 to run web alone.
+ADMIN_PORT="${ADMIN_PORT:-3001}"
+admin_pid=""
+
+start_admin() {
+  if [[ "${DEV_NO_ADMIN:-}" == "1" ]]; then
+    echo "dev-web: DEV_NO_ADMIN=1 → skipping the admin console"
+    return
+  fi
+  if [[ ! -f "$ROOT/apps/admin/.env.local" ]]; then
+    echo "dev-web: WARNING — apps/admin/.env.local missing; skipping admin console." >&2
+    echo "  Copy apps/admin/.env.example → .env.local to enable staff sign-in locally." >&2
+    return
+  fi
+  if lsof -i ":${ADMIN_PORT}" -sTCP:LISTEN -t >/dev/null 2>&1; then
+    echo "dev-web: admin console already listening on :${ADMIN_PORT} — reusing it"
+    return
+  fi
+  echo "dev-web: starting @repo/admin on http://localhost:${ADMIN_PORT}/"
+  pnpm --filter @repo/admin dev &
+  admin_pid=$!
+}
+
+# Without this the admin server outlives Ctrl-C and squats :3001 for the next run.
+stop_admin() {
+  if [[ -n "$admin_pid" ]] && kill -0 "$admin_pid" 2>/dev/null; then
+    kill "$admin_pid" 2>/dev/null || true
+    wait "$admin_pid" 2>/dev/null || true
+  fi
+}
+trap stop_admin EXIT INT TERM
+
+start_admin
+
 echo "dev-web: starting @repo/web on http://localhost:${PORT}/"
 
-exec pnpm --filter @repo/web dev
+# Not exec: the trap has to survive to clean up the admin child.
+pnpm --filter @repo/web dev

@@ -128,10 +128,10 @@ test('campaign yields finding-aid candidates from seeded archives', async () => 
 
   assert.equal(result.kind, COUNTY_ARCHIVE_CAMPAIGN_KIND);
   assert.equal(result.adapterId, FINDING_AID_ADAPTER_ID);
-  assert.deepEqual(
-    [...result.sourceIds].sort(),
-    ['src_finding_aid_test_al', 'src_finding_aid_test_ms'],
-  );
+  assert.deepEqual([...result.sourceIds].sort(), [
+    'src_finding_aid_test_al',
+    'src_finding_aid_test_ms',
+  ]);
   assert.ok(result.yield.survivors >= 2, 'expected at least two survivors');
   assert.equal(result.ranked.length, result.yield.survivors);
 

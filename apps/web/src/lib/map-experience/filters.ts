@@ -1,7 +1,7 @@
 /**
- * Pure filter application + facet-option building for the map/list shared state. Mirrors
- * history find-in-time facet convention (`apps/web/src/app/history/history-view-model.ts`) but
- * operates over `ExploreMapFeature` so the map canvas and the synchronized list can share one
+ * Pure filter application + facet-option building for the map/list shared state. Mirrors the
+ * history find-in-time facet convention (`apps/web/src/lib/history/filters.ts`) but operates
+ * over `ExploreMapFeature` so the map canvas and the synchronized list can share one
  * filter/facet computation.
  *
  * Record filters (hide pins): kind → tone → era → theme → status → confidence, plus optional

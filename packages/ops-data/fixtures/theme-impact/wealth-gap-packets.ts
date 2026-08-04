@@ -87,7 +87,7 @@ const MECHANISM_ARTIFACTS = [
     artifactClass: 'primary_government_document',
     title: "Freedman's Savings and Trust Company failure, 1874",
     citation:
-      "Office of the Comptroller of the Currency, “The Freedman’s Savings Bank: Good Intentions Were Not Enough,” OCC history; corroborated by the National Archives, Prologue, “Providing for the Freedmen’s Savings and Trust Company” (1997).",
+      'Office of the Comptroller of the Currency, “The Freedman’s Savings Bank: Good Intentions Were Not Enough,” OCC history; corroborated by the National Archives, Prologue, “Providing for the Freedmen’s Savings and Trust Company” (1997).',
     sourceUrl:
       'https://www.occ.gov/about/who-we-are/history/history-of-the-occ/1863-1865/1863-1865-freedmans-savings-bank.html',
     dated: '1874',
@@ -474,12 +474,7 @@ export const wealthGapPackets = [
     theme_id: 'wealth_gap',
     title: 'The gap that never closed',
     summary: SUMMARY,
-    policy_eras: [
-      'emancipation',
-      'black_wall_street',
-      'civil_rights_era',
-      'post_1980_stall',
-    ],
+    policy_eras: ['emancipation', 'black_wall_street', 'civil_rights_era', 'post_1980_stall'],
     geography: {
       geographyType: 'nation',
       jurisdictionId: NATION_JURISDICTION,

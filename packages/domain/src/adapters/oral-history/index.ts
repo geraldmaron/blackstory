@@ -451,10 +451,10 @@ export function normalizeOralHistoryMention(
     ? withholdResidentialPrecision(mention.placeHint.trim())
     : undefined;
 
-  const linkHints = [
-    ...(mention.citedUrls ?? []),
-    ...(input.extraLinkHints ?? []),
-  ].slice(0, MAX_LINK_HINTS);
+  const linkHints = [...(mention.citedUrls ?? []), ...(input.extraLinkHints ?? [])].slice(
+    0,
+    MAX_LINK_HINTS,
+  );
 
   const identifiers = stripForbiddenIdentifiers(mention.identifiers);
 

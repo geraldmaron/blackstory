@@ -8,10 +8,7 @@ import { randomUUID } from 'node:crypto';
 import { auditCategoryFor } from '@repo/domain';
 import { ledgerPaths } from '@repo/data-access';
 import { commitWithAuditPostgres } from '@/lib/postgres-commit';
-import {
-  listCatalogDecisionsPostgres,
-  writeCatalogDecisionPostgres,
-} from '@/lib/postgres-catalog';
+import { listCatalogDecisionsPostgres, writeCatalogDecisionPostgres } from '@/lib/postgres-catalog';
 
 export const CATALOG_BULK_DECISION_LIMIT = 50;
 

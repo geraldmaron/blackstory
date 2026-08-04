@@ -11,10 +11,7 @@ import {
 } from './review-signal.js';
 
 test('independenceKeyForCitation mirrors promotion coordinated vs independent keys', () => {
-  assert.equal(
-    independenceKeyForCitation({ independenceGroupId: 'pub-a' }),
-    'independent:pub-a',
-  );
+  assert.equal(independenceKeyForCitation({ independenceGroupId: 'pub-a' }), 'independent:pub-a');
   assert.equal(
     independenceKeyForCitation({
       independenceGroupId: 'ignored-when-coordinated',

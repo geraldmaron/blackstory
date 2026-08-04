@@ -13,7 +13,10 @@ test('sanitizePublicProseText resolves pipe labels and never emits brackets', ()
 });
 
 test('sanitizePublicProseText falls back to entity id when markup has no label', () => {
-  assert.equal(sanitizePublicProseText('See [[gap_supreme_court]] for context.'), 'See gap_supreme_court for context.');
+  assert.equal(
+    sanitizePublicProseText('See [[gap_supreme_court]] for context.'),
+    'See gap_supreme_court for context.',
+  );
 });
 
 test('sanitizePublicProseText is a no-op when no markup is present', () => {

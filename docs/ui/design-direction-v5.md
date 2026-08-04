@@ -1,3 +1,5 @@
+> **SUPERSEDED.** This document is superseded by v6, then the v9 design law. Route today: Historical. It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
+
 # blap design direction v5 — the atlas opens to your page
 
 > **Home layout supersession (2026-07-23):** The `/` surface layout is deferred to

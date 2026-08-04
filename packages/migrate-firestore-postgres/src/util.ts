@@ -97,9 +97,12 @@ export function toJsonValue(value: unknown): unknown {
       }
     }
     const seconds = maybe._seconds ?? maybe.seconds;
-    if (typeof seconds === 'number' && Object.keys(maybe).every((k) =>
-      k === 'seconds' || k === '_seconds' || k === 'nanoseconds' || k === '_nanoseconds'
-    )) {
+    if (
+      typeof seconds === 'number' &&
+      Object.keys(maybe).every(
+        (k) => k === 'seconds' || k === '_seconds' || k === 'nanoseconds' || k === '_nanoseconds',
+      )
+    ) {
       return new Date(seconds * 1000).toISOString();
     }
     const out: Record<string, unknown> = {};

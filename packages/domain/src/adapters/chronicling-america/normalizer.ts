@@ -98,14 +98,14 @@ export function assertChroniclingAmericaCandidate(
     throw new Error(`Expected adapterId ${CHRONICLING_AMERICA_ADAPTER_ID}`);
   }
   if (candidate.payload.schemaVersion !== CHRONICLING_AMERICA_PAYLOAD_SCHEMA_VERSION) {
-    throw new Error(
-      `Unexpected payload schema version: ${candidate.payload.schemaVersion}`,
-    );
+    throw new Error(`Unexpected payload schema version: ${candidate.payload.schemaVersion}`);
   }
   if (
     candidate.payload.summary &&
     candidate.payload.summary.length > MAX_EVIDENCE_SNIPPET_CHARACTERS
   ) {
-    throw new Error('Chronicling America candidate summary exceeds the evidence-pointer snippet cap');
+    throw new Error(
+      'Chronicling America candidate summary exceeds the evidence-pointer snippet cap',
+    );
   }
 }

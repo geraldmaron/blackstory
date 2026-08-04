@@ -7,8 +7,15 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import policeViolenceRaw from '../../../../../../docs/research/police-violence-memorial-names.json';
 import racialTerrorRaw from '../../../../../../docs/research/racial-terror-memorial-names.json';
-import { isMemorialNamePlateEligible, MEMORIAL_NAMES as ARCHIVE_ENTRIES } from '../../atmosphere/memorial-names';
-import { MEMORIAL_NAMES, MEMORIAL_NAMES_REQUIRED, memorialNamesAlphabetical } from './memorial-names';
+import {
+  isMemorialNamePlateEligible,
+  MEMORIAL_NAMES as ARCHIVE_ENTRIES,
+} from '../../atmosphere/memorial-names';
+import {
+  MEMORIAL_NAMES,
+  MEMORIAL_NAMES_REQUIRED,
+  memorialNamesAlphabetical,
+} from './memorial-names';
 
 type RawEntry = { readonly name: string };
 
@@ -34,7 +41,10 @@ test('shared archive dataset is exactly the deduped merge of the two raw sources
 test('every merged name is either plate-eligible or was correctly filtered out', () => {
   const eligibleArchiveCount = ARCHIVE_ENTRIES.filter(isMemorialNamePlateEligible).length;
   const ineligibleArchiveCount = ARCHIVE_ENTRIES.length - eligibleArchiveCount;
-  assert.ok(ineligibleArchiveCount > 0, 'expected at least one single-token archive name to be filtered');
+  assert.ok(
+    ineligibleArchiveCount > 0,
+    'expected at least one single-token archive name to be filtered',
+  );
 
   for (const name of MEMORIAL_NAMES) {
     const tokenCount = name
@@ -47,9 +57,15 @@ test('every merged name is either plate-eligible or was correctly filtered out',
 });
 
 test('merged wall/list dataset is unique and reaches the expected final count', () => {
-  assert.equal(new Set(MEMORIAL_NAMES.map((n) => n.trim().toLowerCase())).size, MEMORIAL_NAMES.length);
+  assert.equal(
+    new Set(MEMORIAL_NAMES.map((n) => n.trim().toLowerCase())).size,
+    MEMORIAL_NAMES.length,
+  );
   assert.equal(MEMORIAL_NAMES.length, 1672);
-  assert.ok(MEMORIAL_NAMES.length > 1000, 'expected the full merged dataset, not the old 64-name subset');
+  assert.ok(
+    MEMORIAL_NAMES.length > 1000,
+    'expected the full merged dataset, not the old 64-name subset',
+  );
 });
 
 test('required names remain present verbatim', () => {

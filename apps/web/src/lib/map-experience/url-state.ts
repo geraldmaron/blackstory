@@ -74,6 +74,12 @@ export type ExploreViewState = {
    * shareable URLs when off (the default).
    */
   readonly group: boolean;
+  /**
+   * Aerial imagery under the archive instead of the flat plate (opt-in via `sat=1`). Shareable
+   * for the same reason `group` is: it changes what the reader is looking at, so a link that
+   * drops it hands the recipient a different map than the sender was reading.
+   */
+  readonly sat: boolean;
   /** Draw evidence-backed History relationship lines between entity anchors.  */
   readonly lines: boolean;
   /** When set with lines, filter edges to this decade slice (e.g. `1950s`).  */
@@ -119,6 +125,7 @@ export const EXPLORE_URL_PARAM_KEYS = [
   'selected',
   'state',
   'group',
+  'sat',
   'lines',
   'decade',
   'edge',
@@ -285,6 +292,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const selectedRaw = firstValue(raw.selected)?.trim();
   const stateRaw = firstValue(raw.state)?.trim().toUpperCase();
   const groupRaw = firstValue(raw.group);
+  const satRaw = firstValue(raw.sat);
   const linesRaw = firstValue(raw.lines);
   const decadeRaw = firstValue(raw.decade)?.trim();
   const edgeRaw = firstValue(raw.edge)?.trim();
@@ -297,6 +305,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const nearRaw = firstValue(raw.near)?.trim();
 
   const groupOn = groupRaw === '1' || groupRaw === 'true';
+  const satOn = satRaw === '1' || satRaw === 'true';
 
   const popGeoBase = parseExplorePopulationGeo(popGeoRaw, DEFAULT_POPULATION_GEO);
   const popDecadeParsed =
@@ -347,6 +356,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
     ...(popFrom ? { popFrom } : {}),
     ...(popTo ? { popTo } : {}),
     group: groupOn,
+    sat: satOn,
     lines: linesRaw === '1' || linesRaw === 'true',
     ...(decadeRaw ? { decade: decadeRaw } : {}),
     ...(edgeRaw ? { edge: edgeRaw } : {}),
@@ -406,6 +416,7 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
     }
   }
   if (state.group) params.set('group', '1');
+  if (state.sat) params.set('sat', '1');
   if (state.lines) params.set('lines', '1');
   if (state.decade) params.set('decade', state.decade);
   if (state.edge) params.set('edge', state.edge);
@@ -427,11 +438,12 @@ export function buildExploreHref(state: ExploreViewState): string {
 /** Default overlay + toggle state for callers building explore links without a full view model. */
 export function defaultExploreOverlayState(): Pick<
   ExploreViewState,
-  'layerMode' | 'group' | 'lines' | 'showFilters' | 'showResults' | 'showKey'
+  'layerMode' | 'group' | 'sat' | 'lines' | 'showFilters' | 'showResults' | 'showKey'
 > {
   return {
     layerMode: 'presence',
     group: false,
+    sat: false,
     lines: false,
     ...DEFAULT_PANEL_VISIBILITY,
   };

@@ -87,11 +87,17 @@ export function EntityRoomSections({
             The history here
           </h2>
           <div className="ds-room-prose">
-            <LinkedProse
-              text={entity.historicalContext}
-              skipEntityIds={[entity.id]}
-              catalog={entityLinkCatalog}
-            />
+            {entity.historicalContext
+              .split(/\n\s*\n/)
+              .filter((paragraph) => paragraph.trim().length > 0)
+              .map((paragraph, index) => (
+                <LinkedProse
+                  key={`context-${index}`}
+                  text={paragraph}
+                  skipEntityIds={[entity.id]}
+                  catalog={entityLinkCatalog}
+                />
+              ))}
           </div>
         </section>
       ) : null}
@@ -113,8 +119,8 @@ export function EntityRoomSections({
             What the sources say
           </h2>
           <p className="ds-record-beat__standfirst">
-            Each statement below is one accepted claim, shown with the source it was taken from
-            and how strongly that source carries it.
+            Each statement below is one accepted claim, shown with the source it was taken from and
+            how strongly that source carries it.
           </p>
           <EntityEvidencePanel
             labelledBy="claims-heading"

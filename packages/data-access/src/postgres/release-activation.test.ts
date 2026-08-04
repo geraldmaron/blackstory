@@ -49,7 +49,11 @@ function input(
   return {
     releaseId,
     generatedAt: '2026-07-21T12:00:00.000Z',
-    mapEntities: [PLACE_HARLEM_NY_FIXTURE, INSTITUTION_ATLANTA_GA_SENSITIVE_FIXTURE, DECEASED_RESIDENCE_FIXTURE],
+    mapEntities: [
+      PLACE_HARLEM_NY_FIXTURE,
+      INSTITUTION_ATLANTA_GA_SENSITIVE_FIXTURE,
+      DECEASED_RESIDENCE_FIXTURE,
+    ],
     redactLocation: redactLocationForPublic,
     contentIndex: [{ id: 'story-1', kind: 'story', title: 'A Story', version: 'v1' }],
     entitiesList: { schemaVersion: 1, entities: [{ id: 'ent_a', displayName: 'A' }] },
@@ -97,7 +101,8 @@ test('Postgres activation rejects corrupted artifact before pointer moves', asyn
 
   await assert.rejects(
     activateReleaseAsync(store, tampered),
-    (error: unknown) => error instanceof ReleaseActivationError && error.code === 'RELEASE_VALIDATION',
+    (error: unknown) =>
+      error instanceof ReleaseActivationError && error.code === 'RELEASE_VALIDATION',
   );
   assert.equal((await store.getPointer())?.activeReleaseId, 'rel_good');
 });

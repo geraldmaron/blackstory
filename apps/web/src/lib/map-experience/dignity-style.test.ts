@@ -9,7 +9,12 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
-import { DENSITY_TIER_FILL, DIGNITY_PALETTE, POPULATION_SHARE_TIER_FILL, plateForScheme } from './dignity-style';
+import {
+  DENSITY_TIER_FILL,
+  DIGNITY_PALETTE,
+  POPULATION_SHARE_TIER_FILL,
+  plateForScheme,
+} from './dignity-style';
 import {
   displayEncodingFor,
   kindEncodingFor,
@@ -105,7 +110,10 @@ test('history relationship edge plate colors meet WCAG 1.4.11 (≥3:1) on both t
     contrastRatio(dark.historyEdge, dark.ocean) >= 3,
     `dark historyEdge ${dark.historyEdge} on ${dark.ocean} must be ≥3:1`,
   );
-  assert.ok(contrastRatio(DIGNITY_PALETTE.pointHalo, light.ocean) < 3, 'pageSand must fail on white');
+  assert.ok(
+    contrastRatio(DIGNITY_PALETTE.pointHalo, light.ocean) < 3,
+    'pageSand must fail on white',
+  );
 });
 
 test('no color in DIGNITY_PALETTE is red-hued except the allowlisted massacre tone', () => {

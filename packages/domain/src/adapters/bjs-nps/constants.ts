@@ -4,7 +4,8 @@
  */
 
 /** Registry homepage — cite on every published observation. */
-export const BJS_NPS_HOMEPAGE_URL = 'https://bjs.ojp.gov/data-collection/national-prisoner-statistics-nps';
+export const BJS_NPS_HOMEPAGE_URL =
+  'https://bjs.ojp.gov/data-collection/national-prisoner-statistics-nps';
 
 /** Prisoners in 2023 statistical tables zip (Appendix table 1 = p23stat01.csv). */
 export const BJS_NPS_P23_TABLES_ZIP_URL = 'https://bjs.ojp.gov/document/p23st.zip';

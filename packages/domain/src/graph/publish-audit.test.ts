@@ -3,10 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {
-  auditGraphReleaseArtifact,
-  graphPublishAuditPasses,
-} from './publish-audit.js';
+import { auditGraphReleaseArtifact, graphPublishAuditPasses } from './publish-audit.js';
 import { buildGraphReleaseArtifact } from './build.js';
 import type { EntityRelationship } from '../relationship.js';
 
@@ -49,13 +46,23 @@ test('auditGraphReleaseArtifact reports full retention when endpoints are in rel
     artifact,
     relationships,
     releaseEntityIds: ['a', 'b', 'c'],
-    decadeEntities: artifact.decadeViews.length > 0
-      ? [
-          { entityId: 'a', activeSpans: [{ validFrom: '1960', validTo: '1970', datePrecision: 'year' }] },
-          { entityId: 'b', activeSpans: [{ validFrom: '1960', validTo: '1970', datePrecision: 'year' }] },
-          { entityId: 'c', activeSpans: [{ validFrom: '1960', validTo: '1970', datePrecision: 'year' }] },
-        ]
-      : [],
+    decadeEntities:
+      artifact.decadeViews.length > 0
+        ? [
+            {
+              entityId: 'a',
+              activeSpans: [{ validFrom: '1960', validTo: '1970', datePrecision: 'year' }],
+            },
+            {
+              entityId: 'b',
+              activeSpans: [{ validFrom: '1960', validTo: '1970', datePrecision: 'year' }],
+            },
+            {
+              entityId: 'c',
+              activeSpans: [{ validFrom: '1960', validTo: '1970', datePrecision: 'year' }],
+            },
+          ]
+        : [],
   });
 
   assert.equal(report.unexplainedAllTimeDrops, 0);
@@ -70,7 +77,10 @@ test('auditGraphReleaseArtifact flags endpoint_not_in_release drops', () => {
     generatedAt: '2026-07-01T00:00:00.000Z',
     entityIds: ['a'],
     entities: [
-      { entityId: 'a', activeSpans: [{ validFrom: '1960', validTo: '1970', datePrecision: 'year' }] },
+      {
+        entityId: 'a',
+        activeSpans: [{ validFrom: '1960', validTo: '1970', datePrecision: 'year' }],
+      },
     ],
     relationships,
   });
@@ -80,7 +90,10 @@ test('auditGraphReleaseArtifact flags endpoint_not_in_release drops', () => {
     relationships,
     releaseEntityIds: ['a'],
     decadeEntities: [
-      { entityId: 'a', activeSpans: [{ validFrom: '1960', validTo: '1970', datePrecision: 'year' }] },
+      {
+        entityId: 'a',
+        activeSpans: [{ validFrom: '1960', validTo: '1970', datePrecision: 'year' }],
+      },
     ],
   });
 

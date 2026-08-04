@@ -4,6 +4,7 @@
 export type LawSnapshotKind =
   | 'federal-statute'
   | 'federal-regulation'
+  | 'constitutional-amendment'
   | 'landmark-case'
   | 'state-statute';
 

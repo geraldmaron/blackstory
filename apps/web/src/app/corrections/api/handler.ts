@@ -5,6 +5,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { createQuarantinedSubmission, createSubmissionCampaignDetector } from '@repo/security';
+import { requirePrivacyPepper } from '@/lib/web-security';
 import { buildPublicCorrectionStatus } from '../public-status';
 import {
   validateAbuseReportSubmission,
@@ -294,15 +295,6 @@ export async function handleCorrectionAbuseReportRequest(
 }
 
 let defaultStore: CorrectionSubmissionStore | undefined;
-
-export function requirePrivacyPepper(): string {
-  const pepper = process.env.SUBMISSION_PRIVACY_PEPPER;
-  if (pepper && pepper.trim()) return pepper;
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('SUBMISSION_PRIVACY_PEPPER must be set in production');
-  }
-  return 'local-dev-only-pepper-do-not-use-in-production';
-}
 
 export function getDefaultCorrectionStore(): CorrectionSubmissionStore {
   if (!defaultStore) {

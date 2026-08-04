@@ -12,6 +12,7 @@ import {
   STORY_CHAPTERS,
   chapterById,
   isValidChapterCamera,
+  STORY_STAGE_ORDER,
 } from './chapters';
 import { copyFor, headingParts } from '../../components/story/story-copy';
 
@@ -69,13 +70,26 @@ test('the corridor chapter carries the honesty line from the corridor data, not 
   );
 });
 
-test('exactly one chapter runs the sweep, draws a record, and rotates a fact', () => {
+test('exactly one chapter runs the sweep, draws a record, and draws the corridors', () => {
   // Two sweeps would step the histogram against each other; two record chapters would leave the
-  // second one fighting the first for the camera on a fast scroll.
+  // second one fighting the first for the camera on a fast scroll. Rotating-fact chapters are the
+  // exception: a visit may run more than one, and `pickStoryChapters` gives each a distinct fact.
   assert.equal(STORY_CHAPTERS.filter((chapter) => chapter.sweep).length, 1);
   assert.equal(STORY_CHAPTERS.filter((chapter) => chapter.focusRandomRecord).length, 1);
-  assert.equal(STORY_CHAPTERS.filter((chapter) => chapter.rotatingFact).length, 1);
   assert.equal(STORY_CHAPTERS.filter((chapter) => chapter.routes).length, 1);
+  assert.ok(STORY_CHAPTERS.filter((chapter) => chapter.rotatingFact).length >= 1);
+});
+
+test('every chapter declares a stage the running order knows how to place', () => {
+  for (const chapter of STORY_CHAPTERS) {
+    assert.ok(
+      STORY_STAGE_ORDER.includes(chapter.stage),
+      `${chapter.id} declares a stage the order does not know`,
+    );
+  }
+  // Exactly one opening and one closing: they are the fixed framing every visit gets.
+  assert.equal(STORY_CHAPTERS.filter((chapter) => chapter.stage === 'opening').length, 1);
+  assert.equal(STORY_CHAPTERS.filter((chapter) => chapter.stage === 'closing').length, 1);
 });
 
 test('the intersection threshold fires a chapter before it is centred, but not at the edge', () => {

@@ -25,19 +25,13 @@ import {
 } from './phase1-nhgis-mapper.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const FIXTURE_DIR = join(
-  __dirname,
-  '../../../../ops-data/fixtures/reference-indicators',
-);
+const FIXTURE_DIR = join(__dirname, '../../../../ops-data/fixtures/reference-indicators');
 const RACE_FIXTURE_CSV = readFileSync(
   join(FIXTURE_DIR, 'nhgis-cook-county-17031-race-population-share-1970-2010.csv'),
   'utf8',
 );
 const TENURE_FIXTURE_CSV = readFileSync(
-  join(
-    FIXTURE_DIR,
-    'nhgis-cook-county-17031-tenure-homeownership-by-race-1990-2010.csv',
-  ),
+  join(FIXTURE_DIR, 'nhgis-cook-county-17031-tenure-homeownership-by-race-1990-2010.csv'),
   'utf8',
 );
 const RETRIEVED_AT = '2026-07-22T00:00:00.000Z';
@@ -50,7 +44,10 @@ test('parseNhgisCookRacePopulationShareFixtureCsv loads 1970–2010 Cook rows', 
     rows.map((row) => row.decade),
     [...PHASE1_NHGIS_THEME_IMPACT_DECADES],
   );
-  assert.equal(rows.every((row) => row.countyFips === '17031'), true);
+  assert.equal(
+    rows.every((row) => row.countyFips === '17031'),
+    true,
+  );
 });
 
 test('parseNhgisCookTenureHomeownershipFixtureCsv loads 1990–2010 Cook rows', () => {

@@ -32,7 +32,11 @@ test('findEntityMention: returns undefined when no known entity is named', () =>
 });
 
 test('findEntityMention: never matches the excluded entity itself', () => {
-  const found = findEntityMention('Timothy Thomas Fortune was born in Florida', allEntities, person.id);
+  const found = findEntityMention(
+    'Timothy Thomas Fortune was born in Florida',
+    allEntities,
+    person.id,
+  );
   assert.equal(found, undefined);
 });
 
@@ -118,8 +122,16 @@ test('temporal gate: does not require temporal context for non-causal types', ()
 });
 
 test('temporal gate: gates all hard-required causal types (enabled, influenced, overturned)', () => {
-  const movement: ClaimEntity = { id: 'mv1', kind: 'movement', displayName: 'Civil Rights Movement' };
-  const laterCase: ClaimEntity = { id: 'case1', kind: 'case', displayName: 'Brown v. Board of Education' };
+  const movement: ClaimEntity = {
+    id: 'mv1',
+    kind: 'movement',
+    displayName: 'Civil Rights Movement',
+  };
+  const laterCase: ClaimEntity = {
+    id: 'case1',
+    kind: 'case',
+    displayName: 'Brown v. Board of Education',
+  };
   const earlierCase: ClaimEntity = { id: 'case2', kind: 'case', displayName: 'Plessy v. Ferguson' };
   const fixtures: Array<[ClaimEntity, string, ClaimEntity]> = [
     [lawEntity, 'enabled', movement],
@@ -127,27 +139,51 @@ test('temporal gate: gates all hard-required causal types (enabled, influenced, 
     [laterCase, 'overturned', earlierCase],
   ];
   for (const [entity, predicate, target] of fixtures) {
-    const claim: ClaimRow = { claimId: `c-${predicate}`, entity, predicate, object: target.displayName };
+    const claim: ClaimRow = {
+      claimId: `c-${predicate}`,
+      entity,
+      predicate,
+      object: target.displayName,
+    };
     const result = extractCandidate(claim, [entity, target]);
-    assert.equal('reason' in result && result.reason, 'needs_temporal_context', `predicate=${predicate}`);
+    assert.equal(
+      'reason' in result && result.reason,
+      'needs_temporal_context',
+      `predicate=${predicate}`,
+    );
   }
 });
 
 test('rejects a claim whose predicate matches no known pattern', () => {
-  const claim: ClaimRow = { claimId: 'c6', entity: person, predicate: 'is remembered as', object: 'a pioneering editor' };
+  const claim: ClaimRow = {
+    claimId: 'c6',
+    entity: person,
+    predicate: 'is remembered as',
+    object: 'a pioneering editor',
+  };
   const result = extractCandidate(claim, allEntities);
   assert.equal('reason' in result && result.reason, 'no_pattern_match');
 });
 
 test('rejects a claim with a matched pattern but no named second entity', () => {
-  const claim: ClaimRow = { claimId: 'c7', entity: person, predicate: 'founded', object: 'a small local newspaper' };
+  const claim: ClaimRow = {
+    claimId: 'c7',
+    entity: person,
+    predicate: 'founded',
+    object: 'a small local newspaper',
+  };
   const result = extractCandidate(claim, allEntities);
   assert.equal('reason' in result && result.reason, 'no_entity_mention');
 });
 
 test('extractCandidates: splits results into candidates and rejected', () => {
   const claims: ClaimRow[] = [
-    { claimId: 'c8', entity: person, predicate: 'founded', object: 'National Urban League in 1910' },
+    {
+      claimId: 'c8',
+      entity: person,
+      predicate: 'founded',
+      object: 'National Urban League in 1910',
+    },
     { claimId: 'c9', entity: person, predicate: 'is remembered as', object: 'a pioneer' },
   ];
   const { candidates, rejected } = extractCandidates(claims, allEntities);
@@ -156,7 +192,12 @@ test('extractCandidates: splits results into candidates and rejected', () => {
 });
 
 test('evidence attachment: attaches the source claim id as evidence on every staged row', async () => {
-  const claim: ClaimRow = { claimId: 'claim_abc_01', entity: person, predicate: 'founded', object: 'National Urban League in 1910' };
+  const claim: ClaimRow = {
+    claimId: 'claim_abc_01',
+    entity: person,
+    predicate: 'founded',
+    object: 'National Urban League in 1910',
+  };
   const result = extractCandidate(claim, allEntities);
   assert.equal('reason' in result, false);
   if ('reason' in result) return;
@@ -180,7 +221,12 @@ test('evidence attachment: attaches the source claim id as evidence on every sta
 });
 
 test('evidence attachment: never stages a row with zero evidence ids', async () => {
-  const claim: ClaimRow = { claimId: 'claim_xyz_01', entity: person, predicate: 'employed by', object: 'National Urban League' };
+  const claim: ClaimRow = {
+    claimId: 'claim_xyz_01',
+    entity: person,
+    predicate: 'employed by',
+    object: 'National Urban League',
+  };
   const result = extractCandidate(claim, allEntities);
   assert.equal('reason' in result, false);
   if ('reason' in result) return;

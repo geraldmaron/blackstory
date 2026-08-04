@@ -119,10 +119,7 @@ export function ExploreAddressSearch({
 
     // Exact / strong catalog hit first — grounded in published coords, no geocoder round-trip.
     const catalogHit = suggestCatalogRecords(trimmed, catalogFeatures, 1)[0];
-    if (
-      catalogHit &&
-      catalogHit.displayName.toLowerCase() === trimmed.toLowerCase()
-    ) {
+    if (catalogHit && catalogHit.displayName.toLowerCase() === trimmed.toLowerCase()) {
       emitResolved(cameraFromCatalogRecord(catalogHit), catalogHit.entityId);
       return;
     }
@@ -146,7 +143,8 @@ export function ExploreAddressSearch({
       if (recommendations.length > 0) {
         setStatus({
           kind: 'error',
-          message: 'No street or city match: pick a record from the archive below, or try City, ST.',
+          message:
+            'No street or city match: pick a record from the archive below, or try City, ST.',
         });
         return;
       }
@@ -217,8 +215,8 @@ export function ExploreAddressSearch({
         </Button>
       </form>
       <p className="ds-explore-place__privacy">
-        Place lookup uses the U.S. Census Geocoder on our servers; no third-party map keys in
-        this browser. Coarse framing only; living residences stay off the public map.
+        Place lookup uses the U.S. Census Geocoder on our servers; no third-party map keys in this
+        browser. Coarse framing only; living residences stay off the public map.
       </p>
 
       {recommendations.length > 0 ? (

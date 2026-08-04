@@ -97,12 +97,12 @@ describe('ContentRenderer', () => {
   it('uses the editorial type scale (17/27) for longform body text', async () => {
     const { getByText } = await renderPage(BASE_PAGE, { presentation: 'longform' });
     const paragraph = getByText('Body paragraph one.');
-    // The longform paragraph must inherit the shared `editorial` variant (17/27 Source Serif)
+    // The longform paragraph must inherit the shared `editorial` variant (17/27 Newsreader)
     // rather than a one-off 18/30 override that drifts from the type scale.
     const flattened = Object.assign({}, ...[paragraph.props.style].flat());
     expect(flattened.fontSize).toBe(17);
     expect(flattened.lineHeight).toBe(27);
-    expect(flattened.fontFamily).toBe('SourceSerif4-Regular');
+    expect(flattened.fontFamily).toBe('Newsreader-Regular');
   });
 
   it('shows a stale-legal-version affordance and fires onViewCurrent when pressed', async () => {

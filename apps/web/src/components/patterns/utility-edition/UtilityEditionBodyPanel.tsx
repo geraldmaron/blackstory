@@ -19,10 +19,7 @@ export function UtilityEditionBodyPanel({
 }: UtilityEditionBodyPanelProps) {
   const panelClass = [utilityEditionPanelClassName('body'), className].filter(Boolean).join(' ');
   return (
-    <article
-      className={panelClass}
-      {...(labelledBy ? { 'aria-labelledby': labelledBy } : {})}
-    >
+    <article className={panelClass} {...(labelledBy ? { 'aria-labelledby': labelledBy } : {})}>
       <div className="ds-utility-edition__body">{children}</div>
     </article>
   );

@@ -97,8 +97,7 @@ export async function writePhase1IndicatorCoverageSnapshot(
 }
 
 async function main(): Promise<void> {
-  const apply =
-    process.env.BUILD_PHASE1_COVERAGE_APPLY === '1' && process.env.DRY_RUN !== '1';
+  const apply = process.env.BUILD_PHASE1_COVERAGE_APPLY === '1' && process.env.DRY_RUN !== '1';
   const databaseUrl = process.env.DATABASE_URL?.trim() || process.env.APP_DATABASE_URL?.trim();
 
   if (apply && !databaseUrl) {

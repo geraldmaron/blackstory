@@ -22,9 +22,7 @@
 const ELIGIBLE_CASE_STATES = new Set(['substantial_enrichment']);
 
 export type CasePromotionGateReason =
-  | 'case_not_ready'
-  | 'proposer_approver_conflict'
-  | 'missing_identity';
+  'case_not_ready' | 'proposer_approver_conflict' | 'missing_identity';
 
 export type CasePromotionGateResult = {
   readonly approved: boolean;
@@ -118,7 +116,9 @@ export function validateCanonicalPromotionRecord(
 
   const claimSources = record.sources.filter((source) => !source.locationOnly);
   const hosts = new Set(
-    claimSources.map((source) => sourceHostname(source.url)).filter((host): host is string => !!host),
+    claimSources
+      .map((source) => sourceHostname(source.url))
+      .filter((host): host is string => !!host),
   );
   if (claimSources.length < 2 || hosts.size < 2) {
     reasons.add('insufficient_independent_source_hosts');

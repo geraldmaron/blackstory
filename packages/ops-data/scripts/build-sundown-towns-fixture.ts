@@ -55,9 +55,7 @@ function slug(value: string): string {
     .replace(/^_+|_+$/g, '');
 }
 
-const rows = Object.values(
-  JSON.parse(readFileSync(SOURCE, 'utf8')) as Record<string, ResearchRow>,
-);
+const rows = Object.values(JSON.parse(readFileSync(SOURCE, 'utf8')) as Record<string, ResearchRow>);
 
 const seen = new Set<string>();
 const candidates: BulkFixtureCandidate[] = rows.map((row) => {

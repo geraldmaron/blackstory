@@ -103,10 +103,7 @@ test('fixture SPARQL responses parse for person and NRHP strategies', () => {
     'occupationLabel',
   ]);
   assert.equal(personFixture.results.bindings.length, 2);
-  assert.equal(
-    personFixture.results.bindings[0]?.personLabel?.value,
-    'Rosa Parks',
-  );
+  assert.equal(personFixture.results.bindings[0]?.personLabel?.value, 'Rosa Parks');
 
   const nrhpFixture = parseWikidataSparqlFixture(
     loadFixtureJson('place-nrhp-linked-sparql-response.v1.json'),

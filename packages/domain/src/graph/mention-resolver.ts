@@ -60,14 +60,16 @@ function loadMentionOverrides(): ReadonlyMap<string, string> {
 export const MENTION_OVERRIDES: ReadonlyMap<string, string> = loadMentionOverrides();
 
 function normalizeName(value: string): string {
-  return value
-    // `[^()]*`, not `[^)]*`: the latter also matches '(', so a run of them backtracks.
-    .replace(/\([^()]*\)/g, ' ') // drop parenthetical asides (e.g. an acronym suffix) for name matching.
-    .toLowerCase()
-    .replace(/[-_]/g, ' ')
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+  return (
+    value
+      // `[^()]*`, not `[^)]*`: the latter also matches '(', so a run of them backtracks.
+      .replace(/\([^()]*\)/g, ' ') // drop parenthetical asides (e.g. an acronym suffix) for name matching.
+      .toLowerCase()
+      .replace(/[-_]/g, ' ')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+  );
 }
 
 function normalizeToken(value: string): string {

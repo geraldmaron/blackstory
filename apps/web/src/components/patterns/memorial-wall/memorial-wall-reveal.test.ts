@@ -46,7 +46,11 @@ test('message lines appear in order at their scheduled times and hold permanentl
     assert.equal(atTime.messageLinesShown[i], true, `line ${i} should be shown at ${time}ms`);
 
     const justBefore = computeMemorialRevealState(time - 1);
-    assert.equal(justBefore.messageLinesShown[i], false, `line ${i} should not show before ${time}ms`);
+    assert.equal(
+      justBefore.messageLinesShown[i],
+      false,
+      `line ${i} should not show before ${time}ms`,
+    );
   }
 
   // Once shown, a line must never revert as elapsed time only moves forward.

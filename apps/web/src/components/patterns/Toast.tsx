@@ -7,10 +7,11 @@
  */
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { cx } from '@repo/ui';
 import {
   dismissToast,
+  latestActionableToast,
   pushToast,
   toastDurationMs,
   type ToastAction,
@@ -37,7 +38,11 @@ function ToastRow({ toast, onDismiss }: { toast: ToastSpec; onDismiss: (id: stri
   );
 
   useEffect(() => {
-    const timer = setTimeout(dismiss, toastDurationMs(toast));
+    const duration = toastDurationMs(toast);
+    // Null means this toast carries an action and waits for the reader. No timer is started at
+    // all, rather than a very long one: a long timer is still a deadline, just a hidden one.
+    if (duration === null) return;
+    const timer = setTimeout(dismiss, duration);
     return () => clearTimeout(timer);
   }, [dismiss, toast]);
 
@@ -79,6 +84,8 @@ export type UseToasts = {
   readonly toasts: readonly ToastSpec[];
   readonly show: (toast: ToastSpec) => void;
   readonly dismiss: (id: string) => void;
+  /** Runs the newest actionable toast's action and dismisses it. No-op when there is none. */
+  readonly runLatestAction: () => void;
 };
 
 /** Owns the toast stack for a surface. One per surface — toasts are not a global singleton. */
@@ -95,5 +102,26 @@ export function useToasts(): UseToasts {
     setToasts((current) => dismissToast(current, id));
   }, []);
 
-  return { toasts, show, dismiss };
+  /**
+   * The keyboard route to an action toast.
+   *
+   * Persisting the toast is only half of it: a toast that waits forever but can only be reached by
+   * pointing at a small button in the corner still excludes the readers the persistence was for.
+   *
+   * Reads the stack through a ref rather than from inside a `setToasts` updater. React may invoke
+   * an updater more than once, and `action.run()` is a side effect — undoing twice is worse than
+   * not undoing at all. The ref also keeps this callback referentially stable for callers that
+   * list it in a dependency array.
+   */
+  const toastsRef = useRef(toasts);
+  toastsRef.current = toasts;
+
+  const runLatestAction = useCallback(() => {
+    const toast = latestActionableToast(toastsRef.current);
+    if (!toast?.action) return;
+    toast.action.run();
+    dismiss(toast.id);
+  }, [dismiss]);
+
+  return { toasts, show, dismiss, runLatestAction };
 }

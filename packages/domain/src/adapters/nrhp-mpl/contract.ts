@@ -49,7 +49,8 @@ export function createNrhpMplAdapterContract(
     volume: { expectedRecordsPerRun: 25, countToleranceFraction: 0.35 },
     geographicCoverage: {
       countries: ['US'],
-      notes: 'U.S. NRHP Multiple Property Documentation Forms filtered to African American heritage themes',
+      notes:
+        'U.S. NRHP Multiple Property Documentation Forms filtered to African American heritage themes',
     },
     expectedSchemaVersion: ADAPTER_CANDIDATE_SCHEMA_VERSION,
     canarySampleFraction: 0.1,
