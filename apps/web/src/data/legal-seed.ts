@@ -371,6 +371,8 @@ export const SEED_LEGAL_CATALOG: readonly LegalCatalogEntry[] = [
       [
         'Before 1964, "Whites Only" signs were legal in much of the South. Black travelers could be turned away from motels and diners.',
         'The Act gave federal courts a direct tool to strike down segregation laws that states had kept for decades.',
+        "Title VI's funding leverage desegregated Southern hospitals and school districts in a few years — faster than a decade of case-by-case lawsuits after Brown.",
+        'Title VII became the main legal engine of Black economic advancement: in Griggs v. Duke Power Co. (1971) the Supreme Court read it to reach hiring practices that screen out Black applicants in effect, not just by intent.',
       ],
       [
         {
@@ -453,6 +455,8 @@ export const SEED_LEGAL_CATALOG: readonly LegalCatalogEntry[] = [
       [
         'School segregation was the legal backbone of Jim Crow. Brown opened the door to the modern civil-rights movement.',
         'Many districts resisted for years; federal troops were sent to Little Rock Central High School in 1957.',
+        'Resistance ran deep: Prince Edward County, Virginia closed its entire public school system from 1959 to 1964 rather than integrate, leaving Black children without public schooling for five years.',
+        'Real desegregation barely moved until the Civil Rights Act of 1964 let the federal government cut funding to segregated districts; Southern school integration then rose sharply through the 1970s, though many districts have resegregated since.',
       ],
       [
         {
@@ -502,6 +506,8 @@ export const SEED_LEGAL_CATALOG: readonly LegalCatalogEntry[] = [
       [
         'States that had been under preclearance quickly passed new voting laws after Shelby County.',
         'Civil-rights groups argue the decision removed a key guardrail against voter suppression.',
+        'The effects were immediate: Texas announced enforcement of its previously blocked voter-ID law within hours of the decision, and North Carolina passed sweeping voting restrictions weeks later that a federal court struck down in 2016 for targeting Black voters "with almost surgical precision."',
+        'Formerly covered jurisdictions closed over a thousand polling places in the following years, and voters lost the advance-review protection that had blocked hundreds of discriminatory changes since 1965.',
       ],
       [
         {

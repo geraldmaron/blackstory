@@ -87,11 +87,17 @@ export function EntityRoomSections({
             The history here
           </h2>
           <div className="ds-room-prose">
-            <LinkedProse
-              text={entity.historicalContext}
-              skipEntityIds={[entity.id]}
-              catalog={entityLinkCatalog}
-            />
+            {entity.historicalContext
+              .split(/\n\s*\n/)
+              .filter((paragraph) => paragraph.trim().length > 0)
+              .map((paragraph, index) => (
+                <LinkedProse
+                  key={`context-${index}`}
+                  text={paragraph}
+                  skipEntityIds={[entity.id]}
+                  catalog={entityLinkCatalog}
+                />
+              ))}
           </div>
         </section>
       ) : null}
