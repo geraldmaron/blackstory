@@ -16,13 +16,13 @@
 import { queryPostgres } from './postgres-client.js';
 
 /**
- * `living_status` is a free-text column whose dominant value is `not_applicable` (3,623 of
- * 4,097 rows — every place, org, and event). The previous reader accepted only
- * living/deceased/unknown and returned undefined for everything else, so living status was
- * blank for 88% of the catalog. There is no `living` row in the table at all.
+ * Living status lives in the vocabulary module so client components can read it without pulling
+ * `pg` into the browser bundle; re-exported because callers of the query layer expect it here.
+ * The previous reader accepted only living/deceased/unknown and returned undefined for
+ * everything else, so living status was blank for 88% of the catalog.
  */
-export const LIVING_STATUSES = ['living', 'deceased', 'unknown', 'not_applicable'] as const;
-export type LivingStatus = (typeof LIVING_STATUSES)[number];
+export { LIVING_STATUSES, type LivingStatus } from './entity-vocabulary.js';
+import type { LivingStatus } from './entity-vocabulary.js';
 
 export type EntitySortKey = 'updated' | 'created' | 'name' | 'kind' | 'claims';
 export type MergeStateFilter = 'active' | 'absorbed' | 'all';

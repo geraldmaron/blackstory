@@ -7,7 +7,7 @@
     "build": "next build --webpack",
     "start": "next start --port 3001",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/surface.test.ts src/auth/server-authorization.test.ts src/auth/staff-permissions.test.ts src/lib/canonical-write.test.ts src/lib/postgres-client.test.ts src/auth/supabase-session.test.ts src/auth/request-auth.test.ts src/auth/protected-paths.test.ts src/stories/story-review-queue.test.ts src/ops/ops-summary.test.ts src/console/research-case-queue.test.ts src/cases/case-queue.test.ts src/console.test.ts src/catalog/catalog-decisions-store.test.ts src/lib/admin-data-source.test.ts src/lib/entity-query-params.test.ts",
+    "test": "node --conditions development --import tsx --test src/surface.test.ts src/auth/server-authorization.test.ts src/auth/staff-permissions.test.ts src/lib/canonical-write.test.ts src/lib/entity-edit.test.ts src/lib/postgres-client.test.ts src/auth/supabase-session.test.ts src/auth/request-auth.test.ts src/auth/protected-paths.test.ts src/stories/story-review-queue.test.ts src/ops/ops-summary.test.ts src/console/research-case-queue.test.ts src/cases/case-queue.test.ts src/console.test.ts src/catalog/catalog-decisions-store.test.ts src/lib/admin-data-source.test.ts src/lib/entity-query-params.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

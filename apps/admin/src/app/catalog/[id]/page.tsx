@@ -1,21 +1,29 @@
 /**
- * Canonical entity detail page — aliases, identifiers, locations, and claim count.
- * Auth is enforced by the catalog layout gate; APIs re-verify the ID token.
+ * Canonical entity detail — an editable record, not a read-only card.
+ *
+ * Server-rendered: the record, the operator's role, and whether that role may edit are all
+ * resolved before the first byte. The previous version was a client page that fetched a token,
+ * then fetched the entity, then rendered — and offered no way to fix anything it displayed, so
+ * corrections happened in ad hoc scripts with no audit trail.
+ *
+ * Edit affordances are hidden for roles without `canonical:write`, but that is presentation only:
+ * every save re-checks the role server-side in `commitCanonicalWrite`.
  */
-'use client';
-
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { useAdminAuth } from '../../../auth/AdminAuthProvider';
-import type { CatalogEntityDetail } from '../../../catalog/catalog-store';
+import { notFound } from 'next/navigation';
+import { SENSITIVITY_CLASSES } from '@repo/domain';
+import { readVerifiedAdminIdentity } from '../../../auth/supabase-server';
+import { staffRoleHasPermission } from '../../../auth/staff-permissions';
+import { readEntityDetail } from '../../../lib/entity-detail';
+import { readPostgresOrDegrade } from '../../../lib/postgres-client';
 import { formatLivingStatusLabel } from '../living-status-label';
+import { EntityRecordEditor } from './EntityRecordEditor';
 
 function formatWhen(iso: string): string {
   if (!iso) return '—';
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
-  return date.toLocaleString(undefined, {
+  return date.toLocaleString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -24,168 +32,163 @@ function formatWhen(iso: string): string {
   });
 }
 
-export default function CatalogEntityDetailPage() {
-  const params = useParams<{ id: string }>();
-  const entityId = params.id;
-  const { getIdToken, user } = useAdminAuth();
-  const [detail, setDetail] = useState<CatalogEntityDetail | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+export default async function CatalogEntityDetailPage({
+  params,
+}: {
+  readonly params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const entityId = decodeURIComponent(id);
 
-  const load = useCallback(async () => {
-    if (!entityId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const token = await getIdToken();
-      if (!token) {
-        setDetail(null);
-        return;
-      }
-      const response = await fetch(`/api/catalog/entities/${encodeURIComponent(entityId)}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const body = (await response.json()) as {
-        item?: CatalogEntityDetail;
-        error?: string;
-      };
-      if (!response.ok) {
-        throw new Error(body.error ?? `Load failed (${response.status})`);
-      }
-      setDetail(body.item ?? null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-      setDetail(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [entityId, getIdToken]);
+  const [identity, outcome] = await Promise.all([
+    readVerifiedAdminIdentity(),
+    readPostgresOrDegrade(() => readEntityDetail(entityId), 'entity detail'),
+  ]);
 
-  useEffect(() => {
-    if (user) void load();
-  }, [user, load]);
+  if (outcome.status === 'degraded') {
+    return (
+      <main className="story-review ds-container ds-page" id="main">
+        <h1 className="ds-page__title">{entityId}</h1>
+        <p className="story-review__alert" role="alert">
+          The catalog database did not answer, so this record could not be loaded. Reload to retry.{' '}
+          <span className="ds-mono">{outcome.reason}</span>
+        </p>
+        <p className="story-review__notice">
+          <Link href="/catalog">← Back to catalog</Link>
+        </p>
+      </main>
+    );
+  }
+
+  const entity = outcome.value;
+  if (!entity) notFound();
+
+  const canEdit = identity ? staffRoleHasPermission(identity.role, 'canonical:write') : false;
 
   return (
     <main className="story-review ds-container ds-page" id="main">
       <header className="story-review__header">
         <div>
           <p className="ds-page__eyebrow">Canonical catalog</p>
-          <h1 className="ds-page__title">{detail?.displayName ?? entityId}</h1>
+          <h1 className="ds-page__title">{entity.displayName}</h1>
           <p className="ds-page__lede">
-            Read-only canonical record — identifiers, aliases, and stored locations already in the
-            archive. Edits and promotion stay in research triage, not on this desk.
+            The canonical record itself. Edits here change what the archive holds; they do not
+            publish. The next release build reads canonical, and the signed manifest is still what
+            makes anything live.
           </p>
           <p className="story-review__notice">
             <Link href="/catalog">← Back to catalog</Link>
             {' · '}
             <Link href="/inbox">Open inbox</Link>
             {' · '}
-            <Link href="/cases">All cases</Link>
+            <Link href="/audit">Audit log</Link>
           </p>
         </div>
-        <button
-          type="button"
-          className="ds-button ds-button--secondary"
-          onClick={() => void load()}
-          disabled={loading}
-        >
-          {loading ? 'Refreshing…' : 'Refresh'}
-        </button>
       </header>
 
-      {error ? (
+      {entity.mergedIntoId ? (
         <p className="story-review__alert" role="alert">
-          {error}
+          This record was merged away. Edit{' '}
+          <Link href={`/catalog/${encodeURIComponent(entity.mergedIntoId)}`}>the survivor</Link>{' '}
+          instead — changes here will not reach the archive.
         </p>
       ) : null}
 
-      {loading && !detail ? (
-        <p className="ds-mono">Loading entity…</p>
-      ) : !detail ? (
-        <p className="ds-sans">
-          Entity not found. Confirm the id in <Link href="/catalog">Catalog</Link> or check whether
-          it is still pending in <Link href="/inbox">Inbox</Link>.
+      <section className="story-review__detail" aria-label="Record">
+        <p className="story-review__detail-meta ds-mono">
+          {entity.id} · {entity.kind}
+          {entity.entityClass ? ` · ${entity.entityClass}` : ''} ·{' '}
+          {formatLivingStatusLabel(entity.livingStatus)} · {entity.claimCount} claims · updated{' '}
+          {formatWhen(entity.updatedAt)}
         </p>
-      ) : (
-        <section className="story-review__detail" aria-label="Entity detail">
-          <p className="story-review__detail-meta ds-mono">
-            {detail.kind} · updated {formatWhen(detail.updatedAt)}
-            {detail.livingStatus ? ` · ${formatLivingStatusLabel(detail.livingStatus)}` : ''}
-            {detail.claimCount !== undefined ? ` · ${detail.claimCount} claims` : ''}
-          </p>
 
-          {detail.sensitivity && detail.sensitivity.length > 0 ? (
-            <p className="ds-sans">
-              Sensitivity: <span className="ds-mono">{detail.sensitivity.join(', ')}</span>
+        {canEdit ? (
+          <EntityRecordEditor entity={entity} sensitivityClasses={SENSITIVITY_CLASSES} />
+        ) : (
+          <>
+            <p className="story-review__notice ds-sans">
+              {identity
+                ? `Your role (${identity.role}) can read this record but not edit it. Editing canonical fields needs canonical:write.`
+                : 'Sign in to edit this record.'}
             </p>
-          ) : null}
 
-          <h2 className="ds-section__title">Identifiers</h2>
-          {detail.identifiers.length === 0 ? (
-            <p className="ds-sans">No identifiers recorded.</p>
-          ) : (
-            <ul className="story-review__anchors">
-              {detail.identifiers.map((identifier) => (
-                <li key={`${identifier.system}:${identifier.value}`}>
-                  <span className="ds-mono">{identifier.system}</span> — {identifier.value}
-                  {identifier.note ? ` (${identifier.note})` : ''}
-                </li>
-              ))}
-            </ul>
-          )}
+            <h2 className="ds-section__title">Aliases</h2>
+            {entity.aliases.length === 0 ? (
+              <p className="ds-sans">No aliases recorded.</p>
+            ) : (
+              <ul className="story-review__anchors">
+                {entity.aliases.map((alias) => (
+                  <li key={alias}>{alias}</li>
+                ))}
+              </ul>
+            )}
 
-          <h2 className="ds-section__title">Aliases</h2>
-          {detail.aliases.length === 0 ? (
-            <p className="ds-sans">No aliases recorded.</p>
-          ) : (
-            <ul className="story-review__anchors">
-              {detail.aliases.map((alias) => (
-                <li key={`${alias.kind ?? 'alias'}:${alias.value}`}>
-                  {alias.value}
-                  {alias.kind ? (
-                    <>
-                      {' '}
-                      · <span className="ds-mono">{alias.kind}</span>
-                    </>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          )}
+            <h2 className="ds-section__title">Sensitivity</h2>
+            {entity.sensitivity.length === 0 ? (
+              <p className="ds-sans">No sensitivity classes recorded.</p>
+            ) : (
+              <ul className="story-review__anchors">
+                {entity.sensitivity.map((entry) => (
+                  <li key={entry.class}>
+                    <span className="ds-mono">{entry.class}</span>
+                    {entry.source ? ` (${entry.source})` : ''}
+                  </li>
+                ))}
+              </ul>
+            )}
 
-          <h2 className="ds-section__title">Locations</h2>
-          {detail.locations.length === 0 ? (
-            <p className="ds-sans">No locations in subcollection.</p>
-          ) : (
-            <div className="story-review__table-wrap">
-              <table className="story-review__table">
-                <thead>
-                  <tr>
-                    <th scope="col">Label</th>
-                    <th scope="col">Precision</th>
-                    <th scope="col">Coordinates</th>
-                    <th scope="col">Id</th>
+            <h2 className="ds-section__title">Identifiers</h2>
+            {entity.identifiers.length === 0 ? (
+              <p className="ds-sans">No identifiers recorded.</p>
+            ) : (
+              <ul className="story-review__anchors">
+                {entity.identifiers.map((identifier) => (
+                  <li key={identifier.id}>
+                    <span className="ds-mono">{identifier.namespace}</span> — {identifier.value}
+                    {identifier.trusted ? ' · trusted' : ''}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        )}
+
+        <h2 className="ds-section__title">Locations</h2>
+        {entity.locations.length === 0 ? (
+          <p className="ds-sans">No locations recorded.</p>
+        ) : (
+          <div className="story-review__table-wrap">
+            <table className="story-review__table">
+              <thead>
+                <tr>
+                  <th scope="col">Label</th>
+                  <th scope="col">Role</th>
+                  <th scope="col">Precision</th>
+                  <th scope="col">Coordinates</th>
+                </tr>
+              </thead>
+              <tbody>
+                {entity.locations.map((location) => (
+                  <tr key={location.id}>
+                    <td>{location.label ?? '—'}</td>
+                    <td className="ds-mono">{location.role}</td>
+                    <td className="ds-mono">{location.precision ?? '—'}</td>
+                    <td className="ds-mono">
+                      {location.lat !== undefined && location.lng !== undefined
+                        ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`
+                        : '—'}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {detail.locations.map((location) => (
-                    <tr key={location.id}>
-                      <td>{location.label ?? '—'}</td>
-                      <td className="ds-mono">{location.precision ?? '—'}</td>
-                      <td className="ds-mono">
-                        {location.lat !== undefined && location.lng !== undefined
-                          ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`
-                          : '—'}
-                      </td>
-                      <td className="ds-mono">{location.id}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
-      )}
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <p className="entity-edit__hint ds-sans">
+          Locations are read-only here. Each row carries geometry, geohash, jurisdiction, and
+          validity fields that need a geocoding flow rather than a text box — tracked separately.
+        </p>
+      </section>
     </main>
   );
 }

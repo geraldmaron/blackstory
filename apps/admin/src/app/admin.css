@@ -687,3 +687,103 @@ body {
   justify-content: center;
   min-height: 2.75rem;
 }
+
+/* --------------------------------------------------------------------------
+   Entity record editor (catalog detail)
+   Each field is its own form, so the rhythm is: heading, inputs, save row.
+   -------------------------------------------------------------------------- */
+
+.entity-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.entity-edit__reason {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin-bottom: 0.5rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--ds-rule, #d7d0c4);
+  border-radius: var(--ds-radius-sm, 8px);
+  background: var(--ds-surface, #fbf8f2);
+}
+
+.entity-edit__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0 0 1.25rem;
+}
+
+.entity-edit__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.entity-edit__hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--ds-ink-subtle, #6d675f);
+}
+
+.entity-edit__ok {
+  font-size: 0.75rem;
+  color: var(--ds-ink-subtle, #6d675f);
+}
+
+.entity-edit__error {
+  font-family: var(--ds-font-sans), system-ui, sans-serif;
+  font-size: 0.875rem;
+  color: var(--ds-copper-text, #8e4f2a);
+}
+
+.entity-edit__checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--ds-rule, #d7d0c4);
+  border-radius: var(--ds-radius-sm, 8px);
+}
+
+.entity-edit__checks legend {
+  padding: 0 0.35rem;
+  font-family: var(--ds-font-mono), ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-ink-subtle, #6d675f);
+}
+
+.entity-edit__check {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--ds-font-sans), system-ui, sans-serif;
+  font-size: 0.9375rem;
+}
+
+.entity-edit__list {
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.entity-edit__list-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--ds-rule, #d7d0c4);
+}
+
+.entity-edit__list-row .entity-edit__form {
+  margin: 0;
+}
