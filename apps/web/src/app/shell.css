@@ -290,12 +290,6 @@
   outline-offset: 3px;
 }
 
-.ds-home-about__maker {
-  margin-top: var(--ds-space-10);
-  padding-top: var(--ds-space-6);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
 @media (min-width: 40rem) {
   .ds-shell-footer__columns {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -462,8 +456,7 @@
 }
 
 /* Serif italic accent register — one warm word inside a display headline. */
-.ds-page__title em,
-.ds-hero-stage__headline em {
+.ds-page__title em {
   font-family: var(--ds-font-editorial);
   font-style: italic;
   font-weight: 500;
@@ -694,940 +687,54 @@
   opacity: 0.7;
 }
 
-/* —— Home edition (v6) — the composition `/` used to be, before the Atlas took the route.
-   `.ds-home-hero` is no longer rendered by any component, so the four `.ds-shell:has(...)`
-   gates that keyed off it are gone; what is left below is the panel styling, retired with the
-   rest of the v6 home markup. ——  */
-.ds-home {
-  position: relative;
-  z-index: 1;
-  width: min(100% - (var(--ds-gutter) * 2), var(--ds-grid-max));
-  margin-inline: auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-5);
-  padding-block: 0 var(--ds-space-6);
-  /* Transparent — atmosphere ::before supplies canvas + grain; opaque fill here
-     made the hero copy color-mix scrim read as a solid cream slab. */
-  background: transparent;
-  --ds-home-panel-padding: var(--ds-space-8);
-  --ds-home-panel-padding-compact: var(--ds-space-6);
-}
-
-.ds-home > .ds-home-hero {
-  flex-shrink: 0;
-}
-
 /* —— Home hero — one Surface panel; copy left + live map readout right —— */
-.ds-home-hero {
-  pointer-events: none;
-  position: relative;
-  display: grid;
-  grid-template-columns: 46fr 54fr;
-  grid-template-rows: minmax(0, 1fr);
-  gap: 0;
-  align-items: stretch;
-  /* Transparent shell — MapStage insets to the full rounded panel (under copy +
-     map readout). Copy sits on a light matte scrim; map column is a pass-through. */
-  background: transparent;
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  overflow: hidden;
-  min-height: clamp(18rem, min(48vh, 28rem), 32rem);
-  height: auto;
-}
-
-.ds-home-hero::before {
-  /* Legibility scrim over the full-panel map (repo-pyyw): one continuous canvas-tinted
-     wash spanning the WHOLE hero, faded by a long horizontal mask ramp — opaque canvas
-     behind the copy column, gradually clearing over the map focus area. The mask fades
-     the flat color and the grain together, so no vertical seam/edge line exists at any
-     point. WCAG AA ink contrast holds on the left where copy sits. */
-  content: '';
-  grid-column: 1 / -1;
-  grid-row: 1;
-  z-index: 1;
-  pointer-events: none;
-  align-self: stretch;
-  justify-self: stretch;
-  min-width: 0;
-  /* Full-area coverage comes from align/justify-self: stretch alone. Never set
-     min-height: 100% here: on the stacked mobile grid this ::before spans the auto-sized
-     copy row, and WebKit resolves the percentage against the container it is inflating —
-     a layout feedback loop that grows the hero by thousands of px (the mobile "long black
-     gap before the map" on iOS Safari/Chrome). Blink happens not to loop, so Chrome looks
-     fine — test hero layout changes in WebKit. */
-  min-height: 0;
-  background-color: var(--ds-canvas);
-  background-image: var(--ds-edition-pattern-grain);
-  background-size: 256px 256px;
-  background-position: 0 0;
-  background-repeat: repeat;
-  opacity: 1;
-  transition: opacity var(--ds-duration-base) var(--ds-easing);
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    rgb(0 0 0) 0%,
-    rgb(0 0 0 / 0.96) 32%,
-    rgb(0 0 0 / 0.78) 44%,
-    rgb(0 0 0 / 0.52) 56%,
-    rgb(0 0 0 / 0.28) 68%,
-    rgb(0 0 0 / 0.1) 80%,
-    rgb(0 0 0 / 0) 94%
-  );
-  mask-image: linear-gradient(
-    90deg,
-    rgb(0 0 0) 0%,
-    rgb(0 0 0 / 0.96) 32%,
-    rgb(0 0 0 / 0.78) 44%,
-    rgb(0 0 0 / 0.52) 56%,
-    rgb(0 0 0 / 0.28) 68%,
-    rgb(0 0 0 / 0.1) 80%,
-    rgb(0 0 0 / 0) 94%
-  );
-}
-
-[data-theme='dark'] .ds-home-hero::before {
-  background-color: var(--ds-canvas);
-  background-image: var(--ds-edition-pattern-grain);
-}
 
 /* Engaged: the wash lifts with the cinematic scrim so the full-bleed interactive map
    is unobstructed (spec §5 Engaged behavior). */
-.ds-home-hero:has(.ds-map-scrim[data-cinematic-state='engaged'])::before {
-  opacity: 0;
-}
 
 /* ...and the hero frame itself dissolves with it. The plate is full-bleed while Engaged, so a
    bordered, centered panel still drawn over it reads as a window onto the map rather than a
    transition into it (the "the rest of the page is still there" defect). */
-.ds-home-hero:has(.ds-map-scrim[data-cinematic-state='engaged']) {
-  border-color: transparent;
-}
-
-.ds-home-hero:has(.ds-map-scrim[data-cinematic-state='engaged']) .ds-home-hero__map-readout {
-  opacity: 0;
-}
-
-.ds-home-hero,
-.ds-home-hero__map-readout {
-  transition:
-    opacity var(--ds-duration-base) var(--ds-easing),
-    border-color var(--ds-duration-base) var(--ds-easing);
-}
-
-.ds-home-hero__map {
-  grid-column: 2;
-  grid-row: 1;
-  z-index: 0;
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-  align-self: stretch;
-  background: transparent;
-  /* Transparent window — hits pass through to the repositioned MapStage plate. */
-  pointer-events: none;
-}
-
-.ds-home-hero__map-readout {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding: var(--ds-space-5) var(--ds-home-panel-padding, var(--ds-space-8))
-    var(--ds-home-panel-padding, var(--ds-space-8)) var(--ds-space-5);
-  min-height: inherit;
-  pointer-events: none;
-}
-
-.ds-home-hero__map-caption {
-  flex-shrink: 0;
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
-  text-align: center;
-}
-
-.ds-home-hero__copy {
-  grid-column: 1;
-  grid-row: 1;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  padding: var(--ds-home-panel-padding, var(--ds-space-8));
-  position: relative;
-  min-height: 0;
-  /* Transparent text layer — matte scrim + grain/grid live on `::before` so
-     map tiles read under the words. No blur/glow/gradient. */
-  background: transparent;
-  color: var(--ds-ink);
-  /* No border-right: the hero is one continuous map surface (repo-pyyw); legibility
-     comes from the `::before` gradient wash, never a hard column edge. */
-  /* Owns document scroll over the full-panel map; map-surfaces.css must keep this auto. */
-  pointer-events: auto;
-}
-
-[data-theme='dark'] .ds-home-hero__copy {
-  background: transparent;
-}
-
-.ds-home-hero__copy > * {
-  position: relative;
-  z-index: 1;
-}
-
-.ds-home-hero__kicker {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding-top: var(--ds-space-1);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
-}
-
-.ds-home-hero__kicker-tick {
-  width: 1.375rem;
-  height: 0.8125rem;
-  flex-shrink: 0;
-  color: var(--ds-accent-graphic);
-}
-
-.ds-home-hero__headline {
-  margin: var(--ds-space-4) 0 0;
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: clamp(1.875rem, 3.8vw, 2.625rem);
-  line-height: 1.08;
-  letter-spacing: -0.03em;
-  /* Wide enough for the nowrap trailer ("happened here.") on its own line;
-     subject morph stays above so wrap never splits mid-phrase. */
-  max-width: min(100%, 16ch);
-  color: var(--ds-ink);
-}
-
-.ds-home-hero__headline em {
-  font-family: var(--ds-font-editorial);
-  font-style: italic;
-  font-weight: 400;
-  color: var(--ds-accent);
-}
-
-.ds-home-hero__lede {
-  margin: var(--ds-space-4) 0 0;
-  font-family: var(--ds-font-editorial);
-  font-size: 1.0625rem;
-  line-height: 1.55;
-  /* Primary ink — muted Stone can fail AA on an open canvas bleed. */
-  color: var(--ds-ink);
-  max-width: 38ch;
-}
-
-.ds-home-hero__ctas {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.625rem 1rem;
-  margin-top: var(--ds-space-6);
-}
-
-.ds-home-hero__cta-quiet {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.75rem;
-  padding: 0.5rem 0;
-  border: 0;
-  background: transparent;
-  color: var(--ds-accent);
-  font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
-  font-weight: 500;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.ds-home-hero__cta-quiet:hover {
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
-}
-
-.ds-home-hero__scroll-cue {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  width: fit-content;
-  margin-top: 0.625rem;
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  color: var(--ds-ink-muted);
-  text-decoration: none;
-}
-
-.ds-home-hero__scroll-cue svg {
-  width: 0.875rem;
-  height: 0.875rem;
-  color: var(--ds-accent-graphic);
-}
-
-.ds-home-hero__micro-facts {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  border-top: var(--ds-border-width) solid var(--ds-border);
-  padding-top: var(--ds-space-4);
-  margin-top: var(--ds-space-6);
-}
-
-.ds-home-hero__micro-fact {
-  padding: 0 0.625rem;
-  border-right: var(--ds-border-width) solid var(--ds-border);
-}
-
-.ds-home-hero__micro-fact:first-child {
-  padding-left: 0;
-}
-
-.ds-home-hero__micro-fact:last-child {
-  border-right: 0;
-  padding-right: 0;
-}
-
-.ds-home-hero__micro-fact-value {
-  display: block;
-  font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--ds-ink);
-  font-variant-numeric: tabular-nums;
-  line-height: 1.2;
-}
-
-.ds-home-hero__micro-fact-label {
-  display: block;
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
-  margin-top: 0.125rem;
-}
 
 @media (max-width: 47.9375rem) {
-  .ds-home-hero {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto minmax(12rem, min(36svh, 16rem));
-    min-height: 0;
-  }
-
-  .ds-home-hero__map {
-    grid-column: 1;
-    grid-row: 2;
-    min-height: min(36svh, 16rem);
-  }
-
-  .ds-home-hero__map-readout {
-    min-height: inherit;
-    padding: var(--ds-space-5) var(--ds-home-panel-padding-compact, var(--ds-space-6));
-  }
 
   /* Stacked layout: copy sits above the map row, so the legibility ramp turns
      vertical — opaque behind the copy, fading down into the map. No border seam. */
-  .ds-home-hero::before {
-    grid-row: 1 / -1;
-    -webkit-mask-image: linear-gradient(
-      180deg,
-      rgb(0 0 0) 0%,
-      rgb(0 0 0 / 0.96) 40%,
-      rgb(0 0 0 / 0.6) 58%,
-      rgb(0 0 0 / 0.28) 74%,
-      rgb(0 0 0 / 0.1) 86%,
-      rgb(0 0 0 / 0) 100%
-    );
-    mask-image: linear-gradient(
-      180deg,
-      rgb(0 0 0) 0%,
-      rgb(0 0 0 / 0.96) 40%,
-      rgb(0 0 0 / 0.6) 58%,
-      rgb(0 0 0 / 0.28) 74%,
-      rgb(0 0 0 / 0.1) 86%,
-      rgb(0 0 0 / 0) 100%
-    );
-  }
-
-  .ds-home-hero__copy {
-    padding: var(--ds-home-panel-padding-compact, var(--ds-space-6));
-  }
-
-  .ds-home-hero__micro-facts {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-
-  .ds-home-hero__micro-fact {
-    border-right: 0;
-    border-bottom: var(--ds-border-width) solid var(--ds-border);
-    padding: 0 0 0.5rem;
-  }
-
-  .ds-home-hero__micro-fact:last-child {
-    border-bottom: 0;
-    padding-bottom: 0;
-  }
-}
-
-/* —— Hero — cinema over the live plate. Typography floats on the map;
-   a bottom scrim earns the contrast; the timeline instrument closes the
-   frame. Text + scrim follow [data-theme] with the map plate. The scrim is
-   a map-plate treatment (v5 §4 note), not page UI. Legacy cinema hero only
-   (home edition uses `.ds-home-hero` above). ——  */
-.ds-hero-stage:not(.ds-home-hero) {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  height: 100svh;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 0 clamp(1rem, 5vw, 4rem) clamp(1rem, 3.5vh, 2.5rem);
-  /* Pass-through hit regions + interactive carve-outs live in map-surfaces.css. */
 }
 
 /* Legibility scrim: bottom fades to canvas so theme ink clears WCAG on top
    of whatever the camera shows. Decorative only — never captures input. */
-.ds-hero-stage:not(.ds-home-hero)::before {
-  content: '';
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 72%;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    color-mix(in srgb, var(--ds-canvas) 40%, transparent) 35%,
-    color-mix(in srgb, var(--ds-canvas) 78%, transparent) 70%,
-    color-mix(in srgb, var(--ds-canvas) 92%, transparent) 100%
-  );
-  pointer-events: none;
-  z-index: -1;
-}
-
-.ds-hero-stage__kicker {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-3);
-  color: var(--ds-accent);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  animation: ds-rise var(--ds-duration-slow) var(--ds-easing) both;
-}
-
-.ds-hero-stage__kicker::before {
-  content: '';
-  width: 1.75rem;
-  height: 2px;
-  background: var(--ds-accent-graphic);
-}
-
-.ds-hero-stage__headline {
-  margin: var(--ds-space-4) 0 0;
-  /* Wide enough for the nowrap trailer ("happened here.") on its own line;
-     subject morph stays above so wrap never splits mid-phrase. */
-  max-width: min(100%, 16ch);
-  color: var(--ds-ink);
-  font-family: var(--ds-font-display);
-  font-weight: 500;
-  font-size: clamp(2.25rem, 1.6rem + 3.5vw, 4.5rem);
-  letter-spacing: -0.04em;
-  line-height: 1.02;
-  animation: ds-rise var(--ds-duration-slow) var(--ds-easing) 0.06s both;
-}
 
 /* Hero subject morph — History → His Story → … → Black Story.
    Flat matte only: opacity + width. Prefix slot width is JS-interpolated so
    Story slides with the crossfade; the S never scales (baseline stays put). */
-.ds-hero-headline-morph {
-  --ds-hero-morph-ease: cubic-bezier(0.4, 0, 0.2, 1);
-  display: inline-flex;
-  align-items: baseline;
-  flex-wrap: nowrap;
-}
-
-.ds-hero-headline-morph__prefix {
-  position: relative;
-  display: inline-block;
-  vertical-align: baseline;
-  white-space: nowrap;
-  overflow-x: clip;
-  overflow-y: visible;
-  box-sizing: content-box;
-}
-
-.ds-hero-headline-morph__prefix-out {
-  position: absolute;
-  inset: 0 auto auto 0;
-  white-space: nowrap;
-  pointer-events: none;
-  animation: ds-hero-prefix-out var(--ds-hero-prefix-ms, 1100ms) var(--ds-hero-morph-ease) both;
-}
-
-.ds-hero-headline-morph__prefix-in {
-  display: inline-block;
-  white-space: nowrap;
-  vertical-align: baseline;
-}
-
-.ds-hero-headline-morph__prefix-out + .ds-hero-headline-morph__prefix-in {
-  animation: ds-hero-prefix-in var(--ds-hero-prefix-ms, 1100ms) var(--ds-hero-morph-ease) both;
-}
-
-.ds-hero-headline-morph__gap {
-  display: inline-block;
-  width: 0;
-  flex: 0 0 auto;
-  transition: width var(--ds-hero-split-ms, 1500ms) var(--ds-hero-morph-ease);
-}
-
-.ds-hero-headline-morph[data-split='true'] .ds-hero-headline-morph__gap {
-  width: 0.28em;
-}
 
 /* Clip-slot opens; the S glyph itself never scales or reflows off the baseline. */
-.ds-hero-headline-morph__s-slot {
-  display: inline-block;
-  overflow: hidden;
-  width: 0;
-  flex: 0 0 auto;
-  vertical-align: baseline;
-  transition: width var(--ds-hero-split-ms, 1500ms) var(--ds-hero-morph-ease);
-}
-
-.ds-hero-headline-morph[data-split='true'] .ds-hero-headline-morph__s-slot {
-  width: 0.72em;
-}
-
-.ds-hero-headline-morph__s {
-  display: inline-block;
-  opacity: 0;
-  text-transform: uppercase;
-  line-height: inherit;
-  vertical-align: baseline;
-  transition: opacity var(--ds-hero-split-ms, 1500ms) var(--ds-hero-morph-ease);
-}
-
-.ds-hero-headline-morph[data-split='true'] .ds-hero-headline-morph__s {
-  opacity: 1;
-}
-
-.ds-hero-headline-morph__story {
-  display: inline-flex;
-  align-items: baseline;
-  flex: 0 0 auto;
-}
-
-.ds-hero-headline-morph__tail {
-  display: inline-block;
-  line-height: inherit;
-  vertical-align: baseline;
-}
 
 /* Own line + nowrap: phrase stays intact; morph width changes never yank
    "happened" onto the subject line or orphan "here." */
-.ds-hero-headline-morph__trailer {
-  display: block;
-  white-space: nowrap;
-  color: inherit;
-}
-
-@keyframes ds-hero-prefix-out {
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes ds-hero-prefix-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-.ds-hero-stage__support {
-  margin: var(--ds-space-5) 0 0;
-  max-width: 28rem;
-  color: var(--ds-ink);
-  font-family: var(--ds-font-editorial);
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  animation: ds-rise var(--ds-duration-slow) var(--ds-easing) 0.12s both;
-}
-
-.ds-hero-stage__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-3);
-  margin-top: var(--ds-space-6);
-  animation: ds-rise var(--ds-duration-slow) var(--ds-easing) 0.18s both;
-}
-
-.ds-hero-stage__count {
-  margin: var(--ds-space-4) 0 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-}
 
 /* —— The timeline instrument — decades in motion, newest → oldest.
    A full-width rail of decade ticks along the hero's lower edge: passed
    decades burn copper, the live decade reads large, and every tick is a
    44px target that jumps the archive to that decade. ——  */
-.ds-hero-timeline {
-  width: 100%;
-  margin-top: var(--ds-space-6);
-  animation: ds-rise var(--ds-duration-slow) var(--ds-easing) 0.24s both;
-}
-
-.ds-hero-timeline__head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--ds-space-4);
-}
-
-.ds-hero-timeline__readout {
-  display: grid;
-  gap: 0.125rem;
-}
-
-.ds-hero-timeline__decade {
-  margin: 0;
-  color: var(--ds-ink);
-  font-family: var(--ds-font-mono);
-  font-size: clamp(2rem, 1.5rem + 2.4vw, 3.25rem);
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.01em;
-  font-variant-numeric: tabular-nums;
-}
-
-.ds-hero-timeline__note {
-  margin: 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-}
 
 /* Play/pause — a circular instrument key. */
-.ds-hero-timeline__toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  flex: 0 0 auto;
-  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-ink) 38%, transparent);
-  border-radius: var(--ds-radius-full);
-  background: color-mix(in srgb, var(--ds-canvas) 55%, transparent);
-  color: var(--ds-ink);
-  cursor: pointer;
-  transition:
-    border-color var(--ds-duration-fast) var(--ds-easing),
-    background-color var(--ds-duration-fast) var(--ds-easing);
-}
-
-.ds-hero-timeline__toggle:hover {
-  border-color: var(--ds-ink);
-  background: color-mix(in srgb, var(--ds-ink) 10%, transparent);
-}
-
-.ds-hero-timeline__toggle svg {
-  width: 1rem;
-  height: 1rem;
-  fill: currentColor;
-}
-
-.ds-hero-timeline__rail {
-  display: flex;
-  align-items: flex-end;
-  gap: 0;
-  margin-top: var(--ds-space-3);
-}
 
 /* Each decade is one tick: a hairline that grows and burns copper as the
    archive reaches it. The whole column is the touch target. */
-.ds-hero-timeline__tick {
-  position: relative;
-  flex: 1 1 0;
-  min-width: 0;
-  height: 2.75rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: stretch;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-}
-
-.ds-hero-timeline__tick::after {
-  content: '';
-  display: block;
-  height: 3px;
-  margin-inline: 1px;
-  border-radius: 2px;
-  background: color-mix(in srgb, var(--ds-ink) 22%, transparent);
-  transition:
-    background-color var(--ds-duration-fast) var(--ds-easing),
-    height var(--ds-duration-fast) var(--ds-easing);
-}
-
-.ds-hero-timeline__tick:hover::after {
-  background: color-mix(in srgb, var(--ds-ink) 55%, transparent);
-}
-
-.ds-hero-timeline__tick.is-passed::after {
-  background: color-mix(in srgb, var(--ds-accent-graphic) 72%, transparent);
-}
-
-.ds-hero-timeline__tick.is-current::after {
-  height: 10px;
-  background: var(--ds-accent-graphic);
-}
-
-.ds-hero-timeline__tick-label {
-  margin-bottom: var(--ds-space-1);
-  color: color-mix(in srgb, var(--ds-ink-muted) 80%, transparent);
-  font-family: var(--ds-font-mono);
-  font-size: 0.5625rem;
-  letter-spacing: 0.04em;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.ds-hero-timeline__tick.is-current .ds-hero-timeline__tick-label {
-  color: var(--ds-accent);
-}
 
 @media (max-width: 47.9375rem) {
-  .ds-hero-stage:not(.ds-home-hero) {
-    /* Full viewport — a shorter hero left a map strip that stole scroll. */
-    height: 100svh;
-  }
 
   /* Dense scrim: pins and state labels must not punch through ink on small screens. */
-  .ds-hero-stage:not(.ds-home-hero)::before {
-    height: 90%;
-    background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      color-mix(in srgb, var(--ds-canvas) 55%, transparent) 16%,
-      color-mix(in srgb, var(--ds-canvas) 90%, transparent) 42%,
-      color-mix(in srgb, var(--ds-canvas) 97%, transparent) 100%
-    );
-  }
-
-  .ds-hero-timeline__head {
-    padding: var(--ds-space-3) var(--ds-space-4);
-    margin-inline: calc(-1 * var(--ds-space-4));
-    border-radius: var(--ds-radius-sm);
-    background: color-mix(in srgb, var(--ds-canvas) 90%, transparent);
-  }
-
-  .ds-hero-stage__actions {
-    width: 100%;
-  }
-
-  .ds-hero-stage__actions .ds-cta {
-    flex: 1 1 auto;
-  }
 
   /* Mobile rail: labels off (the readout carries the decade), ticks stay
      44px-tall touch targets. */
-  .ds-hero-timeline__tick-label {
-    display: none;
-  }
 }
 
 /* —— Home About —— product thesis + quiet place orientation —— */
-.ds-home-about__intro {
-  max-width: 40rem;
-}
-
-.ds-home-about__title {
-  font-size: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
-}
-
-.ds-home-about__lede {
-  margin-top: var(--ds-space-5);
-  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
-}
-
-.ds-home-about__pillars {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
-  margin: var(--ds-space-10) 0 0;
-  padding: 0;
-  list-style: none;
-  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
-}
-
-@media (min-width: 48rem) {
-  .ds-home-about__pillars {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.ds-home-about__pillar {
-  display: grid;
-  gap: var(--ds-space-3);
-  align-content: start;
-  padding: var(--ds-space-6) var(--ds-space-6) var(--ds-space-6) 0;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-@media (min-width: 48rem) {
-  .ds-home-about__pillar {
-    padding: var(--ds-space-6) var(--ds-space-6) var(--ds-space-8) 0;
-    border-bottom: 0;
-    border-right: var(--ds-border-width) solid var(--ds-rule);
-  }
-
-  .ds-home-about__pillar:last-child {
-    border-right: 0;
-    padding-right: 0;
-  }
-}
-
-.ds-home-about__pillar-index {
-  margin: 0;
-  color: var(--ds-accent);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-}
-
-.ds-home-about__pillar-kicker {
-  margin: 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.ds-home-about__pillar-title {
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.375rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  color: var(--ds-ink);
-}
-
-.ds-home-about__pillar-body {
-  margin: 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-editorial);
-  font-size: 1rem;
-  line-height: 1.6;
-}
-
-.ds-home-about__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-3);
-  margin: var(--ds-space-10) 0 0;
-}
-
-.ds-home-about__orient {
-  display: grid;
-  gap: var(--ds-space-3);
-  margin: var(--ds-space-12) 0 0;
-  padding: var(--ds-space-8) 0 0;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-home-about__orient-kicker {
-  margin: 0;
-  color: var(--ds-accent);
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.ds-home-about__orient-lede {
-  margin: 0;
-  max-width: 36rem;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-editorial);
-  font-size: 1.0625rem;
-  line-height: 1.55;
-}
 
 /* —— Home data pulse —— archive strip + /data charts —— */
-.ds-home-data-pulse__viz {
-  display: grid;
-  gap: var(--ds-space-8);
-  margin-top: var(--ds-space-6);
-  min-width: 0;
-  max-width: 100%;
-}
-
-.ds-home-data-pulse__subhead {
-  margin: 0 0 var(--ds-space-4);
-  font-family: var(--ds-font-sans);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--ds-ink);
-}
-
-.ds-home-data-pulse__changes {
-  margin-top: var(--ds-space-2);
-}
-
-.ds-home-data-pulse__fallback {
-  margin: var(--ds-space-6) 0 0;
-  color: var(--ds-ink-muted);
-}
-
-.ds-home-data-pulse__cta {
-  margin: var(--ds-space-8) 0 0;
-}
-
-.ds-home-data-pulse .ds-data-strip {
-  margin-top: var(--ds-space-6);
-}
 
 /* —— State start (quiet orientation under About) —— */
 .ds-state-start {
@@ -1750,105 +857,11 @@
 }
 
 /* —— Home “How this works” — theme-aware section with methodology sketch —— */
-.ds-home-how__intro {
-  max-width: 40rem;
-}
-
-.ds-home-how__title {
-  font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
-}
-
-.ds-home-how__lede {
-  color: var(--ds-ink-muted);
-}
-
-.ds-home-how__compose {
-  display: grid;
-  gap: var(--ds-space-8);
-  margin-top: var(--ds-space-8);
-  align-items: start;
-}
-
-@media (min-width: 64rem) {
-  .ds-home-how__compose {
-    grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.85fr);
-    gap: var(--ds-space-8);
-  }
-}
-
-.ds-home-how__sketch {
-  min-width: 0;
-  max-width: 100%;
-  overflow: hidden;
-}
 
 /*
  * Sketch keeps ordinary --ds-* tokens so it flips with [data-theme] like
  * /methodology — no fixed-ink remapping and no forced cream plate.
  */
-.ds-home-how__sketch .ds-pipeline-sketch {
-  margin: 0;
-}
-
-.ds-home-how__sketch .ds-pipeline-sketch__svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-width: 100%;
-}
-
-.ds-home-how__points {
-  display: grid;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  min-width: 0;
-}
-
-.ds-home-how__point {
-  display: grid;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-4) 0;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-home-how__point:last-child {
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-home-how__point-index {
-  color: var(--ds-accent);
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-}
-
-.ds-home-how__point-title {
-  margin: 0;
-  color: var(--ds-ink);
-  font-family: var(--ds-font-display);
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.25;
-}
-
-.ds-home-how__point-body {
-  margin: 0;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-editorial);
-  font-size: 1rem;
-  line-height: 1.55;
-}
-
-.ds-home-how__cta {
-  margin-top: var(--ds-space-8);
-}
 
 /* —— Story rail — top-rule entries, never boxes ——  */
 .ds-story-rail {
@@ -2503,25 +1516,8 @@
   /* The page-root wrapper has no animation to suppress any more — it was deleted outright
      because its fill-mode left a transform that trapped the fixed plate. */
 
-  .ds-hero-stage__kicker,
-  .ds-hero-stage__headline,
-  .ds-home-hero__headline,
-  .ds-hero-stage__support,
-  .ds-hero-stage__actions,
-  .ds-hero-timeline,
   .ds-shell-nav--drawer,
   .ds-loading__bar {
-    animation: none;
-  }
-
-  .ds-hero-headline-morph__gap,
-  .ds-hero-headline-morph__s-slot,
-  .ds-hero-headline-morph__s {
-    transition: none;
-  }
-
-  .ds-hero-headline-morph__prefix-out,
-  .ds-hero-headline-morph__prefix-out + .ds-hero-headline-morph__prefix-in {
     animation: none;
   }
 }
@@ -2764,3 +1760,325 @@
   letter-spacing: 0.06em;
   line-height: 1.45;
 }
+
+/* —— The persistent map plate ——————————————————————————————————————————————————————
+   `.ds-map-stage` is `MapStage.tsx`'s sole canvas mount: one fixed, full-viewport plate that
+   outlives navigation (ADR-017). It used to be styled from the `(map)` route group's sheet,
+   which stopped reaching it the moment the provider was hoisted to the root shell — the plate
+   renders as a sibling of `.ds-shell`, not a descendant of the group's `.ds-map-surface`, so
+   every descendant rule and every inherited `--ds-explore-*` custom property silently stopped
+   applying. Plate geometry, the MapLibre chrome contract and the marker styling therefore live
+   here, in the sheet the root layout loads on every route.
+
+   Surface gating reads `data-surface`, never a marker class a route happens to render. The
+   attribute sits on the page-root wrapper and the plate is its sibling, so the hops below are
+   rooted at `<body>`, their nearest common ancestor. Rules keyed on `[data-results]` and
+   `[data-instruments]` are runtime panel state, not route identity, and stay on the stage's own
+   attributes. —— */
+/* The attribution safe-zone defaults live on the root, not on the plate. Declared on the plate
+   they would shadow the surface-level overrides below — a custom property set on an element
+   always beats one inherited into it, however specific the inherited rule's selector — and the
+   Instrument's attribution would never clear its floating panels. */
+:root {
+  --ds-map-attrib-bottom: var(--ds-space-3);
+  --ds-map-attrib-left: var(--ds-space-3);
+}
+
+.ds-map-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  height: 100dvh;
+  /* Pre-style-load flash — dark ocean by default; light theme matches Archive Paper. */
+  background: #080606;
+}
+
+/* The plate is viewport-fixed under every surface, so document scroll must end on opaque
+   chrome rather than trapped map glass. The Instrument renders no footer at all, so this
+   needs no surface gate. */
+.ds-shell-footer {
+  position: relative;
+  z-index: 1;
+}
+
+[data-theme='light'] .ds-map-stage {
+  background: #f4efe5;
+}
+
+/* MapLibre's own container (MapStage.tsx's `containerRef`) — never the plate above. MapLibre
+   stamps `maplibregl-map` (position: relative, from maplibre-gl.css) onto whatever element it's
+   given, so that class name must land here, one level in, not on the fixed plate. Memorial
+   names live inside the MapLibre style stack (ocean symbol layer under land fills), not as a
+   DOM sibling under this canvas. */
+.ds-map-stage__canvas {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  /* Isolate MapLibre stacking so canvas children cannot slip under chrome. */
+  isolation: isolate;
+}
+
+/* The stock zoom control re-dressed in the island language — ink glass, not white plastic.
+   Document surfaces keep it top-right; the Instrument parks zoom bottom-right so the records
+   rail never covers it (see the surface-gated rules below). */
+.ds-map-stage .maplibregl-ctrl-top-right {
+  top: calc(var(--ds-island-clearance) + var(--ds-space-3));
+}
+
+.ds-map-stage .maplibregl-ctrl-group {
+  border-radius: var(--ds-radius-full);
+  background: color-mix(in srgb, var(--ds-surface) 88%, transparent);
+  border: var(--ds-border-width) solid var(--ds-border);
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.ds-map-stage .maplibregl-ctrl-group button {
+  background: transparent;
+  border: 0;
+}
+
+.ds-map-stage .maplibregl-ctrl-group button + button {
+  border-top: var(--ds-border-width) solid var(--ds-border);
+}
+
+/* Compact OSM / OpenFreeMap attribution — bottom-left safe zone; flat matte island
+   matching zoom chrome. Links use theme ink on a raised surface for WCAG contrast. */
+.ds-map-stage .maplibregl-ctrl-bottom-left {
+  bottom: var(--ds-map-attrib-bottom);
+  left: var(--ds-map-attrib-left);
+  margin: 0;
+  z-index: 1;
+}
+
+.ds-map-stage .maplibregl-ctrl-attrib {
+  max-width: 16rem;
+  border-radius: var(--ds-radius-sm);
+  border: var(--ds-border-width) solid var(--ds-border);
+  background: color-mix(in srgb, var(--ds-surface) 92%, transparent);
+  box-shadow: none;
+  font-family: var(--ds-font-sans);
+  font-size: 0.625rem;
+  line-height: 1.35;
+  color: var(--ds-ink);
+}
+
+.ds-map-stage .maplibregl-ctrl-attrib.maplibregl-compact {
+  min-height: 1.75rem;
+  padding: 0;
+}
+
+.ds-map-stage .maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-button {
+  background: transparent;
+  color: var(--ds-ink-muted);
+}
+
+.ds-map-stage .maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-inner,
+.ds-map-stage .maplibregl-ctrl-attrib:not(.maplibregl-compact) .maplibregl-ctrl-attrib-inner {
+  padding: var(--ds-space-1) var(--ds-space-2);
+  color: var(--ds-ink);
+}
+
+.ds-map-stage .maplibregl-ctrl-attrib a {
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.ds-map-stage .maplibregl-ctrl-attrib a:hover,
+.ds-map-stage .maplibregl-ctrl-attrib a:focus-visible {
+  color: var(--ds-accent);
+}
+
+.ds-map-stage .maplibregl-ctrl-attrib a:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+/* Recolor the +/− glyphs — paper on dark, ink on light. */
+.ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%23f4efe5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%23f4efe5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+[data-theme='light']
+  .ds-map-stage
+  .maplibregl-ctrl
+  button.maplibregl-ctrl-zoom-in
+  .maplibregl-ctrl-icon {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+[data-theme='light']
+  .ds-map-stage
+  .maplibregl-ctrl
+  button.maplibregl-ctrl-zoom-out
+  .maplibregl-ctrl-icon {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* Hero / non-explore: pinch-only on touch-scale — no +/- affordance to tap through.
+   Explore keeps zoom visible and repositions it into panel safe-zones below. */
+@media (max-width: 47.9375rem) {
+  body:not(:has([data-surface='instrument'])) .ds-map-stage .maplibregl-ctrl-top-right {
+    display: none;
+  }
+}
+
+/* Explore: bottom-right zoom, inset when the records sheet/rail is open. */
+body:has([data-surface='instrument']) {
+  --ds-explore-edge: var(--ds-space-4);
+  /* % of the fixed containing block (viewport) — avoid 100vw scrollbar gutter. */
+  --ds-explore-results-width: min(22.5rem, 92%);
+  --ds-explore-restore-chip-width: 6.5rem;
+  --ds-explore-zoom-right: var(--ds-explore-edge);
+  --ds-explore-zoom-bottom: var(--ds-explore-edge);
+  --ds-map-attrib-left: var(--ds-explore-edge);
+  --ds-map-attrib-bottom: var(--ds-explore-edge);
+}
+
+body:has([data-surface='instrument']) .ds-map-stage .maplibregl-ctrl-top-right {
+  top: auto;
+  right: var(--ds-explore-zoom-right);
+  bottom: var(--ds-explore-zoom-bottom);
+  display: block;
+}
+
+body:has(.ds-explore-stage[data-results='open']) {
+  --ds-explore-zoom-right: calc(
+    var(--ds-explore-edge) + var(--ds-explore-results-width) + var(--ds-space-3)
+  );
+}
+
+@media (max-width: 64rem) {
+  body:has([data-surface='instrument']) {
+    --ds-explore-results-width: min(22.5rem, 92%);
+  }
+
+  /* Records become a bottom sheet — park zoom above it, not beside a right rail. */
+  body:has(.ds-explore-stage[data-results='open']) {
+    --ds-explore-zoom-right: var(--ds-explore-edge);
+    --ds-explore-zoom-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
+    --ds-map-attrib-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
+  }
+
+  body:has(.ds-explore-stage[data-instruments='open']) {
+    --ds-explore-zoom-right: calc(
+      var(--ds-explore-edge) + var(--ds-explore-restore-chip-width) + var(--ds-space-2)
+    );
+    --ds-explore-zoom-bottom: calc(2.75rem + var(--ds-explore-edge) + var(--ds-space-2));
+    --ds-map-attrib-bottom: calc(2.75rem + var(--ds-explore-edge) + var(--ds-space-2));
+  }
+
+  body:has(.ds-explore-stage[data-instruments='open'][data-results='open']) {
+    --ds-explore-zoom-bottom: calc(
+      min(42vh, 22rem) + 2.75rem + var(--ds-explore-edge) + var(--ds-space-3)
+    );
+    --ds-map-attrib-bottom: calc(
+      min(42vh, 22rem) + 2.75rem + var(--ds-explore-edge) + var(--ds-space-3)
+    );
+  }
+}
+
+@media (max-width: 39.9375rem) {
+  body:has([data-surface='instrument']) {
+    --ds-explore-edge: var(--ds-space-3);
+    /* Width comes from left+right insets on the panel; keep a length for zoom math. */
+    --ds-explore-results-width: calc(100% - var(--ds-explore-edge) * 2);
+  }
+
+  body:has(.ds-explore-stage[data-results='open']) {
+    --ds-explore-zoom-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
+    --ds-map-attrib-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
+  }
+}
+
+/* Spotlight card as a bottom sheet must not cover zoom +/-. */
+@media (max-width: 64rem) {
+  body:has(.ds-explore-stage__spotlight[open]) {
+    --ds-explore-zoom-right: var(--ds-explore-edge);
+    --ds-explore-zoom-bottom: calc(
+      min(72svh, 36rem) + var(--ds-explore-edge) + var(--ds-space-3) + var(--ds-space-2)
+    );
+    --ds-map-attrib-bottom: calc(
+      min(72svh, 36rem) + var(--ds-explore-edge) + var(--ds-space-3) + var(--ds-space-2)
+    );
+  }
+}
+
+/* Kind-colored hit-target disc aligned with GL `explore-point` / KindBadge shade.
+   `--ds-map-entity-shade` is set per feature in MapStage.syncCircularMarkers from the same
+   `displayEncodingFor` hex carried on GeoJSON `properties.shade`. Fill opacity matches
+   ENTITY_POINT_FILL_OPACITY in explore-style.ts (52%). */
+.ds-map-entity-marker {
+  position: relative;
+  width: 1.125rem;
+  height: 1.125rem;
+  padding: 0;
+  border: 1.5px solid color-mix(in srgb, var(--ds-map-entity-shade, #b86b2a) 70%, #f4efe5);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ds-map-entity-shade, #b86b2a) 52%, transparent);
+  cursor: pointer;
+}
+
+/* Selected orientation ring — copper pulse; static when reduced-motion is preferred. */
+.ds-map-entity-marker--selected::after {
+  content: '';
+  position: absolute;
+  inset: -0.35rem;
+  border: 2px solid var(--ds-accent);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: ds-map-entity-selected-pulse 1.8s var(--ds-easing, ease-in-out) infinite;
+}
+
+@keyframes ds-map-entity-selected-pulse {
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+
+  55% {
+    opacity: 0.15;
+    transform: scale(1.55);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-map-entity-marker--selected::after {
+    animation: none;
+    opacity: 0.85;
+    transform: scale(1.2);
+  }
+}
+
+/* Place-search orientation pin — copper head + stem; not an entity hit target. */
+.ds-map-search-center-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 1.125rem;
+  pointer-events: none;
+}
+
+.ds-map-search-center-marker__head {
+  box-sizing: border-box;
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 2px solid var(--ds-canvas);
+  border-radius: 50%;
+  background: var(--ds-accent);
+}
+
+.ds-map-search-center-marker__stem {
+  width: 2px;
+  height: 0.625rem;
+  margin-top: -1px;
+  background: var(--ds-accent);
+}
+
