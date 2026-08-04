@@ -101,6 +101,7 @@ export type ReleaseSourceEntity = {
   readonly lng: number;
   readonly claims?: readonly ReleaseSourceClaim[];
   readonly historicalContext?: string;
+  readonly impactStatement?: string;
   readonly sensitivityClass?: string;
   readonly status?: string;
   readonly statusHistory?: readonly {
@@ -235,6 +236,7 @@ export type ReleaseEntityProjectionFields = {
   readonly notabilityBasis: readonly NotabilityBasisRecord[];
   readonly researchCoverage: ReleaseResearchCoverage;
   readonly historicalContext?: string;
+  readonly impactStatement?: string;
   /** Typed related entries from graph adjacency (or catalog bootstrap fallback). */
   readonly related?: readonly PublicRelatedEntry[];
   /** Real release-build-time timestamps (see module doc comment). */
@@ -702,6 +704,7 @@ export function resolveReleaseProjectionStatus(
     ...(entry.historicalContext !== undefined
       ? { historicalContext: entry.historicalContext }
       : {}),
+    ...(entry.impactStatement !== undefined ? { impactStatement: entry.impactStatement } : {}),
     ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
     ...(entry.claims !== undefined ? { claims: entry.claims } : {}),
     ...(entry.statusHistory !== undefined ? { statusHistory: entry.statusHistory as never } : {}),
@@ -856,6 +859,7 @@ export function buildReleaseEntityArtifacts(
     ...(entry.historicalContext !== undefined
       ? { historicalContext: entry.historicalContext }
       : {}),
+    ...(entry.impactStatement !== undefined ? { impactStatement: entry.impactStatement } : {}),
     ...(related.length > 0 ? { related } : {}),
     generatedAt: context.generatedAt,
     recordUpdatedAt: context.generatedAt,

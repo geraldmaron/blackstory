@@ -153,6 +153,12 @@ export const publicEntityProjectionSchema = z.object({
   keywords: z.array(z.string().min(1)).default([]),
   campaignIds: z.array(z.string().min(1)).default([]),
   historicalContext: z.string().min(1).optional(),
+  /**
+   * Explicit impact-on-Black-Americans statement (content-expectations spec: required for
+   * law/case kinds). Also woven into historicalContext prose; this field is the
+   * machine-checkable copy the audit evaluator reads.
+   */
+  impactStatement: z.string().min(1).optional(),
   extendedNarrative: z.string().min(1).optional(),
   primaryImage: z
     .object({
