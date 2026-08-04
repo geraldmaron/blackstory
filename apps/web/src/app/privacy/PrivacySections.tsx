@@ -3,6 +3,7 @@
  * rules, optional location, client integrity, corrections intake, and owner placeholders.
  */
 import React from 'react';
+import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import Link from 'next/link';
 import './privacy.css';
 
@@ -300,7 +301,7 @@ export function PrivacySections() {
           <p className="ds-section__lede">
             Material changes to this policy will be posted on this page with an updated date. For
             product questions or privacy requests, contact{' '}
-            <a href="mailto:me@geralddagher.com">me@geralddagher.com</a> or use the{' '}
+            <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> or use the{' '}
             <Link href="/support">support page</Link>.
           </p>
         </section>

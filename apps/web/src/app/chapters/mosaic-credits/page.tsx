@@ -7,11 +7,14 @@ import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { ATMOSPHERE_TILE_CREDITS } from '../../../components/atmosphere';
 import {
-  storiesEditionPanelClassName,
-  storiesEditionRootClassName,
-  storiesEditionStackClassName,
-} from './stories-panel-chrome';
-import './stories-edition.css';
+  DataTable,
+  GroupHeading,
+  OffRamp,
+  Prose,
+  Room,
+  RoomHeader,
+} from '../../../components/room';
+import '../../utility.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/chapters/mosaic-credits',
@@ -22,63 +25,48 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function MosaicCreditsPage() {
   return (
-    <div className={storiesEditionRootClassName()} data-stories-edition="v6">
-      <main className="ds-container ds-page" id="main">
-        <div className={storiesEditionStackClassName()}>
-          <article className={storiesEditionPanelClassName('intro')}>
-            <header className="ds-stories-edition__header">
-              <span className="ds-stories-edition__index" aria-hidden="true">
-                00
-              </span>
-              <div>
-                <p className="ds-stories-edition__kicker">Attribution</p>
-                <h1 className="ds-stories-edition__title">
-                  Archive mosaic <em>credits</em>
-                </h1>
-                <p className="ds-stories-edition__lede">
-                  Story pages may show a soft black-and-white mosaic in the page gutters. Those
-                  tiles are rights-cleared archive images, served from this site (never hotlinked
-                  from Wikimedia at request time). The mosaic is symbolic atmosphere, not a
-                  photograph of a page subject.
-                </p>
-              </div>
-            </header>
-          </article>
+    <Room>
+      <RoomHeader
+        pathname="/chapters/mosaic-credits"
+        kicker="Attribution"
+        title={
+          <>
+            Archive mosaic <em>credits</em>
+          </>
+        }
+        lede="Story pages may show a soft black-and-white mosaic in the page gutters. Those tiles are rights-cleared archive images, served from this site (never hotlinked from Wikimedia at request time). The mosaic is symbolic atmosphere, not a photograph of a page subject."
+      />
 
-          <article
-            className={storiesEditionPanelClassName('credits')}
-            aria-labelledby="tile-list-heading"
-          >
-            <p className="ds-stories-edition__panel-title">Tile pool</p>
-            <h2 className="ds-stories-edition__panel-heading" id="tile-list-heading">
-              {ATMOSPHERE_TILE_CREDITS.length} curated tiles
-            </h2>
-            <p className="ds-stories-edition__lede">
-              Each tile maps to a published entity primary image (GCS public-media). Rebuild the
-              local pool with the collage tile script when the Commons promote set changes.
-            </p>
-            <ol className="ds-story-mosaic-credits">
-              {ATMOSPHERE_TILE_CREDITS.map((tile) => (
-                <li key={tile.index} className="ds-story-mosaic-credits__item">
-                  <span className="ds-mono ds-story-mosaic-credits__index">{tile.index}</span>
-                  <div>
-                    <p className="ds-story-mosaic-credits__entity">
-                      <Link href={`/entity/${tile.entityId}`}>{tile.entityId}</Link>
-                    </p>
-                    <p className="ds-mono ds-story-mosaic-credits__path">{tile.path}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </article>
+      <GroupHeading>{ATMOSPHERE_TILE_CREDITS.length} curated tiles</GroupHeading>
+      <Prose>
+        <p>
+          Each tile maps to a published entity primary image (GCS public-media). Rebuild the local
+          pool with the collage tile script when the Commons promote set changes.
+        </p>
+      </Prose>
+      <DataTable
+        caption="Archive mosaic tile pool: index, source entity and stored path"
+        columns={[
+          { key: 'index', label: 'Tile', numeric: true },
+          { key: 'entity', label: 'Entity' },
+          { key: 'path', label: 'Path' },
+        ]}
+        rows={ATMOSPHERE_TILE_CREDITS.map((tile) => ({
+          index: tile.index,
+          entity: <Link href={`/entity/${tile.entityId}`}>{tile.entityId}</Link>,
+          path: <span className="ds-mono">{tile.path}</span>,
+        }))}
+      />
 
-          <p className="ds-stories-edition__footer">
-            <Link href="/chapters">All chapters</Link>
-            {' · '}
-            <Link href="/about">About</Link>
-          </p>
-        </div>
-      </main>
-    </div>
+      <OffRamp
+        title="Keep reading"
+        actions={[
+          { href: '/chapters', label: 'All chapters', emphasis: 'copper' },
+          { href: '/about', label: 'About the archive' },
+        ]}
+      >
+        These tiles are atmosphere. The chapters they sit behind are the account.
+      </OffRamp>
+    </Room>
   );
 }

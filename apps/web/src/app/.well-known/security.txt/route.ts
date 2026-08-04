@@ -6,8 +6,9 @@
  * so reports do not tie to an individual; move it there once that mailbox exists and set
  * SECURITY_TXT_CONTACT rather than editing this file again.
  */
+import { SECURITY_CONTACT } from '../../../lib/config/contact';
+
 const SITE_DOMAIN = 'blackstory.app';
-const SECURITY_CONTACT = process.env.SECURITY_TXT_CONTACT?.trim() || 'me@geralddagher.com';
 const EXPIRES_WINDOW_DAYS = 365;
 
 /** RFC 9116 requires an Expires field; this repo has no scheduler wired up yet (that is a
