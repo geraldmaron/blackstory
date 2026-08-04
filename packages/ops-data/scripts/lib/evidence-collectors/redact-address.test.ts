@@ -103,10 +103,7 @@ test('UTM and coordinate data are redacted', () => {
 
   for (const coords of cases) {
     const result = redactStreetAddresses(coords);
-    assert.ok(
-      result.text.includes(REDACTION_MARKER),
-      `Failed to redact coordinates: ${coords}`,
-    );
+    assert.ok(result.text.includes(REDACTION_MARKER), `Failed to redact coordinates: ${coords}`);
     assert.equal(result.redactionCount, 1, `Expected 1 redaction for: ${coords}`);
   }
 });
@@ -196,7 +193,11 @@ test('property described with compass direction and street type survives without
     to the south.`;
 
   const result = redactStreetAddresses(text);
-  assert.equal(result.redactionCount, 0, 'Bare street names without numbers should not be redacted');
+  assert.equal(
+    result.redactionCount,
+    0,
+    'Bare street names without numbers should not be redacted',
+  );
   assert.equal(result.text, text, 'Text should be unchanged');
 });
 
@@ -220,12 +221,7 @@ test('mixed content with addresses, coordinates, and bare street names handles e
 });
 
 test('house number followed by compass abbreviation and street name is redacted', () => {
-  const cases = [
-    '123 N. Main Street',
-    '456 S. Oak Ave',
-    '789 E. Pine Rd',
-    '321 W. Elm Dr.',
-  ];
+  const cases = ['123 N. Main Street', '456 S. Oak Ave', '789 E. Pine Rd', '321 W. Elm Dr.'];
 
   for (const address of cases) {
     const result = redactStreetAddresses(address);

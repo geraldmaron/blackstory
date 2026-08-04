@@ -169,6 +169,8 @@ export function buildNrhpListingFactObject(payload: {
  * Drives `notabilityBasis[0].note` once `buildReleaseNotabilityBasis` derives it from this claim
  * — distinct text from both the summary and the listing-fact claim object above.
  */
-export function buildNrhpSignificanceObject(payload: { readonly areaOfSignificance?: string }): string {
+export function buildNrhpSignificanceObject(payload: {
+  readonly areaOfSignificance?: string;
+}): string {
   return humanizeAreas(payload.areaOfSignificance);
 }

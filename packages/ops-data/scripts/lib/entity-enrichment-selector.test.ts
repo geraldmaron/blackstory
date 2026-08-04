@@ -60,7 +60,9 @@ test('selectEntitiesForEnrichment runs the built query and returns entity ids', 
   assert.deepEqual(calls[0]?.params, [14]);
 });
 
-const freshLedger = (overrides: Partial<EnrichmentLedgerSnapshot> = {}): EnrichmentLedgerSnapshot => ({
+const freshLedger = (
+  overrides: Partial<EnrichmentLedgerSnapshot> = {},
+): EnrichmentLedgerSnapshot => ({
   lastEnrichedAt: new Date().toISOString(),
   evidenceDigest: 'sha256:abc123',
   ...overrides,

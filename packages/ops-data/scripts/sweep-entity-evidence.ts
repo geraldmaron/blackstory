@@ -429,10 +429,7 @@ async function main(): Promise<void> {
 
   const generatedAt = new Date().toISOString();
   mkdirSync(REPORT_DIR, { recursive: true });
-  const reportPath = join(
-    REPORT_DIR,
-    `evidence-sweep-${generatedAt.replace(/[:.]/gu, '-')}.json`,
-  );
+  const reportPath = join(REPORT_DIR, `evidence-sweep-${generatedAt.replace(/[:.]/gu, '-')}.json`);
   writeFileSync(
     reportPath,
     JSON.stringify(
@@ -461,7 +458,9 @@ async function main(): Promise<void> {
   console.log(`Report written to ${reportPath}`);
 
   if (DRY_RUN || !APPLY) {
-    console.log('\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 EVIDENCE_SWEEP_APPLY=1 to apply.');
+    console.log(
+      '\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 EVIDENCE_SWEEP_APPLY=1 to apply.',
+    );
     await pool.end();
     return;
   }
@@ -541,7 +540,9 @@ async function main(): Promise<void> {
       );
     }
     await client.query('COMMIT');
-    console.log(`Applied: ${allEvidence.length} evidence row(s), ${outcomes.length} ledger row(s).`);
+    console.log(
+      `Applied: ${allEvidence.length} evidence row(s), ${outcomes.length} ledger row(s).`,
+    );
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
     throw error;

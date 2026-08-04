@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { measureTextQuality, scoreTextQuality, assessText, QUARANTINE_BELOW, MIN_USABLE_CHARS } from './text-quality.ts';
+import {
+  measureTextQuality,
+  scoreTextQuality,
+  assessText,
+  QUARANTINE_BELOW,
+  MIN_USABLE_CHARS,
+} from './text-quality.ts';
 
 test('measureTextQuality on empty string returns all zeros except orphanLetterRatio is 1', () => {
   const result = measureTextQuality('');
@@ -22,7 +28,8 @@ test('scoreTextQuality returns high score (>= 0.85) for clean English prose', ()
 
 test('measureTextQuality on shredded OCR text returns low signals', () => {
   // Realistic OCR damage: dropped characters, letter-by-letter, mixed text
-  const shredded = 'T h e b u i l d i n g w a s c o n s t r u c t e d i n 1 8 9 0 a n d r e p r e s e n t s^';
+  const shredded =
+    'T h e b u i l d i n g w a s c o n s t r u c t e d i n 1 8 9 0 a n d r e p r e s e n t s^';
   const result = measureTextQuality(shredded);
   // Mostly single letters and junk characters
   assert.ok(result.orphanLetterRatio > 0.5, 'shredded text should have high orphan letter ratio');
@@ -30,7 +37,8 @@ test('measureTextQuality on shredded OCR text returns low signals', () => {
 
 test('scoreTextQuality on shredded OCR text returns low score', () => {
   // Classic OCR shredding with mostly single letters and junk
-  const shredded = 't h e b u i l d i n g w a s c o n s t r u c t e d i n 1 8 9 0 a n d r e p r e s e n t s ^ $ % * ( ) @ # & ! * s c a t t e r e d';
+  const shredded =
+    't h e b u i l d i n g w a s c o n s t r u c t e d i n 1 8 9 0 a n d r e p r e s e n t s ^ $ % * ( ) @ # & ! * s c a t t e r e d';
   const signals = measureTextQuality(shredded);
   const score = scoreTextQuality(signals);
   assert.ok(score < 0.75, `Heavily shredded text should score relatively low, got ${score}`);
@@ -45,15 +53,25 @@ test('scoreTextQuality is reduced by very short mean word length (distance from 
   const shreddedScore = scoreTextQuality(shreddedSignals);
   const normalScore = scoreTextQuality(normalSignals);
   // Verify word length difference
-  assert.ok(shreddedSignals.meanWordLength < 2, 'shredded text should have very low mean word length');
-  assert.ok(normalSignals.meanWordLength > 4, 'normal text should have reasonable mean word length');
+  assert.ok(
+    shreddedSignals.meanWordLength < 2,
+    'shredded text should have very low mean word length',
+  );
+  assert.ok(
+    normalSignals.meanWordLength > 4,
+    'normal text should have reasonable mean word length',
+  );
   // Verify that very short words reduce score compared to normal
-  assert.ok(shreddedScore < normalScore, `Very short words should score lower; shredded=${shreddedScore}, normal=${normalScore}`);
+  assert.ok(
+    shreddedScore < normalScore,
+    `Very short words should score lower; shredded=${shreddedScore}, normal=${normalScore}`,
+  );
 });
 
 test('scoreTextQuality is reduced by very long mean word length (run-together text)', () => {
   // Run-together words without spaces - multiple tokens to make wordlikeRatio low
-  const runTogether = 'ThebuildinginGermantownrepresentsdistinctiveArchitecturalsignificance 123 456 789 0987654321';
+  const runTogether =
+    'ThebuildinginGermantownrepresentsdistinctiveArchitecturalsignificance 123 456 789 0987654321';
   const signals = measureTextQuality(runTogether);
   const score = scoreTextQuality(signals);
   // Mean word length is extremely long for wordlike tokens
@@ -70,7 +88,10 @@ test('assessText returns usable:false with reason mentioning "too short" when un
   assert.ok(shortText.length < MIN_USABLE_CHARS);
   const result = assessText(shortText);
   assert.equal(result.usable, false);
-  assert.ok(result.reason?.includes('too short'), `Expected reason to mention 'too short', got: ${result.reason}`);
+  assert.ok(
+    result.reason?.includes('too short'),
+    `Expected reason to mention 'too short', got: ${result.reason}`,
+  );
 });
 
 test('assessText returns usable:false with reason mentioning "ocr quality" when below QUARANTINE_BELOW and long enough', () => {
@@ -89,7 +110,10 @@ test('assessText returns usable:false with reason mentioning "ocr quality" when 
     assert.equal(result.usable, true);
   } else {
     assert.equal(result.usable, false);
-    assert.ok(result.reason?.includes('ocr quality'), `Expected reason to mention 'ocr quality', got: ${result.reason}`);
+    assert.ok(
+      result.reason?.includes('ocr quality'),
+      `Expected reason to mention 'ocr quality', got: ${result.reason}`,
+    );
   }
 });
 
@@ -149,6 +173,9 @@ test('assessText reason format includes score and threshold when OCR-damaged', (
   if (!result.usable) {
     assert.ok(result.reason?.includes('ocr quality'));
     // Reason should contain both score and threshold
-    assert.ok(result.reason?.includes(QUARANTINE_BELOW.toString()), `Reason should contain threshold ${QUARANTINE_BELOW}`);
+    assert.ok(
+      result.reason?.includes(QUARANTINE_BELOW.toString()),
+      `Reason should contain threshold ${QUARANTINE_BELOW}`,
+    );
   }
 });

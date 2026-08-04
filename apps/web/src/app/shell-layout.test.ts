@@ -252,8 +252,7 @@ describe('the plate is styled globally, not from the route group', () => {
     // an ancestor the containing block for a fixed descendant — the plate would then scroll
     // with the document instead of holding the viewport. `.ds-shell` and `body` are the only
     // ancestors the plate has, so no rule targeting either may declare one.
-    const trapping =
-      /(transform|filter|perspective|backdrop-filter|contain|will-change)\s*:/;
+    const trapping = /(transform|filter|perspective|backdrop-filter|contain|will-change)\s*:/;
     for (const selector of ['body', '.ds-shell']) {
       const pattern = new RegExp(
         `(^|\\n)${selector.replace('.', '\\.')}\\s*(:has\\([^)]*\\))?\\s*\\{([^}]*)\\}`,

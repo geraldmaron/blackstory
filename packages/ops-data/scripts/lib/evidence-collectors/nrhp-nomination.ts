@@ -39,18 +39,20 @@ export type NominationSection = {
  * pattern below can assume one space between tokens instead of `\s+` everywhere.
  */
 export function normalizeExtractedText(raw: string): string {
-  return raw
-    .replace(/\r/gu, '\n')
-    // U+00A0 (non-breaking), U+2007 (figure) and U+202F (narrow no-break) spaces all come
-    // out of PDF text extraction and are invisible in an editor; fold them to a plain
-    // space so the patterns below can assume ordinary whitespace.
-    .replace(/[\t\u{a0}\u{2007}\u{202f}]/gu, ' ')
-    // text extraction and are invisible in an editor; fold them to a plain space so the
-    // patterns below can assume ordinary whitespace.
-    .replace(/[\t\u{a0}\u{2007}\u{202f}]/gu, ' ')
-    .replace(/[ ]{2,}/gu, ' ')
-    .replace(/\n{3,}/gu, '\n\n')
-    .trim();
+  return (
+    raw
+      .replace(/\r/gu, '\n')
+      // U+00A0 (non-breaking), U+2007 (figure) and U+202F (narrow no-break) spaces all come
+      // out of PDF text extraction and are invisible in an editor; fold them to a plain
+      // space so the patterns below can assume ordinary whitespace.
+      .replace(/[\t\u{a0}\u{2007}\u{202f}]/gu, ' ')
+      // text extraction and are invisible in an editor; fold them to a plain space so the
+      // patterns below can assume ordinary whitespace.
+      .replace(/[\t\u{a0}\u{2007}\u{202f}]/gu, ' ')
+      .replace(/[ ]{2,}/gu, ' ')
+      .replace(/\n{3,}/gu, '\n\n')
+      .trim()
+  );
 }
 
 /**
@@ -200,9 +202,7 @@ const NARRATIVE_HEADINGS: readonly { readonly section: string; readonly pattern:
 /** A heading opening less than this much text is a form label, not the start of narrative. */
 const MIN_FALLBACK_SECTION_CHARS = 600;
 
-export function splitByNarrativeHeadings(
-  normalizedText: string,
-): readonly NominationSection[] {
+export function splitByNarrativeHeadings(normalizedText: string): readonly NominationSection[] {
   const starts = new Map<string, number[]>();
   for (const { section, pattern } of NARRATIVE_HEADINGS) {
     pattern.lastIndex = 0;
@@ -257,9 +257,9 @@ export function parseNomination(rawText: string, displayName: string): ParsedNom
   const normalized = normalizeExtractedText(rawText);
   const headerSections = splitNominationSections(normalized);
   const pick = (from: readonly NominationSection[]): readonly NominationSection[] =>
-    CAPTURED_SECTIONS.map((wanted) =>
-      from.find((section) => section.section === wanted),
-    ).filter((section): section is NominationSection => section !== undefined);
+    CAPTURED_SECTIONS.map((wanted) => from.find((section) => section.section === wanted)).filter(
+      (section): section is NominationSection => section !== undefined,
+    );
 
   // Prefer the section table; fall back to narrative headings when OCR destroyed it. 21 of the
   // first 100 forms swept had 18k-158k characters of perfectly good text and no readable

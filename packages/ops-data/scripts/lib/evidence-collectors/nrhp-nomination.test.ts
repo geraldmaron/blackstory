@@ -100,7 +100,10 @@ test('splitNominationSections concatenates multiple pages of the same section in
   const firstIdx = sections[0].text.indexOf('First');
   const secondIdx = sections[0].text.indexOf('Second');
   const thirdIdx = sections[0].text.indexOf('Third');
-  assert.ok(firstIdx < secondIdx && secondIdx < thirdIdx, 'paragraphs should remain in document order');
+  assert.ok(
+    firstIdx < secondIdx && secondIdx < thirdIdx,
+    'paragraphs should remain in document order',
+  );
 });
 
 test('splitNominationSections ignores bare digits in running prose', () => {
@@ -245,7 +248,11 @@ test('checkNominationIdentity sets nameMismatch true when place corroborates but
     county: 'dallas county',
   });
   assert.equal(result.placeCorroborated, true, 'place should corroborate');
-  assert.equal(result.nameMismatch, true, 'name mismatch should be true when place agrees but name does not');
+  assert.equal(
+    result.nameMismatch,
+    true,
+    'name mismatch should be true when place agrees but name does not',
+  );
 });
 
 test('checkNominationIdentity sets nameMismatch false when place does not corroborate', () => {
@@ -256,7 +263,11 @@ test('checkNominationIdentity sets nameMismatch false when place does not corrob
     county: 'cobb county',
   });
   assert.equal(result.placeCorroborated, false);
-  assert.equal(result.nameMismatch, false, 'nameMismatch is only meaningful when place corroborates');
+  assert.equal(
+    result.nameMismatch,
+    false,
+    'nameMismatch is only meaningful when place corroborates',
+  );
 });
 
 test('checkNominationIdentity ignores filing-inverted punctuation in name matching', () => {
@@ -287,8 +298,10 @@ test('checkNominationIdentity ignores generic tokens in name matching', () => {
 // Tests for splitByNarrativeHeadings fallback segmentation
 
 test('splitByNarrativeHeadings segments on 7. DESCRIPTION and 8. STATEMENT OF SIGNIFICANCE headings with realistic prose', () => {
-  const prose7 = 'The Mitchell House is a two-story brick dwelling constructed in 1892, featuring Romanesque Revival architectural elements including round-arched windows with decorative voussoirs and a prominent corner tower with pyramidal roof. The main facade is articulated by rusticated brick with contrasting bands of lighter stone. The structure served as a residence for prominent civic leaders throughout its history and represents a significant example of late nineteenth-century residential architecture in the county. Windows have been partially replaced but the original ornamental details remain intact on the main elevations. The building sits on a large lot with mature landscaping including several specimen trees dating to the original construction period. The stone foundation is laid in random rubble with lime mortar. The roof is covered with slate shingles and copper flashing.';
-  const prose8 = 'This property is historically significant as the residence of Governor Edward Mitchell, who served from 1901 to 1905 and was instrumental in establishing public education reform throughout the state. The building\'s architectural significance lies in its exemplary representation of Romanesque Revival design, a style popular among the wealthy elite during the 1890s. The construction techniques visible in the masonry represent the skilled craftsmanship of the period. Several important civic meetings took place within this building during the early twentieth century, making it a center of political activity in the region. The property has been well-maintained and retains most of its original character-defining features including the ornamental brickwork, original window casings, and decorative interior elements. Local historical records document significant events that occurred here.';
+  const prose7 =
+    'The Mitchell House is a two-story brick dwelling constructed in 1892, featuring Romanesque Revival architectural elements including round-arched windows with decorative voussoirs and a prominent corner tower with pyramidal roof. The main facade is articulated by rusticated brick with contrasting bands of lighter stone. The structure served as a residence for prominent civic leaders throughout its history and represents a significant example of late nineteenth-century residential architecture in the county. Windows have been partially replaced but the original ornamental details remain intact on the main elevations. The building sits on a large lot with mature landscaping including several specimen trees dating to the original construction period. The stone foundation is laid in random rubble with lime mortar. The roof is covered with slate shingles and copper flashing.';
+  const prose8 =
+    "This property is historically significant as the residence of Governor Edward Mitchell, who served from 1901 to 1905 and was instrumental in establishing public education reform throughout the state. The building's architectural significance lies in its exemplary representation of Romanesque Revival design, a style popular among the wealthy elite during the 1890s. The construction techniques visible in the masonry represent the skilled craftsmanship of the period. Several important civic meetings took place within this building during the early twentieth century, making it a center of political activity in the region. The property has been well-maintained and retains most of its original character-defining features including the ornamental brickwork, original window casings, and decorative interior elements. Local historical records document significant events that occurred here.";
   const text = normalizeExtractedText(`
     7. DESCRIPTION
     ${prose7}
@@ -305,9 +318,12 @@ test('splitByNarrativeHeadings segments on 7. DESCRIPTION and 8. STATEMENT OF SI
 });
 
 test('splitByNarrativeHeadings section 8 ends at following 9. MAJOR BIBLIOGRAPHICAL REFERENCES heading', () => {
-  const prose7 = 'The property consists of a large brick building with multiple stories, constructed in the early twentieth century. The facade features classical proportions with regularly spaced fenestration and decorative stone quoins at the corners. The building\'s structural system employs timber framing with brick infill, typical of the period. Multiple windows retain original wood casements and divided lights. The roof features slate covering with copper gutters and downspouts. The landscape setting includes mature elm and oak trees along the street front, contributing to the property\'s sense of place within the historic district. The property maintains structural integrity and good condition.';
-  const prose8 = 'This building served as an important commercial and civic center throughout the twentieth century. It was designed by a prominent regional architect and represents his mature style. The building hosted numerous cultural events and political gatherings that influenced the community\'s development. Its architectural significance lies in the refined classical details and high-quality materials used throughout. The interior spaces retain period fixtures including original lighting, hardware, and finishes. The building has been sympathetically maintained and continues to serve the community.';
-  const bibliography = 'Smith, John. Historic Architecture of the Region. 1995. County Records, 1901-1950.';
+  const prose7 =
+    "The property consists of a large brick building with multiple stories, constructed in the early twentieth century. The facade features classical proportions with regularly spaced fenestration and decorative stone quoins at the corners. The building's structural system employs timber framing with brick infill, typical of the period. Multiple windows retain original wood casements and divided lights. The roof features slate covering with copper gutters and downspouts. The landscape setting includes mature elm and oak trees along the street front, contributing to the property's sense of place within the historic district. The property maintains structural integrity and good condition.";
+  const prose8 =
+    "This building served as an important commercial and civic center throughout the twentieth century. It was designed by a prominent regional architect and represents his mature style. The building hosted numerous cultural events and political gatherings that influenced the community's development. Its architectural significance lies in the refined classical details and high-quality materials used throughout. The interior spaces retain period fixtures including original lighting, hardware, and finishes. The building has been sympathetically maintained and continues to serve the community.";
+  const bibliography =
+    'Smith, John. Historic Architecture of the Region. 1995. County Records, 1901-1950.';
 
   const text = normalizeExtractedText(`
     7. DESCRIPTION
@@ -320,14 +336,18 @@ test('splitByNarrativeHeadings section 8 ends at following 9. MAJOR BIBLIOGRAPHI
     ${bibliography}
   `);
   const sections = splitByNarrativeHeadings(text);
-  const section8 = sections.find(s => s.section === '8');
+  const section8 = sections.find((s) => s.section === '8');
   assert.ok(section8, 'section 8 should exist');
   assert.ok(section8!.text.includes('cultural events'), 'section 8 should include its prose');
-  assert.ok(!section8!.text.includes('County Records'), 'section 8 should NOT include section 9 bibliography text');
+  assert.ok(
+    !section8!.text.includes('County Records'),
+    'section 8 should NOT include section 9 bibliography text',
+  );
 });
 
 test('splitByNarrativeHeadings section 8 runs to end of document when there is no section 9 heading', () => {
-  const prose8 = 'This property gained significance through its role in the community development. It was constructed using techniques reflecting the building traditions of the era. The original builders were local craftspeople known for quality work. The building witnessed important historical events that shaped the region. Its architectural features demonstrate high standards of design and execution. The property remains in good condition and continues to serve the community.';
+  const prose8 =
+    'This property gained significance through its role in the community development. It was constructed using techniques reflecting the building traditions of the era. The original builders were local craftspeople known for quality work. The building witnessed important historical events that shaped the region. Its architectural features demonstrate high standards of design and execution. The property remains in good condition and continues to serve the community.';
 
   const text = normalizeExtractedText(`
     8. STATEMENT OF SIGNIFICANCE
@@ -335,15 +355,22 @@ test('splitByNarrativeHeadings section 8 runs to end of document when there is n
     Additional details about the building continue here with information about its construction quality and historical importance to the region.
   `);
   const sections = splitByNarrativeHeadings(text);
-  const section8 = sections.find(s => s.section === '8');
+  const section8 = sections.find((s) => s.section === '8');
   assert.ok(section8, 'section 8 should exist');
-  assert.ok(section8!.text.includes('significance'), 'section 8 text should include content up to end of document');
-  assert.ok(section8!.text.includes('continue here'), 'section 8 should include trailing text without a section 9 boundary');
+  assert.ok(
+    section8!.text.includes('significance'),
+    'section 8 text should include content up to end of document',
+  );
+  assert.ok(
+    section8!.text.includes('continue here'),
+    'section 8 should include trailing text without a section 9 boundary',
+  );
 });
 
 test('splitByNarrativeHeadings: the LAST occurrence of a heading wins, not the first', () => {
   const shortProse = 'A brief mention.';
-  const longProse = 'The property is significant for multiple reasons. It was designed by a renowned architect and constructed using innovative techniques for its period. The building exemplifies the architectural movement of the era through its proportions, massing, and decorative elements. Throughout its history it served important community functions. The structure maintains excellent integrity with most original features intact including windows, doors, interior details, and decorative treatments. Local historians have documented its significance through primary source research. The building continues to contribute to the character of its historic district.';
+  const longProse =
+    'The property is significant for multiple reasons. It was designed by a renowned architect and constructed using innovative techniques for its period. The building exemplifies the architectural movement of the era through its proportions, massing, and decorative elements. Throughout its history it served important community functions. The structure maintains excellent integrity with most original features intact including windows, doors, interior details, and decorative treatments. Local historians have documented its significance through primary source research. The building continues to contribute to the character of its historic district.';
 
   const text = normalizeExtractedText(`
     8. STATEMENT OF SIGNIFICANCE
@@ -355,14 +382,18 @@ test('splitByNarrativeHeadings: the LAST occurrence of a heading wins, not the f
     ${longProse}
   `);
   const sections = splitByNarrativeHeadings(text);
-  const section8 = sections.find(s => s.section === '8');
+  const section8 = sections.find((s) => s.section === '8');
   assert.ok(section8, 'section 8 should exist');
   assert.ok(!section8!.text.includes('brief mention'), 'should use LAST occurrence, not first');
-  assert.ok(section8!.text.includes('renowned architect'), 'should capture the long prose from the later occurrence');
+  assert.ok(
+    section8!.text.includes('renowned architect'),
+    'should capture the long prose from the later occurrence',
+  );
 });
 
 test('splitByNarrativeHeadings: a repeated same-numbered heading does not truncate the section', () => {
-  const prose2 = 'The continued description extends from the previous sheet. The property maintains a well-developed landscape setting with specimen trees and period-appropriate fencing. The foundation is laid in stone rubble with lime mortar, showing signs of age but remaining sound. The building\'s massing and proportions create a pleasing silhouette on the streetscape. Original window glass in the transom lights has survived, providing authentic character. The interior hearths retain original fireplace equipment and chimney details. The property exemplifies construction quality and thoughtful design of the period. Additional interior details include carved woodwork in the main parlor and period-appropriate wall coverings in the dining areas. The staircase features an ornamental newel post and turned balusters indicating high-quality joinery. Multiple fireplaces with original mantels and accessories survive throughout the structure.';
+  const prose2 =
+    "The continued description extends from the previous sheet. The property maintains a well-developed landscape setting with specimen trees and period-appropriate fencing. The foundation is laid in stone rubble with lime mortar, showing signs of age but remaining sound. The building's massing and proportions create a pleasing silhouette on the streetscape. Original window glass in the transom lights has survived, providing authentic character. The interior hearths retain original fireplace equipment and chimney details. The property exemplifies construction quality and thoughtful design of the period. Additional interior details include carved woodwork in the main parlor and period-appropriate wall coverings in the dining areas. The staircase features an ornamental newel post and turned balusters indicating high-quality joinery. Multiple fireplaces with original mantels and accessories survive throughout the structure.";
 
   const text = normalizeExtractedText(`
     8. STATEMENT OF SIGNIFICANCE
@@ -372,17 +403,20 @@ test('splitByNarrativeHeadings: a repeated same-numbered heading does not trunca
     ${prose2}
   `);
   const sections = splitByNarrativeHeadings(text);
-  const section8 = sections.find(s => s.section === '8');
+  const section8 = sections.find((s) => s.section === '8');
   assert.ok(section8, 'section 8 should exist');
   // When the same section heading appears multiple times (on continuation sheets), the code uses the LAST occurrence
   // and captures text following it, verifying no error occurs and content is extracted
-  assert.ok(section8!.text.includes('specimen trees'),
-    'should capture text from the last occurrence of heading 8');
+  assert.ok(
+    section8!.text.includes('specimen trees'),
+    'should capture text from the last occurrence of heading 8',
+  );
 });
 
 test('splitByNarrativeHeadings drops a heading opening fewer than 600 characters', () => {
   const tooShortProse = 'This is too short.';
-  const longProse = 'The property represents a significant example of regional architecture from the early twentieth century. It was designed and constructed using high-quality materials and skilled craftsmanship. The building\'s design demonstrates understanding of contemporary architectural principles and proportional systems. Throughout its operational history the property served important civic and social functions. The structural systems have proven durable and require minimal intervention. Original features including windows, doors, mantels, and hardware demonstrate the quality of the initial construction. The property contributes substantially to the character and continuity of the historic district.';
+  const longProse =
+    "The property represents a significant example of regional architecture from the early twentieth century. It was designed and constructed using high-quality materials and skilled craftsmanship. The building's design demonstrates understanding of contemporary architectural principles and proportional systems. Throughout its operational history the property served important civic and social functions. The structural systems have proven durable and require minimal intervention. Original features including windows, doors, mantels, and hardware demonstrate the quality of the initial construction. The property contributes substantially to the character and continuity of the historic district.";
 
   const text = normalizeExtractedText(`
     7. DESCRIPTION
@@ -392,15 +426,17 @@ test('splitByNarrativeHeadings drops a heading opening fewer than 600 characters
     ${longProse}
   `);
   const sections = splitByNarrativeHeadings(text);
-  const section7 = sections.find(s => s.section === '7');
-  const section8 = sections.find(s => s.section === '8');
+  const section7 = sections.find((s) => s.section === '7');
+  const section8 = sections.find((s) => s.section === '8');
   assert.equal(section7, undefined, 'section 7 should be dropped because it has insufficient text');
   assert.ok(section8, 'section 8 should exist because it has sufficient text');
 });
 
 test('splitByNarrativeHeadings recognizes NARRATIVE DESCRIPTION and NARRATIVE STATEMENT OF SIGNIFICANCE variants', () => {
-  const prose7 = 'The building was constructed with timber frame and brick infill, employing techniques standard for the period. The exterior exhibits fine brickwork with soldier course banding and decorative corbelling beneath the eaves. Window openings retain much original glazing with period-appropriate muntin patterns. The roof structure uses timber principals and purlins, covered with slate shingles showing excellent preservation. The main entrance features an ornamental pediment with carved detailing. Interior spaces preserve original plaster finishes, hardwood flooring, and decorative moldings. The property demonstrates high standards of building practice and materials selection throughout.';
-  const prose8 = 'The property gained its historical significance through association with prominent community leaders and important local institutions. The architecture reflects influences from contemporary design movements adapted to local conditions and materials. Stylistic features including proportions, fenestration patterns, and ornamental details exemplify the architectural language of the period. The property has been maintained in good condition and retains integrity in design, materials, and workmanship. Historic photographs and records document the property through various periods. The building continues to serve useful purposes while maintaining its historical character.';
+  const prose7 =
+    'The building was constructed with timber frame and brick infill, employing techniques standard for the period. The exterior exhibits fine brickwork with soldier course banding and decorative corbelling beneath the eaves. Window openings retain much original glazing with period-appropriate muntin patterns. The roof structure uses timber principals and purlins, covered with slate shingles showing excellent preservation. The main entrance features an ornamental pediment with carved detailing. Interior spaces preserve original plaster finishes, hardwood flooring, and decorative moldings. The property demonstrates high standards of building practice and materials selection throughout.';
+  const prose8 =
+    'The property gained its historical significance through association with prominent community leaders and important local institutions. The architecture reflects influences from contemporary design movements adapted to local conditions and materials. Stylistic features including proportions, fenestration patterns, and ornamental details exemplify the architectural language of the period. The property has been maintained in good condition and retains integrity in design, materials, and workmanship. Historic photographs and records document the property through various periods. The building continues to serve useful purposes while maintaining its historical character.';
 
   const text = normalizeExtractedText(`
     NARRATIVE DESCRIPTION
@@ -414,7 +450,10 @@ test('splitByNarrativeHeadings recognizes NARRATIVE DESCRIPTION and NARRATIVE ST
   assert.equal(sections[0].section, '7');
   assert.equal(sections[1].section, '8');
   assert.ok(sections[0].text.includes('timber'), 'NARRATIVE DESCRIPTION variant should work');
-  assert.ok(sections[1].text.includes('significance'), 'NARRATIVE STATEMENT OF SIGNIFICANCE variant should work');
+  assert.ok(
+    sections[1].text.includes('significance'),
+    'NARRATIVE STATEMENT OF SIGNIFICANCE variant should work',
+  );
 });
 
 test('splitByNarrativeHeadings returns empty array for text with no narrative headings', () => {
@@ -424,7 +463,11 @@ test('splitByNarrativeHeadings returns empty array for text with no narrative he
     There are no DESCRIPTION or STATEMENT OF SIGNIFICANCE headings present in this text.
   `);
   const sections = splitByNarrativeHeadings(text);
-  assert.equal(sections.length, 0, 'should return empty array when no narrative headings are found');
+  assert.equal(
+    sections.length,
+    0,
+    'should return empty array when no narrative headings are found',
+  );
 });
 
 // Tests for parseNomination fallback wiring
@@ -438,13 +481,18 @@ test('parseNomination: when text HAS a readable section table, segmentation is s
     Statement of the property's historical significance and importance
   `);
   const result = parseNomination(text, 'Test Property');
-  assert.equal(result.segmentation, 'section-table', 'should use section-table when headers are readable');
+  assert.equal(
+    result.segmentation,
+    'section-table',
+    'should use section-table when headers are readable',
+  );
   assert.ok(result.narrative.length > 0, 'should have captured narrative');
 });
 
 test('parseNomination: refnum 00000534 case with corrupted section table falls back to narrative headings', () => {
   // This reproduces the real case: "Section number Z — Page — I —" where the section number is corrupted
-  const prose8 = 'The property is historically significant as the former residence of State Senator James Whitmore, who served from 1903 to 1921 and was influential in the development of state transportation infrastructure. The building exemplifies Victorian architectural style with Queen Anne elements including asymmetrical facade, varied wall textures, and decorative bargeboards. Constructed in 1887, the building originally included extensive grounds with carriage house and servants quarters, now removed. The main residence retains original interior features including parquet flooring, ornamental plaster work, and period light fixtures. Historic photographs document the property\'s original appearance and landscaping. The property has been recognized by the state historical society as significant to the community\'s development.';
+  const prose8 =
+    "The property is historically significant as the former residence of State Senator James Whitmore, who served from 1903 to 1921 and was influential in the development of state transportation infrastructure. The building exemplifies Victorian architectural style with Queen Anne elements including asymmetrical facade, varied wall textures, and decorative bargeboards. Constructed in 1887, the building originally included extensive grounds with carriage house and servants quarters, now removed. The main residence retains original interior features including parquet flooring, ornamental plaster work, and period light fixtures. Historic photographs document the property's original appearance and landscaping. The property has been recognized by the state historical society as significant to the community's development.";
 
   const text = normalizeExtractedText(`
     CONTINUATION SHEET
@@ -456,7 +504,11 @@ test('parseNomination: refnum 00000534 case with corrupted section table falls b
     ${prose8}
   `);
   const result = parseNomination(text, 'Whitmore House');
-  assert.equal(result.segmentation, 'narrative-headings', 'should fall back to narrative-headings when section table is unreadable');
+  assert.equal(
+    result.segmentation,
+    'narrative-headings',
+    'should fall back to narrative-headings when section table is unreadable',
+  );
   assert.ok(result.narrative.length > 0, 'should have captured narrative via fallback');
   assert.ok(result.narrative.includes('Senator'), 'narrative should contain the significance text');
   assert.equal(result.hasSignificance, true, 'should identify section 8 from narrative fallback');
@@ -474,8 +526,10 @@ test('parseNomination: when neither section table nor narrative headings present
 });
 
 test('parseNomination: section table takes priority even when narrative headings are also present', () => {
-  const tableDescribedProse = 'The property was built in 1895 using local brick and stone materials in a commercial Romanesque style with heavy rustication and round arches.';
-  const narrativeHeadingProse = 'The property gained importance through its long service as a community meeting hall and cultural center. It represents skilled craftsmanship and enduring architectural principles. The original building materials and construction techniques demonstrate the quality standards of the period.';
+  const tableDescribedProse =
+    'The property was built in 1895 using local brick and stone materials in a commercial Romanesque style with heavy rustication and round arches.';
+  const narrativeHeadingProse =
+    'The property gained importance through its long service as a community meeting hall and cultural center. It represents skilled craftsmanship and enduring architectural principles. The original building materials and construction techniques demonstrate the quality standards of the period.';
 
   const text = normalizeExtractedText(`
     Section number 7 Page 1
@@ -490,8 +544,15 @@ test('parseNomination: section table takes priority even when narrative headings
     This would be an alternate segmentation, but the section table should take priority.
   `);
   const result = parseNomination(text, 'Test Building');
-  assert.equal(result.segmentation, 'section-table', 'should prefer section-table over narrative-headings');
-  assert.ok(result.narrative.includes('Romanesque'), 'should use text from section-table headers, not narrative headings');
+  assert.equal(
+    result.segmentation,
+    'section-table',
+    'should prefer section-table over narrative-headings',
+  );
+  assert.ok(
+    result.narrative.includes('Romanesque'),
+    'should use text from section-table headers, not narrative headings',
+  );
 });
 
 // Both nomination quarantines in the first 100-entity batch were real documents about the right

@@ -133,11 +133,7 @@ export type EnrichmentLedgerSnapshot = {
 };
 
 export type EnrichmentCandidacyReason =
-  | 'never_enriched'
-  | 'missing_field'
-  | 'stale'
-  | 'unchanged_evidence_fresh'
-  | 'fresh';
+  'never_enriched' | 'missing_field' | 'stale' | 'unchanged_evidence_fresh' | 'fresh';
 
 export type EnrichmentCandidacyResult = {
   readonly include: boolean;

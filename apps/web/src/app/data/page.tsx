@@ -106,6 +106,7 @@ export default async function DataPage() {
         }
         actions={[
           { label: 'Explore the map', href: '/', emphasis: 'copper' },
+          { label: 'Search the archive', href: '/records' },
           { label: 'Read methodology', href: '/methodology' },
           { label: 'Banned books', href: '/books' },
         ]}

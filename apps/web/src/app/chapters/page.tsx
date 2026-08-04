@@ -8,7 +8,7 @@ import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { listPublicArticleListItems } from '../../lib/articles/source';
-import { Room, RoomHeader } from '../../components/room';
+import { OffRamp, Room, RoomHeader } from '../../components/room';
 import '../reading-room.css';
 // Retained for the chapter card itself, which carries a hero image the kit's RoomCard does not.
 import './articles-edition.css';
@@ -60,6 +60,16 @@ export default async function ChaptersIndexPage() {
           ))}
         </ul>
       )}
+
+      <OffRamp
+        title="Go straight to the archive"
+        actions={[
+          { label: 'Open the Atlas', href: '/', emphasis: 'copper' },
+          { label: 'Search the archive', href: '/records' },
+        ]}
+      >
+        Every figure and quotation in these chapters cites its record.
+      </OffRamp>
     </Room>
   );
 }

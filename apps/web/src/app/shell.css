@@ -697,7 +697,6 @@
    transition into it (the "the rest of the page is still there" defect). */
 
 @media (max-width: 47.9375rem) {
-
   /* Stacked layout: copy sits above the map row, so the legibility ramp turns
      vertical — opaque behind the copy, fading down into the map. No border seam. */
 }
@@ -725,7 +724,6 @@
    archive reaches it. The whole column is the touch target. */
 
 @media (max-width: 47.9375rem) {
-
   /* Dense scrim: pins and state labels must not punch through ink on small screens. */
 
   /* Mobile rail: labels off (the readout carries the decade), ticks stay
@@ -2081,4 +2079,3 @@ body:has(.ds-explore-stage[data-results='open']) {
   margin-top: -1px;
   background: var(--ds-accent);
 }
-

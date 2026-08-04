@@ -55,7 +55,12 @@ export function measureTextQuality(text: string): TextQualitySignals {
   const tokens = text.split(/\s+/u).filter((token) => token.length > 0);
   const wordlike = tokens.filter((token) => WORDLIKE_RE.test(token));
   const orphans = tokens.filter(
-    (token) => token.length === 1 && /[A-Za-z]/u.test(token) && token !== 'a' && token !== 'A' && token !== 'I',
+    (token) =>
+      token.length === 1 &&
+      /[A-Za-z]/u.test(token) &&
+      token !== 'a' &&
+      token !== 'A' &&
+      token !== 'I',
   );
   const totalWordLength = wordlike.reduce((sum, token) => sum + token.length, 0);
 

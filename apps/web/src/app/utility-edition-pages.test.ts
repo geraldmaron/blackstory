@@ -14,33 +14,33 @@ import { fileURLToPath } from 'node:url';
 
 const appDir = dirname(fileURLToPath(import.meta.url));
 
-/** Still on the v6 utility shell. Each one is a room-kit conversion still owed. */
+/**
+ * Still on the v6 utility shell. Each one is a room-kit conversion still owed.
+ * `/locate` is deliberately last out: SP-14 folds it into the Lens Where group rather than
+ * restyling it in place, so converting it here would be work thrown away.
+ */
 const UTILITY_PAGES = [
   { route: 'locate', file: 'locate/page.tsx', seed: 'locate-edition-v6' },
-  { route: 'not-found', file: 'not-found.tsx', seed: 'not-found-edition-v6' },
-  {
-    route: 'error',
-    file: 'error.tsx',
-    seed: 'error-edition-v6',
-    delegate: '../components/patterns/utility-edition/UtilityEditionErrorView.tsx',
-  },
-  {
-    route: 'correction-status',
-    file: 'corrections/status/[receiptCode]/page.tsx',
-    seed: 'correction-status-edition-v6',
-  },
 ] as const;
 
 /** Converted to the shared room kit. */
 const ROOM_KIT_PAGES = [
   { route: 'submit', file: 'submit/page.tsx' },
   { route: 'corrections', file: 'corrections/page.tsx' },
+  { route: 'support', file: 'support/page.tsx' },
+  { route: 'privacy', file: 'privacy/page.tsx' },
+  { route: 'not-found', file: 'not-found.tsx' },
+  { route: 'error', file: 'error.tsx' },
+  { route: 'correction-status', file: 'corrections/status/[receiptCode]/page.tsx' },
 ] as const;
 
 for (const page of ROOM_KIT_PAGES) {
   test(`${page.route} renders through the room kit`, () => {
     const source = readFileSync(join(appDir, page.file), 'utf8');
-    assert.match(source, /from '\.\.\/\.\.\/components\/room'/);
+    // Depth-agnostic: these rooms sit anywhere from the app root (`not-found.tsx`) to four
+    // levels down (`corrections/status/[receiptCode]`), so pinning the `../` count would fail
+    // a correct conversion for the wrong reason.
+    assert.match(source, /from '(?:\.\.\/)+components\/room'/);
     assert.match(source, /<Room/);
     assert.match(source, /<RoomHeader/);
     // The v6 shell must be gone rather than merely unused: two chromes on one page is the drift
@@ -53,8 +53,7 @@ for (const page of ROOM_KIT_PAGES) {
 
 for (const page of UTILITY_PAGES) {
   test(`${page.route} uses UtilityEditionShell with main landmark`, () => {
-    const sourceFile = 'delegate' in page ? join(appDir, page.delegate) : join(appDir, page.file);
-    const source = readFileSync(sourceFile, 'utf8');
+    const source = readFileSync(join(appDir, page.file), 'utf8');
     assert.match(source, /UtilityEditionShell/);
     assert.match(source, /UtilityEditionIntro/);
     assert.doesNotMatch(source, /mosaicSeed/);
