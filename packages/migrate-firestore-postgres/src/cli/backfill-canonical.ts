@@ -59,6 +59,15 @@ function parseMode(argv: readonly string[]): 'dry-run' | 'apply' {
   return apply ? 'apply' : 'dry-run';
 }
 
+/**
+ * repo-8yk8: `--json` prints exactly one compact JSON line — `{ mode, plan, preflight, before,
+ * after?, warnings }` — and nothing else, so a CI monitor can `JSON.parse(stdout.trim())` instead
+ * of scraping the pretty-printed, multi-block human output the default mode prints.
+ */
+function wantsJsonOutput(argv: readonly string[]): boolean {
+  return argv.includes('--json');
+}
+
 function asIso(value: Date | string): string {
   return value instanceof Date ? value.toISOString() : String(value);
 }
@@ -738,8 +747,61 @@ async function insertAuditEvent(
   );
 }
 
+/**
+ * repo-8yk8: a run that throws (assertVerified, a query failure, anything) previously left no
+ * trace anywhere — only insertAuditEvent's success path reached bb_audit.events, so a failed
+ * --apply was indistinguishable from one that never ran. Logged on its own connection query
+ * (not inside the aborted transaction, which is already rolled back by the time this runs) so
+ * the failure survives the rollback that discarded the attempted write.
+ */
+async function insertFailureAuditEvent(
+  client: pg.PoolClient,
+  mode: 'dry-run' | 'apply',
+  plan: CanonicalConvergencePlan | undefined,
+  error: unknown,
+): Promise<void> {
+  const message = error instanceof Error ? error.message : String(error);
+  const idempotencyKey = `canonical-convergence-failed:${plan?.releaseId ?? 'unknown'}:${plan?.planHash ?? 'no-plan'}:${Date.now()}`;
+  const eventId = stableId('audit', idempotencyKey);
+  await client.query(
+    `
+      INSERT INTO bb_audit.events (
+        id, action, category, actor, subject, reason, request_id, correlation_id,
+        release_id, idempotency_key, occurred_at, data
+      )
+      VALUES (
+        $1,
+        'canonical.active_release_backfill_failed',
+        'canonical',
+        $2::jsonb,
+        $3::jsonb,
+        $4,
+        $5,
+        $5,
+        $6,
+        $7,
+        now(),
+        $8::jsonb
+      )
+      ON CONFLICT (id) DO NOTHING
+    `,
+    [
+      eventId,
+      JSON.stringify({ id: 'canonical-convergence', type: 'service' }),
+      JSON.stringify({ type: 'release', id: plan?.releaseId ?? null }),
+      `Canonical convergence ${mode} failed: ${message}`,
+      eventId,
+      plan?.releaseId ?? null,
+      idempotencyKey,
+      JSON.stringify({ mode, plan: plan ? planSummary(plan) : null, error: message }),
+    ],
+  );
+}
+
 async function main(): Promise<void> {
-  const mode = parseMode(process.argv.slice(2));
+  const argv = process.argv.slice(2);
+  const mode = parseMode(argv);
+  const jsonOutput = wantsJsonOutput(argv);
   const connection = normalizePgConnectionString(requireDatabaseUrl());
   const pool = new pg.Pool({
     connectionString: connection.connectionString,
@@ -764,16 +826,24 @@ async function main(): Promise<void> {
     plan = buildCanonicalConvergencePlan(rows);
     const preflight = await assertNoCanonicalConflicts(client, plan);
     const before = await verifyPlan(client, plan, preflight.preservedCuratedEntityIds);
-    console.log(JSON.stringify({ mode, plan: planSummary(plan), preflight, before }, null, 2));
-    if (plan.warnings.length > 0) {
-      console.log(JSON.stringify({ warnings: plan.warnings }, null, 2));
+    if (!jsonOutput) {
+      console.log(JSON.stringify({ mode, plan: planSummary(plan), preflight, before }, null, 2));
+      if (plan.warnings.length > 0) {
+        console.log(JSON.stringify({ warnings: plan.warnings }, null, 2));
+      }
     }
 
     if (mode === 'dry-run') {
       await client.query('ROLLBACK');
-      console.log(
-        `Dry-run only. Re-run with --apply ${APPLY_CONFIRMATION} to perform the hosted transaction.`,
-      );
+      if (jsonOutput) {
+        console.log(
+          JSON.stringify({ mode, plan: planSummary(plan), preflight, before, warnings: plan.warnings }),
+        );
+      } else {
+        console.log(
+          `Dry-run only. Re-run with --apply ${APPLY_CONFIRMATION} to perform the hosted transaction.`,
+        );
+      }
       return;
     }
 
@@ -782,12 +852,28 @@ async function main(): Promise<void> {
     assertVerified(after);
     await insertAuditEvent(client, plan, after);
     await client.query('COMMIT');
-    console.log(JSON.stringify({ applied: true, after }, null, 2));
+    if (jsonOutput) {
+      console.log(
+        JSON.stringify({ mode, plan: planSummary(plan), preflight, before, applied: true, after }),
+      );
+    } else {
+      console.log(JSON.stringify({ applied: true, after }, null, 2));
+    }
   } catch (error) {
     try {
       await client.query('ROLLBACK');
     } catch {
       // Preserve the original failure.
+    }
+    if (mode === 'apply') {
+      try {
+        await insertFailureAuditEvent(client, mode, plan, error);
+      } catch (auditError) {
+        console.error(
+          'Failed to record the failure in bb_audit.events (original error follows):',
+          auditError,
+        );
+      }
     }
     throw error;
   } finally {

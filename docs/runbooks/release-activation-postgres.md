@@ -44,6 +44,20 @@ Human steps that agents **cannot** apply:
 - CDN cache purge / cache-header verification (deferred to MOB-021 launch gate)
 - Firebase emulator-backed integration (deferred — unit tests use injectable memory backend)
 
+## Canonical convergence monitoring (repo-8yk8)
+
+`.github/workflows/canonical-convergence-monitor.yml` dry-runs `backfill-canonical.ts --json`
+on a timer and fails (alerting watchers) if any hard-fail verification counter is nonzero, or
+warns if a convergence backlog (`missing_planned_claims`/`missing_planned_relationships`) is
+building up unapplied. It does **not** run `--apply` itself — every hosted write against
+`bb_canonical` should go through a human-reviewed dry-run first.
+
+To activate it: add a `HOSTED_DATABASE_URL` repo secret (Settings → Secrets and variables →
+Actions) holding the real Supabase connection string — read access to `bb_public`/`bb_canonical`
+is sufficient, this workflow never writes. Then uncomment the `schedule:` trigger in the
+workflow file. Until the secret exists, the job fails closed with a clear message rather than
+reporting a false green, and `workflow_dispatch` still works for a manual check.
+
 ## Rollback drill
 
 Call `rollbackToAsync(store, priorReleaseId)` from ops code with the same pool-backed store.

@@ -1,0 +1,104 @@
+# repo-8yk8: bb_canonical is reconciled against bb_public.release_entities only when a human
+# remembers to run backfill-canonical.ts --apply. Nothing scheduled it and nothing alerted on
+# drift — measured 2026-08-04, the last successful apply was five days stale and
+# missing_planned_claims had grown from 399 to 2449 with no signal anywhere.
+#
+# This is the "minimum" fix the bead calls for: a dry-run on a timer that fails (and so alerts,
+# since GitHub notifies watchers of scheduled-workflow failures by default) when any hard-fail
+# verification counter is nonzero. It deliberately does NOT run --apply automatically — every
+# hosted write against bb_canonical this session went through a human-reviewed dry-run first,
+# and CI silently promoting drift into a write is a bigger risk than the drift itself. A human
+# still runs the actual --apply, informed by this alert instead of by accident.
+#
+# Requires the HOSTED_DATABASE_URL secret (the real Supabase connection string with read access
+# to bb_public/bb_canonical/bb_audit — see docs/runbooks/release-activation-postgres.md). No
+# workflow in this repo has touched the hosted database before now; every existing scheduled job
+# runs against an ephemeral local Postgres service. Until that secret is added, this job fails
+# closed with a clear message rather than silently reporting green, and the schedule trigger
+# stays commented out (matching canary-uptime.yml's pattern) so it doesn't page on an unset
+# secret every run.
+
+name: Canonical Convergence Monitor
+
+on:
+  # Uncomment once HOSTED_DATABASE_URL is set (repo secret, Settings -> Secrets and variables ->
+  # Actions). Twice daily is the cadence discussed in repo-8yk8; adjust freely.
+  # schedule:
+  #   - cron: '0 6,18 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: canonical-convergence-monitor-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  dry-run-check:
+    name: Dry-run backfill-canonical.ts and alert on drift
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.HOSTED_DATABASE_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          version: 9.12.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Fail closed if HOSTED_DATABASE_URL is not configured
+        run: |
+          if [ -z "${DATABASE_URL:-}" ]; then
+            echo "::error::HOSTED_DATABASE_URL secret is not set — this monitor cannot check drift. See this workflow's header comment."
+            exit 1
+          fi
+
+      - name: Dry-run backfill-canonical.ts (--json) and alert if any hard-fail counter is nonzero
+        run: |
+          set -euo pipefail
+          node --conditions development --import tsx \
+            packages/migrate-firestore-postgres/src/cli/backfill-canonical.ts --json \
+            > convergence-report.json
+          cat convergence-report.json
+          # assertVerified's own hard-fail counters (backfill-canonical.ts) — missing_planned_claims
+          # and missing_planned_relationships are excluded on purpose: those converge cleanly on
+          # --apply by design (see repo-43qt) and are not a defect, just unapplied backlog. A nonzero
+          # value there still means "someone should run --apply", so it is checked and reported, but
+          # it alone does not fail this job the way the true correctness failures below do.
+          node -e "
+            const fs = require('node:fs');
+            const report = JSON.parse(fs.readFileSync('convergence-report.json', 'utf8').trim());
+            const before = report.before;
+            const hardFailKeys = [
+              'missing_canonical_entities',
+              'display_name_mismatches',
+              'kind_mismatches',
+              'missing_canonical_locations',
+              'claims_without_current_version',
+              'claims_without_evidence_link',
+            ];
+            const hardFailures = hardFailKeys.filter((k) => before[k] !== 0);
+            const backlog = before.missing_planned_claims + before.missing_planned_relationships;
+            if (hardFailures.length > 0) {
+              console.error('::error::Canonical convergence hard-fail counters are nonzero: ' + hardFailures.map((k) => k + '=' + before[k]).join(', '));
+              process.exit(1);
+            }
+            if (backlog > 0) {
+              console.error('::warning::Convergence backlog is nonzero (missing_planned_claims=' + before.missing_planned_claims + ', missing_planned_relationships=' + before.missing_planned_relationships + '). Run backfill-canonical.ts --apply --confirm-hosted-write=canonical-convergence to clear it.');
+            } else {
+              console.log('Canonical is fully converged with the active release.');
+            }
+          "
