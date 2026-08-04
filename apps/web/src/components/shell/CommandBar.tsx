@@ -21,6 +21,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { BRAND_ASSETS } from '@repo/config';
 import { cx, ShellWordmark } from '@repo/ui';
 import { CommandBarSearch } from './CommandBarSearch';
@@ -83,12 +84,12 @@ export function CommandBar({
     <header className={cx('ds-bar', className)}>
       {/* The same brand component the site header and the admin shell render, so the Atlas
           cannot drift to its own artwork or its own light/dark pairing. */}
-      <a className="ds-bar__brand ds-shell-wordmark" href="/" aria-label="BlackStory · home">
+      <Link className="ds-bar__brand ds-shell-wordmark" href="/" aria-label="BlackStory · home">
         {/* Wordmark only. The `ATLAS` tag that used to sit beside it named one of the two modes
             the bar already carries as a control, so the same word appeared twice, three inches
             apart, meaning two different things. */}
         <ShellWordmark lockup={BRAND_ASSETS.lockup} symbol={BRAND_ASSETS.symbol} />
-      </a>
+      </Link>
 
       {onOpenPalette ? (
         <button
@@ -109,10 +110,10 @@ export function CommandBar({
         <>
           <CommandBarSearch placeholder={searchLabel(recordCount)} />
           <noscript>
-            <a className="ds-bar__search" href="/records" aria-label="Search the record index">
+            <Link className="ds-bar__search" href="/records" aria-label="Search the record index">
               <SearchGlyph />
               <span className="ds-bar__search-text">{searchLabel(recordCount)}</span>
-            </a>
+            </Link>
           </noscript>
         </>
       )}
@@ -147,20 +148,20 @@ export function CommandBar({
                the link would land on a plain Atlas. A fragment never reaches the server, so it
                cannot be stripped and cannot split the cache key either. */
             <>
-              <a className="ds-bar__mode-link ds-bar__mode-link--first" href="/">
+              <Link className="ds-bar__mode-link ds-bar__mode-link--first" href="/">
                 Atlas
-              </a>
-              <a className="ds-bar__mode-link" href="/#story">
+              </Link>
+              <Link className="ds-bar__mode-link" href="/#story">
                 Story
-              </a>
+              </Link>
             </>
           )}
           {/* An anchor, not a mode button: Atlas and Story are two views of one surface, Library
               is a different room. A real href is also what lets it be opened in a new tab and
               followed by a crawler, which a mode toggle never could. */}
-          <a className="ds-bar__mode-link" href="/library">
+          <Link className="ds-bar__mode-link" href="/library">
             Library
-          </a>
+          </Link>
         </nav>
 
         {onOpenSaved ? (
