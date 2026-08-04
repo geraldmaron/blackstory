@@ -56,7 +56,6 @@
     "test:db:integration": "pnpm --filter @repo/data-access test:integration"
   },
   "devDependencies": {
-    "@geraldmaron/construct": "^2.0.1",
     "@repo/eslint-config": "workspace:^",
     "@repo/typescript-config": "workspace:^",
     "firebase-tools": "^15.24.0",
