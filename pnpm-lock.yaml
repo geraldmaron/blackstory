@@ -23,7 +23,7 @@ importers:
     devDependencies:
       '@geraldmaron/construct':
         specifier: ^2.0.1
-        version: 2.0.1(@types/react@19.2.17)(zod@4.4.3)
+        version: 2.0.1(@types/react@19.2.17)(react-devtools-core@6.1.5)(zod@4.4.3)
       '@repo/eslint-config':
         specifier: workspace:^
         version: link:packages/eslint-config
@@ -60,12 +60,15 @@ importers:
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@supabase/ssr':
+        specifier: ^0.12.4
+        version: 0.12.4(@supabase/supabase-js@2.110.8)
       '@supabase/supabase-js':
         specifier: ^2.110.8
         version: 2.110.8
       next:
         specifier: ^16.2.12
-        version: 16.2.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 16.2.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       pg:
         specifier: ^8.16.3
         version: 8.22.0
@@ -201,7 +204,7 @@ importers:
         version: 4.0.3
       next:
         specifier: ^16.2.12
-        version: 16.2.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 16.2.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
         specifier: ^19.2.7
         version: 19.2.7
@@ -443,7 +446,7 @@ importers:
         version: 5.24.0
       next:
         specifier: ^16.2.11
-        version: 16.2.11(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 16.2.11(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       pg:
         specifier: ^8.16.3
         version: 8.22.0
@@ -3333,6 +3336,11 @@ packages:
     resolution: {integrity: sha512-mwX7ituX6O31fLf+0g65rpLlNxqgnMaPltPsQwzox6jfmbfVl3tCxXrfr3HEsQcCRjpjuJG1+A0vFzP1yVjKHA==}
     engines: {node: '>=22.0.0'}
 
+  '@supabase/ssr@0.12.4':
+    resolution: {integrity: sha512-xHzcgI8cC1TpBKSwJcR5Yd8CCwfIq0SBc5yb4yz/YFw5tbCrEQ0QT3a+2jymCxHgQWLfzwN93HZ6eRbcoMkOlA==}
+    peerDependencies:
+      '@supabase/supabase-js': ^2.111.0
+
   '@supabase/storage-js@2.110.8':
     resolution: {integrity: sha512-CcfhkZFBLxsthgUabZKxwfsoXdrikIGsL3LsGoV3FZTqCMx/s1y49taT4jT/oya5+1IuB0sFFHw6pF0o0iJniQ==}
     engines: {node: '>=22.0.0'}
@@ -4502,6 +4510,10 @@ packages:
   cookie@0.7.2:
     resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
     engines: {node: '>= 0.6'}
+
+  cookie@1.1.1:
+    resolution: {integrity: sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==}
+    engines: {node: '>=18'}
 
   core-js-compat@3.49.0:
     resolution: {integrity: sha512-VQXt1jr9cBz03b331DFDCCP90b3fanciLkgiOoy8SBHy06gNf+vQ1A3WFLqG7I8TipYIKeYK9wxd0tUrvHcOZA==}
@@ -10811,7 +10823,7 @@ snapshots:
       '@fortawesome/fontawesome-svg-core': 7.3.1
       react: 19.2.7
 
-  '@geraldmaron/construct@2.0.1(@types/react@19.2.17)(zod@4.4.3)':
+  '@geraldmaron/construct@2.0.1(@types/react@19.2.17)(react-devtools-core@6.1.5)(zod@4.4.3)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.29.0(zod@4.4.3)
       js-yaml: 5.2.2
@@ -10829,7 +10841,7 @@ snapshots:
       '@opentelemetry/api': 1.9.1
       ai: 7.0.37(zod@4.4.3)
       apache-arrow: 18.1.0
-      ink: 7.1.1(@types/react@19.2.17)(react@19.2.7)
+      ink: 7.1.1(@types/react@19.2.17)(react-devtools-core@6.1.5)(react@19.2.7)
       mammoth: 1.12.0
       postgres: 3.4.9
       pptx-embed-fonts: 0.0.6(pptxgenjs@4.0.1)
@@ -12156,6 +12168,11 @@ snapshots:
     dependencies:
       '@supabase/phoenix': 0.4.5
       tslib: 2.8.1
+
+  '@supabase/ssr@0.12.4(@supabase/supabase-js@2.110.8)':
+    dependencies:
+      '@supabase/supabase-js': 2.110.8
+      cookie: 1.1.1
 
   '@supabase/storage-js@2.110.8':
     dependencies:
@@ -13503,6 +13520,8 @@ snapshots:
   cookie-signature@1.2.2: {}
 
   cookie@0.7.2: {}
+
+  cookie@1.1.1: {}
 
   core-js-compat@3.49.0:
     dependencies:
@@ -15522,7 +15541,7 @@ snapshots:
 
   ini@2.0.0: {}
 
-  ink@7.1.1(@types/react@19.2.17)(react@19.2.7):
+  ink@7.1.1(@types/react@19.2.17)(react-devtools-core@6.1.5)(react@19.2.7):
     dependencies:
       '@alcalzone/ansi-tokenize': 0.3.0
       ansi-escapes: 7.3.0
@@ -15552,6 +15571,7 @@ snapshots:
       yoga-layout: 3.2.1
     optionalDependencies:
       '@types/react': 19.2.17
+      react-devtools-core: 6.1.5
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -17277,7 +17297,7 @@ snapshots:
 
   netmask@2.1.1: {}
 
-  next@16.2.11(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  next@16.2.11(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       '@next/env': 16.2.11
       '@swc/helpers': 0.5.15
@@ -17297,13 +17317,14 @@ snapshots:
       '@next/swc-win32-arm64-msvc': 16.2.11
       '@next/swc-win32-x64-msvc': 16.2.11
       '@opentelemetry/api': 1.9.1
+      babel-plugin-react-compiler: 1.0.0
       sharp: 0.35.3(@types/node@22.20.1)
     transitivePeerDependencies:
       - '@babel/core'
       - '@types/node'
       - babel-plugin-macros
 
-  next@16.2.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  next@16.2.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       '@next/env': 16.2.12
       '@swc/helpers': 0.5.15
@@ -17323,6 +17344,7 @@ snapshots:
       '@next/swc-win32-arm64-msvc': 16.2.12
       '@next/swc-win32-x64-msvc': 16.2.12
       '@opentelemetry/api': 1.9.1
+      babel-plugin-react-compiler: 1.0.0
       sharp: 0.35.3(@types/node@22.20.1)
     transitivePeerDependencies:
       - '@babel/core'

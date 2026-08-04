@@ -1,10 +1,15 @@
 /**
  * Browser-only Supabase client init for the admin portal.
  * Uses the anon/publishable key only — never service_role on the client.
+ *
+ * Cookie-backed (createBrowserClient), not localStorage: middleware and server
+ * components have to read the session too, otherwise page authorization can only
+ * run after hydration and every server render is identity-blind.
  */
 'use client';
 
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 function readPublicSupabaseConfig() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -23,12 +28,6 @@ let clientSingleton: SupabaseClient | undefined;
 export function getAdminSupabaseClient(): SupabaseClient {
   if (clientSingleton) return clientSingleton;
   const { url, anonKey } = readPublicSupabaseConfig();
-  clientSingleton = createClient(url, anonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-    },
-  });
+  clientSingleton = createBrowserClient(url, anonKey);
   return clientSingleton;
 }

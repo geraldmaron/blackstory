@@ -6,15 +6,18 @@
  */
 'use client';
 
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAdminAuth } from '../../auth/AdminAuthProvider';
 import { safeAdminNextPath } from './safe-admin-next-path';
 
+const NOT_PROVISIONED =
+  'This account is not provisioned for admin access. Ask an administrator to set a staff role on it.';
+
 export default function LoginClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { ready, user, signIn } = useAdminAuth();
+  const { ready, user, signIn, signOut, getIdToken } = useAdminAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -22,11 +25,32 @@ export default function LoginClient() {
 
   const nextPath = useMemo(() => safeAdminNextPath(searchParams.get('next')), [searchParams]);
 
+  /**
+   * A Supabase session alone is not admin access — the gates require a staff role in
+   * app_metadata.bb_role. Confirm it here, otherwise redirecting would bounce straight
+   * back off the middleware and loop. router.refresh() drops the cached RSC payload so
+   * the destination re-renders on the server with the new session cookie.
+   */
+  const enterConsole = useCallback(async () => {
+    const token = await getIdToken();
+    const response = token
+      ? await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+      : null;
+    if (!response?.ok) {
+      await signOut();
+      setError(NOT_PROVISIONED);
+      setBusy(false);
+      return;
+    }
+    router.refresh();
+    router.replace(nextPath);
+  }, [getIdToken, signOut, router, nextPath]);
+
   useEffect(() => {
     if (ready && user) {
-      router.replace(nextPath);
+      void enterConsole();
     }
-  }, [ready, user, router, nextPath]);
+  }, [ready, user, enterConsole]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,7 +58,7 @@ export default function LoginClient() {
     setError(null);
     try {
       await signIn(email, password);
-      router.replace(nextPath);
+      await enterConsole();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : String(err));
       setBusy(false);
