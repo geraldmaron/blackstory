@@ -32,6 +32,14 @@ type Verification = {
   readonly claims_without_current_version: number;
   readonly claims_without_evidence_link: number;
   readonly missing_planned_relationships: number;
+  /**
+   * display_name/kind mismatches on entities the preflight already found curated (canonical
+   * disagrees with the incoming release on purpose, and applyPlan preserved canonical's value).
+   * Surfaced, never asserted: a curated disagreement is an intentional editorial decision, not a
+   * convergence defect, but it must stay visible rather than vanish into the exemption.
+   */
+  readonly curated_display_name_mismatches: number;
+  readonly curated_kind_mismatches: number;
 };
 
 function requireDatabaseUrl(): string {
@@ -108,7 +116,10 @@ function planSummary(plan: CanonicalConvergencePlan): Record<string, unknown> {
 async function assertNoCanonicalConflicts(
   client: pg.PoolClient,
   plan: CanonicalConvergencePlan,
-): Promise<{ readonly preservedCuratedEntities: number }> {
+): Promise<{
+  readonly preservedCuratedEntities: number;
+  readonly preservedCuratedEntityIds: readonly string[];
+}> {
   const claimIds = plan.claims.map((claim) => claim.id);
   const claims = await client.query<{
     readonly id: string;
@@ -142,7 +153,10 @@ async function assertNoCanonicalConflicts(
     const incoming = incomingEntities.get(row.id);
     return !!incoming && (incoming.display_name !== row.display_name || incoming.kind !== row.kind);
   });
-  return { preservedCuratedEntities: preserved.length };
+  return {
+    preservedCuratedEntities: preserved.length,
+    preservedCuratedEntityIds: preserved.map((row) => row.id),
+  };
 }
 
 async function forEachBatch<T>(
@@ -520,6 +534,7 @@ async function applyPlan(client: pg.PoolClient, plan: CanonicalConvergencePlan):
 async function verifyPlan(
   client: pg.PoolClient,
   plan: CanonicalConvergencePlan,
+  curatedEntityIds: readonly string[] = [],
 ): Promise<Verification> {
   const claimIds = plan.claims.map((claim) => claim.id);
   const relationshipsJson = JSON.stringify(plan.relationships);
@@ -560,13 +575,29 @@ async function verifyPlan(
           FROM public_entities p
           JOIN bb_canonical.entities e ON e.id = p.entity_id
           WHERE e.display_name IS DISTINCT FROM p.display_name
+            AND p.entity_id <> ALL($3::text[])
         ) AS display_name_mismatches,
         (
           SELECT count(*)::int
           FROM public_entities p
           JOIN bb_canonical.entities e ON e.id = p.entity_id
           WHERE e.kind IS DISTINCT FROM p.kind
+            AND p.entity_id <> ALL($3::text[])
         ) AS kind_mismatches,
+        (
+          SELECT count(*)::int
+          FROM public_entities p
+          JOIN bb_canonical.entities e ON e.id = p.entity_id
+          WHERE e.display_name IS DISTINCT FROM p.display_name
+            AND p.entity_id = ANY($3::text[])
+        ) AS curated_display_name_mismatches,
+        (
+          SELECT count(*)::int
+          FROM public_entities p
+          JOIN bb_canonical.entities e ON e.id = p.entity_id
+          WHERE e.kind IS DISTINCT FROM p.kind
+            AND p.entity_id = ANY($3::text[])
+        ) AS curated_kind_mismatches,
         (
           SELECT count(*)::int
           FROM public_entities p
@@ -625,7 +656,7 @@ async function verifyPlan(
           )
         ) AS missing_planned_relationships
     `,
-    [claimIds, relationshipsJson],
+    [claimIds, relationshipsJson, curatedEntityIds],
   );
   const verification = result.rows[0];
   if (!verification) throw new Error('Convergence verification returned no row');
@@ -633,6 +664,11 @@ async function verifyPlan(
 }
 
 function assertVerified(verification: Verification): void {
+  // display_name_mismatches / kind_mismatches already exclude curated entities (verifyPlan's
+  // $3 exemption) — those disagreements are intentional (assertNoCanonicalConflicts preserves
+  // canonical's value over the incoming release) and are surfaced separately below, never
+  // asserted here. Preserve-then-assert-equality on the same rows would make convergence
+  // permanently unreachable once any curation exists.
   const failures = [
     ['missing_canonical_entities', verification.missing_canonical_entities],
     ['display_name_mismatches', verification.display_name_mismatches],
@@ -648,6 +684,15 @@ function assertVerified(verification: Verification): void {
       `Canonical convergence verification failed: ${failures
         .map(([name, count]) => `${name}=${count}`)
         .join(', ')}`,
+    );
+  }
+  const curatedMismatchTotal =
+    verification.curated_display_name_mismatches + verification.curated_kind_mismatches;
+  if (curatedMismatchTotal > 0) {
+    console.log(
+      `Curated disagreements preserved (exempt from convergence, not a defect): ` +
+        `display_name_mismatches=${verification.curated_display_name_mismatches}, ` +
+        `kind_mismatches=${verification.curated_kind_mismatches}`,
     );
   }
 }
@@ -718,7 +763,7 @@ async function main(): Promise<void> {
     const rows = await loadActiveReleaseRows(client);
     plan = buildCanonicalConvergencePlan(rows);
     const preflight = await assertNoCanonicalConflicts(client, plan);
-    const before = await verifyPlan(client, plan);
+    const before = await verifyPlan(client, plan, preflight.preservedCuratedEntityIds);
     console.log(JSON.stringify({ mode, plan: planSummary(plan), preflight, before }, null, 2));
     if (plan.warnings.length > 0) {
       console.log(JSON.stringify({ warnings: plan.warnings }, null, 2));
@@ -733,7 +778,7 @@ async function main(): Promise<void> {
     }
 
     await applyPlan(client, plan);
-    const after = await verifyPlan(client, plan);
+    const after = await verifyPlan(client, plan, preflight.preservedCuratedEntityIds);
     assertVerified(after);
     await insertAuditEvent(client, plan, after);
     await client.query('COMMIT');
