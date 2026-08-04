@@ -91,8 +91,9 @@ export function filterCommandPaletteItems(
 
   return items
     .map((item, index) => ({ item, index, rank: rankItem(item, normalized) }))
-    .filter((entry): entry is { item: CommandPaletteItem; index: number; rank: number } =>
-      entry.rank !== null,
+    .filter(
+      (entry): entry is { item: CommandPaletteItem; index: number; rank: number } =>
+        entry.rank !== null,
     )
     .sort((a, b) => a.rank - b.rank || a.index - b.index)
     .map((entry) => entry.item);

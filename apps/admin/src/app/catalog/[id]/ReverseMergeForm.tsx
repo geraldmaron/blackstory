@@ -27,7 +27,11 @@ export function ReverseMergeForm({ mergeId }: { readonly mergeId: string }) {
         />
       </label>
       <div className="entity-edit__actions">
-        <button type="submit" className="ds-button ds-button--secondary" disabled={pending || !reason.trim()}>
+        <button
+          type="submit"
+          className="ds-button ds-button--secondary"
+          disabled={pending || !reason.trim()}
+        >
           {pending ? 'Reversing…' : 'Reverse this merge'}
         </button>
         {state.status === 'ok' ? (

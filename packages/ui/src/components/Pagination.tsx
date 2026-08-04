@@ -31,7 +31,9 @@ function pageWindow(page: number, pageCount: number): readonly (number | 'gap')[
     return Array.from({ length: pageCount }, (_, index) => index + 1);
   }
   const pages = new Set<number>([1, pageCount, page, page - 1, page + 1]);
-  const sorted = [...pages].filter((value) => value >= 1 && value <= pageCount).sort((a, b) => a - b);
+  const sorted = [...pages]
+    .filter((value) => value >= 1 && value <= pageCount)
+    .sort((a, b) => a - b);
 
   const out: (number | 'gap')[] = [];
   let previous = 0;

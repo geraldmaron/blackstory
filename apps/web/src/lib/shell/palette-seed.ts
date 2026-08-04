@@ -34,14 +34,16 @@ export function sanitizePaletteSeed(rawPath: string): string {
     return '';
   }
 
-  return decoded
-    .replace(/[?#].*$/, '')
-    // Anything that is not a letter, digit or space becomes a space: separators (`/`, `-`, `_`)
-    // become word breaks, and markup, quotes and control characters simply cease to exist.
-    .replace(/[^\p{L}\p{N}]+/gu, ' ')
-    .trim()
-    .slice(0, MAX_SEED_LENGTH)
-    .trim();
+  return (
+    decoded
+      .replace(/[?#].*$/, '')
+      // Anything that is not a letter, digit or space becomes a space: separators (`/`, `-`, `_`)
+      // become word breaks, and markup, quotes and control characters simply cease to exist.
+      .replace(/[^\p{L}\p{N}]+/gu, ' ')
+      .trim()
+      .slice(0, MAX_SEED_LENGTH)
+      .trim()
+  );
 }
 
 type Listener = () => void;

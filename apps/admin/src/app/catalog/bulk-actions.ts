@@ -57,10 +57,9 @@ export async function applyBulkEdit(
     data: { field, after: describeBulkEdit(edit), selectedCount: checked.ids.length },
     async applyState(client) {
       const before = bulkBeforeStatement(checked.ids, field);
-      const beforeRows = await client.query<{ value: string | null; ids: string[] }>(
-        before.sql,
-        [...before.params],
-      );
+      const beforeRows = await client.query<{ value: string | null; ids: string[] }>(before.sql, [
+        ...before.params,
+      ]);
 
       const update = bulkUpdateStatement(checked.ids, edit);
       const updated = await client.query<{ id: string }>(update.sql, [...update.params]);

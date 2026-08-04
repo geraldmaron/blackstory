@@ -107,7 +107,10 @@ export function parseEntityFieldEdit(values: EditFormValues): ParsedEntityEdit {
       const value = (values.get('value') ?? '').trim().replace(/\s+/g, ' ');
       if (!value) return { ok: false, message: 'A display name is required.' };
       if (value.length > MAX_DISPLAY_NAME) {
-        return { ok: false, message: `Display name is longer than ${MAX_DISPLAY_NAME} characters.` };
+        return {
+          ok: false,
+          message: `Display name is longer than ${MAX_DISPLAY_NAME} characters.`,
+        };
       }
       return { ok: true, edit: { field: 'displayName', value } };
     }
@@ -123,7 +126,10 @@ export function parseEntityFieldEdit(values: EditFormValues): ParsedEntityEdit {
     case 'livingStatus': {
       const value = (values.get('value') ?? '').trim();
       if (!(LIVING_STATUSES as readonly string[]).includes(value)) {
-        return { ok: false, message: `Living status must be one of: ${LIVING_STATUSES.join(', ')}.` };
+        return {
+          ok: false,
+          message: `Living status must be one of: ${LIVING_STATUSES.join(', ')}.`,
+        };
       }
       return { ok: true, edit: { field: 'livingStatus', value: value as LivingStatus } };
     }
@@ -151,7 +157,10 @@ export function parseEntityFieldEdit(values: EditFormValues): ParsedEntityEdit {
       if (!namespace) return { ok: false, message: 'An identifier namespace is required.' };
       if (!value) return { ok: false, message: 'An identifier value is required.' };
       if (namespace.length > MAX_IDENTIFIER_LENGTH || value.length > MAX_IDENTIFIER_LENGTH) {
-        return { ok: false, message: 'Identifier namespace and value must be under 200 characters.' };
+        return {
+          ok: false,
+          message: 'Identifier namespace and value must be under 200 characters.',
+        };
       }
       const trusted = values.get('trusted') === 'on' || values.get('trusted') === '1';
       return { ok: true, edit: { field: 'identifierAdd', value: { namespace, value, trusted } } };
@@ -313,7 +322,11 @@ export function beforeValueFor(
     readonly livingStatus: string;
     readonly aliases: readonly string[];
     readonly sensitivity: readonly { readonly class: string }[];
-    readonly identifiers: readonly { readonly id: string; readonly namespace: string; readonly value: string }[];
+    readonly identifiers: readonly {
+      readonly id: string;
+      readonly namespace: string;
+      readonly value: string;
+    }[];
   },
 ): unknown {
   switch (edit.field) {

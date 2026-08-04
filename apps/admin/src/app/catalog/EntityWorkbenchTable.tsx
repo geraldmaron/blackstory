@@ -195,7 +195,10 @@ export function EntityWorkbenchTable({
         row.sensitivity.length === 0 ? (
           <span aria-hidden="true">—</span>
         ) : (
-          <span className="story-review__badge" title={row.sensitivity.map((s) => s.source ?? s.class).join(', ')}>
+          <span
+            className="story-review__badge"
+            title={row.sensitivity.map((s) => s.source ?? s.class).join(', ')}
+          >
             {row.sensitivity.map((entry) => entry.class.replace(/_/g, ' ')).join(', ')}
           </span>
         ),

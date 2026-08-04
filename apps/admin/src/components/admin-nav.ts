@@ -119,7 +119,12 @@ export function adminPaletteItems(
   extras: readonly { readonly href: string; readonly label: string; readonly group: string }[] = [],
 ): readonly CommandPaletteItem[] {
   return [
-    { id: ADMIN_HOME.href, label: ADMIN_HOME.label, hint: ADMIN_HOME.href, ...keywordsOf(ADMIN_HOME) },
+    {
+      id: ADMIN_HOME.href,
+      label: ADMIN_HOME.label,
+      hint: ADMIN_HOME.href,
+      ...keywordsOf(ADMIN_HOME),
+    },
     ...ADMIN_NAV_GROUPS.flatMap((group) =>
       group.destinations.map((destination) => ({
         id: destination.href,

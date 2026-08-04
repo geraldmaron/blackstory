@@ -123,7 +123,13 @@ export default async function CatalogPage({
       query,
       formatLivingStatusLabel,
     ),
-    toFacetGroup('sensitivity', 'Sensitivity', 'sensitivityClasses', facets.sensitivityClass, query),
+    toFacetGroup(
+      'sensitivity',
+      'Sensitivity',
+      'sensitivityClasses',
+      facets.sensitivityClass,
+      query,
+    ),
   ];
 
   const filtersActive = hasActiveFilters(query);
@@ -153,8 +159,8 @@ export default async function CatalogPage({
 
       {degradedReason ? (
         <p className="story-review__alert" role="alert">
-          The catalog database did not answer, so this page is showing nothing rather than
-          waiting. Filters and search still work once it is reachable — reload to retry.{' '}
+          The catalog database did not answer, so this page is showing nothing rather than waiting.
+          Filters and search still work once it is reachable — reload to retry.{' '}
           <span className="ds-mono">{degradedReason}</span>
         </p>
       ) : null}

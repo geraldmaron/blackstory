@@ -39,10 +39,7 @@ test('an implausibly large selection is refused rather than run', () => {
   const result = planMerge('ent_survivor', many);
   assert.equal(result.status, 'invalid');
 
-  const atLimit = planMerge(
-    'ent_survivor',
-    many.slice(0, MAX_ABSORBED_PER_MERGE),
-  );
+  const atLimit = planMerge('ent_survivor', many.slice(0, MAX_ABSORBED_PER_MERGE));
   assert.equal(atLimit.status, 'ok');
 });
 

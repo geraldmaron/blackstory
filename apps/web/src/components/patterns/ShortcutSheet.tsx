@@ -140,9 +140,7 @@ export function ShortcutSheet({ open, onClose, className }: ShortcutSheetProps) 
             />
             <span>
               Single-key shortcuts
-              <span className="ds-shortcuts__settinghint">
-                Off leaves ⌘ and ⌥ chords working
-              </span>
+              <span className="ds-shortcuts__settinghint">Off leaves ⌘ and ⌥ chords working</span>
             </span>
           </label>
           <button

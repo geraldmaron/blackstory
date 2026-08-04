@@ -106,7 +106,9 @@ test('sensitivity writes the {class} shape the column actually stores', () => {
     { field: 'sensitivity', value: ['violence_associated'] },
     OPTIONS,
   );
-  assert.deepEqual(JSON.parse(String(statements[0]!.params[1])), [{ class: 'violence_associated' }]);
+  assert.deepEqual(JSON.parse(String(statements[0]!.params[1])), [
+    { class: 'violence_associated' },
+  ]);
 });
 
 test('adding an identifier already owned by another entity is refused, not moved', () => {
@@ -130,7 +132,10 @@ test('removing an identifier is scoped to the entity, not the id alone', () => {
     OPTIONS,
   );
 
-  assert.match(statements[0]!.sql, /DELETE FROM bb_canonical\.entity_identifiers WHERE id = \$2 AND entity_id = \$1/);
+  assert.match(
+    statements[0]!.sql,
+    /DELETE FROM bb_canonical\.entity_identifiers WHERE id = \$2 AND entity_id = \$1/,
+  );
   assert.deepEqual(statements[0]!.params, ['ent-1', 'ident-9']);
 });
 

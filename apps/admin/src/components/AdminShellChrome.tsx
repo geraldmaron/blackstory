@@ -49,9 +49,7 @@ export function AdminShellChrome({ children }: { readonly children: React.ReactN
     ...(ready && !user ? [{ href: '/login', label: 'Sign in' }] : []),
   ];
 
-  const paletteItems = adminPaletteItems(
-    extras.map((item) => ({ ...item, group: PUBLIC_GROUP })),
-  );
+  const paletteItems = adminPaletteItems(extras.map((item) => ({ ...item, group: PUBLIC_GROUP })));
 
   return (
     <div className="admin-shell">

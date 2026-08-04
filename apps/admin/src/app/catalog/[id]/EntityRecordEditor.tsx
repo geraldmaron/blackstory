@@ -115,7 +115,9 @@ export function EntityRecordEditor({
                 type="checkbox"
                 name="sensitivity"
                 value={sensitivityClass}
-                defaultChecked={entity.sensitivity.some((entry) => entry.class === sensitivityClass)}
+                defaultChecked={entity.sensitivity.some(
+                  (entry) => entry.class === sensitivityClass,
+                )}
               />
               <span>{titleCase(sensitivityClass)}</span>
             </label>

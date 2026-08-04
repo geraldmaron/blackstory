@@ -17,7 +17,14 @@ import { MergeForm } from './MergeForm';
 
 function parseIds(raw: string | string[] | undefined): readonly string[] {
   const values = Array.isArray(raw) ? raw : raw ? [raw] : [];
-  return [...new Set(values.flatMap((value) => value.split(',')).map((id) => id.trim()).filter(Boolean))];
+  return [
+    ...new Set(
+      values
+        .flatMap((value) => value.split(','))
+        .map((id) => id.trim())
+        .filter(Boolean),
+    ),
+  ];
 }
 
 export default async function MergePage({

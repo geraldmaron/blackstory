@@ -39,8 +39,7 @@ export type BulkEdit =
   | { readonly field: 'sensitivity'; readonly classes: readonly string[] };
 
 export type ParsedBulkEdit =
-  | { readonly ok: true; readonly edit: BulkEdit }
-  | { readonly ok: false; readonly message: string };
+  { readonly ok: true; readonly edit: BulkEdit } | { readonly ok: false; readonly message: string };
 
 export function parseBulkEdit(
   field: string,
@@ -54,7 +53,10 @@ export function parseBulkEdit(
         return { ok: false, message: `"${value}" is not a kind this archive uses.` };
       }
       // Class is derived, never posted: the form cannot offer a kind/class pair that disagrees.
-      return { ok: true, edit: { field: 'kind', kind: value, entityClass: entityClassForKind(value) } };
+      return {
+        ok: true,
+        edit: { field: 'kind', kind: value, entityClass: entityClassForKind(value) },
+      };
     }
     case 'livingStatus': {
       if (!(LIVING_STATUSES as readonly string[]).includes(value)) {
@@ -177,6 +179,8 @@ export function describeBulkEdit(edit: BulkEdit): string {
 }
 
 /** The verb each field commits under. Kind gets its own so the log reads as what happened. */
-export function bulkVerbFor(field: BulkField): 'entity.bulk_kind_reassign' | 'entity.bulk_field_edit' {
+export function bulkVerbFor(
+  field: BulkField,
+): 'entity.bulk_kind_reassign' | 'entity.bulk_field_edit' {
   return field === 'kind' ? 'entity.bulk_kind_reassign' : 'entity.bulk_field_edit';
 }

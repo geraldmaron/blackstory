@@ -120,11 +120,7 @@ import {
   type ExploreSearchCenterMarkerInput,
 } from '../../lib/map-experience/explore-search-marker';
 import { readDocumentColorScheme, stateLabelColorFor } from './color-scheme';
-import {
-  EMPTY_EDGE_COLLECTION,
-  EMPTY_FEATURE_COLLECTION,
-  type StageConfig,
-} from './stage-config';
+import { EMPTY_EDGE_COLLECTION, EMPTY_FEATURE_COLLECTION, type StageConfig } from './stage-config';
 import {
   applyGeographyStyle,
   buildStyleForScheme,
