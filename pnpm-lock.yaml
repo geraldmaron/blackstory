@@ -559,6 +559,9 @@ importers:
       pg:
         specifier: ^8.16.3
         version: 8.22.0
+      unpdf:
+        specifier: 1.6.2
+        version: 1.6.2
       zod:
         specifier: ^3.25.76
         version: 3.25.76
@@ -10898,8 +10901,7 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  unpdf@1.6.2:
-    optional: true
+  unpdf@1.6.2: {}
 
   unpipe@1.0.0: {}
 
