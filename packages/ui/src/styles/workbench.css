@@ -35,7 +35,7 @@
 .ds-datatable__head th {
   position: sticky;
   top: var(--ds-shell-header-height, 0px);
-  z-index: 1;
+  z-index: 1; /* local: lifts the sticky header row above its own scrolling rows, not above the page */
   background: var(--ds-surface);
   border-bottom: var(--ds-border-width) solid var(--ds-border-strong);
   padding: var(--ds-space-2) var(--ds-space-3);
@@ -211,7 +211,7 @@
 .ds-selection-bar {
   position: sticky;
   bottom: var(--ds-space-4);
-  z-index: 2;
+  z-index: 2; /* local: sits over the table it acts on, including that table's sticky head */
   display: flex;
   flex-wrap: wrap;
   align-items: center;
