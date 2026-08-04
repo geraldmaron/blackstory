@@ -1,3 +1,5 @@
+> **SUPERSEDED.** This document is superseded by design-direction-v9-surfaces.md. Route today: /books and /books/[slug]. It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
+
 # BlackStory design direction v6 — books edition
 
 **Status:** binding layout pattern for `/books` and `/books/*` (2026-07-23, redesign pass).  

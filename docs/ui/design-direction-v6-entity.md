@@ -1,3 +1,5 @@
+> **SUPERSEDED.** This document is superseded by design-direction-v9-surfaces.md and the v9 record page. Route today: /entity/[id]. It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
+
 # BlackStory design direction v6 — entity edition
 
 **Status:** binding layout pattern for `/entity/[id]` (2026-07-23; adaptive-beats revision 2026-07-29).  

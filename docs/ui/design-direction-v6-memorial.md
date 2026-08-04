@@ -1,3 +1,5 @@
+> **SUPERSEDED.** This document is superseded by design-direction-v9-surfaces.md. Route today: /memorial. It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
+
 # Design direction v6: Memorial (`/memorial`)
 
 **Status:** Binding for `/memorial`.  
