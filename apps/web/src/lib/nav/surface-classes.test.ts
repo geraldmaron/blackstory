@@ -10,7 +10,7 @@ import { readdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { ENDPOINT_ROUTES, surfaceClassFor } from './surface-classes';
+import { CLASSIFIED_PATHS, ENDPOINT_ROUTES, surfaceClassFor } from './surface-classes';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const appDir = join(here, '../../app');
@@ -37,10 +37,14 @@ function concretePath(route: string): string {
 }
 
 describe('surface class resolution', () => {
-  it('puts the Atlas and Story on the instrument', () => {
+  it('puts the Atlas on the instrument', () => {
     assert.equal(surfaceClassFor('/'), 'instrument');
-    assert.equal(surfaceClassFor('/story'), 'instrument');
-    assert.equal(surfaceClassFor('/story#chapter-redlining'), 'instrument');
+  });
+
+  it('does not classify /story, which was deprecated in favour of the Atlas story mode', () => {
+    // A classified path with no registry entry fails the coverage test, and a registry entry for
+    // a route that never renders puts a 404 in the palette. Story is neither: it is a mode of `/`.
+    assert.ok(!CLASSIFIED_PATHS.includes('/story'));
   });
 
   it('separates a catalogue index from its record pages', () => {

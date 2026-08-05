@@ -28,7 +28,7 @@ const SUPPORT_PATHS = [
     href: '/corrections',
     label: 'Report a correction',
     detail:
-      'Challenge a published record, suggest missing evidence, or report a precision issue. Submissions enter moderated review — nothing changes publicly until it passes independent review.',
+      'Challenge a published record, suggest missing evidence, or report a precision issue. Submissions enter moderated review, and nothing changes publicly until it passes independent review.',
   },
   {
     href: '/methodology',
@@ -51,7 +51,7 @@ export default function SupportPage() {
         pathname="/support"
         kicker="Help"
         title="Support"
-        lede="BlackStory is a place-connected research archive. The fastest path for factual issues is the corrections lane — moderated, receipted, and never published as submitted."
+        lede="BlackStory is a place-connected research archive. The fastest path for factual issues is the corrections lane: moderated, receipted, and never published as submitted."
         showPath={false}
       />
 
@@ -78,8 +78,8 @@ export default function SupportPage() {
       <UtilityCard title="Reach the team" className="ds-support__section-contact">
         <Prose>
           <p className="ds-support__contact-intro">
-            For issues that do not fit the corrections form — account of operation questions,
-            privacy requests, or accessibility barriers — email the contact below.
+            For issues that do not fit the corrections form (account of operation questions, privacy
+            requests, or accessibility barriers), email the contact below.
           </p>
         </Prose>
 

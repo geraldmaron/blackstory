@@ -342,7 +342,7 @@ const ARTIFACTS = [
       'https://fraser.stlouisfed.org/files/docs/publications/fha/1938feb_fha_underwritingmanual.pdf',
     dated: '1938',
     summary:
-      'Rule in force, 1938. Verbatim: "Usually the protection from adverse influences afforded by these means includes prevention of the infiltration of business and industrial uses, lower class occupancy, and inharmonious racial groups." (evidence ev_fha_1938_para935 / claim_fha1938_para935; public domain).',
+      'Rule in force, 1938. Verbatim: "Usually the protection from adverse influences afforded by these means includes prevention of the infiltration of business and industrial uses, lower class occupancy, and inharmonious racial groups." (public domain).',
     provenance: {
       source: 'federal-housing-administration',
       sourceUrl:
@@ -363,7 +363,7 @@ const ARTIFACTS = [
       'https://dsl.richmond.edu/panorama/redlining/static/citiesData/ILChicago1940/areaDescriptions/D30.json',
     dated: '1940-03',
     summary:
-      'Rule in force, Chicago D-area. Verbatim area description: "Negro population is largely concentrated south of Division St., and west of Wells St., but a continued infiltration of this race has caused an overflow north of that point; and it is reasonable to assume that the section may eventually become more negro than Italian." (evidence ev_holc_d30_nearnorth / claim_holc_d30; public domain).',
+      'Rule in force, Chicago D-area. Verbatim area description: "Negro population is largely concentrated south of Division St., and west of Wells St., but a continued infiltration of this race has caused an overflow north of that point; and it is reasonable to assume that the section may eventually become more negro than Italian." (public domain).',
     provenance: {
       source: 'mapping-inequality-holc',
       sourceUrl:
@@ -386,7 +386,7 @@ const ARTIFACTS = [
       'https://tile.loc.gov/storage-services/service/ll/usrep/usrep334/usrep334001/usrep334001.pdf',
     dated: '1911-02-16',
     summary:
-      'Rule in force, covenant era. Verbatim: ". . . that hereafter no part of said property or any portion thereof shall be, for said term of Fifty-years, occupied by any person not of the Caucasian race, it being intended hereby to restrict the use of said property ... against the occupancy as owners or tenants of any portion of said property for resident or other purpose by people of the Negro or Mongolian Race." (evidence ev_shelley_covenant_st_louis / claim_shelley_covenant_stlouis; public domain). Judicial enforcement of such covenants was held unconstitutional in Shelley v. Kraemer (1948).',
+      'Rule in force, covenant era. Verbatim: ". . . that hereafter no part of said property or any portion thereof shall be, for said term of Fifty-years, occupied by any person not of the Caucasian race, it being intended hereby to restrict the use of said property ... against the occupancy as owners or tenants of any portion of said property for resident or other purpose by people of the Negro or Mongolian Race." (public domain). Judicial enforcement of such covenants was held unconstitutional in Shelley v. Kraemer (1948).',
     provenance: {
       source: 'shelley-v-kraemer-record',
       sourceUrl:

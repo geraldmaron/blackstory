@@ -210,6 +210,15 @@ function positionScrollCue(
   const top = fieldBox.bottom - containerBox.top + SCROLL_CUE_GAP;
   scrollCue.style.top = `${top}px`;
 
+  /*
+   * The cue is now at its real resting place rather than the 60vh CSS fallback.
+   * `MemorialScrollCue` watches this attribute and takes the reader down to the
+   * name list the moment it appears — the cue is "available" from here on, and
+   * the page scrolls without waiting for a click. Setting it is idempotent; the
+   * packer rebuilds on resize and the cue only acts on the first transition.
+   */
+  scrollCue.dataset.anchored = 'true';
+
   // Read back after the write so the box reflects the position just applied,
   // and so the cue's own size comes from the rendered pill rather than a guess
   // at its padding and label width.

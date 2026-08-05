@@ -40,8 +40,13 @@ const nextConfig = {
     '/*': [
       './packages/schemas/constitution/**/*',
       '../../packages/schemas/constitution/**/*',
-      // Mention overrides are read at runtime via fs from @repo/domain's dist (repo-xez5.10);
-      // without this include the serverless bundle 500s with ENOENT on every dynamic route.
+      // Mention overrides: these two globs may no longer be needed. The comment here used to say
+      // @repo/domain reads the JSON at runtime via fs, and that is no longer true —
+      // packages/domain/src/graph/mention-resolver.ts imports it statically
+      // (`import ... with { type: 'json' }`), so the bundler carries it without help.
+      // Left in place deliberately rather than removed on that reasoning alone: if the inference
+      // is wrong, every dynamic route 500s with ENOENT in production. Removal is being evaluated
+      // under repo-01si, which wants a real production build to confirm before deleting.
       '../../packages/domain/dist/graph/data/**/*',
       '../../packages/domain/src/graph/data/**/*',
     ],

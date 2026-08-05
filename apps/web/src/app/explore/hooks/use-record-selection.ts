@@ -6,6 +6,13 @@ import type { CameraApi } from '../../../lib/map-experience/camera-moves';
 import { gradeForConfidence } from '../../../lib/map-experience/evidence-grade';
 import { placeLabelFor } from '../../../lib/map-experience/place-label';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
+import type { HistoryEdgeView } from '../../../lib/history/build-history-graph';
+import type { CitesEdgeIndex } from '../../../lib/release/build-cites-edge';
+import { chaptersCiting } from '../../../lib/release/build-cites-edge';
+import {
+  buildSheetConnections,
+  buildSheetSources,
+} from '../../../lib/map-experience/build-sheet-detail';
 import { anatomyPrecisionFor, eraFor } from './atlas-feature-helpers';
 
 /**
@@ -23,7 +30,43 @@ export function useRecordSelection(
   mode: AtlasMode,
   selectedId: string | undefined,
   setSelectedId: Dispatch<SetStateAction<string | undefined>>,
+  /**
+   * The ALL-TIME edge slice, not the active decade's. The decade rail filters what the plate
+   * draws; it must not filter what a record is documented by (SP-20).
+   */
+  allTimeEdges: readonly HistoryEdgeView[] = [],
+  citesEdge: CitesEdgeIndex = {},
+  /** Every feature in the catalog, so a connection can resolve to a record the lens filtered out. */
+  allFeatures: readonly ExploreMapFeature[] = sorted,
 ) {
+  /*
+   * Connections must resolve against the whole catalog, not the current lens. A record founded by
+   * an institution the reader has filtered out is still founded by it, and dropping the row would
+   * make the archive look thinner the more precisely someone searched it.
+   */
+  const featuresById = useMemo(() => {
+    const byId = new Map<string, ExploreMapFeature>();
+    for (const feature of allFeatures) byId.set(feature.properties.entityId, feature);
+    return byId;
+  }, [allFeatures]);
+
+  /** Selects a connected record, flying to it when the plate is carrying that pin. */
+  const selectById = useCallback(
+    (entityId: string) => {
+      const feature = featuresById.get(entityId);
+      if (feature) {
+        const [lng, lat] = feature.geometry.coordinates;
+        setSelectedId(entityId);
+        camera.flyToRecord({ center: [lng, lat], place: placeLabelFor(feature) });
+        return;
+      }
+      // No pin for it in this catalog: select it anyway so the rail and URL agree, without a
+      // camera move to nowhere.
+      setSelectedId(entityId);
+    },
+    [camera, featuresById, setSelectedId],
+  );
+
   const selectedFeature = useMemo(
     () => sorted.find((feature) => feature.properties.entityId === selectedId) ?? null,
     [selectedId, sorted],
@@ -104,15 +147,30 @@ export function useRecordSelection(
        */
       sourceCount: sources,
       href: selectedFeature.properties.href,
-      sources: [],
-      connections: [],
+      sources: buildSheetSources(allTimeEdges, selectedFeature.properties.entityId),
+      connections: buildSheetConnections(
+        allTimeEdges,
+        selectedFeature.properties.entityId,
+        (entityId) => {
+          const feature = featuresById.get(entityId);
+          if (!feature) return undefined;
+          return {
+            name: feature.properties.displayName,
+            kind: feature.properties.kind,
+            ...(feature.properties.mapTone ? { mapTone: feature.properties.mapTone } : {}),
+            ...(feature.properties.href ? { href: feature.properties.href } : {}),
+          };
+        },
+      ),
+      citingChapters: chaptersCiting(citesEdge, selectedFeature.properties.entityId),
     };
-  }, [mode, selectedFeature]);
+  }, [allTimeEdges, citesEdge, featuresById, mode, selectedFeature]);
 
   return {
     selectedFeature,
     selectedIndex,
     select,
+    selectById,
     stepRecord,
     sheetRecord,
   } as const;

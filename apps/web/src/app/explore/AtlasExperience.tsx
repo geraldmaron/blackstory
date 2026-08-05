@@ -27,7 +27,8 @@ import { ToastStack, useToasts } from '../../components/patterns/Toast';
 import { AnnotationOverlay } from '../../components/map-experience/AnnotationOverlay';
 import { CameraConsole } from '../../components/map-experience/CameraConsole';
 import { LensPanel, type LensLayerKey } from '../../components/map-experience/LensPanel';
-import { ResultsRail } from '../../components/map-experience/ResultsRail';
+import { MapExperienceLegend } from '../../components/map-experience/MapExperienceLegend';
+import { ResultsRail, type ResultsConstraint } from '../../components/map-experience/ResultsRail';
 import { RecordSheet } from '../../components/map-experience/RecordSheet';
 import { TimePanel } from '../../components/map-experience/TimePanel';
 import { MIGRATION_CORRIDORS } from '../../lib/map-experience/migration-corridors';
@@ -53,6 +54,24 @@ import { useStoryRunner } from './hooks/use-story-runner';
 import './atlas.css';
 
 void React;
+
+/**
+ * Basemap symbol layers the "Place labels" Lens chip governs (state/city and street names —
+ * `app/map/explore-style.ts`'s `plate-place-city` and `explore-street-label`). That module is
+ * outside this package's file lock, so the toggle reaches these layers through the live map
+ * instance rather than a new patch field on `MapStageDataPatch`.
+ */
+const PLACE_LABEL_LAYER_IDS = ['plate-place-city', 'explore-street-label'] as const;
+
+/** The narrow slice of the MapLibre instance the label toggle needs. `stage.getMap()` types as
+ * `AtlasCameraTarget` (camera-only, by design — MapStage.tsx §doc comment), so this file casts
+ * to this structural type the same way it already casts for `AnnotationOverlay`. */
+type LabelLayerMap = {
+  getLayer(id: string): unknown;
+  setLayoutProperty(id: string, name: string, value: unknown): void;
+  on(event: string, handler: () => void): void;
+  off(event: string, handler: () => void): void;
+};
 
 export type AtlasExperienceProps = {
   readonly initial: SerializableExploreViewModel;
@@ -128,6 +147,10 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     setEvidenceFloor,
     decade,
     setDecade,
+    topicId,
+    setTopicId,
+    layerMode,
+    setLayerMode,
     layers,
     setLayers,
     sort,
@@ -135,12 +158,61 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     filtered,
     sorted,
     kindCounts,
+    topicCounts,
     presence,
     stateOptions,
     decadeBars,
+    constraints,
     resetLens,
   } = useLensFilters(view, toasts);
   useMapSync(stage, view, filtered, layers.pins, layers.satellite, selectedId, stateCode);
+
+  // The Lens's own population-layer choice overrides the URL-seeded `view.viewState.layerMode`
+  // once the reader touches it. `useMapSync` (outside this package's file lock) still runs its
+  // own patch on the same data; this effect is declared after it so it always applies last and
+  // wins — see this file's props doc for why the layer id list above lives here instead.
+  useEffect(() => {
+    stage.patchData({
+      featureCollection: { type: 'FeatureCollection', features: layers.pins ? filtered : [] },
+      jurisdictionAreaFeatures: [],
+      layerMode,
+      densityLevels: view.densityLevels,
+      satellite: layers.satellite,
+      historyEdgesEnabled: false,
+      historyEdgeCollection: view.edgeLineCollection,
+      ...(view.viewState.popGeo ? { popGeo: view.viewState.popGeo } : {}),
+    });
+  }, [
+    filtered,
+    layers.pins,
+    layers.satellite,
+    layerMode,
+    stage,
+    view.densityLevels,
+    view.edgeLineCollection,
+    view.viewState.popGeo,
+  ]);
+
+  // "Place labels" (§5.2): the map plate's own basemap label layers. Reapplied on every
+  // `styledata` event because `patchData` rebuilds the style, which resets layout properties set
+  // through the live instance back to their style defaults.
+  useEffect(() => {
+    const map = stage.getMap() as unknown as LabelLayerMap | null;
+    if (!map) return;
+    const applyLabelVisibility = () => {
+      const visibility = layers.labels ? 'visible' : 'none';
+      for (const id of PLACE_LABEL_LAYER_IDS) {
+        if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', visibility);
+      }
+    };
+    applyLabelVisibility();
+    map.on('styledata', applyLabelVisibility);
+    return () => {
+      map.off('styledata', applyLabelVisibility);
+    };
+  }, [layers.labels, stage]);
+
+  const [legendOpen, setLegendOpen] = useState(false);
   const { camera, readout, spotlight, setSpotlight, runMove } = useAtlasCamera(
     stage,
     panels,
@@ -148,14 +220,18 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     selectedId !== undefined,
     setLayers,
   );
-  const { selectedFeature, selectedIndex, select, stepRecord, sheetRecord } = useRecordSelection(
-    stage,
-    camera,
-    sorted,
-    mode,
-    selectedId,
-    setSelectedId,
-  );
+  const { selectedFeature, selectedIndex, select, selectById, stepRecord, sheetRecord } =
+    useRecordSelection(
+      stage,
+      camera,
+      sorted,
+      mode,
+      selectedId,
+      setSelectedId,
+      view.edgeLineCatalog.allTime.edges,
+      view.citesEdge,
+      view.allFeatures,
+    );
   const { copy, citationFor, nearMe } = useReaderActions(toasts, camera);
   const { paletteRecords, destinations, paletteStates, featureById } = usePaletteData(
     view,
@@ -280,11 +356,17 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           onKindFamilyChange={setKindFamily}
           evidenceFloor={evidenceFloor}
           onEvidenceFloorChange={setEvidenceFloor}
+          topicOptions={topicCounts}
+          topicId={topicId}
+          onTopicChange={setTopicId}
           layers={layers}
           onLayerToggle={(layer: LensLayerKey) =>
             setLayers((current) => ({ ...current, [layer]: !current[layer] }))
           }
+          layerMode={layerMode}
+          onLayerModeChange={setLayerMode}
           presence={presence}
+          onShowLegend={() => setLegendOpen(true)}
           onReset={resetLens}
           onHide={() => hidePanel('lens')}
         />
@@ -301,6 +383,11 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           savedIds={savedSet}
           onToggleSave={toggleSave}
           onHide={() => hidePanel('results')}
+          constraints={constraints.map((constraint): ResultsConstraint => ({
+            key: constraint.key,
+            label: constraint.label,
+            onClear: constraint.onClear,
+          }))}
           emptyState={
             <EmptyState
               constraints={{
@@ -355,6 +442,16 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         </div>
       ) : null}
 
+      {legendOpen ? (
+        <div className="ds-atlas__legend-overlay" role="dialog" aria-label="Legend">
+          <MapExperienceLegend
+            layerMode={layerMode}
+            {...(view.viewState.popGeo ? { popGeo: view.viewState.popGeo } : {})}
+            onHide={() => setLegendOpen(false)}
+          />
+        </div>
+      ) : null}
+
       <p className="ds-atlas__readout" role="status" aria-live="polite">
         {readout}
       </p>
@@ -366,6 +463,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           ? { position: { index: selectedIndex + 1, total: sorted.length } }
           : {})}
         onStep={stepRecord}
+        onSelectConnection={selectById}
         onFlyToPlace={() => {
           if (selectedFeature) select(selectedFeature);
         }}

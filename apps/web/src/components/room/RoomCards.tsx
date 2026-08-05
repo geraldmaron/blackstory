@@ -31,6 +31,16 @@ export function CardGrid({ children, className }: CardGridProps) {
   return <div className={cx('ds-room-cards', className)}>{children}</div>;
 }
 
+/**
+ * A card's hero image. Optional, and only for catalogues whose entries are authored with one:
+ * a chapter has a hero, a law does not. `alt` is required rather than optional because a
+ * catalogue of images with no alt text is a catalogue a screen reader cannot browse.
+ */
+export type RoomCardMedia = {
+  readonly url: string;
+  readonly alt: string;
+};
+
 export type RoomCardProps = {
   readonly href: string;
   /** Mono caps kind tag: what sort of thing this is. */
@@ -40,12 +50,28 @@ export type RoomCardProps = {
   readonly description?: ReactNode;
   /** Mono footer facts — year, count, jurisdiction. Rendered as written. */
   readonly meta?: string;
+  /** Hero image, bled to the card's edges above the kind tag. */
+  readonly media?: RoomCardMedia;
   readonly className?: string;
 };
 
-export function RoomCard({ href, kind, title, description, meta, className }: RoomCardProps) {
+export function RoomCard({
+  href,
+  kind,
+  title,
+  description,
+  meta,
+  media,
+  className,
+}: RoomCardProps) {
   return (
-    <Link className={cx('ds-room-card', className)} href={href}>
+    <Link className={cx('ds-room-card', media && 'ds-room-card--media', className)} href={href}>
+      {media ? (
+        <span className="ds-room-card__media">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={media.url} alt={media.alt} loading="lazy" />
+        </span>
+      ) : null}
       <span className="ds-room-card__kind">{kind}</span>
       <h3 className="ds-room-card__title">{title}</h3>
       {description ? <p className="ds-room-card__desc">{description}</p> : null}

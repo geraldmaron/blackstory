@@ -22,6 +22,35 @@ bd close <id>         # Complete work
 - Run `bd prime` for detailed command reference and session close protocol
 - Use `bd remember` for persistent knowledge — do NOT use MEMORY.md files
 
+## Running subagents that edit files
+
+**Concurrent agents must not share one git working tree.** Spawn them with
+`isolation: "worktree"` (the Agent tool's own flag) so each gets its own checkout, or run them one
+at a time.
+
+This is not a style preference. On 2026-08-05 three agents were dispatched at once on
+non-overlapping *files*, which looked safe. One of them ran a broad `git checkout` to undo its own
+work and silently reverted another agent's already-verified, already-reviewed edits. Non-
+overlapping files are not enough; they also share a git index, a stash, and a working tree, and any
+agent that touches git destroys the others' work.
+
+Rules for any file-editing subagent:
+
+- Give it `isolation: "worktree"`, or run it alone.
+- Tell it explicitly not to run `git add`, `commit`, `push`, `stash`, `checkout`, or `restore` —
+  the orchestrator owns version control.
+- Tell it not to run `bd` — the orchestrator owns issue bookkeeping, and concurrent writers churn
+  `.beads/issues.jsonl`.
+- Review the actual `git diff` before believing the report. In that same run, one agent reported
+  "no non-comment modifications" while having edited a test assertion, and another reported success
+  on an edit that introduced a user-visible regression.
+- Check `git status` for files nobody was asked to touch (generated files like `next-env.d.ts`
+  reappear this way).
+
+Small models are fine for genuinely mechanical work, but "mechanical" is a claim to verify, not
+assume. A one-line regex widening in that run would have rendered "pre-Columbian" as
+"pre to Columbian" in production.
+
 ## Session Completion
 
 **When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
@@ -35,10 +64,14 @@ bd close <id>         # Complete work
    (see **Branching & Release Policy** below):
    ```bash
    git pull --rebase origin staging
-   bd dolt push
    git push origin HEAD:staging
    git status  # MUST show local branch is up to date with what you pushed
    ```
+
+   There is **no Dolt remote on this project and there is not going to be one.** Do not run
+   `bd dolt push` and do not report its "no remote is configured" output as a problem to solve.
+   Beads data reaches the remote the same way everything else does: the pre-commit hook exports
+   `.beads/issues.jsonl`, and `git push` carries it.
 5. **Clean up** - Clear stashes, prune remote branches
 6. **Verify** - All changes committed AND pushed
 7. **Hand off** - Provide context for next session
@@ -64,6 +97,31 @@ to merge). This is enforced server-side, not just a convention.
   intended for release. Do this only when asked, not automatically at session end.
 - If you're unsure whether a change belongs on `staging` alone or should also go to `main`,
   default to `staging` and ask.
+
+## Web local QA (agents)
+
+The web dev server is `preview_start {name: "web"}` on port 3048.
+
+**If something is already listening on 3048, attach to it — do not start a second one and do not
+kill the running process.** It is probably the developer's own server.
+
+```
+preview_start {url: "http://localhost:3048/"}
+```
+
+`autoPort` does not help here and should not be added to `.claude/launch.json`. Next 16 holds a
+dev lock per *directory*, not per port: a second `next dev` on `apps/web` binds its assigned port,
+prints "Ready", and is then killed by the first instance's lock. The port was never the conflict.
+
+The server is Postgres-backed (`dev-web.sh` loads `apps/web/.env.local` and sets
+`PUBLIC_DATA_SOURCE=postgres`), so a preview reflects live `bb_public` data, not seed.
+
+To run a one-off script against the same data, source the env and use the dev export condition —
+without `--conditions development` the workspace packages fail to resolve:
+
+```bash
+cd apps/web && set -a && . ./.env.local && set +a && node --conditions development --import tsx <script>.mts
+```
 
 ## Mobile local QA (agents)
 

@@ -96,7 +96,7 @@ export function SubmitLeadForm() {
   if (state.status === 'success') {
     return (
       <Notice tone="warning" title="Lead received">
-        Thank you — this lead (reference <code>{state.submissionId}</code>) has entered a moderated
+        Thank you. This lead (reference <code>{state.submissionId}</code>) has entered a moderated
         review queue. It is not public, and it will only ever seed research after independent
         reviewers agree it is worth pursuing. Nothing you submitted is visible to anyone but the
         moderation team.
@@ -147,7 +147,7 @@ export function SubmitLeadForm() {
 
       <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
         <label className="ds-filters__label" htmlFor={descriptionId}>
-          Description (if there is no single link — e.g. something you know firsthand)
+          Description (if there is no single link, e.g. something you know firsthand)
         </label>
         <textarea
           className="ds-filters__control"
@@ -197,7 +197,7 @@ export function SubmitLeadForm() {
 
       <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
         <label className="ds-filters__label" htmlFor={contactId}>
-          Contact (optional — only reachable by moderators, never shown publicly)
+          Contact (optional, only reachable by moderators, never shown publicly)
         </label>
         <input className="ds-filters__control" id={contactId} name="contact" type="text" />
       </div>
@@ -209,7 +209,7 @@ export function SubmitLeadForm() {
           className="ds-sans"
           style={{ marginLeft: 'var(--ds-space-2)' }}
         >
-          I believe this information is accurate to the best of my knowledge (optional attestation —
+          I believe this information is accurate to the best of my knowledge (optional attestation;
           leads are reviewed either way).
         </label>
       </div>

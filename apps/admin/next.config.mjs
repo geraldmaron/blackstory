@@ -15,9 +15,12 @@ const nextConfig = {
   // Vercel serves the Next build directly (same as apps/web) — do not emit
   // `output: 'standalone'`. Admin is its own Vercel project so its
   // write-capable DATABASE_URL stays out of the public site's runtime env.
-  // @repo/domain reads dist/graph/data/mention-overrides.json at runtime via
-  // fs (a computed path the tracer can't follow) — include it explicitly so
-  // the serverless bundle carries it.
+  // Mention overrides: this include may no longer be needed. The comment here used to say
+  // @repo/domain reads the JSON at runtime via fs on a path the tracer cannot follow, and that
+  // is no longer true — packages/domain/src/graph/mention-resolver.ts imports it statically
+  // (`import ... with { type: 'json' }`), so the bundler carries it without help. Left in place
+  // rather than removed on that inference alone; removal is being evaluated under repo-01si,
+  // which covers this config as well as apps/web's.
   outputFileTracingRoot: monorepoRoot,
   outputFileTracingIncludes: {
     '/*': ['../../packages/domain/dist/graph/data/**/*'],

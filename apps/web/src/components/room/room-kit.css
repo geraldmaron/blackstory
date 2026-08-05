@@ -299,6 +299,29 @@
   transform: translateY(-1px);
 }
 
+/* Hero media bleeds to the card's edges. `overflow: hidden` clips the image to the card's
+   radius; the fixed aspect ratio keeps a grid of mixed-aspect heroes on one baseline. */
+.ds-room-card--media {
+  overflow: hidden;
+}
+
+.ds-room-card__media {
+  display: block;
+  margin: calc(-1 * var(--ds-space-4)) calc(-1 * var(--ds-space-4)) var(--ds-space-1);
+  aspect-ratio: 16 / 9;
+  /* Clips on the media box, not the card: without it a portrait hero (a redlining map is
+     3:4) overflows its slot and the grid's cards stop sharing a baseline. */
+  overflow: hidden;
+  background: var(--ds-surface-raised);
+}
+
+.ds-room-card__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .ds-room-card__kind {
   font-family: var(--ds-font-mono);
   font-size: 9px;
@@ -1038,4 +1061,147 @@ a.ds-room-chip {
   margin-top: var(--ds-space-2);
   font-size: 13px;
   color: var(--room-ink-3);
+}
+
+/* —— map moment ————————————————————————————————————————————————————————————
+   The plate, borrowed, inside the flow. The slot is a 16:9 box the persistent map is moved into
+   when this moment is the one on screen; it never contains a map of its own.
+
+   Never full bleed behind prose. §4 states it as design law and this is where it is enforced:
+   the moment is a bounded figure in the column, so a route cannot opt into running body text
+   over a live map by styling its own wrapper. */
+
+.ds-mapmoment {
+  margin: var(--ds-space-8) 0;
+}
+
+.ds-mapmoment__plate {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  /* The idle ground the kit already reserved for this component. */
+  background: var(--room-sunk);
+  transition: border-color var(--ds-duration-base) ease;
+}
+
+/* Live is signalled by the copper edge AND by the tag text, never by colour alone. */
+.ds-mapmoment[data-live='1'] .ds-mapmoment__plate {
+  border-color: var(--ds-accent-graphic);
+}
+
+.ds-mapmoment__idle {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  padding-inline: var(--ds-space-4);
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--room-ink-4);
+  transition: opacity var(--ds-duration-base) ease;
+}
+
+.ds-mapmoment[data-live='1'] .ds-mapmoment__idle {
+  opacity: 0;
+}
+
+.ds-mapmoment__tag {
+  position: absolute;
+  left: var(--ds-space-3);
+  top: var(--ds-space-3);
+  z-index: 2; /* local: above the borrowed plate within this figure only, never the global ladder */
+  padding: 3px 8px;
+  font-family: var(--ds-font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-pill);
+  opacity: 0;
+  transition: opacity var(--ds-duration-base) ease;
+}
+
+.ds-mapmoment[data-live='1'] .ds-mapmoment__tag {
+  opacity: 1;
+}
+
+/* The Atlas hand-off. Hidden until the moment is live, because a control that opens "this view"
+   is a lie when the plate is somewhere else on the page. `visibility` rather than `opacity`
+   alone: an invisible control must also leave the tab order. */
+.ds-mapmoment__open {
+  position: absolute;
+  right: var(--ds-space-3);
+  bottom: var(--ds-space-3);
+  z-index: 2; /* local: same as the tag, above the borrowed plate within this figure only */
+  padding: var(--ds-space-2) var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  color: var(--ds-ink);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-pill);
+  text-decoration: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--ds-duration-base) ease,
+    visibility var(--ds-duration-base) ease;
+}
+
+.ds-mapmoment[data-live='1'] .ds-mapmoment__open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.ds-mapmoment__open:hover,
+.ds-mapmoment__open:focus-visible {
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+.ds-mapmoment__open:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+/* No scripting means no stage, which means the plate can never be borrowed into this slot. Holding
+   a 16:9 box open for a map that is never coming is dead space on seven rooms, so the slot
+   collapses to its message and the caption carries the moment on its own. Scoped to
+   `scripting: none` rather than done in the component, because a JS reader must not pay a layout
+   shift on hydration for a state that only ever applies to a reader who has none. */
+@media (scripting: none) {
+  .ds-mapmoment__plate {
+    aspect-ratio: auto;
+    min-height: 0;
+  }
+
+  .ds-mapmoment__idle {
+    position: static;
+    padding-block: var(--ds-space-4);
+    text-align: left;
+    place-content: start;
+  }
+
+  .ds-mapmoment__tag {
+    display: none;
+  }
+}
+
+.ds-mapmoment__caption {
+  max-width: 40em;
+  margin-top: var(--ds-space-3);
+  padding-left: var(--ds-space-3);
+  border-left: 2px solid var(--ds-rule);
+  font-family: var(--ds-font-mono);
+  font-size: 0.65625rem;
+  line-height: 1.5;
+  color: var(--room-ink-4);
 }

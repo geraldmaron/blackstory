@@ -12,6 +12,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { SENSITIVITY_CLASSES } from '@repo/domain';
+import { DetailField, DetailPanel } from '@repo/ui';
 import { readVerifiedAdminIdentity } from '../../../auth/supabase-server';
 import { staffRoleHasPermission } from '../../../auth/staff-permissions';
 import { readEntityDetail } from '../../../lib/entity-detail';
@@ -117,44 +118,45 @@ export default async function CatalogEntityDetailPage({
                 : 'Sign in to edit this record.'}
             </p>
 
-            <h2 className="ds-section__title">Aliases</h2>
-            {entity.aliases.length === 0 ? (
-              <p className="ds-sans">No aliases recorded.</p>
-            ) : (
-              <ul className="story-review__anchors">
-                {entity.aliases.map((alias) => (
-                  <li key={alias}>{alias}</li>
-                ))}
-              </ul>
-            )}
+            {/* Read-only view. Each empty case says which field is empty rather than going
+                blank, so "no aliases" cannot be mistaken for "aliases failed to load". */}
+            <DetailPanel title="Record fields">
+              <DetailField label="Aliases" emptyLabel="No aliases recorded">
+                {entity.aliases.length === 0 ? null : (
+                  <ul className="story-review__anchors">
+                    {entity.aliases.map((alias) => (
+                      <li key={alias}>{alias}</li>
+                    ))}
+                  </ul>
+                )}
+              </DetailField>
 
-            <h2 className="ds-section__title">Sensitivity</h2>
-            {entity.sensitivity.length === 0 ? (
-              <p className="ds-sans">No sensitivity classes recorded.</p>
-            ) : (
-              <ul className="story-review__anchors">
-                {entity.sensitivity.map((entry) => (
-                  <li key={entry.class}>
-                    <span className="ds-mono">{entry.class}</span>
-                    {entry.source ? ` (${entry.source})` : ''}
-                  </li>
-                ))}
-              </ul>
-            )}
+              <DetailField label="Sensitivity" emptyLabel="No sensitivity classes recorded">
+                {entity.sensitivity.length === 0 ? null : (
+                  <ul className="story-review__anchors">
+                    {entity.sensitivity.map((entry) => (
+                      <li key={entry.class}>
+                        <span className="ds-mono">{entry.class}</span>
+                        {entry.source ? ` (${entry.source})` : ''}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </DetailField>
 
-            <h2 className="ds-section__title">Identifiers</h2>
-            {entity.identifiers.length === 0 ? (
-              <p className="ds-sans">No identifiers recorded.</p>
-            ) : (
-              <ul className="story-review__anchors">
-                {entity.identifiers.map((identifier) => (
-                  <li key={identifier.id}>
-                    <span className="ds-mono">{identifier.namespace}</span> — {identifier.value}
-                    {identifier.trusted ? ' · trusted' : ''}
-                  </li>
-                ))}
-              </ul>
-            )}
+              <DetailField label="Identifiers" emptyLabel="No identifiers recorded">
+                {entity.identifiers.length === 0 ? null : (
+                  <ul className="story-review__anchors">
+                    {entity.identifiers.map((identifier) => (
+                      <li key={identifier.id}>
+                        <span className="ds-mono">{identifier.namespace}</span> — {identifier.value}
+                        {identifier.trusted ? ' · trusted' : ''}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </DetailField>
+            </DetailPanel>
           </>
         )}
 

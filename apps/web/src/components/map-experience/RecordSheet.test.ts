@@ -166,3 +166,106 @@ test('position reads as n of N', () => {
 test('copy carries no em dash', () => {
   assert.equal(render({ onFlyToPlace: () => {}, onSave: () => {} }).includes('—'), false);
 });
+
+/* ---------------------------------------------------------------------------- *
+ * SP-20 — the chapter-cites-record edge on the sheet.
+ * ---------------------------------------------------------------------------- */
+
+const CITED: SheetRecord = {
+  ...RECORD,
+  citingChapters: [
+    {
+      slug: 'birmingham-1963',
+      title: 'Birmingham, 1963',
+      relation: 'mapped in',
+      href: '/chapters/birmingham-1963',
+    },
+  ],
+};
+
+test('a cited record names the chapters that cite it, and how', () => {
+  const html = render({ record: CITED });
+  assert.match(html, /Chapters that cite this record/);
+  assert.match(html, /href="\/chapters\/birmingham-1963"/);
+  assert.match(html, /Birmingham, 1963/);
+  assert.match(html, /mapped in/, 'the relation must be stated in words, not implied');
+});
+
+test('a record no chapter cites renders no chapter section at all', () => {
+  assert.equal(render().includes('Chapters that cite this record'), false);
+  assert.equal(
+    render({ record: { ...RECORD, citingChapters: [] } }).includes(
+      'Chapters that cite this record',
+    ),
+    false,
+    'an empty heading would read as a hole in the archive',
+  );
+});
+
+test('the chapter count is stated alongside the heading', () => {
+  assert.match(render({ record: CITED }), /1 chapter/);
+  assert.match(
+    render({
+      record: {
+        ...CITED,
+        citingChapters: [
+          ...(CITED.citingChapters ?? []),
+          { slug: 'zoning', title: 'Zoning', relation: 'referenced in', href: '/chapters/zoning' },
+        ],
+      },
+    }),
+    /2 chapters/,
+  );
+});
+
+test('a connection with no page of its own still offers selection when the Atlas can select', () => {
+  const html = render({ onSelectConnection: () => {} });
+  assert.match(html, /ds-sheet__connection-select/);
+});
+
+test('without a select handler a page-less connection stays inert text, not a dead button', () => {
+  assert.equal(render().includes('ds-sheet__connection-select'), false);
+});
+
+test('a connection that has a page keeps its real link', () => {
+  const html = render({
+    record: {
+      ...RECORD,
+      connections: [
+        {
+          id: 'c1',
+          name: 'Kelly Ingram Park',
+          kind: 'place',
+          relation: 'across from',
+          href: '/entity/c1',
+        },
+      ],
+    },
+    onSelectConnection: () => {},
+  });
+  assert.match(html, /href="\/entity\/c1"/, 'middle-click and copy-link must still work');
+});
+
+test('the source count describes the list on screen, not a different tally', () => {
+  const html = render({
+    record: {
+      ...RECORD,
+      // The plate's own evidenceCount, which counts the record's accepted claims rather than the
+      // citations behind its documented relationships.
+      sourceCount: 2,
+      sources: [
+        { id: 's1', title: 'One' },
+        { id: 's2', title: 'Two' },
+        { id: 's3', title: 'Three' },
+      ],
+    },
+  });
+  assert.match(html, /3 sources/);
+  assert.equal(html.includes('2 sources'), false, 'the heading must not contradict its own list');
+});
+
+test('with no citations carried, the plate count still speaks for the record', () => {
+  const html = render({ record: { ...RECORD, sourceCount: 6, sources: [] } });
+  assert.match(html, /6 sources/);
+  assert.match(html, /This record cites 6 sources\./);
+});

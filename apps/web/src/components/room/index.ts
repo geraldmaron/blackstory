@@ -57,6 +57,19 @@ export {
   type UtilityStepProps,
 } from './Utility';
 export {
+  MapMoment,
+  MapMomentStage,
+  useMapMomentFrame,
+  pickLiveMoment,
+  resolveMomentCamera,
+  MOMENT_VISIBILITY_FLOOR,
+  type MapMomentProps,
+  type MapMomentStageProps,
+  type MapMomentCamera,
+  type MomentCandidate,
+  type MomentFrame,
+} from './MapMoment';
+export {
   OffRamp,
   RecordNav,
   EmptyList,

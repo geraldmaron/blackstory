@@ -87,12 +87,13 @@ test('every path the sitemap advertises is a page that exists', () => {
 });
 
 test('a destination is left out of the sitemap only on purpose', () => {
-  // Absent `crawl` is a decision, and the only decisions taken so far are /story (not built) and
-  // /design-system (noindex). Any third omission is an oversight until someone records why.
+  // Absent `crawl` is a decision, and the only one taken so far is /design-system (noindex).
+  // /story left this list by leaving the registry entirely when the route was deprecated.
+  // Any second omission is an oversight until someone records why.
   const omitted = allDestinations()
     .filter((destination) => destination.crawl === undefined)
     .map((destination) => destination.path);
-  assert.deepEqual(omitted.sort(), ['/design-system', '/story']);
+  assert.deepEqual(omitted.sort(), ['/design-system']);
 });
 
 test('the sitemap is the registry, not a second list of the same routes', () => {

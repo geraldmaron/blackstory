@@ -1,5 +1,10 @@
 /**
- * Fixed BlackStory brand palette (the "Pinned Page" identity, brand pack v3).
+ * Fixed BlackStory brand palette, kept in step with brand/tokens/colors.json.
+ *
+ * The "Pinned Page" name this comment used to carry was retired at the rebrand, and the label
+ * outliving the palette is what made repo-2jmd read as an unmigrated pre-rebrand file. Every hex
+ * below already matches brand/tokens/colors.json, which is the source mobile generates from; the
+ * only value here without a counterpart there is the extra copper shade.
  *
  * These colors are the brand's own, independent of light/dark theme tokens in
  * colors.ts, the same way a printed logo doesn't change color when the room

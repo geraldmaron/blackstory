@@ -83,9 +83,20 @@ export default async function DataPage() {
     throw new Error('Data page indicator bundle unavailable');
   }
 
+  const asOfDate = new Date(indicators.generatedAt);
+  const asOfLabel = Number.isNaN(asOfDate.getTime())
+    ? indicators.generatedAt
+    : asOfDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
   return (
     <Room>
-      <RoomHeader pathname="/data" kicker="Numbers" title="Data" lede={DATA_INTRO.lede} />
+      <RoomHeader
+        pathname="/data"
+        kicker="INDICATORS"
+        title="Data"
+        lede={DATA_INTRO.lede}
+        meta={[`As of ${asOfLabel} release`]}
+      />
 
       <DataSections
         timelineRows={timelineRows}
@@ -96,22 +107,15 @@ export default async function DataPage() {
         historicalStates={historicalStates}
         phase1Indicators={phase1}
         indicators={indicators}
+        populationGeneratedAt={timeline?.generatedAt}
       />
 
       <OffRamp
-        title={
-          <>
-            Go back to the <em>map</em>
-          </>
-        }
-        actions={[
-          { label: 'Explore the map', href: '/', emphasis: 'copper' },
-          { label: 'Search the archive', href: '/records' },
-          { label: 'Read methodology', href: '/methodology' },
-          { label: 'Banned books', href: '/books' },
-        ]}
+        title="Go to the record index"
+        actions={[{ label: 'Search the record index', href: '/records', emphasis: 'copper' }]}
       >
-        Use the archive itself—place layers show the records in their geography.
+        Every number here is a national or Phase 1 series. For the records behind a place, use the
+        record index.
       </OffRamp>
     </Room>
   );

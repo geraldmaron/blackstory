@@ -22,7 +22,7 @@ const REVIEW_BEATS = [
   },
   {
     kicker: 'Receipt code',
-    body: 'You receive a receipt code — the only way to check status. We cannot look up submissions without it.',
+    body: 'You receive a receipt code, the only way to check status. We cannot look up submissions without it.',
   },
   {
     kicker: 'No volume bias',
@@ -31,7 +31,7 @@ const REVIEW_BEATS = [
 ] as const;
 
 const AFTER_SUBMIT_STEPS: readonly React.ReactNode[] = [
-  'Save your receipt code immediately — it is the only credential for status lookup.',
+  'Save your receipt code immediately. It is the only credential for status lookup.',
   'Moderators verify your claim against primary and secondary sources before any public change.',
   'If closed and you believe the outcome was wrong, one appeal is available via the same receipt code.',
   <>
@@ -92,7 +92,7 @@ export function CorrectionsSections() {
             </h2>
             <p className="ds-section__lede">
               Challenge a published record, suggest missing evidence, or report a precision issue.
-              Corrections are normal system function — not an admission of failure.
+              Corrections are normal system function, not an admission of failure.
             </p>
             <ul className="ds-corrections__beat-grid">
               {REVIEW_BEATS.map((beat) => (

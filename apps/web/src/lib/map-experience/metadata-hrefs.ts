@@ -108,7 +108,7 @@ export function entityEvidenceHref(entityHref: string): string {
  * Label + optional href for era display.
  * - empty buckets → { label: 'Undated', href: undefined }
  * - one bucket → { label, href: exploreHrefForEra(bucket) }
- * - many → { label: `${first} – ${last}`, href: exploreHrefForEra(first) }
+ * - many → { label: `${first}-${last}`, href: exploreHrefForEra(first) }
  */
 export function eraFactLink(eraBuckets: readonly string[]): {
   readonly label: string;
@@ -126,5 +126,5 @@ export function eraFactLink(eraBuckets: readonly string[]): {
 
   const first = buckets[0]!;
   const last = buckets[buckets.length - 1]!;
-  return { label: `${first} – ${last}`, href: exploreHrefForEra(first) };
+  return { label: `${first}-${last}`, href: exploreHrefForEra(first) };
 }

@@ -26,9 +26,9 @@ export type SurfaceClass = 'instrument' | 'reading' | 'record' | 'utility';
  * (`/chapters/mosaic-credits` is Utility) can never be swallowed by its parent's prefix rule.
  */
 const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
-  // Instrument — the map is the content.
+  // Instrument — the map is the content. Story is a mode of `/`, not a path of its own, so it is
+  // not classified here; see the deprecation note in `destination-registry.ts`.
   ['/', 'instrument'],
-  ['/story', 'instrument'],
 
   // Reading room — one scrolling, measure-limited column on paper.
   // `/library` is the hub the rest of this list hangs off: it renders cards, not records, but it

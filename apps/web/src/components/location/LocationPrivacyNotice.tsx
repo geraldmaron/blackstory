@@ -21,7 +21,7 @@ export function LocationPrivacyNotice() {
   return (
     <details className="ds-location-privacy-notice">
       <summary className="ds-sans ds-location-privacy-notice__summary">
-        How this lookup uses your location — press the button below; nothing runs automatically
+        How this lookup uses your location. Press the button below; nothing runs automatically
       </summary>
       <Notice tone="warning" title="How this lookup uses your location">
         <ul
@@ -29,7 +29,7 @@ export function LocationPrivacyNotice() {
           style={{ gap: 'var(--ds-space-1)', margin: 0, paddingLeft: '1.1em' }}
         >
           <li>
-            Using your device&rsquo;s location requires you to press the button below — this page
+            Using your device&rsquo;s location requires you to press the button below. This page
             never requests it automatically.
           </li>
           <li>
@@ -38,7 +38,7 @@ export function LocationPrivacyNotice() {
           </li>
           <li>
             The exact coordinate is discarded immediately after that resolution; a ZIP code you
-            enter is translated to a place and then discarded — neither is kept as a stored history
+            enter is translated to a place and then discarded. Neither is kept as a stored history
             of your searches.
           </li>
           <li>

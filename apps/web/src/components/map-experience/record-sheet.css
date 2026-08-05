@@ -295,6 +295,36 @@
   color: var(--ds-ink-muted);
 }
 
+/*
+ * A connection with no page of its own still selects on the plate, so it is a button. Stripped
+ * back to the anchor's look rather than given a second appearance: the two rows sit in the same
+ * list and differing chrome would imply a difference in the record, not in its routing.
+ */
+.ds-sheet__connection-select {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+/*
+ * Chapter titles are sentences, not names, so this list wraps where the connection list does not.
+ * The relation keeps its own line at the end rather than being pushed off the right edge.
+ */
+.ds-sheet__chapters .ds-sheet__connection {
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.ds-sheet__chapters .ds-sheet__connection > a {
+  flex: 1 1 12rem;
+}
+
 .ds-sheet__relation {
   margin-left: auto;
   font-family: var(--ds-font-mono);
