@@ -49,7 +49,6 @@ const LEGACY_EDITION_CHROME: readonly string[] = [
   'explore/explore-panel-chrome.ts',
   'books/books-edition.css',
   'books/books-panel-chrome.ts',
-  'chapters/articles-edition.css',
   'data/data-edition.css',
   'data/data-panel-chrome.ts',
   'law/law-edition.css',

@@ -6,12 +6,9 @@
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import Link from 'next/link';
 import { listPublicArticleListItems } from '../../lib/articles/source';
-import { OffRamp, Room, RoomHeader } from '../../components/room';
+import { CardGrid, Note, OffRamp, Room, RoomCard, RoomHeader } from '../../components/room';
 import '../reading-room.css';
-// Retained for the chapter card itself, which carries a hero image the kit's RoomCard does not.
-import './articles-edition.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/chapters',
@@ -33,32 +30,26 @@ export default async function ChaptersIndexPage() {
       />
 
       {source === 'unavailable' ? (
-        <p className="ds-articles-edition__notice">
-          Articles are temporarily unavailable while we reconnect to the live record. Nothing here
+        <Note kind="Unavailable">
+          Chapters are temporarily unavailable while we reconnect to the live record. Nothing here
           is lost; please check back shortly.
-        </p>
+        </Note>
       ) : items.length === 0 ? (
-        <p className="ds-articles-edition__notice">No chapters are published yet.</p>
+        <Note kind="Empty">No chapters are published yet.</Note>
       ) : (
-        <ul className="ds-articles-grid">
+        <CardGrid>
           {items.map((item) => (
-            <li key={item.slug} className="ds-articles-grid__item">
-              <Link className="ds-article-card" href={`/chapters/${item.slug}`}>
-                {item.heroImage ? (
-                  <span className="ds-article-card__media">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={item.heroImage.url} alt={item.heroImage.alt} loading="lazy" />
-                  </span>
-                ) : null}
-                <span className="ds-article-card__meta">
-                  {item.eraLabel} · {item.placeLabel}
-                </span>
-                <span className="ds-article-card__title">{item.title}</span>
-                <span className="ds-article-card__summary">{item.summary}</span>
-              </Link>
-            </li>
+            <RoomCard
+              key={item.slug}
+              href={`/chapters/${item.slug}`}
+              kind="Chapter"
+              title={item.title}
+              description={item.summary}
+              meta={`${item.eraLabel} · ${item.placeLabel}`}
+              {...(item.heroImage ? { media: item.heroImage } : {})}
+            />
           ))}
-        </ul>
+        </CardGrid>
       )}
 
       <OffRamp
