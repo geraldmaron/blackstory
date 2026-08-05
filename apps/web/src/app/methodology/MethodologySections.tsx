@@ -10,17 +10,15 @@
  * for evidence grades, and "Precision" language identical to `Precision`'s own copy contract
  * (apps/web/src/components/room/Evidence.tsx).
  */
-'use client';
-
-import React, { useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Citation, Confidence, Notice } from '@repo/ui';
 import {
   FACT_CONFIDENCE_DEFINITIONS,
   FACT_CONFIDENCE_GRADES,
   type FactConfidenceGrade,
 } from '@repo/domain/facts';
+import { MethodologyAtlasShortcut } from './MethodologyAtlasShortcut';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import { humanizeToken, mapConfidenceToUiLevel } from '../../components/facts/format';
 import { ResearchPipelineSketch } from '../../components/trust/ResearchPipelineSketch';
@@ -60,50 +58,12 @@ export type MethodologySectionsProps = {
   readonly exampleRecordHref?: string;
 };
 
-/**
- * `A` opens the Atlas with the evidence floor set to A only. The Lens carries an exact-match
- * `confidence` parameter today, not a floor (`buildAtlasHref` in
- * `lib/records/build-records-index.ts`); "A only" and "confidence=high" happen to select the same
- * set, because the top floor admits nothing an exact match on the top tier would not, so this is
- * the correct link today and stays correct once the floor param ships (SP-16, repo-92n2.16).
- *
- * No shared reading-room shortcut registry exists yet to hang this on (`lib/keyboard/bindings.ts`
- * scopes bare keys to the Instrument only), so this is a locally scoped listener rather than a
- * registry entry. It reuses the registry's own `isTypingTarget` shape check so it fails the same
- * way the registry does when a reader is mid-form, instead of inventing a second definition of
- * "typing".
- */
-function useAtlasEvidenceFloorShortcut(): void {
-  const router = useRouter();
-  useEffect(() => {
-    function isTypingTarget(target: EventTarget | null): boolean {
-      if (target === null || typeof target !== 'object') return false;
-      const element = target as { tagName?: unknown; isContentEditable?: unknown };
-      if (element.isContentEditable === true) return true;
-      return (
-        typeof element.tagName === 'string' &&
-        ['INPUT', 'TEXTAREA', 'SELECT'].includes(element.tagName)
-      );
-    }
-    function onKeyDown(event: KeyboardEvent): void {
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
-      if (event.key.toLowerCase() !== 'a') return;
-      if (isTypingTarget(event.target)) return;
-      event.preventDefault();
-      router.push('/?confidence=high');
-    }
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [router]);
-}
-
 export function MethodologySections({ exampleRecordHref }: MethodologySectionsProps) {
-  useAtlasEvidenceFloorShortcut();
-
   const grades = FACT_CONFIDENCE_GRADES as readonly FactConfidenceGrade[];
 
   return (
     <>
+      <MethodologyAtlasShortcut />
       <RoomHeader
         pathname="/methodology"
         kicker="RECEIPT"

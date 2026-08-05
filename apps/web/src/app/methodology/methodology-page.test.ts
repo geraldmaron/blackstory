@@ -17,6 +17,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'MethodologySections.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'methodology-copy.ts'), 'utf8');
+const shortcutSource = readFileSync(join(here, 'MethodologyAtlasShortcut.tsx'), 'utf8');
 
 test('methodology page renders through the room kit, with no edition chrome left', () => {
   assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
@@ -56,7 +57,17 @@ test('methodology links to /memorial by name', () => {
 });
 
 test('the A shortcut sets the Atlas evidence floor to A only', () => {
-  assert.match(sectionsSource, /router\.push\('\/\?confidence=high'\)/);
+  assert.match(shortcutSource, /router\.push\('\/\?confidence=high'\)/);
+});
+
+test('the client boundary is the shortcut alone, never the sections', () => {
+  // `'use client'` is contagious through imports, not just behaviour. With the directive on
+  // MethodologySections, its `@repo/domain/facts` import dragged `@repo/schemas` and the
+  // constitution loader's `node:path`/`node:url` into the browser bundle, and `next build` failed
+  // on an unhandled `node:` scheme while lint, typecheck, tests and a11y all passed. None of the
+  // five gates builds, so this assertion is the guard that stands in for one.
+  assert.match(shortcutSource, /^'use client';/);
+  assert.doesNotMatch(sectionsSource, /'use client'/);
 });
 
 test('methodology preserves core trust copy', () => {

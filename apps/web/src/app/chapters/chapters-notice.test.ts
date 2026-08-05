@@ -17,7 +17,7 @@ import {
   buildEraGroups,
   buildPlaceGroups,
   chaptersHref,
-} from './page';
+} from './chapters-index';
 import type { PublicArticleListItemDoc } from '@repo/schemas';
 
 function item(overrides: Partial<PublicArticleListItemDoc>): PublicArticleListItemDoc {
