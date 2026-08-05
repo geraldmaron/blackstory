@@ -37,7 +37,7 @@ const TAXONOMY_ITEMS: readonly {
   {
     id: 'editors_note',
     term: "Editor's note",
-    definition: 'Editorial framing or methodology change — not a fact correction.',
+    definition: 'Editorial framing or methodology change, not a fact correction.',
   },
 ];
 
@@ -125,7 +125,7 @@ export function ErrataSections({ entries }: { readonly entries: readonly ErrataE
           </h2>
           <p className="ds-section__lede">
             Errors are fixed fully, quickly, and ungrudgingly. Every change is timestamped,
-            categorized, and preserved — nothing is silently edited. Corrected facts also carry
+            categorized, and preserved. Nothing is silently edited. Corrected facts also carry
             schema.org <span className="ds-mono">CorrectionComment</span> markup on their record
             pages.
           </p>

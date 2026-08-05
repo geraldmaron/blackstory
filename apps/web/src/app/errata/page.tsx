@@ -18,7 +18,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
   path: '/errata',
   title: 'Errata & corrections policy',
   description:
-    'Reverse-chronological log of corrections, clarifications, updates, and editor notes — fully, quickly, and without defensiveness.',
+    'Reverse-chronological log of corrections, clarifications, updates, and editor notes. Fixed fully, quickly, and without defensiveness.',
 });
 
 export default function ErrataPage() {
@@ -32,7 +32,7 @@ export default function ErrataPage() {
         pathname="/errata"
         kicker="Corrections"
         title="Errata log"
-        lede="Errors are fixed fully, quickly, and ungrudgingly. Every change is timestamped, categorized, and preserved — nothing is silently edited."
+        lede="Errors are fixed fully, quickly, and ungrudgingly. Every change is timestamped, categorized, and preserved. Nothing is silently edited."
       />
       <ErrataSections entries={entries} />
 

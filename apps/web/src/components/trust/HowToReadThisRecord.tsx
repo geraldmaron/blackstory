@@ -21,7 +21,7 @@ export function HowToReadThisRecord({
   if (variant === 'compact') {
     return (
       <p className="ds-entity-trust-offramp ds-sans">
-        How this record is built — <Link href={methodologyHref}>read the methodology</Link> for
+        How this record is built: <Link href={methodologyHref}>read the methodology</Link> for
         source hierarchy, confidence, and verification steps.
       </p>
     );
@@ -31,7 +31,7 @@ export function HowToReadThisRecord({
     <section aria-labelledby="how-to-read-heading">
       <Notice tone="dispute" title="How to read this record">
         <p id="how-to-read-heading" style={{ margin: 0 }}>
-          Historical records get challenged in predictable ways — quoting a source out of context,
+          Historical records get challenged in predictable ways: quoting a source out of context,
           demanding a single &ldquo;official&rdquo; document for events that were deliberately never
           documented, or attacking the messenger instead of the evidence. Here is how this record is
           built so you can check it yourself.

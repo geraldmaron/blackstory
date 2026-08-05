@@ -22,6 +22,35 @@ bd close <id>         # Complete work
 - Run `bd prime` for detailed command reference and session close protocol
 - Use `bd remember` for persistent knowledge — do NOT use MEMORY.md files
 
+## Running subagents that edit files
+
+**Concurrent agents must not share one git working tree.** Spawn them with
+`isolation: "worktree"` (the Agent tool's own flag) so each gets its own checkout, or run them one
+at a time.
+
+This is not a style preference. On 2026-08-05 three agents were dispatched at once on
+non-overlapping *files*, which looked safe. One of them ran a broad `git checkout` to undo its own
+work and silently reverted another agent's already-verified, already-reviewed edits. Non-
+overlapping files are not enough; they also share a git index, a stash, and a working tree, and any
+agent that touches git destroys the others' work.
+
+Rules for any file-editing subagent:
+
+- Give it `isolation: "worktree"`, or run it alone.
+- Tell it explicitly not to run `git add`, `commit`, `push`, `stash`, `checkout`, or `restore` —
+  the orchestrator owns version control.
+- Tell it not to run `bd` — the orchestrator owns issue bookkeeping, and concurrent writers churn
+  `.beads/issues.jsonl`.
+- Review the actual `git diff` before believing the report. In that same run, one agent reported
+  "no non-comment modifications" while having edited a test assertion, and another reported success
+  on an edit that introduced a user-visible regression.
+- Check `git status` for files nobody was asked to touch (generated files like `next-env.d.ts`
+  reappear this way).
+
+Small models are fine for genuinely mechanical work, but "mechanical" is a claim to verify, not
+assume. A one-line regex widening in that run would have rendered "pre-Columbian" as
+"pre to Columbian" in production.
+
 ## Session Completion
 
 **When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.

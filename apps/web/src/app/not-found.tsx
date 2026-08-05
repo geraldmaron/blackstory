@@ -49,7 +49,7 @@ export default function NotFound() {
           </div>
         }
       >
-        Press <kbd className="ds-kbd">⌘K</kbd> to search — it opens holding what this address was
+        Press <kbd className="ds-kbd">⌘K</kbd> to search. It opens holding what this address was
         trying to say.
       </EmptyState>
     </Room>
