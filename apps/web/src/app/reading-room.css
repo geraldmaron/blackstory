@@ -19,3 +19,107 @@
 [data-surface='reading'] .ds-room-offramp:not(:last-child) {
   margin-bottom: var(--ds-space-8);
 }
+
+/* ============================================================================================
+ * SP-11h — errata log rules
+ * Folded from apps/web/src/app/errata/errata.css (now deleted). The log is a plain
+ * reverse-chronological hairline list, never a set of disclosures: docs/ui/
+ * design-direction-v9-surfaces.md §4.2 "/errata".
+ * ============================================================================================ */
+
+.ds-errata__feedbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin: 0 0 var(--ds-space-8);
+}
+
+.ds-errata__log {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--ds-rule);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  overflow: hidden;
+}
+
+.ds-errata__row {
+  display: grid;
+  grid-template-columns: 6.5rem 12rem 1fr auto;
+  align-items: baseline;
+  gap: var(--ds-space-4);
+  padding: var(--ds-space-4);
+  background: var(--ds-surface);
+}
+
+.ds-errata__row-date {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ds-errata__row-id {
+  overflow: hidden;
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+a.ds-errata__row-id {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ds-errata__row-statement {
+  margin: 0;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.ds-errata__row-phase {
+  padding: 0.2rem 0.55rem;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+@media (max-width: 40rem) {
+  .ds-errata__row {
+    grid-template-columns: 1fr auto;
+    row-gap: var(--ds-space-2);
+  }
+
+  .ds-errata__row-statement {
+    grid-column: 1 / -1;
+  }
+}
+
+.ds-errata__empty {
+  margin: 0;
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) dashed var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
