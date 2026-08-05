@@ -1,5 +1,5 @@
 /**
- * Methodology v6 page wiring: shared gutter mosaic, preserved trust copy, home beat 04 alignment.
+ * Methodology v9 page wiring: room kit chrome, live evidence components, no drifted duplicate.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -21,21 +21,46 @@ const copySource = readFileSync(join(here, 'methodology-copy.ts'), 'utf8');
 test('methodology page renders through the room kit, with no edition chrome left', () => {
   assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
   assert.doesNotMatch(pageSource, /METHODOLOGY_EDITION_MOSAIC_SEED/);
-  // `data-methodology-edition="v6"` marked the per-route chrome the shared kit replaces.
   assert.doesNotMatch(pageSource, /data-methodology-edition="v6"/);
   assert.match(pageSource, /from '\.\.\/\.\.\/components\/room'/);
   assert.match(pageSource, /<Room>/);
-  // No RoomHeader on purpose: MethodologySections renders the page's own h1 and lede, and a second
-  // title would put two of each on the page the archive uses to prove its own rigour.
-  assert.doesNotMatch(pageSource, /<RoomHeader/);
 });
 
-test('methodology sections preserve core trust copy and evidence pipeline', () => {
-  assert.match(sectionsSource, /Released projections with receipts/);
-  assert.match(sectionsSource, /Evidence before assertion/);
+test('methodology renders its header through the shared RoomHeader with the RECEIPT kicker', () => {
+  assert.match(sectionsSource, /<RoomHeader/);
+  assert.match(sectionsSource, /kicker="RECEIPT"/);
+});
+
+test('methodology renders grade marks and citation strings through the live record-page components', () => {
+  // Same import source as apps/web/src/components/evidence/EvidenceCard.tsx, which is what
+  // record pages render a claim's grade mark and citation string with.
+  assert.match(sectionsSource, /import \{ Citation, Confidence, Notice \} from '@repo\/ui'/);
+  assert.match(sectionsSource, /<Confidence/);
+  assert.match(sectionsSource, /<Citation/);
+  // No local reimplementation of the grade mark or the citation string.
+  assert.doesNotMatch(sectionsSource, /ConfidenceMark/);
+  assert.match(sectionsSource, /formatCitation/);
+});
+
+test('methodology section names match the record page vocabulary', () => {
+  assert.match(sectionsSource, /How a record gets in/);
+  assert.match(sectionsSource, /What the evidence grades mean/);
+  assert.match(sectionsSource, /Why a point is never drawn sharper than its source/);
+  assert.match(sectionsSource, /<Precision/);
+  assert.match(sectionsSource, /Living person protection/);
+  assert.match(sectionsSource, /See it applied/);
+});
+
+test('methodology links to /memorial by name', () => {
+  assert.match(sectionsSource, /href="\/memorial"/);
+});
+
+test('the A shortcut sets the Atlas evidence floor to A only', () => {
+  assert.match(sectionsSource, /router\.push\('\/\?confidence=high'\)/);
+});
+
+test('methodology preserves core trust copy', () => {
   assert.match(sectionsSource, /ResearchPipelineSketch compact/);
-  assert.match(sectionsSource, /Confidence grades/);
-  assert.match(sectionsSource, /Map dignity/);
   for (const beat of METHODOLOGY_MISSION_BEATS) {
     assert.match(copySource, new RegExp(beat.kicker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
@@ -54,9 +79,4 @@ test('methodology user-facing copy avoids em dashes', () => {
   for (const value of strings) {
     assert.doesNotMatch(value, /—/);
   }
-});
-
-test('methodology operations section uses theme-aware edition panel, not ds-band', () => {
-  assert.match(sectionsSource, /methodologyEditionPanelClassName\('operations'\)/);
-  assert.doesNotMatch(sectionsSource, /ds-band/);
 });

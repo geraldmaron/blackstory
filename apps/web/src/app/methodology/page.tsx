@@ -1,6 +1,7 @@
 /**
- * Methodology v6 edition page: transparency and trust surface as a Surface card
- * stack on shared edition atmosphere. JSON-LD preserved; copy accurate.
+ * `/methodology` — the room kit build. See `MethodologySections.tsx` for why it renders no grade
+ * mark or citation string of its own: both come from the live `Confidence` and `Citation`
+ * components record pages use.
  */
 
 import type { Metadata } from 'next';
@@ -10,12 +11,10 @@ import {
   TrustSiteJsonLdScript,
 } from '../../components/trust/index';
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
+import { getPublicSearchIndex } from '../../lib/public-data/source';
 import { MethodologySections } from './MethodologySections';
 import { Room } from '../../components/room';
 import '../reading-room.css';
-// Retained for the section-level styling MethodologySections still carries; the page chrome it
-// used to provide is drawn by the room kit now.
-import './methodology-edition.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/methodology',
@@ -24,7 +23,25 @@ export const metadata: Metadata = buildStaticPageMetadata({
     'How BlackStory decides what qualifies, verifies sources, protects living people, handles corrections, and publishes confidence you can check yourself. History should not be erased, should not be hard to find, and should be accessible because it is about you.',
 });
 
-export default function MethodologyPage() {
+/**
+ * "See it applied" links to a currently published record. Live Postgres reads are only mounted
+ * at runtime (see `apps/web/src/app/entity/[id]/page.tsx`'s note on the same constraint), so this
+ * is best effort: when the catalogue cannot be reached, `MethodologySections` falls back to
+ * `/records`, which is itself always live.
+ */
+async function resolveExampleRecordHref(): Promise<string | undefined> {
+  try {
+    const { data } = await getPublicSearchIndex();
+    const first = data[0];
+    return first ? `/entity/${first.id}` : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export default async function MethodologyPage() {
+  const exampleRecordHref = await resolveExampleRecordHref();
+
   return (
     <Room>
       <TrustSiteJsonLdScript />
@@ -32,9 +49,7 @@ export default function MethodologyPage() {
         pagePath={TRUST_PATHS.methodology}
         pageTitle="Methodology"
       />
-      {/* MethodologySections renders its own heading and lede, so the room takes no RoomHeader:
-          a second title would put two h1s on the page the archive uses to prove its own rigour. */}
-      <MethodologySections />
+      <MethodologySections {...(exampleRecordHref ? { exampleRecordHref } : {})} />
     </Room>
   );
 }

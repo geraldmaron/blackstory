@@ -1,6 +1,17 @@
 /**
- * Data page body: v6 Surface edition stack with census population, Phase 1 indicator
- * visualizations, coverage strip, and explore/methodology next steps.
+ * Data page body: chart stack rendered through the v9 room kit.
+ *
+ * Each chart lives in its own card, and every card carries, in this order: the chart as static
+ * SVG, a mono source label, a mono as-of line, a plain-language reading of what the chart does
+ * and does not say, and a "Show the numbers" disclosure holding the table. No value is
+ * hover-only or colour-only: every series here is readable from the disclosure table alone.
+ *
+ * The kind composition graph that design-direction-v9-surfaces.md originally sent here from
+ * /history does not exist. `HistoryGraphPanel` was already a `@deprecated` pass-through with no
+ * graph body, and the document's own correction (repo-92n2.27) records that it was deleted, not
+ * moved, because the composition facet it would have shown already lives on /records as a
+ * crawlable facet. The composition card below renders the unavailable state design law defines
+ * for exactly this case: a source line and a Notice, never a fabricated chart.
  */
 import type { ReactNode } from 'react';
 import Link from 'next/link';
@@ -18,15 +29,20 @@ import { GroupedBarIndicatorChart } from '../../components/data/GroupedBarIndica
 import { PopulationByDecadeChart } from '../../components/data/PopulationByDecadeChart';
 import { RacePairComparisonChart } from '../../components/data/RacePairComparisonChart';
 import { StatePopulationShift } from '../../components/data/StatePopulationShift';
+import { formatDataPageValue } from '../../components/data/chart-utils';
 import type { DataSourceRef } from '../../components/data/SourceFootnote';
+import { humanSourceLabel } from '../../components/data/SourceFootnote';
+import '../../components/data/data-charts.css';
+import { DATA_ORIENTATION_BEATS, DATA_PAGE_SECTIONS, DATA_SECTION_COPY } from './data-copy';
 import {
-  DATA_INTRO,
-  DATA_ORIENTATION_BEATS,
-  DATA_PAGE_SECTIONS,
-  DATA_SECTION_COPY,
-} from './data-copy';
-import { dataEditionPanelClassName, dataEditionStackClassName } from './data-panel-chrome';
-import './data-edition.css';
+  DataTable,
+  Disclosure,
+  GroupHeading,
+  Note,
+  Prose,
+  UtilityCard,
+  type DataTableColumn,
+} from '../../components/room';
 
 export type DataStatStripItem = {
   readonly id: string;
@@ -45,57 +61,118 @@ export type DataSectionsProps = {
   readonly historicalStates: HistoricalStatePopulationCoverage | undefined;
   readonly phase1Indicators: Phase1IndicatorCoverageSummary | undefined;
   readonly indicators: DataPageIndicatorBundle;
+  readonly populationGeneratedAt?: string | undefined;
 };
 
-function formatCount(value: number): string {
-  return value.toLocaleString('en-US');
+function formatAsOf(value: string | undefined): string {
+  if (!value) return 'Release date not recorded for this series';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-function formatDecadeRange(min: string, max: string): string {
-  return `${min} to ${max}`;
+function sourceLabelLine(sources: readonly DataSourceRef[]): string {
+  if (sources.length === 0) return 'Source not recorded for this series';
+  const labels = sources.map((source) => humanSourceLabel(source.label));
+  return Array.from(new Set(labels)).join('; ');
 }
 
-function DataUnavailable({ topic }: { readonly topic: string }) {
-  return (
-    <p className="ds-data-edition__empty">
-      {topic} is not available on this release yet. <Link href="/">Open the map</Link> for place
-      layers, or check back after the next update.
-    </p>
-  );
-}
-
-type EditionHeaderProps = {
-  readonly index: string;
-  readonly kicker: string;
-  readonly title: ReactNode;
-  readonly lede?: ReactNode;
-  readonly headingId: string;
-  readonly titleTag?: 'h1' | 'h2';
+type ChartTable = {
+  readonly caption: string;
+  readonly columns: readonly DataTableColumn[];
+  readonly rows: readonly Readonly<Record<string, ReactNode>>[];
 };
 
-function DataEditionHeader({
-  index,
+/**
+ * Every chart card, in order: chart (static SVG, rendered by the caller), source label, as-of
+ * line, a plain-language limits sentence, then "Show the numbers".
+ */
+function ChartCard({
+  id,
   kicker,
   title,
-  lede,
-  headingId,
-  titleTag = 'h2',
-}: EditionHeaderProps) {
-  const TitleTag = titleTag;
+  sourceLabel,
+  asOf,
+  limits,
+  table,
+  children,
+}: {
+  readonly id: string;
+  readonly kicker: string;
+  readonly title: string;
+  readonly sourceLabel: string;
+  readonly asOf: string;
+  readonly limits: ReactNode;
+  readonly table: ChartTable | null;
+  readonly children: ReactNode;
+}) {
+  const headingId = `${id}-heading`;
   return (
-    <header className="ds-data-edition__header">
-      <span className="ds-data-edition__index" aria-hidden="true">
-        {index}
-      </span>
-      <div>
-        <p className="ds-data-edition__kicker">{kicker}</p>
-        <TitleTag className="ds-data-edition__title" id={headingId}>
-          {title}
-        </TitleTag>
-        {lede ? <p className="ds-data-edition__lede">{lede}</p> : null}
-      </div>
-    </header>
+    <article className="ds-data-edition__panel" aria-labelledby={headingId} id={id}>
+      <GroupHeading>
+        <span id={headingId}>
+          {kicker} · {title}
+        </span>
+      </GroupHeading>
+      <UtilityCard>
+        <div className="ds-data-edition__viz">{children}</div>
+        <Note kind="SOURCE">{sourceLabel}</Note>
+        <Note kind="AS OF">{asOf}</Note>
+        <p>{limits}</p>
+        <Disclosure summary="Show the numbers">
+          {table ? (
+            <DataTable caption={table.caption} columns={table.columns} rows={table.rows} />
+          ) : (
+            <p>
+              No numeric series is attached to this card. See the kind facet on{' '}
+              <Link href="/records">the record index</Link> for the counted breakdown.
+            </p>
+          )}
+        </Disclosure>
+      </UtilityCard>
+    </article>
   );
+}
+
+function racePairRows(series: {
+  readonly primary: {
+    readonly label: string;
+    readonly value: number;
+    readonly unit: 'usd' | 'percent' | 'per_100k' | 'months';
+  };
+  readonly comparison: {
+    readonly label: string;
+    readonly value: number;
+    readonly unit: 'usd' | 'percent' | 'per_100k' | 'months';
+  };
+}) {
+  return [
+    {
+      group: series.primary.label,
+      value: formatDataPageValue(series.primary.value, series.primary.unit),
+    },
+    {
+      group: series.comparison.label,
+      value: formatDataPageValue(series.comparison.value, series.comparison.unit),
+    },
+  ];
+}
+
+function groupedBarRows(series: {
+  readonly unit: 'usd' | 'percent' | 'per_100k' | 'months';
+  readonly series: readonly { readonly id: string; readonly label: string }[];
+  readonly points: readonly {
+    readonly period: string;
+    readonly values: Readonly<Record<string, number>>;
+  }[];
+}) {
+  return series.points.map((point) => {
+    const row: Record<string, ReactNode> = { period: point.period };
+    for (const def of series.series) {
+      row[def.id] = formatDataPageValue(point.values[def.id] ?? 0, series.unit);
+    }
+    return row;
+  });
 }
 
 export function DataSections({
@@ -107,6 +184,7 @@ export function DataSections({
   historicalStates,
   phase1Indicators,
   indicators,
+  populationGeneratedAt,
 }: DataSectionsProps) {
   const servedFromNote =
     indicators.servedFrom === 'fixture'
@@ -114,43 +192,20 @@ export function DataSections({
       : 'Charts below read from the reference indicator warehouse when available.';
 
   return (
-    <div className={dataEditionStackClassName()}>
-      <article className={dataEditionPanelClassName('intro')}>
-        <DataEditionHeader
-          index="00"
-          kicker={DATA_INTRO.kicker}
-          title={
-            <>
-              Data behind the <em>archive</em>.
-            </>
-          }
-          lede={DATA_INTRO.lede}
-          headingId="data-intro-heading"
-          titleTag="h1"
-        />
-        <p className="ds-data-edition__actions">
-          <Link className="ds-cta ds-cta--quiet" href="/methodology">
-            Juxtaposition rules
-          </Link>
-        </p>
-        <p className="ds-data-edition__credit">
-          Archive texture · symbolic atmosphere.{' '}
-          <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
-        </p>
-      </article>
-
+    <div className="ds-data-edition__stack">
       <article
-        className={dataEditionPanelClassName('orientation')}
+        className="ds-data-edition__panel"
         aria-labelledby="orientation-heading"
         id="orientation"
       >
-        <DataEditionHeader
-          index={DATA_SECTION_COPY.orientation.index}
-          kicker={DATA_SECTION_COPY.orientation.kicker}
-          title={DATA_SECTION_COPY.orientation.title}
-          lede={`${DATA_SECTION_COPY.orientation.lede} ${servedFromNote}`}
-          headingId="orientation-heading"
-        />
+        <GroupHeading>
+          <span id="orientation-heading">{DATA_SECTION_COPY.orientation.title}</span>
+        </GroupHeading>
+        <Prose>
+          <p>
+            {DATA_SECTION_COPY.orientation.lede} {servedFromNote}
+          </p>
+        </Prose>
         <ul className="ds-data-edition__beat-grid">
           {DATA_ORIENTATION_BEATS.map((beat) => (
             <li key={beat.kicker} className="ds-data-edition__beat">
@@ -173,37 +228,56 @@ export function DataSections({
             ))}
           </ul>
         </nav>
+        <p className="ds-data-edition__credit">
+          Archive texture · symbolic atmosphere.{' '}
+          <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
+        </p>
       </article>
 
-      <article
-        className={dataEditionPanelClassName('population')}
-        aria-labelledby="population-heading"
+      <ChartCard
         id="population"
+        kicker={DATA_SECTION_COPY.population.kicker}
+        title={DATA_SECTION_COPY.population.title}
+        sourceLabel={sourceLabelLine(chartSources)}
+        asOf={formatAsOf(populationGeneratedAt)}
+        limits={
+          <>
+            This chart shows how many Black Americans the decennial census counted each decade, 1790
+            to 2020. Race categories on the census have changed, so a count in 1940 and a count in
+            2020 are not the same measurement. The chart marks the 2000 boundary rather than
+            smoothing across it, and it does not say why a state&apos;s count moved: that argument
+            needs records, not a count.
+          </>
+        }
+        table={
+          timelineRows.length > 0
+            ? {
+                caption: 'Black population by decade, 1790 to 2020',
+                columns: [
+                  { key: 'decade', label: 'Decade' },
+                  { key: 'black', label: 'Black population', numeric: true },
+                  { key: 'total', label: 'Total population', numeric: true },
+                  { key: 'share', label: 'Share', numeric: true },
+                ],
+                rows: timelineRows.map((row) => ({
+                  decade: `${row.decade}${row.southernUndercountCaveat ? ' (undercount noted)' : ''}`,
+                  black: row.blackPopulation.toLocaleString('en-US'),
+                  total: row.totalPopulation.toLocaleString('en-US'),
+                  share:
+                    row.totalPopulation > 0
+                      ? `${((row.blackPopulation / row.totalPopulation) * 100).toFixed(1)}%`
+                      : '—',
+                })),
+              }
+            : null
+        }
       >
-        <DataEditionHeader
-          index={DATA_SECTION_COPY.population.index}
-          kicker={DATA_SECTION_COPY.population.kicker}
-          title={DATA_SECTION_COPY.population.title}
-          lede={DATA_SECTION_COPY.population.lede}
-          headingId="population-heading"
-        />
         {timelineRows.length > 0 ? (
           <>
-            <div className="ds-data-edition__viz">
-              <PopulationByDecadeChart rows={timelineRows} sources={chartSources} />
-              <BlackPopulationShareChart rows={timelineRows} sources={chartSources} />
-            </div>
+            <PopulationByDecadeChart rows={timelineRows} sources={chartSources} />
+            <BlackPopulationShareChart rows={timelineRows} sources={chartSources} />
             {changeStripItems.length > 0 ? (
-              <>
-                <h3 className="ds-data-edition__subhead" id="population-change-heading">
-                  Recent decade-to-decade change
-                </h3>
-                <DataStatStrip labelledBy="population-change-heading" items={changeStripItems} />
-                <p className="ds-data-edition__note">
-                  Race labels on the Census have changed. The charts mark definition boundaries
-                  instead of hiding them.
-                </p>
-              </>
+              <DataStatStrip labelledBy="population-heading" items={changeStripItems} />
             ) : null}
             {stateChanges.length > 0 ? (
               <StatePopulationShift
@@ -215,142 +289,165 @@ export function DataSections({
               />
             ) : null}
             {historicalStates ? (
-              <>
-                <h3 className="ds-data-edition__subhead" id="historical-state-coverage-heading">
-                  Historical state tables (1790 to 1990)
-                </h3>
-                <DataStatStrip
-                  labelledBy="historical-state-coverage-heading"
-                  sources={[
-                    {
-                      label: 'U.S. Census Bureau, Working Paper 56 (state tables 15 to 65)',
-                      url: historicalStates.sourceUrl,
-                    },
-                  ]}
-                  items={[
-                    {
-                      id: 'hist-state-rows',
-                      value: formatCount(historicalStates.rowCount),
-                      label: 'State-by-decade records',
-                      note: formatDecadeRange(
-                        historicalStates.decadeMin,
-                        historicalStates.decadeMax,
-                      ),
-                    },
-                    {
-                      id: 'hist-state-count',
-                      value: formatCount(historicalStates.stateCount),
-                      label: 'States and D.C. included',
-                      note: 'Not every state appears in every decade',
-                    },
-                  ]}
-                />
-              </>
+              <DataStatStrip
+                labelledBy="population-heading"
+                sources={[
+                  {
+                    label: 'U.S. Census Bureau, Working Paper 56 (state tables 15 to 65)',
+                    url: historicalStates.sourceUrl,
+                  },
+                ]}
+                items={[
+                  {
+                    id: 'hist-state-rows',
+                    value: historicalStates.rowCount.toLocaleString('en-US'),
+                    label: 'State-by-decade records',
+                    note: `${historicalStates.decadeMin} to ${historicalStates.decadeMax}`,
+                  },
+                  {
+                    id: 'hist-state-count',
+                    value: historicalStates.stateCount.toLocaleString('en-US'),
+                    label: 'States and D.C. included',
+                    note: 'Not every state appears in every decade',
+                  },
+                ]}
+              />
             ) : null}
           </>
         ) : (
-          <DataUnavailable topic="Census population figures" />
+          <p className="ds-data-edition__empty">
+            Census population figures are not available on this release. Open{' '}
+            <Link href="/">the map</Link> for place layers.
+          </p>
         )}
-      </article>
+      </ChartCard>
 
-      <article
-        className={dataEditionPanelClassName('wealth')}
-        aria-labelledby="wealth-heading"
+      <ChartCard
         id="wealth"
+        kicker={DATA_SECTION_COPY.wealth.kicker}
+        title={DATA_SECTION_COPY.wealth.title}
+        sourceLabel={sourceLabelLine(indicators.wealthComparison.sources)}
+        asOf={formatAsOf(indicators.generatedAt)}
+        limits={
+          <>
+            Median family net worth from the Federal Reserve&apos;s triennial survey: a national
+            juxtaposition, not a place-specific measurement. It names a gap; it does not name a
+            cause. Reading a cause needs the statutes, deeds and underwriting records the archive
+            holds elsewhere.
+          </>
+        }
+        table={{
+          caption: indicators.wealthComparison.title,
+          columns: [
+            { key: 'group', label: 'Group' },
+            { key: 'value', label: 'Value', numeric: true },
+          ],
+          rows: racePairRows(indicators.wealthComparison),
+        }}
       >
-        <DataEditionHeader
-          index={DATA_SECTION_COPY.wealth.index}
-          kicker={DATA_SECTION_COPY.wealth.kicker}
-          title={DATA_SECTION_COPY.wealth.title}
-          lede={
-            <>
-              Median family net worth from the Federal Reserve&apos;s triennial survey: a national
-              juxtaposition used when asking how housing-credit eras relate to wealth.
-            </>
-          }
-          headingId="wealth-heading"
-        />
-        <div className="ds-data-edition__viz">
-          <RacePairComparisonChart series={indicators.wealthComparison} />
-          {indicators.wealthTrend ? (
-            <GroupedBarIndicatorChart series={indicators.wealthTrend} />
-          ) : null}
-        </div>
-      </article>
+        <RacePairComparisonChart series={indicators.wealthComparison} />
+        {indicators.wealthTrend ? (
+          <GroupedBarIndicatorChart series={indicators.wealthTrend} />
+        ) : null}
+      </ChartCard>
 
-      <article
-        className={dataEditionPanelClassName('housing')}
-        aria-labelledby="housing-heading"
+      <ChartCard
         id="housing"
+        kicker={DATA_SECTION_COPY.housing.kicker}
+        title={DATA_SECTION_COPY.housing.title}
+        sourceLabel={sourceLabelLine([
+          ...indicators.cookHomeownership.sources,
+          ...indicators.hmdaDenialRates.sources,
+          ...indicators.costBurdenComparison.sources,
+        ])}
+        asOf={formatAsOf(indicators.generatedAt)}
+        limits={
+          <>
+            Cook County is the Phase 1 place spine: decennial homeownership, mortgage denial rates
+            and HUD cost burden. These are published rates for the censuses and years shown, with
+            nothing interpolated between them. A rate is only as good as the survey behind it; it
+            does not trace an individual household&apos;s path.
+          </>
+        }
+        table={{
+          caption: indicators.cookHomeownership.title,
+          columns: [
+            { key: 'period', label: 'Period' },
+            ...indicators.cookHomeownership.series.map((def) => ({
+              key: def.id,
+              label: def.label,
+              numeric: true,
+            })),
+          ],
+          rows: groupedBarRows(indicators.cookHomeownership),
+        }}
       >
-        <DataEditionHeader
-          index={DATA_SECTION_COPY.housing.index}
-          kicker={DATA_SECTION_COPY.housing.kicker}
-          title={DATA_SECTION_COPY.housing.title}
-          lede={DATA_SECTION_COPY.housing.lede}
-          headingId="housing-heading"
-        />
-        <div className="ds-data-edition__viz">
-          <GroupedBarIndicatorChart series={indicators.cookHomeownership} />
-          <GroupedBarIndicatorChart series={indicators.hmdaDenialRates} />
-          <RacePairComparisonChart series={indicators.costBurdenComparison} />
-        </div>
-      </article>
+        <GroupedBarIndicatorChart series={indicators.cookHomeownership} />
+        <GroupedBarIndicatorChart series={indicators.hmdaDenialRates} />
+        <RacePairComparisonChart series={indicators.costBurdenComparison} />
+      </ChartCard>
 
-      <article
-        className={dataEditionPanelClassName('justice')}
-        aria-labelledby="justice-heading"
+      <ChartCard
         id="justice"
+        kicker={DATA_SECTION_COPY.justice.kicker}
+        title={DATA_SECTION_COPY.justice.title}
+        sourceLabel={sourceLabelLine([
+          ...indicators.imprisonmentComparison.sources,
+          ...indicators.federalDrugSentences.sources,
+        ])}
+        asOf={formatAsOf(indicators.generatedAt)}
+        limits={
+          <>
+            State imprisonment rates and federal cocaine sentencing averages give context for
+            drug-policy eras. They are not proof that any single law caused a number: that argument
+            has to be made with the statute text and the record it produced.
+          </>
+        }
+        table={{
+          caption: indicators.imprisonmentComparison.title,
+          columns: [
+            { key: 'group', label: 'Group' },
+            { key: 'value', label: 'Value', numeric: true },
+          ],
+          rows: racePairRows(indicators.imprisonmentComparison),
+        }}
       >
-        <DataEditionHeader
-          index={DATA_SECTION_COPY.justice.index}
-          kicker={DATA_SECTION_COPY.justice.kicker}
-          title={DATA_SECTION_COPY.justice.title}
-          lede={
-            <>
-              State imprisonment rates (BJS) and federal cocaine sentencing averages (USSC Quick
-              Facts): context for drug-policy eras, not proof that any single law caused a number.
-            </>
-          }
-          headingId="justice-heading"
-        />
-        <div className="ds-data-edition__viz">
-          <RacePairComparisonChart series={indicators.imprisonmentComparison} />
-          <GroupedBarIndicatorChart series={indicators.federalDrugSentences} />
-        </div>
-      </article>
+        <RacePairComparisonChart series={indicators.imprisonmentComparison} />
+        <GroupedBarIndicatorChart series={indicators.federalDrugSentences} />
+      </ChartCard>
 
-      <article
-        className={dataEditionPanelClassName('themes')}
-        aria-labelledby="themes-heading"
-        id="themes"
+      <ChartCard
+        id="composition"
+        kicker="Records"
+        title="Kind composition"
+        sourceLabel="Record index (/records)"
+        asOf="Not published as a chart on this release"
+        limits={
+          <>
+            This card once pointed at a kind composition graph inherited from the retired /history
+            route. That graph was already a placeholder with no chart of its own, so it has been
+            retired rather than rebuilt here: the composition it would have shown, how many records
+            of each kind, already renders as a crawlable, linkable facet on the record index, which
+            is where /history&apos;s redirect sends every bookmark. Nothing about record kinds is
+            hidden; it lives at a different address.
+          </>
+        }
+        table={null}
       >
-        <DataEditionHeader
-          index={DATA_SECTION_COPY.themes.index}
-          kicker={DATA_SECTION_COPY.themes.kicker}
-          title={DATA_SECTION_COPY.themes.title}
-          lede={DATA_SECTION_COPY.themes.lede}
-          headingId="themes-heading"
-        />
         {phase1Indicators ? (
           <DataStatStrip
-            labelledBy="themes-heading"
-            sources={[
-              {
-                label: 'Phase 1 indicator catalog',
-                url: '/methodology',
-              },
-            ]}
+            labelledBy="composition-heading"
+            sources={[{ label: 'Phase 1 indicator catalog', url: '/methodology' }]}
             items={[
               {
                 id: 'p1-metrics',
-                value: formatCount(phase1Indicators.metricCount),
+                value: phase1Indicators.metricCount.toLocaleString('en-US'),
                 label: 'Curated metrics defined',
                 note: phase1Indicators.themes.join(', '),
               },
               {
                 id: 'p1-obs',
-                value: formatCount(phase1Indicators.sampleObservationCount),
+                value: phase1Indicators.sampleObservationCount.toLocaleString('en-US'),
                 label: 'Warehouse observations loaded',
                 note:
                   phase1Indicators.sampleObservationCount === 0
@@ -359,37 +456,30 @@ export function DataSections({
               },
             ]}
           />
-        ) : null}
-        <p className="ds-data-edition__actions">
-          <Link className="ds-cta ds-cta--quiet" href="/methodology">
-            Juxtaposition rules
-          </Link>
-        </p>
+        ) : (
+          <p className="ds-data-edition__empty">
+            No chart renders here. Open <Link href="/records">the record index</Link> for the kind
+            breakdown.
+          </p>
+        )}
+      </ChartCard>
+
+      <article className="ds-data-edition__panel" aria-labelledby="themes-heading" id="themes">
+        <GroupHeading>
+          <span id="themes-heading">{DATA_SECTION_COPY.themes.title}</span>
+        </GroupHeading>
+        <Prose>
+          <p>{DATA_SECTION_COPY.themes.lede}</p>
+        </Prose>
       </article>
 
-      <article
-        className={dataEditionPanelClassName('next')}
-        aria-labelledby="how-to-use-heading"
-        id="next"
-      >
-        <DataEditionHeader
-          index={DATA_SECTION_COPY.next.index}
-          kicker={DATA_SECTION_COPY.next.kicker}
-          title={DATA_SECTION_COPY.next.title}
-          lede={DATA_SECTION_COPY.next.lede}
-          headingId="how-to-use-heading"
-        />
-        <p className="ds-data-edition__actions">
-          <Link className="ds-cta ds-cta--copper" href="/">
-            Explore the map
-          </Link>
-          <Link className="ds-cta ds-cta--quiet" href="/methodology">
-            Read methodology
-          </Link>
-          <Link className="ds-cta ds-cta--quiet" href="/books">
-            Banned books
-          </Link>
-        </p>
+      <article className="ds-data-edition__panel" aria-labelledby="next-heading" id="next">
+        <GroupHeading>
+          <span id="next-heading">{DATA_SECTION_COPY.next.title}</span>
+        </GroupHeading>
+        <Prose>
+          <p>{DATA_SECTION_COPY.next.lede}</p>
+        </Prose>
       </article>
     </div>
   );

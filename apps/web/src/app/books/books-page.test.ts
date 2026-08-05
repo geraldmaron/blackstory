@@ -38,11 +38,21 @@ test('books detail page uses anatomy strip and cover art without gutter mosaic',
   assert.doesNotMatch(detailSource, /ds-entity-mast/);
 });
 
-test('books browse uses rip rows with fact stacks and active filter chips', () => {
-  assert.match(browseSectionsSource, /BooksRipRow/);
-  assert.match(browseSectionsSource, /BooksActiveFilters|active-filters/);
-  assert.match(ripRowSource, /EditionFactIcon/);
+test('books browse renders its rows through the shared index, not a bespoke row', () => {
+  // SP-11c moved the browse list onto `HairlineIndex`, the same block `/records` renders, so the
+  // rows and the facet chips carry one vocabulary instead of two. `BooksRipRow` survives because
+  // `/books/[slug]` still renders it for related titles; it is the BROWSE page that stopped.
+  assert.match(browseSectionsSource, /HairlineIndex/);
+  assert.doesNotMatch(browseSectionsSource, /BooksRipRow/);
+  assert.match(browseSectionsSource, /BooksCoverArt/);
   assert.match(ripRowSource, /BooksCoverArt/);
+});
+
+test('books browse facet chips use the room kit chip vocabulary', () => {
+  // The drift guard: chips here must be the kit's, never a books-only chip class resurrected
+  // from the retired edition sheet.
+  assert.match(browseSectionsSource, /IndexFilter|ds-room-chip/);
+  assert.doesNotMatch(browseSectionsSource, /ds-books-edition__filter-chip/);
 });
 
 test('books browse preserves GET filter and sort URL contract', () => {

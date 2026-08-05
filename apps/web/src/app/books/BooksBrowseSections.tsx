@@ -1,300 +1,161 @@
 /**
- * Books browse: edition catalog panel with typeahead search, facet filters, active chips,
- * sort toolbar, rip rows with fact stacks, pagination, and about panel.
+ * `/books` catalogue body: search, state facet chips in the room kit's own chip vocabulary
+ * (the same `ds-room-chip` markup `/records` renders from the Lens, per
+ * docs/ui/design-direction-v9-surfaces.md §4.2), and rip rows through `HairlineIndex`.
+ *
+ * Cover art rides in the index row's glyph slot, which `HairlineIndex` already wraps
+ * `aria-hidden`, so the row's accessible name is carried by the title text next to it, never by
+ * an image alt string.
  */
 import React from 'react';
 import Link from 'next/link';
-import { EmptyState } from '@repo/ui';
+
+void React;
+import type { BannedBooksListingSnapshot } from '@repo/domain';
+import { bannedBookReportedStates } from '@repo/domain';
+import { EmptyList, HairlineIndex, type IndexFilter } from '../../components/room';
 import type { BannedBookSuggestCorpusItem } from '../../lib/banned-books/suggest-books.js';
-import { buildBooksBrowseHref, type BooksBrowseViewModel } from './books-view-model.js';
-import { BooksSearchTypeahead } from './BooksSearchTypeahead.js';
-import { BooksRipRow } from './BooksRipRow.js';
 import { AutoSubmitSelect } from '../../components/forms/AutoSubmitSelect.js';
-import { booksEditionPanelClassName } from './books-panel-chrome.js';
-import { BOOKS_ABOUT, BOOKS_CATALOG } from './books-copy.js';
+import { buildBooksBrowseHref, stateLabel, type BooksBrowseViewModel } from './books-view-model';
+import { BooksCoverArt } from './BooksCoverArt';
+import { BooksSearchTypeahead } from './BooksSearchTypeahead';
+import { BOOKS_CATALOG } from './books-copy';
 import '../typeahead.css';
 
 export type BooksBrowseSectionsProps = {
   readonly view: BooksBrowseViewModel;
   readonly suggestCorpus: readonly BannedBookSuggestCorpusItem[];
+  readonly snapshot: BannedBooksListingSnapshot;
 };
 
-function sortIndicator(ariaSort: 'ascending' | 'descending' | 'none'): string {
-  if (ariaSort === 'ascending') return ' ↑';
-  if (ariaSort === 'descending') return ' ↓';
-  return '';
-}
-
-function BooksActiveFilters({ view }: { readonly view: BooksBrowseViewModel }) {
-  const chips: { readonly key: string; readonly label: string; readonly href: string }[] = [];
-
-  if (view.q.trim()) {
-    chips.push({
-      key: 'q',
-      label: `Search: ${view.q.trim()}`,
-      href: buildBooksBrowseHref({
-        q: '',
-        state: view.state,
-        author: view.author,
-        sort: view.sort,
-        dir: view.dir,
-      }),
-    });
+/** State facet chips, counted across the full catalog rather than the current page. */
+function buildStateFilters(
+  snapshot: BannedBooksListingSnapshot,
+  view: BooksBrowseViewModel,
+): readonly IndexFilter[] {
+  const counts = new Map<string, number>();
+  for (const book of snapshot.books) {
+    for (const code of bannedBookReportedStates(book)) {
+      counts.set(code, (counts.get(code) ?? 0) + 1);
+    }
   }
 
+  const hrefFor = (state: string) =>
+    buildBooksBrowseHref({ q: view.q, state, author: view.author, sort: view.sort, dir: view.dir });
+
+  const all: IndexFilter = {
+    id: 'all',
+    label: 'All states',
+    count: snapshot.books.length,
+    href: hrefFor('all'),
+  };
+
+  const states = [...counts.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .slice(0, 8)
+    .map(([code, count]): IndexFilter => ({
+      id: code,
+      label: stateLabel(code),
+      count,
+      href: hrefFor(code),
+    }));
+
+  return [all, ...states];
+}
+
+/** What was searched for, in words, so the empty and unavailable states can each say why. */
+function activeFacetWords(view: BooksBrowseViewModel): readonly string[] {
+  const words: string[] = [];
+  if (view.q.trim()) words.push(`the search "${view.q.trim()}"`);
   if (view.state !== 'all') {
-    const stateLabel =
+    const label =
       view.stateOptions.find((entry) => entry.value === view.state)?.label ?? view.state;
-    chips.push({
-      key: 'state',
-      label: stateLabel,
-      href: buildBooksBrowseHref({
-        q: view.q,
-        state: 'all',
-        author: view.author,
-        sort: view.sort,
-        dir: view.dir,
-      }),
-    });
+    words.push(label);
   }
-
-  if (view.author !== 'all') {
-    chips.push({
-      key: 'author',
-      label: view.author,
-      href: buildBooksBrowseHref({
-        q: view.q,
-        state: view.state,
-        author: 'all',
-        sort: view.sort,
-        dir: view.dir,
-      }),
-    });
-  }
-
-  if (chips.length === 0) return null;
-
-  return (
-    <div className="ds-books-edition__active-filters" aria-label="Active filters">
-      <p className="ds-books-edition__active-filters-label">Filtered by</p>
-      <ul className="ds-books-edition__active-filters-list">
-        {chips.map((chip) => (
-          <li key={chip.key}>
-            <Link className="ds-books-edition__filter-chip" href={chip.href}>
-              <span>{chip.label}</span>
-              <span className="ds-visually-hidden">. Remove filter.</span>
-            </Link>
-          </li>
-        ))}
-        <li>
-          <Link className="ds-cta-link ds-books-edition__clear-all" href="/books">
-            Clear all
-          </Link>
-        </li>
-      </ul>
-    </div>
-  );
+  if (view.author !== 'all') words.push(view.author);
+  return words;
 }
 
-function BooksPagination({ view }: { readonly view: BooksBrowseViewModel }) {
-  const { pagination } = view;
-  if (pagination.totalMatched === 0 || pagination.totalPages <= 1) return null;
-
-  return (
-    <nav className="ds-books-edition__pager" aria-label="Books catalog pages">
-      <p className="ds-books-edition__count">
-        Showing {pagination.rangeStart}–{pagination.rangeEnd} of {pagination.totalMatched}
-      </p>
-      <div className="ds-books-edition__pager-controls">
-        {pagination.previousHref ? (
-          <Link className="ds-cta ds-cta--quiet" href={pagination.previousHref} rel="prev">
-            Previous
-          </Link>
-        ) : (
-          <span
-            className="ds-cta ds-cta--quiet ds-books-edition__pager-disabled"
-            aria-disabled="true"
-          >
-            Previous
-          </span>
-        )}
-        <ul className="ds-books-edition__pager-pages">
-          {pagination.pageHrefs.map((entry) => (
-            <li key={entry.page}>
-              {entry.current ? (
-                <span
-                  className="ds-books-edition__pager-page ds-books-edition__pager-page--current"
-                  aria-current="page"
-                >
-                  {entry.page}
-                </span>
-              ) : (
-                <Link className="ds-books-edition__pager-page" href={entry.href}>
-                  <span className="ds-visually-hidden">Page </span>
-                  {entry.page}
-                </Link>
-              )}
-            </li>
-          ))}
-        </ul>
-        {pagination.nextHref ? (
-          <Link className="ds-cta ds-cta--quiet" href={pagination.nextHref} rel="next">
-            Next
-          </Link>
-        ) : (
-          <span
-            className="ds-cta ds-cta--quiet ds-books-edition__pager-disabled"
-            aria-disabled="true"
-          >
-            Next
-          </span>
-        )}
-      </div>
-    </nav>
-  );
-}
-
-export function BooksBrowseSections({ view, suggestCorpus }: BooksBrowseSectionsProps) {
+export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrowseSectionsProps) {
   const countLabel = `${view.totalMatched} title${view.totalMatched === 1 ? '' : 's'}`;
+  const activeWords = activeFacetWords(view);
 
   return (
-    <>
-      <article
-        className={booksEditionPanelClassName('catalog')}
-        aria-labelledby="books-browse-heading"
-        id="browse"
-      >
-        <header className="ds-books-edition__header">
-          <span className="ds-books-edition__index" aria-hidden="true">
-            01
-          </span>
-          <div>
-            <p className="ds-books-edition__kicker">{BOOKS_CATALOG.kicker}</p>
-            <h2 className="ds-books-edition__title" id="books-browse-heading">
-              {BOOKS_CATALOG.title}
-            </h2>
-            <p className="ds-books-edition__lede">{BOOKS_CATALOG.lede}</p>
-          </div>
-        </header>
+    <div className="ds-room-idx" id="browse">
+      <form action="/books" method="get" role="search" className="ds-room-idx__bar">
+        <BooksSearchTypeahead defaultValue={view.q} corpus={suggestCorpus} />
+        <AutoSubmitSelect
+          id="author"
+          name="author"
+          label="Author"
+          defaultValue={view.author}
+          options={view.authorOptions}
+        />
+        <input type="hidden" name="state" value={view.state} />
+        <input type="hidden" name="sort" value={view.sort} />
+        <input type="hidden" name="dir" value={view.dir} />
+        <Link className="ds-cta-link" href="/books">
+          Clear
+        </Link>
+      </form>
 
-        <form className="ds-books-edition__refine" method="get" action="/books" role="search">
-          <div className="ds-books-edition__refine-search">
-            <BooksSearchTypeahead defaultValue={view.q} corpus={suggestCorpus} />
-          </div>
-          <div className="ds-books-edition__refine-filters">
-            <AutoSubmitSelect
-              id="state"
-              name="state"
-              label="State"
-              defaultValue={view.state}
-              options={view.stateOptions}
+      <HairlineIndex
+        filters={buildStateFilters(snapshot, view)}
+        activeFilterId={view.state === 'all' ? 'all' : view.state}
+        countLabel={
+          view.pagination.totalPages > 1
+            ? `${countLabel} · page ${view.pagination.page} of ${view.pagination.totalPages}`
+            : countLabel
+        }
+        rows={view.items.map((item) => ({
+          href: `/books/${item.slug}`,
+          name: item.title,
+          place: item.authorNames,
+          era: item.publishedDate,
+          glyph: (
+            <BooksCoverArt
+              title={item.title}
+              size="S"
+              {...(item.coverIsbn ? { isbn: item.coverIsbn } : {})}
             />
-            <AutoSubmitSelect
-              id="author"
-              name="author"
-              label="Author"
-              defaultValue={view.author}
-              options={view.authorOptions}
-            />
-            <input type="hidden" name="sort" value={view.sort} />
-            <input type="hidden" name="dir" value={view.dir} />
-            <Link className="ds-cta-link" href="/books">
-              Clear
+          ),
+          grade:
+            item.states.length > 0
+              ? item.states.map((state) => state.code).join(' ')
+              : 'None on file',
+        }))}
+        empty={
+          activeWords.length > 0 ? (
+            <EmptyList title={BOOKS_CATALOG.emptyTitle}>
+              Nothing in the catalog matches {activeWords.join(', ')}.{' '}
+              <Link href="/books">Clear every facet</Link> to see all {snapshot.books.length}{' '}
+              titles, or <Link href="/submit">tell us about a title we are missing</Link>.
+            </EmptyList>
+          ) : (
+            <EmptyList title={BOOKS_CATALOG.emptyTitle}>
+              No titles are on file yet. <Link href="/submit">Tell us about one</Link>.
+            </EmptyList>
+          )
+        }
+      />
+
+      {view.pagination.totalPages > 1 ? (
+        <nav className="ds-room-idx__bar" aria-label="Books catalog pages">
+          {view.pagination.previousHref ? (
+            <Link className="ds-cta ds-cta--quiet" href={view.pagination.previousHref} rel="prev">
+              Previous
             </Link>
-          </div>
-        </form>
-
-        <BooksActiveFilters view={view} />
-
-        <div className="ds-books-edition__toolbar">
-          <p className="ds-books-edition__count" id="books-results-heading">
-            {countLabel}
-            {view.pagination.totalPages > 1
-              ? ` · page ${view.pagination.page} of ${view.pagination.totalPages}`
-              : null}
-          </p>
-          <div className="ds-books-edition__sort" role="group" aria-label="Sort catalog">
-            <span className="ds-books-edition__sort-label">Sort</span>
-            <ul className="ds-books-edition__sort-list">
-              {view.sortOptions.map((option) => (
-                <li key={option.key}>
-                  <Link
-                    className={
-                      option.active
-                        ? 'ds-books-edition__sort-link ds-books-edition__sort-link--active'
-                        : 'ds-books-edition__sort-link'
-                    }
-                    href={option.href}
-                    aria-current={option.active ? 'true' : undefined}
-                    aria-label={
-                      option.ariaSort === 'none'
-                        ? `Sort by ${option.label}`
-                        : `Sort by ${option.label}, currently ${option.ariaSort}. Activate to reverse.`
-                    }
-                  >
-                    {option.label}
-                    <span aria-hidden="true">{sortIndicator(option.ariaSort)}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {view.items.length === 0 ? (
-          <EmptyState
-            title={BOOKS_CATALOG.emptyTitle}
-            action={
-              <a className="ds-cta ds-cta--ink" href="/books">
-                {BOOKS_CATALOG.emptyAction}
-              </a>
-            }
-          >
-            {BOOKS_CATALOG.emptyBody}
-          </EmptyState>
-        ) : (
-          <div className="ds-books-edition__rip-list" aria-labelledby="books-results-heading">
-            {view.items.map((item, index) => (
-              <BooksRipRow
-                key={item.id}
-                item={item}
-                sort={view.sort}
-                dir={view.dir}
-                isFirst={index === 0}
-              />
-            ))}
-          </div>
-        )}
-
-        <BooksPagination view={view} />
-      </article>
-
-      <article
-        className={booksEditionPanelClassName('about')}
-        aria-labelledby="about-books-heading"
-        id="about-books"
-      >
-        <header className="ds-books-edition__header">
-          <span className="ds-books-edition__index" aria-hidden="true">
-            02
+          ) : null}
+          <span className="ds-room-idx__count">
+            Page {view.pagination.page} of {view.pagination.totalPages}
           </span>
-          <div>
-            <p className="ds-books-edition__kicker">{BOOKS_ABOUT.kicker}</p>
-            <h2 className="ds-books-edition__title" id="about-books-heading">
-              {BOOKS_ABOUT.title}
-            </h2>
-            <p className="ds-books-edition__lede">{BOOKS_ABOUT.lede}</p>
-            <p className="ds-books-edition__actions">
-              <Link className="ds-cta ds-cta--quiet" href="/methodology">
-                Methodology
-              </Link>
-              <Link className="ds-cta ds-cta--quiet" href="/records?kind=sources">
-                Search sources
-              </Link>
-            </p>
-          </div>
-        </header>
-      </article>
-    </>
+          {view.pagination.nextHref ? (
+            <Link className="ds-cta ds-cta--quiet" href={view.pagination.nextHref} rel="next">
+              Next
+            </Link>
+          ) : null}
+        </nav>
+      ) : null}
+    </div>
   );
 }

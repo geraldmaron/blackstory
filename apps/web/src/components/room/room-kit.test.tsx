@@ -45,18 +45,16 @@ const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../.
  * render components now that /history is a redirect endpoint.
  */
 const LEGACY_EDITION_CHROME: readonly string[] = [
-  'explore/explore-edition.css',
-  'explore/explore-panel-chrome.ts',
+  // Retained by /books/[slug], which is still on the v6 detail chrome. SP-12b deletes both.
   'books/books-edition.css',
   'books/books-panel-chrome.ts',
-  'data/data-edition.css',
-  'data/data-panel-chrome.ts',
+  'explore/explore-edition.css',
+  'explore/explore-panel-chrome.ts',
+  // Retained by /law/[slug], which is still on the v6 detail chrome. SP-12c deletes both.
   'law/law-edition.css',
   'law/law-panel-chrome.ts',
   'memorial/memorial-edition.css',
   'memorial/memorial-panel-chrome.ts',
-  'methodology/methodology-edition.css',
-  'methodology/methodology-panel-chrome.ts',
 ];
 
 function walk(dir: string, out: string[] = []): string[] {

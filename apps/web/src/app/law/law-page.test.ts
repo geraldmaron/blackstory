@@ -1,5 +1,5 @@
 /**
- * Law v6 page wiring: shared gutter mosaic, preserved browse URL contract, edition stack.
+ * Law room kit page wiring: room kit chrome, preserved browse URL contract.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -21,15 +21,14 @@ test('law browse page renders through the room kit, with no edition chrome left'
   // `data-law-edition="v6"` marked the per-route chrome the shared kit replaces.
   assert.doesNotMatch(browsePageSource, /data-law-edition="v6"/);
   assert.match(browsePageSource, /from '\.\.\/\.\.\/components\/room'/);
-  assert.match(browsePageSource, /<Room>/);
+  assert.match(browsePageSource, /<Room rail={rail}>/);
   assert.match(browsePageSource, /<RoomHeader/);
   assert.doesNotMatch(browsePageSource, /ds-page__title/);
 });
 
-test('law browse preserves GET URL contract and auto-submit facets', () => {
+test('law browse preserves GET URL contract', () => {
   assert.match(browseSectionsSource, /method="get"/);
   assert.match(browseSectionsSource, /action="\/law"/);
-  assert.match(browseSectionsSource, /AutoSubmitSelect/);
   assert.match(browseSectionsSource, /name="q"/);
   assert.match(browseSectionsSource, /name="kind"/);
   assert.match(browseSectionsSource, /name="topic"/);
@@ -49,11 +48,6 @@ test('every rendered browse control is in the edge param allowlist', async () =>
       `browse renders name="${param}" but it is not in LAW_PAGE_PARAM_ALLOWLIST`,
     );
   }
-});
-
-test('the browse page imports the stylesheet its ledger and chips live in', () => {
-  // Without this import the catalog rendered as unstyled <ul> bullets.
-  assert.match(browsePageSource, /law-edition\.css/);
 });
 
 test('law detail page uses anatomy strip without gutter mosaic', () => {
