@@ -1,40 +1,78 @@
 /**
- * About v6 page wiring: shared gutter mosaic, preserved mission copy, no legacy mast.
+ * `/about` page wiring: the two voices, the refusals, and destinations that come from the registry.
+ *
+ * The assertions here are about what the page cannot lose, not about its exact wording. The two
+ * that matter most are the last two: a hardcoded destination list is how the old page shipped two
+ * links into `/history` after `/history` became a redirect, and numbered markers on a list that is
+ * not a sequence is the specific decoration this rewrite removed.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { ABOUT_MISSION_BEATS, ABOUT_PILLARS, ABOUT_DESTINATIONS } from './about-copy';
+import { ABOUT_CONTRIBUTE, ABOUT_ORIGIN, ABOUT_PILLARS, ABOUT_REFUSALS } from './about-copy';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
-const copySource = readFileSync(join(here, 'about-copy.ts'), 'utf8');
+const cssSource = readFileSync(join(here, 'about-page.css'), 'utf8');
 
-test('about page does not mount EditionAtmosphereMosaic instead of legacy mast', () => {
+test('about page does not mount the retired v6 mast or mosaic chrome', () => {
   assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
   assert.doesNotMatch(pageSource, /ABOUT_EDITION_MOSAIC_SEED/);
   assert.doesNotMatch(pageSource, /AboutMosaicMast/);
   assert.doesNotMatch(pageSource, /LivingAtmosphereMosaic/);
 });
 
-test('about page preserves core mission headline and pillars', () => {
-  assert.match(pageSource, /History, pinned to/);
-  assert.match(pageSource, /People\. Places\. Evidence\. Context\./);
-  for (const pillar of ABOUT_PILLARS) {
-    assert.match(copySource, new RegExp(pillar.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-  }
-  for (const beat of ABOUT_MISSION_BEATS) {
-    assert.match(copySource, new RegExp(beat.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-  }
+test('the page explains the project in the maker voice before it states any rule', () => {
+  // The origin section is the reason this room exists; a reader meets the person before the policy.
+  assert.ok(ABOUT_ORIGIN.length >= 3, 'the origin section is more than a strapline');
+  assert.match(pageSource, /ABOUT_ORIGIN/);
+  const originAt = pageSource.indexOf('ABOUT_ORIGIN');
+  const pillarsAt = pageSource.indexOf('ABOUT_PILLARS');
+  assert.ok(originAt < pillarsAt, 'the first person section precedes the rules');
 });
 
-test('about user-facing copy avoids em dashes', () => {
+test('the page invites contribution, not only reading', () => {
+  assert.match(pageSource, /ABOUT_CONTRIBUTE/);
+  assert.match(pageSource, /take-part/);
+  // The terms have to be on the page: "reviewed, not published on arrival" is the promise that
+  // makes submitting safe to do, and burying it in /submit asks for trust before explaining it.
+  assert.ok(ABOUT_CONTRIBUTE.terms.length > 0);
+});
+
+test('the page states what the archive refuses to do', () => {
+  assert.ok(ABOUT_REFUSALS.length >= 4, 'refusals are a section, not an aside');
+  assert.match(pageSource, /ABOUT_REFUSALS/);
+});
+
+test('destinations are generated from the registry, never hardcoded', () => {
+  assert.match(pageSource, /destinationsInGroup/);
+  assert.match(pageSource, /classLabelFor/);
+  // The old page hardcoded six links, two of them into `/history`, which is a redirect endpoint.
+  assert.doesNotMatch(pageSource, /href="\/history"/);
+  assert.doesNotMatch(pageSource, /ABOUT_DESTINATIONS/);
+});
+
+test('no list is numbered: neither the pillars nor the refusals are a sequence', () => {
+  assert.doesNotMatch(pageSource, /padStart\(2, '0'\)/);
+  assert.doesNotMatch(cssSource, /__pillar-index|__mission-index/);
+});
+
+test('every multi-column rule is inside a min-width query', () => {
+  // Guards the defect this rewrite fixed: three columns of prose held down to 375px.
+  const beforeFirstQuery = cssSource.split('@media')[0] ?? '';
+  assert.doesNotMatch(beforeFirstQuery, /grid-template-columns:\s*repeat\(/);
+});
+
+test('user-facing copy avoids em dashes', () => {
   const strings = [
+    ...ABOUT_ORIGIN,
+    ...ABOUT_REFUSALS,
+    ABOUT_CONTRIBUTE.heading,
+    ABOUT_CONTRIBUTE.lede,
+    ABOUT_CONTRIBUTE.terms,
     ...ABOUT_PILLARS.flatMap((pillar) => [pillar.kicker, pillar.title, pillar.body]),
-    ...ABOUT_MISSION_BEATS.flatMap((beat) => [beat.title, beat.body]),
-    ...ABOUT_DESTINATIONS.flatMap((item) => [item.label, item.detail]),
   ];
   for (const value of strings) {
     assert.doesNotMatch(value, /—/);

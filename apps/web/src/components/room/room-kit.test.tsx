@@ -46,8 +46,6 @@ const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../.
 const LEGACY_EDITION_CHROME: readonly string[] = [
   'explore/explore-edition.css',
   'explore/explore-panel-chrome.ts',
-  'about/about-edition.css',
-  'about/about-panel-chrome.ts',
   'books/books-edition.css',
   'books/books-panel-chrome.ts',
   'chapters/articles-edition.css',

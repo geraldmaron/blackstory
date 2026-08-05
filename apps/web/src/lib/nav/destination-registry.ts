@@ -124,18 +124,11 @@ const DESTINATIONS: readonly Destination[] = [
     group: 'find',
     crawl: { changeFrequency: 'daily', priority: 0.9 },
   },
-  {
-    // No `crawl` yet: /story does not render until SP-10 (repo-92n2.10), and a sitemap that
-    // advertises a 404 spends crawl budget teaching a crawler the site is unreliable.
-    // `sitemap-builders.test.ts` asserts every crawled path has a page on disk, so this entry
-    // gains its `crawl` the moment the route exists and not before.
-    path: '/story',
-    label: 'Story',
-    parent: '/',
-    kind: 'GUIDED',
-    description: 'The Atlas, walked through rather than explored.',
-    group: 'find',
-  },
+  // `/story` is deliberately absent. Story is a MODE of the Atlas, not a room: `StoryMode` is
+  // mounted inside `AtlasExperience` and reached from the Atlas itself. The route was deprecated
+  // rather than built (repo-92n2.10 closed won't-do), and a registry entry for a path that never
+  // renders would put it back in the palette, the footer and the library as a destination that
+  // 404s. Deleting the entry is what removes it from all five readers at once.
 
   /* ---- read ---- */
   {
@@ -390,9 +383,6 @@ export function footerColumns(): readonly FooterColumn[] {
     title,
     items: groups
       .flatMap((group) => destinationsInGroup(group))
-      // Story is a mode of the Atlas rather than a room; it is reachable by key and from the
-      // Atlas itself, and listing it here reads as a fourth place records live.
-      .filter((destination) => destination.path !== '/story')
       .map((destination) => ({ href: destination.path, label: destination.label })),
   });
 
