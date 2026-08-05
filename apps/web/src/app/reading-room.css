@@ -20,8 +20,8 @@
   margin-bottom: var(--ds-space-8);
 }
 
-/* ============================================================================================
- * SP-11h — errata log rules
+/* =====================================================================================
+* SP-11h — errata log rules
  * Folded from apps/web/src/app/errata/errata.css (now deleted). The log is a plain
  * reverse-chronological hairline list, never a set of disclosures: docs/ui/
  * design-direction-v9-surfaces.md §4.2 "/errata".
@@ -123,3 +123,42 @@ a.ds-errata__row-id {
   font-size: 0.875rem;
   line-height: 1.5;
 }
+=======
+/* —— /chapters pager (SP-atlas-v9 chapters package) ————————————————————————————
+   Fifty-plus chapters windows the same way `/records` does: a fixed page size, real
+   anchors, prev/next link relations. Naming is kept separate from `.ds-records-pager`
+   (which lives in the /records route stylesheet) so this reading room adds no
+   per-route stylesheet of its own, per design law. */
+.ds-chapters-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  margin-top: var(--ds-space-6);
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-chapters-pager__link {
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-chapters-pager__link:hover {
+  color: var(--ds-accent);
+}
+
+.ds-chapters-pager__at {
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-chapters-pager__spacer {
+  flex: 0 0 1px;
+}
+/* —— end /chapters pager —————————————————————————————————————————————————————— */
