@@ -110,7 +110,7 @@ test('eraFactLink handles undated, single-bucket, and multi-bucket labels', () =
   });
 
   assert.deepEqual(eraFactLink(['1860s', '1890s', '1920s']), {
-    label: '1860s – 1920s',
+    label: '1860s-1920s',
     href: '/?era=1860s',
   });
 });

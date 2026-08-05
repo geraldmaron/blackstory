@@ -110,8 +110,14 @@ export function entityEraFact(input: EntityEraInput): EntityEraFact {
   if (buckets.length > 0) {
     const link = eraFactLink(buckets);
     return {
+      /*
+       * The hyphen is in this pattern because `eraFactLink` builds this exact label as
+       * `${first}-${last}` \u2014 we generate the separator, so we can safely spell it back out as
+       * "to". The arbitrary-era branch below deliberately does NOT strip hyphens: that string
+       * comes from the record, and an era written "mid-1800s" would become "mid to 1800s".
+       */
       label: link.label
-        .replace(/\u2013|\u2014/g, ' to ')
+        .replace(/\u2013|\u2014|-/g, ' to ')
         .replace(/\s+/g, ' ')
         .trim(),
       ...(link.href !== undefined ? { href: link.href } : {}),
