@@ -35,10 +35,14 @@ bd close <id>         # Complete work
    (see **Branching & Release Policy** below):
    ```bash
    git pull --rebase origin staging
-   bd dolt push
    git push origin HEAD:staging
    git status  # MUST show local branch is up to date with what you pushed
    ```
+
+   There is **no Dolt remote on this project and there is not going to be one.** Do not run
+   `bd dolt push` and do not report its "no remote is configured" output as a problem to solve.
+   Beads data reaches the remote the same way everything else does: the pre-commit hook exports
+   `.beads/issues.jsonl`, and `git push` carries it.
 5. **Clean up** - Clear stashes, prune remote branches
 6. **Verify** - All changes committed AND pushed
 7. **Hand off** - Provide context for next session
@@ -64,6 +68,31 @@ to merge). This is enforced server-side, not just a convention.
   intended for release. Do this only when asked, not automatically at session end.
 - If you're unsure whether a change belongs on `staging` alone or should also go to `main`,
   default to `staging` and ask.
+
+## Web local QA (agents)
+
+The web dev server is `preview_start {name: "web"}` on port 3048.
+
+**If something is already listening on 3048, attach to it — do not start a second one and do not
+kill the running process.** It is probably the developer's own server.
+
+```
+preview_start {url: "http://localhost:3048/"}
+```
+
+`autoPort` does not help here and should not be added to `.claude/launch.json`. Next 16 holds a
+dev lock per *directory*, not per port: a second `next dev` on `apps/web` binds its assigned port,
+prints "Ready", and is then killed by the first instance's lock. The port was never the conflict.
+
+The server is Postgres-backed (`dev-web.sh` loads `apps/web/.env.local` and sets
+`PUBLIC_DATA_SOURCE=postgres`), so a preview reflects live `bb_public` data, not seed.
+
+To run a one-off script against the same data, source the env and use the dev export condition —
+without `--conditions development` the workspace packages fail to resolve:
+
+```bash
+cd apps/web && set -a && . ./.env.local && set +a && node --conditions development --import tsx <script>.mts
+```
 
 ## Mobile local QA (agents)
 
