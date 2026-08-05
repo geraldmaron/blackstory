@@ -20,6 +20,7 @@ import type { PublicEntityView } from '../../data/public-seed';
 import { hasPostgresConnection } from '../public-data/live-policy';
 import { listPublicEntityViewsByIds } from '../public-data/source';
 import { listReleaseThemeImpactPacketsByIds } from '../theme-impact/postgres-readers';
+import { buildCitesEdge, type CitesEdgeIndex } from '../release/build-cites-edge';
 import { fetchReleaseArticle, listReleaseArticles } from './postgres-readers';
 import {
   articleMapEntityIds,
@@ -93,6 +94,24 @@ async function loadEntities(entityIds: readonly string[]): Promise<readonly Publ
   const { data } = await listPublicEntityViewsByIds([...entityIds]);
   return data;
 }
+
+/**
+ * The chapter-cites-record index for the active release.
+ *
+ * `cache()`-wrapped because every record surface in a render wants it (the Atlas sheet for the
+ * whole catalog, `/entity/[id]` for one record) and it is one full-body article read. Degrades to
+ * an empty index rather than throwing: a record page whose chapter list is missing is worse than
+ * ideal, a record page that 500s because the article table is unreachable is unacceptable.
+ */
+export const resolveCitesEdgeIndex = cache(async (): Promise<CitesEdgeIndex> => {
+  if (!shouldAttemptLiveReads()) return {};
+  try {
+    return buildCitesEdge(await listReleaseArticles());
+  } catch (error) {
+    logReadFailure('resolveCitesEdgeIndex', error);
+    return {};
+  }
+});
 
 /** Slugs of every published article, for `generateStaticParams`. */
 export async function listPublishedArticleSlugs(): Promise<readonly string[]> {

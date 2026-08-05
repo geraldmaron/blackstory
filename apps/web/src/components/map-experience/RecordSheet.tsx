@@ -49,6 +49,15 @@ export type SheetConnection = {
   readonly href?: string;
 };
 
+/** One chapter that cites the record. Mirrors `ChapterCitation` without importing the server module. */
+export type SheetCitingChapter = {
+  readonly slug: string;
+  readonly title: string;
+  /** Stated in words: "mapped in", "referenced in". */
+  readonly relation: string;
+  readonly href: string;
+};
+
 export type SheetRecord = {
   readonly id: string;
   readonly name: string;
@@ -75,6 +84,11 @@ export type SheetRecord = {
   readonly href?: string;
   readonly sources: readonly SheetSource[];
   readonly connections: readonly SheetConnection[];
+  /**
+   * Chapters that cite this record (SP-20). Optional so every existing caller keeps compiling
+   * and simply renders no chapter list; the Atlas and `/entity/[id]` supply it.
+   */
+  readonly citingChapters?: readonly SheetCitingChapter[];
   readonly anatomyPlace?: RecordAnatomyPlace;
 };
 
@@ -89,6 +103,8 @@ export type RecordSheetProps = {
   readonly saved?: boolean;
   readonly onCite?: () => void;
   readonly onShare?: () => void;
+  /** Selects a connected record on the plate instead of navigating away from the Atlas. */
+  readonly onSelectConnection?: (entityId: string) => void;
   readonly className?: string;
 };
 
@@ -126,6 +142,7 @@ export function RecordSheet({
   saved = false,
   onCite,
   onShare,
+  onSelectConnection,
   className,
 }: RecordSheetProps) {
   const sheetRef = useRef<HTMLElement | null>(null);
@@ -153,9 +170,21 @@ export function RecordSheet({
 
   if (!record) return null;
 
-  // Falls back to what the plate is holding, so a caller that does pass citations stays honest
-  // when its count is absent.
-  const sourceCount = record.sourceCount ?? record.sources.length;
+  /*
+   * What is actually on screen wins.
+   *
+   * `sourceCount` is the map feature's `evidenceCount`: the record's own accepted claims. Once
+   * SP-20 started passing real citations, that count stopped describing the list under it, and
+   * the sheet printed "2 sources" as the heading hint above six numbered entries. The two
+   * numbers count different things (own claims vs. citations backing the record's documented
+   * relationships) and both are true, but only one of them is the list the reader is looking at.
+   * The count therefore describes the list whenever there is a list, and falls back to the
+   * plate's count only when the sheet is carrying no citations at all, which is the case the
+   * fallback copy below exists for.
+   */
+  const sourceCount =
+    record.sources.length > 0 ? record.sources.length : (record.sourceCount ?? 0);
+  const citingChapters = record.citingChapters ?? [];
 
   return (
     <aside
@@ -363,11 +392,73 @@ export function RecordSheet({
                     size={12}
                   />
                   {connection.href ? (
-                    <a href={connection.href}>{connection.name}</a>
+                    /*
+                     * A real anchor even when selecting in place is the primary action: the
+                     * connected record HAS a page, and a reader who middle-clicks or copies the
+                     * link should get it. The click handler intercepts the plain left-click only,
+                     * because staying on the Atlas and flying to the neighbour is the better
+                     * answer for the reader who is comparing two pins.
+                     */
+                    <a
+                      href={connection.href}
+                      onClick={
+                        onSelectConnection
+                          ? (event) => {
+                              if (
+                                event.defaultPrevented ||
+                                event.metaKey ||
+                                event.ctrlKey ||
+                                event.shiftKey ||
+                                event.altKey ||
+                                event.button !== 0
+                              ) {
+                                return;
+                              }
+                              event.preventDefault();
+                              onSelectConnection(connection.id);
+                            }
+                          : undefined
+                      }
+                    >
+                      {connection.name}
+                    </a>
+                  ) : onSelectConnection ? (
+                    <button
+                      type="button"
+                      className="ds-sheet__connection-select"
+                      onClick={() => onSelectConnection(connection.id)}
+                    >
+                      {connection.name}
+                    </button>
                   ) : (
                     <span>{connection.name}</span>
                   )}
                   <span className="ds-sheet__relation">{connection.relation}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {/*
+         * The record side of the thesis: every record links back to the writing about it. Renders
+         * only when a chapter actually cites this record — an empty "Chapters that cite this
+         * record" heading on most of the catalog would read as a gap in the archive rather than
+         * as the ordinary state of a record no chapter has reached yet.
+         */}
+        {citingChapters.length > 0 ? (
+          <section className="ds-sheet__group">
+            <h3 className="ds-sheet__group-label">
+              Chapters that cite this record
+              <span className="ds-sheet__group-hint">
+                {citingChapters.length === 1 ? '1 chapter' : `${citingChapters.length} chapters`}
+              </span>
+            </h3>
+            <ul className="ds-sheet__connections ds-sheet__chapters">
+              {citingChapters.map((chapter) => (
+                <li key={chapter.slug} className="ds-sheet__connection">
+                  <a href={chapter.href}>{chapter.title}</a>
+                  <span className="ds-sheet__relation">{chapter.relation}</span>
                 </li>
               ))}
             </ul>

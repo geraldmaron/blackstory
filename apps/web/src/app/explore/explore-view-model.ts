@@ -10,6 +10,7 @@ import {
   resolveHistoryGraphReleaseArtifact,
 } from '../../data/history-graph-seed';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
+import { resolveCitesEdgeIndex } from '../../lib/articles/source';
 import {
   buildHistoryEdges,
   buildHistoryGraphContext,
@@ -35,6 +36,7 @@ import {
   type ExploreMapSource,
 } from '../../lib/map-experience/build-explore-map-source';
 import type { PublicReadSource } from '../../lib/public-data/source';
+import type { CitesEdgeIndex } from '../../lib/release/build-cites-edge';
 import {
   pickExploreEdgeSlice,
   type ExploreEdgeLineCatalog,
@@ -61,6 +63,13 @@ export type ExploreViewModel = {
   readonly historyEdges: readonly HistoryEdgeView[];
   readonly edgeLineCollection: ExploreEdgeLineSlice['lineCollection'];
   readonly selectedEdge?: HistoryEdgeView;
+  /**
+   * Chapter-cites-record edge for the whole catalog (SP-20). Ships with the view model rather
+   * than being fetched on select: it is one small string map (only records some chapter actually
+   * cites appear), and the sheet must be able to state "no chapter cites this yet" instantly
+   * instead of holding a spinner over an answer that is usually empty.
+   */
+  readonly citesEdge: CitesEdgeIndex;
 };
 
 /** Prefer each entity's published geoAnchor (national catalog). Seed-table fallback
@@ -130,6 +139,7 @@ export function buildExploreViewModel(
   entities: readonly PublicEntityView[] = listPublicEntities(),
   dataSource: PublicReadSource = 'none',
   graphArtifact?: ReturnType<typeof getHistoryGraphReleaseArtifact>,
+  citesEdge: CitesEdgeIndex = {},
 ): ExploreViewModel {
   const viewState = parseExploreSearchParams(raw);
   const source = buildExploreMapSource(entities);
@@ -160,6 +170,7 @@ export function buildExploreViewModel(
     edgeLineCatalog,
     historyEdges: active.edges,
     edgeLineCollection: active.lineCollection,
+    citesEdge,
     ...(selectedEdge ? { selectedEdge } : {}),
   };
 }
@@ -168,11 +179,19 @@ export async function buildExploreViewModelAsync(
   raw: RawExploreSearchParams,
   entities: readonly PublicEntityView[] = listPublicEntities(),
   dataSource: PublicReadSource = 'none',
-  options: { readonly releaseId?: string; readonly generatedAt?: string } = {},
+  options: {
+    readonly releaseId?: string;
+    readonly generatedAt?: string;
+    /** Injected in tests; defaults to the active release's article read. */
+    readonly loadCitesEdge?: () => Promise<CitesEdgeIndex>;
+  } = {},
 ): Promise<ExploreViewModel> {
-  const artifact = await resolveHistoryGraphReleaseArtifact(entities, {
-    ...(options.releaseId ? { releaseId: options.releaseId } : {}),
-    ...(options.generatedAt ? { generatedAt: options.generatedAt } : {}),
-  });
-  return buildExploreViewModel(raw, entities, dataSource, artifact);
+  const [artifact, citesEdge] = await Promise.all([
+    resolveHistoryGraphReleaseArtifact(entities, {
+      ...(options.releaseId ? { releaseId: options.releaseId } : {}),
+      ...(options.generatedAt ? { generatedAt: options.generatedAt } : {}),
+    }),
+    (options.loadCitesEdge ?? resolveCitesEdgeIndex)(),
+  ]);
+  return buildExploreViewModel(raw, entities, dataSource, artifact, citesEdge);
 }

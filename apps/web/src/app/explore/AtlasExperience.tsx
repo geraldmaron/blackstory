@@ -148,14 +148,18 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     selectedId !== undefined,
     setLayers,
   );
-  const { selectedFeature, selectedIndex, select, stepRecord, sheetRecord } = useRecordSelection(
-    stage,
-    camera,
-    sorted,
-    mode,
-    selectedId,
-    setSelectedId,
-  );
+  const { selectedFeature, selectedIndex, select, selectById, stepRecord, sheetRecord } =
+    useRecordSelection(
+      stage,
+      camera,
+      sorted,
+      mode,
+      selectedId,
+      setSelectedId,
+      view.edgeLineCatalog.allTime.edges,
+      view.citesEdge,
+      view.allFeatures,
+    );
   const { copy, citationFor, nearMe } = useReaderActions(toasts, camera);
   const { paletteRecords, destinations, paletteStates, featureById } = usePaletteData(
     view,
@@ -366,6 +370,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           ? { position: { index: selectedIndex + 1, total: sorted.length } }
           : {})}
         onStep={stepRecord}
+        onSelectConnection={selectById}
         onFlyToPlace={() => {
           if (selectedFeature) select(selectedFeature);
         }}

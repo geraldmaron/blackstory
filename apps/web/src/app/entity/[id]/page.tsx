@@ -48,6 +48,8 @@ import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
 import { getPublicSearchIndex, resolvePublicEntityView } from '../../../lib/public-data/source';
 import { shouldUseLivePublicProjections } from '../../../lib/public-data/live-policy';
 import { resolveEntityCrossReferences } from '../../../lib/theme-impact/source';
+import { resolveCitesEdgeIndex } from '../../../lib/articles/source';
+import { chaptersCiting } from '../../../lib/release/build-cites-edge';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
 import { toEvidenceClaimInputs } from './adapters';
 import { buildEntityAnatomyInputs } from './entity-anatomy-facts';
@@ -210,6 +212,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const { data: searchIndex } = await getPublicSearchIndex();
   const orderedIds = searchIndex.map((doc) => doc.id);
   const crossReferences = await resolveEntityCrossReferences(entity.id);
+  const citingChapters = chaptersCiting(await resolveCitesEdgeIndex(), entity.id);
 
   const anatomyInputs = buildEntityAnatomyInputs(entity, mapTone);
   const sources = toRoomSources(entity.claims);
@@ -297,6 +300,30 @@ export default async function EntityPage({ params }: EntityPageProps) {
             Sources
           </h2>
           <SourceList sources={sources} />
+        </section>
+      ) : null}
+
+      {/*
+        * The record side of the chapter-cites-record edge (SP-20). Sits directly under Sources
+        * because it is the same kind of apparatus: what the archive can show you behind this
+        * record. Renders only when a chapter actually cites it. An empty heading would read as
+        * a hole in the archive rather than as a record no chapter has reached yet.
+        */}
+      {citingChapters.length > 0 ? (
+        <section className="ds-record-rail-block" aria-labelledby="cited-by-heading">
+          <h2 className="ds-room-rail-group__title" id="cited-by-heading">
+            Chapters that cite this record
+          </h2>
+          <ul className="ds-record-rail-block__chapters">
+            {citingChapters.map((chapter) => (
+              <li key={chapter.slug}>
+                <Link href={chapter.href} prefetch={false}>
+                  {chapter.title}
+                </Link>
+                <span className="ds-record-rail-block__relation ds-mono">{chapter.relation}</span>
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
 

@@ -126,6 +126,31 @@
   color: var(--room-ink-3);
 }
 
+/* Chapters that cite this record. Unbulleted: these are links out of the record, not reasons
+   for it, and a bullet would file them with the inclusion rubric directly below. */
+.ds-record-rail-block__chapters {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.ds-record-rail-block__chapters > li {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ds-space-1) / 2);
+}
+
+.ds-record-rail-block__relation {
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  color: var(--room-ink-3);
+}
+
 /* The kit's Anatomy is a 2x2 grid, which is right in a 680px column and wrong in a 240px rail:
    "Fort Lauderdale, FL" broke over three lines and "Grade A · 1 source" over two. In the rail it
    is one column of rows, so every value gets the full width and the labels stay aligned. */
