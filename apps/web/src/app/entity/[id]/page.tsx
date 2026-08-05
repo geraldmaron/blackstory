@@ -304,11 +304,11 @@ export default async function EntityPage({ params }: EntityPageProps) {
       ) : null}
 
       {/*
-        * The record side of the chapter-cites-record edge (SP-20). Sits directly under Sources
-        * because it is the same kind of apparatus: what the archive can show you behind this
-        * record. Renders only when a chapter actually cites it. An empty heading would read as
-        * a hole in the archive rather than as a record no chapter has reached yet.
-        */}
+       * The record side of the chapter-cites-record edge (SP-20). Sits directly under Sources
+       * because it is the same kind of apparatus: what the archive can show you behind this
+       * record. Renders only when a chapter actually cites it. An empty heading would read as
+       * a hole in the archive rather than as a record no chapter has reached yet.
+       */}
       {citingChapters.length > 0 ? (
         <section className="ds-record-rail-block" aria-labelledby="cited-by-heading">
           <h2 className="ds-room-rail-group__title" id="cited-by-heading">

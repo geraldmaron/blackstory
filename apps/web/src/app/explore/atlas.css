@@ -183,3 +183,70 @@
     transition-duration: 0.01ms;
   }
 }
+
+/*
+ * "Show the legend" overlay (§5.2, §7 quality-of-life "Colour key ... palette and the record
+ * sheet"). Sits at the palette/overlays tier (z 90): it is a reader-summoned reference panel over
+ * the instruments, not a floating instrument of its own.
+ */
+.ds-atlas__legend-overlay {
+  position: fixed;
+  right: var(--ds-space-4);
+  top: calc(56px + var(--ds-space-4));
+  bottom: var(--ds-space-4);
+  z-index: var(--ds-z-modal-sheet);
+  width: min(360px, calc(100vw - var(--ds-space-4) * 2));
+  overflow-y: auto;
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-4);
+}
+
+@media (max-width: 819px) {
+  .ds-atlas__legend-overlay {
+    left: var(--ds-space-2);
+    right: var(--ds-space-2);
+    width: auto;
+  }
+}
+
+/*
+ * The three dead attributes (§7 quality-of-life: Density `⌥D`, Motion `M`). `useCommandContext`
+ * already flips `document.documentElement.dataset.density` / `.motion` on keypress; until this
+ * rule existed nothing read the attribute back, so the keys changed a DOM property and nothing
+ * else. Density rescales instrument spacing and the two rail widths (§5.2/§5.3's compact
+ * measurements). Motion kills the ambient camera readout fade and chrome-hidden transition,
+ * while leaving functional transitions (panel show/hide, the spotlight mask) intact — the same
+ * split `prefers-reduced-motion` already draws, just reader-chosen instead of OS-chosen.
+ */
+:root[data-density='compact'] .ds-lens,
+:root[data-density='compact'] .ds-results {
+  width: 276px;
+}
+
+:root[data-density='compact'] .ds-results {
+  width: 316px;
+}
+
+:root[data-density='compact'] .ds-lens__group {
+  padding-block: calc(var(--ds-space-3) * 0.75);
+}
+
+:root[data-density='compact'] .ds-results__row {
+  height: 46px;
+}
+
+:root[data-density='compact'] .ds-atlas__dock button {
+  min-height: 38px;
+  min-width: 38px;
+}
+
+:root[data-motion='calm'] .ds-atlas__readout,
+:root[data-motion='calm'] .ds-atlas[data-chrome='hidden'] .ds-bar {
+  transition-duration: 0.01ms;
+}
+
+:root[data-motion='calm'] .ds-atlas__spotlight {
+  transition-duration: 0.01ms;
+}

@@ -78,8 +78,8 @@ export default function SupportPage() {
       <UtilityCard title="Reach the team" className="ds-support__section-contact">
         <Prose>
           <p className="ds-support__contact-intro">
-            For issues that do not fit the corrections form (account of operation questions,
-            privacy requests, or accessibility barriers), email the contact below.
+            For issues that do not fit the corrections form (account of operation questions, privacy
+            requests, or accessibility barriers), email the contact below.
           </p>
         </Prose>
 

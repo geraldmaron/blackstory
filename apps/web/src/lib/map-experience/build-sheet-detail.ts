@@ -17,21 +17,21 @@ import type { HistoryEdgeView } from '../history/build-history-graph';
 import type { SheetConnection, SheetSource } from '../../components/map-experience/RecordSheet';
 
 /** What the sheet needs to know about the entity on the other end of an edge. */
-export type ConnectedRecordLookup = (entityId: string) => {
-  readonly name?: string;
-  readonly kind?: string;
-  readonly mapTone?: string;
-  readonly href?: string;
-} | undefined;
+export type ConnectedRecordLookup = (entityId: string) =>
+  | {
+      readonly name?: string;
+      readonly kind?: string;
+      readonly mapTone?: string;
+      readonly href?: string;
+    }
+  | undefined;
 
 /** Edges incident to a record, in either direction. */
 export function edgesTouching(
   edges: readonly HistoryEdgeView[],
   entityId: string,
 ): readonly HistoryEdgeView[] {
-  return edges.filter(
-    (edge) => edge.fromEntityId === entityId || edge.toEntityId === entityId,
-  );
+  return edges.filter((edge) => edge.fromEntityId === entityId || edge.toEntityId === entityId);
 }
 
 /**

@@ -28,10 +28,10 @@ export default function SubmitLeadPage() {
 
       <Notice tone="warning" title="This is not a public post">
         Leads submitted here are never published as-is. Every submission enters a moderated
-        quarantine queue, is reviewed independently by multiple reviewers, and seeds a private research
-        case only if those reviewers agree it is worth pursuing. It still has to pass the full
-        research and fact-checking process before anything about it is ever public. Please do not
-        include anyone's home address or other sensitive personal details about a living person.
+        quarantine queue, is reviewed independently by multiple reviewers, and seeds a private
+        research case only if those reviewers agree it is worth pursuing. It still has to pass the
+        full research and fact-checking process before anything about it is ever public. Please do
+        not include anyone's home address or other sensitive personal details about a living person.
       </Notice>
 
       <SubmitLeadForm />
@@ -41,8 +41,8 @@ export default function SubmitLeadPage() {
         Zooniverse/Caesar pattern; see{' '}
         <a href="/methodology">how disputes and review are handled</a>
         ); if they agree it is legitimate, it becomes a private research candidate. If they
-        disagree, a human expert resolves it. Disagreement is never silently averaged away. Only
-        the standard research and promotion pipeline can ever make anything from this lane public.
+        disagree, a human expert resolves it. Disagreement is never silently averaged away. Only the
+        standard research and promotion pipeline can ever make anything from this lane public.
       </EmptyState>
     </Room>
   );

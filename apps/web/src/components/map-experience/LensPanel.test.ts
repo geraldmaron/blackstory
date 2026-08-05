@@ -27,8 +27,13 @@ function lensProps(overrides: Partial<LensPanelProps> = {}): LensPanelProps {
     onKindFamilyChange: () => {},
     evidenceFloor: 'any',
     onEvidenceFloorChange: () => {},
+    topicOptions: [],
+    topicId: null,
+    onTopicChange: () => {},
     layers: { pins: true, routes: false, labels: true, satellite: false },
     onLayerToggle: () => {},
+    layerMode: 'off',
+    onLayerModeChange: () => {},
     presence: [
       { postalCode: 'DC', name: 'District of Columbia', count: 372 },
       { postalCode: 'SC', name: 'South Carolina', count: 285 },
@@ -40,7 +45,14 @@ function lensProps(overrides: Partial<LensPanelProps> = {}): LensPanelProps {
 
 test('every group is visible in one panel, with no tabs', () => {
   const html = renderToStaticMarkup(createElement(LensPanel, lensProps()));
-  for (const group of ['Where', 'Kind', 'Evidence floor', 'Layers', 'Deepest coverage']) {
+  for (const group of [
+    'Where',
+    'Kind',
+    'Evidence floor',
+    'Layers',
+    'Population layer',
+    'Deepest coverage',
+  ]) {
     assert.match(html, new RegExp(group), `missing group: ${group}`);
   }
   assert.equal(html.includes('role="tab"'), false, 'v6 tabs must not come back');
@@ -59,7 +71,49 @@ test('kind chips carry the family label, its live count and a pressed state', ()
     assert.match(html, new RegExp(entry.label), `missing kind family: ${entry.label}`);
   }
   assert.match(html, /1,330/);
-  assert.equal(html.match(/aria-pressed="true"/g)?.length, 4, 'places + Any floor + 2 on layers');
+  assert.equal(
+    html.match(/aria-pressed="true"/g)?.length,
+    5,
+    'places + Any floor + 2 on layers + None population layer',
+  );
+});
+
+test('the topic group only renders when there are topics to show, and carries live counts', () => {
+  const empty = renderToStaticMarkup(createElement(LensPanel, lensProps()));
+  assert.equal(empty.includes('>Topic<'), false);
+
+  const withTopics = renderToStaticMarkup(
+    createElement(
+      LensPanel,
+      lensProps({
+        topicOptions: [{ id: 'redlining', label: 'Redlining', count: 214 }],
+        topicId: 'redlining',
+      }),
+    ),
+  );
+  assert.match(withTopics, /Topic/);
+  assert.match(withTopics, /Redlining/);
+  assert.match(withTopics, /214/);
+});
+
+test('the population layer group offers the two comparability-noted choropleths, plus none', () => {
+  const html = renderToStaticMarkup(
+    createElement(LensPanel, lensProps({ layerMode: 'blackShare' })),
+  );
+  assert.match(html, /Black population share/);
+  assert.match(html, /Black share change/);
+  assert.match(html, /not directly comparable/);
+});
+
+test('the legend trigger only renders when the caller wants one', () => {
+  assert.equal(
+    renderToStaticMarkup(createElement(LensPanel, lensProps())).includes('Show the legend'),
+    false,
+  );
+  assert.match(
+    renderToStaticMarkup(createElement(LensPanel, lensProps({ onShowLegend: () => {} }))),
+    /Show the legend/,
+  );
 });
 
 test('evidence floor chips read as and-up and carry a grade dot', () => {

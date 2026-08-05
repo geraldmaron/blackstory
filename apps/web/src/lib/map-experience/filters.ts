@@ -28,7 +28,7 @@ import type { ExploreMapBounds } from './url-state';
  * before the split. Either way every value is validated against `TOPIC_REGISTRY` — the theme
  * facet is NEVER built from raw, uncontrolled tag counting.
  */
-function effectiveTopicIds(feature: ExploreMapFeature): readonly string[] {
+export function effectiveTopicIds(feature: ExploreMapFeature): readonly string[] {
   const source = feature.properties.topicIds ?? feature.properties.topicTags;
   return source.filter(isValidTopicId);
 }
@@ -244,6 +244,28 @@ export function buildExploreFacetOptions(
       'All states',
     ),
   };
+}
+
+export type TopicCount = { readonly id: string; readonly label: string; readonly count: number };
+
+/**
+ * Live topic counts over the given features, for the Lens's Topic group (directly under Kind,
+ * same chip contract as Kind: glyph-free chip, label, live count). Capped so the group behaves
+ * like Kind's five chips rather than rendering the full ~200-entry controlled taxonomy —
+ * `TOPIC_CHIP_LIMIT` is the cap, ranked by how many records in view carry the topic so the chips
+ * shown are always the ones worth pressing.
+ */
+export const TOPIC_CHIP_LIMIT = 12;
+
+export function buildTopicCounts(
+  features: readonly ExploreMapFeature[],
+  limit = TOPIC_CHIP_LIMIT,
+): readonly TopicCount[] {
+  const counts = countBy(features, effectiveTopicIds);
+  return Object.entries(counts)
+    .map(([id, count]) => ({ id, label: getTopicLabel(id) ?? humanize(id), count }))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
+    .slice(0, limit);
 }
 
 export type EntityDecadeCount = { readonly decade: string; readonly count: number };

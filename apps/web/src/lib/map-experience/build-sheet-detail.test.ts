@@ -49,7 +49,10 @@ test('a connection names the entity at the other end, whichever end that is', ()
     [['ent_b', 'A.G. Gaston', 'founded by']],
   );
   const inbound = buildSheetConnections([edge({})], 'ent_b');
-  assert.deepEqual(inbound.map((c) => c.name), ['Gaston Motel']);
+  assert.deepEqual(
+    inbound.map((c) => c.name),
+    ['Gaston Motel'],
+  );
 });
 
 test('the lookup supplies kind, tone and href when the plate is carrying that pin', () => {

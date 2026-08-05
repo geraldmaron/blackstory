@@ -232,7 +232,13 @@ test('a connection that has a page keeps its real link', () => {
     record: {
       ...RECORD,
       connections: [
-        { id: 'c1', name: 'Kelly Ingram Park', kind: 'place', relation: 'across from', href: '/entity/c1' },
+        {
+          id: 'c1',
+          name: 'Kelly Ingram Park',
+          kind: 'place',
+          relation: 'across from',
+          href: '/entity/c1',
+        },
       ],
     },
     onSelectConnection: () => {},

@@ -22,10 +22,12 @@ import {
   floorLabel,
   type EvidenceFloor,
 } from '../../lib/map-experience/evidence-grade';
+import type { TopicCount } from '../../lib/map-experience/filters';
 import {
   MAP_KIND_FAMILY_ENCODING,
   type MapKindFamily,
 } from '../../lib/map-experience/kind-encoding';
+import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
 import { GradeDot } from './GradeDot';
 import { KindFamilyGlyph } from './KindGlyph';
 import './lens-panel.css';
@@ -57,6 +59,16 @@ export type PresenceRow = {
 
 export type StateOption = { readonly value: string; readonly label: string };
 
+/** The population layer choices the Lens exposes. `off` is "None" — pins alone, no choropleth. */
+const POPULATION_LAYER_MODES: readonly ExploreLayerMode[] = ['off', 'blackShare', 'blackChange'];
+
+const POPULATION_LAYER_LABELS: Readonly<Record<ExploreLayerMode, string>> = {
+  off: 'None',
+  presence: 'Record presence',
+  blackShare: 'Black population share',
+  blackChange: 'Black share change',
+};
+
 export type LensPanelProps = {
   /** Records matching the current lens, for the header count. */
   readonly matched: number;
@@ -76,10 +88,25 @@ export type LensPanelProps = {
   readonly evidenceFloor: EvidenceFloor;
   readonly onEvidenceFloorChange: (floor: EvidenceFloor) => void;
 
+  /** Live counts over the unfiltered release, capped and ranked (`buildTopicCounts`). */
+  readonly topicOptions: readonly TopicCount[];
+  /** Single-select, same contract as `kindFamily`: pressing the active chip clears it. */
+  readonly topicId: string | null;
+  readonly onTopicChange: (id: string | null) => void;
+
   readonly layers: LensLayers;
   readonly onLayerToggle: (layer: LensLayerKey) => void;
 
+  /** Population layer model: `off` for none, or one of the two comparability-noted choropleths.
+   * `presence` is deliberately not offered here — it is the default map shading the Atlas already
+   * carries, not a reader-facing "population" choice. */
+  readonly layerMode: ExploreLayerMode;
+  readonly onLayerModeChange: (mode: ExploreLayerMode) => void;
+
   readonly presence: readonly PresenceRow[];
+
+  /** Opens the "Show the legend" overlay (§3, WP retained from v6). */
+  readonly onShowLegend?: () => void;
 
   readonly onReset: () => void;
   readonly onHide?: () => void;
@@ -105,9 +132,15 @@ export function LensPanel({
   onKindFamilyChange,
   evidenceFloor,
   onEvidenceFloorChange,
+  topicOptions,
+  topicId,
+  onTopicChange,
   layers,
   onLayerToggle,
+  layerMode,
+  onLayerModeChange,
   presence,
+  onShowLegend,
   onReset,
   onHide,
   className,
@@ -220,6 +253,34 @@ export function LensPanel({
           </div>
         </div>
 
+        {topicOptions.length > 0 ? (
+          <div className="ds-lens__group">
+            <div className="ds-lens__group-head">
+              <span className="ds-lens__group-label">Topic</span>
+              <span className="ds-lens__hint">{topicOptions.length} shown</span>
+            </div>
+            <div className="ds-lens__chips" role="group" aria-label="Topic">
+              {topicOptions.map((topic) => {
+                const pressed = topicId === topic.id;
+                return (
+                  <button
+                    key={topic.id}
+                    type="button"
+                    className="ds-lens__chip"
+                    aria-pressed={pressed}
+                    onClick={() => onTopicChange(pressed ? null : topic.id)}
+                  >
+                    {topic.label}
+                    <span className="ds-lens__chip-count">
+                      {topic.count.toLocaleString('en-US')}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+
         <div className="ds-lens__group">
           <div className="ds-lens__group-head">
             <span className="ds-lens__group-label">Evidence floor</span>
@@ -260,6 +321,42 @@ export function LensPanel({
               </button>
             ))}
           </div>
+          {onShowLegend ? (
+            <button
+              type="button"
+              className="ds-lens__link ds-lens__show-legend"
+              onClick={onShowLegend}
+            >
+              Show the legend
+            </button>
+          ) : null}
+        </div>
+
+        <div className="ds-lens__group">
+          <div className="ds-lens__group-head">
+            <span className="ds-lens__group-label">Population layer</span>
+          </div>
+          <div className="ds-lens__chips" role="group" aria-label="Population layer">
+            {POPULATION_LAYER_MODES.map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                className="ds-lens__chip"
+                aria-pressed={layerMode === mode}
+                onClick={() => onLayerModeChange(layerMode === mode ? 'off' : mode)}
+              >
+                {POPULATION_LAYER_LABELS[mode]}
+              </button>
+            ))}
+          </div>
+          {layerMode === 'blackShare' || layerMode === 'blackChange' ? (
+            <p className="ds-lens__note">
+              Published Census decennial counts, not modeled story density. Record presence and
+              population share are two different measures and are not directly comparable: one
+              counts documented entities in this archive, the other counts residents in a census
+              year.
+            </p>
+          ) : null}
         </div>
 
         <hr className="ds-lens__rule" />

@@ -206,14 +206,22 @@ describe('/records · the Atlas handoff', () => {
     );
   });
 
-  it('never sends q or the evidence floor, because the Atlas would silently drop them', () => {
+  it('never sends q, because the Atlas has no text constraint at all', () => {
     const href = buildAtlasHref({
       ...EMPTY_RECORDS_QUERY,
       q: 'tulsa',
-      evidence: 'B',
       state: 'OK',
     });
     assert.equal(href, '/?state=OK');
+  });
+
+  it('sends the evidence floor as `floor`, now that SP-16 landed it on the Lens', () => {
+    const href = buildAtlasHref({
+      ...EMPTY_RECORDS_QUERY,
+      evidence: 'B',
+      state: 'OK',
+    });
+    assert.equal(href, '/?state=OK&floor=B');
   });
 
   it('an unnarrowed index hands over bare /', () => {

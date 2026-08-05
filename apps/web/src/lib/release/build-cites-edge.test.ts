@@ -26,9 +26,7 @@ function doc(over: Partial<PublicArticleProjectionDoc>): PublicArticleProjection
 }
 
 test('a mapInset block cites its entity as "mapped in"', () => {
-  const cited = articleCitedEntities(
-    doc({ body: [{ type: 'mapInset', entityId: 'ent_a' }] }),
-  );
+  const cited = articleCitedEntities(doc({ body: [{ type: 'mapInset', entityId: 'ent_a' }] }));
   assert.equal(cited.get('ent_a'), 'mapped in');
 });
 
@@ -47,7 +45,11 @@ test('mapping a record outranks merely relating it, in either declaration order'
 test('the index inverts articles onto records, sorted by chapter title', () => {
   const index = buildCitesEdge([
     doc({ slug: 'zoning', title: 'Zoning', relatedEntityIds: ['ent_a'] }),
-    doc({ slug: 'blockbusting', title: 'Blockbusting', body: [{ type: 'mapInset', entityId: 'ent_a' }] }),
+    doc({
+      slug: 'blockbusting',
+      title: 'Blockbusting',
+      body: [{ type: 'mapInset', entityId: 'ent_a' }],
+    }),
   ]);
   assert.deepEqual(
     index['ent_a']?.map((c) => [c.title, c.relation, c.href]),

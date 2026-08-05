@@ -450,13 +450,17 @@ export function buildRecordsIndex(
  * by `query-normalization`, so a param this function invents is stripped by middleware before the
  * Atlas ever sees it — silently widening the set the reader thought they were carrying over.
  *
- * Two constraints therefore do NOT cross, and the off-ramp copy says so rather than pretending:
- * - `q`, because the Atlas has no text constraint at all.
- * - `evidence`, because the Lens carries an exact-match `confidence` tier today, not a floor.
- *   Mapping "B and up" onto `confidence=medium` would drop every grade A record. SP-16
- *   (repo-92n2.16) adds the floor to the Lens; this maps through the moment it lands.
+ * One constraint does NOT cross, and the off-ramp copy says so rather than pretending: `q`,
+ * because the Atlas has no text constraint at all.
  *
  * `topic` becomes `theme`, which is the Lens's name for the same controlled topic id.
+ *
+ * `evidence` becomes `floor`. SP-16 (repo-92n2.16) landed the evidence floor on the Lens as its
+ * own predicate, separate from the Lens's pre-existing exact-match `confidence` tier — routing a
+ * floor through `confidence` would map "B and up" onto `confidence=medium` and drop every grade A
+ * record, the opposite of what the reader asked for (see `evidence-grade.ts`'s
+ * `applyEvidenceFloor`). `floor` carries the same `EvidenceFloor` vocabulary this module already
+ * uses (`'C' | 'B' | 'A'`), unencoded, so `?floor=B` and "B and up" here name the same set.
  */
 export function buildAtlasHref(query: RecordsQuery): string {
   const params = new URLSearchParams();
@@ -465,6 +469,7 @@ export function buildAtlasHref(query: RecordsQuery): string {
   if (query.state.length > 0) params.set('state', query.state);
   if (query.topic.length > 0) params.set('theme', query.topic);
   if (query.status.length > 0) params.set('status', query.status);
+  if (query.evidence.length > 0) params.set('floor', query.evidence);
   const search = params.toString();
   return search.length > 0 ? `/?${search}` : '/';
 }

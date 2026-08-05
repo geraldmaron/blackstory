@@ -182,8 +182,7 @@ export function RecordSheet({
    * plate's count only when the sheet is carrying no citations at all, which is the case the
    * fallback copy below exists for.
    */
-  const sourceCount =
-    record.sources.length > 0 ? record.sources.length : (record.sourceCount ?? 0);
+  const sourceCount = record.sources.length > 0 ? record.sources.length : (record.sourceCount ?? 0);
   const citingChapters = record.citingChapters ?? [];
 
   return (

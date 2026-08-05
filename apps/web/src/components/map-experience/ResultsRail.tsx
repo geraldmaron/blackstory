@@ -33,6 +33,14 @@ const OVERSCAN = 6;
 
 export type ResultsSort = 'oldest' | 'newest';
 
+/** One active, clearable narrowing constraint (docs/ui/patterns-lens-handoff.md §3). Rendered as
+ * a chip naming what narrowed the set, with a control to clear just that one. */
+export type ResultsConstraint = {
+  readonly key: string;
+  readonly label: string;
+  readonly onClear: () => void;
+};
+
 export type ResultsRailProps = {
   readonly features: readonly ExploreMapFeature[];
   readonly total: number;
@@ -43,6 +51,9 @@ export type ResultsRailProps = {
   readonly savedIds?: ReadonlySet<string>;
   readonly onToggleSave?: (feature: ExploreMapFeature) => void;
   readonly onHide?: () => void;
+  /** Every constraint currently narrowing the set, arrived by URL or set in the Lens — excluding
+   * `selected`, `collection` and `find`, which address rather than narrow. */
+  readonly constraints?: readonly ResultsConstraint[];
   /** Rendered in place of the list when nothing matches. Never a bare "no results". */
   readonly emptyState?: React.ReactNode;
   readonly className?: string;
@@ -78,6 +89,7 @@ export function ResultsRail({
   savedIds,
   onToggleSave,
   onHide,
+  constraints,
   emptyState,
   className,
 }: ResultsRailProps) {
@@ -155,6 +167,30 @@ export function ResultsRail({
           </button>
         ) : null}
       </header>
+
+      {constraints && constraints.length > 0 ? (
+        <div className="ds-results__constraints" role="group" aria-label="Active constraints">
+          {constraints.map((constraint) => (
+            <button
+              key={constraint.key}
+              type="button"
+              className="ds-results__constraint"
+              onClick={constraint.onClear}
+              aria-label={`Clear constraint: ${constraint.label}`}
+            >
+              {constraint.label}
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M3.5 3.5l9 9m0-9-9 9"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       {features.length === 0 ? (
         <div className="ds-results__empty">{emptyState}</div>
