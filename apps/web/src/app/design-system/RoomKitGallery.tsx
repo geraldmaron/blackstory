@@ -23,6 +23,8 @@ import {
   Field,
   GroupHeading,
   HairlineIndex,
+  MapMoment,
+  MapMomentStage,
   Note,
   OffRamp,
   Precision,
@@ -291,6 +293,32 @@ export function RoomKitGallery() {
           previous={{ href: '/design-system#room-kit-heading', label: 'Elias Clayton' }}
           next={{ href: '/design-system#room-kit-heading', label: 'Elmer Jackson' }}
         />
+      </Specimen>
+
+      <Specimen
+        name="MapMoment"
+        tokens={['--room-sunk', '--ds-accent-graphic', '--ds-radius-md', '--ds-rule']}
+      >
+        {/* Inside a stage, so both states are inspectable: scroll one of these past the halfway
+            mark and it takes the plate — copper edge, tag, and the Atlas hand-off appear, while
+            the other returns to idle. Exactly one is ever live, which is the rule /law,
+            /methodology and chapter detail depend on.
+
+            Outside a stage — which is every room until SP-08 lands, and every reader with no
+            JavaScript — the slot says the map is unavailable and the caption carries the moment
+            on its own. See /about for that state. */}
+        <MapMomentStage>
+          <MapMoment
+            camera={{ center: [-87.635, 41.901], zoom: 12.8, pitch: 36, bearing: -12 }}
+            note="Chicago's Black Belt, 1919. The camera flies in because the subject is a neighbourhood, not a killing."
+            atlasHref="/?find=place"
+          />
+          <MapMoment
+            plain
+            camera={{ center: [-92.1005, 46.7867], zoom: 12 }}
+            note="Duluth, Minnesota, held at locality precision. The camera cuts here and does not move."
+          />
+        </MapMomentStage>
       </Specimen>
     </section>
   );

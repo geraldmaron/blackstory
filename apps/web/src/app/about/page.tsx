@@ -34,6 +34,7 @@ import { ABOUT_CONTRIBUTE, ABOUT_ORIGIN, ABOUT_PILLARS, ABOUT_REFUSALS } from '.
 import {
   CardGrid,
   GroupHeading,
+  MapMoment,
   OffRamp,
   Prose,
   Room,
@@ -93,6 +94,15 @@ export default function AboutPage() {
           <p key={paragraph.slice(0, 40)}>{paragraph}</p>
         ))}
       </Prose>
+
+      {/* The establishing shot, taken straight from the mock's /about room. It sits here rather
+          than at the top because the claim it illustrates — that this is national, and held county
+          by county — is the one the paragraphs above just finished making. */}
+      <MapMoment
+        camera={{ center: [-96.5, 38.6], zoom: 3.4 }}
+        note="Records sit in every region of the country. That is a claim this archive has to keep county by county rather than assert once, so the map is the evidence for it and not an illustration of it."
+        atlasHref="/"
+      />
 
       <section className="ds-about-page__section" aria-labelledby="pillars-heading">
         <GroupHeading>

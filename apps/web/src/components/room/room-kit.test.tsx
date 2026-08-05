@@ -27,6 +27,7 @@ import { HairlineIndex } from './HairlineIndex';
 import { DataTable } from './DataTable';
 import { Disclosure, Field, UtilityCard, UtilityStep } from './Utility';
 import { EmptyList, OffRamp, RecordNav } from './RoomFoot';
+import { MapMoment, pickLiveMoment, resolveMomentCamera } from './MapMoment';
 
 void React;
 
@@ -471,5 +472,131 @@ describe('room kit · the column', () => {
     );
     assert.match(html, /<main class="ds-room" id="main"><div class="ds-room__doc">/);
     assert.doesNotMatch(html, /max-width/);
+  });
+});
+
+describe('room kit · map moment', () => {
+  it('renders the slot, the tag and the caption, and starts idle', () => {
+    const html = renderToStaticMarkup(
+      <MapMoment camera={{ center: [-90.049, 35.1495], zoom: 12 }} note="Memphis, 1866." />,
+    );
+    assert.match(html, /class="ds-mapmoment"/);
+    assert.match(html, /data-live="0"/);
+    assert.match(html, /ds-mapmoment__plate/);
+    assert.match(html, /<figcaption[^>]*>Memphis, 1866\.<\/figcaption>/);
+  });
+
+  it('says the map is unavailable when no stage is mounted, rather than inviting a scroll', () => {
+    // The §10 degrade. A slot with no plate behind it must not tell the reader to scroll for a
+    // map that will never arrive; the caption is what carries the point.
+    const html = renderToStaticMarkup(
+      <MapMoment camera={{ center: [-87.63, 41.9] }} note="Chicago." />,
+    );
+    assert.match(html, /The map is unavailable\. The caption below carries the point\./);
+    assert.doesNotMatch(html, /Scroll to bring the map here/);
+  });
+
+  it('a plain moment is tagged STILL, not LIVE', () => {
+    const html = renderToStaticMarkup(
+      <MapMoment camera={{ center: [-92.1, 46.78] }} note="Duluth, 1920." plain />,
+    );
+    assert.match(html, /data-plain="1"/);
+    assert.match(html, /Plate · Still/);
+    assert.doesNotMatch(html, /Plate · Live/);
+  });
+
+  it('the Atlas hand-off renders only when a destination is given', () => {
+    const without = renderToStaticMarkup(
+      <MapMoment camera={{ center: [-90, 35] }} note="A place." />,
+    );
+    assert.doesNotMatch(without, /ds-mapmoment__open/);
+
+    const with_ = renderToStaticMarkup(
+      <MapMoment camera={{ center: [-90, 35] }} note="A place." atlasHref="/?find=place" />,
+    );
+    assert.match(with_, /href="\/\?find=place"/);
+  });
+
+  it('refuses pitch and bearing on a plain moment, and cuts instead of flying', () => {
+    // The dignity rule lives at the camera layer, not at the call site: passing a pitch to a
+    // plain moment must not tilt it.
+    const resolved = resolveMomentCamera(
+      { center: [-92.1, 46.78], zoom: 12, pitch: 45, bearing: 30 },
+      { plain: true },
+    );
+    assert.equal(resolved.pitch, 0);
+    assert.equal(resolved.bearing, 0);
+    assert.equal(resolved.move, 'cut');
+  });
+
+  it('reduced motion cuts too, without being told the subject', () => {
+    const resolved = resolveMomentCamera(
+      { center: [-87.63, 41.9], zoom: 13, pitch: 40, bearing: -12 },
+      { reducedMotion: true },
+    );
+    assert.equal(resolved.move, 'cut');
+    assert.equal(resolved.pitch, 0);
+  });
+
+  it('an ordinary moment keeps its composition', () => {
+    const resolved = resolveMomentCamera(
+      { center: [-87.63, 41.9], zoom: 13, pitch: 40, bearing: -12 },
+      {},
+    );
+    assert.equal(resolved.move, 'fly');
+    assert.equal(resolved.pitch, 40);
+    assert.equal(resolved.bearing, -12);
+  });
+});
+
+describe('room kit · map moment arbitration', () => {
+  const slot = (id: string, top: number, height = 300) => ({
+    id,
+    top,
+    bottom: top + height,
+    height,
+  });
+
+  it('a room with four moments frames exactly one', () => {
+    // Chapter detail is the case: four moments, one plate.
+    const live = pickLiveMoment(
+      [slot('a', -400), slot('b', 100), slot('c', 700), slot('d', 1200)],
+      800,
+    );
+    assert.equal(live, 'b');
+  });
+
+  it('no moment takes the plate until it is properly on screen', () => {
+    // Just peeking over the fold is not enough; below the floor the plate stays parked.
+    assert.equal(pickLiveMoment([slot('a', 700)], 800), null);
+    assert.equal(pickLiveMoment([slot('a', 500)], 800), 'a');
+  });
+
+  it('a zero-height slot never wins', () => {
+    // A moment inside a collapsed disclosure has a rect, and it is all zeroes.
+    assert.equal(pickLiveMoment([{ id: 'hidden', top: 0, bottom: 0, height: 0 }], 800), null);
+  });
+
+  it('scrolling hands the plate forward one moment at a time', () => {
+    const two = [slot('first', 0), slot('second', 320)];
+    assert.equal(pickLiveMoment(two, 800), 'first');
+    const scrolled = [slot('first', -260), slot('second', 60)];
+    assert.equal(pickLiveMoment(scrolled, 800), 'second');
+  });
+
+  it('nothing is framed when every moment has scrolled away', () => {
+    assert.equal(pickLiveMoment([slot('a', -900), slot('b', 1400)], 800), null);
+  });
+});
+
+describe('room kit · no room invents its own map moment', () => {
+  it('no route defines moment markup outside the kit', () => {
+    // The gap this package closed: the mock renders a moment in seven rooms and the kit had no
+    // component for it, so six of them would each have grown their own.
+    const offenders = walk(APP_DIR)
+      .filter((file) => /\.(tsx|ts|css)$/.test(file))
+      .filter((file) => /ds-mapmoment__plate|mm-plate/.test(readFileSync(file, 'utf8')))
+      .map((file) => path.relative(APP_DIR, file));
+    assert.deepEqual(offenders, [], 'map moment markup belongs to components/room/MapMoment.tsx');
   });
 });
