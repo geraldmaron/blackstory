@@ -533,7 +533,13 @@ async function collectReferenceHops(
  * in a downstream gate.
  */
 function applyAddressRestriction(row: CandidateRow, item: EvidenceRow): EvidenceRow {
-  if (row.payload.restrictedAddress !== true) return item;
+  // Person entities get the same capture-time redaction as address-restricted properties:
+  // living status is usually unknown at capture time, treatAsLiving('unknown') is true, and the
+  // constitution's neverStoreResidentialAsOrdinaryPersonLocation applies to the stored evidence
+  // itself, not just published prose. A deceased figure losing a street mention in a bio is the
+  // cheap side of that trade.
+  const guardApplies = row.payload.restrictedAddress === true || row.payload.kind === 'person';
+  if (!guardApplies) return item;
   const { text, redactionCount } = redactStreetAddresses(item.contentText);
   return {
     ...item,
@@ -542,11 +548,12 @@ function applyAddressRestriction(row: CandidateRow, item: EvidenceRow): Evidence
     charCount: text.length,
     provenance: {
       ...item.provenance,
-      addressRestricted: true,
+      addressRestricted: row.payload.restrictedAddress === true,
+      personAddressGuard: row.payload.kind === 'person' || undefined,
       redactionCount,
-      // Zero redactions on a restricted property means the patterns matched nothing — a signal
-      // to check the row by hand, not evidence that it was already clean.
-      redactionSuspicious: redactionCount === 0,
+      // Zero redactions on a restricted PROPERTY means the patterns matched nothing — a signal
+      // to check the row by hand. A clean person bio with zero redactions is normal, not suspect.
+      redactionSuspicious: row.payload.restrictedAddress === true && redactionCount === 0,
     },
   };
 }

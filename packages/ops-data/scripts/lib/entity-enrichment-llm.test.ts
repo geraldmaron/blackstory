@@ -222,3 +222,25 @@ test('rejects non-JSON responses without throwing', () => {
     assert.deepEqual(attempt.validation.errors, ['response is not valid JSON']);
   }
 });
+
+test('rejects an address-shaped keyword for a person entity', () => {
+  const attempt = validateEnrichmentResponse(
+    baseSubject({ kind: 'person' }),
+    ['business'],
+    validResponse({ keywords: ['entrepreneurship', '511 West South Street'] }),
+  );
+  assert.equal(attempt.validation.ok, false);
+  if (!attempt.validation.ok) {
+    assert.ok(attempt.validation.errors.some((error) => error.includes('keywords')));
+  }
+});
+
+test('user prompt carries the privacy rule for person subjects and omits it for plain places', async () => {
+  const { buildEnrichmentUserPrompt } = await import('./entity-enrichment-llm.ts');
+  const personPrompt = buildEnrichmentUserPrompt(baseSubject({ kind: 'person' }), ['business']);
+  const restrictedPrompt = buildEnrichmentUserPrompt(baseSubject({ restrictedAddress: true }), ['business']);
+  const placePrompt = buildEnrichmentUserPrompt(baseSubject(), ['business']);
+  assert.ok(personPrompt.includes('PRIVACY'));
+  assert.ok(restrictedPrompt.includes('PRIVACY'));
+  assert.ok(!placePrompt.includes('PRIVACY'));
+});

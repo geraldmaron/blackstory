@@ -124,7 +124,10 @@ export const ENTITY_ENRICHMENT_SYSTEM_PROMPT =
   'copied verbatim from a supplied evidence document\'s text. Never invent dates, names, events, or ' +
   'quotes not present in the evidence. If the evidence does not support a historicalContext ' +
   'paragraph beyond the summary, return null for it and an empty citations array rather than padding ' +
-  'with generic prose. Return JSON only.';
+  'with generic prose. Privacy: never state a street address, house number, coordinate pair, or ' +
+  'other parcel-precise location in any output field — for people (living or possibly living) and ' +
+  'address-restricted places this is a hard safety rule, and neighborhood- or city-level wording is ' +
+  'always sufficient. Return JSON only.';
 
 export function buildEnrichmentUserPrompt(
   subject: EnrichmentSubject,
@@ -151,6 +154,14 @@ export function buildEnrichmentUserPrompt(
         'topicIds must only use ids from allowedTopicIds; omit if none clearly apply',
         'eraBuckets must be decade labels ("1950s") grounded in a year present in the evidence',
         'if evidence is too thin for historicalContext, set it to null and historicalContextCitations to []',
+        ...(addressGuardApplies(subject)
+          ? [
+              'PRIVACY (hard rule for this subject): never state a street address, house number, ' +
+                'rural route, coordinate pair, lot/block, or distance-and-direction locator in ' +
+                'summary, historicalContext, or keywords — even if the evidence states one. ' +
+                'Neighborhood- or city-level wording is the maximum location precision allowed.',
+            ]
+          : []),
       ],
     },
     null,
@@ -400,6 +411,7 @@ export function validateEnrichmentResponse(
   if (addressGuardApplies(subject)) {
     checkNoAddressTokens(summary, errors, 'summary');
     checkNoAddressTokens(historicalContext ?? null, errors, 'historicalContext');
+    checkNoAddressTokens(keywords.join('; '), errors, 'keywords');
   }
 
   if (errors.length > 0) {
