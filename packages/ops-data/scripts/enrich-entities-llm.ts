@@ -47,8 +47,9 @@ import {
   ENTITY_ENRICHMENT_SCHEMA_ID,
   ENTITY_ENRICHMENT_SCHEMA_VERSION,
   type EnrichmentAttempt,
-  type EnrichmentSubject,
 } from './lib/entity-enrichment-llm.ts';
+import { fetchEnrichmentSubjects } from './lib/entity-enrichment-fetch.ts';
+import { applyEnrichmentResult } from './lib/entity-enrichment-apply.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.ENRICH_ENTITIES_LLM_APPLY === '1';
@@ -63,10 +64,6 @@ const PROVIDER_NAME = (process.env.ENRICH_ENTITIES_LLM_PROVIDER ?? 'mock') as
 const ACTIVITY_ID = process.env.ENRICH_ENTITIES_LLM_ACTIVITY_ID?.trim() || undefined;
 
 const ALLOWED_TOPIC_IDS = TOPIC_REGISTRY.map((topic) => topic.id);
-/** Per-source cap so one huge nomination form does not crowd out every other source. */
-const MAX_CHARS_PER_SOURCE = 4_000;
-/** Total evidence chars offered to the model, across all sources for one entity. */
-const MAX_TOTAL_EVIDENCE_CHARS = 14_000;
 /** Bounded batches (bead spec: "~250 entities"); override with --limit for smaller runs. */
 const DEFAULT_LIMIT = 250;
 
@@ -90,24 +87,6 @@ const REPORT_DIR = join(dirname(fileURLToPath(import.meta.url)), '../../../.cach
 
 type LedgerRow = {
   readonly entity_id: string;
-  readonly lane: string | null;
-  readonly evidence_digest: string | null;
-};
-
-type CandidateRow = {
-  readonly id: string;
-  readonly display_name: string;
-  readonly payload: {
-    readonly kind?: string;
-    readonly restrictedAddress?: boolean;
-  };
-};
-
-type EvidenceRow = {
-  readonly id: string;
-  readonly source_tier: 'tier1' | 'tier2' | 'lead';
-  readonly title: string | null;
-  readonly content_text: string | null;
 };
 
 async function mapPool<T, R>(
@@ -134,37 +113,6 @@ function resolveProvider(): LlmProvider {
   return createLaneProvider('entity-depth-enrichment', { fetchImpl: fetch });
 }
 
-function buildEvidenceForModel(rows: readonly EvidenceRow[]): EnrichmentSubject['evidence'] {
-  const usable = rows.filter((row) => row.content_text !== null && row.content_text.length > 0);
-  // tier1 first (richest, most authoritative), then by length — matches WS3's own preference.
-  const ordered = [...usable].sort((a, b) => {
-    if (a.source_tier !== b.source_tier) return a.source_tier === 'tier1' ? -1 : 1;
-    return (b.content_text?.length ?? 0) - (a.content_text?.length ?? 0);
-  });
-  const evidence: EnrichmentSubject['evidence'][number][] = [];
-  let budget = MAX_TOTAL_EVIDENCE_CHARS;
-  for (const row of ordered) {
-    if (budget <= 0) break;
-    const text = (row.content_text ?? '').slice(0, Math.min(MAX_CHARS_PER_SOURCE, budget));
-    if (text.length === 0) continue;
-    evidence.push({
-      id: row.id,
-      sourceTier: row.source_tier as 'tier1' | 'tier2',
-      title: row.title,
-      text,
-    });
-    budget -= text.length;
-  }
-  return evidence;
-}
-
-/** Same digest formula sweep-entity-evidence.ts uses, so "unchanged since WS3" is comparable. */
-function evidenceDigest(rows: readonly { readonly content_hash: string | null }[]): string | null {
-  const hashes = rows.map((row) => row.content_hash).filter((hash): hash is string => hash !== null);
-  if (hashes.length === 0) return null;
-  return createHash('sha256').update([...hashes].sort().join('|')).digest('hex');
-}
-
 async function main(): Promise<void> {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error('DATABASE_URL is required (source apps/web/.env.local)');
@@ -182,7 +130,7 @@ async function main(): Promise<void> {
     idClause = `AND entity_id = ANY($${ledgerParams.length}::text[])`;
   }
   const ledgerRows = await pool.query<LedgerRow>(
-    `SELECT entity_id, lane, evidence_digest
+    `SELECT entity_id
        FROM bb_research.entity_enrichment
       WHERE status = 'pending' ${laneClause} ${idClause}
       ORDER BY entity_id`,
@@ -199,47 +147,10 @@ async function main(): Promise<void> {
     return;
   }
 
-  const candidateRows = await pool.query<CandidateRow>(
-    `SELECT id, display_name, payload
-       FROM bb_research.landscape_candidates
-      WHERE id = ANY($1::text[])`,
-    [targeted.map((row) => row.entity_id)],
+  const { subjects, skippedNoEvidence } = await fetchEnrichmentSubjects(
+    pool,
+    targeted.map((row) => row.entity_id),
   );
-  const candidateById = new Map(candidateRows.rows.map((row) => [row.id, row]));
-
-  const evidenceRows = await pool.query<EvidenceRow & { readonly entity_id: string; readonly content_hash: string | null }>(
-    `SELECT entity_id, id, source_tier, title, content_text, content_hash
-       FROM bb_research.entity_evidence
-      WHERE entity_id = ANY($1::text[]) AND status = 'captured'`,
-    [targeted.map((row) => row.entity_id)],
-  );
-  const evidenceByEntity = new Map<string, (EvidenceRow & { readonly content_hash: string | null })[]>();
-  for (const row of evidenceRows.rows) {
-    const list = evidenceByEntity.get(row.entity_id) ?? [];
-    list.push(row);
-    evidenceByEntity.set(row.entity_id, list);
-  }
-
-  const subjects: (EnrichmentSubject & { readonly evidenceDigest: string | null })[] = [];
-  const skippedNoEvidence: string[] = [];
-  for (const ledgerRow of targeted) {
-    const candidate = candidateById.get(ledgerRow.entity_id);
-    const evidenceRowsForEntity = evidenceByEntity.get(ledgerRow.entity_id) ?? [];
-    const evidence = buildEvidenceForModel(evidenceRowsForEntity);
-    if (evidence.length === 0 || candidate === undefined) {
-      skippedNoEvidence.push(ledgerRow.entity_id);
-      continue;
-    }
-    subjects.push({
-      entityId: ledgerRow.entity_id,
-      displayName: candidate.display_name,
-      kind: candidate.payload.kind,
-      lane: ledgerRow.lane ?? '',
-      restrictedAddress: candidate.payload.restrictedAddress === true,
-      evidence,
-      evidenceDigest: evidenceDigest(evidenceRowsForEntity),
-    });
-  }
   if (skippedNoEvidence.length > 0) {
     console.log(
       `Skipping ${skippedNoEvidence.length} entit(ies) with status='pending' but no captured ` +
@@ -374,49 +285,12 @@ async function main(): Promise<void> {
   try {
     await client.query('BEGIN');
     for (const result of results) {
-      const subject = result.subject;
-      const fieldsWritten = result.attempt.validation.ok
-        ? [
-            'summary',
-            ...(result.attempt.validation.draft.historicalContext !== null ? ['historicalContext'] : []),
-            ...(result.attempt.validation.draft.topicIds.length > 0 ? ['topicIds'] : []),
-            ...(result.attempt.validation.draft.eraBuckets.length > 0 ? ['eraBuckets'] : []),
-            ...(result.attempt.validation.draft.keywords.length > 0 ? ['keywords'] : []),
-          ]
-        : [];
-      const notes = result.attempt.validation.ok
-        ? {
-            ws: 'repo-n7p6.4',
-            schemaId: ENTITY_ENRICHMENT_SCHEMA_ID,
-            schemaVersion: ENTITY_ENRICHMENT_SCHEMA_VERSION,
-            draft: result.attempt.validation.draft,
-          }
-        : {
-            ws: 'repo-n7p6.4',
-            schemaId: ENTITY_ENRICHMENT_SCHEMA_ID,
-            schemaVersion: ENTITY_ENRICHMENT_SCHEMA_VERSION,
-            validationErrors: result.attempt.validation.errors,
-            rawContent: result.attempt.rawContent.slice(0, 4000),
-          };
-      await client.query(
-        `UPDATE bb_research.entity_enrichment
-            SET status = $2,
-                model_id = $3,
-                cost_usd = coalesce(cost_usd, 0) + $4,
-                fields_written = $5,
-                notes = $6::jsonb,
-                last_enriched_at = now(),
-                updated_at = now()
-          WHERE entity_id = $1`,
-        [
-          subject.entityId,
-          result.attempt.validation.ok ? 'enriched' : 'quarantined',
-          result.completion.modelId,
-          result.completion.costUsdEstimate,
-          fieldsWritten,
-          JSON.stringify(notes),
-        ],
-      );
+      await applyEnrichmentResult(client, {
+        entityId: result.subject.entityId,
+        attempt: result.attempt,
+        modelId: result.completion.modelId,
+        costUsdEstimate: result.completion.costUsdEstimate,
+      });
     }
     await client.query('COMMIT');
     console.log(`\nApplied: ${results.length} ledger row(s) updated (${accepted.length} enriched, ${rejected.length} quarantined).`);

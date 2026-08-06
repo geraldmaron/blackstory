@@ -12,7 +12,11 @@ import { treatAsLiving } from '@repo/domain';
 import { decadeStartYearFromLabel, isDecadeAtOrBeforeCurrent } from '@repo/domain';
 import { isValidTopicId } from '@repo/domain';
 import { redactStreetAddresses } from './evidence-collectors/redact-address.ts';
-import type { LlmCompletionRequest, LlmProvider } from '../../../operator-cli/src/llm-provider.ts';
+import {
+  stripMarkdownCodeFence,
+  type LlmCompletionRequest,
+  type LlmProvider,
+} from '../../../operator-cli/src/llm-provider.ts';
 
 export const ENTITY_ENRICHMENT_SCHEMA_ID = 'entity_enrichment_draft.v1' as const;
 export const ENTITY_ENRICHMENT_SCHEMA_VERSION = '1' as const;
@@ -113,7 +117,7 @@ export const ENTITY_ENRICHMENT_RESPONSE_SCHEMA = {
   },
 } as const;
 
-const SYSTEM_PROMPT =
+export const ENTITY_ENRICHMENT_SYSTEM_PROMPT =
   'You write short factual entries for a Black history catalog, using ONLY the evidence documents ' +
   'supplied in the user message. State only facts present in that evidence. Every sentence of fact ' +
   'in "summary" and "historicalContext" must be traceable to at least one citation whose quote is ' +
@@ -161,12 +165,17 @@ export function buildEnrichmentRequest(
 ): LlmCompletionRequest {
   return {
     messages: [
-      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'system', content: ENTITY_ENRICHMENT_SYSTEM_PROMPT },
       { role: 'user', content: buildEnrichmentUserPrompt(subject, allowedTopicIds) },
     ],
     model,
     temperature: 0.2,
-    maxTokens: 1400,
+    // Reasoning models on the default paid roster (deepseek-r1-0528) write their chain-of-thought
+    // directly into the response body ahead of the final JSON — OpenRouter's `reasoning` field
+    // separation isn't honored by every router. 1400 tokens was measured truncating mid-reasoning
+    // on 17/20 real dc-sites entities (2026-08-06 live run), never reaching the JSON at all. 6000
+    // leaves headroom for a multi-paragraph reasoning chain plus the (short) final answer.
+    maxTokens: 6000,
     responseSchema: ENTITY_ENRICHMENT_RESPONSE_SCHEMA,
   };
 }
@@ -309,7 +318,11 @@ export function validateEnrichmentResponse(
 ): EnrichmentAttempt {
   let payload: RawDraft;
   try {
-    payload = JSON.parse(rawContent) as RawDraft;
+    // A session-drafted answer (Haiku subagent, human operator) commonly wraps its JSON in a
+    // markdown fence out of habit; OpenRouter responses already get this treatment inside
+    // extractMessageContent before reaching here. Normalizing at the validation boundary means
+    // every raw-content source — API or session — is held to one parsing rule, not one per caller.
+    payload = JSON.parse(stripMarkdownCodeFence(rawContent)) as RawDraft;
   } catch {
     return { subject, rawContent, validation: { ok: false, errors: ['response is not valid JSON'] } };
   }
