@@ -49,7 +49,22 @@ import {
 } from './lib/evidence-collectors/nrhp-nomination.ts';
 import { redactStreetAddresses } from './lib/evidence-collectors/redact-address.ts';
 import { assessText } from './lib/evidence-collectors/text-quality.ts';
-import { WIKIPEDIA_LICENCE, lookupWikipediaArticle } from './lib/evidence-collectors/wikipedia.ts';
+import {
+  WIKIPEDIA_LICENCE,
+  lookupWikipediaArticle,
+  lookupWikipediaArticleByTitle,
+} from './lib/evidence-collectors/wikipedia.ts';
+import {
+  DEFAULT_FETCH_BUDGET,
+  DEFAULT_MAX_DEPTH,
+  documentKey,
+  extractReferenceLinks,
+  planReferenceHops,
+  subjectTokens,
+  type HopSubject,
+} from './lib/evidence-collectors/reference-hops.ts';
+import { hostLineageKey, isWikipediaHost } from './lib/tier1-sources.ts';
+import { safeFetchPage } from './lib/safe-fetch.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(SCRIPT_DIR, '../../..');
@@ -101,6 +116,8 @@ type CandidateRow = {
     readonly county?: string;
     readonly state?: string;
     readonly restrictedAddress?: boolean;
+    readonly kind?: string;
+    readonly canonicalUrl?: string;
   };
 };
 
@@ -125,6 +142,13 @@ type EntityOutcome = {
   readonly displayName: string;
   readonly evidence: readonly EvidenceRow[];
   readonly notes: readonly string[];
+  /**
+   * Off-policy hosts the hop walk judged relevant but would not fetch (the Mizell pattern —
+   * reference-hops.ts). No promotion table exists yet, so these surface only in the run report
+   * for a human to review as candidate tier1-sources.ts additions; nothing here is ever stored
+   * as evidence.
+   */
+  readonly leads: readonly { readonly entityId: string; readonly url: string; readonly anchorText: string }[];
 };
 
 function sleep(ms: number): Promise<void> {
@@ -291,6 +315,218 @@ async function collectWikipedia(row: CandidateRow): Promise<EvidenceRow | null> 
 }
 
 /**
+ * DC HPO's own inventory page for the site (dcpreservation.org, tier2 by tier1-sources policy).
+ * Unlike the NRHP/Wikipedia paths there is no search step here: the row's canonicalUrl was
+ * assigned at import time straight from the DC Historic Preservation Office's own ArcGIS feature
+ * for this exact record, so the URL already IS the identity — nothing to corroborate against.
+ */
+async function collectDcHpo(row: CandidateRow): Promise<EvidenceRow | null> {
+  if (row.lane !== 'dc-sites') throw new SkipReason('not a dc-sites row');
+  const url = row.payload.canonicalUrl;
+  if (url === undefined) throw new SkipReason('dc-sites row has no canonicalUrl');
+
+  const page = await safeFetchPage(url, { allowedContentTypes: ['text/html'] });
+  if (page === undefined) throw new SkipReason('safeFetchPage rejected or could not reach canonicalUrl');
+
+  const quality = assessText(page.text);
+  return {
+    id: evidenceId(row.id, 'dc-hpo', url),
+    entityId: row.id,
+    lane: row.lane,
+    collector: 'dc-hpo',
+    sourceUrl: page.finalUrl,
+    sourceTier: 'tier2',
+    title: row.display_name,
+    contentText: page.text,
+    contentHash: hashContent(page.text),
+    charCount: page.text.length,
+    qualityScore: quality.score,
+    status: quality.usable ? 'captured' : 'quarantined',
+    provenance: {
+      publisher: 'DC Office of Planning, Historic Preservation Office',
+      licence: 'CC BY 4.0',
+      quarantineReason: quality.usable ? undefined : quality.reason,
+    },
+  };
+}
+
+/**
+ * Person-kind landscape candidates (discovered from a Wikidata QID, or from a mention gap-fill —
+ * see repo-n7p6.3 notes). When the row already carries a Wikipedia canonicalUrl its identity was
+ * anchored at discovery time by the QID binding, so this fetches that exact article by title
+ * rather than re-running `collectWikipedia`'s place-corroborated search: these rows have no
+ * city/county/state at all, which would make `articleCorroboratesPlace` reject every hit.
+ */
+async function collectPersonWikipedia(row: CandidateRow): Promise<EvidenceRow | null> {
+  if (row.payload.kind !== 'person') throw new SkipReason('not a person-kind row');
+  const canonicalUrl = row.payload.canonicalUrl;
+  if (canonicalUrl === undefined || !isWikipediaHost(canonicalUrl)) {
+    throw new SkipReason('person row has no wikipedia canonicalUrl to anchor identity');
+  }
+  const title = decodeURIComponent(new URL(canonicalUrl).pathname.replace(/^\/wiki\//u, '')).replace(
+    /_/gu,
+    ' ',
+  );
+
+  const article = await lookupWikipediaArticleByTitle(title);
+  if (article === null) throw new SkipReason(`wikipedia has no article at title "${title}"`);
+
+  const quality = assessText(article.extract);
+  return {
+    id: evidenceId(row.id, 'person-wikipedia', article.url),
+    entityId: row.id,
+    lane: row.lane,
+    collector: 'person-wikipedia',
+    sourceUrl: article.url,
+    sourceTier: 'tier2',
+    title: article.title,
+    contentText: article.extract,
+    contentHash: hashContent(article.extract),
+    charCount: article.extract.length,
+    qualityScore: quality.score,
+    status: quality.usable ? 'captured' : 'quarantined',
+    provenance: {
+      licence: WIKIPEDIA_LICENCE,
+      publisher: 'Wikipedia contributors',
+      attributionRequired: true,
+      identityAnchor: 'canonicalUrl (assigned from Wikidata QID at discovery)',
+      quarantineReason: quality.usable ? undefined : quality.reason,
+    },
+  };
+}
+
+/**
+ * repo-n7p6.17 (WS3 PATH 2) — fetching loop over the pure traversal policy in reference-hops.ts.
+ *
+ * Runs only when PATH 1 left the entity thin: a nomination form or a solid Wikipedia article is
+ * already the richest source we have, and re-walking their citations would spend the entity's
+ * hop budget for little gain. "Thin" here means no tier1 evidence, or under 4,000 combined
+ * captured characters — a threshold, not a law; the epic's PATH 2 charter is "entities still thin
+ * after PATH 1" and this is what operationalizes that.
+ *
+ * Only PATH 1 rows with a real fetched page (dc-hpo, nomination-quality Wikipedia) can seed a
+ * walk: the NRHP nomination is a PDF, not an HTML page with a reference list, so it is never a
+ * seed even though it is tier1.
+ */
+type ReferenceHopResult = {
+  readonly evidence: readonly EvidenceRow[];
+  readonly leads: readonly { readonly url: string; readonly anchorText: string }[];
+};
+
+async function collectReferenceHops(
+  row: CandidateRow,
+  path1Evidence: readonly EvidenceRow[],
+): Promise<ReferenceHopResult> {
+  const captured = path1Evidence.filter((item) => item.status === 'captured');
+  const totalChars = captured.reduce((sum, item) => sum + item.charCount, 0);
+  const alreadyRich = captured.some((item) => item.sourceTier === 'tier1') && totalChars >= 4000;
+  if (alreadyRich) {
+    throw new SkipReason('entity already has rich tier1 evidence from PATH 1');
+  }
+
+  const seeds = captured
+    .filter((item) => item.collector === 'wikipedia' || item.collector === 'person-wikipedia')
+    .map((item) => ({ url: item.sourceUrl, sourceId: item.id }));
+  if (seeds.length === 0) {
+    throw new SkipReason('no seed page with a fetchable reference list (wikipedia collectors only)');
+  }
+
+  const subject: HopSubject = {
+    displayName: row.display_name,
+    city: row.payload.city,
+    county: row.payload.county,
+    state: row.payload.state,
+  };
+  const tokens = subjectTokens(subject);
+  const visited = new Set<string>(
+    seeds.map((seed) => documentKey(seed.url)).filter((key): key is string => key !== null),
+  );
+  const capturedHosts = new Set<string>(
+    captured.flatMap((item) => {
+      const key = hostLineageKey(item.sourceUrl);
+      return key === undefined ? [] : [key];
+    }),
+  );
+
+  let remainingFetches = DEFAULT_FETCH_BUDGET;
+  let frontier = seeds;
+  const results: EvidenceRow[] = [];
+  const leads: { url: string; anchorText: string }[] = [];
+
+  for (let depth = 1; depth <= DEFAULT_MAX_DEPTH && remainingFetches > 0 && frontier.length > 0; depth++) {
+    const nextFrontier: typeof seeds = [];
+    for (const seed of frontier) {
+      if (remainingFetches <= 0) break;
+      const seedPage = await safeFetchPage(seed.url, { allowedContentTypes: ['text/html'] });
+      if (seedPage === undefined) continue;
+
+      const candidates = extractReferenceLinks(seedPage.html, seedPage.finalUrl);
+      const plan = planReferenceHops({ candidates, subject, visited, capturedHosts, remainingFetches });
+      leads.push(
+        ...plan.leads.map((candidate) => ({ url: candidate.url, anchorText: candidate.anchorText })),
+      );
+
+      for (const hop of plan.follow) {
+        if (remainingFetches <= 0) break;
+        remainingFetches -= 1;
+        const key = documentKey(hop.candidate.url);
+        if (key !== null) visited.add(key);
+
+        await sleep(FETCH_DELAY_MS);
+        const hopPage = await safeFetchPage(hop.candidate.url, { allowedContentTypes: ['text/html'] });
+        if (hopPage === undefined) continue;
+
+        const quality = assessText(hopPage.text);
+        // The relevance gate that picked this candidate is a budget filter, not an evidence
+        // gate (reference-hops.ts docs): what actually clears a fetched page for storage is the
+        // same identity discipline every other collector applies — the full page text must
+        // corroborate the subject, not just the anchor's 300-char context window.
+        const identityCorroborated = tokens.some((token) =>
+          hopPage.text.toLowerCase().includes(token),
+        );
+        const evId = evidenceId(row.id, 'reference-hop', hop.candidate.url);
+        const status: 'captured' | 'quarantined' =
+          quality.usable && identityCorroborated ? 'captured' : 'quarantined';
+        const evRow: EvidenceRow = {
+          id: evId,
+          entityId: row.id,
+          lane: row.lane,
+          collector: 'reference-hop',
+          sourceUrl: hopPage.finalUrl,
+          sourceTier: hop.tier,
+          title: hop.candidate.anchorText.length > 0 ? hop.candidate.anchorText : null,
+          contentText: hopPage.text,
+          contentHash: hashContent(hopPage.text),
+          charCount: hopPage.text.length,
+          qualityScore: quality.score,
+          status,
+          provenance: {
+            hopDepth: depth,
+            referringSourceId: seed.sourceId,
+            relevanceScore: hop.relevanceScore,
+            quarantineReason: status === 'quarantined'
+              ? (!identityCorroborated ? 'identity not corroborated by subject text' : quality.reason)
+              : undefined,
+          },
+        };
+        results.push(evRow);
+        if (status === 'captured') {
+          const lineage = hostLineageKey(hop.candidate.url);
+          if (lineage !== undefined) capturedHosts.add(lineage);
+          nextFrontier.push({ url: hopPage.finalUrl, sourceId: evId });
+        }
+      }
+    }
+    frontier = nextFrontier;
+  }
+
+  if (results.length === 0 && leads.length === 0) {
+    throw new SkipReason('no in-policy reference passed the relevance gate');
+  }
+  return { evidence: results, leads };
+}
+
+/**
  * Address-restricted properties (63 in this lane) are withheld from the NPS public dataset for
  * safety, but the nomination PDF still states the address in full. Redact before the row is
  * stored, not before it is published: evidence never captured cannot leak through a later bug
@@ -322,12 +558,14 @@ async function sweepEntity(row: CandidateRow): Promise<EntityOutcome> {
   for (const [name, collect] of [
     ['nrhp-nomination', collectNomination],
     ['wikipedia', collectWikipedia],
+    ['dc-hpo', collectDcHpo],
+    ['person-wikipedia', collectPersonWikipedia],
   ] as const) {
     try {
       const found = await collect(row);
       if (found !== null) evidence.push(applyAddressRestriction(row, found));
     } catch (error) {
-      // One collector declining or failing must not lose the other's result, and must not
+      // One collector declining or failing must not lose the others' results, and must not
       // abort the batch. Skips and errors are labelled differently so the run report separates
       // "the source has nothing" from "our code broke".
       const prefix = error instanceof SkipReason ? 'skip' : 'error';
@@ -336,7 +574,17 @@ async function sweepEntity(row: CandidateRow): Promise<EntityOutcome> {
     await sleep(FETCH_DELAY_MS);
   }
 
-  return { entityId: row.id, displayName: row.display_name, evidence, notes };
+  let leads: EntityOutcome['leads'] = [];
+  try {
+    const hops = await collectReferenceHops(row, evidence);
+    for (const item of hops.evidence) evidence.push(applyAddressRestriction(row, item));
+    leads = hops.leads.map((lead) => ({ entityId: row.id, ...lead }));
+  } catch (error) {
+    const prefix = error instanceof SkipReason ? 'skip' : 'error';
+    notes.push(`reference-hop: ${prefix} — ${(error as Error).message}`);
+  }
+
+  return { entityId: row.id, displayName: row.display_name, evidence, notes, leads };
 }
 
 async function main(): Promise<void> {
@@ -418,10 +666,12 @@ async function main(): Promise<void> {
   const withNoEvidence = outcomes.filter(
     (outcome) => outcome.evidence.filter((item) => item.status === 'captured').length === 0,
   );
+  const allLeads = outcomes.flatMap((outcome) => outcome.leads);
 
   console.log(
     `\nEntities swept: ${outcomes.length}. Evidence captured: ${captured.length}. ` +
-      `Quarantined: ${quarantined.length}. Entities with no usable evidence: ${withNoEvidence.length}.`,
+      `Quarantined: ${quarantined.length}. Entities with no usable evidence: ${withNoEvidence.length}. ` +
+      `Off-policy leads for review: ${allLeads.length}.`,
   );
   console.log(
     `Needs name adjudication: ${captured.filter((item) => item.provenance['needsNameAdjudication'] === true).length}`,
@@ -442,6 +692,9 @@ async function main(): Promise<void> {
         capturedCount: captured.length,
         quarantinedCount: quarantined.length,
         noEvidenceEntityIds: withNoEvidence.map((outcome) => outcome.entityId),
+        // Off-policy hosts the hop walk found relevant (Mizell pattern): candidates for a human
+        // to review as tier1-sources.ts additions. Never fetched, never evidence.
+        leads: allLeads,
         outcomes: outcomes.map((outcome) => ({
           ...outcome,
           // Keep the report readable; full text lives in the DB after an --apply run.

@@ -109,6 +109,34 @@ export function articleCorroboratesPlace(
 }
 
 /**
+ * Fetch a specific article by exact title, no search and no place corroboration. For rows whose
+ * identity is already anchored elsewhere — a person-kind landscape candidate discovered FROM a
+ * Wikidata QID, whose canonicalUrl already points at the matching enwiki article — re-deriving
+ * identity via place-text search would be redundant at best and would wrongly reject persons
+ * with no city/county/state in payload at all (`articleCorroboratesPlace` requires at least one).
+ * Returns null only when the title does not resolve to any article.
+ */
+export async function lookupWikipediaArticleByTitle(
+  title: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<WikipediaArticle | null> {
+  const extractRaw = await apiGet(
+    { action: 'query', prop: 'extracts', explaintext: '1', exsectionformat: 'plain', titles: title },
+    fetchImpl,
+  );
+  const found = readExtract(extractRaw);
+  if (found === null) return null;
+  return {
+    title: found.title,
+    // pageid isn't in this response shape (no pageids requested); callers that need it should
+    // use lookupWikipediaArticle instead. 0 marks "not fetched" rather than a real page id.
+    pageId: 0,
+    extract: found.extract,
+    url: `https://en.wikipedia.org/wiki/${encodeURIComponent(found.title.replace(/ /gu, '_'))}`,
+  };
+}
+
+/**
  * Find and fetch the best-matching article, or null when nothing corroborates. Checks the top
  * few hits rather than only the first: for NRHP names the exact property often ranks below a
  * more famous namesake, and the place check is what tells them apart.
