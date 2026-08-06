@@ -255,6 +255,7 @@ async function main(): Promise<void> {
 
   console.log(`Provider: ${provider.id} (${PROVIDER_NAME})`);
   console.log(`Subjects with evidence: ${subjects.length}`);
+  console.log(`Calling model at concurrency ${Math.min(CONCURRENCY, subjects.length)}...\n`);
 
   type Result = {
     readonly subject: (typeof subjects)[number];
@@ -262,6 +263,8 @@ async function main(): Promise<void> {
     readonly completion: RoutedCompletion;
   };
 
+  let completedCount = 0;
+  const startedAt = Date.now();
   const results = await mapPool(subjects, CONCURRENCY, async (subject): Promise<Result> => {
     const request = buildEnrichmentRequest(subject, ALLOWED_TOPIC_IDS, model);
     const completion = await routed.complete(request);
@@ -282,6 +285,16 @@ async function main(): Promise<void> {
         status: attempt.validation.ok ? 'valid' : 'invalid',
       });
     }
+    completedCount += 1;
+    const elapsedS = ((Date.now() - startedAt) / 1000).toFixed(1);
+    const verdict = attempt.validation.ok ? 'accepted' : 'quarantined';
+    const detail = attempt.validation.ok
+      ? `$${completion.costUsdEstimate.toFixed(5)}`
+      : attempt.validation.errors[0]?.slice(0, 80);
+    console.log(
+      `[${completedCount}/${subjects.length}] (${elapsedS}s) ${subject.entityId} ` +
+        `(${subject.displayName}) — ${verdict} — ${detail}`,
+    );
     return { subject, attempt, completion };
   });
 
