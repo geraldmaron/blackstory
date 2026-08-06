@@ -19,6 +19,29 @@
  * degrades to "ugly but not raw-leak" instead of failing the backfill outright.
  */
 
+/**
+ * The two fixed sentences `backfill-nrhp-black-heritage-summaries.ts` appends to every summary it
+ * generates. They live here, not in that script, because two call sites now need them: the
+ * generator that writes them, and the publish depth gate in `lib/incremental-publish.ts` that
+ * recognizes them as a template fingerprint. A row whose summary carries one of these was
+ * assembled from registry index fields alone — no source was ever fetched for it — so the gate
+ * treats the match as proof of a template, not as prose. Changing the wording in one place only
+ * would silently reopen the hole, which is the whole reason they are shared constants.
+ */
+export const NRHP_SUMMARY_TRAILER =
+  ` The National Park Service's National Register program recognizes it as a documented site of ` +
+  `African American historical importance.`;
+
+export const NRHP_SUMMARY_FILLER =
+  ` It is one of thousands of properties nationwide the National Register has formally recognized ` +
+  `for preserving African American history and heritage.`;
+
+/** Every known generated-summary fingerprint, in the form the depth gate substring-matches. */
+export const LANE_TEMPLATE_SIGNATURES: readonly string[] = [
+  NRHP_SUMMARY_TRAILER.trim(),
+  NRHP_SUMMARY_FILLER.trim(),
+];
+
 /** Raw NPS area-of-significance code (already trimmed, upper-cased) -> lowercase human phrase
  *  for mid-sentence use ("for its significance in X, Y, and Z"). `null` drops the code entirely
  *  — either too NPS-internal to read as a public "significance" (e.g. a negatively-defined

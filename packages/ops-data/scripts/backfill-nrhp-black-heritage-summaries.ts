@@ -30,7 +30,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
-import { formatNrhpListedDate, humanizeAreas } from './lib/nrhp-area-labels.ts';
+import {
+  NRHP_SUMMARY_FILLER,
+  NRHP_SUMMARY_TRAILER,
+  formatNrhpListedDate,
+  humanizeAreas,
+} from './lib/nrhp-area-labels.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(SCRIPT_DIR, '../../..');
@@ -67,12 +72,9 @@ const CATEGORY_LABELS: Record<string, string> = {
  *  lib/nrhp-area-labels.ts (shared with lib/incremental-publish.ts's claim/notabilityBasis text). */
 export const formatListedDate = formatNrhpListedDate;
 
-const TRAILER =
-  ` The National Park Service's National Register program recognizes it as a documented site of ` +
-  `African American historical importance.`;
-const FILLER =
-  ` It is one of thousands of properties nationwide the National Register has formally recognized ` +
-  `for preserving African American history and heritage.`;
+// Shared with the publish depth gate — see lib/nrhp-area-labels.ts for why they live there.
+const TRAILER = NRHP_SUMMARY_TRAILER;
+const FILLER = NRHP_SUMMARY_FILLER;
 
 function coreSentence(displayName: string, payload: Row['payload'], areas: string): string {
   const categoryLabel =

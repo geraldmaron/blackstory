@@ -53,3 +53,18 @@ export const RECORD_GAP_COPY: Readonly<Record<RecordGapKind, RecordGapCopy>> = {
       'The documented claims and connections below still carry the record.',
   },
 };
+
+/**
+ * Record-level state, not a section gap: the record was published from a registry listing and
+ * has not been through an evidence sweep yet. Distinct from RECORD_GAP_COPY because it describes
+ * how the whole record was built rather than which section is empty — a reader needs to be able
+ * to tell "this is all the recorded history" apart from "we have not done the research yet",
+ * and silence reads as the former.
+ */
+export const THIN_RECORD_COPY: RecordGapCopy = {
+  title: 'Registry listing',
+  body:
+    'This record comes from a registry listing and has not been through a full source sweep ' +
+    'yet, so what you see here is the listing itself rather than a researched history. ' +
+    'This reflects the current state of research, not an absence of history.',
+};

@@ -115,6 +115,34 @@ function notabilityBasisFor(entity: PublicEntityView): readonly NotabilityBasisR
   }));
 }
 
+/**
+ * Normalizes prose for the summary-echo comparison below: case, surrounding and internal
+ * whitespace, and a single trailing period are all display noise, not content differences.
+ */
+function normalizeForEcho(text: string): string {
+  return text.trim().replace(/\s+/gu, ' ').replace(/\.$/u, '').toLowerCase();
+}
+
+/**
+ * Drops claims whose object is the summary restated. Lanes that publish a `documented_site`
+ * claim built from the row's own summary (see `buildReleaseSourceFromLandscape`) make the page
+ * print the same paragraph twice: once as the lede, once under "What the sources say". The
+ * claim carries no information the reader has not already had, so it is not shown.
+ *
+ * Suppression is display-only and scoped to the claims section (and the matching research-gap
+ * disclosure, so the two never contradict each other). The rail's source list and the record's
+ * evidence grade still read the full claim set — the citation behind that summary is real and
+ * stays visible as a source.
+ */
+export function withoutSummaryEchoClaims(
+  claims: readonly PublicClaimView[],
+  summary: string,
+): readonly PublicClaimView[] {
+  const normalizedSummary = normalizeForEcho(summary);
+  if (normalizedSummary.length === 0) return claims;
+  return claims.filter((claim) => normalizeForEcho(claim.object) !== normalizedSummary);
+}
+
 /** Maps seed `PublicClaimView` rows into `EvidenceClaimInput` (citation field rename + dispute).  */
 export function toEvidenceClaimInputs(
   claims: readonly PublicClaimView[],

@@ -30,3 +30,15 @@ export function isSparseRecord(entity: PublicEntityView): boolean {
     entity.timeline.length === 0
   );
 }
+
+/**
+ * True when the record's own coverage assessment says it has not been researched beyond its
+ * source listing. `minimal` is written by the publish path for rows built from registry index
+ * fields alone; the page owes the reader that fact outright, because a short record with no
+ * caveat reads as "this is the whole of the recorded history" when it actually means "the
+ * research has not happened yet". Derived from the published field, never inferred from how
+ * empty the page looks.
+ */
+export function isThinRecord(entity: PublicEntityView): boolean {
+  return entity.researchCoverage === 'minimal';
+}

@@ -16,7 +16,11 @@ import {
 } from '@repo/domain';
 import { computeClaimConfidence } from '../lib/confidence.ts';
 import { lintPublishStatus, type PublishStatusLintReport } from './publish-status-linter.ts';
-import { buildNrhpListingFactObject, buildNrhpSignificanceObject } from './nrhp-area-labels.ts';
+import {
+  LANE_TEMPLATE_SIGNATURES,
+  buildNrhpListingFactObject,
+  buildNrhpSignificanceObject,
+} from './nrhp-area-labels.ts';
 
 export const INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR = 0.75;
 
@@ -45,6 +49,7 @@ export type PublishGateSkipReason =
   | 'name_overlap'
   | 'missing_canonical_url'
   | 'summary_too_short'
+  | 'template_only'
   | 'build_failed'
   | 'confidence_below_floor';
 
@@ -413,11 +418,18 @@ export function buildReleaseSourceFromLandscape(
           },
         ];
 
+  // Enrichment writes its long-form prose back onto the landscape row; without this passthrough
+  // the builder would rebuild the entity from index fields alone and silently drop it, so a
+  // researched record would republish as thin as it started.
+  const enrichedContext =
+    typeof row.payload.historicalContext === 'string' ? row.payload.historicalContext.trim() : '';
+
   return {
     id: row.id,
     kind: row.kind,
     displayName,
     summary,
+    ...(enrichedContext.length > 0 ? { historicalContext: enrichedContext } : {}),
     ...(livingStatus !== undefined ? { livingStatus } : {}),
     jurisdictionLabel: jurisdictionFromProvenance(provenance),
     locationPrecision,
@@ -426,6 +438,92 @@ export function buildReleaseSourceFromLandscape(
     lng: row.lng,
     claims,
     mentionedEntityIds: [],
+  };
+}
+
+/**
+ * Compares citation URLs at document granularity, not host. An NRHP row's nomination form — the
+ * richest evidence the lane has, and the whole point of the sweep — lives on the same host as the
+ * registry index entry it was found through. Comparing hosts would reject exactly the records
+ * that had the most research done on them.
+ */
+function documentKey(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    const path = parsed.pathname.replace(/\/$/u, '');
+    return `${parsed.hostname.replace(/^www\./iu, '').toLowerCase()}${path}${parsed.search}`;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeProse(text: string): string {
+  return text.trim().replace(/\s+/gu, ' ').replace(/\.$/u, '').toLowerCase();
+}
+
+export type DepthAssessment =
+  | { readonly deep: true }
+  | { readonly deep: false; readonly detail: string };
+
+/**
+ * Rejects rows that carry nothing a reader could not get from the registry index entry itself.
+ *
+ * The lane importers publish prose generated from index fields — category, city, state, area of
+ * significance, listed date — and the only bar in front of them was "summary is non-empty", which
+ * a template satisfies by construction. That is how 2,578 records reached the public release
+ * asserting a history nobody had researched, three of them saying the same sentence in the
+ * summary, the sole claim, and the notability note.
+ *
+ * A row clears this gate by carrying evidence, in one of two forms:
+ *   - `historicalContext`, which only the enrichment harness writes, and only from swept sources;
+ *   - a claim citing a document other than the row's own registry index entry — a nomination
+ *     form, a newspaper page, an archive record — whether or not it shares that entry's host.
+ *
+ * A lane-constant corroborating URL (the DC program's catalog page, identical on every row in the
+ * lane) deliberately does NOT count. It already lifts the confidence score, and treating it as
+ * per-entity evidence here would let an entire lane through on one shared link.
+ *
+ * Rejected rows are not discarded — they stay in the research lane, where the enrichment sweep
+ * picks them up, and the record surfaces its honest registry-listing state instead of publishing
+ * as though the work were done.
+ */
+export function assessLandscapeDepth(
+  entry: ReleaseSourceEntity,
+  row: LandscapePublishRow,
+): DepthAssessment {
+  const context = entry.historicalContext?.trim() ?? '';
+  if (context.length > 0) return { deep: true };
+
+  const registryDocument = documentKey(row.canonical_url);
+  const claims = entry.claims ?? [];
+  const hasIndependentSource = claims.some((claim) => {
+    const key = documentKey(claim.citationHref);
+    return key !== null && key !== registryDocument;
+  });
+  if (hasIndependentSource) return { deep: true };
+
+  const summary = entry.summary;
+  const signature = LANE_TEMPLATE_SIGNATURES.find((phrase) => summary.includes(phrase));
+  if (signature !== undefined) {
+    return {
+      deep: false,
+      detail: `summary carries a generated-template signature ("${signature.slice(0, 48)}…")`,
+    };
+  }
+
+  const normalizedSummary = normalizeProse(summary);
+  const echoed = claims.filter((claim) => normalizeProse(claim.object) === normalizedSummary);
+  if (echoed.length === claims.length && claims.length > 0) {
+    return {
+      deep: false,
+      detail: 'every claim restates the summary verbatim — no fact beyond the registry listing',
+    };
+  }
+
+  return {
+    deep: false,
+    detail: `no evidence beyond the registry index row (${registryDocument ?? 'unknown source'})`,
   };
 }
 
@@ -505,6 +603,11 @@ export function gateLandscapePublishCandidate(input: {
       reason: 'summary_too_short',
       detail: `summary length ${entry.summary.length} outside projection schema bounds 120..400`,
     };
+  }
+
+  const depth = assessLandscapeDepth(entry, row);
+  if (!depth.deep) {
+    return { eligible: false, reason: 'template_only', detail: depth.detail };
   }
 
   const payloadConfidence = readPayloadConfidence(row.payload);

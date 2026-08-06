@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { getPublicEntity } from '../../../data/public-seed';
-import { deriveHistoricalFraming, isSparseRecord } from './entity-view-model';
+import { deriveHistoricalFraming, isSparseRecord, isThinRecord } from './entity-view-model';
 
 function requireEntity(id: string) {
   const entity = getPublicEntity(id);
@@ -35,6 +35,18 @@ test('a place-like kind with status=historic frames as historical', () => {
 test('a place-like kind with no status field at all frames as historical (never present_day by default)', () => {
   const { status: _status, ...withoutStatus } = requireEntity('ent_15th_st_church_001');
   assert.equal(deriveHistoricalFraming(withoutStatus), 'historical');
+});
+
+test('isThinRecord reads the published coverage field, not how empty the page looks', () => {
+  const base = requireEntity('ent_15th_st_church_001');
+  assert.equal(isThinRecord({ ...base, researchCoverage: 'minimal' }), true);
+  assert.equal(isThinRecord({ ...base, researchCoverage: 'partial' }), false);
+  assert.equal(isThinRecord({ ...base, researchCoverage: 'substantial' }), false);
+  assert.equal(
+    isThinRecord({ ...base, researchCoverage: 'partial', claims: [], related: [], timeline: [] }),
+    false,
+    'an empty page is not a registry listing unless the record says its coverage is minimal',
+  );
 });
 
 test('isSparseRecord is true only when claims, related, and timeline are all empty', () => {
