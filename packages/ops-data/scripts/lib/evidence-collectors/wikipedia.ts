@@ -91,6 +91,21 @@ function readExtract(raw: unknown): { readonly extract: string; readonly title: 
 }
 
 /**
+ * True for a MediaWiki disambiguation page ("Maplewood may refer to: ..."). These pass
+ * `articleCorroboratesPlace` for free: a disambiguation page enumerating many same-named places
+ * will very often happen to mention the target city/county/state somewhere in its list, which is
+ * exactly the false-positive that check exists to prevent for a real article about the wrong
+ * subject — it just wasn't built to notice the subject here is "no single place" at all. Found
+ * live (repo-n7p6.22, 2026-08-06): 'Maplewood' NRHP row corroborated against a disambiguation
+ * page listing multiple "Maplewood, County, State" entries. Disambiguation pages open with this
+ * phrase as their first sentence by MediaWiki convention, so a prefix check is reliable without
+ * an extra API call.
+ */
+export function isDisambiguationExtract(extract: string): boolean {
+  return /^\s*\S[^.]{0,80}\bmay refer to\b/iu.test(extract);
+}
+
+/**
  * Does this article actually corroborate the registry row's place? Same discipline as the
  * nomination identity gate: a fluent article about the wrong subject is the failure mode that
  * costs us most, so place has to agree before the text is allowed to become evidence.
@@ -99,6 +114,7 @@ export function articleCorroboratesPlace(
   extract: string,
   input: Pick<WikipediaLookupInput, 'city' | 'county' | 'state'>,
 ): boolean {
+  if (isDisambiguationExtract(extract)) return false;
   const haystack = extract.toLowerCase();
   const candidates = [input.city, input.county, input.state]
     .map((value) => value?.trim().toLowerCase())
@@ -126,6 +142,10 @@ export async function lookupWikipediaArticleByTitle(
   );
   const found = readExtract(extractRaw);
   if (found === null) return null;
+  // No place-corroboration loop to fall through to here (unlike lookupWikipediaArticle) — this
+  // is a direct title fetch, so a disambiguation page must be rejected outright rather than
+  // silently accepted as identity-anchored content.
+  if (isDisambiguationExtract(found.extract)) return null;
   return {
     title: found.title,
     // pageid isn't in this response shape (no pageids requested); callers that need it should

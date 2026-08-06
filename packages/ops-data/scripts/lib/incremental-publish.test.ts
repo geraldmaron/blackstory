@@ -307,6 +307,35 @@ test('buildReleaseSourceFromLandscape carries enrichment historicalContext onto 
   assert.match(entry!.historicalContext ?? '', /Consolidated Parent Group/u);
 });
 
+test('buildReleaseSourceFromLandscape carries enrichment topicIds/eraBuckets/keywords onto the entry', () => {
+  // Same passthrough gap as historicalContext, for the rest of the WS4 (repo-n7p6.4) harness's
+  // output — never wired in before because nothing wrote these fields onto a landscape row.
+  const entry = buildReleaseSourceFromLandscape(
+    enrichedRow({
+      payload: {
+        historicalContext: 'x',
+        topicIds: ['school-desegregation', 'civil-rights'],
+        eraBuckets: ['1950s'],
+        keywords: ['Gardner Bishop', 'Bolling v. Sharpe'],
+      },
+    }),
+  );
+  assert.ok(entry);
+  assert.deepEqual(entry!.topicIds, ['school-desegregation', 'civil-rights']);
+  assert.deepEqual(entry!.eraBuckets, ['1950s']);
+  assert.deepEqual(entry!.keywords, ['Gardner Bishop', 'Bolling v. Sharpe']);
+});
+
+test('buildReleaseSourceFromLandscape ignores non-string entries and a missing field', () => {
+  const entry = buildReleaseSourceFromLandscape(
+    enrichedRow({ payload: { historicalContext: 'x', topicIds: ['music', 42, null] } }),
+  );
+  assert.ok(entry);
+  assert.deepEqual(entry!.topicIds, ['music']);
+  assert.deepEqual(entry!.eraBuckets, undefined);
+  assert.deepEqual(entry!.keywords, undefined);
+});
+
 test('assessLandscapeDepth does not count a lane-constant corroborating URL as a second source', () => {
   // The DC catalog URL is identical on every row in the lane; counting it would pass the whole
   // lane on one shared link. Only the row's own claim citations are evidence here.

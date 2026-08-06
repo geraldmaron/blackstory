@@ -159,6 +159,11 @@ function asRecord(value: unknown): Readonly<Record<string, unknown>> {
   return {};
 }
 
+function asStringArray(value: unknown): readonly string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === 'string');
+}
+
 function parseStatusHistory(raw: unknown): readonly StatusHistoryEntry<EntityStatusValue>[] {
   if (!Array.isArray(raw)) return [];
   const parsed: StatusHistoryEntry<EntityStatusValue>[] = [];
@@ -423,6 +428,14 @@ export function buildReleaseSourceFromLandscape(
   // researched record would republish as thin as it started.
   const enrichedContext =
     typeof row.payload.historicalContext === 'string' ? row.payload.historicalContext.trim() : '';
+  // Same passthrough for the rest of the enrichment harness's (repo-n7p6.4) output — these were
+  // never wired in before because nothing wrote them onto a landscape row until WS4 existed.
+  // Validated (isValidTopicId / decade-label format) by the harness before it ever reaches here;
+  // buildReleaseEntityArtifacts re-validates topicIds against TOPIC_REGISTRY regardless, so an
+  // unresolvable id fails the build rather than publishing silently.
+  const enrichedTopicIds = asStringArray(row.payload.topicIds);
+  const enrichedEraBuckets = asStringArray(row.payload.eraBuckets);
+  const enrichedKeywords = asStringArray(row.payload.keywords);
 
   return {
     id: row.id,
@@ -430,6 +443,9 @@ export function buildReleaseSourceFromLandscape(
     displayName,
     summary,
     ...(enrichedContext.length > 0 ? { historicalContext: enrichedContext } : {}),
+    ...(enrichedTopicIds.length > 0 ? { topicIds: enrichedTopicIds } : {}),
+    ...(enrichedEraBuckets.length > 0 ? { eraBuckets: enrichedEraBuckets } : {}),
+    ...(enrichedKeywords.length > 0 ? { keywords: enrichedKeywords } : {}),
     ...(livingStatus !== undefined ? { livingStatus } : {}),
     jurisdictionLabel: jurisdictionFromProvenance(provenance),
     locationPrecision,
