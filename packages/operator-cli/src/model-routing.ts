@@ -43,6 +43,7 @@ export type ResearchLane =
   | 'research-intake'
   | 'discovery-run'
   | 'editorial-enrichment'
+  | 'entity-depth-enrichment'
   | 'story-craft'
   | 'theme-study'
   | 'case-drafting';
@@ -86,6 +87,15 @@ export const LANE_ROUTING_POLICY: Readonly<Record<ResearchLane, LaneRoutingPolic
         'confidence score or a disagreement between two free-roster passes escalates the same ' +
         'item to paid-research rather than accepting a shaky free verdict.',
       escalateBelowConfidence: 0.6,
+    },
+    'entity-depth-enrichment': {
+      lane: 'entity-depth-enrichment',
+      tier: 'free-batch',
+      rationale:
+        'repo-n7p6.4 (WS4): drafting short cited prose from evidence already captured by WS3 is ' +
+        'bounded extraction, not open-ended judgment — free/cheap roster, same tier as editorial ' +
+        'enrichment. Escalation is per-item on quarantine (deterministic validator rejection), not ' +
+        'confidence-scored, so it is handled by the harness rather than escalateBelowConfidence.',
     },
     'story-craft': {
       lane: 'story-craft',
