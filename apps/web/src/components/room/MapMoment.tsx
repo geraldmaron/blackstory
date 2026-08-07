@@ -281,10 +281,30 @@ export type MapMomentProps = {
   readonly plain?: boolean;
   /** Where "Open this view on the Atlas" goes. Omit to render no control. */
   readonly atlasHref?: string;
+  /**
+   * What the slot says while it is not holding the plate.
+   *
+   * The default suits a moment in a scrolling chapter, where the plate genuinely does arrive on
+   * scroll. It is wrong in the two places where the plate is never coming: a record sheet floating
+   * over the live Atlas (`framedClaimAllowed` refuses the claim there, deliberately) and any slot
+   * on a Utility surface. Those callers pass their own line rather than telling the reader to
+   * scroll for something that will not happen.
+   *
+   * Not a second component and not a variant flag: it is one string with a default, so the markup,
+   * the arbitration and the degrade stay in one place.
+   */
+  readonly idle?: string;
   readonly className?: string;
 };
 
-export function MapMoment({ camera, note, plain = false, atlasHref, className }: MapMomentProps) {
+export function MapMoment({
+  camera,
+  note,
+  plain = false,
+  atlasHref,
+  idle,
+  className,
+}: MapMomentProps) {
   const stage = useContext(MapMomentStageContext);
   const slotRef = useRef<HTMLDivElement>(null);
   const reactId = useId();
@@ -314,7 +334,7 @@ export function MapMoment({ camera, note, plain = false, atlasHref, className }:
         <div className="ds-mapmoment__idle">
           <span>
             {plateAvailable
-              ? 'Scroll to bring the map here'
+              ? (idle ?? 'Scroll to bring the map here')
               : 'The map is unavailable. The caption below carries the point.'}
           </span>
         </div>

@@ -1077,7 +1077,11 @@ a.ds-room-chip {
 
 .ds-mapmoment__plate {
   position: relative;
-  aspect-ratio: 16 / 9;
+  /* 16:9 is the reading-column moment. A room whose slot sits somewhere narrower — the record
+     page's 15rem rail is the case that forced this — sets the token on its own container rather
+     than restating `.ds-mapmoment__plate`, which the ratchet below forbids on purpose. The room
+     picks the proportion; the kit still owns the block. */
+  aspect-ratio: var(--ds-mapmoment-aspect, 16 / 9);
   overflow: hidden;
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);

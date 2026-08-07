@@ -92,20 +92,19 @@
   overflow-wrap: anywhere;
 }
 
-/* The map is square-ish in a 15rem rail rather than the wide strip it was in the column. */
-.ds-record-rail-block .ds-entity-location-map,
-.ds-record-rail-block .ds-cinematic-map {
-  aspect-ratio: 4 / 3;
-  width: 100%;
-  border-radius: var(--ds-radius-md);
-  overflow: hidden;
+/* The map is square-ish in a 15rem rail rather than the wide strip it was in the column.
+   SP-08 retired `.ds-entity-location-map` and `.ds-cinematic-map` with the second MapLibre
+   instance they styled, so the place block is now the room kit's map moment. The proportion is
+   set through the kit's token rather than by restating its slot selector here: the room decides
+   how tall its own rail is, and the kit keeps sole ownership of the block. */
+.ds-record-rail-block {
+  --ds-mapmoment-aspect: 4 / 3;
 }
 
 /* Below the rail breakpoint the rail stacks under the column, where a 4:3 map is too tall. */
 @media (max-width: 67.9375rem) {
-  .ds-record-rail-block .ds-entity-location-map,
-  .ds-record-rail-block .ds-cinematic-map {
-    aspect-ratio: 16 / 9;
+  .ds-record-rail-block {
+    --ds-mapmoment-aspect: 16 / 9;
   }
 
   .ds-record-rail-block__actions > * {

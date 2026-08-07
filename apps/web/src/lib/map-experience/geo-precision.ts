@@ -41,6 +41,24 @@ export function geoPrecisionTierForPublicPrecision(publicPrecision: string): Geo
 }
 
 /**
+ * Camera zoom matched to a record's public precision.
+ *
+ * Moved here from `entity-location-map-style.ts` when SP-08 retired the second MapLibre instance
+ * that module existed to style. It belongs with the rest of the precision vocabulary rather than
+ * with any one map's paint: it is the same "never draw a point sharper than its source" rule the
+ * radius resolver enforces, expressed as a camera rather than a circle. A county-precision record
+ * that flew to z13 would show a street corner the archive never claimed.
+ */
+export function zoomForLocationPrecision(
+  precision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution',
+): number {
+  if (precision === 'county') return 8;
+  if (precision === 'city') return 10;
+  if (precision === 'neighborhood') return 12;
+  return 13;
+}
+
+/**
  * District of Columbia has no separate city/locality boundary layer in this repo's reference data
  * (`@repo/domain`'s `US_STATES` bbox IS the city extent for D.C. it is a consolidated
  * city-state, the one case where "state bbox" and "locality bbox" are the same real boundary).
