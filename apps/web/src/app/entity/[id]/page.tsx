@@ -34,7 +34,11 @@ import {
   TrustBlock,
   type RoomSource,
 } from '../../../components/room';
-import { RECORD_GAP_COPY, type RecordGapKind } from '../../../components/entity/copy';
+import {
+  RECORD_GAP_COPY,
+  THIN_RECORD_COPY,
+  type RecordGapKind,
+} from '../../../components/entity/copy';
 import { humanizeToken } from '../../../components/entity/format';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
 import { buildExternalMapsSearchUrl } from '../../../lib/geography/external-maps-url';
@@ -51,9 +55,9 @@ import { resolveEntityCrossReferences } from '../../../lib/theme-impact/source';
 import { resolveCitesEdgeIndex } from '../../../lib/articles/source';
 import { chaptersCiting } from '../../../lib/release/build-cites-edge';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
-import { toEvidenceClaimInputs } from './adapters';
+import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './adapters';
 import { buildEntityAnatomyInputs } from './entity-anatomy-facts';
-import { deriveHistoricalFraming } from './entity-view-model';
+import { deriveHistoricalFraming, isThinRecord } from './entity-view-model';
 import { EntityRoomSections } from './EntityRoomSections';
 import { EntitySessionNavClient } from './entity-session-nav-client';
 import '../../record-page.css';
@@ -157,11 +161,18 @@ function toRoomSources(claims: PublicEntityView['claims']): readonly RoomSource[
   return [...seen.values()];
 }
 
-/** The gaps disclosed once, in the rail, in the approved vocabulary. */
-function resolveRecordGaps(entity: PublicEntityView): readonly RecordGapKind[] {
+/**
+ * The gaps disclosed once, in the rail, in the approved vocabulary. Takes the claims the page
+ * actually renders, not the raw set: a record whose only claim was suppressed as a summary echo
+ * has nothing under "What the sources say", and the disclosure has to agree with the page.
+ */
+function resolveRecordGaps(
+  entity: PublicEntityView,
+  displayClaims: readonly PublicEntityView['claims'][number][],
+): readonly RecordGapKind[] {
   const gaps: RecordGapKind[] = [];
   if (entity.historicalContext.trim().length === 0) gaps.push('context');
-  if (entity.claims.length === 0) gaps.push('claims');
+  if (displayClaims.length === 0) gaps.push('claims');
   if (entity.timeline.length === 0) gaps.push('timeline');
   if ((entity.relatedNeighbors?.length ?? 0) === 0) gaps.push('related');
   return gaps;
@@ -189,7 +200,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
     ? entity.jurisdictionLabel.trim()
     : undefined;
   const mapTone = mapToneFromTopics(entity.topicIds ?? entity.topicTags);
-  const evidenceClaims = toEvidenceClaimInputs(entity.claims);
+  const displayClaims = withoutSummaryEchoClaims(entity.claims, entity.summary);
+  const evidenceClaims = toEvidenceClaimInputs(displayClaims);
   const geoAnchor = entity.geoAnchor ?? geoAnchorFor(entity.id);
   const mapsHref = buildExternalMapsSearchUrl({
     ...(geoAnchor ? { lat: geoAnchor.lat, lng: geoAnchor.lng } : {}),
@@ -218,7 +230,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const sources = toRoomSources(entity.claims);
   // Rubric sentences, whole. They used to be truncated into chips next to the title.
   const inclusionBasis = entity.notabilityLabels ?? [];
-  const gaps = resolveRecordGaps(entity);
+  const gaps = resolveRecordGaps(entity, [...displayClaims]);
+  const thinRecord = isThinRecord(entity);
 
   const rail = (
     <>
@@ -353,6 +366,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
             { label: 'Updated', value: formatRecordDate(entity.revision.recordUpdatedAt) },
           ]}
         />
+        {thinRecord ? <Note kind="REGISTRY LISTING">{THIN_RECORD_COPY.body}</Note> : null}
         {gaps.length > 0 ? (
           <Note kind="STILL RESEARCHING">
             {gaps.map((gap) => RECORD_GAP_COPY[gap].title).join('. ')}. These are gaps in the

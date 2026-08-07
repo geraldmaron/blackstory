@@ -4,6 +4,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  assessLandscapeDepth,
   buildReleaseSourceFromLandscape,
   buildArtifactsForEntry,
   canonicalUpsertParamsFromLandscape,
@@ -38,6 +39,22 @@ const baseRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublish
   name_overlap: false,
   ...overrides,
 });
+
+/**
+ * The same DC row after an evidence sweep has written its history back onto the landscape row.
+ * Tests that only need a publishable entry use this, not `baseRow()` — the bare inventory row is
+ * held back by the depth gate by design.
+ */
+const enrichedRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublishRow =>
+  baseRow({
+    payload: {
+      historicalContext:
+        'Gardner Bishop, a barber with no formal legal training, organized the Consolidated ' +
+        'Parent Group out of this shop and drove the school-desegregation suit that became ' +
+        'Bolling v. Sharpe, decided the same day as Brown.',
+    },
+    ...overrides,
+  });
 
 test('jurisdictionFromProvenance maps DC to full label', () => {
   assert.equal(
@@ -174,26 +191,158 @@ test('buildReleaseSourceFromLandscape keeps the single-claim shape for non-NRHP 
   assert.equal(entry?.claims?.[0]?.object, entry?.summary);
 });
 
-test('gateLandscapePublishCandidate accepts tier-1 DC site stub', () => {
+/**
+ * A DC site stub built purely from the inventory row: its one claim is the summary restated, and
+ * its only citation is the inventory page itself. This shape used to publish — it is the shape
+ * that put template-only records in front of readers — and the depth gate now holds it back.
+ */
+test('gateLandscapePublishCandidate holds back a row whose only claim restates its summary', () => {
   const result = gateLandscapePublishCandidate({
     row: baseRow(),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
   });
-  assert.equal(result.eligible, true);
-  if (result.eligible) {
-    assert.ok(result.confidence >= 0.75);
-    const build = buildReleaseEntityArtifacts(result.entry, {
-      releaseId: 'rel_seed_001',
-      generatedAt: '2026-07-22T00:00:00.000Z',
-    });
-    assert.equal(build.ok, true);
-    if (build.ok) {
-      const row = toReleaseEntityRow(build.projection);
-      assert.equal(row.entity_id, 'dc-black-history-sites-b10');
-      assert.equal(row.release_id, 'rel_seed_001');
-    }
+  assert.equal(result.eligible, false);
+  if (!result.eligible) {
+    assert.equal(result.reason, 'template_only');
+    assert.match(result.detail, /restates the summary/u);
   }
+});
+
+test('gateLandscapePublishCandidate holds back a generated NRHP template summary', () => {
+  const result = gateLandscapePublishCandidate({
+    row: nrhpRow(),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) {
+    assert.equal(result.reason, 'template_only');
+    assert.match(result.detail, /generated-template signature/u);
+  }
+});
+
+/**
+ * The enriched counterpart: same lane, same registry row, but a sweep has written historical
+ * context from fetched sources. That is what the gate is for — it separates researched records
+ * from generated ones, not one lane from another.
+ */
+test('gateLandscapePublishCandidate publishes a row once enrichment has written context', () => {
+  const enriched = baseRow({
+    payload: { historicalContext: 'x' },
+  });
+  const entry = buildReleaseSourceFromLandscape(enriched);
+  assert.ok(entry);
+  const withContext = {
+    ...entry!,
+    historicalContext:
+      'Gardner Bishop, a barber with no formal legal training, organized the Consolidated ' +
+      'Parent Group out of this shop and drove the school-desegregation suit that became Bolling ' +
+      'v. Sharpe, decided the same day as Brown.',
+  };
+  assert.equal(assessLandscapeDepth(withContext, enriched).deep, true);
+
+  const build = buildReleaseEntityArtifacts(withContext, {
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(build.ok, true);
+  if (build.ok) {
+    const row = toReleaseEntityRow(build.projection);
+    assert.equal(row.entity_id, 'dc-black-history-sites-b10');
+    assert.equal(row.release_id, 'rel_seed_001');
+  }
+});
+
+test('assessLandscapeDepth accepts a claim cited to a host other than the registry itself', () => {
+  const row = baseRow();
+  const entry = buildReleaseSourceFromLandscape(row);
+  assert.ok(entry);
+  const withSecondSource = {
+    ...entry!,
+    claims: [
+      ...(entry!.claims ?? []),
+      {
+        predicate: 'documented_in',
+        object: 'a 1953 Washington Post account of the Consolidated Parent Group',
+        confidenceLevel: 'high' as const,
+        citationSource: 'chroniclingamerica.loc.gov',
+        citationHref: 'https://chroniclingamerica.loc.gov/lccn/sn83045433/1953-06-09/ed-1/seq-1/',
+        citationLabel: 'Chronicling America',
+      },
+    ],
+  };
+  assert.equal(assessLandscapeDepth(withSecondSource, row).deep, true);
+});
+
+test('assessLandscapeDepth counts a nomination form on the registry own host as real evidence', () => {
+  // The NRHP nomination form is the richest source the lane has and it is served by the same
+  // host as the index entry. A host-level comparison would reject the best-researched records
+  // in the corpus; the comparison is per-document for exactly this case.
+  const row = nrhpRow();
+  const entry = buildReleaseSourceFromLandscape(row);
+  assert.ok(entry);
+  const withNomination = {
+    ...entry!,
+    claims: [
+      ...(entry!.claims ?? []),
+      {
+        predicate: 'documented_in',
+        object: 'the property nomination form statement of significance',
+        confidenceLevel: 'high' as const,
+        citationSource: 'npgallery.nps.gov',
+        citationHref: 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/71000836_text',
+        citationLabel: 'NRHP nomination form',
+      },
+    ],
+  };
+  assert.equal(assessLandscapeDepth(withNomination, row).deep, true);
+});
+
+test('buildReleaseSourceFromLandscape carries enrichment historicalContext onto the entry', () => {
+  // Without the passthrough the builder rebuilds from index fields and drops swept prose, so a
+  // researched record would republish exactly as thin as it was before the sweep.
+  const entry = buildReleaseSourceFromLandscape(enrichedRow());
+  assert.ok(entry);
+  assert.match(entry!.historicalContext ?? '', /Consolidated Parent Group/u);
+});
+
+test('buildReleaseSourceFromLandscape carries enrichment topicIds/eraBuckets/keywords onto the entry', () => {
+  // Same passthrough gap as historicalContext, for the rest of the WS4 (repo-n7p6.4) harness's
+  // output — never wired in before because nothing wrote these fields onto a landscape row.
+  const entry = buildReleaseSourceFromLandscape(
+    enrichedRow({
+      payload: {
+        historicalContext: 'x',
+        topicIds: ['school-desegregation', 'civil-rights'],
+        eraBuckets: ['1950s'],
+        keywords: ['Gardner Bishop', 'Bolling v. Sharpe'],
+      },
+    }),
+  );
+  assert.ok(entry);
+  assert.deepEqual(entry!.topicIds, ['school-desegregation', 'civil-rights']);
+  assert.deepEqual(entry!.eraBuckets, ['1950s']);
+  assert.deepEqual(entry!.keywords, ['Gardner Bishop', 'Bolling v. Sharpe']);
+});
+
+test('buildReleaseSourceFromLandscape ignores non-string entries and a missing field', () => {
+  const entry = buildReleaseSourceFromLandscape(
+    enrichedRow({ payload: { historicalContext: 'x', topicIds: ['music', 42, null] } }),
+  );
+  assert.ok(entry);
+  assert.deepEqual(entry!.topicIds, ['music']);
+  assert.deepEqual(entry!.eraBuckets, undefined);
+  assert.deepEqual(entry!.keywords, undefined);
+});
+
+test('assessLandscapeDepth does not count a lane-constant corroborating URL as a second source', () => {
+  // The DC catalog URL is identical on every row in the lane; counting it would pass the whole
+  // lane on one shared link. Only the row's own claim citations are evidence here.
+  const row = baseRow();
+  const entry = buildReleaseSourceFromLandscape(row);
+  assert.ok(entry);
+  assert.equal(assessLandscapeDepth(entry!, row).deep, false);
 });
 
 test('incrementalPublishProvenancePatch records publish metadata', () => {
@@ -219,6 +368,8 @@ test('buildArtifactsForEntry publishes canonical deceased even when personReview
       'A'.repeat(120) +
       ' A community leader who was assassinated in 1968 during the struggle for civil rights in Washington, DC.',
     payload: {
+      // Present so the row clears the depth gate; this test is about status resolution, not depth.
+      historicalContext: 'Swept context standing in for a researched biography.',
       personReview: {
         approved: true,
         approvedBy: 'operator',
@@ -249,7 +400,7 @@ test('buildArtifactsForEntry publishes canonical deceased even when personReview
 
 test('toReleaseEntityRow normalizes empty related to array', () => {
   const result = gateLandscapePublishCandidate({
-    row: baseRow(),
+    row: enrichedRow(),
     releaseId: 'rel_seed_001',
     generatedAt: '2026-07-22T00:00:00.000Z',
   });
