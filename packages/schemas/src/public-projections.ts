@@ -130,7 +130,24 @@ export const publicEntityProjectionSchema = z.object({
   kind: entityKindSchema,
   displayName: z.string().min(1),
   nameLower: z.string().min(1),
-  summary: z.string().min(120).max(400),
+  /**
+   * The `min(120)` floor is the load-bearing half: it keeps a one-line stub from passing as a
+   * summary.
+   *
+   * The ceiling is 5000 to match `entityV1Schema.summary` in @repo/public-contracts — the contract
+   * the data is actually served under. It was 400, which made this READ-side parser stricter than
+   * the wire contract, and the failure mode was not a truncated summary: `parseEntityProjection`
+   * returned undefined, so the whole record vanished from both surfaces (repo-n7p6.26). That hit
+   * 9 records in the active release — Baldwin, Audre Lorde, bell hooks, Pauli Murray, Breonna
+   * Taylor, Lorraine Hansberry, Cool Papa Bell, Annie Easley, Leesylvania — which is to say it
+   * deleted precisely the best-enriched records in the catalog, because richer enrichment writes
+   * longer summaries. A read-side length check must never be the thing that unpublishes a record.
+   *
+   * ~400 chars remains the editorial norm for a card blurb. That belongs in the enrichment and
+   * publish-gate checks, which can flag or trim before anything ships; it does not belong here,
+   * where it silently 404s already-published work.
+   */
+  summary: z.string().min(120).max(5000),
   location: geoPointSchema.optional(),
   claimIds: z.array(z.string()).default([]),
   claims: z.array(publicClaimProjectionSchema).optional(),
