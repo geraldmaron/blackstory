@@ -25,7 +25,12 @@ import { TOPIC_REGISTRY } from '@repo/domain';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import { validateEnrichmentResponse, type EnrichmentAttempt } from './lib/entity-enrichment-llm.ts';
 import { fetchEnrichmentSubjects } from './lib/entity-enrichment-fetch.ts';
-import { applyEnrichmentResult } from './lib/entity-enrichment-apply.ts';
+import { applyEnrichmentResult, isReviewSampled } from './lib/entity-enrichment-apply.ts';
+
+/** repo-n7p6.16 item 5: same review-sampling of passing outputs as enrich-entities-llm.ts. */
+const REVIEW_SAMPLE_RATE = Number.parseFloat(
+  process.env.ENRICH_REVIEW_SAMPLE_RATE?.trim() || '0.05',
+);
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.ENRICH_ENTITIES_LLM_APPLY === '1';
@@ -71,16 +76,24 @@ async function main(): Promise<void> {
     console.log(`Skipping ${skippedNoEvidence.length} answer(s) with no captured evidence: ${skippedNoEvidence.join(', ')}`);
   }
 
-  type Result = { readonly entityId: string; readonly attempt: EnrichmentAttempt };
+  type Result = {
+    readonly entityId: string;
+    readonly attempt: EnrichmentAttempt;
+    readonly reviewSample: boolean;
+  };
+  const sampleSalt = new Date().toISOString().slice(0, 10);
   const results: Result[] = [];
   for (const answer of answers) {
     const subject = subjectById.get(answer.entityId);
     if (subject === undefined) continue;
     const attempt = validateEnrichmentResponse(subject, ALLOWED_TOPIC_IDS, answer.rawContent);
-    results.push({ entityId: answer.entityId, attempt });
+    const reviewSample =
+      attempt.validation.ok && isReviewSampled(answer.entityId, REVIEW_SAMPLE_RATE, sampleSalt);
+    results.push({ entityId: answer.entityId, attempt, reviewSample });
     const verdict = attempt.validation.ok ? 'accepted' : 'quarantined';
     const detail = attempt.validation.ok
-      ? `"${attempt.validation.draft.summary.slice(0, 80)}…"`
+      ? `"${attempt.validation.draft.summary.slice(0, 80)}…"` +
+        (reviewSample ? ' [review sample]' : '')
       : attempt.validation.errors.slice(0, 2).join('; ');
     console.log(`${answer.entityId} (${subject.displayName}) — ${verdict} — ${detail}`);
   }
@@ -109,6 +122,7 @@ async function main(): Promise<void> {
         attempt: result.attempt,
         modelId: SESSION_MODEL_ID,
         costUsdEstimate: 0,
+        reviewSample: result.reviewSample,
       });
     }
     await client.query('COMMIT');

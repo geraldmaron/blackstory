@@ -5,8 +5,23 @@
  * land in the ledger identically. NEVER writes to bb_public — publishing an accepted draft into
  * the release projection is WS5 (repo-n7p6.5), a separately gated step.
  */
+import { createHash } from 'node:crypto';
 import type pg from 'pg';
 import { ENTITY_ENRICHMENT_SCHEMA_ID, ENTITY_ENRICHMENT_SCHEMA_VERSION, type EnrichmentAttempt } from './entity-enrichment-llm.ts';
+
+/**
+ * repo-n7p6.16 item 5: deterministic random-sample selector for passing outputs. Hash-based
+ * rather than Math.random so a re-run of the same batch (resume after interruption) selects the
+ * same entities — the sample can't be dodged or double-counted by re-running. `salt` varies the
+ * draw per batch (e.g. the run date) so the same entity isn't permanently in/out of the sample.
+ */
+export function isReviewSampled(entityId: string, rate: number, salt = ''): boolean {
+  if (!(rate > 0)) return false;
+  if (rate >= 1) return true;
+  const digest = createHash('sha256').update(`${salt}:${entityId}`).digest();
+  const draw = digest.readUInt32BE(0) / 0x1_0000_0000;
+  return draw < rate;
+}
 
 /** Minimal query surface this module needs — satisfied by `pg.PoolClient` and `pg.Pool`. */
 export type QueryableClient = Pick<pg.PoolClient, 'query'>;
@@ -17,6 +32,13 @@ export type ApplyEnrichmentResultInput = {
   readonly modelId: string;
   /** 0 for a session-drafted answer (no metered API cost). */
   readonly costUsdEstimate: number;
+  /**
+   * repo-n7p6.16 item 5: a deterministically sampled PASSING output routed to review alongside
+   * quarantined ones, so a validator/judge that starts waving through weak work is caught early.
+   * The row keeps status='enriched' (it passed every deterministic check); reviewers pull the
+   * queue with: status='quarantined' OR notes->'reviewSample'->>'selected' = 'true'.
+   */
+  readonly reviewSample?: boolean;
 };
 
 function fieldsWrittenFor(attempt: EnrichmentAttempt): readonly string[] {
@@ -31,8 +53,15 @@ function fieldsWrittenFor(attempt: EnrichmentAttempt): readonly string[] {
   ];
 }
 
-function notesFor(attempt: EnrichmentAttempt): Record<string, unknown> {
-  const base = { ws: 'repo-n7p6.4', schemaId: ENTITY_ENRICHMENT_SCHEMA_ID, schemaVersion: ENTITY_ENRICHMENT_SCHEMA_VERSION };
+function notesFor(attempt: EnrichmentAttempt, reviewSample: boolean): Record<string, unknown> {
+  const base = {
+    ws: 'repo-n7p6.4',
+    schemaId: ENTITY_ENRICHMENT_SCHEMA_ID,
+    schemaVersion: ENTITY_ENRICHMENT_SCHEMA_VERSION,
+    ...(reviewSample
+      ? { reviewSample: { selected: true, reason: 'random-audit-of-passing-output' } }
+      : {}),
+  };
   return attempt.validation.ok
     ? { ...base, draft: attempt.validation.draft }
     : {
@@ -63,7 +92,7 @@ export async function applyEnrichmentResult(
       input.modelId,
       input.costUsdEstimate,
       fieldsWrittenFor(input.attempt),
-      JSON.stringify(notesFor(input.attempt)),
+      JSON.stringify(notesFor(input.attempt, input.reviewSample === true)),
     ],
   );
 }
