@@ -256,6 +256,21 @@
   padding: 0 var(--ds-space-4) var(--ds-space-4);
 }
 
+/*
+ * A drawer holding a live map moment becomes a window.
+ *
+ * The borrowed plate is `position: fixed` below the document's stacking context, so it shows
+ * through the moment's transparent slot — that is how the moment's own tag and Atlas control
+ * stay on top of the map. It only works if everything between the slot and the page is
+ * transparent too, and this card's background was not: an opened map drawer showed an empty
+ * box with the map hidden behind it. Raising the plate instead is not an option, because
+ * `.ds-shell-page-transition` isolates the whole document, so a plate above the card is also
+ * above the moment's controls.
+ */
+.ds-article__drawer:has(.ds-mapmoment[data-live='1']) {
+  background: transparent;
+}
+
 /* The wrapped artifact loses its own outer card chrome inside the drawer. */
 .ds-article__drawer-body .ds-article__document {
   border: 0;

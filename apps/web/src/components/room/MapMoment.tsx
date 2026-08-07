@@ -100,6 +100,38 @@ export type MomentCandidate = {
 };
 
 /**
+ * Whether a slot is actually on screen, as opposed to merely having a rect.
+ *
+ * A rect is not enough, and the case that proves it is a moment inside a closed `<details>`:
+ * Chrome collapses the drawer but keeps its contents laid out, so the slot still reports a
+ * full-size rect at its old position. Arbitration then hands that slot the plate, and the
+ * plate paints a map into a box the reader cannot see — directly over the prose that now
+ * occupies the space. That is the "map bleeding through the text" failure, and it looks like
+ * a z-order bug when it is really a visibility one.
+ *
+ * `checkVisibility` is the only check that catches it, because the drawer hides its content
+ * with `content-visibility` rather than `display: none`. Browsers without it keep the old
+ * rect-only behaviour rather than losing every moment.
+ */
+export function momentIsVisible(element: Element): boolean {
+  const check = (
+    element as Element & {
+      checkVisibility?: (options?: {
+        contentVisibilityAuto?: boolean;
+        opacityProperty?: boolean;
+        visibilityProperty?: boolean;
+      }) => boolean;
+    }
+  ).checkVisibility;
+  if (typeof check !== 'function') return true;
+  return check.call(element, {
+    contentVisibilityAuto: true,
+    opacityProperty: true,
+    visibilityProperty: true,
+  });
+}
+
+/**
  * Which moment holds the plate, given where everything currently sits.
  *
  * Pure, because "a room with two moments has exactly one Framed plate at any scroll position" is
@@ -173,10 +205,15 @@ export function MapMomentStage({ children }: MapMomentStageProps) {
   const listeners = useRef(new Set<(frame: MomentFrame | null) => void>());
   const [liveId, setLiveId] = useState<string | null>(null);
   const frameRef = useRef(0);
+  const observerRef = useRef<ResizeObserver | null>(null);
 
   const register = useCallback((id: string, entry: MomentRegistration) => {
     registry.current.set(id, entry);
+    // Child effects run before the parent's, so a moment can register before the observer
+    // exists; the effect below observes whatever is already in the registry when it starts.
+    observerRef.current?.observe(entry.element);
     return () => {
+      observerRef.current?.unobserve(entry.element);
       registry.current.delete(id);
     };
   }, []);
@@ -195,6 +232,10 @@ export function MapMomentStage({ children }: MapMomentStageProps) {
       frameRef.current = 0;
       const candidates: MomentCandidate[] = [];
       for (const [id, entry] of registry.current) {
+        // A slot that is laid out but not visible (a collapsed drawer) is not a candidate:
+        // see momentIsVisible. Skipping it here is what releases the plate rather than
+        // leaving it painting into a box the reader cannot see.
+        if (!momentIsVisible(entry.element)) continue;
         const rect = entry.element.getBoundingClientRect();
         candidates.push({ id, top: rect.top, bottom: rect.bottom, height: rect.height });
       }
@@ -230,11 +271,35 @@ export function MapMomentStage({ children }: MapMomentStageProps) {
     // Same reason: scroll events that arrived while the tab was hidden were coalesced into an rAF
     // that never ran, so the moment the reader comes back is exactly when the pick is stale.
     document.addEventListener('visibilitychange', sync);
+    // A drawer opening or closing moves every slot below it and changes whether its own slot is
+    // visible at all, and it fires neither scroll nor resize. Without this the plate keeps the
+    // rect it held when the drawer was open and goes on painting there. `toggle` does not bubble,
+    // hence capture.
+    document.addEventListener('toggle', queue, true);
+
+    // Everything else that reflows the column without scrolling it: a hero image finishing its
+    // load, a font swapping, a chart mounting. Observing the slots themselves rather than the
+    // document keeps the callback count proportional to moments, not to page size.
+    const resizeObserver =
+      typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(() => queue());
+    if (resizeObserver) {
+      for (const entry of registry.current.values()) resizeObserver.observe(entry.element);
+    }
+    observerRef.current = resizeObserver;
+
     return () => {
       window.removeEventListener('scroll', queue);
       window.removeEventListener('resize', queue);
       document.removeEventListener('visibilitychange', sync);
-      if (frameRef.current) window.cancelAnimationFrame(frameRef.current);
+      document.removeEventListener('toggle', queue, true);
+      resizeObserver?.disconnect();
+      observerRef.current = null;
+      if (frameRef.current) {
+        window.cancelAnimationFrame(frameRef.current);
+        // Cleared, not just cancelled: `queue` treats a non-zero id as "a sync is already
+        // pending" and would refuse to schedule another one for the life of the page.
+        frameRef.current = 0;
+      }
     };
   }, []);
 

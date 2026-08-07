@@ -1134,6 +1134,9 @@ a.ds-room-chip {
   text-align: center;
   color: var(--room-ink-4);
   transition: opacity var(--ds-duration-base) ease;
+  /* Decorative text that covers the whole slot. Left interactive it swallowed clicks meant for
+     the Atlas control beneath it, including once it had faded to nothing on a live moment. */
+  pointer-events: none;
 }
 
 .ds-mapmoment[data-live='1'] .ds-mapmoment__idle {

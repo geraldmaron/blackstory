@@ -27,7 +27,7 @@ import { HairlineIndex } from './HairlineIndex';
 import { DataTable } from './DataTable';
 import { Disclosure, Field, UtilityCard, UtilityStep } from './Utility';
 import { EmptyList, OffRamp, RecordNav } from './RoomFoot';
-import { MapMoment, pickLiveMoment, resolveMomentCamera } from './MapMoment';
+import { MapMoment, momentIsVisible, pickLiveMoment, resolveMomentCamera } from './MapMoment';
 
 void React;
 
@@ -583,6 +583,23 @@ describe('room kit · map moment arbitration', () => {
 
   it('nothing is framed when every moment has scrolled away', () => {
     assert.equal(pickLiveMoment([slot('a', -900), slot('b', 1400)], 800), null);
+  });
+});
+
+describe('room kit · a slot that is laid out but not visible is not a candidate', () => {
+  it('refuses a slot the browser reports as not visible, so the plate is released', () => {
+    // A moment inside a closed <details>: Chrome collapses the drawer but keeps the contents
+    // laid out, so the slot still reports a full-size rect at its old position. Judging by
+    // rect alone handed that slot the plate, and the map painted over the prose that had
+    // taken the space — the "map bleeding through the text" report.
+    const hidden = { checkVisibility: () => false } as unknown as Element;
+    const shown = { checkVisibility: () => true } as unknown as Element;
+    assert.equal(momentIsVisible(hidden), false);
+    assert.equal(momentIsVisible(shown), true);
+  });
+
+  it('keeps rect-only behaviour where checkVisibility is unsupported, rather than losing every moment', () => {
+    assert.equal(momentIsVisible({} as unknown as Element), true);
   });
 });
 
