@@ -50,8 +50,11 @@ export interface ContentExpectationSpec {
 }
 
 /**
- * The default bar: summary is already schema-enforced (120–400 chars), so the floor here is
- * one narrative paragraph, one source, and at least partial coverage.
+ * The default bar: summary already has a schema-enforced 120-char floor, so the floor here is
+ * one narrative paragraph, one source, and at least partial coverage. (The old upper bound of
+ * 400 was removed from the projection schema in repo-n7p6.26 — as a read-side check it deleted
+ * over-long records instead of flagging them. ~400 is still the editorial norm for a card blurb;
+ * enforcing it belongs in a publish gate, not in a parser.)
  */
 const BASELINE: Omit<ContentExpectationSpec, 'appliesTo'> = {
   minNarrativeParagraphs: 1,

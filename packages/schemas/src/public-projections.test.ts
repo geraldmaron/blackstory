@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { publicStoryProjectionSchema } from './public-projections.ts';
+import { publicEntityProjectionSchema, publicStoryProjectionSchema } from './public-projections.ts';
 
 const baseStory = {
   id: 'story-1',
@@ -108,5 +108,36 @@ test('moment refId is required', () => {
   };
 
   const result = publicStoryProjectionSchema.safeParse(withMissingRefId);
+  assert.equal(result.success, false);
+});
+
+/**
+ * repo-n7p6.26 — a read-side length check must never unpublish a record.
+ *
+ * `summary` was capped at 400 here while the wire contract (`entityV1Schema`) allows 5000. The
+ * result was not a truncated summary: `parseEntityProjection` returned undefined and the record
+ * disappeared from the API and the website both. It hit the 9 best-enriched records in the active
+ * release, because richer enrichment writes longer summaries.
+ */
+const baseEntity = {
+  id: 'ent_test_001',
+  releaseId: 'release-1',
+  kind: 'person',
+  displayName: 'Test Person',
+  nameLower: 'test person',
+  summary: 'S'.repeat(140),
+};
+
+test('entity projection accepts a summary longer than the old 400-char cap', () => {
+  // 613 chars: the real length of the James Baldwin summary that used to 404 the record.
+  const result = publicEntityProjectionSchema.safeParse({
+    ...baseEntity,
+    summary: 'S'.repeat(613),
+  });
+  assert.equal(result.success, true);
+});
+
+test('entity projection still rejects a summary below the 120-char substance floor', () => {
+  const result = publicEntityProjectionSchema.safeParse({ ...baseEntity, summary: 'Too short.' });
   assert.equal(result.success, false);
 });

@@ -106,11 +106,28 @@ async function main(): Promise<void> {
         );
         entitiesUpdated += ent.rowCount ?? 0;
 
+        /*
+         * BOTH the `status` column and the `facets` blob, because the blob is what gets served.
+         *
+         * `search_index.facets` holds the whole search document, and
+         * apps/api-public/src/http/postgres-search-index.ts's mapPostgresSearchIndexRow returns
+         * `parseSearchProjection(facets)` verbatim whenever that blob is a full doc — the `status`
+         * column is never consulted on that path. Updating only the column (what this script and
+         * flip-release-living-to-unknown.ts both used to do) therefore changed nothing a reader
+         * could see: the public search API went on serving `status: "living"` for 338 of 469
+         * persons, 212 of them already recorded as deceased, Denmark Vesey and W. E. B. Du Bois
+         * among them. See repo-n7p6.28.
+         */
         const search = await client.query(
           `UPDATE bb_public.search_index
-           SET status = $3
+           SET status = $3,
+               facets = CASE
+                 WHEN jsonb_typeof(facets) = 'object'
+                   THEN jsonb_set(facets, '{status}', to_jsonb($3::text), true)
+                 ELSE facets
+               END
            WHERE release_id = $1 AND entity_id = $2
-             AND status IS DISTINCT FROM $3`,
+             AND (status IS DISTINCT FROM $3 OR facets->>'status' IS DISTINCT FROM $3)`,
           [row.release_id, row.entity_id, row.canonical_status],
         );
         searchUpdated += search.rowCount ?? 0;
