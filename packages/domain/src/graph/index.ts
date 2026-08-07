@@ -146,6 +146,16 @@ export type {
   ProposeRelationshipCandidatesInput,
 } from './relationship-candidates.js';
 
+export {
+  UNDATED_LABEL,
+  humanizeToken,
+  relationshipSentence,
+  inferDatePrecision,
+  isUndatedTimelineEntry,
+  buildGraphTimeline,
+} from './timeline.js';
+export type { GraphTimelineEntry, TimelineRelatedEntry, TimelineSourceEntity } from './timeline.js';
+
 // Gold-corpus-style regression fixtures internal-facing like
 // /map/fixtures.js's re-export here (see ../map/index.ts): NOT re-exported from the top-level
 // packages/domain/src/index.ts barrel, only from this subsystem index, for this package's own

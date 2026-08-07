@@ -59,6 +59,18 @@ const REPORT_PATH =
   process.env.WIKIDATA_STATUS_REVIEW_REPORT?.trim() || join(REPORT_DIR, 'report.json');
 const TSV_PATH = process.env.WIKIDATA_STATUS_REVIEW_TSV?.trim() || join(REPORT_DIR, 'verdicts.tsv');
 const FETCH_DELAY_MS = Number(process.env.WIKIDATA_FETCH_DELAY_MS ?? 400);
+/**
+ * Optional comma-separated entity-id allowlist (repo-n7p6.23). Re-running the full sweep to
+ * re-check a handful of repaired QIDs would re-stage every other unknown person alongside them,
+ * churning the operator's review lane for no new information. Empty means "every unknown person",
+ * the original behaviour.
+ */
+const ONLY_ENTITY_IDS = new Set(
+  (process.env.WIKIDATA_STATUS_REVIEW_ENTITY_IDS ?? '')
+    .split(',')
+    .map((id) => id.trim())
+    .filter((id) => id.length > 0),
+);
 
 type PersonRow = {
   readonly entity_id: string;
@@ -227,7 +239,9 @@ async function loadUnknownPersons(client: pg.Client): Promise<PersonRow[]> {
        AND re.projection->>'status' = 'unknown'
      ORDER BY re.entity_id`,
   );
-  return rows;
+  return ONLY_ENTITY_IDS.size === 0
+    ? rows
+    : rows.filter((row) => ONLY_ENTITY_IDS.has(row.entity_id));
 }
 
 function sleep(ms: number): Promise<void> {

@@ -159,115 +159,15 @@ export function sensitivityFor(entityId: string): EntitySensitivity | undefined 
 // Graph-driven timeline
 // ---------------------------------------------------------------------------
 
-export type GraphTimelineEntry = {
-  readonly id: string;
-  readonly time: string;
-  readonly title: string;
-  readonly body: string;
-};
-
-/** Structurally matches both this module's own `PublicRelatedEntry` (domain, `type:
- * RelationshipType`) and `./public-seed.ts`'s public-projection `PublicRelatedEntry` (`type:
- * string`) — the timeline builder only ever humanizes/reads `type`, never re-validates it against
- * the closed `RelationshipType` vocabulary, so it accepts the wider public-projection shape. */
-export type TimelineRelatedEntry = {
-  readonly id: string;
-  readonly type: string;
-  readonly direction: 'outgoing' | 'incoming';
-  readonly timespan?: { readonly validFrom?: string; readonly validTo?: string | null };
-};
-
-export type TimelineSourceEntity = {
-  readonly id: string;
-  readonly displayName: string;
-  readonly statusHistory?: readonly StatusHistoryEntry<EntityStatusValue>[];
-  readonly related?: readonly TimelineRelatedEntry[];
-};
-
-function humanizeToken(value: string): string {
-  return value
-    .split('_')
-    .map((word) => (word.length > 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
-    .join(' ');
-}
-
-/** `{from} <verb phrase> {to}` sentence templates for the relationship types this seed graph
- * uses, plus a generic fallback for any other `RelationshipType` a future edit might add. Mirrors
- * the direction semantics documented in `RELATIONSHIP_TYPE_SEMANTICS`
- * (packages/domain/src/relationship.ts). */
-const RELATIONSHIP_SENTENCE_TEMPLATES: Readonly<
-  Record<string, (from: string, to: string) => string>
-> = {
-  located_at: (from, to) => `${from} is located at ${to}.`,
-  occurred_at: (from, to) => `${from} occurred at ${to}.`,
-  commemorates: (from, to) => `${from} commemorates ${to}.`,
-  member_of: (from, to) => `${from} is a member of ${to}.`,
-  part_of: (from, to) => `${from} is part of ${to}.`,
-  founded: (from, to) => `${from} founded ${to}.`,
-};
-
-/** Exported so `apps/web/src/components/entity/EntityRelatedList.tsx` can render the identical
- * sentence the timeline uses one description of a graph edge, not two independently-drifting
- * copies. */
-export function relationshipSentence(
-  entry: TimelineRelatedEntry,
-  thisDisplayName: string,
-  neighborDisplayName: string,
-): string {
-  const template =
-    RELATIONSHIP_SENTENCE_TEMPLATES[entry.type] ??
-    ((from: string, to: string) => `${from} ${humanizeToken(entry.type).toLowerCase()} ${to}.`);
-  return entry.direction === 'outgoing'
-    ? template(thisDisplayName, neighborDisplayName)
-    : template(neighborDisplayName, thisDisplayName);
-}
-
 /**
- * Builds one entity's timeline purely from its status history and related-entry
- * timespans the two structured, evidence-backed inputs the entity page has, sorted
- * chronologically. `entitiesById` resolves neighbor display names for the relationship sentences;
- * callers pass a lookup over the full seed catalog (see `./public-seed.ts`).
+ * The builder itself now lives in `@repo/domain` (`graph/timeline.ts`) so `apps/api-public` can
+ * serve the same timeline this page renders instead of hard-coding an empty array — see
+ * repo-n7p6.6 item 2. Re-exported here unchanged so every existing import path keeps working.
  */
-export function buildGraphTimeline(
-  entity: TimelineSourceEntity,
-  entitiesById: ReadonlyMap<string, { readonly displayName: string }>,
-): readonly GraphTimelineEntry[] {
-  const dated: { readonly sortKey: string; readonly entry: GraphTimelineEntry }[] = [];
-
-  (entity.statusHistory ?? []).forEach((record, index) => {
-    const basis =
-      record.basisClaimIds.length > 0 ? record.basisClaimIds.join(', ') : 'none recorded';
-    dated.push({
-      sortKey: record.validFrom ?? '',
-      entry: {
-        id: `${entity.id}_status_${index}`,
-        time: record.validFrom ?? 'Undated',
-        title: `Status: ${humanizeToken(record.status)}`,
-        body: record.validTo
-          ? `In effect from ${record.validFrom ?? 'an undated point'} through ${record.validTo}. Basis: ${basis}.`
-          : `In effect from ${record.validFrom ?? 'an undated point'}, ongoing as of this release. Basis: ${basis}.`,
-      },
-    });
-  });
-
-  for (const rel of entity.related ?? []) {
-    if (!rel.timespan?.validFrom) continue;
-    const neighborName = entitiesById.get(rel.id)?.displayName ?? rel.id;
-    const sentence = relationshipSentence(rel, entity.displayName, neighborName);
-    dated.push({
-      sortKey: rel.timespan.validFrom,
-      entry: {
-        id: `${entity.id}_rel_${rel.id}_${rel.type}`,
-        time: rel.timespan.validFrom,
-        title: humanizeToken(rel.type),
-        body: rel.timespan.validTo
-          ? `${sentence} Through ${rel.timespan.validTo}.`
-          : `${sentence} Ongoing connection.`,
-      },
-    });
-  }
-
-  return dated
-    .sort((a, b) => a.sortKey.localeCompare(b.sortKey) || a.entry.id.localeCompare(b.entry.id))
-    .map((item) => item.entry);
-}
+export {
+  buildGraphTimeline,
+  relationshipSentence,
+  isUndatedTimelineEntry,
+  UNDATED_LABEL,
+} from '@repo/domain';
+export type { GraphTimelineEntry, TimelineRelatedEntry, TimelineSourceEntity } from '@repo/domain';

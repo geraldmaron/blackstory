@@ -12,8 +12,12 @@
  *   nonexistent id — the handler cannot distinguish from a 404 (T3).
  * - Inline `claims` on the projection map through when present; bootstrap-window stubs that carry
  *   only `claimIds` still emit `claims: []`. No per-claim reads are added here.
- * - `timeline` is not carried on the projection — always `[]` until a release-builder field exists
- *   (same as `apps/web`'s `map-projection.ts`).
+ * - `timeline` is DERIVED, not stored: `@repo/domain`'s `buildGraphTimeline` composes it from the
+ *   projection's own `statusHistory` records and dated `related` timespans — the identical builder
+ *   `apps/web` renders from, so the same record no longer carries a timeline on the website and an
+ *   empty array over the API (repo-n7p6.6 item 2). Neighbor display names are NOT resolved here
+ *   for the same N+1 reason `relatedNeighbors` is not hydrated below; a dated edge therefore names
+ *   its neighbor by id. Undated entries are dropped rather than shown with a guessed date.
  * - `related` neighbor entries map straight from the projection's own `related` array (ids/types/
  *   direction/timespan only). `relatedNeighbors`/`continueLearning` (denormalized neighbor display
  *   fields) are deliberately NOT hydrated here: doing so would require reading every related
@@ -23,7 +27,8 @@
  *   `researchCoverage`, revision timestamps) fall back to the same honest placeholders
  *   `apps/web`'s `map-projection.ts` uses — never fabricated curated content.
  */
-import { findUsStateForPoint } from '@repo/domain';
+import { buildGraphTimeline, isUndatedTimelineEntry, findUsStateForPoint } from '@repo/domain';
+import type { TimelineEventV1 } from '@repo/public-contracts/v1/timeline';
 import { ENTITY_KINDS, entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
 import type { ClaimV1 } from '@repo/public-contracts/v1/claim';
 import type { PublicClaimProjectionDoc, PublicEntityProjectionDoc } from '@repo/ops-data';
@@ -43,6 +48,38 @@ const NOMINAL_CONFIDENCE_SCORE: Record<'high' | 'medium' | 'low', number> = {
   medium: 0.6,
   low: 0.4,
 };
+
+/** The empty lookup makes every neighbor resolve to its own id — see the module doc: resolving
+ * display names would mean reading each related entity's projection per request. */
+const NO_NEIGHBOR_LOOKUP: ReadonlyMap<string, { readonly displayName: string }> = new Map();
+
+/**
+ * Timeline for the wire DTO, built from the projection's own evidence-backed time records.
+ * `atLabel` keeps the display-ready label; `at` is present only when the underlying precision
+ * genuinely supports an ISO timestamp, per the `timelineEventV1Schema` contract.
+ */
+function mapTimeline(projection: PublicEntityProjectionDoc): TimelineEventV1[] {
+  return buildGraphTimeline(
+    {
+      id: projection.id,
+      displayName: projection.displayName,
+      ...(projection.statusHistory !== undefined
+        ? { statusHistory: projection.statusHistory }
+        : {}),
+      ...(projection.related !== undefined ? { related: projection.related } : {}),
+    },
+    NO_NEIGHBOR_LOOKUP,
+  )
+    .filter((entry) => !isUndatedTimelineEntry(entry))
+    .map((entry) => ({
+      id: entry.id,
+      atLabel: entry.time,
+      ...(entry.at !== undefined ? { at: entry.at } : {}),
+      datePrecision: entry.datePrecision,
+      title: entry.title,
+      body: entry.body,
+    }));
+}
 
 function mapLocationPrecision(precision: string | undefined): EntityV1['locationPrecision'] {
   if (precision === 'neighborhood' || precision === 'campus' || precision === 'institution') {
@@ -138,7 +175,7 @@ export function mapProjectionToEntityV1(
     recordMaturity: claims.length > 0 ? 'partial_enrichment' : 'projection_stub',
     researchCoverage: projection.researchCoverage ?? (claims.length >= 2 ? 'partial' : 'minimal'),
     claims,
-    timeline: [],
+    timeline: mapTimeline(projection),
     revision: {
       releaseId: projection.releaseId,
       generatedAt: projection.generatedAt ?? '',

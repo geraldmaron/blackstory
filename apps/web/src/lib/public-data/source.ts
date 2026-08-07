@@ -24,7 +24,7 @@ import {
   type NeighborLookup,
 } from '@repo/domain/learning-index';
 import type { PublicEntityView, RelatedNeighborView } from '../../data/public-seed';
-import { buildGraphTimeline } from '../../data/entity-graph-seed';
+import { buildGraphTimeline, isUndatedTimelineEntry } from '../../data/entity-graph-seed';
 import {
   fetchActiveRelease,
   fetchPublicEntityProjection,
@@ -140,7 +140,7 @@ export function hydrateEntityLearningLinks(
     }
   }
   const timeline = buildGraphTimeline(entity, displayNameLookup).filter(
-    (item) => !/^undated$/i.test(item.time.trim()),
+    (item) => !isUndatedTimelineEntry(item),
   );
 
   return {
