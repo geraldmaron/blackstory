@@ -138,7 +138,9 @@ async function main(): Promise<void> {
     console.log(`Report: ${reportPath}`);
 
     if (DRY_RUN || !APPLY) {
-      console.log('Dry run — no ledger rows written. Set DRY_RUN=0 CONTENT_AUDIT_APPLY=1 to apply.');
+      console.log(
+        'Dry run — no ledger rows written. Set DRY_RUN=0 CONTENT_AUDIT_APPLY=1 to apply.',
+      );
       return;
     }
 

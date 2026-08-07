@@ -81,18 +81,30 @@ async function main(): Promise<void> {
   );
   console.log(`Found ${rows.rows.length} enriched entit(ies) to stage onto landscape_candidates.`);
 
-  const staged: { entityId: string; summaryLen: number; topicIds: number; eraBuckets: number; keywords: number }[] = [];
+  const staged: {
+    entityId: string;
+    summaryLen: number;
+    topicIds: number;
+    eraBuckets: number;
+    keywords: number;
+  }[] = [];
   const skipped: { entityId: string; reason: string }[] = [];
 
   for (const row of rows.rows) {
     const draft = row.notes.draft;
     if (draft === undefined) {
-      skipped.push({ entityId: row.entity_id, reason: 'no draft in notes (unexpected for status=enriched)' });
+      skipped.push({
+        entityId: row.entity_id,
+        reason: 'no draft in notes (unexpected for status=enriched)',
+      });
       continue;
     }
     const summary = typeof draft.summary === 'string' ? draft.summary : undefined;
     if (summary === undefined || summary.length < 120 || summary.length > 400) {
-      skipped.push({ entityId: row.entity_id, reason: `summary missing or out of bounds (${summary?.length ?? 'n/a'})` });
+      skipped.push({
+        entityId: row.entity_id,
+        reason: `summary missing or out of bounds (${summary?.length ?? 'n/a'})`,
+      });
       continue;
     }
     staged.push({
@@ -142,7 +154,8 @@ async function main(): Promise<void> {
           row.entity_id,
           summary,
           JSON.stringify({
-            historicalContext: typeof draft.historicalContext === 'string' ? draft.historicalContext : undefined,
+            historicalContext:
+              typeof draft.historicalContext === 'string' ? draft.historicalContext : undefined,
             topicIds: Array.isArray(draft.topicIds) ? draft.topicIds : undefined,
             eraBuckets: Array.isArray(draft.eraBuckets) ? draft.eraBuckets : undefined,
             keywords: Array.isArray(draft.keywords) ? draft.keywords : undefined,

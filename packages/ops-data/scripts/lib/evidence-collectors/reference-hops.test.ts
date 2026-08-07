@@ -19,7 +19,11 @@ const SUBJECT = {
   state: 'Tennessee',
 };
 
-const candidate = (url: string, anchorText = 'Tri-State Bank of Memphis', context = ''): HopCandidate => ({
+const candidate = (
+  url: string,
+  anchorText = 'Tri-State Bank of Memphis',
+  context = '',
+): HopCandidate => ({
   url,
   anchorText,
   context,

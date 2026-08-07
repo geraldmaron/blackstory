@@ -48,9 +48,7 @@ describe('applyEnrichmentResult review-sample notes', () => {
     },
   } as unknown as EnrichmentAttempt;
 
-  async function captureNotes(
-    reviewSample: boolean | undefined,
-  ): Promise<Record<string, unknown>> {
+  async function captureNotes(reviewSample: boolean | undefined): Promise<Record<string, unknown>> {
     let captured: unknown;
     const client = {
       query: (_sql: string, params: unknown[]) => {

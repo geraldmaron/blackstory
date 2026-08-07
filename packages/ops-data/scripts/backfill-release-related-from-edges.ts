@@ -111,7 +111,9 @@ async function main(): Promise<void> {
     for (const target of [...targets.values()].slice(0, 15)) {
       console.log(
         `  ${target.entity_id}: ${target.entries.length} entr(ies) — ` +
-          target.entries.map((entry) => `${entry.direction === 'outgoing' ? '→' : '←'}${entry.id}`).join(', '),
+          target.entries
+            .map((entry) => `${entry.direction === 'outgoing' ? '→' : '←'}${entry.id}`)
+            .join(', '),
       );
     }
     if (targets.size > 15) console.log(`  ...and ${targets.size - 15} more`);

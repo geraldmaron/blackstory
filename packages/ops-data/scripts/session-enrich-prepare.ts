@@ -22,7 +22,10 @@
 import pg from 'pg';
 import { TOPIC_REGISTRY } from '@repo/domain';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
-import { ENTITY_ENRICHMENT_SYSTEM_PROMPT, buildEnrichmentUserPrompt } from './lib/entity-enrichment-llm.ts';
+import {
+  ENTITY_ENRICHMENT_SYSTEM_PROMPT,
+  buildEnrichmentUserPrompt,
+} from './lib/entity-enrichment-llm.ts';
 import { fetchEnrichmentSubjects } from './lib/entity-enrichment-fetch.ts';
 
 const ALLOWED_TOPIC_IDS = TOPIC_REGISTRY.map((topic) => topic.id);

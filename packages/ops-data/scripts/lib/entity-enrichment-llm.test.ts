@@ -29,7 +29,9 @@ function baseSubject(overrides: Partial<EnrichmentSubject> = {}): EnrichmentSubj
 function validResponse(overrides: Record<string, unknown> = {}): string {
   return JSON.stringify({
     summary: LONG_ENOUGH_SUMMARY,
-    summaryCitations: [{ evidenceId: 'ev_1', quote: 'operated a business at this site starting in 1925' }],
+    summaryCitations: [
+      { evidenceId: 'ev_1', quote: 'operated a business at this site starting in 1925' },
+    ],
     historicalContext: null,
     historicalContextCitations: [],
     topicIds: ['business'],
@@ -52,7 +54,10 @@ test('rejects a summary shorter than the 120-char floor', () => {
   const attempt = validateEnrichmentResponse(
     baseSubject(),
     ['business'],
-    validResponse({ summary: 'Too short.', summaryCitations: [{ evidenceId: 'ev_1', quote: 'John Doe' }] }),
+    validResponse({
+      summary: 'Too short.',
+      summaryCitations: [{ evidenceId: 'ev_1', quote: 'John Doe' }],
+    }),
   );
   assert.equal(attempt.validation.ok, false);
   if (!attempt.validation.ok) {
@@ -64,11 +69,15 @@ test('rejects a citation quote that does not appear verbatim in the named eviden
   const attempt = validateEnrichmentResponse(
     baseSubject(),
     ['business'],
-    validResponse({ summaryCitations: [{ evidenceId: 'ev_1', quote: 'this sentence was never in the source' }] }),
+    validResponse({
+      summaryCitations: [{ evidenceId: 'ev_1', quote: 'this sentence was never in the source' }],
+    }),
   );
   assert.equal(attempt.validation.ok, false);
   if (!attempt.validation.ok) {
-    assert.ok(attempt.validation.errors.some((error) => error.includes('does not appear verbatim')));
+    assert.ok(
+      attempt.validation.errors.some((error) => error.includes('does not appear verbatim')),
+    );
   }
 });
 
@@ -76,7 +85,9 @@ test('rejects a citation that names an evidence id not offered to the model', ()
   const attempt = validateEnrichmentResponse(
     baseSubject(),
     ['business'],
-    validResponse({ summaryCitations: [{ evidenceId: 'ev_does_not_exist', quote: 'John Doe operated' }] }),
+    validResponse({
+      summaryCitations: [{ evidenceId: 'ev_does_not_exist', quote: 'John Doe operated' }],
+    }),
   );
   assert.equal(attempt.validation.ok, false);
   if (!attempt.validation.ok) {
@@ -104,7 +115,9 @@ test('rejects a topicId that is valid taxonomy but was not in allowedTopicIds', 
   );
   assert.equal(attempt.validation.ok, false);
   if (!attempt.validation.ok) {
-    assert.ok(attempt.validation.errors.some((error) => error.includes('was not in the allowedTopicIds')));
+    assert.ok(
+      attempt.validation.errors.some((error) => error.includes('was not in the allowedTopicIds')),
+    );
   }
 });
 
@@ -238,7 +251,9 @@ test('rejects an address-shaped keyword for a person entity', () => {
 test('user prompt carries the privacy rule for person subjects and omits it for plain places', async () => {
   const { buildEnrichmentUserPrompt } = await import('./entity-enrichment-llm.ts');
   const personPrompt = buildEnrichmentUserPrompt(baseSubject({ kind: 'person' }), ['business']);
-  const restrictedPrompt = buildEnrichmentUserPrompt(baseSubject({ restrictedAddress: true }), ['business']);
+  const restrictedPrompt = buildEnrichmentUserPrompt(baseSubject({ restrictedAddress: true }), [
+    'business',
+  ]);
   const placePrompt = buildEnrichmentUserPrompt(baseSubject(), ['business']);
   assert.ok(personPrompt.includes('PRIVACY'));
   assert.ok(restrictedPrompt.includes('PRIVACY'));

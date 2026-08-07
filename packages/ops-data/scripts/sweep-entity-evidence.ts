@@ -148,7 +148,11 @@ type EntityOutcome = {
    * for a human to review as candidate tier1-sources.ts additions; nothing here is ever stored
    * as evidence.
    */
-  readonly leads: readonly { readonly entityId: string; readonly url: string; readonly anchorText: string }[];
+  readonly leads: readonly {
+    readonly entityId: string;
+    readonly url: string;
+    readonly anchorText: string;
+  }[];
 };
 
 function sleep(ms: number): Promise<void> {
@@ -326,7 +330,8 @@ async function collectDcHpo(row: CandidateRow): Promise<EvidenceRow | null> {
   if (url === undefined) throw new SkipReason('dc-sites row has no canonicalUrl');
 
   const page = await safeFetchPage(url, { allowedContentTypes: ['text/html'] });
-  if (page === undefined) throw new SkipReason('safeFetchPage rejected or could not reach canonicalUrl');
+  if (page === undefined)
+    throw new SkipReason('safeFetchPage rejected or could not reach canonicalUrl');
 
   const quality = assessText(page.text);
   return {
@@ -363,10 +368,9 @@ async function collectPersonWikipedia(row: CandidateRow): Promise<EvidenceRow | 
   if (canonicalUrl === undefined || !isWikipediaHost(canonicalUrl)) {
     throw new SkipReason('person row has no wikipedia canonicalUrl to anchor identity');
   }
-  const title = decodeURIComponent(new URL(canonicalUrl).pathname.replace(/^\/wiki\//u, '')).replace(
-    /_/gu,
-    ' ',
-  );
+  const title = decodeURIComponent(
+    new URL(canonicalUrl).pathname.replace(/^\/wiki\//u, ''),
+  ).replace(/_/gu, ' ');
 
   const article = await lookupWikipediaArticleByTitle(title);
   if (article === null) throw new SkipReason(`wikipedia has no article at title "${title}"`);
@@ -428,7 +432,9 @@ async function collectReferenceHops(
     .filter((item) => item.collector === 'wikipedia' || item.collector === 'person-wikipedia')
     .map((item) => ({ url: item.sourceUrl, sourceId: item.id }));
   if (seeds.length === 0) {
-    throw new SkipReason('no seed page with a fetchable reference list (wikipedia collectors only)');
+    throw new SkipReason(
+      'no seed page with a fetchable reference list (wikipedia collectors only)',
+    );
   }
 
   const subject: HopSubject = {
@@ -453,7 +459,11 @@ async function collectReferenceHops(
   const results: EvidenceRow[] = [];
   const leads: { url: string; anchorText: string }[] = [];
 
-  for (let depth = 1; depth <= DEFAULT_MAX_DEPTH && remainingFetches > 0 && frontier.length > 0; depth++) {
+  for (
+    let depth = 1;
+    depth <= DEFAULT_MAX_DEPTH && remainingFetches > 0 && frontier.length > 0;
+    depth++
+  ) {
     const nextFrontier: typeof seeds = [];
     for (const seed of frontier) {
       if (remainingFetches <= 0) break;
@@ -461,9 +471,18 @@ async function collectReferenceHops(
       if (seedPage === undefined) continue;
 
       const candidates = extractReferenceLinks(seedPage.html, seedPage.finalUrl);
-      const plan = planReferenceHops({ candidates, subject, visited, capturedHosts, remainingFetches });
+      const plan = planReferenceHops({
+        candidates,
+        subject,
+        visited,
+        capturedHosts,
+        remainingFetches,
+      });
       leads.push(
-        ...plan.leads.map((candidate) => ({ url: candidate.url, anchorText: candidate.anchorText })),
+        ...plan.leads.map((candidate) => ({
+          url: candidate.url,
+          anchorText: candidate.anchorText,
+        })),
       );
 
       for (const hop of plan.follow) {
@@ -473,7 +492,9 @@ async function collectReferenceHops(
         if (key !== null) visited.add(key);
 
         await sleep(FETCH_DELAY_MS);
-        const hopPage = await safeFetchPage(hop.candidate.url, { allowedContentTypes: ['text/html'] });
+        const hopPage = await safeFetchPage(hop.candidate.url, {
+          allowedContentTypes: ['text/html'],
+        });
         if (hopPage === undefined) continue;
 
         const quality = assessText(hopPage.text);
@@ -504,9 +525,12 @@ async function collectReferenceHops(
             hopDepth: depth,
             referringSourceId: seed.sourceId,
             relevanceScore: hop.relevanceScore,
-            quarantineReason: status === 'quarantined'
-              ? (!identityCorroborated ? 'identity not corroborated by subject text' : quality.reason)
-              : undefined,
+            quarantineReason:
+              status === 'quarantined'
+                ? !identityCorroborated
+                  ? 'identity not corroborated by subject text'
+                  : quality.reason
+                : undefined,
           },
         };
         results.push(evRow);

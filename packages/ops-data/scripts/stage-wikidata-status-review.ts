@@ -29,13 +29,16 @@
  * Apply inserts:
  *   DRY_RUN=0 STAGE_WIKIDATA_STATUS_REVIEW_APPLY=1 ...
  *
- * Outputs:
- *   /tmp/wikidata-status-review-report.json  (all attempts)
- *   /tmp/wikidata-status-review-verdicts.tsv (apply-death-review-verdicts.ts input; verdict
- *   column pre-filled 'approve' only for high-confidence rows, else 'reject' with empty
- *   true_death_year so the apply script quarantines nothing silently — operator edits before use)
+ * Outputs (default .cache/wikidata-status-review/, override via WIKIDATA_STATUS_REVIEW_REPORT /
+ * WIKIDATA_STATUS_REVIEW_TSV):
+ *   report.json   (all attempts)
+ *   verdicts.tsv  (apply-death-review-verdicts.ts input; verdict column pre-filled 'approve'
+ *   only for high-confidence rows, else 'reject' with empty true_death_year so the apply script
+ *   quarantines nothing silently — operator edits before use)
  */
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
@@ -43,10 +46,18 @@ const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.STAGE_WIKIDATA_STATUS_REVIEW_APPLY === '1';
 const LANE = 'living-status-review' as const;
 const PROGRAM_ID = 'wikidata-status-review' as const;
+/**
+ * Defaults live under the repo's own .cache/ (same pattern as enrich-entities-llm.ts's
+ * REPORT_DIR), not the shared system /tmp — a predictable path in a world-writable directory is
+ * an insecure-temp-file pattern (symlink/race risk) that a raw /tmp default invites.
+ */
+const REPORT_DIR = join(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../.cache/wikidata-status-review',
+);
 const REPORT_PATH =
-  process.env.WIKIDATA_STATUS_REVIEW_REPORT?.trim() || '/tmp/wikidata-status-review-report.json';
-const TSV_PATH =
-  process.env.WIKIDATA_STATUS_REVIEW_TSV?.trim() || '/tmp/wikidata-status-review-verdicts.tsv';
+  process.env.WIKIDATA_STATUS_REVIEW_REPORT?.trim() || join(REPORT_DIR, 'report.json');
+const TSV_PATH = process.env.WIKIDATA_STATUS_REVIEW_TSV?.trim() || join(REPORT_DIR, 'verdicts.tsv');
 const FETCH_DELAY_MS = Number(process.env.WIKIDATA_FETCH_DELAY_MS ?? 400);
 
 type PersonRow = {
@@ -301,19 +312,25 @@ async function main(): Promise<void> {
     };
     console.log(JSON.stringify(counts, null, 2));
 
+    mkdirSync(dirname(REPORT_PATH), { recursive: true });
+    mkdirSync(dirname(TSV_PATH), { recursive: true });
     writeFileSync(REPORT_PATH, JSON.stringify({ counts, attempts }, null, 2));
     const tsvHeader =
       'entity_id\tdisplay_name\tmined_year\tmined_signal\tverdict\ttrue_death_year\tconfidence\treason';
+    // Wikidata-sourced strings (label/description feed displayName/reason) are untrusted input —
+    // strip tabs/newlines before joining so a stray control character can never shift a column in
+    // the TSV that apply-death-review-verdicts.ts parses by splitting on '\t'.
+    const tsvField = (value: string): string => value.replace(/[\t\r\n]+/g, ' ').trim();
     const tsvLines = staged.map((a) =>
       [
-        a.entityId,
-        a.displayName,
+        tsvField(a.entityId),
+        tsvField(a.displayName),
         String(a.deathYear ?? ''),
         'wikidata_p570',
         a.confidence === 'high' ? 'approve' : 'reject',
         '',
         a.confidence ?? 'low',
-        `${a.reason ?? ''} (${a.qid}; birth ${a.birthYear ?? '?'})`,
+        tsvField(`${a.reason ?? ''} (${a.qid}; birth ${a.birthYear ?? '?'})`),
       ].join('\t'),
     );
     writeFileSync(TSV_PATH, [tsvHeader, ...tsvLines].join('\n') + '\n');

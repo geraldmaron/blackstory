@@ -137,7 +137,13 @@ export async function lookupWikipediaArticleByTitle(
   fetchImpl: typeof fetch = fetch,
 ): Promise<WikipediaArticle | null> {
   const extractRaw = await apiGet(
-    { action: 'query', prop: 'extracts', explaintext: '1', exsectionformat: 'plain', titles: title },
+    {
+      action: 'query',
+      prop: 'extracts',
+      explaintext: '1',
+      exsectionformat: 'plain',
+      titles: title,
+    },
     fetchImpl,
   );
   const found = readExtract(extractRaw);

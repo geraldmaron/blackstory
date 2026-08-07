@@ -73,7 +73,7 @@ const citationSchema = {
   required: ['evidenceId', 'quote'],
   properties: {
     evidenceId: { type: 'string' },
-    quote: { type: 'string', description: 'Exact substring copied from that evidence id\'s text.' },
+    quote: { type: 'string', description: "Exact substring copied from that evidence id's text." },
   },
 } as const;
 
@@ -121,7 +121,7 @@ export const ENTITY_ENRICHMENT_SYSTEM_PROMPT =
   'You write short factual entries for a Black history catalog, using ONLY the evidence documents ' +
   'supplied in the user message. State only facts present in that evidence. Every sentence of fact ' +
   'in "summary" and "historicalContext" must be traceable to at least one citation whose quote is ' +
-  'copied verbatim from a supplied evidence document\'s text. Never invent dates, names, events, or ' +
+  "copied verbatim from a supplied evidence document's text. Never invent dates, names, events, or " +
   'quotes not present in the evidence. If the evidence does not support a historicalContext ' +
   'paragraph beyond the summary, return null for it and an empty citations array rather than padding ' +
   'with generic prose. Privacy: never state a street address, house number, coordinate pair, or ' +
@@ -150,7 +150,7 @@ export function buildEnrichmentUserPrompt(
       rules: [
         `summary must be ${SUMMARY_MIN_CHARS}-${SUMMARY_MAX_CHARS} characters`,
         'every citation.evidenceId must be one of the ids in the evidence array above',
-        'every citation.quote must be an exact verbatim substring of that evidence id\'s text',
+        "every citation.quote must be an exact verbatim substring of that evidence id's text",
         'topicIds must only use ids from allowedTopicIds; omit if none clearly apply',
         'eraBuckets must be decade labels ("1950s") grounded in a year present in the evidence',
         'if evidence is too thin for historicalContext, set it to null and historicalContextCitations to []',
@@ -209,21 +209,24 @@ export function createMockEnrichmentProvider(): LlmProvider {
       } catch {
         subject = {};
       }
-      const displayName = typeof subject.displayName === 'string' ? subject.displayName : 'This entity';
+      const displayName =
+        typeof subject.displayName === 'string' ? subject.displayName : 'This entity';
       const firstEvidence = Array.isArray(subject.evidence)
         ? (subject.evidence[0] as { id?: unknown; text?: unknown } | undefined)
         : undefined;
       const evidenceId = typeof firstEvidence?.id === 'string' ? firstEvidence.id : 'ev_mock';
       const evidenceText = typeof firstEvidence?.text === 'string' ? firstEvidence.text : '';
       const quote = evidenceText.slice(0, 60).trim();
-      const filler =
-        `${displayName} is documented in the supplied evidence. `.repeat(6).slice(0, SUMMARY_MAX_CHARS - 1);
+      const filler = `${displayName} is documented in the supplied evidence. `
+        .repeat(6)
+        .slice(0, SUMMARY_MAX_CHARS - 1);
       const summary = quote.length > 0 ? `${quote} ${filler}`.slice(0, SUMMARY_MAX_CHARS) : filler;
       const paddedSummary =
         summary.length < SUMMARY_MIN_CHARS ? summary.padEnd(SUMMARY_MIN_CHARS, '.') : summary;
       const payload = {
         summary: paddedSummary,
-        summaryCitations: quote.length > 0 ? [{ evidenceId, quote }] : [{ evidenceId, quote: filler.slice(0, 20) }],
+        summaryCitations:
+          quote.length > 0 ? [{ evidenceId, quote }] : [{ evidenceId, quote: filler.slice(0, 20) }],
         historicalContext: null,
         historicalContextCitations: [],
         topicIds: [],
@@ -335,7 +338,9 @@ function checkNoAddressTokens(text: string | null, errors: string[], fieldLabel:
   if (text === null || text.length === 0) return;
   const { redactionCount } = redactStreetAddresses(text);
   if (redactionCount > 0) {
-    errors.push(`${fieldLabel}: contains ${redactionCount} address-shaped token(s), must not publish`);
+    errors.push(
+      `${fieldLabel}: contains ${redactionCount} address-shaped token(s), must not publish`,
+    );
   }
 }
 
@@ -352,14 +357,20 @@ export function validateEnrichmentResponse(
     // every raw-content source — API or session — is held to one parsing rule, not one per caller.
     payload = JSON.parse(stripMarkdownCodeFence(rawContent)) as RawDraft;
   } catch {
-    return { subject, rawContent, validation: { ok: false, errors: ['response is not valid JSON'] } };
+    return {
+      subject,
+      rawContent,
+      validation: { ok: false, errors: ['response is not valid JSON'] },
+    };
   }
 
   const errors: string[] = [];
   const summary = typeof payload.summary === 'string' ? payload.summary : '';
   if (typeof payload.summary !== 'string') errors.push('summary is missing or not a string');
   if (summary.length < SUMMARY_MIN_CHARS || summary.length > SUMMARY_MAX_CHARS) {
-    errors.push(`summary length ${summary.length} outside [${SUMMARY_MIN_CHARS}, ${SUMMARY_MAX_CHARS}]`);
+    errors.push(
+      `summary length ${summary.length} outside [${SUMMARY_MIN_CHARS}, ${SUMMARY_MAX_CHARS}]`,
+    );
   }
 
   const summaryCitations = parseCitations(payload.summaryCitations, errors, 'summaryCitations');
@@ -377,19 +388,30 @@ export function validateEnrichmentResponse(
     errors,
     'historicalContextCitations',
   );
-  if (typeof historicalContext === 'string' && historicalContext.length > 0 && historicalContextCitations.length === 0) {
+  if (
+    typeof historicalContext === 'string' &&
+    historicalContext.length > 0 &&
+    historicalContextCitations.length === 0
+  ) {
     errors.push('historicalContext has prose but no citations');
   }
 
   const evidenceById = new Map(subject.evidence.map((item) => [item.id, item]));
   validateCitationsAnchor(summaryCitations, evidenceById, 'summaryCitations', errors);
-  validateCitationsAnchor(historicalContextCitations, evidenceById, 'historicalContextCitations', errors);
+  validateCitationsAnchor(
+    historicalContextCitations,
+    evidenceById,
+    'historicalContextCitations',
+    errors,
+  );
 
   const rawTopicIds = parseStringArray(payload.topicIds, errors, 'topicIds');
   const topicIds = rawTopicIds.filter((id) => isValidTopicId(id));
   const invalidTopicIds = rawTopicIds.filter((id) => !isValidTopicId(id));
   if (invalidTopicIds.length > 0) {
-    errors.push(`topicIds contains ids outside the controlled vocabulary: ${invalidTopicIds.join(', ')}`);
+    errors.push(
+      `topicIds contains ids outside the controlled vocabulary: ${invalidTopicIds.join(', ')}`,
+    );
   }
   for (const id of topicIds) {
     if (!allowedTopicIds.includes(id)) {
@@ -403,7 +425,9 @@ export function validateEnrichmentResponse(
   );
   const invalidEraBuckets = rawEraBuckets.filter((label) => !eraBuckets.includes(label));
   if (invalidEraBuckets.length > 0) {
-    errors.push(`eraBuckets contains invalid or future decade labels: ${invalidEraBuckets.join(', ')}`);
+    errors.push(
+      `eraBuckets contains invalid or future decade labels: ${invalidEraBuckets.join(', ')}`,
+    );
   }
 
   const keywords = parseStringArray(payload.keywords, errors, 'keywords');

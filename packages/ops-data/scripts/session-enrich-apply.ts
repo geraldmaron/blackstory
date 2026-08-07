@@ -35,7 +35,8 @@ const REVIEW_SAMPLE_RATE = Number.parseFloat(
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.ENRICH_ENTITIES_LLM_APPLY === '1';
 /** Records who actually drafted this — never a metered API model id, so cost stays honest. */
-const SESSION_MODEL_ID = process.env.SESSION_ENRICH_MODEL_ID?.trim() || 'claude-haiku-4-5-20251001-session';
+const SESSION_MODEL_ID =
+  process.env.SESSION_ENRICH_MODEL_ID?.trim() || 'claude-haiku-4-5-20251001-session';
 
 const ALLOWED_TOPIC_IDS = TOPIC_REGISTRY.map((topic) => topic.id);
 
@@ -47,7 +48,9 @@ function flag(name: string, fallback: string): string {
 type Answer = { readonly entityId: string; readonly rawContent: string };
 
 function loadAnswers(path: string): readonly Answer[] {
-  const lines = readFileSync(path, 'utf8').split('\n').filter((line) => line.trim().length > 0);
+  const lines = readFileSync(path, 'utf8')
+    .split('\n')
+    .filter((line) => line.trim().length > 0);
   return lines.map((line, index) => {
     const parsed = JSON.parse(line) as { entityId?: unknown; rawContent?: unknown };
     if (typeof parsed.entityId !== 'string' || typeof parsed.rawContent !== 'string') {
@@ -73,7 +76,9 @@ async function main(): Promise<void> {
   );
   const subjectById = new Map(subjects.map((subject) => [subject.entityId, subject]));
   if (skippedNoEvidence.length > 0) {
-    console.log(`Skipping ${skippedNoEvidence.length} answer(s) with no captured evidence: ${skippedNoEvidence.join(', ')}`);
+    console.log(
+      `Skipping ${skippedNoEvidence.length} answer(s) with no captured evidence: ${skippedNoEvidence.join(', ')}`,
+    );
   }
 
   type Result = {
@@ -108,7 +113,9 @@ async function main(): Promise<void> {
   console.log(`Model recorded: ${SESSION_MODEL_ID} (cost_usd=0, session-drafted)`);
 
   if (DRY_RUN || !APPLY) {
-    console.log('\nDRY_RUN=1 (default): no ledger writes. Set DRY_RUN=0 ENRICH_ENTITIES_LLM_APPLY=1 to apply.');
+    console.log(
+      '\nDRY_RUN=1 (default): no ledger writes. Set DRY_RUN=0 ENRICH_ENTITIES_LLM_APPLY=1 to apply.',
+    );
     await pool.end();
     return;
   }
@@ -126,7 +133,9 @@ async function main(): Promise<void> {
       });
     }
     await client.query('COMMIT');
-    console.log(`\nApplied: ${results.length} ledger row(s) updated (${accepted.length} enriched, ${rejected.length} quarantined).`);
+    console.log(
+      `\nApplied: ${results.length} ledger row(s) updated (${accepted.length} enriched, ${rejected.length} quarantined).`,
+    );
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
     throw error;

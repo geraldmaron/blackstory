@@ -480,8 +480,7 @@ function normalizeProse(text: string): string {
 }
 
 export type DepthAssessment =
-  | { readonly deep: true }
-  | { readonly deep: false; readonly detail: string };
+  { readonly deep: true } | { readonly deep: false; readonly detail: string };
 
 /**
  * Rejects rows that carry nothing a reader could not get from the registry index entry itself.

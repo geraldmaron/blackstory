@@ -55,7 +55,11 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { TOPIC_REGISTRY } from '@repo/domain';
-import { createLaneProvider, withLaneMetadata, type RoutedCompletion } from '../../operator-cli/src/model-routing.ts';
+import {
+  createLaneProvider,
+  withLaneMetadata,
+  type RoutedCompletion,
+} from '../../operator-cli/src/model-routing.ts';
 import {
   createHybridLlmProvider,
   createOpenRouterLlmProvider,
@@ -131,7 +135,9 @@ const SESSION_ANSWERS_PATH = flag('session-answers', '');
 function loadSessionAnswers(path: string): ReadonlyMap<string, string> {
   if (!path) return new Map();
   const answers = new Map<string, string>();
-  const lines = readFileSync(path, 'utf8').split('\n').filter((line) => line.trim().length > 0);
+  const lines = readFileSync(path, 'utf8')
+    .split('\n')
+    .filter((line) => line.trim().length > 0);
   for (const [index, line] of lines.entries()) {
     const parsed = JSON.parse(line) as { entityId?: unknown; rawContent?: unknown };
     if (typeof parsed.entityId !== 'string' || typeof parsed.rawContent !== 'string') {
@@ -142,7 +148,10 @@ function loadSessionAnswers(path: string): ReadonlyMap<string, string> {
   return answers;
 }
 
-const REPORT_DIR = join(dirname(fileURLToPath(import.meta.url)), '../../../.cache/entity-enrichment-llm');
+const REPORT_DIR = join(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../.cache/entity-enrichment-llm',
+);
 
 type LedgerRow = {
   readonly entity_id: string;
@@ -237,7 +246,9 @@ async function main(): Promise<void> {
   const provider = resolveProvider();
   const routed = withLaneMetadata('entity-depth-enrichment', provider);
   const model =
-    PROVIDER_NAME === 'mock' ? 'mock-entity-enrichment-v1' : (process.env.OPENROUTER_MODEL?.trim() ?? '');
+    PROVIDER_NAME === 'mock'
+      ? 'mock-entity-enrichment-v1'
+      : (process.env.OPENROUTER_MODEL?.trim() ?? '');
 
   console.log(`Provider: ${provider.id} (${PROVIDER_NAME})`);
   console.log(`Subjects with evidence: ${subjects.length}`);
@@ -254,7 +265,9 @@ async function main(): Promise<void> {
 
   const sessionAnswers = loadSessionAnswers(SESSION_ANSWERS_PATH);
   if (SESSION_ANSWERS_PATH) {
-    console.log(`Tier 0: ${sessionAnswers.size} session answer(s) loaded from ${SESSION_ANSWERS_PATH}`);
+    console.log(
+      `Tier 0: ${sessionAnswers.size} session answer(s) loaded from ${SESSION_ANSWERS_PATH}`,
+    );
   }
   const meteredRetryProvider = resolveMeteredRetryProvider();
   const meteredRouted =
@@ -385,7 +398,10 @@ async function main(): Promise<void> {
 
   const accepted = completedResults.filter((result) => result.attempt.validation.ok);
   const rejected = completedResults.filter((result) => !result.attempt.validation.ok);
-  const totalCost = completedResults.reduce((sum, result) => sum + result.completion.costUsdEstimate, 0);
+  const totalCost = completedResults.reduce(
+    (sum, result) => sum + result.completion.costUsdEstimate,
+    0,
+  );
   const sampled = accepted.filter((result) => result.reviewSample);
 
   console.log(`\nAccepted: ${accepted.length}`);
@@ -493,7 +509,9 @@ async function main(): Promise<void> {
       });
     }
     await client.query('COMMIT');
-    console.log(`\nApplied: ${completedResults.length} ledger row(s) updated (${accepted.length} enriched, ${rejected.length} quarantined).`);
+    console.log(
+      `\nApplied: ${completedResults.length} ledger row(s) updated (${accepted.length} enriched, ${rejected.length} quarantined).`,
+    );
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
     throw error;

@@ -7,7 +7,11 @@
  */
 import { createHash } from 'node:crypto';
 import type pg from 'pg';
-import { ENTITY_ENRICHMENT_SCHEMA_ID, ENTITY_ENRICHMENT_SCHEMA_VERSION, type EnrichmentAttempt } from './entity-enrichment-llm.ts';
+import {
+  ENTITY_ENRICHMENT_SCHEMA_ID,
+  ENTITY_ENRICHMENT_SCHEMA_VERSION,
+  type EnrichmentAttempt,
+} from './entity-enrichment-llm.ts';
 
 /**
  * repo-n7p6.16 item 5: deterministic random-sample selector for passing outputs. Hash-based

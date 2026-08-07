@@ -179,7 +179,9 @@ async function main(): Promise<void> {
     if (before.rows.length !== ENTITY_IDS.length) {
       const found = new Set(before.rows.map((r) => r.entity_id));
       const missing = ENTITY_IDS.filter((id) => !found.has(id));
-      console.error(`Expected ${ENTITY_IDS.length} rows, found ${before.rows.length}. Missing: ${missing.join(', ')}`);
+      console.error(
+        `Expected ${ENTITY_IDS.length} rows, found ${before.rows.length}. Missing: ${missing.join(', ')}`,
+      );
       process.exit(1);
     }
 
@@ -198,7 +200,9 @@ async function main(): Promise<void> {
         JSON.stringify(claims),
         JSON.stringify(claimIds),
       ]);
-      console.log(`${entityId}: updated ${result.rowCount ?? 0} row(s), ${claims.length} claim(s).`);
+      console.log(
+        `${entityId}: updated ${result.rowCount ?? 0} row(s), ${claims.length} claim(s).`,
+      );
     }
 
     const after = await client.query<{ entity_id: string; claims: unknown; claim_ids: unknown }>(

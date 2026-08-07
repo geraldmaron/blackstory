@@ -62,10 +62,16 @@ function selectEvidenceForModel(rows: readonly EvidenceRow[]): EnrichmentSubject
 }
 
 /** Same digest formula sweep-entity-evidence.ts uses, so "unchanged since WS3" is comparable. */
-export function evidenceDigestFor(rows: readonly { readonly content_hash: string | null }[]): string | null {
-  const hashes = rows.map((row) => row.content_hash).filter((hash): hash is string => hash !== null);
+export function evidenceDigestFor(
+  rows: readonly { readonly content_hash: string | null }[],
+): string | null {
+  const hashes = rows
+    .map((row) => row.content_hash)
+    .filter((hash): hash is string => hash !== null);
   if (hashes.length === 0) return null;
-  return createHash('sha256').update([...hashes].sort().join('|')).digest('hex');
+  return createHash('sha256')
+    .update([...hashes].sort().join('|'))
+    .digest('hex');
 }
 
 export type FetchedSubject = EnrichmentSubject & { readonly evidenceDigest: string | null };

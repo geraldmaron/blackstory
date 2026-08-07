@@ -63,7 +63,8 @@ export type PlannedHop = {
 
 export type HopRejection = {
   readonly candidate: HopCandidate;
-  readonly reason: 'off_policy' | 'bridge_source' | 'already_visited' | 'not_relevant' | 'unparseable';
+  readonly reason:
+    'off_policy' | 'bridge_source' | 'already_visited' | 'not_relevant' | 'unparseable';
 };
 
 export type HopPlan = {
@@ -175,7 +176,12 @@ export function extractReferenceLinks(html: string, baseUrl: string): readonly H
   for (const match of html.matchAll(anchorRe)) {
     const href = match[1];
     const inner = match[2] ?? '';
-    if (href === undefined || href.startsWith('#') || href.startsWith('javascript:')) continue;
+    if (
+      href === undefined ||
+      href.startsWith('#') ||
+      /^\s*(javascript|data|vbscript):/iu.test(href)
+    )
+      continue;
 
     let absolute: string;
     try {
@@ -187,7 +193,10 @@ export function extractReferenceLinks(html: string, baseUrl: string): readonly H
     if (key === null || seen.has(key)) continue;
     seen.add(key);
 
-    const anchorText = inner.replace(/<[^>]*>/gu, ' ').replace(/\s+/gu, ' ').trim();
+    const anchorText = inner
+      .replace(/<[^>]*>/gu, ' ')
+      .replace(/\s+/gu, ' ')
+      .trim();
     // Context window around the anchor: enough to catch "…the Tri-State Bank, see [12]…".
     const at = match.index ?? 0;
     const context = html
