@@ -3,6 +3,13 @@
     python3 packages/ops-data/scripts/build-presidents-fixture.py \
       packages/ops-data/fixtures/articles/presidents.ts
 
+Entries are emitted at status `published`, which is what they are. Emitting `review` here
+would mean every rebuild silently demoted the whole live series: `apply` writes the
+fixture's declared status over whatever is in the table, and `project` then drops anything
+not published out of the release. Publishing from the fixture also means each rebuild
+re-runs the strict published gates (T4 sources, the prose floor and uncited call-outs are
+hard errors there, warnings below), so a regression cannot reach the release quietly.
+
 Reads every group-*.json in ../fixtures/articles/presidents-research/. Those files are the
 Layer-1 research record: each fact with the URL actually fetched for it and a verbatim
 quote, per docs/methodology/chapter-fact-validation.md. They are kept in the repo because
@@ -163,12 +170,12 @@ def build(president: dict) -> str:
     id: 'article_potus_{number:02d}_{slug.replace('-', '_')}',
     slug: '{slug}',
     kind: 'article' as const,
-    title: '{esc(name)}',
+    title: 'President: {esc(name)}',
     summary: '{esc(president['summary'])}',
     eraLabel: '{esc(president['termLabel'])}',
     placeLabel: 'United States',
     publishedAt: '2026-08-07',
-    status: 'review' as const,
+    status: 'published' as const,
     series: {{
       id: 'presidents',
       label: 'The presidents on the record',
