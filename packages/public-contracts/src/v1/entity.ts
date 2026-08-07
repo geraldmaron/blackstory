@@ -141,7 +141,20 @@ export const entityV1Schema = z.object({
   locationPrecision: locationPrecisionSchema,
   locationLabel: nonEmptyText(300),
   relevanceExplanation: nonEmptyText(4000),
-  historicalContext: nonEmptyText(4000),
+  /**
+   * Always present, but MAY be empty. "No historical context has been written for this record
+   * yet" is a real, honest state for a registry listing, and the field is how a client learns it.
+   *
+   * This was `nonEmptyText(4000)` until repo-n7p6.6. The effect was not a stricter contract, it
+   * was a silent outage: `mapProjectionToEntityV1` deliberately emits `''` rather than substituting
+   * build-status prose, so every record without written context failed validation and the handler
+   * — which cannot distinguish an unmappable projection from a missing one — served it as 404.
+   * That was 2,667 of the 4,094 entities in the active release, 65% of the published catalog.
+   * Clients already treat it as possibly-empty (`apps/mobile`'s entity normalizer defaults it to
+   * `''` and its narrative section renders only when non-blank), so allowing the empty string
+   * describes what the field already meant.
+   */
+  historicalContext: z.string().max(4000),
   extendedNarrative: z.string().max(20_000).optional(),
   primaryImage: mediaV1Schema.optional(),
   recordMaturity: nonEmptyText(100),

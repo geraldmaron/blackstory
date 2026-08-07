@@ -323,8 +323,17 @@ export {
   RELATIONSHIP_CANDIDATE_TYPES,
   RELATIONSHIP_CANDIDATE_REASONS,
   proposeRelationshipCandidates,
+  UNDATED_LABEL,
+  humanizeToken,
+  relationshipSentence,
+  inferDatePrecision,
+  isUndatedTimelineEntry,
+  buildGraphTimeline,
 } from './graph/index.js';
 export type {
+  GraphTimelineEntry,
+  TimelineRelatedEntry,
+  TimelineSourceEntity,
   ContainmentRelationshipType,
   ContainmentEdgeInput,
   ContainmentEntityInput,
