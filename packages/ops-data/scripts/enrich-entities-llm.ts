@@ -24,6 +24,10 @@
  * Provider (default mock — no network, no cost):
  *   ENRICH_ENTITIES_LLM_PROVIDER=mock|openrouter|ollama|hybrid
  *
+ * Spend ceiling (repo-n7p6.16 item 3): once cumulative metered cost for this batch reaches
+ * ENRICH_ENTITIES_LLM_SPEND_CEILING_USD (default 3), no further model calls are started —
+ * remaining subjects are skipped and reported, not silently dropped.
+ *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a
  *   export DATABASE_SSL=1
@@ -71,6 +75,18 @@ function flag(name: string, fallback: string): string {
   const hit = process.argv.find((arg) => arg.startsWith(`--${name}=`));
   return hit === undefined ? fallback : hit.slice(name.length + 3);
 }
+
+/**
+ * repo-n7p6.16 item 3: a hard ceiling on cumulative metered spend for this batch, enforced in
+ * code rather than relying on an operator watching the console total. Checked before each call
+ * starts, not after, so it can only ever ABORT further calls — it never cancels one in flight.
+ * With CONCURRENCY calls able to be in flight when the ceiling is crossed, actual spend can
+ * overshoot the ceiling by at most (CONCURRENCY - 1) call costs; that bound is acceptable for a
+ * batch of small per-call costs and is logged explicitly when it happens.
+ */
+const SPEND_CEILING_USD = Number.parseFloat(
+  process.env.ENRICH_ENTITIES_LLM_SPEND_CEILING_USD?.trim() || '3',
+);
 
 const LANES = flag('lanes', '')
   .split(',')
@@ -175,10 +191,22 @@ async function main(): Promise<void> {
   };
 
   let completedCount = 0;
+  let cumulativeCostUsd = 0;
+  const skippedForCeiling: string[] = [];
   const startedAt = Date.now();
-  const results = await mapPool(subjects, CONCURRENCY, async (subject): Promise<Result> => {
+  const results = await mapPool(subjects, CONCURRENCY, async (subject): Promise<Result | null> => {
+    if (cumulativeCostUsd >= SPEND_CEILING_USD) {
+      skippedForCeiling.push(subject.entityId);
+      completedCount += 1;
+      console.log(
+        `[${completedCount}/${subjects.length}] ${subject.entityId} — SKIPPED — ` +
+          `spend ceiling reached ($${cumulativeCostUsd.toFixed(4)} >= $${SPEND_CEILING_USD.toFixed(2)})`,
+      );
+      return null;
+    }
     const request = buildEnrichmentRequest(subject, ALLOWED_TOPIC_IDS, model);
     const completion = await routed.complete(request);
+    cumulativeCostUsd += completion.costUsdEstimate;
     const attempt = validateEnrichmentResponse(subject, ALLOWED_TOPIC_IDS, completion.content);
     // Dry run must mean zero DB writes, full stop — model_invocations logging (like ledger
     // writes below) only happens on an actual apply, same boundary as extract-claim-date-
@@ -209,19 +237,29 @@ async function main(): Promise<void> {
     return { subject, attempt, completion };
   });
 
-  const accepted = results.filter((result) => result.attempt.validation.ok);
-  const rejected = results.filter((result) => !result.attempt.validation.ok);
-  const totalCost = results.reduce((sum, result) => sum + result.completion.costUsdEstimate, 0);
+  if (skippedForCeiling.length > 0) {
+    console.log(
+      `\nSpend ceiling reached: skipped ${skippedForCeiling.length}/${subjects.length} ` +
+        `entit(ies) (final cumulative cost $${cumulativeCostUsd.toFixed(4)} vs ` +
+        `$${SPEND_CEILING_USD.toFixed(2)} ceiling): ${skippedForCeiling.slice(0, 10).join(', ')}` +
+        `${skippedForCeiling.length > 10 ? '…' : ''}`,
+    );
+  }
+  const completedResults = results.filter((result): result is Result => result !== null);
+
+  const accepted = completedResults.filter((result) => result.attempt.validation.ok);
+  const rejected = completedResults.filter((result) => !result.attempt.validation.ok);
+  const totalCost = completedResults.reduce((sum, result) => sum + result.completion.costUsdEstimate, 0);
 
   console.log(`\nAccepted: ${accepted.length}`);
   console.log(`Quarantined: ${rejected.length}`);
-  if (results.length > 0) {
-    const rate = ((rejected.length / results.length) * 100).toFixed(1);
+  if (completedResults.length > 0) {
+    const rate = ((rejected.length / completedResults.length) * 100).toFixed(1);
     console.log(`Quarantine rate: ${rate}%`);
   }
   console.log(
     `Total cost (this batch): $${totalCost.toFixed(4)} ` +
-      `($${(totalCost / Math.max(1, results.length)).toFixed(5)}/entity avg)`,
+      `($${(totalCost / Math.max(1, completedResults.length)).toFixed(5)}/entity avg)`,
   );
 
   for (const result of accepted.slice(0, 5)) {
@@ -255,8 +293,10 @@ async function main(): Promise<void> {
         subjectCount: subjects.length,
         acceptedCount: accepted.length,
         quarantinedCount: rejected.length,
+        skippedForSpendCeiling: skippedForCeiling,
+        spendCeilingUsd: SPEND_CEILING_USD,
         totalCostUsdEstimate: totalCost,
-        results: results.map((result) => ({
+        results: completedResults.map((result) => ({
           entityId: result.subject.entityId,
           displayName: result.subject.displayName,
           modelId: result.completion.modelId,
@@ -284,7 +324,7 @@ async function main(): Promise<void> {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    for (const result of results) {
+    for (const result of completedResults) {
       await applyEnrichmentResult(client, {
         entityId: result.subject.entityId,
         attempt: result.attempt,
@@ -293,7 +333,7 @@ async function main(): Promise<void> {
       });
     }
     await client.query('COMMIT');
-    console.log(`\nApplied: ${results.length} ledger row(s) updated (${accepted.length} enriched, ${rejected.length} quarantined).`);
+    console.log(`\nApplied: ${completedResults.length} ledger row(s) updated (${accepted.length} enriched, ${rejected.length} quarantined).`);
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
     throw error;

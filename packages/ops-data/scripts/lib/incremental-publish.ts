@@ -5,6 +5,7 @@
 import {
   US_STATES,
   buildReleaseEntityArtifacts,
+  normalizeReleaseClaims,
   normalizeReleaseRelated,
   type CanonicalStatusSnapshot,
   type ReleaseEntityProjectionFields,
@@ -660,6 +661,7 @@ export function toReleaseEntityRow(
   projection: ReleaseEntityProjectionFields,
 ): ReleaseEntityUpsertRow {
   const related = normalizeReleaseRelated(projection.related);
+  const claims = normalizeReleaseClaims(projection.claims);
   return {
     release_id: projection.releaseId,
     entity_id: projection.id,
@@ -670,7 +672,7 @@ export function toReleaseEntityRow(
     geohash: projection.location.geohash,
     lat: projection.location.lat,
     lng: projection.location.lng,
-    claims: projection.claims,
+    claims,
     taxonomy: {
       topicTags: projection.topicTags,
       topicIds: projection.topicIds,

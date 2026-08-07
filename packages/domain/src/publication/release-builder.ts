@@ -735,6 +735,19 @@ export function normalizeReleaseRelated(
 }
 
 /**
+ * Ensures claims is always an array at the write boundary, never a legacy `{}` object
+ * (repo-n7p6.14: four seed rows reached bb_public.release_entities with `claims: {}`, which
+ * jsonb_array_length/.map consumers can't handle). buildClaimProjections already always returns
+ * an array, so this only guards a write path that bypasses it — same shape as
+ * normalizeReleaseRelated above.
+ */
+export function normalizeReleaseClaims(
+  claims: readonly ReleaseClaimProjection[] | undefined,
+): readonly ReleaseClaimProjection[] {
+  return Array.isArray(claims) ? claims : [];
+}
+
+/**
  * The single deterministic release/projection builder (the related workstream). Given one source entry,
  * produces BOTH the entity-projection fields and the search-index fields from the same claims,
  * notabilityBasis, and researchCoverage never two independently-recomputed copies. Fails closed
