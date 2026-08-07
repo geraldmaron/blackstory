@@ -23,7 +23,7 @@ export type SurfaceClass = 'instrument' | 'reading' | 'record' | 'utility';
 
 /**
  * Exact-path membership. Checked before {@link SURFACE_CLASS_PREFIXES} so that a specific child
- * (`/chapters/mosaic-credits` is Utility) can never be swallowed by its parent's prefix rule.
+ * (`/stories/mosaic-credits` is Utility) can never be swallowed by its parent's prefix rule.
  */
 const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
   // Instrument — the map is the content. Story is a mode of `/`, not a path of its own, so it is
@@ -35,7 +35,7 @@ const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
   // is the same measure-limited column on paper, so it is a Reading room and not a fifth class.
   ['/library', 'reading'],
   ['/records', 'reading'],
-  ['/chapters', 'reading'],
+  ['/stories', 'reading'],
   ['/books', 'reading'],
   ['/law', 'reading'],
   ['/data', 'reading'],
@@ -45,7 +45,7 @@ const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
   ['/errata', 'reading'],
 
   // Utility — task surfaces, finished and left.
-  ['/chapters/mosaic-credits', 'utility'],
+  ['/stories/mosaic-credits', 'utility'],
   ['/corrections', 'utility'],
   ['/submit', 'utility'],
   ['/support', 'utility'],
@@ -56,14 +56,14 @@ const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
 
 /**
  * Prefix membership for dynamic segments, longest first so `/corrections/status/…` resolves
- * before `/corrections/…` and `/chapters/mosaic-credits` never reaches `/chapters/`.
+ * before `/corrections/…` and `/stories/mosaic-credits` never reaches `/stories/`.
  */
 const SURFACE_CLASS_PREFIXES: readonly (readonly [string, SurfaceClass])[] = [
   ['/corrections/status/', 'utility'],
   // `/corrections/appeal` and `/corrections/abuse` used to be classified here. Neither renders:
   // both are API-only directories, and the appeal and abuse forms are mounted inside the receipt
   // status page. Classifying them promised chrome for two URLs that 404 (SP-19, repo-92n2.19).
-  ['/chapters/', 'reading'],
+  ['/stories/', 'reading'],
   ['/entity/', 'record'],
   ['/books/', 'record'],
   ['/law/', 'record'],

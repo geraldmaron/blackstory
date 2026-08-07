@@ -178,7 +178,7 @@ const CITED: SheetRecord = {
       slug: 'birmingham-1963',
       title: 'Birmingham, 1963',
       relation: 'mapped in',
-      href: '/chapters/birmingham-1963',
+      href: '/stories/birmingham-1963',
     },
   ],
 };
@@ -186,7 +186,7 @@ const CITED: SheetRecord = {
 test('a cited record names the chapters that cite it, and how', () => {
   const html = render({ record: CITED });
   assert.match(html, /Chapters that cite this record/);
-  assert.match(html, /href="\/chapters\/birmingham-1963"/);
+  assert.match(html, /href="\/stories\/birmingham-1963"/);
   assert.match(html, /Birmingham, 1963/);
   assert.match(html, /mapped in/, 'the relation must be stated in words, not implied');
 });
@@ -210,7 +210,7 @@ test('the chapter count is stated alongside the heading', () => {
         ...CITED,
         citingChapters: [
           ...(CITED.citingChapters ?? []),
-          { slug: 'zoning', title: 'Zoning', relation: 'referenced in', href: '/chapters/zoning' },
+          { slug: 'zoning', title: 'Zoning', relation: 'referenced in', href: '/stories/zoning' },
         ],
       },
     }),

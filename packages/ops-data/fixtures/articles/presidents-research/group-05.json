@@ -1,0 +1,381 @@
+{
+  "presidents": [
+    {
+      "number": 25,
+      "name": "William McKinley",
+      "termLabel": "1897–1901",
+      "summary": "McKinley condemned lynching in his March 4, 1897 inaugural address but took no federal action against the wave of anti-Black violence and disfranchisement that ran through his presidency. When white supremacists overthrew Wilmington, North Carolina's elected government in November 1898 and killed Black residents, no federal aid was sent, and Black citizens organized to protest his public silence.",
+      "paragraph": "McKinley used his inaugural to say that lynchings \"must not be tolerated in a great and civilized country like the United States,\" and that courts, not mobs, should carry out the law. That's about as far as it went. The Miller Center's account says he refrained from acting against the anti-Black violence in the South that had \"reached near epidemic proportions\" in the century's last four years, and that his roughly thirty appointments of African Americans went mostly to diplomatic and records posts. On November 10, 1898, Alfred Moore Waddell led armed white men through Wilmington, North Carolina, driving out the elected Republican and Populist officials; North Carolina's own Department of Natural and Cultural Resources notes the dead are disputed and that many call it a massacre rather than a riot. No federal troops came. On October 3, 1899, Boston's Colored National League sent McKinley an open letter, now held by the Library of Congress, opening by naming his \"incomprehensible silence\" and saying Wilmington's self-government perished \"for want of federal aid, which you would not and did not furnish.\"",
+      "callouts": [
+        {
+          "text": "March 4, 1897 inaugural address: McKinley said lynchings must not be tolerated and that courts, not mobs, must execute the penalties of the law. He proposed no enforcement legislation.",
+          "sources": [
+            { "label": "American Presidency Project, McKinley First Inaugural (Mar. 4, 1897)", "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-43", "quote": "Lynchings must not be tolerated in a great and civilized country like the United States; courts, not mobs, must execute the penalties of the law." },
+            { "label": "Avalon Project, Yale Law School, First Inaugural Address of William McKinley", "url": "https://avalon.law.yale.edu/19th_century/mckin1.asp", "quote": "The constituted authorities must be cheerfully and vigorously upheld." }
+          ]
+        },
+        {
+          "text": "November 10, 1898: armed white men led by Alfred Moore Waddell overthrew Wilmington, North Carolina's elected city government and killed Black residents. No federal intervention followed.",
+          "sources": [
+            { "label": "N.C. Dept. of Natural and Cultural Resources, \"Wilmington Coup\"", "url": "https://www.dncr.nc.gov/blog/2012/11/10/wilmington-race-riots", "quote": "The number of dead is disputed" },
+            { "label": "Open Letter to President McKinley by Colored People of Massachusetts (Oct. 3, 1899), Library of Congress", "url": "https://tile.loc.gov/storage-services/service/rbc/rbaapc/05800/05800.pdf", "quote": "government of the people by the people and for the people perished in your very presence by the hands of violent men during those bitter November days" }
+          ]
+        },
+        {
+          "text": "October 3, 1899: the Colored National League, meeting at Boston's Charles Street Church, adopted an open letter read by Archibald H. Grimké charging McKinley with silence on Wilmington and Phoenix, S.C.",
+          "sources": [
+            { "label": "Open Letter to President McKinley by Colored People of Massachusetts, LOC rbaapc.05800", "url": "https://tile.loc.gov/storage-services/service/rbc/rbaapc/05800/05800.pdf", "quote": "your extraordinary, your incomprehensible silence on the subject of our wrongs in your annual and other messages to Congress" },
+            { "label": "Library of Congress catalog record, rbaapc.05800", "url": "http://www.loc.gov/resource/rbaapc.05800", "quote": "Open letter to President McKinley by colored people of Massachusetts" }
+          ]
+        },
+        {
+          "text": "Across his term McKinley appointed about thirty African Americans, mostly to diplomatic and records posts, which the Miller Center calls largely cosmetic and short of what Black Republicans sought.",
+          "sources": [
+            { "label": "Miller Center, University of Virginia, \"William McKinley: Domestic Affairs\"", "url": "https://millercenter.org/president/mckinley/domestic-affairs", "quote": "largely cosmetic" },
+            { "label": "NCpedia (State Library of North Carolina), \"Lily-White Politics\"", "url": "https://www.ncpedia.org/lily-white-politics", "quote": "unsuccessfully attempted to increase his party's standing in the region by reaching out to white voters during two southern tours" }
+          ]
+        }
+      ],
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/William_McKinley_by_Courtney_Art_Studio%2C_1896.jpg",
+        "alt": "Studio photographic portrait of President William McKinley, 1896",
+        "credit": "Courtney Art Studio, 1896, via Wikimedia Commons",
+        "rights": "public_domain"
+      },
+      "sources": [
+        { "id": "mckinley-inaugural-1897-app", "label": "American Presidency Project, \"Inaugural Address,\" William McKinley, March 4, 1897", "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-43", "quote": "Lynchings must not be tolerated in a great and civilized country like the United States; courts, not mobs, must execute the penalties of the law." },
+        { "id": "mckinley-inaugural-1897-avalon", "label": "Avalon Project, Yale Law School, First Inaugural Address of William McKinley", "url": "https://avalon.law.yale.edu/19th_century/mckin1.asp", "quote": "The constituted authorities must be cheerfully and vigorously upheld." },
+        { "id": "colored-national-league-open-letter-1899", "label": "Colored National League, Open Letter to President McKinley by Colored People of Massachusetts, Boston, Oct. 3, 1899 (Library of Congress, rbaapc.05800)", "url": "https://tile.loc.gov/storage-services/service/rbc/rbaapc/05800/05800.pdf", "quote": "for want of federal aid, which you would not and did not furnish, on the plea that you could not give what was not asked for by a coward and recreant governor" },
+        { "id": "ncdncr-wilmington-coup", "label": "North Carolina Department of Natural and Cultural Resources, \"Wilmington Coup\"", "url": "https://www.dncr.nc.gov/blog/2012/11/10/wilmington-race-riots", "quote": "traditionally termed a 'race riot,' though many have called the event a massacre" },
+        { "id": "miller-center-mckinley-domestic", "label": "Miller Center, University of Virginia, \"William McKinley: Domestic Affairs\"", "url": "https://millercenter.org/president/mckinley/domestic-affairs", "quote": "refrained from taking action to curtail the general anti-black violence in the South that had reached near epidemic proportions" },
+        { "id": "ncpedia-lily-white", "label": "NCpedia, State Library of North Carolina, \"Lily-White Politics\"", "url": "https://www.ncpedia.org/lily-white-politics", "quote": "advocacy for an all-white Republican Party in the South" }
+      ],
+      "disputes": [
+        "Death toll at Wilmington: the North Carolina Department of Natural and Cultural Resources states the number of dead is disputed and gives no figure; other accounts give ranges. Not resolved here."
+      ],
+      "unverified": [
+        "Whether McKinley personally received or read the Colored National League's October 1899 open letter, and whether he ever replied, was not verified from any fetched source.",
+        "The exact number and identity of McKinley's African American appointees beyond the Miller Center's approximate figure of thirty was not verified."
+      ]
+    },
+    {
+      "number": 26,
+      "name": "Theodore Roosevelt",
+      "termLabel": "1901–1909",
+      "summary": "Roosevelt hosted Booker T. Washington for dinner at the White House on October 16, 1901, the first time a President entertained a Black American there, and Southern press reaction was furious. Five years later, after a shooting in Brownsville, Texas, he discharged 167 Black soldiers of the 25th Infantry without honor and without a trial; Congress reversed the order in 1972.",
+      "paragraph": "Two events frame Roosevelt's record. On October 16, 1901, weeks into his presidency, he had Booker T. Washington to dinner at the White House. The Washington Bee wrote three days later that Roosevelt was \"The first President of the United States to entertain a colored man,\" and Southern papers reacted with fury. Then came Brownsville. On the night of August 13, 1906, shots in Brownsville, Texas killed one white civilian and wounded another. White townspeople blamed Black soldiers of the 25th Infantry at nearby Fort Brown, though the white officers said the men were in barracks. No court-martial was held, and a Texas court cleared them. Roosevelt discharged 167 men without honor anyway. In his December 19, 1906 message he said he ordered the discharge of nearly all of Companies B, C, and D \"in the exercise of my constitutional power,\" citing a conspiracy of silence. They lost careers, pay, and pensions. He never apologized. In 1972 Congress reversed the dismissal order and made restitution.",
+      "callouts": [
+        {
+          "text": "October 16, 1901: Roosevelt dined with Booker T. Washington at the White House. The Washington Bee of October 19, 1901 called him the first President to entertain a Black man there.",
+          "sources": [
+            { "label": "White House Historical Association, \"Booker T. Washington's Dinner with President Theodore Roosevelt\" (reprinting Washington Bee, Oct. 19, 1901)", "url": "https://www.whitehousehistory.org/booker-t-washingtons-dinner-with-president-theodore-roosevelt", "quote": "The first President of the United States to entertain a colored man." },
+            { "label": "Gilder Lehrman Institute of American History, \"Booker T. Washington Dines with Theodore Roosevelt, Americans Outraged\"", "url": "https://www.gilderlehrman.org/news/booker-t-washington-dines-theodore-roosevelt-americans-outraged", "quote": "Booker T. Washington Dines with Theodore Roosevelt, Americans Outraged" }
+          ]
+        },
+        {
+          "text": "August 13, 1906: shooting in Brownsville, Texas killed one white civilian. White officers said the 25th Infantry's Black soldiers were in barracks; a Texas court cleared them; no court-martial was ever held.",
+          "sources": [
+            { "label": "Theodore Roosevelt Center, Dickinson State University, \"Brownsville Incident\"", "url": "https://www.theodorerooseveltcenter.org/encyclopedia/race-ethnicity-and-gender/brownsville-incident/", "quote": "No military trial was ever held. A Texas court cleared the soldiers of wrongdoing." },
+            { "label": "Miller Center, Theodore Roosevelt, \"Message Regarding Disturbances in Texas,\" Dec. 19, 1906", "url": "https://millercenter.org/the-presidency/presidential-speeches/december-19-1906-message-regarding-disturbances-texas", "quote": "from 9 to 15 or 20 of the colored soldiers took part in the attack" }
+          ]
+        },
+        {
+          "text": "Roosevelt discharged 167 Black soldiers without honor, forfeiting careers, salaries, pensions and honors; he defended it to Congress on December 19, 1906 as an exercise of his constitutional power.",
+          "sources": [
+            { "label": "Miller Center, TR, \"Message Regarding Disturbances in Texas,\" Dec. 19, 1906", "url": "https://millercenter.org/the-presidency/presidential-speeches/december-19-1906-message-regarding-disturbances-texas", "quote": "I ordered the discharge of nearly all the members of Companies B, C, and D of the Twenty-fifth Infantry by name, in the exercise of my constitutional power." },
+            { "label": "Theodore Roosevelt Center, Dickinson State University, \"Brownsville Incident\"", "url": "https://www.theodorerooseveltcenter.org/encyclopedia/race-ethnicity-and-gender/brownsville-incident/", "quote": "The men lost their careers, salaries, pensions, and military honors." }
+          ]
+        },
+        {
+          "text": "Roosevelt never reversed himself. After journalist John Weaver's 1970 reinvestigation, Congress restudied the case and in 1972 reversed the dismissal order and made restitution.",
+          "sources": [
+            { "label": "Theodore Roosevelt Center, Dickinson State University, \"Brownsville Incident\"", "url": "https://www.theodorerooseveltcenter.org/encyclopedia/race-ethnicity-and-gender/brownsville-incident/", "quote": "in 1972, Congress reversed Roosevelt's order of dismissal and made restitution to the soldiers" },
+            { "label": "Texas State Historical Association, Handbook of Texas, \"Brownsville Raid of 1906\"", "url": "https://www.tshaonline.org/handbook/entries/brownsville-raid-of-1906", "quote": "Representative Augustus Hawkins urged justice for the debarred soldiers" }
+          ]
+        },
+        {
+          "text": "Roosevelt's Southern patronage bent toward the lily-white faction; NCpedia records his 1902 replacement of a Black postmaster in Wilson, North Carolina with a white appointee.",
+          "sources": [
+            { "label": "NCpedia, State Library of North Carolina, \"Lily-White Politics\"", "url": "https://www.ncpedia.org/lily-white-politics", "quote": "dealt pragmatically with both factions, allowing local conditions to dictate the racial makeup of a state's party" },
+            { "label": "USPS, \"African-American Postal Workers in the 20th Century\"", "url": "https://about.usps.com/who/profile/history/african-american-workers-20thc.htm", "quote": "African-American Postal Workers in the 20th Century" }
+          ]
+        }
+      ],
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/1/19/President_Theodore_Roosevelt%2C_1904.jpg",
+        "alt": "Photographic portrait of President Theodore Roosevelt, 1904",
+        "credit": "Pach Brothers, 1904, via Wikimedia Commons",
+        "rights": "public_domain"
+      },
+      "sources": [
+        { "id": "whha-btw-dinner-1901", "label": "White House Historical Association, \"Booker T. Washington's Dinner with President Theodore Roosevelt\" (Washington Bee, Oct. 19, 1901)", "url": "https://www.whitehousehistory.org/booker-t-washingtons-dinner-with-president-theodore-roosevelt", "quote": "he entertained Prof. Booker T. Washington in the Executive Mansion on last Wednesday evening" },
+        { "id": "gilder-lehrman-btw-dinner", "label": "Gilder Lehrman Institute of American History, \"Booker T. Washington Dines with Theodore Roosevelt, Americans Outraged\"", "url": "https://www.gilderlehrman.org/news/booker-t-washington-dines-theodore-roosevelt-americans-outraged", "quote": "Booker T. Washington Dines with Theodore Roosevelt, Americans Outraged" },
+        { "id": "trc-brownsville", "label": "Theodore Roosevelt Center, Dickinson State University, TR Encyclopedia, \"Brownsville Incident\"", "url": "https://www.theodorerooseveltcenter.org/encyclopedia/race-ethnicity-and-gender/brownsville-incident/", "quote": "President Theodore Roosevelt discharged without honor the entire regiment of 167 men, despite the fact that all the soldiers asserted their innocence." },
+        { "id": "tr-message-dec-19-1906", "label": "Miller Center, University of Virginia, Theodore Roosevelt, \"Message Regarding Disturbances in Texas,\" December 19, 1906", "url": "https://millercenter.org/the-presidency/presidential-speeches/december-19-1906-message-regarding-disturbances-texas", "quote": "the usefulness of the Army would be at an end were we to permit such an outrage to be committed with impunity" },
+        { "id": "tsha-brownsville-raid", "label": "Texas State Historical Association, Handbook of Texas, \"The Brownsville Raid of 1906\"", "url": "https://www.tshaonline.org/handbook/entries/brownsville-raid-of-1906", "quote": "The Nixon administration concurred and awarded honorable discharges without back pay." },
+        { "id": "ncpedia-lily-white-tr", "label": "NCpedia, State Library of North Carolina, \"Lily-White Politics\"", "url": "https://www.ncpedia.org/lily-white-politics", "quote": "appointing a white replacement for a Black postmaster in Wilson in 1902" }
+      ],
+      "disputes": [
+        "Mechanism of the 1972 reversal: the Theodore Roosevelt Center says Congress reversed the dismissal order and made restitution; the Texas State Historical Association credits the Nixon administration with awarding honorable discharges without back pay after Rep. Augustus Hawkins pressed the case. Both are recorded; not resolved here.",
+        "Whether any 25th Infantry soldiers fired at all: Roosevelt's December 19, 1906 message asserts 9 to 20 took part; the Theodore Roosevelt Center states the soldiers were innocent and that white townspeople misled investigators. Both recorded."
+      ],
+      "unverified": [
+        "The specific designation 'Special Orders No. 266' and its exact signing date (reported elsewhere as November 6, 1906) could not be confirmed from a primary or institutional page actually fetched.",
+        "The $25,000 payment reportedly made to surviving veteran Dorsie Willis was not confirmed from a fetched institutional source."
+      ]
+    },
+    {
+      "number": 27,
+      "name": "William Howard Taft",
+      "termLabel": "1909–1913",
+      "summary": "In his March 4, 1909 inaugural address Taft said the Executive must use careful discretion in appointing Black Americans and questioned whether appointing one to local office in a South with acute race feeling did more harm than good. In practice he appointed no new Black postmasters in the South and declined to reappoint incumbents as their terms lapsed, while making a handful of high-profile appointments in Washington.",
+      "paragraph": "Taft laid out the policy in his own inaugural. He acknowledged the Reconstruction amendments, said the Fifteenth \"attempted to secure the negro against any deprivation of the privilege to vote because he was a negro,\" and then said the Executive \"must exercise a careful discretion not thereby to do it more harm than good.\" He doubted whether appointing a Black man to local office where race feeling was \"so widespread and acute\" was worth the increase in race feeling it would provoke, and told Black Americans to base their hope on \"their own industry, self-restraint, thrift, and business success.\" The Postal Service's own history, citing historian Louis Harlan, records what that meant on the ground: Taft appointed no new Black postmasters in the South and refused to reappoint incumbents as their four-year terms expired, though the total number of Black postal employees kept growing. He also told the South it was \"not the disposition or within the province of the Federal Government to interfere\" with their domestic affairs.",
+      "callouts": [
+        {
+          "text": "March 4, 1909 inaugural: Taft said the Executive, in recognizing the negro race by appointments, must use careful discretion not to do more harm than good, and doubted local Southern appointments were worth the race feeling they stirred.",
+          "sources": [
+            { "label": "American Presidency Project, Taft Inaugural Address, Mar. 4, 1909", "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-46", "quote": "an appointment of one of their number to a local office in a community in which the race feeling is so widespread and acute" },
+            { "label": "Miller Center, University of Virginia, Taft Inaugural Address, Mar. 4, 1909", "url": "https://millercenter.org/the-presidency/presidential-speeches/march-4-1909-inaugural-address", "quote": "The negroes are now Americans. Their ancestors came here years ago against their will, and this is their only country and their only flag." }
+          ]
+        },
+        {
+          "text": "Same address: Taft told Black Americans to base their hope on their own industry, self-restraint, thrift and business success and on the sympathy of white Southern neighbors.",
+          "sources": [
+            { "label": "American Presidency Project, Taft Inaugural Address, Mar. 4, 1909", "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-46", "quote": "The colored men must base their hope on the results of their own industry, self-restraint, thrift, and business success" },
+            { "label": "Miller Center, Taft Inaugural Address, Mar. 4, 1909", "url": "https://millercenter.org/the-presidency/presidential-speeches/march-4-1909-inaugural-address", "quote": "The fifteenth amendment attempted to secure the negro against any deprivation of the privilege to vote because he was a negro." }
+          ]
+        },
+        {
+          "text": "As a matter of policy Taft appointed no new Black postmasters in the South and refused to reappoint incumbents as their four-year terms expired, per USPS history citing historian Louis Harlan.",
+          "sources": [
+            { "label": "USPS, \"African-American Postal Workers in the 20th Century\"", "url": "https://about.usps.com/who/profile/history/african-american-workers-20thc.htm", "quote": "Taft appointed no new black postmasters in the South and refused to reappoint incumbents as their four-year terms expired." },
+            { "label": "American Presidency Project, Taft Inaugural Address, Mar. 4, 1909", "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-46", "quote": "the Executive, in recognizing the negro race by appointments, must exercise a careful discretion not thereby to do it more harm than good" }
+          ]
+        },
+        {
+          "text": "Taft told the South the federal government would not interfere with the regulation by Southern states of their domestic affairs, the framing his Southern patronage policy rested on.",
+          "sources": [
+            { "label": "USPS, \"African-American Postal Workers in the 20th Century\"", "url": "https://about.usps.com/who/profile/history/african-american-workers-20thc.htm", "quote": "it is not the disposition or within the province of the Federal Government to interfere with the regulation by Southern States of their domestic affairs" },
+            { "label": "NCpedia, State Library of North Carolina, \"Lily-White Politics\"", "url": "https://www.ncpedia.org/lily-white-politics", "quote": "advocacy for an all-white Republican Party in the South" }
+          ]
+        }
+      ],
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/9/9b/William_Howard_Taft_1909.jpg",
+        "alt": "Photographic portrait of President William Howard Taft, 1909",
+        "credit": "Library of Congress collection image, 1909, via Wikimedia Commons",
+        "rights": "public_domain"
+      },
+      "sources": [
+        { "id": "taft-inaugural-1909-app", "label": "American Presidency Project, \"Inaugural Address,\" William Howard Taft, March 4, 1909", "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-46", "quote": "is of sufficient benefit by way of encouragement to the race to outweigh the recurrence and increase of race feeling" },
+        { "id": "taft-inaugural-1909-miller", "label": "Miller Center, University of Virginia, \"March 4, 1909: Inaugural Address\"", "url": "https://millercenter.org/the-presidency/presidential-speeches/march-4-1909-inaugural-address", "quote": "The negroes are now Americans. Their ancestors came here years ago against their will, and this is their only country and their only flag." },
+        { "id": "usps-african-american-workers-20thc", "label": "United States Postal Service, \"African-American Postal Workers in the 20th Century\"", "url": "https://about.usps.com/who/profile/history/african-american-workers-20thc.htm", "quote": "Taft appointed no new black postmasters in the South and refused to reappoint incumbents as their four-year terms expired." },
+        { "id": "ncpedia-lily-white-taft", "label": "NCpedia, State Library of North Carolina, \"Lily-White Politics\"", "url": "https://www.ncpedia.org/lily-white-politics", "quote": "1902: Lily whites gained control of North Carolina's Republican Party" }
+      ],
+      "disputes": [
+        "Scope of Taft's lily-white policy: USPS/Harlan record a freeze on new Black Southern postmasters, while other accounts note Taft made high-level Washington appointments including James C. Napier as Register of the Treasury. The Napier appointment was not verified from a fetched institutional source and is listed as unverified."
+      ],
+      "unverified": [
+        "James C. Napier's appointment as Register of the Treasury under Taft, and the claim that Taft made four high-level Black appointments, were not verified from any fetched primary or institutional page.",
+        "The 1912 replacement of Georgia's GOP leader with Henry Lincoln Johnson was not verified from a fetched institutional source."
+      ]
+    },
+    {
+      "number": 28,
+      "name": "Woodrow Wilson",
+      "termLabel": "1913–1921",
+      "summary": "Beginning in 1913 Wilson's cabinet segregated federal workplaces, restrooms and cafeterias in departments including the Post Office and the Treasury, and Black federal employees were demoted and discharged. On February 18, 1915 he screened D.W. Griffith's The Birth of a Nation at the White House, and what he said about it is disputed.",
+      "paragraph": "Wilson had courted Black voters in 1912 with talk of justice for all Americans. In office he let his cabinet segregate the federal workforce. The Miller Center records that he allowed members of his cabinet to introduce segregation into departments like the Post Office and Treasury, covering restrooms, cafeterias and offices, and that many Black federal workers were downgraded and discharged. USPS history notes Postmaster General Albert Burleson complaining about integrated conditions in the Railway Mail Service in April 1913, and a Civil Service Commission order of May 27, 1914 requiring applicant photographs, which let appointing officials screen out Black applicants. Research by Abhay Aneja and Guo Xu using 1907–1921 Official Registers found the Black-white civil service salary gap widened by about seven percentage points between 1913 and 1921. William Monroe Trotter confronted Wilson at the White House on November 12, 1914; Wilson declared himself offended and had him removed. On February 18, 1915, The Birth of a Nation was shown in the East Room.",
+      "callouts": [
+        {
+          "text": "From 1913 Wilson's cabinet segregated restrooms, cafeterias and offices in departments including the Post Office and Treasury; Black federal workers were downgraded and discharged.",
+          "sources": [
+            { "label": "Miller Center, University of Virginia, \"Woodrow Wilson: Domestic Affairs\"", "url": "https://millercenter.org/president/wilson/domestic-affairs", "quote": "allowed members of his cabinet to introduce segregation into federal departments such as the Post Office and the Treasury Department" },
+            { "label": "UC Berkeley Haas, on Aneja & Xu research", "url": "https://newsroom.haas.berkeley.edu/research/how-woodrow-wilsons-racist-segregation-order-eroded-the-black-civil-service/", "quote": "The segregation of the federal civil service is a dark chapter in the history of the American government that has been relatively unstudied." }
+          ]
+        },
+        {
+          "text": "May 27, 1914: the Civil Service Commission required applicants to submit photographs. USPS history states this enabled appointing officials to screen out Black applicants.",
+          "sources": [
+            { "label": "USPS, \"African-American Postal Workers in the 20th Century\"", "url": "https://about.usps.com/who/profile/history/african-american-workers-20thc.htm", "quote": "enabled appointing officials to screen out black applicants" },
+            { "label": "UC Berkeley Haas, on Aneja & Xu research", "url": "https://newsroom.haas.berkeley.edu/research/how-woodrow-wilsons-racist-segregation-order-eroded-the-black-civil-service/", "quote": "Black workers experienced higher rates of demotion and lower entry-level positions after the order." }
+          ]
+        },
+        {
+          "text": "November 12, 1914: William Monroe Trotter challenged Wilson at the White House over segregation of federal clerks. Wilson declared himself offended and had Trotter removed.",
+          "sources": [
+            { "label": "White House Historical Association, \"William Monroe Trotter Challenges President Wilson\"", "url": "https://www.whitehousehistory.org/william-monroe-trotter-challenges-president-wilson", "quote": "Angered by this confrontation that questioned his integrity, President Wilson declared himself \"offended\" and had Trotter removed from the White House." },
+            { "label": "USPS, \"African-American Postal Workers in the 20th Century\"", "url": "https://about.usps.com/who/profile/history/african-american-workers-20thc.htm", "quote": "denied that his administration followed a policy of segregation" }
+          ]
+        },
+        {
+          "text": "February 18, 1915: The Birth of a Nation was screened in the White House East Room, arranged through Wilson's Johns Hopkins classmate Thomas Dixon.",
+          "sources": [
+            { "label": "Woodrow Wilson Presidential Library & Museum blog, \"Birth of a Nation\"", "url": "https://wwplblog.wordpress.com/2017/09/01/birth-of-a-nation/", "quote": "February 18, 1915 at the White House East Room." },
+            { "label": "Mark E. Benbow, \"Birth of a Quotation,\" Journal of the Gilded Age and Progressive Era 9:4 (2010), Cambridge University Press", "url": "https://www.cambridge.org/core/journals/journal-of-the-gilded-age-and-progressive-era/article/abs/birth-of-a-quotation-woodrow-wilson-and-like-writing-history-with-lightning/320F8624D6FD74BE15443D8032FC7625", "quote": "In February 1915, upon viewing The Birth of a Nation at a special White House screening, President Woodrow Wilson reportedly remarked" }
+          ]
+        },
+        {
+          "text": "Aneja and Xu found the Black-white federal salary gap widened roughly seven percentage points from 1913 to 1921, using digitized Official Registers linked to 1910 Census records.",
+          "sources": [
+            { "label": "UC Berkeley Haas newsroom, Aneja & Xu research summary", "url": "https://newsroom.haas.berkeley.edu/research/how-woodrow-wilsons-racist-segregation-order-eroded-the-black-civil-service/", "quote": "The Black-white salary gap in the civil service widened by approximately 7 percentage points between 1913-1921" },
+            { "label": "Miller Center, \"Woodrow Wilson: Domestic Affairs\"", "url": "https://millercenter.org/president/wilson/domestic-affairs", "quote": "many African Americans who worked in the federal government were downgraded and discharged during Wilson's administration" }
+          ]
+        }
+      ],
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/2/2d/President_Woodrow_Wilson_portrait_December_2_1912.jpg",
+        "alt": "Photographic portrait of Woodrow Wilson, December 2, 1912",
+        "credit": "Photograph dated December 2, 1912, via Wikimedia Commons",
+        "rights": "public_domain"
+      },
+      "sources": [
+        { "id": "miller-center-wilson-domestic", "label": "Miller Center, University of Virginia, \"Woodrow Wilson: Domestic Affairs\"", "url": "https://millercenter.org/president/wilson/domestic-affairs", "quote": "segregation reduced friction between blacks and whites working together" },
+        { "id": "whha-trotter-1914", "label": "White House Historical Association, \"William Monroe Trotter Challenges President Wilson\"", "url": "https://www.whitehousehistory.org/william-monroe-trotter-challenges-president-wilson", "quote": "Trotter directly challenged the president for permitting the segregation of black and white government clerks." },
+        { "id": "usps-wilson-segregation", "label": "United States Postal Service, \"African-American Postal Workers in the 20th Century\"", "url": "https://about.usps.com/who/profile/history/african-american-workers-20thc.htm", "quote": "complained about integrated working conditions in the Railway Mail Service" },
+        { "id": "haas-aneja-xu-civil-service", "label": "UC Berkeley Haas School of Business newsroom on Abhay Aneja & Guo Xu, \"How Woodrow Wilson's racist policies eroded the Black civil service\"", "url": "https://newsroom.haas.berkeley.edu/research/how-woodrow-wilsons-racist-segregation-order-eroded-the-black-civil-service/", "quote": "Wilson's directive targeted the Post Office (which housed over 60% of federal jobs) and the Treasury Department." },
+        { "id": "wwpl-birth-of-a-nation", "label": "Woodrow Wilson Presidential Library & Museum, \"Birth of a Nation\"", "url": "https://wwplblog.wordpress.com/2017/09/01/birth-of-a-nation/", "quote": "It is true that The Birth of a Nation was produced before the President and his family at the White House, but the President was entirely unaware of the character of the play before it was presented" },
+        { "id": "benbow-birth-of-a-quotation-2010", "label": "Mark E. Benbow, \"Birth of a Quotation: Woodrow Wilson and 'Like Writing History with Lightning',\" Journal of the Gilded Age and Progressive Era 9, no. 4 (Oct. 2010), Cambridge University Press", "url": "https://www.cambridge.org/core/journals/journal-of-the-gilded-age-and-progressive-era/article/abs/birth-of-a-quotation-woodrow-wilson-and-like-writing-history-with-lightning/320F8624D6FD74BE15443D8032FC7625", "quote": "This article examines the history of this alleged quotation and the sources where it has appeared." }
+        ],
+      "disputes": [
+        "The Birth of a Nation quotation. One tradition holds Wilson said the film was \"like writing history with lightning\" and that his only regret was that it was all so terribly true; the line has circulated in books and articles for decades. Against it: Mark E. Benbow's peer-reviewed 2010 study in the Journal of the Gilded Age and Progressive Era examines the quotation's provenance, and the Woodrow Wilson Presidential Library notes the line did not appear in print until roughly 22 years later and that Thomas Dixon, who arranged the screening, never mentioned it in his memoirs. Some accounts say Wilson paid little attention and left without comment. Recorded on both sides; not resolved here.",
+        "Wilson's own position on the screening: through secretary Joseph Tumulty he stated he was unaware of the film's character beforehand and had at no time expressed approbation of it; critics at the time treated the White House screening itself as an endorsement. Both recorded."
+      ],
+      "unverified": [
+        "Whether Wilson signed any written executive order mandating segregation, as opposed to permitting cabinet-level department policies, was not verified from a fetched primary document.",
+        "The exact text and date of Wilson's reported 1918 proclamation against lynching and mob violence was not verified from a fetched primary source (referenced only in the Miller Center summary)."
+      ]
+    },
+    {
+      "number": 29,
+      "name": "Warren G. Harding",
+      "termLabel": "1921–1923",
+      "summary": "On April 12, 1921 Harding told a joint session of Congress it ought to wipe out the stain of barbaric lynching, and on October 26, 1921 he spoke about race at Birmingham's semicentennial. In the same Birmingham speech he endorsed political and economic rights for Black Americans while rejecting social equality and asserting an inescapable racial difference.",
+      "paragraph": "Harding put lynching in a message to Congress six weeks into his term. On April 12, 1921 he told a joint session that \"Congress ought to wipe the stain of barbaric lynching from the banners of a free and orderly, representative democracy,\" and floated a commission \"embracing representatives of both races, to study and report on the entire subject.\" That October 26 he spoke at Birmingham's fiftieth-anniversary celebration and said the World War had brought full recognition that \"the race problem is national rather than merely sectional.\" He wanted Black voters to stop being a single bloc and to vote Democratic if they preferred Democratic policy. But he also drew a hard line: men of both races, he said, should stand \"uncompromisingly against every suggestion of social equality,\" which he framed as a fundamental and inescapable difference rather than a matter of rights. The Dyer anti-lynching bill passed the House on January 26, 1922 with his support and died to a Senate filibuster.",
+      "callouts": [
+        {
+          "text": "April 12, 1921: in an address to a joint session of Congress, Harding said Congress ought to wipe the stain of barbaric lynching from the banners of a free and orderly representative democracy.",
+          "sources": [
+            { "label": "American Presidency Project, Harding, \"Address to a Joint Session of Congress on Urgent National Problems,\" Apr. 12, 1921", "url": "https://www.presidency.ucsb.edu/documents/address-joint-session-congress-urgent-national-problems", "quote": "Congress ought to wipe the stain of barbaric lynching from the banners of a free and orderly, representative democracy." },
+            { "label": "Miller Center, University of Virginia, \"Warren G. Harding: Domestic Affairs\"", "url": "https://millercenter.org/president/harding/domestic-affairs", "quote": "was generally tolerant on civil liberties, honestly criticizing the unfair treatment of African Americans" }
+          ]
+        },
+        {
+          "text": "Same address: Harding endorsed a proposed commission of members of both races to study and report on the race question.",
+          "sources": [
+            { "label": "American Presidency Project, Harding address of Apr. 12, 1921", "url": "https://www.presidency.ucsb.edu/documents/address-joint-session-congress-urgent-national-problems", "quote": "One proposal is the creation of a commission embracing representatives of both races, to study and report on the entire subject." },
+            { "label": "American Presidency Project, Coolidge First Annual Message, Dec. 6, 1923 (referencing the same proposal)", "url": "https://www.presidency.ucsb.edu/documents/first-annual-message-20", "quote": "it has been proposed that a commission be created, composed of members from both races, to formulate a better policy for mutual understanding and confidence" }
+          ]
+        },
+        {
+          "text": "October 26, 1921, Birmingham: Harding said the World War had brought full recognition that the race problem is national rather than merely sectional, and urged Black voters not to remain in one party.",
+          "sources": [
+            { "label": "American Presidency Project, Harding, Birmingham semicentennial address, Oct. 26, 1921", "url": "https://www.presidency.ucsb.edu/documents/address-the-celebration-the-semicentennial-the-founding-the-city-birmingham-alabama", "quote": "The World War brought us to full recognition that the race problem is national rather than merely sectional." },
+            { "label": "Voices of Democracy, University of Maryland, Harding Birmingham address (26 October 1921)", "url": "https://voicesofdemocracy.umd.edu/warren-harding-address-of-the-president-of-the-united-states-at-the-celebration-of-the-semicentennial-of-the-founding-of-the-city-of-birmingham-alabama-26-october-1921/", "quote": "Address of the President of the United States at the Celebration of the Semicentennial of the Founding of the City of Birmingham, Alabama" }
+          ]
+        },
+        {
+          "text": "In the same Birmingham speech Harding told both races to stand uncompromisingly against every suggestion of social equality, calling it a fundamental and inescapable difference.",
+          "sources": [
+            { "label": "American Presidency Project, Harding Birmingham address, Oct. 26, 1921", "url": "https://www.presidency.ucsb.edu/documents/address-the-celebration-the-semicentennial-the-founding-the-city-birmingham-alabama", "quote": "Men of both races may well stand uncompromisingly against every suggestion of social equality" },
+            { "label": "Miller Center, \"Warren G. Harding: Domestic Affairs\"", "url": "https://millercenter.org/president/harding/domestic-affairs", "quote": "lectured a segregated crowd of thirty thousand people at the University of Alabama on the virtues of racial equality and the evils of segregation" }
+          ]
+        },
+        {
+          "text": "January 26, 1922: the Dyer anti-lynching bill, which Harding supported, passed the House 230–119. Southern Democrats filibustered it in the Senate and it never became law.",
+          "sources": [
+            { "label": "Megan Ming Francis, Civil Rights and the Making of the Modern American State (Cambridge Univ. Press, 2014), ch. on anti-lynching legislation", "url": "https://www.cambridge.org/core/books/civil-rights-and-the-making-of-the-modern-american-state/antilynching-legislation-and-the-sinking-of-the-republican-ship-in-congress/8B742E5D51680719F310EB88888B666A", "quote": "the first piece of legislation African Americans felt they had a hand in crafting" },
+            { "label": "Forbes Library (Calvin Coolidge Presidential Library & Museum), \"Coolidge and Civil Rights\"", "url": "https://forbeslibrary.org/coolidge/coolidge-and-civil-rights/", "quote": "he ultimately declined to actively campaign for the bill's passage" }
+          ]
+        }
+      ],
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Warren_G_Harding-Harris_%26_Ewing.jpg",
+        "alt": "Photographic portrait of President Warren G. Harding",
+        "credit": "Harris & Ewing, via Wikimedia Commons",
+        "rights": "public_domain"
+      },
+      "sources": [
+        { "id": "harding-april-1921-address", "label": "American Presidency Project, Warren G. Harding, \"Address to a Joint Session of Congress on Urgent National Problems,\" April 12, 1921", "url": "https://www.presidency.ucsb.edu/documents/address-joint-session-congress-urgent-national-problems", "quote": "Congress ought to wipe the stain of barbaric lynching from the banners of a free and orderly, representative democracy." },
+        { "id": "harding-birmingham-1921-app", "label": "American Presidency Project, \"Address at the Celebration of the Semicentennial of the Founding of the City of Birmingham, Alabama,\" October 26, 1921", "url": "https://www.presidency.ucsb.edu/documents/address-the-celebration-the-semicentennial-the-founding-the-city-birmingham-alabama", "quote": "I want to see the time come when black men will regard themselves as full participants in the benefits and duties of American citizenship" },
+        { "id": "vod-harding-birmingham", "label": "Voices of Democracy, University of Maryland, Harding Birmingham address, 26 October 1921", "url": "https://voicesofdemocracy.umd.edu/warren-harding-address-of-the-president-of-the-united-states-at-the-celebration-of-the-semicentennial-of-the-founding-of-the-city-of-birmingham-alabama-26-october-1921/", "quote": "26 October 1921" },
+        { "id": "miller-center-harding-domestic", "label": "Miller Center, University of Virginia, \"Warren G. Harding: Domestic Affairs\"", "url": "https://millercenter.org/president/harding/domestic-affairs", "quote": "lectured a segregated crowd of thirty thousand people" },
+        { "id": "francis-antilynching-chapter", "label": "Megan Ming Francis, \"Anti-Lynching Legislation and the Sinking of the Republican Ship in Congress,\" in Civil Rights and the Making of the Modern American State (Cambridge University Press, 2014)", "url": "https://www.cambridge.org/core/books/civil-rights-and-the-making-of-the-modern-american-state/antilynching-legislation-and-the-sinking-of-the-republican-ship-in-congress/8B742E5D51680719F310EB88888B666A", "quote": "The House approved the measure with a two-thirds majority (230-119)." }
+      ],
+      "disputes": [
+        "Birmingham speech date: the American Presidency Project and the University of Maryland's Voices of Democracy both date it October 26, 1921; some secondary accounts give October 27, 1921. Both recorded.",
+        "Birmingham venue and audience: the Miller Center describes a segregated crowd of thirty thousand at the University of Alabama; the speech itself is titled as the semicentennial celebration of the city of Birmingham. Both recorded; not resolved here.",
+        "Dyer bill House tally: Megan Ming Francis gives 230–119; other accounts give 231–119. Both recorded."
+      ],
+      "unverified": [
+        "The precise text of any Harding message or letter explicitly endorsing the Dyer bill by name was not located in a fetched primary source; his support is attested in secondary accounts.",
+        "Congressional Record citations for the December 1922 Senate filibuster of the Dyer bill were not retrieved from govinfo."
+      ]
+    },
+    {
+      "number": 30,
+      "name": "Calvin Coolidge",
+      "termLabel": "1923–1929",
+      "summary": "In his first annual message on December 6, 1923 Coolidge said Black Americans' rights under the Constitution were as sacred as any other citizen's and urged Congress to use all its powers against lynching, and he recommended about half a million dollars for medical education at Howard University. He did not campaign for the Dyer anti-lynching bill, which Southern Democrats filibustered to death in the Senate.",
+      "paragraph": "Coolidge said the words. In his first annual message on December 6, 1923 he noted the roughly 12 million colored people in the population, said that \"under our Constitution their rights are just as sacred as those of any other citizen,\" and told Congress it \"ought to exercise all its powers of prevention and punishment against the hideous crime of lynching.\" The same message recommended about half a million dollars for medical courses at Howard University. He was cooler on the two-race commission Harding had floated, treating these mostly as local matters. The Coolidge Presidential Library's own account says he declined to actively campaign for the Dyer bill, worried it would jeopardize priorities like tax reduction; the bill, which had cleared the House 230–119 on January 26, 1922, died to filibuster. On August 9, 1924 he wrote Charles F. Gardner that \"a colored man is precisely as much entitled to submit his candidacy in a party primary, as is any other citizen.\" He spoke at Howard University's commencement on June 6, 1924.",
+      "callouts": [
+        {
+          "text": "December 6, 1923 first annual message: Coolidge said Congress ought to exercise all its powers of prevention and punishment against the hideous crime of lynching.",
+          "sources": [
+            { "label": "American Presidency Project, Coolidge First Annual Message, Dec. 6, 1923", "url": "https://www.presidency.ucsb.edu/documents/first-annual-message-20", "quote": "The Congress ought to exercise all its powers of prevention and punishment against the hideous crime of lynching, of which the negroes are by no means the sole sufferers" },
+            { "label": "Forbes Library, Calvin Coolidge Presidential Library & Museum, \"Coolidge and Civil Rights\"", "url": "https://forbeslibrary.org/coolidge/coolidge-and-civil-rights/", "quote": "rights are just as sacred as those of any other citizen" }
+          ]
+        },
+        {
+          "text": "Same message: he recommended roughly $500,000 for medical courses at Howard University, aimed at the annual need for Black physicians.",
+          "sources": [
+            { "label": "American Presidency Project, Coolidge First Annual Message, Dec. 6, 1923", "url": "https://www.presidency.ucsb.edu/documents/first-annual-message-20", "quote": "About half a million dollars is recommended for medical courses at Howard University" },
+            { "label": "Forbes Library, \"Coolidge and Civil Rights\"", "url": "https://forbeslibrary.org/coolidge/coolidge-and-civil-rights/", "quote": "Coolidge announced approximately $500,000 in federal funding for Howard University's medical courses" }
+          ]
+        },
+        {
+          "text": "June 6, 1924: Coolidge gave the Howard University commencement address, \"The Progress of a People,\" citing Black war service and economic gains. It did not address lynching.",
+          "sources": [
+            { "label": "American Presidency Project, Coolidge, \"Address at Howard University: The Progress of a People,\" June 6, 1924", "url": "https://www.presidency.ucsb.edu/documents/address-howard-university-the-progress-people", "quote": "Among well-nigh 400,000 colored men who were taken into the military service, about one half had overseas experience." },
+            { "label": "Forbes Library, \"Coolidge and Civil Rights\"", "url": "https://forbeslibrary.org/coolidge/coolidge-and-civil-rights/", "quote": "Coolidge announced approximately $500,000 in federal funding for Howard University's medical courses" }
+          ]
+        },
+        {
+          "text": "August 9, 1924: replying to Charles F. Gardner, who objected to a Black candidate for Congress, Coolidge wrote that a colored man is as entitled to submit his candidacy in a party primary as any other citizen.",
+          "sources": [
+            { "label": "American Presidency Project, Coolidge, \"Letter to Charles F. Gardner on Equality of Rights,\" Aug. 9, 1924", "url": "https://www.presidency.ucsb.edu/documents/letter-charles-f-gardner-equality-rights", "quote": "A colored man is precisely as much entitled to submit his candidacy in a party primary, as is any other citizen." },
+            { "label": "Forbes Library, \"Coolidge and Civil Rights\"", "url": "https://forbeslibrary.org/coolidge/coolidge-and-civil-rights/", "quote": "gave Coolidge new strength among Negroes" }
+          ]
+        },
+        {
+          "text": "Coolidge did not actively campaign for the Dyer anti-lynching bill, per the Coolidge Presidential Library, fearing it would jeopardize other priorities; the bill died to a Senate filibuster after passing the House 230–119.",
+          "sources": [
+            { "label": "Forbes Library, Calvin Coolidge Presidential Library & Museum, \"Coolidge and Civil Rights\"", "url": "https://forbeslibrary.org/coolidge/coolidge-and-civil-rights/", "quote": "he ultimately declined to actively campaign for the bill's passage, fearing it would jeopardize other legislative priorities" },
+            { "label": "Megan Ming Francis, Civil Rights and the Making of the Modern American State (Cambridge Univ. Press, 2014)", "url": "https://www.cambridge.org/core/books/civil-rights-and-the-making-of-the-modern-american-state/antilynching-legislation-and-the-sinking-of-the-republican-ship-in-congress/8B742E5D51680719F310EB88888B666A", "quote": "the machinery of the United States Senate is antiquated to the point that millions of people may suffer injustice and death on account of it" }
+          ]
+        }
+      ],
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Calvin_Coolidge_cph.3g10777.jpg",
+        "alt": "Photographic portrait of President Calvin Coolidge",
+        "credit": "Library of Congress, Prints & Photographs Division, cph.3g10777, via Wikimedia Commons",
+        "rights": "public_domain"
+      },
+      "sources": [
+        { "id": "coolidge-first-annual-message-1923", "label": "American Presidency Project, Calvin Coolidge, \"First Annual Message,\" December 6, 1923", "url": "https://www.presidency.ucsb.edu/documents/first-annual-message-20", "quote": "Numbered among our population are some 12,000,000 colored people. Under our Constitution their rights are just as sacred as those of any other citizen." },
+        { "id": "coolidge-howard-1924", "label": "American Presidency Project, Calvin Coolidge, \"Address at Howard University: The Progress of a People,\" June 6, 1924", "url": "https://www.presidency.ucsb.edu/documents/address-howard-university-the-progress-people", "quote": "They were tempted, but not one betrayed his country." },
+        { "id": "coolidge-gardner-letter-1924", "label": "American Presidency Project, Calvin Coolidge, \"Letter to Charles F. Gardner on Equality of Rights,\" August 9, 1924", "url": "https://www.presidency.ucsb.edu/documents/letter-charles-f-gardner-equality-rights", "quote": "Our Constitution guarantees equal rights to all our citizens, without discrimination on account of race or color." },
+        { "id": "forbes-library-coolidge-civil-rights", "label": "Forbes Library, Calvin Coolidge Presidential Library & Museum, \"Coolidge and Civil Rights\"", "url": "https://forbeslibrary.org/coolidge/coolidge-and-civil-rights/", "quote": "By 1929, segregation had been \"practically ended\" in several departments" },
+        { "id": "francis-antilynching-chapter-coolidge", "label": "Megan Ming Francis, \"Anti-Lynching Legislation and the Sinking of the Republican Ship in Congress,\" in Civil Rights and the Making of the Modern American State (Cambridge University Press, 2014)", "url": "https://www.cambridge.org/core/books/civil-rights-and-the-making-of-the-modern-american-state/antilynching-legislation-and-the-sinking-of-the-republican-ship-in-congress/8B742E5D51680719F310EB88888B666A", "quote": "The House approved the measure with a two-thirds majority (230-119)." }
+      ],
+      "disputes": [
+        "Extent of desegregation under Coolidge: the Coolidge Presidential Library states segregation was \"practically ended\" in several departments by 1929 while noting cafeteria and restroom segregation persisted in some facilities. Recorded as stated, with the qualification intact.",
+        "Coolidge and the Dyer bill: his December 1923 message urged congressional action against lynching, while the Coolidge Presidential Library records that he declined to actively campaign for the bill. Both recorded."
+      ],
+      "unverified": [
+        "The precise date and mechanics of the Senate filibuster that killed the Dyer bill (commonly given as December 1922) were not confirmed from a fetched Congressional Record or senate.gov page.",
+        "Whether Coolidge took any specific administrative action to desegregate federal departments, as distinct from segregation lapsing, was not verified from a primary source."
+      ]
+    }
+  ]
+}

@@ -82,7 +82,7 @@ export function buildCitesEdge(docs: readonly PublicArticleProjectionDoc[]): Cit
         slug: doc.slug,
         title: doc.title,
         relation,
-        href: `/chapters/${doc.slug}`,
+        href: `/stories/${doc.slug}`,
       });
       byEntity.set(entityId, citations);
     }

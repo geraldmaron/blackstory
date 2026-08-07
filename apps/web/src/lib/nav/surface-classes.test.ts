@@ -56,10 +56,10 @@ describe('surface class resolution', () => {
   });
 
   it('lets a specific child override its parent prefix', () => {
-    // `/chapters/*` is a reading room, but the credits page is a utility surface.
-    assert.equal(surfaceClassFor('/chapters'), 'reading');
-    assert.equal(surfaceClassFor('/chapters/redlining'), 'reading');
-    assert.equal(surfaceClassFor('/chapters/mosaic-credits'), 'utility');
+    // `/stories/*` is a reading room, but the credits page is a utility surface.
+    assert.equal(surfaceClassFor('/stories'), 'reading');
+    assert.equal(surfaceClassFor('/stories/redlining'), 'reading');
+    assert.equal(surfaceClassFor('/stories/mosaic-credits'), 'utility');
     assert.equal(surfaceClassFor('/corrections'), 'utility');
     assert.equal(surfaceClassFor('/corrections/status/ABC123'), 'utility');
   });
@@ -108,7 +108,7 @@ function isDeclaredUtility(route: string): boolean {
     '/privacy',
     '/design-system',
     '/locate',
-    '/chapters/mosaic-credits',
+    '/stories/mosaic-credits',
   ];
   return declared.includes(route);
 }

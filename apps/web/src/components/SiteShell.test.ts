@@ -18,7 +18,7 @@ test('only the Atlas resolves to the instrument class', () => {
   assert.equal(surfaceClassFor('/explore'), null);
   assert.equal(surfaceClassFor('/explore/api'), null);
   assert.equal(surfaceClassFor('/locate'), 'utility');
-  assert.equal(surfaceClassFor('/chapters'), 'reading');
+  assert.equal(surfaceClassFor('/stories'), 'reading');
 });
 
 test('the two shell gates read the same registry, so they cannot disagree', () => {

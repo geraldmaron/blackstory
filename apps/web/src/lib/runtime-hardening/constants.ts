@@ -74,6 +74,29 @@ export const LAW_PAGE_PARAM_ALLOWLIST = ['q', 'kind', 'topic', 'sort'] as const;
 export type LawPageParam = (typeof LAW_PAGE_PARAM_ALLOWLIST)[number];
 
 /**
+ * Allowed browse params on /stories.
+ *
+ * `/stories` (and `/chapters` before it) sat in the proxy matcher with no allowlist, so the
+ * edge stripped every filter before the page ran: the era and place rail links the index
+ * rendered were dead on arrival, and the reader saw the unfiltered list with no indication
+ * anything had been dropped. Same failure the law and corrections allowlists were added to
+ * fix. Any control the stories index renders has to be named here, or it silently does
+ * nothing — `parseStoriesQuery` and this list are one contract.
+ */
+export const STORIES_PAGE_PARAM_ALLOWLIST = [
+  'q',
+  'kind',
+  'series',
+  'tag',
+  'era',
+  'place',
+  'sort',
+  'page',
+] as const;
+
+export type StoriesPageParam = (typeof STORIES_PAGE_PARAM_ALLOWLIST)[number];
+
+/**
  * Allowed prefill keys on /corrections.
  *
  * `CorrectionForm` reads both from `useSearchParams` to pre-select the record under correction.

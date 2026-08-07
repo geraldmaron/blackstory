@@ -258,7 +258,7 @@ test('RacePairComparisonChart renders wealth juxtaposition with a chapter link',
   assert.match(html, /\$44,900/);
   assert.match(html, /\$285,000/);
   assert.match(html, /Read the chapter/);
-  assert.match(html, /\/chapters\/the-gap-that-never-closed/);
+  assert.match(html, /\/stories\/the-gap-that-never-closed/);
 });
 
 test('GroupedBarIndicatorChart renders NHGIS homeownership decades', () => {

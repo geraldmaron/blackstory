@@ -73,7 +73,7 @@ describe('destination registry · coverage', () => {
     // the library's own answers to "which room", even though it also appears in the off-ramp.
     for (const path of [
       '/records',
-      '/chapters',
+      '/stories',
       '/books',
       '/law',
       '/data',
@@ -97,7 +97,7 @@ describe('destination registry · coverage', () => {
     assert.equal(parentPathFor('/entity/tulsa-greenwood'), '/');
     assert.equal(parentPathFor('/books/beloved'), '/books');
     assert.equal(parentPathFor('/law/plessy'), '/law');
-    assert.equal(parentPathFor('/chapters/redlining'), '/chapters');
+    assert.equal(parentPathFor('/stories/redlining'), '/stories');
     assert.equal(parentPathFor('/corrections/status/ABC123'), '/corrections');
   });
 });
@@ -130,13 +130,13 @@ describe('destination registry · card content', () => {
   it('the modifier is appended to the class rather than replacing it', () => {
     assert.equal(classLabelFor(destinationFor('/law')!), 'READING ROOM · PLAIN LANGUAGE');
     assert.equal(classLabelFor(destinationFor('/memorial')!), 'READING ROOM · STILL');
-    assert.equal(classLabelFor(destinationFor('/chapters')!), 'READING ROOM');
+    assert.equal(classLabelFor(destinationFor('/stories')!), 'READING ROOM');
   });
 
   it('a card title may be a verb where the breadcrumb label cannot be', () => {
     assert.equal(cardTitleFor(destinationFor('/submit')!), 'Submit a lead');
     assert.equal(destinationFor('/submit')?.label, 'Submit', 'the crumb stays short');
-    assert.equal(cardTitleFor(destinationFor('/chapters')!), 'Chapters');
+    assert.equal(cardTitleFor(destinationFor('/stories')!), 'Stories');
   });
 
   it('every group in the type is a group the registry actually populates', () => {

@@ -9,7 +9,7 @@ import {
 } from './palette-seed';
 
 test('a mistyped path becomes the words the reader was reaching for', () => {
-  assert.equal(sanitizePaletteSeed('/chapters/tulsa-race-masacre'), 'chapters tulsa race masacre');
+  assert.equal(sanitizePaletteSeed('/stories/tulsa-race-masacre'), 'stories tulsa race masacre');
   assert.equal(
     sanitizePaletteSeed('/entity/lynching_isaac_mcghie'),
     'entity lynching isaac mcghie',
@@ -40,7 +40,7 @@ test('the seed is capped and never ends mid-space', () => {
 });
 
 test('non-latin scripts are kept: the archive is searched in more than ascii', () => {
-  assert.equal(sanitizePaletteSeed('/chapters/café-noir'), 'chapters café noir');
+  assert.equal(sanitizePaletteSeed('/stories/café-noir'), 'stories café noir');
 });
 
 test('subscribers are notified on change and only on change', () => {

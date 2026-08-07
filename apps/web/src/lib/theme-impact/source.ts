@@ -118,7 +118,7 @@ export async function resolveEntityCrossReferences(
  */
 function themeHref(themeId: string): string {
   const slug = THEME_CHAPTER_SLUGS[themeId];
-  return slug === undefined ? '/chapters' : `/chapters/${slug}`;
+  return slug === undefined ? '/stories' : `/stories/${slug}`;
 }
 
 /** Build an in-app href for a resolved cross-reference surface. Never returns a dead link. */

@@ -177,7 +177,7 @@ describe('room kit · the trail is computed, never hand-written', () => {
   });
 
   it('every step above the last is a real link', () => {
-    const trail = resolveTrail('/chapters/redlining', 'Redlining');
+    const trail = resolveTrail('/stories/redlining', 'Redlining');
     for (const step of trail.slice(0, -1)) assert.ok(step.href, `${step.label} must be a link`);
   });
 });

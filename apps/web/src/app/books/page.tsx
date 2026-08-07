@@ -98,7 +98,7 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
             Also find publications in the record index
           </Link>
           {' · '}
-          <Link className="ds-cta-link" href="/chapters">
+          <Link className="ds-cta-link" href="/stories">
             Chapters
           </Link>
           {' · '}

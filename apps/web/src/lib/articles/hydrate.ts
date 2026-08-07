@@ -38,6 +38,13 @@ export type HydratedArticleParagraph = {
   readonly text: string;
 };
 
+/** Call-out list. Items keep their inline citation markers for per-item rendering. */
+export type HydratedArticleList = {
+  readonly type: 'list';
+  readonly style: 'bullet' | 'number';
+  readonly items: readonly string[];
+};
+
 export type HydratedArticlePullQuote = {
   readonly type: 'pullquote';
   readonly text: string;
@@ -110,6 +117,7 @@ export type HydratedArticleImage = {
 export type HydratedArticleBlock =
   | HydratedArticleHeading
   | HydratedArticleParagraph
+  | HydratedArticleList
   | HydratedArticlePullQuote
   | HydratedArticleFigure
   | HydratedArticleStat
@@ -217,15 +225,25 @@ export function buildArticleReferences(
   };
 
   for (const block of doc.body) {
-    if (block.type === 'paragraph' || block.type === 'pullquote') {
-      for (const match of block.text.matchAll(INLINE_CITATION_PATTERN)) {
-        const id = match[1]!;
-        const ref = referenceById.get(id);
-        if (!ref) {
-          warn(`inline [ref:${id}] has no matching reference in "${doc.slug}" — skipping marker`);
-          continue;
+    // Every block carrying author prose contributes citation numbers, list items
+    // included — a call-out's reference has to land in the numbered list like any other.
+    const proseTexts =
+      block.type === 'paragraph' || block.type === 'pullquote'
+        ? [block.text]
+        : block.type === 'list'
+          ? block.items
+          : [];
+    if (proseTexts.length > 0) {
+      for (const text of proseTexts) {
+        for (const match of text.matchAll(INLINE_CITATION_PATTERN)) {
+          const id = match[1]!;
+          const ref = referenceById.get(id);
+          if (!ref) {
+            warn(`inline [ref:${id}] has no matching reference in "${doc.slug}" — skipping marker`);
+            continue;
+          }
+          refNumberById.set(id, ensure(ref.label, ref.url, ref.locator));
         }
-        refNumberById.set(id, ensure(ref.label, ref.url, ref.locator));
       }
       continue;
     }
@@ -292,6 +310,8 @@ function hydrateBlock(
     case 'paragraph':
     case 'dispute':
       return block;
+    case 'list':
+      return { type: 'list', style: block.style ?? 'bullet', items: block.items };
     case 'pullquote':
       return {
         type: 'pullquote',

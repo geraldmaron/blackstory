@@ -176,7 +176,7 @@ export function LawDetailIntro({ snapshot }: LawDetailIntroProps) {
           />
           <p className="ds-law-edition__credit">
             Archive texture · symbolic atmosphere.{' '}
-            <Link href="/chapters/mosaic-credits">Mosaic credits</Link>
+            <Link href="/stories/mosaic-credits">Mosaic credits</Link>
           </p>
         </div>
       </header>

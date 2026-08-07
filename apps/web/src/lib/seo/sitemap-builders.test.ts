@@ -17,7 +17,7 @@ test('buildPublicSitemapEntries includes static core journeys', () => {
   // `/records` replaced `/history` here with SP-09: the record index is the crawlable list the
   // decade view used to stand in for, and `/history` is now only a redirect into it.
   assert.ok(urls.some((url) => url.endsWith('/records')));
-  assert.ok(urls.some((url) => url.endsWith('/chapters')));
+  assert.ok(urls.some((url) => url.endsWith('/stories')));
   assert.ok(urls.some((url) => url.endsWith('/corrections')));
   assert.ok(urls.some((url) => url.endsWith('/law')));
   assert.ok(urls.some((url) => url.endsWith('/books')));

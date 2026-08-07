@@ -1,0 +1,110 @@
+/**
+ * `/stories` index controls: kind chips, the search + sort form, and the result count.
+ *
+ * Everything here is a link or a native form control, so the whole narrowing surface
+ * works without JavaScript and stays keyboard-navigable by default. Layout is flex with
+ * wrapping rather than a fixed column count, so the controls reflow at any width instead
+ * of relying on breakpoints to rescue them.
+ */
+
+.ds-stories-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+  margin: var(--ds-space-4) 0 var(--ds-space-5);
+  padding-bottom: var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-stories-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+}
+
+.ds-stories-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ds-space-3);
+}
+
+.ds-stories-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* The search field takes the slack; the sort select stays at its content width. */
+.ds-stories-field:first-of-type {
+  flex: 1 1 16rem;
+}
+
+.ds-stories-field__label {
+  color: var(--ds-ink-muted, var(--ds-ink));
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ds-stories-input,
+.ds-stories-select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.5rem 0.6rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm, 4px);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+}
+
+.ds-stories-input:focus-visible,
+.ds-stories-select:focus-visible,
+.ds-stories-submit:focus-visible {
+  outline: 2px solid var(--ds-accent-graphic);
+  outline-offset: 2px;
+}
+
+.ds-stories-submit {
+  padding: 0.5rem 0.9rem;
+  border: var(--ds-border-width) solid var(--ds-accent-graphic);
+  border-radius: var(--ds-radius-sm, 4px);
+  background: color-mix(in srgb, var(--ds-accent-graphic) 12%, var(--ds-surface-raised));
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.ds-stories-clear {
+  align-self: center;
+  color: var(--ds-ink-muted, var(--ds-ink));
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+}
+
+.ds-stories-count {
+  margin: 0;
+  color: var(--ds-ink-muted, var(--ds-ink));
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 33rem) {
+  .ds-stories-form {
+    align-items: stretch;
+  }
+
+  .ds-stories-field:first-of-type {
+    flex-basis: 100%;
+  }
+
+  .ds-stories-submit {
+    flex: 1 1 auto;
+  }
+}

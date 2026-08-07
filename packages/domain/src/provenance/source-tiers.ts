@@ -101,6 +101,125 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
     tier: 'T1',
     rationale: 'American Economic Association — peer-reviewed journal host',
   },
+  {
+    domain: 'journalofthecivilwarera.org',
+    tier: 'T1',
+    rationale: 'The Journal of the Civil War Era — peer-reviewed, University of North Carolina Press',
+  },
+  {
+    domain: 'cambridge.org',
+    tier: 'T1',
+    rationale: 'Cambridge University Press — peer-reviewed journals and academic monographs',
+  },
+  {
+    domain: 'theodorerooseveltcenter.org',
+    tier: 'T2',
+    rationale: 'Theodore Roosevelt Center, Dickinson State University — digital primary-document archive',
+  },
+  {
+    domain: 'about.usps.com',
+    tier: 'T2',
+    rationale:
+      'United States Postal Service official historian — federal agency history published on a .com host',
+  },
+  {
+    domain: 'forbeslibrary.org',
+    tier: 'T2',
+    rationale: 'Forbes Library — Calvin Coolidge Presidential Library and Museum, holder of the Coolidge papers',
+  },
+  {
+    domain: 'millercenter.org',
+    tier: 'T2',
+    rationale:
+      'Miller Center, University of Virginia — nonpartisan presidential scholarship; hosts the primary text of presidential speeches and messages',
+  },
+  {
+    domain: 'masshist.org',
+    tier: 'T2',
+    rationale: 'Massachusetts Historical Society — primary-document archive of record',
+  },
+  {
+    domain: 'fdrlibrary.org',
+    tier: 'T2',
+    rationale: 'Franklin D. Roosevelt Presidential Library and Museum (NARA presidential library)',
+  },
+  {
+    domain: 'history.army.mil',
+    tier: 'T2',
+    rationale:
+      'U.S. Army Center of Military History — official service history (.mil is not covered by the .gov fallback)',
+  },
+  {
+    domain: 'mil',
+    tier: 'T2',
+    rationale: 'U.S. military host (unspecified service or command)',
+  },
+
+  // Historic sites, state humanities councils and university-published reference works.
+  // T3 rather than T2: these are edited, citation-bearing secondary sources with named
+  // scholarly programs, not archives holding the primary record themselves.
+  {
+    domain: 'whitehousehistory.org',
+    tier: 'T3',
+    rationale:
+      'White House Historical Association — Rubenstein Center scholarship on the enslaved households of the presidents',
+  },
+  {
+    domain: 'encyclopediavirginia.org',
+    tier: 'T3',
+    rationale: 'Encyclopedia Virginia — Virginia Humanities, editorially reviewed and cited entries',
+  },
+  {
+    domain: 'montpelier.org',
+    tier: 'T3',
+    rationale: "James Madison's Montpelier — museum research program and descendant-community scholarship",
+  },
+  {
+    domain: 'highland.org',
+    tier: 'T3',
+    rationale: "James Monroe's Highland — historic site research program (William & Mary)",
+  },
+  {
+    domain: 'thehermitage.com',
+    tier: 'T3',
+    rationale: "Andrew Jackson's Hermitage — museum research and site archaeology",
+  },
+  {
+    domain: 'scencyclopedia.org',
+    tier: 'T3',
+    rationale: 'South Carolina Encyclopedia — USC Institute for Southern Studies',
+  },
+  {
+    domain: 'philadelphiaencyclopedia.org',
+    tier: 'T3',
+    rationale: 'Encyclopedia of Greater Philadelphia — Rutgers University-Camden',
+  },
+  {
+    domain: 'factcheck.org',
+    tier: 'T3',
+    rationale: 'FactCheck.org — Annenberg Public Policy Center, University of Pennsylvania',
+  },
+  {
+    domain: 'civilrights.org',
+    tier: 'T3',
+    rationale: 'The Leadership Conference on Civil and Human Rights — published research reports',
+  },
+  { domain: 'pbs.org', tier: 'T3', rationale: 'PBS — public broadcaster, documented sourcing' },
+  {
+    domain: 'ncpedia.org',
+    tier: 'T3',
+    rationale: 'NCpedia — State Library of North Carolina, edited and cited reference work',
+  },
+  {
+    domain: 'gilderlehrman.org',
+    tier: 'T3',
+    rationale: 'Gilder Lehrman Institute of American History — curated primary sources with scholarly essays',
+  },
+  {
+    domain: 'tshaonline.org',
+    tier: 'T3',
+    rationale: 'Texas State Historical Association — Handbook of Texas, edited and cited entries',
+  },
 
   // ---- T3: established nonprofits / journalism with named methodology ----
   { domain: 'vera.org', tier: 'T3', rationale: 'Vera Institute of Justice' },

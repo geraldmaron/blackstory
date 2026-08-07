@@ -15,6 +15,11 @@ export type ArticleProseProps = {
   readonly text: string;
   readonly refNumberById: ReadonlyMap<string, number>;
   readonly className?: string;
+  /**
+   * Element to render into. Defaults to `p`; call-out list items pass `span` so the
+   * prose sits inside its own `<li>` rather than nesting a paragraph in a list item.
+   */
+  readonly as?: 'p' | 'span';
 };
 
 const CITE_MARKER_SOURCE = String.raw`\[ref:([a-z0-9]+(?:-[a-z0-9]+)*)\]`;
@@ -75,10 +80,11 @@ export function ArticleCitationMarks({ numbers }: { readonly numbers: readonly n
   );
 }
 
-export function ArticleProse({ text, refNumberById, className }: ArticleProseProps) {
+export function ArticleProse({ text, refNumberById, className, as }: ArticleProseProps) {
   const segments = segmentize(text, refNumberById);
+  const Tag = as ?? 'p';
   return (
-    <p className={className}>
+    <Tag className={className}>
       {segments.map((segment, index) => {
         if (segment.kind === 'text') {
           return <React.Fragment key={index}>{segment.value}</React.Fragment>;
@@ -92,6 +98,6 @@ export function ArticleProse({ text, refNumberById, className }: ArticleProsePro
         }
         return <ArticleCitationMarks key={index} numbers={[segment.number]} />;
       })}
-    </p>
+    </Tag>
   );
 }

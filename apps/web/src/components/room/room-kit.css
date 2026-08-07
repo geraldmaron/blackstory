@@ -320,6 +320,19 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Anchor the crop to the top. `cover` defaults to centring, which cut the head off every
+     full-length portrait in the presidential series — a card grid of decapitated subjects.
+     Faces sit near the top of a portrait, and a landscape hero (a redlining map, a
+     postcard) loses nothing meaningful from its lower edge, so top is right for both. */
+  object-position: center top;
+}
+
+/* A gallery of portraits: show the whole image rather than crop it. No single crop origin
+   suits both a full-length painting (head in the upper third) and a tight bust (head
+   filling the frame) — centring beheads the first, top-anchoring clips the second. */
+.ds-room-card__media--contain img {
+  object-fit: contain;
+  object-position: center;
 }
 
 .ds-room-card__kind {

@@ -17,7 +17,7 @@ import {
 import '../../utility.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
-  path: '/chapters/mosaic-credits',
+  path: '/stories/mosaic-credits',
   title: 'Archive mosaic credits',
   description:
     'Source credits for the rights-cleared archive mosaic tiles used as symbolic atmosphere on BlackStory story and about pages.',
@@ -27,7 +27,7 @@ export default function MosaicCreditsPage() {
   return (
     <Room>
       <RoomHeader
-        pathname="/chapters/mosaic-credits"
+        pathname="/stories/mosaic-credits"
         kicker="Attribution"
         title={
           <>
@@ -61,7 +61,7 @@ export default function MosaicCreditsPage() {
       <OffRamp
         title="Keep reading"
         actions={[
-          { href: '/chapters', label: 'All chapters', emphasis: 'copper' },
+          { href: '/stories', label: 'All stories', emphasis: 'copper' },
           { href: '/about', label: 'About the archive' },
         ]}
       >

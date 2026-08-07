@@ -132,8 +132,8 @@ const DESTINATIONS: readonly Destination[] = [
 
   /* ---- read ---- */
   {
-    path: '/chapters',
-    label: 'Chapters',
+    path: '/stories',
+    label: 'Stories',
     parent: '/library',
     kind: 'LONG FORM',
     description:
@@ -252,9 +252,9 @@ const DESTINATIONS: readonly Destination[] = [
 
   /* ---- real destinations, but not somewhere we send a reader browsing ---- */
   {
-    path: '/chapters/mosaic-credits',
+    path: '/stories/mosaic-credits',
     label: 'Mosaic credits',
-    parent: '/chapters',
+    parent: '/stories',
     crawl: { changeFrequency: 'monthly', priority: 0.2 },
   },
   // `/corrections/appeal` and `/corrections/abuse` are gone from this list. They were carried
@@ -296,7 +296,7 @@ const DESTINATION_BY_PATH: ReadonlyMap<string, Destination> = new Map(
  */
 export const DYNAMIC_PARENTS: readonly (readonly [string, string])[] = [
   ['/corrections/status/', '/corrections'],
-  ['/chapters/', '/chapters'],
+  ['/stories/', '/stories'],
   ['/entity/', '/'],
   ['/books/', '/books'],
   ['/law/', '/law'],

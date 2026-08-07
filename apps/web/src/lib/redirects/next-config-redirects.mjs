@@ -24,24 +24,23 @@ import { buildThemeAliasRedirects } from './theme-alias-table.mjs';
  */
 export function redirectsForNextConfig() {
   return [
-    // Legacy publication surfaces all fold into /chapters. Article detail slugs carry over 1:1;
-    // the theme, story and topic indexes collapse to the chapters index.
-    { source: '/articles/:slug', destination: '/chapters/:slug', permanent: true },
-    { source: '/articles', destination: '/chapters', permanent: true },
-    { source: '/stories', destination: '/chapters', permanent: true },
-    // Site-wide atmosphere-tile attribution keeps its own page (moved under /chapters); this
-    // specific rule must precede the /stories/:path* catch-all.
-    { source: '/stories/mosaic-credits', destination: '/chapters/mosaic-credits', permanent: true },
-    { source: '/stories/:path*', destination: '/chapters', permanent: true },
+    // Every legacy publication surface folds into /stories, the single long-form index.
+    // A chapter is now one kind of story rather than its own surface, so /chapters
+    // redirects here too; detail slugs carry over 1:1 because the slug namespace is shared.
+    { source: '/chapters/mosaic-credits', destination: '/stories/mosaic-credits', permanent: true },
+    { source: '/chapters/:slug', destination: '/stories/:slug', permanent: true },
+    { source: '/chapters', destination: '/stories', permanent: true },
+    { source: '/articles/:slug', destination: '/stories/:slug', permanent: true },
+    { source: '/articles', destination: '/stories', permanent: true },
 
-    { source: '/themes', destination: '/chapters', permanent: true },
+    { source: '/themes', destination: '/stories', permanent: true },
     // Generated from THEME_CHAPTER_SLUGS — the same table `theme-impact/source.ts` builds its
     // in-app hrefs from, so a new chapter cannot land with a stale redirect behind it.
     ...buildThemeAliasRedirects(),
-    { source: '/themes/:path*', destination: '/chapters', permanent: true },
+    { source: '/themes/:path*', destination: '/stories', permanent: true },
 
-    { source: '/topics', destination: '/chapters', permanent: true },
-    { source: '/topics/:path*', destination: '/chapters', permanent: true },
+    { source: '/topics', destination: '/stories', permanent: true },
+    { source: '/topics/:path*', destination: '/stories', permanent: true },
 
     // Straight to the record index. Routing /facts through /history instead would be a chain,
     // because /history resolves to /records too.

@@ -68,7 +68,7 @@ test('resolveEntityCrossReferences resolves a single bound packet', async () => 
   assert.ok(surface);
   assert.equal(surface.kind, 'theme_packet');
   // redlining has an authored chapter, so the href targets it directly.
-  assert.equal(entityCrossReferenceHref(surface), '/chapters/buying-a-home');
+  assert.equal(entityCrossReferenceHref(surface), '/stories/buying-a-home');
   assert.equal(entityCrossReferenceLabel(surface), 'Housing segregation & redlining: Question Q1');
 });
 
@@ -84,13 +84,13 @@ test('resolveEntityCrossReferences resolves bound packets across multiple themes
   assert.equal(surfaces.length, 2);
   for (const surface of surfaces) {
     assert.equal(surface.kind, 'theme_packet');
-    assert.match(entityCrossReferenceHref(surface), /^\/chapters/);
+    assert.match(entityCrossReferenceHref(surface), /^\/stories/);
     assert.ok(entityCrossReferenceLabel(surface).length > 0);
   }
   // urban_renewal has no authored chapter yet, so its href falls back to the index.
   const urbanRenewal = surfaces.find((surface) => surface.themeId === 'urban_renewal');
   assert.ok(urbanRenewal);
-  assert.equal(entityCrossReferenceHref(urbanRenewal), '/chapters');
+  assert.equal(entityCrossReferenceHref(urbanRenewal), '/stories');
 });
 
 test('resolveEntityCrossReferences skips themes with no catalog title', async () => {

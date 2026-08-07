@@ -39,6 +39,14 @@ export function CardGrid({ children, className }: CardGridProps) {
 export type RoomCardMedia = {
   readonly url: string;
   readonly alt: string;
+  /**
+   * How the image fills its slot. `cover` (default) fills the box and crops, which is right
+   * for a hero whose subject is the whole frame — a map, a streetscape. `contain` fits the
+   * whole image inside the box, which is right when the subject must not be cut: a gallery
+   * of portraits has no crop origin that works for both a full-length painting and a tight
+   * bust, so cropping either beheads one or clips the forehead off the other.
+   */
+  readonly fit?: 'cover' | 'contain';
 };
 
 export type RoomCardProps = {
@@ -67,7 +75,12 @@ export function RoomCard({
   return (
     <Link className={cx('ds-room-card', media && 'ds-room-card--media', className)} href={href}>
       {media ? (
-        <span className="ds-room-card__media">
+        <span
+          className={cx(
+            'ds-room-card__media',
+            media.fit === 'contain' && 'ds-room-card__media--contain',
+          )}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={media.url} alt={media.alt} loading="lazy" />
         </span>

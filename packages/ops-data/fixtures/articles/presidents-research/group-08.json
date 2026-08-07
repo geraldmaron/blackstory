@@ -1,0 +1,856 @@
+{
+  "presidents": [
+    {
+      "number": 40,
+      "name": "Ronald Reagan",
+      "termLabel": "1981–1989",
+      "summary": "Reagan signed the law making Martin Luther King, Jr.'s birthday a federal holiday in 1983 and signed the Anti-Drug Abuse Act of 1986, which set mandatory minimum drug penalties at what the U.S. Sentencing Commission later called the 100-to-1 crack-to-powder cocaine quantity ratio. He vetoed the Comprehensive Anti-Apartheid Act of 1986 and the Civil Rights Restoration Act of 1987; Congress overrode both vetoes.",
+      "paragraph": "Two of Reagan's most-cited actions on race point in opposite directions, and both are on the record in the Statutes at Large. On November 2, 1983 he signed Public Law 98-144, adding \"Birthday of Martin Luther King, Jr., the third Monday in January\" to the federal holiday list, and he spoke at the signing with Coretta Scott King present. Three years later, on October 27, 1986, he signed Public Law 99-570, the Anti-Drug Abuse Act, whose text set the five-year mandatory minimum at 5 grams of cocaine base but 500 grams of powder, and the ten-year minimum at 50 grams versus 5,000 — the ratio the U.S. Sentencing Commission's 2007 report to Congress describes as the \"100-to-1 drug quantity ratio.\" He also vetoed two bills Congress then enacted over his objection: the Comprehensive Anti-Apartheid Act of 1986 (vetoed September 26, 1986; House overrode September 29, Senate October 2) and the Civil Rights Restoration Act of 1987 (vetoed March 16, 1988; both chambers overrode March 22).",
+      "callouts": [
+        {
+          "text": "Nov. 2, 1983: signed Public Law 98-144 (97 Stat. 917) making the birthday of Martin Luther King, Jr. a legal public holiday, effective after a two-year period.",
+          "sources": [
+            {
+              "label": "GovInfo, Statutes at Large, PL 98-144",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-97/pdf/STATUTE-97-Pg917.pdf",
+              "quote": "Birthday of Martin Luther King, Jr., the third Monday in January."
+            },
+            {
+              "label": "American Presidency Project (UC Santa Barbara), Remarks on Signing, Nov. 2, 1983",
+              "url": "https://www.presidency.ucsb.edu/documents/remarks-signing-the-bill-making-the-birthday-martin-luther-king-jr-national-holiday",
+              "quote": "Remarks on Signing the Bill Making the Birthday of Martin Luther King, Jr., a National Holiday"
+            }
+          ]
+        },
+        {
+          "text": "Oct. 27, 1986: signed the Anti-Drug Abuse Act, Public Law 99-570 (100 Stat. 3207), whose mandatory minimums keyed on 5 and 50 grams of cocaine base versus 500 and 5,000 grams of powder cocaine.",
+          "sources": [
+            {
+              "label": "GovInfo, Statutes at Large, PL 99-570",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-100/pdf/STATUTE-100-Pg3207.pdf",
+              "quote": "5 grams or more of a mixture or substance described in clause (ii) which contains cocaine base"
+            },
+            {
+              "label": "U.S. Sentencing Commission, Report to Congress: Cocaine and Federal Sentencing Policy (May 2007)",
+              "url": "https://www.ussc.gov/sites/default/files/pdf/news/congressional-testimony-and-reports/drug-topics/200705_RtC_Cocaine_Sentencing_Policy.pdf",
+              "quote": "this penalty structure is commonly referred to as the \"100-to-1 drug quantity ratio.\""
+            }
+          ]
+        },
+        {
+          "text": "Sept. 26, 1986: vetoed H.R. 4868, the Comprehensive Anti-Apartheid Act. The House overrode Sept. 29 and the Senate Oct. 2, 1986, enacting Public Law 99-440 (100 Stat. 1086).",
+          "sources": [
+            {
+              "label": "American Presidency Project (UCSB), veto message, Sept. 26, 1986",
+              "url": "https://www.presidency.ucsb.edu/documents/message-the-house-representatives-returning-without-approval-bill-concerning-apartheid",
+              "quote": "I am returning herewith without my approval H.R. 4868, the Comprehensive Anti-Apartheid Act of 1986."
+            },
+            {
+              "label": "GovInfo, Statutes at Large, PL 99-440 legislative history",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-100/pdf/STATUTE-100-Pg1086.pdf",
+              "quote": "Sept. 29, House overrode veto. Oct. 2, Senate overrode veto."
+            }
+          ]
+        },
+        {
+          "text": "March 16, 1988: vetoed S. 557, the Civil Rights Restoration Act of 1987; the Senate and House overrode the veto March 22, 1988, enacting Public Law 100-259 (102 Stat. 28).",
+          "sources": [
+            {
+              "label": "GovInfo, Statutes at Large, PL 100-259 legislative history",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-102/pdf/STATUTE-102-Pg28.pdf",
+              "quote": "Mar. 16, Presidential veto messages. ... Mar. 22, Senate and House overrode veto."
+            },
+            {
+              "label": "GovInfo, Statutes at Large, PL 100-259 (text and enrollment resolution)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-102/pdf/STATUTE-102-Pg28.pdf",
+              "quote": "returned by the President of the United States with his objections, to the Senate, in which it originated, and passed by the Senate on reconsideration"
+            }
+          ]
+        }
+      ],
+      "personalRecord": "",
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/1/16/Official_Portrait_of_President_Reagan_1981.jpg",
+        "alt": "Official 1981 White House portrait photograph of President Ronald Reagan",
+        "credit": "White House Photographic Office, via Wikimedia Commons (verified HTTP 200, image/jpeg)",
+        "rights": "public_domain"
+      },
+      "sources": [
+        {
+          "id": "pl-98-144-mlk-holiday",
+          "label": "Public Law 98-144, 97 Stat. 917 (Nov. 2, 1983), GovInfo",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-97/pdf/STATUTE-97-Pg917.pdf",
+          "quote": "An Act To amend title 5, United States Code, to make the birthday of Martin Luther King, Jr., a legal public holiday."
+        },
+        {
+          "id": "ucsb-reagan-mlk-signing",
+          "label": "American Presidency Project, Reagan remarks on signing MLK holiday bill, Nov. 2, 1983",
+          "url": "https://www.presidency.ucsb.edu/documents/remarks-signing-the-bill-making-the-birthday-martin-luther-king-jr-national-holiday",
+          "quote": "The man whose words and deeds in that crisis stirred our nation to the very depths of its soul was Dr. Martin Luther King, Jr."
+        },
+        {
+          "id": "pl-99-570-anti-drug-abuse-1986",
+          "label": "Public Law 99-570, 100 Stat. 3207 (Oct. 27, 1986), GovInfo",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-100/pdf/STATUTE-100-Pg3207.pdf",
+          "quote": "50 grams or more of a mixture or substance described in clause (ii) which contains cocaine base"
+        },
+        {
+          "id": "ussc-2007-cocaine-report",
+          "label": "U.S. Sentencing Commission, Cocaine and Federal Sentencing Policy, Report to Congress (May 2007)",
+          "url": "https://www.ussc.gov/sites/default/files/pdf/news/congressional-testimony-and-reports/drug-topics/200705_RtC_Cocaine_Sentencing_Policy.pdf",
+          "quote": "Because it takes 100 times more powder cocaine than crack cocaine to trigger the same mandatory minimum penalty"
+        },
+        {
+          "id": "reagan-apartheid-veto-message",
+          "label": "American Presidency Project, Reagan message returning H.R. 4868 without approval, Sept. 26, 1986",
+          "url": "https://www.presidency.ucsb.edu/documents/message-the-house-representatives-returning-without-approval-bill-concerning-apartheid",
+          "quote": "Title III of this bill would seriously impede the prospects for a peaceful end to apartheid"
+        },
+        {
+          "id": "pl-99-440-anti-apartheid",
+          "label": "Public Law 99-440, 100 Stat. 1086 (Oct. 2, 1986), GovInfo",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-100/pdf/STATUTE-100-Pg1086.pdf",
+          "quote": "This Act may be cited as the \"Comprehensive Anti-Apartheid Act of 1986\"."
+        },
+        {
+          "id": "pl-100-259-civil-rights-restoration",
+          "label": "Public Law 100-259, 102 Stat. 28 (Mar. 22, 1988), GovInfo",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-102/pdf/STATUTE-102-Pg28.pdf",
+          "quote": "This Act may be cited as the \"Civil Rights Restoration Act of 1987\"."
+        }
+      ],
+      "disputes": [
+        "Reagan's stated reason for vetoing the Comprehensive Anti-Apartheid Act was that broad sanctions would harm Black South Africans and impede a peaceful end to apartheid; the congressional majority that overrode the veto held the opposite view of sanctions' effect. The record shows both positions; this file does not resolve which was correct.",
+        "Whether the 100-to-1 crack/powder ratio in the 1986 Act was intended to target Black defendants, or produced that effect without that intent, is contested in the scholarly literature. The U.S. Sentencing Commission's reports document the disparate racial impact but the question of legislative intent is not settled by the sources fetched here."
+      ],
+      "unverified": [
+        "Roll-call vote tallies for the 1986 and 1988 veto overrides were not verified from a fetched page (Senate.gov roll-call records begin with the 101st Congress); only the fact and dates of the overrides are sourced, from the Statutes at Large legislative-history notes."
+      ]
+    },
+    {
+      "number": 41,
+      "name": "George H. W. Bush",
+      "termLabel": "1989–1993",
+      "summary": "Bush vetoed the Civil Rights Act of 1990 on October 22, 1990, and the Senate failed to override it two days later by 66-34. He signed a renegotiated bill, the Civil Rights Act of 1991, on November 21, 1991, and nominated Clarence Thomas to the Supreme Court, who was confirmed 52-48 on October 15, 1991.",
+      "paragraph": "Bush's civil rights record turns on a two-year fight over employment discrimination law. On October 22, 1990 he returned S. 2104, the Civil Rights Act of 1990, to the Senate without his approval, writing that he deeply regretted acting against a bill with that title. The Senate's override attempt failed 66-34 on October 24, 1990. A year later he signed a renegotiated version: Public Law 102-166, the Civil Rights Act of 1991, enacted November 21, 1991, whose findings say added remedies were needed to deter workplace harassment and intentional discrimination and which responded directly to the Supreme Court's Wards Cove decision. In between, he nominated Clarence Thomas to succeed Thurgood Marshall on the Supreme Court. The Senate confirmed Thomas 52-48 on October 15, 1991, after hearings that reopened over Anita Hill's allegations. That vote remains among the closest Supreme Court confirmations on record.",
+      "callouts": [
+        {
+          "text": "Oct. 22, 1990: vetoed S. 2104, the Civil Rights Act of 1990. The Senate's override attempt failed 66-34 on Oct. 24, 1990 (roll-call vote 304, 101st Congress).",
+          "sources": [
+            {
+              "label": "American Presidency Project (UCSB), veto message, Oct. 22, 1990",
+              "url": "https://www.presidency.ucsb.edu/documents/message-the-senate-returning-without-approval-the-civil-rights-act-1990",
+              "quote": "I am today returning without my approval S. 2104, the \"Civil Rights Act of 1990.\""
+            },
+            {
+              "label": "U.S. Senate, roll call votes, 101st Congress, 2nd Session",
+              "url": "https://www.senate.gov/legislative/LIS/roll_call_lists/vote_menu_101_2.htm",
+              "quote": "Oct 24 (00304) 304 (66-34) Veto Sustained On Overriding the Veto: S. 2104"
+            }
+          ]
+        },
+        {
+          "text": "Nov. 21, 1991: signed the Civil Rights Act of 1991, Public Law 102-166 (105 Stat. 1071), providing damages in intentional employment discrimination cases.",
+          "sources": [
+            {
+              "label": "GovInfo, Statutes at Large, PL 102-166",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-105/pdf/STATUTE-105-Pg1071.pdf",
+              "quote": "This Act may be cited as the \"Civil Rights Act of 1991\"."
+            },
+            {
+              "label": "U.S. Senate, roll call votes, 101st Congress (context: prior-year bill S. 2104)",
+              "url": "https://www.senate.gov/legislative/LIS/roll_call_lists/vote_menu_101_2.htm",
+              "quote": "A bill to amend the Civil Rights Act of 1964 to restore and strengthen civil rights laws that ban discrimination in employment"
+            }
+          ]
+        },
+        {
+          "text": "Oct. 15, 1991: the Senate confirmed Clarence Thomas, of Georgia, as Associate Justice of the Supreme Court by 52 yeas to 48 nays (roll-call vote 220, 102nd Congress).",
+          "sources": [
+            {
+              "label": "U.S. Senate, Roll Call Vote 102nd Congress, 1st Session, Vote 220",
+              "url": "https://www.senate.gov/legislative/LIS/roll_call_lists/roll_call_vote_cfm.cfm?congress=102&session=1&vote=00220",
+              "quote": "Vote Result: Nomination Confirmed ... Vote Counts: YEAs 52 NAYs 48"
+            },
+            {
+              "label": "GovInfo, PL 102-166 (contemporaneous statutory response to Supreme Court employment rulings)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-105/pdf/STATUTE-105-Pg1071.pdf",
+              "quote": "the decision of the Supreme Court in Wards Cove Packing Co. v. Atonio, 490 U.S. 642"
+            }
+          ]
+        },
+        {
+          "text": "The 1991 Act's congressional findings state that additional federal remedies were needed to deter unlawful harassment and intentional discrimination in the workplace.",
+          "sources": [
+            {
+              "label": "GovInfo, Statutes at Large, PL 102-166, Sec. 2",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-105/pdf/STATUTE-105-Pg1071.pdf",
+              "quote": "additional remedies under Federal law are needed to deter unlawful harassment and intentional discrimination in the workplace"
+            },
+            {
+              "label": "American Presidency Project (UCSB), 1990 veto message (Bush's stated objections to the earlier version)",
+              "url": "https://www.presidency.ucsb.edu/documents/message-the-senate-returning-without-approval-the-civil-rights-act-1990",
+              "quote": "One step that the Congress can take to fight discrimination right now is to act promptly on the civil rights"
+            }
+          ]
+        }
+      ],
+      "personalRecord": "",
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/9/90/George_H._W._Bush%2C_President_of_the_United_States%2C_1989_official_portrait_%28cropped%29.jpg",
+        "alt": "Official 1989 White House portrait photograph of President George H. W. Bush",
+        "credit": "White House / Executive Office of the President, via Wikimedia Commons (verified HTTP 200, image/jpeg)",
+        "rights": "public_domain"
+      },
+      "sources": [
+        {
+          "id": "bush41-cra1990-veto-message",
+          "label": "American Presidency Project, Message to the Senate Returning Without Approval the Civil Rights Act of 1990, Oct. 22, 1990",
+          "url": "https://www.presidency.ucsb.edu/documents/message-the-senate-returning-without-approval-the-civil-rights-act-1990",
+          "quote": "Discrimination, whether on the basis of race, national origin, sex, religion, or disability, is worse than wrong."
+        },
+        {
+          "id": "senate-101-2-vote-menu",
+          "label": "U.S. Senate, Roll Call Vote Menu, 101st Congress, 2nd Session",
+          "url": "https://www.senate.gov/legislative/LIS/roll_call_lists/vote_menu_101_2.htm",
+          "quote": "Oct 24 (00304) 304 (66-34) Veto Sustained On Overriding the Veto: S. 2104 - Veto Override"
+        },
+        {
+          "id": "pl-102-166-cra-1991",
+          "label": "Public Law 102-166, 105 Stat. 1071 (Nov. 21, 1991), GovInfo",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-105/pdf/STATUTE-105-Pg1071.pdf",
+          "quote": "To amend the Civil Rights Act of 1964 to strengthen and improve Federal civil rights laws"
+        },
+        {
+          "id": "senate-vote-102-1-220-thomas",
+          "label": "U.S. Senate, Roll Call Vote 220, 102nd Congress, 1st Session (Clarence Thomas confirmation), Oct. 15, 1991",
+          "url": "https://www.senate.gov/legislative/LIS/roll_call_lists/roll_call_vote_cfm.cfm?congress=102&session=1&vote=00220",
+          "quote": "Nomination Description: Clarence Thomas, of Georgia, to be an Associate Justice of the Supreme Court of the United States"
+        }
+      ],
+      "disputes": [
+        "Bush characterized the 1990 bill as a \"quota bill\" and its sponsors rejected that description; the veto message and the Senate record preserve both framings without resolving them.",
+        "Whether the Civil Rights Act of 1991 substantially restored, or only partially restored, the standards narrowed by the Supreme Court's 1989 employment-discrimination decisions is disputed among legal scholars. The statute's own findings claim restoration; the extent is contested."
+      ],
+      "unverified": []
+    },
+    {
+      "number": 42,
+      "name": "Bill Clinton",
+      "termLabel": "1993–2001",
+      "summary": "Clinton signed the Violent Crime Control and Law Enforcement Act of 1994 and the welfare overhaul of 1996, and created the President's Advisory Board on Race by executive order in 1997. In July 2015 he told the NAACP's annual convention that he had signed a bill that made the problem worse.",
+      "paragraph": "Clinton signed two laws that dominate assessments of his record. Public Law 103-322, the Violent Crime Control and Law Enforcement Act of 1994, became law September 13, 1994; it funded 100,000 additional police officers and carried a federal \"three strikes\" life-sentence provision. Public Law 104-193, the Personal Responsibility and Work Opportunity Reconciliation Act, became law August 22, 1996, converting cash welfare into the Temporary Assistance for Needy Families block grant. Between them, on June 13, 1997, he issued Executive Order 13050 creating the President's Advisory Board on Race, a seven-member outside panel meant to advise on race relations, the public face of what the administration called One America. Two decades later, at the NAACP's annual meeting in Philadelphia in July 2015, Clinton said of the crime bill, \"I signed a bill that made the problem worse. And I want to admit it.\" Both CNN and FactCheck.org report the same wording.",
+      "callouts": [
+        {
+          "text": "Sept. 13, 1994: signed the Violent Crime Control and Law Enforcement Act of 1994, Public Law 103-322 (108 Stat. 1796), including \"Cops on the Beat\" community policing and prison-construction incentive grants.",
+          "sources": [
+            {
+              "label": "GovInfo, Statutes at Large, PL 103-322",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-108/pdf/STATUTE-108-Pg1796.pdf",
+              "quote": "This Act may be cited as the \"Violent Crime Control and Law Enforcement Act of 1994\"."
+            },
+            {
+              "label": "FactCheck.org (Annenberg Public Policy Center, Univ. of Pennsylvania), Bill Clinton and the 1994 Crime Bill",
+              "url": "https://www.factcheck.org/2016/04/bill-clinton-and-the-1994-crime-bill/",
+              "quote": "the tougher incarceration provisions in the 1994 crime bill"
+            }
+          ]
+        },
+        {
+          "text": "Aug. 22, 1996: signed the Personal Responsibility and Work Opportunity Reconciliation Act, Public Law 104-193 (110 Stat. 2105), replacing cash welfare with Temporary Assistance for Needy Families block grants.",
+          "sources": [
+            {
+              "label": "GovInfo, Statutes at Large, PL 104-193",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-104publ193/html/PLAW-104publ193.htm",
+              "quote": "TITLE I--BLOCK GRANTS FOR TEMPORARY ASSISTANCE FOR NEEDY FAMILIES"
+            },
+            {
+              "label": "GovInfo, PL 104-193 enactment note",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-104publ193/html/PLAW-104publ193.htm",
+              "quote": "Aug. 22, 1996 - [H.R. 3734]"
+            }
+          ]
+        },
+        {
+          "text": "June 13, 1997: issued Executive Order 13050 establishing the President's Advisory Board on Race, a seven-member panel from outside the federal government.",
+          "sources": [
+            {
+              "label": "American Presidency Project (UCSB), Executive Order 13050, June 13, 1997",
+              "url": "https://www.presidency.ucsb.edu/documents/executive-order-13050-presidents-advisory-board-race",
+              "quote": "There is established the President's Advisory Board on Race. The Advisory Board shall comprise 7 members from outside the Federal Government"
+            },
+            {
+              "label": "GovInfo, Statutes at Large, PL 103-322 (the policy backdrop the Board was asked to address)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-108/pdf/STATUTE-108-Pg1796.pdf",
+              "quote": "Community policing; \"Cops on the Beat\""
+            }
+          ]
+        },
+        {
+          "text": "July 15, 2015: at the NAACP annual meeting in Philadelphia, Clinton said of the 1994 crime bill, \"I signed a bill that made the problem worse. And I want to admit it.\"",
+          "sources": [
+            {
+              "label": "CNN Politics, July 15, 2015",
+              "url": "https://www.cnn.com/2015/07/15/politics/bill-clinton-1994-crime-bill",
+              "quote": "“I signed a bill that made the problem worse,” Clinton told an audience at the National Association for the Advancement of Colored People’s annual meeting in Philadelphia."
+            },
+            {
+              "label": "FactCheck.org (Annenberg Public Policy Center, Univ. of Pennsylvania)",
+              "url": "https://www.factcheck.org/2016/04/bill-clinton-and-the-1994-crime-bill/",
+              "quote": "I signed a bill that made the problem worse. And I want to admit it."
+            }
+          ]
+        }
+      ],
+      "personalRecord": "",
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Bill_Clinton.jpg",
+        "alt": "Official White House portrait photograph of President Bill Clinton",
+        "credit": "White House / Executive Office of the President, via Wikimedia Commons (verified HTTP 200, image/jpeg)",
+        "rights": "public_domain"
+      },
+      "sources": [
+        {
+          "id": "pl-103-322-crime-act-1994",
+          "label": "Public Law 103-322, 108 Stat. 1796 (Sept. 13, 1994), GovInfo",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-108/pdf/STATUTE-108-Pg1796.pdf",
+          "quote": "An Act To control and prevent crime."
+        },
+        {
+          "id": "pl-104-193-prwora",
+          "label": "Public Law 104-193, 110 Stat. 2105 (Aug. 22, 1996), GovInfo",
+          "url": "https://www.govinfo.gov/content/pkg/PLAW-104publ193/html/PLAW-104publ193.htm",
+          "quote": "This Act may be cited as the \"Personal Responsibility and Work Opportunity Reconciliation Act of 1996\"."
+        },
+        {
+          "id": "eo-13050-race-board",
+          "label": "Executive Order 13050, President's Advisory Board on Race, June 13, 1997 (American Presidency Project)",
+          "url": "https://www.presidency.ucsb.edu/documents/executive-order-13050-presidents-advisory-board-race",
+          "quote": "in order to establish a President's Advisory Board on Race, it is hereby ordered as follows"
+        },
+        {
+          "id": "cnn-clinton-2015-naacp",
+          "label": "CNN, \"Bill Clinton says he made mass incarceration issue worse,\" July 15, 2015",
+          "url": "https://www.cnn.com/2015/07/15/politics/bill-clinton-1994-crime-bill",
+          "quote": "the crime bill he signed into law as President in 1994 worsened the nation’s criminal justice system by increasing prison sentences"
+        },
+        {
+          "id": "factcheck-clinton-crime-bill",
+          "label": "FactCheck.org, \"Bill Clinton and the 1994 Crime Bill\" (April 2016)",
+          "url": "https://www.factcheck.org/2016/04/bill-clinton-and-the-1994-crime-bill/",
+          "quote": "At the NAACP convention in Philadelphia in July 2015, Clinton stated: \"I signed a bill that made the problem worse.\""
+        }
+      ],
+      "disputes": [
+        "How much of the 1990s rise in incarceration is attributable to the 1994 federal crime bill is contested. Clinton has said the bill made the problem worse; other analysts, including FactCheck.org's review, note most incarceration growth occurred under state law rather than the federal statute. Both accounts are recorded here.",
+        "The effect of the 1996 welfare law on Black families is disputed between accounts emphasizing caseload and employment declines and accounts emphasizing deepened extreme poverty. This file records the statute, not a verdict on its effects."
+      ],
+      "unverified": [
+        "The date of Clinton's NAACP remarks is given as July 2015 by FactCheck.org and July 15, 2015 by CNN; a primary transcript was not fetched.",
+        "The final report of the President's Advisory Board on Race (\"One America in the 21st Century\") was not fetched and its contents are not summarized here."
+      ]
+    },
+    {
+      "number": 43,
+      "name": "George W. Bush",
+      "termLabel": "2001–2009",
+      "summary": "Bush signed the 25-year reauthorization of the Voting Rights Act on July 27, 2006. His administration's response to Hurricane Katrina in 2005 was found deficient by a House select committee whose final report was titled \"A Failure of Initiative.\"",
+      "paragraph": "Two documented events define this stretch. Hurricane Katrina struck the Gulf Coast in late August 2005 and flooded a majority-Black New Orleans. On September 15, 2005, speaking from the city, Bush said the region's deep, persistent poverty \"has roots in a history of racial discrimination, which cut off generations from the opportunity of America.\" The following February, the House Select Bipartisan Committee to Investigate the Preparation for and Response to Hurricane Katrina transmitted its final report to the Speaker under the title \"A Failure of Initiative,\" concluding that it had identified failures at all levels of government and that Katrina was \"primarily a failure of initiative.\" Less than five months later, on July 27, 2006, Bush signed Public Law 109-246, the Fannie Lou Hamer, Rosa Parks, and Coretta Scott King Voting Rights Act Reauthorization and Amendments Act of 2006, whose stated purpose is to ensure the right of all citizens to vote is preserved and protected.",
+      "callouts": [
+        {
+          "text": "July 27, 2006: signed Public Law 109-246 (120 Stat. 577), the Fannie Lou Hamer, Rosa Parks, and Coretta Scott King Voting Rights Act Reauthorization and Amendments Act of 2006.",
+          "sources": [
+            {
+              "label": "GovInfo, Public Law 109-246",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-109publ246/html/PLAW-109publ246.htm",
+              "quote": "Fannie Lou Hamer, Rosa Parks, and Coretta Scott King Voting Rights Act Reauthorization and Amendments Act of 2006"
+            },
+            {
+              "label": "GovInfo, PL 109-246, Sec. 2 purpose",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-109publ246/html/PLAW-109publ246.htm",
+              "quote": "The purpose of this Act is to ensure that the right of all citizens to vote, including the right to register to vote and cast meaningful votes, is preserved and protected"
+            }
+          ]
+        },
+        {
+          "text": "Feb. 15, 2006: the House Select Bipartisan Committee transmitted \"A Failure of Initiative,\" its final Katrina report (H. Rept. 109-377), finding failures at all levels of government.",
+          "sources": [
+            {
+              "label": "GovInfo, H. Rept. 109-377, \"A Failure of Initiative\"",
+              "url": "https://www.govinfo.gov/content/pkg/CRPT-109hrpt377/pdf/CRPT-109hrpt377.pdf",
+              "quote": "The Select Committee identified failures at all levels of government that significantly undermined and detracted from the heroic efforts of first responders"
+            },
+            {
+              "label": "GovInfo, H. Rept. 109-377, Executive Summary of Findings",
+              "url": "https://www.govinfo.gov/content/pkg/CRPT-109hrpt377/pdf/CRPT-109hrpt377.pdf",
+              "quote": "The Select Committee believes Katrina was primarily a failure of initiative."
+            }
+          ]
+        },
+        {
+          "text": "Sept. 15, 2005: in his address to the nation from New Orleans, Bush said Gulf Coast poverty \"has roots in a history of racial discrimination, which cut off generations from the opportunity of America.\"",
+          "sources": [
+            {
+              "label": "American Presidency Project (UCSB), Address to the Nation on Hurricane Katrina Recovery From New Orleans, Sept. 15, 2005",
+              "url": "https://www.presidency.ucsb.edu/documents/address-the-nation-hurricane-katrina-recovery-from-new-orleans-louisiana",
+              "quote": "That poverty has roots in a history of racial discrimination, which cut off generations from the opportunity of America."
+            },
+            {
+              "label": "GovInfo, H. Rept. 109-377 (contemporaneous congressional record of the same events)",
+              "url": "https://www.govinfo.gov/content/pkg/CRPT-109hrpt377/pdf/CRPT-109hrpt377.pdf",
+              "quote": "A FAILURE OF INITIATIVE: Final Report of the Select Bipartisan Committee"
+            }
+          ]
+        },
+        {
+          "text": "Aug. 29, 2006: returned to New Orleans on the storm's first anniversary to speak on recovery efforts, a documented public appearance in the official record.",
+          "sources": [
+            {
+              "label": "American Presidency Project (UCSB), Remarks on Hurricane Katrina Recovery Efforts in New Orleans, Aug. 29, 2006",
+              "url": "https://www.presidency.ucsb.edu/documents/remarks-hurricane-katrina-recovery-efforts-new-orleans",
+              "quote": "Remarks on Hurricane Katrina Recovery Efforts in New Orleans August 29, 2006"
+            },
+            {
+              "label": "GovInfo, H. Rept. 109-377",
+              "url": "https://www.govinfo.gov/content/pkg/CRPT-109hrpt377/pdf/CRPT-109hrpt377.pdf",
+              "quote": "By direction of the Select Bipartisan Committee to Investigate the Preparation for and Response to Hurricane Katrina, I submit herewith the committee's report"
+            }
+          ]
+        }
+      ],
+      "personalRecord": "",
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/d4/George-W-Bush.jpeg",
+        "alt": "Official White House portrait photograph of President George W. Bush",
+        "credit": "Eric Draper / White House, via Wikimedia Commons (verified HTTP 200, image/jpeg)",
+        "rights": "public_domain"
+      },
+      "sources": [
+        {
+          "id": "pl-109-246-vra-reauth",
+          "label": "Public Law 109-246, 120 Stat. 577 (July 27, 2006), GovInfo",
+          "url": "https://www.govinfo.gov/content/pkg/PLAW-109publ246/html/PLAW-109publ246.htm",
+          "quote": "An Act To amend the Voting Rights Act of 1965. ... July 27, 2006 - [H.R. 9]"
+        },
+        {
+          "id": "hrpt-109-377-failure-of-initiative",
+          "label": "H. Rept. 109-377, A Failure of Initiative (Feb. 15, 2006), GovInfo",
+          "url": "https://www.govinfo.gov/content/pkg/CRPT-109hrpt377/pdf/CRPT-109hrpt377.pdf",
+          "quote": "We reflect on the 9/11 Commission's finding that \"the most important failure was one of imagination.\""
+        },
+        {
+          "id": "bush43-katrina-address-2005",
+          "label": "American Presidency Project, Address to the Nation on Hurricane Katrina Recovery From New Orleans, Sept. 15, 2005",
+          "url": "https://www.presidency.ucsb.edu/documents/address-the-nation-hurricane-katrina-recovery-from-new-orleans-louisiana",
+          "quote": "I'm speaking to you from the city of New Orleans, nearly empty, still partly under water, and waiting for life and hope to return."
+        },
+        {
+          "id": "bush43-katrina-anniversary-2006",
+          "label": "American Presidency Project, Remarks on Hurricane Katrina Recovery Efforts in New Orleans, Aug. 29, 2006",
+          "url": "https://www.presidency.ucsb.edu/documents/remarks-hurricane-katrina-recovery-efforts-new-orleans",
+          "quote": "From our beginnings as a nation, the church steeple and the schoolhouse door have been enduring symbols of the American community"
+        }
+      ],
+      "disputes": [
+        "The House select committee's report attributes Katrina failures to all levels of government, including state and local authorities; Louisiana and New Orleans officials disputed that allocation of responsibility, and Democratic members largely declined to participate in the select committee. Both positions are on the record.",
+        "Whether race, poverty, or geography best explains who was left behind in New Orleans is disputed; Bush's own address names racial discrimination as a root of the region's poverty, while the House report frames the failures largely in terms of information flow and initiative."
+      ],
+      "unverified": [
+        "GAO's Katrina testimony and reports were not fetched (gao.gov returned HTTP 403), so no GAO findings are cited here.",
+        "Specific racial-disparity statistics from the Katrina response were not extracted from a fetched page and are omitted."
+      ]
+    },
+    {
+      "number": 44,
+      "name": "Barack Obama",
+      "termLabel": "2009–2017",
+      "summary": "Obama was inaugurated January 20, 2009 as the first African American president. He signed the Fair Sentencing Act of 2010, issued the My Brother's Keeper memorandum in 2014, and his Justice Department's Civil Rights Division published its investigation of the Ferguson Police Department in March 2015.",
+      "paragraph": "Obama took office January 20, 2009 as the first African American to hold the presidency. On August 3, 2010 he signed Public Law 111-220, the Fair Sentencing Act, whose text raised the crack-cocaine trigger quantities for federal mandatory minimums from 5 grams to 28 and from 50 grams to 280, cutting the 100-to-1 ratio set in 1986 to roughly 18-to-1, and eliminated the mandatory minimum for simple possession. On February 27, 2014 he signed a presidential memorandum, \"Creating and Expanding Ladders of Opportunity for Boys and Young Men of Color,\" the founding document of My Brother's Keeper, which cited persistent gaps in employment and educational outcomes. A year later, on March 4, 2015, the Justice Department's Civil Rights Division released its Ferguson investigation, reporting that African Americans made up 85 percent of vehicle stops, 90 percent of citations and 93 percent of arrests in a city that was 67 percent Black.",
+      "callouts": [
+        {
+          "text": "Aug. 3, 2010: signed the Fair Sentencing Act of 2010, Public Law 111-220 (124 Stat. 2372), raising crack-cocaine mandatory-minimum thresholds from 5 to 28 grams and 50 to 280 grams.",
+          "sources": [
+            {
+              "label": "GovInfo, Public Law 111-220",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-111publ220/html/PLAW-111publ220.htm",
+              "quote": "in subparagraph (A)(iii), by striking ``50 grams'' and inserting ``280 grams''; and ... by striking ``5 grams'' and inserting ``28 grams''"
+            },
+            {
+              "label": "U.S. Sentencing Commission, Cocaine and Federal Sentencing Policy (2007), on the prior ratio",
+              "url": "https://www.ussc.gov/sites/default/files/pdf/news/congressional-testimony-and-reports/drug-topics/200705_RtC_Cocaine_Sentencing_Policy.pdf",
+              "quote": "a five-year mandatory minimum penalty for a first-time trafficking offense involving five grams or more of crack cocaine, or 500 grams or more of powder cocaine"
+            }
+          ]
+        },
+        {
+          "text": "Aug. 3, 2010: the same Act eliminated the mandatory minimum sentence for simple possession of crack cocaine under 21 U.S.C. 844(a).",
+          "sources": [
+            {
+              "label": "GovInfo, PL 111-220, Sec. 3",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-111publ220/html/PLAW-111publ220.htm",
+              "quote": "ELIMINATION OF MANDATORY MINIMUM SENTENCE FOR SIMPLE POSSESSION."
+            },
+            {
+              "label": "GovInfo, PL 111-220 title",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-111publ220/html/PLAW-111publ220.htm",
+              "quote": "An Act To restore fairness to Federal cocaine sentencing."
+            }
+          ]
+        },
+        {
+          "text": "Feb. 27, 2014: issued the presidential memorandum \"Creating and Expanding Ladders of Opportunity for Boys and Young Men of Color,\" launching My Brother's Keeper.",
+          "sources": [
+            {
+              "label": "Obama White House Archives, Presidential Memorandum, Feb. 27, 2014",
+              "url": "https://obamawhitehouse.archives.gov/the-press-office/2014/02/27/presidential-memorandum-creating-and-expanding-ladders-opportunity-boys-",
+              "quote": "persistent gaps in employment, educational outcomes, and career skills remain for many boys and young men of color throughout their lives"
+            },
+            {
+              "label": "Miller Center, University of Virginia, Barack Obama: Life in Brief",
+              "url": "https://millercenter.org/president/obama/life-in-brief",
+              "quote": "Barack Obama was inaugurated as the 44th president of the United States—becoming the first African American to serve in that office—on January 20, 2009."
+            }
+          ]
+        },
+        {
+          "text": "March 4, 2015: DOJ Civil Rights Division released its Ferguson Police Department investigation, documenting racial disparities in stops, citations, arrests and use of force.",
+          "sources": [
+            {
+              "label": "U.S. Department of Justice, Investigation of the Ferguson Police Department (Mar. 4, 2015)",
+              "url": "https://www.justice.gov/sites/default/files/opa/press-releases/attachments/2015/03/04/ferguson_police_department_report.pdf",
+              "quote": "account for 85% of vehicle stops, 90% of citations, and 93% of arrests made by FPD officers, despite comprising only 67% of Ferguson's population"
+            },
+            {
+              "label": "U.S. Department of Justice, same report, use-of-force finding",
+              "url": "https://www.justice.gov/sites/default/files/opa/press-releases/attachments/2015/03/04/ferguson_police_department_report.pdf",
+              "quote": "The overwhelming majority of force—almost 90%—is used against African Americans."
+            }
+          ]
+        }
+      ],
+      "personalRecord": "",
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/8/8d/President_Barack_Obama.jpg",
+        "alt": "Official White House portrait photograph of President Barack Obama",
+        "credit": "Pete Souza / White House, via Wikimedia Commons (verified HTTP 200, image/jpeg)",
+        "rights": "public_domain"
+      },
+      "sources": [
+        {
+          "id": "pl-111-220-fair-sentencing",
+          "label": "Public Law 111-220, 124 Stat. 2372 (Aug. 3, 2010), GovInfo",
+          "url": "https://www.govinfo.gov/content/pkg/PLAW-111publ220/html/PLAW-111publ220.htm",
+          "quote": "This Act may be cited as the \"Fair Sentencing Act of 2010\"."
+        },
+        {
+          "id": "doj-ferguson-report-2015",
+          "label": "U.S. Department of Justice, Civil Rights Division, Investigation of the Ferguson Police Department, Mar. 4, 2015",
+          "url": "https://www.justice.gov/sites/default/files/opa/press-releases/attachments/2015/03/04/ferguson_police_department_report.pdf",
+          "quote": "FERGUSON LAW ENFORCEMENT PRACTICES VIOLATE THE LAW AND UNDERMINE COMMUNITY TRUST, ESPECIALLY AMONG AFRICAN AMERICANS"
+        },
+        {
+          "id": "obama-mbk-memo-2014",
+          "label": "Obama White House Archives, Presidential Memorandum: Creating and Expanding Ladders of Opportunity for Boys and Young Men of Color, Feb. 27, 2014",
+          "url": "https://obamawhitehouse.archives.gov/the-press-office/2014/02/27/presidential-memorandum-creating-and-expanding-ladders-opportunity-boys-",
+          "quote": "The disproportionate number of African American and Hispanic young men who are unemployed or involved in the criminal justice system undermines family and community stability"
+        },
+        {
+          "id": "miller-center-obama-brief",
+          "label": "Miller Center, University of Virginia, Barack Obama: Life in Brief",
+          "url": "https://millercenter.org/president/obama/life-in-brief",
+          "quote": "the first African American to serve in that office—on January 20, 2009"
+        },
+        {
+          "id": "ussc-2007-cocaine-report-obama",
+          "label": "U.S. Sentencing Commission, Cocaine and Federal Sentencing Policy, Report to Congress (May 2007)",
+          "url": "https://www.ussc.gov/sites/default/files/pdf/news/congressional-testimony-and-reports/drug-topics/200705_RtC_Cocaine_Sentencing_Policy.pdf",
+          "quote": "commonly referred to as the \"100-to-1 drug quantity ratio.\""
+        }
+      ],
+      "disputes": [
+        "Whether the Fair Sentencing Act went far enough is disputed: the U.S. Sentencing Commission had repeatedly recommended eliminating the crack/powder differential entirely, while the 2010 statute reduced rather than removed it. Both positions are documented.",
+        "The reach and durability of the Justice Department's pattern-or-practice consent decrees is contested among policing scholars and municipal officials; this file records the Ferguson findings, not an assessment of the decree's results."
+      ],
+      "unverified": [
+        "The total count of pattern-or-practice investigations opened under Obama was not verified from a fetched page and is not stated.",
+        "The Fair Sentencing Act's resulting ratio (commonly described as about 18-to-1) is an arithmetic description of the statutory quantities; the phrase \"18-to-1\" was not quoted from a fetched official page."
+      ]
+    },
+    {
+      "number": 45,
+      "name": "Donald Trump",
+      "termLabel": "2017–2021",
+      "summary": "Trump signed the First Step Act on December 21, 2018 and the FUTURE Act, which made permanent mandatory funding for historically Black colleges and other minority-serving institutions, on December 19, 2019. He also signed Executive Order 13950 restricting certain diversity training by federal contractors and Executive Order 13958 creating the 1776 Commission, and his Justice Department imposed new restrictions on civil consent decrees with state and local governments.",
+      "paragraph": "Four documented acts anchor this term. On December 21, 2018 Trump signed Public Law 115-391, the First Step Act of 2018, a federal sentencing and prison law whose Title I covers recidivism reduction. On December 19, 2019 he signed Public Law 116-91, the FUTURE Act, which amended the Higher Education Act to provide mandatory minority-serving-institution funding \"for fiscal year 2020 and each fiscal year thereafter,\" replacing a program that had expired. On September 22, 2020 he issued Executive Order 13950, \"Combating Race and Sex Stereotyping,\" applying to federal contractors, and on November 2, 2020 Executive Order 13958 established the President's Advisory 1776 Commission. Separately, Attorney General Jeff Sessions issued a November 7, 2018 memorandum setting limits on when consent decrees with state or local governments are appropriate and requiring senior-leadership approval; the Federal Register later records both that memorandum and the December 2020 rule implementing it, and their 2021-22 rescission.",
+      "callouts": [
+        {
+          "text": "Dec. 21, 2018: signed the First Step Act of 2018, Public Law 115-391 (132 Stat. 5194), covering federal risk-and-needs assessment, prison programming and sentencing changes.",
+          "sources": [
+            {
+              "label": "GovInfo, Public Law 115-391",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-115publ391/html/PLAW-115publ391.htm",
+              "quote": "This Act may be cited as the ``First Step Act of 2018''. ... Dec. 21, 2018 - [S. 756]"
+            },
+            {
+              "label": "GovInfo, PL 115-391 table of contents",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-115publ391/html/PLAW-115publ391.htm",
+              "quote": "TITLE I--RECIDIVISM REDUCTION Sec. 101. Risk and needs assessment system."
+            }
+          ]
+        },
+        {
+          "text": "Dec. 19, 2019: signed the FUTURE Act, Public Law 116-91 (133 Stat. 1189), making mandatory HBCU and minority-serving-institution funding permanent from fiscal year 2020 onward.",
+          "sources": [
+            {
+              "label": "GovInfo, Public Law 116-91",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-116publ91/html/PLAW-116publ91.htm",
+              "quote": "An Act To reauthorize mandatory funding programs for historically Black colleges and universities and other minority-serving institutions"
+            },
+            {
+              "label": "GovInfo, PL 116-91, Sec. 2",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-116publ91/html/PLAW-116publ91.htm",
+              "quote": "inserting ``for fiscal year 2020 and each fiscal year thereafter.''"
+            }
+          ]
+        },
+        {
+          "text": "Nov. 2, 2020: issued Executive Order 13958 (85 FR 70951) establishing the President's Advisory 1776 Commission on the teaching of American founding history.",
+          "sources": [
+            {
+              "label": "Federal Register, Executive Order 13958 of November 2, 2020",
+              "url": "https://www.federalregister.gov/documents/2020/11/05/2020-24793/establishing-the-presidents-advisory-1776-commission",
+              "quote": "Executive Order 13958 of November 2, 2020 Establishing the President's Advisory 1776 Commission"
+            },
+            {
+              "label": "Federal Register full text, 85 FR 70951",
+              "url": "https://www.federalregister.gov/documents/full_text/text/2020/11/05/2020-24793.txt",
+              "quote": "in order to better enable a rising generation to understand the history and principles of the founding of the United States in 1776"
+            }
+          ]
+        },
+        {
+          "text": "Sept. 22, 2020: issued Executive Order 13950 (85 FR 60683), \"Combating Race and Sex Stereotyping,\" restricting certain diversity training content for federal contractors.",
+          "sources": [
+            {
+              "label": "Federal Register, Executive Order 13950 of September 22, 2020",
+              "url": "https://www.federalregister.gov/documents/2020/09/28/2020-21534/combating-race-and-sex-stereotyping",
+              "quote": "Executive Order 13950 of September 22, 2020 Combating Race and Sex Stereotyping"
+            },
+            {
+              "label": "Federal Register full text, 85 FR 60683",
+              "url": "https://www.federalregister.gov/documents/full_text/text/2020/09/28/2020-21534.txt",
+              "quote": "to combat offensive and anti-American race and sex stereotyping and scapegoating"
+            }
+          ]
+        },
+        {
+          "text": "Nov. 7, 2018: AG Sessions issued a memorandum limiting when civil consent decrees with state or local governments are appropriate and requiring senior DOJ approval; a rule followed Dec. 28, 2020 (85 FR 84229).",
+          "sources": [
+            {
+              "label": "Federal Register, 87 FR 12402 (Mar. 4, 2022), describing the November 2018 Memorandum",
+              "url": "https://www.federalregister.gov/documents/2022/03/04/2022-04509/revisions-to-approval-of-civil-consent-decrees-with-state-and-local-governmental-entities",
+              "quote": "``Principles and Procedures for Civil Consent Decrees and Settlement Agreements with State and Local Governmental Entities'' (November 7, 2018)"
+            },
+            {
+              "label": "Federal Register, 85 FR 84229 (Dec. 28, 2020), Approval of Civil Consent Decrees",
+              "url": "https://www.federalregister.gov/documents/2020/12/28/2020-27190/approval-of-civil-consent-decrees-with-state-and-local-governmental-entities",
+              "quote": "Approval of Civil Consent Decrees With State and Local Governmental Entities"
+            }
+          ]
+        }
+      ],
+      "personalRecord": "",
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/5/56/Donald_Trump_official_portrait.jpg",
+        "alt": "Official White House portrait photograph of President Donald Trump",
+        "credit": "White House / Executive Office of the President, via Wikimedia Commons (verified HTTP 200, image/jpeg)",
+        "rights": "public_domain"
+      },
+      "sources": [
+        {
+          "id": "pl-115-391-first-step-act",
+          "label": "Public Law 115-391, 132 Stat. 5194 (Dec. 21, 2018), GovInfo",
+          "url": "https://www.govinfo.gov/content/pkg/PLAW-115publ391/html/PLAW-115publ391.htm",
+          "quote": "FIRST STEP ACT OF 2018 ... Public Law 115-391 115th Congress"
+        },
+        {
+          "id": "pl-116-91-future-act",
+          "label": "Public Law 116-91, 133 Stat. 1189 (Dec. 19, 2019), GovInfo",
+          "url": "https://www.govinfo.gov/content/pkg/PLAW-116publ91/html/PLAW-116publ91.htm",
+          "quote": "This Act may be cited as the ``Fostering Undergraduate Talent by Unlocking Resources for Education Act'' or the ``FUTURE Act''."
+        },
+        {
+          "id": "eo-13958-1776-commission",
+          "label": "Executive Order 13958, 85 FR 70951 (signed Nov. 2, 2020; published Nov. 5, 2020), Federal Register",
+          "url": "https://www.federalregister.gov/documents/2020/11/05/2020-24793/establishing-the-presidents-advisory-1776-commission",
+          "quote": "Establishing the President's Advisory 1776 Commission"
+        },
+        {
+          "id": "eo-13950-race-sex-stereotyping",
+          "label": "Executive Order 13950, 85 FR 60683 (signed Sept. 22, 2020; published Sept. 28, 2020), Federal Register",
+          "url": "https://www.federalregister.gov/documents/2020/09/28/2020-21534/combating-race-and-sex-stereotyping",
+          "quote": "Combating Race and Sex Stereotyping"
+        },
+        {
+          "id": "fr-2020-consent-decree-rule",
+          "label": "Approval of Civil Consent Decrees With State and Local Governmental Entities, 85 FR 84229 (Dec. 28, 2020)",
+          "url": "https://www.federalregister.gov/documents/2020/12/28/2020-27190/approval-of-civil-consent-decrees-with-state-and-local-governmental-entities",
+          "quote": "Approval of Civil Consent Decrees With State and Local Governmental Entities"
+        },
+        {
+          "id": "fr-2022-consent-decree-revision",
+          "label": "Revisions to Approval of Civil Consent Decrees With State and Local Governmental Entities, 87 FR 12402 (Mar. 4, 2022)",
+          "url": "https://www.federalregister.gov/documents/2022/03/04/2022-04509/revisions-to-approval-of-civil-consent-decrees-with-state-and-local-governmental-entities",
+          "quote": "The November 2018 Memorandum set forth principles to guide the development of consent decrees with State or local governmental entities, including limitations"
+        }
+      ],
+      "disputes": [
+        "The scope of the First Step Act is contested: supporters describe it as the largest federal sentencing reform in a generation, while critics note it applies only to the federal system, which holds a minority of U.S. prisoners. Both characterizations circulate; this file records the statute only.",
+        "Executive Order 13950's effect is disputed, with the administration framing it as combating stereotyping in federal contracting and civil rights organizations framing it as suppressing discussion of racism; both framings are recorded here without resolution.",
+        "Whether the November 2018 consent-decree memorandum amounted to a retreat from pattern-or-practice police oversight is a characterization; the fetched Federal Register text documents the restrictions and the later rescission, not the motive."
+      ],
+      "unverified": [
+        "The Justice Department's own November 2018 press release on the Sessions memorandum could not be retrieved (justice.gov returned a bot-check page), so the memorandum is documented only through the later Federal Register descriptions.",
+        "Claims about the number of new pattern-or-practice investigations opened between 2017 and 2021 were not verified and are omitted.",
+        "The 1776 Commission's report content was not fetched and is not summarized."
+      ]
+    },
+    {
+      "number": 46,
+      "name": "Joe Biden",
+      "termLabel": "2021–2025",
+      "summary": "Biden signed Executive Order 13985 on racial equity on his first day in office, signed the Juneteenth National Independence Day Act in June 2021 and the Emmett Till Antilynching Act in March 2022, and issued a blanket pardon for federal simple marijuana possession in October 2022. The Senate confirmed his nominee Ketanji Brown Jackson to the Supreme Court on April 7, 2022.",
+      "paragraph": "Biden's first official act on this front came the day he took office. Executive Order 13985, signed January 20, 2021 and published at 86 FR 7009, directs a government-wide approach to racial equity and states that entrenched disparities in laws and public policies have denied equal opportunity to individuals and communities. On June 17, 2021 he signed Public Law 117-17, adding Juneteenth National Independence Day, June 19, to the federal holiday list in 5 U.S.C. 6103. On March 29, 2022 he signed Public Law 117-107, the Emmett Till Antilynching Act, which amended 18 U.S.C. 249 to make conspiracy to commit a hate-crime offense resulting in death or serious bodily injury punishable by up to 30 years. Nine days later, on April 7, 2022, the Senate confirmed Ketanji Brown Jackson to the Supreme Court, 53-47. On October 6, 2022 he issued Proclamation 10467, pardoning federal and D.C. simple marijuana possession offenses.",
+      "callouts": [
+        {
+          "text": "Jan. 20, 2021: signed Executive Order 13985 (86 FR 7009), Advancing Racial Equity and Support for Underserved Communities Through the Federal Government.",
+          "sources": [
+            {
+              "label": "Federal Register, Executive Order 13985 of January 20, 2021",
+              "url": "https://www.federalregister.gov/documents/2021/01/25/2021-01753/advancing-racial-equity-and-support-for-underserved-communities-through-the-federal-government",
+              "quote": "Executive Order 13985 of January 20, 2021 Advancing Racial Equity and Support for Underserved Communities Through the Federal Government"
+            },
+            {
+              "label": "Federal Register full text, 86 FR 7009",
+              "url": "https://www.federalregister.gov/documents/full_text/text/2021/01/25/2021-01753.txt",
+              "quote": "Entrenched disparities in our laws and public policies, and in our public and private institutions, have often denied that equal opportunity to individuals and communities."
+            }
+          ]
+        },
+        {
+          "text": "June 17, 2021: signed the Juneteenth National Independence Day Act, Public Law 117-17 (135 Stat. 287), adding June 19 to the list of federal legal public holidays.",
+          "sources": [
+            {
+              "label": "GovInfo, Public Law 117-17",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-117publ17/html/PLAW-117publ17.htm",
+              "quote": "``Juneteenth National Independence Day, June 19.'' ... Approved June 17, 2021."
+            },
+            {
+              "label": "GovInfo, PL 117-17 legislative history",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-117publ17/html/PLAW-117publ17.htm",
+              "quote": "June 15, considered and passed Senate. June 16, considered and passed House."
+            }
+          ]
+        },
+        {
+          "text": "March 29, 2022: signed the Emmett Till Antilynching Act, Public Law 117-107 (136 Stat. 1125), amending 18 U.S.C. 249 to punish hate-crime conspiracies causing death or serious bodily injury by up to 30 years.",
+          "sources": [
+            {
+              "label": "GovInfo, Public Law 117-107",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-117publ107/html/PLAW-117publ107.htm",
+              "quote": "An Act To amend section 249 of title 18, United States Code, to specify lynching as a hate crime act."
+            },
+            {
+              "label": "GovInfo, PL 117-107, Sec. 2",
+              "url": "https://www.govinfo.gov/content/pkg/PLAW-117publ107/html/PLAW-117publ107.htm",
+              "quote": "shall, if death or serious bodily injury ... results from the offense, be imprisoned for not more than 30 years"
+            }
+          ]
+        },
+        {
+          "text": "April 7, 2022: the Senate confirmed Ketanji Brown Jackson as Associate Justice of the Supreme Court, 53 yeas to 47 nays (roll-call vote 134, 117th Congress).",
+          "sources": [
+            {
+              "label": "U.S. Senate, Roll Call Vote 134, 117th Congress, 2nd Session",
+              "url": "https://www.senate.gov/legislative/LIS/roll_call_lists/roll_call_vote_cfm.cfm?congress=117&session=2&vote=00134",
+              "quote": "Vote Date: April 7, 2022 ... Vote Result: Nomination Confirmed ... Vote Counts: YEAs 53 NAYs 47"
+            },
+            {
+              "label": "U.S. Senate, same roll-call record, nomination description",
+              "url": "https://www.senate.gov/legislative/LIS/roll_call_lists/roll_call_vote_cfm.cfm?congress=117&session=2&vote=00134",
+              "quote": "Ketanji Brown Jackson, of the District of Columbia, to be an Associate Justice of the Supreme Court of the United States"
+            }
+          ]
+        },
+        {
+          "text": "Oct. 6, 2022: issued Proclamation 10467 (87 FR 61441) granting a full pardon for federal and D.C. Code simple possession of marijuana offenses committed on or before that date.",
+          "sources": [
+            {
+              "label": "Federal Register, Proclamation 10467 of October 6, 2022",
+              "url": "https://www.federalregister.gov/documents/full_text/text/2022/10/12/2022-22262.txt",
+              "quote": "Proclamation 10467 of October 6, 2022 Granting Pardon for the Offense of Simple Possession of Marijuana"
+            },
+            {
+              "label": "Federal Register API record, 87 FR 61441",
+              "url": "https://www.federalregister.gov/documents/2022/10/12/2022-22262/granting-pardon-for-the-offense-of-simple-possession-of-marijuana",
+              "quote": "I, Joseph R. Biden Jr., do hereby grant a full, complete, and unconditional pardon"
+            }
+          ]
+        }
+      ],
+      "personalRecord": "",
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Joe_Biden_presidential_portrait_%28cropped%29.jpg",
+        "alt": "Official White House portrait photograph of President Joe Biden",
+        "credit": "Adam Schultz / White House, via Wikimedia Commons (verified HTTP 200, image/jpeg)",
+        "rights": "public_domain"
+      },
+      "sources": [
+        {
+          "id": "eo-13985-racial-equity",
+          "label": "Executive Order 13985, 86 FR 7009 (signed Jan. 20, 2021; published Jan. 25, 2021), Federal Register",
+          "url": "https://www.federalregister.gov/documents/2021/01/25/2021-01753/advancing-racial-equity-and-support-for-underserved-communities-through-the-federal-government",
+          "quote": "Our Nation deserves an ambitious whole-of-government"
+        },
+        {
+          "id": "pl-117-17-juneteenth",
+          "label": "Public Law 117-17, 135 Stat. 287 (June 17, 2021), GovInfo",
+          "url": "https://www.govinfo.gov/content/pkg/PLAW-117publ17/html/PLAW-117publ17.htm",
+          "quote": "This Act may be cited as the ``Juneteenth National Independence Day Act''."
+        },
+        {
+          "id": "pl-117-107-emmett-till",
+          "label": "Public Law 117-107, 136 Stat. 1125 (Mar. 29, 2022), GovInfo",
+          "url": "https://www.govinfo.gov/content/pkg/PLAW-117publ107/html/PLAW-117publ107.htm",
+          "quote": "This Act may be cited as the ``Emmett Till Antilynching Act''."
+        },
+        {
+          "id": "senate-vote-117-2-134-kbj",
+          "label": "U.S. Senate, Roll Call Vote 134, 117th Congress, 2nd Session, Apr. 7, 2022",
+          "url": "https://www.senate.gov/legislative/LIS/roll_call_lists/roll_call_vote_cfm.cfm?congress=117&session=2&vote=00134",
+          "quote": "Question: On the Nomination (Confirmation: Ketanji Brown Jackson ... to be an Associate Justice of the Supreme Court"
+        },
+        {
+          "id": "proclamation-10467-marijuana-pardon",
+          "label": "Proclamation 10467, 87 FR 61441 (Oct. 6, 2022), Federal Register",
+          "url": "https://www.federalregister.gov/documents/2022/10/12/2022-22262/granting-pardon-for-the-offense-of-simple-possession-of-marijuana",
+          "quote": "all current United States citizens and lawful permanent residents who committed the offense of simple possession of marijuana"
+        },
+        {
+          "id": "fr-2022-consent-decree-rescission",
+          "label": "Revisions to Approval of Civil Consent Decrees With State and Local Governmental Entities, 87 FR 12402 (Mar. 4, 2022)",
+          "url": "https://www.federalregister.gov/documents/2022/03/04/2022-04509/revisions-to-approval-of-civil-consent-decrees-with-state-and-local-governmental-entities",
+          "quote": "The April 2021 Memorandum also specifically rescinded the Memorandum issued by former Attorney General Jefferson B. Sessions III"
+        }
+      ],
+      "disputes": [
+        "The practical reach of the October 2022 marijuana pardon is disputed: the proclamation covers federal and D.C. Code simple possession only, and commentators disagree about how many people it freed, since most marijuana convictions are under state law. The proclamation text is recorded; the effect estimates are not.",
+        "Whether Executive Order 13985 produced measurable changes in agency practice is contested between the administration's equity-action-plan reporting and outside critics; this file records the order, not its outcomes."
+      ],
+      "unverified": [
+        "The number of people affected by the marijuana pardon proclamation was not verified from a fetched official source and is not stated.",
+        "Biden's second, broader marijuana pardon proclamation of Dec. 22, 2023 (88 FR 90083) is noted in the Federal Register index but its text was not fetched and is not described here."
+      ]
+    }
+  ]
+}

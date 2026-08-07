@@ -1642,4 +1642,4 @@ export const ATMOSPHERE_TILE_CREDITS: readonly AtmosphereTileCredit[] = [
   },
 ] as const;
 
-export const ATMOSPHERE_ATTRIBUTION_HREF = '/chapters/mosaic-credits';
+export const ATMOSPHERE_ATTRIBUTION_HREF = '/stories/mosaic-credits';

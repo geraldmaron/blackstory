@@ -20,7 +20,7 @@ export type RoomProps = {
   readonly id?: string;
   /**
    * Optional right rail, for the Reading rooms whose design law gives them one (`/records` by
-   * era and state, `/chapters` by era and place, `/books` and `/law` by jurisdiction). It renders
+   * era and state, `/stories` by era and place, `/books` and `/law` by jurisdiction). It renders
    * AFTER the column in the document so the rail's grouping links never come before the thing
    * they group; the grid places it alongside on wide viewports and below on narrow.
    */
