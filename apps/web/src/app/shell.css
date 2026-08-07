@@ -1830,6 +1830,37 @@
    Covering the plate rather than hiding it keeps the persistence contract in ADR-017 — the
    MapLibre instance is never touched, so returning to the Instrument does not rebuild it, and
    no resize observer fires against a hidden container. */
+/* —— Framed ————————————————————————————————————————————————————————————————————
+   The plate, borrowed into a bounded in-flow slot published by a MapMoment. MapStage writes the
+   four custom properties from the slot's clamped viewport rect on each scroll frame; the plate
+   stays `position: fixed`, so those values ARE its box and no layout of the document changes.
+
+   KEYED ON `data-plate-slot`, NOT ON THE POSTURE. A record page RESTS in the Framed posture —
+   its place block always has something to frame — but resting is not holding: until a moment
+   claims the slot there is no rect, the custom properties are unset, and a rule keyed on the
+   posture would fall back to its defaults and paint the plate full-viewport behind the record.
+   That is the exact regression 7157d4c7 fixed. `data-plate-slot` is written only alongside a
+   real inset, so the two states cannot be confused.
+
+   `inset: auto` first, because `inset: 0` above sets all four physical sides — leaving it in
+   place would pin right and bottom and the width/height below would be ignored. */
+.ds-map-stage[data-plate-slot] {
+  inset: auto;
+  top: var(--ds-plate-frame-top);
+  left: var(--ds-plate-frame-left);
+  width: var(--ds-plate-frame-width);
+  height: var(--ds-plate-frame-height);
+  border-radius: var(--ds-radius-2, 2px);
+  overflow: hidden;
+}
+
+/* The cover below exists because a Live plate under a reading room reads straight through the
+   prose column. A plate holding a slot is the opposite case: it is inside a box the document
+   gave it, and covering it would paint over the thing the moment exists to show. */
+body:not(:has([data-surface='instrument'])) .ds-map-stage[data-plate-slot]::after {
+  content: none;
+}
+
 body:not(:has([data-surface='instrument'])) .ds-map-stage::after {
   content: '';
   position: absolute;

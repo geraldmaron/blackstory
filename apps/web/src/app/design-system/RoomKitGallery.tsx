@@ -24,7 +24,6 @@ import {
   GroupHeading,
   HairlineIndex,
   MapMoment,
-  MapMomentStage,
   Note,
   OffRamp,
   Precision,
@@ -304,21 +303,26 @@ export function RoomKitGallery() {
             the other returns to idle. Exactly one is ever live, which is the rule /law,
             /methodology and chapter detail depend on.
 
-            Outside a stage — which is every room until SP-08 lands, and every reader with no
-            JavaScript — the slot says the map is unavailable and the caption carries the moment
-            on its own. See /about for that state. */}
-        <MapMomentStage>
-          <MapMoment
-            camera={{ center: [-87.635, 41.901], zoom: 12.8, pitch: 36, bearing: -12 }}
-            note="Chicago's Black Belt, 1919. The camera flies in because the subject is a neighbourhood, not a killing."
-            atlasHref="/?find=place"
-          />
-          <MapMoment
-            plain
-            camera={{ center: [-92.1005, 46.7867], zoom: 12 }}
-            note="Duluth, Minnesota, held at locality precision. The camera cuts here and does not move."
-          />
-        </MapMomentStage>
+            NO STAGE IS MOUNTED HERE. `SiteShell` now mounts one for the whole document (SP-08),
+            and a second stage nested inside it would shadow the first for every moment below it:
+            the moments would register with the inner stage while the plate — which subscribes
+            once, from above — listened to the outer one, so nothing would ever borrow the plate.
+            One stage per document is the contract.
+
+            These two specimens therefore demonstrate arbitration, not the borrow. /design-system
+            is a Utility surface and `framedClaimAllowed` refuses a claim there on purpose, so the
+            plate stays parked however visible these slots are. The borrow itself is shown on a
+            Reading or Record surface. */}
+        <MapMoment
+          camera={{ center: [-87.635, 41.901], zoom: 12.8, pitch: 36, bearing: -12 }}
+          note="Chicago's Black Belt, 1919. The camera flies in because the subject is a neighbourhood, not a killing."
+          atlasHref="/?find=place"
+        />
+        <MapMoment
+          plain
+          camera={{ center: [-92.1005, 46.7867], zoom: 12 }}
+          note="Duluth, Minnesota, held at locality precision. The camera cuts here and does not move."
+        />
       </Specimen>
     </section>
   );

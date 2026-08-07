@@ -156,6 +156,30 @@ import {
   type CameraFlyTarget,
   type MapStageFlyOptions,
 } from './camera';
+import { usePathname } from 'next/navigation';
+import { surfaceClassFor } from '../../lib/nav/surface-classes';
+import { defaultPostureFor, framedClaimAllowed, type PlatePosture } from './plate-posture';
+import { createFramedSlotRegistry } from './framed-slot-registry';
+import { insetIsPaintable, plateInsetForSlot, resolvePlatePosture } from './plate-frame';
+import { lockGestures, unlockGestures } from './gesture-lock';
+import { createReducedMotionListener, type ReducedMotionListener } from './reduced-motion-listener';
+// The plate is the subscriber half of the seam `MapMoment` documents: the stage publishes which
+// moment is live and where, and never touches a map itself.
+import { resolveMomentCamera, useMapMomentFrame } from '../room/MapMoment';
+
+/**
+ * Give the slot geometry back, so the plate returns to its resting full-viewport box and the
+ * reading-room cover applies again. Paired with the `data-plate-slot` write in the Framed path;
+ * kept as one function because dropping the attribute while leaving the custom properties set
+ * (or the reverse) is the failure that leaves a plate painted over a prose column.
+ */
+function releasePlateSlot(plate: HTMLDivElement): void {
+  delete plate.dataset.plateSlot;
+  plate.style.removeProperty('--ds-plate-frame-top');
+  plate.style.removeProperty('--ds-plate-frame-left');
+  plate.style.removeProperty('--ds-plate-frame-width');
+  plate.style.removeProperty('--ds-plate-frame-height');
+}
 
 type MaplibreModule = typeof MapLibreNamespace;
 
@@ -392,6 +416,20 @@ export function MapStageProvider({
   children,
 }: MapStageProviderProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  /** The fixed plate itself, so the Framed posture can write its inset without a re-render. */
+  const plateRef = useRef<HTMLDivElement | null>(null);
+  /**
+   * The one-Framed-slot guard. A ref rather than a module singleton so two providers in a test
+   * render do not share a slot, and so the registry dies with the provider that owns it.
+   */
+  const framedSlotsRef = useRef(createFramedSlotRegistry());
+  const heldSlotRef = useRef<string | null>(null);
+  /** The moment the camera last flew to, so a scroll frame does not restart the flight. */
+  const lastFramedMomentRef = useRef<string | null>(null);
+  const reducedMotionRef = useRef<ReducedMotionListener | null>(null);
+  const pathname = usePathname();
+  const surfaceClass = surfaceClassFor(pathname ?? '/');
+  const [posture, setPosture] = useState<PlatePosture>(() => defaultPostureFor(surfaceClass));
   const mapRef = useRef<MapLibreMap | null>(null);
   const maplibreglRef = useRef<MaplibreModule['default'] | null>(null);
   const markersRef = useRef<Marker[]>([]);
@@ -1392,6 +1430,133 @@ export function MapStageProvider({
   /** Stable across renders: the ref is the identity, not the map it currently holds. */
   const getMap = useCallback(() => mapRef.current as unknown as AtlasCameraTarget | null, []);
 
+  /* —— The Framed posture ————————————————————————————————————————————————————————
+     This is the seam `components/room/MapMoment.tsx` documents and SP-08 owes it: the stage
+     publishes which moment is live and where its slot is, and the plate moves into that slot
+     rather than a second MapLibre instance being built inside the document.
+
+     It lives here, in the provider, because it is the only place that holds all three things it
+     needs at once — the plate element, the GL instance, and the surface class. */
+
+  /**
+   * Reset to the resting posture on navigation, and hand back any slot still held.
+   *
+   * Without the release, a chapter's moment that held the slot when the reader clicked through
+   * would keep holding it on the next route: React unmounts the outgoing tree AFTER mounting the
+   * incoming one, so the moment's own cleanup cannot be relied on to run before the new page's
+   * first claim. The registry's id-checked release makes the double-release safe.
+   */
+  useEffect(() => {
+    const held = heldSlotRef.current;
+    if (held !== null) {
+      framedSlotsRef.current.release(held);
+      heldSlotRef.current = null;
+    }
+    lastFramedMomentRef.current = null;
+    setPosture(defaultPostureFor(surfaceClass));
+  }, [surfaceClass]);
+
+  /** A live read of the reduced-motion preference for the camera path below. */
+  useEffect(() => {
+    const listener = createReducedMotionListener();
+    reducedMotionRef.current = listener;
+    return () => {
+      listener.disconnect();
+      reducedMotionRef.current = null;
+    };
+  }, []);
+
+  /**
+   * Move the plate into the live moment's slot.
+   *
+   * Runs inside `MapMomentStage`'s rAF callback on every scroll frame while a moment is live, so
+   * everything here is either a cheap write or guarded by a change check. Two guards matter:
+   *
+   *  - `setPosture` only fires on an actual transition. Calling it unconditionally would re-render
+   *    the entire subtree under the plate sixty times a second to set an attribute to the value it
+   *    already had.
+   *  - the camera moves only when the LIVE MOMENT changes, not when its rect does. Re-flying on
+   *    every frame would restart the animation continuously and the camera would never arrive.
+   */
+  useMapMomentFrame((frame) => {
+    const plate = plateRef.current;
+    if (!plate) return;
+
+    const claimGranted =
+      frame !== null && framedClaimAllowed(surfaceClass) && framedSlotsRef.current.claim(frame.id);
+    if (claimGranted && frame !== null) heldSlotRef.current = frame.id;
+
+    const next = resolvePlatePosture({
+      surface: surfaceClass,
+      hasLiveMoment: frame !== null,
+      claimGranted,
+    });
+
+    if (next !== 'framed') {
+      const held = heldSlotRef.current;
+      if (held !== null) {
+        framedSlotsRef.current.release(held);
+        heldSlotRef.current = null;
+      }
+      lastFramedMomentRef.current = null;
+      releasePlateSlot(plate);
+      // Only the Instrument steers. Returning to Live is the one transition that gives gestures
+      // back; Parked keeps them locked so an unpainted plate cannot be reached by the keyboard.
+      const map = mapRef.current;
+      if (map) {
+        if (next === 'live') unlockGestures(map);
+        else lockGestures(map);
+      }
+      setPosture((current) => (current === next ? current : next));
+      return;
+    }
+
+    if (frame === null) return;
+    const inset = plateInsetForSlot(frame.rect, {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+    // A slot scrolled entirely out of view: hold the claim (the reader is still inside this
+    // moment's document position) but stop painting, so a zero-height canvas never gets resized
+    // and the plate does not sit uncovered at its resting full-viewport box.
+    if (!insetIsPaintable(inset)) {
+      releasePlateSlot(plate);
+      return;
+    }
+
+    plate.style.setProperty('--ds-plate-frame-top', `${inset.top}px`);
+    plate.style.setProperty('--ds-plate-frame-left', `${inset.left}px`);
+    plate.style.setProperty('--ds-plate-frame-width', `${inset.width}px`);
+    plate.style.setProperty('--ds-plate-frame-height', `${inset.height}px`);
+    // The marker CSS keys on, distinguishing "holding a slot" from the record page's resting
+    // Framed posture. Written last, so the geometry is never applied without its rect.
+    plate.dataset.plateSlot = '1';
+    setPosture((current) => (current === 'framed' ? current : 'framed'));
+
+    // First contact with the stage on this surface: a reading room never calls the handle, so
+    // without this a moment would frame an empty plate.
+    ensureMap();
+    const map = mapRef.current;
+    if (!map) return;
+    lockGestures(map);
+    map.resize();
+
+    if (lastFramedMomentRef.current === frame.id) return;
+    lastFramedMomentRef.current = frame.id;
+    const camera = resolveMomentCamera(frame.camera, {
+      plain: frame.plain,
+      reducedMotion: reducedMotionRef.current?.matches() ?? false,
+    });
+    const target = {
+      center: [camera.center[0], camera.center[1]] as [number, number],
+      zoom: camera.zoom,
+      pitch: camera.pitch,
+      bearing: camera.bearing,
+    };
+    if (camera.move === 'cut') map.jumpTo(target);
+    else map.flyTo(target);
+  });
+
   /**
    * Every method that needs a live plate goes through `ensureMap` first, which is what makes the
    * lazy build self-enforcing: a surface cannot use the stage without asking for it, and a
@@ -1456,7 +1621,7 @@ export function MapStageProvider({
           canvas back in normal document flow. `aria-hidden` on the plate: the synchronized
           result list is this map's accessible-parity surface (see `syncCircularMarkers`'s doc
           comment on marker `tabIndex`), so the canvas itself carries no separate a11y tree. */}
-      <div className="ds-map-stage" aria-hidden="true">
+      <div className="ds-map-stage" data-plate-posture={posture} ref={plateRef} aria-hidden="true">
         <div ref={containerRef} className="ds-map-stage__canvas" />
       </div>
       {children}
