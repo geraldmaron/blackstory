@@ -36,7 +36,7 @@ export const theCountArticle = {
   eraLabel: '1787–present',
   placeLabel: 'United States',
   publishedAt: '2026-08-07',
-  status: 'review' as const,
+  status: 'published' as const,
   relatedEntityIds: [],
   references: [
     {
