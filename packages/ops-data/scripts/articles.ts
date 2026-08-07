@@ -192,7 +192,58 @@ function gateProseWordFloor(article: ArticleAuthoring): { proseWords: number; wa
   return { proseWords, warnings: [message] };
 }
 
-/** Offline gates: schema (via loader) + inline-citation integrity + source-tier gate + prose floor. */
+/**
+ * Standalone-prose gate (editorial direction, 2026-08-07). A chapter is a piece of
+ * history, not a page of a product: its prose never names the site it is published on,
+ * never cross-references sibling chapters as chapters, and never speaks in the
+ * publisher's first person ("our summary," "a story we are telling you"). Readers arrive
+ * on these pages from search and syndication with no idea what else exists here, and a
+ * sentence like "another chapter on this site follows what happened next" is a dead end
+ * to them and an unexplained brand reference to everyone else. Related history is reached
+ * through `[[entityId|Label]]` links and `relatedEntityIds`, which resolve to real
+ * records, rather than through prose pointing at navigation.
+ *
+ * Hard error on published articles, surfaced warning otherwise — same posture as the tier
+ * and word-floor gates. Governed by docs/ui/voice-theme-chapters.md Rule 6.
+ */
+const SELF_REFERENCE_PATTERNS: readonly { readonly label: string; readonly pattern: RegExp }[] = [
+  { label: 'names the publishing surface', pattern: /\bthis (?:site|website|project|page)\b/i },
+  { label: 'names the publishing surface', pattern: /\b(?:on|across|throughout) (?:the|our) site\b/i },
+  { label: 'cross-references a sibling chapter', pattern: /\b(?:another|the other|a sibling|the next|the previous) chapters?\b/i },
+  { label: 'cross-references a sibling chapter', pattern: /\bchapters? (?:here|on this)\b/i },
+  { label: 'cross-references a sibling chapter', pattern: /\bthe (?:wealth|redlining|housing|voting|sentencing) chapter\b/i },
+  { label: "speaks in the publisher's first person", pattern: /\b(?:we|our) (?:are telling|tell|show|summari[sz]e|built|collected|assembled)\b/i },
+  { label: "speaks in the publisher's first person", pattern: /\b(?:our summary|needs us in order|we are telling you)\b/i },
+];
+
+function gateStandaloneProse(article: ArticleAuthoring): { warnings: string[] } {
+  const findings: string[] = [];
+  article.body.forEach((block, index) => {
+    if (block.type !== 'paragraph' && block.type !== 'pullquote') return;
+    const text = (block as { text?: string }).text ?? '';
+    for (const { label, pattern } of SELF_REFERENCE_PATTERNS) {
+      const match = pattern.exec(text);
+      if (!match) continue;
+      const start = Math.max(0, match.index - 40);
+      const excerpt = text.slice(start, match.index + match[0].length + 40).replace(/\s+/g, ' ');
+      findings.push(
+        `${article.id} / body[${index}] (${block.type}): prose ${label} — …${excerpt}… ` +
+          `(link related history with [[entityId|Label]] instead)`,
+      );
+      break;
+    }
+  });
+  if (findings.length === 0) return { warnings: [] };
+  if (article.status === 'published') {
+    throw new Error(`standalone-prose gate failed (published articles):\n  ${findings.join('\n  ')}`);
+  }
+  return { warnings: findings };
+}
+
+/**
+ * Offline gates: schema (via loader) + inline-citation integrity + source-tier gate +
+ * prose floor + standalone-prose gate.
+ */
 function validateArticleOffline(article: ArticleAuthoring): void {
   assertArticleCitationIntegrity(article);
   const { warnings: tierWarnings } = gateArticleSourceTiers(article);
@@ -201,6 +252,8 @@ function validateArticleOffline(article: ArticleAuthoring): void {
   for (const warning of anchorWarnings) console.warn(`warning: ${warning}`);
   const { warnings: floorWarnings } = gateProseWordFloor(article);
   for (const warning of floorWarnings) console.warn(`warning: ${warning}`);
+  const { warnings: standaloneWarnings } = gateStandaloneProse(article);
+  for (const warning of standaloneWarnings) console.warn(`warning: ${warning}`);
 }
 
 type PacketRow = {

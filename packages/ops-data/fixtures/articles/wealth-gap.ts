@@ -444,7 +444,7 @@ export const wealthGapArticle = {
     { type: 'heading', level: 3 as const, text: 'The record, in order' },
     {
       type: 'paragraph',
-      text: 'The events in this chapter aren’t our summary of what happened. They’re documents, each with its own date, sitting in a federal archive, a university transcription project, or a state historical society right now: the minutes of a question and its answer, an order and its reversal, a bank failure counted down to the last depositor, a front page and the state’s accounting of what followed it eighty years later, two laws and the way they were actually run, and the one-sentence policy that finally made the discrimination illegal. Read them in order and they trace the same slope the ratio does.',
+      text: 'The events above aren’t a summary of what happened. They’re documents, each with its own date, sitting in a federal archive, a university transcription project, or a state historical society right now: the minutes of a question and its answer, an order and its reversal, a bank failure counted down to the last depositor, a front page and the state’s accounting of what followed it eighty years later, two laws and the way they were actually run, and the one-sentence policy that finally made the discrimination illegal. Read them in order and they trace the same slope the ratio does.',
     },
     {
       type: 'timeline',

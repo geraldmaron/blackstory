@@ -18,7 +18,7 @@ dashboard with captions. It is prose that a reader sits inside for several
 paragraphs before a number ever appears. That format fails in two specific
 directions if left unguided: it can slide into anonymous "trends affected
 communities" mush that presence+proof already forbids, or it can front-load
-the statistic and let the prose become a caption. Five rules keep it in the
+the statistic and let the prose become a caption. Six rules keep it in the
 narrow lane between those failures.
 
 ## Rule 1 — Specific person, specific hour
@@ -142,6 +142,52 @@ declarative sentence available instead of forcing one.
 > map, the ghosts of everyone who was ever told no are still whispering
 > that they were here.
 
+## Rule 6 — The chapter stands alone
+
+A chapter is a piece of history, not a page of a product. Its prose never names the
+site it is published on, never points at sibling chapters as chapters, and never
+speaks in the publisher's first person.
+
+This is a reader-facing requirement before it is a stylistic one. Readers arrive on
+these pages from search, syndication, and shared links with no idea what else is
+published here. "Another chapter on this site follows what happened next" is a dead
+end to that reader and an unexplained brand reference to everyone else, and it dates
+badly the moment the other chapter is renamed, merged, or unpublished. It also
+quietly changes what the piece is: prose that references its own navigation is
+marketing the surface, not narrating the record.
+
+Forbidden in body prose and pullquotes:
+
+- **Naming the surface** — "this site," "this page," "this project," "on our site."
+- **Cross-referencing siblings as siblings** — "another chapter," "the other
+  chapters," "the wealth chapter," "a chapter here."
+- **The publisher's first person** — "our summary," "a story we are telling you,"
+  "none of it needs us in order to be believed," "we show them side by side."
+
+Allowed and encouraged:
+
+- **"This chapter"** referring to the piece the reader is currently inside
+  ("two wealth series run through this chapter, and they're never averaged"). That
+  is ordinary essay voice about the writing at hand, not a reference to a platform.
+- **Second person** for the reader inside an era, which the era-immersion structure
+  requires.
+- **Entity links** — `[[entityId|Label]]` inline, plus `relatedEntityIds` on the
+  article. This is how related history gets reached: through links that resolve to
+  real records and degrade gracefully, never through prose describing navigation.
+
+When a chapter genuinely needs the history a sibling covers, write the history, cited,
+in one or two sentences and link the entity. "Four days later Sherman issues Special
+Field Orders No. 15, and within the year the land goes back" carries the reader
+without assuming they can see a table of contents.
+
+**Enforced** by `gateStandaloneProse` in `packages/ops-data/scripts/articles.ts`: a
+hard error on published articles, a warning below that. The gate matches phrasings,
+not intent, so it is a floor rather than a substitute for reading the prose.
+
+**Scope:** this rule governs chapter *content*. Site chrome written by components
+(drawer labels, the dispute block's standing line, empty states) is the site
+speaking as itself and may use the institutional voice.
+
 ## Sample chapter — illustrative figure
 
 **This is an illustrative figure, not the original artifact.** The original
@@ -150,7 +196,7 @@ the issue that produced this document could not be located in this
 repository, its design-mock directories, or prior conversation history at
 the time of writing. If that original artifact surfaces later, it should
 replace the sample below; until then, the sample below is a newly written
-exemplar that follows all five rules above and should be treated as
+exemplar that follows all six rules above and should be treated as
 canonical guidance for register, not as historical fact about a real
 person or address.
 
@@ -205,7 +251,8 @@ person or address.
 |---|---|
 | Presence+proof, microcopy, dispute phrasing, legal-status vocabulary, "why this appears" | `docs/ui/story.md` |
 | Theme arc structure, journey beats, ink-sketch visuals, instrument rail rules | `docs/ui/design-direction-v6-themes.md` § 1.1–1.2 |
-| Folded-chapter prose rules (the five rules above) | This document |
+| Folded-chapter prose rules (the six rules above) | This document |
+| Standalone-prose enforcement (no site/sibling-chapter/publisher-voice references) | Rule 6 above, gated by `gateStandaloneProse` in `packages/ops-data/scripts/articles.ts` |
 | `named_actors` / `multiDecadeChecklist` data contract | `packages/domain/src/statistics/theme-impact-packet.ts` |
 
 This document governs prose craft only. It does not change the data

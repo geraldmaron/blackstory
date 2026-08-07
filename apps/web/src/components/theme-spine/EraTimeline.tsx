@@ -1,14 +1,20 @@
 /**
- * Theme-spine "era timeline" moment: a horizontal strip of dated events for a chapter,
+ * Theme-spine "era timeline" moment: the dated documents behind a chapter, in order,
  * sourced from a theme-impact packet's dated artifacts (the packet's `event_timeline`
  * evidence-spine item — see `THEME_IMPACT_MULTI_DECADE_CHECKLIST_ITEMS` in
  * packages/domain/src/statistics/theme-impact-packet.ts) plus the packet's policy eras.
  *
- * Hairline axis with a copper tick + label per event; the chapter's own era band (when it
- * matches one of the packet's `policyEras`) renders as a low-alpha `sand` wash behind its
- * span. Inline SVG, static (no animation — reduced-motion is a non-issue here by design).
- * Scrolls horizontally in its own `overflow-x: auto` container so a long span never causes
- * page-level horizontal overflow.
+ * Rendered as a vertical chronological rail: a semantic ordered list, one row per event,
+ * date in a mono column and the document's own title beside it. This replaced a horizontal
+ * SVG axis that positioned each event by year ratio on a fixed-width canvas — with real
+ * packet data (documents clustered in the same decade, titles running 40+ characters) the
+ * labels collided into an unreadable overprint, and no viewport width fixed it. Elapsed
+ * time is the information that axis was carrying, so it is kept explicitly: a gap marker
+ * between rows names the years between one document and the next.
+ *
+ * Fully responsive by construction — text wraps, nothing is positioned absolutely, and
+ * there is no horizontal scroll at any width. The chapter's own era band (when it matches
+ * one of the packet's `policyEras`) renders as a low-alpha `sand` wash behind the rail.
  */
 import React from 'react';
 
@@ -35,18 +41,44 @@ export type EraTimelineProps = {
   readonly className?: string;
 };
 
-const TRACK_HEIGHT = 96;
-const AXIS_Y = 56;
-const MIN_EVENT_SPACING = 96;
-const SIDE_PADDING = 32;
+/** Only call out a gap once it is long enough to be part of the story. */
+const GAP_YEARS_THRESHOLD = 5;
+
+const MONTHS = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
 
 function yearOf(date: string): number {
   const match = /^-?\d{1,4}/.exec(date.trim());
   return match ? Number.parseInt(match[0], 10) : Number.NaN;
 }
 
+/**
+ * Renders the stored date at whatever precision the packet actually carries, so a
+ * year-only artifact never gets a fabricated month or day: "1937", "June 1937",
+ * "June 12, 1937".
+ */
 function formatDateLabel(date: string): string {
-  return date.trim();
+  const trimmed = date.trim();
+  const match = /^(-?\d{1,4})(?:-(\d{2}))?(?:-(\d{2}))?$/.exec(trimmed);
+  if (!match) return trimmed;
+  const [, year, month, day] = match;
+  if (!month) return year!;
+  const monthName = MONTHS[Number.parseInt(month, 10) - 1];
+  if (!monthName) return trimmed;
+  if (!day) return `${monthName} ${year}`;
+  return `${monthName} ${Number.parseInt(day, 10)}, ${year}`;
 }
 
 /** Formats the aria-label summary: date range + event count. */
@@ -62,94 +94,55 @@ function summarizeSpan(sorted: readonly EraTimelineEvent[]): string {
   return `Timeline: ${countLabel}, ${formatDateLabel(first.date)} to ${formatDateLabel(last.date)}`;
 }
 
+function gapLabel(years: number): string {
+  if (years >= 100) {
+    const centuries = Math.round(years / 100);
+    return centuries === 1 ? 'about a century later' : `about ${centuries} centuries later`;
+  }
+  return years === 1 ? '1 year later' : `${years} years later`;
+}
+
 export function EraTimeline({ events, policyEras, currentEraId, className }: EraTimelineProps) {
   const sorted = [...events].sort((a, b) => a.date.localeCompare(b.date));
   if (sorted.length === 0) {
     return null;
   }
 
-  const years = sorted.map((event) => yearOf(event.date));
-  const minYear = Math.min(...years.filter((year) => !Number.isNaN(year)));
-  const maxYear = Math.max(...years.filter((year) => !Number.isNaN(year)));
-  const span = maxYear - minYear || 1;
-
-  const width = Math.max(480, SIDE_PADDING * 2 + (sorted.length - 1) * MIN_EVENT_SPACING);
-  const usableWidth = width - SIDE_PADDING * 2;
-
-  function xForYear(year: number): number {
-    if (Number.isNaN(year)) return SIDE_PADDING;
-    const ratio = (year - minYear) / span;
-    return SIDE_PADDING + ratio * usableWidth;
-  }
-
   const currentEra = policyEras?.find((era) => era.id === currentEraId);
-
-  const rootClassName = ['ds-era-timeline', className].filter(Boolean).join(' ');
-  const ariaLabel = summarizeSpan(sorted);
+  const rootClassName = [
+    'ds-era-timeline',
+    currentEra ? 'ds-era-timeline--banded' : null,
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <figure className={rootClassName}>
-      <div className="ds-era-timeline__scroller">
-        <svg
-          className="ds-era-timeline__svg"
-          viewBox={`0 0 ${width} ${TRACK_HEIGHT}`}
-          width={width}
-          height={TRACK_HEIGHT}
-          role="img"
-          aria-label={ariaLabel}
-          preserveAspectRatio="xMinYMid meet"
-        >
-          {currentEra ? (
-            <rect
-              className="ds-era-timeline__era-band"
-              x={0}
-              y={0}
-              width={width}
-              height={TRACK_HEIGHT}
-            />
-          ) : null}
-
-          <line
-            className="ds-era-timeline__axis"
-            x1={SIDE_PADDING}
-            y1={AXIS_Y}
-            x2={width - SIDE_PADDING}
-            y2={AXIS_Y}
-          />
-
-          {sorted.map((event, index) => {
-            const x = xForYear(years[index]!);
-            return (
-              <g className="ds-era-timeline__event" key={`${event.date}-${index}`}>
-                <line
-                  className="ds-era-timeline__tick"
-                  x1={x}
-                  y1={AXIS_Y - 8}
-                  x2={x}
-                  y2={AXIS_Y + 8}
-                />
-                <circle className="ds-era-timeline__dot" cx={x} cy={AXIS_Y} r={3} />
-                <text
-                  className="ds-era-timeline__date-label"
-                  x={x}
-                  y={AXIS_Y - 16}
-                  textAnchor="middle"
-                >
+      {currentEra ? <div className="ds-era-timeline__era-band" aria-hidden="true" /> : null}
+      <ol className="ds-era-timeline__list" aria-label={summarizeSpan(sorted)}>
+        {sorted.map((event, index) => {
+          const previous = index > 0 ? sorted[index - 1] : undefined;
+          const gapYears = previous ? yearOf(event.date) - yearOf(previous.date) : Number.NaN;
+          const showGap = Number.isFinite(gapYears) && gapYears >= GAP_YEARS_THRESHOLD;
+          return (
+            <li className="ds-era-timeline__item" key={`${event.date}-${index}`}>
+              {showGap ? (
+                <span className="ds-era-timeline__gap" aria-hidden="true">
+                  {gapLabel(gapYears)}
+                </span>
+              ) : null}
+              <div className="ds-era-timeline__row">
+                <span className="ds-era-timeline__dot" aria-hidden="true" />
+                <time className="ds-era-timeline__date-label" dateTime={event.date.trim()}>
                   {formatDateLabel(event.date)}
-                </text>
-                <text
-                  className="ds-era-timeline__event-label"
-                  x={x}
-                  y={AXIS_Y + 24}
-                  textAnchor="middle"
-                >
-                  {event.label}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-      </div>
+                </time>
+                <span className="ds-era-timeline__event-label">{event.label}</span>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
       {currentEra ? (
         <figcaption className="ds-era-timeline__caption">
           {currentEra.label}

@@ -504,7 +504,7 @@ export const buyingAHomeArticle = {
     },
     {
       type: 'paragraph',
-      text: 'Every rule quoted here is sitting in an archive right now with its own date stamped on it, and none of it needs us in order to be believed: an agreement signed by thirty property owners, a survey form filled out block by block, a paragraph of federal underwriting guidance, a contract that kept the deed in the seller’s drawer, a statute that promised a right and priced the remedy out of reach, and the amendments that took twenty years to arrive. Line them up and read them in order. They are not a story we are telling you. They are a story the country told about itself, in its own handwriting, on its own letterhead, and never quite got around to taking back.',
+      text: 'Every rule quoted here is sitting in an archive right now with its own date stamped on it, and none of it needs retelling in order to be believed: an agreement signed by thirty property owners, a survey form filled out block by block, a paragraph of federal underwriting guidance, a contract that kept the deed in the seller’s drawer, a statute that promised a right and priced the remedy out of reach, and the amendments that took twenty years to arrive. Line them up and read them in order. They are not a story told about the country. They are a story the country told about itself, in its own handwriting, on its own letterhead, and never quite got around to taking back.',
     },
     {
       type: 'timeline',

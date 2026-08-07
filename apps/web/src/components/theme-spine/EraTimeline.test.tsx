@@ -1,7 +1,8 @@
 /**
- * Unit coverage for the theme-spine EraTimeline moment: renders from fixture events in both
- * themes, summarizes the date span + event count in `aria-label`, highlights the current era
- * band, and scrolls horizontally in its own `overflow-x: auto` container (never the page).
+ * Unit coverage for the theme-spine EraTimeline moment: renders fixture events as a vertical
+ * chronological rail in both themes, summarizes the date span + event count in `aria-label`,
+ * highlights the current era band, names the elapsed years between distant documents, and
+ * renders dates at the precision the packet actually stores.
  */
 
 import assert from 'node:assert/strict';
@@ -24,13 +25,49 @@ const policyEras = [
 ];
 
 describe('EraTimeline', () => {
-  it('renders a hairline axis with a tick + label per event, sorted by date', () => {
+  it('renders one rail row per event, in date order', () => {
     const html = renderToStaticMarkup(<EraTimeline events={events} />);
-    assert.match(html, /ds-era-timeline__axis/);
+    assert.match(html, /ds-era-timeline__list/);
     const dateMatches = [...html.matchAll(/ds-era-timeline__date-label[^>]*>([^<]+)</g)].map(
       (match) => match[1],
     );
     assert.deepEqual(dateMatches, ['1934', '1937', '1968']);
+  });
+
+  it('renders each date at the precision the packet stores, never inventing one', () => {
+    const html = renderToStaticMarkup(
+      <EraTimeline
+        events={[
+          { label: 'Year only', date: '1937' },
+          { label: 'Year and month', date: '1938-02' },
+          { label: 'Full date', date: '1948-05-03' },
+        ]}
+      />,
+    );
+    const dateMatches = [...html.matchAll(/ds-era-timeline__date-label[^>]*>([^<]+)</g)].map(
+      (match) => match[1],
+    );
+    assert.deepEqual(dateMatches, ['1937', 'February 1938', 'May 3, 1948']);
+  });
+
+  it('names the elapsed years between distant documents, and stays quiet between close ones', () => {
+    const html = renderToStaticMarkup(
+      <EraTimeline
+        events={[
+          { label: 'First', date: '1911' },
+          { label: 'Close behind', date: '1913' },
+          { label: 'Long after', date: '1968' },
+        ]}
+      />,
+    );
+    assert.match(html, /55 years later/);
+    assert.doesNotMatch(html, /2 years later/);
+  });
+
+  it('marks up the rail as an ordered list of times, for assistive technology', () => {
+    const html = renderToStaticMarkup(<EraTimeline events={events} />);
+    assert.match(html, /<ol/);
+    assert.match(html, /<time[^>]*datetime="1934"/i);
   });
 
   it('summarizes the date span and event count in aria-label', () => {
@@ -58,9 +95,10 @@ describe('EraTimeline', () => {
     assert.equal(html, '');
   });
 
-  it('scrolls horizontally in its own container, never the page', () => {
+  it('lays out vertically, so nothing needs horizontal scrolling at any width', () => {
     const html = renderToStaticMarkup(<EraTimeline events={events} />);
-    assert.match(html, /class="ds-era-timeline__scroller"/);
+    assert.doesNotMatch(html, /scroller/);
+    assert.doesNotMatch(html, /<svg/);
   });
 
   it('renders identically regardless of theme class on an ancestor (both themes safe)', () => {
