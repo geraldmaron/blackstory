@@ -52,9 +52,39 @@ import {
   fetchReleaseSearchIndexArtifact,
 } from './release-artifacts';
 
-/** Cross-request cache window for release catalog / search index (seconds). */
-const RELEASE_CATALOG_REVALIDATE_SECONDS = 300;
+/**
+ * Cross-request cache window for release catalog / search index (seconds).
+ * Cache keys include `releaseId + activatedAt`, so entries can never serve a stale
+ * release — a new activation changes the key. The TTL is therefore only a memory
+ * bound, not a freshness control; keep it long (each expiry re-pulls the ~5MB
+ * catalog from Postgres and was the dominant driver of Supabase egress).
+ */
+const RELEASE_CATALOG_REVALIDATE_SECONDS = 21_600; // 6h
 const RELEASE_CATALOG_TTL_MS = RELEASE_CATALOG_REVALIDATE_SECONDS * 1000;
+
+/**
+ * How long a fetched active-release pointer may serve across requests. The pointer
+ * was previously read from Postgres on every request (~625k reads per billing
+ * period); a short window keeps release activation near-immediate while collapsing
+ * that to ~2 reads/min/instance.
+ */
+const ACTIVE_RELEASE_POINTER_TTL_MS = 30_000;
+
+type ActiveReleaseResult = Awaited<ReturnType<typeof fetchActiveRelease>>;
+let activeReleaseMemo: { value: ActiveReleaseResult; expiresAtMs: number } | undefined;
+
+async function fetchActiveReleaseMemoized(): Promise<ActiveReleaseResult> {
+  const now = Date.now();
+  if (activeReleaseMemo && activeReleaseMemo.expiresAtMs > now) {
+    return activeReleaseMemo.value;
+  }
+  const value = await fetchActiveRelease();
+  // Only memoize successful reads; a missing pointer should retry next request.
+  if (value !== undefined) {
+    activeReleaseMemo = { value, expiresAtMs: now + ACTIVE_RELEASE_POINTER_TTL_MS };
+  }
+  return value;
+}
 
 /** Process-local store for public release catalogs (never private/research docs). */
 const liveEntitiesMemory = createLiveCatalogMemoryCache<readonly PublicEntityView[]>({
@@ -64,7 +94,7 @@ const liveSearchIndexMemory = createLiveCatalogMemoryCache<readonly PublicSearch
   defaultTtlMs: RELEASE_CATALOG_TTL_MS,
 });
 /** One active-release pointer read per request (shared across entities/search). */
-const getCachedActiveRelease = cache(fetchActiveRelease);
+const getCachedActiveRelease = cache(fetchActiveReleaseMemoized);
 
 /**
  * Thin active-release meta for sitemap / cache keys — one pointer read, no catalog load.

@@ -57,12 +57,21 @@ export type CreatePostgresDataAccessReadersOptions = {
   readonly query?: PostgresQueryFn;
 };
 
-/** Matches `apps/web`'s release-catalog cache window (`RELEASE_CATALOG_REVALIDATE_SECONDS`). */
-const ENTITY_PROJECTIONS_CACHE_TTL_MS = 5 * 60 * 1000;
+/**
+ * Matches `apps/web`'s release-catalog cache window (`RELEASE_CATALOG_REVALIDATE_SECONDS`).
+ * Entries are keyed by release id and release contents are immutable once published, so
+ * this TTL is a memory bound, not a freshness control — each expiry re-pulls the full
+ * multi-MB catalog from Postgres (the dominant Supabase egress driver at 5 minutes).
+ */
+const ENTITY_PROJECTIONS_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 /** Only ever 1-2 releases are active in practice; bounded defensively against release churn. */
 const MAX_CACHED_RELEASES = 4;
+/** Active-release pointer reads were per-request; a short window keeps activation prompt. */
+const ACTIVE_RELEASE_POINTER_TTL_MS = 30_000;
 
 type EntityProjectionsList = Awaited<ReturnType<typeof listPublicEntityProjections>>;
+type SearchIndexList = Awaited<ReturnType<typeof listPublicSearchIndexDocs>>;
+type ActiveReleaseResult = Awaited<ReturnType<typeof fetchActiveRelease>>;
 
 function mapActiveReleaseToPointer(
   active: NonNullable<Awaited<ReturnType<typeof fetchActiveRelease>>>,
@@ -92,26 +101,68 @@ export function createPostgresDataAccessReaders(
     string,
     { readonly value: EntityProjectionsList; readonly expiresAtMs: number }
   >();
+  // `readSearchPage` previously re-pulled the entire search index from Postgres on every
+  // search request (~3MB each) — cache it under the same release-keyed convention.
+  const searchIndexCache = new Map<
+    string,
+    { readonly value: SearchIndexList; readonly expiresAtMs: number }
+  >();
+  let activeReleaseMemo:
+    | { readonly value: ActiveReleaseResult; readonly expiresAtMs: number }
+    | undefined;
+
+  function readReleaseCache<Value>(
+    cache: Map<string, { readonly value: Value; readonly expiresAtMs: number }>,
+    releaseId: string,
+  ): Value | undefined {
+    const hit = cache.get(releaseId);
+    return hit && hit.expiresAtMs > Date.now() ? hit.value : undefined;
+  }
+
+  function writeReleaseCache<Value>(
+    cache: Map<string, { readonly value: Value; readonly expiresAtMs: number }>,
+    releaseId: string,
+    value: Value,
+  ): void {
+    if (!cache.has(releaseId) && cache.size >= MAX_CACHED_RELEASES) {
+      cache.clear();
+    }
+    cache.set(releaseId, { value, expiresAtMs: Date.now() + ENTITY_PROJECTIONS_CACHE_TTL_MS });
+  }
 
   async function listPublicEntityProjectionsCached(
     releaseId: string,
   ): Promise<EntityProjectionsList> {
-    const now = Date.now();
-    const hit = projectionsCache.get(releaseId);
-    if (hit && hit.expiresAtMs > now) {
-      return hit.value;
-    }
+    const hit = readReleaseCache(projectionsCache, releaseId);
+    if (hit) return hit;
     const value = await listPublicEntityProjections(releaseId, runQuery);
-    if (!projectionsCache.has(releaseId) && projectionsCache.size >= MAX_CACHED_RELEASES) {
-      projectionsCache.clear();
+    writeReleaseCache(projectionsCache, releaseId, value);
+    return value;
+  }
+
+  async function listPublicSearchIndexDocsCached(releaseId: string): Promise<SearchIndexList> {
+    const hit = readReleaseCache(searchIndexCache, releaseId);
+    if (hit) return hit;
+    const value = await listPublicSearchIndexDocs(releaseId, runQuery);
+    writeReleaseCache(searchIndexCache, releaseId, value);
+    return value;
+  }
+
+  async function fetchActiveReleaseMemoized(): Promise<ActiveReleaseResult> {
+    if (activeReleaseMemo && activeReleaseMemo.expiresAtMs > Date.now()) {
+      return activeReleaseMemo.value;
     }
-    projectionsCache.set(releaseId, { value, expiresAtMs: now + ENTITY_PROJECTIONS_CACHE_TTL_MS });
+    const value = await fetchActiveRelease(runQuery);
+    // Only memoize successful reads; a missing pointer should retry next request.
+    if (value !== undefined) {
+      activeReleaseMemo = { value, expiresAtMs: Date.now() + ACTIVE_RELEASE_POINTER_TTL_MS };
+    }
     return value;
   }
 
   return {
     async readReleasePointer(): Promise<ReleasePointer | undefined> {
-      const active = await fetchActiveRelease(runQuery);
+      const active = await fetchActiveReleaseMemoized();
       if (!active) return undefined;
       return mapActiveReleaseToPointer(active);
     },
@@ -136,7 +187,7 @@ export function createPostgresDataAccessReaders(
       canonical: CanonicalSearchQuery,
       searchOptions: { readonly releaseId: string },
     ): Promise<SearchPage> {
-      const indexDocs = await listPublicSearchIndexDocs(searchOptions.releaseId, runQuery);
+      const indexDocs = await listPublicSearchIndexDocsCached(searchOptions.releaseId);
       if (indexDocs.length > 0) {
         return searchOverIndex(indexDocs.map(mapPublicSearchProjection), canonical);
       }
