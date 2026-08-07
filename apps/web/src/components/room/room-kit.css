@@ -1106,6 +1106,19 @@ a.ds-room-chip {
 /* Live is signalled by the copper edge AND by the tag text, never by colour alone. */
 .ds-mapmoment[data-live='1'] .ds-mapmoment__plate {
   border-color: var(--ds-accent-graphic);
+  /*
+   * The slot becomes a window onto the borrowed plate.
+   *
+   * The plate is `position: fixed` at `--ds-z-map-plate` (0) and the document column sits at
+   * `--ds-z-content` (1), so a plate holding this slot paints BEHIND the column by design —
+   * that ordering is what keeps a live plate from reading through prose everywhere else. The
+   * slot kept its opaque idle ground when live, which meant the map was positioned perfectly
+   * over the slot and then covered by it: every MapMoment on every reading surface rendered
+   * an empty box. Dropping the ground here lets the plate show through without touching the
+   * z-order that protects the rest of the page. The tag and the Atlas control sit at local
+   * `z-index: 2`, so they stay above the map.
+   */
+  background: transparent;
 }
 
 .ds-mapmoment__idle {

@@ -586,6 +586,30 @@ describe('room kit · map moment arbitration', () => {
   });
 });
 
+describe('room kit · a live moment is a window onto the borrowed plate', () => {
+  it('drops the slot background when live, or the plate paints behind an opaque box', () => {
+    // The regression this guards was invisible for a long time and hid EVERY map on the site.
+    // The plate is fixed at --ds-z-map-plate (0) and the document column sits at
+    // --ds-z-content (1), so a plate holding a slot paints behind the column by design. The
+    // slot kept its opaque idle ground when live, so the map was positioned perfectly over the
+    // slot and then covered by it: every MapMoment rendered an empty box. Nothing failed, no
+    // error was logged, and the moment still reported itself live.
+    const css = readFileSync(
+      path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'room-kit.css'),
+      'utf8',
+    );
+    const liveRule = /\.ds-mapmoment\[data-live='1'\]\s+\.ds-mapmoment__plate\s*\{([^}]*)\}/.exec(
+      css,
+    );
+    assert.ok(liveRule, 'the live-slot rule must exist');
+    assert.match(
+      liveRule[1]!,
+      /background:\s*transparent/,
+      'a live slot must drop its background so the borrowed plate shows through',
+    );
+  });
+});
+
 describe('room kit · no room invents its own map moment', () => {
   it('no route defines moment markup outside the kit', () => {
     // The gap this package closed: the mock renders a moment in seven rooms and the kit had no
