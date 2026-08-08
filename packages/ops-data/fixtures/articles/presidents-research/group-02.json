@@ -10,29 +10,61 @@
         {
           "text": "December 1835 annual message: Jackson asked Congress to bar, under severe penalties, the mailing of antislavery 'incendiary publications' into the southern states.",
           "sources": [
-            { "label": "Jackson, Seventh Annual Message, Dec. 7, 1835 (American Presidency Project, UC Santa Barbara)", "url": "https://www.presidency.ucsb.edu/documents/seventh-annual-message-2", "quote": "prohibit, under severe penalties, the circulation in the Southern States, through the mail, of incendiary publications intended to instigate the slaves to insurrection" },
-            { "label": "Miller Center, University of Virginia — Andrew Jackson: Domestic Affairs", "url": "https://millercenter.org/president/jackson/domestic-affairs", "quote": "Jackson recommended federal suppression of 'incendiary publications' and damned the abolitionists' 'wicked attempts' to incite a slave rebellion." }
+            {
+              "label": "Jackson, Seventh Annual Message, Dec. 7, 1835 (American Presidency Project, UC Santa Barbara)",
+              "url": "https://www.presidency.ucsb.edu/documents/seventh-annual-message-2",
+              "quote": "prohibit, under severe penalties, the circulation in the Southern States, through the mail, of incendiary publications intended to instigate the slaves to insurrection"
+            },
+            {
+              "label": "Miller Center, University of Virginia — Andrew Jackson: Domestic Affairs",
+              "url": "https://millercenter.org/president/jackson/domestic-affairs",
+              "quote": "Jackson recommended federal suppression of 'incendiary publications' and damned the abolitionists' 'wicked attempts' to incite a slave rebellion."
+            }
           ]
         },
         {
           "text": "May 26, 1836: the House adopted the Pinckney gag rule, automatically tabling all antislavery petitions; Adams objected on the floor that it was unconstitutional.",
           "sources": [
-            { "label": "U.S. House of Representatives, History, Art & Archives — 'The House Gag Rule'", "url": "https://history.house.gov/HistoricalHighlight/Detail/35837", "quote": "all petitions, memorials, or resolutions regarding slavery should automatically be tabled and that no further action be taken upon them" },
-            { "label": "Miller Center, University of Virginia — Andrew Jackson: Domestic Affairs", "url": "https://millercenter.org/president/jackson/domestic-affairs", "quote": "During Jackson's administration, Congress began adopting annual 'gag rules' to keep discussion of abolition petitions off the House and Senate floor." }
+            {
+              "label": "U.S. House of Representatives, History, Art & Archives — 'The House Gag Rule'",
+              "url": "https://history.house.gov/HistoricalHighlight/Detail/35837",
+              "quote": "all petitions, memorials, or resolutions regarding slavery should automatically be tabled and that no further action be taken upon them"
+            },
+            {
+              "label": "Miller Center, University of Virginia — Andrew Jackson: Domestic Affairs",
+              "url": "https://millercenter.org/president/jackson/domestic-affairs",
+              "quote": "During Jackson's administration, Congress began adopting annual 'gag rules' to keep discussion of abolition petitions off the House and Senate floor."
+            }
           ]
         },
         {
           "text": "1835 mail crisis: abolitionists sent thousands of tracts south; many were intercepted by southern postmasters or destroyed by mobs before delivery.",
           "sources": [
-            { "label": "Miller Center, University of Virginia — Andrew Jackson: Domestic Affairs", "url": "https://millercenter.org/president/jackson/domestic-affairs", "quote": "Many of these were never delivered, intercepted by southern postmasters or by angry mobs." },
-            { "label": "Jackson, Seventh Annual Message, Dec. 7, 1835 (American Presidency Project, UC Santa Barbara)", "url": "https://www.presidency.ucsb.edu/documents/seventh-annual-message-2", "quote": "I would therefore call the special attention of Congress to the subject" }
+            {
+              "label": "Miller Center, University of Virginia — Andrew Jackson: Domestic Affairs",
+              "url": "https://millercenter.org/president/jackson/domestic-affairs",
+              "quote": "Many of these were never delivered, intercepted by southern postmasters or by angry mobs."
+            },
+            {
+              "label": "Jackson, Seventh Annual Message, Dec. 7, 1835 (American Presidency Project, UC Santa Barbara)",
+              "url": "https://www.presidency.ucsb.edu/documents/seventh-annual-message-2",
+              "quote": "I would therefore call the special attention of Congress to the subject"
+            }
           ]
         },
         {
           "text": "Holdings grew across his life: ten enslaved people at the Hermitage in 1804, 95 at his 1828 election, about 150 at his death in 1845.",
           "sources": [
-            { "label": "Andrew Jackson's Hermitage — Enslaved Community", "url": "https://thehermitage.com/enslaved-community", "quote": "When Andrew Jackson moved to The Hermitage in 1804, he enslaved ten people. When he was elected president in 1828, he enslaved 95, and when he died in 1845, his son inherited about 150 enslaved." },
-            { "label": "Miller Center, University of Virginia — Andrew Jackson: Domestic Affairs", "url": "https://millercenter.org/president/jackson/domestic-affairs", "quote": "Like his neighbors, he bought and sold slaves and used them to work his plantation and wait on his needs." }
+            {
+              "label": "Andrew Jackson's Hermitage — Enslaved Community",
+              "url": "https://thehermitage.com/enslaved-community",
+              "quote": "When Andrew Jackson moved to The Hermitage in 1804, he enslaved ten people. When he was elected president in 1828, he enslaved 95, and when he died in 1845, his son inherited about 150 enslaved."
+            },
+            {
+              "label": "Miller Center, University of Virginia — Andrew Jackson: Domestic Affairs",
+              "url": "https://millercenter.org/president/jackson/domestic-affairs",
+              "quote": "Like his neighbors, he bought and sold slaves and used them to work his plantation and wait on his needs."
+            }
           ]
         }
       ],
@@ -45,10 +77,30 @@
         "rightsNote": "19th-century work, author died well over 100 years ago and the image was published long before 1929; verified to load as image/jpeg."
       },
       "sources": [
-        { "id": "jackson-1835-annual-message-ucsb", "label": "Andrew Jackson, Seventh Annual Message, December 7, 1835 — The American Presidency Project, UC Santa Barbara", "url": "https://www.presidency.ucsb.edu/documents/seventh-annual-message-2", "quote": "prohibit, under severe penalties, the circulation in the Southern States, through the mail, of incendiary publications intended to instigate the slaves to insurrection" },
-        { "id": "millercenter-jackson-domestic", "label": "Miller Center, University of Virginia — Andrew Jackson: Domestic Affairs", "url": "https://millercenter.org/president/jackson/domestic-affairs", "quote": "There is nothing to show that Jackson ever pondered slavery as a fundamental moral question." },
-        { "id": "house-gag-rule-1836", "label": "U.S. House of Representatives, History, Art & Archives — Historical Highlights: 'The House Gag Rule,' May 26, 1836", "url": "https://history.house.gov/HistoricalHighlight/Detail/35837", "quote": "Adams shouted during the roll call vote, “I hold the resolution to be a direct violation of the Constitution of the United States.”" },
-        { "id": "hermitage-enslaved-community", "label": "Andrew Jackson's Hermitage — Enslaved Community", "url": "https://thehermitage.com/enslaved-community", "quote": "Andrew Jackson first purchased an enslaved African American, a woman named Nancy, in 1788. During the next 77 years, the Jackson family enslaved at least 325 men, women, and children." }
+        {
+          "id": "jackson-1835-annual-message-ucsb",
+          "label": "Andrew Jackson, Seventh Annual Message, December 7, 1835 — The American Presidency Project, UC Santa Barbara",
+          "url": "https://www.presidency.ucsb.edu/documents/seventh-annual-message-2",
+          "quote": "prohibit, under severe penalties, the circulation in the Southern States, through the mail, of incendiary publications intended to instigate the slaves to insurrection"
+        },
+        {
+          "id": "millercenter-jackson-domestic",
+          "label": "Miller Center, University of Virginia — Andrew Jackson: Domestic Affairs",
+          "url": "https://millercenter.org/president/jackson/domestic-affairs",
+          "quote": "There is nothing to show that Jackson ever pondered slavery as a fundamental moral question."
+        },
+        {
+          "id": "house-gag-rule-1836",
+          "label": "U.S. House of Representatives, History, Art & Archives — Historical Highlights: 'The House Gag Rule,' May 26, 1836",
+          "url": "https://history.house.gov/HistoricalHighlight/Detail/35837",
+          "quote": "Adams shouted during the roll call vote, “I hold the resolution to be a direct violation of the Constitution of the United States.”"
+        },
+        {
+          "id": "hermitage-enslaved-community",
+          "label": "Andrew Jackson's Hermitage — Enslaved Community",
+          "url": "https://thehermitage.com/enslaved-community",
+          "quote": "Andrew Jackson first purchased an enslaved African American, a woman named Nancy, in 1788. During the next 77 years, the Jackson family enslaved at least 325 men, women, and children."
+        }
       ],
       "disputes": [
         "Total number enslaved: the Hermitage frames the figure as 'at least 325 men, women, and children' enslaved by the Jackson family across 77 years and more than 500 names identified including descendants, while the count attached to Jackson personally at any one moment is 95 (1828) and about 150 (1845). Different sources cite these different bases, so headline totals vary."
@@ -67,29 +119,61 @@
         {
           "text": "March 4, 1837 inaugural address: Van Buren pledged to be the 'inflexible and uncompromising opponent' of any congressional attempt to abolish slavery in the District of Columbia.",
           "sources": [
-            { "label": "Martin Van Buren, Inaugural Address, March 4, 1837 (American Presidency Project, UC Santa Barbara)", "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-28", "quote": "the inflexible and uncompromising opponent of every attempt on the part of Congress to abolish slavery in the District of Columbia against the wishes of the slaveholding States" },
-            { "label": "White House Historical Association — The Enslaved Households of President Martin Van Buren", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-martin-van-buren", "quote": "It now only remains to add that no bill conflicting with these views can ever receive my constitutional sanction." }
+            {
+              "label": "Martin Van Buren, Inaugural Address, March 4, 1837 (American Presidency Project, UC Santa Barbara)",
+              "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-28",
+              "quote": "the inflexible and uncompromising opponent of every attempt on the part of Congress to abolish slavery in the District of Columbia against the wishes of the slaveholding States"
+            },
+            {
+              "label": "White House Historical Association — The Enslaved Households of President Martin Van Buren",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-martin-van-buren",
+              "quote": "It now only remains to add that no bill conflicting with these views can ever receive my constitutional sanction."
+            }
           ]
         },
         {
           "text": "January 1840: Van Buren issued an executive order directing that the Amistad Africans be turned over to their claimed enslavers; his cabinet treated them as property.",
           "sources": [
-            { "label": "Miller Center, University of Virginia — Martin Van Buren: Domestic Affairs", "url": "https://millercenter.org/president/vanburen/domestic-affairs", "quote": "Van Buren and his cabinet considered the self-emancipated Africans property, and, in January 1840, the president issued an executive order that the African men be turned over to their previous enslavers." },
-            { "label": "White House Historical Association — The Enslaved Households of President Martin Van Buren", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-martin-van-buren", "quote": "The District Court ruled that the Africans could not be considered property because their enslavement was illegal. The U.S. Attorney appealed the decision" }
+            {
+              "label": "Miller Center, University of Virginia — Martin Van Buren: Domestic Affairs",
+              "url": "https://millercenter.org/president/vanburen/domestic-affairs",
+              "quote": "Van Buren and his cabinet considered the self-emancipated Africans property, and, in January 1840, the president issued an executive order that the African men be turned over to their previous enslavers."
+            },
+            {
+              "label": "White House Historical Association — The Enslaved Households of President Martin Van Buren",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-martin-van-buren",
+              "quote": "The District Court ruled that the Africans could not be considered property because their enslavement was illegal. The U.S. Attorney appealed the decision"
+            }
           ]
         },
         {
           "text": "March 1841: in United States v. The Amistad the Supreme Court ordered the Africans declared free and dismissed from custody, rejecting the government's position.",
           "sources": [
-            { "label": "United States v. The Amistad, 40 U.S. (15 Pet.) 518 (1841) — U.S. Reports, Library of Congress", "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep040/usrep040518/usrep040518.pdf", "quote": "that the said negroes be declared to be free, and be dismissed from the custody of the Court, and go without day." },
-            { "label": "Miller Center, University of Virginia — Martin Van Buren: Domestic Affairs", "url": "https://millercenter.org/president/vanburen/domestic-affairs", "quote": "Van Buren and his cabinet considered the self-emancipated Africans property" }
+            {
+              "label": "United States v. The Amistad, 40 U.S. (15 Pet.) 518 (1841) — U.S. Reports, Library of Congress",
+              "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep040/usrep040518/usrep040518.pdf",
+              "quote": "that the said negroes be declared to be free, and be dismissed from the custody of the Court, and go without day."
+            },
+            {
+              "label": "Miller Center, University of Virginia — Martin Van Buren: Domestic Affairs",
+              "url": "https://millercenter.org/president/vanburen/domestic-affairs",
+              "quote": "Van Buren and his cabinet considered the self-emancipated Africans property"
+            }
           ]
         },
         {
           "text": "Van Buren backed Calhoun's Senate effort to block introduction of antislavery petitions, the upper-chamber counterpart to the House gag rule.",
           "sources": [
-            { "label": "Miller Center, University of Virginia — Martin Van Buren: Domestic Affairs", "url": "https://millercenter.org/president/vanburen/domestic-affairs", "quote": "He supported John C. Calhoun's attempt to stop the introduction of antislavery petitions on the Senate floor." },
-            { "label": "U.S. House of Representatives, History, Art & Archives — 'The House Gag Rule'", "url": "https://history.house.gov/HistoricalHighlight/Detail/35837", "quote": "the U.S. House of Representatives instituted the “gag rule,” the first instance of what would become a traditional practice forbidding the House from considering antislavery petitions" }
+            {
+              "label": "Miller Center, University of Virginia — Martin Van Buren: Domestic Affairs",
+              "url": "https://millercenter.org/president/vanburen/domestic-affairs",
+              "quote": "He supported John C. Calhoun's attempt to stop the introduction of antislavery petitions on the Senate floor."
+            },
+            {
+              "label": "U.S. House of Representatives, History, Art & Archives — 'The House Gag Rule'",
+              "url": "https://history.house.gov/HistoricalHighlight/Detail/35837",
+              "quote": "the U.S. House of Representatives instituted the “gag rule,” the first instance of what would become a traditional practice forbidding the House from considering antislavery petitions"
+            }
           ]
         }
       ],
@@ -102,10 +186,30 @@
         "rightsNote": "Photograph made c. 1855–1858, published long before 1929; verified to load as image/jpeg."
       },
       "sources": [
-        { "id": "vanburen-inaugural-1837-ucsb", "label": "Martin Van Buren, Inaugural Address, March 4, 1837 — The American Presidency Project, UC Santa Barbara", "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-28", "quote": "with a determination equally decided to resist the slightest interference with it in the States where it exists." },
-        { "id": "amistad-40us518-loc", "label": "United States v. The Amistad, 40 U.S. (15 Pet.) 518 (1841) — U.S. Reports PDF, Library of Congress", "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep040/usrep040518/usrep040518.pdf", "quote": "When the Amistad arrived she was in possession of the negroes, asserting their freedom" },
-        { "id": "millercenter-vanburen-domestic", "label": "Miller Center, University of Virginia — Martin Van Buren: Domestic Affairs", "url": "https://millercenter.org/president/vanburen/domestic-affairs", "quote": "the president issued an executive order that the African men be turned over to their previous enslavers." },
-        { "id": "whha-vanburen-enslaved", "label": "White House Historical Association, Rubenstein Center Scholarship — The Enslaved Households of President Martin Van Buren", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-martin-van-buren", "quote": "“Tom” a black man who you purchaised of & who quit you some 10 years since is now in the neighbourhood of Worcester Ms." }
+        {
+          "id": "vanburen-inaugural-1837-ucsb",
+          "label": "Martin Van Buren, Inaugural Address, March 4, 1837 — The American Presidency Project, UC Santa Barbara",
+          "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-28",
+          "quote": "with a determination equally decided to resist the slightest interference with it in the States where it exists."
+        },
+        {
+          "id": "amistad-40us518-loc",
+          "label": "United States v. The Amistad, 40 U.S. (15 Pet.) 518 (1841) — U.S. Reports PDF, Library of Congress",
+          "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep040/usrep040518/usrep040518.pdf",
+          "quote": "When the Amistad arrived she was in possession of the negroes, asserting their freedom"
+        },
+        {
+          "id": "millercenter-vanburen-domestic",
+          "label": "Miller Center, University of Virginia — Martin Van Buren: Domestic Affairs",
+          "url": "https://millercenter.org/president/vanburen/domestic-affairs",
+          "quote": "the president issued an executive order that the African men be turned over to their previous enslavers."
+        },
+        {
+          "id": "whha-vanburen-enslaved",
+          "label": "White House Historical Association, Rubenstein Center Scholarship — The Enslaved Households of President Martin Van Buren",
+          "url": "https://www.whitehousehistory.org/the-enslaved-households-of-martin-van-buren",
+          "quote": "“Tom” a black man who you purchaised of & who quit you some 10 years since is now in the neighbourhood of Worcester Ms."
+        }
       ],
       "disputes": [
         "Van Buren's later politics: he ran as the Free Soil candidate in 1848 on opposition to slavery's extension, which sits against the 1837 inaugural pledge; this pass verified the pledge and the Amistad conduct but did not fetch a source for the 1848 platform, so the two records are noted, not reconciled."
@@ -125,29 +229,61 @@
         {
           "text": "November 22, 1802: Harrison proclaimed a Vincennes convention to consider repealing the Northwest Ordinance's sixth article, which prohibited slavery in the territory.",
           "sources": [
-            { "label": "Proclamation Calling a Convention…, Nov. 22, 1802, in Logan Esarey, ed., Messages and Letters of William Henry Harrison (Wikisource transcription)", "url": "https://en.wikisource.org/wiki/Messages_and_Letters_of_William_Henry_Harrison/Proclamation_calling_a_convention_to_petition_congress_to_allow_slavery_in_Indiana_territory", "quote": "for the purpose of taking into consideration the propriety of repealing the sixth article of Compact between the United States" },
-            { "label": "Indiana Historical Bureau (in.gov) — Slavery in Indiana Territory", "url": "https://www.in.gov/history/for-educators/download-issues-of-the-indiana-historian/indiana-territory/slavery-in-indiana-territory/", "quote": "the propriety of repealing the sixth article" }
+            {
+              "label": "Proclamation Calling a Convention…, Nov. 22, 1802, in Logan Esarey, ed., Messages and Letters of William Henry Harrison (Wikisource transcription)",
+              "url": "https://en.wikisource.org/wiki/Messages_and_Letters_of_William_Henry_Harrison/Proclamation_calling_a_convention_to_petition_congress_to_allow_slavery_in_Indiana_territory",
+              "quote": "for the purpose of taking into consideration the propriety of repealing the sixth article of Compact between the United States"
+            },
+            {
+              "label": "Indiana Historical Bureau (in.gov) — Slavery in Indiana Territory",
+              "url": "https://www.in.gov/history/for-educators/download-issues-of-the-indiana-historian/indiana-territory/slavery-in-indiana-territory/",
+              "quote": "the propriety of repealing the sixth article"
+            }
           ]
         },
         {
           "text": "December 28, 1802: the convention's petition asked Congress to suspend the slavery ban ten years and keep those brought in enslaved afterward. Congress rejected it.",
           "sources": [
-            { "label": "Indiana Historical Bureau (in.gov) — Slavery in Indiana Territory", "url": "https://www.in.gov/history/for-educators/download-issues-of-the-indiana-historian/indiana-territory/slavery-in-indiana-territory/", "quote": "should remain slaves after the ten years had passed" },
-            { "label": "Indiana Historical Bureau — 'Laying the Foundation' (Crenshaw, Bury Me in a Free Land)", "url": "https://www.in.gov/history/for-educators/all-resources-for-educators/resources/underground-railroad/bury-me-in-a-free-land-the-abolitionist-movement-in-indiana-by-gwen-crenshaw/laying-the-foundation/", "quote": "not ask that the article be repealed “but that it may be suspended for the Term of Ten Years”" }
+            {
+              "label": "Indiana Historical Bureau (in.gov) — Slavery in Indiana Territory",
+              "url": "https://www.in.gov/history/for-educators/download-issues-of-the-indiana-historian/indiana-territory/slavery-in-indiana-territory/",
+              "quote": "should remain slaves after the ten years had passed"
+            },
+            {
+              "label": "Indiana Historical Bureau — 'Laying the Foundation' (Crenshaw, Bury Me in a Free Land)",
+              "url": "https://www.in.gov/history/for-educators/all-resources-for-educators/resources/underground-railroad/bury-me-in-a-free-land-the-abolitionist-movement-in-indiana-by-gwen-crenshaw/laying-the-foundation/",
+              "quote": "not ask that the article be repealed “but that it may be suspended for the Term of Ten Years”"
+            }
           ]
         },
         {
           "text": "August 26, 1805: Harrison approved a territorial act letting owners bring enslaved people into Indiana Territory and indenture them, with holders setting terms for those over fifteen.",
           "sources": [
-            { "label": "Indiana Historical Bureau — 'Laying the Foundation'", "url": "https://www.in.gov/history/for-educators/all-resources-for-educators/resources/underground-railroad/bury-me-in-a-free-land-the-abolitionist-movement-in-indiana-by-gwen-crenshaw/laying-the-foundation/", "quote": "The strategem, approved by Harrison on August 26, 1805, provided that anyone who held or purchased slaves anywhere in the United States could lawfully bring them into the territory and indenture them." },
-            { "label": "Indiana Historical Bureau (in.gov) — Slavery in Indiana Territory", "url": "https://www.in.gov/history/for-educators/download-issues-of-the-indiana-historian/indiana-territory/slavery-in-indiana-territory/", "quote": "territory officials continued to evade Article VI with indenture laws" }
+            {
+              "label": "Indiana Historical Bureau — 'Laying the Foundation'",
+              "url": "https://www.in.gov/history/for-educators/all-resources-for-educators/resources/underground-railroad/bury-me-in-a-free-land-the-abolitionist-movement-in-indiana-by-gwen-crenshaw/laying-the-foundation/",
+              "quote": "The strategem, approved by Harrison on August 26, 1805, provided that anyone who held or purchased slaves anywhere in the United States could lawfully bring them into the territory and indenture them."
+            },
+            {
+              "label": "Indiana Historical Bureau (in.gov) — Slavery in Indiana Territory",
+              "url": "https://www.in.gov/history/for-educators/download-issues-of-the-indiana-historian/indiana-territory/slavery-in-indiana-territory/",
+              "quote": "territory officials continued to evade Article VI with indenture laws"
+            }
           ]
         },
         {
           "text": "March 4, 1841 inaugural: Harrison called District of Columbia residents 'free American citizens,' not subjects, while taking no position recorded here on slavery there.",
           "sources": [
-            { "label": "William Henry Harrison, Inaugural Address, March 4, 1841 (Avalon Project, Yale Law School)", "url": "https://avalon.law.yale.edu/19th_century/harrison.asp", "quote": "The people of the District of Columbia are not the subjects of the people of the States, but free American citizens." },
-            { "label": "Miller Center, University of Virginia — Death of the President", "url": "https://millercenter.org/president/harrison/death-of-the-president", "quote": "Exactly one month after taking the oath of office, Harrison was dead. It was the most fleeting presidency ever" }
+            {
+              "label": "William Henry Harrison, Inaugural Address, March 4, 1841 (Avalon Project, Yale Law School)",
+              "url": "https://avalon.law.yale.edu/19th_century/harrison.asp",
+              "quote": "The people of the District of Columbia are not the subjects of the people of the States, but free American citizens."
+            },
+            {
+              "label": "Miller Center, University of Virginia — Death of the President",
+              "url": "https://millercenter.org/president/harrison/death-of-the-president",
+              "quote": "Exactly one month after taking the oath of office, Harrison was dead. It was the most fleeting presidency ever"
+            }
           ]
         }
       ],
@@ -160,11 +296,36 @@
         "rightsNote": "19th-century painting reproduced long before 1929; verified to load as image/jpeg."
       },
       "sources": [
-        { "id": "harrison-1802-proclamation-esarey", "label": "William Henry Harrison, Proclamation Calling a Convention, Nov. 22, 1802, in Logan Esarey, ed., Messages and Letters of William Henry Harrison (Indianapolis, 1922), via Wikisource", "url": "https://en.wikisource.org/wiki/Messages_and_Letters_of_William_Henry_Harrison/Proclamation_calling_a_convention_to_petition_congress_to_allow_slavery_in_Indiana_territory", "quote": "praying that a proclamation should Issue from the Executive authority for Calling a General Convention" },
-        { "id": "ihb-slavery-indiana-territory", "label": "Indiana Historical Bureau — Slavery in Indiana Territory (The Indiana Historian)", "url": "https://www.in.gov/history/for-educators/download-issues-of-the-indiana-historian/indiana-territory/slavery-in-indiana-territory/", "quote": "desirable settlers were forced to move west of the Mississippi [River] because they could not bring their slaves into Indiana Territory" },
-        { "id": "ihb-laying-the-foundation", "label": "Indiana Historical Bureau — 'Laying the Foundation,' in Gwen Crenshaw, Bury Me in a Free Land", "url": "https://www.in.gov/history/for-educators/all-resources-for-educators/resources/underground-railroad/bury-me-in-a-free-land-the-abolitionist-movement-in-indiana-by-gwen-crenshaw/laying-the-foundation/", "quote": "William Henry Harrison, Indiana's first territorial governor and a slaveholder, encouraged slavery in lndiana" },
-        { "id": "harrison-inaugural-avalon", "label": "William Henry Harrison, Inaugural Address, March 4, 1841 — Avalon Project, Yale Law School", "url": "https://avalon.law.yale.edu/19th_century/harrison.asp", "quote": "Are there, indeed, citizens of any of our States who have dreamed of their subjects in the District of Columbia? Such dreams can never be realized by any agency of mine." },
-        { "id": "millercenter-harrison-death", "label": "Miller Center, University of Virginia — William Henry Harrison: Death of the President", "url": "https://millercenter.org/president/harrison/death-of-the-president", "quote": "It was the most fleeting presidency ever, lasting one scant month." }
+        {
+          "id": "harrison-1802-proclamation-esarey",
+          "label": "William Henry Harrison, Proclamation Calling a Convention, Nov. 22, 1802, in Logan Esarey, ed., Messages and Letters of William Henry Harrison (Indianapolis, 1922), via Wikisource",
+          "url": "https://en.wikisource.org/wiki/Messages_and_Letters_of_William_Henry_Harrison/Proclamation_calling_a_convention_to_petition_congress_to_allow_slavery_in_Indiana_territory",
+          "quote": "praying that a proclamation should Issue from the Executive authority for Calling a General Convention"
+        },
+        {
+          "id": "ihb-slavery-indiana-territory",
+          "label": "Indiana Historical Bureau — Slavery in Indiana Territory (The Indiana Historian)",
+          "url": "https://www.in.gov/history/for-educators/download-issues-of-the-indiana-historian/indiana-territory/slavery-in-indiana-territory/",
+          "quote": "desirable settlers were forced to move west of the Mississippi [River] because they could not bring their slaves into Indiana Territory"
+        },
+        {
+          "id": "ihb-laying-the-foundation",
+          "label": "Indiana Historical Bureau — 'Laying the Foundation,' in Gwen Crenshaw, Bury Me in a Free Land",
+          "url": "https://www.in.gov/history/for-educators/all-resources-for-educators/resources/underground-railroad/bury-me-in-a-free-land-the-abolitionist-movement-in-indiana-by-gwen-crenshaw/laying-the-foundation/",
+          "quote": "William Henry Harrison, Indiana's first territorial governor and a slaveholder, encouraged slavery in lndiana"
+        },
+        {
+          "id": "harrison-inaugural-avalon",
+          "label": "William Henry Harrison, Inaugural Address, March 4, 1841 — Avalon Project, Yale Law School",
+          "url": "https://avalon.law.yale.edu/19th_century/harrison.asp",
+          "quote": "Are there, indeed, citizens of any of our States who have dreamed of their subjects in the District of Columbia? Such dreams can never be realized by any agency of mine."
+        },
+        {
+          "id": "millercenter-harrison-death",
+          "label": "Miller Center, University of Virginia — William Henry Harrison: Death of the President",
+          "url": "https://millercenter.org/president/harrison/death-of-the-president",
+          "quote": "It was the most fleeting presidency ever, lasting one scant month."
+        }
       ],
       "disputes": [
         "Length of term is stated as 31 days (March 4 to April 4, 1841); the Miller Center phrases it as 'exactly one month' and 'one scant month.' Both describe the same dates."
@@ -184,36 +345,76 @@
         {
           "text": "March 1, 1845: Tyler signed the joint resolution annexing Texas, three days before leaving office, after abandoning the treaty route that required two-thirds of the Senate.",
           "sources": [
-            { "label": "Miller Center, University of Virginia — John Tyler: Domestic Affairs", "url": "https://millercenter.org/president/tyler/domestic-affairs", "quote": "Tyler signed the Texas statehood bill into law on the first day of March 1845, just three days before leaving office." },
-            { "label": "Miller Center, University of Virginia — John Tyler: Domestic Affairs", "url": "https://millercenter.org/president/tyler/domestic-affairs", "quote": "submitted a joint resolution that needed only a majority vote in the House and Senate, which it got" }
+            {
+              "label": "Miller Center, University of Virginia — John Tyler: Domestic Affairs",
+              "url": "https://millercenter.org/president/tyler/domestic-affairs",
+              "quote": "Tyler signed the Texas statehood bill into law on the first day of March 1845, just three days before leaving office."
+            },
+            {
+              "label": "Miller Center, University of Virginia — John Tyler: Domestic Affairs",
+              "url": "https://millercenter.org/president/tyler/domestic-affairs",
+              "quote": "submitted a joint resolution that needed only a majority vote in the House and Senate, which it got"
+            }
           ]
         },
         {
           "text": "Tyler's Secretary of State John C. Calhoun defended slavery at length in his message to Congress on the Texas annexation question.",
           "sources": [
-            { "label": "Miller Center, University of Virginia — John Tyler: Domestic Affairs", "url": "https://millercenter.org/president/tyler/domestic-affairs", "quote": "His message to Congress contained a long, eloquent defense of slavery." },
-            { "label": "White House Historical Association — The Enslaved Households of President John Tyler", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-john-tyler", "quote": "These enslaved men, women, and children were the people maintaining the property, farming the land, and providing the means for the growing Tyler family." }
+            {
+              "label": "Miller Center, University of Virginia — John Tyler: Domestic Affairs",
+              "url": "https://millercenter.org/president/tyler/domestic-affairs",
+              "quote": "His message to Congress contained a long, eloquent defense of slavery."
+            },
+            {
+              "label": "White House Historical Association — The Enslaved Households of President John Tyler",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-john-tyler",
+              "quote": "These enslaved men, women, and children were the people maintaining the property, farming the land, and providing the means for the growing Tyler family."
+            }
           ]
         },
         {
           "text": "1813: Tyler inherited Greenway and thirteen enslaved people; by the 1830 census twenty-nine enslaved people were counted at his Woodburn plantation.",
           "sources": [
-            { "label": "White House Historical Association — The Enslaved Households of President John Tyler", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-john-tyler", "quote": "After Judge Tyler died in 1813, he left Greenway and thirteen enslaved individuals to his son John." },
-            { "label": "White House Historical Association — The Enslaved Households of President John Tyler", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-john-tyler", "quote": "twenty-nine individuals, more than half of which were under the age of ten, were counted at the Tyler property" }
+            {
+              "label": "White House Historical Association — The Enslaved Households of President John Tyler",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-john-tyler",
+              "quote": "After Judge Tyler died in 1813, he left Greenway and thirteen enslaved individuals to his son John."
+            },
+            {
+              "label": "White House Historical Association — The Enslaved Households of President John Tyler",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-john-tyler",
+              "quote": "twenty-nine individuals, more than half of which were under the age of ten, were counted at the Tyler property"
+            }
           ]
         },
         {
           "text": "James Hambleton Christian, enslaved in Tyler's household and serving in the White House, escaped and gave his account to William Still for The Underground Rail Road.",
           "sources": [
-            { "label": "White House Historical Association — The Enslaved Households of President John Tyler", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-john-tyler", "quote": "Still shared the biography of James Hambleton Christian, who was born into slavery on the plantation of Robert Christian" },
-            { "label": "Miller Center, University of Virginia — John Tyler: Domestic Affairs", "url": "https://millercenter.org/president/tyler/domestic-affairs", "quote": "I, as president, shall be responsible for my administration." }
+            {
+              "label": "White House Historical Association — The Enslaved Households of President John Tyler",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-john-tyler",
+              "quote": "Still shared the biography of James Hambleton Christian, who was born into slavery on the plantation of Robert Christian"
+            },
+            {
+              "label": "Miller Center, University of Virginia — John Tyler: Domestic Affairs",
+              "url": "https://millercenter.org/president/tyler/domestic-affairs",
+              "quote": "I, as president, shall be responsible for my administration."
+            }
           ]
         },
         {
           "text": "1860–61: Tyler chaired a peace convention that collapsed, then backed secession and was elected to the Confederate House of Representatives, dying before it convened.",
           "sources": [
-            { "label": "Miller Center, University of Virginia — John Tyler: Life After the Presidency", "url": "https://millercenter.org/president/tyler/life-after-the-presidency", "quote": "Tyler then became a leading proponent of southern secession, and in late 1861, he was elected to the Confederate House of Representatives." },
-            { "label": "Miller Center, University of Virginia — John Tyler: Life After the Presidency", "url": "https://millercenter.org/president/tyler/life-after-the-presidency", "quote": "Tyler tried in vain to avert the conflict by chairing a “Peace Convention” between representatives of both northern and southern states." }
+            {
+              "label": "Miller Center, University of Virginia — John Tyler: Life After the Presidency",
+              "url": "https://millercenter.org/president/tyler/life-after-the-presidency",
+              "quote": "Tyler then became a leading proponent of southern secession, and in late 1861, he was elected to the Confederate House of Representatives."
+            },
+            {
+              "label": "Miller Center, University of Virginia — John Tyler: Life After the Presidency",
+              "url": "https://millercenter.org/president/tyler/life-after-the-presidency",
+              "quote": "Tyler tried in vain to avert the conflict by chairing a “Peace Convention” between representatives of both northern and southern states."
+            }
           ]
         }
       ],
@@ -226,9 +427,24 @@
         "rightsNote": "Painted in 1842, far more than a century before publication cutoff; verified to load as image/jpeg."
       },
       "sources": [
-        { "id": "millercenter-tyler-domestic", "label": "Miller Center, University of Virginia — John Tyler: Domestic Affairs", "url": "https://millercenter.org/president/tyler/domestic-affairs", "quote": "Tyler signed the Texas statehood bill into law on the first day of March 1845, just three days before leaving office." },
-        { "id": "millercenter-tyler-after", "label": "Miller Center, University of Virginia — John Tyler: Life After the Presidency", "url": "https://millercenter.org/president/tyler/life-after-the-presidency", "quote": "in late 1861, he was elected to the Confederate House of Representatives" },
-        { "id": "whha-tyler-enslaved", "label": "White House Historical Association, Rubenstein Center Scholarship — The Enslaved Households of President John Tyler (Matthew Costello)", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-john-tyler", "quote": "According to the 1820 census, there were twenty-four enslaved people living at Woodburn with the Tylers." }
+        {
+          "id": "millercenter-tyler-domestic",
+          "label": "Miller Center, University of Virginia — John Tyler: Domestic Affairs",
+          "url": "https://millercenter.org/president/tyler/domestic-affairs",
+          "quote": "Tyler signed the Texas statehood bill into law on the first day of March 1845, just three days before leaving office."
+        },
+        {
+          "id": "millercenter-tyler-after",
+          "label": "Miller Center, University of Virginia — John Tyler: Life After the Presidency",
+          "url": "https://millercenter.org/president/tyler/life-after-the-presidency",
+          "quote": "in late 1861, he was elected to the Confederate House of Representatives"
+        },
+        {
+          "id": "whha-tyler-enslaved",
+          "label": "White House Historical Association, Rubenstein Center Scholarship — The Enslaved Households of President John Tyler (Matthew Costello)",
+          "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-john-tyler",
+          "quote": "According to the 1820 census, there were twenty-four enslaved people living at Woodburn with the Tylers."
+        }
       ],
       "disputes": [
         "Whether Tyler's Texas push was primarily about slavery's expansion or about his own political rehabilitation: the Miller Center frames annexation as a bid to build a new party and win reelection, while noting Calhoun's explicit proslavery defense of the same policy. Both readings are recorded here."
@@ -247,36 +463,76 @@
         {
           "text": "During his presidency Polk secretly bought nineteen enslaved people through agents, at least thirteen of them children aged roughly twelve to seventeen, shipped to his Mississippi plantation.",
           "sources": [
-            { "label": "White House Historical Association — The Enslaved Households of President James K. Polk", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk", "quote": "he used profits from his Mississippi plantation to purchase an additional nineteen enslaved people during his time in the White House" },
-            { "label": "White House Historical Association — The Enslaved Households of President James K. Polk", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk", "quote": "Out of nineteen enslaved people purchased by Polk during his presidency, at least thirteen were children." }
+            {
+              "label": "White House Historical Association — The Enslaved Households of President James K. Polk",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk",
+              "quote": "he used profits from his Mississippi plantation to purchase an additional nineteen enslaved people during his time in the White House"
+            },
+            {
+              "label": "White House Historical Association — The Enslaved Households of President James K. Polk",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk",
+              "quote": "Out of nineteen enslaved people purchased by Polk during his presidency, at least thirteen were children."
+            }
           ]
         },
         {
           "text": "Polk instructed his slave-purchasing agent to keep the transactions secret: the reasons why should not be known to anyone but the two of them.",
           "sources": [
-            { "label": "White House Historical Association — The Enslaved Households of President James K. Polk", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk", "quote": "the reasons why, it should not be known to any one but him and yourself that you are making the purchases for me" },
-            { "label": "White House Historical Association — The Enslaved Households of President James K. Polk", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk", "quote": "This letter is for your eyes alone...to buy me some property for my Yalobusha plantation." }
+            {
+              "label": "White House Historical Association — The Enslaved Households of President James K. Polk",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk",
+              "quote": "the reasons why, it should not be known to any one but him and yourself that you are making the purchases for me"
+            },
+            {
+              "label": "White House Historical Association — The Enslaved Households of President James K. Polk",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk",
+              "quote": "This letter is for your eyes alone...to buy me some property for my Yalobusha plantation."
+            }
           ]
         },
         {
           "text": "August 1846: the Wilmot Proviso proposed barring slavery from all territory taken from Mexico; Polk opposed it and drafted veto language against it.",
           "sources": [
-            { "label": "Miller Center, University of Virginia — James K. Polk: Domestic Affairs", "url": "https://millercenter.org/president/polk/domestic-affairs", "quote": "neither slavery not involuntary servitude shall ever exist in any part of" },
-            { "label": "White House Historical Association — The Enslaved Households of President James K. Polk", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk", "quote": "In a draft message prepared for the veto of the provision, Polk stated: “the blessings of liberty may be put in jeopardy or lost forever.”" }
+            {
+              "label": "Miller Center, University of Virginia — James K. Polk: Domestic Affairs",
+              "url": "https://millercenter.org/president/polk/domestic-affairs",
+              "quote": "neither slavery not involuntary servitude shall ever exist in any part of"
+            },
+            {
+              "label": "White House Historical Association — The Enslaved Households of President James K. Polk",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk",
+              "quote": "In a draft message prepared for the veto of the provision, Polk stated: “the blessings of liberty may be put in jeopardy or lost forever.”"
+            }
           ]
         },
         {
           "text": "Polk's own solution to slavery in the Mexican Cession was to extend the Missouri Compromise line of 36°30' west to the Pacific Ocean.",
           "sources": [
-            { "label": "Miller Center, University of Virginia — James K. Polk: Domestic Affairs", "url": "https://millercenter.org/president/polk/domestic-affairs", "quote": "extending the old Missouri Compromise line of 36°30' to the Pacific Ocean" },
-            { "label": "White House Historical Association — The Enslaved Households of President James K. Polk", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk", "quote": "Historian William Dusinberre argues that Polk likely considered the expansion of slavery into western territories as he pursued war with Mexico" }
+            {
+              "label": "Miller Center, University of Virginia — James K. Polk: Domestic Affairs",
+              "url": "https://millercenter.org/president/polk/domestic-affairs",
+              "quote": "extending the old Missouri Compromise line of 36°30' to the Pacific Ocean"
+            },
+            {
+              "label": "White House Historical Association — The Enslaved Households of President James K. Polk",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk",
+              "quote": "Historian William Dusinberre argues that Polk likely considered the expansion of slavery into western territories as he pursued war with Mexico"
+            }
           ]
         },
         {
           "text": "Polk moved enslaved people to a Mississippi plantation to make escape harder and kept the plan from them: 'The negroes have no idea that they are going to be sent to the South.'",
           "sources": [
-            { "label": "White House Historical Association — The Enslaved Households of President James K. Polk", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk", "quote": "The negroes have no idea that they are going to be sent to the South" },
-            { "label": "White House Historical Association — The Enslaved Households of President James K. Polk", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk", "quote": "he believed moving further south to a his new plantation near Yalobusha, Mississippi, would make escape more difficult" }
+            {
+              "label": "White House Historical Association — The Enslaved Households of President James K. Polk",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk",
+              "quote": "The negroes have no idea that they are going to be sent to the South"
+            },
+            {
+              "label": "White House Historical Association — The Enslaved Households of President James K. Polk",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk",
+              "quote": "he believed moving further south to a his new plantation near Yalobusha, Mississippi, would make escape more difficult"
+            }
           ]
         }
       ],
@@ -289,9 +545,24 @@
         "rightsNote": "Mid-19th-century image, published far before 1929; verified to load as image/jpeg."
       },
       "sources": [
-        { "id": "whha-polk-enslaved", "label": "White House Historical Association, Rubenstein Center Scholarship — The Enslaved Households of President James K. Polk (Lina Mann)", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk", "quote": "Polk secretly purchased enslaved people and separated children aged ten through seventeen from their families while in office." },
-        { "id": "millercenter-polk-domestic", "label": "Miller Center, University of Virginia — James K. Polk: Domestic Affairs", "url": "https://millercenter.org/president/polk/domestic-affairs", "quote": "extending the old Missouri Compromise line of 36°30' to the Pacific Ocean" },
-        { "id": "house-gag-rule-polk-speaker", "label": "U.S. House of Representatives, History, Art & Archives — 'The House Gag Rule'", "url": "https://history.house.gov/HistoricalHighlight/Detail/35837", "quote": "James K. Polk of Tennessee, Speaker at the time the gag rule was instituted" }
+        {
+          "id": "whha-polk-enslaved",
+          "label": "White House Historical Association, Rubenstein Center Scholarship — The Enslaved Households of President James K. Polk (Lina Mann)",
+          "url": "https://www.whitehousehistory.org/the-enslaved-households-of-james-k-polk",
+          "quote": "Polk secretly purchased enslaved people and separated children aged ten through seventeen from their families while in office."
+        },
+        {
+          "id": "millercenter-polk-domestic",
+          "label": "Miller Center, University of Virginia — James K. Polk: Domestic Affairs",
+          "url": "https://millercenter.org/president/polk/domestic-affairs",
+          "quote": "extending the old Missouri Compromise line of 36°30' to the Pacific Ocean"
+        },
+        {
+          "id": "house-gag-rule-polk-speaker",
+          "label": "U.S. House of Representatives, History, Art & Archives — 'The House Gag Rule'",
+          "url": "https://history.house.gov/HistoricalHighlight/Detail/35837",
+          "quote": "James K. Polk of Tennessee, Speaker at the time the gag rule was instituted"
+        }
       ],
       "disputes": [
         "Polk's self-presentation versus his conduct: he publicly projected the image of a paternalistic owner who merely inherited enslaved people, while the White House Historical Association documents active secret purchasing and family separation. Both the public persona and the documented transactions are recorded here."
@@ -311,29 +582,61 @@
         {
           "text": "December 4, 1849 annual message: Taylor reported California had met in convention to form a state government and would soon apply for admission as a state.",
           "sources": [
-            { "label": "Zachary Taylor, First Annual Message, Dec. 4, 1849 (Miller Center, University of Virginia)", "url": "https://millercenter.org/the-presidency/presidential-speeches/december-4-1849-first-annual-message", "quote": "the people of that Territory... recently met in convention for the purpose of forming a constitution and State government" },
-            { "label": "Miller Center, University of Virginia — Zachary Taylor: Domestic Affairs", "url": "https://millercenter.org/president/taylor/domestic-affairs", "quote": "He urged the residents of California...and New Mexico to write constitutions and apply for statehood when Congress met in December." }
+            {
+              "label": "Zachary Taylor, First Annual Message, Dec. 4, 1849 (Miller Center, University of Virginia)",
+              "url": "https://millercenter.org/the-presidency/presidential-speeches/december-4-1849-first-annual-message",
+              "quote": "the people of that Territory... recently met in convention for the purpose of forming a constitution and State government"
+            },
+            {
+              "label": "Miller Center, University of Virginia — Zachary Taylor: Domestic Affairs",
+              "url": "https://millercenter.org/president/taylor/domestic-affairs",
+              "quote": "He urged the residents of California...and New Mexico to write constitutions and apply for statehood when Congress met in December."
+            }
           ]
         },
         {
           "text": "Taylor opposed Clay's Compromise of 1850; after he died on July 9, 1850, the compromise forces regrouped and Fillmore signed the measures.",
           "sources": [
-            { "label": "Miller Center, University of Virginia — Zachary Taylor: Domestic Affairs", "url": "https://millercenter.org/president/taylor/domestic-affairs", "quote": "Taylor also firmly opposed Clay's compromise. When Taylor died unexpectedly on July 9, the forces for compromise stepped up their efforts." },
-            { "label": "White House Historical Association — The Enslaved Households of President Zachary Taylor", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-zachary-taylor", "quote": "He opposed the spread of slavery to new U.S. territories. However, he also vacillated over supporting the Wilmot Proviso" }
+            {
+              "label": "Miller Center, University of Virginia — Zachary Taylor: Domestic Affairs",
+              "url": "https://millercenter.org/president/taylor/domestic-affairs",
+              "quote": "Taylor also firmly opposed Clay's compromise. When Taylor died unexpectedly on July 9, the forces for compromise stepped up their efforts."
+            },
+            {
+              "label": "White House Historical Association — The Enslaved Households of President Zachary Taylor",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-zachary-taylor",
+              "quote": "He opposed the spread of slavery to new U.S. territories. However, he also vacillated over supporting the Wilmot Proviso"
+            }
           ]
         },
         {
           "text": "1842: Taylor purchased Cypress Grove plantation in Rodney, Mississippi, along with eighty-one enslaved men, women, and children listed by name in the sale.",
           "sources": [
-            { "label": "White House Historical Association — The Enslaved Households of President Zachary Taylor (Sarah Fling)", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-zachary-taylor", "quote": "he also bought the following eighty-one enslaved men, women, and children" },
-            { "label": "White House Historical Association — The Enslaved Households of President Zachary Taylor", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-zachary-taylor", "quote": "In 1842, Taylor purchased Cypress Grove, a plantation in Rodney, Mississippi" }
+            {
+              "label": "White House Historical Association — The Enslaved Households of President Zachary Taylor (Sarah Fling)",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-zachary-taylor",
+              "quote": "he also bought the following eighty-one enslaved men, women, and children"
+            },
+            {
+              "label": "White House Historical Association — The Enslaved Households of President Zachary Taylor",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-zachary-taylor",
+              "quote": "In 1842, Taylor purchased Cypress Grove, a plantation in Rodney, Mississippi"
+            }
           ]
         },
         {
           "text": "Taylor's will freed no one: about 131 enslaved people went to his wife and children, designated 'slaves for life'; six were left to Margaret Taylor.",
           "sources": [
-            { "label": "White House Historical Association — The Enslaved Households of President Zachary Taylor", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-zachary-taylor", "quote": "In his will, approximately 131 enslaved men, women, and children, ranging in age from infants to the elderly, were left to Taylor's wife Margaret; daughters Ann and Betty; and his son Richard." },
-            { "label": "White House Historical Association — The Enslaved Households of President Zachary Taylor", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-zachary-taylor", "quote": "designating in his will that these men, women, and children were to be “slaves for life.”" }
+            {
+              "label": "White House Historical Association — The Enslaved Households of President Zachary Taylor",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-zachary-taylor",
+              "quote": "In his will, approximately 131 enslaved men, women, and children, ranging in age from infants to the elderly, were left to Taylor's wife Margaret; daughters Ann and Betty; and his son Richard."
+            },
+            {
+              "label": "White House Historical Association — The Enslaved Households of President Zachary Taylor",
+              "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-zachary-taylor",
+              "quote": "designating in his will that these men, women, and children were to be “slaves for life.”"
+            }
           ]
         }
       ],
@@ -346,9 +649,24 @@
         "rightsNote": "Mid-19th-century image, published far before 1929; verified to load as image/jpeg."
       },
       "sources": [
-        { "id": "whha-taylor-enslaved", "label": "White House Historical Association, Rubenstein Center Scholarship — The Enslaved Households of President Zachary Taylor (Sarah Fling)", "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-zachary-taylor", "quote": "When Richard Taylor died in 1829, Zachary inherited two enslaved men, Charles and Tom, who remained with him until his death in 1850." },
-        { "id": "millercenter-taylor-domestic", "label": "Miller Center, University of Virginia — Zachary Taylor: Domestic Affairs", "url": "https://millercenter.org/president/taylor/domestic-affairs", "quote": "Taylor also firmly opposed Clay's compromise." },
-        { "id": "taylor-1849-annual-message", "label": "Zachary Taylor, First Annual Message, December 4, 1849 — Miller Center, University of Virginia", "url": "https://millercenter.org/the-presidency/presidential-speeches/december-4-1849-first-annual-message", "quote": "it is believed they will shortly apply for the admission of California into the Union as a sovereign State" }
+        {
+          "id": "whha-taylor-enslaved",
+          "label": "White House Historical Association, Rubenstein Center Scholarship — The Enslaved Households of President Zachary Taylor (Sarah Fling)",
+          "url": "https://www.whitehousehistory.org/the-enslaved-households-of-president-zachary-taylor",
+          "quote": "When Richard Taylor died in 1829, Zachary inherited two enslaved men, Charles and Tom, who remained with him until his death in 1850."
+        },
+        {
+          "id": "millercenter-taylor-domestic",
+          "label": "Miller Center, University of Virginia — Zachary Taylor: Domestic Affairs",
+          "url": "https://millercenter.org/president/taylor/domestic-affairs",
+          "quote": "Taylor also firmly opposed Clay's compromise."
+        },
+        {
+          "id": "taylor-1849-annual-message",
+          "label": "Zachary Taylor, First Annual Message, December 4, 1849 — Miller Center, University of Virginia",
+          "url": "https://millercenter.org/the-presidency/presidential-speeches/december-4-1849-first-annual-message",
+          "quote": "it is believed they will shortly apply for the admission of California into the Union as a sovereign State"
+        }
       ],
       "disputes": [
         "Taylor and the Wilmot Proviso: the White House Historical Association says he 'vacillated' on supporting it, and notes that Southern Whigs expected a veto while Northern Whigs believed he might quietly support it. The Miller Center presents him as expecting free-state constitutions from California and New Mexico. Both are recorded.",

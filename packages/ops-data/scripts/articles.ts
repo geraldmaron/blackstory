@@ -231,7 +231,9 @@ function gateCalloutCitations(article: ArticleAuthoring): { warnings: string[] }
   });
   if (findings.length === 0) return { warnings: [] };
   if (article.status === 'published') {
-    throw new Error(`call-out citation gate failed (published articles):\n  ${findings.join('\n  ')}`);
+    throw new Error(
+      `call-out citation gate failed (published articles):\n  ${findings.join('\n  ')}`,
+    );
   }
   return { warnings: findings };
 }
@@ -277,12 +279,27 @@ function gateSeriesPositions(articles: readonly ArticleAuthoring[]): void {
  */
 const SELF_REFERENCE_PATTERNS: readonly { readonly label: string; readonly pattern: RegExp }[] = [
   { label: 'names the publishing surface', pattern: /\bthis (?:site|website|project|page)\b/i },
-  { label: 'names the publishing surface', pattern: /\b(?:on|across|throughout) (?:the|our) site\b/i },
-  { label: 'cross-references a sibling chapter', pattern: /\b(?:another|the other|a sibling|the next|the previous) chapters?\b/i },
+  {
+    label: 'names the publishing surface',
+    pattern: /\b(?:on|across|throughout) (?:the|our) site\b/i,
+  },
+  {
+    label: 'cross-references a sibling chapter',
+    pattern: /\b(?:another|the other|a sibling|the next|the previous) chapters?\b/i,
+  },
   { label: 'cross-references a sibling chapter', pattern: /\bchapters? (?:here|on this)\b/i },
-  { label: 'cross-references a sibling chapter', pattern: /\bthe (?:wealth|redlining|housing|voting|sentencing) chapter\b/i },
-  { label: "speaks in the publisher's first person", pattern: /\b(?:we|our) (?:are telling|tell|show|summari[sz]e|built|collected|assembled)\b/i },
-  { label: "speaks in the publisher's first person", pattern: /\b(?:our summary|needs us in order|we are telling you)\b/i },
+  {
+    label: 'cross-references a sibling chapter',
+    pattern: /\bthe (?:wealth|redlining|housing|voting|sentencing) chapter\b/i,
+  },
+  {
+    label: "speaks in the publisher's first person",
+    pattern: /\b(?:we|our) (?:are telling|tell|show|summari[sz]e|built|collected|assembled)\b/i,
+  },
+  {
+    label: "speaks in the publisher's first person",
+    pattern: /\b(?:our summary|needs us in order|we are telling you)\b/i,
+  },
 ];
 
 function gateStandaloneProse(article: ArticleAuthoring): { warnings: string[] } {
@@ -313,7 +330,9 @@ function gateStandaloneProse(article: ArticleAuthoring): { warnings: string[] } 
   });
   if (findings.length === 0) return { warnings: [] };
   if (article.status === 'published') {
-    throw new Error(`standalone-prose gate failed (published articles):\n  ${findings.join('\n  ')}`);
+    throw new Error(
+      `standalone-prose gate failed (published articles):\n  ${findings.join('\n  ')}`,
+    );
   }
   return { warnings: findings };
 }

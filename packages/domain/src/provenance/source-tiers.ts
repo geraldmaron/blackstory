@@ -104,7 +104,8 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
   {
     domain: 'journalofthecivilwarera.org',
     tier: 'T1',
-    rationale: 'The Journal of the Civil War Era — peer-reviewed, University of North Carolina Press',
+    rationale:
+      'The Journal of the Civil War Era — peer-reviewed, University of North Carolina Press',
   },
   {
     domain: 'cambridge.org',
@@ -114,7 +115,8 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
   {
     domain: 'theodorerooseveltcenter.org',
     tier: 'T2',
-    rationale: 'Theodore Roosevelt Center, Dickinson State University — digital primary-document archive',
+    rationale:
+      'Theodore Roosevelt Center, Dickinson State University — digital primary-document archive',
   },
   {
     domain: 'about.usps.com',
@@ -125,7 +127,8 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
   {
     domain: 'forbeslibrary.org',
     tier: 'T2',
-    rationale: 'Forbes Library — Calvin Coolidge Presidential Library and Museum, holder of the Coolidge papers',
+    rationale:
+      'Forbes Library — Calvin Coolidge Presidential Library and Museum, holder of the Coolidge papers',
   },
   {
     domain: 'millercenter.org',
@@ -167,12 +170,14 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
   {
     domain: 'encyclopediavirginia.org',
     tier: 'T3',
-    rationale: 'Encyclopedia Virginia — Virginia Humanities, editorially reviewed and cited entries',
+    rationale:
+      'Encyclopedia Virginia — Virginia Humanities, editorially reviewed and cited entries',
   },
   {
     domain: 'montpelier.org',
     tier: 'T3',
-    rationale: "James Madison's Montpelier — museum research program and descendant-community scholarship",
+    rationale:
+      "James Madison's Montpelier — museum research program and descendant-community scholarship",
   },
   {
     domain: 'highland.org',
@@ -213,7 +218,8 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
   {
     domain: 'gilderlehrman.org',
     tier: 'T3',
-    rationale: 'Gilder Lehrman Institute of American History — curated primary sources with scholarly essays',
+    rationale:
+      'Gilder Lehrman Institute of American History — curated primary sources with scholarly essays',
   },
   {
     domain: 'tshaonline.org',

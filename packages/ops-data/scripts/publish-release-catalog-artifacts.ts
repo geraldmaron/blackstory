@@ -55,7 +55,9 @@ async function uploadJson(objectPath: string, body: string): Promise<void> {
   });
   if (!response.ok) {
     const detail = await response.text().catch(() => '');
-    throw new Error(`upload failed (${response.status}) for ${objectPath}: ${detail.slice(0, 300)}`);
+    throw new Error(
+      `upload failed (${response.status}) for ${objectPath}: ${detail.slice(0, 300)}`,
+    );
   }
 }
 

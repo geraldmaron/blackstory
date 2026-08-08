@@ -10,36 +10,76 @@
         {
           "text": "Washington signed \"An Act respecting fugitives from justice, and persons escaping from the service of their masters\" on February 12, 1793, creating a federal process for reclaiming people who escaped slavery across state lines.",
           "sources": [
-            { "label": "Statutes at Large, 1 Stat. 302 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg302.pdf", "quote": "Feb. 12, 1793. Chap. VII.—An Act respecting fugitives from justice, and persons escaping from the service of their masters." },
-            { "label": "Encyclopedia Virginia (Virginia Humanities), \"George Washington and Slavery\"", "url": "https://encyclopediavirginia.org/entries/washington-george-and-slavery/", "quote": "which allowed slaveholders to capture escaped enslaved people, even in free states or territory, and return them to bondage." }
+            {
+              "label": "Statutes at Large, 1 Stat. 302 (govinfo)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg302.pdf",
+              "quote": "Feb. 12, 1793. Chap. VII.—An Act respecting fugitives from justice, and persons escaping from the service of their masters."
+            },
+            {
+              "label": "Encyclopedia Virginia (Virginia Humanities), \"George Washington and Slavery\"",
+              "url": "https://encyclopediavirginia.org/entries/washington-george-and-slavery/",
+              "quote": "which allowed slaveholders to capture escaped enslaved people, even in free states or territory, and return them to bondage."
+            }
           ]
         },
         {
           "text": "After Attorney General Edmund Randolph warned that Pennsylvania's 1780 gradual abolition law freed enslaved people after six consecutive months' residence, the Washingtons rotated household workers back to Mount Vernon; Christopher Sheels was sent back in September 1791.",
           "sources": [
-            { "label": "White House Historical Association, \"The Enslaved Household of President George Washington\" (Lindsay M. Chervinsky)", "url": "https://www.whitehousehistory.org/the-enslaved-household-of-president-george-washington", "quote": "Randolph warned the Washingtons that Pennsylvania's 1780 gradual abolition law freed enslaved people after they had lived in the state for six consecutive months." },
-            { "label": "White House Historical Association, same article", "url": "https://www.whitehousehistory.org/the-enslaved-household-of-president-george-washington", "quote": "The Washingtons and Lear conspired to rotate many of the enslaved people back to Mount Vernon to reset their residence." }
+            {
+              "label": "White House Historical Association, \"The Enslaved Household of President George Washington\" (Lindsay M. Chervinsky)",
+              "url": "https://www.whitehousehistory.org/the-enslaved-household-of-president-george-washington",
+              "quote": "Randolph warned the Washingtons that Pennsylvania's 1780 gradual abolition law freed enslaved people after they had lived in the state for six consecutive months."
+            },
+            {
+              "label": "White House Historical Association, same article",
+              "url": "https://www.whitehousehistory.org/the-enslaved-household-of-president-george-washington",
+              "quote": "The Washingtons and Lear conspired to rotate many of the enslaved people back to Mount Vernon to reset their residence."
+            }
           ]
         },
         {
           "text": "Ona Judge escaped the President's House in Philadelphia on May 21, 1796; Washington enlisted Treasury Secretary Oliver Wolcott and a federal customs collector to recover her, and made a final attempt in 1799.",
           "sources": [
-            { "label": "National Park Service, Independence NHP, \"Ona Judge Escapes to Freedom\"", "url": "https://www.nps.gov/articles/independence-oneyjudge.htm", "quote": "Two years later, Washington asked his secretary and nephew, Burwell Bassett, Jr., to seize Judge and her child, born since her escape." },
-            { "label": "Encyclopedia Virginia, \"Oney Judge (ca. 1773–1848)\"", "url": "https://encyclopediavirginia.org/entries/judge-oney-ca-1773-1848/", "quote": "a thirst for compleat freedom" }
+            {
+              "label": "National Park Service, Independence NHP, \"Ona Judge Escapes to Freedom\"",
+              "url": "https://www.nps.gov/articles/independence-oneyjudge.htm",
+              "quote": "Two years later, Washington asked his secretary and nephew, Burwell Bassett, Jr., to seize Judge and her child, born since her escape."
+            },
+            {
+              "label": "Encyclopedia Virginia, \"Oney Judge (ca. 1773–1848)\"",
+              "url": "https://encyclopediavirginia.org/entries/judge-oney-ca-1773-1848/",
+              "quote": "a thirst for compleat freedom"
+            }
           ]
         },
         {
           "text": "On March 22, 1794 Washington signed \"An Act to prohibit the carrying on the Slave Trade from the United States to any foreign place or country,\" which forfeited ships involved in that trade.",
           "sources": [
-            { "label": "Statutes at Large, 1 Stat. 347 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg347.pdf", "quote": "Chap. XI.—An Act to prohibit the carrying on the Slave Trade from the United States to any foreign place or country. March 22, 1794." },
-            { "label": "Statutes at Large, note to 1 Stat. 347 listing the slave trade acts", "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg347.pdf", "quote": "The acts prohibiting and punishing the Slave trade, are : An act to prohibit the carrying on the slave trade from the United States to any foreign place or country, March 22, 1794, chap. 11" }
+            {
+              "label": "Statutes at Large, 1 Stat. 347 (govinfo)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg347.pdf",
+              "quote": "Chap. XI.—An Act to prohibit the carrying on the Slave Trade from the United States to any foreign place or country. March 22, 1794."
+            },
+            {
+              "label": "Statutes at Large, note to 1 Stat. 347 listing the slave trade acts",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg347.pdf",
+              "quote": "The acts prohibiting and punishing the Slave trade, are : An act to prohibit the carrying on the slave trade from the United States to any foreign place or country, March 22, 1794, chap. 11"
+            }
           ]
         },
         {
           "text": "On March 26, 1790 Washington signed the first naturalization act, which limited naturalized citizenship to \"any alien, being a free white person,\" excluding people of African descent from that path to citizenship.",
           "sources": [
-            { "label": "Statutes at Large, 1 Stat. 103 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg103.pdf", "quote": "That any alien, being a free white person, who shall have resided within the limits and under the jurisdiction of the United States for the term of two years, may be admitted to become a citizen" },
-            { "label": "Statutes at Large, marginal note to the same act", "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg103.pdf", "quote": "Alien whites may become citizens, and how." }
+            {
+              "label": "Statutes at Large, 1 Stat. 103 (govinfo)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg103.pdf",
+              "quote": "That any alien, being a free white person, who shall have resided within the limits and under the jurisdiction of the United States for the term of two years, may be admitted to become a citizen"
+            },
+            {
+              "label": "Statutes at Large, marginal note to the same act",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg103.pdf",
+              "quote": "Alien whites may become citizens, and how."
+            }
           ]
         }
       ],
@@ -51,15 +91,60 @@
         "rights": "public_domain"
       },
       "sources": [
-        { "id": "stat-fugitive-slave-1793", "label": "United States Statutes at Large, vol. 1, p. 302, Act of February 12, 1793 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg302.pdf", "quote": "Feb. 12, 1793. Chap. VII.—An Act respecting fugitives from justice, and persons escaping from the service of their masters." },
-        { "id": "stat-slave-trade-1794", "label": "United States Statutes at Large, vol. 1, p. 347, Act of March 22, 1794 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg347.pdf", "quote": "An Act to prohibit the carrying on the Slave Trade from the United States to any foreign place or country." },
-        { "id": "stat-naturalization-1790", "label": "United States Statutes at Large, vol. 1, p. 103, Act of March 26, 1790 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg103.pdf", "quote": "That any alien, being a free white person, who shall have resided within the limits and under the jurisdiction of the United States for the term of two years" },
-        { "id": "stat-northwest-1789", "label": "United States Statutes at Large, vol. 1, p. 50, Act of August 7, 1789 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg50.pdf", "quote": "Aug. 7, 1789. Chap. VIII.—An Act to provide for the Government of the Territory North-west of the river Ohio." },
-        { "id": "whha-gw-household", "label": "White House Historical Association, Lindsay M. Chervinsky, \"The Enslaved Household of President George Washington\"", "url": "https://www.whitehousehistory.org/the-enslaved-household-of-president-george-washington", "quote": "During Washington's presidency, at least ten enslaved people worked at the president's houses in New York City and Philadelphia: Ona, Hercules, Moll, Giles, Austin, Richmond, Paris, Joe, Christopher Sheels, and William Lee." },
-        { "id": "ev-gw-slavery", "label": "Encyclopedia Virginia (Virginia Humanities), \"George Washington and Slavery\"", "url": "https://encyclopediavirginia.org/entries/washington-george-and-slavery/", "quote": "decreed that all 123 of his enslaved people be freed upon the death of his wife" },
-        { "id": "nps-ona-judge", "label": "National Park Service, Independence National Historical Park, \"Ona Judge Escapes to Freedom\"", "url": "https://www.nps.gov/articles/independence-oneyjudge.htm", "quote": "Two years later, Washington asked his secretary and nephew, Burwell Bassett, Jr., to seize Judge and her child, born since her escape." },
-        { "id": "ev-oney-judge", "label": "Encyclopedia Virginia, \"Oney Judge (ca. 1773–1848)\"", "url": "https://encyclopediavirginia.org/entries/judge-oney-ca-1773-1848/", "quote": "the ingratitude of the girl, who was brought up & treated more like a child than a servant" },
-        { "id": "miller-presidents-slavery", "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"", "url": "https://millercenter.org/us-presidents-and-slavery", "quote": "including in his will a plan to free one slave and to manumit those under his control—roughly over a hundred" }
+        {
+          "id": "stat-fugitive-slave-1793",
+          "label": "United States Statutes at Large, vol. 1, p. 302, Act of February 12, 1793 (govinfo)",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg302.pdf",
+          "quote": "Feb. 12, 1793. Chap. VII.—An Act respecting fugitives from justice, and persons escaping from the service of their masters."
+        },
+        {
+          "id": "stat-slave-trade-1794",
+          "label": "United States Statutes at Large, vol. 1, p. 347, Act of March 22, 1794 (govinfo)",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg347.pdf",
+          "quote": "An Act to prohibit the carrying on the Slave Trade from the United States to any foreign place or country."
+        },
+        {
+          "id": "stat-naturalization-1790",
+          "label": "United States Statutes at Large, vol. 1, p. 103, Act of March 26, 1790 (govinfo)",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg103.pdf",
+          "quote": "That any alien, being a free white person, who shall have resided within the limits and under the jurisdiction of the United States for the term of two years"
+        },
+        {
+          "id": "stat-northwest-1789",
+          "label": "United States Statutes at Large, vol. 1, p. 50, Act of August 7, 1789 (govinfo)",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg50.pdf",
+          "quote": "Aug. 7, 1789. Chap. VIII.—An Act to provide for the Government of the Territory North-west of the river Ohio."
+        },
+        {
+          "id": "whha-gw-household",
+          "label": "White House Historical Association, Lindsay M. Chervinsky, \"The Enslaved Household of President George Washington\"",
+          "url": "https://www.whitehousehistory.org/the-enslaved-household-of-president-george-washington",
+          "quote": "During Washington's presidency, at least ten enslaved people worked at the president's houses in New York City and Philadelphia: Ona, Hercules, Moll, Giles, Austin, Richmond, Paris, Joe, Christopher Sheels, and William Lee."
+        },
+        {
+          "id": "ev-gw-slavery",
+          "label": "Encyclopedia Virginia (Virginia Humanities), \"George Washington and Slavery\"",
+          "url": "https://encyclopediavirginia.org/entries/washington-george-and-slavery/",
+          "quote": "decreed that all 123 of his enslaved people be freed upon the death of his wife"
+        },
+        {
+          "id": "nps-ona-judge",
+          "label": "National Park Service, Independence National Historical Park, \"Ona Judge Escapes to Freedom\"",
+          "url": "https://www.nps.gov/articles/independence-oneyjudge.htm",
+          "quote": "Two years later, Washington asked his secretary and nephew, Burwell Bassett, Jr., to seize Judge and her child, born since her escape."
+        },
+        {
+          "id": "ev-oney-judge",
+          "label": "Encyclopedia Virginia, \"Oney Judge (ca. 1773–1848)\"",
+          "url": "https://encyclopediavirginia.org/entries/judge-oney-ca-1773-1848/",
+          "quote": "the ingratitude of the girl, who was brought up & treated more like a child than a servant"
+        },
+        {
+          "id": "miller-presidents-slavery",
+          "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"",
+          "url": "https://millercenter.org/us-presidents-and-slavery",
+          "quote": "including in his will a plan to free one slave and to manumit those under his control—roughly over a hundred"
+        }
       ],
       "disputes": [
         "The number Washington owned outright is given as 123 by Encyclopedia Virginia and as 124 in descriptions of his June 1799 list; both figures circulate in reputable sources and we did not resolve them.",
@@ -80,22 +165,46 @@
         {
           "text": "Adams was the first president who owned no enslaved people, hiring white and free African American workers for the vice president's and president's houses between 1789 and 1801.",
           "sources": [
-            { "label": "White House Historical Association, \"The Households of President John Adams\"", "url": "https://www.whitehousehistory.org/the-households-of-john-adams", "quote": "Adams did not own enslaved people. Instead, the Adamses hired white and free African-American workers to provide these services." },
-            { "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"", "url": "https://millercenter.org/us-presidents-and-slavery", "quote": "one of the only US presidents not to own slaves" }
+            {
+              "label": "White House Historical Association, \"The Households of President John Adams\"",
+              "url": "https://www.whitehousehistory.org/the-households-of-john-adams",
+              "quote": "Adams did not own enslaved people. Instead, the Adamses hired white and free African-American workers to provide these services."
+            },
+            {
+              "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"",
+              "url": "https://millercenter.org/us-presidents-and-slavery",
+              "quote": "one of the only US presidents not to own slaves"
+            }
           ]
         },
         {
           "text": "During the Quasi-War, Adams reversed the earlier U.S. posture toward Saint-Domingue and provided aid to Toussaint Louverture against his British-supported rivals while preserving American trade with the colony.",
           "sources": [
-            { "label": "U.S. Department of State, Office of the Historian, \"The United States and the Haitian Revolution, 1791–1804\"", "url": "https://history.state.gov/milestones/1784-1800/haitian-rev", "quote": "Adams decided to provide aid to L'Ouverture against his British-supported rivals." },
-            { "label": "U.S. Department of State, Office of the Historian, same page", "url": "https://history.state.gov/milestones/1784-1800/haitian-rev", "quote": "The beginning of the Federalist administration of President John Adams signaled a change in policy. Adams was resolutely anti-slavery and felt no need to aid white forces in St. Domingue." }
+            {
+              "label": "U.S. Department of State, Office of the Historian, \"The United States and the Haitian Revolution, 1791–1804\"",
+              "url": "https://history.state.gov/milestones/1784-1800/haitian-rev",
+              "quote": "Adams decided to provide aid to L'Ouverture against his British-supported rivals."
+            },
+            {
+              "label": "U.S. Department of State, Office of the Historian, same page",
+              "url": "https://history.state.gov/milestones/1784-1800/haitian-rev",
+              "quote": "The beginning of the Federalist administration of President John Adams signaled a change in policy. Adams was resolutely anti-slavery and felt no need to aid white forces in St. Domingue."
+            }
           ]
         },
         {
           "text": "The White House Historical Association records that although the Adamses opposed slavery, they tolerated it around them and may have hired enslaved African Americans, paying wages to the people who owned them.",
           "sources": [
-            { "label": "White House Historical Association, \"The Households of President John Adams\"", "url": "https://www.whitehousehistory.org/the-households-of-john-adams", "quote": "they may have hired out enslaved African Americans, paying wages to their owners, to work in the Vice President's and President's House." },
-            { "label": "White House Historical Association, \"The Enslaved Household of President John Quincy Adams\"", "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams", "quote": "Of the first seven U.S. presidents, John Quincy Adams (JQA) and his father John Adams were the only two who did not bring enslaved people into the White House." }
+            {
+              "label": "White House Historical Association, \"The Households of President John Adams\"",
+              "url": "https://www.whitehousehistory.org/the-households-of-john-adams",
+              "quote": "they may have hired out enslaved African Americans, paying wages to their owners, to work in the Vice President's and President's House."
+            },
+            {
+              "label": "White House Historical Association, \"The Enslaved Household of President John Quincy Adams\"",
+              "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams",
+              "quote": "Of the first seven U.S. presidents, John Quincy Adams (JQA) and his father John Adams were the only two who did not bring enslaved people into the White House."
+            }
           ]
         }
       ],
@@ -107,10 +216,30 @@
         "rights": "public_domain"
       },
       "sources": [
-        { "id": "whha-ja-households", "label": "White House Historical Association, Lindsay M. Chervinsky, \"The Households of President John Adams\"", "url": "https://www.whitehousehistory.org/the-households-of-john-adams", "quote": "Adams did not own enslaved people. Instead, the Adamses hired white and free African-American workers to provide these services." },
-        { "id": "whha-jqa-household", "label": "White House Historical Association, \"The Enslaved Household of President John Quincy Adams\"", "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams", "quote": "Of the first seven U.S. presidents, John Quincy Adams (JQA) and his father John Adams were the only two who did not bring enslaved people into the White House." },
-        { "id": "state-haitian-rev", "label": "U.S. Department of State, Office of the Historian, \"The United States and the Haitian Revolution, 1791–1804\"", "url": "https://history.state.gov/milestones/1784-1800/haitian-rev", "quote": "Adams decided to provide aid to L'Ouverture against his British-supported rivals." },
-        { "id": "miller-presidents-slavery", "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"", "url": "https://millercenter.org/us-presidents-and-slavery", "quote": "one of the only US presidents not to own slaves" }
+        {
+          "id": "whha-ja-households",
+          "label": "White House Historical Association, Lindsay M. Chervinsky, \"The Households of President John Adams\"",
+          "url": "https://www.whitehousehistory.org/the-households-of-john-adams",
+          "quote": "Adams did not own enslaved people. Instead, the Adamses hired white and free African-American workers to provide these services."
+        },
+        {
+          "id": "whha-jqa-household",
+          "label": "White House Historical Association, \"The Enslaved Household of President John Quincy Adams\"",
+          "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams",
+          "quote": "Of the first seven U.S. presidents, John Quincy Adams (JQA) and his father John Adams were the only two who did not bring enslaved people into the White House."
+        },
+        {
+          "id": "state-haitian-rev",
+          "label": "U.S. Department of State, Office of the Historian, \"The United States and the Haitian Revolution, 1791–1804\"",
+          "url": "https://history.state.gov/milestones/1784-1800/haitian-rev",
+          "quote": "Adams decided to provide aid to L'Ouverture against his British-supported rivals."
+        },
+        {
+          "id": "miller-presidents-slavery",
+          "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"",
+          "url": "https://millercenter.org/us-presidents-and-slavery",
+          "quote": "one of the only US presidents not to own slaves"
+        }
       ],
       "disputes": [
         "Whether enslaved labor was used in Adams's official households: the White House Historical Association says he owned no one but raises the possibility that the Adamses hired enslaved people from their owners, and that a cook may have brought an enslaved woman with him. Both readings appear in the same source and are not resolved."
@@ -130,36 +259,76 @@
         {
           "text": "In his annual message of December 2, 1806, Jefferson urged Congress to use its new constitutional authority to withdraw Americans from the African slave trade at the earliest date allowed.",
           "sources": [
-            { "label": "Miller Center, University of Virginia, \"December 2, 1806: Sixth Annual Message\"", "url": "https://millercenter.org/the-presidency/presidential-speeches/december-2-1806-sixth-annual-message", "quote": "to withdraw the citizens of the United States from all further participation in those violations of human rights which have been so long continued on the unoffending inhabitants of Africa" },
-            { "label": "United States Statutes at Large, vol. 2, p. 426 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-2/pdf/STATUTE-2-Pg426.pdf", "quote": "An Act to prohibit the importation of Slaves into any port or place within the jurisdiction of the United States, from and after the first day of January, in the year of our Lord one thousand eight hundred and eight." }
+            {
+              "label": "Miller Center, University of Virginia, \"December 2, 1806: Sixth Annual Message\"",
+              "url": "https://millercenter.org/the-presidency/presidential-speeches/december-2-1806-sixth-annual-message",
+              "quote": "to withdraw the citizens of the United States from all further participation in those violations of human rights which have been so long continued on the unoffending inhabitants of Africa"
+            },
+            {
+              "label": "United States Statutes at Large, vol. 2, p. 426 (govinfo)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-2/pdf/STATUTE-2-Pg426.pdf",
+              "quote": "An Act to prohibit the importation of Slaves into any port or place within the jurisdiction of the United States, from and after the first day of January, in the year of our Lord one thousand eight hundred and eight."
+            }
           ]
         },
         {
           "text": "Jefferson signed the Act Prohibiting Importation of Slaves on March 2, 1807; it made importing a person as a slave unlawful from January 1, 1808 and forfeited vessels fitted out for the trade.",
           "sources": [
-            { "label": "United States Statutes at Large, vol. 2, p. 426, Act of March 2, 1807 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-2/pdf/STATUTE-2-Pg426.pdf", "quote": "it shall not be lawful to import or bring into the United States or the territories thereof from any foreign kingdom, place, or country, any negro, mulatto, or person of colour, with intent to hold, sell, or dispose of such" },
-            { "label": "United States Statutes at Large, vol. 1, p. 347, editorial note listing the slave trade acts", "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg347.pdf", "quote": "an act to prohibit the importation of slaves into any port or place within the jurisdiction of the United States from and after the first of January one thousand eight hundred and eight, March 2, 1807, chap. 22" }
+            {
+              "label": "United States Statutes at Large, vol. 2, p. 426, Act of March 2, 1807 (govinfo)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-2/pdf/STATUTE-2-Pg426.pdf",
+              "quote": "it shall not be lawful to import or bring into the United States or the territories thereof from any foreign kingdom, place, or country, any negro, mulatto, or person of colour, with intent to hold, sell, or dispose of such"
+            },
+            {
+              "label": "United States Statutes at Large, vol. 1, p. 347, editorial note listing the slave trade acts",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-1/pdf/STATUTE-1-Pg347.pdf",
+              "quote": "an act to prohibit the importation of slaves into any port or place within the jurisdiction of the United States from and after the first of January one thousand eight hundred and eight, March 2, 1807, chap. 22"
+            }
           ]
         },
         {
           "text": "On February 28, 1806 Jefferson signed an act prohibiting all commercial intercourse with the parts of Saint-Domingue not under the acknowledged government of France, isolating the Black-led revolutionary government.",
           "sources": [
-            { "label": "United States Statutes at Large, vol. 2, p. 351, Act of February 28, 1806 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-2/pdf/STATUTE-2-Pg351.pdf", "quote": "all commercial intercourse between any person or persons resident within the United States, and any person or persons resident within any part of the island of St. Domingo ... is hereby prohibited" },
-            { "label": "U.S. Department of State, Office of the Historian, \"The United States and the Haitian Revolution, 1791–1804\"", "url": "https://history.state.gov/milestones/1784-1800/haitian-rev", "quote": "Under President Thomas Jefferson's presidency, the United States cut off aid to L'Ouverture and instead pursued a policy to isolate Haiti" }
+            {
+              "label": "United States Statutes at Large, vol. 2, p. 351, Act of February 28, 1806 (govinfo)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-2/pdf/STATUTE-2-Pg351.pdf",
+              "quote": "all commercial intercourse between any person or persons resident within the United States, and any person or persons resident within any part of the island of St. Domingo ... is hereby prohibited"
+            },
+            {
+              "label": "U.S. Department of State, Office of the Historian, \"The United States and the Haitian Revolution, 1791–1804\"",
+              "url": "https://history.state.gov/milestones/1784-1800/haitian-rev",
+              "quote": "Under President Thomas Jefferson's presidency, the United States cut off aid to L'Ouverture and instead pursued a policy to isolate Haiti"
+            }
           ]
         },
         {
           "text": "Jefferson refused to recognize Haitian independence; the United States did not recognize Haiti until 1862, decades after France did so in 1825.",
           "sources": [
-            { "label": "U.S. Department of State, Office of the Historian", "url": "https://history.state.gov/milestones/1784-1800/haitian-rev", "quote": "Jefferson refused to recognize Haitian independence, a policy to which U.S. Federalists also acquiesced." },
-            { "label": "U.S. Department of State, Office of the Historian, same page", "url": "https://history.state.gov/milestones/1784-1800/haitian-rev", "quote": "Although France recognized Haitian independence in 1825, Haitians would have to wait until 1862 for the United States to recognize Haiti's status as a sovereign, independent nation." }
+            {
+              "label": "U.S. Department of State, Office of the Historian",
+              "url": "https://history.state.gov/milestones/1784-1800/haitian-rev",
+              "quote": "Jefferson refused to recognize Haitian independence, a policy to which U.S. Federalists also acquiesced."
+            },
+            {
+              "label": "U.S. Department of State, Office of the Historian, same page",
+              "url": "https://history.state.gov/milestones/1784-1800/haitian-rev",
+              "quote": "Although France recognized Haitian independence in 1825, Haitians would have to wait until 1862 for the United States to recognize Haiti's status as a sovereign, independent nation."
+            }
           ]
         },
         {
           "text": "In Notes on the State of Virginia Jefferson published the claim that Black people were intellectually and imaginatively inferior, a text he never retracted while holding office.",
           "sources": [
-            { "label": "Encyclopedia Virginia (Virginia Humanities), \"Thomas Jefferson (1743–1826)\"", "url": "https://encyclopediavirginia.org/entries/jefferson-thomas-1743-1826/", "quote": "advanced the disturbingly racist hypothesis, which he claimed to base on his own observations, that Blacks were limited in intellect, lacking in imagination and foresight, incapable of lasting grief" },
-            { "label": "Encyclopedia Virginia, same entry", "url": "https://encyclopediavirginia.org/entries/jefferson-thomas-1743-1826/", "quote": "eloquently denounced slavery as an evil that corrupted masters as much as it degraded people held in bondage" }
+            {
+              "label": "Encyclopedia Virginia (Virginia Humanities), \"Thomas Jefferson (1743–1826)\"",
+              "url": "https://encyclopediavirginia.org/entries/jefferson-thomas-1743-1826/",
+              "quote": "advanced the disturbingly racist hypothesis, which he claimed to base on his own observations, that Blacks were limited in intellect, lacking in imagination and foresight, incapable of lasting grief"
+            },
+            {
+              "label": "Encyclopedia Virginia, same entry",
+              "url": "https://encyclopediavirginia.org/entries/jefferson-thomas-1743-1826/",
+              "quote": "eloquently denounced slavery as an evil that corrupted masters as much as it degraded people held in bondage"
+            }
           ]
         }
       ],
@@ -171,12 +340,42 @@
         "rights": "public_domain"
       },
       "sources": [
-        { "id": "stat-slave-import-1807", "label": "United States Statutes at Large, vol. 2, p. 426, Act of March 2, 1807 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-2/pdf/STATUTE-2-Pg426.pdf", "quote": "March 2, 1807. Chap. XXII.—An Act to prohibit the importation of Slaves into any port or place within the jurisdiction of the United States" },
-        { "id": "stat-st-domingo-1806", "label": "United States Statutes at Large, vol. 2, p. 351, Act of February 28, 1806 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-2/pdf/STATUTE-2-Pg351.pdf", "quote": "An Act to suspend the commercial intercourse between the United States, and certain parts of the island of St. Domingo." },
-        { "id": "miller-tj-1806-message", "label": "Miller Center, University of Virginia, \"December 2, 1806: Sixth Annual Message\"", "url": "https://millercenter.org/the-presidency/presidential-speeches/december-2-1806-sixth-annual-message", "quote": "I congratulate you, fellow-citizens, on the approach of the period at which you may interpose your authority constitutionally, to withdraw the citizens of the United States from all further participation in those violations of human rights" },
-        { "id": "state-haitian-rev", "label": "U.S. Department of State, Office of the Historian, \"The United States and the Haitian Revolution, 1791–1804\"", "url": "https://history.state.gov/milestones/1784-1800/haitian-rev", "quote": "Jefferson refused to recognize Haitian independence, a policy to which U.S. Federalists also acquiesced." },
-        { "id": "ev-jefferson", "label": "Encyclopedia Virginia (Virginia Humanities), \"Thomas Jefferson (1743–1826)\"", "url": "https://encyclopediavirginia.org/entries/jefferson-thomas-1743-1826/", "quote": "Largely through inheritance and natural increase he owned more than 600 enslaved persons at one time or another, of which he freed only a handful." },
-        { "id": "miller-presidents-slavery", "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"", "url": "https://millercenter.org/us-presidents-and-slavery", "quote": "more than one hundred were sold to help cover Jefferson's debts" }
+        {
+          "id": "stat-slave-import-1807",
+          "label": "United States Statutes at Large, vol. 2, p. 426, Act of March 2, 1807 (govinfo)",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-2/pdf/STATUTE-2-Pg426.pdf",
+          "quote": "March 2, 1807. Chap. XXII.—An Act to prohibit the importation of Slaves into any port or place within the jurisdiction of the United States"
+        },
+        {
+          "id": "stat-st-domingo-1806",
+          "label": "United States Statutes at Large, vol. 2, p. 351, Act of February 28, 1806 (govinfo)",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-2/pdf/STATUTE-2-Pg351.pdf",
+          "quote": "An Act to suspend the commercial intercourse between the United States, and certain parts of the island of St. Domingo."
+        },
+        {
+          "id": "miller-tj-1806-message",
+          "label": "Miller Center, University of Virginia, \"December 2, 1806: Sixth Annual Message\"",
+          "url": "https://millercenter.org/the-presidency/presidential-speeches/december-2-1806-sixth-annual-message",
+          "quote": "I congratulate you, fellow-citizens, on the approach of the period at which you may interpose your authority constitutionally, to withdraw the citizens of the United States from all further participation in those violations of human rights"
+        },
+        {
+          "id": "state-haitian-rev",
+          "label": "U.S. Department of State, Office of the Historian, \"The United States and the Haitian Revolution, 1791–1804\"",
+          "url": "https://history.state.gov/milestones/1784-1800/haitian-rev",
+          "quote": "Jefferson refused to recognize Haitian independence, a policy to which U.S. Federalists also acquiesced."
+        },
+        {
+          "id": "ev-jefferson",
+          "label": "Encyclopedia Virginia (Virginia Humanities), \"Thomas Jefferson (1743–1826)\"",
+          "url": "https://encyclopediavirginia.org/entries/jefferson-thomas-1743-1826/",
+          "quote": "Largely through inheritance and natural increase he owned more than 600 enslaved persons at one time or another, of which he freed only a handful."
+        },
+        {
+          "id": "miller-presidents-slavery",
+          "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"",
+          "url": "https://millercenter.org/us-presidents-and-slavery",
+          "quote": "more than one hundred were sold to help cover Jefferson's debts"
+        }
       ],
       "disputes": [
         "The count of people freed by Jefferson: Encyclopedia Virginia describes five freed by the will (three men in the codicil plus Madison and Eston Hemings), while the Miller Center frames it in terms of Sally Hemings's children being freed or allowed to leave. Both are recorded here without resolution.",
@@ -196,36 +395,76 @@
         {
           "text": "Madison brought enslaved people from Montpelier into the White House during his presidency, among them Paul Jennings, who arrived in Washington at age ten and served as a footman.",
           "sources": [
-            { "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"", "url": "https://millercenter.org/us-presidents-and-slavery", "quote": "imported to the White House several enslaved people from Montpelier" },
-            { "label": "James Madison's Montpelier, \"The Life of Paul Jennings\"", "url": "https://www.montpelier.org/the-life-of-paul-jennings/", "quote": "he accompanied the Madisons to Washington after James was elected president" }
+            {
+              "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"",
+              "url": "https://millercenter.org/us-presidents-and-slavery",
+              "quote": "imported to the White House several enslaved people from Montpelier"
+            },
+            {
+              "label": "James Madison's Montpelier, \"The Life of Paul Jennings\"",
+              "url": "https://www.montpelier.org/the-life-of-paul-jennings/",
+              "quote": "he accompanied the Madisons to Washington after James was elected president"
+            }
           ]
         },
         {
           "text": "Historians have identified 300 individuals enslaved at Montpelier, with more than 100 living and working there at any given time.",
           "sources": [
-            { "label": "Encyclopedia Virginia (Virginia Humanities), \"The Enslaved Community at Montpelier\"", "url": "https://encyclopediavirginia.org/entries/the-enslaved-community-at-montpelier/", "quote": "At any given time, more than 100 enslaved people worked and lived at Montpelier." },
-            { "label": "James Madison's Montpelier, \"The Mere Distinction of Colour\"", "url": "https://www.montpelier.org/learn/the-mere-distinction-of-colour", "quote": "nearly 300 enslaved people, of all ages, made their mark on Montpelier" }
+            {
+              "label": "Encyclopedia Virginia (Virginia Humanities), \"The Enslaved Community at Montpelier\"",
+              "url": "https://encyclopediavirginia.org/entries/the-enslaved-community-at-montpelier/",
+              "quote": "At any given time, more than 100 enslaved people worked and lived at Montpelier."
+            },
+            {
+              "label": "James Madison's Montpelier, \"The Mere Distinction of Colour\"",
+              "url": "https://www.montpelier.org/learn/the-mere-distinction-of-colour",
+              "quote": "nearly 300 enslaved people, of all ages, made their mark on Montpelier"
+            }
           ]
         },
         {
           "text": "Madison freed no one at his death in 1836, leaving the people he enslaved to Dolley Madison; he had emancipated only one man, Billey, during his life.",
           "sources": [
-            { "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"", "url": "https://millercenter.org/us-presidents-and-slavery", "quote": "emancipated only one enslaved person, Billey" },
-            { "label": "Encyclopedia Virginia, \"James Madison (1751–1836)\"", "url": "https://encyclopediavirginia.org/entries/madison-james-1751-1836/", "quote": "Madison, who enslaved more than 100 people, did not emancipate his own enslaved workers despite his professed concerns about slavery" }
+            {
+              "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"",
+              "url": "https://millercenter.org/us-presidents-and-slavery",
+              "quote": "emancipated only one enslaved person, Billey"
+            },
+            {
+              "label": "Encyclopedia Virginia, \"James Madison (1751–1836)\"",
+              "url": "https://encyclopediavirginia.org/entries/madison-james-1751-1836/",
+              "quote": "Madison, who enslaved more than 100 people, did not emancipate his own enslaved workers despite his professed concerns about slavery"
+            }
           ]
         },
         {
           "text": "Madison staked his hopes for ending slavery on compensated emancipation coupled with relocating freed people out of the country, and became president of the American Colonization Society in 1833.",
           "sources": [
-            { "label": "Encyclopedia Virginia, \"James Madison (1751–1836)\"", "url": "https://encyclopediavirginia.org/entries/madison-james-1751-1836/", "quote": "coupled with the requirement that freed people be relocated out of the country, potentially in the Liberia settlement of the American Colonization Society, of which Madison became president in 1833" },
-            { "label": "Encyclopedia Virginia, same entry", "url": "https://encyclopediavirginia.org/entries/madison-james-1751-1836/", "quote": "doubted that whites and free Blacks could live together" }
+            {
+              "label": "Encyclopedia Virginia, \"James Madison (1751–1836)\"",
+              "url": "https://encyclopediavirginia.org/entries/madison-james-1751-1836/",
+              "quote": "coupled with the requirement that freed people be relocated out of the country, potentially in the Liberia settlement of the American Colonization Society, of which Madison became president in 1833"
+            },
+            {
+              "label": "Encyclopedia Virginia, same entry",
+              "url": "https://encyclopediavirginia.org/entries/madison-james-1751-1836/",
+              "quote": "doubted that whites and free Blacks could live together"
+            }
           ]
         },
         {
           "text": "After Madison's death, Dolley Madison sold Paul Jennings for $200 to Pollard Webb; Daniel Webster then bought him for $120 and let Jennings buy his freedom at $8 a month.",
           "sources": [
-            { "label": "James Madison's Montpelier, \"The Life of Paul Jennings\"", "url": "https://www.montpelier.org/the-life-of-paul-jennings/", "quote": "Webster then bought Jennings for $120, allowing him to purchase his own freedom at a rate of $8 per month." },
-            { "label": "Encyclopedia Virginia, \"The Enslaved Community at Montpelier\"", "url": "https://encyclopediavirginia.org/entries/the-enslaved-community-at-montpelier/", "quote": "owned approximately seventy-five enslaved people" }
+            {
+              "label": "James Madison's Montpelier, \"The Life of Paul Jennings\"",
+              "url": "https://www.montpelier.org/the-life-of-paul-jennings/",
+              "quote": "Webster then bought Jennings for $120, allowing him to purchase his own freedom at a rate of $8 per month."
+            },
+            {
+              "label": "Encyclopedia Virginia, \"The Enslaved Community at Montpelier\"",
+              "url": "https://encyclopediavirginia.org/entries/the-enslaved-community-at-montpelier/",
+              "quote": "owned approximately seventy-five enslaved people"
+            }
           ]
         }
       ],
@@ -237,12 +476,42 @@
         "rights": "public_domain"
       },
       "sources": [
-        { "id": "ev-madison", "label": "Encyclopedia Virginia (Virginia Humanities), \"James Madison (1751–1836)\"", "url": "https://encyclopediavirginia.org/entries/madison-james-1751-1836/", "quote": "Madison, who enslaved more than 100 people, did not emancipate his own enslaved workers despite his professed concerns about slavery" },
-        { "id": "ev-montpelier-community", "label": "Encyclopedia Virginia, \"The Enslaved Community at Montpelier\"", "url": "https://encyclopediavirginia.org/entries/the-enslaved-community-at-montpelier/", "quote": "At any given time, more than 100 enslaved people worked and lived at Montpelier." },
-        { "id": "montpelier-jennings", "label": "James Madison's Montpelier, \"The Life of Paul Jennings\"", "url": "https://www.montpelier.org/the-life-of-paul-jennings/", "quote": "Webster then bought Jennings for $120, allowing him to purchase his own freedom at a rate of $8 per month." },
-        { "id": "montpelier-mere-distinction", "label": "James Madison's Montpelier, \"The Mere Distinction of Colour\"", "url": "https://www.montpelier.org/learn/the-mere-distinction-of-colour", "quote": "nearly 300 enslaved people, of all ages, made their mark on Montpelier" },
-        { "id": "miller-presidents-slavery", "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"", "url": "https://millercenter.org/us-presidents-and-slavery", "quote": "imported to the White House several enslaved people from Montpelier" },
-        { "id": "miller-madison-domestic", "label": "Miller Center, University of Virginia, \"James Madison: Domestic Affairs\"", "url": "https://millercenter.org/president/madison/domestic-affairs", "quote": "Not even slavery would arise as a major domestic wedge until the Missouri Crisis, several years after Madison's presidency." }
+        {
+          "id": "ev-madison",
+          "label": "Encyclopedia Virginia (Virginia Humanities), \"James Madison (1751–1836)\"",
+          "url": "https://encyclopediavirginia.org/entries/madison-james-1751-1836/",
+          "quote": "Madison, who enslaved more than 100 people, did not emancipate his own enslaved workers despite his professed concerns about slavery"
+        },
+        {
+          "id": "ev-montpelier-community",
+          "label": "Encyclopedia Virginia, \"The Enslaved Community at Montpelier\"",
+          "url": "https://encyclopediavirginia.org/entries/the-enslaved-community-at-montpelier/",
+          "quote": "At any given time, more than 100 enslaved people worked and lived at Montpelier."
+        },
+        {
+          "id": "montpelier-jennings",
+          "label": "James Madison's Montpelier, \"The Life of Paul Jennings\"",
+          "url": "https://www.montpelier.org/the-life-of-paul-jennings/",
+          "quote": "Webster then bought Jennings for $120, allowing him to purchase his own freedom at a rate of $8 per month."
+        },
+        {
+          "id": "montpelier-mere-distinction",
+          "label": "James Madison's Montpelier, \"The Mere Distinction of Colour\"",
+          "url": "https://www.montpelier.org/learn/the-mere-distinction-of-colour",
+          "quote": "nearly 300 enslaved people, of all ages, made their mark on Montpelier"
+        },
+        {
+          "id": "miller-presidents-slavery",
+          "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"",
+          "url": "https://millercenter.org/us-presidents-and-slavery",
+          "quote": "imported to the White House several enslaved people from Montpelier"
+        },
+        {
+          "id": "miller-madison-domestic",
+          "label": "Miller Center, University of Virginia, \"James Madison: Domestic Affairs\"",
+          "url": "https://millercenter.org/president/madison/domestic-affairs",
+          "quote": "Not even slavery would arise as a major domestic wedge until the Missouri Crisis, several years after Madison's presidency."
+        }
       ],
       "disputes": [
         "Totals at Montpelier differ by framing: Montpelier says 'nearly 300 enslaved people' made their mark on the property across its history, Encyclopedia Virginia gives 300 individuals identified and more than 100 at any one time, and Encyclopedia Virginia's Madison entry says he 'enslaved more than 100 people.' These are different measures and are recorded separately rather than merged."
@@ -262,29 +531,61 @@
         {
           "text": "Monroe signed the Missouri Compromise on March 6, 1820, prohibiting slavery in Louisiana Purchase territory north of 36°30' north latitude while admitting Missouri as a state, with a clause preserving enslavers' right to reclaim escapees there.",
           "sources": [
-            { "label": "United States Statutes at Large, vol. 3, p. 545, Act of March 6, 1820 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg545.pdf", "quote": "which lies north of thirty-six degrees and thirty minutes north latitude, not included within the limits of the state, contemplated by this act, slavery and involuntary servitude ... shall be, and is hereby, forever prohibited" },
-            { "label": "Miller Center, University of Virginia, \"James Monroe: Domestic Affairs\"", "url": "https://millercenter.org/president/monroe/domestic-affairs", "quote": "signed the bill on March 6, 1820, after he was satisfied that the provisions were, indeed, constitutional" }
+            {
+              "label": "United States Statutes at Large, vol. 3, p. 545, Act of March 6, 1820 (govinfo)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg545.pdf",
+              "quote": "which lies north of thirty-six degrees and thirty minutes north latitude, not included within the limits of the state, contemplated by this act, slavery and involuntary servitude ... shall be, and is hereby, forever prohibited"
+            },
+            {
+              "label": "Miller Center, University of Virginia, \"James Monroe: Domestic Affairs\"",
+              "url": "https://millercenter.org/president/monroe/domestic-affairs",
+              "quote": "signed the bill on March 6, 1820, after he was satisfied that the provisions were, indeed, constitutional"
+            }
           ]
         },
         {
           "text": "Monroe signed the act of March 3, 1819 authorizing armed U.S. vessels to seize slave ships and to deliver recaptured Africans to agents appointed on the African coast, with a $25 bounty per person to the crews.",
           "sources": [
-            { "label": "United States Statutes at Large, vol. 3, p. 532, Act of March 3, 1819 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg532.pdf", "quote": "March 3, 1819. Chap. CI.—An Act in addition to the Acts prohibiting the slave trade" },
-            { "label": "United States Statutes at Large, vol. 3, p. 533 (same act)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg532.pdf", "quote": "to appoint a proper person or persons, residing upon the coast of Africa, as agent or agents for receiving the negroes, mulattoes, or persons of colour, delivered from on board vessels" }
+            {
+              "label": "United States Statutes at Large, vol. 3, p. 532, Act of March 3, 1819 (govinfo)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg532.pdf",
+              "quote": "March 3, 1819. Chap. CI.—An Act in addition to the Acts prohibiting the slave trade"
+            },
+            {
+              "label": "United States Statutes at Large, vol. 3, p. 533 (same act)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg532.pdf",
+              "quote": "to appoint a proper person or persons, residing upon the coast of Africa, as agent or agents for receiving the negroes, mulattoes, or persons of colour, delivered from on board vessels"
+            }
           ]
         },
         {
           "text": "As governor of Virginia, Monroe responded to Gabriel's Conspiracy in 1800 by ordering patrols; twenty-six men were hanged, and on September 15 he asked Jefferson how many executions would be needed to deter another uprising.",
           "sources": [
-            { "label": "Encyclopedia Virginia (Virginia Humanities), \"Gabriel's Conspiracy (1800)\"", "url": "https://encyclopediavirginia.org/entries/gabriels-conspiracy-1800/", "quote": "ordered patrols to be sent out" },
-            { "label": "James Monroe's Highland (William & Mary), \"Highland and Slavery\"", "url": "https://highland.org/highland-and-slavery/", "quote": "178 individuals who led their lives—in part or wholly—enslaved by Monroe during his adulthood" }
+            {
+              "label": "Encyclopedia Virginia (Virginia Humanities), \"Gabriel's Conspiracy (1800)\"",
+              "url": "https://encyclopediavirginia.org/entries/gabriels-conspiracy-1800/",
+              "quote": "ordered patrols to be sent out"
+            },
+            {
+              "label": "James Monroe's Highland (William & Mary), \"Highland and Slavery\"",
+              "url": "https://highland.org/highland-and-slavery/",
+              "quote": "178 individuals who led their lives—in part or wholly—enslaved by Monroe during his adulthood"
+            }
           ]
         },
         {
           "text": "The American Colonization Society was formed in 1817, Monroe's first year as president; Liberia's capital was named Monrovia in recognition of his support for the colonization scheme.",
           "sources": [
-            { "label": "James Monroe's Highland (William & Mary), \"Highland and Slavery\"", "url": "https://highland.org/highland-and-slavery/", "quote": "Because of Monroe's endorsement of the ACS, Liberia named its capital, Monrovia, after him." },
-            { "label": "United States Statutes at Large, vol. 3, p. 532, Act of March 3, 1819 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg532.pdf", "quote": "such regulations and arrangements as he may deem expedient for the safe keeping, support, and removal beyond the limits of the United States, of all such negroes, mulattoes, or persons of colour" }
+            {
+              "label": "James Monroe's Highland (William & Mary), \"Highland and Slavery\"",
+              "url": "https://highland.org/highland-and-slavery/",
+              "quote": "Because of Monroe's endorsement of the ACS, Liberia named its capital, Monrovia, after him."
+            },
+            {
+              "label": "United States Statutes at Large, vol. 3, p. 532, Act of March 3, 1819 (govinfo)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg532.pdf",
+              "quote": "such regulations and arrangements as he may deem expedient for the safe keeping, support, and removal beyond the limits of the United States, of all such negroes, mulattoes, or persons of colour"
+            }
           ]
         }
       ],
@@ -296,11 +597,36 @@
         "rights": "public_domain"
       },
       "sources": [
-        { "id": "stat-missouri-1820", "label": "United States Statutes at Large, vol. 3, p. 545, Act of March 6, 1820 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg545.pdf", "quote": "An Act to authorize the people of the Missouri territory to form a constitution and state government ... and to prohibit slavery in certain territories" },
-        { "id": "stat-slave-trade-1819", "label": "United States Statutes at Large, vol. 3, p. 532, Act of March 3, 1819 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg532.pdf", "quote": "March 3, 1819. Chap. CI.—An Act in addition to the Acts prohibiting the slave trade" },
-        { "id": "highland-slavery", "label": "James Monroe's Highland (William & Mary), \"Highland and Slavery\"", "url": "https://highland.org/highland-and-slavery/", "quote": "He freed only one: Peter Marks, who was manumitted in a request Monroe made during the last days of his life." },
-        { "id": "ev-gabriels-conspiracy", "label": "Encyclopedia Virginia (Virginia Humanities), \"Gabriel's Conspiracy (1800)\"", "url": "https://encyclopediavirginia.org/entries/gabriels-conspiracy-1800/", "quote": "how many executions might be necessary to prevent another uprising" },
-        { "id": "miller-monroe-domestic", "label": "Miller Center, University of Virginia, \"James Monroe: Domestic Affairs\"", "url": "https://millercenter.org/president/monroe/domestic-affairs", "quote": "signed the bill on March 6, 1820, after he was satisfied that the provisions were, indeed, constitutional" }
+        {
+          "id": "stat-missouri-1820",
+          "label": "United States Statutes at Large, vol. 3, p. 545, Act of March 6, 1820 (govinfo)",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg545.pdf",
+          "quote": "An Act to authorize the people of the Missouri territory to form a constitution and state government ... and to prohibit slavery in certain territories"
+        },
+        {
+          "id": "stat-slave-trade-1819",
+          "label": "United States Statutes at Large, vol. 3, p. 532, Act of March 3, 1819 (govinfo)",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-3/pdf/STATUTE-3-Pg532.pdf",
+          "quote": "March 3, 1819. Chap. CI.—An Act in addition to the Acts prohibiting the slave trade"
+        },
+        {
+          "id": "highland-slavery",
+          "label": "James Monroe's Highland (William & Mary), \"Highland and Slavery\"",
+          "url": "https://highland.org/highland-and-slavery/",
+          "quote": "He freed only one: Peter Marks, who was manumitted in a request Monroe made during the last days of his life."
+        },
+        {
+          "id": "ev-gabriels-conspiracy",
+          "label": "Encyclopedia Virginia (Virginia Humanities), \"Gabriel's Conspiracy (1800)\"",
+          "url": "https://encyclopediavirginia.org/entries/gabriels-conspiracy-1800/",
+          "quote": "how many executions might be necessary to prevent another uprising"
+        },
+        {
+          "id": "miller-monroe-domestic",
+          "label": "Miller Center, University of Virginia, \"James Monroe: Domestic Affairs\"",
+          "url": "https://millercenter.org/president/monroe/domestic-affairs",
+          "quote": "signed the bill on March 6, 1820, after he was satisfied that the provisions were, indeed, constitutional"
+        }
       ],
       "disputes": [
         "The number executed after Gabriel's Conspiracy is given by Encyclopedia Virginia as twenty-six hanged with eight more sold outside Virginia; Highland's teacher materials describe Gabriel, his two brothers and twenty-three other conspirators being executed. Both counts are recorded."
@@ -319,29 +645,61 @@
         {
           "text": "On February 23, 1828, President Adams recorded in his diary the death of Holzey, described as \"the black boy belonging to Johnson Hellen,\" who had lived with the Adams family for several years.",
           "sources": [
-            { "label": "White House Historical Association, \"The Enslaved Household of President John Quincy Adams\"", "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams", "quote": "Holzey, the black boy belonging to Johnson Hellen, and who has been several years with us, died about five o'clock this afternoon." },
-            { "label": "White House Historical Association, same article", "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams", "quote": "while Adams never owned enslaved people and is considered by many an antislavery president, he appears to have permitted slavery under his own roof" }
+            {
+              "label": "White House Historical Association, \"The Enslaved Household of President John Quincy Adams\"",
+              "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams",
+              "quote": "Holzey, the black boy belonging to Johnson Hellen, and who has been several years with us, died about five o'clock this afternoon."
+            },
+            {
+              "label": "White House Historical Association, same article",
+              "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams",
+              "quote": "while Adams never owned enslaved people and is considered by many an antislavery president, he appears to have permitted slavery under his own roof"
+            }
           ]
         },
         {
           "text": "On February 25, 1828, the day she married Adams's son in the White House, Mary Catherine Hellen filed manumission papers for an enslaved woman named Rachel Clark.",
           "sources": [
-            { "label": "White House Historical Association, \"The Enslaved Household of President John Quincy Adams\"", "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams", "quote": "On the day of her wedding, she filed manumission papers for an enslaved woman named Rachel Clark." },
-            { "label": "White House Historical Association, same article", "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams", "quote": "The 1820 census entry for John Quincy Adams' family included one enslaved girl under the age of fourteen." }
+            {
+              "label": "White House Historical Association, \"The Enslaved Household of President John Quincy Adams\"",
+              "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams",
+              "quote": "On the day of her wedding, she filed manumission papers for an enslaved woman named Rachel Clark."
+            },
+            {
+              "label": "White House Historical Association, same article",
+              "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams",
+              "quote": "The 1820 census entry for John Quincy Adams' family included one enslaved girl under the age of fourteen."
+            }
           ]
         },
         {
           "text": "After leaving the presidency, Adams served in the House from 1830 to 1848 and spent eight years fighting the gag rule that tabled antislavery petitions without debate.",
           "sources": [
-            { "label": "Miller Center, University of Virginia, \"John Quincy Adams: Life After the Presidency\"", "url": "https://millercenter.org/president/jqadams/life-after-the-presidency", "quote": "struggled for eight years to end the House's notorious 'gag rule,' which tabled without debate any petition critical of slavery" },
-            { "label": "White House Historical Association, \"The Enslaved Household of President John Quincy Adams\"", "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams", "quote": "his long fight against Congress' \"gag rule\" later earned him a reputation for personally opposing slavery" }
+            {
+              "label": "Miller Center, University of Virginia, \"John Quincy Adams: Life After the Presidency\"",
+              "url": "https://millercenter.org/president/jqadams/life-after-the-presidency",
+              "quote": "struggled for eight years to end the House's notorious 'gag rule,' which tabled without debate any petition critical of slavery"
+            },
+            {
+              "label": "White House Historical Association, \"The Enslaved Household of President John Quincy Adams\"",
+              "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams",
+              "quote": "his long fight against Congress' \"gag rule\" later earned him a reputation for personally opposing slavery"
+            }
           ]
         },
         {
           "text": "In 1841, at 73, Adams argued the Amistad case before the Supreme Court and won freedom for the Africans who had seized the ship; the Court held they had been illegally kidnapped and never lawfully enslaved.",
           "sources": [
-            { "label": "National Archives, \"The Amistad Case\"", "url": "https://www.archives.gov/education/lessons/amistad", "quote": "passionately and eloquently defended the Africans' right to freedom on both legal and moral grounds" },
-            { "label": "Miller Center, University of Virginia, \"John Quincy Adams: Life After the Presidency\"", "url": "https://millercenter.org/president/jqadams/life-after-the-presidency", "quote": "In 1841, Adams argued successfully before the U.S. Supreme Court to win freedom for slave mutineers aboard the Spanish ship Amistad." }
+            {
+              "label": "National Archives, \"The Amistad Case\"",
+              "url": "https://www.archives.gov/education/lessons/amistad",
+              "quote": "passionately and eloquently defended the Africans' right to freedom on both legal and moral grounds"
+            },
+            {
+              "label": "Miller Center, University of Virginia, \"John Quincy Adams: Life After the Presidency\"",
+              "url": "https://millercenter.org/president/jqadams/life-after-the-presidency",
+              "quote": "In 1841, Adams argued successfully before the U.S. Supreme Court to win freedom for slave mutineers aboard the Spanish ship Amistad."
+            }
           ]
         }
       ],
@@ -353,10 +711,30 @@
         "rights": "public_domain"
       },
       "sources": [
-        { "id": "whha-jqa-household", "label": "White House Historical Association, Lindsay M. Chervinsky and Callie Hopkins, \"The Enslaved Household of President John Quincy Adams\"", "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams", "quote": "there is considerable evidence to suggest that Adams relied on enslaved labor even during his White House years" },
-        { "id": "miller-jqa-after", "label": "Miller Center, University of Virginia, \"John Quincy Adams: Life After the Presidency\"", "url": "https://millercenter.org/president/jqadams/life-after-the-presidency", "quote": "attempted to read into the record at every opportunity the hundreds of antislavery petitions that abolitionists around the country sent him" },
-        { "id": "nara-amistad", "label": "National Archives, Educator Resources, \"The Amistad Case\"", "url": "https://www.archives.gov/education/lessons/amistad", "quote": "passionately and eloquently defended the Africans' right to freedom on both legal and moral grounds" },
-        { "id": "miller-presidents-slavery", "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"", "url": "https://millercenter.org/us-presidents-and-slavery", "quote": "one of the only US presidents not to own slaves" }
+        {
+          "id": "whha-jqa-household",
+          "label": "White House Historical Association, Lindsay M. Chervinsky and Callie Hopkins, \"The Enslaved Household of President John Quincy Adams\"",
+          "url": "https://www.whitehousehistory.org/the-enslaved-household-of-john-quincy-adams",
+          "quote": "there is considerable evidence to suggest that Adams relied on enslaved labor even during his White House years"
+        },
+        {
+          "id": "miller-jqa-after",
+          "label": "Miller Center, University of Virginia, \"John Quincy Adams: Life After the Presidency\"",
+          "url": "https://millercenter.org/president/jqadams/life-after-the-presidency",
+          "quote": "attempted to read into the record at every opportunity the hundreds of antislavery petitions that abolitionists around the country sent him"
+        },
+        {
+          "id": "nara-amistad",
+          "label": "National Archives, Educator Resources, \"The Amistad Case\"",
+          "url": "https://www.archives.gov/education/lessons/amistad",
+          "quote": "passionately and eloquently defended the Africans' right to freedom on both legal and moral grounds"
+        },
+        {
+          "id": "miller-presidents-slavery",
+          "label": "Miller Center, University of Virginia, \"U.S. presidents and slavery\"",
+          "url": "https://millercenter.org/us-presidents-and-slavery",
+          "quote": "one of the only US presidents not to own slaves"
+        }
       ],
       "disputes": [
         "Whether Adams's household used enslaved labor: the conventional account (and Adams's own 1832 statement) says he never suffered slavery in his family, while the White House Historical Association's research finds considerable evidence that enslaved people belonging to his wife's relatives lived and worked in his home, including at the White House. Both are recorded."

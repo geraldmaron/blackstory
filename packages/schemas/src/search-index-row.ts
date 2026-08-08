@@ -7,7 +7,10 @@
  * Shared by the web app's live Postgres readers and the ops release-artifact publisher so
  * both produce identical `PublicSearchProjectionDoc` values from the same rows.
  */
-import { publicSearchProjectionSchema, type PublicSearchProjectionDoc } from './public-projections.js';
+import {
+  publicSearchProjectionSchema,
+  type PublicSearchProjectionDoc,
+} from './public-projections.js';
 
 export type PublicSearchIndexRow = {
   readonly id: string;

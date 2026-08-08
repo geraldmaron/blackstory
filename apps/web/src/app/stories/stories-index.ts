@@ -247,7 +247,9 @@ export function buildPlaceGroups(items: readonly PublicArticleListItemDoc[]): re
 }
 
 /** Collections, for the rail: one entry per distinct series, ordered by size. */
-export function buildSeriesGroups(items: readonly PublicArticleListItemDoc[]): readonly RailEntry[] {
+export function buildSeriesGroups(
+  items: readonly PublicArticleListItemDoc[],
+): readonly RailEntry[] {
   const labels = new Map<string, string>();
   for (const item of items) {
     if (item.series) labels.set(item.series.id, item.series.label);
@@ -290,7 +292,12 @@ export function buildKindChips(
     items.filter((item) => (item.kind ?? 'chapter') === kind).length;
   const base = { ...query, page: 1 };
   return [
-    { label: 'All', href: storiesHref({ ...base, kind: '' }), count: items.length, active: query.kind === '' },
+    {
+      label: 'All',
+      href: storiesHref({ ...base, kind: '' }),
+      count: items.length,
+      active: query.kind === '',
+    },
     {
       label: 'Chapters',
       href: storiesHref({ ...base, kind: 'chapter' }),

@@ -112,8 +112,7 @@ export function createPostgresDataAccessReaders(
     { readonly value: SearchIndexList; readonly expiresAtMs: number }
   >();
   let activeReleaseMemo:
-    | { readonly value: ActiveReleaseResult; readonly expiresAtMs: number }
-    | undefined;
+    { readonly value: ActiveReleaseResult; readonly expiresAtMs: number } | undefined;
 
   function readReleaseCache<Value>(
     cache: Map<string, { readonly value: Value; readonly expiresAtMs: number }>,

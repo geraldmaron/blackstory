@@ -10,35 +10,71 @@
         {
           "text": "1870: Grant signed the ratified Fifteenth Amendment, calling it a measure of grander importance than any other act of its kind in U.S. history.",
           "sources": [
-            { "label": "Miller Center, Grant: Domestic Affairs", "url": "https://millercenter.org/president/grant/domestic-affairs", "quote": "a measure of grander importance than any other one act of the kind" }
+            {
+              "label": "Miller Center, Grant: Domestic Affairs",
+              "url": "https://millercenter.org/president/grant/domestic-affairs",
+              "quote": "a measure of grander importance than any other one act of the kind"
+            }
           ]
         },
         {
           "text": "Beginning 1870 and through April 1871, Grant signed the Enforcement Acts and the Ku Klux Klan Act, giving federal courts power over voting intimidation and conspiracies to deny equal protection.",
           "sources": [
-            { "label": "Miller Center, Grant: Domestic Affairs", "url": "https://millercenter.org/president/grant/domestic-affairs", "quote": "Beginning in 1870, Congress passed a series of laws known collectively as the Enforcement Acts to help protect the right to vote." },
-            { "label": "Federal Judicial Center, The South Carolina Ku Klux Klan Trials of 1871-1872", "url": "https://www.fjc.gov/history/spotlight-judicial-history/ku-klux-klan-trials-1871-1872", "quote": "The Enforcement Act of 1871 and the Ku Klux Klan Act of 1871 provided federal tools to prosecute violence against African Americans." }
+            {
+              "label": "Miller Center, Grant: Domestic Affairs",
+              "url": "https://millercenter.org/president/grant/domestic-affairs",
+              "quote": "Beginning in 1870, Congress passed a series of laws known collectively as the Enforcement Acts to help protect the right to vote."
+            },
+            {
+              "label": "Federal Judicial Center, The South Carolina Ku Klux Klan Trials of 1871-1872",
+              "url": "https://www.fjc.gov/history/spotlight-judicial-history/ku-klux-klan-trials-1871-1872",
+              "quote": "The Enforcement Act of 1871 and the Ku Klux Klan Act of 1871 provided federal tools to prosecute violence against African Americans."
+            }
           ]
         },
         {
           "text": "October 1871: Grant declared South Carolina upcountry counties in rebellion, suspended habeas corpus, and used troops; over 600 men were detained by year's end.",
           "sources": [
-            { "label": "Miller Center, Grant: Domestic Affairs", "url": "https://millercenter.org/president/grant/domestic-affairs", "quote": "In October 1871, he instituted martial law in nine counties in South Carolina and used federal troops to restore law and order in those areas." },
-            { "label": "Federal Judicial Center, South Carolina Ku Klux Klan Trials", "url": "https://www.fjc.gov/history/spotlight-judicial-history/ku-klux-klan-trials-1871-1872", "quote": "suspended the writ of habeas corpus throughout the area in October 1871" }
+            {
+              "label": "Miller Center, Grant: Domestic Affairs",
+              "url": "https://millercenter.org/president/grant/domestic-affairs",
+              "quote": "In October 1871, he instituted martial law in nine counties in South Carolina and used federal troops to restore law and order in those areas."
+            },
+            {
+              "label": "Federal Judicial Center, South Carolina Ku Klux Klan Trials",
+              "url": "https://www.fjc.gov/history/spotlight-judicial-history/ku-klux-klan-trials-1871-1872",
+              "quote": "suspended the writ of habeas corpus throughout the area in October 1871"
+            }
           ]
         },
         {
           "text": "1871–72: Federal prosecutors won 49 guilty pleas in the November 1871 term and convicted all eighteen men tried for conspiracy in the April term.",
           "sources": [
-            { "label": "Federal Judicial Center, South Carolina Ku Klux Klan Trials", "url": "https://www.fjc.gov/history/spotlight-judicial-history/ku-klux-klan-trials-1871-1872", "quote": "convictions of all eighteen men tried for conspiracy" },
-            { "label": "National Park Service, Reconstruction", "url": "https://www.nps.gov/articles/reconstruction.htm", "quote": "In 1871, the administration launched a legal and military offensive that destroyed the Klan." }
+            {
+              "label": "Federal Judicial Center, South Carolina Ku Klux Klan Trials",
+              "url": "https://www.fjc.gov/history/spotlight-judicial-history/ku-klux-klan-trials-1871-1872",
+              "quote": "convictions of all eighteen men tried for conspiracy"
+            },
+            {
+              "label": "National Park Service, Reconstruction",
+              "url": "https://www.nps.gov/articles/reconstruction.htm",
+              "quote": "In 1871, the administration launched a legal and military offensive that destroyed the Klan."
+            }
           ]
         },
         {
           "text": "March 1, 1875: Grant signed the Civil Rights Act guaranteeing access to inns, public transportation, theaters, and other places of amusement regardless of race.",
           "sources": [
-            { "label": "Federal Judicial Center, Civil Rights Act of 1875", "url": "https://www.fjc.gov/history/timeline/civil-rights-act-1875", "quote": "guaranteed universal access to inns, public transportation, theaters, and 'other places of amusement' regardless of race" },
-            { "label": "U.S. Reports: Civil Rights Cases, 109 U.S. 3 (1883), Library of Congress PDF", "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep109/usrep109003/usrep109003.pdf", "quote": "The 1st and 2d sections of the Civil Rights Act passed March 1st, 1875" }
+            {
+              "label": "Federal Judicial Center, Civil Rights Act of 1875",
+              "url": "https://www.fjc.gov/history/timeline/civil-rights-act-1875",
+              "quote": "guaranteed universal access to inns, public transportation, theaters, and 'other places of amusement' regardless of race"
+            },
+            {
+              "label": "U.S. Reports: Civil Rights Cases, 109 U.S. 3 (1883), Library of Congress PDF",
+              "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep109/usrep109003/usrep109003.pdf",
+              "quote": "The 1st and 2d sections of the Civil Rights Act passed March 1st, 1875"
+            }
           ]
         }
       ],
@@ -50,13 +86,48 @@
         "rights": "public_domain"
       },
       "sources": [
-        { "id": "miller-center-grant-domestic", "label": "Miller Center, University of Virginia — Ulysses S. Grant: Domestic Affairs", "url": "https://millercenter.org/president/grant/domestic-affairs", "quote": "Beginning in 1870, Congress passed a series of laws known collectively as the Enforcement Acts to help protect the right to vote." },
-        { "id": "fjc-sc-klan-trials", "label": "Federal Judicial Center — The South Carolina Ku Klux Klan Trials of 1871-1872", "url": "https://www.fjc.gov/history/spotlight-judicial-history/ku-klux-klan-trials-1871-1872", "quote": "dealt a powerful blow to the organization, stopped its campaign of terror, and ensured a fair election in 1872" },
-        { "id": "fjc-civil-rights-act-1875", "label": "Federal Judicial Center — Civil Rights Act of 1875", "url": "https://www.fjc.gov/history/timeline/civil-rights-act-1875", "quote": "Congress granted the U.S. district and circuit courts exclusive jurisdiction over cases regarding alleged violations of the act." },
-        { "id": "loc-usrep-109-3", "label": "U.S. Reports: Civil Rights Cases, 109 U.S. 3 (1883), Library of Congress", "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep109/usrep109003/usrep109003.pdf", "quote": "The 1st and 2d sections of the Civil Rights Act passed March 1st, 1875, are unconstitutional enactments as applied to the several States" },
-        { "id": "nps-reconstruction", "label": "National Park Service — Reconstruction", "url": "https://www.nps.gov/articles/reconstruction.htm", "quote": "In 1871, the administration launched a legal and military offensive that destroyed the Klan." },
-        { "id": "nps-william-jones", "label": "National Park Service — William Jones", "url": "https://www.nps.gov/people/william-jones.htm", "quote": "On March 29, 1859, Grant went to the St. Louis Courthouse and wrote a manumission paper legally freeing Jones from slavery." },
-        { "id": "jcwe-mystery-william-jones", "label": "Nick Sacco, \"The Mystery of William Jones, An Enslaved Man Owned by Ulysses S. Grant,\" Journal of the Civil War Era (Muster), Dec. 7, 2018", "url": "https://www.journalofthecivilwarera.org/2018/12/the-mystery-of-william-jones-an-enslaved-man-owned-by-ulysses-s-grant/", "quote": "That day Grant signed a manumission paper freeing William Jones, an enslaved African American man that he had previously acquired from his father-in-law" }
+        {
+          "id": "miller-center-grant-domestic",
+          "label": "Miller Center, University of Virginia — Ulysses S. Grant: Domestic Affairs",
+          "url": "https://millercenter.org/president/grant/domestic-affairs",
+          "quote": "Beginning in 1870, Congress passed a series of laws known collectively as the Enforcement Acts to help protect the right to vote."
+        },
+        {
+          "id": "fjc-sc-klan-trials",
+          "label": "Federal Judicial Center — The South Carolina Ku Klux Klan Trials of 1871-1872",
+          "url": "https://www.fjc.gov/history/spotlight-judicial-history/ku-klux-klan-trials-1871-1872",
+          "quote": "dealt a powerful blow to the organization, stopped its campaign of terror, and ensured a fair election in 1872"
+        },
+        {
+          "id": "fjc-civil-rights-act-1875",
+          "label": "Federal Judicial Center — Civil Rights Act of 1875",
+          "url": "https://www.fjc.gov/history/timeline/civil-rights-act-1875",
+          "quote": "Congress granted the U.S. district and circuit courts exclusive jurisdiction over cases regarding alleged violations of the act."
+        },
+        {
+          "id": "loc-usrep-109-3",
+          "label": "U.S. Reports: Civil Rights Cases, 109 U.S. 3 (1883), Library of Congress",
+          "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep109/usrep109003/usrep109003.pdf",
+          "quote": "The 1st and 2d sections of the Civil Rights Act passed March 1st, 1875, are unconstitutional enactments as applied to the several States"
+        },
+        {
+          "id": "nps-reconstruction",
+          "label": "National Park Service — Reconstruction",
+          "url": "https://www.nps.gov/articles/reconstruction.htm",
+          "quote": "In 1871, the administration launched a legal and military offensive that destroyed the Klan."
+        },
+        {
+          "id": "nps-william-jones",
+          "label": "National Park Service — William Jones",
+          "url": "https://www.nps.gov/people/william-jones.htm",
+          "quote": "On March 29, 1859, Grant went to the St. Louis Courthouse and wrote a manumission paper legally freeing Jones from slavery."
+        },
+        {
+          "id": "jcwe-mystery-william-jones",
+          "label": "Nick Sacco, \"The Mystery of William Jones, An Enslaved Man Owned by Ulysses S. Grant,\" Journal of the Civil War Era (Muster), Dec. 7, 2018",
+          "url": "https://www.journalofthecivilwarera.org/2018/12/the-mystery-of-william-jones-an-enslaved-man-owned-by-ulysses-s-grant/",
+          "quote": "That day Grant signed a manumission paper freeing William Jones, an enslaved African American man that he had previously acquired from his father-in-law"
+        }
       ],
       "disputes": [
         "How Grant came to own William Jones is unresolved. NPS states Grant \"purchased Jones from his father-in-law,\" while the Journal of the Civil War Era says only that Grant \"acquired\" him and lists as open questions whether he paid money or received Jones as a gift.",
@@ -77,34 +148,66 @@
         {
           "text": "March 5, 1877: In his inaugural address Hayes pledged a civil policy that would \"forever wipe out in our political affairs the color line.\"",
           "sources": [
-            { "label": "American Presidency Project, Hayes Inaugural Address, March 5, 1877", "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-38", "quote": "put forth my best efforts in behalf of a civil policy which will forever wipe out in our political affairs the color line" }
+            {
+              "label": "American Presidency Project, Hayes Inaugural Address, March 5, 1877",
+              "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-38",
+              "quote": "put forth my best efforts in behalf of a civil policy which will forever wipe out in our political affairs the color line"
+            }
           ]
         },
         {
           "text": "April 10, 1877: Federal troops left the South Carolina statehouse; Republican governor Chamberlain yielded and Wade Hampton took office April 11.",
           "sources": [
-            { "label": "Miller Center, Hayes: Key Events", "url": "https://millercenter.org/president/rutherford-b-hayes/key-events", "quote": "Troops depart the statehouse in South Carolina following a meeting at the White House with Daniel H. Chamberlain and Wade Hampton" },
-            { "label": "South Carolina Encyclopedia, Wade Hampton III", "url": "https://www.scencyclopedia.org/sce/entries/hampton-wade-iii/", "quote": "in April 1877, President Rutherford B. Hayes withdrew the soldiers and Hampton took office on April 11" }
+            {
+              "label": "Miller Center, Hayes: Key Events",
+              "url": "https://millercenter.org/president/rutherford-b-hayes/key-events",
+              "quote": "Troops depart the statehouse in South Carolina following a meeting at the White House with Daniel H. Chamberlain and Wade Hampton"
+            },
+            {
+              "label": "South Carolina Encyclopedia, Wade Hampton III",
+              "url": "https://www.scencyclopedia.org/sce/entries/hampton-wade-iii/",
+              "quote": "in April 1877, President Rutherford B. Hayes withdrew the soldiers and Hampton took office on April 11"
+            }
           ]
         },
         {
           "text": "April 24, 1877: Hayes withdrew soldiers from Louisiana; Republican governor Packard submitted, ending the last federally backed Reconstruction government.",
           "sources": [
-            { "label": "Miller Center, Hayes: Key Events", "url": "https://millercenter.org/president/rutherford-b-hayes/key-events", "quote": "As in South Carolina, Hayes officially withdraws soldiers from Louisiana." },
-            { "label": "Library of Congress, \"Louisiana—the withdrawal of the federal troops from the State House in New Orleans, at noon, on April 24th\"", "url": "https://www.loc.gov/item/93505869/", "quote": "the withdrawal of the federal troops from the State House in New Orleans, at noon, on April 24th" }
+            {
+              "label": "Miller Center, Hayes: Key Events",
+              "url": "https://millercenter.org/president/rutherford-b-hayes/key-events",
+              "quote": "As in South Carolina, Hayes officially withdraws soldiers from Louisiana."
+            },
+            {
+              "label": "Library of Congress, \"Louisiana—the withdrawal of the federal troops from the State House in New Orleans, at noon, on April 24th\"",
+              "url": "https://www.loc.gov/item/93505869/",
+              "quote": "the withdrawal of the federal troops from the State House in New Orleans, at noon, on April 24th"
+            }
           ]
         },
         {
           "text": "1878: Hayes recorded in his diary that Southern Democrats had broken their pledges, citing \"violence of the most atrocious character\" in that year's elections.",
           "sources": [
-            { "label": "Miller Center, Hayes: Domestic Affairs", "url": "https://millercenter.org/president/hayes/domestic-affairs", "quote": "violence of the most atrocious character" }
+            {
+              "label": "Miller Center, Hayes: Domestic Affairs",
+              "url": "https://millercenter.org/president/hayes/domestic-affairs",
+              "quote": "violence of the most atrocious character"
+            }
           ]
         },
         {
           "text": "After 1877: Black Southerners were disfranchised by poll taxes, literacy tests, intimidation, and violence over the following two decades.",
           "sources": [
-            { "label": "Miller Center, Hayes: Domestic Affairs", "url": "https://millercenter.org/president/hayes/domestic-affairs", "quote": "Over the next two decades, southern blacks were systematically disfranchised through poll taxes, literacy tests, intimidation, and violence until virtually none could vote." },
-            { "label": "National Park Service, Reconstruction", "url": "https://www.nps.gov/articles/reconstruction.htm", "quote": "Reconstruction, defined as an era when the federal government accepted the responsibility for protecting the rights of the former slaves, came to an end" }
+            {
+              "label": "Miller Center, Hayes: Domestic Affairs",
+              "url": "https://millercenter.org/president/hayes/domestic-affairs",
+              "quote": "Over the next two decades, southern blacks were systematically disfranchised through poll taxes, literacy tests, intimidation, and violence until virtually none could vote."
+            },
+            {
+              "label": "National Park Service, Reconstruction",
+              "url": "https://www.nps.gov/articles/reconstruction.htm",
+              "quote": "Reconstruction, defined as an era when the federal government accepted the responsibility for protecting the rights of the former slaves, came to an end"
+            }
           ]
         }
       ],
@@ -115,12 +218,42 @@
         "rights": "public_domain"
       },
       "sources": [
-        { "id": "ucsb-hayes-inaugural-1877", "label": "American Presidency Project (UC Santa Barbara) — Rutherford B. Hayes, Inaugural Address, March 5, 1877", "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-38", "quote": "only a local government which recognizes and maintains inviolate the rights of all is a true self-government" },
-        { "id": "miller-center-hayes-key-events", "label": "Miller Center — Rutherford B. Hayes: Key Events", "url": "https://millercenter.org/president/rutherford-b-hayes/key-events", "quote": "Troops depart the statehouse in South Carolina following a meeting at the White House with Daniel H. Chamberlain and Wade Hampton" },
-        { "id": "miller-center-hayes-domestic", "label": "Miller Center — Rutherford B. Hayes: Domestic Affairs", "url": "https://millercenter.org/president/hayes/domestic-affairs", "quote": "Over the next two decades, southern blacks were systematically disfranchised through poll taxes, literacy tests, intimidation, and violence until virtually none could vote." },
-        { "id": "sc-encyclopedia-hampton", "label": "South Carolina Encyclopedia (Univ. of South Carolina Institute for Southern Studies) — Hampton, Wade III", "url": "https://www.scencyclopedia.org/sce/entries/hampton-wade-iii/", "quote": "President Rutherford B. Hayes withdrew the soldiers and Hampton took office on April 11, effectively bringing Reconstruction in the state to an end" },
-        { "id": "loc-nola-troop-withdrawal-1877", "label": "Library of Congress — \"Louisiana—the withdrawal of the federal troops from the State House in New Orleans, at noon, on April 24th\" (Frank Leslie's, 1877)", "url": "https://www.loc.gov/item/93505869/", "quote": "the withdrawal of the federal troops from the State House in New Orleans, at noon, on April 24th" },
-        { "id": "nps-reconstruction-hayes", "label": "National Park Service — Reconstruction", "url": "https://www.nps.gov/articles/reconstruction.htm", "quote": "Hayes was inaugurated, federal troops returned to their barracks, and Reconstruction ... came to an end" }
+        {
+          "id": "ucsb-hayes-inaugural-1877",
+          "label": "American Presidency Project (UC Santa Barbara) — Rutherford B. Hayes, Inaugural Address, March 5, 1877",
+          "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-38",
+          "quote": "only a local government which recognizes and maintains inviolate the rights of all is a true self-government"
+        },
+        {
+          "id": "miller-center-hayes-key-events",
+          "label": "Miller Center — Rutherford B. Hayes: Key Events",
+          "url": "https://millercenter.org/president/rutherford-b-hayes/key-events",
+          "quote": "Troops depart the statehouse in South Carolina following a meeting at the White House with Daniel H. Chamberlain and Wade Hampton"
+        },
+        {
+          "id": "miller-center-hayes-domestic",
+          "label": "Miller Center — Rutherford B. Hayes: Domestic Affairs",
+          "url": "https://millercenter.org/president/hayes/domestic-affairs",
+          "quote": "Over the next two decades, southern blacks were systematically disfranchised through poll taxes, literacy tests, intimidation, and violence until virtually none could vote."
+        },
+        {
+          "id": "sc-encyclopedia-hampton",
+          "label": "South Carolina Encyclopedia (Univ. of South Carolina Institute for Southern Studies) — Hampton, Wade III",
+          "url": "https://www.scencyclopedia.org/sce/entries/hampton-wade-iii/",
+          "quote": "President Rutherford B. Hayes withdrew the soldiers and Hampton took office on April 11, effectively bringing Reconstruction in the state to an end"
+        },
+        {
+          "id": "loc-nola-troop-withdrawal-1877",
+          "label": "Library of Congress — \"Louisiana—the withdrawal of the federal troops from the State House in New Orleans, at noon, on April 24th\" (Frank Leslie's, 1877)",
+          "url": "https://www.loc.gov/item/93505869/",
+          "quote": "the withdrawal of the federal troops from the State House in New Orleans, at noon, on April 24th"
+        },
+        {
+          "id": "nps-reconstruction-hayes",
+          "label": "National Park Service — Reconstruction",
+          "url": "https://www.nps.gov/articles/reconstruction.htm",
+          "quote": "Hayes was inaugurated, federal troops returned to their barracks, and Reconstruction ... came to an end"
+        }
       ],
       "disputes": [
         "Sources differ on whether Hayes's withdrawal was the cause or the ratification of Reconstruction's end. Miller Center notes Reconstruction had already ended everywhere except Louisiana and South Carolina before Hayes took office; NPS frames the 1877 withdrawal itself as the end of the era."
@@ -140,26 +273,46 @@
         {
           "text": "March 4, 1881: Garfield's inaugural called Black emancipation and citizenship \"the most important political change we have known since the adoption of the Constitution of 1787.\"",
           "sources": [
-            { "label": "American Presidency Project, Garfield Inaugural Address", "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-39", "quote": "The elevation of the negro race from slavery to the full rights of citizenship is the most important political change we have known since the adoption of the Constitution of 1787." },
-            { "label": "Miller Center, March 4, 1881: Inaugural Address", "url": "https://millercenter.org/the-presidency/presidential-speeches/march-4-1881-inaugural-address", "quote": "Inaugural Address, March 4, 1881" }
+            {
+              "label": "American Presidency Project, Garfield Inaugural Address",
+              "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-39",
+              "quote": "The elevation of the negro race from slavery to the full rights of citizenship is the most important political change we have known since the adoption of the Constitution of 1787."
+            },
+            {
+              "label": "Miller Center, March 4, 1881: Inaugural Address",
+              "url": "https://millercenter.org/the-presidency/presidential-speeches/march-4-1881-inaugural-address",
+              "quote": "Inaugural Address, March 4, 1881"
+            }
           ]
         },
         {
           "text": "March 4, 1881: On suffrage, Garfield said violating \"the freedom and sanctities of the suffrage\" is \"a crime which, if persisted in, will destroy the Government itself.\"",
           "sources": [
-            { "label": "American Presidency Project, Garfield Inaugural Address", "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-39", "quote": "to violate the freedom and sanctities of the suffrage is more than an evil. It is a crime which, if persisted in, will destroy the Government itself." }
+            {
+              "label": "American Presidency Project, Garfield Inaugural Address",
+              "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-39",
+              "quote": "to violate the freedom and sanctities of the suffrage is more than an evil. It is a crime which, if persisted in, will destroy the Government itself."
+            }
           ]
         },
         {
           "text": "March 4, 1881: Garfield linked Black citizenship to education, warning the census showed \"how dangerously high the tide of illiteracy has risen among our voters and their children.\"",
           "sources": [
-            { "label": "American Presidency Project, Garfield Inaugural Address", "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-39", "quote": "The census has already sounded the alarm in the appalling figures which mark how dangerously high the tide of illiteracy has risen among our voters and their children." }
+            {
+              "label": "American Presidency Project, Garfield Inaugural Address",
+              "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-39",
+              "quote": "The census has already sounded the alarm in the appalling figures which mark how dangerously high the tide of illiteracy has risen among our voters and their children."
+            }
           ]
         },
         {
           "text": "July–September 1881: Garfield was shot roughly four months into his term and died, leaving his domestic program unenacted.",
           "sources": [
-            { "label": "Miller Center, Garfield: Domestic Affairs", "url": "https://millercenter.org/president/garfield/domestic-affairs", "quote": "struck down by an assassin's bullet just one hundred days after his inauguration" }
+            {
+              "label": "Miller Center, Garfield: Domestic Affairs",
+              "url": "https://millercenter.org/president/garfield/domestic-affairs",
+              "quote": "struck down by an assassin's bullet just one hundred days after his inauguration"
+            }
           ]
         }
       ],
@@ -170,9 +323,24 @@
         "rights": "public_domain"
       },
       "sources": [
-        { "id": "ucsb-garfield-inaugural-1881", "label": "American Presidency Project (UC Santa Barbara) — James A. Garfield, Inaugural Address, March 4, 1881", "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-39", "quote": "The elevation of the negro race from slavery to the full rights of citizenship is the most important political change we have known since the adoption of the Constitution of 1787." },
-        { "id": "miller-center-garfield-inaugural", "label": "Miller Center — March 4, 1881: Inaugural Address", "url": "https://millercenter.org/the-presidency/presidential-speeches/march-4-1881-inaugural-address", "quote": "March 4, 1881: Inaugural Address" },
-        { "id": "miller-center-garfield-domestic", "label": "Miller Center — James A. Garfield: Domestic Affairs", "url": "https://millercenter.org/president/garfield/domestic-affairs", "quote": "struck down by an assassin's bullet just one hundred days after his inauguration" }
+        {
+          "id": "ucsb-garfield-inaugural-1881",
+          "label": "American Presidency Project (UC Santa Barbara) — James A. Garfield, Inaugural Address, March 4, 1881",
+          "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-39",
+          "quote": "The elevation of the negro race from slavery to the full rights of citizenship is the most important political change we have known since the adoption of the Constitution of 1787."
+        },
+        {
+          "id": "miller-center-garfield-inaugural",
+          "label": "Miller Center — March 4, 1881: Inaugural Address",
+          "url": "https://millercenter.org/the-presidency/presidential-speeches/march-4-1881-inaugural-address",
+          "quote": "March 4, 1881: Inaugural Address"
+        },
+        {
+          "id": "miller-center-garfield-domestic",
+          "label": "Miller Center — James A. Garfield: Domestic Affairs",
+          "url": "https://millercenter.org/president/garfield/domestic-affairs",
+          "quote": "struck down by an assassin's bullet just one hundred days after his inauguration"
+        }
       ],
       "disputes": [],
       "unverified": [
@@ -190,34 +358,66 @@
         {
           "text": "October 15, 1883: The Supreme Court held sections 1 and 2 of the Civil Rights Act of 1875 unconstitutional as applied to the states, not authorized by the 13th or 14th Amendments.",
           "sources": [
-            { "label": "U.S. Reports: Civil Rights Cases, 109 U.S. 3 (1883), Library of Congress PDF", "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep109/usrep109003/usrep109003.pdf", "quote": "are unconstitutional enactments as applied to the several States, not being authorized either by the XIIIth or XIVth Amendments of the Constitution." },
-            { "label": "Federal Judicial Center, Civil Rights Act of 1875", "url": "https://www.fjc.gov/history/timeline/civil-rights-act-1875", "quote": "the act was unconstitutional because the Fourteenth Amendment applied only to state, and not to private, action" }
+            {
+              "label": "U.S. Reports: Civil Rights Cases, 109 U.S. 3 (1883), Library of Congress PDF",
+              "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep109/usrep109003/usrep109003.pdf",
+              "quote": "are unconstitutional enactments as applied to the several States, not being authorized either by the XIIIth or XIVth Amendments of the Constitution."
+            },
+            {
+              "label": "Federal Judicial Center, Civil Rights Act of 1875",
+              "url": "https://www.fjc.gov/history/timeline/civil-rights-act-1875",
+              "quote": "the act was unconstitutional because the Fourteenth Amendment applied only to state, and not to private, action"
+            }
           ]
         },
         {
           "text": "October 15, 1883: Justice Harlan dissented alone, saying the Court held \"erroneously\" that Congress lacked power under the Thirteenth or Fourteenth Amendment.",
           "sources": [
-            { "label": "U.S. Reports: Civil Rights Cases, 109 U.S. 3 (1883), Harlan dissent", "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep109/usrep109003/usrep109003.pdf", "quote": "The court adjudges, I think erroneously, that Congress is without power, under either the Thirteenth or Fourteenth Amendment, to establish such regulations" }
+            {
+              "label": "U.S. Reports: Civil Rights Cases, 109 U.S. 3 (1883), Harlan dissent",
+              "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep109/usrep109003/usrep109003.pdf",
+              "quote": "The court adjudges, I think erroneously, that Congress is without power, under either the Thirteenth or Fourteenth Amendment, to establish such regulations"
+            }
           ]
         },
         {
           "text": "December 4, 1883: In his third annual message Arthur told Congress that replacement civil rights legislation \"will receive my unhesitating approval.\"",
           "sources": [
-            { "label": "American Presidency Project, Arthur Third Annual Message", "url": "https://www.presidency.ucsb.edu/documents/third-annual-message-13", "quote": "Certain statutory provisions intended to secure the enforcement of those rights have been recently declared unconstitutional by the Supreme Court." },
-            { "label": "American Presidency Project, Arthur Third Annual Message", "url": "https://www.presidency.ucsb.edu/documents/third-annual-message-13", "quote": "Any legislation whereby Congress may lawfully supplement the guaranties which the Constitution affords ... will receive my unhesitating approval." }
+            {
+              "label": "American Presidency Project, Arthur Third Annual Message",
+              "url": "https://www.presidency.ucsb.edu/documents/third-annual-message-13",
+              "quote": "Certain statutory provisions intended to secure the enforcement of those rights have been recently declared unconstitutional by the Supreme Court."
+            },
+            {
+              "label": "American Presidency Project, Arthur Third Annual Message",
+              "url": "https://www.presidency.ucsb.edu/documents/third-annual-message-13",
+              "quote": "Any legislation whereby Congress may lawfully supplement the guaranties which the Constitution affords ... will receive my unhesitating approval."
+            }
           ]
         },
         {
           "text": "1881–1883: Virginia's biracial Readjuster coalition elected Black officeholders and, with Mahone caucusing with Senate Republicans from 1881, controlled state patronage.",
           "sources": [
-            { "label": "Encyclopedia Virginia, The Readjuster Party", "url": "https://encyclopediavirginia.org/entries/readjuster-party-the/", "quote": "African Americans held party offices and won election to the General Assembly and to local offices as Readjusters." },
-            { "label": "Encyclopedia Virginia, William Mahone (1826–1895)", "url": "https://encyclopediavirginia.org/entries/mahone-william-1826-1895/", "quote": "Elected to a tightly divided U.S. Senate in 1881, he caucused with the national Republican Party, giving it the majority and allowing Mahone to dispense patronage positions in Virginia." }
+            {
+              "label": "Encyclopedia Virginia, The Readjuster Party",
+              "url": "https://encyclopediavirginia.org/entries/readjuster-party-the/",
+              "quote": "African Americans held party offices and won election to the General Assembly and to local offices as Readjusters."
+            },
+            {
+              "label": "Encyclopedia Virginia, William Mahone (1826–1895)",
+              "url": "https://encyclopediavirginia.org/entries/mahone-william-1826-1895/",
+              "quote": "Elected to a tightly divided U.S. Senate in 1881, he caucused with the national Republican Party, giving it the majority and allowing Mahone to dispense patronage positions in Virginia."
+            }
           ]
         },
         {
           "text": "1879–1883: Readjuster rule abolished Virginia's poll tax as a voting prerequisite, more than doubled public school funding, and founded what became Virginia State University.",
           "sources": [
-            { "label": "Encyclopedia Virginia, The Readjuster Party", "url": "https://encyclopediavirginia.org/entries/readjuster-party-the/", "quote": "eliminating the poll tax as a voting prerequisite ... more than doubled the funding for public schools" }
+            {
+              "label": "Encyclopedia Virginia, The Readjuster Party",
+              "url": "https://encyclopediavirginia.org/entries/readjuster-party-the/",
+              "quote": "eliminating the poll tax as a voting prerequisite ... more than doubled the funding for public schools"
+            }
           ]
         }
       ],
@@ -228,12 +428,42 @@
         "rights": "public_domain"
       },
       "sources": [
-        { "id": "loc-usrep-109-3-arthur", "label": "U.S. Reports: Civil Rights Cases, 109 U.S. 3 (1883), Library of Congress", "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep109/usrep109003/usrep109003.pdf", "quote": "Submitted October Term, 1882.—Decided October 15th, 1883." },
-        { "id": "fjc-civil-rights-cases-1883", "label": "Federal Judicial Center — Civil Rights Act of 1875", "url": "https://www.fjc.gov/history/timeline/civil-rights-act-1875", "quote": "the act was unconstitutional because the Fourteenth Amendment applied only to state, and not to private, action" },
-        { "id": "ucsb-arthur-third-annual-1883", "label": "American Presidency Project (UC Santa Barbara) — Chester A. Arthur, Third Annual Message, December 4, 1883", "url": "https://www.presidency.ucsb.edu/documents/third-annual-message-13", "quote": "Any legislation whereby Congress may lawfully supplement the guaranties which the Constitution affords ... will receive my unhesitating approval." },
-        { "id": "encyclopedia-virginia-readjusters", "label": "Encyclopedia Virginia (Virginia Humanities) — The Readjuster Party", "url": "https://encyclopediavirginia.org/entries/readjuster-party-the/", "quote": "African Americans held party offices and won election to the General Assembly and to local offices as Readjusters." },
-        { "id": "encyclopedia-virginia-mahone", "label": "Encyclopedia Virginia (Virginia Humanities) — William Mahone (1826–1895)", "url": "https://encyclopediavirginia.org/entries/mahone-william-1826-1895/", "quote": "One of the most successful biracial political coalitions in the New South" },
-        { "id": "house-baic-temporary-farewell-1883", "label": "U.S. House of Representatives, History, Art & Archives — Black Americans in Congress, \"Toward a Temporary Farewell\"", "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/", "quote": "In 1883, the Supreme Court struck down the provisions in the law prohibiting discrimination by private businesses" }
+        {
+          "id": "loc-usrep-109-3-arthur",
+          "label": "U.S. Reports: Civil Rights Cases, 109 U.S. 3 (1883), Library of Congress",
+          "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep109/usrep109003/usrep109003.pdf",
+          "quote": "Submitted October Term, 1882.—Decided October 15th, 1883."
+        },
+        {
+          "id": "fjc-civil-rights-cases-1883",
+          "label": "Federal Judicial Center — Civil Rights Act of 1875",
+          "url": "https://www.fjc.gov/history/timeline/civil-rights-act-1875",
+          "quote": "the act was unconstitutional because the Fourteenth Amendment applied only to state, and not to private, action"
+        },
+        {
+          "id": "ucsb-arthur-third-annual-1883",
+          "label": "American Presidency Project (UC Santa Barbara) — Chester A. Arthur, Third Annual Message, December 4, 1883",
+          "url": "https://www.presidency.ucsb.edu/documents/third-annual-message-13",
+          "quote": "Any legislation whereby Congress may lawfully supplement the guaranties which the Constitution affords ... will receive my unhesitating approval."
+        },
+        {
+          "id": "encyclopedia-virginia-readjusters",
+          "label": "Encyclopedia Virginia (Virginia Humanities) — The Readjuster Party",
+          "url": "https://encyclopediavirginia.org/entries/readjuster-party-the/",
+          "quote": "African Americans held party offices and won election to the General Assembly and to local offices as Readjusters."
+        },
+        {
+          "id": "encyclopedia-virginia-mahone",
+          "label": "Encyclopedia Virginia (Virginia Humanities) — William Mahone (1826–1895)",
+          "url": "https://encyclopediavirginia.org/entries/mahone-william-1826-1895/",
+          "quote": "One of the most successful biracial political coalitions in the New South"
+        },
+        {
+          "id": "house-baic-temporary-farewell-1883",
+          "label": "U.S. House of Representatives, History, Art & Archives — Black Americans in Congress, \"Toward a Temporary Farewell\"",
+          "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/",
+          "quote": "In 1883, the Supreme Court struck down the provisions in the law prohibiting discrimination by private businesses"
+        }
       ],
       "disputes": [
         "Sources differ on Arthur's degree of engagement. The American Presidency Project text shows him formally inviting replacement legislation in December 1883; Miller Center's Arthur domestic-affairs essay does not mention the Civil Rights Cases or Black Americans at all, and no fetched source shows Arthur pressing Congress after the message.",
@@ -254,26 +484,46 @@
         {
           "text": "1885–1889: Cleveland courted white Southern Democrats and former Confederates and, per Miller Center, was reluctant to treat African Americans as social and political equals.",
           "sources": [
-            { "label": "Miller Center, Cleveland: Domestic Affairs", "url": "https://millercenter.org/president/cleveland/domestic-affairs", "quote": "he agreed with white southerners in their reluctance to treat African Americans as social and political equals" },
-            { "label": "Miller Center, Cleveland: Domestic Affairs", "url": "https://millercenter.org/president/cleveland/domestic-affairs", "quote": "He also opposed integrated schools in New York and saw African Americans as essentially inferior." }
+            {
+              "label": "Miller Center, Cleveland: Domestic Affairs",
+              "url": "https://millercenter.org/president/cleveland/domestic-affairs",
+              "quote": "he agreed with white southerners in their reluctance to treat African Americans as social and political equals"
+            },
+            {
+              "label": "Miller Center, Cleveland: Domestic Affairs",
+              "url": "https://millercenter.org/president/cleveland/domestic-affairs",
+              "quote": "He also opposed integrated schools in New York and saw African Americans as essentially inferior."
+            }
           ]
         },
         {
           "text": "March 11, 1887: Cleveland commissioned Charles Henry James Taylor, an African American, as Minister Resident/Consul General to Liberia during a Senate recess; Taylor left the post after September 22, 1887.",
           "sources": [
-            { "label": "U.S. Department of State, Office of the Historian — Charles Henry James Taylor", "url": "https://history.state.gov/departmenthistory/people/taylor-charles-henry-james", "quote": "Appointment: March 11, 1887 ... Presentation of Credentials: June 4, 1887 ... Left post soon after September 22, 1887" }
+            {
+              "label": "U.S. Department of State, Office of the Historian — Charles Henry James Taylor",
+              "url": "https://history.state.gov/departmenthistory/people/taylor-charles-henry-james",
+              "quote": "Appointment: March 11, 1887 ... Presentation of Credentials: June 4, 1887 ... Left post soon after September 22, 1887"
+            }
           ]
         },
         {
           "text": "1894: The Democratically controlled 53rd Congress, with Cleveland in the White House, repealed the remaining federal elections protections enacted during Reconstruction.",
           "sources": [
-            { "label": "U.S. House of Representatives, History, Art & Archives, Black Americans in Congress", "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/", "quote": "When the Democratically controlled 53rd Congress (1893–1895) repealed the remaining federal elections protections in 1894" }
+            {
+              "label": "U.S. House of Representatives, History, Art & Archives, Black Americans in Congress",
+              "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/",
+              "quote": "When the Democratically controlled 53rd Congress (1893–1895) repealed the remaining federal elections protections in 1894"
+            }
           ]
         },
         {
           "text": "1889–1890: The Blair education bill, which would have sent most federal school aid to Southern states with anti-discrimination oversight, was reintroduced and defeated in a Congress preoccupied with tariff and election fights.",
           "sources": [
-            { "label": "U.S. House of Representatives, History, Art & Archives, Black Americans in Congress", "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/", "quote": "In 1889, Senator Henry William Blair of New Hampshire reintroduced an education bill that he had first proposed in 1881." }
+            {
+              "label": "U.S. House of Representatives, History, Art & Archives, Black Americans in Congress",
+              "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/",
+              "quote": "In 1889, Senator Henry William Blair of New Hampshire reintroduced an education bill that he had first proposed in 1881."
+            }
           ]
         }
       ],
@@ -284,11 +534,36 @@
         "rights": "public_domain"
       },
       "sources": [
-        { "id": "miller-center-cleveland-domestic", "label": "Miller Center — Grover Cleveland: Domestic Affairs", "url": "https://millercenter.org/president/cleveland/domestic-affairs", "quote": "made special efforts to reach out to Democrats and former Confederates in the South to assure them that they had a friend in the White House" },
-        { "id": "state-historian-chj-taylor", "label": "U.S. Department of State, Office of the Historian — Charles Henry James Taylor, Minister Resident/Consul General to Liberia", "url": "https://history.state.gov/departmenthistory/people/taylor-charles-henry-james", "quote": "commissioned during a recess of the Senate" },
-        { "id": "house-baic-1894-repeal", "label": "U.S. House of Representatives, History, Art & Archives — Black Americans in Congress, \"Toward a Temporary Farewell\"", "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/", "quote": "the Democratically controlled 53rd Congress (1893–1895) repealed the remaining federal elections protections in 1894" },
-        { "id": "house-baic-blair-bill", "label": "U.S. House of Representatives, History, Art & Archives — Black Americans in Congress, on the Blair education bill", "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/", "quote": "the Blair bill did not prohibit segregated schools. In fact, it allowed for separate schools so long as funding was equal." },
-        { "id": "miller-center-cleveland-franchise", "label": "Miller Center — Grover Cleveland: The American Franchise", "url": "https://millercenter.org/president/cleveland/the-american-franchise", "quote": "In the South, state constitutions, registration laws, literacy tests, and poll taxes disfranchised many African Americans" }
+        {
+          "id": "miller-center-cleveland-domestic",
+          "label": "Miller Center — Grover Cleveland: Domestic Affairs",
+          "url": "https://millercenter.org/president/cleveland/domestic-affairs",
+          "quote": "made special efforts to reach out to Democrats and former Confederates in the South to assure them that they had a friend in the White House"
+        },
+        {
+          "id": "state-historian-chj-taylor",
+          "label": "U.S. Department of State, Office of the Historian — Charles Henry James Taylor, Minister Resident/Consul General to Liberia",
+          "url": "https://history.state.gov/departmenthistory/people/taylor-charles-henry-james",
+          "quote": "commissioned during a recess of the Senate"
+        },
+        {
+          "id": "house-baic-1894-repeal",
+          "label": "U.S. House of Representatives, History, Art & Archives — Black Americans in Congress, \"Toward a Temporary Farewell\"",
+          "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/",
+          "quote": "the Democratically controlled 53rd Congress (1893–1895) repealed the remaining federal elections protections in 1894"
+        },
+        {
+          "id": "house-baic-blair-bill",
+          "label": "U.S. House of Representatives, History, Art & Archives — Black Americans in Congress, on the Blair education bill",
+          "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/",
+          "quote": "the Blair bill did not prohibit segregated schools. In fact, it allowed for separate schools so long as funding was equal."
+        },
+        {
+          "id": "miller-center-cleveland-franchise",
+          "label": "Miller Center — Grover Cleveland: The American Franchise",
+          "url": "https://millercenter.org/president/cleveland/the-american-franchise",
+          "quote": "In the South, state constitutions, registration laws, literacy tests, and poll taxes disfranchised many African Americans"
+        }
       ],
       "disputes": [
         "Whether Cleveland personally drove the 1894 repeal of the federal elections laws is contested and NOT resolved here. The House historical essay attributes the repeal to the 53rd Congress without naming Cleveland; no fetched institutional source documents his signature date or lobbying.",
@@ -310,33 +585,61 @@
         {
           "text": "December 3, 1889: Harrison's first annual message said that where \"the colored population is large the people of that race are by various devices deprived of any effective exercise of their political rights.\"",
           "sources": [
-            { "label": "Miller Center, December 3, 1889: First Annual Message", "url": "https://millercenter.org/the-presidency/presidential-speeches/december-3-1889-first-annual-message", "quote": "in many parts of our country where the colored population is large the people of that race are by various devices deprived of any effective exercise of their political rights" }
+            {
+              "label": "Miller Center, December 3, 1889: First Annual Message",
+              "url": "https://millercenter.org/the-presidency/presidential-speeches/december-3-1889-first-annual-message",
+              "quote": "in many parts of our country where the colored population is large the people of that race are by various devices deprived of any effective exercise of their political rights"
+            }
           ]
         },
         {
           "text": "December 3, 1889: He asserted federal authority over House elections: \"The power to take the whole direction and control of the election of members of the House of Representatives is clearly given to the General Government.\"",
           "sources": [
-            { "label": "Miller Center, December 3, 1889: First Annual Message", "url": "https://millercenter.org/the-presidency/presidential-speeches/december-3-1889-first-annual-message", "quote": "The power to take the whole direction and control of the election of members of the House of Representatives is clearly given to the General Government." }
+            {
+              "label": "Miller Center, December 3, 1889: First Annual Message",
+              "url": "https://millercenter.org/the-presidency/presidential-speeches/december-3-1889-first-annual-message",
+              "quote": "The power to take the whole direction and control of the election of members of the House of Representatives is clearly given to the General Government."
+            }
           ]
         },
         {
           "text": "June 14, 1890: Lodge introduced the federal elections bill allowing constituents to petition a federal judge and letting the government appoint election supervisors; it barely passed the House and died in the Senate.",
           "sources": [
-            { "label": "U.S. House of Representatives, History, Art & Archives, Black Americans in Congress", "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/", "quote": "On June 14, 1890, Representative Henry Cabot Lodge of Massachusetts introduced a new federal elections bill in the House." },
-            { "label": "U.S. House of Representatives, History, Art & Archives, Black Americans in Congress", "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/", "quote": "the bill barely passed the House and then languished and died in the Senate" }
+            {
+              "label": "U.S. House of Representatives, History, Art & Archives, Black Americans in Congress",
+              "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/",
+              "quote": "On June 14, 1890, Representative Henry Cabot Lodge of Massachusetts introduced a new federal elections bill in the House."
+            },
+            {
+              "label": "U.S. House of Representatives, History, Art & Archives, Black Americans in Congress",
+              "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/",
+              "quote": "the bill barely passed the House and then languished and died in the Senate"
+            }
           ]
         },
         {
           "text": "Harrison lobbied for the Lodge elections bill, the Blair education bill, and the Land Revision Act; only the Land Revision Act reached his desk.",
           "sources": [
-            { "label": "Miller Center, Benjamin Harrison: Domestic Affairs", "url": "https://millercenter.org/president/bharrison/domestic-affairs", "quote": "Although Harrison supported all three measures with vigorous presidential lobbying, only the Land Revision Act passed through Congress for his signature." },
-            { "label": "U.S. House of Representatives, History, Art & Archives", "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/", "quote": "the 51st Congress was ineffective at passing legislation important to Black Americans" }
+            {
+              "label": "Miller Center, Benjamin Harrison: Domestic Affairs",
+              "url": "https://millercenter.org/president/bharrison/domestic-affairs",
+              "quote": "Although Harrison supported all three measures with vigorous presidential lobbying, only the Land Revision Act passed through Congress for his signature."
+            },
+            {
+              "label": "U.S. House of Representatives, History, Art & Archives",
+              "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/",
+              "quote": "the 51st Congress was ineffective at passing legislation important to Black Americans"
+            }
           ]
         },
         {
           "text": "December 6, 1892: Harrison's fourth annual message told Congress \"The frequent lynching of colored people accused of crime is without the excuse\" and called such acts a reproach.",
           "sources": [
-            { "label": "Miller Center, December 6, 1892: Fourth Annual Message", "url": "https://millercenter.org/the-presidency/presidential-speeches/december-6-1892-fourth-annual-message", "quote": "The frequent lynching of colored people accused of crime is without the excuse... Such acts are a reproach to the community where they occur." }
+            {
+              "label": "Miller Center, December 6, 1892: Fourth Annual Message",
+              "url": "https://millercenter.org/the-presidency/presidential-speeches/december-6-1892-fourth-annual-message",
+              "quote": "The frequent lynching of colored people accused of crime is without the excuse... Such acts are a reproach to the community where they occur."
+            }
           ]
         }
       ],
@@ -347,11 +650,36 @@
         "rights": "public_domain"
       },
       "sources": [
-        { "id": "miller-center-harrison-1889-message", "label": "Miller Center — Benjamin Harrison, First Annual Message, December 3, 1889", "url": "https://millercenter.org/the-presidency/presidential-speeches/december-3-1889-first-annual-message", "quote": "in many parts of our country where the colored population is large the people of that race are by various devices deprived of any effective exercise of their political rights" },
-        { "id": "miller-center-harrison-1892-message", "label": "Miller Center — Benjamin Harrison, Fourth Annual Message, December 6, 1892", "url": "https://millercenter.org/the-presidency/presidential-speeches/december-6-1892-fourth-annual-message", "quote": "The frequent lynching of colored people accused of crime is without the excuse" },
-        { "id": "miller-center-harrison-domestic", "label": "Miller Center — Benjamin Harrison: Domestic Affairs", "url": "https://millercenter.org/president/bharrison/domestic-affairs", "quote": "the so-called Force Bill attempted to establish federal supervision of congressional elections as a means of preventing the disfranchisement of southern blacks" },
-        { "id": "house-baic-lodge-bill", "label": "U.S. House of Representatives, History, Art & Archives — Black Americans in Congress, \"Toward a Temporary Farewell\"", "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/", "quote": "Opponents in the South soon labeled the Lodge bill the \"Force Bill\" and likened it to federal policy during Reconstruction." },
-        { "id": "house-baic-blair-1889", "label": "U.S. House of Representatives, History, Art & Archives — on the Blair education bill, 1889", "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/", "quote": "It was designed to provide direct federal investment to support a national education system—and establish mechanisms for federal oversight of local schools" }
+        {
+          "id": "miller-center-harrison-1889-message",
+          "label": "Miller Center — Benjamin Harrison, First Annual Message, December 3, 1889",
+          "url": "https://millercenter.org/the-presidency/presidential-speeches/december-3-1889-first-annual-message",
+          "quote": "in many parts of our country where the colored population is large the people of that race are by various devices deprived of any effective exercise of their political rights"
+        },
+        {
+          "id": "miller-center-harrison-1892-message",
+          "label": "Miller Center — Benjamin Harrison, Fourth Annual Message, December 6, 1892",
+          "url": "https://millercenter.org/the-presidency/presidential-speeches/december-6-1892-fourth-annual-message",
+          "quote": "The frequent lynching of colored people accused of crime is without the excuse"
+        },
+        {
+          "id": "miller-center-harrison-domestic",
+          "label": "Miller Center — Benjamin Harrison: Domestic Affairs",
+          "url": "https://millercenter.org/president/bharrison/domestic-affairs",
+          "quote": "the so-called Force Bill attempted to establish federal supervision of congressional elections as a means of preventing the disfranchisement of southern blacks"
+        },
+        {
+          "id": "house-baic-lodge-bill",
+          "label": "U.S. House of Representatives, History, Art & Archives — Black Americans in Congress, \"Toward a Temporary Farewell\"",
+          "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/",
+          "quote": "Opponents in the South soon labeled the Lodge bill the \"Force Bill\" and likened it to federal policy during Reconstruction."
+        },
+        {
+          "id": "house-baic-blair-1889",
+          "label": "U.S. House of Representatives, History, Art & Archives — on the Blair education bill, 1889",
+          "url": "https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Temporary-Farewell/Anti-Lynching-Legislation/",
+          "quote": "It was designed to provide direct federal investment to support a national education system—and establish mechanisms for federal oversight of local schools"
+        }
       ],
       "disputes": [
         "The House history describes the Lodge bill as having \"barely passed the House\" and died in the Senate amid trade and currency fights; the commonly cited roll-call figures (155–149 on July 2, 1890; 35–34 to postpone on January 22, 1891) appear only in non-institutional sources and are recorded here as unverified."

@@ -106,7 +106,8 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
                 href={chip.href}
                 {...(chip.active ? { 'aria-current': 'true' as const } : {})}
               >
-                {chip.label} <span className="ds-room-num">{chip.count.toLocaleString('en-US')}</span>
+                {chip.label}{' '}
+                <span className="ds-room-num">{chip.count.toLocaleString('en-US')}</span>
               </a>
             ))}
           </nav>

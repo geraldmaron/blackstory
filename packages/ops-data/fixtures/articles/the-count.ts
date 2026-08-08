@@ -94,8 +94,7 @@ export const theCountArticle = {
     },
     {
       id: 'archives-dred-scott',
-      label:
-        'National Archives, Milestone Documents, "Dred Scott v. Sandford (1857)."',
+      label: 'National Archives, Milestone Documents, "Dred Scott v. Sandford (1857)."',
       url: 'https://www.archives.gov/milestone-documents/dred-scott-v-sandford',
     },
     {
@@ -136,8 +135,7 @@ export const theCountArticle = {
     },
     {
       id: 'nara-freedmen-marriage',
-      label:
-        'National Archives, Prologue (Spring 2005), "Freedmen’s Bureau Marriage Records."',
+      label: 'National Archives, Prologue (Spring 2005), "Freedmen’s Bureau Marriage Records."',
       url: 'https://www.archives.gov/publications/prologue/2005/spring/freedman-marriage-recs.html',
     },
     {
@@ -216,7 +214,8 @@ export const theCountArticle = {
     },
     {
       id: 'doj-section5',
-      label: 'U.S. Department of Justice, Civil Rights Division, "About Section 5 of the Voting Rights Act."',
+      label:
+        'U.S. Department of Justice, Civil Rights Division, "About Section 5 of the Voting Rights Act."',
       url: 'https://www.justice.gov/crt/about-section-5-voting-rights-act',
     },
     {
@@ -438,7 +437,8 @@ export const theCountArticle = {
       packetId: 'tip_voting_rights_q12_national',
       kind: 'observation' as const,
       refId: 'usccr-black-registration-rate-state:state:28:1967',
-      caption: 'Black voter registration rate, Mississippi, 1967, two years after the Voting Rights Act.',
+      caption:
+        'Black voter registration rate, Mississippi, 1967, two years after the Voting Rights Act.',
     },
     {
       type: 'paragraph',
