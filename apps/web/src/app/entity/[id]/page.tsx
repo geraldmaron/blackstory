@@ -18,7 +18,7 @@ import { notFound } from 'next/navigation';
 import { MapsExternalLink } from '../../../components/map-experience/MapsExternalLink';
 import type { PublicEntityView } from '../../../data/public-seed';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
-import { EntityLocationCinematicMap } from '../../../components/entity/EntityLocationCinematicMap';
+import { RecordPlacePreview } from '../../../components/patterns/RecordPlacePreview';
 import '../../../components/entity/entity-page.css';
 import { EntityMastMedia } from '../../../components/entity/EntityMastMedia';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
@@ -278,8 +278,11 @@ export default async function EntityPage({ params }: EntityPageProps) {
           <h2 className="ds-room-rail-group__title" id="where-heading">
             Where
           </h2>
-          <EntityLocationCinematicMap
-            entityId={entity.id}
+          {/* SP-08: the persistent plate, borrowed into this block. This was
+              `EntityLocationCinematicMap`, which built a second MapLibre instance (and a whole
+              Rest/Engaged interaction layer) inside the record page. The record surface rests in
+              the Framed posture, so the one plate moves in when this block is on screen. */}
+          <RecordPlacePreview
             lat={geoAnchor.lat}
             lng={geoAnchor.lng}
             label={entity.locationLabel}

@@ -97,6 +97,15 @@ SELECT
   ) AS name_overlap
 FROM bb_research.landscape_candidates lc
 WHERE lc.status = 'pending'
+  -- repo-n7p6.15: never publish an entity that has been merged away. An absorbed record is not a
+  -- separate thing, and without this filter it republishes as one: both SCLC records and both SNCC
+  -- records were live in the active release six days after they were merged, because the merge
+  -- wrote merge_state and nothing on the publish path ever read it.
+  AND NOT EXISTS (
+    SELECT 1 FROM bb_canonical.entities me
+     WHERE me.id IN (lc.id, lc.source_item_id)
+       AND me.merge_state->>'status' = 'absorbed'
+  )
 ORDER BY lc.lane, lc.id
 `;
 

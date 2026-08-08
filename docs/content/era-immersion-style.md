@@ -182,7 +182,7 @@ throughout (no gated causal claim wired to this illustrative excerpt).
 | Concern | Governed by |
 |---|---|
 | Presence+proof, microcopy, dispute phrasing, legal-status vocabulary | `docs/ui/story.md` |
-| Named-actor folded-chapter prose rules (five rules, sentence rhythm, earned flourish) | `docs/ui/voice-theme-chapters.md` |
+| Named-actor folded-chapter prose rules (six rules, sentence rhythm, earned flourish, standalone prose) | `docs/ui/voice-theme-chapters.md` |
 | Theme arc structure, journey beats, ink-sketch visuals, instrument rail rules | `docs/ui/design-direction-v6-themes.md` §1.1-1.2 |
 | Second-person era-jump structure, odds-not-decimals numeric voice, method-note gap handling, causal-language tiers | This document |
 | Juxtaposition-vs-causal-claim gate, boundary-discontinuity citation requirements | `docs/methodology/juxtaposition-not-causation.md`, `docs/methodology/scholarship-principles.md` §6 |

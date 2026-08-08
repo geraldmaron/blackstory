@@ -1,0 +1,769 @@
+{
+  "presidents": [
+    {
+      "number": 35,
+      "name": "John F. Kennedy",
+      "termLabel": "1961\u20131963",
+      "summary": "Kennedy issued Executive Order 10925 in March 1961, which introduced the phrase \"affirmative action\" into federal contracting policy, and used federal marshals and federalized troops to enforce James Meredith's court-ordered admission to the University of Mississippi in 1962. He waited until November 1962 to sign Executive Order 11063 barring discrimination in federally assisted housing, and did not send a comprehensive civil rights bill to Congress until June 1963.",
+      "paragraph": "Kennedy's civil rights record is mostly executive action, and it came in stages. Six weeks into his term, on March 6, 1961, he signed Executive Order 10925, creating the President's Committee on Equal Employment Opportunity and requiring federal contractors to \"take affirmative action\" so applicants were hired without regard to race, creed, color, or national origin. In September 1962 he issued Proclamation 3497 commanding Mississippians obstructing federal court orders to disperse, then backed James Meredith's enrollment with federal force; Meredith registered October 1, 1962 after a riot that took thousands of guardsmen and soldiers about fifteen hours to put down. The housing order he'd promised took longer. He didn't sign Executive Order 11063, directing federal agencies to prevent discrimination in federally assisted housing, until November 20, 1962. On June 11, 1963 he went on television and called civil rights \"primarily a moral issue,\" then sent legislation to Congress. Of the federal judges he named, the Federal Judicial Center records three African Americans: Thurgood Marshall, Wade H. McCree, Jr., and James Benton Parsons.",
+      "callouts": [
+        {
+          "text": "March 6, 1961: signed Executive Order 10925 (26 FR 1977), creating the President's Committee on Equal Employment Opportunity and requiring contractors to \"take affirmative action\" in hiring without regard to race, creed, color, or national origin.",
+          "sources": [
+            {
+              "label": "National Archives, Executive Orders Disposition Tables, 1961 (Kennedy)",
+              "url": "https://www.archives.gov/federal-register/executive-orders/1961-kennedy.html",
+              "quote": "Executive Order 10925 Establishing the President's Committee on Equal Employment Opportunity Signed: March 6, 1961 Federal Register page and date: 26 FR 1977, March 8, 1961"
+            },
+            {
+              "label": "American Presidency Project (UC Santa Barbara), Executive Order 10925",
+              "url": "https://www.presidency.ucsb.edu/documents/executive-order-10925-establishing-the-presidents-committee-equal-employment-opportunity",
+              "quote": "The contractor will take affirmative action to ensure that applicants are employed, and that employees are treated during employment, without regard to their race, creed, color, or national origin."
+            }
+          ]
+        },
+        {
+          "text": "September 30, 1962: issued Proclamation 3497 ordering those obstructing federal court orders in Mississippi to disperse; James Meredith registered at Ole Miss on October 1, 1962 after a riot federal forces took about fifteen hours to quell.",
+          "sources": [
+            {
+              "label": "American Presidency Project, Proclamation 3497 \u2014 Obstructions of Justice in the State of Mississippi",
+              "url": "https://www.presidency.ucsb.edu/documents/proclamation-3497-obstructions-justice-the-state-mississippi",
+              "quote": "all persons engaged in such obstructions of justice to cease and desist therefrom and to disperse and retire peaceably forthwith"
+            },
+            {
+              "label": "Miller Center, University of Virginia \u2014 John F. Kennedy: Domestic Affairs",
+              "url": "https://millercenter.org/president/kennedy/domestic-affairs",
+              "quote": "Meredith finally enrolled on October 1, 1962, but not without a violent riot that took thousands of guardsmen and armed soldiers fifteen hours to quell."
+            }
+          ]
+        },
+        {
+          "text": "November 20, 1962: signed Executive Order 11063, \"Equal Opportunity in Housing,\" directing federal departments and agencies to prevent discrimination in housing owned, operated, or financially assisted by the federal government.",
+          "sources": [
+            {
+              "label": "American Presidency Project, Executive Order 11063 \u2014 Equal Opportunity in Housing",
+              "url": "https://www.presidency.ucsb.edu/documents/executive-order-11063-equal-opportunity-housing",
+              "quote": "I hereby direct all departments and agencies in the executive branch of the Federal Government ... to take all action necessary and appropriate to prevent discrimination because of race, color, creed, or national origin"
+            },
+            {
+              "label": "National Archives, Codification of Presidential Proclamations and Executive Orders \u2014 EO 11063",
+              "url": "https://www.archives.gov/federal-register/codification/executive-order/11063.html",
+              "quote": "Executive Order 11063\u2014Equal Opportunity in Housing"
+            }
+          ]
+        },
+        {
+          "text": "June 11, 1963: in a televised address Kennedy called civil rights \"primarily a moral issue\" and announced he would send comprehensive civil rights legislation to Congress.",
+          "sources": [
+            {
+              "label": "American Presidency Project, Radio and Television Report to the American People on Civil Rights, June 11, 1963",
+              "url": "https://www.presidency.ucsb.edu/documents/radio-and-television-report-the-american-people-civil-rights",
+              "quote": "We are confronted primarily with a moral issue. It is as old as the scriptures and is as clear as the American Constitution."
+            },
+            {
+              "label": "Miller Center, University of Virginia \u2014 John F. Kennedy: Domestic Affairs",
+              "url": "https://millercenter.org/president/kennedy/domestic-affairs",
+              "quote": "are not yet freed from the bonds of injustice"
+            }
+          ]
+        },
+        {
+          "text": "Appointed three African American Article III federal judges: Thurgood Marshall, Wade H. McCree, Jr., and James Benton Parsons, per Federal Judicial Center records of judges nominated January 20, 1961 \u2013 November 22, 1963.",
+          "sources": [
+            {
+              "label": "Federal Judicial Center, Biographical Directory of Article III Federal Judges \u2014 advanced search, race \"African American,\" nomination date 1961-01-20 to 1963-11-22",
+              "url": "https://www.fjc.gov/history/judges/search/advanced-search",
+              "quote": "Number of judges matching the search criteria: 3 \u2014 Marshall, Thurgood; McCree, Wade Hampton, Jr.; Parsons, James Benton"
+            },
+            {
+              "label": "Federal Judicial Center, African American Judges on the Federal Courts",
+              "url": "https://www.fjc.gov/history/judges/search/african-american",
+              "quote": "Number of judges matching the search criteria: 285"
+            }
+          ]
+        }
+      ],
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/c/c3/John_F._Kennedy%2C_White_House_color_photo_portrait.jpg",
+        "alt": "Color White House photographic portrait of President John F. Kennedy, seated, facing the camera.",
+        "credit": "Cecil W. Stoughton, White House Press Office; via Wikimedia Commons",
+        "rights": "public_domain"
+      },
+      "sources": [
+        {
+          "id": "nara-eo-disposition-1961-kennedy",
+          "label": "National Archives, Office of the Federal Register, Executive Orders Disposition Tables, John F. Kennedy 1961",
+          "url": "https://www.archives.gov/federal-register/executive-orders/1961-kennedy.html",
+          "quote": "Executive Order 10925 Establishing the President's Committee on Equal Employment Opportunity Signed: March 6, 1961"
+        },
+        {
+          "id": "app-eo-10925",
+          "label": "American Presidency Project (UC Santa Barbara), Executive Order 10925",
+          "url": "https://www.presidency.ucsb.edu/documents/executive-order-10925-establishing-the-presidents-committee-equal-employment-opportunity",
+          "quote": "The contractor will take affirmative action to ensure that applicants are employed, and that employees are treated during employment, without regard to their race, creed, color, or national origin."
+        },
+        {
+          "id": "app-eo-11063",
+          "label": "American Presidency Project, Executive Order 11063 \u2014 Equal Opportunity in Housing (Nov. 20, 1962)",
+          "url": "https://www.presidency.ucsb.edu/documents/executive-order-11063-equal-opportunity-housing",
+          "quote": "to take all action necessary and appropriate to prevent discrimination because of race, color, creed, or national origin"
+        },
+        {
+          "id": "app-proclamation-3497",
+          "label": "American Presidency Project, Proclamation 3497 \u2014 Obstructions of Justice in the State of Mississippi (Sept. 30, 1962)",
+          "url": "https://www.presidency.ucsb.edu/documents/proclamation-3497-obstructions-justice-the-state-mississippi",
+          "quote": "all persons engaged in such obstructions of justice to cease and desist therefrom and to disperse and retire peaceably forthwith"
+        },
+        {
+          "id": "app-jfk-civil-rights-address-1963",
+          "label": "American Presidency Project, Radio and Television Report to the American People on Civil Rights, June 11, 1963",
+          "url": "https://www.presidency.ucsb.edu/documents/radio-and-television-report-the-american-people-civil-rights",
+          "quote": "We are confronted primarily with a moral issue. It is as old as the scriptures and is as clear as the American Constitution."
+        },
+        {
+          "id": "miller-center-jfk-domestic",
+          "label": "Miller Center, University of Virginia \u2014 John F. Kennedy: Domestic Affairs",
+          "url": "https://millercenter.org/president/kennedy/domestic-affairs",
+          "quote": "Meredith finally enrolled on October 1, 1962, but not without a violent riot that took thousands of guardsmen and armed soldiers fifteen hours to quell."
+        },
+        {
+          "id": "fjc-african-american-judges",
+          "label": "Federal Judicial Center, Biographical Directory of Article III Federal Judges \u2014 African American judges search",
+          "url": "https://www.fjc.gov/history/judges/search/african-american",
+          "quote": "Number of judges matching the search criteria: 285"
+        },
+        {
+          "id": "senate-church-committee",
+          "label": "United States Senate, \"The Church Committee\"",
+          "url": "https://www.senate.gov/about/powers-procedures/investigations/church-committee.htm",
+          "quote": "The FBI included among the program's many targets organizations such as the Southern Christian Leadership Conference, the anti-Vietnam War movement, and individuals such as Martin Luther King, Jr."
+        }
+      ],
+      "disputes": [
+        "The pace of Kennedy's housing order is contested. Kennedy had signalled during the 1960 campaign that housing discrimination could be ended by executive action, and EO 11063 was not signed until November 20, 1962; asked at the time why it took so long, he said he issued it when he thought it was in the public interest. Some accounts treat the delay as deliberate deference to Southern Democrats in Congress; others treat it as legislative sequencing. This project did not verify the '\"stroke of the pen\"/\"Ink for Jack\"' campaign framing from a primary source.",
+        "Whether Kennedy's Justice Department was a driver of, or a reluctant responder to, civil rights enforcement is disputed among historians. Miller Center frames the administration as emphasizing enforcement of existing law over new legislation until 1963; other scholarship credits earlier and more deliberate DOJ litigation strategy. Both readings are recorded here without resolution."
+      ],
+      "unverified": [
+        "The number of deputy U.S. Marshals deployed at Ole Miss in 1962 and casualty figures \u2014 usmarshals.gov and jfklibrary.org both blocked automated retrieval (403 / Cloudflare), so no figure is asserted.",
+        "Attorney General Robert F. Kennedy's October 1963 authorization of FBI wiretaps on Dr. Martin Luther King, Jr. was not confirmed from a fetched primary Church Committee text in this pass. The Senate's Church Committee page (fetched) confirms King and SCLC were COINTELPRO targets but does not date the wiretap authorization.",
+        "Kennedy's appointment of segregationist district judges in the South (e.g., W. Harold Cox) was not verified from a fetched source in this pass."
+      ]
+    },
+    {
+      "number": 36,
+      "name": "Lyndon B. Johnson",
+      "termLabel": "1963\u20131969",
+      "summary": "Johnson signed the Civil Rights Act of 1964, the Voting Rights Act of 1965, and the Civil Rights Act of 1968, and issued Executive Order 11246 requiring affirmative action by federal contractors. He appointed the first African American Cabinet secretary and the first African American Supreme Court justice, and publicly distanced himself from the findings of the Kerner Commission he had created.",
+      "paragraph": "Johnson signed the three statutes that reshaped federal civil rights law. The Civil Rights Act of 1964 became Public Law 88-352 on July 2, 1964 (78 Stat. 241). The Voting Rights Act of 1965 became Public Law 89-110 on August 6, 1965 (79 Stat. 437); its Section 2 bars any voting qualification \"to deny or abridge the right of any citizen of the United States to vote on account of race or color.\" The Civil Rights Act of 1968, which carries the Fair Housing Act, became Public Law 90-284 on April 11, 1968 (82 Stat. 73). On September 24, 1965 he signed Executive Order 11246, carrying the affirmative action contract clause forward and giving Labor the enforcement role. At Howard University on June 4, 1965 he argued that formal freedom wasn't enough. He put Robert C. Weaver in the Cabinet at HUD on January 18, 1966, and the Senate confirmed Thurgood Marshall to the Supreme Court 69-11 on August 30, 1967. He also created the Kerner Commission by Executive Order 11365 on July 29, 1967, then rejected its conclusions.",
+      "callouts": [
+        {
+          "text": "July 2, 1964: signed the Civil Rights Act of 1964, Public Law 88-352, 78 Stat. 241 (H.R. 7152), barring discrimination in public accommodations, employment, and federally assisted programs.",
+          "sources": [
+            {
+              "label": "U.S. Statutes at Large, vol. 78, p. 241 (GPO/govinfo scan of Public Law 88-352)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-78/pdf/STATUTE-78-Pg241.pdf",
+              "quote": "PUBLIC LAW 88-352\u2014JULY 2, 1964 ... That this Act may be cited as the \"Civil Rights Act of 1964.\""
+            },
+            {
+              "label": "American Presidency Project, Lyndon B. Johnson documents on the Civil Rights Act of 1964",
+              "url": "https://www.presidency.ucsb.edu/documents/app-categories/presidential/statements-administration-policy",
+              "quote": "Civil Rights Act of 1964"
+            }
+          ]
+        },
+        {
+          "text": "August 6, 1965: signed the Voting Rights Act of 1965, Public Law 89-110, 79 Stat. 437 (S. 1564), whose Section 2 bars voting qualifications that deny or abridge the right to vote on account of race or color.",
+          "sources": [
+            {
+              "label": "U.S. Statutes at Large, vol. 79, p. 437 (GPO/govinfo scan of Public Law 89-110)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-79/pdf/STATUTE-79-Pg437.pdf",
+              "quote": "No voting qualification or prerequisite to voting ... shall be imposed or applied by any State or political subdivision to deny or abridge the right of any citizen of the United States to vote on account of race or color."
+            },
+            {
+              "label": "Miller Center, University of Virginia \u2014 Lyndon B. Johnson: Domestic Affairs",
+              "url": "https://millercenter.org/president/lbjohnson/domestic-affairs",
+              "quote": "federal registrars and marshals to enroll African American voters"
+            }
+          ]
+        },
+        {
+          "text": "September 24, 1965: signed Executive Order 11246, carrying the affirmative action contract requirement forward and assigning enforcement over federal contractors to the Department of Labor.",
+          "sources": [
+            {
+              "label": "American Presidency Project, Executive Order 11246 \u2014 Equal Employment Opportunity",
+              "url": "https://www.presidency.ucsb.edu/documents/executive-order-11246-equal-employment-opportunity",
+              "quote": "The contractor will take affirmative action to ensure that applicants are employed, and that employees are treated during employment, without regard to their race, creed, color, or national origin."
+            },
+            {
+              "label": "National Archives, Executive Orders Disposition Tables (EO 10925 superseded by EO 11246, September 24, 1965)",
+              "url": "https://www.archives.gov/federal-register/executive-orders/1961-kennedy.html",
+              "quote": "Superseded by: EO 11246 , September 24, 1965 (Committee abolished)"
+            }
+          ]
+        },
+        {
+          "text": "June 4, 1965: in the Howard University commencement address, Johnson argued formal legal equality was not sufficient remedy for people \"hobbled by chains.\"",
+          "sources": [
+            {
+              "label": "American Presidency Project, Commencement Address at Howard University: \"To Fulfill These Rights,\" June 4, 1965",
+              "url": "https://www.presidency.ucsb.edu/documents/commencement-address-howard-university-fulfill-these-rights",
+              "quote": "You do not take a person who, for years, has been hobbled by chains and liberate him, bring him up to the starting line of a race and then say, 'you are free to compete with all the others.'"
+            },
+            {
+              "label": "Miller Center, University of Virginia \u2014 Lyndon B. Johnson: Domestic Affairs",
+              "url": "https://millercenter.org/president/lbjohnson/domestic-affairs",
+              "quote": "Black voter turnout tripled within four years."
+            }
+          ]
+        },
+        {
+          "text": "January 18, 1966 and August 30, 1967: Robert C. Weaver was sworn in as HUD Secretary, the first African American Cabinet member; the Senate confirmed Thurgood Marshall to the Supreme Court by 69-11.",
+          "sources": [
+            {
+              "label": "HUD Archives, \"HUD Headquarters Building Renamed To Honor Robert C. Weaver\" (2000) and HUD Archives: Past Secretaries",
+              "url": "https://archives.hud.gov/news/2000/pr00-161.html",
+              "quote": "the first HUD Secretary and the first African American member of a President's Cabinet"
+            },
+            {
+              "label": "U.S. Senate, Supreme Court Nominations (1789\u2013Present)",
+              "url": "https://www.senate.gov/legislative/nominations/SupremeCourtNominations1789present.htm",
+              "quote": "Marshall, Thurgood ... Jun 13, 1967 ... Aug 30, 1967 ... 69-11"
+            }
+          ]
+        },
+        {
+          "text": "July 29, 1967 and April 11, 1968: created the National Advisory Commission on Civil Disorders by Executive Order 11365 (32 FR 11111); signed the Civil Rights Act of 1968, Public Law 90-284, 82 Stat. 73, carrying the Fair Housing Act.",
+          "sources": [
+            {
+              "label": "National Archives, Executive Orders Disposition Tables, 1967",
+              "url": "https://www.archives.gov/federal-register/executive-orders/1967.html",
+              "quote": "Executive Order 11365 ... a National Advisory Commission on Civil Disorders ... Signed: July 29, 1967 ... 32 FR 11111; August 1, 1967"
+            },
+            {
+              "label": "U.S. Statutes at Large, vol. 82, p. 73 (GPO/govinfo scan of Public Law 90-284)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-82/pdf/STATUTE-82-Pg73.pdf",
+              "quote": "82 STAT. ] PUBLIC LAW 90-284\u2014APR. 11, 1968 ... Public Law 90-284 AN ACT To prescribe penalties for certain acts of violence or intimidation, and for other purposes."
+            }
+          ]
+        }
+      ],
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Lyndon_B._Johnson_photo_portrait-Black%27n_white_%28Cropped%29.jpg",
+        "alt": "Photographic portrait of President Lyndon B. Johnson.",
+        "credit": "Yoichi Okamoto, official White House photographer; White House Photo Office via Wikimedia Commons. Work of a federal employee in the course of official duties, public domain.",
+        "rights": "public_domain"
+      },
+      "sources": [
+        {
+          "id": "statute-78-241-civil-rights-act-1964",
+          "label": "U.S. Statutes at Large, vol. 78, p. 241 \u2014 Public Law 88-352, July 2, 1964 (GPO authenticated scan)",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-78/pdf/STATUTE-78-Pg241.pdf",
+          "quote": "That this Act may be cited as the \"Civil Rights Act of 1964.\""
+        },
+        {
+          "id": "statute-79-437-voting-rights-act-1965",
+          "label": "U.S. Statutes at Large, vol. 79, p. 437 \u2014 Public Law 89-110, August 6, 1965 (GPO authenticated scan)",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-79/pdf/STATUTE-79-Pg437.pdf",
+          "quote": "No voting qualification or prerequisite to voting ... shall be imposed or applied by any State or political subdivision to deny or abridge the right of any citizen of the United States to vote on account of race or color."
+        },
+        {
+          "id": "statute-82-73-civil-rights-act-1968",
+          "label": "U.S. Statutes at Large, vol. 82, p. 73 \u2014 Public Law 90-284, April 11, 1968 (GPO authenticated scan)",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-82/pdf/STATUTE-82-Pg73.pdf",
+          "quote": "PUBLIC LAW 90-284\u2014APR. 11, 1968 ... AN ACT To prescribe penalties for certain acts of violence or intimidation, and for other purposes."
+        },
+        {
+          "id": "app-eo-11246",
+          "label": "American Presidency Project, Executive Order 11246 \u2014 Equal Employment Opportunity (Sept. 24, 1965)",
+          "url": "https://www.presidency.ucsb.edu/documents/executive-order-11246-equal-employment-opportunity",
+          "quote": "The contractor will take affirmative action to ensure that applicants are employed, and that employees are treated during employment, without regard to their race, creed, color, or national origin."
+        },
+        {
+          "id": "app-howard-1965",
+          "label": "American Presidency Project, Commencement Address at Howard University: \"To Fulfill These Rights,\" June 4, 1965",
+          "url": "https://www.presidency.ucsb.edu/documents/commencement-address-howard-university-fulfill-these-rights",
+          "quote": "You do not take a person who, for years, has been hobbled by chains and liberate him, bring him up to the starting line of a race"
+        },
+        {
+          "id": "nara-eo-disposition-1967",
+          "label": "National Archives, Executive Orders Disposition Tables, 1967 \u2014 EO 11365",
+          "url": "https://www.archives.gov/federal-register/executive-orders/1967.html",
+          "quote": "a National Advisory Commission on Civil Disorders ... Signed: July 29, 1967 ... 32 FR 11111; August 1, 1967"
+        },
+        {
+          "id": "hud-archives-weaver",
+          "label": "HUD Archives press release PR00-161 (2000), \"HUD Headquarters Building Renamed To Honor Robert C. Weaver\"",
+          "url": "https://archives.hud.gov/news/2000/pr00-161.html",
+          "quote": "the first HUD Secretary and the first African American member of a President's Cabinet"
+        },
+        {
+          "id": "hud-archives-past-secretaries",
+          "label": "HUD Archives: Past Secretaries",
+          "url": "https://archives.hud.gov/pastsecretaries.cfm",
+          "quote": "Robert C. Weaver ... January 18, 1966 - December 18, 1968"
+        },
+        {
+          "id": "senate-scotus-nominations",
+          "label": "U.S. Senate, Supreme Court Nominations (1789\u2013Present)",
+          "url": "https://www.senate.gov/legislative/nominations/SupremeCourtNominations1789present.htm",
+          "quote": "Jun 13, 1967 ... Aug 30, 1967 ... 69-11"
+        },
+        {
+          "id": "miller-center-lbj-domestic",
+          "label": "Miller Center, University of Virginia \u2014 Lyndon B. Johnson: Domestic Affairs",
+          "url": "https://millercenter.org/president/lbjohnson/domestic-affairs",
+          "quote": "Johnson rejected the findings of the commission and thought that they were too radical."
+        },
+        {
+          "id": "fjc-advanced-search",
+          "label": "Federal Judicial Center, Biographical Directory of Article III Federal Judges \u2014 advanced search (race: African American, by nomination date)",
+          "url": "https://www.fjc.gov/history/judges/search/advanced-search",
+          "quote": "Number of judges matching the search criteria: 10"
+        }
+      ],
+      "disputes": [
+        "Johnson's response to the Kerner Commission is disputed. Miller Center states he \"rejected the findings of the commission and thought that they were too radical.\" Other accounts hold that he had already enacted much of what the report urged and objected chiefly to its framing and its cost implications rather than its substance. Both are recorded; this project does not resolve which characterization is correct.",
+        "The extent to which Johnson personally drove passage of the Civil Rights Act of 1964 versus inheriting a bill Kennedy had already sent to Congress on June 19, 1963 is contested in the scholarship. Both the inheritance and the legislative management are documented facts; the relative weight assigned to each varies by source."
+      ],
+      "unverified": [
+        "Johnson's specific public statements on receiving the Kerner Report (released late February/early March 1968) were not retrieved from a primary source in this pass; nmaahc.si.edu was blocked by Cloudflare and the ojp.gov abstract URL 404'd.",
+        "The exact release date of the Kerner Report is given variously as February 29 and March 1, 1968; not confirmed here from a primary source.",
+        "That Title VIII of Public Law 90-284 is the Fair Housing Act was not confirmed on the fetched first page of the statute (the scan captured Title I); hud.gov fair housing history pages 404'd. The Public Law number, date, and Statutes at Large page ARE confirmed from the GPO scan.",
+        "FJC count of 10 African American judges nominated by Johnson (Nov. 23, 1963 \u2013 Jan. 20, 1969) comes from the FJC advanced search filtered on the exact category \"African American\"; it excludes multiracial categories."
+      ]
+    },
+    {
+      "number": 37,
+      "name": "Richard Nixon",
+      "termLabel": "1969\u20131974",
+      "summary": "Nixon's Labor Department imposed the Revised Philadelphia Plan in 1969, setting numerical minority hiring goals and timetables for federal construction contractors, and he issued executive orders building a federal minority business enterprise program. He also publicly opposed compulsory busing for racial balance and stated that de facto segregation arising from housing patterns should not by itself trigger federal enforcement.",
+      "paragraph": "Nixon's record runs in two directions at once, and both halves are documented. On March 5, 1969 he signed Executive Order 11458, setting up federal machinery for minority business enterprise, and followed it on October 13, 1971 with Executive Order 11625 (36 FR 19967) expanding that program. In June 1969 his Assistant Secretary of Labor, Arthur Fletcher, issued the Revised Philadelphia Plan, which required federal construction contractors in the Philadelphia area to set numerical goals and timetables for minority hiring in the skilled trades. That's the first sustained federal use of numerical goals. Then on March 24, 1970 he issued a statement on school desegregation saying he had \"consistently expressed\" opposition to compulsory busing beyond normal geographic zones for racial balance, and that de facto separation from housing patterns should not by itself be cause for federal enforcement action. Five months earlier, on October 29, 1969, the Supreme Court had ruled in Alexander v. Holmes County that \"all deliberate speed\" was no longer constitutionally permissible. He signed the Voting Rights Act Amendments of 1970 on June 22, 1970.",
+      "callouts": [
+        {
+          "text": "June 1969: Assistant Labor Secretary Arthur Fletcher issued the Revised Philadelphia Plan, requiring federal construction contractors in Philadelphia to adopt numerical goals and timetables for minority hiring in skilled trades.",
+          "sources": [
+            {
+              "label": "U.S. Department of Labor, official history, Chapter 7: Nixon and Ford Administrations 1969-1977",
+              "url": "https://www.dol.gov/general/aboutdol/history/dolchp07",
+              "quote": "set a range of percentages of minority hirings with which contractors would be required to make a \"good faith\" effort to comply"
+            },
+            {
+              "label": "Encyclopedia of Greater Philadelphia (Rutgers-Camden), \"Philadelphia Plan\"",
+              "url": "https://philadelphiaencyclopedia.org/essays/philadelphia-plan-2/",
+              "quote": "On June 27, 1969, Fletcher implemented the Revised Philadelphia Plan, which required federal contractors to meet minority hiring goals"
+            }
+          ]
+        },
+        {
+          "text": "March 5, 1969 and October 13, 1971: signed Executive Order 11458 creating federal minority business enterprise machinery, then Executive Order 11625 (36 FR 19967) prescribing additional arrangements for a national minority business enterprise program.",
+          "sources": [
+            {
+              "label": "American Presidency Project, Executive Order 11458 (March 5, 1969)",
+              "url": "https://www.presidency.ucsb.edu/documents/executive-order-11458-prescribing-arrangements-for-developing-and-coordinating-national",
+              "quote": "Advisory Council for Minority Enterprise"
+            },
+            {
+              "label": "National Archives, Executive Orders Disposition Tables, 1971 \u2014 EO 11625",
+              "url": "https://www.archives.gov/federal-register/executive-orders/1971.html",
+              "quote": "Prescribing additional arrangements for developing and coordinating a national program for minority business enterprise ... Signed: October 13, 1971 ... 36 FR 19967; October 14, 1971"
+            }
+          ]
+        },
+        {
+          "text": "March 24, 1970: issued a statement on school desegregation opposing compulsory busing beyond normal geographic zones for racial balance and saying de facto separation from housing patterns should not by itself trigger federal enforcement.",
+          "sources": [
+            {
+              "label": "American Presidency Project, Statement about Desegregation of Elementary and Secondary Schools, March 24, 1970",
+              "url": "https://www.presidency.ucsb.edu/documents/statement-about-desegregation-elementary-and-secondary-schools",
+              "quote": "I have consistently expressed my opposition to any compulsory busing of pupils beyond normal geographic school zones for the purpose of achieving racial balance."
+            },
+            {
+              "label": "American Presidency Project, same statement (de facto segregation passage)",
+              "url": "https://www.presidency.ucsb.edu/documents/statement-about-desegregation-elementary-and-secondary-schools",
+              "quote": "De facto racial separation, resulting genuinely from housing patterns, exists in the South as well as the North; in neither area should this condition by itself be cause for Federal enforcement actions."
+            }
+          ]
+        },
+        {
+          "text": "October 29, 1969: the Supreme Court decided Alexander v. Holmes County Board of Education, 396 U.S. 19, holding \"all deliberate speed\" no longer constitutionally permissible; the United States was a party to the case.",
+          "sources": [
+            {
+              "label": "U.S. Reports vol. 396, p. 19 (Library of Congress scan), Alexander v. Holmes County Bd. of Educ.",
+              "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep396/usrep396019/usrep396019.pdf",
+              "quote": "Continued operation of racially segregated schools under the standard of \"all deliberate speed\" is no longer constitutionally permissible."
+            },
+            {
+              "label": "U.S. Reports vol. 396, p. 19 \u2014 counsel listing (Library of Congress scan)",
+              "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep396/usrep396019/usrep396019.pdf",
+              "quote": "Assistant Attorney General Leonard argued the cause for the United States. With him on the memorandum was Solicitor General Griswold."
+            }
+          ]
+        },
+        {
+          "text": "June 22, 1970: signed the Voting Rights Act Amendments of 1970 (Public Law 91-285), extending expiring provisions of the 1965 Act for five years.",
+          "sources": [
+            {
+              "label": "American Presidency Project, Statement on Signing the Voting Rights Act Amendments of 1970",
+              "url": "https://www.presidency.ucsb.edu/documents/statement-signing-the-voting-rights-act-amendments-1970",
+              "quote": "The Voting Rights Act of 1965 has opened participation in the political process ... it does incorporate improvements which extend its reach still further."
+            },
+            {
+              "label": "Congressional Research Service, \"The Voting Rights Act: Historical Development and Policy Background\" (R47520), Congress.gov",
+              "url": "https://www.congress.gov/crs-product/R47520",
+              "quote": "Voting Rights Act Amendments of 1970"
+            }
+          ]
+        }
+      ],
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Richard_Nixon_presidential_portrait.jpg",
+        "alt": "Official color presidential portrait photograph of Richard Nixon, seated with an American flag behind him.",
+        "credit": "U.S. Army Audiovisual Center / Department of Defense; via Wikimedia Commons",
+        "rights": "public_domain"
+      },
+      "sources": [
+        {
+          "id": "dol-history-chapter-7",
+          "label": "U.S. Department of Labor, official departmental history, Chapter 7: Nixon and Ford Administrations 1969-1977",
+          "url": "https://www.dol.gov/general/aboutdol/history/dolchp07",
+          "quote": "set a range of percentages of minority hirings with which contractors would be required to make a \"good faith\" effort to comply"
+        },
+        {
+          "id": "encyclopedia-greater-philadelphia-philadelphia-plan",
+          "label": "Encyclopedia of Greater Philadelphia (Rutgers University\u2013Camden), \"Philadelphia Plan\"",
+          "url": "https://philadelphiaencyclopedia.org/essays/philadelphia-plan-2/",
+          "quote": "On June 27, 1969, Fletcher implemented the Revised Philadelphia Plan, which required federal contractors to meet minority hiring goals"
+        },
+        {
+          "id": "app-eo-11458",
+          "label": "American Presidency Project, Executive Order 11458 (March 5, 1969)",
+          "url": "https://www.presidency.ucsb.edu/documents/executive-order-11458-prescribing-arrangements-for-developing-and-coordinating-national",
+          "quote": "Advisory Council for Minority Enterprise"
+        },
+        {
+          "id": "nara-eo-disposition-1971",
+          "label": "National Archives, Executive Orders Disposition Tables, 1971 \u2014 EO 11625",
+          "url": "https://www.archives.gov/federal-register/executive-orders/1971.html",
+          "quote": "Prescribing additional arrangements for developing and coordinating a national program for minority business enterprise ... Signed: October 13, 1971"
+        },
+        {
+          "id": "app-nixon-school-desegregation-1970",
+          "label": "American Presidency Project, Statement about Desegregation of Elementary and Secondary Schools, March 24, 1970",
+          "url": "https://www.presidency.ucsb.edu/documents/statement-about-desegregation-elementary-and-secondary-schools",
+          "quote": "I have consistently expressed my opposition to any compulsory busing of pupils beyond normal geographic school zones for the purpose of achieving racial balance."
+        },
+        {
+          "id": "loc-alexander-v-holmes-396-us-19",
+          "label": "U.S. Reports vol. 396, p. 19 \u2014 Alexander v. Holmes County Board of Education (Library of Congress scan of the official reporter)",
+          "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep396/usrep396019/usrep396019.pdf",
+          "quote": "Continued operation of racially segregated schools under the standard of \"all deliberate speed\" is no longer constitutionally permissible."
+        },
+        {
+          "id": "app-nixon-vra-1970",
+          "label": "American Presidency Project, Statement on Signing the Voting Rights Act Amendments of 1970 (June 22, 1970)",
+          "url": "https://www.presidency.ucsb.edu/documents/statement-signing-the-voting-rights-act-amendments-1970",
+          "quote": "The Voting Rights Act of 1965 has opened participation in the political process"
+        },
+        {
+          "id": "crs-r47520-vra-history",
+          "label": "Congressional Research Service report R47520, \"The Voting Rights Act: Historical Development and Policy Background\"",
+          "url": "https://www.congress.gov/crs-product/R47520",
+          "quote": "Voting Rights Act Amendments of 1970"
+        }
+      ],
+      "disputes": [
+        "The share of Southern Black students in all-Black or intensely segregated schools fell sharply between 1968 and 1972, and sources disagree both on the figures and on the cause. Figures circulating in secondary sources range from 68% in all-Black Southern schools in 1968 down to 18.5% (fall 1970) or 8% (end of Nixon's first term). This project could not verify any of these figures from a primary federal source (HEW or U.S. Commission on Civil Rights) and does not assert them. Attribution is likewise contested: some accounts credit Nixon administration implementation machinery, others credit the Supreme Court's Alexander v. Holmes County mandate and lower-court orders that the administration was obliged to execute.",
+        "Nixon's \"Southern strategy\" is described by many historians as a deliberate electoral appeal to white Southern opposition to desegregation, and by others as a broader realignment appeal not reducible to race. This project verified Nixon's own March 24, 1970 statements on busing and de facto segregation from the primary record, but did not verify from a fetched primary source any internal document establishing racial electoral intent. Both interpretations are recorded unresolved.",
+        "Whether the Nixon Justice Department sought delay of Mississippi desegregation before Alexander v. Holmes County is widely reported but was not established by the fetched U.S. Reports text, which shows only that the United States was represented by Assistant Attorney General Leonard and Solicitor General Griswold. The Court vacated a Fifth Circuit order of August 28, 1969 that had delayed desegregation."
+      ],
+      "unverified": [
+        "The specific numerical goal ranges of the Revised Philadelphia Plan (commonly cited as 4-6% rising to about 20% over four years, on contracts over $500,000, in six skilled trades) appeared only in secondary sources in this pass and are not asserted as verified.",
+        "FJC advanced search records 6 African American Article III judges nominated during Nixon's term (Jan. 21, 1969 \u2013 Aug. 9, 1974); individual names were not enumerated in this pass.",
+        "Nixon's 1972 proposed busing moratorium legislation was not verified from a fetched primary source."
+      ]
+    },
+    {
+      "number": 38,
+      "name": "Gerald Ford",
+      "termLabel": "1974\u20131977",
+      "summary": "Ford signed the Voting Rights Act Amendments of 1975, which extended the Act's expiring special provisions for seven more years and made permanent the nationwide ban on tests and devices as prerequisites to voting. His presidency also coincided with the Church Committee's public disclosure of the FBI's COINTELPRO operations against civil rights organizations and Dr. Martin Luther King, Jr.",
+      "paragraph": "Ford's clearest documented action is the 1975 Voting Rights Act extension. On August 6, 1975 he signed H.R. 6219 into law as Public Law 94-73 (89 Stat. 400). Title I amended Section 4(a) of the 1965 Act by striking \"ten\" and inserting \"seventeen\" each time it appeared, which pushed the special coverage provisions out another seven years, and it struck the \"Prior to August 6, 1975\" limitation on the ban against tests and devices, making that ban permanent. At the Rose Garden signing he said the right to vote is at the foundation of the American system and nothing must interfere with it. During his term the Senate Select Committee to Study Governmental Operations with Respect to Intelligence Activities, the Church Committee, ran its investigation and issued its final report in April 1976; it documented that the FBI's COINTELPRO had targeted the Southern Christian Leadership Conference and Dr. King. The Federal Judicial Center records three African American Article III judges nominated during Ford's term.",
+      "callouts": [
+        {
+          "text": "August 6, 1975: signed the Voting Rights Act Amendments of 1975, Public Law 94-73, 89 Stat. 400 (H.R. 6219), extending expiring provisions seven years and making permanent the ban on tests and devices.",
+          "sources": [
+            {
+              "label": "U.S. Statutes at Large, vol. 89, p. 400 \u2014 Public Law 94-73, August 6, 1975 (GPO authenticated scan)",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-89/pdf/STATUTE-89-Pg400.pdf",
+              "quote": "To amend the Voting Rights Act of 1965 to extend certain provisions for an additional seven years, to make permanent the ban against certain prerequisites to voting, and for other purposes."
+            },
+            {
+              "label": "American Presidency Project, Remarks Upon Signing a Bill Extending the Voting Rights Act of 1965",
+              "url": "https://www.presidency.ucsb.edu/documents/remarks-upon-signing-bill-extending-the-voting-rights-act-1965",
+              "quote": "The right to vote is at the very foundation of our American system, and nothing must interfere with this very precious right."
+            }
+          ]
+        },
+        {
+          "text": "Title I of Public Law 94-73 amended Section 4(a) of the Voting Rights Act by striking \"ten\" and inserting \"seventeen\" each time it appeared, extending federal coverage of the special provisions.",
+          "sources": [
+            {
+              "label": "U.S. Statutes at Large, vol. 89, p. 400 (GPO authenticated scan), Title I, Sec. 101",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-89/pdf/STATUTE-89-Pg400.pdf",
+              "quote": "SEC. 101. Section 4(a) of the Voting Rights Act of 1965 is amended by striking out \"ten\" each time it appears and inserting in lieu thereof \"seventeen\"."
+            },
+            {
+              "label": "Congressional Research Service, \"The Voting Rights Act: Historical Development and Policy Background\" (R47520)",
+              "url": "https://www.congress.gov/crs-product/R47520",
+              "quote": "Voting Rights Act"
+            }
+          ]
+        },
+        {
+          "text": "Title I also struck the phrase \"Prior to August 6, 1975\" from Section 201(a), making permanent the nationwide statutory ban on tests or devices as prerequisites to voting.",
+          "sources": [
+            {
+              "label": "U.S. Statutes at Large, vol. 89, p. 400 (GPO authenticated scan), Title I, Sec. 102",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-89/pdf/STATUTE-89-Pg400.pdf",
+              "quote": "striking out \"Prior to August 6, 1975, no\" and inserting \"No\" in lieu thereof"
+            },
+            {
+              "label": "American Presidency Project, Remarks Upon Signing a Bill Extending the Voting Rights Act of 1965",
+              "url": "https://www.presidency.ucsb.edu/documents/remarks-upon-signing-bill-extending-the-voting-rights-act-1965",
+              "quote": "which extends as well as broadens the provisions of the Voting Rights Act of 1965"
+            }
+          ]
+        },
+        {
+          "text": "1975\u20131976: the Church Committee, operating during Ford's presidency, documented that the FBI's COINTELPRO targeted the Southern Christian Leadership Conference and Dr. Martin Luther King, Jr.; its final report issued April 1976.",
+          "sources": [
+            {
+              "label": "United States Senate, \"The Church Committee\"",
+              "url": "https://www.senate.gov/about/powers-procedures/investigations/church-committee.htm",
+              "quote": "The FBI included among the program's many targets organizations such as the Southern Christian Leadership Conference, the anti-Vietnam War movement, and individuals such as Martin Luther King, Jr."
+            },
+            {
+              "label": "Church Committee Final Report, Book II (San Diego State University document archive scan)",
+              "url": "https://loveman.sdsu.edu/docs/1976Churchcommittee.pdf",
+              "quote": "prevent or disrupt the exercise of First Amendment rights"
+            }
+          ]
+        },
+        {
+          "text": "Federal Judicial Center records show three African American Article III federal judges nominated during Ford's term (August 10, 1974 \u2013 January 20, 1977).",
+          "sources": [
+            {
+              "label": "Federal Judicial Center, Biographical Directory of Article III Federal Judges \u2014 advanced search, race \"African American,\" nomination date 1974-08-10 to 1977-01-20",
+              "url": "https://www.fjc.gov/history/judges/search/advanced-search",
+              "quote": "Number of judges matching the search criteria: 3"
+            },
+            {
+              "label": "Federal Judicial Center, African American Judges on the Federal Courts",
+              "url": "https://www.fjc.gov/history/judges/search/african-american",
+              "quote": "Number of judges matching the search criteria: 285"
+            }
+          ]
+        }
+      ],
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Gerald_Ford_presidential_portrait.jpg",
+        "alt": "Official color presidential portrait photograph of Gerald R. Ford, seated at a desk.",
+        "credit": "David Hume Kennerly, White House Photographic Office; via Wikimedia Commons",
+        "rights": "public_domain"
+      },
+      "sources": [
+        {
+          "id": "statute-89-400-vra-amendments-1975",
+          "label": "U.S. Statutes at Large, vol. 89, p. 400 \u2014 Public Law 94-73, August 6, 1975 (GPO authenticated scan)",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-89/pdf/STATUTE-89-Pg400.pdf",
+          "quote": "To amend the Voting Rights Act of 1965 to extend certain provisions for an additional seven years, to make permanent the ban against certain prerequisites to voting"
+        },
+        {
+          "id": "app-ford-vra-signing-1975",
+          "label": "American Presidency Project, Remarks Upon Signing a Bill Extending the Voting Rights Act of 1965 (August 6, 1975)",
+          "url": "https://www.presidency.ucsb.edu/documents/remarks-upon-signing-bill-extending-the-voting-rights-act-1965",
+          "quote": "The right to vote is at the very foundation of our American system, and nothing must interfere with this very precious right."
+        },
+        {
+          "id": "senate-church-committee",
+          "label": "United States Senate, \"The Church Committee\"",
+          "url": "https://www.senate.gov/about/powers-procedures/investigations/church-committee.htm",
+          "quote": "covert action designed to disrupt and discredit the activities of groups and individuals deemed a threat to the social order"
+        },
+        {
+          "id": "church-committee-book-ii-sdsu",
+          "label": "Church Committee Final Report, Book II, \"Intelligence Activities and the Rights of Americans\" (San Diego State University archive scan)",
+          "url": "https://loveman.sdsu.edu/docs/1976Churchcommittee.pdf",
+          "quote": "prevent or disrupt the exercise of First Amendment rights"
+        },
+        {
+          "id": "fjc-advanced-search",
+          "label": "Federal Judicial Center, Biographical Directory of Article III Federal Judges \u2014 advanced search",
+          "url": "https://www.fjc.gov/history/judges/search/advanced-search",
+          "quote": "Number of judges matching the search criteria: 3"
+        },
+        {
+          "id": "crs-r47520-vra-history",
+          "label": "Congressional Research Service report R47520, \"The Voting Rights Act: Historical Development and Policy Background\"",
+          "url": "https://www.congress.gov/crs-product/R47520",
+          "quote": "The Voting Rights Act: Historical Development and Policy Background"
+        }
+      ],
+      "disputes": [
+        "Ford's civil rights record before the presidency is characterized differently across sources. As House Minority Leader he voted for the Civil Rights Act of 1964 and the Voting Rights Act of 1965, while also being associated with Republican alternatives to Democratic bills; this project did not fetch the roll-call records in this pass and therefore records the characterization as contested rather than asserting it.",
+        "Whether Ford's signature on the 1975 extension reflected personal commitment or acceptance of a bill with veto-proof congressional majorities is disputed. The signing statement and the statute are verified; the motive is not."
+      ],
+      "unverified": [
+        "Ford's House roll-call votes on the Civil Rights Act of 1964 and Voting Rights Act of 1965 were not fetched or verified in this pass.",
+        "Ford's positions and executive actions on school busing (including his administration's posture in the Boston desegregation crisis, 1974-1976) were not verified from a fetched primary source.",
+        "The names of the three African American judges nominated during Ford's term were not enumerated in this pass.",
+        "The Church Committee's specific findings on FBI actions against Dr. King (Book III case study) were not read directly; the Book II PDF fetched refers to the \"King Report\" but the King case study itself was not retrieved. The intelligence.senate.gov Book III PDF is 67 MB and was not downloaded."
+      ]
+    },
+    {
+      "number": 39,
+      "name": "Jimmy Carter",
+      "termLabel": "1977\u20131981",
+      "summary": "Carter nominated 37 African American Article III federal judges, far more than any president before him, aided by the 152 new judgeships created by the Omnibus Judgeship Act of 1978. He appointed Patricia Roberts Harris as Secretary of Housing and Urban Development in 1977 and his Justice Department filed a brief in Regents of the University of California v. Bakke supporting race-conscious admissions while opposing rigid quotas.",
+      "paragraph": "Carter's main documented civil rights instrument was appointments. Federal Judicial Center records show 37 Article III judges categorized as African American nominated between January 21, 1977 and January 20, 1981, against 3 for Kennedy, 10 for Johnson, 6 for Nixon, and 3 for Ford. The Omnibus Judgeship Act of 1978 created 152 new judgeships, which gave him the vacancies to fill. He named Patricia Roberts Harris Secretary of Housing and Urban Development; HUD's own records list her tenure as January 23, 1977 to September 10, 1979, and she later moved to Health, Education, and Welfare. He appointed Wade H. McCree, Jr. as Solicitor General, serving March 28, 1977 to January 20, 1981, and Drew S. Days III as Assistant Attorney General for Civil Rights. In Regents of the University of California v. Bakke, decided June 1978, McCree argued for the United States as amicus curiae with Attorney General Bell and Days on the briefs; the administration's position supported considering race in admissions while opposing fixed quotas.",
+      "callouts": [
+        {
+          "text": "Nominated 37 African American Article III federal judges (January 21, 1977 \u2013 January 20, 1981) per Federal Judicial Center records \u2014 compared with 3 under Kennedy, 10 under Johnson, 6 under Nixon, and 3 under Ford.",
+          "sources": [
+            {
+              "label": "Federal Judicial Center, Biographical Directory of Article III Federal Judges \u2014 advanced search, race \"African American,\" nomination date 1977-01-21 to 1981-01-20",
+              "url": "https://www.fjc.gov/history/judges/search/advanced-search",
+              "quote": "Number of judges matching the search criteria: 37"
+            },
+            {
+              "label": "Federal Judicial Center, African American Judges on the Federal Courts",
+              "url": "https://www.fjc.gov/history/judges/search/african-american",
+              "quote": "Number of judges matching the search criteria: 285"
+            }
+          ]
+        },
+        {
+          "text": "January 23, 1977: Patricia Roberts Harris began service as Secretary of Housing and Urban Development, the first African American woman to hold a Cabinet post; HUD lists her tenure through September 10, 1979.",
+          "sources": [
+            {
+              "label": "HUD Archives: Past Secretaries",
+              "url": "https://archives.hud.gov/pastsecretaries.cfm",
+              "quote": "Patricia R. Harris ... January 23, 1977 - September 10, 1979"
+            },
+            {
+              "label": "National Museum of African American History and Culture (Smithsonian), \"A Higher Standard: Patricia Roberts Harris\"",
+              "url": "https://nmaahc.si.edu/explore/stories/higher-standard-patricia-roberts-harris",
+              "quote": "the first African American woman to serve in a presidential Cabinet"
+            }
+          ]
+        },
+        {
+          "text": "1977: appointed Wade H. McCree, Jr. as Solicitor General (serving March 28, 1977 \u2013 January 20, 1981) and Drew S. Days III as Assistant Attorney General for the Civil Rights Division.",
+          "sources": [
+            {
+              "label": "U.S. Reports vol. 438, p. 265 \u2014 Regents of the University of California v. Bakke, counsel listing (Library of Congress scan)",
+              "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep438/usrep438265/usrep438265.pdf",
+              "quote": "Solicitor General McCree argued the cause for the United States as amicus curiae ... with Attorney General Bell, Assistant Attorney General Days, Deputy Solicitor General Wallace"
+            },
+            {
+              "label": "Federal Judicial Center, Biographical Directory of Article III Federal Judges \u2014 McCree, Wade Hampton, Jr.",
+              "url": "https://www.fjc.gov/history/judges/mccree-wade-hampton-jr",
+              "quote": "McCree, Wade Hampton, Jr."
+            }
+          ]
+        },
+        {
+          "text": "June 1978: in Regents of the University of California v. Bakke, 438 U.S. 265, the Carter Justice Department appeared as amicus curiae for the United States, supporting consideration of race in admissions while opposing rigid numerical quotas.",
+          "sources": [
+            {
+              "label": "U.S. Reports vol. 438, p. 265 (Library of Congress scan of the official reporter)",
+              "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep438/usrep438265/usrep438265.pdf",
+              "quote": "\u00a7 601 of Title VI of the Civil Rights Act of 1964, which provides, inter alia, that no person shall on the ground of race or color be excluded from participating in any program receiving federal financial assistance."
+            },
+            {
+              "label": "The Harvard Crimson, \"Justice Department Files Bakke Brief\" (September 21, 1977)",
+              "url": "https://www.thecrimson.com/article/1977/9/21/justice-department-files-bakke-brief-pan/",
+              "quote": "Justice Department Files Bakke Brief"
+            }
+          ]
+        },
+        {
+          "text": "The Omnibus Judgeship Act of 1978 created 152 new federal judgeships (117 district, 35 circuit), supplying most of the vacancies Carter used for his record number of Black appointments.",
+          "sources": [
+            {
+              "label": "Federal Judicial Center, Biographical Directory of Article III Federal Judges \u2014 advanced search (Carter-era nominations)",
+              "url": "https://www.fjc.gov/history/judges/search/advanced-search",
+              "quote": "Number of judges matching the search criteria: 37"
+            },
+            {
+              "label": "The Leadership Conference on Civil and Human Rights, \"President Carter's Judicial Appointments Are Central to His Tremendous Civil Rights Legacy\"",
+              "url": "https://civilrights.org/blog/president-carters-judicial-appointments-are-central-to-his-tremendous-civil-rights-legacy/",
+              "quote": "nine Black people to the circuit courts ... and 28 Black jurists to the district courts"
+            }
+          ]
+        }
+      ],
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/5/5a/JimmyCarterPortrait2.jpg",
+        "alt": "Official color presidential portrait photograph of Jimmy Carter, seated with an American flag behind him.",
+        "credit": "Department of the Navy, Naval Photographic Center / Department of Defense; via Wikimedia Commons",
+        "rights": "public_domain"
+      },
+      "sources": [
+        {
+          "id": "fjc-advanced-search",
+          "label": "Federal Judicial Center, Biographical Directory of Article III Federal Judges \u2014 advanced search (race: African American, filtered by nomination date range)",
+          "url": "https://www.fjc.gov/history/judges/search/advanced-search",
+          "quote": "Number of judges matching the search criteria: 37"
+        },
+        {
+          "id": "fjc-african-american-judges",
+          "label": "Federal Judicial Center, African American Judges on the Federal Courts",
+          "url": "https://www.fjc.gov/history/judges/search/african-american",
+          "quote": "Number of judges matching the search criteria: 285"
+        },
+        {
+          "id": "hud-archives-past-secretaries",
+          "label": "HUD Archives: Past Secretaries",
+          "url": "https://archives.hud.gov/pastsecretaries.cfm",
+          "quote": "Patricia R. Harris ... January 23, 1977 - September 10, 1979"
+        },
+        {
+          "id": "nmaahc-patricia-roberts-harris",
+          "label": "Smithsonian National Museum of African American History and Culture, \"A Higher Standard: Patricia Roberts Harris\"",
+          "url": "https://nmaahc.si.edu/explore/stories/higher-standard-patricia-roberts-harris",
+          "quote": "A Higher Standard: Patricia Roberts Harris"
+        },
+        {
+          "id": "loc-bakke-438-us-265",
+          "label": "U.S. Reports vol. 438, p. 265 \u2014 Regents of the University of California v. Bakke (Library of Congress scan of the official reporter)",
+          "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep438/usrep438265/usrep438265.pdf",
+          "quote": "no person shall on the ground of race or color be excluded from participating in any program receiving federal financial assistance"
+        },
+        {
+          "id": "harvard-crimson-bakke-brief-1977",
+          "label": "The Harvard Crimson, \"Justice Department Files Bakke Brief,\" September 21, 1977",
+          "url": "https://www.thecrimson.com/article/1977/9/21/justice-department-files-bakke-brief-pan/",
+          "quote": "Justice Department Files Bakke Brief"
+        },
+        {
+          "id": "leadership-conference-carter-judges",
+          "label": "The Leadership Conference on Civil and Human Rights, \"President Carter's Judicial Appointments Are Central to His Tremendous Civil Rights Legacy\"",
+          "url": "https://civilrights.org/blog/president-carters-judicial-appointments-are-central-to-his-tremendous-civil-rights-legacy/",
+          "quote": "nine Black people to the circuit courts ... and 28 Black jurists to the district courts"
+        }
+      ],
+      "disputes": [
+        "The Carter administration's Bakke brief was contested at the time and remains so. Reporting from 1977 describes an internal fight in which an earlier draft treating the UC Davis program as an unlawful quota was revised; the filed brief supported race-conscious admissions while Attorney General Bell and Solicitor General McCree stated opposition to fixed, inflexible quotas and declined to conclude that a quota was involved in the Davis program. Some accounts read this as a strong pro-affirmative-action position; others read it as a retreat under political pressure. Both are recorded.",
+        "Whether Carter's judicial appointments record reflects a distinctive commitment or primarily the arithmetic of the 152 judgeships created by the Omnibus Judgeship Act of 1978 is disputed. The count (37) and the Act (152 new judgeships) are both documented; the causal weight is not resolved here."
+      ],
+      "unverified": [
+        "The claim that Carter's 37 African American appointees comprised 9 circuit and 28 district judges comes from an advocacy organization (The Leadership Conference), not from a primary FJC breakdown; the 37 total IS verified from FJC. The 9/28 split is not independently verified.",
+        "The Omnibus Judgeship Act of 1978 figures (152 judgeships; 117 district and 35 circuit) were not confirmed from a fetched primary statute (Public Law 95-486) in this pass.",
+        "Wade H. McCree's exact term as Solicitor General (March 28, 1977 \u2013 January 20, 1981) was not confirmed from a fetched justice.gov page (justice.gov returned 403); the Bakke counsel listing confirms he served as Solicitor General and argued for the United States.",
+        "Eleanor Holmes Norton's appointment as EEOC Chair and Andrew Young's as UN Ambassador were not verified from fetched primary sources in this pass.",
+        "Carter's specific Justice Department civil rights enforcement statistics (school desegregation, voting rights, employment cases 1977-1981) were not verified; justice.gov/crt/history returned 403."
+      ]
+    }
+  ]
+}

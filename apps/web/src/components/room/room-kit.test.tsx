@@ -27,7 +27,7 @@ import { HairlineIndex } from './HairlineIndex';
 import { DataTable } from './DataTable';
 import { Disclosure, Field, UtilityCard, UtilityStep } from './Utility';
 import { EmptyList, OffRamp, RecordNav } from './RoomFoot';
-import { MapMoment, pickLiveMoment, resolveMomentCamera } from './MapMoment';
+import { MapMoment, momentIsVisible, pickLiveMoment, resolveMomentCamera } from './MapMoment';
 
 void React;
 
@@ -177,7 +177,7 @@ describe('room kit · the trail is computed, never hand-written', () => {
   });
 
   it('every step above the last is a real link', () => {
-    const trail = resolveTrail('/chapters/redlining', 'Redlining');
+    const trail = resolveTrail('/stories/redlining', 'Redlining');
     for (const step of trail.slice(0, -1)) assert.ok(step.href, `${step.label} must be a link`);
   });
 });
@@ -583,6 +583,47 @@ describe('room kit · map moment arbitration', () => {
 
   it('nothing is framed when every moment has scrolled away', () => {
     assert.equal(pickLiveMoment([slot('a', -900), slot('b', 1400)], 800), null);
+  });
+});
+
+describe('room kit · a slot that is laid out but not visible is not a candidate', () => {
+  it('refuses a slot the browser reports as not visible, so the plate is released', () => {
+    // A moment inside a closed <details>: Chrome collapses the drawer but keeps the contents
+    // laid out, so the slot still reports a full-size rect at its old position. Judging by
+    // rect alone handed that slot the plate, and the map painted over the prose that had
+    // taken the space — the "map bleeding through the text" report.
+    const hidden = { checkVisibility: () => false } as unknown as Element;
+    const shown = { checkVisibility: () => true } as unknown as Element;
+    assert.equal(momentIsVisible(hidden), false);
+    assert.equal(momentIsVisible(shown), true);
+  });
+
+  it('keeps rect-only behaviour where checkVisibility is unsupported, rather than losing every moment', () => {
+    assert.equal(momentIsVisible({} as unknown as Element), true);
+  });
+});
+
+describe('room kit · a live moment is a window onto the borrowed plate', () => {
+  it('drops the slot background when live, or the plate paints behind an opaque box', () => {
+    // The regression this guards was invisible for a long time and hid EVERY map on the site.
+    // The plate is fixed at --ds-z-map-plate (0) and the document column sits at
+    // --ds-z-content (1), so a plate holding a slot paints behind the column by design. The
+    // slot kept its opaque idle ground when live, so the map was positioned perfectly over the
+    // slot and then covered by it: every MapMoment rendered an empty box. Nothing failed, no
+    // error was logged, and the moment still reported itself live.
+    const css = readFileSync(
+      path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'room-kit.css'),
+      'utf8',
+    );
+    const liveRule = /\.ds-mapmoment\[data-live='1'\]\s+\.ds-mapmoment__plate\s*\{([^}]*)\}/.exec(
+      css,
+    );
+    assert.ok(liveRule, 'the live-slot rule must exist');
+    assert.match(
+      liveRule[1]!,
+      /background:\s*transparent/,
+      'a live slot must drop its background so the borrowed plate shows through',
+    );
   });
 });
 

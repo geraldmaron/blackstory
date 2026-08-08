@@ -33,6 +33,22 @@ function connectionString(): string {
   return value;
 }
 
+/**
+ * Opt-in id allowlist that re-derives `related[]` even when it is already populated.
+ *
+ * The default pass only fills an EMPTY related[], which is the safe behaviour for a backfill: it
+ * never overwrites a curated list. But after an entity merge the survivor's published related[]
+ * is stale rather than empty — it reflects the graph before its absorbed twin's edges were
+ * repointed onto it (repo-n7p6.15) — and stale is exactly the case the empty-only guard skips.
+ * Naming the ids keeps the blast radius explicit; there is deliberately no "refresh everything".
+ */
+const REFRESH_ENTITY_IDS = new Set(
+  (process.env.BACKFILL_RELATED_REFRESH_ENTITY_IDS ?? '')
+    .split(',')
+    .map((id) => id.trim())
+    .filter((id) => id.length > 0),
+);
+
 type RelatedEntry = {
   readonly id: string;
   readonly type: string;
@@ -80,8 +96,11 @@ async function main(): Promise<void> {
        FROM released r
        JOIN edges e ON e.eid = r.entity_id
        JOIN released r2 ON r2.entity_id = e.other_id
-       WHERE r.projection->'related' = '[]'::jsonb OR r.projection->'related' IS NULL
+       WHERE r.projection->'related' = '[]'::jsonb
+          OR r.projection->'related' IS NULL
+          OR r.entity_id = ANY($1::text[])
        ORDER BY r.entity_id, e.other_id, e.relationship_type`,
+      [[...REFRESH_ENTITY_IDS]],
     );
 
     const targets = new Map<string, TargetRow>();
@@ -108,6 +127,9 @@ async function main(): Promise<void> {
 
     console.log('=== Backfill release related[] from canonical edges ===');
     console.log(`Entities with empty related and published in-release edges: ${targets.size}`);
+    if (REFRESH_ENTITY_IDS.size > 0) {
+      console.log(`Force-refreshing ${REFRESH_ENTITY_IDS.size} named entity/entities.`);
+    }
     for (const target of [...targets.values()].slice(0, 15)) {
       console.log(
         `  ${target.entity_id}: ${target.entries.length} entr(ies) — ` +
@@ -134,8 +156,16 @@ async function main(): Promise<void> {
              SET related = $3::jsonb,
                  projection = $4::jsonb
            WHERE release_id = $1 AND entity_id = $2
-             AND (projection->'related' = '[]'::jsonb OR projection->'related' IS NULL)`,
-          [target.release_id, target.entity_id, relatedJson, nextProjection],
+             AND (projection->'related' = '[]'::jsonb
+                  OR projection->'related' IS NULL
+                  OR entity_id = ANY($5::text[]))`,
+          [
+            target.release_id,
+            target.entity_id,
+            relatedJson,
+            nextProjection,
+            [...REFRESH_ENTITY_IDS],
+          ],
         );
         updated += result.rowCount ?? 0;
       }

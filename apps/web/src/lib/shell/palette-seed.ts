@@ -2,7 +2,7 @@
  * The 404's hand-off to the bar search: turn the path a reader mistyped into a query they can
  * search with, and publish it to the shell.
  *
- * A reader who lands on `/chapters/tulsa-race-masacre` typed something real and got nothing. The
+ * A reader who lands on `/stories/tulsa-race-masacre` typed something real and got nothing. The
  * path is the best guess anyone has at what they wanted, so the bar's search opens holding it
  * (design-direction-v9-surfaces.md §"/_not-found"). What the bar must never hold is the path
  * verbatim: an arbitrary URL segment rendered into a search field is a reflected-content vector,
@@ -20,7 +20,7 @@
 const MAX_SEED_LENGTH = 64;
 
 /**
- * A path to words. `/chapters/tulsa-race-massacre` becomes `chapters tulsa race massacre`.
+ * A path to words. `/stories/tulsa-race-massacre` becomes `stories tulsa race massacre`.
  *
  * Percent-escapes are decoded first so that `%2Fscript` cannot smuggle a separator past the
  * whitelist; a malformed escape sequence throws in `decodeURIComponent`, and that is treated as

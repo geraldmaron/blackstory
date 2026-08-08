@@ -43,7 +43,7 @@ export default function NotFound() {
             <Link className="ds-button ds-button--secondary" href="/">
               Open the Atlas
             </Link>
-            <Link className="ds-button ds-button--secondary" href="/chapters">
+            <Link className="ds-button ds-button--secondary" href="/stories">
               Read the chapters
             </Link>
           </div>

@@ -208,6 +208,25 @@ function readLocalJsonArtifact<T>(objectPath: string, root: string): T | undefin
   }
 }
 
+/** Fetch the release entities-list artifact (CDN/GCS HTTPS, optional local fixture fallback). */
+export async function fetchReleaseEntitiesListArtifact(
+  releaseId: string,
+  options: FetchReleaseArtifactOptions = {},
+): Promise<ReleaseEntitiesListArtifact | undefined> {
+  const objectPath = publicReleaseEntitiesListPath(releaseId);
+  const remote = await fetchJsonArtifact<ReleaseEntitiesListArtifact>(objectPath, options);
+  if (remote && remote.releaseId === releaseId && Array.isArray(remote.entities)) {
+    return remote;
+  }
+  if (options.allowLocalFallback === false) return undefined;
+  const localRoot = options.localArtifactsRoot ?? defaultLocalArtifactsRoot();
+  const local = readLocalJsonArtifact<ReleaseEntitiesListArtifact>(objectPath, localRoot);
+  if (local && local.releaseId === releaseId && Array.isArray(local.entities)) {
+    return local;
+  }
+  return undefined;
+}
+
 /** Fetch the release search-index artifact (CDN/GCS HTTPS, optional local fixture fallback). */
 export async function fetchReleaseSearchIndexArtifact(
   releaseId: string,

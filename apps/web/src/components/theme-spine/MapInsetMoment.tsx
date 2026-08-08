@@ -1,27 +1,26 @@
 /**
- * Theme-spine "map inset" moment: a small static map panel pinned to a chapter's place,
- * with a copperPin marker, linking into the full map experience with the entity selected.
+ * A chapter's `mapInset` block, rendered as the room kit's map moment.
  *
- * Reuses the existing hero/entity map machinery instead of forking it:
- *  - `EntityLocationMap` (apps/web/src/components/entity/EntityLocationMap.tsx) already
- *    renders exactly this shape — an OpenFreeMap panel centered on a public-precision
- *    coordinate with a copper pin — built on `entity-location-map-style.ts` and this
- *    codebase's `dignity-style.ts` palette (the same color tokens `hero-map-inset.ts`'s
- *    MapStage plate draws from). `hero-map-inset.ts` itself only positions the persistent
- *    full-bleed home-hero MapStage plate against scroll geometry, which doesn't apply to a
- *    small inline panel, so this component calls into `EntityLocationMap` rather than that
- *    module.
- *  - The "view on map" link reuses `buildExploreHref`/`defaultExploreOverlayState` from
- *    `lib/map-experience/url-state.ts` — the same `selected=<entityId>` convention used by
- *    entity and story pages ("View on map" CTAs) to pre-select an entity on `/explore`.
+ * WHAT CHANGED AND WHY (SP-08, repo-92n2.8). This used to mount `EntityLocationMap`, a second
+ * MapLibre instance inside the article column. That cost a whole extra GL context per chapter that
+ * happened to cite a place, and it put a live, independently-styled map behind prose — the thing
+ * the plate postures exist to forbid. It now contributes a SLOT and a caption, and the one
+ * persistent plate moves into that slot when the block scrolls into view.
  *
- * Static and reduced-motion safe: `selected`/`locked` are left at their default (false), so
- * `EntityLocationMap` never engages its selection-pulse animation here.
+ * This is where the Framed posture first runs for real: chapter detail is a Reading surface, so
+ * the plate rests Parked and is borrowed only while a moment is live. Between moments, and for a
+ * reader with no JavaScript, the caption still carries the point.
+ *
+ * The component survives as a thin adapter rather than the article rendering `MapMoment` directly,
+ * because the `mapInset` block carries an `entityId` and the Atlas hand-off has to be built from
+ * it — `selected=<entityId>` is the same convention entity and story pages use. That is real
+ * mapping logic and it belongs somewhere; a wrapper this size is cheaper than teaching `ArticleBody`
+ * the explore URL vocabulary.
  */
 import React from 'react';
-import Link from 'next/link';
-import { EntityLocationMap } from '../entity/EntityLocationMap';
+import { MapMoment } from '../room';
 import { DEFAULT_EXPLORE_FILTERS } from '../../lib/map-experience/filters';
+import { zoomForLocationPrecision } from '../../lib/map-experience/geo-precision';
 import { buildExploreHref, defaultExploreOverlayState } from '../../lib/map-experience/url-state';
 
 void React;
@@ -43,7 +42,6 @@ export function MapInsetMoment({
   precision,
   className,
 }: MapInsetMomentProps) {
-  const rootClassName = ['ds-map-inset-moment', className].filter(Boolean).join(' ');
   const exploreHref = buildExploreHref({
     filters: DEFAULT_EXPLORE_FILTERS,
     ...defaultExploreOverlayState(),
@@ -51,16 +49,13 @@ export function MapInsetMoment({
   });
 
   return (
-    <figure className={rootClassName}>
-      <div className="ds-map-inset-moment__frame">
-        <EntityLocationMap lat={lat} lng={lng} label={label} precision={precision} />
-      </div>
-      <figcaption className="ds-map-inset-moment__caption">
-        <span className="ds-map-inset-moment__place">{label}</span>
-        <Link className="ds-map-inset-moment__link" href={exploreHref}>
-          View on map
-        </Link>
-      </figcaption>
-    </figure>
+    <MapMoment
+      // No pitch and no bearing. A chapter's place inset is a locator, not a cinematic: the
+      // camera arrives level, and `resolveMomentCamera` still drops both under reduced motion.
+      camera={{ center: [lng, lat], zoom: zoomForLocationPrecision(precision) }}
+      note={label}
+      atlasHref={exploreHref}
+      {...(className ? { className } : {})}
+    />
   );
 }

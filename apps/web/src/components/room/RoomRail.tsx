@@ -3,7 +3,7 @@
  *
  * The rail's job is always the same across the class: take the set the room is already showing
  * and offer it back grouped a second way, as links that stay inside the room. `/records` groups
- * by era and by state; `/chapters` by era and place; `/books` and `/law` by jurisdiction.
+ * by era and by state; `/stories` by era and place; `/books` and `/law` by jurisdiction.
  *
  * Entries are anchors with a mono count, never buttons: a rail that needs JavaScript to regroup
  * is a rail a crawler cannot follow, and these links are a large part of how the index is

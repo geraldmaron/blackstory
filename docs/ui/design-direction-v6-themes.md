@@ -54,10 +54,11 @@ Do not advertise a slogan for this pattern. The page should simply read that way
 
 **Folded chapters (stories promoted into a theme's spine):** when a story
 folds into a theme arc as a chapter, its prose must additionally follow the
-five rules in `docs/ui/voice-theme-chapters.md` (named actor/hour, prose
+six rules in `docs/ui/voice-theme-chapters.md` (named actor/hour, prose
 builds stakes before a `DataMoment` delivers the verdict, sentence rhythm,
 disputes shown in prose not only in metadata, at most one earned closing
-flourish). That document extends `docs/ui/story.md`'s presence+proof
+flourish, and prose that stands alone without naming the site or its sibling
+chapters). That document extends `docs/ui/story.md`'s presence+proof
 principle for this specific prose format and includes a labeled illustrative
 sample chapter.
 

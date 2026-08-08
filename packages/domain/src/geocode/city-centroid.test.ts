@@ -20,3 +20,26 @@ test('lookupUsCityCentroid returns a finite centroid for Montgomery, AL', () => 
 test('lookupUsCityCentroid returns undefined for unknown city', () => {
   assert.equal(lookupUsCityCentroid('DefinitelyNotACityXx', 'AL'), undefined);
 });
+
+test('lookupUsCityCentroid resolves abbreviated saint/mount/fort prefixes', () => {
+  // The dataset spells these out; sources almost always abbreviate them.
+  const abbreviated = lookupUsCityCentroid('St. Louis', 'MO');
+  const expanded = lookupUsCityCentroid('Saint Louis', 'MO');
+  assert.ok(abbreviated, 'St. Louis, MO should resolve');
+  assert.deepEqual(abbreviated, expanded);
+
+  assert.ok(lookupUsCityCentroid('St Louis', 'MO'), 'no-period form should resolve too');
+  assert.ok(lookupUsCityCentroid('Mt. Vernon', 'NY'), 'Mt. Vernon, NY should resolve');
+  assert.ok(lookupUsCityCentroid('Ft. Worth', 'TX'), 'Ft. Worth, TX should resolve');
+});
+
+test('expanding a prefix never invents a city that does not exist', () => {
+  assert.equal(lookupUsCityCentroid('St. NotARealPlaceXx', 'MO'), undefined);
+});
+
+test('lookupUsCityCentroid resolves conversational names for New York City', () => {
+  const bare = lookupUsCityCentroid('New York', 'NY');
+  assert.ok(bare);
+  assert.deepEqual(lookupUsCityCentroid('New York City', 'NY'), bare);
+  assert.deepEqual(lookupUsCityCentroid('NYC', 'NY'), bare);
+});

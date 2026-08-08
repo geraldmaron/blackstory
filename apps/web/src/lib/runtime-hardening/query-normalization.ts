@@ -13,6 +13,7 @@
 import { buildExploreSearchParams, parseExploreSearchParams } from '../map-experience/url-state';
 import {
   CORRECTIONS_PAGE_PARAM_ALLOWLIST,
+  STORIES_PAGE_PARAM_ALLOWLIST,
   EXPLORE_PAGE_PARAM_ALLOWLIST,
   LAW_PAGE_PARAM_ALLOWLIST,
   SEARCH_PAGE_PARAM_ALLOWLIST,
@@ -57,6 +58,9 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
   // note where HISTORY_PAGE_PARAM_ALLOWLIST used to live in `constants.ts`.
   if (path === '/law') {
     return LAW_PAGE_PARAM_ALLOWLIST;
+  }
+  if (path === '/stories') {
+    return STORIES_PAGE_PARAM_ALLOWLIST;
   }
   if (path === '/corrections') {
     return CORRECTIONS_PAGE_PARAM_ALLOWLIST;

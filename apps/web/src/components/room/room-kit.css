@@ -320,6 +320,19 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Anchor the crop to the top. `cover` defaults to centring, which cut the head off every
+     full-length portrait in the presidential series — a card grid of decapitated subjects.
+     Faces sit near the top of a portrait, and a landscape hero (a redlining map, a
+     postcard) loses nothing meaningful from its lower edge, so top is right for both. */
+  object-position: center top;
+}
+
+/* A gallery of portraits: show the whole image rather than crop it. No single crop origin
+   suits both a full-length painting (head in the upper third) and a tight bust (head
+   filling the frame) — centring beheads the first, top-anchoring clips the second. */
+.ds-room-card__media--contain img {
+  object-fit: contain;
+  object-position: center;
 }
 
 .ds-room-card__kind {
@@ -1077,7 +1090,11 @@ a.ds-room-chip {
 
 .ds-mapmoment__plate {
   position: relative;
-  aspect-ratio: 16 / 9;
+  /* 16:9 is the reading-column moment. A room whose slot sits somewhere narrower — the record
+     page's 15rem rail is the case that forced this — sets the token on its own container rather
+     than restating `.ds-mapmoment__plate`, which the ratchet below forbids on purpose. The room
+     picks the proportion; the kit still owns the block. */
+  aspect-ratio: var(--ds-mapmoment-aspect, 16 / 9);
   overflow: hidden;
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
@@ -1089,6 +1106,19 @@ a.ds-room-chip {
 /* Live is signalled by the copper edge AND by the tag text, never by colour alone. */
 .ds-mapmoment[data-live='1'] .ds-mapmoment__plate {
   border-color: var(--ds-accent-graphic);
+  /*
+   * The slot becomes a window onto the borrowed plate.
+   *
+   * The plate is `position: fixed` at `--ds-z-map-plate` (0) and the document column sits at
+   * `--ds-z-content` (1), so a plate holding this slot paints BEHIND the column by design —
+   * that ordering is what keeps a live plate from reading through prose everywhere else. The
+   * slot kept its opaque idle ground when live, which meant the map was positioned perfectly
+   * over the slot and then covered by it: every MapMoment on every reading surface rendered
+   * an empty box. Dropping the ground here lets the plate show through without touching the
+   * z-order that protects the rest of the page. The tag and the Atlas control sit at local
+   * `z-index: 2`, so they stay above the map.
+   */
+  background: transparent;
 }
 
 .ds-mapmoment__idle {
@@ -1104,6 +1134,9 @@ a.ds-room-chip {
   text-align: center;
   color: var(--room-ink-4);
   transition: opacity var(--ds-duration-base) ease;
+  /* Decorative text that covers the whole slot. Left interactive it swallowed clicks meant for
+     the Atlas control beneath it, including once it had faded to nothing on a live moment. */
+  pointer-events: none;
 }
 
 .ds-mapmoment[data-live='1'] .ds-mapmoment__idle {

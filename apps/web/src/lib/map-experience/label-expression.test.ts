@@ -27,10 +27,10 @@ test('fallback order runs most specific to least specific', () => {
 });
 
 test('OpenMapTiles style builders reference the shared expression', () => {
-  const styleFiles = [
-    new URL('../../app/map/explore-style.ts', import.meta.url),
-    new URL('./entity-location-map-style.ts', import.meta.url),
-  ];
+  // `entity-location-map-style.ts` stood here until SP-08 retired the second MapLibre instance it
+  // styled. One style builder is now the whole list, which is the point of the persistent plate:
+  // there is one map, so there is one place a label expression can drift.
+  const styleFiles = [new URL('../../app/map/explore-style.ts', import.meta.url)];
 
   for (const file of styleFiles) {
     const source = readFileSync(file, 'utf8');

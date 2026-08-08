@@ -1,0 +1,295 @@
+/**
+ * `/stories` index logic: notice states, query parsing, href building, filtering, search,
+ * sorting, pagination and the rail groups.
+ *
+ * Two behaviours here are load-bearing and easy to regress silently. The unavailable
+ * (load failure) state and the none-published state must read differently: one is a fault
+ * on our side, the other an honest statement that the release has nothing here yet.
+ * Collapsing them would tell a reader whose connection to the live record failed that the
+ * archive is simply empty. And sorting must be total — every comparator falls through to
+ * slug — because a collection whose order changes between identical requests reads as
+ * broken even when its contents are right.
+ */
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import {
+  buildEraGroups,
+  buildKindChips,
+  buildPlaceGroups,
+  buildSeriesGroups,
+  buildTagGroups,
+  computeStoriesFacts,
+  filterItems,
+  hasActiveNarrowing,
+  paginateStories,
+  parseStoriesQuery,
+  sortItems,
+  storiesHref,
+  storiesNotice,
+} from './stories-index';
+import type { PublicArticleListItemDoc } from '@repo/schemas';
+import { RECORDS_PAGE_SIZE } from '../../lib/records/build-records-index';
+
+function item(overrides: Partial<PublicArticleListItemDoc>): PublicArticleListItemDoc {
+  return {
+    id: overrides.id ?? 'a1',
+    releaseId: 'rel-1',
+    slug: overrides.slug ?? 'a-chapter',
+    kind: overrides.kind ?? 'chapter',
+    title: overrides.title ?? 'A chapter',
+    summary: overrides.summary ?? 'A summary long enough to pass validation.',
+    publishedAt: overrides.publishedAt ?? '2020-01-01',
+    eraLabel: overrides.eraLabel ?? 'Redlining',
+    placeLabel: overrides.placeLabel ?? 'Tulsa, Oklahoma',
+    tags: overrides.tags ?? [],
+    ...overrides,
+  };
+}
+
+const EMPTY = parseStoriesQuery({});
+
+describe('/stories · the two notice states differ', () => {
+  it('unavailable and none-published render different titles and bodies', () => {
+    const unavailable = storiesNotice('unavailable', 0, 0);
+    const nonePublished = storiesNotice('live', 0, 0);
+    assert.notEqual(unavailable.title, nonePublished.title);
+    assert.notEqual(unavailable.body, nonePublished.body);
+    assert.match(unavailable.body, /check back/i);
+    assert.match(nonePublished.body, /published yet/i);
+  });
+
+  it('the filtered-empty state names the total so the reader can widen back out', () => {
+    const notice = storiesNotice('live', 12, 0);
+    assert.match(notice.body, /12/);
+  });
+
+  it('is silent when there are results to show', () => {
+    assert.equal(storiesNotice('live', 5, 5).body, '');
+  });
+});
+
+describe('/stories · query parsing', () => {
+  it('collapses unrecognised values rather than throwing, since bookmarks reach here', () => {
+    const query = parseStoriesQuery({ kind: 'nonsense', sort: 'sideways', page: 'abc' });
+    assert.equal(query.kind, '');
+    assert.equal(query.sort, 'series');
+    assert.equal(query.page, 1);
+  });
+
+  it('accepts the real kinds and sorts', () => {
+    assert.equal(parseStoriesQuery({ kind: 'article' }).kind, 'article');
+    assert.equal(parseStoriesQuery({ sort: 'title' }).sort, 'title');
+  });
+
+  it('takes the first value when a param repeats', () => {
+    assert.equal(parseStoriesQuery({ series: ['presidents', 'other'] }).series, 'presidents');
+  });
+});
+
+describe('/stories · href building', () => {
+  it('omits page=1 and the default sort, matching the records convention', () => {
+    assert.equal(storiesHref({}), '/stories');
+    assert.equal(storiesHref({ page: 1, sort: 'series' }), '/stories');
+  });
+
+  it('carries real narrowing into the query string', () => {
+    assert.equal(storiesHref({ series: 'presidents' }), '/stories?series=presidents');
+    assert.equal(storiesHref({ kind: 'article', page: 3 }), '/stories?kind=article&page=3');
+  });
+});
+
+describe('/stories · filtering and search', () => {
+  const items = [
+    item({ id: 'c1', slug: 'buying-a-home', kind: 'chapter', title: 'Buying a Home' }),
+    item({
+      id: 'p16',
+      slug: 'abraham-lincoln',
+      kind: 'article',
+      title: 'Abraham Lincoln',
+      tags: ['Civil War and Reconstruction'],
+      series: { id: 'presidents', label: 'Presidential records', position: 16 },
+    }),
+    item({
+      id: 'p40',
+      slug: 'ronald-reagan',
+      kind: 'article',
+      title: 'Ronald Reagan',
+      tags: ['Modern era'],
+      series: { id: 'presidents', label: 'Presidential records', position: 40 },
+    }),
+  ];
+
+  it('filters by kind', () => {
+    const rows = filterItems(items, { ...EMPTY, kind: 'article' });
+    assert.deepEqual(
+      rows.map((row) => row.id),
+      ['p16', 'p40'],
+    );
+  });
+
+  it('filters by series', () => {
+    assert.equal(filterItems(items, { ...EMPTY, series: 'presidents' }).length, 2);
+    assert.equal(filterItems(items, { ...EMPTY, series: 'nope' }).length, 0);
+  });
+
+  it('filters by tag', () => {
+    const rows = filterItems(items, { ...EMPTY, tag: 'Modern era' });
+    assert.deepEqual(
+      rows.map((row) => row.id),
+      ['p40'],
+    );
+  });
+
+  it('searches case-insensitively across title, series and tags', () => {
+    assert.equal(filterItems(items, { ...EMPTY, q: 'lincoln' })[0]?.id, 'p16');
+    assert.equal(filterItems(items, { ...EMPTY, q: 'PRESIDENTIAL' }).length, 2);
+    assert.equal(filterItems(items, { ...EMPTY, q: 'nothing here' }).length, 0);
+  });
+
+  it('reports when any narrowing is engaged, so the clear affordance can show', () => {
+    assert.equal(hasActiveNarrowing(EMPTY), false);
+    assert.equal(hasActiveNarrowing({ ...EMPTY, q: 'x' }), true);
+    assert.equal(hasActiveNarrowing({ ...EMPTY, series: 'presidents' }), true);
+  });
+});
+
+describe('/stories · sorting', () => {
+  const unordered = [
+    item({ id: 'b', slug: 'b', title: 'Beta', publishedAt: '2021-01-01' }),
+    item({
+      id: 'p40',
+      slug: 'reagan',
+      title: 'Reagan',
+      publishedAt: '2019-01-01',
+      series: { id: 'presidents', label: 'Presidential records', position: 40 },
+    }),
+    item({
+      id: 'p16',
+      slug: 'lincoln',
+      title: 'Lincoln',
+      publishedAt: '2022-01-01',
+      series: { id: 'presidents', label: 'Presidential records', position: 16 },
+    }),
+    item({ id: 'a', slug: 'a', title: 'Alpha', publishedAt: '2020-01-01' }),
+  ];
+
+  it('sorts a series by its own position, not by publication date', () => {
+    const rows = sortItems(unordered, 'series');
+    assert.deepEqual(
+      rows.slice(0, 2).map((row) => row.id),
+      ['p16', 'p40'],
+    );
+  });
+
+  it('keeps non-series entries behind the collection, newest first', () => {
+    const rows = sortItems(unordered, 'series');
+    assert.deepEqual(
+      rows.slice(2).map((row) => row.id),
+      ['b', 'a'],
+    );
+  });
+
+  it('sorts by title and by date when asked', () => {
+    assert.equal(sortItems(unordered, 'title')[0]?.title, 'Alpha');
+    assert.equal(sortItems(unordered, 'newest')[0]?.publishedAt, '2022-01-01');
+    assert.equal(sortItems(unordered, 'oldest')[0]?.publishedAt, '2019-01-01');
+  });
+
+  it('is total: entries tied on the visible key never swap between identical calls', () => {
+    const tied = [
+      item({ id: 'x', slug: 'zulu', title: 'Same', publishedAt: '2020-01-01' }),
+      item({ id: 'y', slug: 'alpha', title: 'Same', publishedAt: '2020-01-01' }),
+    ];
+    const first = sortItems(tied, 'title').map((row) => row.slug);
+    const second = sortItems([...tied].reverse(), 'title').map((row) => row.slug);
+    assert.deepEqual(first, second);
+    assert.deepEqual(first, ['alpha', 'zulu']);
+  });
+
+  it('does not mutate the array it was given', () => {
+    const original = [...unordered];
+    sortItems(unordered, 'title');
+    assert.deepEqual(unordered, original);
+  });
+});
+
+describe('/stories · rail groups and chips', () => {
+  const items = [
+    item({ id: 'c1', slug: 'c1', kind: 'chapter', eraLabel: '1911–present', placeLabel: 'US' }),
+    item({
+      id: 'p1',
+      slug: 'p1',
+      kind: 'article',
+      eraLabel: '1789–1797',
+      placeLabel: 'US',
+      tags: ['Founding era'],
+      series: { id: 'presidents', label: 'Presidential records', position: 1 },
+    }),
+  ];
+
+  it('counts each kind, and drops a chip with no entries behind it', () => {
+    const chips = buildKindChips(items, EMPTY);
+    assert.deepEqual(
+      chips.map((chip) => [chip.label, chip.count]),
+      [
+        ['All', 2],
+        ['Chapters', 1],
+        ['Records', 1],
+      ],
+    );
+    assert.equal(chips[0]?.active, true);
+  });
+
+  it('marks the engaged chip as current for assistive technology', () => {
+    const chips = buildKindChips(items, { ...EMPTY, kind: 'article' });
+    assert.equal(chips.find((chip) => chip.label === 'Records')?.active, true);
+    assert.equal(chips.find((chip) => chip.label === 'All')?.active, false);
+  });
+
+  it('builds collection, era, tag and place groups that link back into the index', () => {
+    assert.deepEqual(buildSeriesGroups(items), [
+      { label: 'Presidential records', href: '/stories?series=presidents', count: 1 },
+    ]);
+    assert.deepEqual(buildTagGroups(items), [
+      { label: 'Founding era', href: '/stories?tag=Founding+era', count: 1 },
+    ]);
+    assert.equal(buildEraGroups(items).length, 2);
+    assert.deepEqual(buildPlaceGroups(items), [
+      { label: 'US', href: '/stories?place=US', count: 2 },
+    ]);
+  });
+});
+
+describe('/stories · facts and pagination', () => {
+  it('summarizes the published count, year span and place count', () => {
+    const facts = computeStoriesFacts([
+      item({ id: '1', slug: '1', publishedAt: '2019-01-01', placeLabel: 'A' }),
+      item({ id: '2', slug: '2', publishedAt: '2024-01-01', placeLabel: 'B' }),
+    ]);
+    assert.equal(facts.publishedCount, 2);
+    assert.equal(facts.eraSpanLabel, '2019 to 2024');
+    assert.equal(facts.placeCount, 2);
+  });
+
+  it('never emits page=1 in the previous link, and clamps an out-of-range page', () => {
+    // Sized off the shared page constant so this never re-breaks if /records retunes it.
+    const many = Array.from({ length: RECORDS_PAGE_SIZE * 2 + 1 }, (_, index) =>
+      item({ id: `i${index}`, slug: `i${index}` }),
+    );
+    const page2 = paginateStories(many, { ...EMPTY, page: 2 });
+    assert.equal(page2.previousHref, '/stories');
+    assert.match(String(page2.nextHref), /page=3/);
+
+    const beyond = paginateStories(many, { ...EMPTY, page: 999 });
+    assert.equal(beyond.page, beyond.pageCount);
+    assert.equal(beyond.nextHref, undefined);
+  });
+
+  it('carries active narrowing through the pager links', () => {
+    const many = Array.from({ length: RECORDS_PAGE_SIZE * 2 + 1 }, (_, index) =>
+      item({ id: `i${index}`, slug: `i${index}`, kind: 'article' }),
+    );
+    const page2 = paginateStories(many, { ...EMPTY, kind: 'article', page: 2 });
+    assert.match(String(page2.nextHref), /kind=article/);
+  });
+});

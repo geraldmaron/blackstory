@@ -22,7 +22,7 @@ test('selectAtmospherePlane defaults to mosaic mode with density 8', () => {
   const selection = selectAtmospherePlane({ seedKey: 'naming-dunbar-1916' });
   assert.equal(selection.mode, 'mosaic');
   assert.equal(selection.tiles.length, 8);
-  assert.equal(selection.attributionHref, '/chapters/mosaic-credits');
+  assert.equal(selection.attributionHref, '/stories/mosaic-credits');
   assert.ok(selection.geometric.path.startsWith('/brand/atmosphere/fallback/'));
 });
 test('preferGeometric returns geometric mode with empty tiles', () => {

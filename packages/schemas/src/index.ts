@@ -6,5 +6,6 @@ export const SCHEMAS_PACKAGE = '@repo/schemas' as const;
 
 export * from './constitution/index.js';
 export * from './public-projections.js';
+export * from './search-index-row.js';
 export * from './public-articles.js';
 export * from './banned-books.js';

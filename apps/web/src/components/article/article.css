@@ -62,15 +62,29 @@
   margin: 0;
 }
 
+/*
+ * A hero is never cropped. This used to force `aspect-ratio: 3/2` with `object-fit: cover`
+ * so a grid of mixed-aspect heroes shared one footprint, but a hero is not in a grid — it
+ * is one image at the top of one page, and the cover crop cut the head off every
+ * full-length portrait in the presidential series (the subject of the picture, removed to
+ * keep a ratio nothing depended on).
+ *
+ * Natural aspect with a height cap instead: a landscape hero fills the measure exactly as
+ * before, a portrait stands tall without exceeding the fold, and `contain` guarantees that
+ * whatever the ratio, the whole image survives. The cap is in `rem` rather than `vh` so a
+ * short window doesn't shrink the image to a strip.
+ */
 .ds-article__hero img,
 .ds-article__image img {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
+  max-height: 34rem;
+  object-fit: contain;
+  object-position: center;
   border-radius: var(--ds-radius-md);
   border: var(--ds-border-width) solid var(--ds-border);
+  background: var(--ds-surface-raised);
 }
 
 .ds-article__figcaption {
@@ -240,6 +254,21 @@
 
 .ds-article__drawer-body {
   padding: 0 var(--ds-space-4) var(--ds-space-4);
+}
+
+/*
+ * A drawer holding a live map moment becomes a window.
+ *
+ * The borrowed plate is `position: fixed` below the document's stacking context, so it shows
+ * through the moment's transparent slot — that is how the moment's own tag and Atlas control
+ * stay on top of the map. It only works if everything between the slot and the page is
+ * transparent too, and this card's background was not: an opened map drawer showed an empty
+ * box with the map hidden behind it. Raising the plate instead is not an option, because
+ * `.ds-shell-page-transition` isolates the whole document, so a plate above the card is also
+ * above the moment's controls.
+ */
+.ds-article__drawer:has(.ds-mapmoment[data-live='1']) {
+  background: transparent;
 }
 
 /* The wrapped artifact loses its own outer card chrome inside the drawer. */

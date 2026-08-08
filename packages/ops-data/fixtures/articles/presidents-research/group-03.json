@@ -1,0 +1,621 @@
+{
+  "presidents": [
+    {
+      "number": 13,
+      "name": "Millard Fillmore",
+      "termLabel": "1850–1853",
+      "summary": "Fillmore became president in July 1850 and signed the Fugitive Slave Act on September 18, 1850, as part of the Compromise of 1850. He then used federal power to enforce it, including a February 18, 1851 proclamation ordering prosecution of the men who rescued Shadrach Minkins from federal custody in Boston.",
+      "paragraph": "Fillmore took office when Zachary Taylor died, and within two months he'd signed the Fugitive Slave Act, approved September 18, 1850. The statute told federal commissioners to decide who was a fugitive, and it shut the accused out of the proceeding: \"In no trial or hearing under this act shall the testimony of such alleged fugitive be admitted in evidence.\" Anyone who helped a person escape faced a fine up to a thousand dollars and up to six months in jail. The Miller Center records that Fillmore \"believed the South would secede\" without such a law, and that he used patronage to appoint officials who'd enforce it. He didn't leave enforcement to chance. After a crowd freed Shadrach Minkins from the Boston Court-House on February 15, 1851, Fillmore issued a proclamation three days later describing \"sundry lawless persons, principally persons of color,\" and directing \"that prosecutions be commenced against all persons who shall have made themselves aiders or abettors.\"",
+      "callouts": [
+        {
+          "text": "September 18, 1850: signed the Fugitive Slave Act (9 Stat. 462), which barred an accused fugitive's own testimony and penalized anyone aiding escape with fines up to $1,000 and six months' imprisonment.",
+          "sources": [
+            {
+              "label": "Avalon Project, Yale Law School — Fugitive Slave Act 1850",
+              "url": "https://avalon.law.yale.edu/19th_century/fugitive.asp",
+              "quote": "In no trial or hearing under this act shall the testimony of such alleged fugitive be admitted in evidence"
+            },
+            {
+              "label": "Miller Center, University of Virginia — Millard Fillmore: Key Events",
+              "url": "https://millercenter.org/president/millard-fillmore/key-events",
+              "quote": "prohibited individuals from aiding runaway slaves, and threatening fines and imprisonment to those who do"
+            }
+          ]
+        },
+        {
+          "text": "February 18, 1851: issued a presidential proclamation after the Shadrach Minkins rescue in Boston, directing that prosecutions be commenced against everyone who aided or abetted the rescue.",
+          "sources": [
+            {
+              "label": "Encyclopedia Virginia (Virginia Humanities) — 'A Proclamation by the President of the United States' (February 18, 1851)",
+              "url": "https://encyclopediavirginia.org/primary-documents/a-proclamation-by-the-president-of-the-united-states-february-18-1851/",
+              "quote": "I do, especially, direct, that prosecutions be commenced against all persons who shall have made themselves aiders or abettors"
+            },
+            {
+              "label": "Encyclopedia Virginia — Shadrach Minkins (d. 1875)",
+              "url": "https://encyclopediavirginia.org/entries/minkins-shadrach-d-1875/",
+              "quote": "the first person arrested in Massachusetts under the Fugitive Slave Act of 1850"
+            }
+          ]
+        },
+        {
+          "text": "Throughout 1850–1853: used presidential patronage to place officials committed to enforcing the Fugitive Slave Law in federal office, per the Miller Center's account of his administration.",
+          "sources": [
+            {
+              "label": "Miller Center, University of Virginia — Millard Fillmore: Key Events",
+              "url": "https://millercenter.org/president/millard-fillmore/key-events",
+              "quote": "his patronage powers to appoint pro-Fugitive Slave Law political allies to federal office"
+            }
+          ]
+        },
+        {
+          "text": "September 20, 1850: the remaining Compromise of 1850 measures became law, admitting California free and organizing Utah and New Mexico on popular sovereignty.",
+          "sources": [
+            {
+              "label": "Miller Center, University of Virginia — Millard Fillmore: Key Events",
+              "url": "https://millercenter.org/president/millard-fillmore/key-events",
+              "quote": "California is admitted as a free state, the Utah and New Mexico territories are to be organized on the principle of 'popular sovereignty.'"
+            }
+          ]
+        }
+      ],
+      "personalRecord": "No documentary record found in the sources fetched showing that Fillmore ever enslaved anyone. The Miller Center records that he came from a \"desperately poor\" family and was himself bound as an apprentice to a cloth maker — an arrangement the Miller Center says \"amounted to little more than slavery\" — and that he borrowed thirty dollars to buy out the indenture. The same source says he \"was also opposed to slavery in principle but thought that compromise was essential.\" Nothing about his estate at death was verified from the sources fetched; treat any figure as UNVERIFIED.",
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/3/33/Millard_Fillmore_Better_Crop_%28cropped%29.jpg",
+        "alt": "Photographic portrait of Millard Fillmore, seated, facing slightly left, in a dark coat",
+        "credit": "Wikimedia Commons (19th-century photographic portrait). Verified 2026-08-07: HTTP 200, content-type image/jpeg.",
+        "rights": "public_domain",
+        "whyPublicDomain": "A 19th-century United States photograph, published well before 1929; copyright has expired in the United States."
+      },
+      "sources": [
+        {
+          "id": "avalon-fugitive-slave-act-1850",
+          "label": "Avalon Project, Yale Law School — Fugitive Slave Act 1850 (full text)",
+          "url": "https://avalon.law.yale.edu/19th_century/fugitive.asp",
+          "quote": "Approved, September 18, 1850."
+        },
+        {
+          "id": "avalon-fsa-1850-penalty",
+          "label": "Avalon Project, Yale Law School — Fugitive Slave Act 1850, Section 7",
+          "url": "https://avalon.law.yale.edu/19th_century/fugitive.asp",
+          "quote": "subject to a fine not exceeding one thousand dollars, and imprisonment not exceeding six months"
+        },
+        {
+          "id": "miller-center-fillmore-key-events",
+          "label": "Miller Center, University of Virginia — Millard Fillmore: Key Events",
+          "url": "https://millercenter.org/president/millard-fillmore/key-events",
+          "quote": "Runaway slaves apprehended anywhere in the United States had to be returned to their masters if new federally appointed commissioners decided that they were in fact fugitive slaves."
+        },
+        {
+          "id": "ev-fillmore-proclamation-1851",
+          "label": "Encyclopedia Virginia (Virginia Humanities) — 'A Proclamation by the President of the United States' (February 18, 1851)",
+          "url": "https://encyclopediavirginia.org/primary-documents/a-proclamation-by-the-president-of-the-united-states-february-18-1851/",
+          "quote": "WHEREAS information has been received that sundry lawless persons, principally persons of color, combined and confederated together"
+        },
+        {
+          "id": "miller-center-fillmore-early-life",
+          "label": "Miller Center, University of Virginia — Millard Fillmore: Life Before the Presidency",
+          "url": "https://millercenter.org/president/fillmore/life-before-the-presidency",
+          "quote": "His large, desperately poor family knew little but struggle and failure."
+        }
+      ],
+      "disputes": [
+        "Motive for signing: the Miller Center states Fillmore \"personally opposed slavery\" and signed because he \"believed the South would secede\" without a fugitive slave law; the same page records that he nonetheless used patronage to appoint enforcement-minded officials. Both are recorded here without adjudicating which weighed more."
+      ],
+      "unverified": [
+        "The exact Statutes at Large pin cite (9 Stat. 462) appeared in web-search summaries; the loc.gov Statutes at Large volume page and the LOC broadside returned HTTP 403 and were not read directly.",
+        "Whether Fillmore ordered federal troops (as distinct from prosecutions) in the Minkins matter — search summaries assert it; the fetched proclamation text does not.",
+        "Fillmore's estate/holdings at death."
+      ]
+    },
+    {
+      "number": 14,
+      "name": "Franklin Pierce",
+      "termLabel": "1853–1857",
+      "summary": "Pierce signed the Kansas-Nebraska Act on May 30, 1854, which declared the Missouri Compromise restriction on slavery \"inoperative and void\" and left the question to territorial settlers. He also backed federal enforcement of the Fugitive Slave Act in the Anthony Burns case in Boston that same month, telegraphing the U.S. marshal that the law must be executed.",
+      "paragraph": "Pierce's signature on the Kansas-Nebraska Act, May 30, 1854, undid the line drawn in 1820. The act declared the 1820 restriction \"inoperative and void\" and said its intent was \"to leave the people thereof perfectly free to form and regulate their domestic institutions in their own way.\" The Miller Center records that the Kansas territory then \"devolves into a guerilla war between pro-slavery and anti-slavery settlers,\" with roughly 200 dead over two years. The same spring, federal marshals in Boston arrested Anthony Burns, who'd escaped from Virginia. Pierce wired Marshal Watson Freeman on May 27, 1854: \"Your conduct is approved. The law must be executed.\" Four days later he told the U.S. attorney to \"incur any expense deemed necessary.\" The Massachusetts Historical Society records that on June 2 an estimated 50,000 people filled Court Square and State Street while marshals, soldiers, marines and militia marched Burns to the harbor. Before his presidency, the Miller Center says, Pierce \"upheld the right of Americans to own property, even human property.\"",
+      "callouts": [
+        {
+          "text": "May 30, 1854: signed the Kansas-Nebraska Act, whose Section 14 declared the Missouri Compromise slavery restriction \"inoperative and void\" and substituted territorial popular sovereignty.",
+          "sources": [
+            {
+              "label": "National Archives — Milestone Documents: Kansas-Nebraska Act (1854)",
+              "url": "https://www.archives.gov/milestone-documents/kansas-nebraska-act",
+              "quote": "is hereby declared inoperative and void"
+            },
+            {
+              "label": "Miller Center, University of Virginia — Franklin Pierce: Key Events",
+              "url": "https://millercenter.org/president/pierce/key-events",
+              "quote": "organized the territories of Kansas and Nebraska on the basis of popular sovereignty"
+            }
+          ]
+        },
+        {
+          "text": "May 27, 1854: telegraphed U.S. Marshal Watson Freeman in Boston during the Anthony Burns case, \"Your conduct is approved. The law must be executed.\"",
+          "sources": [
+            {
+              "label": "Famous Trials (Douglas O. Linder, UMKC School of Law) — Orders of President Franklin Pierce in the Anthony Burns Affair (1854)",
+              "url": "https://www.famous-trials.com/anthonyburns/2407-orders-of-president-franklin-pierce-in-the-anthony-burns-affair-1854",
+              "quote": "Your conduct is approved. The law must be executed."
+            },
+            {
+              "label": "Massachusetts Historical Society — The Trial and Rendition of Anthony Burns",
+              "url": "https://www.masshist.org/object-of-the-month/objects/only-the-beginning-of-difficulties-2010-09-01",
+              "quote": "an estimated 50,000 people gathered in Court Square and along State Street between the courthouse and Boston Harbor to protest his extradition."
+            }
+          ]
+        },
+        {
+          "text": "May 31, 1854: instructed U.S. Attorney B. F. Hallett to \"incur any expense deemed necessary by the Marshal and yourself for city military, or otherwise, to insure the execution of the law.\"",
+          "sources": [
+            {
+              "label": "Famous Trials (UMKC School of Law) — Orders of President Franklin Pierce in the Anthony Burns Affair (1854)",
+              "url": "https://www.famous-trials.com/anthonyburns/2407-orders-of-president-franklin-pierce-in-the-anthony-burns-affair-1854",
+              "quote": "Incur any expense deemed necessary by the Marshal and yourself for city military, or otherwise, to insure the execution of the law."
+            }
+          ]
+        },
+        {
+          "text": "1854–1856: after Kansas-Nebraska, the Kansas territory fell into armed conflict; the Miller Center records roughly 200 dead and $2 million in property lost in two years.",
+          "sources": [
+            {
+              "label": "Miller Center, University of Virginia — Franklin Pierce: Key Events",
+              "url": "https://millercenter.org/president/pierce/key-events",
+              "quote": "200 dead and $2 million in property lost during the two years of strife"
+            }
+          ]
+        }
+      ],
+      "personalRecord": "No documentary record found in the sources fetched showing that Pierce ever enslaved anyone; he was a New Hampshire native. The Miller Center records that before the presidency \"only one cause seemed to inspire any real passion in him: opposition to the abolitionist movement,\" that he \"remained firmly opposed to the abolition of slavery in the states where it already existed,\" and that he \"upheld the right of Americans to own property, even human property.\" Nothing about his estate at death was verified from the sources fetched; treat any figure as UNVERIFIED.",
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Mathew_Brady_-_Franklin_Pierce_-_alternate_crop_%28cropped%29%282%29.jpg",
+        "alt": "Photographic portrait of Franklin Pierce by Mathew Brady, head and shoulders, facing slightly right",
+        "credit": "Mathew Brady studio photograph, via Wikimedia Commons. Verified 2026-08-07: HTTP 200, content-type image/jpeg.",
+        "rights": "public_domain",
+        "whyPublicDomain": "A mid-19th-century United States photograph, published well before 1929; copyright has expired in the United States."
+      },
+      "sources": [
+        {
+          "id": "nara-kansas-nebraska-act",
+          "label": "National Archives — Milestone Documents: Kansas-Nebraska Act (1854)",
+          "url": "https://www.archives.gov/milestone-documents/kansas-nebraska-act",
+          "quote": "not to legislate slavery into any Territory or State, nor to exclude it therefrom, but to leave the people thereof perfectly free to form and regulate their domestic institutions in their own way"
+        },
+        {
+          "id": "miller-center-pierce-key-events",
+          "label": "Miller Center, University of Virginia — Franklin Pierce: Key Events",
+          "url": "https://millercenter.org/president/pierce/key-events",
+          "quote": "the Kansas territory devolves into a guerilla war between pro-slavery and anti-slavery settlers"
+        },
+        {
+          "id": "famous-trials-pierce-burns-orders",
+          "label": "Famous Trials (Douglas O. Linder, UMKC School of Law) — Orders of President Franklin Pierce in the Anthony Burns Affair (1854)",
+          "url": "https://www.famous-trials.com/anthonyburns/2407-orders-of-president-franklin-pierce-in-the-anthony-burns-affair-1854",
+          "quote": "Your conduct is approved. The law must be executed."
+        },
+        {
+          "id": "mhs-anthony-burns-rendition",
+          "label": "Massachusetts Historical Society — 'Only the beginning of difficulties': The Trial and Rendition of Anthony Burns",
+          "url": "https://www.masshist.org/object-of-the-month/objects/only-the-beginning-of-difficulties-2010-09-01",
+          "quote": "A phalanx of U.S. marshals, soldiers, and marines, reinforced by Massachusetts militia, and 200 volunteers"
+        },
+        {
+          "id": "miller-center-pierce-before-presidency",
+          "label": "Miller Center, University of Virginia — Franklin Pierce: Life Before the Presidency",
+          "url": "https://millercenter.org/president/pierce/life-before-the-presidency",
+          "quote": "He also upheld the right of Americans to own property, even human property."
+        }
+      ],
+      "disputes": [
+        "Scale of the Burns rendition: web-search summaries cite ~2,000 troops and a $40,000 federal cost; the Massachusetts Historical Society page fetched describes marshals, soldiers, marines, militia and 200 volunteers without those figures. The troop count and cost are recorded here as unverified rather than stated."
+      ],
+      "unverified": [
+        "The '2,000 troops / $40,000' figures for the Burns rendition (search-summary only, not confirmed in a fetched primary or institutional page).",
+        "Whether the Miller Center's Pierce key-events page addresses fugitive-slave enforcement at all — the fetched version did not.",
+        "Pierce's estate/holdings at death."
+      ]
+    },
+    {
+      "number": 15,
+      "name": "James Buchanan",
+      "termLabel": "1857–1861",
+      "summary": "In his March 4, 1857 inaugural address Buchanan said the territorial slavery question was pending before the Supreme Court and would be \"speedily and finally settled,\" and pledged to \"cheerfully submit\" to the ruling. Two days later the Court decided Dred Scott v. Sandford; documented correspondence shows Buchanan had privately written to Justice Robert Grier beforehand.",
+      "paragraph": "Two days before the Dred Scott ruling, Buchanan stood at his inauguration and called the territorial slavery question \"a judicial question, which legitimately belongs to the Supreme Court of the United States, before whom it is now pending, and will, it is understood, be speedily and finally settled.\" He added that he would \"cheerfully submit.\" He already knew more than he let on. In a letter dated February 23, 1857, Justice Robert Cooper Grier told Buchanan he had \"taken the liberty to shew it in confidence to our mutual friends Judge Wayne and the Chief Justice,\" and that \"six if not seven\" justices would hold the 1820 compromise law of no effect. On March 6, 1857, Taney's opinion held that the act of Congress barring slavery north of the line \"is not warranted by the Constitution, and is therefore void,\" and described Black people as having been regarded as \"beings of an inferior order\" with \"no rights which the white man was bound to respect.\" Buchanan then backed the pro-slavery Lecompton constitution for Kansas.",
+      "callouts": [
+        {
+          "text": "March 4, 1857: in his inaugural address, told the country the Supreme Court would settle the territorial slavery question \"speedily and finally\" and that he would \"cheerfully submit\" to it.",
+          "sources": [
+            {
+              "label": "Miller Center, University of Virginia — March 4, 1857: Inaugural Address",
+              "url": "https://millercenter.org/the-presidency/presidential-speeches/march-4-1857-inaugural-address",
+              "quote": "will, it is understood, be speedily and finally settled. To their decision, in common with all good citizens, I shall cheerfully submit"
+            },
+            {
+              "label": "Miller Center — James Buchanan: Key Events",
+              "url": "https://millercenter.org/president/buchanan/key-events",
+              "quote": "only 45.3 percent of the popular vote"
+            }
+          ]
+        },
+        {
+          "text": "February 23, 1857: received a letter from Justice Robert Grier reporting that Grier had shown Buchanan's own letter in confidence to Chief Justice Taney and Justice Wayne, and previewing the vote count.",
+          "sources": [
+            {
+              "label": "House Divided Project, Dickinson College — Robert Cooper Grier to James Buchanan, February 23, 1857",
+              "url": "https://hd.housedivided.dickinson.edu/node/487",
+              "quote": "taken the liberty to shew it in confidence to our mutual friends Judge Wayne and the Chief Justice"
+            },
+            {
+              "label": "House Divided Project, Dickinson College — Grier to Buchanan, February 23, 1857",
+              "url": "https://hd.housedivided.dickinson.edu/node/487",
+              "quote": "six if not seven (perhaps Nelson will remain neutral) who will decide the compromise law of 1820 to be of non-effect"
+            }
+          ]
+        },
+        {
+          "text": "March 6, 1857: Dred Scott v. Sandford was decided, holding the congressional restriction on slavery in the territories void and Black Americans outside the Constitution's \"citizens.\"",
+          "sources": [
+            {
+              "label": "Library of Congress, U.S. Reports vol. 60 (19 How.) — Dred Scott v. Sandford, Taney, C.J.",
+              "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep060/usrep060393a/usrep060393a.pdf",
+              "quote": "the act of Congress which prohibited a citizen from holding and owning property of this kind in the territory of the United States north of the line therein mentioned, is not warranted by the Constitution, and is therefore void"
+            },
+            {
+              "label": "Miller Center — James Buchanan: Key Events",
+              "url": "https://millercenter.org/president/buchanan/key-events",
+              "quote": "blacks are not citizens"
+            }
+          ]
+        },
+        {
+          "text": "1858: threw his administration's weight behind the pro-slavery Lecompton constitution for Kansas over the objections of northern Democrats.",
+          "sources": [
+            {
+              "label": "Miller Center, University of Virginia — James Buchanan: Key Events",
+              "url": "https://millercenter.org/president/buchanan/key-events",
+              "quote": "throws in his lot with the pro-slavery forces"
+            }
+          ]
+        }
+      ],
+      "personalRecord": "Buchanan is the one lifelong bachelor president. The White House Historical Association records that in March 1835 a deed of transfer brought Daphne Cook, age twenty-two, and her daughter Ann Cook, age five, into Buchanan's possession in Pennsylvania: \"Daphne, age twenty-two, would serve Buchanan for seven years while her daughter Ann Cook, age five, would serve for twenty-three years until she reached the age of twenty-eight.\" The WHHA notes historians question whether they were really indentured servants \"or rather term slaves,\" and records that Ann died about three months later and Daphne ran away about two weeks after her daughter's death, with no record of what followed. Buchanan's nephew James Buchanan Henry claimed in 1911 that his uncle bought people's freedom in Washington, D.C.; the WHHA states that \"to this date, direct evidence of Buchanan purchasing and freeing enslaved people while living in Washington, D.C. has not been found.\" His estate at death was not verified from sources fetched.",
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/fd/James_Buchanan.jpg",
+        "alt": "Photographic portrait of James Buchanan, head and shoulders, with white hair swept upward",
+        "credit": "19th-century photographic portrait via Wikimedia Commons. Verified 2026-08-07: HTTP 200, content-type image/jpeg.",
+        "rights": "public_domain",
+        "whyPublicDomain": "A mid-19th-century United States photograph, published well before 1929; copyright has expired in the United States."
+      },
+      "sources": [
+        {
+          "id": "miller-center-buchanan-inaugural-1857",
+          "label": "Miller Center, University of Virginia — March 4, 1857: Inaugural Address",
+          "url": "https://millercenter.org/the-presidency/presidential-speeches/march-4-1857-inaugural-address",
+          "quote": "it is a judicial question, which legitimately belongs to the Supreme Court of the United States, before whom it is now pending"
+        },
+        {
+          "id": "housedivided-grier-buchanan-1857",
+          "label": "House Divided Project, Dickinson College — Robert Cooper Grier to James Buchanan, February 23, 1857",
+          "url": "https://hd.housedivided.dickinson.edu/node/487",
+          "quote": "if the question must be met, there will be an opinion of the court upon it, if possible, without the contradictory views which would weaken its force"
+        },
+        {
+          "id": "loc-dred-scott-usrep060",
+          "label": "Library of Congress, U.S. Reports vol. 60 — Dred Scott v. Sandford (1857), opinion of Taney, C.J.",
+          "url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep060/usrep060393a/usrep060393a.pdf",
+          "quote": "beings of an inferior order, and altogether unfit to associate with the white race, either in social or political relations; and so far inferior, that they had no rights which the white man was bound to respect"
+        },
+        {
+          "id": "miller-center-buchanan-key-events",
+          "label": "Miller Center, University of Virginia — James Buchanan: Key Events",
+          "url": "https://millercenter.org/president/buchanan/key-events",
+          "quote": "slavery cannot be prohibited in the territories"
+        },
+        {
+          "id": "whha-households-of-buchanan",
+          "label": "White House Historical Association — The Households of James Buchanan",
+          "url": "https://www.whitehousehistory.org/the-households-of-james-buchanan",
+          "quote": "To this date, direct evidence of Buchanan purchasing and freeing enslaved people while living in Washington, D.C. has not been found."
+        }
+      ],
+      "disputes": [
+        "Buchanan's holding of the Cooks: Philip Klein's 1962 biography frames the March 1835 transaction as purchase-and-manumission and a \"win-win\"; the White House Historical Association notes the twenty-three-year term for a five-year-old and the absence of other options for the Cooks \"calls into question whether Daphne and Ann were really indentured servants or rather term slaves.\" Both readings recorded.",
+        "Klein's timing: Klein casts the sale as defusing pre-election \"political dynamite,\" but the WHHA points out the sale occurred in March 1835, three months after Buchanan's December 6, 1834 Senate election.",
+        "Whether Buchanan bought and freed enslaved people in Washington, D.C.: asserted by his nephew James Buchanan Henry in 1911; the WHHA says no direct evidence has been found and some historians think Henry relocated the Cook episode."
+      ],
+      "unverified": [
+        "The February 3, 1857 Buchanan–Catron correspondence and Catron's February 19, 1857 letter (search-summary only; the underlying documents were not fetched).",
+        "A February 2, 1858 Lecompton message date — the Miller Center page fetched carried no such dated item.",
+        "Buchanan's estate at death."
+      ]
+    },
+    {
+      "number": 16,
+      "name": "Abraham Lincoln",
+      "termLabel": "1861–1865",
+      "summary": "Lincoln signed the District of Columbia Compensated Emancipation Act on April 16, 1862, issued the Emancipation Proclamation effective January 1, 1863, and approved the joint resolution sending the Thirteenth Amendment to the states on February 1, 1865. His stated position shifted over the war, from prioritizing the Union in August 1862 to publicly favoring limited Black suffrage on April 11, 1865.",
+      "paragraph": "Lincoln's record moves. On April 16, 1862, he signed the act ending slavery in the District of Columbia; the National Archives records that commissioners went on to approve 930 petitions freeing 2,989 people, with former owners paid up to $300 each and up to $100 available to any freed person choosing to emigrate. On January 1, 1863, the Emancipation Proclamation declared that \"all persons held as slaves within said designated States, and parts of States, are, and henceforward shall be free,\" and said such persons \"will be received into the armed service of the United States.\" It applied to areas in rebellion and excepted parts of Louisiana and Virginia. Congress passed the Thirteenth Amendment on January 31, 1865, and Lincoln approved the resolution the next day; it was ratified December 6, 1865. In his last public address, April 11, 1865, speaking about the vote for Black men in Louisiana, he said: \"I would myself prefer that it were now conferred on the very intelligent, and on those who serve our cause as soldiers.\"",
+      "callouts": [
+        {
+          "text": "April 16, 1862: signed the District of Columbia Compensated Emancipation Act, which freed enslaved people in the capital and compensated former owners up to $300 per person.",
+          "sources": [
+            {
+              "label": "National Archives — The District of Columbia Emancipation Act",
+              "url": "https://www.archives.gov/exhibits/featured-documents/dc-emancipation-act",
+              "quote": "approved 930 petitions, completely or in part, from former owners for the freedom of 2,989 former slaves"
+            },
+            {
+              "label": "U.S. Senate — DC Emancipation Act, Featured Document",
+              "url": "https://www.senate.gov/artandhistory/history/common/civil_war/DCEmancipationAct_FeaturedDoc.htm",
+              "quote": "the act freed slaves in the District of Columbia and compensated owners up to $300 for each freeperson"
+            }
+          ]
+        },
+        {
+          "text": "January 1, 1863: issued the Emancipation Proclamation, declaring people held as slaves in designated rebelling areas free and opening Union military service to them.",
+          "sources": [
+            {
+              "label": "National Archives — Emancipation Proclamation transcript",
+              "url": "https://www.archives.gov/exhibits/featured-documents/emancipation-proclamation/transcript.html",
+              "quote": "all persons held as slaves within said designated States, and parts of States, are, and henceforward shall be free"
+            },
+            {
+              "label": "Miller Center, University of Virginia — Abraham Lincoln: Key Events",
+              "url": "https://millercenter.org/president/lincoln/key-events",
+              "quote": "the Union Army would now receive black men into the service as regular soldiers"
+            }
+          ]
+        },
+        {
+          "text": "February 1, 1865: approved the joint resolution submitting the Thirteenth Amendment to the states, one day after Congress passed it; ratified December 6, 1865.",
+          "sources": [
+            {
+              "label": "National Archives — Milestone Documents: 13th Amendment (1865)",
+              "url": "https://www.archives.gov/milestone-documents/13th-amendment",
+              "quote": "Neither slavery nor involuntary servitude, except as a punishment for crime whereof the party shall have been duly convicted, shall exist within the United States"
+            },
+            {
+              "label": "Miller Center — Abraham Lincoln: Key Events",
+              "url": "https://millercenter.org/president/lincoln/key-events",
+              "quote": "which calls for the emancipation of all slaves and no compensation to their owners"
+            }
+          ]
+        },
+        {
+          "text": "September 22, 1862: issued the preliminary Emancipation Proclamation after Antietam, warning that emancipation would follow if the rebellion had not ended by January 1, 1863.",
+          "sources": [
+            {
+              "label": "Miller Center, University of Virginia — Abraham Lincoln: Key Events",
+              "url": "https://millercenter.org/president/lincoln/key-events",
+              "quote": "warned that if the rebellion did not end by January 1, 1863, he would issue his presidential order of emancipation"
+            }
+          ]
+        },
+        {
+          "text": "April 11, 1865: in his last public address, said he would prefer the vote be conferred on \"the very intelligent, and on those who serve our cause as soldiers\" — a qualified, not universal, endorsement.",
+          "sources": [
+            {
+              "label": "House Divided Project, Dickinson College — Lincoln's Last Speech (April 11, 1865)",
+              "url": "https://housedivided.dickinson.edu/sites/lincoln/last-speech-april-11-1865/",
+              "quote": "I would myself prefer that it were now conferred on the very intelligent, and on those who serve our cause as soldiers."
+            }
+          ]
+        }
+      ],
+      "personalRecord": "No documentary record found in the sources fetched showing that Lincoln ever enslaved anyone. What is documented in the fetched sources is his official record: signing DC emancipation (April 16, 1862), the Emancipation Proclamation (January 1, 1863), and the Thirteenth Amendment resolution (February 1, 1865), alongside the colonization provision in the DC act paying up to $100 to freed people choosing to emigrate. Nothing about his estate at death was verified from the sources fetched; treat any figure as UNVERIFIED.",
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Abraham_Lincoln_O-77_matte_collodion_print.jpg",
+        "alt": "Photographic portrait of Abraham Lincoln, head and shoulders, bearded, facing slightly left",
+        "credit": "Alexander Gardner studio, February 1865 (O-77 sitting), via Wikimedia Commons. Verified 2026-08-07: HTTP 200, content-type image/jpeg.",
+        "rights": "public_domain",
+        "whyPublicDomain": "An 1865 United States photograph, published well before 1929; copyright has expired in the United States."
+      },
+      "sources": [
+        {
+          "id": "nara-emancipation-proclamation-transcript",
+          "label": "National Archives — Emancipation Proclamation transcript",
+          "url": "https://www.archives.gov/exhibits/featured-documents/emancipation-proclamation/transcript.html",
+          "quote": "such persons of suitable condition, will be received into the armed service of the United States to garrison forts, positions, stations, and other places, and to man vessels of all sorts in said service"
+        },
+        {
+          "id": "nara-13th-amendment",
+          "label": "National Archives — Milestone Documents: 13th Amendment to the U.S. Constitution (1865)",
+          "url": "https://www.archives.gov/milestone-documents/13th-amendment",
+          "quote": "Neither slavery nor involuntary servitude, except as a punishment for crime whereof the party shall have been duly convicted, shall exist within the United States, or any place subject to their jurisdiction."
+        },
+        {
+          "id": "nara-dc-emancipation-act",
+          "label": "National Archives — The District of Columbia Emancipation Act",
+          "url": "https://www.archives.gov/exhibits/featured-documents/dc-emancipation-act",
+          "quote": "payments of up to $100 for each person choosing emigration"
+        },
+        {
+          "id": "senate-dc-emancipation-act",
+          "label": "U.S. Senate — DC Emancipation Act, Featured Document",
+          "url": "https://www.senate.gov/artandhistory/history/common/civil_war/DCEmancipationAct_FeaturedDoc.htm",
+          "quote": "On April 16, 1862, the District of Columbia Compensated Emancipation Act became law."
+        },
+        {
+          "id": "miller-center-lincoln-key-events",
+          "label": "Miller Center, University of Virginia — Abraham Lincoln: Key Events",
+          "url": "https://millercenter.org/president/lincoln/key-events",
+          "quote": "Major General David Hunter of the Union organizes the first black troops, among whom number many former slaves."
+        },
+        {
+          "id": "housedivided-lincoln-last-speech",
+          "label": "House Divided Project, Dickinson College — Last Speech (April 11, 1865)",
+          "url": "https://housedivided.dickinson.edu/sites/lincoln/last-speech-april-11-1865/",
+          "quote": "I would myself prefer that it were now conferred on the very intelligent, and on those who serve our cause as soldiers."
+        }
+      ],
+      "disputes": [
+        "Number freed in the District: the National Archives records commissioners approving 930 petitions covering 2,989 people; web-search summaries commonly cite ~3,100 or 3,185 enslaved people in the District in 1862. The Archives figure is the adjudicated-petition count, not necessarily the total population; both figures recorded.",
+        "Whether Lincoln's April 11, 1865 remark was the first public presidential endorsement of Black voting rights: this is widely asserted, but the House Divided page fetched does not make that claim, and it is not recorded here as established."
+      ],
+      "unverified": [
+        "The full text of Lincoln's August 22, 1862 letter to Horace Greeley — loc.gov returned HTTP 403 and the Miller Center URL 404'd; the 'paramount object' passage is NOT verified here.",
+        "Lincoln's June 28, 1864 signing of the repeal of the Fugitive Slave Acts (not fetched).",
+        "Lincoln's colonization advocacy at the August 14, 1862 White House meeting with Black leaders (not fetched).",
+        "Lincoln's estate at death."
+      ]
+    },
+    {
+      "number": 17,
+      "name": "Andrew Johnson",
+      "termLabel": "1865–1869",
+      "summary": "Johnson vetoed the Freedmen's Bureau extension bill on February 19, 1866 and the Civil Rights Act on March 27, 1866, the latter overridden by Congress on April 9, 1866. His pardon policy and Bureau Circular No. 15 of September 12, 1865 set up the restoration of abandoned lands to pardoned former Confederate owners, and the House impeached him on February 24, 1868.",
+      "paragraph": "Johnson's May 29, 1865 amnesty proclamation offered pardon to white southerners who took a loyalty oath, excluding high Confederate officials and planters with property over $20,000. On September 12, 1865, Bureau Circular No. 15 — drawn up at the White House — rescinded Howard's earlier Circular No. 13 and laid out how pardoned owners could apply to get abandoned lands back. Then came the vetoes. On February 19, 1866, he rejected the Freedmen's Bureau extension, objecting that it would \"take away land from its former owners without any legal proceedings\" and asserting freed people \"can attain to that condition only through their own merits and exertions.\" On March 27, 1866, he vetoed the Civil Rights Act, writing that \"the distinction of race and color is by the bill made to operate in favor of the colored and against the white race.\" Congress overrode him on April 9. In his December 3, 1867 annual message he wrote that \"Negroes have shown less capacity for government than any other race of people.\" The House impeached him February 24, 1868; the Senate acquitted by one vote.",
+      "callouts": [
+        {
+          "text": "March 27, 1866: vetoed the Civil Rights Act of 1866, arguing it favored \"the colored\" against \"the white race\"; the Senate overrode April 6 and the House April 9, 1866.",
+          "sources": [
+            {
+              "label": "Miller Center, University of Virginia — March 27, 1866: Veto Message on Civil Rights Legislation",
+              "url": "https://millercenter.org/the-presidency/presidential-speeches/march-27-1866-veto-message-civil-rights-legislation",
+              "quote": "the distinction of race and color is by the bill made to operate in favor of the colored and against the white race"
+            },
+            {
+              "label": "Miller Center — Andrew Johnson: Key Events",
+              "url": "https://millercenter.org/president/johnson/key-events",
+              "quote": "Congress overrode this veto on April 9, 1866."
+            }
+          ]
+        },
+        {
+          "text": "February 19, 1866: vetoed the bill extending the Freedmen's Bureau, objecting to land transfers and military tribunals and asserting freed people should rely on \"their own merits and exertions.\"",
+          "sources": [
+            {
+              "label": "Miller Center — February 19, 1866: Veto Message on Freedmen and Refugee Relief Bureau Legislation",
+              "url": "https://millercenter.org/the-presidency/presidential-speeches/february-19-1866-veto-message-freedmen-and-refugee-relief",
+              "quote": "take away land from its former owners without any legal proceedings being first had, contrary to that provision of the Constitution"
+            },
+            {
+              "label": "National Park Service — The Rise and Fall of the Freedmen's Bureau",
+              "url": "https://www.nps.gov/articles/000/the-rise-and-fall-of-the-freedmen-s-bureau.htm",
+              "quote": "he vetoed legislation to extend the Freedmen's Bureau, though Congress overturned his veto"
+            }
+          ]
+        },
+        {
+          "text": "September 12, 1865: Bureau Circular No. 15, drawn up at the White House, rescinded Circular No. 13 and established how pardoned owners could reclaim abandoned lands held for freedpeople.",
+          "sources": [
+            {
+              "label": "The American Presidency Project, UC Santa Barbara — Circular No. 15 (September 12, 1865)",
+              "url": "https://www.presidency.ucsb.edu/documents/circular-no-15",
+              "quote": "Circular No. 13, of July 28, 1865, from this Bureau, and all portions of circulars from this Bureau conflicting with the provisions of this circular are hereby rescinded."
+            },
+            {
+              "label": "National Park Service — The Rise and Fall of the Freedmen's Bureau (on Sherman's Field Order 15)",
+              "url": "https://www.nps.gov/articles/000/the-rise-and-fall-of-the-freedmen-s-bureau.htm",
+              "quote": "there shall be assigned not more than forty acres of such land, and the person to whom it was so assigned shall be protected in the use and enjoyment of the land"
+            }
+          ]
+        },
+        {
+          "text": "May 29, 1865: issued the amnesty proclamation pardoning white southerners who took a loyalty oath, excepting Confederate officials and planters with property over $20,000.",
+          "sources": [
+            {
+              "label": "Miller Center, University of Virginia — Andrew Johnson: Key Events",
+              "url": "https://millercenter.org/president/johnson/key-events",
+              "quote": "High Confederate officials and southern planters owning property worth more than $20,000"
+            },
+            {
+              "label": "The American Presidency Project — Circular No. 15",
+              "url": "https://www.presidency.ucsb.edu/documents/circular-no-15",
+              "quote": "No land under cultivation by loyal refugees or freedmen will be restored under this circular until the crops now growing shall be secured for the benefit of the cultivators"
+            }
+          ]
+        },
+        {
+          "text": "December 3, 1867: wrote in his Third Annual Message that \"Negroes have shown less capacity for government than any other race of people.\"",
+          "sources": [
+            {
+              "label": "The American Presidency Project, UC Santa Barbara — Andrew Johnson, Third Annual Message (December 3, 1867)",
+              "url": "https://www.presidency.ucsb.edu/documents/third-annual-message-10",
+              "quote": "in the progress of nations Negroes have shown less capacity for government than any other race of people"
+            },
+            {
+              "label": "Miller Center — Andrew Johnson: Domestic Affairs",
+              "url": "https://millercenter.org/president/johnson/domestic-affairs",
+              "quote": "his deep-seated racism"
+            }
+          ]
+        }
+      ],
+      "personalRecord": "Johnson enslaved people. The National Park Service records that on November 29 he \"paid $541.00 for Sam, a youth 'about thirteen years of age'\"; on January 3, 1843 he \"paid $500.00 to purchase Sam's half-sister, Dolly,\" then \"about nineteen\"; and on May 6, 1857 he \"paid $1015.00 for Henry, another youth 'about thirteen years of age.'\" NPS also names children born into that household — Dolly's children Liz, Florence and William, and Sam's children Dora, Robert and Hattie. On the freeing, NPS is explicit that the date rests on family tradition, not a document: \"According to family lore, Andrew Johnson freed all his personal slaves on August 8, 1863.\" August 8 is still observed as Emancipation Day in East Tennessee. His estate at death was not verified from the sources fetched.",
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Andrew_Johnson_photo_portrait_head_and_shoulders%2C_c1870-1880-Edit1.jpg",
+        "alt": "Photographic portrait of Andrew Johnson, head and shoulders, facing slightly right",
+        "credit": "19th-century photographic portrait via Wikimedia Commons. Verified 2026-08-07: HTTP 200, content-type image/jpeg.",
+        "rights": "public_domain",
+        "whyPublicDomain": "A 19th-century United States photograph, published well before 1929; copyright has expired in the United States."
+      },
+      "sources": [
+        {
+          "id": "miller-center-johnson-civil-rights-veto-1866",
+          "label": "Miller Center, University of Virginia — March 27, 1866: Veto Message on Civil Rights Legislation",
+          "url": "https://millercenter.org/the-presidency/presidential-speeches/march-27-1866-veto-message-civil-rights-legislation",
+          "quote": "safeguards which go infinitely beyond any that the General Government has ever provided for the white race"
+        },
+        {
+          "id": "miller-center-johnson-freedmens-bureau-veto-1866",
+          "label": "Miller Center — February 19, 1866: Veto Message on Freedmen and Refugee Relief Bureau Legislation",
+          "url": "https://millercenter.org/the-presidency/presidential-speeches/february-19-1866-veto-message-freedmen-and-refugee-relief",
+          "quote": "It is certain that they can attain to that condition only through their own merits and exertions"
+        },
+        {
+          "id": "miller-center-johnson-key-events",
+          "label": "Miller Center, University of Virginia — Andrew Johnson: Key Events",
+          "url": "https://millercenter.org/president/johnson/key-events",
+          "quote": "The House voted 126-47 to impeach Johnson"
+        },
+        {
+          "id": "senate-johnson-impeachment",
+          "label": "U.S. Senate — The Impeachment Trial of President Andrew Johnson",
+          "url": "https://www.senate.gov/about/powers-procedures/impeachment/impeachment-johnson.htm",
+          "quote": "The House voted 126 to 47 on February 24, 1868, to impeach President Johnson of high crimes and misdemeanors."
+        },
+        {
+          "id": "app-circular-15-1865",
+          "label": "The American Presidency Project, UC Santa Barbara — Circular No. 15, Bureau of Refugees, Freedmen, and Abandoned Lands (September 12, 1865)",
+          "url": "https://www.presidency.ucsb.edu/documents/circular-no-15",
+          "quote": "Circular No. 13, of July 28, 1865, from this Bureau ... are hereby rescinded."
+        },
+        {
+          "id": "app-johnson-third-annual-message-1867",
+          "label": "The American Presidency Project — Andrew Johnson, Third Annual Message (December 3, 1867)",
+          "url": "https://www.presidency.ucsb.edu/documents/third-annual-message-10",
+          "quote": "But if anything can be proved by known facts, if all reasoning upon evidence is not abandoned"
+        },
+        {
+          "id": "nps-anjo-slaves",
+          "label": "National Park Service — Slaves of Andrew Johnson, Andrew Johnson National Historic Site",
+          "url": "https://www.nps.gov/anjo/learn/historyculture/slaves.htm",
+          "quote": "January 3, 1843, Johnson paid $500.00 to purchase Sam's half-sister, Dolly. She was 'about nineteen.'"
+        },
+        {
+          "id": "nps-freedmens-bureau-rise-fall",
+          "label": "National Park Service — The Rise and Fall of the Freedmen's Bureau",
+          "url": "https://www.nps.gov/articles/000/the-rise-and-fall-of-the-freedmen-s-bureau.htm",
+          "quote": "to every male citizen, whether refugee or freedman, as aforesaid, there shall be assigned not more than forty acres of such land"
+        },
+        {
+          "id": "miller-center-johnson-domestic-affairs",
+          "label": "Miller Center, University of Virginia — Andrew Johnson: Domestic Affairs",
+          "url": "https://millercenter.org/president/johnson/domestic-affairs",
+          "quote": "These codes were designed to force the former slaves into a slave-like employment status on the plantations."
+        }
+      ],
+      "disputes": [
+        "The August 8, 1863 emancipation of Johnson's own enslaved household: NPS attributes the date to \"family lore\" rather than a document, while regional Emancipation Day observance treats it as established. Both recorded.",
+        "Senate acquittal vote count and dates: the Senate's own page records 35–19 on Article 11 on May 16, 1868 and again on Articles 2 and 3 on May 26, 1868; the Miller Center page fetched gives only May 16, 1868, 35–19. No conflict in the numbers, but the May 26 votes are omitted from the Miller Center summary.",
+        "Number of people Johnson enslaved: NPS's purchase records document Sam, Dolly and Henry plus children born into the household; search summaries cite census counts of five in 1850 and 1860. The census figures were not confirmed on the NPS page."
+      ],
+      "unverified": [
+        "1850 and 1860 census counts of people enslaved by Johnson (search-summary only; not on the fetched NPS page).",
+        "Exact year of the November 29 purchase of Sam — the fetched NPS text gives the month and day but the year was not captured.",
+        "Johnson's 1867 Reconstruction Act vetoes and their override dates (not fetched).",
+        "Johnson's estate at death."
+      ]
+    }
+  ]
+}

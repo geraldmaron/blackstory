@@ -13,7 +13,7 @@
 
 /**
  * Legacy theme id -> chapter slug. A theme id absent here has no authored chapter yet and
- * falls through to the `/chapters` index via the catch-all, which is why the catch-all stays.
+ * falls through to the `/stories` index via the catch-all, which is why the catch-all stays.
  *
  * @type {Readonly<Record<string, string>>}
  */
@@ -33,7 +33,7 @@ export const THEME_CHAPTER_SLUGS = Object.freeze({
  */
 export function buildThemeAliasRedirects() {
   return Object.entries(THEME_CHAPTER_SLUGS).flatMap(([themeId, slug]) => [
-    { source: `/themes/${themeId}`, destination: `/chapters/${slug}`, permanent: true },
-    { source: `/themes/${themeId}/:path*`, destination: `/chapters/${slug}`, permanent: true },
+    { source: `/themes/${themeId}`, destination: `/stories/${slug}`, permanent: true },
+    { source: `/themes/${themeId}/:path*`, destination: `/stories/${slug}`, permanent: true },
   ]);
 }

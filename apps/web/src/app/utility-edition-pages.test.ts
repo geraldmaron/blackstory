@@ -80,7 +80,7 @@ test('not-found offers the four exits the design law names, and no gallery', () 
     .replace(/^[ \t]*\/\/.*$/gm, '');
   // design-direction-v9-surfaces.md §"/_not-found": the palette, the Atlas, Chapters, /records.
   assert.match(source, /href="\/"/);
-  assert.match(source, /href="\/chapters"/);
+  assert.match(source, /href="\/stories"/);
   assert.match(source, /⌘K/);
   // The `/design-system` exit sent a reader who mistyped a chapter slug to a component gallery.
   // Its removal is the criterion, so an assertion that it stays removed is the guard.

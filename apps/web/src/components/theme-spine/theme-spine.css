@@ -10,6 +10,7 @@
  * -------------------------------------------------------------------------------------------- */
 
 .ds-era-timeline {
+  position: relative;
   margin: var(--ds-space-5) 0;
   padding: var(--ds-space-4) var(--ds-space-5);
   border: var(--ds-border-width) solid var(--ds-rule);
@@ -22,52 +23,103 @@
   background: color-mix(in srgb, var(--ds-accent-graphic) 8%, var(--ds-surface-raised));
 }
 
-/* Own horizontal scroller so a long timeline never causes page-level horizontal overflow. */
-.ds-era-timeline__scroller {
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-}
-
-.ds-era-timeline__svg {
-  display: block;
-  max-width: none;
-}
-
 /* Chapter's era band — brand `sand` token (pageSand #D8A178) at low alpha. */
 .ds-era-timeline__era-band {
-  fill: rgba(216, 161, 120, 0.14);
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(216, 161, 120, 0.14);
+  pointer-events: none;
 }
 
-.ds-era-timeline__axis {
-  stroke: var(--ds-rule);
-  stroke-width: 1;
+/*
+ * Vertical chronological rail. The continuous hairline is drawn on the list itself so it
+ * spans every row without absolute positioning per item; rows lay out with grid, so a long
+ * document title wraps under itself instead of colliding with its neighbours.
+ */
+.ds-era-timeline__list {
+  position: relative;
+  margin: 0;
+  padding: 0 0 0 var(--ds-space-4);
+  list-style: none;
+  border-left: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-era-timeline__tick {
-  stroke: var(--ds-accent-graphic);
-  stroke-width: 1.5;
+.ds-era-timeline__item + .ds-era-timeline__item {
+  margin-top: var(--ds-space-3);
 }
 
+.ds-era-timeline__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px var(--ds-space-3);
+  align-items: baseline;
+}
+
+/*
+ * The tick straddles the rail. Offset by the list's own left padding so it centres on the
+ * border regardless of the space token's value, and nudged down to sit on the date's cap
+ * height rather than its baseline.
+ */
 .ds-era-timeline__dot {
-  fill: var(--ds-accent-graphic);
+  position: absolute;
+  top: 0.42em;
+  left: calc(-1 * var(--ds-space-4));
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ds-accent-graphic);
+  transform: translateX(-50%);
 }
 
 .ds-era-timeline__date-label {
-  fill: var(--ds-ink);
+  color: var(--ds-ink);
   font-family: var(--ds-font-mono);
-  font-size: 11px;
+  font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .ds-era-timeline__event-label {
-  fill: var(--ds-ink-muted, var(--ds-ink));
+  min-width: 0;
+  color: var(--ds-ink-muted, var(--ds-ink));
   font-family: var(--ds-font-sans);
-  font-size: 10px;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* Elapsed time between two documents — the information the old horizontal axis carried. */
+.ds-era-timeline__gap {
+  display: block;
+  margin-bottom: var(--ds-space-2);
+  color: var(--ds-ink-muted, var(--ds-ink));
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+  text-transform: uppercase;
+}
+
+/*
+ * Narrow viewports: the date moves onto its own line above the title, so neither column is
+ * squeezed. Nothing overflows horizontally at any width.
+ */
+@media (max-width: 33rem) {
+  .ds-era-timeline {
+    padding: var(--ds-space-4) var(--ds-space-4);
+  }
+
+  .ds-era-timeline__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
 }
 
 .ds-era-timeline__caption {
-  margin-top: var(--ds-space-2);
+  position: relative;
+  margin-top: var(--ds-space-3);
   color: var(--ds-ink-muted, var(--ds-ink));
   font-family: var(--ds-font-sans);
   font-size: 0.8125rem;

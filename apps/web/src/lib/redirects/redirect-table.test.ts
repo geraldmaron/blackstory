@@ -80,8 +80,8 @@ test('specific rules precede the catch-all for their family', () => {
   }
 
   assert.ok(
-    indexOfSource('/stories/mosaic-credits') < indexOfSource('/stories/:path*'),
-    'the mosaic-credits rule must win over the /stories catch-all',
+    indexOfSource('/chapters/mosaic-credits') < indexOfSource('/chapters/:slug'),
+    'the mosaic-credits rule must win over the /chapters slug rule',
   );
   for (const themeId of Object.keys(THEME_CHAPTER_SLUGS)) {
     assert.ok(
@@ -99,8 +99,8 @@ test('theme aliases are generated from the chapter slug table, not retyped', () 
   for (const [themeId, slug] of Object.entries(THEME_CHAPTER_SLUGS)) {
     const bare = RULES.find((rule) => rule.source === `/themes/${themeId}`);
     const nested = RULES.find((rule) => rule.source === `/themes/${themeId}/:path*`);
-    assert.equal(bare?.destination, `/chapters/${slug}`);
-    assert.equal(nested?.destination, `/chapters/${slug}`);
+    assert.equal(bare?.destination, `/stories/${slug}`);
+    assert.equal(nested?.destination, `/stories/${slug}`);
   }
 });
 
@@ -109,17 +109,18 @@ test('every folded path reaches its surface in exactly one hop', () => {
     ['/facts', '/records'],
     ['/facts/anything', '/records'],
     ['/facts/deeply/nested/path', '/records'],
-    ['/articles', '/chapters'],
-    ['/stories', '/chapters'],
-    ['/stories/mosaic-credits', '/chapters/mosaic-credits'],
-    ['/stories/whatever', '/chapters'],
-    ['/themes', '/chapters'],
-    ['/themes/redlining', '/chapters/buying-a-home'],
-    ['/themes/redlining/sources', '/chapters/buying-a-home'],
-    ['/themes/wealth_gap', '/chapters/the-gap-that-never-closed'],
-    ['/themes/unknown-theme', '/chapters'],
-    ['/topics', '/chapters'],
-    ['/topics/anything', '/chapters'],
+    ['/articles', '/stories'],
+    ['/articles/buying-a-home', '/stories/buying-a-home'],
+    ['/chapters', '/stories'],
+    ['/chapters/buying-a-home', '/stories/buying-a-home'],
+    ['/chapters/mosaic-credits', '/stories/mosaic-credits'],
+    ['/themes', '/stories'],
+    ['/themes/redlining', '/stories/buying-a-home'],
+    ['/themes/redlining/sources', '/stories/buying-a-home'],
+    ['/themes/wealth_gap', '/stories/the-gap-that-never-closed'],
+    ['/themes/unknown-theme', '/stories'],
+    ['/topics', '/stories'],
+    ['/topics/anything', '/stories'],
     ['/myths', '/methodology'],
     ['/myths/anything', '/methodology'],
     ['/legal', '/law'],

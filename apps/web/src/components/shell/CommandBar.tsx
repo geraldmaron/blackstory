@@ -49,7 +49,7 @@ function searchLabel(recordCount: number | undefined): string {
 
 export type CommandBarProps = {
   /**
-   * Present only on the Atlas, where Atlas and Story are two views of one surface. Every other
+   * Present only on the Atlas, where Atlas and Journey are two views of one surface. Every other
    * room renders the same bar without them: a reading room has no story to switch into, and a
    * toggle that navigates instead of switching would be lying about what it does.
    */
@@ -134,29 +134,29 @@ export function CommandBar({
                 onClick={() => onModeChange('story')}
                 aria-current={mode === 'story' ? 'true' : undefined}
               >
-                Story
+                Journey
               </button>
             </>
           ) : (
             /* Off the Atlas the two modes are still offered, as links rather than toggles: there is
                no surface here to switch, so each one navigates to the Atlas and arrives in the mode
-               it names. Dropping Story outside the map would make it look like a feature of one
+               it names. Dropping Journey outside the map would make it look like a feature of one
                page rather than a way into the archive.
 
                A fragment, not a query param: `/` normalizes its query at the edge against the
-               explore allowlist, so `?mode=story` would be stripped before the page ever ran and
-               the link would land on a plain Atlas. A fragment never reaches the server, so it
+               explore allowlist, so `?mode=journey` would be stripped before the page ever ran
+               and the link would land on a plain Atlas. A fragment never reaches the server, so it
                cannot be stripped and cannot split the cache key either. */
             <>
               <Link className="ds-bar__mode-link ds-bar__mode-link--first" href="/">
                 Atlas
               </Link>
-              <Link className="ds-bar__mode-link" href="/#story">
-                Story
+              <Link className="ds-bar__mode-link" href="/#journey">
+                Journey
               </Link>
             </>
           )}
-          {/* An anchor, not a mode button: Atlas and Story are two views of one surface, Library
+          {/* An anchor, not a mode button: Atlas and Journey are two views of one surface, Library
               is a different room. A real href is also what lets it be opened in a new tab and
               followed by a crawler, which a mode toggle never could. */}
           <Link className="ds-bar__mode-link" href="/library">

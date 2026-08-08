@@ -107,6 +107,27 @@ function Block({
       return (
         <ArticleProse className="ds-article__p" text={block.text} refNumberById={refNumberById} />
       );
+    case 'list':
+      // Call-outs. Each item is its own cited assertion, so the citation marks render
+      // per item rather than once for the list — a bullet quoted on its own still
+      // arrives with its receipt.
+      return block.style === 'number' ? (
+        <ol className="ds-article__list ds-article__list--number">
+          {block.items.map((item, index) => (
+            <li className="ds-article__list-item" key={index}>
+              <ArticleProse as="span" text={item} refNumberById={refNumberById} />
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <ul className="ds-article__list">
+          {block.items.map((item, index) => (
+            <li className="ds-article__list-item" key={index}>
+              <ArticleProse as="span" text={item} refNumberById={refNumberById} />
+            </li>
+          ))}
+        </ul>
+      );
     case 'pullquote':
       return (
         <blockquote className="ds-article__pullquote">

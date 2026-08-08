@@ -1,5 +1,5 @@
 /**
- * Chapter detail page at `/chapters/[slug]`. The publication layout: title →
+ * Story detail page at `/stories/[slug]` (chapters and record articles alike). The publication layout: title →
  * hero image → summary → body (prose with inline citations, figures, stat
  * callouts, primary documents, timelines, map insets, disputes) → numbered
  * references. Emits schema.org Article JSON-LD only.
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: ArticlePageProps) {
   return {
     title: doc.title,
     description: doc.summary,
-    alternates: { canonical: `/chapters/${doc.slug}` },
+    alternates: { canonical: `/stories/${doc.slug}` },
   };
 }
 
@@ -47,7 +47,7 @@ function buildArticleJsonLd(article: HydratedArticle) {
     description: doc.summary,
     datePublished: doc.publishedAt,
     ...(doc.updatedAt ? { dateModified: doc.updatedAt } : {}),
-    '@id': `/chapters/${doc.slug}`,
+    '@id': `/stories/${doc.slug}`,
     author: { '@type': 'Organization', name: 'BlackStory' },
     ...(doc.heroImage ? { image: doc.heroImage.url } : {}),
   };
@@ -64,7 +64,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
       <Room>
         <Note kind="Unavailable">
           This chapter is temporarily unavailable while we reconnect to the live record.{' '}
-          <Link href="/chapters">Back to all chapters</Link>.
+          <Link href="/stories">Back to all stories</Link>.
         </Note>
       </Room>
     );
@@ -114,7 +114,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         </section>
 
         <p className="ds-article__footer">
-          <Link href="/chapters">All chapters</Link>
+          <Link href="/stories">All stories</Link>
         </p>
       </article>
     </Room>

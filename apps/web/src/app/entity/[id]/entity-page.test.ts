@@ -12,8 +12,8 @@ import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'EntityRoomSections.tsx'), 'utf8');
-const mapSource = readFileSync(
-  join(here, '../../../components/entity/EntityLocationMap.tsx'),
+const placeSource = readFileSync(
+  join(here, '../../../components/patterns/RecordPlacePreview.tsx'),
   'utf8',
 );
 const mediaSource = readFileSync(
@@ -47,10 +47,19 @@ test('the summary is the lede and is never restated as a section', () => {
   assert.doesNotMatch(pageSource, /WhyThisAppears/);
 });
 
-test('the location is drawn once', () => {
-  const rendered = pageSource.match(/<EntityLocationCinematicMap/g) ?? [];
+test('the location is drawn once, by borrowing the plate rather than building a second map', () => {
+  const rendered = pageSource.match(/<RecordPlacePreview/g) ?? [];
   assert.equal(rendered.length, 1, 'the record must not render two maps for one place');
   assert.doesNotMatch(pageSource, /RecordAnatomyPanel/);
+
+  // SP-08 acceptance: one GL context on a record page. The place block contributes a slot for the
+  // persistent plate; constructing MapLibre here is the defect, and importing it is how that
+  // happens. Asserted on the source rather than in a browser because the harness has no WebGL.
+  // Matched on imports, not on the whole file: the module's own history note names the component
+  // it replaced, and a prose mention is not a mount.
+  assert.doesNotMatch(placeSource, /^import .*maplibre-gl/m);
+  assert.doesNotMatch(placeSource, /^import .*EntityLocationMap/m);
+  assert.match(placeSource, /<MapMoment/);
 });
 
 test('a beat renders only when the record has that content', () => {
@@ -86,9 +95,14 @@ test('entity media fail-closed: mark fallback on photo exhaustion', () => {
   assert.match(mediaSource, /onError/);
 });
 
-test('entity map fail-closed: accessible WebGL unavailable message', () => {
-  assert.match(mapSource, /role="status"/);
-  assert.match(mapSource, /Map tiles could not load/);
+test('entity map fail-closed: the place block still makes its point with no plate', () => {
+  // The degrade moved with the map. `EntityLocationMap` owned a WebGL-unavailable status message
+  // because it built its own context and could fail on its own; the place block now borrows the
+  // one plate, so its fail-closed state is the moment's: a caption that carries the point without
+  // the map, and an idle line that does not tell a reader to scroll for a plate that is refused
+  // on the Atlas sheet. Both are text, so the block survives greyscale and no-JS alike.
+  assert.match(placeSource, /note=\{caption \?\? label\}/);
+  assert.match(placeSource, /idle="The map of this place is on the Atlas\."/);
 });
 
 test('entity user-facing copy avoids em dashes on touched surfaces', () => {

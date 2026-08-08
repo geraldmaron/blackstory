@@ -185,9 +185,23 @@ const articleImageBlockSchema = z.object({
   caption: z.string().min(1).max(400).optional(),
 });
 
+/**
+ * A list of short, individually-sourced points — the "call-outs" shape the record
+ * articles are built from (one documented act per item, each carrying its own
+ * `[ref:<id>]` markers). Items are prose strings, not nested blocks: a call-out that
+ * needs a chart or a document excerpt is not a call-out, it is a section, and should be
+ * authored as one. Citation integrity scans these items exactly like paragraph text.
+ */
+const articleListBlockSchema = z.object({
+  type: z.literal('list'),
+  style: z.enum(['bullet', 'number']).default('bullet'),
+  items: z.array(z.string().min(1).max(600)).min(1).max(24),
+});
+
 export const articleBodyBlockSchema = z.discriminatedUnion('type', [
   articleHeadingBlockSchema,
   articleParagraphBlockSchema,
+  articleListBlockSchema,
   articlePullQuoteBlockSchema,
   articleFigureBlockSchema,
   articleStatBlockSchema,
@@ -203,6 +217,41 @@ export type ArticleBodyBlockDoc = z.infer<typeof articleBodyBlockSchema>;
  * Article projection.
  * ------------------------------------------------------------------------- */
 
+/**
+ * What editorial contract a story is published under. Both kinds are stored in the same
+ * table and rendered by the same body-block renderer; the kind selects which gates apply
+ * and how the piece is presented in the index.
+ *
+ * - `chapter` — the long-form era-immersion piece (`docs/content/era-immersion-style.md`).
+ *   Carries the 2,000-word prose floor and the second-person era structure.
+ * - `article` — a short, structured record entry: a paragraph of context plus cited
+ *   call-outs. Same citation and source-tier bar, no prose floor, no era structure.
+ *   Built for series where the reader compares many entries against each other.
+ *
+ * Defaults to `chapter` so every article authored before this field existed keeps its
+ * contract without being rewritten.
+ */
+export const articleKindSchema = z.enum(['chapter', 'article']);
+export type ArticleKind = z.infer<typeof articleKindSchema>;
+
+/**
+ * Membership in an ordered collection (the presidential records, for instance).
+ * `position` is the collection's own ordering key — presidency number, not publication
+ * date — so an index can present the series in the order the subject actually runs in
+ * rather than the order the entries happened to be written.
+ */
+export const articleSeriesSchema = z.object({
+  id: z
+    .string()
+    .min(1)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  label: z.string().min(1).max(120),
+  position: z.number().int().min(0),
+  /** Short label for this entry within the series, e.g. "16th president". */
+  positionLabel: z.string().min(1).max(80).optional(),
+});
+export type ArticleSeriesDoc = z.infer<typeof articleSeriesSchema>;
+
 export const publicArticleProjectionSchema = z.object({
   id: z.string().min(1),
   releaseId: z.string().min(1),
@@ -210,6 +259,7 @@ export const publicArticleProjectionSchema = z.object({
     .string()
     .min(1)
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  kind: articleKindSchema.default('chapter'),
   title: z.string().min(1).max(160),
   summary: z.string().min(1).max(600),
   heroImage: articleImageSchema.optional(),
@@ -221,6 +271,9 @@ export const publicArticleProjectionSchema = z.object({
   eraLabel: z.string().min(1).max(80),
   placeLabel: z.string().min(1).max(120),
   themeId: articleThemeIdSchema.optional(),
+  series: articleSeriesSchema.optional(),
+  /** Free facet labels the index groups and filters on (era grouping, subject class). */
+  tags: z.array(z.string().min(1).max(80)).max(12).default([]),
   body: z.array(articleBodyBlockSchema).min(1),
   references: z.array(articleReferenceSchema).default([]),
   relatedEntityIds: z.array(z.string().min(1)).default([]),
@@ -270,11 +323,20 @@ export function collectArticleCitationIssues(
   const issues: ArticleCitationIntegrityIssue[] = [];
 
   for (const block of article.body) {
-    if (block.type !== 'paragraph' && block.type !== 'pullquote') continue;
-    for (const refId of extractInlineCitationIds(block.text)) {
-      usedIds.add(refId);
-      if (!referenceIds.has(refId)) {
-        issues.push({ kind: 'unknown_reference', refId });
+    // Every block that carries author-written prose is scanned. `list` items are prose
+    // too: a call-out bullet is exactly where an uncited claim would otherwise hide.
+    const texts =
+      block.type === 'paragraph' || block.type === 'pullquote'
+        ? [block.text]
+        : block.type === 'list'
+          ? block.items
+          : [];
+    for (const text of texts) {
+      for (const refId of extractInlineCitationIds(text)) {
+        usedIds.add(refId);
+        if (!referenceIds.has(refId)) {
+          issues.push({ kind: 'unknown_reference', refId });
+        }
       }
     }
   }

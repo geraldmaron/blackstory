@@ -43,6 +43,12 @@ apps/mobile
 docs/ui/mobile-polish-mockups.html
 docs/ui/prototypes
 
+# Saved source pages captured while researching the presidential series (committed at repo root
+# in b246a775). Ignored rather than reformatted so 2,800 lines of someone else's markup do not
+# churn through a release diff. These should be deleted outright — see the cleanup issue.
+wh1.html
+wh2.html
+
 # Generated geometry fixture — reformatting rewrites every coordinate line.
 scripts/fixtures
 

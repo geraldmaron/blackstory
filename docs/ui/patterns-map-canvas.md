@@ -11,7 +11,12 @@ Binding for every MapLibre mount in the web app. Target browsers: **Safari, Chro
 | Home + Explore plate | `MapStage` (ADR-017 persistent canvas) | Full viewport; hero uses viewport-fixed inset |
 | Entity detail | `EntityLocationMap` | Compact streets preview |
 | Record anatomy | `RecordPlacePreview` → `EntityLocationMap` | Explicit `7.5rem` frame height |
-| `/map` demo | `MapLibreCanvas` | Internal style lab only |
+
+`MapLibreCanvas` and the `/map` demo route it served are gone (SP-08). The route's `page.tsx` was
+deleted earlier; the canvas outlived it as an unreferenced module that still constructed a third
+MapLibre instance, so it counted against SP-08's one-GL-context contract while rendering nowhere.
+`app/map/` survives as the style-and-layer-id module directory `MapStage` imports from, not as a
+route.
 
 Theme-impact map strips are metadata panels, not MapLibre mounts.
 

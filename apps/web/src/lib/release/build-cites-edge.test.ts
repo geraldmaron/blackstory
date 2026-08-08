@@ -54,8 +54,8 @@ test('the index inverts articles onto records, sorted by chapter title', () => {
   assert.deepEqual(
     index['ent_a']?.map((c) => [c.title, c.relation, c.href]),
     [
-      ['Blockbusting', 'mapped in', '/chapters/blockbusting'],
-      ['Zoning', 'referenced in', '/chapters/zoning'],
+      ['Blockbusting', 'mapped in', '/stories/blockbusting'],
+      ['Zoning', 'referenced in', '/stories/zoning'],
     ],
   );
 });

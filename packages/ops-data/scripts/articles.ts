@@ -169,14 +169,30 @@ function gateLoadBearingAnchors(article: ArticleAuthoring): { warnings: string[]
  */
 const MIN_PUBLISHED_PROSE_WORDS = 2000;
 
+/**
+ * The floor is per-kind, because the two kinds promise the reader different things.
+ * A `chapter` promises immersion and has to earn it with sourced depth. An `article`
+ * promises a compact, comparable record entry, and padding one to 2,000 words would be
+ * the exact failure the chapter floor exists to prevent, pointed the other way. The
+ * article floor is set where a paragraph of real context lives and a stub does not.
+ */
+const MIN_PROSE_WORDS_BY_KIND: Record<'chapter' | 'article', number> = {
+  chapter: MIN_PUBLISHED_PROSE_WORDS,
+  article: 120,
+};
+
+function visibleProse(text: string): string {
+  return text
+    .replace(/\[ref:[a-z0-9-]+\]/g, ' ')
+    .replace(/\[\[[^\]|]+\|([^\]]+)\]\]/g, '$1')
+    .replace(/\[\[([^\]]+)\]\]/g, '$1');
+}
+
 function countProseWords(article: ArticleAuthoring): number {
   let words = 0;
   for (const block of article.body) {
     if (block.type !== 'paragraph') continue;
-    const visible = ((block as { text?: string }).text ?? '')
-      .replace(/\[ref:[a-z0-9-]+\]/g, ' ')
-      .replace(/\[\[[^\]|]+\|([^\]]+)\]\]/g, '$1')
-      .replace(/\[\[([^\]]+)\]\]/g, '$1');
+    const visible = visibleProse((block as { text?: string }).text ?? '');
     words += visible.split(/\s+/).filter(Boolean).length;
   }
   return words;
@@ -184,15 +200,147 @@ function countProseWords(article: ArticleAuthoring): number {
 
 function gateProseWordFloor(article: ArticleAuthoring): { proseWords: number; warnings: string[] } {
   const proseWords = countProseWords(article);
-  if (proseWords >= MIN_PUBLISHED_PROSE_WORDS) return { proseWords, warnings: [] };
-  const message = `${article.id}: body prose is ${proseWords} words, below the ${MIN_PUBLISHED_PROSE_WORDS}-word chapter floor`;
+  const kind = article.kind ?? 'chapter';
+  const floor = MIN_PROSE_WORDS_BY_KIND[kind];
+  if (proseWords >= floor) return { proseWords, warnings: [] };
+  const message = `${article.id}: body prose is ${proseWords} words, below the ${floor}-word ${kind} floor`;
   if (article.status === 'published') {
     throw new Error(`prose word-floor gate failed (published articles):\n  ${message}`);
   }
   return { proseWords, warnings: [message] };
 }
 
-/** Offline gates: schema (via loader) + inline-citation integrity + source-tier gate + prose floor. */
+/**
+ * Call-out gate. A `list` item is the most quotable, most screenshot-able unit an article
+ * publishes: a single flat assertion that a named president did a specific thing on a
+ * specific date. Every one of them carries its own citation, so a bullet lifted out of
+ * the page still arrives with its receipt attached. Enforced for every kind, because a
+ * bullet in a chapter is no less liftable than a bullet in a record entry.
+ */
+function gateCalloutCitations(article: ArticleAuthoring): { warnings: string[] } {
+  const findings: string[] = [];
+  article.body.forEach((block, index) => {
+    if (block.type !== 'list') return;
+    block.items.forEach((item, itemIndex) => {
+      if (/\[ref:[a-z0-9-]+\]/.test(item)) return;
+      const excerpt = visibleProse(item).slice(0, 80).replace(/\s+/g, ' ');
+      findings.push(
+        `${article.id} / body[${index}].items[${itemIndex}]: call-out carries no [ref:id] citation — "${excerpt}…"`,
+      );
+    });
+  });
+  if (findings.length === 0) return { warnings: [] };
+  if (article.status === 'published') {
+    throw new Error(
+      `call-out citation gate failed (published articles):\n  ${findings.join('\n  ')}`,
+    );
+  }
+  return { warnings: findings };
+}
+
+/**
+ * Series integrity. Within one series id, `position` is the ordering key the index sorts
+ * on and must be unique — two entries claiming the same slot sort nondeterministically,
+ * which reads as a bug in the collection rather than in the data. Checked across the
+ * whole fixture set being validated together, and against the database on apply.
+ */
+function gateSeriesPositions(articles: readonly ArticleAuthoring[]): void {
+  const seen = new Map<string, string>();
+  const collisions: string[] = [];
+  for (const article of articles) {
+    if (!article.series) continue;
+    const key = `${article.series.id}#${article.series.position}`;
+    const prior = seen.get(key);
+    if (prior && prior !== article.id) {
+      collisions.push(
+        `series "${article.series.id}" position ${article.series.position} claimed by both ${prior} and ${article.id}`,
+      );
+    }
+    seen.set(key, article.id);
+  }
+  if (collisions.length > 0) {
+    throw new Error(`series position gate failed:\n  ${collisions.join('\n  ')}`);
+  }
+}
+
+/**
+ * Standalone-prose gate (editorial direction, 2026-08-07). A chapter is a piece of
+ * history, not a page of a product: its prose never names the site it is published on,
+ * never cross-references sibling chapters as chapters, and never speaks in the
+ * publisher's first person ("our summary," "a story we are telling you"). Readers arrive
+ * on these pages from search and syndication with no idea what else exists here, and a
+ * sentence like "another chapter on this site follows what happened next" is a dead end
+ * to them and an unexplained brand reference to everyone else. Related history is reached
+ * through `[[entityId|Label]]` links and `relatedEntityIds`, which resolve to real
+ * records, rather than through prose pointing at navigation.
+ *
+ * Hard error on published articles, surfaced warning otherwise — same posture as the tier
+ * and word-floor gates. Governed by docs/ui/voice-theme-chapters.md Rule 6.
+ */
+const SELF_REFERENCE_PATTERNS: readonly { readonly label: string; readonly pattern: RegExp }[] = [
+  { label: 'names the publishing surface', pattern: /\bthis (?:site|website|project|page)\b/i },
+  {
+    label: 'names the publishing surface',
+    pattern: /\b(?:on|across|throughout) (?:the|our) site\b/i,
+  },
+  {
+    label: 'cross-references a sibling chapter',
+    pattern: /\b(?:another|the other|a sibling|the next|the previous) chapters?\b/i,
+  },
+  { label: 'cross-references a sibling chapter', pattern: /\bchapters? (?:here|on this)\b/i },
+  {
+    label: 'cross-references a sibling chapter',
+    pattern: /\bthe (?:wealth|redlining|housing|voting|sentencing) chapter\b/i,
+  },
+  {
+    label: "speaks in the publisher's first person",
+    pattern: /\b(?:we|our) (?:are telling|tell|show|summari[sz]e|built|collected|assembled)\b/i,
+  },
+  {
+    label: "speaks in the publisher's first person",
+    pattern: /\b(?:our summary|needs us in order|we are telling you)\b/i,
+  },
+];
+
+function gateStandaloneProse(article: ArticleAuthoring): { warnings: string[] } {
+  const findings: string[] = [];
+  article.body.forEach((block, index) => {
+    const texts =
+      block.type === 'paragraph' || block.type === 'pullquote'
+        ? [(block as { text?: string }).text ?? '']
+        : block.type === 'list'
+          ? block.items
+          : [];
+    for (const text of texts) {
+      let flagged = false;
+      for (const { label, pattern } of SELF_REFERENCE_PATTERNS) {
+        const match = pattern.exec(text);
+        if (!match) continue;
+        const start = Math.max(0, match.index - 40);
+        const excerpt = text.slice(start, match.index + match[0].length + 40).replace(/\s+/g, ' ');
+        findings.push(
+          `${article.id} / body[${index}] (${block.type}): prose ${label} — …${excerpt}… ` +
+            `(link related history with [[entityId|Label]] instead)`,
+        );
+        flagged = true;
+        break;
+      }
+      if (flagged) break;
+    }
+  });
+  if (findings.length === 0) return { warnings: [] };
+  if (article.status === 'published') {
+    throw new Error(
+      `standalone-prose gate failed (published articles):\n  ${findings.join('\n  ')}`,
+    );
+  }
+  return { warnings: findings };
+}
+
+/**
+ * Offline gates: schema (via loader) + inline-citation integrity + source-tier gate +
+ * prose floor + standalone-prose gate.
+ */
 function validateArticleOffline(article: ArticleAuthoring): void {
   assertArticleCitationIntegrity(article);
   const { warnings: tierWarnings } = gateArticleSourceTiers(article);
@@ -201,6 +349,10 @@ function validateArticleOffline(article: ArticleAuthoring): void {
   for (const warning of anchorWarnings) console.warn(`warning: ${warning}`);
   const { warnings: floorWarnings } = gateProseWordFloor(article);
   for (const warning of floorWarnings) console.warn(`warning: ${warning}`);
+  const { warnings: standaloneWarnings } = gateStandaloneProse(article);
+  for (const warning of standaloneWarnings) console.warn(`warning: ${warning}`);
+  const { warnings: calloutWarnings } = gateCalloutCitations(article);
+  for (const warning of calloutWarnings) console.warn(`warning: ${warning}`);
 }
 
 type PacketRow = {
@@ -297,10 +449,10 @@ async function verifyArticleReferences(
 const UPSERT_SQL = `
 INSERT INTO bb_reference.articles (
   id, slug, title, summary, theme_id, era_label, place_label, published_at, updated_at,
-  hero_image, body, "references", related_entity_ids, status, row_updated_at
+  hero_image, body, "references", related_entity_ids, status, kind, series, tags, row_updated_at
 ) VALUES (
   $1, $2, $3, $4, $5, $6, $7, $8::date, $9::date,
-  $10::jsonb, $11::jsonb, $12::jsonb, $13::text[], $14, now()
+  $10::jsonb, $11::jsonb, $12::jsonb, $13::text[], $14, $15, $16::jsonb, $17::text[], now()
 )
 ON CONFLICT (id) DO UPDATE SET
   slug = EXCLUDED.slug,
@@ -316,12 +468,16 @@ ON CONFLICT (id) DO UPDATE SET
   "references" = EXCLUDED."references",
   related_entity_ids = EXCLUDED.related_entity_ids,
   status = EXCLUDED.status,
+  kind = EXCLUDED.kind,
+  series = EXCLUDED.series,
+  tags = EXCLUDED.tags,
   row_updated_at = now()
 RETURNING id, status;
 `;
 
 const REFERENCE_COLUMNS = `id, slug, title, summary, theme_id, era_label, place_label,
-  published_at, updated_at, hero_image, body, "references", related_entity_ids, status`;
+  published_at, updated_at, hero_image, body, "references", related_entity_ids, status,
+  kind, series, tags`;
 
 type ArticleRow = {
   readonly id: string;
@@ -338,6 +494,9 @@ type ArticleRow = {
   readonly references: unknown;
   readonly related_entity_ids: readonly string[];
   readonly status: string;
+  readonly kind: string | null;
+  readonly series: unknown;
+  readonly tags: readonly string[] | null;
 };
 
 function dateString(value: string | Date | null): string | undefined {
@@ -360,6 +519,9 @@ function rowToProjection(row: ArticleRow, releaseId: string) {
     eraLabel: row.era_label,
     placeLabel: row.place_label,
     ...(row.theme_id ? { themeId: row.theme_id } : {}),
+    kind: row.kind ?? 'chapter',
+    ...(row.series ? { series: row.series } : {}),
+    tags: row.tags ?? [],
     body: row.body,
     references: row.references ?? [],
     relatedEntityIds: row.related_entity_ids ?? [],
@@ -383,6 +545,9 @@ function upsertParams(article: ArticleAuthoring): readonly unknown[] {
     JSON.stringify(article.references),
     [...article.relatedEntityIds],
     article.status,
+    article.kind ?? 'chapter',
+    article.series ? JSON.stringify(article.series) : null,
+    [...(article.tags ?? [])],
   ];
 }
 
@@ -490,6 +655,7 @@ async function gateDoiCitations(article: ArticleAuthoring): Promise<void> {
 async function commandValidate(paths: readonly string[]): Promise<void> {
   const articles = await loadFixtureArticles(paths);
   for (const article of articles) validateArticleOffline(article);
+  gateSeriesPositions(articles);
 
   // DB-binding gate: when DATABASE_URL is present, transitively resolve every
   // figure/stat/primaryDocument/timeline refId against its published packet's
@@ -520,6 +686,7 @@ async function commandValidate(paths: readonly string[]): Promise<void> {
         articles: articles.map((a) => ({
           id: a.id,
           slug: a.slug,
+          kind: a.kind ?? 'chapter',
           status: a.status,
           blocks: a.body.length,
           references: a.references.length,
@@ -535,6 +702,7 @@ async function commandValidate(paths: readonly string[]): Promise<void> {
 async function commandApply(paths: readonly string[]): Promise<void> {
   const articles = await loadFixtureArticles(paths);
   for (const article of articles) validateArticleOffline(article);
+  gateSeriesPositions(articles);
 
   const result = await withDb(async ({ client, dryRun }) => {
     const applied: { id: string; status: string }[] = [];
@@ -601,6 +769,9 @@ function rowToProjectionAuthoring(row: ArticleRow) {
     eraLabel: row.era_label,
     placeLabel: row.place_label,
     ...(row.theme_id ? { themeId: row.theme_id } : {}),
+    kind: row.kind ?? 'chapter',
+    ...(row.series ? { series: row.series } : {}),
+    tags: row.tags ?? [],
     body: row.body,
     references: row.references ?? [],
     relatedEntityIds: row.related_entity_ids ?? [],

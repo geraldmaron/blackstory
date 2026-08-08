@@ -1,0 +1,579 @@
+{
+  "presidents": [
+    {
+      "number": 31,
+      "name": "Herbert Hoover",
+      "termLabel": "1929–1933",
+      "summary": "Hoover nominated federal appeals judge John J. Parker to the Supreme Court in 1930, and the NAACP ran a public campaign against him over a 1920 statement opposing Black participation in politics; the Senate rejected Parker on May 7, 1930. His administration also ran the government-funded Gold Star Mothers pilgrimages to France on a racially separated basis beginning in 1930.",
+      "paragraph": "Hoover's best-documented dealings with Black Americans mostly went badly for them. On March 21, 1930 he sent John J. Parker's name to the Senate for the Supreme Court. Parker, running for governor of North Carolina in 1920, had called Black political participation \"a source of evil and danger to both races.\" The NAACP ran what the Library of Congress calls its first successful campaign against a Supreme Court nominee, organized labor joined over Parker's anti-union ruling, and the Senate voted him down 41 to 39 on May 7, 1930. That same year Hoover's War Department began sending Gold Star mothers and widows to visit their sons' graves in France, and split the travelers by race; the administration said the separation was \"in the interests of the pilgrims themselves.\" Of roughly 1,593 eligible Black mothers and widows, only 233 accepted and fewer than 200 sailed. Earlier, as Coolidge's flood coordinator in 1927, Hoover oversaw relief camps where Black refugees were held under guard, and he appointed Robert Moton's Colored Advisory Commission, which documented the abuses.",
+      "callouts": [
+        {
+          "text": "Nominated John J. Parker to the Supreme Court on March 21, 1930. The Senate rejected him 41-39 on May 7, 1930, after an NAACP campaign over Parker's 1920 statement opposing Black voting.",
+          "sources": [
+            {
+              "label": "U.S. Senate Historical Office",
+              "url": "https://www.senate.gov/about/powers-procedures/nominations/judge-parker-nomination-rejected.htm",
+              "quote": "The participation of the Negro in politics is a source of evil and danger to both races"
+            },
+            {
+              "label": "Library of Congress, NAACP exhibition",
+              "url": "https://www.loc.gov/exhibits/naacp/the-great-depression.html",
+              "quote": "the Senate rejected Judge Parker's confirmation on May 7, 1930, by a vote of 41 to 39."
+            }
+          ]
+        },
+        {
+          "text": "In 1930 his administration ran the federally funded Gold Star Mothers pilgrimages to France with Black and white travelers separated, saying the split was in the pilgrims' own interest. Only 233 of about 1,593 eligible Black women accepted.",
+          "sources": [
+            {
+              "label": "Smithsonian NMAAHC, 'Honoring Our Gold Star Mothers'",
+              "url": "https://nmaahc.si.edu/honoring-our-gold-star-mothers",
+              "quote": "in the interests of the pilgrims themselves"
+            },
+            {
+              "label": "American Battle Monuments Commission, 'African American Gold Star Mothers'",
+              "url": "https://www.abmc.gov/education/teaching-aid/african-american-gold-star-mothers/",
+              "quote": "segregated from white pilgrims, causing protest"
+            }
+          ]
+        },
+        {
+          "text": "As Coolidge's 1927 Mississippi flood relief coordinator (before his presidency), Hoover oversaw Red Cross camps where Black refugees were confined by National Guard troops, then named Robert Moton's Colored Advisory Commission to investigate.",
+          "sources": [
+            {
+              "label": "Smithsonian NMAAHC, 'The Great Mississippi River Flood of 1927'",
+              "url": "https://nmaahc.si.edu/explore/stories/great-mississippi-river-flood-1927",
+              "quote": "National Guard troops prevented refugees from leaving and outsiders from visiting"
+            },
+            {
+              "label": "PBS American Experience, 'Robert Moton and the Colored Advisory Commission'",
+              "url": "https://www.pbs.org/wgbh/americanexperience/features/flood-moton-cac/",
+              "quote": "appointed by Hoover to investigate the handling of Negro flood sufferers"
+            }
+          ]
+        }
+      ],
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/5/57/President_Hoover_portrait.jpg",
+        "alt": "Photographic portrait of Herbert Hoover in a dark suit, facing the camera",
+        "credit": "Underwood & Underwood, via Library of Congress / Wikimedia Commons",
+        "rights": "public_domain",
+        "why": "1928 Underwood & Underwood photograph; Commons categorizes it PD-Underwood and Library of Congress 'no known copyright restrictions'. Verified: HTTP 200, image/jpeg."
+      },
+      "sources": [
+        {
+          "id": "senate-parker-rejected",
+          "label": "U.S. Senate Historical Office, 'Senate Rejects Judge John J. Parker for the Supreme Court'",
+          "url": "https://www.senate.gov/about/powers-procedures/nominations/judge-parker-nomination-rejected.htm",
+          "quote": "The participation of the Negro in politics is a source of evil and danger to both races"
+        },
+        {
+          "id": "loc-naacp-great-depression",
+          "label": "Library of Congress, 'NAACP: A Century in the Fight for Freedom — The Great Depression'",
+          "url": "https://www.loc.gov/exhibits/naacp/the-great-depression.html",
+          "quote": "the NAACP won the first successful campaign against a Supreme Court nominee, Judge John J. Parker"
+        },
+        {
+          "id": "millercenter-hoover-domestic",
+          "label": "Miller Center, 'Herbert Hoover: Domestic Affairs'",
+          "url": "https://millercenter.org/president/hoover/domestic-affairs",
+          "quote": "the judge's record was hostile toward unions and African-Americans"
+        },
+        {
+          "id": "nmaahc-gold-star-mothers",
+          "label": "Smithsonian NMAAHC, 'Honoring Our Gold Star Mothers'",
+          "url": "https://nmaahc.si.edu/honoring-our-gold-star-mothers",
+          "quote": "in the interests of the pilgrims themselves"
+        },
+        {
+          "id": "abmc-african-american-gold-star",
+          "label": "American Battle Monuments Commission, 'African American Gold Star Mothers'",
+          "url": "https://www.abmc.gov/education/teaching-aid/african-american-gold-star-mothers/",
+          "quote": "did not receive the same quality of accommodations and were segregated from white pilgrims"
+        },
+        {
+          "id": "nmaahc-1927-flood",
+          "label": "Smithsonian NMAAHC, 'The Great Mississippi River Flood of 1927'",
+          "url": "https://nmaahc.si.edu/explore/stories/great-mississippi-river-flood-1927",
+          "quote": "steering more than 200,000 African Americans into them"
+        },
+        {
+          "id": "pbs-moton-commission",
+          "label": "PBS American Experience, 'Robert Moton and the Colored Advisory Commission'",
+          "url": "https://www.pbs.org/wgbh/americanexperience/features/flood-moton-cac/",
+          "quote": "complaints of rough treatment of colored people and discrimination regarding labor conditions"
+        }
+      ],
+      "disputes": [
+        "Sources differ on whether the Parker nomination reflected Hoover's own racial views or careless vetting. The Senate Historical Office and Library of Congress document the NAACP and AFL opposition without attributing motive to Hoover; Miller Center likewise frames it as a failed nomination rather than a stated Hoover position."
+      ],
+      "unverified": [
+        "Claims that Hoover deliberately pursued a 'lily-white' reorganization of southern Republican party organizations — not verified from any source fetched here.",
+        "Whether Hoover personally approved the racial separation of the Gold Star pilgrimages, as opposed to the War Department — not established by the sources fetched."
+      ]
+    },
+    {
+      "number": 32,
+      "name": "Franklin D. Roosevelt",
+      "termLabel": "1933–1945",
+      "summary": "Roosevelt signed Executive Order 8802 on June 25, 1941, barring racial discrimination in defense industries and federal employment and creating the Fair Employment Practice Committee, after A. Philip Randolph threatened a mass march on Washington. He did not publicly back federal anti-lynching legislation, and the Social Security Act he signed in 1935 excluded agricultural and domestic workers, categories that covered most employed Black Americans.",
+      "paragraph": "Roosevelt's record here is two things at once. In 1941 A. Philip Randolph and other Black leaders told the administration they were ready to bring tens of thousands of people to Washington unless job discrimination in war plants ended. On June 25, 1941 Roosevelt signed Executive Order 8802, which said there'd be \"no discrimination in the employment of workers in defense industries or government because of race, creed, color, or national origin,\" and set up the Fair Employment Practice Committee to take complaints. The march was called off. But when the Costigan-Wagner anti-lynching bill hit a southern filibuster in 1935, Roosevelt stayed quiet; he needed those same southern Democrats for the New Deal, and the bill died without a vote. The Social Security Act he signed that August left out agricultural and domestic workers, and at least 60 percent of the Black population worked in those categories. He also promoted Benjamin O. Davis Sr., the first Black general officer in the U.S. armed forces.",
+      "callouts": [
+        {
+          "text": "Signed Executive Order 8802 on June 25, 1941, banning racial discrimination in defense industries and government employment and creating the Fair Employment Practice Committee, days before A. Philip Randolph's threatened march on Washington.",
+          "sources": [
+            {
+              "label": "National Archives, Milestone Documents: EO 8802",
+              "url": "https://www.archives.gov/milestone-documents/executive-order-8802",
+              "quote": "There shall be no discrimination in the employment of workers in defense industries or government because of race, creed, color, or national origin"
+            },
+            {
+              "label": "National Park Service, 'A. Philip Randolph', Home of FDR NHS",
+              "url": "https://www.nps.gov/hofr/learn/historyculture/a-philip-randolph.htm",
+              "quote": "ten, twenty, fifty thousand Negroes on the White House lawn"
+            }
+          ]
+        },
+        {
+          "text": "Stayed publicly silent during the southern filibuster of the Costigan-Wagner anti-lynching bill in January–February 1935; the bill died without a Senate vote.",
+          "sources": [
+            {
+              "label": "National Park Service, 'Walter White', Home of FDR NHS",
+              "url": "https://www.nps.gov/hofr/learn/historyculture/walter-white.htm",
+              "quote": "President Roosevelt remained silent on the filibuster and the anti-lynching bill died without a vote."
+            },
+            {
+              "label": "FDR Library, 'Roosevelt and Race' (educational resource PDF)",
+              "url": "https://www.fdrlibrary.org/documents/356632/390886/5.3+Roosevelt+and+Race+FINAL+5-20-14.pdf/a805ca12-70af-48e8-8147-ce755854ed0e",
+              "quote": "believed his New Deal reforms would be jeopardized if he took advanced positions on race"
+            }
+          ]
+        },
+        {
+          "text": "Signed the Social Security Act on August 14, 1935 with agricultural and domestic employment excluded from old-age insurance coverage; at least 60 percent of the Black population worked in those two categories.",
+          "sources": [
+            {
+              "label": "Social Security Administration, Social Security Bulletin 70(4)",
+              "url": "https://www.ssa.gov/policy/docs/ssb/v70n4/v70n4p49.html",
+              "quote": "at least 60 percent of the nation's Black population"
+            },
+            {
+              "label": "National Archives, Milestone Documents: Social Security Act (1935)",
+              "url": "https://www.archives.gov/milestone-documents/social-security-act",
+              "quote": "Social Security Act (1935)"
+            }
+          ]
+        },
+        {
+          "text": "Promoted Benjamin O. Davis Sr. to brigadier general (temporary) on October 25, 1940 — the first Black general officer in the U.S. armed forces; the regular-Army promotion followed on August 1, 1941.",
+          "sources": [
+            {
+              "label": "U.S. Army Center of Military History, 'The First African-American General Officer'",
+              "url": "https://history.army.mil/Research/Reference-Topics/African-Americans-in-the-US-Army/-First-African-American-General-Officer/",
+              "quote": "first African-American general officer in the regular Army and the U.S. armed forces"
+            },
+            {
+              "label": "Smithsonian National Postal Museum, 'Military: Benjamin O. Davis, Sr.'",
+              "url": "https://postalmuseum.si.edu/exhibition/the-black-experience/military-benjamin-o-davis-sr",
+              "quote": "the nation's first African-American brigadier general"
+            }
+          ]
+        }
+      ],
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Franklin_D._Roosevelt_-_NARA_-_196898.jpg",
+        "alt": "Black-and-white official portrait photograph of Franklin D. Roosevelt, 1944",
+        "credit": "National Archives and Records Administration, FDR Library Public Domain Photographs, via Wikimedia Commons",
+        "rights": "public_domain",
+        "why": "U.S. federal government work held in NARA's 'Franklin D. Roosevelt Library Public Domain Photographs' series; Commons tags PD-USGov. Verified: HTTP 200, image/jpeg."
+      },
+      "sources": [
+        {
+          "id": "nara-eo-8802",
+          "label": "National Archives, Milestone Documents: Executive Order 8802 (1941)",
+          "url": "https://www.archives.gov/milestone-documents/executive-order-8802",
+          "quote": "There shall be no discrimination in the employment of workers in defense industries or government because of race, creed, color, or national origin"
+        },
+        {
+          "id": "nps-randolph",
+          "label": "National Park Service, 'A. Philip Randolph', Home of Franklin D. Roosevelt NHS",
+          "url": "https://www.nps.gov/hofr/learn/historyculture/a-philip-randolph.htm",
+          "quote": "ten, twenty, fifty thousand Negroes on the White House lawn"
+        },
+        {
+          "id": "nps-walter-white",
+          "label": "National Park Service, 'Walter White', Home of Franklin D. Roosevelt NHS",
+          "url": "https://www.nps.gov/hofr/learn/historyculture/walter-white.htm",
+          "quote": "President Roosevelt remained silent on the filibuster and the anti-lynching bill died without a vote."
+        },
+        {
+          "id": "ssa-1935-exclusions",
+          "label": "DeWitt, 'The Decision to Exclude Agricultural and Domestic Workers from the 1935 Social Security Act', Social Security Bulletin 70(4), SSA",
+          "url": "https://www.ssa.gov/policy/docs/ssb/v70n4/v70n4p49.html",
+          "quote": "excluded from coverage about half the workers in the American economy"
+        },
+        {
+          "id": "nara-social-security-act",
+          "label": "National Archives, Milestone Documents: Social Security Act (1935)",
+          "url": "https://www.archives.gov/milestone-documents/social-security-act",
+          "quote": "Social Security Act (1935)"
+        },
+        {
+          "id": "army-first-black-general",
+          "label": "U.S. Army Center of Military History, 'The First African-American General Officer'",
+          "url": "https://history.army.mil/Research/Reference-Topics/African-Americans-in-the-US-Army/-First-African-American-General-Officer/",
+          "quote": "promoted to brigadier general on Aug. 1, 1941"
+        },
+        {
+          "id": "si-postal-davis",
+          "label": "Smithsonian National Postal Museum, 'Military: Benjamin O. Davis, Sr.'",
+          "url": "https://postalmuseum.si.edu/exhibition/the-black-experience/military-benjamin-o-davis-sr",
+          "quote": "the nation's first African-American brigadier general"
+        },
+        {
+          "id": "loc-civil-rights-act-wwii",
+          "label": "Library of Congress, 'The Civil Rights Act of 1964: A Long Struggle for Freedom — World War II and Post War (1940–1949)'",
+          "url": "https://www.loc.gov/exhibits/civil-rights-act/world-war-ii-and-post-war.html",
+          "quote": "Executive Order 8802 established the Committee on Fair Employment Practices"
+        }
+      ],
+      "disputes": [
+        "Whether the Social Security Act's agricultural and domestic exclusions were racially motivated is actively contested. SSA's own Social Security Bulletin summarizes the view that the Roosevelt administration 'acceded to a Southern amendment' to satisfy southern congressmen, and then argues the racial-bias thesis is 'conceptually flawed and unsupported by the existing empirical evidence,' pointing instead to administrative collection difficulties. Both positions are recorded here without resolution.",
+        "The date of Benjamin O. Davis Sr.'s promotion: the Army Center of Military History records a temporary brigadier-general promotion on October 25, 1940 and a regular-Army promotion on August 1, 1941, and different official pages lead with different dates."
+      ],
+      "unverified": [
+        "Details and dates of Executive Order 9346 (1943) reconstituting the FEPC — not fetched, so not asserted.",
+        "The composition and influence of the informal 'Black Cabinet' and Mary McLeod Bethune's NYA role — not fetched here."
+      ]
+    },
+    {
+      "number": 33,
+      "name": "Harry S. Truman",
+      "termLabel": "1945–1953",
+      "summary": "Truman created the President's Committee on Civil Rights by Executive Order 9808 on December 5, 1946, and its 1947 report To Secure These Rights documented discrimination in voting, housing, education and public accommodations. On July 26, 1948 he signed Executive Order 9981, requiring equality of treatment and opportunity in the armed forces, and Executive Order 9980, barring discrimination in federal employment.",
+      "paragraph": "Truman moved on civil rights mainly through executive power, because Congress wouldn't move. After the 1946 beating and blinding of Sgt. Isaac Woodard, a decorated Black veteran pulled off a bus in South Carolina, Truman issued Executive Order 9808 on December 5, 1946 creating the President's Committee on Civil Rights. Its 1947 report, To Secure These Rights, laid out discrimination in voting, housing, education and public accommodations. On February 2, 1948 he asked a joint session of Congress for federal anti-lynching protection, voting rights safeguards and a permanent Fair Employment Practices Commission. Congress didn't deliver, so on July 26, 1948 he signed two orders: 9981, requiring \"equality of treatment and opportunity for all persons in the armed forces,\" and 9980, directing that federal personnel actions be based \"solely on merit and fitness\" with no discrimination by race, color, religion or national origin. He was also the first president to address the NAACP, speaking at the Lincoln Memorial on June 29, 1947.",
+      "callouts": [
+        {
+          "text": "Issued Executive Order 9808 on December 5, 1946, establishing the President's Committee on Civil Rights, whose 1947 report To Secure These Rights catalogued discrimination in voting, housing, education and public accommodations.",
+          "sources": [
+            {
+              "label": "American Presidency Project, EO 9808",
+              "url": "https://www.presidency.ucsb.edu/documents/executive-order-9808-establishing-the-presidents-committee-civil-rights",
+              "quote": "may be strengthened and improved to safeguard the civil rights of the people"
+            },
+            {
+              "label": "National Park Service, 'Harry S Truman and Civil Rights'",
+              "url": "https://www.nps.gov/articles/000/harry-s-truman-and-civil-rights.htm",
+              "quote": "I want our Bill of Rights implemented in fact."
+            }
+          ]
+        },
+        {
+          "text": "Signed Executive Order 9981 on July 26, 1948, directing equality of treatment and opportunity in the armed forces without regard to race, color, religion or national origin.",
+          "sources": [
+            {
+              "label": "National Archives, Milestone Documents: EO 9981",
+              "url": "https://www.archives.gov/milestone-documents/executive-order-9981",
+              "quote": "there shall be equality of treatment and opportunity for all persons in the armed forces without regard to race, color, religion, or national origin."
+            },
+            {
+              "label": "National Park Service, 'Harry S Truman and Civil Rights'",
+              "url": "https://www.nps.gov/articles/000/harry-s-truman-and-civil-rights.htm",
+              "quote": "equality of treatment and opportunity in the Armed Services"
+            }
+          ]
+        },
+        {
+          "text": "Signed Executive Order 9980 the same day, July 26, 1948, requiring federal appointing officers to base personnel actions solely on merit and fitness and to prevent racial and religious discrimination.",
+          "sources": [
+            {
+              "label": "American Presidency Project, EO 9980",
+              "url": "https://www.presidency.ucsb.edu/documents/executive-order-9980-regulations-governing-fair-employment-practices-within-the-federal",
+              "quote": "All personnel actions taken by Federal appointing officers shall be based solely on merit and fitness"
+            },
+            {
+              "label": "Truman Library, Executive Orders: EO 9980",
+              "url": "https://www.trumanlibrary.gov/library/executive-orders/9980/executive-order-9980",
+              "quote": "Regulations Governing Fair Employment Practices Within the Federal Establishment"
+            }
+          ]
+        },
+        {
+          "text": "Delivered a civil rights message to a joint session of Congress on February 2, 1948, asking for federal anti-lynching protection, voting rights protection and a permanent Fair Employment Practices Commission. Congress did not pass the package.",
+          "sources": [
+            {
+              "label": "National Park Service, 'Harry S Truman and Civil Rights'",
+              "url": "https://www.nps.gov/articles/000/harry-s-truman-and-civil-rights.htm",
+              "quote": "federal anti-lynching protection, voting rights safeguards, and a permanent Fair Employment Practices Commission"
+            },
+            {
+              "label": "Truman Library, 'The Legacy of Sgt. Isaac Woodard, Jr.'",
+              "url": "https://www.trumanlibrary.gov/sites/default/files/Copy%20of%20Sergeant%20Isaac%20Woodard,%20Jr.%20.pdf",
+              "quote": "took great political risk by presenting a daring civil rights speech to a joint session of Congress"
+            }
+          ]
+        },
+        {
+          "text": "Spoke at the NAACP's 38th annual conference at the Lincoln Memorial on June 29, 1947 — the first sitting president to address the organization — in a nationwide radio broadcast.",
+          "sources": [
+            {
+              "label": "Truman Library sound recording SR64-54",
+              "url": "https://www.trumanlibrary.gov/soundrecording-records/sr64-54-president-trumans-address-national-association-advancement-colored",
+              "quote": "President Truman's Address Before the National Association for the Advancement of Colored People at the Lincoln Memorial"
+            },
+            {
+              "label": "Miller Center, 'June 29, 1947: Address before the NAACP'",
+              "url": "https://millercenter.org/the-presidency/presidential-speeches/june-29-1947-address-naacp",
+              "quote": "Truman became the first President to address the NAACP"
+            }
+          ]
+        }
+      ],
+      "personalRecord": "Truman's own private and public language conflicted with his official record. In a June 22, 1911 letter to Bess Wallace, published by the Truman Library, he wrote that one man is as good as another \"so long as he's honest and decent and not a nigger or a Chinaman,\" and added that he was \"strongly of the opinion that negroes ought to be in Africa.\" As a senator, addressing the National Colored Democratic Association in Chicago on July 14, 1940, he said: \"I wish to make it clear that I am not appealing for social equality of the Negro... Negroes want justice, not social relations.\"",
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/5/52/Harry_S_Truman%2C_bw_half-length_photo_portrait%2C_facing_front%2C_1945-crop.jpg",
+        "alt": "Black-and-white half-length portrait photograph of Harry S. Truman facing the camera, 1945",
+        "credit": "Photograph by David Bell Edmonston, 1945; Library of Congress, via Wikimedia Commons",
+        "rights": "public_domain",
+        "why": "1945 official portrait held by the Library of Congress; Commons records it as public domain in the United States. Verified: HTTP 200, image/jpeg."
+      },
+      "sources": [
+        {
+          "id": "nara-eo-9981",
+          "label": "National Archives, Milestone Documents: Executive Order 9981 (1948)",
+          "url": "https://www.archives.gov/milestone-documents/executive-order-9981",
+          "quote": "there shall be equality of treatment and opportunity for all persons in the armed forces without regard to race, color, religion, or national origin."
+        },
+        {
+          "id": "app-eo-9980",
+          "label": "American Presidency Project, Executive Order 9980 — Regulations Governing Fair Employment Practices Within the Federal Establishment",
+          "url": "https://www.presidency.ucsb.edu/documents/executive-order-9980-regulations-governing-fair-employment-practices-within-the-federal",
+          "quote": "All personnel actions taken by Federal appointing officers shall be based solely on merit and fitness"
+        },
+        {
+          "id": "app-eo-9808",
+          "label": "American Presidency Project, Executive Order 9808 — Establishing the President's Committee on Civil Rights",
+          "url": "https://www.presidency.ucsb.edu/documents/executive-order-9808-establishing-the-presidents-committee-civil-rights",
+          "quote": "The Committee is authorized on behalf of the President to inquire into and to determine whether and in what respect current law-enforcement measures"
+        },
+        {
+          "id": "trumanlib-eo-9980",
+          "label": "Harry S. Truman Presidential Library, Executive Order 9980",
+          "url": "https://www.trumanlibrary.gov/library/executive-orders/9980/executive-order-9980",
+          "quote": "Regulations Governing Fair Employment Practices Within the Federal Establishment"
+        },
+        {
+          "id": "nps-truman-civil-rights",
+          "label": "National Park Service, 'Harry S Truman and Civil Rights'",
+          "url": "https://www.nps.gov/articles/000/harry-s-truman-and-civil-rights.htm",
+          "quote": "I want our Bill of Rights implemented in fact."
+        },
+        {
+          "id": "trumanlib-eo-9981-lesson",
+          "label": "Harry S. Truman Presidential Library, 'Truman and Executive Order 9981: Idealistic, Pragmatic, or Shrewd Politician?' (document set)",
+          "url": "https://www.trumanlibrary.gov/education/lesson-plans/truman-and-executive-order-9981-idealistic-pragmatic-or-shrewd-politician",
+          "quote": "so long as he's honest and decent and not a nigger or a Chinaman"
+        },
+        {
+          "id": "trumanlib-naacp-address",
+          "label": "Harry S. Truman Presidential Library, sound recording SR64-54, Address before the NAACP",
+          "url": "https://www.trumanlibrary.gov/soundrecording-records/sr64-54-president-trumans-address-national-association-advancement-colored",
+          "quote": "President Truman's Address Before the National Association for the Advancement of Colored People at the Lincoln Memorial"
+        },
+        {
+          "id": "millercenter-truman-naacp",
+          "label": "Miller Center, 'June 29, 1947: Address before the NAACP'",
+          "url": "https://millercenter.org/the-presidency/presidential-speeches/june-29-1947-address-naacp",
+          "quote": "Truman became the first President to address the NAACP"
+        },
+        {
+          "id": "trumanlib-woodard",
+          "label": "Harry S. Truman Presidential Library, 'The Legacy of Sgt. Isaac Woodard, Jr.'",
+          "url": "https://www.trumanlibrary.gov/sites/default/files/Copy%20of%20Sergeant%20Isaac%20Woodard,%20Jr.%20.pdf",
+          "quote": "removed from a bus in Batesburg, SC"
+        },
+        {
+          "id": "nara-woodard-event",
+          "label": "National Archives, 'The Blinding of Isaac Woodard'",
+          "url": "https://www.archives.gov/calendar/event/the-blinding-of-isaac-woodard-0",
+          "quote": "The local chief of police savagely beat him, leaving him unconscious and permanently blind."
+        }
+      ],
+      "disputes": [
+        "Motive behind EO 9981 is contested. The Truman Library frames the question itself — 'Idealistic, Pragmatic, or Shrewd Politician?' — placing his 1911 and 1940 statements alongside the 1948 orders; other accounts, including the National Park Service, emphasize the political cost he paid as the Democratic Party split before the 1948 election.",
+        "How far EO 9981 went in practice is described differently: the National Park Service calls it 'ending military segregation,' while the order's own text commits only to equality of treatment and opportunity 'as rapidly as possible,' with implementation running for years afterward."
+      ],
+      "unverified": [
+        "The exact release date of To Secure These Rights (commonly given as October 29, 1947) — the Truman Library page returned unreadable content and no fetched source stated the day.",
+        "Whether the Justice Department's prosecution of the officer who blinded Isaac Woodard ended in acquittal — the outcome was not stated in the fetched text."
+      ]
+    },
+    {
+      "number": 34,
+      "name": "Dwight D. Eisenhower",
+      "termLabel": "1953–1961",
+      "summary": "Eisenhower signed Executive Order 10730 on September 24, 1957 and sent the 101st Airborne Division to Little Rock, Arkansas, to enforce a federal court desegregation order at Central High School. He signed the Civil Rights Act of 1957 (P.L. 85-315) on September 9, 1957 and the Civil Rights Act of 1960 (P.L. 86-449) on May 6, 1960, and never publicly endorsed the Brown v. Board of Education decision.",
+      "paragraph": "Eisenhower did the enforcing without doing the endorsing. When Governor Orval Faubus used the Arkansas National Guard to keep nine Black students out of Little Rock's Central High School, Eisenhower signed Executive Order 10730 on September 24, 1957, authorizing the Secretary of Defense to use \"such of the armed forces of the United States as he may deem necessary,\" and ordered the 101st Airborne in. He'd already signed the Civil Rights Act of 1957 on September 9 at Newport, Rhode Island: the first civil rights legislation since Reconstruction, creating a Civil Rights Commission and a Civil Rights Division at Justice, though Congress had stripped out the stronger voting protections. The 1960 act, signed May 6, added federal voting referees and record-retention requirements. On Brown itself he stayed carefully neutral, saying the Court had spoken and he was sworn to obey, and earlier that he did not believe \"we can cure all the evils in men's hearts by law.\"",
+      "callouts": [
+        {
+          "text": "Signed Executive Order 10730 on September 24, 1957, federalizing the Arkansas National Guard and authorizing the Secretary of Defense to use armed force; the 101st Airborne Division deployed to Little Rock's Central High School.",
+          "sources": [
+            {
+              "label": "American Presidency Project, EO 10730",
+              "url": "https://www.presidency.ucsb.edu/documents/executive-order-10730-providing-assistance-for-the-removal-obstruction-justice-within-the",
+              "quote": "the Secretary of Defense is authorized to use such of the armed forces of the United States as he may deem necessary"
+            },
+            {
+              "label": "Eisenhower Presidential Library, 'The Little Rock School Integration Crisis'",
+              "url": "https://www.eisenhowerlibrary.gov/research/online-documents/civil-rights-little-rock-school-integration-crisis",
+              "quote": "President Eisenhower ordered the 101st Airborne Division into Little Rock to insure the safety of the 'Little Rock Nine.'"
+            }
+          ]
+        },
+        {
+          "text": "Signed the Civil Rights Act of 1957 (Public Law 85-315, 71 Stat. 634) on September 9, 1957 — the first civil rights statute since Reconstruction — creating the Civil Rights Commission and a civil rights unit at the Justice Department.",
+          "sources": [
+            {
+              "label": "GovInfo, Public Law 85-315, 71 Stat. 634",
+              "url": "https://www.govinfo.gov/content/pkg/COMPS-340/pdf/COMPS-340.pdf",
+              "quote": "CIVIL RIGHTS ACT OF 1957 [Public Law 85–315; 71 Stat. 634]"
+            },
+            {
+              "label": "U.S. House of Representatives History, Art & Archives",
+              "url": "https://history.house.gov/Historical-Highlights/1951-2000/The-Civil-Rights-Act-of-1957/",
+              "quote": "the first civil rights legislation since Reconstruction"
+            }
+          ]
+        },
+        {
+          "text": "Signed the Civil Rights Act of 1960 (Public Law 86-449, 74 Stat. 86) on May 6, 1960, authorizing federal courts to appoint voting referees and requiring the preservation of voting records.",
+          "sources": [
+            {
+              "label": "GovInfo, Public Law 86-449, 74 Stat. 86",
+              "url": "https://www.govinfo.gov/content/pkg/STATUTE-74/pdf/STATUTE-74-Pg86.pdf",
+              "quote": "PUBLIC LAW 86-449-MAY 6, 1960"
+            },
+            {
+              "label": "American Presidency Project, 'Statement by the President Upon Signing the Civil Rights Act of 1960'",
+              "url": "https://www.presidency.ucsb.edu/documents/statement-the-president-upon-signing-the-civil-rights-act-1960",
+              "quote": "the use by federal courts of voting referees, holding great promise of making the Fifteenth Amendment of the Constitution fully meaningful"
+            }
+          ]
+        },
+        {
+          "text": "Declined to publicly endorse Brown v. Board of Education (May 17, 1954), limiting himself to saying the Court had spoken and he was sworn to uphold the constitutional process.",
+          "sources": [
+            {
+              "label": "National Park Service, 'President Eisenhower and Civil Rights'",
+              "url": "https://www.nps.gov/articles/000/eisenhower-and-civil-rights.htm",
+              "quote": "The Supreme Court has spoken, and I am sworn to uphold the constitutional process in this country; I will obey."
+            },
+            {
+              "label": "Miller Center, 'The struggle for civil rights' (Age of Eisenhower)",
+              "url": "https://millercenter.org/the-presidency/educational-resources/age-of-eisenhower/struggle-civil-rights",
+              "quote": "I do not believe we can cure all the evils in men's hearts by law"
+            }
+          ]
+        },
+        {
+          "text": "Issued Executive Order 10479 on August 13, 1953, establishing the Government Contract Committee to monitor nondiscrimination clauses in federal contracts and receive complaints against contractors.",
+          "sources": [
+            {
+              "label": "American Presidency Project, EO 10479",
+              "url": "https://www.presidency.ucsb.edu/documents/executive-order-10479-establishing-the-government-contract-committee",
+              "quote": "Executive Order 10479—Establishing the Government Contract Committee"
+            },
+            {
+              "label": "National Archives, Guide to Federal Records, RG 220",
+              "url": "https://www.archives.gov/research/guide-fed-records/groups/220.html",
+              "quote": "Established by EO 10479, August 13, 1953"
+            }
+          ]
+        }
+      ],
+      "portrait": {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/6/63/Dwight_D._Eisenhower%2C_official_photo_portrait%2C_May_29%2C_1959.jpg",
+        "alt": "Official color portrait photograph of Dwight D. Eisenhower, May 29, 1959",
+        "credit": "Executive Office of the President, via Wikimedia Commons",
+        "rights": "public_domain",
+        "why": "Official White House photograph made by a U.S. federal employee in the course of duty; Commons records it as public domain in the United States. Verified: HTTP 200, image/jpeg."
+      },
+      "sources": [
+        {
+          "id": "app-eo-10730",
+          "label": "American Presidency Project, Executive Order 10730 — Providing Assistance for the Removal of an Obstruction of Justice Within the State of Arkansas",
+          "url": "https://www.presidency.ucsb.edu/documents/executive-order-10730-providing-assistance-for-the-removal-obstruction-justice-within-the",
+          "quote": "the Secretary of Defense is authorized to use such of the armed forces of the United States as he may deem necessary"
+        },
+        {
+          "id": "eisenhowerlib-little-rock",
+          "label": "Eisenhower Presidential Library, 'Civil Rights: The Little Rock School Integration Crisis'",
+          "url": "https://www.eisenhowerlibrary.gov/research/online-documents/civil-rights-little-rock-school-integration-crisis",
+          "quote": "President Eisenhower ordered the 101st Airborne Division into Little Rock to insure the safety of the 'Little Rock Nine.'"
+        },
+        {
+          "id": "govinfo-cra-1957",
+          "label": "GovInfo, Civil Rights Act of 1957, Public Law 85-315, 71 Stat. 634",
+          "url": "https://www.govinfo.gov/content/pkg/COMPS-340/pdf/COMPS-340.pdf",
+          "quote": "CIVIL RIGHTS ACT OF 1957 [Public Law 85–315; 71 Stat. 634]"
+        },
+        {
+          "id": "house-cra-1957",
+          "label": "U.S. House of Representatives, History, Art & Archives, 'The Civil Rights Act of 1957'",
+          "url": "https://history.house.gov/Historical-Highlights/1951-2000/The-Civil-Rights-Act-of-1957/",
+          "quote": "the first civil rights legislation since Reconstruction"
+        },
+        {
+          "id": "eisenhowerlib-cra-1957",
+          "label": "Eisenhower Presidential Library, 'Civil Rights Act of 1957'",
+          "url": "https://www.eisenhowerlibrary.gov/research/online-documents/civil-rights-act-1957",
+          "quote": "obtain court injunctions against interference with the right to vote"
+        },
+        {
+          "id": "govinfo-cra-1960",
+          "label": "GovInfo, Civil Rights Act of 1960, Public Law 86-449, 74 Stat. 86",
+          "url": "https://www.govinfo.gov/content/pkg/STATUTE-74/pdf/STATUTE-74-Pg86.pdf",
+          "quote": "PUBLIC LAW 86-449-MAY 6, 1960"
+        },
+        {
+          "id": "app-cra-1960-signing",
+          "label": "American Presidency Project, 'Statement by the President Upon Signing the Civil Rights Act of 1960'",
+          "url": "https://www.presidency.ucsb.edu/documents/statement-the-president-upon-signing-the-civil-rights-act-1960",
+          "quote": "which requires the retention of voting records, will be of invaluable aid in the successful enforcement of existing voting rights statutes"
+        },
+        {
+          "id": "nps-eisenhower-civil-rights",
+          "label": "National Park Service, 'President Eisenhower and Civil Rights'",
+          "url": "https://www.nps.gov/articles/000/eisenhower-and-civil-rights.htm",
+          "quote": "The Supreme Court has spoken, and I am sworn to uphold the constitutional process in this country; I will obey."
+        },
+        {
+          "id": "millercenter-eisenhower-civil-rights",
+          "label": "Miller Center, 'The struggle for civil rights', Age of Eisenhower",
+          "url": "https://millercenter.org/the-presidency/educational-resources/age-of-eisenhower/struggle-civil-rights",
+          "quote": "I do not believe we can cure all the evils in men's hearts by law"
+        },
+        {
+          "id": "app-eo-10479",
+          "label": "American Presidency Project, Executive Order 10479 — Establishing the Government Contract Committee",
+          "url": "https://www.presidency.ucsb.edu/documents/executive-order-10479-establishing-the-government-contract-committee",
+          "quote": "Establishing the Government Contract Committee"
+        },
+        {
+          "id": "nara-rg-220",
+          "label": "National Archives, Guide to Federal Records, Record Group 220",
+          "url": "https://www.archives.gov/research/guide-fed-records/groups/220.html",
+          "quote": "monitoring implementation of the nondiscrimination provision in Federal Government contracts"
+        }
+      ],
+      "disputes": [
+        "Assessments of Eisenhower's overall civil rights leadership diverge. The National Park Service, citing historian William Hitchcock, describes an administration that 'marked a turning point in the Civil Rights movement' while his personal leadership stayed hesitant; the Miller Center emphasizes that he 'did not champion the need for equality and fairness' and did not embrace Brown.",
+        "Whether Eisenhower's Little Rock intervention reflected support for desegregation or only for federal court authority: the Eisenhower Library frames it as enforcing the Supreme Court's ruling, while the National Park Service notes he acted only after 'initial reluctance' and once a federal injunction gave him clear authority."
+      ],
+      "unverified": [
+        "The frequently repeated account of Eisenhower telling Chief Justice Earl Warren at a 1954 White House dinner that southern segregationists were not bad people — anecdotal and not verified from any source fetched here.",
+        "Specific claims about desegregation of Washington, D.C. public facilities and Navy yards under Eisenhower — mentioned in passing but not documented in the text fetched."
+      ]
+    }
+  ]
+}

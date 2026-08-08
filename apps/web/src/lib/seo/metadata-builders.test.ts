@@ -81,7 +81,7 @@ test('every static room emits an absolute self-canonical', () => {
   // A relative canonical is only resolved by Next when `metadataBase` is set, and it is not; it
   // would emit verbatim and tell a crawler nothing. Sixteen rooms shipped with no canonical at
   // all before SP-19, so every filter and tracking permutation of them was a separate URL.
-  for (const path of ['/about', '/books', '/chapters', '/law', '/memorial', '/library']) {
+  for (const path of ['/about', '/books', '/stories', '/law', '/memorial', '/library']) {
     const metadata = buildStaticPageMetadata({ path, title: 'Room', description: 'A room.' });
     const canonical = metadata.alternates?.canonical;
     assert.equal(typeof canonical, 'string');

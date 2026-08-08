@@ -47,6 +47,8 @@ const doc: PublicArticleProjectionDoc = {
   id: 'a1',
   releaseId: 'r1',
   slug: 'test',
+  kind: 'chapter',
+  tags: [],
   title: 'Test',
   summary: 'A test article.',
   publishedAt: '2026-07-26',

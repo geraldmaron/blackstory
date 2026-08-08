@@ -706,16 +706,22 @@ test('plate fills stay opaque', () => {
 });
 
 test('no memorial name is painted on the plate — the layer id is absent from the built style', () => {
-  const style = buildStyleFixture('presence');
-  const layerIds = (style.layers ?? []).map((layer) => layer.id);
-  assert.ok(
-    !layerIds.some((id) => id.includes('memorial')),
-    'SP-08 deleted the memorial names layer; no layer id may reference it',
-  );
-  assert.ok(
-    !Object.keys(style.sources ?? {}).some((id) => id.includes('memorial')),
-    'SP-08 deleted the memorial names source; no source id may reference it',
-  );
+  // Every layer mode, not just 'presence': the population modes rebuild the layer list, so a
+  // reintroduced memorial layer could hide in a mode this test never built. The check is on the
+  // substring rather than the retired `explore-memorial-names` id because the defect to guard is
+  // "a victim's name is painted as basemap furniture", not "this exact string came back".
+  for (const mode of ['off', 'presence', 'blackShare', 'blackChange'] as const) {
+    const style = buildStyleFixture(mode);
+    const layerIds = (style.layers ?? []).map((layer) => layer.id);
+    assert.ok(
+      !layerIds.some((id) => id.includes('memorial')),
+      `SP-08 deleted the memorial names layer; no layer id may reference it (mode: ${mode})`,
+    );
+    assert.ok(
+      !Object.keys(style.sources ?? {}).some((id) => id.includes('memorial')),
+      `SP-08 deleted the memorial names source; no source id may reference it (mode: ${mode})`,
+    );
+  }
 });
 
 /** Collect string color outputs nested inside case/match paint expressions. */
