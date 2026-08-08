@@ -20,6 +20,10 @@ import {
   type PostgresQueryFn,
 } from './postgres-readers.js';
 import { queryPostgres } from './postgres-client.js';
+import {
+  loadEntityProjectionsFromArtifact,
+  loadSearchIndexDocsFromArtifact,
+} from './release-artifact-catalogs.js';
 
 export function mapPublicSearchProjection(doc: PublicSearchProjectionDoc): PublicSearchIndexDoc {
   const notabilityBasis: readonly NotabilityBasisRecord[] = (doc.notabilityBasis ?? []).map(
@@ -135,7 +139,11 @@ export function createPostgresDataAccessReaders(
   ): Promise<EntityProjectionsList> {
     const hit = readReleaseCache(projectionsCache, releaseId);
     if (hit) return hit;
-    const value = await listPublicEntityProjections(releaseId, runQuery);
+    // CDN artifact first so a cold start does not pull the whole catalog out of Postgres;
+    // `undefined` (unconfigured origin, miss, or release mismatch) falls through to the SoR.
+    const value =
+      (await loadEntityProjectionsFromArtifact(releaseId)) ??
+      (await listPublicEntityProjections(releaseId, runQuery));
     writeReleaseCache(projectionsCache, releaseId, value);
     return value;
   }
@@ -143,7 +151,9 @@ export function createPostgresDataAccessReaders(
   async function listPublicSearchIndexDocsCached(releaseId: string): Promise<SearchIndexList> {
     const hit = readReleaseCache(searchIndexCache, releaseId);
     if (hit) return hit;
-    const value = await listPublicSearchIndexDocs(releaseId, runQuery);
+    const value =
+      (await loadSearchIndexDocsFromArtifact(releaseId)) ??
+      (await listPublicSearchIndexDocs(releaseId, runQuery));
     writeReleaseCache(searchIndexCache, releaseId, value);
     return value;
   }

@@ -176,6 +176,7 @@ export {
   publicReleaseSearchIndexPath,
   writeReleaseCatalogArtifactsToDir,
   uploadReleaseCatalogArtifacts,
+  fetchReleaseEntitiesListArtifact,
   fetchReleaseSearchIndexArtifact,
   type ArtifactFetchImpl,
   type BuiltReleaseCatalogArtifacts,
