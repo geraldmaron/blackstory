@@ -28,13 +28,19 @@
 name: Publish Release Catalog Artifacts
 
 on:
-  # 5m is GitHub Actions' minimum schedule granularity; each tick is now cheap (a single-row
-  # watermark check in the common no-change case), so there's no cost reason to go coarser.
-  # Note: GitHub does not guarantee scheduled workflows fire exactly on time — under platform
-  # load a tick can lag by several minutes, so treat 5m as the target cadence, not a hard bound.
+  # Release data only changes when an operator runs an ops-data script by hand, so the primary
+  # trigger is a manual dispatch right after such a run. The daily tick is forgetting-insurance:
+  # it bounds worst-case artifact staleness after an unpublished mutation to ~24h instead of
+  # indefinitely. (Was */5 polling — 288 runs/day to detect a human-initiated action; see
+  # 2026-08-08 session.)
   schedule:
-    - cron: '*/5 * * * *'
-  workflow_dispatch: {}
+    - cron: '17 9 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'FORCE=1 — publish even if the watermark is clean and hashes match'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -87,6 +93,8 @@ jobs:
           fi
 
       - name: Publish release catalog artifacts
+        env:
+          FORCE: ${{ inputs.force && '1' || '' }}
         run: |
           node --conditions development --import tsx \
             packages/ops-data/scripts/publish-release-catalog-artifacts.ts
