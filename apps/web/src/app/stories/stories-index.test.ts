@@ -69,16 +69,24 @@ describe('/stories · the two notice states differ', () => {
 });
 
 describe('/stories · query parsing', () => {
-  it('collapses unrecognised values rather than throwing, since bookmarks reach here', () => {
+  it('collapses unrecognised values to the chapters default rather than throwing, since bookmarks reach here', () => {
     const query = parseStoriesQuery({ kind: 'nonsense', sort: 'sideways', page: 'abc' });
-    assert.equal(query.kind, '');
+    assert.equal(query.kind, 'chapter');
     assert.equal(query.sort, 'series');
     assert.equal(query.page, 1);
+  });
+
+  it('defaults to chapters when no kind param is present', () => {
+    assert.equal(parseStoriesQuery({}).kind, 'chapter');
   });
 
   it('accepts the real kinds and sorts', () => {
     assert.equal(parseStoriesQuery({ kind: 'article' }).kind, 'article');
     assert.equal(parseStoriesQuery({ sort: 'title' }).sort, 'title');
+  });
+
+  it('reaches the unfiltered "All" view only via the explicit kind=all sentinel', () => {
+    assert.equal(parseStoriesQuery({ kind: 'all' }).kind, '');
   });
 
   it('takes the first value when a param repeats', () => {
@@ -95,6 +103,10 @@ describe('/stories · href building', () => {
   it('carries real narrowing into the query string', () => {
     assert.equal(storiesHref({ series: 'presidents' }), '/stories?series=presidents');
     assert.equal(storiesHref({ kind: 'article', page: 3 }), '/stories?kind=article&page=3');
+  });
+
+  it('renders the explicit "All" kind as kind=all, since an omitted kind means chapters', () => {
+    assert.equal(storiesHref({ kind: '' }), '/stories?kind=all');
   });
 });
 
@@ -119,6 +131,18 @@ describe('/stories · filtering and search', () => {
     }),
   ];
 
+  // EMPTY now defaults to kind: 'chapter'; these cases exercise series/tag/search filtering
+  // on its own, across both kinds, so they start from the explicit "All" kind instead.
+  const ALL = { ...EMPTY, kind: '' };
+
+  it('defaults to chapters only, since that is now the index default', () => {
+    const rows = filterItems(items, EMPTY);
+    assert.deepEqual(
+      rows.map((row) => row.id),
+      ['c1'],
+    );
+  });
+
   it('filters by kind', () => {
     const rows = filterItems(items, { ...EMPTY, kind: 'article' });
     assert.deepEqual(
@@ -127,13 +151,17 @@ describe('/stories · filtering and search', () => {
     );
   });
 
+  it('the explicit "All" kind returns every kind', () => {
+    assert.equal(filterItems(items, ALL).length, 3);
+  });
+
   it('filters by series', () => {
-    assert.equal(filterItems(items, { ...EMPTY, series: 'presidents' }).length, 2);
-    assert.equal(filterItems(items, { ...EMPTY, series: 'nope' }).length, 0);
+    assert.equal(filterItems(items, { ...ALL, series: 'presidents' }).length, 2);
+    assert.equal(filterItems(items, { ...ALL, series: 'nope' }).length, 0);
   });
 
   it('filters by tag', () => {
-    const rows = filterItems(items, { ...EMPTY, tag: 'Modern era' });
+    const rows = filterItems(items, { ...ALL, tag: 'Modern era' });
     assert.deepEqual(
       rows.map((row) => row.id),
       ['p40'],
@@ -141,15 +169,17 @@ describe('/stories · filtering and search', () => {
   });
 
   it('searches case-insensitively across title, series and tags', () => {
-    assert.equal(filterItems(items, { ...EMPTY, q: 'lincoln' })[0]?.id, 'p16');
-    assert.equal(filterItems(items, { ...EMPTY, q: 'PRESIDENTIAL' }).length, 2);
-    assert.equal(filterItems(items, { ...EMPTY, q: 'nothing here' }).length, 0);
+    assert.equal(filterItems(items, { ...ALL, q: 'lincoln' })[0]?.id, 'p16');
+    assert.equal(filterItems(items, { ...ALL, q: 'PRESIDENTIAL' }).length, 2);
+    assert.equal(filterItems(items, { ...ALL, q: 'nothing here' }).length, 0);
   });
 
   it('reports when any narrowing is engaged, so the clear affordance can show', () => {
     assert.equal(hasActiveNarrowing(EMPTY), false);
     assert.equal(hasActiveNarrowing({ ...EMPTY, q: 'x' }), true);
     assert.equal(hasActiveNarrowing({ ...EMPTY, series: 'presidents' }), true);
+    assert.equal(hasActiveNarrowing({ ...EMPTY, kind: 'article' }), true);
+    assert.equal(hasActiveNarrowing(ALL), true);
   });
 });
 
@@ -237,7 +267,9 @@ describe('/stories · rail groups and chips', () => {
         ['Records', 1],
       ],
     );
-    assert.equal(chips[0]?.active, true);
+    // EMPTY now defaults to chapters, not All.
+    assert.equal(chips[0]?.active, false);
+    assert.equal(chips[1]?.active, true);
   });
 
   it('marks the engaged chip as current for assistive technology', () => {
@@ -246,16 +278,19 @@ describe('/stories · rail groups and chips', () => {
     assert.equal(chips.find((chip) => chip.label === 'All')?.active, false);
   });
 
-  it('builds collection, era, tag and place groups that link back into the index', () => {
+  it('builds collection, era, tag and place groups that link back into the index across both kinds', () => {
+    // These rail links always carry kind=all: they group across both editorial kinds (e.g.
+    // "Presidential records" is entirely `article`), so they must not fall through to the
+    // chapters default.
     assert.deepEqual(buildSeriesGroups(items), [
-      { label: 'Presidential records', href: '/stories?series=presidents', count: 1 },
+      { label: 'Presidential records', href: '/stories?kind=all&series=presidents', count: 1 },
     ]);
     assert.deepEqual(buildTagGroups(items), [
-      { label: 'Founding era', href: '/stories?tag=Founding+era', count: 1 },
+      { label: 'Founding era', href: '/stories?kind=all&tag=Founding+era', count: 1 },
     ]);
     assert.equal(buildEraGroups(items).length, 2);
     assert.deepEqual(buildPlaceGroups(items), [
-      { label: 'US', href: '/stories?place=US', count: 2 },
+      { label: 'US', href: '/stories?kind=all&place=US', count: 2 },
     ]);
   });
 });

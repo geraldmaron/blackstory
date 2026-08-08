@@ -115,7 +115,11 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
           <form className="ds-stories-form" method="get" action="/stories" role="search">
             {/* Narrowing already in the URL rides along as hidden fields, so submitting the
                 search box refines the current view instead of silently resetting it. */}
-            {query.kind.length > 0 ? <input type="hidden" name="kind" value={query.kind} /> : null}
+            {/* 'chapter' is the default and needs no param; '' is the explicit "All" view
+                and must round-trip as kind=all, not an empty/absent field. */}
+            {query.kind !== 'chapter' ? (
+              <input type="hidden" name="kind" value={query.kind === '' ? 'all' : query.kind} />
+            ) : null}
             {query.series.length > 0 ? (
               <input type="hidden" name="series" value={query.series} />
             ) : null}
