@@ -48,6 +48,25 @@ export function estimateJsonCacheBytes(value: unknown): number {
   return Buffer.byteLength(JSON.stringify(value), 'utf8');
 }
 
+/**
+ * Lower bound on the serialized size of an array, without serializing it.
+ *
+ * `estimateJsonCacheBytes` on the national catalog stringifies >13MB purely to conclude "too
+ * big", then throws the string away — on every cold start, on both the artifact and Postgres
+ * paths. Any JSON array element serializes to at least a couple of bytes plus its comma, so
+ * once `length * MIN_BYTES_PER_ELEMENT` already exceeds the ceiling the answer is settled and
+ * the full stringify can be skipped. Deliberately conservative: it only short-circuits the
+ * definitely-oversized case and never claims something fits.
+ */
+const MIN_BYTES_PER_ARRAY_ELEMENT = 2;
+
+export function isDefinitelyOversizedArray(
+  value: unknown,
+  safeBytes: number = NEXT_DATA_CACHE_SAFE_BYTES,
+): boolean {
+  return Array.isArray(value) && value.length * MIN_BYTES_PER_ARRAY_ELEMENT > safeBytes;
+}
+
 /** True when a payload is safe to store in Next's shared data cache. */
 export function fitsNextDataCache(
   byteLength: number,
@@ -71,6 +90,9 @@ export function isOversizedLiveCatalogSentinel(
  * fits, otherwise only the oversized sentinel (fat payload must live in process memory).
  */
 export function nextDataCacheValueForCatalog<T>(loaded: T): T | OversizedLiveCatalogSentinel {
+  if (isDefinitelyOversizedArray(loaded)) {
+    return OVERSIZED_LIVE_CATALOG_SENTINEL;
+  }
   if (!fitsNextDataCache(estimateJsonCacheBytes(loaded))) {
     return OVERSIZED_LIVE_CATALOG_SENTINEL;
   }

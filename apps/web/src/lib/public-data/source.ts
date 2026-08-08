@@ -148,35 +148,84 @@ function asRelatedNeighborViews(
   }));
 }
 
+/**
+ * Prebuilt per-catalog lookups. Building these is O(catalog); doing it inside
+ * `hydrateEntityLearningLinks` made whole-catalog hydration O(catalog²) — for the ~4.1k national
+ * release that was ~33M Map insertions and 8k Map allocations per cold start, burned on every
+ * instance on both the artifact and Postgres paths. Built once by `mapProjectionsToHydratedViews`
+ * and shared across every entity in the pass.
+ */
+type CatalogLookups = {
+  readonly neighborsById: Map<string, NeighborLookup>;
+  readonly displayNameById: Map<string, { readonly displayName: string }>;
+};
+
+function buildCatalogLookups(catalog: readonly PublicEntityView[]): CatalogLookups {
+  const neighborsById = new Map<string, NeighborLookup>();
+  const displayNameById = new Map<string, { readonly displayName: string }>();
+  for (const item of catalog) {
+    neighborsById.set(item.id, toNeighborLookup(item));
+    displayNameById.set(item.id, { displayName: item.displayName });
+  }
+  return { neighborsById, displayNameById };
+}
+
 /** Attach 1-hop stubs + capped 2-hop continue-learning using a neighbor catalog.
- * Also composes the dated timeline once neighbor display names are resolvable. */
+ * Also composes the dated timeline once neighbor display names are resolvable.
+ *
+ * `lookups` is an optional optimization for whole-catalog passes: when omitted the maps are
+ * built from `catalog` (correct, but O(catalog) per call — fine for the single-entity path
+ * where the catalog is the entity plus its bounded neighbors). Callers that hydrate every
+ * entity in a catalog MUST pass shared lookups or the pass degrades to O(n²). */
 export function hydrateEntityLearningLinks(
   entity: PublicEntityView,
   catalog: readonly PublicEntityView[],
+  lookups?: CatalogLookups,
 ): PublicEntityView {
-  const neighborsById = new Map(catalog.map((item) => [item.id, toNeighborLookup(item)]));
-  neighborsById.set(entity.id, toNeighborLookup(entity));
+  const shared = lookups ?? buildCatalogLookups(catalog);
+
+  // The entity's own record must win over any catalog copy, but must not leak into the shared
+  // maps (they are reused across sibling entities in a whole-catalog pass). Snapshot and restore.
+  const hadNeighbor = shared.neighborsById.has(entity.id);
+  const priorNeighbor = shared.neighborsById.get(entity.id);
+  shared.neighborsById.set(entity.id, toNeighborLookup(entity));
 
   const relatedNeighbors = asRelatedNeighborViews(
-    buildRelatedNeighborStubs(entity.related, neighborsById),
+    buildRelatedNeighborStubs(entity.related, shared.neighborsById),
   );
   const continueLearning = asRelatedNeighborViews(
-    composeContinueLearningStubs(entity.id, relatedNeighbors, neighborsById),
+    composeContinueLearningStubs(entity.id, relatedNeighbors, shared.neighborsById),
   );
 
-  const displayNameLookup = new Map(
-    catalog.map((item) => [item.id, { displayName: item.displayName }]),
-  );
-  displayNameLookup.set(entity.id, { displayName: entity.displayName });
+  if (hadNeighbor && priorNeighbor !== undefined) {
+    shared.neighborsById.set(entity.id, priorNeighbor);
+  } else if (!hadNeighbor) {
+    shared.neighborsById.delete(entity.id);
+  }
+
   // Prefer already-hydrated neighbor stubs when the catalog is thin (single-entity path).
+  // Overlay entries are tracked so the shared map is left exactly as it was found.
+  const hadDisplayName = shared.displayNameById.has(entity.id);
+  const priorDisplayName = shared.displayNameById.get(entity.id);
+  shared.displayNameById.set(entity.id, { displayName: entity.displayName });
+  const overlaidIds: string[] = [];
   for (const neighbor of relatedNeighbors) {
-    if (!displayNameLookup.has(neighbor.id)) {
-      displayNameLookup.set(neighbor.id, { displayName: neighbor.displayName });
+    if (!shared.displayNameById.has(neighbor.id)) {
+      shared.displayNameById.set(neighbor.id, { displayName: neighbor.displayName });
+      overlaidIds.push(neighbor.id);
     }
   }
-  const timeline = buildGraphTimeline(entity, displayNameLookup).filter(
+
+  const timeline = buildGraphTimeline(entity, shared.displayNameById).filter(
     (item) => !isUndatedTimelineEntry(item),
   );
+
+  for (const id of overlaidIds) shared.displayNameById.delete(id);
+  if (hadDisplayName && priorDisplayName !== undefined) {
+    shared.displayNameById.set(entity.id, priorDisplayName);
+  } else if (!hadDisplayName) {
+    shared.displayNameById.delete(entity.id);
+  }
 
   return {
     ...entity,
@@ -192,7 +241,8 @@ function mapProjectionsToHydratedViews(
   const mapped = projections.map((projection) =>
     mapProjectionToPublicEntityView(projection as PublicProjectionInput),
   );
-  return mapped.map((entity) => hydrateEntityLearningLinks(entity, mapped));
+  const lookups = buildCatalogLookups(mapped);
+  return mapped.map((entity) => hydrateEntityLearningLinks(entity, mapped, lookups));
 }
 
 function projectionsFromArtifactEntities(
@@ -227,7 +277,15 @@ async function loadLiveEntitiesForRelease(
     if (artifact && artifact.entities.length > 0) {
       const projections = projectionsFromArtifactEntities(artifact.entities);
       if (projections.length > 0) return mapProjectionsToHydratedViews(projections);
+      console.warn(
+        `[public-data] entities artifact had ${artifact.entities.length} entries but none parsed; falling back to Postgres`,
+      );
     }
+    // Every arrival here is a full multi-MB catalog pull. release-artifacts.ts has already
+    // logged the specific reason; this line marks the cost that reason caused.
+    console.warn(
+      `[public-data] full Postgres entity catalog pull for ${releaseId} (artifact unusable)`,
+    );
   }
 
   const projections = await listPublicEntityProjections(releaseId);
@@ -244,6 +302,9 @@ async function loadLiveSearchIndexForRelease(
       const mapped = searchDocsFromArtifact(artifact.docs);
       if (mapped.length > 0) return mapped;
     }
+    console.warn(
+      `[public-data] full Postgres search-index pull for ${releaseId} (artifact unusable)`,
+    );
   }
 
   const projectionDocs = await listPublicSearchIndexDocs(releaseId);
@@ -258,6 +319,30 @@ async function loadLiveSearchIndexForRelease(
  * When the serialized catalog exceeds the safe ceiling, Next stores only a tiny oversized
  * sentinel (never the full array) so SET no longer warns and every instance still fills memory.
  */
+/**
+ * In-flight catalog loads, keyed like the memory cache.
+ *
+ * Without this, the process-memory TTL and the Next data-cache `revalidate` window are both
+ * 30 minutes and therefore expire together: at that instant every concurrent request on the
+ * instance misses memory, and the oversized-sentinel branch below calls `load()` *outside*
+ * `unstable_cache`, which does no deduplication of its own. N concurrent requests meant N
+ * concurrent full catalog loads — the bursty Postgres read pattern observed on 2026-08-08
+ * (several full pulls within seconds, then quiet). One load per key now serves all waiters.
+ */
+const inFlightCatalogLoads = new Map<string, Promise<unknown>>();
+
+function singleFlight<T>(key: string, load: () => Promise<T>): Promise<T> {
+  const existing = inFlightCatalogLoads.get(key) as Promise<T> | undefined;
+  if (existing !== undefined) return existing;
+  // Deleting in `finally` (not `then`) guarantees the key is released even when the load
+  // rejects, so a single failure cannot wedge the key and starve every later request.
+  const started = load().finally(() => {
+    inFlightCatalogLoads.delete(key);
+  });
+  inFlightCatalogLoads.set(key, started);
+  return started;
+}
+
 async function cacheLiveCatalog<T>(options: {
   readonly kind: LiveCatalogKind;
   readonly releaseId: string;
@@ -270,6 +355,27 @@ async function cacheLiveCatalog<T>(options: {
   const memoryHit = options.memory.get(memKey);
   if (memoryHit !== undefined) {
     return memoryHit;
+  }
+
+  return singleFlight(memKey, () => loadAndCacheLiveCatalog(memKey, options));
+}
+
+async function loadAndCacheLiveCatalog<T>(
+  memKey: string,
+  options: {
+    readonly kind: LiveCatalogKind;
+    readonly releaseId: string;
+    readonly activatedAt: string;
+    readonly memory: LiveCatalogMemoryCache<T>;
+    readonly load: () => Promise<T | undefined>;
+    readonly nextCacheKeyPrefix: string;
+  },
+): Promise<T | undefined> {
+  // Re-check: a load that completed while this caller queued behind the single-flight key
+  // has already populated memory.
+  const raced = options.memory.get(memKey);
+  if (raced !== undefined) {
+    return raced;
   }
 
   const fromNext = await unstable_cache(
