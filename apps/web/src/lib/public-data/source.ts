@@ -54,12 +54,17 @@ import {
 
 /**
  * Cross-request cache window for release catalog / search index (seconds).
- * Cache keys include `releaseId + activatedAt`, so entries can never serve a stale
- * release — a new activation changes the key. The TTL is therefore only a memory
- * bound, not a freshness control; keep it long (each expiry re-pulls the ~5MB
- * catalog from Postgres and was the dominant driver of Supabase egress).
+ *
+ * Correction (repo-csw0 follow-up): the cache key includes `releaseId + activatedAt`, but
+ * those do NOT change when content is corrected in place — dozens of `packages/ops-data/scripts`
+ * fix/backfill scripts upsert `bb_public.release_entities` under the *same* release id and
+ * `active_release.activated_at` is not bumped by them. So this TTL is a real freshness bound
+ * on editorial corrections, not just a memory bound as originally assumed when it was raised
+ * from 300s to 6h. 30 minutes bounds a correction's visible staleness to roughly
+ * TTL + the artifact-republish cron interval (`publish-release-catalog-artifacts.yml`) while
+ * keeping Postgres pulls far below the pre-fix rate (~48 calls/day/instance vs one per request).
  */
-const RELEASE_CATALOG_REVALIDATE_SECONDS = 21_600; // 6h
+const RELEASE_CATALOG_REVALIDATE_SECONDS = 1_800; // 30m
 const RELEASE_CATALOG_TTL_MS = RELEASE_CATALOG_REVALIDATE_SECONDS * 1000;
 
 /**

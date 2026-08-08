@@ -63,11 +63,16 @@ export type CreatePostgresDataAccessReadersOptions = {
 
 /**
  * Matches `apps/web`'s release-catalog cache window (`RELEASE_CATALOG_REVALIDATE_SECONDS`).
- * Entries are keyed by release id and release contents are immutable once published, so
- * this TTL is a memory bound, not a freshness control — each expiry re-pulls the full
- * multi-MB catalog from Postgres (the dominant Supabase egress driver at 5 minutes).
+ *
+ * Correction (repo-csw0 follow-up): release contents are NOT immutable once published —
+ * `packages/ops-data/scripts` fix/backfill scripts upsert `bb_public.release_entities` in
+ * place under the same release id, without bumping `active_release.activated_at`. So this
+ * TTL is a real freshness bound on editorial corrections, not just a memory bound. 30 minutes
+ * bounds visible staleness to roughly TTL + the artifact-republish cron interval
+ * (`publish-release-catalog-artifacts.yml`) while keeping Postgres pulls far below the
+ * pre-fix per-request rate.
  */
-const ENTITY_PROJECTIONS_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+const ENTITY_PROJECTIONS_CACHE_TTL_MS = 30 * 60 * 1000;
 /** Only ever 1-2 releases are active in practice; bounded defensively against release churn. */
 const MAX_CACHED_RELEASES = 4;
 /** Active-release pointer reads were per-request; a short window keeps activation prompt. */

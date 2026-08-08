@@ -1,0 +1,84 @@
+# repo-csw0 follow-up: publish-release-catalog-artifacts.ts must run after every release
+# activation AND after in-place release mutations (the many `packages/ops-data/scripts`
+# fix/backfill scripts that upsert bb_public.release_entities under the same release id
+# without bumping active_release.activated_at) — otherwise the CDN artifact silently drifts
+# from bb_public and consumers keep serving stale data for as long as their cache TTL allows.
+# There is no single "activation" code path to hook this into; ops-data has ~19 scripts that
+# mutate release_entities directly and ad hoc. A timer is the general fix: it bounds staleness
+# to at most the cron interval plus the consumer cache TTL, regardless of which script wrote
+# the correction or whether anyone remembered to run the publisher by hand.
+#
+# The upload is idempotent (x-upsert) and derived-only — it republishes a read-through cache
+# artifact, never bb_public itself — so unlike canonical-convergence-monitor.yml (which
+# deliberately stays dry-run-only ahead of a human-reviewed --apply) this is safe to run
+# unattended on every tick.
+#
+# Requires HOSTED_DATABASE_URL (already set, see canonical-convergence-monitor.yml) plus
+# SUPABASE_URL and SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY) repo secrets with
+# Storage write access to the public-media bucket. Fails closed with a clear message if any
+# are missing rather than silently reporting green.
+
+name: Publish Release Catalog Artifacts
+
+on:
+  # 30m matches the consumer cache TTL (RELEASE_CATALOG_REVALIDATE_SECONDS /
+  # ENTITY_PROJECTIONS_CACHE_TTL_MS) so worst-case staleness after an editorial correction is
+  # roughly one cron interval plus one consumer TTL window, not open-ended.
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-release-catalog-artifacts-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    name: Publish entities.json / search-index.json for the active release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.HOSTED_DATABASE_URL }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          version: 9.12.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Fail closed if required secrets are not configured
+        run: |
+          if [ -z "${DATABASE_URL:-}" ]; then
+            echo "::error::HOSTED_DATABASE_URL secret is not set — this job cannot read bb_public. See this workflow's header comment."
+            exit 1
+          fi
+          if [ -z "${SUPABASE_URL:-}" ]; then
+            echo "::error::SUPABASE_URL secret is not set — this job cannot upload to Storage. See this workflow's header comment."
+            exit 1
+          fi
+          if [ -z "${SUPABASE_SECRET_KEY:-}" ] && [ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ]; then
+            echo "::error::Neither SUPABASE_SECRET_KEY nor SUPABASE_SERVICE_ROLE_KEY is set — this job cannot upload to Storage. See this workflow's header comment."
+            exit 1
+          fi
+
+      - name: Publish release catalog artifacts
+        run: |
+          node --conditions development --import tsx \
+            packages/ops-data/scripts/publish-release-catalog-artifacts.ts
