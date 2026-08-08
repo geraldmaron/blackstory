@@ -4,9 +4,16 @@
 # without bumping active_release.activated_at) — otherwise the CDN artifact silently drifts
 # from bb_public and consumers keep serving stale data for as long as their cache TTL allows.
 # There is no single "activation" code path to hook this into; ops-data has ~19 scripts that
-# mutate release_entities directly and ad hoc. A timer is the general fix: it bounds staleness
-# to at most the cron interval plus the consumer cache TTL, regardless of which script wrote
-# the correction or whether anyone remembered to run the publisher by hand.
+# mutate release_entities directly and ad hoc, none through a shared write path.
+#
+# This is event-driven, not a blind timer: a statement-level trigger (see
+# supabase/migrations/20260808020846_release_catalog_publish_watermark.sql) marks
+# bb_public.release_catalog_publish_watermark dirty on any write to release_entities /
+# search_index. The script checks that watermark FIRST and returns immediately if nothing
+# changed — the common case on every tick costs one single-row SELECT, not a 13MB rebuild.
+# When something did change, each artifact (entities.json / search-index.json) is uploaded
+# only if its content hash actually differs from what's published, so a value-preserving
+# rewrite still marks dirty but doesn't force a needless re-upload / CDN invalidation.
 #
 # The upload is idempotent (x-upsert) and derived-only — it republishes a read-through cache
 # artifact, never bb_public itself — so unlike canonical-convergence-monitor.yml (which
@@ -21,11 +28,12 @@
 name: Publish Release Catalog Artifacts
 
 on:
-  # 30m matches the consumer cache TTL (RELEASE_CATALOG_REVALIDATE_SECONDS /
-  # ENTITY_PROJECTIONS_CACHE_TTL_MS) so worst-case staleness after an editorial correction is
-  # roughly one cron interval plus one consumer TTL window, not open-ended.
+  # 5m is GitHub Actions' minimum schedule granularity; each tick is now cheap (a single-row
+  # watermark check in the common no-change case), so there's no cost reason to go coarser.
+  # Note: GitHub does not guarantee scheduled workflows fire exactly on time — under platform
+  # load a tick can lag by several minutes, so treat 5m as the target cadence, not a hard bound.
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch: {}
 
 permissions:
