@@ -66,9 +66,26 @@ test('shouldUseLivePublicProjections enables postgres mode when DATABASE_URL is 
   assert.equal(isPostgresPublicDataSource({ PUBLIC_DATA_SOURCE: 'postgres' }), true);
 });
 
-test('postgres mode skips ADR-004 release artifacts so stale fixtures cannot shadow bb_public', () => {
+test('postgres mode uses ADR-004 release artifacts only behind an explicit origin', () => {
   // Regression: local rel_seed_001 entities.json is a 684-entity slice; Postgres has 1103+.
+  // Without a configured origin, postgres mode must never pick up fixture artifacts.
   assert.equal(shouldPreferReleaseArtifacts({ PUBLIC_DATA_SOURCE: 'postgres' }), false);
+  assert.equal(
+    shouldPreferReleaseArtifacts({
+      PUBLIC_DATA_SOURCE: 'postgres',
+      APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL: '   ',
+    }),
+    false,
+  );
+  // With an explicit origin, artifacts act as the egress read-through cache (repo-csw0);
+  // release-artifacts.ts still rejects any artifact whose releaseId mismatches the live pointer.
+  assert.equal(
+    shouldPreferReleaseArtifacts({
+      PUBLIC_DATA_SOURCE: 'postgres',
+      APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL: 'https://cdn.example.com/public-media',
+    }),
+    true,
+  );
   assert.equal(shouldPreferReleaseArtifacts({ PUBLIC_DATA_SOURCE: 'seed' }), true);
   assert.equal(shouldPreferReleaseArtifacts({}), true);
 });
@@ -100,7 +117,7 @@ test('postgres without DATABASE_URL is an explicit misconfig (empty catalog, not
 test('postgres mode must not prefer seed-style artifact caches (hero 4-pin regression)', () => {
   // Build-time prerender without DATABASE_URL previously baked listPublicEntities() (4 Dunbar
   // fixtures) into `/` while `/explore/api` stayed live. Artifact preference must stay off
-  // whenever PUBLIC_DATA_SOURCE=postgres so fixtures cannot shadow bb_public.
+  // in PUBLIC_DATA_SOURCE=postgres unless an explicit artifact origin is configured.
   assert.equal(isPostgresPublicDataSource({ PUBLIC_DATA_SOURCE: 'postgres' }), true);
   assert.equal(shouldPreferReleaseArtifacts({ PUBLIC_DATA_SOURCE: 'postgres' }), false);
 });

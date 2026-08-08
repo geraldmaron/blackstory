@@ -28,13 +28,21 @@ export function isPostgresPublicDataSource(env: EnvironmentLike = process.env): 
 
 /**
  * Whether list/map/search may prefer ADR-004 CDN/local `entities.json` artifacts.
- * Postgres mode always reads `bb_public` instead — fixtures and stale GCS slices must not
- * shadow the system of record.
+ *
+ * Postgres stays the system of record: the active-release pointer is always read live, and
+ * `release-artifacts.ts` rejects any artifact whose `releaseId` doesn't match that pointer,
+ * so a stale artifact can never shadow `bb_public`. In postgres mode artifacts are used only
+ * when an explicit origin (`APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL`) is configured — they are
+ * the read-through cache that keeps multi-MB catalog pulls off the database (Supabase egress
+ * audit 2026-08: cold-start catalog reads were the dominant uncached-egress driver).
  */
 export function shouldPreferReleaseArtifacts(env: EnvironmentLike = process.env): boolean {
-  // Only skip artifacts when Postgres is the explicit SoR. Seed / unset still allow
-  // ADR-004 CDN/local entities.json as a read-through cache.
-  return resolvePublicDataSource(env) !== 'postgres';
+  if (resolvePublicDataSource(env) !== 'postgres') {
+    // Seed / unset still allow ADR-004 CDN/local entities.json as a read-through cache.
+    return true;
+  }
+  const artifactOrigin = env.APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL?.trim();
+  return Boolean(artifactOrigin && artifactOrigin.length > 0);
 }
 
 /** Server-only Postgres URL present (`DATABASE_URL` or `APP_DATABASE_URL`). */
