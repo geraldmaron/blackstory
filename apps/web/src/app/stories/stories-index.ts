@@ -43,7 +43,9 @@ export type StoriesQuery = {
 
 const EMPTY_STORIES_QUERY: StoriesQuery = {
   q: '',
-  kind: '',
+  // Chapters are the default view; `kind: ''` is reserved for an explicit "All" narrowing
+  // (URL param `kind=all`), not the unset state.
+  kind: 'chapter',
   series: '',
   tag: '',
   era: '',
@@ -72,9 +74,17 @@ export function parseStoriesQuery(
   const rawPage = Number.parseInt(one('page'), 10);
   const rawSort = one('sort');
   const rawKind = one('kind');
+  // `kind=all` is the only way to reach the unfiltered view; anything unrecognised
+  // (including no param at all) falls back to the chapters default rather than "all".
+  const kind =
+    rawKind === 'all'
+      ? ''
+      : (STORY_KINDS as readonly string[]).includes(rawKind)
+        ? rawKind
+        : 'chapter';
   return {
     q: one('q').slice(0, 120),
-    kind: (STORY_KINDS as readonly string[]).includes(rawKind) ? rawKind : '',
+    kind,
     series: one('series'),
     tag: one('tag'),
     era: one('era'),
@@ -89,7 +99,10 @@ export function storiesHref(query: Partial<StoriesQuery>): string {
   const merged = { ...EMPTY_STORIES_QUERY, ...query };
   const params = new URLSearchParams();
   if (merged.q.length > 0) params.set('q', merged.q);
-  if (merged.kind.length > 0) params.set('kind', merged.kind);
+  // '' is the explicit "All" narrowing and must round-trip as `kind=all`; `chapter` is the
+  // default and stays out of the URL like the other default values below.
+  if (merged.kind === '') params.set('kind', 'all');
+  else if (merged.kind !== 'chapter') params.set('kind', merged.kind);
   if (merged.series.length > 0) params.set('series', merged.series);
   if (merged.tag.length > 0) params.set('tag', merged.tag);
   if (merged.era.length > 0) params.set('era', merged.era);
@@ -230,11 +243,16 @@ function buildGroups(
     .map(([entryLabel, count]) => ({ label: entryLabel, href: hrefFor(entryLabel), count }));
 }
 
+// Rail links (era/place/series/tag) group across both editorial kinds — a collection like
+// "Presidential records" is entirely `article`, so these must carry an explicit kind: ''
+// (renders as `kind=all`) rather than falling through to the chapters default, or they'd
+// resolve to an empty result for any all-article grouping.
+
 export function buildEraGroups(items: readonly PublicArticleListItemDoc[]): readonly RailEntry[] {
   return buildGroups(
     items,
     (item) => item.eraLabel,
-    (era) => storiesHref({ era }),
+    (era) => storiesHref({ era, kind: '' }),
   );
 }
 
@@ -242,7 +260,7 @@ export function buildPlaceGroups(items: readonly PublicArticleListItemDoc[]): re
   return buildGroups(
     items,
     (item) => item.placeLabel,
-    (place) => storiesHref({ place }),
+    (place) => storiesHref({ place, kind: '' }),
   );
 }
 
@@ -263,7 +281,7 @@ export function buildSeriesGroups(
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .map(([id, count]) => ({
       label: labels.get(id) ?? id,
-      href: storiesHref({ series: id }),
+      href: storiesHref({ series: id, kind: '' }),
       count,
     }));
 }
@@ -275,7 +293,7 @@ export function buildTagGroups(items: readonly PublicArticleListItemDoc[]): read
   }
   return [...counts.entries()]
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .map(([tag, count]) => ({ label: tag, href: storiesHref({ tag }), count }));
+    .map(([tag, count]) => ({ label: tag, href: storiesHref({ tag, kind: '' }), count }));
 }
 
 /** Kind chips, with live counts, so a reader can see both contracts exist. */
@@ -324,7 +342,8 @@ export const STORY_SORT_LABELS: Record<StorySortKey, string> = {
 export function hasActiveNarrowing(query: StoriesQuery): boolean {
   return (
     query.q.length > 0 ||
-    query.kind.length > 0 ||
+    // 'chapter' is the default view, not a narrowing; 'article' and '' (all) both are.
+    query.kind !== 'chapter' ||
     query.series.length > 0 ||
     query.tag.length > 0 ||
     query.era.length > 0 ||

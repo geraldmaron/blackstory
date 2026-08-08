@@ -9,25 +9,51 @@
  * reads from CDN-cached Storage instead of pulling multi-MB projections from Postgres
  * on every cold start.
  *
- * Run after every release activation (and after in-place release mutations such as
- * incremental publishes) so the artifact tracks `bb_public`:
+ * Event-driven, not blind-poll (repo-csw0 follow-up): `bb_public.release_catalog_publish_watermark`
+ * is set dirty by a statement-level trigger on any write to `release_entities` / `search_index`
+ * (see `supabase/migrations/20260808020846_release_catalog_publish_watermark.sql`). This script
+ * checks that watermark BEFORE doing any expensive work, so a scheduled run that finds nothing
+ * changed costs one single-row SELECT — not a 13MB rebuild + upload. When something did change,
+ * each artifact's upload is further skipped independently if its content hash matches what's
+ * already published (a touch-and-rewrite-same-value write still marks dirty but need not
+ * re-upload or force a CDN cache invalidation).
  *
+ * Race safety: the watermark's `dirty_at` is captured ONCE at the start, before the read. On
+ * success, `published_at` is advanced to that captured value — not to "now" — so a write that
+ * lands mid-run (after the catalog read started) stays flagged dirty and is picked up next run,
+ * rather than being silently skipped because "now" had already moved past it.
+ *
+ * Manual runs (see usage below) always do real work — DRY_RUN inspects without ever touching
+ * the watermark; FORCE=1 does a real publish while ignoring the watermark and hash checks.
+ *
+ * Usage — manual run:
  *   cd apps/web && set -a && . ./.env.local && set +a && cd ../../ && \
  *   node --conditions development --import tsx \
  *     packages/ops-data/scripts/publish-release-catalog-artifacts.ts
  *
+ * Scheduled run: .github/workflows/publish-release-catalog-artifacts.yml, every 5 minutes.
+ *
  * Env: DATABASE_URL (or APP_DATABASE_URL), SUPABASE_URL, SUPABASE_SECRET_KEY
- * (or SUPABASE_SERVICE_ROLE_KEY). DRY_RUN=1 builds and reports without uploading.
+ * (or SUPABASE_SERVICE_ROLE_KEY). DRY_RUN=1 builds and reports without uploading or touching
+ * the watermark. FORCE=1 bypasses both the watermark skip and the per-artifact hash skip.
  * Consumers validate `releaseId` against the live active-release pointer, so a stale
  * artifact is ignored, never served.
  */
 import pg from 'pg';
 import { mapPostgresSearchIndexRow, type PublicSearchIndexRow } from '@repo/schemas';
-import type { JsonValue } from '@repo/domain';
+import { sha256Json, type JsonValue } from '@repo/domain';
 import { buildReleaseCatalogArtifacts } from '../src/firestore/release-artifacts.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
+import { shouldSkipPublish, shouldUploadArtifact } from './lib/release-catalog-publish-decision.ts';
 
 const PUBLIC_MEDIA_BUCKET = process.env.APP_PUBLIC_MEDIA_BUCKET?.trim() || 'public-media';
+
+type WatermarkRow = {
+  readonly dirty_at: Date | null;
+  readonly published_at: Date | null;
+  readonly published_entities_hash: string | null;
+  readonly published_search_index_hash: string | null;
+};
 
 function requireEnv(...names: readonly string[]): string {
   for (const name of names) {
@@ -63,11 +89,28 @@ async function uploadJson(objectPath: string, body: string): Promise<void> {
 
 async function main(): Promise<void> {
   const dryRun = process.env.DRY_RUN === '1';
+  const force = process.env.FORCE === '1';
   const rawConnection = requireEnv('DATABASE_URL', 'APP_DATABASE_URL');
   const { connectionString, ssl } = normalizePgConnectionString(rawConnection);
   const client = new pg.Client({ connectionString, ...(ssl ? { ssl } : {}) });
   await client.connect();
   try {
+    // Capture the watermark BEFORE any expensive read. A write landing after this point stays
+    // flagged dirty (see the race-safety note at the top of the file) and is caught next run.
+    const watermark = await client.query<WatermarkRow>(
+      `SELECT dirty_at, published_at, published_entities_hash, published_search_index_hash
+       FROM bb_public.release_catalog_publish_watermark WHERE id = 'catalog' LIMIT 1`,
+    );
+    const dirtyAt = watermark.rows[0]?.dirty_at ?? null;
+    const publishedAt = watermark.rows[0]?.published_at ?? null;
+
+    if (shouldSkipPublish({ dryRun, force, dirtyAt, publishedAt })) {
+      console.log(
+        `up to date (dirty_at=${dirtyAt?.toISOString()} <= published_at=${publishedAt?.toISOString()}) — skipping`,
+      );
+      return;
+    }
+
     const active = await client.query<{ release_id: string; activated_at: Date }>(
       `SELECT release_id, activated_at FROM bb_public.active_release WHERE id = 'active' LIMIT 1`,
     );
@@ -108,16 +151,50 @@ async function main(): Promise<void> {
         `(${(searchBody.length / 1e6).toFixed(1)}MB), ${droppedSearchRows} unmappable search rows dropped`,
     );
     if (dryRun) {
-      console.log('DRY_RUN=1 — skipping upload');
+      console.log('DRY_RUN=1 — skipping upload and watermark update');
       return;
     }
 
-    await uploadJson(artifacts.entitiesListPath, entitiesBody);
-    await uploadJson(artifacts.searchIndexPath, searchBody);
+    // Content-only hashes, deliberately NOT artifacts.entitiesListHash / searchIndexHash —
+    // those hash the full artifact object including generatedAt, a fresh timestamp on every
+    // run, so they can never match run-to-run even when the underlying data is identical.
+    // Hashing just the entities/docs arrays is what actually answers "did the content change".
+    const newEntitiesHash = sha256Json(
+      projections.rows.map((row) => row.projection) as unknown as JsonValue,
+    ).digest;
+    const newSearchHash = sha256Json(searchDocs as unknown as JsonValue).digest;
+    const prevEntitiesHash = watermark.rows[0]?.published_entities_hash ?? null;
+    const prevSearchHash = watermark.rows[0]?.published_search_index_hash ?? null;
+
     const base = requireEnv('SUPABASE_URL').replace(/\/+$/, '');
     const publicBase = `${base}/storage/v1/object/public/${PUBLIC_MEDIA_BUCKET}`;
-    console.log(`uploaded ${publicBase}/${artifacts.entitiesListPath}`);
-    console.log(`uploaded ${publicBase}/${artifacts.searchIndexPath}`);
+
+    if (shouldUploadArtifact({ force, newHash: newEntitiesHash, previousHash: prevEntitiesHash })) {
+      await uploadJson(artifacts.entitiesListPath, entitiesBody);
+      console.log(`uploaded ${publicBase}/${artifacts.entitiesListPath}`);
+    } else {
+      console.log(`entities.json unchanged (hash match) — upload skipped`);
+    }
+
+    if (shouldUploadArtifact({ force, newHash: newSearchHash, previousHash: prevSearchHash })) {
+      await uploadJson(artifacts.searchIndexPath, searchBody);
+      console.log(`uploaded ${publicBase}/${artifacts.searchIndexPath}`);
+    } else {
+      console.log(`search-index.json unchanged (hash match) — upload skipped`);
+    }
+
+    // Advance published_at to the dirty_at we captured at the START of this run, not "now" —
+    // a write that landed mid-run (after we snapshotted the watermark) must stay dirty so the
+    // next run picks it up, rather than being masked because "now" had already moved past it.
+    await client.query(
+      `UPDATE bb_public.release_catalog_publish_watermark
+       SET published_at = COALESCE($1::timestamptz, now()),
+           published_entities_hash = $2,
+           published_search_index_hash = $3
+       WHERE id = 'catalog'`,
+      [dirtyAt ? dirtyAt.toISOString() : null, newEntitiesHash, newSearchHash],
+    );
+
     console.log(`consumer env: APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL=${publicBase}`);
   } finally {
     await client.end();
