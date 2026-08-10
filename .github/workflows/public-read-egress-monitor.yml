@@ -1,0 +1,75 @@
+# Between 2026-07-21 and 2026-08-09, `SELECT projection FROM bb_public.release_entities` ran
+# 49,226 times for 140.6M rows — roughly 253GB of egress and about 80% of all query time on the
+# project. Every serverless instance re-pulled the whole ~7MB catalog every 5 minutes because it
+# was too large for Next's data cache. The causes are fixed (dd7d71e5, 8aa98eeb, 3b38bae0).
+#
+# The reason it ran for twenty days is not fixed by any of those commits: nothing was watching.
+# It was found by hand, after the bill. This workflow is that missing part.
+#
+# Same shape and same reasoning as canonical-convergence-monitor.yml: a scheduled check that
+# FAILS on breach, because GitHub notifies watchers of scheduled-workflow failures by default.
+# It is read-only against the database apart from its own watermark row in
+# bb_ops.public_read_egress_watermark, and it never changes application behaviour.
+#
+# Requires the HOSTED_DATABASE_URL secret (the same one canonical-convergence-monitor.yml uses).
+# If it is ever removed, this job fails closed with a clear message rather than reporting green.
+#
+# Budgets live in the script, not here, and are deliberately generous: this is a smoke alarm for
+# a return to the incident's order of magnitude, not a performance regression detector. A monitor
+# tuned tight enough to fire on ordinary cold-start variance gets muted, and a muted monitor is
+# worse than none because it still looks like coverage.
+
+name: Public Read Egress Monitor
+
+on:
+  # Daily. The incident took twenty days to notice; a day's exposure is a large improvement and
+  # keeps the delta window wide enough that ordinary cold-start noise does not dominate it.
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  # Two runs at once would each advance the watermark and halve the other's delta window.
+  group: public-read-egress-monitor
+  cancel-in-progress: false
+
+jobs:
+  check-egress:
+    name: Compare public-read egress against budget
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.HOSTED_DATABASE_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          version: 9.12.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Fail closed if HOSTED_DATABASE_URL is not configured
+        run: |
+          if [ -z "${DATABASE_URL:-}" ]; then
+            echo "::error::HOSTED_DATABASE_URL secret is not set — this monitor cannot check egress. See this workflow's header comment."
+            exit 1
+          fi
+
+      - name: Compare public-read egress against budget
+        run: |
+          set -euo pipefail
+          node --conditions development --import tsx \
+            packages/ops-data/scripts/check-public-read-egress.ts
