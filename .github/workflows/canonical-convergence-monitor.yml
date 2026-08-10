@@ -75,6 +75,10 @@ jobs:
           # --apply by design (see repo-43qt) and are not a defect, just unapplied backlog. A nonzero
           # value there still means "someone should run --apply", so it is checked and reported, but
           # it alone does not fail this job the way the true correctness failures below do.
+          # missing_canonical_locations is backlog too: its SQL gate mirrors the plan builder's
+          # coordinate gate exactly, so every row it counts is a row --apply will insert. Verified
+          # 2026-08-10 — it sat at 2 across a week of runs and dropped to 0 on the next --apply.
+          # Keeping it in hardFailKeys made the monitor red twice a day on non-defect backlog.
           node -e "
             const fs = require('node:fs');
             const report = JSON.parse(fs.readFileSync('convergence-report.json', 'utf8').trim());
@@ -83,18 +87,17 @@ jobs:
               'missing_canonical_entities',
               'display_name_mismatches',
               'kind_mismatches',
-              'missing_canonical_locations',
               'claims_without_current_version',
               'claims_without_evidence_link',
             ];
             const hardFailures = hardFailKeys.filter((k) => before[k] !== 0);
-            const backlog = before.missing_planned_claims + before.missing_planned_relationships;
+            const backlog = before.missing_planned_claims + before.missing_planned_relationships + before.missing_canonical_locations;
             if (hardFailures.length > 0) {
               console.error('::error::Canonical convergence hard-fail counters are nonzero: ' + hardFailures.map((k) => k + '=' + before[k]).join(', '));
               process.exit(1);
             }
             if (backlog > 0) {
-              console.error('::warning::Convergence backlog is nonzero (missing_planned_claims=' + before.missing_planned_claims + ', missing_planned_relationships=' + before.missing_planned_relationships + '). Run backfill-canonical.ts --apply --confirm-hosted-write=canonical-convergence to clear it.');
+              console.error('::warning::Convergence backlog is nonzero (missing_planned_claims=' + before.missing_planned_claims + ', missing_planned_relationships=' + before.missing_planned_relationships + ', missing_canonical_locations=' + before.missing_canonical_locations + '). Run backfill-canonical.ts --apply --confirm-hosted-write=canonical-convergence to clear it.');
             } else {
               console.log('Canonical is fully converged with the active release.');
             }
