@@ -157,7 +157,7 @@ export function createLiveCatalogMemoryCache<Value>(
   };
 }
 
-export type LiveCatalogKind = 'entities' | 'search-index';
+export type LiveCatalogKind = 'entities' | 'search-index' | 'graph';
 
 export function liveCatalogCacheKey(
   kind: LiveCatalogKind,
@@ -165,4 +165,29 @@ export function liveCatalogCacheKey(
   activatedAt: string,
 ): string {
   return `${kind}:${releaseId}:${activatedAt}`;
+}
+
+/**
+ * Collapses concurrent loads of the same key onto one in-flight promise.
+ *
+ * Every full-catalog reader has the same failure mode: the process-memory TTL expires, N
+ * concurrent requests all miss at that instant, and each one issues its own multi-MB Postgres
+ * pull. That produced the bursty read pattern observed on 2026-08-08 (several full pulls within
+ * seconds, then quiet). One load per key now serves all waiters.
+ *
+ * The key is released in `finally`, not `then`, so a rejected load cannot wedge the key and
+ * starve every later request.
+ */
+export function createSingleFlight(): <T>(key: string, load: () => Promise<T>) => Promise<T> {
+  const inFlight = new Map<string, Promise<unknown>>();
+
+  return function singleFlight<T>(key: string, load: () => Promise<T>): Promise<T> {
+    const existing = inFlight.get(key) as Promise<T> | undefined;
+    if (existing !== undefined) return existing;
+    const started = load().finally(() => {
+      inFlight.delete(key);
+    });
+    inFlight.set(key, started);
+    return started;
+  };
 }

@@ -38,6 +38,7 @@ import {
 import { isPostgresPublicDataMisconfigured, shouldPreferReleaseArtifacts } from './live-policy';
 import {
   createLiveCatalogMemoryCache,
+  createSingleFlight,
   isOversizedLiveCatalogSentinel,
   liveCatalogCacheKey,
   nextDataCacheValueForCatalog,
@@ -328,20 +329,10 @@ async function loadLiveSearchIndexForRelease(
  * `unstable_cache`, which does no deduplication of its own. N concurrent requests meant N
  * concurrent full catalog loads — the bursty Postgres read pattern observed on 2026-08-08
  * (several full pulls within seconds, then quiet). One load per key now serves all waiters.
+ *
+ * Entities and search index share one map; the key already carries the catalog kind.
  */
-const inFlightCatalogLoads = new Map<string, Promise<unknown>>();
-
-function singleFlight<T>(key: string, load: () => Promise<T>): Promise<T> {
-  const existing = inFlightCatalogLoads.get(key) as Promise<T> | undefined;
-  if (existing !== undefined) return existing;
-  // Deleting in `finally` (not `then`) guarantees the key is released even when the load
-  // rejects, so a single failure cannot wedge the key and starve every later request.
-  const started = load().finally(() => {
-    inFlightCatalogLoads.delete(key);
-  });
-  inFlightCatalogLoads.set(key, started);
-  return started;
-}
+const singleFlight = createSingleFlight();
 
 async function cacheLiveCatalog<T>(options: {
   readonly kind: LiveCatalogKind;

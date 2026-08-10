@@ -63,6 +63,20 @@ const REPORT_PATH = join(REPO_ROOT, '.cache/landscape-intake/incremental-publish
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.INCREMENTAL_PUBLISH_APPLY === '1';
 
+/**
+ * All three LANDSCAPE_* queries below test release membership with
+ * `re.entity_id = ANY(ARRAY[lc.id, lc.source_item_id])`. Do not "simplify" that back to
+ * `(re.entity_id = lc.id OR re.entity_id = lc.source_item_id)`.
+ *
+ * The two forms are logically identical and the planner does not treat them the same. As an OR,
+ * Postgres uses the (release_id, entity_id) primary key as an Index Only Scan but demotes the OR
+ * to a Filter, so the subplan walks every entity in the active release once per candidate row.
+ * Measured on 2026-08-09: subplan cost 174.17, whole-query cost 434,525, mean execution 44.8s
+ * (max 50.0s) over 30,965 rows. As an array-ANY it becomes an Index Cond — subplan cost 2.86,
+ * query cost 9,950, roughly 44x cheaper.
+ *
+ * A NULL `source_item_id` never matches under either form, so the semantics are unchanged.
+ */
 const LANDSCAPE_PENDING_SQL = `
 WITH active AS (
   SELECT release_id FROM bb_public.active_release LIMIT 1
@@ -84,7 +98,7 @@ SELECT
     FROM active a
     JOIN bb_public.release_entities re
       ON re.release_id = a.release_id
-      AND (re.entity_id = lc.id OR re.entity_id = lc.source_item_id)
+      AND re.entity_id = ANY(ARRAY[lc.id, lc.source_item_id])
   ) AS exact_in_release,
   EXISTS (
     SELECT 1
@@ -130,7 +144,7 @@ SELECT
     FROM active a
     JOIN bb_public.release_entities re
       ON re.release_id = a.release_id
-      AND (re.entity_id = lc.id OR re.entity_id = lc.source_item_id)
+      AND re.entity_id = ANY(ARRAY[lc.id, lc.source_item_id])
   ) AS exact_in_release,
   EXISTS (
     SELECT 1
@@ -171,7 +185,7 @@ SELECT
     FROM active a
     JOIN bb_public.release_entities re
       ON re.release_id = a.release_id
-      AND (re.entity_id = lc.id OR re.entity_id = lc.source_item_id)
+      AND re.entity_id = ANY(ARRAY[lc.id, lc.source_item_id])
   ) AS exact_in_release,
   EXISTS (
     SELECT 1
