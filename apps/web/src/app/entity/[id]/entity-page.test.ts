@@ -80,9 +80,25 @@ test('a related record states its relation in words', () => {
   assert.match(sectionsSource, /<Connections/);
 });
 
-test('entity page preserves session nav and force-dynamic routing', () => {
+test('entity page preserves session nav and stays CDN-cacheable', () => {
   assert.match(pageSource, /EntitySessionNavClient/);
-  assert.match(pageSource, /export const dynamic = 'force-dynamic'/);
+  // force-dynamic made Next send `private, no-cache, no-store` on every response, which
+  // overrode the s-maxage=3600 rule next.config.mjs declares for this route: x-vercel-cache
+  // was MISS on 100% of entity requests. ISR is what lets the CDN serve them.
+  assert.match(pageSource, /export const revalidate = 3600/);
+  assert.match(pageSource, /export const dynamicParams = true/);
+  assert.doesNotMatch(pageSource, /export const dynamic = 'force-dynamic'/);
+});
+
+test('entity generateStaticParams prerenders nothing', () => {
+  // Guardrail, not a style preference. On Vercel DATABASE_URL is present at build, so a
+  // generateStaticParams that enumerates the search index would pull the full catalog and
+  // prerender ~4,092 pages on every build. It was inert under force-dynamic; under
+  // revalidate it is not.
+  const body = /generateStaticParams\(\)[\s\S]*?\n}/.exec(pageSource)?.[0] ?? '';
+  assert.ok(body.length > 0, 'generateStaticParams should exist');
+  assert.match(body, /return \[\];/);
+  assert.doesNotMatch(body, /getPublicSearchIndex/);
 });
 
 test('entity intro media renders only when a primary photo exists', () => {

@@ -50,7 +50,6 @@ import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
 import { entityEvidenceHref, exploreHrefForKind } from '../../../lib/map-experience/metadata-hrefs';
 import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
 import { getPublicSearchIndex, resolvePublicEntityView } from '../../../lib/public-data/source';
-import { shouldUseLivePublicProjections } from '../../../lib/public-data/live-policy';
 import { resolveEntityCrossReferences } from '../../../lib/theme-impact/source';
 import { resolveCitesEdgeIndex } from '../../../lib/articles/source';
 import { chaptersCiting } from '../../../lib/release/build-cites-edge';
@@ -63,8 +62,22 @@ import { EntitySessionNavClient } from './entity-session-nav-client';
 import '../../record-page.css';
 import './record-room.css';
 
-/** Runtime Postgres reads; never bake Dunbar seed at build without DATABASE_URL. */
-export const dynamic = 'force-dynamic';
+/**
+ * Incrementally regenerated, not force-dynamic.
+ *
+ * `force-dynamic` here dated from the era when the catalog was an expensive per-request
+ * Postgres pull. Its cost was measured on 2026-08-09: every response carried Next's dynamic
+ * `cache-control: private, no-cache, no-store`, which overrides the `s-maxage=3600` rule this
+ * route already declares in `next.config.mjs`, so `x-vercel-cache` was MISS on 100% of entity
+ * requests and every reader hit a function.
+ *
+ * `revalidate` keeps the original guarantee intact (nothing renders at build, so a build
+ * without `DATABASE_URL` can never bake the Dunbar seed into a page) while letting a rendered
+ * page be reused. 3600s matches the Cache-Control this route already advertises; visible
+ * staleness for an in-place correction is bounded by that plus the 30m catalog TTL.
+ */
+export const revalidate = 3600;
+export const dynamicParams = true;
 
 type EntityPageProps = {
   readonly params: Promise<{ id: string }>;
@@ -86,14 +99,17 @@ function entityLinkCatalogFromNeighbors(
 }
 
 export async function generateStaticParams() {
-  // Build time has no live Postgres connection (App Hosting mounts DATABASE_URL at runtime
-  // only): skip enumeration rather than throw. This route is force-dynamic, so an empty
-  // static param list is harmless; every id still renders on-demand at request time.
-  if (!shouldUseLivePublicProjections()) {
-    return [];
-  }
-  const { data: index } = await getPublicSearchIndex();
-  return index.map((doc) => ({ id: doc.id }));
+  // Deliberately empty: prerender nothing, render every id on demand, then let `revalidate`
+  // cache it. `dynamicParams = true` is what makes that safe.
+  //
+  // This used to enumerate every id from the search index, guarded by a
+  // `shouldUseLivePublicProjections()` check for builds with no database. That was inert while
+  // the route was `force-dynamic` (Next ignores static params for a force-dynamic route). Under
+  // `revalidate` it would become live again, and on Vercel `DATABASE_URL` *is* present at build
+  // time, so the guard would pass and the build would pull the full catalog and prerender ~4,092
+  // entity pages. On-demand rendering reaches the same cached steady state without paying that
+  // at build, and keeps the no-database build safe for the same reason it was safe before.
+  return [];
 }
 
 export async function generateMetadata({ params }: EntityPageProps) {

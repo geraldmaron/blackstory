@@ -55,7 +55,7 @@ SELECT
     FROM active a
     JOIN bb_public.release_entities re
       ON re.release_id = a.release_id
-      AND (re.entity_id = lc.id OR re.entity_id = lc.source_item_id)
+      AND re.entity_id = ANY(ARRAY[lc.id, lc.source_item_id])
   ) AS exact_in_release,
   EXISTS (
     SELECT 1

@@ -43,6 +43,19 @@ import './memorial-edition.css';
 
 void React;
 
+/*
+ * Must stay dynamic, same constraint as /library: rendering reads the live public catalog, and
+ * the `Build and Typecheck` CI job builds without database secrets, so prerendering fails the
+ * export with `[public-data] postgres live catalog unavailable`.
+ *
+ * Tried and reverted on 2026-08-10 along with /library; see the longer note there. The premise
+ * that this was a Firebase App Hosting quirk is wrong: Vercel does have DATABASE_URL at build,
+ * but the CI gate does not, and that gate is required. `revalidate` on a route with no dynamic
+ * segment means prerender at build, so there is no ISR variant that avoids the catalog read.
+ *
+ * Known cost: dynamic responses carry `private, no-cache, no-store`, so this route is a CDN miss
+ * on every request.
+ */
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildStaticPageMetadata({

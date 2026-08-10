@@ -9,6 +9,39 @@ import {
   type StoredGraphAdjacencyRow,
 } from '@repo/domain';
 import { queryPostgres } from './postgres-client';
+import {
+  createLiveCatalogMemoryCache,
+  createSingleFlight,
+  liveCatalogCacheKey,
+} from './live-catalog-cache';
+
+/**
+ * Matches `RELEASE_CATALOG_REVALIDATE_SECONDS` in `./source.ts`. Same reasoning: the graph
+ * tables are upserted in place by `packages/ops-data/scripts` under an unchanged release id,
+ * so this TTL is a freshness bound on editorial corrections, not merely a memory bound.
+ */
+const GRAPH_RELEASE_TTL_MS = 30 * 60 * 1000;
+
+/**
+ * Before this cache, `fetchStoredGraphReleaseArtifact` pulled three full tables from Postgres
+ * on *every* call with no TTL and no dedupe: `release_graph_adjacency` (~656KB / 4,092 rows),
+ * `release_graph_decades` (~339KB) and `release_graph_all_time` (~61KB), so ~1MB per invocation.
+ * Over the 20 days to 2026-08-09 that was 9,347 calls and 38.2M adjacency rows (~6.3GB egress).
+ *
+ * Structurally this was the same defect as the `release_entities` catalog pull that produced
+ * ~253GB of egress, just two orders of magnitude smaller — an unbounded per-instance full-table
+ * read behind no cache. It gets the same treatment: release-keyed process memory plus
+ * single-flight so a cold instance under concurrent load issues one pull, not N.
+ */
+const graphArtifactMemory = createLiveCatalogMemoryCache<GraphReleaseArtifact>({
+  defaultTtlMs: GRAPH_RELEASE_TTL_MS,
+});
+const graphSingleFlight = createSingleFlight();
+
+/** Test seam: drop memoized graph artifacts between cases. */
+export function __resetGraphReleaseCacheForTests(): void {
+  graphArtifactMemory.clear();
+}
 
 type GraphAdjacencyRow = {
   readonly entity_id: string;
@@ -42,8 +75,34 @@ function decadeLabelFromInteger(decade: number): string {
   return `${decade}s`;
 }
 
-/** Returns a stored graph release artifact when all three tables are populated. */
+/**
+ * Returns a stored graph release artifact when all three tables are populated, memoized per
+ * release for `GRAPH_RELEASE_TTL_MS` with concurrent misses collapsed onto one load.
+ *
+ * A miss is deliberately not memoized: the negative case costs one indexed empty result on
+ * `release_graph_adjacency` rather than the ~1MB three-table read, and caching it would hide a
+ * freshly published graph for up to the full TTL.
+ */
 export async function fetchStoredGraphReleaseArtifact(input: {
+  readonly releaseId: string;
+  readonly generatedAt: string;
+}): Promise<GraphReleaseArtifact | undefined> {
+  const cacheKey = liveCatalogCacheKey('graph', input.releaseId, input.generatedAt);
+  const cached = graphArtifactMemory.get(cacheKey);
+  if (cached !== undefined) return cached;
+
+  return graphSingleFlight(cacheKey, async () => {
+    const raced = graphArtifactMemory.get(cacheKey);
+    if (raced !== undefined) return raced;
+    const loaded = await loadStoredGraphReleaseArtifact(input);
+    if (loaded !== undefined) {
+      graphArtifactMemory.set(cacheKey, loaded);
+    }
+    return loaded;
+  });
+}
+
+async function loadStoredGraphReleaseArtifact(input: {
   readonly releaseId: string;
   readonly generatedAt: string;
 }): Promise<GraphReleaseArtifact | undefined> {

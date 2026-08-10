@@ -37,12 +37,30 @@ import '../reading-room.css';
 void React;
 
 /*
- * Must stay dynamic, same reason as /memorial, /entity/[id] and the map group: the room counts
- * its rooms from the live public catalog (`getSharedPublicEntities`), and App Hosting mounts
- * DATABASE_URL at runtime only. Left prerendered, the build tried to fetch the catalog, got
- * `[public-data] postgres live catalog unavailable`, and failed the whole export on /library.
- * `/records` reads the same data and escapes this only because its searchParams already opt it
- * out of prerendering, which is an accident rather than a decision.
+ * Must stay dynamic. This page counts its rooms from the live public catalog
+ * (`getSharedPublicEntities`), so rendering it requires a database. Left prerendered, the build
+ * fetches the catalog, gets `[public-data] postgres live catalog unavailable`, and fails the
+ * whole export on /library.
+ *
+ * Tried and reverted on 2026-08-10: switched to `export const revalidate` to make the route
+ * CDN-cacheable, on the reasoning that the original constraint was Firebase App Hosting mounting
+ * DATABASE_URL at runtime only, and that Vercel has it at build. Vercel does. THE CI BUILD DOES
+ * NOT. The `Build and Typecheck` job builds without database secrets, so ISR here fails the
+ * required gate:
+ *
+ *   Error occurred prerendering page "/library"
+ *   Error: [public-data] postgres live catalog unavailable
+ *   Export encountered an error on /library/page: /library, exiting the build.
+ *
+ * The constraint is therefore about any database-less build, not about one hosting platform, and
+ * it does not expire. /entity/[id] escapes it only because its generateStaticParams returns [],
+ * so nothing is prerendered and the catalog is never read at build. There is no equivalent escape
+ * for a route with no dynamic segment: `revalidate` means prerender at build.
+ *
+ * The cost of staying dynamic is real and known: Next sends `private, no-cache, no-store` on every
+ * dynamic response, so this route is a CDN miss on every request. Making it cacheable needs the
+ * page to stop requiring the catalog at render, or the build to have a database. Both are bigger
+ * changes than a route-segment-config flip.
  */
 export const dynamic = 'force-dynamic';
 

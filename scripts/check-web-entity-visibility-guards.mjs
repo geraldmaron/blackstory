@@ -109,9 +109,13 @@ function main() {
     // absent is correct
   }
 
+  // Read once and reuse the contents. Checking existence with statSync and then reading the same
+  // path separately is a time-of-check/time-of-use pair (CodeQL js/file-system-race); a single
+  // read that treats ENOENT as "missing" answers both questions without the window.
   const home = path.join(APP_DIR, 'page.tsx');
+  let homeSource;
   try {
-    statSync(home);
+    homeSource = readFileSync(home, 'utf8');
   } catch {
     errors.push('Missing apps/web/src/app/page.tsx (the Atlas homepage)');
   }
@@ -123,18 +127,54 @@ function main() {
     errors.push('Missing apps/web/src/app/explore/api/route.ts (live JSON refine endpoint)');
   }
 
-  // --- force-dynamic module shape (RUNTIME DATABASE_URL / no seed bake) ---
-  const dynamicGuarded = [
-    path.join(APP_DIR, 'entity', '[id]', 'page.tsx'),
-    path.join(APP_DIR, 'page.tsx'),
-  ];
-  for (const file of dynamicGuarded) {
+  // --- No seed bake at build (RUNTIME DATABASE_URL) ---
+  //
+  // `/` stays force-dynamic: it reads searchParams for the Atlas filters, so App Router renders
+  // it per request regardless, and the declaration keeps that explicit.
+  //
+  // `/entity/[id]` is ISR since 2026-08-09. force-dynamic there cost a CDN MISS on 100% of
+  // entity requests (Next sends no-store on dynamic responses, overriding the s-maxage=3600 this
+  // route declares in next.config.mjs). The no-seed-bake guarantee did not come from
+  // force-dynamic and does not depend on it: it now comes from generateStaticParams returning []
+  // unconditionally, so the build has no id to bake. That is stricter than before, when the
+  // enumeration was still present and merely ignored.
+  if (homeSource !== undefined) {
     try {
-      const source = readFileSync(file, 'utf8');
-      assertDynamicAfterImports(source, relativeAppPath(file));
+      assertDynamicAfterImports(homeSource, relativeAppPath(home));
     } catch (error) {
       errors.push(error instanceof Error ? error.message : String(error));
     }
+  }
+
+  const entityPage = path.join(APP_DIR, 'entity', '[id]', 'page.tsx');
+  try {
+    const source = readFileSync(entityPage, 'utf8');
+    const label = relativeAppPath(entityPage);
+    if (/^export\s+const\s+dynamic\s*=/m.test(source)) {
+      errors.push(
+        `${label}: must not declare export const dynamic — the route is ISR (revalidate), and ` +
+          `force-dynamic here makes every entity request a CDN miss`,
+      );
+    }
+    if (!/^export\s+const\s+revalidate\s*=\s*\d+/m.test(source)) {
+      errors.push(`${label}: missing export const revalidate (ISR is what makes this cacheable)`);
+    }
+    if (!/^export\s+const\s+dynamicParams\s*=\s*true/m.test(source)) {
+      errors.push(`${label}: missing export const dynamicParams = true`);
+    }
+    // The actual no-seed-bake guarantee. On Vercel DATABASE_URL IS present at build, so an
+    // enumerating generateStaticParams would both bake pages and pull the whole catalog.
+    const staticParams = /generateStaticParams\(\)[\s\S]*?\n}/.exec(source)?.[0] ?? '';
+    if (staticParams === '') {
+      errors.push(`${label}: missing generateStaticParams`);
+    } else if (!/return \[\];/.test(staticParams) || /getPublicSearchIndex/.test(staticParams)) {
+      errors.push(
+        `${label}: generateStaticParams must return [] and must not read the catalog — ` +
+          `enumerating ids prerenders ~4k pages and pulls the full catalog on every build`,
+      );
+    }
+  } catch (error) {
+    errors.push(error instanceof Error ? error.message : String(error));
   }
 
   if (errors.length > 0) {

@@ -67,51 +67,83 @@ test('collectPublicRenderPathFindings flags forbidden imports', () => {
   assert.equal(findings.length, 1);
 });
 
-test('entity detail route stays force-dynamic so RUNTIME DATABASE_URL is used', () => {
-  // Regression: build-time GSP without DATABASE_URL baked seed-snapshot into
+test('entity detail route never prerenders, so RUNTIME DATABASE_URL is used', () => {
+  // Regression this guards: build-time GSP without DATABASE_URL baked seed-snapshot into
   // /entity/ent_15th_st_church_001 while non-seed ids still read rel_seed_001.
+  //
+  // force-dynamic used to be how that was prevented. It also forced Next to send
+  // `private, no-cache, no-store` on every response, overriding the s-maxage=3600 this route
+  // declares in next.config.mjs, so x-vercel-cache was MISS on 100% of entity requests.
+  //
+  // The route is now ISR, and the same guarantee is enforced at its source: generateStaticParams
+  // returns [] unconditionally, so there is no id for the build to bake. That is strictly
+  // stronger than force-dynamic here — force-dynamic left the enumeration in place and merely
+  // caused Next to ignore it.
   const source = readFileSync(join(APP_ROOT, 'entity/[id]/page.tsx'), 'utf8');
-  assert.match(source, /export const dynamic = 'force-dynamic'/);
+  assert.match(source, /export const revalidate = \d+/);
+  assert.match(source, /export const dynamicParams = true/);
+
+  const staticParams = /generateStaticParams\(\)[\s\S]*?\n}/.exec(source)?.[0] ?? '';
+  assert.notEqual(staticParams, '', 'entity page must declare generateStaticParams');
+  assert.match(staticParams, /return \[\];/);
+  // The specific failure mode: reading the catalog at build and prerendering every id.
+  assert.doesNotMatch(staticParams, /getPublicSearchIndex|listPublicEntityViews/);
 });
 
 /**
  * Next.js App Router: route segment config must come AFTER imports. Placing
  * `export const dynamic` between import statements previously broke entity RSC.
  */
-function assertForceDynamicAfterImports(source: string, label: string): void {
+function assertSegmentConfigAfterImports(
+  source: string,
+  label: string,
+  configName: 'dynamic' | 'revalidate',
+  valuePattern: RegExp,
+): void {
   const lines = source.split(/\r?\n/);
+  const declaration = new RegExp(`^export\\s+const\\s+${configName}\\s*=`);
   let lastImportLine = -1;
-  let dynamicLine = -1;
-  let importAfterDynamic = false;
+  let configLine = -1;
+  let importAfterConfig = false;
   for (let i = 0; i < lines.length; i += 1) {
     const trimmed = (lines[i] ?? '').trimStart();
     const isImport =
       /^import\s/.test(trimmed) || /^import["']/.test(trimmed) || /^import\{/.test(trimmed);
-    const isDynamic = /^export\s+const\s+dynamic\s*=/.test(trimmed);
+    const isConfig = declaration.test(trimmed);
     if (isImport) {
       lastImportLine = i;
-      if (dynamicLine >= 0) importAfterDynamic = true;
+      if (configLine >= 0) importAfterConfig = true;
     }
-    if (isDynamic) {
-      assert.equal(dynamicLine, -1, `${label}: duplicate export const dynamic`);
-      dynamicLine = i;
+    if (isConfig) {
+      assert.equal(configLine, -1, `${label}: duplicate export const ${configName}`);
+      configLine = i;
     }
   }
-  assert.notEqual(dynamicLine, -1, `${label}: missing export const dynamic`);
-  assert.match(lines[dynamicLine] ?? '', /force-dynamic/);
+  assert.notEqual(configLine, -1, `${label}: missing export const ${configName}`);
+  assert.match(lines[configLine] ?? '', valuePattern);
   assert.equal(
-    dynamicLine > lastImportLine && !importAfterDynamic,
+    configLine > lastImportLine && !importAfterConfig,
     true,
-    `${label}: export const dynamic must come after all imports (dynamic@${dynamicLine + 1}, lastImport@${lastImportLine + 1})`,
+    `${label}: export const ${configName} must come after all imports (${configName}@${configLine + 1}, lastImport@${lastImportLine + 1})`,
   );
 }
 
-test('Atlas page and entity page keep force-dynamic after all imports', () => {
-  assertForceDynamicAfterImports(
+test('Atlas and entity route segment config stays after all imports', () => {
+  // The ordering rule is about Next parsing route segment config, not about which config it is:
+  // placing the export between import statements previously broke entity RSC. It applies to the
+  // entity route's `revalidate` exactly as it did to its former `dynamic`.
+  assertSegmentConfigAfterImports(
     readFileSync(join(APP_ROOT, 'entity/[id]/page.tsx'), 'utf8'),
     'entity/[id]/page.tsx',
+    'revalidate',
+    /\d+/,
   );
-  assertForceDynamicAfterImports(readFileSync(join(APP_ROOT, 'page.tsx'), 'utf8'), 'page.tsx');
+  assertSegmentConfigAfterImports(
+    readFileSync(join(APP_ROOT, 'page.tsx'), 'utf8'),
+    'page.tsx',
+    'dynamic',
+    /force-dynamic/,
+  );
 });
 
 test('the Atlas is one route — `/` — with no page rendering at /explore', () => {
