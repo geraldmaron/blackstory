@@ -4,6 +4,7 @@ import {
   measureTextQuality,
   scoreTextQuality,
   assessText,
+  stripUnstorableCharacters,
   QUARANTINE_BELOW,
   MIN_USABLE_CHARS,
 } from './text-quality.ts';
@@ -178,4 +179,30 @@ test('assessText reason format includes score and threshold when OCR-damaged', (
       `Reason should contain threshold ${QUARANTINE_BELOW}`,
     );
   }
+});
+
+/**
+ * The failure this exists to prevent: one NUL from a scanned nomination form aborted the whole
+ * sweep transaction with `invalid byte sequence for encoding "UTF8": 0x00`, losing every other
+ * document captured in that batch.
+ */
+test('stripUnstorableCharacters removes the NUL that Postgres rejects', () => {
+  assert.equal(stripUnstorableCharacters('Bethel\x00 AME Church'), 'Bethel AME Church');
+});
+
+test('stripUnstorableCharacters removes other C0 controls but keeps real formatting', () => {
+  assert.equal(
+    stripUnstorableCharacters('Section 7\x0b\x0cDescription\x1f end'),
+    'Section 7Description end',
+  );
+  assert.equal(
+    stripUnstorableCharacters('line one\nline two\ttabbed\r\n'),
+    'line one\nline two\ttabbed\r\n',
+    'tab, newline and carriage return are formatting, not damage',
+  );
+});
+
+test('stripUnstorableCharacters leaves clean prose byte-identical', () => {
+  const clean = 'Built in 1930 by Dr. William Monroe Wells — a hotel for African Americans.';
+  assert.equal(stripUnstorableCharacters(clean), clean);
 });

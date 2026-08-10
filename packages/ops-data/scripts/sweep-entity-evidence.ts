@@ -48,7 +48,7 @@ import {
   parseNomination,
 } from './lib/evidence-collectors/nrhp-nomination.ts';
 import { redactStreetAddresses } from './lib/evidence-collectors/redact-address.ts';
-import { assessText } from './lib/evidence-collectors/text-quality.ts';
+import { assessText, stripUnstorableCharacters } from './lib/evidence-collectors/text-quality.ts';
 import {
   WIKIPEDIA_LICENCE,
   lookupWikipediaArticle,
@@ -556,6 +556,31 @@ async function collectReferenceHops(
  * stored, not before it is published: evidence never captured cannot leak through a later bug
  * in a downstream gate.
  */
+/**
+ * Every captured row passes through here before it can be pushed, so sanitation cannot be
+ * skipped by adding a collector. Sanitation runs FIRST and recomputes the hash and char count,
+ * so the stored `content_hash`/`char_count` describe the text that was actually stored — the
+ * digest is what `selectEntitiesForEnrichment` compares to decide an entity's evidence is
+ * unchanged, so hashing pre-strip text would make a re-sweep look like new evidence forever.
+ */
+function finalizeEvidenceRow(row: CandidateRow, item: EvidenceRow): EvidenceRow {
+  const stripped = stripUnstorableCharacters(item.contentText);
+  const sanitized =
+    stripped === item.contentText
+      ? item
+      : {
+          ...item,
+          contentText: stripped,
+          contentHash: hashContent(stripped),
+          charCount: stripped.length,
+          provenance: {
+            ...item.provenance,
+            strippedControlChars: item.contentText.length - stripped.length,
+          },
+        };
+  return applyAddressRestriction(row, sanitized);
+}
+
 function applyAddressRestriction(row: CandidateRow, item: EvidenceRow): EvidenceRow {
   // Person entities get the same capture-time redaction as address-restricted properties:
   // living status is usually unknown at capture time, treatAsLiving('unknown') is true, and the
@@ -594,7 +619,7 @@ async function sweepEntity(row: CandidateRow): Promise<EntityOutcome> {
   ] as const) {
     try {
       const found = await collect(row);
-      if (found !== null) evidence.push(applyAddressRestriction(row, found));
+      if (found !== null) evidence.push(finalizeEvidenceRow(row, found));
     } catch (error) {
       // One collector declining or failing must not lose the others' results, and must not
       // abort the batch. Skips and errors are labelled differently so the run report separates
@@ -608,7 +633,7 @@ async function sweepEntity(row: CandidateRow): Promise<EntityOutcome> {
   let leads: EntityOutcome['leads'] = [];
   try {
     const hops = await collectReferenceHops(row, evidence);
-    for (const item of hops.evidence) evidence.push(applyAddressRestriction(row, item));
+    for (const item of hops.evidence) evidence.push(finalizeEvidenceRow(row, item));
     leads = hops.leads.map((lead) => ({ entityId: row.id, ...lead }));
   } catch (error) {
     const prefix = error instanceof SkipReason ? 'skip' : 'error';
