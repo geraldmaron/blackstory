@@ -166,7 +166,8 @@ test('buildReleaseNotabilityBasis never fabricates evidence for an uncited claim
   assert.deepEqual(basis[0]!.evidenceIds, []);
 });
 
-test('computeReleaseResearchCoverage: zero/one cited claim is minimal', () => {
+/** One claim citing one document — the floor case. */
+test('computeReleaseResearchCoverage: a single cited claim is minimal', () => {
   const claims: readonly ReleaseClaimProjection[] = [
     {
       id: 'c1',
@@ -180,28 +181,94 @@ test('computeReleaseResearchCoverage: zero/one cited claim is minimal', () => {
   assert.equal(computeReleaseResearchCoverage(claims), 'minimal');
 });
 
-test('computeReleaseResearchCoverage: two-to-four cited claims is partial', () => {
+/** repo-z1pw, the exact live shape: the nrhp-black-heritage lane carves a listing fact and a
+ *  significance fact out of ONE registry index row, both citing that row's own URL. Counting
+ *  claims graded this 'partial' and suppressed the thin-record notice on 2,436 live records. */
+test('computeReleaseResearchCoverage: many claims citing ONE document is minimal, not partial', () => {
   const claims: readonly ReleaseClaimProjection[] = Array.from({ length: 3 }, (_, i) => ({
     id: `c${i}`,
     predicate: `p${i}`,
     object: 'o',
     confidenceLevel: 'high' as const,
-    citationSource: 'S',
+    citationSource: 'catalog.archives.gov',
+    citationHref: 'https://catalog.archives.gov/id/77843341',
     citationLabel: 'L',
   }));
+  assert.equal(computeReleaseResearchCoverage(claims), 'minimal');
+});
+
+/** Query strings, anchors and trailing slashes must not split one document into several — that
+ *  would recreate the inflation this function exists to prevent. */
+test('computeReleaseResearchCoverage: url noise does not make one document look like several', () => {
+  const hrefs = [
+    'https://catalog.archives.gov/id/77843341',
+    'https://www.catalog.archives.gov/id/77843341/',
+    'https://catalog.archives.gov/id/77843341?utm_source=x',
+    'https://catalog.archives.gov/id/77843341#section-8',
+  ];
+  const claims: readonly ReleaseClaimProjection[] = hrefs.map((href, i) => ({
+    id: `c${i}`,
+    predicate: `p${i}`,
+    object: 'o',
+    confidenceLevel: 'high' as const,
+    citationSource: 'catalog.archives.gov',
+    citationHref: href,
+    citationLabel: 'L',
+  }));
+  assert.equal(computeReleaseResearchCoverage(claims), 'minimal');
+});
+
+/** Same publisher, different documents — the NRHP nomination form alongside the index entry.
+ *  That is real research and counts, which is why this grades documents, not publishers. */
+test('computeReleaseResearchCoverage: two documents from one publisher is partial', () => {
+  const claims: readonly ReleaseClaimProjection[] = [
+    {
+      id: 'c1',
+      predicate: 'listing',
+      object: 'o',
+      confidenceLevel: 'high',
+      citationSource: 'npgallery.nps.gov',
+      citationHref: 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/12000300_text',
+      citationLabel: 'L',
+    },
+    {
+      id: 'c2',
+      predicate: 'built',
+      object: 'o',
+      confidenceLevel: 'high',
+      citationSource: 'npgallery.nps.gov',
+      citationHref: 'https://npgallery.nps.gov/NRHP/AssetDetail?assetID=12000300',
+      citationLabel: 'L',
+    },
+  ];
   assert.equal(computeReleaseResearchCoverage(claims), 'partial');
 });
 
-test('computeReleaseResearchCoverage: five+ fully-cited claims is substantial', () => {
+test('computeReleaseResearchCoverage: five+ fully-cited claims across two documents is substantial', () => {
   const claims: readonly ReleaseClaimProjection[] = Array.from({ length: 5 }, (_, i) => ({
     id: `c${i}`,
     predicate: `p${i}`,
     object: 'o',
     confidenceLevel: 'high' as const,
     citationSource: 'S',
+    citationHref: `https://example.org/doc-${i % 2}`,
     citationLabel: 'L',
   }));
   assert.equal(computeReleaseResearchCoverage(claims), 'substantial');
+});
+
+/** Claim volume alone never reaches 'substantial' — the document floor binds first. */
+test('computeReleaseResearchCoverage: five+ claims on one document stays minimal', () => {
+  const claims: readonly ReleaseClaimProjection[] = Array.from({ length: 6 }, (_, i) => ({
+    id: `c${i}`,
+    predicate: `p${i}`,
+    object: 'o',
+    confidenceLevel: 'high' as const,
+    citationSource: 'S',
+    citationHref: 'https://example.org/only-doc',
+    citationLabel: 'L',
+  }));
+  assert.equal(computeReleaseResearchCoverage(claims), 'minimal');
 });
 
 test('computeReleaseResearchCoverage: five claims with one uncited stays partial, not substantial', () => {
@@ -211,9 +278,42 @@ test('computeReleaseResearchCoverage: five claims with one uncited stays partial
     object: 'o',
     confidenceLevel: 'high' as const,
     citationSource: i === 4 ? '' : 'S',
+    citationHref: i === 4 ? undefined : `https://example.org/doc-${i % 2}`,
     citationLabel: 'L',
   }));
   assert.equal(computeReleaseResearchCoverage(claims), 'partial');
+});
+
+/** An uncited claim contributes no document — it must not be counted as its own source. */
+test('computeReleaseResearchCoverage: uncited claims contribute no coverage', () => {
+  const claims: readonly ReleaseClaimProjection[] = [
+    {
+      id: 'c1',
+      predicate: 'p',
+      object: 'o',
+      confidenceLevel: 'high',
+      citationSource: 'https://example.org/doc-a',
+      citationHref: 'https://example.org/doc-a',
+      citationLabel: 'L',
+    },
+    {
+      id: 'c2',
+      predicate: 'p',
+      object: 'o',
+      confidenceLevel: 'high',
+      citationSource: '',
+      citationLabel: 'L',
+    },
+    {
+      id: 'c3',
+      predicate: 'p',
+      object: 'o',
+      confidenceLevel: 'high',
+      citationSource: '   ',
+      citationLabel: 'L',
+    },
+  ];
+  assert.equal(computeReleaseResearchCoverage(claims), 'minimal');
 });
 
 test('resolveReleaseEntityReferences fails closed on an unresolved topicId', () => {

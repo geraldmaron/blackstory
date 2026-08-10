@@ -376,10 +376,17 @@ export function mapProjectionToPublicEntityView(
     recordMaturity: claims.length > 0 ? 'partial_enrichment' : 'projection_stub',
     // Prefer the release builder's own computed researchCoverage (the related workstream,
     // packages/domain/src/publication/release-builder.ts's computeReleaseResearchCoverage) —
-    // it is derived from the real claim count + citation completeness at release-BUILD time.
-    // The claims.length heuristic below is only a fallback for bootstrap-window stubs that
-    // predate the release builder and never carried this field.
-    researchCoverage: projection.researchCoverage ?? (claims.length >= 2 ? 'partial' : 'minimal'),
+    // it is derived from the real distinct-source-document count at release-BUILD time.
+    // The fallback below is only for bootstrap-window stubs that predate the release builder and
+    // never carried this field. repo-z1pw: it counted claims (`claims.length >= 2`), the same
+    // defect the builder just shed — two claims carved out of one document are one document — so
+    // it now defers to a stub being 'minimal' unless it cites more than one distinct source.
+    researchCoverage:
+      projection.researchCoverage ??
+      (new Set(claims.map((claim) => claim.citationSource?.trim().toLowerCase()).filter(Boolean))
+        .size >= 2
+        ? 'partial'
+        : 'minimal'),
     mapPin,
     claims,
     // Timeline is composed at hydrate time once neighbor display names are known
