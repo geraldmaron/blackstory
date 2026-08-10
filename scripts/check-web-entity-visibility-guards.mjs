@@ -109,9 +109,13 @@ function main() {
     // absent is correct
   }
 
+  // Read once and reuse the contents. Checking existence with statSync and then reading the same
+  // path separately is a time-of-check/time-of-use pair (CodeQL js/file-system-race); a single
+  // read that treats ENOENT as "missing" answers both questions without the window.
   const home = path.join(APP_DIR, 'page.tsx');
+  let homeSource;
   try {
-    statSync(home);
+    homeSource = readFileSync(home, 'utf8');
   } catch {
     errors.push('Missing apps/web/src/app/page.tsx (the Atlas homepage)');
   }
@@ -134,10 +138,12 @@ function main() {
   // force-dynamic and does not depend on it: it now comes from generateStaticParams returning []
   // unconditionally, so the build has no id to bake. That is stricter than before, when the
   // enumeration was still present and merely ignored.
-  try {
-    assertDynamicAfterImports(readFileSync(home, 'utf8'), relativeAppPath(home));
-  } catch (error) {
-    errors.push(error instanceof Error ? error.message : String(error));
+  if (homeSource !== undefined) {
+    try {
+      assertDynamicAfterImports(homeSource, relativeAppPath(home));
+    } catch (error) {
+      errors.push(error instanceof Error ? error.message : String(error));
+    }
   }
 
   const entityPage = path.join(APP_DIR, 'entity', '[id]', 'page.tsx');

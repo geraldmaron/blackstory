@@ -44,17 +44,19 @@ import './memorial-edition.css';
 void React;
 
 /*
- * Incrementally regenerated, for the same reasons as /library and /entity/[id]. This was
- * `force-dynamic` because App Hosting mounted DATABASE_URL at runtime only and a prerender
- * without a database would have baked the Dunbar seed. On Vercel the database is present at
- * build, the catalog is served from the CDN artifact, and `listPublicEntityViews` now throws
- * rather than falling back to seed, so a database-less build fails loudly instead of shipping
- * wrong data.
+ * Must stay dynamic, same constraint as /library: rendering reads the live public catalog, and
+ * the `Build and Typecheck` CI job builds without database secrets, so prerendering fails the
+ * export with `[public-data] postgres live catalog unavailable`.
  *
- * Cost of leaving it dynamic, measured 2026-08-09: every response carried
- * `private, no-cache, no-store`, so nothing was CDN-cached and every reader hit a function.
+ * Tried and reverted on 2026-08-10 along with /library; see the longer note there. The premise
+ * that this was a Firebase App Hosting quirk is wrong: Vercel does have DATABASE_URL at build,
+ * but the CI gate does not, and that gate is required. `revalidate` on a route with no dynamic
+ * segment means prerender at build, so there is no ISR variant that avoids the catalog read.
+ *
+ * Known cost: dynamic responses carry `private, no-cache, no-store`, so this route is a CDN miss
+ * on every request.
  */
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/memorial',
