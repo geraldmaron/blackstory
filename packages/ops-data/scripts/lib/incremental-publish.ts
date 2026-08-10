@@ -165,6 +165,13 @@ function asStringArray(value: unknown): readonly string[] {
   return value.filter((item): item is string => typeof item === 'string');
 }
 
+function asRecordArray(value: unknown): readonly Readonly<Record<string, unknown>>[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((item): item is Record<string, unknown> => item !== null && typeof item === 'object')
+    .map((item) => item as Readonly<Record<string, unknown>>);
+}
+
 function parseStatusHistory(raw: unknown): readonly StatusHistoryEntry<EntityStatusValue>[] {
   if (!Array.isArray(raw)) return [];
   const parsed: StatusHistoryEntry<EntityStatusValue>[] = [];
@@ -313,6 +320,19 @@ function corroboratingSourcesForLandscape(row: LandscapePublishRow): readonly st
   const sourceUrl = provenance.sourceUrl;
   if (typeof sourceUrl === 'string' && sourceUrl.startsWith('https://')) urls.add(sourceUrl);
   if (row.lane === 'dc-sites') urls.add(DC_SOURCE_PROGRAM_CATALOG_URL);
+  // repo-fbjr: the documents the evidence sweep read corroborate this record's claims, so they
+  // belong in the corroboration set the confidence engine scores against.
+  //
+  // Without this, enrichment made a record LESS publishable. `minClaimConfidence` scores each
+  // claim by its citation host and takes the minimum, so attaching a Wikipedia article — real
+  // corroborating research — introduced a lower-scoring claim and dropped 13 of the first 21
+  // enriched records to 0.720 against a 0.75 floor. Records that had been published on the
+  // registry row alone were rejected the moment someone did more research on them, which is the
+  // exact opposite of what the floor is for.
+  for (const raw of asRecordArray(row.payload.evidenceCitations)) {
+    const url = typeof raw.sourceUrl === 'string' ? raw.sourceUrl.trim() : '';
+    if (url.startsWith('https://')) urls.add(url);
+  }
   if (row.canonical_url) urls.delete(row.canonical_url);
   return [...urls];
 }
@@ -324,9 +344,15 @@ function minClaimConfidence(entry: ReleaseSourceEntity, row?: LandscapePublishRo
   let min = Number.POSITIVE_INFINITY;
   for (const [index, claim] of claims.entries()) {
     if (!claim.citationHref) continue;
+    const citationHref = claim.citationHref;
     const sources = [
-      { url: claim.citationHref, textContainsSubjectName: true },
-      ...corroborating.map((url) => ({ url, textContainsSubjectName: true })),
+      { url: citationHref, textContainsSubjectName: true },
+      // A claim does not corroborate itself: now that the evidence documents are in the
+      // corroboration set, a claim citing one of them would otherwise be counted twice and
+      // score higher than the single source it actually rests on.
+      ...corroborating
+        .filter((url) => url !== citationHref)
+        .map((url) => ({ url, textContainsSubjectName: true })),
     ];
     const result = computeClaimConfidence(`${entry.id}-claim-${index}`, sources);
     min = Math.min(min, result.score);
@@ -423,6 +449,54 @@ export function buildReleaseSourceFromLandscape(
             citationLabel: hostname,
           },
         ];
+
+  // repo-fbjr: the documents the enrichment sweep actually READ, as claims that cite them.
+  //
+  // Without this, an enriched record published citing only its registry index row: the nomination
+  // form its every sentence came from appeared nowhere in the projection. Three things went wrong
+  // at once — `assessLandscapeDepth` saw no document beyond the index row and rejected the record
+  // as `template_only` unless it happened to have a historicalContext paragraph (6 of 21 in the
+  // first live batch), `computeReleaseResearchCoverage` counted one distinct document and graded
+  // a researched record 'minimal', and a reader was shown a federal index link as the sole source
+  // for prose drawn from a 40,000-character nomination form.
+  //
+  // One claim per distinct DOCUMENT, not per citation: the drafts cite the same nomination form
+  // several times over, and eight claims quoting one PDF would inflate the same count this is
+  // meant to make honest. The object is the verbatim quote the draft anchored on, which is
+  // already validated as a substring of that document's captured text — so the claim a reader
+  // sees is the exact sentence the prose rests on, not a restatement of it.
+  const evidenceClaims: ReleaseSourceClaim[] = [];
+  const seenEvidenceDocuments = new Set([documentKey(canonicalUrl)].filter(Boolean) as string[]);
+  for (const raw of asRecordArray(row.payload.evidenceCitations)) {
+    const sourceUrl = typeof raw.sourceUrl === 'string' ? raw.sourceUrl.trim() : '';
+    const quote = typeof raw.quote === 'string' ? raw.quote.trim() : '';
+    if (sourceUrl.length === 0 || quote.length === 0) continue;
+    const key = documentKey(sourceUrl);
+    if (key === null || seenEvidenceDocuments.has(key)) continue;
+    seenEvidenceDocuments.add(key);
+    let evidenceHost = 'source';
+    try {
+      evidenceHost = new URL(sourceUrl).hostname;
+    } catch {
+      continue; // an unparseable url cannot be cited; drop rather than publish a broken link
+    }
+    const label =
+      typeof raw.title === 'string' && raw.title.trim().length > 0
+        ? raw.title.trim()
+        : evidenceHost;
+    evidenceClaims.push({
+      predicate: 'source states',
+      object: quote,
+      // tier2 (Wikipedia and similar) is corroborating, not authoritative; tier1 (the nomination
+      // form, a government record) is. Publishing both at 'high' would erase that distinction in
+      // the confidence floor and in what a reader is told about the evidence.
+      confidenceLevel: raw.sourceTier === 'tier1' ? 'high' : 'medium',
+      citationSource: evidenceHost,
+      citationHref: sourceUrl,
+      citationLabel: label,
+    });
+  }
+  claims.push(...evidenceClaims);
 
   // Enrichment writes its long-form prose back onto the landscape row; without this passthrough
   // the builder would rebuild the entity from index fields alone and silently drop it, so a

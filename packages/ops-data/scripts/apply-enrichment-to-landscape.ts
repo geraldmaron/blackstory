@@ -47,9 +47,78 @@ type EnrichedRow = {
       readonly topicIds?: unknown;
       readonly eraBuckets?: unknown;
       readonly keywords?: unknown;
+      readonly summaryCitations?: unknown;
+      readonly historicalContextCitations?: unknown;
     };
   };
 };
+
+/** One captured evidence document, as `entity_evidence` stores it. */
+type EvidenceDocRow = {
+  readonly entity_id: string;
+  readonly id: string;
+  readonly source_url: string;
+  readonly title: string | null;
+  readonly source_tier: string;
+};
+
+type EvidenceCitation = {
+  readonly sourceUrl: string;
+  readonly title: string | null;
+  readonly sourceTier: string;
+  readonly quote: string;
+};
+
+function citationEntries(raw: unknown): { evidenceId: string; quote: string }[] {
+  if (!Array.isArray(raw)) return [];
+  const entries: { evidenceId: string; quote: string }[] = [];
+  for (const item of raw) {
+    if (item === null || typeof item !== 'object') continue;
+    const record = item as Record<string, unknown>;
+    if (typeof record.evidenceId !== 'string' || typeof record.quote !== 'string') continue;
+    entries.push({ evidenceId: record.evidenceId, quote: record.quote });
+  }
+  return entries;
+}
+
+/**
+ * repo-fbjr: turns the draft's citations into the citable-document list the publish builder
+ * reads (`payload.evidenceCitations` -> `buildReleaseSourceFromLandscape`), so a record's
+ * projection cites the documents its prose was actually written from instead of only the
+ * registry index row it was found through.
+ *
+ * One entry per distinct DOCUMENT. A draft cites the same nomination form repeatedly; publishing
+ * one claim per citation would multiply a single PDF into eight sources and inflate exactly the
+ * count the depth gate and researchCoverage use to judge how well-sourced a record is. The
+ * representative quote is the LONGEST one the draft anchored to that document — the most
+ * substantive sentence a reader can check the prose against, and already validated by the
+ * enrichment harness as a verbatim substring of that document's captured text.
+ */
+function buildEvidenceCitations(
+  draft: NonNullable<EnrichedRow['notes']['draft']>,
+  docsById: ReadonlyMap<string, EvidenceDocRow>,
+): EvidenceCitation[] {
+  const bestQuoteByDoc = new Map<string, { doc: EvidenceDocRow; quote: string }>();
+  for (const entry of [
+    ...citationEntries(draft.summaryCitations),
+    ...citationEntries(draft.historicalContextCitations),
+  ]) {
+    const doc = docsById.get(entry.evidenceId);
+    if (doc === undefined) continue;
+    const quote = entry.quote.trim();
+    if (quote.length === 0) continue;
+    const existing = bestQuoteByDoc.get(doc.source_url);
+    if (existing === undefined || quote.length > existing.quote.length) {
+      bestQuoteByDoc.set(doc.source_url, { doc, quote });
+    }
+  }
+  return [...bestQuoteByDoc.values()].map(({ doc, quote }) => ({
+    sourceUrl: doc.source_url,
+    title: doc.title,
+    sourceTier: doc.source_tier,
+    quote,
+  }));
+}
 
 async function main(): Promise<void> {
   const databaseUrl = process.env.DATABASE_URL;
@@ -81,12 +150,23 @@ async function main(): Promise<void> {
   );
   console.log(`Found ${rows.rows.length} enriched entit(ies) to stage onto landscape_candidates.`);
 
+  // Only 'captured' evidence is citable — a quarantined document (failed identity or OCR-quality
+  // check at sweep time) must never become a public citation, however the draft referenced it.
+  const evidenceRows = await pool.query<EvidenceDocRow>(
+    `SELECT entity_id, id, source_url, title, source_tier
+       FROM bb_research.entity_evidence
+      WHERE status = 'captured' AND entity_id = ANY($1::text[])`,
+    [rows.rows.map((row) => row.entity_id)],
+  );
+  const docsById = new Map(evidenceRows.rows.map((row) => [row.id, row]));
+
   const staged: {
     entityId: string;
     summaryLen: number;
     topicIds: number;
     eraBuckets: number;
     keywords: number;
+    evidenceCitations: EvidenceCitation[];
   }[] = [];
   const skipped: { entityId: string; reason: string }[] = [];
 
@@ -113,13 +193,25 @@ async function main(): Promise<void> {
       topicIds: Array.isArray(draft.topicIds) ? draft.topicIds.length : 0,
       eraBuckets: Array.isArray(draft.eraBuckets) ? draft.eraBuckets.length : 0,
       keywords: Array.isArray(draft.keywords) ? draft.keywords.length : 0,
+      evidenceCitations: buildEvidenceCitations(draft, docsById),
     });
   }
 
   for (const item of staged) {
     console.log(
       `  ${item.entityId}: summary=${item.summaryLen} chars, topicIds=${item.topicIds}, ` +
-        `eraBuckets=${item.eraBuckets}, keywords=${item.keywords}`,
+        `eraBuckets=${item.eraBuckets}, keywords=${item.keywords}, ` +
+        `evidenceDocs=${item.evidenceCitations.length}`,
+    );
+  }
+  // A staged row with zero citable documents still publishes its prose, but it will be judged by
+  // the depth gate on historicalContext alone — worth seeing in the run output rather than
+  // discovering as a template_only skip one step later.
+  const withoutDocs = staged.filter((item) => item.evidenceCitations.length === 0);
+  if (withoutDocs.length > 0) {
+    console.log(
+      `\n${withoutDocs.length} staged row(s) resolved NO citable evidence document ` +
+        `(draft cited only quarantined or missing evidence).`,
     );
   }
   if (skipped.length > 0) {
@@ -139,9 +231,14 @@ async function main(): Promise<void> {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+    // Write from `staged` rather than re-deriving from rows.rows: the dry-run output a reviewer
+    // approved is exactly this list, and re-running the filters here is how the two drift.
+    const stagedById = new Map(staged.map((item) => [item.entityId, item]));
     for (const row of rows.rows) {
       const draft = row.notes.draft;
       if (draft === undefined) continue;
+      const plan = stagedById.get(row.entity_id);
+      if (plan === undefined) continue;
       const summary = typeof draft.summary === 'string' ? draft.summary : undefined;
       if (summary === undefined || summary.length < 120 || summary.length > 400) continue;
       await client.query(
@@ -159,6 +256,8 @@ async function main(): Promise<void> {
             topicIds: Array.isArray(draft.topicIds) ? draft.topicIds : undefined,
             eraBuckets: Array.isArray(draft.eraBuckets) ? draft.eraBuckets : undefined,
             keywords: Array.isArray(draft.keywords) ? draft.keywords : undefined,
+            evidenceCitations:
+              plan.evidenceCitations.length > 0 ? plan.evidenceCitations : undefined,
           }),
         ],
       );
