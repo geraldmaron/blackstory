@@ -108,7 +108,20 @@ const nextConfig = {
         source: '/corrections/status/:receiptCode*',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
       },
+      // Cache-Control here only reaches the CDN for routes that are NOT dynamically rendered.
+      //
+      // Measured on Vercel, 2026-08-09: a dynamically rendered route sends Next's own
+      // `private, no-cache, no-store, max-age=0, must-revalidate`, and that wins over anything
+      // declared here. `main` has carried the `/` rule below for weeks and production still
+      // answered `/` with no-store and `x-vercel-cache: MISS` on every request. Note this does
+      // NOT reproduce under `next start`, where the rule below does take effect: the precedence
+      // differs between the local server and Vercel's routing layer, so a local check will tell
+      // you these rules work when on Vercel they do not.
+      //
+      // Practical rule: making a route cacheable is a route-segment-config change (ISR), not a
+      // header change. The header is what the CDN then honours.
       {
+        // Live: /entity/[id] became ISR (revalidate=3600), so this is now the served header.
         source: '/entity/:id',
         headers: [
           {
@@ -118,6 +131,10 @@ const nextConfig = {
         ],
       },
       {
+        // INERT while `/` is force-dynamic, which it must stay: the Atlas reads searchParams for
+        // its state/era/kind/topic filters, and App Router renders any searchParams-reading page
+        // per request. Kept, not deleted, because it is the intended posture the moment `/` can
+        // stop being dynamic (see repo-ajb0 for the partial-prerender option).
         source: '/',
         headers: [
           {

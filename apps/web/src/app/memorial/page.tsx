@@ -43,7 +43,18 @@ import './memorial-edition.css';
 
 void React;
 
-export const dynamic = 'force-dynamic';
+/*
+ * Incrementally regenerated, for the same reasons as /library and /entity/[id]. This was
+ * `force-dynamic` because App Hosting mounted DATABASE_URL at runtime only and a prerender
+ * without a database would have baked the Dunbar seed. On Vercel the database is present at
+ * build, the catalog is served from the CDN artifact, and `listPublicEntityViews` now throws
+ * rather than falling back to seed, so a database-less build fails loudly instead of shipping
+ * wrong data.
+ *
+ * Cost of leaving it dynamic, measured 2026-08-09: every response carried
+ * `private, no-cache, no-store`, so nothing was CDN-cached and every reader hit a function.
+ */
+export const revalidate = 3600;
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/memorial',

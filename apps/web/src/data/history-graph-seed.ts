@@ -48,11 +48,36 @@ function decadeBucketInputs(
     .filter((input): input is DecadeBucketEntityInput => input !== undefined);
 }
 
+/**
+ * Identity of a catalog, for memo lookup only.
+ *
+ * This used to map every id, sort them with `localeCompare` and join them into one string: at
+ * 4,081 entities that is a collator-driven sort plus a ~100KB allocation, paid on EVERY request
+ * to `/`, the highest-traffic route, purely to look up a Map entry that was almost always
+ * already there.
+ *
+ * The cheap key is order-insensitive without sorting: count plus an XOR-fold of a per-id hash.
+ * XOR is commutative, so two orderings of the same id set agree, which is the property the sort
+ * was there to provide.
+ *
+ * Collision risk is acceptable *here* specifically because this key never crosses a release
+ * boundary on its own: the caller prefixes it with the releaseId, and within one release the
+ * catalog is a fixed set. A collision would require two same-length id sets in one release whose
+ * hashes XOR-fold identically, and the consequence would be serving a graph built from a
+ * sibling catalog of identical size, not corrupted data.
+ */
 function catalogCacheKey(entities: readonly PublicEntityView[]): string {
-  return entities
-    .map((entity) => entity.id)
-    .sort((a, b) => a.localeCompare(b))
-    .join('\0');
+  let fold = 0;
+  for (const entity of entities) {
+    let hash = 0x811c9dc5;
+    const id = entity.id;
+    for (let i = 0; i < id.length; i += 1) {
+      hash ^= id.charCodeAt(i);
+      hash = Math.imul(hash, 0x01000193);
+    }
+    fold ^= hash;
+  }
+  return `${entities.length}:${(fold >>> 0).toString(36)}`;
 }
 
 const artifactCache = new Map<string, GraphReleaseArtifact>();

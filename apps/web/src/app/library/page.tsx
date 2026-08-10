@@ -37,14 +37,25 @@ import '../reading-room.css';
 void React;
 
 /*
- * Must stay dynamic, same reason as /memorial, /entity/[id] and the map group: the room counts
- * its rooms from the live public catalog (`getSharedPublicEntities`), and App Hosting mounts
- * DATABASE_URL at runtime only. Left prerendered, the build tried to fetch the catalog, got
- * `[public-data] postgres live catalog unavailable`, and failed the whole export on /library.
- * `/records` reads the same data and escapes this only because its searchParams already opt it
- * out of prerendering, which is an accident rather than a decision.
+ * Incrementally regenerated. This page counts its rooms from the live public catalog
+ * (`getSharedPublicEntities`), so it needs a database, and it used to be `force-dynamic` because
+ * App Hosting mounted DATABASE_URL at runtime only: left prerendered, the build fetched the
+ * catalog, got `[public-data] postgres live catalog unavailable`, and failed the export.
+ *
+ * That premise no longer holds. The app is on Vercel, where DATABASE_URL is present at build, and
+ * the catalog now comes from the CDN release artifact rather than a multi-MB Postgres pull.
+ * Prerendering here is cheap and correct.
+ *
+ * The old failure mode is also no longer silent-and-wrong: `listPublicEntityViews` throws when
+ * the catalog is unavailable, so a build without a database fails loudly instead of baking the
+ * 4-entity Dunbar seed into production. Fail-closed at the data layer is what `force-dynamic` was
+ * standing in for here.
+ *
+ * Cost of leaving it dynamic, measured 2026-08-09: Next sends `private, no-cache, no-store` on
+ * every dynamic response, so `x-vercel-cache` was MISS on 100% of requests and every reader hit a
+ * function. 3600s matches /entity/[id].
  */
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/library',
