@@ -142,13 +142,20 @@ export function foldPunctuation(text: string): string {
 export function countWholeWord(foldedHaystack: string, token: string): number {
   if (token.length === 0) return 0;
   const padded = ` ${foldedHaystack} `;
-  const needle = ` ${token} `;
   let count = 0;
-  let index = padded.indexOf(needle);
-  while (index !== -1) {
-    count += 1;
-    // Advance by 1, not by needle.length: consecutive occurrences share the delimiting space.
-    index = padded.indexOf(needle, index + 1);
+  // A trailing "s" is matched as the same word. `foldPunctuation` strips the apostrophe from a
+  // possessive, so "St. Joseph's AME Church" folds to "st josephs ame church" and a strict
+  // whole-word test for "joseph" misses its own article — measured: the Wikipedia article on
+  // St. Joseph's AME Church was refused as evidence for St. Joseph AME Church, which is exactly
+  // the apostrophe failure this module's foldPunctuation was written to prevent. Widening by one
+  // trailing "s" restores that without reopening substring matching.
+  for (const needle of [` ${token} `, ` ${token}s `]) {
+    let index = padded.indexOf(needle);
+    while (index !== -1) {
+      count += 1;
+      // Advance by 1, not by needle.length: consecutive occurrences share the delimiting space.
+      index = padded.indexOf(needle, index + 1);
+    }
   }
   return count;
 }
@@ -220,11 +227,13 @@ export function nameTokensCooccur(
   const others = present.map((entry) => entry.token).filter((token) => token !== anchor);
 
   const padded = ` ${foldedHaystack} `;
-  const needle = ` ${anchor} `;
-  for (let at = padded.indexOf(needle); at !== -1; at = padded.indexOf(needle, at + 1)) {
-    const from = Math.max(0, at - NAME_COOCCURRENCE_WINDOW_CHARS);
-    const window = padded.slice(from, at + needle.length + NAME_COOCCURRENCE_WINDOW_CHARS);
-    if (others.some((token) => containsWholeWord(window.trim(), token))) return true;
+  // Both forms, for the same possessive reason `countWholeWord` widens on.
+  for (const needle of [` ${anchor} `, ` ${anchor}s `]) {
+    for (let at = padded.indexOf(needle); at !== -1; at = padded.indexOf(needle, at + 1)) {
+      const from = Math.max(0, at - NAME_COOCCURRENCE_WINDOW_CHARS);
+      const window = padded.slice(from, at + needle.length + NAME_COOCCURRENCE_WINDOW_CHARS);
+      if (others.some((token) => containsWholeWord(window.trim(), token))) return true;
+    }
   }
   return false;
 }

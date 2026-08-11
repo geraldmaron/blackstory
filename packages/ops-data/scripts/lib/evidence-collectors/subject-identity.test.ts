@@ -397,6 +397,18 @@ describe('countWholeWord / containsWholeWord (repo-u84y defect 1: substring matc
     const folded = foldPunctuation('Hogan Hogan and Hogan, attorneys');
     assert.equal(countWholeWord(folded, 'hogan'), 3);
   });
+
+  it('treats a possessive as the same word', () => {
+    // foldPunctuation drops the apostrophe, so a strict whole-word test refused the Wikipedia
+    // article on St. Joseph's AME Church as evidence for St. Joseph AME Church.
+    const folded = foldPunctuation("St. Joseph's African Methodist Episcopal Church");
+    assert.equal(containsWholeWord(folded, 'joseph'), true);
+  });
+
+  it('does not treat a longer word as a possessive of a shorter one', () => {
+    const folded = foldPunctuation('corporate headquarters');
+    assert.equal(containsWholeWord(folded, 'quarter'), false);
+  });
 });
 
 describe('nameTokensCooccur (repo-u84y defect 2: a name is a phrase, not a bag of words)', () => {
