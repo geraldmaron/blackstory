@@ -148,4 +148,15 @@ most half the climb — a 12% floor has nothing to do with evidence volume. And 
 terminal `no-lane-significance` status must not be applied to a refusal without checking which kind
 it is first, or it will permanently close records whose real nomination was simply never fetched.
 
-Triage with `audit-evidence-subject-match.ts` before spending a wave.
+Triage with `audit-evidence-subject-match.ts` before spending a wave. As of 2026-08-11 that has
+been done once for this lane: 231 tier2 documents quarantined, 227 entities moved out of the
+drafting pool and into re-sweep. **Do not re-sweep them before repo-u84y is fixed** — the identity
+gate accepts 231 of the 249 documents in question, so a sweep today re-attaches the same class.
+
+The one thing to keep in mind when you read a refusal: *thin* evidence is more dangerous than
+*unrelated* evidence, which is the opposite of the intuition. An unrelated document gives a drafter
+nothing and it refuses. A city article attached to one of its own historic districts gives it
+paragraphs of real, quotable Black history about a **different** district — and every quote is a
+genuine verbatim substring, so the validator passes it. That is how a sourced-looking entry ends up
+attributing Vinegar Hill's destruction to West Main Street. Refusing is the drafter's job; the
+harness cannot catch this one.

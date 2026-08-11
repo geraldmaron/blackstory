@@ -34,12 +34,38 @@
  *
  * READ-ONLY: no write path.
  *
+ * WHY THIS QUARANTINES RATHER THAN ONLY REPORTING
+ *
+ * A hand-read of a 20-subject stratified sample of the flagged tier2 population returned 2 usable,
+ * 7 thin, 11 unrelated — 90% unusable. The thin ones are the reason this writes: they are more
+ * dangerous than the unrelated ones, not less. A city article attached to one of its own historic
+ * districts is full of *real* Black history about a DIFFERENT district — Roanoke's Gainsboro and
+ * Henry Street material sitting under Southwest Historic District, Charlottesville's Vinegar Hill
+ * material under West Main Street. Every quote a drafter pulls from it is a genuine verbatim
+ * substring, so `validateEnrichmentResponse` passes it, and the result is a sourced-looking
+ * paragraph attributing a neighbouring place's history to this entity. Leaving the row
+ * `status='captured'` is not neutral.
+ *
+ * Quarantining costs the ~10% that were usable. That trade is deliberate and cheap to reverse: the
+ * row keeps its content, the flip is one column, and the entity returns to the sweep to be
+ * re-fetched by a collector that can do better.
+ *
+ * NOT APPLIED TO tier1 nomination captures, which this audit flags but must not act on. Those are
+ * fetched by the entity's own refnum (verified: every flagged one has the refnum in its
+ * source_url), so the document is right by construction and a missing name means the NPS text
+ * extraction dropped the header field — "The ___ is historically significant because..." — or the
+ * capture truncated. Quarantining them would delete correct evidence over an extraction artifact.
+ * Their real defect is capture quality; see repo-pjob.
+ *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a
  *   export DATABASE_SSL=1
  *   node --conditions development --import tsx \
  *     packages/ops-data/scripts/audit-evidence-subject-match.ts [--lane=nrhp-black-heritage] \
  *     [--samples=15] [--json=<path>]
+ *
+ * Dry-run by default. Writes require:
+ *   DRY_RUN=0 AUDIT_EVIDENCE_SUBJECT_MATCH_APPLY=1
  */
 import pg from 'pg';
 import { writeFileSync } from 'node:fs';
@@ -53,6 +79,8 @@ function flag(name: string, fallback: string): string {
 const LANE = flag('lane', 'nrhp-black-heritage');
 const SAMPLES = Number.parseInt(flag('samples', '15'), 10);
 const JSON_OUT = flag('json', '');
+const DRY_RUN = process.env.DRY_RUN !== '0';
+const APPLY = process.env.AUDIT_EVIDENCE_SUBJECT_MATCH_APPLY === '1';
 
 /**
  * Words that carry no identifying power in this corpus. "Church", "House" and "Historic District"
@@ -287,6 +315,60 @@ async function main(): Promise<void> {
     );
     console.log(`\nFull findings -> ${JSON_OUT}`);
   }
+
+  // Only the searched tier2 documents are actionable. See the header for why tier1 nomination
+  // captures are flagged but never quarantined.
+  const quarantineIds = findings
+    .filter((f) => f.sourceTier !== 'tier1')
+    .filter((f) => fullyMismatched.includes(f.entityId))
+    .map((f) => f.evidenceId);
+  const uniqueQuarantineIds = [...new Set(quarantineIds)];
+  const tier1Flagged = findings.filter(
+    (f) => f.sourceTier === 'tier1' && fullyMismatched.includes(f.entityId),
+  ).length;
+
+  console.log('\n=== DISPOSITION ===');
+  console.log(`quarantine (tier2, searched):      ${uniqueQuarantineIds.length} document(s)`);
+  console.log(`leave alone (tier1, refnum-addressed, capture-quality issue): ${tier1Flagged}`);
+
+  if (uniqueQuarantineIds.length === 0) {
+    await pool.end();
+    return;
+  }
+
+  if (DRY_RUN || !APPLY) {
+    console.log('\nDRY_RUN (default): no writes. Set DRY_RUN=0 AUDIT_EVIDENCE_SUBJECT_MATCH_APPLY=1 to apply.');
+    await pool.end();
+    return;
+  }
+
+  // Reason is stored so a later reader can tell this apart from an identity-gate quarantine —
+  // these rows passed checkSubjectIdentity and were rejected on a different test (repo-u84y).
+  const result = await pool.query(
+    `UPDATE bb_research.entity_evidence
+        SET status = 'quarantined',
+            provenance = coalesce(provenance, '{}'::jsonb) || jsonb_build_object(
+              'quarantineReason', 'subject-match: document title does not name the entity (repo-pjob)',
+              'quarantinedBy', 'audit-evidence-subject-match',
+              'previousStatus', status
+            )
+      WHERE id = ANY($1::text[]) AND status = 'captured'`,
+    [uniqueQuarantineIds],
+  );
+  console.log(`\nApplied: ${result.rowCount} evidence row(s) quarantined.`);
+
+  const stranded = await pool.query<{ n: string }>(
+    `SELECT count(*) AS n FROM bb_research.entity_enrichment ee
+      WHERE ee.lane = $1 AND ee.status = 'pending'
+        AND NOT EXISTS (
+          SELECT 1 FROM bb_research.entity_evidence ev
+           WHERE ev.entity_id = ee.entity_id AND ev.status = 'captured')`,
+    [LANE],
+  );
+  console.log(
+    `Lane now has ${stranded.rows[0]?.n} pending entit(ies) with no captured evidence — these ` +
+      `are re-sweep candidates, not drafting candidates.`,
+  );
 
   await pool.end();
 }
