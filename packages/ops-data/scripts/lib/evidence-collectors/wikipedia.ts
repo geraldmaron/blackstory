@@ -16,9 +16,22 @@
  *   2. Identity is corroborated, not assumed. Wikipedia search will confidently return
  *      *something* for any query, and a wrong article is worse than no article: it produces
  *      fluent, plausible, well-cited history about the wrong subject. So a candidate article is
- *      rejected unless its text corroborates the place we already know from the registry row.
+ *      rejected unless it clears the shared identity gate in `subject-identity.ts`.
+ *
+ *      That gate replaced this module's own place-only check in repo-ppeu. The place-only check
+ *      accepted an article if ANY ONE of city/county/state appeared, which is how "First Baptist
+ *      Church of Covington, Virginia" was given the article for Covington, KENTUCKY, and how a
+ *      house in Virginia was given an article about a Virginia election. Search picks the
+ *      candidate; identity — place AND name AND focus — decides whether it becomes evidence.
  */
 import { WIKIMEDIA_USER_AGENT } from '@repo/domain';
+import {
+  checkSubjectIdentity,
+  isDisambiguationExtract,
+  type SubjectIdentity,
+} from './subject-identity.ts';
+
+export { isDisambiguationExtract };
 
 const API = 'https://en.wikipedia.org/w/api.php';
 
@@ -30,6 +43,12 @@ export type WikipediaArticle = {
   readonly url: string;
   readonly extract: string;
   readonly pageId: number;
+  /**
+   * How this article was tied to the row. Undefined for the title-fetch path, whose identity is
+   * anchored by the row's own canonicalUrl rather than derived from the text. Recorded on the
+   * evidence row so a later audit can see which gates a capture passed without refetching.
+   */
+  readonly identity?: SubjectIdentity;
 };
 
 export type WikipediaLookupInput = {
@@ -91,45 +110,24 @@ function readExtract(raw: unknown): { readonly extract: string; readonly title: 
 }
 
 /**
- * True for a MediaWiki disambiguation page ("Maplewood may refer to: ..."). These pass
- * `articleCorroboratesPlace` for free: a disambiguation page enumerating many same-named places
- * will very often happen to mention the target city/county/state somewhere in its list, which is
- * exactly the false-positive that check exists to prevent for a real article about the wrong
- * subject — it just wasn't built to notice the subject here is "no single place" at all. Found
- * live (repo-n7p6.22, 2026-08-06): 'Maplewood' NRHP row corroborated against a disambiguation
- * page listing multiple "Maplewood, County, State" entries. Disambiguation pages open with this
- * phrase as their first sentence by MediaWiki convention, so a prefix check is reliable without
- * an extra API call.
+ * Does this article actually corroborate the row — place, name, and focus? Thin wrapper over the
+ * shared gate, present so the collector reads in its own vocabulary and so the article's TITLE
+ * takes part in the check (it is what identifies a listings/index page).
  */
-export function isDisambiguationExtract(extract: string): boolean {
-  return /^\s*\S[^.]{0,80}\bmay refer to\b/iu.test(extract);
-}
-
-/**
- * Does this article actually corroborate the registry row's place? Same discipline as the
- * nomination identity gate: a fluent article about the wrong subject is the failure mode that
- * costs us most, so place has to agree before the text is allowed to become evidence.
- */
-export function articleCorroboratesPlace(
+export function articleCorroboratesSubject(
   extract: string,
-  input: Pick<WikipediaLookupInput, 'city' | 'county' | 'state'>,
-): boolean {
-  if (isDisambiguationExtract(extract)) return false;
-  const haystack = extract.toLowerCase();
-  const candidates = [input.city, input.county, input.state]
-    .map((value) => value?.trim().toLowerCase())
-    .filter((value): value is string => value !== undefined && value.length > 0);
-  if (candidates.length === 0) return false;
-  // State alone is weak but is all some rows have; city or county agreement is the strong signal.
-  return candidates.some((value) => haystack.includes(value));
+  title: string,
+  input: Pick<WikipediaLookupInput, 'displayName' | 'city' | 'county' | 'state'>,
+): SubjectIdentity {
+  return checkSubjectIdentity(extract, input, { title });
 }
 
 /**
  * Fetch a specific article by exact title, no search and no place corroboration. For rows whose
  * identity is already anchored elsewhere — a person-kind landscape candidate discovered FROM a
  * Wikidata QID, whose canonicalUrl already points at the matching enwiki article — re-deriving
- * identity via place-text search would be redundant at best and would wrongly reject persons
- * with no city/county/state in payload at all (`articleCorroboratesPlace` requires at least one).
+ * identity from the article text would be redundant at best and would wrongly reject persons with
+ * no city/county/state in payload at all (the shared gate requires place agreement).
  * Returns null only when the title does not resolve to any article.
  */
 export async function lookupWikipediaArticleByTitle(
@@ -194,11 +192,13 @@ export async function lookupWikipediaArticle(
     );
     const found = readExtract(extractRaw);
     if (found === null) continue;
-    if (!articleCorroboratesPlace(found.extract, input)) continue;
+    const identity = articleCorroboratesSubject(found.extract, found.title, input);
+    if (!identity.corroborated) continue;
     return {
       title: found.title,
       pageId: hit.pageid,
       extract: found.extract,
+      identity,
       url: `https://en.wikipedia.org/wiki/${encodeURIComponent(found.title.replace(/ /gu, '_'))}`,
     };
   }

@@ -38,7 +38,7 @@ test('a place-like kind with no status field at all frames as historical (never 
 });
 
 test('isThinRecord reads the published coverage field, not how empty the page looks', () => {
-  const base = requireEntity('ent_15th_st_church_001');
+  const base = { ...requireEntity('ent_15th_st_church_001'), historicalContext: '' };
   assert.equal(isThinRecord({ ...base, researchCoverage: 'minimal' }), true);
   assert.equal(isThinRecord({ ...base, researchCoverage: 'partial' }), false);
   assert.equal(isThinRecord({ ...base, researchCoverage: 'substantial' }), false);
@@ -46,6 +46,30 @@ test('isThinRecord reads the published coverage field, not how empty the page lo
     isThinRecord({ ...base, researchCoverage: 'partial', claims: [], related: [], timeline: [] }),
     false,
     'an empty page is not a registry listing unless the record says its coverage is minimal',
+  );
+});
+
+/**
+ * repo-z1pw/repo-ol8v: coverage counts distinct source DOCUMENTS, so 'minimal' also covers a
+ * genuinely researched record that leans on one source. THIN_RECORD_COPY tells the reader "what
+ * you see here is the listing itself rather than a researched history" — false over real
+ * narrative prose, so narrative context suppresses the notice.
+ */
+test('isThinRecord does not call a single-sourced record with real narrative a registry listing', () => {
+  const base = requireEntity('ent_15th_st_church_001');
+  assert.equal(
+    isThinRecord({
+      ...base,
+      researchCoverage: 'minimal',
+      historicalContext: 'Founded in 1866 by freedmen who had met in a Georgetown parlor.',
+    }),
+    false,
+    'a record carrying researched narrative is single-sourced, not unresearched',
+  );
+  assert.equal(
+    isThinRecord({ ...base, researchCoverage: 'minimal', historicalContext: '   ' }),
+    true,
+    'whitespace-only context is no context',
   );
 });
 

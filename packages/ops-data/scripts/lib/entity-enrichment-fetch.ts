@@ -12,8 +12,33 @@ import type { EnrichmentSubject } from './entity-enrichment-llm.ts';
 
 /** Per-source cap so one huge nomination form does not crowd out every other source. */
 export const MAX_CHARS_PER_SOURCE = 4_000;
+
+/**
+ * Tier-1 sources get a bigger window. A National Register nomination is the deepest source in the
+ * corpus and the only one that carries a statement of significance; a Wikipedia stub is not
+ * competing for the same space.
+ *
+ * Sized from the corpus rather than picked: the median captured nomination runs about 23,000
+ * characters, of which the significance statement is a large share. 4,000 was leaving a median of
+ * 18,893 characters unread (repo-de8i), and while ordering significance first means the window now
+ * lands on the history rather than the cornice profiles, a 4,000-character view of a 23,000
+ * character document still stops mid-argument.
+ */
+export const MAX_CHARS_PER_TIER1_SOURCE = 12_000;
+
 /** Total evidence chars offered to the model, across all sources for one entity. */
-export const MAX_TOTAL_EVIDENCE_CHARS = 14_000;
+export const MAX_TOTAL_EVIDENCE_CHARS = 20_000;
+
+/**
+ * Floor held back for each source still waiting behind the current one.
+ *
+ * Without it the tier-1 window silently becomes a source-count reduction: two nomination-tier
+ * documents at 12,000 each consume the entire budget, every remaining source is handed zero
+ * characters and is dropped, and the record loses the independent corroboration that
+ * `researchCoverage` counts and that `minClaimConfidence` needs to clear the publish floor. More
+ * text from one source is not worth fewer sources — that trade is the opposite of the point.
+ */
+export const MIN_CHARS_RESERVED_PER_REMAINING_SOURCE = 1_200;
 
 type CandidateRow = {
   readonly id: string;
@@ -37,7 +62,13 @@ type EvidenceRow = {
 /** Minimal query surface this module needs — satisfied by `pg.Pool` and `pg.PoolClient`. */
 export type QueryablePool = Pick<pg.Pool, 'query'>;
 
-function selectEvidenceForModel(rows: readonly EvidenceRow[]): EnrichmentSubject['evidence'] {
+/**
+ * Exported for tests. The budget arithmetic decides what a drafter actually reads, and it is the
+ * kind of code where an off-by-one silently costs a whole source rather than throwing.
+ */
+export function selectEvidenceForModel(
+  rows: readonly EvidenceRow[],
+): EnrichmentSubject['evidence'] {
   const usable = rows.filter((row) => row.content_text !== null && row.content_text.length > 0);
   // tier1 first (richest, most authoritative), then by length — matches WS3's own preference.
   const ordered = [...usable].sort((a, b) => {
@@ -46,9 +77,21 @@ function selectEvidenceForModel(rows: readonly EvidenceRow[]): EnrichmentSubject
   });
   const evidence: EnrichmentSubject['evidence'][number][] = [];
   let budget = MAX_TOTAL_EVIDENCE_CHARS;
-  for (const row of ordered) {
+  for (const [index, row] of ordered.entries()) {
     if (budget <= 0) break;
-    const text = (row.content_text ?? '').slice(0, Math.min(MAX_CHARS_PER_SOURCE, budget));
+    const perSourceCap =
+      row.source_tier === 'tier1' ? MAX_CHARS_PER_TIER1_SOURCE : MAX_CHARS_PER_SOURCE;
+    // Keep a slice for each source still queued behind this one, so a long tier-1 document cannot
+    // crowd the others out of the bundle entirely.
+    // With many sources the reserve can exceed the whole budget, so this source always keeps at
+    // least the floor itself — otherwise a 20-source entity reserves everything for everyone,
+    // hands the first source zero characters, and drops every source in the bundle.
+    const reserved = (ordered.length - index - 1) * MIN_CHARS_RESERVED_PER_REMAINING_SOURCE;
+    const available = Math.min(
+      budget,
+      Math.max(budget - reserved, MIN_CHARS_RESERVED_PER_REMAINING_SOURCE),
+    );
+    const text = (row.content_text ?? '').slice(0, Math.min(perSourceCap, available));
     if (text.length === 0) continue;
     evidence.push({
       id: row.id,

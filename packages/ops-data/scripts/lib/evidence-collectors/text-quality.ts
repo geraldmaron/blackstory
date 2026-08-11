@@ -99,6 +99,27 @@ export type QualityVerdict = {
   readonly reason?: string;
 };
 
+/**
+ * Strips characters Postgres cannot store in a `text` column, and the neighbours that carry no
+ * meaning alongside them.
+ *
+ * NUL (0x00) is the one that actually fails: a `text` value is a C string server-side, so a
+ * single embedded NUL aborts the statement with `invalid byte sequence for encoding "UTF8":
+ * 0x00` and — because the sweep writes its whole batch in one transaction — takes every other
+ * captured document down with it. PDF text extraction from scanned nomination forms produces
+ * them routinely (unpdf emits NUL for unmapped glyphs in some form vintages), so this is a
+ * property of the richest source in the lane, not an edge case.
+ *
+ * The other C0 controls are dropped in the same pass. They survive to no purpose in prose, they
+ * are invisible to a reviewer reading the evidence, and a citation quote that silently contains
+ * one would fail the verbatim-substring check downstream for a reason nobody could see. Tab,
+ * newline and carriage return are real formatting and stay.
+ */
+export function stripUnstorableCharacters(text: string): string {
+  // eslint-disable-next-line no-control-regex -- matching control characters is the point
+  return text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/gu, '');
+}
+
 export function assessText(text: string): QualityVerdict {
   const signals = measureTextQuality(text);
   const score = scoreTextQuality(signals);

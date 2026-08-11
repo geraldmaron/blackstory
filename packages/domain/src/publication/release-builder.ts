@@ -17,8 +17,10 @@
  *  - `notabilityBasis`: derived from the entry's own claims (one basis record per distinct claim
  *    predicate, `evidenceIds` pointing at that predicate's claim ids), not a single hardcoded
  *    placeholder string.
- *  - `researchCoverage`: derived from actual claim count + citation completeness, not a UI-side
- *    guess and not duplicated ad hoc between the projection and search-index builders.
+ *  - `researchCoverage`: derived from the number of distinct SOURCE DOCUMENTS the entry's claims
+ *    rest on, not a UI-side guess and not duplicated ad hoc between the projection and
+ *    search-index builders. Counting claims instead measured how finely a publish path chose to
+ *    slice one source — see `computeReleaseResearchCoverage` and repo-z1pw.
  *  - `generatedAt`/`recordUpdatedAt`: a real "this publish happened at this instant" timestamp,
  *    legitimate at release-BUILD time (unlike the web read-path, which must never fabricate one
  *    at render time — see `apps/web/src/lib/public-data/map-projection.ts`).
@@ -444,23 +446,69 @@ export function buildReleaseNotabilityBasis(
 }
 
 /**
- * Derives `researchCoverage` from the entry's real claim count and citation-completeness ratio
+ * Citation identity for coverage counting: the DOCUMENT a claim rests on, normalized to
+ * host + path so `?utm=…`, a `#section` anchor, or a trailing slash cannot make one document
+ * look like two. Falls back to the free-text `citationSource` when a claim carries no resolvable
+ * href. Returns `null` for an uncited claim, which contributes no coverage.
+ *
+ * Document granularity, deliberately — the same question `assessLandscapeDepth` asks
+ * (`packages/ops-data/scripts/lib/incremental-publish.ts`): "has anyone read anything beyond the
+ * index row?" An NRHP nomination form is served by the same publisher as the NRHP index entry but
+ * is a different document and real research, so it counts. This is a different granularity from
+ * `entity-content-audit.ts`'s `countDistinctSources`, which counts PUBLISHERS because it asks the
+ * corroboration question ("do independent publishers agree?") — same corpus, two questions.
+ */
+function citationDocumentKey(claim: ReleaseClaimProjection): string | null {
+  const href = claim.citationHref?.trim() ?? '';
+  if (href.length > 0) {
+    try {
+      const url = new URL(href);
+      return `${url.hostname.replace(/^www\./iu, '')}${url.pathname}`
+        .toLowerCase()
+        .replace(/\/$/u, '');
+    } catch {
+      // Unparseable href — fall through to the text source rather than inventing a document.
+    }
+  }
+  const source = claim.citationSource.trim();
+  return source.length > 0 ? source.toLowerCase() : null;
+}
+
+/**
+ * Derives `researchCoverage` from how many distinct SOURCE DOCUMENTS an entry's claims rest on
  * never a UI-side guess, and computed exactly ONCE here so the projection and search-index
  * builders below always agree.
  *
- * Reasoning (documented, not a scoring formula): `substantial` requires both a meaningfully sized
- * claim set (>=5) AND every one of those claims carrying a resolvable citation; `partial` only
- * requires >=2 claims (matching the pre-existing threshold this replaces, see git history of
- * `publish-national-catalog.ts`'s old `toSearchDoc`); everything else, `minimal`.
+ * repo-z1pw: this counted CLAIMS before (`claimCount >= 2 -> 'partial'`), which measured how many
+ * assertions a publish path chose to split a source into, not how much documentation backs the
+ * record. The nrhp-black-heritage lane synthesizes exactly two claims — a listing fact and a
+ * significance fact — from one registry index row, both citing that row's own URL. 2,436 live
+ * records built from a single spreadsheet line therefore published as 'partial', and because
+ * `isThinRecord()` (apps/web) keys strictly on 'minimal', the registry-listing disclosure never
+ * fired for the population it was written for. A reader saw an uncaveated description and
+ * reasonably concluded it was the whole of the recorded history.
+ *
+ * Reasoning (documented, not a scoring formula): coverage answers "how much documentation stands
+ * behind this record", so the unit is the document.
+ *  - `minimal`     — fewer than two distinct cited documents. One document, however many claims
+ *                    were carved out of it, is one document.
+ *  - `partial`     — two or more distinct cited documents.
+ *  - `substantial` — two or more distinct documents AND a meaningfully sized claim set (>=5) AND
+ *                    every one of those claims carrying a citation (the pre-existing
+ *                    completeness requirement, unchanged).
  */
 export function computeReleaseResearchCoverage(
   claims: readonly ReleaseClaimProjection[],
 ): ReleaseResearchCoverage {
   const claimCount = claims.length;
   const citedCount = claims.filter((claim) => claim.citationSource.trim().length > 0).length;
+  const documentCount = new Set(
+    claims.map((claim) => citationDocumentKey(claim)).filter((key): key is string => key !== null),
+  ).size;
+
+  if (documentCount < 2) return 'minimal';
   if (claimCount >= 5 && citedCount === claimCount) return 'substantial';
-  if (claimCount >= 2) return 'partial';
-  return 'minimal';
+  return 'partial';
 }
 
 export type ReferenceResolutionFailure = { readonly ok: false; readonly reason: string };

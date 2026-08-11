@@ -76,6 +76,67 @@ function notesFor(attempt: EnrichmentAttempt, reviewSample: boolean): Record<str
 }
 
 /** UPDATEs the entity's existing ledger row (WS3 must have INSERTed it already, status='pending'). */
+/**
+ * repo-n9dq — the third outcome of a drafting pass, alongside accepted and quarantined.
+ *
+ * A drafter that reads captured, identity-verified evidence and finds no Black-history
+ * significance in it is doing the right thing by refusing: the alternative is architectural
+ * padding to clear the 120-char summary floor, which is the failure the whole enrichment effort
+ * exists to undo. But until now a refusal wrote nothing, so the row stayed `pending` and every
+ * later pass re-selected and re-spent on it. Wave 4's selection was 8 of wave 3's own refusals,
+ * top of the list, because they still carried the most evidence by volume.
+ *
+ * `no-lane-significance` is terminal but NOT permanent, and `evidence_digest` is what makes the
+ * difference. It records exactly which evidence was judged. A later sweep that captures a new
+ * source changes the digest, and the row can be reopened by comparing the two — the refusal
+ * expires when the input it was made about does, and not before.
+ *
+ * NOT to be used for a mis-attached document (repo-pjob). "This evidence says nothing about Black
+ * history" and "this evidence is about a different subject entirely" look identical to a drafter
+ * and are opposite facts: the first is a finished judgement about the entity, the second is a
+ * retrieval bug where the entity was never researched at all. Marking the second terminal would
+ * permanently close a record whose real nomination was simply never fetched. Those belong in the
+ * identity gate and leave the row with no captured evidence at all.
+ */
+export async function applyLaneSignificanceRefusal(
+  client: QueryableClient,
+  input: {
+    readonly entityId: string;
+    /** The drafter's stated reason — kept verbatim; it is the whole audit trail for the decision. */
+    readonly reason: string;
+    /** Digest of the evidence this judgement was made about. Null only if the row has none. */
+    readonly evidenceDigest: string | null;
+    readonly modelId: string;
+  },
+): Promise<void> {
+  await client.query(
+    `UPDATE bb_research.entity_enrichment
+        SET status = 'no-lane-significance',
+            model_id = $2,
+            evidence_digest = $3,
+            notes = $4::jsonb,
+            last_enriched_at = now(),
+            updated_at = now()
+      WHERE entity_id = $1`,
+    [
+      input.entityId,
+      input.modelId,
+      input.evidenceDigest,
+      JSON.stringify({
+        schemaId: ENTITY_ENRICHMENT_SCHEMA_ID,
+        schemaVersion: ENTITY_ENRICHMENT_SCHEMA_VERSION,
+        refusal: {
+          kind: 'no-lane-significance',
+          reason: input.reason,
+          // Stated explicitly so a reader of this row never has to infer it: the evidence was
+          // read and judged, it was not missing and it was not wrong.
+          evidenceWasRead: true,
+        },
+      }),
+    ],
+  );
+}
+
 export async function applyEnrichmentResult(
   client: QueryableClient,
   input: ApplyEnrichmentResultInput,

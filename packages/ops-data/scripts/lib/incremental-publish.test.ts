@@ -17,6 +17,15 @@ import {
 } from './incremental-publish.ts';
 import { buildReleaseEntityArtifacts } from '@repo/domain';
 
+/** Parsed host, or null for anything unparseable — never a substring test on the raw URL. */
+const hostOf = (url: string): string | null => {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
+};
+
 const baseRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublishRow => ({
   id: 'dc-black-history-sites-b10',
   lane: 'dc-sites',
@@ -435,4 +444,145 @@ test('canonicalUpsertParamsFromLandscape maps personReview livingStatus', () => 
   );
   assert.equal(params.livingStatus, 'deceased');
   assert.equal(params.kind, 'person');
+});
+
+/**
+ * repo-fbjr — the documents the sweep actually read become claims that cite them.
+ *
+ * Before this, an enriched record published citing only its registry index row: the nomination
+ * form every sentence came from appeared nowhere in the projection, so the depth gate saw no
+ * evidence beyond the index and researchCoverage counted one document for a researched record.
+ */
+test('buildReleaseSourceFromLandscape cites the evidence documents an enriched record was written from', () => {
+  const entry = buildReleaseSourceFromLandscape(
+    nrhpRow({
+      payload: {
+        refnum: '71000836',
+        listedDateSerial: '26146',
+        areaOfSignificance: 'BLACK; PERFORMING ARTS',
+        evidenceCitations: [
+          {
+            sourceUrl: 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/71000836_text',
+            title: 'National Register nomination — Example Hall',
+            sourceTier: 'tier1',
+            quote: 'the hall served as the social center of the Black community',
+          },
+          {
+            sourceUrl: 'https://en.wikipedia.org/wiki/Example_Hall',
+            title: 'Example Hall',
+            sourceTier: 'tier2',
+            quote: 'built in 1912 by a benevolent society',
+          },
+        ],
+      },
+    }),
+  );
+  assert.ok(entry);
+  // Two registry claims plus one per distinct evidence document.
+  assert.equal(entry?.claims?.length, 4);
+
+  // Selected by predicate, not host: the NRHP fixture's own canonical_url is an npgallery URL,
+  // so a host match would find the registry listing claim instead. They are different DOCUMENTS
+  // on the same host — exactly the case documentKey() exists to tell apart.
+  const nomination = entry!.claims!.find((claim) => claim.predicate === 'source states');
+  assert.ok(nomination, 'expected a claim citing the nomination form');
+  assert.equal(nomination!.object, 'the hall served as the social center of the Black community');
+  assert.equal(nomination!.confidenceLevel, 'high', 'tier1 is authoritative');
+  assert.equal(nomination!.citationLabel, 'National Register nomination — Example Hall');
+
+  // Match on the parsed host, not a substring of the URL. `includes('en.wikipedia.org')` also
+  // matches en.wikipedia.org.evil.test and any path containing the string, which is why CodeQL
+  // flags the pattern (js/incomplete-url-substring-sanitization). Harmless in a fixture-driven
+  // test, but the test should model how the host is actually identified.
+  const wiki = entry!.claims!.find(
+    (claim) =>
+      claim.citationHref !== undefined && hostOf(claim.citationHref) === 'en.wikipedia.org',
+  );
+  assert.equal(nomination!.predicate, 'source states');
+  assert.ok(wiki);
+  assert.equal(wiki!.confidenceLevel, 'medium', 'tier2 corroborates, it does not authorize');
+});
+
+test('evidence citations never duplicate a document already cited', () => {
+  const registryUrl = 'https://catalog.archives.gov/id/77843341';
+  const entry = buildReleaseSourceFromLandscape(
+    nrhpRow({
+      canonical_url: registryUrl,
+      payload: {
+        refnum: '71000836',
+        evidenceCitations: [
+          // The registry row itself, re-cited by the draft — must not become a second "document".
+          { sourceUrl: registryUrl, title: 'registry', sourceTier: 'tier1', quote: 'listed 1971' },
+          // The same nomination form twice, with url noise that must not split it in two.
+          {
+            sourceUrl: 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/71000836_text',
+            title: 'nomination',
+            sourceTier: 'tier1',
+            quote: 'first quote',
+          },
+          {
+            sourceUrl: 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/71000836_text/',
+            title: 'nomination',
+            sourceTier: 'tier1',
+            quote: 'second quote',
+          },
+        ],
+      },
+    }),
+  );
+  assert.ok(entry);
+  assert.equal(entry?.claims?.length, 3, 'two registry claims + exactly one nomination document');
+  const nominationClaims = entry!.claims!.filter((claim) =>
+    claim.citationHref?.includes('npgallery'),
+  );
+  assert.equal(nominationClaims.length, 1);
+});
+
+test('a malformed or empty evidence citation is dropped, never published as a broken link', () => {
+  const entry = buildReleaseSourceFromLandscape(
+    nrhpRow({
+      payload: {
+        refnum: '71000836',
+        evidenceCitations: [
+          { sourceUrl: 'not a url', title: 'x', sourceTier: 'tier1', quote: 'something' },
+          { sourceUrl: 'https://example.org/doc', title: 'y', sourceTier: 'tier1', quote: '   ' },
+          { sourceUrl: '', title: 'z', sourceTier: 'tier1', quote: 'something' },
+          'not an object',
+        ],
+      },
+    }),
+  );
+  assert.ok(entry);
+  assert.equal(entry?.claims?.length, 2, 'only the two registry claims survive');
+});
+
+/**
+ * The population this unblocks: a record with a real evidence-backed summary but no
+ * historicalContext paragraph. Six of the first live batch of 21 were rejected this way — the
+ * research was done, the projection just could not show it.
+ */
+test('gateLandscapePublishCandidate admits a null-context record that cites a real evidence document', () => {
+  const row = nrhpRow({
+    summary:
+      'John McKenzie, a former fugitive slave, built this Greek Revival frame house about 1847, and it became the home he shared with Harriet McKenzie in Oswego, New York.',
+    payload: {
+      refnum: '71000836',
+      evidenceCitations: [
+        {
+          sourceUrl: 'https://en.wikipedia.org/wiki/McKenzie_House',
+          title: 'McKenzie House',
+          sourceTier: 'tier2',
+          quote: 'Its owner John McKenzie was a former fugitive slave',
+        },
+      ],
+    },
+  });
+  const entry = buildReleaseSourceFromLandscape(row);
+  assert.ok(entry);
+  assert.equal(
+    entry!.historicalContext,
+    undefined,
+    'no narrative paragraph — depth must not rely on one',
+  );
+  assert.equal(assessLandscapeDepth(entry!, row).deep, true);
 });

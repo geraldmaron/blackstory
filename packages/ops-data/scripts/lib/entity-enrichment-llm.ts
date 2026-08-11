@@ -124,7 +124,17 @@ export const ENTITY_ENRICHMENT_SYSTEM_PROMPT =
   "copied verbatim from a supplied evidence document's text. Never invent dates, names, events, or " +
   'quotes not present in the evidence. If the evidence does not support a historicalContext ' +
   'paragraph beyond the summary, return null for it and an empty citations array rather than padding ' +
-  'with generic prose. Privacy: never state a street address, house number, coordinate pair, or ' +
+  'with generic prose. What an entry is FOR is significance: who the subject mattered to, what ' +
+  'happened there, which people, congregations, schools, businesses, or movements it served, and ' +
+  'why it is recognized as Black heritage. It is NOT a description of physical fabric. National ' +
+  'Register nominations spend most of their length on materials, plan, dimensions, and style; treat ' +
+  'that as background and draw on it only where the fabric carries the significance itself — a ' +
+  'building designed or built by Black architects or craftsmen, a form that records how the space ' +
+  'was actually used. Open the summary on significance, never on construction description. If the ' +
+  'supplied evidence establishes nothing about Black history beyond the bare fact of listing, write ' +
+  'only what the evidence supports and return null for historicalContext: a short honest entry is ' +
+  'correct, a padded architectural one is not. ' +
+  'Privacy: never state a street address, house number, coordinate pair, or ' +
   'other parcel-precise location in any output field — for people (living or possibly living) and ' +
   'address-restricted places this is a hard safety rule, and neighborhood- or city-level wording is ' +
   'always sufficient. Return JSON only.';
@@ -149,6 +159,8 @@ export function buildEnrichmentUserPrompt(
       })),
       rules: [
         `summary must be ${SUMMARY_MIN_CHARS}-${SUMMARY_MAX_CHARS} characters`,
+        "the summary must open on the subject's significance to Black history, not on its " +
+          'construction, materials, plan, or architectural style',
         'every citation.evidenceId must be one of the ids in the evidence array above',
         "every citation.quote must be an exact verbatim substring of that evidence id's text",
         'topicIds must only use ids from allowedTopicIds; omit if none clearly apply',

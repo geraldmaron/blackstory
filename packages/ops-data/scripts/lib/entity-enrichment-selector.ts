@@ -96,6 +96,24 @@ export function buildEnrichmentSelectorQuery(
     laneClause = `\n      AND lc.lane = ANY($${queryParams.length}::text[])`;
   }
 
+  /**
+   * Exclude entities the sweep already looked at and found nothing for, until they go stale.
+   *
+   * This is an AND, deliberately, not another OR branch: a swept-and-empty entity is by definition
+   * still missing every requested field, so an OR would be satisfied by `missingFieldClause` and
+   * the exclusion would never bite.
+   *
+   * Without it the sweep loops. The sweep records its outcome as status='skipped' + updated_at but
+   * never sets last_enriched_at (it does not enrich — WS4 does), so `ee.last_enriched_at IS NULL`
+   * stays true forever, and with ORDER BY entity_id the same lowest-id entities are re-offered on
+   * every pass. Measured 2026-08-11: the last six chunks of a 24-chunk run re-swept an identical
+   * set of 50 entities, ~100 minutes of fetching for zero new evidence.
+   */
+  const retrySkippedClause = `\n      AND NOT (
+        ee.status = 'skipped'
+        AND ee.updated_at > now() - make_interval(days => $${staleDaysParamIndex}::int)
+      )`;
+
   const sql = `
     WITH active AS (
       SELECT release_id FROM bb_public.active_release WHERE id = 'active'
@@ -107,7 +125,7 @@ export function buildEnrichmentSelectorQuery(
     LEFT JOIN bb_research.landscape_candidates lc ON lc.id = re.entity_id
     WHERE (
       ${inclusionReasons.join('\n      OR ')}
-    )${laneClause}
+    )${laneClause}${retrySkippedClause}
     ORDER BY re.entity_id
   `;
 

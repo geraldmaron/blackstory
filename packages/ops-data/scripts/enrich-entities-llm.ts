@@ -312,6 +312,27 @@ async function main(): Promise<void> {
         };
       }
       sessionAttemptErrors = attempt.validation.errors;
+
+      // A failed session answer normally falls through to the model tiers — the tier order is
+      // about where compute comes from, not about giving up early. But the mock provider does not
+      // decline to answer: it stitches fragments of the subject's own evidence into a draft that
+      // passes validation, and the run then reports it as "accepted" with nothing but the missing
+      // "session-drafted" marker to distinguish it from real work.
+      //
+      // Measured 2026-08-11: one draft of 38 cited an evidence id withdrawn by an identity audit
+      // between the dump and the run. It fell through, mock manufactured a summary opening with
+      // OCR form furniture ("Dallas County, AL 7. Architectural Classification Late Victo"), and
+      // that was queued for publication as researched history. Falling through to a real model is
+      // a routing decision; falling through to mock is fabrication.
+      if (PROVIDER_NAME === 'mock') {
+        completedCount += 1;
+        console.log(
+          `[${completedCount}/${subjects.length}] ${subject.entityId} (${subject.displayName}) ` +
+            `— SESSION DRAFT REJECTED, not substituting mock output: ` +
+            `${attempt.validation.errors.slice(0, 2).join('; ')}`,
+        );
+        return null;
+      }
     }
 
     if (cumulativeCostUsd >= SPEND_CEILING_USD) {

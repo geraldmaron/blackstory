@@ -48,7 +48,8 @@ import {
   parseNomination,
 } from './lib/evidence-collectors/nrhp-nomination.ts';
 import { redactStreetAddresses } from './lib/evidence-collectors/redact-address.ts';
-import { assessText } from './lib/evidence-collectors/text-quality.ts';
+import { checkSubjectIdentity } from './lib/evidence-collectors/subject-identity.ts';
+import { assessText, stripUnstorableCharacters } from './lib/evidence-collectors/text-quality.ts';
 import {
   WIKIPEDIA_LICENCE,
   lookupWikipediaArticle,
@@ -60,7 +61,6 @@ import {
   documentKey,
   extractReferenceLinks,
   planReferenceHops,
-  subjectTokens,
   type HopSubject,
 } from './lib/evidence-collectors/reference-hops.ts';
 import { hostLineageKey, isWikipediaHost } from './lib/tier1-sources.ts';
@@ -222,6 +222,16 @@ async function collectNomination(row: CandidateRow): Promise<EvidenceRow | null>
     throw new SkipReason(`PDF has no text layer (${bytes.length} bytes, needs OCR)`);
   }
 
+  // NPGallery answers every refnum with a real 22KB PDF. For a property whose form has not been
+  // scanned, that PDF's entire text layer is this one sentence. Left unrecognized it fell through
+  // to the "unhandled form vintage?" branch below and blamed our parser for an NPS coverage gap —
+  // the exact confusion that branch's comment claims to prevent. 42 of the 50 entities in the last
+  // sweep chunk hit this, so it is the dominant reason the backlog stops yielding, and it is not
+  // something a better parser can fix.
+  if (/has not yet been digitized/iu.test(text)) {
+    throw new SkipReason('NPS has not digitized this nomination form (no text to parse)');
+  }
+
   const parsed = parseNomination(text, row.display_name);
   if (parsed.narrative.length === 0) {
     // Distinguishable from "no document": we HAVE the form and it has text, but the section
@@ -289,7 +299,7 @@ async function collectWikipedia(row: CandidateRow): Promise<EvidenceRow | null> 
     state: row.payload.state,
   });
   if (article === null) {
-    throw new SkipReason('no enwiki article corroborating the registry place');
+    throw new SkipReason('no enwiki article clearing the identity gate (place, name, focus)');
   }
 
   const quality = assessText(article.extract);
@@ -313,6 +323,7 @@ async function collectWikipedia(row: CandidateRow): Promise<EvidenceRow | null> 
       licence: WIKIPEDIA_LICENCE,
       publisher: 'Wikipedia contributors',
       attributionRequired: true,
+      identity: article.identity,
       quarantineReason: quality.usable ? undefined : quality.reason,
     },
   };
@@ -443,7 +454,6 @@ async function collectReferenceHops(
     county: row.payload.county,
     state: row.payload.state,
   };
-  const tokens = subjectTokens(subject);
   const visited = new Set<string>(
     seeds.map((seed) => documentKey(seed.url)).filter((key): key is string => key !== null),
   );
@@ -502,9 +512,15 @@ async function collectReferenceHops(
         // gate (reference-hops.ts docs): what actually clears a fetched page for storage is the
         // same identity discipline every other collector applies — the full page text must
         // corroborate the subject, not just the anchor's 300-char context window.
-        const identityCorroborated = tokens.some((token) =>
-          hopPage.text.toLowerCase().includes(token),
-        );
+        //
+        // repo-ppeu: this used to be `tokens.some(...)`, and `tokens` folds place words in, so a
+        // page containing the word "Virginia" anywhere corroborated a Virginia house. That is how
+        // a house was given an article about a gubernatorial election. The shared gate requires
+        // place AND name AND focus, and rejects index pages outright.
+        const identity = checkSubjectIdentity(hopPage.text, subject, {
+          title: hop.candidate.anchorText,
+        });
+        const identityCorroborated = identity.corroborated;
         const evId = evidenceId(row.id, 'reference-hop', hop.candidate.url);
         const status: 'captured' | 'quarantined' =
           quality.usable && identityCorroborated ? 'captured' : 'quarantined';
@@ -525,12 +541,9 @@ async function collectReferenceHops(
             hopDepth: depth,
             referringSourceId: seed.sourceId,
             relevanceScore: hop.relevanceScore,
+            identity,
             quarantineReason:
-              status === 'quarantined'
-                ? !identityCorroborated
-                  ? 'identity not corroborated by subject text'
-                  : quality.reason
-                : undefined,
+              status === 'quarantined' ? (identity.reason ?? quality.reason) : undefined,
           },
         };
         results.push(evRow);
@@ -556,6 +569,31 @@ async function collectReferenceHops(
  * stored, not before it is published: evidence never captured cannot leak through a later bug
  * in a downstream gate.
  */
+/**
+ * Every captured row passes through here before it can be pushed, so sanitation cannot be
+ * skipped by adding a collector. Sanitation runs FIRST and recomputes the hash and char count,
+ * so the stored `content_hash`/`char_count` describe the text that was actually stored — the
+ * digest is what `selectEntitiesForEnrichment` compares to decide an entity's evidence is
+ * unchanged, so hashing pre-strip text would make a re-sweep look like new evidence forever.
+ */
+function finalizeEvidenceRow(row: CandidateRow, item: EvidenceRow): EvidenceRow {
+  const stripped = stripUnstorableCharacters(item.contentText);
+  const sanitized =
+    stripped === item.contentText
+      ? item
+      : {
+          ...item,
+          contentText: stripped,
+          contentHash: hashContent(stripped),
+          charCount: stripped.length,
+          provenance: {
+            ...item.provenance,
+            strippedControlChars: item.contentText.length - stripped.length,
+          },
+        };
+  return applyAddressRestriction(row, sanitized);
+}
+
 function applyAddressRestriction(row: CandidateRow, item: EvidenceRow): EvidenceRow {
   // Person entities get the same capture-time redaction as address-restricted properties:
   // living status is usually unknown at capture time, treatAsLiving('unknown') is true, and the
@@ -594,7 +632,7 @@ async function sweepEntity(row: CandidateRow): Promise<EntityOutcome> {
   ] as const) {
     try {
       const found = await collect(row);
-      if (found !== null) evidence.push(applyAddressRestriction(row, found));
+      if (found !== null) evidence.push(finalizeEvidenceRow(row, found));
     } catch (error) {
       // One collector declining or failing must not lose the others' results, and must not
       // abort the batch. Skips and errors are labelled differently so the run report separates
@@ -608,7 +646,7 @@ async function sweepEntity(row: CandidateRow): Promise<EntityOutcome> {
   let leads: EntityOutcome['leads'] = [];
   try {
     const hops = await collectReferenceHops(row, evidence);
-    for (const item of hops.evidence) evidence.push(applyAddressRestriction(row, item));
+    for (const item of hops.evidence) evidence.push(finalizeEvidenceRow(row, item));
     leads = hops.leads.map((lead) => ({ entityId: row.id, ...lead }));
   } catch (error) {
     const prefix = error instanceof SkipReason ? 'skip' : 'error';
@@ -803,9 +841,33 @@ async function main(): Promise<void> {
          VALUES ($1,$2,$3,$4,$5, now())
          ON CONFLICT (entity_id) DO UPDATE SET
            lane = EXCLUDED.lane,
-           status = EXCLUDED.status,
+           -- repo-n9dq: 'no-lane-significance' is terminal-until-the-evidence-changes, and the
+           -- digest is the whole mechanism. A drafter read this entity's sources and judged that
+           -- they carry no Black-history significance; re-running the sweep and finding the SAME
+           -- documents is not new information, so resetting the row to 'pending' would re-offer it
+           -- to a drafter that can only reach the same conclusion — the exact re-selection loop
+           -- that status was added to stop. A changed digest does mean new evidence, and then
+           -- EXCLUDED.status correctly reopens it.
+           status = CASE
+             WHEN entity_enrichment.status = 'no-lane-significance'
+                  AND entity_enrichment.evidence_digest IS NOT DISTINCT FROM EXCLUDED.evidence_digest
+               THEN entity_enrichment.status
+             ELSE EXCLUDED.status
+           END,
            evidence_digest = EXCLUDED.evidence_digest,
-           notes = EXCLUDED.notes,
+           -- Keep any WS4 draft that is already on the row. A re-sweep replaces this entity's
+           -- EVIDENCE, and moving the status back to 'pending' is right — new evidence means the
+           -- record wants re-drafting. Destroying the draft alongside it is not: the draft is the
+           -- only copy of WS4's output, and apply-enrichment-to-landscape reads notes.draft to
+           -- stage it. The significance-first re-sweep on 2026-08-11 wiped ~79 of them; those had
+           -- already been staged and published, so nothing reader-facing was lost, but a draft
+           -- swept before it was applied would have been unrecoverable from the database.
+           notes = EXCLUDED.notes ||
+                   CASE
+                     WHEN entity_enrichment.notes ? 'draft'
+                       THEN jsonb_build_object('draft', entity_enrichment.notes -> 'draft')
+                     ELSE '{}'::jsonb
+                   END,
            updated_at = now()`,
         [
           outcome.entityId,

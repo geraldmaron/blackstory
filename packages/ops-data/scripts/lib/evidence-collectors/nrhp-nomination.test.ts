@@ -177,6 +177,30 @@ test('parseNomination returns narrative as sections 7 and 8 joined', () => {
   assert.ok(result.narrative.includes('Second section'));
 });
 
+test('parseNomination puts SIGNIFICANCE before description in the narrative', () => {
+  // Everything downstream reads a truncated PREFIX of this string — the enrichment harness hands
+  // a model the first 4,000 characters. In section order that prefix is the building's fabric and
+  // the history is what falls off the end: measured across the captured corpus, 361 of 368
+  // nominations exceed the window and the median one loses 18,893 characters. So the order here
+  // decides whether a record gets drafted from its history or from its window sash.
+  const text =
+    'Section number 7 Page 1\nThe cornice is bracketed\n\n' +
+    'Section number 8 Page 1\nThe congregation organized in 1867';
+  const result = parseNomination(text, 'Test Property');
+  assert.ok(
+    result.narrative.indexOf('congregation organized') <
+      result.narrative.indexOf('cornice is bracketed'),
+    'section 8 (significance) must precede section 7 (description) in the joined narrative',
+  );
+  // Section 7 is still kept — it is where builders, architects and construction dates appear.
+  assert.ok(result.narrative.includes('cornice is bracketed'));
+  // The reported section list stays in section order; only the prose was reordered.
+  assert.deepEqual(
+    result.sections.map((section) => section.section),
+    ['7', '8'],
+  );
+});
+
 test('parseNomination returns empty narrative and hasSignificance false for text with no sections', () => {
   const text = 'Just some random text without any section headers';
   const result = parseNomination(text, 'Test Property');

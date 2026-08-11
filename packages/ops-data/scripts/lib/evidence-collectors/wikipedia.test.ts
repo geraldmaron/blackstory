@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  articleCorroboratesPlace,
+  articleCorroboratesSubject,
   isDisambiguationExtract,
   searchQueryFromDisplayName,
 } from './wikipedia.ts';
@@ -42,25 +42,51 @@ describe('isDisambiguationExtract', () => {
   });
 });
 
-describe('articleCorroboratesPlace rejects disambiguation pages', () => {
+describe('articleCorroboratesSubject', () => {
   it('returns false for a disambiguation page even when it happens to name the target place', () => {
     const extract =
       'Maplewood may refer to:\n\nUnited States\n\nMaplewood, Jefferson County, Alabama\nMaplewood, California\n...';
     assert.equal(
-      articleCorroboratesPlace(extract, { city: undefined, county: 'Jefferson', state: 'Alabama' }),
+      articleCorroboratesSubject(extract, 'Maplewood', {
+        displayName: 'Maplewood',
+        city: undefined,
+        county: 'Jefferson',
+        state: 'Alabama',
+      }).corroborated,
       false,
     );
   });
 
-  it('still corroborates a real article mentioning the place', () => {
-    const extract = 'The Whitelaw Hotel is a historic building in Washington, D.C.';
+  it('corroborates a real article about the subject in the right place', () => {
+    const extract =
+      'The Whitelaw Hotel is a historic building in Washington, D.C. Built in 1919 by John ' +
+      'Whitelaw Lewis, the Whitelaw was the first luxury hotel in the city built for and by ' +
+      'African Americans.';
     assert.equal(
-      articleCorroboratesPlace(extract, {
+      articleCorroboratesSubject(extract, 'Whitelaw Hotel', {
+        displayName: 'Whitelaw Hotel',
         city: 'Washington',
         county: undefined,
-        state: undefined,
-      }),
+        state: 'District of Columbia',
+      }).corroborated,
       true,
+    );
+  });
+
+  // repo-ppeu, the case that named the bead: search returns the same city name in a different
+  // state, and the article corroborates "Covington" perfectly.
+  it('refuses the same city name in the wrong state', () => {
+    const extract =
+      'Covington is a home rule-class city in Kenton County, Kentucky, United States, at the ' +
+      'confluence of the Ohio and Licking rivers.';
+    assert.equal(
+      articleCorroboratesSubject(extract, 'Covington, Kentucky', {
+        displayName: 'First Baptist Church',
+        city: 'Covington',
+        county: 'Alleghany',
+        state: 'Virginia',
+      }).corroborated,
+      false,
     );
   });
 });
