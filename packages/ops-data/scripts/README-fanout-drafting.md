@@ -79,6 +79,31 @@ From the repo root, with `set -a && source apps/web/.env.local && set +a` and
      packages/ops-data/scripts/session-enrich-apply.ts --answers-file=<dir>/answers.jsonl
    ```
 
+6. **Stage onto the landscape row — do not skip this** (repo-63ka). Applying a draft writes only
+   to `bb_research.entity_enrichment`; the publisher reads `bb_research.landscape_candidates`.
+   Nothing bridges them automatically, and skipping the bridge fails *silently and misleadingly* —
+   the publisher evaluates the stale row and reports `template_only: summary carries a
+   generated-template signature`, which reads exactly like the drafter never ran.
+
+   ```
+   DRY_RUN=0 APPLY_ENRICHMENT_TO_LANDSCAPE_APPLY=1 \
+     node --conditions development --import tsx \
+     packages/ops-data/scripts/apply-enrichment-to-landscape.ts --entity-ids=<ids>
+   ```
+
+7. **Publish.** Dry-run first and read the skip counts; `template_only` should be zero for
+   anything you just staged.
+
+   ```
+   DRY_RUN=0 INCREMENTAL_PUBLISH_APPLY=1 \
+     node --conditions development --import tsx \
+     packages/ops-data/scripts/publish-release-entities-incremental.ts \
+     --lane=nrhp-black-heritage --republish
+   ```
+
+   Expect some drafted records not to publish. Two gates legitimately hold them back and neither
+   is a drafting problem: `confidence_below_floor` (repo-60zx) and `name_overlap` (repo-n7p6.10).
+
 ## Two things that will bite
 
 **Agents write to the scratchpad, never the repo.** Concurrent agents sharing one git working tree
@@ -89,8 +114,12 @@ there is no shared index to corrupt and no worktree isolation to set up.
 identity-verified evidence containing no Black-history significance at all — a purely architectural
 nomination, or a Catholic cemetery nomination about Irish and German immigrant communities. Two
 independent drafters refused the same subject for the same reason. Those entities currently stay
-`pending` and will be re-offered on every future pass; repo-y7hd tracks giving them a terminal
+`pending` and will be re-offered on every future pass; repo-n9dq tracks giving them a terminal
 state.
 
-This lane runs ~15% refusal. Budget for it, and treat a batch with a 0% refusal rate as a signal
-that the drafters are padding rather than as a good run.
+The refusal rate CLIMBS as you work down the backlog, because batches are ordered by evidence
+volume and the tail is thinner: wave 1 refused 5 of 40 (12.5%), wave 2 refused 14 of 40 (35%).
+Wave 2 was full of plantation and rural districts whose nominations are about white founding
+families or colonial archaeology, with Black history as one incidental clause. Do not plan capacity
+off the first wave, and treat a batch with a 0% refusal rate as a signal that the drafters are
+padding rather than as a good run.

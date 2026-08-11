@@ -15,7 +15,7 @@
  *
  * REFUSALS ARE NOT FAILURES. A subject whose captured evidence carries no Black-history
  * significance should be refused, not padded to reach the 120-char summary floor. Those are
- * reported and written to a separate file for triage — see repo-y7hd, which is about the ledger
+ * reported and written to a separate file for triage — see repo-n9dq, which is about the ledger
  * having no terminal state to record them in. Until that lands, a refused subject stays 'pending'
  * and will be re-offered on the next pass.
  *
