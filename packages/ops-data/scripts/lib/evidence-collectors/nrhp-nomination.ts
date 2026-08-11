@@ -26,9 +26,30 @@
 
 import { checkPlaceIdentity, significantNameTokens } from './subject-identity.ts';
 
-/** Sections whose continuation-sheet prose is worth capturing, in output order. */
+/** Sections whose continuation-sheet prose is worth capturing. */
 export const CAPTURED_SECTIONS = ['7', '8'] as const;
 export type CapturedSection = (typeof CAPTURED_SECTIONS)[number];
+
+/**
+ * The order the captured sections are JOINED into `narrative` — significance FIRST.
+ *
+ * This is not cosmetic. Everything downstream reads a truncated prefix of this text: the
+ * enrichment harness gives a model the first 4,000 characters of each source
+ * (MAX_CHARS_PER_SOURCE). Joined in section order, that prefix is section 7 — the physical
+ * description of the building's fabric — and section 8, the statement of significance, is the
+ * part that gets cut.
+ *
+ * Measured 2026-08-11 across the captured corpus: 361 of 368 nominations exceed the window, all
+ * 288 that carry both sections are truncated, and the median nomination loses 18,893 characters
+ * (max 415,762). So essentially every record was being drafted from cornice profiles and window
+ * sash while the history sat just past the cutoff. It is exactly what the drafters kept reporting
+ * as "the nomination excerpt is purely architectural" — including for a district in Neshoba
+ * County, Mississippi.
+ *
+ * Section 7 still follows, because it is where builders, architects and construction dates
+ * appear. It is simply no longer what a reader of the first 4,000 characters gets.
+ */
+export const NARRATIVE_SECTION_ORDER = ['8', '7'] as const;
 
 export type NominationSection = {
   readonly section: string;
@@ -280,7 +301,13 @@ export function parseNomination(rawText: string, displayName: string): ParsedNom
     }
   }
 
-  const narrative = captured
+  // Significance first — see NARRATIVE_SECTION_ORDER. `captured` is in section order because
+  // that is what `pick` produces and what `sectionsFound` reports; only the joined prose is
+  // reordered, so nothing else downstream changes meaning.
+  const narrative = NARRATIVE_SECTION_ORDER.map((wanted) =>
+    captured.find((section) => section.section === wanted),
+  )
+    .filter((section): section is NominationSection => section !== undefined)
     .map((section) => dropRepeatedPropertyHeader(section.text, displayName))
     .filter((text) => text.length > 0)
     .join('\n\n');
