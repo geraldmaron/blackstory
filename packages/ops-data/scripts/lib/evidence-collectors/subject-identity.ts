@@ -82,6 +82,20 @@ const GENERIC_NAME_TOKENS = new Set([
   'theater',
   'college',
   'university',
+  // Administrative-geography words. These are the residue the place-independence rule was built to
+  // remove and did not catch: "Leon County Health Unit Building" keeps the token "county" once the
+  // place word "leon" is stripped, and every page on a county government site says "county" a
+  // hundred times, so focus was satisfied by a word that identifies nothing. Same shape for "Town
+  // of Surry Historic District", where "town" survived and "surry" (the county) did not.
+  'county',
+  'town',
+  'township',
+  'city',
+  'village',
+  'borough',
+  'parish',
+  'area',
+  'region',
   'the',
   'and',
   'for',

@@ -264,6 +264,62 @@ describe('a name that is only its own location cannot corroborate a document', (
   });
 });
 
+describe('administrative-geography words cannot carry identity either', () => {
+  // Both survived the first version of the place-independence rule and reached a drafter, who
+  // refused them (round 3, 2026-08-11). The place word is stripped and an equally empty
+  // administrative word is left behind to satisfy the focus test.
+  it('refuses a county article matched to a building named for that county', () => {
+    const identity = checkSubjectIdentity(
+      'Leon County is a county located in the Florida Panhandle. As of the 2020 census the ' +
+        'population was 292,198. The county seat is Tallahassee. Leon County was created in 1824.',
+      {
+        displayName: 'Leon County Health Unit Building',
+        city: 'Tallahassee',
+        county: 'Leon',
+        state: 'Florida',
+      },
+      { title: 'Leon County, Florida' },
+    );
+    // Which gate catches it depends on the document — the live evidence for this entity was
+    // refused by three different ones (place, name, focus) across seven documents. The contract
+    // under test is that none of them get through, not which rule does the work.
+    assert.equal(identity.corroborated, false);
+    assert.notEqual(identity.reason, undefined);
+  });
+
+  it('refuses a county government page matched to a town historic district', () => {
+    const identity = checkSubjectIdentity(
+      'Surry County, Virginia government. The county administrator’s office serves residents of ' +
+        'the county. Surry County and the Town of Dendron signed an economic development MOU.',
+      {
+        displayName: 'Town of Surry Historic District',
+        city: 'Surry',
+        county: 'Surry',
+        state: 'Virginia',
+      },
+      { title: 'Surry County, Virginia' },
+    );
+    assert.equal(identity.corroborated, false);
+  });
+
+  it('keeps a county-named property that has a real word of its own', () => {
+    const identity = checkSubjectIdentity(
+      'The Warren County Training School served Black students in Warrenton, Warren County, ' +
+        'North Carolina, from 1925. The training school was one of the Rosenwald schools built ' +
+        'across the county, and its graduates staffed classrooms throughout the region.',
+      {
+        displayName: 'Warren County Training School',
+        city: 'Warrenton',
+        county: 'Warren',
+        state: 'North Carolina',
+      },
+      { title: 'Warren County Training School' },
+    );
+    assert.deepEqual(identity.distinctiveTokens, ['training']);
+    assert.equal(identity.corroborated, true);
+  });
+});
+
 describe('checkPlaceIdentity', () => {
   it('requires state AND locality when the roster has both', () => {
     const expected = { displayName: 'X', city: 'Covington', state: 'Virginia' };
