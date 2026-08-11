@@ -251,8 +251,19 @@ async function main(): Promise<void> {
           row.entity_id,
           summary,
           JSON.stringify({
+            // An explicit null means the drafter READ the evidence and judged it insufficient for
+            // narrative — a different statement from "this draft has nothing to say about the
+            // field". Both used to serialize away to undefined, which JSON.stringify drops, so
+            // `payload || ...` left the previous prose standing and a re-draft could never
+            // retract. Found on Killearn Plantation (2026-08-11): a drafter with three times the
+            // evidence set historicalContext to null, and the record kept narrative written from
+            // the old truncated excerpt. Null now clears the field; absent still leaves it alone.
             historicalContext:
-              typeof draft.historicalContext === 'string' ? draft.historicalContext : undefined,
+              draft.historicalContext === null
+                ? ''
+                : typeof draft.historicalContext === 'string'
+                  ? draft.historicalContext
+                  : undefined,
             topicIds: Array.isArray(draft.topicIds) ? draft.topicIds : undefined,
             eraBuckets: Array.isArray(draft.eraBuckets) ? draft.eraBuckets : undefined,
             keywords: Array.isArray(draft.keywords) ? draft.keywords : undefined,
