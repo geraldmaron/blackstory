@@ -150,9 +150,19 @@ async function main(): Promise<void> {
   // whose evidence has since been quarantined as mis-attached (repo-pjob) has nothing left to have
   // been judged, so recording it terminal would close a record that was never actually researched.
   // fetchEnrichmentSubjects reports exactly that condition, so the guard is free.
+  //
+  // The second half of that guard is the drafter's own verdict. A mis-attachment the audits have
+  // not caught yet still has its evidence attached and so passes the check above — repo-nlcq is a
+  // measured example, an entity named after its own county whose county article defeats both
+  // automated layers. The human-in-the-loop drafter that read the document IS the detector in
+  // that case, so an explicit MIS-ATTACHED verdict has to be honoured here or the terminal status
+  // silently closes exactly the records it was designed to protect.
+  const isMisattachedVerdict = (reason: string): boolean => /^\s*MIS-ATTACHED\b/iu.test(reason);
   const noEvidence = new Set(skippedNoEvidence);
-  const recordable = refusals.filter((refusal) => !noEvidence.has(refusal.entityId));
-  const unrecordable = refusals.filter((refusal) => noEvidence.has(refusal.entityId));
+  const blocked = (refusal: Refusal): boolean =>
+    noEvidence.has(refusal.entityId) || isMisattachedVerdict(refusal.reason);
+  const recordable = refusals.filter((refusal) => !blocked(refusal));
+  const unrecordable = refusals.filter(blocked);
   if (refusals.length > 0) {
     console.log(`\nRefusals: ${refusals.length}`);
     for (const refusal of recordable) {
@@ -164,11 +174,16 @@ async function main(): Promise<void> {
     }
     if (unrecordable.length > 0) {
       console.log(
-        `  NOT recorded (${unrecordable.length}): evidence is gone or was quarantined as ` +
-          `mis-attached, so there is nothing to have judged — these are re-sweep candidates, ` +
-          `not settled records (repo-pjob):`,
+        `  NOT recorded (${unrecordable.length}): the evidence was mis-attached or is already ` +
+          `gone, so there is nothing to have judged — these are re-sweep candidates, not settled ` +
+          `records (repo-pjob, repo-nlcq):`,
       );
-      for (const refusal of unrecordable) console.log(`    ${refusal.entityId}`);
+      for (const refusal of unrecordable) {
+        const why = isMisattachedVerdict(refusal.reason)
+          ? 'drafter flagged MIS-ATTACHED'
+          : 'no captured evidence remains';
+        console.log(`    ${refusal.entityId} — ${why}`);
+      }
     }
   }
 
