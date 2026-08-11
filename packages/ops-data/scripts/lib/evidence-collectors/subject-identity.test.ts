@@ -3,7 +3,11 @@ import assert from 'node:assert/strict';
 import {
   checkPlaceIdentity,
   checkSubjectIdentity,
+  containsWholeWord,
+  countWholeWord,
+  foldPunctuation,
   isIndexDocument,
+  nameTokensCooccur,
   significantNameTokens,
 } from './subject-identity.ts';
 
@@ -369,5 +373,118 @@ describe('significantNameTokens', () => {
 
   it('keeps denominational and personal words that actually identify', () => {
     assert.deepEqual(significantNameTokens('First Baptist Church'), ['first', 'baptist']);
+  });
+});
+
+/**
+ * repo-u84y. Same convention as the repo-ppeu cases above: every negative below is written from a
+ * document that was really attached to that entity and really passed the old gate, because a
+ * synthetic "obviously wrong" fixture would have passed the old code too and so proves nothing.
+ */
+describe('countWholeWord / containsWholeWord (repo-u84y defect 1: substring matching)', () => {
+  it('does not let "quarters" match "headquarters"', () => {
+    const folded = foldPunctuation('the seat of many global and european corporate headquarters');
+    assert.equal(countWholeWord(folded, 'quarters'), 0);
+    assert.equal(containsWholeWord(folded, 'quarters'), false);
+  });
+
+  it('does not let "catholic" match "catholicism"', () => {
+    const folded = foldPunctuation('religions such as islam protestantism catholicism and spiritualism');
+    assert.equal(containsWholeWord(folded, 'catholic'), false);
+  });
+
+  it('still counts genuine repeats, including adjacent ones', () => {
+    const folded = foldPunctuation('Hogan Hogan and Hogan, attorneys');
+    assert.equal(countWholeWord(folded, 'hogan'), 3);
+  });
+});
+
+describe('nameTokensCooccur (repo-u84y defect 2: a name is a phrase, not a bag of words)', () => {
+  it('rejects a roster carrying the name’s words far apart', () => {
+    // The shape of "African American officeholders ... until before 1900", which supplied 61
+    // instances of "thomas" and 17 of "isaac" — all different people.
+    const folded = foldPunctuation(
+      'Isaac Burton served in the South Carolina House. ' +
+        'A long stretch of unrelated roster text separates these entries, listing legislators from ' +
+        'several states across two decades of Reconstruction government and the years after it. ' +
+        'Thomas Walker represented Alabama in the state assembly.',
+    );
+    assert.equal(nameTokensCooccur(folded, ['keys', 'thomas', 'isaac']), false);
+  });
+
+  it('accepts a document that writes the name as a name', () => {
+    const folded = foldPunctuation('The Keys, Thomas Isaac, House is a historic home in Pearlington.');
+    assert.equal(nameTokensCooccur(folded, ['keys', 'thomas', 'isaac']), true);
+  });
+
+  it('does not require every component to be present', () => {
+    // Measured false negative from a first version of this rule: the NPS biography of Wharlest
+    // Jackson is real evidence for "Jackson, Wharlest and Exerlena, House" and never names the wife.
+    const folded = foldPunctuation('Wharlest Jackson was a civil rights activist murdered in 1967.');
+    assert.equal(nameTokensCooccur(folded, ['jackson', 'wharlest', 'exerlena']), true);
+  });
+
+  it('needs at least two present tokens to say anything', () => {
+    const folded = foldPunctuation('Jackson is a common surname.');
+    assert.equal(nameTokensCooccur(folded, ['jackson', 'wharlest', 'exerlena']), false);
+  });
+});
+
+describe('checkSubjectIdentity rejects the measured repo-u84y mismatches', () => {
+  it('rejects an article about Frankfurt, Germany as evidence for Hogan Quarters', () => {
+    const identity = checkSubjectIdentity(
+      'Frankfurt am Main, usually shortened to Frankfurt, is the most populous city in the German ' +
+        'state of Hesse. It is the seat of many global and european corporate headquarters due to ' +
+        'its central location. Law firms including Hogan Lovells, Jones Day and Latham Watkins ' +
+        'maintain offices in the city, which lies on the Main river in Mississippi-like lowlands.',
+      { displayName: 'Hogan Quarters', city: 'Pearlington', state: 'Mississippi' },
+      { title: 'Frankfurt' },
+    );
+    // Rejected on place here; the live row also matched place and was then rejected on the name
+    // rule, which the next case covers with place deliberately satisfied.
+    assert.equal(identity.corroborated, false);
+  });
+
+  it('rejects a roster of officeholders even when place agrees, because the name never appears', () => {
+    const identity = checkSubjectIdentity(
+      'African American officeholders from the end of the Civil War until before 1900. ' +
+        'Isaac Burton served in the South Carolina House during Reconstruction. ' +
+        'A long stretch of unrelated roster entries separates these names, covering legislators ' +
+        'from Mississippi, Hancock County and many other states across two decades of ' +
+        'Reconstruction government and the years that followed it in Pearlington and elsewhere. ' +
+        'Thomas Walker represented Alabama in the state assembly.',
+      {
+        displayName: 'Keys, Thomas Isaac, House',
+        city: 'Pearlington',
+        county: 'Hancock',
+        state: 'Mississippi',
+      },
+      { title: 'African American officeholders from the end of the Civil War until before 1900' },
+    );
+    assert.equal(identity.placeCorroborated, true);
+    assert.equal(identity.corroborated, false);
+    assert.match(identity.reason ?? '', /never together as a name/u);
+  });
+
+  it('rejects a disability-rights timeline whose only hit is the Hosanna-Tabor case', () => {
+    const identity = checkSubjectIdentity(
+      'This disability rights timeline lists events relating to the civil rights of people with ' +
+        'disabilities in the United States. In 2012 in Hosanna Tabor the Supreme Court faced the ' +
+        'ministerial exception. Maryland courts had considered the question earlier.',
+      { displayName: 'Hosanna Church and Cemetery', city: 'Darlington', state: 'Maryland' },
+      { title: 'Timeline of disability rights in the United States' },
+    );
+    assert.equal(identity.corroborated, false);
+  });
+
+  it('still accepts a document that is genuinely about the subject', () => {
+    const identity = checkSubjectIdentity(
+      'The Okmulgee Colored Hospital opened in 1924 and served African American patients in ' +
+        'Okmulgee, Oklahoma until 1956. The Okmulgee Colored Hospital was one of few such ' +
+        'institutions in the state, and the hospital trained nurses locally.',
+      { displayName: 'Okmulgee Colored Hospital', city: 'Okmulgee', state: 'Oklahoma' },
+      { title: 'Okmulgee Colored Hospital' },
+    );
+    assert.equal(identity.corroborated, true);
   });
 });

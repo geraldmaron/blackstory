@@ -128,6 +128,108 @@ export function foldPunctuation(text: string): string {
 }
 
 /**
+ * Whole-word occurrences of a token in punctuation-folded text.
+ *
+ * repo-u84y: every name test here used `haystack.includes(token)`, which is a SUBSTRING scan, and
+ * substring matching manufactured corroboration on real rows. "Hogan Quarters" scored 45 hits for
+ * the token "quarters" inside an encyclopedia article about Frankfurt, Germany — all 45 were
+ * head-QUARTERS. "Our Lady of Victory" scored "catholic" three times inside catholiCISM. Since
+ * MIN_FOCUS_MENTIONS is 3, substring inflation alone was enough to satisfy the focus test.
+ *
+ * `foldPunctuation` collapses punctuation to single spaces and keeps word boundaries intact, so
+ * padding both sides of the needle is a sufficient whole-word test on its output.
+ */
+export function countWholeWord(foldedHaystack: string, token: string): number {
+  if (token.length === 0) return 0;
+  const padded = ` ${foldedHaystack} `;
+  const needle = ` ${token} `;
+  let count = 0;
+  let index = padded.indexOf(needle);
+  while (index !== -1) {
+    count += 1;
+    // Advance by 1, not by needle.length: consecutive occurrences share the delimiting space.
+    index = padded.indexOf(needle, index + 1);
+  }
+  return count;
+}
+
+/** Whole-word presence. See `countWholeWord` for why substring matching is not usable here. */
+export function containsWholeWord(foldedHaystack: string, token: string): boolean {
+  return countWholeWord(foldedHaystack, token) > 0;
+}
+
+/**
+ * How close the row's distinctive name tokens must sit before they read as the NAME rather than as
+ * unrelated words that happen to share a page.
+ *
+ * Sized to hold a long inverted roster name once punctuation is folded — "Lyons, Sidney and Mary,
+ * House and Commercial Historic District" is 62 characters of distinctive tokens end to end — with
+ * room for a document to write the same name in a different order or with a middle initial.
+ *
+ * Backtested at 60, 80 and 120 over the lane's captured evidence. Tightening buys almost nothing
+ * (known-bad rejection 41.1% -> 44.6%) and costs entities that lose their last document, so the
+ * loosest value wins. Two known mismatches survive at EVERY window — an encyclopedia roster of
+ * African American officeholders standing in for "Keys, Thomas Isaac, House" and "William and Mary
+ * McGee House" — because that roster really does contain a different Thomas Keys and a different
+ * William McGee, written close together. No proximity rule can separate those; the title test in
+ * audit-evidence-subject-match.ts is the layer that does.
+ */
+export const NAME_COOCCURRENCE_WINDOW_CHARS = 120;
+
+/**
+ * Do the row's distinctive tokens appear TOGETHER anywhere in the document?
+ *
+ * repo-u84y's second defect: the gate scored each name token against the whole document
+ * independently, so a name was a bag of words rather than a phrase. "Keys, Thomas Isaac, House"
+ * was corroborated by an encyclopedia roster of African American officeholders because that roster
+ * contains "thomas" 61 times and "isaac" 17 times — hundreds of DIFFERENT people. Nothing required
+ * the words to be the same person, in the same sentence, ever.
+ *
+ * Any document genuinely about the subject writes its name somewhere. Requiring one co-occurrence
+ * inside a window is the cheapest test that distinguishes "names the subject" from "contains the
+ * subject's words".
+ *
+ * Two deliberate looseneses, both measured rather than guessed. A first version demanded that EVERY
+ * distinctive token co-occur and it cost 10% of the evidence behind already-drafted records: a
+ * roster name carries components the source has no reason to repeat, so the NPS biography of
+ * Wharlest Jackson was refused as evidence for "Jackson, Wharlest and Exerlena, House" over the
+ * wife's name, and the Wade Hampton III article was refused for "Wade Hampton State Office
+ * Building". So:
+ *
+ *   1. Only tokens actually PRESENT in the document take part. An absent component cannot be
+ *      evidence of anything; `nameCorroborated` upstream already requires a majority to be present
+ *      at all, which is where an entirely wrong name is caught.
+ *   2. The anchor is the RAREST present token — the most identifying word — and it needs one other
+ *      present token beside it, not all of them. Anchoring on the rarest is what stops a common
+ *      word like "thomas" from driving the search and finding itself.
+ *
+ * Single-token names cannot be tested this way and fall back to the focus rule.
+ */
+export function nameTokensCooccur(
+  foldedHaystack: string,
+  distinctiveTokens: readonly string[],
+): boolean {
+  if (distinctiveTokens.length < 2) return false;
+
+  const present = distinctiveTokens
+    .map((token) => ({ token, n: countWholeWord(foldedHaystack, token) }))
+    .filter((entry) => entry.n > 0);
+  if (present.length < 2) return false;
+
+  const anchor = present.reduce((a, b) => (b.n < a.n ? b : a)).token;
+  const others = present.map((entry) => entry.token).filter((token) => token !== anchor);
+
+  const padded = ` ${foldedHaystack} `;
+  const needle = ` ${anchor} `;
+  for (let at = padded.indexOf(needle); at !== -1; at = padded.indexOf(needle, at + 1)) {
+    const from = Math.max(0, at - NAME_COOCCURRENCE_WINDOW_CHARS);
+    const window = padded.slice(from, at + needle.length + NAME_COOCCURRENCE_WINDOW_CHARS);
+    if (others.some((token) => containsWholeWord(window.trim(), token))) return true;
+  }
+  return false;
+}
+
+/**
  * Roster names are inverted for filing ("Jude, George, House"); compare on the bare tokens. Run
  * the document through `foldPunctuation` too, or these will not match it.
  */
@@ -366,7 +468,7 @@ export function checkSubjectIdentity(
       : 'subject';
 
   const nameTokens = significantNameTokens(expected.displayName);
-  const nameHits = nameTokens.filter((token) => haystack.includes(token)).length;
+  const nameHits = nameTokens.filter((token) => containsWholeWord(haystack, token)).length;
   // Majority of distinctive name tokens present. A document genuinely about the subject names it
   // repeatedly, so a real match is never marginal.
   const nameCorroborated = nameTokens.length > 0 && nameHits / nameTokens.length >= 0.5;
@@ -388,10 +490,22 @@ export function checkSubjectIdentity(
   // Focus is measured on the token most specific to this subject — the longest DISTINCTIVE one —
   // rather than on any token, so that neither a place word nor a common surname carried by an
   // unrelated article can supply it.
+  //
+  // repo-u84y: "longest distinctive token" is still one word, and one word is not a name. It chose
+  // "thomas" for "Keys, Thomas Isaac, House" and "quarters" for "Hogan Quarters", both of which a
+  // large unrelated document supplies for free. So a multi-token name must additionally appear as
+  // a NAME — its tokens together, once, inside a window — before the document counts as being
+  // about the subject. Single-token names have no such test available and keep the old rule; they
+  // are already the weakest case, which is what `distinctiveTokens.length === 0` and the
+  // place-independence rule above exist to bound.
   const focusToken = [...distinctiveTokens].sort((a, b) => b.length - a.length)[0];
-  const mentions = focusToken === undefined ? 0 : haystack.split(focusToken).length - 1;
-  const focusCorroborated =
-    focusToken !== undefined && (lead.includes(focusToken) || mentions >= MIN_FOCUS_MENTIONS);
+  const mentions = focusToken === undefined ? 0 : countWholeWord(haystack, focusToken);
+  const tokenFocus =
+    focusToken !== undefined &&
+    (containsWholeWord(lead, focusToken) || mentions >= MIN_FOCUS_MENTIONS);
+  const nameAppearsAsAName =
+    distinctiveTokens.length < 2 || nameTokensCooccur(haystack, distinctiveTokens);
+  const focusCorroborated = tokenFocus && nameAppearsAsAName;
 
   // A row with no place on it (person-kind rows, chiefly) is carried by name and focus alone.
   // That is weaker, and it is also the only signal that exists — refusing every such document
@@ -405,9 +519,13 @@ export function checkSubjectIdentity(
           ? `identity not corroborated by name (${nameHits}/${nameTokens.length} distinctive tokens)`
           : distinctiveTokens.length === 0
             ? 'name carries no identity independent of its place'
-            : !focusCorroborated
-              ? 'document mentions the subject but is not about it'
-              : undefined;
+            : !nameAppearsAsAName
+              ? // Distinct from the focus failure below, and the more useful message: it says the
+                // document never writes the name at all, only scatters its words.
+                "document contains the name's words separately but never together as a name"
+              : !focusCorroborated
+                ? 'document mentions the subject but is not about it'
+                : undefined;
 
   return {
     ...place,
