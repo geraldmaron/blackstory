@@ -17,6 +17,15 @@ import {
 } from './incremental-publish.ts';
 import { buildReleaseEntityArtifacts } from '@repo/domain';
 
+/** Parsed host, or null for anything unparseable — never a substring test on the raw URL. */
+const hostOf = (url: string): string | null => {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
+};
+
 const baseRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublishRow => ({
   id: 'dc-black-history-sites-b10',
   lane: 'dc-sites',
@@ -481,7 +490,14 @@ test('buildReleaseSourceFromLandscape cites the evidence documents an enriched r
   assert.equal(nomination!.confidenceLevel, 'high', 'tier1 is authoritative');
   assert.equal(nomination!.citationLabel, 'National Register nomination — Example Hall');
 
-  const wiki = entry!.claims!.find((claim) => claim.citationHref?.includes('en.wikipedia.org'));
+  // Match on the parsed host, not a substring of the URL. `includes('en.wikipedia.org')` also
+  // matches en.wikipedia.org.evil.test and any path containing the string, which is why CodeQL
+  // flags the pattern (js/incomplete-url-substring-sanitization). Harmless in a fixture-driven
+  // test, but the test should model how the host is actually identified.
+  const wiki = entry!.claims!.find(
+    (claim) =>
+      claim.citationHref !== undefined && hostOf(claim.citationHref) === 'en.wikipedia.org',
+  );
   assert.equal(nomination!.predicate, 'source states');
   assert.ok(wiki);
   assert.equal(wiki!.confidenceLevel, 'medium', 'tier2 corroborates, it does not authorize');
