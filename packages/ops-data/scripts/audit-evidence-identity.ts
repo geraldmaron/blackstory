@@ -210,8 +210,30 @@ async function main(): Promise<void> {
         ],
       );
     }
+    // Reconcile the ledger for entities this pass emptied. Their row still says 'pending', which
+    // in this ledger means "evidence is in hand, WS4 has not drafted from it yet" — no longer true
+    // once the last captured document is withdrawn, and `dump-enrichment-subjects` would keep
+    // offering them as draftable subjects with nothing to draft from.
+    //
+    // Scoped to entities that have evidence rows, i.e. ones the sweep actually visited. Most
+    // 'pending' rows in this ledger (2,333 of 2,894 on 2026-08-11) were seeded before any sweep
+    // ran and have no evidence rows at all; sweeping them in here would mark them 'skipped' and
+    // hide them from the selector for a full staleDays window, which is the opposite of the truth.
+    const reconciled = await client.query(
+      `UPDATE bb_research.entity_enrichment ee
+          SET status = 'skipped',
+              notes = COALESCE(ee.notes, '{}'::jsonb)
+                      || jsonb_build_object('reason', 'evidence withdrawn by identity audit'),
+              updated_at = now()
+        WHERE ee.status = 'pending'
+          AND EXISTS (SELECT 1 FROM bb_research.entity_evidence e WHERE e.entity_id = ee.entity_id)
+          AND NOT EXISTS (
+                SELECT 1 FROM bb_research.entity_evidence e
+                 WHERE e.entity_id = ee.entity_id AND e.status = 'captured')`,
+    );
     await client.query('COMMIT');
     console.log(`\nApplied: ${failures.length} row(s) moved captured -> quarantined.`);
+    console.log(`Ledger reconciled: ${reconciled.rowCount ?? 0} entit(ies) pending -> skipped.`);
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
     throw error;
