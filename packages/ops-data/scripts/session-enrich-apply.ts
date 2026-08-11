@@ -104,10 +104,10 @@ async function main(): Promise<void> {
   if (!databaseUrl) throw new Error('DATABASE_URL is required (source apps/web/.env.local)');
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
 
-  const { subjects, skippedNoEvidence } = await fetchEnrichmentSubjects(
-    pool,
-    [...answers.map((answer) => answer.entityId), ...refusals.map((refusal) => refusal.entityId)],
-  );
+  const { subjects, skippedNoEvidence } = await fetchEnrichmentSubjects(pool, [
+    ...answers.map((answer) => answer.entityId),
+    ...refusals.map((refusal) => refusal.entityId),
+  ]);
   const subjectById = new Map(subjects.map((subject) => [subject.entityId, subject]));
   if (skippedNoEvidence.length > 0) {
     console.log(

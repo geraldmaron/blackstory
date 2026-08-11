@@ -366,7 +366,10 @@ export type PlaceIdentity = {
  * no state, any locality agreement is all that is available; when it gave no locality, the state
  * alone has to do. The AND is the whole point: "Covington" alone matched Covington, Kentucky.
  */
-export function checkPlaceIdentity(documentText: string, expected: SubjectExpectation): PlaceIdentity {
+export function checkPlaceIdentity(
+  documentText: string,
+  expected: SubjectExpectation,
+): PlaceIdentity {
   const haystack = documentText.toLowerCase();
   const packed = normalizePlace(documentText);
   const present = (value: string | undefined): boolean => {

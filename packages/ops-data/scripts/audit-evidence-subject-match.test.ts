@@ -50,7 +50,10 @@ describe('placeWordsOf (repo-nlcq)', () => {
   });
 
   it('tolerates missing fields', () => {
-    assert.equal(placeWordsOf({ city: null, county: null, state: 'Virginia' }).has('virginia'), true);
+    assert.equal(
+      placeWordsOf({ city: null, county: null, state: 'Virginia' }).has('virginia'),
+      true,
+    );
   });
 });
 
@@ -69,8 +72,9 @@ describe('titleNamesSubject with place words removed (repo-nlcq)', () => {
   });
 
   it('rejects it once the row’s own place words are removed', () => {
-    const tokens = distinctiveTokens('Caswell County Training School')
-      .filter((token) => !placeWordsOf(caswell).has(token));
+    const tokens = distinctiveTokens('Caswell County Training School').filter(
+      (token) => !placeWordsOf(caswell).has(token),
+    );
     assert.deepEqual(tokens, ['training']);
     assert.equal(titleNamesSubject('Caswell County, North Carolina', tokens), false);
   });
@@ -83,7 +87,10 @@ describe('titleCarriesWholeName (repo-nlcq false positive)', () => {
    * document titled "Abbeville Colored School" — as right as a document can be.
    */
   it('accepts a title that carries the entity’s whole name', () => {
-    assert.equal(titleCarriesWholeName('Abbeville Colored School', 'Abbeville Colored School'), true);
+    assert.equal(
+      titleCarriesWholeName('Abbeville Colored School', 'Abbeville Colored School'),
+      true,
+    );
   });
 
   it('is order-insensitive, because roster names are inverted for filing', () => {
@@ -98,7 +105,10 @@ describe('titleCarriesWholeName (repo-nlcq false positive)', () => {
   });
 
   it('requires every name word, not merely an overlap', () => {
-    assert.equal(titleCarriesWholeName('Abbeville, Mississippi', 'Abbeville Colored School'), false);
+    assert.equal(
+      titleCarriesWholeName('Abbeville, Mississippi', 'Abbeville Colored School'),
+      false,
+    );
   });
 
   it('treats a null title as no evidence', () => {

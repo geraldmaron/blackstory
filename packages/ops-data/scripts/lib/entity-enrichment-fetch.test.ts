@@ -25,7 +25,10 @@ function row(id: string, tier: 'tier1' | 'tier2', length: number) {
 }
 
 test('a tier1 nomination gets the larger window, a tier2 stub does not', () => {
-  const evidence = selectEvidenceForModel([row('nom', 'tier1', 60_000), row('wiki', 'tier2', 9_000)]);
+  const evidence = selectEvidenceForModel([
+    row('nom', 'tier1', 60_000),
+    row('wiki', 'tier2', 9_000),
+  ]);
   const nom = evidence.find((item) => item.id === 'nom');
   const wiki = evidence.find((item) => item.id === 'wiki');
   assert.equal(nom?.text.length, MAX_CHARS_PER_TIER1_SOURCE);
@@ -78,7 +81,10 @@ test('the total across sources never exceeds the overall budget', () => {
 });
 
 test('tier1 is offered before tier2 regardless of input order', () => {
-  const evidence = selectEvidenceForModel([row('wiki', 'tier2', 9_000), row('nom', 'tier1', 9_000)]);
+  const evidence = selectEvidenceForModel([
+    row('wiki', 'tier2', 9_000),
+    row('nom', 'tier1', 9_000),
+  ]);
   assert.equal(evidence[0]?.id, 'nom');
 });
 

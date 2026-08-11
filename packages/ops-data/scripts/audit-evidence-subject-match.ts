@@ -89,12 +89,60 @@ const APPLY = process.env.AUDIT_EVIDENCE_SUBJECT_MATCH_APPLY === '1';
  * them would clear a mismatched document as easily as a correct one.
  */
 const STOPWORDS = new Set([
-  'the', 'and', 'of', 'in', 'at', 'on', 'for', 'a', 'an', 'to',
-  'house', 'home', 'building', 'historic', 'district', 'site', 'church', 'chapel',
-  'cemetery', 'school', 'hall', 'center', 'centre', 'park', 'company', 'no', 'sr', 'jr',
-  'st', 'saint', 'mount', 'mt', 'new', 'old', 'north', 'south', 'east', 'west',
-  'baptist', 'methodist', 'episcopal', 'african', 'american', 'colored', 'negro', 'black',
-  'first', 'second', 'third', 'memorial', 'community', 'county', 'city', 'town',
+  'the',
+  'and',
+  'of',
+  'in',
+  'at',
+  'on',
+  'for',
+  'a',
+  'an',
+  'to',
+  'house',
+  'home',
+  'building',
+  'historic',
+  'district',
+  'site',
+  'church',
+  'chapel',
+  'cemetery',
+  'school',
+  'hall',
+  'center',
+  'centre',
+  'park',
+  'company',
+  'no',
+  'sr',
+  'jr',
+  'st',
+  'saint',
+  'mount',
+  'mt',
+  'new',
+  'old',
+  'north',
+  'south',
+  'east',
+  'west',
+  'baptist',
+  'methodist',
+  'episcopal',
+  'african',
+  'american',
+  'colored',
+  'negro',
+  'black',
+  'first',
+  'second',
+  'third',
+  'memorial',
+  'community',
+  'county',
+  'city',
+  'town',
 ]);
 
 /**
@@ -172,7 +220,9 @@ export function titleCarriesWholeName(title: string | null, displayName: string)
   // Roster names are inverted for filing ("Jude, George, House"), so compare on sorted words
   // rather than raw order — otherwise a correctly-titled document fails on comma placement alone.
   const words = (value: string) =>
-    normalizeForSearch(value).split(' ').filter((w) => w.length > 0);
+    normalizeForSearch(value)
+      .split(' ')
+      .filter((w) => w.length > 0);
   const titleWords = new Set(words(title));
   const nameWords = words(displayName);
   return nameWords.length > 0 && nameWords.every((word) => titleWords.has(word));
@@ -400,7 +450,9 @@ async function main(): Promise<void> {
   }
 
   if (DRY_RUN || !APPLY) {
-    console.log('\nDRY_RUN (default): no writes. Set DRY_RUN=0 AUDIT_EVIDENCE_SUBJECT_MATCH_APPLY=1 to apply.');
+    console.log(
+      '\nDRY_RUN (default): no writes. Set DRY_RUN=0 AUDIT_EVIDENCE_SUBJECT_MATCH_APPLY=1 to apply.',
+    );
     await pool.end();
     return;
   }

@@ -27,10 +27,7 @@
 import pg from 'pg';
 import type { ReleaseSourceEntity } from '@repo/domain';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
-import {
-  assessLandscapeDepth,
-  type LandscapePublishRow,
-} from './lib/incremental-publish.ts';
+import { assessLandscapeDepth, type LandscapePublishRow } from './lib/incremental-publish.ts';
 import { humanizeAreaCode } from './lib/nrhp-area-labels.ts';
 
 function flag(name: string, fallback: string): string {
@@ -117,7 +114,9 @@ async function main(): Promise<void> {
       ORDER BY re.entity_id`,
     params,
   );
-  console.log(`Auditing ${rows.rows.length} live record(s)${LANE_FILTER ? ` in lane ${LANE_FILTER}` : ''}.\n`);
+  console.log(
+    `Auditing ${rows.rows.length} live record(s)${LANE_FILTER ? ` in lane ${LANE_FILTER}` : ''}.\n`,
+  );
 
   type RejectBucket = { count: number; reasons: Map<string, number>; samples: string[] };
   type LeakBucket = { count: number; samples: string[] };
@@ -146,14 +145,18 @@ async function main(): Promise<void> {
     if (depth.deep) {
       deep += 1;
     } else {
-      const bucket: RejectBucket =
-        rejectedByLane.get(lane) ?? { count: 0, reasons: new Map<string, number>(), samples: [] };
+      const bucket: RejectBucket = rejectedByLane.get(lane) ?? {
+        count: 0,
+        reasons: new Map<string, number>(),
+        samples: [],
+      };
       bucket.count += 1;
       // Collapse the parenthetical detail so counts group by KIND of shallowness, not by which
       // template phrase or source URL happened to appear.
       const reasonKey = depth.detail.replace(/\s*\(.*\)\s*$/u, '').replace(/\(.*?\)/gu, '(…)');
       bucket.reasons.set(reasonKey, (bucket.reasons.get(reasonKey) ?? 0) + 1);
-      if (bucket.samples.length < SAMPLES) bucket.samples.push(`${row.entity_id} — ${row.display_name.trim()}`);
+      if (bucket.samples.length < SAMPLES)
+        bucket.samples.push(`${row.entity_id} — ${row.display_name.trim()}`);
       rejectedByLane.set(lane, bucket);
     }
 
@@ -161,7 +164,8 @@ async function main(): Promise<void> {
     if (leaks.length > 0) {
       const bucket = leakByLane.get(lane) ?? { count: 0, samples: [] };
       bucket.count += 1;
-      if (bucket.samples.length < SAMPLES) bucket.samples.push(`${row.entity_id} — ${row.display_name.trim()}`);
+      if (bucket.samples.length < SAMPLES)
+        bucket.samples.push(`${row.entity_id} — ${row.display_name.trim()}`);
       leakByLane.set(lane, bucket);
     }
   }
@@ -212,7 +216,11 @@ async function main(): Promise<void> {
         return label !== null && RAW_CODE_PATTERNS.some((p) => p.test(label));
       });
     console.log('=== FORWARD CHECK: would a republish reintroduce a raw code? ===');
-    console.log(stillRaw.length === 0 ? 'no — every live code maps to a human phrase\n' : `YES: ${stillRaw.join(', ')}\n`);
+    console.log(
+      stillRaw.length === 0
+        ? 'no — every live code maps to a human phrase\n'
+        : `YES: ${stillRaw.join(', ')}\n`,
+    );
   }
 
   await pool.end();

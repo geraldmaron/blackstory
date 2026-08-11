@@ -352,17 +352,26 @@ describe('checkPlaceIdentity', () => {
 describe('isIndexDocument', () => {
   it('flags NRHP listings roll-ups by title', () => {
     assert.equal(
-      isIndexDocument('National Register of Historic Places listings in Warren County, Georgia', ''),
+      isIndexDocument(
+        'National Register of Historic Places listings in Warren County, Georgia',
+        '',
+      ),
       true,
     );
   });
 
   it('flags a page whose opening announces a list', () => {
-    assert.equal(isIndexDocument('Warren County landmarks', 'This is a list of landmarks in...'), true);
+    assert.equal(
+      isIndexDocument('Warren County landmarks', 'This is a list of landmarks in...'),
+      true,
+    );
   });
 
   it('does not flag ordinary prose', () => {
-    assert.equal(isIndexDocument('Whitelaw Hotel', 'The Whitelaw Hotel is a historic building.'), false);
+    assert.equal(
+      isIndexDocument('Whitelaw Hotel', 'The Whitelaw Hotel is a historic building.'),
+      false,
+    );
   });
 });
 
@@ -389,7 +398,9 @@ describe('countWholeWord / containsWholeWord (repo-u84y defect 1: substring matc
   });
 
   it('does not let "catholic" match "catholicism"', () => {
-    const folded = foldPunctuation('religions such as islam protestantism catholicism and spiritualism');
+    const folded = foldPunctuation(
+      'religions such as islam protestantism catholicism and spiritualism',
+    );
     assert.equal(containsWholeWord(folded, 'catholic'), false);
   });
 
@@ -425,14 +436,18 @@ describe('nameTokensCooccur (repo-u84y defect 2: a name is a phrase, not a bag o
   });
 
   it('accepts a document that writes the name as a name', () => {
-    const folded = foldPunctuation('The Keys, Thomas Isaac, House is a historic home in Pearlington.');
+    const folded = foldPunctuation(
+      'The Keys, Thomas Isaac, House is a historic home in Pearlington.',
+    );
     assert.equal(nameTokensCooccur(folded, ['keys', 'thomas', 'isaac']), true);
   });
 
   it('does not require every component to be present', () => {
     // Measured false negative from a first version of this rule: the NPS biography of Wharlest
     // Jackson is real evidence for "Jackson, Wharlest and Exerlena, House" and never names the wife.
-    const folded = foldPunctuation('Wharlest Jackson was a civil rights activist murdered in 1967.');
+    const folded = foldPunctuation(
+      'Wharlest Jackson was a civil rights activist murdered in 1967.',
+    );
     assert.equal(nameTokensCooccur(folded, ['jackson', 'wharlest', 'exerlena']), true);
   });
 

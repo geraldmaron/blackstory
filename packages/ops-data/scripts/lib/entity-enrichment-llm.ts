@@ -159,7 +159,7 @@ export function buildEnrichmentUserPrompt(
       })),
       rules: [
         `summary must be ${SUMMARY_MIN_CHARS}-${SUMMARY_MAX_CHARS} characters`,
-        'the summary must open on the subject\'s significance to Black history, not on its ' +
+        "the summary must open on the subject's significance to Black history, not on its " +
           'construction, materials, plan, or architectural style',
         'every citation.evidenceId must be one of the ids in the evidence array above',
         "every citation.quote must be an exact verbatim substring of that evidence id's text",
