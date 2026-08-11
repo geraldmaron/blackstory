@@ -45,9 +45,20 @@ const REVIEW_SAMPLE_RATE = Number.parseFloat(
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.ENRICH_ENTITIES_LLM_APPLY === '1';
-/** Records who actually drafted this — never a metered API model id, so cost stays honest. */
+/**
+ * Records who actually drafted this — never a metered API model id, so cost stays honest.
+ *
+ * The DEFAULT deliberately names no model. It used to hard-code the one model that happened to
+ * run the first session wave, which meant every later wave silently claimed to be that model
+ * whoever actually drafted it. A provenance field exists to answer "which model wrote this", and
+ * a confidently wrong answer is worse than an honest "not recorded" — set
+ * SESSION_ENRICH_MODEL_ID per wave to get a real one.
+ *
+ * This value lands in bb_research.entity_enrichment, which is NOT a published surface. Model
+ * identity belongs there and nowhere public — see repo-wzz3.
+ */
 const SESSION_MODEL_ID =
-  process.env.SESSION_ENRICH_MODEL_ID?.trim() || 'claude-haiku-4-5-20251001-session';
+  process.env.SESSION_ENRICH_MODEL_ID?.trim() || 'session-drafted-model-unspecified';
 
 const ALLOWED_TOPIC_IDS = TOPIC_REGISTRY.map((topic) => topic.id);
 
