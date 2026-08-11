@@ -843,7 +843,19 @@ async function main(): Promise<void> {
            lane = EXCLUDED.lane,
            status = EXCLUDED.status,
            evidence_digest = EXCLUDED.evidence_digest,
-           notes = EXCLUDED.notes,
+           -- Keep any WS4 draft that is already on the row. A re-sweep replaces this entity's
+           -- EVIDENCE, and moving the status back to 'pending' is right — new evidence means the
+           -- record wants re-drafting. Destroying the draft alongside it is not: the draft is the
+           -- only copy of WS4's output, and apply-enrichment-to-landscape reads notes.draft to
+           -- stage it. The significance-first re-sweep on 2026-08-11 wiped ~79 of them; those had
+           -- already been staged and published, so nothing reader-facing was lost, but a draft
+           -- swept before it was applied would have been unrecoverable from the database.
+           notes = EXCLUDED.notes ||
+                   CASE
+                     WHEN entity_enrichment.notes ? 'draft'
+                       THEN jsonb_build_object('draft', entity_enrichment.notes -> 'draft')
+                     ELSE '{}'::jsonb
+                   END,
            updated_at = now()`,
         [
           outcome.entityId,
