@@ -69,6 +69,7 @@
  */
 import pg from 'pg';
 import { writeFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 function flag(name: string, fallback: string): string {
@@ -101,7 +102,7 @@ const STOPWORDS = new Set([
  * and numbers survive; generic type words do not. Diacritics and punctuation are stripped because
  * OCR in these nominations is unreliable about both.
  */
-function distinctiveTokens(displayName: string): readonly string[] {
+export function distinctiveTokens(displayName: string): readonly string[] {
   return displayName
     .normalize('NFD')
     .replace(/[̀-ͯ]/gu, '')
@@ -110,7 +111,7 @@ function distinctiveTokens(displayName: string): readonly string[] {
     .filter((token) => token.length >= 4 && !STOPWORDS.has(token));
 }
 
-function normalizeForSearch(text: string): string {
+export function normalizeForSearch(text: string): string {
   return text
     .normalize('NFD')
     .replace(/[̀-ͯ]/gu, '')
@@ -124,7 +125,7 @@ function normalizeForSearch(text: string): string {
  * "headquarters". Counting (rather than testing) is what separates a document about the subject
  * from one that merely collides with its name.
  */
-function countWholeWord(haystack: string, token: string): number {
+export function countWholeWord(haystack: string, token: string): number {
   const needle = ` ${token} `;
   let count = 0;
   let index = haystack.indexOf(needle);
@@ -150,10 +151,31 @@ function countWholeWord(haystack: string, token: string): number {
  * A title is short and deliberate, so a shared distinctive token there is strong evidence and its
  * absence is strong evidence too.
  */
-function titleNamesSubject(title: string | null, tokens: readonly string[]): boolean {
+export function titleNamesSubject(title: string | null, tokens: readonly string[]): boolean {
   if (title === null) return false;
   const haystack = ` ${normalizeForSearch(title)} `;
   return tokens.some((token) => haystack.includes(` ${token} `));
+}
+
+/**
+ * Does the title carry the entity's whole name, generic words and all?
+ *
+ * The strongest possible title signal, and the one that has to be checked FIRST, because the
+ * place-word filtering below is blind to it. "Abbeville Colored School" in Abbeville reduces to no
+ * distinctive tokens at all once "colored", "school" and the place word "abbeville" are removed —
+ * yet its attached document is titled "Abbeville Colored School", which is as right as a document
+ * can be. Whole-phrase containment recognises that without weakening anything: "Caswell County,
+ * North Carolina" does not contain "caswell county training school".
+ */
+export function titleCarriesWholeName(title: string | null, displayName: string): boolean {
+  if (title === null) return false;
+  // Roster names are inverted for filing ("Jude, George, House"), so compare on sorted words
+  // rather than raw order — otherwise a correctly-titled document fails on comma placement alone.
+  const words = (value: string) =>
+    normalizeForSearch(value).split(' ').filter((w) => w.length > 0);
+  const titleWords = new Set(words(title));
+  const nameWords = words(displayName);
+  return nameWords.length > 0 && nameWords.every((word) => titleWords.has(word));
 }
 
 type Row = {
@@ -164,7 +186,30 @@ type Row = {
   readonly title: string | null;
   readonly content_text: string | null;
   readonly ledger_status: string | null;
+  readonly city: string | null;
+  readonly county: string | null;
+  readonly state: string | null;
 };
+
+/**
+ * repo-nlcq: tokens that are simply the row's own location carry no identifying power, and the two
+ * anti-mis-attachment layers have to agree about that or a whole class escapes both.
+ *
+ * Caswell County Training School sits in Caswell County and was attached to the Wikipedia article
+ * "Caswell County, North Carolina". subject-identity.ts strips "caswell" as a place word — correct,
+ * a name that only repeats its location says nothing — which leaves that name one distinctive
+ * token and too few for its co-occurrence rule. This audit then cleared the document because its
+ * TITLE contains "caswell": the very token the gate had just discarded as meaningless. Stripping a
+ * place word in one layer while honouring it in the other is what let the document through both.
+ */
+export function placeWordsOf(row: Pick<Row, 'city' | 'county' | 'state'>): ReadonlySet<string> {
+  return new Set(
+    [row.city, row.county, row.state]
+      .filter((value): value is string => typeof value === 'string' && value.length > 0)
+      .flatMap((value) => normalizeForSearch(value).split(' '))
+      .filter((token) => token.length > 0),
+  );
+}
 
 async function main(): Promise<void> {
   const databaseUrl = process.env.DATABASE_URL;
@@ -173,6 +218,8 @@ async function main(): Promise<void> {
 
   const rows = await pool.query<Row>(
     `SELECT lc.id AS entity_id, lc.display_name,
+            lc.payload->>'city' AS city, lc.payload->>'county' AS county,
+            lc.payload->>'state' AS state,
             ev.id AS ev_id, ev.source_tier, ev.title, ev.content_text,
             ee.status AS ledger_status
        FROM bb_research.landscape_candidates lc
@@ -219,6 +266,12 @@ async function main(): Promise<void> {
       continue;
     }
 
+    // repo-nlcq. Body matching still uses every token — a document about the subject names the
+    // whole thing, place word and all — but the TITLE test must not be satisfied by a word that is
+    // only the row's location, or a county article clears every property in that county.
+    const placeWords = placeWordsOf(row);
+    const titleTokens = tokens.filter((token) => !placeWords.has(token));
+
     const haystack = ` ${normalizeForSearch(text)} `;
 
     // Best evidence of aboutness is the strongest single token — the rarest, most specific word in
@@ -243,8 +296,18 @@ async function main(): Promise<void> {
     //   Castle Rock's nomination text is about the Dr. A. Porter Davis Residence.
     // tier2: the body is a general article far too long for mention-counting to mean anything
     //   (see titleNamesSubject). The title is the honest signal.
+    //
+    // A name that is ONLY its place ("Warren County Community Center" in Warren County) leaves
+    // titleTokens empty. That is not evidence of a good attachment, so it cannot pass by default —
+    // fall back to requiring the body to name the subject, which a county article will not do
+    // beyond the place word itself.
     const looksRight =
-      row.source_tier === 'tier1' ? bestCount > 0 : titleNamesSubject(row.title, tokens);
+      row.source_tier === 'tier1'
+        ? bestCount > 0
+        : titleCarriesWholeName(row.title, row.display_name) ||
+          (titleTokens.length > 0
+            ? titleNamesSubject(row.title, titleTokens)
+            : bestCount > 0 && !placeWords.has(bestToken));
 
     if (looksRight) {
       entitiesWithAnyMatch.add(row.entity_id);
@@ -373,7 +436,11 @@ async function main(): Promise<void> {
   await pool.end();
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+// Only run when invoked as a script. The token rules above are unit-tested, and importing this
+// module to test them must not open a database connection or start an audit as a side effect.
+if (process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}
