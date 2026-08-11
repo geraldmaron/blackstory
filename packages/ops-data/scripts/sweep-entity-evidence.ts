@@ -48,6 +48,7 @@ import {
   parseNomination,
 } from './lib/evidence-collectors/nrhp-nomination.ts';
 import { redactStreetAddresses } from './lib/evidence-collectors/redact-address.ts';
+import { checkSubjectIdentity } from './lib/evidence-collectors/subject-identity.ts';
 import { assessText, stripUnstorableCharacters } from './lib/evidence-collectors/text-quality.ts';
 import {
   WIKIPEDIA_LICENCE,
@@ -60,7 +61,6 @@ import {
   documentKey,
   extractReferenceLinks,
   planReferenceHops,
-  subjectTokens,
   type HopSubject,
 } from './lib/evidence-collectors/reference-hops.ts';
 import { hostLineageKey, isWikipediaHost } from './lib/tier1-sources.ts';
@@ -289,7 +289,7 @@ async function collectWikipedia(row: CandidateRow): Promise<EvidenceRow | null> 
     state: row.payload.state,
   });
   if (article === null) {
-    throw new SkipReason('no enwiki article corroborating the registry place');
+    throw new SkipReason('no enwiki article clearing the identity gate (place, name, focus)');
   }
 
   const quality = assessText(article.extract);
@@ -313,6 +313,7 @@ async function collectWikipedia(row: CandidateRow): Promise<EvidenceRow | null> 
       licence: WIKIPEDIA_LICENCE,
       publisher: 'Wikipedia contributors',
       attributionRequired: true,
+      identity: article.identity,
       quarantineReason: quality.usable ? undefined : quality.reason,
     },
   };
@@ -443,7 +444,6 @@ async function collectReferenceHops(
     county: row.payload.county,
     state: row.payload.state,
   };
-  const tokens = subjectTokens(subject);
   const visited = new Set<string>(
     seeds.map((seed) => documentKey(seed.url)).filter((key): key is string => key !== null),
   );
@@ -502,9 +502,15 @@ async function collectReferenceHops(
         // gate (reference-hops.ts docs): what actually clears a fetched page for storage is the
         // same identity discipline every other collector applies — the full page text must
         // corroborate the subject, not just the anchor's 300-char context window.
-        const identityCorroborated = tokens.some((token) =>
-          hopPage.text.toLowerCase().includes(token),
-        );
+        //
+        // repo-ppeu: this used to be `tokens.some(...)`, and `tokens` folds place words in, so a
+        // page containing the word "Virginia" anywhere corroborated a Virginia house. That is how
+        // a house was given an article about a gubernatorial election. The shared gate requires
+        // place AND name AND focus, and rejects index pages outright.
+        const identity = checkSubjectIdentity(hopPage.text, subject, {
+          title: hop.candidate.anchorText,
+        });
+        const identityCorroborated = identity.corroborated;
         const evId = evidenceId(row.id, 'reference-hop', hop.candidate.url);
         const status: 'captured' | 'quarantined' =
           quality.usable && identityCorroborated ? 'captured' : 'quarantined';
@@ -525,12 +531,9 @@ async function collectReferenceHops(
             hopDepth: depth,
             referringSourceId: seed.sourceId,
             relevanceScore: hop.relevanceScore,
+            identity,
             quarantineReason:
-              status === 'quarantined'
-                ? !identityCorroborated
-                  ? 'identity not corroborated by subject text'
-                  : quality.reason
-                : undefined,
+              status === 'quarantined' ? (identity.reason ?? quality.reason) : undefined,
           },
         };
         results.push(evRow);
