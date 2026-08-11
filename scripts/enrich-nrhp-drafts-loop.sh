@@ -10,8 +10,8 @@
 # the sweep adds pending rows, this drains them, and the ledger is the handoff. The pending pool
 # genuinely grows under the drafter — that is the sweep working, not a bug.
 #
-# Cost: measured $0.0017/entity on the free-or-ollama tier (2026-08-11, 10-entity batch,
-# deepseek-v3.2). The harness's own ENRICH_ENTITIES_LLM_SPEND_CEILING_USD (default $3) is a
+# Cost: measured $0.0017/entity on the unmetered tier (2026-08-11, 10-entity batch).
+# The harness's own ENRICH_ENTITIES_LLM_SPEND_CEILING_USD (default $3) is a
 # PER-INVOCATION ceiling, so a loop of N chunks can spend up to N x ceiling. Set the ceiling for
 # the chunk size you are running, not for the whole night.
 #
