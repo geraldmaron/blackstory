@@ -645,3 +645,126 @@ test('a genuinely different place still fails corroboration', () => {
   });
   assert.equal(result.placeCorroborated, false);
 });
+
+// --- repo-pb5l: form vintages and blank-template hazards -----------------------------------
+
+test('splitNominationSections handles vintage C "Item number" headers (NPS Form 10-900 3-82)', () => {
+  const prose7 = `The church is a brick edifice with Gothic influences. ${'Fabric detail. '.repeat(40)}`;
+  const text = normalizeExtractedText(`
+    National Register of Historic Places Inventory-Nomination Form
+    Continuation sheet Item number 7 OMB No. 1024-0018 Page 2
+    ${prose7}
+  `);
+  const sections = splitNominationSections(text);
+  const section7 = sections.find((s) => s.section === '7');
+  assert.ok(section7, 'the Item-number vintage must yield section 7');
+  assert.ok(section7!.text.includes('Gothic influences'));
+});
+
+test('splitNominationSections matches a section header whose page rule is unreadable', () => {
+  // Refnum 91001106: the property name is printed where the page rule sits, so there is no
+  // "Page" token at all. A Page-mandatory pattern matched none of its 10 headers.
+  const prose = `The district developed after 1900. ${'Historical detail. '.repeat(40)}`;
+  const text = normalizeExtractedText(`
+    CONTINUATION SHEET Section number 8 Woodland-Scarboro Historic District
+    ${prose}
+  `);
+  const section8 = splitNominationSections(text).find((s) => s.section === '8');
+  assert.ok(section8, 'a header without a readable page rule must still open a section');
+  assert.ok(section8!.text.includes('developed after 1900'));
+});
+
+test('splitNominationSections ignores section numbers above 13, which the form does not have', () => {
+  // Refnum 88003348 came back segmented into sections 18, 32, 55 and 82 — photo-log captions
+  // and OCR debris, each spurious header truncating the real section it landed inside.
+  const text = normalizeExtractedText(`
+    Section number 8 Page 1
+    ${'Real significance prose. '.repeat(40)}
+    Section number 55 Page 2
+    ${'This must not open a new section. '.repeat(20)}
+  `);
+  const sections = splitNominationSections(text);
+  assert.ok(!sections.some((s) => s.section === '55'), 'section 55 does not exist on the form');
+  const section8 = sections.find((s) => s.section === '8');
+  assert.ok(section8!.text.includes('must not open a new section'), 'the run should not be cut');
+});
+
+test('splitByNarrativeHeadings skips a trailing BLANK form template and uses the filled instance', () => {
+  // The hazard from repo-pb5l: many scans bind an empty copy of the form after the filled one,
+  // so the last occurrence of the heading is boilerplate.
+  const real = `The congregation was formed in 1886 on a site donated by a local landowner. ${'Congregational history. '.repeat(40)}`;
+  const text = normalizeExtractedText(`
+    8. STATEMENT OF SIGNIFICANCE
+    ${real}
+
+    9. MAJOR BIBLIOGRAPHICAL REFERENCES
+    Sanborn Insurance Maps.
+
+    8. STATEMENT OF SIGNIFICANCE
+    D summary paragraph D completeness D clarity D applicable criteria
+    D justification of areas checked D relating significance to the resource
+    9. MAJOR BIBLIOGRAPHICAL REFERENCES
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, 'the blank template must not cost the section entirely');
+  assert.ok(section8!.text.includes('formed in 1886'), 'must use the filled instance');
+  assert.ok(
+    !section8!.text.includes('justification of areas checked'),
+    'must not capture the empty checklist',
+  );
+});
+
+test('splitByNarrativeHeadings keeps searching back when the last occurrence is too short', () => {
+  const real = `The property served the community for decades. ${'Documented history. '.repeat(40)}`;
+  const text = normalizeExtractedText(`
+    8. STATEMENT OF SIGNIFICANCE
+    ${real}
+
+    9. MAJOR BIBLIOGRAPHICAL REFERENCES
+    References here.
+
+    8. STATEMENT OF SIGNIFICANCE
+    See continuation sheet.
+    9. MAJOR BIBLIOGRAPHICAL REFERENCES
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, 'a short final occurrence must not drop the section');
+  assert.ok(section8!.text.includes('served the community'));
+});
+
+test('parseNomination fills a section the table missed from the narrative headings', () => {
+  // The 3-82 form carries a continuation sheet for item 7 and none for item 8, whose
+  // significance runs on the front form. All-or-nothing captured fabric and dropped history.
+  const prose7 = `The building is of brick construction. ${'Fabric detail. '.repeat(40)}`;
+  const prose8 = `SUMMARY The church is a key institution in the history of the community. ${'Historical detail. '.repeat(40)}`;
+  const text = normalizeExtractedText(`
+    Continuation sheet Item number 7 OMB No. 1024-0018 Page 2
+    ${prose7}
+
+    STATEMENT OF SIGNIFICANCE
+    ${prose8}
+  `);
+  const parsed = parseNomination(text, 'Mount Zion Baptist Church');
+  assert.equal(parsed.segmentation, 'mixed');
+  assert.ok(parsed.hasSignificance, 'section 8 must come from the fallback');
+  assert.ok(parsed.narrative.includes('key institution'));
+  assert.ok(parsed.narrative.includes('brick construction'));
+});
+
+test('parseNomination prefers whichever strategy found more of a section', () => {
+  // Refnum 76001238: a table that read only some of its sheets opened section 8 at "PAGE Two",
+  // losing the first page of significance. Taking the table on the strength of matching at all
+  // turned 19,719 characters into 2,759.
+  const full = `Will Marion Cook was described as a musician of international reputation. ${'Biographical detail. '.repeat(60)}`;
+  const text = normalizeExtractedText(`
+    8. STATEMENT OF SIGNIFICANCE
+    ${full}
+    Section number 8 Page 2
+    ${'Only the second sheet. '.repeat(30)}
+  `);
+  const parsed = parseNomination(text, 'Cook, Will Marion, House');
+  assert.ok(
+    parsed.narrative.includes('international reputation'),
+    'the longer strategy must win for the section',
+  );
+});

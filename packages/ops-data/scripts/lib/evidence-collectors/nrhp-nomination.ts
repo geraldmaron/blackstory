@@ -86,23 +86,51 @@ export function normalizeExtractedText(raw: string): string {
  *   A. "CONTINUATION SHEET Section number 7 Page 1"
  *      "Section number _8_ Page _3_"      (typewriter forms fill the rules with underscores)
  *      "Section number  8   Page  12"
+ *      "CONTINUATION SHEET Section number 8 Woodland-Scarboro Historic District"
+ *      The trailing "Page N" is OPTIONAL. On the 1991 layout the property name is printed where
+ *      the page rule sits, so there is no "Page" token to anchor on at all — refnum 91001106 has
+ *      10 of these and a Page-mandatory pattern matched none of them. It then fell through to
+ *      the heading fallback, which had nothing to work with but the cover sheet, and captured
+ *      698 characters of certification language out of a 96,416-character document.
+ *      Dropping the requirement is safe because "Section number" is itself a form label that
+ *      does not occur in running prose; the digit alone was never what carried the precision.
  *
  *   B. "Continuation Sheet Section 7-Description"
  *      "Continuation Sheet Section 8-Statement of Significance"
  *      (the 1990s district-nomination layout; refnum 00000071 has 18 of these and zero of A,
  *      which is why a Pattern-A-only parser returned no sections for it at all)
  *
- * The section token is a digit, optionally with a letter suffix ("8a"). Both alternatives
- * require a literal lead-in ("Section number", or "Section" immediately followed by a rule or
- * label separator) so a bare "8" in running prose can never open a section.
+ *   C. "Continuation sheet Item number 7 OMB No. 1024-0018 Page 2"
+ *      NPS Form 10-900 (3-82), the "Inventory-Nomination Form". This vintage numbers its
+ *      continuation sheets by ITEM rather than by SECTION, so neither A nor B matched a single
+ *      header on it and the parser returned zero sections for the whole document.
+ *
+ * The section token is a digit, optionally with a letter suffix ("8a"). Every alternative
+ * requires a literal form label as its lead-in ("Section number", "Item number", or "Section"
+ * immediately followed by a rule or label separator) so a bare "8" in running prose can never
+ * open a section.
  */
+/**
+ * The NPS nomination form numbers its items 1 through 13 and no further. Constraining the
+ * capture to that range is what makes the optional page rule safe: without it, "Section number"
+ * followed by any one or two digits matched photo-log captions and OCR debris. Refnum 88003348
+ * came back segmented into sections 18, 21, 32, 33, 38, 55, 69, 75 and 82, each spurious header
+ * truncating the real section it landed inside.
+ */
+// The trailing lookahead is load-bearing: without it "Section number 55" matches its leading
+// "5" and opens a spurious section 5, and "Section number 133" opens a spurious 13.
+const SECTION_TOKEN = String.raw`(1[0-3]|[1-9])(?![0-9])[a-z]?`;
+
 const SECTION_HEADER_RE = new RegExp(
   [
-    // A: "Section number 8 Page 3", rules and spacing tolerated.
-    String.raw`Section\s+number\s*[_.\s—–-]*([0-9]{1,2}[a-z]?)\s*[_.\s—–-]*Page\s*[_.\s—–-]*(?:[0-9]{1,3}|[a-z]{1,3})?`,
+    // A: "Section number 8 Page 3" / "Section number 8 <property name>", rules and spacing
+    // tolerated, the page rule optional.
+    String.raw`Section\s+number\s*[_.\s—–-]*${SECTION_TOKEN}(?:\s*[_.\s—–-]*Page\s*[_.\s—–-]*(?:[0-9]{1,3}|[a-z]{1,3})?)?`,
     // B: "Section 8-Statement of Significance" — separator is required so that the label,
     // not just any digit, is what identifies the header.
-    String.raw`Section\s+([0-9]{1,2}[a-z]?)\s*[—–-]\s*(?:Description|Statement of Significance|[A-Z][A-Za-z ]{2,40})`,
+    String.raw`Section\s+${SECTION_TOKEN}\s*[—–-]\s*(?:Description|Statement of Significance|[A-Z][A-Za-z ]{2,40})`,
+    // C: "Item number 7" — the 3-82 Inventory-Nomination Form.
+    String.raw`Item\s+number\s*[_.\s—–-]*${SECTION_TOKEN}`,
   ].join('|'),
   'giu',
 );
@@ -140,8 +168,8 @@ export function splitNominationSections(normalizedText: string): readonly Nomina
   SECTION_HEADER_RE.lastIndex = 0;
   let match = SECTION_HEADER_RE.exec(normalizedText);
   while (match !== null) {
-    // Group 1 is Pattern A's section number, group 2 is Pattern B's; exactly one is defined.
-    const section = match[1] ?? match[2];
+    // One capture group per vintage (A, B, C); exactly one is defined on any given match.
+    const section = match[1] ?? match[2] ?? match[3];
     if (section !== undefined) {
       headers.push({
         section: section.toLowerCase(),
@@ -201,10 +229,28 @@ export function dropRepeatedPropertyHeader(text: string, displayName: string): s
  * "7. DESCRIPTION", "8. STATEMENT OF SIGNIFICANCE", "9. MAJOR BIBLIOGRAPHICAL REFERENCES".
  * Those are set in ordinary running text rather than in a ruled box, so OCR keeps them.
  *
- * The headings appear twice: once on the front form (where they label an empty box that says
- * "continue on a separate sheet") and again where the actual prose begins. So the LAST
- * occurrence is the one that opens real narrative, and the section ends at the next
- * higher-numbered heading after it, or at end of document.
+ * CHOOSING AMONG OCCURRENCES. A heading appears several times in one document, and picking the
+ * wrong instance is the difference between history and letterhead. This used to take the LAST
+ * occurrence, on the reasoning that the front form's copy comes first. That is wrong in two
+ * ways, and both were costing real narrative:
+ *
+ *   1. Many scans append a BLANK copy of the form after the filled one. Its
+ *      "Statement of Significance (in one paragraph)" is followed by the empty checklist
+ *      ("summary paragraph, completeness, clarity, applicable criteria...") and then, a couple
+ *      of hundred characters later, by the blank "9. Major Bibliographical References". So the
+ *      last occurrence opens a section too short to survive MIN_FALLBACK_SECTION_CHARS, the
+ *      candidate was dropped, and the section was lost entirely rather than taken from the
+ *      earlier, filled instance. Refnum 85000186 (Freedmen's Town) has four occurrences: two
+ *      real ones at 130k and 134k, two blank ones at 220k. The document is 696,543 characters
+ *      and it captured 700 of them, all checkbox glyphs.
+ *   2. On some layouts the only occurrence is the cover sheet's certification block
+ *      ("Certifying official has considered the significance of this property..."), which runs
+ *      a few hundred characters into "9. Major Bibliographical References".
+ *
+ * So the rule is still "latest wins", but it now SKIPS rather than accepts: an occurrence is
+ * rejected when what follows it is recognizably form furniture, and rejected when the text it
+ * opens is too short to be narrative — and in both cases the search continues to the next
+ * occurrence back instead of abandoning the section.
  */
 const NARRATIVE_HEADINGS: readonly { readonly section: string; readonly pattern: RegExp }[] = [
   {
@@ -225,6 +271,48 @@ const NARRATIVE_HEADINGS: readonly { readonly section: string; readonly pattern:
 /** A heading opening less than this much text is a form label, not the start of narrative. */
 const MIN_FALLBACK_SECTION_CHARS = 600;
 
+/**
+ * How much text after a heading is inspected to decide whether it opens prose or the blank
+ * form. Long enough to clear the heading's own trailing words, short enough that a real
+ * narrative's opening sentences dominate the sample.
+ */
+const CANDIDATE_PROBE_CHARS = 400;
+
+/**
+ * The blank form's own review checklist, printed under "Statement of Significance" on the empty
+ * template that many scans bind in after the filled one. These labels do not appear under the
+ * heading on a completed form, so finding them is proof the heading opens the template.
+ *
+ * DELIBERATELY NARROW. A first version of this check also rejected candidates opening with
+ * "Certifying official has considered", "See continuation sheet", or a high density of orphan
+ * single characters. Backtested over 1,159 documents that cost 43 records their statement of
+ * significance and shrank 111 others: the modern 10-900 Registration Form genuinely opens its
+ * section 8 with "Applicable National Register Criteria (Mark 'x' in one or more boxes...)",
+ * which is checkbox-dense and entirely legitimate. Rejecting a real heading is far more
+ * expensive than accepting a blank one, because the blank one is caught anyway by
+ * MIN_FALLBACK_SECTION_CHARS — the template's checklist runs only a couple of hundred
+ * characters before the blank "9. Major Bibliographical References" closes it.
+ */
+const BLANK_TEMPLATE_CHECKLIST: readonly RegExp[] = [
+  /justification\s+of\s+areas\s+checked/iu,
+  /relating\s+significance\s+to\s+the\s+resource/iu,
+  /relationship\s+of\s+integrity\s+to\s+significance/iu,
+  /justification\s+of\s+exception/iu,
+];
+
+/**
+ * NOT in the list above, though it looks like it belongs: "Certifying official has considered".
+ * On many forms that certification block sits on the same page as, and immediately before, the
+ * real statement of significance, so rejecting it costs 35 documents their section 8 and shrinks
+ * 32 more. Measured, not assumed. The one document it would have helped (refnum 91000269, Bethel
+ * A.M.E. Church) is left as a known miss rather than paying that price.
+ */
+
+/** True when the text opening a heading is the blank template's checklist, not narrative. */
+function opensFormFurniture(probe: string): boolean {
+  return BLANK_TEMPLATE_CHECKLIST.some((pattern) => pattern.test(probe));
+}
+
 export function splitByNarrativeHeadings(normalizedText: string): readonly NominationSection[] {
   const starts = new Map<string, number[]>();
   for (const { section, pattern } of NARRATIVE_HEADINGS) {
@@ -238,15 +326,10 @@ export function splitByNarrativeHeadings(normalizedText: string): readonly Nomin
     starts.set(section, positions);
   }
 
-  const sections: NominationSection[] = [];
-  for (const wanted of CAPTURED_SECTIONS) {
-    const positions = starts.get(wanted) ?? [];
-    if (positions.length === 0) continue;
-    const begin = positions[positions.length - 1]!;
-
-    // End at the earliest heading of a HIGHER section that starts after this one. Lower and
-    // equal numbers are skipped: a repeated "8. Statement" is the same section continuing on
-    // the next sheet, not a boundary.
+  // End at the earliest heading of a HIGHER section that starts after this one. Lower and
+  // equal numbers are skipped: a repeated "8. Statement" is the same section continuing on
+  // the next sheet, not a boundary.
+  const endFor = (wanted: string, begin: number): number => {
     let end = normalizedText.length;
     for (const [section, sectionStarts] of starts) {
       if (section.localeCompare(wanted, 'en') <= 0) continue;
@@ -254,9 +337,27 @@ export function splitByNarrativeHeadings(normalizedText: string): readonly Nomin
         if (start > begin && start < end) end = start;
       }
     }
+    return end;
+  };
 
-    const text = stripBoilerplate(normalizedText.slice(begin, end));
-    if (text.length >= MIN_FALLBACK_SECTION_CHARS) sections.push({ section: wanted, text });
+  const sections: NominationSection[] = [];
+  for (const wanted of CAPTURED_SECTIONS) {
+    const positions = starts.get(wanted) ?? [];
+    // Latest first. An earlier occurrence's span subsumes every later one (equal-numbered
+    // headings do not bound a section, so that a statement continuing across sheets is not
+    // truncated at the sheet break), which is exactly why "the longest span" is NOT the rule
+    // here: it would always resolve to the first occurrence, i.e. the front form's label.
+    for (let i = positions.length - 1; i >= 0; i -= 1) {
+      const begin = positions[i]!;
+      if (opensFormFurniture(normalizedText.slice(begin, begin + CANDIDATE_PROBE_CHARS))) continue;
+      const text = stripBoilerplate(normalizedText.slice(begin, endFor(wanted, begin)));
+      // Keep looking rather than giving up. Dropping the section on the first short candidate
+      // is what lost Freedmen's Town: its last two occurrences are the blank form, 253
+      // characters apart, and the two filled ones 90k characters earlier were never reached.
+      if (text.length < MIN_FALLBACK_SECTION_CHARS) continue;
+      sections.push({ section: wanted, text });
+      break;
+    }
   }
   return sections;
 }
@@ -266,7 +367,7 @@ export function splitByNarrativeHeadings(normalizedText: string): readonly Nomin
  * can tell whether a capture came from the form's own section table or from the looser
  * heading-based fallback, without re-parsing the document.
  */
-export type SectionSegmentation = 'section-table' | 'narrative-headings' | 'none';
+export type SectionSegmentation = 'section-table' | 'narrative-headings' | 'mixed' | 'none';
 
 export type ParsedNomination = {
   readonly sections: readonly NominationSection[];
@@ -288,17 +389,47 @@ export function parseNomination(rawText: string, displayName: string): ParsedNom
   // first 100 forms swept had 18k-158k characters of perfectly good text and no readable
   // section table at all (repo-n7p6.12), so the fallback is the difference between capturing
   // that history and discarding it.
-  let sections = headerSections;
-  let captured = pick(headerSections);
-  let segmentation: SectionSegmentation = captured.length > 0 ? 'section-table' : 'none';
-  if (captured.length === 0) {
-    const fallback = splitByNarrativeHeadings(normalized);
-    const fallbackCaptured = pick(fallback);
-    if (fallbackCaptured.length > 0) {
-      sections = fallback;
-      captured = fallbackCaptured;
-      segmentation = 'narrative-headings';
+  //
+  // The choice is PER SECTION and it is decided on evidence, not on a fixed preference for the
+  // table. Two failures forced this, both measured over the whole captured corpus:
+  //
+  //   1. All-or-nothing hid statements of significance. The 3-82 Inventory-Nomination Form
+  //      often carries a continuation sheet for item 7 and none for item 8, because its
+  //      significance runs on the front form under "Statement of Significance (in one
+  //      paragraph)". A document-level strategy saw section 7 in the table, declared success,
+  //      and never asked the fallback for section 8 — capturing the building's fabric and
+  //      dropping its history, which is the one thing this corpus is for.
+  //   2. A table that reads only SOME of its sheets slices the section from the wrong sheet.
+  //      Refnum 76001238 (Will Marion Cook House) opened at "PAGE Two", losing the first page
+  //      of significance: 19,719 characters became 2,759 when the table took priority on the
+  //      strength of having matched at all.
+  //
+  // So each section takes whichever strategy produced more text. Length is a fair test between
+  // them because both are bounded by the same section boundaries; what differs is how much of
+  // the section each one managed to find.
+  const fallbackSections = splitByNarrativeHeadings(normalized);
+  const headerCaptured = pick(headerSections);
+  const fallbackCaptured = pick(fallbackSections);
+
+  const usedFallback: string[] = [];
+  const usedTable: string[] = [];
+  const captured = CAPTURED_SECTIONS.map((wanted) => {
+    const fromTable = headerCaptured.find((section) => section.section === wanted);
+    const fromHeadings = fallbackCaptured.find((section) => section.section === wanted);
+    if (fromTable && (!fromHeadings || fromTable.text.length >= fromHeadings.text.length)) {
+      usedTable.push(wanted);
+      return fromTable;
     }
+    if (fromHeadings) usedFallback.push(wanted);
+    return fromHeadings;
+  }).filter((section): section is NominationSection => section !== undefined);
+
+  const sections = usedTable.length > 0 ? headerSections : fallbackSections;
+  let segmentation: SectionSegmentation = 'none';
+  if (usedTable.length > 0) {
+    segmentation = usedFallback.length > 0 ? 'mixed' : 'section-table';
+  } else if (usedFallback.length > 0) {
+    segmentation = 'narrative-headings';
   }
 
   // Significance first — see NARRATIVE_SECTION_ORDER. `captured` is in section order because
