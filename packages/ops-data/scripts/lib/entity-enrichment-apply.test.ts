@@ -1,7 +1,11 @@
 /** repo-n7p6.16 items 2/5 — review-sampling selector + ledger write shape. */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { applyEnrichmentResult, isReviewSampled } from './entity-enrichment-apply.ts';
+import {
+  applyEnrichmentResult,
+  applyLaneSignificanceRefusal,
+  isReviewSampled,
+} from './entity-enrichment-apply.ts';
 import type { EnrichmentAttempt } from './entity-enrichment-llm.ts';
 
 describe('isReviewSampled', () => {
@@ -79,5 +83,56 @@ describe('applyEnrichmentResult review-sample notes', () => {
     assert.equal('reviewSample' in notes, false);
     const notesDefault = await captureNotes(undefined);
     assert.equal('reviewSample' in notesDefault, false);
+  });
+});
+
+/** repo-n9dq — the third outcome of a drafting pass, alongside accepted and quarantined. */
+describe('applyLaneSignificanceRefusal', () => {
+  async function capture(input: {
+    reason: string;
+    evidenceDigest: string | null;
+  }): Promise<{ sql: string; params: unknown[] }> {
+    let sql = '';
+    let params: unknown[] = [];
+    const client = {
+      query: (text: string, values: unknown[]) => {
+        sql = text;
+        params = values;
+        return Promise.resolve({ rows: [], rowCount: 1 });
+      },
+    };
+    await applyLaneSignificanceRefusal(client as never, {
+      entityId: 'ent_x_001',
+      modelId: 'test-model',
+      ...input,
+    });
+    return { sql, params };
+  }
+
+  it('writes the terminal status', async () => {
+    const { sql } = await capture({ reason: 'purely architectural', evidenceDigest: 'abc123' });
+    assert.match(sql, /status = 'no-lane-significance'/u);
+  });
+
+  it('records the evidence digest the judgement was made about, so it can be reopened', async () => {
+    const { params } = await capture({ reason: 'purely architectural', evidenceDigest: 'abc123' });
+    assert.equal(params[2], 'abc123');
+  });
+
+  it('keeps the drafter’s reason verbatim as the audit trail', async () => {
+    const reason = 'The nomination is a genealogy of the white Randolph family.';
+    const { params } = await capture({ reason, evidenceDigest: null });
+    const notes = JSON.parse(params[3] as string) as {
+      refusal: { reason: string; kind: string; evidenceWasRead: boolean };
+    };
+    assert.equal(notes.refusal.reason, reason);
+    assert.equal(notes.refusal.kind, 'no-lane-significance');
+    // The distinction from 'skipped' is the whole point of the row and is asserted, not implied.
+    assert.equal(notes.refusal.evidenceWasRead, true);
+  });
+
+  it('tolerates a null digest without dropping the row', async () => {
+    const { params } = await capture({ reason: 'thin', evidenceDigest: null });
+    assert.equal(params[2], null);
   });
 });
