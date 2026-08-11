@@ -44,6 +44,7 @@ import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import { selectEntitiesForEnrichment } from './lib/entity-enrichment-selector.ts';
 import {
   checkNominationIdentity,
+  isUsableRefnum,
   nominationTextUrl,
   parseNomination,
 } from './lib/evidence-collectors/nrhp-nomination.ts';
@@ -201,7 +202,9 @@ async function fetchWithTimeout(url: string, ms: number): Promise<Response> {
  */
 async function collectNomination(row: CandidateRow): Promise<EvidenceRow | null> {
   const refnum = row.payload.refnum;
-  if (refnum === undefined || !/^[0-9]{8}$/u.test(refnum)) {
+  // One definition of "usable refnum", shared with nominationTextUrl. This check having its own
+  // copy of the pattern is how 485 rows were rejected here before any fetch was attempted.
+  if (!isUsableRefnum(refnum)) {
     throw new SkipReason('no usable refnum on the roster row');
   }
 

@@ -7,6 +7,7 @@ import {
   splitByNarrativeHeadings,
   parseNomination,
   checkNominationIdentity,
+  isUsableRefnum,
   nominationTextUrl,
 } from './nrhp-nomination.ts';
 
@@ -213,11 +214,33 @@ test('nominationTextUrl builds NPGallery URL for 8-digit refnum', () => {
   assert.equal(url, 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/71000836_text');
 });
 
-test('nominationTextUrl throws for refnum that is not exactly 8 digits', () => {
-  assert.throws(() => nominationTextUrl('123'), /8 digits/);
-  assert.throws(() => nominationTextUrl('123456789'), /8 digits/);
-  assert.throws(() => nominationTextUrl('abcdefgh'), /8 digits/);
-  assert.throws(() => nominationTextUrl(''), /8 digits/);
+/**
+ * The 9-digit case is not hypothetical. NPS issues modern listings from a 100000000-block, and
+ * rejecting those starved 485 entities in the nrhp-black-heritage lane of the richest source in
+ * the corpus — the nomination collector had never been attempted on ANY of the 695 rows carrying
+ * one. Verified against NPGallery that they serve full nomination PDFs.
+ */
+test('nominationTextUrl builds NPGallery URL for a modern 9-digit refnum', () => {
+  const url = nominationTextUrl('100002883');
+  assert.equal(url, 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/100002883_text');
+});
+
+test('nominationTextUrl throws for a refnum that is not 8 or 9 digits', () => {
+  assert.throws(() => nominationTextUrl('123'), /8 or 9 digits/);
+  assert.throws(() => nominationTextUrl('1234567'), /8 or 9 digits/);
+  assert.throws(() => nominationTextUrl('1234567890'), /8 or 9 digits/);
+  assert.throws(() => nominationTextUrl('abcdefgh'), /8 or 9 digits/);
+  assert.throws(() => nominationTextUrl(''), /8 or 9 digits/);
+});
+
+test('isUsableRefnum accepts both series and nothing else', () => {
+  assert.equal(isUsableRefnum('71000836'), true);
+  assert.equal(isUsableRefnum('100002883'), true);
+  assert.equal(isUsableRefnum('7100083'), false);
+  assert.equal(isUsableRefnum(undefined), false);
+  // The sweep and nominationTextUrl must not disagree about what is usable; sharing this
+  // predicate is what stops a row being rejected before a fetch that would have succeeded.
+  assert.equal(isUsableRefnum('100002883'), true);
 });
 
 test('checkNominationIdentity corroborates place when both state and county appear in narrative', () => {

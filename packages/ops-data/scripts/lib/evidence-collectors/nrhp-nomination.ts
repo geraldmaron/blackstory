@@ -381,10 +381,33 @@ export function checkNominationIdentity(
   };
 }
 
+/**
+ * A National Register reference number, as NPS actually issues them.
+ *
+ * Eight digits for the historic series (71000836), NINE for the modern one — NPS moved to a
+ * 100000000-block sequence for newer listings, and 100002883 is a perfectly ordinary refnum.
+ *
+ * This started as an 8-digit-only rule and that quietly starved the newest listings of the richest
+ * source in the corpus. Measured in the nrhp-black-heritage lane: 695 entities carry a 9-digit
+ * refnum, and the nomination collector had never once been attempted on any of them — 485 sat at
+ * status='skipped' having been rejected here before a single fetch. Only 2 of those 695 were ever
+ * enriched, against 203 of the 1,855 8-digit rows. Verified against NPGallery that the modern
+ * refnums serve full nomination PDFs (5-6 MB, larger than the 8-digit forms), so the exclusion was
+ * costing real documents, not filtering absent ones.
+ *
+ * Range rather than an exact length, so the next series NPS issues is a data question rather than
+ * another silent starvation.
+ */
+const REFNUM_PATTERN = /^[0-9]{8,9}$/u;
+
+export function isUsableRefnum(refnum: string | undefined): refnum is string {
+  return refnum !== undefined && REFNUM_PATTERN.test(refnum);
+}
+
 /** NPS asset URL carrying the OCR'd text layer of the nomination form for a refnum. */
 export function nominationTextUrl(refnum: string): string {
-  if (!/^[0-9]{8}$/u.test(refnum)) {
-    throw new Error(`Refnum must be 8 digits, got: ${refnum}`);
+  if (!isUsableRefnum(refnum)) {
+    throw new Error(`Refnum must be 8 or 9 digits, got: ${refnum}`);
   }
   return `https://npgallery.nps.gov/NRHP/GetAsset/NRHP/${refnum}_text`;
 }
