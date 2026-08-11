@@ -841,7 +841,19 @@ async function main(): Promise<void> {
          VALUES ($1,$2,$3,$4,$5, now())
          ON CONFLICT (entity_id) DO UPDATE SET
            lane = EXCLUDED.lane,
-           status = EXCLUDED.status,
+           -- repo-n9dq: 'no-lane-significance' is terminal-until-the-evidence-changes, and the
+           -- digest is the whole mechanism. A drafter read this entity's sources and judged that
+           -- they carry no Black-history significance; re-running the sweep and finding the SAME
+           -- documents is not new information, so resetting the row to 'pending' would re-offer it
+           -- to a drafter that can only reach the same conclusion — the exact re-selection loop
+           -- that status was added to stop. A changed digest does mean new evidence, and then
+           -- EXCLUDED.status correctly reopens it.
+           status = CASE
+             WHEN entity_enrichment.status = 'no-lane-significance'
+                  AND entity_enrichment.evidence_digest IS NOT DISTINCT FROM EXCLUDED.evidence_digest
+               THEN entity_enrichment.status
+             ELSE EXCLUDED.status
+           END,
            evidence_digest = EXCLUDED.evidence_digest,
            -- Keep any WS4 draft that is already on the row. A re-sweep replaces this entity's
            -- EVIDENCE, and moving the status back to 'pending' is right — new evidence means the
