@@ -38,12 +38,17 @@ From the repo root, with `set -a && source apps/web/.env.local && set +a` and
      packages/ops-data/scripts/session-enrich-prepare.ts --entity-ids=<ids> > <dir>/prompts.jsonl
    ```
 
-2. **Write two throwaway helpers next to it** — `show.mjs` (print subject N's rules, allowed topic
-   ids and full evidence) and `check.mjs` (pre-flight a draft: summary length, citation quotes as
-   verbatim substrings, topic ids in `allowedTopicIds`, era buckets grounded in a year that appears
-   in the evidence). Keep these OUT of the repo. They deliberately duplicate a subset of
-   `validateEnrichmentResponse`, and a committed copy would drift from the real validator. They are
-   a fast local loop, never the authority.
+2. **Write two throwaway helpers next to it** — `show.mts` (print subject N's rules, allowed topic
+   ids and full evidence) and `check.mts` (pre-flight one draft). Keep these out of version
+   control; `packages/ops-data/tmp/` is gitignored and resolves workspace imports, which the
+   scratchpad does not.
+
+   Have `check.mts` **call `validateEnrichmentResponse` directly** rather than restate its rules.
+   An earlier version of this runbook told you to duplicate a subset of the validator and warned
+   that the copy would drift — importing the real one removes the drift instead of warning about
+   it, and a drafter that sees PASS locally is then guaranteed to pass `session-enrich-apply`.
+   Pair it with a one-off `dump-subjects.mts` that writes the assembled subjects to a JSON file, so
+   the checker runs offline and eight concurrent drafters do not each reopen Postgres.
 
 3. **Fan out.** One subagent per ~5 lines. Give each agent LINE NUMBERS, never entity ids — the
    line number is the only binding to a subject, and it is resolved later from the prompts file, so
@@ -104,6 +109,15 @@ From the repo root, with `set -a && source apps/web/.env.local && set +a` and
    Expect some drafted records not to publish. Two gates legitimately hold them back and neither
    is a drafting problem: `confidence_below_floor` (repo-60zx) and `name_overlap` (repo-n7p6.10).
 
+   The lane-wide `--republish` scans the whole lane and takes several minutes; run it in the
+   background rather than under a short command timeout.
+
+8. **Verify against the live projection, not the publisher's exit code.** The publisher reporting
+   *N* upserts does not tell you those rows now read as prose. Query `bb_public.release_entities`
+   for the ids you just published and assert none of their summaries still contains a
+   `LANE_TEMPLATE_SIGNATURES` fingerprint. Wave 3: 22 of 23 live with drafted prose, the 23rd
+   correctly held by `confidence_below_floor`.
+
 ## Two things that will bite
 
 **Agents write to the scratchpad, never the repo.** Concurrent agents sharing one git working tree
@@ -117,9 +131,21 @@ independent drafters refused the same subject for the same reason. Those entitie
 `pending` and will be re-offered on every future pass; repo-n9dq tracks giving them a terminal
 state.
 
-The refusal rate CLIMBS as you work down the backlog, because batches are ordered by evidence
-volume and the tail is thinner: wave 1 refused 5 of 40 (12.5%), wave 2 refused 14 of 40 (35%).
-Wave 2 was full of plantation and rural districts whose nominations are about white founding
-families or colonial archaeology, with Black history as one incidental clause. Do not plan capacity
-off the first wave, and treat a batch with a 0% refusal rate as a signal that the drafters are
-padding rather than as a good run.
+The rate climbs as you work down the backlog: wave 1 refused 5 of 40 (12.5%), wave 2 refused 14 of
+40 (35%), wave 3 refused 17 of 40 (42.5%). Do not plan capacity off the first wave, and treat a
+batch with a 0% refusal rate as a signal that the drafters are padding rather than as a good run.
+
+**But a refusal rate is two numbers wearing one hat** (repo-pjob). Only 8 of wave 3's 17 refusals
+were "evidence carries no significance". The other 9 were evidence about an *entirely different
+subject* — a 240,000-character timeline of US disability rights filed under a church, an
+encyclopedia entry on Frankfurt filed under Hogan Quarters, an article on Confederate monuments
+filed under a university student union. Corpus-wide, 244 of 2,029 evidence-bearing entities (12%)
+have no attached document that names them, and every one is still `pending` and still queued to be
+offered to a drafter.
+
+That distinction is load-bearing in two directions. It means the "thinning tail" story explains at
+most half the climb — a 12% floor has nothing to do with evidence volume. And it means repo-n9dq's
+terminal `no-lane-significance` status must not be applied to a refusal without checking which kind
+it is first, or it will permanently close records whose real nomination was simply never fetched.
+
+Triage with `audit-evidence-subject-match.ts` before spending a wave.

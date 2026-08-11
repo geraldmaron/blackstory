@@ -1,0 +1,297 @@
+/**
+ * repo-pjob — does each captured evidence document actually mention the entity it is attached to?
+ *
+ * Wave 3 of the drafting campaign refused 17 of 40 subjects, and 9 of those refusals were not thin
+ * evidence at all: the attached document was about a different subject entirely (a US disability-
+ * rights timeline filed under a church, an encyclopedia entry on Frankfurt filed under Hogan
+ * Quarters). Those entities are unretrieved, not undraftable — a distinction that matters because
+ * repo-n9dq is about to give "no Black-history significance" a TERMINAL ledger state, and applying
+ * it to a retrieval failure would permanently close a record whose real nomination was never
+ * fetched.
+ *
+ * This measures the size of that population instead of extrapolating it from one batch.
+ *
+ * THE TEST IS FREQUENCY, NOT PRESENCE, and that distinction is the whole script. "Does a token
+ * from the display name appear anywhere in the text" fails badly here, because the mis-attached
+ * documents are enormous general-encyclopedia articles (116,000-240,000 chars against a real
+ * nomination's ~23,000) and a document that long contains almost any token by coincidence. All
+ * three cases below passed a presence test while being obviously wrong:
+ *
+ *   Hosanna Church and Cemetery  <- disability-rights timeline   "hosanna" hit Hosanna-Tabor, the
+ *                                                                 Supreme Court case
+ *   Hogan Quarters               <- encyclopedia entry, Frankfurt "hogan" hit the law firm Hogan
+ *                                                                 Lovells; "quarters" hit
+ *                                                                 head-QUARTERS
+ *   Lawrence A. Davis Student Union <- Confederate monuments      "davis" hit Jefferson Davis;
+ *                                                                 "union" hit the Union army
+ *
+ * A document actually about a subject names it repeatedly. A document that merely collides with it
+ * names it once. So the signal is the subject-mention RATE, and matching is word-boundary (the
+ * head-quarters hit above was a substring artifact, not a coincidence).
+ *
+ * A flag is strong evidence of mis-attachment; a clean result is NOT proof of correct attachment
+ * (this will not catch right-town/wrong-building). Read the flagged count as a floor.
+ *
+ * READ-ONLY: no write path.
+ *
+ * Usage (from repo root):
+ *   set -a && source apps/web/.env.local && set +a
+ *   export DATABASE_SSL=1
+ *   node --conditions development --import tsx \
+ *     packages/ops-data/scripts/audit-evidence-subject-match.ts [--lane=nrhp-black-heritage] \
+ *     [--samples=15] [--json=<path>]
+ */
+import pg from 'pg';
+import { writeFileSync } from 'node:fs';
+import { normalizePgConnectionString } from './lib/pg-connection.ts';
+
+function flag(name: string, fallback: string): string {
+  const hit = process.argv.find((arg) => arg.startsWith(`--${name}=`));
+  return hit === undefined ? fallback : hit.slice(name.length + 3);
+}
+
+const LANE = flag('lane', 'nrhp-black-heritage');
+const SAMPLES = Number.parseInt(flag('samples', '15'), 10);
+const JSON_OUT = flag('json', '');
+
+/**
+ * Words that carry no identifying power in this corpus. "Church", "House" and "Historic District"
+ * appear in a large share of display names AND in almost any historical document, so matching on
+ * them would clear a mismatched document as easily as a correct one.
+ */
+const STOPWORDS = new Set([
+  'the', 'and', 'of', 'in', 'at', 'on', 'for', 'a', 'an', 'to',
+  'house', 'home', 'building', 'historic', 'district', 'site', 'church', 'chapel',
+  'cemetery', 'school', 'hall', 'center', 'centre', 'park', 'company', 'no', 'sr', 'jr',
+  'st', 'saint', 'mount', 'mt', 'new', 'old', 'north', 'south', 'east', 'west',
+  'baptist', 'methodist', 'episcopal', 'african', 'american', 'colored', 'negro', 'black',
+  'first', 'second', 'third', 'memorial', 'community', 'county', 'city', 'town',
+]);
+
+/**
+ * Tokens distinctive enough that their total absence from a document is meaningful. Proper nouns
+ * and numbers survive; generic type words do not. Diacritics and punctuation are stripped because
+ * OCR in these nominations is unreliable about both.
+ */
+function distinctiveTokens(displayName: string): readonly string[] {
+  return displayName
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/gu, '')
+    .toLowerCase()
+    .split(/[^a-z0-9]+/u)
+    .filter((token) => token.length >= 4 && !STOPWORDS.has(token));
+}
+
+function normalizeForSearch(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/gu, ' ');
+}
+
+/**
+ * Word-boundary occurrence count. The normalized haystack is space-delimited, so padding both
+ * sides turns a substring scan into a whole-word one — this is what stops "quarters" matching
+ * "headquarters". Counting (rather than testing) is what separates a document about the subject
+ * from one that merely collides with its name.
+ */
+function countWholeWord(haystack: string, token: string): number {
+  const needle = ` ${token} `;
+  let count = 0;
+  let index = haystack.indexOf(needle);
+  while (index !== -1) {
+    count += 1;
+    // Step by 1, not by needle.length: adjacent repeats share the delimiting space.
+    index = haystack.indexOf(needle, index + 1);
+  }
+  return count;
+}
+
+/**
+ * Does the evidence document's own title name the subject?
+ *
+ * This, not mention-frequency, is the discriminator for tier2. Counting mentions was tried first
+ * and fails outright on exactly the documents that matter: the mis-attached sources are
+ * general-encyclopedia articles long enough that common name words saturate them. Measured on the
+ * confirmed cases — "davis" x57 and "union" x37 inside the Confederate-monuments article filed
+ * under Lawrence A. Davis Student Union, "thomas" x61 under Keys, Thomas Isaac House, "hosanna" x5
+ * (all Hosanna-Tabor, the Supreme Court case) inside the disability-rights timeline. Every one
+ * clears any sane frequency bar while being the wrong document.
+ *
+ * A title is short and deliberate, so a shared distinctive token there is strong evidence and its
+ * absence is strong evidence too.
+ */
+function titleNamesSubject(title: string | null, tokens: readonly string[]): boolean {
+  if (title === null) return false;
+  const haystack = ` ${normalizeForSearch(title)} `;
+  return tokens.some((token) => haystack.includes(` ${token} `));
+}
+
+type Row = {
+  readonly entity_id: string;
+  readonly display_name: string;
+  readonly ev_id: string;
+  readonly source_tier: string;
+  readonly title: string | null;
+  readonly content_text: string | null;
+  readonly ledger_status: string | null;
+};
+
+async function main(): Promise<void> {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) throw new Error('DATABASE_URL is required (source apps/web/.env.local)');
+  const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
+
+  const rows = await pool.query<Row>(
+    `SELECT lc.id AS entity_id, lc.display_name,
+            ev.id AS ev_id, ev.source_tier, ev.title, ev.content_text,
+            ee.status AS ledger_status
+       FROM bb_research.landscape_candidates lc
+       JOIN bb_research.entity_evidence ev ON ev.entity_id = lc.id AND ev.status = 'captured'
+       LEFT JOIN bb_research.entity_enrichment ee ON ee.entity_id = lc.id
+      WHERE lc.lane = $1
+      ORDER BY lc.id, ev.source_tier`,
+    [LANE],
+  );
+
+  type Finding = {
+    entityId: string;
+    displayName: string;
+    evidenceId: string;
+    sourceTier: string;
+    title: string | null;
+    ledgerStatus: string | null;
+    tokensTried: readonly string[];
+    bestToken: string;
+    bestCount: number;
+    textLength: number;
+    excerpt: string;
+  };
+
+  const findings: Finding[] = [];
+  const entitiesSeen = new Set<string>();
+  const entitiesFlagged = new Set<string>();
+  const entitiesWithAnyMatch = new Set<string>();
+  let noDistinctiveToken = 0;
+  let docsChecked = 0;
+
+  for (const row of rows.rows) {
+    entitiesSeen.add(row.entity_id);
+    const text = row.content_text ?? '';
+    if (text.length === 0) continue;
+    docsChecked += 1;
+
+    const tokens = distinctiveTokens(row.display_name);
+    if (tokens.length === 0) {
+      // e.g. "Old West Baltimore Historic District" reduces to "baltimore"; a name that reduces to
+      // nothing cannot be judged either way, and counting it as a mismatch would be a false alarm.
+      noDistinctiveToken += 1;
+      entitiesWithAnyMatch.add(row.entity_id);
+      continue;
+    }
+
+    const haystack = ` ${normalizeForSearch(text)} `;
+
+    // Best evidence of aboutness is the strongest single token — the rarest, most specific word in
+    // the name. Summing across tokens would let a name like "Lawrence A. Davis Student Union"
+    // accumulate a passing score from four independently common words, which is exactly the false
+    // negative this replaces.
+    let bestToken = tokens[0]!;
+    let bestCount = -1;
+    for (const token of tokens) {
+      const count = countWholeWord(haystack, token);
+      if (count > bestCount) {
+        bestCount = count;
+        bestToken = token;
+      }
+    }
+
+    // The usable signal differs by tier, so the test does too.
+    //
+    // tier1: the title is GENERATED from the display name upstream ("National Register
+    //   nomination — <name>"), so it always matches and proves nothing. Only the body can speak,
+    //   and a nomination whose body never once names its own subject is wrong or truncated —
+    //   Castle Rock's nomination text is about the Dr. A. Porter Davis Residence.
+    // tier2: the body is a general article far too long for mention-counting to mean anything
+    //   (see titleNamesSubject). The title is the honest signal.
+    const looksRight =
+      row.source_tier === 'tier1' ? bestCount > 0 : titleNamesSubject(row.title, tokens);
+
+    if (looksRight) {
+      entitiesWithAnyMatch.add(row.entity_id);
+    } else {
+      entitiesFlagged.add(row.entity_id);
+      findings.push({
+        entityId: row.entity_id,
+        displayName: row.display_name.trim(),
+        evidenceId: row.ev_id,
+        sourceTier: row.source_tier,
+        title: row.title,
+        ledgerStatus: row.ledger_status,
+        tokensTried: tokens,
+        bestToken,
+        bestCount,
+        textLength: text.length,
+        excerpt: text.slice(0, 160).replace(/\s+/gu, ' '),
+      });
+    }
+  }
+
+  // An entity is only really broken if NO attached document mentions it. One bad doc alongside a
+  // good nomination is noise; zero good docs is why a drafter had nothing to work with.
+  const fullyMismatched = [...entitiesFlagged].filter((id) => !entitiesWithAnyMatch.has(id));
+
+  console.log(`Lane: ${LANE}`);
+  console.log(`Entities with captured evidence: ${entitiesSeen.size}`);
+  console.log(`Evidence documents checked:      ${docsChecked}`);
+  console.log(`Names too generic to judge:      ${noDistinctiveToken} document(s)\n`);
+  console.log(`Documents not mentioning their entity: ${findings.length}`);
+  console.log(`Entities where NO attached document mentions them: ${fullyMismatched.length}`);
+  if (entitiesSeen.size > 0) {
+    const pct = ((fullyMismatched.length / entitiesSeen.size) * 100).toFixed(1);
+    console.log(`  = ${pct}% of the lane's evidence-bearing entities\n`);
+  }
+
+  const byStatus = new Map<string, number>();
+  for (const id of fullyMismatched) {
+    const status = findings.find((f) => f.entityId === id)?.ledgerStatus ?? '(none)';
+    byStatus.set(status, (byStatus.get(status) ?? 0) + 1);
+  }
+  console.log('Fully-mismatched entities by ledger status:');
+  for (const [status, n] of [...byStatus].sort((a, b) => b[1] - a[1])) {
+    console.log(`  ${String(n).padStart(5)}  ${status}`);
+  }
+
+  console.log(`\nSamples (up to ${SAMPLES}):`);
+  for (const id of fullyMismatched.slice(0, SAMPLES)) {
+    const f = findings.find((x) => x.entityId === id)!;
+    console.log(`\n  ${f.entityId} — ${f.displayName}  [${f.ledgerStatus ?? 'no ledger row'}]`);
+    console.log(`    looked for: ${f.tokensTried.join(', ')}`);
+    console.log(
+      `    best "${f.bestToken}" x${f.bestCount} in ${f.textLength.toLocaleString()} chars ` +
+        `(${f.sourceTier === 'tier1' ? 'tier1: body must name subject' : 'tier2: title must name subject'})`,
+    );
+    console.log(`    attached  : ${f.sourceTier} "${f.title ?? '(untitled)'}"`);
+    console.log(`    begins    : ${f.excerpt}…`);
+  }
+
+  if (JSON_OUT.length > 0) {
+    writeFileSync(
+      JSON_OUT,
+      JSON.stringify(
+        { lane: LANE, entitiesSeen: entitiesSeen.size, docsChecked, fullyMismatched, findings },
+        null,
+        2,
+      ),
+    );
+    console.log(`\nFull findings -> ${JSON_OUT}`);
+  }
+
+  await pool.end();
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
