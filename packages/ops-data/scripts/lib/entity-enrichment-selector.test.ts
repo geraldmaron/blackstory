@@ -46,6 +46,21 @@ test('buildEnrichmentSelectorQuery respects a custom staleDays value', () => {
   void sql;
 });
 
+test('buildEnrichmentSelectorQuery stops re-offering entities the sweep found nothing for', () => {
+  // The sweep records status='skipped' + updated_at and never touches last_enriched_at, so
+  // without this conjunct 'ee.last_enriched_at IS NULL' keeps them eligible forever and the run
+  // loops over the same lowest-id entities (measured: 6 chunks, ~100 minutes, zero new evidence).
+  const { sql } = buildEnrichmentSelectorQuery({ missingFields: ['historicalContext'] });
+  assert.match(sql, /AND NOT \(\s*ee\.status = 'skipped'/u);
+  // It has to be an AND on the outside. As another OR branch it would be defeated by the
+  // missing-field clause, which a swept-and-empty entity satisfies by definition.
+  const [, afterOrBlock = ''] = sql.split(/\)\s*(?=AND NOT)/u);
+  assert.match(afterOrBlock, /^AND NOT/u);
+  // Reuses the staleDays parameter rather than adding one: a skipped entity becomes eligible
+  // again on the same schedule as a stale one.
+  assert.match(sql, /ee\.updated_at > now\(\) - make_interval\(days => \$2::int\)/u);
+});
+
 test('selectEntitiesForEnrichment runs the built query and returns entity ids', async () => {
   const calls: { sql: string; params: unknown[] }[] = [];
   const fakeDb = {

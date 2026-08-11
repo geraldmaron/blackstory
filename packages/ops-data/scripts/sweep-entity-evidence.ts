@@ -222,6 +222,16 @@ async function collectNomination(row: CandidateRow): Promise<EvidenceRow | null>
     throw new SkipReason(`PDF has no text layer (${bytes.length} bytes, needs OCR)`);
   }
 
+  // NPGallery answers every refnum with a real 22KB PDF. For a property whose form has not been
+  // scanned, that PDF's entire text layer is this one sentence. Left unrecognized it fell through
+  // to the "unhandled form vintage?" branch below and blamed our parser for an NPS coverage gap —
+  // the exact confusion that branch's comment claims to prevent. 42 of the 50 entities in the last
+  // sweep chunk hit this, so it is the dominant reason the backlog stops yielding, and it is not
+  // something a better parser can fix.
+  if (/has not yet been digitized/iu.test(text)) {
+    throw new SkipReason('NPS has not digitized this nomination form (no text to parse)');
+  }
+
   const parsed = parseNomination(text, row.display_name);
   if (parsed.narrative.length === 0) {
     // Distinguishable from "no document": we HAVE the form and it has text, but the section
