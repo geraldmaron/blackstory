@@ -9,6 +9,7 @@
 import type pg from 'pg';
 import { createHash } from 'node:crypto';
 import type { EnrichmentSubject } from './entity-enrichment-llm.ts';
+import { type EvidenceExcerpt, excerptForWindow } from './evidence-excerpt.ts';
 
 /** Per-source cap so one huge nomination form does not crowd out every other source. */
 export const MAX_CHARS_PER_SOURCE = 4_000;
@@ -63,6 +64,30 @@ type EvidenceRow = {
 export type QueryablePool = Pick<pg.Pool, 'query'>;
 
 /**
+ * Turns an excerpt's shape into the one line of prose the drafter sees beside the text.
+ *
+ * The `laneTermScore === 0` case is the one that changes an outcome. A drafter handed a truncated
+ * document cannot tell "the history is past the window" from "there is no history here", and the
+ * two call for opposite actions — defer, or refuse. Only the excerpter, which scanned the WHOLE
+ * document, can tell them apart, so it says which.
+ */
+export function readNoteFor(excerpt: EvidenceExcerpt): string | null {
+  if (excerpt.complete) return null;
+  const scale = `${excerpt.omittedChars.toLocaleString('en-US')} characters of this document are not shown`;
+  if (excerpt.laneTermScore === 0) {
+    return (
+      `${scale}. Nothing anywhere in the full document mentions Black history — not the omitted ` +
+      'part either, which was scanned in full. This is an absence, not a truncation.'
+    );
+  }
+  return (
+    `${scale}. This is not the opening of the document: it is the document's own opening ` +
+    'statement followed by the passages that discuss Black history, selected from the whole ' +
+    'document and shown in order. "[…]" marks each gap.'
+  );
+}
+
+/**
  * Exported for tests. The budget arithmetic decides what a drafter actually reads, and it is the
  * kind of code where an off-by-one silently costs a whole source rather than throwing.
  */
@@ -91,13 +116,19 @@ export function selectEvidenceForModel(
       budget,
       Math.max(budget - reserved, MIN_CHARS_RESERVED_PER_REMAINING_SOURCE),
     );
-    const text = (row.content_text ?? '').slice(0, Math.min(perSourceCap, available));
+    // Relevance-aware rather than a head slice (repo-z57b): on a large district nomination the
+    // first `cap` characters are criteria checkboxes, UTM points and building inventory, and the
+    // history begins past the window. See evidence-excerpt.ts for why raising the cap is not the
+    // fix.
+    const excerpt = excerptForWindow(row.content_text ?? '', Math.min(perSourceCap, available));
+    const text = excerpt.text;
     if (text.length === 0) continue;
     evidence.push({
       id: row.id,
       sourceTier: row.source_tier as 'tier1' | 'tier2',
       title: row.title,
       text,
+      readNote: readNoteFor(excerpt),
     });
     budget -= text.length;
   }

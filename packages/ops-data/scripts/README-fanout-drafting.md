@@ -148,6 +148,30 @@ From the repo root, with `set -a && source apps/web/.env.local && set +a` and
    `LANE_TEMPLATE_SIGNATURES` fingerprint. Wave 3: 22 of 23 live with drafted prose, the 23rd
    correctly held by `confidence_below_floor`.
 
+## The evidence you are handed is an excerpt, and it says so
+
+Since repo-z57b the read window is **relevance-aware, not positional**. It is no longer the first
+12,000 characters of the nomination. For any source too long to hand over whole, a drafter gets the
+document's own opening statement plus the passages that actually discuss Black history, chosen from
+the whole document, in document order, with `[…]` marking each gap
+(`scripts/lib/evidence-excerpt.ts`).
+
+Two consequences at the drafting desk:
+
+- **Never quote across a `[…]`.** Each side is verbatim from the source; the join is not. The
+  validator only checks that a quote is a substring of what you were handed, so it would *accept* a
+  quote that spans the marker and reads as one sentence in the source when it is two, thousands of
+  characters apart.
+- **Read the `readNote`.** It states how much was omitted and whether the document mentions Black
+  history *anywhere* — the excerpter scanned all of it, so this is knowledge you do not otherwise
+  have. `Nothing anywhere in the full document mentions Black history` is an **absence**, which is a
+  refusal. Anything else is a truncation question, which is a defer.
+
+Why this replaced the head slice: Redd Road Rural HD's narrative began at 12,183 characters and the
+old window stopped at 12,000. It missed by 183 characters and cost a whole drafting attempt, which
+came back with a sentence about the nomination form. Big Sink Rural HD's best passages sit at 27%
+and 55% of a 290,000-character document — no affordable cap reaches those by reading from the front.
+
 ## The tier-2 stub trap
 
 The validator checks that prose is *sourced*. It cannot check that the prose is about *our*
