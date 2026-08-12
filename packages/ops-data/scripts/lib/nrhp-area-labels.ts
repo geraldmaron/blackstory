@@ -131,6 +131,39 @@ export function humanizeAreas(raw: string | undefined): string {
   return `${parts.slice(0, -1).join(', ')}, and ${parts[parts.length - 1]}`;
 }
 
+/**
+ * Text that reads as raw NPS registry vocabulary rather than prose, in either of the two ways it
+ * can reach public text:
+ *
+ *   - the TEMPLATE path — a code substituted into a generated summary without going through
+ *     `humanizeAreaCode` (repo-n7p6.1, now closed);
+ *   - the DRAFTING path — a drafter copying the `areaOfSignificance` field into a sentence
+ *     verbatim (repo-lm6h). `humanizeAreaCode` never sees that text, because no code substitution
+ *     ever happened: the phrase is genuinely present in the source document, so quote-verification
+ *     passes and the draft publishes with "recognized under ethnic heritage (black)" in it.
+ *
+ * Patterns are deliberately narrow. `ethnic heritage (black)` matches case-insensitively because
+ * the parenthesized form only ever comes from the registry field; the bare `ETHNIC HERITAGE`
+ * matcher requires upper case so ordinary prose using the words "ethnic heritage" is not flagged.
+ * Keep it that way — this list gates draft acceptance, and a pattern that fires on legitimate prose
+ * costs a redraft cycle every time.
+ */
+export const RAW_REGISTRY_VOCABULARY_PATTERNS: readonly RegExp[] = [
+  /ethnic heritage \(black\)/iu,
+  /ETHNIC HERITAGE[-\s]/u,
+  /NON-ABORIGINAL/u,
+  /OTHER-ETHNIC/u,
+  /ENTERTAINMENT\/RECREATION/u,
+];
+
+/** Which raw-registry patterns (by source) `text` trips; empty when the text is clean. */
+export function findRawRegistryVocabulary(text: string | null | undefined): readonly string[] {
+  if (!text) return [];
+  return RAW_REGISTRY_VOCABULARY_PATTERNS.filter((pattern) => pattern.test(text)).map(
+    (pattern) => pattern.source,
+  );
+}
+
 /** Pure — Excel/NPS serial date (days since 1899-12-30) -> "Month D, YYYY". */
 export function formatNrhpListedDate(serial: string | null | undefined): string | null {
   if (!serial) return null;

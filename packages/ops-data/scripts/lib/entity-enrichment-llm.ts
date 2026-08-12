@@ -12,6 +12,7 @@ import { treatAsLiving } from '@repo/domain';
 import { decadeStartYearFromLabel, isDecadeAtOrBeforeCurrent } from '@repo/domain';
 import { isValidTopicId } from '@repo/domain';
 import { redactStreetAddresses } from './evidence-collectors/redact-address.ts';
+import { findRawRegistryVocabulary } from './nrhp-area-labels.ts';
 import {
   stripMarkdownCodeFence,
   type LlmCompletionRequest,
@@ -176,6 +177,10 @@ export function buildEnrichmentUserPrompt(
         'if a readNote says the document never mentions the subject matter, do not build an entry ' +
           'out of its criteria labels or theme lists — that describes the nomination form, not ' +
           'history, and it will pass every check while saying nothing',
+        'never copy a registry classification field into prose — "ethnic heritage (black)", ' +
+          '"ETHNIC HERITAGE-BLACK", "OTHER-ETHNIC", "HISTORIC - NON-ABORIGINAL", ' +
+          '"ENTERTAINMENT/RECREATION" are NPS form vocabulary, not English. Say what the ' +
+          'classification means in plain words ("recognized for its Black heritage") or leave it out',
         'topicIds must only use ids from allowedTopicIds; omit if none clearly apply',
         'eraBuckets must be decade labels ("1950s") grounded in a year present in the evidence',
         'if evidence is too thin for historicalContext, set it to null and historicalContextCitations to []',
@@ -369,6 +374,33 @@ function checkNoAddressTokens(text: string | null, errors: string[], fieldLabel:
   }
 }
 
+/**
+ * repo-lm6h — refuse a draft that copies raw registry vocabulary into prose.
+ *
+ * Quote-verification cannot catch this and never will: "recognized under ethnic heritage (black)"
+ * is a genuine substring of the NPS source document, so the citation anchors, the draft validates,
+ * and the phrase publishes. `humanizeAreaCode` cannot catch it either — it guards the template
+ * path, where a code is substituted into a generated sentence, and here no substitution ever
+ * happened. The only place this is catchable is here, on the model's own output text, which is
+ * also where `checkNoAddressTokens` sits for the same structural reason.
+ *
+ * Applied to every lane, not just nrhp-black-heritage: an entity drafted from an NPS nomination
+ * carries the same vocabulary whatever lane routed it.
+ */
+function checkNoRawRegistryVocabulary(
+  text: string | null,
+  errors: string[],
+  fieldLabel: string,
+): void {
+  const hits = findRawRegistryVocabulary(text);
+  if (hits.length > 0) {
+    errors.push(
+      `${fieldLabel}: contains raw NPS registry vocabulary (${hits.join(', ')}) — write the ` +
+        `significance in plain prose (e.g. "Black heritage") rather than copying the registry field`,
+    );
+  }
+}
+
 export function validateEnrichmentResponse(
   subject: EnrichmentSubject,
   allowedTopicIds: readonly string[],
@@ -456,6 +488,10 @@ export function validateEnrichmentResponse(
   }
 
   const keywords = parseStringArray(payload.keywords, errors, 'keywords');
+
+  checkNoRawRegistryVocabulary(summary, errors, 'summary');
+  checkNoRawRegistryVocabulary(historicalContext ?? null, errors, 'historicalContext');
+  checkNoRawRegistryVocabulary(keywords.join('; '), errors, 'keywords');
 
   if (addressGuardApplies(subject)) {
     checkNoAddressTokens(summary, errors, 'summary');
