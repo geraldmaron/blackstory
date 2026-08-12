@@ -20,7 +20,7 @@ function requireEntity(id: string) {
 test('renders the current status and full time-scoped statusHistory for a place-like kind', () => {
   const school = requireEntity('ent_dunbar_school_001');
   const html = renderToStaticMarkup(
-    createElement(EntityStatusPanel, { entity: school, framing: 'present_day' }),
+    createElement(EntityStatusPanel, { entity: school }),
   );
   assert.match(html, /Current status/);
   assert.match(html, /ds-status-mark/);
@@ -37,7 +37,7 @@ test('renders the current status and full time-scoped statusHistory for a place-
 test('renders an eventWindow panel (never active/historic) for an event kind', () => {
   const event = requireEntity('ent_dc_landmark_listing_1975');
   const html = renderToStaticMarkup(
-    createElement(EntityStatusPanel, { entity: event, framing: 'historical' }),
+    createElement(EntityStatusPanel, { entity: event }),
   );
   assert.match(html, /1975/);
   assert.match(html, /when-span is authoritative/);
@@ -49,7 +49,7 @@ test('renders the approved statusHistory gap notice when a place-like kind has n
   const school = requireEntity('ent_dunbar_school_001');
   const { status: _status, statusHistory: _statusHistory, ...withoutHistory } = school;
   const html = renderToStaticMarkup(
-    createElement(EntityStatusPanel, { entity: withoutHistory, framing: 'historical' }),
+    createElement(EntityStatusPanel, { entity: withoutHistory }),
   );
   assert.match(html, /No status recorded/);
 });
@@ -58,7 +58,7 @@ test('renders current status alone when history is missing', () => {
   const school = requireEntity('ent_dunbar_school_001');
   const { statusHistory: _statusHistory, ...statusOnly } = school;
   const html = renderToStaticMarkup(
-    createElement(EntityStatusPanel, { entity: statusOnly, framing: 'present_day' }),
+    createElement(EntityStatusPanel, { entity: statusOnly }),
   );
   assert.match(html, /Current status/);
   assert.match(html, /Active/);

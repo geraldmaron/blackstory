@@ -5,19 +5,31 @@
  * status-driven decision logic the page's JSX consumes so it stays directly testable.
  */
 import type { PublicEntityView } from '../../../data/public-seed';
-
-export type HistoricalFraming = 'historical' | 'present_day';
+import { humanizeToken } from '../../../components/entity/format';
 
 /**
- * Historical-vs-present-day framing is DERIVED from the status-lifecycle field, never authored
- * as prose. `event` kinds carry no status field at all (their when-span is authoritative) and
- * always frame as historical — a documented past happening is never "present-day". Every other
- * kind frames as present-day only when its derived current status is `active`; `historic`/
- * `inactive` (or a missing status) frame as historical.
+ * Present standing of the SUBJECT, for the mast's glance line.
+ *
+ * Standing and era are different axes and must not be phrased as if they compete. A church
+ * built in the 1890s that still holds services spans the 1890s AND is active; the mast used to
+ * answer this slot with "Present-day record", which reads as a claim about *when* the record
+ * belongs and sat directly beside the era saying something else.
+ *
+ * It was also wrong for two whole vocabularies. The old rule was `status === 'active'`, but only
+ * place-like kinds ever take that value: laws are `in_force`, people are `living`. Measured on
+ * the active release, that mislabelled 66 in-force laws and cases as "Historical record", and no
+ * living person could ever have come out as present-day.
+ *
+ * So this returns the record's own status vocabulary (the same terms `StatusMark` renders) and
+ * nothing else. `undefined` means the slot is dropped rather than filled with a default:
+ * `event` kinds are statusless by design — their when-span is authoritative — and `unknown` is
+ * a real answer that must not harden into "Historical record" for the 112 people carrying it.
  */
-export function deriveHistoricalFraming(entity: PublicEntityView): HistoricalFraming {
-  if (entity.kind === 'event') return 'historical';
-  return entity.status === 'active' ? 'present_day' : 'historical';
+export function deriveRecordStanding(entity: PublicEntityView): string | undefined {
+  if (entity.kind === 'event') return undefined;
+  const status = entity.status?.trim();
+  if (!status || status === 'unknown') return undefined;
+  return humanizeToken(status);
 }
 
 /** True when a record has no claims, no related entries, and no timeline the case that must

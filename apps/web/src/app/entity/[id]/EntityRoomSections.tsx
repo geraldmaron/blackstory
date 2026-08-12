@@ -31,13 +31,11 @@ import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel'
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { Connections, type RoomConnection } from '../../../components/room';
 import { humanizeToken } from '../../../components/entity/format';
-import type { HistoricalFraming } from './entity-view-model';
 
 void React;
 
 export type EntityRoomSectionsProps = {
   readonly entity: PublicEntityView;
-  readonly framing: HistoricalFraming;
   readonly evidenceClaims: readonly EvidenceClaimInput[];
   readonly entityLinkCatalog: readonly EntityLinkCatalogEntry[];
   readonly crossReferences?: readonly EntityCrossReferenceSurface[];
@@ -66,7 +64,6 @@ function toConnections(entity: PublicEntityView): readonly RoomConnection[] {
 
 export function EntityRoomSections({
   entity,
-  framing,
   evidenceClaims,
   entityLinkCatalog,
   crossReferences = [],
@@ -135,7 +132,7 @@ export function EntityRoomSections({
           <h2 className="ds-record-beat__heading" id="status-heading">
             {entity.kind === 'event' ? 'When this happened' : 'Status and history'}
           </h2>
-          <EntityStatusPanel entity={entity} framing={framing} />
+          <EntityStatusPanel entity={entity} />
         </section>
       ) : null}
 
