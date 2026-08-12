@@ -251,26 +251,82 @@ export type EraEvidenceInput = {
 };
 
 /**
- * Decade buckets a record's dates genuinely support, in precedence order: authored buckets,
- * then the event window, then lifecycle spans that are not designation-only. Returns an empty
- * array when the record documents no historical date — callers render that as "Undated" rather
- * than substituting a date the record never claimed.
+ * Decades a record's historical claims explicitly name — the last tier, for records carrying no
+ * structured date at all. Only the decades actually attested are returned, never the span between
+ * them: a life documented by a 1962 degree and a 1988 election yields 1960s and 1980s, because
+ * nothing in the record speaks to the 1970s.
  */
-export function resolveEraBucketsFromEvidence(input: EraEvidenceInput): readonly string[] {
+function bucketsFromClaimYears(claims: readonly EraEvidenceClaim[]): readonly string[] {
+  const buckets = new Set<string>();
+  for (const claim of claims) {
+    if (isDesignationClaim(claim)) continue;
+    for (const year of yearsInClaim(claim)) {
+      buckets.add(`${Math.floor(Number.parseInt(year, 10) / 10) * 10}s`);
+    }
+  }
+  return [...buckets].sort((a, b) => a.localeCompare(b));
+}
+
+/**
+ * Why a record has no era, so the gap can be told apart from a subject that genuinely has no date.
+ *
+ * `awaiting_research` is the one that matters operationally: the record carries a designation
+ * date, which means a real historical era exists and simply has not been ingested. That is the
+ * work list for pulling period-of-significance out of NRHP nominations, and it is why this is a
+ * state rather than a flat "undated".
+ */
+export type EraDocumentationState = 'documented' | 'awaiting_research' | 'undocumented';
+
+export type EraEvidenceResult = {
+  readonly buckets: readonly string[];
+  readonly state: EraDocumentationState;
+};
+
+/**
+ * Decade buckets a record's dates genuinely support, in precedence order: authored buckets, the
+ * event window, lifecycle spans that are not designation-only, then years named by historical
+ * claims. Also reports whether an empty result is a research gap or a genuinely undated subject.
+ */
+export function resolveEraEvidence(input: EraEvidenceInput): EraEvidenceResult {
+  const documented = (buckets: readonly string[]): EraEvidenceResult => ({
+    buckets,
+    state: 'documented',
+  });
+
   const authored = (input.eraBuckets ?? []).map((bucket) => bucket.trim()).filter(Boolean);
-  if (authored.length > 0) return filterDecadesAtOrBeforeCurrent(authored);
+  if (authored.length > 0) {
+    const kept = filterDecadesAtOrBeforeCurrent(authored);
+    if (kept.length > 0) return documented(kept);
+  }
 
   if (input.eventWindow) {
-    const fromEvent = bucketsForSpan(input.eventWindow);
-    if (fromEvent.length > 0) return filterDecadesAtOrBeforeCurrent(fromEvent);
+    const fromEvent = filterDecadesAtOrBeforeCurrent(bucketsForSpan(input.eventWindow));
+    if (fromEvent.length > 0) return documented(fromEvent);
   }
 
   const claims = input.claims ?? [];
+  const spans = input.statusHistory ?? [];
   const buckets = new Set<string>();
-  for (const span of input.statusHistory ?? []) {
-    if (spanIsDesignationOnly(span, claims)) continue;
+  let suppressedDesignation = false;
+  for (const span of spans) {
+    if (spanIsDesignationOnly(span, claims)) {
+      suppressedDesignation = true;
+      continue;
+    }
     for (const bucket of bucketsForSpan(span)) buckets.add(bucket);
   }
-  if (buckets.size === 0) return [];
-  return filterDecadesAtOrBeforeCurrent([...buckets].sort((a, b) => a.localeCompare(b)));
+  if (buckets.size > 0) {
+    const kept = filterDecadesAtOrBeforeCurrent([...buckets].sort((a, b) => a.localeCompare(b)));
+    if (kept.length > 0) return documented(kept);
+  }
+
+  const fromClaims = filterDecadesAtOrBeforeCurrent(bucketsFromClaimYears(claims));
+  if (fromClaims.length > 0) return documented(fromClaims);
+
+  return { buckets: [], state: suppressedDesignation ? 'awaiting_research' : 'undocumented' };
+}
+
+/** Buckets only, for callers that do not need to know why an empty result is empty. */
+export function resolveEraBucketsFromEvidence(input: EraEvidenceInput): readonly string[] {
+  return resolveEraEvidence(input).buckets;
 }

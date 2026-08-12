@@ -16,6 +16,7 @@ import {
   isDesignationOnlyYear,
   maxDecadeInclusive,
   resolveEraBucketsFromEvidence,
+  resolveEraEvidence,
 } from './era.js';
 
 test('DATE_PRECISIONS carries the full day|month|year|decade|circa vocabulary', () => {
@@ -190,4 +191,54 @@ test('resolveEraBucketsFromEvidence ignores undated spans and future decades', (
     resolveEraBucketsFromEvidence({ eraBuckets: ['2050s'] }),
     [],
   );
+});
+
+test('resolveEraBucketsFromEvidence reads decades named by historical claims', () => {
+  assert.deepEqual(
+    resolveEraBucketsFromEvidence({
+      claims: [
+        { predicate: 'first_black_graduate', object: 'earned his law degree in 1962' },
+        { predicate: 'elected_position', object: 'president of the bar association in 1988' },
+      ],
+    }),
+    // Not 1970s: the record attests two decades, not the span between them.
+    ['1960s', '1980s'],
+  );
+});
+
+test('claim years never rescue a record whose only year is its listing', () => {
+  assert.deepEqual(resolveEraBucketsFromEvidence({ claims: NRHP_CLAIMS }), []);
+});
+
+test('structured spans outrank claim years', () => {
+  assert.deepEqual(
+    resolveEraBucketsFromEvidence({
+      statusHistory: [{ validFrom: '1912', datePrecision: 'year' }],
+      claims: [{ predicate: 'note', object: 'a 1975 restoration' }],
+    }),
+    ['1910s'],
+  );
+});
+
+test('resolveEraEvidence separates a research gap from a genuinely undated record', () => {
+  // A suppressed listing date proves an era exists and simply has not been ingested.
+  assert.deepEqual(
+    resolveEraEvidence({
+      statusHistory: [{ validFrom: '2001', datePrecision: 'year' }],
+      claims: NRHP_CLAIMS,
+    }),
+    { buckets: [], state: 'awaiting_research' },
+  );
+  assert.deepEqual(resolveEraEvidence({}), { buckets: [], state: 'undocumented' });
+  assert.deepEqual(resolveEraEvidence({ eraBuckets: ['1930s'] }), {
+    buckets: ['1930s'],
+    state: 'documented',
+  });
+});
+
+test('an authored bucket that is entirely in the future is not treated as documented', () => {
+  assert.deepEqual(resolveEraEvidence({ eraBuckets: ['2050s'] }), {
+    buckets: [],
+    state: 'undocumented',
+  });
 });
