@@ -28,11 +28,7 @@
  * so it cannot import from here. Domain owns the strings; this file re-exports rather than keeping
  * a second copy, because two copies drifting apart is precisely the hole these constants close.
  */
-export {
-  NRHP_SUMMARY_TRAILER,
-  NRHP_SUMMARY_FILLER,
-  LANE_TEMPLATE_SIGNATURES,
-} from '@repo/domain';
+export { NRHP_SUMMARY_TRAILER, NRHP_SUMMARY_FILLER, LANE_TEMPLATE_SIGNATURES } from '@repo/domain';
 
 /** Raw NPS area-of-significance code (already trimmed, upper-cased) -> lowercase human phrase
  *  for mid-sentence use ("for its significance in X, Y, and Z"). `null` drops the code entirely
