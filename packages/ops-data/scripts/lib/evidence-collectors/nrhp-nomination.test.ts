@@ -768,3 +768,68 @@ test('parseNomination prefers whichever strategy found more of a section', () =>
     'the longer strategy must win for the section',
   );
 });
+
+test('splitNominationSections reads the modern sheet header that omits the word "number"', () => {
+  // Vintage D. The 10-900 Registration Form as printed since the late 1990s heads its
+  // continuation sheets "Section 8 Page _9" — no "number", no dash, no "Item". Refnum 07001083
+  // (Harriet M. Cornwell Tourist House) is the measured case: none of the three earlier patterns
+  // matched a single sheet, so the section table came back without the pages carrying the
+  // narrative and the heading fallback took the criteria checkbox block off the front form.
+  const significance = `The Harriet M. Cornwell Tourist Home is eligible for listing under Criterion A based upon its role in the practice of segregation. ${'Travellers relied on the Green Book. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    Section 7 Page _5
+    ${'The foundation is granite masonry. '.repeat(30)}
+
+    Section 8 Page _9
+    ${significance}
+  `);
+  const sections = splitNominationSections(text);
+  const eight = sections.find((section) => section.section === '8');
+  assert.ok(eight, 'the sheet header without "number" must open section 8');
+  assert.ok(eight.text.includes('practice of segregation'));
+  assert.ok(
+    sections.find((section) => section.section === '7')?.text.includes('granite masonry'),
+    'the same header shape must still bound section 7',
+  );
+});
+
+test('a bare "Section 8" in running prose does not open a section', () => {
+  // What keeps vintage D safe. "number" is the form label that makes vintage A's digit
+  // trustworthy; "Page" is the one that makes D's trustworthy. Without a mandatory page rule,
+  // prose discussing the form would carve the document up.
+  const text = normalizeExtractedText(`
+    Continuation sheet Item number 7 Page 1
+    ${'The reviewer noted that Section 8 should be expanded before resubmission. '.repeat(20)}
+  `);
+  const sections = splitNominationSections(text);
+  assert.equal(
+    sections.find((section) => section.section === '8'),
+    undefined,
+    'a section number mentioned in prose is not a sheet header',
+  );
+});
+
+test('parseNomination reports the sections it actually captured, not the winning strategy', () => {
+  // `sections` feeds `sectionsFound` in the evidence row's provenance, which a later pass reads
+  // to decide whether a record still needs re-sweeping. It used to be all-or-nothing — the whole
+  // output of whichever strategy won ANY section — so a document taking 7 from the table and 8
+  // from the headings reported the table's sections and omitted 8, while `narrative` contained
+  // it. Refnum 100003285 carried 103,604 characters of significance that the provenance denied.
+  const prose7 = `The building is of brick construction. ${'Fabric detail. '.repeat(40)}`;
+  const prose8 = `The school is significant for its association with Black education. ${'Historical detail. '.repeat(40)}`;
+  const text = normalizeExtractedText(`
+    Section number 7 Page 1
+    ${prose7}
+
+    NARRATIVE STATEMENT OF SIGNIFICANCE
+    ${prose8}
+  `);
+  const parsed = parseNomination(text, 'Immanuel School');
+  assert.equal(parsed.segmentation, 'mixed', 'one section from each strategy');
+  assert.deepEqual(
+    parsed.sections.map((section) => section.section),
+    ['7', '8'],
+    'both captured sections must be reported',
+  );
+  assert.ok(parsed.hasSignificance);
+});

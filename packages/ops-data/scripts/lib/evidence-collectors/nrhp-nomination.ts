@@ -105,10 +105,29 @@ export function normalizeExtractedText(raw: string): string {
  *      continuation sheets by ITEM rather than by SECTION, so neither A nor B matched a single
  *      header on it and the parser returned zero sections for the whole document.
  *
+ *   D. "Section 8 Page _9"
+ *      The 10-900 Registration Form as printed since the late 1990s drops the word "number"
+ *      from its continuation-sheet header. A requires "number", B requires a dash and a label,
+ *      C requires "Item" — so none of them matched, the section table came back without the
+ *      sheets carrying the narrative, and the heading fallback then took the only "Statement of
+ *      Significance" left on the front form: the criteria checkbox block.
+ *
+ *      That failure is quiet and it is the expensive kind, because the front form of this
+ *      vintage says in as many words "Explain the significance of the property on one or more
+ *      continuation sheets" — so on exactly these documents the entire statement of
+ *      significance lives on the sheets that were being missed. Refnum 07001083 (Harriet M.
+ *      Cornwell Tourist House) is the measured example: a 33,026-character nomination whose
+ *      section 8 came back as 1,487 characters of checkbox glyphs, while the real narrative —
+ *      "its role in the practice of segregation in Columbia, South Carolina from ca. 1940 to
+ *      ca. 1960", and eight mentions of the Green Book — sat unread from character 19,580 on.
+ *      `hasSignificance` was true the whole time, so nothing downstream had any reason to look.
+ *
  * The section token is a digit, optionally with a letter suffix ("8a"). Every alternative
  * requires a literal form label as its lead-in ("Section number", "Item number", or "Section"
  * immediately followed by a rule or label separator) so a bare "8" in running prose can never
- * open a section.
+ * open a section. D keeps that guarantee with a different label: it drops "number" but makes
+ * the "Page" rule MANDATORY, so the pair "Section <n> Page" is still two form labels bracketing
+ * the digit rather than a bare number in prose.
  */
 /**
  * The NPS nomination form numbers its items 1 through 13 and no further. Constraining the
@@ -131,6 +150,10 @@ const SECTION_HEADER_RE = new RegExp(
     String.raw`Section\s+${SECTION_TOKEN}\s*[—–-]\s*(?:Description|Statement of Significance|[A-Z][A-Za-z ]{2,40})`,
     // C: "Item number 7" — the 3-82 Inventory-Nomination Form.
     String.raw`Item\s+number\s*[_.\s—–-]*${SECTION_TOKEN}`,
+    // D: "Section 8 Page _9" — the modern Registration Form's sheet header, without "number".
+    // Unlike A the page rule is REQUIRED: "number" is what makes A's digit safe, and "Page" is
+    // what makes D's digit safe. Drop both and "Section 8" matches running prose.
+    String.raw`Section\s*[_.\s—–-]*${SECTION_TOKEN}\s*[_.\s—–-]*Page\s*[_.\s—–-]*(?:[0-9]{1,3}|[a-z]{1,3})?`,
   ].join('|'),
   'giu',
 );
@@ -168,8 +191,11 @@ export function splitNominationSections(normalizedText: string): readonly Nomina
   SECTION_HEADER_RE.lastIndex = 0;
   let match = SECTION_HEADER_RE.exec(normalizedText);
   while (match !== null) {
-    // One capture group per vintage (A, B, C); exactly one is defined on any given match.
-    const section = match[1] ?? match[2] ?? match[3];
+    // One capture group per vintage (A, B, C, D); exactly one is defined on any given match.
+    // Read them by scanning rather than by index: the alternatives are numbered by their order
+    // in SECTION_HEADER_RE, so a hard-coded list silently ignores whichever vintage is added
+    // last — the new pattern matches, its group is never read, and the header is dropped.
+    const section = match.slice(1).find((group) => group !== undefined);
     if (section !== undefined) {
       headers.push({
         section: section.toLowerCase(),
@@ -424,7 +450,19 @@ export function parseNomination(rawText: string, displayName: string): ParsedNom
     return fromHeadings;
   }).filter((section): section is NominationSection => section !== undefined);
 
-  const sections = usedTable.length > 0 ? headerSections : fallbackSections;
+  // Report what was actually captured, not the whole output of whichever strategy happened to
+  // win a section. This used to be `usedTable.length > 0 ? headerSections : fallbackSections`,
+  // which is all-or-nothing and so contradicts the per-section choice made just above: a
+  // document that took section 7 from the table and section 8 from the headings reported the
+  // table's sections and dropped 8 from `sectionsFound` entirely — while `narrative` (built
+  // from `captured`) contained it all along. Refnum 100003285 is the measured case: 103,604
+  // characters of significance present in the text, absent from the provenance.
+  //
+  // That mismatch is worse than cosmetic. `sectionsFound` is what a later pass reads to decide
+  // whether a record needs re-sweeping, so a row can be re-swept forever to recover a section
+  // it already has, or passed over because the field says a section is there when the winning
+  // strategy simply happened to list it.
+  const sections = captured;
   let segmentation: SectionSegmentation = 'none';
   if (usedTable.length > 0) {
     segmentation = usedFallback.length > 0 ? 'mixed' : 'section-table';
