@@ -310,6 +310,41 @@ test('depth gate falls back to the strict admission test when live state is unkn
   if (!result.eligible) assert.equal(result.reason, 'template_only');
 });
 
+/**
+ * repo-8dlu — name_overlap, same admission/regression split. The overlap flag is identical in all
+ * three cases; only whether the row is already live changes the answer.
+ */
+test('name_overlap still blocks a NEW candidate whose name collides with a live entity', () => {
+  const result = gateLandscapePublishCandidate({
+    row: enrichedRow({ name_overlap: true }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) assert.equal(result.reason, 'name_overlap');
+});
+
+test('name_overlap still blocks a colliding candidate that is NOT already live, even on a republish run', () => {
+  const result = gateLandscapePublishCandidate({
+    row: enrichedRow({ name_overlap: true, exact_in_release: false }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    allowRepublish: true,
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) assert.equal(result.reason, 'name_overlap');
+});
+
+test('name_overlap does not block an in-place correction of a row already live under its own id', () => {
+  const result = gateLandscapePublishCandidate({
+    row: enrichedRow({ name_overlap: true, exact_in_release: true }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    allowRepublish: true,
+  });
+  assert.equal(result.eligible, true);
+});
+
 /** A republish admitted by the regression clause must still read as thin (repo-vymq). */
 test('a regression-clause republish publishes researchCoverage=minimal', () => {
   const row = nrhpRow({ exact_in_release: true });

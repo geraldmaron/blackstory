@@ -706,7 +706,26 @@ export function gateLandscapePublishCandidate(input: {
       detail: 'entity id already in active release',
     };
   }
-  if (row.name_overlap) {
+  // repo-8dlu: the same ADMISSION vs REGRESSION distinction the depth gate makes below.
+  //
+  // For a NEW candidate this check is right and unchanged: do not admit a second
+  // "Mount Zion Missionary Baptist Church" whose name collides with one already public, because
+  // readers cannot tell two identically-named records apart.
+  //
+  // For a row ALREADY LIVE under its own entity id it asks the wrong question. The record is not
+  // competing for a name — it already holds one, and this is an in-place correction of the text
+  // under that name. Blocking it changes nothing about the collision and only keeps the stale
+  // prose public. It fires hardest on exactly the names that repeat by nature (AME churches,
+  // Mount Zion Baptist, Lincoln School), which is why it was pinning 99 live summaries that still
+  // print the raw NPS code `ethnic heritage (Black)` while their corrected, researched prose sat
+  // in bb_research at status='accepted'.
+  //
+  // The SQL behind `name_overlap` already excludes the row's own ids (LANDSCAPE_BY_LANE_SQL:
+  // `re.entity_id <> lc.id AND re.entity_id <> lc.source_item_id`), so a genuine collision with a
+  // DIFFERENT live entity still sets the flag. Skipping it here is a decision about what to do
+  // with that flag on a republish, not a loosening of how it is computed.
+  const republishingLiveRow = input.allowRepublish === true && row.exact_in_release === true;
+  if (row.name_overlap && !republishingLiveRow) {
     return {
       eligible: false,
       reason: 'name_overlap',
@@ -759,7 +778,6 @@ export function gateLandscapePublishCandidate(input: {
   // the enrichment queue, and keeps counting against `audit-live-depth-gate.ts`.
   const depth = assessLandscapeDepth(entry, row);
   if (!depth.deep) {
-    const republishingLiveRow = input.allowRepublish === true && row.exact_in_release === true;
     const liveIsShallow = input.liveDepth !== undefined && !input.liveDepth.deep;
     if (!republishingLiveRow || !liveIsShallow) {
       return { eligible: false, reason: 'template_only', detail: depth.detail };
