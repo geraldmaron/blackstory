@@ -148,3 +148,129 @@ export function deriveEraBuckets(span: EraSpan): readonly string[] {
   }
   return buckets;
 }
+
+/*
+ * ---------------------------------------------------------------------------
+ * Era evidence: which dates on a record may speak for its historical era
+ * ---------------------------------------------------------------------------
+ *
+ * A record can carry dates that say nothing about when its history happened. The
+ * National Register listing date is the motivating case: the NPS weekly-list feed
+ * (`scrape-nrhp-black-heritage-roster.ts`) publishes a `Listed Date` and no period of
+ * significance, so `deriveCatalogEntityStatus` picks the listing year as `validFrom` and
+ * every downstream era derivation reads it as the site's era. That is how a lowcountry
+ * cemetery came to be labelled "2000s".
+ *
+ * The rule below is deliberately evidence-based rather than source-based: a year is a
+ * designation year when the record's own claims only ever mention it inside a designation
+ * claim. "1907 House", listed in 1979, keeps its 1907 because 1907 is not the listing year;
+ * a church listed in 2001 with no other dated claim yields no era at all, which is the
+ * honest answer until a period of significance is ingested.
+ */
+
+/** Claim predicates that record an administrative designation rather than a historical fact. */
+const DESIGNATION_PREDICATE =
+  /^(listing|listed|designation|designated|nrhp_listing|national_register_listing)$/i;
+
+/** Designation vocabulary in claim prose, for records whose predicate is less specific. */
+const DESIGNATION_TEXT =
+  /\bNational (?:Register of Historic Places|Historic Landmark|Register)\b|\blisted on the National Register\b|\bNational Historic Landmark\b/i;
+
+/** Four-digit years a claim can plausibly assert, 1500–2099. */
+const CLAIM_YEAR = /\b(1[5-9]\d{2}|20\d{2})\b/g;
+
+/** The slice of a claim this module reads. Structurally compatible with public claim views. */
+export type EraEvidenceClaim = {
+  readonly predicate?: string;
+  readonly object?: string;
+};
+
+/** A dated lifecycle span, loosened to the shape both release entries and public views carry. */
+export type EraEvidenceSpan = {
+  readonly validFrom?: string;
+  readonly validTo?: string | null;
+  readonly datePrecision?: string;
+};
+
+/** True when a claim records a designation/listing event rather than a historical one. */
+export function isDesignationClaim(claim: EraEvidenceClaim): boolean {
+  if (DESIGNATION_PREDICATE.test(claim.predicate?.trim() ?? '')) return true;
+  return DESIGNATION_TEXT.test(claim.object ?? '');
+}
+
+function yearsInClaim(claim: EraEvidenceClaim): readonly string[] {
+  return (claim.object ?? '').match(CLAIM_YEAR) ?? [];
+}
+
+/**
+ * True when `year` is attested only by designation claims. A year no claim mentions is not
+ * designation-only — absence of evidence must not silently suppress an authored date.
+ */
+export function isDesignationOnlyYear(year: string, claims: readonly EraEvidenceClaim[]): boolean {
+  let seenInDesignation = false;
+  for (const claim of claims) {
+    if (!yearsInClaim(claim).includes(year)) continue;
+    if (!isDesignationClaim(claim)) return false;
+    seenInDesignation = true;
+  }
+  return seenInDesignation;
+}
+
+function spanIsDesignationOnly(
+  span: EraEvidenceSpan,
+  claims: readonly EraEvidenceClaim[],
+): boolean {
+  const from = /\d{4}/.exec(span.validFrom ?? '')?.[0];
+  const to = /\d{4}/.exec(span.validTo ?? '')?.[0];
+  if (from === undefined && to === undefined) return false;
+  const years = [from, to].filter((year): year is string => year !== undefined);
+  return years.every((year) => isDesignationOnlyYear(year, claims));
+}
+
+function bucketsForSpan(span: EraEvidenceSpan): readonly string[] {
+  const validFrom = span.validFrom?.trim();
+  if (!validFrom || /^undated$/iu.test(validFrom)) return [];
+  return deriveEraBuckets({
+    validFrom,
+    ...(span.validTo !== undefined ? { validTo: span.validTo } : {}),
+    datePrecision:
+      span.datePrecision && isDatePrecision(span.datePrecision) ? span.datePrecision : 'year',
+  });
+}
+
+/** Everything a record can offer as evidence of when its history happened. */
+export type EraEvidenceInput = {
+  /** Authored decade labels. Always authoritative — never second-guessed against claims. */
+  readonly eraBuckets?: readonly string[];
+  /** `event`-kind records carry their span here instead of in `statusHistory`. */
+  readonly eventWindow?: EraEvidenceSpan;
+  /** Lifecycle spans, which may hold designation dates and are therefore screened. */
+  readonly statusHistory?: readonly EraEvidenceSpan[];
+  /** The record's claims, read only to tell designation years from historical ones. */
+  readonly claims?: readonly EraEvidenceClaim[];
+};
+
+/**
+ * Decade buckets a record's dates genuinely support, in precedence order: authored buckets,
+ * then the event window, then lifecycle spans that are not designation-only. Returns an empty
+ * array when the record documents no historical date — callers render that as "Undated" rather
+ * than substituting a date the record never claimed.
+ */
+export function resolveEraBucketsFromEvidence(input: EraEvidenceInput): readonly string[] {
+  const authored = (input.eraBuckets ?? []).map((bucket) => bucket.trim()).filter(Boolean);
+  if (authored.length > 0) return filterDecadesAtOrBeforeCurrent(authored);
+
+  if (input.eventWindow) {
+    const fromEvent = bucketsForSpan(input.eventWindow);
+    if (fromEvent.length > 0) return filterDecadesAtOrBeforeCurrent(fromEvent);
+  }
+
+  const claims = input.claims ?? [];
+  const buckets = new Set<string>();
+  for (const span of input.statusHistory ?? []) {
+    if (spanIsDesignationOnly(span, claims)) continue;
+    for (const bucket of bucketsForSpan(span)) buckets.add(bucket);
+  }
+  if (buckets.size === 0) return [];
+  return filterDecadesAtOrBeforeCurrent([...buckets].sort((a, b) => a.localeCompare(b)));
+}

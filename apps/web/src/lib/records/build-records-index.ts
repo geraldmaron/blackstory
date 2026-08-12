@@ -217,6 +217,7 @@ function toFacts(entity: PublicEntityView): RecordFacts {
     ...(entity.era !== undefined ? { era: entity.era } : {}),
     ...(entity.eventWindow !== undefined ? { eventWindow: entity.eventWindow } : {}),
     ...(entity.statusHistory !== undefined ? { statusHistory: entity.statusHistory } : {}),
+    claims: entity.claims,
   });
   const confidenceTier = highestConfidence(entity.claims);
   const state = findUsStateFromJurisdictionLabel(entity.jurisdictionLabel);

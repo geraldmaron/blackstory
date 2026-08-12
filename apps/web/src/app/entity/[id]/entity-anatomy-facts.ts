@@ -54,6 +54,7 @@ export function buildEntityAnatomyInputs(
     ...(entity.era !== undefined ? { era: entity.era } : {}),
     ...(entity.eventWindow !== undefined ? { eventWindow: entity.eventWindow } : {}),
     ...(entity.statusHistory !== undefined ? { statusHistory: entity.statusHistory } : {}),
+    claims: entity.claims,
   });
   const evidenceTier = highestConfidence(entity.claims);
   const claimCount = entity.claims.length;
