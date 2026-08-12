@@ -31,6 +31,13 @@ export type EnrichmentEvidenceInput = {
   readonly title: string | null;
   /** Possibly truncated by the caller to bound prompt size; truncation never hides a citation's source. */
   readonly text: string;
+  /**
+   * How `text` relates to the source document, when it is not the whole of it (repo-z57b). Says
+   * whether the excerpt was selected for relevance or is a plain head slice, how much was left
+   * out, and — the part a drafter must act on — whether the document mentions the lane's subject
+   * matter anywhere at all. Absent when the source was handed over whole.
+   */
+  readonly readNote?: string | null;
 };
 
 export type EnrichmentSubject = {
@@ -155,6 +162,7 @@ export function buildEnrichmentUserPrompt(
         id: item.id,
         tier: item.sourceTier,
         title: item.title,
+        ...(item.readNote == null ? {} : { readNote: item.readNote }),
         text: item.text,
       })),
       rules: [
@@ -163,6 +171,11 @@ export function buildEnrichmentUserPrompt(
           'construction, materials, plan, or architectural style',
         'every citation.evidenceId must be one of the ids in the evidence array above',
         "every citation.quote must be an exact verbatim substring of that evidence id's text",
+        'an evidence item carrying a readNote is an excerpt: "[…]" marks omitted text, and a ' +
+          'quote must come from one side of it, never span it',
+        'if a readNote says the document never mentions the subject matter, do not build an entry ' +
+          'out of its criteria labels or theme lists — that describes the nomination form, not ' +
+          'history, and it will pass every check while saying nothing',
         'topicIds must only use ids from allowedTopicIds; omit if none clearly apply',
         'eraBuckets must be decade labels ("1950s") grounded in a year present in the evidence',
         'if evidence is too thin for historicalContext, set it to null and historicalContextCitations to []',

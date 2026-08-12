@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   assessLandscapeDepth,
+  buildLiveDepthEntry,
   buildReleaseSourceFromLandscape,
   buildArtifactsForEntry,
   canonicalUpsertParamsFromLandscape,
@@ -228,6 +229,140 @@ test('gateLandscapePublishCandidate holds back a generated NRHP template summary
   if (!result.eligible) {
     assert.equal(result.reason, 'template_only');
     assert.match(result.detail, /generated-template signature/u);
+  }
+});
+
+/**
+ * repo-b4ad — ADMISSION vs REGRESSION. All four tests below use the SAME shallow candidate, the
+ * one the test directly above rejects. What changes is whether the record is already live and
+ * what is published for it, because that is the only thing that should change the answer.
+ */
+
+/** The live baseline: a shallow published row, the shape 2,360 live records are in. */
+const shallowLiveRow = () => ({
+  summary: 'Historic site listed on the National Register. ethnic heritage (Black)',
+  claims: [],
+  projection: {},
+});
+
+/** A live row a sweep has enriched — deep, and therefore not overwritable by template prose. */
+const deepLiveRow = () => ({
+  summary: 'Founded in 1881 by formerly enslaved families and served the county until 1968.',
+  claims: [],
+  projection: { historicalContext: 'A researched paragraph written from fetched sources.' },
+});
+
+test('depth gate still rejects a shallow candidate for a record that is NOT live', () => {
+  const result = gateLandscapePublishCandidate({
+    row: nrhpRow(),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    allowRepublish: true,
+    liveDepth: { deep: false, detail: 'irrelevant — the candidate is not in the release' },
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) assert.equal(result.reason, 'template_only');
+});
+
+test('depth gate lets a corrected summary replace SHALLOW published prose', () => {
+  const row = nrhpRow({ exact_in_release: true });
+  const liveDepth = assessLandscapeDepth(buildLiveDepthEntry(shallowLiveRow()), row);
+  assert.equal(liveDepth.deep, false);
+
+  const result = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    allowRepublish: true,
+    liveDepth,
+  });
+  assert.equal(result.eligible, true);
+});
+
+test('depth gate refuses to replace DEEP published prose with a shallow candidate', () => {
+  const row = nrhpRow({ exact_in_release: true });
+  const liveDepth = assessLandscapeDepth(buildLiveDepthEntry(deepLiveRow()), row);
+  assert.equal(liveDepth.deep, true);
+
+  const result = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    allowRepublish: true,
+    liveDepth,
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) assert.equal(result.reason, 'template_only');
+});
+
+/**
+ * The fail-closed default. A caller that never loaded live state gets the strict admission test,
+ * so forgetting to pass `liveDepth` cannot silently widen what publishes.
+ */
+test('depth gate falls back to the strict admission test when live state is unknown', () => {
+  const result = gateLandscapePublishCandidate({
+    row: nrhpRow({ exact_in_release: true }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    allowRepublish: true,
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) assert.equal(result.reason, 'template_only');
+});
+
+/**
+ * repo-8dlu — name_overlap, same admission/regression split. The overlap flag is identical in all
+ * three cases; only whether the row is already live changes the answer.
+ */
+test('name_overlap still blocks a NEW candidate whose name collides with a live entity', () => {
+  const result = gateLandscapePublishCandidate({
+    row: enrichedRow({ name_overlap: true }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) assert.equal(result.reason, 'name_overlap');
+});
+
+test('name_overlap still blocks a colliding candidate that is NOT already live, even on a republish run', () => {
+  const result = gateLandscapePublishCandidate({
+    row: enrichedRow({ name_overlap: true, exact_in_release: false }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    allowRepublish: true,
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) assert.equal(result.reason, 'name_overlap');
+});
+
+test('name_overlap does not block an in-place correction of a row already live under its own id', () => {
+  const result = gateLandscapePublishCandidate({
+    row: enrichedRow({ name_overlap: true, exact_in_release: true }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    allowRepublish: true,
+  });
+  assert.equal(result.eligible, true);
+});
+
+/** A republish admitted by the regression clause must still read as thin (repo-vymq). */
+test('a regression-clause republish publishes researchCoverage=minimal', () => {
+  const row = nrhpRow({ exact_in_release: true });
+  const result = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    allowRepublish: true,
+    liveDepth: assessLandscapeDepth(buildLiveDepthEntry(shallowLiveRow()), row),
+  });
+  assert.equal(result.eligible, true);
+  if (result.eligible) {
+    const build = buildReleaseEntityArtifacts(result.entry, {
+      releaseId: 'rel_seed_001',
+      generatedAt: '2026-07-22T00:00:00.000Z',
+    });
+    assert.equal(build.ok, true);
+    assert.equal(build.ok && build.projection.researchCoverage, 'minimal');
   }
 });
 

@@ -55,10 +55,40 @@ From the repo root, with `set -a && source apps/web/.env.local && set +a` and
    an agent cannot attach its output to the wrong entity. Tell each agent:
    - what a good entry is (significance, not fabric — the same instruction the system prompt in
      `lib/entity-enrichment-llm.ts` now carries)
+   - the full draft shape, **including `keywords`** — it is a required string array, and a brief
+     that omits it costs every drafter a round-trip on `keywords is not an array`
    - to iterate `check.mjs` until PASS
-   - to REFUSE by writing `refuse-N.json` when the evidence carries no Black-history significance,
-     rather than padding to clear the 120-char floor
+   - to weigh the evidence tiers: the tier-1 nomination is authoritative and a tier-2 block is
+     often a short encyclopedia stub. **If all the Black-history content lives in one sentence of
+     a tier-2 stub and the tier-1 nomination has none, that is a refusal.** See "The tier-2 stub
+     trap" below — this is the rule that catches otherwise-valid entries about the wrong subject.
+   - to choose between THREE outcomes, not two (see below)
    - not to run `git`, `bd`, `psql`, or any repo script, and to write only under its drafts dir
+
+   **Three outcomes, and the difference between the last two matters.**
+
+   | outcome | file | what it records |
+   | --- | --- | --- |
+   | draft | `draft-N.json` | an entry |
+   | refuse | `refuse-N.json` | terminal `no-lane-significance`; never re-offered |
+   | defer | *(write nothing)* | row stays `pending`; will be re-offered |
+
+   Refuse means *this subject does not belong on the site* — a white institution, an architecture-
+   only nomination, a district that turns out to be someone else's history. Defer means *it may
+   well belong, but the captured text cannot support an entry* — most often because the read
+   window truncated before the Section 8 narrative (repo-z57b), leaving only an "Areas of
+   Significance" line or a theme label.
+
+   Conflating them is expensive in both directions: refusing a truncation case permanently drops a
+   real subject, and drafting one produces a sentence about the nomination form. Wave 5 hit this
+   exactly — a first pass at Redd Road Rural HD returned *"Black heritage is one of the historic
+   themes the National Register nomination recognizes across this rural Kentucky district…"*,
+   which **passed the validator** because every clause was citable. Only a human read caught it.
+
+   Mechanically, a deferred subject writes no file, so `session-enrich-collect.ts` reports it under
+   `NO OUTPUT AT ALL — a drafter likely died`. That is the right behaviour reached by the wrong
+   path; read that line as "deferred or died" until collect learns about an explicit
+   `defer-N.json`.
 
 4. **Collect and validate.**
 
@@ -117,6 +147,53 @@ From the repo root, with `set -a && source apps/web/.env.local && set +a` and
    for the ids you just published and assert none of their summaries still contains a
    `LANE_TEMPLATE_SIGNATURES` fingerprint. Wave 3: 22 of 23 live with drafted prose, the 23rd
    correctly held by `confidence_below_floor`.
+
+## The evidence you are handed is an excerpt, and it says so
+
+Since repo-z57b the read window is **relevance-aware, not positional**. It is no longer the first
+12,000 characters of the nomination. For any source too long to hand over whole, a drafter gets the
+document's own opening statement plus the passages that actually discuss Black history, chosen from
+the whole document, in document order, with `[…]` marking each gap
+(`scripts/lib/evidence-excerpt.ts`).
+
+Two consequences at the drafting desk:
+
+- **Never quote across a `[…]`.** Each side is verbatim from the source; the join is not. The
+  validator only checks that a quote is a substring of what you were handed, so it would *accept* a
+  quote that spans the marker and reads as one sentence in the source when it is two, thousands of
+  characters apart.
+- **Read the `readNote`.** It states how much was omitted and whether the document mentions Black
+  history *anywhere* — the excerpter scanned all of it, so this is knowledge you do not otherwise
+  have. `Nothing anywhere in the full document mentions Black history` is an **absence**, which is a
+  refusal. Anything else is a truncation question, which is a defer.
+
+Why this replaced the head slice: Redd Road Rural HD's narrative began at 12,183 characters and the
+old window stopped at 12,000. It missed by 183 characters and cost a whole drafting attempt, which
+came back with a sentence about the nomination form. Big Sink Rural HD's best passages sit at 27%
+and 55% of a 290,000-character document — no affordable cap reaches those by reading from the front.
+
+## The tier-2 stub trap
+
+The validator checks that prose is *sourced*. It cannot check that the prose is about *our*
+subject, and that gap has a specific, repeatable shape.
+
+Cato Hill Historic District is the clean example. Its tier-1 nomination documents an Irish, then
+French-Canadian, then Central European mill neighbourhood in Woonsocket and contains no Black
+content whatsoever. Its entire Black connection is one sentence in a Wikipedia-derived tier-2 stub:
+the hill is named for Cato Aldrich, an African American who bought the land from the family that
+founded the town. A drafter turned that into a valid entry — the naming fact is genuinely citable —
+but it only cleared the 120-character floor by appending *"and it grew into a dense working-class
+enclave"*, and its context paragraph was entirely about Irish and French-Canadian immigrants.
+
+Every clause was true and every quote verbatim, and the entry was still wrong. This is the same
+family as the "thin" mis-attachment class in repo-pjob: correct citations, wrong subject. Give
+drafters the tier rule up front and they catch it themselves — once it was added, drafters flagged
+West Capitol Street HD (a white downtown Jackson commercial strip whose tier-2 block is a
+mis-attached stub about the Mississippi Governor's Mansion) and Portland Proper (an archaeological
+site whose only Black reference is "slavery and ethnicity" listed among research problems the site
+could *potentially* address) without further prompting.
+
+District and archaeological nominations are where this concentrates.
 
 ## Two things that will bite
 

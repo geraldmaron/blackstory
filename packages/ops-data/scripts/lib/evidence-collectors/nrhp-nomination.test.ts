@@ -7,6 +7,7 @@ import {
   splitByNarrativeHeadings,
   parseNomination,
   checkNominationIdentity,
+  isUsableRefnum,
   nominationTextUrl,
 } from './nrhp-nomination.ts';
 
@@ -213,11 +214,33 @@ test('nominationTextUrl builds NPGallery URL for 8-digit refnum', () => {
   assert.equal(url, 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/71000836_text');
 });
 
-test('nominationTextUrl throws for refnum that is not exactly 8 digits', () => {
-  assert.throws(() => nominationTextUrl('123'), /8 digits/);
-  assert.throws(() => nominationTextUrl('123456789'), /8 digits/);
-  assert.throws(() => nominationTextUrl('abcdefgh'), /8 digits/);
-  assert.throws(() => nominationTextUrl(''), /8 digits/);
+/**
+ * The 9-digit case is not hypothetical. NPS issues modern listings from a 100000000-block, and
+ * rejecting those starved 485 entities in the nrhp-black-heritage lane of the richest source in
+ * the corpus — the nomination collector had never been attempted on ANY of the 695 rows carrying
+ * one. Verified against NPGallery that they serve full nomination PDFs.
+ */
+test('nominationTextUrl builds NPGallery URL for a modern 9-digit refnum', () => {
+  const url = nominationTextUrl('100002883');
+  assert.equal(url, 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/100002883_text');
+});
+
+test('nominationTextUrl throws for a refnum that is not 8 or 9 digits', () => {
+  assert.throws(() => nominationTextUrl('123'), /8 or 9 digits/);
+  assert.throws(() => nominationTextUrl('1234567'), /8 or 9 digits/);
+  assert.throws(() => nominationTextUrl('1234567890'), /8 or 9 digits/);
+  assert.throws(() => nominationTextUrl('abcdefgh'), /8 or 9 digits/);
+  assert.throws(() => nominationTextUrl(''), /8 or 9 digits/);
+});
+
+test('isUsableRefnum accepts both series and nothing else', () => {
+  assert.equal(isUsableRefnum('71000836'), true);
+  assert.equal(isUsableRefnum('100002883'), true);
+  assert.equal(isUsableRefnum('7100083'), false);
+  assert.equal(isUsableRefnum(undefined), false);
+  // The sweep and nominationTextUrl must not disagree about what is usable; sharing this
+  // predicate is what stops a row being rejected before a fetch that would have succeeded.
+  assert.equal(isUsableRefnum('100002883'), true);
 });
 
 test('checkNominationIdentity corroborates place when both state and county appear in narrative', () => {
@@ -621,4 +644,192 @@ test('a genuinely different place still fails corroboration', () => {
     city: 'Atlanta',
   });
   assert.equal(result.placeCorroborated, false);
+});
+
+// --- repo-pb5l: form vintages and blank-template hazards -----------------------------------
+
+test('splitNominationSections handles vintage C "Item number" headers (NPS Form 10-900 3-82)', () => {
+  const prose7 = `The church is a brick edifice with Gothic influences. ${'Fabric detail. '.repeat(40)}`;
+  const text = normalizeExtractedText(`
+    National Register of Historic Places Inventory-Nomination Form
+    Continuation sheet Item number 7 OMB No. 1024-0018 Page 2
+    ${prose7}
+  `);
+  const sections = splitNominationSections(text);
+  const section7 = sections.find((s) => s.section === '7');
+  assert.ok(section7, 'the Item-number vintage must yield section 7');
+  assert.ok(section7!.text.includes('Gothic influences'));
+});
+
+test('splitNominationSections matches a section header whose page rule is unreadable', () => {
+  // Refnum 91001106: the property name is printed where the page rule sits, so there is no
+  // "Page" token at all. A Page-mandatory pattern matched none of its 10 headers.
+  const prose = `The district developed after 1900. ${'Historical detail. '.repeat(40)}`;
+  const text = normalizeExtractedText(`
+    CONTINUATION SHEET Section number 8 Woodland-Scarboro Historic District
+    ${prose}
+  `);
+  const section8 = splitNominationSections(text).find((s) => s.section === '8');
+  assert.ok(section8, 'a header without a readable page rule must still open a section');
+  assert.ok(section8!.text.includes('developed after 1900'));
+});
+
+test('splitNominationSections ignores section numbers above 13, which the form does not have', () => {
+  // Refnum 88003348 came back segmented into sections 18, 32, 55 and 82 — photo-log captions
+  // and OCR debris, each spurious header truncating the real section it landed inside.
+  const text = normalizeExtractedText(`
+    Section number 8 Page 1
+    ${'Real significance prose. '.repeat(40)}
+    Section number 55 Page 2
+    ${'This must not open a new section. '.repeat(20)}
+  `);
+  const sections = splitNominationSections(text);
+  assert.ok(!sections.some((s) => s.section === '55'), 'section 55 does not exist on the form');
+  const section8 = sections.find((s) => s.section === '8');
+  assert.ok(section8!.text.includes('must not open a new section'), 'the run should not be cut');
+});
+
+test('splitByNarrativeHeadings skips a trailing BLANK form template and uses the filled instance', () => {
+  // The hazard from repo-pb5l: many scans bind an empty copy of the form after the filled one,
+  // so the last occurrence of the heading is boilerplate.
+  const real = `The congregation was formed in 1886 on a site donated by a local landowner. ${'Congregational history. '.repeat(40)}`;
+  const text = normalizeExtractedText(`
+    8. STATEMENT OF SIGNIFICANCE
+    ${real}
+
+    9. MAJOR BIBLIOGRAPHICAL REFERENCES
+    Sanborn Insurance Maps.
+
+    8. STATEMENT OF SIGNIFICANCE
+    D summary paragraph D completeness D clarity D applicable criteria
+    D justification of areas checked D relating significance to the resource
+    9. MAJOR BIBLIOGRAPHICAL REFERENCES
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, 'the blank template must not cost the section entirely');
+  assert.ok(section8!.text.includes('formed in 1886'), 'must use the filled instance');
+  assert.ok(
+    !section8!.text.includes('justification of areas checked'),
+    'must not capture the empty checklist',
+  );
+});
+
+test('splitByNarrativeHeadings keeps searching back when the last occurrence is too short', () => {
+  const real = `The property served the community for decades. ${'Documented history. '.repeat(40)}`;
+  const text = normalizeExtractedText(`
+    8. STATEMENT OF SIGNIFICANCE
+    ${real}
+
+    9. MAJOR BIBLIOGRAPHICAL REFERENCES
+    References here.
+
+    8. STATEMENT OF SIGNIFICANCE
+    See continuation sheet.
+    9. MAJOR BIBLIOGRAPHICAL REFERENCES
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, 'a short final occurrence must not drop the section');
+  assert.ok(section8!.text.includes('served the community'));
+});
+
+test('parseNomination fills a section the table missed from the narrative headings', () => {
+  // The 3-82 form carries a continuation sheet for item 7 and none for item 8, whose
+  // significance runs on the front form. All-or-nothing captured fabric and dropped history.
+  const prose7 = `The building is of brick construction. ${'Fabric detail. '.repeat(40)}`;
+  const prose8 = `SUMMARY The church is a key institution in the history of the community. ${'Historical detail. '.repeat(40)}`;
+  const text = normalizeExtractedText(`
+    Continuation sheet Item number 7 OMB No. 1024-0018 Page 2
+    ${prose7}
+
+    STATEMENT OF SIGNIFICANCE
+    ${prose8}
+  `);
+  const parsed = parseNomination(text, 'Mount Zion Baptist Church');
+  assert.equal(parsed.segmentation, 'mixed');
+  assert.ok(parsed.hasSignificance, 'section 8 must come from the fallback');
+  assert.ok(parsed.narrative.includes('key institution'));
+  assert.ok(parsed.narrative.includes('brick construction'));
+});
+
+test('parseNomination prefers whichever strategy found more of a section', () => {
+  // Refnum 76001238: a table that read only some of its sheets opened section 8 at "PAGE Two",
+  // losing the first page of significance. Taking the table on the strength of matching at all
+  // turned 19,719 characters into 2,759.
+  const full = `Will Marion Cook was described as a musician of international reputation. ${'Biographical detail. '.repeat(60)}`;
+  const text = normalizeExtractedText(`
+    8. STATEMENT OF SIGNIFICANCE
+    ${full}
+    Section number 8 Page 2
+    ${'Only the second sheet. '.repeat(30)}
+  `);
+  const parsed = parseNomination(text, 'Cook, Will Marion, House');
+  assert.ok(
+    parsed.narrative.includes('international reputation'),
+    'the longer strategy must win for the section',
+  );
+});
+
+test('splitNominationSections reads the modern sheet header that omits the word "number"', () => {
+  // Vintage D. The 10-900 Registration Form as printed since the late 1990s heads its
+  // continuation sheets "Section 8 Page _9" — no "number", no dash, no "Item". Refnum 07001083
+  // (Harriet M. Cornwell Tourist House) is the measured case: none of the three earlier patterns
+  // matched a single sheet, so the section table came back without the pages carrying the
+  // narrative and the heading fallback took the criteria checkbox block off the front form.
+  const significance = `The Harriet M. Cornwell Tourist Home is eligible for listing under Criterion A based upon its role in the practice of segregation. ${'Travellers relied on the Green Book. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    Section 7 Page _5
+    ${'The foundation is granite masonry. '.repeat(30)}
+
+    Section 8 Page _9
+    ${significance}
+  `);
+  const sections = splitNominationSections(text);
+  const eight = sections.find((section) => section.section === '8');
+  assert.ok(eight, 'the sheet header without "number" must open section 8');
+  assert.ok(eight.text.includes('practice of segregation'));
+  assert.ok(
+    sections.find((section) => section.section === '7')?.text.includes('granite masonry'),
+    'the same header shape must still bound section 7',
+  );
+});
+
+test('a bare "Section 8" in running prose does not open a section', () => {
+  // What keeps vintage D safe. "number" is the form label that makes vintage A's digit
+  // trustworthy; "Page" is the one that makes D's trustworthy. Without a mandatory page rule,
+  // prose discussing the form would carve the document up.
+  const text = normalizeExtractedText(`
+    Continuation sheet Item number 7 Page 1
+    ${'The reviewer noted that Section 8 should be expanded before resubmission. '.repeat(20)}
+  `);
+  const sections = splitNominationSections(text);
+  assert.equal(
+    sections.find((section) => section.section === '8'),
+    undefined,
+    'a section number mentioned in prose is not a sheet header',
+  );
+});
+
+test('parseNomination reports the sections it actually captured, not the winning strategy', () => {
+  // `sections` feeds `sectionsFound` in the evidence row's provenance, which a later pass reads
+  // to decide whether a record still needs re-sweeping. It used to be all-or-nothing — the whole
+  // output of whichever strategy won ANY section — so a document taking 7 from the table and 8
+  // from the headings reported the table's sections and omitted 8, while `narrative` contained
+  // it. Refnum 100003285 carried 103,604 characters of significance that the provenance denied.
+  const prose7 = `The building is of brick construction. ${'Fabric detail. '.repeat(40)}`;
+  const prose8 = `The school is significant for its association with Black education. ${'Historical detail. '.repeat(40)}`;
+  const text = normalizeExtractedText(`
+    Section number 7 Page 1
+    ${prose7}
+
+    NARRATIVE STATEMENT OF SIGNIFICANCE
+    ${prose8}
+  `);
+  const parsed = parseNomination(text, 'Immanuel School');
+  assert.equal(parsed.segmentation, 'mixed', 'one section from each strategy');
+  assert.deepEqual(
+    parsed.sections.map((section) => section.section),
+    ['7', '8'],
+    'both captured sections must be reported',
+  );
+  assert.ok(parsed.hasSignificance);
 });

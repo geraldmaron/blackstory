@@ -33,13 +33,16 @@ import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
+  assessLandscapeDepth,
   buildArtifactsForEntry,
+  buildLiveDepthEntry,
   canonicalUpsertParamsFromLandscape,
   gateLandscapePublishCandidate,
   incrementalPublishProvenancePatch,
   parseCanonicalStatusSnapshot,
   type CanonicalEntityPublishRow,
   type LandscapePublishRow,
+  type LivePublishedRow,
   type PublishGateSkipReason,
   type PublishStatusLintReport,
   type ReleaseEntityUpsertRow,
@@ -213,6 +216,22 @@ FROM bb_canonical.entities
 WHERE id = ANY($1::text[])
 `;
 
+/**
+ * repo-b4ad: what is CURRENTLY published for these entities, so the depth gate can ask the
+ * non-regression question ("is this better than what readers see?") instead of the admission
+ * question ("is this good enough to publish at all?") for a record that is already live.
+ *
+ * Only the three columns `assessLandscapeDepth` reads — see `buildLiveDepthEntry`. Scoped to the
+ * ACTIVE release: a row from a superseded release is not what any reader is looking at, and
+ * treating it as the live baseline would compare the candidate against text nobody can see.
+ */
+const LIVE_PUBLISHED_BY_IDS_SQL = `
+SELECT e.entity_id, e.summary, e.claims, e.projection
+FROM bb_public.release_entities e
+JOIN bb_public.active_release a ON a.release_id = e.release_id
+WHERE e.entity_id = ANY($1::text[])
+`;
+
 function readArg(prefix: string): string | undefined {
   const hit = process.argv.find((entry) => entry.startsWith(prefix));
   return hit ? hit.slice(prefix.length) : undefined;
@@ -371,13 +390,23 @@ function preparePublish(input: {
   readonly fromLandscape: boolean;
   readonly canonicalStatus?: ReturnType<typeof parseCanonicalStatusSnapshot>;
   readonly allowRepublish?: boolean;
+  /** The active-release row for this entity, when it is already live (repo-b4ad). */
+  readonly livePublished?: LivePublishedRow;
 }): PreparedPublish | SkippedRow {
   if (input.fromLandscape && input.row) {
+    // Computed here rather than in the batch load because the verdict needs the candidate row's
+    // canonical_url: `assessLandscapeDepth` counts a claim as independent evidence only when it
+    // cites a document OTHER than the record's own registry index entry.
+    const liveDepth =
+      input.livePublished === undefined
+        ? undefined
+        : assessLandscapeDepth(buildLiveDepthEntry(input.livePublished), input.row);
     const gate = gateLandscapePublishCandidate({
       row: input.row,
       releaseId: input.releaseId,
       generatedAt: input.generatedAt,
       allowRepublish: input.allowRepublish ?? false,
+      ...(liveDepth !== undefined ? { liveDepth } : {}),
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
     });
     if (!gate.eligible) {
@@ -503,6 +532,12 @@ async function main(): Promise<void> {
       canonicalRes.rows.map((row) => [row.entity_id, parseCanonicalStatusSnapshot(row)]),
     );
 
+    const liveRes = await client.query<LivePublishedRow & { readonly entity_id: string }>(
+      LIVE_PUBLISHED_BY_IDS_SQL,
+      [sliced.map((item) => item.entityId)],
+    );
+    const livePublishedById = new Map(liveRes.rows.map((row) => [row.entity_id, row]));
+
     const prepared: PreparedPublish[] = [];
     const skipped: SkippedRow[] = [];
     const skipCounts = new Map<string, number>();
@@ -516,6 +551,9 @@ async function main(): Promise<void> {
         entityId: item.entityId,
         fromLandscape: item.fromLandscape,
         allowRepublish,
+        ...(livePublishedById.get(item.entityId) !== undefined
+          ? { livePublished: livePublishedById.get(item.entityId) }
+          : {}),
         ...(canonicalById.get(item.entityId) !== undefined
           ? { canonicalStatus: canonicalById.get(item.entityId) }
           : {}),

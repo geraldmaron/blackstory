@@ -16,6 +16,7 @@ import {
   type ReleaseClaimProjection,
   type ReleaseSourceEntity,
 } from './release-builder.js';
+import { NRHP_SUMMARY_FILLER, NRHP_SUMMARY_TRAILER } from './template-summary-signatures.js';
 import { sanitizePublicProseText } from './public-render.js';
 
 const CONTEXT = { releaseId: 'release-2026-07-18', generatedAt: '2026-07-18T00:00:00.000Z' };
@@ -166,6 +167,15 @@ test('buildReleaseNotabilityBasis never fabricates evidence for an uncited claim
   assert.deepEqual(basis[0]!.evidenceIds, []);
 });
 
+/**
+ * Prose with no registered template fingerprint — the normal case, where coverage is decided by
+ * the claim set alone. The tests below that exercise the fingerprint cap pass a templated summary
+ * instead, so the two axes stay independently testable (repo-vymq).
+ */
+const RESEARCHED_SUMMARY =
+  'Founded in 1881 by formerly enslaved families, the school served the county until 1968 and its ' +
+  'graduates led the local voter-registration drives of the following decade.';
+
 /** One claim citing one document — the floor case. */
 test('computeReleaseResearchCoverage: a single cited claim is minimal', () => {
   const claims: readonly ReleaseClaimProjection[] = [
@@ -178,7 +188,7 @@ test('computeReleaseResearchCoverage: a single cited claim is minimal', () => {
       citationLabel: 'L',
     },
   ];
-  assert.equal(computeReleaseResearchCoverage(claims), 'minimal');
+  assert.equal(computeReleaseResearchCoverage(claims, RESEARCHED_SUMMARY), 'minimal');
 });
 
 /** repo-z1pw, the exact live shape: the nrhp-black-heritage lane carves a listing fact and a
@@ -194,7 +204,7 @@ test('computeReleaseResearchCoverage: many claims citing ONE document is minimal
     citationHref: 'https://catalog.archives.gov/id/77843341',
     citationLabel: 'L',
   }));
-  assert.equal(computeReleaseResearchCoverage(claims), 'minimal');
+  assert.equal(computeReleaseResearchCoverage(claims, RESEARCHED_SUMMARY), 'minimal');
 });
 
 /** Query strings, anchors and trailing slashes must not split one document into several — that
@@ -215,7 +225,7 @@ test('computeReleaseResearchCoverage: url noise does not make one document look 
     citationHref: href,
     citationLabel: 'L',
   }));
-  assert.equal(computeReleaseResearchCoverage(claims), 'minimal');
+  assert.equal(computeReleaseResearchCoverage(claims, RESEARCHED_SUMMARY), 'minimal');
 });
 
 /** Same publisher, different documents — the NRHP nomination form alongside the index entry.
@@ -241,7 +251,7 @@ test('computeReleaseResearchCoverage: two documents from one publisher is partia
       citationLabel: 'L',
     },
   ];
-  assert.equal(computeReleaseResearchCoverage(claims), 'partial');
+  assert.equal(computeReleaseResearchCoverage(claims, RESEARCHED_SUMMARY), 'partial');
 });
 
 test('computeReleaseResearchCoverage: five+ fully-cited claims across two documents is substantial', () => {
@@ -254,7 +264,75 @@ test('computeReleaseResearchCoverage: five+ fully-cited claims across two docume
     citationHref: `https://example.org/doc-${i % 2}`,
     citationLabel: 'L',
   }));
-  assert.equal(computeReleaseResearchCoverage(claims), 'substantial');
+  assert.equal(computeReleaseResearchCoverage(claims, RESEARCHED_SUMMARY), 'substantial');
+});
+
+/**
+ * repo-vymq. The claim set here is the SAME one that scores 'substantial' directly above — five
+ * fully-cited claims across two documents. Only the summary differs. A record whose description
+ * was assembled from index fields cannot publish above 'minimal' no matter how its claims score,
+ * because coverage is a statement about the prose a reader actually sees.
+ */
+test('computeReleaseResearchCoverage: a templated summary caps coverage at minimal', () => {
+  const claims: readonly ReleaseClaimProjection[] = Array.from({ length: 5 }, (_, i) => ({
+    id: `c${i}`,
+    predicate: `p${i}`,
+    object: 'o',
+    confidenceLevel: 'high' as const,
+    citationSource: 'S',
+    citationHref: `https://example.org/doc-${i % 2}`,
+    citationLabel: 'L',
+  }));
+  const templated = `The Mount Zion Missionary Baptist Church is a historic site.${NRHP_SUMMARY_TRAILER}`;
+  assert.equal(computeReleaseResearchCoverage(claims, RESEARCHED_SUMMARY), 'substantial');
+  assert.equal(computeReleaseResearchCoverage(claims, templated), 'minimal');
+});
+
+/** The filler sentence is a fingerprint in its own right, not only the trailer. */
+test('computeReleaseResearchCoverage: the filler sentence also caps coverage', () => {
+  const claims: readonly ReleaseClaimProjection[] = [0, 1].map((i) => ({
+    id: `c${i}`,
+    predicate: `p${i}`,
+    object: 'o',
+    confidenceLevel: 'high' as const,
+    citationSource: 'S',
+    citationHref: `https://example.org/doc-${i}`,
+    citationLabel: 'L',
+  }));
+  assert.equal(computeReleaseResearchCoverage(claims, RESEARCHED_SUMMARY), 'partial');
+  assert.equal(
+    computeReleaseResearchCoverage(claims, `A historic site.${NRHP_SUMMARY_FILLER}`),
+    'minimal',
+  );
+});
+
+/** The cap follows the entity through the builder, not just the bare coverage function. */
+test('buildReleaseEntityArtifacts publishes a templated summary as minimal coverage', () => {
+  const entry = baseEntry({
+    summary: `The Lincoln School is a historic site in Alabama.${NRHP_SUMMARY_TRAILER}`,
+    claims: [
+      {
+        predicate: 'listed',
+        object: 'Listed on the National Register in 1979.',
+        confidenceLevel: 'high',
+        citationSource: 'npgallery.nps.gov',
+        citationHref: 'https://npgallery.nps.gov/GetAsset/1',
+        citationLabel: 'NRHP nomination',
+      },
+      {
+        predicate: 'documented by',
+        object: 'A 1979 survey of Black schools in the county.',
+        confidenceLevel: 'high',
+        citationSource: 'example.org',
+        citationHref: 'https://example.org/survey',
+        citationLabel: 'County survey',
+      },
+    ],
+  });
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  assert.equal(result.ok && result.projection.researchCoverage, 'minimal');
+  assert.equal(result.ok && result.searchIndex.researchCoverage, 'minimal');
 });
 
 /** Claim volume alone never reaches 'substantial' — the document floor binds first. */
@@ -268,7 +346,7 @@ test('computeReleaseResearchCoverage: five+ claims on one document stays minimal
     citationHref: 'https://example.org/only-doc',
     citationLabel: 'L',
   }));
-  assert.equal(computeReleaseResearchCoverage(claims), 'minimal');
+  assert.equal(computeReleaseResearchCoverage(claims, RESEARCHED_SUMMARY), 'minimal');
 });
 
 test('computeReleaseResearchCoverage: five claims with one uncited stays partial, not substantial', () => {
@@ -281,7 +359,7 @@ test('computeReleaseResearchCoverage: five claims with one uncited stays partial
     citationHref: i === 4 ? undefined : `https://example.org/doc-${i % 2}`,
     citationLabel: 'L',
   }));
-  assert.equal(computeReleaseResearchCoverage(claims), 'partial');
+  assert.equal(computeReleaseResearchCoverage(claims, RESEARCHED_SUMMARY), 'partial');
 });
 
 /** An uncited claim contributes no document — it must not be counted as its own source. */
@@ -313,7 +391,7 @@ test('computeReleaseResearchCoverage: uncited claims contribute no coverage', ()
       citationLabel: 'L',
     },
   ];
-  assert.equal(computeReleaseResearchCoverage(claims), 'minimal');
+  assert.equal(computeReleaseResearchCoverage(claims, RESEARCHED_SUMMARY), 'minimal');
 });
 
 test('resolveReleaseEntityReferences fails closed on an unresolved topicId', () => {

@@ -44,6 +44,7 @@ const APPLY = process.env.RETRACT_CITATIONS_APPLY === '1';
 type LiveRow = {
   readonly entity_id: string;
   readonly display_name: string;
+  readonly summary: string | null;
   readonly claims: unknown;
   readonly projection: Record<string, unknown>;
   readonly facet_coverage: string | null;
@@ -107,7 +108,7 @@ async function main(): Promise<void> {
   console.log(`Quarantined (entity, document) pairs: ${rejected.size}`);
 
   const live = await pool.query<LiveRow>(
-    `SELECT e.entity_id, e.display_name, e.claims, e.projection,
+    `SELECT e.entity_id, e.display_name, e.summary, e.claims, e.projection,
             s.facets->>'researchCoverage' AS facet_coverage
        FROM bb_public.release_entities e
        JOIN bb_public.active_release a ON a.release_id = e.release_id
@@ -160,7 +161,9 @@ async function main(): Promise<void> {
       dropped,
       keptClaims: kept,
       coverageBefore: String(row.projection?.researchCoverage ?? ''),
-      coverageAfter: computeReleaseResearchCoverage(toClaimProjections(kept)),
+      // repo-vymq: summary passed so a retraction cannot leave a templated record reading
+      // 'partial' — dropping claims may only lower coverage, never lift the template cap.
+      coverageAfter: computeReleaseResearchCoverage(toClaimProjections(kept), row.summary ?? ''),
       facetBefore: row.facet_coverage,
     });
   }
