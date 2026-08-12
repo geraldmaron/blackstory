@@ -177,9 +177,13 @@ async function main(): Promise<void> {
     console.log('none\n');
   } else {
     console.log(
-      `${totalLeak} live summary(ies) contain a raw NPS code. No current code path produces ` +
-        `these — humanizeAreaCode maps every code present in the lane — so this text predates ` +
-        `that mapping and no republish has reached it.\n`,
+      `${totalLeak} live summary(ies) contain a raw NPS code. Two different origins, and the ` +
+        `fix differs:\n` +
+        `  - TEMPLATE text that predates humanizeAreaCode and no republish has reached ` +
+        `(republishing fixes it);\n` +
+        `  - DRAFTED prose that copied the registry field into a sentence (repo-lm6h) — ` +
+        `republishing preserves it, only a re-draft clears it.\n` +
+        `Check whether the summary reads as a generated template before assuming the first.\n`,
     );
     for (const [lane, bucket] of [...leakByLane].sort((a, b) => b[1].count - a[1].count)) {
       console.log(`${lane}: ${bucket.count}`);
