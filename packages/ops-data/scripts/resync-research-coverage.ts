@@ -56,6 +56,7 @@ type Row = {
   readonly entity_id: string;
   readonly release_id: string;
   readonly display_name: string;
+  readonly summary: string | null;
   readonly claims: unknown;
   readonly projection: Record<string, unknown>;
   /** `null` when the entity has no search_index row at all — nothing to reconcile. */
@@ -102,7 +103,7 @@ async function main(): Promise<void> {
 
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
   const res = await pool.query<Row>(
-    `SELECT e.entity_id, e.release_id, e.display_name, e.claims, e.projection,
+    `SELECT e.entity_id, e.release_id, e.display_name, e.summary, e.claims, e.projection,
             s.facets->>'researchCoverage' AS facet_coverage
        FROM bb_public.release_entities e
        JOIN bb_public.active_release a ON a.release_id = e.release_id
@@ -121,7 +122,10 @@ async function main(): Promise<void> {
   const facetFixes: { entityId: string; before: string; after: ReleaseResearchCoverage }[] = [];
   for (const row of res.rows) {
     const before = String(row.projection?.researchCoverage ?? '');
-    const after = computeReleaseResearchCoverage(toClaimProjections(row.claims));
+    // repo-vymq: the live summary is passed, not omitted — this pass recomputes the authoritative
+    // value for BOTH denormalized copies, so a version of it that could not see a template
+    // fingerprint would quietly restore 'partial' on every record the guard just capped.
+    const after = computeReleaseResearchCoverage(toClaimProjections(row.claims), row.summary ?? '');
     const facetBefore = row.facet_coverage;
     if (facetBefore !== null && facetBefore !== after) {
       facetFixes.push({

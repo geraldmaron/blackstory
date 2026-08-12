@@ -48,6 +48,7 @@ import {
   type StatusHistoryEntry,
 } from '../entity-status.js';
 import { deriveCatalogEntityStatus } from '../derive-catalog-status.js';
+import { findTemplateSummarySignature } from './template-summary-signatures.js';
 import type { LivingStatus } from '../living.js';
 import { sanitizePublicProseText } from '../editorial/prose-links.js';
 import { evaluateNotabilityGate } from '../relevance/notability-gate.js';
@@ -496,10 +497,23 @@ function citationDocumentKey(claim: ReleaseClaimProjection): string | null {
  *  - `substantial` — two or more distinct documents AND a meaningfully sized claim set (>=5) AND
  *                    every one of those claims carrying a citation (the pre-existing
  *                    completeness requirement, unchanged).
+ *
+ * repo-vymq: the document count above is necessary but not sufficient, because it measures the
+ * claims and never looks at the prose those claims are supposed to support. A roster importer
+ * templates its summary from index fields BY CONSTRUCTION and can still accumulate two cited
+ * documents — a corroborating catalog page, a second registry URL — at which point a record whose
+ * description nobody researched would publish as 'partial'. `summary` is therefore a required
+ * argument, not an optional refinement: a registered template fingerprint caps coverage at
+ * 'minimal' regardless of how the claim set scores. Required rather than optional so that adding
+ * a new call site is a compile error instead of a silently uncapped publish path — the last
+ * version of this guard was bypassed exactly that way.
  */
 export function computeReleaseResearchCoverage(
   claims: readonly ReleaseClaimProjection[],
+  summary: string,
 ): ReleaseResearchCoverage {
+  if (findTemplateSummarySignature(summary) !== null) return 'minimal';
+
   const claimCount = claims.length;
   const citedCount = claims.filter((claim) => claim.citationSource.trim().length > 0).length;
   const documentCount = new Set(
@@ -853,7 +867,7 @@ export function buildReleaseEntityArtifacts(
     return { ok: false, reason: 'reference_resolution', message: referenceResolution.reason };
   }
 
-  const researchCoverage = computeReleaseResearchCoverage(claims);
+  const researchCoverage = computeReleaseResearchCoverage(claims, entry.summary);
   const geohashPrecision = context.geohashPrecision ?? 5;
   const lat = context.locationOverride?.lat ?? entry.lat;
   const lng = context.locationOverride?.lng ?? entry.lng;

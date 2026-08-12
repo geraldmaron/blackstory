@@ -25,9 +25,12 @@
  *     packages/ops-data/scripts/audit-live-depth-gate.ts [--lane=nrhp-black-heritage] [--samples=5]
  */
 import pg from 'pg';
-import type { ReleaseSourceEntity } from '@repo/domain';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
-import { assessLandscapeDepth, type LandscapePublishRow } from './lib/incremental-publish.ts';
+import {
+  assessLandscapeDepth,
+  buildLiveDepthEntry,
+  type LandscapePublishRow,
+} from './lib/incremental-publish.ts';
 import { humanizeAreaCode } from './lib/nrhp-area-labels.ts';
 
 function flag(name: string, fallback: string): string {
@@ -51,21 +54,10 @@ type LiveRow = {
 };
 
 /**
- * Rebuild only the three fields `assessLandscapeDepth` actually reads (summary,
- * historicalContext, claims) from the published row. Reconstructing a fuller
- * `ReleaseSourceEntity` would invite the audit to depend on fields the gate ignores, and any
- * mismatch there would look like a gate disagreement when it is really a reconstruction artifact.
+ * repo-b4ad moved this reconstruction into `lib/incremental-publish.ts` — the publisher now needs
+ * the same live-depth verdict this audit reports, and one copy is the only way the two can agree.
  */
-function asDepthInput(row: LiveRow): ReleaseSourceEntity {
-  const projection = row.projection ?? {};
-  const historicalContext =
-    typeof projection.historicalContext === 'string' ? projection.historicalContext : undefined;
-  return {
-    summary: row.summary ?? '',
-    historicalContext,
-    claims: Array.isArray(row.claims) ? row.claims : [],
-  } as unknown as ReleaseSourceEntity;
-}
+const asDepthInput = buildLiveDepthEntry;
 
 /**
  * A live summary leaks if it contains a raw NPS area code verbatim. Detected by asking

@@ -14,14 +14,11 @@ import {
   type ReleaseSourceEntity,
   type StatusHistoryEntry,
   type EntityStatusValue,
+  findTemplateSummarySignature,
 } from '@repo/domain';
 import { computeClaimConfidence } from '../lib/confidence.ts';
 import { lintPublishStatus, type PublishStatusLintReport } from './publish-status-linter.ts';
-import {
-  LANE_TEMPLATE_SIGNATURES,
-  buildNrhpListingFactObject,
-  buildNrhpSignificanceObject,
-} from './nrhp-area-labels.ts';
+import { buildNrhpListingFactObject, buildNrhpSignificanceObject } from './nrhp-area-labels.ts';
 
 export const INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR = 0.75;
 
@@ -557,6 +554,38 @@ export type DepthAssessment =
   { readonly deep: true } | { readonly deep: false; readonly detail: string };
 
 /**
+ * The published state of a record that is already live, in the only shape the depth gate reads.
+ * `projection` carries `historicalContext`; `summary` and `claims` are the columns themselves.
+ */
+export type LivePublishedRow = {
+  readonly summary: string | null;
+  readonly claims: unknown;
+  readonly projection: Record<string, unknown> | null;
+};
+
+/**
+ * Rebuild only the three fields `assessLandscapeDepth` actually reads (summary,
+ * historicalContext, claims) from an already-published row, so the gate can be asked what it
+ * thinks of what is CURRENTLY live rather than only of the candidate.
+ *
+ * Reconstructing a fuller `ReleaseSourceEntity` would invite callers to depend on fields the gate
+ * ignores, and any mismatch there would look like a gate disagreement when it is really a
+ * reconstruction artifact. This started life inside `audit-live-depth-gate.ts` (repo-r8qh) and
+ * moved here when the publisher needed the same reconstruction — one copy, so an audit verdict and
+ * a publish verdict on the same live row cannot differ.
+ */
+export function buildLiveDepthEntry(row: LivePublishedRow): ReleaseSourceEntity {
+  const projection = row.projection ?? {};
+  const historicalContext =
+    typeof projection.historicalContext === 'string' ? projection.historicalContext : undefined;
+  return {
+    summary: row.summary ?? '',
+    historicalContext,
+    claims: Array.isArray(row.claims) ? row.claims : [],
+  } as unknown as ReleaseSourceEntity;
+}
+
+/**
  * Rejects rows that carry nothing a reader could not get from the registry index entry itself.
  *
  * The lane importers publish prose generated from index fields — category, city, state, area of
@@ -594,8 +623,8 @@ export function assessLandscapeDepth(
   if (hasIndependentSource) return { deep: true };
 
   const summary = entry.summary;
-  const signature = LANE_TEMPLATE_SIGNATURES.find((phrase) => summary.includes(phrase));
-  if (signature !== undefined) {
+  const signature = findTemplateSummarySignature(summary);
+  if (signature !== null) {
     return {
       deep: false,
       detail: `summary carries a generated-template signature ("${signature.slice(0, 48)}…")`,
@@ -633,6 +662,14 @@ export function gateLandscapePublishCandidate(input: {
    * bans, location, name_overlap) still applies unchanged.
    */
   readonly allowRepublish?: boolean;
+  /**
+   * repo-b4ad: the depth verdict on what is CURRENTLY published for this entity, from
+   * `assessLandscapeDepth(buildLiveDepthEntry(liveRow), row)`. Supplying it turns the depth check
+   * into a non-regression test for an already-live record (see the ADMISSION vs REGRESSION note
+   * below). Omitting it leaves the strict admission test in force — the gate fails closed, so a
+   * caller that has not loaded live state cannot accidentally relax anything.
+   */
+  readonly liveDepth?: DepthAssessment;
 }): PublishGateResult {
   const floor = input.confidenceFloor ?? INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR;
   const row = input.row;
@@ -695,9 +732,38 @@ export function gateLandscapePublishCandidate(input: {
     };
   }
 
+  // ADMISSION vs REGRESSION (repo-b4ad). One depth verdict, two different questions:
+  //
+  //   new record        -> ADMISSION.  "Is this good enough to appear in public at all?"
+  //                        Strict, unchanged: the record must be deep. This is the bar the gate
+  //                        was written for, and the 2,578 unresearched records in its header are
+  //                        why it does not move.
+  //
+  //   already live      -> REGRESSION. "Is this good enough to REPLACE what readers see today?"
+  //                        The comparison that matters is candidate-vs-published, not
+  //                        candidate-vs-floor. Asking the admission question here is what pinned
+  //                        2,360 live records in place: their corrected prose is shallow by the
+  //                        same measure as the prose already public, so the publisher skipped
+  //                        them and the stale text stayed — including 98 summaries still printing
+  //                        the raw NPS code 'ethnic heritage (Black)' whose fixed form has been
+  //                        sitting in bb_research the whole time.
+  //
+  // A live-shallow record cannot be made worse by any replacement: the gate's own verdict on the
+  // published text is already "does not clear the bar". A live-DEEP record still cannot be
+  // overwritten by a shallow candidate — that is the one transition this must forbid, and it
+  // stays forbidden below.
+  //
+  // Nothing here lets templated prose masquerade as researched. A summary carrying a registered
+  // fingerprint is capped at researchCoverage='minimal' by `computeReleaseResearchCoverage`
+  // (repo-vymq), so a record admitted by the regression clause publishes visibly thin, stays in
+  // the enrichment queue, and keeps counting against `audit-live-depth-gate.ts`.
   const depth = assessLandscapeDepth(entry, row);
   if (!depth.deep) {
-    return { eligible: false, reason: 'template_only', detail: depth.detail };
+    const republishingLiveRow = input.allowRepublish === true && row.exact_in_release === true;
+    const liveIsShallow = input.liveDepth !== undefined && !input.liveDepth.deep;
+    if (!republishingLiveRow || !liveIsShallow) {
+      return { eligible: false, reason: 'template_only', detail: depth.detail };
+    }
   }
 
   const payloadConfidence = readPayloadConfidence(row.payload);

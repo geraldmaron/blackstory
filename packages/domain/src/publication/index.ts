@@ -5,6 +5,7 @@
 import { createHash, sign as signBytes, verify as verifyBytes, type KeyLike } from 'node:crypto';
 
 export * from './release-builder.js';
+export * from './template-summary-signatures.js';
 export * from './mobile-bootstrap.js';
 export * from './release-activation.js';
 export * from './public-render.js';
