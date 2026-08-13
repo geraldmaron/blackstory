@@ -12,7 +12,7 @@ import {
   type StatusHistoryEntry,
 } from '@repo/domain';
 import { sanitizePublicProseText } from '@repo/domain/editorial';
-import { deriveEraBuckets, isDatePrecision } from '@repo/domain/era';
+import { isDatePrecision, resolveEraBucketsFromEvidence } from '@repo/domain/era';
 import { findUsStateForPoint } from '@repo/domain/map/geography';
 import { type PublicEntityView } from '../../data/public-seed';
 
@@ -189,6 +189,9 @@ function resolveStatusHistory(
       ? { historicalContext: projection.historicalContext }
       : {}),
     ...(projection.eraBuckets !== undefined ? { eraBuckets: projection.eraBuckets } : {}),
+    ...(projection.researchCoverage !== undefined
+      ? { researchCoverage: projection.researchCoverage }
+      : {}),
     claims: claims.map((claim) => ({
       id: claim.id,
       predicate: claim.predicate,
@@ -281,28 +284,22 @@ export function resolveJurisdictionLabel(projection: PublicProjectionInput): str
   return '';
 }
 
+/**
+ * Era for projections built before the release builder derived it (see `resolveEraBucketsFromEvidence`
+ * in `@repo/domain/era`). Screens designation dates the same way the builder now does, so a record
+ * whose only date is a National Register listing reads as undated here rather than borrowing the
+ * listing decade as its era.
+ */
 function resolveProjectionEraBuckets(
   projection: PublicProjectionInput,
+  claims: PublicEntityView['claims'],
 ): readonly string[] | undefined {
-  if (projection.eraBuckets && projection.eraBuckets.length > 0) {
-    return projection.eraBuckets;
-  }
-  const history = projection.statusHistory ?? [];
-  const buckets = new Set<string>();
-  for (const entry of history) {
-    if (!entry.validFrom?.trim()) continue;
-    const precision =
-      entry.datePrecision && isDatePrecision(entry.datePrecision) ? entry.datePrecision : 'year';
-    for (const bucket of deriveEraBuckets({
-      validFrom: entry.validFrom,
-      ...(entry.validTo !== undefined ? { validTo: entry.validTo } : {}),
-      datePrecision: precision,
-    })) {
-      buckets.add(bucket);
-    }
-  }
-  if (buckets.size > 0) return [...buckets].sort((a, b) => a.localeCompare(b));
-  return undefined;
+  const buckets = resolveEraBucketsFromEvidence({
+    ...(projection.eraBuckets !== undefined ? { eraBuckets: projection.eraBuckets } : {}),
+    ...(projection.statusHistory !== undefined ? { statusHistory: projection.statusHistory } : {}),
+    claims,
+  });
+  return buckets.length > 0 ? buckets : undefined;
 }
 
 /**
@@ -320,7 +317,7 @@ export function mapProjectionToPublicEntityView(
   const geoAnchor = mapGeoAnchor(projection.location);
   const claims = mapClaims(projection.claims);
   const { status, statusHistory } = resolveStatusHistory(projection, claims);
-  const eraBuckets = resolveProjectionEraBuckets(projection);
+  const eraBuckets = resolveProjectionEraBuckets(projection, claims);
 
   const lat = projection.location?.lat;
   const lng = projection.location?.lng;

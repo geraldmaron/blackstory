@@ -1,12 +1,17 @@
 /**
  * Shared era resolution for record cards, rip rows, and anatomy panels.
- * Prefers structured `eraBuckets`; falls back to event/status spans and legacy `era` text
- * before showing "Undated".
+ * Prefers structured `eraBuckets`; falls back to event/status spans, historical claim years,
+ * and legacy `era` text before reporting the era as undocumented.
+ *
+ * Span screening lives in `@repo/domain`'s `resolveEraEvidence`, shared with the release builder:
+ * a date that only ever appears in a designation claim (a National Register listing, say) is not
+ * evidence of when the record's history happened, so it yields no era.
  */
 import {
-  deriveEraBuckets,
+  type EraDocumentationState,
+  type EraEvidenceInput,
   filterDecadesAtOrBeforeCurrent,
-  isDatePrecision,
+  resolveEraEvidence,
 } from '@repo/domain/era';
 import { eraFactLink } from './metadata-hrefs';
 
@@ -23,6 +28,11 @@ export type EntityEraInput = {
     readonly validTo?: string | null;
     readonly datePrecision?: string;
   }[];
+  /** Read only to tell designation dates from historical ones; never rendered from here. */
+  readonly claims?: readonly {
+    readonly predicate?: string;
+    readonly object?: string;
+  }[];
 };
 
 function normalizeBucketLabel(bucket: string): string | undefined {
@@ -34,16 +44,6 @@ function normalizeBucketLabel(bucket: string): string | undefined {
     return `${Math.floor(decade / 10) * 10}s`;
   }
   return trimmed;
-}
-
-function bucketsFromSpan(validFrom?: string, validTo?: string | null, datePrecision?: string) {
-  if (!validFrom?.trim()) return [] as readonly string[];
-  const precision = datePrecision && isDatePrecision(datePrecision) ? datePrecision : 'year';
-  return deriveEraBuckets({
-    validFrom: validFrom.trim(),
-    ...(validTo !== undefined ? { validTo } : {}),
-    datePrecision: precision,
-  });
 }
 
 function bucketsFromEraText(era: string): readonly string[] {
@@ -61,34 +61,44 @@ function bucketsFromEraText(era: string): readonly string[] {
   return [];
 }
 
-/** Resolve decade bucket labels from any public entity era fields. */
-export function resolveEntityEraBuckets(input: EntityEraInput): readonly string[] {
+/** Translate the web's era input shape into the shared domain evidence shape. */
+function toEvidenceInput(input: EntityEraInput): EraEvidenceInput {
   const explicit = (input.eraBuckets ?? [])
     .map(normalizeBucketLabel)
     .filter((bucket): bucket is string => bucket !== undefined);
-  if (explicit.length > 0) {
-    return filterDecadesAtOrBeforeCurrent(explicit);
-  }
 
-  const fromEvent = bucketsFromSpan(
-    input.eventWindow?.startAt,
-    input.eventWindow?.endAt,
-    input.eventWindow?.datePrecision,
-  );
-  if (fromEvent.length > 0) return filterDecadesAtOrBeforeCurrent(fromEvent);
+  return {
+    ...(explicit.length > 0 ? { eraBuckets: explicit } : {}),
+    ...(input.eventWindow !== undefined
+      ? {
+          eventWindow: {
+            ...(input.eventWindow.startAt !== undefined
+              ? { validFrom: input.eventWindow.startAt }
+              : {}),
+            ...(input.eventWindow.endAt !== undefined ? { validTo: input.eventWindow.endAt } : {}),
+            ...(input.eventWindow.datePrecision !== undefined
+              ? { datePrecision: input.eventWindow.datePrecision }
+              : {}),
+          },
+        }
+      : {}),
+    ...(input.statusHistory !== undefined ? { statusHistory: input.statusHistory } : {}),
+    ...(input.claims !== undefined ? { claims: input.claims } : {}),
+  };
+}
 
-  const history = input.statusHistory ?? [];
-  if (history.length > 0) {
-    const buckets = new Set<string>();
-    for (const entry of history) {
-      for (const bucket of bucketsFromSpan(entry.validFrom, entry.validTo, entry.datePrecision)) {
-        buckets.add(bucket);
-      }
-    }
-    if (buckets.size > 0) {
-      return filterDecadesAtOrBeforeCurrent([...buckets].sort((a, b) => a.localeCompare(b)));
-    }
-  }
+/**
+ * Why this record carries no era. Legacy free-text `era` counts as documented even when it is
+ * too vague to bucket, since the record does say something about when.
+ */
+function eraDocumentationState(input: EntityEraInput): EraDocumentationState {
+  return resolveEraEvidence(toEvidenceInput(input)).state;
+}
+
+/** Resolve decade bucket labels from any public entity era fields. */
+export function resolveEntityEraBuckets(input: EntityEraInput): readonly string[] {
+  const fromEvidence = resolveEraEvidence(toEvidenceInput(input)).buckets;
+  if (fromEvidence.length > 0) return fromEvidence;
 
   const era = input.era?.trim() ?? '';
   if (era.length > 0 && !/^unknown$/iu.test(era) && !/^undated$/iu.test(era)) {
@@ -99,12 +109,20 @@ export function resolveEntityEraBuckets(input: EntityEraInput): readonly string[
   return [];
 }
 
+/**
+ * Shown when a record resolves to no era. It names a gap in the archive rather than a property
+ * of the subject: a church listed in 2001 is not undated, we just have not documented when its
+ * history happened. `state` carries which kind of gap for callers that triage the backlog.
+ */
+export const ERA_NOT_DOCUMENTED_LABEL = 'Era not documented';
+
 export type EntityEraFact = {
   readonly label: string;
   readonly href?: string;
+  readonly state: EraDocumentationState;
 };
 
-/** Human-readable era label + optional explore href; never "Undated" when legacy era text exists. */
+/** Human-readable era label + optional explore href, plus why an absent era is absent. */
 export function entityEraFact(input: EntityEraInput): EntityEraFact {
   const buckets = resolveEntityEraBuckets(input);
   if (buckets.length > 0) {
@@ -121,13 +139,14 @@ export function entityEraFact(input: EntityEraInput): EntityEraFact {
         .replace(/\s+/g, ' ')
         .trim(),
       ...(link.href !== undefined ? { href: link.href } : {}),
+      state: 'documented',
     };
   }
 
   const era = input.era?.trim() ?? '';
   if (era.length > 0 && !/^unknown$/iu.test(era) && !/^undated$/iu.test(era)) {
-    return { label: era.replace(/\u2013|\u2014/g, ' to ') };
+    return { label: era.replace(/\u2013|\u2014/g, ' to '), state: 'documented' };
   }
 
-  return { label: 'Undated' };
+  return { label: ERA_NOT_DOCUMENTED_LABEL, state: eraDocumentationState(input) };
 }

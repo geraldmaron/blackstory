@@ -29,6 +29,8 @@ export type CatalogStatusSource = {
   readonly statusHistory?: readonly StatusHistoryEntry<EntityStatusValue>[];
   readonly status?: string;
   readonly livingStatus?: LivingStatus;
+  /** Distinct-source-document coverage, used to tell a researched record from a bare listing. */
+  readonly researchCoverage?: string;
 };
 
 export type DerivedCatalogStatus = {
@@ -80,26 +82,65 @@ function earliestYear(entry: CatalogStatusSource): string | undefined {
   return years[0];
 }
 
+/**
+ * Claims a reader could check this status against — real claim ids only.
+ *
+ * This used to synthesize `${entry.id}_claim_${i}` for any claim arriving without an id, which
+ * produced references to nothing: claims are minted as `claim_<entityId>_<nn>`, so the invented
+ * ids matched no claim on the record. Measured on release rel_20260723_authority_net_001, 3,270
+ * published records cite a basis that resolves to no claim at all — the audit trail from a status
+ * back to its evidence was decorative. An unciteable claim is dropped instead; a status with an
+ * empty basis is honestly unsupported, which is the signal callers need.
+ */
 function basisClaimIds(entry: CatalogStatusSource): readonly string[] {
-  const ids = (entry.claims ?? []).map((c, i) => c.id ?? `${entry.id}_claim_${i}`).filter(Boolean);
+  const ids = (entry.claims ?? [])
+    .map((claim) => claim.id)
+    .filter((id): id is string => typeof id === 'string' && id.trim().length > 0);
   return ids.slice(0, 4);
 }
 
-function derivePlaceLike(entry: CatalogStatusSource): PlaceLikeStatus {
+/**
+ * True when the record has not been researched past the listing that created it.
+ *
+ * This is the same test the entity page's `isThinRecord` applies: single-source coverage with no
+ * narrative context means what you are reading is the registry row itself. Such a record cannot
+ * support a claim about present standing — its whole content is "X was listed on DATE for its
+ * significance in Y", which is evidence of a listing, not of a building.
+ *
+ * Claim classification cannot stand in for this. A listing stub's second claim is
+ * `significant_for: architecture, Black heritage`, which `isDesignationClaim` correctly declines
+ * to call a designation, and the prose cannot be read either: the NRHP template asserts present
+ * existence grammatically — "St. Paul AME Zion Church IS a building in Johnson City" — with
+ * nothing behind it. Provenance is the only honest discriminator.
+ */
+function isUnresearchedRecord(entry: CatalogStatusSource): boolean {
+  return entry.researchCoverage === 'minimal' && (entry.historicalContext ?? '').trim() === '';
+}
+
+/**
+ * Place-like standing. `undefined` when the record supports no answer either way.
+ *
+ * This used to end in a bare `return 'active'`, reached by anything whose text mentioned a
+ * church, school, park, district or town, and by everything else that fell through. That made
+ * "still operates today" the catalog's single largest assertion and its least evidenced: a
+ * building listed in 2001 may have burned down in 2009, and a registry stub says nothing either
+ * way.
+ *
+ * The default survives for records that have actually been researched, where curated prose makes
+ * it a reasonable reading. It does not survive for unresearched listings, which are exactly the
+ * population that made the old default wrong at scale — 2,063 of them on that release. Dropping
+ * the cue-free default outright was measured first and rejected: it also stripped `active` from
+ * 564 curated records including the DuSable Museum and Ebenezer Baptist Church, because ACTIVE_RE
+ * does not match plain present tense like "is a museum operated by the Oakland Public Library".
+ */
+function derivePlaceLike(entry: CatalogStatusSource): PlaceLikeStatus | undefined {
   const text = `${entry.summary ?? ''} ${entry.historicalContext ?? ''} ${entry.displayName ?? ''}`;
   if (HISTORIC_RE.test(text) && !ACTIVE_RE.test(text)) return 'historic';
   if (ACTIVE_RE.test(text)) return 'active';
-  // Districts, museums, universities, churches, towns default active unless historic cues
-  if (
-    /\b(university|college|museum|church|cathedral|mosque|synagogue|library|park|district|town|city|school)\b/i.test(
-      text,
-    )
-  ) {
-    return 'active';
-  }
   if (/\b(movement|league|association|union|federation)\b/i.test(text) && HISTORIC_RE.test(text)) {
     return 'historic';
   }
+  if (isUnresearchedRecord(entry)) return undefined;
   return 'active';
 }
 
@@ -169,7 +210,7 @@ export function deriveCatalogEntityStatus(entry: CatalogStatusSource): DerivedCa
 
   const validFrom = earliestYear(entry);
   const basis = basisClaimIds(entry);
-  let status: EntityStatusValue;
+  let status: EntityStatusValue | undefined;
 
   if ((PLACE_LIKE_STATUS_KINDS as readonly string[]).includes(entry.kind)) {
     status = derivePlaceLike(entry);
@@ -181,6 +222,13 @@ export function deriveCatalogEntityStatus(entry: CatalogStatusSource): DerivedCa
   } else {
     // publication / artifact / other — treat as place-like active/historic
     status = derivePlaceLike(entry);
+  }
+
+  // No cue either way. Report `unknown` and write no lifecycle span: a statusHistory entry is a
+  // dated assertion that the record cannot make, and callers already drop `unknown` rather than
+  // rendering it as a finding.
+  if (status === undefined) {
+    return { status: 'unknown' };
   }
 
   const history: StatusHistoryEntry<EntityStatusValue> = {

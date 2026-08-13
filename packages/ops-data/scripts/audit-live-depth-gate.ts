@@ -14,9 +14,12 @@
  * It also reports raw-registry-code leakage separately. That is a different defect from
  * shallowness — prose can be deep and still leak, or shallow and read cleanly — and conflating
  * them hides whichever is smaller. A record whose live summary says "ethnic heritage (Black)"
- * carries a raw NPS code no current code path can still produce (`humanizeAreas` maps every live
- * code to a human phrase), which means the text predates that mapping and no republish has
- * reached it.
+ * carries a raw NPS code the TEMPLATE path can no longer produce (`humanizeAreas` maps every live
+ * code to a human phrase), so such text is usually pre-mapping prose no republish has reached.
+ * "Usually", not "always": repo-lm6h showed the DRAFTING path can mint fresh leaks at any time by
+ * copying the registry field verbatim into a researched sentence, where nothing substitutes a code
+ * and so nothing humanizes one. Read the leak count below as the statement about live prose, and
+ * the forward check at the end as a statement about republishing only.
  *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a
@@ -31,7 +34,11 @@ import {
   buildLiveDepthEntry,
   type LandscapePublishRow,
 } from './lib/incremental-publish.ts';
-import { humanizeAreaCode } from './lib/nrhp-area-labels.ts';
+import {
+  humanizeAreaCode,
+  findRawRegistryVocabulary,
+  RAW_REGISTRY_VOCABULARY_PATTERNS,
+} from './lib/nrhp-area-labels.ts';
 
 function flag(name: string, fallback: string): string {
   const hit = process.argv.find((arg) => arg.startsWith(`--${name}=`));
@@ -60,21 +67,11 @@ type LiveRow = {
 const asDepthInput = buildLiveDepthEntry;
 
 /**
- * A live summary leaks if it contains a raw NPS area code verbatim. Detected by asking
- * `humanizeAreaCode` what each code *should* render as and looking for the un-rendered form, so
- * the check follows the mapping rather than hardcoding today's known-bad strings.
+ * A live summary leaks if it contains a raw NPS area code verbatim. The patterns moved to
+ * `lib/nrhp-area-labels.ts` for repo-lm6h so the DRAFTING validator can refuse the same vocabulary
+ * at draft time; one list means the two checks cannot disagree about what counts as a raw code.
  */
-const RAW_CODE_PATTERNS: readonly RegExp[] = [
-  /ethnic heritage \(black\)/iu,
-  /ETHNIC HERITAGE[-\s]/u,
-  /NON-ABORIGINAL/u,
-  /OTHER-ETHNIC/u,
-  /ENTERTAINMENT\/RECREATION/u,
-];
-
-function leakedCodesIn(text: string): readonly string[] {
-  return RAW_CODE_PATTERNS.filter((pattern) => pattern.test(text)).map((p) => p.source);
-}
+const leakedCodesIn = findRawRegistryVocabulary;
 
 async function main(): Promise<void> {
   const databaseUrl = process.env.DATABASE_URL;
@@ -180,9 +177,13 @@ async function main(): Promise<void> {
     console.log('none\n');
   } else {
     console.log(
-      `${totalLeak} live summary(ies) contain a raw NPS code. No current code path produces ` +
-        `these — humanizeAreaCode maps every code present in the lane — so this text predates ` +
-        `that mapping and no republish has reached it.\n`,
+      `${totalLeak} live summary(ies) contain a raw NPS code. Two different origins, and the ` +
+        `fix differs:\n` +
+        `  - TEMPLATE text that predates humanizeAreaCode and no republish has reached ` +
+        `(republishing fixes it);\n` +
+        `  - DRAFTED prose that copied the registry field into a sentence (repo-lm6h) — ` +
+        `republishing preserves it, only a re-draft clears it.\n` +
+        `Check whether the summary reads as a generated template before assuming the first.\n`,
     );
     for (const [lane, bucket] of [...leakByLane].sort((a, b) => b[1].count - a[1].count)) {
       console.log(`${lane}: ${bucket.count}`);
@@ -205,12 +206,21 @@ async function main(): Promise<void> {
       .filter((c) => c.length > 0)
       .filter((c) => {
         const label = humanizeAreaCode(c);
-        return label !== null && RAW_CODE_PATTERNS.some((p) => p.test(label));
+        return label !== null && RAW_REGISTRY_VOCABULARY_PATTERNS.some((p) => p.test(label));
       });
-    console.log('=== FORWARD CHECK: would a republish reintroduce a raw code? ===');
+    // Name the path this clears. repo-lm6h cost a verification cycle because "no" here was read as
+    // "live prose is clean": it only ever proved that TEMPLATE republishing cannot reintroduce a
+    // code, and said nothing about prose a drafter wrote by copying the registry field into a
+    // sentence. The leak report above is the check that covers live prose, whatever its origin.
+    console.log(
+      '=== FORWARD CHECK (TEMPLATE PATH ONLY): would a republish reintroduce a raw code? ===',
+    );
     console.log(
       stillRaw.length === 0
-        ? 'no — every live code maps to a human phrase\n'
+        ? 'no — every live code maps to a human phrase.\n' +
+            '  Scope: the template/backfill path only. Drafted prose can still carry registry\n' +
+            '  vocabulary verbatim (repo-lm6h) — the leak count above, not this line, is the\n' +
+            '  statement about what is live.\n'
         : `YES: ${stillRaw.join(', ')}\n`,
     );
   }

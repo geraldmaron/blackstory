@@ -3,7 +3,83 @@
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildDecadeEntitiesForGraph, buildReleaseGraphArtifact } from './release-graph-publish.ts';
+import {
+  assertReleaseGraphAuditOrThrow,
+  buildDecadeEntitiesForGraph,
+  buildReleaseGraphArtifact,
+} from './release-graph-publish.ts';
+
+/** A passing audit; individual tests bend the one field they are about. */
+function audit(over: Record<string, unknown> = {}) {
+  return {
+    canonicalEdgeCount: 10,
+    allTimeEdgeCount: 10,
+    uniqueDecadeEdgeCount: 5,
+    entitiesInRelease: 4092,
+    entitiesWithDecadeBuckets: 4000,
+    decadeCoveragePct: 97.8,
+    adjacencyCapHits: [],
+    droppedFromAllTime: [],
+    unexplainedAllTimeDrops: 0,
+    contentHash: 'abc',
+    ...over,
+  } as Parameters<typeof assertReleaseGraphAuditOrThrow>[0];
+}
+
+test('an unexplained edge drop is a build failure and says so', () => {
+  assert.throws(
+    () => assertReleaseGraphAuditOrThrow(audit({ unexplainedAllTimeDrops: 3 })),
+    /release graph integrity.*must not be waived/s,
+  );
+});
+
+/**
+ * Coverage below the floor must not read like a corrupted build. Withdrawing designation dates
+ * that were never eras took real coverage to 49.4%, and the old combined message made that
+ * indistinguishable from the integrity failure above.
+ */
+test('coverage below the floor fails as completeness, not as a broken build', () => {
+  assert.throws(
+    () =>
+      assertReleaseGraphAuditOrThrow(
+        audit({ decadeCoveragePct: 49.4, entitiesWithDecadeBuckets: 2022 }),
+      ),
+    (error: Error) => {
+      assert.match(error.message, /decade coverage 49\.4% is below the acknowledged floor 90%/);
+      assert.match(error.message, /not whether the build is sound/);
+      assert.doesNotMatch(error.message, /integrity/);
+      return true;
+    },
+  );
+});
+
+test('the floor defaults to 90 so nothing weakens by omission', () => {
+  assert.throws(
+    () => assertReleaseGraphAuditOrThrow(audit({ decadeCoveragePct: 89.9 })),
+    /floor 90%/,
+  );
+  assert.doesNotThrow(() => assertReleaseGraphAuditOrThrow(audit({ decadeCoveragePct: 90 })));
+});
+
+test('an acknowledged floor permits a lower coverage but still fails below it', () => {
+  const low = audit({ decadeCoveragePct: 49.4, entitiesWithDecadeBuckets: 2022 });
+  assert.doesNotThrow(() => assertReleaseGraphAuditOrThrow(low, { minDecadeCoveragePct: 45 }));
+  assert.throws(
+    () => assertReleaseGraphAuditOrThrow(low, { minDecadeCoveragePct: 55 }),
+    /below the acknowledged floor 55%/,
+  );
+});
+
+test('an acknowledged floor never waives an integrity failure', () => {
+  assert.throws(
+    () =>
+      assertReleaseGraphAuditOrThrow(audit({ unexplainedAllTimeDrops: 1, decadeCoveragePct: 10 }), {
+        minDecadeCoveragePct: 0,
+        enforceCoverage: false,
+      }),
+    /release graph integrity/,
+  );
+});
 
 test('buildDecadeEntitiesForGraph unions projection eraBuckets and canonical status_history', () => {
   const decadeEntities = buildDecadeEntitiesForGraph({

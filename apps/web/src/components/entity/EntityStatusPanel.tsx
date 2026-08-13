@@ -2,8 +2,8 @@
  * Kind-appropriate status panel. Place/school/institution kinds render the derived current
  * status plus the full time-scoped `statusHistory` record when present; `event` kinds have no
  * status field by design (their when-span is authoritative `STATUSLESS_ENTITY_KINDS`) and render
- * an `eventWindow` panel instead. Framing is owned by the entity mast — this panel does not
- * repeat historical-vs-present-day badges or nest a second titled Card under the section heading.
+ * an `eventWindow` panel instead. The mast's glance line carries the one-word standing; this
+ * panel does not nest a second titled Card under the section heading.
  */
 
 import React from 'react';
@@ -12,11 +12,8 @@ import { StatusMark } from '../map-experience';
 import { humanizeToken } from './format';
 import { RecordGapNotice } from './RecordGapNotice';
 
-export type HistoricalFraming = 'historical' | 'present_day';
-
 export type EntityStatusPanelProps = {
   readonly entity: PublicEntityView;
-  readonly framing: HistoricalFraming;
 };
 
 function formatEventWindow(window: PublicEventWindow): string {
@@ -25,7 +22,7 @@ function formatEventWindow(window: PublicEventWindow): string {
   return `${window.startAt} \u2013 ${window.endAt}`;
 }
 
-export function EntityStatusPanel({ entity, framing: _framing }: EntityStatusPanelProps) {
+export function EntityStatusPanel({ entity }: EntityStatusPanelProps) {
   if (entity.kind === 'event') {
     return (
       <div className="ds-entity-status">
@@ -46,7 +43,11 @@ export function EntityStatusPanel({ entity, framing: _framing }: EntityStatusPan
   const currentStatus = entity.status;
   const history = entity.statusHistory;
 
-  if (!currentStatus && (!history || history.length === 0)) {
+  // `unknown` is the absence of a finding, not a finding. Catalog derivation returns it when the
+  // sources give no cue either way, and with no lifecycle span behind it there is nothing to show
+  // but a shrug — the gap notice says the same thing in the approved words.
+  const undetermined = !currentStatus || currentStatus === 'unknown';
+  if (undetermined && (!history || history.length === 0)) {
     return <RecordGapNotice kind="statusHistory" />;
   }
 

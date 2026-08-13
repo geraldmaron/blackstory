@@ -24,6 +24,11 @@ export default tseslint.config(
       'packages/data-access/generated/**',
       // Isolated npm app (not in the pnpm workspace); linted via `apps/mobile` scripts.
       'apps/mobile/**',
+      // Gitignored operator scratch (`.gitignore` line 60 ignores `tmp/`). These are one-off
+      // query scripts that never ship, but eslint still walked them, so leftovers from any
+      // session made `pnpm lint` — and therefore `pnpm validate` — exit non-zero on a clean
+      // tree. Same reasoning as the build-output entries above: nothing here is authored code.
+      '**/tmp/**',
     ],
   },
   eslint.configs.recommended,

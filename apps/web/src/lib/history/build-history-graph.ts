@@ -123,6 +123,7 @@ function buildNodeView(
     ...(entity.era !== undefined ? { era: entity.era } : {}),
     ...(entity.eventWindow !== undefined ? { eventWindow: entity.eventWindow } : {}),
     ...(entity.statusHistory !== undefined ? { statusHistory: entity.statusHistory } : {}),
+    claims: entity.claims,
   };
   const eraBuckets = resolveEntityEraBuckets(eraInput);
   const era = entityEraFact({ ...eraInput, eraBuckets });

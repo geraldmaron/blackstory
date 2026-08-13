@@ -248,6 +248,26 @@ function readLimit(): number | undefined {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
 }
 
+/**
+ * The decade-coverage floor this publish accepts, as a percentage.
+ *
+ * Coverage is research completeness, not build integrity (see assertReleaseGraphAuditOrThrow).
+ * Withdrawing designation dates that were never eras took real coverage to ~49%, so a fixed 90%
+ * bar can now only be cleared by publishing dates the sources do not support. The floor stays 90
+ * by default and still fails closed; going below it requires stating the number, which is echoed
+ * to the log and stored in the report so the decision is visible after the fact.
+ */
+function readMinDecadeCoverage(): number | undefined {
+  const raw = readArg('--min-decade-coverage=');
+  if (raw === undefined) return undefined;
+  const parsed = Number.parseFloat(raw);
+  if (!Number.isFinite(parsed) || parsed < 0 || parsed > 100) {
+    console.error(`--min-decade-coverage must be a percentage between 0 and 100 (got "${raw}")`);
+    process.exit(2);
+  }
+  return parsed;
+}
+
 function readIdsArg(): readonly string[] {
   const raw = readArg('--ids=');
   if (!raw) return [];
@@ -460,6 +480,7 @@ async function main(): Promise<void> {
   }
 
   const limit = readLimit();
+  const minDecadeCoverage = readMinDecadeCoverage();
   const generatedAt = new Date().toISOString();
 
   const conn = normalizePgConnectionString(databaseUrl);
@@ -593,6 +614,10 @@ async function main(): Promise<void> {
       skipCounts: Object.fromEntries(skipCounts),
       publishedIds: prepared.map((row) => row.id),
       skippedSample: skipped.slice(0, 20),
+      // Recorded so an accepted coverage floor is auditable after the fact, not just a flag
+      // someone typed once.
+      decadeCoverageFloorPct: minDecadeCoverage ?? 90,
+      decadeCoverageFloorAcknowledged: minDecadeCoverage !== undefined,
       statusLinter: {
         errors: lintSummary.findings.filter((finding) => finding.severity === 'error').length,
         warnings: lintSummary.findings.filter((finding) => finding.severity === 'warn').length,
@@ -684,11 +709,19 @@ async function main(): Promise<void> {
         );
       }
 
+      const enforceCoverage = process.env.ENFORCE_DECADE_COVERAGE !== '0';
+      console.log(
+        enforceCoverage
+          ? `  graph: decade coverage floor ${minDecadeCoverage ?? 90}%` +
+              `${minDecadeCoverage === undefined ? ' (default)' : ' (acknowledged via --min-decade-coverage)'}`
+          : '  graph: decade coverage NOT ENFORCED (ENFORCE_DECADE_COVERAGE=0)',
+      );
       const graphRebuild = await rebuildReleaseGraphForRelease(client, {
         releaseId,
         generatedAt,
         dryRun: false,
-        enforceCoverage: process.env.ENFORCE_DECADE_COVERAGE !== '0',
+        enforceCoverage,
+        ...(minDecadeCoverage !== undefined ? { minDecadeCoveragePct: minDecadeCoverage } : {}),
       });
       for (const line of formatReleaseGraphAuditLog(graphRebuild.audit)) {
         console.log(`  graph: ${line}`);

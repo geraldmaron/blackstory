@@ -148,3 +148,185 @@ export function deriveEraBuckets(span: EraSpan): readonly string[] {
   }
   return buckets;
 }
+
+/*
+ * ---------------------------------------------------------------------------
+ * Era evidence: which dates on a record may speak for its historical era
+ * ---------------------------------------------------------------------------
+ *
+ * A record can carry dates that say nothing about when its history happened. The
+ * National Register listing date is the motivating case: the NPS weekly-list feed
+ * (`scrape-nrhp-black-heritage-roster.ts`) publishes a `Listed Date` and no period of
+ * significance, so `deriveCatalogEntityStatus` picks the listing year as `validFrom` and
+ * every downstream era derivation reads it as the site's era. That is how a lowcountry
+ * cemetery came to be labelled "2000s".
+ *
+ * The rule below is deliberately evidence-based rather than source-based: a year is a
+ * designation year when the record's own claims only ever mention it inside a designation
+ * claim. "1907 House", listed in 1979, keeps its 1907 because 1907 is not the listing year;
+ * a church listed in 2001 with no other dated claim yields no era at all, which is the
+ * honest answer until a period of significance is ingested.
+ */
+
+/** Claim predicates that record an administrative designation rather than a historical fact. */
+const DESIGNATION_PREDICATE =
+  /^(listing|listed|designation|designated|nrhp_listing|national_register_listing)$/i;
+
+/** Designation vocabulary in claim prose, for records whose predicate is less specific. */
+const DESIGNATION_TEXT =
+  /\bNational (?:Register of Historic Places|Historic Landmark|Register)\b|\blisted on the National Register\b|\bNational Historic Landmark\b/i;
+
+/** Four-digit years a claim can plausibly assert, 1500–2099. */
+const CLAIM_YEAR = /\b(1[5-9]\d{2}|20\d{2})\b/g;
+
+/** The slice of a claim this module reads. Structurally compatible with public claim views. */
+export type EraEvidenceClaim = {
+  readonly predicate?: string;
+  readonly object?: string;
+};
+
+/** A dated lifecycle span, loosened to the shape both release entries and public views carry. */
+export type EraEvidenceSpan = {
+  readonly validFrom?: string;
+  readonly validTo?: string | null;
+  readonly datePrecision?: string;
+};
+
+/** True when a claim records a designation/listing event rather than a historical one. */
+export function isDesignationClaim(claim: EraEvidenceClaim): boolean {
+  if (DESIGNATION_PREDICATE.test(claim.predicate?.trim() ?? '')) return true;
+  return DESIGNATION_TEXT.test(claim.object ?? '');
+}
+
+function yearsInClaim(claim: EraEvidenceClaim): readonly string[] {
+  return (claim.object ?? '').match(CLAIM_YEAR) ?? [];
+}
+
+/**
+ * True when `year` is attested only by designation claims. A year no claim mentions is not
+ * designation-only — absence of evidence must not silently suppress an authored date.
+ */
+export function isDesignationOnlyYear(year: string, claims: readonly EraEvidenceClaim[]): boolean {
+  let seenInDesignation = false;
+  for (const claim of claims) {
+    if (!yearsInClaim(claim).includes(year)) continue;
+    if (!isDesignationClaim(claim)) return false;
+    seenInDesignation = true;
+  }
+  return seenInDesignation;
+}
+
+function spanIsDesignationOnly(
+  span: EraEvidenceSpan,
+  claims: readonly EraEvidenceClaim[],
+): boolean {
+  const from = /\d{4}/.exec(span.validFrom ?? '')?.[0];
+  const to = /\d{4}/.exec(span.validTo ?? '')?.[0];
+  if (from === undefined && to === undefined) return false;
+  const years = [from, to].filter((year): year is string => year !== undefined);
+  return years.every((year) => isDesignationOnlyYear(year, claims));
+}
+
+function bucketsForSpan(span: EraEvidenceSpan): readonly string[] {
+  const validFrom = span.validFrom?.trim();
+  if (!validFrom || /^undated$/iu.test(validFrom)) return [];
+  return deriveEraBuckets({
+    validFrom,
+    ...(span.validTo !== undefined ? { validTo: span.validTo } : {}),
+    datePrecision:
+      span.datePrecision && isDatePrecision(span.datePrecision) ? span.datePrecision : 'year',
+  });
+}
+
+/** Everything a record can offer as evidence of when its history happened. */
+export type EraEvidenceInput = {
+  /** Authored decade labels. Always authoritative — never second-guessed against claims. */
+  readonly eraBuckets?: readonly string[];
+  /** `event`-kind records carry their span here instead of in `statusHistory`. */
+  readonly eventWindow?: EraEvidenceSpan;
+  /** Lifecycle spans, which may hold designation dates and are therefore screened. */
+  readonly statusHistory?: readonly EraEvidenceSpan[];
+  /** The record's claims, read only to tell designation years from historical ones. */
+  readonly claims?: readonly EraEvidenceClaim[];
+};
+
+/**
+ * Decades a record's historical claims explicitly name — the last tier, for records carrying no
+ * structured date at all. Only the decades actually attested are returned, never the span between
+ * them: a life documented by a 1962 degree and a 1988 election yields 1960s and 1980s, because
+ * nothing in the record speaks to the 1970s.
+ */
+function bucketsFromClaimYears(claims: readonly EraEvidenceClaim[]): readonly string[] {
+  const buckets = new Set<string>();
+  for (const claim of claims) {
+    if (isDesignationClaim(claim)) continue;
+    for (const year of yearsInClaim(claim)) {
+      buckets.add(`${Math.floor(Number.parseInt(year, 10) / 10) * 10}s`);
+    }
+  }
+  return [...buckets].sort((a, b) => a.localeCompare(b));
+}
+
+/**
+ * Why a record has no era, so the gap can be told apart from a subject that genuinely has no date.
+ *
+ * `awaiting_research` is the one that matters operationally: the record carries a designation
+ * date, which means a real historical era exists and simply has not been ingested. That is the
+ * work list for pulling period-of-significance out of NRHP nominations, and it is why this is a
+ * state rather than a flat "undated".
+ */
+export type EraDocumentationState = 'documented' | 'awaiting_research' | 'undocumented';
+
+export type EraEvidenceResult = {
+  readonly buckets: readonly string[];
+  readonly state: EraDocumentationState;
+};
+
+/**
+ * Decade buckets a record's dates genuinely support, in precedence order: authored buckets, the
+ * event window, lifecycle spans that are not designation-only, then years named by historical
+ * claims. Also reports whether an empty result is a research gap or a genuinely undated subject.
+ */
+export function resolveEraEvidence(input: EraEvidenceInput): EraEvidenceResult {
+  const documented = (buckets: readonly string[]): EraEvidenceResult => ({
+    buckets,
+    state: 'documented',
+  });
+
+  const authored = (input.eraBuckets ?? []).map((bucket) => bucket.trim()).filter(Boolean);
+  if (authored.length > 0) {
+    const kept = filterDecadesAtOrBeforeCurrent(authored);
+    if (kept.length > 0) return documented(kept);
+  }
+
+  if (input.eventWindow) {
+    const fromEvent = filterDecadesAtOrBeforeCurrent(bucketsForSpan(input.eventWindow));
+    if (fromEvent.length > 0) return documented(fromEvent);
+  }
+
+  const claims = input.claims ?? [];
+  const spans = input.statusHistory ?? [];
+  const buckets = new Set<string>();
+  let suppressedDesignation = false;
+  for (const span of spans) {
+    if (spanIsDesignationOnly(span, claims)) {
+      suppressedDesignation = true;
+      continue;
+    }
+    for (const bucket of bucketsForSpan(span)) buckets.add(bucket);
+  }
+  if (buckets.size > 0) {
+    const kept = filterDecadesAtOrBeforeCurrent([...buckets].sort((a, b) => a.localeCompare(b)));
+    if (kept.length > 0) return documented(kept);
+  }
+
+  const fromClaims = filterDecadesAtOrBeforeCurrent(bucketsFromClaimYears(claims));
+  if (fromClaims.length > 0) return documented(fromClaims);
+
+  return { buckets: [], state: suppressedDesignation ? 'awaiting_research' : 'undocumented' };
+}
+
+/** Buckets only, for callers that do not need to know why an empty result is empty. */
+export function resolveEraBucketsFromEvidence(input: EraEvidenceInput): readonly string[] {
+  return resolveEraEvidence(input).buckets;
+}

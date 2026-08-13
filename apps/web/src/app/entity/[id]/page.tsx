@@ -56,7 +56,7 @@ import { chaptersCiting } from '../../../lib/release/build-cites-edge';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
 import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './adapters';
 import { buildEntityAnatomyInputs } from './entity-anatomy-facts';
-import { deriveHistoricalFraming, isThinRecord } from './entity-view-model';
+import { deriveRecordStanding, isThinRecord } from './entity-view-model';
 import { EntityRoomSections } from './EntityRoomSections';
 import { EntitySessionNavClient } from './entity-session-nav-client';
 import '../../record-page.css';
@@ -210,8 +210,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
     notFound();
   }
 
-  const framing = deriveHistoricalFraming(entity);
-  const framingLabel = framing === 'present_day' ? 'Present-day record' : 'Historical record';
+  const standingLabel = deriveRecordStanding(entity);
   const jurisdictionLabel = isDisplayableJurisdictionLabel(entity.jurisdictionLabel)
     ? entity.jurisdictionLabel.trim()
     : undefined;
@@ -418,7 +417,9 @@ export default async function EntityPage({ params }: EntityPageProps) {
             catalog={entityLinkCatalog}
           />
         }
-        meta={[anatomyInputs.whereLabel, anatomyInputs.eraLabel, framingLabel]}
+        meta={[anatomyInputs.whereLabel, anatomyInputs.eraLabel, standingLabel].filter(
+          (fact): fact is string => fact !== undefined,
+        )}
         showPath={false}
       />
 
@@ -443,7 +444,6 @@ export default async function EntityPage({ params }: EntityPageProps) {
 
       <EntityRoomSections
         entity={entity}
-        framing={framing}
         evidenceClaims={evidenceClaims}
         entityLinkCatalog={entityLinkCatalog}
         {...(crossReferences.length > 0 ? { crossReferences } : {})}

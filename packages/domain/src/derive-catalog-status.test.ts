@@ -49,7 +49,7 @@ test('place-like historic cues yield historic', () => {
   assert.equal(derived.status, 'historic');
 });
 
-test('universities default active', () => {
+test('a place-like kind is active on a positive cue, not on being a university', () => {
   const derived = deriveCatalogEntityStatus({
     id: 'ent_school_1',
     kind: 'school',
@@ -57,6 +57,103 @@ test('universities default active', () => {
     eraBuckets: ['1860s'],
   });
   assert.equal(derived.status, 'active');
+});
+
+/**
+ * The catalog's single largest assertion used to be a guess: any text mentioning a church,
+ * school, park, district or town fell through to `active`, as did everything else reaching the
+ * end of derivePlaceLike. Measured on release rel_20260723_authority_net_001, that put `active`
+ * on 2,344 NRHP places, 2,337 of which contain no claim of present existence.
+ */
+test('an unresearched listing is unknown, not active', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'nrhp-example',
+    kind: 'place',
+    displayName: 'St. Paul AME Zion Church',
+    summary:
+      'St. Paul AME Zion Church is a building in Johnson City, Washington County, Tennessee ' +
+      'listed on the National Register of Historic Places on April 12, 2001 for its significance ' +
+      'in architecture, Black heritage, and social history.',
+    researchCoverage: 'minimal',
+  });
+  assert.equal(derived.status, 'unknown');
+  assert.equal(
+    derived.statusHistory,
+    undefined,
+    'a lifecycle span is a dated assertion the record cannot make',
+  );
+});
+
+test('an unknown standing still yields no span even when the record has a datable year', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'nrhp-example-2',
+    kind: 'place',
+    displayName: 'Block Unit #1 Historic District',
+    summary: 'A district listed on the National Register in 2000.',
+    eraBuckets: ['1920s'],
+    researchCoverage: 'minimal',
+  });
+  assert.equal(derived.status, 'unknown');
+  assert.equal(derived.statusHistory, undefined);
+});
+
+/**
+ * The suppression is scoped to unresearched listings on purpose. Dropping the cue-free default
+ * for every record was measured against the live catalog first and stripped `active` from 564
+ * curated records — the DuSable Museum, Ebenezer Baptist Church — because ACTIVE_RE does not
+ * match plain present tense.
+ */
+test('a researched record keeps the active default even with no explicit present-tense cue', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_aamlo_oakland_001',
+    kind: 'institution',
+    summary:
+      'AAMLO is a museum and non-circulating reference library operated by the Oakland Public ' +
+      'Library.',
+    historicalContext: 'Opened in 1965 as the Oakland Public Library Black history collection.',
+    researchCoverage: 'partial',
+  });
+  assert.equal(derived.status, 'active');
+});
+
+test('narrative context alone is enough to keep the default on a single-sourced record', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_single_source',
+    kind: 'place',
+    summary: 'A meeting hall in Selma.',
+    historicalContext: 'Organizers met here through the 1965 voting-rights campaign.',
+    researchCoverage: 'minimal',
+  });
+  assert.equal(derived.status, 'active');
+});
+
+/**
+ * basisClaimIds used to synthesize `${entry.id}_claim_${i}` for claims arriving without an id,
+ * but claims are minted as `claim_<entityId>_<nn>`. That published 3,270 records whose stated
+ * evidential basis resolved to no claim on the record.
+ */
+test('basisClaimIds cites real claim ids only and never invents one', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_place_basis',
+    kind: 'place',
+    summary: 'A meeting hall that still stands and continues to host the congregation.',
+    claims: [
+      { id: 'claim_ent_place_basis_01', predicate: 'founded', object: 'Built in 1888.' },
+      { predicate: 'listing', object: 'Listed on the National Register in 2001.' },
+    ],
+  });
+  assert.deepEqual(derived.statusHistory?.[0]?.basisClaimIds, ['claim_ent_place_basis_01']);
+});
+
+test('a status resting on no citeable claim reports an empty basis rather than a fabricated one', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_place_nobasis',
+    kind: 'place',
+    summary: 'A former school; the building was demolished in 1974.',
+    claims: [{ predicate: 'listing', object: 'Listed in 1998.' }],
+  });
+  assert.equal(derived.status, 'historic');
+  assert.deepEqual(derived.statusHistory?.[0]?.basisClaimIds, []);
 });
 
 test('persons derive livingStatus from death cues', () => {

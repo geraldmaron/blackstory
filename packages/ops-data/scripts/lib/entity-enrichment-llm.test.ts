@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { validateEnrichmentResponse, type EnrichmentSubject } from './entity-enrichment-llm.ts';
+import {
+  buildEnrichmentUserPrompt,
+  validateEnrichmentResponse,
+  type EnrichmentSubject,
+} from './entity-enrichment-llm.ts';
 
 const LONG_ENOUGH_SUMMARY =
   'John Doe operated a business at this site starting in 1925, documented in the National ' +
@@ -246,6 +250,129 @@ test('rejects an address-shaped keyword for a person entity', () => {
   if (!attempt.validation.ok) {
     assert.ok(attempt.validation.errors.some((error) => error.includes('keywords')));
   }
+});
+
+/**
+ * repo-lm6h. The live failure this reproduces: nrhp-black-heritage-14000104 (Monte Verdi
+ * Plantation) published with '...recognized under ethnic heritage (black) as well as agriculture.'
+ * The phrase is a real substring of the NPS source, so the citation anchored and every other check
+ * passed. Note the subject/evidence below make the quote genuinely verifiable — the point is that a
+ * VALID citation is not enough, so a test that cheated the anchor would prove nothing.
+ */
+test('rejects a summary that copies raw registry vocabulary out of the source', () => {
+  const subject = baseSubject({
+    evidence: [
+      {
+        id: 'ev_1',
+        sourceTier: 'tier1',
+        title: 'Nomination',
+        text: 'The property is recognized under ethnic heritage (black) as well as agriculture.',
+      },
+    ],
+  });
+  const summaryWithCode =
+    'The plantation was home to a large African American community whose labor sustained one of ' +
+    'the largest antebellum estates in the county, and it is recognized under ethnic heritage ' +
+    '(black) as well as agriculture in the National Register listing for the site.';
+  assert.ok(summaryWithCode.length >= 120 && summaryWithCode.length <= 400);
+  const attempt = validateEnrichmentResponse(
+    subject,
+    ['business'],
+    validResponse({
+      summary: summaryWithCode,
+      summaryCitations: [
+        { evidenceId: 'ev_1', quote: 'recognized under ethnic heritage (black) as well as' },
+      ],
+    }),
+  );
+  assert.equal(attempt.validation.ok, false);
+  if (!attempt.validation.ok) {
+    assert.ok(attempt.validation.errors.some((error) => error.includes('registry vocabulary')));
+  }
+});
+
+test('rejects raw registry vocabulary in historicalContext and in keywords', () => {
+  const subject = baseSubject({
+    evidence: [
+      {
+        id: 'ev_1',
+        sourceTier: 'tier1',
+        title: 'Nomination',
+        text:
+          'John Doe operated a business at this site starting in 1925. It closed in 1958. ' +
+          'Areas of significance: ETHNIC HERITAGE-BLACK; ENTERTAINMENT/RECREATION.',
+      },
+    ],
+  });
+  const contextAttempt = validateEnrichmentResponse(
+    subject,
+    ['business'],
+    validResponse({
+      historicalContext:
+        'The nomination records the site under ETHNIC HERITAGE-BLACK, alongside its commercial role.',
+      historicalContextCitations: [{ evidenceId: 'ev_1', quote: 'ETHNIC HERITAGE-BLACK' }],
+    }),
+  );
+  assert.equal(contextAttempt.validation.ok, false);
+  if (!contextAttempt.validation.ok) {
+    assert.ok(
+      contextAttempt.validation.errors.some(
+        (error) => error.startsWith('historicalContext') && error.includes('registry vocabulary'),
+      ),
+    );
+  }
+
+  const keywordAttempt = validateEnrichmentResponse(
+    subject,
+    ['business'],
+    validResponse({ keywords: ['ENTERTAINMENT/RECREATION'] }),
+  );
+  assert.equal(keywordAttempt.validation.ok, false);
+  if (!keywordAttempt.validation.ok) {
+    assert.ok(
+      keywordAttempt.validation.errors.some(
+        (error) => error.startsWith('keywords') && error.includes('registry vocabulary'),
+      ),
+    );
+  }
+});
+
+/**
+ * The guard has to leave ordinary English alone: "ethnic heritage" as words in a sentence is not
+ * the registry field, and a pattern that cannot tell them apart costs a redraft cycle on every
+ * legitimate entry that uses the phrase.
+ */
+test('accepts prose that uses the words "ethnic heritage" naturally', () => {
+  const subject = baseSubject({
+    evidence: [
+      {
+        id: 'ev_1',
+        sourceTier: 'tier1',
+        title: 'Nomination',
+        text: 'The congregation preserved its ethnic heritage through music and language after 1925.',
+      },
+    ],
+  });
+  const summary =
+    'The congregation preserved its ethnic heritage through music and language after 1925, and ' +
+    'the church remained the center of Black community life in the district for several decades.';
+  assert.ok(summary.length >= 120 && summary.length <= 400);
+  const attempt = validateEnrichmentResponse(
+    subject,
+    ['business'],
+    validResponse({
+      summary,
+      summaryCitations: [
+        { evidenceId: 'ev_1', quote: 'preserved its ethnic heritage through music and language' },
+      ],
+    }),
+  );
+  assert.equal(attempt.validation.ok, true);
+});
+
+test('user prompt tells the drafter not to copy registry classification fields', () => {
+  const prompt = buildEnrichmentUserPrompt(baseSubject(), ['business']);
+  assert.ok(prompt.includes('never copy a registry classification field into prose'));
 });
 
 test('user prompt carries the privacy rule for person subjects and omits it for plain places', async () => {

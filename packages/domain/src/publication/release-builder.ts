@@ -48,6 +48,7 @@ import {
   type StatusHistoryEntry,
 } from '../entity-status.js';
 import { deriveCatalogEntityStatus } from '../derive-catalog-status.js';
+import { resolveEraBucketsFromEvidence } from '../era.js';
 import { findTemplateSummarySignature } from './template-summary-signatures.js';
 import type { LivingStatus } from '../living.js';
 import { sanitizePublicProseText } from '../editorial/prose-links.js';
@@ -727,6 +728,12 @@ function canonicalHasAssertedStatus(
 export function resolveReleaseProjectionStatus(
   entry: ReleaseSourceEntity,
   canonical: CanonicalStatusSnapshot | undefined,
+  /**
+   * Distinct-source coverage for this entry, computed just upstream. Passed in rather than
+   * recomputed so the heuristic backstop can tell a researched record from a bare registry
+   * listing before defaulting a place to `active`.
+   */
+  researchCoverage?: string,
 ): ResolvedReleaseProjectionStatus {
   if (canonicalHasAssertedStatus(entry, canonical) && canonical) {
     if (entry.kind === 'person') {
@@ -768,6 +775,7 @@ export function resolveReleaseProjectionStatus(
       : {}),
     ...(entry.impactStatement !== undefined ? { impactStatement: entry.impactStatement } : {}),
     ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
+    ...(researchCoverage !== undefined ? { researchCoverage } : {}),
     ...(entry.claims !== undefined ? { claims: entry.claims } : {}),
     ...(entry.statusHistory !== undefined ? { statusHistory: entry.statusHistory as never } : {}),
     ...(entry.status !== undefined ? { status: entry.status } : {}),
@@ -889,9 +897,25 @@ export function buildReleaseEntityArtifacts(
     ...new Set(notabilityBasis.map((basis) => NOTABILITY_RUBRIC[basis.criterion])),
   ];
   const related = normalizeReleaseRelated(resolveRelatedEntries(entry, context));
-  const resolvedStatus = resolveReleaseProjectionStatus(entry, context.canonicalStatus);
+  const resolvedStatus = resolveReleaseProjectionStatus(
+    entry,
+    context.canonicalStatus,
+    researchCoverage,
+  );
   const publicStatus = resolvedStatus.status;
   const publicStatusHistory = resolvedStatus.statusHistory;
+  /*
+   * Derive era once, here, so the entity projection and the search index cannot disagree.
+   * Previously both copied `entry.eraBuckets` verbatim; catalog entries that carry only a dated
+   * `statusHistory` shipped with no era at all, and the web read path patched the entity page
+   * while the search index kept an empty era facet. Screening designation dates is the whole
+   * reason this goes through `resolveEraBucketsFromEvidence` rather than `deriveEraBuckets`.
+   */
+  const eraBuckets = resolveEraBucketsFromEvidence({
+    ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
+    ...(publicStatusHistory !== undefined ? { statusHistory: publicStatusHistory } : {}),
+    claims,
+  });
 
   const projection: ReleaseEntityProjectionFields = {
     id: entry.id,
@@ -922,7 +946,7 @@ export function buildReleaseEntityArtifacts(
     ...(resolvedStatus.statusProvenance !== undefined
       ? { statusProvenance: resolvedStatus.statusProvenance }
       : {}),
-    ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
+    ...(eraBuckets.length > 0 ? { eraBuckets } : {}),
     ...(entry.sensitivityClass !== undefined ? { sensitivityClass: entry.sensitivityClass } : {}),
     topicTags: entry.topicTags ?? [],
     topicIds: entry.topicIds ?? [],
@@ -954,7 +978,7 @@ export function buildReleaseEntityArtifacts(
     keywords: entry.keywords ?? [],
     jurisdictionState: entry.jurisdictionLabel,
     ...(publicStatus !== undefined ? { status: publicStatus } : {}),
-    eraBuckets: entry.eraBuckets ?? [],
+    eraBuckets,
     notabilityBasis,
     notabilityLabels,
     ...(entry.sensitivityClass !== undefined ? { sensitivityClass: entry.sensitivityClass } : {}),
