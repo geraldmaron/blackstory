@@ -189,6 +189,9 @@ function resolveStatusHistory(
       ? { historicalContext: projection.historicalContext }
       : {}),
     ...(projection.eraBuckets !== undefined ? { eraBuckets: projection.eraBuckets } : {}),
+    ...(projection.researchCoverage !== undefined
+      ? { researchCoverage: projection.researchCoverage }
+      : {}),
     claims: claims.map((claim) => ({
       id: claim.id,
       predicate: claim.predicate,

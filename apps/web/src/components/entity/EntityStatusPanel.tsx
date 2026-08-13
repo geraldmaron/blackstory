@@ -43,7 +43,11 @@ export function EntityStatusPanel({ entity }: EntityStatusPanelProps) {
   const currentStatus = entity.status;
   const history = entity.statusHistory;
 
-  if (!currentStatus && (!history || history.length === 0)) {
+  // `unknown` is the absence of a finding, not a finding. Catalog derivation returns it when the
+  // sources give no cue either way, and with no lifecycle span behind it there is nothing to show
+  // but a shrug — the gap notice says the same thing in the approved words.
+  const undetermined = !currentStatus || currentStatus === 'unknown';
+  if (undetermined && (!history || history.length === 0)) {
     return <RecordGapNotice kind="statusHistory" />;
   }
 

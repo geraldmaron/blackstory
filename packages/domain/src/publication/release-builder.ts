@@ -728,6 +728,12 @@ function canonicalHasAssertedStatus(
 export function resolveReleaseProjectionStatus(
   entry: ReleaseSourceEntity,
   canonical: CanonicalStatusSnapshot | undefined,
+  /**
+   * Distinct-source coverage for this entry, computed just upstream. Passed in rather than
+   * recomputed so the heuristic backstop can tell a researched record from a bare registry
+   * listing before defaulting a place to `active`.
+   */
+  researchCoverage?: string,
 ): ResolvedReleaseProjectionStatus {
   if (canonicalHasAssertedStatus(entry, canonical) && canonical) {
     if (entry.kind === 'person') {
@@ -769,6 +775,7 @@ export function resolveReleaseProjectionStatus(
       : {}),
     ...(entry.impactStatement !== undefined ? { impactStatement: entry.impactStatement } : {}),
     ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
+    ...(researchCoverage !== undefined ? { researchCoverage } : {}),
     ...(entry.claims !== undefined ? { claims: entry.claims } : {}),
     ...(entry.statusHistory !== undefined ? { statusHistory: entry.statusHistory as never } : {}),
     ...(entry.status !== undefined ? { status: entry.status } : {}),
@@ -890,7 +897,11 @@ export function buildReleaseEntityArtifacts(
     ...new Set(notabilityBasis.map((basis) => NOTABILITY_RUBRIC[basis.criterion])),
   ];
   const related = normalizeReleaseRelated(resolveRelatedEntries(entry, context));
-  const resolvedStatus = resolveReleaseProjectionStatus(entry, context.canonicalStatus);
+  const resolvedStatus = resolveReleaseProjectionStatus(
+    entry,
+    context.canonicalStatus,
+    researchCoverage,
+  );
   const publicStatus = resolvedStatus.status;
   const publicStatusHistory = resolvedStatus.statusHistory;
   /*
