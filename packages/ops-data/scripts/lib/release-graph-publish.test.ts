@@ -40,7 +40,10 @@ test('an unexplained edge drop is a build failure and says so', () => {
  */
 test('coverage below the floor fails as completeness, not as a broken build', () => {
   assert.throws(
-    () => assertReleaseGraphAuditOrThrow(audit({ decadeCoveragePct: 49.4, entitiesWithDecadeBuckets: 2022 })),
+    () =>
+      assertReleaseGraphAuditOrThrow(
+        audit({ decadeCoveragePct: 49.4, entitiesWithDecadeBuckets: 2022 }),
+      ),
     (error: Error) => {
       assert.match(error.message, /decade coverage 49\.4% is below the acknowledged floor 90%/);
       assert.match(error.message, /not whether the build is sound/);
@@ -51,7 +54,10 @@ test('coverage below the floor fails as completeness, not as a broken build', ()
 });
 
 test('the floor defaults to 90 so nothing weakens by omission', () => {
-  assert.throws(() => assertReleaseGraphAuditOrThrow(audit({ decadeCoveragePct: 89.9 })), /floor 90%/);
+  assert.throws(
+    () => assertReleaseGraphAuditOrThrow(audit({ decadeCoveragePct: 89.9 })),
+    /floor 90%/,
+  );
   assert.doesNotThrow(() => assertReleaseGraphAuditOrThrow(audit({ decadeCoveragePct: 90 })));
 });
 

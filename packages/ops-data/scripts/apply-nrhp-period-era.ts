@@ -111,7 +111,9 @@ try {
   console.log(`  by method: ${JSON.stringify(byMethod)}`);
   console.log('\nsamples:');
   for (const u of updates.slice(0, 6)) {
-    console.log(`  - ${u.id} [${u.method}] ${u.buckets.join(',')} from "${u.evidence.slice(0, 40)}"`);
+    console.log(
+      `  - ${u.id} [${u.method}] ${u.buckets.join(',')} from "${u.evidence.slice(0, 40)}"`,
+    );
   }
 
   const artifactDir = join(

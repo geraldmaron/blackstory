@@ -152,7 +152,10 @@ try {
     const beforeEra = ((before.eraBuckets as string[]) ?? []).join(',');
     const afterEra = ((after.eraBuckets as string[]) ?? []).join(',');
     if (beforeEra !== afterEra) {
-      tally(eraMoves, `${beforeEra === '' ? 'none' : 'set'} -> ${afterEra === '' ? 'none' : 'set'}`);
+      tally(
+        eraMoves,
+        `${beforeEra === '' ? 'none' : 'set'} -> ${afterEra === '' ? 'none' : 'set'}`,
+      );
       if (eraSamples.length < 8) {
         eraSamples.push(`${row.id}: [${beforeEra || '—'}] -> [${afterEra || '—'}]`);
       }

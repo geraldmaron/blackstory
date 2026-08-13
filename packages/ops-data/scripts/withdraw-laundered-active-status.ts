@@ -75,7 +75,10 @@ type Row = {
   readonly id: string;
   readonly kind: string;
   readonly display_name: string;
-  readonly status_history: readonly { readonly status?: string; readonly basisClaimIds?: string[] }[];
+  readonly status_history: readonly {
+    readonly status?: string;
+    readonly basisClaimIds?: string[];
+  }[];
   readonly claim_ids: readonly string[];
   readonly projection: Record<string, unknown> | null;
   readonly lane: string | null;
@@ -141,9 +144,9 @@ try {
       historicalContext: projection.historicalContext as string | undefined,
       eraBuckets: projection.eraBuckets as readonly string[] | undefined,
       researchCoverage: projection.researchCoverage as string | undefined,
-      claims: ((projection.claims as { id?: string; predicate?: string; object?: string }[]) ?? []).map(
-        (claim) => ({ id: claim.id, predicate: claim.predicate, object: claim.object }),
-      ),
+      claims: (
+        (projection.claims as { id?: string; predicate?: string; object?: string }[]) ?? []
+      ).map((claim) => ({ id: claim.id, predicate: claim.predicate, object: claim.object })),
     });
     if (derived.status !== 'unknown') {
       reject(`corrected derivation still says ${derived.status ?? '(none)'}`);
@@ -166,7 +169,10 @@ try {
   console.log('samples:');
   qualifying.slice(0, 5).forEach((q) => console.log(`  - ${q.id} (${q.kind}) ${q.name}`));
 
-  const artifactDir = join(dirname(fileURLToPath(import.meta.url)), '../../../.cache/canonical-corrections');
+  const artifactDir = join(
+    dirname(fileURLToPath(import.meta.url)),
+    '../../../.cache/canonical-corrections',
+  );
   mkdirSync(artifactDir, { recursive: true });
   const artifact = join(artifactDir, 'repo-i2st-withdraw-laundered-active.json');
   writeFileSync(

@@ -42,7 +42,8 @@ export type PeriodOfSignificance = {
 };
 
 /** A full calendar date — how listing dates are written, and how periods never are. */
-const CALENDAR_DATE = /\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2},?\s*(\d{4})\b/gi;
+const CALENDAR_DATE =
+  /\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2},?\s*(\d{4})\b/gi;
 
 const YEAR = /\b(1[5-9]\d{2}|20[0-2]\d)\b/g;
 /** "1929-1950", "1910–1955", "1929 to 1950". */
@@ -58,10 +59,12 @@ const RANGE = /\b(1[5-9]\d{2}|20[0-2]\d)\s*(?:-|–|—|\bto\b)\s*(1[5-9]\d{2}|2
  * a form field. Same years, wrong provenance — and provenance is the point of recording a method.
  */
 const FIELD_CUE = /period\s+of\s+significance\s*:?\s*(?=\d{4})/i;
-const JUSTIFICATION_CUE = /period\s+of\s+significance\b[^.]{0,40}?(?:begins?|is|spans?|covers?|runs?|extends?)\b/i;
+const JUSTIFICATION_CUE =
+  /period\s+of\s+significance\b[^.]{0,40}?(?:begins?|is|spans?|covers?|runs?|extends?)\b/i;
 /** Any period-of-significance heading, for the last period-derived reading before giving up. */
 const CONTEXT_CUE = /period\s+of\s+significance/i;
-const CONSTRUCTION_CUE = /\b(?:built|constructed|erected|completed|established|founded)\b(?:\s+\w+){0,3}?\s+(?:in\s+|c\.?\s*|ca\.?\s*|circa\s+)?(1[5-9]\d{2}|20[0-2]\d)\b/i;
+const CONSTRUCTION_CUE =
+  /\b(?:built|constructed|erected|completed|established|founded)\b(?:\s+\w+){0,3}?\s+(?:in\s+|c\.?\s*|ca\.?\s*|circa\s+)?(1[5-9]\d{2}|20[0-2]\d)\b/i;
 
 /** Years that belong to a full calendar date, which is the listing-date shape. */
 function calendarDateYears(text: string): ReadonlySet<string> {

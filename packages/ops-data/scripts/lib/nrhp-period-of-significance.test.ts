@@ -39,12 +39,14 @@ test('an open-ended justification yields the single year it states', () => {
  * predates it in 41.7% of cases, by a median of 30 years.
  */
 test('a construction date does NOT become an era by default', () => {
-  const text = 'Goodwin Memorial AME Zion Church is a Craftsman-style building constructed in 1910.';
+  const text =
+    'Goodwin Memorial AME Zion Church is a Craftsman-style building constructed in 1910.';
   assert.equal(extractPeriodOfSignificance(text), undefined);
 });
 
 test('construction is available only when a caller opts in explicitly', () => {
-  const text = 'Goodwin Memorial AME Zion Church is a Craftsman-style building constructed in 1910.';
+  const text =
+    'Goodwin Memorial AME Zion Church is a Craftsman-style building constructed in 1910.';
   const period = extractPeriodOfSignificance(text, { allowConstructionFallback: true });
   assert.equal(period?.method, 'construction');
   assert.equal(period?.startYear, 1910);
@@ -83,7 +85,10 @@ test('a calendar-dated year inside the period window is discarded, not read', ()
 });
 
 test('a nomination stating no period returns undefined rather than guessing', () => {
-  assert.equal(extractPeriodOfSignificance('Area of Significance: ethnic heritage, Black.'), undefined);
+  assert.equal(
+    extractPeriodOfSignificance('Area of Significance: ethnic heritage, Black.'),
+    undefined,
+  );
   assert.equal(extractPeriodOfSignificance(''), undefined);
   assert.equal(extractPeriodOfSignificance('   '), undefined);
 });

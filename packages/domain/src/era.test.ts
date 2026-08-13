@@ -187,10 +187,7 @@ test('resolveEraBucketsFromEvidence ignores undated spans and future decades', (
     }),
     [],
   );
-  assert.deepEqual(
-    resolveEraBucketsFromEvidence({ eraBuckets: ['2050s'] }),
-    [],
-  );
+  assert.deepEqual(resolveEraBucketsFromEvidence({ eraBuckets: ['2050s'] }), []);
 });
 
 test('resolveEraBucketsFromEvidence reads decades named by historical claims', () => {
