@@ -7,8 +7,6 @@ import {
   auditGraphReleaseArtifact,
   buildGraphReleaseArtifact,
   deriveGraphDecadeBucketInput,
-  graphPublishAuditFailureMessage,
-  graphPublishAuditPasses,
   serializeGraphAdjacency,
   serializeGraphAllTimeView,
   serializeGraphDecadeView,
@@ -376,6 +374,19 @@ export function formatReleaseGraphAuditLog(audit: GraphPublishAuditReport): read
   return lines;
 }
 
+/**
+ * Two unlike checks, reported as two unlike failures.
+ *
+ * `unexplainedAllTimeDrops` is build integrity: edges vanished and the builder cannot say why, so
+ * the artifact is wrong. Decade coverage is research completeness: the archive has not dated its
+ * records yet. Collapsing both into one message made a correctness fix indistinguishable from a
+ * corrupted build — withdrawing ~2,100 designation dates that were never eras dropped coverage
+ * from "90%" to its real 49.4% and read as a broken release.
+ *
+ * Coverage therefore has an ACKNOWLEDGED FLOOR rather than a fixed bar. It still defaults to 90
+ * and still fails closed, so nothing weakens by accident; publishing below it requires an
+ * operator to state the number they are accepting, which lands in the log and the report.
+ */
 export function assertReleaseGraphAuditOrThrow(
   audit: GraphPublishAuditReport,
   options: { readonly minDecadeCoveragePct?: number; readonly enforceCoverage?: boolean } = {},
@@ -383,10 +394,18 @@ export function assertReleaseGraphAuditOrThrow(
   const enforceCoverage = options.enforceCoverage ?? true;
   const minCoverage = options.minDecadeCoveragePct ?? 90;
   if (audit.unexplainedAllTimeDrops > 0) {
-    throw new Error(graphPublishAuditFailureMessage(audit));
+    throw new Error(
+      `release graph integrity: ${audit.unexplainedAllTimeDrops} unexplained all-time edge drop(s). ` +
+        'The built artifact is wrong — this is not a coverage threshold and must not be waived.',
+    );
   }
-  if (enforceCoverage && !graphPublishAuditPasses(audit, { minDecadeCoveragePct: minCoverage })) {
-    throw new Error(graphPublishAuditFailureMessage(audit));
+  if (enforceCoverage && audit.decadeCoveragePct < minCoverage) {
+    throw new Error(
+      `decade coverage ${audit.decadeCoveragePct.toFixed(1)}% is below the acknowledged floor ` +
+        `${minCoverage}% (${audit.entitiesWithDecadeBuckets}/${audit.entitiesInRelease}). ` +
+        'This measures how much of the archive carries researched dates, not whether the build ' +
+        'is sound. If the drop is intended, re-run stating the floor you accept.',
+    );
   }
 }
 

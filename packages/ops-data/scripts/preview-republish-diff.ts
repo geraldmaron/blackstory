@@ -163,13 +163,16 @@ try {
   console.log(`built through the real gate: ${built}\n`);
   console.log('gate/build rejections:');
   const gr = Object.entries(gateRejects).sort((a, b) => b[1] - a[1]);
-  gr.length === 0 ? console.log('  (none)') : gr.forEach(([k, n]) => console.log(String(n).padStart(6), k));
+  if (gr.length === 0) console.log('  (none)');
+  else for (const [k, n] of gr) console.log(String(n).padStart(6), k);
   console.log('\nSTATUS changes:');
   const st = Object.entries(statusMoves).sort((a, b) => b[1] - a[1]);
-  st.length === 0 ? console.log('  (none)') : st.forEach(([k, n]) => console.log(String(n).padStart(6), k));
+  if (st.length === 0) console.log('  (none)');
+  else for (const [k, n] of st) console.log(String(n).padStart(6), k);
   console.log('\nERA BUCKET changes:');
   const er = Object.entries(eraMoves).sort((a, b) => b[1] - a[1]);
-  er.length === 0 ? console.log('  (none)') : er.forEach(([k, n]) => console.log(String(n).padStart(6), k));
+  if (er.length === 0) console.log('  (none)');
+  else for (const [k, n] of er) console.log(String(n).padStart(6), k);
   if (eraSamples.length > 0) {
     console.log('\nera samples:');
     eraSamples.forEach((s) => console.log('  -', s));
