@@ -33,17 +33,37 @@ test('an open-ended justification yields the single year it states', () => {
   assert.equal(period?.endYear, 1906);
 });
 
-test('falls back to a construction date, the weaker but far more common signal', () => {
-  const period = extractPeriodOfSignificance(
-    'Goodwin Memorial AME Zion Church is a Craftsman-style building constructed in 1910.',
-  );
+/**
+ * Construction is off by default because it is not an era. Across the 345 captured nominations
+ * stating both, the construction year sits inside the stated period only 38.3% of the time — it
+ * predates it in 41.7% of cases, by a median of 30 years.
+ */
+test('a construction date does NOT become an era by default', () => {
+  const text = 'Goodwin Memorial AME Zion Church is a Craftsman-style building constructed in 1910.';
+  assert.equal(extractPeriodOfSignificance(text), undefined);
+});
+
+test('construction is available only when a caller opts in explicitly', () => {
+  const text = 'Goodwin Memorial AME Zion Church is a Craftsman-style building constructed in 1910.';
+  const period = extractPeriodOfSignificance(text, { allowConstructionFallback: true });
   assert.equal(period?.method, 'construction');
   assert.equal(period?.startYear, 1910);
 });
 
-test('circa construction dates are read at year precision', () => {
-  assert.equal(extractPeriodOfSignificance('The hall was built c. 1888.')?.startYear, 1888);
-  assert.equal(extractPeriodOfSignificance('erected circa 1902 by freedmen')?.startYear, 1902);
+test('circa construction dates are read at year precision when opted in', () => {
+  const opt = { allowConstructionFallback: true } as const;
+  assert.equal(extractPeriodOfSignificance('The hall was built c. 1888.', opt)?.startYear, 1888);
+  assert.equal(extractPeriodOfSignificance('erected circa 1902 by freedmen', opt)?.startYear, 1902);
+});
+
+/** nrhp-black-heritage-00000731: built 1873, significant 1964. The period must govern. */
+test('a stated period wins over a construction date even when both appear', () => {
+  const period = extractPeriodOfSignificance(
+    'The church was built in 1873. Period of Significance 1964-1964',
+    { allowConstructionFallback: true },
+  );
+  assert.equal(period?.method, 'field');
+  assert.equal(period?.startYear, 1964);
 });
 
 /**

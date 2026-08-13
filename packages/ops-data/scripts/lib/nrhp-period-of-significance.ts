@@ -12,9 +12,13 @@
  *                  field — the registered answer, and the one to trust.
  *   'justification' the Section 8 continuation prose, "the period of significance is the years
  *                  1910-1955" or "begins in 1906". Present when the form field OCR'd badly.
- *   'construction'  "built in 1888" / "constructed c. 1902". A single year, and a weaker claim:
- *                  it dates the fabric, not the significance. Kept because 1,121 of 1,227
- *                  captured nominations carry it while only 553 state a period outright.
+ *   'context'      a year sitting next to a period-of-significance heading that matched neither
+ *                  shape above — OCR routinely mangles the form's layout. Weaker than the two
+ *                  above but still period evidence, and worth 94 records that would otherwise go
+ *                  undated.
+ *   'construction'  "built in 1888" / "constructed c. 1902". NOT an era, and OFF BY DEFAULT.
+ *                  It dates the fabric, not the significance, and measurement showed those are
+ *                  usually different facts — see `allowConstructionFallback`.
  *
  * THE LISTING DATE MUST NEVER BE READ AS ERA. That confusion is the whole reason this exists, so
  * matching is confined to a window after a period-of-significance cue rather than run over the
@@ -25,7 +29,7 @@
 /** Years a nomination can plausibly assert. NRHP covers pre-contact through the recent past. */
 const MIN_YEAR = 1500;
 
-export type PeriodMethod = 'field' | 'justification' | 'construction';
+export type PeriodMethod = 'field' | 'justification' | 'context' | 'construction';
 
 export type PeriodOfSignificance = {
   /** Inclusive start year. */
@@ -44,11 +48,19 @@ const YEAR = /\b(1[5-9]\d{2}|20[0-2]\d)\b/g;
 /** "1929-1950", "1910–1955", "1929 to 1950". */
 const RANGE = /\b(1[5-9]\d{2}|20[0-2]\d)\s*(?:-|–|—|\bto\b)\s*(1[5-9]\d{2}|20[0-2]\d)\b/;
 
-// The lookahead must sit before the whitespace is consumed: with `\s*` first, backtracking
-// lets the engine match zero spaces and the lookahead then sees " (justification", which does
-// not start with "(", so the exclusion silently never fires.
-const FIELD_CUE = /period\s+of\s+significance\b(?!\s*\(justification)\s*:?\s*/i;
+/**
+ * The transcribed form field, which is "Period of Significance" followed straight by the years.
+ *
+ * The lookahead for a digit is what separates the field from prose, and it has to be positive
+ * rather than a list of prose words to exclude. Excluding "(justification)" alone was not enough:
+ * `exec` scans the whole document, so on a nomination whose field OCR'd badly it simply found the
+ * later sentence "the period of significance is the years 1910-1955" and reported those years as
+ * a form field. Same years, wrong provenance — and provenance is the point of recording a method.
+ */
+const FIELD_CUE = /period\s+of\s+significance\s*:?\s*(?=\d{4})/i;
 const JUSTIFICATION_CUE = /period\s+of\s+significance\b[^.]{0,40}?(?:begins?|is|spans?|covers?|runs?|extends?)\b/i;
+/** Any period-of-significance heading, for the last period-derived reading before giving up. */
+const CONTEXT_CUE = /period\s+of\s+significance/i;
 const CONSTRUCTION_CUE = /\b(?:built|constructed|erected|completed|established|founded)\b(?:\s+\w+){0,3}?\s+(?:in\s+|c\.?\s*|ca\.?\s*|circa\s+)?(1[5-9]\d{2}|20[0-2]\d)\b/i;
 
 /** Years that belong to a full calendar date, which is the listing-date shape. */
@@ -69,6 +81,13 @@ function plausible(start: number, end: number, maxYear: number): boolean {
   return end - start <= 200;
 }
 
+/**
+ * Try every occurrence of the cue, not just the first.
+ *
+ * A nomination names its period of significance more than once — the form field, then the
+ * Section 8 justification. When the first mention OCR'd without readable years, stopping there
+ * threw away a perfectly good later one.
+ */
 function readWindow(
   text: string,
   cue: RegExp,
@@ -76,9 +95,21 @@ function readWindow(
   maxYear: number,
   windowChars: number,
 ): PeriodOfSignificance | undefined {
-  const cueMatch = cue.exec(text);
-  if (!cueMatch) return undefined;
-  const from = cueMatch.index + cueMatch[0].length;
+  const scanner = new RegExp(cue.source, cue.flags.includes('g') ? cue.flags : `${cue.flags}g`);
+  for (const cueMatch of text.matchAll(scanner)) {
+    const found = readAt(text, cueMatch.index + cueMatch[0].length, method, maxYear, windowChars);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+function readAt(
+  text: string,
+  from: number,
+  method: PeriodMethod,
+  maxYear: number,
+  windowChars: number,
+): PeriodOfSignificance | undefined {
   const window = text.slice(from, from + windowChars);
   const excluded = calendarDateYears(window);
 
@@ -115,7 +146,24 @@ function readWindow(
  */
 export function extractPeriodOfSignificance(
   text: string,
-  options: { readonly maxYear?: number } = {},
+  options: {
+    readonly maxYear?: number;
+    /**
+     * Accept a construction date when no period of significance is stated. DEFAULT FALSE, and it
+     * should stay false for anything that feeds `eraBuckets`.
+     *
+     * It reads like a safe fallback and is not. Measured across the 345 captured nominations that
+     * state both, the construction year falls inside the stated period of significance just 38.3%
+     * of the time; it predates it in 41.7% of cases by a median of 30 years and a maximum of 369.
+     * nrhp-black-heritage-00000731 is the case that decides it: built 1873, significant 1964. Era
+     * from construction would file a Civil Rights Act-era record under the 1870s, where nobody
+     * browsing the 1960s would ever find it.
+     *
+     * So a construction date is not a partial view of the era — it is a different fact that
+     * usually disagrees with it. Publish it as a sourced claim about the building instead.
+     */
+    readonly allowConstructionFallback?: boolean;
+  } = {},
 ): PeriodOfSignificance | undefined {
   if (!text.trim()) return undefined;
   const maxYear = options.maxYear ?? new Date().getUTCFullYear();
@@ -127,6 +175,11 @@ export function extractPeriodOfSignificance(
 
   const justification = readWindow(text, JUSTIFICATION_CUE, 'justification', maxYear, 120);
   if (justification) return justification;
+
+  const context = readWindow(text, CONTEXT_CUE, 'context', maxYear, 80);
+  if (context) return context;
+
+  if (options.allowConstructionFallback !== true) return undefined;
 
   const construction = CONSTRUCTION_CUE.exec(text);
   if (construction?.[1]) {
