@@ -27,8 +27,10 @@ These hold across every child bead unless an accepted ADR explicitly supersedes 
 4. **Releases**: immutable release artifacts with atomic activation and proven rollback.
 5. **Identity first**: product identity (MOB-001) resolves before any permanent store
    resource is created.
-6. **Client trust**: App Check is attestation, not authorization. The server stays
-   authoritative; a compromised client must not gain a canonical write path.
+6. **Client trust**: client attestation is a signal, not authorization (2026-08-14: this was
+   Firebase App Check at writing; the live mechanism is the `X-BlackStory-Client` header check,
+   see `docs/mobile/security/threat-model.md`'s 2026-08-14 amendment — the invariant is unchanged).
+   The server stays authoritative; a compromised client must not gain a canonical write path.
 7. **Privacy**: no ad/tracking SDKs; no query text, correction content, precise
    location, or sensitive entity classifications in logs or crash reports.
 

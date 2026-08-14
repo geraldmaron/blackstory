@@ -5,7 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckDecision } from '@repo/ops-data';
+import type { ClientAttestationDecision } from '@repo/security';
 import {
   createDeterministicMockEmbeddingProvider,
   createInMemoryVectorIndexStore,
@@ -17,21 +17,18 @@ import {
   type FindNearestHttpRequest,
 } from './vector-search-endpoint.ts';
 
-const ALLOWED_APP_CHECK: AppCheckDecision = {
+const ALLOWED_ATTESTATION: ClientAttestationDecision = {
   allowed: true,
   verified: true,
   mode: 'enforce',
-  trustedService: false,
 };
 
-const DENIED_APP_CHECK: AppCheckDecision = {
+const FAILED_ATTESTATION: ClientAttestationDecision = {
   allowed: false,
   verified: false,
   mode: 'enforce',
   status: 401,
-  code: 'APP_CHECK_REQUIRED',
-  reason: 'missing_token',
-  trustedService: false,
+  reason: 'missing_header',
 };
 
 function baseRequest(overrides: Partial<FindNearestHttpRequest> = {}): FindNearestHttpRequest {
@@ -46,21 +43,27 @@ function baseRequest(overrides: Partial<FindNearestHttpRequest> = {}): FindNeare
   };
 }
 
-test('find_nearest denies with 401 when App Check fails', async () => {
+test('find_nearest never hard-denies at the attestation-guard layer itself (fail-open, T1/T2)', async () => {
+  // Failed attestation still reaches the same quota policy every other expensive-read endpoint
+  // uses (unattested anonymous + expensive_read -> app_check_required, packages/security's
+  // evaluateQuota) this is the existing enumeration defense, not a bespoke 401 branch in this
+  // file. The old version of this file short-circuited to 401 before quota evaluation ever ran;
+  // this test proves that branch is gone by confirming the *quota* denial reason surfaces
+  // instead (429), not an attestation-layer 401.
   const endpoint = createFindNearestEndpoint({
-    appCheckGuard: async () => DENIED_APP_CHECK,
+    clientAttestationGuard: async () => FAILED_ATTESTATION,
     embeddingProvider: createDeterministicMockEmbeddingProvider(),
     vectorStore: createInMemoryVectorIndexStore(),
     loadKillSwitchSnapshot: () => ({}),
   });
 
   const response = await endpoint.handle(baseRequest());
-  assert.equal(response.status, 401);
+  assert.equal(response.status, 429);
 });
 
 test('find_nearest denies with 403 when the search kill switch is engaged', async () => {
   const endpoint = createFindNearestEndpoint({
-    appCheckGuard: async () => ALLOWED_APP_CHECK,
+    clientAttestationGuard: async () => ALLOWED_ATTESTATION,
     embeddingProvider: createDeterministicMockEmbeddingProvider(),
     vectorStore: createInMemoryVectorIndexStore(),
     loadKillSwitchSnapshot: () => ({ search: { id: 'search', enabled: true } }),
@@ -72,7 +75,7 @@ test('find_nearest denies with 403 when the search kill switch is engaged', asyn
 
 test('find_nearest denies with 400 on an empty query', async () => {
   const endpoint = createFindNearestEndpoint({
-    appCheckGuard: async () => ALLOWED_APP_CHECK,
+    clientAttestationGuard: async () => ALLOWED_ATTESTATION,
     embeddingProvider: createDeterministicMockEmbeddingProvider(),
     vectorStore: createInMemoryVectorIndexStore(),
     loadKillSwitchSnapshot: () => ({}),
@@ -84,7 +87,7 @@ test('find_nearest denies with 400 on an empty query', async () => {
 
 test('find_nearest denies with 429 once the anonymous/search token bucket is exhausted', async () => {
   const endpoint = createFindNearestEndpoint({
-    appCheckGuard: async () => ALLOWED_APP_CHECK,
+    clientAttestationGuard: async () => ALLOWED_ATTESTATION,
     embeddingProvider: createDeterministicMockEmbeddingProvider(),
     vectorStore: createInMemoryVectorIndexStore(),
     loadKillSwitchSnapshot: () => ({}),
@@ -121,7 +124,7 @@ test('find_nearest returns ranked matches and echoes canonical k/distanceThresho
   });
 
   const endpoint = createFindNearestEndpoint({
-    appCheckGuard: async () => ALLOWED_APP_CHECK,
+    clientAttestationGuard: async () => ALLOWED_ATTESTATION,
     embeddingProvider: provider,
     vectorStore: store,
     loadKillSwitchSnapshot: () => ({}),

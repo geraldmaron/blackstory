@@ -1,5 +1,18 @@
 # api-public Cloud Run deploy (Postgres SoR)
 
+> **2026-08-14 correction:** this file's deploy mechanism is **unverified, not just undocumented**
+> — `apps/api-public` has no `Dockerfile`, no `cloudbuild.yaml`, and no build config anywhere in
+> the repo, and `.github/workflows/deploy-production.yml` only echoes a `[DRY-RUN]` line for this
+> surface. Whether `gcloud builds submit apps/api-public` (as written below) actually produces a
+> working image via buildpacks, whether api-public is deployed some other way outside this repo,
+> or whether it has never been deployed to production at all is a genuine open question this pass
+> could not answer — treat the "Deploy" section below as unverified until confirmed. Separately,
+> the **"Legacy Firestore path" section near the bottom of this file is flatly wrong, not just
+> stale**: `apps/api-public/src/http/README.md` confirms the Firestore read path
+> (`firestore-data-access.ts`, `firestore-read-budget.ts`, `emulator-harness.ts`, and the
+> `PUBLIC_DATA_SOURCE=firestore` branch) was fully removed in `repo-348e.3` — setting
+> `PUBLIC_DATA_SOURCE=firestore` today does nothing, there is no fallback, silent or explicit.
+
 Production reads use Supabase Postgres `bb_public.*` — same env vocabulary as `apps/web`.
 **Firebase App Hosting** (web/admin host) and **Firebase Storage** stay in place; this runbook
 only covers the `@repo/api-public` Cloud Run service.
@@ -110,10 +123,11 @@ curl -sS -H 'X-BlackStory-Client: mobile/1.0.0; api=1' 'http://127.0.0.1:8080/v1
 
 CI validates examples against `@repo/public-contracts` in `openapi-artifact.test.ts`.
 
-## Legacy Firestore path
+## Legacy Firestore path (removed)
 
-Explicit opt-in only: `PUBLIC_DATA_SOURCE=firestore` + Firebase ADC/break-glass. Retained for
-migration rollback tests — not a production default.
+`PUBLIC_DATA_SOURCE=firestore` no longer does anything — the Firestore read path was fully
+removed in `repo-348e.3` (see `apps/api-public/src/http/README.md`). Postgres is the only data
+source this service supports.
 
 ## Kill switch
 

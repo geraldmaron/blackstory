@@ -41,6 +41,8 @@ import { type PublicSearchHttpQuery } from '../search-guardrails.js';
 import { buildMapSourceV1 } from './build-map-source-v1.js';
 import type { PublicDataAccess } from './data-access.js';
 import { CACHE_CONTROL, errorResponse, jsonRead, type ApiResponse } from './responses.js';
+import type { FindNearestEndpoint } from '../vector-search-endpoint.js';
+import type { VectorSearchHttpQuery } from '../vector-search-guardrails.js';
 
 /** Parsed request the handlers operate on. The `server.ts` adapter builds this from `node:http`. */
 export type ApiRequest = {
@@ -61,6 +63,9 @@ export type HandlerDeps = {
   }) => Promise<ClientAttestationDecision>;
   readonly rateLimitGuard: ReturnType<typeof createPublicRateLimitGuard>;
   readonly searchGuard: ReturnType<typeof createPublicSearchGuard>;
+  /** `find_nearest` semantic search (`/v1/search/nearest`) — undefined disables the route (404),
+   * used when vector search isn't configured (e.g. missing embedding API key in an environment). */
+  readonly vectorSearch?: FindNearestEndpoint;
 };
 
 const ENTITY_ID_PATTERN = /^[A-Za-z0-9_-]{1,200}$/;
@@ -402,6 +407,61 @@ function toSearchHttpQuery(query: URLSearchParams): PublicSearchHttpQuery {
     if (value !== null) out[key] = value;
   }
   return out as PublicSearchHttpQuery;
+}
+
+// ---------------------------------------------------------------------------
+// GET /v1/search/nearest
+// ---------------------------------------------------------------------------
+
+const VECTOR_SEARCH_QUERY_KEYS = ['q', 'kind', 'state', 'eraBucket', 'k', 'distanceThreshold'] as const;
+
+function toVectorSearchHttpQuery(query: URLSearchParams): VectorSearchHttpQuery {
+  const out: Record<string, string> = {};
+  for (const key of VECTOR_SEARCH_QUERY_KEYS) {
+    const value = query.get(key);
+    if (value !== null) out[key] = value;
+  }
+  return out as VectorSearchHttpQuery;
+}
+
+/** `find_nearest` semantic search delegates guard/rate-limit/kill-switch composition to
+ * `createFindNearestEndpoint` (`vector-search-endpoint.ts`) this handler only adapts the
+ * `ApiRequest`/`ApiResponse` shapes this directory's other handlers use. */
+export async function handleVectorSearch(request: ApiRequest, deps: HandlerDeps): Promise<ApiResponse> {
+  const floor = enforceClientFloor(request);
+  if (floor) return floor;
+
+  if (!deps.vectorSearch) {
+    return errorResponse('NOT_FOUND', 'No such resource.', { requestId: request.requestId });
+  }
+
+  const result = await deps.vectorSearch.handle({
+    method: request.method,
+    path: request.path,
+    query: toVectorSearchHttpQuery(request.query),
+    headers: request.headers,
+    subject: 'anonymous',
+    ...(request.clientIp ? { clientIp: request.clientIp } : {}),
+  });
+
+  if (result.status === 200) {
+    return jsonRead(result.body, {
+      requestId: request.requestId,
+      cacheControl: CACHE_CONTROL.releasedRead,
+    });
+  }
+
+  const extraHeaders = result.status === 429 ? { ...result.headers } : undefined;
+  return {
+    status: result.status,
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': CACHE_CONTROL.operational,
+      'X-Request-Id': request.requestId,
+      ...extraHeaders,
+    },
+    body: { ...result.body, requestId: request.requestId },
+  };
 }
 
 // ---------------------------------------------------------------------------

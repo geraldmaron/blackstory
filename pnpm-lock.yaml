@@ -547,6 +547,9 @@ importers:
       '@google/genai':
         specifier: ^2.12.0
         version: 2.12.0(@modelcontextprotocol/sdk@1.29.0(zod@3.25.76))
+      '@repo/data-access':
+        specifier: workspace:*
+        version: link:../data-access
       '@repo/domain':
         specifier: workspace:*
         version: link:../domain

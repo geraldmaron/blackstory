@@ -3,13 +3,23 @@
  *
  * Exposed ONLY through this server-side apps/api-public module Firestore's `findNearest` KNN
  * is not supported by client/web SDKs at all, so there is no parallel client surface to
- * accidentally create. Every dependency (App Check verifier, rate limiter, kill-switch
+ * accidentally create. Every dependency (client-attestation guard, rate limiter, kill-switch
  * snapshot, embedding provider, vector store) is injected, matching the factory-function style
- * already used by `createPublicSearchGuard`/`createPublicRateLimitGuard`/`createPublicApiAppCheckGuard`
- * in this same directory so this composes with those guards rather than replacing them.
+ * already used by `createPublicSearchGuard`/`createPublicRateLimitGuard`/
+ * `createPublicApiClientAttestationGuard` in this same directory so this composes with those
+ * guards rather than replacing them.
  *
- * Guardrail order (fail-closed at every step, matching precedent):
- * 1. App Check verification (`createPublicApiAppCheckGuard`, imported not modified)
+ * 2026-08-14: swapped from Firebase App Check to client attestation (`X-BlackStory-Client`) —
+ * see `docs/mobile/security/threat-model.md`'s 2026-08-14 amendment. The original version of this
+ * file hard-denied a request on failed attestation (`!appCheckDecision.allowed` -> 401), which
+ * never matched the fail-open convention every other handler in this directory follows (T1/T2:
+ * attestation is a signal, never an authorization gate). Fixed here rather than carried forward —
+ * this endpoint was never wired into the live route table, so there was no shipped behavior to
+ * preserve.
+ *
+ * Guardrail order:
+ * 1. Client attestation (`createPublicApiClientAttestationGuard`, imported not modified) — feeds
+ *    the risk/rate-limit signal only, never denies (fail-open, matches every other handler).
  * 2. Kill switch (`vector-search-kill-switch.ts`, reusing the existing `search` switch)
  * 3. Rate limit (`createPublicRateLimitGuard`, imported not modified `/v1/search/nearest`
  * already resolves to the `search` endpoint class via the existing path regex)
@@ -17,11 +27,14 @@
  * vector-specific distanceThreshold/eraBucket/k bounds)
  * 5. Embed the validated query text, then run the capped, thresholded KNN query.
  */
-import type { AppCheckDecision, AppCheckHeaders } from '@repo/ops-data';
 import type { EmbeddingProvider, VectorIndexStore, VectorQueryMatch } from '@repo/ops-data';
 import { truncateAndNormalize, EMBEDDING_DIMS } from '@repo/ops-data';
 import type { KillSwitchSnapshot } from '@repo/config';
-import type { RateLimitSubject } from '@repo/security';
+import type {
+  ClientAttestationDecision,
+  ClientAttestationHeaders,
+  RateLimitSubject,
+} from '@repo/security';
 import { evaluateVectorSearchKillSwitch } from './vector-search-kill-switch.js';
 import {
   evaluateVectorSearchGuardrails,
@@ -34,7 +47,7 @@ export type FindNearestHttpRequest = {
   readonly method: string;
   readonly path: string;
   readonly query: VectorSearchHttpQuery;
-  readonly headers: AppCheckHeaders;
+  readonly headers: ClientAttestationHeaders;
   readonly subject: RateLimitSubject;
   readonly clientIp?: string;
   readonly userId?: string;
@@ -58,7 +71,6 @@ export type FindNearestHttpResponse =
       };
     }
   | { readonly status: 400; readonly body: Record<string, unknown> }
-  | { readonly status: 401; readonly body: Record<string, unknown> }
   | { readonly status: 403; readonly body: Record<string, unknown> }
   | {
       readonly status: 429;
@@ -67,9 +79,9 @@ export type FindNearestHttpResponse =
     };
 
 export type FindNearestEndpointOptions = {
-  readonly appCheckGuard: (request: {
-    readonly headers: AppCheckHeaders;
-  }) => Promise<AppCheckDecision>;
+  readonly clientAttestationGuard: (request: {
+    readonly headers: ClientAttestationHeaders;
+  }) => Promise<ClientAttestationDecision>;
   readonly embeddingProvider: EmbeddingProvider;
   readonly vectorStore: VectorIndexStore;
   readonly loadKillSwitchSnapshot: () => Promise<KillSwitchSnapshot> | KillSwitchSnapshot;
@@ -91,13 +103,8 @@ export function createFindNearestEndpoint(
 
   return {
     async handle(request) {
-      const appCheckDecision = await options.appCheckGuard({ headers: request.headers });
-      if (!appCheckDecision.allowed) {
-        return {
-          status: 401,
-          body: { error: 'app_check_required', reason: appCheckDecision.reason },
-        };
-      }
+      // Signal only never denies (fail-open, matches every other handler in this directory).
+      const attestation = await options.clientAttestationGuard({ headers: request.headers });
 
       const killSwitchSnapshot = await options.loadKillSwitchSnapshot();
       const killSwitchDecision = evaluateVectorSearchKillSwitch(killSwitchSnapshot);
@@ -120,7 +127,7 @@ export function createFindNearestEndpoint(
         ...(request.userId !== undefined ? { userId: request.userId } : {}),
         ...(request.deviceId !== undefined ? { deviceId: request.deviceId } : {}),
         ...(request.sessionId !== undefined ? { sessionId: request.sessionId } : {}),
-        appCheckVerified: appCheckDecision.verified,
+        clientAttested: attestation.verified,
       });
       if (rateLimitDecision && !rateLimitDecision.allowed) {
         const formatted = rateLimitGuard.formatDeniedResponse(rateLimitDecision);

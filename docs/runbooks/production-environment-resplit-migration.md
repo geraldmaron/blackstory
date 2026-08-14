@@ -1,5 +1,17 @@
 # Runbook: Production environment re-split migration ( → )
 
+> **2026-08-14 correction:** this runbook's "System of record: Firestore (ADR-011)" line and its
+> [ADR-012](../adr/ADR-012-production-environment-resplit.md) link are both stale — `docs/adr/`
+> was purged 2026-07-24 (ADR-012's content not found restated elsewhere), the system of record is
+> now Supabase Postgres (`docs/data/postgres-schema.md`, `docs/decisions-carryover.md`), and
+> Firestore has no live database, rules, or indexes left (`docs/data/firebase-wind-down.md`).
+> Steps 11-12 (admin App Hosting / Cloud Run + IAP provisioning) are superseded: Admin is now a
+> standalone Vercel project (`apps/admin/vercel.json`), not a GCP-hosted surface, so those steps
+> no longer apply to the current architecture. The rest of this runbook was not re-verified in
+> this pass — like `production-cloud-apply-checklist.md`, nothing here was ever executed
+> (explicitly "Not executed"), so there is nothing live to roll back, only planning content that
+> may be out of date.
+
 **Scope:** Human-executed migration from the single production project `black-book-efaaf` to the
 [ADR-012](../adr/ADR-012-production-environment-resplit.md) three-project topology
 (`blackbook-prod` = retained `black-book-efaaf`, `blackbook-staging`, `blackbook-internal`).

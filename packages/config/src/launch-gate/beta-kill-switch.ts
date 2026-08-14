@@ -37,13 +37,6 @@ export const BETA_DISABLE_CONTROLS: readonly BetaDisableControl[] = [
   },
 ];
 
-/** @deprecated Use BETA_DISABLE_CONTROLS; retained name for import compatibility. */
-export type AppHostingEnvProbe = {
-  readonly file: string;
-  readonly variable: string;
-  readonly expectedDefault?: string;
-};
-
 /**
  * Asserts the public-static-mode kill switch is registered for Vercel public web.
  * `repoRoot` is retained in the signature for compatibility with existing launch-gate callers.

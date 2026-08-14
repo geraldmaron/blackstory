@@ -36,7 +36,8 @@ Do not add deployable microservices beyond this set. See [ADR-005](./adr/ADR-005
 ## Platform intent (live)
 
 - **Data:** **Supabase Postgres** on `blackstory-app` is the product system of record
-  ([ADR-020](./adr/ADR-020-supabase-postgres-system-of-record.md)). Blobs: Supabase Storage for
+  (ADR-020; `docs/adr/` purged 2026-07-24, precedence rule restated in
+  [decisions-carryover.md](./decisions-carryover.md)). Blobs: Supabase Storage for
   `public-media` (GCS dual-serve / rollback). Firestore itself is gone — no live database, rules,
   or indexes remain (`docs/data/firebase-wind-down.md`). Cloud SQL / SQL Connect under
   `infra/database/` stay parked.

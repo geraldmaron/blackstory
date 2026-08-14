@@ -96,9 +96,11 @@ anything else.
 
 ## 2. Root-account hardening (free; blocks the worst case)
 
-Extends  (which is app-layer admin MFA — Firebase Auth + IAP + RBAC for the admin console —
-not root/console-account security; see `docs/security/admin-identity.md`). This section is about
-the human accounts that hold the keys to GitHub and Google Cloud/Firebase themselves.
+Extends  (which is app-layer admin MFA — see `docs/security/admin-identity.md` for the current
+mechanism; as of 2026-08-14 admin authorization is Postgres roles via `bb_auth.current_role()`
+on a standalone Vercel deployment, not Firebase Auth + IAP — not root/console-account security
+either way). This section is about the human accounts that hold the keys to GitHub and Google
+Cloud/Firebase themselves.
 
 - [ ] **Buy two hardware security keys (FIDO2/WebAuthn), e.g. two YubiKeys** — one primary, one
   backup stored in a separate physical location. Two keys, not one: a lost single key otherwise
@@ -258,13 +260,16 @@ make.
   AI-training/bulk-scraping user agents while allowing normal search-engine indexing. The list
   lives once, in `AI_TRAINING_USER_AGENTS` in `robots.ts`, and `ai.txt` imports it — the two files
   cannot drift apart. Both are courtesy signals honored only by crawlers that choose to; they are
-  not access control (see `docs/security/threat-model.md` T-19 for the real controls: rate limits,
-  App Check, cache-busting normalization). Review `AI_TRAINING_USER_AGENTS` periodically as new
+  not access control (see `docs/security/threat-model.md` T-19 for the real controls: rate
+  limits, client attestation, cache-busting normalization — 2026-08-14: App Check was retired and
+  replaced by `packages/security/src/client-attestation.ts`). Review `AI_TRAINING_USER_AGENTS`
+  periodically as new
   agents appear — fold that review into 's scheduled maintenance.
   **Verify:** `GET /robots.txt` and `GET /ai.txt` on the deployed site both return the expected
   disallow lists (confirmed locally via `next build && next start` during this bead's
   implementation).
-- [ ] **Map-tile/static-asset scraping caps** ( tiles are not App-Check-eligible) — **not**
+- [ ] **Map-tile/static-asset scraping caps** ( tiles are not attestation-eligible; this line
+  previously said "App-Check-eligible" — App Check was retired 2026-08-14) — **not**
   built by this bead; this is a documented forward reference, not a checklist item with a human
   action. The intended mechanism is long-TTL immutable caching plus Referer/Origin checks at the
   tile-serving layer, tracked against 's own scope. File or locate the  follow-up bead

@@ -4,8 +4,9 @@
 leads/sources/evidence through `packages/operator-cli`, running a bounded discovery campaign,
 drafting a case toward review-ready, and closing the session correctly.
 **Not in scope:** promotion/publication (/032 — a distinct, fresh-auth reviewer action),
-adapter/source fetching (`packages/domain/src/adapters/**`), and live IAP/Firebase
-authentication for the admin console's quick-add route (documented gap below).
+adapter/source fetching (`packages/domain/src/adapters/**`), and live Postgres-role
+administrator authentication for the admin console's quick-add route (documented gap below;
+corrected 2026-08-14 — this was previously described as IAP/Firebase auth).
 
 ## The one invariant every task in this runbook respects
 
@@ -126,22 +127,27 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts pend
   --from /tmp/obscurity.json
 
 # Draft keep/reject + linked prose (mock default; use --provider openrouter|ollama)
-# --catalog-from=firestore loads entityEmbeddings vectors for related suggestions
+# --catalog-from=postgres loads bb_canonical.entity_embeddings vectors for related suggestions
+# (2026-08-14: --catalog-from=firestore no longer exists; postgres is the only accepted value —
+# see packages/operator-cli/src/ops-data-source-gate.ts)
 OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \
   packages/operator-cli/src/bin.ts editorial-run \
   --subjects /tmp/subjects.json \
-  --catalog-from=firestore \
+  --catalog-from=postgres \
   --provider mock \
   --operator-id "$USER" --session-id "sess-$(date +%s)" --identity-source cursor_session
 ```
 
-One-time (or incremental) embedding backfill into `entityEmbeddings`:
+One-time (or incremental) embedding backfill into `bb_canonical.entity_embeddings`:
 
 ```bash
-GEMINI_API_KEY=... APP_FIREBASE_ALLOW_PRODUCTION=1 FIREBASE_PROJECT_ID=black-book-efaaf \
+# 2026-08-14: the backfill CLI moved to packages/ops-data and now targets Postgres, not
+# Firestore — packages/firebase/src/embeddings/backfill-cli.ts no longer exists, and the
+# --source flag was removed (Postgres is the only source).
+GEMINI_API_KEY=... DATABASE_URL=... \
   node --conditions development --import tsx \
-  packages/firebase/src/embeddings/backfill-cli.ts \
-  --source=publicSearchIndex --max-items 600 --max-cost-usd 1
+  packages/ops-data/src/embeddings/backfill-cli.ts \
+  --max-items 600 --max-cost-usd 1
 ```
 
 Add `--commit` only after review — stages quarantine `editorial_packet` proposals, never
@@ -158,8 +164,9 @@ GOOGLE_APPLICATION_CREDENTIALS=... node --conditions development --import tsx \
   packages/operator-cli/src/bin.ts submit-lead ... --commit
 ```
 
-`--commit` needs Firestore Admin SDK credentials for the target project (or emulator env vars —
-see `apps/admin/.env.example`). There is no `--publish`, `--approve`, or `--promote` flag on
+`--commit` needs a Postgres connection (`DATABASE_URL`) for the target project — the CLI's
+commit path is Postgres-backed, not Firestore (2026-08-14 correction; see
+`packages/operator-cli/src/cli.ts`). There is no `--publish`, `--approve`, or `--promote` flag on
 this CLI, anywhere — publication is a separate action through /032's own gated tooling
 with a distinct, fresh-authenticated approver identity.
 
@@ -172,10 +179,14 @@ the same `runResearchIntake` the CLI's `research-intake` command uses. The "Comm
 quarantine pipeline" button is intentionally disabled, matching `/console`'s existing pattern —
 commit the exact prepared proposal via the CLI's `--commit` flag instead.
 
-**Known, documented gap:** `/quick-add` does not yet read a verified IAP/Firebase administrator
-identity (no route in `apps/admin` wires `createServerAdminAuthorizer` into a request handler
-yet). Until that lands, the operator identifies themselves via a plain "Operator id" form
-field. Swap that for a verified identity once 's live wiring reaches this route.
+**Known, documented gap (still true as of 2026-08-14; corrected below to match current auth
+architecture):** `/quick-add` does not yet read a verified administrator identity — no route
+under `apps/admin/src/app/quick-add/` calls `createServerAdminAuthorizer`
+(`apps/admin/src/auth/server-authorization.ts`) yet. That authorizer checks Postgres roles via
+`bb_auth.current_role()`, not IAP/Firebase — admin's auth boundary moved off Cloud IAP when
+Admin became a standalone Vercel project (2026-07-25). Until quick-add wires the authorizer in,
+the operator identifies themselves via a plain "Operator id" form field. Swap that for a verified
+identity once the live wiring reaches this route.
 
 ## End-of-session checklist
 

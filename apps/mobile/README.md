@@ -13,7 +13,9 @@ Bare scaffold only (`black-book-mobile-006` / MOB-006): Expo + Expo Router + Typ
 strict + `expo-dev-client`, dev/preview/prod identity, EAS build profiles. MapLibre Native,
 SQLite, and other native modules land via CNG plugins — always run a **dev client** build
 (`expo run:ios` / `expo run:android`), never Expo Go. See
-`docs/adr/ADR-020-mobile-stack.md` for the framework/version-pinning rationale.
+the mobile-stack ADR for the framework/version-pinning rationale — that document was removed in
+the 2026-07-24 `docs/adr/` purge and its rationale was not carried over to
+`docs/decisions-carryover.md`; see `git log -- docs/adr/` for the original text.
 
 ## Version matrix (as actually installed — read from `package.json` / `node_modules`, not guessed)
 
