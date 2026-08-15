@@ -1,5 +1,16 @@
 # Runbook: Recovery and rollback rehearsal
 
+> **2026-08-14 correction:** "System of record: Firestore (ADR-011)" below is stale — the system
+> of record is now Supabase Postgres (`docs/data/postgres-schema.md`,
+> `docs/decisions-carryover.md`); Firestore has no live database, rules, or indexes left
+> (`docs/data/firebase-wind-down.md`). "human-platform-admin (IAP)" in the non-compromised
+> recovery path also predates the 2026-07-25 Admin → Vercel cutover — there is no IAP boundary in
+> the current architecture; admin authorization is Postgres roles via `bb_auth.current_role()`.
+> This entire runbook is dry-run/stub-script only (`--dry-run`, `.stub.sh`) and was never executed
+> against live infrastructure, so there's nothing to roll back — but the stubs, timing matrix, and
+> break-glass matrix referenced here were not re-verified against current architecture in this
+> pass and may target retired GCP/Firestore surfaces.
+
 **Scope:** Quarterly dry-run proving recovery procedures under pressure without live GCP restore.
 **System of record:** Firestore (ADR-011). **Not in scope:** live production import, Cloud SQL restore.
 

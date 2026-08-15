@@ -79,7 +79,6 @@ export {
 export type {
   BackfillOptions,
   BackfillSummary,
-  BackfillEntitySourceName,
   CanonicalEntitySource,
   CanonicalEntitySourcePage,
   ExistingEmbeddingHashLookup,
@@ -91,3 +90,11 @@ export {
   parseStateCodeFromJurisdiction,
 } from './backfill-sources.js';
 export type { SearchIndexEmbeddingRecord } from './backfill-sources.js';
+
+export {
+  createPostgresCanonicalEntitySource,
+  createPostgresExistingHashLookup,
+} from './backfill-sources-postgres.js';
+
+export { createPostgresVectorIndexStore } from './postgres-vector-store.js';
+export type { PostgresQueryExecutor } from './postgres-vector-store.js';

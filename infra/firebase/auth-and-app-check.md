@@ -1,5 +1,22 @@
 # Firebase Auth and App Check
 
+> **2026-08-14 correction:** the **App Check** sections below (client binding, server
+> enforcement, `createPublicApiAppCheckGuard`/`createSubmissionsApiAppCheckGuard`,
+> `initializeAppCheckScaffold`, reCAPTCHA Enterprise) describe a system that has been fully
+> retired and removed from the codebase — `apps/api-public/src/app-check.ts`,
+> `apps/api-submissions/src/app-check.ts`, and the `@repo/ops-data` App Check family no longer
+> exist. It was replaced by a stateless client-attestation header
+> (`X-BlackStory-Client: <platform>/<version>; api=<major>`,
+> `packages/security/src/client-attestation.ts`) — a format check, not cryptographic device
+> attestation, and it is a risk-score input only, never a hard-deny gate (see
+> `docs/mobile/security/threat-model.md`). Treat the entire "App Check client binding and server
+> enforcement" section as historical. The **Auth** section's admin posture ("authorization is IAP
+> + server roles") also predates the 2026-07-25 Admin → Vercel cutover — admin authorization today
+> is Postgres roles via `bb_auth.current_role()` (`research`/`admin`/`publication`;
+> `docs/decisions-carryover.md`), not Cloud IAP on Cloud Run. Firebase Auth provider guidance below
+> may still be relevant if Firebase Auth itself is still in use for any surface — not verified in
+> this pass.
+
 Production project: `black-book-efaaf` (`332234323945`).  
 Registered apps: see [`registered-apps.json`](./registered-apps.json).
 

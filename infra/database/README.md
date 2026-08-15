@@ -7,8 +7,12 @@
 > **Cloud SQL / PostGIS / Firebase SQL Connect** under this directory remain **parked /
 > non-production**. Do **not** provision a paid Cloud SQL instance for the current phase.
 >
-> Firestore on `black-book-efaaf` remains the **live** store until a separate cutover bead.
-> Prefer `supabase/` for new schema work; keep `infra/firebase/` until cutover completes.
+> **2026-08-14 correction:** the line below originally read "Firestore on `black-book-efaaf`
+> remains the live store until a separate cutover bead" — that cutover is now complete. Per
+> `docs/data/firebase-wind-down.md`: "Structured SoR is Postgres (ADR-020); Firestore has no live
+> database, rules, or indexes left — repo-side config is fully removed, not just export/rollback
+> only." Supabase Postgres is the live store; `infra/firebase/` is retained only as bounded
+> history/backup-tooling reference (firebase-wind-down.md), not a live deploy target.
 
 Historical BB-012 notes below remain accurate as a description of the parked artifacts.
 
@@ -23,8 +27,8 @@ Local PostGIS, role/grant foundation, pool budgets, Cloud SQL design, and Fireba
 
 | Path | Status |
 |------|--------|
-| Supabase DDL / schema design | **Active design path** — `supabase/`, ADR-020 |
-| Firestore model / rules | **Live until cutover** — `infra/firebase/`, `@repo/firebase` |
+| Supabase DDL / schema design | **Live** — `supabase/`, ADR-020 |
+| Firestore model / rules | **Retired (2026-08-14 correction)** — no live database, rules, or indexes left; `infra/firebase/` retained as history/backup reference only |
 | Local PostGIS compose / init | Optional / deferred experiments |
 | SQL Connect templates | Parked; do not block beads or CI |
 | Cloud SQL instance | **Do not create** (cost gate; superseded by Supabase target) |

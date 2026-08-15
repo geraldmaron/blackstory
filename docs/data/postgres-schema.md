@@ -1,7 +1,8 @@
 # Postgres schema design (BlackStory → Supabase)
 
 **Status:** Design + DDL authored (remote apply gated)  
-**ADR:** [ADR-020](../adr/ADR-020-supabase-postgres-system-of-record.md)  
+**ADR:** ADR-020 (`docs/adr/` purged 2026-07-24; precedence rule restated in
+[decisions-carryover.md](../decisions-carryover.md))  
 **Target project:** `blackstory-app` (`twykhihqkcldpreuovay`, `us-west-2`)  
 **Bead:** repo-ivh4
 

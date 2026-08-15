@@ -1,5 +1,21 @@
 # Runbook: Production cloud apply checklist
 
+> **2026-08-14 correction:** this checklist targets [ADR-012](../adr/ADR-012-production-environment-resplit.md),
+> a link that is now dead — `docs/adr/` was purged 2026-07-24 and ADR-012's content was not found
+> restated anywhere (`docs/decisions-carryover.md` only restates two invariants; the three-project
+> resplit topology isn't one of them). Since this checklist's own status line already reads
+> "DEFERRED — requires live cloud/account action outside this session's authority" for every item,
+> nothing here was actually applied, so nothing needs rolling back — but several sections now
+> describe infrastructure this repo no longer targets at all, not just "not yet applied":
+> **§3** (Firestore rules/indexes) — Firestore has no live database, rules, or indexes left
+> (`docs/data/firebase-wind-down.md`); **§5** (App Check) — the App Check code this section
+> configures was fully removed from the repo and replaced by client attestation
+> (`packages/security/src/client-attestation.ts`); **§9** (Admin: Cloud Run + IAP) — Admin is now
+> a standalone Vercel project (`apps/admin/vercel.json`), not Cloud Run/IAP. Sections 1, 2, 4, 6,
+> 7, 8, and 10 were not re-verified against current architecture in this pass — read each against
+> current reality (`docs/architecture.md`, `docs/data/firebase-wind-down.md`) before treating it as
+> an actionable plan.
+
 **Scope:** The single consolidated list of every "human cloud step remaining" note scattered
 across the close comments and READMEs of roughly a dozen closed beads
 (/009/010/011/020/021/023/024/025/027/034/035, plus 's drill), reorganized against the

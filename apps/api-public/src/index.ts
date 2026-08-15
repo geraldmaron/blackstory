@@ -7,9 +7,6 @@ import { SURFACE_ID } from './posture.js';
 
 export { createPublicApiClientAttestationGuard } from './client-attestation.js';
 export type { PublicApiClientAttestationOptions } from './client-attestation.js';
-/** @deprecated Use `createPublicApiClientAttestationGuard` — Firebase App Check retired after ADR-020. */
-export { createPublicApiAppCheckGuard } from './app-check.js';
-export type { PublicApiAppCheckOptions } from './app-check.js';
 export { createPublicRateLimitGuard, resolvePublicEndpointClass } from './rate-limits.js';
 export type {
   PublicRateLimitGuardDecision,

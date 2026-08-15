@@ -1,0 +1,87 @@
+{
+  "name": "@repo/domain-core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Security-independent domain primitives shared by @repo/domain and @repo/security (living status, era/relationship vocabulary, claim confidence, public projection shapes). Exists to break the @repo/domain <-> @repo/security circular dependency: this package depends only on @repo/schemas, and both domain and security depend on it.",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./living": {
+      "development": "./src/living.ts",
+      "types": "./dist/living.d.ts",
+      "import": "./dist/living.js"
+    },
+    "./era": {
+      "development": "./src/era.ts",
+      "types": "./dist/era.d.ts",
+      "import": "./dist/era.js"
+    },
+    "./relationship": {
+      "development": "./src/relationship.ts",
+      "types": "./dist/relationship.d.ts",
+      "import": "./dist/relationship.js"
+    },
+    "./claims/confidence": {
+      "development": "./src/claims/confidence.ts",
+      "types": "./dist/claims/confidence.d.ts",
+      "import": "./dist/claims/confidence.js"
+    },
+    "./claims/evidence-link": {
+      "development": "./src/claims/evidence-link.ts",
+      "types": "./dist/claims/evidence-link.d.ts",
+      "import": "./dist/claims/evidence-link.js"
+    },
+    "./claims/measurements": {
+      "development": "./src/claims/measurements.ts",
+      "types": "./dist/claims/measurements.d.ts",
+      "import": "./dist/claims/measurements.js"
+    },
+    "./provenance/rights": {
+      "development": "./src/provenance/rights.ts",
+      "types": "./dist/provenance/rights.d.ts",
+      "import": "./dist/provenance/rights.js"
+    },
+    "./graph/adjacency": {
+      "development": "./src/graph/adjacency.ts",
+      "types": "./dist/graph/adjacency.d.ts",
+      "import": "./dist/graph/adjacency.js"
+    },
+    "./geography/precision": {
+      "development": "./src/geography/precision.ts",
+      "types": "./dist/geography/precision.d.ts",
+      "import": "./dist/geography/precision.js"
+    },
+    "./geography/display-radius": {
+      "development": "./src/geography/display-radius.ts",
+      "types": "./dist/geography/display-radius.d.ts",
+      "import": "./dist/geography/display-radius.js"
+    },
+    "./learning-index": {
+      "development": "./src/learning-index/index.ts",
+      "types": "./dist/learning-index/index.d.ts",
+      "import": "./dist/learning-index/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --conditions development --import tsx --test 'src/**/*.test.ts'",
+    "lint": "echo 'lint: use root pnpm lint'"
+  },
+  "dependencies": {
+    "@repo/schemas": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:^",
+    "@types/node": "^22.20.1",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}

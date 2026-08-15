@@ -6,16 +6,20 @@
  * residential/address fields, and fails closed (`assertPublicProjectionSafe`) if any
  * prohibited precision or protected value would otherwise reach a public surface.
  * Learning-index fields (required summary, topic tags, optional prose/photo) are
- * gated via `@repo/domain` assertLearningIndexProjection.
+ * gated via `@repo/domain-core` assertLearningIndexProjection.
  */
-import type { LivingStatus, PublicEntityPrimaryImage, PublicRelatedEntry } from '@repo/domain';
+import type { LivingStatus } from '@repo/domain-core/living';
+import type { PublicEntityPrimaryImage } from '@repo/domain-core/learning-index';
+import type { PublicRelatedEntry } from '@repo/domain-core/graph/adjacency';
 import {
-  allowedPublicPrecisionLevels,
   assertLearningIndexProjection,
   hasPreferredTopicTags,
-  prohibitedPublicPrecisionLevels,
   sanitizePrimaryImageForRelease,
-} from '@repo/domain';
+} from '@repo/domain-core/learning-index';
+import {
+  allowedPublicPrecisionLevels,
+  prohibitedPublicPrecisionLevels,
+} from '@repo/domain-core/geography/precision';
 import { evaluatePublicPrecision } from '@repo/schemas';
 import {
   createSensitiveDataRedactor,

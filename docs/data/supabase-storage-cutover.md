@@ -6,7 +6,8 @@
 # Supabase Storage cutover
 
 **Status:** Public-media copy complete (2026-07-21); raw-sources optional  
-**ADR:** [ADR-020](../adr/ADR-020-supabase-postgres-system-of-record.md) (amended)  
+**ADR:** ADR-020 (amended) (`docs/adr/` purged 2026-07-24; restated in
+[decisions-carryover.md](../decisions-carryover.md))  
 **Buckets:** `public-media` (public), `raw-sources` (private)
 
 ## Done

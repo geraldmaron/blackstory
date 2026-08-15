@@ -136,7 +136,9 @@ Owner flipped Cloudflare DNS to Vercel (apex A + www CNAME, DNS-only). Post-flip
 
 ## Do not
 
-- Host `apps/admin` on this Vercel project (IAP boundary — ADR-001 / ADR-005).
+- Host `apps/admin` on this Vercel project — keep it a separate deployment (admin moved to its
+  own standalone Vercel project 2026-07-25, gated by Postgres roles via `bb_auth.current_role()`,
+  not an IAP boundary; ADR-001/ADR-005 predate that cutover).
 - Enable unattended production deploys on every `main` push without amending ADR-006 / ADR-027.
 - Recreate public web App Hosting configs in-repo.
 - Put secrets in user-facing copy.

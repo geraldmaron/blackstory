@@ -8,7 +8,7 @@
  * constitution (@repo/schemas); nothing here weakens those rules.
  */
 import { evaluatePublicPrecision, loadProductConstitution } from '@repo/schemas';
-import { treatAsLiving, type LivingStatus } from '@repo/domain/living';
+import { treatAsLiving, type LivingStatus } from '@repo/domain-core/living';
 import {
   isResidentialPrecision,
   type PrecisionReductionReason,

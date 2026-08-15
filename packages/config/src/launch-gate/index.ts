@@ -10,4 +10,4 @@ export {
   assertBetaDisableConfigDocumented,
   assertBetaDisableConfigKeys,
 } from './beta-kill-switch.js';
-export type { AppHostingEnvProbe, BetaDisableControl } from './beta-kill-switch.js';
+export type { BetaDisableControl } from './beta-kill-switch.js';

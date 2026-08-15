@@ -21,6 +21,25 @@
 >   upgrade. Also, `expo-updates` is not yet installed in `apps/mobile`, so the OTA path itself is a pending
 >   MOB-019 task. See the amendment note in T6.
 
+> **Amendment (2026-08-14) — Firebase App Check retired; client attestation is the live mechanism (`repo-hhif`).**
+> Verified against shipped code, not docs (`apps/mobile/package.json` has zero Firebase packages;
+> `apps/api-public/src/app-check.ts` is re-exported from `index.ts` but never invoked by any handler;
+> `apps/api-public/src/http/handlers.ts` calls only `deps.clientAttestationGuard`). The live mechanism, per
+> `packages/security/src/client-attestation.ts`, is a **stateless header-format check**: the client sends
+> `X-BlackStory-Client: <platform>/<version>; api=<major>`, and the server parses it for well-formedness — there
+> is no cryptographic device attestation, no App Attest/Play Integrity, and (contrary to `apps/mobile/PRIVACY.md`,
+> `apps/mobile/README.md`, `apps/mobile/src/security/README.md`, and the `api-client.ts` header comment, which all
+> describe validation "against the Postgres-backed client registry") **no database lookup** — no such registry
+> exists anywhere in this repo's server code. That mobile-side documentation claim is tracked separately
+> (`repo-hhif` covers only this file and `mobile-app-epic.md`; the mobile-doc registry claim needs its own bead).
+> T1 and T2 below are rewritten in place for the mechanism actually deployed; T2's title and framing changed
+> because "provider outage" cannot occur for a mechanism with no external dependency. Original 2026-07-20 text
+> is preserved as historical record inside each section rather than deleted, consistent with this document's
+> amendment convention. `apps/api-public/src/http/handlers.ts` line ~169 still comments "App Check as a signal
+> only" and `packages/security/src/rate-limits.ts` still names its fields `appCheckVerified` / `missing_app_check`
+> / the `app_check_required` deny reason — that naming debt is a code-cleanup question, out of scope for a docs
+> reconciliation, and not fixed by this amendment.
+
 ## Purpose and scope
 
 This document extends the existing web/API security doctrine (`docs/adr/ADR-010-security-and-abuse-assumptions.md`)
@@ -41,9 +60,11 @@ From `docs/mobile/mobile-app-epic.md` (identity/gate record removed 2026-07-24 a
    released `public/**` projections and never write canonical, evidence, publication, audit, or
    operations paths; Firestore security rules enforce this client-closed boundary and privileged
    writes use the Admin SDK from Cloud Run with distinct service accounts.
-2. **Client trust (invariant 6)**: App Check is **attestation, not authorization**. The server stays
-   authoritative; a compromised client must not gain a canonical write path (there is none for any
-   client) nor treat an App Check pass as an entitlement.
+2. **Client trust (invariant 6)**: client attestation is **a signal, not authorization** (2026-08-14:
+   this was Firebase App Check at MOB-002's original writing; it is now the `X-BlackStory-Client`
+   header check, see the 2026-08-14 amendment above — the invariant's substance is unchanged). The
+   server stays authoritative; a compromised client must not gain a canonical write path (there is
+   none for any client) nor treat an attestation pass as an entitlement.
 3. **Privacy (invariant 7)**: no ad/tracking SDKs; no query text, correction content, precise
    location, or sensitive entity classifications in logs or crash reports.
 4. **Non-goals at launch**: no user accounts, push notifications, social features, or full offline
@@ -83,11 +104,18 @@ storage (SQLite cache, key–value prefs, files) read and rewritten, its network
 any API request replayed with modified parameters from a rooted device or an off-device script.
 
 **Attacker capability.** Full read/write of on-device state; ability to forge or omit any
-client-supplied header (including the App Check token); ability to bypass App Check attestation
+client-supplied header. **2026-08-14: under the live mechanism (client attestation, not Firebase App
+Check), this requires no sophistication at all** — `X-BlackStory-Client` is a plain string header
+checked only for format (`packages/security/src/client-attestation.ts`), so any HTTP client
+(curl, a script, a rooted device, or an honest but unmodified app) can produce a value the server
+treats as "verified" by simply setting the header correctly. No rooted device, Frida/hooking, or
+token capture is needed — this is strictly easier to satisfy than the original App Check analysis
+assumed. (Original 2026-07-19 text, describing App Check: "ability to bypass App Check attestation
 entirely on a sufficiently instrumented rooted device (Frida/hooking, emulator farms, or lifting a
-valid token and replaying it).
+valid token and replaying it)" — kept for record; the conclusion below was already written to not
+depend on attestation being hard to forge, so it still holds.)
 
-**Impact if unmitigated.** If the server treated any client-supplied value (App Check pass, a
+**Impact if unmitigated.** If the server treated any client-supplied value (an attestation pass, a
 "role" flag, a cache-derived assertion) as an authorization decision, a rooted client could
 escalate to reads or writes it should not have, or exfiltrate protected data.
 
@@ -100,13 +128,15 @@ escalate to reads or writes it should not have, or exfiltrate protected data.
   living-residential fields never reach the client in the first place, because the server applies
   `redactLocationForPublic` / `toPublicEntityProjection` (`PROTECTED_FIELD_KEYS`) *before*
   serialization — the redaction choke point is server-side, not a client responsibility.
-- **App Check is a signal, never a gate for authorization (invariant 6).** The server MUST NOT
-  branch any authorization decision on App Check pass/fail. It is consumed only as an abuse signal:
-  a missing or failing token maps to the existing `missing_app_check` `RiskSignalKind`, feeds
-  `aggregateRiskScore`, and at most tightens rate limits or trips anomaly detection. It never
-  unlocks data or a write path. (This matches ADR-010 assumption 3, which scopes App Check to
-  "sensitive public mutations and expensive reads" as *one* defense-in-depth layer, not the
-  authorization decision.)
+- **Client attestation is a signal, never a gate for authorization (invariant 6).** The server MUST
+  NOT branch any authorization decision on the `X-BlackStory-Client` header's presence or validity.
+  It is consumed only as an abuse signal: a missing or malformed header maps to the (legacy-named,
+  see 2026-08-14 amendment) `missing_app_check` `RiskSignalKind` and the `appCheckVerified`/
+  `clientAttested` evaluator inputs, feeds `aggregateRiskScore`, and at most tightens rate limits.
+  It never unlocks data or a write path. (This matches ADR-010 assumption 3, which scoped the
+  original App Check mechanism to "sensitive public mutations and expensive reads" as *one*
+  defense-in-depth layer, not the authorization decision — the same scoping now applies to client
+  attestation.)
 - **Server is authoritative on every parameter.** Replayed/modified requests are re-validated
   server-side against the same guardrails as any request (`evaluateSearchQueryGuardrails`,
   ID-format validation, approved query shapes). The client cannot widen its own quota, page size,
@@ -114,23 +144,37 @@ escalate to reads or writes it should not have, or exfiltrate protected data.
 - **No canonical write path exists for any client** (ADR-011 §7; invariant 6). Corrections
   (MOB-016) are submissions into a quarantine/promotion pipeline, never direct canonical writes.
 
-**Accepted risk.** Attestation *can* be defeated on a rooted device. We accept this explicitly:
-App Check raises the cost of automated abuse, it is not a wall. The security posture does not
-depend on attestation being unbreakable, because attestation carries no authority (see mitigation).
+**Accepted risk.** Attestation can be trivially defeated by any caller, not only a rooted device
+(2026-08-14: confirmed — see attacker-capability note above). We accept this explicitly: the
+mechanism raises the *bar* for casual scraping by requiring one well-formed header, it is not a
+wall. The security posture does not depend on attestation being hard to forge, because attestation
+carries no authority (see mitigation) — this was already the design intent under App Check and
+holds even more clearly now.
 
-**Evidence to close.** MOB-010 test proving the server ignores App Check state for authZ (identical
-data returned with a valid token, an invalid token, and no token — differing only in
-rate-limit/risk treatment); MOB-009 evidence that the SQLite schema stores only public projection
-fields and no secret material; a decompilation/strings pass on a release build (MOB-021) confirming
-no secret is embedded.
+**Evidence to close.** MOB-010 test proving the server ignores client-attestation state for authZ
+(identical data returned with a well-formed header, a malformed header, and no header — differing
+only in rate-limit/risk treatment); MOB-009 evidence that the SQLite schema stores only public
+projection fields and no secret material; a decompilation/strings pass on a release build (MOB-021)
+confirming no secret is embedded.
 
 ---
 
-## T2 — App Check outage or misconfiguration
+## T2 — Client-attestation header missing or malformed
 
-**Threat.** Firebase App Check is unavailable (Google outage), misconfigured (wrong key/rollout),
-or a legitimate client's attestation fails transiently (network blip, clock skew, provider
-throttling). This will happen; it is an availability event, not only an attack.
+**2026-08-14 retitle.** Originally "App Check outage or misconfiguration." Client attestation
+(`X-BlackStory-Client`, `packages/security/src/client-attestation.ts`) is a stateless local
+header-format check with **no external provider and no network call** — there is nothing that can
+have a "Google outage" or a "provider" outage. The threat this section now covers is narrower: a
+legitimate client (old build, misconfigured proxy, non-standard caller) sends no header or a
+malformed one. The original App Check-era analysis is preserved below because its conclusion
+(fail open, never lock out readers) still holds and because the automatic-outage-detection
+mitigation it describes is now confirmed **dead code in the live request path** — see the
+amendment paragraph after "Evidence to close" below.
+
+**Threat (original, App Check era, kept for record).** Firebase App Check is unavailable (Google
+outage), misconfigured (wrong key/rollout), or a legitimate client's attestation fails transiently
+(network blip, clock skew, provider throttling). This will happen; it is an availability event,
+not only an attack.
 
 **Attacker capability.** None required — this is primarily a self-inflicted availability risk. An
 attacker's only leverage is to *hope* we fail closed and thereby deny the public corpus to everyone.
@@ -139,43 +183,50 @@ attacker's only leverage is to *hope* we fail closed and thereby deny the public
 outage would lock every legitimate reader out of public historical content — converting a
 third-party hiccup into a full product outage and handing attackers a denial-of-service lever.
 
-**Mitigation.**
-- **Fail OPEN for read-only public content, degrade to rate-limited access.** Because App Check is
-  a signal and not an authorization gate (T1), a missing or unverifiable token on a read endpoint
-  does not deny the request. It downgrades the caller: the request is served but treated as the
-  lowest-trust `anonymous` subject and, when the `missing_app_check` signal is widespread or paired
-  with other risk signals, subjected to tighter quotas via the existing evaluator. This mirrors
-  ADR-010's degraded-read-only doctrine and its explicit rollback guidance: *"If App Check
-  misconfiguration locks out users, fail to degraded snapshot reads rather than disabling all
-  verification permanently."*
+**Mitigation (original text, still substantively accurate for the current mechanism).**
+- **Fail OPEN for read-only public content, degrade to rate-limited access.** Because client
+  attestation is a signal and not an authorization gate (T1), a missing or malformed header on a
+  read endpoint does not deny the request (confirmed in current code: `handlers.ts` never branches
+  on the guard's `allowed` field, only `verified`). It downgrades the caller: the request is served
+  but treated as the lowest-trust `anonymous` subject and, when the (legacy-named) `missing_app_check`
+  signal is widespread or paired with other risk signals, subjected to tighter quotas via the
+  existing evaluator. This mirrors ADR-010's degraded-read-only doctrine.
 - **Fail closed only on a specific abuse signal**, not on the mere absence of attestation — e.g.
   when `aggregateRiskScore` crosses threshold for that key (`app_check_required` /
-  `risk_score_exceeded` denial), or the mobile kill-switch (T9) is engaged.
-- The `evaluateQuota` input already models this: `appCheckVerified` is an optional input and
-  `missing_app_check` is a weighted risk signal, not a hard deny.
-- **Automatic outage detection (repo-vdnm, closed 2026-07-20).** Sustained App Check verifier failures
-  flip `appCheckAvailability` to `'outage'` via `@repo/firebase`'s circuit breaker wired through
-  `apps/api-public`; the operator `APP_CHECK_OUTAGE_OVERRIDE` flag still takes precedence when set.
+  `risk_score_exceeded` denial, legacy-named), or the mobile kill-switch (T9) is engaged.
+- The `evaluateQuota` input already models this: `appCheckVerified`/`clientAttested` are optional
+  inputs and `missing_app_check` is a weighted risk signal, not a hard deny.
+- **Automatic outage detection (repo-vdnm, closed 2026-07-20) — now dead code, not wired.** This
+  mitigation was built for the App Check circuit breaker: sustained verifier failures flipped
+  `appCheckAvailability` to `'outage'` via `@repo/firebase`. **2026-08-14: confirmed via code read
+  that `apps/api-public/src/http/handlers.ts` and `rate-limits.ts` never set `appCheckAvailability`
+  today** — nothing calls the old circuit breaker because `app-check.ts` (the only thing it could
+  monitor) is no longer wired into any handler. `evaluateQuota`'s `outage` carve-out still exists in
+  `packages/security/src/rate-limits.ts` and is harmless (defaults to `'available'`), but it is
+  currently unreachable in production. This is now moot rather than broken: client attestation has
+  no external provider, so there is no outage condition for it to detect. No action needed unless a
+  future change reintroduces an external dependency into attestation.
 
-**Accepted risk.** During an App Check outage, automated-abuse cost temporarily drops to the
-rate-limiter's floor. Accepted: the content is public and non-sensitive, and rate limits + budget
-caps (T9) still bound exposure. Availability of the public corpus outranks maximal bot-resistance,
-consistent with ADR-010.
+**Accepted risk.** Rate-limiter-floor abuse cost during a missing/malformed-header period is
+accepted for the same reason as originally stated: the content is public and non-sensitive, and
+rate limits + budget caps (T9) still bound exposure.
 
-**Amendment (2026-07-20) — fail-open is not fully implemented for expensive reads.** The mitigation above
-is implemented for **static reads**, but `@repo/security`'s `evaluateQuota` currently **hard-denies
-`expensive_read` (e.g. `/v1/search`) for callers without a verified App Check token, with no
-outage/degraded-mode carve-out** — so during a genuine App Check outage a legitimate client's *search* is
-denied, contradicting the fail-open intent stated here. This is verified in the shipped code and candidly
-noted in `apps/mobile/src/security/app-check.ts`. Because the fix is a **platform-wide** change to
-`packages/security` (shared with `apps/web`), it is an explicit owner/security decision, tracked by
-**`repo-uqmm` (OPEN)**. Until resolved, this threat's fail-open guarantee should be read as scoped to
-static reads; the client must surface the server's honest `429` for expensive reads rather than assume
-fail-open. **Remaining risk, open by design.**
+**Amendment (2026-07-20, App Check era) — fail-open was not fully implemented for expensive reads.**
+Preserved for record: `@repo/security`'s `evaluateQuota` hard-denied `expensive_read` (e.g.
+`/v1/search`) for callers without `appCheckVerified`/`clientAttested`, with no outage carve-out,
+tracked by `repo-uqmm` (closed). **2026-08-14: this specific hard-deny behavior for unattested
+`expensive_read`/`mutation` from an `anonymous` subject is still present in
+`packages/security/src/rate-limits.ts` (`unattestedExpensiveAnon` → `app_check_required` deny) and
+is now, if anything, more consequential** — since client attestation is trivially satisfiable (T1),
+the hard-deny mainly filters callers who send no `X-BlackStory-Client` header at all, not
+sophisticated abuse. This is a working-as-designed enumeration defense (T3), not a new gap; noted
+here because the original amendment's "remaining risk, open by design" framing assumed a
+harder-to-forge signal than the one actually shipped.
 
-**Evidence to close.** MOB-010 test simulating App Check provider failure and asserting reads still
-succeed (as `anonymous`, rate-limited) rather than 4xx-lockout; MOB-021 chaos/game-day exercise
-toggling App Check off and confirming the app degrades to rate-limited reads, not a blank screen.
+**Evidence to close.** MOB-010 test simulating a missing/malformed `X-BlackStory-Client` header and
+asserting reads still succeed (as `anonymous`, rate-limited) rather than 4xx-lockout; since there is
+no external provider to fail, the MOB-021 chaos/game-day exercise for this threat reduces to
+confirming the fail-open behavior itself (not an outage simulation).
 
 ---
 
@@ -458,8 +509,8 @@ runbook entry naming the single operator and the recovery path.
 
 | # | Threat | Primary owning bead(s) | Mitigation implemented as |
 |---|--------|------------------------|---------------------------|
-| T1 | Compromised / rooted client | MOB-010 (security), MOB-009 (cache) | App Check as signal-only; no on-device secrets; server-authoritative validation |
-| T2 | App Check outage / misconfig | MOB-010 (security) | Fail-open to rate-limited `anonymous` reads; fail-closed only on abuse signal |
+| T1 | Compromised / rooted client | MOB-010 (security), MOB-009 (cache) | Client attestation (`X-BlackStory-Client`) as signal-only; no on-device secrets; server-authoritative validation |
+| T2 | Client-attestation header missing/malformed (2026-08-14: was "App Check outage/misconfig" — no longer applicable, no external provider) | MOB-010 (security) | Fail-open to rate-limited `anonymous` reads; fail-closed only on abuse signal |
 | T3 | API enumeration / scraping | MOB-004 (API) | Cursor pagination, page-size/depth caps, quota matrix, approved query shapes |
 | T4 | Deep-link injection | MOB-008 (nav/deep links) | Route allowlist + strict ID validation; no privileged target exists |
 | T5 | Stale artifact / rollback replay | MOB-016 (corrections), MOB-009 (cache); **ADR-022** | Release-invalidation stamp; drop/refetch on stamp advance |
@@ -475,29 +526,31 @@ from this MOB-002 pass; T5, T6, and T7 verified that they ratify — and do not 
 
 ---
 
-## Red-team resolution — App Check posture on MOB-016 correction submission
+## Red-team resolution — client-attestation posture on MOB-016 correction submission
 
-*Resolved: MOB-016 correction submission **fails open with the strictest quota**, not fail-closed, when App Check
-is unavailable — but it is the **first surface shed** under abuse and remains fully gated by the quarantine
-pipeline.* (MOB-002 requires recorded reviewer findings and dispositions.)
+*Resolved: MOB-016 correction submission **fails open with the strictest quota**, not fail-closed, when client
+attestation is missing or malformed — but it is the **first surface shed** under abuse and remains fully gated by
+the quarantine pipeline.* (MOB-002 requires recorded reviewer findings and dispositions. Originally written for
+Firebase App Check; retitled and reworded 2026-08-14 per the amendment above — the reviewer's disposition and
+reasoning are unchanged, since the mechanism swap doesn't touch this section's actual guarantees.)
 
 The reviewer accepted this model's lean, with corrections-specific tightening made explicit:
 
-- **Fail open, not closed.** A missing/unverifiable App Check token on the correction endpoint does **not** hard-deny
-  the submission. Failing closed would deny an availability-sensitive civic function — letting people report errors
-  in historical records — during a Google/App Check *outage*, to defend a boundary App Check was never the real
-  guard for. The actual defenses stand regardless of attestation: the submission is **quarantine-only and cannot
-  publish** (ADR-005; never a canonical write — invariant 6), and per-subject/per-endpoint rate limits, budget
-  caps, and the promotion-review pipeline all remain in force.
+- **Fail open, not closed.** A missing/malformed `X-BlackStory-Client` header on the correction endpoint does
+  **not** hard-deny the submission. Failing closed would deny an availability-sensitive civic function — letting
+  people report errors in historical records — to defend a boundary attestation was never the real guard for.
+  The actual defenses stand regardless of attestation: the submission is **quarantine-only and cannot publish**
+  (ADR-005; never a canonical write — invariant 6), and per-subject/per-endpoint rate limits, budget caps, and the
+  promotion-review pipeline all remain in force.
 - **Corrections get the *strictest* quota and shed first.** Because a write-shaped endpoint is a higher-value abuse
   target than a read, the submissions endpoint class receives the tightest tier of `DEFAULT_ENDPOINT_QUOTA_MATRIX`,
-  and a widespread `missing_app_check` signal (or `aggregateRiskScore` crossing threshold) tightens or trips it
-  **before** it would a read path — and the mobile kill-switch (T9) can disable correction intake independently
-  while leaving public reads up. So availability is preserved for the common case, but corrections are the first
-  thing throttled/shed under a genuine abuse spike.
+  and a widespread `missing_app_check` (legacy-named) signal (or `aggregateRiskScore` crossing threshold) tightens
+  or trips it **before** it would a read path — and the mobile kill-switch (T9) can disable correction intake
+  independently while leaving public reads up. So availability is preserved for the common case, but corrections
+  are the first thing throttled/shed under a genuine abuse spike.
 - **Client-offline is a separate, already-honest case.** ADR-022 §3 disables correction submission when the
   *client* is offline (with a clear "needs connection" message) and never queues its content to disk (invariant 7).
-  That is orthogonal to server-side App Check availability decided here; the two are consistent — neither ever
+  That is orthogonal to server-side client-attestation handling decided here; the two are consistent — neither ever
   silently drops or fabricates a correction.
 
 This keeps corrections consistent with ADR-010's degraded-mode doctrine (availability of a public civic function

@@ -10,6 +10,7 @@ import {
   handleHealth,
   handleMap,
   handleSearch,
+  handleVectorSearch,
   type ApiRequest,
   type HandlerDeps,
 } from './handlers.js';
@@ -33,6 +34,8 @@ export async function dispatch(request: ApiRequest, deps: HandlerDeps): Promise<
       return handleBootstrap(request, deps);
     case '/v1/search':
       return handleSearch(request, deps);
+    case '/v1/search/nearest':
+      return handleVectorSearch(request, deps);
     case '/v1/map':
       return handleMap(request, deps);
     default:

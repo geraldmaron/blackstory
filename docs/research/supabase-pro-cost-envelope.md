@@ -195,6 +195,7 @@ pnpm --filter @repo/security test   # assertShutdownOrdering, evaluateSoftShutdo
 - [Black history data landscape intake §5](./black-history-data-landscape-intake.md#5-cost-envelope-supabase-pro--three-projects)
 - [Cost and resource exhaustion controls](../security/cost-resource-controls.md)
 - [`packages/security/src/resource-controls.ts`](../../packages/security/src/resource-controls.ts)
-- [ADR-020 Supabase Postgres SoR](../adr/ADR-020-supabase-postgres-system-of-record.md)
+- ADR-020 Supabase Postgres SoR (`docs/adr/` purged 2026-07-24; restated in
+  [decisions-carryover.md](../decisions-carryover.md))
 - [Postgres schema](../data/postgres-schema.md)
 - [Rate limits](../security/rate-limits.md)

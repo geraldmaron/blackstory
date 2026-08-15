@@ -1,19 +1,26 @@
 /**
  * Budget-aware bulk (re)embedding CLI for entity corpora.
  *
- * Default live source is `publicSearchIndex` (prod often has searchable projections before
- * `canonicalEntities` is filled). The canonical source remains available via `--source`. Run:
- * GEMINI_API_KEY=... node --conditions development --import tsx \
- * packages/ops-data/src/embeddings/backfill-cli.ts --source=publicSearchIndex \
- * --max-items 500 --max-cost-usd 1
+ * 2026-08-14: live source and store are Postgres (`bb_public.release_entities` /
+ * `bb_canonical.entity_embeddings` via `@repo/data-access`'s ops pool) after the Postgres
+ * cutover (ADR-020) `canonicalEntities`/`publicSearchIndex` no longer exist in Firestore
+ * (docs/data/firebase-wind-down.md). Run:
+ * GEMINI_API_KEY=... DATABASE_URL=... node --conditions development --import tsx \
+ * packages/ops-data/src/embeddings/backfill-cli.ts --max-items 500 --max-cost-usd 1
+ *
+ * The `createFirestore*` source/lookup functions below are retained only as bounded
+ * history/reference (firebase-wind-down.md) — Firestore has no live database left to read from.
  *
  * Every dependency (entity source, provider, store) is injected so `runBackfill` itself is
- * fully unit-testable without Firestore or network access; only the `if (import.meta.url...)`
- * block at the bottom touches real infrastructure.
+ * fully unit-testable without Postgres, Firestore, or network access; only the
+ * `if (import.meta.url...)` block at the bottom touches real infrastructure.
  */
 import type { Firestore } from 'firebase-admin/firestore';
-import { createServerFirebaseApp } from '../server.js';
-import { createFirestorePublicSearchIndexEntitySource } from './backfill-sources.js';
+import { getOpsPostgresPool } from '@repo/data-access';
+import {
+  createPostgresCanonicalEntitySource,
+  createPostgresExistingHashLookup,
+} from './backfill-sources-postgres.js';
 import { EMBEDDING_DIMS } from './constants.js';
 import { createGeminiEmbeddingProvider } from './gemini-provider.js';
 import {
@@ -25,7 +32,8 @@ import {
 } from './pipeline.js';
 import type { EmbeddingProvider } from './provider.js';
 import { buildEntityEmbeddingText, type EntityLocationContext } from './text.js';
-import { createAdminVectorIndexStore, type VectorIndexStore } from './vector-store.js';
+import { createPostgresVectorIndexStore } from './postgres-vector-store.js';
+import { type VectorIndexStore } from './vector-store.js';
 
 export type CanonicalEntitySourcePage = {
   readonly items: readonly EntityEmbeddingInput[];
@@ -215,73 +223,37 @@ export function createFirestoreExistingHashLookup(
   };
 }
 
-export type BackfillEntitySourceName = 'publicSearchIndex' | 'canonicalEntities';
-
 function parseArgs(argv: readonly string[]): {
   maxItems?: number;
   maxCostUsd?: number;
   force: boolean;
-  source: BackfillEntitySourceName;
 } {
-  const result: {
-    maxItems?: number;
-    maxCostUsd?: number;
-    force: boolean;
-    source: BackfillEntitySourceName;
-  } = {
-    force: false,
-    source: 'publicSearchIndex',
-  };
+  const result: { maxItems?: number; maxCostUsd?: number; force: boolean } = { force: false };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--max-items') result.maxItems = Number(argv[++index]);
     else if (arg === '--max-cost-usd') result.maxCostUsd = Number(argv[++index]);
     else if (arg === '--force') result.force = true;
-    else if (arg === '--source') {
-      const value = argv[++index] as BackfillEntitySourceName;
-      if (value !== 'publicSearchIndex' && value !== 'canonicalEntities') {
-        throw new Error(
-          `--source must be publicSearchIndex|canonicalEntities (got ${String(value)})`,
-        );
-      }
-      result.source = value;
-    } else if (arg?.startsWith('--source=')) {
-      const value = arg.slice('--source='.length) as BackfillEntitySourceName;
-      if (value !== 'publicSearchIndex' && value !== 'canonicalEntities') {
-        throw new Error(
-          `--source must be publicSearchIndex|canonicalEntities (got ${String(value)})`,
-        );
-      }
-      result.source = value;
-    }
   }
   return result;
 }
 
-function resolveEntitySource(
-  firestore: Firestore,
-  args: { source: BackfillEntitySourceName },
-): CanonicalEntitySource {
-  switch (args.source) {
-    case 'canonicalEntities':
-      return createFirestoreCanonicalEntitySource(firestore);
-    case 'publicSearchIndex':
-    default:
-      return createFirestorePublicSearchIndexEntitySource(firestore);
-  }
-}
-
 async function mainCli(argv: string[]): Promise<void> {
   const args = parseArgs(argv);
-  const { app } = createServerFirebaseApp(process.env);
-  const { getFirestore } = await import('firebase-admin/firestore');
-  const firestore = getFirestore(app);
+  const pool = getOpsPostgresPool(process.env);
+  const query = async <T extends Record<string, unknown> = Record<string, unknown>>(
+    sql: string,
+    params: readonly unknown[],
+  ): Promise<readonly T[]> => {
+    const result = await pool.query<T>(sql, [...params]);
+    return result.rows;
+  };
 
   const summary = await runBackfill({
-    source: resolveEntitySource(firestore, args),
+    source: createPostgresCanonicalEntitySource(query),
     provider: createGeminiEmbeddingProvider({ environment: process.env }),
-    store: createAdminVectorIndexStore(firestore),
-    existingHashes: createFirestoreExistingHashLookup(firestore),
+    store: createPostgresVectorIndexStore(query),
+    existingHashes: createPostgresExistingHashLookup(query),
     ...(args.maxItems !== undefined ? { maxItems: args.maxItems } : {}),
     ...(args.maxCostUsd !== undefined ? { maxEstimatedCostUsd: args.maxCostUsd } : {}),
     force: args.force,
@@ -290,7 +262,7 @@ async function mainCli(argv: string[]): Promise<void> {
   console.log(
     JSON.stringify(
       {
-        source: args.source,
+        source: 'bb_public.release_entities',
         ...summary,
       },
       null,

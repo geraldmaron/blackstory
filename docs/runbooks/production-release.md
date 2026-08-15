@@ -1,5 +1,15 @@
 # Runbook: Production release pipeline
 
+> **2026-08-14 correction (partial — needs a full pass, see `repo-euqi`):** the Admin section
+> below (App Hosting / `apphosting.admin.yaml` / Firebase CLI rollout) describes a state that
+> `docs/data/firebase-wind-down.md` records as superseded 2026-07-25 — Admin is now a standalone
+> Vercel project (`apps/admin/vercel.json`), deployed from git main like public web, with no
+> GCP/Cloud Run/App Hosting involved. The Firestore rules/indexes references likewise predate the
+> Postgres cutover (ADR-020): Firestore has no live database, rules, or indexes left. Treat the
+> Public web / Vercel guidance in this file as current; treat the Admin/App-Hosting and
+> Firestore-rules steps as historical until someone rewrites them against the actual Vercel admin
+> deploy flow.
+
 **Scope:** End-to-end release procedure for BlackStory — from merged PR through staging
 validation, progressive release metadata, protected production approval, deploy to each surface,
 post-deploy health checks, and rollback rehearsal.
@@ -162,7 +172,8 @@ Jobs with `environment: production` pause for required reviewers configured in
 
 ## AC #4 — Migrations / rules sequencing before traffic
 
-Per [ADR-020](../adr/ADR-020-supabase-postgres-system-of-record.md), **Supabase Postgres** is the
+Per [ADR-020](../decisions-carryover.md) (`docs/adr/` was purged 2026-07-24; the precedence rule is
+restated in `docs/decisions-carryover.md`), **Supabase Postgres** is the
 product system of record (`bb_public.*`). **Admin** interim host is App Hosting
 (`black-book-admin-production`); **Firebase Storage / GCS** remains the blob store. Firestore is
 wind-down / rollback only ([firebase-wind-down.md](../data/firebase-wind-down.md)) — not a live

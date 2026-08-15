@@ -47,54 +47,6 @@ export {
 } from './emulators.js';
 export type { EmulatorHosts } from './emulators.js';
 
-export {
-  configureAppCheckDebugToken,
-  getAppCheckRequestHeaders,
-  initializeAppCheckScaffold,
-} from './app-check.js';
-export type { AppCheckClientRuntime, AppCheckScaffoldOptions } from './app-check.js';
-export {
-  APP_CHECK_HEADER,
-  appCheckSatisfiesRateLimitGate,
-  createAppCheckGuard,
-  createFirebaseAppCheckVerifier,
-  parseAppCheckMode,
-  readAppCheckToken,
-} from './app-check-enforce.js';
-export type {
-  AppCheckDecision,
-  AppCheckFailureReason,
-  AppCheckGuardOptions,
-  AppCheckHeaders,
-  AppCheckMode,
-  AppCheckRequest,
-  AppCheckTelemetry,
-  AppCheckTelemetryEvent,
-  AppCheckVerifier,
-  TrustedServiceIdentity,
-  VerifiedAppCheckToken,
-} from './app-check-enforce.js';
-export {
-  DEFAULT_APP_CHECK_CIRCUIT_BREAKER_CONFIG,
-  advanceAppCheckCircuitBreaker,
-  appCheckCircuitBreakerAvailability,
-  createAppCheckCircuitBreaker,
-  recordAppCheckVerifierFailure,
-  recordAppCheckVerifierSuccess,
-} from './app-check-circuit-breaker.js';
-export type {
-  AppCheckCircuitBreaker,
-  AppCheckCircuitBreakerConfig,
-  AppCheckCircuitBreakerSnapshot,
-  AppCheckCircuitBreakerState,
-  AppCheckCircuitBreakerTelemetry,
-  AppCheckCircuitBreakerTelemetryEvent,
-  CreateAppCheckCircuitBreakerOptions,
-} from './app-check-circuit-breaker.js';
-
-export { createWebFirebaseClient } from './web-client.js';
-export type { WebFirebaseClient } from './web-client.js';
-
 export { createAdminFirebaseClient } from './admin-client.js';
 export type { AdminFirebaseClient } from './admin-client.js';
 export * from './admin-auth.js';
@@ -299,6 +251,9 @@ export {
   createFirestorePublicSearchIndexEntitySource,
   mapSearchIndexRecordToEmbeddingInput,
   parseStateCodeFromJurisdiction,
+  createPostgresCanonicalEntitySource,
+  createPostgresExistingHashLookup,
+  createPostgresVectorIndexStore,
 } from './embeddings/index.js';
 export type {
   EmbeddingVector,
@@ -321,11 +276,11 @@ export type {
   VectorIndexStore,
   BackfillOptions,
   BackfillSummary,
-  BackfillEntitySourceName,
   CanonicalEntitySource,
   CanonicalEntitySourcePage,
   ExistingEmbeddingHashLookup,
   SearchIndexEmbeddingRecord,
+  PostgresQueryExecutor,
 } from './embeddings/index.js';
 export type {
   FirestoreRootCollection,
