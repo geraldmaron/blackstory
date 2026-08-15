@@ -32,11 +32,20 @@ export const theCountArticle = {
   slug: 'the-count',
   title: 'Chapter: The Count',
   summary:
-    'The United States has been writing Black people down since before it had a president: a fraction in the Constitution, a numbered line on a slave schedule, a grade on a survey form, a name struck from a registration roll. The archive those records left behind is enormous, and it is mostly the paperwork of being counted by someone else. This chapter reads that archive in order, and marks the few places where the hand holding the pen changes.',
+    "The United States has been writing Black people down since before it had a president: a fraction in the Constitution, a numbered line on a slave schedule, a grade on a survey form, a name struck from a registration roll. The archive those records left behind is enormous, and it's mostly the paperwork of being counted by someone else. This chapter reads that archive in order, and marks the few places where the hand holding the pen changes.",
   eraLabel: '1787–present',
   placeLabel: 'United States',
   publishedAt: '2026-08-07',
   status: 'published' as const,
+  heroImage: {
+    url: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Constitution_of_the_United_States_-_DPLA_-_9ca804144bd5965e992ae3528bc3c6a3_%28page_1%29.jpg',
+    alt: 'The engrossed first page of the United States Constitution, September 17, 1787, carrying Article I, Section 2 and its "three fifths of all other Persons" apportionment clause.',
+    credit:
+      'Constitution of the United States, page 1, September 17, 1787. Work of the Constitutional Convention; U.S. government record, public domain (National Archives, via Digital Public Library of America / Wikimedia Commons).',
+    rightsStatus: 'public_domain' as const,
+    width: 7258,
+    height: 8785,
+  },
   relatedEntityIds: [
     'ent_case_dred_scott_v_sandford_1857',
     'ent_law_freedmens_bureau_act_1865',
@@ -243,23 +252,41 @@ export const theCountArticle = {
     { type: 'heading', level: 2 as const, text: '1787 · Three fifths of all other Persons' },
     {
       type: 'paragraph',
-      text: 'The first time the United States writes you down, it writes you down as arithmetic. Article I, Section 2 of the Constitution directs that representation and direct taxes be apportioned by population, and then it defines the population: "the whole Number of free Persons, including those bound to Service for a Term of Years, and excluding Indians not taxed, three fifths of all other Persons" [ref:archives-constitution][ref:senate-constitution]. You are the other persons. The sentence never uses the word slave, or the word Black, or any word at all for what you actually are. It does not need to. Everyone drafting it knows who the fraction is for, and the drafting is careful precisely because the thing being drafted is permanent. Your first appearance in the founding record is as a number that makes other people’s votes count for more.',
+      text: 'The first time the United States writes you down, it writes you down as arithmetic. Article I, Section 2 of the Constitution directs that representation and direct taxes be apportioned by population, and then it defines the population: "the whole Number of free Persons, including those bound to Service for a Term of Years, and excluding Indians not taxed, three fifths of all other Persons" [ref:archives-constitution][ref:senate-constitution]. You are the other persons. The sentence never uses the word slave, or the word Black, or any word at all for what you actually are. It doesn’t need to. Everyone drafting it knows who the fraction is for, and the drafting is careful precisely because the thing being drafted is permanent. Your first appearance in the founding record is as a number that makes other people’s votes count for more.',
     },
     {
       type: 'paragraph',
-      text: 'Three years later the counting begins in earnest. The first census, taken in 1790, sorts every household in the country into a handful of columns: free white males sixteen and over, free white males under sixteen, free white females, "all other free persons," and "slaves" [ref:census-1790-publication]. If you are enslaved, the marshal taking the count does not ask your name, and there is no line on which to write it. The National Archives’ own guide to these records states it plainly: the census "lists slaves statistically under the owner’s name" [ref:nara-census-reference]. The country counts 3,929,214 people that year [ref:census-1790-facts]. How many of them were enslaved depends on which record you trust: the Census Bureau’s own historical tables carry 697,681, while a peer-reviewed history of the count puts it at 697,624 [ref:census-twps0056][ref:pmc-census-history]. Fifty-seven human beings sit inside that disagreement. Nobody can resolve it now, because the only people who knew were never asked, and the men who wrote the totals did not think the difference worth checking.',
+      text: 'Three years later, the counting begins in earnest. The first census, taken in 1790, sends marshals and their assistants on horseback from house to house, a ledger open on the saddle or the knee, sorting every household into a handful of columns: free white males sixteen and over, free white males under sixteen, free white females, "all other free persons," and "slaves" [ref:census-1790-publication]. If you are enslaved, the marshal doesn’t dismount to ask your name. There’s no column on the page for it. The National Archives’ own guide to these records states it plainly: the census "lists slaves statistically under the owner’s name" [ref:nara-census-reference].',
     },
     {
       type: 'paragraph',
-      text: 'The results are printed in 1793 under a title worth reading slowly: "Return of the Whole Number of Persons within the Several Districts of the United States" [ref:census-1790-publication]. The whole number of persons. The publication that reduces you to an unnamed tally in an owner’s household still calls you a person on its cover, because the Constitution’s fraction requires you to be one; three-fifths of a chair apportions nothing. That is the strange doubleness the count carries from the beginning. The record cannot afford to deny your personhood outright, because your personhood is what it is harvesting. It needs you to exist exactly enough to be counted, and not one entry more.',
+      text: 'That year the country counts 3,929,214 people [ref:census-1790-facts]. By the Census Bureau’s own historical tables, 697,681 of them are enslaved; a peer-reviewed demographic history of the same census puts the figure at 697,624 [ref:census-twps0056][ref:pmc-census-history].',
     },
     {
       type: 'paragraph',
-      text: 'Hold on to what just happened, because the rest of this chapter is the same event repeating in different clothes. A government made a record about you, for its own purposes, with real consequences riding on it, and the record neither needed your name nor wanted your answer. The archive of that census survives. It is consulted, cited, and digitized. It recognizes no one.',
+      text: 'The results are printed in 1793 under a title worth reading slowly: "Return of the Whole Number of Persons within the Several Districts of the United States" [ref:census-1790-publication]. The whole number of persons. The publication that reduces you to an unnamed tally in an owner’s household still calls you a person on its cover, because the Constitution’s fraction requires you to be one; three-fifths of a chair apportions nothing. That is the strange doubleness the count carries from the beginning. The record can’t afford to deny your personhood outright, because your personhood is what it’s harvesting. It needs you to exist exactly enough to be counted, and not one entry more.',
+    },
+    {
+      type: 'paragraph',
+      text: 'A government has now made a record about you, for its own purposes, with real consequences riding on it — and the record never needed your name or wanted your answer to get what it wanted from you. That census survives today. Genealogists consult it. Historians cite it. Archivists have digitized every column of it down to the last tally mark. It recognizes no one who was never asked to be recognized in the first place, and it will not be the last record in this chapter built the same way.',
     },
 
     // ---- Era 1857: the record rules on you ----
     { type: 'heading', level: 2 as const, text: '1857 · The record rules on who you are' },
+    {
+      type: 'image',
+      image: {
+        url: 'https://upload.wikimedia.org/wikipedia/commons/4/48/Dred_Scott_photograph_%28circa_1857%29.jpg',
+        alt: 'A photographic portrait of Dred Scott, taken around 1857, the year the Supreme Court ruled that he could not be a citizen entitled to sue in federal court.',
+        credit:
+          'Dred Scott, photograph, circa 1857. Public domain (Library of Congress Prints and Photographs Division, via Wikimedia Commons).',
+        rightsStatus: 'public_domain' as const,
+        width: 2017,
+        height: 2598,
+      },
+      caption:
+        'DRED SCOTT, PLAINTIFF, ST. LOUIS, MISSOURI, 1857 — the year the Court ruled on the case that carried his name.',
+    },
     {
       type: 'paragraph',
       text: 'Seventy years into the counting, the highest record-keeper in the country is asked to say what the records mean. Dred Scott, held in slavery in Missouri, has sued for his freedom on the ground that his enslaver took him to live for years on free soil, and the suit turns on a threshold question: whether a Black man can be a citizen who is entitled to sue in a federal court at all. On March 6, 1857, in [[ent_case_dred_scott_v_sandford_1857|Dred Scott v. Sandford]], Chief Justice Roger Taney reads the answer for the Court [ref:archives-dred-scott]. "We think they are not," the opinion says of Black Americans and the Constitution’s word citizens, "and that they are not included, and were not intended to be included, under the word ‘citizens’ in the Constitution, and can therefore claim none of the rights and privileges which that instrument provides for and secures to citizens of the United States" [ref:dred-scott-us-reports].',
@@ -270,11 +297,11 @@ export const theCountArticle = {
     },
     {
       type: 'paragraph',
-      text: 'The National Archives’ summary of the case states the rest of the holding in two clean strokes: the Court ruled that enslaved people were not citizens and could not sue in federal court, and that Congress had no authority to ban slavery from a federal territory [ref:archives-dred-scott]. The second stroke matters to this chapter as much as the first. The Missouri Compromise line was itself a kind of national record, a boundary written in 1820 that sorted the map into ground where the schedules would run and ground where they would not. The Court erases it. After March 1857 there is no line on the federal map that the property schedule cannot, in principle, cross.',
+      text: 'The National Archives’ summary of the case states the rest of the holding in two clean strokes: the Court ruled that enslaved people weren’t citizens and couldn’t sue in federal court, and that Congress had no authority to ban slavery from a federal territory [ref:archives-dred-scott]. The second stroke matters to this chapter as much as the first. The Missouri Compromise line was itself a kind of national record, a boundary written in 1820 that sorted the map into ground where the schedules would run and ground where they wouldn’t. The Court erases it. After March 1857 there is no line on the federal map that the property schedule can’t, in principle, cross.',
     },
     {
       type: 'paragraph',
-      text: 'The ruling also decides what the count you appear in can never do for you. Residence on free soil does not free you; the census of a free state may enumerate you; no accumulation of paper makes you a person the federal courts can hear. Three years later the marshals go out again with their schedules, and the ruling rides along with every form.',
+      text: 'The ruling also decides what the count you appear in can never do for you. Residence on free soil doesn’t free you; the census of a free state may enumerate you; no accumulation of paper makes you a person the federal courts can hear. Three years later the marshals go out again with their schedules, and the ruling rides along with every form.',
     },
 
     // ---- Era 1860: the schedule ----
@@ -337,7 +364,7 @@ export const theCountArticle = {
     },
     {
       type: 'paragraph',
-      text: 'One more record from the decade, and it is the largest. The 1870 census, the first taken after the war, is the first to enumerate the formerly enslaved like everyone else; the National Archives calls it "often the first official record of a surname for former slaves" [ref:nara-census-reference]. Four million people cross, in one count, from the property schedule to the population schedule. It took a war, three constitutional amendments, and eighty years of counting to get a name onto the page.',
+      text: 'One more record from the decade, and it’s the largest. The 1870 census, the first taken after the war, is the first to enumerate the formerly enslaved like everyone else; the National Archives calls it "often the first official record of a surname for former slaves" [ref:nara-census-reference]. Four million people cross, in one count, from the property schedule to the population schedule. It took a war, three constitutional amendments, and eighty years of counting to get a name onto the page.',
     },
     {
       type: 'pullquote',
@@ -357,7 +384,7 @@ export const theCountArticle = {
     },
     {
       type: 'paragraph',
-      text: 'Sit with the shape of that instrument for a moment. Disfranchisement here is not a man at the courthouse door with a gun, though the era had those too. It is a registrar with a form, applying facially neutral requirements whose exemptions were drafted around a birth date. The same machinery that once counted you as three-fifths and then declined to name you now names you precisely, checks your name against a test your grandfather’s status decides, and strikes it. Across the South the pattern repeats state by state, and the registration ledgers, kept meticulously throughout, become the record of their own emptying. Nothing about the record-keeping was hidden. The numbers were published. Publication was not the same thing as shame.',
+      text: 'Sit with the shape of that instrument for a moment. Disfranchisement here isn’t a man at the courthouse door with a gun, though the era had those too. It is a registrar with a form, applying facially neutral requirements whose exemptions were drafted around a birth date. The same machinery that once counted you as three-fifths and then declined to name you now names you precisely, checks your name against a test your grandfather’s status decides, and strikes it. Across the South the pattern repeats state by state, and the registration ledgers, kept meticulously throughout, become the record of their own emptying. Nothing about the record-keeping was hidden. The numbers were published. Publication wasn’t the same thing as shame.',
     },
 
     // ---- Era 1921: the record burns, and then accuses ----
@@ -373,7 +400,7 @@ export const theCountArticle = {
     },
     {
       type: 'paragraph',
-      text: 'Survivors remembered that same day’s Tribune carrying an editorial headed "To Lynch Negro Tonight." No copy exists. Someone tore the story and nearly all of the editorial page out of the bound file of that day’s edition before it was microfilmed, so the front page survives only through a 1946 transcription and a reprint, and the editorial survives only in the memories of the people who described reading it [ref:tulsa-commission-2001][ref:loc-tulsa-newspapers]. Think about what that torn place in the file is. For every earlier era in this chapter, the problem with the record was what it wrote about you. Here the record has been edited after the fact, by an unknown hand, at the exact page where it might have documented who called for the killing. The archive about Black Americans is not only shaped by what officials chose to write down. It is shaped by what someone later chose to remove, and the removal is itself now part of the record, a hole with a date.',
+      text: 'Survivors remembered that same day’s Tribune carrying an editorial headed "To Lynch Negro Tonight." No copy exists. Someone tore the story and nearly all of the editorial page out of the bound file of that day’s edition before it was microfilmed, so the front page survives only through a 1946 transcription and a reprint, and the editorial survives only in the memories of the people who described reading it [ref:tulsa-commission-2001][ref:loc-tulsa-newspapers]. Think about what that torn place in the file is. For every earlier era in this chapter, the problem with the record was what it wrote about you. Here the record has been edited after the fact, by an unknown hand, at the exact page where it might have documented who called for the killing. The archive about Black Americans isn’t only shaped by what officials chose to write down. It is shaped by what someone later chose to remove, and the removal is itself now part of the record, a hole with a date.',
     },
     {
       type: 'paragraph',
@@ -389,7 +416,7 @@ export const theCountArticle = {
     { type: 'heading', level: 2 as const, text: '1937 · The form asks about you, not for you' },
     {
       type: 'paragraph',
-      text: 'Move north with the Great Migration and the counting follows you into the city. In the late 1930s a federal surveyor works through the neighborhoods of more than two hundred cities with a printed sheet, NS Form-8, "Area Description," grading each area for mortgage security. Item 5 of the form is headed "Inhabitants," and its fifth line reads "d. Negro (Yes or No)," followed by a percentage; the printed instructions on the back ask whether there is "any threat of infiltration of foreign born, negro or lower grade population," and supply the wording to use: "indicate these by nationality and rate of infiltration like this: ‘Negro - rapid’" [ref:nara-holc-area-description]. The grade attached to the address rather than to the applicant, so it was already settled before you said a word about yourself, and it went on deciding who could borrow on that block for decades after the survey was shelved [ref:nara-holc-area-description]. Notice what kind of record this is. The form does not ask you anything. It asks about you, in the third person, so that your presence on a block can be entered as a hazard to someone else’s collateral.',
+      text: 'Move north with the Great Migration and the counting follows you into the city. In the late 1930s a federal surveyor works through the neighborhoods of more than two hundred cities with a printed sheet, NS Form-8, "Area Description," grading each area for mortgage security. Item 5 of the form is headed "Inhabitants," and its fifth line reads "d. Negro (Yes or No)," followed by a percentage; the printed instructions on the back ask whether there is "any threat of infiltration of foreign born, negro or lower grade population," and supply the wording to use: "indicate these by nationality and rate of infiltration like this: ‘Negro - rapid’" [ref:nara-holc-area-description]. The grade attached to the address rather than to the applicant, so it was already settled before you said a word about yourself, and it went on deciding who could borrow on that block for decades after the survey was shelved [ref:nara-holc-area-description]. Notice what kind of record this is. The form doesn’t ask you anything. It asks about you, in the third person, so that your presence on a block can be entered as a hazard to someone else’s collateral.',
     },
     {
       type: 'primaryDocument',
@@ -404,12 +431,26 @@ export const theCountArticle = {
     // ---- Era 1965: the list restored ----
     { type: 'heading', level: 2 as const, text: '1965 · A federal examiner writes your name' },
     {
+      type: 'image',
+      image: {
+        url: 'https://upload.wikimedia.org/wikipedia/commons/6/64/Lyndon_Johnson_and_Martin_Luther_King%2C_Jr._-_Voting_Rights_Act.jpg',
+        alt: 'President Lyndon Johnson signs the Voting Rights Act on August 6, 1965, in the Capitol Rotunda, with Martin Luther King Jr. and other civil rights leaders standing behind him.',
+        credit:
+          'Photograph by Yoichi Okamoto, August 6, 1965. Lyndon Baines Johnson Library and Museum, image serial number A1030-17a. U.S. government work, public domain.',
+        rightsStatus: 'public_domain' as const,
+        width: 2000,
+        height: 1339,
+      },
+      caption:
+        'PRESIDENT LYNDON B. JOHNSON, WASHINGTON, D.C., AUGUST 6, 1965 — the day a federal examiner’s pen was authorized to write your name onto the rolls.',
+    },
+    {
       type: 'paragraph',
       text: 'It takes until August 6, 1965, for the machinery of listing to run the other way. The [[ent_law_voting_rights_act_1965|Voting Rights Act]], signed that day, is built out of the same materials as the laws it breaks: coverage formulas, determinations, lists. Section 4 reaches any state or county that maintained a test or device on November 1, 1964, and where, by the census director’s determination, "less than 50 per centum of the persons of voting age residing therein were registered" [ref:vra-1965-statute]. Section 5 freezes those places’ election laws, requiring federal signoff before any change takes effect [ref:vra-1965-statute][ref:doj-history-voting]. And Sections 6 and 7 put the pen directly in a federal hand: examiners are appointed "to prepare and maintain lists of persons eligible to vote in Federal, State, and local elections," and "any person whose name appears on the examiner’s list shall be entitled and allowed to vote" [ref:vra-1965-statute]. For the first time since the bureau closed its registers, a federal officer’s job is to write your name down so that the writing itself protects you.',
     },
     {
       type: 'paragraph',
-      text: 'The instrument the act breaks is itself preserved. A literacy test from Alabama, the kind a registrar could put in front of you in 1965 and grade however the day required, survives in the record and is reproduced below. It does not need commentary. It is a form, like the others in this chapter, and by now you know how to read a form: look at what it asks, and ask who the asking serves.',
+      text: 'The instrument the act breaks is itself preserved. A literacy test from Alabama, the kind a registrar could put in front of you in 1965 and grade however the day required, survives in the record and is reproduced below. It doesn’t need commentary. It’s a form, like the others in this chapter, and by now you know how to read a form: look at what it asks, and ask who the asking serves.',
     },
     {
       type: 'primaryDocument',
@@ -453,7 +494,7 @@ export const theCountArticle = {
     { type: 'heading', level: 2 as const, text: '1967 · The file you are never meant to see' },
     {
       type: 'paragraph',
-      text: 'Two years after the examiner starts writing your name onto the rolls, another federal office starts a file on you that you will never be shown. On August 25, 1967, FBI headquarters sends a letter to its field offices opening a counterintelligence program against what it calls black nationalist, hate-type organizations. The Senate committee that later investigated, chaired by Frank Church, quotes the letter’s purpose in the Bureau’s own words: "to expose, disrupt, misdirect, discredit, or otherwise neutralize the activities of black nationalist, hate-type organizations and groupings, their leadership, spokesmen, membership, and supporters" [ref:church-committee-b3]. Even the size of the program’s opening move is disputed in the official record: the Church Committee’s report says the letter went to twenty-three field offices, while the House Select Committee on Assassinations, describing the same letter, says twenty-two [ref:church-committee-b3][ref:archives-hsca-cointelpro]. The two committees also disagree about the expansion that followed, forty-one offices by one account, more by the other [ref:church-committee-b3][ref:archives-hsca-cointelpro]. The most closely investigated secret program in the Bureau’s history, examined twice by Congress, and the file cannot agree with itself about how many offices were told to open it.',
+      text: 'Two years after the examiner starts writing your name onto the rolls, another federal office starts a file on you that you will never be shown. On August 25, 1967, FBI headquarters sends a letter to its field offices opening a counterintelligence program against what it calls black nationalist, hate-type organizations. The Senate committee that later investigated, chaired by Frank Church, quotes the letter’s purpose in the Bureau’s own words: "to expose, disrupt, misdirect, discredit, or otherwise neutralize the activities of black nationalist, hate-type organizations and groupings, their leadership, spokesmen, membership, and supporters" [ref:church-committee-b3]. Even the size of the program’s opening move is disputed in the official record: the Church Committee’s report says the letter went to twenty-three field offices, while the House Select Committee on Assassinations, describing the same letter, says twenty-two [ref:church-committee-b3][ref:archives-hsca-cointelpro]. The two committees also disagree about the expansion that followed, forty-one offices by one account, more by the other [ref:church-committee-b3][ref:archives-hsca-cointelpro]. The most closely investigated secret program in the Bureau’s history, examined twice by Congress, and the file can’t agree with itself about how many offices were told to open it.',
     },
     {
       type: 'paragraph',
@@ -477,18 +518,18 @@ export const theCountArticle = {
     },
     {
       type: 'paragraph',
-      text: 'There is an irony in the mechanism worth stating carefully, without embellishment, because the record supports it on its own. The formula was struck for resting on old evidence about places with a long history of altering voting rules to racial ends. The evidence was old partly because the formula had been working: the register of what those places would do without supervision could not grow while the supervision held. Five years later the Commission on Civil Rights takes the new measurements: "At least 23 states have enacted newly restrictive statewide voter laws since the Shelby County decision" [ref:usccr-2018-voting]. The commission’s report also relays a count made by the Leadership Conference, which it names as the source, that 61 percent of Louisiana parishes had closed a total of 103 polling places in those same years [ref:usccr-2018-voting]. Louisiana again. The state that cut its rolls from a hundred thirty thousand to thirteen hundred with paperwork is back to adjusting the geography of the ballot with paperwork, and the federal record-keepers are back to writing it down after the fact.',
+      text: 'There is an irony in the mechanism worth stating carefully, without embellishment, because the record supports it on its own. The formula was struck for resting on old evidence about places with a long history of altering voting rules to racial ends. The evidence was old partly because the formula had been working: the register of what those places would do without supervision couldn’t grow while the supervision held. Five years later the Commission on Civil Rights takes the new measurements: "At least 23 states have enacted newly restrictive statewide voter laws since the Shelby County decision" [ref:usccr-2018-voting]. The commission’s report also relays a count made by the Leadership Conference, which it names as the source, that 61 percent of Louisiana parishes had closed a total of 103 polling places in those same years [ref:usccr-2018-voting]. Louisiana again. The state that cut its rolls from a hundred thirty thousand to thirteen hundred with paperwork is back to adjusting the geography of the ballot with paperwork, and the federal record-keepers are back to writing it down after the fact.',
     },
     {
       type: 'paragraph',
-      text: 'One more line from the commission’s report belongs here, because it measures the retreat in the chapter’s own currency, people sent to watch and write. In 2012, the last full election year before Shelby, the Justice Department sent over 780 federal observers and 259 election monitors to 51 jurisdictions in 23 states [ref:usccr-2018-voting]. The observers were creatures of the coverage formula; when the formula fell, the department largely lost its authority to send them. The examiner of 1965 and the observer of 2012 were the same idea at different ages, a federal witness with a notebook, stationed where the local record could not be trusted to keep itself honestly. After June 25, 2013, most of the notebooks went home.',
+      text: 'One more line from the commission’s report belongs here, because it measures the retreat in the chapter’s own currency, people sent to watch and write. In 2012, the last full election year before Shelby, the Justice Department sent over 780 federal observers and 259 election monitors to 51 jurisdictions in 23 states [ref:usccr-2018-voting]. The observers were creatures of the coverage formula; when the formula fell, the department largely lost its authority to send them. The examiner of 1965 and the observer of 2012 were the same idea at different ages, a federal witness with a notebook, stationed where the local record couldn’t be trusted to keep itself honestly. After June 25, 2013, most of the notebooks went home.',
     },
 
     // ---- Present-day close ----
     { type: 'heading', level: 2 as const, text: 'Today · You are counted, still' },
     {
       type: 'paragraph',
-      text: 'Today you are the best-counted you have ever been. A census with your name and your answers. A survey of what your family owns, run every three years. A registry of every mortgage decision, every prison admission, every ballot cast, cross-tabulated by race and published on federal websites. None of this is an argument against being counted; every figure quoted above exists because someone counted. The question is a different one: at each point in the record, who is the record for? And the honest answer is that the modern file, voluminous as it is, still mostly measures what is done to you and around you. What it shows, when you read it, is continuity.',
+      text: 'Today you are the best-counted you’ve ever been. A census with your name and your answers. A survey of what your family owns, run every three years. A registry of every mortgage decision, every prison admission, every ballot cast, cross-tabulated by race and published on federal websites. None of this is an argument against being counted; every figure quoted above exists because someone counted. The question is a different one: at each point in the record, who is the record for? And the honest answer is that the modern file, voluminous as it is, still mostly measures what is done to you and around you. What it shows, when you read it, is continuity.',
     },
     {
       type: 'stat',
@@ -510,7 +551,7 @@ export const theCountArticle = {
     },
     {
       type: 'paragraph',
-      text: 'And yet the modern counting differs from the old counting in one respect that has to be said plainly, because the difference is the whole of the progress. Most of today’s racial data series were mandated as instruments of enforcement: the counting is how discrimination is caught, measured, and litigated, which is why the laws of the civil rights era required so much of it. When the mortgage registry tabulates denials by race, it is doing on purpose what the HOLC form did incidentally, making a pattern visible, except that now the pattern’s visibility is the remedy’s first step rather than the harm’s. The instrument is the same. The intended reader changed. A form that asks about race in order to protect collateral and a form that asks about race in order to expose a lender are physically almost identical documents, and the entire moral distance between them is who the record is for. That distance was crossed by law, recently, and, as the voting sections above show, it can be crossed back.',
+      text: 'And yet the modern counting differs from the old counting in one respect that has to be said plainly, because the difference is the whole of the progress. Most of today’s racial data series were mandated as instruments of enforcement: the counting is how discrimination is caught, measured, and litigated, which is why the laws of the civil rights era required so much of it. When the mortgage registry tabulates denials by race, it’s doing on purpose what the HOLC form did incidentally, making a pattern visible, except that now the pattern’s visibility is the remedy’s first step rather than the harm’s. The instrument is the same. The intended reader changed. A form that asks about race in order to protect collateral and a form that asks about race in order to expose a lender are physically almost identical documents, and the entire moral distance between them is who the record is for. That distance was crossed by law, recently, and, as the voting sections above show, it can be crossed back.',
     },
     {
       type: 'stat',
@@ -528,20 +569,15 @@ export const theCountArticle = {
     },
     {
       type: 'paragraph',
-      text: 'So here is how to read this archive, and how not to. The United States holds an enormous documentary record of Black life, and it would be easy to mistake the size of that record for a history of recognition, as though a people this thoroughly documented must have been seen. Read the documents themselves and the proportion inverts. The fraction was written to apportion power among white men. The schedules were written to inventory property. The security forms were written to protect collateral. The registration rolls were written, for most of their history, to be culled. The secret files were written to neutralize. The parts of the record where Black Americans appear as themselves, by name, on purpose, at their own request, are countable on your fingers: the Savannah minutes, the Edisto petition, a marriage register, a bank signature book, a census line after 1870, an examiner’s list after 1965. Half of those were undone, ignored, or emptied of force within a decade of being made.',
+      text: 'The United States holds an enormous documentary record of Black life, and it would be easy to mistake the size of that record for a history of recognition, as though a people this thoroughly documented must have been seen. Read the documents themselves and the proportion inverts. The fraction was written to apportion power among white men. The schedules were written to inventory property. The security forms were written to protect collateral. The registration rolls were written, for most of their history, to be culled. The secret files were written to neutralize. The parts of the record where Black Americans appear as themselves, by name, on purpose, at their own request, are countable on one hand: the Savannah minutes, the Edisto petition, a marriage register, a bank signature book, a census line after 1870, an examiner’s list after 1965. Half of those were undone, ignored, or emptied of force within a decade of being made.',
     },
     {
       type: 'paragraph',
-      text: 'Which is also the instruction for reading the rest of it. A covenant, a survey form, a sentencing table, a denial rate: each is a page from the file described above, and the right question is never only what does the record say. It is the question each era here has forced in turn: who wrote this, about whom, for whose use, and what did the writing do once it existed. Ask that of the three-fifths clause and it stops being an embarrassing compromise and becomes an apportionment engine. Ask it of a slave schedule and the blank where a name should be stops being an omission and becomes the design. Ask it of a modern dataset and you can tell, usually within a column or two, whether you are holding an instrument of enforcement or the latest edition of the survey that grades your block.',
+      text: 'A covenant, a survey form, a sentencing table, a denial rate: each is a page from that same file. The question that matters is never only what the record says — it’s who wrote it, about whom, for whose use, and what the writing did once it existed. Ask that of the three-fifths clause and it stops being an embarrassing compromise and becomes an apportionment engine. Ask it of a slave schedule and the blank where a name should be stops being an omission and becomes the design. Ask it of a modern dataset and you can tell, usually within a column or two, whether you’re holding an instrument of enforcement or the latest edition of the survey that grades your block.',
     },
     {
       type: 'paragraph',
       text: 'Every deed, grade, sentence, and ledger in the American record of Black life is a page from that same file, and the file has a grain. It runs from being counted to counting, and the direction of that grain is the story. The record of Black America is immense because America never stopped writing it. The pages Black hands were allowed to write are the ones worth going back for.',
-    },
-    { type: 'heading', level: 3 as const, text: 'The record, in order' },
-    {
-      type: 'paragraph',
-      text: 'Everything quoted here is sitting in an archive with its own date on it: a clause in the founding parchment, a marshal’s tally sheet, an opinion that read the old records back as law, a schedule that substituted numbers for names, the minutes of one January interview, a petition in the petitioners’ own spelling, a signature book from a failed bank, a state constitution built around a grandfather’s birthday, a torn page in a bound newspaper file, a survey form with a yes-or-no box, a statute that put the pen in a federal hand, a secret file printed by the Senate, and an opinion that took the pen back out. None of it needs retelling in order to be believed. Read it in order, and watch who is holding the pen.',
     },
     {
       type: 'timeline',

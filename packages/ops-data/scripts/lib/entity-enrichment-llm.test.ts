@@ -2,14 +2,21 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   buildEnrichmentUserPrompt,
+  SUMMARY_MIN_CHARS,
   validateEnrichmentResponse,
   type EnrichmentSubject,
 } from './entity-enrichment-llm.ts';
 
 const LONG_ENOUGH_SUMMARY =
   'John Doe operated a business at this site starting in 1925, documented in the National ' +
-  'Register nomination for the property, which describes the founding and early decades in detail.';
-assert.ok(LONG_ENOUGH_SUMMARY.length >= 120 && LONG_ENOUGH_SUMMARY.length <= 400);
+  'Register nomination for the property, which describes the founding and early decades in detail. ' +
+  'The business served local residents during a formative period and its documented operations ' +
+  'provide a record of community economic life.';
+assert.ok(LONG_ENOUGH_SUMMARY.length >= SUMMARY_MIN_CHARS && LONG_ENOUGH_SUMMARY.length <= 400);
+
+function atMinimumSummary(value: string): string {
+  return value.padEnd(SUMMARY_MIN_CHARS, ' ');
+}
 
 function baseSubject(overrides: Partial<EnrichmentSubject> = {}): EnrichmentSubject {
   return {
@@ -54,13 +61,21 @@ test('accepts a well-formed response with an anchored citation', () => {
   }
 });
 
-test('rejects a summary shorter than the 120-char floor', () => {
+test('rejects a 156-character summary below the 220-char floor', () => {
+  const underFloorSummary =
+    'John Doe operated a business at this site starting in 1925. The property records a documented local business history and its role in the neighborhood during that period.'.slice(
+      0,
+      156,
+    );
+  assert.equal(underFloorSummary.length, 156);
   const attempt = validateEnrichmentResponse(
     baseSubject(),
     ['business'],
     validResponse({
-      summary: 'Too short.',
-      summaryCitations: [{ evidenceId: 'ev_1', quote: 'John Doe' }],
+      summary: underFloorSummary,
+      summaryCitations: [
+        { evidenceId: 'ev_1', quote: 'John Doe operated a business at this site starting in 1925' },
+      ],
     }),
   );
   assert.equal(attempt.validation.ok, false);
@@ -164,12 +179,15 @@ test('rejects address-shaped tokens in generated prose for a restricted-address 
   const summaryWithAddress =
     'The site at 123 Main Street was founded in 1925 and served the community for decades ' +
     'as documented in the National Register nomination form on file with the state office.';
-  assert.ok(summaryWithAddress.length >= 120 && summaryWithAddress.length <= 400);
+  assert.ok(
+    atMinimumSummary(summaryWithAddress).length >= SUMMARY_MIN_CHARS &&
+      atMinimumSummary(summaryWithAddress).length <= 400,
+  );
   const attempt = validateEnrichmentResponse(
     subject,
     ['business'],
     validResponse({
-      summary: summaryWithAddress,
+      summary: atMinimumSummary(summaryWithAddress),
       summaryCitations: [{ evidenceId: 'ev_1', quote: '123 Main Street in the historic district' }],
     }),
   );
@@ -195,12 +213,15 @@ test('rejects address-shaped tokens for a person entity even without restrictedA
   const summaryWithAddress =
     'She lived at 456 Elm Street and worked as a community organizer starting in 1962, ' +
     'according to the encyclopedia article documenting her decades of civic involvement.';
-  assert.ok(summaryWithAddress.length >= 120 && summaryWithAddress.length <= 400);
+  assert.ok(
+    atMinimumSummary(summaryWithAddress).length >= SUMMARY_MIN_CHARS &&
+      atMinimumSummary(summaryWithAddress).length <= 400,
+  );
   const attempt = validateEnrichmentResponse(
     subject,
     [],
     validResponse({
-      summary: summaryWithAddress,
+      summary: atMinimumSummary(summaryWithAddress),
       summaryCitations: [{ evidenceId: 'ev_1', quote: 'lived at 456 Elm Street' }],
       topicIds: [],
     }),
@@ -274,12 +295,15 @@ test('rejects a summary that copies raw registry vocabulary out of the source', 
     'The plantation was home to a large African American community whose labor sustained one of ' +
     'the largest antebellum estates in the county, and it is recognized under ethnic heritage ' +
     '(black) as well as agriculture in the National Register listing for the site.';
-  assert.ok(summaryWithCode.length >= 120 && summaryWithCode.length <= 400);
+  assert.ok(
+    atMinimumSummary(summaryWithCode).length >= SUMMARY_MIN_CHARS &&
+      atMinimumSummary(summaryWithCode).length <= 400,
+  );
   const attempt = validateEnrichmentResponse(
     subject,
     ['business'],
     validResponse({
-      summary: summaryWithCode,
+      summary: atMinimumSummary(summaryWithCode),
       summaryCitations: [
         { evidenceId: 'ev_1', quote: 'recognized under ethnic heritage (black) as well as' },
       ],
@@ -356,12 +380,15 @@ test('accepts prose that uses the words "ethnic heritage" naturally', () => {
   const summary =
     'The congregation preserved its ethnic heritage through music and language after 1925, and ' +
     'the church remained the center of Black community life in the district for several decades.';
-  assert.ok(summary.length >= 120 && summary.length <= 400);
+  assert.ok(
+    atMinimumSummary(summary).length >= SUMMARY_MIN_CHARS &&
+      atMinimumSummary(summary).length <= 400,
+  );
   const attempt = validateEnrichmentResponse(
     subject,
     ['business'],
     validResponse({
-      summary,
+      summary: atMinimumSummary(summary),
       summaryCitations: [
         { evidenceId: 'ev_1', quote: 'preserved its ethnic heritage through music and language' },
       ],
