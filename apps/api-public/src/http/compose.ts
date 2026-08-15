@@ -11,10 +11,7 @@
  * cannot function without one.
  */
 import { createInMemoryRateLimitStore } from '@repo/security';
-import {
-  createPostgresVectorIndexStore,
-  createGeminiEmbeddingProvider,
-} from '@repo/ops-data';
+import { createPostgresVectorIndexStore, createGeminiEmbeddingProvider } from '@repo/ops-data';
 import { createPublicApiClientAttestationGuard } from '../client-attestation.js';
 import { createPublicRateLimitGuard, createNoopRateLimitGuard } from '../rate-limits.js';
 import { createPublicSearchGuard } from '../search-guardrails.js';
@@ -64,7 +61,9 @@ export function createProductionHandlerDeps(options: ComposeHandlerDepsOptions =
             embeddingProvider: createGeminiEmbeddingProvider({ environment }),
             vectorStore: createPostgresVectorIndexStore(queryPostgres),
             loadKillSwitchSnapshot,
-            ...(rateLimitDisabled ? {} : { rateLimitGuardOptions: { store: sharedRateLimitStore } }),
+            ...(rateLimitDisabled
+              ? {}
+              : { rateLimitGuardOptions: { store: sharedRateLimitStore } }),
           }),
         }
       : {}),

@@ -130,15 +130,13 @@ export function createPostgresVectorIndexStore(query: PostgresQueryExecutor): Ve
         params,
       );
 
-      return rows.map(
-        (row): VectorQueryMatch => ({
-          entityId: row.entity_id,
-          kind: row.kind as EntityVectorFilters['kind'],
-          ...(row.state ? { state: row.state } : {}),
-          ...(row.era_bucket ? { eraBucket: row.era_bucket } : {}),
-          distance: typeof row.distance === 'number' ? row.distance : Number(row.distance),
-        }),
-      );
+      return rows.map((row): VectorQueryMatch => ({
+        entityId: row.entity_id,
+        kind: row.kind as EntityVectorFilters['kind'],
+        ...(row.state ? { state: row.state } : {}),
+        ...(row.era_bucket ? { eraBucket: row.era_bucket } : {}),
+        distance: typeof row.distance === 'number' ? row.distance : Number(row.distance),
+      }));
     },
   };
 }

@@ -413,7 +413,14 @@ function toSearchHttpQuery(query: URLSearchParams): PublicSearchHttpQuery {
 // GET /v1/search/nearest
 // ---------------------------------------------------------------------------
 
-const VECTOR_SEARCH_QUERY_KEYS = ['q', 'kind', 'state', 'eraBucket', 'k', 'distanceThreshold'] as const;
+const VECTOR_SEARCH_QUERY_KEYS = [
+  'q',
+  'kind',
+  'state',
+  'eraBucket',
+  'k',
+  'distanceThreshold',
+] as const;
 
 function toVectorSearchHttpQuery(query: URLSearchParams): VectorSearchHttpQuery {
   const out: Record<string, string> = {};
@@ -427,7 +434,10 @@ function toVectorSearchHttpQuery(query: URLSearchParams): VectorSearchHttpQuery 
 /** `find_nearest` semantic search delegates guard/rate-limit/kill-switch composition to
  * `createFindNearestEndpoint` (`vector-search-endpoint.ts`) this handler only adapts the
  * `ApiRequest`/`ApiResponse` shapes this directory's other handlers use. */
-export async function handleVectorSearch(request: ApiRequest, deps: HandlerDeps): Promise<ApiResponse> {
+export async function handleVectorSearch(
+  request: ApiRequest,
+  deps: HandlerDeps,
+): Promise<ApiResponse> {
   const floor = enforceClientFloor(request);
   if (floor) return floor;
 
