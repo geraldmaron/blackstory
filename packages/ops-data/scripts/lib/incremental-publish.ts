@@ -741,13 +741,12 @@ export function gateLandscapePublishCandidate(input: {
       detail: 'insufficient landscape fields to build release source',
     };
   }
-  // publicEntityProjectionSchema requires summary 120..400 chars; anything
-  // outside that range would publish an unparseable (invisible) projection.
-  if (entry.summary.length < 120 || entry.summary.length > 400) {
+  // Enrichment and landscape staging require summaries between 220 and 400 chars.
+  if (entry.summary.length < 220 || entry.summary.length > 400) {
     return {
       eligible: false,
       reason: 'summary_too_short',
-      detail: `summary length ${entry.summary.length} outside projection schema bounds 120..400`,
+      detail: `summary length ${entry.summary.length} outside enrichment bounds 220..400`,
     };
   }
 

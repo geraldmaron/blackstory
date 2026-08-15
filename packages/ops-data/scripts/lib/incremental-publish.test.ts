@@ -33,7 +33,9 @@ const baseRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublish
   kind: 'place',
   display_name: 'Gardner Bishop Barber Shop',
   summary:
-    'Business site at 1900 15th Street NW in Washington, DC (1940), documented in the DC Historic Preservation Office inventory.',
+    'Business site at 1900 15th Street NW in Washington, DC (1940), documented in the DC Historic Preservation Office inventory. ' +
+    'The site records a locally significant commercial setting associated with the Black community, ' +
+    'with source material preserved through the historic-preservation inventory.',
   lat: 38.915775,
   lng: -77.034763,
   canonical_url: 'https://historicsites.dcpreservation.org/items/show/1055',
@@ -509,7 +511,7 @@ test('buildArtifactsForEntry publishes canonical deceased even when personReview
   const reviewed = baseRow({
     kind: 'person',
     summary:
-      'A'.repeat(120) +
+      'A'.repeat(220) +
       ' A community leader who was assassinated in 1968 during the struggle for civil rights in Washington, DC.',
     payload: {
       // Present so the row clears the depth gate; this test is about status resolution, not depth.

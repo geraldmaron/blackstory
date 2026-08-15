@@ -23,7 +23,7 @@ export const ENTITY_ENRICHMENT_SCHEMA_ID = 'entity_enrichment_draft.v1' as const
 export const ENTITY_ENRICHMENT_SCHEMA_VERSION = '1' as const;
 
 /** Public-projection bounds this draft must satisfy (packages/schemas/src/public-projections.ts). */
-export const SUMMARY_MIN_CHARS = 120;
+export const SUMMARY_MIN_CHARS = 220;
 export const SUMMARY_MAX_CHARS = 400;
 
 export type EnrichmentEvidenceInput = {

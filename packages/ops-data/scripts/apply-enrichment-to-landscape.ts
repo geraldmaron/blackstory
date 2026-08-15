@@ -180,7 +180,7 @@ async function main(): Promise<void> {
       continue;
     }
     const summary = typeof draft.summary === 'string' ? draft.summary : undefined;
-    if (summary === undefined || summary.length < 120 || summary.length > 400) {
+    if (summary === undefined || summary.length < 220 || summary.length > 400) {
       skipped.push({
         entityId: row.entity_id,
         reason: `summary missing or out of bounds (${summary?.length ?? 'n/a'})`,
@@ -240,7 +240,7 @@ async function main(): Promise<void> {
       const plan = stagedById.get(row.entity_id);
       if (plan === undefined) continue;
       const summary = typeof draft.summary === 'string' ? draft.summary : undefined;
-      if (summary === undefined || summary.length < 120 || summary.length > 400) continue;
+      if (summary === undefined || summary.length < 220 || summary.length > 400) continue;
       await client.query(
         `UPDATE bb_research.landscape_candidates
             SET summary = $2,
