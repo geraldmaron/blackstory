@@ -265,7 +265,20 @@ async function main(): Promise<void> {
                   ? draft.historicalContext
                   : undefined,
             topicIds: Array.isArray(draft.topicIds) ? draft.topicIds : undefined,
-            eraBuckets: Array.isArray(draft.eraBuckets) ? draft.eraBuckets : undefined,
+            // eraBuckets is required on every draft, so it is an array even when the drafter's
+            // evidence slice named no date -- WS4 sees only a snippet, not the full nomination form
+            // apply-nrhp-period-era.ts reads. An empty draft array means "this drafter found
+            // nothing", not "there is no era": writing it through `payload || $3::jsonb` would
+            // overwrite (not merge over) an already-populated key, silently erasing nomination-
+            // derived decade data on every wave that touched the entity. Found 2026-08-15: coverage
+            // fell from 98.8% (2026-08-07 rebuild) to 60.4% after round 14, tracking the waves run
+            // in between (repo-o4zu). Only write eraBuckets forward when the drafter actually found
+            // one; leave an existing value alone otherwise, matching apply-nrhp-period-era.ts's own
+            // "never overwrite an existing era" rule.
+            eraBuckets:
+              Array.isArray(draft.eraBuckets) && draft.eraBuckets.length > 0
+                ? draft.eraBuckets
+                : undefined,
             keywords: Array.isArray(draft.keywords) ? draft.keywords : undefined,
             evidenceCitations:
               plan.evidenceCitations.length > 0 ? plan.evidenceCitations : undefined,

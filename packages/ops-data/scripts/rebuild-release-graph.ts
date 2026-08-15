@@ -14,8 +14,12 @@
  *   DRY_RUN=0 RELEASE_GRAPH_APPLY=1 node --conditions development --import tsx \
  *     packages/ops-data/scripts/rebuild-release-graph.ts
  *
- * Relax decade coverage gate (measure only):
+ * Relax decade coverage gate (measure only, no floor enforced):
  *   ENFORCE_DECADE_COVERAGE=0 DRY_RUN=0 RELEASE_GRAPH_APPLY=1 ...
+ *
+ * Accept a specific floor below the 90% default (stays fail-closed, just at a stated number):
+ *   DRY_RUN=0 RELEASE_GRAPH_APPLY=1 node --conditions development --import tsx \
+ *     packages/ops-data/scripts/rebuild-release-graph.ts --min-decade-coverage=55
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -40,6 +44,26 @@ const APPLY = process.env.RELEASE_GRAPH_APPLY === '1';
 const ENFORCE_COVERAGE = process.env.ENFORCE_DECADE_COVERAGE !== '0';
 
 const ACTIVE_RELEASE_SQL = `SELECT release_id FROM bb_public.active_release LIMIT 1`;
+
+/**
+ * The decade-coverage floor this rebuild accepts, mirroring
+ * publish-release-entities-incremental.ts's --min-decade-coverage. Without this, the only way
+ * to get an already-committed entity apply's graph step past a below-90% but honest coverage
+ * number was ENFORCE_DECADE_COVERAGE=0, which drops the floor entirely rather than stating one —
+ * the gate this script exists to keep (see assertReleaseGraphAuditOrThrow).
+ */
+function readMinDecadeCoverage(): number | undefined {
+  const raw = process.argv.find((arg) => arg.startsWith('--min-decade-coverage='));
+  if (raw === undefined) return undefined;
+  const parsed = Number.parseFloat(raw.slice('--min-decade-coverage='.length));
+  if (!Number.isFinite(parsed) || parsed < 0 || parsed > 100) {
+    console.error(`--min-decade-coverage must be a percentage between 0 and 100 (got "${raw}")`);
+    process.exit(2);
+  }
+  return parsed;
+}
+
+const MIN_DECADE_COVERAGE = readMinDecadeCoverage();
 
 async function main(): Promise<void> {
   const databaseUrl = process.env.DATABASE_URL?.trim() || process.env.APP_DATABASE_URL?.trim();
@@ -74,6 +98,7 @@ async function main(): Promise<void> {
       generatedAt,
       dryRun: DRY_RUN || !APPLY,
       enforceCoverage: ENFORCE_COVERAGE,
+      ...(MIN_DECADE_COVERAGE !== undefined ? { minDecadeCoveragePct: MIN_DECADE_COVERAGE } : {}),
     });
 
     const report = {
@@ -82,6 +107,8 @@ async function main(): Promise<void> {
       releaseId,
       audit: built.audit,
       persisted: built.persisted ?? null,
+      decadeCoverageFloorPct: MIN_DECADE_COVERAGE ?? 90,
+      decadeCoverageFloorAcknowledged: MIN_DECADE_COVERAGE !== undefined,
       regressionWarnings: regression.findings.filter((finding) => finding.severity === 'warn'),
     };
 
