@@ -12,9 +12,7 @@ const LONG_ENOUGH_SUMMARY =
   'Register nomination for the property, which describes the founding and early decades in detail. ' +
   'The business served local residents during a formative period and its documented operations ' +
   'provide a record of community economic life.';
-assert.ok(
-  LONG_ENOUGH_SUMMARY.length >= SUMMARY_MIN_CHARS && LONG_ENOUGH_SUMMARY.length <= 400,
-);
+assert.ok(LONG_ENOUGH_SUMMARY.length >= SUMMARY_MIN_CHARS && LONG_ENOUGH_SUMMARY.length <= 400);
 
 function atMinimumSummary(value: string): string {
   return value.padEnd(SUMMARY_MIN_CHARS, ' ');
