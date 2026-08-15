@@ -19,6 +19,7 @@
     "@maplibre/maplibre-react-native": "^11.3.6",
     "@react-native-community/netinfo": "~12.0.1",
     "@repo/domain": "file:../../packages/domain",
+    "@repo/domain-core": "file:../../packages/domain-core",
     "@repo/public-contracts": "file:../../packages/public-contracts",
     "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-query-persist-client": "^5.101.4",

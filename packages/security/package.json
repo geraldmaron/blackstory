@@ -30,7 +30,7 @@
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
-    "@repo/domain": "workspace:*",
+    "@repo/domain-core": "workspace:*",
     "@repo/schemas": "workspace:*"
   },
   "devDependencies": {

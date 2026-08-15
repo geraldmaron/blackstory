@@ -9,8 +9,8 @@
   },
   "scripts": {
     "bootstrap": "./scripts/bootstrap.sh",
-    "build": "pnpm run build:foundation && pnpm -r --filter './packages/**' --filter './apps/**' --filter '!@repo/schemas' --filter '!@repo/data-access' --filter '!@repo/ui' --filter '!@repo/domain' --filter '!@repo/security' --filter '!@repo/observability' run build",
-    "build:foundation": "pnpm --filter @repo/schemas --filter @repo/ui run build && pnpm --filter @repo/domain run build && pnpm --filter @repo/data-access run build && pnpm --filter @repo/security run build && pnpm --filter @repo/observability run build",
+    "build": "pnpm run build:foundation && pnpm -r --filter './packages/**' --filter './apps/**' --filter '!@repo/schemas' --filter '!@repo/data-access' --filter '!@repo/ui' --filter '!@repo/domain-core' --filter '!@repo/domain' --filter '!@repo/security' --filter '!@repo/observability' run build",
+    "build:foundation": "pnpm --filter @repo/schemas --filter @repo/ui run build && pnpm --filter @repo/domain-core run build && pnpm --filter @repo/security run build && pnpm --filter @repo/domain run build && pnpm --filter @repo/data-access run build && pnpm --filter @repo/observability run build",
     "test": "pnpm test:preflight && pnpm -r --filter './packages/**' --filter './apps/**' run --if-present test && uv run pytest",
     "test:preflight": "node --import tsx scripts/test-preflight.mjs",
     "test:js": "pnpm test:preflight && pnpm -r --filter './packages/**' --filter './apps/**' run --if-present test",

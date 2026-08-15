@@ -21,6 +21,9 @@
       "@repo/domain/era": [
         "../../packages/domain/src/era.ts"
       ],
+      "@repo/domain-core/era": [
+        "../../packages/domain-core/src/era.ts"
+      ],
       "zod": [
         "./node_modules/zod"
       ]

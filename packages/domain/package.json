@@ -150,12 +150,13 @@
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
+    "@repo/domain-core": "workspace:*",
     "@repo/schemas": "workspace:*",
+    "@repo/security": "workspace:*",
     "edtf": "^4.11.0",
     "zipcodes": "^8.0.0"
   },
   "devDependencies": {
-    "@repo/security": "workspace:*",
     "@repo/testing": "workspace:*",
     "@repo/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
