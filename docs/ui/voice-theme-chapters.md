@@ -119,6 +119,29 @@ component.
 
 > The area was assessed poorly at the time. (See dispute metadata.)
 
+**When two figures disagree because of *method*, not because anyone hid or
+lost anything** — one is a raw historical tabulation, the other a later
+scholar's adjusted reconstruction — say only what the sources actually
+establish: both numbers, both attributed, then stop. Do not narrate a cause
+the sources don't give ("nobody can resolve it," "the difference wasn't
+worth checking to them"), and never assign motive or negligence to a
+record-keeper unless a cited source supports that motive. A discrepancy of
+a few dozen against a total in the hundreds of thousands does not need to
+be made to feel large; state it at its actual size and let the reader do
+that arithmetic.
+
+**Good:**
+
+> By the Census Bureau's own historical tables, 697,681 of them are
+> enslaved; a peer-reviewed demographic history of the same census puts the
+> figure at 697,624.
+
+**Bad (invents a cause and a culprit neither source supports):**
+
+> Fifty-seven human beings sit inside that disagreement. Nobody can resolve
+> it now, because the only people who knew were never asked, and the men
+> who wrote the totals didn't think the difference worth checking.
+
 ## Rule 5 — Earned flourish
 
 A folded chapter may end on one lyrical line — no more than one per
@@ -141,6 +164,22 @@ declarative sentence available instead of forcing one.
 > resilience. And somewhere, in the space between the lines on that old
 > map, the ghosts of everyone who was ever told no are still whispering
 > that they were here.
+
+### Coda discipline
+
+A chapter's closing section gets **one** synthesis pass, not several. If a
+draft ends with two or three paragraphs that each restate "here is how to
+read this record" in different words, that is Rule 2's failure at the scale
+of a whole section: the narrator explaining the point instead of trusting
+the material that already made it. Pick the single strongest closing
+move — usually the one earned flourish Rule 5 allows — and cut the rest
+rather than stacking them. A closing list that just re-itemizes sources or
+scenes already given their own beat earlier in the chapter is the same
+over-explanation in list form; if the reader already sat inside those
+scenes, they don't need a recap to be convinced they happened. Meta-framing
+that announces its own instructional purpose ("so here is how to read this
+archive," "which is also the instruction for reading the rest of it") gets
+cut on sight — let the sentence that follows stand on its own.
 
 ## Rule 6 — The chapter stands alone
 

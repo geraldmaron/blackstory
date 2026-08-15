@@ -97,6 +97,18 @@ this document makes binding:
    sourced detail, never from padding; if a chapter cannot reach the floor
    with validated material, it needs more research, not more adjectives.
 
+## Editorial hygiene: fixtures are the published artifact, not an edit log
+
+A chapter fixture (`packages/ops-data/fixtures/articles/*.ts`) is the
+content a reader sees once it ships — it is not a private workspace. Do not
+leave inline comments narrating what changed and why between drafts
+("2026-08-15 revision: cut the...") inside the article object or its
+surrounding file. That reasoning is genuinely useful during editing, but it
+belongs in the commit message for the change, not in a file that is itself
+the product. Before a fixture is considered ready to publish, its top-of-file
+comment should describe what the chapter is and which craft documents
+govern it — never the history of edits that produced it.
+
 ## What this document does not change
 
 Causal language stays governed by
