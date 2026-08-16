@@ -3,8 +3,10 @@
  * Used by publish-release-entities-incremental.ts and unit tests — no database I/O.
  */
 import {
-  US_STATES,
   buildReleaseEntityArtifacts,
+  findUsStateByPostalCode,
+  findUsStateForPoint,
+  findUsStateFromJurisdictionLabel,
   normalizeReleaseClaims,
   normalizeReleaseRelated,
   type CanonicalStatusSnapshot,
@@ -16,6 +18,7 @@ import {
   type EntityStatusValue,
   findTemplateSummarySignature,
 } from '@repo/domain';
+import { SUMMARY_MIN_CHARS, SUMMARY_MAX_CHARS } from './entity-enrichment-llm.ts';
 import { computeClaimConfidence } from '../lib/confidence.ts';
 import { lintPublishStatus, type PublishStatusLintReport } from './publish-status-linter.ts';
 import { buildNrhpListingFactObject, buildNrhpSignificanceObject } from './nrhp-area-labels.ts';
@@ -269,29 +272,82 @@ export function resolveSourceCategory(row: LandscapePublishRow): string | null {
   return null;
 }
 
-export function jurisdictionFromProvenance(provenance: Readonly<Record<string, unknown>>): string {
-  const city = typeof provenance.sourceCity === 'string' ? provenance.sourceCity : undefined;
-  const stateCode =
-    typeof provenance.sourceState === 'string' ? provenance.sourceState.toUpperCase() : undefined;
-  if (stateCode === 'DC') return 'Washington, District of Columbia';
-  if (city && stateCode) {
-    const stateName = US_STATES[stateCode as keyof typeof US_STATES]?.name ?? stateCode;
-    return `${city}, ${stateName}`;
+function readTrimmedString(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function displayCityName(city: string): string {
+  return city.replace(/\s*\(independent city\)\s*$/iu, '').trim();
+}
+
+function displayStateName(state: string): string {
+  if (/^d\.?c\.?$/iu.test(state) || /district of columbia/iu.test(state)) {
+    return 'District of Columbia';
   }
-  if (stateCode) {
-    return US_STATES[stateCode as keyof typeof US_STATES]?.name ?? stateCode;
+  const byPostal = findUsStateByPostalCode(state);
+  if (byPostal) return byPostal.name;
+  const byLabel = findUsStateFromJurisdictionLabel(state);
+  return byLabel?.name ?? state;
+}
+
+/**
+ * City + state for a landscape row. DC-sites store these on provenance
+ * (`sourceCity` / `sourceState`); NRHP stores them on payload (`city` / `state`).
+ */
+export function placeFieldsFromLandscape(row: LandscapePublishRow): {
+  readonly city: string;
+  readonly state: string;
+  readonly historicAddress: string;
+} {
+  const provenance = { ...asRecord(row.payload.provenance), ...row.provenance };
+  return {
+    city: readTrimmedString(provenance.sourceCity) || readTrimmedString(row.payload.city),
+    state: readTrimmedString(provenance.sourceState) || readTrimmedString(row.payload.state),
+    historicAddress: readTrimmedString(provenance.historicAddress),
+  };
+}
+
+export function jurisdictionFromPlace(input: {
+  readonly city?: string;
+  readonly state?: string;
+  readonly lat?: number | null;
+  readonly lng?: number | null;
+}): string {
+  const cityRaw = input.city?.trim() ?? '';
+  const stateRaw = input.state?.trim() ?? '';
+  const city = cityRaw.length > 0 ? displayCityName(cityRaw) : '';
+  const stateName = stateRaw.length > 0 ? displayStateName(stateRaw) : '';
+  if (stateName === 'District of Columbia' && (city.length === 0 || /^washington$/iu.test(city))) {
+    return 'Washington, District of Columbia';
+  }
+  if (city.length > 0 && stateName.length > 0) return `${city}, ${stateName}`;
+  if (stateName.length > 0) return stateName;
+  if (city.length > 0) return city;
+  if (typeof input.lat === 'number' && typeof input.lng === 'number') {
+    const fromPoint = findUsStateForPoint(input.lat, input.lng);
+    if (fromPoint) return fromPoint.name;
   }
   return 'United States';
+}
+
+export function jurisdictionFromProvenance(provenance: Readonly<Record<string, unknown>>): string {
+  return jurisdictionFromPlace({
+    ...(readTrimmedString(provenance.sourceCity)
+      ? { city: readTrimmedString(provenance.sourceCity) }
+      : {}),
+    ...(readTrimmedString(provenance.sourceState)
+      ? { state: readTrimmedString(provenance.sourceState) }
+      : {}),
+  });
 }
 
 export function locationLabelFromProvenance(
   displayName: string,
   provenance: Readonly<Record<string, unknown>>,
 ): string {
-  const historicAddress =
-    typeof provenance.historicAddress === 'string' ? provenance.historicAddress.trim() : '';
-  const city = typeof provenance.sourceCity === 'string' ? provenance.sourceCity : '';
-  const state = typeof provenance.sourceState === 'string' ? provenance.sourceState : '';
+  const historicAddress = readTrimmedString(provenance.historicAddress);
+  const city = readTrimmedString(provenance.sourceCity);
+  const state = readTrimmedString(provenance.sourceState);
   if (historicAddress.length > 0) {
     const suffix = [city, state].filter((part) => part.length > 0).join(', ');
     return suffix.length > 0 ? `${historicAddress}, ${suffix}` : historicAddress;
@@ -519,7 +575,11 @@ export function buildReleaseSourceFromLandscape(
     ...(enrichedEraBuckets.length > 0 ? { eraBuckets: enrichedEraBuckets } : {}),
     ...(enrichedKeywords.length > 0 ? { keywords: enrichedKeywords } : {}),
     ...(livingStatus !== undefined ? { livingStatus } : {}),
-    jurisdictionLabel: jurisdictionFromProvenance(provenance),
+    jurisdictionLabel: jurisdictionFromPlace({
+      ...placeFieldsFromLandscape(row),
+      lat: row.lat,
+      lng: row.lng,
+    }),
     locationPrecision,
     locationLabel: locationLabelFromProvenance(displayName, provenance),
     lat: row.lat,
@@ -741,12 +801,19 @@ export function gateLandscapePublishCandidate(input: {
       detail: 'insufficient landscape fields to build release source',
     };
   }
-  // Enrichment and landscape staging require summaries between 220 and 400 chars.
-  if (entry.summary.length < 220 || entry.summary.length > 400) {
+  // Enrichment and landscape staging require summaries within the current editorial band
+  // (repo-2t04.1: 400-900, was 220-400). Best-effort short drafts are validated and
+  // ledger-flagged at draft time (entity-enrichment-llm.ts); this coarse length gate does not
+  // yet see that flag, so a legitimate best-effort record still needs a human override to stage
+  // — known gap, not silently swallowed. Kept in sync with the draft-time bounds via the shared
+  // constants rather than a second hardcoded pair of numbers.
+  if (entry.summary.length < SUMMARY_MIN_CHARS || entry.summary.length > SUMMARY_MAX_CHARS) {
     return {
       eligible: false,
       reason: 'summary_too_short',
-      detail: `summary length ${entry.summary.length} outside enrichment bounds 220..400`,
+      detail:
+        `summary length ${entry.summary.length} outside enrichment bounds ` +
+        `${SUMMARY_MIN_CHARS}..${SUMMARY_MAX_CHARS}`,
     };
   }
 

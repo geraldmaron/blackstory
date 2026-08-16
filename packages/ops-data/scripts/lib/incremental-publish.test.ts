@@ -11,6 +11,7 @@ import {
   canonicalUpsertParamsFromLandscape,
   gateLandscapePublishCandidate,
   incrementalPublishProvenancePatch,
+  jurisdictionFromPlace,
   jurisdictionFromProvenance,
   parseCanonicalStatusSnapshot,
   toReleaseEntityRow,
@@ -35,7 +36,10 @@ const baseRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublish
   summary:
     'Business site at 1900 15th Street NW in Washington, DC (1940), documented in the DC Historic Preservation Office inventory. ' +
     'The site records a locally significant commercial setting associated with the Black community, ' +
-    'with source material preserved through the historic-preservation inventory.',
+    'with source material preserved through the historic-preservation inventory. The inventory entry ' +
+    'notes the shop operated continuously through the mid-twentieth century, serving the surrounding ' +
+    'Shaw neighborhood, and remained a fixture of the commercial corridor until the property changed ' +
+    'hands in the following decades, per the same preservation-office record.',
   lat: 38.915775,
   lng: -77.034763,
   canonical_url: 'https://historicsites.dcpreservation.org/items/show/1055',
@@ -73,6 +77,42 @@ test('jurisdictionFromProvenance maps DC to full label', () => {
     jurisdictionFromProvenance({ sourceCity: 'Washington', sourceState: 'DC' }),
     'Washington, District of Columbia',
   );
+});
+
+test('jurisdictionFromPlace uses NRHP payload city and state, not country fallback', () => {
+  assert.equal(
+    jurisdictionFromPlace({
+      city: 'St. Louis (Independent City)',
+      state: 'Missouri',
+      lat: 38.637,
+      lng: -90.216,
+    }),
+    'St. Louis, Missouri',
+  );
+});
+
+test('jurisdictionFromPlace expands postal codes and falls back to the pin state', () => {
+  assert.equal(jurisdictionFromPlace({ city: 'Selma', state: 'AL' }), 'Selma, Alabama');
+  assert.equal(jurisdictionFromPlace({ lat: 42.6526, lng: -73.7562 }), 'New York');
+});
+
+test('buildReleaseSourceFromLandscape reads city/state off NRHP payload', () => {
+  const entry = buildReleaseSourceFromLandscape(
+    baseRow({
+      id: 'nrhp-black-heritage-76002235',
+      lane: 'nrhp-black-heritage',
+      display_name: 'Joplin, Scott, House',
+      lat: 38.637,
+      lng: -90.216,
+      provenance: { refnum: '76002235' },
+      payload: {
+        city: 'St. Louis (Independent City)',
+        state: 'Missouri',
+      },
+    }),
+  );
+  assert.ok(entry);
+  assert.equal(entry.jurisdictionLabel, 'St. Louis, Missouri');
 });
 
 test('buildReleaseSourceFromLandscape produces claims from canonical_url', () => {
@@ -165,7 +205,10 @@ const nrhpRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublish
       'Tri-State Bank is a building in Memphis, Shelby County, Tennessee listed on the National ' +
       'Register of Historic Places on July 30, 1971 for its significance in Black heritage and ' +
       "performing arts. The National Park Service's National Register program recognizes it as " +
-      'a documented site of African American historical importance.',
+      'a documented site of African American historical importance. The nomination records the ' +
+      'bank as a Beale Street institution serving Black-owned businesses through the mid-twentieth ' +
+      'century, and its listing recognizes that role alongside the building itself as a landmark ' +
+      'of the district.',
     canonical_url: 'https://npgallery.nps.gov/AssetDetail/NRIS/71000836',
     payload: {
       refnum: '71000836',
@@ -511,7 +554,7 @@ test('buildArtifactsForEntry publishes canonical deceased even when personReview
   const reviewed = baseRow({
     kind: 'person',
     summary:
-      'A'.repeat(220) +
+      'A'.repeat(300) +
       ' A community leader who was assassinated in 1968 during the struggle for civil rights in Washington, DC.',
     payload: {
       // Present so the row clears the depth gate; this test is about status resolution, not depth.

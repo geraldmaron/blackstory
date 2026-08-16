@@ -19,7 +19,16 @@
  *     packages/ops-data/scripts/apply-enrichment-to-landscape.ts --entity-ids=id1,id2,...
  */
 import pg from 'pg';
+import { SUMMARY_MIN_CHARS, SUMMARY_MAX_CHARS } from './lib/entity-enrichment-llm.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
+
+/** A ledger draft passes bounds if it's in-band, or below-band with a valid bestEffort flag. */
+function summaryInBounds(draft: { summary?: unknown; bestEffort?: unknown }): boolean {
+  const summary = typeof draft.summary === 'string' ? draft.summary : undefined;
+  if (summary === undefined || summary.length > SUMMARY_MAX_CHARS) return false;
+  if (summary.length >= SUMMARY_MIN_CHARS) return true;
+  return draft.bestEffort === true;
+}
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.APPLY_ENRICHMENT_TO_LANDSCAPE_APPLY === '1';
@@ -49,6 +58,8 @@ type EnrichedRow = {
       readonly keywords?: unknown;
       readonly summaryCitations?: unknown;
       readonly historicalContextCitations?: unknown;
+      readonly bestEffort?: unknown;
+      readonly bestEffortReason?: unknown;
     };
   };
 };
@@ -180,7 +191,7 @@ async function main(): Promise<void> {
       continue;
     }
     const summary = typeof draft.summary === 'string' ? draft.summary : undefined;
-    if (summary === undefined || summary.length < 220 || summary.length > 400) {
+    if (summary === undefined || !summaryInBounds(draft)) {
       skipped.push({
         entityId: row.entity_id,
         reason: `summary missing or out of bounds (${summary?.length ?? 'n/a'})`,
@@ -240,7 +251,7 @@ async function main(): Promise<void> {
       const plan = stagedById.get(row.entity_id);
       if (plan === undefined) continue;
       const summary = typeof draft.summary === 'string' ? draft.summary : undefined;
-      if (summary === undefined || summary.length < 220 || summary.length > 400) continue;
+      if (summary === undefined || !summaryInBounds(draft)) continue;
       await client.query(
         `UPDATE bb_research.landscape_candidates
             SET summary = $2,

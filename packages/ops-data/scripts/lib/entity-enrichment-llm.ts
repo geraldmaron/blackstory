@@ -23,8 +23,8 @@ export const ENTITY_ENRICHMENT_SCHEMA_ID = 'entity_enrichment_draft.v1' as const
 export const ENTITY_ENRICHMENT_SCHEMA_VERSION = '1' as const;
 
 /** Public-projection bounds this draft must satisfy (packages/schemas/src/public-projections.ts). */
-export const SUMMARY_MIN_CHARS = 220;
-export const SUMMARY_MAX_CHARS = 400;
+export const SUMMARY_MIN_CHARS = 400;
+export const SUMMARY_MAX_CHARS = 900;
 
 export type EnrichmentEvidenceInput = {
   readonly id: string;
@@ -63,6 +63,14 @@ export type EnrichmentDraft = {
   readonly topicIds: readonly string[];
   readonly eraBuckets: readonly string[];
   readonly keywords: readonly string[];
+  /**
+   * Floor v2 (repo-2t04.1): the only way a summary under SUMMARY_MIN_CHARS is ever accepted.
+   * Requires bestEffortReason stating the evidence sweep was exhausted — never silent. Written
+   * through to the ledger's notes.draft (entity-enrichment-apply.ts) so best-effort rows stay
+   * queryable and re-sweepable once better evidence lands.
+   */
+  readonly bestEffort?: boolean;
+  readonly bestEffortReason?: string | null;
 };
 
 export type EnrichmentValidationResult =
@@ -102,7 +110,20 @@ export const ENTITY_ENRICHMENT_RESPONSE_SCHEMA = {
     properties: {
       summary: {
         type: 'string',
-        description: `${SUMMARY_MIN_CHARS}-${SUMMARY_MAX_CHARS} characters, facts only from supplied evidence.`,
+        description:
+          `${SUMMARY_MIN_CHARS}-${SUMMARY_MAX_CHARS} characters, facts only from supplied evidence. ` +
+          'A shorter summary is only accepted with bestEffort:true and a bestEffortReason stating ' +
+          'the evidence sweep was exhausted — never omit the flag to sneak under the floor.',
+      },
+      bestEffort: {
+        type: 'boolean',
+        description:
+          'true only when the full evidence sweep genuinely cannot support a ' +
+          `${SUMMARY_MIN_CHARS}-char summary. Omit or false otherwise.`,
+      },
+      bestEffortReason: {
+        type: ['string', 'null'],
+        description: 'Required when bestEffort is true: what was searched and why it fell short.',
       },
       summaryCitations: { type: 'array', minItems: 1, items: citationSchema },
       historicalContext: {
@@ -168,6 +189,10 @@ export function buildEnrichmentUserPrompt(
       })),
       rules: [
         `summary must be ${SUMMARY_MIN_CHARS}-${SUMMARY_MAX_CHARS} characters`,
+        `if — after using all supplied evidence — the entity genuinely does not support a ` +
+          `${SUMMARY_MIN_CHARS}-char summary, set bestEffort:true and bestEffortReason to what ` +
+          'was searched and why it fell short; never write a shorter summary without the flag, ' +
+          'and never set the flag to avoid the work of using the evidence fully',
         "the summary must open on the subject's significance to Black history, not on its " +
           'construction, materials, plan, or architectural style',
         'every citation.evidenceId must be one of the ids in the evidence array above',
@@ -248,7 +273,7 @@ export function createMockEnrichmentProvider(): LlmProvider {
       const evidenceText = typeof firstEvidence?.text === 'string' ? firstEvidence.text : '';
       const quote = evidenceText.slice(0, 60).trim();
       const filler = `${displayName} is documented in the supplied evidence. `
-        .repeat(6)
+        .repeat(20)
         .slice(0, SUMMARY_MAX_CHARS - 1);
       const summary = quote.length > 0 ? `${quote} ${filler}`.slice(0, SUMMARY_MAX_CHARS) : filler;
       const paddedSummary =
@@ -281,6 +306,8 @@ type RawDraft = {
   readonly topicIds?: unknown;
   readonly eraBuckets?: unknown;
   readonly keywords?: unknown;
+  readonly bestEffort?: unknown;
+  readonly bestEffortReason?: unknown;
 };
 
 function parseCitations(raw: unknown, errors: string[], fieldLabel: string): Citation[] {
@@ -424,10 +451,23 @@ export function validateEnrichmentResponse(
   const errors: string[] = [];
   const summary = typeof payload.summary === 'string' ? payload.summary : '';
   if (typeof payload.summary !== 'string') errors.push('summary is missing or not a string');
-  if (summary.length < SUMMARY_MIN_CHARS || summary.length > SUMMARY_MAX_CHARS) {
-    errors.push(
-      `summary length ${summary.length} outside [${SUMMARY_MIN_CHARS}, ${SUMMARY_MAX_CHARS}]`,
-    );
+
+  const bestEffort = payload.bestEffort === true;
+  const bestEffortReason =
+    typeof payload.bestEffortReason === 'string' ? payload.bestEffortReason.trim() : '';
+  if (bestEffort && bestEffortReason.length === 0) {
+    errors.push('bestEffort is true but bestEffortReason is missing or empty');
+  }
+
+  if (summary.length > SUMMARY_MAX_CHARS) {
+    errors.push(`summary length ${summary.length} exceeds max ${SUMMARY_MAX_CHARS}`);
+  } else if (summary.length < SUMMARY_MIN_CHARS) {
+    if (!bestEffort || bestEffortReason.length === 0) {
+      errors.push(
+        `summary length ${summary.length} below min ${SUMMARY_MIN_CHARS} without a valid ` +
+          'bestEffort:true + bestEffortReason exception',
+      );
+    }
   }
 
   const summaryCitations = parseCitations(payload.summaryCitations, errors, 'summaryCitations');
@@ -516,6 +556,7 @@ export function validateEnrichmentResponse(
         topicIds,
         eraBuckets,
         keywords,
+        ...(bestEffort ? { bestEffort: true, bestEffortReason } : {}),
       },
     },
   };
