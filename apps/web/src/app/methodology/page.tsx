@@ -11,10 +11,11 @@ import {
   TrustSiteJsonLdScript,
 } from '../../components/trust/index';
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
-import { getPublicSearchIndex } from '../../lib/public-data/source';
 import { MethodologySections } from './MethodologySections';
 import { Room } from '../../components/room';
 import '../reading-room.css';
+
+export const revalidate = 3600;
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/methodology',
@@ -24,24 +25,11 @@ export const metadata: Metadata = buildStaticPageMetadata({
 });
 
 /**
- * "See it applied" links to a currently published record. Live Postgres reads are only mounted
- * at runtime (see `apps/web/src/app/entity/[id]/page.tsx`'s note on the same constraint), so this
- * is best effort: when the catalogue cannot be reached, `MethodologySections` falls back to
- * `/records`, which is itself always live.
+ * Off-ramp stays on `/records` rather than a live catalog pick. Fetching the
+ * search index here made this receipt page dynamic and a CDN miss (~5k
+ * requests/day). MethodologySections already defaults the CTA to `/records`.
  */
-async function resolveExampleRecordHref(): Promise<string | undefined> {
-  try {
-    const { data } = await getPublicSearchIndex();
-    const first = data[0];
-    return first ? `/entity/${first.id}` : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-export default async function MethodologyPage() {
-  const exampleRecordHref = await resolveExampleRecordHref();
-
+export default function MethodologyPage() {
   return (
     <Room>
       <TrustSiteJsonLdScript />
@@ -49,7 +37,7 @@ export default async function MethodologyPage() {
         pagePath={TRUST_PATHS.methodology}
         pageTitle="Methodology"
       />
-      <MethodologySections {...(exampleRecordHref ? { exampleRecordHref } : {})} />
+      <MethodologySections />
     </Room>
   );
 }

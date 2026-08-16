@@ -9,6 +9,8 @@ import { Room, RoomHeader } from '../../components/room';
 import '../utility.css';
 import { SubmitLeadForm } from './SubmitLeadForm';
 
+export const revalidate = 86400;
+
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/submit',
   title: 'Submit a lead',

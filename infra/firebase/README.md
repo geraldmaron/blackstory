@@ -34,8 +34,8 @@ and `firebaseapphosting.googleapis.com` can be enabled.
 **Public web:** App Hosting configs retired in-repo (ADR-027). Owner deletes
 `black-book-web-production` and optional `black-book-web-staging` backends in console.
 
-**Admin (interim):** Live backend `black-book-admin-production` configured via root
-[`apphosting.admin.yaml`](../../apphosting.admin.yaml). Target host is Cloud Run + IAP.
+**Admin:** Firebase App Hosting backend `black-book-admin-production` was deleted 2026-08-15.
+Admin is the standalone Vercel project `apps/admin`. Do not recreate App Hosting.
 
 ## Data plane (ADR-011)
 

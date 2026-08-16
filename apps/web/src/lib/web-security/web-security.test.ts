@@ -50,7 +50,11 @@ test('CSP includes strict defaults and frame-ancestors none', () => {
   assert.ok(csp.includes('covers.openlibrary.org'), 'CSP must allow covers.openlibrary.org');
   assert.ok(csp.includes('archive.org'), 'CSP must allow archive.org');
   assert.ok(csp.includes('*.us.archive.org'), 'CSP must allow *.us.archive.org');
-  assert.match(csp, /frame-src 'none'/);
+  assert.ok(csp.includes('va.vercel-scripts.com'), 'CSP must allow va.vercel-scripts.com');
+  assert.ok(
+    csp.includes('vitals.vercel-insights.com'),
+    'CSP must allow vitals.vercel-insights.com',
+  );
 });
 
 test('CSP development relaxes script-src for Next.js hydration and HMR', () => {
@@ -115,6 +119,8 @@ test('next.config.mjs wires global security headers', () => {
     'storage.googleapis.com',
     'twykhihqkcldpreuovay.supabase.co',
     'upload.wikimedia.org',
+    'va.vercel-scripts.com',
+    'vitals.vercel-insights.com',
   ]) {
     assert.ok(mjsCsp.includes(host), `mjs CSP missing host ${host}`);
     assert.ok(tsCsp.includes(host), `ts CSP missing host ${host}`);

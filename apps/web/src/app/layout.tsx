@@ -24,6 +24,7 @@ import '@repo/ui/styles.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import '../lib/fontawesome';
 import { SiteShell } from '../components/SiteShell';
+import { Analytics } from '@vercel/analytics/next';
 import './shell.css';
 
 /** Archive Paper — light canvas / default splash + theme-color. */
@@ -168,6 +169,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           Skip to main content
         </a>
         <SiteShell>{children}</SiteShell>
+        <Analytics />
       </body>
     </html>
   );

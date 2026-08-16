@@ -25,10 +25,13 @@ function publicReleaseSearchIndexPath(releaseId: string): string {
   return `public/releases/${encodeURIComponent(releaseId)}/search-index.json`;
 }
 
-export type ArtifactFetchImpl = (
-  url: string,
-  init?: { readonly signal?: AbortSignal },
-) => Promise<Response>;
+export type ArtifactFetchInit = {
+  readonly signal?: AbortSignal;
+  readonly cache?: RequestCache;
+  readonly next?: { readonly revalidate: number };
+};
+
+export type ArtifactFetchImpl = (url: string, init?: ArtifactFetchInit) => Promise<Response>;
 
 function artifactBaseUrl(env: NodeJS.ProcessEnv = process.env): string | undefined {
   const configured = env.APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL?.trim();
@@ -69,7 +72,9 @@ async function fetchJsonArtifact<T>(
 ): Promise<T | undefined> {
   const env = options.env ?? process.env;
   const fetchImpl = options.fetchImpl ?? fetch;
-  const timeoutMs = options.timeoutMs ?? 8_000;
+  // 13.8 MB entities.json timed out at 8s on Vercel and fell back to the 968 ms
+  // full-catalog SQL path. 60s covers a cold Storage GET.
+  const timeoutMs = options.timeoutMs ?? 60_000;
   const url = remoteArtifactUrl(objectPath, env);
   // Not a miss worth logging: no origin configured is a deliberate "Postgres only" posture.
   if (!url) return undefined;
@@ -77,7 +82,11 @@ async function fetchJsonArtifact<T>(
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const startedAtMs = Date.now();
   try {
-    const response = await fetchImpl(url, { signal: controller.signal });
+    const response = await fetchImpl(url, {
+      signal: controller.signal,
+      cache: 'force-cache',
+      next: { revalidate: 3600 },
+    });
     if (!response.ok) {
       warnArtifactMiss(objectPath, `http ${response.status}`);
       return undefined;

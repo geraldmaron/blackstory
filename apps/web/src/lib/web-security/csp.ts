@@ -67,7 +67,18 @@ const DEFAULT_IMG_SRC = [
   ...ARTICLE_MEDIA_IMG_SRC,
   ...BOOK_COVER_IMG_SRC,
 ];
-const DEFAULT_CONNECT_SRC = ["'self'", ...MAP_TILE_SRC, ...SATELLITE_TILE_SRC];
+/** Vercel Web Analytics ingest + script host. */
+const VERCEL_ANALYTICS_SRC = [
+  'https://va.vercel-scripts.com',
+  'https://vitals.vercel-insights.com',
+];
+
+const DEFAULT_CONNECT_SRC = [
+  "'self'",
+  ...MAP_TILE_SRC,
+  ...SATELLITE_TILE_SRC,
+  ...VERCEL_ANALYTICS_SRC,
+];
 const DEFAULT_FONT_SRC = ["'self'", ...MAP_TILE_SRC];
 
 /** Build a semicolon-delimited CSP header value.  */
@@ -85,8 +96,8 @@ export function buildContentSecurityPolicy(options: CspBuildOptions = {}): strin
   // Production must allow 'unsafe-inline' until a per-request nonce pipeline lands
   // (see tracker follow-up for nonce + strict-dynamic). Dev still needs 'unsafe-eval' for HMR.
   const scriptSrc = isDev
-    ? ["'self'", "'unsafe-inline'", "'unsafe-eval'"]
-    : ["'self'", "'unsafe-inline'"];
+    ? ["'self'", "'unsafe-inline'", "'unsafe-eval'", ...VERCEL_ANALYTICS_SRC]
+    : ["'self'", "'unsafe-inline'", ...VERCEL_ANALYTICS_SRC];
   const workerSrc = ["'self'", 'blob:'];
   const resolvedConnectSrc = isDev ? [...connectSrc, 'ws:', 'wss:'] : connectSrc;
 
