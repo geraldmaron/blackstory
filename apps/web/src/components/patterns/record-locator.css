@@ -1,0 +1,78 @@
+/**
+ * The record locator: a US inset with one pin.
+ *
+ * Sized by its own aspect ratio rather than by the room, because the pin is positioned as a
+ * percentage of the same canvas the mask is drawn on. `aspect-ratio` matching the SVG viewBox is
+ * what makes `mask-size: contain` an exact fit, and an exact fit is what makes `left: 41.2%` land
+ * on Mississippi rather than near it. A room that wants a different proportion has to crop the
+ * canvas, not restretch it.
+ */
+
+.ds-locator {
+  position: relative;
+  width: 100%;
+  /* 960 x 500 — apps/web/public/geo/us-locator.svg's viewBox, and US_LOCATOR_* in albers-usa.ts. */
+  aspect-ratio: 960 / 500;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+  overflow: hidden;
+}
+
+/*
+ * The ground is a mask, not an image: the SVG carries alpha (land at 0.32, state hairlines at 1)
+ * and the colour comes from here, so the same one asset is correct in both themes instead of
+ * needing a light copy and a dark copy that drift.
+ */
+.ds-locator__ground {
+  position: absolute;
+  inset: 0;
+  background-color: var(--ds-ink-muted);
+  -webkit-mask-image: url('/geo/us-locator.svg');
+  mask-image: url('/geo/us-locator.svg');
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+/*
+ * The pin is a ring rather than a filled dot. At locator scale a solid disc reads as a region the
+ * record covers; a ring reads as a mark placed on one, which is the honest claim for a point the
+ * archive holds to city precision.
+ */
+.ds-locator__pin {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border: 2px solid var(--ds-accent-graphic);
+  border-radius: var(--ds-radius-full, 999px);
+  background: color-mix(in srgb, var(--ds-accent-graphic) 28%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ds-canvas) 70%, transparent);
+}
+
+/*
+ * The place block. `margin: 0` is load-bearing, not tidiness: this is a `<figure>`, and the UA
+ * default `margin: 1em 40px` is what shrank the locator to 112px inside a 192px rail before this
+ * stylesheet was reachable from the record page at all. `RecordPlacePreview` now imports its own
+ * `record-locator.css`, so the graphic can never again depend on a page remembering to import a
+ * sheet on its behalf — but this block is still the layout owner and still has to zero that margin.
+ */
+.ds-record-anatomy__place {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: 0;
+}
+
+.ds-record-anatomy__place-caption {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+}

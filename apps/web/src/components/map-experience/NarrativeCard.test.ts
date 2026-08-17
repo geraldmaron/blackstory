@@ -45,7 +45,9 @@ test('links Where to external maps and other metadata to the right site views', 
   assert.equal(properties.statePostalCode, 'DC');
   assert.match(html, /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=/);
   assert.match(html, /aria-label="Open [^"]+ in maps"/);
-  assert.match(html, /ds-record-anatomy__place-link/);
+  // One maps link per card, on the WHERE fact. The place figure above it used to carry a second
+  // one pointing at the same coordinates.
+  assert.equal((html.match(/ds-maps-external-link/g) ?? []).length, 1);
   assert.match(html, /rel="noopener noreferrer"/);
   assert.match(html, /target="_blank"/);
   assert.doesNotMatch(html, /href="[^"]*state=DC"/);

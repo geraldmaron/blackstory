@@ -293,15 +293,15 @@ export default async function EntityPage({ params }: EntityPageProps) {
           <h2 className="ds-room-rail-group__title" id="where-heading">
             Where
           </h2>
-          {/* SP-08: the persistent plate, borrowed into this block. This was
-              `EntityLocationCinematicMap`, which built a second MapLibre instance (and a whole
-              Rest/Engaged interaction layer) inside the record page. The record surface rests in
-              the Framed posture, so the one plate moves in when this block is on screen. */}
+          {/* A static locator, not the borrowed plate. The plate is `position: fixed` and chases
+              its slot's rect on every scroll frame, which is fine for a full-column reading moment
+              and visibly wrong in a 240px rail; the caveat directly below also holds this record to
+              city precision, which a live street camera contradicts by rendering. See
+              `RecordLocator` for the full argument. */}
           <RecordPlacePreview
             lat={geoAnchor.lat}
             lng={geoAnchor.lng}
             label={entity.locationLabel}
-            precision={entity.locationPrecision}
           />
           <Precision
             resolution={`${entity.locationPrecision} precision`}

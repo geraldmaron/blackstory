@@ -82,7 +82,10 @@ test('renders inline fact rows without legacy column strip classes', () => {
     /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=38\.9098%2C-77\.0143"/,
   );
   assert.match(html, /aria-label="Open Washington, D\.C\. in maps"/);
-  assert.match(html, /ds-record-anatomy__place-link/);
+  // Exactly one route out to maps, on the WHERE fact. The place figure used to carry a second
+  // link to the same coordinates, directly above this one.
+  assert.match(html, /ds-record-anatomy__fact-link/);
+  assert.equal((html.match(/ds-maps-external-link/g) ?? []).length, 1);
   assert.match(html, /rel="noopener noreferrer"/);
   assert.match(html, /target="_blank"/);
   assert.doesNotMatch(html, /ds-nc__facts-strip/);

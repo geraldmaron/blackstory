@@ -47,19 +47,22 @@ test('the summary is the lede and is never restated as a section', () => {
   assert.doesNotMatch(pageSource, /WhyThisAppears/);
 });
 
-test('the location is drawn once, by borrowing the plate rather than building a second map', () => {
+test('the location is drawn once, and as a static locator rather than a live camera', () => {
   const rendered = pageSource.match(/<RecordPlacePreview/g) ?? [];
   assert.equal(rendered.length, 1, 'the record must not render two maps for one place');
   assert.doesNotMatch(pageSource, /RecordAnatomyPanel/);
 
-  // SP-08 acceptance: one GL context on a record page. The place block contributes a slot for the
-  // persistent plate; constructing MapLibre here is the defect, and importing it is how that
-  // happens. Asserted on the source rather than in a browser because the harness has no WebGL.
-  // Matched on imports, not on the whole file: the module's own history note names the component
-  // it replaced, and a prose mention is not a mount.
+  // Still one GL context on a record page, and now zero. Matched on imports rather than on the
+  // whole file: the module's history note names both components it replaced, and a prose mention
+  // is not a mount.
   assert.doesNotMatch(placeSource, /^import .*maplibre-gl/m);
   assert.doesNotMatch(placeSource, /^import .*EntityLocationMap/m);
-  assert.match(placeSource, /<MapMoment/);
+  // The borrowed plate is `position: fixed` and chases its slot's rect every scroll frame, which
+  // tore visibly in a 240px rail and flickered as the slot crossed the moment visibility floor.
+  // A moment here is the regression, not a refactor: reinstating it reinstates both.
+  assert.doesNotMatch(placeSource, /^import .*MapMoment/m);
+  assert.doesNotMatch(placeSource, /<MapMoment/);
+  assert.match(placeSource, /<RecordLocator/);
 });
 
 test('a beat renders only when the record has that content', () => {
@@ -112,13 +115,21 @@ test('entity media fail-closed: mark fallback on photo exhaustion', () => {
 });
 
 test('entity map fail-closed: the place block still makes its point with no plate', () => {
-  // The degrade moved with the map. `EntityLocationMap` owned a WebGL-unavailable status message
-  // because it built its own context and could fail on its own; the place block now borrows the
-  // one plate, so its fail-closed state is the moment's: a caption that carries the point without
-  // the map, and an idle line that does not tell a reader to scroll for a plate that is refused
-  // on the Atlas sheet. Both are text, so the block survives greyscale and no-JS alike.
-  assert.match(placeSource, /note=\{caption \?\? label\}/);
-  assert.match(placeSource, /idle="The map of this place is on the Atlas\."/);
+  // The degrade moved with the map, twice. `EntityLocationMap` owned a WebGL-unavailable message
+  // because it built its own context; the `MapMoment` version owned an idle line for a plate that
+  // was never coming on the Atlas sheet. The locator needs neither: it is a mask over an ordinary
+  // block, so there is no context to lose and nothing to wait for. What has to survive is the
+  // words, because a coordinate outside the projection renders no graphic at all.
+  assert.match(placeSource, /<figcaption className="ds-record-anatomy__place-caption">\{label\}/);
+  assert.doesNotMatch(placeSource, /idle=/);
+  // And it says it once. The panel links its own WHERE fact out to maps and the page prints an
+  // `Open in maps` CTA under this block, so a third copy inside the figure was the same
+  // destination offered three times in one rail.
+  // Matched on the import, not the file: the module doc explains where the link went, and that
+  // sentence is not a link.
+  assert.doesNotMatch(placeSource, /^import .*MapsExternalLink/m);
+  assert.doesNotMatch(placeSource, /<MapsExternalLink/);
+  assert.match(pageSource, /Open in maps/);
 });
 
 test('entity user-facing copy avoids em dashes on touched surfaces', () => {
