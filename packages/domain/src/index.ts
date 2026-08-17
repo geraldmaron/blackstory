@@ -681,6 +681,7 @@ export {
   findUsStateForPoint,
   findUsStateFromJurisdictionLabel,
   findUsStateByPostalCode,
+  isDisplayableJurisdictionLabel,
   buildMapSource,
   aggregateDecadePresence,
   buildDecadePresenceAggregates,

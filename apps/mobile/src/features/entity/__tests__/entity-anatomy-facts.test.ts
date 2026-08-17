@@ -33,6 +33,16 @@ describe('buildEntityAnatomyInputs', () => {
     expect(buildEntityAnatomyInputs(entity).whereLabel).toBe('Historic Dunbar neighborhood');
   });
 
+  it('does not treat United States as a place', () => {
+    const raw = {
+      ...fullEntityFixture('place'),
+      jurisdictionLabel: 'United States',
+      locationLabel: 'Historic Dunbar neighborhood',
+    };
+    const entity = normalizeEntity(raw)!;
+    expect(buildEntityAnatomyInputs(entity).whereLabel).toBe('Historic Dunbar neighborhood');
+  });
+
   it('shows Grade only when there are zero claims', () => {
     const raw = { ...fullEntityFixture('place'), claims: [] };
     const entity = normalizeEntity(raw)!;

@@ -25,6 +25,15 @@ test('buildEntityAnatomyInputs falls back to Place withheld when jurisdiction un
   assert.equal(inputs.whereLabel, entity.locationLabel);
 });
 
+test('buildEntityAnatomyInputs does not treat United States as a place', () => {
+  const entity = requireEntity('ent_15th_st_church_001');
+  const inputs = buildEntityAnatomyInputs(
+    { ...entity, jurisdictionLabel: 'United States' },
+    undefined,
+  );
+  assert.equal(inputs.whereLabel, entity.locationLabel);
+});
+
 test('buildEntityAnatomyPlace returns undefined without geo anchor', () => {
   const entity = requireEntity('ent_15th_st_church_001');
   assert.equal(buildEntityAnatomyPlace(entity, undefined), undefined);

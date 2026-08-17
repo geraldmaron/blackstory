@@ -258,12 +258,29 @@ test('resolveJurisdictionLabel ignores placeholder Unknown strings', () => {
   );
 });
 
-test('isDisplayableJurisdictionLabel rejects empty and Unknown placeholders', () => {
+test('resolveJurisdictionLabel keeps country-only United States (bbox would mislabel St. Louis as Illinois)', () => {
+  assert.equal(
+    resolveJurisdictionLabel({
+      id: 'nrhp-black-heritage-76002235',
+      releaseId: 'rel_x',
+      kind: 'place',
+      displayName: 'Joplin, Scott, House',
+      nameLower: 'joplin, scott, house',
+      claimIds: [],
+      jurisdictionLabel: 'United States',
+      location: { lat: 38.637, lng: -90.216, geohash: '9yzg' },
+    }),
+    'United States',
+  );
+});
+
+test('isDisplayableJurisdictionLabel rejects empty, Unknown, and country-only US labels', () => {
   assert.equal(isDisplayableJurisdictionLabel(undefined), false);
   assert.equal(isDisplayableJurisdictionLabel(''), false);
   assert.equal(isDisplayableJurisdictionLabel('  '), false);
   assert.equal(isDisplayableJurisdictionLabel('Unknown'), false);
   assert.equal(isDisplayableJurisdictionLabel('UNKNOWN'), false);
+  assert.equal(isDisplayableJurisdictionLabel('United States'), false);
   assert.equal(isDisplayableJurisdictionLabel('Washington, D.C.'), true);
 });
 

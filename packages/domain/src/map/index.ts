@@ -12,6 +12,7 @@ export {
   findUsStateForPoint,
   findUsStateFromJurisdictionLabel,
   findUsStateByPostalCode,
+  isDisplayableJurisdictionLabel,
 } from './us-geography.js';
 export type { UsStateInfo } from './us-geography.js';
 

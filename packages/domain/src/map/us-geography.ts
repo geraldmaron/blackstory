@@ -203,3 +203,14 @@ export function findUsStateByPostalCode(postalCode: string): UsStateInfo | undef
   const upper = postalCode.toUpperCase();
   return US_STATES.find((s) => s.postalCode === upper);
 }
+
+/**
+ * True when a jurisdiction string is worth rendering. Empty, Unknown, and
+ * country-only US labels are placeholders: they do not locate a record.
+ */
+export function isDisplayableJurisdictionLabel(label: string | undefined): boolean {
+  const trimmed = label?.trim() ?? '';
+  if (trimmed.length === 0) return false;
+  if (/^unknown(\s+jurisdiction)?$/iu.test(trimmed)) return false;
+  return !/^(united states of america|united states|u\.s\.a\.|u\.s\.|usa)$/iu.test(trimmed);
+}
