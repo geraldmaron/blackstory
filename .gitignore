@@ -73,13 +73,13 @@ packages/data-access/generated/*/
 # .claude/ — machine-local Claude Code config (hooks, launch config, synced
 # skill libraries). Never source, except the carve-out below.
 .claude/*
-# Exception: Black Book product skills (BB-085) are committed source — thin
-# callers over tested @repo/* packages.
+# Exception: BlackStory research skills are committed source (CLI pointers and
+# judgment playbooks under `.claude/skills/blackstory/`).
 # (A gitignored parent dir can't be re-included by a child negation, so this
 # un-ignores .claude/ contents one level at a time down to the carve-out.)
 !.claude/skills/
 .claude/skills/*
-!.claude/skills/black-book/
+!.claude/skills/blackstory/
 .codex/
 .cursor/
 .vscode/
@@ -101,8 +101,10 @@ plan.md
 
 # Construct — generated adapters, launcher, and runtime state.
 # Machine-specific, recreated by `construct sync`; never source (ADR-0027).
+# `.claude/` contents stay ignored by the block above, except the
+# `.claude/skills/blackstory/` carve-out. Do not re-ignore `.claude/` here;
+# a later `.claude/` rule would hide the committed research skills.
 .construct/
-.claude/
 inbox/
 .vercel
 

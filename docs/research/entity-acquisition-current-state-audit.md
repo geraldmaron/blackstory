@@ -122,7 +122,7 @@ flowchart TB
 
 ### DEFECTS
 
-- **Stale skill references:** `.claude/skills/black-book/research-intake/SKILL.md` and `case-drafting/SKILL.md` still cite `@blap/domain` and `@blap/operator-cli`; production code uses `@repo/*`.
+- **Skill paths (2026-08-16):** research playbooks now live under `.claude/skills/blackstory/`. The `@blap/*` cites previously recorded against intake/case-drafting skills are gone; those files are CLI pointers into `docs/research/research-operations.md`.
 
 ---
 
@@ -325,7 +325,7 @@ Roster source: `packages/config/src/scheduled-jobs/roster.ts`; dispatcher job id
 | CLI commands | `submit-lead`, `research-intake`, `register-source`, `attach-evidence`, `bulk-import`, `propose-edge`, `discovery-run`, `community-obscurity-run`, `rss-campaign-run`, `discovery-dispatch`, `pending-list`, `editorial-run`, `enrichment-run`, `story-research-run`, `locate` | `packages/operator-cli/src/cli.ts:213+` |
 | Admin quick-add | Shares `runResearchIntake` | `packages/operator-cli/src/research-intake.ts:9–10` |
 | Firebase scripts | `discover-candidates.ts`, `publish-national-catalog.ts`, ingest scripts | `packages/firebase/scripts/` |
-| Agent skills | `.claude/skills/black-book/*` | Editorial enrichment, discovery-run, research-intake, etc. |
+| Agent skills | `.claude/skills/blackstory/*` | Editorial enrichment, discovery-run, research-intake, etc. |
 | Python workers | `workers/research/`, `workers/publication/` | Mirror contracts for Cloud Run |
 
 ### VERIFIED FACTS
@@ -463,7 +463,7 @@ Roster source: `packages/config/src/scheduled-jobs/roster.ts`; dispatcher job id
 
 - **TypeScript + Python duplicate contracts:** `workers/research/src/black_book_research/` mirrors `packages/domain/` adapters, discovery, query-packs, resolution (`docs/research/source-registry.md:37`, `discovery-pipeline.md:48`). Intentional parallel; drift risk if not synced.
 - **In-memory registry triplication:** Adapter registry, query-pack registry, corpus vetting store, historic-safety store — all in-memory with Firestore deferred.
-- **Stale `@blap/*` in skills:** `.claude/skills/black-book/research-intake/SKILL.md`, `case-drafting/SKILL.md` — not used by build.
+- **Skill pointers:** `.claude/skills/blackstory/research-intake/SKILL.md`, `case-drafting/SKILL.md` are CLI pointers (no `@blap/*`, not used by build).
 - **Legacy naming in workers/tests:** `black_book_research`, `admin@blackbook.local`, `black-book-efaaf` project id — rebrand-stable `@repo/*` in code; Firebase project id unchanged per `packages/config/src/identity.ts`.
 - **`mentionedEntityIds` fail-open at release:** Documented technical debt in `release-builder.ts` header.
 - **Dispatcher live fetch:** Comment states SafeHttp not wired (`discovery-dispatcher.ts:5–6`).
@@ -532,7 +532,7 @@ Roster source: `packages/config/src/scheduled-jobs/roster.ts`; dispatcher job id
 2. Pipeline: subjects JSON → `runEditorialJudge` → `buildEditorialPacket` → validation → optional `prepareEditorialPacketIntake` + `--commit`.
 3. Catalog for linkification: `loadEditorialCatalogFromFirestore` / `mergeJsonCatalogOverFirestore` (`editorial-catalog-firestore.ts`).
 4. Vectors: `suggestRelatedEntitiesFromVectors` when embeddings provided.
-5. Skill: `.claude/skills/black-book/editorial-enrichment/SKILL.md`.
+5. Skill: `.claude/skills/blackstory/editorial-enrichment/SKILL.md`.
 6. Overnight: `scripts/run-overnight-hybrid-enrichment.sh` chains discovery + enrichment with hybrid LLM.
 
 **Never publishes:** module headers + no publish CLI flag.

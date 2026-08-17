@@ -112,7 +112,8 @@ Human-or-agent researched entities (the `fixtures/national-catalog/*.json` →
   geocoders. Never snap to US state/city centroids; parent-site snaps are capped at 15km,
   otherwise retain the pin and honesty-downgrade precision. Operator one-off:
   `operator-cli locate --entity-id … --address …` (see
-  `.claude/skills/black-book/locate/SKILL.md`).
+  `.claude/skills/blackstory/locate/SKILL.md`). Finding or confirming a place without a sourced
+  address is `.claude/skills/blackstory/entity-verify`.
 - Dignity framing per BB-051: presence and institution-building, never deficit;
   `sensitivityClass` only where violence is the documented subject.
 - Claims carry `confidenceLevel` honestly (`high` only when the cited source states it

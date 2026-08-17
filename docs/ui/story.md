@@ -128,7 +128,7 @@ enter the composite — see `docs/security/threat-model.md`).
 Staged `/stories` articles use the **research linking method** from strong oral
 storytelling — start-line relocation, omitted actors, winner-built tests — without
 importing viral rhetorical costume. Skill reference:
-`.claude/skills/black-book/story-craft/SKILL.md`. Packets use
+`.claude/skills/blackstory/story-craft/SKILL.md`. Packets use
 `story.research.packet.v1`; human approval maps an approved packet onto
 `packages/firebase/src/firestore/public-story-seed.ts` (Firestore
 `publicReleases/{id}/stories/{slug}`). Nothing auto-publishes. Every published

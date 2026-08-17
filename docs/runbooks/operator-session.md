@@ -10,12 +10,12 @@ corrected 2026-08-14 — this was previously described as IAP/Firebase auth).
 
 ## The one invariant every task in this runbook respects
 
-**Proposer is never approver.** Everything in this runbook — the CLI, the four
-`.claude/skills/black-book/` skills, and the admin console's `/quick-add` route — lands data in
-the *existing*  submission quarantine and  research-case pipeline. None of it can
+**Proposer is never approver.** Everything in this runbook (the CLI, the
+`.claude/skills/blackstory/` BlackStory research skills, and the admin console's `/quick-add` route)
+lands data in the *existing*  submission quarantine and  research-case pipeline. None of it can
 publish, promote, or approve anything: `evaluatePromotionGate`
 (`packages/domain/src/promotion/controls.ts`) refuses when the approver id equals the proposer
-id, and 's `promote`/`retract` actions require a *fresh* (≤10 minute), separately
+id, and admin `promote`/`retract` actions require a *fresh* (≤10 minute), separately
 authenticated `publication`-role token (`assertRecentReauth`,
 `packages/firebase/src/admin-auth.ts`) — something a long-running operator session never holds.
 `packages/operator-cli/src/promotion-boundary.test.ts` proves this mechanically; read it if you
@@ -32,7 +32,13 @@ want to see the exact gate calls.
    consistent handle) and a fresh `--session-id` (e.g. `date +%Y%m%d-%H%M`). Both get stamped
    onto every proposal's audit event and quarantine payload.
 4. Know which surface you're using:
-   - **Claude session / terminal** → the CLI directly, or through one of the four skills below.
+   - **Claude session / terminal** → the CLI directly, or a matching `.claude/skills/blackstory/` skill.
+     CLI pointers (`research-intake`, `discovery-run`, `editorial-enrichment`, `locate`,
+     `case-drafting`, `story-craft`, `theme-study`, `triage-graylist`) load a verb from
+     `docs/research/research-operations.md`. Judgment playbooks (`entity-verify`,
+     `claim-corroborate`, `entity-complete`, `coverage-target`, `publish-preview`) have
+     no verb of their own. `locate` Census-geocodes a sourced address;
+     identity, place, and era belong to `entity-verify`.
    - **Admin console** → `/quick-add` (paste a URL, see below) or `/console` (read-only fixture
      shell today — see its "Known gaps" note).
 
@@ -49,7 +55,7 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts subm
 ```
 
 Prints the prepared quarantine submission + draft research case as JSON. Nothing is written
-until you add `--commit`. See `.claude/skills/black-book/research-intake/SKILL.md` for the
+until you add `--commit`. See `.claude/skills/blackstory/research-intake/SKILL.md` for the
 fetch-first variant (`research-intake` command), which pre-fills the citation from the URL.
 
 ### Register a source
@@ -74,9 +80,9 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts atta
   --operator-id "$OPERATOR_ID" --session-id "$SESSION_ID"
 ```
 
-See `.claude/skills/black-book/case-drafting/SKILL.md` for evaluating what a case is missing
+See `.claude/skills/blackstory/case-drafting/SKILL.md` for evaluating what a case is missing
 before you go looking for a source to fill it, and
-`.claude/skills/black-book/triage-graylist/SKILL.md` for walking already-parked candidates.
+`.claude/skills/blackstory/triage-graylist/SKILL.md` for walking already-parked candidates.
 
 ### Bulk-import leads from CSV or markdown notes
 
@@ -102,7 +108,7 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts disc
 
 Requires an already-assembled batch file (`{pack, records, runContext}`) — this command runs
 the real  gate over it and reports yield; it does not fetch from any adapter itself. See
-`.claude/skills/black-book/discovery-run/SKILL.md`.
+`.claude/skills/blackstory/discovery-run/SKILL.md`.
 
 ### Run community-feed obscurity discovery (dry-run)
 
@@ -151,7 +157,7 @@ GEMINI_API_KEY=... DATABASE_URL=... \
 ```
 
 Add `--commit` only after review — stages quarantine `editorial_packet` proposals, never
-publishes. Skill: `.claude/skills/black-book/editorial-enrichment/SKILL.md`.
+publishes. Skill: `.claude/skills/blackstory/editorial-enrichment/SKILL.md`.
 
 ### Commit a prepared proposal
 

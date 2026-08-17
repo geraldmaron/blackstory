@@ -53,13 +53,22 @@ cp -rf source dest          # NOT: cp -r source dest
 
 See `apps/mobile/README.md` for setup (`API_BASE_URL=http://127.0.0.1:8080` in `apps/mobile/.env.local`).
 
-## Research Verbs (black-book lanes)
+## BlackStory research lanes
 
-Canonical how-to for every research/operator-cli verb lives in
-[`docs/research/research-operations.md`](docs/research/research-operations.md) — read it before
-running any of these. This index is the same for any tool/agent (Claude Code, opencode, or a
-bare shell); per-tool skill files (`.claude/skills/black-book/*`) are pointers only, no unique
-content. All commands: `node --conditions development --import tsx packages/operator-cli/src/bin.ts <verb> [flags]`. Every verb accepts `--json`; entity targets use `--entity-id`, case targets use `--case-id`.
+Two skill kinds live under `.claude/skills/blackstory/`:
+
+- **CLI pointers** (`research-intake`, `discovery-run`, `editorial-enrichment`, `locate`,
+  `case-drafting`, `story-craft`, `theme-study`, `triage-graylist`) match a verb and then read
+  [`docs/research/research-operations.md`](docs/research/research-operations.md). They do not
+  duplicate command flags.
+- **Judgment playbooks** (`entity-verify`, `claim-corroborate`, `entity-complete`,
+  `coverage-target`, `publish-preview`) carry decision order, source ladders, and Do/Never.
+  They have no operator-cli verb of their own.
+
+`blackstory-locate` Census-geocodes a sourced address (no LLM). Finding the place, confirming
+which namesake, and assigning era is `blackstory-entity-verify`.
+
+All commands: `node --conditions development --import tsx packages/operator-cli/src/bin.ts <verb> [flags]`. Every verb accepts `--json`; entity targets use `--entity-id`, case targets use `--case-id`. Read the operations doc before running a verb.
 
 | Lane | When to use | Exact command |
 |---|---|---|
@@ -70,7 +79,7 @@ content. All commands: `node --conditions development --import tsx packages/oper
 | prose-run | Short-form prose draft for one subject (lighter than story-research-run) | `prose-run --entity-id <id> --provider mock --operator-id "$USER" --session-id "<id>"` |
 | story-research-run | Draft/recommend longform `/stories` articles via citation-gated story packets | `story-research-run --topics <topics.json> --provider mock --operator-id "$USER" --session-id "<id>"` |
 | harness-run | Run a thematic study (redlining, urban renewal) and draft ThemeImpactPackets | `harness-run --theme <theme> --metro <metro> --connectors dpla,nps-network-to-freedom,shpo --output <out.json>` |
-| locate | Resolve/correct an entity's lat/lng via Census geocoding (no LLM) | `locate --entity-id <id> --address "<address>" --precision institution --operator-id "$USER" --session-id "<id>"` |
+| locate | Census-geocode a sourced address to lat/lng (no LLM). Finding the place is `blackstory-entity-verify`. | `locate --entity-id <id> --address "<address>" --precision institution --operator-id "$USER" --session-id "<id>"` |
 | case-drafting (`attach-evidence`) | Check if a research case is review-ready; fill missing evidence | `attach-evidence --case-id "<id>" --description "<what this fills>" --source-url "<url>" --operator-id "$USER" --session-id "<id>"` |
 | triage-graylist (`graylist-read`, `attach-evidence`) | Walk parked/weak-signal candidates; corroborate or recommend | `graylist-read --limit 20` (Postgres only — see doc); `attach-evidence` to corroborate |
 | expand (stub) | Grow an entity's network outward from an id — pending repo-xez5.4 | `expand --entity-id <id> --depth 1` |
