@@ -66,6 +66,7 @@ import {
 } from './lib/evidence-collectors/reference-hops.ts';
 import { hostLineageKey, isTier1Host, isWikipediaHost } from './lib/tier1-sources.ts';
 import { safeFetchPage } from './lib/safe-fetch.ts';
+import { collectNcesNavigatorEvidence } from './lib/evidence-collectors/nces-navigator.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(SCRIPT_DIR, '../../..');
@@ -371,6 +372,37 @@ async function collectDcHpo(row: CandidateRow): Promise<EvidenceRow | null> {
       licence: 'CC BY 4.0',
       quarantineReason: quality.usable ? undefined : quality.reason,
     },
+  };
+}
+
+/**
+ * NCES College Navigator — second-lineage source for the `us-ed-hbcu-*` lane (repo-2t04.6).
+ * `collectNcesNavigatorEvidence` returns null for any entity_id without a `us-ed-hbcu-<UNITID>`
+ * shape, so this is a no-op skip for every other lane.
+ */
+async function collectNcesNavigator(row: CandidateRow): Promise<EvidenceRow | null> {
+  const result = await collectNcesNavigatorEvidence({
+    entityId: row.id,
+    displayName: row.display_name,
+    city: row.payload.city,
+    county: row.payload.county,
+    state: row.payload.state,
+  });
+  if (result === null) throw new SkipReason('not a us-ed-hbcu row or Navigator page did not corroborate HBCU status');
+  return {
+    id: evidenceId(row.id, result.collector, result.sourceUrl),
+    entityId: row.id,
+    lane: row.lane,
+    collector: result.collector,
+    sourceUrl: result.sourceUrl,
+    sourceTier: result.sourceTier,
+    title: result.title,
+    contentText: result.contentText,
+    contentHash: result.contentHash,
+    charCount: result.charCount,
+    qualityScore: result.qualityScore,
+    status: result.status,
+    provenance: result.provenance,
   };
 }
 
@@ -696,6 +728,7 @@ async function sweepEntity(row: CandidateRow): Promise<EntityOutcome> {
     ['wikipedia', collectWikipedia],
     ['dc-hpo', collectDcHpo],
     ['person-wikipedia', collectPersonWikipedia],
+    ['nces-navigator', collectNcesNavigator],
   ] as const) {
     try {
       const found = await collect(row);
@@ -794,19 +827,20 @@ async function main(): Promise<void> {
             COALESCE(citations.urls, ARRAY[]::text[]) AS "publicClaimCitationUrls"
        FROM bb_research.landscape_candidates lc
        JOIN active a ON true
-       -- An explicit id is only eligible when that exact entity is in the active public release.
-       -- Do not join source_item_id or a same-name record: that would bind a different entity's
-       -- citations to this candidate.
-       JOIN bb_public.release_entities re
+       -- Publication is optional: a candidate not yet in the active release (e.g. blocked by the
+       -- confidence gate) is still a legitimate evidence-sweep target, it just contributes no
+       -- restored-claim-source citations. Do not join source_item_id or a same-name record: that
+       -- would bind a different entity's citations to this candidate.
+       LEFT JOIN bb_public.release_entities re
          ON re.release_id = a.release_id
         AND re.entity_id = lc.id
-       CROSS JOIN LATERAL (
+       LEFT JOIN LATERAL (
          SELECT array_agg(DISTINCT claim->>'citationHref')
                   FILTER (WHERE claim->>'citationHref' ~ '^https://') AS urls
            FROM jsonb_array_elements(
              COALESCE(re.projection->'claims', re.claims, '[]'::jsonb)
            ) AS claim
-       ) citations
+       ) citations ON re.entity_id IS NOT NULL
       WHERE lc.id = ANY($1::text[])
       ORDER BY lc.id`,
     [targeted],
@@ -814,9 +848,7 @@ async function main(): Promise<void> {
   const resolvedIds = new Set(rows.rows.map((row) => row.id));
   for (const entityId of targeted) {
     if (!resolvedIds.has(entityId)) {
-      console.log(
-        `${entityId} — skipped: no matching active-release entity with typed claim citations`,
-      );
+      console.log(`${entityId} — skipped: no matching bb_research.landscape_candidates row`);
     }
   }
 
