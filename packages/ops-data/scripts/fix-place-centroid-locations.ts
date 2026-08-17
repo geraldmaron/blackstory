@@ -39,6 +39,17 @@ const APPLY = process.env.PLACE_CENTROID_FIX_APPLY === '1';
 /** Geohash character precision the affected rows already store. */
 const GEOHASH_PRECISION = 5;
 
+/**
+ * How a corrected point was derived, written to BOTH copies.
+ *
+ * `matchMethod` is published — it reaches `PublicEntityView.geoAnchor.matchMethod` and the explore
+ * map source — so it is a claim about provenance, not an internal note. The first run of this
+ * script set it on the canonical row and left the release JSON saying `manual_research`, which
+ * meant the archive was published as having hand-researched a coordinate it took from a Census
+ * file. One constant now feeds both writes.
+ */
+const MATCH_METHOD = 'census-gazetteer-place-centroid';
+
 const GAZETTEER_URL = (stateFips: string) =>
   `https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_gaz_place_${stateFips}.txt`;
 
@@ -132,10 +143,28 @@ async function main(): Promise<void> {
         );
       }
 
-      const current = await client.query<{ id: string; lat: number; lng: number; label: string }>(
-        `SELECT id, lat, lng, label FROM bb_canonical.entity_locations WHERE entity_id = $1`,
+      const current = await client.query<{
+        id: string;
+        lat: number;
+        lng: number;
+        label: string;
+        match_method: string | null;
+        geo_lat: number | null;
+        geo_lng: number | null;
+      }>(
+        `SELECT id, lat, lng, label, match_method,
+                ST_X(location::geometry) AS geo_lng, ST_Y(location::geometry) AS geo_lat
+           FROM bb_canonical.entity_locations WHERE entity_id = $1`,
         [fix.entityId],
       );
+      const published = await client.query<{ match_method: string | null }>(
+        `SELECT location->>'matchMethod' AS match_method
+           FROM bb_public.release_entities
+          WHERE entity_id = $1
+            AND release_id = (SELECT release_id FROM bb_public.v_active_release_id)`,
+        [fix.entityId],
+      );
+      const publishedMethod = published.rows[0]?.match_method ?? null;
       if (current.rowCount === 0) {
         console.log(`SKIP ${fix.entityId}: no canonical location row`);
         skipped += 1;
@@ -150,25 +179,60 @@ async function main(): Promise<void> {
           { lat: Number(row.lat), lng: Number(row.lng) },
           { lat: place.lat, lng: place.lng },
         );
-        // Already inside the place it names: leave it alone. Rewriting a correct site-level
-        // point to a town centroid would be a coarsening, not a correction.
-        if (drift < 5_000) {
+        const coordinateSettled = drift < 5_000;
+        /*
+         * `entity_locations` stores the point THREE times: the `lat`/`lng` scalars, the `geohash`,
+         * and a PostGIS `geography` column. The first version of this script moved the scalars and
+         * left the geography behind, so the row read as Mound Bayou to the site and as Cartersville
+         * to any spatial query — a radius search would still have found this record in Georgia.
+         * Nothing failed; the row was simply internally inconsistent, and it was the only such row
+         * in 4,110. Checking it here is what makes re-running repair it.
+         */
+        const geographySettled =
+          row.geo_lat !== null &&
+          row.geo_lng !== null &&
+          Math.abs(Number(row.geo_lat) - place.lat) < 0.0001 &&
+          Math.abs(Number(row.geo_lng) - place.lng) < 0.0001;
+        // Provenance is part of the correction, not decoration. Checking it separately from the
+        // coordinate is what makes this script idempotent in the way that matters: a row whose
+        // point is already right but whose two copies disagree about where the point came from
+        // gets repaired by re-running, instead of needing a hand-written UPDATE that lives in
+        // nobody's version control.
+        const provenanceSettled =
+          row.match_method === MATCH_METHOD && publishedMethod === MATCH_METHOD;
+
+        // Already inside the place it names, and both copies agree how it got there: leave it
+        // alone. Rewriting a correct site-level point to a town centroid would be a coarsening,
+        // not a correction.
+        if (coordinateSettled && provenanceSettled && geographySettled) {
           console.log(`SKIP ${fix.entityId} (${row.id}): already within ${Math.round(drift)}m`);
           skipped += 1;
           continue;
         }
 
-        console.log(
-          [
-            `FIX  ${fix.entityId} (${row.id})`,
-            `  label   ${row.label}`,
-            `  from    ${row.lat}, ${row.lng}`,
-            `  to      ${place.lat}, ${place.lng}  (Census ${place.name}, ${fix.stateName}, GEOID ${place.geoid})`,
-            `  drift   ${Math.round(drift / 1000)} km`,
-            `  geohash ${geohash}`,
-            `  why     ${fix.reason}`,
-          ].join('\n'),
-        );
+        if (coordinateSettled) {
+          console.log(
+            [
+              `FIX  ${fix.entityId} (${row.id}) — coordinate already correct, other copies stale`,
+              `  canonical match_method  ${row.match_method ?? '(null)'} -> ${MATCH_METHOD}`,
+              `  release   matchMethod   ${publishedMethod ?? '(null)'} -> ${MATCH_METHOD}`,
+              `  postgis   geography     ${row.geo_lng ?? '(null)'}, ${row.geo_lat ?? '(null)'} -> ${place.lng}, ${place.lat}`,
+            ].join('\n'),
+          );
+        }
+
+        if (!coordinateSettled)
+          console.log(
+            [
+              `FIX  ${fix.entityId} (${row.id})`,
+              `  label   ${row.label}`,
+              `  from    ${row.lat}, ${row.lng}`,
+              `  to      ${place.lat}, ${place.lng}  (Census ${place.name}, ${fix.stateName}, GEOID ${place.geoid})`,
+              `  drift   ${Math.round(drift / 1000)} km`,
+              `  geohash ${geohash}`,
+              `  why     ${fix.reason}`,
+            ].join('\n'),
+          );
 
         if (DRY_RUN || !APPLY) {
           skipped += 1;
@@ -180,9 +244,11 @@ async function main(): Promise<void> {
           await client.query(
             `UPDATE bb_canonical.entity_locations
                 SET lat = $2, lng = $3, geohash = $4, geohash_prefixes = $5,
-                    match_method = 'census-gazetteer-place-centroid', updated_at = now()
+                    match_method = $6,
+                    location = ST_SetSRID(ST_MakePoint($3, $2), 4326)::geography,
+                    updated_at = now()
               WHERE id = $1`,
-            [row.id, place.lat, place.lng, geohash, prefixes],
+            [row.id, place.lat, place.lng, geohash, prefixes, MATCH_METHOD],
           );
           // The published release carries its own copy: the site reads bb_public, so a canonical
           // fix alone would leave the wrong pin live until the next full republish.
@@ -192,13 +258,15 @@ async function main(): Promise<void> {
                     location = jsonb_set(
                       jsonb_set(
                         jsonb_set(
-                          jsonb_set(location, '{lat}', to_jsonb($2::double precision)),
-                          '{lng}', to_jsonb($3::double precision)),
-                        '{geohash}', to_jsonb($4::text)),
-                      '{geohashPrefixes}', to_jsonb($5::text[]))
+                          jsonb_set(
+                            jsonb_set(location, '{lat}', to_jsonb($2::double precision)),
+                            '{lng}', to_jsonb($3::double precision)),
+                          '{geohash}', to_jsonb($4::text)),
+                        '{geohashPrefixes}', to_jsonb($5::text[])),
+                      '{matchMethod}', to_jsonb($6::text))
               WHERE entity_id = $1
                 AND release_id = (SELECT release_id FROM bb_public.v_active_release_id)`,
-            [fix.entityId, place.lat, place.lng, geohash, prefixes],
+            [fix.entityId, place.lat, place.lng, geohash, prefixes, MATCH_METHOD],
           );
           await client.query('COMMIT');
           applied += 1;
