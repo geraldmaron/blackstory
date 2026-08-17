@@ -45,6 +45,12 @@ const WEB_INVENTORY = [
     definition:
       'Like most websites, infrastructure may record IP address, user agent, request path, and timestamps in server logs for security and reliability. These logs are operational, not sold, not used for ad targeting, and not linked to an account because there is none.',
   },
+  {
+    id: 'web-analytics',
+    term: 'Visit measurement',
+    definition:
+      'The public site records pageviews and a coarse traffic class (likely human, automated, search crawler, AI crawler, or tool) so operators can tell people from scrapers. The class is an enum only. It is not a user id, not a stored fingerprint, and not used for advertising.',
+  },
 ] as const;
 
 const MOBILE_INVENTORY = [
@@ -77,7 +83,7 @@ const MOBILE_INVENTORY = [
 const NOT_COLLECTED_RULES = [
   'No user accounts at launch, on web or in the mobile app.',
   'No advertising SDKs, no ad identifiers (IDFA/GAID), and no App Tracking Transparency prompt because nothing tracks.',
-  'No general analytics or attribution SDKs beyond privacy-safe, redacted developer diagnostics.',
+  'No advertising or attribution SDKs. Public web records pageviews and a coarse traffic class (enum only) via host analytics. The mobile app has no user-behavior analytics product.',
   'No push notifications, social sign-in, contacts access, camera, microphone, or background location at mobile launch.',
   'No sale of personal information and no cross-context behavioral advertising.',
 ] as const;

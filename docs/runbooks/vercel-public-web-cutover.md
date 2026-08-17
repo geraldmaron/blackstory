@@ -130,7 +130,9 @@ Owner flipped Cloudflare DNS to Vercel (apex A + www CNAME, DNS-only). Post-flip
 
 **Soak closed:** Vercel is the sole public web host. Public web App Hosting configs are removed from the repo. Firebase backends `black-book-web-production` and `black-book-web-staging` were deleted 2026-07-22. Admin App Hosting + Cloud Run `black-book-admin-production` were deleted 2026-08-15.
 
-**Web Analytics (2026-08-15):** Enable on the Vercel project (`vercel project web-analytics`), ship `<Analytics />` from `@vercel/analytics/next`, and allow `va.vercel-scripts.com` + `vitals.vercel-insights.com` in CSP. Redeploy Production so the 60s artifact timeout and analytics script actually run.
+**Web Analytics (2026-08-15):** Enable on the Vercel project (`vercel project web-analytics`), ship `<WebAnalytics />` (pageviews plus a classified `traffic` custom event), and allow `va.vercel-scripts.com` + `vitals.vercel-insights.com` in CSP. Redeploy Production so the 60s artifact timeout and analytics script actually run.
+
+**Traffic by class:** each JS pageview also sends `track('traffic', { class })` where `class` is one of `likely_human`, `automated`, `search_crawler`, `ai_crawler`, `tool`. Query the Vercel `events` dataset, filter `eventName eq 'traffic'`, group by `eventData/class`. This only sees clients that run the analytics script. Search crawlers that do not execute JS will not appear. Stealth scrapers that spoof a full browser can still land in `likely_human`.
 
 ## Rollback
 
