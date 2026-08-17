@@ -8,40 +8,9 @@
  * `NEXT_PUBLIC_SITE_URL` once the production domain is live so `sitemap`/host resolve correctly.
  */
 import type { MetadataRoute } from 'next';
+import { AI_TRAINING_USER_AGENTS } from '../lib/traffic-class/agent-lists';
 
-/**
- * Crawlers that identify themselves as AI-training or bulk-AI-ingestion agents.
- * Not exhaustive and not guaranteed to be honored see the file header note above.
- * Review periodically (fold into scheduled maintenance) as new agents appear.
- */
-export const AI_TRAINING_USER_AGENTS: readonly string[] = [
-  'GPTBot',
-  'ChatGPT-User',
-  'OAI-SearchBot',
-  'ClaudeBot',
-  'Claude-Web',
-  'anthropic-ai',
-  'CCBot',
-  'Google-Extended',
-  'GoogleOther',
-  'Bytespider',
-  'PetalBot',
-  'Amazonbot',
-  'Applebot-Extended',
-  'FacebookBot',
-  'Meta-ExternalAgent',
-  'meta-externalagent',
-  'Diffbot',
-  'ImagesiftBot',
-  'Omgilibot',
-  'Omgili',
-  'cohere-ai',
-  'cohere-training-data-crawler',
-  'PerplexityBot',
-  'YouBot',
-  'Timpibot',
-  'Ai2Bot',
-];
+export { AI_TRAINING_USER_AGENTS };
 
 function siteUrl(): string {
   return process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3048';

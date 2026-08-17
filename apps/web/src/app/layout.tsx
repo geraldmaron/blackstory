@@ -23,8 +23,8 @@ import { THEME_BOOTSTRAP_SCRIPT } from '@repo/ui';
 import '@repo/ui/styles.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import '../lib/fontawesome';
+import { WebAnalytics } from '../components/analytics/WebAnalytics';
 import { SiteShell } from '../components/SiteShell';
-import { Analytics } from '@vercel/analytics/next';
 import './shell.css';
 
 /** Archive Paper — light canvas / default splash + theme-color. */
@@ -169,7 +169,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           Skip to main content
         </a>
         <SiteShell>{children}</SiteShell>
-        <Analytics />
+        <WebAnalytics />
       </body>
     </html>
   );
