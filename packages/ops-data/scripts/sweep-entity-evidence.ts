@@ -846,9 +846,62 @@ async function main(): Promise<void> {
     [targeted],
   );
   const resolvedIds = new Set(rows.rows.map((row) => row.id));
+  const unresolvedAfterLandscape = targeted.filter((id) => !resolvedIds.has(id));
+
+  // repo-qe6j: curated one-off entities (ent_/recon_/lynching_/west_ prefixes, hand-authored
+  // directly against bb_canonical rather than sourced from a landscape_candidates row) were
+  // silently dropped here entirely — no collector ever ran for them. They are still real,
+  // published entities with real citationHref values on their public claims, so build a
+  // synthetic CandidateRow straight from bb_public.release_entities for any id that survives
+  // the landscape_candidates lookup unresolved.
+  if (unresolvedAfterLandscape.length > 0) {
+    const fallback = await pool.query<{
+      id: string;
+      display_name: string;
+      payload: CandidateRow['payload'];
+      publicClaimCitationUrls: readonly string[];
+    }>(
+      `WITH active AS (
+         SELECT release_id FROM bb_public.active_release LIMIT 1
+       )
+       SELECT re.entity_id AS id,
+              re.projection->>'displayName' AS display_name,
+              jsonb_build_object(
+                'kind', re.projection->>'kind',
+                'city', split_part(re.projection->>'locationLabel', ', ', 1),
+                'state', split_part(re.projection->>'locationLabel', ', ', 2)
+              ) AS payload,
+              COALESCE(citations.urls, ARRAY[]::text[]) AS "publicClaimCitationUrls"
+         FROM bb_public.release_entities re
+         JOIN active a ON re.release_id = a.release_id
+         LEFT JOIN LATERAL (
+           SELECT array_agg(DISTINCT claim->>'citationHref')
+                    FILTER (WHERE claim->>'citationHref' ~ '^https://') AS urls
+             FROM jsonb_array_elements(
+               COALESCE(re.projection->'claims', re.claims, '[]'::jsonb)
+             ) AS claim
+         ) citations ON true
+        WHERE re.entity_id = ANY($1::text[])`,
+      [unresolvedAfterLandscape],
+    );
+    for (const row of fallback.rows) {
+      rows.rows.push({
+        id: row.id,
+        // No landscape lane concept for a curated one-off; derive a stable label from the id's
+        // own prefix so collectors that branch on lane (e.g. dc-hpo's dc-sites check) behave
+        // exactly as they would for any other non-dc-sites row.
+        lane: row.id.split(/[_-]/u)[0] ?? 'curated',
+        display_name: row.display_name,
+        payload: row.payload,
+        publicClaimCitationUrls: row.publicClaimCitationUrls,
+      });
+      resolvedIds.add(row.id);
+    }
+  }
+
   for (const entityId of targeted) {
     if (!resolvedIds.has(entityId)) {
-      console.log(`${entityId} — skipped: no matching bb_research.landscape_candidates row`);
+      console.log(`${entityId} — skipped: no matching landscape_candidates or release_entities row`);
     }
   }
 
