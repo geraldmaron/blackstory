@@ -27,7 +27,7 @@
  *   `researchCoverage`, revision timestamps) fall back to the same honest placeholders
  *   `apps/web`'s `map-projection.ts` uses — never fabricated curated content.
  */
-import { buildGraphTimeline, isUndatedTimelineEntry, findUsStateForPoint } from '@repo/domain';
+import { buildGraphTimeline, findUsStateForPoint, isUndatedTimelineEntry } from '@repo/domain';
 import type { TimelineEventV1 } from '@repo/public-contracts/v1/timeline';
 import { ENTITY_KINDS, entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
 import type { ClaimV1 } from '@repo/public-contracts/v1/claim';
@@ -88,15 +88,25 @@ function mapLocationPrecision(precision: string | undefined): EntityV1['location
   return 'city';
 }
 
-function isDisplayableJurisdictionLabel(label: string | undefined): boolean {
+/**
+ * Stored labels that should not be replaced by bbox state attribution.
+ * Empty and Unknown still fall through to coordinates. Country-only
+ * "United States" stays stored until republish (repo-2t04.2/repo-tjqn): the
+ * lat/lng fallback below is bbox-based and gets border cases wrong — the
+ * Shelley House (St. Louis) pin sits in the Illinois/Missouri bbox overlap,
+ * so swapping a stored "United States" for a coordinate guess here would
+ * trade one placeholder for a confidently wrong state. Matches
+ * apps/web's map-projection.ts of the same name and for the same reason.
+ */
+function isUsableStoredJurisdictionLabel(label: string | undefined): boolean {
   const trimmed = label?.trim() ?? '';
   if (trimmed.length === 0) return false;
-  return !/^unknown$/iu.test(trimmed);
+  return !/^unknown(\s+jurisdiction)?$/iu.test(trimmed);
 }
 
 function resolveJurisdictionLabel(projection: PublicEntityProjectionDoc): string {
   const explicit = projection.jurisdictionLabel?.trim();
-  if (explicit && isDisplayableJurisdictionLabel(explicit)) {
+  if (explicit && isUsableStoredJurisdictionLabel(explicit)) {
     return explicit;
   }
   const lat = projection.location?.lat;
