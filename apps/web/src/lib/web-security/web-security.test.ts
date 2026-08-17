@@ -40,21 +40,29 @@ test('CSP includes strict defaults and frame-ancestors none', () => {
   assert.match(csp, /object-src 'none'/);
   assert.match(csp, /upgrade-insecure-requests/);
   assert.match(csp, /worker-src 'self' blob:/);
-  assert.ok(csp.includes('demotiles.maplibre.org'), 'CSP must allow demotiles.maplibre.org');
-  assert.ok(csp.includes('storage.googleapis.com'), 'CSP must allow storage.googleapis.com');
-  assert.ok(
-    csp.includes('twykhihqkcldpreuovay.supabase.co'),
-    'CSP must allow twykhihqkcldpreuovay.supabase.co',
-  );
-  // Banned-books covers: Open Library + archive.org redirect chain (see BOOK_COVER_IMG_SRC).
-  assert.ok(csp.includes('covers.openlibrary.org'), 'CSP must allow covers.openlibrary.org');
-  assert.ok(csp.includes('archive.org'), 'CSP must allow archive.org');
-  assert.ok(csp.includes('*.us.archive.org'), 'CSP must allow *.us.archive.org');
-  assert.ok(csp.includes('va.vercel-scripts.com'), 'CSP must allow va.vercel-scripts.com');
-  assert.ok(
-    csp.includes('vitals.vercel-insights.com'),
-    'CSP must allow vitals.vercel-insights.com',
-  );
+  /*
+   * Whole source expressions, not substrings.
+   *
+   * `csp.includes('archive.org')` also passes on a policy that only allowed `evil-archive.org`,
+   * which is the opposite of what an allow-list assertion is for — and it is what CodeQL's
+   * js/incomplete-url-substring-sanitization was pointing at. Splitting the policy on its own
+   * delimiters and asking a Set for the exact source expression means the test fails if a host is
+   * ever widened, shortened, or swapped for a lookalike.
+   */
+  const sources = new Set(csp.split(/[\s;]+/u).filter(Boolean));
+  for (const source of [
+    'https://demotiles.maplibre.org',
+    'https://storage.googleapis.com',
+    'https://twykhihqkcldpreuovay.supabase.co',
+    // Banned-books covers: Open Library + archive.org redirect chain (see BOOK_COVER_IMG_SRC).
+    'https://covers.openlibrary.org',
+    'https://archive.org',
+    'https://*.us.archive.org',
+    'https://va.vercel-scripts.com',
+    'https://vitals.vercel-insights.com',
+  ]) {
+    assert.ok(sources.has(source), `CSP must allow ${source} as a whole source expression`);
+  }
 });
 
 test('CSP development relaxes script-src for Next.js hydration and HMR', () => {

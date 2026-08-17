@@ -388,7 +388,8 @@ async function collectNcesNavigator(row: CandidateRow): Promise<EvidenceRow | nu
     county: row.payload.county,
     state: row.payload.state,
   });
-  if (result === null) throw new SkipReason('not a us-ed-hbcu row or Navigator page did not corroborate HBCU status');
+  if (result === null)
+    throw new SkipReason('not a us-ed-hbcu row or Navigator page did not corroborate HBCU status');
   return {
     id: evidenceId(row.id, result.collector, result.sourceUrl),
     entityId: row.id,
@@ -901,7 +902,9 @@ async function main(): Promise<void> {
 
   for (const entityId of targeted) {
     if (!resolvedIds.has(entityId)) {
-      console.log(`${entityId} — skipped: no matching landscape_candidates or release_entities row`);
+      console.log(
+        `${entityId} — skipped: no matching landscape_candidates or release_entities row`,
+      );
     }
   }
 

@@ -114,10 +114,7 @@ describe('unitIdFromEntityId', () => {
 
 describe('navigatorUrl', () => {
   it('builds the stable College Navigator URL for a UNITID', () => {
-    assert.equal(
-      navigatorUrl('107840'),
-      'https://nces.ed.gov/collegenavigator/?id=107840',
-    );
+    assert.equal(navigatorUrl('107840'), 'https://nces.ed.gov/collegenavigator/?id=107840');
   });
 });
 
@@ -231,7 +228,7 @@ describe('synthesizeNcesNarrative', () => {
     assert.equal(assessText(narrative).usable, true);
   });
 
-  it('expands NCES\'s USPS directional abbreviation in the address to a full word', () => {
+  it("expands NCES's USPS directional abbreviation in the address to a full word", () => {
     // NCES prints "N Little Rock", not "North Little Rock" — the exact shape of mismatch that
     // would otherwise fail the shared place-identity gate on an abbreviation, not a wrong
     // subject. `parseCollegeNavigatorFacts` expands it (see `expandDirectionalAbbreviations`)

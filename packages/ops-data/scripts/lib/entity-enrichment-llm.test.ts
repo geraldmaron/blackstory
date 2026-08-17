@@ -93,7 +93,11 @@ test('rejects a summary over the 900-char ceiling regardless of bestEffort', () 
   const attempt = validateEnrichmentResponse(
     baseSubject(),
     ['business'],
-    validResponse({ summary: overCeilingSummary, bestEffort: true, bestEffortReason: 'irrelevant' }),
+    validResponse({
+      summary: overCeilingSummary,
+      bestEffort: true,
+      bestEffortReason: 'irrelevant',
+    }),
   );
   assert.equal(attempt.validation.ok, false);
   if (!attempt.validation.ok) {
@@ -130,7 +134,8 @@ test('accepts a 350-char summary with bestEffort:true and a real reason, and car
     validResponse({
       summary: shortSummary,
       bestEffort: true,
-      bestEffortReason: 'Full evidence sweep found only a brief NPS listing entry; no further ' +
+      bestEffortReason:
+        'Full evidence sweep found only a brief NPS listing entry; no further ' +
         'tier-1 or tier-2 sources named this subject.',
       summaryCitations: [
         { evidenceId: 'ev_1', quote: 'John Doe operated a business at this site starting in 1925' },

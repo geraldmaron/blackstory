@@ -453,13 +453,21 @@ test('resolveReleaseEntityReferences rejects "address" precision for a living or
   for (const livingStatus of ['living', 'unknown'] as const) {
     const entry = baseEntry({ kind: 'person', locationPrecision: 'address', livingStatus });
     const result = resolveReleaseEntityReferences(entry, [], []);
-    assert.equal(result.ok, false, `expected "address" to be rejected for livingStatus=${livingStatus}`);
+    assert.equal(
+      result.ok,
+      false,
+      `expected "address" to be rejected for livingStatus=${livingStatus}`,
+    );
     if (!result.ok) assert.match(result.reason, /precision ceiling/);
   }
 });
 
 test('resolveReleaseEntityReferences allows "address" precision for a confirmed-deceased person', () => {
-  const entry = baseEntry({ kind: 'person', locationPrecision: 'address', livingStatus: 'deceased' });
+  const entry = baseEntry({
+    kind: 'person',
+    locationPrecision: 'address',
+    livingStatus: 'deceased',
+  });
   const result = resolveReleaseEntityReferences(entry, [], []);
   assert.equal(result.ok, true);
 });

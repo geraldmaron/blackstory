@@ -70,15 +70,28 @@ export type CollegeNavigatorFacts = {
   readonly isHbcu: true;
 };
 
-/** Decodes the handful of HTML entities that appear in this page's plain-text fields. */
+const HTML_ENTITIES: Readonly<Record<string, string>> = {
+  '&amp;': '&',
+  '&nbsp;': ' ',
+  '&#39;': "'",
+  '&quot;': '"',
+  '&lt;': '<',
+  '&gt;': '>',
+};
+
+/**
+ * Decodes the handful of HTML entities that appear in this page's plain-text fields.
+ *
+ * One pass, not a chain of `.replace`. Decoding `&amp;` first and `&#39;` afterwards turns the
+ * literal source text `&amp;#39;` into an apostrophe — NCES's page said `&#39;` and the collector
+ * would record that it said `'`. A single alternation consumes each entity exactly once, so
+ * nothing this function outputs is fed back through it. (CodeQL js/double-escaping.)
+ */
 function decodeEntities(text: string): string {
-  return text
-    .replace(/&amp;/gu, '&')
-    .replace(/&nbsp;/gu, ' ')
-    .replace(/&#39;/gu, "'")
-    .replace(/&quot;/gu, '"')
-    .replace(/&lt;/gu, '<')
-    .replace(/&gt;/gu, '>');
+  return text.replace(
+    /&(?:amp|nbsp|quot|lt|gt|#39);/gu,
+    (entity) => HTML_ENTITIES[entity] ?? entity,
+  );
 }
 
 /** Strips tags from a `<td>` cell's inner HTML, turning `<br />` into a list separator. */
@@ -172,7 +185,10 @@ export function parseCollegeNavigatorFacts(
   const typeLine = rows.get('Type')?.[0];
   const [level, control] =
     typeLine !== undefined && typeLine.includes(',')
-      ? [typeLine.slice(0, typeLine.indexOf(',')).trim(), typeLine.slice(typeLine.indexOf(',') + 1).trim()]
+      ? [
+          typeLine.slice(0, typeLine.indexOf(',')).trim(),
+          typeLine.slice(typeLine.indexOf(',') + 1).trim(),
+        ]
       : [undefined, typeLine];
 
   const campusSetting = rows.get('Campus setting')?.[0];
@@ -251,9 +267,7 @@ export function synthesizeNcesNarrative(facts: CollegeNavigatorFacts): string {
     campusFacts.push(`a student-to-faculty ratio of ${facts.studentFacultyRatio}`);
   }
   if (campusFacts.length > 0) {
-    sentences.push(
-      `As reported to NCES, ${facts.name} has ${formatList(campusFacts)}.`,
-    );
+    sentences.push(`As reported to NCES, ${facts.name} has ${formatList(campusFacts)}.`);
   }
 
   if (facts.campusSetting !== undefined) {

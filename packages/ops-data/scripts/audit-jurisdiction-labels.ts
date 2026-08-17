@@ -33,7 +33,14 @@ function connectionString(): string {
 
 /** First underscore-delimited segment(s) that identify a lane, without over-splitting ids like `ent_authority_net_...`. */
 function lanePrefix(entityId: string): string {
-  const known = ['nrhp-black-heritage', 'dc-black', 'dc-sites', 'us-ed', 'negro-leagues', 'sundown'];
+  const known = [
+    'nrhp-black-heritage',
+    'dc-black',
+    'dc-sites',
+    'us-ed',
+    'negro-leagues',
+    'sundown',
+  ];
   for (const prefix of known) {
     if (entityId.startsWith(`${prefix}-`) || entityId.startsWith(`${prefix}_`)) return prefix;
   }
