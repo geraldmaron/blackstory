@@ -135,7 +135,7 @@ GEMINI_API_KEY=... APP_FIREBASE_ALLOW_PRODUCTION=1 FIREBASE_PROJECT_ID=black-boo
   --source=publicSearchIndex --max-items 600 --max-cost-usd 1
 ```
 
-Skill: `.claude/skills/black-book/editorial-enrichment/SKILL.md`.
+Skill: `.claude/skills/blackstory/editorial-enrichment/SKILL.md`.
 
 ## Deferred (not this bead)
 

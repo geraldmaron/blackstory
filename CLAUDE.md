@@ -98,6 +98,13 @@ to merge). This is enforced server-side, not just a convention.
 - If you're unsure whether a change belongs on `staging` alone or should also go to `main`,
   default to `staging` and ask.
 
+## BlackStory research skills
+
+Research playbooks live in `.claude/skills/blackstory/`. CLI pointers load a verb from
+`docs/research/research-operations.md`. Judgment playbooks (`entity-verify`,
+`claim-corroborate`, `entity-complete`, `coverage-target`, `publish-preview`) have unique
+content. See `AGENTS.md` for the lane index.
+
 ## Web local QA (agents)
 
 The web dev server is `preview_start {name: "web"}` on port 3048.

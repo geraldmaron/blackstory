@@ -11,8 +11,11 @@ const LONG_ENOUGH_SUMMARY =
   'John Doe operated a business at this site starting in 1925, documented in the National ' +
   'Register nomination for the property, which describes the founding and early decades in detail. ' +
   'The business served local residents during a formative period and its documented operations ' +
-  'provide a record of community economic life.';
-assert.ok(LONG_ENOUGH_SUMMARY.length >= SUMMARY_MIN_CHARS && LONG_ENOUGH_SUMMARY.length <= 400);
+  'provide a record of community economic life. The nomination further records that the business ' +
+  'anchored a block of Black-owned enterprises through the 1940s, employing residents of the ' +
+  'surrounding neighborhood and hosting community gatherings until it closed in 1958, after which ' +
+  'the building passed through several owners before its 1979 listing on the National Register.';
+assert.ok(LONG_ENOUGH_SUMMARY.length >= SUMMARY_MIN_CHARS && LONG_ENOUGH_SUMMARY.length <= 900);
 
 function atMinimumSummary(value: string): string {
   return value.padEnd(SUMMARY_MIN_CHARS, ' ');
@@ -61,7 +64,7 @@ test('accepts a well-formed response with an anchored citation', () => {
   }
 });
 
-test('rejects a 156-character summary below the 220-char floor', () => {
+test('rejects a 156-character summary below the 400-char floor without bestEffort', () => {
   const underFloorSummary =
     'John Doe operated a business at this site starting in 1925. The property records a documented local business history and its role in the neighborhood during that period.'.slice(
       0,
@@ -80,7 +83,69 @@ test('rejects a 156-character summary below the 220-char floor', () => {
   );
   assert.equal(attempt.validation.ok, false);
   if (!attempt.validation.ok) {
-    assert.ok(attempt.validation.errors.some((error) => error.includes('length')));
+    assert.ok(attempt.validation.errors.some((error) => error.includes('below min')));
+  }
+});
+
+test('rejects a summary over the 900-char ceiling regardless of bestEffort', () => {
+  const overCeilingSummary = LONG_ENOUGH_SUMMARY.repeat(3);
+  assert.ok(overCeilingSummary.length > 900);
+  const attempt = validateEnrichmentResponse(
+    baseSubject(),
+    ['business'],
+    validResponse({
+      summary: overCeilingSummary,
+      bestEffort: true,
+      bestEffortReason: 'irrelevant',
+    }),
+  );
+  assert.equal(attempt.validation.ok, false);
+  if (!attempt.validation.ok) {
+    assert.ok(attempt.validation.errors.some((error) => error.includes('exceeds max')));
+  }
+});
+
+test('rejects a 350-char summary with bestEffort:true but no reason', () => {
+  const shortSummary = LONG_ENOUGH_SUMMARY.slice(0, 350);
+  const attempt = validateEnrichmentResponse(
+    baseSubject(),
+    ['business'],
+    validResponse({
+      summary: shortSummary,
+      bestEffort: true,
+      summaryCitations: [
+        { evidenceId: 'ev_1', quote: 'John Doe operated a business at this site starting in 1925' },
+      ],
+    }),
+  );
+  assert.equal(attempt.validation.ok, false);
+  if (!attempt.validation.ok) {
+    assert.ok(
+      attempt.validation.errors.some((error) => error.includes('bestEffortReason is missing')),
+    );
+  }
+});
+
+test('accepts a 350-char summary with bestEffort:true and a real reason, and carries it into the draft', () => {
+  const shortSummary = LONG_ENOUGH_SUMMARY.slice(0, 350);
+  const attempt = validateEnrichmentResponse(
+    baseSubject(),
+    ['business'],
+    validResponse({
+      summary: shortSummary,
+      bestEffort: true,
+      bestEffortReason:
+        'Full evidence sweep found only a brief NPS listing entry; no further ' +
+        'tier-1 or tier-2 sources named this subject.',
+      summaryCitations: [
+        { evidenceId: 'ev_1', quote: 'John Doe operated a business at this site starting in 1925' },
+      ],
+    }),
+  );
+  assert.equal(attempt.validation.ok, true);
+  if (attempt.validation.ok) {
+    assert.equal(attempt.validation.draft.bestEffort, true);
+    assert.ok(attempt.validation.draft.bestEffortReason?.includes('evidence sweep'));
   }
 });
 
@@ -181,7 +246,7 @@ test('rejects address-shaped tokens in generated prose for a restricted-address 
     'as documented in the National Register nomination form on file with the state office.';
   assert.ok(
     atMinimumSummary(summaryWithAddress).length >= SUMMARY_MIN_CHARS &&
-      atMinimumSummary(summaryWithAddress).length <= 400,
+      atMinimumSummary(summaryWithAddress).length <= 900,
   );
   const attempt = validateEnrichmentResponse(
     subject,
@@ -215,7 +280,7 @@ test('rejects address-shaped tokens for a person entity even without restrictedA
     'according to the encyclopedia article documenting her decades of civic involvement.';
   assert.ok(
     atMinimumSummary(summaryWithAddress).length >= SUMMARY_MIN_CHARS &&
-      atMinimumSummary(summaryWithAddress).length <= 400,
+      atMinimumSummary(summaryWithAddress).length <= 900,
   );
   const attempt = validateEnrichmentResponse(
     subject,
@@ -297,7 +362,7 @@ test('rejects a summary that copies raw registry vocabulary out of the source', 
     '(black) as well as agriculture in the National Register listing for the site.';
   assert.ok(
     atMinimumSummary(summaryWithCode).length >= SUMMARY_MIN_CHARS &&
-      atMinimumSummary(summaryWithCode).length <= 400,
+      atMinimumSummary(summaryWithCode).length <= 900,
   );
   const attempt = validateEnrichmentResponse(
     subject,
@@ -382,7 +447,7 @@ test('accepts prose that uses the words "ethnic heritage" naturally', () => {
     'the church remained the center of Black community life in the district for several decades.';
   assert.ok(
     atMinimumSummary(summary).length >= SUMMARY_MIN_CHARS &&
-      atMinimumSummary(summary).length <= 400,
+      atMinimumSummary(summary).length <= 900,
   );
   const attempt = validateEnrichmentResponse(
     subject,

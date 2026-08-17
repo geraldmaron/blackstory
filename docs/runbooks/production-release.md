@@ -1,14 +1,9 @@
 # Runbook: Production release pipeline
 
-> **2026-08-14 correction (partial — needs a full pass, see `repo-euqi`):** the Admin section
-> below (App Hosting / `apphosting.admin.yaml` / Firebase CLI rollout) describes a state that
-> `docs/data/firebase-wind-down.md` records as superseded 2026-07-25 — Admin is now a standalone
-> Vercel project (`apps/admin/vercel.json`), deployed from git main like public web, with no
-> GCP/Cloud Run/App Hosting involved. The Firestore rules/indexes references likewise predate the
-> Postgres cutover (ADR-020): Firestore has no live database, rules, or indexes left. Treat the
-> Public web / Vercel guidance in this file as current; treat the Admin/App-Hosting and
-> Firestore-rules steps as historical until someone rewrites them against the actual Vercel admin
-> deploy flow.
+> **2026-08-15:** Admin App Hosting + Cloud Run `black-book-admin-production` are deleted. Do not
+> recreate them. Admin is the standalone Vercel project `apps/admin`. The Admin/App-Hosting and
+> Firestore-rules steps below are historical. Public web / Vercel guidance is current. Full rewrite
+> still tracked separately.
 
 **Scope:** End-to-end release procedure for BlackStory — from merged PR through staging
 validation, progressive release metadata, protected production approval, deploy to each surface,

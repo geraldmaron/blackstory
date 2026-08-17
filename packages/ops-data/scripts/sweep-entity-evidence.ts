@@ -64,8 +64,9 @@ import {
   planReferenceHops,
   type HopSubject,
 } from './lib/evidence-collectors/reference-hops.ts';
-import { hostLineageKey, isWikipediaHost } from './lib/tier1-sources.ts';
+import { hostLineageKey, isTier1Host, isWikipediaHost } from './lib/tier1-sources.ts';
 import { safeFetchPage } from './lib/safe-fetch.ts';
+import { collectNcesNavigatorEvidence } from './lib/evidence-collectors/nces-navigator.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(SCRIPT_DIR, '../../..');
@@ -111,6 +112,11 @@ type CandidateRow = {
   readonly id: string;
   readonly lane: string;
   readonly display_name: string;
+  /**
+   * Citation URLs read directly from the matching active release projection. Unlike landscape
+   * payload fields, this is a typed public-claim boundary and cannot be supplied by intake.
+   */
+  readonly publicClaimCitationUrls: readonly string[];
   readonly payload: {
     readonly refnum?: string;
     readonly city?: string;
@@ -367,6 +373,97 @@ async function collectDcHpo(row: CandidateRow): Promise<EvidenceRow | null> {
       quarantineReason: quality.usable ? undefined : quality.reason,
     },
   };
+}
+
+/**
+ * NCES College Navigator — second-lineage source for the `us-ed-hbcu-*` lane (repo-2t04.6).
+ * `collectNcesNavigatorEvidence` returns null for any entity_id without a `us-ed-hbcu-<UNITID>`
+ * shape, so this is a no-op skip for every other lane.
+ */
+async function collectNcesNavigator(row: CandidateRow): Promise<EvidenceRow | null> {
+  const result = await collectNcesNavigatorEvidence({
+    entityId: row.id,
+    displayName: row.display_name,
+    city: row.payload.city,
+    county: row.payload.county,
+    state: row.payload.state,
+  });
+  if (result === null)
+    throw new SkipReason('not a us-ed-hbcu row or Navigator page did not corroborate HBCU status');
+  return {
+    id: evidenceId(row.id, result.collector, result.sourceUrl),
+    entityId: row.id,
+    lane: row.lane,
+    collector: result.collector,
+    sourceUrl: result.sourceUrl,
+    sourceTier: result.sourceTier,
+    title: result.title,
+    contentText: result.contentText,
+    contentHash: result.contentHash,
+    charCount: result.charCount,
+    qualityScore: result.qualityScore,
+    status: result.status,
+    provenance: result.provenance,
+  };
+}
+
+/**
+ * Captures documents already cited by the matching active-release public claims but never
+ * materialized into entity_evidence. The URLs come only from
+ * `release_entities.projection.claims[].citationHref`, selected in the query below. Ordinary
+ * landscape payload fields are intentionally not consulted: they are intake data, not evidence
+ * provenance. A row with no matching claim citation fails closed.
+ */
+async function collectRestoredClaimSources(row: CandidateRow): Promise<EvidenceRow[]> {
+  const urls = [...new Set(row.publicClaimCitationUrls)].slice(0, 3);
+  if (urls.length === 0) throw new SkipReason('no active-release claim citation URLs on row');
+
+  const evidence: EvidenceRow[] = [];
+  for (const citationHref of urls) {
+    const page = await safeFetchPage(citationHref, { allowedContentTypes: ['text/html'] });
+    if (page === undefined) continue;
+    const quality = assessText(page.text);
+    const identity = checkSubjectIdentity(
+      page.text,
+      {
+        displayName: row.display_name,
+        city: row.payload.city,
+        county: row.payload.county,
+        state: row.payload.state,
+      },
+      { title: row.display_name },
+    );
+    const status: 'captured' | 'quarantined' =
+      quality.usable && identity.corroborated ? 'captured' : 'quarantined';
+    evidence.push({
+      // Keep the typed claim citation as the durable evidence URL. `finalUrl` may be a redirect
+      // target and need not itself appear on the claim, which would break provenance rechecks.
+      id: evidenceId(row.id, 'restored-claim-source', citationHref),
+      entityId: row.id,
+      lane: row.lane,
+      collector: 'restored-claim-source',
+      sourceUrl: citationHref,
+      sourceTier: isTier1Host(citationHref) ? 'tier1' : 'tier2',
+      title: row.display_name,
+      contentText: page.text,
+      contentHash: hashContent(page.text),
+      charCount: page.text.length,
+      qualityScore: quality.score,
+      status,
+      provenance: {
+        restoredFrom: 'bb_public.release_entities.projection.claims[].citationHref',
+        citationHref,
+        fetchedFinalUrl: page.finalUrl,
+        identity,
+        quarantineReason:
+          status === 'quarantined' ? (identity.reason ?? quality.reason) : undefined,
+      },
+    });
+  }
+  if (evidence.length === 0) {
+    throw new SkipReason('no restored claim source passed safe fetch');
+  }
+  return evidence;
 }
 
 /**
@@ -632,6 +729,7 @@ async function sweepEntity(row: CandidateRow): Promise<EntityOutcome> {
     ['wikipedia', collectWikipedia],
     ['dc-hpo', collectDcHpo],
     ['person-wikipedia', collectPersonWikipedia],
+    ['nces-navigator', collectNcesNavigator],
   ] as const) {
     try {
       const found = await collect(row);
@@ -644,6 +742,15 @@ async function sweepEntity(row: CandidateRow): Promise<EntityOutcome> {
       notes.push(`${name}: ${prefix} — ${(error as Error).message}`);
     }
     await sleep(FETCH_DELAY_MS);
+  }
+
+  try {
+    evidence.push(
+      ...(await collectRestoredClaimSources(row)).map((item) => finalizeEvidenceRow(row, item)),
+    );
+  } catch (error) {
+    const prefix = error instanceof SkipReason ? 'skip' : 'error';
+    notes.push(`restored-claim-source: ${prefix} — ${(error as Error).message}`);
   }
 
   let leads: EntityOutcome['leads'] = [];
@@ -711,12 +818,95 @@ async function main(): Promise<void> {
   }
 
   const rows = await pool.query<CandidateRow>(
-    `SELECT id, lane, display_name, payload
-       FROM bb_research.landscape_candidates
-      WHERE id = ANY($1::text[])
-      ORDER BY id`,
+    `WITH active AS (
+       SELECT release_id FROM bb_public.active_release LIMIT 1
+     )
+     SELECT lc.id,
+            lc.lane,
+            lc.display_name,
+            lc.payload,
+            COALESCE(citations.urls, ARRAY[]::text[]) AS "publicClaimCitationUrls"
+       FROM bb_research.landscape_candidates lc
+       JOIN active a ON true
+       -- Publication is optional: a candidate not yet in the active release (e.g. blocked by the
+       -- confidence gate) is still a legitimate evidence-sweep target, it just contributes no
+       -- restored-claim-source citations. Do not join source_item_id or a same-name record: that
+       -- would bind a different entity's citations to this candidate.
+       LEFT JOIN bb_public.release_entities re
+         ON re.release_id = a.release_id
+        AND re.entity_id = lc.id
+       LEFT JOIN LATERAL (
+         SELECT array_agg(DISTINCT claim->>'citationHref')
+                  FILTER (WHERE claim->>'citationHref' ~ '^https://') AS urls
+           FROM jsonb_array_elements(
+             COALESCE(re.projection->'claims', re.claims, '[]'::jsonb)
+           ) AS claim
+       ) citations ON re.entity_id IS NOT NULL
+      WHERE lc.id = ANY($1::text[])
+      ORDER BY lc.id`,
     [targeted],
   );
+  const resolvedIds = new Set(rows.rows.map((row) => row.id));
+  const unresolvedAfterLandscape = targeted.filter((id) => !resolvedIds.has(id));
+
+  // repo-qe6j: curated one-off entities (ent_/recon_/lynching_/west_ prefixes, hand-authored
+  // directly against bb_canonical rather than sourced from a landscape_candidates row) were
+  // silently dropped here entirely — no collector ever ran for them. They are still real,
+  // published entities with real citationHref values on their public claims, so build a
+  // synthetic CandidateRow straight from bb_public.release_entities for any id that survives
+  // the landscape_candidates lookup unresolved.
+  if (unresolvedAfterLandscape.length > 0) {
+    const fallback = await pool.query<{
+      id: string;
+      display_name: string;
+      payload: CandidateRow['payload'];
+      publicClaimCitationUrls: readonly string[];
+    }>(
+      `WITH active AS (
+         SELECT release_id FROM bb_public.active_release LIMIT 1
+       )
+       SELECT re.entity_id AS id,
+              re.projection->>'displayName' AS display_name,
+              jsonb_build_object(
+                'kind', re.projection->>'kind',
+                'city', split_part(re.projection->>'locationLabel', ', ', 1),
+                'state', split_part(re.projection->>'locationLabel', ', ', 2)
+              ) AS payload,
+              COALESCE(citations.urls, ARRAY[]::text[]) AS "publicClaimCitationUrls"
+         FROM bb_public.release_entities re
+         JOIN active a ON re.release_id = a.release_id
+         LEFT JOIN LATERAL (
+           SELECT array_agg(DISTINCT claim->>'citationHref')
+                    FILTER (WHERE claim->>'citationHref' ~ '^https://') AS urls
+             FROM jsonb_array_elements(
+               COALESCE(re.projection->'claims', re.claims, '[]'::jsonb)
+             ) AS claim
+         ) citations ON true
+        WHERE re.entity_id = ANY($1::text[])`,
+      [unresolvedAfterLandscape],
+    );
+    for (const row of fallback.rows) {
+      rows.rows.push({
+        id: row.id,
+        // No landscape lane concept for a curated one-off; derive a stable label from the id's
+        // own prefix so collectors that branch on lane (e.g. dc-hpo's dc-sites check) behave
+        // exactly as they would for any other non-dc-sites row.
+        lane: row.id.split(/[_-]/u)[0] ?? 'curated',
+        display_name: row.display_name,
+        payload: row.payload,
+        publicClaimCitationUrls: row.publicClaimCitationUrls,
+      });
+      resolvedIds.add(row.id);
+    }
+  }
+
+  for (const entityId of targeted) {
+    if (!resolvedIds.has(entityId)) {
+      console.log(
+        `${entityId} — skipped: no matching landscape_candidates or release_entities row`,
+      );
+    }
+  }
 
   const outcomes: EntityOutcome[] = [];
   let index = 0;

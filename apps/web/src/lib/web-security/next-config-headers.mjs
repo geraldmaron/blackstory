@@ -8,9 +8,10 @@ export function securityHeadersForNextConfig() {
   const isDev = process.env.NODE_ENV !== 'production';
   // Keep in sync with csp.ts — production needs 'unsafe-inline' for Next RSC flight
   // scripts until a nonce pipeline lands.
+  const vercelAnalytics = 'https://va.vercel-scripts.com https://vitals.vercel-insights.com';
   const scriptSrc = isDev
-    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-    : "script-src 'self' 'unsafe-inline'";
+    ? `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${vercelAnalytics}`
+    : `script-src 'self' 'unsafe-inline' ${vercelAnalytics}`;
   const mapTiles = 'https://demotiles.maplibre.org https://tiles.openfreemap.org';
   // Keep in sync with csp.ts DEFAULT_IMG_SRC (GCS + Supabase public-media + book covers).
   const publicMedia = 'https://storage.googleapis.com https://twykhihqkcldpreuovay.supabase.co';
@@ -20,8 +21,8 @@ export function securityHeadersForNextConfig() {
   // Open Library cover URLs redirect to archive.org / ia*.us.archive.org — allow each hop.
   const bookCovers = 'https://covers.openlibrary.org https://archive.org https://*.us.archive.org';
   const connectSrc = isDev
-    ? `connect-src 'self' ws: wss: ${mapTiles}`
-    : `connect-src 'self' ${mapTiles}`;
+    ? `connect-src 'self' ws: wss: ${mapTiles} ${vercelAnalytics}`
+    : `connect-src 'self' ${mapTiles} ${vercelAnalytics}`;
   const cspParts = [
     "default-src 'self'",
     "base-uri 'self'",

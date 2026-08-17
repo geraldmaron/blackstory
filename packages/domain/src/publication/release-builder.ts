@@ -50,7 +50,7 @@ import {
 import { deriveCatalogEntityStatus } from '../derive-catalog-status.js';
 import { resolveEraBucketsFromEvidence } from '../era.js';
 import { findTemplateSummarySignature } from './template-summary-signatures.js';
-import type { LivingStatus } from '../living.js';
+import { treatAsLiving, type LivingStatus } from '../living.js';
 import { sanitizePublicProseText } from '../editorial/prose-links.js';
 import { evaluateNotabilityGate } from '../relevance/notability-gate.js';
 import { evaluateFactPublishGate } from '../facts/publish-gate.js';
@@ -580,9 +580,56 @@ export function resolveReleaseEntityReferences(
       reason: 'locationPrecision does not resolve to a real precision level (empty)',
     };
   }
+  if (PROHIBITED_LOCATION_PRECISIONS.has(entry.locationPrecision.trim().toLowerCase())) {
+    return {
+      ok: false,
+      reason: `locationPrecision "${entry.locationPrecision}" is a prohibited public precision level (constitution policy.v1.json publicPrecisionRules.prohibited)`,
+    };
+  }
+  // repo-2t04.3 — living-person privacy rail, enforced in the publish path itself rather than
+  // only declared in constitution policy.v1.json (packages/schemas/src/constitution/policy.v1.json
+  // livingPersonRules.neverReturnResidentialPublicly). treatAsLiving('unknown') is true, so a
+  // person entry with no recorded status gets the same protection as a confirmed-living one.
+  if (
+    entry.kind === 'person' &&
+    treatAsLiving(entry.livingStatus ?? 'unknown') &&
+    LIVING_PERSON_MAX_PRECISION_DENYLIST.has(entry.locationPrecision.trim().toLowerCase())
+  ) {
+    return {
+      ok: false,
+      reason:
+        `locationPrecision "${entry.locationPrecision}" exceeds the public precision ceiling for ` +
+        'a living or possibly-living person (constitution livingResidenceMaxPublicPrecision)',
+    };
+  }
 
   return { ok: true };
 }
+
+/** constitution policy.v1.json publicPrecisionRules.prohibited — never a real precision level. */
+const PROHIBITED_LOCATION_PRECISIONS: ReadonlySet<string> = new Set([
+  'street_address',
+  'unit',
+  'parcel',
+  'exact_coordinates',
+  'residence',
+]);
+
+/**
+ * Precision levels a living/possibly-living person's OWN location must never carry (constitution
+ * livingResidenceMaxPublicPrecision: "city"; neverReturnResidentialPublicly). "address" is the
+ * live corpus's actual street-level precision tier — repo-2t04.3's audit found 9 person records
+ * carrying it, 7 of them long-deceased historical figures (fine: a dead person's childhood home
+ * is a historical fact, not a privacy risk) and 2 status="unknown" (treatAsLiving = true). One of
+ * those two, recon_j_w_randolph, is a bare street address ("315 Clark Avenue, Pass Christian,
+ * Mississippi") with no institutional context — exactly what this rule exists to catch.
+ * "institution" and "campus" are deliberately NOT in this set: repo-2t04.3 verified all 57 live
+ * person records carrying those precisions are workplace/alma-mater/memorial associations, which
+ * the constitution's public-precision rules allow outright, not residences. Likewise "site" — the
+ * 3 live unknown-status persons carrying it are cemetery burial sites and a state capitol
+ * convention site, not residences.
+ */
+const LIVING_PERSON_MAX_PRECISION_DENYLIST: ReadonlySet<string> = new Set(['address']);
 
 const US_STATES_BY_NAME_LENGTH_DESC: readonly (typeof US_STATES)[number][] = [...US_STATES].sort(
   (a, b) => b.name.length - a.name.length,

@@ -84,6 +84,13 @@
   text-align: center;
 }
 
+/* Below the rail breakpoint the rail stacks under the column, where full-width buttons are wrong. */
+@media (max-width: 67.9375rem) {
+  .ds-record-rail-block__actions > * {
+    flex: 0 1 auto;
+  }
+}
+
 .ds-record-rail-block__release {
   margin: var(--ds-space-3) 0 0;
   font-size: 10px;
@@ -92,24 +99,12 @@
   overflow-wrap: anywhere;
 }
 
-/* The map is square-ish in a 15rem rail rather than the wide strip it was in the column.
-   SP-08 retired `.ds-entity-location-map` and `.ds-cinematic-map` with the second MapLibre
-   instance they styled, so the place block is now the room kit's map moment. The proportion is
-   set through the kit's token rather than by restating its slot selector here: the room decides
-   how tall its own rail is, and the kit keeps sole ownership of the block. */
-.ds-record-rail-block {
-  --ds-mapmoment-aspect: 4 / 3;
-}
-
-/* Below the rail breakpoint the rail stacks under the column, where a 4:3 map is too tall. */
-@media (max-width: 67.9375rem) {
-  .ds-record-rail-block {
-    --ds-mapmoment-aspect: 16 / 9;
-  }
-
-  .ds-record-rail-block__actions > * {
-    flex: 0 1 auto;
-  }
+/* The place block sits flush in the rail. The locator brings its own proportion (the projection's
+   960x500 canvas) rather than taking one from the room: the pin is positioned as a percentage of
+   that canvas, so a room that restretched the box would move the pin off the place it marks. What
+   the room still owns is the space around it. */
+.ds-record-rail-block .ds-record-anatomy__place {
+  margin-top: var(--ds-space-3);
 }
 
 /* Rubric sentences, set as sentences. These were chips before, which meant cutting them off
@@ -155,12 +150,4 @@
    is one column of rows, so every value gets the full width and the labels stay aligned. */
 .ds-record-rail-block .ds-room-anat {
   grid-template-columns: 1fr;
-}
-
-/* The map's "View interactive map" control is sized for a full-width figure and covered most of
-   a rail-width tile. Scaled to the rail, keeping the 44px tap target the pattern guarantees. */
-.ds-record-rail-block .ds-explore-map-control {
-  padding: 0 var(--ds-space-3);
-  font-size: 0.8125rem;
-  max-width: calc(100% - var(--ds-space-4));
 }

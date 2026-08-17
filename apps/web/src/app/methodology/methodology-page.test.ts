@@ -80,6 +80,11 @@ test('methodology preserves core trust copy', () => {
   }
 });
 
+test('methodology does not fetch the live catalog', () => {
+  assert.doesNotMatch(pageSource, /getPublicSearchIndex/);
+  assert.match(pageSource, /export const revalidate = 3600/);
+});
+
 test('methodology user-facing copy avoids em dashes', () => {
   const strings = [
     METHODOLOGY_INTRO_LEDE,

@@ -7,6 +7,10 @@ import { buildExternalMapsSearchUrl } from '../../lib/geography/external-maps-ur
 import { MapsExternalLink } from '../map-experience/MapsExternalLink';
 import { EditionFactIcon, type EditionFactIconProps } from './EditionFactIcon';
 import { RecordPlacePreview } from './RecordPlacePreview';
+// The panel owns its own stylesheet rather than trusting each route to import it. `/entity/[id]`
+// did not, and the place block fell back to the UA `<figure>` margin — 40px a side inside a 192px
+// rail, which is what left the map 112px wide.
+import './record-anatomy.css';
 
 void React;
 
@@ -64,15 +68,7 @@ function whereFactValue(
 
 function PlaceSlot({ place }: { readonly place: RecordAnatomyPlace | undefined }) {
   if (place) {
-    return (
-      <RecordPlacePreview
-        lat={place.lat}
-        lng={place.lng}
-        label={place.label}
-        precision={place.precision}
-        {...(place.precisionCaption ? { caption: place.precisionCaption } : {})}
-      />
-    );
+    return <RecordPlacePreview lat={place.lat} lng={place.lng} label={place.label} />;
   }
 
   return (

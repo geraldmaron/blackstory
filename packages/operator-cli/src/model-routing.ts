@@ -32,7 +32,7 @@ export type RoutingTier =
   | 'trusted-session';
 
 /**
- * Research lanes as named by `.claude/skills/black-book/*` and the operator-cli commands that
+ * Research lanes as named by `.claude/skills/blackstory/*` and the operator-cli commands that
  * back them (`cli.ts`: research-intake, discovery-run, editorial-run/enrichment-run,
  * story-research-run). `theme-study` and `case-drafting` do not yet call an LLM through this
  * module (theme-study drafts via the editorial bridge already covered by editorial-enrichment;

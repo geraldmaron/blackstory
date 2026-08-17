@@ -269,3 +269,24 @@ test('with no citations carried, the plate count still speaks for the record', (
   assert.match(html, /6 sources/);
   assert.match(html, /This record cites 6 sources\./);
 });
+
+/*
+ * A reader who clicks a pin is asking about that entity. The sheet is a preview of its page, so
+ * the page has to be reachable from the two places the reader looks first — the name they just
+ * clicked, and the actions row — not only from a line under Sources that renders in one branch.
+ */
+test('the record page is reachable from the name and from the actions row', () => {
+  const html = render({ record: { ...RECORD, href: '/entity/ent_gaston_motel' } });
+  assert.match(
+    html,
+    /<a class="ds-sheet__name-link" href="\/entity\/ent_gaston_motel">A.G. Gaston Motel<\/a>/,
+  );
+  assert.match(html, /href="\/entity\/ent_gaston_motel"[^>]*>Open record</);
+});
+
+test('without an href the sheet offers no dead link, and the primary slot stays filled', () => {
+  const html = render({ onFlyToPlace: () => {} });
+  assert.equal(html.includes('Open record'), false);
+  assert.equal(html.includes('ds-sheet__name-link'), false);
+  assert.match(html, /ds-sheet__action ds-sheet__action--primary[^>]*>Fly to place</);
+});

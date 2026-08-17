@@ -264,8 +264,20 @@ export function RecordSheet({
             <span aria-hidden="true">·</span>
             <span>{record.era}</span>
           </p>
+          {/*
+           * The name is the way out of the sheet and onto the record. A reader who clicks a pin
+           * is asking about that entity, and the sheet is a preview of it — without a link on the
+           * thing they clicked, the only route to the page was a conditional line buried under
+           * Sources, which does not render at all when the sheet already carries citations.
+           */}
           <h2 className="ds-sheet__name" id="ds-sheet-name">
-            {record.name}
+            {record.href ? (
+              <a className="ds-sheet__name-link" href={record.href}>
+                {record.name}
+              </a>
+            ) : (
+              record.name
+            )}
           </h2>
         </div>
 
@@ -292,10 +304,22 @@ export function RecordSheet({
         </p>
 
         <div className="ds-sheet__actions">
+          {/*
+           * Opening the record is the primary action, and it takes the one filled slot the accent
+           * hierarchy allows (§8) — so `Fly to place`, which keeps the reader where they already
+           * are, drops to the plain treatment.
+           */}
+          {record.href ? (
+            <a className="ds-sheet__action ds-sheet__action--primary" href={record.href}>
+              Open record
+            </a>
+          ) : null}
           {onFlyToPlace ? (
             <button
               type="button"
-              className="ds-sheet__action ds-sheet__action--primary"
+              className={
+                record.href ? 'ds-sheet__action' : 'ds-sheet__action ds-sheet__action--primary'
+              }
               onClick={onFlyToPlace}
             >
               Fly to place

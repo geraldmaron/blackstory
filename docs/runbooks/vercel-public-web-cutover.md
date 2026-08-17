@@ -20,7 +20,7 @@
 | Production DNS | **Vercel** — apex `A 76.76.21.21`; `www` `CNAME cname.vercel-dns.com` (DNS-only / grey cloud; Cloudflare NS retained) |
 | Live probe (post-flip) | `server: Vercel` (not App Hosting `envoy` / `via: google`); `/explore/api` `totalMatched=1338` `degraded=false`; `/history/api` `1340`; `/search?q=obama` 200 with Barack Obama; sample entity 200 |
 | Soak | **Closed** — Vercel is sole public web host |
-| Owner wind-down | **Done 2026-07-22** — `black-book-web-production` and `black-book-web-staging` deleted; only `black-book-admin-production` remains |
+| Owner wind-down | **Done** — public web App Hosting deleted 2026-07-22; admin App Hosting + Cloud Run `black-book-admin-production` deleted 2026-08-15 |
 
 ### DNS records in effect (re-confirm via Vercel domain API before any future change)
 
@@ -83,6 +83,7 @@ Set on the Vercel project (Preview + Production unless noted):
 | `DATABASE_URL` | Sensitive; **Supabase session pooler** (IPv4). Direct `db.<ref>.supabase.co` is IPv6-only and fails on Vercel (`ENOTFOUND`). For `blackstory-app` use `aws-1-us-west-2.pooler.supabase.com:5432` with user `postgres.<ref>`, `sslmode=require`, `uselibpqcompat=true`. Decode the DB password once if the source URL was already percent-encoded (passwords containing `%`/`@` break when double-encoded). |
 | `SENTRY_DSN` | Optional; not wired in `apps/web` yet — **omit on Vercel** until observability lands |
 | `SUBMISSION_PRIVACY_PEPPER` | Required for production `POST /submit` and corrections IP hashing; not needed for public catalog reads. **Set 2026-07-22** (see below). |
+| `APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL` | Public-media origin, no trailing slash: `https://twykhihqkcldpreuovay.supabase.co/storage/v1/object/public/public-media`. Required on Production and all Preview branches. Without it (or if the 13.8 MB GET times out), every catalog cold start runs full-table `bb_public.release_entities` SQL. Fetch timeout in code is 60s; redeploy after changing it. Set 2026-08-15 on Production, Preview (`staging`), and Preview (all branches). |
 
 ### Secrets checklist (names only)
 
@@ -99,6 +100,7 @@ Set on the Vercel project (Preview + Production unless noted):
 | `SUBMISSION_PRIVACY_PEPPER` | set (sensitive) | set (sensitive) | 1Password + Vercel; never commit value |
 | `NEXT_PUBLIC_ADMIN_ORIGIN` | optional | optional | Footer admin link only |
 | `NEXT_PUBLIC_FIREBASE_*` | not required for Vercel public reads | not required | Public dig uses Postgres |
+| `APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL` | required | required | Public-media origin; 60s fetch timeout in `apps/web` |
 
 ### `SUBMISSION_PRIVACY_PEPPER` (set 2026-07-22)
 
@@ -126,7 +128,9 @@ vercel redeploy <preview-deployment-url>
 
 Owner flipped Cloudflare DNS to Vercel (apex A + www CNAME, DNS-only). Post-flip verification: Vercel `misconfigured=false`; catalog `/explore/api` `totalMatched=1338`; Obama search + sample entity OK.
 
-**Soak closed:** Vercel is the sole public web host. Public web App Hosting configs are removed from the repo. Firebase backends `black-book-web-production` and `black-book-web-staging` were deleted 2026-07-22 (admin App Hosting remains).
+**Soak closed:** Vercel is the sole public web host. Public web App Hosting configs are removed from the repo. Firebase backends `black-book-web-production` and `black-book-web-staging` were deleted 2026-07-22. Admin App Hosting + Cloud Run `black-book-admin-production` were deleted 2026-08-15.
+
+**Web Analytics (2026-08-15):** Enable on the Vercel project (`vercel project web-analytics`), ship `<Analytics />` from `@vercel/analytics/next`, and allow `va.vercel-scripts.com` + `vitals.vercel-insights.com` in CSP. Redeploy Production so the 60s artifact timeout and analytics script actually run.
 
 ## Rollback
 

@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { mapPublicSearchProjection } from './map-search-index.js';
 import {
   fetchReleaseEntitiesListArtifact,
@@ -66,6 +68,15 @@ test('release artifacts are accepted only from the configured origin and matchin
       ),
   });
   assert.equal(search, undefined);
+});
+
+test('default artifact fetch timeout is 60s so a 13.8 MB GET is not a miss', () => {
+  const source = readFileSync(
+    fileURLToPath(new URL('./release-artifacts.ts', import.meta.url)),
+    'utf8',
+  );
+  assert.match(source, /timeoutMs = options\.timeoutMs \?\? 60_000/);
+  assert.match(source, /cache: 'force-cache'/);
 });
 
 test('release artifact reads are disabled when no origin is configured', async () => {

@@ -9,6 +9,7 @@ import {
   findUsStateForPoint,
   findUsStateFromJurisdictionLabel,
   findUsStateByPostalCode,
+  isDisplayableJurisdictionLabel,
   isWithinUsBounds,
 } from './us-geography.js';
 
@@ -95,4 +96,15 @@ test('US_BOUNDS is derived from the state table and is internally consistent', (
     assert.ok(sw >= west && se <= east, `${state.postalCode} west/east within US_BOUNDS`);
     assert.ok(ss >= south && sn <= north, `${state.postalCode} south/north within US_BOUNDS`);
   }
+});
+
+test('isDisplayableJurisdictionLabel rejects empty, Unknown, and country-only US labels', () => {
+  assert.equal(isDisplayableJurisdictionLabel(undefined), false);
+  assert.equal(isDisplayableJurisdictionLabel(''), false);
+  assert.equal(isDisplayableJurisdictionLabel('Unknown'), false);
+  assert.equal(isDisplayableJurisdictionLabel('United States'), false);
+  assert.equal(isDisplayableJurisdictionLabel('USA'), false);
+  assert.equal(isDisplayableJurisdictionLabel('U.S.'), false);
+  assert.equal(isDisplayableJurisdictionLabel('St. Louis, Missouri'), true);
+  assert.equal(isDisplayableJurisdictionLabel('Washington, D.C.'), true);
 });

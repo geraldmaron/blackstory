@@ -13,7 +13,7 @@ import {
 } from '@repo/domain';
 import { sanitizePublicProseText } from '@repo/domain/editorial';
 import { isDatePrecision, resolveEraBucketsFromEvidence } from '@repo/domain/era';
-import { findUsStateForPoint } from '@repo/domain/map/geography';
+import { findUsStateForPoint, isDisplayableJurisdictionLabel } from '@repo/domain/map/geography';
 import { type PublicEntityView } from '../../data/public-seed';
 
 /**
@@ -258,11 +258,20 @@ function mapPrimaryImage(
 /**
  * True when a jurisdiction string is worth rendering (non-empty, not a placeholder).
  * UI surfaces should omit the jurisdiction segment when this is false.
+ * Re-exported from `@repo/domain` so country-only US labels are hidden.
  */
-export function isDisplayableJurisdictionLabel(label: string | undefined): boolean {
+export { isDisplayableJurisdictionLabel };
+
+/**
+ * Stored labels that should not be replaced by bbox state attribution.
+ * Empty and Unknown still fall through to coordinates. Country-only
+ * "United States" stays stored until republish: St. Louis pins sit in the
+ * Illinois bbox overlap, so a coord swap would mislabel Missouri records.
+ */
+function isUsableStoredJurisdictionLabel(label: string | undefined): boolean {
   const trimmed = label?.trim() ?? '';
   if (trimmed.length === 0) return false;
-  return !/^unknown$/iu.test(trimmed);
+  return !/^unknown(\s+jurisdiction)?$/iu.test(trimmed);
 }
 
 /**
@@ -272,7 +281,7 @@ export function isDisplayableJurisdictionLabel(label: string | undefined): boole
  */
 export function resolveJurisdictionLabel(projection: PublicProjectionInput): string {
   const explicit = projection.jurisdictionLabel?.trim();
-  if (explicit && isDisplayableJurisdictionLabel(explicit)) {
+  if (explicit && isUsableStoredJurisdictionLabel(explicit)) {
     return explicit;
   }
   const lat = projection.location?.lat;

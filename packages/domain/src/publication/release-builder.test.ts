@@ -428,6 +428,56 @@ test('resolveReleaseEntityReferences fails closed on an empty jurisdictionLabel'
   if (!result.ok) assert.match(result.reason, /jurisdiction/);
 });
 
+test('resolveReleaseEntityReferences rejects a prohibited public precision on any kind', () => {
+  for (const precision of ['street_address', 'unit', 'parcel', 'exact_coordinates', 'residence']) {
+    const entry = baseEntry({ kind: 'place', locationPrecision: precision });
+    const result = resolveReleaseEntityReferences(entry, [], []);
+    assert.equal(result.ok, false, `expected "${precision}" to be rejected`);
+    if (!result.ok) assert.match(result.reason, /prohibited public precision/);
+  }
+});
+
+test('resolveReleaseEntityReferences allows institution/campus precision for a person (repo-2t04.3)', () => {
+  for (const precision of ['institution', 'campus']) {
+    const entry = baseEntry({
+      kind: 'person',
+      locationPrecision: precision,
+      livingStatus: 'unknown',
+    });
+    const result = resolveReleaseEntityReferences(entry, [], []);
+    assert.equal(result.ok, true, `expected "${precision}" to be allowed for a person`);
+  }
+});
+
+test('resolveReleaseEntityReferences rejects "address" precision for a living or unknown-status person', () => {
+  for (const livingStatus of ['living', 'unknown'] as const) {
+    const entry = baseEntry({ kind: 'person', locationPrecision: 'address', livingStatus });
+    const result = resolveReleaseEntityReferences(entry, [], []);
+    assert.equal(
+      result.ok,
+      false,
+      `expected "address" to be rejected for livingStatus=${livingStatus}`,
+    );
+    if (!result.ok) assert.match(result.reason, /precision ceiling/);
+  }
+});
+
+test('resolveReleaseEntityReferences allows "address" precision for a confirmed-deceased person', () => {
+  const entry = baseEntry({
+    kind: 'person',
+    locationPrecision: 'address',
+    livingStatus: 'deceased',
+  });
+  const result = resolveReleaseEntityReferences(entry, [], []);
+  assert.equal(result.ok, true);
+});
+
+test('resolveReleaseEntityReferences allows "address" precision for a non-person entity', () => {
+  const entry = baseEntry({ kind: 'place', locationPrecision: 'address' });
+  const result = resolveReleaseEntityReferences(entry, [], []);
+  assert.equal(result.ok, true);
+});
+
 test('buildReleaseEntityArtifacts produces a full projection + search doc for a valid entry', () => {
   const entry = baseEntry();
   const result = buildReleaseEntityArtifacts(entry, CONTEXT);

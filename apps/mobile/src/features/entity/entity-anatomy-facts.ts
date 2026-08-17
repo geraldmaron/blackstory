@@ -35,8 +35,8 @@ const CONFIDENCE_GRADE: Readonly<Record<ConfidenceTierKey, string>> = {
 function isDisplayableJurisdictionLabel(label: string): boolean {
   const trimmed = label.trim();
   if (trimmed.length === 0) return false;
-  const lower = trimmed.toLowerCase();
-  return lower !== 'unknown jurisdiction' && lower !== 'unknown';
+  if (/^unknown(\s+jurisdiction)?$/iu.test(trimmed)) return false;
+  return !/^(united states of america|united states|u\.s\.a\.|u\.s\.|usa)$/iu.test(trimmed);
 }
 
 function whereLabelFor(entity: Entity): string {

@@ -305,47 +305,66 @@ export async function loadReleaseGraphInputs(
   };
 }
 
+/**
+ * repo-zocd — the delete+reinsert used to run as bare auto-committed statements with no
+ * surrounding transaction. Observed twice (2026-08-07, 2026-08-17) leaving the active release's
+ * graph tables empty or partially populated for the whole run: readers see a catalog with no
+ * relationships, and a mid-run failure (a slow remote round trip timing out, or two overlapping
+ * runs racing on the same primary key) leaves permanently broken partial state rather than either
+ * the old graph or the new one. BEGIN/COMMIT here means a reader always sees a complete graph —
+ * the prior one until this transaction commits, the new one after — and any failure rolls back to
+ * the prior state instead of leaving a partial one. This alone removes the outage; batching the
+ * INSERTs (still one row per statement below) is a separate, non-correctness follow-up.
+ */
 export async function persistReleaseGraphArtifact(
   client: pg.PoolClient,
   releaseId: string,
   artifact: GraphReleaseArtifact,
 ): Promise<{ readonly adjacencyRows: number; readonly decadeRows: number }> {
-  await client.query(`DELETE FROM bb_public.release_graph_adjacency WHERE release_id = $1`, [
-    releaseId,
-  ]);
-  await client.query(`DELETE FROM bb_public.release_graph_decades WHERE release_id = $1`, [
-    releaseId,
-  ]);
-  await client.query(`DELETE FROM bb_public.release_graph_all_time WHERE release_id = $1`, [
-    releaseId,
-  ]);
-
-  for (const [, adjacency] of artifact.adjacencyByEntityId) {
-    await client.query(
-      `INSERT INTO bb_public.release_graph_adjacency (release_id, entity_id, adjacency)
-       VALUES ($1, $2, $3::jsonb)`,
-      [releaseId, adjacency.entityId, JSON.stringify(serializeGraphAdjacency(adjacency))],
-    );
-  }
-
-  for (const view of artifact.decadeViews) {
-    const decadeInt = decadeStartYearFromLabel(view.decade);
-    if (decadeInt === undefined) continue;
-    await client.query(
-      `INSERT INTO bb_public.release_graph_decades (release_id, decade, payload)
-       VALUES ($1, $2, $3::jsonb)`,
-      [releaseId, decadeInt, JSON.stringify(serializeGraphDecadeView(view))],
-    );
-  }
-
-  await client.query(
-    `INSERT INTO bb_public.release_graph_all_time (release_id, payload)
-     VALUES ($1, $2::jsonb)`,
-    [
+  await client.query('BEGIN');
+  try {
+    await client.query(`DELETE FROM bb_public.release_graph_adjacency WHERE release_id = $1`, [
       releaseId,
-      JSON.stringify(serializeGraphAllTimeView(artifact.allTimeView, artifact.contentHash)),
-    ],
-  );
+    ]);
+    await client.query(`DELETE FROM bb_public.release_graph_decades WHERE release_id = $1`, [
+      releaseId,
+    ]);
+    await client.query(`DELETE FROM bb_public.release_graph_all_time WHERE release_id = $1`, [
+      releaseId,
+    ]);
+
+    for (const [, adjacency] of artifact.adjacencyByEntityId) {
+      await client.query(
+        `INSERT INTO bb_public.release_graph_adjacency (release_id, entity_id, adjacency)
+         VALUES ($1, $2, $3::jsonb)`,
+        [releaseId, adjacency.entityId, JSON.stringify(serializeGraphAdjacency(adjacency))],
+      );
+    }
+
+    for (const view of artifact.decadeViews) {
+      const decadeInt = decadeStartYearFromLabel(view.decade);
+      if (decadeInt === undefined) continue;
+      await client.query(
+        `INSERT INTO bb_public.release_graph_decades (release_id, decade, payload)
+         VALUES ($1, $2, $3::jsonb)`,
+        [releaseId, decadeInt, JSON.stringify(serializeGraphDecadeView(view))],
+      );
+    }
+
+    await client.query(
+      `INSERT INTO bb_public.release_graph_all_time (release_id, payload)
+       VALUES ($1, $2::jsonb)`,
+      [
+        releaseId,
+        JSON.stringify(serializeGraphAllTimeView(artifact.allTimeView, artifact.contentHash)),
+      ],
+    );
+
+    await client.query('COMMIT');
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  }
 
   return {
     adjacencyRows: artifact.adjacencyByEntityId.size,

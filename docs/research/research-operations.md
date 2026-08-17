@@ -1,10 +1,18 @@
 # Research operations: verb reference
 
-Canonical, tool-agnostic how-to for every research/operator-cli verb ("lane"). This is the
-one place the actual command shapes, invocation rules, and guardrails live. Per-tool layers
-(`.claude/skills/black-book/*`, `.opencode/opencode.json`) are pointers into this document —
-they carry no command detail of their own. See `AGENTS.md` for the one-line index of every
-verb with its exact command.
+Canonical, tool-agnostic how-to for every research/operator-cli verb. This is the one place
+the actual command shapes, invocation rules, and guardrails live.
+
+Agent skills live under `.claude/skills/blackstory/`:
+
+- **CLI pointers** (`research-intake`, `discovery-run`, `editorial-enrichment`, `locate`,
+  `case-drafting`, `story-craft`, `theme-study`, `triage-graylist`) exist for skill-matching
+  UX. They point here and carry no command detail of their own.
+- **Judgment playbooks** (`entity-verify`, `claim-corroborate`, `entity-complete`,
+  `coverage-target`, `publish-preview`) are not verbs. Their decision order lives in the
+  skill file. They call verbs from this document when a command is needed.
+
+See `AGENTS.md` for the one-line index of every verb with its exact command.
 
 All commands live in `packages/operator-cli/src/bin.ts` (entry) / `cli.ts` (dispatch) and run
 as:
@@ -249,7 +257,10 @@ record); no anonymous cites; archive citations must have valid Wayback/content-a
 
 ## locate
 
-**When to use:** resolve or correct an entity's lat/lng via Census geocoding (no LLM).
+**When to use:** a sourced street or named-place address already exists and must be
+Census-geocoded to lat/lng (no LLM). If you still need to find the place, confirm which
+namesake this is, choose precision honestly, or assign era, stop and use the
+`blackstory-entity-verify` skill first. Do not invent an address so this verb can run.
 
 ```bash
 node --conditions development --import tsx packages/operator-cli/src/bin.ts locate \
@@ -271,8 +282,9 @@ P625 (parent-site snaps capped at 15km, otherwise an honest precision downgrade)
 **Do:** prefer street addresses; queue bare place names for review; re-publish after locating
 so projections pick up `EntityLocation` overrides.
 
-**Never:** use an LLM to guess coordinates; call Nominatim from product `/locate`; `--commit`
-without reviewing `decision.action` when it is `review`.
+**Never:** use an LLM to guess coordinates; invent an address so this verb can run; call
+Nominatim from product `/locate`; `--commit` without reviewing `decision.action` when it is
+`review`. Identity, unsourced sites, and era are the `blackstory-entity-verify` skill.
 
 ---
 
@@ -386,3 +398,18 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts expa
 Intended interface once repo-xez5.4 lands: `{ entityId, neighbors: [{ entityId,
 relationshipType, edgeConfidence }], frontier }`, sourced from real relationship edges
 (`propose-edge`'s domain, `RelationshipType`/`RelationshipRole`), never fabricated.
+
+---
+
+## Judgment playbooks (not verbs)
+
+These have no operator-cli command. Load the skill, then call verbs from this document when
+a sourced address, evidence attachment, or campaign is actually ready.
+
+| Skill | When |
+|---|---|
+| `.claude/skills/blackstory/entity-verify` | Confirm identity, source a place, set precision, assign era |
+| `.claude/skills/blackstory/claim-corroborate` | Independent lineage, Wikipedia rule, superlatives |
+| `.claude/skills/blackstory/entity-complete` | Blank public fields (image, related, historicalContext) |
+| `.claude/skills/blackstory/coverage-target` | Where research should look next |
+| `.claude/skills/blackstory/publish-preview` | Release preview only; never activate |

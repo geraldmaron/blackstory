@@ -24,8 +24,9 @@
  * Everything else is untouched: `historic`, `in_force`, `repealed`, `struck_down`, and any
  * `active` the fixed derivation still supports.
  *
- * Reversible: prior values are copied to bb_canonical.status_history_backup_repo_i2st before any
- * update, and dumped to a JSON artifact. Undo is
+ * Reversible: apply copies prior values into bb_canonical.status_history_backup_repo_i2st
+ * (CREATE TABLE IF NOT EXISTS) and dumps ids to a JSON artifact. The leftover table from the
+ * original run was dropped 2026-08-15 after soak; a future apply recreates it. Undo is
  *   UPDATE bb_canonical.entities e SET status_history = b.status_history
  *     FROM bb_canonical.status_history_backup_repo_i2st b WHERE b.id = e.id;
  *
