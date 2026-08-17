@@ -57,7 +57,8 @@ test('search crawlers that we allow to index', () => {
   );
   assert.equal(
     classifyTraffic({
-      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Applebot/0.1',
+      userAgent:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Applebot/0.1',
     }),
     'search_crawler',
   );
