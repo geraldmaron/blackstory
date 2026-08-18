@@ -35,7 +35,7 @@
  *     packages/ops-data/scripts/sweep-entity-evidence.ts --lanes=nrhp-black-heritage --limit=100
  */
 import { createHash } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
@@ -107,6 +107,39 @@ const STALE_DAYS = Number.parseInt(flag('stale-days', '30'), 10);
 const REFETCH = process.argv.includes('--refetch');
 /** Politeness delay between outbound fetches. NPS assets are multi-MB scans. */
 const FETCH_DELAY_MS = Number.parseInt(flag('delay-ms', '750'), 10);
+/**
+ * repo-75et (PATH 2) — candidate URLs found by a search step this script does not itself run.
+ * This script has no LLM/search access of its own (PATH 1 is deliberately deterministic, no
+ * model); PATH 2 needs judgement per entity per the epic's own charter, so search happens in a
+ * separate pass (a subagent, or any process with real web-search access) that writes
+ * `{ [entityId]: string[] }` to this file. What THIS script does with those URLs is unchanged
+ * from every other collector here: fetch via the same safe-fetch path, gate via the same
+ * checkSubjectIdentity + assessText discipline, classify tier via the same isTier1Host list.
+ * Nothing about the identity bar is relaxed for search-sourced candidates — if anything they need
+ * it more, since a search hit's relevance ranking is not evidence of subject identity.
+ */
+const WEBSEARCH_LEADS_PATH = flag('websearch-leads', '');
+/** Cap outbound fetches per entity for search-sourced candidates — a search can return many
+ * plausible-looking hits, most of which will fail identity and just cost a wasted fetch. */
+const WEBSEARCH_LEADS_PER_ENTITY = Number.parseInt(flag('websearch-leads-per-entity', '5'), 10);
+
+/** `{ [entityId]: string[] }` written by the separate search step. Empty when no flag given. */
+function loadWebSearchLeads(path: string): ReadonlyMap<string, readonly string[]> {
+  if (path.length === 0) return new Map();
+  if (!existsSync(path)) throw new Error(`--websearch-leads path does not exist: ${path}`);
+  const parsed: unknown = JSON.parse(readFileSync(path, 'utf8'));
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error(`--websearch-leads must be a JSON object of { [entityId]: string[] }`);
+  }
+  const map = new Map<string, readonly string[]>();
+  for (const [entityId, urls] of Object.entries(parsed as Record<string, unknown>)) {
+    if (!Array.isArray(urls) || !urls.every((u) => typeof u === 'string')) {
+      throw new Error(`--websearch-leads entry for ${entityId} is not a string array`);
+    }
+    map.set(entityId, urls as readonly string[]);
+  }
+  return map;
+}
 
 type CandidateRow = {
   readonly id: string;
@@ -470,6 +503,69 @@ async function collectRestoredClaimSources(row: CandidateRow): Promise<EvidenceR
 }
 
 /**
+ * repo-75et (PATH 2) — candidate URLs found by a search step outside this script (see
+ * loadWebSearchLeads' docs). Structurally this is collectRestoredClaimSources with a different
+ * URL source, but the identity bar is checkSubjectIdentity (place AND name AND focus) rather than
+ * the looser checkSubjectIdentity call restored-claim-source already uses — both already use
+ * checkSubjectIdentity, so the real difference is trust: a citation already published on this
+ * entity's own claims (restored-claim-source) has a prior human/pipeline decision behind it; a
+ * search hit has none, so it gets the same full gate every reference-hop candidate gets, and nas
+ * no default trust from being merely "found".
+ */
+async function collectWebSearchLeads(
+  row: CandidateRow,
+  leadsByEntity: ReadonlyMap<string, readonly string[]>,
+): Promise<EvidenceRow[]> {
+  const urls = [...new Set(leadsByEntity.get(row.id) ?? [])].slice(0, WEBSEARCH_LEADS_PER_ENTITY);
+  if (urls.length === 0) throw new SkipReason('no web-search leads for this entity');
+
+  const evidence: EvidenceRow[] = [];
+  for (const url of urls) {
+    const page = await safeFetchPage(url, { allowedContentTypes: ['text/html'] });
+    if (page === undefined) continue;
+    const quality = assessText(page.text);
+    const identity = checkSubjectIdentity(
+      page.text,
+      {
+        displayName: row.display_name,
+        city: row.payload.city,
+        county: row.payload.county,
+        state: row.payload.state,
+      },
+      { title: row.display_name },
+    );
+    const status: 'captured' | 'quarantined' =
+      quality.usable && identity.corroborated ? 'captured' : 'quarantined';
+    evidence.push({
+      id: evidenceId(row.id, 'web-search', page.finalUrl),
+      entityId: row.id,
+      lane: row.lane,
+      collector: 'web-search',
+      sourceUrl: page.finalUrl,
+      sourceTier: isTier1Host(page.finalUrl) ? 'tier1' : 'tier2',
+      title: row.display_name,
+      contentText: page.text,
+      contentHash: hashContent(page.text),
+      charCount: page.text.length,
+      qualityScore: quality.score,
+      status,
+      provenance: {
+        searchCandidateUrl: url,
+        fetchedFinalUrl: page.finalUrl,
+        identity,
+        quarantineReason:
+          status === 'quarantined' ? (identity.reason ?? quality.reason) : undefined,
+      },
+    });
+    await sleep(FETCH_DELAY_MS);
+  }
+  if (evidence.length === 0) {
+    throw new SkipReason('no web-search lead passed safe fetch');
+  }
+  return evidence;
+}
+
+/**
  * Person-kind landscape candidates (discovered from a Wikidata QID, or from a mention gap-fill —
  * see repo-n7p6.3 notes). When the row already carries a Wikipedia canonicalUrl its identity was
  * anchored at discovery time by the QID binding, so this fetches that exact article by title
@@ -729,7 +825,10 @@ function applyAddressRestriction(row: CandidateRow, item: EvidenceRow): Evidence
   };
 }
 
-async function sweepEntity(row: CandidateRow): Promise<EntityOutcome> {
+async function sweepEntity(
+  row: CandidateRow,
+  webSearchLeads: ReadonlyMap<string, readonly string[]>,
+): Promise<EntityOutcome> {
   const evidence: EvidenceRow[] = [];
   const notes: string[] = [];
 
@@ -762,6 +861,17 @@ async function sweepEntity(row: CandidateRow): Promise<EntityOutcome> {
     notes.push(`restored-claim-source: ${prefix} — ${(error as Error).message}`);
   }
 
+  try {
+    evidence.push(
+      ...(await collectWebSearchLeads(row, webSearchLeads)).map((item) =>
+        finalizeEvidenceRow(row, item),
+      ),
+    );
+  } catch (error) {
+    const prefix = error instanceof SkipReason ? 'skip' : 'error';
+    notes.push(`web-search: ${prefix} — ${(error as Error).message}`);
+  }
+
   let leads: EntityOutcome['leads'] = [];
   try {
     const hops = await collectReferenceHops(row, evidence);
@@ -779,6 +889,12 @@ async function main(): Promise<void> {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error('DATABASE_URL is required (source apps/web/.env.local)');
   if (LANES.length === 0) throw new Error('No lanes selected (greenbook is hard-excluded)');
+  const webSearchLeads = loadWebSearchLeads(WEBSEARCH_LEADS_PATH);
+  if (webSearchLeads.size > 0) {
+    console.log(
+      `Loaded web-search leads for ${webSearchLeads.size} entities from ${WEBSEARCH_LEADS_PATH}.`,
+    );
+  }
 
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
 
@@ -921,7 +1037,7 @@ async function main(): Promise<void> {
   let index = 0;
   for (const row of rows.rows) {
     index += 1;
-    const outcome = await sweepEntity(row);
+    const outcome = await sweepEntity(row, webSearchLeads);
     outcomes.push(outcome);
     const captured = outcome.evidence.filter((item) => item.status === 'captured');
     console.log(
@@ -1104,7 +1220,9 @@ async function main(): Promise<void> {
       } catch (error) {
         await client.query('ROLLBACK').catch(() => {});
         failedEntities.push({ entityId: outcome.entityId, error: (error as Error).message });
-        console.error(`Apply failed for ${outcome.entityId}, rolled back that entity only: ${(error as Error).message}`);
+        console.error(
+          `Apply failed for ${outcome.entityId}, rolled back that entity only: ${(error as Error).message}`,
+        );
       }
     }
     console.log(
