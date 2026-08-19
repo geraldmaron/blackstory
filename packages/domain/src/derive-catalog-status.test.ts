@@ -225,3 +225,63 @@ test('authored statusHistory is preserved', () => {
   assert.equal(derived.statusHistory, history);
   assert.equal(derived.status, 'active');
 });
+
+test('a dated closure beats a generic present-day cue (repo-rlq1)', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_place_closed_dated',
+    kind: 'place',
+    summary:
+      'Cherokee State Park was Kentucky’s only all-Black state park, opened in 1952 and closed in 1963 as segregated recreation became politically untenable. A marker stands at the site today.',
+  });
+  assert.equal(derived.status, 'historic');
+});
+
+test('demolition language wins over a commemorative today-clause (repo-rlq1)', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_place_demolished',
+    kind: 'place',
+    summary:
+      'Mill Creek Valley was demolished by the city beginning in 1959, destroying 5,600 housing units; today the site is remembered as one of the largest acts of urban-renewal displacement.',
+  });
+  assert.equal(derived.status, 'historic');
+});
+
+test('operated-until phrasing yields historic (repo-rlq1)', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_place_operated_until',
+    kind: 'school',
+    summary:
+      'Twenty-eight students enrolled in its first year, and it operated until 1952. The building currently houses apartments.',
+  });
+  assert.equal(derived.status, 'historic');
+});
+
+test('a closure followed by reopening is not terminal (repo-rlq1)', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_place_reopened',
+    kind: 'place',
+    summary:
+      'The theater closed in 1978 after decades of decline, was restored by a community trust, and reopened in 1994; it still operates as a performance venue today.',
+  });
+  assert.equal(derived.status, 'active');
+});
+
+test('a razed predecessor building does not close an active congregation (repo-rlq1)', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_place_razed_predecessor',
+    kind: 'place',
+    summary:
+      'Following the thwarted rebellion the original church was razed to the ground and the congregation was forced to meet in secret until after the Civil War. It remains an active congregation today.',
+  });
+  assert.equal(derived.status, 'active');
+});
+
+test('an undated demolition of a different subject stays active (repo-rlq1)', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_place_predecessor_demolished',
+    kind: 'place',
+    summary:
+      'Federally funded public housing built for African American families on the site of a Black neighborhood largely demolished for it; the complex still serves residents today.',
+  });
+  assert.equal(derived.status, 'active');
+});

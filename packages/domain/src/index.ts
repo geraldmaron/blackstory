@@ -208,6 +208,7 @@ export type {
 } from './entity-status.js';
 export {
   deriveCatalogEntityStatus,
+  TERMINAL_CLOSURE_RE,
   type CatalogStatusSource,
   type DerivedCatalogStatus,
 } from './derive-catalog-status.js';

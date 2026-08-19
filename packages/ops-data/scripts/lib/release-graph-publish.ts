@@ -323,6 +323,11 @@ export async function persistReleaseGraphArtifact(
 ): Promise<{ readonly adjacencyRows: number; readonly decadeRows: number }> {
   await client.query('BEGIN');
   try {
+    // Session default statement_timeout cancelled the bulk DELETE mid-transaction on 2026-08-19
+    // (SQLSTATE 57014 "while deleting tuple ... release_graph_adjacency") once the table had
+    // accumulated dead tuples from earlier aborted rebuilds. SET LOCAL scopes the override to
+    // this transaction only — the session default is restored at COMMIT/ROLLBACK.
+    await client.query(`SET LOCAL statement_timeout = '15min'`);
     await client.query(`DELETE FROM bb_public.release_graph_adjacency WHERE release_id = $1`, [
       releaseId,
     ]);
@@ -333,11 +338,22 @@ export async function persistReleaseGraphArtifact(
       releaseId,
     ]);
 
-    for (const [, adjacency] of artifact.adjacencyByEntityId) {
+    // Chunked multi-row inserts (repo-z4id): one row per statement was ~4,100 sequential network
+    // round trips at ~100ms each — over seven silent minutes inside one transaction, which reads
+    // as a hang and invites an operator kill. 200 rows per statement is ~21 round trips.
+    const adjacencyRows = [...artifact.adjacencyByEntityId.values()];
+    const CHUNK = 200;
+    for (let start = 0; start < adjacencyRows.length; start += CHUNK) {
+      const chunk = adjacencyRows.slice(start, start + CHUNK);
+      const params: unknown[] = [releaseId];
+      const tuples = chunk.map((adjacency) => {
+        params.push(adjacency.entityId, JSON.stringify(serializeGraphAdjacency(adjacency)));
+        return `($1, $${params.length - 1}, $${params.length}::jsonb)`;
+      });
       await client.query(
         `INSERT INTO bb_public.release_graph_adjacency (release_id, entity_id, adjacency)
-         VALUES ($1, $2, $3::jsonb)`,
-        [releaseId, adjacency.entityId, JSON.stringify(serializeGraphAdjacency(adjacency))],
+         VALUES ${tuples.join(', ')}`,
+        params,
       );
     }
 
