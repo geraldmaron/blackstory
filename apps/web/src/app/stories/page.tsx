@@ -18,6 +18,7 @@ import { listPublicArticleListItems } from '../../lib/articles/source';
 import { RECORDS_PAGE_SIZE } from '../../lib/records/build-records-index';
 import {
   CardGrid,
+  GroupHeading,
   Note,
   OffRamp,
   RailGroup,
@@ -30,14 +31,18 @@ import {
   buildKindChips,
   buildPlaceGroups,
   buildSeriesGroups,
+  buildSeriesShelves,
   buildTagGroups,
   computeStoriesFacts,
   filterItems,
   hasActiveNarrowing,
   paginateStories,
   parseStoriesQuery,
+  pickLeadStory,
+  showsShelves,
   sortItems,
   storiesNotice,
+  uncollectedItems,
   STORY_SORT_KEYS,
   STORY_SORT_LABELS,
 } from './stories-index';
@@ -62,11 +67,24 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
   const { items, source } = await listPublicArticleListItems();
   const { publishedCount, eraSpanLabel, placeCount } = computeStoriesFacts(items);
   const filtered = sortItems(filterItems(items, query), query.sort);
-  const { rows, page, pageCount, previousHref, nextHref } = paginateStories(filtered, query);
   const notice = storiesNotice(source, items.length, filtered.length);
   const kindChips = buildKindChips(items, query);
   const seriesGroups = buildSeriesGroups(items);
   const tagGroups = buildTagGroups(items);
+
+  // The shelves layout only ever renders in the page's default, unnarrowed browse state (see
+  // `showsShelves`); everything else — a search, a filter, a non-default sort — falls back to
+  // the flat, paginated index above. No new reads: shelves are built from `filtered`, the same
+  // sorted-and-filtered set the flat index already computed.
+  const shelfMode = source === 'live' && items.length > 0 && showsShelves(query);
+  const lead = shelfMode ? pickLeadStory(filtered) : undefined;
+  const shelves = shelfMode ? buildSeriesShelves(filtered) : [];
+  const uncollected = shelfMode ? uncollectedItems(filtered) : [];
+  // Pagination is scoped to the "Everything else" list only — the lead and the shelves above
+  // it stay put across its pages, which is what "applies to the Everything else list only"
+  // means in practice. Outside shelf mode there is no lead or shelf to hold in place, so the
+  // whole filtered set paginates directly.
+  const pager = paginateStories(shelfMode ? uncollected : filtered, query);
 
   const meta = [
     `${publishedCount.toLocaleString('en-US')} published`,
@@ -170,49 +188,121 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
 
       {notice.body.length > 0 ? (
         <Note kind={source === 'unavailable' ? 'Unavailable' : 'Empty'}>{notice.body}</Note>
+      ) : shelfMode ? (
+        <>
+          {lead ? (
+            <article className="ds-stories-lead">
+              <div className="ds-stories-lead__copy">
+                <p className="ds-stories-lead__meta">
+                  {KIND_LABELS[lead.kind ?? 'chapter'] ?? 'Story'} · {lead.eraLabel}
+                </p>
+                <h2 className="ds-stories-lead__title">
+                  <a href={`/stories/${lead.slug}`}>{lead.title}</a>
+                </h2>
+                <p className="ds-stories-lead__summary">{lead.summary}</p>
+                <a className="ds-cta ds-cta--copper" href={`/stories/${lead.slug}`}>
+                  Read the chapter
+                </a>
+              </div>
+              {lead.heroImage ? (
+                <a
+                  className="ds-stories-lead__plate"
+                  href={`/stories/${lead.slug}`}
+                  aria-hidden="true"
+                  tabIndex={-1}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={lead.heroImage.url} alt="" loading="lazy" />
+                </a>
+              ) : null}
+            </article>
+          ) : null}
+
+          {shelves.map((shelf) => (
+            <section key={shelf.id} className="ds-stories-shelf">
+              <div className="ds-stories-shelf__head">
+                <h2 className="ds-stories-shelf__title">
+                  {shelf.label} <span className="ds-room-num">{shelf.count}</span>
+                </h2>
+                <a className="ds-stories-shelf__all" href={shelf.href}>
+                  See all →
+                </a>
+              </div>
+              <div className="ds-stories-shelf__grid">
+                {shelf.members.slice(0, 4).map((item, index) => (
+                  <a
+                    key={item.slug}
+                    className="ds-stories-shelf__entry"
+                    href={`/stories/${item.slug}`}
+                  >
+                    <span className="ds-stories-shelf__plate">
+                      {item.heroImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={item.heroImage.url} alt={item.heroImage.alt} loading="lazy" />
+                      ) : null}
+                    </span>
+                    <span className="ds-stories-shelf__index">
+                      {String(index + 1).padStart(2, '0')} / {String(shelf.count).padStart(2, '0')}
+                    </span>
+                    <span className="ds-stories-shelf__entry-title">{item.title}</span>
+                    <span className="ds-stories-shelf__entry-summary">{item.summary}</span>
+                  </a>
+                ))}
+              </div>
+            </section>
+          ))}
+
+          {uncollected.length > 0 ? (
+            <>
+              <GroupHeading>Everything else</GroupHeading>
+              <CardGrid>
+                {pager.rows.map((item) => (
+                  <RoomCard
+                    key={item.slug}
+                    href={`/stories/${item.slug}`}
+                    kind={KIND_LABELS[item.kind ?? 'chapter'] ?? 'Story'}
+                    title={item.title}
+                    description={item.summary}
+                    meta={`${item.eraLabel} · ${item.placeLabel}`}
+                  />
+                ))}
+              </CardGrid>
+            </>
+          ) : null}
+        </>
       ) : (
+        // Outside shelf mode (a search, a kind chip, a non-default sort applied) there is no
+        // lead and no collection grouping to hold in place — just the current query's matches,
+        // as one flat, directly comparable list. Same CardGrid/RoomCard the "Everything else"
+        // list above uses, so narrowed results and the shelf remainder read as one visual system.
         <CardGrid>
-          {rows.map((item) => (
+          {pager.rows.map((item) => (
             <RoomCard
               key={item.slug}
               href={`/stories/${item.slug}`}
               kind={KIND_LABELS[item.kind ?? 'chapter'] ?? 'Story'}
               title={item.title}
               description={item.summary}
-              meta={
-                item.series?.positionLabel
-                  ? `${item.series.positionLabel} · ${item.eraLabel}`
-                  : `${item.eraLabel} · ${item.placeLabel}`
-              }
-              {...(item.heroImage
-                ? {
-                    media: {
-                      url: item.heroImage.url,
-                      alt: item.heroImage.alt,
-                      // Series entries are portrait galleries; show the sitter whole.
-                      ...(item.series ? { fit: 'contain' as const } : {}),
-                    },
-                  }
-                : {})}
+              meta={`${item.eraLabel} · ${item.placeLabel}`}
             />
           ))}
         </CardGrid>
       )}
 
-      {pageCount > 1 ? (
+      {pager.pageCount > 1 ? (
         <nav className="ds-chapters-pager" aria-label="Stories pages">
-          {previousHref === undefined ? (
+          {pager.previousHref === undefined ? (
             <span className="ds-chapters-pager__spacer" />
           ) : (
-            <a className="ds-chapters-pager__link" href={previousHref} rel="prev">
+            <a className="ds-chapters-pager__link" href={pager.previousHref} rel="prev">
               ← Previous {RECORDS_PAGE_SIZE}
             </a>
           )}
-          <span className="ds-chapters-pager__at">{`Page ${page} of ${pageCount}`}</span>
-          {nextHref === undefined ? (
+          <span className="ds-chapters-pager__at">{`Page ${pager.page} of ${pager.pageCount}`}</span>
+          {pager.nextHref === undefined ? (
             <span className="ds-chapters-pager__spacer" />
           ) : (
-            <a className="ds-chapters-pager__link" href={nextHref} rel="next">
+            <a className="ds-chapters-pager__link" href={pager.nextHref} rel="next">
               Next {RECORDS_PAGE_SIZE} →
             </a>
           )}

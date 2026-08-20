@@ -1,5 +1,5 @@
 /**
- * Books detail body: v6 edition Surface panels for context, challenges, evidence,
+ * Books detail body: hairline-divided sections for context, challenges, evidence,
  * lookup, related titles, and connected depart links. Primary story stays above related.
  */
 import React from 'react';
@@ -10,7 +10,6 @@ import {
   type BooksDetailViewModel,
 } from './books-view-model';
 import { BooksRipRow } from './BooksRipRow';
-import { booksEditionPanelClassName } from './books-panel-chrome';
 import { BOOKS_DETAIL } from './books-copy';
 
 const CHALLENGE_STATUS_LABEL: Record<string, string> = {
@@ -32,23 +31,15 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
 
   return (
     <>
-      <article
-        className={booksEditionPanelClassName('context')}
-        aria-labelledby="description-heading"
-        id="description"
-      >
+      <section className="ds-room-section" aria-labelledby="description-heading" id="description">
         <p className="ds-books-edition__panel-title">{BOOKS_DETAIL.contextKicker}</p>
         <h2 className="ds-books-edition__panel-heading" id="description-heading">
           {BOOKS_DETAIL.contextTitle}
         </h2>
         <p className="ds-books-edition__body">{book.description}</p>
-      </article>
+      </section>
 
-      <article
-        className={booksEditionPanelClassName('challenges')}
-        aria-labelledby="challenges-heading"
-        id="challenges"
-      >
+      <section className="ds-room-section" aria-labelledby="challenges-heading" id="challenges">
         <p className="ds-books-edition__panel-title">{BOOKS_DETAIL.challengesKicker}</p>
         <h2 className="ds-books-edition__panel-heading" id="challenges-heading">
           {BOOKS_DETAIL.challengesTitle}
@@ -120,13 +111,9 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
             </ul>
           </div>
         ) : null}
-      </article>
+      </section>
 
-      <article
-        className={booksEditionPanelClassName('evidence')}
-        aria-labelledby="citations-heading"
-        id="citations"
-      >
+      <section className="ds-room-section" aria-labelledby="citations-heading" id="citations">
         <p className="ds-books-edition__panel-title">{BOOKS_DETAIL.evidenceKicker}</p>
         <h2 className="ds-books-edition__panel-heading" id="citations-heading">
           {BOOKS_DETAIL.evidenceTitle}
@@ -148,12 +135,9 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
             </li>
           ))}
         </ul>
-      </article>
+      </section>
 
-      <article
-        className={booksEditionPanelClassName('provenance')}
-        aria-labelledby="purchase-heading"
-      >
+      <section className="ds-room-section" aria-labelledby="purchase-heading">
         <p className="ds-books-edition__panel-title">{BOOKS_DETAIL.lookupKicker}</p>
         <h2 className="ds-books-edition__panel-heading" id="purchase-heading">
           {BOOKS_DETAIL.lookupTitle}
@@ -215,16 +199,12 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
             </div>
           </dl>
         </section>
-      </article>
+      </section>
 
       {placePanel}
 
       {relatedItems.length > 0 || book.canonicalEntityId ? (
-        <article
-          className={booksEditionPanelClassName('related')}
-          aria-labelledby="books-related-heading"
-          id="related"
-        >
+        <section className="ds-room-section" aria-labelledby="books-related-heading" id="related">
           <p className="ds-books-edition__panel-title">{BOOKS_DETAIL.relatedKicker}</p>
           <h2 className="ds-books-edition__panel-heading" id="books-related-heading">
             {BOOKS_DETAIL.relatedTitle}
@@ -247,13 +227,10 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
               ))}
             </div>
           ) : null}
-        </article>
+        </section>
       ) : null}
 
-      <article
-        className={booksEditionPanelClassName('connected')}
-        aria-labelledby="books-detail-next"
-      >
+      <section className="ds-room-section" aria-labelledby="books-detail-next">
         <p className="ds-books-edition__panel-title">{BOOKS_DETAIL.connectedKicker}</p>
         <h2 className="ds-books-edition__panel-heading" id="books-detail-next">
           {BOOKS_DETAIL.connectedTitle}
@@ -269,7 +246,7 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
             Methodology
           </Link>
         </p>
-      </article>
+      </section>
     </>
   );
 }

@@ -110,14 +110,14 @@
   scroll-margin-top: var(--ds-island-clearance);
 }
 
+/* Ink direction: the footer sits directly on the page ground above a hairline — the Surface
+   card frame comes off sitewide, not just here (see RoomCard for the same move). */
 .ds-shell-footer__card {
   width: min(100%, var(--ds-grid-max));
   margin-inline: auto;
-  padding: var(--ds-space-8);
-  background: var(--ds-surface);
+  padding-top: var(--ds-space-8);
   color: var(--ds-ink);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-shell-footer__inner {
@@ -159,7 +159,7 @@
   margin: 0 0 var(--ds-space-3);
   color: var(--ds-accent);
   font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
+  font-size: 10.5px;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -173,14 +173,6 @@
   padding: 0;
   font-family: var(--ds-font-sans);
   font-size: 0.9375rem;
-}
-
-.ds-shell-footer__links li {
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-shell-footer__links li:last-child {
-  border-bottom: none;
 }
 
 .ds-shell-footer__links a {
@@ -585,10 +577,12 @@
   border-radius: var(--ds-radius-full);
   border: var(--ds-border-width) solid transparent;
   font-family: var(--ds-font-sans);
-  font-size: 0.75rem;
+  /* Ink direction: a button is a label, not a signpost — drop the caps and tracking that made
+     every action on the site read as mono-adjacent shouting. */
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: normal;
+  text-transform: none;
   text-decoration: none;
   cursor: pointer;
   transition:

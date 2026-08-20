@@ -28,14 +28,17 @@
 }
 
 .ds-article__meta-row {
-  color: var(--ds-ink-muted);
-  font-size: 0.85rem;
-  letter-spacing: 0.02em;
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
 }
 
 .ds-article__title {
   font-family: var(--ds-font-display);
-  font-size: clamp(2rem, 4vw + 1rem, 3.25rem);
+  max-width: 26ch;
+  font-size: clamp(2.375rem, 5vw + 1rem, 3.875rem); /* up to 62px */
   line-height: 1.05;
   margin: 0;
   color: var(--ds-ink);
@@ -43,8 +46,8 @@
 
 .ds-article__summary {
   font-family: var(--ds-font-editorial);
-  font-size: clamp(1rem, 0.4vw + 0.95rem, 1.2rem);
-  line-height: 1.55;
+  font-size: 22px;
+  line-height: 1.5;
   color: var(--ds-ink-muted);
   margin: 0;
 }
@@ -89,8 +92,8 @@
 
 .ds-article__figcaption {
   margin-top: var(--ds-space-2);
-  font-family: var(--ds-font-sans);
-  font-size: 0.85rem;
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
   color: var(--ds-ink-muted);
   line-height: 1.5;
 }
@@ -108,11 +111,19 @@
   width: 100%;
 }
 
+/* Clears the fixed 64px command bar on an anchor jump — from a reference link, or from the
+   sticky rail's "In this chapter" list. */
+.ds-article__heading {
+  scroll-margin-top: 88px;
+}
+
 .ds-article__heading--2 {
   font-family: var(--ds-font-display);
-  font-size: 1.75rem;
+  font-size: 30px;
   line-height: 1.15;
   margin: var(--ds-space-6) 0 0;
+  padding-top: 24px;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
   color: var(--ds-ink);
 }
 
@@ -125,8 +136,8 @@
 
 .ds-article__p {
   font-family: var(--ds-font-editorial);
-  font-size: 1.125rem;
-  line-height: 1.7;
+  font-size: 19.5px;
+  line-height: 1.68;
   color: var(--ds-ink);
   margin: 0;
 }
@@ -155,12 +166,13 @@
 .ds-article__pullquote {
   margin: var(--ds-space-2) 0;
   padding-left: var(--ds-space-5);
-  border-left: 3px solid var(--ds-accent);
+  border-left: var(--ds-border-width-strong) solid var(--ds-accent);
 }
 
 .ds-article__pullquote p {
-  font-family: var(--ds-font-display);
-  font-size: 1.5rem;
+  font-family: var(--ds-font-editorial);
+  font-style: italic;
+  font-size: 24px;
   line-height: 1.3;
   color: var(--ds-ink);
   margin: 0;
@@ -189,12 +201,18 @@
  * Collapsed evidence drawers. Native <details>; charts are never wrapped here.
  * Begins closed so prose reads as prose; the reader opens the receipt on demand.
  * ------------------------------------------------------------------------- */
+/* Ink direction: a drawer is a hairline row, not a box — the border/radius/background come
+   off, same move RoomCard makes. A live map moment inside still needs a transparent ground
+   to show the borrowed plate through; that rule below no longer has anything to override. */
 .ds-article__drawer {
   margin-block: var(--ds-space-3);
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-surface-raised);
-  overflow: hidden;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-article__drawer + .ds-article__drawer {
+  margin-top: calc(-1 * var(--ds-space-3));
+  border-top: 0;
 }
 
 .ds-article__drawer-summary {
@@ -223,55 +241,46 @@
 
 .ds-article__drawer-kind {
   flex: none;
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ds-accent);
 }
 
 .ds-article__drawer-lead {
   flex: 1 1 auto;
-  font-family: var(--ds-font-sans);
+  font-family: var(--ds-font-editorial);
   font-size: 0.95rem;
   color: var(--ds-ink);
 }
 
-/* Chevron cue that rotates when the drawer opens. */
+/* `+` / `–` text cue, not a rotating chevron — same disclosure idiom room-kit.css's
+   .ds-room-draw__summary uses. */
 .ds-article__drawer-cue {
   flex: none;
   align-self: center;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-right: 2px solid var(--ds-ink-subtle);
-  border-bottom: 2px solid var(--ds-ink-subtle);
-  transform: rotate(45deg);
-  transition: transform 160ms ease;
+  font-family: var(--ds-font-sans);
+  font-size: 13px;
+  color: var(--ds-accent);
 }
 
-.ds-article__drawer[open] .ds-article__drawer-cue {
-  transform: rotate(-135deg);
+.ds-article__drawer-cue::before {
+  content: '+';
+}
+
+.ds-article__drawer[open] .ds-article__drawer-cue::before {
+  content: '\2013'; /* – */
 }
 
 .ds-article__drawer-body {
   padding: 0 var(--ds-space-4) var(--ds-space-4);
 }
 
-/*
- * A drawer holding a live map moment becomes a window.
- *
- * The borrowed plate is `position: fixed` below the document's stacking context, so it shows
- * through the moment's transparent slot — that is how the moment's own tag and Atlas control
- * stay on top of the map. It only works if everything between the slot and the page is
- * transparent too, and this card's background was not: an opened map drawer showed an empty
- * box with the map hidden behind it. Raising the plate instead is not an option, because
- * `.ds-shell-page-transition` isolates the whole document, so a plate above the card is also
- * above the moment's controls.
- */
-.ds-article__drawer:has(.ds-mapmoment[data-live='1']) {
-  background: transparent;
-}
-
-/* The wrapped artifact loses its own outer card chrome inside the drawer. */
+/* The wrapped artifact loses its own outer card chrome inside the drawer. The drawer itself
+   carries no background any more (see .ds-article__drawer above), so a live map moment's
+   borrowed plate — position: fixed below the document's stacking context — already shows
+   through without a transparency override; this only strips the document figure's own box. */
 .ds-article__drawer-body .ds-article__document {
   border: 0;
   background: transparent;
@@ -289,11 +298,17 @@
  * Stat rail — consecutive figures as one compact comparison strip, not a wall
  * of stacked cards. Two-up when the run is a pair; auto-fit otherwise.
  * ------------------------------------------------------------------------- */
+/* Three-up, 1px-gap grid on panel ground — same technique as the kit's TrustBlock/Anatomy:
+   the gap is the background color showing through as hairlines between cells. */
 .ds-article__statrail {
   margin-block: var(--ds-space-4);
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: var(--ds-space-3);
+  gap: 1px;
+  background: var(--ds-rule);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  overflow: hidden;
 }
 
 .ds-article__statrail[data-count='2'] {
@@ -305,23 +320,20 @@
   flex-direction: column;
   gap: var(--ds-space-1);
   padding: var(--ds-space-4);
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  border-left: 3px solid var(--ds-accent);
-  background: var(--ds-surface-raised);
+  background: var(--ds-surface);
 }
 
 .ds-article__statfigure {
   font-family: var(--ds-font-display);
-  font-size: clamp(1.6rem, 2vw + 1rem, 2.25rem);
+  font-size: 38px;
   line-height: 1.05;
-  color: var(--ds-ink);
+  color: var(--ds-accent);
   font-variant-numeric: tabular-nums;
 }
 
 .ds-article__statlabel {
-  font-family: var(--ds-font-sans);
-  font-size: 0.85rem;
+  font-family: var(--ds-font-editorial);
+  font-size: 15.5px;
   line-height: 1.4;
   color: var(--ds-ink-muted);
 }
@@ -337,10 +349,12 @@
   }
 }
 
-.ds-article__source-line {
+/* Matches the className ArticleBody.tsx actually renders (`ds-article-source-line`, no
+   double underscore) — this rule previously used the BEM spelling and never matched. */
+.ds-article-source-line {
   margin: var(--ds-space-1) 0 0;
-  font-family: var(--ds-font-sans);
-  font-size: 0.8rem;
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
   color: var(--ds-ink-subtle);
 }
 
@@ -385,11 +399,9 @@
   color: var(--ds-ink-muted);
 }
 
-/* References */
-.ds-article__references-section {
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  padding-top: var(--ds-space-6);
-}
+/* References — the reader-column heading class stays defined for other article surfaces
+   that still render an inline references section; this route's own list now lives in the
+   sticky rail (see `.ds-article-rail` in reading-room.css) and no longer wraps in this. */
 
 .ds-article-references {
   list-style: none;
@@ -405,10 +417,17 @@
   display: grid;
   grid-template-columns: 2.25rem 1fr;
   gap: var(--ds-space-2);
+  padding-bottom: var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
   font-family: var(--ds-font-sans);
   font-size: 0.9rem;
   line-height: 1.5;
   scroll-margin-top: var(--ds-space-8);
+}
+
+.ds-article-references__item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
 }
 
 .ds-article-references__item:target {
@@ -440,4 +459,60 @@
 
 .ds-article__footer a {
   color: var(--ds-accent);
+}
+
+/* ----------------------------------------------------------------------------
+ * Sticky evidence rail — Ink direction. "In this chapter" and "Records cited" are
+ * RailGroup, styled by room-kit.css; only the wrapper's stickiness and the one-off
+ * "Next in this collection" block belong to this sheet.
+ * ------------------------------------------------------------------------- */
+.ds-article-rail {
+  position: sticky;
+  top: 24px;
+}
+
+.ds-article-rail__next {
+  margin-top: var(--ds-space-7);
+  padding: var(--ds-space-4);
+  background: var(--ds-surface);
+  border-left: var(--ds-border-width-strong) solid var(--ds-accent);
+}
+
+.ds-article-rail__next-kicker {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-article-rail__next-position {
+  margin: var(--ds-space-1) 0 0;
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
+  color: var(--ds-accent);
+}
+
+.ds-article-rail__next-title {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: 15.5px;
+  letter-spacing: -0.015em;
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-article-rail__next-title:hover {
+  color: var(--ds-accent);
+}
+
+@media (max-width: 68rem) {
+  /* Below .ds-room--railed's breakpoint the rail stacks under the column (Room.tsx), where
+     sticky positioning has no meaningful ground to stick to. */
+  .ds-article-rail {
+    position: static;
+  }
 }

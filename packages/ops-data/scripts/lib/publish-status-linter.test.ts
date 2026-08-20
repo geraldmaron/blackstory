@@ -74,3 +74,38 @@ test('publishStatusLintFailureMessage summarizes blocking errors', () => {
   assert.match(message, /blocked 1 entity/);
   assert.match(message, /ent-person-1/);
 });
+
+test('place with dated closure and active status warns place_self_demise_vs_active', () => {
+  const report = lintPublishStatus({
+    entityId: 'ent-place-closed',
+    kind: 'place',
+    summary:
+      'The nightclub anchored the neighborhood for decades. It closed in 1968 following the assassination of Dr. King.',
+    status: 'active',
+  });
+  assert.equal(report.hasWarnings, true);
+  assert.equal(report.findings[0]?.code, 'place_self_demise_vs_active');
+});
+
+test('place with dated closure and historic status does not warn', () => {
+  const report = lintPublishStatus({
+    entityId: 'ent-place-closed-ok',
+    kind: 'place',
+    summary: 'It closed in 1968 following the assassination of Dr. King.',
+    status: 'historic',
+  });
+  assert.equal(report.findings.length, 0);
+});
+
+test('law kind never triggers the place self-demise warning', () => {
+  const report = lintPublishStatus({
+    entityId: 'ent-law-closed-word',
+    kind: 'law',
+    summary: 'The statute closed in 1900... (nonsensical for a law, must not match the place gate)',
+    status: 'active',
+  });
+  assert.equal(
+    report.findings.some((f) => f.code === 'place_self_demise_vs_active'),
+    false,
+  );
+});

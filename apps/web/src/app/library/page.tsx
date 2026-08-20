@@ -20,7 +20,6 @@ import {
   GROUP_HEADINGS,
   LIBRARY_CARD_GROUPS,
   cardTitleFor,
-  classLabelFor,
   destinationsInGroup,
 } from '../../lib/nav/destination-registry';
 import {
@@ -122,7 +121,7 @@ export default async function LibraryPage() {
       {LIBRARY_CARD_GROUPS.map((group) => (
         <React.Fragment key={group}>
           <GroupHeading>{GROUP_HEADINGS[group]}</GroupHeading>
-          <CardGrid>
+          <CardGrid variant="hub">
             {destinationsInGroup(group).map((destination) => (
               <RoomCard
                 key={destination.path}
@@ -130,7 +129,6 @@ export default async function LibraryPage() {
                 kind={destination.kind ?? ''}
                 title={cardTitleFor(destination)}
                 description={destination.description}
-                meta={classLabelFor(destination)}
               />
             ))}
           </CardGrid>

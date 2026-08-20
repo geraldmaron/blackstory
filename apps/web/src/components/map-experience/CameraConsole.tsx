@@ -171,6 +171,7 @@ export function CameraConsole({
   // With no record selected the camera is acting on geography, and a wide shot is not about
   // anyone. An empty record is the ungated case, which `allowedMovesFor` already models.
   const allowed = allowedMovesFor(activeRecord ?? {});
+  const anyRefused = KEYED_CAMERA_MOVES.some((move) => !allowed.has(move));
 
   return (
     <section className={cx('ds-camera', className)} aria-label="Camera">
@@ -224,6 +225,10 @@ export function CameraConsole({
           );
         })}
       </div>
+
+      {/* The reason lives on every refused button already (`title`, and a visually-hidden span
+          for assistive tech); this is the same statement made visible without a hover. */}
+      {anyRefused ? <p className="ds-camera__refusal">{REFUSAL_NOTE}</p> : null}
     </section>
   );
 }

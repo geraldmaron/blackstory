@@ -24,6 +24,7 @@ import type {
   HydratedArticleBlock,
   HydratedArticleStat,
 } from '../../lib/articles/hydrate';
+import { extractChapterHeadings } from '../../lib/articles/heading-anchors';
 import { ArticleCitationMarks, ArticleProse } from './ArticleProse';
 
 void React;
@@ -31,6 +32,23 @@ void React;
 export type ArticleBodyProps = {
   readonly article: HydratedArticle;
 };
+
+/**
+ * Anchor id for an h3 subheading. Prefixed with the block's own index in `article.blocks` —
+ * stable and guaranteed unique by construction — with a readable slug appended so the URL
+ * fragment still says something about the section. h2 section headings get their id from
+ * `extractChapterHeadings` instead (the same function the rail's "In this chapter" nav reads),
+ * so the two can never drift apart; h3s have no rail entry to stay in sync with.
+ */
+export function headingAnchorId(index: number, text: string): string {
+  const slug = text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+  return slug.length > 0 ? `section-${index}-${slug}` : `section-${index}`;
+}
 
 function SourceLine({ numbers }: { readonly numbers: readonly number[] }) {
   if (numbers.length === 0) return null;
@@ -91,18 +109,29 @@ function StatRail({ stats }: { readonly stats: readonly HydratedArticleStat[] })
 
 function Block({
   block,
+  index,
   refNumberById,
+  headingId,
 }: {
   readonly block: HydratedArticleBlock;
+  readonly index: number;
   readonly refNumberById: ReadonlyMap<string, number>;
+  /** DOM anchor id for an h2 section heading, so the rail's "In this chapter" nav can jump to it. */
+  readonly headingId?: string;
 }) {
   switch (block.type) {
-    case 'heading':
+    case 'heading': {
+      const id = headingAnchorId(index, block.text);
       return block.level === 2 ? (
-        <h2 className="ds-article__heading ds-article__heading--2">{block.text}</h2>
+        <h2 id={headingId} className="ds-article__heading ds-article__heading--2">
+          {block.text}
+        </h2>
       ) : (
-        <h3 className="ds-article__heading ds-article__heading--3">{block.text}</h3>
+        <h3 id={id} className="ds-article__heading ds-article__heading--3">
+          {block.text}
+        </h3>
       );
+    }
     case 'paragraph':
       return (
         <ArticleProse className="ds-article__p" text={block.text} refNumberById={refNumberById} />
@@ -229,6 +258,9 @@ function Block({
 export function ArticleBody({ article }: ArticleBodyProps) {
   const rendered: React.ReactNode[] = [];
   const blocks = article.blocks;
+  const headingIdByBlockIndex = new Map(
+    extractChapterHeadings(blocks).map((heading) => [heading.blockIndex, heading.id]),
+  );
   for (let i = 0; i < blocks.length; i += 1) {
     const block = blocks[i]!;
     if (block.type === 'stat') {
@@ -243,7 +275,16 @@ export function ArticleBody({ article }: ArticleBodyProps) {
       i = j - 1;
       continue;
     }
-    rendered.push(<Block key={i} block={block} refNumberById={article.refNumberById} />);
+    const headingId = headingIdByBlockIndex.get(i);
+    rendered.push(
+      <Block
+        key={i}
+        block={block}
+        index={i}
+        refNumberById={article.refNumberById}
+        {...(headingId === undefined ? {} : { headingId })}
+      />,
+    );
   }
   return <div className="ds-article__body ds-prose">{rendered}</div>;
 }

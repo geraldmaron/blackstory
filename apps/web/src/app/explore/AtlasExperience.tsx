@@ -225,7 +225,6 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       stage,
       camera,
       sorted,
-      mode,
       selectedId,
       setSelectedId,
       view.edgeLineCatalog.allTime.edges,
@@ -327,6 +326,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         recordSpotlight={storyRecord ?? undefined}
         chapters={storyOrder.chapters}
         factByChapterId={storyOrder.factByChapterId}
+        sheetOpen={sheetRecord !== null}
       />
 
       {spotlight ? (

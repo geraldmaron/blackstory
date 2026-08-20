@@ -286,6 +286,79 @@ export function buildSeriesGroups(
     }));
 }
 
+export type StoriesShelf = {
+  readonly id: string;
+  readonly label: string;
+  readonly count: number;
+  readonly href: string;
+  readonly members: readonly PublicArticleListItemDoc[];
+};
+
+/**
+ * One shelf per collection, ordered by size (largest first, same order as `buildSeriesGroups`),
+ * each carrying its own first `membersPerShelf` entries in the collection's own order. Reuses
+ * `sortItems(..., 'series')` for member order rather than inventing a second sort.
+ */
+export function buildSeriesShelves(
+  items: readonly PublicArticleListItemDoc[],
+  membersPerShelf = 4,
+): readonly StoriesShelf[] {
+  const labels = new Map<string, string>();
+  const bySeries = new Map<string, PublicArticleListItemDoc[]>();
+  for (const item of items) {
+    if (!item.series) continue;
+    labels.set(item.series.id, item.series.label);
+    const list = bySeries.get(item.series.id);
+    if (list) list.push(item);
+    else bySeries.set(item.series.id, [item]);
+  }
+  return [...bySeries.entries()]
+    .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
+    .map(([id, members]) => ({
+      id,
+      label: labels.get(id) ?? id,
+      count: members.length,
+      href: storiesHref({ series: id, kind: '' }),
+      members: sortItems(members, 'series').slice(0, membersPerShelf),
+    }));
+}
+
+/**
+ * The next entry in a collection after `afterPosition`, for the story page's "Next in this
+ * collection" rail block. `undefined` when the given series has no later member (its own
+ * `sortItems(..., 'series')` order applies, so a tie on position falls back to slug like
+ * everywhere else series order is computed).
+ */
+export function nextInSeries(
+  items: readonly PublicArticleListItemDoc[],
+  seriesId: string,
+  afterPosition: number,
+): PublicArticleListItemDoc | undefined {
+  const members = sortItems(
+    items.filter((item) => item.series?.id === seriesId),
+    'series',
+  );
+  return members.find((item) => (item.series?.position ?? -1) > afterPosition);
+}
+
+/** Stories with no collection — the "Everything else" list beneath the shelves. */
+export function uncollectedItems(
+  items: readonly PublicArticleListItemDoc[],
+): readonly PublicArticleListItemDoc[] {
+  return items.filter((item) => !item.series);
+}
+
+/**
+ * The one chapter that leads the shelves page at full width: the most recently published
+ * chapter in view. Deterministic and reads from data already on hand — no new field, no
+ * editorial "featured" flag to maintain.
+ */
+export function pickLeadStory(
+  items: readonly PublicArticleListItemDoc[],
+): PublicArticleListItemDoc | undefined {
+  return sortItems(items, 'newest')[0];
+}
+
 export function buildTagGroups(items: readonly PublicArticleListItemDoc[]): readonly RailEntry[] {
   const counts = new Map<string, number>();
   for (const item of items) {
@@ -337,6 +410,16 @@ export const STORY_SORT_LABELS: Record<StorySortKey, string> = {
   oldest: 'Oldest first',
   title: 'Title A–Z',
 };
+
+/**
+ * True in the page's default, unnarrowed browse state — the one state the shelves layout
+ * renders in. Any active filter/search or a non-default sort drops back to the flat, paginated
+ * index: shelves have their own count order and per-collection position order, and showing them
+ * while a reader's `sort` choice sits unapplied would be dishonest about what changed.
+ */
+export function showsShelves(query: StoriesQuery): boolean {
+  return !hasActiveNarrowing(query) && query.sort === 'series';
+}
 
 /** True when any narrowing control is engaged — drives the "clear" affordance. */
 export function hasActiveNarrowing(query: StoriesQuery): boolean {

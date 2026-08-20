@@ -30,12 +30,10 @@
 
 .ds-record-beat__subheading {
   margin: var(--ds-space-6) 0 var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--room-ink-4);
+  font-family: var(--ds-font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--room-ink-3);
 }
 
 /* One line under a heading saying what the block is, so a reader knows whether to read it. */
@@ -145,9 +143,29 @@
   color: var(--room-ink-3);
 }
 
-/* The kit's Anatomy is a 2x2 grid, which is right in a 680px column and wrong in a 240px rail:
-   "Fort Lauderdale, FL" broke over three lines and "Grade A · 1 source" over two. In the rail it
-   is one column of rows, so every value gets the full width and the labels stay aligned. */
-.ds-record-rail-block .ds-room-anat {
+/* The kit's Anatomy and TrustBlock are bordered grids — right for a single fact strip under a
+   header, wrong repeated three times down a rail: a sidebar of stacked boxes is the SaaS-widget
+   look the redesign replaced everywhere else with hairlines. In the rail both become a plain
+   column of rows, each divided by the same hairline every other rail block already uses, with
+   no box of their own — "Fort Lauderdale, FL" also no longer breaks over three narrow columns. */
+.ds-record-rail-block .ds-room-anat,
+.ds-record-rail-block .ds-room-trust {
   grid-template-columns: 1fr;
+  gap: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.ds-record-rail-block .ds-room-anat__cell,
+.ds-record-rail-block .ds-room-trust__row {
+  padding: 9px 0;
+  background: none;
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-record-rail-block .ds-room-anat__cell:first-child,
+.ds-record-rail-block .ds-room-trust__row:first-child {
+  border-top: 0;
+  padding-top: 0;
 }

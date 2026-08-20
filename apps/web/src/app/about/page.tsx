@@ -26,7 +26,6 @@ import { MakerCredit } from '../../components/MakerCredit';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import {
   cardTitleFor,
-  classLabelFor,
   destinationsInGroup,
   type Destination,
 } from '../../lib/nav/destination-registry';
@@ -53,7 +52,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
     'BlackStory is a place-connected Black history archive, built by one person so documented history stays findable, and kept open so other people can add to it.',
 });
 
-/** A registry entry as a card. The kind and class label come from the registry, never retyped. */
+/** A registry entry as a card. The kind comes from the registry, never retyped. */
 function destinationCard(destination: Destination) {
   return (
     <RoomCard
@@ -62,7 +61,6 @@ function destinationCard(destination: Destination) {
       kind={destination.kind ?? 'ROOM'}
       title={cardTitleFor(destination)}
       {...(destination.description === undefined ? {} : { description: destination.description })}
-      meta={classLabelFor(destination)}
     />
   );
 }

@@ -35,7 +35,7 @@
  *     packages/ops-data/scripts/sweep-entity-evidence.ts --lanes=nrhp-black-heritage --limit=100
  */
 import { createHash } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
@@ -107,6 +107,39 @@ const STALE_DAYS = Number.parseInt(flag('stale-days', '30'), 10);
 const REFETCH = process.argv.includes('--refetch');
 /** Politeness delay between outbound fetches. NPS assets are multi-MB scans. */
 const FETCH_DELAY_MS = Number.parseInt(flag('delay-ms', '750'), 10);
+/**
+ * repo-75et (PATH 2) — candidate URLs found by a search step this script does not itself run.
+ * This script has no LLM/search access of its own (PATH 1 is deliberately deterministic, no
+ * model); PATH 2 needs judgement per entity per the epic's own charter, so search happens in a
+ * separate pass (a subagent, or any process with real web-search access) that writes
+ * `{ [entityId]: string[] }` to this file. What THIS script does with those URLs is unchanged
+ * from every other collector here: fetch via the same safe-fetch path, gate via the same
+ * checkSubjectIdentity + assessText discipline, classify tier via the same isTier1Host list.
+ * Nothing about the identity bar is relaxed for search-sourced candidates — if anything they need
+ * it more, since a search hit's relevance ranking is not evidence of subject identity.
+ */
+const WEBSEARCH_LEADS_PATH = flag('websearch-leads', '');
+/** Cap outbound fetches per entity for search-sourced candidates — a search can return many
+ * plausible-looking hits, most of which will fail identity and just cost a wasted fetch. */
+const WEBSEARCH_LEADS_PER_ENTITY = Number.parseInt(flag('websearch-leads-per-entity', '5'), 10);
+
+/** `{ [entityId]: string[] }` written by the separate search step. Empty when no flag given. */
+function loadWebSearchLeads(path: string): ReadonlyMap<string, readonly string[]> {
+  if (path.length === 0) return new Map();
+  if (!existsSync(path)) throw new Error(`--websearch-leads path does not exist: ${path}`);
+  const parsed: unknown = JSON.parse(readFileSync(path, 'utf8'));
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error(`--websearch-leads must be a JSON object of { [entityId]: string[] }`);
+  }
+  const map = new Map<string, readonly string[]>();
+  for (const [entityId, urls] of Object.entries(parsed as Record<string, unknown>)) {
+    if (!Array.isArray(urls) || !urls.every((u) => typeof u === 'string')) {
+      throw new Error(`--websearch-leads entry for ${entityId} is not a string array`);
+    }
+    map.set(entityId, urls as readonly string[]);
+  }
+  return map;
+}
 
 type CandidateRow = {
   readonly id: string;
@@ -355,7 +388,10 @@ async function collectDcHpo(row: CandidateRow): Promise<EvidenceRow | null> {
 
   const quality = assessText(page.text);
   return {
-    id: evidenceId(row.id, 'dc-hpo', url),
+    // Same fix as collectReferenceHops: hash the stored sourceUrl (page.finalUrl), not the
+    // pre-fetch canonicalUrl, so the id can never collide with a row whose (entity_id, collector,
+    // source_url) differs because a redirect target changed between runs.
+    id: evidenceId(row.id, 'dc-hpo', page.finalUrl),
     entityId: row.id,
     lane: row.lane,
     collector: 'dc-hpo',
@@ -462,6 +498,69 @@ async function collectRestoredClaimSources(row: CandidateRow): Promise<EvidenceR
   }
   if (evidence.length === 0) {
     throw new SkipReason('no restored claim source passed safe fetch');
+  }
+  return evidence;
+}
+
+/**
+ * repo-75et (PATH 2) — candidate URLs found by a search step outside this script (see
+ * loadWebSearchLeads' docs). Structurally this is collectRestoredClaimSources with a different
+ * URL source, but the identity bar is checkSubjectIdentity (place AND name AND focus) rather than
+ * the looser checkSubjectIdentity call restored-claim-source already uses — both already use
+ * checkSubjectIdentity, so the real difference is trust: a citation already published on this
+ * entity's own claims (restored-claim-source) has a prior human/pipeline decision behind it; a
+ * search hit has none, so it gets the same full gate every reference-hop candidate gets, and nas
+ * no default trust from being merely "found".
+ */
+async function collectWebSearchLeads(
+  row: CandidateRow,
+  leadsByEntity: ReadonlyMap<string, readonly string[]>,
+): Promise<EvidenceRow[]> {
+  const urls = [...new Set(leadsByEntity.get(row.id) ?? [])].slice(0, WEBSEARCH_LEADS_PER_ENTITY);
+  if (urls.length === 0) throw new SkipReason('no web-search leads for this entity');
+
+  const evidence: EvidenceRow[] = [];
+  for (const url of urls) {
+    const page = await safeFetchPage(url, { allowedContentTypes: ['text/html'] });
+    if (page === undefined) continue;
+    const quality = assessText(page.text);
+    const identity = checkSubjectIdentity(
+      page.text,
+      {
+        displayName: row.display_name,
+        city: row.payload.city,
+        county: row.payload.county,
+        state: row.payload.state,
+      },
+      { title: row.display_name },
+    );
+    const status: 'captured' | 'quarantined' =
+      quality.usable && identity.corroborated ? 'captured' : 'quarantined';
+    evidence.push({
+      id: evidenceId(row.id, 'web-search', page.finalUrl),
+      entityId: row.id,
+      lane: row.lane,
+      collector: 'web-search',
+      sourceUrl: page.finalUrl,
+      sourceTier: isTier1Host(page.finalUrl) ? 'tier1' : 'tier2',
+      title: row.display_name,
+      contentText: page.text,
+      contentHash: hashContent(page.text),
+      charCount: page.text.length,
+      qualityScore: quality.score,
+      status,
+      provenance: {
+        searchCandidateUrl: url,
+        fetchedFinalUrl: page.finalUrl,
+        identity,
+        quarantineReason:
+          status === 'quarantined' ? (identity.reason ?? quality.reason) : undefined,
+      },
+    });
+    await sleep(FETCH_DELAY_MS);
+  }
+  if (evidence.length === 0) {
+    throw new SkipReason('no web-search lead passed safe fetch');
   }
   return evidence;
 }
@@ -621,7 +720,13 @@ async function collectReferenceHops(
           title: hop.candidate.anchorText,
         });
         const identityCorroborated = identity.corroborated;
-        const evId = evidenceId(row.id, 'reference-hop', hop.candidate.url);
+        // Hash the SAME url that gets stored as sourceUrl (the post-redirect finalUrl), not the
+        // pre-fetch candidate url. Hashing candidate.url let a site's redirect target flip
+        // between runs (www <-> non-www) produce an id computed from the old candidate url that
+        // collided with a differently-redirected finalUrl already on disk -- the row's PK matched
+        // an existing id while its (entity_id, collector, source_url) did not, so ON CONFLICT
+        // couldn't route it to an UPDATE and the whole apply transaction aborted on the PK clash.
+        const evId = evidenceId(row.id, 'reference-hop', hopPage.finalUrl);
         const status: 'captured' | 'quarantined' =
           quality.usable && identityCorroborated ? 'captured' : 'quarantined';
         const evRow: EvidenceRow = {
@@ -720,7 +825,10 @@ function applyAddressRestriction(row: CandidateRow, item: EvidenceRow): Evidence
   };
 }
 
-async function sweepEntity(row: CandidateRow): Promise<EntityOutcome> {
+async function sweepEntity(
+  row: CandidateRow,
+  webSearchLeads: ReadonlyMap<string, readonly string[]>,
+): Promise<EntityOutcome> {
   const evidence: EvidenceRow[] = [];
   const notes: string[] = [];
 
@@ -753,6 +861,17 @@ async function sweepEntity(row: CandidateRow): Promise<EntityOutcome> {
     notes.push(`restored-claim-source: ${prefix} — ${(error as Error).message}`);
   }
 
+  try {
+    evidence.push(
+      ...(await collectWebSearchLeads(row, webSearchLeads)).map((item) =>
+        finalizeEvidenceRow(row, item),
+      ),
+    );
+  } catch (error) {
+    const prefix = error instanceof SkipReason ? 'skip' : 'error';
+    notes.push(`web-search: ${prefix} — ${(error as Error).message}`);
+  }
+
   let leads: EntityOutcome['leads'] = [];
   try {
     const hops = await collectReferenceHops(row, evidence);
@@ -770,6 +889,12 @@ async function main(): Promise<void> {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error('DATABASE_URL is required (source apps/web/.env.local)');
   if (LANES.length === 0) throw new Error('No lanes selected (greenbook is hard-excluded)');
+  const webSearchLeads = loadWebSearchLeads(WEBSEARCH_LEADS_PATH);
+  if (webSearchLeads.size > 0) {
+    console.log(
+      `Loaded web-search leads for ${webSearchLeads.size} entities from ${WEBSEARCH_LEADS_PATH}.`,
+    );
+  }
 
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
 
@@ -912,7 +1037,7 @@ async function main(): Promise<void> {
   let index = 0;
   for (const row of rows.rows) {
     index += 1;
-    const outcome = await sweepEntity(row);
+    const outcome = await sweepEntity(row, webSearchLeads);
     outcomes.push(outcome);
     const captured = outcome.evidence.filter((item) => item.status === 'captured');
     console.log(
@@ -980,44 +1105,20 @@ async function main(): Promise<void> {
     return;
   }
 
+  // One transaction PER ENTITY, not one transaction for the whole batch. A multi-hour sweep can
+  // touch hundreds of entities; wrapping all of them in a single BEGIN...COMMIT means one bad row
+  // (repo-5csj: a redirect-target flip produced an id/source_url mismatch and threw a raw PK
+  // violation mid-batch) discards every entity's already-fetched evidence, not just the offender's.
+  // Evidence rows and their entity's ledger row still commit together, so a partial write for one
+  // entity can never leave its evidence captured but its ledger status stale.
   const client = await pool.connect();
+  let appliedEntities = 0;
+  let appliedEvidenceRows = 0;
+  const failedEntities: { entityId: string; error: string }[] = [];
   try {
-    await client.query('BEGIN');
-    for (const item of allEvidence) {
-      await client.query(
-        `INSERT INTO bb_research.entity_evidence
-           (id, entity_id, lane, collector, source_url, source_tier, title, content_text,
-            content_hash, char_count, quality_score, status, provenance, fetched_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, now())
-         ON CONFLICT (entity_id, collector, source_url) DO UPDATE SET
-           content_text = EXCLUDED.content_text,
-           content_hash = EXCLUDED.content_hash,
-           char_count = EXCLUDED.char_count,
-           quality_score = EXCLUDED.quality_score,
-           status = EXCLUDED.status,
-           provenance = EXCLUDED.provenance,
-           fetched_at = now()`,
-        [
-          item.id,
-          item.entityId,
-          item.lane,
-          item.collector,
-          item.sourceUrl,
-          item.sourceTier,
-          item.title,
-          item.contentText,
-          item.contentHash,
-          item.charCount,
-          item.qualityScore,
-          item.status,
-          JSON.stringify(item.provenance),
-        ],
-      );
-    }
-
-    // Ledger: evidence_digest is what WS4 compares to decide "nothing changed since last pass".
     for (const outcome of outcomes) {
-      const capturedForEntity = outcome.evidence.filter((item) => item.status === 'captured');
+      const entityEvidence = outcome.evidence;
+      const capturedForEntity = entityEvidence.filter((item) => item.status === 'captured');
       const digest =
         capturedForEntity.length === 0
           ? null
@@ -1028,63 +1129,107 @@ async function main(): Promise<void> {
                 .join('|'),
             );
       const row = rows.rows.find((candidate) => candidate.id === outcome.entityId);
-      await client.query(
-        `INSERT INTO bb_research.entity_enrichment
-           (entity_id, lane, status, evidence_digest, notes, updated_at)
-         VALUES ($1,$2,$3,$4,$5, now())
-         ON CONFLICT (entity_id) DO UPDATE SET
-           lane = EXCLUDED.lane,
-           -- repo-n9dq: 'no-lane-significance' is terminal-until-the-evidence-changes, and the
-           -- digest is the whole mechanism. A drafter read this entity's sources and judged that
-           -- they carry no Black-history significance; re-running the sweep and finding the SAME
-           -- documents is not new information, so resetting the row to 'pending' would re-offer it
-           -- to a drafter that can only reach the same conclusion — the exact re-selection loop
-           -- that status was added to stop. A changed digest does mean new evidence, and then
-           -- EXCLUDED.status correctly reopens it.
-           status = CASE
-             WHEN entity_enrichment.status = 'no-lane-significance'
-                  AND entity_enrichment.evidence_digest IS NOT DISTINCT FROM EXCLUDED.evidence_digest
-               THEN entity_enrichment.status
-             ELSE EXCLUDED.status
-           END,
-           evidence_digest = EXCLUDED.evidence_digest,
-           -- Keep any WS4 draft that is already on the row. A re-sweep replaces this entity's
-           -- EVIDENCE, and moving the status back to 'pending' is right — new evidence means the
-           -- record wants re-drafting. Destroying the draft alongside it is not: the draft is the
-           -- only copy of WS4's output, and apply-enrichment-to-landscape reads notes.draft to
-           -- stage it. The significance-first re-sweep on 2026-08-11 wiped ~79 of them; those had
-           -- already been staged and published, so nothing reader-facing was lost, but a draft
-           -- swept before it was applied would have been unrecoverable from the database.
-           notes = EXCLUDED.notes ||
-                   CASE
-                     WHEN entity_enrichment.notes ? 'draft'
-                       THEN jsonb_build_object('draft', entity_enrichment.notes -> 'draft')
-                     ELSE '{}'::jsonb
-                   END,
-           updated_at = now()`,
-        [
-          outcome.entityId,
-          row?.lane ?? null,
-          // 'pending' = evidence is in hand, WS4 has not enriched from it yet. 'skipped' = both
-          // PATH 1 collectors came back empty; the record keeps its thin-record notice.
-          capturedForEntity.length > 0 ? 'pending' : 'skipped',
-          digest,
-          JSON.stringify({
-            ws: 'repo-n7p6.3',
-            collectors: capturedForEntity.map((item) => item.collector),
-            notes: outcome.notes,
-            reason: capturedForEntity.length === 0 ? 'no-evidence' : undefined,
-          }),
-        ],
-      );
+
+      try {
+        await client.query('BEGIN');
+        for (const item of entityEvidence) {
+          await client.query(
+            `INSERT INTO bb_research.entity_evidence
+               (id, entity_id, lane, collector, source_url, source_tier, title, content_text,
+                content_hash, char_count, quality_score, status, provenance, fetched_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, now())
+             ON CONFLICT (entity_id, collector, source_url) DO UPDATE SET
+               content_text = EXCLUDED.content_text,
+               content_hash = EXCLUDED.content_hash,
+               char_count = EXCLUDED.char_count,
+               quality_score = EXCLUDED.quality_score,
+               status = EXCLUDED.status,
+               provenance = EXCLUDED.provenance,
+               fetched_at = now()`,
+            [
+              item.id,
+              item.entityId,
+              item.lane,
+              item.collector,
+              item.sourceUrl,
+              item.sourceTier,
+              item.title,
+              item.contentText,
+              item.contentHash,
+              item.charCount,
+              item.qualityScore,
+              item.status,
+              JSON.stringify(item.provenance),
+            ],
+          );
+        }
+
+        // Ledger: evidence_digest is what WS4 compares to decide "nothing changed since last pass".
+        await client.query(
+          `INSERT INTO bb_research.entity_enrichment
+             (entity_id, lane, status, evidence_digest, notes, updated_at)
+           VALUES ($1,$2,$3,$4,$5, now())
+           ON CONFLICT (entity_id) DO UPDATE SET
+             lane = EXCLUDED.lane,
+             -- repo-n9dq: 'no-lane-significance' is terminal-until-the-evidence-changes, and the
+             -- digest is the whole mechanism. A drafter read this entity's sources and judged that
+             -- they carry no Black-history significance; re-running the sweep and finding the SAME
+             -- documents is not new information, so resetting the row to 'pending' would re-offer it
+             -- to a drafter that can only reach the same conclusion — the exact re-selection loop
+             -- that status was added to stop. A changed digest does mean new evidence, and then
+             -- EXCLUDED.status correctly reopens it.
+             status = CASE
+               WHEN entity_enrichment.status = 'no-lane-significance'
+                    AND entity_enrichment.evidence_digest IS NOT DISTINCT FROM EXCLUDED.evidence_digest
+                 THEN entity_enrichment.status
+               ELSE EXCLUDED.status
+             END,
+             evidence_digest = EXCLUDED.evidence_digest,
+             -- Keep any WS4 draft that is already on the row. A re-sweep replaces this entity's
+             -- EVIDENCE, and moving the status back to 'pending' is right — new evidence means the
+             -- record wants re-drafting. Destroying the draft alongside it is not: the draft is the
+             -- only copy of WS4's output, and apply-enrichment-to-landscape reads notes.draft to
+             -- stage it. The significance-first re-sweep on 2026-08-11 wiped ~79 of them; those had
+             -- already been staged and published, so nothing reader-facing was lost, but a draft
+             -- swept before it was applied would have been unrecoverable from the database.
+             notes = EXCLUDED.notes ||
+                     CASE
+                       WHEN entity_enrichment.notes ? 'draft'
+                         THEN jsonb_build_object('draft', entity_enrichment.notes -> 'draft')
+                       ELSE '{}'::jsonb
+                     END,
+             updated_at = now()`,
+          [
+            outcome.entityId,
+            row?.lane ?? null,
+            // 'pending' = evidence is in hand, WS4 has not enriched from it yet. 'skipped' = both
+            // PATH 1 collectors came back empty; the record keeps its thin-record notice.
+            capturedForEntity.length > 0 ? 'pending' : 'skipped',
+            digest,
+            JSON.stringify({
+              ws: 'repo-n7p6.3',
+              collectors: capturedForEntity.map((item) => item.collector),
+              notes: outcome.notes,
+              reason: capturedForEntity.length === 0 ? 'no-evidence' : undefined,
+            }),
+          ],
+        );
+        await client.query('COMMIT');
+        appliedEntities += 1;
+        appliedEvidenceRows += entityEvidence.length;
+      } catch (error) {
+        await client.query('ROLLBACK').catch(() => {});
+        failedEntities.push({ entityId: outcome.entityId, error: (error as Error).message });
+        console.error(
+          `Apply failed for ${outcome.entityId}, rolled back that entity only: ${(error as Error).message}`,
+        );
+      }
     }
-    await client.query('COMMIT');
     console.log(
-      `Applied: ${allEvidence.length} evidence row(s), ${outcomes.length} ledger row(s).`,
+      `Applied: ${appliedEvidenceRows} evidence row(s), ${appliedEntities} ledger row(s). ` +
+        `Failed: ${failedEntities.length} entit${failedEntities.length === 1 ? 'y' : 'ies'}` +
+        `${failedEntities.length > 0 ? ` (${failedEntities.map((f) => f.entityId).join(', ')})` : ''}.`,
     );
-  } catch (error) {
-    await client.query('ROLLBACK').catch(() => {});
-    throw error;
   } finally {
     client.release();
     await pool.end();

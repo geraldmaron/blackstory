@@ -1,7 +1,10 @@
 /**
  * Publish-time status linter: hard errors for person deceased-lexicon vs living contradictions;
- * warnings when law summaries self-describe repeal/struck-down but status remains in_force.
+ * warnings when law summaries self-describe repeal/struck-down but status remains in_force, and
+ * when place-like summaries self-describe closure/demolition but status remains active.
  */
+import { TERMINAL_CLOSURE_RE } from '@repo/domain';
+
 export type PublishStatusLintSeverity = 'error' | 'warn';
 
 export type PublishStatusLintFinding = {
@@ -77,6 +80,22 @@ export function lintPublishStatus(input: PublishStatusLintInput): PublishStatusL
           'Law summary describes repeal/struck-down/overturn language but outgoing status is in_force.',
       });
     }
+  }
+
+  // Same self-demise contradiction, place-like family (repo-rlq1). Every kind that reaches
+  // derivePlaceLike is in scope — place/school/organization/institution plus the
+  // publication/artifact fallback — i.e. anything that is not person/law/case/event/movement.
+  // Warn, not error: ~1 in 5 of the measured contradictions was an institution-vs-building
+  // nuance (an active museum on a closed fort) that needs a person, not an auto-block.
+  const placeLikeFamily = !['person', 'law', 'case', 'event', 'movement'].includes(input.kind);
+  if (placeLikeFamily && input.status === 'active' && TERMINAL_CLOSURE_RE.test(text)) {
+    findings.push({
+      entityId: input.entityId,
+      severity: 'warn',
+      code: 'place_self_demise_vs_active',
+      message:
+        'Summary states a dated closure/demolition but outgoing status is active. Review whether the subject still operates.',
+    });
   }
 
   return {
