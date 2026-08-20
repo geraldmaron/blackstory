@@ -725,5 +725,43 @@ a.ds-errata__row-id {
     top: 24px;
   }
 }
+
+/* "Next in this collection" — panel ground behind a copper left rule, per Ink spec §4:
+   the one rail block that reaches forward rather than describing the current chapter. */
+.ds-article-rail__next {
+  margin-top: var(--ds-space-7);
+  padding: var(--ds-space-4);
+  background: var(--room-note-wash);
+  border-left: var(--ds-border-width-strong) solid var(--ds-accent-graphic);
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-article-rail__next-link {
+  display: block;
+  margin-top: var(--ds-space-2);
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-article-rail__next-link:hover {
+  color: var(--ds-accent);
+}
+
+.ds-article-rail__next-position {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--room-ink-4);
+}
+
+.ds-article-rail__next-title {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
 /* —— end /stories/[slug] rail —————————————————————————————————————————————— */
 /* —— end /chapters pager —————————————————————————————————————————————————————— */

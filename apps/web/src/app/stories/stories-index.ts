@@ -323,6 +323,24 @@ export function buildSeriesShelves(
     }));
 }
 
+/**
+ * The next entry in a collection after `afterPosition`, for the story page's "Next in this
+ * collection" rail block. `undefined` when the given series has no later member (its own
+ * `sortItems(..., 'series')` order applies, so a tie on position falls back to slug like
+ * everywhere else series order is computed).
+ */
+export function nextInSeries(
+  items: readonly PublicArticleListItemDoc[],
+  seriesId: string,
+  afterPosition: number,
+): PublicArticleListItemDoc | undefined {
+  const members = sortItems(
+    items.filter((item) => item.series?.id === seriesId),
+    'series',
+  );
+  return members.find((item) => (item.series?.position ?? -1) > afterPosition);
+}
+
 /** Stories with no collection — the "Everything else" list beneath the shelves. */
 export function uncollectedItems(
   items: readonly PublicArticleListItemDoc[],

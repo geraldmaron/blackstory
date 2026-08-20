@@ -24,6 +24,7 @@ import type {
   HydratedArticleBlock,
   HydratedArticleStat,
 } from '../../lib/articles/hydrate';
+import { extractChapterHeadings } from '../../lib/articles/heading-anchors';
 import { ArticleCitationMarks, ArticleProse } from './ArticleProse';
 
 void React;
@@ -92,14 +93,19 @@ function StatRail({ stats }: { readonly stats: readonly HydratedArticleStat[] })
 function Block({
   block,
   refNumberById,
+  headingId,
 }: {
   readonly block: HydratedArticleBlock;
   readonly refNumberById: ReadonlyMap<string, number>;
+  /** DOM anchor id for an h2 section heading, so the rail's "In this chapter" nav can jump to it. */
+  readonly headingId?: string;
 }) {
   switch (block.type) {
     case 'heading':
       return block.level === 2 ? (
-        <h2 className="ds-article__heading ds-article__heading--2">{block.text}</h2>
+        <h2 id={headingId} className="ds-article__heading ds-article__heading--2">
+          {block.text}
+        </h2>
       ) : (
         <h3 className="ds-article__heading ds-article__heading--3">{block.text}</h3>
       );
@@ -229,6 +235,9 @@ function Block({
 export function ArticleBody({ article }: ArticleBodyProps) {
   const rendered: React.ReactNode[] = [];
   const blocks = article.blocks;
+  const headingIdByBlockIndex = new Map(
+    extractChapterHeadings(blocks).map((heading) => [heading.blockIndex, heading.id]),
+  );
   for (let i = 0; i < blocks.length; i += 1) {
     const block = blocks[i]!;
     if (block.type === 'stat') {
@@ -243,7 +252,15 @@ export function ArticleBody({ article }: ArticleBodyProps) {
       i = j - 1;
       continue;
     }
-    rendered.push(<Block key={i} block={block} refNumberById={article.refNumberById} />);
+    const headingId = headingIdByBlockIndex.get(i);
+    rendered.push(
+      <Block
+        key={i}
+        block={block}
+        refNumberById={article.refNumberById}
+        {...(headingId === undefined ? {} : { headingId })}
+      />,
+    );
   }
   return <div className="ds-article__body ds-prose">{rendered}</div>;
 }
