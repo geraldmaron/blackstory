@@ -30,12 +30,10 @@
 
 .ds-record-beat__subheading {
   margin: var(--ds-space-6) 0 var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--room-ink-4);
+  font-family: var(--ds-font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--room-ink-3);
 }
 
 /* One line under a heading saying what the block is, so a reader knows whether to read it. */
