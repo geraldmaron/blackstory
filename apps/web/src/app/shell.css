@@ -581,6 +581,8 @@
      every action on the site read as mono-adjacent shouting. */
   font-size: 14px;
   font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
   text-decoration: none;
   cursor: pointer;
   transition:

@@ -20,7 +20,6 @@ import {
   GROUP_HEADINGS,
   LIBRARY_CARD_GROUPS,
   cardTitleFor,
-  classLabelFor,
   destinationsInGroup,
 } from '../../lib/nav/destination-registry';
 import {
@@ -130,7 +129,6 @@ export default async function LibraryPage() {
                 kind={destination.kind ?? ''}
                 title={cardTitleFor(destination)}
                 description={destination.description}
-                meta={classLabelFor(destination)}
               />
             ))}
           </CardGrid>

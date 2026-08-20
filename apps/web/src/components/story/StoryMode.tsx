@@ -42,6 +42,12 @@ export type StoryModeProps = {
   readonly recordSpotlight?: StoryRecordSpotlight | undefined;
   /** The fact each rotating-fact chapter drew this visit, by chapter id. Absent falls back. */
   readonly factByChapterId?: Readonly<Record<string, StoryFact>> | undefined;
+  /**
+   * The record sheet is open (the reader clicked a pin). The sheet is a fixed right-side panel
+   * that can collide with a right-laid-out ("even") chapter card, so every chapter card moves to
+   * the left for as long as the sheet is open — see `.ds-story--sheet-open` in story-mode.css.
+   */
+  readonly sheetOpen?: boolean;
   readonly className?: string;
 };
 
@@ -115,6 +121,7 @@ export function StoryMode({
   reducedMotion = false,
   recordSpotlight,
   factByChapterId,
+  sheetOpen = false,
   className,
 }: StoryModeProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -161,7 +168,11 @@ export function StoryMode({
   if (!active) return null;
 
   return (
-    <div className={cx('ds-story', className)} ref={rootRef} id="ds-story">
+    <div
+      className={cx('ds-story', sheetOpen && 'ds-story--sheet-open', className)}
+      ref={rootRef}
+      id="ds-story"
+    >
       {chapters.map((chapter) => {
         const copy = copyFor(chapter.id);
         if (!copy) return null;

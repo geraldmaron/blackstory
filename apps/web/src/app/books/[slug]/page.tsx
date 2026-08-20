@@ -1,6 +1,6 @@
 /**
- * Challenged-books detail page: v6 edition Surface stack with intro anatomy strip,
- * primary context story, challenges/evidence panels, related titles below, and mosaic.
+ * Challenged-books detail page: room kit shell, cover + anatomy header, primary context
+ * story, challenges/evidence sections, related titles below.
  */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -25,12 +25,8 @@ import { BooksAnatomyStrip } from '../BooksAnatomyStrip';
 import { BooksCoverArt } from '../BooksCoverArt';
 import { coverIsbnForBook } from '../books-cover';
 import { BOOKS_DETAIL } from '../books-copy';
-import {
-  booksEditionPanelClassName,
-  booksEditionRootClassName,
-  booksEditionStackClassName,
-} from '../books-panel-chrome';
-import '../books-edition.css';
+import { Room, RoomHeader } from '../../../components/room';
+import '../../reading-room.css';
 import '../../../components/patterns/record-anatomy.css';
 
 type BooksDetailPageProps = {
@@ -107,10 +103,7 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
           },
         ];
         entityPlacePanel = (
-          <article
-            className={booksEditionPanelClassName('place')}
-            aria-labelledby="books-place-heading"
-          >
+          <section className="ds-room-section" aria-labelledby="books-place-heading">
             <p className="ds-books-edition__panel-title">Place</p>
             <h2 className="ds-books-edition__panel-heading" id="books-place-heading">
               Archive record on the map
@@ -123,83 +116,74 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
               place={anatomyPlace}
               aria-label="Related archive record at a glance"
             />
-          </article>
+          </section>
         );
       }
     }
   }
 
   return (
-    <div className={booksEditionRootClassName()} data-books-edition="v6">
-      <main className="ds-container ds-page" id="main">
-        <div className={booksEditionStackClassName()}>
-          <article className={booksEditionPanelClassName('intro')}>
-            <header className="ds-books-edition__header ds-books-edition__header--detail">
-              <span className="ds-books-edition__index" aria-hidden="true">
-                00
-              </span>
-              <div className="ds-books-edition__intro-grid">
-                <BooksCoverArt
-                  title={book.title}
-                  {...(coverIsbn ? { isbn: coverIsbn } : {})}
-                  size="L"
-                  decorative={false}
-                  className="ds-books-edition__intro-cover"
-                />
-                <div>
-                  <p className="ds-books-edition__kicker">{BOOKS_DETAIL.introKicker}</p>
-                  <h1 className="ds-books-edition__title">{book.title}</h1>
-                  {states.length > 0 ? (
-                    <div
-                      className="ds-books-edition__tags"
-                      role="group"
-                      aria-label="States on challenge lists"
-                    >
-                      {states.map((state) => (
-                        <Link
-                          key={state.code}
-                          className="ds-books-edition__tag"
-                          href={`/books?state=${encodeURIComponent(state.code)}`}
-                          title={state.name}
-                        >
-                          <span className="ds-visually-hidden">{state.name} </span>
-                          {state.code}
-                        </Link>
-                      ))}
-                    </div>
-                  ) : null}
-                  {bookshop ? (
-                    <p className="ds-books-edition__actions">
-                      <a
-                        className="ds-cta ds-cta--copper"
-                        href={bookshop.href}
-                        rel="noopener noreferrer sponsored"
-                        target="_blank"
-                      >
-                        Buy on Bookshop
-                      </a>
-                    </p>
-                  ) : null}
-                  <BooksAnatomyStrip
-                    authorLine={authorLine}
-                    publishedDate={book.publishedDate}
-                    citationCount={book.citations.length}
-                    challengeCount={activeChallenges.length}
-                    stateCount={states.length}
-                    {...(isbn ? { isbn: isbn.value } : {})}
-                  />
-                </div>
-              </div>
-            </header>
-          </article>
+    <Room>
+      <RoomHeader
+        pathname={`/books/${book.slug}`}
+        crumbLabel={book.title}
+        kicker={BOOKS_DETAIL.introKicker}
+        title={book.title}
+        showPath={false}
+      />
 
-          <BooksDetailSections
-            view={view}
-            relatedItems={relatedItems}
-            placePanel={entityPlacePanel}
+      <div className="ds-books-edition__intro-grid">
+        <BooksCoverArt
+          title={book.title}
+          {...(coverIsbn ? { isbn: coverIsbn } : {})}
+          size="L"
+          decorative={false}
+          className="ds-books-edition__intro-cover"
+        />
+        <div>
+          {states.length > 0 ? (
+            <div
+              className="ds-books-edition__tags"
+              role="group"
+              aria-label="States on challenge lists"
+            >
+              {states.map((state) => (
+                <Link
+                  key={state.code}
+                  className="ds-books-edition__tag"
+                  href={`/books?state=${encodeURIComponent(state.code)}`}
+                  title={state.name}
+                >
+                  <span className="ds-visually-hidden">{state.name} </span>
+                  {state.code}
+                </Link>
+              ))}
+            </div>
+          ) : null}
+          {bookshop ? (
+            <p className="ds-books-edition__actions">
+              <a
+                className="ds-cta ds-cta--copper"
+                href={bookshop.href}
+                rel="noopener noreferrer sponsored"
+                target="_blank"
+              >
+                Buy on Bookshop
+              </a>
+            </p>
+          ) : null}
+          <BooksAnatomyStrip
+            authorLine={authorLine}
+            publishedDate={book.publishedDate}
+            citationCount={book.citations.length}
+            challengeCount={activeChallenges.length}
+            stateCount={states.length}
+            {...(isbn ? { isbn: isbn.value } : {})}
           />
         </div>
-      </main>
-    </div>
+      </div>
+
+      <BooksDetailSections view={view} relatedItems={relatedItems} placePanel={entityPlacePanel} />
+    </Room>
   );
 }

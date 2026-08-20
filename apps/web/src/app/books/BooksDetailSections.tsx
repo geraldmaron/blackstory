@@ -1,5 +1,5 @@
 /**
- * Books detail body: v6 edition Surface panels for context, challenges, evidence,
+ * Books detail body: hairline-divided sections for context, challenges, evidence,
  * lookup, related titles, and connected depart links. Primary story stays above related.
  */
 import React from 'react';
@@ -10,7 +10,6 @@ import {
   type BooksDetailViewModel,
 } from './books-view-model';
 import { BooksRipRow } from './BooksRipRow';
-import { booksEditionPanelClassName } from './books-panel-chrome';
 import { BOOKS_DETAIL } from './books-copy';
 
 const CHALLENGE_STATUS_LABEL: Record<string, string> = {
@@ -32,8 +31,8 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
 
   return (
     <>
-      <article
-        className={booksEditionPanelClassName('context')}
+      <section
+        className="ds-room-section"
         aria-labelledby="description-heading"
         id="description"
       >
@@ -42,10 +41,10 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
           {BOOKS_DETAIL.contextTitle}
         </h2>
         <p className="ds-books-edition__body">{book.description}</p>
-      </article>
+      </section>
 
-      <article
-        className={booksEditionPanelClassName('challenges')}
+      <section
+        className="ds-room-section"
         aria-labelledby="challenges-heading"
         id="challenges"
       >
@@ -120,10 +119,10 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
             </ul>
           </div>
         ) : null}
-      </article>
+      </section>
 
-      <article
-        className={booksEditionPanelClassName('evidence')}
+      <section
+        className="ds-room-section"
         aria-labelledby="citations-heading"
         id="citations"
       >
@@ -148,10 +147,10 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
             </li>
           ))}
         </ul>
-      </article>
+      </section>
 
-      <article
-        className={booksEditionPanelClassName('provenance')}
+      <section
+        className="ds-room-section"
         aria-labelledby="purchase-heading"
       >
         <p className="ds-books-edition__panel-title">{BOOKS_DETAIL.lookupKicker}</p>
@@ -215,13 +214,13 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
             </div>
           </dl>
         </section>
-      </article>
+      </section>
 
       {placePanel}
 
       {relatedItems.length > 0 || book.canonicalEntityId ? (
-        <article
-          className={booksEditionPanelClassName('related')}
+        <section
+          className="ds-room-section"
           aria-labelledby="books-related-heading"
           id="related"
         >
@@ -247,11 +246,11 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
               ))}
             </div>
           ) : null}
-        </article>
+        </section>
       ) : null}
 
-      <article
-        className={booksEditionPanelClassName('connected')}
+      <section
+        className="ds-room-section"
         aria-labelledby="books-detail-next"
       >
         <p className="ds-books-edition__panel-title">{BOOKS_DETAIL.connectedKicker}</p>
@@ -269,7 +268,7 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
             Methodology
           </Link>
         </p>
-      </article>
+      </section>
     </>
   );
 }

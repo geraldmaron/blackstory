@@ -286,44 +286,62 @@ export function buildSeriesGroups(
     }));
 }
 
-export type SeriesShelf = {
+export type StoriesShelf = {
   readonly id: string;
   readonly label: string;
-  readonly href: string;
   readonly count: number;
+  readonly href: string;
   readonly members: readonly PublicArticleListItemDoc[];
 };
 
 /**
- * Collections, with their members, for the `/stories` shelves: one shelf per series, largest
- * first — same order and counts as `buildSeriesGroups` gives the rail. Members are handed back
- * in the collection's own order (`sortItems(..., 'series')`), never re-derived per shelf, so a
- * shelf's "first four" always matches the collection's own reading order.
+ * One shelf per collection, ordered by size (largest first, same order as `buildSeriesGroups`),
+ * each carrying its own first `membersPerShelf` entries in the collection's own order. Reuses
+ * `sortItems(..., 'series')` for member order rather than inventing a second sort.
  */
 export function buildSeriesShelves(
   items: readonly PublicArticleListItemDoc[],
-): readonly SeriesShelf[] {
+  membersPerShelf = 4,
+): readonly StoriesShelf[] {
   const labels = new Map<string, string>();
-  const membersById = new Map<string, PublicArticleListItemDoc[]>();
-  for (const item of sortItems(items, 'series')) {
+  const bySeries = new Map<string, PublicArticleListItemDoc[]>();
+  for (const item of items) {
     if (!item.series) continue;
     labels.set(item.series.id, item.series.label);
-    const bucket = membersById.get(item.series.id);
-    if (bucket) bucket.push(item);
-    else membersById.set(item.series.id, [item]);
+    const list = bySeries.get(item.series.id);
+    if (list) list.push(item);
+    else bySeries.set(item.series.id, [item]);
   }
-  return [...membersById.entries()]
+  return [...bySeries.entries()]
     .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
     .map(([id, members]) => ({
       id,
       label: labels.get(id) ?? id,
-      href: storiesHref({ series: id, kind: '' }),
       count: members.length,
-      members,
+      href: storiesHref({ series: id, kind: '' }),
+      members: sortItems(members, 'series').slice(0, membersPerShelf),
     }));
 }
 
-/** Stories with no collection — the "Everything else" list, in the page's own sort order. */
+/**
+ * The next entry in a collection after `afterPosition`, for the story page's "Next in this
+ * collection" rail block. `undefined` when the given series has no later member (its own
+ * `sortItems(..., 'series')` order applies, so a tie on position falls back to slug like
+ * everywhere else series order is computed).
+ */
+export function nextInSeries(
+  items: readonly PublicArticleListItemDoc[],
+  seriesId: string,
+  afterPosition: number,
+): PublicArticleListItemDoc | undefined {
+  const members = sortItems(
+    items.filter((item) => item.series?.id === seriesId),
+    'series',
+  );
+  return members.find((item) => (item.series?.position ?? -1) > afterPosition);
+}
+
+/** Stories with no collection — the "Everything else" list beneath the shelves. */
 export function uncollectedItems(
   items: readonly PublicArticleListItemDoc[],
 ): readonly PublicArticleListItemDoc[] {

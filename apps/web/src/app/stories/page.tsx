@@ -42,9 +42,9 @@ import {
   showsShelves,
   sortItems,
   storiesNotice,
+  uncollectedItems,
   STORY_SORT_KEYS,
   STORY_SORT_LABELS,
-  uncollectedItems,
 } from './stories-index';
 import '../reading-room.css';
 import './stories.css';
@@ -67,7 +67,6 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
   const { items, source } = await listPublicArticleListItems();
   const { publishedCount, eraSpanLabel, placeCount } = computeStoriesFacts(items);
   const filtered = sortItems(filterItems(items, query), query.sort);
-  const { rows, page, pageCount, previousHref, nextHref } = paginateStories(filtered, query);
   const notice = storiesNotice(source, items.length, filtered.length);
   const kindChips = buildKindChips(items, query);
   const seriesGroups = buildSeriesGroups(items);
@@ -83,9 +82,9 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
   const uncollected = shelfMode ? uncollectedItems(filtered) : [];
   // Pagination is scoped to the "Everything else" list only — the lead and the shelves above
   // it stay put across its pages, which is what "applies to the Everything else list only"
-  // means in practice.
-  const everythingElse = shelfMode ? paginateStories(uncollected, query) : undefined;
-  const pager = everythingElse ?? { rows, page, pageCount, previousHref, nextHref };
+  // means in practice. Outside shelf mode there is no lead or shelf to hold in place, so the
+  // whole filtered set paginates directly.
+  const pager = paginateStories(shelfMode ? uncollected : filtered, query);
 
   const meta = [
     `${publishedCount.toLocaleString('en-US')} published`,
@@ -272,29 +271,19 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
           ) : null}
         </>
       ) : (
+        // Outside shelf mode (a search, a kind chip, a non-default sort applied) there is no
+        // lead and no collection grouping to hold in place — just the current query's matches,
+        // as one flat, directly comparable list. Same CardGrid/RoomCard the "Everything else"
+        // list above uses, so narrowed results and the shelf remainder read as one visual system.
         <CardGrid>
-          {rows.map((item) => (
+          {pager.rows.map((item) => (
             <RoomCard
               key={item.slug}
               href={`/stories/${item.slug}`}
               kind={KIND_LABELS[item.kind ?? 'chapter'] ?? 'Story'}
               title={item.title}
               description={item.summary}
-              meta={
-                item.series?.positionLabel
-                  ? `${item.series.positionLabel} · ${item.eraLabel}`
-                  : `${item.eraLabel} · ${item.placeLabel}`
-              }
-              {...(item.heroImage
-                ? {
-                    media: {
-                      url: item.heroImage.url,
-                      alt: item.heroImage.alt,
-                      // Series entries are portrait galleries; show the sitter whole.
-                      ...(item.series ? { fit: 'contain' as const } : {}),
-                    },
-                  }
-                : {})}
+              meta={`${item.eraLabel} · ${item.placeLabel}`}
             />
           ))}
         </CardGrid>

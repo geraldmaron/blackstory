@@ -12,7 +12,8 @@
   gap: var(--ds-space-3);
   height: 64px;
   padding: 0 var(--ds-space-3);
-  background: var(--ds-surface);
+  background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
+  backdrop-filter: blur(8px);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
   box-shadow: 0 10px 30px -20px rgb(0 0 0 / 45%);

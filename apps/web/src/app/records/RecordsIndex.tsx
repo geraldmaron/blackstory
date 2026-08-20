@@ -154,34 +154,45 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
       ) : null}
 
       {/*
-        One labelled row per group, inside one hairline-topped-and-bottomed block — rather than
-        six stacked heading-over-chip-bar blocks, which pushed the first record most of a screen
-        down the page. Ink direction: no more disclosure panel (was `<details open>`) or its own
-        box (border/radius/background) — the block is a plain hairline frame, same move RoomCard
-        and the footer make. Every chip stays a real anchor; nothing here needs JavaScript.
+        One always-visible block, six labelled rows, rather than six stacked blocks each with a
+        heading above its own chip bar (or a `<details>` disclosure hiding all of it behind a
+        toggle): the filters are how this room is browsed, so they stay on the page inside a
+        single hairline-topped-and-bottomed block, and the label sits inline beside its chips.
       */}
       <div className="ds-records-filters">
-        {RECORDS_FILTER_KEYS.map((key) => {
-          const options = facets[key];
-          if (options.length === 0) return null;
-          return (
-            <div className="ds-records-facet" key={key}>
-              <h2 className="ds-records-facet__title">{FILTER_GROUP_LABELS[key]}</h2>
-              <div className="ds-room-idx__bar" role="group" aria-label={FILTER_GROUP_LABELS[key]}>
-                {options.slice(0, CHIPS_PER_GROUP).map((option) => (
-                  <a
-                    className="ds-room-chip"
-                    href={option.href}
-                    key={option.id}
-                    aria-current={option.id === query[key] ? true : undefined}
-                  >
-                    {option.label} <span className="ds-room-num">{option.count}</span>
-                  </a>
-                ))}
+        <div className="ds-records-filters__head">
+          <span>Narrow these records</span>
+          <span className="ds-records-filters__hint" aria-hidden="true">
+            {constraints.length > 0 ? `${constraints.length} applied` : 'All records'}
+          </span>
+        </div>
+        <div className="ds-records-filters__body">
+          {RECORDS_FILTER_KEYS.map((key) => {
+            const options = facets[key];
+            if (options.length === 0) return null;
+            return (
+              <div className="ds-records-facet" key={key}>
+                <h2 className="ds-records-facet__title">{FILTER_GROUP_LABELS[key]}</h2>
+                <div
+                  className="ds-room-idx__bar"
+                  role="group"
+                  aria-label={FILTER_GROUP_LABELS[key]}
+                >
+                  {options.slice(0, CHIPS_PER_GROUP).map((option) => (
+                    <a
+                      className="ds-room-chip"
+                      href={option.href}
+                      key={option.id}
+                      aria-current={option.id === query[key] ? true : undefined}
+                    >
+                      {option.label} <span className="ds-room-num">{option.count}</span>
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       <HairlineIndex

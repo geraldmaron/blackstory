@@ -44,6 +44,28 @@ const HISTORIC_RE =
   /\b(former|defunct|demolished|abandoned|ruins?|destroyed|closed in|ceased|no longer|was (a|an|the)|historic site|archaeological)\b/i;
 const ACTIVE_RE =
   /\b(still (operates|operating|stands|serves|open)|remains (a|an|in)|continues to|currently|today\b|present[- ]day|active (congregation|campus|museum|university|school|church))\b/i;
+
+/**
+ * A DATED or definite terminal-closure statement about the subject: "closed in 1963",
+ * "operated until 1952", "closed its doors by the 1960s", "was demolished", "no longer stands".
+ *
+ * This exists because HISTORIC_RE and ACTIVE_RE routinely BOTH match one summary — a record that
+ * says "closed in 1968" and later "a marker stands today" — and the old precedence let the
+ * generic active cue win. Measured on release rel_20260723_authority_net_001: 18 published
+ * entities carried status 'active' while their own prose stated closure or demolition (Mill
+ * Creek Valley, demolished 1959, read as active). A dated closure is the stronger statement and
+ * wins, unless the prose also says the subject reopened.
+ *
+ * Deliberately NOT in this set: bare "razed"/"burned down" (fires and razings are routinely
+ * followed by rebuilding — Emanuel AME's razed 1822 predecessor belongs to an active
+ * congregation), and undated "demolished" without "was" (Craven Terrace's PREDECESSOR
+ * neighborhood was "largely demolished for it" — the closure verb has a different subject).
+ * Exported for the publish-time status linter so the gate and the deriver cannot drift.
+ */
+export const TERMINAL_CLOSURE_RE =
+  /\b(closed (in|by) ((the |early |mid-|late )?([a-z]+ )?\d{4}s?)|closing in \d{4}|closed its doors|operated until|in operation until|until (it|the \w+) closed|ceased operations?\b|was demolished|demolished (in|by) \d{4}|torn down( in \d{4})?|no longer (exists|stands|operates))\b/i;
+
+const REOPENED_RE = /\breopened\b/i;
 const REPEALED_RE = /\b(repealed|struck down|overturned|ruled unconstitutional|enjoined)\b/i;
 const AMENDED_RE = /\b(amended|superseded in part)\b/i;
 const DECEASED_RE =
@@ -135,6 +157,7 @@ function isUnresearchedRecord(entry: CatalogStatusSource): boolean {
  */
 function derivePlaceLike(entry: CatalogStatusSource): PlaceLikeStatus | undefined {
   const text = `${entry.summary ?? ''} ${entry.historicalContext ?? ''} ${entry.displayName ?? ''}`;
+  if (TERMINAL_CLOSURE_RE.test(text) && !REOPENED_RE.test(text)) return 'historic';
   if (HISTORIC_RE.test(text) && !ACTIVE_RE.test(text)) return 'historic';
   if (ACTIVE_RE.test(text)) return 'active';
   if (/\b(movement|league|association|union|federation)\b/i.test(text) && HISTORIC_RE.test(text)) {

@@ -59,6 +59,14 @@
   text-align: center;
 }
 
+/* The record sheet is a fixed right-side panel (record-sheet.css `.ds-sheet`). Opening it while
+   an even ("right") chapter card is up would put both on the same edge, so every chapter moves
+   left for as long as the sheet is open — centred chapters (cold open, close) are unaffected,
+   since they carry no record selection of their own. */
+.ds-story--sheet-open .ds-story__chapter:not(.ds-story__chapter--centred) {
+  justify-items: start;
+}
+
 .ds-story__card {
   width: min(460px, 100%);
   padding: var(--ds-space-6);

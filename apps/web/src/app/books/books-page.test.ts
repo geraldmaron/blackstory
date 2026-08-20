@@ -38,6 +38,20 @@ test('books detail page uses anatomy strip and cover art without gutter mosaic',
   assert.doesNotMatch(detailSource, /ds-entity-mast/);
 });
 
+test('books detail page renders through the room kit, with no edition chrome left', () => {
+  const detailSectionsSource = readFileSync(join(here, 'BooksDetailSections.tsx'), 'utf8');
+  assert.doesNotMatch(detailSource, /books-panel-chrome/);
+  assert.doesNotMatch(detailSource, /books-edition\.css/);
+  assert.doesNotMatch(detailSource, /data-books-edition="v6"/);
+  assert.match(detailSource, /from '\.\.\/\.\.\/\.\.\/components\/room'/);
+  assert.match(detailSource, /<Room>/);
+  assert.match(detailSource, /<RoomHeader/);
+  assert.doesNotMatch(detailSectionsSource, /books-panel-chrome/);
+  // The route-owned box wrapper (`ds-books-edition__panel--<variant>`) is gone; the element
+  // labels it left behind (`__panel-title`, `__panel-heading`) are content, not chrome, and stay.
+  assert.doesNotMatch(detailSectionsSource, /ds-books-edition__panel--/);
+});
+
 test('books browse renders its rows through the shared index, not a bespoke row', () => {
   // SP-11c moved the browse list onto `HairlineIndex`, the same block `/records` renders, so the
   // rows and the facet chips carry one vocabulary instead of two. `BooksRipRow` survives because

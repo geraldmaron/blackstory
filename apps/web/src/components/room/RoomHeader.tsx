@@ -48,6 +48,9 @@ export function RoomHeader({
   void kicker;
   const facts = meta ?? [];
   const hasMeta = facts.length > 0 || showPath;
+  // Kept on the prop surface for the twelve existing callers; no longer rendered — the title
+  // takes the space the kicker used to hold (Ink spec §2/§3).
+  void kicker;
 
   return (
     <header className={cx('ds-room-header', className)}>

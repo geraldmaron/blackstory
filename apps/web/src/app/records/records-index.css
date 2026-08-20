@@ -116,7 +116,31 @@
    is what frames it top and bottom without a redundant border on both. */
 .ds-records-filters {
   margin-top: var(--ds-space-5);
+  padding-bottom: var(--ds-space-2);
   border-top: var(--ds-border-width) solid var(--room-rule-2);
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-records-filters__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  padding-block: var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--room-ink-3);
+}
+
+.ds-records-filters__hint {
+  color: var(--room-ink-4);
+}
+
+.ds-records-filters__body {
+  padding-bottom: var(--ds-space-2);
 }
 
 /* Label beside its chips on a wide column, above them once the column is too narrow for both. */

@@ -1,21 +1,11 @@
 /**
- * `headingAnchorId` and `chapterToc`: the anchor-id scheme the "In this chapter" rail and the
- * headings it points at both depend on. The one thing that must never happen is the two
- * disagreeing about an id — a rail link that 404s within its own page.
+ * `headingAnchorId`: the anchor-id scheme h3 subheadings use. h2 section headings get their id
+ * from `extractChapterHeadings` instead (see heading-anchors.test.ts) — the same function the
+ * rail's "In this chapter" nav reads, so the two can never disagree about an id.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { chapterToc, headingAnchorId } from './ArticleBody';
-import type { HydratedArticle, HydratedArticleBlock } from '../../lib/articles/hydrate';
-
-function article(blocks: readonly HydratedArticleBlock[]): HydratedArticle {
-  return {
-    doc: {} as HydratedArticle['doc'],
-    blocks,
-    references: [],
-    refNumberById: new Map(),
-  };
-}
+import { headingAnchorId } from './ArticleBody';
 
 test('the id is stable and readable: index prefix plus a slug of the text', () => {
   assert.equal(headingAnchorId(2, 'The ordinance and its afterlife'), 'section-2-the-ordinance-and-its-afterlife');
@@ -33,25 +23,4 @@ test('two different headings at different indices never collide, even with ident
   const a = headingAnchorId(1, 'Aftermath');
   const b = headingAnchorId(4, 'Aftermath');
   assert.notEqual(a, b);
-});
-
-test('chapterToc lists only level-2 headings, in reading order, with matching ids', () => {
-  const doc = article([
-    { type: 'heading', level: 2, text: 'Before the ordinance' },
-    { type: 'paragraph', text: 'Some prose.' },
-    { type: 'heading', level: 3, text: 'A subsection, not in the TOC' },
-    { type: 'heading', level: 2, text: 'After the ordinance' },
-  ]);
-  const toc = chapterToc(doc);
-  assert.deepEqual(
-    toc.map((entry) => entry.text),
-    ['Before the ordinance', 'After the ordinance'],
-  );
-  assert.equal(toc[0]?.id, headingAnchorId(0, 'Before the ordinance'));
-  assert.equal(toc[1]?.id, headingAnchorId(3, 'After the ordinance'));
-});
-
-test('an article with no level-2 headings has an empty table of contents', () => {
-  const doc = article([{ type: 'paragraph', text: 'No headings here.' }]);
-  assert.deepEqual(chapterToc(doc), []);
 });

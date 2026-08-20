@@ -74,7 +74,7 @@ export type RoomCardProps = {
   readonly description?: ReactNode;
   /** Mono footer facts — year, count, jurisdiction. Rendered as written. */
   readonly meta?: string;
-  /** Hero image, bled to the card's edges above the kind tag. */
+  /** Hero image, above the title. */
   readonly media?: RoomCardMedia;
   readonly className?: string;
 };

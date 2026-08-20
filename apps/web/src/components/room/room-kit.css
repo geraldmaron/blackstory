@@ -172,6 +172,9 @@
 .ds-room-conns {
   list-style: none;
   padding-left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .ds-room-crumb__link {
@@ -303,6 +306,12 @@
   }
 }
 
+@media (min-width: 56rem) {
+  .ds-room-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 .ds-room-card {
   display: grid;
   grid-template-columns: 1.3fr 2fr auto;
@@ -311,6 +320,8 @@
   padding-block: 22px;
   text-align: left;
   background: none;
+  border: 0;
+  border-radius: 0;
   font-family: var(--ds-font-sans);
   color: var(--ds-ink);
   border-bottom: var(--ds-border-width) solid var(--room-rule-2);
@@ -326,7 +337,7 @@
 
 /* Rows and index entries take a copper wash on hover; cards no longer lift. */
 .ds-room-card:hover {
-  background: rgba(184, 107, 42, 0.06);
+  background: var(--room-copper-wash);
 }
 
 .ds-room-cards--hub .ds-room-card__media {
@@ -335,7 +346,10 @@
 
 .ds-room-card__media {
   display: block;
+  margin: 0 0 var(--ds-space-3);
   aspect-ratio: 16 / 9;
+  /* The fixed aspect ratio keeps a grid of mixed-aspect heroes on one baseline; without it a
+     portrait hero (a redlining map is 3:4) overflows its slot. */
   overflow: hidden;
   /* Media wells keep the raised value the token table reserves for them, now that a plain
      card ground no longer needs it. */
@@ -547,12 +561,6 @@
 }
 
 /* —— Connections: the relation stated in words, never a bare arrow ————————— */
-.ds-room-conns {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
 .ds-room-conn {
   display: flex;
   align-items: baseline;
@@ -768,7 +776,7 @@ a.ds-room-chip {
 
 /* Rows and index entries take a copper wash on hover — same invariant as RoomCard. */
 .ds-room-idx__row:hover {
-  background: rgba(184, 107, 42, 0.06);
+  background: var(--room-copper-wash);
 }
 
 .ds-room-idx__row:hover .ds-room-idx__glyph {

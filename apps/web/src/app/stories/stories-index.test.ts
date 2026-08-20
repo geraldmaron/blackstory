@@ -22,6 +22,7 @@ import {
   computeStoriesFacts,
   filterItems,
   hasActiveNarrowing,
+  nextInSeries,
   paginateStories,
   parseStoriesQuery,
   pickLeadStory,
@@ -345,6 +346,67 @@ describe('/stories · shelves', () => {
     assert.equal(showsShelves({ ...EMPTY, q: 'lincoln' }), false);
     assert.equal(showsShelves({ ...EMPTY, kind: 'article' }), false);
     assert.equal(showsShelves({ ...EMPTY, sort: 'newest' }), false);
+  });
+});
+
+describe('/stories · shelves, the uncollected remainder and series navigation', () => {
+  const items = [
+    item({ id: 'c1', slug: 'lone-chapter', kind: 'chapter' }),
+    item({
+      id: 'p1',
+      slug: 'washington',
+      kind: 'article',
+      title: 'President: George Washington',
+      series: { id: 'presidents', label: 'Presidential records', position: 1 },
+    }),
+    item({
+      id: 'p2',
+      slug: 'adams',
+      kind: 'article',
+      title: 'President: John Adams',
+      series: { id: 'presidents', label: 'Presidential records', position: 2 },
+    }),
+    item({
+      id: 'p3',
+      slug: 'jefferson',
+      kind: 'article',
+      title: 'President: Thomas Jefferson',
+      series: { id: 'presidents', label: 'Presidential records', position: 3 },
+    }),
+  ];
+
+  it('builds one shelf per collection, largest first, each carrying its own members in order', () => {
+    const shelves = buildSeriesShelves(items, 2);
+    assert.deepEqual(
+      shelves.map((shelf) => [shelf.id, shelf.count, shelf.members.map((m) => m.slug)]),
+      [['presidents', 3, ['washington', 'adams']]],
+    );
+    assert.equal(shelves[0]?.href, '/stories?kind=all&series=presidents');
+  });
+
+  it('the uncollected list is everything with no series, and nothing else', () => {
+    assert.deepEqual(
+      uncollectedItems(items).map((i) => i.slug),
+      ['lone-chapter'],
+    );
+  });
+
+  it('finds the next member of a collection after the given position', () => {
+    const next = nextInSeries(items, 'presidents', 1);
+    assert.equal(next?.slug, 'adams');
+  });
+
+  it('skips past a gap in position numbers to the next real member', () => {
+    const next = nextInSeries(items, 'presidents', 0);
+    assert.equal(next?.slug, 'washington');
+  });
+
+  it('returns undefined at the end of a collection', () => {
+    assert.equal(nextInSeries(items, 'presidents', 3), undefined);
+  });
+
+  it('returns undefined for a collection that does not exist', () => {
+    assert.equal(nextInSeries(items, 'nonexistent', 0), undefined);
   });
 });
 

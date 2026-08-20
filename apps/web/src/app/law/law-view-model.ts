@@ -1,9 +1,24 @@
 /**
  * Pure view-model for the `/law` browse and detail pages. No Next.js runtime dependency.
  */
-import type { LegalBrowseItem } from '../../components/legal';
+import type { LawStatus } from '@repo/domain/entity-status';
 import { isLawStatus } from '../../components/legal/format';
 import type { LegalCatalogSource, LegalSnapshotDocument } from '../../lib/legal/public-source';
+
+/** A `/law` browse row, as `LawBrowseSections` renders it. */
+export type LegalBrowseItem = {
+  readonly id: string;
+  readonly slug: string;
+  readonly title: string;
+  readonly kind: string;
+  readonly citation: string;
+  readonly lawStatus: LawStatus;
+  readonly topics: readonly string[];
+  readonly hasExplainer: boolean;
+  /** Plain-language opening line, so the row says what the law does. */
+  readonly summary?: string;
+  readonly effectiveYear?: number;
+};
 
 export type RawLawBrowseParams = {
   readonly q?: string;
