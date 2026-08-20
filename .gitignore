@@ -116,3 +116,6 @@ packages/ops-data/fixtures/national-catalog-location-overrides.json
 # Bulk discovery fixtures are working space, not source. The loaded candidates live
 # in bb_research.landscape_candidates; `--fetch` repopulates this directory on demand.
 packages/ops-data/fixtures/discovery-candidates/bulk-*.json
+
+# Beads / Dolt files (added by bd init)
+.beads/proxieddb/
