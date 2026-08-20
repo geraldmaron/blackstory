@@ -13,7 +13,8 @@
   transform: translateX(-50%);
   width: min(760px, calc(100vw - 24px));
   padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-2);
-  background: var(--ds-surface);
+  background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
+  backdrop-filter: blur(8px);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
 }

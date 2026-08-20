@@ -224,6 +224,10 @@ export function CameraConsole({
           );
         })}
       </div>
+
+      {KEYED_CAMERA_MOVES.some((move) => !allowed.has(move)) ? (
+        <p className="ds-camera__refusal">{REFUSAL_NOTE}</p>
+      ) : null}
     </section>
   );
 }

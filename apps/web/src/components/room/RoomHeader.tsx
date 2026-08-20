@@ -43,11 +43,13 @@ export function RoomHeader({
 }: RoomHeaderProps) {
   const facts = meta ?? [];
   const hasMeta = facts.length > 0 || showPath;
+  // Kept on the prop surface for the twelve existing callers; no longer rendered — the title
+  // takes the space the kicker used to hold (Ink spec §2/§3).
+  void kicker;
 
   return (
     <header className={cx('ds-room-header', className)}>
       <Breadcrumb pathname={pathname} hereLabel={crumbLabel} />
-      {kicker ? <span className="ds-room-header__kicker">{kicker}</span> : null}
       <h1 className="ds-room-header__title">{title}</h1>
       {lede ? <p className="ds-room-header__lede">{lede}</p> : null}
       {hasMeta ? (

@@ -154,22 +154,18 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
       ) : null}
 
       {/*
-        One panel, six labelled rows, rather than six stacked blocks each with a heading above its
-        own chip bar: that shape pushed the first record most of a screen down the page. The label
-        moves inline beside its chips, so the whole vocabulary is scannable in a glance and the
-        list starts where a reader expects it.
-
-        `<details open>`, not a JS disclosure: the filters are visible on arrival (they are how
-        this room is browsed) and can be folded away once a reader has narrowed, with no
-        hydration and no state to lose on a real navigation.
+        One always-visible block, six labelled rows, rather than six stacked blocks each with a
+        heading above its own chip bar (or a `<details>` disclosure hiding all of it behind a
+        toggle): the filters are how this room is browsed, so they stay on the page inside a
+        single hairline-topped-and-bottomed block, and the label sits inline beside its chips.
       */}
-      <details className="ds-records-filters" open>
-        <summary className="ds-records-filters__summary">
+      <div className="ds-records-filters">
+        <div className="ds-records-filters__head">
           <span>Narrow these records</span>
           <span className="ds-records-filters__hint" aria-hidden="true">
             {constraints.length > 0 ? `${constraints.length} applied` : 'All records'}
           </span>
-        </summary>
+        </div>
         <div className="ds-records-filters__body">
           {RECORDS_FILTER_KEYS.map((key) => {
             const options = facets[key];
@@ -197,7 +193,7 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
             );
           })}
         </div>
-      </details>
+      </div>
 
       <HairlineIndex
         countLabel={pageCount > 1 ? `${countLabel} · page ${page} of ${pageCount}` : countLabel}

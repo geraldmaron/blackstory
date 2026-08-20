@@ -45,14 +45,8 @@ const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../.
  * render components now that /history is a redirect endpoint.
  */
 const LEGACY_EDITION_CHROME: readonly string[] = [
-  // Retained by /books/[slug], which is still on the v6 detail chrome. SP-12b deletes both.
-  'books/books-edition.css',
-  'books/books-panel-chrome.ts',
   'explore/explore-edition.css',
   'explore/explore-panel-chrome.ts',
-  // Retained by /law/[slug], which is still on the v6 detail chrome. SP-12c deletes both.
-  'law/law-edition.css',
-  'law/law-panel-chrome.ts',
   'memorial/memorial-edition.css',
   'memorial/memorial-panel-chrome.ts',
 ];
@@ -183,7 +177,7 @@ describe('room kit · the trail is computed, never hand-written', () => {
 });
 
 describe('room kit · RoomHeader is the only header a room renders', () => {
-  it('renders breadcrumb, kicker, title, lede and mono meta in one block', () => {
+  it('renders breadcrumb, title, lede and mono meta in one block, and keeps the kicker prop mute', () => {
     const html = renderToStaticMarkup(
       <RoomHeader
         pathname="/books"
@@ -195,7 +189,9 @@ describe('room kit · RoomHeader is the only header a room renders', () => {
     );
 
     assert.match(html, /ds-room-crumb/);
-    assert.match(html, /ds-room-header__kicker[^>]*>Catalogue/);
+    // Ink spec §2/§3: the kicker is no longer a rendered element — the title takes the space
+    // it used to hold. The prop stays on RoomHeaderProps so existing callers need not change.
+    assert.doesNotMatch(html, /ds-room-header__kicker/);
     assert.match(html, /<h1 class="ds-room-header__title">Banned books<\/h1>/);
     assert.match(html, /ds-room-header__lede/);
     assert.match(html, /1,204 titles/);
@@ -240,7 +236,9 @@ describe('room kit · catalogue blocks', () => {
       </CardGrid>,
     );
     assert.match(html, /<a[^>]+class="ds-room-card"[^>]+href="\/law\/hr-40"/);
-    assert.match(html, /ds-room-card__kind[^>]*>Statute/);
+    // Ink spec §2/§3: kind is implied by the group a card sits in, not printed per-card. The
+    // `kind` prop stays on RoomCardProps so existing callers need not change.
+    assert.doesNotMatch(html, /ds-room-card__kind/);
     assert.match(html, /ds-room-card__meta[^>]*>Federal · 1989/);
   });
 

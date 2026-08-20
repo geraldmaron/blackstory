@@ -188,22 +188,12 @@
   margin-bottom: var(--ds-space-8);
 }
 
-.ds-room-header__kicker {
-  display: block;
-  margin-bottom: var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
-}
-
 .ds-room-header__title {
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(30px, 4vw, 44px);
-  line-height: 1.06;
-  letter-spacing: -0.035em;
+  font-size: clamp(44px, 6vw, 86px);
+  line-height: 0.97;
+  letter-spacing: -0.042em;
 }
 
 .ds-room-header__title em {
@@ -217,8 +207,8 @@
   margin-top: var(--ds-space-4);
   max-width: 34em;
   font-family: var(--ds-font-editorial);
-  font-size: 18.5px;
-  line-height: 1.5;
+  font-size: 22px;
+  line-height: 1.48;
   color: var(--room-ink-2);
 }
 
@@ -257,11 +247,12 @@
   margin-top: var(--ds-space-8);
   padding-bottom: var(--ds-space-2);
   border-bottom: var(--ds-border-width) solid var(--room-rule-2);
-  font-family: var(--ds-font-mono);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--room-ink-4);
+  font-family: var(--ds-font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--room-ink-3);
 }
 
 .ds-room .ds-room-grouphd + .ds-room-cards {
@@ -269,49 +260,48 @@
 }
 
 /* —— CardGrid / RoomCard ——————————————————————————————————————————————————— */
+/* Three-up typographic index, not a card grid: entries are rows separated by a hairline
+   (.ds-room-card carries its own border-bottom), so the gap here only spaces the columns. */
 .ds-room-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
-  gap: var(--ds-space-3);
+  grid-template-columns: 1fr;
+  column-gap: var(--ds-space-8);
   margin-block: var(--ds-space-6);
+}
+
+@media (min-width: 56rem) {
+  .ds-room-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .ds-room-card {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: var(--ds-space-4);
+  padding-block: var(--ds-space-5);
   text-align: left;
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
+  background: none;
+  border: 0;
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
+  border-radius: 0;
   font-family: var(--ds-font-sans);
   color: var(--ds-ink);
-  transition:
-    border-color var(--ds-duration-fast) var(--ds-easing),
-    background var(--ds-duration-fast) var(--ds-easing),
-    transform var(--ds-duration-fast) var(--ds-easing);
+  transition: background var(--ds-duration-fast) var(--ds-easing);
 }
 
 .ds-room-card:hover {
-  border-color: var(--ds-accent-graphic);
-  background: var(--ds-surface-raised);
-  transform: translateY(-1px);
-}
-
-/* Hero media bleeds to the card's edges. `overflow: hidden` clips the image to the card's
-   radius; the fixed aspect ratio keeps a grid of mixed-aspect heroes on one baseline. */
-.ds-room-card--media {
-  overflow: hidden;
+  background: var(--room-copper-wash);
 }
 
 .ds-room-card__media {
   display: block;
-  margin: calc(-1 * var(--ds-space-4)) calc(-1 * var(--ds-space-4)) var(--ds-space-1);
+  margin: 0 0 var(--ds-space-3);
   aspect-ratio: 16 / 9;
-  /* Clips on the media box, not the card: without it a portrait hero (a redlining map is
-     3:4) overflows its slot and the grid's cards stop sharing a baseline. */
+  /* The fixed aspect ratio keeps a grid of mixed-aspect heroes on one baseline; without it a
+     portrait hero (a redlining map is 3:4) overflows its slot. */
   overflow: hidden;
+  border-radius: var(--ds-radius-md);
   background: var(--ds-surface-raised);
 }
 
@@ -335,25 +325,17 @@
   object-position: center;
 }
 
-.ds-room-card__kind {
-  font-family: var(--ds-font-mono);
-  font-size: 9px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
-}
-
 .ds-room .ds-room-card__title {
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 15.5px;
-  letter-spacing: -0.02em;
-  line-height: 1.24;
+  font-size: 24px;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
 }
 
 .ds-room-card__desc {
   font-family: var(--ds-font-editorial);
-  font-size: 13.5px;
+  font-size: 16px;
   line-height: 1.5;
   color: var(--room-ink-3);
 }

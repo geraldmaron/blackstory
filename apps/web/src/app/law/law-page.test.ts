@@ -57,6 +57,17 @@ test('law detail page uses anatomy strip without gutter mosaic', () => {
   assert.match(anatomySource, /EditionFactIcon/);
 });
 
+test('law detail page renders through the room kit, with no edition chrome left', () => {
+  assert.doesNotMatch(detailPageSource, /law-panel-chrome/);
+  assert.doesNotMatch(detailPageSource, /law-edition\.css/);
+  assert.doesNotMatch(detailPageSource, /data-law-edition="v6"/);
+  assert.match(detailPageSource, /from '\.\.\/\.\.\/\.\.\/components\/room'/);
+  assert.match(detailPageSource, /<Room>/);
+  assert.doesNotMatch(detailSectionsSource, /law-panel-chrome/);
+  assert.doesNotMatch(detailSectionsSource, /ds-law-edition__panel/);
+  assert.match(detailSectionsSource, /<RoomHeader/);
+});
+
 test('law browse lede preserved without em dashes', () => {
   assert.match(browsePageSource, /LAW_EDITION_BROWSE_LEDE/);
   assert.doesNotMatch(LAW_EDITION_BROWSE_LEDE, /—/);

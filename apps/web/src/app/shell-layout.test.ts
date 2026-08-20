@@ -179,12 +179,14 @@ describe('horizontal overflow guards', () => {
 });
 
 describe('shell footer theme tokens', () => {
-  it('styles the footer as a theme-aware Surface card', () => {
-    assert.match(shellCss, /\.ds-shell-footer__card\s*\{[^}]*background:\s*var\(--ds-surface\)/s);
+  // Ink spec §3 (SiteFooter): the bordered Surface-card frame comes off — the footer sits
+  // directly on the ground above a hairline, not inside a themed panel box.
+  it('styles the footer on the page ground, above a hairline, not inside a Surface card', () => {
+    assert.doesNotMatch(shellCss, /\.ds-shell-footer__card\s*\{[^}]*background:/s);
     assert.match(shellCss, /\.ds-shell-footer__card\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
     assert.match(
       shellCss,
-      /\.ds-shell-footer__card\s*\{[^}]*border:\s*var\(--ds-border-width\)\s*solid\s*var\(--ds-rule\)/s,
+      /\.ds-shell-footer__card\s*\{[^}]*border-top:\s*var\(--ds-border-width\)\s*solid\s*var\(--ds-rule\)/s,
     );
     assert.match(shellCss, /\.ds-shell-footer__column-title\s*\{[^}]*color:\s*var\(--ds-accent\)/s);
     assert.match(shellCss, /\.ds-shell-footer__links a\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s);

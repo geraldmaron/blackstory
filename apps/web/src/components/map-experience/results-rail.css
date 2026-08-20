@@ -15,7 +15,8 @@
   width: 344px;
   /* Reserves the camera console's own column: 166px of console plus its bottom margin. */
   max-height: calc(100dvh - 56px - var(--ds-space-4) * 2 - 200px);
-  background: var(--ds-surface);
+  background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
+  backdrop-filter: blur(8px);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
   box-shadow: 0 10px 30px -18px rgb(0 0 0 / 45%);
@@ -33,7 +34,7 @@
 .ds-results__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 0.9375rem;
+  font-size: 1.1875rem;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--ds-ink);

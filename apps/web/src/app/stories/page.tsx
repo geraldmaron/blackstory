@@ -16,20 +16,13 @@ import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { listPublicArticleListItems } from '../../lib/articles/source';
 import { RECORDS_PAGE_SIZE } from '../../lib/records/build-records-index';
-import {
-  CardGrid,
-  Note,
-  OffRamp,
-  RailGroup,
-  Room,
-  RoomCard,
-  RoomHeader,
-} from '../../components/room';
+import { Note, OffRamp, RailGroup, Room, RoomHeader } from '../../components/room';
 import {
   buildEraGroups,
   buildKindChips,
   buildPlaceGroups,
   buildSeriesGroups,
+  buildSeriesShelves,
   buildTagGroups,
   computeStoriesFacts,
   filterItems,
@@ -38,6 +31,7 @@ import {
   parseStoriesQuery,
   sortItems,
   storiesNotice,
+  uncollectedItems,
   STORY_SORT_KEYS,
   STORY_SORT_LABELS,
 } from './stories-index';
@@ -62,11 +56,17 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
   const { items, source } = await listPublicArticleListItems();
   const { publishedCount, eraSpanLabel, placeCount } = computeStoriesFacts(items);
   const filtered = sortItems(filterItems(items, query), query.sort);
-  const { rows, page, pageCount, previousHref, nextHref } = paginateStories(filtered, query);
   const notice = storiesNotice(source, items.length, filtered.length);
   const kindChips = buildKindChips(items, query);
   const seriesGroups = buildSeriesGroups(items);
   const tagGroups = buildTagGroups(items);
+
+  // The lead story is the current view's own top item — whatever sort/filter is active — so
+  // narrowing the view (a kind chip, a search) changes what leads without a second code path.
+  const [leadItem, ...rest] = filtered;
+  const shelves = buildSeriesShelves(rest);
+  const uncollected = uncollectedItems(rest);
+  const { rows, page, pageCount, previousHref, nextHref } = paginateStories(uncollected, query);
 
   const meta = [
     `${publishedCount.toLocaleString('en-US')} published`,
@@ -171,32 +171,93 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
       {notice.body.length > 0 ? (
         <Note kind={source === 'unavailable' ? 'Unavailable' : 'Empty'}>{notice.body}</Note>
       ) : (
-        <CardGrid>
-          {rows.map((item) => (
-            <RoomCard
-              key={item.slug}
-              href={`/stories/${item.slug}`}
-              kind={KIND_LABELS[item.kind ?? 'chapter'] ?? 'Story'}
-              title={item.title}
-              description={item.summary}
-              meta={
-                item.series?.positionLabel
-                  ? `${item.series.positionLabel} · ${item.eraLabel}`
-                  : `${item.eraLabel} · ${item.placeLabel}`
-              }
-              {...(item.heroImage
-                ? {
-                    media: {
-                      url: item.heroImage.url,
-                      alt: item.heroImage.alt,
-                      // Series entries are portrait galleries; show the sitter whole.
-                      ...(item.series ? { fit: 'contain' as const } : {}),
-                    },
-                  }
-                : {})}
-            />
+        <>
+          {leadItem ? (
+            <article className="ds-stories-lead">
+              <div className="ds-stories-lead__copy">
+                <p className="ds-stories-lead__meta">
+                  {KIND_LABELS[leadItem.kind ?? 'chapter'] ?? 'Story'}
+                  {leadItem.series?.positionLabel ? ` · ${leadItem.series.positionLabel}` : ''}
+                </p>
+                <h2 className="ds-stories-lead__title">
+                  <a href={`/stories/${leadItem.slug}`}>{leadItem.title}</a>
+                </h2>
+                <p className="ds-stories-lead__summary">{leadItem.summary}</p>
+                <a className="ds-cta-link" href={`/stories/${leadItem.slug}`}>
+                  Read the chapter →
+                </a>
+              </div>
+              {leadItem.heroImage ? (
+                <a
+                  className="ds-stories-lead__media"
+                  href={`/stories/${leadItem.slug}`}
+                  aria-hidden="true"
+                  tabIndex={-1}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={leadItem.heroImage.url} alt="" loading="lazy" />
+                </a>
+              ) : null}
+            </article>
+          ) : null}
+
+          {shelves.map((shelf) => (
+            <section key={shelf.id} className="ds-stories-shelf">
+              <div className="ds-stories-shelf__head">
+                <h3 className="ds-stories-shelf__title">
+                  {shelf.label} <span className="ds-room-num">{shelf.count}</span>
+                </h3>
+                {shelf.count > shelf.members.length ? (
+                  <a className="ds-stories-shelf__seeall" href={shelf.href}>
+                    See all →
+                  </a>
+                ) : null}
+              </div>
+              <div className="ds-stories-shelf__grid">
+                {shelf.members.map((item, index) => (
+                  <a
+                    key={item.slug}
+                    className="ds-stories-shelf__item"
+                    href={`/stories/${item.slug}`}
+                  >
+                    {item.heroImage ? (
+                      <span className="ds-stories-shelf__plate">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={item.heroImage.url} alt={item.heroImage.alt} loading="lazy" />
+                      </span>
+                    ) : null}
+                    <span className="ds-stories-shelf__index">
+                      {String(index + 1).padStart(2, '0')} / {String(shelf.count).padStart(2, '0')}
+                    </span>
+                    <span className="ds-stories-shelf__item-title">{item.title}</span>
+                    <span className="ds-stories-shelf__item-desc">{item.summary}</span>
+                  </a>
+                ))}
+              </div>
+            </section>
           ))}
-        </CardGrid>
+
+          {uncollected.length > 0 ? (
+            <section className="ds-stories-rest">
+              <h3 className="ds-stories-shelf__title">Everything else</h3>
+              <div className="ds-stories-rest__list">
+                {rows.map((item) => (
+                  <a
+                    key={item.slug}
+                    className="ds-stories-rest__row"
+                    href={`/stories/${item.slug}`}
+                  >
+                    <span className="ds-stories-rest__title">{item.title}</span>
+                    <span className="ds-stories-rest__summary">{item.summary}</span>
+                    <span className="ds-stories-rest__meta">
+                      {item.eraLabel} · {item.placeLabel}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </>
       )}
 
       {pageCount > 1 ? (

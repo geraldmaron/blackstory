@@ -286,6 +286,50 @@ export function buildSeriesGroups(
     }));
 }
 
+export type StoriesShelf = {
+  readonly id: string;
+  readonly label: string;
+  readonly count: number;
+  readonly href: string;
+  readonly members: readonly PublicArticleListItemDoc[];
+};
+
+/**
+ * One shelf per collection, ordered by size (largest first, same order as `buildSeriesGroups`),
+ * each carrying its own first `membersPerShelf` entries in the collection's own order. Reuses
+ * `sortItems(..., 'series')` for member order rather than inventing a second sort.
+ */
+export function buildSeriesShelves(
+  items: readonly PublicArticleListItemDoc[],
+  membersPerShelf = 4,
+): readonly StoriesShelf[] {
+  const labels = new Map<string, string>();
+  const bySeries = new Map<string, PublicArticleListItemDoc[]>();
+  for (const item of items) {
+    if (!item.series) continue;
+    labels.set(item.series.id, item.series.label);
+    const list = bySeries.get(item.series.id);
+    if (list) list.push(item);
+    else bySeries.set(item.series.id, [item]);
+  }
+  return [...bySeries.entries()]
+    .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
+    .map(([id, members]) => ({
+      id,
+      label: labels.get(id) ?? id,
+      count: members.length,
+      href: storiesHref({ series: id, kind: '' }),
+      members: sortItems(members, 'series').slice(0, membersPerShelf),
+    }));
+}
+
+/** Stories with no collection — the "Everything else" list beneath the shelves. */
+export function uncollectedItems(
+  items: readonly PublicArticleListItemDoc[],
+): readonly PublicArticleListItemDoc[] {
+  return items.filter((item) => !item.series);
+}
+
 export function buildTagGroups(items: readonly PublicArticleListItemDoc[]): readonly RailEntry[] {
   const counts = new Map<string, number>();
   for (const item of items) {

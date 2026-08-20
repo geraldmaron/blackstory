@@ -58,7 +58,7 @@ export type RoomCardProps = {
   readonly description?: ReactNode;
   /** Mono footer facts — year, count, jurisdiction. Rendered as written. */
   readonly meta?: string;
-  /** Hero image, bled to the card's edges above the kind tag. */
+  /** Hero image, above the title. */
   readonly media?: RoomCardMedia;
   readonly className?: string;
 };
@@ -72,6 +72,9 @@ export function RoomCard({
   media,
   className,
 }: RoomCardProps) {
+  // Kept on the prop surface for the twelve existing callers; no longer rendered — kind is
+  // implied by the group a card sits in, not printed per-card (Ink spec §2/§3).
+  void kind;
   return (
     <Link className={cx('ds-room-card', media && 'ds-room-card--media', className)} href={href}>
       {media ? (
@@ -85,7 +88,6 @@ export function RoomCard({
           <img src={media.url} alt={media.alt} loading="lazy" />
         </span>
       ) : null}
-      <span className="ds-room-card__kind">{kind}</span>
       <h3 className="ds-room-card__title">{title}</h3>
       {description ? <p className="ds-room-card__desc">{description}</p> : null}
       {meta ? <span className="ds-room-card__meta">{meta}</span> : null}

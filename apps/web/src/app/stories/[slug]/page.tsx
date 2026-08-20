@@ -75,8 +75,22 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   const { doc } = article;
   const jsonLd = buildArticleJsonLd(article);
 
+  // Ink spec §4 (/stories/[slug]): "Records cited" moves into the sticky right rail. The
+  // reference list itself, its numbering and its `#ref-N` anchor ids are unchanged
+  // (ArticleProse's citation superscripts link to those ids regardless of where in the
+  // document the list renders) — only its position moves, out of the reading column.
+  const rail =
+    article.references.length > 0 ? (
+      <div className="ds-article-rail">
+        <p className="ds-room-rail-group__title" id="article-references">
+          Records cited
+        </p>
+        <ArticleReferences references={article.references} headingId="article-references" />
+      </div>
+    ) : undefined;
+
   return (
-    <Room>
+    <Room rail={rail}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -105,13 +119,6 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         ) : null}
 
         <ArticleBody article={article} />
-
-        <section className="ds-article__references-section" aria-labelledby="article-references">
-          <h2 className="ds-article__heading ds-article__heading--2" id="article-references">
-            References
-          </h2>
-          <ArticleReferences references={article.references} headingId="article-references" />
-        </section>
 
         <p className="ds-article__footer">
           <Link href="/stories">All stories</Link>

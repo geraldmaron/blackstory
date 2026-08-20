@@ -385,11 +385,9 @@
   color: var(--ds-ink-muted);
 }
 
-/* References */
-.ds-article__references-section {
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  padding-top: var(--ds-space-6);
-}
+/* References — the reader-column heading class stays defined for other article surfaces
+   that still render an inline references section; this route's own list now lives in the
+   sticky rail (see `.ds-article-rail` in reading-room.css) and no longer wraps in this. */
 
 .ds-article-references {
   list-style: none;

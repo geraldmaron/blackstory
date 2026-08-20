@@ -1,14 +1,14 @@
 /**
  * Law reference detail page at `/law/{slug}` with plain-language explainer sections.
  *
- * v6 edition Surface stack with shared gutter mosaic atmosphere and anatomy fact strip.
+ * Room kit edition: the same shell every reading room uses, no route-owned chrome.
  */
 import { notFound } from 'next/navigation';
 import { buildLawDetailViewModel, listLawStaticParams } from '../law-view-model';
 import { loadLegalCatalog } from '../../../lib/legal/public-source';
 import { LawDetailIntro, LawDetailSections } from '../LawDetailSections';
-import { lawEditionRootClassName, lawEditionStackClassName } from '../law-panel-chrome';
-import '../law-edition.css';
+import { Room } from '../../../components/room';
+import '../../reading-room.css';
 
 type LawDetailPageProps = {
   readonly params: Promise<{ readonly slug: string }>;
@@ -40,13 +40,9 @@ export default async function LawDetailPage({ params }: LawDetailPageProps) {
   const { snapshot, explainer } = view;
 
   return (
-    <div className={lawEditionRootClassName()} data-law-edition="v6">
-      <main className="ds-container ds-page" id="main">
-        <div className={lawEditionStackClassName()}>
-          <LawDetailIntro snapshot={snapshot} />
-          <LawDetailSections snapshot={snapshot} {...(explainer ? { explainer } : {})} />
-        </div>
-      </main>
-    </div>
+    <Room>
+      <LawDetailIntro snapshot={snapshot} />
+      <LawDetailSections snapshot={snapshot} {...(explainer ? { explainer } : {})} />
+    </Room>
   );
 }
