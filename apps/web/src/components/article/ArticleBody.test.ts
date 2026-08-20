@@ -8,11 +8,17 @@ import { test } from 'node:test';
 import { headingAnchorId } from './ArticleBody';
 
 test('the id is stable and readable: index prefix plus a slug of the text', () => {
-  assert.equal(headingAnchorId(2, 'The ordinance and its afterlife'), 'section-2-the-ordinance-and-its-afterlife');
+  assert.equal(
+    headingAnchorId(2, 'The ordinance and its afterlife'),
+    'section-2-the-ordinance-and-its-afterlife',
+  );
 });
 
 test('non-alphanumeric characters collapse to single hyphens, trimmed at the edges', () => {
-  assert.equal(headingAnchorId(0, '  1926: "Redlining," Revisited!  '), 'section-0-1926-redlining-revisited');
+  assert.equal(
+    headingAnchorId(0, '  1926: "Redlining," Revisited!  '),
+    'section-0-1926-redlining-revisited',
+  );
 });
 
 test('a heading with nothing sluggable still gets a usable id from its index alone', () => {

@@ -35,9 +35,7 @@ export type CardGridProps = {
 
 export function CardGrid({ children, variant = 'index', className }: CardGridProps) {
   return (
-    <div
-      className={cx('ds-room-cards', variant === 'hub' && 'ds-room-cards--hub', className)}
-    >
+    <div className={cx('ds-room-cards', variant === 'hub' && 'ds-room-cards--hub', className)}>
       {children}
     </div>
   );

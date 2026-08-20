@@ -86,11 +86,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   // "Next in this collection" only needs the rest of the release's list items — the same
   // read `/stories` already does, cached per request, not a new query.
   const next = doc.series
-    ? nextInSeries(
-        (await listPublicArticleListItems()).items,
-        doc.series.id,
-        doc.series.position,
-      )
+    ? nextInSeries((await listPublicArticleListItems()).items, doc.series.id, doc.series.position)
     : undefined;
 
   // Ink spec §4 (/stories/[slug]): the sticky right rail carries "In this chapter", "Records
