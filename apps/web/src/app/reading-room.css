@@ -11,7 +11,7 @@
 /* Declared on the room, not the column: the railed grid sizes its first track from this
    measure so the column-plus-rail pair centres as a unit. The column inherits it. */
 [data-surface='reading'] .ds-room {
-  --room-doc-w: 760px;
+  --room-doc-w: 900px;
 }
 
 /* A reading room ends in an off-ramp. The rule is enforced by room-kit.test.tsx, not by CSS,

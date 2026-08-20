@@ -369,7 +369,7 @@
    competing with it. No full theme toggle, just this zone's own background. */
 /*
  * Widened out of `.ds-room__doc`'s prose measure. That measure is right for the
- * room's paragraphs and wrong for this: an index of 1,672 names held to a 760px
+ * room's paragraphs and wrong for this: an index of 1,672 names held to a 900px
  * column fits three narrow tracks and runs to some 28,000px, so the reader pays
  * for a line length the content never uses. Breaking the zone (and only the
  * zone) out to the room's full width fits roughly twice the columns and roughly
