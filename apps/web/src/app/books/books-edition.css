@@ -388,40 +388,9 @@
 }
 
 /* —— Cover art —— */
-.ds-books-edition__cover {
-  flex: 0 0 auto;
-  width: 5rem;
-  margin: 0;
-  overflow: hidden;
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-canvas);
-}
-
-.ds-books-edition__cover--placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 2 / 3;
-  min-height: 7.5rem;
-}
-
-.ds-books-edition__cover-initials {
-  font-family: var(--ds-font-display);
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--ds-accent);
-}
-
-.ds-books-edition__cover-img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 2 / 3;
-  object-fit: cover;
-}
-
+/* .ds-books-edition__cover and its children moved to BooksCoverArt.css, co-located with the
+   component: BooksCoverArt renders on both /books (browse) and /books/[slug] (detail), and this
+   sheet is imported only by the detail route. See BooksCoverArt.css for why. */
 .ds-books-edition__intro-cover {
   width: clamp(7rem, 18vw, 11rem);
 }

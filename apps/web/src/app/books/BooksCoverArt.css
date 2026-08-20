@@ -1,0 +1,43 @@
+/**
+ * BooksCoverArt — owns its own stylesheet because the component renders on both `/books`
+ * (browse, on the room kit) and `/books/[slug]` (detail, still on books-edition.css). Living
+ * with the component guarantees the cover renders styled wherever it's used, rather than
+ * depending on whichever parent page happened to import books-edition.css — which is exactly
+ * how these rules ended up unstyled on the browse page: books-edition.css is imported only by
+ * the detail route, and the browse route (deliberately, per books-catalogue.test.tsx's guard)
+ * never imports it.
+ */
+
+.ds-books-edition__cover {
+  flex: 0 0 auto;
+  width: 5rem;
+  margin: 0;
+  overflow: hidden;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+}
+
+.ds-books-edition__cover--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 2 / 3;
+  min-height: 7.5rem;
+}
+
+.ds-books-edition__cover-initials {
+  font-family: var(--ds-font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ds-accent);
+}
+
+.ds-books-edition__cover-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+}

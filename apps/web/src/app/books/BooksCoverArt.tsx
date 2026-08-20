@@ -6,6 +6,7 @@
 
 import React, { useState } from 'react';
 import { openLibraryCoverUrl, coverInitialsForTitle } from './books-cover';
+import './BooksCoverArt.css';
 
 void React;
 
