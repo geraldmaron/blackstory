@@ -13,7 +13,8 @@
   transform: translateX(-50%);
   width: min(760px, calc(100vw - 24px));
   padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-2);
-  background: var(--ds-surface);
+  /* One panel recipe shared by all four Atlas instruments — see lens-panel.css. */
+  background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
 }
@@ -36,7 +37,7 @@
 
 .ds-time-panel__current {
   font-family: var(--ds-font-display);
-  font-size: 1.0625rem;
+  font-size: 1.5rem; /* 24px */
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--ds-ink);

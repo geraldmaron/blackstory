@@ -82,6 +82,19 @@ test('the refusal reason is plain language with no bead id or doc reference', ()
   assert.equal(html.includes('—'), false);
 });
 
+test('a refusal is a visible line in the console, not only a hover title', () => {
+  const withRefusal = renderToStaticMarkup(
+    createElement(
+      CameraConsole,
+      consoleProps({ activeRecord: { kind: 'person', displayName: 'A person' } }),
+    ),
+  );
+  assert.match(withRefusal, /class="ds-camera__refusal"/);
+
+  const withoutRefusal = renderToStaticMarkup(createElement(CameraConsole, consoleProps()));
+  assert.doesNotMatch(withoutRefusal, /ds-camera__refusal/);
+});
+
 test('spotlight reports whether it is currently up', () => {
   const on = renderToStaticMarkup(createElement(CameraConsole, consoleProps({ spotlit: true })));
   assert.match(on, /aria-pressed="true"/);

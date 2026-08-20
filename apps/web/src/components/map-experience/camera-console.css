@@ -14,7 +14,8 @@
   gap: var(--ds-space-2);
   width: 210px;
   padding: var(--ds-space-3);
-  background: var(--ds-surface);
+  /* One panel recipe shared by all four Atlas instruments — see lens-panel.css. */
+  background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
   box-shadow: 0 10px 30px -18px rgb(0 0 0 / 45%);
@@ -26,13 +27,15 @@
   gap: var(--ds-space-1);
 }
 
+/* Ink direction: mono is for data — "Camera" is the panel's title, not a data readout, so it
+   takes the same display-type recipe as the Lens and Results titles. */
 .ds-camera__kicker {
   flex: 1;
-  font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
+  font-family: var(--ds-font-display);
+  font-size: 1.1875rem; /* 19px — the shared Atlas instrument title size */
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ds-ink);
 }
 
 .ds-camera__zoom {
@@ -117,6 +120,21 @@
 
 .ds-camera__key {
   flex: none;
+}
+
+/*
+ * The refusal reason, stated once for the console rather than repeated per disabled move —
+ * previously only in each button's `title` (hover-only) and a visually-hidden span. The
+ * dignity gate's own logic (`allowedMovesFor`) is unchanged; this only makes its refusal
+ * legible without a mouse.
+ */
+.ds-camera__refusal {
+  margin: 0;
+  padding-top: var(--ds-space-1);
+  font-family: var(--ds-font-editorial);
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--ds-ink-muted);
 }
 
 @media (max-width: 819px) {
