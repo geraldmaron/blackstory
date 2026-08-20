@@ -24,11 +24,23 @@ export function GroupHeading({ children, className }: GroupHeadingProps) {
 
 export type CardGridProps = {
   readonly children: ReactNode;
+  /**
+   * `'index'` (default): one column, each RoomCard a hairline row — the shape a catalogue like
+   * `/about` or `/support` lists reads as. `'hub'`: three fixed columns — `/library` only, the
+   * one surface the registry calls a hub rather than an index.
+   */
+  readonly variant?: 'index' | 'hub';
   readonly className?: string;
 };
 
-export function CardGrid({ children, className }: CardGridProps) {
-  return <div className={cx('ds-room-cards', className)}>{children}</div>;
+export function CardGrid({ children, variant = 'index', className }: CardGridProps) {
+  return (
+    <div
+      className={cx('ds-room-cards', variant === 'hub' && 'ds-room-cards--hub', className)}
+    >
+      {children}
+    </div>
+  );
 }
 
 /**
@@ -51,7 +63,11 @@ export type RoomCardMedia = {
 
 export type RoomCardProps = {
   readonly href: string;
-  /** Mono caps kind tag: what sort of thing this is. */
+  /**
+   * What sort of thing this is. Ink direction: no longer rendered as a kind tag — kind is
+   * implied by the group the card sits in — but kept on the type so the existing callers do
+   * not have to change in the same commit.
+   */
   readonly kind: string;
   readonly title: ReactNode;
   /** One line. Two lines is a summary, and a card is not a summary. */
@@ -72,6 +88,7 @@ export function RoomCard({
   media,
   className,
 }: RoomCardProps) {
+  void kind;
   return (
     <Link className={cx('ds-room-card', media && 'ds-room-card--media', className)} href={href}>
       {media ? (
@@ -85,7 +102,6 @@ export function RoomCard({
           <img src={media.url} alt={media.alt} loading="lazy" />
         </span>
       ) : null}
-      <span className="ds-room-card__kind">{kind}</span>
       <h3 className="ds-room-card__title">{title}</h3>
       {description ? <p className="ds-room-card__desc">{description}</p> : null}
       {meta ? <span className="ds-room-card__meta">{meta}</span> : null}

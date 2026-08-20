@@ -122,7 +122,7 @@ export default async function LibraryPage() {
       {LIBRARY_CARD_GROUPS.map((group) => (
         <React.Fragment key={group}>
           <GroupHeading>{GROUP_HEADINGS[group]}</GroupHeading>
-          <CardGrid>
+          <CardGrid variant="hub">
             {destinationsInGroup(group).map((destination) => (
               <RoomCard
                 key={destination.path}

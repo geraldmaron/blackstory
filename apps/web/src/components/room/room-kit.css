@@ -188,22 +188,12 @@
   margin-bottom: var(--ds-space-8);
 }
 
-.ds-room-header__kicker {
-  display: block;
-  margin-bottom: var(--ds-space-3);
-  font-family: var(--ds-font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
-}
-
 .ds-room-header__title {
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(30px, 4vw, 44px);
-  line-height: 1.06;
-  letter-spacing: -0.035em;
+  font-size: clamp(44px, 6vw, 86px);
+  line-height: 0.97;
+  letter-spacing: -0.042em;
 }
 
 .ds-room-header__title em {
@@ -217,8 +207,8 @@
   margin-top: var(--ds-space-4);
   max-width: 34em;
   font-family: var(--ds-font-editorial);
-  font-size: 18.5px;
-  line-height: 1.5;
+  font-size: 22px;
+  line-height: 1.48;
   color: var(--room-ink-2);
 }
 
@@ -252,67 +242,96 @@
   letter-spacing: 0.04em;
 }
 
-/* —— GroupHeading: quieter than an h2 rule ————————————————————————————————— */
+/* —— GroupHeading: a section title, not a mono-caps label ——————————————————
+   Ink direction: mono is for data, and a group name is not data. Sized between the room
+   title above it and the 24px card titles it introduces, so the outline still reads top
+   to bottom. */
 .ds-room .ds-room-grouphd {
   margin-top: var(--ds-space-8);
-  padding-bottom: var(--ds-space-2);
+  padding-bottom: var(--ds-space-3);
   border-bottom: var(--ds-border-width) solid var(--room-rule-2);
-  font-family: var(--ds-font-mono);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--room-ink-4);
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: 28px;
+  letter-spacing: -0.025em;
+  color: var(--ds-ink);
 }
 
 .ds-room .ds-room-grouphd + .ds-room-cards {
   margin-top: var(--ds-space-4);
 }
 
-/* —— CardGrid / RoomCard ——————————————————————————————————————————————————— */
+/* —— CardGrid / RoomCard ———————————————————————————————————————————————————
+   Ink direction: a card is no longer a box. The border, background, radius and hover lift all
+   come off; a RoomCard becomes a row separated from the next by a single bottom hairline
+   (the `index` shape — every CardGrid caller but one) or a column entry in a three-fixed-
+   column grid (the `hub` shape — `/library`, the one surface the registry actually calls a
+   hub). Kind used to be a tag drawn on the card; now it is implied by the group the card sits
+   in, so `RoomCard`'s `kind` prop stops rendering — see RoomCards.tsx. */
 .ds-room-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
-  gap: var(--ds-space-3);
+  display: flex;
+  flex-direction: column;
   margin-block: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-room-cards--hub {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: var(--ds-space-8);
+  border-top: 0;
+}
+
+@media (max-width: 56rem) {
+  .ds-room-cards--hub {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 34rem) {
+  .ds-room-cards--hub {
+    grid-template-columns: 1fr;
+  }
 }
 
 .ds-room-card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: var(--ds-space-4);
+  display: grid;
+  grid-template-columns: 1.3fr 2fr auto;
+  align-items: baseline;
+  column-gap: var(--ds-space-4);
+  padding-block: 22px;
   text-align: left;
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
+  background: none;
   font-family: var(--ds-font-sans);
   color: var(--ds-ink);
-  transition:
-    border-color var(--ds-duration-fast) var(--ds-easing),
-    background var(--ds-duration-fast) var(--ds-easing),
-    transform var(--ds-duration-fast) var(--ds-easing);
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
 }
 
+.ds-room-cards--hub .ds-room-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+  padding-block: var(--ds-space-5);
+}
+
+/* Rows and index entries take a copper wash on hover; cards no longer lift. */
 .ds-room-card:hover {
-  border-color: var(--ds-accent-graphic);
-  background: var(--ds-surface-raised);
-  transform: translateY(-1px);
+  background: rgba(184, 107, 42, 0.06);
 }
 
-/* Hero media bleeds to the card's edges. `overflow: hidden` clips the image to the card's
-   radius; the fixed aspect ratio keeps a grid of mixed-aspect heroes on one baseline. */
-.ds-room-card--media {
-  overflow: hidden;
+.ds-room-cards--hub .ds-room-card__media {
+  margin-bottom: var(--ds-space-1);
 }
 
 .ds-room-card__media {
   display: block;
-  margin: calc(-1 * var(--ds-space-4)) calc(-1 * var(--ds-space-4)) var(--ds-space-1);
   aspect-ratio: 16 / 9;
-  /* Clips on the media box, not the card: without it a portrait hero (a redlining map is
-     3:4) overflows its slot and the grid's cards stop sharing a baseline. */
   overflow: hidden;
+  /* Media wells keep the raised value the token table reserves for them, now that a plain
+     card ground no longer needs it. */
   background: var(--ds-surface-raised);
+  border-radius: var(--ds-radius-md);
 }
 
 .ds-room-card__media img {
@@ -335,37 +354,44 @@
   object-position: center;
 }
 
-.ds-room-card__kind {
-  font-family: var(--ds-font-mono);
-  font-size: 9px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
-}
-
 .ds-room .ds-room-card__title {
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: 15.5px;
-  letter-spacing: -0.02em;
-  line-height: 1.24;
+  font-size: 24px;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
 }
 
 .ds-room-card__desc {
   font-family: var(--ds-font-editorial);
-  font-size: 13.5px;
+  font-size: 16px;
   line-height: 1.5;
   color: var(--room-ink-3);
 }
 
 .ds-room-card__meta {
-  margin-top: auto;
-  padding-top: var(--ds-space-3);
-  border-top: var(--ds-border-width) solid var(--room-rule-2);
   font-family: var(--ds-font-mono);
-  font-size: 9.5px;
+  font-size: 10px;
   letter-spacing: 0.06em;
   color: var(--room-ink-4);
+  white-space: nowrap;
+}
+
+.ds-room-cards--hub .ds-room-card__meta {
+  margin-top: auto;
+  padding-top: var(--ds-space-2);
+  white-space: normal;
+}
+
+@media (max-width: 40rem) {
+  .ds-room-cards:not(.ds-room-cards--hub) .ds-room-card {
+    grid-template-columns: 1fr;
+    row-gap: 4px;
+  }
+
+  .ds-room-cards:not(.ds-room-cards--hub) .ds-room-card__meta {
+    white-space: normal;
+  }
 }
 
 /* —— Prose ————————————————————————————————————————————————————————————————— */
@@ -731,8 +757,9 @@ a.ds-room-chip {
   cursor: pointer;
 }
 
+/* Rows and index entries take a copper wash on hover — same invariant as RoomCard. */
 .ds-room-idx__row:hover {
-  background: var(--room-sunk);
+  background: rgba(184, 107, 42, 0.06);
 }
 
 .ds-room-idx__row:hover .ds-room-idx__glyph {

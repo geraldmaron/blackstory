@@ -18,7 +18,11 @@ export type RoomHeaderProps = {
   readonly pathname: string;
   /** Final breadcrumb step. Defaults to the registry label for `pathname`. */
   readonly crumbLabel?: string;
-  /** Mono caps register above the title — the room's kind, not a restatement of the title. */
+  /**
+   * Mono caps register above the title — the room's kind, not a restatement of the title.
+   * Ink direction: no longer rendered (the title takes the space instead); kept on the type
+   * so the twelve existing callers do not have to change in the same commit.
+   */
   readonly kicker?: string;
   /** The display title. `<em>` inside renders in the editorial italic accent. */
   readonly title: ReactNode;
@@ -41,13 +45,13 @@ export function RoomHeader({
   showPath = true,
   className,
 }: RoomHeaderProps) {
+  void kicker;
   const facts = meta ?? [];
   const hasMeta = facts.length > 0 || showPath;
 
   return (
     <header className={cx('ds-room-header', className)}>
       <Breadcrumb pathname={pathname} hereLabel={crumbLabel} />
-      {kicker ? <span className="ds-room-header__kicker">{kicker}</span> : null}
       <h1 className="ds-room-header__title">{title}</h1>
       {lede ? <p className="ds-room-header__lede">{lede}</p> : null}
       {hasMeta ? (
