@@ -109,52 +109,24 @@
 }
 
 /* —— facet groups ———————————————————————————————————————————————————————————
-   One panel of labelled rows. Six stacked heading-over-chip-bar blocks read as six sections of
-   the page and cost most of a screen before the first record; a label beside its own row costs
-   one line each and scans as a single control. */
+   One hairline-topped-and-bottomed block of labelled rows — no box, no disclosure. Six stacked
+   heading-over-chip-bar blocks read as six sections of the page and cost most of a screen before
+   the first record; a label beside its own row costs one line each and scans as a single
+   control. The block's own top hairline plus every row's bottom hairline (including the last)
+   is what frames it top and bottom without a redundant border on both. */
 .ds-records-filters {
   margin-top: var(--ds-space-5);
-  border: var(--ds-border-width) solid var(--room-rule-2);
-  border-radius: var(--ds-radius-md);
-  background: var(--room-sunk);
-}
-
-.ds-records-filters__summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-space-3);
-  padding: var(--ds-space-3) var(--ds-space-4);
-  font-family: var(--ds-font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--room-ink-3);
-  cursor: pointer;
-}
-
-.ds-records-filters__summary:focus-visible {
-  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
-  outline-offset: -2px;
-}
-
-.ds-records-filters__hint {
-  color: var(--room-ink-4);
-}
-
-.ds-records-filters__body {
-  padding: 0 var(--ds-space-4) var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
 }
 
 /* Label beside its chips on a wide column, above them once the column is too narrow for both. */
 .ds-records-facet {
   display: grid;
-  grid-template-columns: 6.5rem minmax(0, 1fr);
+  grid-template-columns: 6.875rem minmax(0, 1fr); /* 110px */
   align-items: start;
   column-gap: var(--ds-space-3);
-  padding-block: var(--ds-space-2);
-  border-top: var(--ds-border-width) solid var(--room-rule-2);
+  padding-block: var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
 }
 
 @media (max-width: 40rem) {
