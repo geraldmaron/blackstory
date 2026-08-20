@@ -17,15 +17,19 @@ import {
   buildKindChips,
   buildPlaceGroups,
   buildSeriesGroups,
+  buildSeriesShelves,
   buildTagGroups,
   computeStoriesFacts,
   filterItems,
   hasActiveNarrowing,
   paginateStories,
   parseStoriesQuery,
+  pickLeadStory,
+  showsShelves,
   sortItems,
   storiesHref,
   storiesNotice,
+  uncollectedItems,
 } from './stories-index';
 import type { PublicArticleListItemDoc } from '@repo/schemas';
 import { RECORDS_PAGE_SIZE } from '../../lib/records/build-records-index';
@@ -292,6 +296,55 @@ describe('/stories · rail groups and chips', () => {
     assert.deepEqual(buildPlaceGroups(items), [
       { label: 'US', href: '/stories?kind=all&place=US', count: 2 },
     ]);
+  });
+});
+
+describe('/stories · shelves', () => {
+  const chapter1 = item({
+    id: 'p1',
+    slug: 'p1',
+    kind: 'chapter',
+    publishedAt: '2020-01-01',
+    series: { id: 'presidents', label: 'Presidential records', position: 1 },
+  });
+  const chapter2 = item({
+    id: 'p2',
+    slug: 'p2',
+    kind: 'chapter',
+    publishedAt: '2021-01-01',
+    series: { id: 'presidents', label: 'Presidential records', position: 2 },
+  });
+  const uncollected = item({ id: 'u1', slug: 'u1', kind: 'chapter', publishedAt: '2024-01-01' });
+  const items = [chapter1, chapter2, uncollected];
+
+  it('groups members by series in the collection order, largest shelf first', () => {
+    const shelves = buildSeriesShelves(items);
+    assert.deepEqual(
+      shelves.map((shelf) => [shelf.id, shelf.label, shelf.count]),
+      [['presidents', 'Presidential records', 2]],
+    );
+    assert.deepEqual(
+      shelves[0]?.members.map((member) => member.slug),
+      ['p1', 'p2'],
+    );
+  });
+
+  it('uncollected items are exactly the ones with no series', () => {
+    assert.deepEqual(
+      uncollectedItems(items).map((entry) => entry.slug),
+      ['u1'],
+    );
+  });
+
+  it('the lead story is the most recently published item in view', () => {
+    assert.equal(pickLeadStory(items)?.slug, 'u1');
+  });
+
+  it('shelves show only in the default, unnarrowed, series-sorted browse state', () => {
+    assert.equal(showsShelves(EMPTY), true);
+    assert.equal(showsShelves({ ...EMPTY, q: 'lincoln' }), false);
+    assert.equal(showsShelves({ ...EMPTY, kind: 'article' }), false);
+    assert.equal(showsShelves({ ...EMPTY, sort: 'newest' }), false);
   });
 });
 

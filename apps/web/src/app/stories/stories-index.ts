@@ -286,6 +286,61 @@ export function buildSeriesGroups(
     }));
 }
 
+export type SeriesShelf = {
+  readonly id: string;
+  readonly label: string;
+  readonly href: string;
+  readonly count: number;
+  readonly members: readonly PublicArticleListItemDoc[];
+};
+
+/**
+ * Collections, with their members, for the `/stories` shelves: one shelf per series, largest
+ * first — same order and counts as `buildSeriesGroups` gives the rail. Members are handed back
+ * in the collection's own order (`sortItems(..., 'series')`), never re-derived per shelf, so a
+ * shelf's "first four" always matches the collection's own reading order.
+ */
+export function buildSeriesShelves(
+  items: readonly PublicArticleListItemDoc[],
+): readonly SeriesShelf[] {
+  const labels = new Map<string, string>();
+  const membersById = new Map<string, PublicArticleListItemDoc[]>();
+  for (const item of sortItems(items, 'series')) {
+    if (!item.series) continue;
+    labels.set(item.series.id, item.series.label);
+    const bucket = membersById.get(item.series.id);
+    if (bucket) bucket.push(item);
+    else membersById.set(item.series.id, [item]);
+  }
+  return [...membersById.entries()]
+    .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
+    .map(([id, members]) => ({
+      id,
+      label: labels.get(id) ?? id,
+      href: storiesHref({ series: id, kind: '' }),
+      count: members.length,
+      members,
+    }));
+}
+
+/** Stories with no collection — the "Everything else" list, in the page's own sort order. */
+export function uncollectedItems(
+  items: readonly PublicArticleListItemDoc[],
+): readonly PublicArticleListItemDoc[] {
+  return items.filter((item) => !item.series);
+}
+
+/**
+ * The one chapter that leads the shelves page at full width: the most recently published
+ * chapter in view. Deterministic and reads from data already on hand — no new field, no
+ * editorial "featured" flag to maintain.
+ */
+export function pickLeadStory(
+  items: readonly PublicArticleListItemDoc[],
+): PublicArticleListItemDoc | undefined {
+  return sortItems(items, 'newest')[0];
+}
+
 export function buildTagGroups(items: readonly PublicArticleListItemDoc[]): readonly RailEntry[] {
   const counts = new Map<string, number>();
   for (const item of items) {
@@ -337,6 +392,16 @@ export const STORY_SORT_LABELS: Record<StorySortKey, string> = {
   oldest: 'Oldest first',
   title: 'Title A–Z',
 };
+
+/**
+ * True in the page's default, unnarrowed browse state — the one state the shelves layout
+ * renders in. Any active filter/search or a non-default sort drops back to the flat, paginated
+ * index: shelves have their own count order and per-collection position order, and showing them
+ * while a reader's `sort` choice sits unapplied would be dishonest about what changed.
+ */
+export function showsShelves(query: StoriesQuery): boolean {
+  return !hasActiveNarrowing(query) && query.sort === 'series';
+}
 
 /** True when any narrowing control is engaged — drives the "clear" affordance. */
 export function hasActiveNarrowing(query: StoriesQuery): boolean {
