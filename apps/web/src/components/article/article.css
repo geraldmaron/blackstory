@@ -111,6 +111,12 @@
   width: 100%;
 }
 
+/* Clears the fixed 64px command bar on an anchor jump — from a reference link, or from the
+   sticky rail's "In this chapter" list. */
+.ds-article__heading {
+  scroll-margin-top: 88px;
+}
+
 .ds-article__heading--2 {
   font-family: var(--ds-font-display);
   font-size: 30px;
@@ -455,4 +461,60 @@
 
 .ds-article__footer a {
   color: var(--ds-accent);
+}
+
+/* ----------------------------------------------------------------------------
+ * Sticky evidence rail — Ink direction. "In this chapter" and "Records cited" are
+ * RailGroup, styled by room-kit.css; only the wrapper's stickiness and the one-off
+ * "Next in this collection" block belong to this sheet.
+ * ------------------------------------------------------------------------- */
+.ds-article-rail {
+  position: sticky;
+  top: 24px;
+}
+
+.ds-article-rail__next {
+  margin-top: var(--ds-space-7);
+  padding: var(--ds-space-4);
+  background: var(--ds-surface);
+  border-left: var(--ds-border-width-strong) solid var(--ds-accent);
+}
+
+.ds-article-rail__next-kicker {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-article-rail__next-position {
+  margin: var(--ds-space-1) 0 0;
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
+  color: var(--ds-accent);
+}
+
+.ds-article-rail__next-title {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: 15.5px;
+  letter-spacing: -0.015em;
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-article-rail__next-title:hover {
+  color: var(--ds-accent);
+}
+
+@media (max-width: 68rem) {
+  /* Below .ds-room--railed's breakpoint the rail stacks under the column (Room.tsx), where
+     sticky positioning has no meaningful ground to stick to. */
+  .ds-article-rail {
+    position: static;
+  }
 }

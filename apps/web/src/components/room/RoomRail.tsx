@@ -19,6 +19,8 @@ export type RailEntry = {
   readonly label: string;
   readonly href: string;
   readonly count?: number;
+  /** Leading decorative mark — a kind glyph on a "records cited" style rail. */
+  readonly glyph?: React.ReactNode;
 };
 
 export type RailGroupProps = {
@@ -42,7 +44,14 @@ export function RailGroup({ title, entries, limit, moreHref, className }: RailGr
         {shown.map((entry) => (
           <li key={entry.href}>
             <a className="ds-room-rail-group__link" href={entry.href}>
-              <span className="ds-room-rail-group__label">{entry.label}</span>
+              <span className="ds-room-rail-group__label">
+                {entry.glyph === undefined ? null : (
+                  <span className="ds-room-rail-group__glyph" aria-hidden="true">
+                    {entry.glyph}
+                  </span>
+                )}
+                {entry.label}
+              </span>
               {entry.count === undefined ? null : (
                 <span className="ds-room-num">{entry.count.toLocaleString('en-US')}</span>
               )}

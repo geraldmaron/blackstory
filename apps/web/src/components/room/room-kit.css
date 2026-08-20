@@ -118,9 +118,18 @@
 }
 
 .ds-room-rail-group__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.ds-room-rail-group__glyph {
+  flex: none;
+  display: inline-flex;
+  color: var(--room-ink-4);
 }
 
 .ds-room-rail-group__more {

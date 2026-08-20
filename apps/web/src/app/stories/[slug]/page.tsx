@@ -7,11 +7,18 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
-import { ArticleBody } from '../../../components/article/ArticleBody';
+import { ArticleBody, chapterToc } from '../../../components/article/ArticleBody';
 import { ArticleReferences } from '../../../components/article/ArticleReferences';
 import type { HydratedArticle } from '../../../lib/articles/hydrate';
-import { resolveArticle, listPublishedArticleSlugs } from '../../../lib/articles/source';
-import { Note, Room } from '../../../components/room';
+import {
+  resolveArticle,
+  listPublishedArticleSlugs,
+  listPublicArticleListItems,
+} from '../../../lib/articles/source';
+import { listPublicEntityViewsByIds } from '../../../lib/public-data/source';
+import { KindGlyph } from '../../../components/map-experience/KindGlyph';
+import { Note, RailGroup, Room } from '../../../components/room';
+import { nextInCollection } from './article-rail';
 import '../../reading-room.css';
 import '../../../components/article/article.css';
 import '../../../components/theme-spine/theme-spine.css';
@@ -75,8 +82,54 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   const { doc } = article;
   const jsonLd = buildArticleJsonLd(article);
 
+  // Rail content — sticky margin rail, Ink direction. Every piece here reads data the page
+  // (or /stories, for the collection lookup) already fetches elsewhere; nothing new.
+  const toc = chapterToc(article);
+  const [citedRecords, collectionItems] = await Promise.all([
+    doc.relatedEntityIds.length > 0
+      ? listPublicEntityViewsByIds(doc.relatedEntityIds)
+      : Promise.resolve({ data: [] as const }),
+    doc.series ? listPublicArticleListItems() : Promise.resolve({ items: [] as const }),
+  ]);
+  const next = doc.series
+    ? nextInCollection(doc.series.id, doc.series.position, doc.slug, collectionItems.items)
+    : undefined;
+
+  const rail =
+    toc.length > 0 || citedRecords.data.length > 0 || next ? (
+      <div className="ds-article-rail">
+        {toc.length > 0 ? (
+          <RailGroup
+            title="In this chapter"
+            entries={toc.map((entry) => ({ label: entry.text, href: `#${entry.id}` }))}
+          />
+        ) : null}
+        {citedRecords.data.length > 0 ? (
+          <RailGroup
+            title="Records cited"
+            entries={citedRecords.data.map((entity) => ({
+              label: entity.displayName,
+              href: `/entity/${entity.id}`,
+              glyph: <KindGlyph kind={entity.kind} size={12} />,
+            }))}
+          />
+        ) : null}
+        {next ? (
+          <section className="ds-article-rail__next">
+            <p className="ds-article-rail__next-kicker">Next in this collection</p>
+            {next.positionLabel ? (
+              <p className="ds-article-rail__next-position">{next.positionLabel}</p>
+            ) : null}
+            <a className="ds-article-rail__next-title" href={next.href}>
+              {next.title}
+            </a>
+          </section>
+        ) : null}
+      </div>
+    ) : undefined;
+
   return (
-    <Room>
+    <Room rail={rail}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

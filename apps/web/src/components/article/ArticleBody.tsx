@@ -32,6 +32,36 @@ export type ArticleBodyProps = {
   readonly article: HydratedArticle;
 };
 
+/**
+ * Anchor id for a heading block. Prefixed with the block's own index in `article.blocks` —
+ * stable and guaranteed unique by construction — with a readable slug appended so the URL
+ * fragment still says something about the section. The same function backs both the id this
+ * module renders onto the heading and `chapterToc`'s rail entries below, so the two can never
+ * drift apart.
+ */
+export function headingAnchorId(index: number, text: string): string {
+  const slug = text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+  return slug.length > 0 ? `section-${index}-${slug}` : `section-${index}`;
+}
+
+/** "In this chapter": the article's own level-2 section headings, in reading order. */
+export function chapterToc(
+  article: HydratedArticle,
+): readonly { readonly id: string; readonly text: string }[] {
+  const entries: { id: string; text: string }[] = [];
+  article.blocks.forEach((block, index) => {
+    if (block.type === 'heading' && block.level === 2) {
+      entries.push({ id: headingAnchorId(index, block.text), text: block.text });
+    }
+  });
+  return entries;
+}
+
 function SourceLine({ numbers }: { readonly numbers: readonly number[] }) {
   if (numbers.length === 0) return null;
   return (
@@ -91,18 +121,26 @@ function StatRail({ stats }: { readonly stats: readonly HydratedArticleStat[] })
 
 function Block({
   block,
+  index,
   refNumberById,
 }: {
   readonly block: HydratedArticleBlock;
+  readonly index: number;
   readonly refNumberById: ReadonlyMap<string, number>;
 }) {
   switch (block.type) {
-    case 'heading':
+    case 'heading': {
+      const id = headingAnchorId(index, block.text);
       return block.level === 2 ? (
-        <h2 className="ds-article__heading ds-article__heading--2">{block.text}</h2>
+        <h2 id={id} className="ds-article__heading ds-article__heading--2">
+          {block.text}
+        </h2>
       ) : (
-        <h3 className="ds-article__heading ds-article__heading--3">{block.text}</h3>
+        <h3 id={id} className="ds-article__heading ds-article__heading--3">
+          {block.text}
+        </h3>
       );
+    }
     case 'paragraph':
       return (
         <ArticleProse className="ds-article__p" text={block.text} refNumberById={refNumberById} />
@@ -243,7 +281,9 @@ export function ArticleBody({ article }: ArticleBodyProps) {
       i = j - 1;
       continue;
     }
-    rendered.push(<Block key={i} block={block} refNumberById={article.refNumberById} />);
+    rendered.push(
+      <Block key={i} block={block} index={i} refNumberById={article.refNumberById} />,
+    );
   }
   return <div className="ds-article__body ds-prose">{rendered}</div>;
 }
