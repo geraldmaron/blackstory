@@ -56,6 +56,19 @@ test('Trayvon Martin is present as a racial-terror milestone', () => {
   assert.ok(trayvon!.place?.toLowerCase().includes('sanford'));
 });
 
+test('no memorial name carries markup residue', () => {
+  // repo-5gyq: one scraped entry shipped as "Matthew Johnson#Shooting_of_Matthew_Johnson)" — a
+  // Wikipedia anchor painted verbatim on the wall in handwriting. A memorial cannot render a URL
+  // fragment as a person's name. Parenthesised alternate spellings from the source rolls are
+  // legitimate and pass; wiki anchors, underscores and unbalanced brackets are not.
+  for (const entry of MEMORIAL_NAMES) {
+    assert.doesNotMatch(entry.name, /[#_|[\]]/, `markup residue in name: ${entry.name}`);
+    const opens = (entry.name.match(/\(/g) ?? []).length;
+    const closes = (entry.name.match(/\)/g) ?? []).length;
+    assert.equal(opens, closes, `unbalanced parentheses in name: ${entry.name}`);
+  }
+});
+
 test('memorial name keys are unique by name+year', () => {
   const seen = new Set<string>();
   for (const entry of MEMORIAL_NAMES) {
