@@ -108,6 +108,7 @@ export const theCountArticle = {
       label:
         'Dred Scott v. Sandford, 60 U.S. (19 How.) 393 (1857); official United States Reports, Library of Congress.',
       url: 'https://tile.loc.gov/storage-services/service/ll/usrep/usrep060/usrep060393a/usrep060393a.pdf',
+      locator: '60 U.S. 404, 407',
     },
     {
       id: 'archives-dred-scott',
@@ -205,10 +206,23 @@ export const theCountArticle = {
       url: 'https://www.archives.gov/research/jfk/select-committee-report/part-2d.html',
     },
     {
+      id: 'usccr-msdelta',
+      label:
+        'U.S. Commission on Civil Rights, "Racial and Ethnic Tensions in American Communities: The Mississippi Delta Report" (2001), chapter 3, on voter registration under the Reconstruction Acts of 1867.',
+      url: 'https://www.usccr.gov/files/pubs/msdelta/ch3.htm',
+    },
+    {
+      id: 'house-historian-reconstruction',
+      label:
+        'U.S. House of Representatives, Office of the Historian, "Black Americans in Congress: Reconstruction and Black Political Activism."',
+      url: 'https://history.house.gov/Exhibitions-and-Publications/BAIC/Historical-Essays/Fifteenth-Amendment/Reconstruction/',
+    },
+    {
       id: 'usccr-2018-voting',
       label:
         'U.S. Commission on Civil Rights, "An Assessment of Minority Voting Rights Access in the United States" (2018), Table 1 and findings.',
       url: 'https://www.usccr.gov/files/pubs/2018/Minority_Voting_Access_2018.pdf',
+      locator: 'Table 1; pp. 23, 82, 176',
     },
     {
       id: 'vra-1965-statute',
@@ -228,6 +242,7 @@ export const theCountArticle = {
       label:
         'Shelby County v. Holder, 570 U.S. 529 (2013); official United States Reports, Library of Congress.',
       url: 'https://tile.loc.gov/storage-services/service/ll/usrep/usrep570/usrep570529/usrep570529.pdf',
+      locator: '570 U.S. 536',
     },
     {
       id: 'doj-section5',
@@ -400,7 +415,7 @@ export const theCountArticle = {
     },
     {
       type: 'paragraph',
-      text: 'A name a record put on can be taken off by a record. It’s the 1890s in Louisiana, and your name on the registration rolls makes you one of a hundred and thirty thousand Black men entitled to vote, a force big enough to decide the state. Every one of those names got there one at a time, by a man walking into a registrar’s office. In that state, as the federal Commission on Civil Rights records, violence met the people who tried to register [ref:usccr-2018-voting]. Then the state rewrites its registration rules. The instruments of the era, as the commission catalogues them, are poll taxes, literacy tests, and grandfather clauses "excluding prior (white) registrants from the new strict rules" [ref:usccr-2018-voting]. No mob is needed for what follows, and no fire. The rolls simply shrink each year as the new paperwork does its work. The commission carries the result in one sentence: "In Louisiana, where more than 130,000 black voters had been registered in 1896, the number had plummeted to 1,342 by 1904" [ref:usccr-2018-voting].',
+      text: 'A name a record put on can be taken off by a record. It’s the 1890s in Louisiana, and your name on the registration rolls makes you one of a hundred and thirty thousand Black men entitled to vote, a force big enough to decide the state. The rolls themselves are Reconstruction’s paperwork. In 1867 Congress had made registration a condition of the South’s readmission and put the registering in federal military hands, and the Commission on Civil Rights’ own history counts approximately 700,000 Black men, most of them held in slavery a few years earlier, going onto the rolls under those acts [ref:usccr-msdelta]. By 1877, in the House Historian’s count, roughly 2,000 Black men held local, state, and federal office across the South [ref:house-historian-reconstruction]. Every one of those names got there one at a time, by a man walking into a registrar’s office. In that state, as the federal Commission on Civil Rights records, violence met the people who tried to register [ref:usccr-2018-voting]. Then the state rewrites its registration rules. The instruments of the era, as the commission catalogues them, are poll taxes, literacy tests, and grandfather clauses "excluding prior (white) registrants from the new strict rules" [ref:usccr-2018-voting]. No mob is needed for what follows, and no fire. The rolls simply shrink each year as the new paperwork does its work. The commission carries the result in one sentence: "In Louisiana, where more than 130,000 black voters had been registered in 1896, the number had plummeted to 1,342 by 1904" [ref:usccr-2018-voting].',
     },
     {
       type: 'paragraph',
@@ -470,7 +485,7 @@ export const theCountArticle = {
     },
     {
       type: 'paragraph',
-      text: 'It takes until August 6, 1965, for the machinery of listing to run the other way. The [[ent_law_voting_rights_act_1965|Voting Rights Act]], signed that day, is built out of the same materials as the laws it breaks: coverage formulas, determinations, lists. Section 4 reaches any state or county that kept a test or device on November 1, 1964, and where the Director of the Census determines either "that less than 50 per centum of the persons of voting age residing therein were registered on November 1, 1964," or "that less than 50 per centum of such persons voted in the presidential election of November 1964" [ref:vra-1965-statute]. Section 5 freezes those places’ election laws, so no change takes effect without federal signoff [ref:vra-1965-statute][ref:doj-history-voting]. Sections 6 and 7 put the pen directly in a federal hand: examiners are appointed "to prepare and maintain lists of persons eligible to vote in Federal, State, and local elections," and "any person whose name appears on the examiner’s list shall be entitled and allowed to vote" [ref:vra-1965-statute]. For the first time since the bureau closed its registers, a federal officer’s job is to write your name down so that the writing itself protects you.',
+      text: 'It takes until August 6, 1965, for the machinery of listing to run the other way. The [[ent_law_voting_rights_act_1965|Voting Rights Act]], signed that day, is built out of the same materials as the laws it breaks: coverage formulas, determinations, lists. Section 4 reaches any state or county that kept a test or device on November 1, 1964, and where the Director of the Census determines either "that less than 50 per centum of the persons of voting age residing therein were registered on November 1, 1964," or "that less than 50 per centum of such persons voted in the presidential election of November 1964" [ref:vra-1965-statute]. Section 5 freezes those places’ election laws, so no change takes effect without federal signoff [ref:vra-1965-statute][ref:doj-history-voting]. Sections 6 and 7 put the pen directly in a federal hand: examiners are appointed "to prepare and maintain lists of persons eligible to vote in Federal, State, and local elections," and "any person whose name appears on the examiner’s list shall be entitled and allowed to vote" [ref:vra-1965-statute]. For the first time since Reconstruction, a federal officer’s job is to write your name down so that the writing itself protects you.',
     },
     {
       type: 'paragraph',
@@ -543,7 +558,7 @@ export const theCountArticle = {
     },
     {
       type: 'paragraph',
-      text: 'There’s a reading of the mechanism worth naming as a reading. The formula was struck for resting on old evidence about places with a long history of changing voting rules to racial ends, and the evidence was old while the supervision held, since a register of what those places would do unsupervised can’t fill up while they’re being supervised. Five years later the Commission on Civil Rights takes the new measurements: "At least 23 states have enacted newly restrictive statewide voter laws since the Shelby County decision" [ref:usccr-2018-voting]. The commission also relays a count it attributes to the Leadership Conference, that Louisiana parishes closed 103 polling places in those same years [ref:usccr-2018-voting]. Louisiana again. The state that cut its rolls from a hundred and thirty thousand to thirteen hundred with paperwork is back to adjusting the geography of the ballot with paperwork, and the federal record-keepers are back to writing it down after the fact.',
+      text: 'There’s a reading of the mechanism worth naming as a reading. The formula was struck for resting on old evidence about places with a long history of changing voting rules to racial ends, and the evidence was old while the supervision held, since a register of what those places would do unsupervised can’t fill up while they’re being supervised. Five years later the Commission on Civil Rights takes the new measurements, citing the Brennan Center’s tally: "At least 23 states have enacted newly restrictive statewide voter laws since the Shelby County decision" [ref:usccr-2018-voting]. The commission also relays a count it attributes to the Leadership Conference, that in those same years three Louisiana parishes in five closed a total of 103 polling places [ref:usccr-2018-voting]. Louisiana again. The state that cut its rolls from a hundred and thirty thousand to thirteen hundred with paperwork is back to adjusting the geography of the ballot with paperwork, and the federal record-keepers are back to writing it down after the fact.',
     },
     {
       type: 'paragraph',

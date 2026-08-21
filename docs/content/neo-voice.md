@@ -283,7 +283,11 @@ three or four, then a present-day close. Each beat:
 
 1. **Cold open, second person, present tense.** Drop the reader into the
    year with a concrete ordinary action: filling out a form, standing in a
-   doorway, opening a letter. No scene-setting throat-clearing.
+   doorway, opening a letter. No scene-setting throat-clearing. A beat
+   anchored on a named historical actor (a plaintiff, a signer, a witness on
+   the record) may instead open in third person on that person, in a place,
+   at a time; Law 1 governs either way, and the tense still holds inside the
+   beat.
 2. **The rule in force.** A primary-document quote (statute, manual clause,
    form language) governing what just happened to "you." Verbatim, cited
    inline.
@@ -343,7 +347,7 @@ and stays plain is compliant. Overuse converts voice into shtick.
 | Technique | What it is | Budget |
 |---|---|---|
 | Call-and-response | Pose the reader's live objection as a short question, answer it flat. "Was it legal? It was legal." | ≤ 2 |
-| Anaphora | Repeat an opening clause across consecutive full sentences to build pressure. "They kept the deed. They kept the ledger. They kept the appraisal card." Full sentences only. | ≤ 2 runs |
+| Anaphora | Repeat an opening clause across consecutive full sentences to build pressure. "They kept the deed. They kept the ledger. They kept the appraisal card." Full sentences only. The budget counts rhetorical pressure runs; plain expository enumeration (walking a form's items, comparing two instruments clause by clause) is description, not cadence, and sits outside it. | ≤ 2 runs |
 | Understatement after magnitude | Deliver the number or the fact, then stop. The next sentence is short and does not characterize. | as needed; the point is the stop |
 | Testifying | The primary record speaks verbatim before Neo characterizes it. Required for every load-bearing document. | standing rule |
 | The pause | A one-sentence paragraph, or a period where a comma was expected, before or after weight. | ≤ 3 one-sentence paragraphs |

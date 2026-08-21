@@ -106,18 +106,16 @@ const MECHANISM_ARTIFACTS = [
   {
     artifactId: 'art_tulsa_tribune_1921_nab_negro',
     artifactClass: 'newspaper_report',
-    title: '"Nab Negro for Attacking Girl in an Elevator," Tulsa Tribune (May 31, 1921)',
+    title: '"Nab Negro for Attacking Girl in Elevator," Tulsa Tribune (May 31, 1921)',
     citation:
-      'Tulsa Tribune, May 31, 1921, front page. The article was torn out of the bound city edition before microfilming; its text survives in Loren Gill’s 1946 transcription (reprinted in the 2001 Oklahoma Commission report, p. 58) and a duplicate printed in the Tribune’s June 1 State Edition (Library of Congress, Headlines & Heroes).',
-    sourceUrl:
-      'https://blogs.loc.gov/headlinesandheroes/2021/05/tulsa-race-massacre-newspaper-complicity-and-coverage/',
+      'Tulsa Tribune, May 31, 1921, front page. The article was torn out of the bound city edition before microfilming; its text survives in Loren Gill’s 1946 transcription (reprinted in the 2001 Oklahoma Commission report, pp. 57–58); a second copy, from that day’s State Edition, was once held by the Oklahoma Historical Society and has since disappeared (per the commission report).',
+    sourceUrl: 'https://www.okhistory.org/research/forms/freport.pdf',
     dated: '1921-05-31',
     summary:
       'The afternoon story that put a crowd outside the Tulsa County Courthouse. It reported the arrest of Dick Rowland, a Black shoe shiner, "charged with attempting to assault the 17-year-old white elevator girl in the Drexel Building." No record survives of what Sarah Page actually told police, and the case against Rowland was dismissed that September when she did not appear. Whether the same edition also carried a lynching editorial is disputed: eyewitness recollection says yes; the surviving copies are missing the pages that could settle it.',
     provenance: {
       source: 'library-of-congress',
-      sourceUrl:
-        'https://blogs.loc.gov/headlinesandheroes/2021/05/tulsa-race-massacre-newspaper-complicity-and-coverage/',
+      sourceUrl: 'https://www.okhistory.org/research/forms/freport.pdf',
       retrievedAt: '2026-07-27T00:00:00.000Z',
       contentHash: 'cbcafb2b447a3b228eb8fb7b238c21f1472ea70f8a0e0d4ddb676a3474b23f5d',
       humanCitation:
@@ -365,7 +363,7 @@ const OBS = {
     estimate: 37250,
     unit: 'USD',
     referencePeriod: '1972',
-    label: 'Median household income, Black householders (1972, 2023 dollars)',
+    label: 'Median household income, Black householders (1972, 2024 dollars)',
     provenance: {
       source: CENSUS_INCOME_SOURCE,
       sourceUrl: CENSUS_INCOME_URL,
@@ -383,7 +381,7 @@ const OBS = {
     estimate: 64730,
     unit: 'USD',
     referencePeriod: '1972',
-    label: 'Median household income, White householders (1972, 2023 dollars)',
+    label: 'Median household income, White householders (1972, 2024 dollars)',
     provenance: {
       source: CENSUS_INCOME_SOURCE,
       sourceUrl: CENSUS_INCOME_URL,
