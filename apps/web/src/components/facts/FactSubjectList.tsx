@@ -17,15 +17,15 @@ export type FactSubjectListProps = {
 export function FactSubjectList({ subjects, labelledBy }: FactSubjectListProps) {
   return (
     <section {...(labelledBy ? { 'aria-labelledby': labelledBy } : {})}>
-      <ul className="bb-stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+      <ul className="ds-stack" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
         {subjects.map((subject) => (
           <li key={`${subject.entityId}_${subject.kind}`}>
-            <a className="bb-cta bb-cta--ink" href={`/entity/${subject.entityId}`}>
+            <a className="ds-cta ds-cta--ink" href={`/entity/${subject.entityId}`}>
               {subject.entityId}
             </a>
             <span
-              className="bb-sans"
-              style={{ marginLeft: 'var(--bb-space-2)', color: 'var(--bb-ink-muted)' }}
+              className="ds-sans"
+              style={{ marginLeft: 'var(--ds-space-2)', color: 'var(--ds-ink-muted)' }}
             >
               {humanizeToken(subject.kind)}
               {subject.role ? ` · ${humanizeToken(subject.role)}` : ''}
@@ -34,8 +34,8 @@ export function FactSubjectList({ subjects, labelledBy }: FactSubjectListProps) 
         ))}
       </ul>
       <p
-        className="bb-sans"
-        style={{ margin: 'var(--bb-space-3) 0 0 0', color: 'var(--bb-ink-muted)' }}
+        className="ds-sans"
+        style={{ margin: 'var(--ds-space-3) 0 0 0', color: 'var(--ds-ink-muted)' }}
       >
         These subject edges feed the published history graph (BB-092) — mirrored into browse-graph
         relationships at publish time so fact-only entity linkages are not silently absent.

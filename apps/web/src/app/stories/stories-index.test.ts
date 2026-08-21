@@ -13,16 +13,16 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
+  buildCollectionGroups,
+  buildCollectionShelves,
   buildEraGroups,
   buildKindChips,
   buildPlaceGroups,
-  buildSeriesGroups,
-  buildSeriesShelves,
   buildTagGroups,
   computeStoriesFacts,
   filterItems,
   hasActiveNarrowing,
-  nextInSeries,
+  nextInCollection,
   paginateStories,
   parseStoriesQuery,
   pickLeadStory,
@@ -77,7 +77,7 @@ describe('/stories · query parsing', () => {
   it('collapses unrecognised values to the chapters default rather than throwing, since bookmarks reach here', () => {
     const query = parseStoriesQuery({ kind: 'nonsense', sort: 'sideways', page: 'abc' });
     assert.equal(query.kind, 'chapter');
-    assert.equal(query.sort, 'series');
+    assert.equal(query.sort, 'collection');
     assert.equal(query.page, 1);
   });
 
@@ -95,18 +95,21 @@ describe('/stories · query parsing', () => {
   });
 
   it('takes the first value when a param repeats', () => {
-    assert.equal(parseStoriesQuery({ series: ['presidents', 'other'] }).series, 'presidents');
+    assert.equal(
+      parseStoriesQuery({ collection: ['presidents', 'other'] }).collection,
+      'presidents',
+    );
   });
 });
 
 describe('/stories · href building', () => {
   it('omits page=1 and the default sort, matching the records convention', () => {
     assert.equal(storiesHref({}), '/stories');
-    assert.equal(storiesHref({ page: 1, sort: 'series' }), '/stories');
+    assert.equal(storiesHref({ page: 1, sort: 'collection' }), '/stories');
   });
 
   it('carries real narrowing into the query string', () => {
-    assert.equal(storiesHref({ series: 'presidents' }), '/stories?series=presidents');
+    assert.equal(storiesHref({ collection: 'presidents' }), '/stories?collection=presidents');
     assert.equal(storiesHref({ kind: 'article', page: 3 }), '/stories?kind=article&page=3');
   });
 
@@ -136,8 +139,8 @@ describe('/stories · filtering and search', () => {
     }),
   ];
 
-  // EMPTY now defaults to kind: 'chapter'; these cases exercise series/tag/search filtering
-  // on its own, across both kinds, so they start from the explicit "All" kind instead.
+  // EMPTY now defaults to kind: 'chapter'; these cases exercise collection/tag/search
+  // filtering on its own, across both kinds, so they start from the explicit "All" kind instead.
   const ALL = { ...EMPTY, kind: '' };
 
   it('defaults to chapters only, since that is now the index default', () => {
@@ -160,9 +163,9 @@ describe('/stories · filtering and search', () => {
     assert.equal(filterItems(items, ALL).length, 3);
   });
 
-  it('filters by series', () => {
-    assert.equal(filterItems(items, { ...ALL, series: 'presidents' }).length, 2);
-    assert.equal(filterItems(items, { ...ALL, series: 'nope' }).length, 0);
+  it('filters by collection', () => {
+    assert.equal(filterItems(items, { ...ALL, collection: 'presidents' }).length, 2);
+    assert.equal(filterItems(items, { ...ALL, collection: 'nope' }).length, 0);
   });
 
   it('filters by tag', () => {
@@ -182,7 +185,7 @@ describe('/stories · filtering and search', () => {
   it('reports when any narrowing is engaged, so the clear affordance can show', () => {
     assert.equal(hasActiveNarrowing(EMPTY), false);
     assert.equal(hasActiveNarrowing({ ...EMPTY, q: 'x' }), true);
-    assert.equal(hasActiveNarrowing({ ...EMPTY, series: 'presidents' }), true);
+    assert.equal(hasActiveNarrowing({ ...EMPTY, collection: 'presidents' }), true);
     assert.equal(hasActiveNarrowing({ ...EMPTY, kind: 'article' }), true);
     assert.equal(hasActiveNarrowing(ALL), true);
   });
@@ -208,16 +211,16 @@ describe('/stories · sorting', () => {
     item({ id: 'a', slug: 'a', title: 'Alpha', publishedAt: '2020-01-01' }),
   ];
 
-  it('sorts a series by its own position, not by publication date', () => {
-    const rows = sortItems(unordered, 'series');
+  it('sorts a collection by its own position, not by publication date', () => {
+    const rows = sortItems(unordered, 'collection');
     assert.deepEqual(
       rows.slice(0, 2).map((row) => row.id),
       ['p16', 'p40'],
     );
   });
 
-  it('keeps non-series entries behind the collection, newest first', () => {
-    const rows = sortItems(unordered, 'series');
+  it('keeps non-collection entries behind the collection, newest first', () => {
+    const rows = sortItems(unordered, 'collection');
     assert.deepEqual(
       rows.slice(2).map((row) => row.id),
       ['b', 'a'],
@@ -269,7 +272,7 @@ describe('/stories · rail groups and chips', () => {
       [
         ['All', 2],
         ['Chapters', 1],
-        ['Records', 1],
+        ['Entries', 1],
       ],
     );
     // EMPTY now defaults to chapters, not All.
@@ -279,7 +282,7 @@ describe('/stories · rail groups and chips', () => {
 
   it('marks the engaged chip as current for assistive technology', () => {
     const chips = buildKindChips(items, { ...EMPTY, kind: 'article' });
-    assert.equal(chips.find((chip) => chip.label === 'Records')?.active, true);
+    assert.equal(chips.find((chip) => chip.label === 'Entries')?.active, true);
     assert.equal(chips.find((chip) => chip.label === 'All')?.active, false);
   });
 
@@ -287,8 +290,8 @@ describe('/stories · rail groups and chips', () => {
     // These rail links always carry kind=all: they group across both editorial kinds (e.g.
     // "Presidential records" is entirely `article`), so they must not fall through to the
     // chapters default.
-    assert.deepEqual(buildSeriesGroups(items), [
-      { label: 'Presidential records', href: '/stories?kind=all&series=presidents', count: 1 },
+    assert.deepEqual(buildCollectionGroups(items), [
+      { label: 'Presidential records', href: '/stories?kind=all&collection=presidents', count: 1 },
     ]);
     assert.deepEqual(buildTagGroups(items), [
       { label: 'Founding era', href: '/stories?kind=all&tag=Founding+era', count: 1 },
@@ -318,8 +321,8 @@ describe('/stories · shelves', () => {
   const uncollected = item({ id: 'u1', slug: 'u1', kind: 'chapter', publishedAt: '2024-01-01' });
   const items = [chapter1, chapter2, uncollected];
 
-  it('groups members by series in the collection order, largest shelf first', () => {
-    const shelves = buildSeriesShelves(items);
+  it('groups members by collection in the collection order, largest shelf first', () => {
+    const shelves = buildCollectionShelves(items);
     assert.deepEqual(
       shelves.map((shelf) => [shelf.id, shelf.label, shelf.count]),
       [['presidents', 'Presidential records', 2]],
@@ -330,7 +333,7 @@ describe('/stories · shelves', () => {
     );
   });
 
-  it('uncollected items are exactly the ones with no series', () => {
+  it('uncollected items are exactly the ones with no collection', () => {
     assert.deepEqual(
       uncollectedItems(items).map((entry) => entry.slug),
       ['u1'],
@@ -341,15 +344,19 @@ describe('/stories · shelves', () => {
     assert.equal(pickLeadStory(items)?.slug, 'u1');
   });
 
-  it('shelves show only in the default, unnarrowed, series-sorted browse state', () => {
+  it('shelves show in the unnarrowed, collection-sorted browse state, for any kind chip', () => {
     assert.equal(showsShelves(EMPTY), true);
     assert.equal(showsShelves({ ...EMPTY, q: 'lincoln' }), false);
-    assert.equal(showsShelves({ ...EMPTY, kind: 'article' }), false);
     assert.equal(showsShelves({ ...EMPTY, sort: 'newest' }), false);
+    // The kind chip alone must not gate shelf mode: a collection can be entirely `article`
+    // (the presidents), so tying shelves to the chapters-only default meant its shelf could
+    // never render under any chip a reader could actually reach.
+    assert.equal(showsShelves({ ...EMPTY, kind: 'article' }), true);
+    assert.equal(showsShelves({ ...EMPTY, kind: '' }), true);
   });
 });
 
-describe('/stories · shelves, the uncollected remainder and series navigation', () => {
+describe('/stories · shelves, the uncollected remainder and collection navigation', () => {
   const items = [
     item({ id: 'c1', slug: 'lone-chapter', kind: 'chapter' }),
     item({
@@ -376,15 +383,15 @@ describe('/stories · shelves, the uncollected remainder and series navigation',
   ];
 
   it('builds one shelf per collection, largest first, each carrying its own members in order', () => {
-    const shelves = buildSeriesShelves(items, 2);
+    const shelves = buildCollectionShelves(items, 2);
     assert.deepEqual(
       shelves.map((shelf) => [shelf.id, shelf.count, shelf.members.map((m) => m.slug)]),
       [['presidents', 3, ['washington', 'adams']]],
     );
-    assert.equal(shelves[0]?.href, '/stories?kind=all&series=presidents');
+    assert.equal(shelves[0]?.href, '/stories?kind=all&collection=presidents');
   });
 
-  it('the uncollected list is everything with no series, and nothing else', () => {
+  it('the uncollected list is everything with no collection, and nothing else', () => {
     assert.deepEqual(
       uncollectedItems(items).map((i) => i.slug),
       ['lone-chapter'],
@@ -392,21 +399,21 @@ describe('/stories · shelves, the uncollected remainder and series navigation',
   });
 
   it('finds the next member of a collection after the given position', () => {
-    const next = nextInSeries(items, 'presidents', 1);
+    const next = nextInCollection(items, 'presidents', 1);
     assert.equal(next?.slug, 'adams');
   });
 
   it('skips past a gap in position numbers to the next real member', () => {
-    const next = nextInSeries(items, 'presidents', 0);
+    const next = nextInCollection(items, 'presidents', 0);
     assert.equal(next?.slug, 'washington');
   });
 
   it('returns undefined at the end of a collection', () => {
-    assert.equal(nextInSeries(items, 'presidents', 3), undefined);
+    assert.equal(nextInCollection(items, 'presidents', 3), undefined);
   });
 
   it('returns undefined for a collection that does not exist', () => {
-    assert.equal(nextInSeries(items, 'nonexistent', 0), undefined);
+    assert.equal(nextInCollection(items, 'nonexistent', 0), undefined);
   });
 });
 

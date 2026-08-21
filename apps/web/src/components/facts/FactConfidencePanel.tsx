@@ -19,28 +19,28 @@ export function FactConfidencePanel({ fact }: FactConfidencePanelProps) {
 
   return (
     <section aria-labelledby="fact-confidence-heading">
-      <p className="bb-section__kicker">Evidence grade</p>
-      <h2 className="bb-section__title" id="fact-confidence-heading">
+      <p className="ds-section__kicker">Evidence grade</p>
+      <h2 className="ds-section__title" id="fact-confidence-heading">
         Confidence
       </h2>
-      <div style={{ marginTop: 'var(--bb-space-3)' }}>
+      <div style={{ marginTop: 'var(--ds-space-3)' }}>
         <Confidence level={level} label={label} />
         <p
-          className="bb-sans"
-          style={{ margin: 'var(--bb-space-3) 0 0 0', color: 'var(--bb-ink-muted)' }}
+          className="ds-sans"
+          style={{ margin: 'var(--ds-space-3) 0 0 0', color: 'var(--ds-ink-muted)' }}
         >
           {confidenceDefinition(fact.confidence)}
         </p>
         {fact.confidenceNote ? (
-          <p className="bb-sans" style={{ margin: 'var(--bb-space-2) 0 0 0' }}>
+          <p className="ds-sans" style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
             <strong>Nuance:</strong> {fact.confidenceNote}
           </p>
         ) : null}
         <p
-          className="bb-sans"
-          style={{ margin: 'var(--bb-space-2) 0 0 0', color: 'var(--bb-ink-muted)' }}
+          className="ds-sans"
+          style={{ margin: 'var(--ds-space-2) 0 0 0', color: 'var(--ds-ink-muted)' }}
         >
-          Workflow status (<span className="bb-mono">{fact.status}</span>) and evidence grade are
+          Workflow status (<span className="ds-mono">{fact.status}</span>) and evidence grade are
           independent axes — a contested grade can still be published when the dispute is disclosed.
         </p>
       </div>

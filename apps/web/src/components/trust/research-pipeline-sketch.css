@@ -15,7 +15,10 @@
   margin: 0 0 var(--ds-space-3);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-sm);
+  /* Was `var(--ds-text-sm)`, a token that is defined nowhere in the repo, so this declaration
+     was invalid and the caption fell back to the inherited body size. 0.8125rem is the caption
+     step the rest of the app uses for exactly this register. */
+  font-size: 0.8125rem;
   line-height: 1.45;
 }
 
@@ -131,7 +134,8 @@
   display: grid;
   gap: var(--ds-space-2);
   font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-sm);
+  /* Same undefined-token bug as the figcaption above. */
+  font-size: 0.8125rem;
   color: var(--ds-ink-muted);
 }
 

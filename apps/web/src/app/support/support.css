@@ -12,6 +12,20 @@
   line-height: 1.55;
 }
 
+/* First UtilityCard on the page: sits directly under the header lede, so it takes the base
+   kit's block margin off its top edge rather than leaving a second gap on top of the one the
+   header already has below it. Carries forward the old ds-section--flush treatment this
+   section had before the page moved onto the shared UtilityCard. */
+.ds-support__section-paths {
+  margin-top: 0;
+}
+
+/* Last UtilityCard on the page: nothing follows it (no ds-room__foot here), so it drops the
+   base kit's bottom block margin rather than leaving trailing whitespace before the page ends. */
+.ds-support__section-contact {
+  margin-bottom: 0;
+}
+
 .ds-support__contact {
   margin: var(--ds-space-4) 0 0;
   padding: var(--ds-space-4);

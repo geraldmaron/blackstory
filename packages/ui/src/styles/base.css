@@ -139,3 +139,33 @@ svg {
     scroll-behavior: auto !important;
   }
 }
+
+/*
+ * iOS zoom guard.
+ *
+ * Mobile Safari zooms the whole viewport when a text control smaller than 16px receives focus,
+ * and it does not zoom back out. The page jumps sideways mid-task and every subsequent tap is
+ * offset — on a search field that is the first thing a reader touches. An audit found thirteen
+ * controls under the floor (13px on the record/law search input, 14.5px on every room form
+ * field, 13.5px on the lens select); only `.ds-filters__control` was holding 16px.
+ *
+ * This is a floor at phone widths rather than a rewrite of each control, because the 13–14.5px
+ * sizes are correct on a pointer device — the bug is specific to touch zoom. Component rules
+ * are class-based and would out-specify a bare element selector, so the guard is marked
+ * important: it is an accessibility floor, not a style preference, and nothing should win
+ * against it.
+ */
+@media (max-width: 559px) {
+  input[type='text'],
+  input[type='search'],
+  input[type='email'],
+  input[type='url'],
+  input[type='tel'],
+  input[type='number'],
+  input[type='password'],
+  input:not([type]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

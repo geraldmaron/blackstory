@@ -1,12 +1,12 @@
 /**
- * The chapter-cites-record edge. The load-bearing assertion is the relation precedence: a chapter
+ * The story-cites-record edge. The load-bearing assertion is the relation precedence: a story
  * that both maps a record and lists it as related must read "mapped in", because telling a reader
- * a chapter merely "referenced" a record it drew a map of understates the archive's own evidence.
+ * a story merely "referenced" a record it drew a map of understates the archive's own evidence.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { PublicArticleProjectionDoc } from '@repo/schemas';
-import { articleCitedEntities, buildCitesEdge, chaptersCiting } from './build-cites-edge';
+import { articleCitedEntities, buildCitesEdge, storiesCiting } from './build-cites-edge';
 
 function doc(over: Partial<PublicArticleProjectionDoc>): PublicArticleProjectionDoc {
   return {
@@ -42,7 +42,7 @@ test('mapping a record outranks merely relating it, in either declaration order'
   assert.equal(mapped.get('ent_a'), 'mapped in');
 });
 
-test('the index inverts articles onto records, sorted by chapter title', () => {
+test('the index inverts articles onto records, sorted by story title', () => {
   const index = buildCitesEdge([
     doc({ slug: 'zoning', title: 'Zoning', relatedEntityIds: ['ent_a'] }),
     doc({
@@ -60,11 +60,11 @@ test('the index inverts articles onto records, sorted by chapter title', () => {
   );
 });
 
-test('a record no chapter cites is absent, and reads as an empty list', () => {
+test('a record no story cites is absent, and reads as an empty list', () => {
   const index = buildCitesEdge([doc({ relatedEntityIds: ['ent_a'] })]);
   assert.equal(index['ent_b'], undefined);
-  assert.deepEqual(chaptersCiting(index, 'ent_b'), []);
-  assert.deepEqual(chaptersCiting(index, undefined), []);
+  assert.deepEqual(storiesCiting(index, 'ent_b'), []);
+  assert.deepEqual(storiesCiting(index, undefined), []);
 });
 
 test('blank entity ids never become an edge', () => {

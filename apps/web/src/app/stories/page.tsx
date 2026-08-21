@@ -1,7 +1,7 @@
 /**
  * Stories index at `/stories`: the single long-form publication surface. A story is one
  * published piece, and `kind` says under which editorial contract — `chapter` for the
- * era-immersion long-forms, `article` for record entries (a paragraph of context plus
+ * era-immersion long-forms, `article` for short entries (a paragraph of context plus
  * individually cited call-outs, published in ordered collections).
  *
  * Both kinds share this index on purpose. A reader looking for what the archive says
@@ -27,11 +27,11 @@ import {
   RoomHeader,
 } from '../../components/room';
 import {
+  buildCollectionGroups,
+  buildCollectionShelves,
   buildEraGroups,
   buildKindChips,
   buildPlaceGroups,
-  buildSeriesGroups,
-  buildSeriesShelves,
   buildTagGroups,
   computeStoriesFacts,
   filterItems,
@@ -53,14 +53,15 @@ export const metadata: Metadata = buildStaticPageMetadata({
   path: '/stories',
   title: 'Stories',
   description:
-    'Evidence-led long-form chapters and cited record entries from the BlackStory archive: history pinned to place and record, with every figure and claim cited inline.',
+    'Evidence-led long-form chapters and cited short entries from the BlackStory archive: history pinned to place and record, with every figure and claim cited inline.',
 });
 
 type StoriesPageProps = {
   readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-const KIND_LABELS: Record<string, string> = { chapter: 'Chapter', article: 'Record' };
+/** Not "Record": `/records` is the unrelated whole-archive entity index. See stories-index.ts. */
+const KIND_LABELS: Record<string, string> = { chapter: 'Chapter', article: 'Entry' };
 
 /**
  * What the lead is leading on. The lead story is whatever sits at the top of the current view, so
@@ -88,7 +89,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
   const filtered = sortItems(filterItems(items, query), query.sort);
   const notice = storiesNotice(source, items.length, filtered.length);
   const kindChips = buildKindChips(items, query);
-  const seriesGroups = buildSeriesGroups(items);
+  const collectionGroups = buildCollectionGroups(items);
   const tagGroups = buildTagGroups(items);
 
   // The shelves layout only ever renders in the page's default, unnarrowed browse state (see
@@ -97,7 +98,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
   // sorted-and-filtered set the flat index already computed.
   const shelfMode = source === 'live' && items.length > 0 && showsShelves(query);
   const lead = shelfMode ? pickLeadStory(filtered) : undefined;
-  const shelves = shelfMode ? buildSeriesShelves(filtered) : [];
+  const shelves = shelfMode ? buildCollectionShelves(filtered) : [];
   const uncollected = shelfMode ? uncollectedItems(filtered) : [];
   // Pagination is scoped to the "Everything else" list only — the lead and the shelves above
   // it stay put across its pages, which is what "applies to the Everything else list only"
@@ -114,8 +115,8 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
   const rail =
     source === 'live' && items.length > 0 ? (
       <>
-        {seriesGroups.length > 0 ? (
-          <RailGroup title="Collections" entries={seriesGroups} limit={12} />
+        {collectionGroups.length > 0 ? (
+          <RailGroup title="Collections" entries={collectionGroups} limit={12} />
         ) : null}
         {tagGroups.length > 0 ? <RailGroup title="By era" entries={tagGroups} limit={12} /> : null}
         <RailGroup title="By period" entries={buildEraGroups(items)} limit={12} />
@@ -128,8 +129,8 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
       <RoomHeader
         pathname="/stories"
         kicker="Writing built out of the record"
-        title="Chapters"
-        lede="Long-form chapters that walk from a named year and place through the rules in force, and short record entries that set out what a given administration actually did. Every chapter names the records it stands on, and every record links back to the chapters about it."
+        title="Stories"
+        lede="Long-form chapters that walk from a named year and place through the rules in force, and shorter entries that set out what a given administration actually did. Every story names the records it stands on, and every record links back to the stories about it."
         meta={meta}
         showPath={false}
       />
@@ -158,8 +159,8 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
             {query.kind !== 'chapter' ? (
               <input type="hidden" name="kind" value={query.kind === '' ? 'all' : query.kind} />
             ) : null}
-            {query.series.length > 0 ? (
-              <input type="hidden" name="series" value={query.series} />
+            {query.collection.length > 0 ? (
+              <input type="hidden" name="collection" value={query.collection} />
             ) : null}
             {query.tag.length > 0 ? <input type="hidden" name="tag" value={query.tag} /> : null}
             {query.era.length > 0 ? <input type="hidden" name="era" value={query.era} /> : null}
@@ -233,7 +234,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
                 </h2>
                 <p className="ds-stories-lead__summary">{lead.summary}</p>
                 <a className="ds-cta ds-cta--copper" href={`/stories/${lead.slug}`}>
-                  Read the chapter
+                  {lead.kind === 'article' ? 'Read the entry' : 'Read the chapter'}
                 </a>
               </div>
               {lead.heroImage ? (
@@ -275,11 +276,12 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
                         <img src={item.heroImage.url} alt={item.heroImage.alt} loading="lazy" />
                       ) : null}
                     </span>
-                    {/* The chapter's own number, not its position in this row: a shelf shows
+                    {/* The entry's own number, not its position in this row: a shelf shows
                         four of nine, and a row index is a fraction of the row rather than of the
                         collection the reader is being offered. */}
                     <span className="ds-stories-shelf__index">
-                      {item.series?.positionLabel ?? `Chapter ${index + 1}`}
+                      {item.series?.positionLabel ??
+                        `${KIND_LABELS[item.kind ?? 'chapter'] ?? 'Entry'} ${index + 1}`}
                     </span>
                     <span className="ds-stories-shelf__entry-title">{item.title}</span>
                     <span className="ds-stories-shelf__entry-summary">{item.summary}</span>

@@ -1,6 +1,6 @@
 /**
- * Story detail page at `/stories/[slug]` (chapters and record articles alike). The publication layout: title →
- * hero image → summary → body (prose with inline citations, figures, stat
+ * Story detail page at `/stories/[slug]` (chapters and short entries alike). The publication
+ * layout: title → hero image → summary → body (prose with inline citations, figures, stat
  * callouts, primary documents, timelines, map insets, disputes) → numbered
  * references. Emits schema.org Article JSON-LD only.
  */
@@ -16,7 +16,7 @@ import {
   listPublishedArticleSlugs,
   listPublicArticleListItems,
 } from '../../../lib/articles/source';
-import { nextInSeries } from '../stories-index';
+import { nextInCollection } from '../stories-index';
 import { Note, Room } from '../../../components/room';
 import '../../reading-room.css';
 import '../../../components/article/article.css';
@@ -69,7 +69,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
     return (
       <Room>
         <Note kind="Unavailable">
-          This chapter is temporarily unavailable while we reconnect to the live record.{' '}
+          This story is temporarily unavailable while we reconnect to the live record.{' '}
           <Link href="/stories">Back to all stories</Link>.
         </Note>
       </Room>
@@ -81,17 +81,27 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   const { doc } = article;
   const jsonLd = buildArticleJsonLd(article);
 
+  // The word this page uses for itself in its own copy: a long-form piece is a "chapter", a
+  // short one is an "entry" — never "record" (that collides with the unrelated `/records`
+  // archive index) and never "chapter" for both (that collides with `/stories`' own kind
+  // filter, which uses "Chapter" to mean this kind specifically). See stories-index.ts.
+  const noun = doc.kind === 'article' ? 'entry' : 'chapter';
+
   const chapterHeadings = extractChapterHeadings(article.blocks);
 
   // "Next in this collection" only needs the rest of the release's list items — the same
   // read `/stories` already does, cached per request, not a new query.
   const next = doc.series
-    ? nextInSeries((await listPublicArticleListItems()).items, doc.series.id, doc.series.position)
+    ? nextInCollection(
+        (await listPublicArticleListItems()).items,
+        doc.series.id,
+        doc.series.position,
+      )
     : undefined;
 
-  // Ink spec §4 (/stories/[slug]): the sticky right rail carries "In this chapter", "Records
-  // cited" and "Next in this collection". The references list itself, its numbering and its
-  // `#ref-N` anchor ids are unchanged (ArticleProse's citation superscripts link to those ids
+  // Ink spec §4 (/stories/[slug]): the sticky right rail carries "In this chapter/entry", the
+  // reference list and "Next in this collection". The references list itself, its numbering and
+  // its `#ref-N` anchor ids are unchanged (ArticleProse's citation superscripts link to those ids
   // regardless of where in the document the list renders) — only its position moves.
   const hasRailContent = chapterHeadings.length > 0 || next;
   const rail = hasRailContent ? (
@@ -99,7 +109,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
       {chapterHeadings.length > 0 ? (
         <nav className="ds-room-rail-group" aria-labelledby="article-toc">
           <p className="ds-room-rail-group__title" id="article-toc">
-            In this chapter
+            In this {noun}
           </p>
           <ul className="ds-room-rail-group__list">
             {chapterHeadings.map((heading) => (
@@ -130,10 +140,10 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   ) : undefined;
 
   /*
-   * The chapter opens on its image, with the chapter written over it, on the same masthead the
+   * The piece opens on its image, with the title written over it, on the same masthead the
    * record page uses. It used to open on a text header and put the hero underneath the summary,
    * which is the layout of a document that happens to have a picture attached rather than of a
-   * piece of writing that leads with one. A chapter with no hero keeps the same block on the
+   * piece of writing that leads with one. A piece with no hero keeps the same block on the
    * canvas: the type is the masthead in that case, and there is nothing to read it over.
    */
   const masthead = (
@@ -147,7 +157,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
           {doc.series?.label ? (
             <Link
               className="ds-article-mast__series"
-              href={`/stories?series=${encodeURIComponent(doc.series.id)}`}
+              href={`/stories?collection=${encodeURIComponent(doc.series.id)}`}
             >
               {doc.series.label}
             </Link>
@@ -175,15 +185,19 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
             </span>
           ) : null}
         </p>
+        {/* Inside the overlay, not beside it. The overlay is the element carrying the scrim, so
+            a credit rendered as its sibling sat on bare photograph: subtle-ink text on a bright
+            parchment scan, and a strip of un-dimmed image below the byline. It is hero text like
+            the rest and belongs on the same ground. */}
+        {doc.heroImage?.credit ? (
+          <span className="ds-article-mast__credit ds-mono">{doc.heroImage.credit}</span>
+        ) : null}
       </figcaption>
-      {doc.heroImage?.credit ? (
-        <span className="ds-article-mast__credit ds-mono">{doc.heroImage.credit}</span>
-      ) : null}
     </figure>
   );
 
   /*
-   * The apparatus band. Every numbered mark in the text resolves here, under the chapter rather
+   * The apparatus band. Every numbered mark in the text resolves here, under the piece rather
    * than beside its third paragraph: a reader checking a citation has finished the sentence, and
    * a reader who is not checking one should not be reading past a column of them.
    */
@@ -191,7 +205,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
     article.references.length > 0 ? (
       <div className="ds-article-appx" id="about-this-chapter">
         <div className="ds-article-appx__head">
-          <h2>About this chapter</h2>
+          <h2>About this {noun}</h2>
           <span>Every numbered mark in the text resolves here.</span>
         </div>
         <div className="ds-article-appx__cols">
@@ -200,7 +214,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
           </div>
           <div className="ds-article-appx__notes">
             <section>
-              <h3>How this chapter was made</h3>
+              <h3>How this {noun} was made</h3>
               <p>
                 Written from released records only. Where two sources disagree the contradiction is
                 shown rather than resolved.

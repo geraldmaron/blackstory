@@ -1,23 +1,27 @@
 /**
- * The chapter-cites-record edge.
+ * The story-cites-record edge.
  *
  * The thesis of v9 is that every record links back to the writing about it. The record side of
  * that link had no implementation: an entity could be pinned on the Atlas, opened, and read in
- * full without ever learning which chapter put it there. This module derives that edge from the
+ * full without ever learning which story put it there. This module derives that edge from the
  * article projection the release already publishes, so it costs one pass over documents the
  * server is loading anyway rather than a new pipeline stage.
+ *
+ * "Story" here covers both editorial kinds — long-form chapters and short entries alike; a
+ * reader checking what cites a record should not have to know which contract it was written
+ * under any more than a reader browsing `/stories` should (see `stories-index.ts`).
  *
  * Two signals, and they are not equivalent:
  *
  *   `mapInset` blocks name an entity id explicitly and pin it on a map inside the prose. The
- *   chapter is looking straight at the record. Relation: "mapped in".
+ *   story is looking straight at the record. Relation: "mapped in".
  *
- *   `relatedEntityIds` is the projection's editorial association list. Weaker — the chapter
+ *   `relatedEntityIds` is the projection's editorial association list. Weaker — the story
  *   touches the record without necessarily drawing it. Relation: "referenced in".
  *
- * When both fire for the same (entity, chapter) pair the stronger one wins, because the reader
- * is being told what kind of attention the chapter actually paid to this record and "referenced"
- * would understate a chapter that maps it.
+ * When both fire for the same (entity, story) pair the stronger one wins, because the reader
+ * is being told what kind of attention the story actually paid to this record and "referenced"
+ * would understate a story that maps it.
  *
  * Deliberately NOT derived from `[ref:<id>]` inline markers or from packet ids. Those resolve to
  * a bibliography reference and a theme-impact packet respectively; neither carries an entity id,
@@ -26,13 +30,13 @@
  */
 import type { PublicArticleProjectionDoc } from '@repo/schemas';
 
-/** How a chapter attends to a record. Ordered weakest to strongest; the order is load-bearing. */
+/** How a story attends to a record. Ordered weakest to strongest; the order is load-bearing. */
 export const CITES_RELATIONS = ['referenced in', 'mapped in'] as const;
 
 export type CitesRelation = (typeof CITES_RELATIONS)[number];
 
-/** One chapter that cites a record, as the record's own surfaces render it. */
-export type ChapterCitation = {
+/** One story that cites a record, as the record's own surfaces render it. */
+export type StoryCitation = {
   readonly slug: string;
   readonly title: string;
   /** Stated in words, not a slug: "mapped in", "referenced in". */
@@ -40,8 +44,8 @@ export type ChapterCitation = {
   readonly href: string;
 };
 
-/** entity id -> the chapters that cite it. Absent key means no chapter cites that record. */
-export type CitesEdgeIndex = Readonly<Record<string, readonly ChapterCitation[]>>;
+/** entity id -> the stories that cite it. Absent key means no story cites that record. */
+export type CitesEdgeIndex = Readonly<Record<string, readonly StoryCitation[]>>;
 
 function strength(relation: CitesRelation): number {
   return CITES_RELATIONS.indexOf(relation);
@@ -70,10 +74,10 @@ export function articleCitedEntities(
  * Inverts the article set into the record-side index.
  *
  * Sorted by title within each record so the list a reader sees is stable across releases —
- * publish order would reshuffle a record's chapter list every time an unrelated chapter shipped.
+ * publish order would reshuffle a record's story list every time an unrelated story shipped.
  */
 export function buildCitesEdge(docs: readonly PublicArticleProjectionDoc[]): CitesEdgeIndex {
-  const byEntity = new Map<string, ChapterCitation[]>();
+  const byEntity = new Map<string, StoryCitation[]>();
 
   for (const doc of docs) {
     for (const [entityId, relation] of articleCitedEntities(doc)) {
@@ -88,7 +92,7 @@ export function buildCitesEdge(docs: readonly PublicArticleProjectionDoc[]): Cit
     }
   }
 
-  const index: Record<string, readonly ChapterCitation[]> = {};
+  const index: Record<string, readonly StoryCitation[]> = {};
   for (const [entityId, citations] of byEntity) {
     index[entityId] = [...citations].sort(
       (a, b) => a.title.localeCompare(b.title) || a.slug.localeCompare(b.slug),
@@ -97,11 +101,11 @@ export function buildCitesEdge(docs: readonly PublicArticleProjectionDoc[]): Cit
   return index;
 }
 
-/** The chapters citing one record, empty when none do. */
-export function chaptersCiting(
+/** The stories citing one record, empty when none do. */
+export function storiesCiting(
   index: CitesEdgeIndex,
   entityId: string | undefined,
-): readonly ChapterCitation[] {
+): readonly StoryCitation[] {
   if (!entityId) return [];
   return index[entityId] ?? [];
 }

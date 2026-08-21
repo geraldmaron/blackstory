@@ -100,6 +100,7 @@ export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrow
       </form>
 
       <HairlineIndex
+        className="ds-books-idx"
         filters={buildStateFilters(snapshot, view)}
         activeFilterId={view.state === 'all' ? 'all' : view.state}
         countLabel={
@@ -142,7 +143,7 @@ export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrow
       {view.pagination.totalPages > 1 ? (
         <nav className="ds-room-idx__bar" aria-label="Books catalog pages">
           {view.pagination.previousHref ? (
-            <Link className="ds-cta ds-cta--quiet" href={view.pagination.previousHref} rel="prev">
+            <Link className="ds-cta ds-cta--quiet ds-cta--sm" href={view.pagination.previousHref} rel="prev">
               Previous
             </Link>
           ) : null}
@@ -150,7 +151,7 @@ export function BooksBrowseSections({ view, suggestCorpus, snapshot }: BooksBrow
             Page {view.pagination.page} of {view.pagination.totalPages}
           </span>
           {view.pagination.nextHref ? (
-            <Link className="ds-cta ds-cta--quiet" href={view.pagination.nextHref} rel="next">
+            <Link className="ds-cta ds-cta--quiet ds-cta--sm" href={view.pagination.nextHref} rel="next">
               Next
             </Link>
           ) : null}

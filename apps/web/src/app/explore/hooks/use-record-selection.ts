@@ -7,7 +7,7 @@ import { placeLabelFor } from '../../../lib/map-experience/place-label';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
 import type { HistoryEdgeView } from '../../../lib/history/build-history-graph';
 import type { CitesEdgeIndex } from '../../../lib/release/build-cites-edge';
-import { chaptersCiting } from '../../../lib/release/build-cites-edge';
+import { storiesCiting } from '../../../lib/release/build-cites-edge';
 import {
   buildSheetConnections,
   buildSheetSources,
@@ -162,7 +162,7 @@ export function useRecordSelection(
           };
         },
       ),
-      citingChapters: chaptersCiting(citesEdge, selectedFeature.properties.entityId),
+      citingStories: storiesCiting(citesEdge, selectedFeature.properties.entityId),
     };
   }, [allTimeEdges, citesEdge, featuresById, selectedFeature]);
 

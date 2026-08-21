@@ -159,7 +159,7 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
         ) : null}
         <p className="ds-books-edition__footnote">{BOOKS_DETAIL.lookupFootnote}</p>
         {book.identifiers.length > 0 ? (
-          <section aria-labelledby="ids-heading">
+          <section className="ds-books-edition__subsection" aria-labelledby="ids-heading">
             <p className="ds-books-edition__panel-title" id="ids-heading">
               Identifiers
             </p>
@@ -176,7 +176,7 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
             </dl>
           </section>
         ) : null}
-        <section aria-labelledby="provenance-heading">
+        <section className="ds-books-edition__subsection" aria-labelledby="provenance-heading">
           <p className="ds-books-edition__panel-title" id="provenance-heading">
             Provenance
           </p>

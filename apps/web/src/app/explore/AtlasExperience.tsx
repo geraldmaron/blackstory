@@ -15,7 +15,14 @@
  */
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import { Notice } from '@repo/ui';
 import { focusLandmark } from '../../lib/keyboard/use-focus-trap';
 import { CommandBar } from '../../components/shell/CommandBar';
@@ -147,9 +154,58 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     setFocusAfterPanels(null);
   }, [focusAfterPanels]);
 
-  // Owned here, not inside the selection hook: the camera's padding needs to know whether the
-  // sheet is open without depending on the camera it drives, so the id has to sit above both.
-  const [selectedId, setSelectedId] = useState<string | undefined>(initial.viewState.selected);
+  /**
+   * The selection, and whether the reader asked for it.
+   *
+   * Owned here, not inside the selection hook: the camera's padding needs to know whether the
+   * sheet is open without depending on the camera it drives, so the id has to sit above both.
+   *
+   * `ambient` is the story's own selection. A chapter that is about one record rings that record's
+   * pin on the plate, and it rings it by selecting it — but a reader scrolling into a chapter has
+   * not asked to open anything, and the record sheet is a reader-opened panel. Without this flag
+   * the sheet flew open by itself partway down the journey, over a chapter card already printing
+   * that same record's name, place, era and source count. The flag separates the two: the ring
+   * still lands, and the sheet stays shut until someone opens a record themselves.
+   */
+  const [selection, setSelection] = useState<{
+    readonly id: string | undefined;
+    readonly ambient: boolean;
+  }>(() => ({ id: initial.viewState.selected, ambient: false }));
+  const selectedId = selection.id;
+
+  const setSelectionWithOrigin = useCallback(
+    (next: SetStateAction<string | undefined>, ambient: boolean) => {
+      setSelection((current) => ({
+        id: typeof next === 'function' ? next(current.id) : next,
+        ambient,
+      }));
+    },
+    [],
+  );
+
+  /** Every reader-initiated path — pin click, rail row, palette, keyboard step, sheet close. */
+  const setSelectedId = useCallback<Dispatch<SetStateAction<string | undefined>>>(
+    (next) => setSelectionWithOrigin(next, false),
+    [setSelectionWithOrigin],
+  );
+
+  /** The story runner's setter. Rings the pin; does not open the sheet. */
+  const setAmbientSelectedId = useCallback<Dispatch<SetStateAction<string | undefined>>>(
+    (next) => setSelectionWithOrigin(next, true),
+    [setSelectionWithOrigin],
+  );
+
+  /**
+   * Leaving the story must not strand its selection either. An ambient selection that survived
+   * into the Atlas would ring a pin with no sheet attached, and no sheet means no close control —
+   * a highlight the reader cannot dismiss. Scoped to ambient selections so a `?selected=` URL,
+   * which arrives with `ambient: false`, is never cleared by a mode change.
+   */
+  useEffect(() => {
+    if (mode === 'story') return;
+    setSelection((current) => (current.ambient ? { id: undefined, ambient: false } : current));
+  }, [mode]);
+
   const { collection, persist, toggleSave, savedSet } = useSavedCollection(toasts);
   const {
     stateCode,
@@ -230,7 +286,8 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     stage,
     panels,
     chromeHidden,
-    selectedId !== undefined,
+    // The padding is for the panel, not the highlight: an ambient story selection opens no sheet.
+    selectedId !== undefined && !selection.ambient,
     setLayers,
   );
   const { selectedFeature, selectedIndex, select, selectById, stepRecord, sheetRecord } =
@@ -255,7 +312,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     decadeBars,
     featureById,
     stage,
-    setSelectedId,
+    setAmbientSelectedId,
     setLayers,
     setSpotlight,
     setDecade,
@@ -286,6 +343,9 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     savedOpen,
     setSavedOpen,
   });
+
+  /** The sheet is open only for a selection the reader made. See `selection.ambient` above. */
+  const sheetOpen = sheetRecord !== null && !selection.ambient;
 
   const showLens = panels.lens && !chromeHidden && mode === 'atlas';
   /*
@@ -347,7 +407,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         recordSpotlight={storyRecord ?? undefined}
         chapters={storyOrder.chapters}
         factByChapterId={storyOrder.factByChapterId}
-        sheetOpen={sheetRecord !== null}
+        sheetOpen={sheetOpen}
       />
 
       {spotlight ? (
@@ -491,7 +551,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       </p>
 
       <RecordSheet
-        record={sheetRecord}
+        record={sheetOpen ? sheetRecord : null}
         onClose={() => setSelectedId(undefined)}
         {...(selectedIndex >= 0
           ? { position: { index: selectedIndex + 1, total: sorted.length } }

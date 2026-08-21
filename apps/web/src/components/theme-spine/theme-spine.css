@@ -23,6 +23,17 @@
   background: color-mix(in srgb, var(--ds-accent-graphic) 8%, var(--ds-surface-raised));
 }
 
+/* Chapter belongs to one of the packet's own policy eras: the rail's accent line steps up
+   from a thin marker to a solid one, so "you are here" reads at a glance and not only from
+   the low-alpha era-band wash underneath the rows. overflow: hidden keeps that wash's inherited
+   corners clipped to the card even though the card's own border is thicker on the left edge
+   than the other three, which would otherwise let a square corner show past the radius there. */
+.ds-era-timeline--banded {
+  overflow: hidden;
+  border-left-width: 4px;
+  border-left-color: var(--ds-accent);
+}
+
 /* Chapter's era band — brand `sand` token (pageSand #D8A178) at low alpha. */
 .ds-era-timeline__era-band {
   position: absolute;

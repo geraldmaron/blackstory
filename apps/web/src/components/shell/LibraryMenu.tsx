@@ -14,7 +14,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import Link from 'next/link';
 import {
   GROUP_HEADINGS,
@@ -40,8 +40,20 @@ export function LibraryMenu({ recordCount }: LibraryMenuProps) {
     (destination): destination is NonNullable<typeof destination> => destination !== undefined,
   );
 
+  /**
+   * `<details>` has no notion of "selecting an option" — a click on a `Link` inside it navigates
+   * and leaves the panel exactly as open as it was, so the reader lands on the destination page
+   * with the menu still hanging open over it until they click elsewhere. Closing it is a
+   * navigation side effect, not something `<details>` does for free; this ref is what lets a
+   * link's click handler reach up and close the disclosure it lives inside.
+   */
+  const detailsRef = useRef<HTMLDetailsElement | null>(null);
+  const closeMenu = () => {
+    if (detailsRef.current) detailsRef.current.open = false;
+  };
+
   return (
-    <details className="ds-libmenu">
+    <details className="ds-libmenu" ref={detailsRef}>
       <summary className="ds-libmenu__trigger">
         Library
         <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true">
@@ -67,6 +79,7 @@ export function LibraryMenu({ recordCount }: LibraryMenuProps) {
                     href={destination.path}
                     key={destination.path}
                     prefetch={false}
+                    onClick={closeMenu}
                   >
                     {cardTitleFor(destination)}
                     {destination.menuLine ? <small>{destination.menuLine}</small> : null}
@@ -85,6 +98,7 @@ export function LibraryMenu({ recordCount }: LibraryMenuProps) {
               href={destination.path}
               key={destination.path}
               prefetch={false}
+              onClick={closeMenu}
             >
               <span className="ds-libmenu__card-kind">
                 {destination.path === '/' ? 'Map' : 'Index'}
@@ -99,7 +113,7 @@ export function LibraryMenu({ recordCount }: LibraryMenuProps) {
           ))}
           <p className="ds-libmenu__foot">
             Everything here is also reachable from{' '}
-            <Link href="/library" prefetch={false}>
+            <Link href="/library" prefetch={false} onClick={closeMenu}>
               the library
             </Link>
             .

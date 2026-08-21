@@ -13,6 +13,15 @@
   scroll-margin-top: var(--ds-island-clearance);
 }
 
+/* CorrectionStatusPanel reuses .ds-page__title for the Appeal/Report abuse sub-headings but
+   downsizes it with `--ds-text-lg`, which nothing ever defined — the full clamp(1.75rem…2.5rem)
+   page-title size rendered instead, oversized for a status-page subsection. Matches
+   .ds-section__title's step, the kit's next size down. */
+#appeal-heading,
+#abuse-heading {
+  --ds-text-lg: clamp(1.25rem, 1.15rem + 0.6vw, 1.625rem);
+}
+
 /* The room no longer renders `ds-section` blocks; these two only still apply if a nested
    pattern brings one in. */
 .ds-corrections .ds-section {
