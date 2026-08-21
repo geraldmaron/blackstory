@@ -8,6 +8,8 @@
 import { useId, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button, Notice } from '@repo/ui';
+import { ChoiceField, Field } from '../../components/room';
+import { ReceiptBlock } from './ReceiptBlock';
 import {
   CORRECTION_CATEGORIES,
   CORRECTION_CATEGORY_LABELS,
@@ -37,7 +39,6 @@ export function CorrectionForm() {
 
   const targetTypeId = useId();
   const targetRecordId = useId();
-  const categoryId = useId();
   const statementId = useId();
   const sourceUrlId = useId();
   const contactId = useId();
@@ -113,17 +114,19 @@ export function CorrectionForm() {
 
   if (state.status === 'success') {
     return (
-      <Notice tone="warning" title="Correction received">
-        <p>
-          Thank you. Save your receipt code <code>{state.receiptCode}</code>. It is the only way to
-          check status; we cannot look it up without it.
+      <div className="ds-corrections__received">
+        <h2>We have it. Here is your receipt.</h2>
+        <ReceiptBlock receiptCode={state.receiptCode} />
+        <p className="ds-room-field__hint">
+          Nothing you sent is public. If your correction is declined you get the reason, not
+          silence.
         </p>
-        <p style={{ marginTop: 'var(--ds-space-3)' }}>
-          <a className="ds-button ds-button--secondary" href={state.statusHref}>
-            View status
+        <p className="ds-corrections__received-actions">
+          <a className="ds-cta ds-cta--quiet" href={state.statusHref}>
+            Check this receipt
           </a>
         </p>
-      </Notice>
+      </div>
     );
   }
 
@@ -149,13 +152,8 @@ export function CorrectionForm() {
         </Notice>
       ) : null}
 
-      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
-        <label className="ds-filters__label" htmlFor={targetTypeId}>
-          What are you correcting? <span aria-hidden="true">*</span>
-          <span className="ds-visually-hidden">required</span>
-        </label>
+      <Field label="What are you correcting?" htmlFor={targetTypeId}>
         <select
-          className="ds-filters__control"
           id={targetTypeId}
           name="targetType"
           defaultValue={
@@ -171,108 +169,102 @@ export function CorrectionForm() {
             </option>
           ))}
         </select>
-      </div>
+      </Field>
 
-      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
-        <label className="ds-filters__label" htmlFor={targetRecordId}>
-          Record identifier <span aria-hidden="true">*</span>
-          <span className="ds-visually-hidden">required</span>
-        </label>
+      <Field
+        label="Which record is wrong?"
+        htmlFor={targetRecordId}
+        hint="The id from the record page — it is in the address bar, and on the record's own About block."
+      >
         <input
-          className="ds-filters__control"
           id={targetRecordId}
           name="targetRecordId"
           type="text"
           required
           defaultValue={initialTarget}
-          placeholder="Entity, claim, source, or place id from the record page"
+          placeholder="Entity, claim, source, or place id"
           aria-describedby={fieldIssue('targetRecordId') ? `${targetRecordId}-issue` : undefined}
         />
         {fieldIssue('targetRecordId') ? (
-          <p id={`${targetRecordId}-issue`} className="ds-sans" role="alert">
+          <p id={`${targetRecordId}-issue`} className="ds-room-field__hint" role="alert">
             {fieldIssue('targetRecordId')!.message}
           </p>
         ) : null}
-      </div>
+      </Field>
 
-      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
-        <label className="ds-filters__label" htmlFor={categoryId}>
-          Category <span aria-hidden="true">*</span>
-          <span className="ds-visually-hidden">required</span>
-        </label>
-        <select
-          className="ds-filters__control"
-          id={categoryId}
-          name="category"
-          required
-          defaultValue=""
-          aria-describedby={fieldIssue('category') ? `${categoryId}-issue` : undefined}
-        >
-          <option value="" disabled>
-            Select a category
-          </option>
-          {CORRECTION_CATEGORIES.map((category) => (
-            <option key={category} value={category}>
-              {CORRECTION_CATEGORY_LABELS[category]}
-            </option>
-          ))}
-        </select>
-        {fieldIssue('category') ? (
-          <p id={`${categoryId}-issue`} className="ds-sans" role="alert">
-            {fieldIssue('category')!.message}
-          </p>
-        ) : null}
-      </div>
+      {/* Four pills rather than a select: the set is small enough to read faster than it opens,
+          and they are real radios, so the answer survives JavaScript being off. */}
+      <ChoiceField
+        legend="What is wrong with it?"
+        name="category"
+        required
+        choices={CORRECTION_CATEGORIES.map((category) => ({
+          value: category,
+          label: CORRECTION_CATEGORY_LABELS[category],
+        }))}
+        {...(fieldIssue('category') ? { hint: fieldIssue('category')!.message } : {})}
+      />
 
-      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
-        <label className="ds-filters__label" htmlFor={statementId}>
-          Describe the correction <span aria-hidden="true">*</span>
-          <span className="ds-visually-hidden">required</span>
-        </label>
+      <Field
+        label="What should it say instead?"
+        htmlFor={statementId}
+        hint="Plain language is fine. You do not need to write like a citation."
+      >
         <textarea
-          className="ds-filters__control"
           id={statementId}
           name="statement"
           rows={5}
           required
           minLength={20}
-          placeholder="What should change, and why? Cite specific facts where possible."
+          placeholder="The 1891 building was purpose-built, not converted."
           aria-describedby={fieldIssue('statement') ? `${statementId}-issue` : undefined}
         />
         {fieldIssue('statement') ? (
-          <p id={`${statementId}-issue`} className="ds-sans" role="alert">
+          <p id={`${statementId}-issue`} className="ds-room-field__hint" role="alert">
             {fieldIssue('statement')!.message}
           </p>
         ) : null}
-      </div>
+      </Field>
 
-      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
-        <label className="ds-filters__label" htmlFor={sourceUrlId}>
-          Supporting source URL <span aria-hidden="true">*</span>
-          <span className="ds-visually-hidden">required</span>
-        </label>
+      {/*
+        The mock marks this field optional. It is not: `correction-intake.ts` rejects a submission
+        with no source URL, and a label that promises otherwise would send a reader through the
+        whole form to a validation error. It is stated as what it is instead — the thing that makes
+        a correction reviewable rather than an assertion.
+      */}
+      <Field
+        label={
+          <>
+            Where can we check it? <small>A link is what makes a correction reviewable</small>
+          </>
+        }
+        htmlFor={sourceUrlId}
+      >
         <input
-          className="ds-filters__control"
           id={sourceUrlId}
           name="sourceUrl"
           type="url"
           required
-          placeholder="https://…"
+          placeholder="https://"
           aria-describedby={fieldIssue('sourceUrl') ? `${sourceUrlId}-issue` : undefined}
         />
         {fieldIssue('sourceUrl') ? (
-          <p id={`${sourceUrlId}-issue`} className="ds-sans" role="alert">
+          <p id={`${sourceUrlId}-issue`} className="ds-room-field__hint" role="alert">
             {fieldIssue('sourceUrl')!.message}
           </p>
         ) : null}
-      </div>
+      </Field>
 
-      <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
-        <label className="ds-filters__label" htmlFor={contactId}>
-          Contact (optional, moderators only, never shown publicly)
-        </label>
-        <input className="ds-filters__control" id={contactId} name="contact" type="text" />
-      </div>
+      <Field
+        label={
+          <>
+            Email <small>Only used to send the outcome</small>
+          </>
+        }
+        htmlFor={contactId}
+      >
+        <input id={contactId} name="contact" type="text" placeholder="you@example.org" />
+      </Field>
 
       <Notice tone="warning" title={CORRECTION_PRIVACY_NOTICE.title}>
         {CORRECTION_PRIVACY_NOTICE.body}
@@ -298,10 +290,11 @@ export function CorrectionForm() {
         </p>
       ) : null}
 
-      <div>
+      <div className="ds-corrections-send">
         <Button type="submit" disabled={state.status === 'submitting'}>
-          {state.status === 'submitting' ? 'Submitting…' : 'Submit correction'}
+          {state.status === 'submitting' ? 'Sending…' : 'Send the correction'}
         </Button>
+        <span>You will get a receipt code on the next screen.</span>
       </div>
     </form>
   );

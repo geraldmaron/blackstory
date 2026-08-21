@@ -924,39 +924,79 @@ a.ds-room-chip {
 }
 
 /* —— Field ————————————————————————————————————————————————————————————————— */
+/* The label sits above the control, in the sans face at reading size, and the box is drawn by
+   the control itself. It used to be a mono-caps micro-label *inside* a bordered wrapper, which
+   made every question look like a data field in a console rather than a question being asked of
+   a person — and left the label competing with the value for the same box. */
+/* `fieldset` when the field is a choice set, `div` otherwise — so the reset has to cover the
+   agent stylesheet's fieldset box, which otherwise draws a second border around the pills. */
 .ds-room-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: var(--ds-space-3) var(--ds-space-4);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-sm);
+  gap: var(--ds-space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
-.ds-room-field:focus-within {
-  border-color: var(--ds-accent-graphic);
+.ds-room-field > legend {
+  float: left;
+  width: 100%;
+  padding: 0;
+}
+
+/* `float` takes the legend out of flow, so the choices need the row back. */
+.ds-room-field > legend + * {
+  clear: both;
 }
 
 .ds-room-field__label {
-  font-family: var(--ds-font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--room-ink-4);
+  font-family: var(--ds-font-sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ds-ink);
+}
+
+/* The quiet half of a label: "Optional, but it speeds review up". */
+.ds-room-field__label small {
+  font-size: inherit;
+  font-weight: 400;
+  color: var(--room-ink-3);
+}
+
+/* One line under the control, for the sentence that tells a person how to answer. */
+.ds-room-field__hint {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--room-ink-3);
 }
 
 .ds-room-field input,
 .ds-room-field select,
 .ds-room-field textarea {
   width: 100%;
-  background: none;
-  border: 0;
+  min-height: 48px;
+  padding: 13px var(--ds-space-4);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
   outline: none;
   font-family: var(--ds-font-sans);
-  font-size: 14px;
+  font-size: 14.5px;
   line-height: 1.5;
   color: var(--ds-ink);
+}
+
+.ds-room-field input:focus-visible,
+.ds-room-field select:focus-visible,
+.ds-room-field textarea:focus-visible {
+  border-color: var(--ds-accent-graphic);
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 1px;
 }
 
 .ds-room-field select {
@@ -965,8 +1005,49 @@ a.ds-room-chip {
 }
 
 .ds-room-field textarea {
-  min-height: 96px;
+  min-height: 110px;
   resize: vertical;
+}
+
+/* A field whose answer is a small closed set: real radios, drawn as pills. Radios rather than
+   buttons because the answer has to survive JavaScript being off, and a chip that is not an
+   input cannot be submitted. */
+.ds-room-field__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+}
+
+.ds-room-field__choice input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ds-room-field__choice span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.ds-room-field__choice input:checked + span {
+  background: var(--room-copper-wash);
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+.ds-room-field__choice input:focus-visible + span {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
 }
 
 /* —— UtilityCard / UtilityStep ————————————————————————————————————————————— */

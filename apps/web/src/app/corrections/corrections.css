@@ -251,3 +251,122 @@
 .ds-corrections__next .ds-band__cta {
   margin-top: var(--ds-space-4);
 }
+
+/* —— the send row ————————————————————————————————————————————————————————————
+   The button and, beside it, what happens after it is pressed. A person is about to hand over
+   work with no account behind it, so the surface says where the receipt comes from before the
+   send rather than after. */
+.ds-corrections-send {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-4);
+  padding-top: var(--ds-space-2);
+}
+
+.ds-corrections-send > span {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+/* —— the lifecycle strip ————————————————————————————————————————————————————
+   Three steps on one row above the form, ruled top and bottom. What happens next is said
+   before the send button rather than after it, which is the whole reason a person hesitates
+   over a form with no account behind it. */
+.ds-corrections__lifecycle {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ds-space-4);
+  margin: var(--ds-space-6) 0 var(--ds-space-8);
+  padding: var(--ds-space-2) 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+@media (max-width: 40rem) {
+  .ds-corrections__lifecycle {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+/* The row already carries the strip's own rules; the per-step hairline would draw three more. */
+.ds-corrections__lifecycle .ds-room-ustep {
+  border-bottom: 0;
+}
+
+/* Step one is where the reader is standing. */
+.ds-corrections__lifecycle li:first-child .ds-room-ustep__i {
+  background: var(--ds-accent);
+  border-color: var(--ds-accent);
+  color: var(--ds-canvas);
+}
+
+.ds-corrections form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-6);
+}
+
+/* —— the receipt ————————————————————————————————————————————————————————————
+   The code is the one thing on this screen a person has to keep, so it is set as the largest
+   object on it. It used to sit at body size inside a bordered warning notice — a receipt is not
+   a warning. */
+.ds-receipt {
+  margin-block: var(--ds-space-6);
+}
+
+.ds-receipt__code {
+  display: flex;
+  flex-direction: column;
+  padding-block: var(--ds-space-5);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-receipt__label {
+  font-size: 12.5px;
+  color: var(--ds-ink-muted);
+}
+
+.ds-receipt__value {
+  margin-top: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 30px;
+  letter-spacing: 0.04em;
+  color: var(--ds-accent);
+  overflow-wrap: anywhere;
+}
+
+.ds-receipt__keep {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+.ds-receipt__steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-receipt__steps > li:last-child .ds-room-ustep {
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+/* The post-submit screen: the same receipt, reached from the form rather than from a URL. */
+.ds-corrections__received > h2 {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.ds-corrections__received-actions {
+  margin-top: var(--ds-space-5);
+}
