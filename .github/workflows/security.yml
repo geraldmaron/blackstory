@@ -283,7 +283,7 @@ jobs:
           format: sarif
           output: trivy-image.sarif
       - name: Install Cosign
-        uses: sigstore/cosign-installer@3094a48ba06382e0e6cfa5a4af4fcc55fc6942b9 # resolved 2026-07-17
+        uses: sigstore/cosign-installer@874852de93c66509b01dc7cd80f7a5385182d017 # resolved 2026-07-17
       - name: Verify keyless release signature
         env:
           IMAGE_REF: ${{ inputs.image_ref }}
