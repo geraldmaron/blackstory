@@ -7,7 +7,7 @@
  * into the second-person era-jump voice, and lands at status 'review' for the
  * epic QA/publish gate rather than auto-publishing.
  *
- * Voice + structure: docs/content/era-immersion-style.md. method_stance is
+ * Voice + structure: docs/content/neo-voice.md Part III. method_stance is
  * juxtaposition throughout. Odds/comparisons live in prose; exact figures and
  * their obs ids live in observations/derived. The CPS citizen-base (CVAP)
  * universe note lives only in method_note, never in the narrative.

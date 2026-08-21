@@ -2,10 +2,10 @@
  * Flagship article: "Buying a Home" — the era-immersion redlining spine, built
  * on the /chapters surface.
  *
- * Voice follows docs/content/era-immersion-style.md (second-person cold open,
- * the rule in force quoted verbatim, odds rather than bare decimals, jump-cuts)
- * and docs/ui/voice-theme-chapters.md (specific person, specific hour; prose
- * builds stakes, data delivers the verdict; disputes shown in the prose).
+ * Voice follows docs/content/neo-voice.md (Part III: second-person cold open,
+ * the rule in force quoted verbatim, odds rather than bare decimals, jump-cuts;
+ * Part II/IV: specific person, specific hour; prose builds stakes, data
+ * delivers the verdict; disputes shown in the prose).
  * Narrative facts follow docs/methodology/chapter-fact-validation.md: every
  * event fact traces to two independent fetched sources, or to a named
  * primary-record holder attributed inside the sentence (the Court's own

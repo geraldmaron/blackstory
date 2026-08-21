@@ -275,7 +275,7 @@ function gateSeriesPositions(articles: readonly ArticleAuthoring[]): void {
  * records, rather than through prose pointing at navigation.
  *
  * Hard error on published articles, surfaced warning otherwise — same posture as the tier
- * and word-floor gates. Governed by docs/ui/voice-theme-chapters.md Rule 6.
+ * and word-floor gates. Governed by docs/content/neo-voice.md Part V ("The chapter stands alone").
  */
 const SELF_REFERENCE_PATTERNS: readonly { readonly label: string; readonly pattern: RegExp }[] = [
   { label: 'names the publishing surface', pattern: /\bthis (?:site|website|project|page)\b/i },

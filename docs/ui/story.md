@@ -125,6 +125,10 @@ enter the composite — see `docs/security/threat-model.md`).
 
 ## Longform story craft (oral methodology, citation-gated)
 
+Narrative prose voice for chapters is governed by `docs/content/neo-voice.md`;
+this document continues to govern site chrome and microcopy (and, below, the
+`/stories` research-linking method).
+
 Staged `/stories` articles use the **research linking method** from strong oral
 storytelling — start-line relocation, omitted actors, winner-built tests — without
 importing viral rhetorical costume. Skill reference:

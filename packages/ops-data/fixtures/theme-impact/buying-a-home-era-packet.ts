@@ -1,7 +1,7 @@
 /**
  * "Buying a home" era-immersion theme packet (theme_id: redlining).
  *
- * Era-immersion rewrite per docs/content/era-immersion-style.md: a second-person
+ * Era-immersion rewrite per docs/content/neo-voice.md Part III: a second-person
  * sequence of eras (1938, 1955, 1985) landing on a present-day (2023) close, each
  * era pairing a verbatim primary-document "rule in force" with the measured national
  * spine odds for that year. Numbers in the narrative are stated as odds/comparisons;

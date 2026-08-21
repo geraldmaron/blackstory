@@ -2,11 +2,11 @@
  * Flagship article: "The gap that never closed" — the era-immersion wealth-gap
  * spine, built on the /articles surface.
  *
- * Voice follows docs/content/era-immersion-style.md (cold open in second
+ * Voice follows docs/content/neo-voice.md (Part III: cold open in second
  * person, the rule in force quoted verbatim, measured odds as plain
- * comparisons, jump-cuts) and docs/ui/voice-theme-chapters.md (specific
- * person, specific hour; prose builds stakes, data delivers the verdict;
- * disputes shown in the prose). Narrative facts follow
+ * comparisons, jump-cuts; Part II/IV: specific person, specific hour; prose
+ * builds stakes, data delivers the verdict; disputes shown in the prose).
+ * Narrative facts follow
  * docs/methodology/chapter-fact-validation.md: every event fact traces to two
  * independent fetched sources, or to a named primary-record holder attributed
  * in the sentence (the 2001 Oklahoma commission report, Douglass's own

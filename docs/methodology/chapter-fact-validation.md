@@ -68,8 +68,9 @@ each fact appears with its citation (`[ref:id]` to a reference carrying the
 source URL, or a `primaryDocument` block bound to a packet artifact), that
 quotes are verbatim, and that no sentence asserts more than its source does.
 Disputed facts (death tolls, motives, lost documents) are written as
-disputes per `docs/ui/voice-theme-chapters.md` Rule 4 — both records shown
-in the prose, never resolved into one number the record doesn't support.
+disputes per `docs/content/neo-voice.md` Part V ("Disputes in prose") — both
+records shown in the prose, never resolved into one number the record
+doesn't support.
 
 **Then the machine gates run** (`validate → apply → promote → project`):
 schema, citation integrity, source tiers, anchors, packet binding, DOI
@@ -79,12 +80,11 @@ fourth check, not the first.
 ## Immersion requirements
 
 A chapter is a place the reader stands, not a summary they receive. The
-binding craft rules are `docs/content/era-immersion-style.md` (era
-structure, second-person cold open, the rule in force quoted verbatim,
-measured odds, jump-cut) and `docs/ui/voice-theme-chapters.md` (specific
-person, specific hour; prose builds stakes, data delivers the verdict;
-Wilkerson register; disputes in prose; one earned flourish). Two additions
-this document makes binding:
+binding craft rules are `docs/content/neo-voice.md` (Part III: era structure,
+second-person cold open, the rule in force quoted verbatim, measured odds,
+jump-cut; Part II/IV: specific person, specific hour; prose builds stakes,
+data delivers the verdict; register; disputes in prose; one earned
+flourish). Two additions this document makes binding:
 
 1. **Events get buildup, not verdicts.** An event narrated in a chapter
    shows its sequence — what was ordinary the day before, what triggered it,
