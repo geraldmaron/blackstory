@@ -25,15 +25,14 @@ import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/en
 import { EntityTopicTags } from '../../../components/entity/EntityTopicTags';
 import { HowToReadThisRecord } from '../../../components/trust';
 import {
-  Anatomy,
-  Note,
+  Breadcrumb,
   Precision,
   Room,
-  RoomHeader,
   SourceList,
   TrustBlock,
   type RoomSource,
 } from '../../../components/room';
+import { KindGlyph } from '../../../components/map-experience/KindGlyph';
 import {
   RECORD_GAP_COPY,
   THIN_RECORD_COPY,
@@ -57,7 +56,7 @@ import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-pro
 import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './adapters';
 import { buildEntityAnatomyInputs } from './entity-anatomy-facts';
 import { deriveRecordStanding, isThinRecord } from './entity-view-model';
-import { EntityRoomSections } from './EntityRoomSections';
+import { EntityRoomSections, recordSectionIndex } from './EntityRoomSections';
 import { EntitySessionNavClient } from './entity-session-nav-client';
 import '../../record-page.css';
 import './record-room.css';
@@ -247,51 +246,27 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const inclusionBasis = entity.notabilityLabels ?? [];
   const gaps = resolveRecordGaps(entity, [...displayClaims]);
   const thinRecord = isThinRecord(entity);
+  const sectionsOnThisRecord = recordSectionIndex({
+    entity,
+    evidenceClaims,
+    ...(crossReferences.length > 0 ? { crossReferences } : {}),
+  });
 
+  /*
+   * The rail is what a reader consults beside the record: where it is, and what is on the page.
+   *
+   * It used to carry the whole apparatus: anatomy, map, sources, citing chapters, inclusion
+   * rubric, provenance, gaps and a how-to-read block, which meant a record opened on a sidebar
+   * of eight stacked boxes. The facts moved up into the strip under the masthead, where they are
+   * read once; the apparatus moved down into the band, where it is checked. What is left is the
+   * locator and a table of contents for the column beside it.
+   */
   const rail = (
     <>
-      <section className="ds-record-rail-block" aria-labelledby="anatomy-heading">
-        <h2 className="ds-room-rail-group__title" id="anatomy-heading">
-          At a glance
-        </h2>
-        <Anatomy
-          label="Record anatomy"
-          cells={[
-            {
-              label: 'Kind',
-              value: (
-                <Link href={exploreHrefForKind(anatomyInputs.kind)} prefetch={false}>
-                  {anatomyInputs.kindLabel}
-                </Link>
-              ),
-            },
-            { label: 'Where', value: anatomyInputs.whereLabel },
-            {
-              label: 'Era',
-              value: anatomyInputs.eraHref ? (
-                <Link href={anatomyInputs.eraHref} prefetch={false}>
-                  {anatomyInputs.eraLabel}
-                </Link>
-              ) : (
-                anatomyInputs.eraLabel
-              ),
-            },
-            {
-              label: 'Evidence',
-              value: (
-                <Link href={entityEvidenceHref(`/entity/${entity.id}`)} prefetch={false}>
-                  {anatomyInputs.evidenceLabel}
-                </Link>
-              ),
-            },
-          ]}
-        />
-      </section>
-
       {geoAnchor ? (
         <section className="ds-record-rail-block" aria-labelledby="where-heading">
-          <h2 className="ds-room-rail-group__title" id="where-heading">
-            Where
+          <h2 className="ds-visually-hidden" id="where-heading">
+            Where this is
           </h2>
           {/* A static locator, not the borrowed plate. The plate is `position: fixed` and chases
               its slot's rect on every scroll frame, which is fine for a full-column reading moment
@@ -305,12 +280,12 @@ export default async function EntityPage({ params }: EntityPageProps) {
           />
           <Precision
             resolution={`${entity.locationPrecision} precision`}
-            caveat="Exact residential addresses are never rendered on public pages."
+            caveat="The archive never draws a point sharper than the source supports."
           />
           <p className="ds-record-rail-block__actions">
             {mapsHref ? (
               <MapsExternalLink
-                className="ds-cta ds-cta--copper"
+                className="ds-cta ds-cta--quiet"
                 href={mapsHref}
                 placeLabel={entity.locationLabel}
                 title={`Open ${entity.locationLabel} in your maps app`}
@@ -318,124 +293,216 @@ export default async function EntityPage({ params }: EntityPageProps) {
                 Open in maps
               </MapsExternalLink>
             ) : null}
-            <Link className="ds-cta ds-cta--quiet" href={exploreHref} scroll={false}>
-              View on the map
-            </Link>
           </p>
         </section>
       ) : null}
 
-      {sources.length > 0 ? (
-        <section className="ds-record-rail-block" aria-labelledby="sources-heading">
-          <h2 className="ds-room-rail-group__title" id="sources-heading">
-            Sources
-          </h2>
-          <SourceList sources={sources} />
-        </section>
-      ) : null}
-
-      {/*
-       * The record side of the chapter-cites-record edge (SP-20). Sits directly under Sources
-       * because it is the same kind of apparatus: what the archive can show you behind this
-       * record. Renders only when a chapter actually cites it. An empty heading would read as
-       * a hole in the archive rather than as a record no chapter has reached yet.
-       */}
-      {citingChapters.length > 0 ? (
-        <section className="ds-record-rail-block" aria-labelledby="cited-by-heading">
-          <h2 className="ds-room-rail-group__title" id="cited-by-heading">
-            Chapters that cite this record
-          </h2>
-          <ul className="ds-record-rail-block__chapters">
-            {citingChapters.map((chapter) => (
-              <li key={chapter.slug}>
-                <Link href={chapter.href} prefetch={false}>
-                  {chapter.title}
-                </Link>
-                <span className="ds-record-rail-block__relation ds-mono">{chapter.relation}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {inclusionBasis.length > 0 ? (
-        <section className="ds-record-rail-block" aria-labelledby="why-heading">
-          <h2 className="ds-room-rail-group__title" id="why-heading">
-            Why this is here
-          </h2>
-          <ul className="ds-record-rail-block__reasons">
-            {inclusionBasis.map((reason) => (
-              <li key={reason}>{reason}</li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      <section className="ds-record-rail-block" aria-labelledby="provenance-heading">
-        <h2 className="ds-room-rail-group__title" id="provenance-heading">
-          About this record
-        </h2>
-        <TrustBlock
-          label="Record provenance"
-          facts={[
-            { label: 'Maturity', value: humanizeToken(entity.recordMaturity) },
-            { label: 'Coverage', value: humanizeToken(entity.researchCoverage) },
-            { label: 'Sources', value: `${sources.length} cited` },
-            { label: 'Updated', value: formatRecordDate(entity.revision.recordUpdatedAt) },
-          ]}
-        />
-        {thinRecord ? <Note kind="REGISTRY LISTING">{THIN_RECORD_COPY.body}</Note> : null}
-        {gaps.length > 0 ? (
-          <Note kind="STILL RESEARCHING">
-            {gaps.map((gap) => RECORD_GAP_COPY[gap].title).join('. ')}. These are gaps in the
-            research, not an absence of history.
-          </Note>
-        ) : null}
-        <p className="ds-record-rail-block__release ds-mono">{entity.revision.releaseId}</p>
-      </section>
-
-      <div className="ds-record-rail-block">
-        <HowToReadThisRecord variant="compact" />
-      </div>
+      <nav className="ds-record-toc" aria-label="On this record">
+        <span className="ds-record-toc__title">On this record</span>
+        {sectionsOnThisRecord.map((section) => (
+          <a className="ds-record-toc__link" href={`#${section.id}`} key={section.id}>
+            {section.label}
+            {section.count === undefined ? null : <span className="ds-mono">{section.count}</span>}
+          </a>
+        ))}
+      </nav>
     </>
   );
 
+  /*
+   * The apparatus band. Every fact here is load-bearing for a reader checking the archive's
+   * work, and none of it is what a reader came for, so it sits under the record rather than
+   * beside the first paragraph of it.
+   */
+  const apparatus = (
+    <div className="ds-record-appx">
+      <div className="ds-record-appx__head">
+        <h2>About this record</h2>
+        <span>Provenance, sourcing and known gaps: the apparatus behind the page above.</span>
+      </div>
+      <div className="ds-record-appx__cols">
+        {sources.length > 0 ? (
+          <section aria-labelledby="sources-heading">
+            <h3 className="ds-record-appx__title" id="sources-heading">
+              Bibliography
+            </h3>
+            <SourceList sources={sources} />
+          </section>
+        ) : null}
+
+        <section aria-labelledby="provenance-heading">
+          <h3 className="ds-record-appx__title" id="provenance-heading">
+            Provenance
+          </h3>
+          <TrustBlock
+            label="Record provenance"
+            facts={[
+              { label: 'Maturity', value: humanizeToken(entity.recordMaturity) },
+              { label: 'Coverage', value: humanizeToken(entity.researchCoverage) },
+              { label: 'Updated', value: formatRecordDate(entity.revision.recordUpdatedAt) },
+              { label: 'Release', value: entity.revision.releaseId },
+            ]}
+          />
+        </section>
+
+        <div className="ds-record-appx__notes">
+          {inclusionBasis.length > 0 ? (
+            <section aria-labelledby="why-heading">
+              <h3 className="ds-record-appx__title" id="why-heading">
+                Why this is here
+              </h3>
+              <ul className="ds-record-rail-block__reasons">
+                {inclusionBasis.map((reason) => (
+                  <li key={reason}>{reason}</li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          {thinRecord || gaps.length > 0 ? (
+            <section aria-labelledby="gaps-heading">
+              <h3 className="ds-record-appx__title" id="gaps-heading">
+                Still researching
+              </h3>
+              {thinRecord ? <p>{THIN_RECORD_COPY.body}</p> : null}
+              {gaps.length > 0 ? (
+                <p>
+                  {gaps.map((gap) => RECORD_GAP_COPY[gap].title).join('. ')}. These are gaps in the
+                  research, not an absence of history.{' '}
+                  <Link href={`/corrections?target=${entity.id}`} prefetch={false}>
+                    Submit a correction
+                  </Link>
+                  .
+                </p>
+              ) : null}
+            </section>
+          ) : null}
+
+          {citingChapters.length > 0 ? (
+            <section aria-labelledby="cited-by-heading">
+              <h3 className="ds-record-appx__title" id="cited-by-heading">
+                Chapters that cite this record
+              </h3>
+              <ul className="ds-record-rail-block__chapters">
+                {citingChapters.map((chapter) => (
+                  <li key={chapter.slug}>
+                    <Link href={chapter.href} prefetch={false}>
+                      {chapter.title}
+                    </Link>
+                    <span className="ds-record-rail-block__relation ds-mono">
+                      {chapter.relation}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          <HowToReadThisRecord variant="compact" />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <Room rail={rail}>
-      <RoomHeader
-        pathname={`/entity/${entity.id}`}
-        crumbLabel={entity.displayName}
-        kicker={anatomyInputs.kindLabel}
-        title={entity.displayName}
-        lede={
-          /* `as="span"`: RoomHeader's lede is already a <p>, and LinkedProse defaults to one,
-             which nested a paragraph inside a paragraph and threw a hydration error. */
-          <LinkedProse
-            as="span"
-            text={entity.summary}
-            skipEntityIds={[entity.id]}
-            catalog={entityLinkCatalog}
-          />
-        }
-        meta={[anatomyInputs.whereLabel, anatomyInputs.eraLabel, standingLabel].filter(
-          (fact): fact is string => fact !== undefined,
-        )}
-        showPath={false}
-      />
+    <Room
+      rail={rail}
+      foot={apparatus}
+      masthead={
+        <>
+          {/*
+           * The masthead. The record's own photograph, at the width of the page, with the record
+           * written over it, rather than a text header followed by a picture of the thing the
+           * header just named.
+           *
+           * `data-media` is load-bearing. Roughly nine records in ten have no rights-cleared
+           * photograph and fall back to the kind mark, which is a pale plate with a silhouette on
+           * it: stretched full bleed under white display type it is both a contrast failure and a
+           * claim the archive has imagery it does not have. A mark masthead is short, the mark
+           * keeps its own proportion, and the title sits under it on the canvas instead of over it.
+           */}
+          <figure
+            className="ds-record-mast"
+            data-media={entity.primaryImage !== undefined ? 'photo' : 'mark'}
+          >
+            <EntityMastMedia
+              entityId={entity.id}
+              entityName={entity.displayName}
+              kind={entity.kind}
+              {...(jurisdictionLabel !== undefined ? { jurisdictionLabel } : {})}
+              {...(entity.primaryImage !== undefined ? { primaryImage: entity.primaryImage } : {})}
+              priority
+            />
+            <figcaption className="ds-record-mast__over">
+              <Breadcrumb pathname={`/entity/${entity.id}`} hereLabel={entity.displayName} />
+              <p className="ds-record-mast__facts">
+                <span className="ds-record-mast__kind">
+                  <KindGlyph kind={entity.kind} {...(mapTone ? { mapTone } : {})} size={12} />
+                  {anatomyInputs.kindLabel}
+                </span>
+                {[anatomyInputs.whereLabel, anatomyInputs.eraLabel, standingLabel]
+                  .filter((fact): fact is string => fact !== undefined)
+                  .map((fact) => (
+                    <span key={fact}>{fact}</span>
+                  ))}
+              </p>
+              <h1 className="ds-record-mast__title">{entity.displayName}</h1>
+              <p className="ds-record-mast__lede">
+                <LinkedProse
+                  as="span"
+                  text={entity.summary}
+                  skipEntityIds={[entity.id]}
+                  catalog={entityLinkCatalog}
+                />
+              </p>
+            </figcaption>
+          </figure>
 
-      {entity.primaryImage !== undefined ? (
-        <figure className="ds-record-mast">
-          <EntityMastMedia
-            entityId={entity.id}
-            entityName={entity.displayName}
-            kind={entity.kind}
-            {...(jurisdictionLabel !== undefined ? { jurisdictionLabel } : {})}
-            primaryImage={entity.primaryImage}
-            priority
-          />
-        </figure>
-      ) : null}
-
+          {/* One strip, four facts, sticky under the bar: what this is, where, when, and how
+              well sourced. These were four boxes stacked down the rail, above the map, above
+              the sources: read once and then in the way for the rest of the page. */}
+          <dl className="ds-record-strip">
+            <div>
+              <dt>Kind</dt>
+              <dd>
+                <Link href={exploreHrefForKind(anatomyInputs.kind)} prefetch={false}>
+                  {anatomyInputs.kindLabel}
+                </Link>
+              </dd>
+            </div>
+            <div>
+              <dt>Where</dt>
+              <dd>{anatomyInputs.whereLabel}</dd>
+            </div>
+            <div>
+              <dt>Era</dt>
+              <dd>
+                {anatomyInputs.eraHref ? (
+                  <Link href={anatomyInputs.eraHref} prefetch={false}>
+                    {anatomyInputs.eraLabel}
+                  </Link>
+                ) : (
+                  anatomyInputs.eraLabel
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>Evidence</dt>
+              <dd>
+                <Link href={entityEvidenceHref(`/entity/${entity.id}`)} prefetch={false}>
+                  {anatomyInputs.evidenceLabel}
+                </Link>
+              </dd>
+            </div>
+            <div className="ds-record-strip__go">
+              <Link className="ds-cta ds-cta--copper" href={exploreHref} scroll={false}>
+                See it on the map
+              </Link>
+            </div>
+          </dl>
+        </>
+      }
+    >
       <EntityTopicTags entity={entity} />
 
       {entity.sensitivity ? (

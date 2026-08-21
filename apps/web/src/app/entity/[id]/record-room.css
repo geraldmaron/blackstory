@@ -54,9 +54,353 @@
   gap: var(--ds-space-2);
 }
 
-/* —— the mast image ————————————————————————————————————————————————————————— */
+/* —— the masthead ——————————————————————————————————————————————————————————
+   The record's own photograph at the width of the page, with the record written over it. The
+   page used to open on a text header and then show a picture of the thing the header had just
+   named; a record is an object in the world, and this is the surface saying so. */
 .ds-record-mast {
-  margin: var(--ds-space-6) 0 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin: 0;
+  min-height: clamp(320px, 46vw, 520px);
+  overflow: hidden;
+  background: var(--ds-surface-raised);
+  isolation: isolate;
+}
+
+.ds-record-mast img,
+.ds-record-mast picture,
+.ds-record-mast > *:first-child {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ds-record-mast > *:first-child {
+  position: absolute;
+  inset: 0;
+}
+
+.ds-record-mast img {
+  object-fit: cover;
+  object-position: center top;
+}
+
+/*
+ * A photograph fills the masthead and is cropped by it. It brings an editorial aspect of its own,
+ * and without this the mast band showed a letterboxed strip of it.
+ */
+.ds-record-mast[data-media='photo'] .ds-entity-photo,
+.ds-record-mast[data-media='photo'] .ds-entity-mark,
+.ds-record-mast[data-media='photo'] .ds-entity-mark__frame {
+  height: 100%;
+  min-height: 0;
+  border-radius: 0;
+}
+
+/*
+ * A mark is not a photograph and the masthead stops pretending it is.
+ *
+ * Most records have no rights-cleared image and fall back to the kind mark: a pale plate with a
+ * silhouette on it. Stretched full bleed under white display type that is a contrast failure, and
+ * it also asserts imagery the archive does not hold. So the mark keeps its own proportion in a
+ * short band, and the record is written under it on the canvas rather than over it.
+ */
+.ds-record-mast[data-media='mark'] {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ds-record-mast[data-media='mark'] > *:first-child {
+  position: relative;
+  inset: auto;
+  height: clamp(180px, 22vw, 260px);
+  overflow: hidden;
+}
+
+.ds-record-mast[data-media='mark'] .ds-entity-mark,
+.ds-record-mast[data-media='mark'] .ds-entity-mark__frame {
+  height: 100%;
+  min-height: 0;
+  border-radius: 0;
+}
+
+.ds-record-mast[data-media='mark'] .ds-record-mast__over {
+  padding-top: var(--ds-space-8);
+  background: none;
+}
+
+/*
+ * The credit stays. It is a rights obligation on a photograph, not decoration, so it moves to the
+ * corner of the plate rather than being hidden: the overlay owns the bottom-left, the credit takes
+ * the bottom-right.
+ */
+.ds-record-mast[data-media='photo'] .ds-entity-photo__credit,
+.ds-record-mast[data-media='photo'] .ds-entity-mark__context {
+  position: absolute;
+  right: var(--ds-gutter);
+  bottom: var(--ds-space-3);
+  z-index: 2; /* local: over the media and the scrim, inside the masthead figure. */
+  margin: 0;
+  max-width: 40ch;
+  text-align: right;
+  font-size: 10px;
+  color: var(--room-ink-4);
+}
+
+/* Two captions can be present at once. Stack them rather than letting them print over each other. */
+.ds-record-mast[data-media='photo'] .ds-entity-photo__credit {
+  bottom: calc(var(--ds-space-3) + 16px);
+}
+
+/*
+ * The scrim. Not decoration: the title is set over a photograph the archive does not control the
+ * exposure of, and without a floor under the text the same heading is legible on one record and
+ * unreadable on the next.
+ */
+.ds-record-mast__over {
+  position: relative;
+  z-index: 1; /* local: over the mast media, inside the figure's own isolation context. */
+  display: flex;
+  flex-direction: column;
+  /*
+   * The scrim is sized to the text, not to the plate. Stretched over the whole masthead the same
+   * ramp put its opaque end under the photograph's midpoint and the picture never appeared; here
+   * the box starts where the text does, so everything above it is the photograph at full strength.
+   */
+  padding: var(--ds-space-16) var(--ds-gutter) var(--ds-space-8);
+  background: linear-gradient(
+    to top,
+    var(--ds-canvas) 0%,
+    color-mix(in srgb, var(--ds-canvas) 82%, transparent) 45%,
+    transparent 100%
+  );
+}
+
+.ds-record-mast__facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  margin: 0 0 var(--ds-space-3);
+  font-size: 12.5px;
+  color: var(--room-ink-3);
+}
+
+/* The separator is drawn rather than typed, so a missing fact cannot leave a dangling dot. */
+.ds-record-mast__facts > * + *::before {
+  content: '·';
+  margin-right: var(--ds-space-3);
+  color: var(--room-ink-4);
+}
+
+.ds-record-mast__kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 26px;
+  padding: 0 10px 0 8px;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  background: color-mix(in srgb, var(--ds-surface) 80%, transparent);
+  backdrop-filter: blur(6px);
+  font-weight: 500;
+  color: var(--ds-ink);
+}
+
+.ds-record-mast__title {
+  margin: 0;
+  max-width: 20ch;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(34px, 4.6vw, 60px);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.ds-record-mast__lede {
+  margin: var(--ds-space-4) 0 0;
+  max-width: 52ch;
+  font-family: var(--ds-font-editorial);
+  font-size: clamp(16px, 1.4vw, 20px);
+  line-height: 1.5;
+  color: var(--room-ink-2);
+}
+
+/*
+ * A floor under the type itself, over a photograph. The archive does not control the exposure of
+ * the images it publishes, so a gradient alone is a gamble taken separately on every record: the
+ * same grey facts line is legible over a dark plate and invisible over a bright one. The shadow
+ * costs nothing where the scrim is already opaque and saves the line where it is not.
+ */
+.ds-record-mast[data-media='photo'] .ds-record-mast__facts,
+.ds-record-mast[data-media='photo'] .ds-record-mast__title,
+.ds-record-mast[data-media='photo'] .ds-record-mast__lede {
+  text-shadow: 0 1px 16px var(--ds-canvas);
+}
+
+/* The breadcrumb rides in the overlay rather than above the photograph, where it would push the
+   masthead down the page to make room for one line of mono. */
+.ds-record-mast__over .ds-room-crumb {
+  margin-bottom: var(--ds-space-4);
+}
+
+/* —— the fact strip ————————————————————————————————————————————————————————
+   Four facts and the way to the map, on one line under the masthead. These were four stacked
+   boxes at the top of the rail: read once, then in the way for the rest of the page. */
+.ds-record-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  align-items: center;
+  margin: 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-record-strip > div {
+  padding: var(--ds-space-5) var(--ds-space-6);
+  border-left: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-record-strip > div:first-child {
+  padding-left: var(--ds-gutter);
+  border-left: 0;
+}
+
+.ds-record-strip__go {
+  padding-right: var(--ds-gutter) !important;
+}
+
+.ds-record-strip dt {
+  font-size: 12px;
+  color: var(--room-ink-3);
+}
+
+.ds-record-strip dd {
+  margin: 5px 0 0;
+  font-family: var(--ds-font-display);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+@media (max-width: 60rem) {
+  .ds-record-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ds-record-strip > div {
+    padding-inline: var(--ds-gutter);
+    border-top: var(--ds-border-width) solid var(--room-rule-2);
+  }
+
+  .ds-record-strip > div:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .ds-record-strip__go {
+    grid-column: 1 / -1;
+  }
+}
+
+/* —— the rail's table of contents ————————————————————————————————————————— */
+.ds-record-toc {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: var(--ds-space-7);
+}
+
+.ds-record-toc__title {
+  margin-bottom: var(--ds-space-2);
+  font-size: 12px;
+  color: var(--room-ink-3);
+}
+
+.ds-record-toc__link {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+  padding: 7px 0 7px var(--ds-space-3);
+  border-left: 2px solid var(--room-rule-2);
+  color: var(--room-ink-3);
+  font-size: 13.5px;
+  text-decoration: none;
+}
+
+.ds-record-toc__link:hover {
+  border-left-color: var(--ds-accent);
+  color: var(--ds-ink);
+}
+
+.ds-record-toc__link .ds-mono {
+  font-size: 11px;
+}
+
+/* —— the apparatus band ————————————————————————————————————————————————————
+   Three columns under the record: what it was built from, where it came from, and what is still
+   missing. Every one of these was a box in the rail. */
+.ds-record-appx {
+  width: min(100%, 1180px);
+  margin-inline: auto;
+}
+
+.ds-record-appx__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin-bottom: var(--ds-space-7);
+}
+
+.ds-record-appx__head h2 {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.ds-record-appx__head span {
+  font-size: 13px;
+  color: var(--room-ink-3);
+}
+
+.ds-record-appx__cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--ds-space-12);
+  row-gap: var(--ds-space-7);
+  align-items: start;
+}
+
+@media (max-width: 60rem) {
+  .ds-record-appx__cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ds-record-appx__title {
+  margin: 0 0 var(--ds-space-3);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--room-ink-3);
+}
+
+.ds-record-appx__notes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-5);
+}
+
+.ds-record-appx__notes p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--room-ink-2);
 }
 
 /* —— rail blocks ————————————————————————————————————————————————————————————

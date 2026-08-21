@@ -466,8 +466,27 @@ describe('room kit · the column', () => {
         <p>Body.</p>
       </Room>,
     );
-    assert.match(html, /<main class="ds-room" id="main"><div class="ds-room__doc">/);
+    assert.match(
+      html,
+      /<main class="ds-room" id="main"><div class="ds-room__body"><div class="ds-room__doc">/,
+    );
     assert.doesNotMatch(html, /max-width/);
+  });
+
+  it('puts the masthead and the apparatus band outside the measure, around the body', () => {
+    const html = renderToStaticMarkup(
+      <Room masthead={<p>Hero.</p>} foot={<p>Sources.</p>} rail={<p>Rail.</p>}>
+        <p>Body.</p>
+      </Room>,
+    );
+
+    // Order is the contract: mast, then the railed body, then the band. The two full-bleed
+    // blocks are siblings of the body rather than children of the column, which is what lets
+    // them run wider than the measure the column is pinned to.
+    assert.match(
+      html,
+      /ds-room__mast[^]*ds-room__body ds-room__body--railed[^]*ds-room__doc[^]*ds-room__rail[^]*ds-room__foot/,
+    );
   });
 });
 

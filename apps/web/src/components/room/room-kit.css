@@ -44,17 +44,33 @@
   padding-block: var(--ds-space-10) var(--ds-space-16);
 }
 
+/* —— the full-bleed blocks —————————————————————————————————————————————————
+   A masthead above the column and an apparatus band below it, both outside the measure. The
+   column keeps its measure between them; these two are the only parts of a room that are wider
+   than what a person reads. */
+.ds-room__mast {
+  position: relative;
+}
+
+.ds-room__foot {
+  margin-top: var(--ds-space-12);
+  padding: var(--ds-space-10) var(--ds-gutter) var(--ds-space-16);
+  /* One step below the canvas: the band is the same page, further from the reader. */
+  background: color-mix(in srgb, var(--ds-canvas) 92%, var(--ds-ink));
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
 /* —— the right rail ————————————————————————————————————————————————————————
    The same set, offered back grouped a second way. It sits beside the column only when there
    is room for the column to keep its measure; below that it stacks under the list, which is
    also its reading order in the document. */
-.ds-room--railed {
+.ds-room__body--railed {
   display: grid;
   grid-template-columns: 1fr;
 }
 
 @media (min-width: 68rem) {
-  .ds-room--railed {
+  .ds-room__body--railed {
     /* The first track is the column's own measure, not `1fr`. With `1fr` the track ate every
        spare pixel, `justify-content` had nothing left to centre, and the column — pinned to the
        end of that oversized track — sat hard against the rail with the whole surplus dumped in
@@ -65,7 +81,7 @@
     column-gap: var(--ds-space-8);
   }
 
-  .ds-room--railed > .ds-room__doc {
+  .ds-room__body--railed > .ds-room__doc {
     margin-inline: 0;
   }
 
