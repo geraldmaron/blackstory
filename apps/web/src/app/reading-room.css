@@ -356,6 +356,29 @@ a.ds-errata__row-id {
    Room kit edition: each detail section is a hairline block (`.ds-room-section`), not a
    route-owned Surface-card panel. These classes are the content-specific pieces the kit
    has no shared primitive for yet — the fact strip is `Anatomy` (BooksAnatomyStrip.tsx). */
+
+/* `.ds-room-section` never actually carried a rule: every section on the detail page (context,
+   challenges, evidence, lookup, related, connected) rendered back to back with no top margin
+   and no divider, so the whole page read as one continuous run of orange mono labels instead of
+   a sequence of grouped blocks. This is the hairline block the class name promises: a generous
+   gap, then a rule, same register as the state-facet rows and the record index. */
+.ds-room-section {
+  margin-top: var(--ds-space-10);
+  padding-top: var(--ds-space-8);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+/* The Lookup section nests Identifiers and Provenance as their own labelled sub-sections
+   (`ids-heading`, `provenance-heading`). Unstyled, they inherited no separation either, so
+   "Purchase and identifiers", "Identifiers" and "Provenance" ran together as one block. A
+   lighter echo of the section rule reads them as two distinct fact groups under the same
+   parent instead of a continuation of the purchase links above them. */
+.ds-books-edition__subsection {
+  margin-top: var(--ds-space-6);
+  padding-top: var(--ds-space-5);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
 .ds-books-edition__panel-title {
   margin: 0;
   font-family: var(--ds-font-mono);
@@ -485,10 +508,13 @@ a.ds-errata__row-id {
   margin-top: var(--ds-space-4);
 }
 
+/* A state code is a two-character label. At the shared 44px action height it drew a box three
+   times taller than its own text and read as a button promising something bigger than the facet
+   link it is. Sized to its content, in the same register as the row chips. */
 .ds-books-edition__tag {
   display: inline-flex;
   align-items: center;
-  min-height: 2.75rem;
+  min-height: 2rem;
   padding: 0 var(--ds-space-3);
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-sm);
@@ -765,3 +791,127 @@ a.ds-errata__row-id {
 }
 /* —— end /stories/[slug] rail —————————————————————————————————————————————— */
 /* —— end /chapters pager —————————————————————————————————————————————————————— */
+
+/* —— /books index rows ————————————————————————————————————————————————————————
+   Two things the shared kit cannot know about this room.
+
+   1. `HairlineIndex` declares its glyph track at 16px because every other room puts an icon
+      there. `/books` puts a real cover thumbnail in it, and `.ds-books-edition__cover` is 5rem
+      wide (7.5rem tall when it falls back to the initials placeholder), so on the kit's own
+      track the cover overflowed its column and printed on top of the title and author.
+
+   2. Each `__row` is its own grid, so `auto` tracks are measured per row: the year and the
+      state codes landed at a different x in every row and the list read as rubble. The list
+      becomes the grid and the rows take `subgrid`, which sizes those tracks once across every
+      row — that is what actually lines the columns up, not a guessed width. */
+.ds-books-idx {
+  --books-row-cover: 2.5rem;
+  /* Space between the cover and the title, on top of the list's shared `column-gap`. It is a
+     token rather than a literal because the row's own inline padding is absorbed by the outer
+     tracks of a subgrid, so the rendered gutter is smaller than the number written here; the
+     value is tuned against the measured cover-to-title distance, not against the source. */
+  --books-cover-gutter: var(--ds-space-5);
+}
+
+/* The cover track is deliberately wider than the cover itself. A shared `column-gap` is the
+   right separation between the three data columns, but it is too tight between a piece of
+   artwork and the title that names it: the title read as a caption stuck to the image rather
+   than as the row's own heading. Widening the track (rather than raising the gap) buys space
+   after the cover alone, and leaves author/year/states at the measure they already read well at. */
+.ds-books-idx .ds-room-idx__list {
+  display: grid;
+  grid-template-columns:
+    calc(var(--books-row-cover) + var(--books-cover-gutter))
+    minmax(0, 1.6fr)
+    minmax(0, 1fr)
+    auto
+    auto;
+  column-gap: var(--ds-space-4);
+}
+
+.ds-books-idx .ds-room-idx__row {
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  /* No `column-gap` here: leaving it unset is what makes a subgrid inherit the list's gap.
+     Setting it to any value, including 0, breaks that inheritance instead of confirming it. */
+}
+
+.ds-books-idx .ds-room-idx__glyph {
+  width: var(--books-row-cover);
+  justify-self: start;
+}
+
+.ds-books-idx .ds-books-edition__cover {
+  width: var(--books-row-cover);
+}
+
+/* The placeholder's 7.5rem floor is sized for the detail header; in a row the 2/3 aspect
+   ratio already gives it height, and the floor would triple the row's height. */
+.ds-books-idx .ds-books-edition__cover--placeholder {
+  min-height: 0;
+}
+
+.ds-books-idx .ds-books-edition__cover-initials {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+/* The kit leaves `__grade` unstyled because every other room passes a small dot there.
+   `/books` passes the reported state codes as text, so unstyled means they inherit the row's
+   body size and shout louder than the title. They are data, not a heading: same mono caption
+   register as the author and year columns, one ink step brighter because they are the payload. */
+.ds-books-idx .ds-room-idx__grade {
+  justify-self: start;
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  color: var(--room-ink-3);
+}
+
+/* Year sits hard against the state codes it qualifies, so it right-aligns into its own track
+   and the two read as one field pair rather than two drifting ones. */
+.ds-books-idx .ds-room-idx__era {
+  text-align: right;
+}
+
+@media (max-width: 48rem) {
+  /* Under this measure five columns cannot hold their own. The title takes the full line and
+     the three data fields share the second, still on the list's shared tracks so author, year
+     and states line up down the page exactly as they do on the wide layout. */
+  .ds-books-idx .ds-room-idx__list {
+    grid-template-columns:
+      calc(var(--books-row-cover) + var(--books-cover-gutter))
+      minmax(0, 1fr)
+      auto
+      auto;
+    column-gap: var(--ds-space-3);
+  }
+
+  .ds-books-idx .ds-room-idx__row {
+    row-gap: 4px;
+  }
+
+  .ds-books-idx .ds-room-idx__name {
+    grid-column: 2 / -1;
+    grid-row: 1;
+  }
+
+  .ds-books-idx .ds-room-idx__place {
+    grid-column: 2 / 3;
+    grid-row: 2;
+  }
+
+  .ds-books-idx .ds-room-idx__era {
+    grid-column: 3 / 4;
+    grid-row: 2;
+  }
+
+  .ds-books-idx .ds-room-idx__grade {
+    grid-column: 4 / 5;
+    grid-row: 2;
+    align-self: end;
+  }
+}
+
+/* —— end /books index rows ————————————————————————————————————————————————— */

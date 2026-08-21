@@ -12,6 +12,49 @@
    measure so the column-plus-rail pair centres as a unit. The column inherits it. */
 [data-surface='record'] .ds-room {
   --room-doc-w: 680px;
+
+  /*
+   * THE SHELL. The one horizontal measure every full-bleed block on a record aligns to.
+   *
+   * A record has three blocks wider than the reading column — the masthead, the fact strip and
+   * the apparatus band — and each of them used to pick its own inset: the masthead's text sat on
+   * `--ds-gutter` (24px from the viewport edge), the apparatus centred itself at 1180px, and the
+   * column-plus-rail pair centred at its own intrinsic width. On a 1680px viewport that put the
+   * title at x=24, the apparatus at x=250 and the first line of the record at x=334 — three left
+   * edges down one page, which is what made the surface read as unaligned parts rather than one
+   * document, and what pushed the masthead type out to the bezel.
+   *
+   * The shell is the column-plus-rail pair's own width, so the title, the facts, the prose and
+   * the apparatus all start on the same vertical line and end on the same one. It is derived
+   * from the two measures rather than typed as a third number, so a room that retunes either
+   * cannot leave the blocks above and below it behind.
+   *
+   * Minus two gutters, because the line to align to is where the reader's eye meets TEXT, not
+   * where the column's box begins. `.ds-room__doc` is `border-box` and carries a gutter of its
+   * own padding, so the pair's box spans 334–1346 on a 1680px viewport while the prose inside it
+   * runs 358–1322. Aligning to the box left the masthead title one gutter to the left of the
+   * first paragraph of the record — the same misalignment as before, 24px instead of 310, and
+   * more confusing for being nearly right.
+   */
+  --record-shell-w: calc(
+    var(--room-doc-w) + var(--ds-space-8) + var(--room-rail-w, 300px) - 2 * var(--ds-gutter)
+  );
+  /*
+   * The inset that produces it. `max()` keeps the gutter as the floor, so below the shell's own
+   * width these blocks behave exactly as they did before: full bleed, one gutter in.
+   */
+  --record-shell-pad: max(var(--ds-gutter), calc((100% - var(--record-shell-w)) / 2));
+}
+
+/*
+ * The shell only aligns to the column while the column and rail are side by side. Below the
+ * kit's rail breakpoint the rail stacks under the column and the pair's width stops meaning
+ * anything, so the shell collapses to the measure the column actually renders at.
+ */
+@media (max-width: 67.9375rem) {
+  [data-surface='record'] .ds-room {
+    --record-shell-w: calc(var(--room-doc-w) - 2 * var(--ds-gutter));
+  }
 }
 
 /* The record's own prose is a caption register, not a chapter register. */

@@ -17,15 +17,15 @@ export function CompactFactReference({ view }: CompactFactReferenceProps) {
   return (
     <Card
       title={view.shortStatement}
-      meta={<span className="bb-mono">{view.id}</span>}
+      meta={<span className="ds-mono">{view.id}</span>}
       as="article"
     >
-      <p className="bb-sans" style={{ margin: '0 0 var(--bb-space-3) 0' }}>
+      <p className="ds-sans" style={{ margin: '0 0 var(--ds-space-3) 0' }}>
         {view.statement}
       </p>
       <p
-        className="bb-sans"
-        style={{ margin: '0 0 var(--bb-space-3) 0', color: 'var(--bb-ink-muted)' }}
+        className="ds-sans"
+        style={{ margin: '0 0 var(--ds-space-3) 0', color: 'var(--ds-ink-muted)' }}
       >
         {humanizeToken(view.claimType)} · {humanizeToken(view.confidence)} · {view.citationCount}{' '}
         {view.citationCount === 1 ? 'citation' : 'citations'}
@@ -37,8 +37,8 @@ export function CompactFactReference({ view }: CompactFactReferenceProps) {
           {...(view.primaryCitation.href ? { href: view.primaryCitation.href } : {})}
         />
       ) : null}
-      <p style={{ margin: 'var(--bb-space-3) 0 0 0' }}>
-        <a className="bb-cta bb-cta--ink" href={view.canonicalUrl}>
+      <p style={{ margin: 'var(--ds-space-3) 0 0 0' }}>
+        <a className="ds-cta ds-cta--ink" href={view.canonicalUrl}>
           Open canonical fact record
         </a>
       </p>

@@ -109,28 +109,96 @@
  * short band, and the record is written under it on the canvas rather than over it.
  */
 .ds-record-mast[data-media='mark'] {
-  display: flex;
-  flex-direction: column;
+  /*
+   * The mark is an emblem beside the record, not a band above it.
+   *
+   * It used to be stretched to the full width of the viewport in a 260px-tall band: a 240x280
+   * silhouette centred in 1680px of pale plate, with the record's title starting underneath it
+   * a screen further down. That is a masthead-sized hole where nine records in ten have no
+   * photograph — the archive's most common record opened on an empty rectangle.
+   *
+   * So the mark keeps its own proportion at emblem size and sits at the shell's right edge, with
+   * the breadcrumb, the facts, the title and the lede filling the shell's left. Nothing is
+   * stretched, nothing is cropped, and the record opens on its own name.
+   */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--record-mark-w, 200px);
+  align-items: end;
+  column-gap: var(--ds-space-8);
   min-height: 0;
+  padding: var(--ds-space-10) var(--record-shell-pad) 0;
+  background: none;
 }
 
 .ds-record-mast[data-media='mark'] > *:first-child {
+  /* Out of the absolute fill the photo masthead needs, back into the grid. */
   position: relative;
   inset: auto;
-  height: clamp(180px, 22vw, 260px);
-  overflow: hidden;
+  grid-column: 2;
+  grid-row: 1;
+  width: 100%;
+  height: auto;
 }
 
-.ds-record-mast[data-media='mark'] .ds-entity-mark,
-.ds-record-mast[data-media='mark'] .ds-entity-mark__frame {
-  height: 100%;
-  min-height: 0;
-  border-radius: 0;
+/* `overflow: hidden` on the band used to clip this line off the bottom of the plate; at emblem
+   size it is the caption that says what kind of record the silhouette stands for, so it stays. */
+.ds-record-mast[data-media='mark'] .ds-entity-mark {
+  height: auto;
+}
+
+/*
+ * The mark's own context line is "Place · Folsom, New Mexico" — word for word the first two facts
+ * of the line already set beside it in the masthead. One emblem carrying two captions that repeat
+ * the heading next to them is the clutter, not the emblem. The reason caption below it stays,
+ * because "no rights-cleared photograph is published" is the one thing this block knows that the
+ * rest of the masthead does not.
+ */
+.ds-record-mast[data-media='mark'] .ds-entity-mark__context {
+  display: none;
+}
+
+/* The reason caption ("no photograph is published for this record") is rail-register detail under
+   an emblem, not a headline. */
+.ds-record-mast[data-media='mark'] .ds-entity-photo__credit {
+  margin-top: var(--ds-space-2);
+  font-size: 10px;
+  text-align: right;
 }
 
 .ds-record-mast[data-media='mark'] .ds-record-mast__over {
-  padding-top: var(--ds-space-8);
+  grid-column: 1;
+  grid-row: 1;
+  padding: 0;
   background: none;
+}
+
+/*
+ * Narrow: one column, and the emblem goes back above the text — it is the first thing in the
+ * document and there is no second column to hold it. Held to its own width rather than the
+ * viewport's, which is the whole argument above.
+ */
+@media (max-width: 47.9375rem) {
+  .ds-record-mast[data-media='mark'] {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: var(--ds-space-8);
+  }
+
+  .ds-record-mast[data-media='mark'] > *:first-child {
+    grid-column: 1;
+    grid-row: 1;
+    width: var(--record-mark-w, 200px);
+    max-width: 100%;
+    margin-bottom: var(--ds-space-6);
+  }
+
+  .ds-record-mast[data-media='mark'] .ds-record-mast__over {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .ds-record-mast[data-media='mark'] .ds-entity-photo__credit {
+    text-align: left;
+  }
 }
 
 /*
@@ -141,7 +209,7 @@
 .ds-record-mast[data-media='photo'] .ds-entity-photo__credit,
 .ds-record-mast[data-media='photo'] .ds-entity-mark__context {
   position: absolute;
-  right: var(--ds-gutter);
+  right: var(--record-shell-pad);
   bottom: var(--ds-space-3);
   z-index: 2; /* local: over the media and the scrim, inside the masthead figure. */
   margin: 0;
@@ -171,7 +239,9 @@
    * ramp put its opaque end under the photograph's midpoint and the picture never appeared; here
    * the box starts where the text does, so everything above it is the photograph at full strength.
    */
-  padding: var(--ds-space-16) var(--ds-gutter) var(--ds-space-8);
+  /* Inline padding is the shell, not the gutter: the title starts on the same vertical line as
+     the first line of the record below it. See `--record-shell-w` in record-page.css. */
+  padding: var(--ds-space-16) var(--record-shell-pad) var(--ds-space-8);
   background: linear-gradient(
     to top,
     var(--ds-canvas) 0%,
@@ -238,13 +308,21 @@
  */
 .ds-record-mast[data-media='photo'] .ds-record-mast__facts,
 .ds-record-mast[data-media='photo'] .ds-record-mast__title,
-.ds-record-mast[data-media='photo'] .ds-record-mast__lede {
+.ds-record-mast[data-media='photo'] .ds-record-mast__lede,
+.ds-record-mast[data-media='photo'] .ds-record-mast__over .ds-room-crumb {
   text-shadow: 0 1px 16px var(--ds-canvas);
 }
 
 /* Muted ink is a step down from body copy against the canvas and a step down from nothing
-   against the bright top of a photograph. Same size, same weight, the colour back up. */
-.ds-record-mast[data-media='photo'] .ds-record-mast__facts {
+   against the bright top of a photograph. Same size, same weight, the colour back up.
+   The crumb needs the same lift, and needs it more: the scrim below (`.ds-record-mast__over`)
+   is sized to the text and opaque at its own bottom edge, fading to fully transparent at its
+   top, and the crumb is the first line in that box — right after the padding that clears the
+   title's clamp(). At a typical content height it lands around 80% up the gradient, where the
+   ramp is already down to roughly a third of its opacity, so it is the one overlay line the
+   text-shadow above does not reach without also getting the colour lift here. */
+.ds-record-mast[data-media='photo'] .ds-record-mast__facts,
+.ds-record-mast[data-media='photo'] .ds-record-mast__over .ds-room-crumb {
   color: var(--ds-ink);
 }
 
@@ -259,24 +337,40 @@
    boxes at the top of the rail: read once, then in the way for the rest of the page. */
 .ds-record-strip {
   display: grid;
+  /*
+   * Four facts on the shell, and the map link on the end of it.
+   *
+   * The strip used to spread its five tracks across the whole viewport, which on a wide screen
+   * put ~400px between a label and the next one and stranded "See it on the map" against the far
+   * bezel — a row of facts reading as five unrelated widgets. The rule stays full bleed, because
+   * a division of the page should cross the page; only the facts come in to the shell.
+   */
   grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
   align-items: center;
   margin: 0;
+  padding-inline: var(--record-shell-pad);
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
+/* Inline padding is `--ds-space-4`, not `-6`. On the shell the four fact tracks are ~209px each;
+   at 24px a side that left 161px of usable measure and "Folsom, New Mexico" — an ordinary place
+   label — broke over two lines, which set the strip's height from its longest value rather than
+   from its type. */
 .ds-record-strip > div {
-  padding: var(--ds-space-5) var(--ds-space-6);
+  padding: var(--ds-space-5) var(--ds-space-4);
   border-left: var(--ds-border-width) solid var(--room-rule-2);
 }
 
+/* The first and last cells sit ON the shell's edges, so their own inset would push the strip's
+   content off the line every other block starts and ends on. */
 .ds-record-strip > div:first-child {
-  padding-left: var(--ds-gutter);
+  padding-left: 0;
   border-left: 0;
 }
 
 .ds-record-strip__go {
-  padding-right: var(--ds-gutter) !important;
+  justify-self: end;
+  padding-right: 0 !important;
 }
 
 .ds-record-strip dt {
@@ -287,9 +381,14 @@
 .ds-record-strip dd {
   margin: 5px 0 0;
   font-family: var(--ds-font-display);
-  font-size: 19px;
+  /* Same reason as the padding above: the strip is four facts read at a glance, and 19px display
+     type is a size that only fits the shortest of them. */
+  font-size: 17px;
   font-weight: 600;
+  line-height: 1.25;
   letter-spacing: -0.015em;
+  /* When a value does have to wrap, break it evenly rather than leaving one orphaned word. */
+  text-wrap: balance;
 }
 
 @media (max-width: 60rem) {
@@ -298,7 +397,7 @@
   }
 
   .ds-record-strip > div {
-    padding-inline: var(--ds-gutter);
+    padding-inline: 0;
     border-top: var(--ds-border-width) solid var(--room-rule-2);
   }
 
@@ -308,6 +407,7 @@
 
   .ds-record-strip__go {
     grid-column: 1 / -1;
+    justify-self: stretch;
   }
 }
 
@@ -349,8 +449,10 @@
 /* —— the apparatus band ————————————————————————————————————————————————————
    Three columns under the record: what it was built from, where it came from, and what is still
    missing. Every one of these was a box in the rail. */
+/* 1180px was a fourth measure on a page that now has one. On the shell the band's three columns
+   line up under the column and the rail they are the apparatus for. */
 .ds-record-appx {
-  width: min(100%, 1180px);
+  width: min(100%, var(--record-shell-w));
   margin-inline: auto;
 }
 

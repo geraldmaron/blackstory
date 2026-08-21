@@ -24,10 +24,10 @@ export function FactStatusBanner({ fact }: FactStatusBannerProps) {
     <Notice tone={tone} title={title}>
       <p style={{ margin: 0 }}>
         This record remains available at its permalink so a cited version can always be verified.
-        Workflow status: <span className="bb-mono">{humanizeToken(fact.status)}</span>.
+        Workflow status: <span className="ds-mono">{humanizeToken(fact.status)}</span>.
       </p>
       {fact.confidenceNote ? (
-        <p style={{ margin: 'var(--bb-space-2) 0 0 0' }}>{fact.confidenceNote}</p>
+        <p style={{ margin: 'var(--ds-space-2) 0 0 0' }}>{fact.confidenceNote}</p>
       ) : null}
     </Notice>
   );

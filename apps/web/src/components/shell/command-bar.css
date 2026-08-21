@@ -19,6 +19,30 @@
   box-shadow: 0 10px 30px -20px rgb(0 0 0 / 45%);
 }
 
+/*
+ * The strip above the floating bar.
+ *
+ * The bar is inset 8px from the top, so on any scrolling page the content passes through that
+ * 8px band in full focus — a 44px chapter title sliding across the gap above the bar, clipped
+ * by nothing. The bar's own translucency is deliberate (the page should show through it,
+ * blurred); the bare strip above it is not.
+ *
+ * Scoped to `--room` rather than `.ds-bar`, because the Atlas is a full-bleed map that does not
+ * scroll and would only gain an opaque band across the top of the instrument. `SiteShellHeader`
+ * puts `ds-bar--room` on every non-Atlas bar, which is exactly the set that scrolls; until now
+ * that modifier resolved to no rule at all.
+ */
+.ds-bar--room::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--ds-space-2) + env(safe-area-inset-top, 0px));
+  background: var(--ds-canvas);
+  pointer-events: none;
+}
+
 /* ---- brand --------------------------------------------------------------- */
 
 /*
@@ -369,6 +393,59 @@
   .ds-bar__search {
     justify-content: center;
     min-width: 44px;
+  }
+
+  /*
+   * The live field gets its own row.
+   *
+   * The rules above collapse the *button* variant (Atlas) to a glyph, which is what frees the
+   * row for the modes. The live-input variant every other room renders has no label span to
+   * hide, so it stayed a full input in the `minmax(0, 1fr)` middle track while brand and tools
+   * kept their intrinsic widths on either side. At 375px those two take ~300px and the input
+   * was left around 60px: it rendered as "Sea" and could not be typed into usefully.
+   *
+   * Stacking is the fix rather than shrinking the neighbours, because there is no width at
+   * which five controls and a usable text field share one 375px row. Brand and tools keep the
+   * top row; the field spans the full width beneath them, which is the same shape the search
+   * takes on every other mobile site and needs no new markup, so `CommandBarSearch`'s tested
+   * structure and its `id="bar-search"` are untouched.
+   */
+  .ds-bar:has(.ds-bar__search--live) {
+    grid-template-columns: auto minmax(0, 1fr);
+    height: auto;
+    padding-block: var(--ds-space-2);
+    row-gap: var(--ds-space-2);
+  }
+
+  .ds-bar:has(.ds-bar__search--live) .ds-bar__brand {
+    grid-area: 1 / 1;
+  }
+
+  .ds-bar:has(.ds-bar__search--live) .ds-bar__tools {
+    grid-area: 1 / 2;
+    justify-self: end;
+  }
+
+  .ds-bar:has(.ds-bar__search--live) .ds-bar__search--live {
+    grid-area: 2 / 1 / 3 / -1;
+    max-width: none;
+    justify-content: flex-start;
+  }
+}
+
+/*
+ * The stacked bar is taller than the one-row bar, and room content clears the fixed bar using
+ * `--ds-island-clearance`, which is derived from `--ds-island-height`. Left at its 4rem
+ * one-row value the first block of every page would slide under the bar, so the token moves
+ * with the layout that changed. Measured against the rendered bar, not assumed.
+ */
+@media (max-width: 559px) {
+  /* `:root:root` rather than `:root`: shell-header.css declares this token at plain `:root`
+     and is imported after this file, so an equal-specificity override here would lose the
+     cascade on source order alone. Doubling the selector wins on specificity instead, which
+     does not depend on which stylesheet the bundler happens to emit last. */
+  :root:root {
+    --ds-island-height: 6.5rem;
   }
 
   .ds-bar__modes button,

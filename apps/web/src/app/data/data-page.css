@@ -26,6 +26,16 @@
   border-radius: var(--ds-radius-md);
 }
 
+/* ChartCard's heading is one text node, "{kicker} · {title}" (e.g. "BJS · USSC ·
+   Imprisonment and federal drug sentences"), with no element boundary CSS can use to keep the
+   kicker and its separator from being orphaned alone on the first line at narrow widths.
+   text-wrap: balance distributes the line breaks evenly instead, so "BJS · USSC ·" never sits
+   alone above the title. Unsupported browsers fall back to normal wrapping, which is the
+   pre-existing behaviour. */
+.ds-data-edition__panel .ds-room-grouphd {
+  text-wrap: balance;
+}
+
 .ds-data-edition__viz {
   display: flex;
   flex-direction: column;

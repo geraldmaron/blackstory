@@ -147,6 +147,15 @@
   inset: 0;
 }
 
+/* fillContainer sizes the grid off the plane's own box (compute-fill-mosaic-layout), which
+   only produces a full plane if the root already fills its container. Today --living (always
+   present alongside --fill) already carries this, but --fill shouldn't depend on always
+   co-occurring with a sibling class to do what its own name promises. */
+.ds-atmosphere--fill {
+  position: absolute;
+  inset: 0;
+}
+
 .ds-atmosphere--interactive {
   pointer-events: auto;
 }

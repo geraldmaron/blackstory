@@ -11,11 +11,33 @@
  * caps at the same token — keep these in step rather than reintroducing a
  * wider shell around a narrower reading column.
  */
+/*
+ * One measure, declared once.
+ *
+ * The chapter had two competing widths: the room's doc track at `--room-doc-w: 900px` and the
+ * article's own `--ds-content-max` (38rem = 608px). The prose therefore rendered 608px wide,
+ * centred inside a 900px track, while the masthead ran full-bleed and the rail sat off past the
+ * track's end — so nothing on the page shared a left edge and the whole column read as though it
+ * had been dropped in at random. The redesign comp names this exact defect and specifies one
+ * 680px measure, which is what both variables are set to here.
+ *
+ * `--room-doc-w` is set via `:has()` on the room rather than globally because 900px is correct
+ * for the index rooms that render tables and card grids; it is only a reading column of running
+ * prose that needs the narrower measure. `article.css` is imported by `/stories/[slug]` alone,
+ * so these rules cannot reach another surface.
+ */
+/* The measure is declared on the room, not on the article: custom properties inherit down, so
+   a value set on `.ds-article` would be invisible to the ancestor track that has to match it. */
+.ds-room:has(.ds-article) {
+  --ds-chapter-measure: 680px;
+  --room-doc-w: var(--ds-chapter-measure);
+}
+
 .ds-article {
   display: flex;
   flex-direction: column;
   gap: var(--ds-space-8);
-  max-width: var(--ds-content-max);
+  max-width: var(--ds-chapter-measure, var(--ds-content-max));
   margin-inline: auto;
 }
 
@@ -233,6 +255,40 @@
 
 .ds-article__drawer[open] .ds-article__drawer-cue::before {
   content: '\2013'; /* – */
+}
+
+/*
+ * Narrow widths: the label takes its own line and the title takes the full measure.
+ *
+ * The summary is a flex row in which `__drawer-kind` is `flex: none` and `__drawer-lead` is
+ * `flex: 1 1 auto`, so every pixel the row is short comes out of the title and none out of the
+ * label. A kind label like "PRIMARY DOCUMENT · 2001-02-28" is around 250px of mono caps that
+ * will not shrink, which on a 375px screen left the title roughly 90px and set a document name
+ * one or two words per line down a dozen lines. The label is the shorter, more compressible
+ * string and the title is the thing being named, so the title gets the width.
+ */
+@media (max-width: 40rem) {
+  .ds-article__drawer-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    row-gap: var(--ds-space-1);
+  }
+
+  .ds-article__drawer-kind {
+    grid-area: 1 / 1;
+  }
+
+  /* Stays on the first row beside the label: a disclosure cue belongs next to the thing that
+     opens, not stranded below a title it does not describe. */
+  .ds-article__drawer-cue {
+    grid-area: 1 / 2;
+    align-self: start;
+  }
+
+  .ds-article__drawer-lead {
+    grid-area: 2 / 1 / 3 / -1;
+  }
 }
 
 .ds-article__drawer-body {
@@ -458,14 +514,35 @@
   z-index: 1; /* local: over the hero image, inside the masthead figure. */
   display: flex;
   flex-direction: column;
-  padding: var(--ds-space-16) var(--ds-gutter) var(--ds-space-10);
+  /* The inline padding was `--ds-gutter` (16px), which put a 44px display title sixteen pixels
+     from the edge of the screen and made the whole masthead read as though the text had fallen
+     off the layout. The masthead is deliberately full-bleed and does not share the body's left
+     edge, so the margin has to do the work of framing it; the comps set 56px. Clamped so the
+     same rule still gives a phone a sane 20px. */
+  padding: var(--ds-space-16) clamp(20px, 4.5vw, 56px) var(--ds-space-10);
 }
 
+/*
+ * The scrim has to cover the type, not a fixed fraction of the plate.
+ *
+ * The old ramp was fully transparent by 45% of the overlay's height, which is fine when the
+ * overlay is short. On a phone, where a 44px title and a six-line lede make the overlay taller
+ * than the picture, the top half of that text ran out past the ramp and sat as near-white type
+ * directly on the brightest part of a parchment scan — effectively unreadable, and worst
+ * exactly where the reader starts.
+ *
+ * This ramp reaches near-opacity by the time it is under the text block and only thins above
+ * it, so the picture still reads at the top of the plate while every line of type keeps a dark
+ * ground beneath it whatever the image happens to be doing there. The floor is a real colour
+ * rather than a percentage of one so the guarantee does not depend on the photograph.
+ */
 .ds-article-mast[data-media='photo'] .ds-article-mast__over {
   background: linear-gradient(
     to top,
     var(--ds-canvas) 0%,
-    color-mix(in srgb, var(--ds-canvas) 82%, transparent) 45%,
+    color-mix(in srgb, var(--ds-canvas) 94%, transparent) 55%,
+    color-mix(in srgb, var(--ds-canvas) 78%, transparent) 78%,
+    color-mix(in srgb, var(--ds-canvas) 45%, transparent) 92%,
     transparent 100%
   );
 }
@@ -542,14 +619,21 @@
   color: var(--ds-ink-muted);
 }
 
+/* The credit runs in flow, under the byline.
+ *
+ * It was absolutely positioned — first bottom-right, where a four-line source note sat directly
+ * beside the lede and won on contrast because it landed on the brightest part of the picture;
+ * then top-left, which collided with the title outright once the plate was shorter than its own
+ * text. Both failures are the same mistake: this figure's height is driven by a title and lede
+ * of unknown length, so anything taken out of flow inside it is positioned against a box whose
+ * size is not known in advance. In flow it cannot overlap anything, at any measure, ever. */
 .ds-article-mast__credit {
-  position: absolute;
-  right: var(--ds-gutter);
-  bottom: var(--ds-space-3);
-  z-index: 2; /* local: over the hero image and its scrim, inside the masthead figure. */
-  max-width: 40ch;
-  text-align: right;
+  margin-top: var(--ds-space-4);
+  max-width: 66ch;
   font-size: 10px;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+  text-transform: uppercase;
   color: var(--ds-ink-subtle);
 }
 

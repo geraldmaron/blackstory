@@ -120,7 +120,11 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
         <h2 id="law-browse-heading" className="ds-room-grouphd">
           Browse landmark statutes and decisions
         </h2>
-        <label className="ds-records-find__label" htmlFor="law-q">
+        {/* `ds-records-find__label` was never defined in any stylesheet, so this rendered as
+            unstyled stray body text above the field. The identical control in `RecordsIndex`
+            hides its label and lets the placeholder carry the visible prompt; matching it keeps
+            the accessible name without the orphaned class or the duplicated visible text. */}
+        <label className="ds-visually-hidden" htmlFor="law-q">
           Title, citation or topic
         </label>
         <div className="ds-records-find__row">

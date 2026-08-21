@@ -422,23 +422,30 @@
 }
 
 /* Action vocabulary (design-direction-v5 §5): `.ds-button` (form buttons)
-   and shell.css's `.ds-cta` (links) share ONE recipe — sans caps 0.75rem,
-   0.08em tracking, PILL radius, ≥44px target. Weights: --primary = copper
-   (THE orientation action, max one per view), --secondary = quiet hairline. */
+   and shell.css's `.ds-cta` (links) share ONE recipe — sans 13px, no caps,
+   PILL radius, 40px target. Weights: --primary = copper (THE orientation
+   action, max one per view), --secondary = quiet hairline.
+
+   Both comments here and in shell.css have claimed "ONE recipe" for several
+   cycles while the two rules actually diverged: `.ds-cta` dropped the caps
+   and moved to 14px under the Ink direction, `.ds-button` was left at 12px
+   uppercase with 0.08em tracking. A form's submit button and a room's link
+   action sat side by side looking like two different components. They are
+   now genuinely the same recipe, at the size the comps draw. */
 .ds-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--ds-space-2);
-  min-height: 2.75rem;
-  padding: 0 var(--ds-space-6);
+  min-height: 2.5rem;
+  padding: 0 var(--ds-space-5);
   border: var(--ds-border-width) solid transparent;
   border-radius: var(--ds-radius-full);
   font-family: var(--ds-font-sans);
-  font-size: 0.75rem;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: normal;
+  text-transform: none;
   line-height: 1.2;
   cursor: pointer;
   transition:

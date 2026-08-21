@@ -76,7 +76,11 @@
        end of that oversized track — sat hard against the rail with the whole surplus dumped in
        the left margin. Sizing the track to the measure makes the pair intrinsically wide, so it
        centres in the viewport the way an unrailed room already does. */
-    grid-template-columns: minmax(0, var(--room-doc-w, 760px)) 15rem;
+    /* The rail was 15rem (240px). At that width the chapter's contents entries could not fit a
+       section title on one line, and widening it to the comps' 300px is what lets them wrap to
+       two readable lines rather than clip. Declared as a variable so a room whose rail carries
+       only short facet labels can still tighten it without forking this rule. */
+    grid-template-columns: minmax(0, var(--room-doc-w, 760px)) var(--room-rail-w, 300px);
     justify-content: center;
     column-gap: var(--ds-space-8);
   }
@@ -133,13 +137,23 @@
   color: var(--ds-accent);
 }
 
+/*
+ * Rail entries wrap to two lines instead of truncating on one.
+ *
+ * `white-space: nowrap` was fine when the rail only ever held short facet labels ("Florida
+ * (FL)"). The chapter's "In this chapter" list puts real section titles here, and at the rail's
+ * measure every one of them clipped mid-word — "1787 · Three fifths of all other Pers…",
+ * "1857 · The record rules on who yo…". A table of contents you cannot read the entries of is
+ * not doing its job, and an ellipsis is not a fix when the truncated part is the part that
+ * identifies the section. Two lines, then clamp: short labels are unaffected.
+ */
 .ds-room-rail-group__label {
-  display: inline-flex;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   align-items: center;
   gap: 6px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .ds-room-rail-group__glyph {
@@ -357,6 +371,16 @@
   flex-direction: column;
   gap: var(--ds-space-2);
   padding-block: var(--ds-space-5);
+}
+
+/* An index card is a three-column row grid (title, description, tag/meta) sized for plain
+   text; a hero image dropped into that grid lands in an arbitrary cell instead of sitting
+   above the title. A card carrying media stacks like a hub card so the image renders as a
+   block above the text regardless of which grid it's cataloguing in. */
+.ds-room-card--media {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
 }
 
 /* Rows and index entries take a copper wash on hover; cards no longer lift. */

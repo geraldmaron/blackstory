@@ -175,10 +175,14 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
             </span>
           ) : null}
         </p>
+        {/* Inside the overlay, not beside it. The overlay is the element carrying the scrim, so
+            a credit rendered as its sibling sat on bare photograph: subtle-ink text on a bright
+            parchment scan, and a strip of un-dimmed image below the byline. It is hero text like
+            the rest and belongs on the same ground. */}
+        {doc.heroImage?.credit ? (
+          <span className="ds-article-mast__credit ds-mono">{doc.heroImage.credit}</span>
+        ) : null}
       </figcaption>
-      {doc.heroImage?.credit ? (
-        <span className="ds-article-mast__credit ds-mono">{doc.heroImage.credit}</span>
-      ) : null}
     </figure>
   );
 

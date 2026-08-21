@@ -26,7 +26,7 @@ export function FactRevisionPanel({
 }: FactRevisionPanelProps) {
   if (fact.revisions.length === 0) {
     return (
-      <p className="bb-sans" style={{ color: 'var(--bb-ink-muted)' }}>
+      <p className="ds-sans" style={{ color: 'var(--ds-ink-muted)' }}>
         No revisions have been recorded for this fact yet.
       </p>
     );
@@ -34,11 +34,11 @@ export function FactRevisionPanel({
 
   return (
     <section {...(labelledBy ? { 'aria-labelledby': labelledBy } : {})}>
-      <ol className="bb-sans" style={{ margin: 0, paddingLeft: 'var(--bb-space-5)' }}>
+      <ol className="ds-sans" style={{ margin: 0, paddingLeft: 'var(--ds-space-5)' }}>
         {fact.revisions.map((revision) => {
           const isCurrent = currentRevisionNumber === revision.revisionNumber;
           return (
-            <li key={revision.revisionNumber} style={{ marginBottom: 'var(--bb-space-3)' }}>
+            <li key={revision.revisionNumber} style={{ marginBottom: 'var(--ds-space-3)' }}>
               <p style={{ margin: 0 }}>
                 <strong>
                   Rev {revision.revisionNumber}
@@ -47,23 +47,23 @@ export function FactRevisionPanel({
                 {' — '}
                 {revision.summary}
               </p>
-              <p style={{ margin: 'var(--bb-space-1) 0 0 0', color: 'var(--bb-ink-muted)' }}>
-                <span className="bb-mono">{humanizeToken(revision.changeType)}</span>
+              <p style={{ margin: 'var(--ds-space-1) 0 0 0', color: 'var(--ds-ink-muted)' }}>
+                <span className="ds-mono">{humanizeToken(revision.changeType)}</span>
                 {' · '}
                 {revisionAgentLabel(revision)} · {formatIsoDate(revision.timestamp)}
               </p>
               {!isCurrent ? (
-                <p style={{ margin: 'var(--bb-space-1) 0 0 0' }}>
+                <p style={{ margin: 'var(--ds-space-1) 0 0 0' }}>
                   <a href={buildFactRevisionPath(fact.id, revision.revisionNumber)}>
                     View revision permalink
                   </a>
                 </p>
               ) : null}
               {revision.diff.length > 0 ? (
-                <ul style={{ margin: 'var(--bb-space-2) 0 0 0', paddingLeft: 'var(--bb-space-5)' }}>
+                <ul style={{ margin: 'var(--ds-space-2) 0 0 0', paddingLeft: 'var(--ds-space-5)' }}>
                   {revision.diff.map((entry) => (
                     <li key={`${revision.revisionNumber}_${entry.field}`}>
-                      <span className="bb-mono">{entry.field}</span>: {entry.before ?? '∅'} →{' '}
+                      <span className="ds-mono">{entry.field}</span>: {entry.before ?? '∅'} →{' '}
                       {entry.after ?? '∅'}
                     </li>
                   ))}
