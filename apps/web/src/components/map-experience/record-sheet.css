@@ -8,9 +8,14 @@
 
 .ds-sheet {
   position: fixed;
-  top: calc(56px + var(--ds-space-4));
+  top: var(--ds-atlas-top);
+  /*
+   * The sheet takes the results rail's slot. It is the same object in the same place: opening a
+   * record replaces the list it was chosen from, and closing it puts the list back. Above
+   * `--ds-atlas-both-columns` the two coexist and the sheet moves one column left — see below.
+   */
   right: var(--ds-space-4);
-  bottom: var(--ds-space-4);
+  bottom: var(--ds-atlas-bottom);
   z-index: var(--ds-z-record-sheet);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -351,6 +356,20 @@
   font-size: 0.625rem;
   letter-spacing: 0.06em;
   color: var(--ds-ink-muted);
+}
+
+/*
+ * Wide enough for both columns: the sheet opens to the left of the results rail rather than over
+ * it, so the row the reader clicked stays on screen next to the record it opened. That comparison
+ * is the whole reason this sheet is non-modal; covering the list threw it away.
+ *
+ * 1150px is the width at which the two fit with the lens still in place:
+ * 300 (lens) + 430 (sheet) + 344 (rail) + gutters.
+ */
+@media (min-width: 1150px) {
+  .ds-sheet {
+    right: calc(var(--ds-space-4) + 344px + var(--ds-space-3));
+  }
 }
 
 @media (max-width: 819px) {

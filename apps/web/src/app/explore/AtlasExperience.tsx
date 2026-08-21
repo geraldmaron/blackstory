@@ -41,7 +41,7 @@ import {
   type SerializableExploreViewModel,
 } from './explore-view-model-wire';
 import { eraBucketFor } from './hooks/atlas-feature-helpers';
-import { usePanelVisibility } from './hooks/use-panel-visibility';
+import { usePanelVisibility, type PanelVisibility } from './hooks/use-panel-visibility';
 import { useSavedCollection } from './hooks/use-saved-collection';
 import { useLensFilters } from './hooks/use-lens-filters';
 import { useMapSync } from './hooks/use-map-sync';
@@ -62,6 +62,18 @@ void React;
  * instance rather than a new patch field on `MapStageDataPatch`.
  */
 const PLACE_LABEL_LAYER_IDS = ['plate-place-city', 'explore-street-label'] as const;
+
+/**
+ * The dock's chips, in the order the narrow switcher shows them. Wide only ever renders the two
+ * that carry a hide control of their own; the other two exist for the narrow layout, where the
+ * dock is the only way to change which single instrument is on screen.
+ */
+const NARROW_INSTRUMENTS = [
+  { key: 'lens', label: 'Lens' },
+  { key: 'results', label: 'Records' },
+  { key: 'decade', label: 'Decade' },
+  { key: 'camera', label: 'Camera' },
+] as const satisfies readonly { key: keyof PanelVisibility; label: string }[];
 
 /** The narrow slice of the MapLibre instance the label toggle needs. `stage.getMap()` types as
  * `AtlasCameraTarget` (camera-only, by design — MapStage.tsx §doc comment), so this file casts
@@ -94,6 +106,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     panels,
     setPanels,
     narrow,
+    bothColumns,
     chromeHidden,
     setChromeHidden,
     showPanel,
@@ -113,7 +126,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   const [focusAfterPanels, setFocusAfterPanels] = useState<string | null>(null);
 
   const hidePanel = useCallback(
-    (panel: 'lens' | 'results') => {
+    (panel: 'lens' | 'results' | 'decade' | 'camera') => {
       setPanels((current) => ({ ...current, [panel]: false }));
       setFocusAfterPanels(`.ds-atlas__dock [data-dock="${panel}"]`);
     },
@@ -121,7 +134,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   );
 
   const restorePanel = useCallback(
-    (panel: 'lens' | 'results') => {
+    (panel: 'lens' | 'results' | 'decade' | 'camera') => {
       showPanel(panel);
       setFocusAfterPanels(panel === 'lens' ? '.ds-lens__head' : '.ds-results__head');
     },
@@ -275,8 +288,16 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   });
 
   const showLens = panels.lens && !chromeHidden && mode === 'atlas';
+  /*
+   * The rail survives a selection once there is room for both columns: the sheet opens one column
+   * to its left and the row the reader clicked stays visible beside the record it opened. Below
+   * that width the sheet takes the rail's slot, so the rail stands down rather than being covered.
+   */
   const showResults =
-    panels.results && !chromeHidden && mode === 'atlas' && selectedId === undefined;
+    panels.results &&
+    !chromeHidden &&
+    mode === 'atlas' &&
+    (bothColumns || selectedId === undefined);
 
   return (
     /* `data-key-scope` is what makes the bare camera, time and record keys legal here and nowhere
@@ -404,13 +425,15 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
 
       {mode === 'atlas' && !chromeHidden ? (
         <>
-          <TimePanel
-            bars={decadeBars}
-            decade={decade}
-            onDecadeChange={setDecade}
-            totalRecords={view.allFeatures.length}
-          />
-          {narrow ? null : (
+          {panels.decade ? (
+            <TimePanel
+              bars={decadeBars}
+              decade={decade}
+              onDecadeChange={setDecade}
+              totalRecords={view.allFeatures.length}
+            />
+          ) : null}
+          {panels.camera ? (
             <CameraConsole
               onMove={runMove}
               onZoom={(delta) => {
@@ -421,24 +444,35 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
               activeRecord={selectedFeature?.properties ?? null}
               spotlit={camera.isSpotlit()}
             />
-          )}
+          ) : null}
         </>
       ) : null}
 
-      {(!panels.lens || !panels.results) && !chromeHidden ? (
-        <div className="ds-atlas__dock">
-          {/* `data-dock` is the focus contract's handle: hiding a panel moves focus to the chip
-              that brings it back, so the pair has to be addressable from one place. */}
-          {!panels.lens ? (
-            <button type="button" data-dock="lens" onClick={() => restorePanel('lens')}>
-              Lens
-            </button>
-          ) : null}
-          {!panels.results ? (
-            <button type="button" data-dock="results" onClick={() => restorePanel('results')}>
-              Records
-            </button>
-          ) : null}
+      {/*
+       * The dock. Two different objects sharing one row of chips.
+       *
+       * Wide: chips for whatever the reader has hidden, and nothing else. `data-dock` is the
+       * focus contract's handle — hiding a panel moves focus to the chip that brings it back.
+       *
+       * Narrow: the four-way instrument switcher. Four panels do not fit on a phone, so the
+       * surface shows one at a time and the dock is how the reader changes which — the mechanism
+       * the dock already existed for, rather than a second one invented for small screens.
+       */}
+      {(narrow || !panels.lens || !panels.results) && !chromeHidden ? (
+        <div className="ds-atlas__dock" data-switcher={narrow ? 'true' : undefined}>
+          {NARROW_INSTRUMENTS.map(({ key, label }) =>
+            narrow || !panels[key] ? (
+              <button
+                key={key}
+                type="button"
+                data-dock={key}
+                aria-pressed={narrow ? panels[key] : undefined}
+                onClick={() => (narrow && panels[key] ? hidePanel(key) : restorePanel(key))}
+              >
+                {label}
+              </button>
+            ) : null,
+          )}
         </div>
       ) : null}
 

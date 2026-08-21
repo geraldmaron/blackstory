@@ -8,13 +8,13 @@
 
 .ds-lens {
   position: fixed;
-  top: calc(56px + var(--ds-space-4));
+  top: var(--ds-atlas-top);
   left: var(--ds-space-4);
   z-index: var(--ds-z-atlas-instruments);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   width: 300px;
-  max-height: calc(100dvh - 56px - var(--ds-space-4) * 2 - 148px);
+  max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom));
   background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
   backdrop-filter: blur(8px);
   border: var(--ds-border-width) solid var(--ds-border);
@@ -382,18 +382,18 @@
 /* ---- narrow -------------------------------------------------------------- */
 
 /*
- * Narrow: the lens becomes a top sheet under the bar and the results rail takes the bottom half.
- * They must not share a rect — at 787px both were pinned to the same bottom offset and the rail
- * rendered straight over the lens.
+ * Narrow: one instrument at a time, in one shared slot above the dock switcher. They no longer
+ * need to avoid each other's rects, because only one of them is ever mounted — `usePanelVisibility`
+ * makes the dock a four-way switcher below 820px.
  */
 @media (max-width: 819px) {
   .ds-lens {
-    top: calc(50px + var(--ds-space-2) * 2);
+    top: auto;
     left: var(--ds-space-2);
     right: var(--ds-space-2);
-    bottom: auto;
+    bottom: calc(var(--ds-space-2) + 66px);
     width: auto;
-    max-height: min(38dvh, 320px);
+    max-height: min(46dvh, 360px);
   }
 }
 

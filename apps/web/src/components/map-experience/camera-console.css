@@ -130,11 +130,13 @@
   flex: none;
 }
 
+/* See lens-panel.css: one shared narrow slot, one instrument in it. */
 @media (max-width: 819px) {
   .ds-camera {
+    left: var(--ds-space-2);
     right: var(--ds-space-2);
-    bottom: calc(var(--ds-space-2) + 132px);
-    width: 186px;
+    bottom: calc(var(--ds-space-2) + 66px);
+    width: auto;
   }
 }
 
