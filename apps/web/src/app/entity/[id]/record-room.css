@@ -439,14 +439,6 @@
   }
 }
 
-.ds-record-rail-block__release {
-  margin: var(--ds-space-3) 0 0;
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  color: var(--room-ink-4);
-  overflow-wrap: anywhere;
-}
-
 /* The place block sits flush in the rail. The locator brings its own proportion (the projection's
    960x500 canvas) rather than taking one from the room: the pin is positioned as a percentage of
    that canvas, so a room that restretched the box would move the pin off the place it marks. What

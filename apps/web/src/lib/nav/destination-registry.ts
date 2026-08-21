@@ -55,7 +55,11 @@ export type Destination = {
    * crumb; "Submit a lead" is the right card. Defaults to {@link Destination.label}.
    */
   readonly cardTitle?: string;
-  /** Mono caps kicker on the card: what sort of thing this room is. */
+  /**
+   * What sort of thing this room is. No longer printed as a card kicker: a three-up card had no
+   * room for it. `/library` cases it into `RoomCard`'s `tag`, which takes the index row's third
+   * column, and the mobile app and the palette still read the field as stored.
+   */
   readonly kind?: string;
   /** One line. Two lines is a summary, and a card is not a summary. */
   readonly description?: string;

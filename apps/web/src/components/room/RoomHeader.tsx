@@ -19,9 +19,9 @@ export type RoomHeaderProps = {
   /** Final breadcrumb step. Defaults to the registry label for `pathname`. */
   readonly crumbLabel?: string;
   /**
-   * Mono caps register above the title — the room's kind, not a restatement of the title.
-   * Ink direction: no longer rendered (the title takes the space instead); kept on the type
-   * so the twelve existing callers do not have to change in the same commit.
+   * One quiet line above the title saying what sort of room this is, not a restatement of the
+   * title. Sentence case in the sans face: it is orientation, not a label. See the render below
+   * for why it stopped being the v6 mono-caps register.
    */
   readonly kicker?: string;
   /** The display title. `<em>` inside renders in the editorial italic accent. */

@@ -630,13 +630,11 @@
   border-left: var(--ds-border-width-strong) solid var(--ds-accent);
 }
 
-.ds-article-rail__next-kicker {
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
+/* The heading above this block is the kit's rail-group title; the link itself carried no rule at
+   all, so it took the global prose underline across both of its lines. */
+.ds-article-rail__next-link {
+  display: block;
+  text-decoration: none;
 }
 
 .ds-article-rail__next-position {
