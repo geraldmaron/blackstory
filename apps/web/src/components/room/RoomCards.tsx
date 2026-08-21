@@ -25,20 +25,20 @@ export function GroupHeading({ children, className }: GroupHeadingProps) {
 export type CardGridProps = {
   readonly children: ReactNode;
   /**
-   * `grid` (default) is the three-up typographic index every catalogue uses.
+   * `'index'` (default): one column, each RoomCard a hairline row. `'hub'`: three fixed columns.
    *
-   * `rows` is the same entries in one column, each on its own hairline with a right-hand tag —
-   * the shape a *hub* wants, where the reader is choosing a room rather than scanning a
-   * catalogue of like things. Three columns of five destinations reads as a card wall; one
-   * column of five reads as a table of contents, which is what /library is.
+   * `/library` used the hub shape and no longer does. Three columns of five destinations reads
+   * as a card wall, and a hub's reader is choosing a room rather than scanning a catalogue of
+   * like things; one column of five reads as a table of contents, which is what a hub is. The
+   * variant stays on the surface because a genuinely wide, flat set may still want it.
    */
-  readonly layout?: 'grid' | 'rows';
+  readonly variant?: 'index' | 'hub';
   readonly className?: string;
 };
 
-export function CardGrid({ children, layout = 'grid', className }: CardGridProps) {
+export function CardGrid({ children, variant = 'index', className }: CardGridProps) {
   return (
-    <div className={cx('ds-room-cards', layout === 'rows' && 'ds-room-cards--rows', className)}>
+    <div className={cx('ds-room-cards', variant === 'hub' && 'ds-room-cards--hub', className)}>
       {children}
     </div>
   );
@@ -64,7 +64,11 @@ export type RoomCardMedia = {
 
 export type RoomCardProps = {
   readonly href: string;
-  /** Mono caps kind tag: what sort of thing this is. */
+  /**
+   * What sort of thing this is. Ink direction: no longer rendered as a kind tag — kind is
+   * implied by the group the card sits in — but kept on the type so the existing callers do
+   * not have to change in the same commit.
+   */
   readonly kind: string;
   readonly title: ReactNode;
   /** One line. Two lines is a summary, and a card is not a summary. */
@@ -72,9 +76,9 @@ export type RoomCardProps = {
   /** Mono footer facts — year, count, jurisdiction. Rendered as written. */
   readonly meta?: string;
   /**
-   * Right-hand tag, for the `rows` layout only: what sort of room this is ("Long form",
-   * "Reference", "Receipt"). Distinct from `kind`, which the Ink spec stopped printing per-card
-   * in the grid — a row has a column free for it and a grid card does not.
+   * Right-hand tag on an index row: what sort of room this is ("Long form",
+   * "Reference", "Receipt"). Distinct from `kind`, which stopped printing per-card because a
+   * three-up card had no room for it: a full-width row does, on the far side of the title.
    */
   readonly tag?: string;
   /** Hero image, above the title. */
@@ -92,8 +96,6 @@ export function RoomCard({
   media,
   className,
 }: RoomCardProps) {
-  // Kept on the prop surface for the twelve existing callers; no longer rendered — kind is
-  // implied by the group a card sits in, not printed per-card (Ink spec §2/§3).
   void kind;
   return (
     <Link className={cx('ds-room-card', media && 'ds-room-card--media', className)} href={href}>

@@ -121,9 +121,11 @@ export default async function LibraryPage() {
       {LIBRARY_CARD_GROUPS.map((group) => (
         <React.Fragment key={group}>
           <GroupHeading>{GROUP_HEADINGS[group]}</GroupHeading>
-          {/* Rows, not the three-up grid: five destinations across three columns read as a card
-              wall, and the reader is choosing a room, not scanning a catalogue of like things. */}
-          <CardGrid layout="rows">
+          {/* The index shape, not the hub's three columns: five destinations across three
+              columns read as a card wall, and the reader here is choosing a room rather than
+              scanning a catalogue of like things. One column of five reads as a table of
+              contents, which is what a hub is. */}
+          <CardGrid>
             {destinationsInGroup(group).map((destination) => (
               <RoomCard
                 key={destination.path}

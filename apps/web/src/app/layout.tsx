@@ -161,7 +161,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${displayFace.variable} ${sans.variable} ${editorial.variable} ${mono.variable}`}
     >
       <head>
-        {/* Blocking theme apply before paint — matches ThemeToggle storage + prefers-color-scheme. */}
+        {/* Blocking theme apply before paint — matches ThemeToggle's own read: storage, else dark. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
       </head>
       <body>

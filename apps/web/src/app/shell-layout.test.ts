@@ -179,9 +179,9 @@ describe('horizontal overflow guards', () => {
 });
 
 describe('shell footer theme tokens', () => {
-  // Ink spec §3 (SiteFooter): the bordered Surface-card frame comes off — the footer sits
-  // directly on the ground above a hairline, not inside a themed panel box.
-  it('styles the footer on the page ground, above a hairline, not inside a Surface card', () => {
+  // Ink direction: the Surface card frame comes off the footer — it sits directly on the page
+  // ground above a hairline, the same move RoomCard makes (see room-kit.css).
+  it('styles the footer as a theme-aware ground with a top hairline, not a Surface card', () => {
     assert.doesNotMatch(shellCss, /\.ds-shell-footer__card\s*\{[^}]*background:/s);
     assert.match(shellCss, /\.ds-shell-footer__card\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
     assert.match(

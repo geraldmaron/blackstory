@@ -95,6 +95,195 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* —— Shelves: the /stories default browse state ——————————————————————————
+   Lead story, then one shelf per collection, then the "Everything else" hairline list (the
+   list itself reuses CardGrid/RoomCard's index shape from the kit — no new CSS needed there).
+   Ink direction, README §2. */
+.ds-stories-lead {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: var(--ds-space-8);
+  align-items: center;
+  margin: var(--ds-space-6) 0 var(--ds-space-12);
+}
+
+.ds-stories-lead__meta {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-stories-lead__title {
+  margin: var(--ds-space-3) 0 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(34px, 5vw, 68px);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.ds-stories-lead__title a {
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-stories-lead__title a:hover {
+  color: var(--ds-accent);
+}
+
+.ds-stories-lead__summary {
+  margin: var(--ds-space-4) 0 0;
+  max-width: 44em;
+  font-family: var(--ds-font-editorial);
+  font-size: 21px;
+  line-height: 1.5;
+  color: var(--room-ink-2, var(--ds-ink-muted));
+}
+
+.ds-stories-lead__copy .ds-cta {
+  margin-top: var(--ds-space-6);
+}
+
+.ds-stories-lead__plate {
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--ds-surface-raised);
+  border-radius: var(--ds-radius-md);
+}
+
+.ds-stories-lead__plate img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+@media (max-width: 56rem) {
+  .ds-stories-lead {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ds-stories-shelf {
+  margin-top: var(--ds-space-12);
+}
+
+.ds-stories-shelf__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
+  padding-bottom: var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-stories-shelf__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: 28px;
+  letter-spacing: -0.025em;
+  color: var(--ds-ink);
+}
+
+.ds-stories-shelf__title .ds-room-num {
+  margin-left: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ds-ink-muted);
+}
+
+.ds-stories-shelf__all {
+  flex: none;
+  color: var(--ds-accent);
+  font-family: var(--ds-font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.ds-stories-shelf__all:hover {
+  text-decoration: underline;
+}
+
+.ds-stories-shelf__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: var(--ds-space-5);
+}
+
+.ds-stories-shelf__entry {
+  display: flex;
+  flex-direction: column;
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-stories-shelf__plate {
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--ds-surface-raised);
+  border-radius: var(--ds-radius-md);
+}
+
+.ds-stories-shelf__plate img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.ds-stories-shelf__index {
+  margin-top: var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--ds-ink-muted);
+}
+
+.ds-stories-shelf__entry-title {
+  margin-top: 6px;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.ds-stories-shelf__entry:hover .ds-stories-shelf__entry-title {
+  color: var(--ds-accent);
+}
+
+.ds-stories-shelf__entry-summary {
+  margin-top: 4px;
+  font-family: var(--ds-font-editorial);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+@media (max-width: 56rem) {
+  .ds-stories-shelf__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 30rem) {
+  .ds-stories-shelf__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 33rem) {
   .ds-stories-form {
     align-items: stretch;
@@ -106,22 +295,6 @@
 
   .ds-stories-submit {
     flex: 1 1 auto;
-  }
-}
-
-/* —— Lead story — full width, copy left, hero right —— */
-.ds-stories-lead {
-  display: grid;
-  gap: var(--ds-space-8);
-  margin-block: var(--ds-space-6) var(--ds-space-10);
-  padding-bottom: var(--ds-space-8);
-  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
-}
-
-@media (min-width: 56rem) {
-  .ds-stories-lead {
-    grid-template-columns: 1.15fr 1fr;
-    align-items: center;
   }
 }
 
@@ -139,233 +312,3 @@
   font-weight: 500;
 }
 
-.ds-stories-lead__meta {
-  margin: 0;
-  color: var(--ds-accent);
-  font-family: var(--ds-font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.ds-stories-lead__title {
-  margin: var(--ds-space-3) 0 0;
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: clamp(34px, 5vw, 60px);
-  line-height: 1;
-  letter-spacing: -0.04em;
-}
-
-.ds-stories-lead__title a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.ds-stories-lead__title a:hover {
-  color: var(--ds-accent);
-}
-
-.ds-stories-lead__summary {
-  margin: var(--ds-space-4) 0 0;
-  max-width: 46em;
-  font-family: var(--ds-font-editorial);
-  font-size: 18px;
-  line-height: 1.55;
-  color: var(--room-ink-2);
-}
-
-.ds-stories-lead .ds-cta-link {
-  margin-top: var(--ds-space-5);
-}
-
-.ds-stories-lead__media {
-  display: block;
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-surface-raised);
-}
-
-.ds-stories-lead__media img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-}
-
-/* —— Collection shelves —— */
-.ds-stories-shelf {
-  margin-top: var(--ds-space-10);
-}
-
-.ds-stories-shelf__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--ds-space-4);
-  padding-bottom: var(--ds-space-3);
-  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
-}
-
-.ds-stories-shelf__title {
-  margin: 0;
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: 28px;
-  letter-spacing: -0.025em;
-}
-
-.ds-stories-shelf__title .ds-room-num {
-  margin-left: var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: 14px;
-  color: var(--room-ink-4);
-}
-
-.ds-stories-shelf__seeall {
-  flex: none;
-  color: var(--ds-accent);
-  font-family: var(--ds-font-sans);
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.ds-stories-shelf__seeall:hover {
-  color: var(--ds-ink);
-}
-
-.ds-stories-shelf__grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--ds-space-6) 24px;
-  margin-top: var(--ds-space-5);
-}
-
-@media (min-width: 56rem) {
-  .ds-stories-shelf__grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-.ds-stories-shelf__item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  color: var(--ds-ink);
-  text-decoration: none;
-}
-
-.ds-stories-shelf__plate {
-  display: block;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-surface-raised);
-}
-
-.ds-stories-shelf__plate img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-}
-
-.ds-stories-shelf__plate img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-}
-
-.ds-stories-shelf__index {
-  margin-top: 4px;
-  font-family: var(--ds-font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.04em;
-  color: var(--room-ink-4);
-}
-
-.ds-stories-shelf__item-title {
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: 20px;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-
-.ds-stories-shelf__item:hover .ds-stories-shelf__item-title {
-  color: var(--ds-accent);
-}
-
-.ds-stories-shelf__item-desc {
-  font-family: var(--ds-font-editorial);
-  font-size: 15px;
-  line-height: 1.45;
-  color: var(--room-ink-3);
-}
-
-/* —— Everything else — the uncollected remainder, on panel ground —— */
-.ds-stories-rest {
-  margin-top: var(--ds-space-12);
-  padding: var(--ds-space-6);
-  background: var(--room-note-wash);
-  border-radius: var(--ds-radius-md);
-}
-
-.ds-stories-rest__list {
-  display: flex;
-  flex-direction: column;
-  margin-top: var(--ds-space-4);
-}
-
-.ds-stories-rest__row {
-  display: grid;
-  grid-template-columns: 1.3fr 2fr auto;
-  gap: var(--ds-space-4);
-  align-items: baseline;
-  padding: var(--ds-space-3) 0;
-  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
-  color: var(--ds-ink);
-  text-decoration: none;
-}
-
-.ds-stories-rest__row:last-child {
-  border-bottom: 0;
-}
-
-.ds-stories-rest__row:hover {
-  color: var(--ds-accent);
-}
-
-.ds-stories-rest__title {
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: 15.5px;
-  letter-spacing: -0.015em;
-}
-
-.ds-stories-rest__summary {
-  font-family: var(--ds-font-editorial);
-  font-size: 14px;
-  line-height: 1.4;
-  color: var(--room-ink-3);
-}
-
-.ds-stories-rest__meta {
-  font-family: var(--ds-font-mono);
-  font-size: 10.5px;
-  color: var(--room-ink-4);
-  white-space: nowrap;
-}
-
-@media (max-width: 40rem) {
-  .ds-stories-rest__row {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-}

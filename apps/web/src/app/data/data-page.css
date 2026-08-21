@@ -1,0 +1,135 @@
+/**
+ * `/data` layout — the wrapper/scaffolding classes DataSections.tsx renders around kit
+ * components (GroupHeading, UtilityCard, Note, Disclosure, DataTable) that already carry their
+ * own styling from room-kit.css. This file owns only what those components don't: panel framing
+ * per the Ink "chart frames follow the panel recipe" direction, the beat grid, the on-page nav,
+ * and the couple of plain-text lines (credit, empty state) — none of which had any CSS at all
+ * before this file existed.
+ *
+ * Named data-page.css, not data-edition.css: room-kit.test.tsx's structural guard forbids new
+ * `*-edition.css` files under `app/`. This sheet happens to style classes an earlier pass named
+ * `ds-data-edition__*`; renaming all seventeen JSX class references was out of scope for
+ * supplying the CSS that was missing for every one of them.
+ */
+
+.ds-data-edition__stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-10);
+}
+
+/* Chart frames follow the panel recipe: panel ground, one hairline, radius-md. */
+.ds-data-edition__panel {
+  padding: var(--ds-space-6);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+}
+
+.ds-data-edition__viz {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-5);
+  margin-block: var(--ds-space-4);
+}
+
+/* Same 1px-gap-as-hairline technique as the kit's TrustBlock/Anatomy and the article stat
+   rail: the gap is the rule color showing through between cells. */
+.ds-data-edition__beat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1px;
+  margin: var(--ds-space-6) 0 0;
+  padding: 0;
+  list-style: none;
+  background: var(--ds-rule);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  overflow: hidden;
+}
+
+.ds-data-edition__beat {
+  padding: var(--ds-space-3) var(--ds-space-4);
+  background: var(--ds-surface-raised);
+}
+
+.ds-data-edition__beat-kicker {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-data-edition__beat-body {
+  margin: 4px 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.ds-data-edition__nav {
+  margin-top: var(--ds-space-6);
+  padding-top: var(--ds-space-5);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-data-edition__nav-title {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-data-edition__nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-data-edition__nav-link {
+  font-family: var(--ds-font-sans);
+  font-size: 13.5px;
+  color: var(--ds-accent);
+  text-decoration: none;
+}
+
+.ds-data-edition__nav-link:hover {
+  text-decoration: underline;
+}
+
+.ds-data-edition__credit {
+  margin: var(--ds-space-5) 0 0;
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
+  color: var(--ds-ink-muted);
+}
+
+.ds-data-edition__credit a {
+  color: var(--ds-accent);
+}
+
+.ds-data-edition__empty {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.ds-data-edition__empty a {
+  color: var(--ds-accent);
+}
+
+@media (max-width: 30rem) {
+  .ds-data-edition__beat-grid {
+    grid-template-columns: 1fr;
+  }
+}

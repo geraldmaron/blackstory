@@ -260,9 +260,11 @@
   color: var(--ds-ink);
 }
 
+/* Ink direction: the active mode is copper on ink, not a surface swap with a shadow — the
+   accent does the one piece of work it should be doing in this composition. */
 .ds-bar__modes button[aria-current='true'] {
   background: var(--ds-accent-graphic);
-  color: var(--ds-inverse-ink);
+  color: var(--ds-fixed-ink);
   box-shadow: none;
 }
 

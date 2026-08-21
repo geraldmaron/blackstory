@@ -1,7 +1,7 @@
 /**
  * RoomHeader — the one header every room in every surface class renders, and the only one.
  *
- * Breadcrumb chain, mono kicker, display title, serif lede, meta row of mono facts. Twelve
+ * Breadcrumb chain, sentence-case kicker, display title, serif lede, meta row of mono facts. Twelve
  * `*-panel-chrome.ts` modules existed because each route drew this itself; the parity gate
  * (repo-92n2.31) asserts no room renders a second header.
  */
@@ -18,7 +18,11 @@ export type RoomHeaderProps = {
   readonly pathname: string;
   /** Final breadcrumb step. Defaults to the registry label for `pathname`. */
   readonly crumbLabel?: string;
-  /** Mono caps register above the title — the room's kind, not a restatement of the title. */
+  /**
+   * Mono caps register above the title — the room's kind, not a restatement of the title.
+   * Ink direction: no longer rendered (the title takes the space instead); kept on the type
+   * so the twelve existing callers do not have to change in the same commit.
+   */
   readonly kicker?: string;
   /** The display title. `<em>` inside renders in the editorial italic accent. */
   readonly title: ReactNode;

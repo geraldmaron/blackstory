@@ -134,9 +134,18 @@
 }
 
 .ds-room-rail-group__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.ds-room-rail-group__glyph {
+  flex: none;
+  display: inline-flex;
+  color: var(--room-ink-4);
 }
 
 .ds-room-rail-group__more {
@@ -179,6 +188,9 @@
 .ds-room-conns {
   list-style: none;
   padding-left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .ds-room-crumb__link {
@@ -269,10 +281,11 @@
   letter-spacing: 0.04em;
 }
 
-/* —— GroupHeading: quieter than an h2 rule ————————————————————————————————— */
-/* A section of a hub or a catalogue. Display face at 24px, ruled off underneath: it has to
-   hold its own above a column of 19px destination titles, which a 13px sans label did not —
-   the group read as a caption on the first row rather than as a heading over all five. */
+/* —— GroupHeading: a section title, not a mono-caps label ——————————————————
+   Mono is for data, and a group name is not data. Display face at 24px, ruled off underneath:
+   it has to hold its own above a column of 19px destination titles, which a 13px sans label did
+   not (the group read as a caption on the first row rather than as a heading over all five),
+   without competing with the room title above it. */
 .ds-room .ds-room-grouphd {
   margin-top: var(--ds-space-10);
   padding-bottom: var(--ds-space-3);
@@ -289,14 +302,37 @@
   margin-top: 0;
 }
 
-/* —— CardGrid / RoomCard ——————————————————————————————————————————————————— */
-/* Three-up typographic index, not a card grid: entries are rows separated by a hairline
-   (.ds-room-card carries its own border-bottom), so the gap here only spaces the columns. */
+/* —— CardGrid / RoomCard ———————————————————————————————————————————————————
+   Ink direction: a card is no longer a box. The border, background, radius and hover lift all
+   come off; a RoomCard becomes a row separated from the next by a single bottom hairline
+   (the `index` shape — every CardGrid caller but one) or a column entry in a three-fixed-
+   column grid (the `hub` shape — `/library`, the one surface the registry actually calls a
+   hub). Kind used to be a tag drawn on the card; now it is implied by the group the card sits
+   in, so `RoomCard`'s `kind` prop stops rendering — see RoomCards.tsx. */
 .ds-room-cards {
-  display: grid;
-  grid-template-columns: 1fr;
-  column-gap: var(--ds-space-8);
+  display: flex;
+  flex-direction: column;
   margin-block: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-room-cards--hub {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: var(--ds-space-8);
+  border-top: 0;
+}
+
+@media (max-width: 56rem) {
+  .ds-room-cards--hub {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 34rem) {
+  .ds-room-cards--hub {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (min-width: 56rem) {
@@ -306,69 +342,35 @@
 }
 
 .ds-room-card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding-block: var(--ds-space-5);
+  display: grid;
+  grid-template-columns: 1.3fr 2fr auto;
+  align-items: baseline;
+  column-gap: var(--ds-space-4);
+  padding-block: 22px;
   text-align: left;
   background: none;
   border: 0;
-  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
   border-radius: 0;
   font-family: var(--ds-font-sans);
   color: var(--ds-ink);
-  transition: background var(--ds-duration-fast) var(--ds-easing);
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
 }
 
+.ds-room-cards--hub .ds-room-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+  padding-block: var(--ds-space-5);
+}
+
+/* Rows and index entries take a copper wash on hover; cards no longer lift. */
 .ds-room-card:hover {
   background: var(--room-copper-wash);
 }
 
-/* —— CardGrid rows ————————————————————————————————————————————————————————
-   A hub, not a catalogue: one column, each destination on its own hairline, with the room's
-   kind held out in a right-hand column. The title takes the display face at a size that reads
-   as a destination rather than a card heading. */
-.ds-room-cards--rows {
-  grid-template-columns: 1fr;
-  margin-block: 0;
-}
-
-@media (min-width: 56rem) {
-  .ds-room-cards--rows {
-    grid-template-columns: 1fr;
-  }
-}
-
-.ds-room-cards--rows .ds-room-card {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: baseline;
-  column-gap: var(--ds-space-4);
-  row-gap: var(--ds-space-1);
-  padding-block: var(--ds-space-4);
-}
-
-.ds-room .ds-room-cards--rows .ds-room-card__title {
-  grid-column: 1;
-  font-size: 19px;
-  letter-spacing: -0.02em;
-}
-
-.ds-room-cards--rows .ds-room-card__desc {
-  grid-column: 1;
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.45;
-}
-
-.ds-room-cards--rows .ds-room-card__tag {
-  grid-column: 2;
-  grid-row: 1;
-  font-family: var(--ds-font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.06em;
-  color: var(--room-ink-3);
-  white-space: nowrap;
+.ds-room-cards--hub .ds-room-card__media {
+  margin-bottom: var(--ds-space-1);
 }
 
 .ds-room-card__media {
@@ -378,8 +380,10 @@
   /* The fixed aspect ratio keeps a grid of mixed-aspect heroes on one baseline; without it a
      portrait hero (a redlining map is 3:4) overflows its slot. */
   overflow: hidden;
-  border-radius: var(--ds-radius-md);
+  /* Media wells keep the raised value the token table reserves for them, now that a plain
+     card ground no longer needs it. */
   background: var(--ds-surface-raised);
+  border-radius: var(--ds-radius-md);
 }
 
 .ds-room-card__media img {
@@ -407,7 +411,7 @@
   font-weight: 600;
   font-size: 24px;
   letter-spacing: -0.03em;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 
 .ds-room-card__desc {
@@ -417,14 +421,44 @@
   color: var(--room-ink-3);
 }
 
-.ds-room-card__meta {
-  margin-top: auto;
-  padding-top: var(--ds-space-3);
-  border-top: var(--ds-border-width) solid var(--room-rule-2);
+.ds-room-card__meta,
+.ds-room-card__tag {
   font-family: var(--ds-font-mono);
-  font-size: 9.5px;
+  font-size: 10px;
   letter-spacing: 0.06em;
   color: var(--room-ink-4);
+  white-space: nowrap;
+}
+
+/*
+ * The tag takes the row's third column, where an index entry carries its mono facts. A hub row
+ * has no year or count to print there; what it has is the sort of room it is ("Long form",
+ * "Reference", "Receipt"), which is the one thing a reader choosing between eleven rooms is
+ * actually comparing.
+ */
+.ds-room-cards:not(.ds-room-cards--hub) .ds-room-card__tag {
+  grid-column: 3;
+  color: var(--room-ink-3);
+  font-size: 10.5px;
+}
+
+.ds-room-cards--hub .ds-room-card__meta {
+  margin-top: auto;
+  padding-top: var(--ds-space-2);
+  white-space: normal;
+}
+
+@media (max-width: 40rem) {
+  .ds-room-cards:not(.ds-room-cards--hub) .ds-room-card {
+    grid-template-columns: 1fr;
+    row-gap: 4px;
+  }
+
+  .ds-room-cards:not(.ds-room-cards--hub) .ds-room-card__meta,
+  .ds-room-cards:not(.ds-room-cards--hub) .ds-room-card__tag {
+    grid-column: 1;
+    white-space: normal;
+  }
 }
 
 /* —— Prose ————————————————————————————————————————————————————————————————— */
@@ -571,12 +605,6 @@
 }
 
 /* —— Connections: the relation stated in words, never a bare arrow ————————— */
-.ds-room-conns {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
 .ds-room-conn {
   display: flex;
   align-items: baseline;
@@ -790,8 +818,9 @@ a.ds-room-chip {
   cursor: pointer;
 }
 
+/* Rows and index entries take a copper wash on hover — same invariant as RoomCard. */
 .ds-room-idx__row:hover {
-  background: var(--room-sunk);
+  background: var(--room-copper-wash);
 }
 
 .ds-room-idx__row:hover .ds-room-idx__glyph {

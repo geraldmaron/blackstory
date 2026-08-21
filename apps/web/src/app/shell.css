@@ -110,6 +110,8 @@
   scroll-margin-top: var(--ds-island-clearance);
 }
 
+/* Ink direction: the footer sits directly on the page ground above a hairline — the Surface
+   card frame comes off sitewide, not just here (see RoomCard for the same move). */
 .ds-shell-footer__card {
   width: min(100%, var(--ds-grid-max));
   margin-inline: auto;
@@ -157,7 +159,7 @@
   margin: 0 0 var(--ds-space-3);
   color: var(--ds-accent);
   font-family: var(--ds-font-mono);
-  font-size: 0.65625rem;
+  font-size: 10.5px;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -575,7 +577,9 @@
   border-radius: var(--ds-radius-full);
   border: var(--ds-border-width) solid transparent;
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  /* Ink direction: a button is a label, not a signpost — drop the caps and tracking that made
+     every action on the site read as mono-adjacent shouting. */
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: normal;
   text-transform: none;

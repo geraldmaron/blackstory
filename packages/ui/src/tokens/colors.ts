@@ -69,6 +69,8 @@ export const lightTheme: ThemePalette = {
 };
 
 export const darkTheme: ThemePalette = {
+  // "Ink" direction: warmer than brandPalette.blackInk/charcoal by design, so these are
+  // theme-specific overrides rather than brand swatches — see tokens.css [data-theme='dark'].
   canvas: '#131110',
   surface: '#1B1917',
   surfaceRaised: '#232019',

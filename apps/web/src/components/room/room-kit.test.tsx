@@ -189,9 +189,9 @@ describe('room kit · RoomHeader is the only header a room renders', () => {
     );
 
     assert.match(html, /ds-room-crumb/);
-    // The kicker renders again, above the title and in sentence case. The Ink spec had muted it
-    // because the v6 register was mono-caps, which shouted over the title; the register changed,
-    // so the line came back rather than the prop staying dead on twelve callers.
+    // The kicker renders again, above the title and in sentence case. It was muted while the
+    // register was mono-caps, which shouted over the title; the register changed, so the line
+    // came back rather than the prop staying dead on twelve callers.
     assert.match(html, /<p class="ds-room-header__kicker">Catalogue<\/p>/);
     assert.match(html, /<h1 class="ds-room-header__title">Banned books<\/h1>/);
     assert.match(html, /ds-room-header__lede/);
@@ -224,7 +224,7 @@ describe('room kit · RoomHeader is the only header a room renders', () => {
 });
 
 describe('room kit · catalogue blocks', () => {
-  it('a RoomCard is a link, so a catalogue entry is a destination', () => {
+  it('a RoomCard is a link, so a catalogue entry is a destination; kind no longer renders as a tag', () => {
     const html = renderToStaticMarkup(
       <CardGrid>
         <RoomCard
@@ -237,10 +237,19 @@ describe('room kit · catalogue blocks', () => {
       </CardGrid>,
     );
     assert.match(html, /<a[^>]+class="ds-room-card"[^>]+href="\/law\/hr-40"/);
-    // Ink spec §2/§3: kind is implied by the group a card sits in, not printed per-card. The
-    // `kind` prop stays on RoomCardProps so existing callers need not change.
+    // Ink direction: kind is implied by the group a card sits in, not drawn as its own tag —
+    // the `kind` prop is kept on the type so existing callers do not have to change.
     assert.doesNotMatch(html, /ds-room-card__kind/);
     assert.match(html, /ds-room-card__meta[^>]*>Federal · 1989/);
+  });
+
+  it('CardGrid defaults to the index shape and opts into the hub shape', () => {
+    const index = renderToStaticMarkup(<CardGrid>{null}</CardGrid>);
+    assert.match(index, /class="ds-room-cards"/);
+    assert.doesNotMatch(index, /ds-room-cards--hub/);
+
+    const hub = renderToStaticMarkup(<CardGrid variant="hub">{null}</CardGrid>);
+    assert.match(hub, /class="ds-room-cards ds-room-cards--hub"/);
   });
 
   it('a GroupHeading is an h2, so the room has a real outline', () => {

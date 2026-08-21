@@ -63,7 +63,13 @@ export function BooksAnatomyStrip({
           ),
         },
         ...(isbn
-          ? [{ label: 'ISBN', icon: <EditionFactIcon variant="entry" step="source" />, value: <span className="ds-mono">{isbn}</span> }]
+          ? [
+              {
+                label: 'ISBN',
+                icon: <EditionFactIcon variant="entry" step="source" />,
+                value: <span className="ds-mono">{isbn}</span>,
+              },
+            ]
           : []),
       ]}
     />

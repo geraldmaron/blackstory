@@ -59,7 +59,9 @@ export function LawAnatomyStrip({
         },
         {
           label: 'Status',
-          icon: <EditionFactIcon variant="record-evidence" tier={evidenceTierForStatus(lawStatus)} />,
+          icon: (
+            <EditionFactIcon variant="record-evidence" tier={evidenceTierForStatus(lawStatus)} />
+          ),
           value: <LegalStatusBadge status={lawStatus} />,
         },
         {

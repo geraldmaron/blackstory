@@ -78,6 +78,15 @@
 [data-theme='dark'] {
   color-scheme: dark;
 
+  /*
+   * "Ink" direction (repo design handoff, 2026-08-20): the ground moves one step warmer so a
+   * panel can sit above it without a border doing all the work, and the panel/media split
+   * collapses to one surface value — --ds-surface-raised is reserved for media wells and hero
+   * plates now that RoomCard no longer has a box. --ds-radius-md drops to 14px for this theme
+   * only (panels and media only; cards and rows have no radius because they have no box) —
+   * scoped here rather than in the shared :root block below so the light theme, which this
+   * direction does not touch, keeps its 16px panel radius.
+   */
   --ds-canvas: #131110;
   --ds-surface: #1b1917;
   --ds-surface-raised: #232019;
@@ -87,6 +96,7 @@
   --ds-border: #2c2823;
   --ds-rule: #2c2823;
   --ds-border-strong: #f4efe5;
+  --ds-radius-md: 14px;
   --ds-focus-ring: #f4efe5;
   --ds-focus-ring-offset: #0a0a0a;
   --ds-inverse: #f4efe5;

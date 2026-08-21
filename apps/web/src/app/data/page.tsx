@@ -19,6 +19,7 @@ import {
 import { getDataPageIndicatorBundle } from '../../lib/demographics/data-page-indicators';
 import { timelineChangeStripItems } from '../../components/data/population-change';
 import '../../components/data/data-charts.css';
+import './data-page.css';
 import { DATA_INTRO, DATA_PAGE_DESCRIPTION } from './data-copy';
 import { DataSections } from './DataSections';
 import { OffRamp, Room, RoomHeader } from '../../components/room';

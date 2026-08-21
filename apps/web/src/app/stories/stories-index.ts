@@ -348,6 +348,17 @@ export function uncollectedItems(
   return items.filter((item) => !item.series);
 }
 
+/**
+ * The one chapter that leads the shelves page at full width: the most recently published
+ * chapter in view. Deterministic and reads from data already on hand — no new field, no
+ * editorial "featured" flag to maintain.
+ */
+export function pickLeadStory(
+  items: readonly PublicArticleListItemDoc[],
+): PublicArticleListItemDoc | undefined {
+  return sortItems(items, 'newest')[0];
+}
+
 export function buildTagGroups(items: readonly PublicArticleListItemDoc[]): readonly RailEntry[] {
   const counts = new Map<string, number>();
   for (const item of items) {
@@ -399,6 +410,16 @@ export const STORY_SORT_LABELS: Record<StorySortKey, string> = {
   oldest: 'Oldest first',
   title: 'Title A–Z',
 };
+
+/**
+ * True in the page's default, unnarrowed browse state — the one state the shelves layout
+ * renders in. Any active filter/search or a non-default sort drops back to the flat, paginated
+ * index: shelves have their own count order and per-collection position order, and showing them
+ * while a reader's `sort` choice sits unapplied would be dishonest about what changed.
+ */
+export function showsShelves(query: StoriesQuery): boolean {
+  return !hasActiveNarrowing(query) && query.sort === 'series';
+}
 
 /** True when any narrowing control is engaged — drives the "clear" affordance. */
 export function hasActiveNarrowing(query: StoriesQuery): boolean {

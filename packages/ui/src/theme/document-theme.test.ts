@@ -36,15 +36,15 @@ function withFakeDom<T>(initialTheme: string | undefined, run: () => T): T {
 }
 
 describe('resolvePreferredTheme', () => {
-  it('prefers stored light or dark over system', () => {
-    assert.equal(resolvePreferredTheme('dark', false), 'dark');
-    assert.equal(resolvePreferredTheme('light', true), 'light');
+  it('respects an explicit stored choice, either way', () => {
+    assert.equal(resolvePreferredTheme('dark'), 'dark');
+    assert.equal(resolvePreferredTheme('light'), 'light');
   });
 
-  it('falls back to prefers-color-scheme when storage is empty', () => {
-    assert.equal(resolvePreferredTheme(null, true), 'dark');
-    assert.equal(resolvePreferredTheme(undefined, false), 'light');
-    assert.equal(resolvePreferredTheme('garbage', true), 'dark');
+  it('falls back to dark — the Ink default — when storage has no explicit choice', () => {
+    assert.equal(resolvePreferredTheme(null), 'dark');
+    assert.equal(resolvePreferredTheme(undefined), 'dark');
+    assert.equal(resolvePreferredTheme('garbage'), 'dark');
   });
 });
 
@@ -75,7 +75,14 @@ describe('THEME_BOOTSTRAP_SCRIPT', () => {
   it('embeds the storage key and sets data-theme', () => {
     assert.match(THEME_BOOTSTRAP_SCRIPT, new RegExp(THEME_STORAGE_KEY));
     assert.match(THEME_BOOTSTRAP_SCRIPT, /setAttribute\('data-theme'/);
-    assert.match(THEME_BOOTSTRAP_SCRIPT, /prefers-color-scheme:\s*dark/);
+  });
+
+  it('defaults to dark — not prefers-color-scheme — when storage has no explicit choice', () => {
+    // Ink direction: the light theme is unchanged, so following system preference here would
+    // show a first-time reader on a light-mode system the old design with no visible redesign.
+    assert.doesNotMatch(THEME_BOOTSTRAP_SCRIPT, /prefers-color-scheme/);
+    assert.match(THEME_BOOTSTRAP_SCRIPT, /:'dark'/);
+    assert.match(THEME_BOOTSTRAP_SCRIPT, /setAttribute\('data-theme','dark'\)/);
   });
 });
 

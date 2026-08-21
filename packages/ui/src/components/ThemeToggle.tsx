@@ -1,6 +1,6 @@
 /**
  * Light/dark theme toggle that sets `data-theme` on the document element.
- * Initial value matches the head bootstrap script (storage → prefers-color-scheme).
+ * Initial value matches the head bootstrap script (storage, else dark).
  */
 
 'use client';
@@ -15,16 +15,13 @@ import { cx } from '../utils/cx.js';
 
 function readPreferredTheme(): ThemeName {
   if (typeof window === 'undefined') {
-    return 'light';
+    return 'dark';
   }
   const fromDom = document.documentElement.dataset.theme;
   if (fromDom === 'light' || fromDom === 'dark') {
     return fromDom;
   }
-  return resolvePreferredTheme(
-    window.localStorage.getItem(THEME_STORAGE_KEY),
-    window.matchMedia('(prefers-color-scheme: dark)').matches,
-  );
+  return resolvePreferredTheme(window.localStorage.getItem(THEME_STORAGE_KEY));
 }
 
 export type ThemeToggleProps = {
@@ -32,7 +29,7 @@ export type ThemeToggleProps = {
 };
 
 export function ThemeToggle({ className }: ThemeToggleProps) {
-  const [theme, setTheme] = useState<ThemeName>('light');
+  const [theme, setTheme] = useState<ThemeName>('dark');
 
   useEffect(() => {
     const initial = readPreferredTheme();

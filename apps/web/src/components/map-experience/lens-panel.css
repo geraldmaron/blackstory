@@ -15,8 +15,9 @@
   grid-template-rows: auto minmax(0, 1fr);
   width: 300px;
   max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom));
+  /* One panel recipe shared by all four Atlas instruments: panel ground at 94% opacity so the
+     live plate reads through at the edges, one hairline, radius-md (14px on the Ink theme). */
   background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
-  backdrop-filter: blur(8px);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
   box-shadow: 0 10px 30px -18px rgb(0 0 0 / 45%);
@@ -36,7 +37,7 @@
 .ds-lens__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1.1875rem;
+  font-size: 1.1875rem; /* 19px — the shared Atlas instrument title size */
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--ds-ink);
@@ -103,9 +104,10 @@
   gap: var(--ds-space-2);
 }
 
+/* Ink direction: mono is for data, and a group name is not data. */
 .ds-lens__group-label {
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 600;
   letter-spacing: normal;
   text-transform: none;

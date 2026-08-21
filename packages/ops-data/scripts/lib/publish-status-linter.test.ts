@@ -79,7 +79,8 @@ test('place with dated closure and active status warns place_self_demise_vs_acti
   const report = lintPublishStatus({
     entityId: 'ent-place-closed',
     kind: 'place',
-    summary: 'The nightclub anchored the neighborhood for decades. It closed in 1968 following the assassination of Dr. King.',
+    summary:
+      'The nightclub anchored the neighborhood for decades. It closed in 1968 following the assassination of Dr. King.',
     status: 'active',
   });
   assert.equal(report.hasWarnings, true);
@@ -103,5 +104,8 @@ test('law kind never triggers the place self-demise warning', () => {
     summary: 'The statute closed in 1900... (nonsensical for a law, must not match the place gate)',
     status: 'active',
   });
-  assert.equal(report.findings.some((f) => f.code === 'place_self_demise_vs_active'), false);
+  assert.equal(
+    report.findings.some((f) => f.code === 'place_self_demise_vs_active'),
+    false,
+  );
 });
