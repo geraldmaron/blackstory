@@ -75,7 +75,7 @@
 
 .ds-atlas__notice {
   position: fixed;
-  top: calc(56px + var(--ds-space-4));
+  top: var(--ds-atlas-top);
   left: 50%;
   z-index: var(--ds-z-atlas-search);
   transform: translateX(-50%);
@@ -102,13 +102,18 @@
   );
 }
 
-/* Camera readout, above the time panel. Transient, `role="status"`. §5.7. */
+/*
+ * Camera readout, bottom-left. Transient, `role="status"`. §5.7.
+ *
+ * It used to sit centred above the time panel, which is dead centre of the plate — the one place
+ * a reader is looking. It is plate metadata, so it joins the plate's own metadata corner: stacked
+ * above the dock chips and the attribution, all three on the same left gutter.
+ */
 .ds-atlas__readout {
   position: fixed;
-  left: 50%;
-  bottom: calc(var(--ds-space-4) + 132px);
+  left: var(--ds-space-4);
+  bottom: calc(var(--ds-space-4) + 86px);
   z-index: var(--ds-z-atlas-pill);
-  transform: translateX(-50%);
   margin: 0;
   padding: 5px 11px;
   border-radius: var(--ds-radius-full);
@@ -165,15 +170,49 @@
   border-color: var(--ds-border-strong);
 }
 
+/*
+ * The narrow layout's four-way switcher. Not a row of loose chips but one bar holding four
+ * segments, because here the dock is not "restore what you hid" — it is the only control that
+ * says which instrument the reader is currently holding, so it has to read as a set with one
+ * member selected.
+ */
+.ds-atlas__dock[data-switcher] {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  padding: 4px;
+  background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
+  backdrop-filter: blur(8px);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+}
+
+.ds-atlas__dock[data-switcher] button {
+  min-width: 0;
+  padding: 0 var(--ds-space-2);
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ds-ink-muted);
+}
+
+.ds-atlas__dock[data-switcher] button[aria-pressed='true'] {
+  background: var(--ds-accent);
+  color: var(--ds-canvas);
+  font-weight: 500;
+}
+
 @media (max-width: 819px) {
   .ds-atlas__readout {
-    bottom: calc(var(--ds-space-2) + 200px);
+    left: var(--ds-space-2);
+    bottom: calc(var(--ds-space-2) + 96px);
   }
 
-  /* Above the full-bleed time panel, which is taller at narrow because its header stacks. */
+  /* The dock is the narrow layout's instrument switcher, so it takes the bottom edge itself. */
   .ds-atlas__dock {
     left: var(--ds-space-2);
-    bottom: calc(var(--ds-space-2) + 200px);
+    right: var(--ds-space-2);
+    bottom: var(--ds-space-2);
   }
 }
 
@@ -192,7 +231,7 @@
 .ds-atlas__legend-overlay {
   position: fixed;
   right: var(--ds-space-4);
-  top: calc(56px + var(--ds-space-4));
+  top: var(--ds-atlas-top);
   bottom: var(--ds-space-4);
   z-index: var(--ds-z-modal-sheet);
   width: min(360px, calc(100vw - var(--ds-space-4) * 2));
@@ -220,8 +259,7 @@
  * while leaving functional transitions (panel show/hide, the spotlight mask) intact — the same
  * split `prefers-reduced-motion` already draws, just reader-chosen instead of OS-chosen.
  */
-:root[data-density='compact'] .ds-lens,
-:root[data-density='compact'] .ds-results {
+:root[data-density='compact'] .ds-lens {
   width: 276px;
 }
 

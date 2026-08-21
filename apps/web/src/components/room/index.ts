@@ -49,10 +49,13 @@ export { DataTable, type DataTableProps, type DataTableColumn } from './DataTabl
 export {
   Disclosure,
   Field,
+  ChoiceField,
   UtilityCard,
   UtilityStep,
   type DisclosureProps,
   type FieldProps,
+  type ChoiceFieldProps,
+  type Choice,
   type UtilityCardProps,
   type UtilityStepProps,
 } from './Utility';

@@ -1,0 +1,194 @@
+/**
+ * The Library menu's panel. Sits under the bar's right end, at the overlay tier: it is a
+ * reader-summoned list over whatever the surface is showing, not part of the surface.
+ */
+
+.ds-libmenu {
+  position: relative;
+}
+
+.ds-libmenu__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-height: 34px;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  color: var(--ds-ink-muted);
+  font-size: 12.5px;
+  list-style: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ds-libmenu__trigger::-webkit-details-marker {
+  display: none;
+}
+
+.ds-libmenu__trigger:hover {
+  border-color: var(--ds-border-strong);
+  color: var(--ds-ink);
+}
+
+/* Open: the trigger takes the accent wash, so the bar says which control the panel belongs to. */
+.ds-libmenu[open] > .ds-libmenu__trigger {
+  background: color-mix(in oklab, var(--ds-accent) 14%, transparent);
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-ink);
+}
+
+.ds-libmenu[open] > .ds-libmenu__trigger svg {
+  transform: rotate(180deg);
+}
+
+.ds-libmenu__panel {
+  position: absolute;
+  z-index: var(--ds-z-modal-sheet);
+  top: calc(100% + 10px);
+  right: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  column-gap: var(--ds-space-6);
+  align-items: start;
+  width: min(660px, calc(100vw - var(--ds-space-4) * 2));
+  padding: var(--ds-space-6);
+  background: color-mix(in srgb, var(--ds-surface) 96%, transparent);
+  backdrop-filter: blur(12px);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  box-shadow: 0 24px 60px -28px rgb(0 0 0 / 70%);
+}
+
+/* Read takes the first column; check and take-part stack in the second. Two short lists beside
+   one long one, rather than three rows that make the panel taller than the surface behind it. */
+.ds-libmenu__rooms {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--ds-space-6);
+  align-items: start;
+}
+
+.ds-libmenu__group:nth-child(n + 2) {
+  grid-column: 2;
+}
+
+.ds-libmenu__group:nth-child(n + 3) {
+  margin-top: var(--ds-space-5);
+}
+
+.ds-libmenu__grouphd {
+  display: block;
+  margin-bottom: var(--ds-space-3);
+  font-size: 12px;
+  color: var(--ds-ink-muted);
+}
+
+.ds-libmenu__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-libmenu__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-block: 9px;
+  border-top: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
+  color: var(--ds-ink);
+  font-size: 13.5px;
+  text-decoration: none;
+}
+
+.ds-libmenu__item:hover {
+  color: var(--ds-accent);
+}
+
+.ds-libmenu__item small {
+  font-size: 12px;
+  color: var(--ds-ink-muted);
+}
+
+.ds-libmenu__direct {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+  padding-left: var(--ds-space-6);
+  border-left: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
+}
+
+.ds-libmenu__card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--ds-space-4);
+  background: var(--ds-canvas);
+  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-libmenu__card:hover {
+  border-color: var(--ds-accent-graphic);
+}
+
+.ds-libmenu__card-kind {
+  font-size: 12px;
+  color: var(--ds-ink-muted);
+}
+
+.ds-libmenu__card-title {
+  font-family: var(--ds-font-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.ds-libmenu__card-desc {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+}
+
+.ds-libmenu__foot {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+/* Narrow: the panel spans the bar and the three columns stack. A 660px mega-menu on a phone is a
+   page, and this one would cover the surface it was opened from. */
+@media (max-width: 60rem) {
+  .ds-libmenu__panel {
+    position: fixed;
+    top: calc(var(--ds-atlas-top) - 8px);
+    right: var(--ds-space-2);
+    left: var(--ds-space-2);
+    width: auto;
+    max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-space-4));
+    overflow-y: auto;
+    grid-template-columns: 1fr;
+    row-gap: var(--ds-space-5);
+  }
+
+  .ds-libmenu__rooms {
+    grid-template-columns: 1fr;
+  }
+
+  .ds-libmenu__group:nth-child(n + 2) {
+    grid-column: 1;
+  }
+
+  .ds-libmenu__group + .ds-libmenu__group {
+    margin-top: var(--ds-space-5);
+  }
+
+  .ds-libmenu__direct {
+    padding-left: 0;
+    border-left: 0;
+    border-top: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
+    padding-top: var(--ds-space-5);
+  }
+}

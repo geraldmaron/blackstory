@@ -22,8 +22,9 @@ const mediaSource = readFileSync(
 );
 
 test('entity page renders through the room kit, not the retired v6 edition chrome', () => {
-  assert.match(pageSource, /<Room rail=/);
-  assert.match(pageSource, /<RoomHeader/);
+  assert.match(pageSource, /<Room\n\s+rail=\{rail\}/);
+  assert.match(pageSource, /foot=\{apparatus\}/);
+  assert.match(pageSource, /masthead=\{/);
   assert.doesNotMatch(pageSource, /entityEditionRootClassName/);
   assert.doesNotMatch(pageSource, /entityEditionPanelClassName/);
   assert.doesNotMatch(pageSource, /data-entity-edition/);
@@ -32,17 +33,30 @@ test('entity page renders through the room kit, not the retired v6 edition chrom
   assert.doesNotMatch(pageSource, /ds-container ds-page/);
 });
 
-test('the apparatus is in the rail and the reading is in the column', () => {
-  for (const block of ['<Anatomy', '<SourceList', '<TrustBlock', '<Precision']) {
-    assert.match(pageSource, new RegExp(block), `${block} belongs in the rail`);
+test('the apparatus is in the band, the facts are in the strip, the reading is in the column', () => {
+  // Sources, provenance and the research gaps are what a reader checks, not what they came for,
+  // so they sit under the record. The rail keeps only the locator and the table of contents.
+  const apparatus = /const apparatus = \([\s\S]*?\n {2}\);/.exec(pageSource)?.[0] ?? '';
+  assert.ok(apparatus.length > 0, 'the apparatus band should exist');
+  for (const block of ['<SourceList', '<TrustBlock', 'Still researching', 'Why this is here']) {
+    assert.match(apparatus, new RegExp(block), `${block} belongs in the apparatus band`);
   }
+
+  const rail = /const rail = \([\s\S]*?\n {2}\);/.exec(pageSource)?.[0] ?? '';
+  assert.ok(rail.length > 0, 'the rail should exist');
+  assert.match(rail, /<Precision/);
+  assert.match(rail, /ds-record-toc/);
+  assert.doesNotMatch(rail, /<SourceList|<TrustBlock/);
+
+  // The four orientation facts are one strip under the masthead, not four boxes down the rail.
+  assert.match(pageSource, /ds-record-strip/);
   assert.match(pageSource, /buildEntityAnatomyInputs/);
   assert.match(pageSource, /EntityRoomSections/);
 });
 
 test('the summary is the lede and is never restated as a section', () => {
   // The v6 page printed it three times: lede, "Inclusion evidence", and the accepted claim.
-  assert.match(pageSource, /lede=\{[\s\S]*?entity\.summary/);
+  assert.match(pageSource, /ds-record-mast__lede[\s\S]*?entity\.summary/);
   assert.doesNotMatch(sectionsSource, /entity\.summary/);
   assert.doesNotMatch(pageSource, /WhyThisAppears/);
 });
@@ -104,8 +118,16 @@ test('entity generateStaticParams prerenders nothing', () => {
   assert.doesNotMatch(body, /getPublicSearchIndex/);
 });
 
-test('entity intro media renders only when a primary photo exists', () => {
-  assert.match(pageSource, /entity\.primaryImage !== undefined \? \(/);
+test('the masthead renders whether or not there is a photograph', () => {
+  // The mast is the page's opening block now, so it cannot be conditional on the photo: with no
+  // image `EntityMastMedia` draws the kind mark, and the title and facts read the same over
+  // either. What stays conditional is the `primaryImage` prop itself.
+  assert.match(pageSource, /entity\.primaryImage !== undefined \? \{ primaryImage/);
+  assert.match(pageSource, /className="ds-record-mast"/);
+  // A mark is not a photograph, and the masthead says which it is holding: a mark keeps its own
+  // proportion in a short band with the record written under it, never stretched full bleed
+  // under display type it cannot carry.
+  assert.match(pageSource, /data-media=\{entity\.primaryImage !== undefined \? 'photo' : 'mark'\}/);
 });
 
 test('entity media fail-closed: mark fallback on photo exhaustion', () => {

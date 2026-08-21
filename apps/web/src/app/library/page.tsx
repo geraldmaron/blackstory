@@ -22,15 +22,7 @@ import {
   cardTitleFor,
   destinationsInGroup,
 } from '../../lib/nav/destination-registry';
-import {
-  CardGrid,
-  GroupHeading,
-  OffRamp,
-  Prose,
-  Room,
-  RoomCard,
-  RoomHeader,
-} from '../../components/room';
+import { CardGrid, GroupHeading, OffRamp, Room, RoomCard, RoomHeader } from '../../components/room';
 import '../reading-room.css';
 
 void React;
@@ -96,6 +88,16 @@ async function releaseFacts(): Promise<readonly string[]> {
   ];
 }
 
+/**
+ * The registry stores kinds in the v6 mono-caps register (`LONG FORM`, `CATALOGUE`). The rows
+ * print them as a quiet right-hand tag, where caps would shout across every row, so they are
+ * cased here rather than rewritten in the registry — the mobile app and the palette still read
+ * the same field.
+ */
+function sentenceCase(kind: string): string {
+  return kind.charAt(0) + kind.slice(1).toLowerCase();
+}
+
 export default async function LibraryPage() {
   const facts = await releaseFacts();
 
@@ -103,25 +105,27 @@ export default async function LibraryPage() {
     <Room>
       <RoomHeader
         pathname="/library"
-        kicker="EVERYTHING THAT IS NOT THE MAP"
+        kicker="Everything that is not the map"
         title="The library"
         lede="The Atlas answers where and when. These rooms answer how it happened, who wrote it down, and how confident the archive is that it is true."
         meta={facts}
+        showPath={false}
       />
 
-      <Prose>
-        <p>
-          Every room below is built on the same records you can see on the Atlas. Prose cites
-          records by name, and every citation opens the record itself, so nothing here is an
-          assertion you have to take on trust. Where the archive is uncertain, it says so in the
-          room rather than in a footnote.
-        </p>
-      </Prose>
-
+      {/*
+        No standing paragraph between the lede and the rooms. A hub's job is to answer "which
+        room", and the sentence that used to sit here — that every room is built on the same
+        records and cites them by name — is the claim /methodology exists to make in full. Here
+        it was a wall between a reader and the eleven links they came for.
+      */}
       {LIBRARY_CARD_GROUPS.map((group) => (
         <React.Fragment key={group}>
           <GroupHeading>{GROUP_HEADINGS[group]}</GroupHeading>
-          <CardGrid variant="hub">
+          {/* The index shape, not the hub's three columns: five destinations across three
+              columns read as a card wall, and the reader here is choosing a room rather than
+              scanning a catalogue of like things. One column of five reads as a table of
+              contents, which is what a hub is. */}
+          <CardGrid>
             {destinationsInGroup(group).map((destination) => (
               <RoomCard
                 key={destination.path}
@@ -129,6 +133,7 @@ export default async function LibraryPage() {
                 kind={destination.kind ?? ''}
                 title={cardTitleFor(destination)}
                 description={destination.description}
+                {...(destination.kind ? { tag: sentenceCase(destination.kind) } : {})}
               />
             ))}
           </CardGrid>
@@ -143,7 +148,7 @@ export default async function LibraryPage() {
         }
         actions={[
           { label: 'Open the Atlas', href: '/', emphasis: 'copper' },
-          { label: 'Read the index instead', href: '/records' },
+          { label: 'The index', href: '/records' },
         ]}
       >
         {/*
@@ -152,8 +157,7 @@ export default async function LibraryPage() {
           that renders with JavaScript disabled must not end on a button that does nothing. The
           shortcut is stated instead, and both real destinations are links.
         */}
-        The map places what can be placed and the index lists everything, including the records with
-        no coordinates to place. Press <kbd className="ds-kbd">⌘</kbd>
+        Press <kbd className="ds-kbd">⌘</kbd>
         <kbd className="ds-kbd">K</kbd> to search from anywhere.
       </OffRamp>
     </Room>

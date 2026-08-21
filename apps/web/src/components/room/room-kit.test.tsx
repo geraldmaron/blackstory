@@ -177,7 +177,7 @@ describe('room kit · the trail is computed, never hand-written', () => {
 });
 
 describe('room kit · RoomHeader is the only header a room renders', () => {
-  it('renders breadcrumb, title, lede and mono meta in one block; the kicker prop no longer renders', () => {
+  it('renders breadcrumb, sentence-case kicker, title, lede and mono meta in one block', () => {
     const html = renderToStaticMarkup(
       <RoomHeader
         pathname="/books"
@@ -189,9 +189,10 @@ describe('room kit · RoomHeader is the only header a room renders', () => {
     );
 
     assert.match(html, /ds-room-crumb/);
-    // Ink direction: the kicker prop is kept on the type so existing callers do not have to
-    // change, but the title takes its space instead of rendering a mono-caps line above it.
-    assert.doesNotMatch(html, /ds-room-header__kicker/);
+    // The kicker renders again, above the title and in sentence case. It was muted while the
+    // register was mono-caps, which shouted over the title; the register changed, so the line
+    // came back rather than the prop staying dead on twelve callers.
+    assert.match(html, /<p class="ds-room-header__kicker">Catalogue<\/p>/);
     assert.match(html, /<h1 class="ds-room-header__title">Banned books<\/h1>/);
     assert.match(html, /ds-room-header__lede/);
     assert.match(html, /1,204 titles/);
@@ -474,8 +475,27 @@ describe('room kit · the column', () => {
         <p>Body.</p>
       </Room>,
     );
-    assert.match(html, /<main class="ds-room" id="main"><div class="ds-room__doc">/);
+    assert.match(
+      html,
+      /<main class="ds-room" id="main"><div class="ds-room__body"><div class="ds-room__doc">/,
+    );
     assert.doesNotMatch(html, /max-width/);
+  });
+
+  it('puts the masthead and the apparatus band outside the measure, around the body', () => {
+    const html = renderToStaticMarkup(
+      <Room masthead={<p>Hero.</p>} foot={<p>Sources.</p>} rail={<p>Rail.</p>}>
+        <p>Body.</p>
+      </Room>,
+    );
+
+    // Order is the contract: mast, then the railed body, then the band. The two full-bleed
+    // blocks are siblings of the body rather than children of the column, which is what lets
+    // them run wider than the measure the column is pinned to.
+    assert.match(
+      html,
+      /ds-room__mast[^]*ds-room__body ds-room__body--railed[^]*ds-room__doc[^]*ds-room__rail[^]*ds-room__foot/,
+    );
   });
 });
 

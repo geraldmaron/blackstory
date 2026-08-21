@@ -34,6 +34,69 @@ import { humanizeToken } from '../../../components/entity/format';
 
 void React;
 
+/**
+ * The column's sections, in render order, with the ids the rail's table of contents links to.
+ *
+ * Derived once and consumed twice (here for the conditionals, in `page.tsx` for the TOC), so
+ * a record that has no timeline cannot end up with a "Timeline" link in its rail. Two copies
+ * of these predicates in two files is exactly how that drift happens.
+ */
+export type RecordSection = {
+  readonly id: string;
+  readonly label: string;
+  readonly count?: number;
+};
+
+export function recordSectionIndex({
+  entity,
+  evidenceClaims,
+  crossReferences = [],
+}: {
+  readonly entity: PublicEntityView;
+  readonly evidenceClaims: readonly EvidenceClaimInput[];
+  readonly crossReferences?: readonly EntityCrossReferenceSurface[];
+}): readonly RecordSection[] {
+  const sections: RecordSection[] = [];
+  if (entity.historicalContext.trim().length > 0) {
+    sections.push({ id: 'context-heading', label: 'The history here' });
+  }
+  if (entity.extendedNarrative) {
+    sections.push({ id: 'further-heading', label: 'Further reading' });
+  }
+  if (evidenceClaims.length > 0) {
+    sections.push({
+      id: 'claims-heading',
+      label: 'What the sources say',
+      count: evidenceClaims.length,
+    });
+  }
+  if (hasStatusFor(entity)) {
+    sections.push({
+      id: 'status-heading',
+      label: entity.kind === 'event' ? 'When this happened' : 'Status and history',
+    });
+  }
+  if (entity.timeline.length > 0) {
+    sections.push({ id: 'timeline-heading', label: 'Timeline', count: entity.timeline.length });
+  }
+  const connectionCount = toConnections(entity).length;
+  if (connectionCount > 0) {
+    sections.push({
+      id: 'related-heading',
+      label: 'Records this one touches',
+      count: connectionCount,
+    });
+  }
+  if (crossReferences.length > 0) {
+    sections.push({
+      id: 'appears-in-heading',
+      label: 'Where this record is written about',
+      count: crossReferences.length,
+    });
+  }
+  return sections;
+}
+
 export type EntityRoomSectionsProps = {
   readonly entity: PublicEntityView;
   readonly evidenceClaims: readonly EvidenceClaimInput[];
@@ -50,6 +113,13 @@ export type EntityRoomSectionsProps = {
 function relationPhrase(relationType: string, direction: 'outgoing' | 'incoming'): string {
   const relation = humanizeToken(relationType).toLowerCase();
   return direction === 'incoming' ? `${relation}, from their record` : relation;
+}
+
+/** Shared by the section index and the component, so the rail and the column cannot disagree. */
+function hasStatusFor(entity: PublicEntityView): boolean {
+  return entity.kind === 'event'
+    ? entity.eventWindow !== undefined
+    : Boolean(entity.status) || (entity.statusHistory?.length ?? 0) > 0;
 }
 
 function toConnections(entity: PublicEntityView): readonly RoomConnection[] {
@@ -69,10 +139,7 @@ export function EntityRoomSections({
   crossReferences = [],
 }: EntityRoomSectionsProps) {
   const hasContext = entity.historicalContext.trim().length > 0;
-  const hasStatus =
-    entity.kind === 'event'
-      ? entity.eventWindow !== undefined
-      : Boolean(entity.status) || (entity.statusHistory?.length ?? 0) > 0;
+  const hasStatus = hasStatusFor(entity);
   const connections = toConnections(entity);
   const continueLearning = entity.continueLearning ?? [];
 

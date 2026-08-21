@@ -25,9 +25,12 @@ export function GroupHeading({ children, className }: GroupHeadingProps) {
 export type CardGridProps = {
   readonly children: ReactNode;
   /**
-   * `'index'` (default): one column, each RoomCard a hairline row — the shape a catalogue like
-   * `/about` or `/support` lists reads as. `'hub'`: three fixed columns — `/library` only, the
-   * one surface the registry calls a hub rather than an index.
+   * `'index'` (default): one column, each RoomCard a hairline row. `'hub'`: three fixed columns.
+   *
+   * `/library` used the hub shape and no longer does. Three columns of five destinations reads
+   * as a card wall, and a hub's reader is choosing a room rather than scanning a catalogue of
+   * like things; one column of five reads as a table of contents, which is what a hub is. The
+   * variant stays on the surface because a genuinely wide, flat set may still want it.
    */
   readonly variant?: 'index' | 'hub';
   readonly className?: string;
@@ -72,6 +75,12 @@ export type RoomCardProps = {
   readonly description?: ReactNode;
   /** Mono footer facts — year, count, jurisdiction. Rendered as written. */
   readonly meta?: string;
+  /**
+   * Right-hand tag on an index row: what sort of room this is ("Long form",
+   * "Reference", "Receipt"). Distinct from `kind`, which stopped printing per-card because a
+   * three-up card had no room for it: a full-width row does, on the far side of the title.
+   */
+  readonly tag?: string;
   /** Hero image, above the title. */
   readonly media?: RoomCardMedia;
   readonly className?: string;
@@ -83,6 +92,7 @@ export function RoomCard({
   title,
   description,
   meta,
+  tag,
   media,
   className,
 }: RoomCardProps) {
@@ -102,6 +112,7 @@ export function RoomCard({
       ) : null}
       <h3 className="ds-room-card__title">{title}</h3>
       {description ? <p className="ds-room-card__desc">{description}</p> : null}
+      {tag ? <span className="ds-room-card__tag">{tag}</span> : null}
       {meta ? <span className="ds-room-card__meta">{meta}</span> : null}
     </Link>
   );

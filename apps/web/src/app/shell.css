@@ -2068,6 +2068,17 @@ body:has(.ds-explore-stage[data-results='open']) {
   }
 }
 
+/*
+ * The Atlas's narrow layout puts the dock switcher on the bottom edge, where the attribution was.
+ * Attribution is a licence obligation, so it moves up rather than being covered: dock height plus
+ * its offset and a gap. The Atlas is the only surface with that bar, hence `:has(.ds-atlas)`.
+ */
+@media (max-width: 819px) {
+  body:has([data-surface='instrument']):has(.ds-atlas) {
+    --ds-map-attrib-bottom: calc(var(--ds-space-2) + 60px);
+  }
+}
+
 /* Spotlight card as a bottom sheet must not cover zoom +/-. */
 @media (max-width: 64rem) {
   body:has(.ds-explore-stage__spotlight[open]) {

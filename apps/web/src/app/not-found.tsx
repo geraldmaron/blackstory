@@ -1,8 +1,12 @@
 /**
  * Global not-found page for unknown public routes and missing entities.
  *
- * v9 Utility room (design-direction-v9-surfaces.md §"/_not-found"): a mono `404` kicker, the
- * title, one serif line naming the two things that actually go wrong, then four exits.
+ * v9 Utility room (design-direction-v9-surfaces.md §"/_not-found"): a kicker, the title, one
+ * serif line naming the two things that actually go wrong, then four exits.
+ *
+ * The kicker is a sentence, not the numeral. It was `404` while the register was mono caps and
+ * the numeral carried; in the quiet sentence-case sans the kicker now takes, a bare `404` reads
+ * as a stray fragment above the title rather than as the name of what happened.
  *
  * The exits are the whole point of the page. `/design-system` was one of them, which sent a lost
  * reader to a component gallery; it is gone. The archive exit points at `/records`, a list, rather
@@ -23,7 +27,7 @@ export default function NotFound() {
       <PaletteSeed />
       <RoomHeader
         pathname="/not-found"
-        kicker="404"
+        kicker="Nothing at this address"
         title="That page is not here"
         lede="Either the address has a typo in it, or it names a record the archive has not published."
         /* Every other room prints its own route as a mono fact because readers cite URLs. This

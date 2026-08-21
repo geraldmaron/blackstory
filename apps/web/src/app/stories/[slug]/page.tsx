@@ -93,7 +93,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   // cited" and "Next in this collection". The references list itself, its numbering and its
   // `#ref-N` anchor ids are unchanged (ArticleProse's citation superscripts link to those ids
   // regardless of where in the document the list renders) — only its position moves.
-  const hasRailContent = chapterHeadings.length > 0 || article.references.length > 0 || next;
+  const hasRailContent = chapterHeadings.length > 0 || next;
   const rail = hasRailContent ? (
     <div className="ds-article-rail">
       {chapterHeadings.length > 0 ? (
@@ -113,15 +113,6 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         </nav>
       ) : null}
 
-      {article.references.length > 0 ? (
-        <div className="ds-room-rail-group">
-          <p className="ds-room-rail-group__title" id="article-references">
-            Records cited
-          </p>
-          <ArticleReferences references={article.references} headingId="article-references" />
-        </div>
-      ) : null}
-
       {next ? (
         <div className="ds-article-rail__next">
           <p className="ds-room-rail-group__title">Next in this collection</p>
@@ -138,35 +129,101 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
     </div>
   ) : undefined;
 
+  /*
+   * The chapter opens on its image, with the chapter written over it, on the same masthead the
+   * record page uses. It used to open on a text header and put the hero underneath the summary,
+   * which is the layout of a document that happens to have a picture attached rather than of a
+   * piece of writing that leads with one. A chapter with no hero keeps the same block on the
+   * canvas: the type is the masthead in that case, and there is nothing to read it over.
+   */
+  const masthead = (
+    <figure className="ds-article-mast" data-media={doc.heroImage ? 'photo' : 'none'}>
+      {doc.heroImage ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={doc.heroImage.url} alt={doc.heroImage.alt} />
+      ) : null}
+      <figcaption className="ds-article-mast__over">
+        <p className="ds-article-mast__facts">
+          {doc.series?.label ? (
+            <Link
+              className="ds-article-mast__series"
+              href={`/stories?series=${encodeURIComponent(doc.series.id)}`}
+            >
+              {doc.series.label}
+            </Link>
+          ) : null}
+          {doc.series?.positionLabel ? (
+            <span className="ds-mono">{doc.series.positionLabel}</span>
+          ) : null}
+          <span className="ds-mono">{doc.eraLabel}</span>
+          <span>{doc.placeLabel}</span>
+        </p>
+        <h1 className="ds-article-mast__title">{doc.title}</h1>
+        <p className="ds-article-mast__lede">{doc.summary}</p>
+        <p className="ds-article-mast__byline">
+          <span>
+            Published <span className="ds-mono">{doc.publishedAt}</span>
+          </span>
+          {doc.updatedAt ? (
+            <span>
+              Updated <span className="ds-mono">{doc.updatedAt}</span>
+            </span>
+          ) : null}
+          {article.references.length > 0 ? (
+            <span>
+              Cites <a href="#about-this-chapter">{article.references.length} records</a>
+            </span>
+          ) : null}
+        </p>
+      </figcaption>
+      {doc.heroImage?.credit ? (
+        <span className="ds-article-mast__credit ds-mono">{doc.heroImage.credit}</span>
+      ) : null}
+    </figure>
+  );
+
+  /*
+   * The apparatus band. Every numbered mark in the text resolves here, under the chapter rather
+   * than beside its third paragraph: a reader checking a citation has finished the sentence, and
+   * a reader who is not checking one should not be reading past a column of them.
+   */
+  const apparatus =
+    article.references.length > 0 ? (
+      <div className="ds-article-appx" id="about-this-chapter">
+        <div className="ds-article-appx__head">
+          <h2>About this chapter</h2>
+          <span>Every numbered mark in the text resolves here.</span>
+        </div>
+        <div className="ds-article-appx__cols">
+          <div>
+            <ArticleReferences references={article.references} headingId="about-this-chapter" />
+          </div>
+          <div className="ds-article-appx__notes">
+            <section>
+              <h3>How this chapter was made</h3>
+              <p>
+                Written from released records only. Where two sources disagree the contradiction is
+                shown rather than resolved.
+              </p>
+            </section>
+            <section>
+              <h3>Found a problem?</h3>
+              <p>
+                <Link href="/corrections">Submit a correction</Link> against any record cited above.
+              </p>
+            </section>
+          </div>
+        </div>
+      </div>
+    ) : undefined;
+
   return (
-    <Room rail={rail}>
+    <Room rail={rail} masthead={masthead} {...(apparatus ? { foot: apparatus } : {})}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <article className="ds-article">
-        <header className="ds-article__header">
-          <p className="ds-article__meta-row">
-            <span className="ds-mono">{doc.eraLabel}</span> · {doc.placeLabel}
-          </p>
-          <h1 className="ds-article__title">{doc.title}</h1>
-          <p className="ds-article__summary">{doc.summary}</p>
-          <p className="ds-article__byline ds-mono">
-            Published {doc.publishedAt}
-            {doc.updatedAt ? ` · Updated ${doc.updatedAt}` : ''}
-          </p>
-        </header>
-
-        {doc.heroImage ? (
-          <figure className="ds-article__hero">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={doc.heroImage.url} alt={doc.heroImage.alt} />
-            <figcaption className="ds-article__figcaption">
-              <span className="ds-article__credit">{doc.heroImage.credit}</span>
-            </figcaption>
-          </figure>
-        ) : null}
-
         <ArticleBody article={article} />
 
         <p className="ds-article__footer">

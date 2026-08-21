@@ -62,6 +62,25 @@ type StoriesPageProps = {
 
 const KIND_LABELS: Record<string, string> = { chapter: 'Chapter', article: 'Record' };
 
+/**
+ * What the lead is leading on. The lead story is whatever sits at the top of the current view, so
+ * the flag has to name the sort that put it there rather than assert an editorial judgement the
+ * page has not made: under "newest" it is the newest chapter, under a collection order it is
+ * where the collection starts.
+ */
+function leadFlag(sort: string): string {
+  switch (sort) {
+    case 'newest':
+      return 'Newest';
+    case 'oldest':
+      return 'Earliest';
+    case 'title':
+      return 'First alphabetically';
+    default:
+      return 'Start here';
+  }
+}
+
 export default async function StoriesIndexPage({ searchParams }: StoriesPageProps) {
   const query = parseStoriesQuery(await searchParams);
   const { items, source } = await listPublicArticleListItems();
@@ -108,10 +127,11 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
     <Room rail={rail}>
       <RoomHeader
         pathname="/stories"
-        kicker="Stories"
-        title="History pinned to place and record."
-        lede="Long-form chapters that walk from a named year and place through the rules in force, and short record entries that set out what a given administration actually did. Every figure and quotation cites the record it rests on."
+        kicker="Writing built out of the record"
+        title="Chapters"
+        lede="Long-form chapters that walk from a named year and place through the rules in force, and short record entries that set out what a given administration actually did. Every chapter names the records it stands on, and every record links back to the chapters about it."
         meta={meta}
+        showPath={false}
       />
 
       {source === 'live' && items.length > 0 ? (
@@ -193,8 +213,20 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
           {lead ? (
             <article className="ds-stories-lead">
               <div className="ds-stories-lead__copy">
+                {/* The lead is the current view's top item, so what makes it the lead is the
+                    sort in force, not an editor's flag. The pill says which. */}
+                <p className="ds-stories-lead__flag">{leadFlag(query.sort)}</p>
                 <p className="ds-stories-lead__meta">
-                  {KIND_LABELS[lead.kind ?? 'chapter'] ?? 'Story'} · {lead.eraLabel}
+                  {/* The collection leads, because it is the thing a reader can follow from
+                      here; the kind and the era are what the row already is. */}
+                  {[
+                    lead.series?.label,
+                    lead.series?.positionLabel,
+                    KIND_LABELS[lead.kind ?? 'chapter'] ?? 'Story',
+                    lead.eraLabel,
+                  ]
+                    .filter((fact): fact is string => Boolean(fact))
+                    .join(' · ')}
                 </p>
                 <h2 className="ds-stories-lead__title">
                   <a href={`/stories/${lead.slug}`}>{lead.title}</a>
@@ -224,8 +256,10 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
                 <h2 className="ds-stories-shelf__title">
                   {shelf.label} <span className="ds-room-num">{shelf.count}</span>
                 </h2>
+                {/* Say how many. "See all" beside a shelf of four is an offer with no size on
+                    it, and the count is the reason to follow it. */}
                 <a className="ds-stories-shelf__all" href={shelf.href}>
-                  See all →
+                  See all {shelf.count}
                 </a>
               </div>
               <div className="ds-stories-shelf__grid">
@@ -241,8 +275,11 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
                         <img src={item.heroImage.url} alt={item.heroImage.alt} loading="lazy" />
                       ) : null}
                     </span>
+                    {/* The chapter's own number, not its position in this row: a shelf shows
+                        four of nine, and a row index is a fraction of the row rather than of the
+                        collection the reader is being offered. */}
                     <span className="ds-stories-shelf__index">
-                      {String(index + 1).padStart(2, '0')} / {String(shelf.count).padStart(2, '0')}
+                      {item.series?.positionLabel ?? `Chapter ${index + 1}`}
                     </span>
                     <span className="ds-stories-shelf__entry-title">{item.title}</span>
                     <span className="ds-stories-shelf__entry-summary">{item.summary}</span>

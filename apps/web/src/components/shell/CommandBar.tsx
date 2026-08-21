@@ -25,6 +25,7 @@ import Link from 'next/link';
 import { BRAND_ASSETS } from '@repo/config';
 import { cx, ShellWordmark } from '@repo/ui';
 import { CommandBarSearch } from './CommandBarSearch';
+import { LibraryMenu } from './LibraryMenu';
 import './command-bar.css';
 
 void React;
@@ -156,13 +157,13 @@ export function CommandBar({
               </Link>
             </>
           )}
-          {/* An anchor, not a mode button: Atlas and Journey are two views of one surface, Library
-              is a different room. A real href is also what lets it be opened in a new tab and
-              followed by a crawler, which a mode toggle never could. */}
-          <Link className="ds-bar__mode-link" href="/library">
-            Library
-          </Link>
         </nav>
+
+        {/* Library sits outside the mode group. Atlas and Journey are two views of one surface;
+            the library is every other room, and it opens rather than navigates — a reader
+            choosing a room wants to see the rooms first. Every entry inside is a real link,
+            including /library itself, so nothing here is unreachable to a crawler. */}
+        <LibraryMenu recordCount={recordCount} />
 
         {onOpenSaved ? (
           <button

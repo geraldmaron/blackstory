@@ -149,8 +149,14 @@
   color: var(--ds-ink-subtle);
 }
 
+/* See lens-panel.css: one shared narrow slot, one instrument in it. */
 @media (max-width: 819px) {
   .ds-time-panel {
+    left: var(--ds-space-2);
+    right: var(--ds-space-2);
+    bottom: calc(var(--ds-space-2) + 66px);
+    width: auto;
+    transform: none;
     padding: var(--ds-space-2) var(--ds-space-3);
   }
 

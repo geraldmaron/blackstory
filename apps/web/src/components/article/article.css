@@ -19,46 +19,11 @@
   margin-inline: auto;
 }
 
-.ds-article__header {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: start;
-  gap: var(--ds-space-3);
-}
-
-.ds-article__meta-row {
-  font-family: var(--ds-font-mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
-}
-
-.ds-article__title {
-  font-family: var(--ds-font-display);
-  max-width: 26ch;
-  font-size: clamp(2.375rem, 5vw + 1rem, 3.875rem); /* up to 62px */
-  line-height: 1.05;
-  margin: 0;
-  color: var(--ds-ink);
-}
-
-.ds-article__summary {
-  font-family: var(--ds-font-editorial);
-  font-size: 22px;
-  line-height: 1.5;
-  color: var(--ds-ink-muted);
-  margin: 0;
-}
-
-.ds-article__byline {
-  color: var(--ds-ink-subtle);
-  font-size: 0.8rem;
-}
-
-/* Hero + inline images */
-.ds-article__hero,
+/*
+ * The chapter's own header, hero and byline are gone: it opens on `.ds-article-mast`, which
+ * carries all three over the image. What is left in this block is the inline figure vocabulary
+ * `ArticleBody` still renders inside the prose.
+ */
 .ds-article__image,
 .ds-article__figure,
 .ds-article__document {
@@ -66,18 +31,15 @@
 }
 
 /*
- * A hero is never cropped. This used to force `aspect-ratio: 3/2` with `object-fit: cover`
- * so a grid of mixed-aspect heroes shared one footprint, but a hero is not in a grid — it
- * is one image at the top of one page, and the cover crop cut the head off every
- * full-length portrait in the presidential series (the subject of the picture, removed to
- * keep a ratio nothing depended on).
+ * An inline figure is never cropped. This used to force `aspect-ratio: 3/2` with
+ * `object-fit: cover` so a grid of mixed-aspect images shared one footprint, but these are not
+ * in a grid: each is one image in one column, and the cover crop cut the head off every
+ * full-length portrait in the presidential series (the subject of the picture, removed to keep
+ * a ratio nothing depended on).
  *
- * Natural aspect with a height cap instead: a landscape hero fills the measure exactly as
- * before, a portrait stands tall without exceeding the fold, and `contain` guarantees that
- * whatever the ratio, the whole image survives. The cap is in `rem` rather than `vh` so a
- * short window doesn't shrink the image to a strip.
+ * Natural aspect with a height cap instead, in `rem` rather than `vh` so a short window does
+ * not shrink the image to a strip.
  */
-.ds-article__hero img,
 .ds-article__image img {
   display: block;
   width: 100%;
@@ -461,6 +423,196 @@
   color: var(--ds-accent);
 }
 
+/* —— the chapter masthead ————————————————————————————————————————————————————
+   The same block the record page opens on, for the same reason: a chapter that leads with its
+   image is a piece of writing, and a chapter that leads with a text header and then shows the
+   image underneath the summary is a document with a picture attached. */
+.ds-article-mast {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.ds-article-mast[data-media='photo'] {
+  min-height: clamp(340px, 48vw, 560px);
+  background: var(--ds-surface-raised);
+}
+
+.ds-article-mast img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* The scrim is sized to the type, not to the plate: over the whole band the opaque end of the
+   ramp lands under the middle of the picture and the picture never arrives. */
+.ds-article-mast__over {
+  position: relative;
+  z-index: 1; /* local: over the hero image, inside the masthead figure. */
+  display: flex;
+  flex-direction: column;
+  padding: var(--ds-space-16) var(--ds-gutter) var(--ds-space-10);
+}
+
+.ds-article-mast[data-media='photo'] .ds-article-mast__over {
+  background: linear-gradient(
+    to top,
+    var(--ds-canvas) 0%,
+    color-mix(in srgb, var(--ds-canvas) 82%, transparent) 45%,
+    transparent 100%
+  );
+}
+
+.ds-article-mast[data-media='photo'] .ds-article-mast__title,
+.ds-article-mast[data-media='photo'] .ds-article-mast__lede,
+.ds-article-mast[data-media='photo'] .ds-article-mast__facts,
+.ds-article-mast[data-media='photo'] .ds-article-mast__byline {
+  text-shadow: 0 1px 16px var(--ds-canvas);
+}
+
+/*
+ * The two quiet lines stop being quiet over a photograph. Muted ink is a step down from body
+ * copy against the canvas, and against the top of a bright hero (a 1937 security map is mostly
+ * yellow and red) it is a step down from nothing. They keep their size and their weight; only
+ * the colour comes back up, because that is the part the photograph took away.
+ */
+.ds-article-mast[data-media='photo'] .ds-article-mast__facts,
+.ds-article-mast[data-media='photo'] .ds-article-mast__byline {
+  color: var(--ds-ink);
+}
+
+.ds-article-mast__facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  margin: 0 0 var(--ds-space-4);
+  font-size: 12.5px;
+  color: var(--ds-ink-muted);
+}
+
+/* The collection is the one thing in this row a reader can act on, so it is the one thing drawn
+   as a control. */
+.ds-article-mast__series {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 11px;
+  border: var(--ds-border-width) solid color-mix(in oklab, var(--ds-accent) 55%, transparent);
+  border-radius: var(--ds-radius-full);
+  background: color-mix(in oklab, var(--ds-accent) 14%, transparent);
+  color: var(--ds-accent);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.ds-article-mast__title {
+  margin: 0;
+  max-width: 22ch;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1;
+  letter-spacing: -0.038em;
+}
+
+.ds-article-mast__lede {
+  margin: var(--ds-space-5) 0 0;
+  max-width: 56ch;
+  font-family: var(--ds-font-editorial);
+  font-size: clamp(17px, 1.5vw, 21px);
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--ds-ink) 88%, var(--ds-canvas));
+}
+
+.ds-article-mast__byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: var(--ds-space-5) 0 0;
+  font-size: 12.5px;
+  color: var(--ds-ink-muted);
+}
+
+.ds-article-mast__credit {
+  position: absolute;
+  right: var(--ds-gutter);
+  bottom: var(--ds-space-3);
+  z-index: 2; /* local: over the hero image and its scrim, inside the masthead figure. */
+  max-width: 40ch;
+  text-align: right;
+  font-size: 10px;
+  color: var(--ds-ink-subtle);
+}
+
+/* —— the chapter's apparatus band ——————————————————————————————————————————— */
+.ds-article-appx {
+  width: min(100%, 1180px);
+  margin-inline: auto;
+}
+
+.ds-article-appx__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin-bottom: var(--ds-space-7);
+}
+
+.ds-article-appx__head h2 {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.ds-article-appx__head span {
+  font-size: 13px;
+  color: var(--ds-ink-muted);
+}
+
+.ds-article-appx__cols {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  column-gap: var(--ds-space-12);
+  row-gap: var(--ds-space-7);
+  align-items: start;
+}
+
+@media (max-width: 60rem) {
+  .ds-article-appx__cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ds-article-appx__notes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-5);
+}
+
+.ds-article-appx__notes h3 {
+  margin: 0 0 var(--ds-space-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ds-ink-muted);
+}
+
+.ds-article-appx__notes p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--ds-ink) 88%, var(--ds-canvas));
+}
 /* ----------------------------------------------------------------------------
  * Sticky evidence rail — Ink direction. "In this chapter" and "Records cited" are
  * RailGroup, styled by room-kit.css; only the wrapper's stickiness and the one-off
@@ -478,13 +630,11 @@
   border-left: var(--ds-border-width-strong) solid var(--ds-accent);
 }
 
-.ds-article-rail__next-kicker {
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
+/* The heading above this block is the kit's rail-group title; the link itself carried no rule at
+   all, so it took the global prose underline across both of its lines. */
+.ds-article-rail__next-link {
+  display: block;
+  text-decoration: none;
 }
 
 .ds-article-rail__next-position {
@@ -510,8 +660,8 @@
 }
 
 @media (max-width: 68rem) {
-  /* Below .ds-room--railed's breakpoint the rail stacks under the column (Room.tsx), where
-     sticky positioning has no meaningful ground to stick to. */
+  /* Below .ds-room__body--railed's breakpoint the rail stacks under the column (Room.tsx),
+     where sticky positioning has no meaningful ground to stick to. */
   .ds-article-rail {
     position: static;
   }

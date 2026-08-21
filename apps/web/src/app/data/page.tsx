@@ -93,7 +93,7 @@ export default async function DataPage() {
     <Room>
       <RoomHeader
         pathname="/data"
-        kicker="INDICATORS"
+        kicker="Indicators"
         title="Data"
         lede={DATA_INTRO.lede}
         meta={[`As of ${asOfLabel} release`]}

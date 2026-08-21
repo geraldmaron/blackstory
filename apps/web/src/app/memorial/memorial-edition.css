@@ -115,57 +115,31 @@
   }
 }
 
-.ds-memorial-edition__panel {
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-surface-raised);
-  padding: var(--ds-space-5);
+/* The list is the page here, not a card on it: no border, no raised ground, no inset. */
+.ds-memorial-edition__list {
   width: 100%;
   max-width: 100%;
   min-width: 0;
 }
 
+/* Heading and count share one baseline over one rule: the count is a fact about the list, not a
+   second heading under the first. */
 .ds-memorial-edition__header {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  column-gap: clamp(1.5rem, 3vw, 2.75rem);
-  row-gap: var(--ds-space-3);
-  align-items: start;
-  padding-bottom: var(--ds-space-5);
-  margin-bottom: var(--ds-space-4);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ds-space-4) var(--ds-space-8);
+  padding-bottom: var(--ds-space-4);
+  margin-bottom: var(--ds-space-5);
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
-/* No accent on this surface (design law: "the memorial takes no accent, no imagery and no
-   score") — the "01" is a decorative section numeral, not live data, so it takes the same
-   quiet ink-muted tone as .ds-memorial-edition__count rather than the copper the rest of the
-   site uses for this kind of large mono numeral. */
-.ds-memorial-edition__index {
-  min-width: 2.75ch;
-  padding-right: var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: clamp(1.25rem, 2vw, 1.75rem);
-  font-weight: 500;
-  line-height: 1;
-  color: var(--ds-ink-muted);
-  letter-spacing: -0.03em;
-}
-
-.ds-memorial-edition__kicker {
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
-}
-
 .ds-memorial-edition__title {
-  margin: var(--ds-space-2) 0 0;
+  margin: 0;
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(1.375rem, 1.15rem + 0.8vw, 2rem);
+  font-size: clamp(1.5rem, 1.15rem + 1.1vw, 2rem);
   letter-spacing: -0.025em;
   line-height: 1.2;
   color: var(--ds-ink);
@@ -180,43 +154,14 @@
   color: var(--ds-ink);
 }
 
-.ds-memorial-edition__lede {
-  margin: var(--ds-space-3) 0 0;
-  max-width: 54ch;
-  font-family: var(--ds-font-editorial);
-  font-size: 1.0625rem;
-  line-height: 1.55;
-  color: var(--ds-ink-muted);
-}
-
-.ds-memorial-edition__body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-4);
-}
-
-.ds-memorial-edition__body p {
-  margin: 0;
-  max-width: 58ch;
-  font-family: var(--ds-font-sans);
-  font-size: 1rem;
-  line-height: 1.6;
-  color: var(--ds-ink);
-}
-
-.ds-memorial-edition__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-3);
-  margin-top: var(--ds-space-2);
-}
-
+/* Sans, sentence case. Mono caps made a count of the dead read like a system readout. */
 .ds-memorial-edition__count {
   margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  flex: none;
+  font-family: var(--ds-font-sans);
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--ds-ink-muted);
 }
 
@@ -237,11 +182,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
-  margin-block: var(--ds-space-4);
-  padding: 0.5rem;
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-  /* Opaque: the rail sits over the names as it sticks. */
+  margin-block: var(--ds-space-5);
+  padding-block: var(--ds-space-2) var(--ds-space-3);
+  /* One hairline under it instead of a box around it: a bordered island floating over a list of
+     names is a widget, and this rail is part of the page it sits in. Opaque because it sticks. */
+  border-bottom: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
   background: var(--ds-canvas);
 }
 
@@ -291,24 +236,27 @@
 }
 
 .ds-memorial-edition__group + .ds-memorial-edition__group {
-  margin-block-start: var(--ds-space-6);
+  margin-block-start: var(--ds-space-10);
 }
 
+/* The letter, in the display face at the size of a heading and in ink. As accent mono caps it
+   read as a label on the group; the memorial takes no accent. */
 .ds-memorial-edition__group-letter {
   display: flex;
   align-items: baseline;
-  gap: var(--ds-space-2);
-  margin: 0 0 var(--ds-space-2);
-  padding-block-end: 0.35rem;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
-  font-family: var(--ds-font-mono);
-  font-size: 0.875rem;
-  letter-spacing: 0.08em;
+  gap: var(--ds-space-3);
+  margin: 0 0 var(--ds-space-3);
+  font-family: var(--ds-font-display);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--ds-ink);
 }
 
 .ds-memorial-edition__group-count {
+  font-family: var(--ds-font-mono);
   font-size: 0.75rem;
+  font-weight: 400;
   color: var(--ds-ink-muted);
 }
 
@@ -398,18 +346,8 @@
   padding: var(--ds-space-3);
 }
 
-.ds-memorial-edition__list-zone[data-contrast='boosted'] .ds-memorial-edition__panel {
-  background: color-mix(in srgb, var(--ds-surface-raised) 92%, black 8%);
-}
-
 [data-theme='dark'] .ds-memorial-edition__list-zone[data-contrast='boosted'] {
   background: color-mix(in srgb, var(--ds-canvas) 70%, black 30%);
-}
-
-[data-theme='dark']
-  .ds-memorial-edition__list-zone[data-contrast='boosted']
-  .ds-memorial-edition__panel {
-  background: color-mix(in srgb, var(--ds-surface-raised) 82%, black 18%);
 }
 
 @media (prefers-reduced-motion: reduce) {

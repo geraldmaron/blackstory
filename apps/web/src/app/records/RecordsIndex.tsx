@@ -30,7 +30,7 @@ const FILTER_GROUP_LABELS: Readonly<Record<(typeof RECORDS_FILTER_KEYS)[number],
     state: 'State',
     topic: 'Topic',
     status: 'Status',
-    evidence: 'Evidence floor',
+    evidence: 'Grade',
   });
 
 /**
@@ -93,7 +93,7 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
     <Room rail={rail}>
       <RoomHeader
         pathname="/records"
-        kicker="RECORDS"
+        kicker="The whole archive, as a list"
         title="Records"
         lede={
           <>
@@ -106,35 +106,76 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           releaseLabel,
           'Readable without the map',
         ]}
+        showPath={false}
       />
 
-      <form className="ds-records-find" action="/records" method="get" role="search">
-        <label className="ds-records-find__label" htmlFor="records-q">
-          Find a record by name or summary
-        </label>
-        <div className="ds-records-find__row">
-          <input
-            className="ds-records-find__input"
-            id="records-q"
-            name="q"
-            type="search"
-            defaultValue={query.q}
-            placeholder="Tulsa, Isaac McGhie, Rosewood…"
-            autoComplete="off"
-          />
-          <button className="ds-records-find__go" type="submit">
-            Search
-          </button>
-        </div>
-        {/*
-          The other constraints ride along as hidden fields, so submitting the text field narrows
-          within the current filter rather than silently resetting it. `page` is deliberately not
-          carried: a new term starts at page one.
-        */}
-        {RECORDS_FILTER_KEYS.filter((key) => query[key].length > 0).map((key) => (
-          <input key={key} type="hidden" name={key} value={query[key]} />
-        ))}
-      </form>
+      {/*
+        One control line: the find field and every facet, side by side. The filters used to be a
+        panel of six labelled chip rows, which cost most of a screen before the first record —
+        on a 1440 canvas the index opened on its own controls. Each facet is now a native
+        `<details>`, so the vocabulary is one click away rather than gone, and the whole thing
+        still works with JavaScript off: a disclosure is markup, and every chip inside it is a
+        GET link.
+      */}
+      <div className="ds-records-controls">
+        <form className="ds-records-find" action="/records" method="get" role="search">
+          <label className="ds-visually-hidden" htmlFor="records-q">
+            Find a record by name or summary
+          </label>
+          <div className="ds-records-find__row">
+            <input
+              className="ds-records-find__input"
+              id="records-q"
+              name="q"
+              type="search"
+              defaultValue={query.q}
+              placeholder="Search names, places"
+              autoComplete="off"
+            />
+            <button className="ds-records-find__go" type="submit">
+              Search
+            </button>
+          </div>
+          {/*
+            The other constraints ride along as hidden fields, so submitting the text field narrows
+            within the current filter rather than silently resetting it. `page` is deliberately not
+            carried: a new term starts at page one.
+          */}
+          {RECORDS_FILTER_KEYS.filter((key) => query[key].length > 0).map((key) => (
+            <input key={key} type="hidden" name={key} value={query[key]} />
+          ))}
+        </form>
+
+        {RECORDS_FILTER_KEYS.map((key) => {
+          const options = facets[key];
+          if (options.length === 0) return null;
+          const active = options.find((option) => option.id === query[key]);
+          return (
+            <details className="ds-records-facet" key={key}>
+              <summary className="ds-records-facet__pill" data-active={active ? 'true' : undefined}>
+                {FILTER_GROUP_LABELS[key]}
+                {active ? <span className="ds-records-facet__value">{active.label}</span> : null}
+              </summary>
+              <div
+                className="ds-records-facet__menu"
+                role="group"
+                aria-label={FILTER_GROUP_LABELS[key]}
+              >
+                {options.slice(0, CHIPS_PER_GROUP).map((option) => (
+                  <a
+                    className="ds-room-chip"
+                    href={option.href}
+                    key={option.id}
+                    aria-current={option.id === query[key] ? true : undefined}
+                  >
+                    {option.label} <span className="ds-room-num">{option.count}</span>
+                  </a>
+                ))}
+              </div>
+            </details>
+          );
+        })}
+      </div>
 
       {constraints.length > 0 ? (
         <div className="ds-records-active" role="group" aria-label="Active constraints">
@@ -152,48 +193,6 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           </a>
         </div>
       ) : null}
-
-      {/*
-        One always-visible block, six labelled rows, rather than six stacked blocks each with a
-        heading above its own chip bar (or a `<details>` disclosure hiding all of it behind a
-        toggle): the filters are how this room is browsed, so they stay on the page inside a
-        single hairline-topped-and-bottomed block, and the label sits inline beside its chips.
-      */}
-      <div className="ds-records-filters">
-        <div className="ds-records-filters__head">
-          <span>Narrow these records</span>
-          <span className="ds-records-filters__hint" aria-hidden="true">
-            {constraints.length > 0 ? `${constraints.length} applied` : 'All records'}
-          </span>
-        </div>
-        <div className="ds-records-filters__body">
-          {RECORDS_FILTER_KEYS.map((key) => {
-            const options = facets[key];
-            if (options.length === 0) return null;
-            return (
-              <div className="ds-records-facet" key={key}>
-                <h2 className="ds-records-facet__title">{FILTER_GROUP_LABELS[key]}</h2>
-                <div
-                  className="ds-room-idx__bar"
-                  role="group"
-                  aria-label={FILTER_GROUP_LABELS[key]}
-                >
-                  {options.slice(0, CHIPS_PER_GROUP).map((option) => (
-                    <a
-                      className="ds-room-chip"
-                      href={option.href}
-                      key={option.id}
-                      aria-current={option.id === query[key] ? true : undefined}
-                    >
-                      {option.label} <span className="ds-room-num">{option.count}</span>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
 
       <HairlineIndex
         countLabel={pageCount > 1 ? `${countLabel} · page ${page} of ${pageCount}` : countLabel}

@@ -44,17 +44,33 @@
   padding-block: var(--ds-space-10) var(--ds-space-16);
 }
 
+/* —— the full-bleed blocks —————————————————————————————————————————————————
+   A masthead above the column and an apparatus band below it, both outside the measure. The
+   column keeps its measure between them; these two are the only parts of a room that are wider
+   than what a person reads. */
+.ds-room__mast {
+  position: relative;
+}
+
+.ds-room__foot {
+  margin-top: var(--ds-space-12);
+  padding: var(--ds-space-10) var(--ds-gutter) var(--ds-space-16);
+  /* One step below the canvas: the band is the same page, further from the reader. */
+  background: color-mix(in srgb, var(--ds-canvas) 92%, var(--ds-ink));
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
 /* —— the right rail ————————————————————————————————————————————————————————
    The same set, offered back grouped a second way. It sits beside the column only when there
    is room for the column to keep its measure; below that it stacks under the list, which is
    also its reading order in the document. */
-.ds-room--railed {
+.ds-room__body--railed {
   display: grid;
   grid-template-columns: 1fr;
 }
 
 @media (min-width: 68rem) {
-  .ds-room--railed {
+  .ds-room__body--railed {
     /* The first track is the column's own measure, not `1fr`. With `1fr` the track ate every
        spare pixel, `justify-content` had nothing left to centre, and the column — pinned to the
        end of that oversized track — sat hard against the rail with the whole surplus dumped in
@@ -65,7 +81,7 @@
     column-gap: var(--ds-space-8);
   }
 
-  .ds-room--railed > .ds-room__doc {
+  .ds-room__body--railed > .ds-room__doc {
     margin-inline: 0;
   }
 
@@ -200,6 +216,17 @@
   margin-bottom: var(--ds-space-8);
 }
 
+/* Sentence case, sans, caption size. Deliberately not the mono-caps register: this line sits
+   directly above a 44px display title, and two shouted lines in a row is two headlines. */
+.ds-room-header__kicker {
+  margin: 0 0 var(--ds-space-3);
+  font-family: var(--ds-font-sans);
+  font-size: 12.5px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--room-ink-3);
+}
+
 .ds-room-header__title {
   font-family: var(--ds-font-display);
   font-weight: 600;
@@ -255,31 +282,34 @@
 }
 
 /* —— GroupHeading: a section title, not a mono-caps label ——————————————————
-   Ink direction: mono is for data, and a group name is not data. Sized between the room
-   title above it and the 24px card titles it introduces, so the outline still reads top
-   to bottom. */
+   Mono is for data, and a group name is not data. Display face at 24px, ruled off underneath:
+   it has to hold its own above a column of 19px destination titles, which a 13px sans label did
+   not (the group read as a caption on the first row rather than as a heading over all five),
+   without competing with the room title above it. */
 .ds-room .ds-room-grouphd {
-  margin-top: var(--ds-space-8);
+  margin-top: var(--ds-space-10);
   padding-bottom: var(--ds-space-3);
   border-bottom: var(--ds-border-width) solid var(--room-rule-2);
   font-family: var(--ds-font-display);
+  font-size: 24px;
   font-weight: 600;
-  font-size: 28px;
   letter-spacing: -0.025em;
+  text-transform: none;
   color: var(--ds-ink);
 }
 
 .ds-room .ds-room-grouphd + .ds-room-cards {
-  margin-top: var(--ds-space-4);
+  margin-top: 0;
 }
 
 /* —— CardGrid / RoomCard ———————————————————————————————————————————————————
    Ink direction: a card is no longer a box. The border, background, radius and hover lift all
    come off; a RoomCard becomes a row separated from the next by a single bottom hairline
-   (the `index` shape — every CardGrid caller but one) or a column entry in a three-fixed-
-   column grid (the `hub` shape — `/library`, the one surface the registry actually calls a
-   hub). Kind used to be a tag drawn on the card; now it is implied by the group the card sits
-   in, so `RoomCard`'s `kind` prop stops rendering — see RoomCards.tsx. */
+   (the `index` shape, which every caller now takes including /library) or a column entry in a
+   three-fixed-column grid (the `hub` shape, kept on the surface for a genuinely wide flat set
+   but currently unused). Kind used to be a tag drawn on the card; it is implied by the group the
+   card sits in, so `RoomCard`'s `kind` prop stops rendering and a hub row that wants to say what
+   sort of room it is passes `tag` instead — see RoomCards.tsx. */
 .ds-room-cards {
   display: flex;
   flex-direction: column;
@@ -303,12 +333,6 @@
 @media (max-width: 34rem) {
   .ds-room-cards--hub {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (min-width: 56rem) {
-  .ds-room-cards {
-    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -392,12 +416,25 @@
   color: var(--room-ink-3);
 }
 
-.ds-room-card__meta {
+.ds-room-card__meta,
+.ds-room-card__tag {
   font-family: var(--ds-font-mono);
   font-size: 10px;
   letter-spacing: 0.06em;
   color: var(--room-ink-4);
   white-space: nowrap;
+}
+
+/*
+ * The tag takes the row's third column, where an index entry carries its mono facts. A hub row
+ * has no year or count to print there; what it has is the sort of room it is ("Long form",
+ * "Reference", "Receipt"), which is the one thing a reader choosing between eleven rooms is
+ * actually comparing.
+ */
+.ds-room-cards:not(.ds-room-cards--hub) .ds-room-card__tag {
+  grid-column: 3;
+  color: var(--room-ink-3);
+  font-size: 10.5px;
 }
 
 .ds-room-cards--hub .ds-room-card__meta {
@@ -412,7 +449,9 @@
     row-gap: 4px;
   }
 
-  .ds-room-cards:not(.ds-room-cards--hub) .ds-room-card__meta {
+  .ds-room-cards:not(.ds-room-cards--hub) .ds-room-card__meta,
+  .ds-room-cards:not(.ds-room-cards--hub) .ds-room-card__tag {
+    grid-column: 1;
     white-space: normal;
   }
 }
@@ -925,39 +964,79 @@ a.ds-room-chip {
 }
 
 /* —— Field ————————————————————————————————————————————————————————————————— */
+/* The label sits above the control, in the sans face at reading size, and the box is drawn by
+   the control itself. It used to be a mono-caps micro-label *inside* a bordered wrapper, which
+   made every question look like a data field in a console rather than a question being asked of
+   a person — and left the label competing with the value for the same box. */
+/* `fieldset` when the field is a choice set, `div` otherwise — so the reset has to cover the
+   agent stylesheet's fieldset box, which otherwise draws a second border around the pills. */
 .ds-room-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: var(--ds-space-3) var(--ds-space-4);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-sm);
+  gap: var(--ds-space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
-.ds-room-field:focus-within {
-  border-color: var(--ds-accent-graphic);
+.ds-room-field > legend {
+  float: left;
+  width: 100%;
+  padding: 0;
+}
+
+/* `float` takes the legend out of flow, so the choices need the row back. */
+.ds-room-field > legend + * {
+  clear: both;
 }
 
 .ds-room-field__label {
-  font-family: var(--ds-font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--room-ink-4);
+  font-family: var(--ds-font-sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ds-ink);
+}
+
+/* The quiet half of a label: "Optional, but it speeds review up". */
+.ds-room-field__label small {
+  font-size: inherit;
+  font-weight: 400;
+  color: var(--room-ink-3);
+}
+
+/* One line under the control, for the sentence that tells a person how to answer. */
+.ds-room-field__hint {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--room-ink-3);
 }
 
 .ds-room-field input,
 .ds-room-field select,
 .ds-room-field textarea {
   width: 100%;
-  background: none;
-  border: 0;
+  min-height: 48px;
+  padding: 13px var(--ds-space-4);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
   outline: none;
   font-family: var(--ds-font-sans);
-  font-size: 14px;
+  font-size: 14.5px;
   line-height: 1.5;
   color: var(--ds-ink);
+}
+
+.ds-room-field input:focus-visible,
+.ds-room-field select:focus-visible,
+.ds-room-field textarea:focus-visible {
+  border-color: var(--ds-accent-graphic);
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 1px;
 }
 
 .ds-room-field select {
@@ -966,8 +1045,49 @@ a.ds-room-chip {
 }
 
 .ds-room-field textarea {
-  min-height: 96px;
+  min-height: 110px;
   resize: vertical;
+}
+
+/* A field whose answer is a small closed set: real radios, drawn as pills. Radios rather than
+   buttons because the answer has to survive JavaScript being off, and a chip that is not an
+   input cannot be submitted. */
+.ds-room-field__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+}
+
+.ds-room-field__choice input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ds-room-field__choice span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.ds-room-field__choice input:checked + span {
+  background: var(--room-copper-wash);
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+.ds-room-field__choice input:focus-visible + span {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
 }
 
 /* —— UtilityCard / UtilityStep ————————————————————————————————————————————— */

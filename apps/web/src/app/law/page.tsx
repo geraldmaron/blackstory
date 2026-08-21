@@ -83,7 +83,7 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
     <Room rail={rail}>
       <RoomHeader
         pathname="/law"
-        kicker="REFERENCE"
+        kicker="Reference"
         title={
           <>
             Civil rights <em>law</em>

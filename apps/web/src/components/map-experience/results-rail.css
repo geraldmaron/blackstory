@@ -7,14 +7,14 @@
 
 .ds-results {
   position: fixed;
-  top: calc(56px + var(--ds-space-4));
+  top: var(--ds-atlas-top);
   right: var(--ds-space-4);
   z-index: var(--ds-z-atlas-instruments);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   width: 344px;
-  /* Reserves the camera console's own column: 166px of console plus its bottom margin. */
-  max-height: calc(100dvh - 56px - var(--ds-space-4) * 2 - 200px);
+  /* The right column's floor, not the shared one: the camera console sits under this rail. */
+  max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom-right));
   /* One panel recipe shared by all four Atlas instruments — see lens-panel.css. */
   background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
   border: var(--ds-border-width) solid var(--ds-border);
@@ -202,15 +202,15 @@
   color: var(--ds-accent);
 }
 
-/* Narrow: bottom sheet, clear of the time panel and the camera console. See lens-panel.css. */
+/* See lens-panel.css: one shared narrow slot, one instrument in it. */
 @media (max-width: 819px) {
   .ds-results {
     top: auto;
     left: var(--ds-space-2);
     right: var(--ds-space-2);
-    bottom: calc(var(--ds-space-2) + 138px);
+    bottom: calc(var(--ds-space-2) + 66px);
     width: auto;
-    max-height: min(34dvh, 300px);
+    max-height: min(46dvh, 360px);
   }
 }
 

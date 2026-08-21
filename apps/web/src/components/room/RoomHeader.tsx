@@ -1,7 +1,7 @@
 /**
  * RoomHeader — the one header every room in every surface class renders, and the only one.
  *
- * Breadcrumb chain, mono kicker, display title, serif lede, meta row of mono facts. Twelve
+ * Breadcrumb chain, sentence-case kicker, display title, serif lede, meta row of mono facts. Twelve
  * `*-panel-chrome.ts` modules existed because each route drew this itself; the parity gate
  * (repo-92n2.31) asserts no room renders a second header.
  */
@@ -19,9 +19,9 @@ export type RoomHeaderProps = {
   /** Final breadcrumb step. Defaults to the registry label for `pathname`. */
   readonly crumbLabel?: string;
   /**
-   * Mono caps register above the title — the room's kind, not a restatement of the title.
-   * Ink direction: no longer rendered (the title takes the space instead); kept on the type
-   * so the twelve existing callers do not have to change in the same commit.
+   * One quiet line above the title saying what sort of room this is, not a restatement of the
+   * title. Sentence case in the sans face: it is orientation, not a label. See the render below
+   * for why it stopped being the v6 mono-caps register.
    */
   readonly kicker?: string;
   /** The display title. `<em>` inside renders in the editorial italic accent. */
@@ -45,16 +45,18 @@ export function RoomHeader({
   showPath = true,
   className,
 }: RoomHeaderProps) {
-  void kicker;
   const facts = meta ?? [];
   const hasMeta = facts.length > 0 || showPath;
-  // Kept on the prop surface for the twelve existing callers; no longer rendered — the title
-  // takes the space the kicker used to hold (Ink spec §2/§3).
-  void kicker;
 
   return (
     <header className={cx('ds-room-header', className)}>
       <Breadcrumb pathname={pathname} hereLabel={crumbLabel} />
+      {/* The kicker is back, and it is not the v6 mono-caps label it used to be. Sentence case
+          in the sans face at reading-caption size: one quiet line saying what sort of room this
+          is before the title says which one. The Ink spec dropped it because a shouted
+          `EVERYTHING THAT IS NOT THE MAP` above a 44px title is two headlines fighting; a
+          lowercase line under the same title is orientation, which is what a kicker is for. */}
+      {kicker ? <p className="ds-room-header__kicker">{kicker}</p> : null}
       <h1 className="ds-room-header__title">{title}</h1>
       {lede ? <p className="ds-room-header__lede">{lede}</p> : null}
       {hasMeta ? (

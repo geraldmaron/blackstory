@@ -25,13 +25,33 @@ export type RoomProps = {
    * they group; the grid places it alongside on wide viewports and below on narrow.
    */
   readonly rail?: ReactNode;
+  /**
+   * Full-bleed block above the column: the record page's media masthead, the chapter's hero.
+   *
+   * It sits outside the measure on purpose. A masthead is the one part of these two surfaces
+   * that is an image first — cropping it to a 680px text column turns the photograph into an
+   * illustration beside the title rather than the thing the reader lands on.
+   */
+  readonly masthead?: ReactNode;
+  /**
+   * Full-bleed block below the column: the apparatus band — bibliography, provenance, gaps.
+   *
+   * Demoted here rather than deleted. Every one of these facts is load-bearing for a reader
+   * checking the archive's work, and none of them is what a reader came for; in the rail they
+   * turned the first screen of a record into four boxes of metadata.
+   */
+  readonly foot?: ReactNode;
 };
 
-export function Room({ children, className, id = 'main', rail }: RoomProps) {
+export function Room({ children, className, id = 'main', rail, masthead, foot }: RoomProps) {
   return (
-    <main className={cx('ds-room', rail !== undefined && 'ds-room--railed', className)} id={id}>
-      <div className="ds-room__doc">{children}</div>
-      {rail === undefined ? null : <aside className="ds-room__rail">{rail}</aside>}
+    <main className={cx('ds-room', className)} id={id}>
+      {masthead === undefined ? null : <div className="ds-room__mast">{masthead}</div>}
+      <div className={cx('ds-room__body', rail !== undefined && 'ds-room__body--railed')}>
+        <div className="ds-room__doc">{children}</div>
+        {rail === undefined ? null : <aside className="ds-room__rail">{rail}</aside>}
+      </div>
+      {foot === undefined ? null : <div className="ds-room__foot">{foot}</div>}
     </main>
   );
 }

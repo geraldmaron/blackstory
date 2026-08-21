@@ -4,7 +4,6 @@
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { CORRECTION_FORM_INTRO } from './copy';
 import { CorrectionsSections } from './CorrectionsSections';
 import { Room, RoomHeader } from '../../components/room';
 import '../utility.css';
@@ -20,9 +19,10 @@ export default function CorrectionsPage() {
     <Room>
       <RoomHeader
         pathname="/corrections"
-        kicker="Trust"
-        title="Corrections"
-        lede={CORRECTION_FORM_INTRO}
+        kicker="Take part"
+        title="Tell the archive it is wrong"
+        lede="You get a receipt code and a tracked outcome. Corrections are reviewed by a person; nothing you send publishes on arrival."
+        showPath={false}
       />
       <CorrectionsSections />
     </Room>

@@ -32,6 +32,7 @@ import { MemorialScrollCue } from './MemorialScrollCue';
 import {
   MEMORIAL_HELD_MESSAGE_LINES,
   MEMORIAL_KICKER,
+  MEMORIAL_PAGE_LEDE,
   MEMORIAL_PAGE_DESCRIPTION,
   MEMORIAL_PAGE_TITLE,
   MEMORIAL_QUIET_LIST_LINK_A11Y_LABEL,
@@ -97,6 +98,7 @@ export default async function MemorialPage() {
             pathname="/memorial"
             kicker={MEMORIAL_KICKER}
             title={MEMORIAL_PAGE_TITLE}
+            lede={MEMORIAL_PAGE_LEDE}
             showPath={false}
           />
         </div>

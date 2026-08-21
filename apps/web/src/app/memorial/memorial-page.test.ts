@@ -12,10 +12,7 @@ import {
   memorialNamesByInitial,
   MEMORIAL_NAMES,
 } from '../../components/patterns/memorial-wall/memorial-names';
-import {
-  memorialEditionPanelClassName,
-  memorialEditionRootClassName,
-} from './memorial-panel-chrome';
+import { memorialEditionRootClassName } from './memorial-panel-chrome';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -26,15 +23,12 @@ test('memorial edition root does not use photo mosaic atmosphere', () => {
   assert.match(memorialEditionRootClassName(), /ds-memorial-edition/);
 });
 
-test('memorial panels expose intro and list variants', () => {
-  assert.equal(
-    memorialEditionPanelClassName('intro'),
-    'ds-memorial-edition__panel ds-memorial-edition__panel--intro',
-  );
-  assert.equal(
-    memorialEditionPanelClassName('list'),
-    'ds-memorial-edition__panel ds-memorial-edition__panel--list',
-  );
+test('the memorial list is not drawn as a panel', () => {
+  const sectionsSource = readFileSync(join(here, 'MemorialSections.tsx'), 'utf8');
+  // No card frame, no section numeral, no mono-caps kicker over the names.
+  assert.doesNotMatch(sectionsSource, /__panel/);
+  assert.doesNotMatch(sectionsSource, /__index/);
+  assert.doesNotMatch(sectionsSource, /__kicker/);
 });
 
 test('memorial name list is unique and alphabetical helper sorts', () => {

@@ -55,10 +55,22 @@ export type Destination = {
    * crumb; "Submit a lead" is the right card. Defaults to {@link Destination.label}.
    */
   readonly cardTitle?: string;
-  /** Mono caps kicker on the card: what sort of thing this room is. */
+  /**
+   * What sort of thing this room is. No longer printed as a card kicker: a three-up card had no
+   * room for it. `/library` cases it into `RoomCard`'s `tag`, which takes the index row's third
+   * column, and the mobile app and the palette still read the field as stored.
+   */
   readonly kind?: string;
   /** One line. Two lines is a summary, and a card is not a summary. */
   readonly description?: string;
+  /**
+   * Three or four words, for the bar's Library menu.
+   *
+   * Not the same string as {@link Destination.description}: a menu row is 195px wide and a
+   * sentence wraps to four lines in it, which turned an eleven-room menu into a panel taller
+   * than the surface it opened over. This is the gloss, not the summary.
+   */
+  readonly menuLine?: string;
   /**
    * Appended to the surface-class name in the card's mono footer: `READING ROOM · PLAIN LANGUAGE`.
    * The class itself is never written here — it is read from `surface-classes.ts`, so a room that
@@ -138,6 +150,7 @@ const DESTINATIONS: readonly Destination[] = [
     kind: 'LONG FORM',
     description:
       'The archive argued rather than listed. Sourced narrative that names the records it rests on.',
+    menuLine: 'Sourced narrative',
     group: 'read',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
@@ -149,6 +162,7 @@ const DESTINATIONS: readonly Destination[] = [
     description:
       'The statutes and rulings that shaped what could be built, owned, attended and voted for.',
     modifier: 'PLAIN LANGUAGE',
+    menuLine: 'Statutes and rulings',
     group: 'read',
     crawl: { changeFrequency: 'weekly', priority: 0.7 },
   },
@@ -160,6 +174,7 @@ const DESTINATIONS: readonly Destination[] = [
     description:
       'National series with their sources attached, and a plain account of what each one cannot tell you.',
     modifier: 'TABULAR',
+    menuLine: 'National series',
     group: 'read',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
@@ -169,6 +184,7 @@ const DESTINATIONS: readonly Destination[] = [
     parent: '/library',
     kind: 'CATALOGUE',
     description: 'Documented challenges to titles, recorded as challenges rather than as verdicts.',
+    menuLine: 'Documented challenges',
     group: 'read',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
@@ -179,6 +195,7 @@ const DESTINATIONS: readonly Destination[] = [
     kind: 'NAMES',
     description: 'Names, held quietly. No imagery of harm, no counts presented as a score.',
     modifier: 'STILL',
+    menuLine: 'Names, held quietly',
     group: 'read',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
@@ -192,6 +209,7 @@ const DESTINATIONS: readonly Destination[] = [
     description:
       'How a record gets in, what the evidence grades mean, and why a point is never drawn sharper than its source.',
     modifier: 'RECEIPT',
+    menuLine: 'How a record gets in',
     group: 'check',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
@@ -203,6 +221,7 @@ const DESTINATIONS: readonly Destination[] = [
     description:
       'The mistakes the archive found and fixed, published rather than quietly overwritten.',
     modifier: 'FEED AVAILABLE',
+    menuLine: 'Mistakes, published',
     group: 'check',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
@@ -212,6 +231,7 @@ const DESTINATIONS: readonly Destination[] = [
     parent: '/library',
     kind: 'FRAMING',
     description: 'What this is for, who it is for, and what it refuses to do.',
+    menuLine: 'What this refuses to do',
     group: 'check',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
@@ -226,6 +246,7 @@ const DESTINATIONS: readonly Destination[] = [
     description:
       'Point the archive at something it has missed. Leads are reviewed, not published on arrival.',
     modifier: 'FORM',
+    menuLine: 'Send us a lead',
     group: 'take-part',
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
@@ -237,6 +258,7 @@ const DESTINATIONS: readonly Destination[] = [
     kind: 'CORRECT',
     description: 'Tell the archive it is wrong. You get a receipt code and a tracked outcome.',
     modifier: 'FORM · TRACKED',
+    menuLine: 'Tell us it is wrong',
     group: 'take-part',
     crawl: { changeFrequency: 'monthly', priority: 0.6 },
   },
@@ -246,6 +268,7 @@ const DESTINATIONS: readonly Destination[] = [
     parent: '/library',
     kind: 'HELP',
     description: 'How to get an answer, and how long it should take.',
+    menuLine: 'Keep this running',
     group: 'take-part',
     crawl: { changeFrequency: 'monthly', priority: 0.4 },
   },

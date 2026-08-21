@@ -185,6 +185,26 @@
   --ds-space-12: 3rem;
   --ds-space-16: 4rem;
 
+  /*
+   * The Atlas gutters. Every floating instrument positions from these two and nothing else.
+   *
+   * They exist because five selectors used to compute their own top from
+   * `calc(56px + var(--ds-space-4))` = 72px, while the command bar is 64px tall at an 8px offset
+   * and so ends at 72px too: the intended 16px of air was zero and the instruments sat flush
+   * against the bar. `--ds-atlas-bottom` is the matching floor — the time panel renders 139px
+   * tall, plus its 16px offset and a 12px gap — so a panel's max-height is
+   * `100dvh - top - bottom` rather than a hand-computed subtraction per file.
+   */
+  --ds-atlas-top: 88px;
+  --ds-atlas-bottom: 168px;
+  /*
+   * The right column's own floor. The camera console lives under the results rail, not under the
+   * time panel, and it is taller than the time panel's band: 174px of console plus its 16px
+   * offset and a 12px gap. Without this the rail ran to the shared floor and the console's top
+   * corner sat inside it.
+   */
+  --ds-atlas-bottom-right: 202px;
+
   --ds-radius-sm: 8px;
   --ds-radius-md: 14px;
   --ds-radius-lg: 28px;
