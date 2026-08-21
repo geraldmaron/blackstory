@@ -86,7 +86,7 @@ export type LawPageParam = (typeof LAW_PAGE_PARAM_ALLOWLIST)[number];
 export const STORIES_PAGE_PARAM_ALLOWLIST = [
   'q',
   'kind',
-  'series',
+  'collection',
   'tag',
   'era',
   'place',

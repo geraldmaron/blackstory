@@ -51,7 +51,7 @@ import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
 import { getPublicSearchIndex, resolvePublicEntityView } from '../../../lib/public-data/source';
 import { resolveEntityCrossReferences } from '../../../lib/theme-impact/source';
 import { resolveCitesEdgeIndex } from '../../../lib/articles/source';
-import { chaptersCiting } from '../../../lib/release/build-cites-edge';
+import { storiesCiting } from '../../../lib/release/build-cites-edge';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
 import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './adapters';
 import { buildEntityAnatomyInputs } from './entity-anatomy-facts';
@@ -238,7 +238,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const { data: searchIndex } = await getPublicSearchIndex();
   const orderedIds = searchIndex.map((doc) => doc.id);
   const crossReferences = await resolveEntityCrossReferences(entity.id);
-  const citingChapters = chaptersCiting(await resolveCitesEdgeIndex(), entity.id);
+  const citingStories = storiesCiting(await resolveCitesEdgeIndex(), entity.id);
 
   const anatomyInputs = buildEntityAnatomyInputs(entity, mapTone);
   const sources = toRoomSources(entity.claims);
@@ -378,20 +378,18 @@ export default async function EntityPage({ params }: EntityPageProps) {
             </section>
           ) : null}
 
-          {citingChapters.length > 0 ? (
+          {citingStories.length > 0 ? (
             <section aria-labelledby="cited-by-heading">
               <h3 className="ds-record-appx__title" id="cited-by-heading">
-                Chapters that cite this record
+                Cited in
               </h3>
               <ul className="ds-record-rail-block__chapters">
-                {citingChapters.map((chapter) => (
-                  <li key={chapter.slug}>
-                    <Link href={chapter.href} prefetch={false}>
-                      {chapter.title}
+                {citingStories.map((story) => (
+                  <li key={story.slug}>
+                    <Link href={story.href} prefetch={false}>
+                      {story.title}
                     </Link>
-                    <span className="ds-record-rail-block__relation ds-mono">
-                      {chapter.relation}
-                    </span>
+                    <span className="ds-record-rail-block__relation ds-mono">{story.relation}</span>
                   </li>
                 ))}
               </ul>

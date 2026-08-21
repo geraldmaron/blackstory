@@ -3,7 +3,7 @@
  * windowing, header facts, the rail groups and the three notice states.
  *
  * A story is one long-form publication, and `kind` says under which editorial contract:
- * `chapter` (era-immersion, prose floor) or `article` (a record entry — a paragraph of
+ * `chapter` (era-immersion, prose floor) or `article` (a short entry — a paragraph of
  * context plus individually cited call-outs). Both live in one index because a reader
  * looking for what the archive says about a subject should not have to know which
  * contract the answer was written under.
@@ -11,6 +11,15 @@
  * Filtering, sorting and search are all URL state — no client-side store. Every control
  * is a link or a form GET, so a narrowed view is bookmarkable, shareable, crawlable, and
  * works with JavaScript off. Same law as `/records`.
+ *
+ * VOCABULARY. `collection` (query field, URL param, sort key) is the reader-facing word for
+ * what the schema calls a `series` — an ordered set like the presidency (`item.series` stays
+ * the schema's own field name; only the navigation-facing vocabulary changed). "Chapter" names
+ * one editorial contract; it does not mean "any story" — the citation edge that says which
+ * stories reference a record is `storiesCiting`, not a chapter-only concept. And the `article`
+ * kind's public label is "Entry", not "Record": `/records` is the unrelated whole-archive entity
+ * index, and reusing its name for a Stories kind chip sent a reader from one to the other
+ * thinking they were the same kind of list.
  *
  * WHY THIS IS NOT IN `page.tsx`. Next 16 type-checks a route file's export surface against
  * a fixed allowlist (`default`, `metadata`, `revalidate`, and so on) and fails the build on
@@ -21,11 +30,11 @@ import { RECORDS_PAGE_SIZE } from '../../lib/records/build-records-index';
 import type { RailEntry } from '../../components/room';
 
 /**
- * Sort keys. `series` is the default whenever a series is being viewed, because a
+ * Sort keys. `collection` is the default whenever a collection is being viewed, because a
  * collection's own order (presidency number) is the order its reader expects; it falls
- * back to newest-first for anything with no series position.
+ * back to newest-first for anything with no collection position.
  */
-export const STORY_SORT_KEYS = ['series', 'newest', 'oldest', 'title'] as const;
+export const STORY_SORT_KEYS = ['collection', 'newest', 'oldest', 'title'] as const;
 export type StorySortKey = (typeof STORY_SORT_KEYS)[number];
 
 export const STORY_KINDS = ['chapter', 'article'] as const;
@@ -33,7 +42,7 @@ export const STORY_KINDS = ['chapter', 'article'] as const;
 export type StoriesQuery = {
   readonly q: string;
   readonly kind: string;
-  readonly series: string;
+  readonly collection: string;
   readonly tag: string;
   readonly era: string;
   readonly place: string;
@@ -46,11 +55,11 @@ const EMPTY_STORIES_QUERY: StoriesQuery = {
   // Chapters are the default view; `kind: ''` is reserved for an explicit "All" narrowing
   // (URL param `kind=all`), not the unset state.
   kind: 'chapter',
-  series: '',
+  collection: '',
   tag: '',
   era: '',
   place: '',
-  sort: 'series',
+  sort: 'collection',
   page: 1,
 };
 
@@ -85,11 +94,11 @@ export function parseStoriesQuery(
   return {
     q: one('q').slice(0, 120),
     kind,
-    series: one('series'),
+    collection: one('collection'),
     tag: one('tag'),
     era: one('era'),
     place: one('place'),
-    sort: isSortKey(rawSort) ? rawSort : 'series',
+    sort: isSortKey(rawSort) ? rawSort : 'collection',
     page: Number.isFinite(rawPage) && rawPage > 1 ? rawPage : 1,
   };
 }
@@ -103,11 +112,11 @@ export function storiesHref(query: Partial<StoriesQuery>): string {
   // default and stays out of the URL like the other default values below.
   if (merged.kind === '') params.set('kind', 'all');
   else if (merged.kind !== 'chapter') params.set('kind', merged.kind);
-  if (merged.series.length > 0) params.set('series', merged.series);
+  if (merged.collection.length > 0) params.set('collection', merged.collection);
   if (merged.tag.length > 0) params.set('tag', merged.tag);
   if (merged.era.length > 0) params.set('era', merged.era);
   if (merged.place.length > 0) params.set('place', merged.place);
-  if (merged.sort !== 'series') params.set('sort', merged.sort);
+  if (merged.sort !== 'collection') params.set('sort', merged.sort);
   if (merged.page > 1) params.set('page', String(merged.page));
   const search = params.toString();
   return search.length > 0 ? `/stories?${search}` : '/stories';
@@ -115,7 +124,7 @@ export function storiesHref(query: Partial<StoriesQuery>): string {
 
 /**
  * Free-text match over the fields a reader can actually see on a card: title, summary,
- * series label and the entry's own position label ("16th president"). Deliberately a
+ * collection label and the entry's own position label ("16th president"). Deliberately a
  * substring scan rather than a ranked index — the collection is small enough that
  * exactness beats cleverness, and a reader typing "lincoln" wants the Lincoln entry, not
  * a relevance-ordered guess.
@@ -142,7 +151,7 @@ export function filterItems(
 ): readonly PublicArticleListItemDoc[] {
   return items.filter((item) => {
     if (query.kind.length > 0 && (item.kind ?? 'chapter') !== query.kind) return false;
-    if (query.series.length > 0 && item.series?.id !== query.series) return false;
+    if (query.collection.length > 0 && item.series?.id !== query.collection) return false;
     if (query.tag.length > 0 && !(item.tags ?? []).includes(query.tag)) return false;
     if (query.era.length > 0 && item.eraLabel !== query.era) return false;
     if (query.place.length > 0 && item.placeLabel !== query.place) return false;
@@ -170,9 +179,9 @@ export function sortItems(
       return copy.sort((a, b) => a.publishedAt.localeCompare(b.publishedAt) || bySlug(a, b));
     case 'newest':
       return copy.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt) || bySlug(a, b));
-    case 'series':
+    case 'collection':
     default:
-      // Series members sort by the collection's own key; everything else keeps
+      // Collection members sort by the collection's own key; everything else keeps
       // newest-first behind them, so a mixed index still leads with recent work.
       return copy.sort((a, b) => {
         const aPos = a.series?.position;
@@ -243,10 +252,10 @@ function buildGroups(
     .map(([entryLabel, count]) => ({ label: entryLabel, href: hrefFor(entryLabel), count }));
 }
 
-// Rail links (era/place/series/tag) group across both editorial kinds — a collection like
-// "Presidential records" is entirely `article`, so these must carry an explicit kind: ''
-// (renders as `kind=all`) rather than falling through to the chapters default, or they'd
-// resolve to an empty result for any all-article grouping.
+// Rail links (era/place/collection/tag) group across both editorial kinds — a collection like
+// "The presidency" is entirely `article`, so these must carry an explicit kind: '' (renders as
+// `kind=all`) rather than falling through to the chapters default, or they'd resolve to an
+// empty result for any all-entry grouping.
 
 export function buildEraGroups(items: readonly PublicArticleListItemDoc[]): readonly RailEntry[] {
   return buildGroups(
@@ -264,8 +273,8 @@ export function buildPlaceGroups(items: readonly PublicArticleListItemDoc[]): re
   );
 }
 
-/** Collections, for the rail: one entry per distinct series, ordered by size. */
-export function buildSeriesGroups(
+/** Collections, for the rail: one entry per distinct collection, ordered by size. */
+export function buildCollectionGroups(
   items: readonly PublicArticleListItemDoc[],
 ): readonly RailEntry[] {
   const labels = new Map<string, string>();
@@ -281,7 +290,7 @@ export function buildSeriesGroups(
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .map(([id, count]) => ({
       label: labels.get(id) ?? id,
-      href: storiesHref({ series: id, kind: '' }),
+      href: storiesHref({ collection: id, kind: '' }),
       count,
     }));
 }
@@ -295,48 +304,49 @@ export type StoriesShelf = {
 };
 
 /**
- * One shelf per collection, ordered by size (largest first, same order as `buildSeriesGroups`),
- * each carrying its own first `membersPerShelf` entries in the collection's own order. Reuses
- * `sortItems(..., 'series')` for member order rather than inventing a second sort.
+ * One shelf per collection, ordered by size (largest first, same order as
+ * `buildCollectionGroups`), each carrying its own first `membersPerShelf` entries in the
+ * collection's own order. Reuses `sortItems(..., 'collection')` for member order rather than
+ * inventing a second sort.
  */
-export function buildSeriesShelves(
+export function buildCollectionShelves(
   items: readonly PublicArticleListItemDoc[],
   membersPerShelf = 4,
 ): readonly StoriesShelf[] {
   const labels = new Map<string, string>();
-  const bySeries = new Map<string, PublicArticleListItemDoc[]>();
+  const byCollection = new Map<string, PublicArticleListItemDoc[]>();
   for (const item of items) {
     if (!item.series) continue;
     labels.set(item.series.id, item.series.label);
-    const list = bySeries.get(item.series.id);
+    const list = byCollection.get(item.series.id);
     if (list) list.push(item);
-    else bySeries.set(item.series.id, [item]);
+    else byCollection.set(item.series.id, [item]);
   }
-  return [...bySeries.entries()]
+  return [...byCollection.entries()]
     .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
     .map(([id, members]) => ({
       id,
       label: labels.get(id) ?? id,
       count: members.length,
-      href: storiesHref({ series: id, kind: '' }),
-      members: sortItems(members, 'series').slice(0, membersPerShelf),
+      href: storiesHref({ collection: id, kind: '' }),
+      members: sortItems(members, 'collection').slice(0, membersPerShelf),
     }));
 }
 
 /**
  * The next entry in a collection after `afterPosition`, for the story page's "Next in this
- * collection" rail block. `undefined` when the given series has no later member (its own
- * `sortItems(..., 'series')` order applies, so a tie on position falls back to slug like
- * everywhere else series order is computed).
+ * collection" rail block. `undefined` when the given collection has no later member (its own
+ * `sortItems(..., 'collection')` order applies, so a tie on position falls back to slug like
+ * everywhere else collection order is computed).
  */
-export function nextInSeries(
+export function nextInCollection(
   items: readonly PublicArticleListItemDoc[],
-  seriesId: string,
+  collectionId: string,
   afterPosition: number,
 ): PublicArticleListItemDoc | undefined {
   const members = sortItems(
-    items.filter((item) => item.series?.id === seriesId),
-    'series',
+    items.filter((item) => item.series?.id === collectionId),
+    'collection',
   );
   return members.find((item) => (item.series?.position ?? -1) > afterPosition);
 }
@@ -349,8 +359,8 @@ export function uncollectedItems(
 }
 
 /**
- * The one chapter that leads the shelves page at full width: the most recently published
- * chapter in view. Deterministic and reads from data already on hand — no new field, no
+ * The one story that leads the shelves page at full width: the most recently published
+ * story in view. Deterministic and reads from data already on hand — no new field, no
  * editorial "featured" flag to maintain.
  */
 export function pickLeadStory(
@@ -396,7 +406,9 @@ export function buildKindChips(
       active: query.kind === 'chapter',
     },
     {
-      label: 'Records',
+      // Not "Records": `/records` is the unrelated whole-archive entity index, and reusing its
+      // name here sent a reader clicking this chip expecting that list.
+      label: 'Entries',
       href: storiesHref({ ...base, kind: 'article' }),
       count: countOf('article'),
       active: query.kind === 'article',
@@ -405,33 +417,49 @@ export function buildKindChips(
 }
 
 export const STORY_SORT_LABELS: Record<StorySortKey, string> = {
-  series: 'Collection order',
+  collection: 'Collection order',
   newest: 'Newest first',
   oldest: 'Oldest first',
   title: 'Title A–Z',
 };
 
 /**
- * True in the page's default, unnarrowed browse state — the one state the shelves layout
- * renders in. Any active filter/search or a non-default sort drops back to the flat, paginated
- * index: shelves have their own count order and per-collection position order, and showing them
- * while a reader's `sort` choice sits unapplied would be dishonest about what changed.
+ * True whenever a search, a collection/tag/era/place narrowing, or a non-default sort is
+ * engaged — the field-level narrowing that makes shelf browsing dishonest about what changed
+ * (shelves have their own count order and per-collection position order). Deliberately excludes
+ * the kind chip: a collection like the presidents is entirely `article`, so gating shelf mode on
+ * `kind === 'chapter'` (the old behaviour) meant its shelf could never render at all — the
+ * default view filtered every one of its members out before the shelf builder ever saw them, and
+ * clicking the "Entries" chip to actually find them dropped into the flat grid instead, since any
+ * kind other than the default counted as "narrowed". A reader could see "The presidents on the
+ * record (45)" advertised in the rail and never once reach a browsable shelf for it.
  */
-export function showsShelves(query: StoriesQuery): boolean {
-  return !hasActiveNarrowing(query) && query.sort === 'series';
-}
-
-/** True when any narrowing control is engaged — drives the "clear" affordance. */
-export function hasActiveNarrowing(query: StoriesQuery): boolean {
+function hasFieldNarrowing(query: StoriesQuery): boolean {
   return (
     query.q.length > 0 ||
-    // 'chapter' is the default view, not a narrowing; 'article' and '' (all) both are.
-    query.kind !== 'chapter' ||
-    query.series.length > 0 ||
+    query.collection.length > 0 ||
     query.tag.length > 0 ||
     query.era.length > 0 ||
     query.place.length > 0
   );
+}
+
+/**
+ * True in the page's unnarrowed browse state for whichever kind is in view — the state the
+ * shelves layout renders in. `filtered` (built from the same query) is already scoped to the
+ * active kind chip, so shelves, the lead and "Everything else" all inherit that scoping for
+ * free; this only has to say whether shelf mode applies at all.
+ */
+export function showsShelves(query: StoriesQuery): boolean {
+  return !hasFieldNarrowing(query) && query.sort === 'collection';
+}
+
+/** True when any narrowing control is engaged — drives the "clear" affordance. */
+export function hasActiveNarrowing(query: StoriesQuery): boolean {
+  // 'chapter' is the default view, not a narrowing; 'article' and '' (all) both are. This is
+  // broader than `hasFieldNarrowing` on purpose: the Clear affordance resets the kind chip too,
+  // even though the kind chip no longer gates shelf mode above.
+  return query.kind !== 'chapter' || hasFieldNarrowing(query);
 }
 
 type StoriesNotice = { readonly title: string; readonly body: string };

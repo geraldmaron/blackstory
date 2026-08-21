@@ -49,8 +49,8 @@ export type SheetConnection = {
   readonly href?: string;
 };
 
-/** One chapter that cites the record. Mirrors `ChapterCitation` without importing the server module. */
-export type SheetCitingChapter = {
+/** One story that cites the record. Mirrors `StoryCitation` without importing the server module. */
+export type SheetCitingStory = {
   readonly slug: string;
   readonly title: string;
   /** Stated in words: "mapped in", "referenced in". */
@@ -85,10 +85,10 @@ export type SheetRecord = {
   readonly sources: readonly SheetSource[];
   readonly connections: readonly SheetConnection[];
   /**
-   * Chapters that cite this record (SP-20). Optional so every existing caller keeps compiling
-   * and simply renders no chapter list; the Atlas and `/entity/[id]` supply it.
+   * Stories that cite this record (SP-20). Optional so every existing caller keeps compiling
+   * and simply renders no citation list; the Atlas and `/entity/[id]` supply it.
    */
-  readonly citingChapters?: readonly SheetCitingChapter[];
+  readonly citingStories?: readonly SheetCitingStory[];
   readonly anatomyPlace?: RecordAnatomyPlace;
 };
 
@@ -183,7 +183,7 @@ export function RecordSheet({
    * fallback copy below exists for.
    */
   const sourceCount = record.sources.length > 0 ? record.sources.length : (record.sourceCount ?? 0);
-  const citingChapters = record.citingChapters ?? [];
+  const citingStories = record.citingStories ?? [];
 
   return (
     <aside
@@ -465,23 +465,23 @@ export function RecordSheet({
 
         {/*
          * The record side of the thesis: every record links back to the writing about it. Renders
-         * only when a chapter actually cites this record — an empty "Chapters that cite this
-         * record" heading on most of the catalog would read as a gap in the archive rather than
-         * as the ordinary state of a record no chapter has reached yet.
+         * only when a story actually cites this record — an empty "Cited in" heading on most of
+         * the catalog would read as a gap in the archive rather than as the ordinary state of a
+         * record no story has reached yet.
          */}
-        {citingChapters.length > 0 ? (
+        {citingStories.length > 0 ? (
           <section className="ds-sheet__group">
             <h3 className="ds-sheet__group-label">
-              Chapters that cite this record
+              Cited in
               <span className="ds-sheet__group-hint">
-                {citingChapters.length === 1 ? '1 chapter' : `${citingChapters.length} chapters`}
+                {citingStories.length === 1 ? '1 story' : `${citingStories.length} stories`}
               </span>
             </h3>
             <ul className="ds-sheet__connections ds-sheet__chapters">
-              {citingChapters.map((chapter) => (
-                <li key={chapter.slug} className="ds-sheet__connection">
-                  <a href={chapter.href}>{chapter.title}</a>
-                  <span className="ds-sheet__relation">{chapter.relation}</span>
+              {citingStories.map((story) => (
+                <li key={story.slug} className="ds-sheet__connection">
+                  <a href={story.href}>{story.title}</a>
+                  <span className="ds-sheet__relation">{story.relation}</span>
                 </li>
               ))}
             </ul>

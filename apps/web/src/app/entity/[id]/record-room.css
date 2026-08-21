@@ -601,8 +601,8 @@
   color: var(--room-ink-3);
 }
 
-/* Chapters that cite this record. Unbulleted: these are links out of the record, not reasons
-   for it, and a bullet would file them with the inclusion rubric directly below. */
+/* Stories cited in this record ("Cited in"). Unbulleted: these are links out of the record, not
+   reasons for it, and a bullet would file them with the inclusion rubric directly below. */
 .ds-record-rail-block__chapters {
   margin: 0;
   padding: 0;

@@ -168,12 +168,12 @@ test('copy carries no em dash', () => {
 });
 
 /* ---------------------------------------------------------------------------- *
- * SP-20 — the chapter-cites-record edge on the sheet.
+ * SP-20 — the story-cites-record edge on the sheet.
  * ---------------------------------------------------------------------------- */
 
 const CITED: SheetRecord = {
   ...RECORD,
-  citingChapters: [
+  citingStories: [
     {
       slug: 'birmingham-1963',
       title: 'Birmingham, 1963',
@@ -183,38 +183,36 @@ const CITED: SheetRecord = {
   ],
 };
 
-test('a cited record names the chapters that cite it, and how', () => {
+test('a cited record names the stories that cite it, and how', () => {
   const html = render({ record: CITED });
-  assert.match(html, /Chapters that cite this record/);
+  assert.match(html, /Cited in/);
   assert.match(html, /href="\/stories\/birmingham-1963"/);
   assert.match(html, /Birmingham, 1963/);
   assert.match(html, /mapped in/, 'the relation must be stated in words, not implied');
 });
 
-test('a record no chapter cites renders no chapter section at all', () => {
-  assert.equal(render().includes('Chapters that cite this record'), false);
+test('a record no story cites renders no citation section at all', () => {
+  assert.equal(render().includes('Cited in'), false);
   assert.equal(
-    render({ record: { ...RECORD, citingChapters: [] } }).includes(
-      'Chapters that cite this record',
-    ),
+    render({ record: { ...RECORD, citingStories: [] } }).includes('Cited in'),
     false,
     'an empty heading would read as a hole in the archive',
   );
 });
 
-test('the chapter count is stated alongside the heading', () => {
-  assert.match(render({ record: CITED }), /1 chapter/);
+test('the story count is stated alongside the heading', () => {
+  assert.match(render({ record: CITED }), /1 story/);
   assert.match(
     render({
       record: {
         ...CITED,
-        citingChapters: [
-          ...(CITED.citingChapters ?? []),
+        citingStories: [
+          ...(CITED.citingStories ?? []),
           { slug: 'zoning', title: 'Zoning', relation: 'referenced in', href: '/stories/zoning' },
         ],
       },
     }),
-    /2 chapters/,
+    /2 stories/,
   );
 });
 
