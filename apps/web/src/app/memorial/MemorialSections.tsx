@@ -10,7 +10,6 @@ import {
 } from '../../components/patterns/memorial-wall/memorial-names';
 import { MEMORIAL_LIST_NOTE } from './memorial-copy';
 import { MemorialListContrastZone } from './MemorialListContrastZone';
-import { memorialEditionPanelClassName } from './memorial-panel-chrome';
 
 export type MemorialSectionsProps = {
   /** Memorial name -> public entity id, for the small subset with a real entity page. */
@@ -26,23 +25,24 @@ export function MemorialSections({ entityLinksByName }: MemorialSectionsProps) {
 
   return (
     <MemorialListContrastZone>
+      {/*
+        No panel, no numeral, no kicker. This list is not section 01 of a publication and it is
+        not a card: it is the names, and every frame drawn around them was chrome asserting
+        itself over them. What is left is a heading, a count, and the list.
+      */}
       <article
-        className={memorialEditionPanelClassName('list')}
+        className="ds-memorial-edition__list"
         aria-labelledby="memorial-names-heading"
         id="memorial-names"
         tabIndex={-1}
       >
         <header className="ds-memorial-edition__header">
-          <span className="ds-memorial-edition__index" aria-hidden="true">
-            01
-          </span>
-          <div>
-            <p className="ds-memorial-edition__kicker">Full list</p>
-            <h2 className="ds-memorial-edition__title" id="memorial-names-heading">
-              Every name on this memorial
-            </h2>
-            <p className="ds-memorial-edition__count">{total} names · alphabetical</p>
-          </div>
+          <h2 className="ds-memorial-edition__title" id="memorial-names-heading">
+            Every name on this memorial
+          </h2>
+          <p className="ds-memorial-edition__count">
+            {total.toLocaleString('en-US')} names, alphabetical
+          </p>
         </header>
 
         {/* Plain in-page anchors, no JS: the list is long enough that scrolling to
