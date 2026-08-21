@@ -208,7 +208,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Generate SPDX JSON SBOM
-        uses: anchore/sbom-action@26ca99d710488389d655c50441b85fbf22179c0b # resolved 2026-07-17
+        uses: anchore/sbom-action@52542941bb775adef77f7a51ff5ea984e600fab8 # resolved 2026-07-17
         with:
           path: .
           format: spdx-json
