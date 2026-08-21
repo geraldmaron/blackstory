@@ -242,6 +242,12 @@
   text-shadow: 0 1px 16px var(--ds-canvas);
 }
 
+/* Muted ink is a step down from body copy against the canvas and a step down from nothing
+   against the bright top of a photograph. Same size, same weight, the colour back up. */
+.ds-record-mast[data-media='photo'] .ds-record-mast__facts {
+  color: var(--ds-ink);
+}
+
 /* The breadcrumb rides in the overlay rather than above the photograph, where it would push the
    masthead down the page to make room for one line of mono. */
 .ds-record-mast__over .ds-room-crumb {
