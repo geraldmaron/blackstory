@@ -43,13 +43,16 @@ export function RoomHeader({
 }: RoomHeaderProps) {
   const facts = meta ?? [];
   const hasMeta = facts.length > 0 || showPath;
-  // Kept on the prop surface for the twelve existing callers; no longer rendered — the title
-  // takes the space the kicker used to hold (Ink spec §2/§3).
-  void kicker;
 
   return (
     <header className={cx('ds-room-header', className)}>
       <Breadcrumb pathname={pathname} hereLabel={crumbLabel} />
+      {/* The kicker is back, and it is not the v6 mono-caps label it used to be. Sentence case
+          in the sans face at reading-caption size: one quiet line saying what sort of room this
+          is before the title says which one. The Ink spec dropped it because a shouted
+          `EVERYTHING THAT IS NOT THE MAP` above a 44px title is two headlines fighting; a
+          lowercase line under the same title is orientation, which is what a kicker is for. */}
+      {kicker ? <p className="ds-room-header__kicker">{kicker}</p> : null}
       <h1 className="ds-room-header__title">{title}</h1>
       {lede ? <p className="ds-room-header__lede">{lede}</p> : null}
       {hasMeta ? (

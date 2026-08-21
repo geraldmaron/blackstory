@@ -24,11 +24,24 @@ export function GroupHeading({ children, className }: GroupHeadingProps) {
 
 export type CardGridProps = {
   readonly children: ReactNode;
+  /**
+   * `grid` (default) is the three-up typographic index every catalogue uses.
+   *
+   * `rows` is the same entries in one column, each on its own hairline with a right-hand tag —
+   * the shape a *hub* wants, where the reader is choosing a room rather than scanning a
+   * catalogue of like things. Three columns of five destinations reads as a card wall; one
+   * column of five reads as a table of contents, which is what /library is.
+   */
+  readonly layout?: 'grid' | 'rows';
   readonly className?: string;
 };
 
-export function CardGrid({ children, className }: CardGridProps) {
-  return <div className={cx('ds-room-cards', className)}>{children}</div>;
+export function CardGrid({ children, layout = 'grid', className }: CardGridProps) {
+  return (
+    <div className={cx('ds-room-cards', layout === 'rows' && 'ds-room-cards--rows', className)}>
+      {children}
+    </div>
+  );
 }
 
 /**
@@ -58,6 +71,12 @@ export type RoomCardProps = {
   readonly description?: ReactNode;
   /** Mono footer facts — year, count, jurisdiction. Rendered as written. */
   readonly meta?: string;
+  /**
+   * Right-hand tag, for the `rows` layout only: what sort of room this is ("Long form",
+   * "Reference", "Receipt"). Distinct from `kind`, which the Ink spec stopped printing per-card
+   * in the grid — a row has a column free for it and a grid card does not.
+   */
+  readonly tag?: string;
   /** Hero image, above the title. */
   readonly media?: RoomCardMedia;
   readonly className?: string;
@@ -69,6 +88,7 @@ export function RoomCard({
   title,
   description,
   meta,
+  tag,
   media,
   className,
 }: RoomCardProps) {
@@ -90,6 +110,7 @@ export function RoomCard({
       ) : null}
       <h3 className="ds-room-card__title">{title}</h3>
       {description ? <p className="ds-room-card__desc">{description}</p> : null}
+      {tag ? <span className="ds-room-card__tag">{tag}</span> : null}
       {meta ? <span className="ds-room-card__meta">{meta}</span> : null}
     </Link>
   );

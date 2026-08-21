@@ -177,7 +177,7 @@ describe('room kit · the trail is computed, never hand-written', () => {
 });
 
 describe('room kit · RoomHeader is the only header a room renders', () => {
-  it('renders breadcrumb, title, lede and mono meta in one block, and keeps the kicker prop mute', () => {
+  it('renders breadcrumb, sentence-case kicker, title, lede and mono meta in one block', () => {
     const html = renderToStaticMarkup(
       <RoomHeader
         pathname="/books"
@@ -189,9 +189,10 @@ describe('room kit · RoomHeader is the only header a room renders', () => {
     );
 
     assert.match(html, /ds-room-crumb/);
-    // Ink spec §2/§3: the kicker is no longer a rendered element — the title takes the space
-    // it used to hold. The prop stays on RoomHeaderProps so existing callers need not change.
-    assert.doesNotMatch(html, /ds-room-header__kicker/);
+    // The kicker renders again, above the title and in sentence case. The Ink spec had muted it
+    // because the v6 register was mono-caps, which shouted over the title; the register changed,
+    // so the line came back rather than the prop staying dead on twelve callers.
+    assert.match(html, /<p class="ds-room-header__kicker">Catalogue<\/p>/);
     assert.match(html, /<h1 class="ds-room-header__title">Banned books<\/h1>/);
     assert.match(html, /ds-room-header__lede/);
     assert.match(html, /1,204 titles/);

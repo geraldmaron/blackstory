@@ -66,7 +66,7 @@ export function MethodologySections({ exampleRecordHref }: MethodologySectionsPr
       <MethodologyAtlasShortcut />
       <RoomHeader
         pathname="/methodology"
-        kicker="RECEIPT"
+        kicker="Receipt"
         title={
           <>
             How we <em>work</em>.

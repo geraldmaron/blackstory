@@ -188,6 +188,17 @@
   margin-bottom: var(--ds-space-8);
 }
 
+/* Sentence case, sans, caption size. Deliberately not the mono-caps register: this line sits
+   directly above a 44px display title, and two shouted lines in a row is two headlines. */
+.ds-room-header__kicker {
+  margin: 0 0 var(--ds-space-3);
+  font-family: var(--ds-font-sans);
+  font-size: 12.5px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--room-ink-3);
+}
+
 .ds-room-header__title {
   font-family: var(--ds-font-display);
   font-weight: 600;
@@ -243,20 +254,23 @@
 }
 
 /* —— GroupHeading: quieter than an h2 rule ————————————————————————————————— */
+/* A section of a hub or a catalogue. Display face at 24px, ruled off underneath: it has to
+   hold its own above a column of 19px destination titles, which a 13px sans label did not —
+   the group read as a caption on the first row rather than as a heading over all five. */
 .ds-room .ds-room-grouphd {
-  margin-top: var(--ds-space-8);
-  padding-bottom: var(--ds-space-2);
+  margin-top: var(--ds-space-10);
+  padding-bottom: var(--ds-space-3);
   border-bottom: var(--ds-border-width) solid var(--room-rule-2);
-  font-family: var(--ds-font-sans);
-  font-size: 13px;
+  font-family: var(--ds-font-display);
+  font-size: 24px;
   font-weight: 600;
-  letter-spacing: normal;
+  letter-spacing: -0.025em;
   text-transform: none;
-  color: var(--room-ink-3);
+  color: var(--ds-ink);
 }
 
 .ds-room .ds-room-grouphd + .ds-room-cards {
-  margin-top: var(--ds-space-4);
+  margin-top: 0;
 }
 
 /* —— CardGrid / RoomCard ——————————————————————————————————————————————————— */
@@ -292,6 +306,53 @@
 
 .ds-room-card:hover {
   background: var(--room-copper-wash);
+}
+
+/* —— CardGrid rows ————————————————————————————————————————————————————————
+   A hub, not a catalogue: one column, each destination on its own hairline, with the room's
+   kind held out in a right-hand column. The title takes the display face at a size that reads
+   as a destination rather than a card heading. */
+.ds-room-cards--rows {
+  grid-template-columns: 1fr;
+  margin-block: 0;
+}
+
+@media (min-width: 56rem) {
+  .ds-room-cards--rows {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ds-room-cards--rows .ds-room-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: var(--ds-space-4);
+  row-gap: var(--ds-space-1);
+  padding-block: var(--ds-space-4);
+}
+
+.ds-room .ds-room-cards--rows .ds-room-card__title {
+  grid-column: 1;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+}
+
+.ds-room-cards--rows .ds-room-card__desc {
+  grid-column: 1;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.ds-room-cards--rows .ds-room-card__tag {
+  grid-column: 2;
+  grid-row: 1;
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--room-ink-3);
+  white-space: nowrap;
 }
 
 .ds-room-card__media {

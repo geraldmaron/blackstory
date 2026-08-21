@@ -25,6 +25,16 @@ export type BreadcrumbProps = {
 export function Breadcrumb({ pathname, hereLabel, className }: BreadcrumbProps) {
   const trail: readonly RoomCrumb[] = resolveTrail(pathname, hereLabel);
 
+  /*
+   * A chain of one is not a chain. On a top-level room the only crumb is the room itself, so the
+   * nav printed the title twice — once in mono caps directly above the display title it repeats.
+   * A breadcrumb earns its line by saying where you came from; with nothing above it, it says
+   * nothing the <h1> two lines down does not.
+   */
+  if (trail.length < 2) {
+    return null;
+  }
+
   return (
     <nav className={cx('ds-room-crumb', className)} aria-label="Breadcrumb">
       {trail.map((crumb, index) => (

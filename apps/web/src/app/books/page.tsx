@@ -46,7 +46,7 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
   if (snapshot.books.length === 0) {
     return (
       <Room>
-        <RoomHeader pathname="/books" kicker="CATALOGUE" title="Banned books" showPath={false} />
+        <RoomHeader pathname="/books" kicker="Catalogue" title="Banned books" showPath={false} />
         <Notice tone="warning" title="The catalog snapshot is unavailable">
           We could not load the challenged-books catalog just now. Nothing documented here is lost;
           this is a fault on our side. Please check back shortly, or read the{' '}
@@ -83,7 +83,7 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
     <Room rail={rail}>
       <RoomHeader
         pathname="/books"
-        kicker="CATALOGUE"
+        kicker="Catalogue"
         title="Banned books"
         lede="This records documented removal requests against titles in schools and libraries, cited from public reports. It is not a list of controversial books, and it is not a complete national census."
         meta={booksCatalogPulseMeta(snapshot)}

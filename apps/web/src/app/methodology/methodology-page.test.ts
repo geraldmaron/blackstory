@@ -27,9 +27,9 @@ test('methodology page renders through the room kit, with no edition chrome left
   assert.match(pageSource, /<Room>/);
 });
 
-test('methodology renders its header through the shared RoomHeader with the RECEIPT kicker', () => {
+test('methodology renders its header through the shared RoomHeader with the Receipt kicker', () => {
   assert.match(sectionsSource, /<RoomHeader/);
-  assert.match(sectionsSource, /kicker="RECEIPT"/);
+  assert.match(sectionsSource, /kicker="Receipt"/);
 });
 
 test('methodology renders grade marks and citation strings through the live record-page components', () => {
