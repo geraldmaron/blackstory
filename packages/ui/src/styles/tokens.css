@@ -197,6 +197,13 @@
    */
   --ds-atlas-top: 88px;
   --ds-atlas-bottom: 168px;
+  /*
+   * The right column's own floor. The camera console lives under the results rail, not under the
+   * time panel, and it is taller than the time panel's band: 174px of console plus its 16px
+   * offset and a 12px gap. Without this the rail ran to the shared floor and the console's top
+   * corner sat inside it.
+   */
+  --ds-atlas-bottom-right: 202px;
 
   --ds-radius-sm: 8px;
   --ds-radius-md: 14px;

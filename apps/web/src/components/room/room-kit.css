@@ -305,10 +305,11 @@
 /* —— CardGrid / RoomCard ———————————————————————————————————————————————————
    Ink direction: a card is no longer a box. The border, background, radius and hover lift all
    come off; a RoomCard becomes a row separated from the next by a single bottom hairline
-   (the `index` shape — every CardGrid caller but one) or a column entry in a three-fixed-
-   column grid (the `hub` shape — `/library`, the one surface the registry actually calls a
-   hub). Kind used to be a tag drawn on the card; now it is implied by the group the card sits
-   in, so `RoomCard`'s `kind` prop stops rendering — see RoomCards.tsx. */
+   (the `index` shape, which every caller now takes including /library) or a column entry in a
+   three-fixed-column grid (the `hub` shape, kept on the surface for a genuinely wide flat set
+   but currently unused). Kind used to be a tag drawn on the card; it is implied by the group the
+   card sits in, so `RoomCard`'s `kind` prop stops rendering and a hub row that wants to say what
+   sort of room it is passes `tag` instead — see RoomCards.tsx. */
 .ds-room-cards {
   display: flex;
   flex-direction: column;
@@ -332,12 +333,6 @@
 @media (max-width: 34rem) {
   .ds-room-cards--hub {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (min-width: 56rem) {
-  .ds-room-cards {
-    grid-template-columns: repeat(3, 1fr);
   }
 }
 

@@ -13,8 +13,8 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   width: 344px;
-  /* The shared Atlas floor, which already reserves the time panel's band. */
-  max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom));
+  /* The right column's floor, not the shared one: the camera console sits under this rail. */
+  max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom-right));
   /* One panel recipe shared by all four Atlas instruments — see lens-panel.css. */
   background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
   border: var(--ds-border-width) solid var(--ds-border);
