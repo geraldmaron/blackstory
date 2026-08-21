@@ -511,6 +511,45 @@
   color: var(--room-ink-2);
 }
 
+/*
+ * The apparatus band's own Provenance column, over `TrustBlock`'s default look.
+ *
+ * `TrustBlock` draws a bordered, backgrounded grid card — right when it appears once in the
+ * middle of prose, wrong here, where it is the middle of three columns and the other two
+ * (Bibliography, a plain numbered list; Why this is here / Still researching, plain paragraphs)
+ * carry no box of their own. The boxed column read as a heavier, disconnected object dropped
+ * between two lighter ones rather than a third column of the same document. Flattened to the
+ * same hairline-divided row register the rail already uses for this component (see
+ * `.ds-record-rail-block .ds-room-trust` above) so the three columns read as one apparatus.
+ *
+ * The release id is also long enough (`rel_20260723_authority_full-a1b2c3`) to overflow a ~300px
+ * column's fixed-width grid cell; the boxed layout clipped it at the cell edge with no ellipsis,
+ * silently dropping the tail of the value. `overflow-wrap` lets it break instead.
+ */
+.ds-record-appx .ds-room-trust {
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-block: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.ds-record-appx .ds-room-trust__row {
+  padding: 9px 0;
+  background: none;
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-record-appx .ds-room-trust__row:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.ds-record-appx .ds-room-trust__v {
+  overflow-wrap: anywhere;
+}
+
 /* —— rail blocks ————————————————————————————————————————————————————————————
    The rail is a column of consulted things, so each block is titled and ruled off the last.
    `.ds-room-rail-group__title` supplies the mono caps register the reading rooms already use. */
