@@ -1,7 +1,9 @@
 # Chapter fact validation
 
-**Status:** binding for every article published on the `/chapters` surface
-(`packages/ops-data/fixtures/articles/*`). This document defines how facts get
+**Status:** binding for every article published on the `/chapters` surface.
+Chapters are canonical in `bb_reference.articles` (Supabase), edited via
+`articles.ts pull` into gitignored local drafts and applied back; they do not
+live as fixture files in git. This document defines how facts get
 into chapter prose and how they are validated before publish. It composes
 standards that already exist elsewhere in this repo; where it cites another
 document, that document governs. Nothing here replaces the machine gates in
@@ -97,17 +99,15 @@ flourish). Two additions this document makes binding:
    sourced detail, never from padding; if a chapter cannot reach the floor
    with validated material, it needs more research, not more adjectives.
 
-## Editorial hygiene: fixtures are the published artifact, not an edit log
+## Editorial hygiene: the applied draft is the published artifact, not an edit log
 
-A chapter fixture (`packages/ops-data/fixtures/articles/*.ts`) is the
-content a reader sees once it ships — it is not a private workspace. Do not
-leave inline comments narrating what changed and why between drafts
-("2026-08-15 revision: cut the...") inside the article object or its
-surrounding file. That reasoning is genuinely useful during editing, but it
-belongs in the commit message for the change, not in a file that is itself
-the product. Before a fixture is considered ready to publish, its top-of-file
-comment should describe what the chapter is and which craft documents
-govern it — never the history of edits that produced it.
+A chapter draft (`articles.ts pull` → `packages/ops-data/drafts/*.article.json`,
+applied back with `articles.ts apply`) becomes the content a reader sees once
+it ships — it is not a private workspace. Do not leave notes narrating what
+changed and why between drafts inside the article document itself. That
+reasoning is genuinely useful during editing, but it belongs in the session's
+record of the change (the review findings, the issue), not in the document
+that is itself the product.
 
 ## What this document does not change
 
