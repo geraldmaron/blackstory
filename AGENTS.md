@@ -193,6 +193,25 @@ Kit implementation: `@repo/ui` (`packages/ui`). Where a pattern doc and the kit 
 
 When adding a reusable control, prefer `apps/web/src/components/patterns/` + a pattern doc + a row in `patterns-registry.md`. Surface-specific layout stays in route folders (`app/`, `components/home/`, etc.) but must cite its binding direction doc.
 
+## Cursor Cloud specific instructions
+
+Notes for Cloud Agents running in this VM. The startup update script already runs `pnpm install --frozen-lockfile` + `uv sync --all-packages --frozen`; toolchains (`node`, `pnpm`, `uv`) are on PATH via the agent's `~/.bashrc`. Standard commands live in `README.md` and root `package.json` scripts; only the non-obvious caveats are here.
+
+### Node version gotcha (load-bearing)
+The base image ships an older `/exec-daemon/node` (v22.14.0) that lacks `module.registerHooks`, which `apps/web` tests require (`test/css-stub.mjs`). `~/.bashrc` prepends nvm's default Node 22 (currently v22.22.2, satisfies `.nvmrc`'s `22` and `>=22.15`) ahead of it, so interactive shells get the right node. If a shell ever resolves `node -v` to 22.14.0 (e.g. a non-login shell), fix PATH with:
+`export PATH="$(dirname "$(nvm which default)"):$PATH"` (after sourcing nvm).
+
+### Running the web app without a database
+- `PUBLIC_DATA_SOURCE=seed DEV_NO_ADMIN=1 pnpm dev:web` starts `@repo/web` alone on port 3048 (`DEV_NO_ADMIN=1` skips the admin console, which needs a Supabase project).
+- The live catalog/map pages (`/`, `/explore`, `/records`, `/memorial`, `/themes`) require live Postgres (`PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` + `DATABASE_SSL=1`). Without a DB they return HTTP 500: `apps/web/src/lib/public-data/source.ts` has no seed fallback, despite older README/`public-seed.ts` comments implying a "Dunbar seed" home page.
+- Editorial/utility pages render fine with no DB: `/about`, `/methodology`, `/stories`, `/data`, `/books`, `/law`, `/support`, `/privacy`, `/errata`, `/design-system`, `/corrections`, `/submit`, `/locate`.
+
+### Corrections/submit intake in dev
+`/corrections` and `/submit` use an in-memory store (`apps/web/src/app/corrections/store.ts`), so a submission succeeds and returns a receipt code with no DB. The `/corrections/status/<receipt>` lookup will report "Receipt not found" in dev because the in-memory store is not shared across route handlers/process boundaries (production persists via the `submissionInbox` backing). This is expected locally, not a bug.
+
+### Optional services (not needed for core web dev)
+Docker is not installed, so the parked local PostGIS (`pnpm db:up`) does not run here; it is optional per ADR-011. Firebase emulators need a Java runtime and are optional. `apps/mobile` (Expo iOS) cannot run on this Linux VM (requires macOS/Xcode) and is excluded from the pnpm workspace (its own `package-lock.json`).
+
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
 ## Beads Issue Tracker
 
