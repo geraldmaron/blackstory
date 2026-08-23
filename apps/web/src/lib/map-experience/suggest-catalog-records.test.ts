@@ -27,7 +27,6 @@ function feature(
       precision: 'site',
       geoPrecisionTier: 'exact-site',
       eraBuckets: [],
-      notabilityLabels: [],
       evidenceCount: 0,
       confidenceTier: 'medium',
       topicTags: [],

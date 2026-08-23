@@ -33,7 +33,6 @@ function feature(
       precision: 'city',
       geoPrecisionTier: 'locality',
       eraBuckets,
-      notabilityLabels: [],
       evidenceCount: 1,
       confidenceTier: 'high',
       topicTags: [],

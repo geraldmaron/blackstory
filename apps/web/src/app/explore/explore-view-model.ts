@@ -43,6 +43,8 @@ import {
   type ExploreEdgeLineSlice,
 } from './explore-edge-catalog';
 
+import type { AtlasShellModel } from './explore-view-model-wire';
+
 export type { ExploreEdgeLineCatalog, ExploreEdgeLineSlice } from './explore-edge-catalog';
 export { pickExploreEdgeSlice } from './explore-edge-catalog';
 
@@ -100,7 +102,12 @@ function buildEdgeSlice(
 }
 
 /** All-time + per-decade edge/line catalog over the history graph release —
- * shared by the explore view model and the home hero's decades-in-motion flow. */
+ * shared by the explore view model and the home hero's decades-in-motion flow.
+ *
+ * Decades are id lists into `allTime` (see `explore-edge-catalog.ts`). A decade edge is the same
+ * relationship as its all-time counterpart, so only ids are kept; an edge a decade view names
+ * that the all-time view does not is dropped here, because the client can only slice what
+ * `allTime` carries. */
 export function buildEdgeLineCatalog(
   artifact: ReturnType<typeof getHistoryGraphReleaseArtifact> = getHistoryGraphReleaseArtifact(),
   entities: readonly PublicEntityView[] = listPublicEntities(),
@@ -117,16 +124,17 @@ export function buildEdgeLineCatalog(
     'all-time',
     resolveLiveGeoAnchor,
   );
-  const byDecade: Record<string, ExploreEdgeLineSlice> = {};
+  const allTimeIds = new Set(allTime.edges.map((edge) => edge.edgeId));
+  const byDecade: Record<string, readonly string[]> = {};
   for (const decade of historyContext.availableDecades) {
-    byDecade[decade] = buildEdgeSlice(
-      artifact,
-      historyContext.entitiesById,
+    const slice = resolveHistoryGraphSlice(artifact, 'decade', decade);
+    const edges = buildHistoryEdges(
+      slice,
       historyContext.relationships,
-      'decade',
-      resolveLiveGeoAnchor,
-      decade,
+      historyContext.entitiesById,
+      new Set(slice.nodeIds),
     );
+    byDecade[decade] = edges.map((edge) => edge.edgeId).filter((id) => allTimeIds.has(id));
   }
   return {
     edgeLineCatalog: { allTime, byDecade },
@@ -172,6 +180,39 @@ export function buildExploreViewModel(
     edgeLineCollection: active.lineCollection,
     citesEdge,
     ...(selectedEdge ? { selectedEdge } : {}),
+  };
+}
+
+/**
+ * The request-scoped half of the view model, for `/` to render: everything that depends on the
+ * URL plus the small catalog derivations the no-JS fallback and the facets need. Builds the map
+ * source (the catalog is already in process memory) but never the history edge catalog, the
+ * graph artifact or the cites edge — those are release-wide and arrive via `/atlas/catalog`.
+ * `noscriptFeatures` is the filtered list for the `<noscript>` fallback; the client rebuilds the
+ * same list from the catalog.
+ */
+export function buildAtlasShell(
+  raw: RawExploreSearchParams,
+  entities: readonly PublicEntityView[] = listPublicEntities(),
+  dataSource: PublicReadSource = 'none',
+): {
+  readonly shell: AtlasShellModel;
+  readonly noscriptFeatures: readonly ExploreMapFeature[];
+} {
+  const viewState = parseExploreSearchParams(raw);
+  const source = buildExploreMapSource(entities);
+  const allFeatures = source.featureCollection.features;
+  const filteredFeatures = applyExploreFilters(allFeatures, viewState.filters, viewState.state);
+  return {
+    shell: {
+      viewState,
+      densityLevels: buildStateDensityLevels(source.stateAggregates),
+      facetOptions: buildExploreFacetOptions(allFeatures),
+      totalMatched: filteredFeatures.length,
+      dataSource,
+      entityDecades: buildEntityDecadeCounts(allFeatures),
+    },
+    noscriptFeatures: filteredFeatures,
   };
 }
 

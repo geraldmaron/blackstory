@@ -34,7 +34,6 @@ function feature(index: number, overrides: Partial<ExploreMapFeature['properties
       precision: 'locality',
       geoPrecisionTier: 'locality',
       eraBuckets: ['1950s'],
-      notabilityLabels: [],
       evidenceCount: 2,
       confidenceTier: 'high',
       topicTags: [],

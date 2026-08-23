@@ -27,7 +27,6 @@ function feature(
       precision: 'city',
       geoPrecisionTier: 'city',
       eraBuckets: [],
-      notabilityLabels: [],
       evidenceCount: 1,
       confidenceTier: 'high',
       topicTags: [],

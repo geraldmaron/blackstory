@@ -288,3 +288,22 @@
 :root[data-motion='calm'] .ds-atlas__spotlight {
   transition-duration: 0.01ms;
 }
+
+/*
+ * Before the catalog arrives (`AtlasLoader`): the plate is already on screen underneath, so the
+ * pending state is one small status pill where the camera readout normally sits, not a blank
+ * page. The error state reuses the design-system notice, centred, and is the only interactive
+ * child, so it takes its events back the same way every instrument does.
+ */
+.ds-atlas--pending .ds-atlas__pending {
+  pointer-events: auto;
+}
+
+.ds-atlas--pending .ds-notice {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--ds-space-4) + 86px);
+  transform: translateX(-50%);
+  z-index: var(--ds-z-atlas-pill);
+  max-width: min(32rem, calc(100vw - 2 * var(--ds-space-4)));
+}

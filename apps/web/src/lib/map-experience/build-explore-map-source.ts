@@ -49,7 +49,6 @@ export type ExploreMapFeatureProperties = {
   readonly radiusMeters?: number;
   readonly eraBuckets: readonly string[];
   readonly status?: string;
-  readonly notabilityLabels: readonly string[];
   /** Count of this record's own already-publicly-enumerated accepted claims (see the entity
    * page's "Accepted claims" section) a transparency affordance, not a hidden ranking input. */
   readonly evidenceCount: number;
@@ -240,7 +239,8 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
       ...(radius.ok ? { radiusMeters: radius.radiusMeters } : {}),
       eraBuckets,
       ...(entity.status !== undefined ? { status: entity.status } : {}),
-      notabilityLabels: entity.notabilityLabels ?? [],
+      // `notabilityLabels` deliberately not carried: nothing on a map surface reads it, and the
+      // labels are full rubric sentences repeated per record (1.8 MB across the catalog).
       evidenceCount: entity.claims.length,
       confidenceTier: highestConfidence(entity.claims),
       topicTags: entity.topicTags,

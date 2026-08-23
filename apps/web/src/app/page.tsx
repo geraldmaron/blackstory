@@ -15,9 +15,8 @@ import { FilterBar } from '@repo/ui';
 import { absolutePublicUrl } from '../lib/seo/metadata-builders';
 import { SynchronizedResultList } from '../components/map-experience/SynchronizedResultList';
 import { getSharedPublicEntities } from '../lib/map-experience/shared-map-data';
-import { AtlasExperience } from './explore/AtlasExperience';
-import { buildExploreViewModelAsync } from './explore/explore-view-model';
-import { toSerializableExploreViewModel } from './explore/explore-view-model-wire';
+import { AtlasLoader } from './explore/AtlasLoader';
+import { buildAtlasShell } from './explore/explore-view-model';
 import '../components/patterns/browse-mode.css';
 import '../components/patterns/edition-fact-icon.css';
 import '../components/patterns/record-anatomy.css';
@@ -25,11 +24,18 @@ import './explore/explore.css';
 import './explore/explore-edition.css';
 
 /**
- * App Hosting mounts `DATABASE_URL` at RUNTIME only, so a statically prerendered `/` would bake
- * the 4-entity Dunbar seed into production instead of reading live Postgres. This export must
- * stay page-scoped (it used to live on the now-deleted `(map)/layout.tsx`, which force-dynamic'd
- * this page and nothing else) — do not hoist it to the root layout, which would force-dynamic
- * every route in the app.
+ * Dynamic because it reads `searchParams` (the filters are GET navigation, so the page works with
+ * JavaScript off), and because a build without a database — the CI gate — must not prerender
+ * it. This export must stay page-scoped (it used to live on the now-deleted `(map)/layout.tsx`,
+ * which force-dynamic'd this page and nothing else) — do not hoist it to the root layout, which
+ * would force-dynamic every route in the app.
+ *
+ * Dynamic means every request is a function invocation with a no-store response, so what this
+ * page renders has to be small. It is: the parsed view state and the facet/count derivations
+ * (`AtlasShellModel`). The release-wide catalog — every feature, the history edge catalog — is
+ * NOT rendered here; `AtlasLoader` fetches it from `/atlas/catalog`, which is CDN-cached. Before
+ * that split (2026-08-22) this page put ~15 MB of RSC payload on every request and was, by
+ * itself, the month's Vercel bill. Do not put the catalog back in the `initial` prop.
  */
 export const dynamic = 'force-dynamic';
 
@@ -57,7 +63,8 @@ type AtlasPageProps = {
 export default async function AtlasPage({ searchParams }: AtlasPageProps) {
   const params = await searchParams;
   const { data: entities, source: dataSource } = await getSharedPublicEntities();
-  const view = await buildExploreViewModelAsync(params, entities, dataSource);
+  const { shell, noscriptFeatures } = buildAtlasShell(params, entities, dataSource);
+  const view = { ...shell, filteredFeatures: noscriptFeatures };
 
   return (
     <>
@@ -145,7 +152,7 @@ export default async function AtlasPage({ searchParams }: AtlasPageProps) {
         </div>
       </noscript>
 
-      <AtlasExperience initial={toSerializableExploreViewModel(view)} />
+      <AtlasLoader shell={shell} />
     </>
   );
 }
