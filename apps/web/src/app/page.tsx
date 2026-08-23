@@ -56,6 +56,9 @@ export const metadata: Metadata = {
   alternates: { canonical: absolutePublicUrl('/') },
 };
 
+/** Rows in the `<noscript>` fallback list. See the comment at its render site. */
+const NOSCRIPT_ROW_CAP = 20;
+
 type AtlasPageProps = {
   readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
@@ -137,16 +140,20 @@ export default async function AtlasPage({ searchParams }: AtlasPageProps) {
             {view.totalMatched} documented record{view.totalMatched === 1 ? '' : 's'} matching
             filters · oldest first
           </p>
-          {/* Cap the no-JS list so progressive-enhancement HTML stays small; the
-              interactive client island owns the full synchronized peer. */}
+          {/* Cap the no-JS list so progressive-enhancement HTML stays small; the interactive
+              client island owns the full synchronized peer. Each row serialises six links and
+              their badges, so the cap is the page's size: at 100 rows the noscript block was
+              ~1.2 MB of a 1.5 MB page (measured 2026-08-22), at 20 it is a fifth of that. The
+              crawlable, complete index is /records. */}
           <SynchronizedResultList
-            features={view.filteredFeatures.slice(0, 100)}
+            features={view.filteredFeatures.slice(0, NOSCRIPT_ROW_CAP)}
             labelledBy="explore-results-heading-njs"
           />
-          {view.filteredFeatures.length > 100 ? (
+          {view.filteredFeatures.length > NOSCRIPT_ROW_CAP ? (
             <p className="ds-sans ds-explore__results-count">
-              Showing the first 100 of {view.filteredFeatures.length}. Enable JavaScript for the
-              full map and records list.
+              Showing the first {NOSCRIPT_ROW_CAP} of {view.filteredFeatures.length}. Enable
+              JavaScript for the full map and records list, or browse every record at{' '}
+              <a href="/records">/records</a>.
             </p>
           ) : null}
         </div>
