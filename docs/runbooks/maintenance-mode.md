@@ -41,9 +41,11 @@ it to reindex the archive as a maintenance notice instead.
 
    Expect `503`. Check `/robots.txt` and one entity URL too.
 
-Leave the variables **unset on Preview**. That is deliberate: a Preview deployment then remains a
-fully working window onto the same production data, which is the most reliable way to check the
-real site while Production is parked.
+Leave the variables **unset on Preview**, so a preview build is never accidentally walled. Note
+that a Preview deployment is not a substitute for the bypass on this project: `DATABASE_URL` is
+scoped to Production only, so Preview has no data plane and serves an empty catalog whether the
+wall is up or not. The bypass below is the way to look at the real site while Production is
+parked.
 
 ## Turning it off
 
