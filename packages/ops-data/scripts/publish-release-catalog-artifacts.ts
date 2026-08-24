@@ -31,7 +31,12 @@
  *   node --conditions development --import tsx \
  *     packages/ops-data/scripts/publish-release-catalog-artifacts.ts
  *
- * Scheduled run: .github/workflows/publish-release-catalog-artifacts.yml, every 5 minutes.
+ * Scheduled run: .github/workflows/publish-release-catalog-artifacts.yml. The workflow's
+ * PRIMARY trigger is workflow_dispatch right after an operator runs an ops-data script; the
+ * cron is a DAILY tick ('17 9 * * *') that bounds worst-case staleness after a forgotten
+ * publish. It polled every 5 minutes until 2026-08-08 and was deliberately slowed: 288 runs/day
+ * to detect a human-initiated action is noise, not coverage. Do not read the watermark's
+ * cheapness as a reason to restore polling — read it as the reason a missed tick is recoverable.
  *
  * Env: DATABASE_URL (or APP_DATABASE_URL), SUPABASE_URL, SUPABASE_SECRET_KEY
  * (or SUPABASE_SERVICE_ROLE_KEY). DRY_RUN=1 builds and reports without uploading or touching

@@ -31,6 +31,40 @@ Ensure a traffic spike, retry storm, or budget burn cannot scale every service w
 
 `autoDisablePublicCorpus` is hard-coded `false`. Full read-only mode requires an explicit operator choice.
 
+## Build-time spend (Vercel)
+
+Every control above governs **runtime** resource exhaustion. The Aug 2026 invoice showed that is
+only half the surface: of $234.41 on Vercel, **$64.68 was Build CPU Minutes** (12d 23h) — the
+second-largest line, and one no evaluator in this document can see. Build spend is not a traffic
+spike; it scales with commit velocity, and this repo ran 437 commits in Aug 2026.
+
+**Control:** [`scripts/vercel-ignore-build.sh`](../../scripts/vercel-ignore-build.sh), wired as
+`ignoreCommand` in both `apps/web/vercel.json` and `apps/admin/vercel.json`. It skips a build when
+no changed file can reach that project's deployed bundle.
+
+Measured against Aug 2026 history (per commit): **60% of commits skippable for web, 78% for admin**.
+Realized saving depends on push granularity — the rule is evaluated per *deployment*, so a push
+batching one relevant commit with twenty irrelevant ones still builds. A day-batched simulation
+skips only 2 of 21 days. Actual behaviour sits between those bounds.
+
+The script **fails open**: every uncertain branch builds. A needless build costs cents; a wrongly
+skipped build means production silently does not get the fix and nothing reports it.
+
+## Platform spend backstop
+
+The GCP billing budgets above do not cover Vercel or Supabase, which is where the Aug 2026 spend
+actually landed. Two gaps remain **operator-only** (dashboard, not code):
+
+| Gap | Control | Issue |
+|-----|---------|-------|
+| No hard cap on Vercel on-demand spend | Spend Management → amount + pause-on-threshold | `repo-n7jq` |
+| Supabase compute billed on 3 active projects | Audit whether `theadministration-app` needs its own project vs. a schema | — |
+
+The precedent for why a cap matters is recorded in
+[`packages/ops-data/scripts/check-public-read-egress.ts`](../../packages/ops-data/scripts/check-public-read-egress.ts):
+a catalog-read regression ran for 20 days and ~253GB of egress because nothing was watching, and
+was found by hand after the bill.
+
 ## Package layout
 
 | Path | Role |

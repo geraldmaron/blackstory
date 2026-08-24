@@ -47,7 +47,7 @@ jobs remain human provisioning steps (see [`infra/gcp/surfaces/README.md`](../..
 
 ### Admin console (`apps/admin`)
 
-- **Hosting:** App Hosting interim (`black-book-admin-production`, `apphosting.admin.yaml`); target Cloud Run + IAP
+- **Hosting:** Vercel (standalone project, own `apps/admin/vercel.json`) since 2026-07-25 — see [firebase wind-down](../data/firebase-wind-down.md). Kept a separate Vercel project from `blackstory` for credential isolation: admin's write-capable `DATABASE_URL` lives in its own project env, never in the anonymous public site's runtime.
 - **Posture:** `iap-protected` — separate Next.js app from `apps/web`
 - **Invariant:** no imports from `apps/web` handlers (see `apps/admin/src/surface.test.ts`)
 - **SA:** `admin@black-book-efaaf.iam.gserviceaccount.com`
