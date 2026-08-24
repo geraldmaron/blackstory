@@ -1,7 +1,9 @@
 # Chapter fact validation
 
-**Status:** binding for every article published on the `/chapters` surface
-(`packages/ops-data/fixtures/articles/*`). This document defines how facts get
+**Status:** binding for every article published on the `/chapters` surface.
+Chapters are canonical in `bb_reference.articles` (Supabase), edited via
+`articles.ts pull` into gitignored local drafts and applied back; they do not
+live as fixture files in git. This document defines how facts get
 into chapter prose and how they are validated before publish. It composes
 standards that already exist elsewhere in this repo; where it cites another
 document, that document governs. Nothing here replaces the machine gates in
@@ -68,8 +70,9 @@ each fact appears with its citation (`[ref:id]` to a reference carrying the
 source URL, or a `primaryDocument` block bound to a packet artifact), that
 quotes are verbatim, and that no sentence asserts more than its source does.
 Disputed facts (death tolls, motives, lost documents) are written as
-disputes per `docs/ui/voice-theme-chapters.md` Rule 4 — both records shown
-in the prose, never resolved into one number the record doesn't support.
+disputes per `docs/content/neo-voice.md` Part V ("Disputes in prose") — both
+records shown in the prose, never resolved into one number the record
+doesn't support.
 
 **Then the machine gates run** (`validate → apply → promote → project`):
 schema, citation integrity, source tiers, anchors, packet binding, DOI
@@ -79,12 +82,11 @@ fourth check, not the first.
 ## Immersion requirements
 
 A chapter is a place the reader stands, not a summary they receive. The
-binding craft rules are `docs/content/era-immersion-style.md` (era
-structure, second-person cold open, the rule in force quoted verbatim,
-measured odds, jump-cut) and `docs/ui/voice-theme-chapters.md` (specific
-person, specific hour; prose builds stakes, data delivers the verdict;
-Wilkerson register; disputes in prose; one earned flourish). Two additions
-this document makes binding:
+binding craft rules are `docs/content/neo-voice.md` (Part III: era structure,
+second-person cold open, the rule in force quoted verbatim, measured odds,
+jump-cut; Part II/IV: specific person, specific hour; prose builds stakes,
+data delivers the verdict; register; disputes in prose; one earned
+flourish). Two additions this document makes binding:
 
 1. **Events get buildup, not verdicts.** An event narrated in a chapter
    shows its sequence — what was ordinary the day before, what triggered it,
@@ -97,17 +99,15 @@ this document makes binding:
    sourced detail, never from padding; if a chapter cannot reach the floor
    with validated material, it needs more research, not more adjectives.
 
-## Editorial hygiene: fixtures are the published artifact, not an edit log
+## Editorial hygiene: the applied draft is the published artifact, not an edit log
 
-A chapter fixture (`packages/ops-data/fixtures/articles/*.ts`) is the
-content a reader sees once it ships — it is not a private workspace. Do not
-leave inline comments narrating what changed and why between drafts
-("2026-08-15 revision: cut the...") inside the article object or its
-surrounding file. That reasoning is genuinely useful during editing, but it
-belongs in the commit message for the change, not in a file that is itself
-the product. Before a fixture is considered ready to publish, its top-of-file
-comment should describe what the chapter is and which craft documents
-govern it — never the history of edits that produced it.
+A chapter draft (`articles.ts pull` → `packages/ops-data/drafts/*.article.json`,
+applied back with `articles.ts apply`) becomes the content a reader sees once
+it ships — it is not a private workspace. Do not leave notes narrating what
+changed and why between drafts inside the article document itself. That
+reasoning is genuinely useful during editing, but it belongs in the session's
+record of the change (the review findings, the issue), not in the document
+that is itself the product.
 
 ## What this document does not change
 

@@ -36,6 +36,12 @@ handlers or research console pages to this app. Shared UI belongs in `packages/u
 logic belongs in `packages/domain`. Admin interim host is App Hosting (`black-book-admin-production`);
 target is Cloud Run + IAP.
 
+## Maintenance mode
+
+The whole surface can be parked behind an edge-served 503 with `MAINTENANCE_MODE=1` on the Vercel
+Production environment plus a redeploy — no function boots and no `bb_public` query runs while it
+is up. Procedure, bypass, and limits: [maintenance mode runbook](../../docs/runbooks/maintenance-mode.md).
+
 ## References
 
 - ADR-005 (service surface separation) and ADR-027 (Vercel public web hosting) — removed

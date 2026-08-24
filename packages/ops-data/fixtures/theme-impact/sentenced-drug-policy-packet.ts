@@ -9,7 +9,7 @@
  * published RESEARCHED_THEME_IMPACT_PACKETS registry (that apply path is
  * published-only); it is applied directly via upsert-sentenced-drug-policy-packet.sql.
  *
- * Voice: docs/content/era-immersion-style.md (second person, present tense,
+ * Voice: docs/content/neo-voice.md Part III (second person, present tense,
  * odds not bare decimals, statute text quoted verbatim, gaps in the method note).
  *
  * Every observation id, estimate, source, and content_hash below is a verified

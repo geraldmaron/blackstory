@@ -62,8 +62,9 @@ Two skill kinds live under `.claude/skills/blackstory/`:
   [`docs/research/research-operations.md`](docs/research/research-operations.md). They do not
   duplicate command flags.
 - **Judgment playbooks** (`entity-verify`, `claim-corroborate`, `entity-complete`,
-  `coverage-target`, `publish-preview`) carry decision order, source ladders, and Do/Never.
-  They have no operator-cli verb of their own.
+  `entity-relate`, `coverage-target`, `publish-preview`, `neo-voice`, `prose-review`,
+  `ringer-review`) carry decision order, source ladders, and Do/Never. They have no
+  operator-cli verb of their own.
 
 `blackstory-locate` Census-geocodes a sourced address (no LLM). Finding the place, confirming
 which namesake, and assigning era is `blackstory-entity-verify`.

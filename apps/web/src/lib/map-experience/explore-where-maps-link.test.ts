@@ -41,7 +41,6 @@ describe('exploreWhereMapsLink', () => {
         precision: 'city',
         geoPrecisionTier: 'locality',
         eraBuckets: [],
-        notabilityLabels: [],
         evidenceCount: 0,
         confidenceTier: 'high',
         topicTags: [],

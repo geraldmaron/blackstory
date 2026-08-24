@@ -23,7 +23,6 @@ function feature(
       precision: 'city',
       geoPrecisionTier: 'city',
       eraBuckets: ['1950s'],
-      notabilityLabels: [],
       evidenceCount: 3,
       confidenceTier: 'high',
       topicTags: [],

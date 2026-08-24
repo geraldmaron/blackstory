@@ -31,7 +31,6 @@ function pointFeature(id: string, lng: number, lat: number, name = id): ExploreM
       precision: 'locality',
       geoPrecisionTier: 'locality',
       eraBuckets: [],
-      notabilityLabels: [],
       evidenceCount: 1,
       confidenceTier: 'high',
       topicTags: [],

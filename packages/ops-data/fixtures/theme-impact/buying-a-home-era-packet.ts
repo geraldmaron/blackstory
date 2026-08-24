@@ -1,7 +1,7 @@
 /**
  * "Buying a home" era-immersion theme packet (theme_id: redlining).
  *
- * Era-immersion rewrite per docs/content/era-immersion-style.md: a second-person
+ * Era-immersion rewrite per docs/content/neo-voice.md Part III: a second-person
  * sequence of eras (1938, 1955, 1985) landing on a present-day (2023) close, each
  * era pairing a verbatim primary-document "rule in force" with the measured national
  * spine odds for that year. Numbers in the narrative are stated as odds/comparisons;
@@ -93,28 +93,28 @@ const OBSERVATIONS: Observation[] = [
   obs({
     observationId: 'obs:census-decennial-homeownership-black-nation:nation:US:1940',
     metricId: 'census-decennial-homeownership-black-nation',
-    estimate: 23.6,
+    estimate: 22.8,
     unit: 'percent',
     referencePeriod: '1940',
     label: 'Black homeownership rate, United States, 1940',
     source: CENSUS_HOUSING_SOURCE,
     sourceUrl: CENSUS_HOUSING_URL,
-    contentHash: '2b4ebfbc772bcb791bd65d1271f805afeaa6d29ba8385a4a18d0be8426657a8b',
+    contentHash: '8cd9ead98ab26e4c3e57ab424467223ece2fa8b2a59ba64cbd92e3e1976de46b',
     humanCitation:
-      'U.S. Census Bureau, Historical Census of Housing Tables, Black household homeownership rate, United States, 1940.',
+      'U.S. Census Bureau, 1940 Census of Housing, Vol. II, Table 1 ("Negro" occupied units, owner-occupied share), United States, 1940.',
   }),
   obs({
     observationId: 'obs:census-decennial-homeownership-white_nh-nation:nation:US:1940',
     metricId: 'census-decennial-homeownership-white_nh-nation',
-    estimate: 53,
+    estimate: 45.7,
     unit: 'percent',
     referencePeriod: '1940',
     label: 'White homeownership rate, United States, 1940',
     source: CENSUS_HOUSING_SOURCE,
     sourceUrl: CENSUS_HOUSING_URL,
-    contentHash: '5d001dfc63705ffdf8ff8b6cf21db6d0be5e92beecaff2283af3e19276e71969',
+    contentHash: '30ab716c1b33a463fe680786837148812eca5abf08c210ef6ea2356bded74dd8',
     humanCitation:
-      'U.S. Census Bureau, Historical Census of Housing Tables, White household homeownership rate, United States, 1940.',
+      'U.S. Census Bureau, 1940 Census of Housing, Vol. II, Table 1 (white occupied units, owner-occupied share), United States, 1940.',
   }),
   // Era 1955 -> homeownership spine 1950 and 1960
   obs({

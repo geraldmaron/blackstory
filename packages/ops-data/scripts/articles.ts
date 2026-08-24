@@ -1,16 +1,19 @@
 /**
  * Article lifecycle CLI — the long-form /articles publication surface.
  *
- * Articles are authored as fixture modules, applied to bb_reference.articles at
- * any lifecycle status, promoted to published behind the publish gate, and
- * projected into bb_public.release_articles for the active release. Mirrors the
- * theme-impact packet CLI (packages/ops-data/scripts/theme-packets.ts).
+ * Articles are canonical in bb_reference.articles (Supabase) — the database is
+ * the source of truth, not files in git. To edit, `pull` an article into a
+ * local draft (JSON, gitignored), edit it, `validate`, `apply` it back, then
+ * `promote` (which re-runs every gate against the DB row) and `project` into
+ * bb_public.release_articles for the active release. Mirrors the theme-impact
+ * packet CLI (packages/ops-data/scripts/theme-packets.ts).
  *
  * Usage (repo root; DATABASE_URL required for every command except validate):
  *   node --conditions development --import tsx packages/ops-data/scripts/articles.ts \
- *     validate packages/ops-data/fixtures/articles/buying-a-home.ts
- *   ... articles.ts apply <fixture.ts ...>     # upsert at declared status
- *   ... articles.ts promote <articleId ...>    # gate + flip to published
+ *     pull <articleId|slug ...>                # DB -> packages/ops-data/drafts/<slug>.article.json
+ *   ... articles.ts validate <draft.json|module.ts ...>  # offline gates on a draft
+ *   ... articles.ts apply <draft.json|module.ts ...>     # upsert at declared status
+ *   ... articles.ts promote <articleId ...>    # gate the DB row + flip to published
  *   ... articles.ts project                    # published -> active release
  *   ... articles.ts audit                      # drift check: release vs reference
  *
@@ -18,7 +21,8 @@
  */
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
-import { resolve } from 'node:path';
+import { resolve, join } from 'node:path';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { assertArticleCitationIntegrity, publicArticleProjectionSchema } from '@repo/schemas';
 import {
   checkDoiCitation,
@@ -31,7 +35,7 @@ import { z } from 'zod';
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
-const USAGE = 'usage: articles.ts <validate|apply|promote|project|audit> [args...]';
+const USAGE = 'usage: articles.ts <pull|validate|apply|promote|project|audit> [args...]';
 
 /** Authoring shape: the projection doc minus the release-assigned id, plus status. */
 const articleAuthoringSchema = publicArticleProjectionSchema
@@ -54,7 +58,9 @@ async function loadFixtureArticles(paths: readonly string[]): Promise<readonly A
   if (paths.length === 0) throw new Error('at least one fixture module path is required');
   const articles = new Map<string, ArticleAuthoring>();
   for (const path of paths) {
-    const module: Record<string, unknown> = await import(pathToFileURL(resolve(path)).href);
+    const module: Record<string, unknown> = path.endsWith('.json')
+      ? { draft: JSON.parse(readFileSync(resolve(path), 'utf8')) as unknown }
+      : await import(pathToFileURL(resolve(path)).href);
     let found = 0;
     for (const exported of Object.values(module)) {
       const candidates = Array.isArray(exported) ? exported : [exported];
@@ -275,7 +281,7 @@ function gateSeriesPositions(articles: readonly ArticleAuthoring[]): void {
  * records, rather than through prose pointing at navigation.
  *
  * Hard error on published articles, surfaced warning otherwise — same posture as the tier
- * and word-floor gates. Governed by docs/ui/voice-theme-chapters.md Rule 6.
+ * and word-floor gates. Governed by docs/content/neo-voice.md Part V ("The chapter stands alone").
  */
 const SELF_REFERENCE_PATTERNS: readonly { readonly label: string; readonly pattern: RegExp }[] = [
   { label: 'names the publishing surface', pattern: /\bthis (?:site|website|project|page)\b/i },
@@ -720,6 +726,43 @@ async function commandApply(paths: readonly string[]): Promise<void> {
   console.log(JSON.stringify({ command: 'apply', ...result }, null, 2));
 }
 
+const DRAFTS_DIR = resolve('packages/ops-data/drafts');
+
+/**
+ * DB -> local draft. Exports bb_reference.articles rows (matched by id or slug)
+ * as authoring JSON into packages/ops-data/drafts/, which is gitignored: drafts
+ * are working copies for an edit session, never a second source of truth.
+ */
+async function commandPull(idsOrSlugs: readonly string[]): Promise<void> {
+  if (idsOrSlugs.length === 0) throw new Error('at least one article id or slug is required');
+
+  const result = await withDb(async ({ client }) => {
+    const rows = await client.query<ArticleRow>(
+      `SELECT ${REFERENCE_COLUMNS} FROM bb_reference.articles
+       WHERE id = ANY($1::text[]) OR slug = ANY($1::text[])`,
+      [[...idsOrSlugs]],
+    );
+    const matched = new Set(rows.rows.flatMap((row) => [row.id, row.slug]));
+    const missing = idsOrSlugs.filter((key) => !matched.has(key));
+    if (missing.length > 0) throw new Error(`articles not found: ${missing.join(', ')}`);
+
+    mkdirSync(DRAFTS_DIR, { recursive: true });
+    const pulled: { id: string; slug: string; status: string; path: string }[] = [];
+    for (const row of rows.rows) {
+      const authoring = articleAuthoringSchema.parse({
+        ...rowToProjectionAuthoring(row),
+        status: row.status,
+      });
+      const path = join(DRAFTS_DIR, `${row.slug}.article.json`);
+      writeFileSync(path, `${JSON.stringify(authoring, null, 2)}\n`);
+      pulled.push({ id: row.id, slug: row.slug, status: row.status, path });
+    }
+    return { pulled };
+  });
+
+  console.log(JSON.stringify({ command: 'pull', ...result }, null, 2));
+}
+
 async function commandPromote(articleIds: readonly string[]): Promise<void> {
   if (articleIds.length === 0) throw new Error('at least one article id is required');
 
@@ -872,6 +915,8 @@ async function commandAudit(): Promise<void> {
 async function main(): Promise<void> {
   const [command, ...args] = process.argv.slice(2);
   switch (command) {
+    case 'pull':
+      return commandPull(args);
     case 'validate':
       return commandValidate(args);
     case 'apply':

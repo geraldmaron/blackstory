@@ -30,7 +30,6 @@ function feature(overrides: Partial<ExploreMapFeature['properties']>): ExploreMa
       precision: 'city',
       geoPrecisionTier: 'locality',
       eraBuckets: ['1950s'],
-      notabilityLabels: [],
       evidenceCount: 1,
       confidenceTier: 'medium',
       topicTags: ['education'],

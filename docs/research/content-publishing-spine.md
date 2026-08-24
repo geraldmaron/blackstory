@@ -70,4 +70,4 @@ becomes a deliberate migration at that point, not before.
 | Lifecycle CLI | `packages/ops-data/scripts/theme-packets.ts` |
 | Release tables + RLS | `supabase/migrations/20260726120000_content_publishing_spine.sql` |
 | Packet system field tables | `docs/research/theme-impact-packet-system.md` |
-| Prose voice for flagship packets | `docs/content/era-immersion-style.md` |
+| Prose voice for flagship packets | `docs/content/neo-voice.md` |

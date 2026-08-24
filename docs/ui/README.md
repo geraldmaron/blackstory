@@ -51,7 +51,7 @@ The two v9 direction docs are read together. Neither is complete alone.
 | **Footer** | [`patterns-site-footer.md`](./patterns-site-footer.md) | `SiteFooter.tsx`, `shell.css` `.ds-shell-footer*` | Reusable. Rewritten from the destination registry in SP-15 |
 | **Utility edition** | [`patterns-utility-edition.md`](./patterns-utility-edition.md) | `components/patterns/utility-edition/*` | Reusable. Folded into the Utility surface class by v9 surfaces section 2.4 |
 | **Cinematic map backdrop** | [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) | `components/patterns/cinematic-map/*`, `MapStage.tsx`, `camera-presets.ts`, mobile `AppBottomSheet.tsx` + `mapCamera.ts` | Binding on mobile. On web, replaced by the Framed plate posture |
-| **Voice & microcopy** | [`story.md`](./story.md), [`voice-theme-chapters.md`](./voice-theme-chapters.md) | All user-facing copy | Binding |
+| **Voice & microcopy** | [`story.md`](./story.md), [`neo-voice.md`](../content/neo-voice.md) | All user-facing copy | Binding |
 | **Learning index entity** | [`learning-index-entity.md`](./learning-index-entity.md) | Entity detail / index cards | Contract |
 | **Add to Home Screen** | [`brand.md`](./brand.md) § Add to Home Screen / install icons | `public/manifest.webmanifest`, `layout.tsx` metadata | Installability (online-first; no service worker). The former `docs/notes/add-to-home-screen.md` was removed on 2026-07-24 and the link to it was left dangling; brand.md is the surviving source |
 

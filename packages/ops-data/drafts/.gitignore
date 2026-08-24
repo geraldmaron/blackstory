@@ -1,0 +1,4 @@
+# Article drafts pulled from bb_reference.articles for an edit session.
+# The database is the source of truth; drafts are never committed.
+*
+!.gitignore

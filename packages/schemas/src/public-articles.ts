@@ -222,7 +222,7 @@ export type ArticleBodyBlockDoc = z.infer<typeof articleBodyBlockSchema>;
  * table and rendered by the same body-block renderer; the kind selects which gates apply
  * and how the piece is presented in the index.
  *
- * - `chapter` — the long-form era-immersion piece (`docs/content/era-immersion-style.md`).
+ * - `chapter` — the long-form era-immersion piece (`docs/content/neo-voice.md`).
  *   Carries the 2,000-word prose floor and the second-person era structure.
  * - `article` — a short, structured record entry: a paragraph of context plus cited
  *   call-outs. Same citation and source-tier bar, no prose floor, no era structure.

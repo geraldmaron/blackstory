@@ -15,8 +15,8 @@ decade,race,homeownership_rate,source_url
 1920,white_nh,52.1,https://www.census.gov/topics/housing/homeownership/data/historical.html
 1930,black,23.1,https://www.census.gov/topics/housing/homeownership/data/historical.html
 1930,white_nh,52.7,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1940,black,23.6,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1940,white_nh,53.0,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1940,black,22.8,https://www2.census.gov/library/publications/decennial/1940/housing-volume-2/housing-v2p1-ch2.pdf
+1940,white_nh,45.7,https://www2.census.gov/library/publications/decennial/1940/housing-volume-2/housing-v2p1-ch2.pdf
 1950,black,34.9,https://www.census.gov/topics/housing/homeownership/data/historical.html
 1950,white_nh,55.1,https://www.census.gov/topics/housing/homeownership/data/historical.html
 1960,black,38.4,https://www.census.gov/topics/housing/homeownership/data/historical.html

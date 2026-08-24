@@ -4,7 +4,7 @@
 **Scope:** `/chapters` and `/chapters/[slug]`, the archive's long form publication surface. `/chapters/mosaic-credits` is a Utility surface and is covered in [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) section 4.4, not here.
 **Surface class:** Reading room. Chrome and exits are governed by [`patterns-reading-room.md`](./patterns-reading-room.md); the plate by [`patterns-plate-posture.md`](./patterns-plate-posture.md); the Atlas handoff by [`patterns-lens-handoff.md`](./patterns-lens-handoff.md).
 **Supersedes:** the `/chapters` rows in `design-direction-v6-stories.md` and `design-direction-v6-themes.md`, whose routes no longer exist. Neither file is deleted: both are the provenance record for how four publication surfaces became one.
-**Unchanged and still binding:** [`brand.md`](./brand.md), [`story.md`](./story.md) voice, [`voice-theme-chapters.md`](./voice-theme-chapters.md) chapter voice, [`patterns-record-anatomy.md`](./patterns-record-anatomy.md).
+**Unchanged and still binding:** [`brand.md`](./brand.md), [`story.md`](./story.md) voice, [`neo-voice.md`](../content/neo-voice.md) chapter voice, [`patterns-record-anatomy.md`](./patterns-record-anatomy.md).
 
 ---
 
@@ -133,7 +133,7 @@ That is the half of the v9 thesis with no implementation today. Until the edge e
 
 ## 4. Voice
 
-Unchanged from [`voice-theme-chapters.md`](./voice-theme-chapters.md) and [`story.md`](./story.md), restated because it is load bearing on this surface:
+Unchanged from [`neo-voice.md`](../content/neo-voice.md) and [`story.md`](./story.md), restated because it is load bearing on this surface:
 
 - Immersion with sourced buildup. A named year and place, the rules in force, the measured odds under them.
 - Plain everyday voice, contractions fine. Not a lecture and not a brochure.

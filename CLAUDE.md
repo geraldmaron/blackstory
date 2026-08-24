@@ -102,8 +102,9 @@ to merge). This is enforced server-side, not just a convention.
 
 Research playbooks live in `.claude/skills/blackstory/`. CLI pointers load a verb from
 `docs/research/research-operations.md`. Judgment playbooks (`entity-verify`,
-`claim-corroborate`, `entity-complete`, `coverage-target`, `publish-preview`) have unique
-content. See `AGENTS.md` for the lane index.
+`claim-corroborate`, `entity-complete`, `entity-relate`, `coverage-target`, `publish-preview`,
+`neo-voice`, `prose-review`, `ringer-review`) have unique content. See `AGENTS.md` for the
+lane index.
 
 ## Web local QA (agents)
 
