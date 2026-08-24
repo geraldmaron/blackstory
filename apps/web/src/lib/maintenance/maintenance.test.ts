@@ -68,7 +68,10 @@ test('retry-after falls back to a day and is capped at a week', () => {
     readMaintenanceSettings({ MAINTENANCE_RETRY_AFTER_SECONDS: '-5' }).retryAfterSeconds,
     DEFAULT_RETRY_AFTER_SECONDS,
   );
-  assert.equal(readMaintenanceSettings({ MAINTENANCE_RETRY_AFTER_SECONDS: '600' }).retryAfterSeconds, 600);
+  assert.equal(
+    readMaintenanceSettings({ MAINTENANCE_RETRY_AFTER_SECONDS: '600' }).retryAfterSeconds,
+    600,
+  );
   assert.equal(
     readMaintenanceSettings({ MAINTENANCE_RETRY_AFTER_SECONDS: '99999999' }).retryAfterSeconds,
     60 * 60 * 24 * 7,
@@ -83,7 +86,14 @@ test('wall down passes every path through untouched', () => {
 });
 
 test('wall up blocks the public surface, robots.txt and sitemap.xml included', () => {
-  for (const pathname of ['/', '/entity/abc', '/search', '/robots.txt', '/sitemap.xml', '/stories/x']) {
+  for (const pathname of [
+    '/',
+    '/entity/abc',
+    '/search',
+    '/robots.txt',
+    '/sitemap.xml',
+    '/stories/x',
+  ]) {
     assert.deepEqual(
       decideMaintenance(WALLED, facts({ pathname })),
       { kind: 'block' },
@@ -122,7 +132,12 @@ test('cookie and header bypasses pass through', () => {
 });
 
 test('wrong, truncated, and extended tokens are all blocked', () => {
-  for (const candidate of ['', 'wrong', 'correct-horse-battery-stapl', 'correct-horse-battery-staple!']) {
+  for (const candidate of [
+    '',
+    'wrong',
+    'correct-horse-battery-stapl',
+    'correct-horse-battery-staple!',
+  ]) {
     assert.deepEqual(
       decideMaintenance(WALLED, facts({ bypassCookie: candidate })),
       { kind: 'block' },
@@ -221,7 +236,10 @@ test('readCookieValue picks the right cookie out of a header', () => {
   assert.equal(readCookieValue(header, MAINTENANCE_BYPASS_HINT_COOKIE), '1');
   assert.equal(readCookieValue(header, 'missing'), null);
   // A cookie whose NAME merely ends with the target name must not match.
-  assert.equal(readCookieValue(`not_${MAINTENANCE_BYPASS_HINT_COOKIE}=1`, MAINTENANCE_BYPASS_HINT_COOKIE), null);
+  assert.equal(
+    readCookieValue(`not_${MAINTENANCE_BYPASS_HINT_COOKIE}=1`, MAINTENANCE_BYPASS_HINT_COOKIE),
+    null,
+  );
   assert.equal(readCookieValue('', MAINTENANCE_BYPASS_HINT_COOKIE), null);
 });
 
