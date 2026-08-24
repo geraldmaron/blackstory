@@ -17,7 +17,7 @@
 | Git production branch | `main` at `bd1b1c08` (includes `5ea25768` `_vercel_*` preserve) |
 | Production deploy | `dpl_ERR5rbReMAdUkrA3uscmYQZ9BCN6` READY |
 | Vercel domains | `blackstory.app` + `www.blackstory.app` attached; `misconfigured=false`; Production public |
-| Production DNS | **Vercel** — apex `A 76.76.21.21`; `www` `CNAME cname.vercel-dns.com` (DNS-only / grey cloud; Cloudflare NS retained) |
+| Production DNS | **Cloudflare-proxied → Vercel.** At cutover this was DNS-only / grey cloud (apex `A 76.76.21.21`, `www` `CNAME cname.vercel-dns.com`). It is no longer: measured 2026-08-24, the apex resolves to Cloudflare anycast (`172.67.210.34`, `104.21.16.57`) and every response carries `server: cloudflare` + `cf-ray`, i.e. orange cloud. **This matters for cost decisions:** grey cloud would mean Cloudflare never sees a request and any Cache Rule is a no-op; orange cloud means Cloudflare rules can absorb traffic before Vercel bills it (see `repo-uuzm`). Re-measure before relying on either state. |
 | Live probe (post-flip) | `server: Vercel` (not App Hosting `envoy` / `via: google`); `/explore/api` `totalMatched=1338` `degraded=false`; `/history/api` `1340`; `/search?q=obama` 200 with Barack Obama; sample entity 200 |
 | Soak | **Closed** — Vercel is sole public web host |
 | Owner wind-down | **Done** — public web App Hosting deleted 2026-07-22; admin App Hosting + Cloud Run `black-book-admin-production` deleted 2026-08-15 |
