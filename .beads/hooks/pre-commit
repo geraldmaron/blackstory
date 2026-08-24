@@ -30,3 +30,24 @@ fi
 # --- Dependabot GHSA-w3rx-r6r6-pgpr / GHSA-5p2g-fcmc-qvqq: keep unparseable image formats out
 # of the mobile bundle. No upstream fix exists, so the asset tree is the only control. ---
 "$(dirname "$0")/check-metro-image-assets.py" || exit 1
+
+# --- Keep CI's `Validate` job green: it runs `prettier --check .` over the whole tree, so any
+# formatting drift that lands on staging/main turns the branch red for everyone. Check the
+# staged files here instead, where it costs a second and the fix is one command.
+# Staged-file scope keeps this fast; `--ignore-unknown` skips anything Prettier can't parse and
+# `.prettierignore` is still honoured. Set SKIP_PRETTIER=1 to bypass in an emergency.
+# NOTE: this reads files from the worktree, not the index, so a partially staged file
+# (`git add -p`) is judged on its full contents. ---
+if [ -z "$SKIP_PRETTIER" ]; then
+  _staged_files=$(git diff --cached --name-only --diff-filter=ACMR)
+  if [ -n "$_staged_files" ]; then
+    if ! printf '%s' "$_staged_files" | tr '\n' '\0' \
+      | xargs -0 npx --no-install prettier --check --ignore-unknown; then
+      echo >&2 ""
+      echo >&2 "pre-commit: Prettier found formatting issues in staged files."
+      echo >&2 "  Fix with: pnpm format"
+      echo >&2 "  Emergency bypass: set SKIP_PRETTIER=1"
+      exit 1
+    fi
+  fi
+fi
