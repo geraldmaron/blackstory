@@ -15,6 +15,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Notice } from '@repo/ui';
+import { hasMaintenanceBypassHint } from '../../lib/maintenance/maintenance-bypass-hint';
 import { AtlasExperience } from './AtlasExperience';
 import {
   ATLAS_CATALOG_PATH,
@@ -29,7 +30,12 @@ let lastCatalog: { readonly url: string; readonly payload: AtlasCatalogPayload }
 
 async function fetchAtlasCatalog(url: string, signal: AbortSignal): Promise<AtlasCatalogPayload> {
   if (lastCatalog?.url === url) return lastCatalog.payload;
-  const response = await fetch(url, { signal, credentials: 'omit' });
+  // `omit` is the normal path: the catalog is public, CDN-cached, and has no business seeing a
+  // cookie. The one exception is an operator holding a maintenance bypass, whose credential has
+  // to ride along or the wall answers this fetch with a 503 and the Atlas comes up empty behind
+  // its own bypass. The hint cookie only exists while the wall is up.
+  const credentials = hasMaintenanceBypassHint() ? 'same-origin' : 'omit';
+  const response = await fetch(url, { signal, credentials });
   if (!response.ok) {
     throw new Error(`atlas catalog ${response.status}`);
   }

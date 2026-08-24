@@ -1,24 +1,45 @@
 /**
- * Edge web security composed with query normalization.
+ * Edge web security composed with query normalization, behind the maintenance wall.
  *
  * Was `middleware.ts`. Next 16 deprecated that file convention in favour of `proxy`; the rename is
  * the whole migration — same request object, same `config.matcher` semantics, same edge runtime.
  * Only the file name and the exported function name changed.
  */
 
-import { type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { handleMaintenance } from './lib/maintenance/maintenance-gate';
 import { handleWebSecurity } from './lib/web-security/edge-security';
 
 export function proxy(request: NextRequest) {
+  // First, always. A walled request must not reach a route, a React render, or `bb_public`.
+  const maintenanceResponse = handleMaintenance(request);
+  if (maintenanceResponse !== null) {
+    return maintenanceResponse;
+  }
+
+  // Outside the security/normalization surface this is a bare pass-through, which is what these
+  // paths got before the matcher was widened for maintenance mode. See `config` below.
+  if (!isSecurityNormalizedPath(request.nextUrl.pathname)) {
+    return NextResponse.next();
+  }
+
   return handleWebSecurity(request);
 }
 
 /**
- * Public HTML routes only. Endpoints must never appear here: an endpoint's contract *is* its
- * query string, and normalization 308s it away before the handler ever parses it. `/history/api`
- * and `/submit/api` were the two that had slipped in, both with an empty allowlist, so both were
- * answering a stripped request. Every other endpoint (`/explore/api`, `/search/api`,
- * `/locate/api`, the `/corrections/*` handlers) is already out and stays out.
+ * The real security/normalization surface: public HTML routes only.
+ *
+ * This predicate is the former `config.matcher` list, moved from build-time routing to a runtime
+ * check. The matcher itself had to widen to everything so maintenance mode can answer any path
+ * at the edge, and a matcher cannot be computed from `process.env` — Next requires it to be
+ * statically analyzable. Rather than let the wider matcher quietly extend query normalization
+ * over endpoints that must never see it, the old list is enforced here instead, unchanged.
+ *
+ * Endpoints must never appear here: an endpoint's contract *is* its query string, and
+ * normalization 308s it away before the handler ever parses it. `/history/api` and `/submit/api`
+ * were the two that had slipped in, both with an empty allowlist, so both were answering a
+ * stripped request. Every other endpoint (`/explore/api`, `/search/api`, `/locate/api`, the
+ * `/corrections/*` handlers) is already out and stays out.
  *
  * `/history` is out for exactly that reason: it renders nothing and exists only to map `decade`
  * onto `era` and resolve to `/records`. Matched, its parse→build normalization rewrote the
@@ -29,22 +50,48 @@ export function proxy(request: NextRequest) {
  * `/explore` is out because it stopped rendering: it 308s to `/`, which is the Atlas and is
  * matched here. Normalising a path on its way to a redirect only buys a second hop.
  */
+const SECURITY_NORMALIZED_EXACT = new Set([
+  '/',
+  '/search',
+  '/law',
+  '/legal',
+  '/errata',
+  '/about',
+  '/methodology',
+  '/stories',
+  '/corrections',
+  '/submit',
+]);
+
+/** Prefix forms of the `:path*` segments in the original matcher. */
+const SECURITY_NORMALIZED_PREFIXES = [
+  '/entity/',
+  '/law/',
+  '/legal/',
+  '/errata/',
+  '/stories/',
+] as const;
+
+export function isSecurityNormalizedPath(pathname: string): boolean {
+  if (SECURITY_NORMALIZED_EXACT.has(pathname)) {
+    return true;
+  }
+  return SECURITY_NORMALIZED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
+
+/**
+ * Everything except build output and brand art.
+ *
+ * Wide because maintenance mode has to be able to answer *any* path — including `/robots.txt`
+ * and `/sitemap.xml`, whose site-wide 503 is the signal that tells crawlers to back off instead
+ * of reindexing the archive as a maintenance notice. The exclusions mirror
+ * `ALWAYS_ALLOWED_PREFIXES` in `maintenance-policy.ts`: static build output and `/brand` stay
+ * reachable so a bypassed operator gets a working site and the maintenance page can render its
+ * lockup.
+ *
+ * With the wall down, the extra paths this now matches cost one `NextResponse.next()` each; on
+ * Vercel they were already counted as edge requests before the proxy ran.
+ */
 export const config = {
-  matcher: [
-    '/',
-    '/search',
-    '/entity/:path*',
-    '/law',
-    '/law/:path*',
-    '/legal',
-    '/legal/:path*',
-    '/errata',
-    '/errata/:path*',
-    '/about',
-    '/methodology',
-    '/stories',
-    '/stories/:path*',
-    '/corrections',
-    '/submit',
-  ],
+  matcher: ['/((?!_next/static|_next/image|brand/|favicon.ico).*)'],
 };
