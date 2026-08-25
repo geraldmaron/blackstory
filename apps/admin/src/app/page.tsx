@@ -98,7 +98,7 @@ export default async function AdminHomePage() {
               <span className="admin-ops__card-metric">{storyMetric.text} pending</span>
             )}
             <span className="admin-ops__card-detail">
-              Staged packets — approve does not publish to the public site
+              Staged packets. Approve does not publish. Cover packages live under Article covers.
             </span>
           </Link>
 
