@@ -84,9 +84,33 @@ A second rule, `Cache HTML at edge`, is present but **disabled**: its expression
 wildcard (`http.request.full_uri wildcard r""`), zone-wide and unreviewed. Left in place rather
 than deleted so its intent can be recovered before someone re-creates it.
 
-**Not yet verified:** every measurement above was taken while `MAINTENANCE_MODE` was on, so only
-the 503 path has been exercised. That the rule produces a `HIT` on a real 200 is untested — see
-`repo-27nn`.
+**Verified on live 200s, 2026-08-25**, after the maintenance wall came down:
+
+| Probe | Result |
+|-------|--------|
+| `/` repeat requests | `cf-cache-status: HIT`, `age` climbing — repeat front-door hits never reach Vercel |
+| `/?state=AL` | `MISS` — faceted variants keep their own entry, which is correct, not a defect |
+| `/` with `rsc: 1` | `DYNAMIC` — the bypass holds, RSC and HTML never share an entry |
+| `/atlas/catalog` | `x-vercel-cache: MISS` then `HIT`, `HIT` with rising `age` |
+
+Two things that settle long-standing questions:
+
+**Vercel DOES honour a route handler's `s-maxage`** (`repo-27nn`). The whole 2026-08-22 shell/catalog
+split rested on that premise and it had never been tested, because a dynamic *page* has its header
+overwritten with `no-store`. A route handler keeps its own. Confirmed.
+
+**The payload is gone.** `/` is now **33.6 KB gzipped** (372 KB raw), against the ~15–17 MB RSC
+payload that was, by itself, the July–August Vercel bill. `/atlas/catalog` carries the 949 KB
+(gzipped) catalog and is CDN-cached.
+
+Note the browser still receives `private, no-cache, no-store` on `/` while Cloudflare serves a
+`HIT`. That is the intended split: `override_origin` caches at the edge, the origin's header passes
+downstream untouched, so no visitor caches a dynamic page locally.
+
+**Remaining opportunity:** `/methodology` and `/entity/[id]` send `public, s-maxage=3600` but answer
+`cf-cache-status: DYNAMIC` — Cloudflare does not cache HTML without a rule, so those are served from
+Vercel every time despite being ISR and perfectly cacheable. Extending the cache rule to them is the
+next cheap win.
 
 ## Cloudflare zone security posture (blackstory.app)
 
