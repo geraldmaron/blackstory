@@ -71,14 +71,21 @@ test('exitCodeForDecision returns non-zero on NO_GO', () => {
 });
 
 test('CLI exits non-zero without attestations and zero with all-pass fixture', () => {
-  const noAttest = spawnSync(process.execPath, [scriptPath, '--evaluator', 'cli-test'], {
-    cwd: repoRoot,
-    encoding: 'utf8',
-  });
-  assert.notEqual(noAttest.status, 0, 'missing attestations must block launch');
-
   const outputDir = mkdtempSync(join(tmpdir(), 'beta-gate-'));
   const outputPath = join(outputDir, 'decision.json');
+
+  // `--output` is REQUIRED on both spawns, not just the second. Without it the CLI writes to its
+  // default path — docs/launch/latest-beta-decision.json, the repo's real launch decision — so
+  // merely running this test suite overwrote the governance artifact with test output. That is why
+  // the committed artifact read `"evaluator": "cli-test"`: it had never been produced by an
+  // operator evaluation at all, and commit d6292b7c ("update beta decision evaluator timestamp")
+  // is that churn being committed by hand. Found 2026-08-25.
+  const noAttest = spawnSync(
+    process.execPath,
+    [scriptPath, '--evaluator', 'cli-test', '--output', join(outputDir, 'no-attest.json')],
+    { cwd: repoRoot, encoding: 'utf8' },
+  );
+  assert.notEqual(noAttest.status, 0, 'missing attestations must block launch');
   const allPass = spawnSync(
     process.execPath,
     [
