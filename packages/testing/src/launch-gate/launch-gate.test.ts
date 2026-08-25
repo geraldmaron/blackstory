@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import { describe, it, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { loadHumanAttestationBundle, validateBetaLaunchDecisionArtifact } from './artifact.js';
+import { BETA_LAUNCH_GATES, REQUIRED_HUMAN_GATE_IDS } from './criteria.js';
 import {
   evaluateBetaLaunchGate,
   exitCodeForDecision,
@@ -48,14 +49,18 @@ describe('evaluateBetaLaunchGate', () => {
     });
     assert.equal(report.decision, 'GO');
     assert.equal(report.requiredFailed, 0);
-    assert.ok(report.requiredPassed >= 15);
+    // Derived, not hardcoded: a GO with zero required failures means every required gate passed,
+    // so this stays true when a gate is added or downgraded to optional. The previous
+    // `>= 15` silently stopped meaning "all of them" the moment the gate count changed.
+    assert.equal(report.requiredPassed, BETA_LAUNCH_GATES.filter((gate) => gate.required).length);
     validateBetaLaunchDecisionArtifact(report);
   });
 
   it('lists missing human gate ids for partial attestation bundles', () => {
     const attestations = loadHumanAttestationBundle(join(fixtureDir, 'partial-attestations.json'));
     const missing = missingHumanAttestations(attestations);
-    assert.ok(missing.length >= 6);
+    // The partial fixture attests exactly one required human gate, so everything else is missing.
+    assert.equal(missing.length, REQUIRED_HUMAN_GATE_IDS.length - 1);
     assert.ok(!missing.includes('published-claims-with-evidence'));
   });
 });
