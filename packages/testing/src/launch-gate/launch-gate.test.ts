@@ -56,6 +56,50 @@ describe('evaluateBetaLaunchGate', () => {
     validateBetaLaunchDecisionArtifact(report);
   });
 
+  // Regression: a bundle signed "TODO" six times produced a full GO with exit code 0 until
+  // 2026-08-25. Empty was rejected at load, but anything non-empty passed the gate, so there was
+  // no state that both loaded and read as unsigned.
+  const signedWith = (attestedBy: string, attestedAt: string) => ({
+    schemaVersion: 1 as const,
+    attestations: REQUIRED_HUMAN_GATE_IDS.map((gateId) => ({ gateId, attestedBy, attestedAt })),
+  });
+
+  const decisionFor = (attestations: ReturnType<typeof signedWith>) =>
+    evaluateBetaLaunchGate({
+      repoRoot,
+      evaluator: 'test-harness',
+      evaluatedAt: '2026-08-25T00:00:00.000Z',
+      attestations,
+    });
+
+  it('rejects placeholder signatures instead of attesting every gate', () => {
+    for (const placeholder of ['TODO', 'todo', 'tbd', 'pending', 'n/a', 'x', 'FIXME']) {
+      const report = decisionFor(signedWith(placeholder, '2026-08-24T00:00:00.000Z'));
+      assert.equal(report.decision, 'NO_GO', `"${placeholder}" must not attest a gate`);
+      assert.equal(report.requiredFailed, REQUIRED_HUMAN_GATE_IDS.length);
+    }
+  });
+
+  it('rejects an attestedAt that is not a real date', () => {
+    // The likeliest improvised placeholder is one that is not a date at all.
+    const report = decisionFor(signedWith('gerald', 'TODO'));
+    assert.equal(report.decision, 'NO_GO');
+    assert.equal(report.requiredFailed, REQUIRED_HUMAN_GATE_IDS.length);
+  });
+
+  it('rejects an attestedAt in the future', () => {
+    // A review cannot have happened yet. Also catches a copy-pasted far-future timestamp.
+    const report = decisionFor(signedWith('gerald', '2027-01-01T00:00:00.000Z'));
+    assert.equal(report.decision, 'NO_GO');
+    assert.equal(report.requiredFailed, REQUIRED_HUMAN_GATE_IDS.length);
+  });
+
+  it('accepts a real identity with a real past date', () => {
+    const report = decisionFor(signedWith('gerald@example.com', '2026-08-24T12:00:00.000Z'));
+    assert.equal(report.requiredFailed, 0);
+    assert.equal(report.decision, 'GO');
+  });
+
   it('lists missing human gate ids for partial attestation bundles', () => {
     const attestations = loadHumanAttestationBundle(join(fixtureDir, 'partial-attestations.json'));
     const missing = missingHumanAttestations(attestations);

@@ -20,12 +20,82 @@ function attestationFor(
   return bundle?.attestations.find((record) => record.gateId === gateId);
 }
 
+/**
+ * Signatures that are obviously not a person.
+ *
+ * WHY THIS EXISTS. `artifact.ts` rejects an empty `attestedBy` at load, but this module only
+ * checked `.trim()` — so ANY non-empty string passed, and a bundle signed `TODO` six times
+ * produced a full GO with exit code 0. There was no state that both loaded successfully and read
+ * as unsigned, which meant the natural way to fill in the scaffold (drop TODO in the blanks, come
+ * back later) silently attested every gate, including living-addresses-zero. Demonstrated and
+ * fixed 2026-08-25.
+ *
+ * The denylist is the weaker half of the fix and is not meant to be exhaustive — `attestedAt`
+ * having to be a real, non-future date is what actually stops improvised placeholders, since
+ * almost nothing a person types absent-mindedly parses as a date.
+ */
+const PLACEHOLDER_SIGNATURES: ReadonlySet<string> = new Set([
+  '-',
+  '?',
+  'change-me',
+  'changeme',
+  'fixme',
+  'n/a',
+  'na',
+  'none',
+  'placeholder',
+  'pending',
+  'tba',
+  'tbd',
+  'todo',
+  'unknown',
+  'x',
+  'xxx',
+]);
+
+/** Date-only or full ISO-8601. Rejects sloppiness like a bare year that `Date.parse` accepts. */
+const ISO_8601 = /^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
+
+/**
+ * Returns why an attestation is not usable, or undefined when it is.
+ *
+ * Deliberately NOT checking staleness (an attestation older than N days). That is a policy call
+ * about how long a human review stays valid, and it belongs to whoever sets the release cadence —
+ * not smuggled in behind a placeholder fix. Note the shipped fixture attests at 2026-07-17, so a
+ * staleness rule would need that fixture regenerated rather than a constant nudged.
+ */
+function attestationDefect(
+  record: HumanAttestationRecord,
+  evaluatedAtMs: number,
+): string | undefined {
+  const by = record.attestedBy.trim();
+  const at = record.attestedAt.trim();
+  if (!by || !at) {
+    return 'attestedBy/attestedAt required';
+  }
+  if (PLACEHOLDER_SIGNATURES.has(by.toLowerCase())) {
+    return `attestedBy is a placeholder ("${by}") — a gate cannot be attested by nobody`;
+  }
+  if (!ISO_8601.test(at)) {
+    return `attestedAt must be an ISO-8601 date, got "${at}"`;
+  }
+  const attestedAtMs = Date.parse(at);
+  if (!Number.isFinite(attestedAtMs)) {
+    return `attestedAt is not a real date, got "${at}"`;
+  }
+  if (attestedAtMs > evaluatedAtMs) {
+    return `attestedAt is in the future ("${at}") — a review cannot have happened yet`;
+  }
+  return undefined;
+}
+
 function evaluateHumanGate(
   gateId: string,
   title: string,
   required: boolean,
   bundle: HumanAttestationBundle | undefined,
   evidence: LaunchGateResult['evidence'],
+  evaluatedAtMs: number,
 ): LaunchGateResult {
   const record = attestationFor(bundle, gateId);
   if (record === undefined) {
@@ -39,14 +109,15 @@ function evaluateHumanGate(
       evidence,
     };
   }
-  if (!record.attestedBy.trim() || !record.attestedAt.trim()) {
+  const defect = attestationDefect(record, evaluatedAtMs);
+  if (defect !== undefined) {
     return {
       id: gateId,
       title,
       kind: 'human',
       required,
       status: 'fail',
-      message: 'Human attestation incomplete (attestedBy/attestedAt required).',
+      message: `Human attestation invalid: ${defect}.`,
       evidence,
     };
   }
@@ -109,6 +180,7 @@ export function evaluateBetaLaunchGate(
   input: BetaLaunchEvaluationInput,
 ): BetaLaunchEvaluationReport {
   const evaluatedAt = input.evaluatedAt ?? new Date().toISOString();
+  const evaluatedAtMs = Date.parse(evaluatedAt);
   const gates = BETA_LAUNCH_GATES.map((definition) => {
     if (definition.kind === 'human') {
       return evaluateHumanGate(
@@ -117,6 +189,7 @@ export function evaluateBetaLaunchGate(
         definition.required,
         input.attestations,
         definition.evidence,
+        evaluatedAtMs,
       );
     }
     return evaluateMachineGate(
