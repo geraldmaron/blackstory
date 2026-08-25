@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "_unsigned": "SCAFFOLD — not a valid bundle until every attestedBy and attestedAt below is filled in. Empty strings are deliberate: loadHumanAttestationBundle() rejects them with a named error, so this file fails closed. Do NOT substitute a placeholder like 'TODO' or 'pending' — evaluate.ts only checks that the field is non-empty, so any placeholder silently PASSES the gate. Notes below record what was measured on 2026-08-25; they are evidence for your decision, not the decision.",
+  "attestations": [
+    {
+      "gateId": "published-claims-with-evidence",
+      "attestedBy": "",
+      "attestedAt": "",
+      "evidenceRef": "bb_canonical.claim_evidence_links",
+      "notes": "Measured 2026-08-25: 9,515 of 9,515 claims carry at least one evidence link (100%). CAVEAT: 'at least one link' is weaker than 'qualifying evidence per publication policy' — the count does not check qualification. Confirm the policy threshold in packages/domain/src/claims/publication.ts is what these links actually satisfy before signing."
+    },
+    {
+      "gateId": "unsupported-narrative-zero",
+      "attestedBy": "",
+      "attestedAt": "",
+      "evidenceRef": "",
+      "notes": "NOT MACHINE-CHECKED. No count was produced and none is possible — this requires reading the published prose against its sourcing. Run the prose-review and ringer-review playbooks over the active release before signing."
+    },
+    {
+      "gateId": "living-addresses-zero",
+      "attestedBy": "",
+      "attestedAt": "",
+      "evidenceRef": "9 person entities with address/building precision, active release rel_20260723_authority_net_001",
+      "notes": "Measured 2026-08-25. Of 455 person entities in the active release, 9 carry address- or building-precision locations, all with role='approximate': Alvin Aaron Coffey Sr., Carter G. Woodson, Edwin T. Pratt, Ellen Eglin, Eugene and Ruth Lasartemay, J. W. Randolph, James A. Fields, Jeremiah J. Hamilton, Wiley H. Bates. All nine read as historical; several are landmarked public sites rather than private homes (Woodson's is a National Historic Site; the James A. Fields House is a museum). CRITICAL CAVEAT: bb_public.release_entities.projection carries NO vital-status field — lifespan, died, deathDate and any nested deathYear all returned null on all nine. The database cannot establish that these people are deceased. This attestation rests entirely on a human recognising the names. Separately: `node --import tsx scripts/run-testing-layer.mjs security` passes 25/25, but that suite tests whether controls would DENY a living-address attempt; it never reads bb_public. It is not evidence about the corpus."
+    },
+    {
+      "gateId": "untracked-publication-decisions-zero",
+      "attestedBy": "",
+      "attestedAt": "",
+      "evidenceRef": "bb_ops.catalog_decisions",
+      "notes": "WEAKEST GATE. Measured 2026-08-25: bb_ops.catalog_decisions has 0 rows, against 8 rows in bb_canonical.publication_candidates. Zero rows cannot distinguish 'every publication decision is tracked' from 'nothing is tracking publication decisions'. Establish which it is — check packages/config/src/scheduled-jobs/publish-guard.ts writes to this table — before signing."
+    },
+    {
+      "gateId": "source-policy-violations-zero",
+      "attestedBy": "",
+      "attestedAt": "",
+      "evidenceRef": "bb_ops.policy_active",
+      "notes": "Measured 2026-08-25: 1 active source policy, 1 policy version, 0 claim tombstones. Thin evidence — a single policy version means little has been evaluated against it. Also note packages/domain/src/provenance/source-tiers.ts has UNCOMMITTED working-tree changes from another session, so the policy in force may not be the one in git."
+    },
+    {
+      "gateId": "incident-exercise-complete",
+      "attestedBy": "",
+      "attestedAt": "",
+      "evidenceRef": "",
+      "notes": "NOT MACHINE-CHECKED and nothing to compute. Requires actually running a tabletop or live exercise against docs/runbooks/incident-response.md. This is pure calendar time and is the longest-lead item of the seven — start it first."
+    },
+    {
+      "gateId": "legal-privacy-review-tracked",
+      "attestedBy": "",
+      "attestedAt": "",
+      "evidenceRef": "bb_public.release_legal_snapshots",
+      "notes": "Measured 2026-08-25: 12 legal snapshots exist on the active release, and 1 row in bb_ops.story_packet_reviews. Presence of snapshots is not the same as findings being tracked to resolution or waiver — read packages/domain/src/legal/review-queue.ts and confirm the queue is empty or every item is waived before signing."
+    }
+  ]
+}
