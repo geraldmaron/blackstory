@@ -50,6 +50,44 @@ skips only 2 of 21 days. Actual behaviour sits between those bounds.
 The script **fails open**: every uncertain branch builds. A needless build costs cents; a wrongly
 skipped build means production silently does not get the fix and nothing reports it.
 
+## Cloudflare edge cache posture
+
+`blackstory.app` is **Cloudflare-proxied** (orange cloud) in front of Vercel, on the **Free**
+plan. Zone `653abe0dbd1b10d22411306cb1f645be`. The cutover runbook's DNS row said grey cloud /
+DNS-only until 2026-08-24; that was stale, and it mattered — grey cloud would make every rule
+below a no-op.
+
+**Cache rule** (ruleset `fbba310d91a3483f88cc5686b25684e1`, phase `http_request_cache_settings`):
+`/`, `/library`, `/memorial`, excluding requests carrying the `rsc` header, are edge-cached for
+one hour with `browser_ttl: respect_origin` and `status_code_ttl` `200-226 -> 3600`,
+`300-526 -> 0`.
+
+Three constraints that are not obvious and cost a live incident on 2026-08-24 when they were
+missed:
+
+1. **`browser_ttl` must be set explicitly.** Omit it and the zone's Browser Cache TTL applies.
+   That default was `14400`, so the first version of this rule answered `/` with
+   `cache-control: max-age=14400` while the site was serving a maintenance **503** — pinning that
+   503 in every visitor's own browser for four hours, where no CDN purge can reach it. The zone
+   setting is now `0` (Respect Existing Headers), so the origin's `Cache-Control` governs.
+2. **`300-526 -> 0` is mandatory, not tidiness.** Without it the maintenance 503 caches at the
+   edge and outlives the wall.
+3. **Do NOT add a custom cache key here.** "Ignore query string" *is* available on Free (only
+   per-parameter include/exclude is Enterprise), so it is tempting. It is wrong: `/` builds its
+   shell and `noscript` list from `state`/`era`/`kind`/`topic`/`status`, so collapsing the facets
+   to one cache entry serves one state's page to everyone. The faceted long tail is correctly
+   uncacheable; this rule only ever caches the bare three URLs, which is the intended scope.
+   `cache_by_device_type` is off for the same reason in reverse — it splits each entry three ways
+   for a site that serves no device-specific HTML.
+
+A second rule, `Cache HTML at edge`, is present but **disabled**: its expression was an empty
+wildcard (`http.request.full_uri wildcard r""`), zone-wide and unreviewed. Left in place rather
+than deleted so its intent can be recovered before someone re-creates it.
+
+**Not yet verified:** every measurement above was taken while `MAINTENANCE_MODE` was on, so only
+the 503 path has been exercised. That the rule produces a `HIT` on a real 200 is untested — see
+`repo-27nn`.
+
 ## Platform spend backstop
 
 The GCP billing budgets above do not cover Vercel or Supabase, which is where the Aug 2026 spend
