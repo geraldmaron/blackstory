@@ -107,10 +107,28 @@ Note the browser still receives `private, no-cache, no-store` on `/` while Cloud
 `HIT`. That is the intended split: `override_origin` caches at the edge, the origin's header passes
 downstream untouched, so no visitor caches a dynamic page locally.
 
-**Remaining opportunity:** `/methodology` and `/entity/[id]` send `public, s-maxage=3600` but answer
-`cf-cache-status: DYNAMIC` — Cloudflare does not cache HTML without a rule, so those are served from
-Vercel every time despite being ISR and perfectly cacheable. Extending the cache rule to them is the
-next cheap win.
+### Second rule: ISR surfaces (added 2026-08-25)
+
+`/methodology`, `/submit`, `/entity/`, `/books/`, `/law/`, `/stories/`, `/chapters/` — same `rsc`
+bypass — with **`edge_ttl: respect_origin`** rather than the `override_origin` the first rule uses.
+
+The two groups need opposite treatment, which is why they are two rules and not one. `/`,
+`/library` and `/memorial` are `force-dynamic` and send `no-store`, so the edge must *override* the
+origin or nothing caches. The ISR surfaces already declare exactly the right thing
+(`public, s-maxage=3600, stale-while-revalidate=86400`), so the edge should *respect* it and keep
+one source of truth in the app.
+
+`respect_origin` also makes the prefix list safe to be generous with: a route that declares
+`no-store` or `max-age=0` simply does not cache. Verified — `/stories/mosaic-credits` sends
+`public, max-age=0, must-revalidate` and stays uncached even though `/stories/` is matched. Adding a
+prefix cannot force-cache something the app said not to.
+
+Verified after deploy: `/methodology`, `/entity/[id]` and `/submit` each go `MISS` then `HIT`; `/`
+and `/library` still `HIT` (no regression); an entity page with `rsc: 1` returns `DYNAMIC`;
+`/corrections` and `/records` stay `DYNAMIC`, correctly excluded.
+
+Before this, every one of 4,107 entity pages was served from Vercel on every request despite the
+origin declaring it cacheable for an hour.
 
 ## Cloudflare zone security posture (blackstory.app)
 
