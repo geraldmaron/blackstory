@@ -88,6 +88,29 @@ than deleted so its intent can be recovered before someone re-creates it.
 the 503 path has been exercised. That the rule produces a `HIT` on a real 200 is untested — see
 `repo-27nn`.
 
+## Cloudflare zone security posture (blackstory.app)
+
+Audited and hardened 2026-08-25. Zone `653abe0dbd1b10d22411306cb1f645be`, Free plan.
+
+| Setting | Was | Now | Why |
+|---------|-----|-----|-----|
+| `min_tls_version` | `1.0` | **`1.2`** | TLS 1.0/1.1 are deprecated and disallowed under PCI-DSS. Verified after the change: a TLS 1.1 handshake is refused, 1.2 succeeds. |
+| `always_use_https` | `off` | **`on`** | Cloudflare now 301s `http://` to `https://` at the edge. Verified. |
+| `ssl` | `full` | **`strict`** | `full` does not validate the origin certificate. Precondition verified BEFORE flipping, because `strict` against an invalid origin cert is a total outage (526): probed `76.76.21.21` directly with `--resolve` and got `ssl_verify_result=0`, i.e. Vercel presents a valid cert for this hostname. |
+| `browser_cache_ttl` | `14400` | **`0`** | See the cache section above — this was the cause of the 2026-08-24 cached-503 incident. |
+
+**HSTS is deliberately NOT set at Cloudflare** and should stay that way. The app already sends
+`Strict-Transport-Security: max-age=63072000` from its own security headers
+(`apps/web/src/lib/web-security/`), which is the right layer: it stays with the app across hosts
+and is reviewable in the repo. Cloudflare's zone HSTS toggle reads `enabled: false`; that is not a
+gap, and switching it on would create a second, invisible source of truth for the same header.
+
+**Not changed, deliberately.** `geralddagher.com` and `bengalsreunion.com` are on the same account
+and still carry `min_tls_version: 1.0` and `browser_cache_ttl: 14400` (and `bengalsreunion.com`
+has `always_use_https: off`). They are separate properties with origins that have not been
+verified here, and `ssl: strict` in particular is an outage if the origin cert does not validate.
+Audit them on their own terms before copying this posture across.
+
 ## Platform spend backstop
 
 The GCP billing budgets above do not cover Vercel or Supabase, which is where the Aug 2026 spend
