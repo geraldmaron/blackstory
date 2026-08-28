@@ -23,6 +23,8 @@ export type EntityRecordMarkProps = {
   readonly jurisdictionLabel?: string;
   /** Why this mark is shown — drives both accessible name and visible caption. */
   readonly reason?: RecordMarkReason;
+  /** First paint: the mast is the place. No rights-clearance or missing-photo caption. */
+  readonly hideCaption?: boolean;
 };
 
 export function EntityRecordMark({
@@ -31,6 +33,7 @@ export function EntityRecordMark({
   kind,
   jurisdictionLabel,
   reason = 'absent',
+  hideCaption = false,
 }: EntityRecordMarkProps) {
   const shape = selectRecordMarkShape(kind);
   const kindLabel = kindLabelForMark(kind);
@@ -45,7 +48,7 @@ export function EntityRecordMark({
     ...(kindLabel !== undefined ? { kindLabel } : {}),
     ...(jurisdictionLabel !== undefined ? { jurisdictionLabel } : {}),
   });
-  const caption = recordMarkCaption(reason);
+  const caption = hideCaption ? undefined : recordMarkCaption(reason);
 
   const contextParts = [kindLabel, jurisdictionLabel].filter(
     (part): part is string => typeof part === 'string' && part.trim().length > 0,
@@ -58,7 +61,7 @@ export function EntityRecordMark({
           className="ds-entity-mark__frame"
           role="img"
           aria-labelledby={nameId}
-          aria-describedby={captionId}
+          {...(hideCaption ? {} : { 'aria-describedby': captionId })}
         >
           <span id={nameId} className="ds-visually-hidden">
             {accessibleName}
@@ -80,10 +83,12 @@ export function EntityRecordMark({
           </p>
         ) : null}
       </div>
-      <figcaption id={captionId} className="ds-entity-photo__credit ds-sans">
-        {caption}
-        <span className="ds-mono"> · {RECORD_MARK_SHAPE_META[shape].label}</span>
-      </figcaption>
+      {hideCaption ? null : (
+        <figcaption id={captionId} className="ds-entity-photo__credit ds-sans">
+          {caption}
+          <span className="ds-mono"> · {RECORD_MARK_SHAPE_META[shape].label}</span>
+        </figcaption>
+      )}
     </figure>
   );
 }
