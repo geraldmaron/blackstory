@@ -113,25 +113,39 @@ test('apps/web does not name the other two org Supabase projects', () => {
   }
 });
 
-test('CSP allows only blackstory-app among supabase.co hosts', () => {
+test('CSP allows blackstory-app and leftover GCS; no other supabase.co host', () => {
   const csp = buildContentSecurityPolicy({ isDev: false });
-  const sources = csp.split(/[\s;]+/u).filter(Boolean);
-  const supabaseHosts = sources.filter((source) => source.includes('supabase.co'));
+  const sources = new Set(csp.split(/[\s;]+/u).filter(Boolean));
+  assert.equal(sources.has(`https://${PRODUCT_SUPABASE_REF}.supabase.co`), true);
+  assert.equal(
+    sources.has('https://storage.googleapis.com'),
+    true,
+    'GCS remains on img-src (dual-serve leftover). Do not delete it here; 235 live rows still use it.',
+  );
+  const supabaseHosts = [...sources].filter((source) => source.includes('supabase.co'));
   assert.deepEqual(supabaseHosts, [`https://${PRODUCT_SUPABASE_REF}.supabase.co`]);
   for (const ref of OTHER_SUPABASE_REFS) {
     assert.equal(csp.includes(ref), false);
   }
 });
 
-test('home stays a small dynamic shell; catalog is a separate cached route', () => {
+test('first paint still boots the full catalog to print Loading N records', () => {
+  // Live blackstory.app first screen (2026-08-28): black plate, "Loading 4,101 records…".
+  // That number is shell.totalMatched from buildAtlasShell(getSharedPublicEntities()).
+  // Proving the request path, not a look. Do not restyle this string on this PR.
   const page = readFileSync(join(SRC_ROOT, 'app/page.tsx'), 'utf8');
   const loader = readFileSync(join(SRC_ROOT, 'app/explore/AtlasLoader.tsx'), 'utf8');
+  const shell = readFileSync(join(SRC_ROOT, 'app/explore/explore-view-model.ts'), 'utf8');
   const catalogRoute = readFileSync(join(SRC_ROOT, 'app/atlas/catalog/route.ts'), 'utf8');
   const catalog = readFileSync(join(SRC_ROOT, 'app/explore/atlas-catalog.ts'), 'utf8');
 
   assert.match(page, /export const dynamic = 'force-dynamic'/);
+  assert.match(page, /getSharedPublicEntities/);
+  assert.match(page, /buildAtlasShell/);
   assert.match(page, /<AtlasLoader shell=\{shell\} \/>/);
   assert.doesNotMatch(page, /initial=\{/);
+  assert.match(loader, /Loading \{shell\.totalMatched\.toLocaleString\(\)\} records/);
+  assert.match(shell, /totalMatched: filteredFeatures\.length/);
   assert.match(loader, /ATLAS_CATALOG_PATH/);
   assert.match(catalogRoute, /ATLAS_CATALOG_CACHE_CONTROL/);
   assert.match(catalog, /s-maxage=3600/);
