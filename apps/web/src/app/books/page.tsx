@@ -7,6 +7,7 @@ import type { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
+import { ATLAS_INSTRUMENT_HREF } from '../../lib/nav/atlas-door';
 import { Notice } from '@repo/ui';
 import { bannedBookReportedStates } from '@repo/domain';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
@@ -121,7 +122,7 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
           </>
         }
         actions={[
-          { label: 'Open the Atlas', href: '/', emphasis: 'copper' },
+          { label: 'Open the Atlas', href: ATLAS_INSTRUMENT_HREF, emphasis: 'copper' },
           { label: 'Search the archive', href: '/records' },
         ]}
       >

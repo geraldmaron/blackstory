@@ -14,6 +14,7 @@
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
+import { ATLAS_INSTRUMENT_HREF } from '../../lib/nav/atlas-door';
 import { listPublicArticleListItems } from '../../lib/articles/source';
 import { RECORDS_PAGE_SIZE } from '../../lib/records/build-records-index';
 import {
@@ -351,7 +352,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
       <OffRamp
         title="Go straight to the archive"
         actions={[
-          { label: 'Open the Atlas', href: '/', emphasis: 'copper' },
+          { label: 'Open the Atlas', href: ATLAS_INSTRUMENT_HREF, emphasis: 'copper' },
           { label: 'Search the archive', href: '/records' },
         ]}
       >

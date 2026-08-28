@@ -14,6 +14,7 @@
 import type { Metadata } from 'next';
 import React from 'react';
 import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-data';
+import { ATLAS_INSTRUMENT_HREF } from '../../lib/nav/atlas-door';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { EMPTY_RECORDS_QUERY, buildRecordsIndex } from '../../lib/records/build-records-index';
 import {
@@ -147,7 +148,7 @@ export default async function LibraryPage() {
           </>
         }
         actions={[
-          { label: 'Open the Atlas', href: '/', emphasis: 'copper' },
+          { label: 'Open the Atlas', href: ATLAS_INSTRUMENT_HREF, emphasis: 'copper' },
           { label: 'The index', href: '/records' },
         ]}
       >

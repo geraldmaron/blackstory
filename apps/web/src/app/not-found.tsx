@@ -17,6 +17,7 @@
 
 import Link from 'next/link';
 import { EmptyState } from '@repo/ui';
+import { ATLAS_INSTRUMENT_HREF } from '../lib/nav/atlas-door';
 import { PaletteSeed } from '../components/shell/PaletteSeed';
 import { Room, RoomHeader } from '../components/room';
 import './utility.css';
@@ -44,7 +45,7 @@ export default function NotFound() {
             <Link className="ds-button ds-button--primary" href="/records">
               Find in the archive
             </Link>
-            <Link className="ds-button ds-button--secondary" href="/">
+            <Link className="ds-button ds-button--secondary" href={ATLAS_INSTRUMENT_HREF}>
               Open the Atlas
             </Link>
             <Link className="ds-button ds-button--secondary" href="/stories">
