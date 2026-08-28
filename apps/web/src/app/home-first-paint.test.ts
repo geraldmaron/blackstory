@@ -140,6 +140,7 @@ test('first paint is the record, not a manifesto or a schema card', () => {
         direction: 'incoming' as const,
       },
     ],
+    continueLearning: [],
     primaryImage: undefined,
   };
   assert.equal(
@@ -158,8 +159,11 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.match(html, /1921/);
   assert.match(html, /Vernon AME Church/);
   assert.match(html, /Tulsa, Oklahoma/);
-  assert.match(html, /id="stories"/);
-  assert.match(html, /href="#stories"/);
+  assert.match(html, />Places</);
+  assert.doesNotMatch(html, /id="stories"/);
+  assert.doesNotMatch(html, /href="#stories"/);
+  assert.doesNotMatch(html, /Records this one touches|this one/);
+  assert.doesNotMatch(html, /Active|Current status|In effect from|Status and history/);
   assert.doesNotMatch(html, /walk past documented Black history/);
   assert.doesNotMatch(html, /place-connected archive of Black history/);
   assert.doesNotMatch(html, /Grade A|Grade B|Grade C/);
@@ -188,7 +192,9 @@ test('seed Dunbar first paint has no claim ids, rights caption, or national room
   );
   assert.match(html, /Paul Laurence Dunbar High School/);
   assert.match(html, /The history here/);
-  assert.match(html, /href="#stories"/);
+  assert.doesNotMatch(html, /href="#stories"/);
+  assert.doesNotMatch(html, /Records this one touches|this one/);
+  assert.doesNotMatch(html, /Active|Current status|In effect from|Status and history/);
   assert.doesNotMatch(html, /ent_[a-z0-9_]+_claim_\d+/i);
   assert.doesNotMatch(html, /claim_dunbar_/);
   assert.doesNotMatch(html, /rights-cleared|awaits a/i);
@@ -198,6 +204,49 @@ test('seed Dunbar first paint has no claim ids, rights caption, or national room
   assert.doesNotMatch(html, /href="\/law"/);
   assert.doesNotMatch(html, /href="\/data"/);
   assert.doesNotMatch(html, /href="\/memorial"/);
+});
+
+test('Stories is citing chapters, or there is no Stories button', () => {
+  const dunbar = getPublicEntity('ent_dunbar_school_001');
+  assert.ok(dunbar);
+  const greenwood = {
+    ...dunbar,
+    displayName: 'Greenwood District',
+    summary: 'Thirty-five blocks of Greenwood, destroyed in the 1921 Tulsa massacre, then rebuilt.',
+    historicalContext: 'Greenwood was a Black commercial district in Tulsa.',
+  };
+  const without = renderToStaticMarkup(
+    createElement(HomeFirstPaint, {
+      model: { lead: greenwood, also: [], story: undefined, citing: [], source: 'live' },
+    }),
+  );
+  assert.match(without, /The history here/);
+  assert.doesNotMatch(without, /href="#stories"/);
+  assert.doesNotMatch(without, />Stories</);
+
+  const withChapter = renderToStaticMarkup(
+    createElement(HomeFirstPaint, {
+      model: {
+        lead: greenwood,
+        also: [],
+        story: undefined,
+        citing: [
+          {
+            slug: 'the-gap-that-never-closed',
+            title: 'The gap that never closed',
+            relation: 'mapped in',
+            href: '/stories/the-gap-that-never-closed',
+          },
+        ],
+        source: 'live',
+      },
+    }),
+  );
+  assert.match(withChapter, /id="stories"/);
+  assert.match(withChapter, /href="#stories"/);
+  assert.match(withChapter, /The gap that never closed/);
+  assert.match(withChapter, /href="\/stories\/the-gap-that-never-closed"/);
+  assert.doesNotMatch(withChapter, /href="\/stories"/);
 });
 
 test('HomeFirstPaint never titles or lists an internal id, even if the model carries one', () => {
