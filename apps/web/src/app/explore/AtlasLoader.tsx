@@ -113,7 +113,7 @@ export function AtlasLoader({ shell, catalogUrl = ATLAS_CATALOG_PATH }: AtlasLoa
   return (
     <div className="ds-atlas ds-atlas--pending" data-atlas-catalog="loading">
       <p className="ds-atlas__pending ds-atlas__readout" role="status" aria-live="polite">
-        Loading {shell.totalMatched.toLocaleString()} records…
+        Opening the map…
       </p>
     </div>
   );

@@ -11,6 +11,7 @@ import {
   exploreHrefForState,
   searchHrefForStatus,
 } from './metadata-hrefs';
+import { ATLAS_INSTRUMENT_HREF } from '../nav/atlas-door';
 import { parseExploreSearchParams } from './url-state';
 
 function parseExploreHref(href: string) {
@@ -38,10 +39,10 @@ test('exploreHrefForState normalizes postal code and includes state (camera from
   assert.equal(parsed.showKey, false);
 });
 
-test('exploreHrefForState returns bare /explore for empty or unknown postal codes', () => {
-  assert.equal(exploreHrefForState(''), '/');
-  assert.equal(exploreHrefForState('   '), '/');
-  assert.equal(exploreHrefForState('ZZ'), '/');
+test('exploreHrefForState returns the Atlas instrument for empty or unknown postal codes', () => {
+  assert.equal(exploreHrefForState(''), '/?atlas=1');
+  assert.equal(exploreHrefForState('   '), '/?atlas=1');
+  assert.equal(exploreHrefForState('ZZ'), '/?atlas=1');
 });
 
 test('exploreHrefForEra filters explore to one era bucket', () => {
@@ -54,8 +55,8 @@ test('exploreHrefForEra filters explore to one era bucket', () => {
 });
 
 test('exploreHrefForEra returns /explore when era bucket is empty', () => {
-  assert.equal(exploreHrefForEra(''), '/');
-  assert.equal(exploreHrefForEra('   '), '/');
+  assert.equal(exploreHrefForEra(''), ATLAS_INSTRUMENT_HREF);
+  assert.equal(exploreHrefForEra('   '), ATLAS_INSTRUMENT_HREF);
 });
 
 test('exploreHrefForKind filters explore to one entity kind', () => {
@@ -68,7 +69,7 @@ test('exploreHrefForKind filters explore to one entity kind', () => {
 });
 
 test('exploreHrefForKind returns /explore when kind is empty', () => {
-  assert.equal(exploreHrefForKind(''), '/');
+  assert.equal(exploreHrefForKind(''), ATLAS_INSTRUMENT_HREF);
 });
 
 test('searchHrefForStatus emits /search links only for known non-all status tokens', () => {

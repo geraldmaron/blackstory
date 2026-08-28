@@ -144,15 +144,13 @@ export function CommandBar({
                it names. Dropping Journey outside the map would make it look like a feature of one
                page rather than a way into the archive.
 
-               A fragment, not a query param: `/` normalizes its query at the edge against the
-               explore allowlist, so `?mode=journey` would be stripped before the page ever ran
-               and the link would land on a plain Atlas. A fragment never reaches the server, so it
-               cannot be stripped and cannot split the cache key either. */
+               Bare `/` is the featured door, so these links carry `atlas=1`. Journey still uses a
+               fragment (`#journey`) because `?mode=` is not on the explore allowlist. */
             <>
-              <Link className="ds-bar__mode-link ds-bar__mode-link--first" href="/">
+              <Link className="ds-bar__mode-link ds-bar__mode-link--first" href="/?atlas=1">
                 Atlas
               </Link>
-              <Link className="ds-bar__mode-link" href="/#journey">
+              <Link className="ds-bar__mode-link" href="/?atlas=1#journey">
                 Journey
               </Link>
             </>

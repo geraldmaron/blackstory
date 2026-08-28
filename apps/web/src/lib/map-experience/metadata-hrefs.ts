@@ -45,7 +45,7 @@ function normalizePostalCode(postalCode: string): string {
 export function exploreHrefForState(postalCode: string): string {
   const normalized = normalizePostalCode(postalCode);
   if (!normalized || !findUsStateByPostalCode(normalized)) {
-    return '/';
+    return '/?atlas=1';
   }
 
   return buildDefaultExploreHref({
@@ -57,7 +57,7 @@ export function exploreHrefForState(postalCode: string): string {
 export function exploreHrefForEra(eraBucket: string): string {
   const trimmed = eraBucket.trim();
   if (!trimmed) {
-    return '/';
+    return '/?atlas=1';
   }
 
   return buildExploreHref({
@@ -70,7 +70,7 @@ export function exploreHrefForEra(eraBucket: string): string {
 export function exploreHrefForKind(kind: string): string {
   const trimmed = kind.trim();
   if (!trimmed) {
-    return '/';
+    return '/?atlas=1';
   }
 
   return buildExploreHref({

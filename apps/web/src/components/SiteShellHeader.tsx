@@ -20,14 +20,29 @@
 
 'use client';
 
+import { Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import { toggleDocumentTheme } from '@repo/ui';
 import { surfaceClassFor } from '../lib/nav/surface-classes';
+import { useSurfaceClass } from '../lib/nav/use-surface-class';
 import { CommandBar } from './shell/CommandBar';
 
 export function SiteShellHeader() {
+  return (
+    <Suspense fallback={<SiteShellHeaderFromPath />}>
+      <SiteShellHeaderFromSearch />
+    </Suspense>
+  );
+}
+
+function SiteShellHeaderFromPath() {
   const pathname = usePathname() || '/';
   if (surfaceClassFor(pathname) === 'instrument') return null;
+  return <CommandBar className="ds-bar--room" onToggleTheme={toggleDocumentTheme} />;
+}
+
+function SiteShellHeaderFromSearch() {
+  if (useSurfaceClass() === 'instrument') return null;
   // No `recordCount`: the count is a promise only a surface holding the index can keep, and a
   // reading room does not load one. The placeholder drops the number rather than inventing it.
   return <CommandBar className="ds-bar--room" onToggleTheme={toggleDocumentTheme} />;

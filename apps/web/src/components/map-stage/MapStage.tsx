@@ -22,6 +22,7 @@
  */
 import {
   createContext,
+  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -157,7 +158,8 @@ import {
   type MapStageFlyOptions,
 } from './camera';
 import { usePathname } from 'next/navigation';
-import { surfaceClassFor } from '../../lib/nav/surface-classes';
+import { surfaceClassFor, type SurfaceClass } from '../../lib/nav/surface-classes';
+import { useSurfaceClass } from '../../lib/nav/use-surface-class';
 import { defaultPostureFor, framedClaimAllowed, type PlatePosture } from './plate-posture';
 import { createFramedSlotRegistry } from './framed-slot-registry';
 import { insetIsPaintable, plateInsetForSlot, resolvePlatePosture } from './plate-frame';
@@ -408,6 +410,18 @@ export type MapStageProviderProps = {
   readonly children: ReactNode;
 };
 
+function SearchAwareSurfaceClass({
+  onChange,
+}: {
+  readonly onChange: (surface: SurfaceClass | null) => void;
+}) {
+  const surface = useSurfaceClass();
+  useEffect(() => {
+    onChange(surface);
+  }, [surface, onChange]);
+  return null;
+}
+
 export function MapStageProvider({
   initialStyle,
   initialFeatureCollection,
@@ -428,8 +442,24 @@ export function MapStageProvider({
   const lastFramedMomentRef = useRef<string | null>(null);
   const reducedMotionRef = useRef<ReducedMotionListener | null>(null);
   const pathname = usePathname();
-  const surfaceClass = surfaceClassFor(pathname ?? '/');
-  const [posture, setPosture] = useState<PlatePosture>(() => defaultPostureFor(surfaceClass));
+  /**
+   * Pathname-only first, then the search-aware class once `useSearchParams` resolves. Calling
+   * that hook on this provider would suspend the whole shell (and the persistent plate) behind
+   * a client boundary. Bare `/` must park as a reading room on first paint; `/?atlas=1` may
+   * briefly inherit that posture until the query hydrates.
+   */
+  const [surfaceClass, setSurfaceClass] = useState<SurfaceClass | null>(() =>
+    surfaceClassFor(pathname ?? '/'),
+  );
+  const onSearchAwareSurface = useCallback((next: SurfaceClass | null) => {
+    setSurfaceClass(next);
+  }, []);
+  useEffect(() => {
+    setSurfaceClass(surfaceClassFor(pathname ?? '/'));
+  }, [pathname]);
+  const [posture, setPosture] = useState<PlatePosture>(() =>
+    defaultPostureFor(surfaceClassFor(pathname ?? '/')),
+  );
   const mapRef = useRef<MapLibreMap | null>(null);
   const maplibreglRef = useRef<MaplibreModule['default'] | null>(null);
   const markersRef = useRef<Marker[]>([]);
@@ -1624,6 +1654,9 @@ export function MapStageProvider({
       <div className="ds-map-stage" data-plate-posture={posture} ref={plateRef} aria-hidden="true">
         <div ref={containerRef} className="ds-map-stage__canvas" />
       </div>
+      <Suspense fallback={null}>
+        <SearchAwareSurfaceClass onChange={onSearchAwareSurface} />
+      </Suspense>
       {children}
     </MapStageContext.Provider>
   );

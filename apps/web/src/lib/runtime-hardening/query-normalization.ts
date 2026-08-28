@@ -11,6 +11,7 @@
  */
 
 import { buildExploreSearchParams, parseExploreSearchParams } from '../map-experience/url-state';
+import { ATLAS_DOOR_PARAM } from '../nav/atlas-door';
 import {
   CORRECTIONS_PAGE_PARAM_ALLOWLIST,
   STORIES_PAGE_PARAM_ALLOWLIST,
@@ -52,7 +53,7 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
     return SEARCH_PAGE_PARAM_ALLOWLIST;
   }
   if (EXPLORE_SURFACE_PATHS.has(path)) {
-    return EXPLORE_PAGE_PARAM_ALLOWLIST;
+    return [...EXPLORE_PAGE_PARAM_ALLOWLIST, ATLAS_DOOR_PARAM];
   }
   // No `/history` branch: the route is not in the middleware matcher and must not be. See the
   // note where HISTORY_PAGE_PARAM_ALLOWLIST used to live in `constants.ts`.
@@ -107,7 +108,12 @@ export function normalizeQueryString(
   const bag = allowlistedBag(path, readParamBag(input));
 
   if (EXPLORE_SURFACE_PATHS.has(path)) {
-    return buildExploreSearchParams(parseExploreSearchParams(bag));
+    const exploreQs = buildExploreSearchParams(parseExploreSearchParams(bag));
+    const atlas = firstString(bag[ATLAS_DOOR_PARAM])?.trim().toLowerCase();
+    if (atlas === '1' || atlas === 'true') {
+      return exploreQs ? `${ATLAS_DOOR_PARAM}=1&${exploreQs}` : `${ATLAS_DOOR_PARAM}=1`;
+    }
+    return exploreQs;
   }
 
   const normalized = new URLSearchParams();

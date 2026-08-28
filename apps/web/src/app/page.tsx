@@ -1,22 +1,28 @@
 /**
- * `/` is the Atlas: one full-viewport live plate with opaque panels floating over it, and the
- * canonical URL for the instrument (design-direction-v9-surfaces.md §4, §6). `/explore` 308s
- * here carrying its query, so this page and that redirect are one contract.
+ * `/` is the public front door. First paint is one released place (or a small featured set),
+ * not a 4,101-record filter board. Gerald's intent: a regular person can find what happened
+ * here. The live Atlas used to be the boot; that painted "Loading 4,101 records…" on black
+ * and pulled the catalog before anything else (also the pooler-cost leak).
  *
- * The plate itself is mounted once by the root shell and persists across navigation; this page
- * only builds the view model and hands it to `AtlasExperience`, which sends the first
- * `patchData` — the call that builds the GL context on demand. Filters use native GET navigation
- * so the surface works without JavaScript; the client island adds the camera and cluster
- * drill-down. The camera stays in memory, so the shareable URL carries filters and selection but
- * never pan or zoom (ADR-017).
+ * Atlas / filter board stays reachable after, not as the boot:
+ * - `/?atlas=1` (CommandBar Atlas, `/explore` and `/map` 308 here)
+ * - any surviving explore filter (`?state=`, `?kind=`, `?selected=`, …)
+ *
+ * Bare `/` uses `loadHomeFirstPaint` (thin ID read + optional lead story). It must not call
+ * `getSharedPublicEntities` or mount `AtlasLoader` (those request the full catalog).
+ *
+ * `/explore` 308s here carrying its query, so a filter bookmark still opens the instrument.
  */
 import type { Metadata } from 'next';
 import { FilterBar } from '@repo/ui';
 import { absolutePublicUrl } from '../lib/seo/metadata-builders';
 import { SynchronizedResultList } from '../components/map-experience/SynchronizedResultList';
 import { getSharedPublicEntities } from '../lib/map-experience/shared-map-data';
+import { wantsAtlasInstrument } from '../lib/nav/atlas-door';
 import { AtlasLoader } from './explore/AtlasLoader';
 import { buildAtlasShell } from './explore/explore-view-model';
+import { HomeFirstPaint } from './HomeFirstPaint';
+import { loadHomeFirstPaint } from './home-first-paint';
 import '../components/patterns/browse-mode.css';
 import '../components/patterns/edition-fact-icon.css';
 import '../components/patterns/record-anatomy.css';
@@ -24,47 +30,37 @@ import './explore/explore.css';
 import './explore/explore-edition.css';
 
 /**
- * Dynamic because it reads `searchParams` (the filters are GET navigation, so the page works with
- * JavaScript off), and because a build without a database — the CI gate — must not prerender
- * it. This export must stay page-scoped (it used to live on the now-deleted `(map)/layout.tsx`,
- * which force-dynamic'd this page and nothing else) — do not hoist it to the root layout, which
- * would force-dynamic every route in the app.
- *
- * Dynamic means every request is a function invocation with a no-store response, so what this
- * page renders has to be small. It is: the parsed view state and the facet/count derivations
- * (`AtlasShellModel`). The release-wide catalog — every feature, the history edge catalog — is
- * NOT rendered here; `AtlasLoader` fetches it from `/atlas/catalog`, which is CDN-cached. Before
- * that split (2026-08-22) this page put ~15 MB of RSC payload on every request and was, by
- * itself, the month's Vercel bill. Do not put the catalog back in the `initial` prop.
+ * Dynamic because it reads `searchParams` (door vs Atlas), and because a build without a
+ * database must not prerender a live featured place. Keep this page-scoped; do not hoist
+ * force-dynamic to the root layout.
  */
 export const dynamic = 'force-dynamic';
 
 /**
- * No `title`: the root layout's default is the product name, which is what `/` should read as.
- * A per-route title here would render "Explore · BlackStory" on the site's front door.
- *
- * The canonical is the bare `/`, deliberately dropping any query (SP-19, repo-92n2.19). The
- * Atlas takes state, era, kind, topic and status as filters and `/explore` 308s here carrying all
- * of them, so the number of reachable URLs that render substantially the same page is the product
- * of every facet. Self-canonicalising each permutation would offer a crawler thousands of near
- * duplicates of the front door; collapsing them onto `/` offers one. `/records` is the surface
- * that self-canonicalises a narrowing, because there the narrowing IS the page.
+ * No `title`: the root layout's default is the product name.
+ * Canonical stays the bare `/` (SP-19). Filter permutations of the Atlas still collapse here.
  */
 export const metadata: Metadata = {
   description:
-    'Map-first national view of documented Black history: every geo-anchored record in the active release.',
+    'History, pinned to place. Start with one documented record, then open the map when you want the archive.',
   alternates: { canonical: absolutePublicUrl('/') },
 };
 
-/** Rows in the `<noscript>` fallback list. See the comment at its render site. */
+/** Rows in the `<noscript>` fallback list when the Atlas is requested. */
 const NOSCRIPT_ROW_CAP = 20;
 
-type AtlasPageProps = {
+type HomePageProps = {
   readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function AtlasPage({ searchParams }: AtlasPageProps) {
+export default async function HomePage({ searchParams }: HomePageProps) {
   const params = await searchParams;
+
+  if (!wantsAtlasInstrument(params)) {
+    const model = await loadHomeFirstPaint();
+    return <HomeFirstPaint model={model} />;
+  }
+
   const { data: entities, source: dataSource } = await getSharedPublicEntities();
   const { shell, noscriptFeatures } = buildAtlasShell(params, entities, dataSource);
   const view = { ...shell, filteredFeatures: noscriptFeatures };
@@ -140,11 +136,6 @@ export default async function AtlasPage({ searchParams }: AtlasPageProps) {
             {view.totalMatched} documented record{view.totalMatched === 1 ? '' : 's'} matching
             filters · oldest first
           </p>
-          {/* Cap the no-JS list so progressive-enhancement HTML stays small; the interactive
-              client island owns the full synchronized peer. Each row serialises six links and
-              their badges, so the cap is the page's size: at 100 rows the noscript block was
-              ~1.2 MB of a 1.5 MB page (measured 2026-08-22), at 20 it is a fifth of that. The
-              crawlable, complete index is /records. */}
           <SynchronizedResultList
             features={view.filteredFeatures.slice(0, NOSCRIPT_ROW_CAP)}
             labelledBy="explore-results-heading-njs"

@@ -10,12 +10,27 @@
 
 'use client';
 
+import { Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import { surfaceClassFor } from '../lib/nav/surface-classes';
+import { useSurfaceClass } from '../lib/nav/use-surface-class';
 import { SiteFooter } from './SiteFooter';
 
 export function SiteShellFooter() {
+  return (
+    <Suspense fallback={<SiteShellFooterFromPath />}>
+      <SiteShellFooterFromSearch />
+    </Suspense>
+  );
+}
+
+function SiteShellFooterFromPath() {
   const pathname = usePathname() || '/';
   if (surfaceClassFor(pathname) === 'instrument') return null;
+  return <SiteFooter />;
+}
+
+function SiteShellFooterFromSearch() {
+  if (useSurfaceClass() === 'instrument') return null;
   return <SiteFooter />;
 }
