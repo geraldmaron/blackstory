@@ -56,8 +56,5 @@ export function redirectsForNextConfig() {
     // `/map` is the old name for the Atlas instrument. The instrument is `/explore`.
     // `/` is the featured place and never the 4,101-row board.
     { source: '/map', destination: '/explore', permanent: true },
-
-    // `/about` names this room "Banned books". The catalogue lives at `/books`.
-    { source: '/banned-books', destination: '/books', permanent: true },
   ];
 }

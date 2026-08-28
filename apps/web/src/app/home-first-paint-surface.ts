@@ -12,13 +12,10 @@ const SHOP_LOCATION = /pin|precision|schematic|affordance|rights-cleared|\brecor
 
 const PLACE_RELATIONS = new Set(['located_at', 'located_in', 'occurred_at', 'part_of']);
 
-const LAW_KINDS = new Set(['law', 'case']);
-
 export const DOOR_ROOM_IDS = [
   'stories',
   'law',
   'data',
-  'books',
   'memorial',
   'methodology',
   'errata',
@@ -31,10 +28,14 @@ export type DoorRoom = {
   readonly href: string;
 };
 
-/** Rooms `/about` names that stay up even when this place is thin. */
+/**
+ * Archive chrome on every place. Law, Data, and Memorial are national rooms,
+ * not this record's rooms. `/banned-books` is not a room.
+ */
 export const ARCHIVE_DOOR_ROOMS: readonly DoorRoom[] = [
+  { id: 'law', label: 'Law', href: '/law' },
   { id: 'data', label: 'Data', href: '/data' },
-  { id: 'books', label: 'Banned books', href: '/books' },
+  { id: 'memorial', label: 'Memorial', href: '/memorial' },
   { id: 'methodology', label: 'Methodology', href: '/methodology' },
   { id: 'errata', label: 'Errata', href: '/errata' },
 ];
@@ -201,38 +202,19 @@ export function firstPaintRecord(entity: PublicEntityView): PublicEntityView {
   };
 }
 
-function neighborsOf(
-  entity: PublicEntityView,
-  kinds: ReadonlySet<string>,
-): readonly RelatedNeighborView[] {
-  return publishableNeighbors([
-    ...(entity.relatedNeighbors ?? []),
-    ...(entity.continueLearning ?? []),
-  ]).filter((neighbor) => kinds.has(String(neighbor.kind)));
-}
-
 export function storiesRoomMaterial(citing: readonly StoryCitation[]): boolean {
   return publishableCitingStories(citing).length > 0;
 }
 
 export function selectDoorRooms(
-  entity: PublicEntityView,
+  _entity: PublicEntityView,
   citing: readonly StoryCitation[] = [],
 ): readonly DoorRoom[] {
   const rooms: DoorRoom[] = [];
   if (storiesRoomMaterial(citing)) {
     rooms.push({ id: 'stories', label: 'Stories', href: '#stories' });
   }
-  if (neighborsOf(entity, LAW_KINDS).length > 0) {
-    rooms.push({ id: 'law', label: 'Law', href: '#law' });
-  }
-  rooms.push(ARCHIVE_DOOR_ROOMS[0]!);
-  rooms.push(ARCHIVE_DOOR_ROOMS[1]!);
-  if (neighborsOf(entity, new Set(['person'])).length > 0) {
-    rooms.push({ id: 'memorial', label: 'Memorial', href: '#memorial' });
-  }
-  rooms.push(ARCHIVE_DOOR_ROOMS[2]!);
-  rooms.push(ARCHIVE_DOOR_ROOMS[3]!);
+  rooms.push(...ARCHIVE_DOOR_ROOMS);
   return rooms;
 }
 
