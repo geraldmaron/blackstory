@@ -1,62 +1,11 @@
 /**
- * `/` first paint: the place is the page, not a record card on black.
- *
- * Tokens only. Flat matte. No schema strip, no raised Surface card, no map widget.
+ * Door-only spacing over the record room. No new visual language.
  */
 
-.ds-home-first-paint .ds-room__mast {
-  background: var(--ds-canvas);
+.ds-home-place-stand {
+  margin: 0 0 var(--ds-space-8);
 }
 
-.ds-home-place {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-height: calc(100dvh - var(--ds-island-clearance, 5.5rem));
-  padding: var(--ds-space-10) var(--ds-gutter) var(--ds-space-9);
-}
-
-.ds-home-place__title {
+.ds-home-place-stand .ds-record-anatomy__place {
   margin: 0;
-  max-width: 16ch;
-  font-family: var(--ds-font-display);
-  font-size: clamp(2.25rem, 1.4rem + 4vw, 4.25rem);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.05;
-  color: var(--ds-ink);
-}
-
-.ds-home-place__title-link {
-  color: inherit;
-  text-decoration: none;
-}
-
-.ds-home-place__title-link:hover,
-.ds-home-place__title-link:focus-visible {
-  color: var(--ds-accent);
-}
-
-.ds-home-place__title-link:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-focus-offset);
-}
-
-.ds-home-place__walk,
-.ds-home-place__ground {
-  margin: var(--ds-space-5) 0 0;
-  max-width: 38ch;
-  font-family: var(--ds-font-editorial);
-  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
-  line-height: 1.5;
-  color: var(--ds-ink-muted);
-}
-
-.ds-home-place__ground {
-  margin-top: var(--ds-space-4);
-}
-
-.ds-home-first-paint .ds-room__doc {
-  padding-block-start: var(--ds-space-8);
 }

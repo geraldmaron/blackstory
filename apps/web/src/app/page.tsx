@@ -1,5 +1,5 @@
 /**
- * `/` is the public front door. First paint is one released place (or a published story),
+ * `/` is the public front door. First paint is the featured place's record,
  * not a 4,101-record filter board and not that board behind a query string.
  *
  * The Atlas instrument lives at `/explore`. This module never imports it.
