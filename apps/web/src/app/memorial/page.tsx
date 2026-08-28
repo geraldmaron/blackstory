@@ -26,6 +26,7 @@ import { matchMemorialNamesToEntities } from '../../components/patterns/memorial
 import { MemorialWallAtmosphere } from '../../components/patterns/memorial-wall/MemorialWallAtmosphere';
 import { MEMORIAL_NAMES } from '../../components/patterns/memorial-wall/memorial-names';
 import { listPublicEntityViews } from '../../lib/public-data/source';
+import { ATLAS_INSTRUMENT_HREF } from '../../lib/nav/atlas-door';
 import { OffRamp, Room, RoomHeader } from '../../components/room';
 import { MemorialSections } from './MemorialSections';
 import { MemorialScrollCue } from './MemorialScrollCue';
@@ -108,7 +109,7 @@ export default async function MemorialPage() {
         <OffRamp
           title="Go from here"
           actions={[
-            { label: 'Open the Atlas', href: '/', emphasis: 'copper' },
+            { label: 'Open the Atlas', href: ATLAS_INSTRUMENT_HREF, emphasis: 'copper' },
             { label: 'Read the index', href: '/records' },
           ]}
         >

@@ -11,6 +11,7 @@ import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { CorrectionForm } from './CorrectionForm';
 import { CORRECTION_PRIVACY_NOTICE } from './copy';
+import { ATLAS_INSTRUMENT_HREF } from '../../lib/nav/atlas-door';
 import { Disclosure, OffRamp, UtilityStep } from '../../components/room';
 import './corrections.css';
 
@@ -64,7 +65,7 @@ export function CorrectionsSections() {
         actions={[
           { href: '/errata', label: 'Errata log', emphasis: 'copper' },
           { href: '/methodology', label: 'How disputes are handled' },
-          { href: '/', label: 'Open the Atlas' },
+          { href: ATLAS_INSTRUMENT_HREF, label: 'Open the Atlas' },
         ]}
       >
         Mistakes are published rather than overwritten, with the record they changed.{' '}

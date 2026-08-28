@@ -7,6 +7,7 @@
 import type { Metadata } from 'next';
 import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
+import { ATLAS_INSTRUMENT_HREF } from '../../lib/nav/atlas-door';
 import { LAW_EDITION_BROWSE_LEDE } from './law-copy';
 import { buildLawBrowseViewModel, type RawLawBrowseParams } from './law-view-model';
 import { loadLegalCatalog } from '../../lib/legal/public-source';
@@ -109,7 +110,7 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
           </>
         }
         actions={[
-          { label: 'Open the Atlas', href: '/', emphasis: 'copper' },
+          { label: 'Open the Atlas', href: ATLAS_INSTRUMENT_HREF, emphasis: 'copper' },
           { label: 'Search the archive', href: '/records' },
         ]}
       >

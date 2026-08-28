@@ -22,6 +22,7 @@ import type { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
+import { ATLAS_INSTRUMENT_HREF } from '../../lib/nav/atlas-door';
 import { MakerCredit } from '../../components/MakerCredit';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import {
@@ -170,7 +171,7 @@ export default function AboutPage() {
       <OffRamp
         title="No account required"
         actions={[
-          { label: 'Open the Atlas', href: '/', emphasis: 'copper' },
+          { label: 'Open the Atlas', href: ATLAS_INSTRUMENT_HREF, emphasis: 'copper' },
           { label: 'Search the records', href: '/records' },
           { label: 'Submit a lead', href: '/submit' },
         ]}

@@ -12,6 +12,7 @@
  */
 import React from 'react';
 import Link from 'next/link';
+import { ATLAS_INSTRUMENT_HREF } from '../../lib/nav/atlas-door';
 import { Citation, Confidence, Notice } from '@repo/ui';
 import {
   FACT_CONFIDENCE_DEFINITIONS,
@@ -79,7 +80,7 @@ export function MethodologySections({ exampleRecordHref }: MethodologySectionsPr
       <Prose>
         <TrustSiteDisclaimer />
         <p className="ds-row">
-          <Link className="ds-cta ds-cta--solid" href="/">
+          <Link className="ds-cta ds-cta--solid" href={ATLAS_INSTRUMENT_HREF}>
             Open the Atlas
           </Link>
           <Link className="ds-cta ds-cta--quiet" href="/about">

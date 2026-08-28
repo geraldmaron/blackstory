@@ -16,6 +16,7 @@
 
 import React, { useRef } from 'react';
 import Link from 'next/link';
+import { ATLAS_INSTRUMENT_HREF } from '../../lib/nav/atlas-door';
 import {
   GROUP_HEADINGS,
   LIBRARY_CARD_GROUPS,
@@ -95,7 +96,7 @@ export function LibraryMenu({ recordCount }: LibraryMenuProps) {
           {direct.map((destination) => (
             <Link
               className="ds-libmenu__card"
-              href={destination.path}
+              href={destination.path === '/' ? ATLAS_INSTRUMENT_HREF : destination.path}
               key={destination.path}
               prefetch={false}
               onClick={closeMenu}
