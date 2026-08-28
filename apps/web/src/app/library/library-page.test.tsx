@@ -40,7 +40,7 @@ describe('/library · the room renders without JavaScript', () => {
   });
 
   it('the off-ramp offers links, not a palette button that would be dead without JS', () => {
-    assert.match(pageSource, /href: '\/'/);
+    assert.match(pageSource, /href: ATLAS_INSTRUMENT_HREF/);
     assert.match(pageSource, /href: '\/records'/);
     assert.doesNotMatch(pageSource, /onOpenPalette|setPaletteOpen/);
   });

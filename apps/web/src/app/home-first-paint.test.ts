@@ -26,6 +26,14 @@ test('the loader never asks for the full catalog', () => {
   assert.doesNotMatch(source, /\/atlas\/catalog/);
 });
 
+test('the door steals about and stories copy, and does not invent a slogan', () => {
+  const paint = readFileSync(new URL('./HomeFirstPaint.tsx', import.meta.url), 'utf8');
+  assert.match(paint, /ABOUT_LINE|ABOUT_LEDE/);
+  assert.match(paint, /ABOUT_PILLARS/);
+  assert.match(paint, /destinationFor\('\/stories'\)/);
+  assert.doesNotMatch(paint, /History happened/);
+});
+
 test('the door page does not mount AtlasLoader or the catalog fetch on the default path', () => {
   const page = readFileSync(fileURLToPath(new URL('./page.tsx', import.meta.url)), 'utf8');
   const imports = page

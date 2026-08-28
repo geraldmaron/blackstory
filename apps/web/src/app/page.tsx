@@ -12,6 +12,7 @@
 import type { Metadata } from 'next';
 import { absolutePublicUrl } from '../lib/seo/metadata-builders';
 import { wantsAtlasInstrument } from '../lib/nav/atlas-door';
+import { ABOUT_LINE } from './about/about-copy';
 import { HomeFirstPaint } from './HomeFirstPaint';
 import { loadHomeFirstPaint } from './home-first-paint';
 
@@ -27,8 +28,7 @@ export const dynamic = 'force-dynamic';
  * Canonical stays the bare `/` (SP-19). Filter permutations of the Atlas still collapse here.
  */
 export const metadata: Metadata = {
-  description:
-    'History, pinned to place. Start with one documented record, then open the map when you want the archive.',
+  description: ABOUT_LINE,
   alternates: { canonical: absolutePublicUrl('/') },
 };
 

@@ -30,7 +30,13 @@ import {
   destinationsInGroup,
   type Destination,
 } from '../../lib/nav/destination-registry';
-import { ABOUT_CONTRIBUTE, ABOUT_ORIGIN, ABOUT_PILLARS, ABOUT_REFUSALS } from './about-copy';
+import {
+  ABOUT_CONTRIBUTE,
+  ABOUT_LEDE,
+  ABOUT_ORIGIN,
+  ABOUT_PILLARS,
+  ABOUT_REFUSALS,
+} from './about-copy';
 import {
   CardGrid,
   GroupHeading,
@@ -84,7 +90,7 @@ export default function AboutPage() {
             Doing my part, and making room for <em>yours</em>.
           </>
         }
-        lede="BlackStory is a place-connected archive of Black history: people, places, and events pinned to where they happened, with the source attached to every claim. I built it with the tools and records available to me, and it is unfinished on purpose."
+        lede={ABOUT_LEDE}
         showPath={false}
       />
 
