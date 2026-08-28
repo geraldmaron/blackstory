@@ -110,7 +110,7 @@ repository:</p>
 <li>Research pipeline: <code>docs/research/</code></li>
 <li>Security: <code>docs/security/</code></li>
 <li>Runbooks: <code>docs/runbooks/</code></li>
-</ul>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"Where apps, packages, workers, and infra live in the monorepo."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"i0xsTYrAup-LEWfDF42eG"}
+</ul>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"Where apps, packages, workers, and infra live in the monorepo."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"ksbhos1Bragw98rnw7AFO"}
 3:["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","repo-map",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]
 4:["$","$L5",null,{"children":["$","$6",null,{"name":"Next.MetadataOutlet","children":"$@7"}]}]
 7:null

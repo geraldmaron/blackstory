@@ -2,5 +2,5 @@
 2:I[39184,["/blackstory/_next/static/chunks/13m8d36xc7t9s.js","/blackstory/_next/static/chunks/03obgaj591_9a.js"],""]
 3:I[99990,["/blackstory/_next/static/chunks/13m8d36xc7t9s.js","/blackstory/_next/static/chunks/03obgaj591_9a.js"],"OutletBoundary"]
 4:"$Sreact.suspense"
-0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","h1",null,{"children":"Page not found"}],["$","p",null,{"children":"That docs path is not in the curated public set."}],["$","p",null,{"children":["$","$L2",null,{"href":"/","children":"Return home"}]}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"i0xsTYrAup-LEWfDF42eG"}
+0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","h1",null,{"children":"Page not found"}],["$","p",null,{"children":"That docs path is not in the curated public set."}],["$","p",null,{"children":["$","$L2",null,{"href":"/","children":"Return home"}]}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"ksbhos1Bragw98rnw7AFO"}
 5:null
