@@ -1,7 +1,7 @@
 1:"$Sreact.fragment"
-5:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
+5:I[99990,["/blackstory/_next/static/chunks/13m8d36xc7t9s.js","/blackstory/_next/static/chunks/03obgaj591_9a.js"],"OutletBoundary"]
 6:"$Sreact.suspense"
-2:Tb08,<h1 id="install-and-bootstrap"><a class="heading-anchor" href="#install-and-bootstrap">Install and bootstrap</a></h1>
+2:Tb78,<h1 id="install-and-bootstrap"><a class="heading-anchor" href="#install-and-bootstrap">Install and bootstrap</a></h1>
 <p>BlackStory is a TypeScript and Python monorepo. Local development does not require
 cloud credentials. If you want the product story first, start with
 <a href="./about.md">Why BlackStory</a>.</p>
@@ -10,7 +10,7 @@ cloud credentials. If you want the product story first, start with
 <li>Node.js 22+ (<code>nvm use</code> from <code>.nvmrc</code>)</li>
 <li><a href="https://pnpm.io/">pnpm</a> 9.x</li>
 <li><a href="https://docs.astral.sh/uv/">uv</a> (Python 3.12+)</li>
-<li>Docker optional for the parked local PostGIS under <code>infra/database/</code></li>
+<li>Docker optional for the parked local PostGIS under <code>infra/database/</code> (leftover; product SoR is Supabase)</li>
 </ul>
 <h2 id="bootstrap"><a class="heading-anchor" href="#bootstrap">Bootstrap</a></h2>
 <pre><code class="language-bash">git clone https://github.com/geraldmaron/blackstory.git
@@ -38,7 +38,7 @@ pnpm test
 <p>The preferred launcher keeps <code>PUBLIC_DATA_SOURCE</code> and <code>DATABASE_URL</code> coherent.
 Without a Postgres URL you get the small Dunbar seed catalog. With Postgres
 configured you see the live released catalog.</p>
-<h2 id="firebase-emulators-optional"><a class="heading-anchor" href="#firebase-emulators-optional">Firebase emulators (optional)</a></h2>
+<h2 id="leftover-firebase-emulators-optional-not-product-sor"><a class="heading-anchor" href="#leftover-firebase-emulators-optional-not-product-sor">Leftover Firebase emulators (optional, not product SoR)</a></h2>
 <pre><code class="language-bash">pnpm firebase:emulators
 pnpm firebase:test:rules
 </code></pre>
@@ -56,7 +56,7 @@ pnpm docs:publish
 <li><a href="./repo-map.md">Repository map</a></li>
 <li><a href="./architecture.md">Architecture</a></li>
 <li><a href="./commands.md">Commands cheat sheet</a></li>
-</ul>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"Clone the monorepo and bring up a reproducible local environment."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","install",".md"]}],"."," ","$L3"]}]}]]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"5F9NtFGTImuCFa5aVssbJ"}
-3:["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]
+</ul>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"Clone the monorepo and bring up a reproducible local environment."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"i0xsTYrAup-LEWfDF42eG"}
+3:["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","install",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]
 4:["$","$L5",null,{"children":["$","$6",null,{"name":"Next.MetadataOutlet","children":"$@7"}]}]
 7:null

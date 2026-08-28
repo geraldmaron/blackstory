@@ -1,7 +1,7 @@
 1:"$Sreact.fragment"
-5:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
+5:I[99990,["/blackstory/_next/static/chunks/13m8d36xc7t9s.js","/blackstory/_next/static/chunks/03obgaj591_9a.js"],"OutletBoundary"]
 6:"$Sreact.suspense"
-2:T1576,<h1 id="why-blackstory"><a class="heading-anchor" href="#why-blackstory">Why BlackStory</a></h1>
+2:T171b,<h1 id="why-blackstory"><a class="heading-anchor" href="#why-blackstory">Why BlackStory</a></h1>
 <p>Black history is everywhere and somehow still easy to lose. A building gets renamed.
 A newspaper digitizes and reshuffles its URLs. A local story lives in a basement
 folder, a family scrapbook, or a grant-funded portal that stops getting updates.
@@ -65,16 +65,21 @@ not on the live canon.</p>
 archived captures before they meet our public evidence bar. That bar measures
 readiness of the evidence ledger, not coverage of the entire field.</p>
 <h2 id="where-we-are-today"><a class="heading-anchor" href="#where-we-are-today">Where we are today</a></h2>
-<p>The public product is live and growing. The catalog is on the order of thousands
-of place-indexed entities, not a finished national inventory. Capture coverage,
-developer query surfaces, and some cloud wiring are still catching up to the
-architecture. This docs site is the orientation layer. The repository is the
-source of truth.</p>
+<p>The public product is live and growing. Verified 2026-08-28: <a href="https://blackstory.app/">blackstory.app</a>
+is a catalog filter board (Kind / Tone / Era / Theme / Status / Confidence /
+Where) with about 4,100 released records, hosted on Vercel, reading Supabase
+Postgres. That is the live front door. The product line <em>History, pinned to
+place</em> is still the design target. It is not a claim that today's homepage
+already works as map-first story-finding.</p>
+<p>The catalog is not a finished national inventory. Capture coverage, developer
+query surfaces, and leftover cloud wiring (Firebase / GCS / parked PostGIS) are
+still catching up to the current stack. This docs site is the orientation
+layer. The repository is the source of truth.</p>
 <p>If you are here to contribute, start with <a href="./install.md">Install and bootstrap</a>
 and the <a href="./architecture.md">Architecture</a> guide. If you are here to understand
 the research posture, read <a href="./methodology.md">Research methodology</a> next.</p>
 <p>BlackStory is being built in the open, carefully, with the people and places
-the history belongs to kept in view.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"The human case for a place-connected archive of Black history."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"5F9NtFGTImuCFa5aVssbJ"}
+the history belongs to kept in view.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"The human case for a place-connected archive of Black history."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"i0xsTYrAup-LEWfDF42eG"}
 3:["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","about",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]
 4:["$","$L5",null,{"children":["$","$6",null,{"name":"Next.MetadataOutlet","children":"$@7"}]}]
 7:null

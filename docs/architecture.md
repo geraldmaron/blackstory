@@ -1,7 +1,31 @@
 # BlackStory architecture
 
-> Required project state. Formal ADRs were cleared 2026-07-24 (decision-doc purge, `repo-xez5.11`);
-> still-binding invariants extracted from them live in `docs/decisions-carryover.md`.
+> Formal ADRs were cleared 2026-07-24 (decision-doc purge). Still-binding invariants live in
+> `docs/decisions-carryover.md`. Historical ADR filenames remain in git (`git log -- docs/adr/`).
+
+## Current stack (verified 2026-08-28)
+
+Checked against live https://blackstory.app/ (`x-vercel-id`, `x-vercel-cache`,
+`va.vercel-scripts.com` / `vitals.vercel-insights.com`, Cloudflare `server` header, CSP
+`img-src` including `https://twykhihqkcldpreuovay.supabase.co` and leftover
+`https://storage.googleapis.com`). This is the current story. Older runbooks that still name
+Firebase App Hosting or Firestore as SoR are leftover.
+
+| Layer | Current | Leftover |
+|-------|---------|----------|
+| Public web | Vercel (Cloudflare in front) | Firebase App Hosting, Cloud Run for `apps/web` |
+| Admin | Separate Vercel project (`apps/admin/vercel.json`) | Deleted App Hosting / Cloud Run `black-book-admin-production` |
+| Data | Supabase Postgres `blackstory-app` (`twykhihqkcldpreuovay.supabase.co`) | Firestore, parked PostGIS / Cloud SQL |
+| Media | Supabase Storage `public-media` | GCS dual-serve (`storage.googleapis.com` still in CSP) |
+
+The live homepage is a catalog filter board (Kind / Tone / Era / Theme / Status / Confidence /
+Where), about 4,100 released records. The product line *History, pinned to place* is the design
+target (Nova owns the reset), not a description of that page.
+
+This repo only configures Supabase project `blackstory-app`. Other org Pro projects are not in
+this config, so unused is not proven here. Docs agreement is not a billing close.
+
+Cover-package work belongs on administration-app, not this repo.
 
 ## System overview
 
@@ -9,58 +33,45 @@ BlackStory is a place-connected Black history research platform. Public surfaces
 released historical projections. Research, evidence, and promotion stay behind private APIs,
 workers, and admin tools.
 
-## Target surfaces
+## Surfaces
 
 ```
-apps/web                 Public Next.js (Vercel — ADR-027)
-apps/admin               Private Next.js admin/research (separate Vercel project; isolated write-capable DB env)
-apps/api-public          Public read/search/location API (Cloud Run)
-apps/api-submissions     Corrections / contribution intake (Cloud Run)
-apps/api-internal        Publication / promotion / internal control (private Cloud Run)
+apps/web                 Public Next.js on Vercel (live: blackstory.app)
+apps/admin               Private Next.js admin/research (separate Vercel project)
+apps/api-public          Public read/search/location API (in-repo; Cloud Run deploy unverified)
+apps/api-submissions     Corrections / contribution intake (in-repo; Cloud Run deploy unverified)
+apps/api-internal        Publication / promotion / internal control (in-repo; Cloud Run deploy unverified)
 apps/docs                Public docs site (GitHub Pages static export)
 apps/mobile              Expo mobile (isolated lockfile)
-workers/research         Research compute (Corsair schedules + Jobs/Tasks when applied)
+workers/research         Research compute
 workers/publication      Projection, snapshot, indexing, release
 workers/security         Quarantine, content validation, integrity
 packages/*               Shared TypeScript libraries
-supabase/                Postgres migrations and project config
-infra/*                  GCP, GitHub scaffolding; infra/firebase/ keeps only the App Check
-                          reference docs, the backup/DR archive, and registered-apps.json
+supabase/                Postgres migrations for blackstory-app
+infra/*                  Leftover Firebase/GCP scaffolding, GitHub, parked PostGIS
 ```
 
-`functions/` (the 5 Firebase Cloud Functions v2 schedules, ADR-018) was deleted `repo-348e.8`;
-its scheduling role moved to `.github/workflows/discovery-campaigns.yml` (ADR-028).
+`functions/` (Firebase Cloud Functions v2 schedules) was deleted. Scheduling moved to
+`.github/workflows/discovery-campaigns.yml`. Do not add deployable microservices beyond this
+set. Historical ADR-005 text is in git history.
 
-Do not add deployable microservices beyond this set. See [ADR-005](./adr/ADR-005-service-surface-separation.md).
+## Platform (live vs leftover)
 
-## Platform intent (live)
-
-- **Data:** **Supabase Postgres** on `blackstory-app` is the product system of record
-  (ADR-020; `docs/adr/` purged 2026-07-24, precedence rule restated in
-  [decisions-carryover.md](./decisions-carryover.md)). Blobs: Supabase Storage for
-  `public-media` (GCS dual-serve / rollback). Firestore itself is gone — no live database, rules,
-  or indexes remain (`docs/data/firebase-wind-down.md`). Cloud SQL / SQL Connect under
-  `infra/database/` stay parked.
-- **App data access:** Postgres via server `DATABASE_URL` / `@repo/data-access`; PostgREST
-  published views ([ADR-026](./adr/ADR-026-postgrest-published-read-surface.md)); `@repo/domain`
-  models. `@repo/firebase` remains only for Firebase App Check client/verification helpers and
-  embedding utilities — not for any Firestore/Firebase SoR access, which no longer exists.
-- **Public web vs APIs:** Vercel for `apps/web` ([ADR-027](./adr/ADR-027-vercel-public-web-hosting.md));
-  Cloud Run for APIs + admin ([ADR-001](./adr/ADR-001-firebase-app-hosting-vs-cloud-run.md)).
+- **Data:** Supabase Postgres on `blackstory-app` is the product system of record. Public media
+  is Supabase Storage. GCS dual-serve and Firestore export tools are leftover
+  (`docs/data/firebase-wind-down.md`, `docs/data/supabase-storage-cutover.md`). Parked Cloud SQL
+  / PostGIS under `infra/database/` is leftover, not the production path.
+- **App data access:** Postgres via server `DATABASE_URL` / `@repo/data-access` on Vercel.
+  PostgREST published views remain the developer-read design. `@repo/firebase` keeps App Check
+  helper types only. Do not add Firestore SoR access.
+- **Public web:** Vercel for `apps/web`. Admin is its own Vercel project. Firebase App Hosting
+  backends for web and admin were deleted. Cloud Run for the in-repo APIs is leftover target
+  text; this repo has no verified production Cloud Run deploy for them
+  (`docs/runbooks/api-public-cloud-run.md`).
 - **Auth / abuse:** Supabase Auth for admin (`app_metadata.bb_role`); request-integrity / client
-  headers for public mutations; App Check retired on mobile/`api-public`
-  ([ADR-010](./adr/ADR-010-security-and-abuse-assumptions.md)).
-- **Ingress:** Cloud Armor / ALB / CDN — staged where applied.
-- **Jobs:** Cloud Tasks + Cloud Run Jobs for long batch ([ADR-007](./adr/ADR-007-background-workflow-model.md));
-  capped discovery on **Corsair systemd + Postgres** ([ADR-028](./adr/ADR-028-discovery-schedule-runtime.md)).
-- **CI/CD:** GitHub Actions ([ADR-006](./adr/ADR-006-github-actions-deployment.md)); WIF apply still
-  staged under `infra/gcp/wif/`.
-- **Search / geo:** Postgres/PostGIS + bounded `api-public` queries; U.S. Census Geocoder
-  ([ADR-008](./adr/ADR-008-search-and-geocoding.md)). Vectors: `pgvector` ([ADR-014](./adr/ADR-014-vector-search.md)).
-- **Research isolation:** Research cannot publish ([ADR-009](./adr/ADR-009-research-isolation.md)).
-- **Observability:** OpenTelemetry + Sentry packages stubbed where not yet wired.
-
-Do **not** provision Cloud SQL. Do not dual-write new canonical truth to Firestore.
+  headers for public mutations. App Check is retired on the public request path.
+- **Jobs / CI:** Discovery on GitHub Actions. WIF apply under `infra/gcp/wif/` is leftover
+  scaffolding. Do not provision Cloud SQL. Do not dual-write canonical truth to Firestore.
 
 ## Boundaries
 

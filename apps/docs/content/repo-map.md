@@ -10,22 +10,30 @@ order: 2
 BlackStory ships as one monorepo so public surfaces, private research tools, and
 shared libraries stay on the same contracts.
 
+Current live stack (verified 2026-08-28): public web on **Vercel**, product data
+and media on **Supabase** `blackstory-app`
+(`https://twykhihqkcldpreuovay.supabase.co`). Firebase App Hosting, Firestore,
+GCS dual-serve, and parked PostGIS are leftover, not the current system of
+record. See [Architecture](./architecture.md).
+
 | Path | Role |
 |------|------|
-| `apps/web` | Public Next.js app (Vercel; live at blackstory.app) |
-| `apps/admin` | Private Next.js admin and research console |
-| `apps/api-public` | Public read, search, and location API |
+| `apps/web` | Public Next.js app on Vercel (live at blackstory.app) |
+| `apps/admin` | Private Next.js admin and research console (separate Vercel project) |
+| `apps/api-public` | Public read, search, and location API (in-repo; Cloud Run deploy unverified) |
 | `apps/api-submissions` | Corrections and contribution intake |
 | `apps/api-internal` | Publication and internal control API |
 | `apps/docs` | This GitHub Pages site (static export) |
 | `apps/mobile` | Expo mobile app (isolated npm lockfile) |
 | `workers/*` | Python research, publication, and security workers |
 | `packages/*` | Shared TypeScript libraries (`@repo/*`) |
-| `supabase/` | Postgres migrations and Supabase project config |
-| `functions/` | Firebase Functions schedules for discovery |
-| `infra/*` | Firebase, GCP, GitHub, and database scaffolding |
-| `docs/` | Operating docs, ADRs, methodology, and runbooks |
+| `supabase/` | Postgres migrations and Supabase project config for `blackstory-app` |
+| `infra/*` | Leftover Firebase / GCP scaffolding, GitHub, parked PostGIS |
+| `docs/` | Operating docs, historical ADRs, methodology, and runbooks |
 | `brand/` | Brand masters (lockups, symbols, tokens, guide) |
+
+`functions/` (Firebase Cloud Functions schedules) is gone. Do not add it back as
+a current host.
 
 ## Stable code prefixes
 
@@ -46,7 +54,8 @@ User-visible strings and assets come from identity helpers and
 This docs site is the orientation layer. Deeper operating notes stay in the
 repository:
 
-- Architecture: `docs/architecture.md` (formal ADRs removed 2026-07-24; see `docs/decisions-carryover.md`)
+- Architecture (current stack): `docs/architecture.md`
+- Historical decisions: `docs/decisions-carryover.md` and `git log -- docs/adr/`
 - Methodology: `docs/methodology/`
 - Research pipeline: `docs/research/`
 - Security: `docs/security/`

@@ -89,11 +89,17 @@ readiness of the evidence ledger, not coverage of the entire field.
 
 ## Where we are today
 
-The public product is live and growing. The catalog is on the order of thousands
-of place-indexed entities, not a finished national inventory. Capture coverage,
-developer query surfaces, and some cloud wiring are still catching up to the
-architecture. This docs site is the orientation layer. The repository is the
-source of truth.
+The public product is live and growing. Verified 2026-08-28: [blackstory.app](https://blackstory.app/)
+is a catalog filter board (Kind / Tone / Era / Theme / Status / Confidence /
+Where) with about 4,100 released records, hosted on Vercel, reading Supabase
+Postgres. That is the live front door. The product line *History, pinned to
+place* is still the design target. It is not a claim that today's homepage
+already works as map-first story-finding.
+
+The catalog is not a finished national inventory. Capture coverage, developer
+query surfaces, and leftover cloud wiring (Firebase / GCS / parked PostGIS) are
+still catching up to the current stack. This docs site is the orientation
+layer. The repository is the source of truth.
 
 If you are here to contribute, start with [Install and bootstrap](./install.md)
 and the [Architecture](./architecture.md) guide. If you are here to understand

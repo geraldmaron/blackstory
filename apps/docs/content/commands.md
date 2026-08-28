@@ -24,6 +24,7 @@ pnpm --filter @repo/web build
 pnpm --filter @repo/admin build
 pnpm --filter @repo/api-public build
 
+# leftover local Firebase emulators (not product SoR)
 pnpm firebase:emulators
 pnpm firebase:test:rules
 ```

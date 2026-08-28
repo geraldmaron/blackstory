@@ -52,10 +52,13 @@ Reuse domain provenance gates (`requiresResolvedRights('media')`,
 `PUBLISHABLE_RIGHTS_STATUSES`). Release builders must drop `primaryImage` when
 the rights gate fails rather than publishing unclear media.
 
-## Firebase / public-media (photos)
+## Leftover GCS / public-media (photos)
 
-Entity photos are **not** Firebase Storage default-bucket objects. Cleared images are
-promoted into the GCP `black-book-efaaf-public-media` bucket and referenced from the
+> **Current media path (2026-08-28):** Supabase Storage on `blackstory-app`. The GCS /
+> Firestore projection notes below are leftover dual-serve history.
+
+Entity photos are **not** Firebase Storage default-bucket objects. Historical cutover promoted
+cleared images into the GCP `black-book-efaaf-public-media` bucket and referenced them from a
 Firestore public entity projection:
 
 | Concern | Convention |

@@ -1,12 +1,12 @@
-# Deferred: Postgres / SQL Connect / PostGIS (ADR-011 / D-014)
+# Deferred: Cloud SQL / SQL Connect / parked PostGIS (historical ADR-011)
 
-This package historically hosted Cloud SQL / SQL Connect helpers from .
+> **Leftover package note.** Current production path (2026-08-28): Supabase Postgres on
+> `blackstory-app` via `@repo/data-access` Postgres modules. Firestore is not the SoR.
 
-**Current production path:** Firestore via `@repo/firebase` converters +
-`src/firestore/` in this package.
+This package historically hosted Cloud SQL / SQL Connect helpers.
 
-Postgres modules (`config`, `pool`, `roles`, `session`, `sql-connect/*`) remain
-exported for optional local experiments and a possible future revisit. They are
-**not** required for app boot, CI primary path, or production deploy.
+Firestore converters under `src/firestore/` and `@repo/firebase` are leftover. Do not treat
+them as the production read path.
 
-Do not provision Cloud SQL unless ADR-011 migration triggers are met.
+Parked Cloud SQL / SQL Connect modules remain exported for optional local experiments. They
+are **not** the product system of record. Do not provision Cloud SQL.

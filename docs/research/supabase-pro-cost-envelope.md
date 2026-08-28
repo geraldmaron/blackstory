@@ -8,6 +8,10 @@
 
 # Supabase Pro cost envelope (× three Micro projects)
 
+> **Docs note (2026-08-28):** this envelope is planning math. It does not verify or close
+> overages. This repository only configures Supabase project `blackstory-app`. Other org Pro
+> projects are not named in repo config, so unused is not proven here.
+
 **Purpose:** Durable cost and traffic envelope for Supabase under the data-landscape capitalization program. Supersedes the summary table in [black-history-data-landscape-intake.md §5](./black-history-data-landscape-intake.md#5-cost-envelope-supabase-pro--three-projects) with pricing math, egress modeling, and operational defaults.
 
 **Date:** 2026-07-21  
@@ -161,11 +165,12 @@ The envelope **assumes Scenario C for product-scale traffic** and treats Scenari
 
 ## 6. Three-project topology (planning map)
 
-Today only **`blackstory-app`** is live. The **$35/mo** envelope reserves room for:
+This repo only configures **`blackstory-app`**. Other org Pro projects are not in this
+config; unused is not proven. The **$35/mo** envelope reserved room for:
 
 | # | Planned role | Compute | Notes |
 |---|---|---|---|
-| 1 | **Production** (`blackstory-app`) | Micro | SoR; published views; App Hosting `DATABASE_URL` reads |
+| 1 | **Production** (`blackstory-app`) | Micro | SoR; published views; Vercel `DATABASE_URL` reads |
 | 2 | **Staging** (future Supabase project) | Micro | Synthetic/mirror data; `minInstances: 0` consumers where possible |
 | 3 | **Preview / internal** (optional) | Micro | Migration dry-runs, operator experiments — **no** PITR/branching |
 

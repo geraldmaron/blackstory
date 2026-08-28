@@ -5,7 +5,12 @@
 
 # Supabase Storage cutover
 
-**Status:** Public-media copy complete (2026-07-21); raw-sources optional  
+> **Historical cutover note.** Current media path (2026-08-28): Supabase Storage on
+> `blackstory-app` (`https://twykhihqkcldpreuovay.supabase.co`). Live CSP still allows leftover
+> GCS (`storage.googleapis.com`). Public web is on Vercel. The "App Hosting stays on Firebase"
+> line below is leftover and superseded.
+
+**Status:** Public-media copy complete (2026-07-21); raw-sources optional; hosting sentence below is leftover  
 **ADR:** ADR-020 (amended) (`docs/adr/` purged 2026-07-24; restated in
 [decisions-carryover.md](../decisions-carryover.md))  
 **Buckets:** `public-media` (public), `raw-sources` (private)
@@ -41,5 +46,6 @@ SUPABASE_STORAGE_COPY=1 SUPABASE_SERVICE_ROLE_KEY=… node scripts/copy-gcs-publ
 
 ## Out of scope
 
-- **App Hosting stays on Firebase** (owner decision 2026-07-21) — do not migrate `apps/web` to Vercel/Cloud Run as part of storage or Postgres cutover
+- **Leftover / superseded (2026-07-21 owner note):** "App Hosting stays on Firebase." Public web
+  hard-cut to Vercel on 2026-07-22. Do not treat that sentence as current hosting.
 - Deleting GCS / Firebase project

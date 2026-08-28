@@ -1,5 +1,8 @@
 # Protected public API ingress and Cloud Armor
 
+> **Leftover GCP ingress design.** Current public web is Vercel (Cloudflare in front), not
+> App Hosting CDN. Cloud Run + Armor rows below are unverified leftover target text.
+
 **Status:** Design + declarative stubs in-repo. Live GCP resources are **not** provisioned by
 this bead.
 **Machine source:** [`../../infra/gcp/armor/ingress-matrix.json`](../../infra/gcp/armor/ingress-matrix.json)
@@ -44,7 +47,7 @@ flowchart TB
 | `api-public` | `api.blackbook.app` | `black-book-api-public` | Yes (read paths) | `black-book-api-public-armor` |
 | `api-submissions` | `submit.blackbook.app` | `black-book-api-submissions` | No | `black-book-api-submissions-armor` |
 
-Out of scope for : `api-internal` (private ingress), `admin` (IAP + LB), `web` (App Hosting CDN).
+Out of scope: `api-internal` (private ingress), `admin` (now Vercel; IAP + LB is leftover), `web` (Vercel; App Hosting CDN is leftover).
 
 ## Cloud Armor policy summary
 

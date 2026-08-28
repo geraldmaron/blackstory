@@ -1,10 +1,14 @@
 # Service surface separation
 
-**Status:** Design + runtime contracts implemented in-repo. Cloud ingress, IAP, and per-surface deploy
-jobs remain human provisioning steps (see [`infra/gcp/surfaces/README.md`](../../infra/gcp/surfaces/README.md)).
+> **Current stack (2026-08-28):** public web on Vercel; product SoR is Supabase Postgres
+> `blackstory-app`. Firebase App Hosting and Firestore are leftover. Capability rules below
+> still apply. Hosting rows that still name App Hosting or Firestore as SoR are historical.
 
-**ADR:** [ADR-005](../adr/ADR-005-service-surface-separation.md)
-**Data store:** Firestore system of record ([ADR-011](../adr/ADR-011-firestore-system-of-record.md))
+**Status:** Design + runtime contracts implemented in-repo. Cloud ingress, IAP, and per-surface deploy
+jobs remain leftover GCP provisioning text (see [`infra/gcp/surfaces/README.md`](../../infra/gcp/surfaces/README.md)).
+
+**ADR:** historical ADR-005 (removed 2026-07-24; see `docs/decisions-carryover.md`)
+**Data store:** Supabase Postgres (`blackstory-app`). Firestore as SoR is leftover.
 
 ## Threat model summary
 
@@ -47,10 +51,11 @@ jobs remain human provisioning steps (see [`infra/gcp/surfaces/README.md`](../..
 
 ### Admin console (`apps/admin`)
 
-- **Hosting:** App Hosting interim (`black-book-admin-production`, `apphosting.admin.yaml`); target Cloud Run + IAP
-- **Posture:** `iap-protected` — separate Next.js app from `apps/web`
+- **Hosting:** Separate Vercel project (`apps/admin/vercel.json`). Firebase App Hosting /
+  Cloud Run `black-book-admin-production` deleted; leftover.
+- **Posture:** Authenticated operators only; separate Next.js app from `apps/web`
 - **Invariant:** no imports from `apps/web` handlers (see `apps/admin/src/surface.test.ts`)
-- **SA:** `admin@black-book-efaaf.iam.gserviceaccount.com`
+- **SA:** leftover GCP `admin@black-book-efaaf.iam.gserviceaccount.com` (not the current Vercel host)
 
 ## Typed capability matrix
 

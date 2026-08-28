@@ -21,9 +21,9 @@ listed here; most invariants from the removed ADRs were already restated in
 
 ## Addendum, 2026-07-24 (repo-xez5.10): entity source-of-truth precedence
 
-Entities exist in four places today (git fixtures, Firestore `canonicalEntities`, Supabase
-`bb_canonical.entities`, in-code hand-curated tables). This restates and extends the ADR-020
-precedence rule now that `docs/adr/` has been purged (`repo-xez5.11`):
+Entities historically existed in four places (git fixtures, Firestore `canonicalEntities`,
+Supabase `bb_canonical.entities`, in-code hand-curated tables). This restates the ADR-020
+precedence rule. Firestore is leftover, not a current write path:
 
 - **Supabase `bb_canonical.entities` is the system of record.** It is the only place that a
   canonical entity is created, promoted, merged, or edited going forward.

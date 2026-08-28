@@ -87,6 +87,16 @@ export default function HomePage() {
         </p>
       </aside>
 
+      <aside className="callout" aria-label="Live front door">
+        <p className="callout-label">Live front door (2026-08-28)</p>
+        <p>
+          blackstory.app is a catalog filter board (Kind, Tone, Era, Theme, Status, Confidence,
+          Where), about 4,100 released records, hosted on Vercel with data on Supabase. The product
+          line is still History, pinned to place. That map-first experience is the design target,
+          not a claim about the page that loads today.
+        </p>
+      </aside>
+
       <details className="section" open>
         <summary>
           <span className="section-num">01</span>

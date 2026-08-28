@@ -32,7 +32,7 @@ trustworthy as the gates between research and release.
 | `apps/api-submissions` | Untrusted intake into quarantine |
 | `apps/admin` | Authenticated operators only |
 | `apps/api-internal` | Private publication and control |
-| Workers / Functions | Research and batch only; cannot publish |
+| Workers | Research and batch only; cannot publish. Firebase Functions schedules are gone. |
 
 ## Reporting
 
