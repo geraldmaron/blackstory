@@ -57,7 +57,7 @@ function anatomyFacts(
 
 export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel }) {
   const lead = model.lead;
-  const mapTone = lead ? mapToneFromTopics(lead.topicTags, lead.topicIds) : undefined;
+  const mapTone = lead ? mapToneFromTopics(lead.topicIds ?? lead.topicTags) : undefined;
   const anatomyInputs = lead ? buildEntityAnatomyInputs(lead, mapTone) : undefined;
   const geo = lead ? (lead.geoAnchor ?? geoAnchorFor(lead.id)) : undefined;
   const place = lead && anatomyInputs ? buildEntityAnatomyPlace(lead, geo) : undefined;
@@ -78,11 +78,11 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
             ? lead.summary
             : 'A regular person should be able to find what happened here. The archive opens on a place, not on a count of every record.'
         }
-        meta={
-          lead && anatomyInputs
-            ? [anatomyInputs.kindLabel, anatomyInputs.whereLabel, anatomyInputs.eraLabel]
-            : undefined
-        }
+        {...(lead && anatomyInputs
+          ? {
+              meta: [anatomyInputs.kindLabel, anatomyInputs.whereLabel, anatomyInputs.eraLabel],
+            }
+          : {})}
         showPath={false}
       />
 
