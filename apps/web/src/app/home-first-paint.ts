@@ -5,10 +5,11 @@
  * That is a point-get, not a catalog pull. Seed mode reads the Dunbar cluster so CI
  * still paints a place when Greenwood is not in the fixture. Internal ids never title.
  */
-import { listPublicArticleListItems } from '../lib/articles/source';
+import { listPublicArticleListItems, resolveCitesEdgeIndex } from '../lib/articles/source';
 import { shouldUseLivePublicProjections } from '../lib/public-data/live-policy';
 import { resolvePublicEntityView } from '../lib/public-data/source';
 import { getPublicEntity, type PublicEntityView } from '../data/public-seed';
+import { storiesCiting, type StoryCitation } from '../lib/release/build-cites-edge';
 import { pickLeadStory } from './stories/stories-index';
 import type { PublicArticleListItemDoc } from '@repo/schemas';
 
@@ -28,6 +29,7 @@ export type HomeFirstPaintModel = {
   readonly lead: PublicEntityView | undefined;
   readonly also: readonly PublicEntityView[];
   readonly story: PublicArticleListItemDoc | undefined;
+  readonly citing: readonly StoryCitation[];
   readonly source: HomeFirstPaintSource;
 };
 
@@ -90,13 +92,15 @@ async function loadLeadRecord(): Promise<{
 }
 
 export async function loadHomeFirstPaint(): Promise<HomeFirstPaintModel> {
-  const [{ lead, source }, articles] = await Promise.all([
+  const [{ lead, source }, articles, cites] = await Promise.all([
     loadLeadRecord(),
     listPublicArticleListItems(),
+    resolveCitesEdgeIndex(),
   ]);
   const story =
     articles.source === 'live' && articles.items.length > 0
       ? pickHomeStory(articles.items)
       : undefined;
-  return { lead, also: [], story, source };
+  const citing = lead ? storiesCiting(cites, lead.id) : [];
+  return { lead, also: [], story, citing, source };
 }

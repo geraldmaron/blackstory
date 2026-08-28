@@ -27,6 +27,8 @@ export type EntityMastMediaProps = {
   readonly primaryImage?: PublicEntityPrimaryImageView;
   /** When true (default), load the photo eagerly for above-the-fold mast placement. */
   readonly priority?: boolean;
+  /** First paint: no rights-clearance or missing-photo caption. The mast is the place. */
+  readonly hideCredit?: boolean;
 };
 
 type MastPhase =
@@ -51,6 +53,7 @@ export function EntityMastMedia({
   jurisdictionLabel,
   primaryImage,
   priority = true,
+  hideCredit = false,
 }: EntityMastMediaProps) {
   const [phase, setPhase] = useState<MastPhase>(() => initialPhase(primaryImage));
 
@@ -79,6 +82,7 @@ export function EntityMastMedia({
         reason={phase.reason}
         {...(kind !== undefined ? { kind } : {})}
         {...(jurisdictionLabel !== undefined ? { jurisdictionLabel } : {})}
+        {...(hideCredit ? { hideCaption: true } : {})}
       />
     );
   }
@@ -94,7 +98,10 @@ export function EntityMastMedia({
   const focalClass = primaryImageFocalClass(kind);
 
   return (
-    <figure className={`ds-entity-photo ${focalClass}`} aria-describedby={creditId}>
+    <figure
+      className={`ds-entity-photo ${focalClass}`}
+      {...(hideCredit ? {} : { 'aria-describedby': creditId })}
+    >
       {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL may be external */}
       <img
         key={src}
@@ -119,15 +126,17 @@ export function EntityMastMedia({
           });
         }}
       />
-      <figcaption id={creditId} className="ds-entity-photo__credit ds-sans">
-        {caption.creditText}
-        {caption.showRightsLabel ? (
-          <span className="ds-mono">
-            {caption.creditText ? ' · ' : ''}
-            {caption.rightsLabel}
-          </span>
-        ) : null}
-      </figcaption>
+      {hideCredit ? null : (
+        <figcaption id={creditId} className="ds-entity-photo__credit ds-sans">
+          {caption.creditText}
+          {caption.showRightsLabel ? (
+            <span className="ds-mono">
+              {caption.creditText ? ' · ' : ''}
+              {caption.rightsLabel}
+            </span>
+          ) : null}
+        </figcaption>
+      )}
     </figure>
   );
 }

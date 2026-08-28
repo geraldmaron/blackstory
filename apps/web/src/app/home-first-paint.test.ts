@@ -1,6 +1,6 @@
 /**
  * First paint loads one published record by id, never the release-wide catalog.
- * The place is that record. Stories, Law, Data, and Memorial are the way out.
+ * The place is that record. Rooms exist only when this record already has material.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -51,6 +51,7 @@ test('the loader loads one record, never the full catalog', () => {
 test('internal ids never title first paint', () => {
   assert.equal(isInternalRecordLabel('42Cb1758'), true);
   assert.equal(isInternalRecordLabel('ent_dunbar_school_001'), true);
+  assert.equal(isInternalRecordLabel('ent_greenwood_district_001_claim_0'), true);
   assert.equal(isInternalRecordLabel(''), true);
   assert.equal(isInternalRecordLabel('Greenwood District'), false);
   assert.equal(isInternalRecordLabel('Paul Laurence Dunbar High School'), false);
@@ -89,6 +90,7 @@ test('first paint never mounts the catalog boot, camera cockpit, or Journey page
   assert.doesNotMatch(page, /Loading \{shell\.totalMatched/);
   assert.doesNotMatch(paint, /CameraConsole|Orbit|Tilt|Trace/);
   assert.doesNotMatch(paint, /Loading 4,101|\/journey|42Cb1758/);
+  assert.doesNotMatch(paint, /Open the full record/);
   assert.doesNotMatch(loader, /Loading \{shell\.totalMatched|4,101 records/);
 });
 
@@ -110,6 +112,35 @@ test('first paint is the record, not a manifesto or a schema card', () => {
     historicalContext:
       'Greenwood was a Black commercial district in Tulsa. In 1921 a massacre burned it. The district rebuilt.',
     claims: dunbar.claims.slice(0, 2),
+    locationLabel: 'Greenwood, Tulsa (neighborhood-level pin)',
+    jurisdictionLabel: 'Tulsa, Oklahoma',
+    timeline: [
+      {
+        id: 'ent_greenwood_district_001_status_0',
+        time: '1921',
+        datePrecision: 'year' as const,
+        title: 'Status: Historic',
+        body: 'In effect from 1921. Basis: ent_greenwood_district_001_claim_0.',
+      },
+      {
+        id: 'leak-title',
+        time: '1921',
+        datePrecision: 'year' as const,
+        title: 'ent_greenwood_district_001_claim_0',
+        body: 'Should never print.',
+      },
+    ],
+    relatedNeighbors: [
+      {
+        id: 'ent_vernon_ame_001',
+        displayName: 'Vernon AME Church',
+        kind: 'place' as const,
+        summary: 'A church in Greenwood.',
+        relationType: 'located_at',
+        direction: 'incoming' as const,
+      },
+    ],
+    primaryImage: undefined,
   };
   assert.equal(
     buildEntityAnatomyInputs(greenwoodShaped, undefined).evidenceLabel,
@@ -117,7 +148,7 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   );
   const html = renderToStaticMarkup(
     createElement(HomeFirstPaint, {
-      model: { lead: greenwoodShaped, also: [], story: undefined, source: 'live' },
+      model: { lead: greenwoodShaped, also: [], story: undefined, citing: [], source: 'live' },
     }),
   );
   assert.match(html, /<h1[^>]*>[\s\S]*Greenwood District/);
@@ -125,6 +156,10 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.match(html, /Thirty-five blocks of Greenwood/);
   assert.match(html, /The history here/);
   assert.match(html, /1921/);
+  assert.match(html, /Vernon AME Church/);
+  assert.match(html, /Tulsa, Oklahoma/);
+  assert.match(html, /id="stories"/);
+  assert.match(html, /href="#stories"/);
   assert.doesNotMatch(html, /walk past documented Black history/);
   assert.doesNotMatch(html, /place-connected archive of Black history/);
   assert.doesNotMatch(html, /Grade A|Grade B|Grade C/);
@@ -132,10 +167,37 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.doesNotMatch(html, />Kind<|>Where<|>Era<|>Evidence</);
   assert.doesNotMatch(html, /radius affordance|Shown at locality/i);
   assert.doesNotMatch(html, /Journey|42Cb1758|4,101|Orbit|Tilt|Trace/);
-  assert.match(html, /href="\/stories"/);
-  assert.match(html, /href="\/law"/);
-  assert.match(html, /href="\/data"/);
-  assert.match(html, /href="\/memorial"/);
+  assert.doesNotMatch(html, /ent_greenwood_district_001_claim_0/);
+  assert.doesNotMatch(html, /rights-cleared|awaits a/i);
+  assert.doesNotMatch(html, /from their record/i);
+  assert.doesNotMatch(html, /Open the full record/);
+  assert.doesNotMatch(html, /href="\/entity\/ent_dunbar_school_001"/);
+  assert.doesNotMatch(html, /href="\/stories"/);
+  assert.doesNotMatch(html, /href="\/law"/);
+  assert.doesNotMatch(html, /href="\/data"/);
+  assert.doesNotMatch(html, /href="\/memorial"/);
+});
+
+test('seed Dunbar first paint has no claim ids, rights caption, or national rooms', () => {
+  const dunbar = getPublicEntity('ent_dunbar_school_001');
+  assert.ok(dunbar);
+  const html = renderToStaticMarkup(
+    createElement(HomeFirstPaint, {
+      model: { lead: dunbar, also: [], story: undefined, citing: [], source: 'seed' },
+    }),
+  );
+  assert.match(html, /Paul Laurence Dunbar High School/);
+  assert.match(html, /The history here/);
+  assert.match(html, /href="#stories"/);
+  assert.doesNotMatch(html, /ent_[a-z0-9_]+_claim_\d+/i);
+  assert.doesNotMatch(html, /claim_dunbar_/);
+  assert.doesNotMatch(html, /rights-cleared|awaits a/i);
+  assert.doesNotMatch(html, /from their record/i);
+  assert.doesNotMatch(html, /Open the full record/);
+  assert.doesNotMatch(html, /href="\/stories"/);
+  assert.doesNotMatch(html, /href="\/law"/);
+  assert.doesNotMatch(html, /href="\/data"/);
+  assert.doesNotMatch(html, /href="\/memorial"/);
 });
 
 test('HomeFirstPaint never titles or lists an internal id, even if the model carries one', () => {
@@ -153,11 +215,13 @@ test('HomeFirstPaint never titles or lists an internal id, even if the model car
           placeLabel: 'Tulsa, Oklahoma',
           id: 'art_gap',
         }),
+        citing: [],
         source: 'live',
       },
     }),
   );
   assert.doesNotMatch(html, /42Cb1758/);
   assert.match(html, /The gap that never closed/);
-  assert.match(html, /href="\/stories"/);
+  assert.doesNotMatch(html, /href="\/stories"/);
+  assert.match(html, /href="\/stories\/the-gap-that-never-closed"/);
 });

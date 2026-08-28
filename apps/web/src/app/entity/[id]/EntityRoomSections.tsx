@@ -31,6 +31,7 @@ import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel'
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { Connections, type RoomConnection } from '../../../components/room';
 import { humanizeToken } from '../../../components/entity/format';
+import { firstPaintRelation } from '../../home-first-paint-surface';
 
 void React;
 
@@ -79,7 +80,7 @@ export function recordSectionIndex({
   if (entity.timeline.length > 0) {
     sections.push({ id: 'timeline-heading', label: 'Timeline', count: entity.timeline.length });
   }
-  const connectionCount = toConnections(entity).length;
+  const connectionCount = toConnections(entity, false).length;
   if (connectionCount > 0) {
     sections.push({
       id: 'related-heading',
@@ -102,6 +103,8 @@ export type EntityRoomSectionsProps = {
   readonly evidenceClaims: readonly EvidenceClaimInput[];
   readonly entityLinkCatalog: readonly EntityLinkCatalogEntry[];
   readonly crossReferences?: readonly EntityCrossReferenceSurface[];
+  /** First paint: human place lines, no "from their record", history is the Stories room. */
+  readonly firstPaint?: boolean;
 };
 
 /**
@@ -122,14 +125,27 @@ function hasStatusFor(entity: PublicEntityView): boolean {
     : Boolean(entity.status) || (entity.statusHistory?.length ?? 0) > 0;
 }
 
-function toConnections(entity: PublicEntityView): readonly RoomConnection[] {
-  return (entity.relatedNeighbors ?? []).map((neighbor) => ({
-    name: neighbor.displayName,
-    relation: neighbor.viaEvent
-      ? `both appear in ${neighbor.viaEvent.displayName}`
-      : relationPhrase(neighbor.relationType, neighbor.direction),
-    href: `/entity/${neighbor.id}`,
-  }));
+function toConnections(
+  entity: PublicEntityView,
+  firstPaint: boolean,
+): readonly RoomConnection[] {
+  return (entity.relatedNeighbors ?? []).flatMap((neighbor) => {
+    const relation = firstPaint
+      ? firstPaintRelation(neighbor, entity)
+      : neighbor.viaEvent
+        ? `both appear in ${neighbor.viaEvent.displayName}`
+        : relationPhrase(neighbor.relationType, neighbor.direction);
+    if (firstPaint && (relation === undefined || relation.length === 0)) {
+      return [{ name: neighbor.displayName, relation: '', href: `/entity/${neighbor.id}` }];
+    }
+    return [
+      {
+        name: neighbor.displayName,
+        relation: relation ?? '',
+        href: `/entity/${neighbor.id}`,
+      },
+    ];
+  });
 }
 
 export function EntityRoomSections({
@@ -137,16 +153,21 @@ export function EntityRoomSections({
   evidenceClaims,
   entityLinkCatalog,
   crossReferences = [],
+  firstPaint = false,
 }: EntityRoomSectionsProps) {
   const hasContext = entity.historicalContext.trim().length > 0;
   const hasStatus = hasStatusFor(entity);
-  const connections = toConnections(entity);
+  const connections = toConnections(entity, firstPaint);
   const continueLearning = entity.continueLearning ?? [];
 
   return (
     <>
       {hasContext ? (
-        <section className="ds-record-beat" aria-labelledby="context-heading">
+        <section
+          className="ds-record-beat"
+          aria-labelledby="context-heading"
+          {...(firstPaint ? { id: 'stories' } : {})}
+        >
           <h2 className="ds-record-beat__heading" id="context-heading">
             The history here
           </h2>
@@ -226,9 +247,11 @@ export function EntityRoomSections({
               <Connections
                 connections={continueLearning.map((neighbor) => ({
                   name: neighbor.displayName,
-                  relation: neighbor.viaEvent
-                    ? `both appear in ${neighbor.viaEvent.displayName}`
-                    : relationPhrase(neighbor.relationType, neighbor.direction),
+                  relation: firstPaint
+                    ? (firstPaintRelation(neighbor, entity) ?? '')
+                    : neighbor.viaEvent
+                      ? `both appear in ${neighbor.viaEvent.displayName}`
+                      : relationPhrase(neighbor.relationType, neighbor.direction),
                   href: `/entity/${neighbor.id}`,
                 }))}
               />
