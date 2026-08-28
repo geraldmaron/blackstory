@@ -31,6 +31,7 @@ import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel'
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { Connections, type RoomConnection } from '../../../components/room';
 import { humanizeToken } from '../../../components/entity/format';
+import { neighborHref } from '../../../lib/place/public-place-path';
 import { firstPaintRelatedHeading, firstPaintRelation } from '../../home-first-paint-surface';
 
 void React;
@@ -125,24 +126,22 @@ function hasStatusFor(entity: PublicEntityView): boolean {
     : Boolean(entity.status) || (entity.statusHistory?.length ?? 0) > 0;
 }
 
-function toConnections(
-  entity: PublicEntityView,
-  firstPaint: boolean,
-): readonly RoomConnection[] {
+function toConnections(entity: PublicEntityView, firstPaint: boolean): readonly RoomConnection[] {
   return (entity.relatedNeighbors ?? []).flatMap((neighbor) => {
     const relation = firstPaint
       ? firstPaintRelation(neighbor, entity)
       : neighbor.viaEvent
         ? `both appear in ${neighbor.viaEvent.displayName}`
         : relationPhrase(neighbor.relationType, neighbor.direction);
+    const href = firstPaint ? neighborHref(neighbor) : `/entity/${neighbor.id}`;
     if (firstPaint && (relation === undefined || relation.length === 0)) {
-      return [{ name: neighbor.displayName, relation: '', href: `/entity/${neighbor.id}` }];
+      return [{ name: neighbor.displayName, relation: '', href }];
     }
     return [
       {
         name: neighbor.displayName,
         relation: relation ?? '',
-        href: `/entity/${neighbor.id}`,
+        href,
       },
     ];
   });
@@ -163,7 +162,7 @@ export function EntityRoomSections({
         ...(entity.continueLearning ?? []).map((neighbor) => ({
           name: neighbor.displayName,
           relation: firstPaintRelation(neighbor, entity) ?? '',
-          href: `/entity/${neighbor.id}`,
+          href: neighborHref(neighbor),
         })),
       ].filter(
         (connection, index, list) =>
@@ -195,6 +194,12 @@ export function EntityRoomSections({
                   text={paragraph}
                   skipEntityIds={[entity.id]}
                   catalog={entityLinkCatalog}
+                  {...(firstPaint
+                    ? {
+                        hrefFor: (entry: { readonly label: string }) =>
+                          neighborHref({ displayName: entry.label, kind: 'place' }),
+                      }
+                    : {})}
                 />
               ))}
           </div>
@@ -266,7 +271,7 @@ export function EntityRoomSections({
                     : neighbor.viaEvent
                       ? `both appear in ${neighbor.viaEvent.displayName}`
                       : relationPhrase(neighbor.relationType, neighbor.direction),
-                  href: `/entity/${neighbor.id}`,
+                  href: firstPaint ? neighborHref(neighbor) : `/entity/${neighbor.id}`,
                 }))}
               />
             </>

@@ -105,10 +105,13 @@ test('era line is English from real fields, not Active or in-effect', () => {
   assert.doesNotMatch(line, /Active|In effect from|Current status/i);
 });
 
-test('door rooms omit Stories unless chapters already cite this record', () => {
+test('door rooms keep archive rooms up and omit Stories unless chapters cite', () => {
   const dunbar = getPublicEntity('ent_dunbar_school_001');
   assert.ok(dunbar);
-  assert.deepEqual(selectDoorRooms(dunbar).map((room) => room.id), []);
+  assert.deepEqual(
+    selectDoorRooms(dunbar).map((room) => room.id),
+    ['data', 'books', 'methodology', 'errata'],
+  );
   const rooms = selectDoorRooms(dunbar, [
     {
       slug: 'the-gap-that-never-closed',
@@ -119,13 +122,14 @@ test('door rooms omit Stories unless chapters already cite this record', () => {
   ]);
   assert.deepEqual(
     rooms.map((room) => room.id),
-    ['stories'],
+    ['stories', 'data', 'books', 'methodology', 'errata'],
   );
   assert.equal(rooms[0]?.href, '#stories');
   assert.ok(!rooms.some((room) => room.href === '/stories'));
   assert.ok(!rooms.some((room) => room.href === '/law' || room.id === 'law'));
-  assert.ok(!rooms.some((room) => room.href === '/data' || room.id === 'data'));
   assert.ok(!rooms.some((room) => room.href === '/memorial' || room.id === 'memorial'));
+  assert.ok(rooms.some((room) => room.href === '/data' && room.id === 'data'));
+  assert.ok(rooms.some((room) => room.href === '/books' && room.id === 'books'));
 });
 
 test('Memorial and Law appear only from this record neighbors', () => {
@@ -155,6 +159,6 @@ test('Memorial and Law appear only from this record neighbors', () => {
   const rooms = selectDoorRooms(withPeople);
   assert.deepEqual(
     rooms.map((room) => room.id),
-    ['law', 'memorial'],
+    ['law', 'data', 'books', 'memorial', 'methodology', 'errata'],
   );
 });

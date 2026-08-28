@@ -48,6 +48,9 @@ function normalizePathname(pathname: string): string {
 /** Routes that may carry user-facing filters; all other paths ignore query strings for caching.  */
 export function getAllowedQueryParamsForPath(pathname: string): readonly string[] {
   const path = normalizePathname(pathname);
+  if (path === '/') {
+    return ['at'];
+  }
   if (path === '/search') {
     return SEARCH_PAGE_PARAM_ALLOWLIST;
   }

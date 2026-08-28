@@ -188,8 +188,8 @@ export function DataSections({
 }: DataSectionsProps) {
   const servedFromNote =
     indicators.servedFrom === 'fixture'
-      ? 'Charts below use verified Phase 1 fixtures until live warehouse rows replace them.'
-      : 'Charts below read from the reference indicator warehouse when available.';
+      ? 'Charts below use published reference figures, and name their sources.'
+      : 'Charts below read published series when they are available, and name their sources.';
 
   return (
     <div className="ds-data-edition__stack">
@@ -363,7 +363,7 @@ export function DataSections({
         asOf={formatAsOf(indicators.generatedAt)}
         limits={
           <>
-            Cook County is the Phase 1 place spine: decennial homeownership, mortgage denial rates
+            Cook County is the first county spine: decennial homeownership, mortgage denial rates
             and HUD cost burden. These are published rates for the censuses and years shown, with
             nothing interpolated between them. A rate is only as good as the survey behind it; it
             does not trace an individual household&apos;s path.
@@ -437,7 +437,7 @@ export function DataSections({
         {phase1Indicators ? (
           <DataStatStrip
             labelledBy="composition-heading"
-            sources={[{ label: 'Phase 1 indicator catalog', url: '/methodology' }]}
+            sources={[{ label: 'Indicator catalog', url: '/methodology' }]}
             items={[
               {
                 id: 'p1-metrics',
@@ -448,11 +448,11 @@ export function DataSections({
               {
                 id: 'p1-obs',
                 value: phase1Indicators.sampleObservationCount.toLocaleString('en-US'),
-                label: 'Warehouse observations loaded',
+                label: 'Published observations loaded',
                 note:
                   phase1Indicators.sampleObservationCount === 0
-                    ? 'Catalog and fixtures until ingest completes'
-                    : 'bb_reference statistical observations',
+                    ? 'Catalog and published figures until more series land'
+                    : 'Published statistical observations',
               },
             ]}
           />

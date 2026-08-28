@@ -219,6 +219,7 @@ export function MethodologySections({ exampleRecordHref }: MethodologySectionsPr
         <OffRamp
           title="See it applied"
           actions={[
+            { label: 'The place', href: '/' },
             {
               label: 'Open a record',
               href: exampleRecordHref ?? '/records',

@@ -12,7 +12,12 @@ import type { PublicArticleListItemDoc } from '@repo/schemas';
 import { FEATURED_SEED_IDS, getPublicEntity } from '../data/public-seed';
 import { buildEntityAnatomyInputs } from './entity/[id]/entity-anatomy-facts';
 import { HomeFirstPaint } from './HomeFirstPaint';
-import { HOME_FEATURED_ENTITY_IDS, isInternalRecordLabel, pickHomeStory } from './home-first-paint';
+import {
+  HOME_FEATURED_ENTITY_IDS,
+  isInternalRecordLabel,
+  loadHomeFirstPaint,
+  pickHomeStory,
+} from './home-first-paint';
 
 function storyDoc(overrides: Partial<PublicArticleListItemDoc> = {}): PublicArticleListItemDoc {
   return {
@@ -30,15 +35,34 @@ function storyDoc(overrides: Partial<PublicArticleListItemDoc> = {}): PublicArti
   } as PublicArticleListItemDoc;
 }
 
-test('the featured set prefers Greenwood, then the two seed places', () => {
+test('the featured set prefers non-Tulsa places; Greenwood is last-resort', () => {
   assert.deepEqual(
     [...HOME_FEATURED_ENTITY_IDS],
-    ['ent_greenwood_district_001', 'ent_dunbar_school_001', 'ent_15th_st_church_001'],
+    ['ent_dunbar_school_001', 'ent_15th_st_church_001', 'ent_greenwood_district_001'],
   );
+  assert.ok(FEATURED_SEED_IDS.includes(HOME_FEATURED_ENTITY_IDS[0]));
   assert.ok(FEATURED_SEED_IDS.includes(HOME_FEATURED_ENTITY_IDS[1]));
-  assert.ok(FEATURED_SEED_IDS.includes(HOME_FEATURED_ENTITY_IDS[2]));
+  assert.ok(getPublicEntity(HOME_FEATURED_ENTITY_IDS[0]));
   assert.ok(getPublicEntity(HOME_FEATURED_ENTITY_IDS[1]));
-  assert.ok(getPublicEntity(HOME_FEATURED_ENTITY_IDS[2]));
+});
+
+test('the loader stands at Dunbar, or at a named slug, never Greenwood first', async () => {
+  const home = await loadHomeFirstPaint();
+  assert.ok(home.lead);
+  assert.equal(home.lead.displayName, 'Paul Laurence Dunbar High School');
+  assert.doesNotMatch(home.lead.displayName, /tulsa|greenwood/i);
+
+  const church = await loadHomeFirstPaint({
+    namedSlug: 'fifteenth-street-presbyterian-church',
+    requireNamed: true,
+  });
+  assert.equal(church.lead?.displayName, 'Fifteenth Street Presbyterian Church');
+
+  const missing = await loadHomeFirstPaint({
+    namedSlug: 'no-such-place',
+    requireNamed: true,
+  });
+  assert.equal(missing.lead, undefined);
 });
 
 test('the loader loads one record, never the full catalog', () => {
@@ -58,16 +82,17 @@ test('internal ids never title first paint', () => {
   assert.equal(isInternalRecordLabel('Chapter: The Count'), false);
 });
 
-test('pickHomeStory prefers a Tulsa story when one is already published, and invents nothing', () => {
+test('pickHomeStory follows published order and invents nothing', () => {
   const count = storyDoc();
   const tulsa = storyDoc({
     slug: 'the-gap-that-never-closed',
     title: 'The gap that never closed',
     summary: 'Greenwood after 1921.',
     placeLabel: 'Tulsa, Oklahoma',
+    publishedAt: '2026-07-01',
     id: 'art_gap',
   });
-  assert.equal(pickHomeStory([count, tulsa])?.slug, 'the-gap-that-never-closed');
+  assert.equal(pickHomeStory([count, tulsa])?.slug, 'the-count');
   assert.equal(pickHomeStory([count])?.slug, 'the-count');
   assert.equal(pickHomeStory([storyDoc({ title: '42Cb1758', slug: 'opaque' })]), undefined);
 });
@@ -158,8 +183,13 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.match(html, /The history here/);
   assert.match(html, /1921/);
   assert.match(html, /Vernon AME Church/);
+  assert.match(html, /href="\/place\/vernon-ame-church"/);
   assert.match(html, /Tulsa, Oklahoma/);
   assert.match(html, />Places</);
+  assert.match(html, /href="\/data"/);
+  assert.match(html, /href="\/books"/);
+  assert.match(html, /href="\/methodology"/);
+  assert.match(html, /href="\/errata"/);
   assert.doesNotMatch(html, /id="stories"/);
   assert.doesNotMatch(html, /href="#stories"/);
   assert.doesNotMatch(html, /Records this one touches|this one/);
@@ -175,14 +205,13 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.doesNotMatch(html, /rights-cleared|awaits a/i);
   assert.doesNotMatch(html, /from their record/i);
   assert.doesNotMatch(html, /Open the full record/);
-  assert.doesNotMatch(html, /href="\/entity\/ent_dunbar_school_001"/);
+  assert.doesNotMatch(html, /href="\/entity\//);
   assert.doesNotMatch(html, /href="\/stories"/);
   assert.doesNotMatch(html, /href="\/law"/);
-  assert.doesNotMatch(html, /href="\/data"/);
   assert.doesNotMatch(html, /href="\/memorial"/);
 });
 
-test('seed Dunbar first paint has no claim ids, rights caption, or national rooms', () => {
+test('seed Dunbar first paint has no claim ids, rights caption, or ent_ addresses', () => {
   const dunbar = getPublicEntity('ent_dunbar_school_001');
   assert.ok(dunbar);
   const html = renderToStaticMarkup(
@@ -192,6 +221,11 @@ test('seed Dunbar first paint has no claim ids, rights caption, or national room
   );
   assert.match(html, /Paul Laurence Dunbar High School/);
   assert.match(html, /The history here/);
+  assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church"/);
+  assert.match(html, /href="\/data"/);
+  assert.match(html, /href="\/books"/);
+  assert.match(html, /href="\/methodology"/);
+  assert.match(html, /href="\/errata"/);
   assert.doesNotMatch(html, /href="#stories"/);
   assert.doesNotMatch(html, /Records this one touches|this one/);
   assert.doesNotMatch(html, /Active|Current status|In effect from|Status and history/);
@@ -200,9 +234,9 @@ test('seed Dunbar first paint has no claim ids, rights caption, or national room
   assert.doesNotMatch(html, /rights-cleared|awaits a/i);
   assert.doesNotMatch(html, /from their record/i);
   assert.doesNotMatch(html, /Open the full record/);
+  assert.doesNotMatch(html, /href="\/entity\//);
   assert.doesNotMatch(html, /href="\/stories"/);
   assert.doesNotMatch(html, /href="\/law"/);
-  assert.doesNotMatch(html, /href="\/data"/);
   assert.doesNotMatch(html, /href="\/memorial"/);
 });
 

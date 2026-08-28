@@ -5,7 +5,9 @@
  * The Atlas instrument lives at `/explore`. This module never imports it.
  */
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { absolutePublicUrl } from '../lib/seo/metadata-builders';
+import { STAND_COOKIE, isPublicPlaceSlug } from '../lib/place/public-place-path';
 import { ABOUT_LINE } from './about/about-copy';
 import { HomeFirstPaint } from './HomeFirstPaint';
 import { loadHomeFirstPaint } from './home-first-paint';
@@ -25,7 +27,21 @@ export const metadata: Metadata = {
   alternates: { canonical: absolutePublicUrl('/') },
 };
 
-export default async function HomePage() {
-  const model = await loadHomeFirstPaint();
+function namedStand(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed || !isPublicPlaceSlug(trimmed)) return undefined;
+  return trimmed;
+}
+
+export default async function HomePage({
+  searchParams,
+}: {
+  readonly searchParams: Promise<{ readonly at?: string | readonly string[] }>;
+}) {
+  const params = await searchParams;
+  const at = Array.isArray(params.at) ? params.at[0] : params.at;
+  const cookieStore = await cookies();
+  const named = namedStand(at) ?? namedStand(cookieStore.get(STAND_COOKIE)?.value);
+  const model = await loadHomeFirstPaint(named ? { namedSlug: named } : {});
   return <HomeFirstPaint model={model} />;
 }

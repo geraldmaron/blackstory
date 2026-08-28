@@ -4,7 +4,7 @@
  */
 
 export const DATA_PAGE_DESCRIPTION =
-  'National Census population and Phase 1 indicator charts: wealth, housing, credit, and justice figures behind the BlackStory archive, each with sources you can open.';
+  'National Census population and published indicator charts: wealth, housing, credit, and justice figures behind the BlackStory archive, each with sources you can open.';
 
 export const DATA_INTRO = {
   kicker: 'Numbers',
@@ -18,7 +18,7 @@ export const DATA_ORIENTATION_BEATS = [
   },
   {
     kicker: 'Sources visible',
-    body: 'Every figure links to where it came from. Fixture-backed charts say so until warehouse ingest replaces them.',
+    body: 'Every figure links to where it came from. Charts that use published reference figures say so.',
   },
   {
     kicker: 'Gaps are not silence',
@@ -41,7 +41,7 @@ export const DATA_SECTION_COPY = {
     index: '01',
     kicker: 'Orientation',
     title: 'How to read these numbers',
-    lede: 'Census decades anchor the national story. Phase 1 indicators (ACS, NHGIS, HMDA, CHAS, BJS, SCF, USSC, and more) show curated metrics we place beside archive evidence.',
+    lede: 'Census decades anchor the national story. Published indicators (ACS, NHGIS, HMDA, CHAS, BJS, SCF, USSC, and more) show curated metrics we place beside archive evidence.',
   },
   population: {
     index: '02',
@@ -59,7 +59,7 @@ export const DATA_SECTION_COPY = {
     index: '04',
     kicker: 'NHGIS · HMDA · CHAS',
     title: 'Housing, credit, and cost burden',
-    lede: 'Cook County is our Phase 1 place spine: decennial homeownership (NHGIS), mortgage denial rates (HMDA), and HUD CHAS cost burden from the Consolidated Plan.',
+    lede: 'Cook County is the first county spine: decennial homeownership (NHGIS), mortgage denial rates (HMDA), and HUD CHAS cost burden from the Consolidated Plan.',
   },
   justice: {
     index: '05',
@@ -69,7 +69,7 @@ export const DATA_SECTION_COPY = {
   },
   themes: {
     index: '06',
-    kicker: 'Phase 1',
+    kicker: 'Coverage',
     title: 'Curated indicator coverage',
     lede: 'These indicators sit beside artifacts and policy eras in research packets. Data shows the numbers; Methodology explains how we juxtapose them without causal overclaim.',
   },

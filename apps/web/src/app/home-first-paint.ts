@@ -1,27 +1,38 @@
 /**
- * Featured first paint for `/`: one published record, never the release-wide catalog.
+ * First paint for `/` and `/place/[slug]`: one published place, never the 4,101 catalog.
  *
- * Live reads the entity the same way `/entity/[id]` does (`resolvePublicEntityView`).
- * That is a point-get, not a catalog pull. Seed mode reads the Dunbar cluster so CI
- * still paints a place when Greenwood is not in the fixture. Internal ids never title.
+ * Live reads are point-gets (`resolvePublicEntityView`). Seed reads the Dunbar cluster.
+ * Greenwood is last-resort fallback when no other place can be resolved. Internal ids
+ * never title and never appear in the address a reader follows.
  */
 import { listPublicArticleListItems, resolveCitesEdgeIndex } from '../lib/articles/source';
 import { shouldUseLivePublicProjections } from '../lib/public-data/live-policy';
 import { resolvePublicEntityView } from '../lib/public-data/source';
-import { getPublicEntity, type PublicEntityView } from '../data/public-seed';
+import { getPublicEntity, listPublicEntities, type PublicEntityView } from '../data/public-seed';
+import {
+  canStandHere,
+  isInternalRecordLabel,
+  isTulsaPlace,
+  publicPlaceSlug,
+} from '../lib/place/public-place-path';
 import { storiesCiting, type StoryCitation } from '../lib/release/build-cites-edge';
 import { pickLeadStory } from './stories/stories-index';
 import type { PublicArticleListItemDoc } from '@repo/schemas';
 
+export { isInternalRecordLabel } from '../lib/place/public-place-path';
+
 /**
- * Greenwood (Tulsa) first: a live published place. Dunbar and 15th Street are the seed
- * cluster so CI/seed still paints a place when Greenwood is not in the fixture.
+ * Places that hold, in stand order. Non-Tulsa first. Greenwood is last-resort
+ * fallback when no other published place can be resolved.
  */
-export const HOME_FEATURED_ENTITY_IDS = [
-  'ent_greenwood_district_001',
+export const HOME_STAND_CANDIDATE_IDS = [
   'ent_dunbar_school_001',
   'ent_15th_st_church_001',
+  'ent_greenwood_district_001',
 ] as const;
+
+/** @deprecated Use HOME_STAND_CANDIDATE_IDS. */
+export const HOME_FEATURED_ENTITY_IDS = HOME_STAND_CANDIDATE_IDS;
 
 export type HomeFirstPaintSource = 'live' | 'seed' | 'none';
 
@@ -33,67 +44,103 @@ export type HomeFirstPaintModel = {
   readonly source: HomeFirstPaintSource;
 };
 
-const TULSA_STORY = /tulsa|greenwood|black wall street/i;
+export type LoadHomeFirstPaintOptions = {
+  readonly namedSlug?: string;
+  /** When true, do not fall back to another place if the named slug misses. */
+  readonly requireNamed?: boolean;
+};
 
-/**
- * Opaque catalog tokens must never title first paint. `42Cb1758` is the live fail:
- * it is not a published record (`/records/42Cb1758` 404s) and it is not a story.
- */
-export function isInternalRecordLabel(value: string | undefined): boolean {
-  if (value === undefined) return true;
-  const trimmed = value.trim();
-  if (trimmed.length === 0) return true;
-  if (/^(ent|disc|art|pkg|rec|src)_/i.test(trimmed)) return true;
-  return (
-    !/\s/.test(trimmed) &&
-    /^[A-Za-z0-9_-]{6,32}$/.test(trimmed) &&
-    /\d/.test(trimmed) &&
-    /[A-Za-z]/.test(trimmed)
-  );
+function stands(entity: PublicEntityView): boolean {
+  return canStandHere(entity);
+}
+
+async function readById(id: string): Promise<{
+  readonly lead: PublicEntityView | undefined;
+  readonly source: HomeFirstPaintSource;
+}> {
+  if (shouldUseLivePublicProjections()) {
+    try {
+      const resolved = await resolvePublicEntityView(id);
+      if (resolved.data && stands(resolved.data)) {
+        return { lead: resolved.data, source: 'live' };
+      }
+    } catch {
+      // A failed point-get must not become a 4,101-row catalog pull.
+    }
+  }
+  const seeded = getPublicEntity(id);
+  if (seeded && stands(seeded)) return { lead: seeded, source: 'seed' };
+  return { lead: undefined, source: 'none' };
+}
+
+function seedBySlug(slug: string): PublicEntityView | undefined {
+  return listPublicEntities().find((entity) => publicPlaceSlug(entity.displayName) === slug);
+}
+
+async function readBySlug(slug: string): Promise<{
+  readonly lead: PublicEntityView | undefined;
+  readonly source: HomeFirstPaintSource;
+}> {
+  const trimmed = slug.trim();
+  if (trimmed.length === 0 || isInternalRecordLabel(trimmed) || trimmed.startsWith('ent_')) {
+    return { lead: undefined, source: 'none' };
+  }
+
+  const seeded = seedBySlug(trimmed);
+  if (seeded && stands(seeded)) {
+    if (!shouldUseLivePublicProjections()) return { lead: seeded, source: 'seed' };
+  }
+
+  for (const id of HOME_STAND_CANDIDATE_IDS) {
+    const resolved = await readById(id);
+    if (resolved.lead && publicPlaceSlug(resolved.lead.displayName) === trimmed) {
+      return resolved;
+    }
+  }
+
+  if (seeded && stands(seeded)) return { lead: seeded, source: 'seed' };
+  return { lead: undefined, source: 'none' };
+}
+
+async function loadLeadRecord(options: LoadHomeFirstPaintOptions = {}): Promise<{
+  readonly lead: PublicEntityView | undefined;
+  readonly source: HomeFirstPaintSource;
+}> {
+  const named = options.namedSlug?.trim();
+  if (named) {
+    const resolved = await readBySlug(named);
+    if (resolved.lead) return resolved;
+    if (options.requireNamed) return { lead: undefined, source: 'none' };
+  }
+
+  const picks: PublicEntityView[] = [];
+  const sources: HomeFirstPaintSource[] = [];
+  for (const id of HOME_STAND_CANDIDATE_IDS) {
+    const resolved = await readById(id);
+    if (resolved.lead) {
+      picks.push(resolved.lead);
+      sources.push(resolved.source);
+    }
+  }
+
+  const away = picks.findIndex((entity) => !isTulsaPlace(entity));
+  if (away >= 0) return { lead: picks[away], source: sources[away] ?? 'none' };
+  if (picks.length > 0) return { lead: picks[0], source: sources[0] ?? 'none' };
+  return { lead: undefined, source: 'none' };
 }
 
 export function pickHomeStory(
   items: readonly PublicArticleListItemDoc[],
 ): PublicArticleListItemDoc | undefined {
   const publishable = items.filter((item) => !isInternalRecordLabel(item.title));
-  const tulsa = publishable.find((item) =>
-    TULSA_STORY.test(
-      [item.title, item.summary, item.placeLabel, item.slug, ...(item.tags ?? [])].join(' '),
-    ),
-  );
-  return tulsa ?? pickLeadStory(publishable);
+  return pickLeadStory(publishable);
 }
 
-async function loadLeadRecord(): Promise<{
-  readonly lead: PublicEntityView | undefined;
-  readonly source: HomeFirstPaintSource;
-}> {
-  if (shouldUseLivePublicProjections()) {
-    for (const id of HOME_FEATURED_ENTITY_IDS) {
-      try {
-        const resolved = await resolvePublicEntityView(id);
-        if (resolved.data && !isInternalRecordLabel(resolved.data.displayName)) {
-          return { lead: resolved.data, source: 'live' };
-        }
-      } catch {
-        // A failed point-get must not become a 4,101-row catalog pull.
-      }
-    }
-    return { lead: undefined, source: 'none' };
-  }
-
-  for (const id of HOME_FEATURED_ENTITY_IDS) {
-    const seeded = getPublicEntity(id);
-    if (seeded && !isInternalRecordLabel(seeded.displayName)) {
-      return { lead: seeded, source: 'seed' };
-    }
-  }
-  return { lead: undefined, source: 'none' };
-}
-
-export async function loadHomeFirstPaint(): Promise<HomeFirstPaintModel> {
+export async function loadHomeFirstPaint(
+  options: LoadHomeFirstPaintOptions = {},
+): Promise<HomeFirstPaintModel> {
   const [{ lead, source }, articles, cites] = await Promise.all([
-    loadLeadRecord(),
+    loadLeadRecord(options),
     listPublicArticleListItems(),
     resolveCitesEdgeIndex(),
   ]);

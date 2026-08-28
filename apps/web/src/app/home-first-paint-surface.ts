@@ -4,10 +4,7 @@
  * rights-clearance captions, and "from their record" never print here.
  */
 import type { PublicEntityView, RelatedNeighborView } from '../data/public-seed';
-import {
-  ERA_NOT_DOCUMENTED_LABEL,
-  entityEraFact,
-} from '../lib/map-experience/entity-era-facts';
+import { ERA_NOT_DOCUMENTED_LABEL, entityEraFact } from '../lib/map-experience/entity-era-facts';
 import type { StoryCitation } from '../lib/release/build-cites-edge';
 import { isInternalRecordLabel } from './home-first-paint';
 
@@ -17,7 +14,15 @@ const PLACE_RELATIONS = new Set(['located_at', 'located_in', 'occurred_at', 'par
 
 const LAW_KINDS = new Set(['law', 'case']);
 
-export const DOOR_ROOM_IDS = ['stories', 'law', 'data', 'memorial'] as const;
+export const DOOR_ROOM_IDS = [
+  'stories',
+  'law',
+  'data',
+  'books',
+  'memorial',
+  'methodology',
+  'errata',
+] as const;
 export type DoorRoomId = (typeof DOOR_ROOM_IDS)[number];
 
 export type DoorRoom = {
@@ -25,6 +30,14 @@ export type DoorRoom = {
   readonly label: string;
   readonly href: string;
 };
+
+/** Rooms `/about` names that stay up even when this place is thin. */
+export const ARCHIVE_DOOR_ROOMS: readonly DoorRoom[] = [
+  { id: 'data', label: 'Data', href: '/data' },
+  { id: 'books', label: 'Banned books', href: '/books' },
+  { id: 'methodology', label: 'Methodology', href: '/methodology' },
+  { id: 'errata', label: 'Errata', href: '/errata' },
+];
 
 export function containsInternalId(value: string | undefined): boolean {
   if (value === undefined) return false;
@@ -37,11 +50,7 @@ export function containsInternalId(value: string | undefined): boolean {
 export function humanPlaceLine(entity: PublicEntityView): string | undefined {
   const location = entity.locationLabel.trim();
   const jurisdiction = entity.jurisdictionLabel.trim();
-  if (
-    location.length > 0 &&
-    !containsInternalId(location) &&
-    !SHOP_LOCATION.test(location)
-  ) {
+  if (location.length > 0 && !containsInternalId(location) && !SHOP_LOCATION.test(location)) {
     return location;
   }
   if (
@@ -217,16 +226,20 @@ export function selectDoorRooms(
   if (neighborsOf(entity, LAW_KINDS).length > 0) {
     rooms.push({ id: 'law', label: 'Law', href: '#law' });
   }
-  // Data stays unlinked until this record has place-specific series. National
-  // packets (wealth gap, census edition) are not Greenwood's numbers.
+  rooms.push(ARCHIVE_DOOR_ROOMS[0]!);
+  rooms.push(ARCHIVE_DOOR_ROOMS[1]!);
   if (neighborsOf(entity, new Set(['person'])).length > 0) {
     rooms.push({ id: 'memorial', label: 'Memorial', href: '#memorial' });
   }
+  rooms.push(ARCHIVE_DOOR_ROOMS[2]!);
+  rooms.push(ARCHIVE_DOOR_ROOMS[3]!);
   return rooms;
 }
 
 export function publishableCitingStories(
   citing: readonly StoryCitation[],
 ): readonly StoryCitation[] {
-  return citing.filter((story) => story.title.trim().length > 0 && !containsInternalId(story.title));
+  return citing.filter(
+    (story) => story.title.trim().length > 0 && !containsInternalId(story.title),
+  );
 }

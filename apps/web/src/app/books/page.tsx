@@ -122,6 +122,7 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
           </>
         }
         actions={[
+          { label: 'The place', href: '/' },
           { label: 'Open the Atlas', href: ATLAS_INSTRUMENT_HREF, emphasis: 'copper' },
           { label: 'Search the archive', href: '/records' },
         ]}

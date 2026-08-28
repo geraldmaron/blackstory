@@ -27,6 +27,24 @@ test('LinkedProse renders entity href from [[entityId]] markup', () => {
   assert.match(html, /href="\/entity\/ent_15th_st_church_001"/);
 });
 
+test('LinkedProse can emit a public place address instead of an entity id', () => {
+  const html = renderToStaticMarkup(
+    createElement(LinkedProse, {
+      text: 'Worship continued at Fifteenth Street Presbyterian Church.',
+      catalog: [
+        { id: 'ent_15th_st_church_001', displayName: 'Fifteenth Street Presbyterian Church' },
+      ],
+      hrefFor: (entry) =>
+        `/place/${entry.label
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '')}`,
+    }),
+  );
+  assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church"/);
+  assert.doesNotMatch(html, /href="\/entity\//);
+});
+
 test('LinkedProse linkifies plain text against catalog when no markup is present', () => {
   const html = renderToStaticMarkup(
     createElement(LinkedProse, {

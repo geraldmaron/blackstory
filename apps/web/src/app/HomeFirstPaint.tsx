@@ -1,9 +1,10 @@
 /**
- * Server-rendered front door: the featured place's record, using the existing record room.
+ * Server-rendered front door: one published place's record, using the existing record room.
  *
- * Not a manifesto, not a schema card, and not the Atlas board. Greenwood (live) or the
- * seed place is the page: mast, locator, and history. Stories, Law, Data, and
- * Memorial exist only when this record already has material for that room.
+ * Not a manifesto, not a schema card, and not the Atlas board. The place is whoever
+ * can be stood at (named slug, last stand, then a published record). Greenwood is
+ * last-resort fallback only. Archive rooms stay up even when the place is thin.
+ * Stories, Law, and Memorial exist only when this record already has that material.
  * No schema strip, no confidence badge, no precision leak, no second record page.
  */
 import React from 'react';
@@ -16,6 +17,7 @@ import { Connections, OffRamp, Room } from '../components/room';
 import { geoAnchorFor } from '../lib/map-experience/entity-geo';
 import type { PublicEntityView, RelatedNeighborView } from '../data/public-seed';
 import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
+import { neighborHref, placeHref } from '../lib/place/public-place-path';
 import { isInternalRecordLabel, type HomeFirstPaintModel } from './home-first-paint';
 import {
   firstPaintEraLine,
@@ -55,11 +57,7 @@ function neighborsOfKind(
   );
 }
 
-function DoorRooms({
-  rooms,
-}: {
-  readonly rooms: ReturnType<typeof selectDoorRooms>;
-}) {
+function DoorRooms({ rooms }: { readonly rooms: ReturnType<typeof selectDoorRooms> }) {
   if (rooms.length === 0) return null;
   const actions = rooms.map((room, index) => ({
     href: room.href,
@@ -69,7 +67,7 @@ function DoorRooms({
   const names = rooms.map((room) => room.label).join(', ');
   return (
     <OffRamp title={names} actions={actions}>
-      What this place already holds.
+      Open a room from this place, then come back.
     </OffRamp>
   );
 }
@@ -112,6 +110,7 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
                   text={lead.summary}
                   skipEntityIds={[lead.id]}
                   catalog={catalog}
+                  hrefFor={(entry) => placeHref(entry.label)}
                 />
               </p>
             </figcaption>
@@ -161,7 +160,7 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
               connections={lawNeighbors.map((neighbor) => ({
                 name: neighbor.displayName,
                 relation: firstPaintRelation(neighbor, lead) ?? '',
-                href: `/entity/${neighbor.id}`,
+                href: neighborHref(neighbor),
               }))}
             />
           </section>
@@ -176,7 +175,7 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
               connections={memorialNeighbors.map((neighbor) => ({
                 name: neighbor.displayName,
                 relation: firstPaintRelation(neighbor, lead) ?? '',
-                href: `/entity/${neighbor.id}`,
+                href: neighborHref(neighbor),
               }))}
             />
           </section>

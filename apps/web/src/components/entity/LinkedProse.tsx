@@ -6,6 +6,7 @@
 
 import React from 'react';
 import type { ReactNode } from 'react';
+import Link from 'next/link';
 import {
   linkifyProseAgainstCatalog,
   parseProseEntityLinks,
@@ -24,6 +25,8 @@ export type LinkedProseProps = {
   readonly skipEntityIds?: readonly string[];
   readonly catalog?: readonly EntityLinkCatalogEntry[];
   readonly as?: 'p' | 'span' | 'div';
+  /** Override the default `/entity/{id}` address. First paint uses `/place/{slug}`. */
+  readonly hrefFor?: (entry: { readonly entityId: string; readonly label: string }) => string;
 };
 
 type ProseSegment =
@@ -103,11 +106,25 @@ export function LinkedProse({
   skipEntityIds,
   catalog,
   as: Tag = 'p',
+  hrefFor,
 }: LinkedProseProps) {
   const segments = toSegments(text, catalog, skipEntityIds);
   const children: ReactNode[] = segments.map((segment, index) => {
     if (segment.kind === 'text') {
       return <React.Fragment key={`t-${index}`}>{segment.text}</React.Fragment>;
+    }
+    const href = hrefFor?.({ entityId: segment.entityId, label: segment.label });
+    if (href) {
+      return (
+        <Link
+          key={`l-${index}-${segment.entityId}`}
+          href={href}
+          className="ds-entity-link"
+          prefetch={false}
+        >
+          {segment.label}
+        </Link>
+      );
     }
     return (
       <EntityLink key={`l-${index}-${segment.entityId}`} entityId={segment.entityId}>
