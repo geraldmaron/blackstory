@@ -34,6 +34,10 @@ test('the sitemap never advertises a URL that redirects', () => {
   assert.ok(!urls.some((url) => url.endsWith('/explore')));
   // `/history` 308s into `/records` for the same reason.
   assert.ok(!urls.some((url) => url.endsWith('/history')));
+  assert.ok(!urls.some((url) => url.endsWith('/journey')));
+  // `/records/<id>` is not a record page (verified 2026-08-28: /records/42Cb1758 is HTTP 404).
+  // Published records are `/entity/<id>`. Do not advertise a records-id URL.
+  assert.ok(!urls.some((url) => /\/records\/[^/?#]+/.test(url)));
   assert.ok(urls.some((url) => url === 'https://blackbook.example/'));
 });
 
@@ -128,4 +132,6 @@ test('buildPublicSitemapEntries adds entity pages from the active release catalo
   assert.ok(entity);
   assert.equal(entity?.changeFrequency, 'weekly');
   assert.equal(entity?.priority, 0.8);
+  assert.ok(!entries.some((entry) => /\/records\/[^/?#]+/.test(entry.url)));
+  assert.ok(!entries.some((entry) => entry.url.includes('42Cb1758')));
 });

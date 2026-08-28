@@ -2,4 +2,4 @@
 2:I[37302,["/blackstory/_next/static/chunks/13m8d36xc7t9s.js","/blackstory/_next/static/chunks/03obgaj591_9a.js"],"default"]
 3:I[6918,["/blackstory/_next/static/chunks/13m8d36xc7t9s.js","/blackstory/_next/static/chunks/03obgaj591_9a.js"],"default"]
 4:[]
-0:{"rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"isPartial":false,"staleTime":300,"varyParams":"$W4","buildId":"ksbhos1Bragw98rnw7AFO"}
+0:{"rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"isPartial":false,"staleTime":300,"varyParams":"$W4","buildId":"yuuD63I0OldEjDA3acYkx"}

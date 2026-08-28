@@ -37,9 +37,10 @@ export function usePanelVisibility() {
   /**
    * The Atlas opens in the instrument unless a link asked for the story.
    *
-   * Rooms outside the map carry Journey in the bar as `/#journey`, because there is no surface
-   * there to toggle. A fragment rather than a query param: `/` normalizes its query at the edge
-   * against the explore allowlist, so a param would be stripped before this ran.
+   * `/#journey` is still honoured for bookmarks. It is not advertised: `/journey` is a 404
+   * (verified 2026-08-28) and rooms outside the map no longer ship a Journey link. A fragment
+   * rather than a query param: `/` normalizes its query at the edge against the explore
+   * allowlist, so a param would be stripped before this ran.
    *
    * `#story` is still honoured. It was the fragment this mode shipped under, so it is sitting in
    * bookmarks and in any link already shared; a renamed label is no reason to break them, and a

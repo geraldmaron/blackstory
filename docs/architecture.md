@@ -22,6 +22,14 @@ The live homepage is a catalog filter board (Kind / Tone / Era / Theme / Status 
 Where), about 4,100 released records. The product line *History, pinned to place* is the design
 target (Nova owns the reset), not a description of that page.
 
+`/journey` is unfinished. Apex and www return HTTP 404 (verified 2026-08-28). Do not add it
+to nav, about, sitemap, or in-app links. There is no public Journey source beyond that 404.
+Felix owns first-paint; do not invent the page here.
+
+`/records/42Cb1758` is not a published record (HTTP 404, verified 2026-08-28). Record pages
+are `/entity/<id>`. The first-paint list title that shows that id is an internal identifier,
+not a story. Do not invent the page or restyle first paint here.
+
 This repo only configures Supabase project `blackstory-app`. Other org Pro projects are not in
 this config, so unused is not proven here. Docs agreement is not a billing close.
 

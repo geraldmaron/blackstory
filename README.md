@@ -20,6 +20,10 @@ Checked against live https://blackstory.app/ headers and CSP, not against a bill
 
 The live front door is a catalog filter board (Kind / Tone / Era / Theme / Status / Confidence / Where), on the order of 4,100 released records. The product line above is the design target (Nova owns the reset). It is not a claim that today's homepage already works as map-first story-finding.
 
+`/journey` is not a live room. Verified 2026-08-28: `https://blackstory.app/journey` and `https://www.blackstory.app/journey` return HTTP 404 (`x-matched-path: /404`). Do not advertise that address. `/about` "Where to begin" already omits unfinished rooms. There is no public Journey source beyond that 404. Felix owns first-paint; this repo does not invent a Journey page.
+
+`/records/42Cb1758` is not a published record. Verified 2026-08-28: `https://blackstory.app/records/42Cb1758` returns HTTP 404 (`x-matched-path: /404`). Public record pages live at `/entity/<id>`. The live first-paint list title that shows that id is an internal identifier, not a story. Do not invent the page. The id leak is Felix's first-paint branch.
+
 This repo's config names **one** Supabase project: `blackstory-app`. Other Dagher-org Supabase Pro projects are not referenced here, so this audit does not call them unused. Aligning docs on Vercel + Supabase does not close overages or standing bills. Cover-package work belongs on administration-app, not this repo.
 
 Historical ADRs and wind-down notes stay in the tree. If they still read as current hosting or SoR, treat them as leftover unless they match this table.

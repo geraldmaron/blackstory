@@ -165,6 +165,19 @@ describe('destination registry · the footer is derived, not authored', () => {
     assert.ok(hrefs.includes('/library'));
     assert.ok(hrefs.includes('/records'));
     assert.ok(!hrefs.includes('/history'));
+    assert.ok(!hrefs.includes('/journey'));
+    assert.ok(!hrefs.includes('/records/42Cb1758'));
+  });
+
+  it('does not register /journey, which is an unfinished 404', () => {
+    assert.equal(destinationFor('/journey'), undefined);
+    assert.ok(!allDestinations().some((destination) => destination.path === '/journey'));
+  });
+
+  it('does not register /records/<id>, which is not a record page', () => {
+    // Verified 2026-08-28: /records/42Cb1758 is HTTP 404. Published records are /entity/<id>.
+    assert.equal(destinationFor('/records/42Cb1758'), undefined);
+    assert.ok(!allDestinations().some((destination) => destination.path.startsWith('/records/')));
   });
 
   it('lists every carded destination exactly once', () => {

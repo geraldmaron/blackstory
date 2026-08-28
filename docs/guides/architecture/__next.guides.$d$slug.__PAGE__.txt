@@ -1,7 +1,7 @@
 1:"$Sreact.fragment"
 5:I[99990,["/blackstory/_next/static/chunks/13m8d36xc7t9s.js","/blackstory/_next/static/chunks/03obgaj591_9a.js"],"OutletBoundary"]
 6:"$Sreact.suspense"
-2:T156d,<h1 id="architecture"><a class="heading-anchor" href="#architecture">Architecture</a></h1>
+2:T17d1,<h1 id="architecture"><a class="heading-anchor" href="#architecture">Architecture</a></h1>
 <p>BlackStory is a place-connected Black history research platform. Public surfaces
 serve only released historical projections. Research, evidence, and promotion
 stay behind private APIs, workers, and admin tools.</p>
@@ -39,6 +39,14 @@ Firestore as the system of record are leftover.</p>
 Confidence / Where), about 4,100 released records. The product line <em>History,
 pinned to place</em> is the design target. It is not a claim that today's front door
 already works as map-first story-finding.</p>
+<p><code>/journey</code> is not a live room. Apex and www return HTTP 404 (verified 2026-08-28).
+Do not advertise it. <code>/about</code> already omits unfinished rooms. There is no public
+Journey source beyond that 404. Felix owns first-paint; this site does not invent
+a Journey page.</p>
+<p><code>/records/42Cb1758</code> is not a published record (HTTP 404, verified 2026-08-28).
+Public record pages live at <code>/entity/&#x3C;id></code>. The live first-paint list title that
+shows that id is an internal identifier, not a story. Do not invent the page.
+The id leak is first-paint work, not this guide.</p>
 <p>This repository only configures Supabase project <code>blackstory-app</code>. Other org Pro
 projects are not named in repo config, so unused is not proven here. Aligning
 docs on Vercel + Supabase does not close overages or standing bills.</p>
@@ -115,7 +123,7 @@ bump, not by an HTTP write API.</p>
 <h2 id="formal-decisions"><a class="heading-anchor" href="#formal-decisions">Formal decisions</a></h2>
 <p>Architecture decision records were removed from the repository 2026-07-24.
 History is in git. Still-binding invariants live in
-<code>docs/decisions-carryover.md</code>.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"concepts"}]]}],["$","p",null,{"className":"doc-lede","children":"Current stack, surfaces, and non-negotiable boundaries."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"ksbhos1Bragw98rnw7AFO"}
+<code>docs/decisions-carryover.md</code>.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"concepts"}]]}],["$","p",null,{"className":"doc-lede","children":"Current stack, surfaces, and non-negotiable boundaries."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"yuuD63I0OldEjDA3acYkx"}
 3:["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","architecture",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]
 4:["$","$L5",null,{"children":["$","$6",null,{"name":"Next.MetadataOutlet","children":"$@7"}]}]
 7:null

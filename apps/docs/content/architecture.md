@@ -28,6 +28,16 @@ Confidence / Where), about 4,100 released records. The product line *History,
 pinned to place* is the design target. It is not a claim that today's front door
 already works as map-first story-finding.
 
+`/journey` is not a live room. Apex and www return HTTP 404 (verified 2026-08-28).
+Do not advertise it. `/about` already omits unfinished rooms. There is no public
+Journey source beyond that 404. Felix owns first-paint; this site does not invent
+a Journey page.
+
+`/records/42Cb1758` is not a published record (HTTP 404, verified 2026-08-28).
+Public record pages live at `/entity/<id>`. The live first-paint list title that
+shows that id is an internal identifier, not a story. Do not invent the page.
+The id leak is first-paint work, not this guide.
+
 This repository only configures Supabase project `blackstory-app`. Other org Pro
 projects are not named in repo config, so unused is not proven here. Aligning
 docs on Vercel + Supabase does not close overages or standing bills.

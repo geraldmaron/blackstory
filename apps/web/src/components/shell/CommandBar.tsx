@@ -51,8 +51,8 @@ function searchLabel(recordCount: number | undefined): string {
 export type CommandBarProps = {
   /**
    * Present only on the Atlas, where Atlas and Journey are two views of one surface. Every other
-   * room renders the same bar without them: a reading room has no story to switch into, and a
-   * toggle that navigates instead of switching would be lying about what it does.
+   * room omits the pair: `/journey` is not a finished room, and a link that pretends it is would
+   * advertise a 404. Felix/Nova own first-paint; this prop does not invent a Journey page.
    */
   readonly mode?: AtlasMode;
   readonly onModeChange?: (mode: AtlasMode) => void;
@@ -120,49 +120,28 @@ export function CommandBar({
       )}
 
       <div className="ds-bar__tools">
-        <nav className="ds-bar__modes" aria-label="Sections">
-          {mode && onModeChange ? (
-            <>
-              <button
-                type="button"
-                onClick={() => onModeChange('atlas')}
-                aria-current={mode === 'atlas' ? 'true' : undefined}
-              >
-                Atlas
-              </button>
-              <button
-                type="button"
-                onClick={() => onModeChange('story')}
-                aria-current={mode === 'story' ? 'true' : undefined}
-              >
-                Journey
-              </button>
-            </>
-          ) : (
-            /* Off the Atlas the two modes are still offered, as links rather than toggles: there is
-               no surface here to switch, so each one navigates to the Atlas and arrives in the mode
-               it names. Dropping Journey outside the map would make it look like a feature of one
-               page rather than a way into the archive.
+        {mode && onModeChange ? (
+          <nav className="ds-bar__modes" aria-label="Sections">
+            <button
+              type="button"
+              onClick={() => onModeChange('atlas')}
+              aria-current={mode === 'atlas' ? 'true' : undefined}
+            >
+              Atlas
+            </button>
+            <button
+              type="button"
+              onClick={() => onModeChange('story')}
+              aria-current={mode === 'story' ? 'true' : undefined}
+            >
+              Journey
+            </button>
+          </nav>
+        ) : null}
 
-               A fragment, not a query param: `/` normalizes its query at the edge against the
-               explore allowlist, so `?mode=journey` would be stripped before the page ever ran
-               and the link would land on a plain Atlas. A fragment never reaches the server, so it
-               cannot be stripped and cannot split the cache key either. */
-            <>
-              <Link className="ds-bar__mode-link ds-bar__mode-link--first" href="/">
-                Atlas
-              </Link>
-              <Link className="ds-bar__mode-link" href="/#journey">
-                Journey
-              </Link>
-            </>
-          )}
-        </nav>
-
-        {/* Library sits outside the mode group. Atlas and Journey are two views of one surface;
-            the library is every other room, and it opens rather than navigates — a reader
-            choosing a room wants to see the rooms first. Every entry inside is a real link,
-            including /library itself, so nothing here is unreachable to a crawler. */}
+        {/* Library sits outside the mode group. Atlas and Journey are two views of one surface
+            when that surface is mounted. `/journey` is not a room (404 as of 2026-08-28); do
+            not advertise it from other pages. The library is every finished room. */}
         <LibraryMenu recordCount={recordCount} />
 
         {onOpenSaved ? (

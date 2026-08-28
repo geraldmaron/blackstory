@@ -84,3 +84,15 @@ describe('the shell above the error boundary', () => {
     assert.doesNotMatch(code('components/SiteShell.tsx'), /loadMapStageBase/);
   });
 });
+
+describe('Journey is not advertised as a room', () => {
+  it('the off-Atlas bar does not link to /journey or /#journey', () => {
+    // Verified 2026-08-28: /journey is HTTP 404 on apex and www. About already refuses to
+    // list unfinished rooms. A CommandBar href would undo that.
+    const source = code('components/shell/CommandBar.tsx');
+    assert.doesNotMatch(source, /href=["']\/journey["']/);
+    assert.doesNotMatch(source, /href=["']\/#journey["']/);
+    // /records/42Cb1758 is also a verified 404; the bar must not mint record-id URLs.
+    assert.doesNotMatch(source, /\/records\/42Cb1758/);
+  });
+});
