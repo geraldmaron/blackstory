@@ -195,6 +195,7 @@ test('the security/normalization surface is unchanged by the widened matcher', (
     '/',
     '/search',
     '/entity/abc',
+    '/place/abc',
     '/law',
     '/law/x',
     '/legal',

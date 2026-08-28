@@ -125,6 +125,7 @@ test('every folded path reaches its surface in exactly one hop', () => {
     ['/myths/anything', '/methodology'],
     ['/legal', '/law'],
     ['/map', '/explore'],
+    ['/banned-books', '/books'],
   ] as const;
 
   for (const [from, to] of oneHop) {

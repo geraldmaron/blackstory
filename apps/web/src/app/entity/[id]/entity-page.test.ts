@@ -1,7 +1,7 @@
 /**
- * Entity page wiring, now that the record renders as a v9 Record room rather than a v6 edition
- * stack: kit composition, the rail/column split, fail-closed media and map states, and the
- * no-repeated-summary rule the rebuild exists to enforce.
+ * Legacy `/entity/{id}` is a hop to `/place/{slug}`. The record room lives on the
+ * place door. This file keeps the ISR / empty-static-params guard and the
+ * column rules that first paint still mounts.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -21,62 +21,12 @@ const mediaSource = readFileSync(
   'utf8',
 );
 
-test('entity page renders through the room kit, not the retired v6 edition chrome', () => {
-  assert.match(pageSource, /<Room\n\s+rail=\{rail\}/);
-  assert.match(pageSource, /foot=\{apparatus\}/);
-  assert.match(pageSource, /masthead=\{/);
-  assert.doesNotMatch(pageSource, /entityEditionRootClassName/);
-  assert.doesNotMatch(pageSource, /entityEditionPanelClassName/);
-  assert.doesNotMatch(pageSource, /data-entity-edition/);
-  assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
-  // The measure and the centring belong to the `record` surface class, not to this route.
-  assert.doesNotMatch(pageSource, /ds-container ds-page/);
-});
-
-test('the apparatus is in the band, the facts are in the strip, the reading is in the column', () => {
-  // Sources, provenance and the research gaps are what a reader checks, not what they came for,
-  // so they sit under the record. The rail keeps only the locator and the table of contents.
-  const apparatus = /const apparatus = \([\s\S]*?\n {2}\);/.exec(pageSource)?.[0] ?? '';
-  assert.ok(apparatus.length > 0, 'the apparatus band should exist');
-  for (const block of ['<SourceList', '<TrustBlock', 'Still researching', 'Why this is here']) {
-    assert.match(apparatus, new RegExp(block), `${block} belongs in the apparatus band`);
-  }
-
-  const rail = /const rail = \([\s\S]*?\n {2}\);/.exec(pageSource)?.[0] ?? '';
-  assert.ok(rail.length > 0, 'the rail should exist');
-  assert.match(rail, /<Precision/);
-  assert.match(rail, /ds-record-toc/);
-  assert.doesNotMatch(rail, /<SourceList|<TrustBlock/);
-
-  // The four orientation facts are one strip under the masthead, not four boxes down the rail.
-  assert.match(pageSource, /ds-record-strip/);
-  assert.match(pageSource, /buildEntityAnatomyInputs/);
-  assert.match(pageSource, /EntityRoomSections/);
-});
-
-test('the summary is the lede and is never restated as a section', () => {
-  // The v6 page printed it three times: lede, "Inclusion evidence", and the accepted claim.
-  assert.match(pageSource, /ds-record-mast__lede[\s\S]*?entity\.summary/);
-  assert.doesNotMatch(sectionsSource, /entity\.summary/);
-  assert.doesNotMatch(pageSource, /WhyThisAppears/);
-});
-
-test('the location is drawn once, and as a static locator rather than a live camera', () => {
-  const rendered = pageSource.match(/<RecordPlacePreview/g) ?? [];
-  assert.equal(rendered.length, 1, 'the record must not render two maps for one place');
-  assert.doesNotMatch(pageSource, /RecordAnatomyPanel/);
-
-  // Still one GL context on a record page, and now zero. Matched on imports rather than on the
-  // whole file: the module's history note names both components it replaced, and a prose mention
-  // is not a mount.
-  assert.doesNotMatch(placeSource, /^import .*maplibre-gl/m);
-  assert.doesNotMatch(placeSource, /^import .*EntityLocationMap/m);
-  // The borrowed plate is `position: fixed` and chases its slot's rect every scroll frame, which
-  // tore visibly in a 240px rail and flickered as the slot crossed the moment visibility floor.
-  // A moment here is the regression, not a refactor: reinstating it reinstates both.
-  assert.doesNotMatch(placeSource, /^import .*MapMoment/m);
-  assert.doesNotMatch(placeSource, /<MapMoment/);
-  assert.match(placeSource, /<RecordLocator/);
+test('entity addresses 308 to the public place slug', () => {
+  assert.match(pageSource, /permanentRedirect\(placeHref/);
+  assert.match(pageSource, /from '\.\.\/\.\.\/\.\.\/lib\/place\/public-place-path'/);
+  assert.doesNotMatch(pageSource, /<Room/);
+  assert.doesNotMatch(pageSource, /getSharedPublicEntities|listPublicEntityViews\(/);
+  assert.doesNotMatch(pageSource, /getPublicSearchIndex/);
 });
 
 test('a beat renders only when the record has that content', () => {
@@ -86,48 +36,24 @@ test('a beat renders only when the record has that content', () => {
   assert.doesNotMatch(sectionsSource, /<RecordGapNotice/);
 });
 
-test('gaps are disclosed once, in the rail, in the approved vocabulary', () => {
-  assert.match(pageSource, /RECORD_GAP_COPY/);
-  assert.match(pageSource, /resolveRecordGaps/);
-  assert.match(pageSource, /not an absence of history/);
-});
-
 test('a related record states its relation in words', () => {
   assert.match(sectionsSource, /relationPhrase/);
   assert.match(sectionsSource, /<Connections/);
 });
 
-test('entity page preserves session nav and stays CDN-cacheable', () => {
-  assert.match(pageSource, /EntitySessionNavClient/);
-  // force-dynamic made Next send `private, no-cache, no-store` on every response, which
-  // overrode the s-maxage=3600 rule next.config.mjs declares for this route: x-vercel-cache
-  // was MISS on 100% of entity requests. ISR is what lets the CDN serve them.
+test('first-paint neighbor hrefs stay off internal ids', () => {
+  assert.match(sectionsSource, /neighborHref/);
+  assert.doesNotMatch(sectionsSource, /firstPaint \? `\/entity\/\$\{neighbor\.id\}`/);
+});
+
+test('entity page stays CDN-cacheable and prerenders nothing', () => {
   assert.match(pageSource, /export const revalidate = 3600/);
   assert.match(pageSource, /export const dynamicParams = true/);
   assert.doesNotMatch(pageSource, /export const dynamic = 'force-dynamic'/);
-});
-
-test('entity generateStaticParams prerenders nothing', () => {
-  // Guardrail, not a style preference. On Vercel DATABASE_URL is present at build, so a
-  // generateStaticParams that enumerates the search index would pull the full catalog and
-  // prerender ~4,092 pages on every build. It was inert under force-dynamic; under
-  // revalidate it is not.
   const body = /generateStaticParams\(\)[\s\S]*?\n}/.exec(pageSource)?.[0] ?? '';
   assert.ok(body.length > 0, 'generateStaticParams should exist');
   assert.match(body, /return \[\];/);
   assert.doesNotMatch(body, /getPublicSearchIndex/);
-});
-
-test('the masthead renders whether or not there is a photograph', () => {
-  // The mast is the page's opening block now, so it cannot be conditional on the photo: with no
-  // image `EntityMastMedia` draws the kind mark, and the title and facts read the same over
-  // either. What stays conditional is the `primaryImage` prop itself.
-  assert.match(pageSource, /entity\.primaryImage !== undefined \? \{ primaryImage/);
-  assert.match(pageSource, /className="ds-record-mast"/);
-  // A mark is not a photograph, and the masthead says which it is holding: a mark keeps its own
-  // proportion in a short band with the record written under it, never stretched full bleed
-  // under display type it cannot carry.
-  assert.match(pageSource, /data-media=\{entity\.primaryImage !== undefined \? 'photo' : 'mark'\}/);
 });
 
 test('entity media fail-closed: mark fallback on photo exhaustion', () => {
@@ -137,21 +63,10 @@ test('entity media fail-closed: mark fallback on photo exhaustion', () => {
 });
 
 test('entity map fail-closed: the place block still makes its point with no plate', () => {
-  // The degrade moved with the map, twice. `EntityLocationMap` owned a WebGL-unavailable message
-  // because it built its own context; the `MapMoment` version owned an idle line for a plate that
-  // was never coming on the Atlas sheet. The locator needs neither: it is a mask over an ordinary
-  // block, so there is no context to lose and nothing to wait for. What has to survive is the
-  // words, because a coordinate outside the projection renders no graphic at all.
   assert.match(placeSource, /<figcaption className="ds-record-anatomy__place-caption">\{label\}/);
   assert.doesNotMatch(placeSource, /idle=/);
-  // And it says it once. The panel links its own WHERE fact out to maps and the page prints an
-  // `Open in maps` CTA under this block, so a third copy inside the figure was the same
-  // destination offered three times in one rail.
-  // Matched on the import, not the file: the module doc explains where the link went, and that
-  // sentence is not a link.
   assert.doesNotMatch(placeSource, /^import .*MapsExternalLink/m);
   assert.doesNotMatch(placeSource, /<MapsExternalLink/);
-  assert.match(pageSource, /Open in maps/);
 });
 
 test('entity user-facing copy avoids em dashes on touched surfaces', () => {

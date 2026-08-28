@@ -1,6 +1,6 @@
 /**
- * Data page: national Census population plus Phase 1 / theme-impact indicator visualizations
- * (wealth, housing, justice). Charts wire to warehouse observations or verified fixtures.
+ * Data page: national Census population plus published indicator charts
+ * (wealth, housing, justice). Every chart names its source.
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
@@ -112,11 +112,14 @@ export default async function DataPage() {
       />
 
       <OffRamp
-        title="Go to the record index"
-        actions={[{ label: 'Search the record index', href: '/records', emphasis: 'copper' }]}
+        title="Back to the place"
+        actions={[
+          { label: 'The place', href: '/', emphasis: 'copper' },
+          { label: 'Search the record index', href: '/records' },
+        ]}
       >
-        Every number here is a national or Phase 1 series. For the records behind a place, use the
-        record index.
+        Every number here is a national series. For the records behind a place, use the record
+        index.
       </OffRamp>
     </Room>
   );

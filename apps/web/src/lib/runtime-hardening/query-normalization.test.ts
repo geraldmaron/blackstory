@@ -342,6 +342,13 @@ test('normalizeQueryString strips atlas=1 on `/` so the catalog cannot hide behi
   assert.equal(needsQueryNormalizationRedirect(new URL('https://example.com/?atlas=1')), true);
 });
 
+test('normalizeQueryString keeps a named stand on `/` and drops the rest', () => {
+  assert.equal(
+    normalizeQueryString('/', { at: 'fifteenth-street-presbyterian-church', atlas: '1' }),
+    'at=fifteenth-street-presbyterian-church',
+  );
+});
+
 test('buildNormalizedUrl issues canonical Atlas URLs on /explore', () => {
   const normalized = buildNormalizedUrl(
     new URL('https://example.com/explore?utm_source=x&state=va&group=true&lines=1'),

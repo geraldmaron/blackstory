@@ -51,6 +51,7 @@ export default function ErrataPage() {
       <OffRamp
         title="Verify in the archive"
         actions={[
+          { label: 'The place', href: '/' },
           { label: 'Request a correction', href: '/corrections', emphasis: 'copper' },
           { label: 'How we correct the record', href: '/methodology' },
         ]}

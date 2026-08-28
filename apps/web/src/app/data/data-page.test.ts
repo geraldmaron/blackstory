@@ -46,6 +46,27 @@ test('data page keeps section anchors for on-page navigation', () => {
   }
 });
 
+test('data user-facing copy does not leak Phase 1 or warehouse', () => {
+  const strings = [
+    DATA_PAGE_DESCRIPTION,
+    DATA_INTRO.kicker,
+    DATA_INTRO.lede,
+    ...DATA_ORIENTATION_BEATS.flatMap((beat) => [beat.kicker, beat.body]),
+    ...Object.values(DATA_SECTION_COPY).flatMap((section) => [
+      section.kicker,
+      section.title,
+      section.lede,
+    ]),
+    ...DATA_PAGE_SECTIONS.map((section) => section.label),
+  ];
+  for (const value of strings) {
+    assert.doesNotMatch(value, /Phase 1|warehouse/i);
+  }
+  assert.doesNotMatch(copySource, /Phase 1|warehouse/i);
+  assert.doesNotMatch(pageSource, /Phase 1|warehouse/i);
+  assert.doesNotMatch(sectionsSource, /Phase 1|warehouse/i);
+});
+
 test('data user-facing copy avoids em dashes', () => {
   const strings = [
     DATA_PAGE_DESCRIPTION,

@@ -66,6 +66,7 @@ const SURFACE_CLASS_PREFIXES: readonly (readonly [string, SurfaceClass])[] = [
   // both are API-only directories, and the appeal and abuse forms are mounted inside the receipt
   // status page. Classifying them promised chrome for two URLs that 404 (SP-19, repo-92n2.19).
   ['/stories/', 'reading'],
+  ['/place/', 'record'],
   ['/entity/', 'record'],
   ['/books/', 'record'],
   ['/law/', 'record'],
@@ -80,6 +81,7 @@ export const ENDPOINT_ROUTES: readonly string[] = [
   '/facts',
   '/search',
   '/map',
+  '/banned-books',
   '/history',
   '/explore/api',
   '/search/api',

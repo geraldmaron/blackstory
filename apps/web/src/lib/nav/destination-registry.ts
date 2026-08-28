@@ -331,6 +331,7 @@ const DESTINATION_BY_PATH: ReadonlyMap<string, Destination> = new Map(
 export const DYNAMIC_PARENTS: readonly (readonly [string, string])[] = [
   ['/corrections/status/', '/corrections'],
   ['/stories/', '/stories'],
+  ['/place/', '/'],
   ['/entity/', '/'],
   ['/books/', '/books'],
   ['/law/', '/law'],

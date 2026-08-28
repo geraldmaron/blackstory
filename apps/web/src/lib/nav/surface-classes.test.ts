@@ -58,6 +58,7 @@ describe('surface class resolution', () => {
     assert.equal(surfaceClassFor('/law'), 'reading');
     assert.equal(surfaceClassFor('/law/hb-1557'), 'record');
     assert.equal(surfaceClassFor('/entity/lynching-sample'), 'record');
+    assert.equal(surfaceClassFor('/place/paul-laurence-dunbar-high-school'), 'record');
   });
 
   it('lets a specific child override its parent prefix', () => {

@@ -95,6 +95,7 @@ describe('destination registry · coverage', () => {
 
   it('an entity goes up to the Atlas and a record goes up to its catalogue', () => {
     assert.equal(parentPathFor('/entity/tulsa-greenwood'), '/');
+    assert.equal(parentPathFor('/place/paul-laurence-dunbar-high-school'), '/');
     assert.equal(parentPathFor('/books/beloved'), '/books');
     assert.equal(parentPathFor('/law/plessy'), '/law');
     assert.equal(parentPathFor('/stories/redlining'), '/stories');
