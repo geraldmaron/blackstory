@@ -50,6 +50,12 @@ export const ABOUT_PILLARS = [
   },
 ] as const;
 
+/** Origin paragraph the door steals. You walk past the place. Do not retype. */
+export const ABOUT_WALK_PAST = ABOUT_ORIGIN[1];
+
+/** Presence pillar body. Not a remote museum shelf. Do not retype. */
+export const ABOUT_ON_THE_GROUND = ABOUT_PILLARS[0].body;
+
 /**
  * What the archive will not do.
  *
