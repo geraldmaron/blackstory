@@ -38,7 +38,7 @@ export function MethodologyAtlasShortcut(): null {
       if (event.key.toLowerCase() !== 'a') return;
       if (isTypingTarget(event.target)) return;
       event.preventDefault();
-      router.push('/?confidence=high');
+      router.push('/explore?confidence=high');
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);

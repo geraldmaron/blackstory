@@ -11,7 +11,6 @@
  */
 
 import { buildExploreSearchParams, parseExploreSearchParams } from '../map-experience/url-state';
-import { ATLAS_DOOR_PARAM } from '../nav/atlas-door';
 import {
   CORRECTIONS_PAGE_PARAM_ALLOWLIST,
   STORIES_PAGE_PARAM_ALLOWLIST,
@@ -26,10 +25,10 @@ import {
 export type QueryParamBag = Record<string, string | string[] | undefined>;
 
 /**
- * The map surface answers on two paths. Both run the same allowlist and the same parse→build
- * pair, so `/` and `/explore` cannot end up accepting different vocabularies for the same view.
+ * The map surface answers on `/explore` only. `/` is the featured door and strips query
+ * state so a leftover `?atlas=1` cannot boot the catalog.
  */
-const EXPLORE_SURFACE_PATHS = new Set(['/', '/explore']);
+const EXPLORE_SURFACE_PATHS = new Set(['/explore']);
 
 function isTrackingKey(key: string): boolean {
   const lower = key.toLowerCase();
@@ -53,7 +52,7 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
     return SEARCH_PAGE_PARAM_ALLOWLIST;
   }
   if (EXPLORE_SURFACE_PATHS.has(path)) {
-    return [...EXPLORE_PAGE_PARAM_ALLOWLIST, ATLAS_DOOR_PARAM];
+    return EXPLORE_PAGE_PARAM_ALLOWLIST;
   }
   // No `/history` branch: the route is not in the middleware matcher and must not be. See the
   // note where HISTORY_PAGE_PARAM_ALLOWLIST used to live in `constants.ts`.
@@ -96,8 +95,8 @@ function allowlistedBag(pathname: string, bag: QueryParamBag): QueryParamBag {
 
 /**
  * Returns a stable query string containing only allowed, non-tracking params.
- * The map surface (`/` and `/explore`) and `/history` go through their parse→build helpers so
- * revisit URLs match what the client writes (`layerMode=presence`, uppercase state).
+ * The map surface (`/explore`) goes through parse→build so revisit URLs match what the
+ * client writes (`layerMode=presence`, uppercase state). `/` has no browse query.
  * Empty string means no query component should appear in cache keys or redirects.
  */
 export function normalizeQueryString(
@@ -108,12 +107,7 @@ export function normalizeQueryString(
   const bag = allowlistedBag(path, readParamBag(input));
 
   if (EXPLORE_SURFACE_PATHS.has(path)) {
-    const exploreQs = buildExploreSearchParams(parseExploreSearchParams(bag));
-    const atlas = firstString(bag[ATLAS_DOOR_PARAM])?.trim().toLowerCase();
-    if (atlas === '1' || atlas === 'true') {
-      return exploreQs ? `${ATLAS_DOOR_PARAM}=1&${exploreQs}` : `${ATLAS_DOOR_PARAM}=1`;
-    }
-    return exploreQs;
+    return buildExploreSearchParams(parseExploreSearchParams(bag));
   }
 
   const normalized = new URLSearchParams();

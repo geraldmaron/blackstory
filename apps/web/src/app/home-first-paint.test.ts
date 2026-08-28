@@ -89,8 +89,8 @@ test('first paint never mounts the catalog boot, camera cockpit, or Journey page
     .filter((line) => line.startsWith('import '))
     .join('\n');
   assert.match(page, /HomeFirstPaint/);
-  assert.match(page, /wantsAtlasInstrument/);
   assert.match(page, /loadHomeFirstPaint/);
+  assert.doesNotMatch(page, /wantsAtlasInstrument|AtlasHome|atlas=1/);
   assert.doesNotMatch(imports, /getSharedPublicEntities|AtlasLoader|atlas\/catalog|explore\.css/);
   assert.doesNotMatch(page, /Loading \{shell\.totalMatched/);
   assert.doesNotMatch(paint, /CameraConsole|Orbit|Tilt|Trace/);

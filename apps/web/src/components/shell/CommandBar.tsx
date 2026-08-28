@@ -144,13 +144,13 @@ export function CommandBar({
                it names. Dropping Journey outside the map would make it look like a feature of one
                page rather than a way into the archive.
 
-               Bare `/` is the featured door, so these links carry `atlas=1`. Journey still uses a
-               fragment (`#journey`) because `?mode=` is not on the explore allowlist. */
+               Journey still uses a fragment (`#journey`) because `?mode=` is not on the
+               explore allowlist. There is no `/journey` page. */
             <>
-              <Link className="ds-bar__mode-link ds-bar__mode-link--first" href="/?atlas=1">
+              <Link className="ds-bar__mode-link ds-bar__mode-link--first" href="/explore">
                 Atlas
               </Link>
-              <Link className="ds-bar__mode-link" href="/?atlas=1#journey">
+              <Link className="ds-bar__mode-link" href="/explore#journey">
                 Journey
               </Link>
             </>

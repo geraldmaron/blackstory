@@ -74,6 +74,7 @@ test('the catalog is CDN-cacheable and served from a fixed path', () => {
 test('the Atlas page never puts the catalog back in the initial prop', async () => {
   const { readFileSync } = await import('node:fs');
   const pageSource = readFileSync(new URL('../page.tsx', import.meta.url), 'utf8');
+  const explorePage = readFileSync(new URL('./page.tsx', import.meta.url), 'utf8');
   const atlasHome = readFileSync(new URL('../atlas-home.tsx', import.meta.url), 'utf8');
   const pageImports = pageSource
     .split('\n')
@@ -81,8 +82,9 @@ test('the Atlas page never puts the catalog back in the initial prop', async () 
     .join('\n');
   assert.doesNotMatch(pageSource, /toSerializableExploreViewModel/);
   assert.doesNotMatch(pageSource, /buildExploreViewModelAsync/);
-  assert.doesNotMatch(pageImports, /AtlasLoader|getSharedPublicEntities/);
-  assert.match(pageSource, /wantsAtlasInstrument/);
+  assert.doesNotMatch(pageImports, /AtlasLoader|getSharedPublicEntities|AtlasHome/);
+  assert.doesNotMatch(pageSource, /wantsAtlasInstrument|atlas=1/);
   assert.match(pageSource, /HomeFirstPaint/);
+  assert.match(explorePage, /AtlasHome/);
   assert.match(atlasHome, /AtlasLoader/);
 });

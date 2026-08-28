@@ -317,7 +317,7 @@ export function DataSections({
         ) : (
           <p className="ds-data-edition__empty">
             Census population figures are not available on this release. Open{' '}
-            <Link href="/">the map</Link> for place layers.
+            <Link href="/explore">the map</Link> for place layers.
           </p>
         )}
       </ChartCard>

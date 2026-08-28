@@ -429,10 +429,10 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   return params.toString();
 }
 
-/** The Atlas answers on `/` with a filter or `atlas=1`. Bare `/` is the featured door. */
+/** The Atlas answers on `/explore`. Bare `/` is the featured door and never the board. */
 export function buildExploreHref(state: ExploreViewState): string {
   const qs = buildExploreSearchParams(state);
-  return qs ? `/?${qs}` : '/?atlas=1';
+  return qs ? `/explore?${qs}` : '/explore';
 }
 
 /** Default overlay + toggle state for callers building explore links without a full view model. */

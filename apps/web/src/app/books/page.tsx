@@ -73,7 +73,7 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
         .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
         .map(([code, count]) => ({
           label: stateLabel(code),
-          href: `/?state=${encodeURIComponent(code)}`,
+          href: `/explore?state=${encodeURIComponent(code)}`,
           count,
         }))}
       limit={12}

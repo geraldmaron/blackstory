@@ -37,11 +37,13 @@ function concretePath(route: string): string {
 }
 
 describe('surface class resolution', () => {
-  it('puts the bare front door on a reading room and the Atlas on the instrument', () => {
+  it('puts the front door on a reading room and the Atlas on /explore', () => {
     assert.equal(surfaceClassFor('/'), 'reading');
-    assert.equal(surfaceClassFor('/', 'atlas=1'), 'instrument');
-    assert.equal(surfaceClassFor('/?atlas=1'), 'instrument');
-    assert.equal(surfaceClassFor('/?state=DC'), 'instrument');
+    assert.equal(surfaceClassFor('/', 'atlas=1'), 'reading');
+    assert.equal(surfaceClassFor('/?atlas=1'), 'reading');
+    assert.equal(surfaceClassFor('/?state=DC'), 'reading');
+    assert.equal(surfaceClassFor('/explore'), 'instrument');
+    assert.equal(surfaceClassFor('/explore?state=DC'), 'instrument');
   });
 
   it('does not classify /story, which was deprecated in favour of the Atlas story mode', () => {
@@ -73,9 +75,9 @@ describe('surface class resolution', () => {
     }
   });
 
-  it('ignores trailing slashes and fragments; `/` query selects door vs Atlas', () => {
+  it('ignores trailing slashes, fragments, and leftover `/` query', () => {
     assert.equal(surfaceClassFor('/about/'), 'reading');
-    assert.equal(surfaceClassFor('/?era=1960s&kind=school'), 'instrument');
+    assert.equal(surfaceClassFor('/?era=1960s&kind=school'), 'reading');
     assert.equal(surfaceClassFor('/about#sources'), 'reading');
     assert.equal(surfaceClassFor('/?junk=1'), 'reading');
   });

@@ -53,11 +53,8 @@ export function redirectsForNextConfig() {
     { source: '/legal', destination: '/law', permanent: true },
     { source: '/legal/:path*', destination: '/law/:path*', permanent: true },
 
-    // Both land on the Atlas instrument. Bare `/` is the featured door, so these 308 to
-    // `/?atlas=1`. Next still merges an incoming query, so `/explore?state=OK` becomes
-    // `/?atlas=1&state=OK` and the filter board opens. Exact `/explore` only: `/explore/api`
-    // must keep answering on its own URL.
-    { source: '/explore', destination: '/?atlas=1', permanent: true },
-    { source: '/map', destination: '/?atlas=1', permanent: true },
+    // `/map` is the old name for the Atlas instrument. The instrument is `/explore`.
+    // `/` is the featured place and never the 4,101-row board.
+    { source: '/map', destination: '/explore', permanent: true },
   ];
 }

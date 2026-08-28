@@ -16,7 +16,6 @@
 
 import React, { useRef } from 'react';
 import Link from 'next/link';
-import { ATLAS_INSTRUMENT_HREF } from '../../lib/nav/atlas-door';
 import {
   GROUP_HEADINGS,
   LIBRARY_CARD_GROUPS,
@@ -29,7 +28,7 @@ import './library-menu.css';
 void React;
 
 /** The two ways into the records themselves, held out of the room lists as the panel's own column. */
-const DIRECT_PATHS = ['/', '/records'] as const;
+const DIRECT_PATHS = ['/explore', '/records'] as const;
 
 export type LibraryMenuProps = {
   /** Rendered on the "All records" card when the surface knows the count. */
@@ -96,13 +95,13 @@ export function LibraryMenu({ recordCount }: LibraryMenuProps) {
           {direct.map((destination) => (
             <Link
               className="ds-libmenu__card"
-              href={destination.path === '/' ? ATLAS_INSTRUMENT_HREF : destination.path}
+              href={destination.path}
               key={destination.path}
               prefetch={false}
               onClick={closeMenu}
             >
               <span className="ds-libmenu__card-kind">
-                {destination.path === '/' ? 'Map' : 'Index'}
+                {destination.path === '/explore' ? 'Map' : 'Index'}
               </span>
               <span className="ds-libmenu__card-title">
                 {destination.path === '/records' && recordCount !== undefined

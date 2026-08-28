@@ -536,9 +536,9 @@ describe('room kit · map moment', () => {
     assert.doesNotMatch(without, /ds-mapmoment__open/);
 
     const with_ = renderToStaticMarkup(
-      <MapMoment camera={{ center: [-90, 35] }} note="A place." atlasHref="/?find=place" />,
+      <MapMoment camera={{ center: [-90, 35] }} note="A place." atlasHref="/explore?find=place" />,
     );
-    assert.match(with_, /href="\/\?find=place"/);
+    assert.match(with_, /href="\/explore\?find=place"/);
   });
 
   it('refuses pitch and bearing on a plain moment, and cuts instead of flying', () => {

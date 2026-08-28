@@ -9,6 +9,7 @@
  * Next client graph via NarrativeCard → the explore surface.
  */
 import { findUsStateByPostalCode } from '@repo/domain/map/geography';
+import { ATLAS_INSTRUMENT_HREF } from '../nav/atlas-door';
 import { DEFAULT_EXPLORE_FILTERS } from './filters';
 import { buildExploreHref, defaultExploreOverlayState, type ExploreViewState } from './url-state';
 
@@ -45,7 +46,7 @@ function normalizePostalCode(postalCode: string): string {
 export function exploreHrefForState(postalCode: string): string {
   const normalized = normalizePostalCode(postalCode);
   if (!normalized || !findUsStateByPostalCode(normalized)) {
-    return '/?atlas=1';
+    return ATLAS_INSTRUMENT_HREF;
   }
 
   return buildDefaultExploreHref({
@@ -57,7 +58,7 @@ export function exploreHrefForState(postalCode: string): string {
 export function exploreHrefForEra(eraBucket: string): string {
   const trimmed = eraBucket.trim();
   if (!trimmed) {
-    return '/?atlas=1';
+    return ATLAS_INSTRUMENT_HREF;
   }
 
   return buildExploreHref({
@@ -70,7 +71,7 @@ export function exploreHrefForEra(eraBucket: string): string {
 export function exploreHrefForKind(kind: string): string {
   const trimmed = kind.trim();
   if (!trimmed) {
-    return '/?atlas=1';
+    return ATLAS_INSTRUMENT_HREF;
   }
 
   return buildExploreHref({

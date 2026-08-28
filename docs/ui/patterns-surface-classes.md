@@ -30,9 +30,9 @@ Verdicts and URL dispositions are in [`design-direction-v9-surfaces.md`](./desig
 
 | Route | Note |
 |---|---|
-| `/` | Front door: a featured place (reading). The Atlas instrument is the same path when the URL asks for it (`?atlas=1` or any surviving explore filter). Canonical stays bare `/`. |
+| `/` | Front door: a featured place (reading). Always. A leftover `?atlas=1` does not open the board. |
 | `/story` | New. Six chapters at `/story#chapter-{id}` inside one document. |
-| `/explore` | 308 to `/?atlas=1` (incoming query is merged, so a filter bookmark still opens the board). |
+| `/explore` | Atlas instrument (catalog + map). Not a query on `/`. |
 | `/locate` | 308 to `/?find=place`. Folds into the Lens Where group and a narrow place sheet. |
 
 Pattern: [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md). Design law: [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md).

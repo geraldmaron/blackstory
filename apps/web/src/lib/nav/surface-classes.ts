@@ -17,11 +17,8 @@
  * Endpoints (redirects, JSON, feeds, crawler files) have no class. They render no chrome, so
  * `surfaceClassFor` returns `null` and nothing is emitted.
  *
- * `/` is the one path whose class depends on the query: bare `/` is reading (featured door);
- * `?atlas=1` or a surviving explore filter is the instrument. See `atlas-door.ts`.
+ * `/` is always reading (featured place). The Atlas instrument is `/explore`.
  */
-import { wantsAtlasInstrument } from './atlas-door';
-
 /** The four rendered surface classes. Endpoints are represented by `null`. */
 export type SurfaceClass = 'instrument' | 'reading' | 'record' | 'utility';
 
@@ -30,10 +27,10 @@ export type SurfaceClass = 'instrument' | 'reading' | 'record' | 'utility';
  * (`/stories/mosaic-credits` is Utility) can never be swallowed by its parent's prefix rule.
  */
 const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
-  // Front door. Bare `/` is a reading room (featured place). The Atlas instrument is the same
-  // path when the URL asks for it (`?atlas=1` or any surviving explore filter); see
-  // `surfaceClassFor` and `atlas-door.ts`. Story is a mode of the Atlas, not a path.
+  // Front door. Always a reading room (featured place). The Atlas instrument is `/explore`.
+  // Story is a mode of the Atlas, not a path.
   ['/', 'reading'],
+  ['/explore', 'instrument'],
 
   // Reading room — one scrolling, measure-limited column on paper.
   // `/library` is the hub the rest of this list hangs off: it renders cards, not records, but it
@@ -83,7 +80,6 @@ export const ENDPOINT_ROUTES: readonly string[] = [
   '/facts',
   '/search',
   '/map',
-  '/explore',
   '/history',
   '/explore/api',
   '/search/api',
@@ -104,20 +100,11 @@ export const ENDPOINT_ROUTES: readonly string[] = [
 
 const ENDPOINT_ROUTE_SET = new Set(ENDPOINT_ROUTES);
 
-/** Trailing slashes never change a route's class. Query strings do only for `/` (door vs Atlas). */
+/** Trailing slashes and query strings never change a route's class. */
 function normalizePath(pathname: string): string {
   const withoutQuery = pathname.split('?')[0]?.split('#')[0] ?? '/';
   if (withoutQuery.length > 1 && withoutQuery.endsWith('/')) return withoutQuery.slice(0, -1);
   return withoutQuery || '/';
-}
-
-function queryFrom(pathname: string, search?: string): string {
-  if (search !== undefined && search.length > 0) {
-    return search.startsWith('?') ? search.slice(1) : search;
-  }
-  const qIndex = pathname.indexOf('?');
-  if (qIndex === -1) return '';
-  return pathname.slice(qIndex + 1).split('#')[0] ?? '';
 }
 
 /**
@@ -127,16 +114,12 @@ function queryFrom(pathname: string, search?: string): string {
  * rather than to nothing: a reader who mistypes a URL still gets the utility chrome instead
  * of a page with no class and therefore no shell rules.
  *
- * Pass `search` when the caller already split the query (client `useSearchParams`). A pathname
- * that still contains `?…` is also accepted so existing tests and logs keep working.
+ * `search` is accepted so older call sites keep compiling. It does not change the class:
+ * `/` is always reading, even with `?atlas=1`.
  */
-export function surfaceClassFor(pathname: string, search?: string): SurfaceClass | null {
+export function surfaceClassFor(pathname: string, _search?: string): SurfaceClass | null {
   const path = normalizePath(pathname);
   if (ENDPOINT_ROUTE_SET.has(path)) return null;
-
-  if (path === '/') {
-    return wantsAtlasInstrument(queryFrom(pathname, search)) ? 'instrument' : 'reading';
-  }
 
   const exact = SURFACE_CLASS_BY_PATH.get(path);
   if (exact) return exact;

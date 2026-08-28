@@ -66,7 +66,7 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
     .map((entry) => ({
       label: entry.label,
       count: entry.count,
-      href: entry.postal ? `/?state=${entry.postal}` : '/',
+      href: entry.postal ? `/explore?state=${entry.postal}` : '/explore',
     }));
 
   const rail = (

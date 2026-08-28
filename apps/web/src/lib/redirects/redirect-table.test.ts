@@ -124,8 +124,7 @@ test('every folded path reaches its surface in exactly one hop', () => {
     ['/myths', '/methodology'],
     ['/myths/anything', '/methodology'],
     ['/legal', '/law'],
-    ['/explore', '/'],
-    ['/map', '/'],
+    ['/map', '/explore'],
   ] as const;
 
   for (const [from, to] of oneHop) {
@@ -140,15 +139,13 @@ test('/legal keeps its slug rather than dumping every statute on the index', () 
   assert.equal(rule?.destination, '/law/:path*');
 });
 
-test('/map and /explore both land on the Atlas instrument, not the featured door', () => {
+test('/map lands on the Atlas instrument; /explore renders it', () => {
   const map = RULES.find((entry) => entry.source === '/map');
   const explore = RULES.find((entry) => entry.source === '/explore');
   assert.ok(map, '/map must have a config rule');
-  assert.equal(map?.destination, '/?atlas=1');
+  assert.equal(map?.destination, '/explore');
   assert.equal(map?.permanent, true);
-  assert.ok(explore, '/explore must have a config rule');
-  assert.equal(explore?.destination, '/?atlas=1');
-  assert.equal(explore?.permanent, true);
+  assert.equal(explore, undefined, '/explore is the instrument, not a redirect');
 });
 
 test('the /explore rule is the exact path, so /explore/api keeps answering', () => {

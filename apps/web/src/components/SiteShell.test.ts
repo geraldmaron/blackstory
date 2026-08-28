@@ -13,10 +13,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 
 test('only the Atlas resolves to the instrument class', () => {
   assert.equal(surfaceClassFor('/'), 'reading');
-  assert.equal(surfaceClassFor('/', 'atlas=1'), 'instrument');
-  // `/explore` 308s to `/` and never renders, so it must not be treated as a live surface —
-  // a stale instrument verdict here would strip the header from a route that does not exist.
-  assert.equal(surfaceClassFor('/explore'), null);
+  assert.equal(surfaceClassFor('/', 'atlas=1'), 'reading');
+  assert.equal(surfaceClassFor('/explore'), 'instrument');
   assert.equal(surfaceClassFor('/explore/api'), null);
   assert.equal(surfaceClassFor('/locate'), 'utility');
   assert.equal(surfaceClassFor('/stories'), 'reading');

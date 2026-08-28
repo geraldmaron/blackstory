@@ -40,7 +40,7 @@ export type SearchPageParam = (typeof SEARCH_PAGE_PARAM_ALLOWLIST)[number];
 const VIEWPORT_POLICY_DROPPED = new Set<string>(EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS);
 
 /**
- * Allowed filter/selection keys on the map surface (`/` and `/explore`).
+ * Allowed filter/selection keys on the map surface (`/explore`).
  *
  * Generated from `EXPLORE_URL_PARAM_KEYS`, the URL parser's own key set, rather than retyped, so
  * the allowlist and the parser cannot drift: a key added to `parseExploreSearchParams` is
