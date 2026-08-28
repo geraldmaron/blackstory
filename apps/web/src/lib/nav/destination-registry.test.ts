@@ -168,6 +168,14 @@ describe('destination registry · the footer is derived, not authored', () => {
     assert.ok(!hrefs.includes('/history'));
   });
 
+  it('does not list Banned books as a walk room', () => {
+    assert.equal(destinationFor('/books')?.group, undefined);
+    assert.ok(!destinationsInGroup('read').some((destination) => destination.path === '/books'));
+    const hrefs = footerColumns().flatMap((column) => column.items.map((item) => item.href));
+    assert.ok(!hrefs.includes('/books'));
+    assert.ok(!hrefs.includes('/banned-books'));
+  });
+
   it('lists every carded destination exactly once', () => {
     const hrefs = footerColumns().flatMap((column) => column.items.map((item) => item.href));
     assert.equal(new Set(hrefs).size, hrefs.length, 'a destination is listed twice in the footer');

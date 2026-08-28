@@ -27,7 +27,7 @@ export function usePaletteData(
   /**
    * Every site destination, from the destination registry the breadcrumb, the library hub and the
    * footer also read (SP-15). The bar carries two modes instead of fourteen links, so this is what
-   * keeps Data, Law, Banned books, Memorial, Methodology, Corrections, Errata and Submit reachable
+   * keeps Data, Law, Memorial, Methodology, Corrections, Errata and Submit reachable
    * from the Atlas.
    *
    * It was built from `PRIMARY_NAV` + `OVERFLOW_NAV`, which is why the palette went on offering

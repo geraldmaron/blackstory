@@ -62,8 +62,8 @@ export type PaletteState = {
 
 /**
  * A site destination. The v9 bar carries two modes instead of fourteen links, so this section is
- * what keeps Data, Law, Banned books, Memorial, Methodology, Corrections, Errata and Submit
- * reachable from the Atlas. Collapsing the nav without it would strand eight routes.
+ * what keeps Data, Law, Memorial, Methodology, Corrections, Errata and Submit
+ * reachable from the Atlas. Collapsing the nav without it would strand those rooms.
  */
 export type PaletteDestination = {
   readonly href: string;

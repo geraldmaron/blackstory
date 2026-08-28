@@ -9,3 +9,11 @@
 .ds-home-place-stand .ds-record-anatomy__place {
   margin: 0;
 }
+
+.ds-home-door-rooms,
+.ds-home-walk-on {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin: var(--ds-space-8) 0 0;
+}

@@ -14,7 +14,7 @@ import { EntityMastMedia } from '../components/entity/EntityMastMedia';
 import { EntitySensitivityBanner } from '../components/entity/EntitySensitivityBanner';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../components/entity/LinkedProse';
 import { RecordPlacePreview } from '../components/patterns/RecordPlacePreview';
-import { Connections, OffRamp, Room } from '../components/room';
+import { Connections, Room } from '../components/room';
 import { geoAnchorFor } from '../lib/map-experience/entity-geo';
 import type { PublicEntityView } from '../data/public-seed';
 import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
@@ -25,6 +25,7 @@ import {
   firstPaintRecord,
   publishableCitingStories,
   selectDoorRooms,
+  walkOnPlace,
 } from './home-first-paint-surface';
 import '../components/entity/entity-page.css';
 import './record-page.css';
@@ -47,16 +48,28 @@ function neighborCatalog(entity: PublicEntityView): readonly EntityLinkCatalogEn
 
 function DoorRooms({ rooms }: { readonly rooms: ReturnType<typeof selectDoorRooms> }) {
   if (rooms.length === 0) return null;
-  const actions = rooms.map((room, index) => ({
-    href: room.href,
-    label: room.label,
-    ...(index === 0 ? { emphasis: 'copper' as const } : {}),
-  }));
-  const names = rooms.map((room) => room.label).join(', ');
   return (
-    <OffRamp title={names} actions={actions}>
-      Open a room from this place, then come back.
-    </OffRamp>
+    <nav className="ds-home-door-rooms" aria-label="Archive">
+      {rooms.map((room, index) => (
+        <Link
+          key={room.id}
+          className={index === 0 ? 'ds-cta ds-cta--copper' : 'ds-cta ds-cta--quiet'}
+          href={room.href}
+        >
+          {room.label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+function WalkOnPlace({ place }: { readonly place: PublicEntityView }) {
+  return (
+    <p className="ds-home-walk-on">
+      <Link className="ds-cta ds-cta--copper" href={placeHref(place.displayName)}>
+        {place.displayName}
+      </Link>
+    </p>
   );
 }
 
@@ -72,6 +85,7 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
     const citing = publishableCitingStories(model.citing);
     const rooms = selectDoorRooms(lead, citing);
     const eraLine = firstPaintEraLine(lead);
+    const nextPlace = walkOnPlace(lead, model.also);
 
     return (
       <Room
@@ -136,6 +150,8 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
             />
           </section>
         ) : null}
+
+        {nextPlace ? <WalkOnPlace place={nextPlace} /> : null}
 
         <DoorRooms rooms={rooms} />
       </Room>
