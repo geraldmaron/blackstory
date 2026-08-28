@@ -77,7 +77,10 @@ test('pickExploreEdgeSlice: lines off -> empty; unknown decade -> all time; know
 });
 
 test('buildEdgeLineCatalog emits id lists whose every id exists in allTime', () => {
-  const { edgeLineCatalog, availableDecades } = buildEdgeLineCatalog(undefined, listPublicEntities());
+  const { edgeLineCatalog, availableDecades } = buildEdgeLineCatalog(
+    undefined,
+    listPublicEntities(),
+  );
   const allTimeIds = new Set(edgeLineCatalog.allTime.edges.map((e) => e.edgeId));
   assert.ok(availableDecades.length > 0);
   for (const decade of availableDecades) {

@@ -27,7 +27,10 @@ export function hasMaintenanceBypassHint(): boolean {
   if (typeof document === 'undefined') {
     return false;
   }
-  return readCookieValue(document.cookie, MAINTENANCE_BYPASS_HINT_COOKIE) === MAINTENANCE_BYPASS_HINT_VALUE;
+  return (
+    readCookieValue(document.cookie, MAINTENANCE_BYPASS_HINT_COOKIE) ===
+    MAINTENANCE_BYPASS_HINT_VALUE
+  );
 }
 
 /** Read one cookie out of a `document.cookie` string. Exported for tests. */
