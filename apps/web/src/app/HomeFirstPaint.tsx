@@ -4,6 +4,7 @@
  * Voice is stolen from `/about` and `/stories`, not invented. Room kit only. The map is an
  * OffRamp, not the boot.
  */
+import React from 'react';
 import Link from 'next/link';
 import { mapToneFromTopics } from '../lib/map-experience/kind-encoding';
 import { geoAnchorFor } from '../lib/map-experience/entity-geo';
@@ -27,7 +28,7 @@ import {
   buildEntityAnatomyPlace,
 } from './entity/[id]/entity-anatomy-facts';
 import { ABOUT_LINE, ABOUT_PILLARS } from './about/about-copy';
-import type { HomeFirstPaintModel } from './home-first-paint';
+import { isInternalRecordLabel, type HomeFirstPaintModel } from './home-first-paint';
 import './reading-room.css';
 
 const PINNED_TO_PLACE = ABOUT_PILLARS[0]?.title ?? 'Pinned to place';
@@ -67,11 +68,16 @@ function anatomyFacts(
 }
 
 export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel }) {
-  const lead = model.lead;
+  const lead =
+    model.lead && !isInternalRecordLabel(model.lead.displayName) ? model.lead : undefined;
+  const story = model.story && !isInternalRecordLabel(model.story.title) ? model.story : undefined;
   const mapTone = lead ? mapToneFromTopics(lead.topicIds ?? lead.topicTags) : undefined;
   const anatomyInputs = lead ? buildEntityAnatomyInputs(lead, mapTone) : undefined;
   const geo = lead ? (lead.geoAnchor ?? geoAnchorFor(lead.id)) : undefined;
   const place = lead && anatomyInputs ? buildEntityAnatomyPlace(lead, geo) : undefined;
+  const title = lead?.displayName ?? story?.title ?? PINNED_TO_PLACE;
+  const also = model.also.filter((entity) => !isInternalRecordLabel(entity.displayName));
+  const showStoryCard = Boolean(story && lead);
 
   return (
     <Room className="ds-home-first-paint">
@@ -79,13 +85,21 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
         pathname="/"
         crumbLabel="Home"
         kicker={PINNED_TO_PLACE}
-        title={lead ? lead.displayName : PINNED_TO_PLACE}
+        title={title}
         lede={ABOUT_LINE}
         {...(lead && anatomyInputs
           ? {
               meta: [anatomyInputs.kindLabel, anatomyInputs.whereLabel, anatomyInputs.eraLabel],
             }
-          : {})}
+          : story
+            ? {
+                meta: [
+                  story.kind === 'article' ? 'Entry' : 'Chapter',
+                  story.placeLabel,
+                  story.eraLabel,
+                ],
+              }
+            : {})}
         showPath={false}
       />
 
@@ -108,11 +122,24 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
         </>
       ) : null}
 
-      {model.also.length > 0 || model.story ? (
+      {!lead && story ? (
+        <>
+          <Prose>
+            <p>{story.summary}</p>
+          </Prose>
+          <p>
+            <Link className="ds-cta ds-cta--copper" href={`/stories/${story.slug}`}>
+              {story.kind === 'article' ? 'Read the entry' : 'Read the chapter'}
+            </Link>
+          </p>
+        </>
+      ) : null}
+
+      {also.length > 0 || showStoryCard ? (
         <>
           <GroupHeading>{STORIES_ARGUED}</GroupHeading>
           <CardGrid>
-            {model.also.map((entity) => (
+            {also.map((entity) => (
               <RoomCard
                 key={entity.id}
                 href={`/entity/${entity.id}`}
@@ -122,14 +149,14 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
                 meta={`${entity.jurisdictionLabel} · ${entity.era}`}
               />
             ))}
-            {model.story ? (
+            {showStoryCard && story ? (
               <RoomCard
-                href={`/stories/${model.story.slug}`}
-                kind={model.story.kind === 'article' ? 'Entry' : 'Chapter'}
-                title={model.story.title}
-                description={model.story.summary}
-                meta={[model.story.eraLabel, model.story.placeLabel].filter(Boolean).join(' · ')}
-                tag={model.story.kind === 'article' ? 'Entry' : 'Chapter'}
+                href={`/stories/${story.slug}`}
+                kind={story.kind === 'article' ? 'Entry' : 'Chapter'}
+                title={story.title}
+                description={story.summary}
+                meta={[story.eraLabel, story.placeLabel].filter(Boolean).join(' · ')}
+                tag={story.kind === 'article' ? 'Entry' : 'Chapter'}
               />
             ) : null}
           </CardGrid>
