@@ -14,6 +14,15 @@
  * redirect for months.
  */
 
+/**
+ * The product line. `/` first paint uses {@link ABOUT_LINE}; `/about` uses the full lede.
+ * Do not retype either on the door.
+ */
+export const ABOUT_LINE =
+  'BlackStory is a place-connected archive of Black history: people, places, and events pinned to where they happened, with the source attached to every claim.';
+
+export const ABOUT_LEDE = `${ABOUT_LINE} I built it with the tools and records available to me, and it is unfinished on purpose.`;
+
 /** Why this exists, in the maker's own voice. Rendered as consecutive paragraphs. */
 export const ABOUT_ORIGIN = [
   "I'm not an institution. I'm one person with a laptop, a stack of evenings, and access to more public records than any generation before mine could have searched in a lifetime.",

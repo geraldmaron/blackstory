@@ -114,7 +114,8 @@ const DESTINATIONS: readonly Destination[] = [
     label: 'Atlas',
     parent: null,
     kind: 'MAP',
-    description: 'Start with a place, then open the map when you want the whole archive.',
+    description:
+      'A place-connected archive, pinned to where it happened, with the source on every claim.',
     group: 'find',
     crawl: { changeFrequency: 'daily', priority: 1 },
   },

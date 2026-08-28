@@ -1,12 +1,14 @@
 /**
  * Server-rendered front door: one released place (and optional story), not the Atlas board.
  *
- * Room kit only. The map is an OffRamp, not the boot. Binding voice: docs/ui/story.md.
+ * Voice is stolen from `/about` and `/stories`, not invented. Room kit only. The map is an
+ * OffRamp, not the boot.
  */
 import Link from 'next/link';
 import { mapToneFromTopics } from '../lib/map-experience/kind-encoding';
 import { geoAnchorFor } from '../lib/map-experience/entity-geo';
 import { ATLAS_INSTRUMENT_HREF } from '../lib/nav/atlas-door';
+import { destinationFor } from '../lib/nav/destination-registry';
 import {
   CardGrid,
   GroupHeading,
@@ -24,8 +26,14 @@ import {
   buildEntityAnatomyInputs,
   buildEntityAnatomyPlace,
 } from './entity/[id]/entity-anatomy-facts';
+import { ABOUT_LINE, ABOUT_PILLARS } from './about/about-copy';
 import type { HomeFirstPaintModel } from './home-first-paint';
 import './reading-room.css';
+
+const PINNED_TO_PLACE = ABOUT_PILLARS[0]?.title ?? 'Pinned to place';
+const STORIES_ROOM = destinationFor('/stories');
+const STORIES_ARGUED =
+  STORIES_ROOM?.description?.split('.')[0] ?? 'The archive argued rather than listed';
 
 function anatomyFacts(
   inputs: ReturnType<typeof buildEntityAnatomyInputs>,
@@ -70,17 +78,9 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
       <RoomHeader
         pathname="/"
         crumbLabel="Home"
-        kicker="History, pinned to place"
-        title={
-          <>
-            History happened <em>here</em>.
-          </>
-        }
-        lede={
-          lead
-            ? lead.summary
-            : 'A regular person should be able to find what happened here. The archive opens on a place, not on a count of every record.'
-        }
+        kicker={PINNED_TO_PLACE}
+        title={lead ? lead.displayName : PINNED_TO_PLACE}
+        lede={ABOUT_LINE}
         {...(lead && anatomyInputs
           ? {
               meta: [anatomyInputs.kindLabel, anatomyInputs.whereLabel, anatomyInputs.eraLabel],
@@ -97,7 +97,7 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
             aria-label={`${lead.displayName} at a glance`}
           />
           <Prose>
-            <h2>{lead.displayName}</h2>
+            <p>{lead.summary}</p>
             <p>{lead.historicalContext}</p>
           </Prose>
           <p>
@@ -110,7 +110,7 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
 
       {model.also.length > 0 || model.story ? (
         <>
-          <GroupHeading>Also here</GroupHeading>
+          <GroupHeading>{STORIES_ARGUED}</GroupHeading>
           <CardGrid>
             {model.also.map((entity) => (
               <RoomCard
@@ -137,19 +137,18 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
       ) : null}
 
       <OffRamp
-        title="Find what happened near you"
+        title="Where to begin"
         actions={[
           {
             href: ATLAS_INSTRUMENT_HREF,
-            label: 'Open the map',
+            label: 'Open the Atlas',
             ...(lead ? {} : { emphasis: 'copper' as const }),
           },
-          { href: '/records', label: 'Browse every record' },
-          { href: '/stories', label: 'Read stories' },
+          { href: '/records', label: 'Search the records' },
+          { href: '/stories', label: 'Stories' },
         ]}
       >
-        The map holds every pinned record. Open it when you want the whole archive, or stay with
-        this place.
+        The Atlas answers where and when.
       </OffRamp>
     </Room>
   );
