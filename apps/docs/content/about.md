@@ -89,12 +89,19 @@ readiness of the evidence ledger, not coverage of the entire field.
 
 ## Where we are today
 
-The public product is live and growing. Verified 2026-08-28: [blackstory.app](https://blackstory.app/)
-is a catalog filter board (Kind / Tone / Era / Theme / Status / Confidence /
-Where) with about 4,100 released records, hosted on Vercel, reading Supabase
-Postgres. That is the live front door. The product line *History, pinned to
-place* is still the design target. It is not a claim that today's homepage
-already works as map-first story-finding.
+The public product is live and growing. Verified 2026-08-28:
+[blackstory.app](https://blackstory.app/) is still the old catalog filter board
+(Kind / Tone / Era / Theme / Status / Confidence / Where) with about 4,100
+released records, hosted on Vercel, reading Supabase Postgres. That is
+production today.
+
+The intended first-run, sat 2026-08-28 on isolated branch
+`cursor/first-paint-local-119c` at localhost:3048 (commit `0dfc8f5a`), is
+Greenwood first, with header rooms Atlas and Library only. It does not list
+Journey as a room, and it does not put a confidence grade or a source count on
+first paint. `/?atlas=1` 308s home. That chrome is not live until that isolated
+work lands. The product line *History, pinned to place* is still the design
+target. It is not a claim that today's homepage already looks like that first-run.
 
 The catalog is not a finished national inventory. Capture coverage, developer
 query surfaces, and leftover cloud wiring (Firebase / GCS / parked PostGIS) are

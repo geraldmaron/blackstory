@@ -18,17 +18,22 @@ Firebase App Hosting or Firestore as SoR are leftover.
 | Data | Supabase Postgres `blackstory-app` (`twykhihqkcldpreuovay.supabase.co`) | Firestore, parked PostGIS / Cloud SQL |
 | Media | Supabase Storage `public-media` | GCS dual-serve (`storage.googleapis.com` still in CSP) |
 
-The live homepage is a catalog filter board (Kind / Tone / Era / Theme / Status / Confidence /
-Where), about 4,100 released records. The product line *History, pinned to place* is the design
-target (Nova owns the reset), not a description of that page.
+**Live** https://blackstory.app/ (verified 2026-08-28) is still the old catalog filter board
+(Kind / Tone / Era / Theme / Status / Confidence / Where), about 4,100 released records.
+That is production today. It is not yet the first-run sat below.
+
+**Intended first-run**, sat 2026-08-28 on isolated branch `cursor/first-paint-local-119c` at
+localhost:3048 (commit `0dfc8f5a`): Greenwood first; header rooms are Atlas and Library only;
+no Journey room; no Grade A; no "2 sources"; `/?atlas=1` 308s home. That chrome is not live
+until that isolated work lands. Do not invent a Journey page. Do not restyle first paint here.
 
 `/journey` is unfinished. Apex and www return HTTP 404 (verified 2026-08-28). Do not add it
-to nav, about, sitemap, or in-app links. There is no public Journey source beyond that 404.
-Felix owns first-paint; do not invent the page here.
+to nav, about, sitemap, or in-app links. Do not list Journey as a room. There is no public
+Journey source beyond that 404.
 
 `/records/42Cb1758` is not a published record (HTTP 404, verified 2026-08-28). Record pages
-are `/entity/<id>`. The first-paint list title that shows that id is an internal identifier,
-not a story. Do not invent the page or restyle first paint here.
+are `/entity/<id>`. Live production can still show that id as a list title. Intended
+first-run does not. Do not invent the page.
 
 This repo only configures Supabase project `blackstory-app`. Other org Pro projects are not in
 this config, so unused is not proven here. Docs agreement is not a billing close.

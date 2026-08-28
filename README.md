@@ -18,11 +18,13 @@ Checked against live https://blackstory.app/ headers and CSP, not against a bill
 | Data / media | **Supabase** project `blackstory-app`, host `https://twykhihqkcldpreuovay.supabase.co`. Postgres `bb_public.*` is the product system of record. Public media is Supabase Storage. | Firestore, Firebase Storage as SoR, parked PostGIS under `infra/database/` |
 | Media CSP | Live `img-src` allows the Supabase host **and** `https://storage.googleapis.com` | GCS dual-serve / rollback objects |
 
-The live front door is a catalog filter board (Kind / Tone / Era / Theme / Status / Confidence / Where), on the order of 4,100 released records. The product line above is the design target (Nova owns the reset). It is not a claim that today's homepage already works as map-first story-finding.
+**Live** https://blackstory.app/ (verified 2026-08-28) is still the old catalog filter board (Kind / Tone / Era / Theme / Status / Confidence / Where), about 4,100 released records. That is production today. It does not yet look like the first-run sat below.
 
-`/journey` is not a live room. Verified 2026-08-28: `https://blackstory.app/journey` and `https://www.blackstory.app/journey` return HTTP 404 (`x-matched-path: /404`). Do not advertise that address. `/about` "Where to begin" already omits unfinished rooms. There is no public Journey source beyond that 404. Felix owns first-paint; this repo does not invent a Journey page.
+**Intended first-run**, sat 2026-08-28 on isolated branch `cursor/first-paint-local-119c` at localhost:3048 (commit `0dfc8f5a`): Greenwood first; header rooms are Atlas and Library only; no Journey room; no Grade A; no "2 sources"; `/?atlas=1` 308s home. That chrome is not live until that isolated work lands. Do not invent a Journey page here. Do not restyle first paint on this branch.
 
-`/records/42Cb1758` is not a published record. Verified 2026-08-28: `https://blackstory.app/records/42Cb1758` returns HTTP 404 (`x-matched-path: /404`). Public record pages live at `/entity/<id>`. The live first-paint list title that shows that id is an internal identifier, not a story. Do not invent the page. The id leak is Felix's first-paint branch.
+`/journey` is not a live room. Verified 2026-08-28: `https://blackstory.app/journey` and `https://www.blackstory.app/journey` return HTTP 404 (`x-matched-path: /404`). Do not list Journey as a room. `/about` "Where to begin" already omits unfinished rooms. There is no public Journey source beyond that 404.
+
+`/records/42Cb1758` is not a published record. Verified 2026-08-28: `https://blackstory.app/records/42Cb1758` returns HTTP 404 (`x-matched-path: /404`). Public record pages live at `/entity/<id>`. Live production can still show that id as a list title. Intended first-run does not. Do not invent the page.
 
 This repo's config names **one** Supabase project: `blackstory-app`. Other Dagher-org Supabase Pro projects are not referenced here, so this audit does not call them unused. Aligning docs on Vercel + Supabase does not close overages or standing bills. Cover-package work belongs on administration-app, not this repo.
 

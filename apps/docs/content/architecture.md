@@ -23,20 +23,24 @@ Firestore as the system of record are leftover.
 | Data / media | **Supabase** project `blackstory-app`, host `https://twykhihqkcldpreuovay.supabase.co`. Postgres is the product system of record. Public media is Supabase Storage. | Firestore, Firebase Storage as SoR, parked PostGIS |
 | Media CSP | Live `img-src` allows the Supabase host **and** `https://storage.googleapis.com` | GCS dual-serve / rollback |
 
-The live homepage is a catalog filter board (Kind / Tone / Era / Theme / Status /
-Confidence / Where), about 4,100 released records. The product line *History,
-pinned to place* is the design target. It is not a claim that today's front door
-already works as map-first story-finding.
+**Live** [blackstory.app](https://blackstory.app/) (verified 2026-08-28) is still
+the old catalog filter board (Kind / Tone / Era / Theme / Status / Confidence /
+Where), about 4,100 released records. That is production today. It is not yet the
+first-run sat below.
+
+**Intended first-run**, sat 2026-08-28 on isolated branch
+`cursor/first-paint-local-119c` at localhost:3048 (commit `0dfc8f5a`): Greenwood
+first; header rooms are Atlas and Library only; no Journey room; no Grade A; no
+"2 sources"; `/?atlas=1` 308s home. That chrome is not live until that isolated
+work lands. This site does not invent a Journey page.
 
 `/journey` is not a live room. Apex and www return HTTP 404 (verified 2026-08-28).
-Do not advertise it. `/about` already omits unfinished rooms. There is no public
-Journey source beyond that 404. Felix owns first-paint; this site does not invent
-a Journey page.
+Do not list Journey as a room. `/about` already omits unfinished rooms. There is
+no public Journey source beyond that 404.
 
 `/records/42Cb1758` is not a published record (HTTP 404, verified 2026-08-28).
-Public record pages live at `/entity/<id>`. The live first-paint list title that
-shows that id is an internal identifier, not a story. Do not invent the page.
-The id leak is first-paint work, not this guide.
+Public record pages live at `/entity/<id>`. Live production can still show that
+id as a list title. Intended first-run does not. Do not invent the page.
 
 This repository only configures Supabase project `blackstory-app`. Other org Pro
 projects are not named in repo config, so unused is not proven here. Aligning
