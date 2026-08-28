@@ -1,5 +1,6 @@
 /**
  * First paint loads a featured set by id, never the release-wide catalog.
+ * The place is the page: no schema strip, no grade, no precision leak.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -70,11 +71,11 @@ test('pickHomeStory prefers a Tulsa story when one is already published, and inv
   assert.equal(pickHomeStory([storyDoc({ title: '42Cb1758', slug: 'opaque' })]), undefined);
 });
 
-test('the door steals about and stories copy, and does not invent a slogan', () => {
+test('the door steals about copy, and does not invent a slogan', () => {
   const paint = readFileSync(new URL('./HomeFirstPaint.tsx', import.meta.url), 'utf8');
-  assert.match(paint, /ABOUT_LINE|ABOUT_LEDE/);
-  assert.match(paint, /ABOUT_PILLARS/);
-  assert.match(paint, /destinationFor\('\/stories'\)/);
+  assert.match(paint, /ABOUT_WALK_PAST/);
+  assert.match(paint, /ABOUT_ON_THE_GROUND/);
+  assert.match(paint, /ABOUT_LINE/);
   assert.doesNotMatch(paint, /History happened/);
 });
 
@@ -99,9 +100,13 @@ test('first paint never mounts the catalog boot, camera cockpit, or Journey page
   assert.doesNotMatch(loader, /Loading \{shell\.totalMatched|4,101 records/);
 });
 
-test('first paint never claims Grade A or a source count', () => {
+test('first paint is the place, not a schema card', () => {
   const paint = readFileSync(new URL('./HomeFirstPaint.tsx', import.meta.url), 'utf8');
-  assert.doesNotMatch(paint, /evidenceLabel|record-evidence|Grade A|2 sources/);
+  assert.doesNotMatch(
+    paint,
+    /RecordAnatomyPanel|buildEntityAnatomy|evidenceLabel|record-evidence|RoomHeader|RoomCard/,
+  );
+  assert.doesNotMatch(paint, /Grade A|2 sources|radius affordance|Shown at locality/);
   const dunbar = getPublicEntity('ent_dunbar_school_001');
   assert.ok(dunbar);
   const greenwoodShaped = {
@@ -109,18 +114,25 @@ test('first paint never claims Grade A or a source count', () => {
     displayName: 'Greenwood District',
     claims: dunbar.claims.slice(0, 2),
   };
-  const wouldClaim = buildEntityAnatomyInputs(greenwoodShaped, undefined).evidenceLabel;
-  assert.equal(wouldClaim, 'Grade A · 2 sources');
+  assert.equal(
+    buildEntityAnatomyInputs(greenwoodShaped, undefined).evidenceLabel,
+    'Grade A · 2 sources',
+  );
   const html = renderToStaticMarkup(
     createElement(HomeFirstPaint, {
       model: { lead: greenwoodShaped, also: [], story: undefined, source: 'live' },
     }),
   );
-  assert.match(html, /Greenwood District/);
+  assert.match(html, /<h1[^>]*>[\s\S]*Greenwood District/);
+  assert.match(html, /ds-home-place/);
+  assert.match(html, /walk past documented Black history/);
+  assert.match(html, /not a remote museum shelf/);
+  assert.match(html, /place-connected archive/);
   assert.doesNotMatch(html, /Grade A|Grade B|Grade C/);
   assert.doesNotMatch(html, /\d+ sources?|independent sources/i);
-  assert.doesNotMatch(html, />Evidence</);
-  assert.equal(html.includes(wouldClaim), false);
+  assert.doesNotMatch(html, />Kind<|>Where<|>Era<|>Evidence</);
+  assert.doesNotMatch(html, /radius affordance|Shown at locality|precisionCaption/i);
+  assert.doesNotMatch(html, /Journey|42Cb1758|4,101|Orbit|Tilt|Trace/);
 });
 
 test('HomeFirstPaint never titles or lists an internal id, even if the model carries one', () => {
