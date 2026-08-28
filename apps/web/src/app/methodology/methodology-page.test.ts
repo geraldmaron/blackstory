@@ -57,7 +57,7 @@ test('methodology links to /memorial by name', () => {
 });
 
 test('the A shortcut sets the Atlas evidence floor to A only', () => {
-  assert.match(shortcutSource, /router\.push\('\/\?confidence=high'\)/);
+  assert.match(shortcutSource, /router\.push\('\/explore\?confidence=high'\)/);
 });
 
 test('the client boundary is the shortcut alone, never the sections', () => {

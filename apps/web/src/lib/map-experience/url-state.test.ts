@@ -31,7 +31,7 @@ test('an empty explore state links to the Atlas instrument, not the featured doo
       showResults: false,
       showKey: false,
     }),
-    '/?atlas=1',
+    '/explore',
   );
 });
 
@@ -82,7 +82,7 @@ test('round-trips a full view state through build -> parse', () => {
   };
 
   const href = buildExploreHref(state);
-  assert.match(href, /^\/\?/);
+  assert.match(href, /^\/explore\?/);
   assert.doesNotMatch(href, /group=/);
   // Intentional deep links may still carry camera; live explore pan/zoom does not rewrite it.
   assert.match(href, /lat=38\.9072/);

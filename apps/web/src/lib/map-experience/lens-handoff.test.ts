@@ -7,7 +7,7 @@ test('buildLensHandoff builds an Atlas href through buildExploreHref', () => {
     { state: 'AL', era: '1960s' },
     'Records in this jurisdiction and era.',
   );
-  assert.match(handoff.href, /^\/\?/);
+  assert.match(handoff.href, /^\/explore\?/);
   assert.match(handoff.href, /state=AL/);
   assert.match(handoff.href, /era=1960s/);
   assert.equal(handoff.reason, 'Records in this jurisdiction and era.');

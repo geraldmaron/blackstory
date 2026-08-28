@@ -472,7 +472,7 @@ export function buildAtlasHref(query: RecordsQuery): string {
   if (query.status.length > 0) params.set('status', query.status);
   if (query.evidence.length > 0) params.set('floor', query.evidence);
   const search = params.toString();
-  return search.length > 0 ? `/?${search}` : '/';
+  return search.length > 0 ? `/explore?${search}` : '/explore';
 }
 
 /** Exported for the drift test: the postal codes this index can actually filter on. */

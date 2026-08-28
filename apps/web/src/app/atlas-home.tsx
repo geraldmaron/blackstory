@@ -1,7 +1,6 @@
 /**
- * Atlas instrument for `/` when the URL asks for the board (`?atlas=1` or a surviving
- * explore filter). Kept out of `page.tsx` so a first-time load of bare `/` does not import
- * the catalog, AtlasLoader, or explore CSS.
+ * Atlas instrument for `/explore`. Kept out of `page.tsx` so a first-time load of `/`
+ * does not import the catalog, AtlasLoader, or explore CSS.
  */
 import { FilterBar } from '@repo/ui';
 import { SynchronizedResultList } from '../components/map-experience/SynchronizedResultList';
@@ -31,7 +30,7 @@ export async function AtlasHome({ params }: AtlasHomeProps) {
         <div className="ds-explore__noscript ds-container ds-page">
           <FilterBar
             method="get"
-            action="/"
+            action="/explore"
             legend="Filter documented records"
             fields={[
               {

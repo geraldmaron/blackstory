@@ -23,7 +23,7 @@ const PALM_BEACH_RESOLUTION = {
 
 test('retained coordinates produce explore href with 10mi radius and near label', () => {
   const href = buildLocateExploreHref(PALM_BEACH_RESOLUTION);
-  assert.match(href, /^\/\?/);
+  assert.match(href, /^\/explore\?/);
   assert.match(href, /radius=10mi/);
   assert.match(href, /near=Palm\+Beach\+County/);
   assert.match(href, /lat=26\.7056/);
@@ -45,7 +45,7 @@ test('state-only fallback links to explore without a finite radius', () => {
     jurisdictionIds: { countryId: 'us', stateId: 'us-13' },
     precision: { tier: 'state', exactCoordinatesRetained: false },
   });
-  assert.match(href, /^\/\?/);
+  assert.match(href, /^\/explore\?/);
   assert.doesNotMatch(href, /radius=/);
   assert.match(href, /near=Georgia/);
   assert.ok(
@@ -59,5 +59,5 @@ test('falls back to the Atlas instrument when neither coords nor state can be fr
     jurisdictionIds: { countryId: 'us' },
     precision: { tier: 'country', exactCoordinatesRetained: false },
   });
-  assert.equal(href, '/?atlas=1');
+  assert.equal(href, '/explore');
 });

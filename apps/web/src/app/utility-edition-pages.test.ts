@@ -79,7 +79,7 @@ test('not-found offers the four exits the design law names, and no gallery', () 
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/^[ \t]*\/\/.*$/gm, '');
   // design-direction-v9-surfaces.md §"/_not-found": the palette, the Atlas, Chapters, /records.
-  // Atlas is `/?atlas=1` now: bare `/` is the featured door, not the board.
+  // Atlas is `/explore`. Bare `/` is the featured door, not the board.
   assert.match(source, /ATLAS_INSTRUMENT_HREF/);
   assert.match(source, /href="\/stories"/);
   assert.match(source, /⌘K/);

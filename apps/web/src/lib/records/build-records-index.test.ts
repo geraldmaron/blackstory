@@ -202,7 +202,7 @@ describe('/records · the Atlas handoff', () => {
   it('maps topic onto the Lens name for the same thing', () => {
     assert.equal(
       buildAtlasHref({ ...EMPTY_RECORDS_QUERY, topic: 'abolition' }),
-      '/?theme=abolition',
+      '/explore?theme=abolition',
     );
   });
 
@@ -212,7 +212,7 @@ describe('/records · the Atlas handoff', () => {
       q: 'tulsa',
       state: 'OK',
     });
-    assert.equal(href, '/?state=OK');
+    assert.equal(href, '/explore?state=OK');
   });
 
   it('sends the evidence floor as `floor`, now that SP-16 landed it on the Lens', () => {
@@ -221,11 +221,11 @@ describe('/records · the Atlas handoff', () => {
       evidence: 'B',
       state: 'OK',
     });
-    assert.equal(href, '/?state=OK&floor=B');
+    assert.equal(href, '/explore?state=OK&floor=B');
   });
 
-  it('an unnarrowed index hands over bare /', () => {
-    assert.equal(buildAtlasHref(EMPTY_RECORDS_QUERY), '/');
+  it('an unnarrowed index hands over the Atlas instrument', () => {
+    assert.equal(buildAtlasHref(EMPTY_RECORDS_QUERY), '/explore');
   });
 });
 

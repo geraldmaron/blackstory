@@ -443,10 +443,9 @@ export function MapStageProvider({
   const reducedMotionRef = useRef<ReducedMotionListener | null>(null);
   const pathname = usePathname();
   /**
-   * Pathname-only first, then the search-aware class once `useSearchParams` resolves. Calling
-   * that hook on this provider would suspend the whole shell (and the persistent plate) behind
-   * a client boundary. Bare `/` must park as a reading room on first paint; `/?atlas=1` may
-   * briefly inherit that posture until the query hydrates.
+   * Pathname-only first. `/` is always a reading room, even with a leftover query.
+   * `/explore` is the instrument. Calling `useSearchParams` on this provider would
+   * suspend the whole shell.
    */
   const [surfaceClass, setSurfaceClass] = useState<SurfaceClass | null>(() =>
     surfaceClassFor(pathname ?? '/'),

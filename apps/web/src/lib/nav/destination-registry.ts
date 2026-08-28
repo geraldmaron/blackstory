@@ -25,10 +25,9 @@ import { CLASSIFIED_PATHS, surfaceClassFor, type SurfaceClass } from './surface-
 /**
  * The three card groups the library hub renders, in order, plus `find`.
  *
- * `find` is the archive's two ways into the records themselves — the map and the index. They are
- * deliberately NOT cards in the library: the library is the room for everything that is not the
- * map, so the map and the index sit in its off-ramp instead. They carry a group anyway because
- * the palette and the footer do list them.
+ * `find` is home, the map, and the index. They are deliberately NOT cards in the library:
+ * the library is the room for everything that is not the map, so those sit in its off-ramp
+ * instead. They carry a group anyway because the palette and the footer do list them.
  */
 export const DESTINATION_GROUPS = ['find', 'read', 'check', 'take-part'] as const;
 export type DestinationGroup = (typeof DESTINATION_GROUPS)[number];
@@ -111,13 +110,24 @@ const DESTINATIONS: readonly Destination[] = [
   /* ---- find: the two ways into the records, plus the library itself ---- */
   {
     path: '/',
-    label: 'Atlas',
+    label: 'Home',
     parent: null,
-    kind: 'MAP',
+    kind: 'PLACE',
     description:
       'A place-connected archive, pinned to where it happened, with the source on every claim.',
+    menuLine: 'Pinned to place',
     group: 'find',
     crawl: { changeFrequency: 'daily', priority: 1 },
+  },
+  {
+    path: '/explore',
+    label: 'Atlas',
+    parent: '/',
+    kind: 'MAP',
+    description: 'The Atlas answers where and when.',
+    menuLine: 'The map',
+    group: 'find',
+    crawl: { changeFrequency: 'daily', priority: 0.9 },
   },
   {
     path: '/library',

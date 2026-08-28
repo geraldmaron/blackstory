@@ -29,9 +29,8 @@ test('the sitemap never advertises a URL that redirects', () => {
     releaseGeneratedAt: '2026-07-17T00:00:00.000Z',
   });
   const urls = entries.map((entry) => entry.url);
-  // `/explore` 308s to `/`, which is the Atlas and carries the crawl weight instead. Listing a
-  // redirect spends crawl budget teaching a URL that immediately disowns itself.
-  assert.ok(!urls.some((url) => url.endsWith('/explore')));
+  // `/explore` is the Atlas instrument. `/` is the featured door.
+  assert.ok(urls.some((url) => url.endsWith('/explore')));
   // `/history` 308s into `/records` for the same reason.
   assert.ok(!urls.some((url) => url.endsWith('/history')));
   assert.ok(urls.some((url) => url === 'https://blackbook.example/'));
