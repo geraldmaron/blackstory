@@ -104,15 +104,19 @@ test('first paint never claims Grade A or a source count', () => {
   assert.doesNotMatch(paint, /evidenceLabel|record-evidence|Grade A|2 sources/);
   const dunbar = getPublicEntity('ent_dunbar_school_001');
   assert.ok(dunbar);
-  const wouldClaim = buildEntityAnatomyInputs(dunbar, undefined).evidenceLabel;
-  assert.match(wouldClaim, /Grade [ABC]|Unrated/);
-  assert.match(wouldClaim, /\d+ sources?/);
+  const greenwoodShaped = {
+    ...dunbar,
+    displayName: 'Greenwood District',
+    claims: dunbar.claims.slice(0, 2),
+  };
+  const wouldClaim = buildEntityAnatomyInputs(greenwoodShaped, undefined).evidenceLabel;
+  assert.equal(wouldClaim, 'Grade A · 2 sources');
   const html = renderToStaticMarkup(
     createElement(HomeFirstPaint, {
-      model: { lead: dunbar, also: [], story: undefined, source: 'seed' },
+      model: { lead: greenwoodShaped, also: [], story: undefined, source: 'live' },
     }),
   );
-  assert.match(html, /Paul Laurence Dunbar High School/);
+  assert.match(html, /Greenwood District/);
   assert.doesNotMatch(html, /Grade A|Grade B|Grade C/);
   assert.doesNotMatch(html, /\d+ sources?|independent sources/i);
   assert.doesNotMatch(html, />Evidence</);
