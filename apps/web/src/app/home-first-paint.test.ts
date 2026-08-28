@@ -9,6 +9,7 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import type { PublicArticleListItemDoc } from '@repo/schemas';
 import { FEATURED_SEED_IDS, getPublicEntity } from '../data/public-seed';
+import { buildEntityAnatomyInputs } from './entity/[id]/entity-anatomy-facts';
 import { HomeFirstPaint } from './HomeFirstPaint';
 import { HOME_FEATURED_ENTITY_IDS, isInternalRecordLabel, pickHomeStory } from './home-first-paint';
 
@@ -96,6 +97,26 @@ test('first paint never mounts the catalog boot, camera cockpit, or Journey page
   assert.doesNotMatch(paint, /CameraConsole|Orbit|Tilt|Trace/);
   assert.doesNotMatch(paint, /Loading 4,101|\/journey|42Cb1758/);
   assert.doesNotMatch(loader, /Loading \{shell\.totalMatched|4,101 records/);
+});
+
+test('first paint never claims Grade A or a source count', () => {
+  const paint = readFileSync(new URL('./HomeFirstPaint.tsx', import.meta.url), 'utf8');
+  assert.doesNotMatch(paint, /evidenceLabel|record-evidence|Grade A|2 sources/);
+  const dunbar = getPublicEntity('ent_dunbar_school_001');
+  assert.ok(dunbar);
+  const wouldClaim = buildEntityAnatomyInputs(dunbar, undefined).evidenceLabel;
+  assert.match(wouldClaim, /Grade [ABC]|Unrated/);
+  assert.match(wouldClaim, /\d+ sources?/);
+  const html = renderToStaticMarkup(
+    createElement(HomeFirstPaint, {
+      model: { lead: dunbar, also: [], story: undefined, source: 'seed' },
+    }),
+  );
+  assert.match(html, /Paul Laurence Dunbar High School/);
+  assert.doesNotMatch(html, /Grade A|Grade B|Grade C/);
+  assert.doesNotMatch(html, /\d+ sources?|independent sources/i);
+  assert.doesNotMatch(html, />Evidence</);
+  assert.equal(html.includes(wouldClaim), false);
 });
 
 test('HomeFirstPaint never titles or lists an internal id, even if the model carries one', () => {
