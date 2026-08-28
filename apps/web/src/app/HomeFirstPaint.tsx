@@ -2,7 +2,8 @@
  * Server-rendered front door: one released place (and optional story), not the Atlas board.
  *
  * Voice is stolen from `/about` and `/stories`, not invented. Room kit only. The map is an
- * OffRamp, not the boot.
+ * OffRamp, not the boot. First paint does not advertise a confidence grade or source count:
+ * a count of citations is not two lineages.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -57,12 +58,6 @@ function anatomyFacts(
       label: 'Era',
       value: inputs.eraLabel,
       icon: { variant: 'record-era' },
-    },
-    {
-      key: 'evidence',
-      label: 'Evidence',
-      value: inputs.evidenceLabel,
-      icon: { variant: 'record-evidence', tier: inputs.evidenceTier },
     },
   ];
 }
