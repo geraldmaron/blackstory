@@ -23,9 +23,7 @@ function firstParam(raw: string | readonly string[] | undefined): string | undef
   return typeof raw === 'string' ? raw : raw[0];
 }
 
-function toBag(
-  input: string | URLSearchParams | RawExploreSearchParams,
-): RawExploreSearchParams {
+function toBag(input: string | URLSearchParams | RawExploreSearchParams): RawExploreSearchParams {
   if (typeof input === 'string') {
     const qs = input.startsWith('?') ? input.slice(1) : input;
     return Object.fromEntries(new URLSearchParams(qs));

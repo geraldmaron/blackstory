@@ -16,7 +16,10 @@ import {
   RoomCard,
   RoomHeader,
 } from '../components/room';
-import { RecordAnatomyPanel, type RecordAnatomyFact } from '../components/patterns/RecordAnatomyPanel';
+import {
+  RecordAnatomyPanel,
+  type RecordAnatomyFact,
+} from '../components/patterns/RecordAnatomyPanel';
 import {
   buildEntityAnatomyInputs,
   buildEntityAnatomyPlace,
@@ -63,7 +66,7 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
   const place = lead && anatomyInputs ? buildEntityAnatomyPlace(lead, geo) : undefined;
 
   return (
-    <Room>
+    <Room className="ds-home-first-paint">
       <RoomHeader
         pathname="/"
         crumbLabel="Home"

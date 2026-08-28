@@ -330,10 +330,7 @@ test('/history carries no browse allowlist, because normalizing it would break t
 test('normalizeQueryString keeps atlas=1 so the instrument door is not stripped', () => {
   assert.equal(normalizeQueryString('/', { atlas: '1' }), 'atlas=1');
   assert.equal(normalizeQueryString('/', { atlas: 'true', state: 'dc' }), 'atlas=1&state=DC');
-  assert.equal(
-    needsQueryNormalizationRedirect(new URL('https://example.com/?atlas=1')),
-    false,
-  );
+  assert.equal(needsQueryNormalizationRedirect(new URL('https://example.com/?atlas=1')), false);
 });
 
 test('buildNormalizedUrl issues canonical Atlas URLs for revisit', () => {
