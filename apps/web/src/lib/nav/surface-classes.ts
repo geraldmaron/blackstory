@@ -81,7 +81,6 @@ export const ENDPOINT_ROUTES: readonly string[] = [
   '/facts',
   '/search',
   '/map',
-  '/banned-books',
   '/history',
   '/explore/api',
   '/search/api',

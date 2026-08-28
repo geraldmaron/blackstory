@@ -26,6 +26,9 @@ export { isInternalRecordLabel } from '../lib/place/public-place-path';
  * fallback when no other published place can be resolved.
  */
 export const HOME_STAND_CANDIDATE_IDS = [
+  'ent_aarlcc_fort_lauderdale_001',
+  'nrhp-black-heritage-91000107',
+  'nrhp-black-heritage-100001861',
   'ent_dunbar_school_001',
   'ent_15th_st_church_001',
   'ent_greenwood_district_001',

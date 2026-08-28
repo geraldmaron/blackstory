@@ -3,9 +3,10 @@
  *
  * Not a manifesto, not a schema card, and not the Atlas board. The place is whoever
  * can be stood at (named slug, last stand, then a published record). Greenwood is
- * last-resort fallback only. Archive rooms stay up even when the place is thin.
- * Stories, Law, and Memorial exist only when this record already has that material.
- * No schema strip, no confidence badge, no precision leak, no second record page.
+ * last-resort fallback only. Archive chrome (Law, Data, Memorial, Methodology,
+ * Errata) is the same on every place. Stories exists only when this record
+ * already names a chapter. No schema strip, no confidence badge, no precision
+ * leak, no second record page.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -15,14 +16,13 @@ import { LinkedProse, type EntityLinkCatalogEntry } from '../components/entity/L
 import { RecordPlacePreview } from '../components/patterns/RecordPlacePreview';
 import { Connections, OffRamp, Room } from '../components/room';
 import { geoAnchorFor } from '../lib/map-experience/entity-geo';
-import type { PublicEntityView, RelatedNeighborView } from '../data/public-seed';
+import type { PublicEntityView } from '../data/public-seed';
 import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
-import { neighborHref, placeHref } from '../lib/place/public-place-path';
+import { placeHref } from '../lib/place/public-place-path';
 import { isInternalRecordLabel, type HomeFirstPaintModel } from './home-first-paint';
 import {
   firstPaintEraLine,
   firstPaintRecord,
-  firstPaintRelation,
   publishableCitingStories,
   selectDoorRooms,
 } from './home-first-paint-surface';
@@ -43,18 +43,6 @@ function neighborCatalog(entity: PublicEntityView): readonly EntityLinkCatalogEn
     catalog.push({ id: neighbor.id, displayName: neighbor.displayName });
   }
   return catalog;
-}
-
-function neighborsOfKind(
-  entity: PublicEntityView,
-  kinds: ReadonlySet<string>,
-): readonly RelatedNeighborView[] {
-  return [...(entity.relatedNeighbors ?? []), ...(entity.continueLearning ?? [])].filter(
-    (neighbor) =>
-      kinds.has(String(neighbor.kind)) &&
-      neighbor.displayName.trim().length > 0 &&
-      !isInternalRecordLabel(neighbor.displayName),
-  );
 }
 
 function DoorRooms({ rooms }: { readonly rooms: ReturnType<typeof selectDoorRooms> }) {
@@ -84,8 +72,6 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
     const citing = publishableCitingStories(model.citing);
     const rooms = selectDoorRooms(lead, citing);
     const eraLine = firstPaintEraLine(lead);
-    const lawNeighbors = neighborsOfKind(lead, new Set(['law', 'case']));
-    const memorialNeighbors = neighborsOfKind(lead, new Set(['person']));
 
     return (
       <Room
@@ -146,36 +132,6 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
                 name: item.title,
                 relation: item.relation,
                 href: item.href,
-              }))}
-            />
-          </section>
-        ) : null}
-
-        {lawNeighbors.length > 0 ? (
-          <section className="ds-record-beat" id="law" aria-labelledby="law-heading">
-            <h2 className="ds-record-beat__heading" id="law-heading">
-              Law
-            </h2>
-            <Connections
-              connections={lawNeighbors.map((neighbor) => ({
-                name: neighbor.displayName,
-                relation: firstPaintRelation(neighbor, lead) ?? '',
-                href: neighborHref(neighbor),
-              }))}
-            />
-          </section>
-        ) : null}
-
-        {memorialNeighbors.length > 0 ? (
-          <section className="ds-record-beat" id="memorial" aria-labelledby="memorial-heading">
-            <h2 className="ds-record-beat__heading" id="memorial-heading">
-              Memorial
-            </h2>
-            <Connections
-              connections={memorialNeighbors.map((neighbor) => ({
-                name: neighbor.displayName,
-                relation: firstPaintRelation(neighbor, lead) ?? '',
-                href: neighborHref(neighbor),
               }))}
             />
           </section>
