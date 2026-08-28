@@ -7,7 +7,9 @@ import { test } from 'node:test';
 import { getPublicEntity } from '../data/public-seed';
 import {
   containsInternalId,
+  firstPaintEraLine,
   firstPaintRecord,
+  firstPaintRelatedHeading,
   firstPaintRelation,
   firstPaintTimeline,
   humanPlaceLine,
@@ -21,7 +23,7 @@ test('containsInternalId catches claim tokens and catalog ids', () => {
   assert.equal(containsInternalId('Status: Historic'), false);
 });
 
-test('firstPaintTimeline drops claim-id titles and strips basis shop talk', () => {
+test('firstPaintTimeline drops status chrome and claim-id titles', () => {
   const cleaned = firstPaintTimeline([
     {
       id: 'ent_greenwood_district_001_status_0',
@@ -37,12 +39,18 @@ test('firstPaintTimeline drops claim-id titles and strips basis shop talk', () =
       title: 'ent_greenwood_district_001_claim_0',
       body: 'A massacre burned thirty-five blocks.',
     },
+    {
+      id: 'keep',
+      time: '1922',
+      datePrecision: 'year',
+      title: 'The district is rebuilt',
+      body: 'Greenwood rebuilt after 1921.',
+    },
   ]);
   assert.equal(cleaned.length, 1);
-  assert.equal(cleaned[0]?.title, 'Status: Historic');
-  assert.doesNotMatch(cleaned[0]?.body ?? '', /ent_greenwood_district_001_claim_0/);
-  assert.doesNotMatch(cleaned[0]?.body ?? '', /this release/i);
-  assert.doesNotMatch(cleaned[0]?.body ?? '', /Basis:/i);
+  assert.equal(cleaned[0]?.title, 'The district is rebuilt');
+  assert.doesNotMatch(cleaned.map((item) => item.title + item.body).join(' '), /In effect from/);
+  assert.doesNotMatch(cleaned.map((item) => item.title).join(' '), /Status:/);
 });
 
 test('incoming located_at becomes a human place line, never from their record', () => {
@@ -71,10 +79,44 @@ test('incoming located_at becomes a human place line, never from their record', 
   assert.doesNotMatch(relation ?? '', /\brecord\b/i);
 });
 
-test('door rooms omit Law, Data, and Memorial when this record has none', () => {
+test('related heading is human names, not catalog voice', () => {
+  assert.equal(
+    firstPaintRelatedHeading([
+      {
+        id: 'ent_vernon_ame_001',
+        displayName: 'Vernon AME Church',
+        kind: 'place',
+        summary: 'A church in Greenwood.',
+        relationType: 'located_at',
+        direction: 'incoming',
+      },
+    ]),
+    'Places',
+  );
+  assert.equal(firstPaintRelatedHeading([]), undefined);
+});
+
+test('era line is English from real fields, not Active or in-effect', () => {
   const dunbar = getPublicEntity('ent_dunbar_school_001');
   assert.ok(dunbar);
-  const rooms = selectDoorRooms(dunbar);
+  const line = firstPaintEraLine(dunbar);
+  assert.ok(line);
+  assert.match(line, /1870s|1910s|Reconstruction/i);
+  assert.doesNotMatch(line, /Active|In effect from|Current status/i);
+});
+
+test('door rooms omit Stories unless chapters already cite this record', () => {
+  const dunbar = getPublicEntity('ent_dunbar_school_001');
+  assert.ok(dunbar);
+  assert.deepEqual(selectDoorRooms(dunbar).map((room) => room.id), []);
+  const rooms = selectDoorRooms(dunbar, [
+    {
+      slug: 'the-gap-that-never-closed',
+      title: 'The gap that never closed',
+      relation: 'mapped in',
+      href: '/stories/the-gap-that-never-closed',
+    },
+  ]);
   assert.deepEqual(
     rooms.map((room) => room.id),
     ['stories'],
@@ -113,6 +155,6 @@ test('Memorial and Law appear only from this record neighbors', () => {
   const rooms = selectDoorRooms(withPeople);
   assert.deepEqual(
     rooms.map((room) => room.id),
-    ['stories', 'law', 'memorial'],
+    ['law', 'memorial'],
   );
 });

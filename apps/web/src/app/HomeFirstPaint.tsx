@@ -18,6 +18,7 @@ import type { PublicEntityView, RelatedNeighborView } from '../data/public-seed'
 import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
 import { isInternalRecordLabel, type HomeFirstPaintModel } from './home-first-paint';
 import {
+  firstPaintEraLine,
   firstPaintRecord,
   firstPaintRelation,
   publishableCitingStories,
@@ -84,6 +85,7 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
     const geo = lead.geoAnchor ?? geoAnchorFor(lead.id);
     const citing = publishableCitingStories(model.citing);
     const rooms = selectDoorRooms(lead, citing);
+    const eraLine = firstPaintEraLine(lead);
     const lawNeighbors = neighborsOfKind(lead, new Set(['law', 'case']));
     const memorialNeighbors = neighborsOfKind(lead, new Set(['person']));
 
@@ -122,6 +124,8 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
           </section>
         ) : null}
 
+        {eraLine ? <p>{eraLine}</p> : null}
+
         {lead.sensitivity ? (
           <EntitySensitivityBanner sensitivity={lead.sensitivity} entityKind={lead.kind} />
         ) : null}
@@ -134,9 +138,9 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
         />
 
         {citing.length > 0 ? (
-          <section className="ds-record-beat" aria-labelledby="cited-stories-heading">
-            <h2 className="ds-record-beat__heading" id="cited-stories-heading">
-              Written about this place
+          <section className="ds-record-beat" id="stories" aria-labelledby="stories-heading">
+            <h2 className="ds-record-beat__heading" id="stories-heading">
+              Stories
             </h2>
             <Connections
               connections={citing.map((item) => ({

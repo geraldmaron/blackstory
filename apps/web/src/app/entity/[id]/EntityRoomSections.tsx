@@ -31,7 +31,7 @@ import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel'
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { Connections, type RoomConnection } from '../../../components/room';
 import { humanizeToken } from '../../../components/entity/format';
-import { firstPaintRelation } from '../../home-first-paint-surface';
+import { firstPaintRelatedHeading, firstPaintRelation } from '../../home-first-paint-surface';
 
 void React;
 
@@ -103,7 +103,7 @@ export type EntityRoomSectionsProps = {
   readonly evidenceClaims: readonly EvidenceClaimInput[];
   readonly entityLinkCatalog: readonly EntityLinkCatalogEntry[];
   readonly crossReferences?: readonly EntityCrossReferenceSurface[];
-  /** First paint: human place lines, no "from their record", history is the Stories room. */
+  /** First paint: human place lines, no status chrome, no catalog related heading. */
   readonly firstPaint?: boolean;
 };
 
@@ -156,18 +156,32 @@ export function EntityRoomSections({
   firstPaint = false,
 }: EntityRoomSectionsProps) {
   const hasContext = entity.historicalContext.trim().length > 0;
-  const hasStatus = hasStatusFor(entity);
-  const connections = toConnections(entity, firstPaint);
-  const continueLearning = entity.continueLearning ?? [];
+  const hasStatus = firstPaint ? false : hasStatusFor(entity);
+  const connections = firstPaint
+    ? [
+        ...toConnections(entity, true),
+        ...(entity.continueLearning ?? []).map((neighbor) => ({
+          name: neighbor.displayName,
+          relation: firstPaintRelation(neighbor, entity) ?? '',
+          href: `/entity/${neighbor.id}`,
+        })),
+      ].filter(
+        (connection, index, list) =>
+          list.findIndex((other) => other.href === connection.href) === index,
+      )
+    : toConnections(entity, false);
+  const continueLearning = firstPaint ? [] : (entity.continueLearning ?? []);
+  const relatedHeading = firstPaint
+    ? firstPaintRelatedHeading([
+        ...(entity.relatedNeighbors ?? []),
+        ...(entity.continueLearning ?? []),
+      ])
+    : 'Records this one touches';
 
   return (
     <>
       {hasContext ? (
-        <section
-          className="ds-record-beat"
-          aria-labelledby="context-heading"
-          {...(firstPaint ? { id: 'stories' } : {})}
-        >
+        <section className="ds-record-beat" aria-labelledby="context-heading">
           <h2 className="ds-record-beat__heading" id="context-heading">
             The history here
           </h2>
@@ -233,10 +247,10 @@ export function EntityRoomSections({
         </section>
       ) : null}
 
-      {connections.length > 0 ? (
+      {connections.length > 0 && relatedHeading ? (
         <section className="ds-record-beat" aria-labelledby="related-heading">
           <h2 className="ds-record-beat__heading" id="related-heading">
-            Records this one touches
+            {relatedHeading}
           </h2>
           <Connections connections={connections} />
           {continueLearning.length > 0 ? (

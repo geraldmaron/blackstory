@@ -4,6 +4,10 @@
  * rights-clearance captions, and "from their record" never print here.
  */
 import type { PublicEntityView, RelatedNeighborView } from '../data/public-seed';
+import {
+  ERA_NOT_DOCUMENTED_LABEL,
+  entityEraFact,
+} from '../lib/map-experience/entity-era-facts';
 import type { StoryCitation } from '../lib/release/build-cites-edge';
 import { isInternalRecordLabel } from './home-first-paint';
 
@@ -82,13 +86,21 @@ export function firstPaintRelation(
   return phrase;
 }
 
+const STATUS_CHROME =
+  /^(status:|current status)|in effect from|\bongoing\b|^active$|^historic$|^unknown$/i;
+
 function sanitizeTimelineBody(body: string): string {
   return body
     .replace(/\s*Basis:[^.]*\.?/gi, '')
     .replace(/\s*ongoing as of this release\.?/gi, '')
     .replace(/\b(?:ent|disc|art|pkg|rec|src|claim)_[a-z0-9_]+/gi, '')
+    .replace(/\s*,\s*$/g, '')
     .replace(/\s{2,}/g, ' ')
     .trim();
+}
+
+function isStatusChrome(value: string): boolean {
+  return STATUS_CHROME.test(value.trim());
 }
 
 export function firstPaintTimeline(
@@ -96,11 +108,68 @@ export function firstPaintTimeline(
 ): PublicEntityView['timeline'] {
   return items.flatMap((item) => {
     const title = item.title.trim();
-    if (title.length === 0 || containsInternalId(title)) return [];
+    if (title.length === 0 || containsInternalId(title) || isStatusChrome(title)) return [];
     const body = sanitizeTimelineBody(item.body);
-    if (containsInternalId(body)) return [];
+    if (containsInternalId(body) || isStatusChrome(body)) return [];
     return [{ ...item, title, body }];
   });
+}
+
+/**
+ * One English when-line from real era fields. Not Active, not "in effect from",
+ * not a status strip. Omit when the archive has nothing honest to say.
+ */
+export function firstPaintEraLine(entity: PublicEntityView): string | undefined {
+  const era = entityEraFact({
+    ...(entity.eraBuckets !== undefined ? { eraBuckets: entity.eraBuckets } : {}),
+    ...(entity.era !== undefined ? { era: entity.era } : {}),
+    ...(entity.eventWindow !== undefined ? { eventWindow: entity.eventWindow } : {}),
+    ...(entity.statusHistory !== undefined ? { statusHistory: entity.statusHistory } : {}),
+    claims: entity.claims,
+  });
+  const label = era.label.trim();
+  if (label.length === 0 || label === ERA_NOT_DOCUMENTED_LABEL) return undefined;
+  if (containsInternalId(label) || isStatusChrome(label)) return undefined;
+  if (/^undated$|^unknown$/i.test(label)) return undefined;
+  return label;
+}
+
+function neighborKindGroup(kind: string): 'people' | 'places' | 'events' | 'other' {
+  switch (kind) {
+    case 'person':
+      return 'people';
+    case 'event':
+      return 'events';
+    case 'place':
+    case 'school':
+    case 'institution':
+    case 'organization':
+      return 'places';
+    default:
+      return 'other';
+  }
+}
+
+/**
+ * Human heading for named neighbors. Catalog voice ("records this one touches") stays off.
+ */
+export function firstPaintRelatedHeading(
+  neighbors: readonly RelatedNeighborView[],
+): string | undefined {
+  const named = publishableNeighbors(neighbors);
+  if (named.length === 0) return undefined;
+  const groups = new Set(named.map((neighbor) => neighborKindGroup(String(neighbor.kind))));
+  const people = groups.has('people');
+  const places = groups.has('places');
+  const events = groups.has('events');
+  if (people && !places && !events) return 'People';
+  if (places && !people && !events) return 'Places';
+  if (events && !people && !places) return 'Events';
+  if (people && places && !events) return 'People and places';
+  if (people && events && !places) return 'People and events';
+  if (places && events && !people) return 'Places and events';
+  if (people && places && events) return 'People, places, and events';
+  return 'Also here';
 }
 
 function publishableNeighbors(
@@ -133,15 +202,8 @@ function neighborsOf(
   ]).filter((neighbor) => kinds.has(String(neighbor.kind)));
 }
 
-export function storiesRoomMaterial(
-  entity: PublicEntityView,
-  citing: readonly StoryCitation[],
-): boolean {
-  return (
-    entity.historicalContext.trim().length > 0 ||
-    Boolean(entity.extendedNarrative?.trim()) ||
-    citing.some((story) => !containsInternalId(story.title))
-  );
+export function storiesRoomMaterial(citing: readonly StoryCitation[]): boolean {
+  return publishableCitingStories(citing).length > 0;
 }
 
 export function selectDoorRooms(
@@ -149,7 +211,7 @@ export function selectDoorRooms(
   citing: readonly StoryCitation[] = [],
 ): readonly DoorRoom[] {
   const rooms: DoorRoom[] = [];
-  if (storiesRoomMaterial(entity, citing)) {
+  if (storiesRoomMaterial(citing)) {
     rooms.push({ id: 'stories', label: 'Stories', href: '#stories' });
   }
   if (neighborsOf(entity, LAW_KINDS).length > 0) {
