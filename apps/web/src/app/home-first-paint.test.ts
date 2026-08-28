@@ -9,10 +9,10 @@ import { FEATURED_SEED_IDS, getPublicEntity } from '../data/public-seed';
 import { HOME_FEATURED_ENTITY_IDS } from './home-first-paint';
 
 test('the featured set is the two released seed places, Dunbar first', () => {
-  assert.deepEqual([...HOME_FEATURED_ENTITY_IDS], [
-    'ent_dunbar_school_001',
-    'ent_15th_st_church_001',
-  ]);
+  assert.deepEqual(
+    [...HOME_FEATURED_ENTITY_IDS],
+    ['ent_dunbar_school_001', 'ent_15th_st_church_001'],
+  );
   assert.ok(FEATURED_SEED_IDS.includes(HOME_FEATURED_ENTITY_IDS[0]));
   assert.ok(FEATURED_SEED_IDS.includes(HOME_FEATURED_ENTITY_IDS[1]));
   assert.ok(getPublicEntity(HOME_FEATURED_ENTITY_IDS[0]));
@@ -28,8 +28,13 @@ test('the loader never asks for the full catalog', () => {
 
 test('the door page does not mount AtlasLoader or the catalog fetch on the default path', () => {
   const page = readFileSync(fileURLToPath(new URL('./page.tsx', import.meta.url)), 'utf8');
+  const imports = page
+    .split('\n')
+    .filter((line) => line.startsWith('import '))
+    .join('\n');
   assert.match(page, /HomeFirstPaint/);
   assert.match(page, /wantsAtlasInstrument/);
   assert.match(page, /loadHomeFirstPaint/);
+  assert.doesNotMatch(imports, /getSharedPublicEntities|AtlasLoader|atlas\/catalog|explore\.css/);
   assert.doesNotMatch(page, /Loading \{shell\.totalMatched/);
 });

@@ -94,7 +94,11 @@ export function AtlasLoader({ shell, catalogUrl = ATLAS_CATALOG_PATH }: AtlasLoa
   if (state.status === 'error') {
     return (
       <div className="ds-atlas ds-atlas--pending" data-atlas-catalog="error">
-        <Notice tone="error" title="The Atlas could not load its records" className="ds-atlas__pending">
+        <Notice
+          tone="error"
+          title="The Atlas could not load its records"
+          className="ds-atlas__pending"
+        >
           <p>The record catalog did not arrive. Check your connection and try again.</p>
           <p>
             <button
