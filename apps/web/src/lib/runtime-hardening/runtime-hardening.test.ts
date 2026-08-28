@@ -147,8 +147,8 @@ test('Atlas and entity route segment config stays after all imports', () => {
 });
 
 test('the Atlas is one route — `/` — with no page rendering at /explore', () => {
-  // `/` IS the Atlas and `/explore` 308s to it, so a second page file claiming /explore would
-  // shadow that redirect and quietly resurrect the surface the redirect exists to retire.
+  // `/` hosts the featured door and, when asked, the Atlas. `/explore` 308s to `/?atlas=1`.
+  // A second page file claiming /explore would shadow that redirect.
   const explorePages = collectAppRouteFiles(APP_ROOT).filter((file) =>
     /(^|\/)explore\/page\.tsx$/.test(
       file

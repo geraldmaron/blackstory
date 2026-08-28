@@ -17,9 +17,10 @@
  */
 'use client';
 
+import { Suspense, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import { type ReactNode } from 'react';
 import { surfaceClassFor } from '../lib/nav/surface-classes';
+import { useSurfaceClass } from '../lib/nav/use-surface-class';
 import { PageField, usePageFieldSelection } from './PageField';
 
 export type ShellPageTransitionProps = {
@@ -27,8 +28,20 @@ export type ShellPageTransitionProps = {
 };
 
 export function ShellPageTransition({ children }: ShellPageTransitionProps) {
-  const pathname = usePathname() || '/';
-  const surface = surfaceClassFor(pathname);
+  return (
+    <Suspense fallback={<ShellPageFrameFromPath>{children}</ShellPageFrameFromPath>}>
+      <ShellPageFrameFromSearch>{children}</ShellPageFrameFromSearch>
+    </Suspense>
+  );
+}
+
+function ShellPageChrome({
+  children,
+  surface,
+}: {
+  readonly children: ReactNode;
+  readonly surface: ReturnType<typeof surfaceClassFor>;
+}) {
   const pageField = usePageFieldSelection();
 
   return (
@@ -41,4 +54,13 @@ export function ShellPageTransition({ children }: ShellPageTransitionProps) {
       <div className="ds-shell-page-transition__content">{children}</div>
     </div>
   );
+}
+
+function ShellPageFrameFromPath({ children }: { readonly children: ReactNode }) {
+  const pathname = usePathname() || '/';
+  return <ShellPageChrome surface={surfaceClassFor(pathname)}>{children}</ShellPageChrome>;
+}
+
+function ShellPageFrameFromSearch({ children }: { readonly children: ReactNode }) {
+  return <ShellPageChrome surface={useSurfaceClass()}>{children}</ShellPageChrome>;
 }

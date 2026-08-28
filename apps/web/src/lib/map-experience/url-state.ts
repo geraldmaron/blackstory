@@ -429,10 +429,10 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   return params.toString();
 }
 
-/** The Atlas is `/`; `/explore` only redirects here, so building a link to it costs a hop. */
+/** The Atlas answers on `/` with a filter or `atlas=1`. Bare `/` is the featured door. */
 export function buildExploreHref(state: ExploreViewState): string {
   const qs = buildExploreSearchParams(state);
-  return qs ? `/?${qs}` : '/';
+  return qs ? `/?${qs}` : '/?atlas=1';
 }
 
 /** Default overlay + toggle state for callers building explore links without a full view model. */

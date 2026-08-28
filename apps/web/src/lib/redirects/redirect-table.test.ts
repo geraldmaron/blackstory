@@ -140,14 +140,14 @@ test('/legal keeps its slug rather than dumping every statute on the index', () 
   assert.equal(rule?.destination, '/law/:path*');
 });
 
-test('/map and /explore both land on the Atlas, which is `/`', () => {
+test('/map and /explore both land on the Atlas instrument, not the featured door', () => {
   const map = RULES.find((entry) => entry.source === '/map');
   const explore = RULES.find((entry) => entry.source === '/explore');
   assert.ok(map, '/map must have a config rule');
-  assert.equal(map?.destination, '/');
+  assert.equal(map?.destination, '/?atlas=1');
   assert.equal(map?.permanent, true);
   assert.ok(explore, '/explore must have a config rule');
-  assert.equal(explore?.destination, '/');
+  assert.equal(explore?.destination, '/?atlas=1');
   assert.equal(explore?.permanent, true);
 });
 

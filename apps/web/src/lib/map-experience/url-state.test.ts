@@ -12,6 +12,29 @@ import {
   viewportForState,
 } from './url-state';
 
+test('an empty explore state links to the Atlas instrument, not the featured door', () => {
+  assert.equal(
+    buildExploreHref({
+      filters: {
+        era: 'all',
+        kind: 'all',
+        tone: 'all',
+        theme: 'all',
+        status: 'all',
+        confidence: 'all',
+      },
+      layerMode: 'presence',
+      group: false,
+      sat: false,
+      lines: false,
+      showFilters: false,
+      showResults: false,
+      showKey: false,
+    }),
+    '/?atlas=1',
+  );
+});
+
 test('an empty query string parses to the "all" default filter state with no viewport/selection', () => {
   const parsed = parseExploreSearchParams({});
   assert.deepEqual(parsed.filters, {

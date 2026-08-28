@@ -114,7 +114,7 @@ const DESTINATIONS: readonly Destination[] = [
     label: 'Atlas',
     parent: null,
     kind: 'MAP',
-    description: 'Every record that can be placed, on the plate, in time.',
+    description: 'Start with a place, then open the map when you want the whole archive.',
     group: 'find',
     crawl: { changeFrequency: 'daily', priority: 1 },
   },
