@@ -5,8 +5,11 @@
  */
 import type { PublicEntityView, RelatedNeighborView } from '../data/public-seed';
 import { ERA_NOT_DOCUMENTED_LABEL, entityEraFact } from '../lib/map-experience/entity-era-facts';
+import { isTulsaPlace, placeHref, publicPlaceSlug } from '../lib/place/public-place-path';
 import type { StoryCitation } from '../lib/release/build-cites-edge';
 import { isInternalRecordLabel } from './home-first-paint';
+
+const CHURCH_SLUG = 'fifteenth-street-presbyterian-church';
 
 const SHOP_LOCATION = /pin|precision|schematic|affordance|rights-cleared|\brecord\b/i;
 
@@ -188,6 +191,38 @@ function publishableNeighbors(
   return (neighbors ?? []).filter(
     (neighbor) =>
       neighbor.displayName.trim().length > 0 && !containsInternalId(neighbor.displayName),
+  );
+}
+
+/** Place-kind neighbors already on this record. Those are the walk, when they exist. */
+export function firstPaintPlaceNeighbors(
+  entity: PublicEntityView,
+): readonly RelatedNeighborView[] {
+  return publishableNeighbors([
+    ...(entity.relatedNeighbors ?? []),
+    ...(entity.continueLearning ?? []),
+  ]).filter((neighbor) => neighborKindGroup(String(neighbor.kind)) === 'places');
+}
+
+/**
+ * Another published stand when this record has no place neighbors.
+ * Prefers the church that already holds. Does not invent a graph edge.
+ */
+export function walkOnPlace(
+  lead: PublicEntityView,
+  also: readonly PublicEntityView[],
+): PublicEntityView | undefined {
+  if (firstPaintPlaceNeighbors(lead).length > 0) return undefined;
+  const leadHref = placeHref(lead.displayName);
+  const candidates = also.filter((place) => {
+    if (place.id === lead.id) return false;
+    if (isTulsaPlace(place)) return false;
+    if (isInternalRecordLabel(place.displayName)) return false;
+    const href = placeHref(place.displayName);
+    return href !== leadHref && !href.includes('ent_');
+  });
+  return (
+    candidates.find((place) => publicPlaceSlug(place.displayName) === CHURCH_SLUG) ?? candidates[0]
   );
 }
 

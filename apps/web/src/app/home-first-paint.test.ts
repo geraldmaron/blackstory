@@ -10,7 +10,7 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import type { PublicArticleListItemDoc } from '@repo/schemas';
 import { FEATURED_SEED_IDS, getPublicEntity } from '../data/public-seed';
-import { isTulsaPlace } from '../lib/place/public-place-path';
+import { isTulsaPlace, placeHref } from '../lib/place/public-place-path';
 import { buildEntityAnatomyInputs } from './entity/[id]/entity-anatomy-facts';
 import { HomeFirstPaint } from './HomeFirstPaint';
 import {
@@ -60,6 +60,13 @@ test('the loader stands away from Tulsa, or at a named slug', async () => {
   assert.ok(home.lead);
   assert.equal(isTulsaPlace(home.lead), false);
   assert.doesNotMatch(home.lead.displayName, /tulsa|greenwood/i);
+  assert.ok(home.also.length > 0);
+  assert.ok(home.also.every((place) => place.id !== home.lead?.id));
+  assert.ok(home.also.every((place) => !isTulsaPlace(place)));
+  assert.ok(home.also.every((place) => !placeHref(place.displayName).includes('ent_')));
+  assert.ok(
+    home.also.some((place) => place.displayName === 'Fifteenth Street Presbyterian Church'),
+  );
 
   const church = await loadHomeFirstPaint({
     namedSlug: 'fifteenth-street-presbyterian-church',
@@ -218,6 +225,9 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.doesNotMatch(html, /Open the full record/);
   assert.doesNotMatch(html, /href="\/entity\//);
   assert.doesNotMatch(html, /href="\/stories"/);
+  assert.doesNotMatch(html, /Open a room from this place/);
+  assert.doesNotMatch(html, /not a photograph|symbolic mark/i);
+  assert.doesNotMatch(html, /Banned books|\/banned-books/);
 });
 
 test('seed Dunbar first paint has no claim ids, rights caption, or ent_ addresses', () => {
@@ -247,6 +257,9 @@ test('seed Dunbar first paint has no claim ids, rights caption, or ent_ addresse
   assert.doesNotMatch(html, /Open the full record/);
   assert.doesNotMatch(html, /href="\/entity\//);
   assert.doesNotMatch(html, /href="\/stories"/);
+  assert.doesNotMatch(html, /Open a room from this place/);
+  assert.doesNotMatch(html, /not a photograph|symbolic mark/i);
+  assert.doesNotMatch(html, /Banned books|\/banned-books/);
 });
 
 test('Stories is citing chapters, or there is no Stories button', () => {
@@ -317,4 +330,54 @@ test('HomeFirstPaint never titles or lists an internal id, even if the model car
   assert.match(html, /The gap that never closed/);
   assert.doesNotMatch(html, /href="\/stories"/);
   assert.match(html, /href="\/stories\/the-gap-that-never-closed"/);
+});
+
+test('a place with no place neighbors walks on to another published stand', () => {
+  const dunbar = getPublicEntity('ent_dunbar_school_001');
+  const church = getPublicEntity('ent_15th_st_church_001');
+  assert.ok(dunbar);
+  assert.ok(church);
+  const library = {
+    ...dunbar,
+    id: 'ent_aarlcc_fort_lauderdale_001',
+    displayName: 'African American Research Library and Cultural Center',
+    summary: 'A research library and cultural center in Fort Lauderdale.',
+    historicalContext: 'The library holds research collections in Fort Lauderdale.',
+    relatedNeighbors: [],
+    continueLearning: [],
+  };
+  const html = renderToStaticMarkup(
+    createElement(HomeFirstPaint, {
+      model: { lead: library, also: [church], story: undefined, citing: [], source: 'live' },
+    }),
+  );
+  assert.match(html, /African American Research Library and Cultural Center/);
+  assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church"/);
+  assert.doesNotMatch(html, /id="stories"/);
+  assert.doesNotMatch(html, /href="#stories"/);
+  assert.doesNotMatch(html, /Open a room from this place/);
+  assert.doesNotMatch(html, /not a photograph|symbolic mark/i);
+  assert.doesNotMatch(html, /Banned books|\/banned-books/);
+  assert.doesNotMatch(html, /href="\/entity\//);
+  assert.doesNotMatch(html, /href="\/stories"/);
+
+  const withNeighbor = renderToStaticMarkup(
+    createElement(HomeFirstPaint, {
+      model: {
+        lead: dunbar,
+        also: [
+          {
+            ...church,
+            id: 'nrhp-black-heritage-91000107',
+            displayName: 'Dillard High School, Old',
+          },
+        ],
+        story: undefined,
+        citing: [],
+        source: 'seed',
+      },
+    }),
+  );
+  assert.match(withNeighbor, /href="\/place\/fifteenth-street-presbyterian-church"/);
+  assert.doesNotMatch(withNeighbor, /href="\/place\/dillard-high-school-old"/);
 });

@@ -9,11 +9,13 @@ import {
   containsInternalId,
   firstPaintEraLine,
   firstPaintRecord,
+  firstPaintPlaceNeighbors,
   firstPaintRelatedHeading,
   firstPaintRelation,
   firstPaintTimeline,
   humanPlaceLine,
   selectDoorRooms,
+  walkOnPlace,
 } from './home-first-paint-surface';
 
 test('containsInternalId catches claim tokens and catalog ids', () => {
@@ -77,6 +79,25 @@ test('incoming located_at becomes a human place line, never from their record', 
   assert.equal(relation, 'Tulsa, Oklahoma');
   assert.doesNotMatch(relation ?? '', /from their record/i);
   assert.doesNotMatch(relation ?? '', /\brecord\b/i);
+});
+
+test('walk-on uses a standable place only when this record has no place neighbors', () => {
+  const dunbar = getPublicEntity('ent_dunbar_school_001');
+  const church = getPublicEntity('ent_15th_st_church_001');
+  assert.ok(dunbar);
+  assert.ok(church);
+  assert.ok(firstPaintPlaceNeighbors(dunbar).length > 0);
+  assert.equal(walkOnPlace(dunbar, [church]), undefined);
+
+  const library = {
+    ...dunbar,
+    id: 'ent_aarlcc_fort_lauderdale_001',
+    displayName: 'African American Research Library and Cultural Center',
+    relatedNeighbors: [],
+    continueLearning: [],
+  };
+  assert.equal(firstPaintPlaceNeighbors(library).length, 0);
+  assert.equal(walkOnPlace(library, [church])?.displayName, 'Fifteenth Street Presbyterian Church');
 });
 
 test('related heading is human names, not catalog voice', () => {

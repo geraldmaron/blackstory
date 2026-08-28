@@ -105,31 +105,31 @@ async function readBySlug(slug: string): Promise<{
   return { lead: undefined, source: 'none' };
 }
 
-async function loadLeadRecord(options: LoadHomeFirstPaintOptions = {}): Promise<{
-  readonly lead: PublicEntityView | undefined;
-  readonly source: HomeFirstPaintSource;
-}> {
-  const named = options.namedSlug?.trim();
-  if (named) {
-    const resolved = await readBySlug(named);
-    if (resolved.lead) return resolved;
-    if (options.requireNamed) return { lead: undefined, source: 'none' };
-  }
-
-  const picks: PublicEntityView[] = [];
-  const sources: HomeFirstPaintSource[] = [];
+async function readStandablePlaces(): Promise<
+  readonly { readonly entity: PublicEntityView; readonly source: HomeFirstPaintSource }[]
+> {
+  const out: { entity: PublicEntityView; source: HomeFirstPaintSource }[] = [];
+  const seen = new Set<string>();
   for (const id of HOME_STAND_CANDIDATE_IDS) {
     const resolved = await readById(id);
-    if (resolved.lead) {
-      picks.push(resolved.lead);
-      sources.push(resolved.source);
-    }
+    if (!resolved.lead || seen.has(resolved.lead.id)) continue;
+    seen.add(resolved.lead.id);
+    out.push({ entity: resolved.lead, source: resolved.source });
   }
+  return out;
+}
 
-  const away = picks.findIndex((entity) => !isTulsaPlace(entity));
-  if (away >= 0) return { lead: picks[away], source: sources[away] ?? 'none' };
-  if (picks.length > 0) return { lead: picks[0], source: sources[0] ?? 'none' };
-  return { lead: undefined, source: 'none' };
+function alsoFromStands(
+  lead: PublicEntityView | undefined,
+  candidates: readonly PublicEntityView[],
+): PublicEntityView[] {
+  const leadId = lead?.id;
+  const leadSlug = lead ? publicPlaceSlug(lead.displayName) : '';
+  return candidates.filter((entity) => {
+    if (entity.id === leadId) return false;
+    if (publicPlaceSlug(entity.displayName) === leadSlug) return false;
+    return !isTulsaPlace(entity);
+  });
 }
 
 export function pickHomeStory(
@@ -142,15 +142,62 @@ export function pickHomeStory(
 export async function loadHomeFirstPaint(
   options: LoadHomeFirstPaintOptions = {},
 ): Promise<HomeFirstPaintModel> {
-  const [{ lead, source }, articles, cites] = await Promise.all([
-    loadLeadRecord(options),
+  const [articles, cites, standRows] = await Promise.all([
     listPublicArticleListItems(),
     resolveCitesEdgeIndex(),
+    readStandablePlaces(),
   ]);
+
+  const named = options.namedSlug?.trim();
+  let lead: PublicEntityView | undefined;
+  let source: HomeFirstPaintSource = 'none';
+
+  if (named) {
+    const fromStands = standRows.find(
+      (row) => publicPlaceSlug(row.entity.displayName) === named,
+    );
+    if (fromStands) {
+      lead = fromStands.entity;
+      source = fromStands.source;
+    } else {
+      const resolved = await readBySlug(named);
+      if (resolved.lead) {
+        lead = resolved.lead;
+        source = resolved.source;
+      } else if (options.requireNamed) {
+        return {
+          lead: undefined,
+          also: [],
+          story: undefined,
+          citing: [],
+          source: 'none',
+        };
+      }
+    }
+  }
+
+  if (!lead) {
+    const away = standRows.find((row) => !isTulsaPlace(row.entity));
+    const pick = away ?? standRows[0];
+    if (pick) {
+      lead = pick.entity;
+      source = pick.source;
+    }
+  }
+
   const story =
     articles.source === 'live' && articles.items.length > 0
       ? pickHomeStory(articles.items)
       : undefined;
   const citing = lead ? storiesCiting(cites, lead.id) : [];
-  return { lead, also: [], story, citing, source };
+  return {
+    lead,
+    also: alsoFromStands(
+      lead,
+      standRows.map((row) => row.entity),
+    ),
+    story,
+    citing,
+    source,
+  };
 }
