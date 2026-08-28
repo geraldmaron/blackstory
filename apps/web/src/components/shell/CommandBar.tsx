@@ -51,8 +51,8 @@ function searchLabel(recordCount: number | undefined): string {
 export type CommandBarProps = {
   /**
    * Present only on the Atlas, where Atlas and Journey are two views of one surface. Every other
-   * room renders the same bar without them: a reading room has no story to switch into, and a
-   * toggle that navigates instead of switching would be lying about what it does.
+   * room renders the same bar without Journey: `/journey` is not a room, and a header label that
+   * names it would invent one. Off the Atlas the bar keeps Atlas as a link to `/explore`.
    */
   readonly mode?: AtlasMode;
   readonly onModeChange?: (mode: AtlasMode) => void;
@@ -139,28 +139,18 @@ export function CommandBar({
               </button>
             </>
           ) : (
-            /* Off the Atlas the two modes are still offered, as links rather than toggles: there is
-               no surface here to switch, so each one navigates to the Atlas and arrives in the mode
-               it names. Dropping Journey outside the map would make it look like a feature of one
-               page rather than a way into the archive.
-
-               Journey still uses a fragment (`#journey`) because `?mode=` is not on the
-               explore allowlist. There is no `/journey` page. */
-            <>
-              <Link className="ds-bar__mode-link ds-bar__mode-link--first" href="/explore">
-                Atlas
-              </Link>
-              <Link className="ds-bar__mode-link" href="/explore#journey">
-                Journey
-              </Link>
-            </>
+            /* Atlas is a finished room (`/explore`). Journey is not: there is no `/journey`
+               page, and a header link would teach that address as a room. The Atlas keeps
+               Journey as an in-page mode toggle when this bar is mounted with `mode`. */
+            <Link className="ds-bar__mode-link ds-bar__mode-link--first" href="/explore">
+              Atlas
+            </Link>
           )}
         </nav>
 
-        {/* Library sits outside the mode group. Atlas and Journey are two views of one surface;
-            the library is every other room, and it opens rather than navigates — a reader
-            choosing a room wants to see the rooms first. Every entry inside is a real link,
-            including /library itself, so nothing here is unreachable to a crawler. */}
+        {/* Library sits outside the mode group. On the Atlas, Atlas and Journey are two views
+            of one surface. Off it, Journey is not advertised. The library is every finished
+            room, and it opens rather than navigates. */}
         <LibraryMenu recordCount={recordCount} />
 
         {onOpenSaved ? (
