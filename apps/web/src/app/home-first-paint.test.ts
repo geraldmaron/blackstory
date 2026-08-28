@@ -1,6 +1,6 @@
 /**
- * First paint loads a featured set by id, never the release-wide catalog.
- * The place is the page: no schema strip, no grade, no precision leak.
+ * First paint loads one published record by id, never the release-wide catalog.
+ * The place is that record. Stories, Law, Data, and Memorial are the way out.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -41,11 +41,11 @@ test('the featured set prefers Greenwood, then the two seed places', () => {
   assert.ok(getPublicEntity(HOME_FEATURED_ENTITY_IDS[2]));
 });
 
-test('the loader never asks for the full catalog', () => {
+test('the loader loads one record, never the full catalog', () => {
   const source = readFileSync(new URL('./home-first-paint.ts', import.meta.url), 'utf8');
-  assert.match(source, /listPublicEntityViewsByIds/);
+  assert.match(source, /resolvePublicEntityView/);
   assert.doesNotMatch(source, /getSharedPublicEntities|listPublicEntityViews\(/);
-  assert.doesNotMatch(source, /\/atlas\/catalog/);
+  assert.doesNotMatch(source, /\/atlas\/catalog|getPublicSearchIndex/);
 });
 
 test('internal ids never title first paint', () => {
@@ -71,14 +71,6 @@ test('pickHomeStory prefers a Tulsa story when one is already published, and inv
   assert.equal(pickHomeStory([storyDoc({ title: '42Cb1758', slug: 'opaque' })]), undefined);
 });
 
-test('the door steals about copy, and does not invent a slogan', () => {
-  const paint = readFileSync(new URL('./HomeFirstPaint.tsx', import.meta.url), 'utf8');
-  assert.match(paint, /ABOUT_WALK_PAST/);
-  assert.match(paint, /ABOUT_ON_THE_GROUND/);
-  assert.match(paint, /ABOUT_LINE/);
-  assert.doesNotMatch(paint, /History happened/);
-});
-
 test('first paint never mounts the catalog boot, camera cockpit, or Journey page', () => {
   const page = readFileSync(fileURLToPath(new URL('./page.tsx', import.meta.url)), 'utf8');
   const paint = readFileSync(
@@ -100,18 +92,23 @@ test('first paint never mounts the catalog boot, camera cockpit, or Journey page
   assert.doesNotMatch(loader, /Loading \{shell\.totalMatched|4,101 records/);
 });
 
-test('first paint is the place, not a schema card', () => {
+test('first paint is the record, not a manifesto or a schema card', () => {
   const paint = readFileSync(new URL('./HomeFirstPaint.tsx', import.meta.url), 'utf8');
+  assert.match(paint, /EntityRoomSections|ds-record-mast/);
+  assert.doesNotMatch(paint, /ABOUT_LINE|ABOUT_WALK_PAST|ABOUT_ON_THE_GROUND|ABOUT_PILLARS/);
   assert.doesNotMatch(
     paint,
-    /RecordAnatomyPanel|buildEntityAnatomy|evidenceLabel|record-evidence|RoomHeader|RoomCard/,
+    /RecordAnatomyPanel|buildEntityAnatomy|evidenceLabel|RoomHeader|toEvidenceClaimInputs/,
   );
-  assert.doesNotMatch(paint, /Grade A|2 sources|radius affordance|Shown at locality/);
+  assert.doesNotMatch(paint, /ds-record-strip|Grade A|radius affordance|Shown at locality/);
   const dunbar = getPublicEntity('ent_dunbar_school_001');
   assert.ok(dunbar);
   const greenwoodShaped = {
     ...dunbar,
     displayName: 'Greenwood District',
+    summary: 'Thirty-five blocks of Greenwood, destroyed in the 1921 Tulsa massacre, then rebuilt.',
+    historicalContext:
+      'Greenwood was a Black commercial district in Tulsa. In 1921 a massacre burned it. The district rebuilt.',
     claims: dunbar.claims.slice(0, 2),
   };
   assert.equal(
@@ -124,15 +121,21 @@ test('first paint is the place, not a schema card', () => {
     }),
   );
   assert.match(html, /<h1[^>]*>[\s\S]*Greenwood District/);
-  assert.match(html, /ds-home-place/);
-  assert.match(html, /walk past documented Black history/);
-  assert.match(html, /not a remote museum shelf/);
-  assert.match(html, /place-connected archive/);
+  assert.match(html, /ds-record-mast/);
+  assert.match(html, /Thirty-five blocks of Greenwood/);
+  assert.match(html, /The history here/);
+  assert.match(html, /1921/);
+  assert.doesNotMatch(html, /walk past documented Black history/);
+  assert.doesNotMatch(html, /place-connected archive of Black history/);
   assert.doesNotMatch(html, /Grade A|Grade B|Grade C/);
-  assert.doesNotMatch(html, /\d+ sources?|independent sources/i);
+  assert.doesNotMatch(html, /Grade A · \d+ sources?|independent sources/i);
   assert.doesNotMatch(html, />Kind<|>Where<|>Era<|>Evidence</);
-  assert.doesNotMatch(html, /radius affordance|Shown at locality|precisionCaption/i);
+  assert.doesNotMatch(html, /radius affordance|Shown at locality/i);
   assert.doesNotMatch(html, /Journey|42Cb1758|4,101|Orbit|Tilt|Trace/);
+  assert.match(html, /href="\/stories"/);
+  assert.match(html, /href="\/law"/);
+  assert.match(html, /href="\/data"/);
+  assert.match(html, /href="\/memorial"/);
 });
 
 test('HomeFirstPaint never titles or lists an internal id, even if the model carries one', () => {
@@ -142,7 +145,7 @@ test('HomeFirstPaint never titles or lists an internal id, even if the model car
     createElement(HomeFirstPaint, {
       model: {
         lead: { ...dunbar, displayName: '42Cb1758' },
-        also: [{ ...dunbar, id: 'ent_opaque_also', displayName: '42Cb1758' }],
+        also: [],
         story: storyDoc({
           slug: 'the-gap-that-never-closed',
           title: 'The gap that never closed',
@@ -156,5 +159,5 @@ test('HomeFirstPaint never titles or lists an internal id, even if the model car
   );
   assert.doesNotMatch(html, /42Cb1758/);
   assert.match(html, /The gap that never closed/);
-  assert.match(html, /place-connected archive/);
+  assert.match(html, /href="\/stories"/);
 });

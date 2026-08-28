@@ -1,13 +1,13 @@
 /**
- * Featured first paint for `/`: a small, already-released set, never the whole catalog.
+ * Featured first paint for `/`: one published record, never the release-wide catalog.
  *
- * Live reads go through `listPublicEntityViewsByIds` (thin point-get). When live projections
- * are off (CI, seed mode) the Dunbar seed ids are read from the bundled cluster so the door
- * still paints a place. That is not a catalog fallback. Internal ids never become titles.
+ * Live reads the entity the same way `/entity/[id]` does (`resolvePublicEntityView`).
+ * That is a point-get, not a catalog pull. Seed mode reads the Dunbar cluster so CI
+ * still paints a place when Greenwood is not in the fixture. Internal ids never title.
  */
 import { listPublicArticleListItems } from '../lib/articles/source';
 import { shouldUseLivePublicProjections } from '../lib/public-data/live-policy';
-import { listPublicEntityViewsByIds } from '../lib/public-data/source';
+import { resolvePublicEntityView } from '../lib/public-data/source';
 import { getPublicEntity, type PublicEntityView } from '../data/public-seed';
 import { pickLeadStory } from './stories/stories-index';
 import type { PublicArticleListItemDoc } from '@repo/schemas';
@@ -50,20 +50,6 @@ export function isInternalRecordLabel(value: string | undefined): boolean {
   );
 }
 
-function publishableEntities(entities: readonly PublicEntityView[]): readonly PublicEntityView[] {
-  return entities.filter((entity) => !isInternalRecordLabel(entity.displayName));
-}
-
-function orderFeatured(entities: readonly PublicEntityView[]): readonly PublicEntityView[] {
-  const byId = new Map(entities.map((entity) => [entity.id, entity] as const));
-  const ordered: PublicEntityView[] = [];
-  for (const id of HOME_FEATURED_ENTITY_IDS) {
-    const hit = byId.get(id);
-    if (hit) ordered.push(hit);
-  }
-  return publishableEntities(ordered);
-}
-
 export function pickHomeStory(
   items: readonly PublicArticleListItemDoc[],
 ): PublicArticleListItemDoc | undefined {
@@ -76,40 +62,41 @@ export function pickHomeStory(
   return tulsa ?? pickLeadStory(publishable);
 }
 
-async function loadFeaturedEntities(): Promise<{
-  readonly entities: readonly PublicEntityView[];
+async function loadLeadRecord(): Promise<{
+  readonly lead: PublicEntityView | undefined;
   readonly source: HomeFirstPaintSource;
 }> {
   if (shouldUseLivePublicProjections()) {
-    try {
-      const live = await listPublicEntityViewsByIds([...HOME_FEATURED_ENTITY_IDS]);
-      const ordered = orderFeatured(live.data);
-      if (ordered.length > 0) {
-        return { entities: ordered, source: 'live' };
+    for (const id of HOME_FEATURED_ENTITY_IDS) {
+      try {
+        const resolved = await resolvePublicEntityView(id);
+        if (resolved.data && !isInternalRecordLabel(resolved.data.displayName)) {
+          return { lead: resolved.data, source: 'live' };
+        }
+      } catch {
+        // A failed point-get must not become a 4,101-row catalog pull.
       }
-    } catch {
-      // A failed thin read must not become a 4,101-row catalog pull.
     }
-    return { entities: [], source: 'none' };
+    return { lead: undefined, source: 'none' };
   }
 
-  const seeded = HOME_FEATURED_ENTITY_IDS.map((id) => getPublicEntity(id)).filter(
-    (entity): entity is PublicEntityView => entity !== undefined,
-  );
-  const ordered = orderFeatured(seeded);
-  return { entities: ordered, source: ordered.length > 0 ? 'seed' : 'none' };
+  for (const id of HOME_FEATURED_ENTITY_IDS) {
+    const seeded = getPublicEntity(id);
+    if (seeded && !isInternalRecordLabel(seeded.displayName)) {
+      return { lead: seeded, source: 'seed' };
+    }
+  }
+  return { lead: undefined, source: 'none' };
 }
 
 export async function loadHomeFirstPaint(): Promise<HomeFirstPaintModel> {
-  const [{ entities, source }, articles] = await Promise.all([
-    loadFeaturedEntities(),
+  const [{ lead, source }, articles] = await Promise.all([
+    loadLeadRecord(),
     listPublicArticleListItems(),
   ]);
-  const lead = entities[0];
-  const also = entities.slice(1);
   const story =
     articles.source === 'live' && articles.items.length > 0
       ? pickHomeStory(articles.items)
       : undefined;
-  return { lead, also, story, source };
+  return { lead, also: [], story, source };
 }
