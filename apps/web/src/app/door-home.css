@@ -10,7 +10,7 @@
 
 .ds-door__frame {
   position: relative;
-  z-index: 3;
+  z-index: 3; /* local: framing above the HTML pin plate on this door only */
   max-width: 42rem;
   margin: calc(var(--ds-space-6) + env(safe-area-inset-top, 0px)) var(--ds-space-5) 0;
   padding: var(--ds-space-5);

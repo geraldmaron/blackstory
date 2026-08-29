@@ -3,12 +3,13 @@
  *
  * Framing copy is ABOUT_LINE and ABOUT_WALK_PAST. Do not retype either.
  * The plate is the existing HTML pin plate. The Atlas instrument stays on
- * `/explore`. Kind / Tone / Era are not first paint here.
+ * `/explore`. Filter chips are not first paint here.
  */
 import React from 'react';
 import Link from 'next/link';
 import { BRAND_ASSETS } from '@repo/config';
 import { ShellWordmark } from '@repo/ui';
+import { listPublicEntities } from '../data/public-seed';
 import { getSharedPublicEntities } from '../lib/map-experience/shared-map-data';
 import { toFirstPaintPins } from '../lib/map-experience/first-paint-pins';
 import { ABOUT_LINE, ABOUT_WALK_PAST } from './about/about-copy';
@@ -18,8 +19,16 @@ import './door-home.css';
 
 void React;
 
+async function loadDoorEntities() {
+  try {
+    return await getSharedPublicEntities();
+  } catch {
+    return { data: listPublicEntities(), source: 'none' as const };
+  }
+}
+
 export async function DoorHome() {
-  const { data: entities, source: dataSource } = await getSharedPublicEntities();
+  const { data: entities, source: dataSource } = await loadDoorEntities();
   const { noscriptFeatures } = buildAtlasShell({}, entities, dataSource);
   const pins = toFirstPaintPins(noscriptFeatures);
 
