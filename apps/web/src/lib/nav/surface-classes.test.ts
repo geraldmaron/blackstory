@@ -37,18 +37,19 @@ function concretePath(route: string): string {
 }
 
 describe('surface class resolution', () => {
-  it('puts the front door and /explore on the Atlas instrument', () => {
-    assert.equal(surfaceClassFor('/'), 'instrument');
-    assert.equal(surfaceClassFor('/', 'atlas=1'), 'instrument');
-    assert.equal(surfaceClassFor('/?atlas=1'), 'instrument');
-    assert.equal(surfaceClassFor('/?state=DC'), 'instrument');
+  it('puts the front door on the reading chrome and /explore on the Atlas instrument', () => {
+    assert.equal(surfaceClassFor('/'), 'reading');
+    assert.equal(surfaceClassFor('/', 'atlas=1'), 'reading');
+    assert.equal(surfaceClassFor('/?atlas=1'), 'reading');
+    assert.equal(surfaceClassFor('/?state=DC'), 'reading');
     assert.equal(surfaceClassFor('/explore'), 'instrument');
     assert.equal(surfaceClassFor('/explore?state=DC'), 'instrument');
   });
 
   it('does not classify /story, which was deprecated in favour of the Atlas story mode', () => {
     // A classified path with no registry entry fails the coverage test, and a registry entry for
-    // a route that never renders puts a 404 in the palette. Story is neither: it is a mode of `/`.
+    // a route that never renders puts a 404 in the palette. Story is neither: it is a mode of
+    // `/explore`.
     assert.ok(!CLASSIFIED_PATHS.includes('/story'));
   });
 
@@ -78,9 +79,10 @@ describe('surface class resolution', () => {
 
   it('ignores trailing slashes, fragments, and leftover `/` query', () => {
     assert.equal(surfaceClassFor('/about/'), 'reading');
-    assert.equal(surfaceClassFor('/?era=1960s&kind=school'), 'instrument');
+    assert.equal(surfaceClassFor('/?era=1960s&kind=school'), 'reading');
     assert.equal(surfaceClassFor('/about#sources'), 'reading');
-    assert.equal(surfaceClassFor('/?junk=1'), 'instrument');
+    assert.equal(surfaceClassFor('/?junk=1'), 'reading');
+    assert.equal(surfaceClassFor('/explore?era=1960s'), 'instrument');
   });
 
   it('falls back to utility so an unknown path still gets the 404 surface chrome', () => {

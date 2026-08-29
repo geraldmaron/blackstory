@@ -117,37 +117,27 @@ export function CommandBar({
       )}
 
       <div className="ds-bar__tools">
-        <nav className="ds-bar__modes" aria-label="Sections">
-          {mode && onModeChange ? (
-            <>
-              <button
-                type="button"
-                onClick={() => onModeChange('atlas')}
-                aria-current={mode === 'atlas' ? 'true' : undefined}
-              >
-                Atlas
-              </button>
-              <button
-                type="button"
-                onClick={() => onModeChange('story')}
-                aria-current={mode === 'story' ? 'true' : undefined}
-              >
-                Journey
-              </button>
-            </>
-          ) : (
-            /* Atlas is a finished room (`/explore`). Journey is not: there is no `/journey`
-               page, and a header link would teach that address as a room. The Atlas keeps
-               Journey as an in-page mode toggle when this bar is mounted with `mode`. */
-            <Link className="ds-bar__mode-link ds-bar__mode-link--first" href="/explore">
+        {mode && onModeChange ? (
+          <nav className="ds-bar__modes" aria-label="Sections">
+            <button
+              type="button"
+              onClick={() => onModeChange('atlas')}
+              aria-current={mode === 'atlas' ? 'true' : undefined}
+            >
               Atlas
-            </Link>
-          )}
-        </nav>
+            </button>
+            <button
+              type="button"
+              onClick={() => onModeChange('story')}
+              aria-current={mode === 'story' ? 'true' : undefined}
+            >
+              Journey
+            </button>
+          </nav>
+        ) : null}
 
-        {/* Library sits outside the mode group. On the Atlas, Atlas and Journey are two views
-            of one surface. Off it, Journey is not advertised. The library is every finished
-            room, and it opens rather than navigates. */}
+        {/* Off the Atlas the chrome is BlackStory plus this menu. Atlas, Explore,
+            Records, Journey, and Banned books stay off it. */}
         <LibraryMenu />
 
         {onOpenSaved ? (

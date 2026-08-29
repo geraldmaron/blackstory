@@ -59,11 +59,11 @@ describe('bar search', () => {
 });
 
 describe('CommandBar destinations', () => {
-  it('does not advertise Journey as a room', () => {
+  it('does not advertise Journey or Atlas as rooms off the instrument', () => {
     const source = code('components/shell/CommandBar.tsx');
     assert.doesNotMatch(source, /href=["'`]\/(?:explore)?#journey["'`]/);
     assert.doesNotMatch(source, /href=["'`]\/journey["'`]/);
-    assert.match(source, /href="\/explore"/);
+    assert.doesNotMatch(source, /href=["'`]\/explore["'`]/);
     assert.match(source, /onModeChange\('story'\)/);
   });
 

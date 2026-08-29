@@ -18,7 +18,7 @@ import { FirstPaintPinPlate } from './first-paint-pin-plate';
 const page = readFileSync(fileURLToPath(new URL('./page.tsx', import.meta.url)), 'utf8');
 const door = readFileSync(fileURLToPath(new URL('./door-home.tsx', import.meta.url)), 'utf8');
 
-test('`/` is framing plus the existing pin plate', () => {
+test('`/` is the locked about mast plus the existing pin plate', () => {
   assert.match(page, /DoorHome/);
   assert.doesNotMatch(page, /AtlasHome|AtlasLoader|AtlasExperience/);
   assert.doesNotMatch(page, /HomeFirstPaint|wantsAtlasInstrument|atlas=1/);
@@ -26,16 +26,27 @@ test('`/` is framing plus the existing pin plate', () => {
   assert.match(door, /ABOUT_WALK_PAST/);
   assert.match(door, /FirstPaintPinPlate/);
   assert.match(door, /listPublicEntities/);
+  assert.doesNotMatch(door, /ABOUT_LEDE/);
   assert.doesNotMatch(door, /AtlasLoader|CameraConsole|FilterBar|Journey|Lens|Camera/);
   assert.doesNotMatch(door, /4,101|42Cb1758/);
   assert.doesNotMatch(door, /label: 'Kind'|label: 'Tone'|label: 'Era'/);
   assert.doesNotMatch(door, /['"`]\/banned-books|['"`]\/journey/);
 });
 
-test('the door can scroll so the about line is not clipped by the Atlas lock', () => {
+test('the mast is ABOUT_LINE, not a rewrite', () => {
+  assert.equal(
+    ABOUT_LINE,
+    'BlackStory is a place-connected archive of Black history: people, places, and events pinned to where they happened, with the source attached to every claim.',
+  );
+  assert.match(door, /<h1 id="door-line" className="ds-door__line">\s*\{ABOUT_LINE\}\s*<\/h1>/);
+  assert.doesNotMatch(ABOUT_LINE, /\u2014/);
+  assert.doesNotMatch(ABOUT_WALK_PAST, /\u2014/);
+});
+
+test('the door plate sits in the page, not over the rooms', () => {
   const css = readFileSync(fileURLToPath(new URL('./door-home.css', import.meta.url)), 'utf8');
   assert.match(css, /:has\(\.ds-door\)/);
-  assert.match(css, /overflow:\s*visible/);
+  assert.match(css, /position:\s*absolute/);
   assert.doesNotMatch(css, /box-shadow|backdrop-filter|linear-gradient/);
 });
 
@@ -45,6 +56,7 @@ test('the door prints the existing about line, not a rewrite', () => {
     createElement(FirstPaintPinPlate, { pins }),
   )}`;
   assert.match(html, /place-connected archive of Black history/);
+  assert.match(html, /with the source attached to every claim/);
   assert.match(html, /walk past documented Black history/);
   assert.match(html, /ds-first-paint-plate/);
   assert.match(html, /ds-first-paint-pin--walk/);
