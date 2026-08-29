@@ -32,7 +32,7 @@ export function useAtlasCamera(
   const [readout, setReadout] = useState('');
   const [spotlight, setSpotlight] = useState<{ x: number; y: number; radius: number } | null>(null);
 
-  const paddingRef = useRef({ lens: true, results: true, sheet: false });
+  const paddingRef = useRef({ lens: false, results: false, sheet: false });
   paddingRef.current = {
     lens: panels.lens && !chromeHidden,
     results: panels.results && !chromeHidden,

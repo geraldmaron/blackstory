@@ -61,17 +61,16 @@ export function usePanelVisibility() {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [savedOpen, setSavedOpen] = useState(false);
   /**
-   * Filter, records, and decade open on wide first paint. The camera console stays docked
-   * until asked: first paint is the map, not a camera cockpit.
-   * On a narrow viewport they would cover the plate between them, so the surface opens on the
-   * map and the dock chips bring an instrument in when asked.
-   * Server-rendered as the wide layout and corrected after mount: `window` has no width on the
-   * server, and guessing one would be a hydration mismatch.
+   * Every instrument stays docked until asked. First paint is the plate of pins, not
+   * Kind / Tone / Era and not a card list. The camera console already shipped this way;
+   * the lens, records rail, and decade panel follow it.
+   * The dock chips bring an instrument in when the reader asks. Server and client start
+   * from the same docked state so first paint does not flash the filter board.
    */
   const [panels, setPanels] = useState<PanelVisibility>({
-    lens: true,
-    results: true,
-    decade: true,
+    lens: false,
+    results: false,
+    decade: false,
     camera: false,
   });
   const [narrow, setNarrow] = useState(false);
@@ -82,19 +81,10 @@ export function usePanelVisibility() {
     const query = window.matchMedia(`(max-width: ${NARROW_BREAKPOINT - 1}px)`);
     const wideQuery = window.matchMedia(`(min-width: ${BOTH_COLUMNS_BREAKPOINT}px)`);
     const sync = () => {
-      const isNarrow = query.matches;
-      setNarrow(isNarrow);
+      setNarrow(query.matches);
       setBothColumns(wideQuery.matches);
-      // Narrow opens on the plate with every instrument docked, and the dock is the switcher that
-      // brings one in. Widening brings them all back: leaving them docked after a resize strands
-      // the reader with an empty map and a row of chips, which is not what they had before the
-      // window changed.
-      setPanels({
-        lens: !isNarrow,
-        results: !isNarrow,
-        decade: !isNarrow,
-        camera: false,
-      });
+      // Do not reopen instruments here. First paint is docked; a resize must not
+      // turn the plate back into Kind / Tone / Era and a card list.
     };
     sync();
     query.addEventListener('change', sync);

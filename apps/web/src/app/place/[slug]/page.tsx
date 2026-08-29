@@ -1,6 +1,6 @@
 /**
  * A published place at a public slug. Walked into from the map. The title is
- * the place. Back is the map. Never `/entity/ent_…`.
+ * the place. Back is BlackStory at `/`. Never `/entity/ent_…`.
  */
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';

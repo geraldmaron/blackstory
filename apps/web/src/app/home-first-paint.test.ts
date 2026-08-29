@@ -124,6 +124,14 @@ test('`/` mounts the Atlas; a place page never mounts the catalog boot or camera
     fileURLToPath(new URL('./explore/hooks/use-panel-visibility.ts', import.meta.url)),
     'utf8',
   );
+  const atlas = readFileSync(
+    fileURLToPath(new URL('./explore/AtlasExperience.tsx', import.meta.url)),
+    'utf8',
+  );
+  const mapSource = readFileSync(
+    fileURLToPath(new URL('../lib/map-experience/build-explore-map-source.ts', import.meta.url)),
+    'utf8',
+  );
   const imports = page
     .split('\n')
     .filter((line) => line.startsWith('import '))
@@ -135,11 +143,19 @@ test('`/` mounts the Atlas; a place page never mounts the catalog boot or camera
   assert.doesNotMatch(paint, /CameraConsole|Orbit|Tilt|Trace/);
   assert.doesNotMatch(paint, /Loading 4,101|\/journey|42Cb1758/);
   assert.doesNotMatch(paint, /Open the full record/);
-  assert.match(paint, /MAP_BACK|The map/);
+  assert.match(paint, /MAP_BACK|BlackStory/);
   assert.doesNotMatch(loader, /Loading \{shell\.totalMatched|4,101 records/);
   assert.match(loader, /Opening the map/);
+  assert.match(panels, /lens: false/);
+  assert.match(panels, /results: false/);
+  assert.match(panels, /decade: false/);
   assert.match(panels, /camera: false/);
+  assert.doesNotMatch(panels, /lens: !isNarrow|results: !isNarrow|decade: !isNarrow/);
   assert.doesNotMatch(panels, /camera: !isNarrow/);
+  assert.match(mapSource, /atlasWalkHref/);
+  assert.doesNotMatch(mapSource, /href: `\/entity\/\$\{entity\.id\}`/);
+  assert.match(atlas, /atlasWalkHref/);
+  assert.doesNotMatch(atlas, /\/entity\/\$\{record\.id\}/);
 });
 
 test('first paint is the record, not a manifesto or a schema card', () => {
@@ -214,7 +230,7 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.match(html, /href="\/memorial"/);
   assert.match(html, /href="\/methodology"/);
   assert.match(html, /href="\/errata"/);
-  assert.match(html, />The map</);
+  assert.match(html, />BlackStory</);
   assert.match(html, /href="\/"/);
   assert.doesNotMatch(html, /id="stories"/);
   assert.doesNotMatch(html, /href="#stories"/);
@@ -399,7 +415,7 @@ test('a place with no place neighbors walks on to another published stand', () =
     }),
   );
   assert.match(html, /African American Research Library and Cultural Center/);
-  assert.match(html, />The map</);
+  assert.match(html, />BlackStory</);
   assert.match(html, /href="\/"/);
   assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church"/);
   assert.match(html, /href="\/place\/dillard-high-school-old"/);
