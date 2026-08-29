@@ -12,6 +12,7 @@ import {
   ATLAS_CATALOG_PATH,
   buildAtlasCatalogPayload,
 } from './atlas-catalog';
+import { toFirstPaintPins } from '../../lib/map-experience/first-paint-pins';
 import { buildAtlasShell, buildExploreViewModel } from './explore-view-model';
 import {
   assembleExploreViewModel,
@@ -88,13 +89,16 @@ test('the Atlas page never puts the catalog back in the initial prop', async () 
   assert.match(pageSource, /AtlasHome/);
   assert.match(explorePage, /AtlasHome/);
   assert.match(atlasHome, /AtlasLoader/);
-  assert.match(atlasHome, /pins=\{\{ type: 'FeatureCollection'/);
+  assert.match(atlasHome, /toFirstPaintPins/);
+  assert.match(atlasHome, /toFirstPaintShell/);
   assert.doesNotMatch(atlasHome, /Opening the map/);
+  assert.doesNotMatch(atlasHome, /FilterBar|Kind|Tone|Era/);
+  assert.doesNotMatch(atlasHome, /pins=\{\{ type: 'FeatureCollection'/);
 });
 
 test('first-paint catalog is the pin collection, not the history edge catalog', () => {
   const { shell, noscriptFeatures } = buildAtlasShell({}, entities, 'none');
-  const pins = { type: 'FeatureCollection' as const, features: noscriptFeatures };
+  const pins = toFirstPaintPins(noscriptFeatures);
   const paint = firstPaintCatalog(pins, 'none');
   assert.equal(paint.schemaVersion, 1);
   assert.equal(paint.source.featureCollection.features.length, noscriptFeatures.length);
@@ -103,4 +107,8 @@ test('first-paint catalog is the pin collection, not the history edge catalog', 
   assert.deepEqual(paint.citesEdge, {});
   const assembled = assembleExploreViewModel(shell, paint);
   assert.equal(assembled.source.featureCollection.features.length, noscriptFeatures.length);
+  const document = JSON.stringify(pins);
+  assert.doesNotMatch(document, /42Cb1758/);
+  assert.doesNotMatch(document, /Grade A/);
+  assert.doesNotMatch(document, /ent_/);
 });

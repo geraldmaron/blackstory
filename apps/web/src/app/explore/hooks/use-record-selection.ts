@@ -12,7 +12,15 @@ import {
   buildSheetConnections,
   buildSheetSources,
 } from '../../../lib/map-experience/build-sheet-detail';
+import { isHoldingPlaceHref } from '../../../lib/place/public-place-path';
 import { anatomyPrecisionFor, eraFor } from './atlas-feature-helpers';
+
+function walkHoldingPlace(feature: ExploreMapFeature): boolean {
+  const href = feature.properties.href;
+  if (!isHoldingPlaceHref(href)) return false;
+  if (typeof window !== 'undefined') window.location.assign(href);
+  return true;
+}
 
 /**
  * The selected record: its index in the current sort order, the sheet's view of it, and the
@@ -53,6 +61,7 @@ export function useRecordSelection(
     (entityId: string) => {
       const feature = featuresById.get(entityId);
       if (feature) {
+        if (walkHoldingPlace(feature)) return;
         const [lng, lat] = feature.geometry.coordinates;
         setSelectedId(entityId);
         camera.flyToRecord({ center: [lng, lat], place: placeLabelFor(feature) });
@@ -77,6 +86,7 @@ export function useRecordSelection(
 
   const select = useCallback(
     (feature: ExploreMapFeature, fly = true) => {
+      if (walkHoldingPlace(feature)) return;
       setSelectedId(feature.properties.entityId);
       if (!fly) return;
       const [lng, lat] = feature.geometry.coordinates;
@@ -96,10 +106,17 @@ export function useRecordSelection(
     [select, selectedIndex, sorted],
   );
 
-  /** Selecting a pin on the plate selects the same record in the rail. */
+  /** A holding `/place/` pin walks. Every other pin stays on the plate. */
   useEffect(
-    () => stage.subscribe('select', (entityId) => setSelectedId(entityId)),
-    [setSelectedId, stage],
+    () =>
+      stage.subscribe('select', (entityId) => {
+        const feature =
+          featuresById.get(entityId) ??
+          allFeatures.find((candidate) => candidate.id === entityId);
+        if (feature && walkHoldingPlace(feature)) return;
+        setSelectedId(entityId);
+      }),
+    [allFeatures, featuresById, setSelectedId, stage],
   );
 
   const sheetRecord = useMemo<SheetRecord | null>(() => {

@@ -7,6 +7,7 @@ import { listPublicEntities } from '../../data/public-seed';
 import {
   atlasWalkHref,
   canStandHere,
+  isHoldingPlaceHref,
   isInternalRecordLabel,
   isPublicPlaceSlug,
   isTulsaPlace,
@@ -15,6 +16,7 @@ import {
   placePageHolds,
   publicPlaceSlug,
   SEED_HOLDING_PLACE_SLUGS,
+  staysOffPublicMap,
 } from './public-place-path';
 
 test('slug comes from the published name, never the catalog id', () => {
@@ -39,6 +41,7 @@ test('internal labels and ent_ tokens are not public slugs', () => {
   assert.equal(isPublicPlaceSlug('ent-vernon-ame-tulsa-001'), false);
   assert.equal(isPublicPlaceSlug('fifteenth-street-presbyterian-church'), true);
   assert.equal(isPublicPlaceSlug('42Cb1758'), false);
+  assert.equal(isInternalRecordLabel('42Cb1758'), true);
 });
 
 test('Tulsa / Greenwood is detectable so it can stay last-resort', () => {
@@ -120,4 +123,23 @@ test('the home-map walk uses a holding slug, never a slugified name or /entity/'
   assert.equal(atlasWalkHref({ displayName: 'ent_dunbar_school_001' }), undefined);
   assert.equal(atlasWalkHref({ displayName: '42Cb1758', kind: 'place' }), undefined);
   assert.equal(placePageHolds({ displayName: 'Industrial Bank of Washington' }), false);
+  assert.equal(
+    atlasWalkHref({
+      displayName: 'Dillard High School, Old',
+      kind: 'place',
+      entityId: 'nrhp-black-heritage-91000107',
+    }),
+    '/place/dillard-high-school-old',
+  );
+  assert.equal(atlasWalkHref({ displayName: 'Dillard University', kind: 'place' }), undefined);
+  assert.equal(
+    atlasWalkHref({ displayName: 'James H. Dillard House', kind: 'place' }),
+    undefined,
+  );
+  assert.equal(staysOffPublicMap({ displayName: 'James H. Dillard House' }), true);
+  assert.equal(staysOffPublicMap({ displayName: 'Dillard University' }), false);
+  assert.equal(staysOffPublicMap({ displayName: 'Dillard High School, Old' }), false);
+  assert.equal(isHoldingPlaceHref('/place/dillard-high-school-old'), true);
+  assert.equal(isHoldingPlaceHref('/place/42Cb1758'), false);
+  assert.equal(isHoldingPlaceHref('/entity/ent_dunbar_school_001'), false);
 });

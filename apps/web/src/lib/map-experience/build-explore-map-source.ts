@@ -26,7 +26,7 @@ import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './ent
 import { resolveEntityEraBuckets } from './entity-era-facts';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
 import { displayEncodingFor, kindFamilyFor, resolveMapTone } from './kind-encoding';
-import { atlasWalkHref } from '../place/public-place-path';
+import { atlasWalkHref, staysOffPublicMap } from '../place/public-place-path';
 
 export type ConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
 
@@ -286,6 +286,7 @@ export function buildExploreMapSource(
   let skippedNoAnchor = 0;
 
   for (const entity of entities) {
+    if (staysOffPublicMap(entity)) continue;
     // Live projections carry their own public-precision anchor; the repo-side table is the
     // fallback for bundled seed fixtures only (see entity-geo.ts's retirement note).
     const anchor = entity.geoAnchor ?? resolveAnchor(entity.id);

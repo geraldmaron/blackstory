@@ -106,6 +106,21 @@ export function neighborHref(neighbor: {
 }
 
 /**
+ * Street-level residences stay off the public map. James H. Dillard House is
+ * the live sit: Dillard University and Old Dillard High School stay; the house
+ * does not, and it never gets a walk.
+ */
+export function staysOffPublicMap(input: { readonly displayName: string }): boolean {
+  return /dillard house/i.test(input.displayName);
+}
+
+/** True when a pin href is a holding `/place/` walk, not a shop token or a 404. */
+export function isHoldingPlaceHref(href: string): boolean {
+  if (!href.startsWith('/place/')) return false;
+  return isPublicPlaceSlug(href.slice('/place/'.length));
+}
+
+/**
  * Walk from the home map. `/place/{slug}` only when that slug holds on the place
  * page. People and statutes go to those rooms. Everything else stays on the plate.
  * Never `/entity/…`, and never a slug invented from a catalog id or a published name.
@@ -116,6 +131,7 @@ export function atlasWalkHref(input: {
   readonly entityId?: string;
 }): string | undefined {
   if (isInternalRecordLabel(input.displayName)) return undefined;
+  if (staysOffPublicMap(input)) return undefined;
   if (input.kind === 'person') return '/memorial';
   if (input.kind === 'law' || input.kind === 'case') return '/law';
   if (!placePageHolds({ displayName: input.displayName, entityId: input.entityId })) {

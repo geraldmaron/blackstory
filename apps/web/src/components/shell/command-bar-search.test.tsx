@@ -66,6 +66,13 @@ describe('CommandBar destinations', () => {
     assert.match(source, /href="\/explore"/);
     assert.match(source, /onModeChange\('story'\)/);
   });
+
+  it('does not greet with the catalog count', () => {
+    const source = code('components/shell/CommandBar.tsx');
+    assert.match(source, /Search records, places, eras/);
+    assert.doesNotMatch(source, /toLocaleString/);
+    assert.doesNotMatch(source, /Search \$\{/);
+  });
 });
 
 describe('the shell above the error boundary', () => {
