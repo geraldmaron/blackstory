@@ -48,16 +48,15 @@ test('the door plate sits in the page, not over the rooms', () => {
   assert.match(css, /:has\(\.ds-door\)/);
   assert.match(css, /position:\s*absolute/);
   assert.match(css, /@media \(max-width: 559px\)/);
-  assert.match(css, /@media \(max-width: 390px\)/);
-  assert.match(css, /@media \(max-width: 390px\)[\s\S]*position:\s*relative/);
+  assert.match(css, /@media \(max-width: 559px\)[\s\S]*position:\s*relative/);
   assert.match(css, /position:\s*relative/);
   assert.doesNotMatch(css, /box-shadow|backdrop-filter|linear-gradient/);
 });
 
-test('at 390 the door frame and line wrap rather than clip', () => {
+test('at phone width the door frame and line wrap rather than clip', () => {
   const css = readFileSync(fileURLToPath(new URL('./door-home.css', import.meta.url)), 'utf8');
-  const start = css.indexOf('@media (max-width: 390px)');
-  assert.ok(start >= 0, '390 block must exist');
+  const start = css.lastIndexOf('@media (max-width: 559px)');
+  assert.ok(start >= 0, 'phone door block must exist');
   const next = css.indexOf('@media', start + 1);
   const block = next === -1 ? css.slice(start) : css.slice(start, next);
   assert.match(block, /\.ds-door__frame/);

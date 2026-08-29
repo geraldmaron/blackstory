@@ -653,7 +653,7 @@
   padding-top: 0;
 }
 
-@media (max-width: 390px) {
+@media (max-width: 559px) {
   .ds-record-mast,
   .ds-record-mast__over,
   .ds-record-strip {
@@ -664,7 +664,7 @@
 
   .ds-record-mast__title {
     font-size: clamp(1.375rem, 7vw, 1.75rem);
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     min-width: 0;
   }
 
@@ -672,7 +672,7 @@
   .ds-record-beat,
   .ds-record-beat__standfirst,
   .ds-record-strip dd {
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     min-width: 0;
   }
 }
