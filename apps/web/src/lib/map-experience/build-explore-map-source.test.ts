@@ -148,3 +148,27 @@ test('jurisdictionAreaFeatures defaults to empty — no area-record kind exists 
   const source = buildExploreMapSource(listPublicEntities());
   assert.deepEqual(source.jurisdictionAreaFeatures, []);
 });
+
+test('James H. Dillard House stays off the public map', () => {
+  const base = listPublicEntities()[0]!;
+  const house: PublicEntityView = {
+    ...base,
+    id: 'nrhp-dillard-house',
+    kind: 'place',
+    displayName: 'James H. Dillard House',
+    locationPrecision: 'city',
+  };
+  const university: PublicEntityView = {
+    ...base,
+    id: 'ent_dillard_university_001',
+    kind: 'place',
+    displayName: 'Dillard University',
+    locationPrecision: 'campus',
+  };
+  const source = buildExploreMapSource([house, university], {
+    geoAnchorFor: () => ({ lat: 29.93, lng: -90.12, geohash: 'djfq', matchMethod: 'geocode_other' }),
+  });
+  assert.equal(source.featureCollection.features.length, 1);
+  assert.equal(source.featureCollection.features[0]!.properties.displayName, 'Dillard University');
+  assert.equal(source.featureCollection.features[0]!.properties.href, '');
+});

@@ -171,8 +171,19 @@ test('`/` mounts the Atlas; a place page never mounts the catalog boot or camera
   assert.doesNotMatch(panels, /camera: !isNarrow/);
   assert.match(mapSource, /atlasWalkHref/);
   assert.doesNotMatch(mapSource, /href: `\/entity\/\$\{entity\.id\}`/);
-  assert.match(atlas, /atlasWalkHref/);
+  assert.match(atlas, /atlasWalkHref|isHoldingPlaceHref/);
   assert.doesNotMatch(atlas, /\/entity\/\$\{record\.id\}/);
+  assert.match(atlas, /instrumentsInvited/);
+  assert.doesNotMatch(atlas, /recordCount=\{view\.allFeatures\.length\}/);
+  const commandBar = readFileSync(
+    fileURLToPath(new URL('../components/shell/CommandBar.tsx', import.meta.url)),
+    'utf8',
+  );
+  assert.match(commandBar, /Search records, places, eras/);
+  assert.doesNotMatch(commandBar, /toLocaleString/);
+  const atlasHome = readFileSync(fileURLToPath(new URL('./atlas-home.tsx', import.meta.url)), 'utf8');
+  assert.match(atlasHome, /toFirstPaintPins/);
+  assert.doesNotMatch(atlasHome, /Opening the map/);
 });
 
 test('first paint is the record, not a manifesto or a schema card', () => {

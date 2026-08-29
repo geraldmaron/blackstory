@@ -41,11 +41,9 @@ function SearchGlyph() {
   );
 }
 
-/** The count is a promise the surface can keep only where it has the index loaded. */
-function searchLabel(recordCount: number | undefined): string {
-  return recordCount === undefined
-    ? 'Search records, places, eras'
-    : `Search ${recordCount.toLocaleString('en-US')} records, places, eras`;
+/** Search greets the reader. The catalog count is not that greeting. */
+function searchLabel(): string {
+  return 'Search records, places, eras';
 }
 
 export type CommandBarProps = {
@@ -61,7 +59,7 @@ export type CommandBarProps = {
    * search slot becomes a real link to /records rather than a button that cannot do anything.
    */
   readonly onOpenPalette?: () => void;
-  /** Record count for the search placeholder. Reads as a promise the surface can keep. */
+  /** Kept so existing Atlas callers compile. Search no longer greets with this count. */
   readonly recordCount?: number;
   readonly savedCount?: number;
   readonly onOpenSaved?: () => void;
@@ -74,7 +72,6 @@ export function CommandBar({
   mode,
   onModeChange,
   onOpenPalette,
-  recordCount,
   savedCount = 0,
   onOpenSaved,
   onOpenShortcuts,
@@ -100,7 +97,7 @@ export function CommandBar({
           aria-label="Search records, places and actions"
         >
           <SearchGlyph />
-          <span className="ds-bar__search-text">{searchLabel(recordCount)}</span>
+          <span className="ds-bar__search-text">{searchLabel()}</span>
           <kbd className="ds-kbd">⌘K</kbd>
         </button>
       ) : (
@@ -109,11 +106,11 @@ export function CommandBar({
            impossible to type into, so on twelve of the thirteen rooms searching meant navigating
            somewhere else first. `<noscript>` keeps the old link for a reader without JS. */
         <>
-          <CommandBarSearch placeholder={searchLabel(recordCount)} />
+          <CommandBarSearch placeholder={searchLabel()} />
           <noscript>
             <Link className="ds-bar__search" href="/records" aria-label="Search the record index">
               <SearchGlyph />
-              <span className="ds-bar__search-text">{searchLabel(recordCount)}</span>
+              <span className="ds-bar__search-text">{searchLabel()}</span>
             </Link>
           </noscript>
         </>
