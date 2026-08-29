@@ -12,7 +12,7 @@ import {
   ATLAS_CATALOG_PATH,
   buildAtlasCatalogPayload,
 } from './atlas-catalog';
-import { toFirstPaintPins } from '../../lib/map-experience/first-paint-pins';
+import { toFirstPaintPins, toFirstPaintShell } from '../../lib/map-experience/first-paint-pins';
 import { buildAtlasShell, buildExploreViewModel } from './explore-view-model';
 import {
   assembleExploreViewModel,
@@ -91,8 +91,10 @@ test('the Atlas page never puts the catalog back in the initial prop', async () 
   assert.match(atlasHome, /AtlasLoader/);
   assert.match(atlasHome, /toFirstPaintPins/);
   assert.match(atlasHome, /toFirstPaintShell/);
+  assert.match(atlasHome, /FirstPaintPinPlate/);
   assert.doesNotMatch(atlasHome, /Opening the map/);
   assert.doesNotMatch(atlasHome, /FilterBar|Kind|Tone|Era/);
+  assert.doesNotMatch(atlasHome, /<noscript>|ds-explore__walks/);
   assert.doesNotMatch(atlasHome, /pins=\{\{ type: 'FeatureCollection'/);
 });
 
@@ -107,7 +109,8 @@ test('first-paint catalog is the pin collection, not the history edge catalog', 
   assert.deepEqual(paint.citesEdge, {});
   const assembled = assembleExploreViewModel(shell, paint);
   assert.equal(assembled.source.featureCollection.features.length, noscriptFeatures.length);
-  const document = JSON.stringify(pins);
+  const firstPaintShell = toFirstPaintShell(shell);
+  const document = `${JSON.stringify(firstPaintShell)}${JSON.stringify(pins)}`;
   assert.doesNotMatch(document, /42Cb1758/);
   assert.doesNotMatch(document, /Grade A/);
   assert.doesNotMatch(document, /ent_/);
