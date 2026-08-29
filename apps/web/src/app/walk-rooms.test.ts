@@ -22,6 +22,13 @@ const WALK_ROOMS = [
   'corrections/CorrectionsSections.tsx',
   'support/page.tsx',
   'library/page.tsx',
+  'privacy/page.tsx',
+] as const;
+
+const WALK_COPY = [
+  ...WALK_ROOMS,
+  'data/DataSections.tsx',
+  'privacy/PrivacySections.tsx',
 ] as const;
 
 test('each walk room comes back to the place and does not sell Atlas or a missing path', () => {
@@ -57,6 +64,27 @@ test('each walk room comes back to the place and does not sell Atlas or a missin
       source,
       /Straight to the records|The Atlas answers where and when/,
       `${relative} must not advertise the board as a cockpit`,
+    );
+    assert.doesNotMatch(
+      source,
+      /mosaic-credits|Mosaic credits|ATMOSPHERE_ATTRIBUTION/,
+      `${relative} must not send a reader to shop credits`,
+    );
+  }
+});
+
+test('walk copy does not send a reader to shop credits or leftover products', () => {
+  for (const relative of WALK_COPY) {
+    const source = readFileSync(join(here, relative), 'utf8');
+    assert.doesNotMatch(
+      source,
+      /mosaic-credits|Mosaic credits|ATMOSPHERE_ATTRIBUTION/,
+      `${relative} must not send a reader to shop credits`,
+    );
+    assert.doesNotMatch(
+      source,
+      /Zooniverse|Caesar|blackbook\.app|native reader|app store/i,
+      `${relative} must not leak leftover product copy`,
     );
   }
 });

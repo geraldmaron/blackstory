@@ -5,7 +5,6 @@ import React from 'react';
 import Link from 'next/link';
 import { Citation, Confidence, Notice } from '@repo/ui';
 import { FACT_CONFIDENCE_GRADES, type FactConfidenceGrade } from '@repo/domain/facts';
-import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import { humanizeToken, mapConfidenceToUiLevel } from '../../components/facts/format';
 import { TrustSiteDisclaimer } from '../../components/trust/TrustSiteDisclaimer';
 import { formatCitation } from '../../lib/citation/format';
@@ -54,10 +53,6 @@ export function MethodologySections() {
 
       <Prose>
         <TrustSiteDisclaimer />
-        <p>
-          Archive texture, symbolic atmosphere.{' '}
-          <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
-        </p>
       </Prose>
 
       <nav aria-labelledby="methodology-toc-title">

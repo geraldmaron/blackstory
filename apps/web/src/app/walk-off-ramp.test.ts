@@ -42,6 +42,8 @@ test('walk rooms do not hardcode The place or door-back protocol copy', () => {
     'corrections/CorrectionsSections.tsx',
     'support/page.tsx',
     'library/page.tsx',
+    'privacy/page.tsx',
+    'privacy/PrivacySections.tsx',
     'books/page.tsx',
     'books/[slug]/page.tsx',
   ];
