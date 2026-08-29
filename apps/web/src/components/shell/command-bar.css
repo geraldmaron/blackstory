@@ -456,6 +456,35 @@
   }
 }
 
+@media (max-width: 390px) {
+  /*
+   * The two-row bar plus the door mast can eat the plate. Shrink island
+   * spacing rather than hide Rooms. Keep the search row from 559; do not
+   * let brand + Rooms overflow the 390 viewport.
+   */
+  :root:root {
+    --ds-island-height: 6.25rem;
+    --ds-island-gap: var(--ds-space-2);
+  }
+
+  .ds-bar {
+    min-width: 0;
+    max-width: calc(100vw - var(--ds-space-2) * 2);
+    overflow-x: clip;
+  }
+
+  .ds-bar__brand,
+  .ds-bar__tools,
+  .ds-bar__search {
+    min-width: 0;
+  }
+
+  .ds-bar:has(.ds-bar__search--live) {
+    padding-block: var(--ds-space-1);
+    row-gap: var(--ds-space-1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ds-bar__search {
     transition-duration: 0.01ms;

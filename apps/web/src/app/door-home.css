@@ -74,3 +74,28 @@ body:has(.ds-door) .ds-first-paint-plate {
     width: 100%;
   }
 }
+
+@media (max-width: 390px) {
+  .ds-door__frame {
+    margin: var(--ds-space-2);
+    padding: var(--ds-space-3);
+  }
+
+  .ds-door__line {
+    font-size: 1.125rem;
+  }
+
+  .ds-door__walk {
+    margin-top: var(--ds-space-3);
+    font-size: 0.9375rem;
+  }
+
+  /* Framing first, then the plate. Keep relative — do not put the discs
+     back under the mast. */
+  body:has(.ds-door) .ds-first-paint-plate {
+    position: relative;
+    inset: auto;
+    min-height: min(64dvh, 24rem);
+    width: 100%;
+  }
+}
