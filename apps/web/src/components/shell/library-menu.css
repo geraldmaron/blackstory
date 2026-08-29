@@ -158,8 +158,8 @@
   }
 }
 
-@media (max-width: 390px) {
-  /* Rooms + theme stay on the 390 bar. Panel sits below the stacked
+@media (max-width: 819px) {
+  /* Rooms stays on the phone bar. Panel sits below the stacked
      island, not over the trigger, and scrolls if the three groups run long. */
   .ds-libmenu__trigger {
     padding: 0 var(--ds-space-2);
