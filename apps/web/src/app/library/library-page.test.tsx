@@ -46,6 +46,13 @@ describe('/library · the room renders without JavaScript', () => {
     assert.doesNotMatch(pageSource, /getSharedPublicEntities|buildRecordsIndex|releaseFacts/);
     assert.doesNotMatch(pageSource, /Straight to the records|The Atlas answers where and when/);
     assert.doesNotMatch(pageSource, /Everything that is not the map/);
+    assert.doesNotMatch(pageSource, /challenged titles|Banned books/);
+  });
+
+  it('is a room on the door, not another first-paint', () => {
+    assert.doesNotMatch(pageSource, /HomeFirstPaint|loadHomeFirstPaint|loadWalkBackPlace/);
+    assert.doesNotMatch(pageSource, /DoorRooms|EntityRoomSections|selectDoorRooms/);
+    assert.doesNotMatch(pageSource, /['"`]\/books['"`]|['"`]\/banned-books/);
   });
 });
 

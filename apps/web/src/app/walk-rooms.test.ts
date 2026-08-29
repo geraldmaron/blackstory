@@ -22,7 +22,6 @@ const WALK_ROOMS = [
   'corrections/CorrectionsSections.tsx',
   'support/page.tsx',
   'library/page.tsx',
-  'books/page.tsx',
 ] as const;
 
 test('each walk room comes back to the place and does not sell Atlas or a missing path', () => {

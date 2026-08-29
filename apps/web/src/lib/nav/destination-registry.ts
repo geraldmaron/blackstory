@@ -195,7 +195,6 @@ const DESTINATIONS: readonly Destination[] = [
     kind: 'CATALOGUE',
     description: 'Documented challenges to titles, recorded as challenges rather than as verdicts.',
     menuLine: 'Documented challenges',
-    group: 'read',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
   {

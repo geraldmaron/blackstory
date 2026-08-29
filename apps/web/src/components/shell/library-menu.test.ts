@@ -25,5 +25,5 @@ test('the library menu lists rooms and the library hub, not the board', () => {
 test('the library menu rooms come from the same registry groups the hub renders', () => {
   assert.match(source, /LIBRARY_CARD_GROUPS/);
   assert.match(source, /destinationsInGroup/);
-  assert.ok(destinationsInGroup('read').some((destination) => destination.path === '/books'));
+  assert.ok(!destinationsInGroup('read').some((destination) => destination.path === '/books'));
 });

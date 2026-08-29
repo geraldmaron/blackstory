@@ -1,9 +1,9 @@
 /**
- * `/library` — the rooms, listed so a reader can choose one.
+ * `/library` — a room on the walk, not another first-paint.
  *
  * Cards come from `lib/nav/destination-registry.ts`, never hand-written.
  * The way back is the place the reader left, the same door every other
- * room on the walk uses. Atlas and the record index stay off this page.
+ * room on the walk uses. This page does not stand at a place.
  */
 import type { Metadata } from 'next';
 import React from 'react';
@@ -23,8 +23,7 @@ void React;
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/library',
   title: 'The library',
-  description:
-    'Chapters, law, data, challenged titles, the memorial, and the receipts that show how a record gets in.',
+  description: 'Law, data, the memorial, and the receipts that show how a record gets in.',
 });
 
 /**
@@ -44,7 +43,7 @@ export default function LibraryPage() {
         pathname="/library"
         kicker="Rooms"
         title="The library"
-        lede="Chapters, law, data, challenged titles, the memorial, and the receipts that show how a record gets in."
+        lede="Law, data, the memorial, and the receipts that show how a record gets in."
         showPath={false}
       />
 
