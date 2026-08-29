@@ -38,8 +38,8 @@ export type DoorRoom = {
 
 /**
  * Archive chrome on every place. Law, Data, and Memorial are national rooms,
- * not this record's rooms. `/books` is the challenged-titles catalogue; it is
- * not on this door, and `/banned-books` is not a room.
+ * not this record's rooms. `/books` is not a walk room. `/banned-books` is
+ * not a room.
  */
 export const ARCHIVE_DOOR_ROOMS: readonly DoorRoom[] = [
   { id: 'law', label: 'Law', href: '/law' },

@@ -29,7 +29,7 @@ test('books browse page renders through the room kit, with the catalog pulse kep
   assert.match(browseSource, /BooksCatalogPulse/);
 });
 
-test('books browse is a room on the walk, not the old board', () => {
+test('books browse holds the door without shipping a finished Banned books walk room', () => {
   assert.match(browseSource, /WalkOffRamp/);
   assert.match(browseSource, /showPath=\{false\}/);
   assert.doesNotMatch(browseSource, /Open the Atlas|ATLAS_INSTRUMENT|label: 'The place'/);
