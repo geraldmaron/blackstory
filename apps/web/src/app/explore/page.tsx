@@ -1,6 +1,5 @@
 /**
- * Atlas instrument. `/` is the map door and mounts the same instrument.
- * This route stays so existing `/explore` links still open the map.
+ * Atlas instrument. `/` is the map door. This route is the live catalog.
  */
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { AtlasHome } from '../atlas-home';
@@ -10,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = buildStaticPageMetadata({
   path: '/explore',
   title: 'Atlas',
-  description: 'The Atlas answers where and when.',
+  description: 'The map of the archive.',
 });
 
 type ExplorePageProps = {

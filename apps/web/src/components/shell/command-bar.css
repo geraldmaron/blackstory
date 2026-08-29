@@ -32,6 +32,12 @@
  * puts `ds-bar--room` on every non-Atlas bar, which is exactly the set that scrolls; until now
  * that modifier resolved to no rule at all.
  */
+.ds-bar--room {
+  background: var(--ds-surface);
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
 .ds-bar--room::before {
   content: '';
   position: fixed;

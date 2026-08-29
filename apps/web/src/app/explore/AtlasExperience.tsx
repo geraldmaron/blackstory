@@ -132,11 +132,6 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
    * element being focused does not exist until React has committed the new panel state.
    */
   const [focusAfterPanels, setFocusAfterPanels] = useState<string | null>(null);
-  /**
-   * Journey / Lens / Decade / Camera stay off the first document. Opening search
-   * is the ask that brings the dock and the mode pair back.
-   */
-  const [instrumentsInvited, setInstrumentsInvited] = useState(false);
 
   const hidePanel = useCallback(
     (panel: 'lens' | 'results' | 'decade' | 'camera') => {
@@ -376,11 +371,9 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       data-mode={mode}
     >
       <CommandBar
-        {...(instrumentsInvited ? { mode, onModeChange: setMode } : {})}
-        onOpenPalette={() => {
-          setInstrumentsInvited(true);
-          setPaletteOpen(true);
-        }}
+        mode={mode}
+        onModeChange={setMode}
+        onOpenPalette={() => setPaletteOpen(true)}
         savedCount={collection.records.length}
         onOpenSaved={() => setSavedOpen(true)}
         onOpenShortcuts={() => setShortcutsOpen(true)}
@@ -525,7 +518,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
        * surface shows one at a time and the dock is how the reader changes which — the mechanism
        * the dock already existed for, rather than a second one invented for small screens.
        */}
-      {instrumentsInvited && (narrow || !panels.lens || !panels.results) && !chromeHidden ? (
+      {(narrow || !panels.lens || !panels.results) && !chromeHidden ? (
         <div className="ds-atlas__dock" data-switcher={narrow ? 'true' : undefined}>
           {NARROW_INSTRUMENTS.map(({ key, label }) =>
             narrow || !panels[key] ? (

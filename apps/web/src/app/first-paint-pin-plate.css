@@ -30,3 +30,8 @@ body:has(.maplibregl-canvas) .ds-first-paint-plate {
   visibility: hidden;
   pointer-events: none;
 }
+
+/* The door keeps the HTML plate even if a prior Atlas visit left a canvas mounted. */
+body:has(.ds-door) .ds-first-paint-plate {
+  visibility: visible;
+}

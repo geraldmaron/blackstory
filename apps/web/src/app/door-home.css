@@ -1,0 +1,76 @@
+/**
+ * Door layout for `/`. Framing sits on archive paper over the existing pin plate.
+ * No second mark, no cockpit, no count. Tokens only.
+ */
+
+.ds-door {
+  position: relative;
+  min-height: 100dvh;
+}
+
+.ds-door__frame {
+  position: relative;
+  z-index: 3;
+  max-width: 42rem;
+  margin: calc(var(--ds-space-6) + env(safe-area-inset-top, 0px)) var(--ds-space-5) 0;
+  padding: var(--ds-space-5);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+}
+
+.ds-door__brand {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 var(--ds-space-4);
+  text-decoration: none;
+}
+
+.ds-door__brand .ds-shell-wordmark__img--lockup {
+  height: 2.25rem;
+}
+
+.ds-door__line {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--ds-ink);
+}
+
+.ds-door__walk {
+  margin: var(--ds-space-4) 0 0;
+  max-width: 46ch;
+  font-family: var(--ds-font-editorial);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+.ds-door__more {
+  margin: var(--ds-space-4) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+}
+
+.ds-door__more a {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ds-door__more a:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 3px;
+}
+
+/* The persistent MapLibre plate belongs to `/explore`. On the door the HTML pins stay. */
+body:has(.ds-door) .ds-map-stage {
+  display: none;
+}
+
+body:has(.ds-door) .ds-first-paint-plate {
+  visibility: visible;
+}

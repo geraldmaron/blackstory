@@ -72,7 +72,9 @@ function destinationCard(destination: Destination) {
 
 export default function AboutPage() {
   // `/about` is itself in the `check` group; a room does not list itself as somewhere to go.
-  const readRooms = destinationsInGroup('read');
+  const readRooms = destinationsInGroup('read').filter(
+    (destination) => destination.path !== '/books',
+  );
   const checkRooms = destinationsInGroup('check').filter(
     (destination) => destination.path !== '/about',
   );

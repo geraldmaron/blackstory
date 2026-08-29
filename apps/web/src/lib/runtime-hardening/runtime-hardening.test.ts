@@ -158,8 +158,8 @@ test('the Atlas is `/`; `/explore` may still mount the same instrument', () => {
   assert.equal(explorePages.length, 1, '/explore may still render the instrument');
 
   const home = readFileSync(join(APP_ROOT, 'page.tsx'), 'utf8');
-  assert.match(home, /AtlasHome/);
-  assert.doesNotMatch(home, /HomeFirstPaint|wantsAtlasInstrument|atlas=1/);
+  assert.match(home, /DoorHome/);
+  assert.doesNotMatch(home, /AtlasHome|HomeFirstPaint|wantsAtlasInstrument|atlas=1/);
 
   assert.equal(
     existsSync(join(APP_ROOT, '(map)')),
