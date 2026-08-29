@@ -1,14 +1,10 @@
 /**
- * The Library menu — the archive's rooms, in the bar rather than behind ⌘K.
- *
- * One control in the bar that opens the same list the library hub renders, from
- * the same registry, so the two can never drift. Atlas stays a link in the bar.
- * This menu does not advertise the board as a cockpit.
+ * The one room menu. Same groups as `/about`. Atlas, Explore, Records,
+ * Journey, and Banned books stay off it. `/library` is a room, not this control.
  *
  * A native `<details>`, not a scripted popover: the bar is rendered on every
  * route including ones that have not hydrated, and a menu that needs JavaScript
- * to open is a menu that sometimes is not there. `/library` itself stays a real
- * link inside the panel, so the hub keeps its crawl path.
+ * to open is a menu that sometimes is not there.
  */
 
 'use client';
@@ -18,7 +14,6 @@ import Link from 'next/link';
 import {
   GROUP_HEADINGS,
   LIBRARY_CARD_GROUPS,
-  cardTitleFor,
   destinationsInGroup,
 } from '../../lib/nav/destination-registry';
 import './library-menu.css';
@@ -41,7 +36,7 @@ export function LibraryMenu() {
   return (
     <details className="ds-libmenu" ref={detailsRef}>
       <summary className="ds-libmenu__trigger">
-        Library
+        Rooms
         <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true">
           <path
             d="M2.5 4.5 6 8l3.5-3.5"
@@ -67,7 +62,7 @@ export function LibraryMenu() {
                     prefetch={false}
                     onClick={closeMenu}
                   >
-                    {cardTitleFor(destination)}
+                    {destination.label}
                     {destination.menuLine ? <small>{destination.menuLine}</small> : null}
                   </Link>
                 ))}
@@ -75,10 +70,6 @@ export function LibraryMenu() {
             </div>
           ))}
         </div>
-
-        <Link className="ds-libmenu__hub" href="/library" prefetch={false} onClick={closeMenu}>
-          Library
-        </Link>
       </div>
     </details>
   );

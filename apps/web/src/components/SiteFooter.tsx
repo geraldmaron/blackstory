@@ -1,7 +1,6 @@
 /**
- * Public site footer — theme-aware Surface card with typographic wordmark, three job
- * columns (Explore / Trust / Contribute from shared shell IA), hairline link rows, and
- * maker credit. Follows v6 home edition card law sitewide; not a fixed-ink band.
+ * Public site footer — theme-aware Surface card with typographic wordmark, the
+ * same three room groups as `/about`, hairline link rows, and maker credit.
  */
 
 import Link from 'next/link';
@@ -29,7 +28,11 @@ export function SiteFooter() {
       <div className="ds-shell-footer__card">
         <div className="ds-shell-footer__inner">
           <div className="ds-shell-footer__mast">
-            <p className="ds-shell-footer__wordmark">{PRODUCT_NAME}</p>
+            <p className="ds-shell-footer__wordmark">
+              <Link href="/" prefetch={false} aria-label="BlackStory">
+                {PRODUCT_NAME}
+              </Link>
+            </p>
             <p className="ds-shell-footer__tagline">People. Places. Evidence. Context.</p>
           </div>
 

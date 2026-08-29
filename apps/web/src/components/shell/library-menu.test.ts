@@ -11,8 +11,8 @@ import { destinationsInGroup } from '../../lib/nav/destination-registry';
 const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, 'LibraryMenu.tsx'), 'utf8');
 
-test('the library menu lists rooms and the library hub, not the board', () => {
-  assert.match(source, /href="\/library"/);
+test('the room menu is the locked about groups, not a second board', () => {
+  assert.doesNotMatch(source, /href="\/library"/);
   assert.doesNotMatch(source, /Straight to the records/);
   assert.doesNotMatch(source, /The Atlas answers where and when/);
   assert.doesNotMatch(source, /The whole archive as a list/);

@@ -161,6 +161,21 @@ describe('destination registry · the footer is derived, not authored', () => {
     }
   });
 
+  it('the locked chrome is the about groups, in that order', () => {
+    assert.deepEqual(
+      destinationsInGroup('read').map((destination) => destination.path),
+      ['/stories', '/law', '/data', '/memorial'],
+    );
+    assert.deepEqual(
+      destinationsInGroup('check').map((destination) => destination.path),
+      ['/about', '/methodology', '/errata'],
+    );
+    assert.deepEqual(
+      destinationsInGroup('take-part').map((destination) => destination.path),
+      ['/submit', '/corrections', '/support'],
+    );
+  });
+
   it('lists the archive rooms and keeps Atlas, records, and history off the chrome', () => {
     const hrefs = footerColumns().flatMap((column) => column.items.map((item) => item.href));
     assert.ok(hrefs.includes('/stories'));
