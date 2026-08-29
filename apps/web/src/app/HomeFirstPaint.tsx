@@ -26,7 +26,7 @@ import {
   firstPaintRecord,
   publishableCitingStories,
   selectDoorRooms,
-  walkOnPlace,
+  walkOnPlaces,
 } from './home-first-paint-surface';
 import '../components/entity/entity-page.css';
 import './record-page.css';
@@ -86,7 +86,7 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
     const citing = publishableCitingStories(model.citing);
     const rooms = selectDoorRooms(lead, citing);
     const eraLine = firstPaintEraLine(lead);
-    const nextPlace = walkOnPlace(lead, model.also);
+    const nextPlaces = walkOnPlaces(lead, model.also);
     const locatorName = firstPaintLocatorName(lead);
 
     return (
@@ -158,7 +158,9 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
           </section>
         ) : null}
 
-        {nextPlace ? <WalkOnPlace place={nextPlace} /> : null}
+        {nextPlaces.map((place) => (
+          <WalkOnPlace key={place.id} place={place} />
+        ))}
 
         <DoorRooms rooms={rooms} />
       </Room>

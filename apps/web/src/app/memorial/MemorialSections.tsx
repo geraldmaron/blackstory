@@ -12,14 +12,14 @@ import { MEMORIAL_LIST_NOTE } from './memorial-copy';
 import { MemorialListContrastZone } from './MemorialListContrastZone';
 
 export type MemorialSectionsProps = {
-  /** Memorial name -> public entity id, for the small subset with a real entity page. */
+  /** Kept for the wall atmosphere. The name list itself stays names. */
   readonly entityLinksByName?: Readonly<Record<string, string>>;
 };
 
 /** DOM id for a letter group, shared by its heading and the jump rail link. */
 const groupId = (letter: string) => `memorial-names-${letter === '#' ? 'other' : letter}`;
 
-export function MemorialSections({ entityLinksByName }: MemorialSectionsProps) {
+export function MemorialSections(_props: MemorialSectionsProps = {}) {
   const groups = memorialNamesByInitial();
   const total = groups.reduce((count, group) => count + group.names.length, 0);
 
@@ -78,16 +78,9 @@ export function MemorialSections({ entityLinksByName }: MemorialSectionsProps) {
             <ul className="ds-memorial-edition__name-list">
               {group.names.map((name) => {
                 const year = memorialNameYear(name);
-                const entityId = entityLinksByName?.[name];
                 return (
                   <li key={name}>
-                    {entityId ? (
-                      <Link className="ds-memorial-edition__name-link" href={`/entity/${entityId}`}>
-                        {name}
-                      </Link>
-                    ) : (
-                      name
-                    )}
+                    {name}
                     {year ? (
                       <span className="ds-memorial-edition__name-year"> · {year}</span>
                     ) : null}

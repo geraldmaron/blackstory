@@ -1,15 +1,13 @@
 /**
- * Public support page for BlackStory store gates. Primary path is the corrections lane;
- * secondary trust surfaces and a contact placeholder until the owner sets a live address.
- *
- * v9 utility room kit edition. This is a UTILITY room: task surface for helping readers
- * find corrections, methodology, and contact information.
+ * Public support page for BlackStory. Primary path is the corrections lane;
+ * methodology, errata, and a contact address sit beside it.
  */
 import type { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { Room, RoomHeader, Prose, CardGrid, RoomCard, UtilityCard } from '../../components/room';
+import { WalkOffRamp } from '../walk-off-ramp';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
 import '../utility.css';
 import './support.css';
@@ -28,7 +26,7 @@ const SUPPORT_PATHS = [
     href: '/corrections',
     label: 'Report a correction',
     detail:
-      'Challenge a published record, suggest missing evidence, or report a precision issue. Submissions enter moderated review, and nothing changes publicly until it passes independent review.',
+      'Challenge a published record or suggest missing evidence. Submissions enter moderated review, and nothing changes publicly until a person accepts it.',
   },
   {
     href: '/methodology',
@@ -59,7 +57,7 @@ export default function SupportPage() {
         <Prose>
           <p className="ds-support__section-intro">
             Most questions about a specific record are best handled through corrections so
-            moderators can tie your report to the published projection and sources.
+            a person can read your report against the published sources.
           </p>
         </Prose>
         <CardGrid>
@@ -78,7 +76,7 @@ export default function SupportPage() {
       <UtilityCard title="Reach the team" className="ds-support__section-contact">
         <Prose>
           <p className="ds-support__contact-intro">
-            For issues that do not fit the corrections form (account of operation questions, privacy
+            For issues that do not fit the corrections form (how the product is run, privacy
             requests, or accessibility barriers), email the contact below.
           </p>
         </Prose>
@@ -91,11 +89,12 @@ export default function SupportPage() {
         </div>
 
         <p className="ds-support__follow">
-          Privacy questions: see the <Link href="/privacy">privacy policy</Link>. Store listings
-          link here and to that policy; both URLs must be live on{' '}
-          <span className="ds-phrase-nowrap">blackbook.app</span> before app store submission.
+          Privacy questions: see the <Link href="/privacy">privacy policy</Link>. This product is
+          BlackStory.
         </p>
       </UtilityCard>
+
+      <WalkOffRamp title="The place">Help for BlackStory, not a store listing.</WalkOffRamp>
     </Room>
   );
 }

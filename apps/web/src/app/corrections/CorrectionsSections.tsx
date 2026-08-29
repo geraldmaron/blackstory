@@ -11,8 +11,8 @@ import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { CorrectionForm } from './CorrectionForm';
 import { CORRECTION_PRIVACY_NOTICE } from './copy';
-import { ATLAS_INSTRUMENT_HREF } from '../../lib/nav/atlas-door';
-import { Disclosure, OffRamp, UtilityStep } from '../../components/room';
+import { Disclosure, UtilityStep } from '../../components/room';
+import { WalkOffRamp } from '../walk-off-ramp';
 import './corrections.css';
 
 /** The lifecycle, in the order it happens. Step one is done the moment the form is sent. */
@@ -56,21 +56,20 @@ export function CorrectionsSections() {
         </p>
       </Disclosure>
 
-      <OffRamp
+      <WalkOffRamp
         title={
           <>
             Every accepted correction is <em>published</em>
           </>
         }
-        actions={[
-          { href: '/errata', label: 'Errata log', emphasis: 'copper' },
+        extra={[
+          { href: '/errata', label: 'Errata log' },
           { href: '/methodology', label: 'How disputes are handled' },
-          { href: ATLAS_INSTRUMENT_HREF, label: 'Open the Atlas' },
         ]}
       >
         Mistakes are published rather than overwritten, with the record they changed.{' '}
         <Link href="/corrections/status">Check a receipt</Link> if you already have a code.
-      </OffRamp>
+      </WalkOffRamp>
     </div>
   );
 }

@@ -43,15 +43,27 @@ export const METHODOLOGY_DIGNITY_LINE =
 export const METHODOLOGY_PAGE_SECTIONS = [
   { id: 'how-a-record-gets-in', label: 'How a record gets in' },
   { id: 'evidence-grades', label: 'Evidence grades' },
-  { id: 'precision', label: 'Precision' },
+  { id: 'how-a-point-is-drawn', label: 'How a point is drawn' },
   { id: 'living-person-protection', label: 'Living person protection' },
   { id: 'see-it-applied', label: 'See it applied' },
 ] as const;
 
+/** How sure we are, in English. Shop field names stay off this page. */
+export const EVIDENCE_GRADE_DEFINITIONS = {
+  established:
+    'Several independent, high-authority sources agree, and there is no serious dispute.',
+  corroborated:
+    'Two or more independent sources support the statement. Small gaps may remain, but they do not undo the core claim.',
+  'single-source':
+    'One source that meets the citation bar. Not necessarily wrong, and not yet checked against another.',
+  contested:
+    'Credible sources disagree, or the statement rests on a source with a known reliability problem. The record names the disagreement in plain language.',
+} as const;
+
 export const VERIFICATION_STEPS = [
   'Identify primary sources closest to the event or record creation.',
   'Cross check against independent secondary scholarship where primaries are sparse.',
-  'Document contradictions in confidence notes and counter claims rather than hiding them.',
+  'Document contradictions in notes on the sources rather than hiding them.',
   'Append every change to the revision log with a mandatory edit summary.',
 ] as const;
 
@@ -65,7 +77,7 @@ export const DIGNITY_RULES = [
 
 export const LIMITATION_RULES = [
   'Coverage is uneven across places and eras. Absence on the map is not proof that nothing happened; it may mean sources have not cleared the publish gate yet.',
-  'Single source facts are published only with an explicit confidence note explaining why.',
+  'Facts that rest on one source are published only with an explicit note on how sure we are, and why.',
   'External statistics (census, ACS, voluntary reporting series) carry their own coverage limits; participation and suppression are part of the reading, not optional footnotes.',
   'Link rot and missing archives happen. Where a web source was captured, the capture travels with the citation; where it was not, the gap is visible.',
 ] as const;

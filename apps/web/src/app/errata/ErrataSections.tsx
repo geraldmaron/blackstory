@@ -25,16 +25,23 @@ function formatDate(timestamp: string): string {
   return timestamp.split('T')[0] ?? timestamp;
 }
 
+function publicErrataHref(url: string | undefined): string | undefined {
+  if (url === undefined || url.trim().length === 0) return undefined;
+  if (url.includes('ent_') || url.startsWith('/entity/')) return undefined;
+  return url;
+}
+
 function ErrataRow({ entry }: { readonly entry: ErrataEntry }) {
   const phase = ERRATA_CHANGE_TYPE_LABELS[entry.changeType];
+  const href = publicErrataHref(entry.affectedUrl);
 
   return (
     <li className="ds-errata__row">
       <time className="ds-errata__row-date" dateTime={entry.timestamp}>
         {formatDate(entry.timestamp)}
       </time>
-      {entry.affectedUrl ? (
-        <Link className="ds-errata__row-id" href={entry.affectedUrl}>
+      {href ? (
+        <Link className="ds-errata__row-id" href={href}>
           {entry.id}
         </Link>
       ) : (

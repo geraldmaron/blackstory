@@ -65,6 +65,12 @@ test('every multi-column rule is inside a min-width query', () => {
   assert.doesNotMatch(beforeFirstQuery, /grid-template-columns:\s*repeat\(/);
 });
 
+test('about is a room on the walk, not the old board', () => {
+  assert.doesNotMatch(pageSource, /Open the Atlas|ATLAS_INSTRUMENT/);
+  assert.doesNotMatch(pageSource, /Banned books|\/banned-books/);
+  assert.match(pageSource, /WalkOffRamp/);
+});
+
 test('user-facing copy avoids em dashes', () => {
   const strings = [
     ...ABOUT_ORIGIN,

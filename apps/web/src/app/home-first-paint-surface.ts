@@ -5,7 +5,12 @@
  */
 import type { PublicEntityView, RelatedNeighborView } from '../data/public-seed';
 import { ERA_NOT_DOCUMENTED_LABEL, entityEraFact } from '../lib/map-experience/entity-era-facts';
-import { isTulsaPlace, placeHref, publicPlaceSlug } from '../lib/place/public-place-path';
+import {
+  isTulsaPlace,
+  neighborHref,
+  placeHref,
+  publicPlaceSlug,
+} from '../lib/place/public-place-path';
 import type { StoryCitation } from '../lib/release/build-cites-edge';
 import { isInternalRecordLabel } from './home-first-paint';
 
@@ -223,25 +228,37 @@ export function firstPaintPlaceNeighbors(
 }
 
 /**
- * Another published stand when this record has no place neighbors.
+ * Other published stands that are not already place neighbors.
  * Prefers the church that already holds. Does not invent a graph edge.
  */
-export function walkOnPlace(
+export function walkOnPlaces(
   lead: PublicEntityView,
   also: readonly PublicEntityView[],
-): PublicEntityView | undefined {
-  if (firstPaintPlaceNeighbors(lead).length > 0) return undefined;
+): readonly PublicEntityView[] {
+  const neighborHrefs = new Set(
+    firstPaintPlaceNeighbors(lead).map((neighbor) => neighborHref(neighbor)),
+  );
   const leadHref = placeHref(lead.displayName);
   const candidates = also.filter((place) => {
     if (place.id === lead.id) return false;
     if (isTulsaPlace(place)) return false;
     if (isInternalRecordLabel(place.displayName)) return false;
     const href = placeHref(place.displayName);
-    return href !== leadHref && !href.includes('ent_');
+    if (href === leadHref || href.includes('ent_')) return false;
+    return !neighborHrefs.has(href);
   });
-  return (
-    candidates.find((place) => publicPlaceSlug(place.displayName) === CHURCH_SLUG) ?? candidates[0]
+  const church = candidates.filter(
+    (place) => publicPlaceSlug(place.displayName) === CHURCH_SLUG,
   );
+  const rest = candidates.filter((place) => publicPlaceSlug(place.displayName) !== CHURCH_SLUG);
+  return [...church, ...rest];
+}
+
+export function walkOnPlace(
+  lead: PublicEntityView,
+  also: readonly PublicEntityView[],
+): PublicEntityView | undefined {
+  return walkOnPlaces(lead, also)[0];
 }
 
 export function firstPaintRecord(entity: PublicEntityView): PublicEntityView {

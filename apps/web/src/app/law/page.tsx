@@ -7,7 +7,7 @@
 import type { Metadata } from 'next';
 import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { ATLAS_INSTRUMENT_HREF } from '../../lib/nav/atlas-door';
+import { WalkOffRamp } from '../walk-off-ramp';
 import { LAW_EDITION_BROWSE_LEDE } from './law-copy';
 import { buildLawBrowseViewModel, type RawLawBrowseParams } from './law-view-model';
 import { loadLegalCatalog } from '../../lib/legal/public-source';
@@ -17,7 +17,7 @@ import {
   statePostalForJurisdiction,
 } from './LawBrowseSections';
 import { humanizeLegalKind } from '../../components/legal';
-import { Room, RoomHeader, OffRamp, RailGroup } from '../../components/room';
+import { Room, RoomHeader, RailGroup } from '../../components/room';
 import '../reading-room.css';
 
 void React;
@@ -93,9 +93,8 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
         lede={
           <>
             {LAW_EDITION_BROWSE_LEDE} This catalogue holds the statutes, regulations, constitutional
-            amendments and landmark decisions themselves. It does not hold the entity records the
-            Atlas maps; the two are linked only by jurisdiction and era, never by a documented
-            connection.
+            amendments and landmark decisions themselves. It is linked to a place only by
+            jurisdiction and era, never by a documented evidentiary join.
           </>
         }
         meta={[`${catalog.length.toLocaleString('en-US')} law entries`, ...kindMeta]}
@@ -103,20 +102,10 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
 
       <LawBrowseSections view={view} catalog={catalog} />
 
-      <OffRamp
-        title={
-          <>
-            Or go straight to the <em>records</em>
-          </>
-        }
-        actions={[
-          { label: 'Open the Atlas', href: ATLAS_INSTRUMENT_HREF, emphasis: 'copper' },
-          { label: 'Search the archive', href: '/records' },
-        ]}
-      >
-        Press <kbd className="ds-kbd">⌘</kbd>
-        <kbd className="ds-kbd">K</kbd> to search laws and records from anywhere.
-      </OffRamp>
+      <WalkOffRamp title="The place">
+        This catalogue is jurisdictional. It does not invent a documented join to the place you
+        opened it from.
+      </WalkOffRamp>
     </Room>
   );
 }

@@ -174,7 +174,7 @@ export function CorrectionForm() {
       <Field
         label="Which record is wrong?"
         htmlFor={targetRecordId}
-        hint="The id from the record page — it is in the address bar, and on the record's own About block."
+        hint="Name the place or paste its page address. You do not need an internal id."
       >
         <input
           id={targetRecordId}
@@ -182,7 +182,7 @@ export function CorrectionForm() {
           type="text"
           required
           defaultValue={initialTarget}
-          placeholder="Entity, claim, source, or place id"
+          placeholder="Fifteenth Street Presbyterian Church"
           aria-describedby={fieldIssue('targetRecordId') ? `${targetRecordId}-issue` : undefined}
         />
         {fieldIssue('targetRecordId') ? (

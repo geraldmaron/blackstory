@@ -9,11 +9,9 @@ import { buildStateFipsNameMap } from '@repo/domain/statistics/public-data-summa
 import {
   getHistoricalStatePopulationCoverage,
   getNationalPopulationTimelineSnapshot,
-  getPhase1IndicatorCoverageSummary,
   getStatePopulationChanges,
   type HistoricalStatePopulationCoverage,
   type NationalPopulationTimelineSnapshot,
-  type Phase1IndicatorCoverageSummary,
   type StatePopulationChange,
 } from '../../lib/demographics/public-stats-source';
 import { getDataPageIndicatorBundle } from '../../lib/demographics/data-page-indicators';
@@ -22,7 +20,8 @@ import '../../components/data/data-charts.css';
 import './data-page.css';
 import { DATA_INTRO, DATA_PAGE_DESCRIPTION } from './data-copy';
 import { DataSections } from './DataSections';
-import { OffRamp, Room, RoomHeader } from '../../components/room';
+import { Room, RoomHeader } from '../../components/room';
+import { WalkOffRamp } from '../walk-off-ramp';
 import '../reading-room.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
@@ -47,17 +46,14 @@ export default async function DataPage() {
     timelineSnapshot,
     stateChanges2010to2020,
     historicalStateCoverage,
-    phase1Indicators,
     indicators,
   ] = await Promise.all([
     safe(getNationalPopulationTimelineSnapshot()),
     safe(getStatePopulationChanges('2010', '2020')),
     safe(getHistoricalStatePopulationCoverage()),
-    safe(getPhase1IndicatorCoverageSummary()),
     safe(getDataPageIndicatorBundle()),
   ]);
 
-  const phase1 = phase1Indicators as Phase1IndicatorCoverageSummary | undefined;
   const historicalStates = historicalStateCoverage as HistoricalStatePopulationCoverage | undefined;
   const timeline = (timelineSnapshot ?? undefined) as
     NationalPopulationTimelineSnapshot | undefined;
@@ -106,21 +102,13 @@ export default async function DataPage() {
         stateChanges={stateChanges}
         stateNameByFips={STATE_NAME_BY_FIPS}
         historicalStates={historicalStates}
-        phase1Indicators={phase1}
         indicators={indicators}
         populationGeneratedAt={timeline?.generatedAt}
       />
 
-      <OffRamp
-        title="Back to the place"
-        actions={[
-          { label: 'The place', href: '/', emphasis: 'copper' },
-          { label: 'Search the record index', href: '/records' },
-        ]}
-      >
-        Every number here is a national series. For the records behind a place, use the record
-        index.
-      </OffRamp>
+      <WalkOffRamp title="Back to the place">
+        Every number here is a national series. The place is the door back.
+      </WalkOffRamp>
     </Room>
   );
 }

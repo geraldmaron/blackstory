@@ -60,11 +60,12 @@ test('data user-facing copy does not leak Phase 1 or warehouse', () => {
     ...DATA_PAGE_SECTIONS.map((section) => section.label),
   ];
   for (const value of strings) {
-    assert.doesNotMatch(value, /Phase 1|warehouse/i);
+    assert.doesNotMatch(value, /Phase 1|warehouse|fixture-backed/i);
   }
-  assert.doesNotMatch(copySource, /Phase 1|warehouse/i);
-  assert.doesNotMatch(pageSource, /Phase 1|warehouse/i);
-  assert.doesNotMatch(sectionsSource, /Phase 1|warehouse/i);
+  assert.doesNotMatch(copySource, /Phase 1|warehouse|fixture-backed/i);
+  assert.doesNotMatch(pageSource, /Phase 1|warehouse|fixture-backed/i);
+  assert.doesNotMatch(sectionsSource, /Phase 1|warehouse|fixture-backed/i);
+  assert.doesNotMatch(sectionsSource, /href="\/explore"/);
 });
 
 test('data user-facing copy avoids em dashes', () => {
