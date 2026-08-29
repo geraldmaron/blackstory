@@ -25,8 +25,10 @@ test('`/` is framing plus the existing pin plate', () => {
   assert.match(door, /ABOUT_LINE/);
   assert.match(door, /ABOUT_WALK_PAST/);
   assert.match(door, /FirstPaintPinPlate/);
+  assert.match(door, /listPublicEntities/);
   assert.doesNotMatch(door, /AtlasLoader|CameraConsole|FilterBar|Journey|Lens|Camera/);
-  assert.doesNotMatch(door, /4,101|42Cb1758|Kind|Tone|Era/);
+  assert.doesNotMatch(door, /4,101|42Cb1758/);
+  assert.doesNotMatch(door, /label: 'Kind'|label: 'Tone'|label: 'Era'/);
   assert.doesNotMatch(door, /['"`]\/banned-books|['"`]\/journey/);
 });
 

@@ -6,7 +6,7 @@
 .ds-first-paint-plate {
   position: fixed;
   inset: 0;
-  z-index: 2;
+  z-index: 2; /* local: HTML pins above the parked plate, below door framing */
   pointer-events: none;
 }
 
