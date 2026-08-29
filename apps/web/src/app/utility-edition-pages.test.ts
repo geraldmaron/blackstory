@@ -78,11 +78,12 @@ test('not-found offers the four exits the design law names, and no gallery', () 
   const source = readFileSync(join(appDir, 'not-found.tsx'), 'utf8')
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/^[ \t]*\/\/.*$/gm, '');
-  // design-direction-v9-surfaces.md §"/_not-found": the palette, the Atlas, Chapters, /records.
-  // Atlas is `/explore`. Bare `/` is the featured door, not the board.
-  assert.match(source, /ATLAS_INSTRUMENT_HREF/);
+  // The place is the door. Atlas is the old board, not a recovery room.
+  assert.match(source, /href="\/"/);
+  assert.match(source, /The place/);
   assert.match(source, /href="\/stories"/);
   assert.match(source, /⌘K/);
+  assert.doesNotMatch(source, /Open the Atlas|ATLAS_INSTRUMENT/);
   // The `/design-system` exit sent a reader who mistyped a chapter slug to a component gallery.
   // Its removal is the criterion, so an assertion that it stays removed is the guard.
   assert.doesNotMatch(source, /design-system/);

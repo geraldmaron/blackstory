@@ -8,7 +8,7 @@ export const DATA_PAGE_DESCRIPTION =
 
 export const DATA_INTRO = {
   kicker: 'Numbers',
-  lede: 'National Census context plus curated indicators for wealth, housing, credit, and justice. Every chart names its source. For county maps, open Explore.',
+  lede: 'National Census context plus curated indicators for wealth, housing, credit, and justice. Every chart names its source.',
 } as const;
 
 export const DATA_ORIENTATION_BEATS = [
@@ -77,6 +77,6 @@ export const DATA_SECTION_COPY = {
     index: '07',
     kicker: 'Next step',
     title: 'Dig into a place',
-    lede: 'Open the map for county layers and local context. Methodology explains how we read outside statistics next to archive records.',
+    lede: 'The place is the door back. Methodology explains how we read these numbers next to a record.',
   },
 } as const;

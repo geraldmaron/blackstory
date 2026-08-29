@@ -7,6 +7,7 @@ import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import {
+  EVIDENCE_GRADE_DEFINITIONS,
   METHODOLOGY_DIGNITY_LINE,
   METHODOLOGY_INTRO_LEDE,
   METHODOLOGY_MISSION_BEATS,
@@ -17,8 +18,6 @@ const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'MethodologySections.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'methodology-copy.ts'), 'utf8');
-const shortcutSource = readFileSync(join(here, 'MethodologyAtlasShortcut.tsx'), 'utf8');
-
 test('methodology page renders through the room kit, with no edition chrome left', () => {
   assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
   assert.doesNotMatch(pageSource, /METHODOLOGY_EDITION_MOSAIC_SEED/);
@@ -47,7 +46,6 @@ test('methodology section names match the record page vocabulary', () => {
   assert.match(sectionsSource, /How a record gets in/);
   assert.match(sectionsSource, /What the evidence grades mean/);
   assert.match(sectionsSource, /Why a point is never drawn sharper than its source/);
-  assert.match(sectionsSource, /<Precision/);
   assert.match(sectionsSource, /Living person protection/);
   assert.match(sectionsSource, /See it applied/);
 });
@@ -56,22 +54,17 @@ test('methodology links to /memorial by name', () => {
   assert.match(sectionsSource, /href="\/memorial"/);
 });
 
-test('the A shortcut sets the Atlas evidence floor to A only', () => {
-  assert.match(shortcutSource, /router\.push\('\/explore\?confidence=high'\)/);
-});
-
-test('the client boundary is the shortcut alone, never the sections', () => {
-  // `'use client'` is contagious through imports, not just behaviour. With the directive on
-  // MethodologySections, its `@repo/domain/facts` import dragged `@repo/schemas` and the
-  // constitution loader's `node:path`/`node:url` into the browser bundle, and `next build` failed
-  // on an unhandled `node:` scheme while lint, typecheck, tests and a11y all passed. None of the
-  // five gates builds, so this assertion is the guard that stands in for one.
-  assert.match(shortcutSource, /^'use client';/);
+test('methodology stays on the server and does not sell the Atlas as a room', () => {
   assert.doesNotMatch(sectionsSource, /'use client'/);
+  assert.doesNotMatch(sectionsSource, /Open the Atlas|ATLAS_INSTRUMENT/);
+  assert.doesNotMatch(sectionsSource, /ResearchPipelineSketch|home-server/);
+  assert.doesNotMatch(sectionsSource, /<Precision|confidenceNote|counterClaims|FACT_CONFIDENCE_DEFINITIONS/);
+  assert.doesNotMatch(copySource, /confidenceNote|counterClaims|home-server/i);
+  assert.match(copySource, /EVIDENCE_GRADE_DEFINITIONS/);
+  assert.doesNotMatch(EVIDENCE_GRADE_DEFINITIONS.contested, /confidenceNote|counterClaims|`/);
 });
 
 test('methodology preserves core trust copy', () => {
-  assert.match(sectionsSource, /ResearchPipelineSketch compact/);
   for (const beat of METHODOLOGY_MISSION_BEATS) {
     assert.match(copySource, new RegExp(beat.kicker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
@@ -91,6 +84,7 @@ test('methodology user-facing copy avoids em dashes', () => {
     METHODOLOGY_DIGNITY_LINE,
     ...METHODOLOGY_MISSION_BEATS.flatMap((beat) => [beat.kicker, beat.body]),
     ...METHODOLOGY_PUBLISH_RULES.flatMap((rule) => [rule.title, rule.body]),
+    ...Object.values(EVIDENCE_GRADE_DEFINITIONS),
   ];
   for (const value of strings) {
     assert.doesNotMatch(value, /—/);

@@ -18,7 +18,6 @@ import Link from 'next/link';
 import type {
   HistoricalStatePopulationCoverage,
   NationalPopulationTimelineRow,
-  Phase1IndicatorCoverageSummary,
   StatePopulationChange,
 } from '@repo/domain/statistics/public-data-summaries';
 import type { DataPageIndicatorBundle } from '@repo/domain/statistics/data-page-series';
@@ -59,7 +58,6 @@ export type DataSectionsProps = {
   readonly stateChanges: readonly StatePopulationChange[];
   readonly stateNameByFips: Readonly<Record<string, string>>;
   readonly historicalStates: HistoricalStatePopulationCoverage | undefined;
-  readonly phase1Indicators: Phase1IndicatorCoverageSummary | undefined;
   readonly indicators: DataPageIndicatorBundle;
   readonly populationGeneratedAt?: string | undefined;
 };
@@ -182,7 +180,6 @@ export function DataSections({
   stateChanges,
   stateNameByFips,
   historicalStates,
-  phase1Indicators,
   indicators,
   populationGeneratedAt,
 }: DataSectionsProps) {
@@ -316,8 +313,8 @@ export function DataSections({
           </>
         ) : (
           <p className="ds-data-edition__empty">
-            Census population figures are not available on this release. Open{' '}
-            <Link href="/explore">the map</Link> for place layers.
+            Census population figures are not available on this release. The place is the door
+            back.
           </p>
         )}
       </ChartCard>
@@ -414,54 +411,6 @@ export function DataSections({
       >
         <RacePairComparisonChart series={indicators.imprisonmentComparison} />
         <GroupedBarIndicatorChart series={indicators.federalDrugSentences} />
-      </ChartCard>
-
-      <ChartCard
-        id="composition"
-        kicker="Records"
-        title="Kind composition"
-        sourceLabel="Record index (/records)"
-        asOf="Not published as a chart on this release"
-        limits={
-          <>
-            This card once pointed at a kind composition graph inherited from the retired /history
-            route. That graph was already a placeholder with no chart of its own, so it has been
-            retired rather than rebuilt here: the composition it would have shown, how many records
-            of each kind, already renders as a crawlable, linkable facet on the record index, which
-            is where /history&apos;s redirect sends every bookmark. Nothing about record kinds is
-            hidden; it lives at a different address.
-          </>
-        }
-        table={null}
-      >
-        {phase1Indicators ? (
-          <DataStatStrip
-            labelledBy="composition-heading"
-            sources={[{ label: 'Indicator catalog', url: '/methodology' }]}
-            items={[
-              {
-                id: 'p1-metrics',
-                value: phase1Indicators.metricCount.toLocaleString('en-US'),
-                label: 'Curated metrics defined',
-                note: phase1Indicators.themes.join(', '),
-              },
-              {
-                id: 'p1-obs',
-                value: phase1Indicators.sampleObservationCount.toLocaleString('en-US'),
-                label: 'Published observations loaded',
-                note:
-                  phase1Indicators.sampleObservationCount === 0
-                    ? 'Catalog and published figures until more series land'
-                    : 'Published statistical observations',
-              },
-            ]}
-          />
-        ) : (
-          <p className="ds-data-edition__empty">
-            No chart renders here. Open <Link href="/records">the record index</Link> for the kind
-            breakdown.
-          </p>
-        )}
       </ChartCard>
 
       <article className="ds-data-edition__panel" aria-labelledby="themes-heading" id="themes">

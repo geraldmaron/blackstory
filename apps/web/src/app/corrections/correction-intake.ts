@@ -90,7 +90,7 @@ export function validateCorrectionSubmission(
   if (!input.targetRecordId?.trim()) {
     issues.push({
       field: 'targetRecordId',
-      message: 'Provide the record identifier you are correcting.',
+      message: 'Name the place or record you are correcting.',
     });
   }
   if (!input.statement?.trim() || input.statement.trim().length < MIN_STATEMENT_LENGTH) {

@@ -17,6 +17,7 @@ import {
   humanPlaceLine,
   selectDoorRooms,
   walkOnPlace,
+  walkOnPlaces,
 } from './home-first-paint-surface';
 
 test('containsInternalId catches claim tokens and catalog ids', () => {
@@ -109,6 +110,24 @@ test('walk-on uses a standable place only when this record has no place neighbor
   };
   assert.equal(firstPaintPlaceNeighbors(library).length, 0);
   assert.equal(walkOnPlace(library, [church])?.displayName, 'Fifteenth Street Presbyterian Church');
+
+  const dillard = {
+    ...church,
+    id: 'nrhp-black-heritage-91000107',
+    displayName: 'Dillard High School, Old',
+    relatedNeighbors: [],
+    continueLearning: [],
+  };
+  const fromLibrary = walkOnPlaces(library, [church, dillard]);
+  assert.deepEqual(
+    fromLibrary.map((place) => place.displayName),
+    ['Fifteenth Street Presbyterian Church', 'Dillard High School, Old'],
+  );
+  const fromChurch = walkOnPlaces(church, [dillard]);
+  assert.deepEqual(
+    fromChurch.map((place) => place.displayName),
+    ['Dillard High School, Old'],
+  );
 });
 
 test('related heading is human names, not catalog voice', () => {

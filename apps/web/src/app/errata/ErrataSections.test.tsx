@@ -18,7 +18,7 @@ const SAMPLE_ENTRIES: readonly ErrataEntry[] = [
     changeType: 'correction',
     headline: 'Fixed a wrong date',
     summary: 'The original entry cited the wrong year for the ordinance.',
-    affectedUrl: '/entity/ent_sample_001',
+    affectedUrl: '/place/paul-laurence-dunbar-high-school',
   },
   {
     id: 'errata_sample_note',
@@ -42,7 +42,7 @@ test('every row shows date, record link, statement and phase', () => {
   assert.match(html, /ds-errata__row-date"[^>]*>2026-08-01</);
   assert.match(
     html,
-    /<a class="ds-errata__row-id" href="\/entity\/ent_sample_001">errata_sample_correction</,
+    /<a class="ds-errata__row-id" href="\/place\/paul-laurence-dunbar-high-school">errata_sample_correction</,
   );
   assert.match(
     html,

@@ -25,9 +25,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
 });
 
 /**
- * Off-ramp stays on `/records` rather than a live catalog pick. Fetching the
- * search index here made this receipt page dynamic and a CDN miss (~5k
- * requests/day). MethodologySections already defaults the CTA to `/records`.
+ * Off-ramp goes back to the place. This receipt page stays static.
  */
 export default function MethodologyPage() {
   return (

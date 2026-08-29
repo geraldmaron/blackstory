@@ -242,6 +242,7 @@ test('seed Dunbar first paint has no claim ids, rights caption, or ent_ addresse
   assert.match(html, /Paul Laurence Dunbar High School/);
   assert.match(html, /The history here/);
   assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church"/);
+  assert.match(html, /href="\/place\/dunbar-alumni-federation"/);
   assert.match(html, /href="\/data"/);
   assert.match(html, /href="\/law"/);
   assert.match(html, /href="\/memorial"/);
@@ -370,13 +371,27 @@ test('a place with no place neighbors walks on to another published stand', () =
     relatedNeighbors: [],
     continueLearning: [],
   };
+  const dillard = {
+    ...church,
+    id: 'nrhp-black-heritage-91000107',
+    displayName: 'Dillard High School, Old',
+    relatedNeighbors: [],
+    continueLearning: [],
+  };
   const html = renderToStaticMarkup(
     createElement(HomeFirstPaint, {
-      model: { lead: library, also: [church], story: undefined, citing: [], source: 'live' },
+      model: {
+        lead: library,
+        also: [church, dillard],
+        story: undefined,
+        citing: [],
+        source: 'live',
+      },
     }),
   );
   assert.match(html, /African American Research Library and Cultural Center/);
   assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church"/);
+  assert.match(html, /href="\/place\/dillard-high-school-old"/);
   assert.doesNotMatch(html, /id="stories"/);
   assert.doesNotMatch(html, /href="#stories"/);
   assert.doesNotMatch(html, /Open a room from this place/);
@@ -403,5 +418,5 @@ test('a place with no place neighbors walks on to another published stand', () =
     }),
   );
   assert.match(withNeighbor, /href="\/place\/fifteenth-street-presbyterian-church"/);
-  assert.doesNotMatch(withNeighbor, /href="\/place\/dillard-high-school-old"/);
+  assert.match(withNeighbor, /href="\/place\/dillard-high-school-old"/);
 });
