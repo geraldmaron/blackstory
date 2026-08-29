@@ -63,3 +63,14 @@ body:has(.ds-door) .ds-first-paint-plate {
   position: absolute;
   visibility: visible;
 }
+
+@media (max-width: 559px) {
+  /* Framing first, then the plate. Must follow the absolute rule or the
+     overlay wins and the discs sit under the mast. */
+  body:has(.ds-door) .ds-first-paint-plate {
+    position: relative;
+    inset: auto;
+    min-height: min(70dvh, 28rem);
+    width: 100%;
+  }
+}
