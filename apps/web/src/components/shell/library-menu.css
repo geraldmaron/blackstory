@@ -164,6 +164,11 @@
   .ds-libmenu__trigger {
     padding: 0 var(--ds-space-2);
     font-size: 12px;
+    gap: 0;
+  }
+
+  .ds-libmenu__trigger svg {
+    display: none;
   }
 
   .ds-libmenu__panel {
