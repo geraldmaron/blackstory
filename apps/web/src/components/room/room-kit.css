@@ -1441,9 +1441,14 @@ a.ds-room-chip {
 }
 
 @media (max-width: 390px) {
-  .ds-room-header__title,
+  .ds-room-header__title {
+    font-size: clamp(1.5rem, 8vw, 2rem);
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+
   .ds-room-prose {
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
     min-width: 0;
   }
 }

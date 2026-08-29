@@ -473,10 +473,22 @@
 
   .ds-bar__brand {
     --ds-bar-symbol-size: 2.25rem;
+    width: 2.25rem;
+    max-width: 2.25rem;
+    min-width: 0;
+    overflow: hidden;
   }
 
-  .ds-bar__brand,
-  .ds-bar__tools,
+  .ds-bar__brand .ds-shell-wordmark__img--symbol,
+  .ds-bar__brand .ds-shell-wordmark__img--lockup {
+    max-width: 100%;
+  }
+
+  .ds-bar__tools {
+    min-width: min-content;
+    justify-self: end;
+  }
+
   .ds-bar__search {
     min-width: 0;
   }
