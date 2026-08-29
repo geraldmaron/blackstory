@@ -67,6 +67,24 @@ export function humanPlaceLine(entity: PublicEntityView): string | undefined {
   return undefined;
 }
 
+/**
+ * Locator name for the door: the place, not a pin taxonomy.
+ * Shop-talk precision language stays off aria, alt, title, and the caption.
+ */
+export function firstPaintLocatorName(entity: PublicEntityView): string | undefined {
+  const name = entity.displayName.trim();
+  if (name.length === 0 || containsInternalId(name)) return undefined;
+  const place = humanPlaceLine(entity);
+  if (
+    place &&
+    place.toLowerCase() !== name.toLowerCase() &&
+    !name.toLowerCase().includes(place.toLowerCase())
+  ) {
+    return `${name}, ${place}`;
+  }
+  return name;
+}
+
 function humanizeRelation(value: string): string {
   return value
     .split('_')

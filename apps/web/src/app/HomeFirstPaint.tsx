@@ -22,6 +22,7 @@ import { placeHref } from '../lib/place/public-place-path';
 import { isInternalRecordLabel, type HomeFirstPaintModel } from './home-first-paint';
 import {
   firstPaintEraLine,
+  firstPaintLocatorName,
   firstPaintRecord,
   publishableCitingStories,
   selectDoorRooms,
@@ -86,6 +87,7 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
     const rooms = selectDoorRooms(lead, citing);
     const eraLine = firstPaintEraLine(lead);
     const nextPlace = walkOnPlace(lead, model.also);
+    const locatorName = firstPaintLocatorName(lead);
 
     return (
       <Room
@@ -117,9 +119,14 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
           </figure>
         }
       >
-        {geo ? (
-          <section className="ds-home-place-stand" aria-label={lead.locationLabel}>
-            <RecordPlacePreview lat={geo.lat} lng={geo.lng} label={lead.locationLabel} />
+        {geo && locatorName ? (
+          <section className="ds-home-place-stand">
+            <RecordPlacePreview
+              lat={geo.lat}
+              lng={geo.lng}
+              label={locatorName}
+              accessibleName={locatorName}
+            />
           </section>
         ) : null}
 

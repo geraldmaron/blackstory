@@ -9,6 +9,7 @@ import {
   containsInternalId,
   firstPaintEraLine,
   firstPaintRecord,
+  firstPaintLocatorName,
   firstPaintPlaceNeighbors,
   firstPaintRelatedHeading,
   firstPaintRelation,
@@ -79,6 +80,16 @@ test('incoming located_at becomes a human place line, never from their record', 
   assert.equal(relation, 'Tulsa, Oklahoma');
   assert.doesNotMatch(relation ?? '', /from their record/i);
   assert.doesNotMatch(relation ?? '', /\brecord\b/i);
+});
+
+test('locator name is the place, not a pin taxonomy', () => {
+  const church = getPublicEntity('ent_15th_st_church_001');
+  assert.ok(church);
+  assert.equal(
+    firstPaintLocatorName(church),
+    'Fifteenth Street Presbyterian Church, Washington, D.C.',
+  );
+  assert.doesNotMatch(firstPaintLocatorName(church) ?? '', /pin|precision|affordance|schematic/i);
 });
 
 test('walk-on uses a standable place only when this record has no place neighbors', () => {

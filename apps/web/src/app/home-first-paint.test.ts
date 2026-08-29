@@ -228,6 +228,7 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.doesNotMatch(html, /Open a room from this place/);
   assert.doesNotMatch(html, /not a photograph|symbolic mark/i);
   assert.doesNotMatch(html, /Banned books|\/banned-books/);
+  assert.doesNotMatch(html, /neighborhood-level pin|locality precision|radius affordance|campus-level pin/i);
 });
 
 test('seed Dunbar first paint has no claim ids, rights caption, or ent_ addresses', () => {
@@ -260,6 +261,29 @@ test('seed Dunbar first paint has no claim ids, rights caption, or ent_ addresse
   assert.doesNotMatch(html, /Open a room from this place/);
   assert.doesNotMatch(html, /not a photograph|symbolic mark/i);
   assert.doesNotMatch(html, /Banned books|\/banned-books/);
+  assert.doesNotMatch(html, /neighborhood-level pin|locality precision|radius affordance|campus-level pin/i);
+});
+
+test('the church locator names the place, not a pin taxonomy', () => {
+  const church = getPublicEntity('ent_15th_st_church_001');
+  assert.ok(church);
+  const html = renderToStaticMarkup(
+    createElement(HomeFirstPaint, {
+      model: { lead: church, also: [], story: undefined, citing: [], source: 'seed' },
+    }),
+  );
+  assert.match(
+    html,
+    /aria-label="Fifteenth Street Presbyterian Church, Washington, D\.C\."/,
+  );
+  assert.match(html, /href="\/place\/paul-laurence-dunbar-high-school"/);
+  assert.doesNotMatch(html, /neighborhood-level pin|locality precision|radius affordance/i);
+  assert.doesNotMatch(html, /Locator map of the United States/);
+  assert.doesNotMatch(html, /Open a room from this place/);
+  assert.doesNotMatch(html, /not a photograph|symbolic mark/i);
+  assert.doesNotMatch(html, /Banned books|\/banned-books/);
+  assert.doesNotMatch(html, /id="stories"/);
+  assert.doesNotMatch(html, /href="\/stories"/);
 });
 
 test('Stories is citing chapters, or there is no Stories button', () => {

@@ -48,12 +48,23 @@ export type RecordPlacePreviewProps = {
   readonly lat: number;
   readonly lng: number;
   readonly label: string;
+  readonly accessibleName?: string;
 };
 
-export function RecordPlacePreview({ lat, lng, label }: RecordPlacePreviewProps) {
+export function RecordPlacePreview({
+  lat,
+  lng,
+  label,
+  accessibleName,
+}: RecordPlacePreviewProps) {
   return (
     <figure className="ds-record-anatomy__place">
-      <RecordLocator lat={lat} lng={lng} label={label} />
+      <RecordLocator
+        lat={lat}
+        lng={lng}
+        label={label}
+        {...(accessibleName !== undefined ? { accessibleName } : {})}
+      />
       {/* The words are the content and the locator is the illustration — the same contract
           `MapMoment` held, and the reason it required its caption. A record whose coordinates fall
           outside the projection renders no locator at all, and this line is then the whole block,
