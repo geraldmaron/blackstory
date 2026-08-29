@@ -1,6 +1,6 @@
 /**
  * Archive rooms on the walk share one way back to the place.
- * Atlas and Banned books are not rooms. Shop leaks stay off the copy.
+ * Atlas is not a room. `/banned-books` is not a path. Shop leaks stay off the copy.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -21,15 +21,29 @@ const WALK_ROOMS = [
   'submit/page.tsx',
   'corrections/CorrectionsSections.tsx',
   'support/page.tsx',
+  'library/page.tsx',
+  'books/page.tsx',
 ] as const;
 
-test('each walk room comes back to the place and does not sell Atlas or Banned books', () => {
+test('each walk room comes back to the place and does not sell Atlas or a missing path', () => {
   for (const relative of WALK_ROOMS) {
     const source = readFileSync(join(here, relative), 'utf8');
     assert.match(source, /WalkOffRamp/, `${relative} uses the shared way back`);
-    assert.doesNotMatch(source, /Open the Atlas|ATLAS_INSTRUMENT/, `${relative} must not sell Atlas`);
-    assert.doesNotMatch(source, /Banned books|\/banned-books/, `${relative} must not sell Banned books`);
-    assert.doesNotMatch(source, /Zooniverse|Caesar|blackbook\.app/, `${relative} must not leak vendor copy`);
+    assert.doesNotMatch(
+      source,
+      /Open the Atlas|ATLAS_INSTRUMENT/,
+      `${relative} must not sell Atlas`,
+    );
+    assert.doesNotMatch(
+      source,
+      /['"`]\/banned-books/,
+      `${relative} must not link a path that 404s`,
+    );
+    assert.doesNotMatch(
+      source,
+      /Zooniverse|Caesar|blackbook\.app/,
+      `${relative} must not leak vendor copy`,
+    );
     assert.doesNotMatch(
       source,
       /confidenceNote|counterClaims\[\]|home-server/,
@@ -39,6 +53,11 @@ test('each walk room comes back to the place and does not sell Atlas or Banned b
       source,
       /['"`]The place['"`]|The place is the door back/,
       `${relative} must not use a sit-script back label`,
+    );
+    assert.doesNotMatch(
+      source,
+      /Straight to the records|The Atlas answers where and when/,
+      `${relative} must not advertise the board as a cockpit`,
     );
   }
 });

@@ -151,7 +151,7 @@ export function CommandBar({
         {/* Library sits outside the mode group. On the Atlas, Atlas and Journey are two views
             of one surface. Off it, Journey is not advertised. The library is every finished
             room, and it opens rather than navigates. */}
-        <LibraryMenu recordCount={recordCount} />
+        <LibraryMenu />
 
         {onOpenSaved ? (
           <button

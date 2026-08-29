@@ -26,8 +26,8 @@ import { CLASSIFIED_PATHS, surfaceClassFor, type SurfaceClass } from './surface-
  * The three card groups the library hub renders, in order, plus `find`.
  *
  * `find` is home, the map, and the index. They are deliberately NOT cards in the library:
- * the library is the room for everything that is not the map, so those sit in its off-ramp
- * instead. They carry a group anyway because the palette and the footer do list them.
+ * the library lists the rooms. They carry a group anyway because the palette and the footer
+ * do list them. Atlas in the bar still goes to `/explore`.
  */
 export const DESTINATION_GROUPS = ['find', 'read', 'check', 'take-part'] as const;
 export type DestinationGroup = (typeof DESTINATION_GROUPS)[number];
@@ -113,8 +113,7 @@ const DESTINATIONS: readonly Destination[] = [
     label: 'Home',
     parent: null,
     kind: 'PLACE',
-    description:
-      'A place-connected archive, pinned to where it happened, with the source on every claim.',
+    description: 'A place-connected archive, pinned to where it happened.',
     menuLine: 'Pinned to place',
     group: 'find',
     crawl: { changeFrequency: 'daily', priority: 1 },
@@ -124,7 +123,7 @@ const DESTINATIONS: readonly Destination[] = [
     label: 'Atlas',
     parent: '/',
     kind: 'MAP',
-    description: 'The Atlas answers where and when.',
+    description: 'The map.',
     menuLine: 'The map',
     group: 'find',
     crawl: { changeFrequency: 'daily', priority: 0.9 },
@@ -134,7 +133,7 @@ const DESTINATIONS: readonly Destination[] = [
     label: 'The library',
     parent: '/',
     kind: 'HUB',
-    description: 'Everything that is not the map, in one place.',
+    description: 'The rooms.',
     group: 'find',
     crawl: { changeFrequency: 'monthly', priority: 0.8 },
   },
@@ -143,7 +142,7 @@ const DESTINATIONS: readonly Destination[] = [
     label: 'Records',
     parent: '/library',
     kind: 'INDEX',
-    description: 'The whole archive as a list you can filter, page and cite.',
+    description: 'The archive as a list.',
     group: 'find',
     crawl: { changeFrequency: 'daily', priority: 0.9 },
   },
@@ -196,6 +195,7 @@ const DESTINATIONS: readonly Destination[] = [
     kind: 'CATALOGUE',
     description: 'Documented challenges to titles, recorded as challenges rather than as verdicts.',
     menuLine: 'Documented challenges',
+    group: 'read',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
   {

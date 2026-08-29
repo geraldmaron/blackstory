@@ -39,10 +39,13 @@ describe('/library · the room renders without JavaScript', () => {
     }
   });
 
-  it('the off-ramp offers links, not a palette button that would be dead without JS', () => {
-    assert.match(pageSource, /href: ATLAS_INSTRUMENT_HREF/);
-    assert.match(pageSource, /href: '\/records'/);
+  it('the way back is the place, not a palette button or the old board', () => {
+    assert.match(pageSource, /WalkOffRamp/);
+    assert.doesNotMatch(pageSource, /ATLAS_INSTRUMENT|Open the Atlas/);
     assert.doesNotMatch(pageSource, /onOpenPalette|setPaletteOpen/);
+    assert.doesNotMatch(pageSource, /getSharedPublicEntities|buildRecordsIndex|releaseFacts/);
+    assert.doesNotMatch(pageSource, /Straight to the records|The Atlas answers where and when/);
+    assert.doesNotMatch(pageSource, /Everything that is not the map/);
   });
 });
 

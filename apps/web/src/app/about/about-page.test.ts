@@ -67,7 +67,7 @@ test('every multi-column rule is inside a min-width query', () => {
 
 test('about is a room on the walk, not the old board', () => {
   assert.doesNotMatch(pageSource, /Open the Atlas|ATLAS_INSTRUMENT/);
-  assert.doesNotMatch(pageSource, /Banned books|\/banned-books/);
+  assert.doesNotMatch(pageSource, /['"`]\/banned-books/);
   assert.match(pageSource, /WalkOffRamp/);
 });
 
