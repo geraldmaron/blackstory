@@ -458,9 +458,9 @@
 
 @media (max-width: 819px) {
   /*
-   * Grid tracks still let tools paint past the bar and html/body clip shears
-   * them to "Roo". Flex-wrap keeps Rooms on screen: if brand + Rooms cannot
-   * share the first row, tools wrap as a whole word rather than clip.
+   * Flex-wrap sent Rooms onto a later row, and html/body overflow-x clip
+   * sheared that row off the door. Named areas keep brand + Rooms on row
+   * 1 and search on row 2, so Rooms cannot leave the island.
    */
   :root:root {
     --ds-island-height: 6.25rem;
@@ -469,22 +469,25 @@
 
   .ds-bar,
   .ds-bar:has(.ds-bar__search--live) {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    grid-template-areas:
+      'brand tools'
+      'search search';
     align-items: center;
     box-sizing: border-box;
     min-width: 0;
     width: auto;
     max-width: none;
-    grid-template-columns: none;
+    height: auto;
     column-gap: var(--ds-space-2);
     row-gap: var(--ds-space-1);
     padding-block: var(--ds-space-1);
   }
 
   .ds-bar__brand {
+    grid-area: brand;
     --ds-bar-symbol-size: 2rem;
-    flex: 0 0 2rem;
     width: 2rem;
     max-width: 2rem;
     min-width: 0;
@@ -498,10 +501,11 @@
   }
 
   .ds-bar__tools {
+    grid-area: tools;
     display: flex;
-    flex: 1 1 auto;
     justify-content: flex-end;
-    min-width: min-content;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .ds-bar__tool {
@@ -510,15 +514,22 @@
 
   .ds-bar__search,
   .ds-bar__search--live {
-    flex: 1 1 100%;
+    grid-area: search;
     min-width: 0;
+    width: 100%;
     max-width: none;
   }
 
-  .ds-bar:has(.ds-bar__search--live) .ds-bar__brand,
-  .ds-bar:has(.ds-bar__search--live) .ds-bar__tools,
+  .ds-bar:has(.ds-bar__search--live) .ds-bar__brand {
+    grid-area: brand;
+  }
+
+  .ds-bar:has(.ds-bar__search--live) .ds-bar__tools {
+    grid-area: tools;
+  }
+
   .ds-bar:has(.ds-bar__search--live) .ds-bar__search--live {
-    grid-area: auto;
+    grid-area: search;
   }
 }
 

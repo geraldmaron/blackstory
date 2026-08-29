@@ -36,12 +36,12 @@ test('the narrow rooms panel clears the stacked bar, not the Atlas gutter', () =
   assert.doesNotMatch(css, /--ds-atlas-top/);
 });
 
-test('at 390 the rooms panel sits below the island and does not cover the trigger', () => {
+test('on the phone the rooms panel sits below the island and does not cover the trigger', () => {
   const css = readFileSync(join(here, 'library-menu.css'), 'utf8');
-  assert.match(css, /@media \(max-width: 390px\)/);
-  assert.match(css, /@media \(max-width: 390px\)[\s\S]*--ds-island-clearance/);
+  assert.match(css, /@media \(max-width: 819px\)/);
+  assert.match(css, /@media \(max-width: 819px\)[\s\S]*--ds-island-clearance/);
   assert.match(
     css,
-    /@media \(max-width: 390px\)[\s\S]*max-height:\s*calc\(100dvh - var\(--ds-island-clearance\)/,
+    /@media \(max-width: 819px\)[\s\S]*max-height:\s*calc\(100dvh - var\(--ds-island-clearance\)/,
   );
 });
