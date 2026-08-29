@@ -1,6 +1,6 @@
 /**
  * A published place you walk into from the map. The title is the place. Back is
- * the map, not another featured sit. Archive chrome (Law, Data, Memorial,
+ * BlackStory at `/`, not another featured sit. Archive chrome (Law, Data, Memorial,
  * Methodology, Errata) is the same on every place. Stories exists only when this
  * record already names a chapter. No schema strip, no confidence badge, no
  * precision leak, no second record page.

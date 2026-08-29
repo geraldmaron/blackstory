@@ -58,6 +58,7 @@ import { usePaletteData } from './hooks/use-palette-data';
 import { useReaderActions } from './hooks/use-reader-actions';
 import { useCommandContext } from './hooks/use-command-context';
 import { useStoryRunner } from './hooks/use-story-runner';
+import { atlasWalkHref } from '../../lib/place/public-place-path';
 import './atlas.css';
 
 void React;
@@ -590,7 +591,8 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           // swallowed: the palette closed and nothing opened, which reads as a broken search.
           // Every record has a page even when it has no pin, so fall through to it.
           setPaletteOpen(false);
-          window.location.assign(`/entity/${record.id}`);
+          const walk = atlasWalkHref({ displayName: record.name });
+          if (walk) window.location.assign(walk);
         }}
         onJumpToState={(paletteState) => {
           const match = stateOptions.find((option) => option.label === paletteState.name);
@@ -617,7 +619,8 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
             return;
           }
           // Same as the palette: a saved record whose pin is not in this projection still opens.
-          window.location.assign(`/entity/${record.id}`);
+          const walk = atlasWalkHref({ displayName: record.name, kind: record.kind });
+          if (walk) window.location.assign(walk);
         }}
         onRemove={(id) => persist(unsaveRecord(collection, id))}
         onClear={() => persist(clearCollection())}

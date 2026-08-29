@@ -8,6 +8,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
+import { atlasWalkHref } from '../place/public-place-path';
 import { buildExploreMapSource, buildJurisdictionAreaFeatures } from './build-explore-map-source';
 import { geoAnchorFor } from './entity-geo';
 import { displayEncodingFor, kindFamilyFor } from './kind-encoding';
@@ -20,7 +21,11 @@ test('every active-release entity with a resolvable anchor becomes a linked, enr
   for (const feature of source.featureCollection.features) {
     const entity = entities.find((candidate) => candidate.id === feature.properties.entityId);
     assert.ok(entity);
-    assert.equal(feature.properties.href, `/entity/${entity!.id}`);
+    const walk = atlasWalkHref({ displayName: entity.displayName, kind: entity.kind });
+    assert.ok(walk);
+    assert.equal(feature.properties.href, walk);
+    assert.doesNotMatch(feature.properties.href, /\/entity\//);
+    assert.doesNotMatch(feature.properties.href, /ent_/);
     assert.equal(feature.properties.oneLineStory, entity!.summary);
     assert.equal(feature.properties.evidenceCount, entity!.claims.length);
     assert.deepEqual(feature.properties.eraBuckets, entity!.eraBuckets ?? []);

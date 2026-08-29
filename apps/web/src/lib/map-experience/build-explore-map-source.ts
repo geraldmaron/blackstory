@@ -26,6 +26,7 @@ import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './ent
 import { resolveEntityEraBuckets } from './entity-era-facts';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
 import { displayEncodingFor, kindFamilyFor, resolveMapTone } from './kind-encoding';
+import { atlasWalkHref } from '../place/public-place-path';
 
 export type ConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
 
@@ -230,7 +231,7 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
     geometry: feature.geometry,
     properties: {
       entityId: entity.id,
-      href: `/entity/${entity.id}`,
+      href: atlasWalkHref({ displayName: entity.displayName, kind: entity.kind }) ?? '/',
       kind: feature.properties.kind,
       displayName: feature.properties.displayName,
       oneLineStory: sanitizePublicProseText(entity.summary),

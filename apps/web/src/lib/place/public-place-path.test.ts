@@ -4,6 +4,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  atlasWalkHref,
   canStandHere,
   isInternalRecordLabel,
   isPublicPlaceSlug,
@@ -81,4 +82,14 @@ test('neighbor hrefs stay off internal ids', () => {
   );
   assert.equal(neighborHref({ displayName: 'A named neighbor', kind: 'person' }), '/memorial');
   assert.equal(neighborHref({ displayName: 'A statute on this record', kind: 'law' }), '/law');
+});
+
+test('the home-map walk uses the public place slug, never /entity/', () => {
+  assert.equal(
+    atlasWalkHref({ displayName: 'Paul Laurence Dunbar High School', kind: 'organization' }),
+    '/place/paul-laurence-dunbar-high-school',
+  );
+  assert.equal(atlasWalkHref({ displayName: 'A named neighbor', kind: 'person' }), '/memorial');
+  assert.equal(atlasWalkHref({ displayName: 'ent_dunbar_school_001' }), undefined);
+  assert.equal(atlasWalkHref({ displayName: '42Cb1758', kind: 'place' }), undefined);
 });

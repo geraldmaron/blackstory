@@ -52,7 +52,7 @@ test('links Where to external maps and other metadata to the right site views', 
   assert.match(html, /target="_blank"/);
   assert.doesNotMatch(html, /href="[^"]*state=DC"/);
   assert.match(html, /href="[^"]*era=1840s"/);
-  assert.match(html, /href="\/entity\/ent_15th_st_church_001#accepted-claims"/);
+  assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church#accepted-claims"/);
   assert.match(html, /href="[^"]*kind=place"/);
   assert.match(html, /aria-label="Browse Place records"/);
   // `/history` is a redirect now; the status facet lives on the record index (SP-15).

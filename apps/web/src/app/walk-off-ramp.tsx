@@ -1,5 +1,5 @@
 /**
- * Same way back from every archive room: the map door, then any extra quiet
+ * Same way back from every archive room: BlackStory at `/`, then any extra quiet
  * links. Atlas and Banned books are not rooms on this walk. The library's name
  * holds on the library's own place page, not as the site back.
  */

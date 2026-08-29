@@ -1,6 +1,6 @@
 /**
- * Archive rooms and place pages walk back to the map door, never a featured
- * library name. The visible label is the map, the href is `/`.
+ * Archive rooms and place pages walk back to `/`. The door is BlackStory,
+ * never a map label, never a sit-script place label, never a featured library name.
  */
 
 export type WalkBackPlace = {
@@ -9,7 +9,7 @@ export type WalkBackPlace = {
 };
 
 export const MAP_BACK: WalkBackPlace = {
-  displayName: 'The map',
+  displayName: 'BlackStory',
   href: '/',
 };
 

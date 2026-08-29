@@ -61,6 +61,21 @@ export function neighborHref(neighbor: {
   return placeHref(neighbor.displayName);
 }
 
+/**
+ * Walk from the home map. Places use the public slug already derived from the
+ * published name. Never `/entity/…`, and never a slug invented from a catalog id.
+ */
+export function atlasWalkHref(input: {
+  readonly displayName: string;
+  readonly kind?: string;
+}): string | undefined {
+  if (isInternalRecordLabel(input.displayName)) return undefined;
+  if (input.kind !== undefined) {
+    return neighborHref({ displayName: input.displayName, kind: input.kind });
+  }
+  return placeHref(input.displayName);
+}
+
 export function isTulsaPlace(input: {
   readonly displayName: string;
   readonly jurisdictionLabel?: string;
