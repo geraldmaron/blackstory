@@ -65,8 +65,8 @@ test('at 390 the door frame and line wrap rather than clip', () => {
   assert.match(block, /max-width:\s*calc\(100% -/);
   assert.match(block, /min-width:\s*0/);
   assert.match(block, /width:\s*auto/);
-  assert.match(block, /\.ds-door__line[\s\S]*overflow-wrap:\s*break-word/);
-  assert.match(css, /overflow-wrap:\s*break-word/);
+  assert.match(block, /\.ds-door__line[\s\S]*overflow-wrap:\s*anywhere/);
+  assert.match(css, /overflow-wrap:\s*anywhere/);
   assert.doesNotMatch(css, /overflow-x:\s*clip/);
 });
 
