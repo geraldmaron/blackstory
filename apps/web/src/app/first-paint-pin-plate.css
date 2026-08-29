@@ -1,0 +1,32 @@
+/**
+ * First-paint pin plate. Same disc language as `.ds-map-entity-marker`.
+ * Copper only on holding walks. Hidden once MapLibre paints the live plate.
+ */
+
+.ds-first-paint-plate {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ds-first-paint-plate .ds-first-paint-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.ds-first-paint-plate .ds-first-paint-pin--walk {
+  pointer-events: auto;
+  --ds-map-entity-shade: var(--ds-accent-graphic);
+}
+
+.ds-first-paint-plate .ds-first-paint-pin--walk:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 3px;
+}
+
+body:has(.maplibregl-canvas) .ds-first-paint-plate {
+  visibility: hidden;
+  pointer-events: none;
+}

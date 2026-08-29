@@ -183,7 +183,9 @@ test('`/` mounts the Atlas; a place page never mounts the catalog boot or camera
   assert.doesNotMatch(commandBar, /toLocaleString/);
   const atlasHome = readFileSync(fileURLToPath(new URL('./atlas-home.tsx', import.meta.url)), 'utf8');
   assert.match(atlasHome, /toFirstPaintPins/);
+  assert.match(atlasHome, /FirstPaintPinPlate/);
   assert.doesNotMatch(atlasHome, /Opening the map/);
+  assert.doesNotMatch(atlasHome, /<noscript>|ds-explore__walks/);
 });
 
 test('first paint is the record, not a manifesto or a schema card', () => {
