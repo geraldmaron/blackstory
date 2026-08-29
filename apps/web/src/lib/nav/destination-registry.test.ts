@@ -178,6 +178,7 @@ describe('destination registry · the footer is derived, not authored', () => {
 
   it('lists the archive rooms and keeps Atlas, records, and history off the chrome', () => {
     const hrefs = footerColumns().flatMap((column) => column.items.map((item) => item.href));
+    const palette = browsableDestinations().map((destination) => destination.path);
     assert.ok(hrefs.includes('/stories'));
     assert.ok(hrefs.includes('/about'));
     assert.ok(hrefs.includes('/submit'));
@@ -185,6 +186,10 @@ describe('destination registry · the footer is derived, not authored', () => {
     assert.ok(!hrefs.includes('/explore'));
     assert.ok(!hrefs.includes('/records'));
     assert.ok(!hrefs.includes('/banned-books'));
+    assert.deepEqual(palette, hrefs);
+    assert.ok(!palette.includes('/explore'));
+    assert.ok(!palette.includes('/records'));
+    assert.ok(!palette.includes('/library'));
   });
 
   it('does not invent a second home lede', () => {

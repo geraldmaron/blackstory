@@ -38,6 +38,21 @@
   color: var(--ds-ink-muted);
 }
 
+@media (max-width: 559px) {
+  .ds-door__frame {
+    margin: var(--ds-space-3);
+    padding: var(--ds-space-4);
+  }
+
+  .ds-door__line {
+    font-size: 1.1875rem;
+  }
+
+  .ds-door__walk {
+    font-size: 1rem;
+  }
+}
+
 /* The persistent MapLibre plate belongs to `/explore`. On the door the HTML pins stay
    inside this page, not fixed over the footer. */
 body:has(.ds-door) .ds-map-stage {

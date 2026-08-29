@@ -16,6 +16,8 @@ import {
 } from '../../components/legal';
 import { GroupHeading, OffRamp, RoomHeader } from '../../components/room';
 import { LawAnatomyStrip } from './LawAnatomyStrip';
+import { jurisdictionLabel } from './LawBrowseSections';
+import { jurisdictionLabel } from './LawBrowseSections';
 
 const DETAIL_SECTIONS = [
   { id: 'what-it-says', label: 'What it says' },
@@ -83,8 +85,7 @@ export function LawDetailSections({ snapshot, explainer }: LawDetailSectionsProp
           <span id="provenance-heading">Archived capture</span>
         </GroupHeading>
         <p className="ds-law-toc__lede">
-          {humanizeLegalKind(snapshot.kind)} ·{' '}
-          <span className="ds-mono">{snapshot.jurisdictionId}</span>
+          {humanizeLegalKind(snapshot.kind)} · {jurisdictionLabel(snapshot.jurisdictionId)}
         </p>
         <dl className="ds-law-provenance">
           <div className="ds-law-provenance__row">
@@ -115,7 +116,6 @@ export function LawDetailSections({ snapshot, explainer }: LawDetailSectionsProp
         actions={[
           { label: 'All law entries', href: '/law' },
           { label: 'Methodology', href: '/methodology' },
-          { label: 'Search the archive', href: '/records', emphasis: 'copper' },
         ]}
       >
         BlackStory explains public laws and court decisions in plain language, not legal advice.

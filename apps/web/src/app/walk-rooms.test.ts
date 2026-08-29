@@ -29,6 +29,7 @@ const WALK_COPY = [
   ...WALK_ROOMS,
   'data/DataSections.tsx',
   'privacy/PrivacySections.tsx',
+  'law/LawBrowseSections.tsx',
 ] as const;
 
 test('each walk room comes back to the map and does not sell Atlas or a missing path', () => {
@@ -37,8 +38,13 @@ test('each walk room comes back to the map and does not sell Atlas or a missing 
     assert.match(source, /WalkOffRamp/, `${relative} uses the shared way back`);
     assert.doesNotMatch(
       source,
-      /Open the Atlas|ATLAS_INSTRUMENT/,
+      /Open the Atlas|ATLAS_INSTRUMENT|href=["'`]\/explore|href: ['"`]\/explore/,
       `${relative} must not sell Atlas`,
+    );
+    assert.doesNotMatch(
+      source,
+      /href=["'`]\/records|href: ['"`]\/records/,
+      `${relative} must not send a reader to the record list`,
     );
     assert.doesNotMatch(
       source,
