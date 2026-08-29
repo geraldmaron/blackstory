@@ -6,6 +6,8 @@
 .ds-door {
   position: relative;
   min-height: 100dvh;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .ds-door__frame {
@@ -21,6 +23,8 @@
 
 .ds-door__line {
   margin: 0;
+  min-width: 0;
+  overflow-wrap: break-word;
   font-family: var(--ds-font-display);
   font-weight: 600;
   font-size: clamp(1.25rem, 2.4vw, 1.75rem);
@@ -32,6 +36,8 @@
 .ds-door__walk {
   margin: var(--ds-space-4) 0 0;
   max-width: 46ch;
+  min-width: 0;
+  overflow-wrap: break-word;
   font-family: var(--ds-font-editorial);
   font-size: 1.0625rem;
   line-height: 1.55;
@@ -77,15 +83,23 @@ body:has(.ds-door) .ds-first-paint-plate {
 
 @media (max-width: 390px) {
   .ds-door__frame {
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+    width: auto;
     margin: var(--ds-space-2);
     padding: var(--ds-space-3);
   }
 
   .ds-door__line {
+    overflow-wrap: break-word;
+    min-width: 0;
     font-size: 1.125rem;
   }
 
   .ds-door__walk {
+    overflow-wrap: break-word;
+    min-width: 0;
     margin-top: var(--ds-space-3);
     font-size: 0.9375rem;
   }

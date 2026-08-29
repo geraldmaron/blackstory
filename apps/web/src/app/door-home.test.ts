@@ -54,6 +54,22 @@ test('the door plate sits in the page, not over the rooms', () => {
   assert.doesNotMatch(css, /box-shadow|backdrop-filter|linear-gradient/);
 });
 
+test('at 390 the door frame and line wrap rather than clip', () => {
+  const css = readFileSync(fileURLToPath(new URL('./door-home.css', import.meta.url)), 'utf8');
+  const start = css.indexOf('@media (max-width: 390px)');
+  assert.ok(start >= 0, '390 block must exist');
+  const next = css.indexOf('@media', start + 1);
+  const block = next === -1 ? css.slice(start) : css.slice(start, next);
+  assert.match(block, /\.ds-door__frame/);
+  assert.match(block, /box-sizing:\s*border-box/);
+  assert.match(block, /max-width:\s*100%/);
+  assert.match(block, /min-width:\s*0/);
+  assert.match(block, /width:\s*auto/);
+  assert.match(block, /\.ds-door__line[\s\S]*overflow-wrap:\s*break-word/);
+  assert.match(css, /overflow-wrap:\s*break-word/);
+  assert.doesNotMatch(css, /overflow-x:\s*clip/);
+});
+
 test('the door prints the existing about line, not a rewrite', () => {
   const pins = toFirstPaintPins(
     buildExploreMapSource(listPublicEntities()).featureCollection.features,

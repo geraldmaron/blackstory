@@ -1439,3 +1439,11 @@ a.ds-room-chip {
   line-height: 1.5;
   color: var(--room-ink-4);
 }
+
+@media (max-width: 390px) {
+  .ds-room-header__title,
+  .ds-room-prose {
+    overflow-wrap: break-word;
+    min-width: 0;
+  }
+}
