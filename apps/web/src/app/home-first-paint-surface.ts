@@ -38,7 +38,8 @@ export type DoorRoom = {
 
 /**
  * Archive chrome on every place. Law, Data, and Memorial are national rooms,
- * not this record's rooms. `/banned-books` is not a room.
+ * not this record's rooms. `/books` is the challenged-titles catalogue; it is
+ * not on this door, and `/banned-books` is not a room.
  */
 export const ARCHIVE_DOOR_ROOMS: readonly DoorRoom[] = [
   { id: 'law', label: 'Law', href: '/law' },
@@ -218,9 +219,7 @@ function publishableNeighbors(
 }
 
 /** Place-kind neighbors already on this record. Those are the walk, when they exist. */
-export function firstPaintPlaceNeighbors(
-  entity: PublicEntityView,
-): readonly RelatedNeighborView[] {
+export function firstPaintPlaceNeighbors(entity: PublicEntityView): readonly RelatedNeighborView[] {
   return publishableNeighbors([
     ...(entity.relatedNeighbors ?? []),
     ...(entity.continueLearning ?? []),
@@ -247,9 +246,7 @@ export function walkOnPlaces(
     if (href === leadHref || href.includes('ent_')) return false;
     return !neighborHrefs.has(href);
   });
-  const church = candidates.filter(
-    (place) => publicPlaceSlug(place.displayName) === CHURCH_SLUG,
-  );
+  const church = candidates.filter((place) => publicPlaceSlug(place.displayName) === CHURCH_SLUG);
   const rest = candidates.filter((place) => publicPlaceSlug(place.displayName) !== CHURCH_SLUG);
   return [...church, ...rest];
 }

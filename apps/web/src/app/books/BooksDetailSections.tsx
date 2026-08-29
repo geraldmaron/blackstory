@@ -239,9 +239,6 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
           <Link className="ds-cta ds-cta--ink" href="/books">
             All challenged titles
           </Link>
-          <Link className="ds-cta ds-cta--quiet" href="/records?kind=sources">
-            Search sources
-          </Link>
           <Link className="ds-cta ds-cta--quiet" href="/methodology">
             Methodology
           </Link>

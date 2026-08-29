@@ -1,19 +1,21 @@
 /**
- * Public banned-books catalogue index at `/books`. v9 room kit reading room: records
- * documented removal requests against titles, not a ranked or curated "controversial books"
- * list. Preserves the browse URL contract (`q`, `state`, `author`, `sort`, `dir`, `page`).
+ * Public banned-books catalogue index at `/books`. Records documented removal
+ * requests against titles, not a ranked or curated "controversial books" list.
+ * Preserves the browse URL contract (`q`, `state`, `author`, `sort`, `dir`, `page`).
+ *
+ * The way back is the place the reader left. Atlas and the record index stay off
+ * this page. State facets stay on `/books`.
  */
 import type { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { ATLAS_INSTRUMENT_HREF } from '../../lib/nav/atlas-door';
 import { Notice } from '@repo/ui';
 import { bannedBookReportedStates } from '@repo/domain';
-import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import { bannedBookToSuggestCorpusItem } from '../../lib/banned-books/suggest-books.js';
 import { loadBannedBooksListing } from '../../lib/banned-books/public-source.js';
 import {
+  buildBooksBrowseHref,
   buildBooksBrowseViewModel,
   stateLabel,
   type RawBooksBrowseParams,
@@ -21,7 +23,8 @@ import {
 import { BooksBrowseSections } from './BooksBrowseSections';
 import { booksCatalogPulseMeta } from './BooksCatalogPulse';
 import { BOOKS_PAGE_DESCRIPTION } from './books-copy';
-import { OffRamp, Prose, RailGroup, Room, RoomHeader } from '../../components/room';
+import { RailGroup, Room, RoomHeader } from '../../components/room';
+import { WalkOffRamp } from '../walk-off-ramp';
 import '../reading-room.css';
 
 void React;
@@ -53,6 +56,7 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
           this is a fault on our side. Please check back shortly, or read the{' '}
           <Link href="/methodology">methodology</Link> for how this catalog is built.
         </Notice>
+        <WalkOffRamp>This list is national. It does not invent a join to a place.</WalkOffRamp>
       </Room>
     );
   }
@@ -73,7 +77,13 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
         .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
         .map(([code, count]) => ({
           label: stateLabel(code),
-          href: `/explore?state=${encodeURIComponent(code)}`,
+          href: buildBooksBrowseHref({
+            q: view.q,
+            state: code,
+            author: view.author,
+            sort: view.sort,
+            dir: view.dir,
+          }),
           count,
         }))}
       limit={12}
@@ -88,48 +98,12 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
         title="Banned books"
         lede="This records documented removal requests against titles in schools and libraries, cited from public reports. It is not a list of controversial books, and it is not a complete national census."
         meta={booksCatalogPulseMeta(snapshot)}
+        showPath={false}
       />
-
-      <Prose>
-        <p>
-          {/* `sources` is the record index's family for publications, laws and artifacts;
-              there is no publication-only facet, so the label names the family honestly
-              rather than promising a narrowing the index cannot make. */}
-          <Link className="ds-cta-link" href="/records?kind=sources">
-            Also find publications in the record index
-          </Link>
-          {' · '}
-          <Link className="ds-cta-link" href="/stories">
-            Chapters
-          </Link>
-          {' · '}
-          <Link className="ds-cta-link" href="/methodology">
-            Methodology
-          </Link>
-        </p>
-        <p>
-          Archive texture · symbolic atmosphere.{' '}
-          <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
-        </p>
-      </Prose>
 
       <BooksBrowseSections view={view} suggestCorpus={suggestCorpus} snapshot={snapshot} />
 
-      <OffRamp
-        title={
-          <>
-            Or go straight to the <em>records</em>
-          </>
-        }
-        actions={[
-          { label: 'The place', href: '/' },
-          { label: 'Open the Atlas', href: ATLAS_INSTRUMENT_HREF, emphasis: 'copper' },
-          { label: 'Search the archive', href: '/records' },
-        ]}
-      >
-        Press <kbd className="ds-kbd">⌘</kbd>
-        <kbd className="ds-kbd">K</kbd> to search books and records from anywhere.
-      </OffRamp>
+      <WalkOffRamp>This list is national. It does not invent a join to a place.</WalkOffRamp>
     </Room>
   );
 }
