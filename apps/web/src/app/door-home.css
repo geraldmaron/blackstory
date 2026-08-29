@@ -74,3 +74,25 @@ body:has(.ds-door) .ds-map-stage {
 body:has(.ds-door) .ds-first-paint-plate {
   visibility: visible;
 }
+
+/*
+ * `/` stays an instrument so the cockpit bar and mega footer stay off. The Atlas lock
+ * (`height: 100dvh; overflow: hidden`) is for `/explore`. Framing on the door must scroll.
+ */
+.ds-shell:has([data-surface='instrument']):has(.ds-door) {
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  overflow-x: clip;
+}
+
+.ds-shell:has([data-surface='instrument']):has(.ds-door) .ds-shell-body {
+  overflow: visible;
+  min-height: 100dvh;
+}
+
+.ds-shell:has([data-surface='instrument']):has(.ds-door) .ds-shell-page-transition,
+.ds-shell:has([data-surface='instrument']):has(.ds-door) .ds-shell-page-transition__content {
+  height: auto;
+  min-height: 100dvh;
+}

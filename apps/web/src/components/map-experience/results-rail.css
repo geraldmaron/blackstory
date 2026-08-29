@@ -16,10 +16,9 @@
   /* The right column's floor, not the shared one: the camera console sits under this rail. */
   max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom-right));
   /* One panel recipe shared by all four Atlas instruments — see lens-panel.css. */
-  background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
+  background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
-  box-shadow: 0 10px 30px -18px rgb(0 0 0 / 45%);
   overflow: hidden;
 }
 

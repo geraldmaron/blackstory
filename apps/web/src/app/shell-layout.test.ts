@@ -176,6 +176,35 @@ describe('horizontal overflow guards', () => {
     assert.doesNotMatch(mapSurfacesCss, /backdrop-filter/);
     assert.doesNotMatch(mapSurfacesCss, /\.ds-explore-stage__instruments\s*\{[^}]*--ds-fixed-/s);
   });
+
+  it('Atlas chrome is matte surface, not shop blur or elevation', () => {
+    const commandBarCss = readFileSync(join(here, '../components/shell/command-bar.css'), 'utf8');
+    const lensCss = readFileSync(join(here, '../components/map-experience/lens-panel.css'), 'utf8');
+    const resultsCss = readFileSync(
+      join(here, '../components/map-experience/results-rail.css'),
+      'utf8',
+    );
+    const sheetCss = readFileSync(join(here, '../components/map-experience/record-sheet.css'), 'utf8');
+    const cameraCss = readFileSync(
+      join(here, '../components/map-experience/camera-console.css'),
+      'utf8',
+    );
+    const atlasCss = readFileSync(join(here, 'explore/atlas.css'), 'utf8');
+    const timeCss = readFileSync(join(here, '../components/map-experience/time-panel.css'), 'utf8');
+    for (const [name, source] of [
+      ['command-bar', commandBarCss],
+      ['lens', lensCss],
+      ['results', resultsCss],
+      ['sheet', sheetCss],
+      ['camera', cameraCss],
+      ['atlas', atlasCss],
+      ['time', timeCss],
+    ] as const) {
+      assert.doesNotMatch(source, /backdrop-filter/, `${name} must not blur`);
+      assert.doesNotMatch(source, /box-shadow:\s*0\s+\d+px/, `${name} must not elevate`);
+      assert.doesNotMatch(source, /color-mix\(in srgb, var\(--ds-surface\) 94%/, `${name} stays opaque`);
+    }
+  });
 });
 
 describe('shell footer theme tokens', () => {

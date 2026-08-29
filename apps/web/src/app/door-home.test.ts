@@ -32,6 +32,13 @@ test('`/` is framing plus the existing pin plate', () => {
   assert.doesNotMatch(door, /['"`]\/banned-books|['"`]\/journey/);
 });
 
+test('the door can scroll so the about line is not clipped by the Atlas lock', () => {
+  const css = readFileSync(fileURLToPath(new URL('./door-home.css', import.meta.url)), 'utf8');
+  assert.match(css, /:has\(\.ds-door\)/);
+  assert.match(css, /overflow:\s*visible/);
+  assert.doesNotMatch(css, /box-shadow|backdrop-filter|linear-gradient/);
+});
+
 test('the door prints the existing about line, not a rewrite', () => {
   const pins = toFirstPaintPins(buildExploreMapSource(listPublicEntities()).featureCollection.features);
   const html = `${ABOUT_LINE}${ABOUT_WALK_PAST}${renderToStaticMarkup(

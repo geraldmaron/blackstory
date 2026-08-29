@@ -168,6 +168,15 @@ describe('destination registry · the footer is derived, not authored', () => {
     assert.ok(!hrefs.includes('/history'));
   });
 
+  it('does not describe home as the map of the archive', () => {
+    const home = destinationFor('/');
+    assert.ok(home);
+    assert.doesNotMatch(home.description ?? '', /map of the archive|archive on a map/i);
+    assert.doesNotMatch(home.menuLine ?? '', /map of the archive|archive on a map/i);
+    const atlas = destinationFor('/explore');
+    assert.equal(atlas?.description, 'The map.');
+  });
+
   it('does not ship /books as a walk room, and never lists /banned-books', () => {
     assert.equal(destinationFor('/books')?.group, undefined);
     assert.ok(!destinationsInGroup('read').some((destination) => destination.path === '/books'));
