@@ -29,7 +29,7 @@ test('the sitemap never advertises a URL that redirects', () => {
     releaseGeneratedAt: '2026-07-17T00:00:00.000Z',
   });
   const urls = entries.map((entry) => entry.url);
-  // `/explore` is the Atlas instrument. `/` is the featured door.
+  // `/` is the map door. `/explore` remains a listed instrument URL.
   assert.ok(urls.some((url) => url.endsWith('/explore')));
   // `/history` 308s into `/records` for the same reason.
   assert.ok(!urls.some((url) => url.endsWith('/history')));

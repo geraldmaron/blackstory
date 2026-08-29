@@ -39,7 +39,7 @@ describe('/library · the room renders without JavaScript', () => {
     }
   });
 
-  it('the way back is the place, not a palette button or the old board', () => {
+  it('the way back is the map, not a palette button or the old board', () => {
     assert.match(pageSource, /WalkOffRamp/);
     assert.doesNotMatch(pageSource, /ATLAS_INSTRUMENT|Open the Atlas/);
     assert.doesNotMatch(pageSource, /onOpenPalette|setPaletteOpen/);

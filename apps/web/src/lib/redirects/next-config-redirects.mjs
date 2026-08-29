@@ -53,8 +53,7 @@ export function redirectsForNextConfig() {
     { source: '/legal', destination: '/law', permanent: true },
     { source: '/legal/:path*', destination: '/law/:path*', permanent: true },
 
-    // `/map` is the old name for the Atlas instrument. The instrument is `/explore`.
-    // `/` is the featured place and never the 4,101-row board.
+    // `/map` is the old name for the Atlas. `/` is the map door; `/explore` still renders it.
     { source: '/map', destination: '/explore', permanent: true },
   ];
 }

@@ -37,11 +37,11 @@ function concretePath(route: string): string {
 }
 
 describe('surface class resolution', () => {
-  it('puts the front door on the featured record and the Atlas on /explore', () => {
-    assert.equal(surfaceClassFor('/'), 'record');
-    assert.equal(surfaceClassFor('/', 'atlas=1'), 'record');
-    assert.equal(surfaceClassFor('/?atlas=1'), 'record');
-    assert.equal(surfaceClassFor('/?state=DC'), 'record');
+  it('puts the front door and /explore on the Atlas instrument', () => {
+    assert.equal(surfaceClassFor('/'), 'instrument');
+    assert.equal(surfaceClassFor('/', 'atlas=1'), 'instrument');
+    assert.equal(surfaceClassFor('/?atlas=1'), 'instrument');
+    assert.equal(surfaceClassFor('/?state=DC'), 'instrument');
     assert.equal(surfaceClassFor('/explore'), 'instrument');
     assert.equal(surfaceClassFor('/explore?state=DC'), 'instrument');
   });
@@ -78,9 +78,9 @@ describe('surface class resolution', () => {
 
   it('ignores trailing slashes, fragments, and leftover `/` query', () => {
     assert.equal(surfaceClassFor('/about/'), 'reading');
-    assert.equal(surfaceClassFor('/?era=1960s&kind=school'), 'record');
+    assert.equal(surfaceClassFor('/?era=1960s&kind=school'), 'instrument');
     assert.equal(surfaceClassFor('/about#sources'), 'reading');
-    assert.equal(surfaceClassFor('/?junk=1'), 'record');
+    assert.equal(surfaceClassFor('/?junk=1'), 'instrument');
   });
 
   it('falls back to utility so an unknown path still gets the 404 surface chrome', () => {

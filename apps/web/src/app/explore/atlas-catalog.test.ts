@@ -82,9 +82,9 @@ test('the Atlas page never puts the catalog back in the initial prop', async () 
     .join('\n');
   assert.doesNotMatch(pageSource, /toSerializableExploreViewModel/);
   assert.doesNotMatch(pageSource, /buildExploreViewModelAsync/);
-  assert.doesNotMatch(pageImports, /AtlasLoader|getSharedPublicEntities|AtlasHome/);
   assert.doesNotMatch(pageSource, /wantsAtlasInstrument|atlas=1/);
-  assert.match(pageSource, /HomeFirstPaint/);
+  assert.match(pageImports, /AtlasHome/);
+  assert.match(pageSource, /AtlasHome/);
   assert.match(explorePage, /AtlasHome/);
   assert.match(atlasHome, /AtlasLoader/);
 });

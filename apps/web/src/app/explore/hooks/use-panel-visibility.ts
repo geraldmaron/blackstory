@@ -61,8 +61,10 @@ export function usePanelVisibility() {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [savedOpen, setSavedOpen] = useState(false);
   /**
-   * Both panels open is the wide default. On a narrow viewport they would cover the plate between
-   * them, so the surface opens on the map and the dock chips bring an instrument in when asked.
+   * Filter, records, and decade open on wide first paint. The camera console stays docked
+   * until asked: first paint is the map, not a camera cockpit.
+   * On a narrow viewport they would cover the plate between them, so the surface opens on the
+   * map and the dock chips bring an instrument in when asked.
    * Server-rendered as the wide layout and corrected after mount: `window` has no width on the
    * server, and guessing one would be a hydration mismatch.
    */
@@ -70,7 +72,7 @@ export function usePanelVisibility() {
     lens: true,
     results: true,
     decade: true,
-    camera: true,
+    camera: false,
   });
   const [narrow, setNarrow] = useState(false);
   const [bothColumns, setBothColumns] = useState(false);
@@ -91,7 +93,7 @@ export function usePanelVisibility() {
         lens: !isNarrow,
         results: !isNarrow,
         decade: !isNarrow,
-        camera: !isNarrow,
+        camera: false,
       });
     };
     sync();

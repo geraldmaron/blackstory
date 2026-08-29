@@ -37,7 +37,7 @@ v9 keeps the archive's voice and every dignity rule. It changes the **shape of t
 
 Design goals, in priority order:
 
-1. **Land in a place.** No catalog boot. First paint of `/` is one released place (or story), not a loading count of the archive. The Atlas instrument is `/explore`. Do not hide the 4,101-row load behind a query on `/`.
+1. **Land on the map.** First paint of `/` is the Atlas (filter bar, map, records list), not one featured place and not a loading count of the archive. A place is a page you walk into. Do not hide the catalog behind `?atlas=1`. The camera console stays docked until asked.
 2. **Search-first, not nav-first.** `⌘K` is the primary affordance. Navigation is a consequence of search, not a menu.
 3. **Motion that explains.** Camera moves are how the archive *argues*. Static is the exception, reserved for dignity-sensitive content.
 4. **Evidence stays legible.** Kind / Where / Era / Evidence anatomy, confidence grades, precision honesty, all carried forward unchanged.

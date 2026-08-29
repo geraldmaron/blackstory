@@ -1,6 +1,7 @@
 /**
- * Same way back from every archive room: the place's published name, then any
- * extra quiet links. Atlas and Banned books are not rooms on this walk.
+ * Same way back from every archive room: the map door, then any extra quiet
+ * links. Atlas and Banned books are not rooms on this walk. The library's name
+ * holds on the library's own place page, not as the site back.
  */
 import React from 'react';
 import { OffRamp, type OffRampAction } from '../components/room';
@@ -45,7 +46,6 @@ export async function WalkOffRamp({
   readonly extra?: readonly OffRampAction[];
 }) {
   const place = await loadWalkBackPlace();
-  if (!place) return null;
   return (
     <WalkOffRampView
       placeName={place.displayName}

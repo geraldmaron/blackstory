@@ -37,7 +37,7 @@ export function placeHref(displayName: string): string {
   return `/place/${publicPlaceSlug(displayName)}`;
 }
 
-/** Cookie set when a reader stands at a named place. `/` reads it as last stand. */
+/** Cookie set when a reader stands at a named place. Rooms no longer print that name as the site back. */
 export const STAND_COOKIE = 'bs-stand';
 
 export function isPublicPlaceSlug(value: string): boolean {

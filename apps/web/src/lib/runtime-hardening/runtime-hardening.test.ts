@@ -146,7 +146,7 @@ test('Atlas and entity route segment config stays after all imports', () => {
   );
 });
 
-test('the Atlas is /explore; `/` never mounts the catalog', () => {
+test('the Atlas is `/`; `/explore` may still mount the same instrument', () => {
   const explorePages = collectAppRouteFiles(APP_ROOT).filter((file) =>
     /(^|\/)explore\/page\.tsx$/.test(
       file
@@ -155,10 +155,11 @@ test('the Atlas is /explore; `/` never mounts the catalog', () => {
         .join('/'),
     ),
   );
-  assert.equal(explorePages.length, 1, 'the Atlas must render at /explore');
+  assert.equal(explorePages.length, 1, '/explore may still render the instrument');
 
   const home = readFileSync(join(APP_ROOT, 'page.tsx'), 'utf8');
-  assert.doesNotMatch(home, /AtlasHome|AtlasLoader|wantsAtlasInstrument|atlas=1/);
+  assert.match(home, /AtlasHome/);
+  assert.doesNotMatch(home, /HomeFirstPaint|wantsAtlasInstrument|atlas=1/);
 
   assert.equal(
     existsSync(join(APP_ROOT, '(map)')),

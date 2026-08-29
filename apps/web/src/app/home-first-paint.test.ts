@@ -113,26 +113,33 @@ test('pickHomeStory follows published order and invents nothing', () => {
   assert.equal(pickHomeStory([storyDoc({ title: '42Cb1758', slug: 'opaque' })]), undefined);
 });
 
-test('first paint never mounts the catalog boot, camera cockpit, or Journey page', () => {
+test('`/` mounts the Atlas; a place page never mounts the catalog boot or camera cockpit', () => {
   const page = readFileSync(fileURLToPath(new URL('./page.tsx', import.meta.url)), 'utf8');
   const paint = readFileSync(
     fileURLToPath(new URL('./HomeFirstPaint.tsx', import.meta.url)),
     'utf8',
   );
   const loader = readFileSync(new URL('./explore/AtlasLoader.tsx', import.meta.url), 'utf8');
+  const panels = readFileSync(
+    fileURLToPath(new URL('./explore/hooks/use-panel-visibility.ts', import.meta.url)),
+    'utf8',
+  );
   const imports = page
     .split('\n')
     .filter((line) => line.startsWith('import '))
     .join('\n');
-  assert.match(page, /HomeFirstPaint/);
-  assert.match(page, /loadHomeFirstPaint/);
-  assert.doesNotMatch(page, /wantsAtlasInstrument|AtlasHome|atlas=1/);
-  assert.doesNotMatch(imports, /getSharedPublicEntities|AtlasLoader|atlas\/catalog|explore\.css/);
+  assert.match(page, /AtlasHome/);
+  assert.match(imports, /AtlasHome/);
+  assert.doesNotMatch(page, /HomeFirstPaint|loadHomeFirstPaint|wantsAtlasInstrument|atlas=1/);
   assert.doesNotMatch(page, /Loading \{shell\.totalMatched/);
   assert.doesNotMatch(paint, /CameraConsole|Orbit|Tilt|Trace/);
   assert.doesNotMatch(paint, /Loading 4,101|\/journey|42Cb1758/);
   assert.doesNotMatch(paint, /Open the full record/);
+  assert.match(paint, /MAP_BACK|The map/);
   assert.doesNotMatch(loader, /Loading \{shell\.totalMatched|4,101 records/);
+  assert.match(loader, /Opening the map/);
+  assert.match(panels, /camera: false/);
+  assert.doesNotMatch(panels, /camera: !isNarrow/);
 });
 
 test('first paint is the record, not a manifesto or a schema card', () => {
@@ -207,6 +214,8 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.match(html, /href="\/memorial"/);
   assert.match(html, /href="\/methodology"/);
   assert.match(html, /href="\/errata"/);
+  assert.match(html, />The map</);
+  assert.match(html, /href="\/"/);
   assert.doesNotMatch(html, /id="stories"/);
   assert.doesNotMatch(html, /href="#stories"/);
   assert.doesNotMatch(html, /href="\/books"/);
@@ -390,6 +399,8 @@ test('a place with no place neighbors walks on to another published stand', () =
     }),
   );
   assert.match(html, /African American Research Library and Cultural Center/);
+  assert.match(html, />The map</);
+  assert.match(html, /href="\/"/);
   assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church"/);
   assert.match(html, /href="\/place\/dillard-high-school-old"/);
   assert.doesNotMatch(html, /id="stories"/);

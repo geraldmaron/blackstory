@@ -12,7 +12,7 @@ import {
   viewportForState,
 } from './url-state';
 
-test('an empty explore state links to the Atlas instrument, not the featured door', () => {
+test('an empty explore state links to /explore, which still mounts the instrument', () => {
   assert.equal(
     buildExploreHref({
       filters: {
