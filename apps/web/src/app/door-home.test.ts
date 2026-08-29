@@ -47,6 +47,8 @@ test('the door plate sits in the page, not over the rooms', () => {
   const css = readFileSync(fileURLToPath(new URL('./door-home.css', import.meta.url)), 'utf8');
   assert.match(css, /:has\(\.ds-door\)/);
   assert.match(css, /position:\s*absolute/);
+  assert.match(css, /@media \(max-width: 559px\)/);
+  assert.match(css, /position:\s*relative/);
   assert.doesNotMatch(css, /box-shadow|backdrop-filter|linear-gradient/);
 });
 
