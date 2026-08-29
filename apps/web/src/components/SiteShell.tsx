@@ -1,9 +1,10 @@
 /**
  * App shell wrapper: header, offline notice, main body slot, and document footer.
  *
- * The door (`/`) and the Atlas (`/explore`) are both instrument surfaces: no site header,
- * no mega footer. `SiteShellHeader` and `SiteShellFooter` read the same surface-class
- * registry so they cannot disagree. The Atlas mounts its own command bar; the door does not.
+ * The Atlas (`/explore`) is the instrument: no site header, no mega footer, its own
+ * command bar. The door (`/`) is a reading surface: same room chrome as the archive,
+ * mast plus plate in the page. `SiteShellHeader` and `SiteShellFooter` read the same
+ * surface-class registry so they cannot disagree.
  */
 
 import type { ReactNode } from 'react';

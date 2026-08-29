@@ -26,8 +26,7 @@ import { CLASSIFIED_PATHS, surfaceClassFor, type SurfaceClass } from './surface-
  * The three card groups the library hub renders, in order, plus `find`.
  *
  * `find` is home, the map, and the index. They are deliberately NOT cards in the library:
- * the library lists the rooms. They carry a group anyway because the palette and the footer
- * do list them. Atlas in the bar still goes to `/explore`.
+ * the library lists the rooms. Home is the door. Atlas and records stay off the room chrome.
  */
 export const DESTINATION_GROUPS = ['find', 'read', 'check', 'take-part'] as const;
 export type DestinationGroup = (typeof DESTINATION_GROUPS)[number];
@@ -35,9 +34,9 @@ export type DestinationGroup = (typeof DESTINATION_GROUPS)[number];
 /** The heading each group renders under in the library hub. `find` has none; see above. */
 export const GROUP_HEADINGS: Readonly<Record<DestinationGroup, string | null>> = Object.freeze({
   find: null,
-  read: 'Read',
-  check: 'Check the archive',
-  'take-part': 'Take part',
+  read: 'Where to begin',
+  check: 'How it decides',
+  'take-part': 'Add to it',
 });
 
 /** The library hub's card groups, in render order. */
@@ -113,8 +112,6 @@ const DESTINATIONS: readonly Destination[] = [
     label: 'Home',
     parent: null,
     kind: 'PLACE',
-    description: 'What this is, then the pins.',
-    menuLine: 'What you are walking into',
     group: 'find',
     crawl: { changeFrequency: 'daily', priority: 1 },
   },
@@ -420,9 +417,9 @@ export function footerColumns(): readonly FooterColumn[] {
   });
 
   return [
-    column('Explore', ['find', 'read']),
-    column('Trust', ['check']),
-    column('Contribute', ['take-part']),
+    column(GROUP_HEADINGS.read ?? 'Where to begin', ['read']),
+    column(GROUP_HEADINGS.check ?? 'How it decides', ['check']),
+    column(GROUP_HEADINGS['take-part'] ?? 'Add to it', ['take-part']),
   ];
 }
 

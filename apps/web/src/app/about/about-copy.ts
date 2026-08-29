@@ -15,7 +15,8 @@
  */
 
 /**
- * The product line. `/about` uses the full lede. Do not retype either on the map door.
+ * The product line. The door mast is this string. `/about` uses the full lede.
+ * Do not retype either. Scribe locked the mast; paint imports it.
  */
 export const ABOUT_LINE =
   'BlackStory is a place-connected archive of Black history: people, places, and events pinned to where they happened, with the source attached to every claim.';

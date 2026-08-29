@@ -161,18 +161,22 @@ describe('destination registry · the footer is derived, not authored', () => {
     }
   });
 
-  it('lists the library and the record index, and no longer lists /history', () => {
+  it('lists the archive rooms and keeps Atlas, records, and history off the chrome', () => {
     const hrefs = footerColumns().flatMap((column) => column.items.map((item) => item.href));
-    assert.ok(hrefs.includes('/library'));
-    assert.ok(hrefs.includes('/records'));
+    assert.ok(hrefs.includes('/stories'));
+    assert.ok(hrefs.includes('/about'));
+    assert.ok(hrefs.includes('/submit'));
     assert.ok(!hrefs.includes('/history'));
+    assert.ok(!hrefs.includes('/explore'));
+    assert.ok(!hrefs.includes('/records'));
+    assert.ok(!hrefs.includes('/banned-books'));
   });
 
-  it('does not describe home as the map of the archive', () => {
+  it('does not invent a second home lede', () => {
     const home = destinationFor('/');
     assert.ok(home);
-    assert.doesNotMatch(home.description ?? '', /map of the archive|archive on a map/i);
-    assert.doesNotMatch(home.menuLine ?? '', /map of the archive|archive on a map/i);
+    assert.equal(home.description, undefined);
+    assert.equal(home.menuLine, undefined);
     const atlas = destinationFor('/explore');
     assert.equal(atlas?.description, 'The map.');
   });
