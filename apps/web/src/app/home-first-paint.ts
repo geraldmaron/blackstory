@@ -1,5 +1,5 @@
 /**
- * First paint for `/` and `/place/[slug]`: one published place, never the 4,101 catalog.
+ * Place-page loader for `/place/[slug]`: one published place, never the 4,101 catalog.
  *
  * Live reads are point-gets (`resolvePublicEntityView`). Seed reads the Dunbar cluster.
  * Greenwood is last-resort fallback when no other place can be resolved. Internal ids

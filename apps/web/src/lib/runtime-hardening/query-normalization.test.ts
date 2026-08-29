@@ -206,7 +206,7 @@ test('ADR-017: lat/lng/zoom never survive normalization on the map surface', () 
   );
   assert.equal(
     normalizeQueryString('/', { lat: '38.9072', lng: '-77.0369', zoom: '11.5', state: 'dc' }),
-    '',
+    'state=DC',
   );
   assert.equal(
     needsQueryNormalizationRedirect(new URL('https://example.com/explore?lat=38.9&lng=-77&zoom=6')),
@@ -224,7 +224,7 @@ test('panel chrome is not shareable state: panels= and hidePanels= normalize awa
   assert.equal(normalizeQueryString('/explore', { panels: 'filters', state: 'dc' }), 'state=DC');
 });
 
-test('/explore is the only map-query surface; `/` strips leftover board params', () => {
+test('`/` and `/explore` share the map-query vocabulary; leftover keys still drop', () => {
   const bag = {
     era: '1970s',
     kind: 'school',
@@ -244,20 +244,22 @@ test('/explore is the only map-query surface; `/` strips leftover board params',
     utm_source: 'x',
     junk: '1',
   };
-  assert.notEqual(normalizeQueryString('/explore', bag), '');
-  assert.equal(normalizeQueryString('/', bag), '');
+  const exploreQs = normalizeQueryString('/explore', bag);
+  assert.notEqual(exploreQs, '');
+  assert.equal(normalizeQueryString('/', bag), exploreQs);
 
   assert.equal(
     normalizeQueryString('/explore', { state: 'va', group: 'true' }),
     'state=VA&group=1',
   );
+  assert.equal(normalizeQueryString('/', { state: 'va', group: 'true' }), 'state=VA&group=1');
   assert.equal(
     needsQueryNormalizationRedirect(new URL('https://example.com/explore?state=VA&group=1')),
     false,
   );
   assert.equal(
     needsQueryNormalizationRedirect(new URL('https://example.com/?state=VA&group=1')),
-    true,
+    false,
   );
 });
 
@@ -298,7 +300,7 @@ test('drift: buildExploreSearchParams writes no key the allowlist lacks', () => 
 
 test('normalizeQueryString preserves /explore?state= revisit links', () => {
   assert.equal(normalizeQueryString('/explore', { state: 'dc' }), 'state=DC');
-  assert.equal(normalizeQueryString('/', { state: 'dc' }), '');
+  assert.equal(normalizeQueryString('/', { state: 'dc' }), 'state=DC');
   assert.equal(
     needsQueryNormalizationRedirect(new URL('https://example.com/explore?state=DC')),
     false,
@@ -336,16 +338,16 @@ test('/history carries no browse allowlist, because normalizing it would break t
   assert.equal(qs, '');
 });
 
-test('normalizeQueryString strips atlas=1 on `/` so the catalog cannot hide behind a query', () => {
+test('normalizeQueryString strips atlas=1 on `/` so it cannot hide a second door', () => {
   assert.equal(normalizeQueryString('/', { atlas: '1' }), '');
-  assert.equal(normalizeQueryString('/', { atlas: 'true', state: 'dc' }), '');
+  assert.equal(normalizeQueryString('/', { atlas: 'true', state: 'dc' }), 'state=DC');
   assert.equal(needsQueryNormalizationRedirect(new URL('https://example.com/?atlas=1')), true);
 });
 
-test('normalizeQueryString keeps a named stand on `/` and drops the rest', () => {
+test('normalizeQueryString does not keep a named stand on `/`', () => {
   assert.equal(
     normalizeQueryString('/', { at: 'fifteenth-street-presbyterian-church', atlas: '1' }),
-    'at=fifteenth-street-presbyterian-church',
+    '',
   );
 });
 

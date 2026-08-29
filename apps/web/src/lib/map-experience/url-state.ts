@@ -429,7 +429,7 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   return params.toString();
 }
 
-/** The Atlas answers on `/explore`. Bare `/` is the featured door and never the board. */
+/** Filter handoffs still answer on `/explore`. `/` is the map door and mounts the same instrument. */
 export function buildExploreHref(state: ExploreViewState): string {
   const qs = buildExploreSearchParams(state);
   return qs ? `/explore?${qs}` : '/explore';

@@ -25,10 +25,11 @@ import {
 export type QueryParamBag = Record<string, string | string[] | undefined>;
 
 /**
- * The map surface answers on `/explore` only. `/` is the featured door and strips query
- * state so a leftover `?atlas=1` cannot boot the catalog.
+ * The map surface answers on two paths. Both run the same allowlist and the same parse→build
+ * pair, so `/` and `/explore` cannot end up accepting different vocabularies for the same view.
+ * `atlas=1` is not in the allowlist and cannot hide a second door.
  */
-const EXPLORE_SURFACE_PATHS = new Set(['/explore']);
+const EXPLORE_SURFACE_PATHS = new Set(['/', '/explore']);
 
 function isTrackingKey(key: string): boolean {
   const lower = key.toLowerCase();
@@ -48,9 +49,6 @@ function normalizePathname(pathname: string): string {
 /** Routes that may carry user-facing filters; all other paths ignore query strings for caching.  */
 export function getAllowedQueryParamsForPath(pathname: string): readonly string[] {
   const path = normalizePathname(pathname);
-  if (path === '/') {
-    return ['at'];
-  }
   if (path === '/search') {
     return SEARCH_PAGE_PARAM_ALLOWLIST;
   }
@@ -98,8 +96,8 @@ function allowlistedBag(pathname: string, bag: QueryParamBag): QueryParamBag {
 
 /**
  * Returns a stable query string containing only allowed, non-tracking params.
- * The map surface (`/explore`) goes through parse→build so revisit URLs match what the
- * client writes (`layerMode=presence`, uppercase state). `/` has no browse query.
+ * The map surface (`/` and `/explore`) goes through parse→build so revisit URLs match what the
+ * client writes (`layerMode=presence`, uppercase state).
  * Empty string means no query component should appear in cache keys or redirects.
  */
 export function normalizeQueryString(

@@ -15,8 +15,7 @@
  */
 
 /**
- * The product line. `/` first paint uses {@link ABOUT_LINE}; `/about` uses the full lede.
- * Do not retype either on the door.
+ * The product line. `/about` uses the full lede. Do not retype either on the map door.
  */
 export const ABOUT_LINE =
   'BlackStory is a place-connected archive of Black history: people, places, and events pinned to where they happened, with the source attached to every claim.';

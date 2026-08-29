@@ -1,7 +1,5 @@
 /**
- * The Atlas instrument is `/explore`, not `/` and not a query on `/`.
- *
- * First paint of `/` is the product: a published place or story. Hiding the 4,101-row
- * catalog behind `?atlas=1` left the old board as the product one param later.
+ * Handoffs that already pointed at `/explore` still do. `/` is the map door and
+ * mounts the same instrument. `?atlas=1` is not a second door.
  */
 export const ATLAS_INSTRUMENT_HREF = '/explore';

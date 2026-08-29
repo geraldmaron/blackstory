@@ -1,12 +1,9 @@
 /**
- * Server-rendered front door: one published place's record, using the existing record room.
- *
- * Not a manifesto, not a schema card, and not the Atlas board. The place is whoever
- * can be stood at (named slug, last stand, then a published record). Greenwood is
- * last-resort fallback only. Archive chrome (Law, Data, Memorial, Methodology,
- * Errata) is the same on every place. Stories exists only when this record
- * already names a chapter. No schema strip, no confidence badge, no precision
- * leak, no second record page.
+ * A published place you walk into from the map. The title is the place. Back is
+ * the map, not another featured sit. Archive chrome (Law, Data, Memorial,
+ * Methodology, Errata) is the same on every place. Stories exists only when this
+ * record already names a chapter. No schema strip, no confidence badge, no
+ * precision leak, no second record page.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -20,6 +17,8 @@ import type { PublicEntityView } from '../data/public-seed';
 import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
 import { placeHref } from '../lib/place/public-place-path';
 import { isInternalRecordLabel, type HomeFirstPaintModel } from './home-first-paint';
+import { MAP_BACK } from './walk-back-place';
+import { WalkOffRampView } from './walk-off-ramp';
 import {
   firstPaintEraLine,
   firstPaintLocatorName,
@@ -163,6 +162,10 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
         ))}
 
         <DoorRooms rooms={rooms} />
+
+        <WalkOffRampView placeName={MAP_BACK.displayName} href={MAP_BACK.href}>
+          {lead.summary}
+        </WalkOffRampView>
       </Room>
     );
   }
@@ -182,6 +185,9 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
       ) : (
         <h1 className="ds-record-mast__title">BlackStory</h1>
       )}
+      <WalkOffRampView placeName={MAP_BACK.displayName} href={MAP_BACK.href}>
+        {story ? story.summary : MAP_BACK.displayName}
+      </WalkOffRampView>
     </Room>
   );
 }

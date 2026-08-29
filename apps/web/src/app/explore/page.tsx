@@ -1,7 +1,6 @@
 /**
- * Atlas instrument. Not the public front door. `/` is the featured place or story.
- *
- * This route may fetch the catalog. Bare `/` must not.
+ * Atlas instrument. `/` is the map door and mounts the same instrument.
+ * This route stays so existing `/explore` links still open the map.
  */
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { AtlasHome } from '../atlas-home';

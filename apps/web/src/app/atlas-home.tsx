@@ -1,6 +1,6 @@
 /**
- * Atlas instrument for `/explore`. Kept out of `page.tsx` so a first-time load of `/`
- * does not import the catalog, AtlasLoader, or explore CSS.
+ * Atlas instrument shared by `/` (the map door) and `/explore`.
+ * First paint is this plate, not a featured place and not a new map UI.
  */
 import { FilterBar } from '@repo/ui';
 import { SynchronizedResultList } from '../components/map-experience/SynchronizedResultList';
@@ -17,9 +17,11 @@ const NOSCRIPT_ROW_CAP = 20;
 
 type AtlasHomeProps = {
   readonly params: Record<string, string | string[] | undefined>;
+  /** GET target for the no-JS filter form. `/` stays on the map door. */
+  readonly formAction?: '/' | '/explore';
 };
 
-export async function AtlasHome({ params }: AtlasHomeProps) {
+export async function AtlasHome({ params, formAction = '/explore' }: AtlasHomeProps) {
   const { data: entities, source: dataSource } = await getSharedPublicEntities();
   const { shell, noscriptFeatures } = buildAtlasShell(params, entities, dataSource);
   const view = { ...shell, filteredFeatures: noscriptFeatures };
@@ -30,7 +32,7 @@ export async function AtlasHome({ params }: AtlasHomeProps) {
         <div className="ds-explore__noscript ds-container ds-page">
           <FilterBar
             method="get"
-            action="/explore"
+            action={formAction}
             legend="Filter documented records"
             fields={[
               {

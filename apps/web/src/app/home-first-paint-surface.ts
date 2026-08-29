@@ -1,6 +1,6 @@
 /**
- * First-paint surface rules: the featured place stays the page, and every linked room
- * is argued from that record. National catalogs are not the door. Internal ids,
+ * Place-page surface rules: the place stays the page, and every linked room
+ * is argued from that record. National catalogs are not invented joins. Internal ids,
  * rights-clearance captions, and "from their record" never print here.
  */
 import type { PublicEntityView, RelatedNeighborView } from '../data/public-seed';
