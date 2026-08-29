@@ -17,7 +17,8 @@
  * Endpoints (redirects, JSON, feeds, crawler files) have no class. They render no chrome, so
  * `surfaceClassFor` returns `null` and nothing is emitted.
  *
- * `/` is the Atlas. `/explore` mounts the same instrument. A place is `/place/{slug}`.
+ * `/` is the door: framing plus the pin plate. `/explore` mounts the Atlas instrument.
+ * A place is `/place/{slug}`.
  */
 /** The four rendered surface classes. Endpoints are represented by `null`. */
 export type SurfaceClass = 'instrument' | 'reading' | 'record' | 'utility';
@@ -27,7 +28,7 @@ export type SurfaceClass = 'instrument' | 'reading' | 'record' | 'utility';
  * (`/stories/mosaic-credits` is Utility) can never be swallowed by its parent's prefix rule.
  */
 const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
-  // Front door. The map of the archive. `/explore` is the same instrument.
+  // Front door: framing plus the pin plate. `/explore` is the live catalog instrument.
   // Story is a mode of the Atlas, not a path.
   ['/', 'instrument'],
   ['/explore', 'instrument'],
@@ -116,7 +117,7 @@ function normalizePath(pathname: string): string {
  * of a page with no class and therefore no shell rules.
  *
  * `search` is accepted so older call sites keep compiling. It does not change the class:
- * `/` is always the Atlas instrument. `?atlas=1` is not a second door.
+ * `/` is always the door. `?atlas=1` is not a second home.
  */
 export function surfaceClassFor(pathname: string, _search?: string): SurfaceClass | null {
   const path = normalizePath(pathname);

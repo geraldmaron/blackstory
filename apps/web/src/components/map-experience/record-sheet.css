@@ -1,8 +1,8 @@
 /**
  * Record sheet — right slab, z 40, above the instruments and below the palette.
  *
- * Built as one of the instruments rather than as a modal that arrived over them: same translucent
- * surface, blur, border, radius and shadow as the lens and the results rail. What marks it as the
+ * Built as one of the instruments rather than as a modal that arrived over them: same matte
+ * surface, hairline, and radius as the lens and the results rail. What marks it as the
  * thing the reader is currently holding is the accent dot in its own header, not a copper spine
  * down its edge.
  */
@@ -23,16 +23,13 @@
   width: min(430px, calc(100vw - var(--ds-space-4) * 2));
   /*
    * The sheet is one of the Atlas's instruments and is built like the rest of them: the same
-   * translucent surface, the same blur, the same border and radius, the same shadow. It used to
-   * be an opaque panel with a large radius and a 3px copper spine, which read as a modal that had
-   * arrived from somewhere else and sat on the plate rather than as part of the instrument set.
+   * matte surface, hairline, and radius. It used to be a blurred panel with a 3px copper spine,
+   * which read as a modal that had arrived from somewhere else.
    * The record it holds is marked by the accent dot in its own header instead.
    */
-  background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
-  backdrop-filter: blur(8px);
+  background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
-  box-shadow: 0 10px 30px -18px rgb(0 0 0 / 45%);
   overflow: hidden;
 }
 

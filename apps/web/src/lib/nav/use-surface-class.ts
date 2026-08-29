@@ -1,5 +1,5 @@
 /**
- * Client surface-class hook. Class is the pathname only: `/` is always the reading door.
+ * Client surface-class hook. Class is the pathname only: `/` is always the door.
  */
 'use client';
 

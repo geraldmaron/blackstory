@@ -181,8 +181,7 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 2px;
   padding: 4px;
-  background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
-  backdrop-filter: blur(8px);
+  background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
 }
