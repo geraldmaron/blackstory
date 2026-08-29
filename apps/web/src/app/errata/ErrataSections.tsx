@@ -31,21 +31,37 @@ function publicErrataHref(url: string | undefined): string | undefined {
   return url;
 }
 
+function publicRecordLabel(href: string | undefined): string | undefined {
+  if (href === undefined) return undefined;
+  if (href === '/methodology') return 'Methodology';
+  if (href === '/corrections') return 'Corrections';
+  if (href.startsWith('/place/')) {
+    return href
+      .slice('/place/'.length)
+      .split('-')
+      .filter((word) => word.length > 0)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+  return href.replace(/^\//, '');
+}
+
 function ErrataRow({ entry }: { readonly entry: ErrataEntry }) {
   const phase = ERRATA_CHANGE_TYPE_LABELS[entry.changeType];
   const href = publicErrataHref(entry.affectedUrl);
+  const recordLabel = publicRecordLabel(href);
 
   return (
     <li className="ds-errata__row">
       <time className="ds-errata__row-date" dateTime={entry.timestamp}>
         {formatDate(entry.timestamp)}
       </time>
-      {href ? (
+      {href && recordLabel ? (
         <Link className="ds-errata__row-id" href={href}>
-          {entry.id}
+          {recordLabel}
         </Link>
       ) : (
-        <span className="ds-errata__row-id">{entry.id}</span>
+        <span className="ds-errata__row-id">{recordLabel ?? 'This archive'}</span>
       )}
       <p className="ds-errata__row-statement">
         {entry.headline}. {entry.summary}

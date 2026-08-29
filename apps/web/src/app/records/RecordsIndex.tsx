@@ -97,8 +97,8 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
         title="Records"
         lede={
           <>
-            Every record in the release as a list. The Atlas shows you where things are. This shows
-            you what there is.
+            Every record in the release as a list. The map shows where a record sits. This list
+            shows what the archive holds.
           </>
         }
         meta={[

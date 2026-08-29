@@ -1,22 +1,16 @@
 /**
- * `/` is the Atlas: one full-viewport live plate with opaque panels floating over it.
- * A place is a page you walk into (`/place/{slug}`). This module mounts the existing
- * Atlas instrument. It does not invent a second map.
- *
- * The plate itself is mounted once by the root shell and persists across navigation; this page
- * only builds the view model and hands the pin collection to `AtlasLoader` / `AtlasExperience`
- * so first paint is not an empty plate. Filters use native GET navigation so the surface works
- * without JavaScript. The camera stays in memory, so the shareable URL carries filters and
- * selection but never pan or zoom (ADR-017).
+ * `/` is the door: existing about framing above the existing HTML pin plate.
+ * People need to know what they are walking into, then walk into a place.
+ * The Atlas instrument stays on `/explore`. This page does not mount it.
  */
 import type { Metadata } from 'next';
 import { absolutePublicUrl } from '../lib/seo/metadata-builders';
-import { AtlasHome } from './atlas-home';
+import { ABOUT_LINE } from './about/about-copy';
+import { DoorHome } from './door-home';
 
 /**
- * Dynamic because it reads `searchParams` (the filters are GET navigation), and because a build
- * without a database must not prerender a live catalog. Keep this page-scoped; do not hoist
- * force-dynamic to the root layout.
+ * Dynamic because a build without a database must not prerender a live pin plate.
+ * Keep this page-scoped; do not hoist force-dynamic to the root layout.
  */
 export const dynamic = 'force-dynamic';
 
@@ -25,16 +19,10 @@ export const dynamic = 'force-dynamic';
  * Canonical stays the bare `/` (SP-19).
  */
 export const metadata: Metadata = {
-  description:
-    'Map-first national view of documented Black history: every geo-anchored record in the active release.',
+  description: ABOUT_LINE,
   alternates: { canonical: absolutePublicUrl('/') },
 };
 
-type AtlasPageProps = {
-  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
-};
-
-export default async function HomePage({ searchParams }: AtlasPageProps) {
-  const params = await searchParams;
-  return <AtlasHome params={params} formAction="/" />;
+export default async function HomePage() {
+  return <DoorHome />;
 }

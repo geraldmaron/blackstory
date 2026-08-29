@@ -72,9 +72,9 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
   const rail = (
     <>
       <p className="ds-room-note">
-        These jurisdiction links hand the reader to the Atlas by place of authority alone. The
-        archive does not document that any specific record was decided under, or is otherwise
-        connected to, a given law.
+        These jurisdiction links open the map by place of authority alone. The archive does
+        not document that any specific record was decided under, or is otherwise connected to,
+        a given law.
       </p>
       <RailGroup title="By jurisdiction" entries={byJurisdiction} limit={12} />
     </>

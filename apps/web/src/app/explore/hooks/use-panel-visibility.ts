@@ -61,17 +61,15 @@ export function usePanelVisibility() {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [savedOpen, setSavedOpen] = useState(false);
   /**
-   * Every instrument stays docked until asked. First paint is the plate of pins, not
-   * Kind / Tone / Era and not a card list. The camera console already shipped this way;
-   * the lens, records rail, and decade panel follow it.
-   * The dock chips bring an instrument in when the reader asks. Server and client start
-   * from the same docked state so first paint does not flash the filter board.
+   * Both panels open is the wide default. On a narrow viewport they would cover the plate
+   * between them, so the surface opens on the map and the dock chips bring an instrument
+   * in when asked. Server-rendered as the wide layout and corrected after mount.
    */
   const [panels, setPanels] = useState<PanelVisibility>({
-    lens: false,
-    results: false,
-    decade: false,
-    camera: false,
+    lens: true,
+    results: true,
+    decade: true,
+    camera: true,
   });
   const [narrow, setNarrow] = useState(false);
   const [bothColumns, setBothColumns] = useState(false);
@@ -81,10 +79,15 @@ export function usePanelVisibility() {
     const query = window.matchMedia(`(max-width: ${NARROW_BREAKPOINT - 1}px)`);
     const wideQuery = window.matchMedia(`(min-width: ${BOTH_COLUMNS_BREAKPOINT}px)`);
     const sync = () => {
-      setNarrow(query.matches);
+      const isNarrow = query.matches;
+      setNarrow(isNarrow);
       setBothColumns(wideQuery.matches);
-      // Do not reopen instruments here. First paint is docked; a resize must not
-      // turn the plate back into Kind / Tone / Era and a card list.
+      setPanels({
+        lens: !isNarrow,
+        results: !isNarrow,
+        decade: !isNarrow,
+        camera: !isNarrow,
+      });
     };
     sync();
     query.addEventListener('change', sync);

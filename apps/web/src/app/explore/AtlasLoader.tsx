@@ -2,11 +2,11 @@
  * Joins the pin collection already on the page to the Atlas shell, mounts
  * `AtlasExperience`, and hydrates instruments from `GET /atlas/catalog`.
  *
- * The catalog is ~15 MB (see `atlas-catalog.ts`) and must not ride every `/`
- * request as RSC. The plate cannot wait for it either: first paint is the pins
- * `AtlasHome` already built from `getSharedPublicEntities`. Instruments fill in
- * when the catalog arrives — from the CDN on a warm path, from the browser cache
- * on a client-side return to `/`.
+ * The catalog is ~15 MB (see `atlas-catalog.ts`) and must not ride every
+ * `/explore` request as RSC. The plate cannot wait for it either: first paint
+ * is the pins `AtlasHome` already built from `getSharedPublicEntities`.
+ * Instruments fill in when the catalog arrives — from the CDN on a warm path,
+ * from the browser cache on a client-side return to `/explore`.
  *
  * The last catalog is also kept in module memory: navigating away and back within
  * one session re-mounts this component, and a 1 MB re-parse for bytes already in

@@ -73,6 +73,13 @@ test('each walk room comes back to the map and does not sell Atlas or a missing 
   }
 });
 
+test('corrections does not ask for an id in the address bar', () => {
+  const form = readFileSync(join(here, 'corrections/CorrectionForm.tsx'), 'utf8');
+  assert.doesNotMatch(form, /useSearchParams/);
+  assert.doesNotMatch(form, /searchParams\.get\(['"]target/);
+  assert.match(form, /Name the place or paste its page address/);
+});
+
 test('walk copy does not send a reader to shop credits or leftover products', () => {
   for (const relative of WALK_COPY) {
     const source = readFileSync(join(here, relative), 'utf8');

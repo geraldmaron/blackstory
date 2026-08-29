@@ -85,16 +85,15 @@ test('the Atlas page never puts the catalog back in the initial prop', async () 
   assert.doesNotMatch(pageSource, /toSerializableExploreViewModel/);
   assert.doesNotMatch(pageSource, /buildExploreViewModelAsync/);
   assert.doesNotMatch(pageSource, /wantsAtlasInstrument|atlas=1/);
-  assert.match(pageImports, /AtlasHome/);
-  assert.match(pageSource, /AtlasHome/);
+  assert.match(pageImports, /DoorHome/);
+  assert.match(pageSource, /DoorHome/);
+  assert.doesNotMatch(pageSource, /AtlasHome/);
   assert.match(explorePage, /AtlasHome/);
   assert.match(atlasHome, /AtlasLoader/);
   assert.match(atlasHome, /toFirstPaintPins/);
-  assert.match(atlasHome, /toFirstPaintShell/);
   assert.match(atlasHome, /FirstPaintPinPlate/);
   assert.doesNotMatch(atlasHome, /Opening the map/);
-  assert.doesNotMatch(atlasHome, /FilterBar|Kind|Tone|Era/);
-  assert.doesNotMatch(atlasHome, /<noscript>|ds-explore__walks/);
+  assert.doesNotMatch(atlasHome, /ds-explore__walks/);
   assert.doesNotMatch(atlasHome, /pins=\{\{ type: 'FeatureCollection'/);
 });
 

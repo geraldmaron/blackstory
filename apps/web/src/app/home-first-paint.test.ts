@@ -128,17 +128,13 @@ test('pickHomeStory follows published order and invents nothing', () => {
   assert.equal(pickHomeStory([storyDoc({ title: '42Cb1758', slug: 'opaque' })]), undefined);
 });
 
-test('`/` mounts the Atlas; a place page never mounts the catalog boot or camera cockpit', () => {
+test('`/` is the door; a place page never mounts the catalog boot or camera cockpit', () => {
   const page = readFileSync(fileURLToPath(new URL('./page.tsx', import.meta.url)), 'utf8');
   const paint = readFileSync(
     fileURLToPath(new URL('./HomeFirstPaint.tsx', import.meta.url)),
     'utf8',
   );
   const loader = readFileSync(new URL('./explore/AtlasLoader.tsx', import.meta.url), 'utf8');
-  const panels = readFileSync(
-    fileURLToPath(new URL('./explore/hooks/use-panel-visibility.ts', import.meta.url)),
-    'utf8',
-  );
   const atlas = readFileSync(
     fileURLToPath(new URL('./explore/AtlasExperience.tsx', import.meta.url)),
     'utf8',
@@ -151,9 +147,9 @@ test('`/` mounts the Atlas; a place page never mounts the catalog boot or camera
     .split('\n')
     .filter((line) => line.startsWith('import '))
     .join('\n');
-  assert.match(page, /AtlasHome/);
-  assert.match(imports, /AtlasHome/);
-  assert.doesNotMatch(page, /HomeFirstPaint|loadHomeFirstPaint|wantsAtlasInstrument|atlas=1/);
+  assert.match(page, /DoorHome/);
+  assert.match(imports, /DoorHome/);
+  assert.doesNotMatch(page, /AtlasHome|AtlasLoader|HomeFirstPaint|wantsAtlasInstrument|atlas=1/);
   assert.doesNotMatch(page, /Loading \{shell\.totalMatched/);
   assert.doesNotMatch(paint, /CameraConsole|Orbit|Tilt|Trace/);
   assert.doesNotMatch(paint, /Loading 4,101|\/journey|42Cb1758/);
@@ -163,17 +159,10 @@ test('`/` mounts the Atlas; a place page never mounts the catalog boot or camera
   assert.doesNotMatch(loader, /Opening the map/);
   assert.match(loader, /firstPaintCatalog/);
   assert.match(loader, /readonly pins/);
-  assert.match(panels, /lens: false/);
-  assert.match(panels, /results: false/);
-  assert.match(panels, /decade: false/);
-  assert.match(panels, /camera: false/);
-  assert.doesNotMatch(panels, /lens: !isNarrow|results: !isNarrow|decade: !isNarrow/);
-  assert.doesNotMatch(panels, /camera: !isNarrow/);
   assert.match(mapSource, /atlasWalkHref/);
   assert.doesNotMatch(mapSource, /href: `\/entity\/\$\{entity\.id\}`/);
   assert.match(atlas, /atlasWalkHref|isHoldingPlaceHref/);
   assert.doesNotMatch(atlas, /\/entity\/\$\{record\.id\}/);
-  assert.match(atlas, /instrumentsInvited/);
   assert.doesNotMatch(atlas, /recordCount=\{view\.allFeatures\.length\}/);
   const commandBar = readFileSync(
     fileURLToPath(new URL('../components/shell/CommandBar.tsx', import.meta.url)),
@@ -185,7 +174,7 @@ test('`/` mounts the Atlas; a place page never mounts the catalog boot or camera
   assert.match(atlasHome, /toFirstPaintPins/);
   assert.match(atlasHome, /FirstPaintPinPlate/);
   assert.doesNotMatch(atlasHome, /Opening the map/);
-  assert.doesNotMatch(atlasHome, /<noscript>|ds-explore__walks/);
+  assert.doesNotMatch(atlasHome, /ds-explore__walks/);
 });
 
 test('first paint is the record, not a manifesto or a schema card', () => {

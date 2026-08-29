@@ -6,7 +6,6 @@
  * privacy consent, and returns a receipt code on success.
  */
 import { useId, useState, type FormEvent } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { Button, Notice } from '@repo/ui';
 import { ChoiceField, Field } from '../../components/room';
 import { ReceiptBlock } from './ReceiptBlock';
@@ -15,7 +14,6 @@ import {
   CORRECTION_CATEGORY_LABELS,
   CORRECTION_TARGET_LABELS,
   CORRECTION_TARGET_TYPES,
-  type CorrectionTargetType,
 } from './categories';
 import { CORRECTION_PRIVACY_NOTICE } from './copy';
 import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
@@ -34,7 +32,6 @@ const DEFAULT_ERROR_MESSAGE =
   'Something went wrong submitting this correction. Please try again in a moment.';
 
 export function CorrectionForm() {
-  const searchParams = useSearchParams();
   const [state, setState] = useState<SubmitState>({ status: 'idle' });
 
   const targetTypeId = useId();
@@ -43,9 +40,6 @@ export function CorrectionForm() {
   const sourceUrlId = useId();
   const contactId = useId();
   const privacyId = useId();
-
-  const initialTarget = searchParams.get('target')?.trim() ?? '';
-  const initialTargetType = searchParams.get('targetType')?.trim() ?? 'entity';
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -156,11 +150,7 @@ export function CorrectionForm() {
         <select
           id={targetTypeId}
           name="targetType"
-          defaultValue={
-            CORRECTION_TARGET_TYPES.includes(initialTargetType as CorrectionTargetType)
-              ? initialTargetType
-              : 'entity'
-          }
+          defaultValue="entity"
           required
         >
           {CORRECTION_TARGET_TYPES.map((targetType) => (
@@ -181,7 +171,6 @@ export function CorrectionForm() {
           name="targetRecordId"
           type="text"
           required
-          defaultValue={initialTarget}
           placeholder="Fifteenth Street Presbyterian Church"
           aria-describedby={fieldIssue('targetRecordId') ? `${targetRecordId}-issue` : undefined}
         />
