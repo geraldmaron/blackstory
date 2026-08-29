@@ -468,13 +468,14 @@
   }
 
   .ds-bar {
+    box-sizing: border-box;
     min-width: 0;
   }
 
   .ds-bar__brand {
-    --ds-bar-symbol-size: 2.25rem;
-    width: 2.25rem;
-    max-width: 2.25rem;
+    --ds-bar-symbol-size: 2rem;
+    width: 2rem;
+    max-width: 2rem;
     min-width: 0;
     overflow: hidden;
   }
