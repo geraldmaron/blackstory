@@ -1440,7 +1440,7 @@ a.ds-room-chip {
   color: var(--room-ink-4);
 }
 
-@media (max-width: 390px) {
+@media (max-width: 559px) {
   .ds-room__doc {
     box-sizing: border-box;
     width: 100%;
@@ -1450,13 +1450,13 @@ a.ds-room-chip {
 
   .ds-room-header__title {
     font-size: clamp(1.5rem, 8vw, 2rem);
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     min-width: 0;
   }
 
   .ds-room-header__lede {
     font-size: 1.0625rem;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     min-width: 0;
   }
 
@@ -1467,12 +1467,12 @@ a.ds-room-chip {
   .ds-room-idx__place,
   .ds-room-idx__era {
     min-width: 0;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     white-space: normal;
   }
 
   .ds-room-prose {
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     min-width: 0;
   }
 }

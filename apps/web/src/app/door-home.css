@@ -85,7 +85,7 @@ body:has(.ds-door) .ds-first-paint-plate {
   }
 }
 
-@media (max-width: 390px) {
+@media (max-width: 559px) {
   .ds-door {
     box-sizing: border-box;
     padding: var(--ds-space-2);

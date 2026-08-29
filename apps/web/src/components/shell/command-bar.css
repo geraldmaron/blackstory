@@ -456,7 +456,7 @@
   }
 }
 
-@media (max-width: 390px) {
+@media (max-width: 819px) {
   /*
    * Grid tracks still let tools paint past the bar and html/body clip shears
    * them to "Roo". Flex-wrap keeps Rooms on screen: if brand + Rooms cannot
