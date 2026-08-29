@@ -35,5 +35,10 @@ test('each walk room comes back to the place and does not sell Atlas or Banned b
       /confidenceNote|counterClaims\[\]|home-server/,
       `${relative} must not leak shop tokens`,
     );
+    assert.doesNotMatch(
+      source,
+      /['"`]The place['"`]|The place is the door back/,
+      `${relative} must not use a sit-script back label`,
+    );
   }
 });

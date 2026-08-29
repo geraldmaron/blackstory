@@ -102,9 +102,8 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
 
       <LawBrowseSections view={view} catalog={catalog} />
 
-      <WalkOffRamp title="The place">
-        This catalogue is jurisdictional. It does not invent a documented join to the place you
-        opened it from.
+      <WalkOffRamp>
+        This catalogue is jurisdictional. It does not invent a documented join to a record.
       </WalkOffRamp>
     </Room>
   );

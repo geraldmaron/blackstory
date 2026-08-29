@@ -94,7 +94,7 @@ export default function SupportPage() {
         </p>
       </UtilityCard>
 
-      <WalkOffRamp title="The place">Help for BlackStory, not a store listing.</WalkOffRamp>
+      <WalkOffRamp>Help for BlackStory, not a store listing.</WalkOffRamp>
     </Room>
   );
 }

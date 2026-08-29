@@ -9,7 +9,7 @@
  * as a stray fragment above the title rather than as the name of what happened.
  *
  * The exits are the whole point of the page. `/design-system` was one of them, which sent a lost
- * reader to a component gallery; it is gone. The first exit is the place. The archive exit
+ * reader to a component gallery; it is gone. The first exit is the record they left. The archive exit
  * points at `/records`, the old board, not a new room. And `PaletteSeed` hands the path the reader
  * mistyped to the bar's search as a sanitised query, so `⌘K` opens holding their best guess
  * instead of an empty field.
@@ -19,9 +19,11 @@ import Link from 'next/link';
 import { EmptyState } from '@repo/ui';
 import { PaletteSeed } from '../components/shell/PaletteSeed';
 import { Room, RoomHeader } from '../components/room';
+import { loadWalkBackPlace } from './walk-back-place';
 import './utility.css';
 
-export default function NotFound() {
+export default async function NotFound() {
+  const back = await loadWalkBackPlace();
   return (
     <Room>
       <PaletteSeed />
@@ -42,7 +44,7 @@ export default function NotFound() {
         action={
           <div className="ds-row">
             <Link className="ds-button ds-button--primary" href="/">
-              The place
+              {back?.displayName ?? 'BlackStory'}
             </Link>
             <Link className="ds-button ds-button--secondary" href="/records">
               Find in the archive

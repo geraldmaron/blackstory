@@ -77,6 +77,6 @@ export const DATA_SECTION_COPY = {
     index: '07',
     kicker: 'Next step',
     title: 'Dig into a place',
-    lede: 'The place is the door back. Methodology explains how we read these numbers next to a record.',
+    lede: 'Methodology explains how we read these numbers next to a record.',
   },
 } as const;

@@ -35,11 +35,7 @@ const EXAMPLE_CITATION = formatCitation({
   accessed: new Date('2026-01-01T00:00:00Z'),
 });
 
-export type MethodologySectionsProps = {
-  readonly exampleRecordHref?: string;
-};
-
-export function MethodologySections({ exampleRecordHref }: MethodologySectionsProps) {
+export function MethodologySections() {
   const grades = FACT_CONFIDENCE_GRADES as readonly FactConfidenceGrade[];
 
   return (
@@ -174,15 +170,11 @@ export function MethodologySections({ exampleRecordHref }: MethodologySectionsPr
         <WalkOffRamp
           title="See it applied"
           extra={[
-            {
-              label: 'Open a record',
-              href: exampleRecordHref ?? '/',
-            },
             { label: 'Errata', href: '/errata' },
             { label: 'Request a correction', href: '/corrections' },
           ]}
         >
-          The same rules run on the place you opened this room from.
+          The same rules run on every public record.
         </WalkOffRamp>
       </div>
     </>

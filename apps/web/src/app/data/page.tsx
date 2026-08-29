@@ -106,9 +106,7 @@ export default async function DataPage() {
         populationGeneratedAt={timeline?.generatedAt}
       />
 
-      <WalkOffRamp title="Back to the place">
-        Every number here is a national series. The place is the door back.
-      </WalkOffRamp>
+      <WalkOffRamp>Every number here is a national series.</WalkOffRamp>
     </Room>
   );
 }

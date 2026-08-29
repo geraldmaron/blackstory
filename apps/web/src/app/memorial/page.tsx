@@ -80,7 +80,7 @@ export default function MemorialPage() {
 
         <MemorialSections />
 
-        <WalkOffRamp title="The place">
+        <WalkOffRamp>
           Names, held quietly. This is the national memorial, not one library&apos;s list.
         </WalkOffRamp>
       </Room>
