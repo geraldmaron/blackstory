@@ -76,6 +76,8 @@
   margin-bottom: var(--ds-space-3);
   font-size: 12px;
   color: var(--ds-ink-muted);
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .ds-libmenu__list {
@@ -92,6 +94,8 @@
   color: var(--ds-ink);
   font-size: 13.5px;
   text-decoration: none;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .ds-libmenu__item:hover {

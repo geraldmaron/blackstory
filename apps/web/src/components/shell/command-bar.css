@@ -469,8 +469,10 @@
 
   .ds-bar {
     min-width: 0;
-    max-width: calc(100vw - var(--ds-space-2) * 2);
-    overflow-x: clip;
+  }
+
+  .ds-bar__brand {
+    --ds-bar-symbol-size: 2.25rem;
   }
 
   .ds-bar__brand,
