@@ -3,7 +3,8 @@
  *
  * Live reads are point-gets (`resolvePublicEntityView`). Seed reads the Dunbar cluster.
  * Greenwood is last-resort fallback when no other place can be resolved. Internal ids
- * never title and never appear in the address a reader follows.
+ * never title and never appear in the address a reader follows. Stand ids live with the
+ * public place path so a walk href can ask the same lookup the place page uses.
  */
 import { listPublicArticleListItems, resolveCitesEdgeIndex } from '../lib/articles/source';
 import { shouldUseLivePublicProjections } from '../lib/public-data/live-policy';
@@ -13,6 +14,7 @@ import {
   canStandHere,
   isInternalRecordLabel,
   isTulsaPlace,
+  PLACE_PAGE_STAND_IDS,
   publicPlaceSlug,
 } from '../lib/place/public-place-path';
 import { storiesCiting, type StoryCitation } from '../lib/release/build-cites-edge';
@@ -25,14 +27,7 @@ export { isInternalRecordLabel } from '../lib/place/public-place-path';
  * Places that hold, in stand order. Non-Tulsa first. Greenwood is last-resort
  * fallback when no other published place can be resolved.
  */
-export const HOME_STAND_CANDIDATE_IDS = [
-  'ent_aarlcc_fort_lauderdale_001',
-  'nrhp-black-heritage-91000107',
-  'nrhp-black-heritage-100001861',
-  'ent_dunbar_school_001',
-  'ent_15th_st_church_001',
-  'ent_greenwood_district_001',
-] as const;
+export const HOME_STAND_CANDIDATE_IDS = PLACE_PAGE_STAND_IDS;
 
 /** @deprecated Use HOME_STAND_CANDIDATE_IDS. */
 export const HOME_FEATURED_ENTITY_IDS = HOME_STAND_CANDIDATE_IDS;
@@ -153,9 +148,7 @@ export async function loadHomeFirstPaint(
   let source: HomeFirstPaintSource = 'none';
 
   if (named) {
-    const fromStands = standRows.find(
-      (row) => publicPlaceSlug(row.entity.displayName) === named,
-    );
+    const fromStands = standRows.find((row) => publicPlaceSlug(row.entity.displayName) === named);
     if (fromStands) {
       lead = fromStands.entity;
       source = fromStands.source;

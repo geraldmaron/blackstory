@@ -15,6 +15,7 @@ import {
 import { buildAtlasShell, buildExploreViewModel } from './explore-view-model';
 import {
   assembleExploreViewModel,
+  firstPaintCatalog,
   toAtlasShellModel,
   toSerializableExploreViewModel,
 } from './explore-view-model-wire';
@@ -87,4 +88,19 @@ test('the Atlas page never puts the catalog back in the initial prop', async () 
   assert.match(pageSource, /AtlasHome/);
   assert.match(explorePage, /AtlasHome/);
   assert.match(atlasHome, /AtlasLoader/);
+  assert.match(atlasHome, /pins=\{\{ type: 'FeatureCollection'/);
+  assert.doesNotMatch(atlasHome, /Opening the map/);
+});
+
+test('first-paint catalog is the pin collection, not the history edge catalog', () => {
+  const { shell, noscriptFeatures } = buildAtlasShell({}, entities, 'none');
+  const pins = { type: 'FeatureCollection' as const, features: noscriptFeatures };
+  const paint = firstPaintCatalog(pins, 'none');
+  assert.equal(paint.schemaVersion, 1);
+  assert.equal(paint.source.featureCollection.features.length, noscriptFeatures.length);
+  assert.ok(paint.source.featureCollection.features.length > 0);
+  assert.deepEqual(paint.edgeLineCatalog.allTime.edges, []);
+  assert.deepEqual(paint.citesEdge, {});
+  const assembled = assembleExploreViewModel(shell, paint);
+  assert.equal(assembled.source.featureCollection.features.length, noscriptFeatures.length);
 });

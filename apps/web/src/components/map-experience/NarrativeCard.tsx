@@ -105,7 +105,7 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
     {
       key: 'evidence',
       label: 'Evidence',
-      value: (
+      value: properties.href ? (
         <Link
           className="ds-record-anatomy__fact-link"
           href={entityEvidenceHref(properties.href)}
@@ -113,6 +113,8 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
         >
           {evidenceLabel}
         </Link>
+      ) : (
+        evidenceLabel
       ),
       icon: { variant: 'record-evidence', tier: properties.confidenceTier },
     },
@@ -168,9 +170,13 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
       </div>
 
       <h3 className="ds-nc__title" id="ds-nc-title">
-        <Link className="ds-nc__title-link" href={properties.href} scroll={false}>
-          {properties.displayName}
-        </Link>
+        {properties.href ? (
+          <Link className="ds-nc__title-link" href={properties.href} scroll={false}>
+            {properties.displayName}
+          </Link>
+        ) : (
+          properties.displayName
+        )}
       </h3>
       <p className="ds-nc__story" id="ds-nc-story">
         {properties.oneLineStory}
@@ -221,9 +227,11 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
         </p>
       ) : null}
 
-      <Link className="ds-cta ds-cta--copper ds-nc__action" href={properties.href} scroll={false}>
-        Open full record
-      </Link>
+      {properties.href ? (
+        <Link className="ds-cta ds-cta--copper ds-nc__action" href={properties.href} scroll={false}>
+          Open full record
+        </Link>
+      ) : null}
     </article>
   );
 }

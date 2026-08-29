@@ -4,9 +4,10 @@
  * Atlas instrument. It does not invent a second map.
  *
  * The plate itself is mounted once by the root shell and persists across navigation; this page
- * only builds the view model and hands it to `AtlasLoader` / `AtlasExperience`. Filters use
- * native GET navigation so the surface works without JavaScript. The camera stays in memory, so
- * the shareable URL carries filters and selection but never pan or zoom (ADR-017).
+ * only builds the view model and hands the pin collection to `AtlasLoader` / `AtlasExperience`
+ * so first paint is not an empty plate. Filters use native GET navigation so the surface works
+ * without JavaScript. The camera stays in memory, so the shareable URL carries filters and
+ * selection but never pan or zoom (ADR-017).
  */
 import type { Metadata } from 'next';
 import { absolutePublicUrl } from '../lib/seo/metadata-builders';

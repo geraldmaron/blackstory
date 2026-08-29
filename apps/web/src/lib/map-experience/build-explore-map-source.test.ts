@@ -13,7 +13,7 @@ import { buildExploreMapSource, buildJurisdictionAreaFeatures } from './build-ex
 import { geoAnchorFor } from './entity-geo';
 import { displayEncodingFor, kindFamilyFor } from './kind-encoding';
 
-test('every active-release entity with a resolvable anchor becomes a linked, enriched feature', () => {
+test('every active-release entity with a resolvable anchor becomes an enriched feature', () => {
   const entities = listPublicEntities();
   const source = buildExploreMapSource(entities);
 
@@ -21,15 +21,43 @@ test('every active-release entity with a resolvable anchor becomes a linked, enr
   for (const feature of source.featureCollection.features) {
     const entity = entities.find((candidate) => candidate.id === feature.properties.entityId);
     assert.ok(entity);
-    const walk = atlasWalkHref({ displayName: entity.displayName, kind: entity.kind });
-    assert.ok(walk);
-    assert.equal(feature.properties.href, walk);
-    assert.doesNotMatch(feature.properties.href, /\/entity\//);
-    assert.doesNotMatch(feature.properties.href, /ent_/);
+    const walk = atlasWalkHref({
+      displayName: entity.displayName,
+      kind: entity.kind,
+      entityId: entity.id,
+    });
+    assert.equal(feature.properties.href, walk ?? '');
+    if (walk) {
+      assert.match(walk, /^\/(place|memorial|law)\//);
+      assert.doesNotMatch(feature.properties.href, /\/entity\//);
+      assert.doesNotMatch(feature.properties.href, /ent_/);
+    }
     assert.equal(feature.properties.oneLineStory, entity!.summary);
     assert.equal(feature.properties.evidenceCount, entity!.claims.length);
     assert.deepEqual(feature.properties.eraBuckets, entity!.eraBuckets ?? []);
   }
+});
+
+test('a published name that the place page cannot resolve does not invent a /place/ href', () => {
+  const base = listPublicEntities()[0]!;
+  const palace: PublicEntityView = {
+    ...base,
+    id: 'ent_test_archie_edwards',
+    kind: 'place',
+    displayName: 'Archie Edwards Alpha Tonsorial Palace',
+  };
+  const source = buildExploreMapSource([palace], {
+    geoAnchorFor: (id) =>
+      id === palace.id
+        ? { lat: 38.91, lng: -77.03, geohash: 'dqcj', matchMethod: 'geocode_other' }
+        : geoAnchorFor(id),
+  });
+  assert.equal(source.featureCollection.features.length, 1);
+  assert.equal(source.featureCollection.features[0]!.properties.href, '');
+  assert.doesNotMatch(
+    source.featureCollection.features[0]!.properties.href,
+    /\/place\/archie-edwards/,
+  );
 });
 
 test('feature shade/glyph/kindFamily match displayEncodingFor and kindFamilyFor', () => {

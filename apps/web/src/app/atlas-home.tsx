@@ -1,6 +1,8 @@
 /**
  * Atlas instrument shared by `/` (the map door) and `/explore`.
- * First paint is this plate, not a featured place and not a new map UI.
+ * First paint is this plate of pins, not a featured place and not a new map UI.
+ * The pin feature collection is already in hand from `getSharedPublicEntities`;
+ * it goes on the first document so the plate is not empty while instruments hydrate.
  */
 import { FilterBar } from '@repo/ui';
 import { SynchronizedResultList } from '../components/map-experience/SynchronizedResultList';
@@ -111,7 +113,7 @@ export async function AtlasHome({ params, formAction = '/explore' }: AtlasHomePr
         </div>
       </noscript>
 
-      <AtlasLoader shell={shell} />
+      <AtlasLoader shell={shell} pins={{ type: 'FeatureCollection', features: noscriptFeatures }} />
     </>
   );
 }
