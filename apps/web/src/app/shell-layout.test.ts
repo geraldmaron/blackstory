@@ -136,11 +136,12 @@ describe('horizontal overflow guards', () => {
   const baseCss = readFileSync(join(here, '../../../../packages/ui/src/styles/base.css'), 'utf8');
   const mapSurfacesCss = readFileSync(join(here, 'explore/explore.css'), 'utf8');
 
-  it('clips document and shell sideways overflow without orphaning overflow-y', () => {
+  it('clips document sideways overflow without clipping the shell or orphaning overflow-y', () => {
     assert.match(baseCss, /html\s*\{[^}]*overflow-x:\s*clip/s);
     assert.match(baseCss, /html\s*\{[^}]*overflow-y:\s*auto/s);
     assert.match(baseCss, /body\s*\{[^}]*overflow-x:\s*clip/s);
-    assert.match(shellCss, /\.ds-shell\s*\{[^}]*overflow-x:\s*clip/s);
+    assert.match(shellCss, /\.ds-shell\s*\{[^}]*max-width:\s*100%[^}]*min-width:\s*0/s);
+    assert.doesNotMatch(shellCss, /\.ds-shell\s*\{[^}]*overflow-x:\s*clip/s);
   });
 
   it('does not size explore chrome with 100vw (scrollbar gutter / hide-translate overflow)', () => {
@@ -184,7 +185,10 @@ describe('horizontal overflow guards', () => {
       join(here, '../components/map-experience/results-rail.css'),
       'utf8',
     );
-    const sheetCss = readFileSync(join(here, '../components/map-experience/record-sheet.css'), 'utf8');
+    const sheetCss = readFileSync(
+      join(here, '../components/map-experience/record-sheet.css'),
+      'utf8',
+    );
     const cameraCss = readFileSync(
       join(here, '../components/map-experience/camera-console.css'),
       'utf8',
@@ -202,7 +206,11 @@ describe('horizontal overflow guards', () => {
     ] as const) {
       assert.doesNotMatch(source, /backdrop-filter/, `${name} must not blur`);
       assert.doesNotMatch(source, /box-shadow:\s*0\s+\d+px/, `${name} must not elevate`);
-      assert.doesNotMatch(source, /color-mix\(in srgb, var\(--ds-surface\) 94%/, `${name} stays opaque`);
+      assert.doesNotMatch(
+        source,
+        /color-mix\(in srgb, var\(--ds-surface\) 94%/,
+        `${name} stays opaque`,
+      );
     }
   });
 });

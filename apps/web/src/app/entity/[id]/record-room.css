@@ -652,3 +652,27 @@
   border-top: 0;
   padding-top: 0;
 }
+
+@media (max-width: 390px) {
+  .ds-record-mast,
+  .ds-record-mast__over,
+  .ds-record-strip {
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .ds-record-mast__title {
+    font-size: clamp(1.375rem, 7vw, 1.75rem);
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+
+  .ds-record-mast__lede,
+  .ds-record-beat,
+  .ds-record-beat__standfirst,
+  .ds-record-strip dd {
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+}

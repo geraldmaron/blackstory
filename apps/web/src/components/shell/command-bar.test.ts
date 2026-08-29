@@ -18,7 +18,8 @@ test('the 390 bar wraps to the viewport instead of clipping Rooms', () => {
   assert.doesNotMatch(block, /overflow-x:\s*clip/);
   assert.doesNotMatch(block, /max-width:\s*calc\(100vw/);
   assert.doesNotMatch(block, /max-width:\s*calc\(100%/);
-  assert.match(block, /\.ds-bar__brand[\s\S]*max-width:\s*2rem/);
+  assert.match(block, /\.ds-bar__brand[\s\S]*max-width:\s*2\.25rem/);
   assert.match(block, /wordmark__img--symbol[\s\S]*max-width:\s*100%/);
   assert.match(block, /min-width:\s*min-content/);
+  assert.match(block, /flex:\s*none/);
 });

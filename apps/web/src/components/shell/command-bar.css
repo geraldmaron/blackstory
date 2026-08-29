@@ -412,7 +412,7 @@
    * structure and its `id="bar-search"` are untouched.
    */
   .ds-bar:has(.ds-bar__search--live) {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: 2.25rem minmax(0, 1fr);
     height: auto;
     padding-block: var(--ds-space-2);
     row-gap: var(--ds-space-2);
@@ -470,24 +470,30 @@
   .ds-bar {
     box-sizing: border-box;
     min-width: 0;
+    grid-template-columns: 2.25rem minmax(0, 1fr) min-content;
   }
 
   .ds-bar__brand {
-    --ds-bar-symbol-size: 2rem;
-    width: 2rem;
-    max-width: 2rem;
+    --ds-bar-symbol-size: 2.25rem;
+    box-sizing: border-box;
+    width: 2.25rem;
+    max-width: 2.25rem;
     min-width: 0;
     overflow: hidden;
+    flex-shrink: 1;
+    margin-inline-end: 0;
   }
 
   .ds-bar__brand .ds-shell-wordmark__img--symbol,
   .ds-bar__brand .ds-shell-wordmark__img--lockup {
+    width: 2.25rem;
     max-width: 100%;
   }
 
   .ds-bar__tools {
     min-width: min-content;
     justify-self: end;
+    flex: none;
   }
 
   .ds-bar__search {
@@ -495,6 +501,7 @@
   }
 
   .ds-bar:has(.ds-bar__search--live) {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
     padding-block: var(--ds-space-1);
     row-gap: var(--ds-space-1);
   }

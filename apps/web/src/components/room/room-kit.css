@@ -1460,9 +1460,15 @@ a.ds-room-chip {
     min-width: 0;
   }
 
-  .ds-room-header__meta span {
-    white-space: normal;
+  .ds-room-header__meta,
+  .ds-room-header__meta span,
+  .ds-room-idx__count,
+  .ds-room-idx__name,
+  .ds-room-idx__place,
+  .ds-room-idx__era {
+    min-width: 0;
     overflow-wrap: anywhere;
+    white-space: normal;
   }
 
   .ds-room-prose {
