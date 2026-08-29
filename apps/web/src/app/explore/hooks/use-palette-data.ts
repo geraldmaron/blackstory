@@ -25,14 +25,8 @@ export function usePaletteData(
   );
 
   /**
-   * Every site destination, from the destination registry the breadcrumb, the library hub and the
-   * footer also read (SP-15). The bar carries two modes instead of fourteen links, so this is what
-   * keeps Data, Law, Memorial, Methodology, Corrections, Errata and Submit reachable
-   * from the Atlas.
-   *
-   * It was built from `PRIMARY_NAV` + `OVERFLOW_NAV`, which is why the palette went on offering
-   * "History" after that route became a redirect. Reading the registry means a route is in the Go
-   * section because it exists, and `destination-registry.test.ts` fails when one is missing.
+   * The same three room groups as `/about`, the footer, and Rooms. Atlas, Records,
+   * and the library hub stay off this list so the palette is not a second menu.
    */
   const destinations = useMemo<readonly PaletteDestination[]>(
     () =>

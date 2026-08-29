@@ -11,9 +11,10 @@
  * after `/history` became a redirect, so every page on the site shipped a link into a 308.
  *
  * ONE TABLE, FIVE READERS: the breadcrumb chain (`room-trail.ts`), the /library hub, the site
- * footer, the command palette's Go section, and the sitemap. `destination-registry.test.ts`
- * fails when a route classified in `surface-classes.ts` has no entry here, which is what makes
- * "a new public route cannot be missing from the library" a test rather than a habit.
+ * footer, the command palette's Go section (the same three room groups), and the sitemap.
+ * `destination-registry.test.ts` fails when a route classified in `surface-classes.ts` has no
+ * entry here, which is what makes "a new public route cannot be missing from the library" a
+ * test rather than a habit. Atlas and Records stay in the table; they stay off the room chrome.
  *
  * WHAT IS NOT HERE. Endpoints — redirects, JSON, feeds, crawler files. They render no chrome and
  * are no reader's destination; `ENDPOINT_ROUTES` in `surface-classes.ts` is their list. A route
@@ -353,9 +354,12 @@ export function destinationsInGroup(group: DestinationGroup): readonly Destinati
   return DESTINATIONS.filter((destination) => destination.group === group);
 }
 
-/** Every destination a reader can be sent to by name — the palette's Go section. */
+/**
+ * The one room list: the same three groups as `/about`, the footer, and Rooms.
+ * Atlas, Records, and the library hub stay off it.
+ */
 export function browsableDestinations(): readonly Destination[] {
-  return DESTINATIONS.filter((destination) => destination.group !== undefined);
+  return LIBRARY_CARD_GROUPS.flatMap((group) => destinationsInGroup(group));
 }
 
 /** The card title: the verb form when there is one, the crumb label otherwise. */

@@ -6,15 +6,10 @@
  * and does not say, and a "Show the numbers" disclosure holding the table. No value is
  * hover-only or colour-only: every series here is readable from the disclosure table alone.
  *
- * The kind composition graph that design-direction-v9-surfaces.md originally sent here from
- * /history does not exist. `HistoryGraphPanel` was already a `@deprecated` pass-through with no
- * graph body, and the document's own correction (repo-92n2.27) records that it was deleted, not
- * moved, because the composition facet it would have shown already lives on /records as a
- * crawlable facet. The composition card below renders the unavailable state design law defines
- * for exactly this case: a source line and a Notice, never a fabricated chart.
+ * The kind composition graph that once lived here does not exist. This page keeps the
+ * national series. It does not send a reader to the record list for a counted breakdown.
  */
 import type { ReactNode } from 'react';
-import Link from 'next/link';
 import type {
   HistoricalStatePopulationCoverage,
   NationalPopulationTimelineRow,
@@ -121,8 +116,8 @@ function ChartCard({
             <DataTable caption={table.caption} columns={table.columns} rows={table.rows} />
           ) : (
             <p>
-              No numeric series is attached to this card. See the kind facet on{' '}
-              <Link href="/records">the record index</Link> for the counted breakdown.
+              No numeric series is attached to this card. The counted breakdown of the archive
+              is not a chart on this page.
             </p>
           )}
         </Disclosure>

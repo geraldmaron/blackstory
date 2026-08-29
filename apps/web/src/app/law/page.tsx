@@ -11,13 +11,9 @@ import { WalkOffRamp } from '../walk-off-ramp';
 import { LAW_EDITION_BROWSE_LEDE } from './law-copy';
 import { buildLawBrowseViewModel, type RawLawBrowseParams } from './law-view-model';
 import { loadLegalCatalog } from '../../lib/legal/public-source';
-import {
-  LawBrowseSections,
-  jurisdictionLabel,
-  statePostalForJurisdiction,
-} from './LawBrowseSections';
+import { LawBrowseSections } from './LawBrowseSections';
 import { humanizeLegalKind } from '../../components/legal';
-import { Room, RoomHeader, RailGroup } from '../../components/room';
+import { Room, RoomHeader } from '../../components/room';
 import '../reading-room.css';
 
 void React;
@@ -50,38 +46,8 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
         `${count} ${humanizeLegalKind(kind).toLowerCase()}${count === 1 ? '' : 's'}`,
     );
 
-  const jurisdictionCounts = new Map<
-    string,
-    { readonly label: string; readonly postal: string | undefined; count: number }
-  >();
-  for (const snapshot of catalog) {
-    const label = jurisdictionLabel(snapshot.jurisdictionId);
-    const postal = statePostalForJurisdiction(snapshot.jurisdictionId);
-    const existing = jurisdictionCounts.get(label);
-    if (existing) existing.count += 1;
-    else jurisdictionCounts.set(label, { label, postal, count: 1 });
-  }
-  const byJurisdiction = [...jurisdictionCounts.values()]
-    .sort((a, b) => b.count - a.count)
-    .map((entry) => ({
-      label: entry.label,
-      count: entry.count,
-      href: entry.postal ? `/explore?state=${entry.postal}` : '/explore',
-    }));
-
-  const rail = (
-    <>
-      <p className="ds-room-note">
-        These jurisdiction links open the map by place of authority alone. The archive does
-        not document that any specific record was decided under, or is otherwise connected to,
-        a given law.
-      </p>
-      <RailGroup title="By jurisdiction" entries={byJurisdiction} limit={12} />
-    </>
-  );
-
   return (
-    <Room rail={rail}>
+    <Room>
       <RoomHeader
         pathname="/law"
         kicker="Reference"

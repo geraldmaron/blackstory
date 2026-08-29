@@ -11,6 +11,7 @@ import { EditionFactIcon } from '../../components/patterns/EditionFactIcon';
 import { LegalStatusBadge } from '../../components/legal/LegalStatusBadge';
 import { humanizeLegalKind } from '../../components/legal/format';
 import { Anatomy } from '../../components/room';
+import { jurisdictionLabel } from './LawBrowseSections';
 import '../../components/patterns/edition-fact-icon.css';
 
 export type LawAnatomyStripProps = {
@@ -67,7 +68,7 @@ export function LawAnatomyStrip({
         {
           label: 'Jurisdiction',
           icon: <EditionFactIcon variant="record-where" />,
-          value: <span className="ds-mono">{jurisdictionId}</span>,
+          value: jurisdictionLabel(jurisdictionId),
         },
         {
           label: 'Citation',
