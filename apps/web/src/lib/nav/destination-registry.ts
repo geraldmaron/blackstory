@@ -208,6 +208,16 @@ const DESTINATIONS: readonly Destination[] = [
 
   /* ---- check the archive ---- */
   {
+    path: '/about',
+    label: 'About',
+    parent: '/library',
+    kind: 'FRAMING',
+    description: 'What this is for, who it is for, and what it refuses to do.',
+    menuLine: 'What this refuses to do',
+    group: 'check',
+    crawl: { changeFrequency: 'monthly', priority: 0.5 },
+  },
+  {
     path: '/methodology',
     label: 'Methodology',
     parent: '/library',
@@ -230,16 +240,6 @@ const DESTINATIONS: readonly Destination[] = [
     menuLine: 'Mistakes, published',
     group: 'check',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
-  },
-  {
-    path: '/about',
-    label: 'About',
-    parent: '/library',
-    kind: 'FRAMING',
-    description: 'What this is for, who it is for, and what it refuses to do.',
-    menuLine: 'What this refuses to do',
-    group: 'check',
-    crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
 
   /* ---- take part ---- */

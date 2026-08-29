@@ -50,7 +50,7 @@ export type CommandBarProps = {
   /**
    * Present only on the Atlas, where Atlas and Journey are two views of one surface. Every other
    * room renders the same bar without Journey: `/journey` is not a room, and a header label that
-   * names it would invent one. Off the Atlas the bar keeps Atlas as a link to `/explore`.
+   * names it would invent one. Off the Atlas the bar does not name Atlas or Journey.
    */
   readonly mode?: AtlasMode;
   readonly onModeChange?: (mode: AtlasMode) => void;
