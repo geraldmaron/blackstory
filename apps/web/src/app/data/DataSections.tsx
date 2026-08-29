@@ -21,7 +21,6 @@ import type {
   StatePopulationChange,
 } from '@repo/domain/statistics/public-data-summaries';
 import type { DataPageIndicatorBundle } from '@repo/domain/statistics/data-page-series';
-import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataStatStrip } from '../../components/data/DataStatStrip';
 import { GroupedBarIndicatorChart } from '../../components/data/GroupedBarIndicatorChart';
@@ -225,10 +224,6 @@ export function DataSections({
             ))}
           </ul>
         </nav>
-        <p className="ds-data-edition__credit">
-          Archive texture · symbolic atmosphere.{' '}
-          <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
-        </p>
       </article>
 
       <ChartCard

@@ -68,6 +68,8 @@ test('data user-facing copy does not leak Phase 1 or warehouse', () => {
   assert.doesNotMatch(sectionsSource, /href="\/explore"/);
   assert.doesNotMatch(pageSource, /The place is the door back|Back to the place/);
   assert.doesNotMatch(copySource, /The place is the door back/);
+  assert.doesNotMatch(sectionsSource, /Mosaic credits|ATMOSPHERE_ATTRIBUTION|mosaic-credits/);
+  assert.doesNotMatch(pageSource, /Mosaic credits|ATMOSPHERE_ATTRIBUTION|mosaic-credits/);
 });
 
 test('data user-facing copy avoids em dashes', () => {

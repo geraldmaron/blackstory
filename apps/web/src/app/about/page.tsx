@@ -24,7 +24,6 @@ import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { MakerCredit } from '../../components/MakerCredit';
 import { WalkOffRamp } from '../walk-off-ramp';
-import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import {
   cardTitleFor,
   destinationsInGroup,
@@ -178,10 +177,6 @@ export default function AboutPage() {
       </WalkOffRamp>
 
       <div className="ds-about-page__foot">
-        <p className="ds-about-page__credit">
-          Archive texture, symbolic atmosphere.{' '}
-          <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
-        </p>
         <MakerCredit variant="inline" />
       </div>
     </Room>
