@@ -123,15 +123,21 @@
 }
 
 /* Narrow: the panel spans the bar and the three columns stack. A 660px mega-menu on a phone is a
-   page, and this one would cover the surface it was opened from. */
+   page, and this one would cover the surface it was opened from. The stacked command bar raises
+   --ds-island-height; the Atlas gutter token does not, so the sheet would sit under the bar. */
 @media (max-width: 60rem) {
+  .ds-libmenu__trigger,
+  .ds-libmenu__item {
+    min-height: 44px;
+  }
+
   .ds-libmenu__panel {
     position: fixed;
-    top: calc(var(--ds-atlas-top) - 8px);
+    top: calc(var(--ds-island-height) + var(--ds-space-2) + var(--ds-space-2));
     right: var(--ds-space-2);
     left: var(--ds-space-2);
     width: auto;
-    max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-space-4));
+    max-height: calc(100dvh - var(--ds-island-height) - var(--ds-space-2) - var(--ds-space-4) * 2);
     overflow-y: auto;
   }
 

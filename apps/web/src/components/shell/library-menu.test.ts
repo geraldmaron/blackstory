@@ -27,3 +27,11 @@ test('the library menu rooms come from the same registry groups the hub renders'
   assert.match(source, /destinationsInGroup/);
   assert.ok(!destinationsInGroup('read').some((destination) => destination.path === '/books'));
 });
+
+test('the narrow rooms panel clears the stacked bar, not the Atlas gutter', () => {
+  const css = readFileSync(join(here, 'library-menu.css'), 'utf8');
+  assert.match(css, /@media \(max-width: 60rem\)/);
+  assert.match(css, /--ds-island-height/);
+  assert.match(css, /overflow-y:\s*auto/);
+  assert.doesNotMatch(css, /--ds-atlas-top/);
+});

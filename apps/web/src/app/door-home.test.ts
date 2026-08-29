@@ -48,12 +48,16 @@ test('the door plate sits in the page, not over the rooms', () => {
   assert.match(css, /:has\(\.ds-door\)/);
   assert.match(css, /position:\s*absolute/);
   assert.match(css, /@media \(max-width: 559px\)/);
+  assert.match(css, /@media \(max-width: 390px\)/);
+  assert.match(css, /@media \(max-width: 390px\)[\s\S]*position:\s*relative/);
   assert.match(css, /position:\s*relative/);
   assert.doesNotMatch(css, /box-shadow|backdrop-filter|linear-gradient/);
 });
 
 test('the door prints the existing about line, not a rewrite', () => {
-  const pins = toFirstPaintPins(buildExploreMapSource(listPublicEntities()).featureCollection.features);
+  const pins = toFirstPaintPins(
+    buildExploreMapSource(listPublicEntities()).featureCollection.features,
+  );
   const html = `${ABOUT_LINE}${ABOUT_WALK_PAST}${renderToStaticMarkup(
     createElement(FirstPaintPinPlate, { pins }),
   )}`;
