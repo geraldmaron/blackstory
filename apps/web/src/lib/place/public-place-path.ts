@@ -1,6 +1,11 @@
 /**
  * Public place addresses. A reader follows `/place/fifteenth-street-presbyterian-church`,
  * never `/entity/ent_…`. Slugs are derived from the published name, not the catalog id.
+ *
+ * A `/place/{slug}` walk is only emitted when that slug actually resolves on the place
+ * page (`loadHomeFirstPaint({ namedSlug, requireNamed: true })`). That lookup is the
+ * stand-candidate ids plus the bundled seed names that can stand. Slugifying a published
+ * catalog name is not enough, and invents a 404.
  */
 
 const TULSA_PLACE = /tulsa|greenwood|black wall street/i;
@@ -49,6 +54,45 @@ export function isPublicPlaceSlug(value: string): boolean {
 }
 
 /**
+ * Place-page point-gets. Same ids `loadHomeFirstPaint` stands at. A live catalog
+ * name is not a holding slug unless it is one of these records.
+ */
+export const PLACE_PAGE_STAND_IDS = [
+  'ent_aarlcc_fort_lauderdale_001',
+  'nrhp-black-heritage-91000107',
+  'nrhp-black-heritage-100001861',
+  'ent_dunbar_school_001',
+  'ent_15th_st_church_001',
+  'ent_greenwood_district_001',
+] as const;
+
+/**
+ * Slugs the place page resolves via its seed path (`seedBySlug`). Keep in lockstep
+ * with `listPublicEntities()` ∩ `canStandHere` — tested, not invented.
+ */
+export const SEED_HOLDING_PLACE_SLUGS = [
+  'fifteenth-street-presbyterian-church',
+  'paul-laurence-dunbar-high-school',
+  'd-c-inventory-of-historic-sites-listing-1975',
+  'dunbar-alumni-federation',
+] as const;
+
+export function isPlacePageStandId(entityId: string): boolean {
+  return (PLACE_PAGE_STAND_IDS as readonly string[]).includes(entityId);
+}
+
+/** True when `/place/{slug}` is an address the place page will hold. */
+export function placePageHolds(input: {
+  readonly displayName: string;
+  readonly entityId?: string;
+}): boolean {
+  if (input.entityId !== undefined && isPlacePageStandId(input.entityId)) return true;
+  return (SEED_HOLDING_PLACE_SLUGS as readonly string[]).includes(
+    publicPlaceSlug(input.displayName),
+  );
+}
+
+/**
  * Address a neighbor from the place door. People and statutes go to the named
  * rooms, not a fabricated place page and never `/entity/ent_…`.
  */
@@ -62,16 +106,20 @@ export function neighborHref(neighbor: {
 }
 
 /**
- * Walk from the home map. Places use the public slug already derived from the
- * published name. Never `/entity/…`, and never a slug invented from a catalog id.
+ * Walk from the home map. `/place/{slug}` only when that slug holds on the place
+ * page. People and statutes go to those rooms. Everything else stays on the plate.
+ * Never `/entity/…`, and never a slug invented from a catalog id or a published name.
  */
 export function atlasWalkHref(input: {
   readonly displayName: string;
   readonly kind?: string;
+  readonly entityId?: string;
 }): string | undefined {
   if (isInternalRecordLabel(input.displayName)) return undefined;
-  if (input.kind !== undefined) {
-    return neighborHref({ displayName: input.displayName, kind: input.kind });
+  if (input.kind === 'person') return '/memorial';
+  if (input.kind === 'law' || input.kind === 'case') return '/law';
+  if (!placePageHolds({ displayName: input.displayName, entityId: input.entityId })) {
+    return undefined;
   }
   return placeHref(input.displayName);
 }

@@ -591,7 +591,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           // swallowed: the palette closed and nothing opened, which reads as a broken search.
           // Every record has a page even when it has no pin, so fall through to it.
           setPaletteOpen(false);
-          const walk = atlasWalkHref({ displayName: record.name });
+          const walk = atlasWalkHref({ displayName: record.name, entityId: record.id });
           if (walk) window.location.assign(walk);
         }}
         onJumpToState={(paletteState) => {
@@ -619,7 +619,11 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
             return;
           }
           // Same as the palette: a saved record whose pin is not in this projection still opens.
-          const walk = atlasWalkHref({ displayName: record.name, kind: record.kind });
+          const walk = atlasWalkHref({
+            displayName: record.name,
+            kind: record.kind,
+            entityId: record.id,
+          });
           if (walk) window.location.assign(walk);
         }}
         onRemove={(id) => persist(unsaveRecord(collection, id))}

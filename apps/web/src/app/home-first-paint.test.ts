@@ -9,7 +9,8 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import type { PublicArticleListItemDoc } from '@repo/schemas';
-import { FEATURED_SEED_IDS, getPublicEntity } from '../data/public-seed';
+import { FEATURED_SEED_IDS, getPublicEntity, listPublicEntities } from '../data/public-seed';
+import { buildExploreMapSource } from '../lib/map-experience/build-explore-map-source';
 import { isTulsaPlace, placeHref } from '../lib/place/public-place-path';
 import { buildEntityAnatomyInputs } from './entity/[id]/entity-anatomy-facts';
 import { HomeFirstPaint } from './HomeFirstPaint';
@@ -53,6 +54,20 @@ test('the featured set prefers non-Tulsa places; Greenwood is last-resort', () =
   assert.ok(FEATURED_SEED_IDS.includes('ent_15th_st_church_001'));
   assert.ok(getPublicEntity('ent_dunbar_school_001'));
   assert.ok(getPublicEntity('ent_15th_st_church_001'));
+});
+
+test('every /place/ href on the seed map source holds on the place page', async () => {
+  const source = buildExploreMapSource(listPublicEntities());
+  const placeHrefs = source.featureCollection.features
+    .map((feature) => feature.properties.href)
+    .filter((href) => href.startsWith('/place/'));
+  assert.ok(placeHrefs.length > 0);
+  for (const href of placeHrefs) {
+    const slug = href.slice('/place/'.length);
+    const model = await loadHomeFirstPaint({ namedSlug: slug, requireNamed: true });
+    assert.ok(model.lead, `${href} must hold`);
+    assert.doesNotMatch(href, /archie-edwards|barnett-aden|industrial-bank|whitelaw/);
+  }
 });
 
 test('the loader stands away from Tulsa, or at a named slug', async () => {
@@ -145,7 +160,9 @@ test('`/` mounts the Atlas; a place page never mounts the catalog boot or camera
   assert.doesNotMatch(paint, /Open the full record/);
   assert.match(paint, /MAP_BACK|BlackStory/);
   assert.doesNotMatch(loader, /Loading \{shell\.totalMatched|4,101 records/);
-  assert.match(loader, /Opening the map/);
+  assert.doesNotMatch(loader, /Opening the map/);
+  assert.match(loader, /firstPaintCatalog/);
+  assert.match(loader, /readonly pins/);
   assert.match(panels, /lens: false/);
   assert.match(panels, /results: false/);
   assert.match(panels, /decade: false/);
@@ -253,7 +270,10 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.doesNotMatch(html, /Open a room from this place/);
   assert.doesNotMatch(html, /not a photograph|symbolic mark/i);
   assert.doesNotMatch(html, /Banned books|\/banned-books/);
-  assert.doesNotMatch(html, /neighborhood-level pin|locality precision|radius affordance|campus-level pin/i);
+  assert.doesNotMatch(
+    html,
+    /neighborhood-level pin|locality precision|radius affordance|campus-level pin/i,
+  );
 });
 
 test('seed Dunbar first paint has no claim ids, rights caption, or ent_ addresses', () => {
@@ -287,7 +307,10 @@ test('seed Dunbar first paint has no claim ids, rights caption, or ent_ addresse
   assert.doesNotMatch(html, /Open a room from this place/);
   assert.doesNotMatch(html, /not a photograph|symbolic mark/i);
   assert.doesNotMatch(html, /Banned books|\/banned-books/);
-  assert.doesNotMatch(html, /neighborhood-level pin|locality precision|radius affordance|campus-level pin/i);
+  assert.doesNotMatch(
+    html,
+    /neighborhood-level pin|locality precision|radius affordance|campus-level pin/i,
+  );
 });
 
 test('the church locator names the place, not a pin taxonomy', () => {
@@ -298,10 +321,7 @@ test('the church locator names the place, not a pin taxonomy', () => {
       model: { lead: church, also: [], story: undefined, citing: [], source: 'seed' },
     }),
   );
-  assert.match(
-    html,
-    /aria-label="Fifteenth Street Presbyterian Church, Washington, D\.C\."/,
-  );
+  assert.match(html, /aria-label="Fifteenth Street Presbyterian Church, Washington, D\.C\."/);
   assert.match(html, /href="\/place\/paul-laurence-dunbar-high-school"/);
   assert.doesNotMatch(html, /neighborhood-level pin|locality precision|radius affordance/i);
   assert.doesNotMatch(html, /Locator map of the United States/);

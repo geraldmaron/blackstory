@@ -231,7 +231,12 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
     geometry: feature.geometry,
     properties: {
       entityId: entity.id,
-      href: atlasWalkHref({ displayName: entity.displayName, kind: entity.kind }) ?? '/',
+      href:
+        atlasWalkHref({
+          displayName: entity.displayName,
+          kind: entity.kind,
+          entityId: entity.id,
+        }) ?? '',
       kind: feature.properties.kind,
       displayName: feature.properties.displayName,
       oneLineStory: sanitizePublicProseText(entity.summary),

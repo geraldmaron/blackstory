@@ -95,14 +95,20 @@ function ResultRowMeta({ feature }: ResultRowMetaProps) {
       <div className="ds-result-meta">
         <MetaFieldLabel field="evidence">Evidence</MetaFieldLabel>
         <dd className="ds-sans">
-          <Link
-            className="ds-result-meta__link"
-            href={entityEvidenceHref(properties.href)}
-            aria-label={`View ${evidenceLabel} on full record`}
-            title={`${evidenceLabel}. How many accepted, cited claims sit on the full record.`}
-          >
-            {evidenceLabel}
-          </Link>
+          {properties.href ? (
+            <Link
+              className="ds-result-meta__link"
+              href={entityEvidenceHref(properties.href)}
+              aria-label={`View ${evidenceLabel} on full record`}
+              title={`${evidenceLabel}. How many accepted, cited claims sit on the full record.`}
+            >
+              {evidenceLabel}
+            </Link>
+          ) : (
+            <span title={`${evidenceLabel}. How many accepted, cited claims sit on this record.`}>
+              {evidenceLabel}
+            </span>
+          )}
         </dd>
       </div>
       <div className="ds-result-meta">
@@ -182,11 +188,16 @@ export function SynchronizedResultList({
                 <h3 className="ds-result-list__title">{properties.displayName}</h3>
                 <p className="ds-result-list__summary">{properties.oneLineStory}</p>
               </button>
-            ) : (
+            ) : properties.href ? (
               <Link {...primaryControlProps} href={properties.href}>
                 <h3 className="ds-result-list__title">{properties.displayName}</h3>
                 <p className="ds-result-list__summary">{properties.oneLineStory}</p>
               </Link>
+            ) : (
+              <div {...primaryControlProps}>
+                <h3 className="ds-result-list__title">{properties.displayName}</h3>
+                <p className="ds-result-list__summary">{properties.oneLineStory}</p>
+              </div>
             )}
             <ResultRowMeta feature={feature} />
           </li>

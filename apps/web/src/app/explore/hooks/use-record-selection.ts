@@ -146,7 +146,7 @@ export function useRecordSelection(
        * false about a record whose page cites a source.
        */
       sourceCount: sources,
-      href: selectedFeature.properties.href,
+      ...(selectedFeature.properties.href ? { href: selectedFeature.properties.href } : {}),
       sources: buildSheetSources(allTimeEdges, selectedFeature.properties.entityId),
       connections: buildSheetConnections(
         allTimeEdges,

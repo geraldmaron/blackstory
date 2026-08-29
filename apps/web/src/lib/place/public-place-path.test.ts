@@ -3,6 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { listPublicEntities } from '../../data/public-seed';
 import {
   atlasWalkHref,
   canStandHere,
@@ -11,7 +12,9 @@ import {
   isTulsaPlace,
   neighborHref,
   placeHref,
+  placePageHolds,
   publicPlaceSlug,
+  SEED_HOLDING_PLACE_SLUGS,
 } from './public-place-path';
 
 test('slug comes from the published name, never the catalog id', () => {
@@ -84,12 +87,37 @@ test('neighbor hrefs stay off internal ids', () => {
   assert.equal(neighborHref({ displayName: 'A statute on this record', kind: 'law' }), '/law');
 });
 
-test('the home-map walk uses the public place slug, never /entity/', () => {
+test('seed holding slugs match the place page seed path, and are not invented', () => {
+  const computed = listPublicEntities()
+    .filter((entity) => canStandHere(entity))
+    .map((entity) => publicPlaceSlug(entity.displayName))
+    .sort();
+  assert.deepEqual([...SEED_HOLDING_PLACE_SLUGS].sort(), computed);
+});
+
+test('the home-map walk uses a holding slug, never a slugified name or /entity/', () => {
   assert.equal(
     atlasWalkHref({ displayName: 'Paul Laurence Dunbar High School', kind: 'organization' }),
     '/place/paul-laurence-dunbar-high-school',
   );
+  assert.equal(
+    atlasWalkHref({
+      displayName: 'African American Research Library and Cultural Center',
+      kind: 'place',
+      entityId: 'ent_aarlcc_fort_lauderdale_001',
+    }),
+    '/place/african-american-research-library-and-cultural-center',
+  );
+  assert.equal(
+    atlasWalkHref({
+      displayName: 'Archie Edwards Alpha Tonsorial Palace',
+      kind: 'place',
+    }),
+    undefined,
+  );
+  assert.equal(atlasWalkHref({ displayName: 'Barnett Aden Gallery', kind: 'place' }), undefined);
   assert.equal(atlasWalkHref({ displayName: 'A named neighbor', kind: 'person' }), '/memorial');
   assert.equal(atlasWalkHref({ displayName: 'ent_dunbar_school_001' }), undefined);
   assert.equal(atlasWalkHref({ displayName: '42Cb1758', kind: 'place' }), undefined);
+  assert.equal(placePageHolds({ displayName: 'Industrial Bank of Washington' }), false);
 });
