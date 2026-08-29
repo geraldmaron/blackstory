@@ -313,8 +313,7 @@ export function DataSections({
           </>
         ) : (
           <p className="ds-data-edition__empty">
-            Census population figures are not available on this release. The place is the door
-            back.
+            Census population figures are not available on this release.
           </p>
         )}
       </ChartCard>

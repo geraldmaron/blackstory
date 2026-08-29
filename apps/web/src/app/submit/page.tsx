@@ -46,9 +46,7 @@ export default function SubmitLeadPage() {
         <a href="/methodology">how a record gets in</a>.
       </EmptyState>
 
-      <WalkOffRamp title="The place">
-        Nothing you send here is public on arrival.
-      </WalkOffRamp>
+      <WalkOffRamp>Nothing you send here is public on arrival.</WalkOffRamp>
     </Room>
   );
 }

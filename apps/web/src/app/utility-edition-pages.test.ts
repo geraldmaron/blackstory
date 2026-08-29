@@ -78,9 +78,10 @@ test('not-found offers the four exits the design law names, and no gallery', () 
   const source = readFileSync(join(appDir, 'not-found.tsx'), 'utf8')
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/^[ \t]*\/\/.*$/gm, '');
-  // The place is the door. Atlas is the old board, not a recovery room.
+  // Recovery goes to the stand the reader left. Atlas is the old board.
   assert.match(source, /href="\/"/);
-  assert.match(source, /The place/);
+  assert.match(source, /loadWalkBackPlace/);
+  assert.doesNotMatch(source, /The place/);
   assert.match(source, /href="\/stories"/);
   assert.match(source, /⌘K/);
   assert.doesNotMatch(source, /Open the Atlas|ATLAS_INSTRUMENT/);
