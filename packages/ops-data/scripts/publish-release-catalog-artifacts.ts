@@ -31,7 +31,12 @@
  *   node --conditions development --import tsx \
  *     packages/ops-data/scripts/publish-release-catalog-artifacts.ts
  *
- * Scheduled run: .github/workflows/publish-release-catalog-artifacts.yml, every 5 minutes.
+ * Scheduled run: .github/workflows/publish-release-catalog-artifacts.yml. The workflow's
+ * PRIMARY trigger is workflow_dispatch right after an operator runs an ops-data script; the
+ * cron is a DAILY tick ('17 9 * * *') that bounds worst-case staleness after a forgotten
+ * publish. It polled every 5 minutes until 2026-08-08 and was deliberately slowed: 288 runs/day
+ * to detect a human-initiated action is noise, not coverage. Do not read the watermark's
+ * cheapness as a reason to restore polling — read it as the reason a missed tick is recoverable.
  *
  * Env: DATABASE_URL (or APP_DATABASE_URL), SUPABASE_URL, SUPABASE_SECRET_KEY
  * (or SUPABASE_SERVICE_ROLE_KEY). DRY_RUN=1 builds and reports without uploading or touching
@@ -47,6 +52,35 @@ import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import { shouldSkipPublish, shouldUploadArtifact } from './lib/release-catalog-publish-decision.ts';
 
 const PUBLIC_MEDIA_BUCKET = process.env.APP_PUBLIC_MEDIA_BUCKET?.trim() || 'public-media';
+
+/**
+ * What the CDN and browsers are told about a published artifact.
+ *
+ * WHY THIS IS LONG (measured 2026-08-24). It was `max-age=3600`, under a comment that said
+ * "cache aggressively" — one hour is not aggressive for an object that changes a few times a
+ * month. `entities.json` for the active release is **16.0 MB**. At a one-hour TTL every
+ * Cloudflare PoP that serves a request re-fetches all 16 MB from Storage every hour, forever,
+ * for bytes that did not change. That is billed Storage egress, and at ~20-30 active PoPs it is
+ * hundreds of GB/month on its own.
+ *
+ * WHY A LONG TTL IS SAFE HERE, which is not obvious. The object path is release-versioned
+ * (`public/releases/{releaseId}/…`), but that alone does NOT make the URL immutable: this script
+ * uploads with `x-upsert: true`, and the watermark trigger fires on any write to
+ * `release_entities` / `search_index` for the release that is already active. So editing the
+ * live release rewrites the same URL, and a naive `immutable` would pin stale data at the edge
+ * until the releaseId changed.
+ *
+ * It is safe because Supabase's Smart CDN purges on overwrite. Verified empirically on
+ * 2026-08-24: uploaded a probe object, confirmed `cf-cache-status: HIT`, overwrote it, and the
+ * very next request served the new body. Re-verify this before shortening the reasoning — the
+ * whole TTL rests on it.
+ *
+ * `max-age` (browser) stays short because Smart CDN purges the EDGE, not somebody's browser
+ * cache; `s-maxage` is the edge TTL that actually carries the saving. Same shape as
+ * `ATLAS_CATALOG_CACHE_CONTROL` in apps/web.
+ */
+const PUBLIC_ARTIFACT_CACHE_CONTROL =
+  'max-age=300, s-maxage=31536000, stale-while-revalidate=86400';
 
 type WatermarkRow = {
   readonly dirty_at: Date | null;
@@ -72,9 +106,7 @@ async function uploadJson(objectPath: string, body: string): Promise<void> {
       authorization: `Bearer ${secretKey}`,
       apikey: secretKey,
       'content-type': 'application/json; charset=utf-8',
-      // Cache aggressively at the CDN: the object path is release-versioned and consumers
-      // discover the current releaseId from the live active_release pointer.
-      'cache-control': 'max-age=3600',
+      'cache-control': PUBLIC_ARTIFACT_CACHE_CONTROL,
       'x-upsert': 'true',
     },
     body,
