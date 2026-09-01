@@ -48,7 +48,7 @@ Atlas `/explore`
  └─ selected record preview on demand
 
 Records `/records`
- └─ full PublicEntityView catalog → in-memory facets (cost risk; must keep ungeocoded)
+ └─ search_index when ≥95% docs have `confidenceTier` (~2.1 MB); else full entities
 
 Place `/place/[slug]`
  ├─ point-get release_entities (+ neighbor batches)
