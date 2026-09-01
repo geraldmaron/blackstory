@@ -78,7 +78,7 @@ Books / Law / Data
 | Current cost driver | Evidence | Cause | UX impact | Recommended change | Expected savings | Confidence | Migration risk |
 |---|---|---|---|---|---|---|---|
 | Full `release_entities` SQL on artifact miss | ~253GB/20d incident cited in ops notes; ~7.4MB/~4k rows | CDN miss falls through to SQL | Latency + egress spike | Keep artifact origin hot; alert on misses | Large on miss days | High | Low |
-| Door + Records hydrate full catalog | `door-home.tsx`, `records/page.tsx` | Shared full-entity load | Slow TTFB; memory | Door: skip Atlas shell (done). Records: request-scoped index cache (done). search_index slim blocked until evidence/confidence is projected | Medium–High | High | Medium |
+| Door + Records hydrate full catalog | `door-home.tsx`, `records/page.tsx` | Shared full-entity load | Slow TTFB; memory | Door: skip Atlas shell (done). Records: request-scoped index cache (done). `confidenceTier` now on search_index write path; backfill + slim still open | Medium–High | High | Medium |
 | Place cites via full articles list | `home-first-paint` cite resolution | No per-entity cites index | Place cost grows with corpus | Per-entity cites snapshot in release | High at scale | High | Medium |
 | `/atlas/catalog` cold rebuild + cites | ~949KB gz | Cold path rebuild | First Explore slow | Cache cites with catalog | Medium | Medium | Low |
 | In-place edits without bumping `activated_at` | 30m cache key staleness | Watermark not in key | Stale public data | Include hash/watermark in cache key | Correctness | High | Low |
@@ -94,6 +94,7 @@ Option B (viewport SQL) and Option C (tiles) deferred until catalog growth makes
 - Per-entity citing-stories index (avoid full article scan)
 - Optional compact Place read model bundling identity + geo + evidence summary + edge counts
 - Do **not** hydrate full evidence arrays into map catalog
+- **Unblocked for Records slim:** `confidenceTier` is on the search_index write path; run `backfill-search-facets-confidence.ts` on active release, then switch Records to `getPublicSearchIndex`
 
 ## Observability before/after Place work
 
