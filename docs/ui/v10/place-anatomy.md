@@ -14,12 +14,8 @@
 | Renderer (Place) | `HomeFirstPaint`: evidence, precision caveat, trust block, Atlas/Records return | RelationshipConstellation visual still open |
 | Banned on Place | schema strip, Grade letter strip, precision shop talk | Keep |
 | Sections | `EntityRoomSections` + trust + discovery off-ramp | Constellation visual incomplete |
-| Neighbors | Typed edges vs continue-learning leads (separate sections; nearby ≠ related) | Constellation visual still open |
-| Citing stories | `publishableCitingStories` | Keep; cost: may scan articles |
-| Map | `RecordPlacePreview` + precision caveat | Keep |
-| Sitemap | Standable → `/place/…`; else `/entity/{id}` | Done |
-| Trust | Coverage, cited-source count, methodology, corrections | Done |
-| Discovery return | Atlas/Records with arrival filters (`from=map|list`); list prev/next when `from=list` | Map-context prev/next still open |
+| Neighbors | `RelationshipConstellation` for typed edges; continue-learning separate | Batch public relationship projection still open |
+| Discovery return | Atlas/Records with arrival filters; list prev/next when `from=list` | Map-context prev/next still open |
 
 **Critical product gap (closed for resolution):** Place resolves standable release records via the search index + point-get. Door Rest pin walks remain allowlist-only. Remaining Place work is constellation, trust, and discovery continuity, not address coverage.
 
