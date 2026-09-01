@@ -53,7 +53,7 @@
 | P1.1 Place Record anatomy | Full 8-question Place page without v6 card filing cabinet | P0.4 |
 | P1.2 Atlas progressive disclosure | Rest stays Door; Explore/Focus chrome after engagement | P0.1 |
 | P1.3 Container capacity states | Compact/Comfortable/Expansive for PlaceMast, Evidence, Constellation, Spine | P1.1 |
-| P1.4 Library Hub | Semantic groups, not settings menu | P0.1 |
+| P1.4 Library Hub | Semantic groups, not settings menu | **Done** — hub framing + group standfirsts; one-column TOC |
 
 ---
 

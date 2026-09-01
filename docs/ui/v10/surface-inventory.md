@@ -14,7 +14,7 @@
 | `/place/[slug]` | `record` | Holding place walks only (~10) | `HomeFirstPaint`, `EntityRoomSections` | Thinned anatomy; tiny hold set | **Redesign** full Place for corpus | Place Record |
 | `/entity/[id]` | `record` | Full record room; 308 to `/place` only when place holds | `entity/[id]/page.tsx` | Sitemap still lists `/entity/*` | **Keep** interim; expand Place | Place Record |
 | `/records` | `reading` | Crawlable non-spatial index | `records/*`, `build-records-index` | Full-catalog hydrate cost | **Keep** + slim projection | Reference Ledger / index |
-| `/library` | `reading` | Knowledge hub beyond map | `library/page.tsx` | Must not read as settings | **Redesign** restrained hub | Library Hub |
+| `/library` | `reading` | Knowledge hub beyond map | `library/page.tsx` | Must not read as settings | **Keep** restrained hub (v10 framing + group standfirsts) | Library Hub |
 | `/stories` | `reading` | Editorial index | `stories/page.tsx` | Docs said `/chapters` | **Redesign** editorial archive | Story Spine (index) |
 | `/stories/[slug]` | `reading` | Chapter/article | story components | Spine/map moments incomplete | **Redesign** | Story Spine |
 | `/stories/mosaic-credits` | `utility` | Mosaic rights | mosaic-credits page | — | **Keep** | Utility Desk |
