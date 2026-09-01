@@ -49,6 +49,8 @@ export type CommandContext = {
   readonly setMode: (mode: 'atlas' | 'story') => void;
   /** Leaves the instrument for the library hub. A navigation, not a mode change. */
   readonly openLibrary: () => void;
+  /** Leaves the instrument for the Door Journey on `/`. */
+  readonly openDoor: () => void;
   readonly togglePlayback: () => void;
   readonly toggleTheme: () => void;
   readonly toggleDensity: () => void;
@@ -205,10 +207,10 @@ export const COMMANDS: readonly Command[] = [
   },
   {
     id: 'view.story',
-    title: 'Story mode',
+    title: 'Open the Door',
     section: 'View',
     keys: ['2'],
-    run: (context) => context.setMode('story'),
+    run: (context) => context.openDoor(),
   },
   {
     id: 'view.library',

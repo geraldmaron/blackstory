@@ -1,0 +1,66 @@
+/**
+ * Visit block on entity and place pages: address, standing, and maps handoff.
+ */
+
+.ds-record-visit {
+  display: grid;
+  gap: var(--ds-space-3);
+}
+
+.ds-record-visit__heading {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-muted);
+}
+
+.ds-record-visit__address {
+  margin: 0;
+  font-family: var(--ds-font-serif);
+  font-size: var(--ds-text-md);
+  line-height: 1.45;
+  color: var(--ds-ink);
+}
+
+.ds-record-visit__standing {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-sm);
+  color: var(--ds-muted);
+}
+
+.ds-record-visit__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+}
+
+.ds-record-visit--rail {
+  gap: var(--ds-space-2);
+}
+
+@media (max-width: 67.99rem) {
+  .ds-record-visit--rail {
+    display: none;
+  }
+}
+
+@media (min-width: 68rem) {
+  .ds-record-visit--main {
+    display: none;
+  }
+}
+
+.ds-record-visit--rail .ds-record-visit__heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

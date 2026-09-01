@@ -163,6 +163,25 @@ export function MethodologySections() {
         </Prose>
       </section>
 
+      <section aria-labelledby="internet-archive-heading" id="internet-archive">
+        <GroupHeading>
+          <span id="internet-archive-heading">Internet Archive handoff</span>
+        </GroupHeading>
+        <Prose>
+          <p>
+            BlackStory links out to preserved copies rather than republishing full third-party
+            pages. When a citation points to the Internet Archive or the Wayback Machine, the record
+            page lists those archived copies beside the bibliography.
+          </p>
+          <p>
+            Outbound contribution is operator-gated: cited public URLs are captured through the
+            Wayback workflow, and curated research exports may be staged for human review before any
+            Internet Archive upload. Operators use the research CLI capture and export verbs; there
+            is no automatic public upload from the reader site.
+          </p>
+        </Prose>
+      </section>
+
       <div id="see-it-applied">
         <WalkOffRamp
           title="See it applied"

@@ -18,7 +18,8 @@
 import Link from 'next/link';
 import { EmptyState } from '@repo/ui';
 import { PaletteSeed } from '../components/shell/PaletteSeed';
-import { Room, RoomHeader } from '../components/room';
+import { Room } from '../components/room/Room';
+import { RoomHeader } from '../components/room/RoomHeader';
 import { loadWalkBackPlace } from './walk-back-place';
 import './utility.css';
 

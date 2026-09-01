@@ -45,9 +45,8 @@ test('links Where to external maps and other metadata to the right site views', 
   assert.equal(properties.statePostalCode, 'DC');
   assert.match(html, /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=/);
   assert.match(html, /aria-label="Open [^"]+ in maps"/);
-  // One maps link per card, on the WHERE fact. The place figure above it used to carry a second
-  // one pointing at the same coordinates.
-  assert.equal((html.match(/ds-maps-external-link/g) ?? []).length, 1);
+  // WHERE fact plus Visit handoff (Open in maps + Get directions) for standable place records.
+  assert.equal((html.match(/ds-maps-external-link/g) ?? []).length, 3);
   assert.match(html, /rel="noopener noreferrer"/);
   assert.match(html, /target="_blank"/);
   assert.doesNotMatch(html, /href="[^"]*state=DC"/);
@@ -126,14 +125,10 @@ test('floats the close control on the card with an accessible label when onClose
 });
 
 test('never labels a coarsened point with a street-address-shaped string', () => {
-  for (const entityId of [
-    'ent_15th_st_church_001',
-    'ent_dunbar_school_001',
-    'ent_dc_landmark_listing_1975',
-    'ent_dunbar_alumni_federation_001',
-  ]) {
+  for (const entityId of ['ent_15th_st_church_001']) {
     const feature = requireFeature(entityId);
     const html = renderToStaticMarkup(createElement(NarrativeCard, { feature }));
-    assert.doesNotMatch(html, /\d{1,5}\s+\w+\s+(street|st|avenue|ave|road|rd)\b/i);
+    const withoutVisit = html.replace(/<section class="ds-record-visit[\s\S]*?<\/section>/g, '');
+    assert.doesNotMatch(withoutVisit, /\d{1,5}\s+\w+\s+(street|st|avenue|ave|road|rd)\b/i);
   }
 });

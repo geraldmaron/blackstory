@@ -9,6 +9,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
 import { instrumentRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
+import { atlasWalkHref } from '../place/public-place-path';
 import { buildExploreMapSource, buildJurisdictionAreaFeatures } from './build-explore-map-source';
 import { geoAnchorFor } from './entity-geo';
 import { displayEncodingFor, kindFamilyFor } from './kind-encoding';
@@ -30,6 +31,42 @@ test('every active-release entity with a resolvable anchor becomes an enriched f
     assert.equal(feature.properties.oneLineStory, entity!.summary);
     assert.equal(feature.properties.evidenceCount, entity!.claims.length);
     assert.deepEqual(feature.properties.eraBuckets, entity!.eraBuckets ?? []);
+  }
+});
+
+test('holdingWalk marks only allowlisted atlas walks, not every /place/ href', () => {
+  const base = listPublicEntities()[0]!;
+  const nonWalkPlace: PublicEntityView = {
+    ...base,
+    id: 'ent_test_archie_edwards',
+    kind: 'place',
+    displayName: 'Archie Edwards Alpha Tonsorial Palace',
+    summary: 'A documented barbershop and gathering place in Washington, D.C.',
+  };
+  const source = buildExploreMapSource([nonWalkPlace], {
+    geoAnchorFor: (id) =>
+      id === nonWalkPlace.id
+        ? { lat: 38.91, lng: -77.03, geohash: 'dqcj', matchMethod: 'geocode_other' }
+        : geoAnchorFor(id),
+  });
+  const feature = source.featureCollection.features[0]!;
+  assert.match(feature.properties.href, /^\/place\//);
+  assert.notEqual(feature.properties.holdingWalk, true);
+
+  const entities = listPublicEntities();
+  const catalog = buildExploreMapSource(entities);
+  for (const entry of catalog.featureCollection.features) {
+    if (entry.properties.holdingWalk !== true) continue;
+    const entity = entities.find((candidate) => candidate.id === entry.properties.entityId);
+    assert.ok(entity);
+    assert.equal(
+      atlasWalkHref({
+        displayName: entity!.displayName,
+        kind: entity!.kind,
+        entityId: entity!.id,
+      }),
+      entry.properties.href,
+    );
   }
 });
 

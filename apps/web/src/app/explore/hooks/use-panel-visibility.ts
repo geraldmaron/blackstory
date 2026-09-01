@@ -35,26 +35,16 @@ function isNarrowViewport(): boolean {
  */
 export function usePanelVisibility() {
   /**
-   * The Atlas opens in the instrument unless a link asked for the story.
-   *
-   * Off the Atlas the header does not name Journey: `/journey` is not a room. A fragment on
-   * `/explore` still opens this mode. `/` normalizes its query at the edge against the explore
-   * allowlist, so a `?mode=` param would be stripped before this ran.
-   *
-   * `#story` is still honoured. It was the fragment this mode shipped under, so it is sitting in
-   * bookmarks and in any link already shared; a renamed label is no reason to break them, and a
-   * fragment cannot be redirected server-side the way a path can.
-   *
-   * Applied after mount, not as the initial value: the server has no fragment, so seeding state
-   * from it would render `atlas` on the server and the journey on the client and fail hydration.
-   * Read once rather than watched, so a reader who then presses Atlas is not pulled back by a
-   * fragment still sitting in the address bar.
+   * Journey lives on the Door (`/`). Legacy `/explore#journey` and `#story` bookmarks
+   * redirect there after mount so the fragment still works without a second Journey chrome.
    */
   const [mode, setMode] = useState<AtlasMode>('atlas');
 
   useEffect(() => {
     const hash = window.location.hash;
-    if (hash === '#journey' || hash === '#story') setMode('story');
+    if (hash === '#journey' || hash === '#story') {
+      window.location.replace('/');
+    }
   }, []);
 
   const [paletteOpen, setPaletteOpen] = useState(false);

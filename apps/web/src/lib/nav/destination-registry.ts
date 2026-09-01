@@ -14,7 +14,8 @@
  * footer, the command palette's Go section (the same three room groups), and the sitemap.
  * `destination-registry.test.ts` fails when a route classified in `surface-classes.ts` has no
  * entry here, which is what makes "a new public route cannot be missing from the library" a
- * test rather than a habit. Atlas and Records stay in the table; they stay off the room chrome.
+ * test rather than a habit. Atlas and Records stay in the table; Find chrome (command bar +
+ * footer Find column) exposes them while Rooms / browsableDestinations stay editorial.
  *
  * WHAT IS NOT HERE. Endpoints — redirects, JSON, feeds, crawler files. They render no chrome and
  * are no reader's destination; `ENDPOINT_ROUTES` in `surface-classes.ts` is their list. A route
@@ -378,8 +379,8 @@ export function destinationsInGroup(group: DestinationGroup): readonly Destinati
 }
 
 /**
- * The one room list: the same three groups as `/about`, the footer, and Rooms.
- * Atlas, Records, and the library hub stay off it.
+ * The one room list: the same three groups as `/about`, Rooms, and the editorial footer columns.
+ * Atlas, Records, and the library hub stay off Rooms; Find chrome lists them separately.
  */
 export function browsableDestinations(): readonly Destination[] {
   return LIBRARY_CARD_GROUPS.flatMap((group) => destinationsInGroup(group));
@@ -424,11 +425,11 @@ export function parentPathFor(pathname: string): string | null {
 }
 
 /**
- * The three footer columns, derived rather than authored.
+ * The footer columns, derived rather than authored.
  *
- * The derivation is the whole point: the footer used to be its own list, which is how it went on
- * linking `/history` for months after that route became a redirect. Now a route joins the footer
- * by having a group, and leaves it by losing one.
+ * Find (Home / Atlas / Library / Records) leads; the three editorial groups follow. A route
+ * joins the footer by having a group, and leaves it by losing one — so `/history` cannot linger
+ * after it becomes a redirect.
  */
 export type FooterColumn = {
   readonly title: string;
@@ -443,7 +444,15 @@ export function footerColumns(): readonly FooterColumn[] {
       .map((destination) => ({ href: destination.path, label: destination.label })),
   });
 
+  /* Find stays in the footer and the command bar; Rooms / browsableDestinations stay editorial. */
   return [
+    {
+      title: 'Find',
+      items: destinationsInGroup('find').map((destination) => ({
+        href: destination.path,
+        label: destination.label === 'The library' ? 'Library' : destination.label,
+      })),
+    },
     column(GROUP_HEADINGS.read ?? 'Where to begin', ['read']),
     column(GROUP_HEADINGS.check ?? 'How it decides', ['check']),
     column(GROUP_HEADINGS['take-part'] ?? 'Add to it', ['take-part']),

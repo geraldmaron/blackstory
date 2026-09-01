@@ -23,11 +23,12 @@ describe('SiteFooter', () => {
     assert.match(html, /People\. Places\. Evidence\. Context\./);
     assert.match(html, /History, pinned to place\./);
     assert.match(html, /aria-label="Footer"/);
+    assert.match(html, /class="ds-shell-footer__column-title">Find</);
     assert.match(html, /class="ds-shell-footer__column-title">Where to begin</);
     assert.match(html, /class="ds-shell-footer__column-title">How it decides</);
     assert.match(html, /class="ds-shell-footer__column-title">Add to it</);
-    assert.doesNotMatch(html, /href="\/explore"/);
-    assert.doesNotMatch(html, /href="\/records"/);
+    assert.match(html, /href="\/explore"/);
+    assert.match(html, /href="\/records"/);
     assert.doesNotMatch(html, /Banned books|\/banned-books|\/journey/);
   });
 

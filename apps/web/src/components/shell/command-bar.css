@@ -252,6 +252,17 @@
   cursor: pointer;
 }
 
+/* Active Find link mirrors the Atlas mode copper ink (flat matte, no shadow). */
+.ds-bar__mode-link[aria-current='page'],
+.ds-bar__mode-link[aria-current='true'] {
+  background: var(--ds-accent-graphic);
+  color: var(--ds-fixed-ink);
+}
+
+span.ds-bar__mode-link {
+  cursor: default;
+}
+
 /* An anchor in a row of buttons, so it needs the line box the others get from being buttons. */
 .ds-bar__mode-link {
   display: inline-flex;
@@ -376,7 +387,9 @@
 @media (max-width: 559px) {
   .ds-bar {
     gap: var(--ds-space-2);
-    padding: 0 var(--ds-space-2);
+    padding: 0 var(--ds-space-3);
+    left: var(--ds-space-3);
+    right: var(--ds-space-3);
   }
 
   /* Glyph alone. The button keeps its full hit area and its aria-label, so the control is the
@@ -480,6 +493,8 @@
     width: auto;
     max-width: none;
     height: auto;
+    left: var(--ds-space-3);
+    right: var(--ds-space-3);
     column-gap: var(--ds-space-2);
     row-gap: var(--ds-space-1);
     padding-block: var(--ds-space-1);

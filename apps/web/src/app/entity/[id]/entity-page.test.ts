@@ -75,6 +75,20 @@ test('entity map fail-closed: the place block still makes its point with no plat
   assert.doesNotMatch(placeSource, /<MapsExternalLink/);
 });
 
+test('entity page renders visit handoff for geo-anchored records', () => {
+  assert.match(pageSource, /RecordVisitBlock/);
+  assert.match(pageSource, /resolvePublicAddressLine/);
+  assert.match(pageSource, /shouldShowVisitBlock/);
+  assert.match(pageSource, /placeAdvisories/);
+  assert.match(pageSource, /claims: entity\.claims/);
+});
+
+test('entity column renders archived Internet Archive sources when cited', () => {
+  assert.match(sectionsSource, /RecordArchiveSources/);
+  assert.match(sectionsSource, /resolveInternetArchiveSources/);
+  assert.match(sectionsSource, /Archived copies/);
+});
+
 test('entity user-facing copy avoids em dashes on touched surfaces', () => {
   for (const source of [pageSource, sectionsSource]) {
     assert.doesNotMatch(source, /—/);

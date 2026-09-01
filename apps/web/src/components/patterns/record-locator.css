@@ -19,6 +19,86 @@
   overflow: hidden;
 }
 
+.ds-locator--interactive {
+  touch-action: none;
+  cursor: grab;
+}
+
+.ds-locator--interactive.is-dragging {
+  cursor: grabbing;
+}
+
+.ds-locator--interactive:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-locator__canvas {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+}
+
+.ds-locator__chrome {
+  position: absolute;
+  right: var(--ds-space-3);
+  bottom: var(--ds-space-3);
+  z-index: 2; /* local: controls above the pannable canvas */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--ds-space-2);
+  pointer-events: none;
+}
+
+.ds-locator__atlas,
+.ds-locator__reset,
+.ds-locator__zoom {
+  pointer-events: auto;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  color: var(--ds-ink);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-pill);
+  text-decoration: none;
+}
+
+.ds-locator__zoom {
+  min-width: 2rem;
+  padding-inline: var(--ds-space-2);
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.ds-locator__reset {
+  cursor: pointer;
+}
+
+.ds-locator__atlas:hover,
+.ds-locator__atlas:focus-visible,
+.ds-locator__reset:hover,
+.ds-locator__reset:focus-visible,
+.ds-locator__zoom:hover,
+.ds-locator__zoom:focus-visible {
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+.ds-locator__atlas:focus-visible,
+.ds-locator__reset:focus-visible,
+.ds-locator__zoom:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-locator__pin--link {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 /*
  * The ground is a mask, not an image: the SVG carries alpha (land at 0.32, state hairlines at 1)
  * and the colour comes from here, so the same one asset is correct in both themes instead of
@@ -51,7 +131,8 @@
   border: 2px solid var(--ds-accent-graphic);
   border-radius: var(--ds-radius-full, 999px);
   background: color-mix(in srgb, var(--ds-accent-graphic) 28%, transparent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ds-canvas) 70%, transparent);
+  outline: 2px solid var(--ds-canvas);
+  outline-offset: 0;
 }
 
 /*

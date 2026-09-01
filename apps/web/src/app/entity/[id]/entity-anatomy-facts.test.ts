@@ -22,7 +22,7 @@ test('buildEntityAnatomyInputs resolves era from structured buckets before Undat
 test('buildEntityAnatomyInputs falls back to Place withheld when jurisdiction unknown', () => {
   const entity = requireEntity('ent_15th_st_church_001');
   const inputs = buildEntityAnatomyInputs({ ...entity, jurisdictionLabel: 'Unknown' }, undefined);
-  assert.equal(inputs.whereLabel, entity.locationLabel);
+  assert.equal(inputs.whereLabel, 'Dupont/Sixteenth Street Historic District area');
 });
 
 test('buildEntityAnatomyInputs does not treat United States as a place', () => {
@@ -31,7 +31,7 @@ test('buildEntityAnatomyInputs does not treat United States as a place', () => {
     { ...entity, jurisdictionLabel: 'United States' },
     undefined,
   );
-  assert.equal(inputs.whereLabel, entity.locationLabel);
+  assert.equal(inputs.whereLabel, 'Dupont/Sixteenth Street Historic District area');
 });
 
 test('buildEntityAnatomyPlace returns undefined without geo anchor', () => {

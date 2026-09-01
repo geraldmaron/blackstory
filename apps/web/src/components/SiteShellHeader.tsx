@@ -9,9 +9,8 @@
  *
  * The Atlas still mounts its own `CommandBar` inside `AtlasExperience`, because there the bar needs
  * the mode toggle, the palette, the saved drawer and the shortcut sheet, all of which are that
- * surface's client state. This renders the same component without them: brand, a search slot that
- * links to the record index, Atlas, Library, and the theme switch. Same component, same position,
- * same artwork — the parts that cannot work off the Atlas are absent rather than inert.
+ * surface's client state. This renders the same component without them: brand, search, Find
+ * (Atlas / Records), Rooms, and the theme switch. Same component, same position, same artwork.
  *
  * The gate reads the surface class registry, the same table `shell.css` and the footer read, so the
  * three cannot disagree about which surface is the Instrument. It stays a render gate rather than a

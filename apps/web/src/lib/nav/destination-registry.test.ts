@@ -176,20 +176,29 @@ describe('destination registry · the footer is derived, not authored', () => {
     );
   });
 
-  it('lists the archive rooms and keeps Atlas, records, and history off the chrome', () => {
-    const hrefs = footerColumns().flatMap((column) => column.items.map((item) => item.href));
+  it('puts Find in the footer; Rooms palette stays editorial without Atlas or records', () => {
+    const columns = footerColumns();
+    const find = columns.find((column) => column.title === 'Find');
+    assert.ok(find);
+    assert.deepEqual(
+      find.items.map((item) => item.href),
+      ['/', '/explore', '/library', '/records'],
+    );
+    const hrefs = columns.flatMap((column) => column.items.map((item) => item.href));
     const palette = browsableDestinations().map((destination) => destination.path);
     assert.ok(hrefs.includes('/stories'));
     assert.ok(hrefs.includes('/about'));
     assert.ok(hrefs.includes('/submit'));
+    assert.ok(hrefs.includes('/explore'));
+    assert.ok(hrefs.includes('/records'));
     assert.ok(!hrefs.includes('/history'));
-    assert.ok(!hrefs.includes('/explore'));
-    assert.ok(!hrefs.includes('/records'));
     assert.ok(!hrefs.includes('/banned-books'));
-    assert.deepEqual(palette, hrefs);
     assert.ok(!palette.includes('/explore'));
     assert.ok(!palette.includes('/records'));
     assert.ok(!palette.includes('/library'));
+    for (const path of palette) {
+      assert.ok(hrefs.includes(path), `${path} missing from footer`);
+    }
   });
 
   it('does not invent a second home lede', () => {

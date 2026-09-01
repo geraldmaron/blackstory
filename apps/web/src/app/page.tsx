@@ -9,10 +9,11 @@ import { ABOUT_LINE } from './about/about-copy';
 import { DoorHome } from './door-home';
 
 /**
- * Dynamic because a build without a database must not prerender a live pin plate.
- * Keep this page-scoped; do not hoist force-dynamic to the root layout.
+ * ISR: the pin plate is release-wide (same bytes for every reader until the catalog changes).
+ * `loadDoorEntities` falls back to seed when Postgres is absent at build time. Chapter rolls stay
+ * per regeneration window, not per bot hit. Keep page-scoped; do not hoist to the root layout.
  */
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 /**
  * No `title`: the root layout's default is the product name.

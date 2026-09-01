@@ -1,25 +1,27 @@
 /**
- * Server-rendered first-paint pin plate for `/`. Every geo pin is a disc on
- * the national frame. Only a holding `/place/` walk is a link. A pin without
- * a holding page is not a link. Shop tokens never title a pin.
- *
- * This is the plate Verity scores, not a typed list of five `/place/` URLs.
- * Binding: `docs/ui/patterns-atlas-instrument.md` and the existing
- * `.ds-map-entity-marker` language. Door-specific layout, not a new mark.
+ * Server-rendered pin plate for `/` and Explore first paint. On the Door Journey every
+ * record with a public href is a link; copper still marks holding walks. A focus entity
+ * (chapter spotlight) enlarges for the active camera frame.
  */
 import React from 'react';
 import type { ExploreMapFeatureCollection } from '../lib/map-experience/build-explore-map-source';
-import {
-  conusPinPercent,
-  isFirstPaintWalk,
-  isShopToken,
-} from '../lib/map-experience/first-paint-pins';
+import { locatorPinPercent } from '../lib/map-experience/albers-usa';
+import { isPinPlateWalk, isShopToken } from '../lib/map-experience/first-paint-pins';
 import './first-paint-pin-plate.css';
 
 void React;
 
 type FirstPaintPinPlateProps = {
   readonly pins: ExploreMapFeatureCollection;
+  /**
+   * Door Journey: every pin with a public href is clickable. Explore first paint keeps
+   * walks-only so the underlay stays light before MapLibre.
+   */
+  readonly linkRecords?: boolean;
+  /** Chapter focus — evidence spotlight or similar. */
+  readonly focusEntityId?: string | null;
+  /** Optional modifier for responsive Door plates (full vs mobile-thinned). */
+  readonly plateClassName?: string;
 };
 
 function pinAriaLabel(name: string): string {
@@ -27,34 +29,67 @@ function pinAriaLabel(name: string): string {
   return `Open ${name}`;
 }
 
-export function FirstPaintPinPlate({ pins }: FirstPaintPinPlateProps) {
+export function FirstPaintPinPlate({
+  pins,
+  linkRecords = false,
+  focusEntityId = null,
+  plateClassName,
+}: FirstPaintPinPlateProps) {
+  const plateClasses = [
+    'ds-first-paint-plate',
+    linkRecords ? 'ds-first-paint-plate--records' : '',
+    plateClassName ?? '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <div className="ds-first-paint-plate" aria-label="Documented places">
+    <div className={plateClasses} aria-label="Documented places">
       {pins.features.map((feature, index) => {
         const [lng, lat] = feature.geometry.coordinates;
-        const { left, top } = conusPinPercent(lng, lat);
-        const walk = isFirstPaintWalk(feature);
-        const style = { left: `${left}%`, top: `${top}%` };
-        const className = walk
-          ? 'ds-map-entity-marker ds-first-paint-pin ds-first-paint-pin--walk'
-          : 'ds-map-entity-marker ds-first-paint-pin';
-        if (walk) {
+        const projected = locatorPinPercent(lng, lat);
+        if (!projected) return null;
+        const style = {
+          left: `${projected.x.toFixed(4)}%`,
+          top: `${projected.y.toFixed(4)}%`,
+        };
+        const walk = isPinPlateWalk(feature, linkRecords);
+        const focused =
+          focusEntityId !== null &&
+          focusEntityId.length > 0 &&
+          feature.properties.entityId === focusEntityId;
+        const href = feature.properties.href;
+        const canLink = Boolean(href) && (linkRecords || walk);
+        const className = [
+          'ds-first-paint-pin',
+          walk ? 'ds-first-paint-pin--walk' : '',
+          focused ? 'ds-first-paint-pin--focus' : '',
+          canLink ? 'ds-first-paint-pin--link' : '',
+        ]
+          .filter(Boolean)
+          .join(' ');
+
+        if (canLink && href) {
           return (
             <a
               key={feature.properties.entityId || `pin-${index}`}
               className={className}
-              href={feature.properties.href}
+              href={href}
               aria-label={pinAriaLabel(feature.properties.displayName)}
+              aria-current={focused ? 'true' : undefined}
               style={style}
+              data-entity-id={feature.properties.entityId}
             />
           );
         }
+
         return (
           <span
             key={feature.properties.entityId || `pin-${index}`}
             className={className}
             aria-hidden="true"
             style={style}
+            data-entity-id={feature.properties.entityId}
           />
         );
       })}

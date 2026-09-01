@@ -4,6 +4,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import type { PublicSearchIndexDoc } from '@repo/domain/search';
+import { listPublicEntities } from '../../data/public-seed';
+import { buildExploreMapSource } from '../map-experience/build-explore-map-source';
 import {
   isResolvablePlaceSlug,
   instrumentRecordHref,
@@ -76,7 +78,7 @@ describe('place slug addresses', () => {
         kind: 'person',
         summary: 'A named person.',
       }),
-      '/memorial',
+      '/entity/ent_person',
     );
     assert.equal(
       instrumentRecordHref({
@@ -86,6 +88,29 @@ describe('place slug addresses', () => {
         summary: 'A statute.',
       }),
       '/law',
+    );
+  });
+
+  it('map pins for people open the entity record, not the memorial room landing', () => {
+    const base = listPublicEntities()[0]!;
+    const person = {
+      ...base,
+      id: 'ent_memorial_person_001',
+      kind: 'person',
+      displayName: 'Example Memorial Name',
+      summary: 'A named person on the map.',
+    };
+    const source = buildExploreMapSource([person], {
+      geoAnchorFor: () => ({
+        lat: 38.91,
+        lng: -77.03,
+        geohash: 'dqcj',
+        matchMethod: 'geocode_other',
+      }),
+    });
+    assert.equal(
+      source.featureCollection.features[0]!.properties.href,
+      '/entity/ent_memorial_person_001',
     );
   });
 });

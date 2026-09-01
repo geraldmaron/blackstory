@@ -16,8 +16,14 @@ import { atlasWalkHref, isHoldingPlaceHref } from '../place/public-place-path';
 import { buildExploreMapSource } from './build-explore-map-source';
 import {
   conusPinPercent,
+  DOOR_MOBILE_NATIONAL_PIN_CAP,
   firstPaintWalksFirst,
   isFirstPaintWalk,
+  isPinPlateWalk,
+  resolveDoorPinTarget,
+  resolveDoorFocusPinId,
+  thinDoorNationalPins,
+  toDoorLinkPins,
   toFirstPaintPins,
   toFirstPaintShell,
 } from './first-paint-pins';
@@ -77,6 +83,61 @@ function firstPaintDocument(
   };
 }
 
+test('thinDoorNationalPins caps dense metros and balances regions', () => {
+  const source = buildExploreMapSource(listPublicEntities());
+  const dense = Array.from({ length: 500 }, (_, index) =>
+    leakyFeature({
+      displayName: `Place ${index}`,
+      href: `/door/pin/pin-${index}`,
+      entityId: `pin-${index}`,
+    }),
+  );
+  dense[0] = leakyFeature({
+    displayName: 'Dillard High School, Old',
+    href: '/place/dillard-high-school-old',
+    entityId: 'nrhp-black-heritage-91000107',
+  });
+  const pins = toDoorLinkPins([...source.featureCollection.features, ...dense]);
+  const thinned = thinDoorNationalPins(pins, { cap: 80 });
+  assert.ok(thinned.features.length <= 80);
+  assert.ok(thinned.features.length < pins.features.length);
+  assert.ok(thinned.features.some((feature) => isFirstPaintWalk(feature)));
+  assert.equal(DOOR_MOBILE_NATIONAL_PIN_CAP, 48);
+});
+
+test('thinDoorNationalPins keeps chapter focus and spreads west pins on a dense eastern field', () => {
+  const focus = leakyFeature({
+    displayName: 'Howard Theatre',
+    href: '/entity/ent_focus_theatre',
+    entityId: 'ent_focus_theatre',
+  });
+  focus.geometry.coordinates = [-77.02, 38.92];
+
+  const dense: ExploreMapFeature[] = [focus];
+  for (let lat = 30; lat <= 44; lat += 1.4) {
+    for (let lng = -124; lng <= -75; lng += 2.6) {
+      const side = lng < -102 ? 'west' : lng >= -90 ? 'east' : 'central';
+      dense.push(
+        leakyFeature({
+          displayName: `${side} heritage site ${lat}-${lng}`,
+          href: `/entity/ent_${side}_${lat}_${lng}`,
+          entityId: `ent_${side}_${lat}_${lng}`,
+        }),
+      );
+      dense[dense.length - 1]!.geometry.coordinates = [lng, lat];
+    }
+  }
+
+  const pins = toDoorLinkPins(dense);
+  const thinned = thinDoorNationalPins(pins, {
+    focusEntityId: resolveDoorFocusPinId('ent_focus_theatre', dense),
+  });
+  assert.ok(thinned.features.length <= DOOR_MOBILE_NATIONAL_PIN_CAP);
+  assert.ok(thinned.features.some((feature) => feature.properties.entityId === 'pin-0'));
+  const westPins = thinned.features.filter((feature) => feature.geometry.coordinates[0] < -102);
+  assert.ok(westPins.length >= 8);
+});
+
 test('fail 1: shop tokens are gone from the first document, and a holding walk still sits on the plate', () => {
   const pins = toFirstPaintPins([
     leakyFeature(),
@@ -94,10 +155,38 @@ test('fail 1: shop tokens are gone from the first document, and a holding walk s
   assert.doesNotMatch(document, /\/entity\//);
   assert.match(plate, /href="\/place\/dillard-high-school-old"/);
   assert.match(plate, /ds-first-paint-pin--walk/);
+  assert.doesNotMatch(plate, /ds-map-entity-marker/);
   assert.equal(pins.features[0]!.properties.displayName, '');
   assert.equal(pins.features[0]!.properties.href, '');
   assert.equal(pins.features[1]!.properties.displayName, 'Dillard High School, Old');
   assert.equal(pins.features[1]!.properties.href, '/place/dillard-high-school-old');
+});
+
+test('Door link pins expose public hrefs and opaque entity redirects', () => {
+  const source = buildExploreMapSource(listPublicEntities());
+  const entityOnly = leakyFeature({
+    displayName: 'Howard Theatre',
+    href: '/entity/ent_howard_theatre_001',
+    entityId: 'ent_howard_theatre_001',
+    kind: 'place',
+  });
+  const features = [...source.featureCollection.features, entityOnly];
+  const pins = toDoorLinkPins(features);
+  const html = renderToStaticMarkup(
+    createElement(FirstPaintPinPlate, { pins, linkRecords: true, focusEntityId: null }),
+  );
+  const walkCount = pins.features.filter((feature) => isPinPlateWalk(feature, true)).length;
+  const linkCount = pins.features.filter((feature) => feature.properties.href.length > 0).length;
+  const anchors = html.match(/<a\b/g) ?? [];
+  assert.ok(linkCount > walkCount);
+  assert.ok(walkCount > 0);
+  assert.equal(anchors.length, linkCount);
+  assert.doesNotMatch(html, /href="\/entity\//);
+  assert.match(html, /href="\/door\/pin\/pin-4"/);
+
+  const target = resolveDoorPinTarget('pin-4', features);
+  assert.equal(target, '/entity/ent_howard_theatre_001');
+  assert.equal(pins.features[4]!.properties.href, '/door/pin/pin-4');
 });
 
 test('fail 2: only holding /place/ pins are links; the rest of the plate is not a sit set', () => {
@@ -117,9 +206,11 @@ test('fail 2: only holding /place/ pins are links; the rest of the plate is not 
   const holding = pins.features.filter((feature) => isFirstPaintWalk(feature));
   const plate = renderToStaticMarkup(createElement(FirstPaintPinPlate, { pins }));
   const walkHrefs = [...plate.matchAll(/href="(\/place\/[^"]+)"/g)].map((match) => match[1]);
-  const pinDiscs = plate.match(/ds-map-entity-marker/g) ?? [];
+  const pinDiscs = plate.match(/ds-first-paint-pin(?!-)/g) ?? [];
   const anchors = plate.match(/<a\b/g) ?? [];
-  assert.equal(pinDiscs.length, pins.features.length);
+  assert.ok(pinDiscs.length > 0);
+  assert.ok(pinDiscs.length <= pins.features.length);
+  assert.doesNotMatch(plate, /ds-map-entity-marker/);
   assert.ok(pins.features.length > holding.length);
   assert.equal(walkHrefs.length, holding.length);
   assert.equal(anchors.length, holding.length);
@@ -177,4 +268,28 @@ test('CONUS projection keeps a Florida pin on the plate', () => {
   const { left, top } = conusPinPercent(-80.14, 26.12);
   assert.ok(left > 50 && left < 100);
   assert.ok(top > 50 && top < 100);
+});
+
+test('first-paint plate projects pins with Albers locator percents, not CONUS clamp', () => {
+  const pins = toFirstPaintPins([
+    leakyFeature({
+      displayName: 'Dillard High School, Old',
+      href: '/place/dillard-high-school-old',
+      entityId: 'nrhp-black-heritage-91000107',
+    }),
+  ]);
+  const plate = renderToStaticMarkup(createElement(FirstPaintPinPlate, { pins }));
+  assert.match(plate, /left:\s*[\d.]+%/);
+  assert.match(plate, /top:\s*[\d.]+%/);
+
+  // Liberia is outside Albers USA — must not clamp onto the board edge.
+  const offshoreFeature = leakyFeature({
+    displayName: '',
+    href: '',
+    entityId: 'pin-offshore',
+  });
+  offshoreFeature.geometry.coordinates = [-9.4, 6.3];
+  const offshore = toFirstPaintPins([offshoreFeature]);
+  const empty = renderToStaticMarkup(createElement(FirstPaintPinPlate, { pins: offshore }));
+  assert.doesNotMatch(empty, /ds-first-paint-pin/);
 });

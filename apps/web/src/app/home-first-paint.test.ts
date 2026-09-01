@@ -328,10 +328,10 @@ test('the church locator names the place, not a pin taxonomy', () => {
       model: { lead: church, also: [], story: undefined, citing: [], source: 'seed' },
     }),
   );
-  assert.match(html, /aria-label="Fifteenth Street Presbyterian Church, Washington, D\.C\."/);
+  assert.match(html, /Fifteenth Street Presbyterian Church, Washington, D\.C\./);
   assert.match(html, /href="\/place\/paul-laurence-dunbar-high-school"/);
+  assert.match(html, /ds-record-visit/);
   assert.doesNotMatch(html, /neighborhood-level pin|locality precision|radius affordance/i);
-  assert.doesNotMatch(html, /Locator map of the United States/);
   assert.doesNotMatch(html, /Open a room from this place/);
   assert.doesNotMatch(html, /not a photograph|symbolic mark/i);
   assert.doesNotMatch(html, /Banned books|\/banned-books/);

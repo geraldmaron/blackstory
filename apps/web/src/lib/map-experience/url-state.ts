@@ -75,8 +75,8 @@ export type ExploreViewState = {
   /** To-decade for `blackChange`. */
   readonly popTo?: string;
   /**
-   * When true, nearby points aggregate while zoomed out (opt-in via `group=1`). Omitted from
-   * shareable URLs when off (the default).
+   * When true, nearby points aggregate while zoomed out. On by default; pass `group=0` to
+   * disable. Omitted from shareable URLs when on (the default).
    */
   readonly group: boolean;
   /**
@@ -322,7 +322,10 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const radiusRaw = firstValue(raw.radius)?.trim();
   const nearRaw = firstValue(raw.near)?.trim();
 
-  const groupOn = groupRaw === '1' || groupRaw === 'true';
+  const groupOn =
+    groupRaw === '0' || groupRaw === 'false'
+      ? false
+      : groupRaw === undefined || groupRaw === '1' || groupRaw === 'true';
   const satOn = satRaw === '1' || satRaw === 'true';
 
   const popGeoBase = parseExplorePopulationGeo(popGeoRaw, DEFAULT_POPULATION_GEO);
@@ -434,7 +437,7 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
       params.set('popTo', state.popTo);
     }
   }
-  if (state.group) params.set('group', '1');
+  if (!state.group) params.set('group', '0');
   if (state.sat) params.set('sat', '1');
   if (state.lines) params.set('lines', '1');
   if (state.decade) params.set('decade', state.decade);
@@ -462,7 +465,7 @@ export function defaultExploreOverlayState(): Pick<
 > {
   return {
     layerMode: 'presence',
-    group: false,
+    group: true,
     sat: false,
     lines: false,
     ...DEFAULT_PANEL_VISIBILITY,

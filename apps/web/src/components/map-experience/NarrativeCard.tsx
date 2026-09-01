@@ -25,6 +25,11 @@ import {
   RecordBrowseControls,
   type RecordBrowseControlsProps,
 } from '../patterns/RecordBrowseControls';
+import { RecordVisitBlock } from '../patterns/RecordVisitBlock';
+import {
+  buildVisitHandoffFromMapFeature,
+  shouldShowVisitBlock,
+} from '../../lib/geography/visit-handoff';
 import { ConfidenceMark } from './ConfidenceMark';
 import { KindBadge } from './KindBadge';
 import { StatusMark } from './StatusMark';
@@ -61,6 +66,15 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
     precision: mapPrecision,
     precisionCaption: radiusAffordanceLabel(properties.geoPrecisionTier, properties.radiusMeters),
   };
+  const visitInput = buildVisitHandoffFromMapFeature({
+    displayName: properties.displayName,
+    locationPrecision: properties.precision,
+    kind: properties.kind,
+    lat,
+    lng,
+    ...(properties.locationLabel !== undefined ? { locationLabel: properties.locationLabel } : {}),
+    ...(properties.status !== undefined ? { status: properties.status } : {}),
+  });
   const kindIcon =
     properties.mapTone !== undefined
       ? { variant: 'record-kind' as const, kind: properties.kind, mapTone: properties.mapTone }
@@ -183,6 +197,10 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
       </p>
 
       <RecordAnatomyPanel facts={anatomyFacts} place={anatomyPlace} />
+
+      {shouldShowVisitBlock(visitInput) ? (
+        <RecordVisitBlock className="ds-nc__visit" compact {...visitInput} />
+      ) : null}
 
       <dl className="ds-nc__facts">
         <div className="ds-nc__fact">

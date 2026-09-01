@@ -11,7 +11,7 @@ export type ExploreSearchCenterMarkerInput = {
   readonly label?: string;
 };
 
-/** Stable class; styles in map-surfaces.css under `.ds-map-search-center-marker`. */
+/** Stable class; styles in shell.css under `.ds-map-search-center-marker`. */
 export const EXPLORE_SEARCH_CENTER_MARKER_CLASS = 'ds-map-search-center-marker';
 
 const DEFAULT_PLACE_LABEL = 'Search center';

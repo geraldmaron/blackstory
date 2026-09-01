@@ -177,7 +177,7 @@ test('normalizeQueryString keeps allowlisted /explore map params', () => {
   // Default layerMode=presence is omitted from the canonical query (cleaner revisit URLs).
   assert.equal(
     qs,
-    'era=1970s&kind=school&selected=ent_dunbar_school_001&state=DC&group=1&lines=1&decade=1970s&edge=rel_landmark_occurred_at_school',
+    'era=1970s&kind=school&selected=ent_dunbar_school_001&state=DC&lines=1&decade=1970s&edge=rel_landmark_occurred_at_school',
   );
 });
 
@@ -248,19 +248,13 @@ test('`/` and `/explore` share the map-query vocabulary; leftover keys still dro
   assert.notEqual(exploreQs, '');
   assert.equal(normalizeQueryString('/', bag), exploreQs);
 
+  assert.equal(normalizeQueryString('/explore', { state: 'va', group: 'true' }), 'state=VA');
+  assert.equal(normalizeQueryString('/', { state: 'va', group: 'true' }), 'state=VA');
   assert.equal(
-    normalizeQueryString('/explore', { state: 'va', group: 'true' }),
-    'state=VA&group=1',
-  );
-  assert.equal(normalizeQueryString('/', { state: 'va', group: 'true' }), 'state=VA&group=1');
-  assert.equal(
-    needsQueryNormalizationRedirect(new URL('https://example.com/explore?state=VA&group=1')),
+    needsQueryNormalizationRedirect(new URL('https://example.com/explore?state=VA')),
     false,
   );
-  assert.equal(
-    needsQueryNormalizationRedirect(new URL('https://example.com/?state=VA&group=1')),
-    false,
-  );
+  assert.equal(needsQueryNormalizationRedirect(new URL('https://example.com/?state=VA')), false);
 });
 
 test('drift: the map-surface allowlist covers every key the URL parser reads', () => {
@@ -356,7 +350,7 @@ test('buildNormalizedUrl issues canonical Atlas URLs on /explore', () => {
     new URL('https://example.com/explore?utm_source=x&state=va&group=true&lines=1'),
   );
   assert.equal(normalized.pathname, '/explore');
-  assert.equal(normalized.search, '?state=VA&group=1&lines=1');
+  assert.equal(normalized.search, '?state=VA&lines=1');
 });
 
 test('/law keeps its GET browse contract (q, kind, topic)', () => {

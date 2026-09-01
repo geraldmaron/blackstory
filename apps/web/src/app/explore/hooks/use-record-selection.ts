@@ -12,6 +12,7 @@ import {
   buildSheetConnections,
   buildSheetSources,
 } from '../../../lib/map-experience/build-sheet-detail';
+import { buildVisitHandoffFromMapFeature } from '../../../lib/geography/visit-handoff';
 import { isHoldingPlaceHref } from '../../../lib/place/public-place-path';
 import { withQuery } from '../../../lib/discovery/discovery-arrival';
 import { anatomyPrecisionFor, eraFor } from './atlas-feature-helpers';
@@ -186,6 +187,19 @@ export function useRecordSelection(
         },
       ),
       citingStories: storiesCiting(citesEdge, selectedFeature.properties.entityId),
+      visitInput: buildVisitHandoffFromMapFeature({
+        displayName: selectedFeature.properties.displayName,
+        locationPrecision: selectedFeature.properties.precision,
+        kind: selectedFeature.properties.kind,
+        lat: selectedFeature.geometry.coordinates[1],
+        lng: selectedFeature.geometry.coordinates[0],
+        ...(selectedFeature.properties.locationLabel !== undefined
+          ? { locationLabel: selectedFeature.properties.locationLabel }
+          : {}),
+        ...(selectedFeature.properties.status !== undefined
+          ? { status: selectedFeature.properties.status }
+          : {}),
+      }),
     };
   }, [allTimeEdges, citesEdge, featuresById, placeArrivalQuery, selectedFeature]);
 

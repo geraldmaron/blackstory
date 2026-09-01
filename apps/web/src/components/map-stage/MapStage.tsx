@@ -41,6 +41,8 @@ import type {
 } from 'maplibre-gl';
 import type * as MapLibreNamespace from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+/** Explore HTML entity markers reuse Door first-paint pin discs (`entity-marker-sync.ts`). */
+import '../../app/first-paint-pin-plate.css';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import {
   EXPLORE_CLUSTER_LAYER_ID,
@@ -355,7 +357,7 @@ function syncCircularMarkers(
     if (!entry) continue;
     const el = document.createElement('button');
     el.type = 'button';
-    el.className = 'ds-map-entity-marker';
+    el.className = 'ds-first-paint-pin ds-first-paint-pin--link ds-map-entity-marker';
     el.dataset.entityId = entityId;
     applyEntityMarkerElementProps(
       el,
@@ -511,7 +513,7 @@ export function MapStageProvider({
     densityLevels: [],
     stateChoroplethLevels: [],
     countyChoroplethLevels: [],
-    clusteringEnabled: false,
+    clusteringEnabled: true,
     satellite: false,
     historyEdgesEnabled: false,
     historyEdgeCollection: EMPTY_EDGE_COLLECTION,

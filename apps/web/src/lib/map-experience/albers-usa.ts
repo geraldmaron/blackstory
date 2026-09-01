@@ -172,12 +172,20 @@ export function projectAlbersUsa(lng: number, lat: number): LocatorPoint | null 
   return null;
 }
 
+/** Decimal places for pin percentages — keeps SSR and client style strings identical. */
+const PIN_PERCENT_DECIMALS = 4;
+
+function roundPinPercent(value: number): number {
+  const factor = 10 ** PIN_PERCENT_DECIMALS;
+  return Math.round(value * factor) / factor;
+}
+
 /** The same point as a percentage of the canvas, which is what CSS positioning wants. */
 export function locatorPinPercent(lng: number, lat: number): LocatorPoint | null {
   const point = projectAlbersUsa(lng, lat);
   if (!point) return null;
   return {
-    x: (point.x / US_LOCATOR_WIDTH) * 100,
-    y: (point.y / US_LOCATOR_HEIGHT) * 100,
+    x: roundPinPercent((point.x / US_LOCATOR_WIDTH) * 100),
+    y: roundPinPercent((point.y / US_LOCATOR_HEIGHT) * 100),
   };
 }

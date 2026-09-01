@@ -26,7 +26,7 @@ import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './ent
 import { resolveEntityEraBuckets } from './entity-era-facts';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
 import { displayEncodingFor, kindFamilyFor, resolveMapTone } from './kind-encoding';
-import { staysOffPublicMap } from '../place/public-place-path';
+import { staysOffPublicMap, atlasWalkHref } from '../place/public-place-path';
 import { instrumentRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
 
 export type ConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
@@ -78,6 +78,8 @@ export type ExploreMapFeatureProperties = {
   readonly stateName?: string;
   /** Public location prose from the release (never a redacted residential exact). */
   readonly locationLabel?: string;
+  /** Door Journey: true only for allowlisted atlas walks, not every `/place/` link. */
+  readonly holdingWalk?: true;
 };
 
 export type ExploreMapFeature = {
@@ -230,13 +232,21 @@ function enrichFeature(
     claims: entity.claims,
   });
 
+  const href = instrumentRecordHref(entity, collisions);
+  const walkHref = atlasWalkHref({
+    displayName: entity.displayName,
+    kind: entity.kind,
+    entityId: entity.id,
+  });
+  const holdingWalk = walkHref !== undefined && walkHref === href;
+
   return {
     type: 'Feature',
     id: feature.id,
     geometry: feature.geometry,
     properties: {
       entityId: entity.id,
-      href: instrumentRecordHref(entity, collisions),
+      href,
       kind: feature.properties.kind,
       displayName: feature.properties.displayName,
       oneLineStory: sanitizePublicProseText(entity.summary),
@@ -263,6 +273,7 @@ function enrichFeature(
       ...(entity.locationLabel.trim().length > 0
         ? { locationLabel: entity.locationLabel.trim() }
         : {}),
+      ...(holdingWalk ? { holdingWalk: true as const } : {}),
     },
   };
 }

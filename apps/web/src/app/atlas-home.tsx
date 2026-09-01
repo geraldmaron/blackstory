@@ -15,6 +15,7 @@ import '../components/patterns/edition-fact-icon.css';
 import '../components/patterns/record-anatomy.css';
 import './explore/explore.css';
 import './explore/explore-edition.css';
+import './first-paint-pin-plate.css';
 
 /** Rows in the `<noscript>` fallback list. The crawlable index is `/records`. */
 const NOSCRIPT_ROW_CAP = 20;
@@ -113,7 +114,7 @@ export async function AtlasHome({ params }: AtlasHomeProps) {
           ) : null}
         </div>
       </noscript>
-      <FirstPaintPinPlate pins={pins} />
+      <FirstPaintPinPlate pins={pins} linkRecords />
       <AtlasLoader shell={shell} pins={pins} />
     </>
   );

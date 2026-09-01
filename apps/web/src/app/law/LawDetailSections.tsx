@@ -17,7 +17,6 @@ import {
 import { GroupHeading, OffRamp, RoomHeader } from '../../components/room';
 import { LawAnatomyStrip } from './LawAnatomyStrip';
 import { jurisdictionLabel } from './LawBrowseSections';
-import { jurisdictionLabel } from './LawBrowseSections';
 
 const DETAIL_SECTIONS = [
   { id: 'what-it-says', label: 'What it says' },

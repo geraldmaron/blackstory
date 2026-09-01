@@ -79,7 +79,7 @@ test('renders inline fact rows without legacy column strip classes', () => {
   assert.match(html, /not an exact address/);
   assert.match(
     html,
-    /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=38\.9098%2C-77\.0143"/,
+    /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=Dunbar%20High%20School%20%40%2038\.9098%2C-77\.0143"/,
   );
   assert.match(html, /aria-label="Open Washington, D\.C\. in maps"/);
   // Exactly one route out to maps, on the WHERE fact. The place figure used to carry a second

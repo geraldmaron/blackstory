@@ -31,7 +31,9 @@ import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel'
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { Connections, type RoomConnection } from '../../../components/room';
 import { RelationshipConstellation } from '../../../components/patterns/RelationshipConstellation';
+import { RecordArchiveSources } from '../../../components/patterns/RecordArchiveSources';
 import { humanizeToken } from '../../../components/entity/format';
+import { resolveInternetArchiveSources } from '../../../lib/geography/internet-archive-sources';
 import { neighborHref } from '../../../lib/place/public-place-path';
 import { firstPaintRelatedHeading, firstPaintRelation } from '../../home-first-paint-surface';
 
@@ -71,6 +73,14 @@ export function recordSectionIndex({
       id: 'claims-heading',
       label: 'What the sources say',
       count: evidenceClaims.length,
+    });
+  }
+  const archiveSources = resolveInternetArchiveSources(entity.claims);
+  if (archiveSources.length > 0) {
+    sections.push({
+      id: 'record-archive-heading',
+      label: 'Archived copies',
+      count: archiveSources.length,
     });
   }
   if (hasStatusFor(entity)) {
@@ -182,6 +192,7 @@ export function EntityRoomSections({
   const hasStatus = firstPaint ? false : hasStatusFor(entity);
   const connections = toConnections(entity, firstPaint);
   const continueLearning = toSuggestedConnections(entity, firstPaint);
+  const archiveSources = resolveInternetArchiveSources(entity.claims);
   const relatedHeading = firstPaint
     ? firstPaintRelatedHeading(entity.relatedNeighbors ?? [])
     : 'Records this one touches';
@@ -240,6 +251,12 @@ export function EntityRoomSections({
             claims={evidenceClaims}
             researchCoverage={{ level: entity.researchCoverage }}
           />
+        </section>
+      ) : null}
+
+      {archiveSources.length > 0 ? (
+        <section className="ds-record-beat" aria-labelledby="record-archive-heading">
+          <RecordArchiveSources sources={archiveSources} />
         </section>
       ) : null}
 

@@ -277,6 +277,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       jurisdictionAreaFeatures: [],
       layerMode,
       densityLevels: view.densityLevels,
+      clusteringEnabled: view.viewState.group,
       satellite: layers.satellite,
       historyEdgesEnabled: false,
       historyEdgeCollection: view.edgeLineCollection,
@@ -290,6 +291,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     stage,
     view.densityLevels,
     view.edgeLineCollection,
+    view.viewState.group,
     view.viewState.popGeo,
   ]);
 

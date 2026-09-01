@@ -47,6 +47,7 @@ function recordingContext(): { calls: string[]; context: CommandContext } {
       closeSheet: note('closeSheet'),
       setMode: note('setMode'),
       openLibrary: note('openLibrary'),
+      openDoor: note('openDoor'),
       togglePlayback: note('togglePlayback'),
       toggleTheme: note('toggleTheme'),
       toggleDensity: note('toggleDensity'),

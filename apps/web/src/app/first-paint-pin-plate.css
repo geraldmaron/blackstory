@@ -1,29 +1,71 @@
 /**
- * First-paint pin plate. Same disc language as `.ds-map-entity-marker`.
- * Copper only on holding walks. Hidden once MapLibre paints the live plate.
+ * First-paint pin plate. Door and Explore first paint share one disc language; copper marks
+ * walks/active/focus; ink dots for records. Hidden once MapLibre paints the live plate.
  */
+
+:root {
+  --ds-first-paint-pin-ink: color-mix(in srgb, var(--ds-ink) 55%, transparent);
+  --ds-first-paint-pin-ink-link: color-mix(in srgb, var(--ds-ink) 72%, transparent);
+  --ds-first-paint-pin-size: 0.4375rem;
+  --ds-first-paint-pin-size-link: 0.5rem;
+  --ds-first-paint-pin-size-walk: 0.5625rem;
+  --ds-first-paint-pin-size-focus: 0.875rem;
+  --ds-first-paint-pin-size-zoomed-link: 0.625rem;
+  --ds-first-paint-pin-size-zoomed-walk: 0.75rem;
+  --ds-first-paint-pin-size-zoomed-focus: 1.125rem;
+}
+
+body:has(.ds-door) {
+  --ds-first-paint-pin-ink: color-mix(in srgb, var(--ds-ink) 68%, transparent);
+  --ds-first-paint-pin-size: 0.5rem;
+  --ds-first-paint-pin-size-walk: 0.75rem;
+}
 
 .ds-first-paint-plate {
   position: fixed;
   inset: 0;
-  z-index: 2; /* local: HTML pins above the parked plate, below door framing */
+  z-index: 2; /* local: pin plate over the locator ground inside the board frame */
   pointer-events: none;
 }
 
 .ds-first-paint-plate .ds-first-paint-pin {
   position: absolute;
   transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  width: var(--ds-first-paint-pin-size);
+  height: var(--ds-first-paint-pin-size);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ds-first-paint-pin-ink);
   pointer-events: none;
 }
 
-.ds-first-paint-plate .ds-first-paint-pin--walk {
+.ds-first-paint-plate .ds-first-paint-pin--walk,
+.ds-first-paint-plate .ds-first-paint-pin--link {
   pointer-events: auto;
+}
+
+.ds-first-paint-plate .ds-first-paint-pin--walk {
+  width: var(--ds-first-paint-pin-size-walk);
+  height: var(--ds-first-paint-pin-size-walk);
+  background: var(--ds-accent-graphic);
   --ds-map-entity-shade: var(--ds-accent-graphic);
 }
 
-.ds-first-paint-plate .ds-first-paint-pin--walk:focus-visible {
+.ds-first-paint-plate--records .ds-first-paint-pin--link:not(.ds-first-paint-pin--walk) {
+  width: var(--ds-first-paint-pin-size-link);
+  height: var(--ds-first-paint-pin-size-link);
+  background: var(--ds-first-paint-pin-ink-link);
+}
+
+.ds-first-paint-plate .ds-first-paint-pin--focus {
+  width: var(--ds-first-paint-pin-size-focus);
+  height: var(--ds-first-paint-pin-size-focus);
+  background: var(--ds-accent-graphic);
   outline: 2px solid var(--ds-accent);
   outline-offset: 3px;
+  z-index: 3; /* local: focus pin above other discs within the plate */
 }
 
 body:has(.maplibregl-canvas) .ds-first-paint-plate {
@@ -31,7 +73,72 @@ body:has(.maplibregl-canvas) .ds-first-paint-plate {
   pointer-events: none;
 }
 
-/* The door keeps the HTML plate even if a prior Atlas visit left a canvas mounted. */
 body:has(.ds-door) .ds-first-paint-plate {
   visibility: visible;
+}
+
+@media (max-width: 899px) {
+  body:has(.ds-door) {
+    --ds-first-paint-pin-size: 0.1875rem;
+    --ds-first-paint-pin-size-link: 0.1875rem;
+    --ds-first-paint-pin-size-walk: 0.25rem;
+    --ds-first-paint-pin-size-focus: 0.4375rem;
+    --ds-first-paint-pin-size-zoomed-link: 0.3125rem;
+    --ds-first-paint-pin-size-zoomed-walk: 0.375rem;
+    --ds-first-paint-pin-size-zoomed-focus: 0.5625rem;
+  }
+
+  /* National mobile: tiny ink discs; copper only for allowlisted walks and focus. */
+  body:has(.ds-door)
+    .ds-door__board:not(.is-zoomed)
+    .ds-first-paint-pin--link:not(.ds-first-paint-pin--walk):not(.ds-first-paint-pin--focus) {
+    background: color-mix(in srgb, var(--ds-ink) 34%, transparent);
+  }
+}
+
+.ds-door__board.is-zoomed .ds-first-paint-pin--link:not(.ds-first-paint-pin--focus) {
+  width: var(--ds-first-paint-pin-size-zoomed-link);
+  height: var(--ds-first-paint-pin-size-zoomed-link);
+}
+
+.ds-door__board.is-zoomed .ds-first-paint-pin--walk:not(.ds-first-paint-pin--focus) {
+  width: var(--ds-first-paint-pin-size-zoomed-walk);
+  height: var(--ds-first-paint-pin-size-zoomed-walk);
+}
+
+.ds-door__board.is-zoomed .ds-first-paint-pin--focus {
+  width: var(--ds-first-paint-pin-size-zoomed-focus);
+  height: var(--ds-first-paint-pin-size-zoomed-focus);
+}
+
+/* Explore live map HTML markers — same discs as the plate (MapStage entity-marker-sync.ts). */
+.ds-map-entity-marker.ds-first-paint-pin {
+  box-sizing: border-box;
+  width: var(--ds-first-paint-pin-size-link);
+  height: var(--ds-first-paint-pin-size-link);
+  border-radius: 999px;
+  background: var(--ds-first-paint-pin-ink-link);
+}
+
+.ds-map-entity-marker.ds-first-paint-pin--walk {
+  width: var(--ds-first-paint-pin-size-walk);
+  height: var(--ds-first-paint-pin-size-walk);
+  background: var(--ds-accent-graphic);
+}
+
+.ds-map-entity-marker.ds-first-paint-pin--focus {
+  width: var(--ds-first-paint-pin-size-focus);
+  height: var(--ds-first-paint-pin-size-focus);
+  background: var(--ds-accent-graphic);
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 3px;
+  z-index: 1; /* local: focus marker above sibling HTML hit targets */
+}
+
+@media (max-width: 899px) {
+  :root {
+    --ds-first-paint-pin-size-link: 0.375rem;
+    --ds-first-paint-pin-size-walk: 0.4375rem;
+    --ds-first-paint-pin-size-focus: 0.625rem;
+  }
 }

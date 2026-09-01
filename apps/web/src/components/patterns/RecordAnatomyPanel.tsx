@@ -4,6 +4,7 @@
  */
 import React from 'react';
 import { buildExternalMapsSearchUrl } from '../../lib/geography/external-maps-url';
+import { resolvePublicAddressLine } from '../../lib/geography/public-address';
 import { MapsExternalLink } from '../map-experience/MapsExternalLink';
 import { EditionFactIcon, type EditionFactIconProps } from './EditionFactIcon';
 import { RecordPlacePreview } from './RecordPlacePreview';
@@ -46,7 +47,15 @@ function whereFactValue(
     return fact.value;
   }
 
-  const href = buildExternalMapsSearchUrl({ lat: place.lat, lng: place.lng });
+  const href = buildExternalMapsSearchUrl({
+    lat: place.lat,
+    lng: place.lng,
+    query: resolvePublicAddressLine({
+      locationLabel: place.label,
+      locationPrecision: place.precision,
+      kind: 'place',
+    }),
+  });
   if (!href) {
     return fact.value;
   }

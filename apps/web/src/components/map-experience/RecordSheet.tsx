@@ -21,9 +21,14 @@ import {
   type RecordAnatomyFact,
   type RecordAnatomyPlace,
 } from '../patterns/RecordAnatomyPanel';
+import { RecordVisitBlock } from '../patterns/RecordVisitBlock';
+import type { VisitHandoffInput } from '../../lib/geography/visit-handoff';
+import { shouldShowVisitBlock } from '../../lib/geography/visit-handoff';
 import type { ConfidenceTierKey } from '../../lib/map-experience/confidence-icons';
 import { KindGlyph } from './KindGlyph';
 import './record-sheet.css';
+import '../patterns/record-visit.css';
+import '../patterns/record-archive.css';
 
 void React;
 
@@ -90,6 +95,8 @@ export type SheetRecord = {
    */
   readonly citingStories?: readonly SheetCitingStory[];
   readonly anatomyPlace?: RecordAnatomyPlace;
+  /** Compact visit block input when the plate carries enough public geo fields. */
+  readonly visitInput?: VisitHandoffInput;
 };
 
 export type RecordSheetProps = {
@@ -289,6 +296,10 @@ export function RecordSheet({
           {...(record.anatomyPlace ? { place: record.anatomyPlace } : {})}
           aria-label={`Anatomy of ${record.name}`}
         />
+
+        {record.visitInput && shouldShowVisitBlock(record.visitInput) ? (
+          <RecordVisitBlock className="ds-sheet__visit" compact {...record.visitInput} />
+        ) : null}
 
         <p className="ds-sheet__precision">
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">

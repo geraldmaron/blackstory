@@ -89,8 +89,9 @@ export function placeHrefForEntity(
 }
 
 /**
- * Atlas instrument / search deep link. Standable records go to Place. People and statutes go to
- * those rooms. Door Rest pin walks still use `atlasWalkHref` (stand allowlist) separately.
+ * Atlas instrument / search / map pin deep link. Standable records go to Place. Named people open
+ * their entity record (the memorial wall is a room, not a substitute for one pin). Statutes go to
+ * `/law`. Door Rest pin walks still use `atlasWalkHref` (stand allowlist) separately.
  */
 export function instrumentRecordHref(
   entity: {
@@ -104,7 +105,7 @@ export function instrumentRecordHref(
 ): string {
   if (isInternalRecordLabel(entity.displayName)) return '';
   if (staysOffPublicMap(entity)) return '';
-  if (entity.kind === 'person') return '/memorial';
+  if (entity.kind === 'person') return `/entity/${entity.id}`;
   if (entity.kind === 'law' || entity.kind === 'case') return '/law';
   const summary = entity.summary?.trim() || entity.displayName;
   if (

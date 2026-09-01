@@ -25,3 +25,14 @@ test('the phone bar keeps Rooms on the first row instead of clipping it', () => 
   assert.match(block, /\.ds-bar__tool[\s\S]*display:\s*none/);
   assert.match(block, /height:\s*auto/);
 });
+
+test('reading bars keep Door, Atlas, and Records in Find; Atlas bars keep a Door exit', () => {
+  const source = readFileSync(join(here, 'CommandBar.tsx'), 'utf8');
+  assert.match(source, /href="\/explore"/);
+  assert.match(source, /href="\/records"/);
+  assert.match(source, /href="\/"/);
+  assert.match(source, /\n\s*Door\n/);
+  assert.match(source, /aria-label="Find"/);
+  assert.doesNotMatch(source, />\s*Journey\s*</);
+  assert.doesNotMatch(source, /onModeChange!\('story'\)/);
+});

@@ -11,7 +11,9 @@ import { EntityMastMedia } from '../components/entity/EntityMastMedia';
 import { EntitySensitivityBanner } from '../components/entity/EntitySensitivityBanner';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../components/entity/LinkedProse';
 import { RecordPlacePreview } from '../components/patterns/RecordPlacePreview';
-import { Connections, Precision, Room, TrustBlock } from '../components/room';
+import { RecordVisitBlock } from '../components/patterns/RecordVisitBlock';
+import { shouldShowVisitBlock } from '../lib/geography/visit-handoff';
+import { Connections, Room, TrustBlock } from '../components/room';
 import { geoAnchorFor } from '../lib/map-experience/entity-geo';
 import type { PlaceDiscoveryReturn } from '../lib/discovery/discovery-state';
 import { placeDiscoveryReturn } from '../lib/discovery/discovery-state';
@@ -114,6 +116,19 @@ export function HomeFirstPaint({
     const nextPlaces = walkOnPlaces(lead, model.also);
     const collisions = placeSlugCollisionCounts([lead, ...model.also]);
     const locatorName = firstPaintLocatorName(lead);
+    const visitInput = {
+      displayName: lead.displayName,
+      locationLabel: lead.locationLabel,
+      jurisdictionLabel: lead.jurisdictionLabel,
+      locationPrecision: lead.locationPrecision,
+      kind: lead.kind,
+      claims: lead.claims,
+      ...(lead.status !== undefined ? { status: lead.status } : {}),
+      ...(lead.livingStatus !== undefined ? { livingStatus: lead.livingStatus } : {}),
+      ...(lead.sensitivityClass !== undefined ? { sensitivityClass: lead.sensitivityClass } : {}),
+      ...(lead.placeAdvisories !== undefined ? { placeAdvisories: lead.placeAdvisories } : {}),
+      ...(geo ? { lat: geo.lat, lng: geo.lng } : {}),
+    };
     const displayClaims = withoutSummaryEchoClaims(lead.claims, lead.summary);
     const evidenceClaims = toEvidenceClaimInputs(displayClaims);
     const sourceCount = citedSourceCount(displayClaims);
@@ -179,14 +194,18 @@ export function HomeFirstPaint({
               lng={geo.lng}
               label={locatorName}
               accessibleName={locatorName}
+              interactive
+              atlasHref={returns.mapHref}
             />
-            {lead.locationPrecision ? (
-              <Precision
-                resolution={`${lead.locationPrecision.replace(/[_-]+/g, ' ')} precision`}
-                caveat="The archive never draws a point sharper than the source supports."
-              />
-            ) : null}
           </section>
+        ) : null}
+
+        {shouldShowVisitBlock(visitInput) ? (
+          <RecordVisitBlock
+            atlasHref={returns.mapHref}
+            {...(locatorName !== undefined ? { locatorLabel: locatorName } : {})}
+            {...visitInput}
+          />
         ) : null}
 
         {eraLine ? <p className="ds-home-place-era">{eraLine}</p> : null}

@@ -141,8 +141,8 @@ test('Atlas and entity route segment config stays after all imports', () => {
   assertSegmentConfigAfterImports(
     readFileSync(join(APP_ROOT, 'page.tsx'), 'utf8'),
     'page.tsx',
-    'dynamic',
-    /force-dynamic/,
+    'revalidate',
+    /300/,
   );
 });
 

@@ -72,7 +72,7 @@ export function RecordLocator({ lat, lng, label, accessibleName, className }: Re
       <span
         className="ds-locator__pin"
         aria-hidden="true"
-        style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
+        style={{ left: `${pin.x.toFixed(4)}%`, top: `${pin.y.toFixed(4)}%` }}
       />
     </div>
   );

@@ -21,6 +21,9 @@
 export const ABOUT_LINE =
   'BlackStory is a place-connected archive of Black history: people, places, and events pinned to where they happened, with the source attached to every claim.';
 
+/** Brand support line. Keep on the door under the product name. */
+export const ABOUT_SUPPORT_LINE = 'People. Places. Evidence. Context.';
+
 export const ABOUT_LEDE = `${ABOUT_LINE} I built it with the tools and records available to me, and it is unfinished on purpose.`;
 
 /** Why this exists, in the maker's own voice. Rendered as consecutive paragraphs. */

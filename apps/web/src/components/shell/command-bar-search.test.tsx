@@ -59,12 +59,16 @@ describe('bar search', () => {
 });
 
 describe('CommandBar destinations', () => {
-  it('does not advertise Journey or Atlas as rooms off the instrument', () => {
+  it('keeps Door, Atlas, and Records in Find; Atlas bars keep a Door exit', () => {
     const source = code('components/shell/CommandBar.tsx');
     assert.doesNotMatch(source, /href=["'`]\/(?:explore)?#journey["'`]/);
     assert.doesNotMatch(source, /href=["'`]\/journey["'`]/);
-    assert.doesNotMatch(source, /href=["'`]\/explore["'`]/);
-    assert.match(source, /onModeChange\('story'\)/);
+    assert.match(source, /href="\/explore"/);
+    assert.match(source, /href="\/records"/);
+    assert.match(source, /href="\/"/);
+    assert.match(source, /aria-label="Find"/);
+    assert.doesNotMatch(source, />\s*Journey\s*</);
+    assert.doesNotMatch(source, /onModeChange!\('story'\)/);
   });
 
   it('does not greet with the catalog count', () => {
