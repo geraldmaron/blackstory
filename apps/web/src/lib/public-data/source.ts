@@ -453,12 +453,18 @@ async function loadLiveEntity(entityId: string): Promise<PublicEntityView | unde
 
   try {
     const oneHopIds = collectOneHopNeighborIds(entity);
-    const oneHopProjections = await fetchPublicEntityProjectionsByIds(active.releaseId, oneHopIds);
+    const oneHopProjections =
+      oneHopIds.length > 0
+        ? await fetchPublicEntityProjectionsByIds(active.releaseId, oneHopIds)
+        : [];
     const oneHopViews = oneHopProjections.map((item) =>
       mapProjectionToPublicEntityView(item as PublicProjectionInput),
     );
     const twoHopIds = collectTwoHopNeighborIds(entityId, oneHopIds, oneHopViews);
-    const twoHopProjections = await fetchPublicEntityProjectionsByIds(active.releaseId, twoHopIds);
+    const twoHopProjections =
+      twoHopIds.length > 0
+        ? await fetchPublicEntityProjectionsByIds(active.releaseId, twoHopIds)
+        : [];
     const twoHopViews = twoHopProjections.map((item) =>
       mapProjectionToPublicEntityView(item as PublicProjectionInput),
     );
