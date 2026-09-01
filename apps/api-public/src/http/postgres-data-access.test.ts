@@ -58,6 +58,16 @@ function createFakeQuery(state: {
       const projection = state.entities?.get(`${releaseId}:${entityId}`);
       return projection ? [{ projection }] : [];
     }
+    if (sql.includes('bb_public.release_entities') && sql.includes('entity_id = ANY')) {
+      const releaseId = params[0] as string;
+      const ids = (params[1] as readonly string[]) ?? [];
+      const rows: { projection: PublicEntityProjectionDoc }[] = [];
+      for (const entityId of ids) {
+        const projection = state.entities?.get(`${releaseId}:${entityId}`);
+        if (projection) rows.push({ projection });
+      }
+      return rows;
+    }
     if (sql.includes('bb_public.release_entities') && sql.includes('ORDER BY entity_id')) {
       const releaseId = params[0] as string;
       const rows: { projection: PublicEntityProjectionDoc }[] = [];
@@ -101,6 +111,75 @@ test('createPostgresDataAccessReaders maps entity projection to EntityV1', async
   assert.ok(entity);
   assert.equal(entity?.displayName, sampleProjection.displayName);
   assert.equal(entityV1Schema.safeParse(entity).success, true);
+});
+
+test('createPostgresDataAccessReaders hydrates relatedNeighbors via one ANY() batch', async () => {
+  const neighbor: PublicEntityProjectionDoc = {
+    ...sampleProjection,
+    id: 'ent_seed_person_001',
+    displayName: 'Seed Neighbor',
+    nameLower: 'seed neighbor',
+    kind: 'person',
+    related: [
+      {
+        id: sampleProjection.id,
+        type: 'related_to',
+        direction: 'outgoing',
+      },
+    ],
+  };
+  const rooted: PublicEntityProjectionDoc = {
+    ...sampleProjection,
+    related: [
+      {
+        id: neighbor.id,
+        type: 'related_to',
+        direction: 'outgoing',
+      },
+    ],
+  };
+
+  let anyBatchCalls = 0;
+  const baseQuery = createFakeQuery({
+    entities: new Map([
+      [`${RELEASE_ID}:${rooted.id}`, rooted],
+      [`${RELEASE_ID}:${neighbor.id}`, neighbor],
+    ]),
+  });
+  const countingQuery: PostgresQueryFn = async (sql, params) => {
+    if (sql.includes('entity_id = ANY')) anyBatchCalls += 1;
+    return baseQuery(sql, params);
+  };
+
+  const readers = createPostgresDataAccessReaders({ query: countingQuery });
+  const access = createPublicDataAccessFromReaders(readers);
+  const entity = await access.getEntity(RELEASE_ID, rooted.id);
+
+  assert.ok(entity);
+  assert.equal(anyBatchCalls, 1, 'one-hop only: no second ANY when two-hop set is empty');
+  assert.equal(entity?.relatedNeighbors?.length, 1);
+  assert.equal(entity?.relatedNeighbors?.[0]?.id, neighbor.id);
+  assert.equal(entity?.relatedNeighbors?.[0]?.displayName, 'Seed Neighbor');
+  assert.equal(entityV1Schema.safeParse(entity).success, true);
+});
+
+test('createPostgresDataAccessReaders skips neighbor hydrate when related is absent', async () => {
+  let anyBatchCalls = 0;
+  const baseQuery = createFakeQuery({
+    entities: new Map([[`${RELEASE_ID}:${sampleProjection.id}`, sampleProjection]]),
+  });
+  const countingQuery: PostgresQueryFn = async (sql, params) => {
+    if (sql.includes('entity_id = ANY')) anyBatchCalls += 1;
+    return baseQuery(sql, params);
+  };
+
+  const readers = createPostgresDataAccessReaders({ query: countingQuery });
+  const access = createPublicDataAccessFromReaders(readers);
+  const entity = await access.getEntity(RELEASE_ID, sampleProjection.id);
+
+  assert.ok(entity);
+  assert.equal(anyBatchCalls, 0);
+  assert.equal(entity?.relatedNeighbors, undefined);
 });
 
 test('createPostgresDataAccessReaders uses search index when present', async () => {
@@ -198,7 +277,11 @@ test('mapPublicSearchProjection preserves domain search fields', () => {
     jurisdictionState: 'DC',
     status: 'extant',
     sensitivityClass: 'standard',
+    confidenceTier: 'high',
+    geohash: 'dqcjq',
   });
   assert.equal(mapped.displayName, sampleProjection.displayName);
   assert.equal(mapped.jurisdictionState, 'DC');
+  assert.equal(mapped.confidenceTier, 'high');
+  assert.equal(mapped.geohash, 'dqcjq');
 });

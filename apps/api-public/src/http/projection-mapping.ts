@@ -15,14 +15,15 @@
  * - `timeline` is DERIVED, not stored: `@repo/domain`'s `buildGraphTimeline` composes it from the
  *   projection's own `statusHistory` records and dated `related` timespans — the identical builder
  *   `apps/web` renders from, so the same record no longer carries a timeline on the website and an
- *   empty array over the API (repo-n7p6.6 item 2). Neighbor display names are NOT resolved here
- *   for the same N+1 reason `relatedNeighbors` is not hydrated below; a dated edge therefore names
- *   its neighbor by id. Undated entries are dropped rather than shown with a guessed date.
+ *   empty array over the API (repo-n7p6.6 item 2). Neighbor display names are resolved on the
+ *   entity GET path after bounded neighbor batching (`hydrateEntityV1Neighbors`); this mapper
+ *   itself keeps an empty lookup so list/search mapping stays O(1) per row.
  * - `related` neighbor entries map straight from the projection's own `related` array (ids/types/
- *   direction/timespan only). `relatedNeighbors`/`continueLearning` (denormalized neighbor display
- *   fields) are deliberately NOT hydrated here: doing so would require reading every related
- *   entity's own projection per request — an N+1 read amplification the bead's adversarial review
- *   explicitly flags as a case to defend against, not introduce.
+ *   direction/timespan only). `relatedNeighbors`/`continueLearning` are hydrated on the
+ *   single-entity read path via bounded `ANY()` batches (`hydrate-entity-neighbors.ts`) — the
+ *   same caps as web Place, never N+1 point-gets. Collection/list reads still omit them.
+ * - Timeline neighbor display names stay unresolved here (id-only labels) so list/search paths
+ *   never pay neighbor reads; Place/entity detail can still resolve names from the hydrate catalog.
  * - Fields absent on bootstrap-window stubs (`jurisdictionLabel`, `locationLabel`,
  *   `researchCoverage`, revision timestamps) fall back to the same honest placeholders
  *   `apps/web`'s `map-projection.ts` uses — never fabricated curated content.

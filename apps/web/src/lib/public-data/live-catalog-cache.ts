@@ -157,7 +157,7 @@ export function createLiveCatalogMemoryCache<Value>(
   };
 }
 
-export type LiveCatalogKind = 'entities' | 'search-index' | 'graph';
+export type LiveCatalogKind = 'entities' | 'search-index' | 'search-index-v2' | 'graph';
 
 export function liveCatalogCacheKey(
   kind: LiveCatalogKind,
