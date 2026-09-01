@@ -8,12 +8,12 @@
 
 | Piece | Today | Gap |
 |---|---|---|
-| Public URL | `/place/{slug}` (or `{slug}--{id}` on collision) for standable records; `/entity/{id}` for people / non-standable | Constellation + discovery continuity still incomplete |
+| Public URL | `/place/{slug}` (or `{slug}--{id}` on collision) for standable records; `/entity/{id}` for people / non-standable | Keep |
 | Holding set | Search-index slug resolve + point-get; Door pin walks still use stand allowlist | Door Rest stays calm by design |
 | Entity route | 308 to Place when `canStandHere`; people and street-precision residences render here | Keep |
-| Renderer (Place) | `HomeFirstPaint`: evidence, precision caveat, trust block, Atlas/Records return | RelationshipConstellation visual still open |
+| Renderer (Place) | `HomeFirstPaint` + `RelationshipConstellation` + trust + discovery return | Keep refining capacity states |
 | Banned on Place | schema strip, Grade letter strip, precision shop talk | Keep |
-| Sections | `EntityRoomSections` + trust + discovery off-ramp | Constellation visual incomplete |
+| Sections | `EntityRoomSections` + constellation + trust + discovery off-ramp | Keep |
 | Neighbors | `RelationshipConstellation` for typed edges; continue-learning separate | Batch public relationship projection still open |
 | Discovery return | Atlas/Records with arrival filters; list prev/next when `from=list` | Map-context prev/next still open |
 
