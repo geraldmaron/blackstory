@@ -94,6 +94,14 @@ describe('instrument shell layout', () => {
   it('locks the instrument to the viewport (not a footer-over-map document)', () => {
     assert.match(
       shellCss,
+      /html:has\(\[data-surface='instrument'\]\)\s*\{[^}]*overflow:\s*hidden/s,
+    );
+    assert.match(
+      shellCss,
+      /\.ds-map-stage\[data-plate-posture='live'\]\s*\{[^}]*touch-action:\s*none/s,
+    );
+    assert.match(
+      shellCss,
       /\.ds-shell:has\(\[data-surface='instrument'\]\)\s*\{[^}]*height:\s*100dvh[^}]*overflow:\s*hidden/s,
     );
     assert.match(
@@ -262,6 +270,7 @@ describe('the plate is styled globally, not from the route group', () => {
     // `.ds-shell`, not a descendant of the group's `.ds-map-surface`. Every plate rule left in
     // the group's sheet was a rule that had silently stopped matching.
     assert.match(shellCss, /\.ds-map-stage\s*\{[^}]*position:\s*fixed/s);
+    assert.match(shellCss, /\.ds-map-stage\s*\{[^}]*isolation:\s*isolate/s);
     assert.match(shellCss, /\.ds-map-stage__canvas\s*\{/);
     assert.doesNotMatch(mapSurfacesCss, /\.ds-map-stage\b/);
   });

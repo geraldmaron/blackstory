@@ -1,13 +1,15 @@
 /**
  * Atlas instrument for `/explore` (and `/map` → `/explore`).
- * First paint is the pin plate plus the live catalog shell. Kind / Tone / Era
- * belong here, not on `/`. Shop tokens stay off the first HTML document.
+ * First paint is the US locator (state hairlines) plus the pin plate, then the
+ * live catalog shell. Kind / Tone / Era belong here, not on `/`. Shop tokens
+ * stay off the first HTML document.
  */
 import { FilterBar } from '@repo/ui';
 import { SynchronizedResultList } from '../components/map-experience/SynchronizedResultList';
 import { getSharedPublicEntities } from '../lib/map-experience/shared-map-data';
 import { toFirstPaintPins } from '../lib/map-experience/first-paint-pins';
 import { AtlasLoader } from './explore/AtlasLoader';
+import { ExploreMapUnderlay } from './explore/explore-map-underlay';
 import { buildAtlasShell } from './explore/explore-view-model';
 import { FirstPaintPinPlate } from './first-paint-pin-plate';
 import '../components/patterns/browse-mode.css';
@@ -15,6 +17,7 @@ import '../components/patterns/edition-fact-icon.css';
 import '../components/patterns/record-anatomy.css';
 import './explore/explore.css';
 import './explore/explore-edition.css';
+import './explore/explore-map-underlay.css';
 import './first-paint-pin-plate.css';
 
 /** Rows in the `<noscript>` fallback list. The crawlable index is `/records`. */
@@ -114,7 +117,9 @@ export async function AtlasHome({ params }: AtlasHomeProps) {
           ) : null}
         </div>
       </noscript>
-      <FirstPaintPinPlate pins={pins} linkRecords />
+      <ExploreMapUnderlay>
+        <FirstPaintPinPlate pins={pins} />
+      </ExploreMapUnderlay>
       <AtlasLoader shell={shell} pins={pins} />
     </>
   );

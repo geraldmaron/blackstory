@@ -116,15 +116,19 @@ export function buildVisitHandoff(input: VisitHandoffInput): VisitHandoff {
   };
 }
 
-/** Build visit input from an explore map feature (address, standing, maps only). */
+/** Build visit input from an explore map feature (address, standing, contact, maps). */
 export function buildVisitHandoffFromMapFeature(input: {
   readonly displayName: string;
   readonly locationLabel?: string;
+  readonly jurisdictionLabel?: string;
   readonly locationPrecision: string;
   readonly kind: string;
   readonly status?: string;
   readonly lat: number;
   readonly lng: number;
+  readonly livingStatus?: string;
+  readonly sensitivityClass?: string;
+  readonly claims?: VisitHandoffInput['claims'];
 }): VisitHandoffInput {
   return {
     displayName: input.displayName,
@@ -133,7 +137,13 @@ export function buildVisitHandoffFromMapFeature(input: {
     kind: input.kind,
     lat: input.lat,
     lng: input.lng,
+    ...(input.jurisdictionLabel !== undefined
+      ? { jurisdictionLabel: input.jurisdictionLabel }
+      : {}),
     ...(input.status !== undefined ? { status: input.status } : {}),
+    ...(input.livingStatus !== undefined ? { livingStatus: input.livingStatus } : {}),
+    ...(input.sensitivityClass !== undefined ? { sensitivityClass: input.sensitivityClass } : {}),
+    ...(input.claims !== undefined && input.claims.length > 0 ? { claims: input.claims } : {}),
   };
 }
 

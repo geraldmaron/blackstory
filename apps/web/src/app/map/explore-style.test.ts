@@ -904,6 +904,14 @@ test('point and halo radii blend first-paint sizes nationally with marker-size.t
   );
 });
 
+test('clusters use Page Sand fill and copper stroke, not white rims', () => {
+  const style = buildStyleFixture('presence');
+  const clusterLayer = layerById(style, EXPLORE_CLUSTER_LAYER_ID);
+  assert.equal(clusterLayer.paint?.['circle-color'], DIGNITY_PALETTE.pointHalo);
+  assert.equal(clusterLayer.paint?.['circle-stroke-color'], DIGNITY_PALETTE.point);
+  assert.notEqual(clusterLayer.paint?.['circle-stroke-color'], DIGNITY_PALETTE.selected);
+});
+
 test('clusters use zoom-scaled count-step radii from CLUSTER_RADIUS_BY_COUNT', () => {
   const style = buildStyleFixture('presence');
   const clusterLayer = layerById(style, EXPLORE_CLUSTER_LAYER_ID);

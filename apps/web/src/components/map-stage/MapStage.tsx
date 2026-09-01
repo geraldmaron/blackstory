@@ -53,7 +53,6 @@ import {
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../../app/map/explore-layer-ids';
@@ -89,6 +88,12 @@ import {
   bindWebGlContextRecovery,
   isWebGlAvailable,
 } from '../../lib/map-experience/map-libre-lifecycle';
+import {
+  ENTITY_POINTER_HIT_LAYER_IDS,
+  entityIdFromProperties,
+  pointerHitBox,
+  resolveEntityPointerHit,
+} from '../../lib/map-experience/entity-pointer-hit';
 import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
@@ -183,6 +188,11 @@ function releasePlateSlot(plate: HTMLDivElement): void {
   plate.style.removeProperty('--ds-plate-frame-left');
   plate.style.removeProperty('--ds-plate-frame-width');
   plate.style.removeProperty('--ds-plate-frame-height');
+}
+
+/** Locator underlay hides; camera, pin clicks, and MapLibre gestures reach the live plate. */
+function stampPlateReady(plate: HTMLDivElement | null): void {
+  if (plate) plate.dataset.plateReady = '1';
 }
 
 type MaplibreModule = typeof MapLibreNamespace;
@@ -548,6 +558,7 @@ export function MapStageProvider({
     if (!mapAvailableRef.current) return;
     mapAvailableRef.current = false;
     setMapAvailable(false);
+    plateRef.current?.removeAttribute('data-plate-ready');
     notify(listenersRef.current, 'error');
   }, []);
 
@@ -730,6 +741,7 @@ export function MapStageProvider({
           )
             .then((joined) => {
               settledDensityFillByFipsRef.current = indexDensityFillColors(joined);
+              if (joined.features.length > 0) stampPlateReady(plateRef.current);
             })
             .catch((error) => {
               console.error('[MapStage] state polygon load failed', error);
@@ -1252,24 +1264,48 @@ export function MapStageProvider({
       lastViewportRef.current = readViewport(activeMap);
       notify(listenersRef.current, 'viewport', lastViewportRef.current);
 
-      /** True when an entity marker or cluster is rendered under the click point. GL circle
-       * layers have no DOM to stopPropagation from (unlike the overlay marker buttons), so the
-       * layer-scoped state/edge click handlers must yield to them explicitly — otherwise one
-       * cluster click would both expand the cluster and select the state beneath it. */
-      function entityHitAt(point: { x: number; y: number }): boolean {
-        const layers = [
-          EXPLORE_CLUSTER_LAYER_ID,
-          EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
-          EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
-        ].filter((id) => activeMap.getLayer(id));
-        return (
-          layers.length > 0 &&
-          activeMap.queryRenderedFeatures([point.x, point.y], { layers }).length > 0
+      /**
+       * National discs are a few pixels; query a padded box so a near-miss still opens
+       * the record sheet instead of selecting the state fill underneath.
+       */
+      function pointerHitAt(point: { x: number; y: number }) {
+        const layers = ENTITY_POINTER_HIT_LAYER_IDS.filter((id) => activeMap.getLayer(id));
+        if (layers.length === 0) return undefined;
+        const features = activeMap.queryRenderedFeatures(pointerHitBox(point), { layers });
+        return resolveEntityPointerHit(
+          features.map((feature) => ({
+            layerId: feature.layer.id,
+            properties: feature.properties ?? null,
+          })),
         );
       }
 
+      function selectFromPointerHit(hit: NonNullable<ReturnType<typeof pointerHitAt>>): void {
+        if (hit.kind === 'entity') {
+          notify(listenersRef.current, 'select', hit.entityId);
+          return;
+        }
+        const source = activeMap.getSource(hit.sourceId) as GeoJSONSource | undefined;
+        if (!source) return;
+        void source
+          .getClusterLeaves(hit.clusterId, 1, 0)
+          .then((leaves) => {
+            const entityId = entityIdFromProperties(leaves[0]?.properties);
+            if (entityId) notify(listenersRef.current, 'select', entityId);
+          })
+          .catch(() => {
+            // Cluster may have dissolved between click and lookup.
+          });
+      }
+
+      function handleEntityPointerClick(event: MapMouseEvent) {
+        const hit = pointerHitAt(event.point);
+        if (!hit) return;
+        selectFromPointerHit(hit);
+      }
+
       function handleStateClick(event: MapLayerMouseEvent) {
-        if (entityHitAt(event.point)) return;
+        if (pointerHitAt(event.point)) return;
         const postal = event.features?.[0]?.properties?.postalCode;
         if (typeof postal === 'string' && postal.length > 0) {
           notify(listenersRef.current, 'stateSelect', postal);
@@ -1277,7 +1313,7 @@ export function MapStageProvider({
       }
 
       function handleEdgeClick(event: MapLayerMouseEvent) {
-        if (entityHitAt(event.point)) return;
+        if (pointerHitAt(event.point)) return;
         const edgeId = event.features?.[0]?.properties?.edgeId;
         if (typeof edgeId === 'string' && edgeId.length > 0) {
           notify(listenersRef.current, 'edgeSelect', edgeId);
@@ -1285,13 +1321,11 @@ export function MapStageProvider({
       }
 
       function handleBackgroundClick(event: MapMouseEvent) {
+        if (pointerHitAt(event.point)) return;
         const hitLayers = [
           EXPLORE_STATE_DENSITY_LAYER_ID,
           EXPLORE_HISTORY_EDGES_LAYER_ID,
           EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
-          EXPLORE_CLUSTER_LAYER_ID,
-          EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
-          EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
         ].filter((id) => activeMap.getLayer(id));
         const hits = hitLayers.length
           ? activeMap.queryRenderedFeatures(event.point, { layers: hitLayers })
@@ -1303,6 +1337,14 @@ export function MapStageProvider({
       activeMap.once('load', () => {
         mapStyleReadyRef.current = true;
         applyStyleAndData();
+        // Hide the Albers locator once the live plate has painted so camera moves and
+        // uncovered pin/cluster clicks hit MapLibre, not the underlay.
+        activeMap.once('idle', () => {
+          if (!cancelledRef.current) stampPlateReady(plateRef.current);
+        });
+        window.setTimeout(() => {
+          if (!cancelledRef.current) stampPlateReady(plateRef.current);
+        }, 1800);
         const canvas = activeMap.getCanvas();
         contextRecoveryRef.current = bindWebGlContextRecovery(
           canvas,
@@ -1331,6 +1373,7 @@ export function MapStageProvider({
             activeMap.getCanvas().style.cursor = '';
           });
         }
+        activeMap.on('click', handleEntityPointerClick);
         activeMap.on('click', handleBackgroundClick);
         activeMap.resize();
         // Flush camera requested while the canvas was still constructing (e.g. locate → explore
@@ -1365,49 +1408,14 @@ export function MapStageProvider({
         requestCountyPolygonLoad(activeMap, configRef.current);
       });
 
-      // Cluster expansion (dignity-style.ts's EXPLORE_CLUSTER_CONFIG contract: "every cluster
-      // decomposes to named entities within two interactions") — clicking a cluster circle
-      // eases down to the zoom where that cluster splits, through the authored camera grammar
-      // (ADR-017: raw easeTo/flyTo defaults are banned). Registered up-front even though the
-      // layer is added post-load: MapLibre's layer-scoped events resolve the layer at event
-      // time, so a not-yet-added layer is simply never hit.
-      activeMap.on('click', EXPLORE_CLUSTER_LAYER_ID, (event: MapLayerMouseEvent) => {
-        const feature = event.features?.[0];
-        const clusterId = feature?.properties?.cluster_id;
-        const source = activeMap.getSource(EXPLORE_ENTITIES_SOURCE_ID) as GeoJSONSource | undefined;
-        if (typeof clusterId !== 'number' || !source || feature?.geometry.type !== 'Point') return;
-        const [lng, lat] = feature.geometry.coordinates;
-        void source
-          .getClusterExpansionZoom(clusterId)
-          .then((expansionZoom) => {
-            if (typeof lng !== 'number' || typeof lat !== 'number') return;
-            const zoom = Math.min(Math.max(expansionZoom, MAP_MIN_ZOOM), MAP_MAX_ZOOM);
-            runFlyPresetRef.current('locality', { center: [lng, lat], zoom }, { mode: 'ease' });
-          })
-          .catch(() => {
-            // Cluster may have dissolved between click and lookup (data patch mid-flight);
-            // nothing to expand.
-          });
-      });
+      // Cursor affordance only. Selection is the padded map click above so national
+      // discs and clusters open the record sheet instead of relying on a 3.5px layer hit.
       activeMap.on('mouseenter', EXPLORE_CLUSTER_LAYER_ID, () => {
         activeMap.getCanvas().style.cursor = 'pointer';
       });
       activeMap.on('mouseleave', EXPLORE_CLUSTER_LAYER_ID, () => {
         activeMap.getCanvas().style.cursor = '';
       });
-
-      // Individual pins (GL circle) — works at every zoom once unclustered; complements the
-      // zoom-gated HTML hit-targets so selection does not depend on DOM overlays alone.
-      const selectFromUnclustered = (event: MapLayerMouseEvent) => {
-        const feature = event.features?.[0];
-        const entityId = feature?.properties?.entityId;
-        if (typeof entityId === 'string' && entityId.length > 0) {
-          event.originalEvent?.stopPropagation();
-          notify(listenersRef.current, 'select', entityId);
-        }
-      };
-      activeMap.on('click', EXPLORE_UNCLUSTERED_POINT_LAYER_ID, selectFromUnclustered);
-      activeMap.on('click', EXPLORE_UNCLUSTERED_HALO_LAYER_ID, selectFromUnclustered);
       activeMap.on('mouseenter', EXPLORE_UNCLUSTERED_POINT_LAYER_ID, () => {
         activeMap.getCanvas().style.cursor = 'pointer';
       });

@@ -150,6 +150,33 @@ test('actions only render when the surface can perform them', () => {
   for (const action of ['Fly to place', 'Save', 'Cite', 'Share']) {
     assert.match(wired, new RegExp(`>${action}<`), `missing action: ${action}`);
   }
+  assert.match(wired, /ds-sheet__action--quiet[^>]*>Save</);
+  assert.match(wired, /ds-sheet__action--quiet[^>]*>Cite</);
+  assert.match(wired, /ds-sheet__action--quiet[^>]*>Share</);
+});
+
+test('visit maps exits stay quiet text; fly stays a sheet action', () => {
+  const html = render({
+    record: {
+      ...RECORD,
+      visitInput: {
+        displayName: 'A.G. Gaston Motel',
+        locationLabel: '1530 Fifth Avenue North, Birmingham, Alabama',
+        jurisdictionLabel: 'Birmingham, Alabama',
+        locationPrecision: 'institution',
+        kind: 'place',
+        status: 'historic',
+        lat: 33.5,
+        lng: -86.8,
+      },
+    },
+    onFlyToPlace: () => {},
+  });
+  assert.match(html, /ds-sheet__visit/);
+  assert.match(html, /ds-record-visit__link/);
+  assert.match(html, /Open in maps/);
+  assert.match(html, /Fly to place/);
+  assert.doesNotMatch(html, /ds-cta/);
 });
 
 test('save reports whether the record is already saved', () => {

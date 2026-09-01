@@ -587,10 +587,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
   const overlayFillOpacity = satellite ? SATELLITE_STATE_FILL_OPACITY : PLATE_STATE_FILL_OPACITY;
   const countyOverlayFillOpacity = satellite ? SATELLITE_STATE_FILL_OPACITY : COUNTY_FILL_OPACITY;
   const popGeo = input.popGeo ?? DEFAULT_POPULATION_GEO;
-  /** National field matches Door first-paint pins; kind encoding returns past locality zoom. */
+  /** National field: Page Sand records / copper walks; kind encoding past locality zoom. */
   const entityPointColor = blendFirstPaintWithKindExpression(
     kindColorExpression(),
-    firstPaintPointColorExpression(plate),
+    firstPaintPointColorExpression(),
   );
   const entityPointOpacity = blendFirstPaintWithKindExpression(
     kindFillOpacityExpression(),
@@ -1116,7 +1116,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: {
           // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
           ...DECADE_TRANSITION_PAINT,
-          // National zoom: first-paint ink/copper (Door field). Locality: kind shade + glyph rim.
+          // National zoom: Page Sand records / copper walks. Locality: kind shade + glyph rim.
           'circle-radius': entityPointRadius,
           'circle-color': entityPointColor,
           'circle-opacity': entityPointOpacity,
@@ -1207,10 +1207,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
               CLUSTER_RADIUS_BY_COUNT[3]![1],
             ],
           ],
-          'circle-color': DIGNITY_PALETTE.point,
+          'circle-color': DIGNITY_PALETTE.pointHalo,
           'circle-opacity': ENTITY_CLUSTER_OPACITY,
           'circle-stroke-width': zoomScaledNumericExpression(2),
-          'circle-stroke-color': plate.selected,
+          'circle-stroke-color': DIGNITY_PALETTE.point,
         },
       },
       {
@@ -1320,10 +1320,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
               CLUSTER_RADIUS_BY_COUNT[3]![1],
             ],
           ],
-          'circle-color': DIGNITY_PALETTE.point,
+          'circle-color': DIGNITY_PALETTE.pointHalo,
           'circle-opacity': 0,
           'circle-stroke-width': zoomScaledNumericExpression(2),
-          'circle-stroke-color': plate.selected,
+          'circle-stroke-color': DIGNITY_PALETTE.point,
         },
       },
       {

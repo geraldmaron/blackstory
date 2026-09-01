@@ -67,8 +67,8 @@ OPERATOR_CLI_PRIVACY_PEPPER=<pepper> node --conditions development --import tsx 
 `runResearchIntake` (`research-intake.ts`) sequences three real, independently tested steps:
 1. `runQuickAddFetch` (`fetch.ts`) — DNS-pinned, SSRF-safe fetch through BB-030
    (`executeSafeFetch`, `packages/security/src/url-safety/`).
-2. `buildCitationPrefill` / `planSelectiveCapture` — citation metadata + a note on where Wayback
-   capture would attach (not wired yet).
+2. `buildCitationPrefill` / `planSelectiveCapture` — citation metadata plus a note that Wayback
+   SPN2 is wired on `capture-backfill --wayback`, not on intake.
 3. `prepareLeadIntake` (`intake.ts`) — real BB-029 quarantine intake plus a real BB-044 draft
    research case.
 
@@ -82,6 +82,39 @@ instead of retrying around it; use the owner's own words for `--description`; re
 **Never:** fetch the URL yourself and paste content in (bypasses BB-030); `--commit` without
 explicit go-ahead; treat a completed call as published (it only reaches `state: 'candidate'`);
 hand-build a `SubmissionInput`/`ResearchCaseRecord`.
+
+---
+
+## capture-backfill
+
+**When to use:** snapshot cited URLs into `bb_evidence.source_captures` (local hash + excerpt),
+optionally secondary-anchor them at Wayback via Save Page Now.
+
+```bash
+node --conditions development --import tsx packages/operator-cli/src/bin.ts capture-backfill
+node --conditions development --import tsx packages/operator-cli/src/bin.ts capture-backfill \
+  --commit --max-captures 25
+node --conditions development --import tsx packages/operator-cli/src/bin.ts capture-backfill \
+  --commit --wayback --max-captures 25
+node --conditions development --import tsx packages/operator-cli/src/bin.ts capture-backfill \
+  --commit --wayback --max-entities 20
+```
+
+Safe by default (inventory + coverage JSON, no fetch, no write). `--commit` fetches through the
+SSRF-safe path and writes capture rows. `--wayback` POSTs each **successful** local capture to
+`web.archive.org/save` (SPN2) through `packages/domain` Wayback client + the operator-cli
+`SafeHttpClient` port. Snapshot URL lands on `source_captures.storage_object`. Keys live in
+1Password item **Internet Archive** (Personal vault); inject with `run-with-dev-secrets`. If
+`INTERNET_ARCHIVE_ACCESS_KEY` / `INTERNET_ARCHIVE_SECRET_KEY` are unset, SPN is skipped and
+local capture still runs (`wayback.status: skipped_no_credentials`).
+
+Do not run unbounded `--wayback --commit` against the full cited-URL inventory. Use
+`--max-captures`, `--max-entities`, and the daily `source_fetch` budget in
+[`capture-completeness-ops-bar.md`](./capture-completeness-ops-bar.md). Failed local fetches do
+not mint SPN jobs; that lookup-fallback is a separate lane.
+
+**Never:** raw `fetch` to archive.org; fabricate a Wayback URL when SPN fails; treat `--wayback`
+without `--commit` as a live save (dry-run only reports `wayback.status: planned`).
 
 ---
 

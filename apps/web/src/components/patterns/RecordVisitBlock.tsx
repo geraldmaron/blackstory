@@ -1,8 +1,10 @@
 /**
- * Shared visit block: public address, standing, precision, and maps handoff CTAs.
+ * Shared visit block: public address, standing, precision, contact, and maps handoff CTAs.
+ * Address and phone (when present) pair with standard flat icons; icons are never the only signal.
  */
 import React from 'react';
 import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MapsExternalLink } from '../map-experience/MapsExternalLink';
 import {
   externalMapsDirectionsLabel,
@@ -10,8 +12,10 @@ import {
 } from '../../lib/geography/external-maps-url';
 import { buildVisitHandoff, type VisitHandoffInput } from '../../lib/geography/visit-handoff';
 import type { PublicVisitContactField } from '../../lib/geography/public-visit-contact';
+import { iconWithFallback } from '../../lib/map-experience/icon-fallback';
 import { Precision } from '../room';
 import { RecordPlacePreview } from './RecordPlacePreview';
+import { visitFactIconFor, type VisitFactIconKey } from './edition-fact-icon';
 import './record-visit.css';
 import './record-archive.css';
 
@@ -37,18 +41,33 @@ function formatPhoneHref(value: string): string {
   return digits.length > 0 ? `tel:${digits}` : `tel:${value.trim()}`;
 }
 
+function VisitIcon({ fact }: { readonly fact: VisitFactIconKey }) {
+  return (
+    <FontAwesomeIcon
+      icon={iconWithFallback(visitFactIconFor(fact))}
+      className="ds-record-visit__icon"
+      aria-hidden="true"
+    />
+  );
+}
+
 function VisitorField({
   label,
+  icon,
   field,
   href,
 }: {
   readonly label: string;
+  readonly icon: VisitFactIconKey;
   readonly field: PublicVisitContactField;
   readonly href?: string;
 }) {
   return (
     <div className="ds-record-visit__visitor-row">
-      <dt>{label}</dt>
+      <dt>
+        <VisitIcon fact={icon} />
+        <span>{label}</span>
+      </dt>
       <dd>
         {href ? (
           <a href={href} rel={href.startsWith('http') ? 'noreferrer' : undefined}>
@@ -83,7 +102,10 @@ export function RecordVisitBlock({
       <h2 className="ds-record-visit__heading" id="record-visit-heading">
         Visit
       </h2>
-      <p className="ds-record-visit__address">{visit.addressLine}</p>
+      <p className="ds-record-visit__address">
+        <VisitIcon fact="address" />
+        <span className="ds-record-visit__address-text">{visit.addressLine}</span>
+      </p>
       {visit.visitStanding ? (
         <p className="ds-record-visit__standing">{visit.visitStanding}</p>
       ) : null}
@@ -101,6 +123,7 @@ export function RecordVisitBlock({
             {contact.website ? (
               <VisitorField
                 label="Website"
+                icon="website"
                 field={contact.website}
                 href={formatWebsiteHref(contact.website.value)}
               />
@@ -108,11 +131,14 @@ export function RecordVisitBlock({
             {contact.phone ? (
               <VisitorField
                 label="Phone"
+                icon="phone"
                 field={contact.phone}
                 href={formatPhoneHref(contact.phone.value)}
               />
             ) : null}
-            {contact.hours ? <VisitorField label="Hours" field={contact.hours} /> : null}
+            {contact.hours ? (
+              <VisitorField label="Hours" icon="hours" field={contact.hours} />
+            ) : null}
           </dl>
         </div>
       ) : null}
@@ -122,10 +148,14 @@ export function RecordVisitBlock({
           caveat="The archive never draws a point sharper than the source supports."
         />
       ) : null}
-      <div className="ds-record-visit__actions">
+      {/*
+       * Maps exits are quiet text links, never copper pills. External handoff and in-app
+       * "Fly to place" (sheet) are different jobs; twin primary CTAs for "go to place" compete.
+       */}
+      <div className="ds-record-visit__actions" role="group" aria-label="Maps handoff">
         {visit.mapsSearchHref ? (
           <MapsExternalLink
-            className="ds-cta ds-cta--quiet"
+            className="ds-record-visit__link"
             href={visit.mapsSearchHref}
             placeLabel={mapsLabel}
             title={externalMapsLinkLabel(mapsLabel)}
@@ -135,7 +165,7 @@ export function RecordVisitBlock({
         ) : null}
         {visit.mapsDirectionsHref ? (
           <MapsExternalLink
-            className="ds-cta ds-cta--quiet"
+            className="ds-record-visit__link"
             href={visit.mapsDirectionsHref}
             placeLabel={mapsLabel}
             title={externalMapsDirectionsLabel(mapsLabel)}
@@ -144,7 +174,7 @@ export function RecordVisitBlock({
           </MapsExternalLink>
         ) : null}
         {atlasHref ? (
-          <Link className="ds-cta ds-cta--quiet" href={atlasHref} scroll={false}>
+          <Link className="ds-record-visit__link" href={atlasHref} scroll={false}>
             See on map
           </Link>
         ) : null}

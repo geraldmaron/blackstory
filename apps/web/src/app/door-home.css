@@ -3,8 +3,10 @@
  * Flat matte only: no shadow, glow, or glass. Tokens only. No radial scrims (brand forbids
  * decorative gradients); centred chapters use an opaque surface plate instead.
  *
- * Board reuses `public/geo/us-locator.svg` (Albers USA) as a vector <img> under layout zoom
- * (width/height/left/top). Never transform:scale the plate — that rasterizes and blurs.
+ * Board reuses `public/geo/us-locator.svg` (Albers USA) as a CSS mask under layout zoom
+ * (width/height/left/top). Land colour is `--ds-ink-muted` on `--ds-canvas` (same quiet
+ * silhouette as RecordLocator) — never Page Sand / accent wash. Never transform:scale the
+ * plate — that rasterizes and blurs.
  *
  * Scroll model: the document scrolls. The plate is position:fixed full-bleed. Door chrome is
  * pointer-events:none except cards and pin links so the wheel and pin hits work over the map.
@@ -50,21 +52,26 @@
 .ds-door__ground {
   position: absolute;
   inset: 0;
-  background-color: color-mix(in srgb, var(--ds-accent-muted) 70%, var(--ds-ink) 30%);
+  background: var(--ds-canvas);
 }
 
-/* Locator SVG as an img stays vector-sharp under layout zoom. */
+/*
+ * Locator as a mask, not a tinted multiply plate: SVG alpha (land 0.32, hairlines 1) paints
+ * `--ds-ink-muted` so both themes stay quiet and on-brand. Copper stays on pins only.
+ */
 .ds-door__ground-map {
   position: absolute;
   inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
   pointer-events: none;
-  /* Black land @ 0.32 opacity multiplies into the tinted ground. */
-  mix-blend-mode: multiply;
+  background-color: var(--ds-ink-muted);
+  -webkit-mask-image: url('/geo/us-locator.svg');
+  mask-image: url('/geo/us-locator.svg');
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
 }
 
 .ds-door__field-chrome {

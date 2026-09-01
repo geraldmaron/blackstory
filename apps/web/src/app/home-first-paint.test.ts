@@ -177,6 +177,7 @@ test('`/` is the door; a place page never mounts the catalog boot or camera cock
   );
   assert.match(atlasHome, /toFirstPaintPins/);
   assert.match(atlasHome, /FirstPaintPinPlate/);
+  assert.match(atlasHome, /ExploreMapUnderlay/);
   assert.doesNotMatch(atlasHome, /Opening the map/);
   assert.doesNotMatch(atlasHome, /ds-explore__walks/);
 });

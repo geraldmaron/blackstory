@@ -3,7 +3,11 @@
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { buildVisitHandoff, visitStandingLabel } from './visit-handoff.js';
+import {
+  buildVisitHandoff,
+  buildVisitHandoffFromMapFeature,
+  visitStandingLabel,
+} from './visit-handoff.js';
 
 describe('visitStandingLabel', () => {
   it('describes active place-like records', () => {
@@ -49,8 +53,40 @@ describe('buildVisitHandoff', () => {
           object: 'https://museum.example.org',
           citationLabel: 'Museum visitor page',
         },
+        {
+          id: 'claim-phone',
+          predicate: 'visitorPhone',
+          object: '(202) 555-0100',
+          citationLabel: 'Museum visitor page',
+        },
       ],
     });
     assert.equal(visit.contact?.website?.value, 'https://museum.example.org');
+    assert.equal(visit.contact?.phone?.value, '(202) 555-0100');
+  });
+
+  it('builds map-feature visit input with jurisdiction and contact claims', () => {
+    const visit = buildVisitHandoff(
+      buildVisitHandoffFromMapFeature({
+        displayName: 'Example Museum',
+        locationLabel: '100 Museum Drive',
+        jurisdictionLabel: 'Washington, D.C.',
+        locationPrecision: 'institution',
+        kind: 'institution',
+        status: 'active',
+        lat: 38.89,
+        lng: -77.02,
+        claims: [
+          {
+            id: 'claim-phone',
+            predicate: 'visitorPhone',
+            object: '(202) 555-0100',
+            citationLabel: 'Museum visitor page',
+          },
+        ],
+      }),
+    );
+    assert.equal(visit.addressLine, '100 Museum Drive, Washington, D.C.');
+    assert.equal(visit.contact?.phone?.value, '(202) 555-0100');
   });
 });

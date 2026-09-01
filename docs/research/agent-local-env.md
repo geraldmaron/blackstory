@@ -51,6 +51,23 @@ test -n "$OPENROUTER_API_KEY" && test -n "$DATABASE_URL" && echo ok
 test -n "$CENSUS_API_KEY" && echo census-ok
 ```
 
+## Internet Archive / Wayback SPN2
+
+S3 access/secret for Save Page Now live in 1Password item **Internet Archive** (vault
+**Personal**), fields `s3_access_key` / `s3_secret_key`. They are referenced from
+`~/.env.1password` as `INTERNET_ARCHIVE_ACCESS_KEY` / `INTERNET_ARCHIVE_SECRET_KEY`.
+Do not copy the values into `apps/web/.env.local`.
+
+```bash
+set -a && source apps/web/.env.local && set +a
+run-with-dev-secrets bash -c 'test -n "$INTERNET_ARCHIVE_ACCESS_KEY" && echo ia-ok'
+run-with-dev-secrets node --conditions development --import tsx \
+  packages/operator-cli/src/bin.ts capture-backfill --wayback --max-captures 5
+```
+
+`--wayback` without those env vars skips SPN (`wayback.status: skipped_no_credentials`) and
+still captures locally.
+
 Optional 1Password path when signed in: `run-with-dev-secrets bash -c 'test -n "$OPENROUTER_API_KEY" && echo ok'`.
 Corsair overnight jobs continue to use `~/.config/blackstory/enrichment.env` (see overnight runbook).
 

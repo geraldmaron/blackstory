@@ -31,7 +31,41 @@ test('every active-release entity with a resolvable anchor becomes an enriched f
     assert.equal(feature.properties.oneLineStory, entity!.summary);
     assert.equal(feature.properties.evidenceCount, entity!.claims.length);
     assert.deepEqual(feature.properties.eraBuckets, entity!.eraBuckets ?? []);
+    if (entity!.jurisdictionLabel.trim().length > 0) {
+      assert.equal(feature.properties.jurisdictionLabel, entity!.jurisdictionLabel.trim());
+    }
   }
+});
+
+test('visitClaims on map features carry only website, phone, and hours predicates', () => {
+  const entities = listPublicEntities().map((entity) =>
+    entity.id === 'ent_dunbar_school_001'
+      ? {
+          ...entity,
+          locationPrecision: 'institution' as const,
+          claims: [
+            ...entity.claims,
+            {
+              id: 'claim_visit_phone',
+              predicate: 'visitorPhone',
+              object: '(202) 555-0140',
+              confidenceScore: 0.7,
+              confidenceLevel: 'medium' as const,
+              citationSource: 'School visitor page',
+              citationLabel: 'School visitor page',
+            },
+          ],
+        }
+      : entity,
+  );
+  const source = buildExploreMapSource(entities);
+  const dunbar = source.featureCollection.features.find(
+    (feature) => feature.properties.entityId === 'ent_dunbar_school_001',
+  );
+  assert.ok(dunbar);
+  assert.ok(dunbar.properties.visitClaims);
+  assert.equal(dunbar.properties.visitClaims.length, 1);
+  assert.equal(dunbar.properties.visitClaims[0]?.predicate, 'visitorPhone');
 });
 
 test('holdingWalk marks only allowlisted atlas walks, not every /place/ href', () => {

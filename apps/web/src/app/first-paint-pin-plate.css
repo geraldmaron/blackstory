@@ -1,11 +1,11 @@
 /**
- * First-paint pin plate. Door and Explore first paint share one disc language; copper marks
- * walks/active/focus; ink dots for records. Hidden once MapLibre paints the live plate.
+ * First-paint pin plate. Door, Explore, and HTML map markers share Page Sand
+ * majority discs; copper marks walks, active, and focus.
  */
 
 :root {
-  --ds-first-paint-pin-ink: color-mix(in srgb, var(--ds-ink) 55%, transparent);
-  --ds-first-paint-pin-ink-link: color-mix(in srgb, var(--ds-ink) 72%, transparent);
+  --ds-first-paint-pin-ink: var(--ds-accent-muted);
+  --ds-first-paint-pin-ink-link: var(--ds-accent-muted);
   --ds-first-paint-pin-size: 0.4375rem;
   --ds-first-paint-pin-size-link: 0.5rem;
   --ds-first-paint-pin-size-walk: 0.5625rem;
@@ -16,7 +16,6 @@
 }
 
 body:has(.ds-door) {
-  --ds-first-paint-pin-ink: color-mix(in srgb, var(--ds-ink) 68%, transparent);
   --ds-first-paint-pin-size: 0.5rem;
   --ds-first-paint-pin-size-walk: 0.75rem;
 }
@@ -24,7 +23,13 @@ body:has(.ds-door) {
 .ds-first-paint-plate {
   position: fixed;
   inset: 0;
-  z-index: 2; /* local: pin plate over the locator ground inside the board frame */
+  /*
+   * Same tier as `.ds-map-stage` (`--ds-z-map-plate`), never above Atlas chrome.
+   * A literal `z-index: 2` here sat above `.ds-atlas` (`--ds-z-content` = 1), so SSR pins
+   * painted over Lens, Record sheet, Records rail, Timeline, and Camera — including after
+   * instruments hydrated. Door re-tiers the plate locally inside `.ds-door__board`.
+   */
+  z-index: var(--ds-z-map-plate);
   pointer-events: none;
 }
 
@@ -68,13 +73,12 @@ body:has(.ds-door) {
   z-index: 3; /* local: focus pin above other discs within the plate */
 }
 
-body:has(.maplibregl-canvas) .ds-first-paint-plate {
-  visibility: hidden;
-  pointer-events: none;
-}
-
-body:has(.ds-door) .ds-first-paint-plate {
-  visibility: visible;
+/*
+ * Instrument `/explore`: keep the SSR pin plate under chrome. Geography lives on
+ * `.ds-explore-underlay`. Door keeps its own absolute plate inside the board (door-home.css).
+ */
+body:has([data-surface='instrument']):not(:has(.ds-door)) .ds-first-paint-plate {
+  z-index: var(--ds-z-map-plate);
 }
 
 @media (max-width: 899px) {
@@ -86,13 +90,6 @@ body:has(.ds-door) .ds-first-paint-plate {
     --ds-first-paint-pin-size-zoomed-link: 0.3125rem;
     --ds-first-paint-pin-size-zoomed-walk: 0.375rem;
     --ds-first-paint-pin-size-zoomed-focus: 0.5625rem;
-  }
-
-  /* National mobile: tiny ink discs; copper only for allowlisted walks and focus. */
-  body:has(.ds-door)
-    .ds-door__board:not(.is-zoomed)
-    .ds-first-paint-pin--link:not(.ds-first-paint-pin--walk):not(.ds-first-paint-pin--focus) {
-    background: color-mix(in srgb, var(--ds-ink) 34%, transparent);
   }
 }
 

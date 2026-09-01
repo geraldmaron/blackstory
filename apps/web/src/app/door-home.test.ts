@@ -49,8 +49,12 @@ test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
   assert.match(css, /html:has\(\.ds-door\)[\s\S]*scroll-snap-type:\s*y\s+proximity/);
   assert.match(css, /ds-door__board-frame/);
   assert.match(css, /\.ds-door__field[\s\S]*position:\s*fixed/);
-  assert.match(css, /us-locator\.svg/);
-  assert.match(css, /mix-blend-mode:\s*multiply/);
+  assert.match(css, /\.ds-door__ground[\s\S]*background:\s*var\(--ds-canvas\)/);
+  assert.match(css, /\.ds-door__ground-map[\s\S]*mask-image:\s*url\('\/geo\/us-locator\.svg'\)/);
+  assert.match(css, /\.ds-door__ground-map[\s\S]*background-color:\s*var\(--ds-ink-muted\)/);
+  // Page Sand / copper wash behind the map was the distracting orange field.
+  assert.doesNotMatch(css, /\.ds-door__ground[\s\S]*--ds-accent-muted/);
+  assert.doesNotMatch(css, /mix-blend-mode:\s*multiply/);
   assert.doesNotMatch(css, /radial-gradient|linear-gradient|box-shadow|backdrop-filter/);
   // Nested overflow scrollport was the bug: wheel only hit cards. Document scrolls instead.
   assert.doesNotMatch(css, /\.ds-door-journey\s*\{[^}]*overflow-y:\s*auto/);
@@ -76,7 +80,9 @@ test('door-home CSS switches mobile typography and gutters', () => {
   assert.match(css, /ds-door-journey__cold[\s\S]*clamp\(/);
   assert.match(css, /var\(--ds-gutter\)/);
   assert.match(pinCss, /max-width: 899px/);
-  assert.match(pinCss, /ds-door__board:not\(\.is-zoomed\)/);
+  assert.match(pinCss, /--ds-first-paint-pin-size:\s*0\.1875rem/);
+  assert.match(pinCss, /\.ds-door__board\.is-zoomed/);
+  assert.doesNotMatch(pinCss, /ds-door__board:not\(\.is-zoomed\)/);
   assert.doesNotMatch(pinCss, /ds-first-paint-plate--door-mobile/);
 });
 

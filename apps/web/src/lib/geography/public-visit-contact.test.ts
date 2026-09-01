@@ -3,7 +3,11 @@
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { canPublishPublicVisitContact, resolvePublicVisitContact } from './public-visit-contact.js';
+import {
+  canPublishPublicVisitContact,
+  resolvePublicVisitContact,
+  visitContactClaimsForMap,
+} from './public-visit-contact.js';
 
 const institutionClaims = [
   {
@@ -81,5 +85,25 @@ describe('resolvePublicVisitContact', () => {
       }),
       undefined,
     );
+  });
+});
+
+describe('visitContactClaimsForMap', () => {
+  it('keeps only website, phone, and hours claims for the map payload', () => {
+    const filtered = visitContactClaimsForMap([
+      ...institutionClaims,
+      {
+        id: 'claim-founded',
+        predicate: 'founded_year',
+        object: '1841',
+        citationLabel: 'Historical marker',
+      },
+    ]);
+    assert.equal(filtered.length, 3);
+    assert.deepEqual(filtered.map((claim) => claim.predicate).sort(), [
+      'officialWebsite',
+      'publicHours',
+      'visitorPhone',
+    ]);
   });
 });

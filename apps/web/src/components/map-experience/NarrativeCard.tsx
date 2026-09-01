@@ -73,7 +73,15 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
     lat,
     lng,
     ...(properties.locationLabel !== undefined ? { locationLabel: properties.locationLabel } : {}),
+    ...(properties.jurisdictionLabel !== undefined
+      ? { jurisdictionLabel: properties.jurisdictionLabel }
+      : {}),
     ...(properties.status !== undefined ? { status: properties.status } : {}),
+    ...(properties.livingStatus !== undefined ? { livingStatus: properties.livingStatus } : {}),
+    ...(properties.sensitivityClass !== undefined
+      ? { sensitivityClass: properties.sensitivityClass }
+      : {}),
+    ...(properties.visitClaims !== undefined ? { claims: properties.visitClaims } : {}),
   });
   const kindIcon =
     properties.mapTone !== undefined

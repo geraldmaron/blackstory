@@ -22,6 +22,7 @@ import {
 } from '@repo/domain/map/map-source';
 import type { GeoPrecisionTier } from '@repo/domain/geography/display-radius';
 import type { PublicClaimView, PublicEntityView } from '../../data/public-seed';
+import { visitContactClaimsForMap } from '../geography/public-visit-contact';
 import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './entity-geo';
 import { resolveEntityEraBuckets } from './entity-era-facts';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
@@ -78,6 +79,18 @@ export type ExploreMapFeatureProperties = {
   readonly stateName?: string;
   /** Public location prose from the release (never a redacted residential exact). */
   readonly locationLabel?: string;
+  /** Jurisdiction for composing a fuller visit address line on the sheet. */
+  readonly jurisdictionLabel?: string;
+  /**
+   * Visit-contact claims only (website / phone / hours). Full claim lists stay on the entity
+   * page; the map payload keeps this lean subset for RecordSheet / NarrativeCard visit blocks.
+   */
+  readonly visitClaims?: readonly Pick<
+    PublicClaimView,
+    'id' | 'predicate' | 'object' | 'citationLabel' | 'citationHref'
+  >[];
+  readonly livingStatus?: string;
+  readonly sensitivityClass?: string;
   /** Door Journey: true only for allowlisted atlas walks, not every `/place/` link. */
   readonly holdingWalk?: true;
 };
@@ -239,6 +252,8 @@ function enrichFeature(
     entityId: entity.id,
   });
   const holdingWalk = walkHref !== undefined && walkHref === href;
+  const visitClaims = visitContactClaimsForMap(entity.claims);
+  const jurisdiction = entity.jurisdictionLabel.trim();
 
   return {
     type: 'Feature',
@@ -272,6 +287,12 @@ function enrichFeature(
       ...(feature.properties.stateName ? { stateName: feature.properties.stateName } : {}),
       ...(entity.locationLabel.trim().length > 0
         ? { locationLabel: entity.locationLabel.trim() }
+        : {}),
+      ...(jurisdiction.length > 0 ? { jurisdictionLabel: jurisdiction } : {}),
+      ...(visitClaims.length > 0 ? { visitClaims } : {}),
+      ...(entity.livingStatus !== undefined ? { livingStatus: entity.livingStatus } : {}),
+      ...(entity.sensitivityClass !== undefined
+        ? { sensitivityClass: entity.sensitivityClass }
         : {}),
       ...(holdingWalk ? { holdingWalk: true as const } : {}),
     },

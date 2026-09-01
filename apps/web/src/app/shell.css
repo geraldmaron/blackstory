@@ -50,6 +50,11 @@
   padding-top: 0;
 }
 
+html:has([data-surface='instrument']) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .ds-shell:has([data-surface='instrument']) {
   height: 100dvh;
   max-height: 100dvh;
@@ -1851,8 +1856,15 @@
   inset: 0;
   z-index: var(--ds-z-map-plate);
   height: 100dvh;
+  /* Trap MapLibre canvas + HTML markers (`.maplibregl-marker` uses will-change/transform)
+     so they cannot paint above Atlas instrument chrome in a sibling stacking context. */
+  isolation: isolate;
   /* Pre-style-load flash — dark ocean by default; light theme matches Archive Paper. */
   background: #080606;
+}
+
+.ds-map-stage[data-plate-posture='live'] {
+  touch-action: none;
 }
 
 /* —— Plate posture ————————————————————————————————————————————————————————————

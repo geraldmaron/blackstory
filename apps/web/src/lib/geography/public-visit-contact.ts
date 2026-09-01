@@ -38,6 +38,24 @@ const VISIT_CONTACT_PREDICATES: Readonly<Record<keyof PublicVisitContact, readon
   hours: ['public_hours', 'publicHours', 'visitor_hours', 'hours_note'],
 };
 
+const ALL_VISIT_CONTACT_PREDICATES = new Set(
+  Object.values(VISIT_CONTACT_PREDICATES)
+    .flat()
+    .map((predicate) => predicate.toLowerCase()),
+);
+
+/**
+ * Claims that may feed visit contact on compact map surfaces. Keeps the explore payload lean
+ * (website / phone / hours only) instead of shipping every accepted claim per pin.
+ */
+export function visitContactClaimsForMap(
+  claims: PublicVisitContactInput['claims'],
+): PublicVisitContactInput['claims'] {
+  return claims.filter((claim) =>
+    ALL_VISIT_CONTACT_PREDICATES.has(normalizePredicate(claim.predicate).toLowerCase()),
+  );
+}
+
 function normalizePredicate(predicate: string): string {
   return predicate.trim();
 }

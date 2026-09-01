@@ -9,20 +9,36 @@
 /*
  * The shell layers between the plate and the Atlas.
  *
- * `.ds-map-stage` sits at z 0 and the shell's page-transition content at z 1, so the entire route
- * wrapper paints above the canvas and, being `pointer-events: auto` and viewport-sized, consumed
- * every click, drag and wheel aimed at the map. Pins were unselectable and the camera could not be
- * panned by hand — the plate was a picture.
+ * `.ds-map-stage` and the Explore locator underlay sit at `--ds-z-map-plate` (0). `.ds-atlas`
+ * sits at `--ds-z-content` (1) so Lens / Record sheet / Records / Timeline / Camera always paint
+ * above pins (HTML first-paint discs and MapLibre markers alike). Until `.ds-map-stage` carries
+ * `data-plate-ready`, the underlay is the map: it captures wheel, drag and pinch. After handoff
+ * the underlay is `pointer-events: none` and gaps on this wrapper pass pan/zoom to the plate.
+ *
+ * `pointer-events` is not inherited. A transparent child still leaves its auto parent as the
+ * hit target. `.ds-shell` and `.ds-shell-body` fill the viewport on the instrument, so they
+ * swallowed wheel, drag and pinch after only the inner wrappers were made transparent — hover
+ * and touch on the map itself did nothing. Every covering ancestor has to pass through.
+ *
+ * Without the pointer-events pass-through, the route wrapper consumed every click aimed at the
+ * map — pins were unselectable and the camera could not be panned by hand.
  *
  * Scoped with `:has(.ds-atlas)` so only the Atlas makes these wrappers transparent. On the reading
  * and utility rooms the same wrappers carry scrolling text, and explore.css's standing warning
  * applies there: a text column over the live plate must keep its own events, or a swipe pans the
  * map instead of the document.
  */
+.ds-shell:has(.ds-atlas),
+.ds-shell:has(.ds-atlas) .ds-shell-body,
 .ds-shell-page-transition:has(.ds-atlas),
 .ds-shell-page-transition:has(.ds-atlas) .ds-shell-page-transition__content,
 .ds-map-surface:has(.ds-atlas) {
   pointer-events: none;
+}
+
+/* Offline banner is a sibling of the body, inside the now-transparent shell. */
+.ds-shell:has(.ds-atlas) .ds-shell-offline {
+  pointer-events: auto;
 }
 
 .ds-atlas {
@@ -32,33 +48,43 @@
    * The plate is underneath this element, and this element covers the viewport. Without this the
    * container itself took every click, drag and wheel event over the map: pins could not be
    * selected and the camera could not be panned by hand, because nothing the reader aimed at the
-   * map ever reached the canvas. The instruments are all `position: fixed` children, so the layer
-   * hands its events down to them and passes everything else through to the plate.
+   * map ever reached the canvas. Instruments are `position: fixed` children; the layer passes
+   * everything else through to the plate.
    */
   pointer-events: none;
 }
 
 /*
- * Every instrument takes its own events back. Kept as a child rule rather than repeated on each
- * panel so a new instrument is interactive by existing, not by remembering this line — the failure
- * it would otherwise cause is silent and looks like a broken component rather than a missing style.
- * Children that must stay transparent to the pointer (the spotlight mask, the readout) set
- * `pointer-events: none` in their own rules below, which come later and win.
+ * Interactive instrument surfaces only. Full-bleed pass-through chrome (annotation, spotlight,
+ * camera readout) and the toast stack keep `pointer-events: none` from this parent so map
+ * pan/zoom reaches the plate in the gaps. Do not blanket `.ds-atlas > * { auto }` — that
+ * overrides toast-stack's none/auto split and any future full-bleed decorative layer.
  */
-.ds-atlas > * {
+.ds-atlas > .ds-bar,
+.ds-atlas > .ds-lens,
+.ds-atlas > .ds-results,
+.ds-atlas > .ds-sheet,
+.ds-atlas > .ds-time-panel,
+.ds-atlas > .ds-camera,
+.ds-atlas > .ds-atlas__dock,
+.ds-atlas > .ds-atlas__notice,
+.ds-atlas > .ds-atlas__legend-overlay,
+.ds-atlas > .ds-story,
+.ds-atlas > .ds-palette,
+.ds-atlas > .ds-shortcuts,
+.ds-atlas > .ds-saved {
   pointer-events: auto;
 }
 
 /*
- * The layers that are drawn over the plate but are not aimed at: the corridor plane, the spotlight
- * mask and the camera readout. Each already declares `pointer-events: none` in its own stylesheet,
- * but at equal specificity to the rule above, so which one won came down to stylesheet order — and
- * the blanket rule won, putting a full-viewport SVG in front of the map. Two classes here beats one
- * there regardless of load order.
+ * Explicit none for layers drawn over the plate but not aimed at. Redundant with the parent
+ * rule; kept so a future blanket child rule cannot silently re-block the map (equal
+ * specificity used to let stylesheet order decide, and the blanket auto won).
  */
 .ds-atlas > .ds-annotation,
 .ds-atlas > .ds-atlas__spotlight,
-.ds-atlas > .ds-atlas__readout {
+.ds-atlas > .ds-atlas__readout,
+.ds-atlas > .ds-toast-stack {
   pointer-events: none;
 }
 

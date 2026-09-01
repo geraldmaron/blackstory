@@ -54,15 +54,28 @@ cd apps/web && node --conditions development --import tsx scripts/audit-public-a
 
 `RecordVisitBlock` renders:
 
-- **Visit** heading
-- Public address line (serif)
+- **Visit** heading (mono caps kicker)
+- Public address line as a **supporting fact** (sans body/UI scale, regular weight, address icon) — never a hero headline
 - Visit standing (when applicable)
 - Optional locator inset (`showLocator` on entity rail)
-- Precision footnote
-- Optional **Visitor information** (institution-only phone, website, hours from sourced claims)
+- Precision footnote (full surfaces; compact sheet omits the duplicate when the sheet already states precision)
+- Optional **Visitor information** (institution-only phone, website, hours from sourced claims), each row with a matching icon (phone / globe / clock) beside the visible label
 - Visit standing from lifecycle status or present-day advisories when present
-- **Open in maps** + **Get directions** (external)
-- Optional **See on map** (Atlas deep link on place stands)
+- Quiet text **Open in maps** + **Get directions** (external handoff)
+- Optional quiet text **See on map** (Atlas deep link on place stands)
+
+### Action economy
+
+External maps exits and in-app camera moves are different jobs. Keep both when useful; never twin copper primaries for "go to place":
+
+| Control | Job | Treatment |
+|---|---|---|
+| Open in maps / Get directions | Leave BlackStory into the reader's maps app | Quiet underlined text (`ds-record-visit__link`) |
+| See on map | Atlas deep link from a place stand | Quiet underlined text |
+| Fly to place (Record sheet) | Re-frame the live Atlas camera | Sheet secondary hairline (or primary only when there is no record href) |
+| Open record (Record sheet) | Leave the sheet for the record page | At most one copper primary on the sheet |
+
+Icons are decorative (`aria-hidden`); the text label remains the accessible name. Never emoji. Flat matte Font Awesome glyphs shared with record anatomy (`edition-fact-icon.ts`).
 
 ### Surfaces
 
@@ -71,7 +84,9 @@ cd apps/web && node --conditions development --import tsx scripts/audit-public-a
 | `/entity/[id]` rail | Desktop: locator + visit block |
 | `/entity/[id]` main | Mobile: visit block above record body |
 | `/place/{slug}` | After interactive locator |
-| Explore record sheet / narrative card | Compact visit block (address, standing, maps) |
+| Explore record sheet / narrative card | Compact visit block (address, standing, contact when mapped, quiet maps text) |
+
+Explore map features carry `jurisdictionLabel` plus a lean `visitClaims` subset (website / phone / hours predicates only) so Atlas RecordSheet and NarrativeCard can resolve the same address and contact lines as the entity page without shipping every accepted claim per pin.
 
 ### Public visit contact (institution lane)
 
@@ -102,4 +117,6 @@ When `placeAdvisories` is present on the projection, `resolveVisitStandingCopy()
 |---|---|
 | Public address | `public-address.test.ts` |
 | Visit handoff | `visit-handoff.test.ts` |
+| Public visit contact | `public-visit-contact.test.ts` |
+| Visit block UI | `RecordVisitBlock.test.ts` |
 | Maps URLs | `external-maps-url.test.ts` |

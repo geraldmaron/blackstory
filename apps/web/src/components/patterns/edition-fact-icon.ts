@@ -3,7 +3,15 @@
  * kind glyphs and confidence tiers so home beats do not invent a second icon language.
  */
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { faCalendarDay, faLocationDot, faMap, faScroll } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCalendarDay,
+  faClock,
+  faGlobe,
+  faLocationDot,
+  faMap,
+  faPhone,
+  faScroll,
+} from '@fortawesome/free-solid-svg-icons';
 import {
   confidenceIconFor,
   type ConfidenceTierKey,
@@ -13,10 +21,19 @@ import { kindIconFor } from '../../lib/map-experience/kind-icons';
 
 export type EntryStepKey = 'pin' | 'browse' | 'source';
 
+export type VisitFactIconKey = 'address' | 'phone' | 'website' | 'hours';
+
 const ENTRY_STEP_ICONS: Readonly<Record<EntryStepKey, IconDefinition>> = {
   pin: faLocationDot,
   browse: faMap,
   source: faScroll,
+};
+
+const VISIT_FACT_ICONS: Readonly<Record<VisitFactIconKey, IconDefinition>> = {
+  address: faLocationDot,
+  phone: faPhone,
+  website: faGlobe,
+  hours: faClock,
 };
 
 export function entryStepIconFor(step: EntryStepKey): IconDefinition {
@@ -46,4 +63,9 @@ export function recordEraIcon(): IconDefinition {
 
 export function recordEvidenceIconFor(tier: ConfidenceTierKey): IconDefinition {
   return confidenceIconFor(tier);
+}
+
+/** Standard visit-block icons (address / phone / website / hours). */
+export function visitFactIconFor(key: VisitFactIconKey): IconDefinition {
+  return VISIT_FACT_ICONS[key];
 }

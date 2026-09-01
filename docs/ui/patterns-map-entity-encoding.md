@@ -105,8 +105,8 @@ Before MapLibre paints, `/` (Door) and `/explore` (Atlas) render the same HTML p
 
 | Role | Visual | Token |
 |---|---|---|
-| Record disc | Translucent ink dot | `--ds-first-paint-pin-ink` / `--ds-first-paint-pin-size` |
-| Linked record (Door `--records`) | Slightly larger ink dot | `--ds-first-paint-pin-ink-link` / `--ds-first-paint-pin-size-link` |
+| Record disc | Page Sand disc | `--ds-first-paint-pin-ink` (`--ds-accent-muted`) / `--ds-first-paint-pin-size` |
+| Linked record (Door `--records`) | Slightly larger Page Sand disc | `--ds-first-paint-pin-ink-link` / `--ds-first-paint-pin-size-link` |
 | Holding walk / focus | Copper disc | `--ds-accent-graphic`; focus adds `--ds-surface` outline |
 | Layout-zoom (Door chapters) | Step up link/walk/focus sizes | `--ds-first-paint-pin-size-zoomed-*` on `.ds-door__board.is-zoomed` |
 
@@ -119,7 +119,7 @@ Door scopes larger national discs via `body:has(.ds-door)` variable overrides on
 | Explore live map | Kind-shaded GL circles + `.ds-map-entity-marker` hit targets | See tables above; `ENTITY_POINT_FILL_OPACITY` = 52% |
 | Place search | `.ds-map-search-center-marker` copper head + stem | Orientation only, not an entity |
 | Record anatomy | `.ds-locator__pin` copper ring | City-precision honesty; ring not filled disc |
-| `@repo/ui` `MapFrame` | `.ds-map__pin` ink dot | Static inset, not live map |
+| `@repo/ui` `MapFrame` | `.ds-map__pin` Page Sand disc | Static inset, not live map |
 
 ---
 

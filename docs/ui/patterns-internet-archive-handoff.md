@@ -43,7 +43,8 @@ Full IA upload integration is operator-gated and deferred. Shipped now:
 
 - `/methodology#internet-archive` explains capture + staged export posture
 - `RecordArchiveContribution` links readers to that section
-- Operator workflow remains CLI capture/export (see methodology copy)
+- Operator workflow remains CLI capture/export (`capture-backfill --wayback` for SPN2; see
+  [`../research/research-operations.md`](../research/research-operations.md) capture-backfill)
 
 Future work: `archive-export --entity-id` verb, IA identifier on evidence rows, curated collection uploads after rights review.
 

@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { plateForScheme } from './dignity-style';
+import { brandPalette } from '@repo/ui';
 import {
   EXPLORE_GL_ENTITY_MAX_ZOOM,
   FIRST_PAINT_MAP_MAX_ZOOM,
@@ -25,10 +25,12 @@ test('first-paint radius uses walk and record sizes', () => {
   ]);
 });
 
-test('first-paint color branches on walk vs record ink', () => {
-  const plate = plateForScheme('dark');
-  const expr = firstPaintPointColorExpression(plate);
+test('first-paint color uses Page Sand for records and copper for walks', () => {
+  const expr = firstPaintPointColorExpression();
   assert.equal(expr[0], 'case');
+  assert.equal(expr[2], brandPalette.copperPin);
+  assert.equal(expr[3], brandPalette.pageSand);
+  assert.notEqual(expr[3], brandPalette.archivePaper);
   assert.equal(FIRST_PAINT_MAP_MAX_ZOOM, 12);
   assert.equal(EXPLORE_GL_ENTITY_MAX_ZOOM, FIRST_PAINT_MAP_MAX_ZOOM + 0.001);
 });

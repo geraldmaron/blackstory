@@ -251,7 +251,7 @@ export function plateForScheme(scheme: MapColorScheme) {
     streetCasing: DIGNITY_PALETTE.streetCasingDark,
     street: DIGNITY_PALETTE.streetDark,
     streetLabel: DIGNITY_PALETTE.streetLabelDark,
-    clusterText: DIGNITY_PALETTE.clusterText,
+    clusterText: DIGNITY_PALETTE.selectedDark,
     stateBounds: mapPalettes.dark.line,
     /** Local, for the reason given on the light branch: §3 has no county role. */
     countyLine: DIGNITY_PALETTE.selected,

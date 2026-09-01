@@ -13,16 +13,8 @@ import {
   buildSheetSources,
 } from '../../../lib/map-experience/build-sheet-detail';
 import { buildVisitHandoffFromMapFeature } from '../../../lib/geography/visit-handoff';
-import { isHoldingPlaceHref } from '../../../lib/place/public-place-path';
 import { withQuery } from '../../../lib/discovery/discovery-arrival';
 import { anatomyPrecisionFor, eraFor } from './atlas-feature-helpers';
-
-function walkHoldingPlace(feature: ExploreMapFeature, arrivalQuery: string): boolean {
-  const href = feature.properties.href;
-  if (!isHoldingPlaceHref(href)) return false;
-  if (typeof window !== 'undefined') window.location.assign(withQuery(href, arrivalQuery));
-  return true;
-}
 
 /**
  * The selected record: its index in the current sort order, the sheet's view of it, and the
@@ -65,7 +57,6 @@ export function useRecordSelection(
     (entityId: string) => {
       const feature = featuresById.get(entityId);
       if (feature) {
-        if (walkHoldingPlace(feature, placeArrivalQuery)) return;
         const [lng, lat] = feature.geometry.coordinates;
         setSelectedId(entityId);
         camera.flyToRecord({ center: [lng, lat], place: placeLabelFor(feature) });
@@ -75,13 +66,17 @@ export function useRecordSelection(
       // camera move to nowhere.
       setSelectedId(entityId);
     },
-    [camera, featuresById, placeArrivalQuery, setSelectedId],
+    [camera, featuresById, setSelectedId],
   );
 
-  const selectedFeature = useMemo(
-    () => sorted.find((feature) => feature.properties.entityId === selectedId) ?? null,
-    [selectedId, sorted],
-  );
+  const selectedFeature = useMemo(() => {
+    if (selectedId === undefined) return null;
+    return (
+      sorted.find((feature) => feature.properties.entityId === selectedId) ??
+      featuresById.get(selectedId) ??
+      null
+    );
+  }, [featuresById, selectedId, sorted]);
 
   const selectedIndex = useMemo(
     () => sorted.findIndex((feature) => feature.properties.entityId === selectedId),
@@ -90,13 +85,12 @@ export function useRecordSelection(
 
   const select = useCallback(
     (feature: ExploreMapFeature, fly = true) => {
-      if (walkHoldingPlace(feature, placeArrivalQuery)) return;
       setSelectedId(feature.properties.entityId);
       if (!fly) return;
       const [lng, lat] = feature.geometry.coordinates;
       camera.flyToRecord({ center: [lng, lat], place: placeLabelFor(feature) });
     },
-    [camera, placeArrivalQuery, setSelectedId],
+    [camera, setSelectedId],
   );
 
   const stepRecord = useCallback(
@@ -110,16 +104,13 @@ export function useRecordSelection(
     [select, selectedIndex, sorted],
   );
 
-  /** A holding `/place/` pin walks. Every other pin stays on the plate. */
+  /** Pin clicks stay on the plate and open the record sheet. Place pages are a sheet CTA. */
   useEffect(
     () =>
       stage.subscribe('select', (entityId) => {
-        const feature =
-          featuresById.get(entityId) ?? allFeatures.find((candidate) => candidate.id === entityId);
-        if (feature && walkHoldingPlace(feature, placeArrivalQuery)) return;
         setSelectedId(entityId);
       }),
-    [allFeatures, featuresById, placeArrivalQuery, setSelectedId, stage],
+    [setSelectedId, stage],
   );
 
   const sheetRecord = useMemo<SheetRecord | null>(() => {
@@ -196,8 +187,20 @@ export function useRecordSelection(
         ...(selectedFeature.properties.locationLabel !== undefined
           ? { locationLabel: selectedFeature.properties.locationLabel }
           : {}),
+        ...(selectedFeature.properties.jurisdictionLabel !== undefined
+          ? { jurisdictionLabel: selectedFeature.properties.jurisdictionLabel }
+          : {}),
         ...(selectedFeature.properties.status !== undefined
           ? { status: selectedFeature.properties.status }
+          : {}),
+        ...(selectedFeature.properties.livingStatus !== undefined
+          ? { livingStatus: selectedFeature.properties.livingStatus }
+          : {}),
+        ...(selectedFeature.properties.sensitivityClass !== undefined
+          ? { sensitivityClass: selectedFeature.properties.sensitivityClass }
+          : {}),
+        ...(selectedFeature.properties.visitClaims !== undefined
+          ? { claims: selectedFeature.properties.visitClaims }
           : {}),
       }),
     };

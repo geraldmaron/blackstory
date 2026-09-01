@@ -69,9 +69,8 @@ export function resolvePublicAddressLine(input: PublicAddressInput): string {
       if (label === jurisdiction || jurisdictionInLabel(label, jurisdiction)) {
         return label.length >= jurisdiction.length ? label : jurisdiction;
       }
-      if (input.locationPrecision === 'city' && !jurisdictionInLabel(label, jurisdiction)) {
-        return `${label}, ${jurisdiction}`;
-      }
+      // Append jurisdiction whenever the label omits it (neighborhood, campus, street, city).
+      return `${label}, ${jurisdiction}`;
     }
     return label;
   }

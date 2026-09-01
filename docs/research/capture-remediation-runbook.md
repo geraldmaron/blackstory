@@ -45,8 +45,9 @@ min(--limit, CAPTURE_COMPLETENESS_SOURCE_FETCH_DAILY_CAP)
 Default `--limit 20` keeps batches conservative. Raise only after reviewing budget headroom.
 
 Live Wayback calls are **not** implemented in this operator script. Setting
-`CAPTURE_REMEDIATION_SPN=1` only reaches a documented stub — route real captures through
-`captureUrlToEvidencePointer` and operator review (see ops bar memo).
+`CAPTURE_REMEDIATION_SPN=1` only reaches a documented stub. Live SPN belongs on
+`capture-backfill --commit --wayback` (operator-cli), which uses the domain SPN2 client and
+skips when `INTERNET_ARCHIVE_ACCESS_KEY` / `INTERNET_ARCHIVE_SECRET_KEY` are absent.
 
 ## Budget and soft shutdown
 

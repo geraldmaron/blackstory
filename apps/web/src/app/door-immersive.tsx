@@ -3,7 +3,7 @@
  *
  * One visit rolls chapters / facts / spotlight on the server so SSR and hydrate match.
  * Document scroll so the wheel works over the map; IntersectionObserver updates plate focus.
- * Zoom uses width/height/left/top (not transform:scale) so the locator SVG stays sharp.
+ * Zoom uses width/height/left/top (not transform:scale) so the locator mask stays sharp.
  * Pins with public hrefs stay clickable. No MapLibre — cheap Rest Door.
  */
 'use client';
@@ -171,8 +171,8 @@ export function DoorImmersive({
 
   /*
    * Layout zoom (width/height/left/top), not transform: scale.
-   * CSS scale rasterizes the SVG mask + pins into a bitmap and looks soft when zoomed.
-   * Growing the board in layout keeps the locator SVG crisp as a vector/img.
+   * CSS scale rasterizes the masked locator + pins into a bitmap and looks soft when zoomed.
+   * Growing the board in layout keeps the locator mask crisp.
    */
   const boardStyle = {
     width: `${focus.scale * 100}%`,
@@ -193,17 +193,8 @@ export function DoorImmersive({
             style={boardStyle}
           >
             <div className="ds-door__ground" aria-hidden="true">
-              {/* Vector img stays sharp under layout zoom; mask+scale was the blur source. */}
-              {/* eslint-disable-next-line @next/next/no-img-element -- locator asset, not content imagery */}
-              <img
-                className="ds-door__ground-map"
-                src="/geo/us-locator.svg"
-                alt=""
-                width={960}
-                height={500}
-                decoding="async"
-                draggable={false}
-              />
+              {/* Land colour via CSS mask (RecordLocator pattern); canvas shows through as field. */}
+              <div className="ds-door__ground-map" />
             </div>
             <FirstPaintPinPlate pins={pins} linkRecords focusEntityId={focusPinId} />
           </div>

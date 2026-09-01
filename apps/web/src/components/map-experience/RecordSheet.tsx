@@ -317,8 +317,8 @@ export function RecordSheet({
         <div className="ds-sheet__actions">
           {/*
            * Opening the record is the primary action, and it takes the one filled slot the accent
-           * hierarchy allows (§8) — so `Fly to place`, which keeps the reader where they already
-           * are, drops to the plain treatment.
+           * hierarchy allows (§8). Fly to place is the in-app camera job (hairline secondary),
+           * distinct from Visit's quiet external maps exits. Save / Cite / Share stay text-quiet.
            */}
           {record.href ? (
             <a className="ds-sheet__action ds-sheet__action--primary" href={record.href}>
@@ -339,7 +339,7 @@ export function RecordSheet({
           {onSave ? (
             <button
               type="button"
-              className="ds-sheet__action"
+              className="ds-sheet__action ds-sheet__action--quiet"
               onClick={onSave}
               aria-pressed={saved}
             >
@@ -347,12 +347,20 @@ export function RecordSheet({
             </button>
           ) : null}
           {onCite ? (
-            <button type="button" className="ds-sheet__action" onClick={onCite}>
+            <button
+              type="button"
+              className="ds-sheet__action ds-sheet__action--quiet"
+              onClick={onCite}
+            >
               Cite
             </button>
           ) : null}
           {onShare ? (
-            <button type="button" className="ds-sheet__action" onClick={onShare}>
+            <button
+              type="button"
+              className="ds-sheet__action ds-sheet__action--quiet"
+              onClick={onShare}
+            >
               Share
             </button>
           ) : null}

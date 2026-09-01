@@ -17,6 +17,10 @@ test('buildEntityAnatomyInputs resolves era from structured buckets before Undat
   const inputs = buildEntityAnatomyInputs(entity, undefined);
   assert.notEqual(inputs.eraLabel, 'Undated');
   assert.match(inputs.evidenceLabel, /source/);
+  assert.equal(
+    inputs.whereLabel,
+    'Dupont/Sixteenth Street Historic District area, Washington, D.C.',
+  );
 });
 
 test('buildEntityAnatomyInputs falls back to Place withheld when jurisdiction unknown', () => {

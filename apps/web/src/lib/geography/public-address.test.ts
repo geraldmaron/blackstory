@@ -33,7 +33,20 @@ describe('resolvePublicAddressLine', () => {
         jurisdictionLabel: 'Washington, D.C.',
         displayName: 'D.C. Inventory of Historic Sites Listing (1975)',
       }),
-      'Paul Laurence Dunbar High School campus',
+      'Paul Laurence Dunbar High School campus, Washington, D.C.',
+    );
+  });
+
+  it('appends jurisdiction when a neighborhood label omits the city', () => {
+    assert.equal(
+      resolvePublicAddressLine({
+        kind: 'place',
+        locationPrecision: 'neighborhood',
+        locationLabel: 'Dupont/Sixteenth Street Historic District area (neighborhood-level pin)',
+        jurisdictionLabel: 'Washington, D.C.',
+        displayName: 'Fifteenth Street Presbyterian Church',
+      }),
+      'Dupont/Sixteenth Street Historic District area, Washington, D.C.',
     );
   });
 

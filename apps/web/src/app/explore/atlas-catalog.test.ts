@@ -92,6 +92,7 @@ test('the Atlas page never puts the catalog back in the initial prop', async () 
   assert.match(atlasHome, /AtlasLoader/);
   assert.match(atlasHome, /toFirstPaintPins/);
   assert.match(atlasHome, /FirstPaintPinPlate/);
+  assert.match(atlasHome, /ExploreMapUnderlay/);
   assert.doesNotMatch(atlasHome, /Opening the map/);
   assert.doesNotMatch(atlasHome, /ds-explore__walks/);
   assert.doesNotMatch(atlasHome, /pins=\{\{ type: 'FeatureCollection'/);

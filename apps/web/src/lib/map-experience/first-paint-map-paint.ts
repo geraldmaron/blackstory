@@ -1,11 +1,11 @@
 /**
- * MapLibre paint helpers that mirror the Door / first-paint pin plate (ink record discs,
- * copper holding walks). Kind-encoded coloring is blended in from explore-style.ts past
- * locality zoom so the instrument Color key still applies when readers zoom in.
+ * MapLibre paint helpers that mirror the Door / first-paint pin plate (Page Sand
+ * record discs, copper holding walks). Kind-encoded coloring is blended in from
+ * explore-style.ts past locality zoom so the instrument Color key still applies
+ * when readers zoom in.
  */
 import type { ExpressionSpecification } from 'maplibre-gl';
 import { brandPalette } from '@repo/ui';
-import type { MapPlate } from './dignity-style';
 import { markerRadiusExpression } from './marker-size';
 
 /** Zoom at and below which entity discs match the first-paint national field. */
@@ -20,8 +20,8 @@ export const FIRST_PAINT_RECORD_RADIUS_PX = 3.5;
 /** CSS `0.5625rem` at 16px root — holding walk disc radius. */
 export const FIRST_PAINT_WALK_RADIUS_PX = 4.5;
 
-/** Matches `--ds-first-paint-pin-ink` mix on the archive plate. */
-export const FIRST_PAINT_RECORD_FILL_OPACITY = 0.55;
+/** Solid Page Sand — Archive Paper read as white and vanished on the dark plate. */
+export const FIRST_PAINT_RECORD_FILL_OPACITY = 1;
 
 /** Holding walks use solid graphic copper like `--ds-accent-graphic`. */
 export const FIRST_PAINT_WALK_FILL_OPACITY = 1;
@@ -31,21 +31,21 @@ export function holdingPlaceWalkExpression(): ExpressionSpecification {
   return ['==', ['get', 'holdingWalk'], true] as unknown as ExpressionSpecification;
 }
 
-function firstPaintRecordColor(plate: MapPlate): string {
-  return plate.selected;
+function firstPaintRecordColor(): string {
+  return brandPalette.pageSand;
 }
 
 function firstPaintWalkColor(): string {
   return brandPalette.copperPin;
 }
 
-/** Ink record vs copper walk — the same rule as `isFirstPaintWalk`. */
-export function firstPaintPointColorExpression(plate: MapPlate): ExpressionSpecification {
+/** Page Sand records vs copper walks — majority pins must not use Archive Paper (white). */
+export function firstPaintPointColorExpression(): ExpressionSpecification {
   return [
     'case',
     holdingPlaceWalkExpression(),
     firstPaintWalkColor(),
-    firstPaintRecordColor(plate),
+    firstPaintRecordColor(),
   ] as unknown as ExpressionSpecification;
 }
 
