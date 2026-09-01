@@ -93,14 +93,33 @@ export function placePageHolds(input: {
 
 /**
  * Address a neighbor from the place door. People and statutes go to the named
- * rooms, not a fabricated place page and never `/entity/ent_…`.
+ * rooms, not a fabricated place page and never `/entity/ent_…` for those kinds.
+ * Standable neighbors keep `/place/{slug}`. Non-standable records with an id
+ * open `/entity/{id}` so the constellation never invents a Place that 404s.
  */
 export function neighborHref(neighbor: {
   readonly displayName: string;
   readonly kind: string;
+  readonly id?: string;
+  readonly summary?: string;
 }): string {
   if (neighbor.kind === 'person') return '/memorial';
   if (neighbor.kind === 'law' || neighbor.kind === 'case') return '/law';
+  if (neighbor.id !== undefined) {
+    if (staysOffPublicMap({ displayName: neighbor.displayName })) {
+      return `/entity/${neighbor.id}`;
+    }
+    const summary = neighbor.summary?.trim() ?? '';
+    if (
+      !canStandHere({
+        displayName: neighbor.displayName,
+        kind: neighbor.kind,
+        summary,
+      })
+    ) {
+      return `/entity/${neighbor.id}`;
+    }
+  }
   return placeHref(neighbor.displayName);
 }
 

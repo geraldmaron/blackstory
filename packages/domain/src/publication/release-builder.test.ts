@@ -491,8 +491,35 @@ test('buildReleaseEntityArtifacts produces a full projection + search doc for a 
   assert.ok(result.projection.notabilityBasis[0]!.evidenceIds.length > 0);
   assert.equal(result.projection.researchCoverage, 'minimal');
   assert.equal(result.searchIndex.claimCount, 1);
+  assert.equal(result.searchIndex.confidenceTier, 'high');
   assert.deepEqual(result.searchIndex.notabilityBasis, result.projection.notabilityBasis);
   assert.equal(result.searchIndex.researchCoverage, result.projection.researchCoverage);
+});
+
+test('buildReleaseEntityArtifacts projects medium confidenceTier from claim levels', () => {
+  const entry = baseEntry({
+    claims: [
+      {
+        predicate: 'founded',
+        object: '1870',
+        confidenceLevel: 'medium',
+        citationSource: 'src_example',
+        citationLabel: 'Example',
+      },
+      {
+        predicate: 'located_in',
+        object: 'Washington, D.C.',
+        confidenceLevel: 'low',
+        citationSource: 'src_example',
+        citationLabel: 'Example',
+      },
+    ],
+  });
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.searchIndex.confidenceTier, 'medium');
+  assert.equal(result.searchIndex.claimCount, 2);
 });
 
 test('buildReleaseEntityArtifacts fails closed with no_citations when an entry has zero claims', () => {

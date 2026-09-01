@@ -41,7 +41,7 @@
 |---|---|
 | Goal | Batch relationship projection; no N+1 on Place |
 | Why | Constellation must not explode read cost |
-| Status | **Audit in progress** |
+| Status | **Partial** — Place uses release `related` + catalog hydrate (O(catalog) once). Search index now projects `confidenceTier` for Records slim. Batched public relationship read + live facet backfill still open |
 | Dependencies | P0.1 |
 
 ---

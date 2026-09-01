@@ -309,6 +309,8 @@ export const publicSearchProjectionSchema = z.object({
   researchCoverage: z.enum(['minimal', 'partial', 'substantial']),
   relatedCount: z.number().int().min(0),
   claimCount: z.number().int().min(0),
+  /** Highest accepted-claim confidence. Defaults unrated for rows published before this field. */
+  confidenceTier: z.enum(['high', 'medium', 'low', 'unrated']).default('unrated'),
 });
 export type PublicSearchProjectionDoc = z.infer<typeof publicSearchProjectionSchema>;
 

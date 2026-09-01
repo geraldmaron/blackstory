@@ -5,8 +5,8 @@
  * cache, one `/records` request built the full catalog index twice. Entities still come from
  * `getSharedPublicEntities` (React.cache); this layer dedupes the CPU-heavy index build.
  *
- * Full search_index slim is deferred: evidence floor needs claim confidence, which the search
- * index does not carry yet.
+ * Full search_index slim is deferred until active-release facets carry `confidenceTier`
+ * (projected by release-builder; backfill via `backfill-search-facets-confidence.ts`).
  */
 import { cache } from 'react';
 import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-data';

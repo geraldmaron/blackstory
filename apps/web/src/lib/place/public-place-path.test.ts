@@ -90,6 +90,27 @@ test('neighbor hrefs stay off internal ids', () => {
   assert.equal(neighborHref({ displayName: 'A statute on this record', kind: 'law' }), '/law');
 });
 
+test('non-standable neighbors with an id open the entity room, not a fake Place', () => {
+  assert.equal(
+    neighborHref({
+      id: 'ent_dillard_house_001',
+      displayName: 'James H. Dillard House',
+      kind: 'place',
+      summary: 'A private residence kept off the public map.',
+    }),
+    '/entity/ent_dillard_house_001',
+  );
+  assert.equal(
+    neighborHref({
+      id: 'ent_thin_001',
+      displayName: 'Thin Record',
+      kind: 'organization',
+      summary: '',
+    }),
+    '/entity/ent_thin_001',
+  );
+});
+
 test('seed holding slugs match the place page seed path, and are not invented', () => {
   const computed = listPublicEntities()
     .filter((entity) => canStandHere(entity))

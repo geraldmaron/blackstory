@@ -72,6 +72,11 @@ export type SearchableEntityRecord = {
   readonly relatedCount: number;
   /** Server-internal supporting-claim count. Same policy as `relatedCount`: never client-facing. */
   readonly claimCount: number;
+  /**
+   * Highest accepted-claim confidence. Used for Records evidence floors when slimmed onto
+   * search_index. Not a numeric ranking score and not shown as a count.
+   */
+  readonly confidenceTier?: 'high' | 'medium' | 'low' | 'unrated';
 };
 
 /**

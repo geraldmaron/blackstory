@@ -131,6 +131,13 @@ export function mapPostgresSearchIndexRow(
     relatedCount:
       row.related_count ?? (typeof facets.relatedCount === 'number' ? facets.relatedCount : 0),
     claimCount: row.claim_count ?? (typeof facets.claimCount === 'number' ? facets.claimCount : 0),
+    confidenceTier:
+      facets.confidenceTier === 'high' ||
+      facets.confidenceTier === 'medium' ||
+      facets.confidenceTier === 'low' ||
+      facets.confidenceTier === 'unrated'
+        ? facets.confidenceTier
+        : 'unrated',
     entityId,
     ...(typeof facets.summary === 'string' ? { summary: facets.summary } : {}),
     ...(typeof row.status === 'string'
