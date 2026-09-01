@@ -11,7 +11,9 @@
  * public geo anchor for, so an index built from it would silently omit every record without
  * coordinates — and "what is documented about X, including the things we cannot place" is the
  * exact question this room exists to answer (design-direction-v9-surfaces.md §4.2, and the
- * epic's first binding correction). So rows are built from `PublicEntityView` directly.
+ * epic's first binding correction). So rows are built from a catalog that keeps ungeocoded
+ * records: full `PublicEntityView` today, or the search_index slim when `confidenceTier` is
+ * projected on active-release docs.
  *
  * The filter VOCABULARY, though, must not drift from the Lens. Every label and bucket here is
  * derived by calling the same shared modules the Atlas calls — `kindFamilyFor`,
@@ -23,6 +25,7 @@ import {
   findUsStateByPostalCode,
   findUsStateFromJurisdictionLabel,
 } from '@repo/domain/map/geography';
+import type { PublicSearchIndexDoc } from '@repo/domain/search';
 import type { PublicEntityView } from '../../data/public-seed';
 import { highestConfidence, type ConfidenceTier } from '../map-experience/build-explore-map-source';
 import { resolveEntityEraBuckets } from '../map-experience/entity-era-facts';
@@ -233,17 +236,41 @@ type RecordFacts = {
   readonly mappable: boolean;
 };
 
-function carriesPublicMapAnchor(entity: PublicEntityView): boolean {
-  if (staysOffPublicMap(entity)) return false;
-  return entity.geoAnchor !== undefined || geoAnchorFor(entity.id) !== undefined;
+/**
+ * Minimal catalog row for Records. Full entities and search_index docs both adapt into this.
+ * Keeps ungeocoded records (unlike ExploreMapFeature).
+ */
+export type RecordsCatalogEntry = {
+  readonly id: string;
+  readonly displayName: string;
+  readonly kind: string;
+  readonly summary: string;
+  readonly jurisdictionLabel: string;
+  readonly locationLabel: string;
+  readonly topicTags: readonly string[];
+  readonly topicIds?: readonly string[];
+  readonly eraBuckets?: readonly string[];
+  readonly status?: string;
+  readonly confidenceTier: ConfidenceTier;
+  readonly mappable: boolean;
+  readonly locationPrecision?: string;
+};
+
+/** True when search_index docs carry projected confidence (backfill or new publishes). */
+export function searchIndexReadyForRecords(
+  docs: readonly PublicSearchIndexDoc[],
+  /** Require this share of docs to carry an explicit tier before leaving full-entity hydrate. */
+  minCoverage = 0.95,
+): boolean {
+  if (docs.length === 0) return false;
+  let withTier = 0;
+  for (const doc of docs) {
+    if (doc.confidenceTier !== undefined) withTier += 1;
+  }
+  return withTier / docs.length >= minCoverage;
 }
 
-function toFacts(entity: PublicEntityView, collisions: ReadonlyMap<string, number>): RecordFacts {
-  const mapTone = resolveMapTone({
-    topicTags: entity.topicTags,
-    ...(entity.topicIds !== undefined ? { topicIds: entity.topicIds } : {}),
-    displayName: entity.displayName,
-  });
+export function recordsCatalogFromEntity(entity: PublicEntityView): RecordsCatalogEntry {
   const eraBuckets = resolveEntityEraBuckets({
     ...(entity.eraBuckets !== undefined ? { eraBuckets: entity.eraBuckets } : {}),
     ...(entity.era !== undefined ? { era: entity.era } : {}),
@@ -251,26 +278,87 @@ function toFacts(entity: PublicEntityView, collisions: ReadonlyMap<string, numbe
     ...(entity.statusHistory !== undefined ? { statusHistory: entity.statusHistory } : {}),
     claims: entity.claims,
   });
-  const confidenceTier = highestConfidence(entity.claims);
-  const state = findUsStateFromJurisdictionLabel(entity.jurisdictionLabel);
-  const location = entity.locationLabel.trim();
-  const place = location.length > 0 ? location : entity.jurisdictionLabel.trim();
-  const topicSource = entity.topicIds ?? entity.topicTags;
-  const href = canStandHere(entity)
-    ? placeHrefForEntity(entity, collisions)
-    : `/entity/${entity.id}`;
+  return {
+    id: entity.id,
+    displayName: entity.displayName,
+    kind: entity.kind,
+    summary: entity.summary,
+    jurisdictionLabel: entity.jurisdictionLabel,
+    locationLabel: entity.locationLabel,
+    topicTags: entity.topicTags,
+    ...(entity.topicIds !== undefined ? { topicIds: entity.topicIds } : {}),
+    eraBuckets,
+    ...(entity.status !== undefined ? { status: entity.status } : {}),
+    confidenceTier: highestConfidence(entity.claims),
+    mappable: carriesPublicMapAnchor(entity),
+    ...(entity.locationPrecision !== undefined
+      ? { locationPrecision: entity.locationPrecision }
+      : {}),
+  };
+}
+
+export function recordsCatalogFromSearchDoc(doc: PublicSearchIndexDoc): RecordsCatalogEntry {
+  const summary = doc.summary?.trim() ?? '';
+  const jurisdictionLabel = doc.jurisdictionState?.trim() ?? '';
+  return {
+    id: doc.id,
+    displayName: doc.displayName,
+    kind: doc.kind,
+    summary,
+    jurisdictionLabel,
+    locationLabel: '',
+    topicTags: doc.topicTags,
+    ...(doc.topicIds !== undefined ? { topicIds: doc.topicIds } : {}),
+    eraBuckets: doc.eraBuckets,
+    ...(doc.status !== undefined ? { status: doc.status } : {}),
+    confidenceTier: doc.confidenceTier ?? 'unrated',
+    mappable:
+      !staysOffPublicMap({ displayName: doc.displayName }) &&
+      typeof doc.geohash === 'string' &&
+      doc.geohash.length > 0,
+  };
+}
+
+function carriesPublicMapAnchor(entity: PublicEntityView): boolean {
+  if (staysOffPublicMap(entity)) return false;
+  return entity.geoAnchor !== undefined || geoAnchorFor(entity.id) !== undefined;
+}
+
+function toFacts(entry: RecordsCatalogEntry, collisions: ReadonlyMap<string, number>): RecordFacts {
+  const mapTone = resolveMapTone({
+    topicTags: entry.topicTags,
+    ...(entry.topicIds !== undefined ? { topicIds: entry.topicIds } : {}),
+    displayName: entry.displayName,
+  });
+  const eraBuckets = entry.eraBuckets ?? [];
+  const confidenceTier = entry.confidenceTier;
+  const state = findUsStateFromJurisdictionLabel(entry.jurisdictionLabel);
+  const location = entry.locationLabel.trim();
+  const place = location.length > 0 ? location : entry.jurisdictionLabel.trim();
+  const topicSource = entry.topicIds ?? entry.topicTags;
+  const standable = canStandHere({
+    displayName: entry.displayName,
+    kind: entry.kind,
+    summary: entry.summary.length > 0 ? entry.summary : entry.displayName,
+    ...(entry.locationPrecision !== undefined
+      ? { locationPrecision: entry.locationPrecision }
+      : {}),
+  });
+  const href = standable
+    ? placeHrefForEntity({ id: entry.id, displayName: entry.displayName }, collisions)
+    : `/entity/${entry.id}`;
 
   return {
     row: {
-      id: entity.id,
+      id: entry.id,
       href,
-      name: entity.displayName,
+      name: entry.displayName,
       // An honest blank, not an invented place: some records genuinely have no located anchor,
       // and that is the population this index exists to keep visible.
       place: place.length > 0 ? place : 'Place not recorded',
       era: eraBuckets[0] ?? 'Undated',
-      kindFamily: kindFamilyFor(entity.kind),
-      kind: entity.kind,
+      kindFamily: kindFamilyFor(entry.kind),
+      kind: entry.kind,
       mapTone,
       grade: gradeForConfidence(confidenceTier),
       gradeDescription: gradeDescription(gradeForConfidence(confidenceTier)),
@@ -280,10 +368,46 @@ function toFacts(entity: PublicEntityView, collisions: ReadonlyMap<string, numbe
     confidenceTier,
     statePostal: state === undefined ? undefined : state.postalCode,
     stateName: state === undefined ? undefined : state.name,
-    status: entity.status ?? '',
-    haystack: `${entity.displayName} ${entity.summary} ${place}`.toLowerCase(),
-    mappable: carriesPublicMapAnchor(entity),
+    status: entry.status ?? '',
+    haystack: `${entry.displayName} ${entry.summary} ${place}`.toLowerCase(),
+    mappable: entry.mappable,
   };
+}
+
+function isRecordsCatalogEntry(value: unknown): value is RecordsCatalogEntry {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'confidenceTier' in value &&
+    'mappable' in value &&
+    'jurisdictionLabel' in value &&
+    'locationLabel' in value
+  );
+}
+
+function isSearchIndexDoc(value: unknown): value is PublicSearchIndexDoc {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'releaseId' in value &&
+    'nameLower' in value &&
+    'claimCount' in value
+  );
+}
+
+function toRecordsCatalog(
+  catalog:
+    readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[],
+): readonly RecordsCatalogEntry[] {
+  if (catalog.length === 0) return [];
+  const first = catalog[0];
+  if (isRecordsCatalogEntry(first)) {
+    return catalog as readonly RecordsCatalogEntry[];
+  }
+  if (isSearchIndexDoc(first)) {
+    return (catalog as readonly PublicSearchIndexDoc[]).map(recordsCatalogFromSearchDoc);
+  }
+  return (catalog as readonly PublicEntityView[]).map(recordsCatalogFromEntity);
 }
 
 function matchesExcept(
@@ -358,13 +482,17 @@ function compareGroups(a: RecordsGroup, b: RecordsGroup): number {
  * Facet counts are computed with that facet's own constraint lifted, which is what makes the
  * chip bar usable: with `kind=people` active, the Places chip still shows how many records you
  * would get by switching to it, rather than zero.
+ *
+ * Accepts either full entities (tests + pre-backfill fallback) or slim search_index docs.
  */
 export function buildRecordsIndex(
-  entities: readonly PublicEntityView[],
+  catalog:
+    readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[],
   query: RecordsQuery,
 ): RecordsIndex {
-  const collisions = placeSlugCollisionCounts(entities);
-  const facts = entities.map((entity) => toFacts(entity, collisions));
+  const entries = toRecordsCatalog(catalog);
+  const collisions = placeSlugCollisionCounts(entries);
+  const facts = entries.map((entry) => toFacts(entry, collisions));
   const stateNames = new Map<string, string>();
   for (const record of facts) {
     if (record.statePostal !== undefined && record.stateName !== undefined) {
@@ -502,14 +630,16 @@ export type RecordsNeighbors = {
  * Does not build facets — filter + adjacency only.
  */
 export function findRecordsNeighbors(
-  entities: readonly PublicEntityView[],
+  catalog:
+    readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[],
   query: RecordsQuery,
   entityId: string,
   arrivalQuery = '',
 ): RecordsNeighbors | undefined {
-  const collisions = placeSlugCollisionCounts(entities);
-  const matched = entities
-    .map((entity) => toFacts(entity, collisions))
+  const entries = toRecordsCatalog(catalog);
+  const collisions = placeSlugCollisionCounts(entries);
+  const matched = entries
+    .map((entry) => toFacts(entry, collisions))
     .filter((record) => matchesExcept(record, query, 'none'));
   const index = matched.findIndex((record) => record.row.id === entityId);
   if (index < 0 || matched.length === 0) return undefined;

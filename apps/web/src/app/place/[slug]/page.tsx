@@ -16,7 +16,11 @@ import {
 import { isResolvablePlaceSlug } from '../../../lib/place/place-slug';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
 import { getSharedPublicEntities } from '../../../lib/map-experience/shared-map-data';
-import { findRecordsNeighbors } from '../../../lib/records/build-records-index';
+import { getPublicSearchIndex } from '../../../lib/public-data/source';
+import {
+  findRecordsNeighbors,
+  searchIndexReadyForRecords,
+} from '../../../lib/records/build-records-index';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,9 +65,12 @@ export default async function PlacePage({ params, searchParams }: PlacePageProps
       }
     | undefined;
   if (arrival.view === 'list') {
-    const { data: entities } = await getSharedPublicEntities();
+    const { data: searchDocs } = await getPublicSearchIndex();
+    const catalog = searchIndexReadyForRecords(searchDocs)
+      ? searchDocs
+      : (await getSharedPublicEntities()).data;
     const found = findRecordsNeighbors(
-      entities,
+      catalog,
       recordsQueryFromDiscovery(arrival),
       model.lead.id,
       placeArrivalQuery(arrival, 'list'),

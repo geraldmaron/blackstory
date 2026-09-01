@@ -77,6 +77,8 @@ export type SearchableEntityRecord = {
    * search_index. Not a numeric ranking score and not shown as a count.
    */
   readonly confidenceTier?: 'high' | 'medium' | 'low' | 'unrated';
+  /** Public geohash when the search row is mappable; absent for ungeocoded records. */
+  readonly geohash?: string;
 };
 
 /**

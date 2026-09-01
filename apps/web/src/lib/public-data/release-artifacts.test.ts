@@ -34,6 +34,34 @@ test('mapPublicSearchProjection preserves ranking inputs and theme topicIds', ()
   assert.deepEqual(mapped.topicIds, ['civil-rights']);
   assert.equal(mapped.relatedCount, 2);
   assert.equal(mapped.claimCount, 3);
+  assert.equal(mapped.confidenceTier, undefined);
+});
+
+test('mapPublicSearchProjection passes confidenceTier and geohash through', () => {
+  const mapped = mapPublicSearchProjection({
+    id: 'ent_map_002',
+    releaseId: 'rel_map_001',
+    kind: 'place',
+    displayName: 'Graded Place',
+    nameLower: 'graded place',
+    aliases: [],
+    topicTags: [],
+    topicIds: [],
+    mentionedEntityIds: [],
+    keywords: [],
+    campaignIds: [],
+    eraBuckets: [],
+    notabilityBasis: [],
+    notabilityLabels: [],
+    recordMaturity: 'published',
+    researchCoverage: 'partial',
+    relatedCount: 0,
+    claimCount: 2,
+    confidenceTier: 'medium',
+    geohash: 'dqcjq',
+  });
+  assert.equal(mapped.confidenceTier, 'medium');
+  assert.equal(mapped.geohash, 'dqcjq');
 });
 
 test('release artifacts are accepted only from the configured origin and matching release', async () => {

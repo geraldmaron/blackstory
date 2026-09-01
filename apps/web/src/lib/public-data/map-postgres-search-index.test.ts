@@ -32,7 +32,7 @@ test('mapPostgresSearchIndexRow builds a valid doc from denormalized columns', (
   assert.equal(doc!.displayName, 'Example Place');
   assert.equal(doc!.relatedCount, 2);
   assert.equal(doc!.claimCount, 3);
-  assert.equal(doc!.confidenceTier, 'unrated');
+  assert.equal(doc!.confidenceTier, undefined);
   assert.deepEqual(doc!.topicTags, ['civil-rights']);
 });
 
