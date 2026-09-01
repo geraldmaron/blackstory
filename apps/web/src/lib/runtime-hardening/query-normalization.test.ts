@@ -388,9 +388,34 @@ test('/corrections keeps the CorrectionForm prefill (target, targetType)', () =>
   );
   assert.equal(
     needsQueryNormalizationRedirect(
-      new URL('https://example.com/corrections?target=x&targetType=entity'),
+      new URL('https://example.com/corrections?target=ent_x&targetType=entity'),
     ),
     false,
+  );
+});
+
+test('/place keeps DiscoveryState arrival params (from=list + filters)', () => {
+  assert.equal(
+    normalizeQueryString('/place/paul-laurence-dunbar-high-school', {
+      from: 'list',
+      state: 'DC',
+      evidence: 'B',
+      utm_source: 'x',
+      junk: '1',
+    }),
+    'evidence=B&from=list&state=DC',
+  );
+  assert.equal(
+    needsQueryNormalizationRedirect(
+      new URL(
+        'https://example.com/place/paul-laurence-dunbar-high-school?from=list&state=DC&evidence=B',
+      ),
+    ),
+    false,
+  );
+  assert.equal(
+    getAllowedQueryParamsForPath('/place/paul-laurence-dunbar-high-school').includes('from'),
+    true,
   );
 });
 

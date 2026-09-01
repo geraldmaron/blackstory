@@ -26,7 +26,8 @@ import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './ent
 import { resolveEntityEraBuckets } from './entity-era-facts';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
 import { displayEncodingFor, kindFamilyFor, resolveMapTone } from './kind-encoding';
-import { atlasWalkHref, staysOffPublicMap } from '../place/public-place-path';
+import { staysOffPublicMap } from '../place/public-place-path';
+import { instrumentRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
 
 export type ConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
 
@@ -204,7 +205,11 @@ function toMapSourceInput(entity: PublicEntityView, anchor: EntityGeoAnchor): Ma
   };
 }
 
-function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): ExploreMapFeature {
+function enrichFeature(
+  feature: MapPointFeature,
+  entity: PublicEntityView,
+  collisions: ReadonlyMap<string, number>,
+): ExploreMapFeature {
   const tier = geoPrecisionTierForPublicPrecision(feature.properties.precision);
   const radius = resolveDisplayRadiusMeters(tier, {
     ...(feature.properties.statePostalCode
@@ -231,12 +236,7 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
     geometry: feature.geometry,
     properties: {
       entityId: entity.id,
-      href:
-        atlasWalkHref({
-          displayName: entity.displayName,
-          kind: entity.kind,
-          entityId: entity.id,
-        }) ?? '',
+      href: instrumentRecordHref(entity, collisions),
       kind: feature.properties.kind,
       displayName: feature.properties.displayName,
       oneLineStory: sanitizePublicProseText(entity.summary),
@@ -304,6 +304,7 @@ export function buildExploreMapSource(
     redactLocation: redactLocationForPublic,
   });
 
+  const collisions = placeSlugCollisionCounts(entities);
   const features = built.featureCollection.features.map((feature) => {
     const entity = entityById.get(feature.properties.entityId);
     if (!entity) {
@@ -311,7 +312,7 @@ export function buildExploreMapSource(
         `buildExploreMapSource: feature "${feature.id}" has no matching active-release entity`,
       );
     }
-    return enrichFeature(feature, entity);
+    return enrichFeature(feature, entity, collisions);
   });
 
   return {

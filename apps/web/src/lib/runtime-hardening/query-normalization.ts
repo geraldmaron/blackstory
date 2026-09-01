@@ -16,6 +16,7 @@ import {
   STORIES_PAGE_PARAM_ALLOWLIST,
   EXPLORE_PAGE_PARAM_ALLOWLIST,
   LAW_PAGE_PARAM_ALLOWLIST,
+  PLACE_PAGE_PARAM_ALLOWLIST,
   SEARCH_PAGE_PARAM_ALLOWLIST,
   TRACKING_QUERY_KEYS,
   TRACKING_QUERY_PREFIXES,
@@ -65,6 +66,9 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
   }
   if (path === '/corrections') {
     return CORRECTIONS_PAGE_PARAM_ALLOWLIST;
+  }
+  if (path.startsWith('/place/')) {
+    return PLACE_PAGE_PARAM_ALLOWLIST;
   }
   return [];
 }

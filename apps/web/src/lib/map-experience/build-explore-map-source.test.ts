@@ -8,29 +8,24 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
-import { atlasWalkHref } from '../place/public-place-path';
+import { instrumentRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
 import { buildExploreMapSource, buildJurisdictionAreaFeatures } from './build-explore-map-source';
 import { geoAnchorFor } from './entity-geo';
 import { displayEncodingFor, kindFamilyFor } from './kind-encoding';
 
 test('every active-release entity with a resolvable anchor becomes an enriched feature', () => {
   const entities = listPublicEntities();
+  const collisions = placeSlugCollisionCounts(entities);
   const source = buildExploreMapSource(entities);
 
   assert.equal(source.featureCollection.features.length, entities.length);
   for (const feature of source.featureCollection.features) {
     const entity = entities.find((candidate) => candidate.id === feature.properties.entityId);
     assert.ok(entity);
-    const walk = atlasWalkHref({
-      displayName: entity.displayName,
-      kind: entity.kind,
-      entityId: entity.id,
-    });
-    assert.equal(feature.properties.href, walk ?? '');
-    if (walk) {
-      assert.match(walk, /^\/(place|memorial|law)\//);
+    const href = instrumentRecordHref(entity, collisions);
+    assert.equal(feature.properties.href, href);
+    if (href.startsWith('/place/')) {
       assert.doesNotMatch(feature.properties.href, /\/entity\//);
-      assert.doesNotMatch(feature.properties.href, /ent_/);
     }
     assert.equal(feature.properties.oneLineStory, entity!.summary);
     assert.equal(feature.properties.evidenceCount, entity!.claims.length);
@@ -38,13 +33,14 @@ test('every active-release entity with a resolvable anchor becomes an enriched f
   }
 });
 
-test('a published name that the place page cannot resolve does not invent a /place/ href', () => {
+test('a standable published place gets a /place/ href on the Atlas instrument', () => {
   const base = listPublicEntities()[0]!;
   const palace: PublicEntityView = {
     ...base,
     id: 'ent_test_archie_edwards',
     kind: 'place',
     displayName: 'Archie Edwards Alpha Tonsorial Palace',
+    summary: 'A documented barbershop and gathering place in Washington, D.C.',
   };
   const source = buildExploreMapSource([palace], {
     geoAnchorFor: (id) =>
@@ -53,10 +49,9 @@ test('a published name that the place page cannot resolve does not invent a /pla
         : geoAnchorFor(id),
   });
   assert.equal(source.featureCollection.features.length, 1);
-  assert.equal(source.featureCollection.features[0]!.properties.href, '');
-  assert.doesNotMatch(
+  assert.equal(
     source.featureCollection.features[0]!.properties.href,
-    /\/place\/archie-edwards/,
+    '/place/archie-edwards-alpha-tonsorial-palace',
   );
 });
 
@@ -166,9 +161,14 @@ test('James H. Dillard House stays off the public map', () => {
     locationPrecision: 'campus',
   };
   const source = buildExploreMapSource([house, university], {
-    geoAnchorFor: () => ({ lat: 29.93, lng: -90.12, geohash: 'djfq', matchMethod: 'geocode_other' }),
+    geoAnchorFor: () => ({
+      lat: 29.93,
+      lng: -90.12,
+      geohash: 'djfq',
+      matchMethod: 'geocode_other',
+    }),
   });
   assert.equal(source.featureCollection.features.length, 1);
   assert.equal(source.featureCollection.features[0]!.properties.displayName, 'Dillard University');
-  assert.equal(source.featureCollection.features[0]!.properties.href, '');
+  assert.equal(source.featureCollection.features[0]!.properties.href, '/place/dillard-university');
 });

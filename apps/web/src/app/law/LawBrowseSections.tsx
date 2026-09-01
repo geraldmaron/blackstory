@@ -101,8 +101,8 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
       <Prose>
         <p>
           This catalogue loads from a separate legal reference, not from the entity records this
-          archive pins to place. Where a law and a record share a jurisdiction and an era, that is
-          a coincidence of scope, not a documented link: the relationship is jurisdictional, not
+          archive pins to place. Where a law and a record share a jurisdiction and an era, that is a
+          coincidence of scope, not a documented link: the relationship is jurisdictional, not
           evidentiary. A jurisdiction is not a location. It is the reach of the authority that
           passed a law, and it carries no address of its own.
         </p>

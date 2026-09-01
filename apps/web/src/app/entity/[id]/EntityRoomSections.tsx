@@ -89,6 +89,14 @@ export function recordSectionIndex({
       count: connectionCount,
     });
   }
+  const continueCount = toSuggestedConnections(entity, false).length;
+  if (continueCount > 0) {
+    sections.push({
+      id: 'continue-heading',
+      label: 'Worth investigating next',
+      count: continueCount,
+    });
+  }
   if (crossReferences.length > 0) {
     sections.push({
       id: 'appears-in-heading',
@@ -133,7 +141,7 @@ function toConnections(entity: PublicEntityView, firstPaint: boolean): readonly 
       : neighbor.viaEvent
         ? `both appear in ${neighbor.viaEvent.displayName}`
         : relationPhrase(neighbor.relationType, neighbor.direction);
-    const href = firstPaint ? neighborHref(neighbor) : `/entity/${neighbor.id}`;
+    const href = neighborHref(neighbor);
     if (firstPaint && (relation === undefined || relation.length === 0)) {
       return [{ name: neighbor.displayName, relation: '', href }];
     }
@@ -147,6 +155,21 @@ function toConnections(entity: PublicEntityView, firstPaint: boolean): readonly 
   });
 }
 
+function toSuggestedConnections(
+  entity: PublicEntityView,
+  firstPaint: boolean,
+): readonly RoomConnection[] {
+  return (entity.continueLearning ?? []).map((neighbor) => ({
+    name: neighbor.displayName,
+    relation: firstPaint
+      ? (firstPaintRelation(neighbor, entity) ?? '')
+      : neighbor.viaEvent
+        ? `both appear in ${neighbor.viaEvent.displayName}`
+        : relationPhrase(neighbor.relationType, neighbor.direction),
+    href: neighborHref(neighbor),
+  }));
+}
+
 export function EntityRoomSections({
   entity,
   evidenceClaims,
@@ -156,25 +179,10 @@ export function EntityRoomSections({
 }: EntityRoomSectionsProps) {
   const hasContext = entity.historicalContext.trim().length > 0;
   const hasStatus = firstPaint ? false : hasStatusFor(entity);
-  const connections = firstPaint
-    ? [
-        ...toConnections(entity, true),
-        ...(entity.continueLearning ?? []).map((neighbor) => ({
-          name: neighbor.displayName,
-          relation: firstPaintRelation(neighbor, entity) ?? '',
-          href: neighborHref(neighbor),
-        })),
-      ].filter(
-        (connection, index, list) =>
-          list.findIndex((other) => other.href === connection.href) === index,
-      )
-    : toConnections(entity, false);
-  const continueLearning = firstPaint ? [] : (entity.continueLearning ?? []);
+  const connections = toConnections(entity, firstPaint);
+  const continueLearning = toSuggestedConnections(entity, firstPaint);
   const relatedHeading = firstPaint
-    ? firstPaintRelatedHeading([
-        ...(entity.relatedNeighbors ?? []),
-        ...(entity.continueLearning ?? []),
-      ])
+    ? firstPaintRelatedHeading(entity.relatedNeighbors ?? [])
     : 'Records this one touches';
 
   return (
@@ -257,25 +265,22 @@ export function EntityRoomSections({
           <h2 className="ds-record-beat__heading" id="related-heading">
             {relatedHeading}
           </h2>
+          <p className="ds-record-beat__standfirst">
+            Typed connections from the archive. Nearby on the map is not the same as related.
+          </p>
           <Connections connections={connections} />
-          {continueLearning.length > 0 ? (
-            <>
-              <h3 className="ds-record-beat__subheading" id="continue-heading">
-                One step further
-              </h3>
-              <Connections
-                connections={continueLearning.map((neighbor) => ({
-                  name: neighbor.displayName,
-                  relation: firstPaint
-                    ? (firstPaintRelation(neighbor, entity) ?? '')
-                    : neighbor.viaEvent
-                      ? `both appear in ${neighbor.viaEvent.displayName}`
-                      : relationPhrase(neighbor.relationType, neighbor.direction),
-                  href: firstPaint ? neighborHref(neighbor) : `/entity/${neighbor.id}`,
-                }))}
-              />
-            </>
-          ) : null}
+        </section>
+      ) : null}
+
+      {continueLearning.length > 0 ? (
+        <section className="ds-record-beat" aria-labelledby="continue-heading">
+          <h2 className="ds-record-beat__heading" id="continue-heading">
+            Worth investigating next
+          </h2>
+          <p className="ds-record-beat__standfirst">
+            Leads from this record. They are not proven the same way as a typed connection.
+          </p>
+          <Connections connections={continueLearning} />
         </section>
       ) : null}
 

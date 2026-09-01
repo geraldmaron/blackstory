@@ -1,14 +1,13 @@
 /**
  * Place-page loader for `/place/[slug]`: one published place, never the 4,101 catalog.
  *
- * Live reads are point-gets (`resolvePublicEntityView`). Seed reads the Dunbar cluster.
- * Greenwood is last-resort fallback when no other place can be resolved. Internal ids
- * never title and never appear in the address a reader follows. Stand ids live with the
- * public place path so a walk href can ask the same lookup the place page uses.
+ * Live named walks resolve via the search index then a point-get. Seed reads the Dunbar
+ * cluster. Door Rest fallback still prefers stand candidates (Greenwood last-resort).
+ * Internal ids never title. Collision addresses use `{slug}--{entityId}`.
  */
 import { listPublicArticleListItems, resolveCitesEdgeIndex } from '../lib/articles/source';
 import { shouldUseLivePublicProjections } from '../lib/public-data/live-policy';
-import { resolvePublicEntityView } from '../lib/public-data/source';
+import { getPublicSearchIndex, resolvePublicEntityView } from '../lib/public-data/source';
 import { getPublicEntity, listPublicEntities, type PublicEntityView } from '../data/public-seed';
 import {
   canStandHere,
@@ -17,6 +16,11 @@ import {
   PLACE_PAGE_STAND_IDS,
   publicPlaceSlug,
 } from '../lib/place/public-place-path';
+import {
+  isResolvablePlaceSlug,
+  parsePlaceAddress,
+  resolvePlaceSlugFromSearchIndex,
+} from '../lib/place/place-slug';
 import { storiesCiting, type StoryCitation } from '../lib/release/build-cites-edge';
 import { pickLeadStory } from './stories/stories-index';
 import type { PublicArticleListItemDoc } from '@repo/schemas';
@@ -71,8 +75,10 @@ async function readById(id: string): Promise<{
   return { lead: undefined, source: 'none' };
 }
 
-function seedBySlug(slug: string): PublicEntityView | undefined {
-  return listPublicEntities().find((entity) => publicPlaceSlug(entity.displayName) === slug);
+function seedMatchesForBase(base: string): PublicEntityView[] {
+  return listPublicEntities().filter(
+    (entity) => stands(entity) && publicPlaceSlug(entity.displayName) === base,
+  );
 }
 
 async function readBySlug(slug: string): Promise<{
@@ -80,23 +86,47 @@ async function readBySlug(slug: string): Promise<{
   readonly source: HomeFirstPaintSource;
 }> {
   const trimmed = slug.trim();
-  if (trimmed.length === 0 || isInternalRecordLabel(trimmed) || trimmed.startsWith('ent_')) {
+  if (!isResolvablePlaceSlug(trimmed)) {
     return { lead: undefined, source: 'none' };
   }
 
-  const seeded = seedBySlug(trimmed);
-  if (seeded && stands(seeded)) {
-    if (!shouldUseLivePublicProjections()) return { lead: seeded, source: 'seed' };
+  const { base, entityId } = parsePlaceAddress(trimmed);
+  if (entityId) {
+    return readById(entityId);
+  }
+
+  if (shouldUseLivePublicProjections()) {
+    try {
+      const index = await getPublicSearchIndex();
+      const resolvedId = resolvePlaceSlugFromSearchIndex(index.data, trimmed);
+      if (resolvedId) {
+        const resolved = await readById(resolvedId);
+        if (resolved.lead) return resolved;
+      }
+    } catch {
+      // Point-get / index miss must not become a full catalog pull.
+    }
+  }
+
+  const seeded = seedMatchesForBase(base);
+  if (seeded.length === 1) {
+    return { lead: seeded[0], source: 'seed' };
+  }
+  if (seeded.length > 1) {
+    const preferred =
+      seeded.find((entity) =>
+        (HOME_STAND_CANDIDATE_IDS as readonly string[]).includes(entity.id),
+      ) ?? seeded[0];
+    return { lead: preferred, source: 'seed' };
   }
 
   for (const id of HOME_STAND_CANDIDATE_IDS) {
     const resolved = await readById(id);
-    if (resolved.lead && publicPlaceSlug(resolved.lead.displayName) === trimmed) {
+    if (resolved.lead && publicPlaceSlug(resolved.lead.displayName) === base) {
       return resolved;
     }
   }
 
-  if (seeded && stands(seeded)) return { lead: seeded, source: 'seed' };
   return { lead: undefined, source: 'none' };
 }
 
@@ -148,7 +178,11 @@ export async function loadHomeFirstPaint(
   let source: HomeFirstPaintSource = 'none';
 
   if (named) {
-    const fromStands = standRows.find((row) => publicPlaceSlug(row.entity.displayName) === named);
+    const { base, entityId } = parsePlaceAddress(named);
+    const fromStands =
+      entityId === undefined
+        ? standRows.find((row) => publicPlaceSlug(row.entity.displayName) === base)
+        : standRows.find((row) => row.entity.id === entityId);
     if (fromStands) {
       lead = fromStands.entity;
       source = fromStands.source;

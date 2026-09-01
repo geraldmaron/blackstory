@@ -4,9 +4,15 @@
  */
 import type { MetadataRoute } from 'next';
 import { crawlableDestinations } from '../nav/destination-registry';
+import { canStandHere } from '../place/public-place-path';
+import { placeHrefForEntity, placeSlugCollisionCounts } from '../place/place-slug';
 
 export type SitemapEntityEntry = {
   readonly id: string;
+  readonly displayName?: string;
+  readonly kind?: string;
+  readonly summary?: string;
+  readonly locationPrecision?: string;
   readonly updatedAt?: string;
 };
 
@@ -44,8 +50,27 @@ function toAbsolute(siteUrl: string, path: string): string {
   return new URL(path, siteUrl).toString();
 }
 
+function recordPath(entity: SitemapEntityEntry, collisions: ReadonlyMap<string, number>): string {
+  const displayName = entity.displayName?.trim() ?? '';
+  if (
+    displayName.length > 0 &&
+    canStandHere({
+      displayName,
+      kind: entity.kind ?? 'place',
+      summary: entity.summary ?? displayName,
+      ...(entity.locationPrecision !== undefined
+        ? { locationPrecision: entity.locationPrecision }
+        : {}),
+    })
+  ) {
+    return placeHrefForEntity({ id: entity.id, displayName }, collisions);
+  }
+  return `/entity/${entity.id}`;
+}
+
 /**
- * Builds sitemap entries for static routes plus entity pages from the active release catalog.
+ * Builds sitemap entries for static routes plus record pages from the active release catalog.
+ * Standable records emit `/place/{slug}`; the rest keep `/entity/{id}`.
  */
 export function buildPublicSitemapEntries(
   options: BuildSitemapOptions = {},
@@ -59,8 +84,15 @@ export function buildPublicSitemapEntries(
     priority: route.priority,
   }));
 
-  const entityEntries: MetadataRoute.Sitemap = (options.entities ?? []).map((entity) => ({
-    url: toAbsolute(siteUrl, `/entity/${entity.id}`),
+  const entities = options.entities ?? [];
+  const collisions = placeSlugCollisionCounts(
+    entities.flatMap((entity) =>
+      entity.displayName?.trim() ? [{ displayName: entity.displayName }] : [],
+    ),
+  );
+
+  const entityEntries: MetadataRoute.Sitemap = entities.map((entity) => ({
+    url: toAbsolute(siteUrl, recordPath(entity, collisions)),
     lastModified: entity.updatedAt ?? releaseStamp,
     changeFrequency: 'weekly',
     priority: 0.8,

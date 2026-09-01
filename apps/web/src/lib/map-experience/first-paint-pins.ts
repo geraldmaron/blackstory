@@ -121,9 +121,9 @@ function shouldDropSelected(selected: string | undefined): boolean {
 }
 
 /** Drop shop tokens from the request-scoped shell before it rides the first document. */
-export function toFirstPaintShell<
-  T extends { readonly viewState: { readonly selected?: string } },
->(shell: T): T {
+export function toFirstPaintShell<T extends { readonly viewState: { readonly selected?: string } }>(
+  shell: T,
+): T {
   const { selected: _selected, ...viewStateRest } = shell.viewState;
   const next = {
     ...shell,

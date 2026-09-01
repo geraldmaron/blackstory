@@ -1,7 +1,7 @@
 /**
- * Legacy `/entity/{id}` is a hop to `/place/{slug}`. The record room lives on the
- * place door. This file keeps the ISR / empty-static-params guard and the
- * column rules that first paint still mounts.
+ * `/entity/{id}` renders the record room for non-holding records, and 308s to
+ * `/place/{slug}` only when that place address actually holds. Column rules for
+ * `EntityRoomSections` still apply on first paint.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -21,12 +21,11 @@ const mediaSource = readFileSync(
   'utf8',
 );
 
-test('entity addresses 308 to the public place slug', () => {
-  assert.match(pageSource, /permanentRedirect\(placeHref/);
-  assert.match(pageSource, /from '\.\.\/\.\.\/\.\.\/lib\/place\/public-place-path'/);
-  assert.doesNotMatch(pageSource, /<Room/);
+test('standable records 308 to /place; non-standable records still render here', () => {
+  assert.match(pageSource, /permanentRedirect\(placeHrefForEntity/);
+  assert.match(pageSource, /canStandHere/);
+  assert.match(pageSource, /<Room/);
   assert.doesNotMatch(pageSource, /getSharedPublicEntities|listPublicEntityViews\(/);
-  assert.doesNotMatch(pageSource, /getPublicSearchIndex/);
 });
 
 test('a beat renders only when the record has that content', () => {
@@ -39,11 +38,18 @@ test('a beat renders only when the record has that content', () => {
 test('a related record states its relation in words', () => {
   assert.match(sectionsSource, /relationPhrase/);
   assert.match(sectionsSource, /<Connections/);
+  assert.match(sectionsSource, /Worth investigating next/);
+  assert.match(sectionsSource, /Nearby on the map is not the same as related/);
+  assert.match(sectionsSource, /toSuggestedConnections/);
+  assert.doesNotMatch(
+    sectionsSource,
+    /firstPaintRelatedHeading\(\[\s*\.\.\.\(entity\.relatedNeighbors/,
+  );
 });
 
-test('first-paint neighbor hrefs stay off internal ids', () => {
+test('neighbor hrefs stay off internal entity paths', () => {
   assert.match(sectionsSource, /neighborHref/);
-  assert.doesNotMatch(sectionsSource, /firstPaint \? `\/entity\/\$\{neighbor\.id\}`/);
+  assert.doesNotMatch(sectionsSource, /`\/entity\/\$\{neighbor\.id\}`/);
 });
 
 test('entity page stays CDN-cacheable and prerenders nothing', () => {

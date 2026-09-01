@@ -15,7 +15,11 @@
  *
  * Selection note: `selected` opens the preview narrative card and orients the copper ring on
  * the map (e.g. “View on map” from a record page). The full record is reached via the card
- * CTA at `/entity/[id]`, not by pin/list selection alone.
+ * CTA at `/place/{slug}` (legacy `/entity/[id]` 308s there), not by pin/list selection alone.
+ *
+ * Evidence floor: `floor=A|B|C` is the Lens “and up” predicate (SP-16). It is distinct from
+ * exact-match `confidence=`. Records→Atlas handoff writes `floor`; without this key in the
+ * parser/allowlist, middleware stripped it and silently widened the set.
  */
 import { isPopulationDecade } from '@repo/domain/demographics/population-decades';
 import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@repo/domain/map/geography';
@@ -31,6 +35,7 @@ import {
   type ExplorePopulationGeo,
 } from './explore-population';
 import { EXPLORE_RADIUS_PRESETS, type ExploreRadiusPresetId } from './explore-place-radius';
+import type { EvidenceGrade } from './evidence-grade';
 
 export type ExploreViewport = {
   readonly lat: number;
@@ -96,6 +101,11 @@ export type ExploreViewState = {
   readonly radius?: ExploreRadiusPresetId;
   /** Human place label for place-search status UI (never raw coordinates). */
   readonly near?: string;
+  /**
+   * Evidence floor (`A` | `B` | `C`) — “this grade and up”. Omitted means any (including
+   * ungraded). Distinct from `filters.confidence`, which is an exact tier match.
+   */
+  readonly floor?: EvidenceGrade;
 };
 
 export type RawExploreSearchParams = Readonly<
@@ -119,6 +129,7 @@ export const EXPLORE_URL_PARAM_KEYS = [
   'theme',
   'status',
   'confidence',
+  'floor',
   'lat',
   'lng',
   'zoom',
@@ -275,6 +286,12 @@ function parseNear(raw: string | undefined): string | undefined {
   return trimmed ? trimmed : undefined;
 }
 
+function parseEvidenceFloor(raw: string | undefined): EvidenceGrade | undefined {
+  const trimmed = raw?.trim().toUpperCase();
+  if (trimmed === 'A' || trimmed === 'B' || trimmed === 'C') return trimmed;
+  return undefined;
+}
+
 export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreViewState {
   const filters: ExploreFilterState = {
     era: cleanSelectParam(firstValue(raw.era)),
@@ -296,6 +313,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const linesRaw = firstValue(raw.lines);
   const decadeRaw = firstValue(raw.decade)?.trim();
   const edgeRaw = firstValue(raw.edge)?.trim();
+  const floor = parseEvidenceFloor(firstValue(raw.floor));
   const layerMode = parseLayerMode(raw);
   const popGeoRaw = firstValue(raw.popGeo)?.trim();
   const popDecadeRaw = firstValue(raw.popDecade)?.trim();
@@ -365,6 +383,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
     showKey,
     ...(radius ? { radius } : {}),
     ...(near ? { near } : {}),
+    ...(floor ? { floor } : {}),
   };
 }
 
@@ -426,10 +445,11 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   // for the same reason. Inbound `panels=` and `hidePanels=` still parse; they never round-trip.
   if (state.radius && state.radius !== 'all') params.set('radius', state.radius);
   if (state.near) params.set('near', state.near);
+  if (state.floor) params.set('floor', state.floor);
   return params.toString();
 }
 
-/** Filter handoffs still answer on `/explore`. `/` is the map door and mounts the same instrument. */
+/** Filter handoffs answer on `/explore`. `/` is the Door (reading); the live instrument is `/explore`. */
 export function buildExploreHref(state: ExploreViewState): string {
   const qs = buildExploreSearchParams(state);
   return qs ? `/explore?${qs}` : '/explore';

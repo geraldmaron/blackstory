@@ -1,10 +1,13 @@
 # BlackStory design direction v9: surfaces
 
-**Status:** proposed (2026-07-30). Binding once owner-approved and this line is changed to `binding`.
+**Status:** superseded (2026-08-31) by [`design-direction-v10.md`](./design-direction-v10.md) and live `apps/web/src/lib/nav/surface-classes.ts`.  
+**Kept as provenance.** Route membership in this file (`/chapters`, Instrument on `/`, `/story`) does not match shipped code (`/stories`, Door on `/`, `/explore` instrument).
+
+**Historical status:** proposed (2026-07-30).  
 **Source mockup:** [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html), extended with a room layer, the reading rooms, the record room, the records index, the legend overlay and the single-key toggle (packages SP-01 to SP-03 below).
-**Companion:** [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md). That document governs the instrument. This one governs every other public surface and the shell they share. They are read together, and neither is complete alone.
-**Supersedes on approval:** `design-direction-v6-history.md` (the route dissolves), `design-direction-v6-about.md`, `design-direction-v6-books.md`, `design-direction-v6-data.md`, `design-direction-v6-law.md`, `design-direction-v6-memorial.md`, `design-direction-v6-methodology.md`, `design-direction-v6-entity.md`, and `design-direction-v6-stories.md` and `design-direction-v6-themes.md`, whose routes no longer exist in the app directory. `patterns-utility-edition.md` is folded into the Utility class in section 2.4.
-**Unchanged and still binding:** [`brand.md`](./brand.md) tokens, palette, type and dignity law; [`story.md`](./story.md) voice; [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md); [`patterns-map-canvas.md`](./patterns-map-canvas.md); [`patterns-record-anatomy.md`](./patterns-record-anatomy.md); [`patterns-browse-mode.md`](./patterns-browse-mode.md); [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md); [`patterns-site-footer.md`](./patterns-site-footer.md); ADR-017 map handoff; WCAG AA floor.
+**Companion:** [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md) — also superseded for product shape.
+**Supersedes on approval (historical):** `design-direction-v6-history.md` (the route dissolves), `design-direction-v6-about.md`, `design-direction-v6-books.md`, `design-direction-v6-data.md`, `design-direction-v6-law.md`, `design-direction-v6-memorial.md`, `design-direction-v6-methodology.md`, `design-direction-v6-entity.md`, and `design-direction-v6-stories.md` and `design-direction-v6-themes.md`, whose routes no longer exist in the app directory. `patterns-utility-edition.md` is folded into the Utility class in section 2.4.
+**Unchanged and still binding:** [`brand.md`](./brand.md) tokens, palette, type and dignity law; [`story.md`](./story.md) voice; [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md); [`patterns-map-canvas.md`](./patterns-map-canvas.md); [`patterns-record-anatomy.md`](./patterns-record-anatomy.md); [`patterns-browse-mode.md`](./patterns-browse-mode.md); [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md); [`patterns-site-footer.md`](./patterns-site-footer.md); ADR-017 map handoff; WCAG AA floor. Protected experiences and v10 override conflicts.
 
 ---
 

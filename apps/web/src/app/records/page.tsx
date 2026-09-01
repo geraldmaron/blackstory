@@ -12,9 +12,8 @@
  * Plate posture: Parked. This room never shows the map; the off-ramp hands the narrowing to it.
  */
 import type { Metadata } from 'next';
-import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-data';
-import { buildRecordsIndex, parseRecordsQuery } from '../../lib/records/build-records-index';
 import { RecordsIndexRoom } from './RecordsIndex';
+import { loadRecordsIndex, recordsQueryCacheKey } from './load-records-index';
 import '../reading-room.css';
 import './records-index.css';
 
@@ -30,9 +29,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3048';
  * §4 names. `prev`/`next` are emitted as real link relations alongside the anchors in the body.
  */
 export async function generateMetadata({ searchParams }: RecordsPageProps): Promise<Metadata> {
-  const query = parseRecordsQuery(await searchParams);
-  const { data: entities } = await getSharedPublicEntities();
-  const model = buildRecordsIndex(entities, query);
+  const key = recordsQueryCacheKey(await searchParams);
+  const { model } = await loadRecordsIndex(key);
   const absolute = (path: string): string => new URL(path, SITE_URL).toString();
 
   const title =
@@ -53,9 +51,8 @@ export async function generateMetadata({ searchParams }: RecordsPageProps): Prom
 }
 
 export default async function RecordsPage({ searchParams }: RecordsPageProps) {
-  const query = parseRecordsQuery(await searchParams);
-  const { data: entities } = await getSharedPublicEntities();
-  const model = buildRecordsIndex(entities, query);
+  const key = recordsQueryCacheKey(await searchParams);
+  const { model } = await loadRecordsIndex(key);
 
   return (
     <>

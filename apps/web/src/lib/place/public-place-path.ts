@@ -2,10 +2,9 @@
  * Public place addresses. A reader follows `/place/fifteenth-street-presbyterian-church`,
  * never `/entity/ent_…`. Slugs are derived from the published name, not the catalog id.
  *
- * A `/place/{slug}` walk is only emitted when that slug actually resolves on the place
- * page (`loadHomeFirstPaint({ namedSlug, requireNamed: true })`). That lookup is the
- * stand-candidate ids plus the bundled seed names that can stand. Slugifying a published
- * catalog name is not enough, and invents a 404.
+ * Place resolution for named walks uses the search index (`place-slug.ts`) so any standable
+ * release record can hold. Door pin walks (`atlasWalkHref`) still use the stand allowlist so
+ * Rest stays calm. Collision addresses are `{slug}--{entityId}`.
  */
 
 const TULSA_PLACE = /tulsa|greenwood|black wall street/i;

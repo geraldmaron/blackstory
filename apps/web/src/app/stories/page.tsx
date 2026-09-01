@@ -349,8 +349,8 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
       ) : null}
 
       <WalkOffRamp>
-        This is the national archive of chapters. A record names Stories only when it already
-        cites one.
+        This is the national archive of chapters. A record names Stories only when it already cites
+        one.
       </WalkOffRamp>
     </Room>
   );

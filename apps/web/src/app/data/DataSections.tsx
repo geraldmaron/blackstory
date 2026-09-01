@@ -116,8 +116,8 @@ function ChartCard({
             <DataTable caption={table.caption} columns={table.columns} rows={table.rows} />
           ) : (
             <p>
-              No numeric series is attached to this card. The counted breakdown of the archive
-              is not a chart on this page.
+              No numeric series is attached to this card. The counted breakdown of the archive is
+              not a chart on this page.
             </p>
           )}
         </Disclosure>
