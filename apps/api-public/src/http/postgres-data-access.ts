@@ -19,6 +19,7 @@ import {
   listPublicSearchIndexDocs,
   type PostgresQueryFn,
 } from './postgres-readers.js';
+import { hydrateEntityV1Neighbors } from './hydrate-entity-neighbors.js';
 import { queryPostgres } from './postgres-client.js';
 import {
   loadEntityProjectionsFromArtifact,
@@ -54,6 +55,8 @@ export function mapPublicSearchProjection(doc: PublicSearchProjectionDoc): Publi
     researchCoverage: doc.researchCoverage,
     relatedCount: doc.relatedCount,
     claimCount: doc.claimCount,
+    ...(doc.confidenceTier !== undefined ? { confidenceTier: doc.confidenceTier } : {}),
+    ...(doc.geohash !== undefined ? { geohash: doc.geohash } : {}),
   };
 }
 
@@ -184,7 +187,9 @@ export function createPostgresDataAccessReaders(
     async readEntity(releaseId, entityId): Promise<EntityV1 | undefined> {
       const projection = await fetchPublicEntityProjection(releaseId, entityId, runQuery);
       if (!projection) return undefined;
-      return mapProjectionToEntityV1(projection);
+      const mapped = mapProjectionToEntityV1(projection);
+      if (!mapped) return undefined;
+      return hydrateEntityV1Neighbors(mapped, releaseId, runQuery);
     },
 
     async readEntities(releaseId): Promise<readonly EntityV1[]> {

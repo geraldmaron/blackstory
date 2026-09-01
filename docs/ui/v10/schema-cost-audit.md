@@ -94,7 +94,8 @@ Option B (viewport SQL) and Option C (tiles) deferred until catalog growth makes
 - Per-entity citing-stories index (avoid full article scan)
 - Optional compact Place read model bundling identity + geo + evidence summary + edge counts
 - Do **not** hydrate full evidence arrays into map catalog
-- **Records slim:** coverage-gated on projected `confidenceTier`; run `backfill-search-facets-confidence.ts` to activate
+- **Records slim:** coverage-gated on projected `confidenceTier` (SQL backfill applied 2026-08-31). Until `publish-release-catalog-artifacts.ts` refreshes the CDN blob, web prefers Postgres search_index over a stale artifact — correct but more egress; republish to restore CDN cost profile.
+- Place / api-public entity GET: bounded 1-hop/2-hop `ANY()` batches only (never N+1; list/search omit neighbor hydrate)
 
 ## Observability before/after Place work
 
