@@ -30,6 +30,7 @@ import { EntityEvidencePanel } from '../../../components/evidence';
 import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { Connections, type RoomConnection } from '../../../components/room';
+import { RelationshipConstellation } from '../../../components/patterns/RelationshipConstellation';
 import { humanizeToken } from '../../../components/entity/format';
 import { neighborHref } from '../../../lib/place/public-place-path';
 import { firstPaintRelatedHeading, firstPaintRelation } from '../../home-first-paint-surface';
@@ -268,7 +269,7 @@ export function EntityRoomSections({
           <p className="ds-record-beat__standfirst">
             Typed connections from the archive. Nearby on the map is not the same as related.
           </p>
-          <Connections connections={connections} />
+          <RelationshipConstellation centerLabel={entity.displayName} edges={connections} />
         </section>
       ) : null}
 

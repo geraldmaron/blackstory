@@ -37,7 +37,7 @@ test('a beat renders only when the record has that content', () => {
 
 test('a related record states its relation in words', () => {
   assert.match(sectionsSource, /relationPhrase/);
-  assert.match(sectionsSource, /<Connections/);
+  assert.match(sectionsSource, /RelationshipConstellation/);
   assert.match(sectionsSource, /Worth investigating next/);
   assert.match(sectionsSource, /Nearby on the map is not the same as related/);
   assert.match(sectionsSource, /toSuggestedConnections/);

@@ -52,6 +52,7 @@ Live instrument chrome belongs on `/explore`. See [`v10/design-doc-reconciliatio
 | **Map canvas lifecycle** | [`patterns-map-canvas.md`](./patterns-map-canvas.md) | `map-libre-lifecycle.ts`, `MapStage.tsx`, `EntityLocationMap.tsx` | Binding (cross-browser WebGL) |
 | **Edition fact icon** | [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md) | [`patterns-registry.md`](./patterns-registry.md) | Reusable |
 | **Browse mode** | [`patterns-browse-mode.md`](./patterns-browse-mode.md) | [`patterns-registry.md`](./patterns-registry.md) | Reusable |
+| **Relationship constellation** | [`patterns-relationship-constellation.md`](./patterns-relationship-constellation.md) | `RelationshipConstellation.tsx` | Reusable (Place typed edges) |
 | **Footer** | [`patterns-site-footer.md`](./patterns-site-footer.md) | `SiteFooter.tsx`, `shell.css` `.ds-shell-footer*` | Reusable. Rewritten from the destination registry in SP-15 |
 | **Utility edition** | [`patterns-utility-edition.md`](./patterns-utility-edition.md) | `components/patterns/utility-edition/*` | Reusable. Folded into the Utility surface class by v9 surfaces section 2.4 |
 | **Cinematic map backdrop** | [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) | `components/patterns/cinematic-map/*`, `MapStage.tsx`, `camera-presets.ts`, mobile `AppBottomSheet.tsx` + `mapCamera.ts` | Binding on mobile. On web, replaced by the Framed plate posture |
