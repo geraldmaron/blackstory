@@ -84,6 +84,7 @@ export const ENDPOINT_ROUTES: readonly string[] = [
   '/map',
   '/history',
   '/explore/api',
+  '/atlas/catalog',
   '/search/api',
   '/locate/api',
   '/submit/api',

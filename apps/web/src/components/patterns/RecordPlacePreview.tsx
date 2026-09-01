@@ -51,12 +51,7 @@ export type RecordPlacePreviewProps = {
   readonly accessibleName?: string;
 };
 
-export function RecordPlacePreview({
-  lat,
-  lng,
-  label,
-  accessibleName,
-}: RecordPlacePreviewProps) {
+export function RecordPlacePreview({ lat, lng, label, accessibleName }: RecordPlacePreviewProps) {
   return (
     <figure className="ds-record-anatomy__place">
       <RecordLocator

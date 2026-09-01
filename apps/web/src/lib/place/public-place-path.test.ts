@@ -132,10 +132,7 @@ test('the home-map walk uses a holding slug, never a slugified name or /entity/'
     '/place/dillard-high-school-old',
   );
   assert.equal(atlasWalkHref({ displayName: 'Dillard University', kind: 'place' }), undefined);
-  assert.equal(
-    atlasWalkHref({ displayName: 'James H. Dillard House', kind: 'place' }),
-    undefined,
-  );
+  assert.equal(atlasWalkHref({ displayName: 'James H. Dillard House', kind: 'place' }), undefined);
   assert.equal(staysOffPublicMap({ displayName: 'James H. Dillard House' }), true);
   assert.equal(staysOffPublicMap({ displayName: 'Dillard University' }), false);
   assert.equal(staysOffPublicMap({ displayName: 'Dillard High School, Old' }), false);

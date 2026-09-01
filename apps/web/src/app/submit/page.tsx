@@ -40,8 +40,8 @@ export default function SubmitLeadPage() {
       <SubmitLeadForm />
 
       <EmptyState title="What happens after you submit">
-        A lead is never published on arrival. Several people read it independently. If they agree
-        it is worth pursuing, it becomes a private research candidate. If they disagree, a person
+        A lead is never published on arrival. Several people read it independently. If they agree it
+        is worth pursuing, it becomes a private research candidate. If they disagree, a person
         decides. Disagreement is never silently averaged away. See{' '}
         <a href="/methodology">how a record gets in</a>.
       </EmptyState>

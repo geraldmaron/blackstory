@@ -58,7 +58,9 @@ import { usePaletteData } from './hooks/use-palette-data';
 import { useReaderActions } from './hooks/use-reader-actions';
 import { useCommandContext } from './hooks/use-command-context';
 import { useStoryRunner } from './hooks/use-story-runner';
+import { useExploreUrlSync } from './hooks/use-explore-url-sync';
 import { atlasWalkHref } from '../../lib/place/public-place-path';
+import { placeArrivalQuery } from '../../lib/discovery/discovery-arrival';
 import './atlas.css';
 
 void React;
@@ -219,6 +221,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     setDecade,
     topicId,
     setTopicId,
+    status,
     layerMode,
     setLayerMode,
     layers,
@@ -235,6 +238,33 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     constraints,
     resetLens,
   } = useLensFilters(view, toasts);
+
+  const holdingPlaceArrival = useMemo(() => {
+    return placeArrivalQuery(
+      {
+        ...(kindFamily ? { kind: kindFamily } : {}),
+        ...(decade !== null ? { era: eraBucketFor(decade) } : {}),
+        ...(stateCode ? { state: stateCode } : {}),
+        ...(topicId ? { topic: topicId } : {}),
+        ...(status ? { status } : {}),
+        ...(evidenceFloor === 'A' || evidenceFloor === 'B' || evidenceFloor === 'C'
+          ? { evidence: evidenceFloor }
+          : {}),
+      },
+      'map',
+    );
+  }, [decade, evidenceFloor, kindFamily, stateCode, status, topicId]);
+
+  useExploreUrlSync(view.viewState, {
+    stateCode,
+    kindFamily,
+    evidenceFloor,
+    topicId,
+    status,
+    layerMode,
+    satellite: layers.satellite,
+    selectedId,
+  });
   useMapSync(stage, view, filtered, layers.pins, layers.satellite, selectedId, stateCode);
 
   // The Lens's own population-layer choice overrides the URL-seeded `view.viewState.layerMode`
@@ -301,6 +331,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       view.edgeLineCatalog.allTime.edges,
       view.citesEdge,
       view.allFeatures,
+      holdingPlaceArrival,
     );
   const { copy, citationFor, nearMe } = useReaderActions(toasts, camera);
   const { paletteRecords, destinations, paletteStates, featureById } = usePaletteData(

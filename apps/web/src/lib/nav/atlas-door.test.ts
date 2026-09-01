@@ -1,5 +1,5 @@
 /**
- * Handoffs may still name `/explore`. `/` is the map door.
+ * Handoffs may still name `/explore`. `/` is the Door; the instrument is `/explore`.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

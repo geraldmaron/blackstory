@@ -54,13 +54,7 @@ export type RecordLocatorProps = {
  * failure — the catalog is not promised to be domestic. A record in Liberia renders its place
  * block without a locator instead of being pinned somewhere plausible-looking off Maine.
  */
-export function RecordLocator({
-  lat,
-  lng,
-  label,
-  accessibleName,
-  className,
-}: RecordLocatorProps) {
+export function RecordLocator({ lat, lng, label, accessibleName, className }: RecordLocatorProps) {
   const pin = locatorPinPercent(lng, lat);
   if (!pin) return null;
 
@@ -72,9 +66,7 @@ export function RecordLocator({
   return (
     <div
       className={className ? `ds-locator ${className}` : 'ds-locator'}
-      {...(name.length > 0
-        ? { role: 'img', 'aria-label': name }
-        : { 'aria-hidden': true })}
+      {...(name.length > 0 ? { role: 'img', 'aria-label': name } : { 'aria-hidden': true })}
     >
       <span className="ds-locator__ground" aria-hidden="true" />
       <span

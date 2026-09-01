@@ -560,3 +560,29 @@ test('parseExploreSearchParams ignores an invalid radius token', () => {
   assert.equal(parsed.radius, undefined);
   assert.ok(parsed.viewport);
 });
+
+test('evidence floor round-trips on explore URLs (Records→Atlas handoff)', () => {
+  const qs = buildExploreSearchParams({
+    filters: {
+      era: 'all',
+      kind: 'all',
+      tone: 'all',
+      theme: 'all',
+      status: 'all',
+      confidence: 'all',
+    },
+    layerMode: 'presence',
+    group: false,
+    sat: false,
+    lines: false,
+    showFilters: false,
+    showResults: false,
+    showKey: false,
+    floor: 'B',
+    state: 'OK',
+  });
+  assert.equal(qs, 'state=OK&floor=B');
+  const parsed = parseExploreSearchParams(Object.fromEntries(new URLSearchParams(qs)));
+  assert.equal(parsed.floor, 'B');
+  assert.equal(parsed.state, 'OK');
+});

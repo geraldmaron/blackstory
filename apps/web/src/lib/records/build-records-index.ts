@@ -26,6 +26,10 @@ import {
 import type { PublicEntityView } from '../../data/public-seed';
 import { highestConfidence, type ConfidenceTier } from '../map-experience/build-explore-map-source';
 import { resolveEntityEraBuckets } from '../map-experience/entity-era-facts';
+import { geoAnchorFor } from '../map-experience/entity-geo';
+import { mapListContinuityLabel } from '../discovery/continuity-label';
+import { canStandHere, staysOffPublicMap } from '../place/public-place-path';
+import { placeHrefForEntity, placeSlugCollisionCounts } from '../place/place-slug';
 import {
   EVIDENCE_FLOORS,
   floorLabel,
@@ -42,6 +46,26 @@ import {
   resolveMapTone,
   type MapKindFamily,
 } from '../map-experience/kind-encoding';
+
+/** Arrival query Place pages understand (`from=list` + shared DiscoveryState keys). */
+function recordsArrivalQuery(query: RecordsQuery): string {
+  const params = new URLSearchParams();
+  params.set('from', 'list');
+  if (query.q.length > 0) params.set('q', query.q);
+  if (query.kind.length > 0) params.set('kind', query.kind);
+  if (query.era.length > 0) params.set('era', query.era);
+  if (query.state.length > 0) params.set('state', query.state);
+  if (query.topic.length > 0) params.set('topic', query.topic);
+  if (query.status.length > 0) params.set('status', query.status);
+  if (query.evidence.length > 0) params.set('evidence', query.evidence);
+  // Bare from=list is enough to mark the handoff; keep it even when unnarrowed.
+  return params.toString();
+}
+
+function withArrivalQuery(href: string, query: string): string {
+  if (query.length === 0) return href;
+  return href.includes('?') ? `${href}&${query}` : `${href}?${query}`;
+}
 
 /** 100 per page, stated in the design law. Page two is its own URL, never client state. */
 export const RECORDS_PAGE_SIZE = 100;
@@ -140,6 +164,8 @@ export type RecordsIndex = {
   /** Hands the current narrowing to the Atlas, with the reason string the off-ramp reads out. */
   readonly atlasHref: string;
   readonly atlasReason: string;
+  /** Matched records that carry a public map anchor (honest Atlas continuity). */
+  readonly mappableMatched: number;
 };
 
 function humanize(value: string): string {
@@ -204,9 +230,15 @@ type RecordFacts = {
   readonly stateName: string | undefined;
   readonly status: string;
   readonly haystack: string;
+  readonly mappable: boolean;
 };
 
-function toFacts(entity: PublicEntityView): RecordFacts {
+function carriesPublicMapAnchor(entity: PublicEntityView): boolean {
+  if (staysOffPublicMap(entity)) return false;
+  return entity.geoAnchor !== undefined || geoAnchorFor(entity.id) !== undefined;
+}
+
+function toFacts(entity: PublicEntityView, collisions: ReadonlyMap<string, number>): RecordFacts {
   const mapTone = resolveMapTone({
     topicTags: entity.topicTags,
     ...(entity.topicIds !== undefined ? { topicIds: entity.topicIds } : {}),
@@ -224,11 +256,14 @@ function toFacts(entity: PublicEntityView): RecordFacts {
   const location = entity.locationLabel.trim();
   const place = location.length > 0 ? location : entity.jurisdictionLabel.trim();
   const topicSource = entity.topicIds ?? entity.topicTags;
+  const href = canStandHere(entity)
+    ? placeHrefForEntity(entity, collisions)
+    : `/entity/${entity.id}`;
 
   return {
     row: {
       id: entity.id,
-      href: `/entity/${entity.id}`,
+      href,
       name: entity.displayName,
       // An honest blank, not an invented place: some records genuinely have no located anchor,
       // and that is the population this index exists to keep visible.
@@ -247,6 +282,7 @@ function toFacts(entity: PublicEntityView): RecordFacts {
     stateName: state === undefined ? undefined : state.name,
     status: entity.status ?? '',
     haystack: `${entity.displayName} ${entity.summary} ${place}`.toLowerCase(),
+    mappable: carriesPublicMapAnchor(entity),
   };
 }
 
@@ -327,7 +363,8 @@ export function buildRecordsIndex(
   entities: readonly PublicEntityView[],
   query: RecordsQuery,
 ): RecordsIndex {
-  const facts = entities.map(toFacts);
+  const collisions = placeSlugCollisionCounts(entities);
+  const facts = entities.map((entity) => toFacts(entity, collisions));
   const stateNames = new Map<string, string>();
   for (const record of facts) {
     if (record.statePostal !== undefined && record.stateName !== undefined) {
@@ -336,6 +373,7 @@ export function buildRecordsIndex(
   }
 
   const matched = facts.filter((record) => matchesExcept(record, query, 'none'));
+  const mappableMatched = matched.filter((record) => record.mappable).length;
 
   const facets = Object.fromEntries(
     RECORDS_FILTER_KEYS.map((key) => {
@@ -379,7 +417,11 @@ export function buildRecordsIndex(
   const pageCount = Math.max(1, Math.ceil(matched.length / RECORDS_PAGE_SIZE));
   const page = Math.min(query.page, pageCount);
   const start = (page - 1) * RECORDS_PAGE_SIZE;
-  const rows = matched.slice(start, start + RECORDS_PAGE_SIZE).map((record) => record.row);
+  const discoveryQuery = recordsArrivalQuery(query);
+  const rows = matched.slice(start, start + RECORDS_PAGE_SIZE).map((record) => ({
+    ...record.row,
+    href: withArrivalQuery(record.row.href, discoveryQuery),
+  }));
 
   const constraints: RecordsConstraint[] = [];
   if (query.q.length > 0) {
@@ -417,11 +459,6 @@ export function buildRecordsIndex(
       }))
       .sort(compareGroups);
 
-  const constraintWords =
-    constraints.length === 0
-      ? 'every record in the release'
-      : constraints.map((constraint) => constraint.label).join(', ');
-
   return {
     query: { ...query, page },
     rows,
@@ -442,26 +479,69 @@ export function buildRecordsIndex(
     constraints,
     clearAllHref: '/records',
     atlasHref: buildAtlasHref(query),
-    atlasReason: `Showing ${constraintWords} that carry a place.`,
+    atlasReason: mapListContinuityLabel(matched.length, mappableMatched),
+    mappableMatched,
+  };
+}
+
+export type RecordsNeighborLink = {
+  readonly id: string;
+  readonly name: string;
+  readonly href: string;
+};
+
+export type RecordsNeighbors = {
+  readonly previous?: RecordsNeighborLink;
+  readonly next?: RecordsNeighborLink;
+  readonly index: number;
+  readonly total: number;
+};
+
+/**
+ * Prev/next within the Records narrowing (same order as the list), for Place discovery stepping.
+ * Does not build facets — filter + adjacency only.
+ */
+export function findRecordsNeighbors(
+  entities: readonly PublicEntityView[],
+  query: RecordsQuery,
+  entityId: string,
+  arrivalQuery = '',
+): RecordsNeighbors | undefined {
+  const collisions = placeSlugCollisionCounts(entities);
+  const matched = entities
+    .map((entity) => toFacts(entity, collisions))
+    .filter((record) => matchesExcept(record, query, 'none'));
+  const index = matched.findIndex((record) => record.row.id === entityId);
+  if (index < 0 || matched.length === 0) return undefined;
+
+  const linkAt = (at: number): RecordsNeighborLink | undefined => {
+    const row = matched[at]?.row;
+    if (!row) return undefined;
+    return {
+      id: row.id,
+      name: row.name,
+      href: withArrivalQuery(row.href, arrivalQuery),
+    };
+  };
+
+  return {
+    ...(index > 0 ? { previous: linkAt(index - 1) } : {}),
+    ...(index < matched.length - 1 ? { next: linkAt(index + 1) } : {}),
+    index,
+    total: matched.length,
   };
 }
 
 /**
- * Hands the current narrowing to the Atlas. Every key is checked against `EXPLORE_URL_PARAM_KEYS`
- * by `query-normalization`, so a param this function invents is stripped by middleware before the
- * Atlas ever sees it — silently widening the set the reader thought they were carrying over.
+ * Hands the current narrowing to the Atlas. Every key must stay inside
+ * `EXPLORE_URL_PARAM_KEYS` / the edge allowlist — a param this function invents is stripped by
+ * middleware before the Atlas ever sees it, silently widening the set.
  *
  * One constraint does NOT cross, and the off-ramp copy says so rather than pretending: `q`,
- * because the Atlas has no text constraint at all.
+ * because the Atlas has no text pin filter.
  *
- * `topic` becomes `theme`, which is the Lens's name for the same controlled topic id.
- *
- * `evidence` becomes `floor`. SP-16 (repo-92n2.16) landed the evidence floor on the Lens as its
- * own predicate, separate from the Lens's pre-existing exact-match `confidence` tier — routing a
- * floor through `confidence` would map "B and up" onto `confidence=medium` and drop every grade A
- * record, the opposite of what the reader asked for (see `evidence-grade.ts`'s
- * `applyEvidenceFloor`). `floor` carries the same `EvidenceFloor` vocabulary this module already
- * uses (`'C' | 'B' | 'A'`), unencoded, so `?floor=B` and "B and up" here name the same set.
+ * `topic` becomes `theme` (Lens name for the same controlled topic id).
+ * `evidence` becomes `floor` (and-up grade predicate; not exact-match `confidence`).
  */
 export function buildAtlasHref(query: RecordsQuery): string {
   const params = new URLSearchParams();

@@ -160,10 +160,7 @@ test('Dillard University and the house do not walk; Old Dillard High School does
     '/place/dillard-high-school-old',
   );
   assert.equal(atlasWalkHref({ displayName: 'Dillard University', kind: 'place' }), undefined);
-  assert.equal(
-    atlasWalkHref({ displayName: 'James H. Dillard House', kind: 'place' }),
-    undefined,
-  );
+  assert.equal(atlasWalkHref({ displayName: 'James H. Dillard House', kind: 'place' }), undefined);
 });
 
 test('the first-paint shell drops shop tokens, including leftover facet labels', () => {

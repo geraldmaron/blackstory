@@ -61,4 +61,3 @@ export function FirstPaintPinPlate({ pins }: FirstPaintPinPlateProps) {
     </div>
   );
 }
-

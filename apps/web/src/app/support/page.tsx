@@ -56,8 +56,8 @@ export default function SupportPage() {
       <UtilityCard className="ds-support__section-paths">
         <Prose>
           <p className="ds-support__section-intro">
-            Most questions about a specific record are best handled through corrections so
-            a person can read your report against the published sources.
+            Most questions about a specific record are best handled through corrections so a person
+            can read your report against the published sources.
           </p>
         </Prose>
         <CardGrid>

@@ -18,6 +18,7 @@ import {
   RECORDS_PAGE_SIZE,
   buildAtlasHref,
   buildRecordsIndex,
+  findRecordsNeighbors,
   parseRecordsQuery,
   recordsHref,
   EMPTY_RECORDS_QUERY,
@@ -273,5 +274,75 @@ describe('/records · filter vocabulary does not drift from the Lens', () => {
   it('the filter key list and the facet map cannot fall out of step', () => {
     const model = buildRecordsIndex([entity({ id: 'a' })], EMPTY_RECORDS_QUERY);
     assert.deepEqual(Object.keys(model.facets).sort(), [...RECORDS_FILTER_KEYS].sort());
+  });
+});
+
+describe('/records · place hrefs and map continuity', () => {
+  it('standable records link to /place; people stay on /entity', () => {
+    const entities = [
+      entity({
+        id: 'ent_school_a',
+        kind: 'school',
+        displayName: 'Union School',
+        summary: 'A documented school.',
+      }),
+      entity({
+        id: 'ent_school_b',
+        kind: 'school',
+        displayName: 'Union School',
+        summary: 'Another documented school.',
+      }),
+      entity({
+        id: 'ent_person_a',
+        kind: 'person',
+        displayName: 'Example Person',
+        summary: 'A named person.',
+      }),
+    ];
+    const model = buildRecordsIndex(entities, EMPTY_RECORDS_QUERY);
+    const byId = new Map(model.rows.map((row) => [row.id, row]));
+    assert.equal(byId.get('ent_school_a')?.href, '/place/union-school--ent_school_a?from=list');
+    assert.equal(byId.get('ent_school_b')?.href, '/place/union-school--ent_school_b?from=list');
+    assert.equal(byId.get('ent_person_a')?.href, '/entity/ent_person_a?from=list');
+    assert.equal(typeof model.mappableMatched, 'number');
+    assert.match(model.atlasReason, /records match/i);
+  });
+
+  it('findRecordsNeighbors steps within the same narrowing and keeps arrival query', () => {
+    const entities = [
+      entity({
+        id: 'ent_a',
+        kind: 'place',
+        displayName: 'Alpha Place',
+        summary: 'First.',
+        jurisdictionLabel: 'Washington, D.C.',
+      }),
+      entity({
+        id: 'ent_b',
+        kind: 'place',
+        displayName: 'Beta Place',
+        summary: 'Second.',
+        jurisdictionLabel: 'Washington, D.C.',
+      }),
+      entity({
+        id: 'ent_c',
+        kind: 'place',
+        displayName: 'Gamma Place',
+        summary: 'Third.',
+        jurisdictionLabel: 'Oklahoma',
+      }),
+    ];
+    const neighbors = findRecordsNeighbors(
+      entities,
+      { ...EMPTY_RECORDS_QUERY, state: 'DC' },
+      'ent_a',
+      'from=list&state=DC',
+    );
+    assert.equal(neighbors?.total, 2);
+    assert.equal(neighbors?.index, 0);
+    assert.equal(neighbors?.previous, undefined);
+    assert.equal(neighbors?.next?.id, 'ent_b');
+    assert.match(neighbors?.next?.href ?? '', /from=list/);
+    assert.match(neighbors?.next?.href ?? '', /state=DC/);
   });
 });

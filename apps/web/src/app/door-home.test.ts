@@ -26,19 +26,26 @@ test('`/` is the locked about mast plus the existing pin plate', () => {
   assert.match(door, /ABOUT_WALK_PAST/);
   assert.match(door, /FirstPaintPinPlate/);
   assert.match(door, /listPublicEntities/);
+  assert.match(door, /BlackStory/);
+  assert.match(door, /History, pinned to place/);
+  assert.match(door, /Open the Atlas/);
   assert.doesNotMatch(door, /ABOUT_LEDE/);
   assert.doesNotMatch(door, /AtlasLoader|CameraConsole|FilterBar|Journey|Lens|Camera/);
   assert.doesNotMatch(door, /4,101|42Cb1758/);
   assert.doesNotMatch(door, /label: 'Kind'|label: 'Tone'|label: 'Era'/);
+  assert.doesNotMatch(door, /buildAtlasShell|explore-view-model/);
+  assert.match(door, /buildExploreMapSource/);
   assert.doesNotMatch(door, /['"`]\/banned-books|['"`]\/journey/);
 });
 
-test('the mast is ABOUT_LINE, not a rewrite', () => {
+test('the brand leads; ABOUT_LINE stays the product sentence', () => {
   assert.equal(
     ABOUT_LINE,
     'BlackStory is a place-connected archive of Black history: people, places, and events pinned to where they happened, with the source attached to every claim.',
   );
-  assert.match(door, /<h1 id="door-line" className="ds-door__line">\s*\{ABOUT_LINE\}\s*<\/h1>/);
+  assert.match(door, /id="door-brand"/);
+  assert.match(door, /id="door-line"/);
+  assert.match(door, /\{ABOUT_LINE\}/);
   assert.doesNotMatch(ABOUT_LINE, /\u2014/);
   assert.doesNotMatch(ABOUT_WALK_PAST, /\u2014/);
 });
@@ -46,6 +53,7 @@ test('the mast is ABOUT_LINE, not a rewrite', () => {
 test('the door plate sits in the page, not over the rooms', () => {
   const css = readFileSync(fileURLToPath(new URL('./door-home.css', import.meta.url)), 'utf8');
   assert.match(css, /:has\(\.ds-door\)/);
+  assert.match(css, /ds-door__ground/);
   assert.match(css, /position:\s*absolute/);
   assert.match(css, /@media \(max-width: 559px\)/);
   assert.match(css, /@media \(max-width: 559px\)[\s\S]*position:\s*relative/);
@@ -53,7 +61,7 @@ test('the door plate sits in the page, not over the rooms', () => {
   assert.doesNotMatch(css, /box-shadow|backdrop-filter|linear-gradient/);
 });
 
-test('at phone width the door frame and line wrap rather than clip', () => {
+test('at phone width the door frame and brand wrap rather than clip', () => {
   const css = readFileSync(fileURLToPath(new URL('./door-home.css', import.meta.url)), 'utf8');
   const start = css.lastIndexOf('@media (max-width: 559px)');
   assert.ok(start >= 0, 'phone door block must exist');
@@ -64,7 +72,7 @@ test('at phone width the door frame and line wrap rather than clip', () => {
   assert.match(block, /max-width:\s*100%/);
   assert.match(block, /min-width:\s*0/);
   assert.match(block, /width:\s*100%/);
-  assert.match(block, /\.ds-door__line[\s\S]*overflow-wrap:\s*break-word/);
+  assert.match(block, /\.ds-door__brand[\s\S]*overflow-wrap:\s*break-word/);
   assert.match(css, /overflow-wrap:\s*break-word/);
   assert.doesNotMatch(css, /overflow-x:\s*clip/);
 });

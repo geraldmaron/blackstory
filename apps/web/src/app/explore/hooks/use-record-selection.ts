@@ -13,12 +13,13 @@ import {
   buildSheetSources,
 } from '../../../lib/map-experience/build-sheet-detail';
 import { isHoldingPlaceHref } from '../../../lib/place/public-place-path';
+import { withQuery } from '../../../lib/discovery/discovery-arrival';
 import { anatomyPrecisionFor, eraFor } from './atlas-feature-helpers';
 
-function walkHoldingPlace(feature: ExploreMapFeature): boolean {
+function walkHoldingPlace(feature: ExploreMapFeature, arrivalQuery: string): boolean {
   const href = feature.properties.href;
   if (!isHoldingPlaceHref(href)) return false;
-  if (typeof window !== 'undefined') window.location.assign(href);
+  if (typeof window !== 'undefined') window.location.assign(withQuery(href, arrivalQuery));
   return true;
 }
 
@@ -44,6 +45,8 @@ export function useRecordSelection(
   citesEdge: CitesEdgeIndex = {},
   /** Every feature in the catalog, so a connection can resolve to a record the lens filtered out. */
   allFeatures: readonly ExploreMapFeature[] = sorted,
+  /** Place arrival query (`from=map` + DiscoveryState filters). Empty when unnarrowed. */
+  placeArrivalQuery = '',
 ) {
   /*
    * Connections must resolve against the whole catalog, not the current lens. A record founded by
@@ -61,7 +64,7 @@ export function useRecordSelection(
     (entityId: string) => {
       const feature = featuresById.get(entityId);
       if (feature) {
-        if (walkHoldingPlace(feature)) return;
+        if (walkHoldingPlace(feature, placeArrivalQuery)) return;
         const [lng, lat] = feature.geometry.coordinates;
         setSelectedId(entityId);
         camera.flyToRecord({ center: [lng, lat], place: placeLabelFor(feature) });
@@ -71,7 +74,7 @@ export function useRecordSelection(
       // camera move to nowhere.
       setSelectedId(entityId);
     },
-    [camera, featuresById, setSelectedId],
+    [camera, featuresById, placeArrivalQuery, setSelectedId],
   );
 
   const selectedFeature = useMemo(
@@ -86,13 +89,13 @@ export function useRecordSelection(
 
   const select = useCallback(
     (feature: ExploreMapFeature, fly = true) => {
-      if (walkHoldingPlace(feature)) return;
+      if (walkHoldingPlace(feature, placeArrivalQuery)) return;
       setSelectedId(feature.properties.entityId);
       if (!fly) return;
       const [lng, lat] = feature.geometry.coordinates;
       camera.flyToRecord({ center: [lng, lat], place: placeLabelFor(feature) });
     },
-    [camera],
+    [camera, placeArrivalQuery, setSelectedId],
   );
 
   const stepRecord = useCallback(
@@ -111,12 +114,11 @@ export function useRecordSelection(
     () =>
       stage.subscribe('select', (entityId) => {
         const feature =
-          featuresById.get(entityId) ??
-          allFeatures.find((candidate) => candidate.id === entityId);
-        if (feature && walkHoldingPlace(feature)) return;
+          featuresById.get(entityId) ?? allFeatures.find((candidate) => candidate.id === entityId);
+        if (feature && walkHoldingPlace(feature, placeArrivalQuery)) return;
         setSelectedId(entityId);
       }),
-    [allFeatures, featuresById, setSelectedId, stage],
+    [allFeatures, featuresById, placeArrivalQuery, setSelectedId, stage],
   );
 
   const sheetRecord = useMemo<SheetRecord | null>(() => {
@@ -163,7 +165,9 @@ export function useRecordSelection(
        * false about a record whose page cites a source.
        */
       sourceCount: sources,
-      ...(selectedFeature.properties.href ? { href: selectedFeature.properties.href } : {}),
+      ...(selectedFeature.properties.href
+        ? { href: withQuery(selectedFeature.properties.href, placeArrivalQuery) }
+        : {}),
       sources: buildSheetSources(allTimeEdges, selectedFeature.properties.entityId),
       connections: buildSheetConnections(
         allTimeEdges,
@@ -175,13 +179,15 @@ export function useRecordSelection(
             name: feature.properties.displayName,
             kind: feature.properties.kind,
             ...(feature.properties.mapTone ? { mapTone: feature.properties.mapTone } : {}),
-            ...(feature.properties.href ? { href: feature.properties.href } : {}),
+            ...(feature.properties.href
+              ? { href: withQuery(feature.properties.href, placeArrivalQuery) }
+              : {}),
           };
         },
       ),
       citingStories: storiesCiting(citesEdge, selectedFeature.properties.entityId),
     };
-  }, [allTimeEdges, citesEdge, featuresById, selectedFeature]);
+  }, [allTimeEdges, citesEdge, featuresById, placeArrivalQuery, selectedFeature]);
 
   return {
     selectedFeature,

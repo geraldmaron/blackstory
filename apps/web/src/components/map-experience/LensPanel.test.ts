@@ -55,8 +55,18 @@ test('every group is visible in one panel, with no tabs', () => {
   ]) {
     assert.match(html, new RegExp(group), `missing group: ${group}`);
   }
+  assert.match(html, /More filters/);
+  assert.match(html, /<details class="ds-lens__advanced"/);
   assert.equal(html.includes('role="tab"'), false, 'v6 tabs must not come back');
   assert.equal(html.includes('role="tablist"'), false);
+});
+
+test('More filters opens when an advanced control is already active', () => {
+  const closed = renderToStaticMarkup(createElement(LensPanel, lensProps()));
+  assert.doesNotMatch(closed, /<details class="ds-lens__advanced" open/);
+
+  const open = renderToStaticMarkup(createElement(LensPanel, lensProps({ evidenceFloor: 'B' })));
+  assert.match(open, /<details class="ds-lens__advanced" open/);
 });
 
 test('there is no Apply button; filters auto-apply', () => {

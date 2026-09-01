@@ -58,7 +58,10 @@ test('methodology stays on the server and does not sell the Atlas as a room', ()
   assert.doesNotMatch(sectionsSource, /'use client'/);
   assert.doesNotMatch(sectionsSource, /Open the Atlas|ATLAS_INSTRUMENT/);
   assert.doesNotMatch(sectionsSource, /ResearchPipelineSketch|home-server/);
-  assert.doesNotMatch(sectionsSource, /<Precision|confidenceNote|counterClaims|FACT_CONFIDENCE_DEFINITIONS/);
+  assert.doesNotMatch(
+    sectionsSource,
+    /<Precision|confidenceNote|counterClaims|FACT_CONFIDENCE_DEFINITIONS/,
+  );
   assert.doesNotMatch(sectionsSource, /Mosaic credits|ATMOSPHERE_ATTRIBUTION|mosaic-credits/);
   assert.doesNotMatch(copySource, /confidenceNote|counterClaims|home-server/i);
   assert.match(copySource, /EVIDENCE_GRADE_DEFINITIONS/);

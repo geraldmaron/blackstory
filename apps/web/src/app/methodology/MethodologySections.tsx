@@ -130,7 +130,9 @@ export function MethodologySections() {
 
       <section aria-labelledby="how-a-point-is-drawn-heading" id="how-a-point-is-drawn">
         <GroupHeading>
-          <span id="how-a-point-is-drawn-heading">Why a point is never drawn sharper than its source</span>
+          <span id="how-a-point-is-drawn-heading">
+            Why a point is never drawn sharper than its source
+          </span>
         </GroupHeading>
         <Prose>
           <p>
@@ -155,8 +157,8 @@ export function MethodologySections() {
           <p>{METHODOLOGY_DIGNITY_LINE}</p>
           <p>
             Unknown living status is treated as living. The people this policy exists for are named
-            on <Link href="/memorial">the memorial wall</Link>, held still on request, never
-            painted as ambient texture on a map.
+            on <Link href="/memorial">the memorial wall</Link>, held still on request, never painted
+            as ambient texture on a map.
           </p>
         </Prose>
       </section>

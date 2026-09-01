@@ -265,19 +265,9 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           { href: '/submit', label: 'Submit a record we are missing' },
         ]}
       >
-        {atlasReason} A record without a documented location has no pin, so the Atlas will show
-        fewer than the {totalMatched.toLocaleString('en-US')} listed here.
-        {query.q.length > 0 || query.evidence.length > 0 ? (
-          <>
-            {' '}
-            The Atlas has no{' '}
-            {query.q.length > 0 && query.evidence.length > 0
-              ? 'text search and no evidence floor'
-              : query.q.length > 0
-                ? 'text search'
-                : 'evidence floor'}{' '}
-            yet, so that part of this narrowing stays here.
-          </>
+        {atlasReason}
+        {query.q.length > 0 ? (
+          <> The Atlas has no text search, so that part of this narrowing stays here.</>
         ) : null}
       </OffRamp>
     </Room>

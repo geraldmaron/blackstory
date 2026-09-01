@@ -161,23 +161,15 @@ no uppercase file names in new work.
 
 | Doc | Scope |
 |---|---|
-| [`docs/ui/brand.md`](docs/ui/brand.md) | Palette, type, mark, copper discipline, supersessions |
-| [`docs/ui/design-direction-v6-home.md`](docs/ui/design-direction-v6-home.md) | `/` layout beats, hero, footer-on-home |
-| [`docs/ui/design-direction-v6-explore.md`](docs/ui/design-direction-v6-explore.md) | `/explore` layout, Surface instruments, records rail |
-| [`docs/ui/design-direction-v6-history.md`](docs/ui/design-direction-v6-history.md) | `/history` unified find-in-time (search merged), decade scrubber, rip list, facets |
-| [`docs/ui/design-direction-v6-about.md`](docs/ui/design-direction-v6-about.md) | `/about` product thesis, Surface stack, shared gutter mosaic |
-| [`docs/ui/design-direction-v6-memorial.md`](docs/ui/design-direction-v6-memorial.md) | `/memorial` names-only memorial wall + full alphabetical list |
-| [`docs/ui/design-direction-v6-stories.md`](docs/ui/design-direction-v6-stories.md) | `/stories` longform edition, gutter mosaic, Surface stack |
-| [`docs/ui/design-direction-v6-methodology.md`](docs/ui/design-direction-v6-methodology.md) | `/methodology` transparency receipt, evidence pipeline, Surface stack |
-| [`docs/ui/design-direction-v6-books.md`](docs/ui/design-direction-v6-books.md) | `/books` challenged-titles edition, catalog rail, gutter mosaic |
-| [`docs/ui/design-direction-v6-data.md`](docs/ui/design-direction-v6-data.md) | `/data` Census + indicators edition, gutter mosaic, chart panels |
-| [`docs/ui/design-direction-v6-themes.md`](docs/ui/design-direction-v6-themes.md) | `/themes` impact browse, packet detail, shared gutter mosaic |
-| [`docs/ui/design-direction-v6-entity.md`](docs/ui/design-direction-v6-entity.md) | `/entity/[id]` record edition, anatomy panel, safe fail states |
-| [`docs/ui/design-direction-v6-mobile.md`](docs/ui/design-direction-v6-mobile.md) | `@repo/mobile` tab bar, More menu, shell chrome, theme tokens |
-| [`docs/ui/design-direction-v5.md`](docs/ui/design-direction-v5.md) | Non-home surfaces, shell chrome, fixed-ink footer (non-home) |
-| [`docs/ui/patterns-cinematic-map.md`](docs/ui/patterns-cinematic-map.md) | Locked-until-invited map plate behind content; Rest → Invite → Engaged state machine |
-| [`docs/ui/patterns-*.md`](docs/ui/) | Reusable site patterns (browse mode, edition fact icon, …) |
+| [`docs/ui/PROTECTED-EXPERIENCES.md`](docs/ui/PROTECTED-EXPERIENCES.md) | Memorial + evidence/precision/dignity/public/brand laws |
+| [`docs/ui/design-direction-v10.md`](docs/ui/design-direction-v10.md) | Product thesis, visual models, surface law, authority order |
+| [`docs/ui/brand.md`](docs/ui/brand.md) | Palette, type, mark, copper discipline |
+| [`docs/ui/v10/`](docs/ui/v10/) | Inventory, DiscoveryState, Place anatomy, research, cost, reconciliation |
+| [`docs/ui/design-direction-v6-mobile.md`](docs/ui/design-direction-v6-mobile.md) | `@repo/mobile` tab bar, More menu, shell chrome (until v10 mobile packet) |
+| [`docs/ui/patterns-*.md`](docs/ui/) | Reusable site patterns (map encoding, record anatomy, …) |
 | [`docs/ui/story.md`](docs/ui/story.md) | Voice, microcopy, narrative arc |
+
+v6/v9 surface direction docs are archival or superseded — see [`docs/ui/v10/design-doc-reconciliation.md`](docs/ui/v10/design-doc-reconciliation.md). Do not restore Instrument chrome on `/` from v9 Atlas docs.
 
 Kit implementation: `@repo/ui` (`packages/ui`). Where a pattern doc and the kit disagree on tokens, **the kit wins**; where layout/behavior is specified, **the pattern doc wins**.
 

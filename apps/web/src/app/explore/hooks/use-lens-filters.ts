@@ -35,15 +35,6 @@ export type LensConstraint = {
   readonly onClear: () => void;
 };
 
-/** Reads `?floor=` directly rather than through `parseExploreSearchParams`: that parser lives in
- * `url-state.ts`, outside this package's file lock, and does not carry a `floor` key yet. This is
- * the seam SP-16 lands the floor into the Lens through until `url-state.ts` grows the param. */
-function initialFloorFromLocation(): EvidenceFloor {
-  if (typeof window === 'undefined') return 'any';
-  const raw = new URLSearchParams(window.location.search).get('floor')?.trim().toUpperCase();
-  return raw === 'A' || raw === 'B' || raw === 'C' ? raw : 'any';
-}
-
 /**
  * The lens: every filter a reader can apply to the archive (state, kind, decade, evidence floor,
  * layer toggles, sort), and everything derived from them — the filtered/sorted feature lists, the
@@ -56,7 +47,7 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
       ? (view.viewState.filters.kind as MapKindFamily)
       : null,
   );
-  const [evidenceFloor, setEvidenceFloor] = useState<EvidenceFloor>(initialFloorFromLocation);
+  const [evidenceFloor, setEvidenceFloor] = useState<EvidenceFloor>(view.viewState.floor ?? 'any');
   const [decade, setDecade] = useState<number | null>(null);
   const [topicId, setTopicId] = useState<string | null>(
     view.viewState.filters.theme !== 'all' ? view.viewState.filters.theme : null,

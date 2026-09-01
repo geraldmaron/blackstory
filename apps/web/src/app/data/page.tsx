@@ -42,17 +42,13 @@ async function safe<T>(promise: Promise<T | undefined | null>): Promise<T | unde
 const STATE_NAME_BY_FIPS = buildStateFipsNameMap(US_STATES);
 
 export default async function DataPage() {
-  const [
-    timelineSnapshot,
-    stateChanges2010to2020,
-    historicalStateCoverage,
-    indicators,
-  ] = await Promise.all([
-    safe(getNationalPopulationTimelineSnapshot()),
-    safe(getStatePopulationChanges('2010', '2020')),
-    safe(getHistoricalStatePopulationCoverage()),
-    safe(getDataPageIndicatorBundle()),
-  ]);
+  const [timelineSnapshot, stateChanges2010to2020, historicalStateCoverage, indicators] =
+    await Promise.all([
+      safe(getNationalPopulationTimelineSnapshot()),
+      safe(getStatePopulationChanges('2010', '2020')),
+      safe(getHistoricalStatePopulationCoverage()),
+      safe(getDataPageIndicatorBundle()),
+    ]);
 
   const historicalStates = historicalStateCoverage as HistoricalStatePopulationCoverage | undefined;
   const timeline = (timelineSnapshot ?? undefined) as

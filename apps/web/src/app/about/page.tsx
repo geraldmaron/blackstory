@@ -171,7 +171,10 @@ export default function AboutPage() {
         <CardGrid>{[...readRooms, ...checkRooms].map(destinationCard)}</CardGrid>
       </section>
 
-      <WalkOffRamp title="No account required" extra={[{ label: 'Submit a lead', href: '/submit' }]}>
+      <WalkOffRamp
+        title="No account required"
+        extra={[{ label: 'Submit a lead', href: '/submit' }]}
+      >
         Every public page works without signing in. Reading here does not require creating an
         identity with us.
       </WalkOffRamp>

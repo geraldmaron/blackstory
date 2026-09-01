@@ -99,8 +99,9 @@ test('the loader stands away from Tulsa, or at a named slug', async () => {
 test('the loader loads one record, never the full catalog', () => {
   const source = readFileSync(new URL('./home-first-paint.ts', import.meta.url), 'utf8');
   assert.match(source, /resolvePublicEntityView/);
+  assert.match(source, /getPublicSearchIndex/);
   assert.doesNotMatch(source, /getSharedPublicEntities|listPublicEntityViews\(/);
-  assert.doesNotMatch(source, /\/atlas\/catalog|getPublicSearchIndex/);
+  assert.doesNotMatch(source, /\/atlas\/catalog/);
 });
 
 test('internal ids never title first paint', () => {
@@ -159,7 +160,7 @@ test('`/` is the door; a place page never mounts the catalog boot or camera cock
   assert.doesNotMatch(loader, /Opening the map/);
   assert.match(loader, /firstPaintCatalog/);
   assert.match(loader, /readonly pins/);
-  assert.match(mapSource, /atlasWalkHref/);
+  assert.match(mapSource, /instrumentRecordHref|atlasWalkHref/);
   assert.doesNotMatch(mapSource, /href: `\/entity\/\$\{entity\.id\}`/);
   assert.match(atlas, /atlasWalkHref|isHoldingPlaceHref/);
   assert.doesNotMatch(atlas, /\/entity\/\$\{record\.id\}/);
@@ -170,7 +171,10 @@ test('`/` is the door; a place page never mounts the catalog boot or camera cock
   );
   assert.match(commandBar, /Search records, places, eras/);
   assert.doesNotMatch(commandBar, /toLocaleString/);
-  const atlasHome = readFileSync(fileURLToPath(new URL('./atlas-home.tsx', import.meta.url)), 'utf8');
+  const atlasHome = readFileSync(
+    fileURLToPath(new URL('./atlas-home.tsx', import.meta.url)),
+    'utf8',
+  );
   assert.match(atlasHome, /toFirstPaintPins/);
   assert.match(atlasHome, /FirstPaintPinPlate/);
   assert.doesNotMatch(atlasHome, /Opening the map/);
@@ -180,11 +184,11 @@ test('`/` is the door; a place page never mounts the catalog boot or camera cock
 test('first paint is the record, not a manifesto or a schema card', () => {
   const paint = readFileSync(new URL('./HomeFirstPaint.tsx', import.meta.url), 'utf8');
   assert.match(paint, /EntityRoomSections|ds-record-mast/);
+  assert.match(paint, /toEvidenceClaimInputs/);
+  assert.match(paint, /Can I trust this|id="trust"/);
+  assert.match(paint, /placeDiscoveryReturn|See this place on the Atlas|mapLabel/);
   assert.doesNotMatch(paint, /ABOUT_LINE|ABOUT_WALK_PAST|ABOUT_ON_THE_GROUND|ABOUT_PILLARS/);
-  assert.doesNotMatch(
-    paint,
-    /RecordAnatomyPanel|buildEntityAnatomy|evidenceLabel|RoomHeader|toEvidenceClaimInputs/,
-  );
+  assert.doesNotMatch(paint, /RecordAnatomyPanel|buildEntityAnatomy|evidenceLabel|RoomHeader/);
   assert.doesNotMatch(paint, /ds-record-strip|Grade A|radius affordance|Shown at locality/);
   const dunbar = getPublicEntity('ent_dunbar_school_001');
   assert.ok(dunbar);
@@ -239,6 +243,7 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.match(html, /ds-record-mast/);
   assert.match(html, /Thirty-five blocks of Greenwood/);
   assert.match(html, /The history here/);
+  assert.match(html, /What the sources say/);
   assert.match(html, /1921/);
   assert.match(html, /Vernon AME Church/);
   assert.match(html, /href="\/place\/vernon-ame-church"/);
@@ -259,7 +264,6 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.doesNotMatch(html, /walk past documented Black history/);
   assert.doesNotMatch(html, /place-connected archive of Black history/);
   assert.doesNotMatch(html, /Grade A|Grade B|Grade C/);
-  assert.doesNotMatch(html, /Grade A · \d+ sources?|independent sources/i);
   assert.doesNotMatch(html, />Kind<|>Where<|>Era<|>Evidence</);
   assert.doesNotMatch(html, /radius affordance|Shown at locality/i);
   assert.doesNotMatch(html, /Journey|42Cb1758|4,101|Orbit|Tilt|Trace/);
@@ -278,7 +282,7 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   );
 });
 
-test('seed Dunbar first paint has no claim ids, rights caption, or ent_ addresses', () => {
+test('seed Dunbar place record shows sourced claims without catalog chrome', () => {
   const dunbar = getPublicEntity('ent_dunbar_school_001');
   assert.ok(dunbar);
   const html = renderToStaticMarkup(
@@ -288,6 +292,9 @@ test('seed Dunbar first paint has no claim ids, rights caption, or ent_ addresse
   );
   assert.match(html, /Paul Laurence Dunbar High School/);
   assert.match(html, /The history here/);
+  assert.match(html, /What the sources say/);
+  assert.match(html, /Can I trust this/);
+  assert.match(html, /See this place on the Atlas|Browse the record list/);
   assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church"/);
   assert.match(html, /href="\/place\/dunbar-alumni-federation"/);
   assert.match(html, /href="\/data"/);
@@ -299,8 +306,6 @@ test('seed Dunbar first paint has no claim ids, rights caption, or ent_ addresse
   assert.doesNotMatch(html, /href="\/books"/);
   assert.doesNotMatch(html, /Records this one touches|this one/);
   assert.doesNotMatch(html, /Active|Current status|In effect from|Status and history/);
-  assert.doesNotMatch(html, /ent_[a-z0-9_]+_claim_\d+/i);
-  assert.doesNotMatch(html, /claim_dunbar_/);
   assert.doesNotMatch(html, /rights-cleared|awaits a/i);
   assert.doesNotMatch(html, /from their record/i);
   assert.doesNotMatch(html, /Open the full record/);

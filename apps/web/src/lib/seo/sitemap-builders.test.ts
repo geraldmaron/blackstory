@@ -118,13 +118,31 @@ test('a noindexed route is never advertised in the sitemap', () => {
   }
 });
 
-test('buildPublicSitemapEntries adds entity pages from the active release catalog', () => {
+test('buildPublicSitemapEntries prefers /place for standable records', () => {
   const entries = buildPublicSitemapEntries({
     siteUrl: 'https://blackbook.example',
-    entities: [{ id: 'ent_15th_st_church_001', updatedAt: '2026-07-01T00:00:00.000Z' }],
+    entities: [
+      {
+        id: 'ent_15th_st_church_001',
+        displayName: 'Fifteenth Street Presbyterian Church',
+        kind: 'institution',
+        summary: 'A documented congregation in Washington, D.C.',
+        updatedAt: '2026-07-01T00:00:00.000Z',
+      },
+      {
+        id: 'ent_person_001',
+        displayName: 'Example Person',
+        kind: 'person',
+        summary: 'A named person in the archive.',
+      },
+    ],
   });
-  const entity = entries.find((entry) => entry.url.includes('/entity/ent_15th_st_church_001'));
-  assert.ok(entity);
-  assert.equal(entity?.changeFrequency, 'weekly');
-  assert.equal(entity?.priority, 0.8);
+  const place = entries.find((entry) =>
+    entry.url.includes('/place/fifteenth-street-presbyterian-church'),
+  );
+  const person = entries.find((entry) => entry.url.includes('/entity/ent_person_001'));
+  assert.ok(place);
+  assert.ok(person);
+  assert.equal(place?.changeFrequency, 'weekly');
+  assert.equal(place?.priority, 0.8);
 });

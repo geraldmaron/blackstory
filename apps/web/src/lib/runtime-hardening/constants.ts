@@ -107,6 +107,31 @@ export const CORRECTIONS_PAGE_PARAM_ALLOWLIST = ['target', 'targetType'] as cons
 
 export type CorrectionsPageParam = (typeof CORRECTIONS_PAGE_PARAM_ALLOWLIST)[number];
 
+/**
+ * Allowed arrival keys on `/place/{slug}`.
+ *
+ * Place is a reading room that must preserve DiscoveryState when the reader arrives from
+ * Records (`from=list`) or the Atlas (`from=map`). Matched with an empty allowlist, the edge
+ * 308s every arrival query away before the page runs — so return links cannot restore the
+ * narrowing the reader already chose. Keep this list aligned with
+ * `discoveryFromSearchParams` / `recordsArrivalQuery`.
+ */
+export const PLACE_PAGE_PARAM_ALLOWLIST = [
+  'from',
+  'q',
+  'kind',
+  'era',
+  'state',
+  'topic',
+  'theme',
+  'status',
+  'evidence',
+  'floor',
+  'selected',
+] as const;
+
+export type PlacePageParam = (typeof PLACE_PAGE_PARAM_ALLOWLIST)[number];
+
 // HISTORY_PAGE_PARAM_ALLOWLIST stood here for the /history decade stepper and its selection
 // params. Both the stepper and the browse UI are gone (repo-92n2.27), and /history left the
 // middleware matcher in SP-06, so nothing read this at the edge or anywhere else.

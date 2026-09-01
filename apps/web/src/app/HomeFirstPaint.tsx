@@ -2,8 +2,8 @@
  * A published place you walk into from the map. The title is the place. Back is
  * BlackStory at `/`, not another featured sit. Archive chrome (Law, Data, Memorial,
  * Methodology, Errata) is the same on every place. Stories exists only when this
- * record already names a chapter. No schema strip, no confidence badge, no
- * precision leak, no second record page.
+ * record already names a chapter. Evidence, trust, and map/list return paths render
+ * when the release carries them.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -11,10 +11,13 @@ import { EntityMastMedia } from '../components/entity/EntityMastMedia';
 import { EntitySensitivityBanner } from '../components/entity/EntitySensitivityBanner';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../components/entity/LinkedProse';
 import { RecordPlacePreview } from '../components/patterns/RecordPlacePreview';
-import { Connections, Room } from '../components/room';
+import { Connections, Precision, Room, TrustBlock } from '../components/room';
 import { geoAnchorFor } from '../lib/map-experience/entity-geo';
+import type { PlaceDiscoveryReturn } from '../lib/discovery/discovery-state';
+import { placeDiscoveryReturn } from '../lib/discovery/discovery-state';
 import type { PublicEntityView } from '../data/public-seed';
 import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
+import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './entity/[id]/adapters';
 import { placeHref } from '../lib/place/public-place-path';
 import { isInternalRecordLabel, type HomeFirstPaintModel } from './home-first-paint';
 import { MAP_BACK } from './walk-back-place';
@@ -73,7 +76,22 @@ function WalkOnPlace({ place }: { readonly place: PublicEntityView }) {
   );
 }
 
-export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel }) {
+function citedSourceCount(claims: PublicEntityView['claims']): number {
+  const sources = new Set<string>();
+  for (const claim of claims) {
+    const key = (claim.citationHref ?? claim.citationSource ?? claim.citationLabel).trim();
+    if (key.length > 0) sources.add(key);
+  }
+  return sources.size;
+}
+
+export function HomeFirstPaint({
+  model,
+  discovery,
+}: {
+  readonly model: HomeFirstPaintModel;
+  readonly discovery?: PlaceDiscoveryReturn;
+}) {
   const rawLead =
     model.lead && !isInternalRecordLabel(model.lead.displayName) ? model.lead : undefined;
   const story = model.story && !isInternalRecordLabel(model.story.title) ? model.story : undefined;
@@ -87,6 +105,13 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
     const eraLine = firstPaintEraLine(lead);
     const nextPlaces = walkOnPlaces(lead, model.also);
     const locatorName = firstPaintLocatorName(lead);
+    const displayClaims = withoutSummaryEchoClaims(lead.claims, lead.summary);
+    const evidenceClaims = toEvidenceClaimInputs(displayClaims);
+    const sourceCount = citedSourceCount(displayClaims);
+    const returns =
+      discovery ??
+      placeDiscoveryReturn(lead.id, {}, geo ? { lat: geo.lat, lng: geo.lng } : undefined);
+    const kindLabel = lead.kind.replace(/[_-]+/g, ' ');
 
     return (
       <Room
@@ -104,6 +129,7 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
               priority
             />
             <figcaption className="ds-record-mast__over">
+              <p className="ds-home-place-kicker">{kindLabel}</p>
               <h1 className="ds-record-mast__title">{lead.displayName}</h1>
               <p className="ds-record-mast__lede">
                 <LinkedProse
@@ -126,10 +152,16 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
               label={locatorName}
               accessibleName={locatorName}
             />
+            {lead.locationPrecision ? (
+              <Precision
+                resolution={`${lead.locationPrecision.replace(/[_-]+/g, ' ')} precision`}
+                caveat="The archive never draws a point sharper than the source supports."
+              />
+            ) : null}
           </section>
         ) : null}
 
-        {eraLine ? <p>{eraLine}</p> : null}
+        {eraLine ? <p className="ds-home-place-era">{eraLine}</p> : null}
 
         {lead.sensitivity ? (
           <EntitySensitivityBanner sensitivity={lead.sensitivity} entityKind={lead.kind} />
@@ -137,7 +169,7 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
 
         <EntityRoomSections
           entity={lead}
-          evidenceClaims={[]}
+          evidenceClaims={evidenceClaims}
           entityLinkCatalog={catalog}
           firstPaint
         />
@@ -157,14 +189,74 @@ export function HomeFirstPaint({ model }: { readonly model: HomeFirstPaintModel 
           </section>
         ) : null}
 
+        <section className="ds-record-beat" id="trust" aria-labelledby="trust-heading">
+          <h2 className="ds-record-beat__heading" id="trust-heading">
+            Can I trust this
+          </h2>
+          <TrustBlock
+            label="How this record stands"
+            facts={[
+              {
+                label: 'Research coverage',
+                value: lead.researchCoverage.replace(/[_-]+/g, ' '),
+              },
+              {
+                label: 'Cited sources on this page',
+                value:
+                  sourceCount === 0
+                    ? 'None linked yet'
+                    : `${sourceCount.toLocaleString('en-US')} ${sourceCount === 1 ? 'source' : 'sources'}`,
+              },
+              {
+                label: 'How a record gets in',
+                value: (
+                  <Link href="/methodology" prefetch={false}>
+                    Methodology
+                  </Link>
+                ),
+              },
+              {
+                label: 'See a mistake',
+                value: (
+                  <Link
+                    href={`/corrections?target=${encodeURIComponent(lead.id)}`}
+                    prefetch={false}
+                  >
+                    Submit a correction
+                  </Link>
+                ),
+              },
+            ]}
+          />
+        </section>
+
         {nextPlaces.map((place) => (
           <WalkOnPlace key={place.id} place={place} />
         ))}
 
         <DoorRooms rooms={rooms} />
 
-        <WalkOffRampView placeName={MAP_BACK.displayName} href={MAP_BACK.href}>
-          {lead.summary}
+        <WalkOffRampView
+          placeName={MAP_BACK.displayName}
+          href={MAP_BACK.href}
+          title={
+            <>
+              Keep going from <em>{lead.displayName}</em>
+            </>
+          }
+          extra={[
+            ...(returns.previousHref && returns.previousLabel
+              ? [{ href: returns.previousHref, label: returns.previousLabel }]
+              : []),
+            ...(returns.nextHref && returns.nextLabel
+              ? [{ href: returns.nextHref, label: returns.nextLabel }]
+              : []),
+            { href: returns.mapHref, label: returns.mapLabel },
+            { href: returns.listHref, label: returns.listLabel },
+            { href: '/methodology', label: 'How a record gets in' },
+          ]}
+        >
+          {returns.positionLabel ? `${returns.positionLabel}. ${lead.summary}` : lead.summary}
         </WalkOffRampView>
       </Room>
     );

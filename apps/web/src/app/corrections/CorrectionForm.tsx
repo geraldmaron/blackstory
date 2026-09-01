@@ -147,12 +147,7 @@ export function CorrectionForm() {
       ) : null}
 
       <Field label="What are you correcting?" htmlFor={targetTypeId}>
-        <select
-          id={targetTypeId}
-          name="targetType"
-          defaultValue="entity"
-          required
-        >
+        <select id={targetTypeId} name="targetType" defaultValue="entity" required>
           {CORRECTION_TARGET_TYPES.map((targetType) => (
             <option key={targetType} value={targetType}>
               {CORRECTION_TARGET_LABELS[targetType]}
