@@ -40,6 +40,29 @@ export const GROUP_HEADINGS: Readonly<Record<DestinationGroup, string | null>> =
   'take-part': 'Add to it',
 });
 
+/**
+ * Library Hub page copy (v10). Footer and the Library menu keep {@link GROUP_HEADINGS};
+ * the hub page uses these longer headings plus standfirsts so it reads as knowledge kinds,
+ * not a settings menu.
+ */
+export const LIBRARY_GROUP_COPY: Readonly<
+  Record<DestinationGroup, { readonly heading: string | null; readonly standfirst: string | null }>
+> = Object.freeze({
+  find: { heading: null, standfirst: null },
+  read: {
+    heading: 'Rooms for reading',
+    standfirst: 'Narrative, law, data, books, and the memorial wall.',
+  },
+  check: {
+    heading: 'How a record gets in',
+    standfirst: 'Methods, origin, and the log of what we corrected.',
+  },
+  'take-part': {
+    heading: 'Add what is missing',
+    standfirst: 'Leads, corrections, and how to reach the archive.',
+  },
+});
+
 /** The library hub's card groups, in render order. */
 export const LIBRARY_CARD_GROUPS: readonly DestinationGroup[] = ['read', 'check', 'take-part'];
 

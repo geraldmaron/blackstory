@@ -1,0 +1,20 @@
+/**
+ * Library Hub layout. Keeps the destination list as a one-column table of contents;
+ * group standfirsts name the kind of knowledge without turning the page into a settings menu.
+ */
+.ds-library-group {
+  margin-block: var(--ds-space-8) 0;
+}
+
+.ds-library-group__standfirst {
+  margin: 0;
+  max-width: 40rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-sm);
+  line-height: 1.45;
+  color: var(--ds-ink-muted, var(--ds-stone, #6d675f));
+}
+
+.ds-library-group .ds-room-cards {
+  margin-top: var(--ds-space-3);
+}
