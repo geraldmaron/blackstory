@@ -309,8 +309,13 @@ export const publicSearchProjectionSchema = z.object({
   researchCoverage: z.enum(['minimal', 'partial', 'substantial']),
   relatedCount: z.number().int().min(0),
   claimCount: z.number().int().min(0),
-  /** Highest accepted-claim confidence. Defaults unrated for rows published before this field. */
-  confidenceTier: z.enum(['high', 'medium', 'low', 'unrated']).default('unrated'),
+  /**
+   * Highest accepted-claim confidence. Absent on rows published before the field existed;
+   * do not invent `unrated` at parse time — Records slim needs to detect coverage.
+   */
+  confidenceTier: z.enum(['high', 'medium', 'low', 'unrated']).optional(),
+  /** Present when the search row carries a public geohash (mappable signal for Records). */
+  geohash: z.string().min(1).optional(),
 });
 export type PublicSearchProjectionDoc = z.infer<typeof publicSearchProjectionSchema>;
 

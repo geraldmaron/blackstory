@@ -21,6 +21,7 @@ import {
   findRecordsNeighbors,
   parseRecordsQuery,
   recordsHref,
+  searchIndexReadyForRecords,
   EMPTY_RECORDS_QUERY,
 } from './build-records-index';
 
@@ -344,5 +345,59 @@ describe('/records · place hrefs and map continuity', () => {
     assert.equal(neighbors?.next?.id, 'ent_b');
     assert.match(neighbors?.next?.href ?? '', /from=list/);
     assert.match(neighbors?.next?.href ?? '', /state=DC/);
+  });
+
+  it('builds from search_index docs when confidenceTier is projected', () => {
+    const docs = [
+      {
+        id: 'ent_a',
+        releaseId: 'rel_1',
+        kind: 'place',
+        displayName: 'Alpha Place',
+        nameLower: 'alpha place',
+        aliases: [],
+        summary: 'First.',
+        topicTags: [],
+        eraBuckets: ['1920s'],
+        notabilityBasis: [],
+        notabilityLabels: [],
+        recordMaturity: 'partial_enrichment',
+        researchCoverage: 'partial' as const,
+        relatedCount: 0,
+        claimCount: 1,
+        confidenceTier: 'high' as const,
+        jurisdictionState: 'Washington, D.C.',
+        geohash: 'dqcjq',
+      },
+      {
+        id: 'ent_b',
+        releaseId: 'rel_1',
+        kind: 'person',
+        displayName: 'Example Person',
+        nameLower: 'example person',
+        aliases: [],
+        summary: 'A named person.',
+        topicTags: [],
+        eraBuckets: [],
+        notabilityBasis: [],
+        notabilityLabels: [],
+        recordMaturity: 'partial_enrichment',
+        researchCoverage: 'minimal' as const,
+        relatedCount: 0,
+        claimCount: 1,
+        confidenceTier: 'medium' as const,
+      },
+    ];
+    assert.equal(searchIndexReadyForRecords(docs), true);
+    assert.equal(searchIndexReadyForRecords([{ ...docs[0]!, confidenceTier: undefined }]), false);
+    const model = buildRecordsIndex(docs, EMPTY_RECORDS_QUERY);
+    assert.equal(model.totalAll, 2);
+    assert.equal(model.rows.find((row) => row.id === 'ent_a')?.grade, 'A');
+    assert.equal(
+      model.rows.find((row) => row.id === 'ent_a')?.href,
+      '/place/alpha-place?from=list',
+    );
+    assert.equal(model.rows.find((row) => row.id === 'ent_b')?.href, '/entity/ent_b?from=list');
+    assert.equal(model.mappableMatched, 1);
   });
 });
