@@ -52,7 +52,7 @@ See [`mobile-inventory.md`](./mobile-inventory.md).
 | Kind | Meaning |
 |---|---|
 | Source-validated | Confirmed in app routes / `surface-classes.ts` / page modules |
-| Rendered | Requires live server + screenshots (pending) |
-| Hypothesis | Needs visual QA |
+| Rendered | Live HTTP 200 smoke 2026-08-31 on Door, Library, Records, Explore, Place (Dunbar + Church); entity→Place 308; Records→Atlas `floor=B` handoff |
+| Hypothesis | Browser light/dark screenshot QA still pending |
 
 Memorial protected files listed in [`../PROTECTED-EXPERIENCES.md`](../PROTECTED-EXPERIENCES.md).
