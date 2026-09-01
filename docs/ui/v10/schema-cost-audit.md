@@ -90,11 +90,11 @@ Option B (viewport SQL) and Option C (tiles) deferred until catalog growth makes
 
 ## Schema gaps for richer Place UX
 
-- Public projection of typed `entity_relationships` (batched, depth-limited) for Constellation
+- Public projection of typed `entity_relationships` (batched, depth-limited) for Constellation — Place already batches 1-hop/2-hop point-gets; empty hops skip SQL
 - Per-entity citing-stories index (avoid full article scan)
 - Optional compact Place read model bundling identity + geo + evidence summary + edge counts
 - Do **not** hydrate full evidence arrays into map catalog
-- **Unblocked for Records slim:** `confidenceTier` is on the search_index write path; run `backfill-search-facets-confidence.ts` on active release, then switch Records to `getPublicSearchIndex`
+- **Records slim:** coverage-gated on projected `confidenceTier`; run `backfill-search-facets-confidence.ts` to activate
 
 ## Observability before/after Place work
 

@@ -19,6 +19,7 @@ import type { PublicEntityView } from '../data/public-seed';
 import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
 import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './entity/[id]/adapters';
 import { placeHref } from '../lib/place/public-place-path';
+import { instrumentRecordHref, placeSlugCollisionCounts } from '../lib/place/place-slug';
 import { isInternalRecordLabel, type HomeFirstPaintModel } from './home-first-paint';
 import { MAP_BACK } from './walk-back-place';
 import { WalkOffRampView } from './walk-off-ramp';
@@ -66,10 +67,17 @@ function DoorRooms({ rooms }: { readonly rooms: ReturnType<typeof selectDoorRoom
   );
 }
 
-function WalkOnPlace({ place }: { readonly place: PublicEntityView }) {
+function WalkOnPlace({
+  place,
+  collisions,
+}: {
+  readonly place: PublicEntityView;
+  readonly collisions: ReadonlyMap<string, number>;
+}) {
+  const href = instrumentRecordHref(place, collisions) || placeHref(place.displayName);
   return (
     <p className="ds-home-walk-on">
-      <Link className="ds-cta ds-cta--copper" href={placeHref(place.displayName)}>
+      <Link className="ds-cta ds-cta--copper" href={href}>
         {place.displayName}
       </Link>
     </p>
@@ -104,6 +112,7 @@ export function HomeFirstPaint({
     const rooms = selectDoorRooms(lead, citing);
     const eraLine = firstPaintEraLine(lead);
     const nextPlaces = walkOnPlaces(lead, model.also);
+    const collisions = placeSlugCollisionCounts([lead, ...model.also]);
     const locatorName = firstPaintLocatorName(lead);
     const displayClaims = withoutSummaryEchoClaims(lead.claims, lead.summary);
     const evidenceClaims = toEvidenceClaimInputs(displayClaims);
@@ -137,7 +146,26 @@ export function HomeFirstPaint({
                   text={lead.summary}
                   skipEntityIds={[lead.id]}
                   catalog={catalog}
-                  hrefFor={(entry) => placeHref(entry.label)}
+                  hrefFor={(entry) => {
+                    const neighbor = [
+                      ...(lead.relatedNeighbors ?? []),
+                      ...(lead.continueLearning ?? []),
+                    ].find((item) => item.id === entry.entityId);
+                    if (neighbor) {
+                      return (
+                        instrumentRecordHref(
+                          {
+                            id: neighbor.id,
+                            displayName: neighbor.displayName,
+                            kind: neighbor.kind,
+                            summary: neighbor.summary,
+                          },
+                          collisions,
+                        ) || placeHref(entry.label)
+                      );
+                    }
+                    return placeHref(entry.label);
+                  }}
                 />
               </p>
             </figcaption>
@@ -231,7 +259,7 @@ export function HomeFirstPaint({
         </section>
 
         {nextPlaces.map((place) => (
-          <WalkOnPlace key={place.id} place={place} />
+          <WalkOnPlace key={place.id} place={place} collisions={collisions} />
         ))}
 
         <DoorRooms rooms={rooms} />
