@@ -13,6 +13,22 @@
   --ds-first-paint-pin-size-zoomed-link: 0.625rem;
   --ds-first-paint-pin-size-zoomed-walk: 0.75rem;
   --ds-first-paint-pin-size-zoomed-focus: 1.125rem;
+  /*
+   * The board's ground is the live plate's ground. The locator SVG is a mask (land alpha 0.32,
+   * hairlines 1), so the ink is chosen to land on `--ds-map-land` through that alpha over the
+   * ground; hairlines read as the plate's state bounds. Light: the plate's background is land and
+   * states are drawn by line, so the board is land with line-2 states. Dark: the plate reads as
+   * near-black water with sepia land; #9a8a6d at 0.32 over --ds-map-water is --ds-map-land.
+   */
+  --ds-first-paint-ground: var(--ds-map-land);
+  --ds-first-paint-ground-ink: var(--ds-map-line-2);
+  --ds-first-paint-cluster-ink: var(--ds-accent-graphic);
+  --ds-first-paint-cluster-text: var(--ds-map-halo);
+}
+
+[data-theme='dark'] {
+  --ds-first-paint-ground: var(--ds-map-water);
+  --ds-first-paint-ground-ink: #9a8a6d;
 }
 
 body:has(.ds-door) {
@@ -71,6 +87,54 @@ body:has(.ds-door) {
   outline: 2px solid var(--ds-accent);
   outline-offset: 3px;
   z-index: 3; /* local: focus pin above other discs within the plate */
+}
+
+/*
+ * A pin the board has folded into a cluster (first-paint-clusters.ts). It stays in the DOM in
+ * index order for the pin-id and photo-index contracts, but neither paints nor takes focus.
+ */
+.ds-first-paint-plate .ds-first-paint-pin--grouped {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/*
+ * The board's count discs: the live plate's clusters at the national frame (copper family
+ * shade, count as the non-color signal, radius stepping at 10 / 50 / 200 — `CLUSTER_RADIUS_BY_COUNT`
+ * shrunk to the national zoom the way explore-style.ts shrinks it).
+ */
+.ds-first-paint-plate .ds-first-paint-cluster {
+  position: absolute;
+  z-index: 2; /* local: count discs over single pins within the plate */
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: var(--ds-first-paint-cluster-size, 0.75rem);
+  height: var(--ds-first-paint-cluster-size, 0.75rem);
+  border-radius: 999px;
+  background: var(--ds-first-paint-cluster-ink);
+  color: var(--ds-first-paint-cluster-text);
+  font-family: var(--ds-font-mono);
+  font-size: 0.5rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.ds-first-paint-plate .ds-first-paint-cluster[data-tier='2'] {
+  --ds-first-paint-cluster-size: 0.9375rem;
+}
+
+.ds-first-paint-plate .ds-first-paint-cluster[data-tier='3'] {
+  --ds-first-paint-cluster-size: 1.125rem;
+  font-size: 0.5625rem;
+}
+
+.ds-first-paint-plate .ds-first-paint-cluster[data-tier='4'] {
+  --ds-first-paint-cluster-size: 1.375rem;
+  font-size: 0.625rem;
 }
 
 /*
