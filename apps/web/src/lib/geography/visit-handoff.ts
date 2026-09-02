@@ -108,7 +108,10 @@ export function buildVisitHandoff(input: VisitHandoffInput): VisitHandoff {
   const contact = contactInput !== undefined ? resolvePublicVisitContact(contactInput) : undefined;
   return {
     addressLine,
-    precisionLabel: `${input.locationPrecision.replace(/[_-]+/g, ' ')} precision`,
+    precisionLabel:
+      input.locationPrecision === 'address'
+        ? 'street address precision'
+        : `${input.locationPrecision.replace(/[_-]+/g, ' ')} precision`,
     ...(mapsSearchHref ? { mapsSearchHref } : {}),
     ...(mapsDirectionsHref ? { mapsDirectionsHref } : {}),
     ...(standing ? { visitStanding: standing } : {}),

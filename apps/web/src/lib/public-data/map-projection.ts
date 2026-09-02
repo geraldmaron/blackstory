@@ -7,6 +7,7 @@
 
 import {
   deriveCatalogEntityStatus,
+  normalizePublicPrecision,
   type EntityStatusValue,
   type NotabilityCriterion,
   type StatusHistoryEntry,
@@ -104,15 +105,14 @@ export type PublicProjectionInput = {
 function locationPrecisionFromProjection(
   precision: string | undefined,
 ): PublicEntityView['locationPrecision'] {
-  if (
-    precision === 'neighborhood' ||
-    precision === 'campus' ||
-    precision === 'institution' ||
-    precision === 'county'
-  ) {
-    return precision;
+  const normalized = normalizePublicPrecision(precision);
+  // 'none' and 'country' are withheld/too-coarse-to-render tiers that never carry a map pin;
+  // PublicEntityView.locationPrecision only ever renders a real geo anchor, so both fall to
+  // the same 'city' floor as an unrecognised raw value.
+  if (normalized === 'none' || normalized === 'country') {
+    return 'city';
   }
-  return 'city';
+  return normalized;
 }
 
 /** View claims render a nominal score alongside the level chip; the projection carries only the

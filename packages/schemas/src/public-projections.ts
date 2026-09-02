@@ -49,6 +49,10 @@ const geoPointSchema = z.object({
   geohashPrefixes: z.array(z.string().min(1)).max(12).optional(),
   precision: z.string().min(1).optional(),
   matchMethod: z.string().min(1).optional(),
+  /** Set only when `reducePublicPrecision` (`@repo/security`, the location precision standard's
+   * publish-path engine, repo-wqcn) coarsened this location; see
+   * `docs/security/location-precision-standard.md` §3 for the reason vocabulary. */
+  precisionReductionReason: z.string().min(1).optional(),
 });
 
 const statusHistoryEntrySchema = z.object({

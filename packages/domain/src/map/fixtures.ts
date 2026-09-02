@@ -152,7 +152,13 @@ export const UNKNOWN_LIVING_STATUS_EXACT_COORDINATES_FIXTURE: MapSourceEntityInp
   },
 };
 
-/** Third negative case: deceased person's historical residence is still reduced, not raw. */
+/**
+ * Third case: a deceased person's historical residence. Per
+ * `docs/security/location-precision-standard.md` §3, NRHP publishes a deceased owner's
+ * occupied residence at full address there is no cap for this case. The 5th decimal
+ * below proves the "address" tier's 4-decimal coarsening still runs (11m accuracy), even
+ * though no SENSITIVITY rule reduces the tier itself.
+ */
 export const DECEASED_RESIDENCE_FIXTURE: MapSourceEntityInput = {
   entityId: 'ent_fixture_person_deceased_residence_kc_mo',
   kind: 'person',
@@ -160,8 +166,8 @@ export const DECEASED_RESIDENCE_FIXTURE: MapSourceEntityInput = {
   livingStatus: 'deceased',
   location: {
     precision: 'street_address',
-    lat: 39.0997,
-    lng: -94.5786,
+    lat: 39.09971,
+    lng: -94.57861,
     geohash: '9yuxb8vfh',
     matchMethod: 'manual_research',
     occupiedPrivateResidence: false,

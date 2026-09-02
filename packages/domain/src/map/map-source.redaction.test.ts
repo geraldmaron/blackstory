@@ -78,7 +78,7 @@ test('CRITICAL: unknown living status (default treat-as-living) also never leaks
   assert.equal(feature.properties.precision, 'city');
 });
 
-test('a deceased person historical residence is coarsened, not published raw', () => {
+test('a deceased person historical residence publishes at full address precision (NRHP posture, no cap)', () => {
   const rawLocation = DECEASED_RESIDENCE_FIXTURE.location;
   assert.ok(rawLocation?.lat !== undefined && rawLocation.lng !== undefined);
 
@@ -90,15 +90,20 @@ test('a deceased person historical residence is coarsened, not published raw', (
   });
 
   const serialized = JSON.stringify(result);
+  // The 5th-decimal raw value never leaks the "address" tier still coarsens to 4 decimals
+  // (~11m, the standard's own accuracy statement) it publishes unreduced, not unredacted.
   assert.doesNotMatch(serialized, new RegExp(String(rawLocation.lat)));
   assert.doesNotMatch(serialized, new RegExp(String(rawLocation.lng)));
 
   const feature = result.featureCollection.features[0];
   assert.ok(feature);
-  assert.equal(feature.properties.precision, 'neighborhood');
+  assert.equal(feature.properties.precision, 'address');
+  const [lng, lat] = feature.geometry.coordinates;
+  assert.equal(lat, 39.0997);
+  assert.equal(lng, -94.5786);
 });
 
-test('a sensitive site is capped even at an otherwise-allowed source precision', () => {
+test('a restricted/sensitive site is capped even at an otherwise-allowed source precision', () => {
   const result = buildMapSource({
     releaseId: RELEASE_ID,
     generatedAt: GENERATED_AT,
@@ -107,8 +112,9 @@ test('a sensitive site is capped even at an otherwise-allowed source precision',
   });
   const feature = result.featureCollection.features[0];
   assert.ok(feature);
-  // Source precision was 'institution' (allowed) but sensitivityClass caps it.
-  assert.equal(feature.properties.precision, 'neighborhood');
+  // Source precision was 'institution' (allowed) but the legacy sensitive_site
+  // sensitivityClass alias caps it to restrictedSiteMaxPublicPrecision ('city').
+  assert.equal(feature.properties.precision, 'city');
 });
 
 test('full demo fixture set through the real redaction pipeline: no raw residential coordinate leaks', () => {
@@ -131,8 +137,11 @@ test('full demo fixture set through the real redaction pipeline: no raw resident
       'exact_coordinates',
     ].includes(loc.precision);
     if (!precisionIsResidential) continue;
-    // Any fixture whose *source* precision was residential-shaped must never
-    // contribute its raw coordinate to the output, regardless of livingStatus.
+    // A DECEASED person's residence is the one documented exception (standard §3): NRHP
+    // publishes it at full address, so its raw coordinate (rounded to the address tier's
+    // 4 decimals) is EXPECTED to appear. Every other residential-shaped fixture here is a
+    // living/unknown-status person or an exact-coordinates record — those must never leak.
+    if (entity.entityId === DECEASED_RESIDENCE_FIXTURE.entityId) continue;
     assert.doesNotMatch(
       serialized,
       new RegExp(String(loc.lat)),

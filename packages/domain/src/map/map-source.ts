@@ -89,6 +89,9 @@ export type MapRedactLocationFn = (input: {
   readonly label?: string;
   readonly livingStatus?: string;
   readonly sensitivityClass?: string;
+  /** Entity kind ('person', 'place', ...) — drives the living-residence rule, which only
+   * fires on the biographical axis (see `@repo/security`'s `reducePublicPrecision`). */
+  readonly kind?: string;
   readonly occupiedPrivateResidence?: boolean;
   readonly neededForPublic?: boolean;
 }) => MapRedactedLocation | undefined;
@@ -193,6 +196,7 @@ export function buildMapSource(input: BuildMapSourceInput): MapSourceBuildResult
       ...(raw.label !== undefined ? { label: raw.label } : {}),
       ...(entity.livingStatus !== undefined ? { livingStatus: entity.livingStatus } : {}),
       ...(raw.sensitivityClass !== undefined ? { sensitivityClass: raw.sensitivityClass } : {}),
+      kind: entity.kind,
       ...(raw.occupiedPrivateResidence !== undefined
         ? { occupiedPrivateResidence: raw.occupiedPrivateResidence }
         : {}),

@@ -26,6 +26,72 @@ import {
 
 export type PublicPrecisionLevel = string;
 
+/**
+ * Controlled public precision tier list, coarsest to finest, per
+ * `docs/security/location-precision-standard.md` §2. This is the ONE list every raw precision
+ * value is normalised onto before it reaches a public surface or the redaction engine.
+ */
+export const PUBLIC_PRECISION_TIERS = [
+  'none',
+  'country',
+  'state',
+  'county',
+  'city',
+  'neighborhood',
+  'campus',
+  'institution',
+  'site',
+  'address',
+] as const;
+
+export type PublicPrecisionTier = (typeof PUBLIC_PRECISION_TIERS)[number];
+
+export function isPublicPrecisionTier(value: string): value is PublicPrecisionTier {
+  return (PUBLIC_PRECISION_TIERS as readonly string[]).includes(value);
+}
+
+/**
+ * Raw precision synonyms normalised onto the controlled tier list, per the standard §2 table.
+ * A raw value not present here and not already a controlled tier falls back to `city` in
+ * {@link normalizePublicPrecision} (unknown -> city, never sharper).
+ */
+const PUBLIC_PRECISION_SYNONYMS: Readonly<Record<string, PublicPrecisionTier>> = {
+  region: 'state',
+  territory: 'state',
+  town: 'city',
+  community: 'neighborhood',
+  district: 'neighborhood',
+  block: 'neighborhood',
+  cemetery: 'campus',
+  park: 'campus',
+  'park-site': 'campus',
+  park_site: 'campus',
+  stadium: 'campus',
+  garrison: 'campus',
+  camp: 'campus',
+  building: 'institution',
+  street_address: 'address',
+};
+
+/**
+ * Normalise any raw precision value onto the controlled public tier list (§2). Unknown raw
+ * values fall to `city`, never to a finer tier than the standard's fail-safe default.
+ */
+export function normalizePublicPrecision(raw: string | undefined): PublicPrecisionTier {
+  if (raw === undefined) {
+    return 'city';
+  }
+  const trimmed = raw.trim().toLowerCase();
+  if (trimmed.length === 0) {
+    return 'city';
+  }
+  if (isPublicPrecisionTier(trimmed)) {
+    return trimmed;
+  }
+  const synonym = PUBLIC_PRECISION_SYNONYMS[trimmed];
+  return synonym ?? 'city';
+}
+
 /** Allowed public precision levels from the active constitution. */
 export function allowedPublicPrecisionLevels(): readonly string[] {
   return loadProductConstitution().publicPrecisionRules.allowedLevels;

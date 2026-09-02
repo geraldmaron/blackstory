@@ -9,11 +9,25 @@ import {
   geoPrecisionTierForPublicPrecision,
   radiusAffordanceLabel,
   resolveDisplayRadiusMeters,
+  zoomForLocationPrecision,
 } from './geo-precision';
 
-test('institution/campus precisions map to the finest tiers', () => {
+test('institution/site/address precisions map to the finest geo tier; campus to block', () => {
   assert.equal(geoPrecisionTierForPublicPrecision('institution'), 'exact-site');
+  assert.equal(geoPrecisionTierForPublicPrecision('site'), 'exact-site');
+  assert.equal(geoPrecisionTierForPublicPrecision('address'), 'exact-site');
   assert.equal(geoPrecisionTierForPublicPrecision('campus'), 'block');
+});
+
+test('zoomForLocationPrecision: address is the closest zoom, site next, then institution/campus', () => {
+  assert.equal(zoomForLocationPrecision('address'), 16);
+  assert.equal(zoomForLocationPrecision('site'), 15);
+  assert.equal(zoomForLocationPrecision('institution'), 13);
+  assert.equal(zoomForLocationPrecision('campus'), 13);
+  assert.equal(zoomForLocationPrecision('neighborhood'), 12);
+  assert.equal(zoomForLocationPrecision('city'), 10);
+  assert.equal(zoomForLocationPrecision('county'), 8);
+  assert.equal(zoomForLocationPrecision('state'), 6);
 });
 
 test('city/neighborhood precisions map to locality; state/country map to state', () => {

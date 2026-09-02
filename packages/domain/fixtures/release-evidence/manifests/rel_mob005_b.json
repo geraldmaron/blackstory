@@ -28,9 +28,9 @@
       "path": "public/releases/rel_mob005_b/map/bounded-points.json",
       "hash": {
         "algorithm": "sha256",
-        "digest": "ce8497ebd3ab420d8c3707846afc8f90e52adc25d71a9c5d1397f5bf0bde488e"
+        "digest": "caaa80ab2eb49ee6116f5b0b9f55850595a14c3790d134d22b0812522005fdf1"
       },
-      "byteLength": 320
+      "byteLength": 322
     },
     "content-index": {
       "path": "public/releases/rel_mob005_b/content/index.json",
@@ -60,9 +60,9 @@
       "path": "public/releases/rel_mob005_b/map/source.json",
       "hash": {
         "algorithm": "sha256",
-        "digest": "24061b3c92566f00d080663cee7bce22849cfafb4410e124b5e7a3092f188541"
+        "digest": "74d95977cd1dca987ea6a572e0216e59ba19b1521856102bc8c685051a16ef27"
       },
-      "byteLength": 1436
+      "byteLength": 1425
     },
     "map-state-aggregates": {
       "path": "public/releases/rel_mob005_b/map/state-aggregates.json",
@@ -87,5 +87,5 @@
     "bootstrapStaleWhileRevalidateSeconds": 600,
     "releaseArtifactImmutableMaxAgeSeconds": 31536000
   },
-  "releaseStamp": "rel_mob005_b@cfc60a373b37"
+  "releaseStamp": "rel_mob005_b@5ccda61c0bc9"
 }

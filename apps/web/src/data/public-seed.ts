@@ -13,6 +13,7 @@ import {
   composeContinueLearningStubs,
 } from '@repo/domain/learning-index';
 import type { DatePrecision } from '@repo/domain/era';
+import type { PublicPrecisionTier } from '@repo/domain';
 import type { PlaceAdvisoryRecord } from '@repo/domain/advisory';
 import {
   NOTABILITY_RUBRIC,
@@ -175,8 +176,10 @@ export type PublicEntityView = {
    * below don't populate it yet and the facet builder falls back to `topicTags`. */
   readonly topicIds?: readonly string[];
   readonly jurisdictionLabel: string;
-  /** City, campus, or neighborhood — never street or residence. */
-  readonly locationPrecision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution';
+  /** The controlled public precision tier a location renders at (never `'none'`/`'country'` —
+   * those never carry a map pin, see `locationPrecisionFromProjection`). Derived from the
+   * standard's tier list, not hand-written — see `@repo/domain`'s `PublicPrecisionTier`. */
+  readonly locationPrecision: Exclude<PublicPrecisionTier, 'none' | 'country'>;
   readonly locationLabel: string;
   readonly relevanceExplanation: string;
   /** Concise framing of this record's place within documented Black history general context,

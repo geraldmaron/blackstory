@@ -30,7 +30,8 @@ export type MapInsetMomentProps = {
   readonly label: string;
   readonly lat: number;
   readonly lng: number;
-  readonly precision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution';
+  readonly precision:
+    'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site' | 'address';
   readonly className?: string;
 };
 

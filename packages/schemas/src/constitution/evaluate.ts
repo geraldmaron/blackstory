@@ -52,7 +52,7 @@ export function evaluatePublicPrecision(
     living.treatAsLiving &&
     policy.livingPersonRules.neverReturnResidentialPublicly &&
     policy.publicPrecisionRules.livingResidentialProhibited &&
-    (precision === 'residence' || precision === 'street_address' || precision === 'unit')
+    policy.sensitivityRules.residentialPrecisionLevels.includes(precision)
   ) {
     return withVersion(policy, {
       allowed: false,

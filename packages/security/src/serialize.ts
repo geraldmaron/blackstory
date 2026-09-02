@@ -244,6 +244,10 @@ export function toPublicEntityProjection(
         ...(options.location.livingStatus === undefined
           ? { livingStatus: entity.livingStatus }
           : {}),
+        // The living-residence rule only fires on the biographical axis (kind === 'person');
+        // without this, reducePublicPrecision cannot tell a person's own location apart from a
+        // place's, and a living person's street address would publish unreduced.
+        kind: entity.kind,
       })
     : undefined;
 
@@ -308,6 +312,10 @@ export function toPublicSearchDocument(
         ...(options.location.livingStatus === undefined
           ? { livingStatus: entity.livingStatus }
           : {}),
+        // The living-residence rule only fires on the biographical axis (kind === 'person');
+        // without this, reducePublicPrecision cannot tell a person's own location apart from a
+        // place's, and a living person's street address would publish unreduced.
+        kind: entity.kind,
       })
     : undefined;
 

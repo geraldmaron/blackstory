@@ -28,7 +28,8 @@ export type RecordAnatomyPlace = {
   readonly lat: number;
   readonly lng: number;
   readonly label: string;
-  readonly precision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution';
+  readonly precision:
+    'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site' | 'address';
   readonly precisionCaption?: string;
 };
 
