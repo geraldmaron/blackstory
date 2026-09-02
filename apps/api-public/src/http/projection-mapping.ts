@@ -28,9 +28,19 @@
  *   `researchCoverage`, revision timestamps) fall back to the same honest placeholders
  *   `apps/web`'s `map-projection.ts` uses — never fabricated curated content.
  */
-import { buildGraphTimeline, findUsStateForPoint, isUndatedTimelineEntry } from '@repo/domain';
+import {
+  buildGraphTimeline,
+  findUsStateForPoint,
+  isUndatedTimelineEntry,
+  normalizePublicPrecision,
+} from '@repo/domain';
 import type { TimelineEventV1 } from '@repo/public-contracts/v1/timeline';
-import { ENTITY_KINDS, entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
+import {
+  ENTITY_KINDS,
+  entityV1Schema,
+  LOCATION_PRECISIONS,
+  type EntityV1,
+} from '@repo/public-contracts/v1/entity';
 import type { ClaimV1 } from '@repo/public-contracts/v1/claim';
 import type { PublicClaimProjectionDoc, PublicEntityProjectionDoc } from '@repo/ops-data';
 
@@ -82,11 +92,18 @@ function mapTimeline(projection: PublicEntityProjectionDoc): TimelineEventV1[] {
     }));
 }
 
+/**
+ * `EntityV1['locationPrecision']` deliberately stays the 4-tier wire subset (city/neighborhood/
+ * campus/institution — see entity.ts's module doc: "never 'address' or 'exact'"). The location
+ * precision standard's finer `site`/`address` tiers, and its coarser `state`/`county`, all
+ * collapse to `city` here they publish at full tier on the website (`@repo/domain`'s
+ * `normalizePublicPrecision` + `apps/web`'s `map-projection.ts`), not over this API contract.
+ */
 function mapLocationPrecision(precision: string | undefined): EntityV1['locationPrecision'] {
-  if (precision === 'neighborhood' || precision === 'campus' || precision === 'institution') {
-    return precision;
-  }
-  return 'city';
+  const normalized = normalizePublicPrecision(precision);
+  return (LOCATION_PRECISIONS as readonly string[]).includes(normalized)
+    ? (normalized as EntityV1['locationPrecision'])
+    : 'city';
 }
 
 /**

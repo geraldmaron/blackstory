@@ -50,7 +50,8 @@ import {
 import { deriveCatalogEntityStatus } from '../derive-catalog-status.js';
 import { resolveEraBucketsFromEvidence } from '../era.js';
 import { findTemplateSummarySignature } from './template-summary-signatures.js';
-import { treatAsLiving, type LivingStatus } from '../living.js';
+import type { LivingStatus } from '../living.js';
+import { redactLocationForPublic, reducePublicPrecision } from '@repo/security/redaction';
 import { sanitizePublicProseText } from '../editorial/prose-links.js';
 import { evaluateNotabilityGate } from '../relevance/notability-gate.js';
 import { evaluateFactPublishGate } from '../facts/publish-gate.js';
@@ -212,6 +213,10 @@ export type ReleaseEntityProjectionFields = {
     readonly geohashPrefixes: readonly string[];
     readonly precision: string;
     readonly matchMethod: string;
+    /** Set only when `reducePublicPrecision` (the location precision standard's one publish-path
+     * engine, repo-wqcn) actually coarsened this entity's precision see §3 of the standard for
+     * the reason vocabulary. Absent means the location published at its source precision. */
+    readonly precisionReductionReason?: string;
   };
   readonly claimIds: readonly string[];
   readonly claims: readonly ReleaseClaimProjection[];
@@ -598,56 +603,15 @@ export function resolveReleaseEntityReferences(
       reason: 'locationPrecision does not resolve to a real precision level (empty)',
     };
   }
-  if (PROHIBITED_LOCATION_PRECISIONS.has(entry.locationPrecision.trim().toLowerCase())) {
-    return {
-      ok: false,
-      reason: `locationPrecision "${entry.locationPrecision}" is a prohibited public precision level (constitution policy.v1.json publicPrecisionRules.prohibited)`,
-    };
-  }
-  // repo-2t04.3 — living-person privacy rail, enforced in the publish path itself rather than
-  // only declared in constitution policy.v1.json (packages/schemas/src/constitution/policy.v1.json
-  // livingPersonRules.neverReturnResidentialPublicly). treatAsLiving('unknown') is true, so a
-  // person entry with no recorded status gets the same protection as a confirmed-living one.
-  if (
-    entry.kind === 'person' &&
-    treatAsLiving(entry.livingStatus ?? 'unknown') &&
-    LIVING_PERSON_MAX_PRECISION_DENYLIST.has(entry.locationPrecision.trim().toLowerCase())
-  ) {
-    return {
-      ok: false,
-      reason:
-        `locationPrecision "${entry.locationPrecision}" exceeds the public precision ceiling for ` +
-        'a living or possibly-living person (constitution livingResidenceMaxPublicPrecision)',
-    };
-  }
+  // repo-wqcn — location precision is no longer a publish-time REJECTION gate. A prohibited
+  // raw level, a living person's own residence, a restricted site, etc. all still reach the
+  // public projection they are COARSENED there by `reducePublicPrecision` (the one engine on
+  // the publish path, `docs/security/location-precision-standard.md` §4), with the reason
+  // recorded on `projection.location.precisionReductionReason`, never silently. See
+  // `buildReleaseEntityArtifacts` below for where that engine actually runs.
 
   return { ok: true };
 }
-
-/** constitution policy.v1.json publicPrecisionRules.prohibited — never a real precision level. */
-const PROHIBITED_LOCATION_PRECISIONS: ReadonlySet<string> = new Set([
-  'street_address',
-  'unit',
-  'parcel',
-  'exact_coordinates',
-  'residence',
-]);
-
-/**
- * Precision levels a living/possibly-living person's OWN location must never carry (constitution
- * livingResidenceMaxPublicPrecision: "city"; neverReturnResidentialPublicly). "address" is the
- * live corpus's actual street-level precision tier — repo-2t04.3's audit found 9 person records
- * carrying it, 7 of them long-deceased historical figures (fine: a dead person's childhood home
- * is a historical fact, not a privacy risk) and 2 status="unknown" (treatAsLiving = true). One of
- * those two, recon_j_w_randolph, is a bare street address ("315 Clark Avenue, Pass Christian,
- * Mississippi") with no institutional context — exactly what this rule exists to catch.
- * "institution" and "campus" are deliberately NOT in this set: repo-2t04.3 verified all 57 live
- * person records carrying those precisions are workplace/alma-mater/memorial associations, which
- * the constitution's public-precision rules allow outright, not residences. Likewise "site" — the
- * 3 live unknown-status persons carrying it are cemetery burial sites and a state capitol
- * convention site, not residences.
- */
-const LIVING_PERSON_MAX_PRECISION_DENYLIST: ReadonlySet<string> = new Set(['address']);
 
 const US_STATES_BY_NAME_LENGTH_DESC: readonly (typeof US_STATES)[number][] = [...US_STATES].sort(
   (a, b) => b.name.length - a.name.length,
@@ -970,6 +934,51 @@ export function buildReleaseEntityArtifacts(
   const publicStatus = resolvedStatus.status;
   const publicStatusHistory = resolvedStatus.statusHistory;
   /*
+   * The ONE engine on the publish path (`docs/security/location-precision-standard.md` §4):
+   * every entity's raw/authored precision is normalised onto the controlled public tier list
+   * and reduced per the standard's §3 conditions (living-residence, restricted/sensitive site,
+   * withheld-on-request, ...) right here, so nothing downstream re-derives or re-decides this.
+   * The reduced tier and its reason (when any rule fired) are both written onto the projection.
+   */
+  const precisionReduction = reducePublicPrecision({
+    precision: locationPrecision,
+    kind: entry.kind,
+    ...(resolvedStatus.livingStatus !== undefined
+      ? { livingStatus: resolvedStatus.livingStatus }
+      : {}),
+    ...(entry.sensitivityClass !== undefined ? { sensitivityClass: entry.sensitivityClass } : {}),
+  });
+  const publicLocationPrecision = precisionReduction.precision;
+  /*
+   * A reduced tier must reduce the point too, or the label would say "city" over a rooftop
+   * coordinate. `redactLocationForPublic` coarsens lat/lng to the tier's decimals and trims
+   * the geohash to the tier's length (standard §2); an unreduced tier passes through untouched.
+   * A location withheld entirely ('none') keeps only a whole-degree point so the projection
+   * still validates while saying nothing sharper than the country.
+   */
+  const publicPoint = precisionReduction.reduced
+    ? redactLocationForPublic({
+        precision: locationPrecision,
+        kind: entry.kind,
+        lat: geo.lat,
+        lng: geo.lng,
+        geohash: geo.geohash,
+        ...(resolvedStatus.livingStatus !== undefined
+          ? { livingStatus: resolvedStatus.livingStatus }
+          : {}),
+        ...(entry.sensitivityClass !== undefined
+          ? { sensitivityClass: entry.sensitivityClass }
+          : {}),
+      })
+    : undefined;
+  const publicGeo: GeoPointFields = precisionReduction.reduced
+    ? buildGeoPointFields(
+        publicPoint?.lat ?? Math.round(geo.lat),
+        publicPoint?.lng ?? Math.round(geo.lng),
+        Math.min(geohashPrecision, publicPoint?.geohash?.length ?? 1),
+      )
+    : geo;
+  /*
    * Derive era once, here, so the entity projection and the search index cannot disagree.
    * Previously both copied `entry.eraBuckets` verbatim; catalog entries that carry only a dated
    * `statusHistory` shipped with no era at all, and the web read path patched the entity page
@@ -990,12 +999,15 @@ export function buildReleaseEntityArtifacts(
     nameLower: entry.displayName.toLowerCase(),
     summary: entry.summary,
     location: {
-      lat: geo.lat,
-      lng: geo.lng,
-      geohash: geo.geohash,
-      geohashPrefixes: geo.geohashPrefixes,
-      precision: locationPrecision,
+      lat: publicGeo.lat,
+      lng: publicGeo.lng,
+      geohash: publicGeo.geohash,
+      geohashPrefixes: publicGeo.geohashPrefixes,
+      precision: publicLocationPrecision,
       matchMethod,
+      ...(precisionReduction.reason !== undefined
+        ? { precisionReductionReason: precisionReduction.reason }
+        : {}),
     },
     claimIds: claims.map((claim) => claim.id),
     claims,

@@ -9,6 +9,7 @@ import {
   findUsStateFromJurisdictionLabel,
   normalizeReleaseClaims,
   normalizeReleaseRelated,
+  normalizePublicPrecision,
   type CanonicalStatusSnapshot,
   type ReleaseEntityProjectionFields,
   type ReleaseSearchIndexFields,
@@ -444,12 +445,20 @@ export function buildReleaseSourceFromLandscape(
 
   // A geocode fallback (e.g. reconcile-nrhp-county-locations.ts) records the real precision
   // of its coordinates here so the map renders an honest radius affordance instead of a
-  // sharpened pin implying site-level accuracy the source data doesn't have.
+  // sharpened pin implying site-level accuracy the source data doesn't have. Per
+  // docs/security/location-precision-standard.md §2, every raw precision is normalised onto
+  // the controlled public tier list before it ever reaches the release builder. When there is
+  // no geocode precision at all, a row carrying a street-address string (historicAddress) is
+  // "address" tier; otherwise it fails safe to "city" (never the old bare "site" default,
+  // which claimed building-level accuracy the row does not actually have).
   const geocode = asRecord(row.payload.geocode);
+  const hasStreetAddress = readTrimmedString(provenance.historicAddress).length > 0;
   const locationPrecision =
     typeof geocode.precision === 'string' && geocode.precision.trim().length > 0
-      ? geocode.precision
-      : 'site';
+      ? normalizePublicPrecision(geocode.precision)
+      : hasStreetAddress
+        ? 'address'
+        : 'city';
 
   // repo-n7p6.1: the NRHP Black-heritage lane used to reuse `summary` verbatim as the claim
   // object — one pasted string in summary, claims[0].object, AND (via buildNotabilityBasisNote's

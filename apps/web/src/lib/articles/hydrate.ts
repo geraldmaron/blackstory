@@ -98,7 +98,8 @@ export type HydratedArticleMapInset = {
   readonly label: string;
   readonly lat: number;
   readonly lng: number;
-  readonly precision: PublicEntityView['locationPrecision'];
+  readonly precision:
+    'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site' | 'address';
 };
 
 export type HydratedArticleDispute = {

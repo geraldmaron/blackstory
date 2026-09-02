@@ -13,6 +13,7 @@ import {
   composeContinueLearningStubs,
 } from '@repo/domain/learning-index';
 import type { DatePrecision } from '@repo/domain/era';
+import type { PublicPrecisionTier } from '@repo/domain';
 import type { PlaceAdvisoryRecord } from '@repo/domain/advisory';
 import {
   NOTABILITY_RUBRIC,
@@ -184,16 +185,10 @@ export type PublicEntityView = {
    * below don't populate it yet and the facet builder falls back to `topicTags`. */
   readonly topicIds?: readonly string[];
   readonly jurisdictionLabel: string;
-  /** City, campus, or neighborhood — never street or residence. */
-  /**
-   * Public precision tier, coarsest to finest: state, county, city, neighborhood, campus,
-   * institution, site. `site` is a verified public place at building level (a listed structure,
-   * a former site with a documented street address), never a residence: publish-time redaction
-   * in `@repo/security` has already coarsened residences, living-person places and sensitive
-   * sites before a projection reaches this view.
-   */
-  readonly locationPrecision:
-    'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site';
+  /** The controlled public precision tier a location renders at (never `'none'`/`'country'` —
+   * those never carry a map pin, see `locationPrecisionFromProjection`). Derived from the
+   * standard's tier list, not hand-written — see `@repo/domain`'s `PublicPrecisionTier`. */
+  readonly locationPrecision: Exclude<PublicPrecisionTier, 'none' | 'country'>;
   readonly locationLabel: string;
   readonly relevanceExplanation: string;
   /** Concise framing of this record's place within documented Black history general context,

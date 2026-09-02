@@ -8,12 +8,14 @@ import {
   GEO_PRECISION_TIERS,
   GEO_PRECISION_TIER_RANK,
   PRECISION_BASES,
+  PUBLIC_PRECISION_TIERS,
   boundingRadiusMeters,
   coarserGeoPrecisionTier,
   displayRadiusMeters,
   isCoarserGeoPrecisionTier,
   isGeoPrecisionTier,
   isPrecisionBasis,
+  normalizePublicPrecision,
   resolveEntityLocationPrecision,
 } from './precision.js';
 
@@ -171,4 +173,74 @@ test('redaction is the exception across a mixed batch: only flagged records coar
   assert.equal(coarsened.length, 1);
   assert.equal(coarsened[0]?.id, 'c');
   assert.ok(isCoarserGeoPrecisionTier(coarsened[0]!.tier, 'exact-site'));
+});
+
+test('PUBLIC_PRECISION_TIERS is the ten-tier controlled list, coarsest to finest', () => {
+  assert.deepEqual(PUBLIC_PRECISION_TIERS, [
+    'none',
+    'country',
+    'state',
+    'county',
+    'city',
+    'neighborhood',
+    'campus',
+    'institution',
+    'site',
+    'address',
+  ]);
+});
+
+test('normalizePublicPrecision passes through every controlled tier unchanged', () => {
+  for (const tier of PUBLIC_PRECISION_TIERS) {
+    assert.equal(normalizePublicPrecision(tier), tier);
+  }
+});
+
+test('normalizePublicPrecision normalises every raw value seen in live bb_public data', () => {
+  const cases: Record<string, string> = {
+    site: 'site',
+    county: 'county',
+    city: 'city',
+    institution: 'institution',
+    campus: 'campus',
+    address: 'address',
+    neighborhood: 'neighborhood',
+    community: 'neighborhood',
+    town: 'city',
+    district: 'neighborhood',
+    cemetery: 'campus',
+    state: 'state',
+    block: 'neighborhood',
+    building: 'institution',
+    park: 'campus',
+    'park-site': 'campus',
+    camp: 'campus',
+    country: 'country',
+    garrison: 'campus',
+    region: 'state',
+    territory: 'state',
+    stadium: 'campus',
+  };
+  for (const [raw, expected] of Object.entries(cases)) {
+    assert.equal(normalizePublicPrecision(raw), expected, `raw="${raw}"`);
+  }
+});
+
+test('normalizePublicPrecision: street_address synonym normalises to address', () => {
+  assert.equal(normalizePublicPrecision('street_address'), 'address');
+});
+
+test('normalizePublicPrecision: unknown values fall to city, never sharper', () => {
+  assert.equal(normalizePublicPrecision('unit'), 'city');
+  assert.equal(normalizePublicPrecision('parcel'), 'city');
+  assert.equal(normalizePublicPrecision('exact_coordinates'), 'city');
+  assert.equal(normalizePublicPrecision('residence'), 'city');
+  assert.equal(normalizePublicPrecision('nonsense-value'), 'city');
+  assert.equal(normalizePublicPrecision(undefined), 'city');
+  assert.equal(normalizePublicPrecision(''), 'city');
+});
+
+test('normalizePublicPrecision is case-insensitive and trims whitespace', () => {
+  assert.equal(normalizePublicPrecision('  SITE  '), 'site');
+  assert.equal(normalizePublicPrecision('Town'), 'city');
 });

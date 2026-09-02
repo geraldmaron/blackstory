@@ -480,9 +480,13 @@ export {
   boundingRadiusMeters,
   displayRadiusMeters,
   resolveEntityLocationPrecision,
+  PUBLIC_PRECISION_TIERS,
+  isPublicPrecisionTier,
+  normalizePublicPrecision,
 } from './geography/precision.js';
 export type {
   PublicPrecisionLevel,
+  PublicPrecisionTier,
   GeoPrecisionTier,
   PrecisionBasis,
   JurisdictionBBox,

@@ -153,9 +153,9 @@
         "precisionReductionReasons",
         "residentialPrecisionLevels",
         "livingResidenceMaxPublicPrecision",
-        "occupiedPrivateResidenceMaxPublicPrecision",
+        "restrictedSiteMaxPublicPrecision",
         "sensitiveSiteMaxPublicPrecision",
-        "reduceOccupiedPrivateResidenceForDeceased"
+        "withheldOnRequestMaxPublicPrecision"
       ],
       "properties": {
         "classes": {
@@ -177,9 +177,9 @@
           "items": { "type": "string", "minLength": 1 }
         },
         "livingResidenceMaxPublicPrecision": { "type": "string", "minLength": 1 },
-        "occupiedPrivateResidenceMaxPublicPrecision": { "type": "string", "minLength": 1 },
+        "restrictedSiteMaxPublicPrecision": { "type": "string", "minLength": 1 },
         "sensitiveSiteMaxPublicPrecision": { "type": "string", "minLength": 1 },
-        "reduceOccupiedPrivateResidenceForDeceased": { "type": "boolean" }
+        "withheldOnRequestMaxPublicPrecision": { "type": "string", "minLength": 1 }
       }
     },
     "ugcLivingPersonRules": {

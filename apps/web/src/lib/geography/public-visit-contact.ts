@@ -30,8 +30,7 @@ export type PublicVisitContactInput = {
 
 const ELIGIBLE_KINDS = new Set(['place', 'school', 'institution', 'organization']);
 
-/** Contact only makes sense for a place a reader can arrive at: a named site or campus. */
-const ELIGIBLE_PRECISION = new Set(['site', 'campus', 'institution']);
+const ELIGIBLE_PRECISION = new Set(['campus', 'institution', 'site', 'address']);
 
 const VISIT_CONTACT_PREDICATES: Readonly<Record<keyof PublicVisitContact, readonly string[]>> = {
   website: ['official_website', 'officialWebsite', 'visitor_website'],

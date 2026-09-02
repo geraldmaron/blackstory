@@ -5,90 +5,107 @@
  * before publication and scrubs protected values (residential addresses, exact
  * coordinates) out of any serialized payload public projections, search index
  * documents, logs, error telemetry, and exports. All rules derive from the product
- * constitution (@repo/schemas); nothing here weakens those rules.
+ * constitution (@repo/schemas) and from `docs/security/location-precision-standard.md`
+ * (the location precision standard, repo-wqcn); nothing here weakens those rules.
+ *
+ * `reducePublicPrecision` runs INSIDE the publish path itself (the release builder,
+ * `packages/domain/src/publication/release-builder.ts`) for every `bb_public.release_entities`
+ * projection — it is not merely a library other code may choose to call before serializing.
+ * See the standard's §4 "One engine on the publish path."
  */
-import { evaluatePublicPrecision, loadProductConstitution } from '@repo/schemas';
+import { loadProductConstitution } from '@repo/schemas';
 import { treatAsLiving, type LivingStatus } from '@repo/domain-core/living';
 import {
-  isResidentialPrecision,
-  type PrecisionReductionReason,
-  type SensitivityClass,
-} from './sensitivity.js';
+  normalizePublicPrecision,
+  PUBLIC_PRECISION_TIERS,
+  type PublicPrecisionTier,
+} from '@repo/domain-core/geography/precision';
+import type { PrecisionReductionReason, SensitivityClass } from './sensitivity.js';
 
-/** Coarse-to-fine ordering used to guarantee reductions only ever lower precision. */
-const PRECISION_RANK: Readonly<Record<string, number>> = {
-  none: 0,
-  country: 1,
-  state: 2,
-  county: 3,
-  city: 4,
-  neighborhood: 5,
-  institution: 6,
-  campus: 6,
-  residence: 7,
-  street_address: 8,
-  unit: 9,
-  parcel: 10,
-  exact_coordinates: 11,
-};
+/** Coarse-to-fine ordering over the controlled public precision tiers (standard §2). */
+const PRECISION_RANK: Readonly<Record<PublicPrecisionTier, number>> = Object.fromEntries(
+  PUBLIC_PRECISION_TIERS.map((tier, index) => [tier, index]),
+) as Readonly<Record<PublicPrecisionTier, number>>;
 
-function rankOf(precision: string): number {
-  return PRECISION_RANK[precision] ?? Number.POSITIVE_INFINITY;
+function rankOf(precision: PublicPrecisionTier): number {
+  return PRECISION_RANK[precision];
 }
 
-/** Number of decimal places kept when coarsening coordinates for a public precision. */
-const COORDINATE_DECIMALS: Readonly<Record<string, number>> = {
+/** Number of decimal places kept when coarsening coordinates for a public precision (standard §2). */
+const COORDINATE_DECIMALS: Readonly<Record<PublicPrecisionTier, number | undefined>> = {
+  none: undefined,
   country: 0,
   state: 1,
   county: 1,
   city: 2,
   neighborhood: 3,
+  campus: 3,
   institution: 4,
-  campus: 4,
+  site: 4,
+  address: 4,
 };
 
 /** Geohash length kept for a public precision level (shorter = coarser). */
-const GEOHASH_LENGTH: Readonly<Record<string, number>> = {
+const GEOHASH_LENGTH: Readonly<Record<PublicPrecisionTier, number | undefined>> = {
+  none: undefined,
   country: 1,
   state: 2,
   county: 3,
   city: 4,
   neighborhood: 5,
+  campus: 5,
   institution: 6,
-  campus: 6,
+  site: 7,
+  address: 7,
 };
 
 export type LivingStatusInput = LivingStatus | undefined;
 
 export type PrecisionReductionInput = {
-  /** Source precision (evidence or internal tier) to reduce for public output. */
+  /** Source precision (raw evidence/geocode value, or an already-controlled tier). */
   readonly precision: string;
   readonly livingStatus?: LivingStatusInput;
   readonly sensitivityClass?: SensitivityClass;
-  /** True when the residence is a currently occupied private residence. */
+  /** Entity kind ('person', 'place', ...). Drives the living-residence rule: it only fires on
+   * the biographical axis (a person record), never on a place's own architectural record. */
+  readonly kind?: string;
+  /** @deprecated no longer changes the reduction outcome — NRHP publishes a deceased owner's
+   * occupied residence at full address (standard §3); kept only so existing callers compile. */
   readonly occupiedPrivateResidence?: boolean;
-  /** True when exact coordinates are genuinely required for the public purpose. */
+  /** @deprecated exact_coordinates is unconditionally a prohibited raw level now (standard §2);
+   * kept only so existing callers compile. */
   readonly neededForPublic?: boolean;
 };
 
 export type PrecisionReductionResult = {
-  readonly precision: string;
+  readonly precision: PublicPrecisionTier;
   readonly reduced: boolean;
   readonly reason?: PrecisionReductionReason;
   readonly policyVersion: string;
 };
 
 /** Reduce a precision to the coarser of itself and a target level. */
-function reduceTo(current: string, target: string): string {
+function reduceTo(current: PublicPrecisionTier, target: PublicPrecisionTier): PublicPrecisionTier {
   return rankOf(target) < rankOf(current) ? target : current;
 }
 
 /**
- * Reduce a source precision to a value that is safe to publish.
+ * Reduce a source precision to a value that is safe to publish, per
+ * `docs/security/location-precision-standard.md` §3.
  *
- * Ordering matters: living-residential and occupied-private-residence checks run
- * before the generic prohibited-level check so callers receive the most specific
- * reduction reason. Unknown living status is treated as living (constitution).
+ * Fixed order (most specific/urgent first):
+ * 1. `withheld_on_request` always wins — an operator/owner/descendant request to withhold.
+ * 2. A raw prohibited level (unit/parcel/exact_coordinates/residence) fails closed to `city`,
+ *    checked against the RAW input so it is distinguishable from an ordinary unknown-value
+ *    normalisation.
+ * 3. The living-residence rule: only when `livingStatus` is living or unknown (fail-safe
+ *    default), AND only on the biographical axis (`kind === 'person'`, or a place whose
+ *    `sensitivityClass` is `living_residence`) — NRHP does not cap an occupied building on the
+ *    architectural axis.
+ * 4. `restricted_site` (and its legacy alias `sensitive_site`) caps to `city`.
+ * 5. `memorial_site`, `violence_associated`, `enslaver_or_segregationist`,
+ *    `perpetrator_associated` — no reduction; these classes publish at source precision.
+ * 6. Otherwise the raw precision is normalised onto the controlled tier list and kept as-is.
  */
 export function reducePublicPrecision(input: PrecisionReductionInput): PrecisionReductionResult {
   const policy = loadProductConstitution();
@@ -97,84 +114,59 @@ export function reducePublicPrecision(input: PrecisionReductionInput): Precision
   const policyVersion = policy.policyVersion;
   const status: LivingStatus = input.livingStatus ?? 'unknown';
   const living = treatAsLiving(status);
-  const source = input.precision;
-  const residential = isResidentialPrecision(source);
+  const normalized = normalizePublicPrecision(input.precision);
 
   const keep = (): PrecisionReductionResult => ({
-    precision: source,
+    precision: normalized,
     reduced: false,
     policyVersion,
   });
-  const reduce = (target: string, reason: PrecisionReductionReason): PrecisionReductionResult => ({
-    precision: reduceTo(source, target),
+  const reduce = (
+    target: PublicPrecisionTier,
+    reason: PrecisionReductionReason,
+  ): PrecisionReductionResult => ({
+    precision: reduceTo(normalized, target),
     reduced: true,
     reason,
     policyVersion,
   });
 
-  // Unknown unclassified precision → drop to nothing (fail closed).
-  if (
-    !precisionRules.allowedLevels.includes(source) &&
-    !precisionRules.prohibitedLevels.includes(source)
-  ) {
-    return reduce('none', 'unknown_precision_level');
+  // 1. Withheld on request always wins, before any other rule (§3, §4 "A request path").
+  if (input.sensitivityClass === 'withheld_on_request') {
+    return reduce('none', 'withheld_on_request');
   }
 
-  // Living (or unknown) residential precision is never published.
-  if (living && residential && precisionRules.livingResidentialProhibited) {
-    return reduce(
-      rules.livingResidenceMaxPublicPrecision,
-      'living_residential_precision_prohibited',
-    );
-  }
-
-  // Occupied private residence of a deceased person is reduced too.
-  if (
-    !living &&
-    residential &&
-    input.occupiedPrivateResidence === true &&
-    rules.reduceOccupiedPrivateResidenceForDeceased
-  ) {
-    return reduce(
-      rules.occupiedPrivateResidenceMaxPublicPrecision,
-      'occupied_private_residence_reduced',
-    );
-  }
-
-  // Any remaining prohibited precision (deceased historical residence, exact coords, parcel).
-  if (precisionRules.prohibitedLevels.includes(source)) {
+  // 2. A raw prohibited level fails closed, checked against the RAW value (not the normalised
+  // one — normalizePublicPrecision would otherwise silently collapse this into an ordinary
+  // "unknown value -> city" case with the wrong reason code).
+  const rawTrimmed = input.precision.trim().toLowerCase();
+  if (precisionRules.prohibitedLevels.includes(rawTrimmed)) {
     const reason: PrecisionReductionReason =
-      source === 'exact_coordinates'
+      rawTrimmed === 'exact_coordinates'
         ? 'exact_coordinates_reduced'
         : 'prohibited_location_precision';
-    return reduce(rules.occupiedPrivateResidenceMaxPublicPrecision, reason);
+    return reduce('city', reason);
   }
 
-  // Sensitive sites are capped even when the raw level is otherwise allowed.
-  if (
-    input.sensitivityClass === 'sensitive_site' &&
-    rankOf(source) > rankOf(rules.sensitiveSiteMaxPublicPrecision)
-  ) {
-    return reduce(rules.sensitiveSiteMaxPublicPrecision, 'sensitivity_class_reduced');
+  // 3. Living-residence rule: fires only on the biographical axis. treatAsLiving('unknown') is
+  // true by constitution policy (treatUnknownAsLiving), so an unrecorded status fails safe.
+  const onBiographicalAxis =
+    input.kind === 'person' || input.sensitivityClass === 'living_residence';
+  if (living && onBiographicalAxis) {
+    const reason: PrecisionReductionReason =
+      status === 'living' ? 'living_residence' : 'living_status_unknown';
+    return reduce(rules.livingResidenceMaxPublicPrecision as PublicPrecisionTier, reason);
   }
 
-  // Exact coordinates not needed for the public purpose are trimmed when configured.
-  if (
-    source === 'exact_coordinates' &&
-    precisionRules.reduceExactCoordinatesWhenNotNeeded &&
-    input.neededForPublic !== true
-  ) {
-    return reduce(rules.occupiedPrivateResidenceMaxPublicPrecision, 'not_needed_for_public');
+  // 4. Restricted/sacred/archaeological sites — the § 307103 "Address Restricted" tier.
+  // "sensitive_site" is kept as the legacy alias of "restricted_site" (standard §3).
+  if (input.sensitivityClass === 'restricted_site' || input.sensitivityClass === 'sensitive_site') {
+    return reduce(rules.restrictedSiteMaxPublicPrecision as PublicPrecisionTier, 'restricted_site');
   }
 
-  // Defensive: confirm the final level is publishable for this living status.
-  const check = evaluatePublicPrecision(
-    source,
-    input.livingStatus === undefined ? {} : { livingStatus: input.livingStatus },
-  );
-  if (!check.allowed) {
-    return reduce('city', check.reason ?? 'prohibited_location_precision');
-  }
+  // 5. Memorial and violence-history classes: no reduction, published at source precision —
+  // a vague location defeats the memorial (standard §3).
+  // (memorial_site, violence_associated, enslaver_or_segregationist, perpetrator_associated)
 
   return keep();
 }
@@ -188,12 +180,16 @@ export type InternalLocationInput = {
   readonly label?: string;
   readonly livingStatus?: LivingStatusInput;
   readonly sensitivityClass?: SensitivityClass;
+  /** Entity kind; see {@link PrecisionReductionInput.kind}. */
+  readonly kind?: string;
+  /** @deprecated see {@link PrecisionReductionInput.occupiedPrivateResidence}. */
   readonly occupiedPrivateResidence?: boolean;
+  /** @deprecated see {@link PrecisionReductionInput.neededForPublic}. */
   readonly neededForPublic?: boolean;
 };
 
 export type PublicLocation = {
-  readonly precision: string;
+  readonly precision: PublicPrecisionTier;
   readonly lat?: number;
   readonly lng?: number;
   readonly geohash?: string;
@@ -202,7 +198,7 @@ export type PublicLocation = {
   readonly reductionReason?: PrecisionReductionReason;
 };
 
-function coarsenCoordinate(value: number, precision: string): number | undefined {
+function coarsenCoordinate(value: number, precision: PublicPrecisionTier): number | undefined {
   const decimals = COORDINATE_DECIMALS[precision];
   if (decimals === undefined) {
     return undefined;
@@ -213,8 +209,10 @@ function coarsenCoordinate(value: number, precision: string): number | undefined
 
 /**
  * Produce a public-safe location, or `undefined` when nothing may be shown.
- * Exact coordinates, street/unit/parcel labels, and fine geohashes are stripped;
- * coordinates and geohash are coarsened to match the reduced precision (protects maps).
+ * Prohibited-level and sensitivity-reduced labels/coordinates are stripped or coarsened to
+ * match the reduced precision (protects maps). A `site`/`address` tier label is allowed to be
+ * a street address per the standard — it is the finest published tier, not an internal-only one
+ * — so `containsProtectedText` is not applied to it; it stays scrubbing for free-text logs only.
  */
 export function redactLocationForPublic(
   location: InternalLocationInput,
@@ -225,6 +223,7 @@ export function redactLocationForPublic(
     ...(location.sensitivityClass === undefined
       ? {}
       : { sensitivityClass: location.sensitivityClass }),
+    ...(location.kind === undefined ? {} : { kind: location.kind }),
     ...(location.occupiedPrivateResidence === undefined
       ? {}
       : { occupiedPrivateResidence: location.occupiedPrivateResidence }),
@@ -239,7 +238,7 @@ export function redactLocationForPublic(
   }
 
   const result: {
-    precision: string;
+    precision: PublicPrecisionTier;
     lat?: number;
     lng?: number;
     geohash?: string;
@@ -268,8 +267,15 @@ export function redactLocationForPublic(
     result.matchMethod = location.matchMethod;
   }
 
-  // Only keep labels that were not reduced and carry no address-shaped content.
-  if (!reduction.reduced && location.label && !containsProtectedText(location.label)) {
+  // Keep labels that were not reduced by a sensitivity rule. A site/address tier label is
+  // allowed to carry a street address (the finest published tier); every coarser tier still
+  // must not carry address-shaped text that outruns its own precision.
+  const labelAllowedAtTier = precision === 'site' || precision === 'address';
+  if (
+    !reduction.reduced &&
+    location.label &&
+    (labelAllowedAtTier || !containsProtectedText(location.label))
+  ) {
     result.label = location.label;
   }
 

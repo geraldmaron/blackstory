@@ -53,7 +53,7 @@ test('included candidate has relevance evidence and policy version', () => {
 
   assert.equal(assessment.decision, 'include');
   assert.equal(assessment.passes, true);
-  assert.equal(assessment.policyVersion, '1.0.0');
+  assert.equal(assessment.policyVersion, '1.1.0');
   assert.ok(assessment.evidence.length > 0);
   assert.ok(assessment.featureValues.length === 5);
   assert.ok(assessment.whyThisAppears.length > 0);
