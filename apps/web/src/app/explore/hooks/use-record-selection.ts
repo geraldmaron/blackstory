@@ -118,6 +118,14 @@ export function useRecordSelection(
     [setSelectedId, stage],
   );
 
+  useEffect(
+    () =>
+      stage.subscribe('deselect', () => {
+        setSelectedId(undefined);
+      }),
+    [setSelectedId, stage],
+  );
+
   const lastUnderlayPinRef = useRef<ExplorePinSelectTarget | null>(null);
 
   useEffect(

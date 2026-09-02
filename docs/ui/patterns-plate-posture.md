@@ -8,11 +8,12 @@ Builds on, and does not replace: [`patterns-map-canvas.md`](./patterns-map-canva
 
 ## 1. The rule
 
-One MapLibre plate mounts once in the root layout and never unmounts. It has exactly three declarative postures, and the posture is selected by the page's surface class (see [`patterns-surface-classes.md`](./patterns-surface-classes.md)), never by a component asking for one.
+One MapLibre plate mounts once in the root layout and never unmounts. It has exactly four declarative postures, and the posture is selected by the page's surface class (see [`patterns-surface-classes.md`](./patterns-surface-classes.md)), never by a component asking for one.
 
 | Posture | Where | Geometry | Gestures | Camera |
 |---|---|---|---|---|
 | **Live** | Instrument | Fixed, full viewport, z 0 | Reader driven | All moves, subject to both dignity gates |
+| **Ambient** | Door | Fixed, full viewport, z 0, same style and markers as Live | Locked; clicks and taps still reach clusters and pins | The scroll chapters' own `flyTo`, the same flights the Atlas story mode makes |
 | **Framed** | Record page, chapter map moment | Inset into a bounded in-flow slot, z 26 | Locked until **Explore this place** | `flyTo` at stored precision only |
 | **Parked** | Reading room by default, Utility always | Not painted, no GL cost on screen | None | None |
 

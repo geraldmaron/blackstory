@@ -1,5 +1,10 @@
 # Environment and workload isolation (, re-split by )
 
+> **Leftover isolation design.** Current live stack (2026-08-28): public web and admin on
+> Vercel; product SoR is Supabase `blackstory-app`. The "Verified live vs. designed" App
+> Hosting row below is historical. Firebase App Hosting backends for web and admin are
+> deleted.
+
 > **Design target: three-project topology**, per [ADR-012](../adr/ADR-012-production-environment-resplit.md)
 >, superseding the single-project design D-013 recorded here on 2026-07-16.
 > **Live reality is unchanged by this document alone** — the actual migration (creating
@@ -19,7 +24,7 @@
 | GCP/Firebase projects | `black-book-efaaf` (project number `332234323945`) is the only live project; Hosting site `black-book-efaaf.web.app` exists | `blackbook-prod` (= `black-book-efaaf`, retained — see ADR-012), `blackbook-staging` (new), `blackbook-internal` (new) |
 | Firebase Hosting | `black-book-efaaf.web.app` exists | App content/release state is outside this design |
 | Firebase apps | **BlackStory Web** `1:332234323945:web:17be349ebc9c029b3bfd78`; **BlackStory Admin** `1:332234323945:web:e1b31c78e32d95943bfd78` | Admin app re-registered under `blackbook-internal` Firebase Auth config at migration time |
-| App Hosting | Admin interim backend `black-book-admin-production` (`apphosting.admin.yaml`); public web App Hosting retired (ADR-027 / Vercel) | `black-book-admin-production` in `blackbook-prod`; owner deletes retired `black-book-web-*` backends |
+| App Hosting | **Leftover / deleted.** Public web and admin are on Vercel. `black-book-web-*` and `black-book-admin-production` backends were removed. | Do not recreate App Hosting backends |
 | Firestore | Not enabled | `(default)` DB in `blackbook-prod`/`blackbook-staging`; named databases `raw-ingest` and `curated` in `blackbook-internal` (ADR-012) |
 | Workload isolation | One live project, no split yet | Three-project split with one-way promotion IAM asymmetry (ADR-012) |
 

@@ -127,6 +127,8 @@ test('next.config.mjs wires global security headers', () => {
     'storage.googleapis.com',
     'twykhihqkcldpreuovay.supabase.co',
     'upload.wikimedia.org',
+    'commons.wikimedia.org',
+    'thumb.wikimedia.org',
     'va.vercel-scripts.com',
     'vitals.vercel-insights.com',
   ]) {

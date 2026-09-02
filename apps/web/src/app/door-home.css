@@ -536,8 +536,47 @@ html:has(.ds-door) {
   }
 }
 
-body:has(.ds-door) .ds-map-stage {
-  display: none;
+/*
+ * The live plate. `/` is the `door` surface: the shared MapLibre plate paints full-bleed in its
+ * `ambient` posture (shell.css) with the same clustered field the Atlas draws. The static board
+ * above is first paint and the no-WebGL field; once the plate stamps `data-plate-ready` the board
+ * steps aside and the canvas behind it is the map.
+ */
+body:has(.ds-map-stage[data-plate-ready]) .ds-door,
+body:has(.ds-map-stage[data-plate-ready]) .ds-door__field,
+body:has(.ds-map-stage[data-plate-ready]) .ds-door__board-frame {
+  background: transparent;
+}
+
+body:has(.ds-map-stage[data-plate-ready]) .ds-door__board-frame {
+  visibility: hidden;
+}
+
+/* Marker and cluster clicks have to reach the plate through the Door's own layers. */
+body:has(.ds-map-stage[data-plate-ready]) .ds-door__field {
+  pointer-events: none;
+}
+
+/*
+ * The shell wrappers cover the viewport and sit above the plate in paint order (the plate is
+ * their earlier sibling). `pointer-events` does not inherit, so each covering ancestor has to
+ * pass through or a click aimed at a cluster lands on `.ds-shell-body` — the same seam
+ * atlas.css opens for the Instrument. The bar, the cards and the pin links re-enable
+ * themselves; the footer is not rendered on this surface.
+ */
+.ds-shell:has(.ds-door),
+.ds-shell:has(.ds-door) .ds-shell-body,
+.ds-shell-page-transition:has(.ds-door) {
+  pointer-events: none;
+}
+
+.ds-shell:has(.ds-door) .ds-shell-offline {
+  pointer-events: auto;
+}
+
+/* Find chrome stays above the fixed pin field; stale `--ds-island-clearance` must not block hits. */
+body:has(.ds-door) .ds-shell > .ds-bar {
+  pointer-events: auto;
 }
 
 /* Immersive Door: footer is still in Rooms and Find. */
@@ -603,6 +642,11 @@ body:has(.ds-door) .ds-door-journey {
     padding: var(--ds-space-3) var(--ds-gutter);
     background: var(--ds-canvas);
     border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  }
+
+  /* With the plate live the sticky field is a window onto the full-bleed map, not a panel. */
+  body:has(.ds-map-stage[data-plate-ready]) .ds-door__field {
+    border-bottom-color: transparent;
   }
 
   .ds-door__board-frame {

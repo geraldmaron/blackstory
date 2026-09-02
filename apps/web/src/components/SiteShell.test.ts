@@ -12,8 +12,8 @@ import { surfaceClassFor } from '../lib/nav/surface-classes';
 const here = dirname(fileURLToPath(import.meta.url));
 
 test('only the Atlas resolves to the instrument class', () => {
-  assert.equal(surfaceClassFor('/'), 'reading');
-  assert.equal(surfaceClassFor('/', 'atlas=1'), 'reading');
+  assert.equal(surfaceClassFor('/'), 'door');
+  assert.equal(surfaceClassFor('/', 'atlas=1'), 'door');
   assert.equal(surfaceClassFor('/explore'), 'instrument');
   assert.equal(surfaceClassFor('/explore/api'), null);
   assert.equal(surfaceClassFor('/locate'), 'utility');
@@ -27,11 +27,4 @@ test('the two shell gates read the same registry, so they cannot disagree', () =
   assert.match(footer, /useSurfaceClass/);
   assert.match(header, /=== 'instrument'/);
   assert.match(footer, /=== 'instrument'/);
-});
-
-test('SiteHeader uses the theme-paired lockup on every route it renders on', () => {
-  const source = readFileSync(join(here, 'SiteHeader.tsx'), 'utf8');
-  assert.match(source, /brandDisplay="lockup"/);
-  assert.doesNotMatch(source, /brandDisplay=\{isExplore/);
-  assert.doesNotMatch(source, /isAtlasShell/);
 });

@@ -195,7 +195,7 @@ export function createCommonsMediaClient(options: FetchCommonsMediaClientOptions
         action: 'query',
         titles: batch.join('|'),
         prop: 'imageinfo',
-        iiprop: 'url|extmetadata',
+        iiprop: 'url|extmetadata|sha1',
         iiurlwidth: '800',
         format: 'json',
         origin: '*',
@@ -211,6 +211,7 @@ export function createCommonsMediaClient(options: FetchCommonsMediaClientOptions
                 readonly imageinfo?: readonly {
                   readonly url?: string;
                   readonly thumburl?: string;
+                  readonly sha1?: string;
                   readonly extmetadata?: Readonly<Record<string, { readonly value?: string }>>;
                 }[];
               }
@@ -229,6 +230,7 @@ export function createCommonsMediaClient(options: FetchCommonsMediaClientOptions
           commonsPageUrl: commonsFilePageUrl(fileTitle),
           ...(info?.thumburl !== undefined ? { thumbUrl: info.thumburl } : {}),
           ...(info?.url !== undefined ? { fullUrl: info.url } : {}),
+          ...(info?.sha1 !== undefined ? { sha1: info.sha1 } : {}),
           ...(meta.LicenseShortName?.value !== undefined
             ? { licenseShortName: meta.LicenseShortName.value }
             : {}),

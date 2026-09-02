@@ -16,6 +16,7 @@ import {
   HISTORY_FILTER_GROUPS,
   HISTORY_KIND_CATEGORIES,
   HISTORY_KIND_TO_CATEGORY,
+  historyKindToRecordsKind,
   historyKindsForCategory,
   isHistoryKindCategory,
   statusLabelToSlug,
@@ -36,6 +37,15 @@ test('HISTORY_FILTER_GROUPS groups era + status together and defers topics', () 
   assert.equal(HISTORY_FILTER_GROUPS.topics.advanced, true);
 });
 
+test('historyKindToRecordsKind remaps history-only categories at the redirect boundary', () => {
+  assert.equal(historyKindToRecordsKind('law'), 'sources');
+  assert.equal(historyKindToRecordsKind('works'), 'sources');
+  assert.equal(historyKindToRecordsKind('people'), 'people');
+  assert.equal(historyKindToRecordsKind('place'), 'place');
+  assert.equal(historyKindToRecordsKind('all'), 'all');
+  assert.equal(historyKindToRecordsKind(''), '');
+});
+
 test('every canonical entity kind maps to exactly one consolidated category', () => {
   for (const kind of ENTITY_KINDS) {
     const categoryId = HISTORY_KIND_TO_CATEGORY[kind];
@@ -54,6 +64,15 @@ test('every canonical entity kind maps to exactly one consolidated category', ()
       );
     }
   }
+});
+
+test('historyKindToRecordsKind remaps history-only categories at the redirect boundary', () => {
+  assert.equal(historyKindToRecordsKind('law'), 'sources');
+  assert.equal(historyKindToRecordsKind('works'), 'sources');
+  assert.equal(historyKindToRecordsKind('people'), 'people');
+  assert.equal(historyKindToRecordsKind('place'), 'place');
+  assert.equal(historyKindToRecordsKind('all'), 'all');
+  assert.equal(historyKindToRecordsKind(''), '');
 });
 
 test('category ids and raw kinds are distinguishable', () => {

@@ -21,6 +21,7 @@ import { basename, extname } from 'node:path';
 import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
+import { entityPrimaryImageUploadMetadata } from './lib/entity-primary-image-upload-metadata.ts';
 import {
   entityPrimaryImageObjectRef,
   preparePublicEntityProjectionForWrite,
@@ -92,15 +93,15 @@ async function main(): Promise<void> {
   const bucket = getStorage().bucket(ref.bucket);
   await bucket.upload(filePath, {
     destination: ref.objectPath,
-    metadata: {
+    metadata: entityPrimaryImageUploadMetadata({
       contentType,
-      metadata: {
+      custom: {
         entityId,
         purpose: 'entity-primary-image',
         rightsStatus: rights,
         sourceFile: basename(filePath),
       },
-    },
+    }),
     resumable: false,
   });
 

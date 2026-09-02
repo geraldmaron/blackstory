@@ -70,7 +70,9 @@ Step radii from `CLUSTER_RADIUS_BY_COUNT` at locality zoom, scaled down at natio
 | 50–199 | 18 |
 | 200+ | 22 |
 
-Copper aggregate fill; count label inside. Color key lists the same four steps.
+Dominant kind-family shade (same palette as single pins); count label inside. Mixed-kind
+clusters pick the family with the most records; ties break events → sources → organizations →
+places → people. Color key lists cluster **size** steps only (radius grows with count).
 
 ---
 
@@ -84,7 +86,8 @@ Color key includes all four tiers beside the size sections.
 
 ## Filters
 
-**Kind** facet uses the five **family** slugs (`people`, `places`, …), not twelve micro-kinds. Legacy `?kind=publication` URLs still filter that micro-kind until re-shared.
+**Kind** facet uses the five **family** slugs (`people`, `places`, …), not twelve micro-kinds.
+Micro-kind deep links (`?kind=place`) still filter that kind until re-shared as a family slug.
 
 Other facets (Tone, Era, Theme, Status, Confidence, Where) unchanged.
 
@@ -130,6 +133,7 @@ Door scopes larger national discs via `body:has(.ds-door)` variable overrides on
 | Family + tone encoding | `kind-encoding.test.ts` |
 | Family facet filter | `filters.test.ts` |
 | Legend contract | `MapExperienceLegend.test.ts` |
+| Cluster dominant-family paint | `cluster-encoding.test.ts`, `cluster-expand.test.ts` |
 | MapLibre paint | `explore-style.test.ts` |
 | Feature denormalization | `build-explore-map-source.test.ts` |
 | First-paint pin tokens | `first-paint-pin-tokens.test.ts` |

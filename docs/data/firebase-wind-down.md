@@ -1,5 +1,10 @@
 # Firebase wind-down checklist (owner)
 
+> **Leftover stack.** Current live stack (verified 2026-08-28): public web on Vercel; product
+> data/media on Supabase `blackstory-app` (`https://twykhihqkcldpreuovay.supabase.co`). Firebase
+> App Hosting, Firestore, and GCS dual-serve are leftover, not the current SoR. This checklist
+> is retained for owner wind-down. It does not claim overages or org bills are closed.
+
 After Postgres cutover, **do not delete** production Firebase project `black-book-efaaf` or its data without dual verification + a verified export. Prefer pause/archive with Firestore left read-only or unused.
 
 ## Already done in-repo (agents)

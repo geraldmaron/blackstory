@@ -430,40 +430,218 @@
   font-size: 0.8125rem;
 }
 
-/* Accepted claims: stop using Card-title size/weight for claim copy. Predicate is a quiet
- * label; claim prose is normal body weight and reading size. */
-.ds-entity-evidence .ds-card__title {
-  font-family: var(--ds-font-sans);
-  font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1.4;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
-}
-
-/* Also stop using Card's own box: `.ds-card` is the shared bordered-panel primitive, right for
-   a standalone surface and wrong for a stack of them — a claims list of bordered boxes is the
-   old catalogue-card look the room kit replaced with hairline rows everywhere else. `.ds-stack`
-   already spaces the claims with its grid gap; each claim after the first gets a hairline top
-   instead of a box, matching `.ds-record-beat + .ds-record-beat`. */
+/* —— Accepted claims ————————————————————————————————————————————————————————————
+   A claim is a row, not a card: `.ds-card` is the shared bordered-panel primitive, right for a
+   standalone surface and wrong for a stack of them. Each claim after the first gets a hairline
+   top, matching `.ds-record-beat + .ds-record-beat`. A tone bar down the left edge carries the
+   confidence tier (paired with the confidence pill, so colour is never the only signal). Sizes
+   are the record scale (`--rec-*`, record-room.css). */
 .ds-entity-evidence .ds-card {
+  position: relative;
   background: none;
   border: 0;
   border-radius: 0;
-  padding: 0;
+  padding: 0 0 0 var(--ds-space-4);
+}
+
+.ds-entity-evidence .ds-card::before {
+  content: '';
+  position: absolute;
+  top: 0.35rem;
+  bottom: 0.35rem;
+  left: 0;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--room-rule-2, var(--ds-rule));
+}
+
+.ds-entity-evidence .ds-evidence-claim--high::before {
+  background: var(--ds-confidence-high-border);
+}
+
+.ds-entity-evidence .ds-evidence-claim--medium::before {
+  background: var(--ds-confidence-medium-border);
+}
+
+.ds-entity-evidence .ds-evidence-claim--low::before {
+  background: var(--ds-confidence-low-border);
 }
 
 .ds-entity-evidence .ds-stack > .ds-card + .ds-card {
+  margin-top: var(--ds-space-5);
   padding-top: var(--ds-space-5);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-top: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
+}
+
+.ds-entity-evidence .ds-stack > .ds-card + .ds-card::before {
+  top: calc(var(--ds-space-5) + 0.35rem);
+}
+
+/* The predicate is a quiet label above the claim, not a card title. */
+.ds-entity-evidence .ds-card__title {
+  margin: 0 0 var(--ds-space-1);
+  font-family: var(--ds-font-mono);
+  font-size: var(--rec-eyebrow, 0.6875rem);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
 }
 
 .ds-evidence-claim__body {
   margin: 0 0 var(--ds-space-3);
   font-family: var(--ds-font-editorial);
-  font-size: 0.9375rem;
+  font-size: var(--rec-body, 0.9375rem);
   font-weight: 400;
   line-height: 1.6;
   color: var(--ds-ink);
+}
+
+.ds-evidence-claim__meta {
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin: 0 0 var(--ds-space-3);
+}
+
+/* The confidence badge as a pill on the record scale. */
+.ds-entity-evidence .ds-confidence {
+  height: var(--rec-pill-h, 1.75rem);
+  padding: 0 0.7rem;
+  border-radius: var(--ds-radius-full);
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta, 0.8125rem);
+  line-height: 1;
+}
+
+.ds-entity-evidence .ds-confidence__mark {
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+}
+
+.ds-evidence-claim__notes {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: var(--ds-space-3);
+  row-gap: var(--ds-space-1);
+  margin: 0 0 var(--ds-space-3);
+  font-size: var(--rec-meta, 0.8125rem);
+  line-height: 1.5;
+}
+
+.ds-evidence-claim__notes dt {
+  font-family: var(--ds-font-mono);
+  font-size: var(--rec-eyebrow, 0.6875rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+  padding-top: 0.15em;
+}
+
+.ds-evidence-claim__notes dd {
+  margin: 0;
+  color: var(--ds-ink);
+}
+
+/* The citation, inline under the claim: label, then the source, on one hairline. */
+.ds-entity-evidence .ds-citation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  padding: var(--ds-space-2) 0 0;
+  border-left: 0;
+  border-top: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
+  border-radius: 0;
+  background: none;
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta, 0.8125rem);
+  line-height: 1.5;
+}
+
+/* The label is the source's own title, so it reads as a title: sans, sentence case. The link
+   is the host, in mono, one step down. */
+.ds-entity-evidence .ds-citation__label {
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta, 0.8125rem);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ds-ink);
+}
+
+.ds-entity-evidence .ds-citation a {
+  font-family: var(--ds-font-mono);
+  font-size: var(--rec-eyebrow, 0.6875rem);
+  letter-spacing: 0.02em;
+  color: var(--ds-ink-muted);
+  text-decoration-color: color-mix(in srgb, var(--ds-accent) 45%, transparent);
+}
+
+.ds-entity-evidence .ds-citation a:hover {
+  color: var(--ds-accent);
+  text-decoration-color: currentColor;
+}
+
+.ds-evidence-claim__withheld,
+.ds-evidence-claim__coverage {
+  margin: var(--ds-space-2) 0 0;
+  font-size: var(--rec-meta, 0.8125rem);
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+.ds-evidence-claim__excerpt {
+  margin: var(--ds-space-3) 0 0;
+  padding: 0 0 0 var(--ds-space-4);
+  border-left: 2px solid var(--ds-accent-graphic);
+  font-family: var(--ds-font-editorial);
+  font-size: var(--rec-body, 0.9375rem);
+  font-style: italic;
+  line-height: 1.55;
+  color: var(--ds-ink);
+}
+
+.ds-evidence-claim__notice {
+  margin-top: var(--ds-space-3);
+}
+
+.ds-evidence-claim__notice-lede {
+  margin: 0;
+}
+
+.ds-evidence-claim__notice-more {
+  margin: var(--ds-space-2) 0 0;
+}
+
+.ds-evidence-claim__alternates {
+  margin: var(--ds-space-2) 0 0;
+  padding-left: var(--ds-space-5);
+}
+
+.ds-evidence-claim__history {
+  margin-top: var(--ds-space-3);
+  font-size: var(--rec-meta, 0.8125rem);
+}
+
+.ds-evidence-claim__history-summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ds-evidence-claim__history-list {
+  margin: var(--ds-space-2) 0 0;
+  padding-left: var(--ds-space-5);
+}
+
+/* The measurement legend and coverage summary follow the claims at the meta register. */
+.ds-entity-evidence .ds-evidence-legend__summary,
+.ds-entity-evidence .ds-aside-block__title {
+  font-size: var(--rec-h3, 0.875rem);
+}
+
+.ds-entity-evidence .ds-evidence-legend__body,
+.ds-entity-evidence .ds-entity-meta-list__row dd,
+.ds-entity-evidence .ds-aside-block__meta {
+  font-size: var(--rec-meta, 0.8125rem);
 }

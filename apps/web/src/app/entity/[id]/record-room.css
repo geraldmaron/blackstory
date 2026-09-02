@@ -1,63 +1,190 @@
 /**
- * The record room's own two rules, over `record-page.css` (which is itself a thin layer over the
- * shared kit). Everything structural — measure, centring, header, rail placement, prose, sources,
- * connections, trust grid — comes from the kit. This file exists for the beats in the column and
- * the blocks in the rail, and it should not grow past that.
+ * The record room's own rules, over `record-page.css` (which is itself a thin layer over the
+ * shared kit). Everything structural — measure, centring, rail placement, prose, sources,
+ * connections — comes from the kit. This file owns the record chrome: the masthead, the pills,
+ * the fact tiles and meters, the beats and their headings, the rail's table of contents and
+ * record file, and the apparatus band.
  *
- * Not a `*-edition.css`: the v6 entity edition drew its own header, its own panel frame and its
- * own numbered index, which is exactly what `room-kit.test.tsx` now forbids under app/.
+ * ONE SCALE. Every size in the record is one of the `--rec-*` tokens below. The page used to
+ * carry eleven distinct body sizes between the masthead and the footer (12px, 12.5px, 13px,
+ * 13.5px, 15.5px, 16px, 17px, 19px, 0.8125rem, 0.9375rem, 1.0625rem), which is the specific
+ * reason it read as assembled rather than designed. A block that needs a new size adds a token
+ * here, not a literal there.
+ *
+ * ONE ICON LANGUAGE. Pills, tiles, beat headings and apparatus titles all draw from
+ * `RecordChrome.tsx`, which draws from the Atlas's own kind / status / confidence icon sets, so
+ * a person is the same glyph on the map, in the pill and on the tile.
+ *
+ * Not a `*-edition.css`: `room-kit.test.tsx` forbids per-route edition chrome under app/.
  */
 
-/* —— column beats ——————————————————————————————————————————————————————————
-   A beat is a heading and its prose, separated by space and a hairline rather than boxed in a
-   card. Cards made every section look like the same object; a rule makes them read as one
-   document that continues. */
-.ds-record-beat + .ds-record-beat {
-  margin-top: var(--ds-space-8);
-  padding-top: var(--ds-space-7);
-  border-top: var(--ds-border-width) solid var(--room-rule-2);
+/* —— the scale ————————————————————————————————————————————————————————————————— */
+.ds-room {
+  --rec-eyebrow: 0.6875rem; /* mono caps: labels, indices, counts */
+  --rec-meta: 0.8125rem; /* sans: supporting lines, TOC, file rows */
+  --rec-body: 0.96875rem; /* editorial: claims, notes */
+  --rec-lede: clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem);
+  --rec-value: 1.0625rem; /* display: tile values */
+  --rec-h3: 0.875rem; /* sans 600: small titles */
+  --rec-h2: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem); /* display 600: beat headings */
+  --rec-title: clamp(2.125rem, 1.4rem + 3.6vw, 3.625rem);
+  --rec-pill-h: 1.75rem;
+  --rec-plate: 2.25rem; /* icon plates on tiles and beat headings */
+  --rec-plate-sm: 1.75rem;
+  --rec-tone-high: var(--ds-confidence-high-fg);
+  --rec-tone-high-bar: var(--ds-confidence-high-border);
+  --rec-tone-medium: var(--ds-confidence-medium-fg);
+  --rec-tone-medium-bar: var(--ds-confidence-medium-border);
+  --rec-tone-low: var(--ds-confidence-low-fg);
+  --rec-tone-low-bar: var(--ds-confidence-low-border);
 }
 
-.ds-record-beat__heading {
+/* —— shared atoms —————————————————————————————————————————————————————————————— */
+
+/* A small count beside a title: mono, hairline, never a badge shouting. */
+.ds-rec-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.25rem;
+  margin-left: var(--ds-space-2);
+  padding: 0 0.4rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  font-family: var(--ds-font-mono);
+  font-size: var(--rec-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: var(--room-ink-3);
+  vertical-align: middle;
+}
+
+.ds-rec-inline-icon {
+  width: 0.8125rem;
+  height: 0.8125rem;
+  margin-right: 0.45em;
+  vertical-align: -0.1em;
+}
+
+/* Pill: icon plus word. Surface-coloured; only the icon takes a tone. */
+.ds-rec-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: var(--rec-pill-h);
+  padding: 0 0.7rem 0 0.55rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  background: color-mix(in srgb, var(--ds-surface) 92%, transparent);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+a.ds-rec-pill:hover,
+a.ds-rec-pill:focus-visible {
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+.ds-rec-pill__icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex: none;
+  color: var(--room-ink-3);
+}
+
+.ds-rec-pill--status[data-variant='active'] .ds-rec-pill__icon,
+.ds-rec-pill--status[data-variant='living'] .ds-rec-pill__icon,
+.ds-rec-pill--status[data-variant='in_force'] .ds-rec-pill__icon {
+  color: var(--ds-accent);
+}
+
+.ds-rec-pill--era .ds-rec-pill__icon {
+  color: var(--ds-accent-graphic);
+}
+
+.ds-rec-pill--grade[data-variant='high'] .ds-rec-pill__icon {
+  color: var(--rec-tone-high);
+}
+
+.ds-rec-pill--grade[data-variant='medium'] .ds-rec-pill__icon {
+  color: var(--rec-tone-medium);
+}
+
+.ds-rec-pill--grade[data-variant='low'] .ds-rec-pill__icon {
+  color: var(--rec-tone-low);
+}
+
+.ds-rec-pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin: 0 0 var(--ds-space-4);
+}
+
+/* Meter: three bars. Colour carries the tone, the aria-label carries the word. */
+.ds-rec-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  vertical-align: middle;
+}
+
+.ds-rec-meter__seg {
+  display: inline-block;
+  width: 0.875rem;
+  height: 0.3125rem;
+  border-radius: 2px;
+  background: var(--room-rule-2);
+}
+
+.ds-rec-meter--high .ds-rec-meter__seg--on {
+  background: var(--rec-tone-high-bar);
+}
+
+.ds-rec-meter--medium .ds-rec-meter__seg--on {
+  background: var(--rec-tone-medium-bar);
+}
+
+.ds-rec-meter--low .ds-rec-meter__seg--on {
+  background: var(--rec-tone-low-bar);
+}
+
+.ds-rec-meter--unrated .ds-rec-meter__seg--on,
+.ds-rec-meter--coverage .ds-rec-meter__seg--on {
+  background: var(--ds-accent-graphic);
+}
+
+/* Small title: an icon and a word, for the rail and the apparatus. */
+.ds-rec-small-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin: 0 0 var(--ds-space-3);
-  font-family: var(--ds-font-display);
-  font-size: clamp(1.125rem, 1.02rem + 0.42vw, 1.375rem);
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-h3);
   font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.25;
+  letter-spacing: 0;
   color: var(--ds-ink);
 }
 
-.ds-record-beat__subheading {
-  margin: var(--ds-space-6) 0 var(--ds-space-3);
-  font-family: var(--ds-font-sans);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--room-ink-3);
+.ds-rec-small-title__icon {
+  width: 0.8125rem;
+  height: 0.8125rem;
+  flex: none;
+  color: var(--ds-accent-graphic);
 }
 
-/* One line under a heading saying what the block is, so a reader knows whether to read it. */
-.ds-record-beat__standfirst {
-  margin: 0 0 var(--ds-space-4);
-  max-width: 62ch;
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--room-ink-3);
-}
-
-.ds-record-beat__links {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-2);
-}
-
-/* —— the masthead ——————————————————————————————————————————————————————————
-   The record's own photograph at the width of the page, with the record written over it. The
-   page used to open on a text header and then show a picture of the thing the header had just
-   named; a record is an object in the world, and this is the surface saying so. */
+/* —— the masthead ——————————————————————————————————————————————————————————————
+   The record's own photograph at the width of the page, with the record written over it. */
 .ds-record-mast {
   position: relative;
   display: flex;
@@ -88,10 +215,6 @@
   object-position: center top;
 }
 
-/*
- * A photograph fills the masthead and is cropped by it. It brings an editorial aspect of its own,
- * and without this the mast band showed a letterboxed strip of it.
- */
 .ds-record-mast[data-media='photo'] .ds-entity-photo,
 .ds-record-mast[data-media='photo'] .ds-entity-mark,
 .ds-record-mast[data-media='photo'] .ds-entity-mark__frame {
@@ -101,28 +224,13 @@
 }
 
 /*
- * A mark is not a photograph and the masthead stops pretending it is.
- *
- * Most records have no rights-cleared image and fall back to the kind mark: a pale plate with a
- * silhouette on it. Stretched full bleed under white display type that is a contrast failure, and
- * it also asserts imagery the archive does not hold. So the mark keeps its own proportion in a
- * short band, and the record is written under it on the canvas rather than over it.
+ * A mark is not a photograph and the masthead stops pretending it is. Most records have no
+ * rights-cleared image and fall back to the kind mark; it keeps its own proportion at emblem
+ * size beside the record, and the record opens on its own name.
  */
 .ds-record-mast[data-media='mark'] {
-  /*
-   * The mark is an emblem beside the record, not a band above it.
-   *
-   * It used to be stretched to the full width of the viewport in a 260px-tall band: a 240x280
-   * silhouette centred in 1680px of pale plate, with the record's title starting underneath it
-   * a screen further down. That is a masthead-sized hole where nine records in ten have no
-   * photograph — the archive's most common record opened on an empty rectangle.
-   *
-   * So the mark keeps its own proportion at emblem size and sits at the shell's right edge, with
-   * the breadcrumb, the facts, the title and the lede filling the shell's left. Nothing is
-   * stretched, nothing is cropped, and the record opens on its own name.
-   */
   display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--record-mark-w, 200px);
+  grid-template-columns: minmax(0, 1fr) var(--record-mark-w, 180px);
   align-items: end;
   column-gap: var(--ds-space-8);
   min-height: 0;
@@ -131,7 +239,6 @@
 }
 
 .ds-record-mast[data-media='mark'] > *:first-child {
-  /* Out of the absolute fill the photo masthead needs, back into the grid. */
   position: relative;
   inset: auto;
   grid-column: 2;
@@ -140,28 +247,17 @@
   height: auto;
 }
 
-/* `overflow: hidden` on the band used to clip this line off the bottom of the plate; at emblem
-   size it is the caption that says what kind of record the silhouette stands for, so it stays. */
 .ds-record-mast[data-media='mark'] .ds-entity-mark {
   height: auto;
 }
 
-/*
- * The mark's own context line is "Place · Folsom, New Mexico" — word for word the first two facts
- * of the line already set beside it in the masthead. One emblem carrying two captions that repeat
- * the heading next to them is the clutter, not the emblem. The reason caption below it stays,
- * because "no rights-cleared photograph is published" is the one thing this block knows that the
- * rest of the masthead does not.
- */
 .ds-record-mast[data-media='mark'] .ds-entity-mark__context {
   display: none;
 }
 
-/* The reason caption ("no photograph is published for this record") is rail-register detail under
-   an emblem, not a headline. */
 .ds-record-mast[data-media='mark'] .ds-entity-photo__credit {
   margin-top: var(--ds-space-2);
-  font-size: 10px;
+  font-size: var(--rec-eyebrow);
   text-align: right;
 }
 
@@ -172,11 +268,6 @@
   background: none;
 }
 
-/*
- * Narrow: one column, and the emblem goes back above the text — it is the first thing in the
- * document and there is no second column to hold it. Held to its own width rather than the
- * viewport's, which is the whole argument above.
- */
 @media (max-width: 47.9375rem) {
   .ds-record-mast[data-media='mark'] {
     grid-template-columns: minmax(0, 1fr);
@@ -186,7 +277,7 @@
   .ds-record-mast[data-media='mark'] > *:first-child {
     grid-column: 1;
     grid-row: 1;
-    width: var(--record-mark-w, 200px);
+    width: var(--record-mark-w, 160px);
     max-width: 100%;
     margin-bottom: var(--ds-space-6);
   }
@@ -201,11 +292,7 @@
   }
 }
 
-/*
- * The credit stays. It is a rights obligation on a photograph, not decoration, so it moves to the
- * corner of the plate rather than being hidden: the overlay owns the bottom-left, the credit takes
- * the bottom-right.
- */
+/* The credit is a rights obligation on a photograph, not decoration: bottom-right of the plate. */
 .ds-record-mast[data-media='photo'] .ds-entity-photo__credit,
 .ds-record-mast[data-media='photo'] .ds-entity-mark__context {
   position: absolute;
@@ -215,32 +302,20 @@
   margin: 0;
   max-width: 40ch;
   text-align: right;
-  font-size: 10px;
+  font-size: var(--rec-eyebrow);
   color: var(--room-ink-4);
 }
 
-/* Two captions can be present at once. Stack them rather than letting them print over each other. */
 .ds-record-mast[data-media='photo'] .ds-entity-photo__credit {
   bottom: calc(var(--ds-space-3) + 16px);
 }
 
-/*
- * The scrim. Not decoration: the title is set over a photograph the archive does not control the
- * exposure of, and without a floor under the text the same heading is legible on one record and
- * unreadable on the next.
- */
+/* The scrim: a floor under the type over a photograph the archive does not control the exposure of. */
 .ds-record-mast__over {
   position: relative;
   z-index: 1; /* local: over the mast media, inside the figure's own isolation context. */
   display: flex;
   flex-direction: column;
-  /*
-   * The scrim is sized to the text, not to the plate. Stretched over the whole masthead the same
-   * ramp put its opaque end under the photograph's midpoint and the picture never appeared; here
-   * the box starts where the text does, so everything above it is the photograph at full strength.
-   */
-  /* Inline padding is the shell, not the gutter: the title starts on the same vertical line as
-     the first line of the record below it. See `--record-shell-w` in record-page.css. */
   padding: var(--ds-space-16) var(--record-shell-pad) var(--ds-space-8);
   background: linear-gradient(
     to top,
@@ -250,207 +325,648 @@
   );
 }
 
-.ds-record-mast__facts {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-2) var(--ds-space-3);
-  margin: 0 0 var(--ds-space-3);
-  font-size: 12.5px;
-  color: var(--room-ink-3);
-}
-
-/* The separator is drawn rather than typed, so a missing fact cannot leave a dangling dot. */
-.ds-record-mast__facts > * + *::before {
-  content: '·';
-  margin-right: var(--ds-space-3);
-  color: var(--room-ink-4);
-}
-
-.ds-record-mast__kind {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  height: 26px;
-  padding: 0 10px 0 8px;
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-full);
-  background: color-mix(in srgb, var(--ds-surface) 80%, transparent);
-  backdrop-filter: blur(6px);
-  font-weight: 500;
-  color: var(--ds-ink);
-}
-
 .ds-record-mast__title {
   margin: 0;
   max-width: 20ch;
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(34px, 4.6vw, 60px);
+  font-size: var(--rec-title);
   line-height: 1.02;
   letter-spacing: -0.035em;
+  text-wrap: balance;
 }
 
 .ds-record-mast__lede {
   margin: var(--ds-space-4) 0 0;
-  max-width: 52ch;
+  max-width: 54ch;
   font-family: var(--ds-font-editorial);
-  font-size: clamp(16px, 1.4vw, 20px);
+  font-size: var(--rec-lede);
   line-height: 1.5;
   color: var(--room-ink-2);
 }
 
-/*
- * A floor under the type itself, over a photograph. The archive does not control the exposure of
- * the images it publishes, so a gradient alone is a gamble taken separately on every record: the
- * same grey facts line is legible over a dark plate and invisible over a bright one. The shadow
- * costs nothing where the scrim is already opaque and saves the line where it is not.
- */
-.ds-record-mast[data-media='photo'] .ds-record-mast__facts,
 .ds-record-mast[data-media='photo'] .ds-record-mast__title,
 .ds-record-mast[data-media='photo'] .ds-record-mast__lede,
 .ds-record-mast[data-media='photo'] .ds-record-mast__over .ds-room-crumb {
   text-shadow: 0 1px 16px var(--ds-canvas);
 }
 
-/* Muted ink is a step down from body copy against the canvas and a step down from nothing
-   against the bright top of a photograph. Same size, same weight, the colour back up.
-   The crumb needs the same lift, and needs it more: the scrim below (`.ds-record-mast__over`)
-   is sized to the text and opaque at its own bottom edge, fading to fully transparent at its
-   top, and the crumb is the first line in that box — right after the padding that clears the
-   title's clamp(). At a typical content height it lands around 80% up the gradient, where the
-   ramp is already down to roughly a third of its opacity, so it is the one overlay line the
-   text-shadow above does not reach without also getting the colour lift here. */
-.ds-record-mast[data-media='photo'] .ds-record-mast__facts,
 .ds-record-mast[data-media='photo'] .ds-record-mast__over .ds-room-crumb {
   color: var(--ds-ink);
 }
 
-/* The breadcrumb rides in the overlay rather than above the photograph, where it would push the
-   masthead down the page to make room for one line of mono. */
 .ds-record-mast__over .ds-room-crumb {
   margin-bottom: var(--ds-space-4);
 }
 
-/* —— the fact strip ————————————————————————————————————————————————————————
-   Four facts and the way to the map, on one line under the masthead. These were four stacked
-   boxes at the top of the rail: read once, then in the way for the rest of the page. */
-.ds-record-strip {
-  display: grid;
-  /*
-   * Four facts on the shell, and the map link on the end of it.
-   *
-   * The strip used to spread its five tracks across the whole viewport, which on a wide screen
-   * put ~400px between a label and the next one and stranded "See it on the map" against the far
-   * bezel — a row of facts reading as five unrelated widgets. The rule stays full bleed, because
-   * a division of the page should cross the page; only the facts come in to the shell.
-   */
-  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
-  align-items: center;
-  margin: 0;
-  padding-inline: var(--record-shell-pad);
+/* —— the fact strip —————————————————————————————————————————————————————————————
+   Five tiles on the shell and the ways out under them. A tile is an icon plate, a label, a
+   value and one supporting line (or a meter): the same shape five times, which is what makes
+   the row read as one instrument. */
+.ds-rec-facts {
+  width: min(100%, var(--record-shell-w));
+  margin-inline: auto;
+  padding: var(--ds-space-5) 0 var(--ds-space-6);
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
-/* Inline padding is `--ds-space-4`, not `-6`. On the shell the four fact tracks are ~209px each;
-   at 24px a side that left 161px of usable measure and "Folsom, New Mexico" — an ordinary place
-   label — broke over two lines, which set the strip's height from its longest value rather than
-   from its type. */
-.ds-record-strip > div {
-  padding: var(--ds-space-5) var(--ds-space-4);
-  border-left: var(--ds-border-width) solid var(--room-rule-2);
+.ds-rec-facts__tiles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--ds-space-3);
+  margin: 0;
 }
 
-/* The first and last cells sit ON the shell's edges, so their own inset would push the strip's
-   content off the line every other block starts and ends on. */
-.ds-record-strip > div:first-child {
-  padding-left: 0;
-  border-left: 0;
+.ds-rec-tile {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-3);
+  min-width: 0;
+  padding: var(--ds-space-4);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
 }
 
-.ds-record-strip__go {
-  justify-self: end;
-  padding-right: 0 !important;
+.ds-rec-tile__plate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--rec-plate);
+  height: var(--rec-plate);
+  border-radius: var(--ds-radius-sm);
+  background: color-mix(in srgb, var(--ds-canvas) 88%, var(--ds-ink));
+  border: var(--ds-border-width) solid var(--room-rule-2);
 }
 
-.ds-record-strip dt {
-  font-size: 12px;
+.ds-rec-tile__icon {
+  width: 1rem;
+  height: 1rem;
   color: var(--room-ink-3);
 }
 
-.ds-record-strip dd {
-  margin: 5px 0 0;
+.ds-rec-tile--evidence-high .ds-rec-tile__icon {
+  color: var(--rec-tone-high);
+}
+
+.ds-rec-tile--evidence-medium .ds-rec-tile__icon {
+  color: var(--rec-tone-medium);
+}
+
+.ds-rec-tile--evidence-low .ds-rec-tile__icon {
+  color: var(--rec-tone-low);
+}
+
+.ds-rec-tile__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.ds-rec-tile__label {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: var(--rec-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-rec-tile__value {
+  margin: 0;
   font-family: var(--ds-font-display);
-  /* Same reason as the padding above: the strip is four facts read at a glance, and 19px display
-     type is a size that only fits the shortest of them. */
-  font-size: 17px;
+  font-size: var(--rec-value);
   font-weight: 600;
   line-height: 1.25;
   letter-spacing: -0.015em;
-  /* When a value does have to wrap, break it evenly rather than leaving one orphaned word. */
+  color: var(--ds-ink);
+  overflow-wrap: anywhere;
   text-wrap: balance;
 }
 
-@media (max-width: 60rem) {
-  .ds-record-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+.ds-rec-tile__value a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-rec-tile__value a:hover,
+.ds-rec-tile__value a:focus-visible {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ds-rec-tile__support {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.15rem 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
+  line-height: 1.35;
+  color: var(--room-ink-3);
+}
+
+.ds-rec-facts__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-4);
+}
+
+.ds-rec-facts__actions .ds-cta {
+  text-decoration: none;
+}
+
+@media (max-width: 67.9375rem) {
+  .ds-rec-facts {
+    padding-inline: var(--ds-gutter);
   }
 
-  .ds-record-strip > div {
-    padding-inline: 0;
-    border-top: var(--ds-border-width) solid var(--room-rule-2);
-  }
-
-  .ds-record-strip > div:nth-child(odd) {
-    border-left: 0;
-  }
-
-  .ds-record-strip__go {
-    grid-column: 1 / -1;
-    justify-self: stretch;
+  .ds-rec-facts__tiles {
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
   }
 }
 
-/* —— the rail's table of contents ————————————————————————————————————————— */
+@media (max-width: 40rem) {
+  .ds-rec-facts__tiles {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* —— topic tags: the same pill, dashed for eras ————————————————————————————————— */
+.ds-room .ds-entity-tags {
+  gap: var(--ds-space-2);
+  margin: 0 0 var(--ds-space-2);
+}
+
+.ds-room .ds-entity-tag {
+  min-height: var(--rec-pill-h);
+  padding: 0 0.7rem;
+  border-radius: var(--ds-radius-full);
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
+  font-weight: 500;
+  color: var(--room-ink-2);
+}
+
+.ds-room .ds-entity-tag--era {
+  border-style: dashed;
+  font-family: var(--ds-font-mono);
+  font-size: var(--rec-eyebrow);
+  letter-spacing: 0.04em;
+}
+
+/* —— column beats ———————————————————————————————————————————————————————————————
+   A beat is a heading and its content, separated by space and a hairline rather than boxed in
+   a card. The heading is one shape everywhere: running index, section icon, title, count. */
+.ds-record-beat + .ds-record-beat,
+.ds-rec-session {
+  margin-top: var(--ds-space-10);
+  padding-top: var(--ds-space-7);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-rec-beat-head {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  grid-template-areas:
+    'index plate title'
+    'standfirst standfirst standfirst';
+  align-items: center;
+  column-gap: var(--ds-space-3);
+  margin: 0 0 var(--ds-space-5);
+}
+
+.ds-rec-beat-head__index {
+  grid-area: index;
+  font-family: var(--ds-font-mono);
+  font-size: var(--rec-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--ds-accent-graphic);
+}
+
+.ds-rec-beat-head__plate {
+  grid-area: plate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--rec-plate-sm);
+  height: var(--rec-plate-sm);
+  border-radius: var(--ds-radius-sm);
+  background: color-mix(in srgb, var(--ds-canvas) 90%, var(--ds-ink));
+  border: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-rec-beat-head__icon {
+  width: 0.8125rem;
+  height: 0.8125rem;
+  color: var(--room-ink-2);
+}
+
+.ds-record-beat__heading {
+  grid-area: title;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--rec-h2);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--ds-ink);
+}
+
+/* Headings still set directly (the place page's Stories and Trust beats) keep the scale. */
+.ds-record-beat > .ds-record-beat__heading {
+  margin-bottom: var(--ds-space-4);
+}
+
+.ds-record-beat__standfirst {
+  grid-area: standfirst;
+  margin: var(--ds-space-2) 0 0;
+  max-width: 62ch;
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
+  line-height: 1.55;
+  color: var(--room-ink-3);
+}
+
+.ds-record-beat__subheading {
+  margin: var(--ds-space-6) 0 var(--ds-space-3);
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-h3);
+  font-weight: 600;
+  color: var(--room-ink-3);
+}
+
+.ds-record-beat__links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-record-beat__links > li {
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-record-beat__links a {
+  display: block;
+  padding: var(--ds-space-3) 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-body);
+  font-weight: 500;
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-record-beat__links a:hover {
+  color: var(--ds-accent);
+}
+
+/* The record's prose, in the caption register. */
+[data-surface='record'] .ds-room-prose {
+  font-size: var(--rec-body);
+}
+
+/* Status: the current standing as a pill, the history as ruled rows. */
+.ds-entity-status__current {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  margin: 0 0 var(--ds-space-4);
+}
+
+.ds-entity-status__current .ds-mono {
+  font-size: var(--rec-eyebrow);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-entity-status__current .ds-status-mark {
+  height: var(--rec-pill-h);
+  padding: 0 0.7rem 0 0.55rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  background: color-mix(in srgb, var(--ds-surface) 92%, transparent);
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
+  text-transform: capitalize;
+  color: var(--ds-ink);
+}
+
+.ds-entity-status__note {
+  margin: var(--ds-space-2) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
+  line-height: 1.55;
+  color: var(--room-ink-3);
+}
+
+.ds-record-beat .ds-qualify-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
+  color: var(--room-ink-2);
+}
+
+.ds-record-beat .ds-qualify-list > li {
+  padding: var(--ds-space-2) 0;
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+/* Timeline: copper markers, mono dates, the kit's line. */
+.ds-record-beat .ds-timeline {
+  border-left-color: var(--room-rule-2);
+}
+
+.ds-record-beat .ds-timeline__marker {
+  background: var(--ds-accent-graphic);
+  border-color: var(--ds-canvas);
+}
+
+.ds-record-beat .ds-timeline__time {
+  font-size: var(--rec-eyebrow);
+  letter-spacing: 0.06em;
+  color: var(--ds-accent);
+}
+
+.ds-record-beat .ds-timeline__title {
+  font-family: var(--ds-font-display);
+  font-size: var(--rec-value);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.ds-record-beat .ds-timeline__body {
+  font-size: var(--rec-meta);
+  line-height: 1.55;
+}
+
+/* Connections: the constellation's diagram nodes and list rows on the same scale. */
+.ds-record-beat .ds-constellation__diagram {
+  padding: var(--ds-space-4);
+  border-radius: var(--ds-radius-md);
+  background: color-mix(in srgb, var(--ds-canvas) 94%, var(--ds-ink));
+}
+
+.ds-record-beat .ds-constellation__center {
+  display: inline-flex;
+  align-items: center;
+  height: var(--rec-pill-h);
+  padding: 0 0.8rem;
+  margin-bottom: var(--ds-space-2);
+  border: var(--ds-border-width) solid var(--ds-accent-graphic);
+  border-radius: var(--ds-radius-full);
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
+  font-weight: 600;
+}
+
+.ds-record-beat .ds-constellation__node {
+  background: var(--ds-surface);
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-record-beat .ds-constellation__rel {
+  font-size: var(--rec-eyebrow);
+  letter-spacing: 0.04em;
+}
+
+.ds-record-beat .ds-constellation__name,
+.ds-record-beat .ds-constellation__link-name {
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
+  font-weight: 600;
+}
+
+.ds-record-beat .ds-constellation__link-rel {
+  font-size: var(--rec-eyebrow);
+  letter-spacing: 0.04em;
+  color: var(--ds-accent);
+}
+
+/* The diagram is the picture; the list is the links. Two columns so the two together do not
+   run a screen and a half for six connections. */
+.ds-record-beat .ds-constellation__list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--ds-space-6);
+  border-top-color: var(--room-rule-2);
+}
+
+.ds-record-beat .ds-constellation__list > li {
+  border-bottom-color: var(--room-rule-2);
+}
+
+@media (max-width: 40rem) {
+  .ds-record-beat .ds-constellation__list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ds-record-beat .ds-room-conns {
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-record-beat .ds-room-conn {
+  padding: var(--ds-space-3) 0;
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
+  border-radius: 0;
+}
+
+.ds-record-beat .ds-room-conn:hover {
+  background: none;
+}
+
+.ds-record-beat .ds-room-conn:hover .ds-room-conn__name {
+  color: var(--ds-accent);
+}
+
+.ds-record-beat .ds-room-conn__name {
+  font-size: var(--rec-meta);
+  font-weight: 600;
+}
+
+.ds-record-beat .ds-room-conn__rel {
+  font-size: var(--rec-eyebrow);
+  letter-spacing: 0.04em;
+  color: var(--ds-accent);
+}
+
+/* Archived copies: the same heading register as a beat's small title. */
+.ds-record-beat .ds-record-archive__heading {
+  font-family: var(--ds-font-display);
+  font-size: var(--rec-h2);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: var(--ds-ink);
+}
+
+/* Keep reading: the session controls under a titled beat, not a bare toolbar. */
+.ds-rec-session__note {
+  margin: 0 0 var(--ds-space-4);
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
+  color: var(--room-ink-3);
+}
+
+.ds-rec-session .ds-rec-small-title {
+  font-family: var(--ds-font-display);
+  font-size: var(--rec-h2);
+  letter-spacing: -0.02em;
+}
+
+/* —— the rail —————————————————————————————————————————————————————————————————— */
+@media (min-width: 68rem) {
+  [data-surface='record'] .ds-room__rail {
+    position: sticky;
+    top: calc(var(--ds-island-clearance) + var(--ds-space-4));
+    align-self: start;
+    max-height: calc(100dvh - var(--ds-island-clearance) - var(--ds-space-8));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
 .ds-record-toc {
   display: flex;
   flex-direction: column;
-  gap: 2px;
   margin-top: var(--ds-space-7);
 }
 
 .ds-record-toc__title {
   margin-bottom: var(--ds-space-2);
-  font-size: 12px;
-  color: var(--room-ink-3);
+}
+
+.ds-record-toc__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .ds-record-toc__link {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--ds-space-2);
-  padding: 7px 0 7px var(--ds-space-3);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--ds-space-3);
+  padding: 0.45rem 0 0.45rem var(--ds-space-3);
   border-left: 2px solid var(--room-rule-2);
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
   color: var(--room-ink-3);
-  font-size: 13.5px;
   text-decoration: none;
 }
 
-.ds-record-toc__link:hover {
-  border-left-color: var(--ds-accent);
+.ds-record-toc__link:hover,
+.ds-record-toc__link:focus-visible {
+  border-left-color: var(--ds-accent-graphic);
   color: var(--ds-ink);
 }
 
-.ds-record-toc__link .ds-mono {
-  font-size: 11px;
+.ds-record-toc__index {
+  font-family: var(--ds-font-mono);
+  font-size: var(--rec-eyebrow);
+  letter-spacing: 0.06em;
+  color: var(--ds-accent-graphic);
 }
 
-/* —— the apparatus band ————————————————————————————————————————————————————
-   Three columns under the record: what it was built from, where it came from, and what is still
-   missing. Every one of these was a box in the rail. */
-/* 1180px was a fourth measure on a page that now has one. On the shell the band's three columns
-   line up under the column and the rail they are the apparatus for. */
+.ds-record-toc__label {
+  min-width: 0;
+}
+
+.ds-record-toc__link .ds-rec-count {
+  margin-left: 0;
+}
+
+/* The record file: four facts about the record itself, as ruled rows. */
+.ds-rec-file {
+  margin-top: var(--ds-space-7);
+  padding-top: var(--ds-space-5);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-rec-file__rows {
+  margin: 0;
+}
+
+.ds-rec-file__row {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: var(--ds-space-3);
+  padding: 0.45rem 0;
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-rec-file__row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.ds-rec-file__row dt {
+  font-family: var(--ds-font-mono);
+  font-size: var(--rec-eyebrow);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-rec-file__row dd {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
+  font-weight: 500;
+  color: var(--ds-ink);
+  overflow-wrap: anywhere;
+}
+
+.ds-rec-file__row dd.ds-mono {
+  font-size: var(--rec-eyebrow);
+  letter-spacing: 0.02em;
+  font-weight: 400;
+  color: var(--room-ink-2);
+}
+
+.ds-rec-file__correct {
+  display: inline-flex;
+  align-items: center;
+  margin-top: var(--ds-space-4);
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
+  font-weight: 500;
+  color: var(--ds-accent);
+  text-decoration: none;
+}
+
+.ds-rec-file__correct:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* The visit block in the rail keeps its own register but takes the rail's rhythm. */
+.ds-record-visit--rail {
+  padding-bottom: var(--ds-space-5);
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+/* —— the apparatus band ————————————————————————————————————————————————————————— */
 .ds-record-appx {
   width: min(100%, var(--record-shell-w));
   margin-inline: auto;
@@ -467,20 +983,21 @@
 .ds-record-appx__head h2 {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 19px;
+  font-size: var(--rec-h2);
   font-weight: 600;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
 }
 
 .ds-record-appx__head span {
-  font-size: 13px;
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
   color: var(--room-ink-3);
 }
 
 .ds-record-appx__cols {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  column-gap: var(--ds-space-12);
+  column-gap: var(--ds-space-10);
   row-gap: var(--ds-space-7);
   align-items: start;
 }
@@ -492,10 +1009,7 @@
 }
 
 .ds-record-appx__title {
-  margin: 0 0 var(--ds-space-3);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--room-ink-3);
+  margin-bottom: var(--ds-space-3);
 }
 
 .ds-record-appx__notes {
@@ -504,105 +1018,42 @@
   gap: var(--ds-space-5);
 }
 
-.ds-record-appx__notes p {
+.ds-record-appx__notes p,
+.ds-record-appx .ds-entity-trust-offramp {
   margin: 0;
-  font-size: 13.5px;
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
   line-height: 1.55;
   color: var(--room-ink-2);
 }
 
-/*
- * The apparatus band's own Provenance column, over `TrustBlock`'s default look.
- *
- * `TrustBlock` draws a bordered, backgrounded grid card — right when it appears once in the
- * middle of prose, wrong here, where it is the middle of three columns and the other two
- * (Bibliography, a plain numbered list; Why this is here / Still researching, plain paragraphs)
- * carry no box of their own. The boxed column read as a heavier, disconnected object dropped
- * between two lighter ones rather than a third column of the same document. Flattened to the
- * same hairline-divided row register the rail already uses for this component (see
- * `.ds-record-rail-block .ds-room-trust` above) so the three columns read as one apparatus.
- *
- * The release id is also long enough (`rel_20260723_authority_full-a1b2c3`) to overflow a ~300px
- * column's fixed-width grid cell; the boxed layout clipped it at the cell edge with no ellipsis,
- * silently dropping the tail of the value. `overflow-wrap` lets it break instead.
- */
-.ds-record-appx .ds-room-trust {
-  grid-template-columns: 1fr;
-  gap: 0;
-  margin-block: 0;
-  background: none;
-  border: 0;
-  border-radius: 0;
+.ds-record-appx .ds-room-src {
+  font-size: var(--rec-meta);
 }
 
-.ds-record-appx .ds-room-trust__row {
-  padding: 9px 0;
-  background: none;
-  border-top: var(--ds-border-width) solid var(--room-rule-2);
+.ds-record-appx .ds-room-src__i,
+.ds-record-appx .ds-room-src__y {
+  font-size: var(--rec-eyebrow);
 }
 
-.ds-record-appx .ds-room-trust__row:first-child {
-  padding-top: 0;
-  border-top: 0;
-}
-
-.ds-record-appx .ds-room-trust__v {
-  overflow-wrap: anywhere;
-}
-
-/* —— rail blocks ————————————————————————————————————————————————————————————
-   The rail is a column of consulted things, so each block is titled and ruled off the last.
-   `.ds-room-rail-group__title` supplies the mono caps register the reading rooms already use. */
-.ds-record-rail-block + .ds-record-rail-block {
-  margin-top: var(--ds-space-6);
-  padding-top: var(--ds-space-5);
-  border-top: var(--ds-border-width) solid var(--room-rule-2);
-}
-
-.ds-record-rail-block__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2);
-  margin: var(--ds-space-3) 0 0;
-}
-
-/* The rail is 15rem: full-width buttons stacked, not two half-width ones clipped. */
-.ds-record-rail-block__actions > * {
-  flex: 1 1 100%;
-  justify-content: center;
-  text-align: center;
-}
-
-/* Below the rail breakpoint the rail stacks under the column, where full-width buttons are wrong. */
-@media (max-width: 67.9375rem) {
-  .ds-record-rail-block__actions > * {
-    flex: 0 1 auto;
-  }
-}
-
-/* The place block sits flush in the rail. The locator brings its own proportion (the projection's
-   960x500 canvas) rather than taking one from the room: the pin is positioned as a percentage of
-   that canvas, so a room that restretched the box would move the pin off the place it marks. What
-   the room still owns is the space around it. */
-.ds-record-rail-block .ds-record-anatomy__place {
-  margin-top: var(--ds-space-3);
-}
-
-/* Rubric sentences, set as sentences. These were chips before, which meant cutting them off
-   mid-word; the rail has the column width to let them finish. */
+.ds-rec-gaps,
 .ds-record-rail-block__reasons {
-  margin: 0;
-  padding: 0 0 0 var(--ds-space-4);
+  margin: 0 0 var(--ds-space-3);
+  padding: 0 0 0 1.1rem;
   display: flex;
   flex-direction: column;
   gap: var(--ds-space-2);
-  font-size: 0.8125rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
   line-height: 1.5;
-  color: var(--room-ink-3);
+  color: var(--room-ink-2);
 }
 
-/* Stories cited in this record ("Cited in"). Unbulleted: these are links out of the record, not
-   reasons for it, and a bullet would file them with the inclusion rubric directly below. */
+.ds-rec-gaps li::marker,
+.ds-record-rail-block__reasons li::marker {
+  color: var(--ds-accent-graphic);
+}
+
 .ds-record-rail-block__chapters {
   margin: 0;
   padding: 0;
@@ -610,7 +1061,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--ds-space-3);
-  font-size: 0.8125rem;
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
   line-height: 1.4;
 }
 
@@ -620,59 +1072,69 @@
   gap: calc(var(--ds-space-1) / 2);
 }
 
+.ds-record-rail-block__chapters a {
+  font-weight: 500;
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-record-rail-block__chapters a:hover {
+  color: var(--ds-accent);
+}
+
 .ds-record-rail-block__relation {
-  font-size: 0.625rem;
+  font-size: var(--rec-eyebrow);
   letter-spacing: 0.06em;
   color: var(--room-ink-3);
 }
 
-/* The kit's Anatomy and TrustBlock are bordered grids — right for a single fact strip under a
-   header, wrong repeated three times down a rail: a sidebar of stacked boxes is the SaaS-widget
-   look the redesign replaced everywhere else with hairlines. In the rail both become a plain
-   column of rows, each divided by the same hairline every other rail block already uses, with
-   no box of their own — "Fort Lauderdale, FL" also no longer breaks over three narrow columns. */
-.ds-record-rail-block .ds-room-anat,
-.ds-record-rail-block .ds-room-trust {
-  grid-template-columns: 1fr;
-  gap: 0;
-  background: none;
-  border: 0;
-  border-radius: 0;
-}
+/* —— narrow ——————————————————————————————————————————————————————————————————— */
+@media (max-width: 47.9375rem) {
+  /* The credit's corner is the lede's corner on a phone. Give the overlay a floor for it and
+     run it the width of the plate, under the last line, instead of over it. */
+  .ds-record-mast[data-media='photo'] .ds-record-mast__over {
+    padding-bottom: calc(var(--ds-space-8) + 3.25rem);
+  }
 
-.ds-record-rail-block .ds-room-anat__cell,
-.ds-record-rail-block .ds-room-trust__row {
-  padding: 9px 0;
-  background: none;
-  border-top: var(--ds-border-width) solid var(--room-rule-2);
-}
-
-.ds-record-rail-block .ds-room-anat__cell:first-child,
-.ds-record-rail-block .ds-room-trust__row:first-child {
-  border-top: 0;
-  padding-top: 0;
+  .ds-record-mast[data-media='photo'] .ds-entity-photo__credit,
+  .ds-record-mast[data-media='photo'] .ds-entity-mark__context {
+    right: var(--ds-gutter);
+    left: var(--ds-gutter);
+    max-width: none;
+    text-align: left;
+  }
 }
 
 @media (max-width: 559px) {
   .ds-record-mast,
   .ds-record-mast__over,
-  .ds-record-strip {
+  .ds-rec-facts {
     box-sizing: border-box;
     max-width: 100%;
     min-width: 0;
   }
 
   .ds-record-mast__title {
-    font-size: clamp(1.375rem, 7vw, 1.75rem);
+    font-size: clamp(1.5rem, 7vw, 1.875rem);
     overflow-wrap: break-word;
     min-width: 0;
   }
 
   .ds-record-mast__lede,
   .ds-record-beat,
-  .ds-record-beat__standfirst,
-  .ds-record-strip dd {
+  .ds-record-beat__standfirst {
     overflow-wrap: break-word;
     min-width: 0;
+  }
+
+  .ds-rec-beat-head {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'plate title'
+      'standfirst standfirst';
+  }
+
+  .ds-rec-beat-head__index {
+    display: none;
   }
 }

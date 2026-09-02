@@ -441,7 +441,8 @@ html:has([data-surface='instrument']) {
 }
 
 /* No motif over the persistent map plate. */
-.ds-shell-page-transition[data-surface='instrument'] .ds-page-field {
+.ds-shell-page-transition[data-surface='instrument'] .ds-page-field,
+.ds-shell-page-transition[data-surface='door'] .ds-page-field {
   display: none;
 }
 
@@ -1867,6 +1868,12 @@ html:has([data-surface='instrument']) {
   touch-action: none;
 }
 
+/* Ambient (the Door): gestures are locked, so a touch on the map must still scroll the document
+   the chapters live in. Clicks and taps that do not move still reach clusters and pins. */
+.ds-map-stage[data-plate-posture='ambient'] {
+  touch-action: pan-y;
+}
+
 /* —— Plate posture ————————————————————————————————————————————————————————————
    Only the Instrument treats the map as content. Every other class is paper: a Reading room
    is "one scrolling, measure-limited column on paper", and MapStage.tsx already states that
@@ -1913,7 +1920,11 @@ body:not(:has([data-surface='instrument'])) .ds-map-stage[data-plate-slot]::afte
   content: none;
 }
 
-body:not(:has([data-surface='instrument'])) .ds-map-stage::after {
+/* The Door is the other surface whose plate is content: the same clustered field the
+   Instrument shows, painted full-bleed under the scroll chapters (posture `ambient`), so it is
+   excluded from the cover below rather than overridden after it — `:has()` and `:not()` take the
+   specificity of their argument, and two equal rules would leave the winner to file order. */
+body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])) .ds-map-stage::after {
   content: '';
   position: absolute;
   inset: 0;

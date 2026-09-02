@@ -1,31 +1,53 @@
 /**
- * Door Immersive Journey: scroll chapters drive a layout zoom on the Albers pin plate.
+ * Door Immersive Journey: scroll chapters drive the camera of the shared map plate.
  *
  * One visit rolls chapters / facts / spotlight on the server so SSR and hydrate match.
- * Document scroll so the wheel works over the map; IntersectionObserver updates plate focus.
- * Zoom uses width/height/left/top (not transform:scale) so the locator mask stays sharp.
- * Pins with public hrefs stay clickable. No MapLibre — cheap Rest Door.
+ * Document scroll so the wheel works over the map; IntersectionObserver picks the chapter.
+ *
+ * THE MAP IS THE ATLAS'S MAP. The Door hands the persistent `MapStage` the same national-field
+ * patch the Atlas rests on (`nationalFieldPatch`: grouped at national zoom, the same style, the
+ * same entity markers) and flies its camera per chapter. The static Albers pin board underneath
+ * is first paint and the no-JS / no-WebGL field: it hands over the moment the plate stamps
+ * `data-plate-ready` (door-home.css). Until then the layout zoom on the board still tracks the
+ * chapters, so a slow connection reads the same journey at lower fidelity rather than a blank.
+ *
+ * Pins with public hrefs stay clickable on both: the board's discs are links, and a marker or
+ * cluster on the live plate goes through the stage's own `select` and cluster-expand paths.
  */
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { BRAND_ASSETS } from '@repo/config';
 import type { ExploreMapFeatureCollection } from '../lib/map-experience/build-explore-map-source';
+import type { StateDensityLevel } from '../lib/map-experience/density';
+import { CAMERA_EASING_SLOW_OUT } from '../lib/map-experience/camera-presets';
+import { CAMERA_FLY_CURVE } from '../lib/map-experience/camera-moves';
+import { nationalFieldPatch } from '../lib/map-experience/national-field';
 import { CHAPTER_INTERSECTION_THRESHOLD, type StoryChapter } from '../lib/story/chapters';
 import type { StoryRecordSpotlight } from '../lib/story/pick-story-record';
 import type { StoryFact } from '../lib/story/story-facts';
 import { COLD_OPEN_WORDS, copyFor, headingParts } from '../components/story/story-copy';
+import {
+  PinPhotoLayer,
+  type PinPhotoHoverTarget,
+} from '../components/map-experience/PinPhotoLayer';
+import { usePinPhotoHoverAnchor } from '../components/map-experience/use-pin-photo-hover';
+import { useMapStage } from '../components/map-stage/MapStage';
 import { ABOUT_SUPPORT_LINE } from './about/about-copy';
-import { resolveDoorFocus, type DoorFocusFrame } from './door-focus';
+import { resolveDoorFocus, type DoorFocusCamera, type DoorFocusFrame } from './door-focus';
 import { FirstPaintPinPlate } from './first-paint-pin-plate';
 
 void React;
 
 const RECORD_CHAPTER_ID = 'one-record';
 
+/** Same flight the Atlas story mode gives a chapter (`use-story-runner.ts`). */
+const CHAPTER_FLIGHT_MS = 1600;
+
 const DOOR_COLD_OPEN_PROSE =
-  'Every record in this archive is tied to a place you can stand in. Scroll to move the field. Copper pins and any pin you can reach open a record.';
+  'Every record in this archive is tied to a place you can stand in. Scroll to move the field. Grouped pins split as you get closer; any pin you can reach opens a record.';
 
 type ChapterBody = {
   readonly prose: string;
@@ -72,8 +94,23 @@ function prefersReducedMotion(): boolean {
   );
 }
 
+/**
+ * A Door pin's href is a public `/place/` or `/law` path, or the opaque `/door/pin/pin-N`
+ * redirect that resolves an entity page without printing its id. The redirect is a server
+ * answer, so it goes through a full navigation; the public paths are ordinary client routes.
+ */
+function openDoorPin(href: string, push: (href: string) => void): void {
+  if (href.startsWith('/door/pin/')) {
+    window.location.assign(href);
+    return;
+  }
+  push(href);
+}
+
 export type DoorImmersiveProps = {
   readonly pins: ExploreMapFeatureCollection;
+  /** Per-state presence tiers, so the plate opens on the same tint the Atlas does. */
+  readonly densityLevels: readonly StateDensityLevel[];
   readonly chapters: readonly StoryChapter[];
   readonly factByChapterId: Readonly<Record<string, StoryFact>>;
   readonly spotlight: StoryRecordSpotlight | null;
@@ -85,6 +122,7 @@ export type DoorImmersiveProps = {
 
 export function DoorImmersive({
   pins,
+  densityLevels,
   chapters,
   factByChapterId,
   spotlight,
@@ -95,6 +133,12 @@ export function DoorImmersive({
   const journeyRef = useRef<HTMLDivElement | null>(null);
   const chaptersRef = useRef(chapters);
   chaptersRef.current = chapters;
+
+  const pinFieldRef = useRef<HTMLElement | null>(null);
+  const boardPhotoTarget = usePinPhotoHoverAnchor(pinFieldRef);
+
+  const stage = useMapStage();
+  const router = useRouter();
 
   const initialFocus = useMemo(
     () =>
@@ -154,6 +198,80 @@ export function DoorImmersive({
       ? spotlightPinId
       : null;
 
+  /* —— The live plate ————————————————————————————————————————————————————————————————
+     The same field the Atlas paints. `patchData` is also what wakes the shared plate on this
+     surface (MapStage builds MapLibre on first contact), so the Door pays for the map exactly
+     once, at the moment it asks for it, and shares the instance with `/explore` afterwards. */
+  useEffect(() => {
+    stage.patchData(nationalFieldPatch(pins, { densityLevels }));
+  }, [densityLevels, pins, stage]);
+
+  /** True once the plate has reported a viewport, which it only does after MapLibre `load`. */
+  const [plateLive, setPlateLive] = useState(false);
+  useEffect(() => stage.subscribe('viewport', () => setPlateLive(true)), [stage]);
+  useEffect(() => stage.subscribe('error', () => setPlateLive(false)), [stage]);
+
+  /** Chapter camera. The chapter's own MapLibre spec, flown the way the Atlas story flies it. */
+  const camera: DoorFocusCamera = focus.camera;
+  useEffect(() => {
+    if (!plateLive) return;
+    const map = stage.getMap();
+    if (!map) return;
+    map.stop();
+    map.flyTo({
+      center: [camera.center[0], camera.center[1]],
+      zoom: camera.zoom,
+      pitch: camera.pitch,
+      bearing: camera.bearing,
+      duration: reducedMotion ? 0 : CHAPTER_FLIGHT_MS,
+      curve: CAMERA_FLY_CURVE,
+      easing: CAMERA_EASING_SLOW_OUT,
+      // Ambient: a scroll-driven move must stay suppressible under reduced motion.
+      essential: false,
+    } as never);
+  }, [camera, plateLive, reducedMotion, stage]);
+
+  /** The spotlight record's copper ring, on the plate as on the board. */
+  useEffect(() => {
+    if (!plateLive) return;
+    stage.applyViewState({
+      selectedState: undefined,
+      selectedEdge: undefined,
+      selectedEntity: focusPinId ?? undefined,
+    });
+  }, [focusPinId, plateLive, stage]);
+
+  /** A marker click on the live plate opens the record the board's link would have opened. */
+  const hrefByPinId = useMemo(() => {
+    const byId = new Map<string, string>();
+    for (const feature of pins.features) {
+      const href = feature.properties.href;
+      if (href.length > 0) byId.set(feature.properties.entityId, href);
+    }
+    return byId;
+  }, [pins]);
+  useEffect(
+    () =>
+      stage.subscribe('select', (entityId) => {
+        const href = hrefByPinId.get(entityId);
+        if (href) openDoorPin(href, (next) => router.push(next));
+      }),
+    [hrefByPinId, router, stage],
+  );
+
+  /** Pin photos rise from live markers exactly as they rise from the board's discs. */
+  const [plateHoverTarget, setPlateHoverTarget] = useState<PinPhotoHoverTarget | null>(null);
+  useEffect(
+    () =>
+      stage.subscribe('pinHover', (target) =>
+        setPlateHoverTarget(
+          target ? { key: target.entityId, name: target.name, rect: target.rect } : null,
+        ),
+      ),
+    [stage],
+  );
+  const pinPhotoTarget = boardPhotoTarget ?? plateHoverTarget;
+
   const scrollToChapter = useCallback(
     (index: number) => {
       const target = journeyRef.current?.querySelector(`[data-chapter="${index}"]`);
@@ -166,9 +284,10 @@ export function DoorImmersive({
   );
 
   /*
-   * Layout zoom (width/height/left/top), not transform: scale.
+   * The static board's layout zoom (width/height/left/top), not transform: scale.
    * CSS scale rasterizes the masked locator + pins into a bitmap and looks soft when zoomed.
-   * Growing the board in layout keeps the locator mask crisp.
+   * Growing the board in layout keeps the locator mask crisp. Only the field until the plate
+   * is live; the plate's camera takes the same frame from `focus.camera`.
    */
   const boardStyle = {
     width: `${focus.scale * 100}%`,
@@ -182,7 +301,12 @@ export function DoorImmersive({
 
   return (
     <>
-      <aside className="ds-door__field" aria-label="National pin field">
+      <aside
+        className="ds-door__field"
+        aria-label="National pin field"
+        ref={pinFieldRef}
+        data-plate={plateLive ? 'live' : 'board'}
+      >
         <div className="ds-door__board-frame">
           <div className="ds-door__board-host">
             <div
@@ -329,7 +453,7 @@ export function DoorImmersive({
                       Begin
                     </button>
                     <Link className="ds-cta ds-cta--quiet" href="/explore">
-                      Skip to the Atlas
+                      Skip to Explore
                     </Link>
                   </div>
                 ) : null}
@@ -337,7 +461,7 @@ export function DoorImmersive({
                 {isClose ? (
                   <div className="ds-door-journey__actions">
                     <Link className="ds-cta ds-cta--copper" href="/explore">
-                      Open the Atlas
+                      Open Explore
                     </Link>
                     <Link className="ds-cta ds-cta--ink" href="/records">
                       Browse records
@@ -356,6 +480,8 @@ export function DoorImmersive({
           );
         })}
       </div>
+
+      <PinPhotoLayer target={pinPhotoTarget} photosUrl="/door/photos" />
     </>
   );
 }

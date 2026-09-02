@@ -13,7 +13,7 @@ import {
   buildExploreFacetOptions,
   type ExploreFilterState,
 } from '../../../lib/map-experience';
-import { buildExploreMapSource } from '../../../lib/map-experience/build-explore-map-source';
+import { exploreMapSourceFor } from '../../../lib/map-experience/build-explore-map-source';
 import { listPublicEntityViews } from '../../../lib/public-data/source';
 import type { ExploreRequestIntegrityGuard } from './request-integrity-guard';
 import type { createExploreRateLimitGuard } from './rate-limit-guard';
@@ -168,7 +168,7 @@ export async function handleExploreRefineRequest(
     }
 
     const entities = await (deps.loadEntities ?? listPublicEntityViews)();
-    const source = buildExploreMapSource(entities.data);
+    const source = exploreMapSourceFor(entities.data);
     const filtered = applyExploreFilters(source.featureCollection.features, filterState);
 
     return NextResponse.json(

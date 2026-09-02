@@ -27,8 +27,11 @@ describe('RecordVisitBlock', () => {
     assert.match(html, /ds-record-visit__icon/);
     assert.match(html, /100 Museum Drive, Washington, D\.C\./);
     assert.match(html, /ds-record-visit__link/);
-    assert.match(html, /Open in maps/);
-    assert.match(html, /Get directions/);
+    assert.match(html, /Apple Maps/);
+    assert.match(html, /Google Maps/);
+    assert.match(html, /maps\.apple\.com\/\?q=100\+Museum\+Drive/);
+    assert.match(html, /Directions \(Apple\)/);
+    assert.match(html, /Directions \(Google\)/);
     assert.doesNotMatch(html, /ds-cta/);
   });
 

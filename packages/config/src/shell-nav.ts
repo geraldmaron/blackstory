@@ -12,14 +12,14 @@ export type ShellNavItem = {
 
 /**
  * Always-visible top-level nav — sans caps; active route gets a copper underline.
- * Journey order: act (Atlas) → read (Chapters) → go deep (Library) → meta (About last).
- * `isShellNavActive` exact-matches `/`, so Atlas only lights on the instrument itself.
+ * Journey order: act (Explore) → read (Chapters) → go deep (Library) → meta (About last).
  *
- * There is no separate Explore entry: `/` IS the Atlas and `/explore` redirects to it, so a
- * second entry would be the same destination listed twice, reached through an extra hop.
+ * Explore is the map instrument on `/explore`. `/` is the Door (immersive pin plate); the brand
+ * lockup already links home, so the first nav item opens the map readers expect when they
+ * press "Explore".
  */
 export const PRIMARY_NAV: readonly ShellNavItem[] = [
-  { href: '/', label: 'Atlas' },
+  { href: '/explore', label: 'Explore' },
   { href: '/chapters', label: 'Chapters' },
   // Was `/history`, which became a permanent redirect to `/records` — so the top nav on every
   // page of the site pointed into a 308. The v9 replacement is the library hub (SP-21): it is
@@ -62,7 +62,7 @@ export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
   {
     title: 'Explore',
     items: [
-      { href: '/', label: 'Atlas' },
+      { href: '/explore', label: 'Explore' },
       { href: '/library', label: 'Library' },
       { href: '/records', label: 'Records' },
       { href: '/chapters', label: 'Chapters' },

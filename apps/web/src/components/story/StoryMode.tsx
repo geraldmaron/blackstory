@@ -235,7 +235,7 @@ export function StoryMode({
                     Begin
                   </button>
                   <button type="button" className="ds-story__action" onClick={onOpenAtlas}>
-                    Skip to the atlas
+                    Skip to Explore
                   </button>
                 </div>
               ) : null}
@@ -247,7 +247,7 @@ export function StoryMode({
                     className="ds-story__action ds-story__action--primary"
                     onClick={onOpenAtlas}
                   >
-                    Open the atlas
+                    Open Explore
                   </button>
                   {onNearMe ? (
                     <button type="button" className="ds-story__action" onClick={onNearMe}>

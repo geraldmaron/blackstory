@@ -44,8 +44,3 @@ export function shouldUsePublicPostgresDataAccess(
   }
   return isPostgresPublicDataSource(environment) && hasPostgresConnection(environment);
 }
-
-/** @deprecated Prefer `shouldUsePublicPostgresDataAccess` for new deployments. */
-export function shouldUsePublicLiveDataAccess(environment: EnvironmentLike = process.env): boolean {
-  return shouldUsePublicPostgresDataAccess(environment);
-}

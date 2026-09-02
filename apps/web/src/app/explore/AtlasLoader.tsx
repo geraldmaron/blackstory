@@ -104,7 +104,7 @@ export function AtlasLoader({ shell, pins, catalogUrl = ATLAS_CATALOG_PATH }: At
       <div className="ds-atlas ds-atlas--pending" data-atlas-catalog="error">
         <Notice
           tone="error"
-          title="The Atlas could not load its records"
+          title="Explore could not load its records"
           className="ds-atlas__pending"
         >
           <p>The record catalog did not arrive. Check your connection and try again.</p>

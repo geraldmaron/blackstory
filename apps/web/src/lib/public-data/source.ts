@@ -14,7 +14,6 @@
  * - Vercel Fluid Compute / function concurrency — primary idle/active cost driver
  */
 
-import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
 import type { PublicSearchIndexDoc } from '@repo/domain/search';
 import type { PublicEntityProjectionDoc } from '@repo/schemas';
@@ -36,15 +35,7 @@ import {
   shouldUseLivePublicProjections,
 } from './public-readers';
 import { isPostgresPublicDataMisconfigured, shouldPreferReleaseArtifacts } from './live-policy';
-import {
-  createLiveCatalogMemoryCache,
-  createSingleFlight,
-  isOversizedLiveCatalogSentinel,
-  liveCatalogCacheKey,
-  nextDataCacheValueForCatalog,
-  type LiveCatalogKind,
-  type LiveCatalogMemoryCache,
-} from './live-catalog-cache';
+import { createReleaseScopedCache } from './release-scoped-cache';
 import { mapProjectionToPublicEntityView, type PublicProjectionInput } from './map-projection';
 import { mapPublicSearchProjection } from './map-search-index';
 import { collectOneHopNeighborIds, collectTwoHopNeighborIds } from './neighbor-ids';
@@ -67,7 +58,6 @@ import {
  * keeping Postgres pulls far below the pre-fix rate (~48 calls/day/instance vs one per request).
  */
 const RELEASE_CATALOG_REVALIDATE_SECONDS = 1_800; // 30m
-const RELEASE_CATALOG_TTL_MS = RELEASE_CATALOG_REVALIDATE_SECONDS * 1000;
 
 /**
  * How long a fetched active-release pointer may serve across requests. The pointer
@@ -93,12 +83,19 @@ async function fetchActiveReleaseMemoized(): Promise<ActiveReleaseResult> {
   return value;
 }
 
-/** Process-local store for public release catalogs (never private/research docs). */
-const liveEntitiesMemory = createLiveCatalogMemoryCache<readonly PublicEntityView[]>({
-  defaultTtlMs: RELEASE_CATALOG_TTL_MS,
+/**
+ * Cross-request stores for the public release catalogs (never private/research docs). Memory,
+ * single-flight, then Next's data cache, keyed on the active release — see
+ * release-scoped-cache.ts. The national catalog exceeds Next's 2MB entry limit, so it lives in
+ * process memory only; the search index usually fits and is shared across instances.
+ */
+const liveEntitiesCache = createReleaseScopedCache<readonly PublicEntityView[]>({
+  kind: 'public-release-entities',
+  revalidateSeconds: RELEASE_CATALOG_REVALIDATE_SECONDS,
 });
-const liveSearchIndexMemory = createLiveCatalogMemoryCache<readonly PublicSearchIndexDoc[]>({
-  defaultTtlMs: RELEASE_CATALOG_TTL_MS,
+const liveSearchIndexCache = createReleaseScopedCache<readonly PublicSearchIndexDoc[]>({
+  kind: 'public-release-search-index-v2',
+  revalidateSeconds: RELEASE_CATALOG_REVALIDATE_SECONDS,
 });
 /** One active-release pointer read per request (shared across entities/search). */
 const getCachedActiveRelease = cache(fetchActiveReleaseMemoized);
@@ -329,120 +326,22 @@ async function loadLiveSearchIndexForRelease(
   return artifactMapped;
 }
 
-/**
- * Load a live catalog with process-local TTL for fat payloads and size-gated Next data cache.
- * When the serialized catalog exceeds the safe ceiling, Next stores only a tiny oversized
- * sentinel (never the full array) so SET no longer warns and every instance still fills memory.
- */
-/**
- * In-flight catalog loads, keyed like the memory cache.
- *
- * Without this, the process-memory TTL and the Next data-cache `revalidate` window are both
- * 30 minutes and therefore expire together: at that instant every concurrent request on the
- * instance misses memory, and the oversized-sentinel branch below calls `load()` *outside*
- * `unstable_cache`, which does no deduplication of its own. N concurrent requests meant N
- * concurrent full catalog loads — the bursty Postgres read pattern observed on 2026-08-08
- * (several full pulls within seconds, then quiet). One load per key now serves all waiters.
- *
- * Entities and search index share one map; the key already carries the catalog kind.
- */
-const singleFlight = createSingleFlight();
-
-async function cacheLiveCatalog<T>(options: {
-  readonly kind: LiveCatalogKind;
-  readonly releaseId: string;
-  readonly activatedAt: string;
-  readonly memory: LiveCatalogMemoryCache<T>;
-  readonly load: () => Promise<T | undefined>;
-  readonly nextCacheKeyPrefix: string;
-}): Promise<T | undefined> {
-  const memKey = liveCatalogCacheKey(options.kind, options.releaseId, options.activatedAt);
-  const memoryHit = options.memory.get(memKey);
-  if (memoryHit !== undefined) {
-    return memoryHit;
-  }
-
-  return singleFlight(memKey, () => loadAndCacheLiveCatalog(memKey, options));
-}
-
-async function loadAndCacheLiveCatalog<T>(
-  memKey: string,
-  options: {
-    readonly kind: LiveCatalogKind;
-    readonly releaseId: string;
-    readonly activatedAt: string;
-    readonly memory: LiveCatalogMemoryCache<T>;
-    readonly load: () => Promise<T | undefined>;
-    readonly nextCacheKeyPrefix: string;
-  },
-): Promise<T | undefined> {
-  // Re-check: a load that completed while this caller queued behind the single-flight key
-  // has already populated memory.
-  const raced = options.memory.get(memKey);
-  if (raced !== undefined) {
-    return raced;
-  }
-
-  const fromNext = await unstable_cache(
-    async () => {
-      const loaded = await options.load();
-      if (loaded === undefined) {
-        return undefined;
-      }
-      const forNext = nextDataCacheValueForCatalog(loaded);
-      if (isOversizedLiveCatalogSentinel(forNext)) {
-        options.memory.set(memKey, loaded);
-      }
-      return forNext;
-    },
-    [options.nextCacheKeyPrefix, options.releaseId, options.activatedAt],
-    { revalidate: RELEASE_CATALOG_REVALIDATE_SECONDS },
-  )();
-
-  if (isOversizedLiveCatalogSentinel(fromNext)) {
-    const afterFactory = options.memory.get(memKey);
-    if (afterFactory !== undefined) {
-      return afterFactory;
-    }
-    const loaded = await options.load();
-    if (loaded !== undefined) {
-      options.memory.set(memKey, loaded);
-    }
-    return loaded;
-  }
-
-  if (fromNext !== undefined) {
-    options.memory.set(memKey, fromNext);
-  }
-  return fromNext;
-}
-
 function cachedLiveEntities(
   releaseId: string,
   activatedAt: string,
 ): Promise<readonly PublicEntityView[] | undefined> {
-  return cacheLiveCatalog({
-    kind: 'entities',
-    releaseId,
-    activatedAt,
-    memory: liveEntitiesMemory,
-    load: () => loadLiveEntitiesForRelease(releaseId),
-    nextCacheKeyPrefix: 'public-release-entities',
-  });
+  return liveEntitiesCache.get({ releaseId, activatedAt }, () =>
+    loadLiveEntitiesForRelease(releaseId),
+  );
 }
 
 function cachedLiveSearchIndex(
   releaseId: string,
   activatedAt: string,
 ): Promise<readonly PublicSearchIndexDoc[] | undefined> {
-  return cacheLiveCatalog({
-    kind: 'search-index-v2',
-    releaseId,
-    activatedAt,
-    memory: liveSearchIndexMemory,
-    load: () => loadLiveSearchIndexForRelease(releaseId),
-    nextCacheKeyPrefix: 'public-release-search-index-v2',
-  });
+  return liveSearchIndexCache.get({ releaseId, activatedAt }, () =>
+    loadLiveSearchIndexForRelease(releaseId),
+  );
 }
 
 async function loadLiveEntities(): Promise<readonly PublicEntityView[] | undefined> {

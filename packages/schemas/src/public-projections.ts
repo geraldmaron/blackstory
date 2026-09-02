@@ -49,7 +49,44 @@ const geoPointSchema = z.object({
   geohashPrefixes: z.array(z.string().min(1)).max(12).optional(),
   precision: z.string().min(1).optional(),
   matchMethod: z.string().min(1).optional(),
+  /** Set only when `reducePublicPrecision` (`@repo/security`, the location precision standard's
+   * publish-path engine, repo-wqcn) coarsened this location; see
+   * `docs/security/location-precision-standard.md` §3 for the reason vocabulary. */
+  precisionReductionReason: z.string().min(1).optional(),
 });
+
+/**
+ * A reader-facing "go visit this place" contract (repo-el9p / WS3). Optional/additive: absent
+ * on records that predate the release builder wiring this up, or that have nothing publishable
+ * once `publicVisitForTier` (packages/domain/src/geography/visit.ts) gates it against location
+ * precision, entity kind, and living status.
+ */
+const publicVisitAddressSchema = z.object({
+  street: z.string().min(1).optional(),
+  city: z.string().min(1).optional(),
+  state: z.string().min(1).optional(),
+  postalCode: z.string().min(1).optional(),
+  /** Pre-composed single-line address, when the source material only offers one string. */
+  line: z.string().min(1).optional(),
+});
+
+const publicVisitPhoneSchema = z.object({
+  e164: z.string().min(1),
+  display: z.string().min(1),
+});
+
+const publicVisitSchema = z.object({
+  address: publicVisitAddressSchema.optional(),
+  phone: publicVisitPhoneSchema.optional(),
+  website: z.string().url().optional(),
+  hours: z.string().min(1).optional(),
+  visitability: z
+    .enum(['open_to_public', 'exterior_only', 'private', 'demolished', 'unknown'])
+    .optional(),
+  /** Claim ids or evidence ids the visit fields rest on. */
+  sources: z.array(z.string().min(1)).optional(),
+});
+export type PublicVisitDoc = z.infer<typeof publicVisitSchema>;
 
 const statusHistoryEntrySchema = z.object({
   status: z.string().min(1),
@@ -149,6 +186,7 @@ export const publicEntityProjectionSchema = z.object({
    */
   summary: z.string().min(120).max(5000),
   location: geoPointSchema.optional(),
+  visit: publicVisitSchema.optional(),
   claimIds: z.array(z.string()).default([]),
   claims: z.array(publicClaimProjectionSchema).optional(),
   jurisdictionLabel: z.string().min(1).optional(),
@@ -186,6 +224,20 @@ export const publicEntityProjectionSchema = z.object({
       width: z.number().int().positive().optional(),
       height: z.number().int().positive().optional(),
       objectPath: z.string().min(1).optional(),
+      /**
+       * Pin-and-serve fields (repo-4vuf / WS5): identify a source-hosted photo that is
+       * fetched by the reader's browser at view time rather than stored as an original.
+       * `sourceSystem` names where the pin resolves; `fileTitle`/`sha1` pin the exact
+       * upstream file version so a weekly imageinfo check can detect drift; `sourcePageUrl`
+       * is the human-readable attribution page; `license` is a short SPDX-ish id
+       * (e.g. 'CC-BY-SA-4.0', 'PD') distinct from the coarse `rightsStatus` bucket above.
+       */
+      sourceSystem: z.enum(['wikimedia_commons', 'nps', 'loc', 'public_media']).optional(),
+      fileTitle: z.string().min(1).optional(),
+      sha1: z.string().min(1).optional(),
+      sourcePageUrl: z.string().url().optional(),
+      license: z.string().min(1).optional(),
+      pinnedAt: z.string().min(1).optional(),
     })
     .optional(),
   related: z

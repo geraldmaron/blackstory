@@ -106,6 +106,10 @@ trap stop_admin EXIT INT TERM
 start_admin
 
 echo "dev-web: starting @repo/web on http://localhost:${PORT}/"
+# If Explore clicks bounce back to `/`, a stale `.next/dev/routes-manifest.json` may still
+# list `308 /explore → /` from an old redirect table. Delete that file or touch
+# `apps/web/next.config.mjs`, then restart this server. Browsers cache permanent redirects too:
+# hard-refresh (Cmd+Shift+R) after the manifest is fixed.
 
 # Not exec: the trap has to survive to clean up the admin child.
 pnpm --filter @repo/web dev

@@ -38,6 +38,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 import { sanitizePrimaryImageForRelease } from '@repo/domain';
 import { entityPrimaryImageObjectRef } from '../src/index.ts';
+import { entityPrimaryImageUploadMetadata } from './lib/entity-primary-image-upload-metadata.ts';
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'black-book-efaaf';
 const ALLOW = process.env.APP_FIREBASE_ALLOW_PRODUCTION === '1';
@@ -310,9 +311,9 @@ async function main(): Promise<void> {
       try {
         await bucket.upload(downloaded.path, {
           destination: ref.objectPath,
-          metadata: {
+          metadata: entityPrimaryImageUploadMetadata({
             contentType: downloaded.contentType,
-            metadata: {
+            custom: {
               entityId,
               purpose: 'entity-primary-image',
               rightsStatus: propose.rightsStatus!,
@@ -321,7 +322,7 @@ async function main(): Promise<void> {
               wikidataId: propose.wikidataId ?? '',
               fileTitle: propose.fileTitle ?? '',
             },
-          },
+          }),
           resumable: false,
         });
         try {

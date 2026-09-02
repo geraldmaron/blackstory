@@ -19,7 +19,7 @@ import { listPublicEntities, type PublicEntityView } from '../../data/public-see
 import { resolveCitesEdgeIndex } from '../../lib/articles/source';
 import type { PublicReadSource } from '../../lib/public-data/source';
 import type { CitesEdgeIndex } from '../../lib/release/build-cites-edge';
-import { buildExploreMapSource } from '../../lib/map-experience/build-explore-map-source';
+import { exploreMapSourceFor } from '../../lib/map-experience/build-explore-map-source';
 import { buildEdgeLineCatalog } from './explore-view-model';
 import type { AtlasCatalogPayload } from './explore-view-model-wire';
 
@@ -41,7 +41,7 @@ export function buildAtlasCatalogPayload(
   citesEdge: CitesEdgeIndex,
   dataSource: PublicReadSource,
 ): AtlasCatalogPayload {
-  const source = buildExploreMapSource(entities);
+  const source = exploreMapSourceFor(entities);
   const { edgeLineCatalog, availableDecades } = buildEdgeLineCatalog(artifact, entities);
   return {
     schemaVersion: 1,

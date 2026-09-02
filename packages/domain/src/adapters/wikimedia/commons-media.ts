@@ -32,6 +32,9 @@ export type CommonsImageMetadata = {
   readonly commonsPageUrl: string;
   readonly thumbUrl?: string;
   readonly fullUrl?: string;
+  /** Wikimedia imageinfo sha1 (hex) of the current file revision — used to pin an exact
+   * upstream version and detect drift on the weekly re-check (repo-n7p6.7.1). */
+  readonly sha1?: string;
   readonly licenseShortName?: string;
   readonly artist?: string;
   readonly credit?: string;
@@ -64,6 +67,10 @@ export type CommonsMediaPropose = {
   readonly credit?: string;
   readonly rightsStatus?: PublishableRightsStatus;
   readonly licenseShortName?: string;
+  /** Wikimedia imageinfo sha1 (hex) of the current file revision, carried through from the
+   * fetched CommonsImageMetadata on an auto_propose row — see CommonsImageMetadata.sha1.
+   * Downstream pin plans (repo-4vuf) use this to skip a redundant metadata re-fetch. */
+  readonly sha1?: string;
   /** Non-image resource links discovered during enrichment (Wikipedia / Commons). */
   readonly resourceLinks?: readonly EntityResourceLinkPropose[];
 };
@@ -386,9 +393,63 @@ function creditPartImpliesRights(part: string, rightsStatus: PublishableRightsSt
   }
 }
 
+/** Matches an original-resolution Commons upload URL: `.../commons/<a>/<ab>/<File name.ext>`. */
+const COMMONS_UPLOAD_ORIGINAL =
+  /^https:\/\/upload\.wikimedia\.org\/wikipedia\/commons\/([0-9a-f])\/([0-9a-f]{2})\/([^/]+)$/i;
+
+/**
+ * A Commons-hosted image, downsized through Wikimedia's own thumbnail renderer.
+ *
+ * `primaryImage.url` on stored entities is the original-resolution `upload.wikimedia.org` file
+ * (see `commons-media-enrichment.ts`'s `sourceImageUrl`). A pin card needs a few hundred px wide,
+ * not the source scan, so this rewrites the original path into Commons' `/thumb/.../<width>px-…`
+ * convention rather than shipping the full file to every hovering pin. Non-Commons URLs (a
+ * Supabase/GCS `primary.*` object, say) pass through unchanged — this only recognizes the one
+ * upload.wikimedia.org shape it knows how to resize.
+ */
+export function commonsUploadThumbnailUrl(url: string, width: number): string {
+  const match = COMMONS_UPLOAD_ORIGINAL.exec(url.trim());
+  if (!match) return url;
+  const [, shard1, shard2, filename] = match;
+  return `https://upload.wikimedia.org/wikipedia/commons/thumb/${shard1}/${shard2}/${filename}/${width}px-${filename}`;
+}
+
 export function commonsFilePageUrl(fileTitle: string): string {
   const title = fileTitle.startsWith('File:') ? fileTitle : `File:${fileTitle}`;
   return `https://commons.wikimedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`;
+}
+
+/** Default thumbnail width (px) used by the pin-and-serve mast display (repo-4vuf). */
+export const COMMONS_PIN_THUMBNAIL_WIDTH = 960;
+
+/**
+ * Build the Commons `Special:FilePath` thumbnail URL for a pinned file title.
+ *
+ * This is the pin-and-serve display URL (repo-4vuf): the reader's browser fetches the
+ * thumbnail bytes directly from Wikimedia at view time — BlackStory never stores the
+ * original. `Special:FilePath/<File title>?width=<n>` 302-redirects to a
+ * `upload.wikimedia.org/.../thumb/...` URL; both hosts must be allowed in img-src (see
+ * apps/web/src/lib/web-security/csp.ts).
+ *
+ * Pure and offline: does not fetch anything, only builds the URL string. Percent-encodes
+ * each path segment (spaces normalized to underscores first, matching MediaWiki title
+ * convention) so titles containing parentheses, apostrophes, or non-ASCII characters
+ * produce a valid URL.
+ */
+export function commonsPinThumbnailUrl(
+  fileTitle: string,
+  width: number = COMMONS_PIN_THUMBNAIL_WIDTH,
+): string {
+  if (!Number.isFinite(width) || width <= 0) {
+    throw new Error(`commonsPinThumbnailUrl: width must be a positive number, got ${width}`);
+  }
+  const title = fileTitle.startsWith('File:') ? fileTitle : `File:${fileTitle}`;
+  const normalized = title.trim().replace(/ /g, '_');
+  const encodedPath = normalized
+    .split('/')
+    .map((segment) => encodeURIComponent(segment))
+    .join('/');
+  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodedPath}?width=${Math.round(width)}`;
 }
 
 export function wikipediaEnUrl(title: string): string {
@@ -569,6 +630,7 @@ export function evaluateCommonsMediaPropose(input: {
     ...(input.image.licenseShortName !== undefined
       ? { licenseShortName: input.image.licenseShortName }
       : {}),
+    ...(input.image.sha1 !== undefined ? { sha1: input.image.sha1 } : {}),
     resourceLinks: [...resourceLinks, commonsLink],
   };
 }

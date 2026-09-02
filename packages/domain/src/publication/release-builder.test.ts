@@ -18,6 +18,7 @@ import {
 } from './release-builder.js';
 import { NRHP_SUMMARY_FILLER, NRHP_SUMMARY_TRAILER } from './template-summary-signatures.js';
 import { sanitizePublicProseText } from './public-render.js';
+import { PUBLIC_PRECISION_TIERS } from '@repo/domain-core/geography/precision';
 
 const CONTEXT = { releaseId: 'release-2026-07-18', generatedAt: '2026-07-18T00:00:00.000Z' };
 
@@ -428,54 +429,86 @@ test('resolveReleaseEntityReferences fails closed on an empty jurisdictionLabel'
   if (!result.ok) assert.match(result.reason, /jurisdiction/);
 });
 
-test('resolveReleaseEntityReferences rejects a prohibited public precision on any kind', () => {
-  for (const precision of ['street_address', 'unit', 'parcel', 'exact_coordinates', 'residence']) {
-    const entry = baseEntry({ kind: 'place', locationPrecision: precision });
-    const result = resolveReleaseEntityReferences(entry, [], []);
-    assert.equal(result.ok, false, `expected "${precision}" to be rejected`);
-    if (!result.ok) assert.match(result.reason, /prohibited public precision/);
+// repo-wqcn / docs/security/location-precision-standard.md: location precision is no longer a
+// publish-time REJECTION gate for `resolveReleaseEntityReferences` — a prohibited raw level, a
+// living person's own residence, etc. all still reach publish; `buildReleaseEntityArtifacts`
+// COARSENS them via `reducePublicPrecision` instead (see the tests on that function below).
+test('resolveReleaseEntityReferences allows any non-empty precision level on any kind', () => {
+  for (const precision of [
+    'street_address',
+    'unit',
+    'parcel',
+    'exact_coordinates',
+    'residence',
+    'institution',
+    'campus',
+    'address',
+    'site',
+  ]) {
+    for (const kind of ['place', 'person'] as const) {
+      const entry = baseEntry({ kind, locationPrecision: precision, livingStatus: 'unknown' });
+      const result = resolveReleaseEntityReferences(entry, [], []);
+      assert.equal(result.ok, true, `expected "${precision}" (kind=${kind}) to resolve`);
+    }
   }
 });
 
-test('resolveReleaseEntityReferences allows institution/campus precision for a person (repo-2t04.3)', () => {
-  for (const precision of ['institution', 'campus']) {
-    const entry = baseEntry({
-      kind: 'person',
-      locationPrecision: precision,
-      livingStatus: 'unknown',
-    });
-    const result = resolveReleaseEntityReferences(entry, [], []);
-    assert.equal(result.ok, true, `expected "${precision}" to be allowed for a person`);
-  }
-});
-
-test('resolveReleaseEntityReferences rejects "address" precision for a living or unknown-status person', () => {
+test('buildReleaseEntityArtifacts coarsens a living person\'s "address" precision to city, with reason', () => {
   for (const livingStatus of ['living', 'unknown'] as const) {
     const entry = baseEntry({ kind: 'person', locationPrecision: 'address', livingStatus });
-    const result = resolveReleaseEntityReferences(entry, [], []);
+    const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    assert.equal(result.projection.location.precision, 'city');
+    // The point is coarsened with the tier: city publishes two decimals, never the rooftop.
+    assert.equal(result.projection.location.lat, Number(result.projection.location.lat.toFixed(2)));
+    assert.equal(result.projection.location.lng, Number(result.projection.location.lng.toFixed(2)));
+    assert.ok(result.projection.location.geohash.length <= 4);
     assert.equal(
-      result.ok,
-      false,
-      `expected "address" to be rejected for livingStatus=${livingStatus}`,
+      result.projection.location.precisionReductionReason,
+      livingStatus === 'living' ? 'living_residence' : 'living_status_unknown',
     );
-    if (!result.ok) assert.match(result.reason, /precision ceiling/);
   }
 });
 
-test('resolveReleaseEntityReferences allows "address" precision for a confirmed-deceased person', () => {
+test('buildReleaseEntityArtifacts publishes "address" precision unreduced for a confirmed-deceased person', () => {
   const entry = baseEntry({
     kind: 'person',
     locationPrecision: 'address',
     livingStatus: 'deceased',
   });
-  const result = resolveReleaseEntityReferences(entry, [], []);
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
   assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.location.precision, 'address');
+  assert.equal(result.projection.location.precisionReductionReason, undefined);
 });
 
-test('resolveReleaseEntityReferences allows "address" precision for a non-person entity', () => {
+test('buildReleaseEntityArtifacts publishes "address" precision unreduced for a non-person entity', () => {
   const entry = baseEntry({ kind: 'place', locationPrecision: 'address' });
-  const result = resolveReleaseEntityReferences(entry, [], []);
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
   assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.location.precision, 'address');
+});
+
+test('buildReleaseEntityArtifacts coarsens a raw prohibited precision level to city, with reason', () => {
+  for (const precision of ['unit', 'parcel', 'residence']) {
+    const entry = baseEntry({
+      kind: 'place',
+      locationPrecision: precision,
+      livingStatus: 'deceased',
+    });
+    const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+    assert.equal(result.ok, true, `precision="${precision}"`);
+    if (!result.ok) return;
+    assert.equal(result.projection.location.precision, 'city', `precision="${precision}"`);
+    assert.equal(
+      result.projection.location.precisionReductionReason,
+      'prohibited_location_precision',
+      `precision="${precision}"`,
+    );
+  }
 });
 
 test('buildReleaseEntityArtifacts produces a full projection + search doc for a valid entry', () => {
@@ -520,6 +553,54 @@ test('buildReleaseEntityArtifacts projects medium confidenceTier from claim leve
   if (!result.ok) return;
   assert.equal(result.searchIndex.confidenceTier, 'medium');
   assert.equal(result.searchIndex.claimCount, 2);
+});
+
+test('buildReleaseEntityArtifacts: every published location precision is a controlled public tier', () => {
+  const rawPrecisions = [
+    'site',
+    'county',
+    'city',
+    'institution',
+    'campus',
+    'address',
+    'neighborhood',
+    'community',
+    'town',
+    'district',
+    'cemetery',
+    'state',
+    'block',
+    'building',
+    'park',
+    'country',
+    'garrison',
+    'region',
+    'territory',
+    'stadium',
+    'unit',
+    'parcel',
+    'exact_coordinates',
+    'residence',
+    'street_address',
+    'totally-unrecognized-value',
+  ];
+  for (const precision of rawPrecisions) {
+    const entry = baseEntry({
+      kind: 'place',
+      locationPrecision: precision,
+      livingStatus: 'deceased',
+    });
+    const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+    assert.equal(result.ok, true, `precision="${precision}"`);
+    if (!result.ok) continue;
+    assert.equal(
+      PUBLIC_PRECISION_TIERS.includes(
+        result.projection.location.precision as (typeof PUBLIC_PRECISION_TIERS)[number],
+      ),
+      true,
+      `precision="${precision}" -> "${result.projection.location.precision}" not a controlled tier`,
+    );
+  }
 });
 
 test('buildReleaseEntityArtifacts fails closed with no_citations when an entry has zero claims', () => {
@@ -760,4 +841,100 @@ test('person projection carries livingStatus and statusProvenance from heuristic
   assert.equal(result.projection.livingStatus, 'deceased');
   assert.equal(result.projection.status, 'deceased');
   assert.equal(result.projection.statusProvenance, 'derived_heuristic');
+});
+
+test('buildReleaseEntityArtifacts emits projection.visit gated through publicVisitForTier', () => {
+  const entry = baseEntry({
+    kind: 'place',
+    locationPrecision: 'address',
+    visit: {
+      address: {
+        street: '1530 6th Avenue North',
+        city: 'Birmingham',
+        state: 'AL',
+        line: '1530 6th Avenue North, Birmingham, AL',
+      },
+      phone: { e164: '+12053281000', display: '(205) 328-1000' },
+      website: 'https://example.org',
+      hours: 'Tue–Sat 10am–5pm',
+      visitability: 'open_to_public',
+      sources: ['claim-visit-1'],
+    },
+  });
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.visit?.address?.street, '1530 6th Avenue North');
+  assert.equal(result.projection.visit?.phone?.e164, '+12053281000');
+  assert.equal(result.projection.visit?.website, 'https://example.org');
+  assert.deepEqual(result.projection.visit?.sources, ['claim-visit-1']);
+});
+
+test('buildReleaseEntityArtifacts omits street/line from projection.visit at coarser precision', () => {
+  const entry = baseEntry({
+    kind: 'place',
+    locationPrecision: 'institution',
+    visit: {
+      address: { street: '1530 6th Avenue North', city: 'Birmingham' },
+      visitability: 'open_to_public',
+    },
+  });
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.visit?.address?.street, undefined);
+  assert.equal(result.projection.visit?.address?.city, 'Birmingham');
+});
+
+test('buildReleaseEntityArtifacts omits phone/website from projection.visit when livingStatus is living', () => {
+  // Institution kind avoids the person-only precision-ceiling gate in
+  // resolveReleaseEntityReferences, isolating the phone/website living-status gate under test.
+  const entry = baseEntry({
+    kind: 'institution',
+    locationPrecision: 'address',
+    livingStatus: 'living',
+    visit: {
+      phone: { e164: '+12055551234', display: '(205) 555-1234' },
+      website: 'https://example.org',
+      visitability: 'open_to_public',
+    },
+  });
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.visit?.phone, undefined);
+  assert.equal(result.projection.visit?.website, undefined);
+});
+
+test('buildReleaseEntityArtifacts context.visitOverride wins over entry.visit', () => {
+  const entry = baseEntry({
+    kind: 'place',
+    locationPrecision: 'address',
+    visit: {
+      address: { street: 'Entry Street' },
+      visitability: 'open_to_public',
+    },
+  });
+  const result = buildReleaseEntityArtifacts(entry, {
+    ...CONTEXT,
+    visitOverride: {
+      address: { street: 'Canonical Street' },
+      visitability: 'open_to_public',
+    },
+  });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.visit?.address?.street, 'Canonical Street');
+});
+
+test('buildReleaseEntityArtifacts omits projection.visit entirely when nothing survives gating', () => {
+  const entry = baseEntry({
+    kind: 'place',
+    locationPrecision: 'institution',
+    visit: { address: { street: 'Only A Street' } },
+  });
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.visit, undefined);
 });

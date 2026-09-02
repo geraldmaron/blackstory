@@ -38,6 +38,8 @@ import {
   DEFAULT_KIND_ENCODING,
   MAP_SEMANTIC_TONE_ENCODING,
 } from '../../lib/map-experience/kind-encoding';
+import { clusterDominantFamilyShadeExpression } from '../../lib/map-experience/cluster-encoding';
+import { exploreClusterProperties } from '../../lib/map-experience/cluster-expand';
 import {
   blendFirstPaintWithKindExpression,
   firstPaintOrKindRadiusExpression,
@@ -571,8 +573,8 @@ export type BuildExploreMapStyleInput = {
  * state-level presence/density fill ("presence, not just incidents"), and a
  * jurisdiction-area polygon layer (area records render as geometry, never as a point;
  * empty today, see `build-explore-map-source.ts`).
- * Clustering config (`EXPLORE_CLUSTER_CONFIG`) is the one place that governs
- * "every cluster decomposes to named entities within two interactions" when grouping is on.
+ * Clustering config (`EXPLORE_CLUSTER_CONFIG`) sets radius and max zoom; cluster taps
+ * ease the camera to expansion zoom (see `cluster-expand.ts`) rather than opening a leaf record.
  */
 export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpecification {
   const colorScheme = input.colorScheme ?? 'dark';
@@ -592,6 +594,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
     kindColorExpression(),
     firstPaintPointColorExpression(),
   );
+  const clusterShade = clusterDominantFamilyShadeExpression();
   const entityPointOpacity = blendFirstPaintWithKindExpression(
     kindFillOpacityExpression(),
     firstPaintPointOpacityExpression(),
@@ -692,6 +695,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
               cluster: true,
               clusterRadius: EXPLORE_CLUSTER_CONFIG.clusterRadius,
               clusterMaxZoom: EXPLORE_CLUSTER_CONFIG.clusterMaxZoom,
+              clusterProperties: exploreClusterProperties(),
             }
           : { cluster: false }),
       },
@@ -704,6 +708,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
               cluster: true,
               clusterRadius: EXPLORE_CLUSTER_CONFIG.clusterRadius,
               clusterMaxZoom: EXPLORE_CLUSTER_CONFIG.clusterMaxZoom,
+              clusterProperties: exploreClusterProperties(),
             }
           : { cluster: false }),
       },
@@ -1210,10 +1215,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
               CLUSTER_RADIUS_BY_COUNT[3]![1],
             ],
           ],
-          'circle-color': DIGNITY_PALETTE.pointHalo,
+          'circle-color': clusterShade,
           'circle-opacity': ENTITY_CLUSTER_OPACITY,
           'circle-stroke-width': zoomScaledNumericExpression(2),
-          'circle-stroke-color': DIGNITY_PALETTE.point,
+          'circle-stroke-color': clusterShade,
         },
       },
       {
@@ -1323,10 +1328,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
               CLUSTER_RADIUS_BY_COUNT[3]![1],
             ],
           ],
-          'circle-color': DIGNITY_PALETTE.pointHalo,
+          'circle-color': clusterShade,
           'circle-opacity': 0,
           'circle-stroke-width': zoomScaledNumericExpression(2),
-          'circle-stroke-color': DIGNITY_PALETTE.point,
+          'circle-stroke-color': clusterShade,
         },
       },
       {

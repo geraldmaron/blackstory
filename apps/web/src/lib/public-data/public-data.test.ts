@@ -9,6 +9,7 @@ import {
   isPostgresPublicDataMisconfigured,
   isPostgresPublicDataSource,
   shouldPreferReleaseArtifacts,
+  resolvePublicDataSource,
 } from './live-policy';
 import {
   isDisplayableJurisdictionLabel,
@@ -25,13 +26,32 @@ test('shouldUseLivePublicProjections is off by default in development', () => {
   );
 });
 
-test('shouldUseLivePublicProjections respects PUBLIC_READ_API_DISABLED', () => {
+test('PUBLIC_DATA_SOURCE=firestore is not a live-policy value', () => {
+  // Root .env.example used to list firestore as a third source. live-policy only
+  // accepts seed|postgres; a firestore value must not enable live reads.
+  assert.equal(resolvePublicDataSource({ PUBLIC_DATA_SOURCE: 'firestore' }), undefined);
+  assert.equal(isPostgresPublicDataSource({ PUBLIC_DATA_SOURCE: 'firestore' }), false);
   assert.equal(
     shouldUseLivePublicProjections({
-      NODE_ENV: 'production',
-      PUBLIC_READ_API_DISABLED: '1',
+      PUBLIC_DATA_SOURCE: 'firestore',
+      DATABASE_URL: 'postgresql://local:local@127.0.0.1:5432/blackbook',
     }),
     false,
+  );
+});
+
+test('PUBLIC_READ_API_DISABLED is not read by web live-policy', () => {
+  // The Vercel cutover runbook and disable-public-beta doc treat this flag as the
+  // web kill switch. The function does not consult it. Setting it to 1 with a
+  // valid postgres pair still enables live reads. Do not "fix" this assertion by
+  // pretending the flag works; wire it or retire the runbook claim.
+  assert.equal(
+    shouldUseLivePublicProjections({
+      PUBLIC_DATA_SOURCE: 'postgres',
+      DATABASE_URL: 'postgresql://local:local@127.0.0.1:5432/blackbook',
+      PUBLIC_READ_API_DISABLED: '1',
+    }),
+    true,
   );
 });
 

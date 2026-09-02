@@ -58,8 +58,6 @@ const ERROR_MESSAGES = {
   fallback: 'No match for that place. Try a city and state, a ZIP, or pick a record below.',
   rate_limited: 'Too many location lookups. Wait a moment and try again.',
   request_integrity_denied: 'This browser session could not be verified. Reload and try again.',
-  /** @deprecated alias — same copy as `request_integrity_denied`. */
-  app_check_denied: 'This browser session could not be verified. Reload and try again.',
   invalid_query: 'That input could not be read as an address, city, or ZIP.',
   network_error: 'Location lookup is temporarily unreachable.',
   no_camera: 'That place resolved, but the map could not frame it.',
@@ -155,7 +153,7 @@ export function ExploreAddressSearch({
       setStatus({ kind: 'error', message: ERROR_MESSAGES.rate_limited });
       return;
     }
-    if (result.kind === 'request_integrity_denied' || result.kind === 'app_check_denied') {
+    if (result.kind === 'request_integrity_denied') {
       setStatus({ kind: 'error', message: ERROR_MESSAGES.request_integrity_denied });
       return;
     }

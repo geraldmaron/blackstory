@@ -62,9 +62,9 @@ export const productConstitutionSchema = z
         precisionReductionReasons: z.array(z.string().min(1)).nonempty(),
         residentialPrecisionLevels: z.array(z.string().min(1)).nonempty(),
         livingResidenceMaxPublicPrecision: z.string().min(1),
-        occupiedPrivateResidenceMaxPublicPrecision: z.string().min(1),
+        restrictedSiteMaxPublicPrecision: z.string().min(1),
         sensitiveSiteMaxPublicPrecision: z.string().min(1),
-        reduceOccupiedPrivateResidenceForDeceased: z.boolean(),
+        withheldOnRequestMaxPublicPrecision: z.string().min(1),
       })
       .strict(),
     ugcLivingPersonRules: z

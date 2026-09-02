@@ -9,8 +9,8 @@ Operating docs for the BlackStory monorepo: architecture, decisions, security, t
 | Doc | Contents |
 |-----|----------|
 | [Public docs site](https://geraldmaron.github.io/blackstory/) | GitHub Pages homepage from `apps/docs` |
-| [`architecture.md`](./architecture.md) | Target architecture and invariants |
-| [`adr/README.md`](./adr/README.md) | Architecture decision records |
+| [`architecture.md`](./architecture.md) | Current stack (Vercel + Supabase) and invariants |
+| Historical ADRs | Removed 2026-07-24; see [`decisions-carryover.md`](./decisions-carryover.md) and `git log -- docs/adr/` |
 | [`security/README.md`](./security/README.md) | Threat model, abuse corpus, environment isolation |
 | [`testing/README.md`](./testing/README.md) | Test layers, CI check names, harnesses |
 | [`ui/README.md`](./ui/README.md) | Design system tokens, components, fixtures |
@@ -19,18 +19,18 @@ Operating docs for the BlackStory monorepo: architecture, decisions, security, t
 | [`admin/research-console.md`](./admin/research-console.md) | Administration and research console |
 | [`../infra/github/README.md`](../infra/github/README.md) | GitHub governance and OIDC/WIF operator docs |
 | [`../infra/database/README.md`](../infra/database/README.md) | Parked PostGIS / SQL Connect (Cloud SQL deferred; see ADR-011) |
-| [`../infra/firebase/FIRESTORE_MODEL.md`](../infra/firebase/FIRESTORE_MODEL.md) | Firestore collection map and rules |
+| [`../infra/firebase/FIRESTORE_MODEL.md`](../infra/firebase/FIRESTORE_MODEL.md) | Leftover Firestore collection map (not current SoR) |
 | [`../SECURITY.md`](../SECURITY.md) | Security policy and private vulnerability reporting |
 | [`../README.md`](../README.md) | Project overview and developer commands |
 | Product constitution | `packages/schemas/constitution/` (shared TypeScript and Python) |
-| Env isolation | `infra/gcp/`, `infra/firebase/` |
+| Env isolation (leftover GCP/Firebase design) | `infra/gcp/`, `infra/firebase/` |
 
 ## What's here
 
 | Path | Contents |
 |------|----------|
-| `architecture.md` | Canonical architecture and invariants |
-| `adr/` | Formal ADRs (scaffold vs target noted; cloud not provisioned from these alone) |
+| `architecture.md` | Current stack and invariants (Vercel + Supabase `blackstory-app`) |
+| `adr/` | Historical; formal ADRs were removed 2026-07-24 |
 | `security/` | Threat model, abuse corpus, isolation design |
 | `testing/` | Test layers, CI check names, guarded harness docs |
 | `ui/` | Design system usage, fixtures, accessibility notes |
@@ -43,7 +43,7 @@ Operating docs for the BlackStory monorepo: architecture, decisions, security, t
 | `ds-001/` | Early baseline reconnaissance notes |
 | `../packages/schemas/constitution/` | Versioned product policy JSON and fixtures |
 | `../infra/gcp/` | Isolation matrices and Terraform stubs (including WIF under `wif/`) |
-| `../infra/firebase/` | Firebase config, Firestore model/rules, App Hosting templates |
+| `../infra/firebase/` | Leftover Firebase reference, Firestore model history, backup/DR notes. Not current SoR or App Hosting. |
 | `../infra/database/` | Parked local PostGIS / SQL Connect (not the production path) |
 
 ## Upkeep

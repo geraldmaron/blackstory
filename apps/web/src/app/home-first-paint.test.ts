@@ -15,7 +15,7 @@ import { isTulsaPlace, placeHref } from '../lib/place/public-place-path';
 import { buildEntityAnatomyInputs } from './entity/[id]/entity-anatomy-facts';
 import { HomeFirstPaint } from './HomeFirstPaint';
 import {
-  HOME_FEATURED_ENTITY_IDS,
+  HOME_STAND_CANDIDATE_IDS,
   isInternalRecordLabel,
   loadHomeFirstPaint,
   pickHomeStory,
@@ -39,7 +39,7 @@ function storyDoc(overrides: Partial<PublicArticleListItemDoc> = {}): PublicArti
 
 test('the featured set prefers non-Tulsa places; Greenwood is last-resort', () => {
   assert.deepEqual(
-    [...HOME_FEATURED_ENTITY_IDS],
+    [...HOME_STAND_CANDIDATE_IDS],
     [
       'ent_aarlcc_fort_lauderdale_001',
       'nrhp-black-heritage-91000107',
@@ -49,7 +49,7 @@ test('the featured set prefers non-Tulsa places; Greenwood is last-resort', () =
       'ent_greenwood_district_001',
     ],
   );
-  assert.equal(HOME_FEATURED_ENTITY_IDS.at(-1), 'ent_greenwood_district_001');
+  assert.equal(HOME_STAND_CANDIDATE_IDS.at(-1), 'ent_greenwood_district_001');
   assert.ok(FEATURED_SEED_IDS.includes('ent_dunbar_school_001'));
   assert.ok(FEATURED_SEED_IDS.includes('ent_15th_st_church_001'));
   assert.ok(getPublicEntity('ent_dunbar_school_001'));
@@ -187,7 +187,7 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.match(paint, /EntityRoomSections|ds-record-mast/);
   assert.match(paint, /toEvidenceClaimInputs/);
   assert.match(paint, /Can I trust this|id="trust"/);
-  assert.match(paint, /placeDiscoveryReturn|See this place on the Atlas|mapLabel/);
+  assert.match(paint, /placeDiscoveryReturn|See this place on Explore|mapLabel/);
   assert.doesNotMatch(paint, /ABOUT_LINE|ABOUT_WALK_PAST|ABOUT_ON_THE_GROUND|ABOUT_PILLARS/);
   assert.doesNotMatch(paint, /RecordAnatomyPanel|buildEntityAnatomy|evidenceLabel|RoomHeader/);
   assert.doesNotMatch(paint, /ds-record-strip|Grade A|radius affordance|Shown at locality/);
@@ -295,7 +295,7 @@ test('seed Dunbar place record shows sourced claims without catalog chrome', () 
   assert.match(html, /The history here/);
   assert.match(html, /What the sources say/);
   assert.match(html, /Can I trust this/);
-  assert.match(html, /See this place on the Atlas|Browse the record list/);
+  assert.match(html, /See this place on Explore|Browse the record list/);
   assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church"/);
   assert.match(html, /href="\/place\/dunbar-alumni-federation"/);
   assert.match(html, /href="\/data"/);

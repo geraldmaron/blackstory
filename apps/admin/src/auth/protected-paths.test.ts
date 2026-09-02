@@ -22,6 +22,8 @@ const ADMIN_PATHS = [
   '/releases',
   '/sources',
   '/stories/review',
+  '/stories/articles',
+  '/stories/articles/before-the-battle-cry',
   '/switches',
 ];
 

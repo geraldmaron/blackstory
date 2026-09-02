@@ -141,7 +141,7 @@ test('confidence retains component values and policy version', () => {
     policy: POLICY,
   });
 
-  assert.equal(result.policyVersion, '1.0.0');
+  assert.equal(result.policyVersion, '1.1.0');
   assert.equal(typeof result.components.sourceAuthority, 'number');
   assert.equal(typeof result.components.directness, 'number');
   assert.equal(typeof result.components.lineageIndependence, 'number');

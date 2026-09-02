@@ -7,6 +7,7 @@
 
 import {
   deriveCatalogEntityStatus,
+  normalizePublicPrecision,
   type EntityStatusValue,
   type NotabilityCriterion,
   type StatusHistoryEntry,
@@ -14,7 +15,7 @@ import {
 import { sanitizePublicProseText } from '@repo/domain/editorial';
 import { isDatePrecision, resolveEraBucketsFromEvidence } from '@repo/domain/era';
 import { findUsStateForPoint, isDisplayableJurisdictionLabel } from '@repo/domain/map/geography';
-import { type PublicEntityView } from '../../data/public-seed';
+import { type PublicEntityView, type PublicVisitView } from '../../data/public-seed';
 
 /**
  * Narrow projection shape used by the web mapper so rendering remains storage-independent.
@@ -38,6 +39,8 @@ export type PublicProjectionInput = {
    * absent on bootstrap-window stubs — mapper derives state name from `location` when present. */
   readonly jurisdictionLabel?: string;
   readonly locationLabel?: string;
+  /** Release-shipped visit contract (repo-el9p WS3), already gated by `publicVisitForTier`. */
+  readonly visit?: PublicVisitView;
   /** Accepted public claims with citations. Non-numeric by standing policy: the projection
    * carries `confidenceLevel` (the display register), never a raw confidence score. */
   readonly claims?: readonly {
@@ -88,6 +91,13 @@ export type PublicProjectionInput = {
     readonly width?: number;
     readonly height?: number;
     readonly objectPath?: string;
+    /** Pin-and-serve (repo-4vuf): see PublicEntityPrimaryImageView for field rationale. */
+    readonly sourceSystem?: 'wikimedia_commons' | 'nps' | 'loc' | 'public_media';
+    readonly fileTitle?: string;
+    readonly sha1?: string;
+    readonly sourcePageUrl?: string;
+    readonly license?: string;
+    readonly pinnedAt?: string;
   };
   readonly related?: readonly {
     readonly id: string;
@@ -104,15 +114,14 @@ export type PublicProjectionInput = {
 function locationPrecisionFromProjection(
   precision: string | undefined,
 ): PublicEntityView['locationPrecision'] {
-  if (
-    precision === 'neighborhood' ||
-    precision === 'campus' ||
-    precision === 'institution' ||
-    precision === 'county'
-  ) {
-    return precision;
+  const normalized = normalizePublicPrecision(precision);
+  // 'none' and 'country' are withheld/too-coarse-to-render tiers that never carry a map pin;
+  // PublicEntityView.locationPrecision only ever renders a real geo anchor, so both fall to
+  // the same 'city' floor as an unrecognised raw value.
+  if (normalized === 'none' || normalized === 'country') {
+    return 'city';
   }
-  return 'city';
+  return normalized;
 }
 
 /** View claims render a nominal score alongside the level chip; the projection carries only the
@@ -252,6 +261,12 @@ function mapPrimaryImage(
     ...(image.width !== undefined ? { width: image.width } : {}),
     ...(image.height !== undefined ? { height: image.height } : {}),
     ...(image.objectPath !== undefined ? { objectPath: image.objectPath } : {}),
+    ...(image.sourceSystem !== undefined ? { sourceSystem: image.sourceSystem } : {}),
+    ...(image.fileTitle !== undefined ? { fileTitle: image.fileTitle } : {}),
+    ...(image.sha1 !== undefined ? { sha1: image.sha1 } : {}),
+    ...(image.sourcePageUrl !== undefined ? { sourcePageUrl: image.sourcePageUrl } : {}),
+    ...(image.license !== undefined ? { license: image.license } : {}),
+    ...(image.pinnedAt !== undefined ? { pinnedAt: image.pinnedAt } : {}),
   };
 }
 
@@ -362,6 +377,7 @@ export function mapProjectionToPublicEntityView(
     jurisdictionLabel: resolveJurisdictionLabel(projection),
     locationPrecision: locationPrecisionFromProjection(projection.location?.precision),
     locationLabel: projection.locationLabel ?? projection.displayName,
+    ...(projection.visit !== undefined ? { visit: projection.visit } : {}),
     relevanceExplanation:
       claims.length > 0
         ? 'Included as a documented site in the active public release; each accepted claim below cites its source.'

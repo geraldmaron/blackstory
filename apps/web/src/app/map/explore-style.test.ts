@@ -88,10 +88,13 @@ function matchExpressionOutputs(expression: unknown): readonly unknown[] {
   return outputs;
 }
 
-/** Stroke widths are zoom-scaled: unwrap `interpolate` → `['*', match, scale]` at the first stop. */
+/** Stroke widths are zoom-scaled: `['*', match, scale]`, either bare (the value at one stop of a
+ * folded first-paint blend, see `blendFirstPaintWithKindExpression`) or at the first stop of a
+ * top-level zoom `interpolate`. */
 function strokeWidthMatchOutputs(expression: unknown): readonly unknown[] {
   const arr = expression as unknown[];
   if (arr[0] === 'match') return matchExpressionOutputs(expression);
+  if (arr[0] === '*') return matchExpressionOutputs(arr[1]);
   assert.equal(arr[0], 'interpolate', 'expected zoom-scaled stroke width');
   assert.deepEqual(arr[2], ['zoom']);
   const firstScaled = arr[4] as unknown[];
@@ -112,16 +115,18 @@ function buildStyleFixture(
   });
 }
 
-test('the entities source is configured to cluster with the shared explore cluster config', () => {
+test('the entities source clusters with per-family counters for dominant shade paint', () => {
   const style = buildStyleFixture('presence');
   const entitiesSource = style.sources['explore-entities'] as {
     cluster?: boolean;
     clusterRadius?: number;
     clusterMaxZoom?: number;
+    clusterProperties?: Record<string, unknown>;
   };
   assert.equal(entitiesSource.cluster, true);
   assert.equal(entitiesSource.clusterRadius, EXPLORE_CLUSTER_CONFIG.clusterRadius);
   assert.equal(entitiesSource.clusterMaxZoom, EXPLORE_CLUSTER_CONFIG.clusterMaxZoom);
+  assert.equal((entitiesSource.clusterProperties?.people_n as unknown[] | undefined)?.[0], '+');
 });
 
 test('clusteringEnabled: false disables GeoJSON clustering on the entities source', () => {
@@ -904,12 +909,15 @@ test('point and halo radii blend first-paint sizes nationally with marker-size.t
   );
 });
 
-test('clusters use Page Sand fill and copper stroke, not white rims', () => {
+test('clusters inherit dominant kind-family shade instead of Page Sand / copper chrome', () => {
   const style = buildStyleFixture('presence');
   const clusterLayer = layerById(style, EXPLORE_CLUSTER_LAYER_ID);
-  assert.equal(clusterLayer.paint?.['circle-color'], DIGNITY_PALETTE.pointHalo);
-  assert.equal(clusterLayer.paint?.['circle-stroke-color'], DIGNITY_PALETTE.point);
-  assert.notEqual(clusterLayer.paint?.['circle-stroke-color'], DIGNITY_PALETTE.selected);
+  const fill = clusterLayer.paint?.['circle-color'] as unknown[];
+  const stroke = clusterLayer.paint?.['circle-stroke-color'] as unknown[];
+  assert.equal(fill[0], 'case');
+  assert.equal(stroke[0], 'case');
+  assert.notEqual(fill, DIGNITY_PALETTE.pointHalo);
+  assert.notEqual(stroke, DIGNITY_PALETTE.point);
 });
 
 test('clusters use zoom-scaled count-step radii from CLUSTER_RADIUS_BY_COUNT', () => {

@@ -25,9 +25,14 @@ type FirstPaintPinPlateProps = {
   readonly plateClassName?: string;
 };
 
+/** Shared with `pinAriaLabel` below and read back out by `use-pin-photo-hover.ts` — deriving a
+ * hover card's display name from the pin's own accessible name costs no extra bytes on the Door's
+ * ISR page, where a second `data-*` attribute repeating the same text would. */
+export const PIN_ARIA_LABEL_PREFIX = 'Open ';
+
 function pinAriaLabel(name: string): string {
   if (isShopToken(name) || name.trim().length === 0) return 'Open this place';
-  return `Open ${name}`;
+  return `${PIN_ARIA_LABEL_PREFIX}${name}`;
 }
 
 export function FirstPaintPinPlate({

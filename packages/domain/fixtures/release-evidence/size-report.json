@@ -3,32 +3,32 @@
     {
       "kind": "bootstrap",
       "byteLength": 2053,
-      "gzipByteLength": 877
+      "gzipByteLength": 870
     },
     {
       "kind": "content-index",
       "byteLength": 123,
-      "gzipByteLength": 117
+      "gzipByteLength": 119
     },
     {
       "kind": "entities-list",
       "byteLength": 65,
-      "gzipByteLength": 82
+      "gzipByteLength": 83
     },
     {
       "kind": "bounded-points",
-      "byteLength": 320,
-      "gzipByteLength": 214
+      "byteLength": 322,
+      "gzipByteLength": 220
     },
     {
       "kind": "map-county-aggregates",
       "byteLength": 145,
-      "gzipByteLength": 128
+      "gzipByteLength": 132
     },
     {
       "kind": "map-source",
-      "byteLength": 1436,
-      "gzipByteLength": 582
+      "byteLength": 1425,
+      "gzipByteLength": 591
     },
     {
       "kind": "map-state-aggregates",
@@ -38,39 +38,39 @@
     {
       "kind": "search-index",
       "byteLength": 59,
-      "gzipByteLength": 78
+      "gzipByteLength": 79
     }
   ],
   "rel_mob005_b": [
     {
       "kind": "bootstrap",
       "byteLength": 2053,
-      "gzipByteLength": 876
+      "gzipByteLength": 869
     },
     {
       "kind": "content-index",
       "byteLength": 123,
-      "gzipByteLength": 117
+      "gzipByteLength": 119
     },
     {
       "kind": "entities-list",
       "byteLength": 65,
-      "gzipByteLength": 82
+      "gzipByteLength": 83
     },
     {
       "kind": "bounded-points",
-      "byteLength": 320,
-      "gzipByteLength": 215
+      "byteLength": 322,
+      "gzipByteLength": 221
     },
     {
       "kind": "map-county-aggregates",
       "byteLength": 145,
-      "gzipByteLength": 128
+      "gzipByteLength": 132
     },
     {
       "kind": "map-source",
-      "byteLength": 1436,
-      "gzipByteLength": 583
+      "byteLength": 1425,
+      "gzipByteLength": 591
     },
     {
       "kind": "map-state-aggregates",
@@ -80,7 +80,7 @@
     {
       "kind": "search-index",
       "byteLength": 59,
-      "gzipByteLength": 78
+      "gzipByteLength": 79
     }
   ]
 }

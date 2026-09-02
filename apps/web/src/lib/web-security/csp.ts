@@ -43,8 +43,19 @@ const PUBLIC_MEDIA_IMG_SRC = [
  * should re-host these into the Supabase media bucket for durability (see
  * repo issue: re-host article hero images); this host keeps them rendering
  * until that pipeline lands.
+ *
+ * `commons.wikimedia.org` is here too (repo-4vuf, pin-and-serve): entity mast photos pin a
+ * Commons file title and render it via `Special:FilePath/<title>?width=960`, which 302s to
+ * `upload.wikimedia.org`. The browser's <img> request starts at commons.wikimedia.org before
+ * the redirect, so both hosts must be allowed.
  */
-const ARTICLE_MEDIA_IMG_SRC = ['https://upload.wikimedia.org'];
+// thumb.wikimedia.org: Commons' Special:Redirect/file now 301s rendered thumbnails to this host
+// (observed 2026-09-02), so it is where a pinned photo's final <img> request lands.
+const ARTICLE_MEDIA_IMG_SRC = [
+  'https://upload.wikimedia.org',
+  'https://commons.wikimedia.org',
+  'https://thumb.wikimedia.org',
+];
 
 /**
  * Banned-books cover thumbnails: Open Library ISBN URLs redirect to archive.org

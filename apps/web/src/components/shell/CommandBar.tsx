@@ -6,7 +6,7 @@
  */
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BRAND_ASSETS } from '@repo/config';
@@ -16,6 +16,18 @@ import { LibraryMenu } from './LibraryMenu';
 import './command-bar.css';
 
 void React;
+
+/** Writes measured command-bar clearance to the document root for Door/room layout tokens. */
+export function syncCommandBarClearance(bar: HTMLElement): void {
+  const bottomPx = bar.getBoundingClientRect().bottom;
+  if (!Number.isFinite(bottomPx) || bottomPx <= 0) {
+    return;
+  }
+  document.documentElement.style.setProperty(
+    '--ds-island-clearance',
+    `calc(${bottomPx}px + var(--ds-island-gap))`,
+  );
+}
 
 export type AtlasMode = 'atlas' | 'story';
 
@@ -71,9 +83,25 @@ export function CommandBar({
 }: CommandBarProps) {
   const pathname = usePathname() || '/';
   const onAtlas = Boolean(mode && onModeChange);
+  const barRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const bar = barRef.current;
+    if (!bar) {
+      return;
+    }
+    syncCommandBarClearance(bar);
+    const observer = new ResizeObserver(() => {
+      syncCommandBarClearance(bar);
+    });
+    observer.observe(bar);
+    return () => {
+      observer.disconnect();
+    };
+  }, [onAtlas, onOpenPalette]);
 
   return (
-    <header className={cx('ds-bar', className)}>
+    <header ref={barRef} className={cx('ds-bar', className)}>
       <Link className="ds-bar__brand ds-shell-wordmark" href="/" aria-label="BlackStory · home">
         <ShellWordmark lockup={BRAND_ASSETS.lockup} symbol={BRAND_ASSETS.symbol} />
       </Link>
@@ -105,7 +133,7 @@ export function CommandBar({
         {onAtlas ? (
           <nav className="ds-bar__modes" aria-label="Sections">
             <span className="ds-bar__mode-link" aria-current="page">
-              Atlas
+              Explore
             </span>
             <Link
               className="ds-bar__mode-link"
@@ -127,9 +155,10 @@ export function CommandBar({
             <Link
               className="ds-bar__mode-link"
               href="/explore"
+              prefetch={false}
               aria-current={pathIsCurrent(pathname, '/explore') ? 'page' : undefined}
             >
-              Atlas
+              Explore
             </Link>
             <Link
               className="ds-bar__mode-link"

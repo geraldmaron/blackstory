@@ -62,6 +62,10 @@ tmp/
 .local/
 artifacts/
 
+# scripts/dev-web.sh output (dev-web.log, dev-web.pid) — local-only, not *.log
+# scoped (directory name, not a file extension match).
+.logs/
+
 # Docker volumes
 infra/database/data/
 

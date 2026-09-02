@@ -93,33 +93,27 @@ write **private candidates and ledger runs in Postgres** via quarantine gates �
 Dataset ingestion (this runbook) is for *carrying* published data faithfully. Don't mix the lanes: statistics never go through the
 candidate pipeline, and scraped candidates never skip corpus vetting.
 
-## Researched-entity records (national catalog lane)
+## Researched-entity records
 
-Human-or-agent researched entities (the `fixtures/national-catalog/*.json` →
-`publish-national-catalog.ts` path) are a third lane with its own bar:
+The fixture-based national catalog lane (`fixtures/national-catalog/*.json` →
+`publish-national-catalog.ts`, with `qa-catalog-fixtures.ts`, `audit-entity-locations.ts`, and
+`enrich-entity-locations.ts`) was retired when Supabase became the sole entity store. There are
+no entity fixtures in git; researched entities are written to Postgres through operator-cli
+and the admin console. The bar for a researched entity is unchanged:
 
 - Every record: real, web-verified, with citation URLs from authoritative custodians
   (NPS/NRHP, institutions themselves, state encyclopedias, university archives).
-- Coordinates must pass state-bbox containment QA
-  (`scripts/qa-catalog-fixtures.ts`) before publish; `manual_research` match method.
-- After fixture edits, run the Census location audit (deterministic, cached, no LLM):
-  `node --conditions development --import tsx packages/firebase/scripts/audit-entity-locations.ts`.
-  Street-address pins beyond the precision drift threshold can be auto-corrected with
-  `--apply-street-corrections`. Named places: run
-  `enrich-entity-locations.ts --apply` (Wikidata P625 → git-durable
-  `national-catalog-location-overrides.json`; raw JSON under `.cache/wikidata-entities/`).
-  Live APIs are enrichment-only — publish/map read overrides + EntityLocation, never live
-  geocoders. Never snap to US state/city centroids; parent-site snaps are capped at 15km,
-  otherwise retain the pin and honesty-downgrade precision. Operator one-off:
+- Locations follow `docs/security/location-precision-standard.md`. Place an entity with
   `operator-cli locate --entity-id … --address …` (see
-  `.claude/skills/blackstory/locate/SKILL.md`). Finding or confirming a place without a sourced
-  address is `.claude/skills/blackstory/entity-verify`.
+  `.claude/skills/blackstory/locate/SKILL.md`); live geocoders are enrichment-only and the
+  public map reads `EntityLocation`, never a live API. Never snap to US state/city centroids;
+  when a sourced address is missing, keep the pin and downgrade precision honestly. Finding or
+  confirming a place without a sourced address is `.claude/skills/blackstory/entity-verify`.
 - Dignity framing per BB-051: presence and institution-building, never deficit;
   `sensitivityClass` only where violence is the documented subject.
 - Claims carry `confidenceLevel` honestly (`high` only when the cited source states it
   directly) — and never numeric scores (public-numeric-policy).
-- DRY_RUN publish validates everything against `publicEntityProjectionSchema` before any
-  write.
+- Publish validates everything against `publicEntityProjectionSchema` before any write.
 
 ## Reference implementations
 

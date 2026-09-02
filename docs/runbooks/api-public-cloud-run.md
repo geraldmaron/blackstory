@@ -1,5 +1,10 @@
 # api-public Cloud Run deploy (Postgres SoR)
 
+> **Leftover runbook.** Current public web is Vercel reading Supabase Postgres directly.
+> Firebase App Hosting is not the web/admin host. Cloud Run deploy for this API remains
+> unverified in-repo. Do not read the "Firebase App Hosting stays in place" sentence below
+> as current.
+
 > **2026-08-14 correction:** this file's deploy mechanism is **unverified, not just undocumented**
 > — `apps/api-public` has no `Dockerfile`, no `cloudbuild.yaml`, and no build config anywhere in
 > the repo, and `.github/workflows/deploy-production.yml` only echoes a `[DRY-RUN]` line for this
@@ -14,8 +19,9 @@
 > `PUBLIC_DATA_SOURCE=firestore` today does nothing, there is no fallback, silent or explicit.
 
 Production reads use Supabase Postgres `bb_public.*` — same env vocabulary as `apps/web`.
-**Firebase App Hosting** (web/admin host) and **Firebase Storage** stay in place; this runbook
-only covers the `@repo/api-public` Cloud Run service.
+**Leftover:** Firebase App Hosting and Firebase Storage are not the current public web host or
+media SoR. This runbook only covers the `@repo/api-public` Cloud Run *target*, which is
+unverified in this repo.
 
 ## Architecture
 

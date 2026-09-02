@@ -16,7 +16,7 @@ import './door-home.css';
 void React;
 
 export async function DoorHome() {
-  const { pins, features } = await loadDoorPinPlate();
+  const { pins, features, densityLevels } = await loadDoorPinPlate();
   const placeCount = pins.features.length.toLocaleString('en-US');
 
   const orderRoll = Math.random();
@@ -38,6 +38,7 @@ export async function DoorHome() {
     <main id="main" className="ds-door">
       <DoorImmersive
         pins={pins}
+        densityLevels={densityLevels}
         chapters={chapters}
         factByChapterId={factByChapterId}
         spotlight={spotlight}

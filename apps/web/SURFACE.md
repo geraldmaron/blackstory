@@ -1,6 +1,8 @@
 # Public web surface contract
 
-This app is the **public UI** surface. It is deployed via **Vercel**, not Cloud Run or App Hosting.
+This app is the **public UI** surface. It is deployed via **Vercel**, not Cloud Run or
+Firebase App Hosting. Verified 2026-08-28 against live blackstory.app (`x-vercel-id`,
+`x-vercel-cache`).
 
 ## Binding
 
@@ -31,10 +33,11 @@ Typed definitions: `packages/config/src/surfaces.ts` (`web` entry).
 
 ## Separation from admin
 
-`apps/admin` is a **separate Next.js deployable** on port 3001 locally. Do not add admin route
-handlers or research console pages to this app. Shared UI belongs in `packages/ui`; shared domain
-logic belongs in `packages/domain`. Admin interim host is App Hosting (`black-book-admin-production`);
-target is Cloud Run + IAP.
+`apps/admin` is a **separate Next.js deployable** on port 3001 locally and a separate Vercel
+project in production. Do not add admin route handlers or research console pages to this app.
+Shared UI belongs in `packages/ui`; shared domain logic belongs in `packages/domain`. Firebase
+App Hosting `black-book-admin-production` and its Cloud Run twin were deleted; do not recreate
+them.
 
 ## Maintenance mode
 

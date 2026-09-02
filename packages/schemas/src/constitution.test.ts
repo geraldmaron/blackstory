@@ -22,8 +22,8 @@ import {
 test('loads versioned product constitution from shared JSON', () => {
   resetProductConstitutionCache();
   const policy = loadProductConstitution();
-  assert.equal(policy.policyVersion, '1.0.0');
-  assert.equal(getPolicyVersion(), '1.0.0');
+  assert.equal(policy.policyVersion, '1.1.0');
+  assert.equal(getPolicyVersion(), '1.1.0');
   assert.ok(policy.relevanceThresholds.includeMinimum > 0);
   assert.ok(
     policy.claimConfidenceThresholds.highImpactPublish >
@@ -56,7 +56,7 @@ test('every evaluation records policyVersion', () => {
   const relevance = evaluateRelevance(0.8, 'include');
   const confidence = evaluateClaimConfidence(0.8, 'standard');
   for (const result of [living, precision, procedural, relevance, confidence]) {
-    assert.equal(result.policyVersion, '1.0.0');
+    assert.equal(result.policyVersion, '1.1.0');
   }
 });
 
@@ -67,14 +67,18 @@ test('living and unknown status are treated as living', () => {
 });
 
 test('prohibited location precision is rejected', () => {
-  const result = evaluatePublicPrecision('street_address');
+  const result = evaluatePublicPrecision('unit');
   assert.equal(result.allowed, false);
   assert.equal(result.reason, 'prohibited_location_precision');
 });
 
 test('living-person residential precision is rejected', () => {
+  // "street_address" is a residentialPrecisionLevels member (a raw/synonym token
+  // normalizePublicPrecision maps onto the "address" tier); it never appears in
+  // publicPrecisionRules.allowedLevels, so it is rejected as residential for a living person.
   const result = evaluatePublicPrecision('street_address', { livingStatus: 'unknown' });
   assert.equal(result.allowed, false);
+  assert.equal(result.reason, 'living_residential_precision_prohibited');
 });
 
 test('unsupported procedural language is rejected', () => {
@@ -130,7 +134,7 @@ test('fixtures cover included, excluded, disputed, sparse, sensitive, living-per
 test('ugcLivingPersonRules extends the constitution without bumping policyVersion ()', () => {
   resetProductConstitutionCache();
   const policy = loadProductConstitution();
-  assert.equal(policy.policyVersion, '1.0.0');
+  assert.equal(policy.policyVersion, '1.1.0');
   assert.equal(policy.ugcLivingPersonRules.crossSourceProfileAggregationProhibited, true);
   assert.equal(policy.ugcLivingPersonRules.deanonymizationProhibited, true);
   assert.equal(policy.ugcLivingPersonRules.elevatedClaimClass, 'high_impact');

@@ -11,6 +11,7 @@ import {
   buildExploreFacetOptions,
   DEFAULT_EXPLORE_FILTERS,
   filterFeaturesInBounds,
+  kindMatchesPublicFilter,
   sortFeaturesForList,
 } from './filters';
 import { kindFamilyFor } from './kind-encoding';
@@ -272,4 +273,18 @@ test('buildEntityDecadeCounts returns chronological decade buckets with counts',
     { decade: '1950s', count: 1 },
     { decade: '1960s', count: 2 },
   ]);
+});
+
+test('kindMatchesPublicFilter accepts families and micro-kinds only', () => {
+  assert.equal(kindMatchesPublicFilter('school', 'places'), true);
+  assert.equal(kindMatchesPublicFilter('school', 'school'), true);
+  assert.equal(kindMatchesPublicFilter('law', 'sources'), true);
+  assert.equal(kindMatchesPublicFilter('law', 'law'), true);
+  assert.equal(kindMatchesPublicFilter('movement', 'organizations'), true);
+  assert.equal(kindMatchesPublicFilter('case', 'events'), true);
+  assert.equal(kindMatchesPublicFilter('publication', 'sources'), true);
+  // Legacy /history category ids are not filter vocabulary.
+  assert.equal(kindMatchesPublicFilter('publication', 'works'), false);
+  assert.equal(kindMatchesPublicFilter('case', 'law'), false);
+  assert.equal(kindMatchesPublicFilter('movement', 'events'), false);
 });

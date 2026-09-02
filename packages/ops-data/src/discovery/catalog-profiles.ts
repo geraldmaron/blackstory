@@ -57,14 +57,6 @@ export function resolutionProfileFromCatalogLeaf(
   return { entity };
 }
 
-/** @deprecated Prefer resolutionProfileFromCatalogLeaf — kept for call-site stability. */
-export function resolutionProfileFromPublicSearchIndex(
-  leaf: DiscoveryCatalogLeaf,
-  nowIso: string,
-): ResolutionProfile {
-  return resolutionProfileFromCatalogLeaf(leaf, nowIso);
-}
-
 function stringArray(value: unknown): string[] {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === 'string')

@@ -31,7 +31,7 @@ import {
   type RawExploreSearchParams,
 } from '../../lib/map-experience';
 import {
-  buildExploreMapSource,
+  exploreMapSourceFor,
   type ExploreMapFeature,
   type ExploreMapSource,
 } from '../../lib/map-experience/build-explore-map-source';
@@ -150,7 +150,7 @@ export function buildExploreViewModel(
   citesEdge: CitesEdgeIndex = {},
 ): ExploreViewModel {
   const viewState = parseExploreSearchParams(raw);
-  const source = buildExploreMapSource(entities);
+  const source = exploreMapSourceFor(entities);
   const allFeatures = source.featureCollection.features;
   const filteredFeatures = applyExploreFilters(allFeatures, viewState.filters, viewState.state);
   const densityLevels = buildStateDensityLevels(source.stateAggregates);
@@ -200,7 +200,7 @@ export function buildAtlasShell(
   readonly noscriptFeatures: readonly ExploreMapFeature[];
 } {
   const viewState = parseExploreSearchParams(raw);
-  const source = buildExploreMapSource(entities);
+  const source = exploreMapSourceFor(entities);
   const allFeatures = source.featureCollection.features;
   const filteredFeatures = applyExploreFilters(allFeatures, viewState.filters, viewState.state);
   return {

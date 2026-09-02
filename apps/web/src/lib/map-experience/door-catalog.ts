@@ -17,7 +17,7 @@ import {
   fitsNextDataCache,
 } from '../public-data/live-catalog-cache';
 import {
-  buildExploreMapSource,
+  exploreMapSourceFor,
   type ExploreMapFeature,
   type ExploreMapFeatureCollection,
 } from './build-explore-map-source';
@@ -27,6 +27,7 @@ import {
   resolveDoorPinTarget,
   toDoorLinkPins,
 } from './first-paint-pins';
+import { buildStateDensityLevels, type StateDensityLevel } from './density';
 import { getSharedPublicEntities } from './shared-map-data';
 
 /** Aligned with `RELEASE_CATALOG_REVALIDATE_SECONDS` in `../public-data/source.ts`. */
@@ -46,6 +47,8 @@ export type DoorRedirectTableCache = {
 export type DoorPinPlateCache = DoorRedirectTableCache & {
   readonly pins: ExploreMapFeatureCollection;
   readonly features: readonly ExploreMapFeature[];
+  /** Per-state presence tiers for the live plate — the same tint the Atlas opens on. */
+  readonly densityLevels: readonly StateDensityLevel[];
 };
 
 const doorPlateMemory = createLiveCatalogMemoryCache<DoorPinPlateCache>({
@@ -74,7 +77,7 @@ function buildDoorPinPlateCache(
   entities: ReturnType<typeof listPublicEntities>,
   source: PublicReadSource | 'none',
 ): DoorPinPlateCache {
-  const mapSource = buildExploreMapSource(entities);
+  const mapSource = exploreMapSourceFor(entities);
   const features = mapSource.featureCollection.features;
   const pins = toDoorLinkPins(features);
   const pinRedirects = features.map((_feature, index) => {
@@ -85,6 +88,7 @@ function buildDoorPinPlateCache(
     pins,
     pinRedirects,
     features,
+    densityLevels: buildStateDensityLevels(mapSource.stateAggregates),
     releaseId: mapSource.releaseId,
     generatedAt: mapSource.generatedAt,
     source,

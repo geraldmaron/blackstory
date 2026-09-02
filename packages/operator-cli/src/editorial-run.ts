@@ -130,7 +130,7 @@ type ModelJson = {
 
 const TOPIC_ID_LIST = TOPIC_REGISTRY.map((topic) => topic.id).join(', ');
 
-const EDITORIAL_RESPONSE_SCHEMA = {
+export const EDITORIAL_RESPONSE_SCHEMA = {
   type: 'object',
   additionalProperties: false,
   required: ['decision', 'rationale', 'confidence', 'drafts'],
@@ -202,7 +202,7 @@ const EDITORIAL_RESPONSE_SCHEMA = {
   },
 } as const;
 
-const SYSTEM_PROMPT = `You are an editorial judge for BlackStory (History, pinned to place).
+export const SYSTEM_PROMPT = `You are an editorial judge for BlackStory (History, pinned to place).
 Return ONLY JSON with keys: decision (keep|reject|needs_evidence), rationale, confidence (0-1),
 drafts: { publicSummary, historicalContext, identityLabel?, relevanceNote?, relatedEntityIds?,
 proposedRelationshipNotes?, claims?, topicIds?, eraBuckets?, keywords? }.

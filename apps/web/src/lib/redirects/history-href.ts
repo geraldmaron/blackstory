@@ -11,6 +11,8 @@
  * incidental extra key.
  */
 
+import { historyKindToRecordsKind } from '../history/filters';
+
 /** `/history` accepts `1930s`; a bare `1930` is the shape people type and bookmark. */
 const DECADE_LABEL_PATTERN = /^(\d{4})s?$/;
 
@@ -47,7 +49,12 @@ export function mapHistoryQueryToRecordsHref(raw: RawHistoryRedirectParams): str
 
   for (const key of ['kind', 'status', 'topic'] as const) {
     const value = (firstValue(raw[key]) ?? '').trim();
-    if (value && value !== 'all') params.set(key, value);
+    if (!value || value === 'all') continue;
+    if (key === 'kind') {
+      params.set('kind', historyKindToRecordsKind(value));
+      continue;
+    }
+    params.set(key, value);
   }
 
   // An explicit `era` is already in the destination vocabulary, so it wins. Two temporal

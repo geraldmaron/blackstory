@@ -8,7 +8,8 @@
  * been retracted or corrected.
  *
  * Pure presentation over `../../lib/evidence`'s `EvidenceClaimView` — no derivation logic lives
- * here; see `buildEvidenceCard` for that.
+ * here; see `buildEvidenceCard` for that. Layout is class-driven (`entity-page.css`'s
+ * `.ds-evidence-claim__*`) so the record page can set the claim register once.
  */
 
 import React from 'react';
@@ -29,81 +30,68 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
   const predicateLabel = humanizeToken(card.predicate);
 
   return (
-    <Card id={card.id} title={predicateLabel} aria-describedby={citationId}>
+    <Card
+      id={card.id}
+      title={predicateLabel}
+      className={`ds-evidence-claim ds-evidence-claim--${card.confidenceLevel}`}
+      aria-describedby={citationId}
+    >
       <p className="ds-evidence-claim__body">{sanitizePublicProseText(card.object)}</p>
 
-      <div className="ds-row" style={{ marginBottom: 'var(--ds-space-3)', flexWrap: 'wrap' }}>
+      <div className="ds-row ds-evidence-claim__meta">
         <Confidence level={card.confidenceLevel} label={card.confidenceLabel} />
       </div>
 
       {(card.relevanceNote || card.connectionStrengthNote) && (
-        <dl className="ds-sans" style={{ margin: '0 0 var(--ds-space-3) 0' }}>
+        <dl className="ds-sans ds-evidence-claim__notes">
           {card.relevanceNote ? (
             <>
-              <dt style={{ fontWeight: 600 }}>Relevance</dt>
-              <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>{card.relevanceNote}</dd>
+              <dt>Relevance</dt>
+              <dd>{card.relevanceNote}</dd>
             </>
           ) : null}
           {card.connectionStrengthNote ? (
             <>
-              <dt style={{ fontWeight: 600 }}>Connection strength</dt>
-              <dd style={{ margin: 0 }}>{card.connectionStrengthNote}</dd>
+              <dt>Connection strength</dt>
+              <dd>{card.connectionStrengthNote}</dd>
             </>
           ) : null}
         </dl>
       )}
 
-      <div id={citationId}>
+      <div id={citationId} className="ds-evidence-claim__source">
         <Citation
           source={card.citation.source}
           label={card.citation.label}
           {...(card.citation.href ? { href: card.citation.href } : {})}
         />
         {card.citation.withheldReason ? (
-          <p
-            className="ds-sans"
-            style={{ margin: 'var(--ds-space-2) 0 0 0', color: 'var(--ds-ink-muted)' }}
-          >
-            {card.citation.withheldReason}
-          </p>
+          <p className="ds-sans ds-evidence-claim__withheld">{card.citation.withheldReason}</p>
         ) : null}
       </div>
 
       {card.excerpt ? (
         card.excerpt.visible ? (
-          <blockquote
-            className="ds-sans"
-            cite={card.citation.href}
-            style={{
-              margin: 'var(--ds-space-3) 0 0 0',
-              paddingLeft: 'var(--ds-space-4)',
-              borderLeft: '2px solid var(--ds-border)',
-            }}
-          >
+          <blockquote className="ds-sans ds-evidence-claim__excerpt" cite={card.citation.href}>
             {card.excerpt.text}
           </blockquote>
         ) : (
-          <p
-            className="ds-sans"
-            style={{ margin: 'var(--ds-space-3) 0 0 0', color: 'var(--ds-ink-muted)' }}
-          >
-            {card.excerpt.reason}
-          </p>
+          <p className="ds-sans ds-evidence-claim__withheld">{card.excerpt.reason}</p>
         )
       ) : null}
 
       {card.dispute?.hasDispute ? (
-        <div style={{ marginTop: 'var(--ds-space-3)' }}>
+        <div className="ds-evidence-claim__notice">
           <Notice tone="dispute" title="Preserved contradiction">
             {card.dispute.note ? (
-              <p style={{ margin: '0 0 var(--ds-space-2) 0' }}>{card.dispute.note}</p>
+              <p className="ds-evidence-claim__notice-lede">{card.dispute.note}</p>
             ) : null}
             {card.dispute.alternates.length > 0 ? (
-              <ul style={{ margin: 0, paddingLeft: 'var(--ds-space-5)' }}>
+              <ul className="ds-evidence-claim__alternates">
                 {card.dispute.alternates.map((alternate) => (
                   <li key={`${card.id}_${alternate.value}`}>
                     <span className="ds-mono">{alternate.value}</span>
-                    {' \u2014 '}
+                    {' — '}
                     {humanizeToken(alternate.kind)}
                     {alternate.credible ? '' : ' (not independently credible)'}
                   </li>
@@ -115,10 +103,7 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
       ) : null}
 
       {hasCoverageMeta ? (
-        <p
-          className="ds-sans"
-          style={{ margin: 'var(--ds-space-3) 0 0 0', color: 'var(--ds-ink-muted)' }}
-        >
+        <p className="ds-sans ds-evidence-claim__coverage">
           {card.sourceLineage ? (
             <>
               Source lineage:{' '}
@@ -137,18 +122,15 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
       ) : null}
 
       {card.revisionHistory.length > 0 ? (
-        <details style={{ marginTop: 'var(--ds-space-3)' }}>
-          <summary className="ds-sans" style={{ fontWeight: 600, cursor: 'pointer' }}>
+        <details className="ds-evidence-claim__history">
+          <summary className="ds-sans ds-evidence-claim__history-summary">
             Revision history ({card.revisionHistory.length})
           </summary>
-          <ol
-            className="ds-sans"
-            style={{ margin: 'var(--ds-space-2) 0 0 0', paddingLeft: 'var(--ds-space-5)' }}
-          >
+          <ol className="ds-sans ds-evidence-claim__history-list">
             {card.revisionHistory.map((entry) => (
               <li key={entry.id}>
                 <span className="ds-mono">{humanizeToken(entry.changeKind)}</span>
-                {' \u2014 '}
+                {' — '}
                 {entry.summary} ({formatIsoDate(entry.changedAt)})
               </li>
             ))}
@@ -157,11 +139,11 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
       ) : null}
 
       {card.retraction ? (
-        <div style={{ marginTop: 'var(--ds-space-3)' }}>
+        <div className="ds-evidence-claim__notice">
           <Notice tone="error" title={`Retracted ${formatIsoDate(card.retraction.retractedAt)}`}>
-            <p style={{ margin: 0 }}>{card.retraction.reason}</p>
+            <p className="ds-evidence-claim__notice-lede">{card.retraction.reason}</p>
             {card.retraction.supersededByClaimId ? (
-              <p style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
+              <p className="ds-evidence-claim__notice-more">
                 Superseded by <span className="ds-mono">{card.retraction.supersededByClaimId}</span>
                 .
               </p>

@@ -1,6 +1,7 @@
 /**
- * The door is an immersive Journey: scroll snaps chapters and zooms the pin field.
- * It is not the Atlas instrument and not a MapLibre StoryMode mount.
+ * The door is an immersive Journey: scroll snaps chapters and flies the shared map plate.
+ * It is not the Atlas instrument (no lens, no rail, no sheet) and not a second map: the plate
+ * it drives is the one `MapStage`, handed the same national-field patch the Atlas rests on.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -32,19 +33,41 @@ test('`/` mounts DoorImmersive over the pin plate, not the Atlas instrument', ()
   assert.match(door, /pickStoryChapters/);
   assert.match(door, /pickStoryRecord/);
   assert.doesNotMatch(door, /toDoorLinkPins/);
-  assert.doesNotMatch(door, /LivingAtmosphereMosaic|useStoryRunner|MapStage/);
+  assert.doesNotMatch(door, /LivingAtmosphereMosaic|useStoryRunner|AtlasExperience/);
   assert.doesNotMatch(door, /['"`]\/banned-books|['"`]\/journey/);
 });
 
-test('DoorImmersive scrolls chapters and drives plate focus without MapLibre', () => {
+test('DoorImmersive scrolls chapters and drives the shared plate', () => {
   assert.match(immersive, /'use client'/);
   assert.match(immersive, /IntersectionObserver/);
   assert.match(immersive, /resolveDoorFocus/);
   assert.match(immersive, /linkRecords/);
   assert.match(immersive, /scrollIntoView/);
   assert.match(immersive, />\s*Begin\s*</);
-  assert.match(immersive, /Open the Atlas/);
-  assert.doesNotMatch(immersive, /useStoryRunner|MapStage|maplibregl/);
+  assert.match(immersive, /Open Explore/);
+  // The one persistent plate, never a second MapLibre instance and never the Atlas's story runner.
+  assert.match(immersive, /useMapStage\(\)/);
+  assert.match(immersive, /stage\.patchData\(nationalFieldPatch\(pins, \{ densityLevels \}\)\)/);
+  assert.match(immersive, /focus\.camera/);
+  assert.doesNotMatch(immersive, /useStoryRunner|from 'maplibre-gl'|new maplibregl/);
+});
+
+test('the Door and the Atlas rest on one national-field patch', () => {
+  const field = readFileSync(
+    fileURLToPath(new URL('../lib/map-experience/national-field.ts', import.meta.url)),
+    'utf8',
+  );
+  const mapSync = readFileSync(
+    fileURLToPath(new URL('./explore/hooks/use-map-sync.ts', import.meta.url)),
+    'utf8',
+  );
+  const atlas = readFileSync(
+    fileURLToPath(new URL('./explore/AtlasExperience.tsx', import.meta.url)),
+    'utf8',
+  );
+  assert.match(field, /NATIONAL_FIELD_GROUPING = true/);
+  assert.match(mapSync, /nationalFieldPatch\(/);
+  assert.match(atlas, /nationalFieldPatch\(/);
 });
 
 test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
@@ -78,6 +101,10 @@ test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
   );
   assert.match(css, /@media \(max-height: 52rem\)/);
   assert.match(css, /\.ds-door__field-chrome[\s\S]*top:\s*var\(--ds-space-4\)/);
+  assert.match(
+    css,
+    /body:has\(\.ds-door\)\s+\.ds-shell\s*>\s*\.ds-bar[\s\S]*pointer-events:\s*auto/,
+  );
   // Mobile chapters are in document flow; nested card scroll would steal the page wheel.
   assert.match(css, /@media \(max-width: 899px\)[\s\S]*max-height:\s*none/);
   // Land mask on the pin plate made link hits fail (mask alpha ~0.32).

@@ -59,11 +59,12 @@ describe('bar search', () => {
 });
 
 describe('CommandBar destinations', () => {
-  it('keeps Door, Atlas, and Records in Find; Atlas bars keep a Door exit', () => {
+  it('keeps Door, Explore, and Records in Find; Explore bars keep a Door exit', () => {
     const source = code('components/shell/CommandBar.tsx');
     assert.doesNotMatch(source, /href=["'`]\/(?:explore)?#journey["'`]/);
     assert.doesNotMatch(source, /href=["'`]\/journey["'`]/);
     assert.match(source, /href="\/explore"/);
+    assert.match(source, /syncCommandBarClearance/);
     assert.match(source, /href="\/records"/);
     assert.match(source, /href="\/"/);
     assert.match(source, /aria-label="Find"/);
@@ -103,5 +104,17 @@ describe('the shell above the error boundary', () => {
     // `loadMapStageBase()` is the specific dependency SP-07 hoisted this provider away from.
     // Awaiting it here would make every room force-dynamic and give the shell a way to fail.
     assert.doesNotMatch(code('components/SiteShell.tsx'), /loadMapStageBase/);
+  });
+});
+
+describe('Journey is not advertised as a room', () => {
+  it('the off-Atlas bar does not link to /journey or /#journey', () => {
+    // Verified 2026-08-28: /journey is HTTP 404 on apex and www. About already refuses to
+    // list unfinished rooms. A CommandBar href would undo that.
+    const source = code('components/shell/CommandBar.tsx');
+    assert.doesNotMatch(source, /href=["']\/journey["']/);
+    assert.doesNotMatch(source, /href=["']\/#journey["']/);
+    // /records/42Cb1758 is also a verified 404; the bar must not mint record-id URLs.
+    assert.doesNotMatch(source, /\/records\/42Cb1758/);
   });
 });

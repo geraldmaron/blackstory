@@ -1,5 +1,5 @@
 /**
- * Padded Explore pointer hits: unclustered pins win, clusters resolve to a source.
+ * Padded Explore pointer hits: unclustered pins win; clusters carry drill-in coordinates.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -54,21 +54,29 @@ test('cluster hits carry the GeoJSON source that owns the cluster id', () => {
     {
       layerId: EXPLORE_CLUSTER_LAYER_ID,
       properties: { cluster_id: 4, point_count: 3 },
+      coordinates: [-77.03, 38.89],
     },
   ]);
   assert.deepEqual(hit, {
     kind: 'cluster',
     clusterId: 4,
     sourceId: EXPLORE_ENTITIES_SOURCE_ID,
+    center: [-77.03, 38.89],
   });
   assert.deepEqual(
     resolveEntityPointerHit([
       {
         layerId: EXPLORE_CLUSTER_LAYER_ID,
         properties: { cluster_id: '4', point_count: '3' },
+        coordinates: [-77.03, 38.89],
       },
     ]),
-    { kind: 'cluster', clusterId: 4, sourceId: EXPLORE_ENTITIES_SOURCE_ID },
+    {
+      kind: 'cluster',
+      clusterId: 4,
+      sourceId: EXPLORE_ENTITIES_SOURCE_ID,
+      center: [-77.03, 38.89],
+    },
   );
 });
 
@@ -82,15 +90,17 @@ test('empty or nameless features do not select', () => {
   assert.equal(entityIdFromProperties({ entityId: 'ent_ok' }), 'ent_ok');
 });
 
-test('MapStage opens a record sheet from padded pin and cluster leaf hits', () => {
+test('MapStage drills into clusters instead of opening a leaf record sheet', () => {
   const mapStage = readFileSync(
     fileURLToPath(new URL('../../components/map-stage/MapStage.tsx', import.meta.url)),
     'utf8',
   );
   assert.match(mapStage, /handleEntityPointerClick/);
-  assert.match(mapStage, /getClusterLeaves/);
+  assert.match(mapStage, /getClusterExpansionZoom/);
+  assert.match(mapStage, /expandClusterFromPointerHit/);
+  assert.match(mapStage, /notify\(listenersRef\.current, 'deselect'\)/);
+  assert.doesNotMatch(mapStage, /getClusterLeaves/);
   assert.match(mapStage, /pointerHitBox/);
   assert.match(mapStage, /clickTolerance:\s*MAP_CLICK_TOLERANCE_PX/);
   assert.match(mapStage, /pointerHitAt\(event\.point\) \? 'pointer'/);
-  assert.doesNotMatch(mapStage, /getClusterExpansionZoom/);
 });

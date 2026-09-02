@@ -215,11 +215,13 @@ const IMPORT_OR_REQUIRE = String.raw`(?:from\s+|import\s*\(\s*|require\s*\(\s*)[
 export const FORBIDDEN_PUBLIC_RENDER_IMPORTS = [
   new RegExp(`${IMPORT_OR_REQUIRE}@repo/data-access`),
   new RegExp(`${IMPORT_OR_REQUIRE}@repo/ops-data/admin`),
+  new RegExp(`${IMPORT_OR_REQUIRE}@repo/firebase`),
   new RegExp(`${IMPORT_OR_REQUIRE}firebase-admin`),
+  new RegExp(`${IMPORT_OR_REQUIRE}@supabase/`),
   new RegExp(`${IMPORT_OR_REQUIRE}[^'"]*/postgres`),
   new RegExp(`${IMPORT_OR_REQUIRE}pg['"]`),
   new RegExp(`${IMPORT_OR_REQUIRE}[^'"]*openai`),
   new RegExp(`${IMPORT_OR_REQUIRE}[^'"]*anthropic`),
   /from\s+['"]@google-cloud\/firestore['"]/,
-  /from\s+['"]firebase\/firestore['"]/,
+  /from\s+['"]firebase\/(?:app|auth|firestore|storage|functions)['"]/,
 ] as const;

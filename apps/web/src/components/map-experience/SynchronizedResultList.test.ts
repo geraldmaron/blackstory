@@ -67,7 +67,7 @@ test('with onSelect, metadata links are not nested inside the row button', () =>
   );
 
   const buttonClose = html.indexOf('</button>');
-  const firstMetaHref = html.indexOf('href="/explore?kind=place"');
+  const firstMetaHref = html.indexOf('href="/explore?kind=places"');
   assert.ok(buttonClose > -1, 'expected a row button');
   assert.ok(firstMetaHref > buttonClose, 'expected metadata links after the row button closes');
   assert.doesNotMatch(html, /<button[^>]*>[\s\S]*<a[\s\S]*<\/button>/);
@@ -86,7 +86,7 @@ test('links Where to external maps and other metadata to the right site views', 
   assert.doesNotMatch(html, /href="[^"]*state=DC"/);
   assert.match(html, /href="[^"]*era=1840s"/);
   assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church#accepted-claims"/);
-  assert.match(html, /href="[^"]*kind=place"/);
+  assert.match(html, /href="[^"]*kind=places"/);
   assert.match(html, /aria-label="Browse Place records"/);
 });
 

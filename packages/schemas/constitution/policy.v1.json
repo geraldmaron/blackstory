@@ -1,5 +1,5 @@
 {
-  "policyVersion": "1.0.0",
+  "policyVersion": "1.1.0",
   "relevanceThresholds": {
     "includeMinimum": 0.7,
     "supportingContextMinimum": 0.4,
@@ -53,10 +53,12 @@
       "county",
       "city",
       "neighborhood",
+      "campus",
       "institution",
-      "campus"
+      "site",
+      "address"
     ],
-    "prohibitedLevels": ["street_address", "unit", "parcel", "exact_coordinates", "residence"],
+    "prohibitedLevels": ["unit", "parcel", "exact_coordinates", "residence"],
     "livingResidentialProhibited": true,
     "reduceExactCoordinatesWhenNotNeeded": true
   },
@@ -92,16 +94,25 @@
       "historical_residence",
       "occupied_private_residence",
       "sensitive_site",
-      "protected_relationship"
+      "protected_relationship",
+      "restricted_site",
+      "memorial_site",
+      "withheld_on_request",
+      "violence_associated",
+      "enslaver_or_segregationist",
+      "perpetrator_associated"
     ],
     "precisionReductionReasons": [
       "prohibited_location_precision",
       "living_residential_precision_prohibited",
-      "occupied_private_residence_reduced",
       "exact_coordinates_reduced",
       "sensitivity_class_reduced",
       "unknown_precision_level",
-      "not_needed_for_public"
+      "not_needed_for_public",
+      "living_residence",
+      "living_status_unknown",
+      "restricted_site",
+      "withheld_on_request"
     ],
     "residentialPrecisionLevels": [
       "residence",
@@ -111,9 +122,9 @@
       "exact_coordinates"
     ],
     "livingResidenceMaxPublicPrecision": "city",
-    "occupiedPrivateResidenceMaxPublicPrecision": "neighborhood",
-    "sensitiveSiteMaxPublicPrecision": "neighborhood",
-    "reduceOccupiedPrivateResidenceForDeceased": true
+    "restrictedSiteMaxPublicPrecision": "city",
+    "sensitiveSiteMaxPublicPrecision": "city",
+    "withheldOnRequestMaxPublicPrecision": "none"
   },
   "ugcLivingPersonRules": {
     "crossSourceProfileAggregationProhibited": true,

@@ -102,6 +102,43 @@ const WATCHED_READS: readonly WatchedRead[] = [
     bytesPerRow: 164,
     budgetBytesPerDay: 1 * GB,
   },
+  // The three below were added 2026-09-02. pg_stat_statements since 2026-07-20 showed them at
+  // 478k, 515k and 960k calls respectively: small rows, but read on every dynamic request with
+  // only per-request memoisation, so they are the calls-blow-up alarm rather than the bytes one.
+  // Per-row sizes measured on the active release the same day.
+  {
+    label: 'release_articles_full',
+    description: 'Full article list pull (article index, cites edge, story lead)',
+    // Anchored on the ORDER BY so the by-slug point read (`WHERE articles.slug = $1`) is not
+    // counted as a full pull.
+    fingerprint:
+      'SELECT articles.payload%FROM bb_public.release_articles%ORDER BY articles.published_at%',
+    // 222,633 bytes across 48 rows.
+    bytesPerRow: 4_638,
+    // Healthy is one pull per instance per 30m (the release-scoped cache TTL); 1GB/day is
+    // ~4,700 full pulls, an order of magnitude above that.
+    budgetBytesPerDay: 1 * GB,
+  },
+  {
+    label: 'release_theme_impact_packets',
+    description: 'Theme-impact packet reads (all shapes: full, by theme, by packet id)',
+    fingerprint: 'SELECT packets.payload%FROM bb_public.release_theme_impact_packets%',
+    // 106,791 bytes across 13 rows.
+    bytesPerRow: 8_215,
+    budgetBytesPerDay: 1 * GB,
+  },
+  {
+    label: 'active_release_pointer',
+    description: 'Active-release pointer read (one tiny row; this is a call-count alarm)',
+    // The select list and FROM are on separate lines in the source, so `%` between them.
+    fingerprint:
+      'SELECT release_id, activated_at, search_index_version, manifest_hash%FROM bb_public.active_release%',
+    // 171 bytes, one row per call.
+    bytesPerRow: 171,
+    // ~600k calls/day. The pointer is memoised for 30s per instance and per request, so a
+    // healthy day is a few thousand calls; this only fires if the memo is bypassed wholesale.
+    budgetBytesPerDay: 100 * 1024 * 1024,
+  },
 ];
 
 type StatementRow = {

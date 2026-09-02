@@ -300,6 +300,27 @@ function enrichFeature(
 }
 
 /**
+ * `buildExploreMapSource(entities)` memoised on the catalog array's identity.
+ *
+ * The live catalog is one array reference for the life of its cross-request cache window (30
+ * minutes, see `release-scoped-cache.ts`), and every dynamic request on `/explore`, `/place`,
+ * the refine API and the Door was rebuilding the same ~4,100-feature source from it: the same
+ * redaction, the same aggregates, the same bytes. Memoising on the array means one build per
+ * catalog instance per process, and a retired catalog takes its source with it (WeakMap).
+ *
+ * Only the default (no-options) build is memoised; an options build is a different result.
+ */
+const defaultSourceByCatalog = new WeakMap<readonly PublicEntityView[], ExploreMapSource>();
+
+export function exploreMapSourceFor(entities: readonly PublicEntityView[]): ExploreMapSource {
+  const hit = defaultSourceByCatalog.get(entities);
+  if (hit) return hit;
+  const built = buildExploreMapSource(entities);
+  defaultSourceByCatalog.set(entities, built);
+  return built;
+}
+
+/**
  * Builds the full explore map source from the active release. Every coordinate that reaches an
  * `ExploreMapFeature` is still, transitively, the return value of `redactLocationForPublic` (via
  * `buildMapSource`) — this function never reads a raw anchor lat/lng back out for output, only

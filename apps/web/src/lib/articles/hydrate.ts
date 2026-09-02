@@ -98,7 +98,8 @@ export type HydratedArticleMapInset = {
   readonly label: string;
   readonly lat: number;
   readonly lng: number;
-  readonly precision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution';
+  readonly precision:
+    'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site' | 'address';
 };
 
 export type HydratedArticleDispute = {

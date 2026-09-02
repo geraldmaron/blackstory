@@ -143,6 +143,16 @@
       "development": "./src/temporal/index.ts",
       "types": "./dist/temporal/index.d.ts",
       "import": "./dist/temporal/index.js"
+    },
+    "./publication/cover-package": {
+      "development": "./src/publication/cover-package.ts",
+      "types": "./dist/publication/cover-package.d.ts",
+      "import": "./dist/publication/cover-package.js"
+    },
+    "./publication/public-story-seed": {
+      "development": "./src/publication/public-story-seed.ts",
+      "types": "./dist/publication/public-story-seed.d.ts",
+      "import": "./dist/publication/public-story-seed.js"
     }
   },
   "files": [

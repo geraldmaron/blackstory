@@ -1,7 +1,7 @@
 1:"$Sreact.fragment"
-5:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
+5:I[99990,["/blackstory/_next/static/chunks/13m8d36xc7t9s.js","/blackstory/_next/static/chunks/03obgaj591_9a.js"],"OutletBoundary"]
 6:"$Sreact.suspense"
-2:Tf0d,<h1 id="brand-language"><a class="heading-anchor" href="#brand-language">Brand language</a></h1>
+2:T104c,<h1 id="brand-language"><a class="heading-anchor" href="#brand-language">Brand language</a></h1>
 <p><strong>Product name:</strong> BlackStory.</p>
 <p><strong>Core line:</strong> History, pinned to place.</p>
 <p><strong>Support:</strong> People. Places. Evidence. Context.</p>
@@ -67,12 +67,16 @@ first-class.</p>
 <p>Flat matte fills only. No bevels, shadows, glows, or gradients.</p>
 <h2 id="type"><a class="heading-anchor" href="#type">Type</a></h2>
 <ul>
-<li><strong>Sora SemiBold</strong>: headlines</li>
-<li><strong>Inter</strong>: UI / body</li>
-<li><strong>Source Serif 4</strong>: editorial / longform</li>
-<li><strong>IBM Plex Mono</strong>: data, citations, dates, confidence</li>
+<li><strong>Schibsted Grotesk SemiBold</strong>: headlines</li>
+<li><strong>Geist</strong>: UI / body</li>
+<li><strong>Newsreader</strong>: editorial / longform</li>
+<li><strong>Geist Mono</strong>: data, citations, dates, confidence</li>
 </ul>
-<p>All open-source. No licensed fonts.</p>
+<p>All open-source. No licensed fonts. All four are variable faces, so weight and
+optical size are axes rather than separate files.</p>
+<p>Replaced Sora / Inter / Source Serif 4 / IBM Plex Mono. Schibsted Grotesk carries an
+editorial spine Sora's geometric construction did not, and Geist reads sharper than
+Inter at UI sizes without Inter's ubiquity.</p>
 <h2 id="shape"><a class="heading-anchor" href="#shape">Shape</a></h2>
 <p>Radii 8 / 16 / 28px (sm / md / lg). Flat matte fills. No ornamental motion.</p>
 <h2 id="the-mark"><a class="heading-anchor" href="#the-mark">The mark</a></h2>
@@ -111,7 +115,7 @@ address.</p>
 </tr>
 </tbody>
 </table>
-<p>Full usage contract: <code>docs/ui/brand.md</code> in the repository.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"concepts"}]]}],["$","p",null,{"className":"doc-lede","children":"Signature, palette, type, and map dignity rules for anything users see."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"5F9NtFGTImuCFa5aVssbJ"}
+<p>Full usage contract: <code>docs/ui/brand.md</code> in the repository.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"concepts"}]]}],["$","p",null,{"className":"doc-lede","children":"Signature, palette, type, and map dignity rules for anything users see."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"yuuD63I0OldEjDA3acYkx"}
 3:["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","brand",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]
 4:["$","$L5",null,{"children":["$","$6",null,{"name":"Next.MetadataOutlet","children":"$@7"}]}]
 7:null

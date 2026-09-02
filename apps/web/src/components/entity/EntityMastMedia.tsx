@@ -14,6 +14,7 @@ import {
   entityPrimaryImageAlt,
   primaryImageCreditCaption,
   primaryImageFocalClass,
+  primaryImageSourceLine,
   type RecordMarkReason,
 } from './record-mark';
 
@@ -95,6 +96,11 @@ export function EntityMastMedia({
     credit: image.credit,
     rightsStatus: image.rightsStatus,
   });
+  const sourceLine = primaryImageSourceLine({
+    ...(image.sourceSystem !== undefined ? { sourceSystem: image.sourceSystem } : {}),
+    ...(image.sourcePageUrl !== undefined ? { sourcePageUrl: image.sourcePageUrl } : {}),
+    ...(image.license !== undefined ? { license: image.license } : {}),
+  });
   const focalClass = primaryImageFocalClass(kind);
 
   return (
@@ -134,6 +140,17 @@ export function EntityMastMedia({
               {caption.creditText ? ' · ' : ''}
               {caption.rightsLabel}
             </span>
+          ) : null}
+          {sourceLine ? (
+            <a
+              href={sourceLine.url}
+              className="ds-entity-photo__source-link ds-mono"
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+            >
+              {caption.creditText || caption.showRightsLabel ? ' · ' : ''}
+              {sourceLine.label}
+            </a>
           ) : null}
         </figcaption>
       )}

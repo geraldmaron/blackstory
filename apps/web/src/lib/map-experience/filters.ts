@@ -1,6 +1,5 @@
 /**
- * Pure filter application + facet-option building for the map/list shared state. Mirrors the
- * history find-in-time facet convention (`apps/web/src/lib/history/filters.ts`) but operates
+ * Pure filter application + facet-option building for the map/list shared state. Operates
  * over `ExploreMapFeature` so the map canvas and the synchronized list can share one
  * filter/facet computation.
  *
@@ -51,16 +50,33 @@ export const DEFAULT_EXPLORE_FILTERS: ExploreFilterState = {
   confidence: 'all',
 };
 
-function kindMatchesFilter(featureKind: string, filterKind: string): boolean {
-  if (filterKind === 'all') return true;
-  if (isKnownMapKindFamily(filterKind)) {
-    return kindFamilyFor(featureKind) === filterKind;
+/**
+ * Single kind-filter matcher shared by the Atlas and `/records`.
+ * Accepts only the five map kind families (`people`) and micro-kinds (`school`).
+ * Legacy `/history` category ids (`law`, `works`) are remapped at the redirect boundary only.
+ */
+export function kindMatchesPublicFilter(featureKind: string, filterKind: string): boolean {
+  const needle = filterKind.trim();
+  if (!needle || needle === 'all') return true;
+  if (isKnownMapKindFamily(needle)) {
+    return kindFamilyFor(featureKind) === needle;
   }
-  // Legacy share URLs may still carry a micro-kind slug.
-  if (isKnownMapKind(filterKind)) {
-    return featureKind === filterKind;
+  if (isKnownMapKind(needle)) {
+    return featureKind === needle;
   }
-  return featureKind === filterKind;
+  return false;
+}
+
+/** Human label for an active kind constraint chip across Atlas and Records. */
+export function kindFilterLabel(filterKind: string): string {
+  const value = filterKind.trim();
+  if (isKnownMapKindFamily(value)) return kindFamilyEncodingFor(value).label;
+  if (isKnownMapKind(value)) return kindEncodingFor(value).label;
+  return value
+    .split(/[_-]/)
+    .filter((word) => word.length > 0)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 /**
@@ -75,7 +91,7 @@ export function applyExploreFilters(
 ): readonly ExploreMapFeature[] {
   const stateFilter = statePostalCode?.trim().toUpperCase();
   return features.filter((feature) => {
-    if (!kindMatchesFilter(feature.properties.kind, filters.kind)) return false;
+    if (!kindMatchesPublicFilter(feature.properties.kind, filters.kind)) return false;
     if (filters.tone !== 'all' && feature.properties.mapTone !== filters.tone) return false;
     if (filters.era !== 'all' && !feature.properties.eraBuckets.includes(filters.era)) return false;
     // Theme facet options come from effectiveTopicIds (topicIds preferred); filter the same set.

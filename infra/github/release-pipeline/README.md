@@ -7,16 +7,8 @@ Scripts and schemas used by `.github/workflows/deploy-staging.yml`,
 Deploy workflows record Vercel expectations, run migrate/health/smoke gates, and write provenance —
 they do **not** promote Firebase App Hosting.
 
-**Admin** interim host is App Hosting (`black-book-admin-production`, root `apphosting.admin.yaml`).
-Automatic App Hosting rollouts stay disabled — admin traffic moves only through explicit Firebase CLI
-rollouts at a pinned SHA:
-
-```bash
-firebase apphosting:rollouts:create black-book-admin-production \
-  --project=black-book-efaaf \
-  --git-commit=<sha> \
-  --force
-```
+**Admin** is the standalone Vercel project `apps/admin`. Firebase App Hosting
+`black-book-admin-production` is leftover / deleted. Do not recreate it.
 
 (`promote-app-hosting.sh` / `promote-app-hosting-dry-run.sh` were removed; they only ever targeted
 retired public-web backends.)
@@ -42,4 +34,4 @@ WIF apply: `infra/github/scripts/apply-wif.sh` (see `docs/runbooks/production-re
 Schema source of truth remains `infra/github/release-metadata/deployment-provenance.schema.json`.
 
 Public web rollback: Vercel promote/redeploy prior Production deployment SHA — not App Hosting.
-Admin rollback: `firebase apphosting:rollouts:create black-book-admin-production` at prior good SHA.
+Admin rollback: Vercel promote/redeploy prior admin Production deployment. App Hosting rollback is leftover.

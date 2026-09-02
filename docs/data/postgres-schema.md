@@ -98,6 +98,13 @@ erDiagram
 | `claimPromotions` | `bb_canonical.claim_promotions` |
 | `publicationCandidates` | `bb_canonical.publication_candidates` |
 
+Two `bb_canonical` tables have no Firestore precedent — added directly in Postgres once it
+became the sole store: `entity_visit` (phone/website/hours/visitability keyed on `entity_id`,
+plus `street`/`postal_code` columns added to `entity_locations`; see
+`supabase/migrations/20260902120000_entity_visit_contact.sql`) and `entity_media` (pinned
+Commons photo per entity/role — `entity_id`, `role`, `url`, license/credit/alt, RLS staff-only
+SELECT; see `supabase/migrations/20260902130000_entity_media.sql`).
+
 ### Evidence
 
 | Firestore | Postgres |

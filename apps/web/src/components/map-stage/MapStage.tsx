@@ -90,10 +90,13 @@ import {
 import {
   ENTITY_POINTER_HIT_LAYER_IDS,
   MAP_CLICK_TOLERANCE_PX,
-  entityIdFromProperties,
   pointerHitBox,
   resolveEntityPointerHit,
 } from '../../lib/map-experience/entity-pointer-hit';
+import {
+  clampClusterExpansionZoom,
+  clusterExpandDurationMs,
+} from '../../lib/map-experience/cluster-expand';
 import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
@@ -314,6 +317,9 @@ export function useMapStage(): MapStageHandle {
  * whole collection (which read as "all entities light up"). Only genuinely new ids mount and
  * only stale ids unmount.
  */
+/** Hover-intent delay before a pin's photo card opens (`PinPhotoCard`'s own doc comment). */
+const PIN_HOVER_INTENT_MS = 120;
+
 function syncCircularMarkers(
   map: MapLibreMap,
   maplibregl: MaplibreModule['default'],
@@ -321,6 +327,9 @@ function syncCircularMarkers(
   markers: Marker[],
   onSelect: (entityId: string) => void,
   selectedEntityId: string | undefined,
+  onHover: (
+    target: { readonly entityId: string; readonly name: string; readonly rect: DOMRect } | null,
+  ) => void,
 ): void {
   // Below clusterMaxZoom, MapLibre aggregates points — HTML hit-targets for every feature
   // sit above clusters and steal clicks. Only mount DOM targets once individuals are visible.
@@ -384,6 +393,23 @@ function syncCircularMarkers(
       event.preventDefault();
       event.stopPropagation();
       onSelect(entityId);
+    });
+    // Pin-photo hover intent: a short delay on enter (so a cursor passing over the plate does not
+    // flicker cards open), immediate on leave. `PinPhotoCard`'s doc comment has the full contract.
+    let hoverTimer: ReturnType<typeof setTimeout> | null = null;
+    el.addEventListener('mouseenter', () => {
+      if (hoverTimer !== null) clearTimeout(hoverTimer);
+      hoverTimer = setTimeout(() => {
+        hoverTimer = null;
+        onHover({ entityId, name: el.dataset.pinName ?? '', rect: el.getBoundingClientRect() });
+      }, PIN_HOVER_INTENT_MS);
+    });
+    el.addEventListener('mouseleave', () => {
+      if (hoverTimer !== null) {
+        clearTimeout(hoverTimer);
+        hoverTimer = null;
+      }
+      onHover(null);
     });
     const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
       .setLngLat([entry.lng, entry.lat])
@@ -471,6 +497,9 @@ export function MapStageProvider({
   const [posture, setPosture] = useState<PlatePosture>(() =>
     defaultPostureFor(surfaceClassFor(pathname ?? '/')),
   );
+  /** The posture as of the last render, readable from the async mount path below. */
+  const postureRef = useRef<PlatePosture>(posture);
+  postureRef.current = posture;
   const mapRef = useRef<MapLibreMap | null>(null);
   const maplibreglRef = useRef<MaplibreModule['default'] | null>(null);
   const markersRef = useRef<Marker[]>([]);
@@ -574,6 +603,7 @@ export function MapStageProvider({
         markersRef.current,
         (entityId) => notify(listenersRef.current, 'select', entityId),
         configRef.current.selectedEntity,
+        (target) => notify(listenersRef.current, 'pinHover', target),
       );
     } catch (error) {
       console.error('[MapStage] marker sync failed', error);
@@ -1190,7 +1220,10 @@ export function MapStageProvider({
         }
         const maplibregl = (await import('maplibre-gl')).default;
         maplibreglRef.current = maplibregl;
-        if (cancelledRef.current || !container.isConnected) return;
+        // Two imports can be in flight at once (StrictMode re-runs the surface's first patch
+        // after the re-arm above); whichever resolves second must not build a second map into
+        // the same container.
+        if (cancelledRef.current || !container.isConnected || mapRef.current) return;
 
         // The style prop was built on the server, which cannot read `<html data-theme>`. Re-resolve
         // the plate against the document BEFORE the first frame so a light-theme reader never sees
@@ -1261,6 +1294,12 @@ export function MapStageProvider({
       syncStateLabelTheme(readDocumentColorScheme());
       updateStateLabelOpacity(activeMap.getZoom());
 
+      // MapLibre constructs with every gesture on. Only the Live posture steers; a plate built
+      // on the Door (ambient) or into a moment (framed) must start locked, or the first wheel
+      // over the map zooms the plate instead of scrolling the document that asked for it.
+      if (postureRef.current === 'live') unlockGestures(activeMap);
+      else lockGestures(activeMap);
+
       syncEntityMarkers();
       lastViewportRef.current = readViewport(activeMap);
       notify(listenersRef.current, 'viewport', lastViewportRef.current);
@@ -1277,32 +1316,45 @@ export function MapStageProvider({
           features.map((feature) => ({
             layerId: feature.layer.id,
             properties: feature.properties ?? null,
+            ...(feature.geometry.type === 'Point'
+              ? { coordinates: feature.geometry.coordinates }
+              : {}),
           })),
         );
       }
 
-      function selectFromPointerHit(hit: NonNullable<ReturnType<typeof pointerHitAt>>): void {
-        if (hit.kind === 'entity') {
-          notify(listenersRef.current, 'select', hit.entityId);
-          return;
-        }
+      function expandClusterFromPointerHit(
+        hit: Extract<NonNullable<ReturnType<typeof pointerHitAt>>, { kind: 'cluster' }>,
+      ): void {
+        notify(listenersRef.current, 'deselect');
         const source = activeMap.getSource(hit.sourceId) as GeoJSONSource | undefined;
         if (!source) return;
         void source
-          .getClusterLeaves(hit.clusterId, 1, 0)
-          .then((leaves) => {
-            const entityId = entityIdFromProperties(leaves[0]?.properties);
-            if (entityId) notify(listenersRef.current, 'select', entityId);
+          .getClusterExpansionZoom(hit.clusterId)
+          .then((expansionZoom) => {
+            activeMap.easeTo({
+              center: [hit.center[0], hit.center[1]],
+              zoom: clampClusterExpansionZoom(expansionZoom, activeMap.getZoom()),
+              duration: clusterExpandDurationMs(prefersReducedMotion()),
+            });
           })
           .catch(() => {
             // Cluster may have dissolved between click and lookup.
           });
       }
 
+      function handleEntityPointerHit(hit: NonNullable<ReturnType<typeof pointerHitAt>>): void {
+        if (hit.kind === 'entity') {
+          notify(listenersRef.current, 'select', hit.entityId);
+          return;
+        }
+        expandClusterFromPointerHit(hit);
+      }
+
       function handleEntityPointerClick(event: MapMouseEvent) {
         const hit = pointerHitAt(event.point);
         if (!hit) return;
-        selectFromPointerHit(hit);
+        handleEntityPointerHit(hit);
       }
 
       function handleStateClick(event: MapLayerMouseEvent) {
@@ -1429,6 +1481,18 @@ export function MapStageProvider({
   }, []);
 
   useEffect(() => {
+    /*
+     * Re-arm on (re)mount. React StrictMode runs this effect, its cleanup, then the effect again
+     * on the same instance in development, and the refs survive that round trip. Without this
+     * reset the simulated unmount below left `cancelledRef` true for the life of the page: the
+     * first `patchData` had already started the `maplibre-gl` import, the import resolved into a
+     * cancelled provider and returned, and no later call could retry because `initStartedRef`
+     * was still set. The chunk loaded, the plate never built, and every dev session showed the
+     * Albers underlay in place of the map — a failure invisible in production, where StrictMode
+     * does not double-invoke.
+     */
+    cancelledRef.current = false;
+    initStartedRef.current = false;
     return () => {
       cancelledRef.current = true;
       pendingFlyRef.current = null;
@@ -1486,6 +1550,19 @@ export function MapStageProvider({
     lastFramedMomentRef.current = null;
     setPosture(defaultPostureFor(surfaceClass));
   }, [surfaceClass]);
+
+  /**
+   * Posture changes reach the gesture handlers directly. The Framed path below does the same
+   * inside its scroll-frame callback, but that callback only runs while a moment is live; a
+   * route change from the Instrument to the Door (or back) has no moment and still has to hand
+   * the wheel over.
+   */
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (posture === 'live') unlockGestures(map);
+    else lockGestures(map);
+  }, [posture]);
 
   /** A live read of the reduced-motion preference for the camera path below. */
   useEffect(() => {

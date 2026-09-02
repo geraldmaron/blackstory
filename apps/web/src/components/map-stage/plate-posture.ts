@@ -25,8 +25,16 @@
  */
 import type { SurfaceClass } from '../../lib/nav/surface-classes';
 
-/** How the plate is painted on the current surface. */
-export type PlatePosture = 'live' | 'framed' | 'parked';
+/**
+ * How the plate is painted on the current surface.
+ *
+ * `ambient` is the Door's posture: painted full-viewport like Live, gestures locked like Framed.
+ * The scroll chapters drive the camera and the reader's wheel has to keep scrolling the document,
+ * so the plate shows the same clustered field the Instrument shows without ever taking the wheel.
+ * Clicks still reach it — a cluster drills in, a pin opens its record — because a click is not a
+ * gesture.
+ */
+export type PlatePosture = 'live' | 'ambient' | 'framed' | 'parked';
 
 /**
  * The resolution table, exhaustive over {@link SurfaceClass} by construction.
@@ -39,6 +47,8 @@ export type PlatePosture = 'live' | 'framed' | 'parked';
 const POSTURE_BY_SURFACE = {
   // The map is the content.
   instrument: 'live',
+  // The map is the field the chapters scroll over: painted, never steered by hand.
+  door: 'ambient',
   // A record page's place block is a bounded slot, and it is the one Reading-adjacent surface
   // that always has something to frame, so the plate arrives already expecting a claim.
   record: 'framed',
@@ -73,5 +83,6 @@ export function defaultPostureFor(surface: SurfaceClass | null): PlatePosture {
  */
 export function framedClaimAllowed(surface: SurfaceClass | null): boolean {
   if (surface === null) return false;
+  // The Door's plate is already painted full-bleed; a moment has nothing to borrow it into.
   return surface === 'reading' || surface === 'record';
 }

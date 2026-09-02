@@ -142,7 +142,8 @@ Skip remigrating high-value collections that already match census unless re-sync
 
 ### Blobs
 
-Media and release JSON artifacts stay in GCS / Firebase Storage. Postgres stores metadata refs only.
+**Leftover blob note:** public media is now Supabase Storage on `blackstory-app`. GCS /
+Firebase Storage remain dual-serve leftovers. Postgres stores metadata refs.
 See `docs/data/firebase-wind-down.md` for owner console shutoff (no irreversible delete by agents).
 
 ### Cutover (public reads)
@@ -153,4 +154,4 @@ DATABASE_URL=op://Private/<item-id>/…   # direct Postgres; never NEXT_PUBLIC_*
 # DATABASE_SSL=1  # optional; supabase hosts auto-enable ssl
 ```
 
-Admin/ops stores and workers may still use Firestore until follow-up rewires; treat migrated `bb_*` tables as SoR.
+Treat migrated `bb_*` tables as SoR. Firestore admin/ops paths are leftover, not a current write target.

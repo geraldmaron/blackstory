@@ -17,12 +17,25 @@ const BASE_ZOOM = 3.35;
 const ZOOM_GAIN = 0.52;
 const MAX_SCALE = 7.5;
 
+/** Where the live plate's camera goes for this frame — the chapter's own MapLibre spec. */
+export type DoorFocusCamera = {
+  readonly center: readonly [lng: number, lat: number];
+  readonly zoom: number;
+  readonly pitch: number;
+  readonly bearing: number;
+};
+
 export type DoorFocusFrame = {
   readonly originX: number;
   readonly originY: number;
   readonly scale: number;
   readonly focusEntityId: string | null;
   readonly placeLabel: string;
+  /**
+   * The same target, for the shared MapLibre plate. `originX`/`originY`/`scale` above are its
+   * projection onto the static Albers board, which is only the field until the plate is live.
+   */
+  readonly camera: DoorFocusCamera;
 };
 
 export function zoomToPlateScale(zoom: number): number {
@@ -58,6 +71,13 @@ export function resolveDoorFocus(input: {
     placeLabel = fact.placeLabel;
   }
 
+  const camera: DoorFocusCamera = {
+    center: [lng, lat],
+    zoom,
+    pitch: chapter.camera.pitch,
+    bearing: chapter.camera.bearing,
+  };
+
   const projected = locatorPinPercent(lng, lat);
   if (!projected) {
     return {
@@ -66,6 +86,7 @@ export function resolveDoorFocus(input: {
       scale: 1,
       focusEntityId,
       placeLabel,
+      camera,
     };
   }
 
@@ -75,5 +96,6 @@ export function resolveDoorFocus(input: {
     scale: zoomToPlateScale(zoom),
     focusEntityId,
     placeLabel,
+    camera,
   };
 }

@@ -163,6 +163,33 @@ export function primaryImageCreditCaption(input: {
   return sanitizePrimaryImageCreditForDisplay(input);
 }
 
+const PIN_SOURCE_SYSTEM_LABELS: Readonly<Record<string, string>> = {
+  wikimedia_commons: 'Wikimedia Commons',
+  nps: 'National Park Service',
+  loc: 'Library of Congress',
+  public_media: 'BlackStory public media',
+};
+
+/**
+ * Source-link line for a pinned photo (repo-4vuf, pin-and-serve): "Source: <system>"
+ * plus a short license id, shown only when the mast has both a source page and a
+ * recognized source system. Absent for legacy stored images that predate pinning.
+ */
+export function primaryImageSourceLine(input: {
+  readonly sourceSystem?: string;
+  readonly sourcePageUrl?: string;
+  readonly license?: string;
+}): { readonly label: string; readonly url: string } | undefined {
+  const url = input.sourcePageUrl?.trim();
+  const systemLabel = input.sourceSystem ? PIN_SOURCE_SYSTEM_LABELS[input.sourceSystem] : undefined;
+  if (!url || !systemLabel) return undefined;
+  const license = input.license?.trim();
+  return {
+    label: license ? `Source: ${systemLabel} · ${license}` : `Source: ${systemLabel}`,
+    url,
+  };
+}
+
 /**
  * Mast photo crop bias: person portraits keep the upper frame (heads);
  * places/events stay centered.

@@ -13,6 +13,7 @@ import {
   composeContinueLearningStubs,
 } from '@repo/domain/learning-index';
 import type { DatePrecision } from '@repo/domain/era';
+import type { PublicPrecisionTier } from '@repo/domain';
 import type { PlaceAdvisoryRecord } from '@repo/domain/advisory';
 import {
   NOTABILITY_RUBRIC,
@@ -86,6 +87,35 @@ export type PublicRevisionMetadata = {
   readonly recordUpdatedAt: string;
 };
 
+/**
+ * Reader-facing "go visit this place" contract shipped by the release builder
+ * (`publicVisitForTier`, packages/domain/src/geography/visit.ts). Already gated by location
+ * precision, entity kind, and living status at publish time — the web read path prefers this
+ * over claim-mining (`lib/geography/public-visit-contact.ts`) when present, but never re-applies
+ * that gate itself.
+ */
+export type PublicVisitAddressView = {
+  readonly street?: string;
+  readonly city?: string;
+  readonly state?: string;
+  readonly postalCode?: string;
+  readonly line?: string;
+};
+
+export type PublicVisitPhoneView = {
+  readonly e164: string;
+  readonly display: string;
+};
+
+export type PublicVisitView = {
+  readonly address?: PublicVisitAddressView;
+  readonly phone?: PublicVisitPhoneView;
+  readonly website?: string;
+  readonly hours?: string;
+  readonly visitability?: 'open_to_public' | 'exterior_only' | 'private' | 'demolished' | 'unknown';
+  readonly sources?: readonly string[];
+};
+
 /** Rights-cleared optional hero image for learning-index entity pages. */
 export type PublicEntityPrimaryImageView = {
   readonly url: string;
@@ -95,6 +125,15 @@ export type PublicEntityPrimaryImageView = {
   readonly width?: number;
   readonly height?: number;
   readonly objectPath?: string;
+  /** Pin-and-serve (repo-4vuf): present when the photo is a pinned Wikimedia Commons (or
+   * similar source-system) thumbnail fetched by the reader's browser at view time, rather
+   * than a stored original. `sourcePageUrl`/`license` drive the mast's source-link line. */
+  readonly sourceSystem?: 'wikimedia_commons' | 'nps' | 'loc' | 'public_media';
+  readonly fileTitle?: string;
+  readonly sha1?: string;
+  readonly sourcePageUrl?: string;
+  readonly license?: string;
+  readonly pinnedAt?: string;
 };
 
 /** Shared event context for co-participation links (WS4 / event_participation junction). */
@@ -175,9 +214,14 @@ export type PublicEntityView = {
    * below don't populate it yet and the facet builder falls back to `topicTags`. */
   readonly topicIds?: readonly string[];
   readonly jurisdictionLabel: string;
-  /** City, campus, or neighborhood — never street or residence. */
-  readonly locationPrecision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution';
+  /** The controlled public precision tier a location renders at (never `'none'`/`'country'` —
+   * those never carry a map pin, see `locationPrecisionFromProjection`). Derived from the
+   * standard's tier list, not hand-written — see `@repo/domain`'s `PublicPrecisionTier`. */
+  readonly locationPrecision: Exclude<PublicPrecisionTier, 'none' | 'country'>;
   readonly locationLabel: string;
+  /** Release-shipped visit contract; see `PublicVisitView` above. Absent on records that predate
+   * the release builder wiring this up, or that have nothing publishable once gated. */
+  readonly visit?: PublicVisitView;
   readonly relevanceExplanation: string;
   /** Concise framing of this record's place within documented Black history general context,
    * not new unsourced facts about this specific record (those live in `claims`). Guards against a

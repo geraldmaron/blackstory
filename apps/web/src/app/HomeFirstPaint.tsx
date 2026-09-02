@@ -18,7 +18,13 @@ import { geoAnchorFor } from '../lib/map-experience/entity-geo';
 import type { PlaceDiscoveryReturn } from '../lib/discovery/discovery-state';
 import { placeDiscoveryReturn } from '../lib/discovery/discovery-state';
 import type { PublicEntityView } from '../data/public-seed';
-import { EntityRoomSections } from './entity/[id]/EntityRoomSections';
+import {
+  RecordBeatHead,
+  RecordKindPill,
+  RecordPill,
+  recordSectionIcon,
+} from '../components/entity/RecordChrome';
+import { EntityRoomSections, renderedBeatCount } from './entity/[id]/EntityRoomSections';
 import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './entity/[id]/adapters';
 import { placeHref } from '../lib/place/public-place-path';
 import { instrumentRecordHref, placeSlugCollisionCounts } from '../lib/place/place-slug';
@@ -121,6 +127,7 @@ export function HomeFirstPaint({
       locationLabel: lead.locationLabel,
       jurisdictionLabel: lead.jurisdictionLabel,
       locationPrecision: lead.locationPrecision,
+      ...(lead.visit !== undefined ? { visit: lead.visit } : {}),
       kind: lead.kind,
       claims: lead.claims,
       ...(lead.status !== undefined ? { status: lead.status } : {}),
@@ -135,7 +142,9 @@ export function HomeFirstPaint({
     const returns =
       discovery ??
       placeDiscoveryReturn(lead.id, {}, geo ? { lat: geo.lat, lng: geo.lng } : undefined);
-    const kindLabel = lead.kind.replace(/[_-]+/g, ' ');
+    const beatsBefore = renderedBeatCount({ entity: lead, evidenceClaims, firstPaint: true });
+    const storiesIndex = String(beatsBefore + 1).padStart(2, '0');
+    const trustIndex = String(beatsBefore + (citing.length > 0 ? 2 : 1)).padStart(2, '0');
 
     return (
       <Room
@@ -149,11 +158,21 @@ export function HomeFirstPaint({
               entityId={lead.id}
               entityName={lead.displayName}
               {...(lead.primaryImage !== undefined ? { primaryImage: lead.primaryImage } : {})}
-              hideCredit
+              // First paint carries no missing-photo or rights-clearance caption (the mast is the
+              // place), but a licensed photograph must show its credit and source: for a Creative
+              // Commons pin, attribution is a license condition, not a caption.
+              hideCredit={lead.primaryImage === undefined}
               priority
             />
             <figcaption className="ds-record-mast__over">
-              <p className="ds-home-place-kicker">{kindLabel}</p>
+              <div className="ds-rec-pills" aria-label="Place at a glance">
+                <RecordKindPill kind={lead.kind} />
+                {eraLine ? (
+                  <RecordPill tone="era" icon={recordSectionIcon('era')}>
+                    {eraLine}
+                  </RecordPill>
+                ) : null}
+              </div>
               <h1 className="ds-record-mast__title">{lead.displayName}</h1>
               <p className="ds-record-mast__lede">
                 <LinkedProse
@@ -208,8 +227,6 @@ export function HomeFirstPaint({
           />
         ) : null}
 
-        {eraLine ? <p className="ds-home-place-era">{eraLine}</p> : null}
-
         {lead.sensitivity ? (
           <EntitySensitivityBanner sensitivity={lead.sensitivity} entityKind={lead.kind} />
         ) : null}
@@ -223,9 +240,13 @@ export function HomeFirstPaint({
 
         {citing.length > 0 ? (
           <section className="ds-record-beat" id="stories" aria-labelledby="stories-heading">
-            <h2 className="ds-record-beat__heading" id="stories-heading">
-              Stories
-            </h2>
+            <RecordBeatHead
+              id="stories-heading"
+              index={storiesIndex}
+              icon="stories"
+              title="Stories"
+              count={citing.length}
+            />
             <Connections
               connections={citing.map((item) => ({
                 name: item.title,
@@ -237,9 +258,12 @@ export function HomeFirstPaint({
         ) : null}
 
         <section className="ds-record-beat" id="trust" aria-labelledby="trust-heading">
-          <h2 className="ds-record-beat__heading" id="trust-heading">
-            Can I trust this
-          </h2>
+          <RecordBeatHead
+            id="trust-heading"
+            index={trustIndex}
+            icon="trust"
+            title="Can I trust this"
+          />
           <TrustBlock
             label="How this record stands"
             facts={[

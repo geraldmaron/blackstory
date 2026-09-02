@@ -61,14 +61,14 @@ test('public projection reduces a stored exact address before publication (livin
   assert.doesNotThrow(() => assertPublicProjectionSafe(projection));
 });
 
-test('public projection reduces a deceased historical residence to neighborhood', () => {
+test("public projection publishes a deceased person's historical residence at full address (NRHP posture, no cap)", () => {
   const projection = toPublicEntityProjection(deceasedPerson, {
     releaseId: 'rel_001',
     summary: LEARNING_SUMMARY,
     location: storedExactResidence,
   });
-  assert.equal(projection.location?.precision, 'neighborhood');
-  assert.equal(projection.location?.geohash?.length, 5);
+  assert.equal(projection.location?.precision, 'address');
+  assert.equal(projection.location?.geohash?.length, 7);
 });
 
 test('public projection rejects summaries below the learning-index minimum', () => {

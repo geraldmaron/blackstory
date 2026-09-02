@@ -33,11 +33,6 @@ export type SchoolCampus = {
   readonly validTo?: string | null;
 };
 
-/** @deprecated Renamed to `SchoolMilestone` to resolve a naming collision with the new
- * entity-level `StatusHistoryEntry` (./entity-status.ts). Kept as an alias for source
- * compatibility only prefer `SchoolMilestone` in new code. */
-export type SchoolStatusEntry = SchoolMilestone;
-
 export type SchoolMilestone = {
   readonly status: string;
   readonly at: string;

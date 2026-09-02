@@ -33,9 +33,6 @@ export { isInternalRecordLabel } from '../lib/place/public-place-path';
  */
 export const HOME_STAND_CANDIDATE_IDS = PLACE_PAGE_STAND_IDS;
 
-/** @deprecated Use HOME_STAND_CANDIDATE_IDS. */
-export const HOME_FEATURED_ENTITY_IDS = HOME_STAND_CANDIDATE_IDS;
-
 export type HomeFirstPaintSource = 'live' | 'seed' | 'none';
 
 export type HomeFirstPaintModel = {

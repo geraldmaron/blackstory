@@ -102,6 +102,22 @@ export function historyKindsForCategory(categoryId: string): readonly string[] {
   return HISTORY_KIND_CATEGORIES.find((category) => category.id === categoryId)?.kinds ?? [];
 }
 
+/**
+ * Remaps `/history` browse category ids onto the five-family vocabulary Atlas and Records share.
+ * Used only at the `/history` → `/records` redirect boundary — not in live filter matchers.
+ */
+export const HISTORY_KIND_TO_RECORDS_KIND: Readonly<Record<string, string>> = Object.freeze({
+  law: 'sources',
+  works: 'sources',
+});
+
+/** Normalize an incoming `/history` kind param for `/records` / Atlas URLs. */
+export function historyKindToRecordsKind(kind: string): string {
+  const trimmed = kind.trim();
+  if (!trimmed || trimmed === 'all') return trimmed;
+  return HISTORY_KIND_TO_RECORDS_KIND[trimmed] ?? trimmed;
+}
+
 export const HISTORY_SORT_OPTIONS: readonly {
   readonly value: HistorySort;
   readonly label: string;

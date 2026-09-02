@@ -4,6 +4,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
+  buildAppleMapsDirectionsUrl,
+  buildAppleMapsSearchUrl,
   buildExternalMapsDirectionsUrl,
   buildExternalMapsSearchUrl,
   buildMapsHandoffQuery,
@@ -74,5 +76,48 @@ describe('externalMapsLinkLabel', () => {
 describe('externalMapsDirectionsLabel', () => {
   it('names the directions action for screen readers', () => {
     assert.equal(externalMapsDirectionsLabel('Kiowa, Kansas'), 'Get directions to Kiowa, Kansas');
+  });
+});
+
+describe('buildAppleMapsSearchUrl', () => {
+  it('sends the prose destination as q and anchors it with ll', () => {
+    const url = buildAppleMapsSearchUrl({
+      lat: 39.788,
+      lng: -86.164,
+      query: '819 West 16th Street, Indianapolis, IN',
+    });
+    assert.equal(
+      url,
+      'https://maps.apple.com/?q=819+West+16th+Street%2C+Indianapolis%2C+IN&ll=39.788%2C-86.164',
+    );
+  });
+
+  it('falls back to coordinates alone and to undefined when nothing is usable', () => {
+    assert.equal(
+      buildAppleMapsSearchUrl({ lat: 39.788, lng: -86.164 }),
+      'https://maps.apple.com/?ll=39.788%2C-86.164',
+    );
+    assert.equal(buildAppleMapsSearchUrl({ query: '   ' }), undefined);
+  });
+});
+
+describe('buildAppleMapsDirectionsUrl', () => {
+  it('routes to the address, disambiguated by ll, driving', () => {
+    const url = buildAppleMapsDirectionsUrl({
+      lat: 39.788,
+      lng: -86.164,
+      query: '819 West 16th Street, Indianapolis, IN',
+    });
+    assert.equal(
+      url,
+      'https://maps.apple.com/?daddr=819+West+16th+Street%2C+Indianapolis%2C+IN&ll=39.788%2C-86.164&dirflg=d',
+    );
+  });
+
+  it('routes to the point when there is no prose destination', () => {
+    assert.equal(
+      buildAppleMapsDirectionsUrl({ lat: 39.788, lng: -86.164 }),
+      'https://maps.apple.com/?daddr=39.788%2C-86.164&dirflg=d',
+    );
   });
 });
