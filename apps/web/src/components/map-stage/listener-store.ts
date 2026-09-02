@@ -13,6 +13,12 @@ export type MapStageEvents = {
   activate: [viewport: ExploreViewportFrame];
   viewport: [viewport: ExploreViewportFrame];
   error: [];
+  /** An entity marker gained/lost hover intent (after the caller's own delay) or DOM focus.
+   * `null` clears it — same "current value, not a delta" convention as the other selection
+   * events. Pin-photo cards (`PinPhotoCard`) are the only subscriber today. */
+  pinHover: [
+    target: { readonly entityId: string; readonly name: string; readonly rect: DOMRect } | null,
+  ];
 };
 
 export type MapStageEventName = keyof MapStageEvents;
@@ -27,6 +33,7 @@ export function makeListenerStore(): {
     activate: new Set(),
     viewport: new Set(),
     error: new Set(),
+    pinHover: new Set(),
   };
 }
 

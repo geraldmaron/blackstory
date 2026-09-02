@@ -1,0 +1,62 @@
+/**
+ * PinPhotoCard. Portaled to `document.body` and positioned with an inline `top`/`left` computed
+ * from the anchor pin's own `getBoundingClientRect()` — this file only owns the card's own box,
+ * type, and entrance motion, never its placement math.
+ */
+.ds-pin-photo-card {
+  position: fixed;
+  z-index: 45; /* local: above the record sheet (--ds-z-record-sheet, 40) so a hovered pin's photo
+    is never hidden behind an open sheet; below the command bar (--ds-z-command-bar, 50) and every
+    overlay above it, since those are reader-opened and should never be upstaged by a hover card. */
+  width: 168px;
+  pointer-events: none;
+  background: var(--ds-surface-raised);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-2);
+
+  animation: ds-pin-photo-card-rise 180ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-pin-photo-card {
+    animation-duration: 0.01ms;
+  }
+}
+
+:root[data-motion='calm'] .ds-pin-photo-card {
+  animation-duration: 0.01ms;
+}
+
+@keyframes ds-pin-photo-card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ds-pin-photo-card__figure {
+  margin: 0 0 var(--ds-space-2);
+}
+
+.ds-pin-photo-card__img {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-pin-photo-card__name {
+  margin: 0;
+  color: var(--ds-ink);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.ds-pin-photo-card__credit {
+  margin-top: var(--ds-space-1);
+  font-size: 0.6875rem;
+}

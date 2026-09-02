@@ -317,6 +317,9 @@ export function useMapStage(): MapStageHandle {
  * whole collection (which read as "all entities light up"). Only genuinely new ids mount and
  * only stale ids unmount.
  */
+/** Hover-intent delay before a pin's photo card opens (`PinPhotoCard`'s own doc comment). */
+const PIN_HOVER_INTENT_MS = 120;
+
 function syncCircularMarkers(
   map: MapLibreMap,
   maplibregl: MaplibreModule['default'],
@@ -324,6 +327,9 @@ function syncCircularMarkers(
   markers: Marker[],
   onSelect: (entityId: string) => void,
   selectedEntityId: string | undefined,
+  onHover: (
+    target: { readonly entityId: string; readonly name: string; readonly rect: DOMRect } | null,
+  ) => void,
 ): void {
   // Below clusterMaxZoom, MapLibre aggregates points — HTML hit-targets for every feature
   // sit above clusters and steal clicks. Only mount DOM targets once individuals are visible.
@@ -387,6 +393,23 @@ function syncCircularMarkers(
       event.preventDefault();
       event.stopPropagation();
       onSelect(entityId);
+    });
+    // Pin-photo hover intent: a short delay on enter (so a cursor passing over the plate does not
+    // flicker cards open), immediate on leave. `PinPhotoCard`'s doc comment has the full contract.
+    let hoverTimer: ReturnType<typeof setTimeout> | null = null;
+    el.addEventListener('mouseenter', () => {
+      if (hoverTimer !== null) clearTimeout(hoverTimer);
+      hoverTimer = setTimeout(() => {
+        hoverTimer = null;
+        onHover({ entityId, name: el.dataset.pinName ?? '', rect: el.getBoundingClientRect() });
+      }, PIN_HOVER_INTENT_MS);
+    });
+    el.addEventListener('mouseleave', () => {
+      if (hoverTimer !== null) {
+        clearTimeout(hoverTimer);
+        hoverTimer = null;
+      }
+      onHover(null);
     });
     const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
       .setLngLat([entry.lng, entry.lat])
@@ -577,6 +600,7 @@ export function MapStageProvider({
         markersRef.current,
         (entityId) => notify(listenersRef.current, 'select', entityId),
         configRef.current.selectedEntity,
+        (target) => notify(listenersRef.current, 'pinHover', target),
       );
     } catch (error) {
       console.error('[MapStage] marker sync failed', error);

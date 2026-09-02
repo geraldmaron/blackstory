@@ -24,6 +24,18 @@ test('exact label match is case-insensitive and whitespace-normalized', () => {
   assert.equal(isExactLabelMatch('Rosa Parks', 'Rosa Louise Parks'), false);
 });
 
+test('commonsPinThumbnailUrl rewrites an original upload.wikimedia.org URL to its /thumb/ variant', () => {
+  assert.equal(
+    commonsPinThumbnailUrl('https://upload.wikimedia.org/wikipedia/commons/a/ab/Example.jpg', 480),
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Example.jpg/480px-Example.jpg',
+  );
+});
+
+test('commonsPinThumbnailUrl passes through a non-Commons URL unchanged', () => {
+  const url = 'https://storage.googleapis.com/bucket/entities/ent_x/primary.jpg';
+  assert.equal(commonsPinThumbnailUrl(url, 480), url);
+});
+
 test('mapCommonsLicenseToRights accepts PD and libre CC; rejects NC/unknown', () => {
   assert.equal(mapCommonsLicenseToRights('Public domain'), 'public_domain');
   assert.equal(mapCommonsLicenseToRights('CC0'), 'public_domain');

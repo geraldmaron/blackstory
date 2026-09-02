@@ -389,6 +389,27 @@ function creditPartImpliesRights(part: string, rightsStatus: PublishableRightsSt
   }
 }
 
+/** Matches an original-resolution Commons upload URL: `.../commons/<a>/<ab>/<File name.ext>`. */
+const COMMONS_UPLOAD_ORIGINAL =
+  /^https:\/\/upload\.wikimedia\.org\/wikipedia\/commons\/([0-9a-f])\/([0-9a-f]{2})\/([^/]+)$/i;
+
+/**
+ * A Commons-hosted image, downsized through Wikimedia's own thumbnail renderer.
+ *
+ * `primaryImage.url` on stored entities is the original-resolution `upload.wikimedia.org` file
+ * (see `commons-media-enrichment.ts`'s `sourceImageUrl`). A pin card needs a few hundred px wide,
+ * not the source scan, so this rewrites the original path into Commons' `/thumb/.../<width>px-…`
+ * convention rather than shipping the full file to every hovering pin. Non-Commons URLs (a
+ * Supabase/GCS `primary.*` object, say) pass through unchanged — this only recognizes the one
+ * upload.wikimedia.org shape it knows how to resize.
+ */
+export function commonsPinThumbnailUrl(url: string, width: number): string {
+  const match = COMMONS_UPLOAD_ORIGINAL.exec(url.trim());
+  if (!match) return url;
+  const [, shard1, shard2, filename] = match;
+  return `https://upload.wikimedia.org/wikipedia/commons/thumb/${shard1}/${shard2}/${filename}/${width}px-${filename}`;
+}
+
 export function commonsFilePageUrl(fileTitle: string): string {
   const title = fileTitle.startsWith('File:') ? fileTitle : `File:${fileTitle}`;
   return `https://commons.wikimedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`;

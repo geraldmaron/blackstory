@@ -37,6 +37,10 @@ import { LensPanel, type LensLayerKey } from '../../components/map-experience/Le
 import { MapExperienceLegend } from '../../components/map-experience/MapExperienceLegend';
 import { ResultsRail, type ResultsConstraint } from '../../components/map-experience/ResultsRail';
 import { RecordSheet } from '../../components/map-experience/RecordSheet';
+import {
+  PinPhotoLayer,
+  type PinPhotoHoverTarget,
+} from '../../components/map-experience/PinPhotoLayer';
 import { TimePanel } from '../../components/map-experience/TimePanel';
 import { MIGRATION_CORRIDORS } from '../../lib/map-experience/migration-corridors';
 import { prefersReducedMotion } from '../../lib/map-experience/camera-presets';
@@ -314,6 +318,40 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     };
   }, [layers.labels, stage]);
 
+  /**
+   * Pin photo card: hover wins over selection (hover is the more specific, momentary intent).
+   * `stage.subscribe('pinHover', …)` is MapStage's own delayed-intent/leave signal off the live
+   * entity markers (`entity-marker-sync.ts`'s `data-pin-name`). Selection has no marker-rect event
+   * of its own, so it looks the marker element up directly by the same `data-entity-id` MapStage
+   * already stamps on it — same DOM, no second source of truth.
+   */
+  const [atlasHoverTarget, setAtlasHoverTarget] = useState<PinPhotoHoverTarget | null>(null);
+  useEffect(
+    () =>
+      stage.subscribe('pinHover', (target) =>
+        setAtlasHoverTarget(
+          target ? { key: target.entityId, name: target.name, rect: target.rect } : null,
+        ),
+      ),
+    [stage],
+  );
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setAtlasHoverTarget(null);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, []);
+  const atlasPinPhotoTarget = useMemo<PinPhotoHoverTarget | null>(() => {
+    if (atlasHoverTarget) return atlasHoverTarget;
+    if (!selectedId || typeof document === 'undefined') return null;
+    const el = document.querySelector<HTMLElement>(
+      `.ds-map-entity-marker[data-entity-id="${CSS.escape(selectedId)}"]`,
+    );
+    if (!el) return null;
+    return { key: selectedId, name: el.dataset.pinName ?? '', rect: el.getBoundingClientRect() };
+  }, [atlasHoverTarget, selectedId]);
+
   const [legendOpen, setLegendOpen] = useState(false);
   const { camera, readout, spotlight, setSpotlight, runMove } = useAtlasCamera(
     stage,
@@ -582,6 +620,8 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       <p className="ds-atlas__readout" role="status" aria-live="polite">
         {readout}
       </p>
+
+      <PinPhotoLayer target={atlasPinPhotoTarget} photosUrl="/atlas/photos" />
 
       <RecordSheet
         record={sheetOpen ? sheetRecord : null}

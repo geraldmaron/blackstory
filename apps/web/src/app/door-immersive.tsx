@@ -16,6 +16,8 @@ import { CHAPTER_INTERSECTION_THRESHOLD, type StoryChapter } from '../lib/story/
 import type { StoryRecordSpotlight } from '../lib/story/pick-story-record';
 import type { StoryFact } from '../lib/story/story-facts';
 import { COLD_OPEN_WORDS, copyFor, headingParts } from '../components/story/story-copy';
+import { PinPhotoLayer } from '../components/map-experience/PinPhotoLayer';
+import { usePinPhotoHoverAnchor } from '../components/map-experience/use-pin-photo-hover';
 import { ABOUT_SUPPORT_LINE } from './about/about-copy';
 import { resolveDoorFocus, type DoorFocusFrame } from './door-focus';
 import { FirstPaintPinPlate } from './first-paint-pin-plate';
@@ -95,6 +97,9 @@ export function DoorImmersive({
   const journeyRef = useRef<HTMLDivElement | null>(null);
   const chaptersRef = useRef(chapters);
   chaptersRef.current = chapters;
+
+  const pinFieldRef = useRef<HTMLElement | null>(null);
+  const pinPhotoTarget = usePinPhotoHoverAnchor(pinFieldRef);
 
   const initialFocus = useMemo(
     () =>
@@ -182,7 +187,7 @@ export function DoorImmersive({
 
   return (
     <>
-      <aside className="ds-door__field" aria-label="National pin field">
+      <aside className="ds-door__field" aria-label="National pin field" ref={pinFieldRef}>
         <div className="ds-door__board-frame">
           <div className="ds-door__board-host">
             <div
@@ -356,6 +361,8 @@ export function DoorImmersive({
           );
         })}
       </div>
+
+      <PinPhotoLayer target={pinPhotoTarget} photosUrl="/door/photos" />
     </>
   );
 }

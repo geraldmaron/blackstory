@@ -20,6 +20,9 @@ export function applyEntityMarkerElementProps(
   if (el.getAttribute('aria-label') !== label) {
     el.setAttribute('aria-label', label);
     el.title = label;
+    // Stable, parse-free name lookup for a hover-opened `PinPhotoCard` — see MapStage's own
+    // `mouseenter` handler on this element.
+    el.dataset.pinName = label;
   }
   if (el.dataset.kind !== feature.properties.kind) {
     el.dataset.kind = feature.properties.kind;
