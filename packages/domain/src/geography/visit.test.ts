@@ -74,18 +74,22 @@ test('publicVisitForTier: phone/website omitted when livingStatus is living', ()
 });
 
 test('publicVisitForTier: phone/website omitted when visitability disqualifies', () => {
-  for (const visitability of ['private', 'demolished', 'unknown'] as const) {
+  for (const visitability of ['private', 'demolished'] as const) {
     const result = publicVisitForTier({ ...FULL_VISIT, visitability }, 'site', 'place', 'deceased');
     assert.equal(result?.phone, undefined, `visitability ${visitability} should omit phone`);
     assert.equal(result?.website, undefined, `visitability ${visitability} should omit website`);
   }
 });
 
-test('publicVisitForTier: phone/website omitted when visitability absent', () => {
+test('publicVisitForTier: phone/website kept when visitability is absent or unknown', () => {
+  // An official website or phone is publishable for a place-like record unless the place is
+  // positively private or gone; unknown visitability is the common case for a live institution.
   const { visitability: _visitability, ...withoutVisitability } = FULL_VISIT;
-  const result = publicVisitForTier(withoutVisitability, 'site', 'place', 'deceased');
-  assert.equal(result?.phone, undefined);
-  assert.equal(result?.website, undefined);
+  for (const visit of [withoutVisitability, { ...FULL_VISIT, visitability: 'unknown' as const }]) {
+    const result = publicVisitForTier(visit, 'site', 'place', 'deceased');
+    assert.deepEqual(result?.phone, FULL_VISIT.phone);
+    assert.equal(result?.website, FULL_VISIT.website);
+  }
 });
 
 test('publicVisitForTier: hours/visitability/sources pass through regardless of tier/kind', () => {

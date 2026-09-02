@@ -109,10 +109,14 @@ export function publicVisitForTier(
   const streetLevelAllowed = STREET_LEVEL_TIERS.has(locationPrecision);
   const address = filterAddress(visit.address, streetLevelAllowed);
 
+  // An official website or phone (Wikidata P856/P1329, a claim) is publishable for a place-like
+  // record unless we positively know the place is private or gone. Unknown visitability is the
+  // common case for a live institution and must not suppress its own front door.
   const contactEligible =
     CONTACT_ELIGIBLE_KINDS.has(kind) &&
-    visit.visitability !== undefined &&
-    CONTACT_ELIGIBLE_VISITABILITY.has(visit.visitability) &&
+    (visit.visitability === undefined ||
+      visit.visitability === 'unknown' ||
+      CONTACT_ELIGIBLE_VISITABILITY.has(visit.visitability)) &&
     livingStatus !== 'living';
 
   const phone = contactEligible ? visit.phone : undefined;
