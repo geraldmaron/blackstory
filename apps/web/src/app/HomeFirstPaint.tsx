@@ -150,6 +150,10 @@ export function HomeFirstPaint({
               entityId={lead.id}
               entityName={lead.displayName}
               {...(lead.primaryImage !== undefined ? { primaryImage: lead.primaryImage } : {})}
+              // First paint carries no missing-photo or rights-clearance caption (the mast is the
+              // place), but a licensed photograph must show its credit and source: for a Creative
+              // Commons pin, attribution is a license condition, not a caption.
+              hideCredit={lead.primaryImage === undefined}
               priority
             />
             <figcaption className="ds-record-mast__over">
