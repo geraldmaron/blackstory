@@ -1,9 +1,14 @@
 1:"$Sreact.fragment"
-5:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
+5:I[99990,["/blackstory/_next/static/chunks/13m8d36xc7t9s.js","/blackstory/_next/static/chunks/03obgaj591_9a.js"],"OutletBoundary"]
 6:"$Sreact.suspense"
-2:Tb1b,<h1 id="repository-map"><a class="heading-anchor" href="#repository-map">Repository map</a></h1>
+2:Td8c,<h1 id="repository-map"><a class="heading-anchor" href="#repository-map">Repository map</a></h1>
 <p>BlackStory ships as one monorepo so public surfaces, private research tools, and
 shared libraries stay on the same contracts.</p>
+<p>Current live stack (verified 2026-08-28): public web on <strong>Vercel</strong>, product data
+and media on <strong>Supabase</strong> <code>blackstory-app</code>
+(<code>https://twykhihqkcldpreuovay.supabase.co</code>). Firebase App Hosting, Firestore,
+GCS dual-serve, and parked PostGIS are leftover, not the current system of
+record. See <a href="./architecture.md">Architecture</a>.</p>
 <table>
 <thead>
 <tr>
@@ -14,15 +19,15 @@ shared libraries stay on the same contracts.</p>
 <tbody>
 <tr>
 <td><code>apps/web</code></td>
-<td>Public Next.js app (Vercel; live at blackstory.app)</td>
+<td>Public Next.js app on Vercel (live at blackstory.app)</td>
 </tr>
 <tr>
 <td><code>apps/admin</code></td>
-<td>Private Next.js admin and research console</td>
+<td>Private Next.js admin and research console (separate Vercel project)</td>
 </tr>
 <tr>
 <td><code>apps/api-public</code></td>
-<td>Public read, search, and location API</td>
+<td>Public read, search, and location API (in-repo; Cloud Run deploy unverified)</td>
 </tr>
 <tr>
 <td><code>apps/api-submissions</code></td>
@@ -50,19 +55,15 @@ shared libraries stay on the same contracts.</p>
 </tr>
 <tr>
 <td><code>supabase/</code></td>
-<td>Postgres migrations and Supabase project config</td>
-</tr>
-<tr>
-<td><code>functions/</code></td>
-<td>Firebase Functions schedules for discovery</td>
+<td>Postgres migrations and Supabase project config for <code>blackstory-app</code></td>
 </tr>
 <tr>
 <td><code>infra/*</code></td>
-<td>Firebase, GCP, GitHub, and database scaffolding</td>
+<td>Leftover Firebase / GCP scaffolding, GitHub, parked PostGIS</td>
 </tr>
 <tr>
 <td><code>docs/</code></td>
-<td>Operating docs, ADRs, methodology, and runbooks</td>
+<td>Operating docs, historical ADRs, methodology, and runbooks</td>
 </tr>
 <tr>
 <td><code>brand/</code></td>
@@ -70,6 +71,8 @@ shared libraries stay on the same contracts.</p>
 </tr>
 </tbody>
 </table>
+<p><code>functions/</code> (Firebase Cloud Functions schedules) is gone. Do not add it back as
+a current host.</p>
 <h2 id="stable-code-prefixes"><a class="heading-anchor" href="#stable-code-prefixes">Stable code prefixes</a></h2>
 <p>Package scope is brand-agnostic so a product rename does not rewrite the
 monorepo:</p>
@@ -101,12 +104,13 @@ monorepo:</p>
 <p>This docs site is the orientation layer. Deeper operating notes stay in the
 repository:</p>
 <ul>
-<li>Architecture and ADRs: <code>docs/architecture.md</code>, <code>docs/adr/</code></li>
+<li>Architecture (current stack): <code>docs/architecture.md</code></li>
+<li>Historical decisions: <code>docs/decisions-carryover.md</code> and <code>git log -- docs/adr/</code></li>
 <li>Methodology: <code>docs/methodology/</code></li>
 <li>Research pipeline: <code>docs/research/</code></li>
 <li>Security: <code>docs/security/</code></li>
 <li>Runbooks: <code>docs/runbooks/</code></li>
-</ul>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"Where apps, packages, workers, and infra live in the monorepo."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","repo-map",".md"]}],"."," ","$L3"]}]}]]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"5F9NtFGTImuCFa5aVssbJ"}
-3:["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]
+</ul>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"Where apps, packages, workers, and infra live in the monorepo."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"yuuD63I0OldEjDA3acYkx"}
+3:["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","repo-map",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]
 4:["$","$L5",null,{"children":["$","$6",null,{"name":"Next.MetadataOutlet","children":"$@7"}]}]
 7:null

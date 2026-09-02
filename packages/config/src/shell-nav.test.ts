@@ -25,6 +25,9 @@ test('primary nav leads with Explore and ends with About', () => {
     // the v9 library hub replaced it (SP-21, repo-92n2.29).
     ['/explore', '/chapters', '/library', '/about'],
   );
+  assert.ok(!PRIMARY_NAV.some((item) => item.href === '/journey'));
+  assert.ok(!PRIMARY_NAV.some((item) => item.href.includes('journey')));
+  assert.ok(!PRIMARY_NAV.some((item) => item.href.includes('42Cb1758')));
 });
 
 test('isShellNavActive understands absolute sibling hrefs', () => {

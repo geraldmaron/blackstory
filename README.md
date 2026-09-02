@@ -6,6 +6,30 @@ This repository is the TypeScript and Python monorepo behind the public site, ad
 
 **Product name:** BlackStory. Package scope stays brand-agnostic: `@repo/*` packages, `ds-*` design tokens, and `APP_*` break-glass env vars. Do not rename those prefixes for a product rebrand.
 
+**GitHub About field** still says "Black Book — historical place-connected public research platform" (checked 2026-08-28). A repo admin needs to update that description. This file is the current story.
+
+## Current stack (verified 2026-08-28)
+
+Checked against live https://blackstory.app/ headers and CSP, not against a bill.
+
+| Layer | Current | Leftover (not SoR) |
+|-------|---------|--------------------|
+| Public web | **Vercel** (`x-vercel-id`, `x-vercel-cache`, `va.vercel-scripts.com`). Cloudflare in front (`server: cloudflare`). | Firebase App Hosting, Cloud Run for `apps/web` |
+| Data / media | **Supabase** project `blackstory-app`, host `https://twykhihqkcldpreuovay.supabase.co`. Postgres `bb_public.*` is the product system of record. Public media is Supabase Storage. | Firestore, Firebase Storage as SoR, parked PostGIS under `infra/database/` |
+| Media CSP | Live `img-src` allows the Supabase host **and** `https://storage.googleapis.com` | GCS dual-serve / rollback objects |
+
+**Live** https://blackstory.app/ (verified 2026-08-28) is still the old catalog filter board (Kind / Tone / Era / Theme / Status / Confidence / Where), about 4,100 released records. That is production today. It does not yet look like the first-run sat below.
+
+**Intended first-run**, sat 2026-08-28 on isolated branch `cursor/first-paint-local-119c` at localhost:3048 (commit `0dfc8f5a`): Greenwood first; header rooms are Atlas and Library only; no Journey room; no Grade A; no "2 sources"; `/?atlas=1` 308s home. That chrome is not live until that isolated work lands. Do not invent a Journey page here. Do not restyle first paint on this branch.
+
+`/journey` is not a live room. Verified 2026-08-28: `https://blackstory.app/journey` and `https://www.blackstory.app/journey` return HTTP 404 (`x-matched-path: /404`). Do not list Journey as a room. `/about` "Where to begin" already omits unfinished rooms. There is no public Journey source beyond that 404.
+
+`/records/42Cb1758` is not a published record. Verified 2026-08-28: `https://blackstory.app/records/42Cb1758` returns HTTP 404 (`x-matched-path: /404`). Public record pages live at `/entity/<id>`. Live production can still show that id as a list title. Intended first-run does not. Do not invent the page.
+
+This repo's config names **one** Supabase project: `blackstory-app`. Other Dagher-org Supabase Pro projects are not referenced here, so this audit does not call them unused. Aligning docs on Vercel + Supabase does not close overages or standing bills. Cover-package work belongs on administration-app, not this repo.
+
+Historical ADRs and wind-down notes stay in the tree. If they still read as current hosting or SoR, treat them as leftover unless they match this table.
+
 ## What we build
 
 - A **public map and catalog** of historical records, with precision and evidence visible
@@ -20,18 +44,18 @@ Public clients read released projections only. Anonymous clients never write can
 
 | Path | Role |
 |------|------|
-| `apps/web` | Public Next.js app (Vercel; see ADR-027) |
-| `apps/admin` | Private admin and research console |
-| `apps/api-public` | Public read, search, and location API |
-| `apps/api-submissions` | Corrections and contribution intake |
-| `apps/api-internal` | Publication and internal control API |
+| `apps/web` | Public Next.js app on **Vercel** (live at blackstory.app) |
+| `apps/admin` | Private admin and research console (separate Vercel project) |
+| `apps/api-public` | Public read, search, and location API (in-repo; Cloud Run deploy unverified) |
+| `apps/api-submissions` | Corrections and contribution intake (in-repo; Cloud Run deploy unverified) |
+| `apps/api-internal` | Publication and internal control API (in-repo; Cloud Run deploy unverified) |
 | `apps/docs` | Public docs site (GitHub Pages export) |
 | `apps/mobile` | Expo mobile app (isolated npm lockfile) |
 | `workers/*` | Python research, publication, and security workers |
 | `packages/*` | Shared TypeScript libraries |
-| `supabase/` | Postgres migrations and Supabase project config |
-| `infra/*` | Firebase, GCP, GitHub, and database scaffolding |
-| `docs/` | Architecture, ADRs, security, testing, and runbooks |
+| `supabase/` | Postgres migrations and Supabase project config for `blackstory-app` |
+| `infra/*` | Leftover Firebase/GCP scaffolding, GitHub, and parked PostGIS. Not current SoR. |
+| `docs/` | Architecture, historical ADRs, security, testing, and runbooks |
 | `brand/` | Brand masters (lockups, symbols, tokens, guide) |
 
 Architecture overview: [`docs/architecture.md`](./docs/architecture.md). Decisions: formal ADRs removed 2026-07-24, still-binding invariants carried to [`docs/decisions-carryover.md`](./docs/decisions-carryover.md). Brand contract: [`docs/ui/brand.md`](./docs/ui/brand.md). Docs index: [`docs/README.md`](./docs/README.md).
@@ -94,11 +118,11 @@ pnpm test:py
 pnpm build
 pnpm build && pnpm typecheck   # typecheck needs built package declarations
 
-# Local Firebase Auth + Firestore + Storage emulators (demo project)
+# Leftover local Firebase emulators (not product SoR; optional)
 pnpm firebase:emulators
 pnpm firebase:test:rules
 
-# Parked local PostGIS (not product SoR)
+# Parked local PostGIS (leftover; not product SoR)
 pnpm db:up && pnpm db:init && pnpm db:verify
 pnpm db:down
 ```
@@ -119,15 +143,17 @@ Shared TypeScript and ESLint policy lives in `packages/typescript-config` and `p
 
 ## Data plane
 
-Product system of record is Supabase Postgres (`blackstory-app`). Schema and migrations: [`docs/data/postgres-schema.md`](./docs/data/postgres-schema.md), [`supabase/migrations/`](./supabase/migrations/). Decision: ADR-020 (removed 2026-07-24, see [`docs/decisions-carryover.md`](./docs/decisions-carryover.md)).
+Product system of record is Supabase Postgres on `blackstory-app` (`https://twykhihqkcldpreuovay.supabase.co`). Schema and migrations: [`docs/data/postgres-schema.md`](./docs/data/postgres-schema.md), [`supabase/migrations/`](./supabase/migrations/). Decision: ADR-020 (removed 2026-07-24, see [`docs/decisions-carryover.md`](./docs/decisions-carryover.md)).
+
+Hosted public web reads `PUBLIC_DATA_SOURCE=postgres` with server-only `DATABASE_URL` on Vercel. Admin uses `ADMIN_DATA_SOURCE=postgres` on its own Vercel project. Public media is Supabase Storage (`public-media`). Live CSP still allows leftover GCS (`storage.googleapis.com`) for dual-serve objects.
+
+Firestore, Firebase App Hosting, and parked PostGIS are leftover. Historical ETL and wind-down notes: [`packages/migrate-firestore-postgres`](./packages/migrate-firestore-postgres/), [`docs/data/supabase-storage-cutover.md`](./docs/data/supabase-storage-cutover.md), [`docs/data/firebase-wind-down.md`](./docs/data/firebase-wind-down.md). Do not treat those files as the current SoR.
 
 Context indicators (justice, wealth, housing) live in `bb_reference.statistical_*`. Catalog: [`docs/research/context-data-source-matrix.md`](./docs/research/context-data-source-matrix.md). Juxtaposition rules: [`docs/methodology/juxtaposition-not-causation.md`](./docs/methodology/juxtaposition-not-causation.md).
 
-Firestore-to-Postgres ETL: [`packages/migrate-firestore-postgres`](./packages/migrate-firestore-postgres/). Hosted apps use `PUBLIC_DATA_SOURCE=postgres` / `ADMIN_DATA_SOURCE=postgres` with Secret Manager `DATABASE_URL`. Blobs cut over to Supabase Storage (`public-media`, `raw-sources`) with dual-serve during migration: [`docs/data/supabase-storage-cutover.md`](./docs/data/supabase-storage-cutover.md). Firestore remains until the wind-down checklist in [`docs/data/firebase-wind-down.md`](./docs/data/firebase-wind-down.md) is complete.
-
 Audit and outbox helpers commit state, immutable audit, and pending delivery together, with idempotency, bounded retry, and publication-history reconstruction.
 
-Firebase config: `infra/firebase/` and `@repo/firebase`. Isolation design: `infra/gcp/` and [`docs/security/environment-isolation.md`](./docs/security/environment-isolation.md).
+Leftover Firebase/GCP scaffolding: `infra/firebase/`, `@repo/firebase` (App Check helpers only), `infra/gcp/`, [`docs/security/environment-isolation.md`](./docs/security/environment-isolation.md).
 
 ## Product constitution
 
@@ -152,7 +178,7 @@ Policy is read-only in both packages. Changes ship as a new `policyVersion`, not
 
 ## Operator tooling (local)
 
-Discovery, enrichment, locate, and story-research CLIs live under `packages/operator-cli` and `packages/firebase/scripts`. Runbooks: [`docs/runbooks/`](./docs/runbooks/), discovery pipeline: [`docs/research/discovery-pipeline.md`](./docs/research/discovery-pipeline.md). Prefer the documented launchers so env vars stay coherent with the data plane.
+Discovery, enrichment, locate, and story-research CLIs live under `packages/operator-cli`. Some leftover utilities remain under `packages/firebase/scripts`. Runbooks: [`docs/runbooks/`](./docs/runbooks/), discovery pipeline: [`docs/research/discovery-pipeline.md`](./docs/research/discovery-pipeline.md). Prefer the documented launchers so env vars stay coherent with the data plane.
 
 ## Invariants
 

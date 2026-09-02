@@ -1,5 +1,9 @@
 # Deployable surface matrix (BB-021)
 
+> **Leftover GCP matrix.** Current live hosts (2026-08-28): `apps/web` and `apps/admin` on
+> Vercel; product SoR is Supabase `blackstory-app`. Rows below that still name Firebase App
+> Hosting, Firestore, or Cloud Run as the live admin/public-web host are historical.
+
 Machine-readable source: [`surface-matrix.json`](./surface-matrix.json). Typed runtime checks:
 [`packages/config/src/surfaces.ts`](../../../packages/config/src/surfaces.ts).
 
@@ -13,9 +17,9 @@ Companion isolation design (SAs, buckets, WIF): [`../isolation-matrix.json`](../
 | Public read API | `apps/api-public` | Cloud Run | Public read (Armor) | `api-public@…` |
 | Submissions API | `apps/api-submissions` | Cloud Run | Public, rate-limited | `api-submissions@…` |
 | Internal publication API | `apps/api-internal` | Cloud Run | **Private** (no public ingress) | `api-internal@…` |
-| Admin console | `apps/admin` | App Hosting interim (`black-book-admin-production`); target Cloud Run + IAP | IAP-protected (target) | `admin-runtime@…` (interim) |
+| Admin console | `apps/admin` | **Vercel** (separate project). App Hosting / Cloud Run `black-book-admin-production` deleted (leftover) | Authenticated operators | leftover GCP SA |
 
-Firestore (ADR-011) holds canonical data; blobs stay in the four GCS buckets from BB-005. Surface
+Supabase Postgres (`blackstory-app`) holds canonical data. Firestore and the four GCS buckets from BB-005 are leftover. Surface
 separation is enforced by **distinct deployables**, **typed capability checks**, **Firestore rules +
 Admin SDK SA boundaries**, and **network posture** (private ingress / IAP).
 

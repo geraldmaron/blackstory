@@ -45,7 +45,7 @@ Flaky tests belong in `packages/testing/quarantine.json` with `owner`, `deadline
 - CI job **Integration Postgres** is **skipped by default** (set repo variable
   `ENABLE_POSTGRES_CI=true` to enable). Not a required status check (ADR-011).
 
-### Firebase emulators (primary data path)
+### Leftover Firebase emulators (not product SoR)
 
 - Local: Java runtime (Homebrew `openjdk@21` is the default `JAVA_HOME` in `pnpm firebase:emulators`) + `pnpm firebase:emulators`, then `pnpm test:integration` (skips if emulators/Java unavailable).
 - Firestore security rules + converters: `pnpm firebase:test:rules` (or `@repo/firebase` tests); skips locally unless emulators are up; set `CI_REQUIRE_FIREBASE=1` to fail closed.

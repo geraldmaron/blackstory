@@ -1,5 +1,10 @@
 # Firebase configuration
 
+> **Leftover.** Current live stack (2026-08-28): public web on Vercel; product SoR is Supabase
+> `blackstory-app`. Firebase App Hosting backends for web and admin are deleted. Firestore is
+> not the system of record. This directory is reference, backup/DR history, and leftover App
+> Check identifiers. Do not treat the data-plane section below as current.
+
 > **ADR-012 (BB-078) target:** `black-book-efaaf` becomes `blackbook-prod` (retained, not
 > recreated); `blackbook-staging` and `blackbook-internal` are new projects. Nothing below in
 > this file describes live state changing from this bead alone - the live root `.firebaserc`
@@ -37,10 +42,11 @@ and `firebaseapphosting.googleapis.com` can be enabled.
 **Admin:** Firebase App Hosting backend `black-book-admin-production` was deleted 2026-08-15.
 Admin is the standalone Vercel project `apps/admin`. Do not recreate App Hosting.
 
-## Data plane (ADR-011)
+## Data plane (historical ADR-011)
 
-**Firestore** is the system of record for structured product data. **Storage / GCS** holds blobs.
-Cloud SQL is deferred — see [`../database/README.md`](../database/README.md) (parked).
+**Leftover:** Firestore is **not** the current system of record. Product SoR is Supabase
+Postgres on `blackstory-app`. **Storage / GCS** remains a leftover dual-serve origin; public
+media is Supabase Storage. Cloud SQL is parked — see [`../database/README.md`](../database/README.md).
 
 Model + rules: [`FIRESTORE_MODEL.md`](./FIRESTORE_MODEL.md), [`firestore.rules`](./firestore.rules),
 [`firestore.indexes.json`](./firestore.indexes.json).

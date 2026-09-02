@@ -1,7 +1,7 @@
 # Administration and research console
 
-The private admin portal lives in `@repo/admin` (Cloud Run + IAP target), separate from the
-public web application. Primary desks are ops-first:
+The private admin portal lives in `@repo/admin` (separate Vercel project; Cloud Run + IAP is
+leftover target text), separate from the public web application. Primary desks are ops-first:
 
 | Desk | Path | Role |
 |------|------|------|

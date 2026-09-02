@@ -16,7 +16,7 @@ cloud credentials. If you want the product story first, start with
 - Node.js 22+ (`nvm use` from `.nvmrc`)
 - [pnpm](https://pnpm.io/) 9.x
 - [uv](https://docs.astral.sh/uv/) (Python 3.12+)
-- Docker optional for the parked local PostGIS under `infra/database/`
+- Docker optional for the parked local PostGIS under `infra/database/` (leftover; product SoR is Supabase)
 
 ## Bootstrap
 
@@ -58,7 +58,7 @@ The preferred launcher keeps `PUBLIC_DATA_SOURCE` and `DATABASE_URL` coherent.
 Without a Postgres URL you get the small Dunbar seed catalog. With Postgres
 configured you see the live released catalog.
 
-## Firebase emulators (optional)
+## Leftover Firebase emulators (optional, not product SoR)
 
 ```bash
 pnpm firebase:emulators

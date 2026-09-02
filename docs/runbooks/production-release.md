@@ -15,10 +15,9 @@ post-deploy health checks, and rollback rehearsal.
 divergent feature branches to fix web prod.
 
 **Repo acceptance:** Firestore migrate / surface deploy / rollback helpers stay **dry-run safe**.
-**Public web** deploys via **Vercel** git integration; Production promote is explicit (ADR-027).
-**Admin** interim host is App Hosting (`black-book-admin-production`, `apphosting.admin.yaml`);
-operators roll out with the Firebase CLI (`apphosting:rollouts:create`) after `firebase login`.
-Automatic App Hosting rollouts remain disabled. Deploy workflows do not promote App Hosting.
+**Public web** deploys via **Vercel** git integration; Production promote is explicit.
+**Admin** is the standalone Vercel project `apps/admin`. App Hosting steps later in this file
+are leftover. Deploy workflows do not promote App Hosting.
 
 **Architecture anchors:** [ADR-006](../adr/ADR-006-github-actions-deployment.md),
 [ADR-027](../adr/ADR-027-vercel-public-web-hosting.md),

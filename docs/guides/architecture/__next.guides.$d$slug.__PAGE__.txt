@@ -1,38 +1,81 @@
 1:"$Sreact.fragment"
-5:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
+5:I[99990,["/blackstory/_next/static/chunks/13m8d36xc7t9s.js","/blackstory/_next/static/chunks/03obgaj591_9a.js"],"OutletBoundary"]
 6:"$Sreact.suspense"
-2:Te34,<h1 id="architecture"><a class="heading-anchor" href="#architecture">Architecture</a></h1>
+2:T17d1,<h1 id="architecture"><a class="heading-anchor" href="#architecture">Architecture</a></h1>
 <p>BlackStory is a place-connected Black history research platform. Public surfaces
 serve only released historical projections. Research, evidence, and promotion
 stay behind private APIs, workers, and admin tools.</p>
+<h2 id="current-stack-verified-2026-08-28"><a class="heading-anchor" href="#current-stack-verified-2026-08-28">Current stack (verified 2026-08-28)</a></h2>
+<p>Checked against live <a href="https://blackstory.app/">blackstory.app</a> headers and CSP.
+This is the current story. Older notes that still name Firebase App Hosting or
+Firestore as the system of record are leftover.</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Current</th>
+<th>Leftover</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Public web</td>
+<td><strong>Vercel</strong> (<code>x-vercel-id</code>, <code>x-vercel-cache</code>, Vercel Analytics). Cloudflare in front.</td>
+<td>Firebase App Hosting, Cloud Run for <code>apps/web</code></td>
+</tr>
+<tr>
+<td>Data / media</td>
+<td><strong>Supabase</strong> project <code>blackstory-app</code>, host <code>https://twykhihqkcldpreuovay.supabase.co</code>. Postgres is the product system of record. Public media is Supabase Storage.</td>
+<td>Firestore, Firebase Storage as SoR, parked PostGIS</td>
+</tr>
+<tr>
+<td>Media CSP</td>
+<td>Live <code>img-src</code> allows the Supabase host <strong>and</strong> <code>https://storage.googleapis.com</code></td>
+<td>GCS dual-serve / rollback</td>
+</tr>
+</tbody>
+</table>
+<p>The live homepage is a catalog filter board (Kind / Tone / Era / Theme / Status /
+Confidence / Where), about 4,100 released records. The product line <em>History,
+pinned to place</em> is the design target. It is not a claim that today's front door
+already works as map-first story-finding.</p>
+<p><code>/journey</code> is not a live room. Apex and www return HTTP 404 (verified 2026-08-28).
+Do not advertise it. <code>/about</code> already omits unfinished rooms. There is no public
+Journey source beyond that 404. Felix owns first-paint; this site does not invent
+a Journey page.</p>
+<p><code>/records/42Cb1758</code> is not a published record (HTTP 404, verified 2026-08-28).
+Public record pages live at <code>/entity/&#x3C;id></code>. The live first-paint list title that
+shows that id is an internal identifier, not a story. Do not invent the page.
+The id leak is first-paint work, not this guide.</p>
+<p>This repository only configures Supabase project <code>blackstory-app</code>. Other org Pro
+projects are not named in repo config, so unused is not proven here. Aligning
+docs on Vercel + Supabase does not close overages or standing bills.</p>
 <h2 id="surfaces"><a class="heading-anchor" href="#surfaces">Surfaces</a></h2>
-<pre><code>apps/web                 Public Next.js (Vercel; see ADR-027)
-apps/admin               Private admin / research console
-apps/api-public          Public read / search / location
-apps/api-submissions     Corrections / contribution intake
-apps/api-internal        Publication / promotion (private)
+<pre><code>apps/web                 Public Next.js on Vercel (live: blackstory.app)
+apps/admin               Private admin / research console (separate Vercel project)
+apps/api-public          Public read / search / location (in-repo; Cloud Run deploy unverified)
+apps/api-submissions     Corrections / contribution intake (in-repo; Cloud Run deploy unverified)
+apps/api-internal        Publication / promotion (in-repo; Cloud Run deploy unverified)
 apps/mobile              Expo mobile app (isolated lockfile)
 apps/docs                This GitHub Pages site
 workers/*                Research, publication, security
-functions/               Tombstone (discovery schedules: ADR-028)
 packages/*               Shared libraries (@repo/*)
-supabase/                Postgres migrations and project config
-infra/*                  Firebase wind-down, GCP, GitHub scaffolding
+supabase/                Postgres migrations for blackstory-app
+infra/*                  Leftover Firebase / GCP scaffolding, parked PostGIS
 </code></pre>
-<p>Do not add deployable microservices beyond this set. See ADR-005 in the
-repository.</p>
+<p>Do not add deployable microservices beyond this set. Historical decision text
+is in git (<code>git log -- docs/adr/</code>).</p>
 <h2 id="data-plane"><a class="heading-anchor" href="#data-plane">Data plane</a></h2>
 <p><strong>Product system of record</strong> is Supabase Postgres (<code>blackstory-app</code>), with
 schema and migrations under <code>supabase/migrations/</code> and
-<code>docs/data/postgres-schema.md</code>. Decision record: ADR-020.</p>
+<code>docs/data/postgres-schema.md</code>.</p>
 <p>Public and admin apps read with <code>PUBLIC_DATA_SOURCE=postgres</code> /
-<code>ADMIN_DATA_SOURCE=postgres</code>. Published developer reads may use PostgREST views
-(ADR-026). Blobs: Supabase Storage for <code>public-media</code> with GCS dual-serve during
-wind-down. Firestore is export/rollback only
+<code>ADMIN_DATA_SOURCE=postgres</code> and a server-only <code>DATABASE_URL</code>. Published
+developer reads may use PostgREST views. Blobs: Supabase Storage for
+<code>public-media</code>. GCS dual-serve and Firestore export tools are leftover
 (<code>docs/data/firebase-wind-down.md</code>).</p>
-<p>Local PostGIS under <code>infra/database/</code> is parked scaffolding, not the production
-path. Cloud SQL and SQL Connect are permanently non-path (ADR-002 / ADR-003
-superseded).</p>
+<p>Local PostGIS under <code>infra/database/</code> is parked leftover scaffolding, not the
+production path. Cloud SQL and SQL Connect are permanently non-path.</p>
 <h2 id="boundaries"><a class="heading-anchor" href="#boundaries">Boundaries</a></h2>
 <table>
 <thead>
@@ -78,8 +121,9 @@ loads it through <code>@repo/schemas</code>. Python workers load the same JSON t
 <code>black_book_constitution</code>. Thresholds and living-person rules change by version
 bump, not by an HTTP write API.</p>
 <h2 id="formal-decisions"><a class="heading-anchor" href="#formal-decisions">Formal decisions</a></h2>
-<p>Architecture decision records live in the repository under <code>docs/adr/</code>. This
-site's <a href="./adrs.md">Architecture decisions</a> guide lists selected topics.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"concepts"}]]}],["$","p",null,{"className":"doc-lede","children":"Surfaces, data plane, and non-negotiable boundaries."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"5F9NtFGTImuCFa5aVssbJ"}
+<p>Architecture decision records were removed from the repository 2026-07-24.
+History is in git. Still-binding invariants live in
+<code>docs/decisions-carryover.md</code>.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"concepts"}]]}],["$","p",null,{"className":"doc-lede","children":"Current stack, surfaces, and non-negotiable boundaries."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"yuuD63I0OldEjDA3acYkx"}
 3:["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","architecture",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]
 4:["$","$L5",null,{"children":["$","$6",null,{"name":"Next.MetadataOutlet","children":"$@7"}]}]
 7:null

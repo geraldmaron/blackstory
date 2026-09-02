@@ -168,11 +168,11 @@ const DESTINATIONS: readonly Destination[] = [
     group: 'find',
     crawl: { changeFrequency: 'daily', priority: 0.9 },
   },
-  // `/story` is deliberately absent. Story is a MODE of the Atlas, not a room: `StoryMode` is
-  // mounted inside `AtlasExperience` and reached from the Atlas itself. The route was deprecated
-  // rather than built (repo-92n2.10 closed won't-do), and a registry entry for a path that never
-  // renders would put it back in the palette, the footer and the library as a destination that
-  // 404s. Deleting the entry is what removes it from all five readers at once.
+  // `/story` and `/journey` are deliberately absent. Story/Journey is a MODE of the Atlas, not a
+  // room: `StoryMode` is mounted inside `AtlasExperience`. `/journey` is a dead address (HTTP 404
+  // on apex and www, verified 2026-08-28). A registry entry for a path that never renders would
+  // put it back in the palette, the footer, the library, and the sitemap as a destination that
+  // 404s. Do not add either path until a first-paint branch actually ships the room.
 
   /* ---- read ---- */
   {
