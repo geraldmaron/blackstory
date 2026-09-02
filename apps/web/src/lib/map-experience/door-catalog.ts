@@ -17,7 +17,7 @@ import {
   fitsNextDataCache,
 } from '../public-data/live-catalog-cache';
 import {
-  buildExploreMapSource,
+  exploreMapSourceFor,
   type ExploreMapFeature,
   type ExploreMapFeatureCollection,
 } from './build-explore-map-source';
@@ -74,7 +74,7 @@ function buildDoorPinPlateCache(
   entities: ReturnType<typeof listPublicEntities>,
   source: PublicReadSource | 'none',
 ): DoorPinPlateCache {
-  const mapSource = buildExploreMapSource(entities);
+  const mapSource = exploreMapSourceFor(entities);
   const features = mapSource.featureCollection.features;
   const pins = toDoorLinkPins(features);
   const pinRedirects = features.map((_feature, index) => {

@@ -11,7 +11,7 @@ import { cache } from 'react';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import type { PublicEntityView } from '../../data/public-seed';
 import {
-  buildExploreMapSource,
+  exploreMapSourceFor,
   type ExploreMapFeatureCollection,
   type JurisdictionAreaFeature,
 } from './build-explore-map-source';
@@ -37,7 +37,7 @@ export type MapStageBase = {
  * a page in the same request still only fetches once. */
 export const loadMapStageBase = cache(async function loadMapStageBase(): Promise<MapStageBase> {
   const { data: entities, source: dataSource } = await getSharedPublicEntities();
-  const mapSource = buildExploreMapSource(entities);
+  const mapSource = exploreMapSourceFor(entities);
   const style = buildExploreMapStyle({
     featureCollection: mapSource.featureCollection,
     jurisdictionAreaFeatures: mapSource.jurisdictionAreaFeatures,

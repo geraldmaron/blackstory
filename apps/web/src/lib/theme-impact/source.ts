@@ -12,9 +12,11 @@ import {
 } from '@repo/domain';
 import { cache } from 'react';
 import { hasPostgresConnection } from '../public-data/live-policy';
+import { createReleaseScopedCache } from '../public-data/release-scoped-cache';
+import { getPublicActiveReleaseMeta } from '../public-data/source';
 import { THEME_CHAPTER_SLUGS } from '../redirects/theme-alias-table.mjs';
 import { getThemeCatalogEntry } from './catalog';
-import { listReleaseThemeImpactPacketsByTheme } from './postgres-readers';
+import { listReleaseThemeImpactPackets } from './postgres-readers';
 
 export type ThemeImpactReadSource = 'live' | 'unavailable';
 
@@ -31,6 +33,40 @@ function logReadFailure(context: string, error: unknown): void {
   console.error(`[theme-impact] ${context} failed; rendering unavailable state: ${message}`);
 }
 
+const releasePacketsCache = createReleaseScopedCache<readonly ThemeImpactPacket[]>({
+  kind: 'release-theme-impact-packets-v1',
+});
+
+/**
+ * Every packet in the active release (~13 rows, ~107KB), read once per release-scoped cache
+ * window and shared across requests. The by-theme and by-id readers below are filters over
+ * this list. Before this, `resolveEntityCrossReferences` issued one by-theme query per theme
+ * on every entity page render — nine queries a page, 515k calls between 2026-07-20 and
+ * 2026-09-02. Throws on read failure; the exported readers own the degraded state.
+ */
+const listReleasePacketsCached = cache(async (): Promise<readonly ThemeImpactPacket[]> => {
+  const release = await getPublicActiveReleaseMeta();
+  if (!release) return listReleaseThemeImpactPackets();
+  return (await releasePacketsCache.get(release, listReleaseThemeImpactPackets)) ?? [];
+});
+
+/** Pure filter, exported for tests: packets of one theme, in the reader's stable order. */
+export function packetsForTheme(
+  packets: readonly ThemeImpactPacket[],
+  themeId: string,
+): readonly ThemeImpactPacket[] {
+  return packets.filter((packet) => packet.themeId === themeId);
+}
+
+/** Pure filter, exported for tests: packets whose id is in `ids`, in the reader's order. */
+export function packetsWithIds(
+  packets: readonly ThemeImpactPacket[],
+  ids: readonly string[],
+): readonly ThemeImpactPacket[] {
+  const wanted = new Set(ids);
+  return packets.filter((packet) => wanted.has(packet.id));
+}
+
 const listLivePacketsByTheme = cache(
   async (
     themeId: string,
@@ -40,13 +76,28 @@ const listLivePacketsByTheme = cache(
   }> => {
     if (!shouldAttemptLiveReads()) return { packets: [], source: 'unavailable' };
     try {
-      return { packets: await listReleaseThemeImpactPacketsByTheme(themeId), source: 'live' };
+      return {
+        packets: packetsForTheme(await listReleasePacketsCached(), themeId),
+        source: 'live',
+      };
     } catch (error) {
-      logReadFailure(`listReleaseThemeImpactPacketsByTheme(${themeId})`, error);
+      logReadFailure(`listReleaseThemeImpactPackets(${themeId})`, error);
       return { packets: [], source: 'unavailable' };
     }
   },
 );
+
+/**
+ * Packets by id, for article data blocks. Throws on read failure so the article reader can
+ * render its own unavailable state (an article with silently missing data blocks would be
+ * a falsehood, not a degraded page).
+ */
+export async function listThemeImpactPacketsByIds(
+  ids: readonly string[],
+): Promise<readonly ThemeImpactPacket[]> {
+  if (ids.length === 0) return [];
+  return packetsWithIds(await listReleasePacketsCached(), ids);
+}
 
 export async function listThemeImpactPacketViews(themeId: string): Promise<{
   readonly packets: readonly ThemeImpactPacketView[];
