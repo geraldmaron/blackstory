@@ -183,6 +183,21 @@ async function main(): Promise<void> {
         rejected.push({ entityId: proposal.entityId, reason: 'quote missing or too short' });
         continue;
       }
+      /*
+       * `low` is the reviewer saying they inferred rather than read it, and the year gate cannot
+       * catch that class: a biography of the right person, on a page that never names the
+       * property, contains real years in the right decade. One reviewer proposed exactly that,
+       * dating a house from a biography of someone who lived in the same county. The sweep's own
+       * rule applies here, that a fluent document about the wrong subject is worse than no
+       * document, so an inferred era is refused rather than published at low confidence.
+       */
+      if (proposal.confidence !== 'high' && proposal.confidence !== 'medium') {
+        rejected.push({
+          entityId: proposal.entityId,
+          reason: `confidence "${proposal.confidence ?? 'absent'}" is below the bar`,
+        });
+        continue;
+      }
       const { rows: evidence } = await client.query<{ content_text: string }>(
         `SELECT content_text FROM bb_research.entity_evidence
           WHERE entity_id = $1 AND status = 'captured' AND content_text IS NOT NULL`,
