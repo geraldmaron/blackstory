@@ -21,6 +21,9 @@ import {
 /** Search box around the click, sized for a 24px-class target around a national disc. */
 export const ENTITY_POINTER_HIT_PAD_PX = 16;
 
+/** MapLibre default is 3px; a national disc plus a slight drag was classified as pan. */
+export const MAP_CLICK_TOLERANCE_PX = 12;
+
 export const ENTITY_POINTER_HIT_LAYER_IDS = [
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
   EXPLORE_UNCLUSTERED_HALO_LAYER_ID,

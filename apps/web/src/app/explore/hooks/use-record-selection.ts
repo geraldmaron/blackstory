@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, type Dispatch, type SetStateAction } from 'react';
+import { useCallback, useEffect, useMemo, useRef, type Dispatch, type SetStateAction } from 'react';
 import type { SheetRecord } from '../../../components/map-experience/RecordSheet';
 import type { MapStageHandle } from '../../../components/map-stage/MapStage';
 import type { CameraApi } from '../../../lib/map-experience/camera-moves';
@@ -15,6 +15,11 @@ import {
 import { buildVisitHandoffFromMapFeature } from '../../../lib/geography/visit-handoff';
 import { withQuery } from '../../../lib/discovery/discovery-arrival';
 import { anatomyPrecisionFor, eraFor } from './atlas-feature-helpers';
+import {
+  resolveExplorePinEntityId,
+  subscribeExplorePinSelect,
+  type ExplorePinSelectTarget,
+} from '../../../lib/map-experience/explore-pin-select';
 
 /**
  * The selected record: its index in the current sort order, the sheet's view of it, and the
@@ -113,6 +118,29 @@ export function useRecordSelection(
     [setSelectedId, stage],
   );
 
+  const lastUnderlayPinRef = useRef<ExplorePinSelectTarget | null>(null);
+
+  useEffect(
+    () =>
+      subscribeExplorePinSelect((target) => {
+        lastUnderlayPinRef.current = target;
+        const entityId = resolveExplorePinEntityId(target, allFeatures);
+        if (entityId) selectById(entityId);
+      }),
+    [allFeatures, selectById],
+  );
+
+  // First-paint discs carry `pin-N`. When the catalog replaces that source, keep the
+  // open sheet on the same geography instead of dropping a now-unknown id.
+  useEffect(() => {
+    if (selectedId === undefined || !selectedId.startsWith('pin-')) return;
+    if (featuresById.has(selectedId)) return;
+    const target = lastUnderlayPinRef.current;
+    if (!target) return;
+    const entityId = resolveExplorePinEntityId(target, allFeatures);
+    if (entityId) selectById(entityId);
+  }, [allFeatures, featuresById, selectById, selectedId]);
+
   const sheetRecord = useMemo<SheetRecord | null>(() => {
     if (!selectedFeature) return null;
     // A reader who clicks a pin during story mode is asking for the same detail a click gets in
@@ -141,7 +169,7 @@ export function useRecordSelection(
       anatomyPlace: {
         lng: selectedFeature.geometry.coordinates[0],
         lat: selectedFeature.geometry.coordinates[1],
-        label: selectedFeature.properties.locationLabel ?? placeLabelFor(selectedFeature),
+        label: placeLabelFor(selectedFeature),
         precision: anatomyPrecisionFor(selectedFeature.properties.precision),
       },
       era: eraFor(selectedFeature),

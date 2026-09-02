@@ -14,8 +14,9 @@ void React;
 type FirstPaintPinPlateProps = {
   readonly pins: ExploreMapFeatureCollection;
   /**
-   * Door Journey: every pin with a public href is clickable. Explore first paint keeps
-   * walks-only so the underlay stays light before MapLibre.
+   * Door Journey: every pin with a public href is a link. Explore first paint
+   * keeps walks-only as hrefs (no-JS); every disc is still a hit target that
+   * opens the record sheet via the locator gestures.
    */
   readonly linkRecords?: boolean;
   /** Chapter focus — evidence spotlight or similar. */
@@ -79,6 +80,8 @@ export function FirstPaintPinPlate({
               aria-current={focused ? 'true' : undefined}
               style={style}
               data-entity-id={feature.properties.entityId}
+              data-lng={lng}
+              data-lat={lat}
             />
           );
         }
@@ -90,6 +93,8 @@ export function FirstPaintPinPlate({
             aria-hidden="true"
             style={style}
             data-entity-id={feature.properties.entityId}
+            data-lng={lng}
+            data-lat={lat}
           />
         );
       })}

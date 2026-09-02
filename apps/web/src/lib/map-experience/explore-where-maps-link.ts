@@ -1,9 +1,10 @@
 /**
  * Resolves WHERE-field display text and an external maps href for explore cards and lists.
+ * Label and maps query are the same public address line Visit uses (`placeLabelFor`).
  */
-import { findUsStateByPostalCode } from '@repo/domain/map/geography';
 import type { ExploreMapFeature } from './build-explore-map-source';
 import { buildExternalMapsSearchUrl } from '../geography/external-maps-url';
+import { placeLabelFor } from './place-label';
 
 export type ExploreWhereMapsLink = {
   readonly label: string;
@@ -21,42 +22,27 @@ function coordinatesFromFeature(
   return { lat, lng };
 }
 
-function labelFromFeature(feature: ExploreMapFeature): string | undefined {
-  const { properties } = feature;
-  const locationLabel = properties.locationLabel?.trim();
-  if (locationLabel) {
-    return locationLabel;
-  }
-
-  const statePostalCode = properties.statePostalCode?.trim().toUpperCase();
-  if (statePostalCode) {
-    return findUsStateByPostalCode(statePostalCode)?.name ?? statePostalCode;
-  }
-
-  return undefined;
-}
-
-/** Maps deep link for a public explore feature; undefined when no location signal exists. */
+/** Maps deep link for a public explore feature; undefined when the pin has no coordinates. */
 export function exploreWhereMapsLink(feature: ExploreMapFeature): ExploreWhereMapsLink | undefined {
   const coords = coordinatesFromFeature(feature);
-  const label = labelFromFeature(feature);
-  const statePostalCode = feature.properties.statePostalCode?.trim().toUpperCase();
-  const query = label ?? statePostalCode;
+  if (!coords) {
+    return undefined;
+  }
+  const label = placeLabelFor(feature);
+  const query = label === 'Place withheld' ? undefined : label;
 
   const href = buildExternalMapsSearchUrl({
-    ...(coords ? { lat: coords.lat, lng: coords.lng } : {}),
+    lat: coords.lat,
+    lng: coords.lng,
     ...(query ? { query } : {}),
   });
   if (!href) {
     return undefined;
   }
 
-  const displayLabel = label ?? statePostalCode ?? 'this location';
-  const placeLabel = label ?? displayLabel;
-
   return {
-    label: displayLabel,
+    label,
     href,
-    placeLabel,
+    placeLabel: label,
   };
 }

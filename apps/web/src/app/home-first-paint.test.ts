@@ -229,8 +229,8 @@ test('first paint is the record, not a manifesto or a schema card', () => {
       },
     ],
     continueLearning: [],
-    primaryImage: undefined,
   };
+  delete (greenwoodShaped as { primaryImage?: unknown }).primaryImage;
   assert.equal(
     buildEntityAnatomyInputs(greenwoodShaped, undefined).evidenceLabel,
     'Grade A · 2 sources',

@@ -27,6 +27,7 @@ import {
   type RoomSource,
 } from '../../../components/room';
 import { KindGlyph } from '../../../components/map-experience/KindGlyph';
+import { MapsExternalLink } from '../../../components/map-experience/MapsExternalLink';
 import {
   RECORD_GAP_COPY,
   THIN_RECORD_COPY,
@@ -34,7 +35,7 @@ import {
 } from '../../../components/entity/copy';
 import { humanizeToken } from '../../../components/entity/format';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
-import { resolvePublicAddressLine } from '../../../lib/geography/public-address';
+import { buildExternalMapsSearchUrl } from '../../../lib/geography/external-maps-url';
 import { shouldShowVisitBlock } from '../../../lib/geography/visit-handoff';
 import {
   buildExploreHref,
@@ -226,13 +227,6 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const displayClaims = withoutSummaryEchoClaims(entity.claims, entity.summary);
   const evidenceClaims = toEvidenceClaimInputs(displayClaims);
   const geoAnchor = entity.geoAnchor ?? geoAnchorFor(entity.id);
-  const publicAddress = resolvePublicAddressLine({
-    displayName: entity.displayName,
-    locationLabel: entity.locationLabel,
-    jurisdictionLabel: entity.jurisdictionLabel,
-    locationPrecision: entity.locationPrecision,
-    kind: entity.kind,
-  });
   const visitInput = {
     displayName: entity.displayName,
     locationLabel: entity.locationLabel,
@@ -266,6 +260,16 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const citingStories = storiesCiting(await resolveCitesEdgeIndex(), entity.id);
 
   const anatomyInputs = buildEntityAnatomyInputs(entity, mapTone);
+  const publicAddress = anatomyInputs.whereLabel;
+  const showVisit = shouldShowVisitBlock(visitInput);
+  const whereMapsHref =
+    !showVisit && geoAnchor
+      ? buildExternalMapsSearchUrl({
+          lat: geoAnchor.lat,
+          lng: geoAnchor.lng,
+          query: publicAddress,
+        })
+      : undefined;
   const sources = toRoomSources(entity.claims);
   // Rubric sentences, whole. They used to be truncated into chips next to the title.
   const inclusionBasis = entity.notabilityLabels ?? [];
@@ -288,7 +292,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
    */
   const rail = (
     <>
-      {shouldShowVisitBlock(visitInput) ? (
+      {showVisit ? (
         <RecordVisitBlock
           className="ds-record-visit--rail"
           showLocator={geoAnchor !== undefined}
@@ -469,7 +473,19 @@ export default async function EntityPage({ params }: EntityPageProps) {
             </div>
             <div>
               <dt>Where</dt>
-              <dd>{publicAddress}</dd>
+              <dd>
+                {whereMapsHref ? (
+                  <MapsExternalLink
+                    href={whereMapsHref}
+                    placeLabel={publicAddress}
+                    title={`Where: ${publicAddress}. Open in your maps app.`}
+                  >
+                    {publicAddress}
+                  </MapsExternalLink>
+                ) : (
+                  publicAddress
+                )}
+              </dd>
             </div>
             <div>
               <dt>Era</dt>
@@ -506,9 +522,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
         <EntitySensitivityBanner sensitivity={entity.sensitivity} entityKind={entity.kind} />
       ) : null}
 
-      {shouldShowVisitBlock(visitInput) ? (
-        <RecordVisitBlock className="ds-record-visit--main" {...visitInput} />
-      ) : null}
+      {showVisit ? <RecordVisitBlock className="ds-record-visit--main" {...visitInput} /> : null}
 
       <EntityRoomSections
         entity={entity}

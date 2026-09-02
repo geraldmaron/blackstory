@@ -73,12 +73,13 @@ missed:
 2. **`300-526 -> 0` is mandatory, not tidiness.** Without it the maintenance 503 caches at the
    edge and outlives the wall.
 3. **Do NOT add a custom cache key here.** "Ignore query string" *is* available on Free (only
-   per-parameter include/exclude is Enterprise), so it is tempting. It is wrong: `/` builds its
-   shell and `noscript` list from `state`/`era`/`kind`/`topic`/`status`, so collapsing the facets
-   to one cache entry serves one state's page to everyone. The faceted long tail is correctly
-   uncacheable; this rule only ever caches the bare three URLs, which is the intended scope.
-   `cache_by_device_type` is off for the same reason in reverse — it splits each entry three ways
-   for a site that serves no device-specific HTML.
+   per-parameter include/exclude is Enterprise), so it is tempting. It was wrong when `/` still
+   rendered Atlas filters: collapsing `state`/`era`/`kind` would have served one state's page to
+   everyone. `/` is now the Door and ignores facet query; leftover `?state=` 308s to the bare
+   path. The faceted long tail lives on `/explore`. `/atlas/catalog` and `/sitemap.xml` are
+   separate origins that must not be cache-busted by junk query. `cache_by_device_type` is off
+   for the same reason in reverse — it splits each entry three ways for a site that serves no
+   device-specific HTML.
 
 A second rule, `Cache HTML at edge`, is present but **disabled**: its expression was an empty
 wildcard (`http.request.full_uri wildcard r""`), zone-wide and unreviewed. Left in place rather
@@ -89,7 +90,7 @@ than deleted so its intent can be recovered before someone re-creates it.
 | Probe | Result |
 |-------|--------|
 | `/` repeat requests | `cf-cache-status: HIT`, `age` climbing — repeat front-door hits never reach Vercel |
-| `/?state=AL` | `MISS` — faceted variants keep their own entry, which is correct, not a defect |
+| `/?state=AL` | 308 to `/` — Door has no facet query; junk keys must not fork the HTML cache |
 | `/` with `rsc: 1` | `DYNAMIC` — the bypass holds, RSC and HTML never share an entry |
 | `/atlas/catalog` | `x-vercel-cache: MISS` then `HIT`, `HIT` with rising `age` |
 
@@ -101,7 +102,14 @@ overwritten with `no-store`. A route handler keeps its own. Confirmed.
 
 **The payload is gone.** `/` is now **33.6 KB gzipped** (372 KB raw), against the ~15–17 MB RSC
 payload that was, by itself, the July–August Vercel bill. `/atlas/catalog` carries the 949 KB
-(gzipped) catalog and is CDN-cached.
+(gzipped) catalog and is CDN-cached. The Door must not re-embed that catalog as `catalogFeatures`
+on the client; spotlight `pin-N` is resolved on the server.
+
+**Origin cost pass, 2026-09-01.** Named AI-training crawlers (`GPTBot`, `ClaudeBot`, …) get a
+cached 403 on `/explore`, `/atlas/catalog`, `/sitemap.xml`, and the search/refine/geocode APIs.
+Googlebot is not denied. `/sitemap.xml` is a route handler with `s-maxage` so crawler polling
+does not rebuild the URL list on every hit. Search/locate/explore refine stay rate-limited via
+`@repo/security`. `autoDisablePublicCorpus` stays false.
 
 Note the browser still receives `private, no-cache, no-store` on `/` while Cloudflare serves a
 `HIT`. That is the intended split: `override_origin` caches at the edge, the origin's header passes
@@ -112,11 +120,12 @@ downstream untouched, so no visitor caches a dynamic page locally.
 `/methodology`, `/submit`, `/entity/`, `/books/`, `/law/`, `/stories/`, `/chapters/` — same `rsc`
 bypass — with **`edge_ttl: respect_origin`** rather than the `override_origin` the first rule uses.
 
-The two groups need opposite treatment, which is why they are two rules and not one. `/`,
-`/library` and `/memorial` are `force-dynamic` and send `no-store`, so the edge must *override* the
-origin or nothing caches. The ISR surfaces already declare exactly the right thing
-(`public, s-maxage=3600, stale-while-revalidate=86400`), so the edge should *respect* it and keep
-one source of truth in the app.
+The two groups need opposite treatment, which is why they are two rules and not one. `/library`
+and `/memorial` are `force-dynamic` and send `no-store`, so the edge must *override* the origin
+or nothing caches. `/` is ISR (`revalidate = 300`) and stays in the same override rule so the
+front door still caches for an hour at Cloudflare. The other ISR surfaces already declare
+exactly the right thing (`public, s-maxage=3600, stale-while-revalidate=86400`), so the edge
+should *respect* it and keep one source of truth in the app.
 
 `respect_origin` also makes the prefix list safe to be generous with: a route that declares
 `no-store` or `max-age=0` simply does not cache. Verified — `/stories/mosaic-credits` sends

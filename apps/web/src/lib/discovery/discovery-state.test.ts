@@ -11,7 +11,6 @@ import {
   discoveryFromSearchParams,
   listHrefFromDiscovery,
   mapHrefFromDiscovery,
-  mapListContinuityLabel,
   placeArrivalQuery,
   placeDiscoveryReturn,
 } from './discovery-state';

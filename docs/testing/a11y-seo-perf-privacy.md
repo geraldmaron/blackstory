@@ -9,7 +9,7 @@ Repo acceptance gates for core public journeys. No live deploy required — auto
 | A11y fixtures | `pnpm --filter @repo/testing test:a11y` | Landmark, heading order, alt text, core journey HTML fixtures |
 | Release gates | `pnpm --filter @repo/testing test:release-gates` | Performance budgets + degraded-mode copy contracts |
 | SEO builders | `pnpm --filter @repo/web test` (seo tests) | Protected fields stripped from metadata previews |
-| Sitemap | `apps/web/src/app/sitemap.ts` | Static routes + active release entity URLs |
+| Sitemap | `apps/web/src/app/sitemap.xml/route.ts` | Static routes + active release entity URLs |
 
 Parent wiring: merge `release-gates` into `scripts/run-testing-layer.mjs` (add `release-gates` matcher or extend `a11y`) and append seo test paths to `apps/web/package.json` `test` script.
 

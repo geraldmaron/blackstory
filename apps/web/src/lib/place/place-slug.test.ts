@@ -3,8 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import type { PublicSearchIndexDoc } from '@repo/domain/search';
-import { listPublicEntities } from '../../data/public-seed';
+import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
 import { buildExploreMapSource } from '../map-experience/build-explore-map-source';
 import {
   isResolvablePlaceSlug,
@@ -12,28 +11,7 @@ import {
   parsePlaceAddress,
   placeHrefForEntity,
   placeSlugCollisionCounts,
-  resolvePlaceSlugFromSearchIndex,
 } from './place-slug';
-
-function doc(
-  partial: Pick<PublicSearchIndexDoc, 'id' | 'displayName' | 'kind'> &
-    Partial<PublicSearchIndexDoc>,
-): PublicSearchIndexDoc {
-  return {
-    releaseId: 'rel_test',
-    nameLower: partial.displayName.toLowerCase(),
-    aliases: [],
-    topicTags: [],
-    eraBuckets: [],
-    notabilityBasis: [],
-    notabilityLabels: [],
-    recordMaturity: 'published',
-    researchCoverage: 'partial',
-    relatedCount: 0,
-    claimCount: 0,
-    ...partial,
-  };
-}
 
 describe('place slug addresses', () => {
   it('parses disambiguated entity ids', () => {
@@ -99,7 +77,7 @@ describe('place slug addresses', () => {
       kind: 'person',
       displayName: 'Example Memorial Name',
       summary: 'A named person on the map.',
-    };
+    } as unknown as PublicEntityView;
     const source = buildExploreMapSource([person], {
       geoAnchorFor: () => ({
         lat: 38.91,

@@ -3,8 +3,9 @@
  * a curated set of AI-training bulk-scraping crawlers are explicitly disallowed. This is a
  * courtesy signal honored only by crawlers that choose to respect it it is not an access
  * control so it is paired with `/ai.txt` (an emerging, narrower AI-specific convention some
- * crawlers check independently) and with real technical controls elsewhere (rate limits, App
- * Check, cache-busting normalization; see docs/security/threat-model.md T-19). Update
+ * crawlers check independently) and with real technical controls elsewhere (named-UA deny on
+ * expensive origin paths, rate limits, cache-busting normalization; see
+ * docs/security/threat-model.md T-19). Update
  * `NEXT_PUBLIC_SITE_URL` once the production domain is live so `sitemap`/host resolve correctly.
  */
 import type { MetadataRoute } from 'next';

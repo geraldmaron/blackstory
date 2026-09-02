@@ -14,7 +14,7 @@ import {
   searchHrefForStatus,
 } from '../../lib/map-experience/metadata-hrefs';
 import { entityEraFact } from '../../lib/map-experience/entity-era-facts';
-import { exploreWhereMapsLink } from '../../lib/map-experience/explore-where-maps-link';
+import { placeLabelFor } from '../../lib/map-experience/place-label';
 import { radiusAffordanceLabel } from '../../lib/map-experience/geo-precision';
 import {
   RecordAnatomyPanel,
@@ -52,8 +52,7 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
   const era = entityEraFact({
     eraBuckets: properties.eraBuckets,
   });
-  const whereMaps = exploreWhereMapsLink(feature);
-  const whereLabel = whereMaps?.label ?? 'Place withheld';
+  const whereLabel = placeLabelFor(feature);
   const statusHref =
     properties.status !== undefined ? searchHrefForStatus(properties.status) : undefined;
   const evidenceLabel = `${properties.evidenceCount} accepted claim${properties.evidenceCount === 1 ? '' : 's'}`;
@@ -62,7 +61,7 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
   const anatomyPlace: RecordAnatomyPlace = {
     lat,
     lng,
-    label: properties.displayName,
+    label: whereLabel,
     precision: mapPrecision,
     precisionCaption: radiusAffordanceLabel(properties.geoPrecisionTier, properties.radiusMeters),
   };
@@ -83,6 +82,7 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
       : {}),
     ...(properties.visitClaims !== undefined ? { claims: properties.visitClaims } : {}),
   });
+  const showVisit = shouldShowVisitBlock(visitInput);
   const kindIcon =
     properties.mapTone !== undefined
       ? { variant: 'record-kind' as const, kind: properties.kind, mapTone: properties.mapTone }
@@ -204,11 +204,9 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
         {properties.oneLineStory}
       </p>
 
-      <RecordAnatomyPanel facts={anatomyFacts} place={anatomyPlace} />
+      <RecordAnatomyPanel facts={anatomyFacts} place={anatomyPlace} linkWhereToMaps={!showVisit} />
 
-      {shouldShowVisitBlock(visitInput) ? (
-        <RecordVisitBlock className="ds-nc__visit" compact {...visitInput} />
-      ) : null}
+      {showVisit ? <RecordVisitBlock className="ds-nc__visit" compact {...visitInput} /> : null}
 
       <dl className="ds-nc__facts">
         <div className="ds-nc__fact">

@@ -45,6 +45,18 @@ describe('explore map underlay', () => {
     assert.match(gestures, /zoomLocatorViewAt/);
   });
 
+  it('lets every pin take a click, with a padded target, until the live plate is ready', () => {
+    assert.match(
+      css,
+      /\.ds-explore-underlay\s+\.ds-first-paint-pin\s*\{[^}]*pointer-events:\s*auto/s,
+    );
+    assert.match(css, /\.ds-explore-underlay\s+\.ds-first-paint-pin::after/);
+    assert.match(gestures, /readExplorePinTarget/);
+    assert.match(gestures, /emitExplorePinSelect/);
+    assert.match(gestures, /pointerExceededClickSlop/);
+    assert.doesNotMatch(gestures, /if \(target\?\.closest\('a, button'\)\) return;/);
+  });
+
   it('puts geography in server HTML, not only after client hydration', () => {
     assert.doesNotMatch(source, /'use client'/);
     assert.match(source, /ds-explore-underlay__ground/);

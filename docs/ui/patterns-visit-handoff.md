@@ -38,7 +38,16 @@ The published **`locationLabel` is the public address line.** There is no separa
 
 ### Display helper
 
-`resolvePublicAddressLine()` composes the reader-facing string from `locationLabel`, `jurisdictionLabel`, `displayName`, and `locationPrecision`. Use it everywhere a Where/Visit address appears.
+`resolvePublicAddressLine()` composes the reader-facing string from `locationLabel`, `jurisdictionLabel`, `displayName`, and `locationPrecision`. Use it everywhere a Where or Visit address appears. Cards use `placeLabelFor()` which is that composer over an explore feature.
+
+**Where** (anatomy strip / card fact) and **Visit** (handoff block) must print the same address line. They are different jobs:
+
+| Region | Job |
+|---|---|
+| Where | Orient: the public place line |
+| Visit | Act: standing, visitor contact, Open in maps / Get directions |
+
+When Visit is on the surface, Where is plain text. When Visit is omitted (people, laws, compact lists), Where may be the maps link.
 
 ### Operator audit
 

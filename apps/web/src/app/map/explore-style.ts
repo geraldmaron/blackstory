@@ -45,7 +45,7 @@ import {
   firstPaintPointColorExpression,
   firstPaintPointOpacityExpression,
   EXPLORE_GL_ENTITY_MAX_ZOOM,
-  FIRST_PAINT_MAP_MAX_ZOOM,
+  literalPaintNumber,
 } from '../../lib/map-experience/first-paint-map-paint';
 import {
   markerHaloRadiusExpression,
@@ -598,7 +598,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
   );
   const entityPointRadius = firstPaintOrKindRadiusExpression(markerRadiusExpression());
   const entityHaloRadius = firstPaintOrKindRadiusExpression(markerHaloRadiusExpression());
-  const entityHaloOpacity = blendFirstPaintWithKindExpression(ENTITY_HALO_OPACITY, 0);
+  const entityHaloOpacity = blendFirstPaintWithKindExpression(
+    literalPaintNumber(ENTITY_HALO_OPACITY),
+    literalPaintNumber(0),
+  );
   const entityStrokeWidth = firstPaintOrKindStrokeWidthExpression(kindStrokeWidthExpression());
   const presenceFillActive = input.layerMode === 'presence';
   const populationFillActive =

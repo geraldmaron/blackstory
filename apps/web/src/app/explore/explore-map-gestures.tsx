@@ -1,8 +1,9 @@
 'use client';
 
 /**
- * Pan, wheel, and pinch for the Explore locator underlay. Geography is server-rendered
- * in `ExploreMapUnderlay` so state hairlines exist in the first HTML.
+ * Pan, wheel, pinch, and pin-select for the Explore locator underlay. Geography is
+ * server-rendered in `ExploreMapUnderlay` so state hairlines exist in the first HTML.
+ * A tap that does not pan opens the record sheet; drag still moves the map.
  */
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
@@ -12,10 +13,26 @@ import {
   wheelFactorForDelta,
   zoomLocatorViewAt,
 } from '../../components/patterns/record-locator-view';
+import {
+  emitExplorePinSelect,
+  pointerExceededClickSlop,
+  readExplorePinTarget,
+  type ExplorePinSelectTarget,
+} from '../../lib/map-experience/explore-pin-select';
 
 void React;
 
 type PointerPoint = { readonly x: number; readonly y: number };
+
+type DragState = {
+  pointerId: number;
+  lastX: number;
+  lastY: number;
+  startX: number;
+  startY: number;
+  didPan: boolean;
+  pin: ExplorePinSelectTarget | null;
+};
 
 function pointerDistance(a: PointerPoint, b: PointerPoint): number {
   return Math.hypot(a.x - b.x, a.y - b.y);
@@ -28,7 +45,7 @@ function pointerMidpoint(a: PointerPoint, b: PointerPoint): PointerPoint {
 export function ExploreMapGestures() {
   const slotRef = useRef<HTMLSpanElement>(null);
   const viewRef = useRef(defaultLocatorView());
-  const dragRef = useRef<{ pointerId: number; lastX: number; lastY: number } | null>(null);
+  const dragRef = useRef<DragState | null>(null);
   const pointersRef = useRef(new Map<number, PointerPoint>());
   const pinchRef = useRef<{ distance: number } | null>(null);
 
@@ -44,7 +61,9 @@ export function ExploreMapGestures() {
     if (!root) return;
     if (event.button !== 0 && event.pointerType === 'mouse') return;
     const target = event.target as HTMLElement | null;
-    if (target?.closest('a, button')) return;
+    const pin = readExplorePinTarget(target);
+    // Pin discs are the select target; other links/buttons keep native clicks.
+    if (!pin && target?.closest('a, button')) return;
     pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     root.setPointerCapture(event.pointerId);
 
@@ -60,8 +79,15 @@ export function ExploreMapGestures() {
       return;
     }
 
-    dragRef.current = { pointerId: event.pointerId, lastX: event.clientX, lastY: event.clientY };
-    root.classList.add('is-dragging');
+    dragRef.current = {
+      pointerId: event.pointerId,
+      lastX: event.clientX,
+      lastY: event.clientY,
+      startX: event.clientX,
+      startY: event.clientY,
+      didPan: false,
+      pin,
+    };
   }, []);
 
   const onPointerMove = useCallback(
@@ -98,6 +124,16 @@ export function ExploreMapGestures() {
 
       const drag = dragRef.current;
       if (!drag || drag.pointerId !== event.pointerId) return;
+      if (
+        !drag.didPan &&
+        !pointerExceededClickSlop(drag.startX, drag.startY, event.clientX, event.clientY)
+      ) {
+        return;
+      }
+      if (!drag.didPan) {
+        drag.didPan = true;
+        root.classList.add('is-dragging');
+      }
       const deltaX = event.clientX - drag.lastX;
       const deltaY = event.clientY - drag.lastY;
       drag.lastX = event.clientX;
@@ -118,6 +154,10 @@ export function ExploreMapGestures() {
     if (drag && drag.pointerId === event.pointerId) {
       dragRef.current = null;
       root?.classList.remove('is-dragging');
+      if (!drag.didPan && drag.pin) {
+        event.preventDefault();
+        emitExplorePinSelect(drag.pin);
+      }
     }
     if (root?.hasPointerCapture(event.pointerId)) {
       root.releasePointerCapture(event.pointerId);

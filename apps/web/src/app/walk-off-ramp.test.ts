@@ -15,11 +15,11 @@ const here = dirname(fileURLToPath(import.meta.url));
 
 test('the copper back control is BlackStory', () => {
   const html = renderToStaticMarkup(
-    createElement(
-      WalkOffRampView,
-      { placeName: MAP_BACK.displayName, href: MAP_BACK.href },
-      'Every number here is a national series.',
-    ),
+    createElement(WalkOffRampView, {
+      placeName: MAP_BACK.displayName,
+      href: MAP_BACK.href,
+      children: 'Every number here is a national series.',
+    }),
   );
   assert.match(html, />BlackStory</);
   assert.match(html, /href="\/"/);

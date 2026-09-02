@@ -65,9 +65,17 @@
   pointer-events: none;
 }
 
-.ds-explore-underlay .ds-first-paint-pin--walk,
-.ds-explore-underlay .ds-first-paint-pin--link {
+.ds-explore-underlay .ds-first-paint-pin {
   pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Generous hit pad — discs stay small (WCAG target size). */
+.ds-explore-underlay .ds-first-paint-pin::after {
+  content: '';
+  position: absolute;
+  inset: -0.7rem;
+  border-radius: 999px;
 }
 
 /*

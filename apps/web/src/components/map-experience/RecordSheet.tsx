@@ -294,6 +294,9 @@ export function RecordSheet({
           className="ds-sheet__anatomy"
           facts={anatomyFacts(record)}
           {...(record.anatomyPlace ? { place: record.anatomyPlace } : {})}
+          linkWhereToMaps={
+            !(record.visitInput !== undefined && shouldShowVisitBlock(record.visitInput))
+          }
           aria-label={`Anatomy of ${record.name}`}
         />
 

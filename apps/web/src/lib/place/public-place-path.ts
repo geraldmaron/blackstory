@@ -152,7 +152,12 @@ export function atlasWalkHref(input: {
   if (staysOffPublicMap(input)) return undefined;
   if (input.kind === 'person') return '/memorial';
   if (input.kind === 'law' || input.kind === 'case') return '/law';
-  if (!placePageHolds({ displayName: input.displayName, entityId: input.entityId })) {
+  if (
+    !placePageHolds({
+      displayName: input.displayName,
+      ...(input.entityId !== undefined ? { entityId: input.entityId } : {}),
+    })
+  ) {
     return undefined;
   }
   return placeHref(input.displayName);

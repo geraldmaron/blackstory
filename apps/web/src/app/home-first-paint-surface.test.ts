@@ -177,7 +177,7 @@ test('archive chrome is the same on every place; Stories only when this record n
   );
   assert.equal(rooms[0]?.href, '#stories');
   assert.ok(!rooms.some((room) => room.href === '/stories'));
-  assert.ok(!rooms.some((room) => room.href === '/books' || room.id === 'books'));
+  assert.ok(!rooms.some((room) => (room.id as string) === 'books'));
   assert.ok(rooms.some((room) => room.href === '/law' && room.id === 'law'));
   assert.ok(rooms.some((room) => room.href === '/memorial' && room.id === 'memorial'));
   assert.ok(rooms.some((room) => room.href === '/data' && room.id === 'data'));

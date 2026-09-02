@@ -26,6 +26,9 @@ test('`/` mounts DoorImmersive over the pin plate, not the Atlas instrument', ()
   assert.doesNotMatch(page, /AtlasHome|AtlasLoader|AtlasExperience/);
   assert.match(door, /DoorImmersive/);
   assert.match(door, /loadDoorPinPlate/);
+  assert.match(door, /resolveDoorFocusPinId/);
+  assert.match(door, /spotlightPinId/);
+  assert.doesNotMatch(door, /catalogFeatures/);
   assert.match(door, /pickStoryChapters/);
   assert.match(door, /pickStoryRecord/);
   assert.doesNotMatch(door, /toDoorLinkPins/);
@@ -58,6 +61,22 @@ test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
   assert.doesNotMatch(css, /radial-gradient|linear-gradient|box-shadow|backdrop-filter/);
   // Nested overflow scrollport was the bug: wheel only hit cards. Document scrolls instead.
   assert.doesNotMatch(css, /\.ds-door-journey\s*\{[^}]*overflow-y:\s*auto/);
+  // Pin percents are Albers 960x500; contain the board so mask-size:contain and pins share a box.
+  assert.match(css, /ds-door__board-host/);
+  assert.match(css, /container-type:\s*size/);
+  assert.match(css, /aspect-ratio:\s*960\s*\/\s*500/);
+  assert.match(css, /min\(100cqw,\s*calc\(100cqh \* 960 \/ 500\)\)/);
+  // Rest invitation docks to the field, not the vertical centre, and cannot overflow the island.
+  assert.match(css, /\.ds-door-journey__chapter--rest[\s\S]*align-content:\s*end/);
+  assert.match(css, /ds-door-journey__chapter--rest/);
+  assert.match(
+    css,
+    /\.ds-door-journey__chapter--rest \.ds-door-journey__card[\s\S]*max-height:\s*min\(26rem/,
+  );
+  assert.match(css, /@media \(max-height: 52rem\)/);
+  assert.match(css, /\.ds-door__field-chrome[\s\S]*top:\s*var\(--ds-space-4\)/);
+  // Mobile chapters are in document flow; nested card scroll would steal the page wheel.
+  assert.match(css, /@media \(max-width: 899px\)[\s\S]*max-height:\s*none/);
   // Land mask on the pin plate made link hits fail (mask alpha ~0.32).
   assert.doesNotMatch(
     css,
@@ -67,7 +86,10 @@ test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
 
 test('DoorImmersive layout-zooms the plate (no transform:scale blur)', () => {
   assert.match(immersive, /width: `\$\{focus\.scale \* 100\}%`/);
-  assert.match(immersive, /ds-door__ground-map/);
+  assert.match(immersive, /ds-door-journey__chapter--rest/);
+  assert.match(immersive, /ds-door-journey__copy/);
+  assert.match(immersive, /ds-door__board-host/);
+  assert.match(immersive, /ds-door__board-frame/);
   assert.doesNotMatch(immersive, /transform:\s*`scale/);
 });
 
@@ -87,8 +109,9 @@ test('door-home CSS switches mobile typography and gutters', () => {
 });
 
 test('DoorImmersive renders one full pin plate for every record', () => {
-  assert.match(immersive, /resolveDoorFocusPinId/);
-  assert.match(immersive, /catalogFeatures/);
+  assert.match(immersive, /spotlightPinId/);
+  assert.doesNotMatch(immersive, /catalogFeatures/);
+  assert.doesNotMatch(immersive, /resolveDoorFocusPinId/);
   assert.doesNotMatch(immersive, /thinDoorNationalPins/);
   assert.doesNotMatch(immersive, /ds-first-paint-plate--door-mobile/);
 });

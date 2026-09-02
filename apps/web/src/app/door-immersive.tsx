@@ -11,16 +11,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { BRAND_ASSETS } from '@repo/config';
-import type {
-  ExploreMapFeature,
-  ExploreMapFeatureCollection,
-} from '../lib/map-experience/build-explore-map-source';
+import type { ExploreMapFeatureCollection } from '../lib/map-experience/build-explore-map-source';
 import { CHAPTER_INTERSECTION_THRESHOLD, type StoryChapter } from '../lib/story/chapters';
 import type { StoryRecordSpotlight } from '../lib/story/pick-story-record';
 import type { StoryFact } from '../lib/story/story-facts';
 import { COLD_OPEN_WORDS, copyFor, headingParts } from '../components/story/story-copy';
 import { ABOUT_SUPPORT_LINE } from './about/about-copy';
-import { resolveDoorFocusPinId } from '../lib/map-experience/first-paint-pins';
 import { resolveDoorFocus, type DoorFocusFrame } from './door-focus';
 import { FirstPaintPinPlate } from './first-paint-pin-plate';
 
@@ -78,22 +74,22 @@ function prefersReducedMotion(): boolean {
 
 export type DoorImmersiveProps = {
   readonly pins: ExploreMapFeatureCollection;
-  /** Pre-link catalog features — used to map spotlight entity ids to `pin-N` ids. */
-  readonly catalogFeatures: readonly ExploreMapFeature[];
   readonly chapters: readonly StoryChapter[];
   readonly factByChapterId: Readonly<Record<string, StoryFact>>;
   readonly spotlight: StoryRecordSpotlight | null;
   readonly spotlightLngLat: readonly [number, number] | null;
+  /** Opaque `pin-N` for the spotlight, resolved on the server so the catalog stays off `/`. */
+  readonly spotlightPinId: string | null;
   readonly placeCount: string;
 };
 
 export function DoorImmersive({
   pins,
-  catalogFeatures,
   chapters,
   factByChapterId,
   spotlight,
   spotlightLngLat,
+  spotlightPinId,
   placeCount,
 }: DoorImmersiveProps) {
   const journeyRef = useRef<HTMLDivElement | null>(null);
@@ -153,10 +149,10 @@ export function DoorImmersive({
     return () => observer.disconnect();
   }, [chapters, factByChapterId, spotlight, spotlightLngLat]);
 
-  const focusPinId = useMemo(
-    () => resolveDoorFocusPinId(focus.focusEntityId, catalogFeatures),
-    [catalogFeatures, focus.focusEntityId],
-  );
+  const focusPinId =
+    focus.focusEntityId !== null && spotlight !== null && focus.focusEntityId === spotlight.entityId
+      ? spotlightPinId
+      : null;
 
   const scrollToChapter = useCallback(
     (index: number) => {
@@ -188,15 +184,17 @@ export function DoorImmersive({
     <>
       <aside className="ds-door__field" aria-label="National pin field">
         <div className="ds-door__board-frame">
-          <div
-            className={`ds-door__board${focus.scale > 1.05 ? ' is-zoomed' : ''}`}
-            style={boardStyle}
-          >
-            <div className="ds-door__ground" aria-hidden="true">
-              {/* Land colour via CSS mask (RecordLocator pattern); canvas shows through as field. */}
-              <div className="ds-door__ground-map" />
+          <div className="ds-door__board-host">
+            <div
+              className={`ds-door__board${focus.scale > 1.05 ? ' is-zoomed' : ''}`}
+              style={boardStyle}
+            >
+              <div className="ds-door__ground" aria-hidden="true">
+                {/* Land colour via CSS mask (RecordLocator pattern); canvas shows through as field. */}
+                <div className="ds-door__ground-map" />
+              </div>
+              <FirstPaintPinPlate pins={pins} linkRecords focusEntityId={focusPinId} />
             </div>
-            <FirstPaintPinPlate pins={pins} linkRecords focusEntityId={focusPinId} />
           </div>
         </div>
         <div className="ds-door__field-chrome">
@@ -230,89 +228,96 @@ export function DoorImmersive({
             <section
               key={chapter.id}
               id={isOpen ? 'door-open' : `door-chapter-${chapter.index}`}
-              className={`ds-door-journey__chapter ds-door-journey__chapter--${side}`}
+              className={`ds-door-journey__chapter ds-door-journey__chapter--${side}${isOpen ? ' ds-door-journey__chapter--rest' : ''}`}
               data-chapter={chapter.index}
               aria-labelledby={`door-journey-heading-${chapter.id}`}
             >
               <div className="ds-door-journey__card">
-                {isOpen ? (
-                  <>
-                    <p className="ds-door-journey__eyebrow">Place-connected archive</p>
-                    <h1 id="door-brand" className="ds-door-journey__brand">
-                      <span className="ds-door-journey__brand-sr">BlackStory</span>
-                      <span className="ds-door-journey__lockup" aria-hidden="true">
-                        {/* eslint-disable-next-line @next/next/no-img-element -- brand lockup */}
-                        <img
-                          className="ds-door-journey__lockup-img ds-door-journey__lockup-img--light"
-                          src={BRAND_ASSETS.lockup.light}
-                          alt=""
-                          width={400}
-                          height={102}
-                          decoding="async"
-                          fetchPriority="high"
-                        />
-                        {/* eslint-disable-next-line @next/next/no-img-element -- brand lockup */}
-                        <img
-                          className="ds-door-journey__lockup-img ds-door-journey__lockup-img--dark"
-                          src={BRAND_ASSETS.lockup.dark}
-                          alt=""
-                          width={400}
-                          height={102}
-                          decoding="async"
-                        />
-                      </span>
-                    </h1>
-                    <p className="ds-door-journey__support">History, pinned to place.</p>
-                    <p className="ds-door-journey__pillars">{ABOUT_SUPPORT_LINE}</p>
-                    <p className="ds-door-journey__presence">
-                      <span className="ds-door-journey__presence-n">{placeCount}</span> places on
-                      the field
-                    </p>
-                    <h2 className="ds-door-journey__cold" id={`door-journey-heading-${chapter.id}`}>
-                      {COLD_OPEN_WORDS.map((word) => (
-                        <span key={word}>{word} </span>
+                <div className="ds-door-journey__copy">
+                  {isOpen ? (
+                    <>
+                      <p className="ds-door-journey__eyebrow">Place-connected archive</p>
+                      <h1 id="door-brand" className="ds-door-journey__brand">
+                        <span className="ds-door-journey__brand-sr">BlackStory</span>
+                        <span className="ds-door-journey__lockup" aria-hidden="true">
+                          {/* eslint-disable-next-line @next/next/no-img-element -- brand lockup */}
+                          <img
+                            className="ds-door-journey__lockup-img ds-door-journey__lockup-img--light"
+                            src={BRAND_ASSETS.lockup.light}
+                            alt=""
+                            width={400}
+                            height={102}
+                            decoding="async"
+                            fetchPriority="high"
+                          />
+                          {/* eslint-disable-next-line @next/next/no-img-element -- brand lockup */}
+                          <img
+                            className="ds-door-journey__lockup-img ds-door-journey__lockup-img--dark"
+                            src={BRAND_ASSETS.lockup.dark}
+                            alt=""
+                            width={400}
+                            height={102}
+                            decoding="async"
+                          />
+                        </span>
+                      </h1>
+                      <p className="ds-door-journey__support">History, pinned to place.</p>
+                      <p className="ds-door-journey__pillars">{ABOUT_SUPPORT_LINE}</p>
+                      <p className="ds-door-journey__presence">
+                        <span className="ds-door-journey__presence-n">{placeCount}</span> places on
+                        the field
+                      </p>
+                      <h2
+                        className="ds-door-journey__cold"
+                        id={`door-journey-heading-${chapter.id}`}
+                      >
+                        {COLD_OPEN_WORDS.map((word) => (
+                          <span key={word}>{word} </span>
+                        ))}
+                      </h2>
+                    </>
+                  ) : (
+                    <>
+                      {chapter.centred ? null : (
+                        <span className="ds-door-journey__index" aria-hidden="true">
+                          {String(chapter.index).padStart(2, '0')}
+                        </span>
+                      )}
+                      {copy.kicker ? (
+                        <p className="ds-door-journey__kicker">{copy.kicker}</p>
+                      ) : null}
+                      <h2
+                        className="ds-door-journey__heading"
+                        id={`door-journey-heading-${chapter.id}`}
+                      >
+                        {before}
+                        <em>{accent}</em>
+                        {after}
+                      </h2>
+                    </>
+                  )}
+
+                  <p className="ds-door-journey__prose">{body.prose}</p>
+
+                  {body.figures ? (
+                    <dl className="ds-door-journey__facts">
+                      {body.figures.map((figure) => (
+                        <div key={`${figure.label}-${figure.value}`}>
+                          <dt className="ds-door-journey__fact-value">{figure.value}</dt>
+                          <dd className="ds-door-journey__fact-label">{figure.label}</dd>
+                        </div>
                       ))}
-                    </h2>
-                  </>
-                ) : (
-                  <>
-                    {chapter.centred ? null : (
-                      <span className="ds-door-journey__index" aria-hidden="true">
-                        {String(chapter.index).padStart(2, '0')}
-                      </span>
-                    )}
-                    {copy.kicker ? <p className="ds-door-journey__kicker">{copy.kicker}</p> : null}
-                    <h2
-                      className="ds-door-journey__heading"
-                      id={`door-journey-heading-${chapter.id}`}
-                    >
-                      {before}
-                      <em>{accent}</em>
-                      {after}
-                    </h2>
-                  </>
-                )}
+                    </dl>
+                  ) : null}
 
-                <p className="ds-door-journey__prose">{body.prose}</p>
+                  <p className="ds-door-journey__cite">{body.cite}</p>
 
-                {body.figures ? (
-                  <dl className="ds-door-journey__facts">
-                    {body.figures.map((figure) => (
-                      <div key={`${figure.label}-${figure.value}`}>
-                        <dt className="ds-door-journey__fact-value">{figure.value}</dt>
-                        <dd className="ds-door-journey__fact-label">{figure.label}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                ) : null}
-
-                <p className="ds-door-journey__cite">{body.cite}</p>
-
-                {spotlightHref ? (
-                  <p className="ds-door-journey__record">
-                    <Link href={spotlightHref}>Open this record</Link>
-                  </p>
-                ) : null}
+                  {spotlightHref ? (
+                    <p className="ds-door-journey__record">
+                      <Link href={spotlightHref}>Open this record</Link>
+                    </p>
+                  ) : null}
+                </div>
 
                 {isOpen ? (
                   <div className="ds-door-journey__actions">

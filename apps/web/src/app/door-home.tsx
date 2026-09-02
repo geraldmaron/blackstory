@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import { loadDoorPinPlate } from '../lib/map-experience/door-catalog';
+import { resolveDoorFocusPinId } from '../lib/map-experience/first-paint-pins';
 import { pickStoryChapters } from '../lib/story/pick-story-chapters';
 import { pickStoryRecord } from '../lib/story/pick-story-record';
 import { DoorImmersive } from './door-immersive';
@@ -31,16 +32,17 @@ export async function DoorHome() {
         spotlightFeature.geometry.coordinates[1],
       ] as const)
     : null;
+  const spotlightPinId = resolveDoorFocusPinId(spotlight?.entityId ?? null, features);
 
   return (
     <main id="main" className="ds-door">
       <DoorImmersive
         pins={pins}
-        catalogFeatures={features}
         chapters={chapters}
         factByChapterId={factByChapterId}
         spotlight={spotlight}
         spotlightLngLat={spotlightLngLat}
+        spotlightPinId={spotlightPinId}
         placeCount={placeCount}
       />
     </main>
