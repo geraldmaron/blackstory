@@ -302,23 +302,27 @@ export function RecordFactTile({
 }: RecordFactTileProps) {
   return (
     <div className={cx('ds-rec-tile', className)}>
-      <span className="ds-rec-tile__plate" aria-hidden="true">
+      {/*
+        The icon rides on the label rather than in a plate of its own. Five plated icons inside
+        five bordered boxes put three nested containers around every fact, which is what made a
+        row of five short strings feel heavier than the name above it.
+      */}
+      <dt className="ds-rec-tile__label">
         <FontAwesomeIcon
           icon={icon}
           className="ds-rec-tile__icon"
           {...(iconColor ? { style: { color: iconColor } } : {})}
+          aria-hidden="true"
         />
-      </span>
-      <div className="ds-rec-tile__text">
-        <dt className="ds-rec-tile__label">{label}</dt>
-        <dd className="ds-rec-tile__value">{value}</dd>
-        {support !== undefined || meter ? (
-          <dd className="ds-rec-tile__support">
-            {meter ? <RecordMeter {...meter} /> : null}
-            {support !== undefined ? <span>{support}</span> : null}
-          </dd>
-        ) : null}
-      </div>
+        {label}
+      </dt>
+      <dd className="ds-rec-tile__value">{value}</dd>
+      {support !== undefined || meter ? (
+        <dd className="ds-rec-tile__support">
+          {meter ? <RecordMeter {...meter} /> : null}
+          {support !== undefined ? <span>{support}</span> : null}
+        </dd>
+      ) : null}
     </div>
   );
 }

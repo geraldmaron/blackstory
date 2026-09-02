@@ -669,8 +669,6 @@ export default async function EntityPage({ params }: EntityPageProps) {
         </>
       }
     >
-      <EntityTopicTags entity={entity} />
-
       {entity.sensitivity ? (
         <EntitySensitivityBanner sensitivity={entity.sensitivity} entityKind={entity.kind} />
       ) : null}
@@ -692,6 +690,13 @@ export default async function EntityPage({ params }: EntityPageProps) {
           Step through the archive one record at a time, in catalog order or at random.
         </p>
         <EntitySessionNavClient currentId={entity.id} orderedIds={orderedIds} />
+        {/*
+          The topic and era chips are ways onward, not facts about this record, so they sit with
+          the other ways onward. They used to open the document column, a strip of unlabelled
+          chips between the actions and the first beat, restating an era the masthead pill had
+          already stated and delaying the record's own first sentence.
+        */}
+        <EntityTopicTags entity={entity} />
       </section>
     </Room>
   );
