@@ -30,7 +30,10 @@ function validPackage() {
 test('the form path opens a real seed article', () => {
   const articles = listCoverArticles();
   assert.ok(articles.some((article) => article.slug === 'before-the-battle-cry'));
-  assert.equal(articleCoverPath('before-the-battle-cry'), '/stories/articles/before-the-battle-cry');
+  assert.equal(
+    articleCoverPath('before-the-battle-cry'),
+    '/stories/articles/before-the-battle-cry',
+  );
   const article = getCoverArticle('before-the-battle-cry');
   assert.equal(article?.fromSeed, true);
   assert.equal(article?.title, 'Before the battle cry');
@@ -68,7 +71,9 @@ test('publish fails closed when the package is missing or stock-like', () => {
     role: 'publication',
   });
   assert.equal(stock.ok, false);
-  assert.ok(stock.issues.some((issue) => issue.code === 'plate.stock' || issue.code === 'plate.refuse'));
+  assert.ok(
+    stock.issues.some((issue) => issue.code === 'plate.stock' || issue.code === 'plate.refuse'),
+  );
 });
 
 test('research cannot publish; publication can when the package is valid', () => {

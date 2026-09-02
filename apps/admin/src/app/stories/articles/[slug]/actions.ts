@@ -4,10 +4,7 @@
  * Save or publish an article cover package. Publish is fail-closed and does
  * not activate a public release.
  */
-import {
-  coverPackageInputFromFields,
-  evaluateCoverPackage,
-} from '@repo/domain';
+import { coverPackageInputFromFields, evaluateCoverPackage } from '@repo/domain';
 import { readVerifiedAdminIdentity } from '../../../../auth/supabase-server';
 import { isCoverArticleSlug } from '../../../../stories/cover-article-catalog';
 import { COVER_PUBLISH_BLOCKED, COVER_PUBLISH_READY } from '../../../../stories/cover-package-copy';

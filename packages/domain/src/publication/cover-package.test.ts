@@ -48,12 +48,10 @@ test('helper text is the Content brief, not a style memo', () => {
 });
 
 test('recipe enum is closed', () => {
-  assert.deepEqual([...COVER_RECIPES], [
-    'object-as-metaphor',
-    'scene',
-    'character',
-    'doodle-diagram',
-  ]);
+  assert.deepEqual(
+    [...COVER_RECIPES],
+    ['object-as-metaphor', 'scene', 'character', 'doodle-diagram'],
+  );
 });
 
 test('a complete package drawn against the house lock may publish', () => {
