@@ -1,0 +1,42 @@
+/* Standalone: loading.tsx renders before AtlasExperience/atlas-home mount, so it cannot rely on
+   their CSS imports (atlas.css, explore.css). Keep this file self-contained. */
+
+.ds-explore-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 1; /* local: lifts the loading mark above the route underlay, not a global tier */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: var(--ds-canvas);
+  color: var(--ds-ink-muted);
+}
+
+.ds-explore-loading__mark {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 2px solid var(--ds-ink-muted);
+  border-top-color: var(--ds-copper, var(--ds-ink));
+  animation: ds-explore-loading-spin 0.8s linear infinite;
+}
+
+.ds-explore-loading__label {
+  font: var(--ds-font-mono, inherit);
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+}
+
+@keyframes ds-explore-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-explore-loading__mark {
+    animation: none;
+  }
+}
