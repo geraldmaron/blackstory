@@ -150,7 +150,6 @@ export function HomeFirstPaint({
               entityId={lead.id}
               entityName={lead.displayName}
               {...(lead.primaryImage !== undefined ? { primaryImage: lead.primaryImage } : {})}
-              hideCredit
               priority
             />
             <figcaption className="ds-record-mast__over">
