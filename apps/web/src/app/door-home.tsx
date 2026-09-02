@@ -8,16 +8,19 @@
 import React from 'react';
 import { loadDoorPinPlate } from '../lib/map-experience/door-catalog';
 import { resolveDoorFocusPinId } from '../lib/map-experience/first-paint-pins';
+import { selectDoorMosaicTiles } from '../lib/map-experience/door-place-mosaic';
 import { pickStoryChapters } from '../lib/story/pick-story-chapters';
 import { pickStoryRecord } from '../lib/story/pick-story-record';
 import { DoorImmersive } from './door-immersive';
+import { DoorPlaceMosaic } from './door-place-mosaic';
 import './door-home.css';
 
 void React;
 
 export async function DoorHome() {
-  const { pins, features } = await loadDoorPinPlate();
+  const { pins, features, releaseId } = await loadDoorPinPlate();
   const placeCount = pins.features.length.toLocaleString('en-US');
+  const mosaicTiles = selectDoorMosaicTiles({ pins, features, releaseId });
 
   const orderRoll = Math.random();
   const recordRoll = Math.random();
@@ -45,6 +48,7 @@ export async function DoorHome() {
         spotlightPinId={spotlightPinId}
         placeCount={placeCount}
       />
+      <DoorPlaceMosaic tiles={mosaicTiles} />
     </main>
   );
 }
