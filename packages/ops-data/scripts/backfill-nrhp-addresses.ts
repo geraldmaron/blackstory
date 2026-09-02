@@ -477,6 +477,7 @@ async function main(): Promise<void> {
                 geohash = $5, geohash_prefixes = $6,
                 precision = $7,
                 match_method = $8,
+                street = COALESCE($9, street),
                 updated_at = now()
           WHERE id = $1`,
         [
@@ -488,6 +489,9 @@ async function main(): Promise<void> {
           prefixes,
           entry.proposedTier,
           MATCH_METHOD,
+          // The street column landed with the WS3 contract (entity_visit_contact migration);
+          // only an address_found row carries a real street, a vicinity row is prose.
+          entry.outcome === 'address_found' && entry.address ? entry.address : null,
         ],
       );
       await client.query(
