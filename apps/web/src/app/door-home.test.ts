@@ -66,8 +66,11 @@ test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
   assert.match(css, /container-type:\s*size/);
   assert.match(css, /aspect-ratio:\s*960\s*\/\s*500/);
   assert.match(css, /min\(100cqw,\s*calc\(100cqh \* 960 \/ 500\)\)/);
-  // Rest invitation docks to the field, not the vertical centre, and cannot overflow the island.
-  assert.match(css, /\.ds-door-journey__chapter--rest[\s\S]*align-content:\s*end/);
+  // Opening invitation card stays vertically centred in the viewport chapter.
+  assert.match(
+    css,
+    /\.ds-door-journey__chapter--centre\.ds-door-journey__chapter--rest[\s\S]*align-content:\s*center/,
+  );
   assert.match(css, /ds-door-journey__chapter--rest/);
   assert.match(
     css,

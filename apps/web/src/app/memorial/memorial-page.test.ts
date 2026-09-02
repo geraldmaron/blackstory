@@ -87,3 +87,9 @@ test('memorial sections render full list anchor and no em dashes in copy', () =>
   assert.doesNotMatch(copy, /\u2014/);
   assert.doesNotMatch(sections, /\u2014/);
 });
+
+test('memorial scroll cue does not auto-scroll on load', () => {
+  const scrollCue = readFileSync(join(here, 'MemorialScrollCue.tsx'), 'utf8');
+  assert.doesNotMatch(scrollCue, /MutationObserver/);
+  assert.doesNotMatch(scrollCue, /data-anchored === 'true'/);
+});

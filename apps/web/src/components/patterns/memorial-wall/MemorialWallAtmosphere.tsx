@@ -212,10 +212,7 @@ function positionScrollCue(
 
   /*
    * The cue is now at its real resting place rather than the 60vh CSS fallback.
-   * `MemorialScrollCue` watches this attribute and takes the reader down to the
-   * name list the moment it appears — the cue is "available" from here on, and
-   * the page scrolls without waiting for a click. Setting it is idempotent; the
-   * packer rebuilds on resize and the cue only acts on the first transition.
+   * Setting it is idempotent; the packer rebuilds on resize.
    */
   scrollCue.dataset.anchored = 'true';
 

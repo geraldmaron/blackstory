@@ -2,9 +2,8 @@
  * Law browse page sections: intro panel, disclaimer, kind/topic chips, search field, and
  * hairline result rows carrying citation, year, jurisdiction and a plain-language gloss.
  *
- * Room kit edition. The kit's `HairlineIndex` row shape (glyph/name/place/era/grade) has no
- * slot for a one-line gloss, so rows are hand-built here reusing the kit's `ds-room-idx-*`
- * classes rather than a fifth field bolted onto a shared component used by five other rooms.
+ * Room kit edition. Rows reuse `ds-room-idx-*` slots plus law-specific citation and gloss
+ * fields styled in `reading-room.css` (`ds-law-idx`), with subgrid alignment like `/books`.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -238,7 +237,7 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
           )}
         </EmptyList>
       ) : (
-        <div className="ds-room-idx__list" aria-labelledby="law-results-heading">
+        <div className="ds-law-idx ds-room-idx__list" aria-labelledby="law-results-heading">
           {view.items.map((item) => {
             const jurisdiction = jurisdictionById.get(item.id) ?? 'Unknown jurisdiction';
             const year = item.effectiveYear ? String(item.effectiveYear) : 'Year unknown';
@@ -253,8 +252,10 @@ export function LawBrowseSections({ view, catalog }: LawBrowseSectionsProps) {
                   {jurisdiction}
                 </span>
                 <span className="ds-room-idx__era">{year}</span>
-                <span className="ds-room-idx__grade">{item.citation}</span>
-                <span style={{ gridColumn: '1 / -1' }}>{gloss}</span>
+                <span className="ds-law-idx__citation" title={item.citation}>
+                  {item.citation}
+                </span>
+                <span className="ds-law-idx__gloss">{gloss}</span>
               </Link>
             );
           })}
