@@ -20,6 +20,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { cx } from '@repo/ui';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 import { gradeForConfidence } from '../../lib/map-experience/evidence-grade';
+import { placeLabelFor } from '../../lib/map-experience/place-label';
 import { GradeDot } from './GradeDot';
 import { KindGlyph } from './KindGlyph';
 import './results-rail.css';
@@ -64,7 +65,7 @@ function eraLabel(feature: ExploreMapFeature): string {
 }
 
 function placeLabel(feature: ExploreMapFeature): string {
-  return feature.properties.locationLabel ?? feature.properties.stateName ?? 'Place not published';
+  return placeLabelFor(feature);
 }
 
 /** Exported for the windowing test: which slice of a list a given scroll position renders. */

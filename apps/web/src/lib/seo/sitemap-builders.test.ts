@@ -2,10 +2,14 @@
  * sitemap builder tests active release entities become canonical entity URLs.
  */
 import assert from 'node:assert/strict';
-import { readdirSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { buildPublicSitemapEntries } from './sitemap-builders';
+import {
+  buildPublicSitemapEntries,
+  serializeSitemapXml,
+  SITEMAP_CACHE_CONTROL,
+} from './sitemap-builders';
 import { allDestinations, crawlableDestinations } from '../nav/destination-registry';
 
 test('buildPublicSitemapEntries includes static core journeys', () => {
@@ -145,4 +149,32 @@ test('buildPublicSitemapEntries prefers /place for standable records', () => {
   assert.ok(person);
   assert.equal(place?.changeFrequency, 'weekly');
   assert.equal(place?.priority, 0.8);
+});
+
+test('serializeSitemapXml is protocol XML and escapes loc', () => {
+  const xml = serializeSitemapXml([
+    {
+      url: 'https://example.com/place/a&b',
+      lastModified: '2026-09-01T00:00:00.000Z',
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+  ]);
+  assert.match(xml, /^<\?xml version="1.0" encoding="UTF-8"\?>/);
+  assert.match(xml, /xmlns="http:\/\/www.sitemaps.org\/schemas\/sitemap\/0.9"/);
+  assert.match(xml, /<loc>https:\/\/example.com\/place\/a&amp;b<\/loc>/);
+  assert.match(xml, /<lastmod>2026-09-01T00:00:00.000Z<\/lastmod>/);
+  assert.match(xml, /<changefreq>weekly<\/changefreq>/);
+  assert.match(xml, /<priority>0.8<\/priority>/);
+});
+
+test('sitemap route is a CDN-cached handler over the thin search index', () => {
+  const route = readFileSync(new URL('../../app/sitemap.xml/route.ts', import.meta.url), 'utf8');
+  assert.match(route, /export const dynamic = 'force-dynamic'/);
+  assert.match(route, /SITEMAP_CACHE_CONTROL/);
+  assert.match(route, /getPublicSearchIndex/);
+  assert.doesNotMatch(route, /getSharedPublicEntities|listPublicEntityViews/);
+  assert.match(SITEMAP_CACHE_CONTROL, /\bpublic\b/);
+  assert.match(SITEMAP_CACHE_CONTROL, /s-maxage=\d+/);
+  assert.doesNotMatch(SITEMAP_CACHE_CONTROL, /no-store|private/);
 });

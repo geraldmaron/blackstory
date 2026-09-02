@@ -29,11 +29,14 @@ import {
 } from './first-paint-pins';
 import type { ExploreMapFeature } from './build-explore-map-source';
 
-function leakyFeature(overrides: Partial<ExploreMapFeature['properties']> = {}): ExploreMapFeature {
+function leakyFeature(
+  overrides: Partial<ExploreMapFeature['properties']> = {},
+  coordinates: [number, number] = [-80.14, 26.12],
+): ExploreMapFeature {
   return {
     type: 'Feature',
     id: '42Cb1758',
-    geometry: { type: 'Point', coordinates: [-80.14, 26.12] },
+    geometry: { type: 'Point', coordinates },
     properties: {
       entityId: 'ent_leaky_001',
       href: '/entity/ent_leaky_001',
@@ -106,25 +109,29 @@ test('thinDoorNationalPins caps dense metros and balances regions', () => {
 });
 
 test('thinDoorNationalPins keeps chapter focus and spreads west pins on a dense eastern field', () => {
-  const focus = leakyFeature({
-    displayName: 'Howard Theatre',
-    href: '/entity/ent_focus_theatre',
-    entityId: 'ent_focus_theatre',
-  });
-  focus.geometry.coordinates = [-77.02, 38.92];
+  const focus = leakyFeature(
+    {
+      displayName: 'Howard Theatre',
+      href: '/entity/ent_focus_theatre',
+      entityId: 'ent_focus_theatre',
+    },
+    [-77.02, 38.92],
+  );
 
   const dense: ExploreMapFeature[] = [focus];
   for (let lat = 30; lat <= 44; lat += 1.4) {
     for (let lng = -124; lng <= -75; lng += 2.6) {
       const side = lng < -102 ? 'west' : lng >= -90 ? 'east' : 'central';
       dense.push(
-        leakyFeature({
-          displayName: `${side} heritage site ${lat}-${lng}`,
-          href: `/entity/ent_${side}_${lat}_${lng}`,
-          entityId: `ent_${side}_${lat}_${lng}`,
-        }),
+        leakyFeature(
+          {
+            displayName: `${side} heritage site ${lat}-${lng}`,
+            href: `/entity/ent_${side}_${lat}_${lng}`,
+            entityId: `ent_${side}_${lat}_${lng}`,
+          },
+          [lng, lat],
+        ),
       );
-      dense[dense.length - 1]!.geometry.coordinates = [lng, lat];
     }
   }
 
@@ -221,6 +228,8 @@ test('fail 2: only holding /place/ pins are links; the rest of the plate is not 
   assert.doesNotMatch(plate, /<ul\b/);
   assert.doesNotMatch(plate, /<noscript\b/);
   assert.doesNotMatch(plate, /42Cb1758|Grade A|ent_/);
+  assert.match(plate, /data-lng="/);
+  assert.match(plate, /data-lat="/);
 });
 
 test('the seed plate stays a plate of pins; only holding slugs walk', () => {
@@ -283,12 +292,14 @@ test('first-paint plate projects pins with Albers locator percents, not CONUS cl
   assert.match(plate, /top:\s*[\d.]+%/);
 
   // Liberia is outside Albers USA — must not clamp onto the board edge.
-  const offshoreFeature = leakyFeature({
-    displayName: '',
-    href: '',
-    entityId: 'pin-offshore',
-  });
-  offshoreFeature.geometry.coordinates = [-9.4, 6.3];
+  const offshoreFeature = leakyFeature(
+    {
+      displayName: '',
+      href: '',
+      entityId: 'pin-offshore',
+    },
+    [-9.4, 6.3],
+  );
   const offshore = toFirstPaintPins([offshoreFeature]);
   const empty = renderToStaticMarkup(createElement(FirstPaintPinPlate, { pins: offshore }));
   assert.doesNotMatch(empty, /ds-first-paint-pin/);

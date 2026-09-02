@@ -50,7 +50,6 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
   const {
     query,
     rows,
-    totalMatched,
     totalAll,
     page,
     pageCount,

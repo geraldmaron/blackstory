@@ -8,22 +8,65 @@
 import {
   buildRelatedNeighborStubs,
   composeContinueLearningStubs,
+  type LearningRelatedEdge,
   type NeighborLookup,
 } from '@repo/domain';
 import type { EntityV1 } from '@repo/public-contracts/v1/entity';
 import { entityV1Schema } from '@repo/public-contracts/v1/entity';
-import type { RelatedNeighborV1 } from '@repo/public-contracts/v1/related';
+import type { RelatedEntryV1, RelatedNeighborV1 } from '@repo/public-contracts/v1/related';
 import type { PublicEntityProjectionDoc } from '@repo/schemas';
 import { collectOneHopNeighborIds, collectTwoHopNeighborIds } from './neighbor-ids.js';
 import { fetchPublicEntityProjectionsByIds, type PostgresQueryFn } from './postgres-readers.js';
 
+type RelatedEdgeInput = Pick<RelatedEntryV1, 'id' | 'type' | 'direction' | 'timespan'>;
+
+function normalizeTimespan(
+  timespan: RelatedEdgeInput['timespan'],
+): LearningRelatedEdge['timespan'] | undefined {
+  if (timespan === undefined) return undefined;
+  return {
+    ...(timespan.label !== undefined ? { label: timespan.label } : {}),
+    ...(timespan.validFrom !== undefined ? { validFrom: timespan.validFrom } : {}),
+    ...(timespan.validTo !== undefined ? { validTo: timespan.validTo } : {}),
+  };
+}
+
+function normalizeRelatedEdge(edge: RelatedEdgeInput): LearningRelatedEdge {
+  const timespan = normalizeTimespan(edge.timespan);
+  return {
+    id: edge.id,
+    type: edge.type,
+    direction: edge.direction,
+    ...(timespan !== undefined ? { timespan } : {}),
+  };
+}
+
+function normalizeRelatedEdges(
+  related: readonly RelatedEdgeInput[],
+): readonly LearningRelatedEdge[] {
+  return related.map(normalizeRelatedEdge);
+}
+
 function toNeighborLookup(projection: PublicEntityProjectionDoc): NeighborLookup {
+  const related =
+    projection.related !== undefined ? normalizeRelatedEdges(projection.related) : undefined;
   return {
     id: projection.id,
     displayName: projection.displayName,
     kind: projection.kind,
     summary: projection.summary,
-    ...(projection.related !== undefined ? { related: projection.related } : {}),
+    ...(related !== undefined ? { related } : {}),
+  };
+}
+
+function entityToNeighborLookup(entity: EntityV1): NeighborLookup {
+  const related = entity.related !== undefined ? normalizeRelatedEdges(entity.related) : undefined;
+  return {
+    id: entity.id,
+    displayName: entity.displayName,
+    kind: entity.kind,
+    summary: entity.summary,
+    ...(related !== undefined ? { related } : {}),
   };
 }
 
@@ -65,18 +108,14 @@ export async function hydrateEntityV1Neighbors(
         : [];
 
     const neighborsById = new Map<string, NeighborLookup>();
-    neighborsById.set(entity.id, {
-      id: entity.id,
-      displayName: entity.displayName,
-      kind: entity.kind,
-      summary: entity.summary,
-      ...(entity.related !== undefined ? { related: entity.related } : {}),
-    });
+    neighborsById.set(entity.id, entityToNeighborLookup(entity));
     for (const projection of [...oneHopProjections, ...twoHopProjections]) {
       neighborsById.set(projection.id, toNeighborLookup(projection));
     }
 
-    const relatedStubs = buildRelatedNeighborStubs(entity.related, neighborsById);
+    const entityRelated =
+      entity.related !== undefined ? normalizeRelatedEdges(entity.related) : undefined;
+    const relatedStubs = buildRelatedNeighborStubs(entityRelated, neighborsById);
     const continueStubs = composeContinueLearningStubs(entity.id, relatedStubs, neighborsById);
     const relatedNeighbors = relatedStubs.map(stubToNeighborV1);
     const continueLearning = continueStubs.map(stubToNeighborV1);

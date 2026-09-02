@@ -26,11 +26,11 @@ import {
 export type QueryParamBag = Record<string, string | string[] | undefined>;
 
 /**
- * The map surface answers on two paths. Both run the same allowlist and the same parse→build
- * pair, so `/` and `/explore` cannot end up accepting different vocabularies for the same view.
- * `atlas=1` is not in the allowlist and cannot hide a second door.
+ * The Atlas instrument answers on `/explore`. `/` is the Door and has no map-query
+ * vocabulary — leftover `state`/`era` keys 308 away so they cannot bust the Cloudflare
+ * HTML cache on the front door.
  */
-const EXPLORE_SURFACE_PATHS = new Set(['/', '/explore']);
+const EXPLORE_SURFACE_PATHS = new Set(['/explore']);
 
 function isTrackingKey(key: string): boolean {
   const lower = key.toLowerCase();
@@ -100,8 +100,9 @@ function allowlistedBag(pathname: string, bag: QueryParamBag): QueryParamBag {
 
 /**
  * Returns a stable query string containing only allowed, non-tracking params.
- * The map surface (`/` and `/explore`) goes through parse→build so revisit URLs match what the
- * client writes (`layerMode=presence`, uppercase state).
+ * The Atlas (`/explore`) goes through parse→build so revisit URLs match what the
+ * client writes (`layerMode=presence`, uppercase state). `/` is the Door and has no
+ * query vocabulary.
  * Empty string means no query component should appear in cache keys or redirects.
  */
 export function normalizeQueryString(

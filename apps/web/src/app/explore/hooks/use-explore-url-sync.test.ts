@@ -30,7 +30,7 @@ describe('exploreHrefFromLens', () => {
   it('omits floor when the Lens is open to any grade', () => {
     const href = exploreHrefFromLens(base, {
       stateCode: 'DC',
-      kindFamily: 'place',
+      kindFamily: 'places',
       evidenceFloor: 'any',
       topicId: 'abolition',
       status: null,
@@ -40,7 +40,7 @@ describe('exploreHrefFromLens', () => {
     });
     assert.equal(href.includes('floor='), false);
     assert.equal(href.includes('state=DC'), true);
-    assert.equal(href.includes('kind=place'), true);
+    assert.equal(href.includes('kind=places'), true);
     assert.equal(href.includes('theme=abolition'), true);
     assert.equal(href.includes('selected=ent_dunbar_school_001'), true);
     assert.equal(href.includes('lat='), false);

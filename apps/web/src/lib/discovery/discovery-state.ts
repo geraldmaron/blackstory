@@ -18,7 +18,6 @@ import {
   recordsHref,
   type RecordsQuery,
 } from '../records/build-records-index';
-import { mapListContinuityLabel } from './continuity-label';
 import { placeArrivalQuery as placeArrivalQueryFields } from './discovery-arrival';
 
 export { mapListContinuityLabel } from './continuity-label';
@@ -213,15 +212,20 @@ export type PlaceDiscoveryReturn = {
 
 /** DiscoveryState → Place arrival query (server/adapters; Atlas uses discovery-arrival directly). */
 export function placeArrivalQuery(state: DiscoveryState, from: 'map' | 'list'): string {
+  const kind = firstOf(state.kind);
+  const era = firstOf(state.era);
+  const stateCode = firstOf(state.state);
+  const topic = firstOf(state.topic);
+  const status = firstOf(state.status);
   return placeArrivalQueryFields(
     {
       ...(state.query ? { query: state.query } : {}),
-      ...(firstOf(state.kind) ? { kind: firstOf(state.kind) } : {}),
-      ...(firstOf(state.era) ? { era: firstOf(state.era) } : {}),
-      ...(firstOf(state.state) ? { state: firstOf(state.state) } : {}),
-      ...(firstOf(state.topic) ? { topic: firstOf(state.topic) } : {}),
+      ...(kind !== undefined ? { kind } : {}),
+      ...(era !== undefined ? { era } : {}),
+      ...(stateCode !== undefined ? { state: stateCode } : {}),
+      ...(topic !== undefined ? { topic } : {}),
       ...(state.evidence ? { evidence: state.evidence } : {}),
-      ...(firstOf(state.status) ? { status: firstOf(state.status) } : {}),
+      ...(status !== undefined ? { status } : {}),
       ...(state.selected ? { selected: state.selected } : {}),
     },
     from,

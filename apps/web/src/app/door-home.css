@@ -4,9 +4,10 @@
  * decorative gradients); centred chapters use an opaque surface plate instead.
  *
  * Board reuses `public/geo/us-locator.svg` (Albers USA) as a CSS mask under layout zoom
- * (width/height/left/top). Land colour is `--ds-ink-muted` on `--ds-canvas` (same quiet
- * silhouette as RecordLocator) — never Page Sand / accent wash. Never transform:scale the
- * plate — that rasterizes and blurs.
+ * (width/height/left/top). The board host is contained to the locator's 960x500 so pin
+ * percents land on the states (same law as RecordLocator / Explore). Land colour is
+ * `--ds-ink-muted` on `--ds-canvas` — never Page Sand / accent wash. Never transform:scale
+ * the plate — that rasterizes and blurs.
  *
  * Scroll model: the document scrolls. The plate is position:fixed full-bleed. Door chrome is
  * pointer-events:none except cards and pin links so the wheel and pin hits work over the map.
@@ -38,14 +39,37 @@
 .ds-door__board-frame {
   position: absolute;
   inset: 0;
+  display: grid;
+  place-items: center;
   box-sizing: border-box;
   overflow: hidden;
   background: var(--ds-canvas);
+  container-type: size;
+}
+
+/*
+ * Pin percents are Albers coordinates on the 960x500 locator. Stretching that board to the
+ * viewport made mask-size:contain letterbox the land while pins still used the stretched box,
+ * so records sat in the ocean. Same contain rule as RecordLocator / Explore underlay: crop
+ * the room, do not restretch the canvas. Zoom % is relative to this host.
+ */
+.ds-door__board-host {
+  position: relative;
+  box-sizing: border-box;
+  width: min(100%, calc((100dvh - var(--ds-island-clearance)) * 960 / 500));
+  aspect-ratio: 960 / 500;
+  max-height: 100%;
+}
+
+@supports (width: 1cqh) {
+  .ds-door__board-host {
+    width: min(100cqw, calc(100cqh * 960 / 500));
+  }
 }
 
 .ds-door__board {
   position: absolute;
-  /* width/height/left/top come from DoorImmersive layout zoom (not transform). */
+  inset: 0;
   box-sizing: border-box;
 }
 
@@ -76,14 +100,15 @@
 
 .ds-door__field-chrome {
   position: absolute;
-  left: var(--ds-space-5);
+  top: var(--ds-space-4);
   right: var(--ds-space-5);
-  bottom: var(--ds-space-4);
+  bottom: auto;
+  left: var(--ds-space-5);
   z-index: 1; /* local: field chrome over the plate, inside the door field */
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: var(--ds-space-3);
   pointer-events: none;
 }
@@ -177,6 +202,7 @@ html:has(.ds-door) {
   align-content: center;
   box-sizing: border-box;
   min-height: calc(100dvh - var(--ds-island-clearance));
+  min-width: 0;
   padding: calc(var(--ds-space-8) + 0.5rem) var(--ds-space-6) var(--ds-space-8);
   scroll-snap-align: start;
   scroll-snap-stop: normal;
@@ -196,10 +222,21 @@ html:has(.ds-door) {
   text-align: center;
 }
 
+.ds-door-journey__chapter--rest {
+  align-content: end;
+  padding-top: var(--ds-space-5);
+  padding-bottom: var(--ds-space-6);
+}
+
 .ds-door-journey__card {
   box-sizing: border-box;
   width: min(28rem, 100%);
+  max-height: calc(100dvh - var(--ds-island-clearance) - var(--ds-space-7));
+  min-width: 0;
   padding: var(--ds-space-6);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--ds-surface);
   color: var(--ds-ink);
   border: var(--ds-border-width) solid var(--ds-rule);
@@ -209,9 +246,54 @@ html:has(.ds-door) {
 }
 
 .ds-door-journey__chapter--centre .ds-door-journey__card {
-  width: min(36rem, 100%);
+  width: min(32rem, 100%);
   border-left-width: var(--ds-border-width);
   border-left-color: var(--ds-rule);
+}
+
+/*
+ * Rest invitation is a caption on the field, not a brochure. Duplicate count/cite live on
+ * field chrome. Keep Begin in view and leave CONUS readable above the card.
+ */
+.ds-door-journey__chapter--rest .ds-door-journey__card {
+  display: flex;
+  flex-direction: column;
+  width: min(30rem, 100%);
+  max-height: min(26rem, calc(100dvh - var(--ds-island-clearance) - var(--ds-space-6)));
+  padding: var(--ds-space-5);
+  overflow: hidden;
+}
+
+.ds-door-journey__chapter--rest .ds-door-journey__copy {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ds-door-journey__chapter--rest .ds-door-journey__lockup {
+  max-width: min(100%, 13.5rem);
+}
+
+.ds-door-journey__chapter--rest .ds-door-journey__cold {
+  margin-top: var(--ds-space-3);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+}
+
+.ds-door-journey__chapter--rest .ds-door-journey__pillars,
+.ds-door-journey__chapter--rest .ds-door-journey__cite {
+  display: none;
+}
+
+.ds-door-journey__chapter--rest .ds-door-journey__actions {
+  flex-shrink: 0;
+  margin-top: var(--ds-space-4);
+}
+
+@media (min-width: 900px) {
+  .ds-door-journey__chapter--rest .ds-door-journey__presence {
+    display: none;
+  }
 }
 
 .ds-door-journey__eyebrow {
@@ -414,6 +496,44 @@ html:has(.ds-door) {
   justify-content: center;
 }
 
+/*
+ * Short landscape / laptop chrome: the rest card used to overflow the island and bury the
+ * field. Compact type and drop duplicate lines (count lives on the field chrome).
+ */
+@media (max-height: 52rem) {
+  .ds-door-journey__chapter {
+    padding-block: var(--ds-space-4);
+  }
+
+  .ds-door-journey__chapter--rest {
+    padding-bottom: var(--ds-space-4);
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__card {
+    padding: var(--ds-space-4) var(--ds-space-5);
+    max-height: min(22rem, calc(100dvh - var(--ds-island-clearance) - var(--ds-space-5)));
+  }
+
+  .ds-door-journey__lockup {
+    max-width: min(100%, 14rem);
+  }
+
+  .ds-door-journey__cold {
+    margin-top: var(--ds-space-3);
+    font-size: clamp(1.5rem, 3.5vh, 2rem);
+  }
+
+  .ds-door-journey__actions {
+    margin-top: var(--ds-space-4);
+  }
+}
+
+@media (max-height: 42rem) and (min-width: 900px) {
+  .ds-door-journey__chapter--rest .ds-door-journey__prose {
+    display: none;
+  }
+}
+
 body:has(.ds-door) .ds-map-stage {
   display: none;
 }
@@ -511,10 +631,13 @@ body:has(.ds-door) .ds-door-journey {
   .ds-door-journey__chapter--end,
   .ds-door-journey__chapter--centre {
     justify-items: stretch;
+    align-content: start;
   }
 
   .ds-door-journey__card {
     width: 100%;
+    max-height: none;
+    overflow: visible;
   }
 
   .ds-door-journey__lockup {
@@ -543,6 +666,30 @@ body:has(.ds-door) .ds-door-journey {
 
   .ds-door-journey__chapter--centre .ds-door-journey__actions {
     justify-content: flex-start;
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__card {
+    max-height: none;
+    overflow: visible;
+    padding: var(--ds-space-4);
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__copy {
+    overflow: visible;
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__lockup {
+    max-width: min(100%, 11.5rem);
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__cold {
+    font-size: clamp(1.25rem, 5.5vw, 1.5rem);
+  }
+}
+
+@media (min-width: 600px) and (max-width: 899px) {
+  .ds-door__field {
+    height: min(40dvh, 22rem);
   }
 }
 
@@ -579,6 +726,56 @@ body:has(.ds-door) .ds-door-journey {
 
   .ds-door-journey__actions {
     margin-top: var(--ds-space-4);
+  }
+
+  .ds-door-journey__chapter--rest {
+    padding-top: var(--ds-space-3);
+    padding-bottom: var(--ds-space-4);
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__eyebrow {
+    display: none;
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__prose {
+    display: none;
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__lockup {
+    max-width: min(100%, 9.5rem);
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__cold {
+    margin-top: var(--ds-space-3);
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__card {
+    max-height: calc(100dvh - var(--ds-island-clearance) - min(32dvh, 13.5rem) - var(--ds-space-4));
+    overflow: hidden;
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__copy {
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 899px) and (max-height: 30rem) {
+  .ds-door__field {
+    height: min(48dvh, 16rem);
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__prose,
+  .ds-door-journey__chapter--rest .ds-door-journey__eyebrow {
+    display: none;
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__card {
+    max-height: calc(100dvh - var(--ds-island-clearance) - min(48dvh, 16rem) - var(--ds-space-4));
+    overflow: hidden;
+  }
+
+  .ds-door-journey__chapter--rest .ds-door-journey__copy {
+    overflow-y: auto;
   }
 }
 

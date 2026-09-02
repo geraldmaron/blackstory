@@ -77,10 +77,13 @@ test('entity map fail-closed: the place block still makes its point with no plat
 
 test('entity page renders visit handoff for geo-anchored records', () => {
   assert.match(pageSource, /RecordVisitBlock/);
-  assert.match(pageSource, /resolvePublicAddressLine/);
+  assert.match(pageSource, /buildEntityAnatomyInputs/);
+  assert.match(pageSource, /whereLabel/);
   assert.match(pageSource, /shouldShowVisitBlock/);
   assert.match(pageSource, /placeAdvisories/);
   assert.match(pageSource, /claims: entity\.claims/);
+  assert.match(pageSource, /MapsExternalLink/);
+  assert.match(pageSource, /linkWhereToMaps|whereMapsHref|showVisit/);
 });
 
 test('entity column renders archived Internet Archive sources when cited', () => {

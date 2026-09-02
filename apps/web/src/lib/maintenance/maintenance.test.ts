@@ -215,7 +215,6 @@ test('the security/normalization surface is unchanged by the widened matcher', (
     '/history',
     '/history/api',
     '/submit/api',
-    '/explore',
     '/explore/api',
     '/search/api',
     '/locate/api',
@@ -225,6 +224,10 @@ test('the security/normalization surface is unchanged by the widened matcher', (
   ]) {
     assert.equal(isSecurityNormalizedPath(pathname), false, `${pathname} was NOT matched before`);
   }
+  assert.equal(isSecurityNormalizedPath('/explore'), true);
+  assert.equal(isSecurityNormalizedPath('/atlas/catalog'), true);
+  assert.equal(isSecurityNormalizedPath('/sitemap.xml'), true);
+  assert.equal(isSecurityNormalizedPath('/explore/api'), false);
 });
 
 test('the bypass hint carries a constant, never the credential', () => {

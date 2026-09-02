@@ -14,6 +14,7 @@ import {
 } from '../../app/map/explore-layer-ids';
 import {
   ENTITY_POINTER_HIT_PAD_PX,
+  MAP_CLICK_TOLERANCE_PX,
   clusterSourceIdForLayer,
   entityIdFromProperties,
   pointerHitBox,
@@ -25,6 +26,8 @@ test('pointer hit box is a square pad around the click', () => {
     [100 - ENTITY_POINTER_HIT_PAD_PX, 40 - ENTITY_POINTER_HIT_PAD_PX],
     [100 + ENTITY_POINTER_HIT_PAD_PX, 40 + ENTITY_POINTER_HIT_PAD_PX],
   ]);
+  assert.equal(MAP_CLICK_TOLERANCE_PX, 12);
+  assert.ok(MAP_CLICK_TOLERANCE_PX < ENTITY_POINTER_HIT_PAD_PX);
 });
 
 test('unclustered entityId wins when the pad also covers a cluster', () => {
@@ -87,5 +90,7 @@ test('MapStage opens a record sheet from padded pin and cluster leaf hits', () =
   assert.match(mapStage, /handleEntityPointerClick/);
   assert.match(mapStage, /getClusterLeaves/);
   assert.match(mapStage, /pointerHitBox/);
+  assert.match(mapStage, /clickTolerance:\s*MAP_CLICK_TOLERANCE_PX/);
+  assert.match(mapStage, /pointerHitAt\(event\.point\) \? 'pointer'/);
   assert.doesNotMatch(mapStage, /getClusterExpansionZoom/);
 });

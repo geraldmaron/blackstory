@@ -6,7 +6,6 @@
  */
 import type { ExpressionSpecification } from 'maplibre-gl';
 import { brandPalette } from '@repo/ui';
-import { markerRadiusExpression } from './marker-size';
 
 /** Zoom at and below which entity discs match the first-paint national field. */
 export const FIRST_PAINT_MAP_MAX_ZOOM = 12;
@@ -67,6 +66,11 @@ export function firstPaintPointRadiusExpression(): ExpressionSpecification {
   ] as unknown as ExpressionSpecification;
 }
 
+/** MapLibre literal for numeric paint slots in first-paint blends. */
+export function literalPaintNumber(value: number): ExpressionSpecification {
+  return ['literal', value] as unknown as ExpressionSpecification;
+}
+
 export function blendFirstPaintWithKindExpression(
   kindExpression: ExpressionSpecification,
   firstPaintExpression: ExpressionSpecification,
@@ -92,5 +96,5 @@ export function firstPaintOrKindRadiusExpression(
 export function firstPaintOrKindStrokeWidthExpression(
   localityStroke: ExpressionSpecification,
 ): ExpressionSpecification {
-  return blendFirstPaintWithKindExpression(localityStroke, 0);
+  return blendFirstPaintWithKindExpression(localityStroke, literalPaintNumber(0));
 }

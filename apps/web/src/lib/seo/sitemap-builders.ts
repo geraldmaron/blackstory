@@ -1,6 +1,6 @@
 /**
  * sitemap helpers derive URL entries from active release projections.
- * Consumed by apps/web/src/app/sitemap.ts; keeps release-scoped routing logic testable.
+ * Consumed by `app/sitemap.xml/route.ts`; keeps release-scoped routing logic testable.
  */
 import type { MetadataRoute } from 'next';
 import { crawlableDestinations } from '../nav/destination-registry';
@@ -99,4 +99,50 @@ export function buildPublicSitemapEntries(
   }));
 
   return [...staticEntries, ...entityEntries];
+}
+
+/**
+ * What the CDN is told for `/sitemap.xml`. Same shape as `/atlas/catalog`: a force-dynamic
+ * route handler keeps this header (dynamic *pages* get `no-store`). Crawlers hit this URL
+ * constantly; one origin build per hour is enough for a release-scoped URL list.
+ */
+export const SITEMAP_CACHE_CONTROL =
+  'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400';
+
+function escapeXml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&apos;');
+}
+
+function lastmodIso(value: MetadataRoute.Sitemap[number]['lastModified']): string | undefined {
+  if (value === undefined) return undefined;
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return undefined;
+  return date.toISOString();
+}
+
+/** Serialize the App Router sitemap array to protocol XML. */
+export function serializeSitemapXml(entries: MetadataRoute.Sitemap): string {
+  const urls = entries
+    .map((entry) => {
+      const lastmod = lastmodIso(entry.lastModified);
+      const changefreq = entry.changeFrequency;
+      const priority = entry.priority;
+      return [
+        '<url>',
+        `<loc>${escapeXml(entry.url)}</loc>`,
+        lastmod ? `<lastmod>${lastmod}</lastmod>` : '',
+        changefreq ? `<changefreq>${changefreq}</changefreq>` : '',
+        priority !== undefined ? `<priority>${priority}</priority>` : '',
+        '</url>',
+      ]
+        .filter((part) => part.length > 0)
+        .join('');
+    })
+    .join('');
+  return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`;
 }

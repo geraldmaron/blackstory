@@ -654,9 +654,12 @@ export function findRecordsNeighbors(
     };
   };
 
+  const previous = index > 0 ? linkAt(index - 1) : undefined;
+  const next = index < matched.length - 1 ? linkAt(index + 1) : undefined;
+
   return {
-    ...(index > 0 ? { previous: linkAt(index - 1) } : {}),
-    ...(index < matched.length - 1 ? { next: linkAt(index + 1) } : {}),
+    ...(previous !== undefined ? { previous } : {}),
+    ...(next !== undefined ? { next } : {}),
     index,
     total: matched.length,
   };

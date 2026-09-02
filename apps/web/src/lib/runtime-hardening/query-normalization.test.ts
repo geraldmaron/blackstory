@@ -206,7 +206,7 @@ test('ADR-017: lat/lng/zoom never survive normalization on the map surface', () 
   );
   assert.equal(
     normalizeQueryString('/', { lat: '38.9072', lng: '-77.0369', zoom: '11.5', state: 'dc' }),
-    'state=DC',
+    '',
   );
   assert.equal(
     needsQueryNormalizationRedirect(new URL('https://example.com/explore?lat=38.9&lng=-77&zoom=6')),
@@ -224,7 +224,7 @@ test('panel chrome is not shareable state: panels= and hidePanels= normalize awa
   assert.equal(normalizeQueryString('/explore', { panels: 'filters', state: 'dc' }), 'state=DC');
 });
 
-test('`/` and `/explore` share the map-query vocabulary; leftover keys still drop', () => {
+test('`/` is the Door: Atlas query 308s away so it cannot bust the HTML cache', () => {
   const bag = {
     era: '1970s',
     kind: 'school',
@@ -246,15 +246,17 @@ test('`/` and `/explore` share the map-query vocabulary; leftover keys still dro
   };
   const exploreQs = normalizeQueryString('/explore', bag);
   assert.notEqual(exploreQs, '');
-  assert.equal(normalizeQueryString('/', bag), exploreQs);
+  assert.equal(normalizeQueryString('/', bag), '');
 
   assert.equal(normalizeQueryString('/explore', { state: 'va', group: 'true' }), 'state=VA');
-  assert.equal(normalizeQueryString('/', { state: 'va', group: 'true' }), 'state=VA');
+  assert.equal(normalizeQueryString('/', { state: 'va', group: 'true' }), '');
   assert.equal(
     needsQueryNormalizationRedirect(new URL('https://example.com/explore?state=VA')),
     false,
   );
-  assert.equal(needsQueryNormalizationRedirect(new URL('https://example.com/?state=VA')), false);
+  assert.equal(needsQueryNormalizationRedirect(new URL('https://example.com/?state=VA')), true);
+  assert.equal(buildNormalizedUrl(new URL('https://example.com/?state=VA')).pathname, '/');
+  assert.equal(buildNormalizedUrl(new URL('https://example.com/?state=VA')).search, '');
 });
 
 test('drift: the map-surface allowlist covers every key the URL parser reads', () => {
@@ -294,7 +296,7 @@ test('drift: buildExploreSearchParams writes no key the allowlist lacks', () => 
 
 test('normalizeQueryString preserves /explore?state= revisit links', () => {
   assert.equal(normalizeQueryString('/explore', { state: 'dc' }), 'state=DC');
-  assert.equal(normalizeQueryString('/', { state: 'dc' }), 'state=DC');
+  assert.equal(normalizeQueryString('/', { state: 'dc' }), '');
   assert.equal(
     needsQueryNormalizationRedirect(new URL('https://example.com/explore?state=DC')),
     false,
@@ -334,7 +336,7 @@ test('/history carries no browse allowlist, because normalizing it would break t
 
 test('normalizeQueryString strips atlas=1 on `/` so it cannot hide a second door', () => {
   assert.equal(normalizeQueryString('/', { atlas: '1' }), '');
-  assert.equal(normalizeQueryString('/', { atlas: 'true', state: 'dc' }), 'state=DC');
+  assert.equal(normalizeQueryString('/', { atlas: 'true', state: 'dc' }), '');
   assert.equal(needsQueryNormalizationRedirect(new URL('https://example.com/?atlas=1')), true);
 });
 
@@ -411,6 +413,28 @@ test('/place keeps DiscoveryState arrival params (from=list + filters)', () => {
     getAllowedQueryParamsForPath('/place/paul-laurence-dunbar-high-school').includes('from'),
     true,
   );
+});
+
+test('atlas catalog query is stripped so cache-busting cannot fork the origin', () => {
+  assert.equal(normalizeQueryString('/atlas/catalog', { x: '1', utm_source: 'bot' }), '');
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/atlas/catalog?x=1')),
+    true,
+  );
+  assert.equal(
+    buildNormalizedUrl(new URL('https://example.com/atlas/catalog?x=1')).pathname +
+      buildNormalizedUrl(new URL('https://example.com/atlas/catalog?x=1')).search,
+    '/atlas/catalog',
+  );
+});
+
+test('sitemap query is stripped so crawlers cannot fork the origin', () => {
+  assert.equal(normalizeQueryString('/sitemap.xml', { x: '1' }), '');
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/sitemap.xml?x=1')),
+    true,
+  );
+  assert.equal(buildNormalizedUrl(new URL('https://example.com/sitemap.xml?x=1')).search, '');
 });
 
 test('API paths are not normalized: an endpoint receives its own query', () => {

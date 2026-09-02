@@ -45,7 +45,6 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import '../../app/first-paint-pin-plate.css';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import {
-  EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
@@ -90,6 +89,7 @@ import {
 } from '../../lib/map-experience/map-libre-lifecycle';
 import {
   ENTITY_POINTER_HIT_LAYER_IDS,
+  MAP_CLICK_TOLERANCE_PX,
   entityIdFromProperties,
   pointerHitBox,
   resolveEntityPointerHit,
@@ -1205,6 +1205,7 @@ export function MapStageProvider({
           container,
           style: buildArchiveBaseStyle(mountScheme),
           attributionControl: false,
+          clickTolerance: MAP_CLICK_TOLERANCE_PX,
           // Keep the camera US-centered without a tight maxBounds box (see the former
           // ExploreMapCanvas's identical comment): a portrait canvas cannot show full CONUS
           // east-west if maxBounds also caps latitude.
@@ -1408,19 +1409,10 @@ export function MapStageProvider({
         requestCountyPolygonLoad(activeMap, configRef.current);
       });
 
-      // Cursor affordance only. Selection is the padded map click above so national
-      // discs and clusters open the record sheet instead of relying on a 3.5px layer hit.
-      activeMap.on('mouseenter', EXPLORE_CLUSTER_LAYER_ID, () => {
-        activeMap.getCanvas().style.cursor = 'pointer';
-      });
-      activeMap.on('mouseleave', EXPLORE_CLUSTER_LAYER_ID, () => {
-        activeMap.getCanvas().style.cursor = '';
-      });
-      activeMap.on('mouseenter', EXPLORE_UNCLUSTERED_POINT_LAYER_ID, () => {
-        activeMap.getCanvas().style.cursor = 'pointer';
-      });
-      activeMap.on('mouseleave', EXPLORE_UNCLUSTERED_POINT_LAYER_ID, () => {
-        activeMap.getCanvas().style.cursor = '';
+      // Cursor affordance uses the same padded hit as selection so a near-miss still
+      // reads as a pin, not empty plate.
+      activeMap.on('mousemove', (event: MapMouseEvent) => {
+        activeMap.getCanvas().style.cursor = pointerHitAt(event.point) ? 'pointer' : '';
       });
 
       resizeLifecycleRef.current = bindMapResizeLifecycle(container, () => {

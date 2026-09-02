@@ -19,6 +19,7 @@
  */
 import { isViolenceAdjacent } from '../map-experience/camera-dignity';
 import type { ExploreMapFeature } from '../map-experience/build-explore-map-source';
+import { placeLabelFor } from '../map-experience/place-label';
 
 export type StoryRecordSpotlight = {
   readonly entityId: string;
@@ -56,7 +57,7 @@ export function toStoryRecordSpotlight(feature: ExploreMapFeature): StoryRecordS
   return {
     entityId: properties.entityId,
     name: properties.displayName,
-    place: properties.locationLabel ?? properties.stateName ?? 'Place not published',
+    place: placeLabelFor(feature),
     era: properties.eraBuckets[0] ?? 'Undated',
     summary: properties.oneLineStory,
     evidenceCount: properties.evidenceCount,

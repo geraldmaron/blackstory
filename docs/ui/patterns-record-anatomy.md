@@ -62,7 +62,7 @@ Map stacks above the fact list. Each fact row stays **icon + label + value** on 
 Each inline fact row (`.ds-record-anatomy__fact--inline`):
 
 1. **Label cluster (column 1):** `EditionFactIcon` + uppercase mono field type (`Kind`, `Where`, …) in `.ds-record-anatomy__fact-label`. Icon and label text are center-aligned within the cluster; the cluster sits in a shared label column (`grid-template-columns: max-content minmax(0, 1fr)` on `.ds-record-anatomy__facts`, `display: contents` on each row wrapper).
-2. **Value (column 2, min-width 0):** editorial serif string beside the label on the same baseline. **Where** links to external maps when coordinates exist (web: `MapsExternalLink`; mobile: pressable copper text + Open in maps CTA).
+2. **Value (column 2, min-width 0):** editorial serif string beside the label on the same baseline. **Where** is the public address line (`resolvePublicAddressLine`). It links to external maps only when the surface does not also render `RecordVisitBlock` (web: `MapsExternalLink`; mobile: pressable copper text + Open in maps CTA). When Visit is present, maps exits live there.
 
 Label text uses `white-space: nowrap` so field types never wrap; values use normal word wrapping (`overflow-wrap: break-word`) inside the value column only. Row wrappers never use `flex-wrap` (that stacks label over value when combined with `flex-grow`). Mobile mirrors the shared label column with a fixed-width label cluster (`anatomyFactLabelColumnWidth`).
 
@@ -97,6 +97,7 @@ Import `record-anatomy.css` once per web route bundle that renders `RecordAnatom
 - [ ] Use `RecordAnatomyPanel` on web — do not fork markup per surface.
 - [ ] Facts are **inline rows** in one column beside or below the map — no 2×2 fact grids.
 - [ ] Long **Where** strings sit beside the label and wrap at word boundaries at full facts-column width.
+- [ ] **Where** uses `resolvePublicAddressLine` (same string as Visit). It links to maps only when a Visit block is not on the same surface.
 - [ ] Verify light + dark theme; focus rings on map and **Where** links.
 - [ ] Compact list rows use `RecordFactStrip`, not this panel layout.
 

@@ -207,7 +207,7 @@ Routes that **do not exist**: `app/stories`, `app/themes`, `app/topics`, `app/ar
 | `/ai.txt` | `app/ai.txt/route.ts` |
 | `/.well-known/security.txt` | `app/.well-known/security.txt/route.ts` |
 | `/robots.txt` | `app/robots.ts` |
-| `/sitemap.xml` | `app/sitemap.ts` |
+| `/sitemap.xml` | `app/sitemap.xml/route.ts` |
 
 Sample entity ids: `ent_seed_place_001`, `ent_seed_school_001`. Data is labeled as seed/sample, not live projections.
 

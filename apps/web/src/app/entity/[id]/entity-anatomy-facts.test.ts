@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { getPublicEntity } from '../../../data/public-seed';
 import { buildEntityAnatomyInputs, buildEntityAnatomyPlace } from './entity-anatomy-facts';
+import { buildVisitHandoff } from '../../../lib/geography/visit-handoff';
 
 function requireEntity(id: string) {
   const entity = getPublicEntity(id);
@@ -51,4 +52,22 @@ test('buildEntityAnatomyPlace carries precision caption when geo exists', () => 
   assert.equal(place.lat, anchor.lat);
   assert.equal(place.precision, entity.locationPrecision);
   assert.ok(place.precisionCaption);
+  assert.equal(place.label, buildEntityAnatomyInputs(entity, undefined).whereLabel);
+});
+
+test('Where and Visit resolve the same public address line', () => {
+  const entity = requireEntity('ent_15th_st_church_001');
+  const where = buildEntityAnatomyInputs(entity, undefined).whereLabel;
+  const visit = buildVisitHandoff({
+    displayName: entity.displayName,
+    locationLabel: entity.locationLabel,
+    jurisdictionLabel: entity.jurisdictionLabel,
+    locationPrecision: entity.locationPrecision,
+    kind: entity.kind,
+    claims: entity.claims,
+    ...(entity.status !== undefined ? { status: entity.status } : {}),
+    ...(entity.geoAnchor ? { lat: entity.geoAnchor.lat, lng: entity.geoAnchor.lng } : {}),
+  });
+  assert.equal(where, visit.addressLine);
+  assert.doesNotMatch(where, /pin|schematic/i);
 });

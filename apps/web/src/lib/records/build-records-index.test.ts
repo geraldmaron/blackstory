@@ -298,7 +298,7 @@ describe('/records · place hrefs and map continuity', () => {
         kind: 'person',
         displayName: 'Example Person',
         summary: 'A named person.',
-      }),
+      } as unknown as EntityOverrides),
     ];
     const model = buildRecordsIndex(entities, EMPTY_RECORDS_QUERY);
     const byId = new Map(model.rows.map((row) => [row.id, row]));
@@ -389,7 +389,8 @@ describe('/records · place hrefs and map continuity', () => {
       },
     ];
     assert.equal(searchIndexReadyForRecords(docs), true);
-    assert.equal(searchIndexReadyForRecords([{ ...docs[0]!, confidenceTier: undefined }]), false);
+    const { confidenceTier: _confidenceTier, ...withoutConfidenceTier } = docs[0]!;
+    assert.equal(searchIndexReadyForRecords([withoutConfidenceTier]), false);
     const model = buildRecordsIndex(docs, EMPTY_RECORDS_QUERY);
     assert.equal(model.totalAll, 2);
     assert.equal(model.rows.find((row) => row.id === 'ent_a')?.grade, 'A');
