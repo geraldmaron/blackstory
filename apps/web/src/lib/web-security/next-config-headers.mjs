@@ -19,7 +19,10 @@ export function securityHeadersForNextConfig() {
   // Commons). Production should re-host into the Supabase media bucket.
   // commons.wikimedia.org (repo-4vuf, pin-and-serve): Special:FilePath 302s from here to
   // upload.wikimedia.org — keep in sync with csp.ts ARTICLE_MEDIA_IMG_SRC.
-  const articleMedia = 'https://upload.wikimedia.org https://commons.wikimedia.org';
+  // thumb.wikimedia.org: since 2026 Commons' Special:Redirect/file answers with a 301 to this
+  // host for rendered thumbnails, so a pinned photo's final image request lands here.
+  const articleMedia =
+    'https://upload.wikimedia.org https://commons.wikimedia.org https://thumb.wikimedia.org';
   // Open Library cover URLs redirect to archive.org / ia*.us.archive.org — allow each hop.
   const bookCovers = 'https://covers.openlibrary.org https://archive.org https://*.us.archive.org';
   const connectSrc = isDev

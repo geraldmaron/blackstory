@@ -49,7 +49,13 @@ const PUBLIC_MEDIA_IMG_SRC = [
  * `upload.wikimedia.org`. The browser's <img> request starts at commons.wikimedia.org before
  * the redirect, so both hosts must be allowed.
  */
-const ARTICLE_MEDIA_IMG_SRC = ['https://upload.wikimedia.org', 'https://commons.wikimedia.org'];
+// thumb.wikimedia.org: Commons' Special:Redirect/file now 301s rendered thumbnails to this host
+// (observed 2026-09-02), so it is where a pinned photo's final <img> request lands.
+const ARTICLE_MEDIA_IMG_SRC = [
+  'https://upload.wikimedia.org',
+  'https://commons.wikimedia.org',
+  'https://thumb.wikimedia.org',
+];
 
 /**
  * Banned-books cover thumbnails: Open Library ISBN URLs redirect to archive.org
