@@ -9,6 +9,7 @@ export * from './template-summary-signatures.js';
 export * from './mobile-bootstrap.js';
 export * from './release-activation.js';
 export * from './public-render.js';
+export * from './cover-package.js';
 
 export const RELEASE_STATUSES = [
   'draft',

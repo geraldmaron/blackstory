@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { StoryResearchPacket } from '@repo/domain';
 import { useAdminAuth } from '../../../auth/AdminAuthProvider';
+import { articleCoverPath, slugifyCoverArticleId } from '../../../stories/cover-article-catalog';
 import {
   STORY_REVIEW_EMPTY_COPY,
   STORY_REVIEW_INTENT_COPY,
@@ -528,6 +529,18 @@ export default function StoryReviewPage() {
                 <span className="ds-mono">{selected.topicId}</span>
               </p>
               <p className="ds-sans">{selected.packet.rationale}</p>
+              <p className="ds-sans">
+                <Link
+                  href={articleCoverPath(
+                    selected.packet.draft.slug?.trim() ||
+                      slugifyCoverArticleId(selected.topicId || selected.packet.draft.title),
+                  )}
+                >
+                  Open cover package
+                </Link>
+                {' · '}
+                publish stays blocked until brief, recipe, and plate cite the house lock.
+              </p>
 
               {selected.packet.validationIssues.length > 0 ? (
                 <div className="story-review__issues">

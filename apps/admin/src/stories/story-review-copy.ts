@@ -3,7 +3,7 @@
  */
 
 export const STORY_REVIEW_INTENT_COPY =
-  'Review staged story packets from research runs. Record approve, reject, or needs evidence. Nothing here publishes to the public site.';
+  'Review staged story packets from research runs. Record approve, reject, or needs evidence. Nothing here publishes to the public site. Open the article cover form to attach a brief, recipe, and plate before publication.';
 
 /** Numbered operator steps for the story review queue. */
 export const STORY_REVIEW_STEPS = [

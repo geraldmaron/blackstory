@@ -1,0 +1,237 @@
+/**
+ * Article cover form: full-bleed sketch plate with kicker and headline under it.
+ * Flat matte only. Copper is a navigational sliver, not a wash.
+ */
+
+.cover-articles {
+  display: grid;
+  gap: var(--ds-space-6, 1.5rem);
+  padding-block: clamp(var(--ds-space-6, 1.5rem), 4vw, var(--ds-space-10, 2.5rem));
+}
+
+.cover-articles .acq__steps,
+.cover-form .acq__steps {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--ds-ink, #0a0a0a);
+  font-family: var(--ds-font-sans), system-ui, sans-serif;
+}
+
+.cover-articles__list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--ds-rule, #d7d0c4);
+}
+
+.cover-articles__row {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--ds-rule, #d7d0c4);
+}
+
+.cover-articles__row a {
+  color: var(--ds-ink, #0a0a0a);
+  font-family: var(--ds-font-display), system-ui, sans-serif;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.cover-articles__row a:hover,
+.cover-articles__row a:focus-visible {
+  color: var(--ds-accent, #8e4f2a);
+}
+
+.cover-articles__meta {
+  margin: 0;
+  color: var(--ds-ink-subtle, #6d675f);
+  font-family: var(--ds-font-mono), ui-monospace, monospace;
+  font-size: 0.8125rem;
+}
+
+.cover-form {
+  display: grid;
+  gap: var(--ds-space-6, 1.5rem);
+}
+
+.cover-form__plate {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  background: #f4efe5;
+  border: 1px solid var(--ds-rule, #d7d0c4);
+  border-left: 4px solid #d8a178;
+}
+
+.cover-form__plate-frame {
+  min-height: min(28rem, 70vw);
+  display: grid;
+  place-items: center;
+  background: #f4efe5;
+}
+
+.cover-form__plate-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 36rem;
+  object-fit: cover;
+}
+
+.cover-form__plate-empty {
+  margin: 0;
+  padding: 2rem;
+  color: var(--ds-ink-subtle, #6d675f);
+  font-family: var(--ds-font-mono), ui-monospace, monospace;
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+.cover-form__under {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.25rem 1.25rem 1.5rem;
+  background: var(--ds-surface, #fbf8f2);
+  border-top: 1px solid var(--ds-rule, #d7d0c4);
+}
+
+.cover-form__kicker {
+  margin: 0;
+  color: var(--ds-accent, #8e4f2a);
+  font-family: var(--ds-font-mono), ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cover-form__headline {
+  margin: 0;
+  color: var(--ds-ink, #0a0a0a);
+  font-family: var(--ds-font-display), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1.15;
+}
+
+.cover-form__grid {
+  display: grid;
+  gap: var(--ds-space-6, 1.5rem);
+}
+
+@media (min-width: 56rem) {
+  .cover-form__grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(16rem, 0.9fr);
+    align-items: start;
+  }
+}
+
+.cover-form__fields,
+.cover-form__upload {
+  display: grid;
+  gap: var(--ds-space-4, 1rem);
+}
+
+.cover-form__field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.cover-form__field label,
+.cover-form__field legend {
+  font-family: var(--ds-font-sans), system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.cover-form__field input,
+.cover-form__field textarea,
+.cover-form__field select {
+  padding: 0.6rem 0.7rem;
+  color: var(--ds-ink, #0a0a0a);
+  background: var(--ds-surface, #fbf8f2);
+  border: 1px solid var(--ds-border-strong, #d7d0c4);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.cover-form__field input:focus-visible,
+.cover-form__field textarea:focus-visible,
+.cover-form__field select:focus-visible,
+.cover-form__field input[type='file']:focus-visible {
+  outline: 2px solid var(--ds-accent, #8e4f2a);
+  outline-offset: 2px;
+}
+
+.cover-form__helper {
+  margin: 0;
+  color: var(--ds-ink-subtle, #6d675f);
+  font-family: var(--ds-font-sans), system-ui, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.cover-form__recipes {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.cover-form__recipe {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-family: var(--ds-font-mono), ui-monospace, monospace;
+  font-size: 0.875rem;
+}
+
+.cover-form__issues {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  background: var(--ds-surface, #fbf8f2);
+  border: 1px solid var(--ds-rule, #d7d0c4);
+}
+
+.cover-form__issues h2 {
+  margin: 0 0 0.5rem;
+  font-family: var(--ds-font-sans), system-ui, sans-serif;
+  font-size: 1rem;
+}
+
+.cover-form__issues ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.cover-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.cover-form__house {
+  margin: 0;
+  color: var(--ds-ink-subtle, #6d675f);
+  font-family: var(--ds-font-sans), system-ui, sans-serif;
+  font-size: 0.875rem;
+  max-width: 65ch;
+}
+
+.cover-form__notice {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--ds-rule, #d7d0c4);
+  font-family: var(--ds-font-sans), system-ui, sans-serif;
+}
+
+.cover-form__notice--ok {
+  background: var(--ds-surface, #fbf8f2);
+}
+
+.cover-form__notice--blocked {
+  background: #f4efe5;
+}
