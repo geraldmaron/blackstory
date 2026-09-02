@@ -320,6 +320,17 @@
   color: var(--room-ink-3, var(--ds-ink-muted));
 }
 
+/*
+ * The three actions sat flush: the row was a plain block, so the buttons were inline boxes with
+ * nothing between them and their rounded ends touched. A row is a row.
+ */
+.ds-rec-facts__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-3);
+}
+
 .ds-rec-facts__actions .ds-cta {
   text-decoration: none;
 }
