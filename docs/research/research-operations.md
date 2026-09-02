@@ -179,10 +179,10 @@ hardcode a host. `enrichment-run` is the same judge, result kind `enrichment.run
 Add `--commit` only after the owner reviews the JSON — writes quarantine `editorial_packet`
 proposals (may open draft research cases). There is no `--publish`/`--promote`.
 
-**Catalog dedupe (required before new fixtures):** run
-`packages/firebase/scripts/classify-corsair-keeps-against-catalog.ts` against enrichment keep
-JSON — `existing_match` → enrich that entity, `non_entity` → exclude, only `new_candidate`
-after human validation becomes a fixture.
+**Catalog dedupe:** `packages/firebase/scripts/classify-corsair-keeps-against-catalog.ts` was
+deleted with the rest of the fixture-catalog tooling once Supabase became the sole entity
+store (commit f8c81a06); there is no scripted dedupe replacement. Before enriching a keep,
+check the live catalog by hand (`--catalog-from=postgres`) for an existing match.
 
 **Prose links:** summaries use `[[ent_id|Display Name]]` so `LinkedProse` renders `EntityLink`s.
 
@@ -303,14 +303,18 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts loca
   --operator-id "$USER" --session-id "locate-$(date +%s)" --identity-source cli
 ```
 
-Add `--commit` only when ready to write Firestore. Precision policy (no LLM, ever): street
-number → `institution` (≤150m drift); named campus/place → `campus` (≤500m);
-neighborhood/district → `neighborhood` (≤1600m); city only → `city`, do not sharpen.
+Add `--commit` only when ready to write Postgres (the live atomic store — there is no
+Firestore path). Precision policy (no LLM, ever): street number → `institution` (≤150m
+drift); named campus/place → `campus` (≤500m); neighborhood/district → `neighborhood`
+(≤1600m); city only → `city`, do not sharpen. See also
+[`docs/security/location-precision-standard.md`](../security/location-precision-standard.md)
+for the full NRHP-derived precision tier standard.
 
-Batch audit fixtures: `packages/firebase/scripts/audit-entity-locations.ts` (add
-`--apply-street-corrections` for high-confidence street fixes only);
-`packages/firebase/scripts/enrich-entity-locations.ts --apply` for named places via Wikidata
-P625 (parent-site snaps capped at 15km, otherwise an honest precision downgrade).
+The old fixture-catalog batch scripts (`audit-entity-locations.ts`,
+`enrich-entity-locations.ts`, and `classify-corsair-keeps-against-catalog.ts` under
+`packages/firebase/scripts/`) were deleted along with the rest of `fixtures/national-catalog/`
+once Supabase became the sole entity store (commit f8c81a06). There is no batch-audit
+replacement yet; run `locate` per entity.
 
 **Do:** prefer street addresses; queue bare place names for review; re-publish after locating
 so projections pick up `EntityLocation` overrides.
@@ -371,14 +375,12 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts gray
 ```
 
 Reads `bb_submissions.intake_items` (Postgres) where `status = 'quarantined'`, newest first,
-via `getOpsPostgresPool`. This is a genuine partial fix, not a full read path: the
-Firestore-backed `submissionInbox` (`moderationState` in `flagged`/`pending_review`/
-`duplicate`/`coordinated_campaign`) and `discoveryCandidates` (`status === 'quarantined'`)
-collections described in the admin console fixtures
-(`apps/admin/src/console/fixtures.ts`) are **not** reachable from this CLI yet — operator-cli
-has no Firestore Admin SDK wiring. Until that lands, use the admin console's
-`/console/submissions` / `/console/candidate-queue` surfaces or a direct Firestore read for
-those two collections.
+via `getOpsPostgresPool`. This is a partial read path: it covers quarantined intake items
+only. Low-confidence discovery candidates (the discovery lane writes them to Postgres through
+its own quarantine gates, see `docs/runbooks/data-ingestion-methodology.md`) are not reachable
+from this command yet; triage those in the admin console. The Firestore-era `submissionInbox`
+and `discoveryCandidates` collections, and the admin console fixtures that described them, no
+longer exist.
 
 ### quarantine-triage (LLM-assisted, repo-t2vh)
 
