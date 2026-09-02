@@ -70,6 +70,7 @@ export {
   chunkForWikimediaBatch,
   commonsFilePageUrl,
   commonsPinThumbnailUrl,
+  commonsUploadThumbnailUrl,
   enwikiTitleFromDisplayName,
   evaluateCommonsMediaPropose,
   extractP18Candidates,

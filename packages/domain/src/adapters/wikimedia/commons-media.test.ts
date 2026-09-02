@@ -8,6 +8,7 @@ import {
   buildCreditLine,
   chunkForWikimediaBatch,
   commonsPinThumbnailUrl,
+  commonsUploadThumbnailUrl,
   evaluateCommonsMediaPropose,
   extractP18Candidates,
   isExactLabelMatch,
@@ -24,16 +25,19 @@ test('exact label match is case-insensitive and whitespace-normalized', () => {
   assert.equal(isExactLabelMatch('Rosa Parks', 'Rosa Louise Parks'), false);
 });
 
-test('commonsPinThumbnailUrl rewrites an original upload.wikimedia.org URL to its /thumb/ variant', () => {
+test('commonsUploadThumbnailUrl rewrites an original upload.wikimedia.org URL to its /thumb/ variant', () => {
   assert.equal(
-    commonsPinThumbnailUrl('https://upload.wikimedia.org/wikipedia/commons/a/ab/Example.jpg', 480),
+    commonsUploadThumbnailUrl(
+      'https://upload.wikimedia.org/wikipedia/commons/a/ab/Example.jpg',
+      480,
+    ),
     'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Example.jpg/480px-Example.jpg',
   );
 });
 
-test('commonsPinThumbnailUrl passes through a non-Commons URL unchanged', () => {
+test('commonsUploadThumbnailUrl passes through a non-Commons URL unchanged', () => {
   const url = 'https://storage.googleapis.com/bucket/entities/ent_x/primary.jpg';
-  assert.equal(commonsPinThumbnailUrl(url, 480), url);
+  assert.equal(commonsUploadThumbnailUrl(url, 480), url);
 });
 
 test('mapCommonsLicenseToRights accepts PD and libre CC; rejects NC/unknown', () => {

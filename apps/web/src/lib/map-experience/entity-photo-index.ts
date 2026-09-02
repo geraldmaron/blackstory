@@ -13,7 +13,7 @@
  * fast as the enrichment/pin pipelines populate that field, with no second definition to keep in
  * sync here.
  */
-import { commonsPinThumbnailUrl } from '@repo/domain/adapters/wikimedia/commons-media';
+import { commonsUploadThumbnailUrl } from '@repo/domain/adapters/wikimedia/commons-media';
 import type { PublicEntityView } from '../../data/public-seed';
 
 /** 480px matches the pin card's rendered width at 2x DPR without shipping the source scan. */
@@ -31,7 +31,7 @@ export type PinPhotoView = {
 
 function toPinPhotoView(image: NonNullable<PublicEntityView['primaryImage']>): PinPhotoView {
   return {
-    url: commonsPinThumbnailUrl(image.url, PIN_PHOTO_THUMBNAIL_WIDTH),
+    url: commonsUploadThumbnailUrl(image.url, PIN_PHOTO_THUMBNAIL_WIDTH),
     alt: image.alt,
     credit: image.credit,
   };

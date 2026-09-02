@@ -139,7 +139,7 @@ test('canonical claim seed parses with confidence components and policyVersion',
   assert.equal(claim.id, 'claim_seed_001');
   assert.equal(claim.publicationStatus, 'published');
   assert.ok(claim.confidence);
-  assert.equal(claim.confidence.policyVersion, '1.0.0');
+  assert.equal(claim.confidence.policyVersion, '1.1.0');
   assert.equal(claim.confidence.independentLineageCount, 1);
   assert.ok(claim.preservedValues.some((v) => v.kind === 'contradicting' && v.value === '1840'));
   assert.doesNotThrow(() => assertNarrativeMayCiteClaim(claim));

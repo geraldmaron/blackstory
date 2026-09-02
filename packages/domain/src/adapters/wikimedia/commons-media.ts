@@ -407,7 +407,7 @@ const COMMONS_UPLOAD_ORIGINAL =
  * Supabase/GCS `primary.*` object, say) pass through unchanged — this only recognizes the one
  * upload.wikimedia.org shape it knows how to resize.
  */
-export function commonsPinThumbnailUrl(url: string, width: number): string {
+export function commonsUploadThumbnailUrl(url: string, width: number): string {
   const match = COMMONS_UPLOAD_ORIGINAL.exec(url.trim());
   if (!match) return url;
   const [, shard1, shard2, filename] = match;
