@@ -31,13 +31,25 @@ export type PinPhotoView = {
 
 function toPinPhotoView(image: NonNullable<PublicEntityView['primaryImage']>): PinPhotoView {
   return {
-    url: commonsUploadThumbnailUrl(image.url, PIN_PHOTO_THUMBNAIL_WIDTH),
+    url: pinThumbnailUrl(image.url, PIN_PHOTO_THUMBNAIL_WIDTH),
     alt: image.alt,
     credit: image.credit,
   };
 }
 
 /** Entity id → pin photo, for every entity in `entities` that carries a `primaryImage`. */
+/**
+ * A pinned Commons file is stored as a `Special:FilePath/<title>?width=960` URL (the mast
+ * size); a pin card wants a narrower render, so rewrite the width there. An original
+ * `upload.wikimedia.org` file goes through the /thumb/ rewrite; anything else passes through.
+ */
+export function pinThumbnailUrl(url: string, width: number): string {
+  if (url.includes('/Special:FilePath/')) {
+    return url.replace(/([?&])width=\d+/, `$1width=${width}`);
+  }
+  return commonsUploadThumbnailUrl(url, width);
+}
+
 export function buildEntityPhotoIndex(
   entities: readonly PublicEntityView[],
 ): Readonly<Record<string, PinPhotoView>> {
