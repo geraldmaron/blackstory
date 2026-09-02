@@ -33,7 +33,47 @@ export type CommonsAutoProposeRow = {
   readonly wikidataId?: string;
   readonly dignityHold?: string;
   readonly sensitivity?: readonly { readonly class?: string }[];
+  /** Set when the source plan already fetched Commons imageinfo sha1 (e.g. the NRHP /
+   * QID-leftover lanes' evaluateCommonsMediaPropose output) — see buildPinPlanRow. */
+  readonly sha1?: string;
 };
+
+/** One `--from` file's parsed JSON — matches dry-run-commons-qid-leftover.ts's
+ * (autoProposeAll/autoProposePeople) and resolve-nrhp-commons-images.ts's (proposes) shapes. */
+export type CommonsPinSourcePayload = {
+  readonly autoProposeAll?: readonly CommonsAutoProposeRow[];
+  readonly autoProposePeople?: readonly CommonsAutoProposeRow[];
+  readonly proposes?: readonly CommonsAutoProposeRow[];
+};
+
+/** Pick one payload's candidate array: autoProposeAll (QID-leftover lane) wins over
+ * autoProposePeople, then falls back to proposes (NRHP lane's plan shape). */
+export function candidatesFromPayload(
+  payload: CommonsPinSourcePayload,
+): readonly CommonsAutoProposeRow[] {
+  return payload.autoProposeAll ?? payload.autoProposePeople ?? payload.proposes ?? [];
+}
+
+/**
+ * Merge multiple `--from` payloads' candidate rows into one list, deduping by entityId —
+ * first payload wins on a collision. The QID-leftover (people/institutions) and NRHP (places)
+ * lanes cover disjoint entity sets in practice, but a dedupe keeps a re-run or an overlapping
+ * input file safe rather than silently double-counting or double-processing an entity.
+ */
+export function mergeCandidatePayloads(
+  payloads: readonly CommonsPinSourcePayload[],
+): readonly CommonsAutoProposeRow[] {
+  const seen = new Set<string>();
+  const merged: CommonsAutoProposeRow[] = [];
+  for (const payload of payloads) {
+    for (const row of candidatesFromPayload(payload)) {
+      if (seen.has(row.entityId)) continue;
+      seen.add(row.entityId);
+      merged.push(row);
+    }
+  }
+  return merged;
+}
 
 export type PinGateResult =
   | { readonly ok: true }
@@ -85,19 +125,22 @@ export type PinPlanRow = {
 /**
  * Build the plan row for a gated-in entity. `thumbUrl` is the pre-built
  * `commonsPinThumbnailUrl(fileTitle)` result (kept as an input so this stays pure); `sha1`
- * is optional because it may not have been fetched yet (see the script's metadata step).
+ * is the caller's fallback (e.g. a freshly fetched or cached value) used only when the row
+ * itself doesn't already carry one — a row's own `sha1` (set when its source plan already
+ * fetched Commons imageinfo) always wins, so the script never re-fetches metadata it has.
  */
 export function buildPinPlanRow(input: {
   readonly row: CommonsAutoProposeRow;
   readonly thumbUrl: string;
   readonly sha1?: string;
 }): PinPlanRow {
-  const { row, thumbUrl, sha1 } = input;
+  const { row, thumbUrl, sha1: fallbackSha1 } = input;
   if (!row.fileTitle || !row.alt || !row.credit || !row.commonsPageUrl) {
     throw new Error(
       `buildPinPlanRow: row ${row.entityId} is missing a required field (fileTitle/alt/credit/commonsPageUrl) — call evaluatePinGate first`,
     );
   }
+  const sha1 = row.sha1 ?? fallbackSha1;
   return {
     entityId: row.entityId,
     url: thumbUrl,

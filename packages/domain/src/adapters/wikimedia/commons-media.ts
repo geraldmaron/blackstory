@@ -67,6 +67,10 @@ export type CommonsMediaPropose = {
   readonly credit?: string;
   readonly rightsStatus?: PublishableRightsStatus;
   readonly licenseShortName?: string;
+  /** Wikimedia imageinfo sha1 (hex) of the current file revision, carried through from the
+   * fetched CommonsImageMetadata on an auto_propose row — see CommonsImageMetadata.sha1.
+   * Downstream pin plans (repo-4vuf) use this to skip a redundant metadata re-fetch. */
+  readonly sha1?: string;
   /** Non-image resource links discovered during enrichment (Wikipedia / Commons). */
   readonly resourceLinks?: readonly EntityResourceLinkPropose[];
 };
@@ -626,6 +630,7 @@ export function evaluateCommonsMediaPropose(input: {
     ...(input.image.licenseShortName !== undefined
       ? { licenseShortName: input.image.licenseShortName }
       : {}),
+    ...(input.image.sha1 !== undefined ? { sha1: input.image.sha1 } : {}),
     resourceLinks: [...resourceLinks, commonsLink],
   };
 }
