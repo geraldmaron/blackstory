@@ -43,7 +43,7 @@ test('DoorImmersive scrolls chapters and drives plate focus without MapLibre', (
   assert.match(immersive, /linkRecords/);
   assert.match(immersive, /scrollIntoView/);
   assert.match(immersive, />\s*Begin\s*</);
-  assert.match(immersive, /Open the Atlas/);
+  assert.match(immersive, /Open Explore/);
   assert.doesNotMatch(immersive, /useStoryRunner|MapStage|maplibregl/);
 });
 
@@ -78,6 +78,10 @@ test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
   );
   assert.match(css, /@media \(max-height: 52rem\)/);
   assert.match(css, /\.ds-door__field-chrome[\s\S]*top:\s*var\(--ds-space-4\)/);
+  assert.match(
+    css,
+    /body:has\(\.ds-door\)\s+\.ds-shell\s*>\s*\.ds-bar[\s\S]*pointer-events:\s*auto/,
+  );
   // Mobile chapters are in document flow; nested card scroll would steal the page wheel.
   assert.match(css, /@media \(max-width: 899px\)[\s\S]*max-height:\s*none/);
   // Land mask on the pin plate made link hits fail (mask alpha ~0.32).

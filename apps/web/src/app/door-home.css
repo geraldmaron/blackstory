@@ -540,6 +540,11 @@ body:has(.ds-door) .ds-map-stage {
   display: none;
 }
 
+/* Find chrome stays above the fixed pin field; stale `--ds-island-clearance` must not block hits. */
+body:has(.ds-door) .ds-shell > .ds-bar {
+  pointer-events: auto;
+}
+
 /* Immersive Door: footer is still in Rooms and Find. */
 body:has(.ds-door) .ds-shell-footer {
   display: none;

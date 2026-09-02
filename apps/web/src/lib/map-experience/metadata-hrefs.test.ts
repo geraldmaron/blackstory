@@ -59,12 +59,12 @@ test('exploreHrefForEra returns /explore when era bucket is empty', () => {
   assert.equal(exploreHrefForEra('   '), ATLAS_INSTRUMENT_HREF);
 });
 
-test('exploreHrefForKind filters explore to one entity kind', () => {
+test('exploreHrefForKind filters explore to the entity kind family', () => {
   const href = exploreHrefForKind('place');
-  assert.equal(href, '/explore?kind=place');
+  assert.equal(href, '/explore?kind=places');
 
   const parsed = parseExploreHref(href);
-  assert.equal(parsed.filters.kind, 'place');
+  assert.equal(parsed.filters.kind, 'places');
   assert.equal(parsed.filters.era, 'all');
 });
 

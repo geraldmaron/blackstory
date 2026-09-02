@@ -206,8 +206,9 @@ describe('destination registry · the footer is derived, not authored', () => {
     assert.ok(home);
     assert.equal(home.description, undefined);
     assert.equal(home.menuLine, undefined);
-    const atlas = destinationFor('/explore');
-    assert.equal(atlas?.description, 'The map.');
+    const explore = destinationFor('/explore');
+    assert.equal(explore?.label, 'Explore');
+    assert.equal(explore?.description, 'The map.');
   });
 
   it('does not ship /books as a walk room, and never lists /banned-books', () => {

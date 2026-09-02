@@ -142,7 +142,7 @@ const DESTINATIONS: readonly Destination[] = [
   },
   {
     path: '/explore',
-    label: 'Atlas',
+    label: 'Explore',
     parent: '/',
     kind: 'MAP',
     description: 'The map.',

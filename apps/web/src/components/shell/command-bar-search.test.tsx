@@ -59,11 +59,12 @@ describe('bar search', () => {
 });
 
 describe('CommandBar destinations', () => {
-  it('keeps Door, Atlas, and Records in Find; Atlas bars keep a Door exit', () => {
+  it('keeps Door, Explore, and Records in Find; Explore bars keep a Door exit', () => {
     const source = code('components/shell/CommandBar.tsx');
     assert.doesNotMatch(source, /href=["'`]\/(?:explore)?#journey["'`]/);
     assert.doesNotMatch(source, /href=["'`]\/journey["'`]/);
     assert.match(source, /href="\/explore"/);
+    assert.match(source, /syncCommandBarClearance/);
     assert.match(source, /href="\/records"/);
     assert.match(source, /href="\/"/);
     assert.match(source, /aria-label="Find"/);

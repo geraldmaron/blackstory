@@ -200,7 +200,7 @@ export const COMMANDS: readonly Command[] = [
   /* ---- View ---- */
   {
     id: 'view.atlas',
-    title: 'Atlas mode',
+    title: 'Explore mode',
     section: 'View',
     keys: ['1'],
     run: (context) => context.setMode('atlas'),

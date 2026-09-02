@@ -259,14 +259,14 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           </>
         }
         actions={[
-          { href: atlasHref, label: 'Open this selection on the Atlas', emphasis: 'copper' },
+          { href: atlasHref, label: 'Open this selection in Explore', emphasis: 'copper' },
           { href: '/methodology', label: 'How a record gets in' },
           { href: '/submit', label: 'Submit a record we are missing' },
         ]}
       >
         {atlasReason}
         {query.q.length > 0 ? (
-          <> The Atlas has no text search, so that part of this narrowing stays here.</>
+          <> Explore has no text search, so that part of this narrowing stays here.</>
         ) : null}
       </OffRamp>
     </Room>

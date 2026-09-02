@@ -119,7 +119,7 @@ export const STORY_COPY: readonly ChapterCopy[] = [
     heading: 'Start where you {accent}.',
     accent: 'stand',
     prose:
-      'Everything you just watched is a control you can hold. Open the atlas, drop into your own state, and follow the evidence.',
+      'Everything you just watched is a control you can hold. Open Explore, drop into your own state, and follow the evidence.',
     cite: 'Every record links to its sources. Where the archive is thin, it says so.',
   },
 ];

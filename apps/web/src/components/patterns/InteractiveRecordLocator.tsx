@@ -184,7 +184,7 @@ export function InteractiveRecordLocator({
           <a
             className="ds-locator__pin ds-locator__pin--link"
             href={atlasHref}
-            aria-label={`Open ${label} on the Atlas`}
+            aria-label={`Open ${label} in Explore`}
             style={pinStyle}
           />
         ) : (
@@ -194,7 +194,7 @@ export function InteractiveRecordLocator({
       <div className="ds-locator__chrome">
         {atlasHref ? (
           <a className="ds-locator__atlas" href={atlasHref}>
-            See on the Atlas
+            See in Explore
           </a>
         ) : null}
         <button type="button" className="ds-locator__reset" onClick={resetView}>

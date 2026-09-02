@@ -329,7 +329,7 @@ export function DoorImmersive({
                       Begin
                     </button>
                     <Link className="ds-cta ds-cta--quiet" href="/explore">
-                      Skip to the Atlas
+                      Skip to Explore
                     </Link>
                   </div>
                 ) : null}
@@ -337,7 +337,7 @@ export function DoorImmersive({
                 {isClose ? (
                   <div className="ds-door-journey__actions">
                     <Link className="ds-cta ds-cta--copper" href="/explore">
-                      Open the Atlas
+                      Open Explore
                     </Link>
                     <Link className="ds-cta ds-cta--ink" href="/records">
                       Browse records

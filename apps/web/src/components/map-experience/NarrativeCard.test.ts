@@ -51,7 +51,7 @@ test('Where matches Visit and does not duplicate maps exits when Visit is presen
   assert.doesNotMatch(html, /neighborhood-level pin/);
   assert.match(html, /href="[^"]*era=1840s"/);
   assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church#accepted-claims"/);
-  assert.match(html, /href="[^"]*kind=place"/);
+  assert.match(html, /href="[^"]*kind=places"/);
   assert.match(html, /aria-label="Browse Place records"/);
   assert.match(html, /href="\/records\?status=active"/);
   void properties;

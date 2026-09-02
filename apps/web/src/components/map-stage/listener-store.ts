@@ -2,6 +2,8 @@ import type { ExploreViewportFrame } from '../../lib/map-experience/url-state';
 
 export type MapStageEvents = {
   select: [entityId: string];
+  /** Clears an open record selection when the reader drills into a cluster aggregate. */
+  deselect: [];
   stateSelect: [postalCode: string];
   edgeSelect: [edgeId: string];
   /** Fired on a background click when nothing else (state, edge) was hit — the
@@ -19,6 +21,7 @@ export function makeListenerStore(): {
 } {
   return {
     select: new Set(),
+    deselect: new Set(),
     stateSelect: new Set(),
     edgeSelect: new Set(),
     activate: new Set(),

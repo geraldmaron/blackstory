@@ -90,10 +90,13 @@ import {
 import {
   ENTITY_POINTER_HIT_LAYER_IDS,
   MAP_CLICK_TOLERANCE_PX,
-  entityIdFromProperties,
   pointerHitBox,
   resolveEntityPointerHit,
 } from '../../lib/map-experience/entity-pointer-hit';
+import {
+  clampClusterExpansionZoom,
+  clusterExpandDurationMs,
+} from '../../lib/map-experience/cluster-expand';
 import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
@@ -1277,32 +1280,45 @@ export function MapStageProvider({
           features.map((feature) => ({
             layerId: feature.layer.id,
             properties: feature.properties ?? null,
+            ...(feature.geometry.type === 'Point'
+              ? { coordinates: feature.geometry.coordinates }
+              : {}),
           })),
         );
       }
 
-      function selectFromPointerHit(hit: NonNullable<ReturnType<typeof pointerHitAt>>): void {
-        if (hit.kind === 'entity') {
-          notify(listenersRef.current, 'select', hit.entityId);
-          return;
-        }
+      function expandClusterFromPointerHit(
+        hit: Extract<NonNullable<ReturnType<typeof pointerHitAt>>, { kind: 'cluster' }>,
+      ): void {
+        notify(listenersRef.current, 'deselect');
         const source = activeMap.getSource(hit.sourceId) as GeoJSONSource | undefined;
         if (!source) return;
         void source
-          .getClusterLeaves(hit.clusterId, 1, 0)
-          .then((leaves) => {
-            const entityId = entityIdFromProperties(leaves[0]?.properties);
-            if (entityId) notify(listenersRef.current, 'select', entityId);
+          .getClusterExpansionZoom(hit.clusterId)
+          .then((expansionZoom) => {
+            activeMap.easeTo({
+              center: [hit.center[0], hit.center[1]],
+              zoom: clampClusterExpansionZoom(expansionZoom, activeMap.getZoom()),
+              duration: clusterExpandDurationMs(prefersReducedMotion()),
+            });
           })
           .catch(() => {
             // Cluster may have dissolved between click and lookup.
           });
       }
 
+      function handleEntityPointerHit(hit: NonNullable<ReturnType<typeof pointerHitAt>>): void {
+        if (hit.kind === 'entity') {
+          notify(listenersRef.current, 'select', hit.entityId);
+          return;
+        }
+        expandClusterFromPointerHit(hit);
+      }
+
       function handleEntityPointerClick(event: MapMouseEvent) {
         const hit = pointerHitAt(event.point);
         if (!hit) return;
-        selectFromPointerHit(hit);
+        handleEntityPointerHit(hit);
       }
 
       function handleStateClick(event: MapLayerMouseEvent) {

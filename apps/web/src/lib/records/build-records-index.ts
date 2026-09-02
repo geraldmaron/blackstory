@@ -42,13 +42,8 @@ import {
   type EvidenceFloor,
   type EvidenceGrade,
 } from '../map-experience/evidence-grade';
-import {
-  isKnownMapKindFamily,
-  kindFamilyEncodingFor,
-  kindFamilyFor,
-  resolveMapTone,
-  type MapKindFamily,
-} from '../map-experience/kind-encoding';
+import { kindFamilyFor, resolveMapTone, type MapKindFamily } from '../map-experience/kind-encoding';
+import { kindFilterLabel, kindMatchesPublicFilter } from '../map-experience/filters';
 
 /** Arrival query Place pages understand (`from=list` + shared DiscoveryState keys). */
 function recordsArrivalQuery(query: RecordsQuery): string {
@@ -416,7 +411,12 @@ function matchesExcept(
   skip: RecordsFilterKey | 'none',
 ): boolean {
   if (query.q.length > 0 && !facts.haystack.includes(query.q.toLowerCase())) return false;
-  if (skip !== 'kind' && query.kind.length > 0 && facts.row.kindFamily !== query.kind) return false;
+  if (
+    skip !== 'kind' &&
+    query.kind.length > 0 &&
+    !kindMatchesPublicFilter(facts.row.kind, query.kind)
+  )
+    return false;
   if (skip !== 'era' && query.era.length > 0 && !facts.eraBuckets.includes(query.era)) return false;
   if (skip !== 'state' && query.state.length > 0 && facts.statePostal !== query.state) return false;
   if (skip !== 'topic' && query.topic.length > 0 && !facts.topicIds.includes(query.topic))
@@ -458,7 +458,7 @@ function valuesFor(facts: RecordFacts, key: RecordsFilterKey): readonly string[]
 function labelFor(key: RecordsFilterKey, value: string, stateNames: Map<string, string>): string {
   switch (key) {
     case 'kind':
-      return isKnownMapKindFamily(value) ? kindFamilyEncodingFor(value).label : humanize(value);
+      return kindFilterLabel(value);
     case 'era':
       return value;
     case 'state':

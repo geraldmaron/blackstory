@@ -187,7 +187,7 @@ test('first paint is the record, not a manifesto or a schema card', () => {
   assert.match(paint, /EntityRoomSections|ds-record-mast/);
   assert.match(paint, /toEvidenceClaimInputs/);
   assert.match(paint, /Can I trust this|id="trust"/);
-  assert.match(paint, /placeDiscoveryReturn|See this place on the Atlas|mapLabel/);
+  assert.match(paint, /placeDiscoveryReturn|See this place on Explore|mapLabel/);
   assert.doesNotMatch(paint, /ABOUT_LINE|ABOUT_WALK_PAST|ABOUT_ON_THE_GROUND|ABOUT_PILLARS/);
   assert.doesNotMatch(paint, /RecordAnatomyPanel|buildEntityAnatomy|evidenceLabel|RoomHeader/);
   assert.doesNotMatch(paint, /ds-record-strip|Grade A|radius affordance|Shown at locality/);
@@ -295,7 +295,7 @@ test('seed Dunbar place record shows sourced claims without catalog chrome', () 
   assert.match(html, /The history here/);
   assert.match(html, /What the sources say/);
   assert.match(html, /Can I trust this/);
-  assert.match(html, /See this place on the Atlas|Browse the record list/);
+  assert.match(html, /See this place on Explore|Browse the record list/);
   assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church"/);
   assert.match(html, /href="\/place\/dunbar-alumni-federation"/);
   assert.match(html, /href="\/data"/);

@@ -11,6 +11,7 @@
 import { findUsStateByPostalCode } from '@repo/domain/map/geography';
 import { ATLAS_INSTRUMENT_HREF } from '../nav/atlas-door';
 import { DEFAULT_EXPLORE_FILTERS } from './filters';
+import { kindFamilyFor } from './kind-encoding';
 import { buildExploreHref, defaultExploreOverlayState, type ExploreViewState } from './url-state';
 
 const ACCEPTED_CLAIMS_HASH = 'accepted-claims';
@@ -54,7 +55,7 @@ export function exploreHrefForState(postalCode: string): string {
   });
 }
 
-/** Explore filtered to one era bucket label (e.g. `1860s`). No-op-ish empty → `/`. */
+/** Explore filtered to one era bucket label (e.g. `1860s`). Empty input → `/explore`. */
 export function exploreHrefForEra(eraBucket: string): string {
   const trimmed = eraBucket.trim();
   if (!trimmed) {
@@ -67,7 +68,7 @@ export function exploreHrefForEra(eraBucket: string): string {
   });
 }
 
-/** Explore filtered to entity kind token (e.g. `place`, `school`). */
+/** Explore filtered to the entity's map kind family (e.g. `places`, `sources`). */
 export function exploreHrefForKind(kind: string): string {
   const trimmed = kind.trim();
   if (!trimmed) {
@@ -75,7 +76,7 @@ export function exploreHrefForKind(kind: string): string {
   }
 
   return buildExploreHref({
-    filters: { ...DEFAULT_EXPLORE_FILTERS, kind: trimmed },
+    filters: { ...DEFAULT_EXPLORE_FILTERS, kind: kindFamilyFor(trimmed) },
     ...defaultExploreOverlayState(),
   });
 }

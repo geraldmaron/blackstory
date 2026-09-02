@@ -15,8 +15,10 @@ import {
   type TopicCount,
 } from '../../../lib/map-experience/filters';
 import {
+  isKnownMapKind,
   isKnownMapKindFamily,
   kindFamilyEncodingFor,
+  kindFamilyFor,
   type MapKindFamily,
 } from '../../../lib/map-experience/kind-encoding';
 import type { ExploreLayerMode } from '../../../lib/map-experience/url-state';
@@ -42,11 +44,12 @@ export type LensConstraint = {
  */
 export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
   const [stateCode, setStateCode] = useState(view.viewState.state ?? '');
-  const [kindFamily, setKindFamily] = useState<MapKindFamily | null>(
-    isKnownMapKindFamily(view.viewState.filters.kind)
-      ? (view.viewState.filters.kind as MapKindFamily)
-      : null,
-  );
+  const [kindFamily, setKindFamily] = useState<MapKindFamily | null>(() => {
+    const kind = view.viewState.filters.kind;
+    if (isKnownMapKindFamily(kind)) return kind;
+    if (isKnownMapKind(kind)) return kindFamilyFor(kind);
+    return null;
+  });
   const [evidenceFloor, setEvidenceFloor] = useState<EvidenceFloor>(view.viewState.floor ?? 'any');
   const [decade, setDecade] = useState<number | null>(null);
   const [topicId, setTopicId] = useState<string | null>(

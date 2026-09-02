@@ -39,11 +39,17 @@ export const ENTITY_POINTER_HIT_LAYER_IDS = [
 
 export type EntityPointerHit =
   | { readonly kind: 'entity'; readonly entityId: string }
-  | { readonly kind: 'cluster'; readonly clusterId: number; readonly sourceId: string };
+  | {
+      readonly kind: 'cluster';
+      readonly clusterId: number;
+      readonly sourceId: string;
+      readonly center: readonly [number, number];
+    };
 
 export type RenderedPointerFeature = {
   readonly layerId?: string;
   readonly properties?: { readonly [key: string]: unknown } | null;
+  readonly coordinates?: readonly number[];
 };
 
 export function pointerHitBox(
@@ -94,7 +100,7 @@ function hasPointCount(properties: RenderedPointerFeature['properties']): boolea
 
 /**
  * Prefer a named unclustered pin when the pad covers both a disc and a cluster.
- * Cluster hits carry `cluster_id` so the map can open one leaf's record sheet.
+ * Cluster hits carry `cluster_id` and center coordinates for drill-in expansion.
  */
 export function resolveEntityPointerHit(
   features: readonly RenderedPointerFeature[],
@@ -109,7 +115,13 @@ export function resolveEntityPointerHit(
     if (clusterId === undefined) continue;
     const sourceId = clusterSourceIdForLayer(feature.layerId ?? '');
     if (!sourceId) continue;
-    return { kind: 'cluster', clusterId, sourceId };
+    const coordinates = feature.coordinates;
+    if (!coordinates || coordinates.length < 2) continue;
+    const lng = coordinates[0];
+    const lat = coordinates[1];
+    if (typeof lng !== 'number' || typeof lat !== 'number') continue;
+    if (!Number.isFinite(lng) || !Number.isFinite(lat)) continue;
+    return { kind: 'cluster', clusterId, sourceId, center: [lng, lat] };
   }
   return undefined;
 }

@@ -463,9 +463,9 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
               <dt>Clusters</dt>
               <dd>
                 When &ldquo;Group nearby&rdquo; is on, a number inside a marker means several
-                records are grouped at this zoom level. Zoom in or activate a cluster to reveal the
-                named records inside it &mdash; every cluster opens to individual entities within
-                two interactions. Turn grouping off to see every disc even when zoomed out.
+                records share this map location at the current zoom. Tap a cluster to zoom in until
+                it splits; open a single pin or list row when you are ready to read one record. Turn
+                grouping off to see every disc even when zoomed out.
               </dd>
             </div>
             <div>

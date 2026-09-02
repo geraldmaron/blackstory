@@ -11,6 +11,7 @@
  * and `offset`, because `/records` pages with `?page=N` at 100 rows and no offset value maps
  * onto a page boundary without silently moving the reader.
  */
+import { historyKindToRecordsKind } from '../history/filters';
 
 /** The filter keys `/search` and `/records` both understand, in canonical URL order. */
 export const SEARCH_TO_RECORDS_PARAM_KEYS = ['kind', 'status', 'era', 'topic'] as const;
@@ -31,7 +32,12 @@ export function mapSearchQueryToRecordsHref(raw: RawSearchParams): string {
 
   for (const key of SEARCH_TO_RECORDS_PARAM_KEYS) {
     const value = (firstValue(raw[key]) ?? '').trim();
-    if (value && value !== 'all') params.set(key, value);
+    if (!value || value === 'all') continue;
+    if (key === 'kind') {
+      params.set('kind', historyKindToRecordsKind(value));
+      continue;
+    }
+    params.set(key, value);
   }
 
   const qs = params.toString();

@@ -9,7 +9,9 @@
  * a rule that looked right against a bare path.
  */
 import assert from 'node:assert/strict';
+import { existsSync, readFileSync } from 'node:fs';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import { mapHistoryQueryToRecordsHref, decadeParamToEra } from './history-href';
 import { redirectsForNextConfig } from './next-config-redirects.mjs';
@@ -161,6 +163,26 @@ test('the /explore rule is the exact path, so /explore/api keeps answering', () 
   );
 });
 
+test('the dev routes manifest never folds /explore into /', () => {
+  const manifestPath = fileURLToPath(
+    new URL('../../../../.next/dev/routes-manifest.json', import.meta.url),
+  );
+  if (!existsSync(manifestPath)) {
+    return;
+  }
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as {
+    redirects?: readonly { source: string; destination: string }[];
+  };
+  const bad = manifest.redirects?.find(
+    (rule) => rule.source === '/explore' && rule.destination === '/',
+  );
+  assert.equal(
+    bad,
+    undefined,
+    'stale .next/dev/routes-manifest.json still redirects /explore → /; delete it and restart dev',
+  );
+});
+
 test('/search reaches /records in one hop, with its params', () => {
   assert.equal(mapSearchQueryToRecordsHref({ q: 'tulsa' }), '/records?q=tulsa');
   assert.equal(
@@ -170,7 +192,9 @@ test('/search reaches /records in one hop, with its params', () => {
   assert.equal(mapSearchQueryToRecordsHref({ topic: 'redlining' }), '/records?topic=redlining');
   // `all` is the no-constraint sentinel; carrying it through would render an active chip.
   assert.equal(mapSearchQueryToRecordsHref({ kind: 'all', status: 'all' }), '/records');
-  assert.equal(mapSearchQueryToRecordsHref({}), '/records');
+  // /search remaps history-only kind categories onto the five-family vocabulary.
+  assert.equal(mapSearchQueryToRecordsHref({ kind: 'law' }), '/records?kind=sources');
+  assert.equal(mapSearchQueryToRecordsHref({ kind: 'works' }), '/records?kind=sources');
   // /records pages with `?page=N`; an offset has no honest landing point on that contract.
   assert.equal(mapSearchQueryToRecordsHref({ q: 'a', offset: '20' }), '/records?q=a');
   assert.equal(mapSearchQueryToRecordsHref({ q: '  spaced  ' }), '/records?q=spaced');
@@ -187,6 +211,8 @@ test('/history maps decade to era and reaches /records in one hop', () => {
     mapHistoryQueryToRecordsHref({ decade: '1930', q: 'tulsa', kind: 'place' }),
     '/records?q=tulsa&kind=place&era=1930s',
   );
+  assert.equal(mapHistoryQueryToRecordsHref({ kind: 'law' }), '/records?kind=sources');
+  assert.equal(mapHistoryQueryToRecordsHref({ kind: 'works' }), '/records?kind=sources');
   assert.equal(mapHistoryQueryToRecordsHref({}), '/records');
   assert.equal(mapHistoryQueryToRecordsHref({ decade: 'all' }), '/records');
   // An explicit era is already in the destination vocabulary and outranks a derived one.

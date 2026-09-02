@@ -276,6 +276,42 @@ describe('/records · filter vocabulary does not drift from the Lens', () => {
     const model = buildRecordsIndex([entity({ id: 'a' })], EMPTY_RECORDS_QUERY);
     assert.deepEqual(Object.keys(model.facets).sort(), [...RECORDS_FILTER_KEYS].sort());
   });
+
+  it('accepts map kind families and micro-kinds in kind= URLs', () => {
+    const entities = [
+      entity({ id: 'law_a', kind: 'law', displayName: 'Law A' } as unknown as EntityOverrides),
+      entity({ id: 'place_a', kind: 'place', displayName: 'Place A' }),
+      entity({
+        id: 'move_a',
+        kind: 'movement',
+        displayName: 'Movement A',
+      } as unknown as EntityOverrides),
+    ];
+    assert.equal(
+      buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, kind: 'law' }).totalMatched,
+      1,
+    );
+    assert.equal(
+      buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, kind: 'place' }).totalMatched,
+      1,
+    );
+    assert.equal(
+      buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, kind: 'events' }).totalMatched,
+      0,
+    );
+    assert.equal(
+      buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, kind: 'organizations' }).totalMatched,
+      1,
+    );
+    assert.equal(
+      buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, kind: 'sources' }).totalMatched,
+      1,
+    );
+    assert.equal(
+      buildRecordsIndex(entities, { ...EMPTY_RECORDS_QUERY, kind: 'works' }).totalMatched,
+      0,
+    );
+  });
 });
 
 describe('/records · place hrefs and map continuity', () => {

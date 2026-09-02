@@ -344,7 +344,7 @@ export type MapMomentProps = {
    * it to each author, so a moment about violence cannot be dramatised by omission.
    */
   readonly plain?: boolean;
-  /** Where "Open this view on the Atlas" goes. Omit to render no control. */
+  /** Where "Open this view in Explore" goes. Omit to render no control. */
   readonly atlasHref?: string;
   /**
    * What the slot says while it is not holding the plate.
@@ -405,7 +405,7 @@ export function MapMoment({
         </div>
         {atlasHref === undefined ? null : (
           <a className="ds-mapmoment__open" href={atlasHref}>
-            Open this view on the Atlas
+            Open this view in Explore
           </a>
         )}
       </div>

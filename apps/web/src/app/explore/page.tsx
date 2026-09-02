@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata = buildStaticPageMetadata({
   path: '/explore',
-  title: 'Atlas',
+  title: 'Explore',
   description: 'The map of the archive.',
 });
 
