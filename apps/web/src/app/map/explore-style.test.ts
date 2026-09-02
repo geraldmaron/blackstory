@@ -152,8 +152,8 @@ test('unclustered point fill and halo use first-paint opacity nationally, kind o
   assert.equal(clusterLayer.paint?.['circle-opacity'], ENTITY_CLUSTER_OPACITY);
   const haloOpacity = haloLayer.paint?.['circle-opacity'] as unknown[];
   assert.equal(haloOpacity[0], 'interpolate');
-  assert.equal(haloOpacity[4], 0);
-  assert.equal(haloOpacity[6], ENTITY_HALO_OPACITY);
+  assert.deepEqual(haloOpacity[4], ['literal', 0]);
+  assert.deepEqual(haloOpacity[6], ['literal', ENTITY_HALO_OPACITY]);
   const pointOpacity = pointLayer.paint?.['circle-opacity'] as unknown[];
   assert.equal(pointOpacity[0], 'interpolate');
   const nationalOpacity = pointOpacity[4] as unknown[];
