@@ -206,9 +206,18 @@
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
+/*
+ * Five tiles, and every one of them the same height.
+ *
+ * `align-items: start` is doing real work here. Grid items stretch by default, so one tile with
+ * a long value used to set the height of all five and leave four of them mostly empty. The
+ * clamp on the value below is the other half: a tile is a glance, and nothing in it earns more
+ * than three lines.
+ */
 .ds-rec-facts__tiles {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: start;
   gap: var(--ds-space-3);
   margin: 0;
 }
@@ -271,7 +280,18 @@
   color: var(--room-ink-4);
 }
 
+/*
+ * Three lines, then an ellipsis. A composed address in a fifth of the measure stacks one word
+ * per line; without this a single record could push the strip past 600px tall. The full value
+ * stays reachable: it is the link's title, and a visitable record prints it in the visit block.
+ */
 .ds-rec-tile__value {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: break-word;
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--rec-value);

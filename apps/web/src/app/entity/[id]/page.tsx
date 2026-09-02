@@ -71,7 +71,7 @@ import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-pro
 import { canStandHere, isInternalRecordLabel } from '../../../lib/place/public-place-path';
 import { placeHrefForEntity, placeSlugCollisionCounts } from '../../../lib/place/place-slug';
 import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './adapters';
-import { buildEntityAnatomyInputs } from './entity-anatomy-facts';
+import { buildEntityAnatomyInputs, whereTileLabel } from './entity-anatomy-facts';
 import { deriveRecordStanding, isThinRecord } from './entity-view-model';
 import { EntityRoomSections, recordSectionIndex } from './EntityRoomSections';
 import { EntitySessionNavClient } from './entity-session-nav-client';
@@ -295,6 +295,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
 
   const anatomyInputs = buildEntityAnatomyInputs(entity, mapTone);
   const publicAddress = anatomyInputs.whereLabel;
+  /* The tile takes a fifth of the measure; a long composed address goes to the jurisdiction. */
+  const whereTile = whereTileLabel(entity, publicAddress);
   const showVisit = shouldShowVisitBlock(visitInput);
   const whereMapsHref =
     !showVisit && geoAnchor
@@ -570,10 +572,12 @@ export default async function EntityPage({ params }: EntityPageProps) {
                       placeLabel={publicAddress}
                       title={`Where: ${publicAddress}. Open in your maps app.`}
                     >
-                      {publicAddress}
+                      {whereTile}
                     </MapsExternalLink>
                   ) : (
-                    publicAddress
+                    <span title={whereTile === publicAddress ? undefined : publicAddress}>
+                      {whereTile}
+                    </span>
                   )
                 }
                 support={locationPrecisionLabel}
