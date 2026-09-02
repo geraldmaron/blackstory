@@ -6,7 +6,16 @@
  * pannable, the camera keeps flying, and the reader can compare the record against its geography
  * without dismissing anything (design-direction-v9-atlas.md §5.6).
  *
- * The anatomy grid is `RecordAnatomyPanel`, unchanged. Rebuilding a second Kind / Where / Era /
+ * The sheet wears the record page's own chrome (`RecordChrome.tsx`): the same kind, era and grade
+ * pills, in the same order, above the same name. A reader who meets a record on the map and then
+ * opens its page should not have to learn a second way of reading the same four facts.
+ *
+ * Those pills are the sheet's only statement of kind, era and grade, which is why the anatomy grid
+ * below carries just Where and Evidence. It used to carry all four, under a mono kicker line that
+ * carried three of them again — kind, place and era each printed twice on one card, and the place
+ * a third time inside the title it repeated verbatim.
+ *
+ * The anatomy grid is still `RecordAnatomyPanel`, the shared one. Rebuilding a second Where /
  * Evidence grid here would give the archive two record anatomies that could drift apart.
  *
  * The precision note is not optional and not editorial. It is the archive stating what its own
@@ -25,6 +34,13 @@ import { RecordVisitBlock } from '../patterns/RecordVisitBlock';
 import type { VisitHandoffInput } from '../../lib/geography/visit-handoff';
 import { shouldShowVisitBlock } from '../../lib/geography/visit-handoff';
 import type { ConfidenceTierKey } from '../../lib/map-experience/confidence-icons';
+import { placeDetail } from '../../lib/map-experience/place-label';
+import {
+  RecordGradePill,
+  RecordKindPill,
+  RecordPill,
+  recordSectionIcon,
+} from '../entity/RecordChrome';
 import { KindGlyph } from './KindGlyph';
 import './record-sheet.css';
 import '../patterns/record-visit.css';
@@ -67,7 +83,6 @@ export type SheetRecord = {
   readonly id: string;
   readonly name: string;
   readonly kind: string;
-  readonly kindLabel: string;
   readonly mapTone?: string;
   readonly place: string;
   readonly era: string;
@@ -115,21 +130,21 @@ export type RecordSheetProps = {
   readonly className?: string;
 };
 
+/**
+ * Where and Evidence. Kind and Era are pills above the name and are not repeated here.
+ *
+ * Where drops the head of the address when it merely restates the name: a place record called
+ * "100 Block North Greenwood Avenue" has that exact string as the first half of its own address,
+ * so the row says "Tulsa, Oklahoma" and lets the title carry the rest.
+ */
 function anatomyFacts(record: SheetRecord): readonly RecordAnatomyFact[] {
   return [
     {
-      key: 'kind',
-      label: 'Kind',
-      value: record.kindLabel,
-      icon: {
-        variant: 'record-kind',
-        kind: record.kind,
-        muted: true,
-        ...(record.mapTone ? { mapTone: record.mapTone } : {}),
-      },
+      key: 'where',
+      label: 'Where',
+      value: placeDetail(record.name, record.place),
+      icon: { variant: 'record-where' },
     },
-    { key: 'where', label: 'Where', value: record.place, icon: { variant: 'record-where' } },
-    { key: 'era', label: 'Era', value: record.era, icon: { variant: 'record-era' } },
     {
       key: 'evidence',
       label: 'Evidence',
@@ -137,6 +152,11 @@ function anatomyFacts(record: SheetRecord): readonly RecordAnatomyFact[] {
       icon: { variant: 'record-evidence', tier: record.confidenceTier },
     },
   ];
+}
+
+/** "Grade A · 6 sources" carries the grade in its head; the pill wants only that word. */
+function gradeWordOf(evidenceLabel: string): string {
+  return evidenceLabel.split(' · ')[0] ?? evidenceLabel;
 }
 
 export function RecordSheet({
@@ -259,18 +279,18 @@ export function RecordSheet({
 
       <div className="ds-sheet__body">
         <div>
-          <p className="ds-sheet__kicker">
-            <KindGlyph
+          <div className="ds-rec-pills ds-sheet__pills" aria-label="Record at a glance">
+            <RecordKindPill
               kind={record.kind}
               {...(record.mapTone ? { mapTone: record.mapTone } : {})}
-              size={12}
             />
-            <span>{record.kindLabel}</span>
-            <span aria-hidden="true">·</span>
-            <span>{record.place}</span>
-            <span aria-hidden="true">·</span>
-            <span>{record.era}</span>
-          </p>
+            <RecordPill tone="era" icon={recordSectionIcon('era')}>
+              {record.era}
+            </RecordPill>
+            <RecordGradePill tier={record.confidenceTier}>
+              {gradeWordOf(record.evidenceLabel)}
+            </RecordGradePill>
+          </div>
           {/*
            * The name is the way out of the sheet and onto the record. A reader who clicks a pin
            * is asking about that entity, and the sheet is a preview of it — without a link on the

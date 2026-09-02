@@ -15,7 +15,6 @@ const RECORD: SheetRecord = {
   id: 'ent_gaston_motel',
   name: 'A.G. Gaston Motel',
   kind: 'place',
-  kindLabel: 'Place',
   place: 'Birmingham, Alabama',
   era: '1950s',
   story: 'Built in 1954, it became the campaign headquarters of the 1963 Birmingham movement.',
@@ -72,9 +71,10 @@ test('precisionNote is the single definition of that sentence', () => {
   );
 });
 
-test('the documented order holds: kicker, name, story, anatomy, precision, actions, sources', () => {
+test('the documented order holds: pills, name, story, anatomy, precision, actions, sources', () => {
   const html = render({ onFlyToPlace: () => {} });
   const order = [
+    'Record at a glance',
     'A.G. Gaston Motel',
     'campaign headquarters',
     'Evidence',
@@ -90,12 +90,46 @@ test('the documented order holds: kicker, name, story, anatomy, precision, actio
   }
 });
 
-test('the anatomy grid is the shared one, with all four facts', () => {
+test('kind, era and grade are pills; the anatomy carries only Where and Evidence', () => {
   const html = render();
-  for (const label of ['Kind', 'Where', 'Era', 'Evidence']) {
+
+  // The pill row is the record page's own `ds-rec-pills`, so a reader who opens the full record
+  // meets the same three pills in the same order.
+  assert.match(html, /ds-rec-pills[^>]*aria-label="Record at a glance"/);
+  for (const word of ['Place', '1950s', 'Grade A']) {
+    assert.match(
+      html,
+      new RegExp(`ds-rec-pill__label">${word}<`),
+      `the pill row is missing ${word}`,
+    );
+  }
+
+  for (const label of ['Where', 'Evidence']) {
     assert.match(html, new RegExp(`>${label}<`), `anatomy is missing ${label}`);
   }
   assert.match(html, /Grade A · 6 sources/);
+
+  // Kind and Era are stated once, as pills. An anatomy row for either would print the same fact
+  // twice on one card, which is what the mono kicker used to do.
+  for (const label of ['Kind', 'Era']) {
+    assert.doesNotMatch(
+      html,
+      new RegExp(`fact-label"[^>]*>(<svg[\\s\\S]*?</svg>)?${label}<`),
+      `${label} is repeated in the anatomy`,
+    );
+  }
+});
+
+test('Where drops an address head that merely restates the name', () => {
+  const html = render({
+    record: {
+      ...RECORD,
+      name: '100 Block North Greenwood Avenue',
+      place: '100 Block North Greenwood Avenue, Tulsa, Oklahoma',
+    },
+  });
+  assert.match(html, /fact-value">Tulsa, Oklahoma</);
+  assert.doesNotMatch(html, /fact-value">100 Block North Greenwood Avenue, Tulsa/);
 });
 
 test('sources are numbered', () => {

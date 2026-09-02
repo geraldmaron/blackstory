@@ -1,6 +1,6 @@
 /**
  * The record page's chrome vocabulary: pills, fact tiles, meters, beat headings and apparatus
- * titles. One set of parts, one type scale (`record-room.css`), so the masthead, the strip, the
+ * titles. One set of parts, one type scale (`record-chrome.css`), so the masthead, the strip, the
  * column and the band read as one instrument rather than five components that met on a page.
  *
  * Every icon here travels with a visible word (WCAG 1.4.1): a pill is icon plus label, a tile
@@ -8,7 +8,11 @@
  * same Font Awesome sets the Atlas already uses (`kind-icons.ts`, `status-icons.ts`,
  * `confidence-icons.ts`), so a person is the same glyph on the map, in the rail and on the page.
  *
+
  * Server-safe: no client state, no effects.
+ *
+ * The atoms' stylesheet travels with the component (`record-chrome.css`), so a surface that
+ * renders a pill gets a styled pill without knowing which route it is on.
  */
 import React, { type ReactNode } from 'react';
 import Link from 'next/link';
@@ -39,6 +43,7 @@ import { iconWithFallback } from '../../lib/map-experience/icon-fallback';
 import { displayEncodingFor } from '../../lib/map-experience/kind-encoding';
 import { kindIconFor } from '../../lib/map-experience/kind-icons';
 import { statusIconFor } from '../../lib/map-experience/status-icons';
+import './record-chrome.css';
 
 void React;
 

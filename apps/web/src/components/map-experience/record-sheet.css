@@ -106,20 +106,17 @@
   overscroll-behavior: contain;
 }
 
-.ds-sheet__kicker {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 5px;
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.06em;
-  color: var(--ds-ink-muted);
+/*
+ * The pill row is `ds-rec-pills` from the record chrome, so kind, era and grade look here exactly
+ * as they look on the record page. Only the bottom margin is the sheet's own: the page sets it
+ * against a masthead, and this sits directly over the name.
+ */
+.ds-sheet__pills {
+  margin: 0 0 var(--ds-space-2);
 }
 
 .ds-sheet__name {
-  margin: 10px 0 0;
+  margin: 0;
   font-family: var(--ds-font-display);
   font-size: 1.6875rem;
   font-weight: 600;

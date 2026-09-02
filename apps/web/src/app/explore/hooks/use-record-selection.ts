@@ -162,7 +162,6 @@ export function useRecordSelection(
       id: selectedFeature.properties.entityId,
       name: selectedFeature.properties.displayName,
       kind: selectedFeature.properties.kind,
-      kindLabel: selectedFeature.properties.kindFamily,
       ...(selectedFeature.properties.mapTone
         ? { mapTone: selectedFeature.properties.mapTone }
         : {}),

@@ -12,7 +12,9 @@
  *
  * Row anatomy is `18px 1fr auto` — glyph, name over meta, save. The place truncates because it is
  * the only part of the meta line with a variable length; era and grade never do, because a
- * half-printed evidence grade is worse than no evidence grade.
+ * half-printed evidence grade is worse than no evidence grade. It also drops an address head that
+ * repeats the name directly above it, which was spending that variable length on a second copy of
+ * the line the reader had just read.
  */
 'use client';
 
@@ -20,7 +22,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { cx } from '@repo/ui';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 import { gradeForConfidence } from '../../lib/map-experience/evidence-grade';
-import { placeLabelFor } from '../../lib/map-experience/place-label';
+import { placeDetail, placeLabelFor } from '../../lib/map-experience/place-label';
 import { GradeDot } from './GradeDot';
 import { KindGlyph } from './KindGlyph';
 import './results-rail.css';
@@ -64,8 +66,13 @@ function eraLabel(feature: ExploreMapFeature): string {
   return feature.properties.eraBuckets[0] ?? 'Undated';
 }
 
+/**
+ * The row prints the name on its own line, so the place beneath it drops any address head that
+ * merely restates that name: "100 Block North Greenwood Avenue" over "Tulsa, Oklahoma" rather
+ * than over a truncated second copy of itself.
+ */
 function placeLabel(feature: ExploreMapFeature): string {
-  return placeLabelFor(feature);
+  return placeDetail(feature.properties.displayName, placeLabelFor(feature));
 }
 
 /** Exported for the windowing test: which slice of a list a given scroll position renders. */
