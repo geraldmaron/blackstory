@@ -20,10 +20,10 @@ export function CorrectionStatusPanel({ status }: { readonly status: PublicCorre
       />
 
       <p className="ds-room-field__hint">
-        Nothing you sent is public. If your correction is declined you get the reason, not silence.
-        Volume of corrections never changes public confidence or publication; coordinated activity
-        is reviewed separately and is not shown here. Accepted corrections appear in{' '}
-        <Link href="/errata">Errata</Link> with the record they changed.
+        Nothing you sent is public. If your correction is declined, you get the reason. Volume of
+        corrections never changes public confidence or publication, and coordinated activity is
+        reviewed separately and is not shown here. An accepted correction appears in{' '}
+        <Link href="/errata">Errata</Link> with the record it changed.
       </p>
 
       {status.appealAvailable ? (

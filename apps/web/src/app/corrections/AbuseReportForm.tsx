@@ -72,7 +72,7 @@ export function AbuseReportForm({ receiptCode }: { readonly receiptCode?: string
   if (state.status === 'success') {
     return (
       <Notice tone="warning" title="Report received">
-        Thank you — abuse reports are reviewed separately and never expose other submitters.
+        Thank you. Abuse reports are reviewed separately, and they never expose another submitter.
       </Notice>
     );
   }

@@ -109,11 +109,10 @@ export function CorrectionForm() {
   if (state.status === 'success') {
     return (
       <div className="ds-corrections__received">
-        <h2>We have it. Here is your receipt.</h2>
+        <h2>It arrived. Here is your receipt.</h2>
         <ReceiptBlock receiptCode={state.receiptCode} />
         <p className="ds-room-field__hint">
-          Nothing you sent is public. If your correction is declined you get the reason, not
-          silence.
+          Nothing you sent is public. If your correction is declined, you get the reason.
         </p>
         <p className="ds-corrections__received-actions">
           <a className="ds-cta ds-cta--quiet" href={state.statusHref}>
@@ -219,7 +218,7 @@ export function CorrectionForm() {
       <Field
         label={
           <>
-            Where can we check it? <small>A link is what makes a correction reviewable</small>
+            Where can I check it? <small>A link is what makes a correction reviewable</small>
           </>
         }
         htmlFor={sourceUrlId}

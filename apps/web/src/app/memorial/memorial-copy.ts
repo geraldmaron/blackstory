@@ -9,17 +9,21 @@
 export const MEMORIAL_PAGE_TITLE = 'Every name the archive has been given';
 
 export const MEMORIAL_PAGE_DESCRIPTION =
-  'A living memorial wall of names held in remembrance. Incomplete by design. People. Places. Evidence. Context.';
+  'A memorial wall of names, written out one at a time, with the same names listed alphabetically underneath. The list is incomplete, and always will be.';
 
 export const MEMORIAL_KICKER = 'Held in remembrance';
 
 export const MEMORIAL_PAGE_LEDE =
-  'Written by hand, one at a time. The wall holds them as handwriting; the list below holds the same names in an order you can search.';
+  'Written by hand, one at a time. The wall holds them as handwriting; the list below holds the same names in alphabetical order, with a jump to any letter.';
 
 /**
  * "Held in the Wall" message: assembles from the wall's own handwriting
  * mechanic, one line at a time, then holds fixed at center permanently.
  * Approved copy. Do not rewrite without checking with product first.
+ *
+ * The "we" in the first line is the reader and the writer saying the names together, which is
+ * what that line is for. It is not the project's first person, and the site-wide rule against
+ * the publisher's "we" does not reach it.
  */
 export const MEMORIAL_HELD_MESSAGE_LINES = [
   'We say their names because silence is how forgetting starts.',
@@ -29,7 +33,7 @@ export const MEMORIAL_HELD_MESSAGE_LINES = [
 ] as const;
 
 export const MEMORIAL_LIST_NOTE =
-  'This list is curated and incomplete. If a name belongs here and is missing, use Submit to send evidence for review.';
+  'This list is incomplete and always will be. If a name belongs here and is missing, send the evidence through Submit, or write to me@geralddagher.com.';
 
 export const MEMORIAL_QUIET_LIST_LINK_LABEL = 'Read every name';
 

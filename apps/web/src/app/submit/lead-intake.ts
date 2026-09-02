@@ -79,7 +79,7 @@ export function validateLeadSubmission(input: LeadSubmissionInput): LeadSubmissi
   if (!hasUrl && !hasDescription) {
     issues.push({
       field: 'url',
-      message: 'Provide a URL, a description, or both — at least one is required.',
+      message: 'Give a link, a description, or both. One of the two is required.',
     });
   }
   if (!input.whyItMatters?.trim() || input.whyItMatters.trim().length < MIN_WHY_IT_MATTERS_LENGTH) {

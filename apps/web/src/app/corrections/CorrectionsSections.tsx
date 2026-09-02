@@ -44,15 +44,15 @@ export function CorrectionsSections() {
        */}
       <Disclosure summary="What happens to what you send">
         <p>
-          Corrections enter a restricted quarantine queue for human review. Nothing you submit
-          changes the public record until it passes independent review and promotion controls.{' '}
+          Corrections enter a restricted quarantine queue. Nothing you submit changes the public
+          record until it passes independent review and promotion controls.{' '}
           {CORRECTION_PRIVACY_NOTICE.body}
         </p>
         <p>
-          Save your receipt code. It is the only credential for a status lookup, and we cannot find
-          a submission without it. If a correction is closed and you believe the outcome was wrong,
-          one appeal is available against the same code. Moderators review every correction;
-          coordinated volume never alters confidence or publication.
+          Save your receipt code. It is the only credential for a status lookup, and a submission
+          cannot be found without it. If a correction is closed and you believe the outcome was
+          wrong, one appeal is available against the same code. Every correction is read by a
+          person, and coordinated volume never alters confidence or publication.
         </p>
       </Disclosure>
 
@@ -67,7 +67,7 @@ export function CorrectionsSections() {
           { href: '/methodology', label: 'How disputes are handled' },
         ]}
       >
-        Mistakes are published rather than overwritten, with the record they changed.{' '}
+        A mistake is published beside the record it changed, never quietly overwritten.{' '}
         <Link href="/corrections/status">Check a receipt</Link> if you already have a code.
       </WalkOffRamp>
     </div>

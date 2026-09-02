@@ -261,7 +261,7 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
         actions={[
           { href: atlasHref, label: 'Open this selection in Explore', emphasis: 'copper' },
           { href: '/methodology', label: 'How a record gets in' },
-          { href: '/submit', label: 'Submit a record we are missing' },
+          { href: '/submit', label: 'Submit a record the archive is missing' },
         ]}
       >
         {atlasReason}

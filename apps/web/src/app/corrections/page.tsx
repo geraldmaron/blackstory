@@ -11,7 +11,8 @@ import '../utility.css';
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/corrections',
   title: 'Corrections',
-  description: 'Challenge or correct a published BlackStory record through moderated review.',
+  description:
+    'Say a published BlackStory record is wrong. Moderated review, receipt code, tracked outcome.',
 });
 
 export default function CorrectionsPage() {
@@ -21,7 +22,7 @@ export default function CorrectionsPage() {
         pathname="/corrections"
         kicker="Take part"
         title="Tell the archive it is wrong"
-        lede="You get a receipt code and a tracked outcome. Corrections are reviewed by a person; nothing you send publishes on arrival."
+        lede="You get a receipt code and a tracked outcome. A person reads every correction, and nothing you send publishes on arrival."
         showPath={false}
       />
       <CorrectionsSections />

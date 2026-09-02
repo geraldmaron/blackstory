@@ -102,7 +102,7 @@ export default async function DataPage() {
         populationGeneratedAt={timeline?.generatedAt}
       />
 
-      <WalkOffRamp>Every number here is a national series.</WalkOffRamp>
+      <WalkOffRamp>Every series here is published by the agency named on its card.</WalkOffRamp>
     </Room>
   );
 }

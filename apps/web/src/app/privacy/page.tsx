@@ -13,7 +13,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
   path: '/privacy',
   title: 'Privacy policy',
   description:
-    'How BlackStory handles information on the public website: no accounts, no advertising, optional location only.',
+    'How BlackStory handles information on the public website: no accounts, no advertising, and location only when you ask for it.',
 });
 
 export default function PrivacyPage() {
@@ -23,7 +23,7 @@ export default function PrivacyPage() {
         pathname="/privacy"
         kicker="Trust"
         title="Privacy policy"
-        lede="An honest inventory of what the BlackStory website may process, and what it deliberately does not collect. No accounts. No advertising. Location is optional."
+        lede="What the BlackStory website processes, and what it deliberately does not. There are no accounts and no advertising, and the map asks for your location only when you press a control that says so."
       />
       <PrivacySections />
       <WalkOffRamp>How this site treats what you send it.</WalkOffRamp>

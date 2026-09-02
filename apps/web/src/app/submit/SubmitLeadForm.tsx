@@ -97,9 +97,8 @@ export function SubmitLeadForm() {
     return (
       <Notice tone="warning" title="Lead received">
         Thank you. This lead (reference <code>{state.submissionId}</code>) has entered a moderated
-        review queue. It is not public, and it will only ever seed research after independent
-        reviewers agree it is worth pursuing. Nothing you submitted is visible to anyone but the
-        moderation team.
+        review queue. It is not public, and it seeds research only after independent reviewers agree
+        it is worth pursuing. Nobody but the people doing that review sees what you sent.
       </Notice>
     );
   }
@@ -147,7 +146,7 @@ export function SubmitLeadForm() {
 
       <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
         <label className="ds-filters__label" htmlFor={descriptionId}>
-          Description (if there is no single link, e.g. something you know firsthand)
+          Description (for something you know firsthand, or anything with no single link)
         </label>
         <textarea
           className="ds-filters__control"
@@ -197,7 +196,7 @@ export function SubmitLeadForm() {
 
       <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
         <label className="ds-filters__label" htmlFor={contactId}>
-          Contact (optional, only reachable by moderators, never shown publicly)
+          Contact (optional, reaches the reviewers only, never shown publicly)
         </label>
         <input className="ds-filters__control" id={contactId} name="contact" type="text" />
       </div>

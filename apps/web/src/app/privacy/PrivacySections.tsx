@@ -2,6 +2,12 @@
  * Privacy policy page sections for the BlackStory website: scope, what the
  * site may process, explicit non-collection rules, optional location,
  * corrections intake, and the published contact.
+ *
+ * Two speakers, kept distinct on purpose. The site states what the software does
+ * ("the site never asks you to sign in"); Gerald Dagher states what he will and
+ * will not do with what the software holds ("I do not sell them"). There is no
+ * institution here, and an institutional "we" on a privacy page would be the one
+ * lie a reader has no way to check.
  */
 import React from 'react';
 import { SUPPORT_CONTACT } from '../../lib/config/contact';
@@ -15,7 +21,7 @@ const PAGE_SECTIONS = [
   { id: 'web', label: 'Website' },
   { id: 'not-collected', label: 'Not collected' },
   { id: 'location', label: 'Location' },
-  { id: 'integrity', label: 'Client integrity' },
+  { id: 'integrity', label: 'Abuse checks' },
   { id: 'corrections', label: 'Corrections' },
   { id: 'changes', label: 'Changes' },
 ] as const;
@@ -25,13 +31,13 @@ const WEB_INVENTORY = [
     id: 'reading',
     term: 'Public reading',
     definition:
-      'Browsing maps, records, stories, and trust pages does not require an account. We do not ask you to sign in to read published pages.',
+      'Browsing maps, records, stories, and trust pages does not require an account. The site never asks you to sign in to read a published page.',
   },
   {
     id: 'integrity',
     term: 'Request integrity',
     definition:
-      'Some interactive features (search refine, corrections, and lead submission) use a same-origin request-integrity token paired with an HttpOnly cookie. This is origin protection, not advertising and not cross-site tracking.',
+      'Some interactive features (search refine, corrections, and lead submission) use a same-origin request-integrity token paired with an HttpOnly cookie. The token proves a request came from this site. It does no advertising and no cross-site tracking.',
   },
   {
     id: 'location',
@@ -43,20 +49,20 @@ const WEB_INVENTORY = [
     id: 'hosting',
     term: 'Standard hosting logs',
     definition:
-      'Like most websites, infrastructure may record IP address, user agent, request path, and timestamps in server logs for security and reliability. These logs are operational, not sold, not used for ad targeting, and not linked to an account because there is none.',
+      'Hosting infrastructure may record IP address, user agent, request path, and timestamps in server logs, for security and reliability. Those logs are operational. I do not sell them, nothing in them is used for ad targeting, and there is no account for them to be linked to.',
   },
   {
     id: 'web-analytics',
     term: 'Visit measurement',
     definition:
-      'The public site records pageviews and a coarse traffic class (likely human, automated, search crawler, AI crawler, or tool) so operators can tell people from scrapers. The class is an enum only. It is not a user id, not a stored fingerprint, and not used for advertising.',
+      'The public site records pageviews and a coarse traffic class (likely human, automated, search crawler, AI crawler, or tool) so I can tell readers apart from scrapers. The class is one of those five values and nothing more: no user id, no stored fingerprint, no advertising use.',
   },
 ] as const;
 
 const NOT_COLLECTED_RULES = [
-  'No user accounts.',
+  'There are no user accounts. Nothing on this site asks you to make one.',
   'No advertising, no ad identifiers, and no tracking prompts.',
-  'No sale of personal information and no cross-context behavioral advertising.',
+  'I do not sell personal information, and the site does no cross-context behavioral advertising.',
 ] as const;
 
 function InventoryLedger({
@@ -117,8 +123,8 @@ export function PrivacySections() {
           </h2>
           <p className="ds-section__lede">
             This policy describes how BlackStory handles information on{' '}
-            <span className="ds-phrase-nowrap">blackstory.app</span>. It is an honest inventory, not
-            a completeness claim about every future feature.
+            <span className="ds-phrase-nowrap">blackstory.app</span>. It covers what the site does
+            now. It is not a promise about features that do not exist yet.
           </p>
           <p className="ds-privacy__follow">
             Data controller: <strong>Gerald Dagher</strong> (individual).
@@ -156,13 +162,13 @@ export function PrivacySections() {
             Explicit limits
           </p>
           <h2 className="ds-section__title" id="privacy-not-collected">
-            What we do not collect or use
+            What I do not collect
           </h2>
           <p className="ds-section__lede">
-            These are product rules, not marketing language. If a future release adds a capability
-            listed here, this page will be updated before it ships.
+            These are rules the software follows. If a release ever adds one of the things listed
+            here, this page changes before that release ships.
           </p>
-          <ol className="ds-privacy__rule-strip" aria-label="Data we do not collect">
+          <ol className="ds-privacy__rule-strip" aria-label="Limits on what is collected">
             {NOT_COLLECTED_RULES.map((rule) => (
               <li key={rule} className="ds-privacy__rule-row">
                 <span className="ds-privacy__rule-text">{rule}</span>
@@ -200,11 +206,12 @@ export function PrivacySections() {
             Abuse protection
           </p>
           <h2 className="ds-section__title" id="privacy-integrity">
-            Client integrity, not tracking
+            What the abuse checks look at
           </h2>
           <p className="ds-section__lede">
-            Public pages that could be abused at scale sit behind rate limits and same-origin
-            checks. Those checks do not build a marketing profile.
+            Pages that could be hit at scale (search, corrections, lead submission) sit behind rate
+            limits and same-origin checks. Nothing those checks record is used to build a marketing
+            profile.
           </p>
         </section>
 
@@ -222,9 +229,9 @@ export function PrivacySections() {
           </h2>
           <p className="ds-section__lede">
             When you file a correction, appeal, abuse report, or research lead, you choose what to
-            write. Submissions enter a restricted quarantine queue; they are never published as
-            submitted. Optional contact fields are for moderator follow-up only and are not shown
-            publicly.
+            write. Submissions enter a restricted quarantine queue and are never published as
+            submitted. The optional contact fields are used only to follow up with you about that
+            submission, and they are never shown publicly.
           </p>
           <p className="ds-privacy__follow">
             Read the corrections privacy notice on the{' '}
@@ -247,8 +254,8 @@ export function PrivacySections() {
             Changes and contact
           </h2>
           <p className="ds-section__lede">
-            Material changes to this policy will be posted on this page with an updated date. For
-            product questions or privacy requests, contact{' '}
+            A material change to this policy is posted here, with a new date at the top. For a
+            privacy request, or a question about how any of this runs, write to{' '}
             <a href={`mailto:${SUPPORT_CONTACT}`}>{SUPPORT_CONTACT}</a> or use the{' '}
             <Link href="/support">support page</Link>.
           </p>

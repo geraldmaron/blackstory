@@ -44,7 +44,7 @@ export function MethodologySections() {
         kicker="Receipt"
         title={
           <>
-            How we <em>work</em>.
+            How the archive <em>works</em>.
           </>
         }
         lede={METHODOLOGY_INTRO_LEDE}
@@ -74,8 +74,10 @@ export function MethodologySections() {
         </GroupHeading>
         <Prose>
           <p>
-            Discovery finds candidates. People verify. A publish gate decides what reaches a public
-            page. A model never writes the public record alone.
+            Candidates come in from research runs, and every one of them is pinned to somewhere real
+            before it can publish: a state, a city, a campus, a documented site. Nothing reaches a
+            public page on a model&apos;s say-so. A person reads it first, and on this project that
+            person is me.
           </p>
         </Prose>
         <ul className="ds-stack">
@@ -106,8 +108,8 @@ export function MethodologySections() {
         </GroupHeading>
         <Prose>
           <p>
-            How sure we are is never color alone. Every grade carries a mark, a text label, and the
-            definition below it.
+            A grade is never a color on its own. Each one carries a mark, a label in words, and the
+            definition printed under it.
           </p>
         </Prose>
         <ul className="ds-stack">
@@ -136,9 +138,10 @@ export function MethodologySections() {
         </GroupHeading>
         <Prose>
           <p>
-            Place is how this archive is organized, and also where harm is easiest to cause. A
-            record is shown no sharper than its sources support. Exact residential addresses are
-            never drawn on public pages.
+            Place is how this archive is organized. It is also the field most likely to put a living
+            person on a map at their own front door, so it carries the strictest rules on the site.
+            A record is drawn no sharper than its sources support, and exact residential addresses
+            are not drawn at all.
           </p>
         </Prose>
         <ol className="ds-stack" aria-label="Map dignity rules">
@@ -156,9 +159,9 @@ export function MethodologySections() {
         <Prose>
           <p>{METHODOLOGY_DIGNITY_LINE}</p>
           <p>
-            Unknown living status is treated as living. The people this policy exists for are named
-            on <Link href="/memorial">the memorial wall</Link>, held still on request, never painted
-            as ambient texture on a map.
+            When the sources do not say whether someone is living, the archive treats them as living
+            and publishes accordingly. Some of the people this rule exists for are named on{' '}
+            <Link href="/memorial">the memorial wall</Link>, which holds a name and nothing else.
           </p>
         </Prose>
       </section>
