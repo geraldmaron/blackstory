@@ -497,6 +497,9 @@ export function MapStageProvider({
   const [posture, setPosture] = useState<PlatePosture>(() =>
     defaultPostureFor(surfaceClassFor(pathname ?? '/')),
   );
+  /** The posture as of the last render, readable from the async mount path below. */
+  const postureRef = useRef<PlatePosture>(posture);
+  postureRef.current = posture;
   const mapRef = useRef<MapLibreMap | null>(null);
   const maplibreglRef = useRef<MaplibreModule['default'] | null>(null);
   const markersRef = useRef<Marker[]>([]);
@@ -1217,7 +1220,10 @@ export function MapStageProvider({
         }
         const maplibregl = (await import('maplibre-gl')).default;
         maplibreglRef.current = maplibregl;
-        if (cancelledRef.current || !container.isConnected) return;
+        // Two imports can be in flight at once (StrictMode re-runs the surface's first patch
+        // after the re-arm above); whichever resolves second must not build a second map into
+        // the same container.
+        if (cancelledRef.current || !container.isConnected || mapRef.current) return;
 
         // The style prop was built on the server, which cannot read `<html data-theme>`. Re-resolve
         // the plate against the document BEFORE the first frame so a light-theme reader never sees
@@ -1287,6 +1293,12 @@ export function MapStageProvider({
       }
       syncStateLabelTheme(readDocumentColorScheme());
       updateStateLabelOpacity(activeMap.getZoom());
+
+      // MapLibre constructs with every gesture on. Only the Live posture steers; a plate built
+      // on the Door (ambient) or into a moment (framed) must start locked, or the first wheel
+      // over the map zooms the plate instead of scrolling the document that asked for it.
+      if (postureRef.current === 'live') unlockGestures(activeMap);
+      else lockGestures(activeMap);
 
       syncEntityMarkers();
       lastViewportRef.current = readViewport(activeMap);
@@ -1469,6 +1481,18 @@ export function MapStageProvider({
   }, []);
 
   useEffect(() => {
+    /*
+     * Re-arm on (re)mount. React StrictMode runs this effect, its cleanup, then the effect again
+     * on the same instance in development, and the refs survive that round trip. Without this
+     * reset the simulated unmount below left `cancelledRef` true for the life of the page: the
+     * first `patchData` had already started the `maplibre-gl` import, the import resolved into a
+     * cancelled provider and returned, and no later call could retry because `initStartedRef`
+     * was still set. The chunk loaded, the plate never built, and every dev session showed the
+     * Albers underlay in place of the map — a failure invisible in production, where StrictMode
+     * does not double-invoke.
+     */
+    cancelledRef.current = false;
+    initStartedRef.current = false;
     return () => {
       cancelledRef.current = true;
       pendingFlyRef.current = null;
@@ -1526,6 +1550,19 @@ export function MapStageProvider({
     lastFramedMomentRef.current = null;
     setPosture(defaultPostureFor(surfaceClass));
   }, [surfaceClass]);
+
+  /**
+   * Posture changes reach the gesture handlers directly. The Framed path below does the same
+   * inside its scroll-frame callback, but that callback only runs while a moment is live; a
+   * route change from the Instrument to the Door (or back) has no moment and still has to hand
+   * the wheel over.
+   */
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (posture === 'live') unlockGestures(map);
+    else lockGestures(map);
+  }, [posture]);
 
   /** A live read of the reduced-motion preference for the camera path below. */
   useEffect(() => {

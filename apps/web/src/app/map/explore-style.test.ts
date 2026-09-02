@@ -88,10 +88,13 @@ function matchExpressionOutputs(expression: unknown): readonly unknown[] {
   return outputs;
 }
 
-/** Stroke widths are zoom-scaled: unwrap `interpolate` → `['*', match, scale]` at the first stop. */
+/** Stroke widths are zoom-scaled: `['*', match, scale]`, either bare (the value at one stop of a
+ * folded first-paint blend, see `blendFirstPaintWithKindExpression`) or at the first stop of a
+ * top-level zoom `interpolate`. */
 function strokeWidthMatchOutputs(expression: unknown): readonly unknown[] {
   const arr = expression as unknown[];
   if (arr[0] === 'match') return matchExpressionOutputs(expression);
+  if (arr[0] === '*') return matchExpressionOutputs(arr[1]);
   assert.equal(arr[0], 'interpolate', 'expected zoom-scaled stroke width');
   assert.deepEqual(arr[2], ['zoom']);
   const firstScaled = arr[4] as unknown[];

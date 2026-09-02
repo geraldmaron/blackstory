@@ -13,6 +13,7 @@ That attribute is the single switch every shell rule, plate posture, keyboard sc
 | Class | `data-surface` | Routes | Map | Document scrolls | Single-key bindings |
 |---|---|---|---|---|---|
 | Instrument | `instrument` | 4 | Live, full viewport | No | Yes, while focus is in `main` |
+| Door | `door` | 1 (`/`) | Ambient, full viewport: the Instrument's plate and markers, gestures locked, camera driven by the scroll chapters | Yes | Chorded only |
 | Reading room | `reading` | 11 | Parked, one Framed slot at a time | Yes | Chorded only |
 | Record page | `record` | 4 | Framed | Yes | Chorded only |
 | Utility | `utility` | 9 | Parked and hidden | Yes | Chorded only |

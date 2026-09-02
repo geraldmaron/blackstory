@@ -291,6 +291,9 @@ importers:
         specifier: ^19.2.7
         version: 19.2.7(react@19.2.7)
     devDependencies:
+      '@maplibre/maplibre-gl-style-spec':
+        specifier: 24.10.0
+        version: 24.10.0
       '@repo/eslint-config':
         specifier: workspace:^
         version: link:../../packages/eslint-config

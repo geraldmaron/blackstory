@@ -51,4 +51,25 @@ test('evidence chapter prefers the spotlight coordinate', () => {
   assert.equal(frame.focusEntityId, 'ent_test_001');
   assert.ok(frame.scale > 2);
   assert.match(frame.placeLabel, /Test Place/);
+  // The live plate flies to the same target the static board zooms toward.
+  assert.deepEqual(frame.camera.center, [-86.81, 33.52]);
+  assert.ok(frame.camera.zoom >= 8.5);
+  assert.equal(frame.camera.pitch, evidence.camera.pitch);
+});
+
+test('a chapter without a spotlight carries its own camera onto the live plate', () => {
+  const opening = STORY_CHAPTERS.find((chapter) => chapter.id === 'cold-open');
+  assert.ok(opening);
+  const frame = resolveDoorFocus({
+    chapter: opening,
+    spotlight: null,
+    fact: undefined,
+    spotlightLngLat: null,
+  });
+  assert.deepEqual(frame.camera, {
+    center: opening.camera.center,
+    zoom: opening.camera.zoom,
+    pitch: opening.camera.pitch,
+    bearing: opening.camera.bearing,
+  });
 });

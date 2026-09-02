@@ -20,17 +20,25 @@
  * `/` is the door: the locked about mast plus the pin plate. `/explore` mounts the
  * Atlas instrument. A place is `/place/{slug}`.
  */
-/** The four rendered surface classes. Endpoints are represented by `null`. */
-export type SurfaceClass = 'instrument' | 'reading' | 'record' | 'utility';
+/**
+ * The five rendered surface classes. Endpoints are represented by `null`.
+ *
+ * `door` is `/` alone: reading-room chrome (bar, scroll, footer decision) over an ambient map
+ * plate — the same persistent MapLibre plate the Instrument steers, painted full-bleed with its
+ * gestures locked so the scroll chapters own the camera. It is neither a reading room (paper
+ * covers the plate there) nor the Instrument (the reader steers there), and pretending it was one
+ * of them is how `/` ended up drawing a second, static map of its own.
+ */
+export type SurfaceClass = 'door' | 'instrument' | 'reading' | 'record' | 'utility';
 
 /**
  * Exact-path membership. Checked before {@link SURFACE_CLASS_PREFIXES} so that a specific child
  * (`/stories/mosaic-credits` is Utility) can never be swallowed by its parent's prefix rule.
  */
 const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
-  // Front door: locked about mast plus the pin plate. Same room chrome as the archive.
+  // Front door: scroll chapters over the shared ambient map plate. Same bar as the archive.
   // `/explore` is the live catalog instrument. Story is a mode of the Atlas, not a path.
-  ['/', 'reading'],
+  ['/', 'door'],
   ['/explore', 'instrument'],
 
   // Reading room — one scrolling, measure-limited column on paper.
@@ -118,8 +126,7 @@ function normalizePath(pathname: string): string {
  * of a page with no class and therefore no shell rules.
  *
  * `search` is accepted so older call sites keep compiling. It does not change the class:
- * `/` is always the reading door. `?atlas=1` is not a second home. The Atlas
- * instrument is `/explore`.
+ * `/` is always the door. `?atlas=1` is not a second home. The Atlas instrument is `/explore`.
  */
 export function surfaceClassFor(pathname: string, _search?: string): SurfaceClass | null {
   const path = normalizePath(pathname);

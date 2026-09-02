@@ -43,6 +43,7 @@ import {
 } from '../../components/map-experience/PinPhotoLayer';
 import { TimePanel } from '../../components/map-experience/TimePanel';
 import { MIGRATION_CORRIDORS } from '../../lib/map-experience/migration-corridors';
+import { nationalFieldPatch } from '../../lib/map-experience/national-field';
 import { prefersReducedMotion } from '../../lib/map-experience/camera-presets';
 import { StoryMode } from '../../components/story/StoryMode';
 import { clearCollection, unsaveRecord } from '../../lib/collections/store';
@@ -276,17 +277,19 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   // own patch on the same data; this effect is declared after it so it always applies last and
   // wins — see this file's props doc for why the layer id list above lives here instead.
   useEffect(() => {
-    stage.patchData({
-      featureCollection: { type: 'FeatureCollection', features: layers.pins ? filtered : [] },
-      jurisdictionAreaFeatures: [],
-      layerMode,
-      densityLevels: view.densityLevels,
-      clusteringEnabled: view.viewState.group,
-      satellite: layers.satellite,
-      historyEdgesEnabled: false,
-      historyEdgeCollection: view.edgeLineCollection,
-      ...(view.viewState.popGeo ? { popGeo: view.viewState.popGeo } : {}),
-    });
+    stage.patchData(
+      nationalFieldPatch(
+        { type: 'FeatureCollection', features: layers.pins ? filtered : [] },
+        {
+          layerMode,
+          densityLevels: view.densityLevels,
+          clusteringEnabled: view.viewState.group,
+          satellite: layers.satellite,
+          historyEdgeCollection: view.edgeLineCollection,
+          ...(view.viewState.popGeo ? { popGeo: view.viewState.popGeo } : {}),
+        },
+      ),
+    );
   }, [
     filtered,
     layers.pins,

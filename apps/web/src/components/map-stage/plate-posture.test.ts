@@ -10,13 +10,19 @@ import {
 } from '../../lib/nav/surface-classes';
 import { defaultPostureFor, framedClaimAllowed } from './plate-posture';
 
-const ALL_SURFACES: readonly SurfaceClass[] = ['instrument', 'reading', 'record', 'utility'];
+const ALL_SURFACES: readonly SurfaceClass[] = [
+  'door',
+  'instrument',
+  'reading',
+  'record',
+  'utility',
+];
 
 test('every surface class resolves to a posture', () => {
   for (const surface of ALL_SURFACES) {
     const posture = defaultPostureFor(surface);
     assert.ok(
-      posture === 'live' || posture === 'framed' || posture === 'parked',
+      posture === 'live' || posture === 'ambient' || posture === 'framed' || posture === 'parked',
       `${surface} resolved to ${posture}`,
     );
   }
@@ -27,6 +33,11 @@ test('the Instrument is the only surface that starts Live', () => {
   for (const surface of ALL_SURFACES.filter((s) => s !== 'instrument')) {
     assert.notEqual(defaultPostureFor(surface), 'live', `${surface} must not paint a live plate`);
   }
+});
+
+test('the Door paints an ambient plate: the shared map, gestures locked', () => {
+  assert.equal(defaultPostureFor('door'), 'ambient');
+  assert.equal(framedClaimAllowed('door'), false);
 });
 
 test('paper surfaces park until something claims a slot', () => {
@@ -62,7 +73,7 @@ test('no classified route resolves to a posture the plate cannot hold', () => {
   for (const path of CLASSIFIED_PATHS) {
     const posture = defaultPostureFor(surfaceClassFor(path));
     assert.ok(
-      posture === 'live' || posture === 'framed' || posture === 'parked',
+      posture === 'live' || posture === 'ambient' || posture === 'framed' || posture === 'parked',
       `${path} resolved to ${posture}`,
     );
   }

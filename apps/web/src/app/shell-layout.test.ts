@@ -280,9 +280,11 @@ describe('the plate is styled globally, not from the route group', () => {
     // once the Instrument built MapLibre the live map stayed lit under every subsequent route
     // and state labels read through the prose column. Only reproduces after visiting the Atlas
     // first, which is why a cold load of /library looked fine.
+    // The Door is the one other surface whose plate is content (posture `ambient`), so it is
+    // excluded from the cover in the same rule rather than uncovered by a second one.
     assert.match(
       shellCss,
-      /body:not\(:has\(\[data-surface='instrument'\]\)\)\s+\.ds-map-stage::after\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
+      /body:not\(:has\(\[data-surface='instrument'\]\)\):not\(:has\(\[data-surface='door'\]\)\)\s+\.ds-map-stage::after\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
     );
     // Covered, not hidden: ADR-017 keeps the MapLibre instance alive across navigation.
     assert.doesNotMatch(

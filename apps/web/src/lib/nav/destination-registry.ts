@@ -392,6 +392,7 @@ export function cardTitleFor(destination: Destination): string {
 }
 
 const SURFACE_CLASS_NAMES: Readonly<Record<SurfaceClass, string>> = Object.freeze({
+  door: 'DOOR',
   instrument: 'INSTRUMENT',
   reading: 'READING ROOM',
   record: 'RECORD',
