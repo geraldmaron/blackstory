@@ -3,6 +3,7 @@
  * (Kind / Where / Era / Evidence). Used on home featured records and Explore spotlight.
  */
 import React from 'react';
+import type { PublicEntityView } from '../../data/public-seed';
 import { buildExternalMapsSearchUrl } from '../../lib/geography/external-maps-url';
 import { resolvePublicAddressLine } from '../../lib/geography/public-address';
 import { MapsExternalLink } from '../map-experience/MapsExternalLink';
@@ -28,7 +29,7 @@ export type RecordAnatomyPlace = {
   readonly lat: number;
   readonly lng: number;
   readonly label: string;
-  readonly precision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution';
+  readonly precision: PublicEntityView['locationPrecision'];
   readonly precisionCaption?: string;
 };
 

@@ -5,6 +5,8 @@ import type { PlaceAdvisoryRecord } from '@repo/domain/advisory';
 import { humanizeToken } from '../../components/entity/format';
 import type { PublicClaimView, PublicEntityView } from '../../data/public-seed';
 import {
+  buildAppleMapsDirectionsUrl,
+  buildAppleMapsSearchUrl,
   buildExternalMapsDirectionsUrl,
   buildExternalMapsSearchUrl,
   type ExternalMapsSearchInput,
@@ -37,8 +39,12 @@ export type VisitHandoffInput = {
 
 export type VisitHandoff = {
   readonly addressLine: string;
+  /** Google Maps search and directions. */
   readonly mapsSearchHref?: string;
   readonly mapsDirectionsHref?: string;
+  /** Apple Maps search and directions, same destination string. */
+  readonly appleMapsSearchHref?: string;
+  readonly appleMapsDirectionsHref?: string;
   readonly visitStanding?: string;
   readonly precisionLabel: string;
   readonly contact?: PublicVisitContact;
@@ -98,6 +104,8 @@ export function buildVisitHandoff(input: VisitHandoffInput): VisitHandoff {
   const handoff = mapsInput(input);
   const mapsSearchHref = buildExternalMapsSearchUrl(handoff);
   const mapsDirectionsHref = buildExternalMapsDirectionsUrl(handoff);
+  const appleMapsSearchHref = buildAppleMapsSearchUrl(handoff);
+  const appleMapsDirectionsHref = buildAppleMapsDirectionsUrl(handoff);
   const standing = resolveVisitStandingCopy({
     kind: input.kind,
     ...(input.status !== undefined ? { status: input.status } : {}),
@@ -111,6 +119,8 @@ export function buildVisitHandoff(input: VisitHandoffInput): VisitHandoff {
     precisionLabel: `${input.locationPrecision.replace(/[_-]+/g, ' ')} precision`,
     ...(mapsSearchHref ? { mapsSearchHref } : {}),
     ...(mapsDirectionsHref ? { mapsDirectionsHref } : {}),
+    ...(appleMapsSearchHref ? { appleMapsSearchHref } : {}),
+    ...(appleMapsDirectionsHref ? { appleMapsDirectionsHref } : {}),
     ...(standing ? { visitStanding: standing } : {}),
     ...(contact !== undefined ? { contact } : {}),
   };

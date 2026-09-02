@@ -101,17 +101,54 @@ export type PublicProjectionInput = {
   }[];
 };
 
-function locationPrecisionFromProjection(
+/**
+ * The release vocabulary for `location.precision` is wider than the view's tier list: the
+ * 2026-09-02 audit of the active release found 23 distinct raw values (site 2,055, county 977,
+ * city 371, institution 350, campus 147, address 55, neighborhood 55, community 30, town 29,
+ * district 13, cemetery 9, state 3, block 2, building 2, and singletons such as park, stadium,
+ * garrison, region, territory, country). Until this table existed everything outside four
+ * pass-through values collapsed to `city` (repo-ywh6), which told a reader that a record with a
+ * verified street-level site was only known to the city. Publish-time redaction has already
+ * decided what may be public; this table only names the tier honestly.
+ */
+const PRECISION_TIER_BY_RAW_VALUE: Readonly<Record<string, PublicEntityView['locationPrecision']>> =
+  {
+    site: 'site',
+    address: 'site',
+    building: 'site',
+    block: 'site',
+    institution: 'institution',
+    campus: 'campus',
+    cemetery: 'campus',
+    park: 'campus',
+    'park-site': 'campus',
+    park_site: 'campus',
+    stadium: 'campus',
+    garrison: 'campus',
+    camp: 'campus',
+    neighborhood: 'neighborhood',
+    community: 'neighborhood',
+    district: 'neighborhood',
+    city: 'city',
+    town: 'city',
+    county: 'county',
+    state: 'state',
+    region: 'state',
+    territory: 'state',
+    country: 'state',
+  };
+
+export function locationPrecisionFromProjection(
   precision: string | undefined,
 ): PublicEntityView['locationPrecision'] {
-  if (
-    precision === 'neighborhood' ||
-    precision === 'campus' ||
-    precision === 'institution' ||
-    precision === 'county'
-  ) {
-    return precision;
+  const raw = precision?.trim().toLowerCase();
+  if (raw !== undefined) {
+    const tier = PRECISION_TIER_BY_RAW_VALUE[raw];
+    if (tier !== undefined) return tier;
   }
+  // Unknown or missing: `city` is the middle of the scale, sharper than county and coarser than
+  // any site claim. A value not in the table is a data problem to fix upstream, not a reason to
+  // draw a sharper point.
   return 'city';
 }
 

@@ -24,6 +24,7 @@ const FEET_DISPLAY_CEILING_METERS = METERS_PER_MILE * 0.25;
 
 /** Finest-known public precision -> the GeoPrecisionTier its radius circle should render at.  */
 const PUBLIC_PRECISION_TO_GEO_TIER: Readonly<Record<string, GeoPrecisionTier>> = {
+  site: 'exact-site',
   institution: 'exact-site',
   campus: 'block',
   neighborhood: 'locality',
@@ -50,8 +51,9 @@ export function geoPrecisionTierForPublicPrecision(publicPrecision: string): Geo
  * that flew to z13 would show a street corner the archive never claimed.
  */
 export function zoomForLocationPrecision(
-  precision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution',
+  precision: 'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site',
 ): number {
+  if (precision === 'state') return 6;
   if (precision === 'county') return 8;
   if (precision === 'city') return 10;
   if (precision === 'neighborhood') return 12;

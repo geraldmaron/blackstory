@@ -46,6 +46,41 @@ export function buildExternalMapsDirectionsUrl(input: ExternalMapsSearchInput): 
   return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
 }
 
+/**
+ * Apple Maps. Two shapes, chosen by what the record can honestly claim:
+ * - a prose destination (an address line or a place label) goes in `q`, anchored by `ll` when
+ *   coordinates exist so the app lands on the archive's point and not a same-name place elsewhere;
+ * - coordinates alone go in `ll`.
+ * Apple's URL scheme is documented at developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html.
+ */
+export function buildAppleMapsSearchUrl(input: ExternalMapsSearchInput): string | undefined {
+  const trimmed = input.query?.trim();
+  const hasCoords = isFiniteCoord(input.lat) && isFiniteCoord(input.lng);
+  if (!trimmed && !hasCoords) {
+    return undefined;
+  }
+  const params = new URLSearchParams();
+  if (trimmed) params.set('q', trimmed);
+  if (hasCoords) params.set('ll', `${input.lat},${input.lng}`);
+  return `https://maps.apple.com/?${params.toString()}`;
+}
+
+/** Apple Maps directions from the user's current location (`daddr`). */
+export function buildAppleMapsDirectionsUrl(input: ExternalMapsSearchInput): string | undefined {
+  const trimmed = input.query?.trim();
+  const hasCoords = isFiniteCoord(input.lat) && isFiniteCoord(input.lng);
+  if (!trimmed && !hasCoords) {
+    return undefined;
+  }
+  const params = new URLSearchParams();
+  // A prose destination routes to the address; coordinates alone route to the point. When both
+  // exist the address wins for routing (it is what a driver needs) and `ll` disambiguates.
+  params.set('daddr', trimmed && trimmed.length > 0 ? trimmed : `${input.lat},${input.lng}`);
+  if (trimmed && hasCoords) params.set('ll', `${input.lat},${input.lng}`);
+  params.set('dirflg', 'd');
+  return `https://maps.apple.com/?${params.toString()}`;
+}
+
 /** Accessible name for a maps deep link opening in a new tab. */
 export function externalMapsLinkLabel(placeLabel: string): string {
   return `Open ${placeLabel} in maps`;

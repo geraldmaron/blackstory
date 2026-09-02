@@ -174,7 +174,8 @@ test('visit maps exits stay quiet text; fly stays a sheet action', () => {
   });
   assert.match(html, /ds-sheet__visit/);
   assert.match(html, /ds-record-visit__link/);
-  assert.match(html, /Open in maps/);
+  assert.match(html, /Apple Maps/);
+  assert.match(html, /Google Maps/);
   assert.match(html, /Fly to place/);
   assert.doesNotMatch(html, /ds-cta/);
 });

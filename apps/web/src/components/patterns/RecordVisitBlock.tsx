@@ -153,14 +153,35 @@ export function RecordVisitBlock({
        * "Fly to place" (sheet) are different jobs; twin primary CTAs for "go to place" compete.
        */}
       <div className="ds-record-visit__actions" role="group" aria-label="Maps handoff">
+        {/* Both maps apps, same destination string: a reader picks the one on their phone. */}
+        {visit.appleMapsSearchHref ? (
+          <MapsExternalLink
+            className="ds-record-visit__link"
+            href={visit.appleMapsSearchHref}
+            placeLabel={mapsLabel}
+            title={`${externalMapsLinkLabel(mapsLabel)} (Apple Maps)`}
+          >
+            Apple Maps
+          </MapsExternalLink>
+        ) : null}
         {visit.mapsSearchHref ? (
           <MapsExternalLink
             className="ds-record-visit__link"
             href={visit.mapsSearchHref}
             placeLabel={mapsLabel}
-            title={externalMapsLinkLabel(mapsLabel)}
+            title={`${externalMapsLinkLabel(mapsLabel)} (Google Maps)`}
           >
-            Open in maps
+            Google Maps
+          </MapsExternalLink>
+        ) : null}
+        {visit.appleMapsDirectionsHref ? (
+          <MapsExternalLink
+            className="ds-record-visit__link"
+            href={visit.appleMapsDirectionsHref}
+            placeLabel={mapsLabel}
+            title={`${externalMapsDirectionsLabel(mapsLabel)} (Apple Maps)`}
+          >
+            Directions (Apple)
           </MapsExternalLink>
         ) : null}
         {visit.mapsDirectionsHref ? (
@@ -168,9 +189,9 @@ export function RecordVisitBlock({
             className="ds-record-visit__link"
             href={visit.mapsDirectionsHref}
             placeLabel={mapsLabel}
-            title={externalMapsDirectionsLabel(mapsLabel)}
+            title={`${externalMapsDirectionsLabel(mapsLabel)} (Google Maps)`}
           >
-            Get directions
+            Directions (Google)
           </MapsExternalLink>
         ) : null}
         {atlasHref ? (

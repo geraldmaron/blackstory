@@ -44,10 +44,12 @@ test('Where matches Visit and does not duplicate maps exits when Visit is presen
 
   assert.match(html, /Dupont\/Sixteenth Street Historic District area, Washington, D\.C\./);
   assert.match(html, /ds-record-visit/);
-  assert.match(html, /Open in maps/);
-  assert.match(html, /Get directions/);
+  assert.match(html, /Apple Maps/);
+  assert.match(html, /Google Maps/);
+  assert.match(html, /Directions \(Apple\)/);
   // Visit owns the two maps exits. Where is the same address as plain text.
-  assert.equal((html.match(/ds-maps-external-link/g) ?? []).length, 2);
+  // Two apps, two jobs each (open, directions): four quiet links, rendered once.
+  assert.equal((html.match(/ds-maps-external-link/g) ?? []).length, 4);
   assert.doesNotMatch(html, /neighborhood-level pin/);
   assert.match(html, /href="[^"]*era=1840s"/);
   assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church#accepted-claims"/);

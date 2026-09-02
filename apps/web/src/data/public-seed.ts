@@ -176,7 +176,15 @@ export type PublicEntityView = {
   readonly topicIds?: readonly string[];
   readonly jurisdictionLabel: string;
   /** City, campus, or neighborhood — never street or residence. */
-  readonly locationPrecision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution';
+  /**
+   * Public precision tier, coarsest to finest: state, county, city, neighborhood, campus,
+   * institution, site. `site` is a verified public place at building level (a listed structure,
+   * a former site with a documented street address), never a residence: publish-time redaction
+   * in `@repo/security` has already coarsened residences, living-person places and sensitive
+   * sites before a projection reaches this view.
+   */
+  readonly locationPrecision:
+    'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site';
   readonly locationLabel: string;
   readonly relevanceExplanation: string;
   /** Concise framing of this record's place within documented Black history general context,

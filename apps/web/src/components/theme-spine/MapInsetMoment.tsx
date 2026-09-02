@@ -18,6 +18,7 @@
  * the explore URL vocabulary.
  */
 import React from 'react';
+import type { PublicEntityView } from '../../data/public-seed';
 import { MapMoment } from '../room';
 import { DEFAULT_EXPLORE_FILTERS } from '../../lib/map-experience/filters';
 import { zoomForLocationPrecision } from '../../lib/map-experience/geo-precision';
@@ -30,7 +31,7 @@ export type MapInsetMomentProps = {
   readonly label: string;
   readonly lat: number;
   readonly lng: number;
-  readonly precision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution';
+  readonly precision: PublicEntityView['locationPrecision'];
   readonly className?: string;
 };
 

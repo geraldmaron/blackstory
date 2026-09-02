@@ -35,6 +35,12 @@ describe('buildVisitHandoff', () => {
     assert.match(visit.mapsSearchHref ?? '', /819%20West%2016th/);
     assert.match(visit.mapsSearchHref ?? '', /39\.788/);
     assert.match(visit.mapsDirectionsHref ?? '', /\/dir\//);
+    assert.match(
+      visit.appleMapsSearchHref ?? '',
+      /^https:\/\/maps\.apple\.com\/\?q=819\+West\+16th/,
+    );
+    assert.match(visit.appleMapsSearchHref ?? '', /ll=39\.788%2C-86\.174/);
+    assert.match(visit.appleMapsDirectionsHref ?? '', /daddr=819\+West\+16th/);
     assert.equal(visit.visitStanding, 'Still standing or operating today');
   });
 
