@@ -199,6 +199,19 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
     tier: 'T3',
     rationale: 'Encyclopedia of Greater Philadelphia — Rutgers University-Camden',
   },
+  // en.wikipedia.org only (not other-language editions or wikimedia mirrors): the same
+  // edited, citation-bearing tertiary source the entity-evidence pipeline already treats as
+  // "a reputable tertiary source, not an official record" (packages/ops-data/scripts/lib/
+  // evidence-collectors/wikipedia.ts). T3, not T1/T2 — it never anchors a claim on its own;
+  // findCorroboratingTier1Source still looks for an independent T1/T2 source on top of it.
+  // Left unclassified (T4/"untrusted") before this, every gap-fill candidate whose only
+  // source was Wikipedia — the gap-fill pipeline's own designed primary lookup — was
+  // structurally unable to pass claim validation regardless of judgment quality.
+  {
+    domain: 'en.wikipedia.org',
+    tier: 'T3',
+    rationale: 'Wikipedia (English) — edited, citation-bearing tertiary reference',
+  },
   {
     domain: 'factcheck.org',
     tier: 'T3',
