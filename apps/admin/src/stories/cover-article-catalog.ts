@@ -2,7 +2,7 @@
  * Articles an editor can open for a cover package. Seed longform stories are
  * the real desk; a packet slug can open a stub so review can hand off here.
  */
-import { listSeedStoryProjections } from '@repo/domain';
+import { listSeedStoryProjections } from '@repo/domain/publication/public-story-seed';
 
 export type CoverArticleRecord = {
   readonly slug: string;

@@ -2,7 +2,11 @@
  * Editor-facing copy for the article cover form. Helper text is owned by
  * the CoverPackage contract so Content and the gate cannot drift.
  */
-import { COVER_BRIEF_HELPERS, COVER_RECIPES, type CoverRecipe } from '@repo/domain';
+import {
+  COVER_BRIEF_HELPERS,
+  COVER_RECIPES,
+  type CoverRecipe,
+} from '@repo/domain/publication/cover-package';
 
 export const COVER_FORM_INTENT =
   'A cover is a brief, a recipe, and a plate drawn against the house lock. No brief, no cover. This desk does not invent a player surface.';

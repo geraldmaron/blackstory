@@ -9,7 +9,7 @@ import {
   COVER_LOCK_REGISTRY,
   evaluateCoverPackage,
   coverPackageInputFromFields,
-} from '@repo/domain';
+} from '@repo/domain/publication/cover-package';
 import type { CoverArticleRecord } from '../../../../stories/cover-article-catalog';
 import {
   COVER_BRIEF_FIELD_COPY,
@@ -42,10 +42,7 @@ export function CoverPackageForm({ article, stored }: CoverFormProps) {
   const [plateAssetName, setPlateAssetName] = useState(draft?.plate?.assetName ?? '');
   const [platePreview, setPlatePreview] = useState<string | null>(null);
 
-  const [saveState, saveAction, savePending] = useActionState(
-    saveCoverPackage,
-    COVER_FORM_INITIAL,
-  );
+  const [saveState, saveAction, savePending] = useActionState(saveCoverPackage, COVER_FORM_INITIAL);
   const [publishState, publishAction, publishPending] = useActionState(
     publishCoverPackage,
     COVER_FORM_INITIAL,
@@ -285,7 +282,9 @@ export function CoverPackageForm({ article, stored }: CoverFormProps) {
       {status.status === 'blocked' ? (
         <p className="cover-form__notice cover-form__notice--blocked" role="alert">
           {status.message}
-          {status.issues.length > 0 ? ` ${status.issues.map((issue) => issue.message).join(' ')}` : ''}
+          {status.issues.length > 0
+            ? ` ${status.issues.map((issue) => issue.message).join(' ')}`
+            : ''}
         </p>
       ) : null}
       {status.status === 'saved' || status.status === 'cover_ready' || status.status === 'error' ? (
