@@ -6,11 +6,20 @@
  * still render here. Door Rest pin walks stay on the stand allowlist; Place itself resolves
  * the wider corpus via the search index.
  *
- * On the v9 room kit (a Record room with a right rail), not the retired v6 edition stack.
+ * On the v9 room kit (a Record room with a right rail), dressed in the record chrome
+ * (`components/entity/RecordChrome.tsx`): one type scale, one icon language, pills for the
+ * facts a reader glances at, tiles for the facts a reader checks, numbered beats for the
+ * prose, and an apparatus band for everything that stands behind the page.
  */
 
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
+import {
+  faArrowUpRightFromSquare,
+  faMapLocationDot,
+  faPenToSquare,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { PublicEntityView } from '../../../data/public-seed';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
 import { RecordVisitBlock } from '../../../components/patterns/RecordVisitBlock';
@@ -18,15 +27,19 @@ import '../../../components/entity/entity-page.css';
 import { EntityMastMedia } from '../../../components/entity/EntityMastMedia';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { EntityTopicTags } from '../../../components/entity/EntityTopicTags';
-import { HowToReadThisRecord } from '../../../components/trust';
 import {
-  Breadcrumb,
-  Room,
-  SourceList,
-  TrustBlock,
-  type RoomSource,
-} from '../../../components/room';
-import { KindGlyph } from '../../../components/map-experience/KindGlyph';
+  meterLevelForCoverage,
+  meterLevelForTier,
+  RecordFactTile,
+  RecordGradePill,
+  RecordKindPill,
+  RecordPill,
+  recordSectionIcon,
+  RecordSmallTitle,
+  RecordStatusPill,
+} from '../../../components/entity/RecordChrome';
+import { HowToReadThisRecord } from '../../../components/trust';
+import { Breadcrumb, Room, SourceList, type RoomSource } from '../../../components/room';
 import { MapsExternalLink } from '../../../components/map-experience/MapsExternalLink';
 import {
   RECORD_GAP_COPY,
@@ -34,6 +47,7 @@ import {
   type RecordGapKind,
 } from '../../../components/entity/copy';
 import { humanizeToken } from '../../../components/entity/format';
+import { confidenceIconFor } from '../../../lib/map-experience/confidence-icons';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
 import { buildExternalMapsSearchUrl } from '../../../lib/geography/external-maps-url';
 import { shouldShowVisitBlock } from '../../../lib/geography/visit-handoff';
@@ -41,7 +55,12 @@ import {
   buildExploreHref,
   defaultExploreOverlayState,
 } from '../../../lib/map-experience/url-state';
-import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
+import {
+  displayEncodingFor,
+  kindFamilyEncodingForKind,
+  mapToneFromTopics,
+} from '../../../lib/map-experience/kind-encoding';
+import { kindIconFor } from '../../../lib/map-experience/kind-icons';
 import { entityEvidenceHref, exploreHrefForKind } from '../../../lib/map-experience/metadata-hrefs';
 import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
 import { getPublicSearchIndex, resolvePublicEntityView } from '../../../lib/public-data/source';
@@ -175,7 +194,7 @@ function toRoomSources(claims: PublicEntityView['claims']): readonly RoomSource[
 }
 
 /**
- * The gaps disclosed once, in the rail, in the approved vocabulary. Takes the claims the page
+ * The gaps disclosed once, in the band, in the approved vocabulary. Takes the claims the page
  * actually renders, not the raw set: a record whose only claim was suppressed as a summary echo
  * has nothing under "What the sources say", and the disclosure has to agree with the page.
  */
@@ -197,6 +216,20 @@ function formatRecordDate(value: string | undefined): string {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return value;
   return parsed.toISOString().slice(0, 10);
+}
+
+/** Distinct sources behind the accepted claims: the number the Evidence tile counts. */
+function distinctSourceCount(claims: PublicEntityView['claims']): number {
+  const sources = new Set<string>();
+  for (const claim of claims) {
+    const key = (claim.citationHref ?? claim.citationSource ?? claim.citationLabel ?? '').trim();
+    if (key.length > 0) sources.add(key);
+  }
+  return sources.size;
+}
+
+function plural(count: number, noun: string): string {
+  return `${count.toLocaleString('en-US')} ${noun}${count === 1 ? '' : 's'}`;
 }
 
 export default async function EntityPage({ params }: EntityPageProps) {
@@ -281,15 +314,17 @@ export default async function EntityPage({ params }: EntityPageProps) {
     evidenceClaims,
     ...(crossReferences.length > 0 ? { crossReferences } : {}),
   });
+  const kindEncoding = displayEncodingFor(entity.kind, mapTone);
+  const gradeWord = anatomyInputs.evidenceLabel.split(' · ')[0] ?? anatomyInputs.evidenceLabel;
+  const sourceCount = distinctSourceCount(displayClaims);
+  const decadeCount = entity.eraBuckets?.length ?? 0;
+  const evidenceHref = entityEvidenceHref(`/entity/${entity.id}`);
+  const correctionsHref = `/corrections?target=${encodeURIComponent(entity.id)}`;
+  const locationPrecisionLabel = `${humanizeToken(entity.locationPrecision)} precision`;
 
   /*
-   * The rail is what a reader consults beside the record: where it is, and what is on the page.
-   *
-   * It used to carry the whole apparatus: anatomy, map, sources, citing chapters, inclusion
-   * rubric, provenance, gaps and a how-to-read block, which meant a record opened on a sidebar
-   * of eight stacked boxes. The facts moved up into the strip under the masthead, where they are
-   * read once; the apparatus moved down into the band, where it is checked. What is left is the
-   * locator and a table of contents for the column beside it.
+   * The rail: where the record is, what is on the page, and the record's own file. The
+   * apparatus that a reader checks (sources, rubric, gaps) sits in the band under the column.
    */
   const rail = (
     <>
@@ -302,14 +337,53 @@ export default async function EntityPage({ params }: EntityPageProps) {
       ) : null}
 
       <nav className="ds-record-toc" aria-label="On this record">
-        <span className="ds-record-toc__title">On this record</span>
-        {sectionsOnThisRecord.map((section) => (
-          <a className="ds-record-toc__link" href={`#${section.id}`} key={section.id}>
-            {section.label}
-            {section.count === undefined ? null : <span className="ds-mono">{section.count}</span>}
-          </a>
-        ))}
+        <RecordSmallTitle as="span" icon="toc" className="ds-record-toc__title">
+          On this record
+        </RecordSmallTitle>
+        <ol className="ds-record-toc__list">
+          {sectionsOnThisRecord.map((section, index) => (
+            <li key={section.id}>
+              <a className="ds-record-toc__link" href={`#${section.id}`}>
+                <span className="ds-record-toc__index" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span className="ds-record-toc__label">{section.label}</span>
+                {section.count === undefined ? null : (
+                  <span className="ds-rec-count">{section.count}</span>
+                )}
+              </a>
+            </li>
+          ))}
+        </ol>
       </nav>
+
+      <section className="ds-rec-file" aria-labelledby="record-file-heading">
+        <RecordSmallTitle id="record-file-heading" icon="provenance">
+          Record file
+        </RecordSmallTitle>
+        <dl className="ds-rec-file__rows">
+          <div className="ds-rec-file__row">
+            <dt>Maturity</dt>
+            <dd>{humanizeToken(entity.recordMaturity)}</dd>
+          </div>
+          <div className="ds-rec-file__row">
+            <dt>Coverage</dt>
+            <dd>{humanizeToken(entity.researchCoverage)}</dd>
+          </div>
+          <div className="ds-rec-file__row">
+            <dt>Updated</dt>
+            <dd className="ds-mono">{formatRecordDate(entity.revision.recordUpdatedAt)}</dd>
+          </div>
+          <div className="ds-rec-file__row">
+            <dt>Release</dt>
+            <dd className="ds-mono ds-rec-file__release">{entity.revision.releaseId}</dd>
+          </div>
+        </dl>
+        <Link className="ds-rec-file__correct" href={correctionsHref} prefetch={false}>
+          <FontAwesomeIcon icon={faPenToSquare} className="ds-rec-inline-icon" aria-hidden="true" />
+          Submit a correction
+        </Link>
+      </section>
     </>
   );
 
@@ -322,71 +396,69 @@ export default async function EntityPage({ params }: EntityPageProps) {
     <div className="ds-record-appx">
       <div className="ds-record-appx__head">
         <h2>About this record</h2>
-        <span>Provenance, sourcing and known gaps: the apparatus behind the page above.</span>
+        <span>Sourcing, inclusion and known gaps: the apparatus behind the page above.</span>
       </div>
       <div className="ds-record-appx__cols">
         {sources.length > 0 ? (
           <section aria-labelledby="sources-heading">
-            <h3 className="ds-record-appx__title" id="sources-heading">
+            <RecordSmallTitle
+              id="sources-heading"
+              icon="bibliography"
+              className="ds-record-appx__title"
+            >
               Bibliography
-            </h3>
+              <span className="ds-rec-count">{sources.length}</span>
+            </RecordSmallTitle>
             <SourceList sources={sources} />
           </section>
         ) : null}
 
-        <section aria-labelledby="provenance-heading">
-          <h3 className="ds-record-appx__title" id="provenance-heading">
-            Provenance
-          </h3>
-          <TrustBlock
-            label="Record provenance"
-            facts={[
-              { label: 'Maturity', value: humanizeToken(entity.recordMaturity) },
-              { label: 'Coverage', value: humanizeToken(entity.researchCoverage) },
-              { label: 'Updated', value: formatRecordDate(entity.revision.recordUpdatedAt) },
-              { label: 'Release', value: entity.revision.releaseId },
-            ]}
-          />
-        </section>
+        {inclusionBasis.length > 0 ? (
+          <section aria-labelledby="why-heading">
+            <RecordSmallTitle id="why-heading" icon="why" className="ds-record-appx__title">
+              Why this is here
+            </RecordSmallTitle>
+            <ul className="ds-record-rail-block__reasons">
+              {inclusionBasis.map((reason) => (
+                <li key={reason}>{reason}</li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
 
         <div className="ds-record-appx__notes">
-          {inclusionBasis.length > 0 ? (
-            <section aria-labelledby="why-heading">
-              <h3 className="ds-record-appx__title" id="why-heading">
-                Why this is here
-              </h3>
-              <ul className="ds-record-rail-block__reasons">
-                {inclusionBasis.map((reason) => (
-                  <li key={reason}>{reason}</li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-
           {thinRecord || gaps.length > 0 ? (
             <section aria-labelledby="gaps-heading">
-              <h3 className="ds-record-appx__title" id="gaps-heading">
+              <RecordSmallTitle id="gaps-heading" icon="gaps" className="ds-record-appx__title">
                 Still researching
-              </h3>
+              </RecordSmallTitle>
               {thinRecord ? <p>{THIN_RECORD_COPY.body}</p> : null}
               {gaps.length > 0 ? (
-                <p>
-                  {gaps.map((gap) => RECORD_GAP_COPY[gap].title).join('. ')}. These are gaps in the
-                  research, not an absence of history.{' '}
-                  <Link href={`/corrections?target=${entity.id}`} prefetch={false}>
-                    Submit a correction
-                  </Link>
-                  .
-                </p>
+                <ul className="ds-rec-gaps">
+                  {gaps.map((gap) => (
+                    <li key={gap}>{RECORD_GAP_COPY[gap].title}</li>
+                  ))}
+                </ul>
               ) : null}
+              <p>
+                These are gaps in the research, not an absence of history.{' '}
+                <Link href={correctionsHref} prefetch={false}>
+                  Submit a correction
+                </Link>
+                .
+              </p>
             </section>
           ) : null}
 
           {citingStories.length > 0 ? (
             <section aria-labelledby="cited-by-heading">
-              <h3 className="ds-record-appx__title" id="cited-by-heading">
+              <RecordSmallTitle
+                id="cited-by-heading"
+                icon="cited"
+                className="ds-record-appx__title"
+              >
                 Cited in
-              </h3>
+              </RecordSmallTitle>
               <ul className="ds-record-rail-block__chapters">
                 {citingStories.map((story) => (
                   <li key={story.slug}>
@@ -437,17 +509,26 @@ export default async function EntityPage({ params }: EntityPageProps) {
             />
             <figcaption className="ds-record-mast__over">
               <Breadcrumb pathname={`/entity/${entity.id}`} hereLabel={entity.displayName} />
-              <p className="ds-record-mast__facts">
-                <span className="ds-record-mast__kind">
-                  <KindGlyph kind={entity.kind} {...(mapTone ? { mapTone } : {})} size={12} />
-                  {anatomyInputs.kindLabel}
-                </span>
-                {[publicAddress, anatomyInputs.eraLabel, standingLabel]
-                  .filter((fact): fact is string => fact !== undefined)
-                  .map((fact) => (
-                    <span key={fact}>{fact}</span>
-                  ))}
-              </p>
+              <div className="ds-rec-pills" aria-label="Record at a glance">
+                <RecordKindPill
+                  kind={entity.kind}
+                  {...(mapTone ? { mapTone } : {})}
+                  href={exploreHrefForKind(anatomyInputs.kind)}
+                />
+                {standingLabel !== undefined && entity.status ? (
+                  <RecordStatusPill status={entity.status} label={standingLabel} />
+                ) : null}
+                <RecordPill
+                  tone="era"
+                  icon={recordSectionIcon('era')}
+                  {...(anatomyInputs.eraHref ? { href: anatomyInputs.eraHref } : {})}
+                >
+                  {anatomyInputs.eraLabel}
+                </RecordPill>
+                <RecordGradePill tier={anatomyInputs.evidenceTier} href={evidenceHref}>
+                  {gradeWord}
+                </RecordGradePill>
+              </div>
               <h1 className="ds-record-mast__title">{entity.displayName}</h1>
               <p className="ds-record-mast__lede">
                 <LinkedProse
@@ -460,60 +541,127 @@ export default async function EntityPage({ params }: EntityPageProps) {
             </figcaption>
           </figure>
 
-          {/* One strip, four facts, sticky under the bar: what this is, where, when, and how
-              well sourced. These were four boxes stacked down the rail, above the map, above
-              the sources: read once and then in the way for the rest of the page. */}
-          <dl className="ds-record-strip">
-            <div>
-              <dt>Kind</dt>
-              <dd>
-                <Link href={exploreHrefForKind(anatomyInputs.kind)} prefetch={false}>
-                  {anatomyInputs.kindLabel}
-                </Link>
-              </dd>
-            </div>
-            <div>
-              <dt>Where</dt>
-              <dd>
-                {whereMapsHref ? (
-                  <MapsExternalLink
-                    href={whereMapsHref}
-                    placeLabel={publicAddress}
-                    title={`Where: ${publicAddress}. Open in your maps app.`}
-                  >
-                    {publicAddress}
-                  </MapsExternalLink>
-                ) : (
-                  publicAddress
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt>Era</dt>
-              <dd>
-                {anatomyInputs.eraHref ? (
-                  <Link href={anatomyInputs.eraHref} prefetch={false}>
-                    {anatomyInputs.eraLabel}
+          {/* The fact strip: what this is, where, when, how well sourced, and how far the
+              research has gone, as tiles a reader checks once; then the ways out. */}
+          <div className="ds-rec-facts">
+            <dl className="ds-rec-facts__tiles">
+              <RecordFactTile
+                icon={kindIconFor(entity.kind, mapTone)}
+                iconColor={kindEncoding.shade}
+                label="Kind"
+                value={
+                  <Link href={exploreHrefForKind(anatomyInputs.kind)} prefetch={false}>
+                    {anatomyInputs.kindLabel}
                   </Link>
-                ) : (
-                  anatomyInputs.eraLabel
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt>Evidence</dt>
-              <dd>
-                <Link href={entityEvidenceHref(`/entity/${entity.id}`)} prefetch={false}>
-                  {anatomyInputs.evidenceLabel}
-                </Link>
-              </dd>
-            </div>
-            <div className="ds-record-strip__go">
+                }
+                support={
+                  mapTone
+                    ? humanizeToken(mapTone)
+                    : `Filed with ${kindFamilyEncodingForKind(entity.kind).label.toLowerCase()}`
+                }
+              />
+              <RecordFactTile
+                icon={recordSectionIcon('where')}
+                label="Where"
+                value={
+                  whereMapsHref ? (
+                    <MapsExternalLink
+                      href={whereMapsHref}
+                      placeLabel={publicAddress}
+                      title={`Where: ${publicAddress}. Open in your maps app.`}
+                    >
+                      {publicAddress}
+                    </MapsExternalLink>
+                  ) : (
+                    publicAddress
+                  )
+                }
+                support={locationPrecisionLabel}
+              />
+              <RecordFactTile
+                icon={recordSectionIcon('era')}
+                label="Era"
+                value={
+                  anatomyInputs.eraHref ? (
+                    <Link href={anatomyInputs.eraHref} prefetch={false}>
+                      {anatomyInputs.eraLabel}
+                    </Link>
+                  ) : (
+                    anatomyInputs.eraLabel
+                  )
+                }
+                support={
+                  decadeCount > 0
+                    ? `${plural(decadeCount, 'decade')} on record`
+                    : 'No dated span yet'
+                }
+              />
+              <RecordFactTile
+                className={`ds-rec-tile--evidence ds-rec-tile--evidence-${anatomyInputs.evidenceTier}`}
+                icon={confidenceIconFor(anatomyInputs.evidenceTier)}
+                label="Evidence"
+                value={
+                  <Link href={evidenceHref} prefetch={false}>
+                    {gradeWord}
+                  </Link>
+                }
+                meter={{
+                  level: meterLevelForTier(anatomyInputs.evidenceTier),
+                  tone: anatomyInputs.evidenceTier,
+                  label: `Evidence ${gradeWord}`,
+                }}
+                support={
+                  sourceCount === 0
+                    ? `${plural(displayClaims.length, 'claim')}`
+                    : `${plural(displayClaims.length, 'claim')} from ${plural(sourceCount, 'source')}`
+                }
+              />
+              <RecordFactTile
+                icon={recordSectionIcon('trust')}
+                label="Coverage"
+                value={humanizeToken(entity.researchCoverage)}
+                meter={{
+                  level: meterLevelForCoverage(entity.researchCoverage),
+                  tone: 'coverage',
+                  label: `Research coverage ${humanizeToken(entity.researchCoverage)}`,
+                }}
+                support={humanizeToken(entity.recordMaturity)}
+              />
+            </dl>
+            <div className="ds-rec-facts__actions">
               <Link className="ds-cta ds-cta--copper" href={exploreHref} scroll={false}>
+                <FontAwesomeIcon
+                  icon={faMapLocationDot}
+                  className="ds-rec-inline-icon"
+                  aria-hidden="true"
+                />
                 See it on the map
               </Link>
+              {whereMapsHref ? (
+                <MapsExternalLink
+                  className="ds-cta ds-cta--quiet"
+                  href={whereMapsHref}
+                  placeLabel={publicAddress}
+                  title={`Open ${publicAddress} in your maps app.`}
+                >
+                  <FontAwesomeIcon
+                    icon={faArrowUpRightFromSquare}
+                    className="ds-rec-inline-icon"
+                    aria-hidden="true"
+                  />
+                  Open in maps
+                </MapsExternalLink>
+              ) : null}
+              <Link className="ds-cta ds-cta--quiet" href={correctionsHref} prefetch={false}>
+                <FontAwesomeIcon
+                  icon={faPenToSquare}
+                  className="ds-rec-inline-icon"
+                  aria-hidden="true"
+                />
+                Correct this record
+              </Link>
             </div>
-          </dl>
+          </div>
         </>
       }
     >
@@ -532,7 +680,15 @@ export default async function EntityPage({ params }: EntityPageProps) {
         {...(crossReferences.length > 0 ? { crossReferences } : {})}
       />
 
-      <EntitySessionNavClient currentId={entity.id} orderedIds={orderedIds} />
+      <section className="ds-rec-session" aria-labelledby="session-heading">
+        <RecordSmallTitle id="session-heading" icon="continue" as="h2">
+          Keep reading
+        </RecordSmallTitle>
+        <p className="ds-rec-session__note">
+          Step through the archive one record at a time, in catalog order or at random.
+        </p>
+        <EntitySessionNavClient currentId={entity.id} orderedIds={orderedIds} />
+      </section>
     </Room>
   );
 }
