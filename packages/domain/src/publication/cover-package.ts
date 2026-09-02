@@ -136,7 +136,11 @@ export type CoverPackageIssue = {
 
 export type CoverPackageEvaluation =
   | { readonly ok: true; readonly cover: CoverPackage; readonly issues: readonly [] }
-  | { readonly ok: false; readonly cover?: undefined; readonly issues: readonly CoverPackageIssue[] };
+  | {
+      readonly ok: false;
+      readonly cover?: undefined;
+      readonly issues: readonly CoverPackageIssue[];
+    };
 
 export class CoverPackagePublishError extends Error {
   readonly issues: readonly CoverPackageIssue[];
@@ -210,7 +214,9 @@ const HEADLINE_MIN = 4;
  * or headline fails closed. A plate without a lock cite, or one that looks
  * like the named stock photo, fails closed.
  */
-export function evaluateCoverPackage(input: CoverPackageInput | null | undefined): CoverPackageEvaluation {
+export function evaluateCoverPackage(
+  input: CoverPackageInput | null | undefined,
+): CoverPackageEvaluation {
   const issues: CoverPackageIssue[] = [];
   const situation = trimField(input?.brief?.situation);
   const metaphor = trimField(input?.brief?.metaphor);
@@ -245,8 +251,7 @@ export function evaluateCoverPackage(input: CoverPackageInput | null | undefined
   if (!isCoverRecipe(recipe)) {
     issues.push({
       code: 'recipe',
-      message:
-        'Recipe must be one of object-as-metaphor, scene, character, or doodle-diagram.',
+      message: 'Recipe must be one of object-as-metaphor, scene, character, or doodle-diagram.',
     });
   }
   if (!assetName) {
@@ -333,18 +338,18 @@ export function coverPackageInputFromFields(fields: {
 }): CoverPackageInput {
   return {
     brief: {
-      situation: fields.situation,
-      metaphor: fields.metaphor,
-      refuse: fields.refuse,
+      ...(fields.situation !== undefined ? { situation: fields.situation } : {}),
+      ...(fields.metaphor !== undefined ? { metaphor: fields.metaphor } : {}),
+      ...(fields.refuse !== undefined ? { refuse: fields.refuse } : {}),
     },
-    recipe: fields.recipe,
+    ...(fields.recipe !== undefined ? { recipe: fields.recipe } : {}),
     plate: {
-      assetName: fields.plateAssetName,
-      lockCite: fields.plateLockCite,
-      sourceUrl: fields.plateSourceUrl,
-      alt: fields.plateAlt,
+      ...(fields.plateAssetName !== undefined ? { assetName: fields.plateAssetName } : {}),
+      ...(fields.plateLockCite !== undefined ? { lockCite: fields.plateLockCite } : {}),
+      ...(fields.plateSourceUrl !== undefined ? { sourceUrl: fields.plateSourceUrl } : {}),
+      ...(fields.plateAlt !== undefined ? { alt: fields.plateAlt } : {}),
     },
-    kicker: fields.kicker,
-    headline: fields.headline,
+    ...(fields.kicker !== undefined ? { kicker: fields.kicker } : {}),
+    ...(fields.headline !== undefined ? { headline: fields.headline } : {}),
   };
 }

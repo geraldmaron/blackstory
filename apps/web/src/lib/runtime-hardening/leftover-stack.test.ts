@@ -25,7 +25,8 @@ const PRODUCT_SUPABASE_REF = 'twykhihqkcldpreuovay';
 const OTHER_SUPABASE_REFS = ['cqdukiktqmcoantrbxzy', 'ltpqfgfcvrmfctcaisuw'] as const;
 const OTHER_SUPABASE_NAMES = ['geralddagher-site', 'theadministration-app'] as const;
 
-const FIREBASE_CLIENT_IMPORT = /(?:from\s+|import\s*\(\s*|require\s*\(\s*)['"](?:firebase(?:-admin)?(?:\/[^'"]*)?|@repo\/firebase|@google-cloud\/firestore)['"]/;
+const FIREBASE_CLIENT_IMPORT =
+  /(?:from\s+|import\s*\(\s*|require\s*\(\s*)['"](?:firebase(?:-admin)?(?:\/[^'"]*)?|@repo\/firebase|@google-cloud\/firestore)['"]/;
 const SUPABASE_JS_IMPORT = /(?:from\s+|import\s*\(\s*|require\s*\(\s*)['"]@supabase\/[^'"]+['"]/;
 
 function collectSourceFiles(directory: string): string[] {
@@ -58,7 +59,10 @@ test('public web package has no Firebase or Supabase JS SDK', () => {
   }
   assert.ok(names.includes('next'), 'public web stays a Next/Vercel surface');
   assert.ok(names.includes('pg'), 'public catalog reads use node-pg, not PostgREST');
-  assert.ok(names.includes('@vercel/analytics'), 'Vercel analytics is the only first-party analytics SDK');
+  assert.ok(
+    names.includes('@vercel/analytics'),
+    'Vercel analytics is the only first-party analytics SDK',
+  );
 });
 
 test('apps/web/src does not import Firebase clients or @supabase/*', () => {
@@ -96,11 +100,12 @@ test('public render-path bans cover leftover Firebase and Supabase JS clients', 
 test('apps/web does not name the other two org Supabase projects', () => {
   const roots = [SRC_ROOT, join(WEB_ROOT, '.env.example'), join(WEB_ROOT, 'vercel.json')];
   for (const root of roots) {
-    const files = existsSync(root) && !root.endsWith('.json') && !root.includes('.env')
-      ? collectSourceFiles(root)
-      : existsSync(root)
-        ? [root]
-        : [];
+    const files =
+      existsSync(root) && !root.endsWith('.json') && !root.includes('.env')
+        ? collectSourceFiles(root)
+        : existsSync(root)
+          ? [root]
+          : [];
     for (const file of files) {
       const source = readFileSync(file, 'utf8');
       for (const ref of OTHER_SUPABASE_REFS) {
@@ -129,24 +134,22 @@ test('CSP allows blackstory-app and leftover GCS; no other supabase.co host', ()
   }
 });
 
-test('first paint still boots the full catalog to print Loading N records', () => {
-  // Live blackstory.app first screen (2026-08-28): black plate, "Loading 4,101 records…".
-  // That number is shell.totalMatched from buildAtlasShell(getSharedPublicEntities()).
-  // Proving the request path, not a look. Do not restyle this string on this PR.
+test('first paint no longer boots the full catalog: `/` is the Door, Atlas stays on /explore', () => {
+  // The 2026-08-28 leftover this test originally documented ("Loading 4,101 records…" from
+  // buildAtlasShell(getSharedPublicEntities()) on `/`) was fixed: `/` renders DoorHome under
+  // ISR and never mounts the Atlas instrument. Guard the fix, and keep the catalog route's
+  // cache contract, which the Atlas on /explore still depends on.
   const page = readFileSync(join(SRC_ROOT, 'app/page.tsx'), 'utf8');
-  const loader = readFileSync(join(SRC_ROOT, 'app/explore/AtlasLoader.tsx'), 'utf8');
   const shell = readFileSync(join(SRC_ROOT, 'app/explore/explore-view-model.ts'), 'utf8');
   const catalogRoute = readFileSync(join(SRC_ROOT, 'app/atlas/catalog/route.ts'), 'utf8');
   const catalog = readFileSync(join(SRC_ROOT, 'app/explore/atlas-catalog.ts'), 'utf8');
 
-  assert.match(page, /export const dynamic = 'force-dynamic'/);
-  assert.match(page, /getSharedPublicEntities/);
-  assert.match(page, /buildAtlasShell/);
-  assert.match(page, /<AtlasLoader shell=\{shell\} \/>/);
-  assert.doesNotMatch(page, /initial=\{/);
-  assert.match(loader, /Loading \{shell\.totalMatched\.toLocaleString\(\)\} records/);
+  assert.doesNotMatch(page, /force-dynamic/);
+  assert.doesNotMatch(page, /getSharedPublicEntities/);
+  assert.doesNotMatch(page, /buildAtlasShell/);
+  assert.doesNotMatch(page, /AtlasLoader/);
+  assert.match(page, /DoorHome/);
   assert.match(shell, /totalMatched: filteredFeatures\.length/);
-  assert.match(loader, /ATLAS_CATALOG_PATH/);
   assert.match(catalogRoute, /ATLAS_CATALOG_CACHE_CONTROL/);
   assert.match(catalog, /s-maxage=3600/);
 });
