@@ -223,9 +223,12 @@ html:has(.ds-door) {
 }
 
 .ds-door-journey__chapter--rest {
-  align-content: end;
   padding-top: var(--ds-space-5);
   padding-bottom: var(--ds-space-6);
+}
+
+.ds-door-journey__chapter--centre.ds-door-journey__chapter--rest {
+  align-content: center;
 }
 
 .ds-door-journey__card {
@@ -252,8 +255,7 @@ html:has(.ds-door) {
 }
 
 /*
- * Rest invitation is a caption on the field, not a brochure. Duplicate count/cite live on
- * field chrome. Keep Begin in view and leave CONUS readable above the card.
+ * Opening invitation card: compact copy; count/cite live on field chrome on desktop.
  */
 .ds-door-journey__chapter--rest .ds-door-journey__card {
   display: flex;

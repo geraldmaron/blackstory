@@ -33,10 +33,8 @@ export function MemorialScrollCue({
   const cueRef = React.useRef<HTMLAnchorElement>(null);
 
   /**
-   * Takes the reader to the name list. Shared by the click handler and the
-   * automatic scroll, so there is exactly one scroll path on this page: the
-   * settle-and-re-aim logic below exists because the target moves while the
-   * wall packs, and that is true however the scroll was started.
+   * Takes the reader to the name list when they activate the cue. The settle-and-re-aim
+   * logic below exists because the target moves while the wall packs.
    */
   const scrollToTarget = React.useCallback(() => {
     const target = document.getElementById(targetId);
@@ -89,16 +87,13 @@ export function MemorialScrollCue({
     /*
      * Has the document been laid out yet?
      *
-     * This is not paranoia. The automatic scroll starts the instant the wall
-     * anchors the cue, and at that moment `scrollHeight` is still 0 — the wall
-     * has measured itself but the names below have not been laid out. A zero
-     * height makes the `atPageEnd` test below read `innerHeight >= -4`, i.e.
-     * "already at the foot of the page", so the loop concluded there was
-     * nowhere to scroll and focused the target without moving. The page sat at
-     * the top with focus mysteriously on the list.
+     * This is not paranoia. A click can race the wall measuring itself and the fonts
+     * settling, and the document grows by several hundred pixels underneath the
+     * animation. The scroll then lands short, or the browser's scroll anchoring
+     * cancels it outright and the page does not move at all — which is exactly the
+     * "click it as soon as it loads and nothing happens" case.
      *
-     * A document shorter than the viewport genuinely cannot scroll, so this
-     * doubles as the honest version of that check.
+     * A document shorter than the viewport genuinely cannot scroll.
      */
     const measured = () => document.documentElement.scrollHeight > window.innerHeight;
 
@@ -112,8 +107,7 @@ export function MemorialScrollCue({
       /*
        * Waiting for the document to exist is not a failed attempt. Counting it
        * as one burns the retry budget on the very churn the budget exists to
-       * ride out, which is how the automatic scroll gave up before the page had
-       * finished building. `waits` is its own, larger budget.
+       * ride out.
        */
       if (!measured()) {
         waits += 1;
@@ -180,50 +174,6 @@ export function MemorialScrollCue({
     event.preventDefault();
     scrollToTarget();
   };
-
-  /*
-   * Scroll automatically as soon as the cue is available.
-   *
-   * `MemorialWallAtmosphere` sets `data-anchored` on this element once it has
-   * measured the held message and moved the cue off its 60vh CSS fallback to
-   * its real resting place. That is the moment the cue is genuinely available,
-   * so that is when the page goes down to the list on the reader's behalf.
-   *
-   * The attribute may already be set before this effect runs (the packer
-   * measures synchronously on mount), so check first and only observe if it
-   * has not landed yet. `fired` makes this once-per-load: the packer rebuilds
-   * on every resize and re-sets the attribute each time, and a page that
-   * scrolls itself back down whenever the window changes size is a trap.
-   */
-  React.useEffect(() => {
-    const cue = cueRef.current;
-    if (!cue) {
-      return;
-    }
-
-    let fired = false;
-    const fire = () => {
-      if (fired) {
-        return;
-      }
-      fired = true;
-      scrollToTarget();
-    };
-
-    if (cue.dataset.anchored === 'true') {
-      fire();
-      return;
-    }
-
-    const observer = new MutationObserver(() => {
-      if (cue.dataset.anchored === 'true') {
-        observer.disconnect();
-        fire();
-      }
-    });
-    observer.observe(cue, { attributes: true, attributeFilter: ['data-anchored'] });
-    return () => observer.disconnect();
-  }, [scrollToTarget]);
 
   return (
     <a

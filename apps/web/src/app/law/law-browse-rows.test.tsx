@@ -128,6 +128,11 @@ test('every row renders citation, year, jurisdiction and a gloss', () => {
   assert.match(html, /Year unknown/);
   assert.match(html, /Unknown jurisdiction/);
   assert.match(html, /No plain-language summary yet\./);
+
+  assert.match(html, /ds-law-idx/);
+  assert.match(html, /ds-law-idx__citation/);
+  assert.match(html, /ds-law-idx__gloss/);
+  assert.doesNotMatch(html, /ds-room-idx__grade/);
 });
 
 test('the jurisdictional-not-documented sentence renders as visible body text', () => {
