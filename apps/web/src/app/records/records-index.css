@@ -11,7 +11,9 @@
    The room used to open on a panel of six labelled chip rows, which cost most of a screen before
    the first record. One line instead: a GET search field that takes the spare width, then one
    disclosure per facet. Both halves work with JavaScript off. */
+/* The tray below is positioned against this row, so it needs to be the containing block. */
 .ds-records-controls {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -113,8 +115,12 @@
 /* —— facets: one pill each, opening onto its own vocabulary ————————————————————
    A native `<details>`, so the menu is markup rather than a script: the pill states the group and
    the value currently narrowing it, and opening it lists the chips that change that value. */
+/*
+ * Deliberately not `position: relative`. The tray below spans the whole control row, so its
+ * containing block has to be `.ds-records-controls`; making the disclosure a containing block
+ * is what pinned each tray to its own 80px pill in the first place.
+ */
 .ds-records-facet {
-  position: relative;
   flex: none;
 }
 
@@ -153,29 +159,45 @@
   opacity: 0.6;
 }
 
-/* Over the list, not shoving it down: an open facet is a menu the reader is about to spend one
-   click in, and reflowing the whole index underneath it moves the rows they came to read. */
+/*
+ * One tray, the width of the control row, under all of the pills.
+ *
+ * It used to be six trays, each anchored to its own pill with `width: max-content` and a
+ * 28rem cap. A pill is about 80px wide and a vocabulary is not, so every tray ran far past its
+ * pill and straight across its neighbours. With the disclosures independent, all six could be
+ * open at once, and the row became a stack of half-legible panels with their labels cut off.
+ *
+ * Spanning the row fixes both halves. Nothing overlaps, because only one facet opens at a time
+ * now; nothing is clipped at the right edge, because the tray starts and ends where the controls
+ * do rather than where one pill happens to sit.
+ *
+ * Still over the list rather than shoving it down: an open facet is one click, and reflowing the
+ * index underneath would move the rows the reader came to read.
+ */
 .ds-records-facet__menu {
   position: absolute;
   z-index: var(--ds-z-atlas-pill);
   top: calc(100% + 6px);
   left: 0;
+  right: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  width: max-content;
-  max-width: min(28rem, 90vw);
   padding: var(--ds-space-3);
   background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
+  box-shadow: var(--ds-shadow-raised, 0 10px 28px rgb(0 0 0 / 35%));
 }
 
-@media (max-width: 40rem) {
-  .ds-records-facet__menu {
-    left: auto;
-    right: 0;
-  }
+/*
+ * The fallback for a browser without exclusive `<details>` (name=). There, more than one can be
+ * open, and without this the last one in the DOM would win on paint order alone. Raising the
+ * one the reader just opened is not possible in CSS, so they simply stack in a readable order
+ * instead of overlapping at the same depth.
+ */
+.ds-records-facet[open] .ds-records-facet__menu {
+  z-index: calc(var(--ds-z-atlas-pill) + 1);
 }
 
 /* One step tighter than a chip standing on its own: inside the panel there are six rows of them
