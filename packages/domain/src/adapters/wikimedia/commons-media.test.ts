@@ -7,6 +7,7 @@ import {
   buildAltText,
   buildCreditLine,
   chunkForWikimediaBatch,
+  commonsPinThumbnailUrl,
   evaluateCommonsMediaPropose,
   extractP18Candidates,
   isExactLabelMatch,
@@ -193,4 +194,38 @@ test('chunkForWikimediaBatch and summarize counts', () => {
   assert.equal(counts.auto_propose, 1);
   assert.equal(counts.no_qid, 1);
   assert.equal(counts.withQid, 1);
+});
+
+test('commonsPinThumbnailUrl builds a Special:FilePath URL at the given width', () => {
+  assert.equal(
+    commonsPinThumbnailUrl('File:Rosa Parks.jpg'),
+    'https://commons.wikimedia.org/wiki/Special:FilePath/File%3ARosa_Parks.jpg?width=960',
+  );
+  // Bare title (no File: prefix) is normalized the same way as commonsFilePageUrl.
+  assert.equal(
+    commonsPinThumbnailUrl('Rosa Parks.jpg', 400),
+    'https://commons.wikimedia.org/wiki/Special:FilePath/File%3ARosa_Parks.jpg?width=400',
+  );
+});
+
+test('commonsPinThumbnailUrl encodes spaces, parentheses, apostrophes, and non-ASCII', () => {
+  const url = commonsPinThumbnailUrl("File:O'Brien (mayor) — café.jpg");
+  // Must be a well-formed URL a browser <img src> can use as-is.
+  const parsed = new URL(url);
+  assert.equal(parsed.origin, 'https://commons.wikimedia.org');
+  assert.equal(parsed.searchParams.get('width'), '960');
+  assert.equal(
+    parsed.pathname,
+    "/wiki/Special:FilePath/File%3AO'Brien_(mayor)_%E2%80%94_caf%C3%A9.jpg",
+  );
+  // Round-trips back to the original (underscore-for-space) file title.
+  assert.equal(
+    decodeURIComponent(parsed.pathname.slice('/wiki/Special:FilePath/'.length)),
+    "File:O'Brien_(mayor)_—_café.jpg",
+  );
+});
+
+test('commonsPinThumbnailUrl rejects a non-positive width', () => {
+  assert.throws(() => commonsPinThumbnailUrl('File:Rosa Parks.jpg', 0));
+  assert.throws(() => commonsPinThumbnailUrl('File:Rosa Parks.jpg', -1));
 });

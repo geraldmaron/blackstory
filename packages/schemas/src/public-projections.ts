@@ -186,6 +186,20 @@ export const publicEntityProjectionSchema = z.object({
       width: z.number().int().positive().optional(),
       height: z.number().int().positive().optional(),
       objectPath: z.string().min(1).optional(),
+      /**
+       * Pin-and-serve fields (repo-4vuf / WS5): identify a source-hosted photo that is
+       * fetched by the reader's browser at view time rather than stored as an original.
+       * `sourceSystem` names where the pin resolves; `fileTitle`/`sha1` pin the exact
+       * upstream file version so a weekly imageinfo check can detect drift; `sourcePageUrl`
+       * is the human-readable attribution page; `license` is a short SPDX-ish id
+       * (e.g. 'CC-BY-SA-4.0', 'PD') distinct from the coarse `rightsStatus` bucket above.
+       */
+      sourceSystem: z.enum(['wikimedia_commons', 'nps', 'loc', 'public_media']).optional(),
+      fileTitle: z.string().min(1).optional(),
+      sha1: z.string().min(1).optional(),
+      sourcePageUrl: z.string().url().optional(),
+      license: z.string().min(1).optional(),
+      pinnedAt: z.string().min(1).optional(),
     })
     .optional(),
   related: z

@@ -17,7 +17,9 @@ export function securityHeadersForNextConfig() {
   const publicMedia = 'https://storage.googleapis.com https://twykhihqkcldpreuovay.supabase.co';
   // Article hero/inline imagery from public-domain archival collections (Wikimedia
   // Commons). Production should re-host into the Supabase media bucket.
-  const articleMedia = 'https://upload.wikimedia.org';
+  // commons.wikimedia.org (repo-4vuf, pin-and-serve): Special:FilePath 302s from here to
+  // upload.wikimedia.org — keep in sync with csp.ts ARTICLE_MEDIA_IMG_SRC.
+  const articleMedia = 'https://upload.wikimedia.org https://commons.wikimedia.org';
   // Open Library cover URLs redirect to archive.org / ia*.us.archive.org — allow each hop.
   const bookCovers = 'https://covers.openlibrary.org https://archive.org https://*.us.archive.org';
   const connectSrc = isDev

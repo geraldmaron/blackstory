@@ -42,6 +42,9 @@ export type LearningRelatedEdge = {
   };
 };
 
+export type PublicEntityPrimaryImageSourceSystem =
+  'wikimedia_commons' | 'nps' | 'loc' | 'public_media';
+
 export type PublicEntityPrimaryImage = {
   readonly url: string;
   readonly alt: string;
@@ -50,6 +53,15 @@ export type PublicEntityPrimaryImage = {
   readonly width?: number;
   readonly height?: number;
   readonly objectPath?: string;
+  /** Pin-and-serve fields (repo-4vuf): identifies a source-hosted photo fetched by the
+   * reader's browser at view time. See packages/schemas public-projections.ts primaryImage
+   * for the field-by-field rationale — kept identical here for the ops-data patch path. */
+  readonly sourceSystem?: PublicEntityPrimaryImageSourceSystem;
+  readonly fileTitle?: string;
+  readonly sha1?: string;
+  readonly sourcePageUrl?: string;
+  readonly license?: string;
+  readonly pinnedAt?: string;
 };
 
 export type RelatedNeighborStub = {

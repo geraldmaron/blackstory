@@ -88,6 +88,13 @@ export type PublicProjectionInput = {
     readonly width?: number;
     readonly height?: number;
     readonly objectPath?: string;
+    /** Pin-and-serve (repo-4vuf): see PublicEntityPrimaryImageView for field rationale. */
+    readonly sourceSystem?: 'wikimedia_commons' | 'nps' | 'loc' | 'public_media';
+    readonly fileTitle?: string;
+    readonly sha1?: string;
+    readonly sourcePageUrl?: string;
+    readonly license?: string;
+    readonly pinnedAt?: string;
   };
   readonly related?: readonly {
     readonly id: string;
@@ -289,6 +296,12 @@ function mapPrimaryImage(
     ...(image.width !== undefined ? { width: image.width } : {}),
     ...(image.height !== undefined ? { height: image.height } : {}),
     ...(image.objectPath !== undefined ? { objectPath: image.objectPath } : {}),
+    ...(image.sourceSystem !== undefined ? { sourceSystem: image.sourceSystem } : {}),
+    ...(image.fileTitle !== undefined ? { fileTitle: image.fileTitle } : {}),
+    ...(image.sha1 !== undefined ? { sha1: image.sha1 } : {}),
+    ...(image.sourcePageUrl !== undefined ? { sourcePageUrl: image.sourcePageUrl } : {}),
+    ...(image.license !== undefined ? { license: image.license } : {}),
+    ...(image.pinnedAt !== undefined ? { pinnedAt: image.pinnedAt } : {}),
   };
 }
 

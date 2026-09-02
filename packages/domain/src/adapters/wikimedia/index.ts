@@ -64,10 +64,12 @@ export { chunkBulkRecords, parseWikimediaBulkBatch } from './bulk.js';
 export {
   COMMONS_MEDIA_OUTCOMES,
   COMMONS_MEDIA_PROPOSE_VERSION,
+  COMMONS_PIN_THUMBNAIL_WIDTH,
   buildAltText,
   buildCreditLine,
   chunkForWikimediaBatch,
   commonsFilePageUrl,
+  commonsPinThumbnailUrl,
   enwikiTitleFromDisplayName,
   evaluateCommonsMediaPropose,
   extractP18Candidates,

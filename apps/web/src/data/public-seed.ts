@@ -95,6 +95,15 @@ export type PublicEntityPrimaryImageView = {
   readonly width?: number;
   readonly height?: number;
   readonly objectPath?: string;
+  /** Pin-and-serve (repo-4vuf): present when the photo is a pinned Wikimedia Commons (or
+   * similar source-system) thumbnail fetched by the reader's browser at view time, rather
+   * than a stored original. `sourcePageUrl`/`license` drive the mast's source-link line. */
+  readonly sourceSystem?: 'wikimedia_commons' | 'nps' | 'loc' | 'public_media';
+  readonly fileTitle?: string;
+  readonly sha1?: string;
+  readonly sourcePageUrl?: string;
+  readonly license?: string;
+  readonly pinnedAt?: string;
 };
 
 /** Shared event context for co-participation links (WS4 / event_participation junction). */

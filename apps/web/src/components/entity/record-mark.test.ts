@@ -12,6 +12,7 @@ import {
   primaryImageCreditCaption,
   primaryImageFocalClass,
   primaryImageRightsLabel,
+  primaryImageSourceLine,
   recordMarkAlt,
   recordMarkCaption,
   selectRecordMarkShape,
@@ -119,4 +120,38 @@ test('primaryImageFocalClass biases person portraits toward the upper frame', ()
   assert.equal(primaryImageFocalClass('person'), 'ds-entity-photo--focal-upper');
   assert.equal(primaryImageFocalClass('place'), 'ds-entity-photo--focal-center');
   assert.equal(primaryImageFocalClass(undefined), 'ds-entity-photo--focal-center');
+});
+
+test('primaryImageSourceLine builds a Wikimedia Commons source line with license', () => {
+  const line = primaryImageSourceLine({
+    sourceSystem: 'wikimedia_commons',
+    sourcePageUrl: 'https://commons.wikimedia.org/wiki/File:Rosa_Parks.jpg',
+    license: 'CC-BY-SA-4.0',
+  });
+  assert.deepEqual(line, {
+    label: 'Source: Wikimedia Commons · CC-BY-SA-4.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Rosa_Parks.jpg',
+  });
+});
+
+test('primaryImageSourceLine omits the license segment when absent', () => {
+  const line = primaryImageSourceLine({
+    sourceSystem: 'wikimedia_commons',
+    sourcePageUrl: 'https://commons.wikimedia.org/wiki/File:Rosa_Parks.jpg',
+  });
+  assert.equal(line?.label, 'Source: Wikimedia Commons');
+});
+
+test('primaryImageSourceLine is undefined for legacy images with no pin fields', () => {
+  assert.equal(primaryImageSourceLine({}), undefined);
+  assert.equal(
+    primaryImageSourceLine({ sourcePageUrl: 'https://example.org/x' }),
+    undefined,
+    'unrecognized/absent sourceSystem must not render a source link',
+  );
+  assert.equal(
+    primaryImageSourceLine({ sourceSystem: 'wikimedia_commons' }),
+    undefined,
+    'missing sourcePageUrl must not render a source link',
+  );
 });
