@@ -71,7 +71,7 @@ export function LocationResolutionPanel({ result }: LocationResolutionPanelProps
   const message =
     result.kind === 'rate_limited'
       ? RATE_LIMIT_MESSAGE
-      : result.kind === 'request_integrity_denied' || result.kind === 'app_check_denied'
+      : result.kind === 'request_integrity_denied'
         ? INTEGRITY_MESSAGE
         : result.kind === 'invalid_query'
           ? INVALID_QUERY_MESSAGE

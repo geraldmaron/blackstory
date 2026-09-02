@@ -52,8 +52,6 @@ export type LocateClientResult =
   | { readonly kind: 'fallback'; readonly fallback: LocateFallback }
   | { readonly kind: 'rate_limited'; readonly retryAfterSec?: number }
   | { readonly kind: 'request_integrity_denied' }
-  /** @deprecated alias — use `request_integrity_denied`; kept for transitional callers. */
-  | { readonly kind: 'app_check_denied' }
   | { readonly kind: 'invalid_query'; readonly reason: string }
   | { readonly kind: 'network_error' };
 

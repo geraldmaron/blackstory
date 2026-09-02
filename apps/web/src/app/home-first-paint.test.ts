@@ -15,7 +15,7 @@ import { isTulsaPlace, placeHref } from '../lib/place/public-place-path';
 import { buildEntityAnatomyInputs } from './entity/[id]/entity-anatomy-facts';
 import { HomeFirstPaint } from './HomeFirstPaint';
 import {
-  HOME_FEATURED_ENTITY_IDS,
+  HOME_STAND_CANDIDATE_IDS,
   isInternalRecordLabel,
   loadHomeFirstPaint,
   pickHomeStory,
@@ -39,7 +39,7 @@ function storyDoc(overrides: Partial<PublicArticleListItemDoc> = {}): PublicArti
 
 test('the featured set prefers non-Tulsa places; Greenwood is last-resort', () => {
   assert.deepEqual(
-    [...HOME_FEATURED_ENTITY_IDS],
+    [...HOME_STAND_CANDIDATE_IDS],
     [
       'ent_aarlcc_fort_lauderdale_001',
       'nrhp-black-heritage-91000107',
@@ -49,7 +49,7 @@ test('the featured set prefers non-Tulsa places; Greenwood is last-resort', () =
       'ent_greenwood_district_001',
     ],
   );
-  assert.equal(HOME_FEATURED_ENTITY_IDS.at(-1), 'ent_greenwood_district_001');
+  assert.equal(HOME_STAND_CANDIDATE_IDS.at(-1), 'ent_greenwood_district_001');
   assert.ok(FEATURED_SEED_IDS.includes('ent_dunbar_school_001'));
   assert.ok(FEATURED_SEED_IDS.includes('ent_15th_st_church_001'));
   assert.ok(getPublicEntity('ent_dunbar_school_001'));

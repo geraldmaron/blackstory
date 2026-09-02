@@ -8,7 +8,7 @@ export { LivingAtmosphereMosaic } from './LivingAtmosphereMosaic';
 export type { LivingAtmosphereMosaicProps, MosaicEntityLink } from './LivingAtmosphereMosaic';
 export { NamesMemorialWall } from './NamesMemorialWall';
 export type { NamesMemorialWallProps } from './NamesMemorialWall';
-export { AboutMosaicMast, AboutMosaicRail } from './AboutMosaicRail';
+export { AboutMosaicMast } from './AboutMosaicRail';
 export type { AboutMosaicMastProps } from './AboutMosaicRail';
 export {
   GEOMETRIC_FALLBACKS,

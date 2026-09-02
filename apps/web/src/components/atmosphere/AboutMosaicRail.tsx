@@ -64,6 +64,3 @@ export async function AboutMosaicMast({ children }: AboutMosaicMastProps) {
     </header>
   );
 }
-
-/** @deprecated Prefer AboutMosaicMast — kept as alias during the about redesign. */
-export const AboutMosaicRail = AboutMosaicMast;

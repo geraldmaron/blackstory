@@ -9,7 +9,6 @@ import {
   buildDensityColorMorphStates,
   DECADE_CROSSFADE_IN_TARGETS,
   DECADE_CROSSFADE_OUT_TARGETS,
-  DECADE_FADE_PAINT_TARGETS,
   DECADE_LAYER_FADE_MS,
   decadeCrossfadeOpacities,
   decadeLayerFadeDurationMs,
@@ -136,11 +135,6 @@ test('crossfade in targets mirror the pin stack only (density uses feature-state
     assert.match(target.layerId, /incoming/);
     assert.match(target.paintKey, /opacity/);
   }
-});
-
-test('deprecated DECADE_FADE_PAINT_TARGETS matches pin/edge out channels only', () => {
-  assert.equal(DECADE_FADE_PAINT_TARGETS.length, DECADE_CROSSFADE_OUT_TARGETS.length);
-  assert.ok(DECADE_FADE_PAINT_TARGETS.every((target) => !target.layerId.includes('incoming')));
 });
 
 test('isDecadeFadePaintChannel matches pin/edge dissolve channels only', () => {

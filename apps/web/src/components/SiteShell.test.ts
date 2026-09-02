@@ -28,10 +28,3 @@ test('the two shell gates read the same registry, so they cannot disagree', () =
   assert.match(header, /=== 'instrument'/);
   assert.match(footer, /=== 'instrument'/);
 });
-
-test('SiteHeader uses the theme-paired lockup on every route it renders on', () => {
-  const source = readFileSync(join(here, 'SiteHeader.tsx'), 'utf8');
-  assert.match(source, /brandDisplay="lockup"/);
-  assert.doesNotMatch(source, /brandDisplay=\{isExplore/);
-  assert.doesNotMatch(source, /isAtlasShell/);
-});

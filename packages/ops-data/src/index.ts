@@ -193,7 +193,6 @@ export {
   isResearchCampaignsKillSwitchEngagedIn,
   DISCOVERY_CATALOG_PROFILE_DEFAULT_MAX,
   resolutionProfileFromCatalogLeaf,
-  resolutionProfileFromPublicSearchIndex,
   publicSearchIndexDocFromRow,
   loadDiscoveryCatalogProfiles,
   createPublicSearchIndexCatalogPager,

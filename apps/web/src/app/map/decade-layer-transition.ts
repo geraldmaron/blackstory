@@ -111,12 +111,6 @@ export const DECADE_CROSSFADE_IN_TARGETS: readonly DecadeCrossfadePaintTarget[] 
   { layerId: EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID, paintKey: 'text-opacity', restOpacity: 1 },
 ];
 
-/** @deprecated Use DECADE_CROSSFADE_OUT_TARGETS — kept for call-site compatibility during migration. */
-export const DECADE_FADE_PAINT_TARGETS: readonly {
-  readonly layerId: string;
-  readonly paintKey: string;
-}[] = DECADE_CROSSFADE_OUT_TARGETS.map(({ layerId, paintKey }) => ({ layerId, paintKey }));
-
 const ALL_DECADE_MORPH_TARGETS = [
   ...DECADE_CROSSFADE_OUT_TARGETS,
   ...DECADE_CROSSFADE_IN_TARGETS,
@@ -130,9 +124,6 @@ const DECADE_CROSSFADE_CHANNEL_KEYS = new Set(
 export function isDecadeFadePaintChannel(layerId: string, paintKey: string): boolean {
   return DECADE_CROSSFADE_CHANNEL_KEYS.has(`${layerId}:${paintKey}`);
 }
-
-/** @deprecated Alias of isDecadeFadePaintChannel. */
-export const isDecadeCrossfadePaintChannel = isDecadeFadePaintChannel;
 
 /** True when a decade patch should run the dual-buffer crossfade (not first paint, not reduced motion). */
 export function shouldFadeDecadePatch(options: {
@@ -164,9 +155,6 @@ export function shouldMorphDecadeDataPatch(options: {
   if (options.historyEdgesToggled) return false;
   return shouldFadeDecadePatch(options);
 }
-
-/** @deprecated Alias of shouldFadeDecadePatch. */
-export const shouldCrossfadeDecadePatch = shouldFadeDecadePatch;
 
 /** MapLibre transition duration for decade crossfades; `0` under reduced motion (instant cut). */
 export function decadeLayerFadeDurationMs(reducedMotion: boolean): number {
@@ -313,9 +301,6 @@ export function setDecadeCrossfadeTransitions(map: MapLibreMap, durationMs: numb
   }
 }
 
-/** @deprecated Prefer setDecadeCrossfadeTransitions. */
-export const setDecadeFadeTransitions = setDecadeCrossfadeTransitions;
-
 /** Snap current buffer to resting opacities and incoming buffer to 0 (idle after promote). */
 export function setDecadeCrossfadeIdleOpacities(map: MapLibreMap): void {
   for (const target of DECADE_CROSSFADE_OUT_TARGETS) {
@@ -337,13 +322,6 @@ export function setDecadeMorphProgress(map: MapLibreMap, progress: number): void
     const { inOpacity } = decadeCrossfadeOpacities(t, target.restOpacity);
     setPaintSafe(map, target.layerId, target.paintKey, inOpacity);
   }
-}
-
-/**
- * @deprecated Prefer setDecadeMorphProgress via runDecadeMorphAnimation.
- */
-export function setDecadeCrossfadeDissolveOpacities(map: MapLibreMap): void {
-  setDecadeMorphProgress(map, 1);
 }
 
 export type DecadeMorphAnimationHandle = {
@@ -407,20 +385,6 @@ export function runDecadeMorphAnimation(options: {
   };
 }
 
-/**
- * @deprecated Global wipe — do not use for routine decade advances.
- */
-export function setDecadeFadeOpacities(map: MapLibreMap, opacity: number): void {
-  for (const target of DECADE_CROSSFADE_OUT_TARGETS) {
-    setPaintSafe(map, target.layerId, target.paintKey, opacity);
-  }
-}
-
-/** @deprecated Incoming uses setDecadeMorphProgress. */
-export function setDecadeFadeInLiterals(map: MapLibreMap): void {
-  setDecadeMorphProgress(map, 1);
-}
-
 /** Restores current-buffer paint channels from the rebuilt explore style (literals or expressions). */
 export function restoreDecadeFadePaintFromStyle(map: MapLibreMap, style: StyleSpecification): void {
   for (const target of DECADE_CROSSFADE_IN_TARGETS) {
@@ -440,15 +404,4 @@ export function restoreDecadeFadePaintFromStyle(map: MapLibreMap, style: StyleSp
     }
     setPaintSafe(map, target.layerId, target.paintKey, paintValue);
   }
-}
-
-/** @deprecated Density cover dissolve removed — use feature-state color lerp instead. */
-export const DECADE_DENSITY_COVER_TARGETS: readonly DecadeCrossfadePaintTarget[] = [];
-
-/** @deprecated Density cover dissolve removed — use feature-state color lerp instead. */
-export function decadeDensityCoverOpacities(
-  progress: number,
-  restOpacity: number,
-): { readonly outOpacity: number; readonly inOpacity: number } {
-  return { outOpacity: restOpacity, inOpacity: restOpacity * Math.min(1, Math.max(0, progress)) };
 }

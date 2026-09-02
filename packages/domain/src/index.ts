@@ -151,8 +151,6 @@ export type {
   SchoolName,
   SchoolCampus,
   SchoolCampusStatus,
-  /** @deprecated alias of SchoolMilestone see school.ts. */
-  SchoolStatusEntry,
   SchoolMilestone,
   SchoolFields,
 } from './school.js';

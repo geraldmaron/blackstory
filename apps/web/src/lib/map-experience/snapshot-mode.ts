@@ -10,8 +10,6 @@ export type ExploreDegradedReason =
   | 'refine_network_error'
   | 'refine_rate_limited'
   | 'refine_request_integrity_denied'
-  /** @deprecated alias — use `refine_request_integrity_denied`. */
-  | 'refine_app_check_denied'
   | 'refine_invalid_query'
   | 'map_canvas_unavailable';
 
@@ -32,8 +30,6 @@ export const DEGRADED_MODE_COPY: Readonly<Record<ExploreDegradedReason, string>>
     'Live refinement is unavailable right now. Showing the last-loaded snapshot.',
   refine_rate_limited: 'Refinement is temporarily rate-limited. Showing the last-loaded snapshot.',
   refine_request_integrity_denied:
-    'This browser could not be verified for live refinement. Showing the last-loaded snapshot.',
-  refine_app_check_denied:
     'This browser could not be verified for live refinement. Showing the last-loaded snapshot.',
   refine_invalid_query:
     'That filter combination could not be refined live. Showing the last-loaded snapshot.',

@@ -27,7 +27,6 @@ export type { KillSwitchDocSnapshot, DocGetter } from './kill-switch.js';
 export {
   DISCOVERY_CATALOG_PROFILE_DEFAULT_MAX,
   resolutionProfileFromCatalogLeaf,
-  resolutionProfileFromPublicSearchIndex,
   publicSearchIndexDocFromRow,
   loadDiscoveryCatalogProfiles,
   createPublicSearchIndexCatalogPager,

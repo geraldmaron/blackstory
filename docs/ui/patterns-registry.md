@@ -25,7 +25,7 @@ These carry no folder of their own. They are law about how routes, the shell and
 | Edition fact icon + record anatomy | [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md), [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) | `edition-fact-icon.ts`, `EditionFactIcon.tsx`, `edition-fact-icon.css`, `RecordAnatomyPanel.tsx`, `RecordPlacePreview.tsx`, `record-anatomy.css` | `EditionFactIcon`, `RecordAnatomyPanel`, `RecordPlacePreview`, icon helpers |
 | Visit handoff + public address | [`patterns-visit-handoff.md`](./patterns-visit-handoff.md) | `lib/geography/{public-address,visit-handoff,public-visit-contact,visit-advisory,external-maps-url}.ts`, `RecordVisitBlock.tsx`, `record-visit.css` | `RecordVisitBlock`, `resolvePublicAddressLine`, `buildVisitHandoff`, `resolvePublicVisitContact` |
 | Internet Archive handoff | [`patterns-internet-archive-handoff.md`](./patterns-internet-archive-handoff.md) | `lib/geography/internet-archive-sources.ts`, `RecordArchiveSources.tsx`, `RecordArchiveContribution.tsx`, `record-archive.css` | `RecordArchiveSources`, `resolveInternetArchiveSources`, `RecordArchiveContribution` |
-| Edition atmosphere (gutter mosaic) | [`design-direction-v6-home.md`](./design-direction-v6-home.md) §2 (superseded, kept for provenance) | `edition-atmosphere/*` | `EditionAtmosphereMosaic`, `computeScatteredMosaicLayout`, `editionAtmosphereCanvasClassName`, `edition-atmosphere-config` |
+| Edition atmosphere (grain + grid canvas) | [`design-direction-v6-home.md`](./design-direction-v6-home.md) §2 (superseded, kept for provenance) | `edition-atmosphere/*` | `editionAtmosphereCanvasClassName` only. The gutter mosaic (`EditionAtmosphereMosaic`, `computeScatteredMosaicLayout`, `edition-atmosphere-config`) was retired; page tests assert it is absent. |
 | Memorial wall | [`design-direction-v6-memorial.md`](./design-direction-v6-memorial.md) (superseded by v9 surfaces §4.2) | `memorial-wall/*` | `MemorialWallAtmosphere`, `packMemorialNames`, `MEMORIAL_NAMES` |
 | Utility edition (compact pages) | [`patterns-utility-edition.md`](./patterns-utility-edition.md) | `utility-edition/*` | `UtilityEditionShell`, `UtilityEditionIntro`, `UtilityEditionBodyPanel`, `UtilityEditionErrorView`, chrome helpers |
 | Map entity encoding | [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) | `kind-encoding.ts`, `marker-size.ts`, `explore-style.ts`, `MapExperienceLegend.tsx` | `kindFamilyFor`, `KIND_FAMILY_ENTRIES`, `displayEncodingFor`, legend Color key |
@@ -87,8 +87,7 @@ import '@/components/patterns/toast.css';
 import '@/components/patterns/empty-state.css';
 import '@/components/patterns/skeleton.css';
 
-// Edition atmosphere: grain + grid + gutter mosaic (import CSS once on the route)
-import { EditionAtmosphereMosaic } from '@/components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
+// Edition atmosphere: grain + grid canvas (import CSS once on the route)
 import { editionAtmosphereCanvasClassName } from '@/components/patterns/edition-atmosphere/edition-atmosphere-canvas';
 import '@/components/patterns/edition-atmosphere/edition-atmosphere.css';
 
@@ -127,10 +126,10 @@ Relative imports from `apps/web/src` use the paths above without the `@/` alias 
 | `/history` find-in-time | Explore decade scrubber classes, `HistoryRipRow`, `EditionFactIcon`, edition Surface panels |
 | `/chapters`, `/chapters/[slug]` | `ArticleBody`, `ArticleProse`, `ArticleReferences`, `MapInsetMoment`, `EraTimeline`, `DisputeBlock`, theme-impact charts, `articles-edition.css` |
 | `/chapters/mosaic-credits` | v6 stories edition chrome, local to that folder (`stories-edition.css`, `stories-panel-chrome.ts`) |
-| `/about` product thesis | `EditionAtmosphereMosaic`, edition Surface panels (`about-edition.css`) |
-| `/books` challenged titles | `EditionAtmosphereMosaic`, `BooksRipRow`, `EditionFactIcon`, `BooksCoverArt`, `RecordAnatomyPanel` (detail place), `books-edition.css` |
-| `/law`, `/data`, `/methodology`, `/memorial` | `EditionAtmosphereMosaic`, edition Surface panels |
-| `/entity/[id]` record detail | `EditionAtmosphereMosaic`, `RecordAnatomyPanel`, `EditionFactIcon`, `EntityMastMedia` fail-closed, session nav; `CinematicMapProvider`, `useCinematicMap`, `ExploreMapControl`, `CinematicMapClose`, `CinematicScrim` around the place-context locator map (`EntityLocationCinematicMap`, Rest → Engaged, no Invite) |
+| `/about` product thesis | edition Surface panels (`about-edition.css`) |
+| `/books` challenged titles | `BooksRipRow`, `EditionFactIcon`, `BooksCoverArt`, `RecordAnatomyPanel` (detail place), `books-edition.css` |
+| `/law`, `/data`, `/methodology`, `/memorial` | edition Surface panels |
+| `/entity/[id]` record detail | `RecordAnatomyPanel`, `EditionFactIcon`, `EntityMastMedia` fail-closed, session nav; `CinematicMapProvider`, `useCinematicMap`, `ExploreMapControl`, `CinematicMapClose`, `CinematicScrim` around the place-context locator map (`EntityLocationCinematicMap`, Rest → Engaged, no Invite) |
 | `/locate`, `/submit`, `/corrections`, `/corrections/status/[receiptCode]`, 404, error | `UtilityEditionShell`, `UtilityEditionIntro`, `UtilityEditionBodyPanel`, `UtilityEditionErrorView` |
 | `/search` | Redirect only, to `/history`, per the `next.config.mjs` rule |
 
@@ -148,7 +147,6 @@ Shared fail-closed patterns. Never render broken decorative or record media.
 |---|---|---|
 | Entity mast photo | `EntityMastMedia.tsx` | URL candidate chain, then `EntityRecordMark` on exhaustion; Save-Data prefers the mark |
 | Story/atmosphere mosaic | `AtmospherePlane.tsx`, `LivingAtmosphereMosaic.tsx` | `onError` hides the mosaic; the geometric plate remains |
-| Edition gutter mosaic | `EditionAtmosphereMosaic.tsx` | Per-tile `onError` removes failed paths; the grain and grid canvas remains |
 | Kind / confidence badges | `KindBadge.tsx`, `ConfidenceMark.tsx`, `EditionFactIcon.tsx` | `iconWithFallback()` to `faCircle`; label text always visible (WCAG 1.4.1) |
 | Bare embeds | `EntityPrimaryImage.tsx` | No fallback; callers must use `EntityMastMedia` or own the policy |
 | Framed map plate | see [`patterns-plate-posture.md`](./patterns-plate-posture.md) §6 | A slot with no plate keeps its caption and states that the map is unavailable; never a blank rectangle |
