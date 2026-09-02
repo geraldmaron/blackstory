@@ -55,6 +55,39 @@ const geoPointSchema = z.object({
   precisionReductionReason: z.string().min(1).optional(),
 });
 
+/**
+ * A reader-facing "go visit this place" contract (repo-el9p / WS3). Optional/additive: absent
+ * on records that predate the release builder wiring this up, or that have nothing publishable
+ * once `publicVisitForTier` (packages/domain/src/geography/visit.ts) gates it against location
+ * precision, entity kind, and living status.
+ */
+const publicVisitAddressSchema = z.object({
+  street: z.string().min(1).optional(),
+  city: z.string().min(1).optional(),
+  state: z.string().min(1).optional(),
+  postalCode: z.string().min(1).optional(),
+  /** Pre-composed single-line address, when the source material only offers one string. */
+  line: z.string().min(1).optional(),
+});
+
+const publicVisitPhoneSchema = z.object({
+  e164: z.string().min(1),
+  display: z.string().min(1),
+});
+
+const publicVisitSchema = z.object({
+  address: publicVisitAddressSchema.optional(),
+  phone: publicVisitPhoneSchema.optional(),
+  website: z.string().url().optional(),
+  hours: z.string().min(1).optional(),
+  visitability: z
+    .enum(['open_to_public', 'exterior_only', 'private', 'demolished', 'unknown'])
+    .optional(),
+  /** Claim ids or evidence ids the visit fields rest on. */
+  sources: z.array(z.string().min(1)).optional(),
+});
+export type PublicVisitDoc = z.infer<typeof publicVisitSchema>;
+
 const statusHistoryEntrySchema = z.object({
   status: z.string().min(1),
   validFrom: z.string().optional(),
@@ -153,6 +186,7 @@ export const publicEntityProjectionSchema = z.object({
    */
   summary: z.string().min(120).max(5000),
   location: geoPointSchema.optional(),
+  visit: publicVisitSchema.optional(),
   claimIds: z.array(z.string()).default([]),
   claims: z.array(publicClaimProjectionSchema).optional(),
   jurisdictionLabel: z.string().min(1).optional(),

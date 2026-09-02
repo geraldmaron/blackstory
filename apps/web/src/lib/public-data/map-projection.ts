@@ -15,7 +15,7 @@ import {
 import { sanitizePublicProseText } from '@repo/domain/editorial';
 import { isDatePrecision, resolveEraBucketsFromEvidence } from '@repo/domain/era';
 import { findUsStateForPoint, isDisplayableJurisdictionLabel } from '@repo/domain/map/geography';
-import { type PublicEntityView } from '../../data/public-seed';
+import { type PublicEntityView, type PublicVisitView } from '../../data/public-seed';
 
 /**
  * Narrow projection shape used by the web mapper so rendering remains storage-independent.
@@ -39,6 +39,8 @@ export type PublicProjectionInput = {
    * absent on bootstrap-window stubs — mapper derives state name from `location` when present. */
   readonly jurisdictionLabel?: string;
   readonly locationLabel?: string;
+  /** Release-shipped visit contract (repo-el9p WS3), already gated by `publicVisitForTier`. */
+  readonly visit?: PublicVisitView;
   /** Accepted public claims with citations. Non-numeric by standing policy: the projection
    * carries `confidenceLevel` (the display register), never a raw confidence score. */
   readonly claims?: readonly {
@@ -375,6 +377,7 @@ export function mapProjectionToPublicEntityView(
     jurisdictionLabel: resolveJurisdictionLabel(projection),
     locationPrecision: locationPrecisionFromProjection(projection.location?.precision),
     locationLabel: projection.locationLabel ?? projection.displayName,
+    ...(projection.visit !== undefined ? { visit: projection.visit } : {}),
     relevanceExplanation:
       claims.length > 0
         ? 'Included as a documented site in the active public release; each accepted claim below cites its source.'

@@ -531,6 +531,18 @@ export type {
   PlaceFields,
 } from './geography/location.js';
 
+export {
+  PUBLIC_VISITABILITY_VALUES,
+  isPublicVisitability,
+  publicVisitForTier,
+} from './geography/visit.js';
+export type {
+  PublicVisitAddress,
+  PublicVisitPhone,
+  PublicVisitability,
+  PublicVisit,
+} from './geography/visit.js';
+
 // HOLC-polygon -> modern-tract crosswalk schema (repo-xez5.7). No rows populated
 // yet — see geography/holc-tract-crosswalk.ts module doc for the GIS-tooling blocker.
 export {

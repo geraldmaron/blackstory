@@ -842,3 +842,99 @@ test('person projection carries livingStatus and statusProvenance from heuristic
   assert.equal(result.projection.status, 'deceased');
   assert.equal(result.projection.statusProvenance, 'derived_heuristic');
 });
+
+test('buildReleaseEntityArtifacts emits projection.visit gated through publicVisitForTier', () => {
+  const entry = baseEntry({
+    kind: 'place',
+    locationPrecision: 'address',
+    visit: {
+      address: {
+        street: '1530 6th Avenue North',
+        city: 'Birmingham',
+        state: 'AL',
+        line: '1530 6th Avenue North, Birmingham, AL',
+      },
+      phone: { e164: '+12053281000', display: '(205) 328-1000' },
+      website: 'https://example.org',
+      hours: 'Tue–Sat 10am–5pm',
+      visitability: 'open_to_public',
+      sources: ['claim-visit-1'],
+    },
+  });
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.visit?.address?.street, '1530 6th Avenue North');
+  assert.equal(result.projection.visit?.phone?.e164, '+12053281000');
+  assert.equal(result.projection.visit?.website, 'https://example.org');
+  assert.deepEqual(result.projection.visit?.sources, ['claim-visit-1']);
+});
+
+test('buildReleaseEntityArtifacts omits street/line from projection.visit at coarser precision', () => {
+  const entry = baseEntry({
+    kind: 'place',
+    locationPrecision: 'institution',
+    visit: {
+      address: { street: '1530 6th Avenue North', city: 'Birmingham' },
+      visitability: 'open_to_public',
+    },
+  });
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.visit?.address?.street, undefined);
+  assert.equal(result.projection.visit?.address?.city, 'Birmingham');
+});
+
+test('buildReleaseEntityArtifacts omits phone/website from projection.visit when livingStatus is living', () => {
+  // Institution kind avoids the person-only precision-ceiling gate in
+  // resolveReleaseEntityReferences, isolating the phone/website living-status gate under test.
+  const entry = baseEntry({
+    kind: 'institution',
+    locationPrecision: 'address',
+    livingStatus: 'living',
+    visit: {
+      phone: { e164: '+12055551234', display: '(205) 555-1234' },
+      website: 'https://example.org',
+      visitability: 'open_to_public',
+    },
+  });
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.visit?.phone, undefined);
+  assert.equal(result.projection.visit?.website, undefined);
+});
+
+test('buildReleaseEntityArtifacts context.visitOverride wins over entry.visit', () => {
+  const entry = baseEntry({
+    kind: 'place',
+    locationPrecision: 'address',
+    visit: {
+      address: { street: 'Entry Street' },
+      visitability: 'open_to_public',
+    },
+  });
+  const result = buildReleaseEntityArtifacts(entry, {
+    ...CONTEXT,
+    visitOverride: {
+      address: { street: 'Canonical Street' },
+      visitability: 'open_to_public',
+    },
+  });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.visit?.address?.street, 'Canonical Street');
+});
+
+test('buildReleaseEntityArtifacts omits projection.visit entirely when nothing survives gating', () => {
+  const entry = baseEntry({
+    kind: 'place',
+    locationPrecision: 'institution',
+    visit: { address: { street: 'Only A Street' } },
+  });
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.visit, undefined);
+});
