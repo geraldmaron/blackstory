@@ -91,7 +91,27 @@ test('the percentage form is the canvas position, so CSS and the mask share one 
   const point = projectAlbersUsa(-77.04, 38.91);
   const percent = locatorPinPercent(-77.04, 38.91);
   assert.ok(point && percent);
-  assert.equal(percent.x, (point.x / US_LOCATOR_WIDTH) * 100);
-  assert.equal(percent.y, (point.y / US_LOCATOR_HEIGHT) * 100);
+  const rawX = (point.x / US_LOCATOR_WIDTH) * 100;
+  const rawY = (point.y / US_LOCATOR_HEIGHT) * 100;
+  assert.equal(percent.x, Math.round(rawX * 10000) / 10000);
+  assert.equal(percent.y, Math.round(rawY * 10000) / 10000);
   assert.equal(locatorPinPercent(-10.8, 6.3), null);
+});
+
+test('pin percentages round to four decimal places for hydration parity', () => {
+  const cases: readonly [number, number][] = [
+    [-77.04, 38.91],
+    [-122.33, 47.61],
+    [-149.9, 61.22],
+  ];
+  for (const [lng, lat] of cases) {
+    const percent = locatorPinPercent(lng, lat);
+    assert.ok(percent, `${lng},${lat} must project`);
+    for (const axis of [percent.x, percent.y] as const) {
+      const rounded = Math.round(axis * 10000) / 10000;
+      assert.equal(axis, rounded, `${lng},${lat} axis must have at most four decimal places`);
+      // FirstPaintPinPlate uses toFixed(4) so SSR and client style strings match.
+      assert.match(`${axis.toFixed(4)}%`, /^\d+\.\d{4}%$/);
+    }
+  }
 });

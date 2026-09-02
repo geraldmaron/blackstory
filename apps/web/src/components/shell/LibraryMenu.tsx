@@ -1,15 +1,10 @@
 /**
- * The Library menu — the archive's rooms, in the bar rather than behind ⌘K.
+ * The one room menu. Same groups as `/about`. Atlas, Explore, Records,
+ * Journey, and Banned books stay off it. `/library` is a room, not this control.
  *
- * v9 emptied the bar down to two modes and moved every destination into the palette. That was
- * right about the fourteen-item menu and wrong about the consequence: a first-time reader has no
- * reason to press ⌘K, so eleven editorial rooms were reachable only by finding the Library link
- * and then reading a second page. This is the middle position — one control in the bar that opens
- * the same list the library hub renders, from the same registry, so the two can never drift.
- *
- * A native `<details>`, not a scripted popover: the bar is rendered on every route including ones
- * that have not hydrated, and a menu that needs JavaScript to open is a menu that sometimes is not
- * there. `/library` itself stays a real link inside the panel, so the hub keeps its crawl path.
+ * A native `<details>`, not a scripted popover: the bar is rendered on every
+ * route including ones that have not hydrated, and a menu that needs JavaScript
+ * to open is a menu that sometimes is not there.
  */
 
 'use client';
@@ -19,27 +14,13 @@ import Link from 'next/link';
 import {
   GROUP_HEADINGS,
   LIBRARY_CARD_GROUPS,
-  cardTitleFor,
-  destinationFor,
   destinationsInGroup,
 } from '../../lib/nav/destination-registry';
 import './library-menu.css';
 
 void React;
 
-/** The two ways into the records themselves, held out of the room lists as the panel's own column. */
-const DIRECT_PATHS = ['/', '/records'] as const;
-
-export type LibraryMenuProps = {
-  /** Rendered on the "All records" card when the surface knows the count. */
-  readonly recordCount?: number | undefined;
-};
-
-export function LibraryMenu({ recordCount }: LibraryMenuProps) {
-  const direct = DIRECT_PATHS.map((path) => destinationFor(path)).filter(
-    (destination): destination is NonNullable<typeof destination> => destination !== undefined,
-  );
-
+export function LibraryMenu() {
   /**
    * `<details>` has no notion of "selecting an option" — a click on a `Link` inside it navigates
    * and leaves the panel exactly as open as it was, so the reader lands on the destination page
@@ -55,7 +36,7 @@ export function LibraryMenu({ recordCount }: LibraryMenuProps) {
   return (
     <details className="ds-libmenu" ref={detailsRef}>
       <summary className="ds-libmenu__trigger">
-        Library
+        Rooms
         <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true">
           <path
             d="M2.5 4.5 6 8l3.5-3.5"
@@ -81,43 +62,13 @@ export function LibraryMenu({ recordCount }: LibraryMenuProps) {
                     prefetch={false}
                     onClick={closeMenu}
                   >
-                    {cardTitleFor(destination)}
+                    {destination.label}
                     {destination.menuLine ? <small>{destination.menuLine}</small> : null}
                   </Link>
                 ))}
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="ds-libmenu__direct">
-          <span className="ds-libmenu__grouphd">Straight to the records</span>
-          {direct.map((destination) => (
-            <Link
-              className="ds-libmenu__card"
-              href={destination.path}
-              key={destination.path}
-              prefetch={false}
-              onClick={closeMenu}
-            >
-              <span className="ds-libmenu__card-kind">
-                {destination.path === '/' ? 'Map' : 'Index'}
-              </span>
-              <span className="ds-libmenu__card-title">
-                {destination.path === '/records' && recordCount !== undefined
-                  ? `All ${recordCount.toLocaleString('en-US')} records`
-                  : cardTitleFor(destination)}
-              </span>
-              <span className="ds-libmenu__card-desc">{destination.description}</span>
-            </Link>
-          ))}
-          <p className="ds-libmenu__foot">
-            Everything here is also reachable from{' '}
-            <Link href="/library" prefetch={false} onClick={closeMenu}>
-              the library
-            </Link>
-            .
-          </p>
         </div>
       </div>
     </details>

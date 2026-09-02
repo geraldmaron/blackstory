@@ -8,7 +8,31 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { handleMaintenance } from './lib/maintenance/maintenance-gate';
+import { denyExpensiveAiCrawler } from './lib/traffic-class/edge-deny';
 import { handleWebSecurity } from './lib/web-security/edge-security';
+import { STAND_COOKIE, isPublicPlaceSlug } from './lib/place/public-place-path';
+
+function standSlugFromRequest(request: NextRequest): string | undefined {
+  const at = request.nextUrl.searchParams.get('at');
+  if (at && isPublicPlaceSlug(at)) return at;
+  if (request.nextUrl.pathname.startsWith('/place/')) {
+    const slug = request.nextUrl.pathname.slice('/place/'.length).split('/')[0] ?? '';
+    if (isPublicPlaceSlug(slug)) return slug;
+  }
+  return undefined;
+}
+
+function attachStandCookie(request: NextRequest, response: NextResponse): NextResponse {
+  const slug = standSlugFromRequest(request);
+  if (!slug) return response;
+  response.cookies.set(STAND_COOKIE, slug, {
+    path: '/',
+    maxAge: 60 * 60 * 24 * 30,
+    sameSite: 'lax',
+    httpOnly: true,
+  });
+  return response;
+}
 
 export function proxy(request: NextRequest) {
   // First, always. A walled request must not reach a route, a React render, or `bb_public`.
@@ -17,13 +41,18 @@ export function proxy(request: NextRequest) {
     return maintenanceResponse;
   }
 
-  // Outside the security/normalization surface this is a bare pass-through, which is what these
-  // paths got before the matcher was widened for maintenance mode. See `config` below.
-  if (!isSecurityNormalizedPath(request.nextUrl.pathname)) {
-    return NextResponse.next();
+  const aiDeny = denyExpensiveAiCrawler(request);
+  if (aiDeny !== null) {
+    return aiDeny;
   }
 
-  return handleWebSecurity(request);
+  // Outside the security/normalization surface this is a bare pass-through, which is what these
+  // paths got before the matcher was widened for maintenance mode. See `config` below.
+  const response = isSecurityNormalizedPath(request.nextUrl.pathname)
+    ? handleWebSecurity(request)
+    : NextResponse.next();
+
+  return attachStandCookie(request, response);
 }
 
 /**
@@ -47,12 +76,18 @@ export function proxy(request: NextRequest) {
  * outright — so the fold cost two hops and lost the decade on the way. `/search` stays matched:
  * it carries a free-text `q` that has to be sanitised before it is echoed anywhere.
  *
- * `/explore` is out because it stopped rendering: it 308s to `/`, which is the Atlas and is
- * matched here. Normalising a path on its way to a redirect only buys a second hop.
+ * `/explore` is the Atlas instrument (not a redirect to `/`). It keeps its facet allowlist.
+ * `/` is the Door and has an empty allowlist, so leftover Atlas params 308 away instead of
+ * fragmenting the Cloudflare HTML cache. `/atlas/catalog` and `/sitemap.xml` take no query:
+ * cache-busting `?x=` 308s to the bare path. Search/refine/geocode APIs stay out so their
+ * contracts are not stripped.
  */
 const SECURITY_NORMALIZED_EXACT = new Set([
   '/',
   '/search',
+  '/explore',
+  '/atlas/catalog',
+  '/sitemap.xml',
   '/law',
   '/legal',
   '/errata',
@@ -65,6 +100,7 @@ const SECURITY_NORMALIZED_EXACT = new Set([
 
 /** Prefix forms of the `:path*` segments in the original matcher. */
 const SECURITY_NORMALIZED_PREFIXES = [
+  '/place/',
   '/entity/',
   '/law/',
   '/legal/',

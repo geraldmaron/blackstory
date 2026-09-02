@@ -7,6 +7,8 @@
  *
  * - `AtlasShellModel` is what `/` renders into its HTML: the parsed view state and the small
  *   request-scoped derivations (facets, counts, density levels). Tens of KB.
+ * - The pin feature collection also rides the page (`AtlasLoader` `pins`). That is first paint.
+ *   It is not the 15 MB catalog.
  * - `AtlasCatalogPayload` is the release-wide half (every feature, the history edge catalog, the
  *   cites edge), identical for every reader. It is NOT in the page; `GET /atlas/catalog` serves it
  *   with a CDN `Cache-Control` and the client fetches it once. See `atlas-catalog.ts`.
@@ -20,7 +22,10 @@
  * enough. The client rebuilds them with `hydrateExploreViewModel`.
  */
 import { applyExploreFilters } from '../../lib/map-experience';
-import type { ExploreMapSource } from '../../lib/map-experience/build-explore-map-source';
+import type {
+  ExploreMapFeatureCollection,
+  ExploreMapSource,
+} from '../../lib/map-experience/build-explore-map-source';
 import type { PublicReadSource } from '../../lib/public-data/source';
 import type { CitesEdgeIndex } from '../../lib/release/build-cites-edge';
 import { pickExploreEdgeSlice, type ExploreEdgeLineCatalog } from './explore-edge-catalog';
@@ -28,6 +33,49 @@ import type { ExploreViewModel } from './explore-view-model';
 
 /** Where the client fetches the catalog from. One path, one cache key. */
 export const ATLAS_CATALOG_PATH = '/atlas/catalog';
+
+const EMPTY_EDGE_CATALOG: ExploreEdgeLineCatalog = {
+  allTime: { edges: [], lineCollection: { type: 'FeatureCollection', features: [] } },
+  byDecade: {},
+};
+
+/**
+ * Pin collection already on the page, shaped as a catalog so `AtlasExperience` can
+ * paint the plate before `GET /atlas/catalog` arrives. No history edges, no cites:
+ * those stay on the cached catalog route. Do not use this as `lastCatalog`.
+ */
+export function firstPaintCatalog(
+  pins: ExploreMapFeatureCollection,
+  dataSource: PublicReadSource,
+): AtlasCatalogPayload {
+  const generatedAt = new Date(0).toISOString();
+  return {
+    schemaVersion: 1,
+    releaseId: 'first-paint',
+    generatedAt,
+    dataSource,
+    source: {
+      schemaVersion: 1,
+      releaseId: 'first-paint',
+      generatedAt,
+      featureCollection: pins,
+      stateAggregates: [],
+      countyAggregates: [],
+      jurisdictionAreaFeatures: [],
+      meta: {
+        totalEntities: pins.features.length,
+        totalWithLocation: pins.features.length,
+        totalFeatures: pins.features.length,
+        skippedNoLocation: 0,
+        skippedRedactedToNothing: 0,
+        skippedOutsideUsBounds: 0,
+      },
+    },
+    edgeLineCatalog: EMPTY_EDGE_CATALOG,
+    availableDecades: [],
+    citesEdge: {},
+  };
+}
 
 export type SerializableExploreViewModel = Omit<
   ExploreViewModel,

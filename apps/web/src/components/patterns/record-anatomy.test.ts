@@ -79,7 +79,7 @@ test('renders inline fact rows without legacy column strip classes', () => {
   assert.match(html, /not an exact address/);
   assert.match(
     html,
-    /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=38\.9098%2C-77\.0143"/,
+    /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=Washington%2C%20D.C.%20%40%2038\.9098%2C-77\.0143"/,
   );
   assert.match(html, /aria-label="Open Washington, D\.C\. in maps"/);
   // Exactly one route out to maps, on the WHERE fact. The place figure used to carry a second
@@ -90,6 +90,50 @@ test('renders inline fact rows without legacy column strip classes', () => {
   assert.match(html, /target="_blank"/);
   assert.doesNotMatch(html, /ds-nc__facts-strip/);
   assert.doesNotMatch(html, /ds-home-edition__record-facts/);
+});
+
+test('Where is not a maps link when the caller already owns Visit handoff', () => {
+  const html = renderToStaticMarkup(
+    createElement(RecordAnatomyPanel, {
+      facts: [
+        {
+          key: 'kind',
+          label: 'Kind',
+          value: 'Place',
+          icon: { variant: 'record-kind', kind: 'place' },
+        },
+        {
+          key: 'where',
+          label: 'Where',
+          value: 'Washington, D.C.',
+          icon: { variant: 'record-where' },
+        },
+        {
+          key: 'era',
+          label: 'Era',
+          value: '1920s',
+          icon: { variant: 'record-era' },
+        },
+        {
+          key: 'evidence',
+          label: 'Evidence',
+          value: 'Grade A · 2 sources',
+          icon: { variant: 'record-evidence', tier: 'high' },
+        },
+      ],
+      place: {
+        lat: 38.9098,
+        lng: -77.0143,
+        label: 'Washington, D.C.',
+        precision: 'city',
+      },
+      linkWhereToMaps: false,
+    }),
+  );
+
+  assert.match(html, />Where</);
+  assert.match(html, /Washington, D\.C\./);
+  assert.equal((html.match(/ds-maps-external-link/g) ?? []).length, 0);
 });
 
 test('renders empty place state when coordinates are unavailable', () => {

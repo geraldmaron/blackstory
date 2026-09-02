@@ -19,11 +19,13 @@ import {
   listPublicSearchIndexDocs,
   type PostgresQueryFn,
 } from './postgres-readers.js';
+import { hydrateEntityV1Neighbors } from './hydrate-entity-neighbors.js';
 import { queryPostgres } from './postgres-client.js';
 import {
   loadEntityProjectionsFromArtifact,
   loadSearchIndexDocsFromArtifact,
 } from './release-artifact-catalogs.js';
+import { createSingleFlight } from './single-flight.js';
 
 export function mapPublicSearchProjection(doc: PublicSearchProjectionDoc): PublicSearchIndexDoc {
   const notabilityBasis: readonly NotabilityBasisRecord[] = (doc.notabilityBasis ?? []).map(
@@ -54,6 +56,8 @@ export function mapPublicSearchProjection(doc: PublicSearchProjectionDoc): Publi
     researchCoverage: doc.researchCoverage,
     relatedCount: doc.relatedCount,
     claimCount: doc.claimCount,
+    ...(doc.confidenceTier !== undefined ? { confidenceTier: doc.confidenceTier } : {}),
+    ...(doc.geohash !== undefined ? { geohash: doc.geohash } : {}),
   };
 }
 
@@ -77,6 +81,19 @@ const ENTITY_PROJECTIONS_CACHE_TTL_MS = 30 * 60 * 1000;
 const MAX_CACHED_RELEASES = 4;
 /** Active-release pointer reads were per-request; a short window keeps activation prompt. */
 const ACTIVE_RELEASE_POINTER_TTL_MS = 30_000;
+
+/** True when enough search docs carry confidenceTier (post-backfill / republished artifact). */
+function searchIndexHasConfidenceCoverage(
+  docs: readonly PublicSearchProjectionDoc[],
+  minCoverage = 0.95,
+): boolean {
+  if (docs.length === 0) return false;
+  let withTier = 0;
+  for (const doc of docs) {
+    if (doc.confidenceTier !== undefined) withTier += 1;
+  }
+  return withTier / docs.length >= minCoverage;
+}
 
 type EntityProjectionsList = Awaited<ReturnType<typeof listPublicEntityProjections>>;
 type SearchIndexList = Awaited<ReturnType<typeof listPublicSearchIndexDocs>>;
@@ -118,6 +135,7 @@ export function createPostgresDataAccessReaders(
   >();
   let activeReleaseMemo:
     { readonly value: ActiveReleaseResult; readonly expiresAtMs: number } | undefined;
+  const singleFlight = createSingleFlight();
 
   function readReleaseCache<Value>(
     cache: Map<string, { readonly value: Value; readonly expiresAtMs: number }>,
@@ -143,23 +161,42 @@ export function createPostgresDataAccessReaders(
   ): Promise<EntityProjectionsList> {
     const hit = readReleaseCache(projectionsCache, releaseId);
     if (hit) return hit;
-    // CDN artifact first so a cold start does not pull the whole catalog out of Postgres;
-    // `undefined` (unconfigured origin, miss, or release mismatch) falls through to the SoR.
-    const value =
-      (await loadEntityProjectionsFromArtifact(releaseId)) ??
-      (await listPublicEntityProjections(releaseId, runQuery));
-    writeReleaseCache(projectionsCache, releaseId, value);
-    return value;
+    return singleFlight(`entities:${releaseId}`, async () => {
+      const raced = readReleaseCache(projectionsCache, releaseId);
+      if (raced) return raced;
+      // CDN artifact first so a cold start does not pull the whole catalog out of Postgres;
+      // `undefined` (unconfigured origin, miss, or release mismatch) falls through to the SoR.
+      const value =
+        (await loadEntityProjectionsFromArtifact(releaseId)) ??
+        (await listPublicEntityProjections(releaseId, runQuery));
+      writeReleaseCache(projectionsCache, releaseId, value);
+      return value;
+    });
   }
 
   async function listPublicSearchIndexDocsCached(releaseId: string): Promise<SearchIndexList> {
     const hit = readReleaseCache(searchIndexCache, releaseId);
     if (hit) return hit;
-    const value =
-      (await loadSearchIndexDocsFromArtifact(releaseId)) ??
-      (await listPublicSearchIndexDocs(releaseId, runQuery));
-    writeReleaseCache(searchIndexCache, releaseId, value);
-    return value;
+    return singleFlight(`search-index:${releaseId}`, async () => {
+      const raced = readReleaseCache(searchIndexCache, releaseId);
+      if (raced) return raced;
+
+      const fromArtifact = await loadSearchIndexDocsFromArtifact(releaseId);
+      if (fromArtifact && searchIndexHasConfidenceCoverage(fromArtifact)) {
+        writeReleaseCache(searchIndexCache, releaseId, fromArtifact);
+        return fromArtifact;
+      }
+      if (fromArtifact && fromArtifact.length > 0) {
+        console.warn(
+          `[api-public] search-index artifact missing confidenceTier coverage; preferring Postgres for ${releaseId}`,
+        );
+      }
+
+      const fromSql = await listPublicSearchIndexDocs(releaseId, runQuery);
+      const value = fromSql.length > 0 ? fromSql : (fromArtifact ?? []);
+      writeReleaseCache(searchIndexCache, releaseId, value);
+      return value;
+    });
   }
 
   async function fetchActiveReleaseMemoized(): Promise<ActiveReleaseResult> {
@@ -184,7 +221,9 @@ export function createPostgresDataAccessReaders(
     async readEntity(releaseId, entityId): Promise<EntityV1 | undefined> {
       const projection = await fetchPublicEntityProjection(releaseId, entityId, runQuery);
       if (!projection) return undefined;
-      return mapProjectionToEntityV1(projection);
+      const mapped = mapProjectionToEntityV1(projection);
+      if (!mapped) return undefined;
+      return hydrateEntityV1Neighbors(mapped, releaseId, runQuery);
     },
 
     async readEntities(releaseId): Promise<readonly EntityV1[]> {

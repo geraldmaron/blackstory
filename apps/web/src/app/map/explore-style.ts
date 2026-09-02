@@ -39,6 +39,15 @@ import {
   MAP_SEMANTIC_TONE_ENCODING,
 } from '../../lib/map-experience/kind-encoding';
 import {
+  blendFirstPaintWithKindExpression,
+  firstPaintOrKindRadiusExpression,
+  firstPaintOrKindStrokeWidthExpression,
+  firstPaintPointColorExpression,
+  firstPaintPointOpacityExpression,
+  EXPLORE_GL_ENTITY_MAX_ZOOM,
+  literalPaintNumber,
+} from '../../lib/map-experience/first-paint-map-paint';
+import {
   markerHaloRadiusExpression,
   markerRadiusExpression,
   markerRadiusPlusExpression,
@@ -578,6 +587,22 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
   const overlayFillOpacity = satellite ? SATELLITE_STATE_FILL_OPACITY : PLATE_STATE_FILL_OPACITY;
   const countyOverlayFillOpacity = satellite ? SATELLITE_STATE_FILL_OPACITY : COUNTY_FILL_OPACITY;
   const popGeo = input.popGeo ?? DEFAULT_POPULATION_GEO;
+  /** National field: Page Sand records / copper walks; kind encoding past locality zoom. */
+  const entityPointColor = blendFirstPaintWithKindExpression(
+    kindColorExpression(),
+    firstPaintPointColorExpression(),
+  );
+  const entityPointOpacity = blendFirstPaintWithKindExpression(
+    kindFillOpacityExpression(),
+    firstPaintPointOpacityExpression(),
+  );
+  const entityPointRadius = firstPaintOrKindRadiusExpression(markerRadiusExpression());
+  const entityHaloRadius = firstPaintOrKindRadiusExpression(markerHaloRadiusExpression());
+  const entityHaloOpacity = blendFirstPaintWithKindExpression(
+    literalPaintNumber(ENTITY_HALO_OPACITY),
+    literalPaintNumber(0),
+  );
+  const entityStrokeWidth = firstPaintOrKindStrokeWidthExpression(kindStrokeWidthExpression());
   const presenceFillActive = input.layerMode === 'presence';
   const populationFillActive =
     input.layerMode === 'blackShare' || input.layerMode === 'blackChange';
@@ -1072,6 +1097,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['!', ['has', 'point_count']],
+        maxzoom: EXPLORE_GL_ENTITY_MAX_ZOOM,
         paint: {
           // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
           ...DECADE_TRANSITION_PAINT,
@@ -1079,9 +1105,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           // source of truth with the point layer below. Halo uses the same kind/tone shade as
           // the point (and KindBadge) at low opacity — a neutral sand wash was washing every
           // marker toward the same warm tone and hiding kind color coding.
-          'circle-radius': markerHaloRadiusExpression(),
-          'circle-color': kindColorExpression(),
-          'circle-opacity': ENTITY_HALO_OPACITY,
+          'circle-radius': entityHaloRadius,
+          'circle-color': entityPointColor,
+          'circle-opacity': entityHaloOpacity,
         },
       },
       {
@@ -1089,16 +1115,15 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['!', ['has', 'point_count']],
+        maxzoom: EXPLORE_GL_ENTITY_MAX_ZOOM,
         paint: {
           // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
           ...DECADE_TRANSITION_PAINT,
-          // size from marker-size.ts (evidenceCount + confidenceTier, clamped [6, 16]);
-          // color + fill/stroke signature from kind-encoding.ts via DIGNITY_PALETTE (color marks
-          // kind only; the fill/stroke signature is the non-color channel WCAG 1.4.1 requires).
-          'circle-radius': markerRadiusExpression(),
-          'circle-color': kindColorExpression(),
-          'circle-opacity': kindFillOpacityExpression(),
-          'circle-stroke-width': kindStrokeWidthExpression(),
+          // National zoom: Page Sand records / copper walks. Locality: kind shade + glyph rim.
+          'circle-radius': entityPointRadius,
+          'circle-color': entityPointColor,
+          'circle-opacity': entityPointOpacity,
+          'circle-stroke-width': entityStrokeWidth,
           'circle-stroke-color': kindStrokeColorExpression(plate.selected),
         },
       },
@@ -1111,6 +1136,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'kind'], 'event']],
+        maxzoom: EXPLORE_GL_ENTITY_MAX_ZOOM,
         paint: {
           // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
           ...DECADE_TRANSITION_PAINT,
@@ -1118,10 +1144,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           // would nest the zoom expression and be rejected by the style spec (see
           // `markerRadiusPlusExpression`'s doc comment).
           'circle-radius': markerRadiusPlusExpression(4),
-          'circle-color': kindColorExpression(),
+          'circle-color': entityPointColor,
           'circle-opacity': 0,
           'circle-stroke-width': zoomScaledNumericExpression(1.5),
-          'circle-stroke-color': kindColorExpression(),
+          'circle-stroke-color': entityPointColor,
           'circle-stroke-opacity': 0.9,
         },
       },
@@ -1184,10 +1210,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
               CLUSTER_RADIUS_BY_COUNT[3]![1],
             ],
           ],
-          'circle-color': DIGNITY_PALETTE.point,
+          'circle-color': DIGNITY_PALETTE.pointHalo,
           'circle-opacity': ENTITY_CLUSTER_OPACITY,
           'circle-stroke-width': zoomScaledNumericExpression(2),
-          'circle-stroke-color': plate.selected,
+          'circle-stroke-color': DIGNITY_PALETTE.point,
         },
       },
       {
@@ -1297,10 +1323,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
               CLUSTER_RADIUS_BY_COUNT[3]![1],
             ],
           ],
-          'circle-color': DIGNITY_PALETTE.point,
+          'circle-color': DIGNITY_PALETTE.pointHalo,
           'circle-opacity': 0,
           'circle-stroke-width': zoomScaledNumericExpression(2),
-          'circle-stroke-color': plate.selected,
+          'circle-stroke-color': DIGNITY_PALETTE.point,
         },
       },
       {
@@ -1320,6 +1346,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: selectedPointFilterExpression(undefined),
+        maxzoom: EXPLORE_GL_ENTITY_MAX_ZOOM,
         paint: {
           'circle-radius': markerRadiusPlusExpression(ENTITY_SELECTED_RADIUS_OFFSET),
           'circle-color': 'rgba(0,0,0,0)',

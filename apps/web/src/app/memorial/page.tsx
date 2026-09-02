@@ -1,10 +1,8 @@
 /**
  * Memorial — a living memorial wall of names held in remembrance.
  *
- * Must stay dynamic: entity-link matching reads the live public entity
- * catalog (listPublicEntityViews), and App Hosting mounts DATABASE_URL at
- * runtime only — a build-time static page would bake an empty/seed catalog
- * into production (same reasoning as sitemap.ts).
+ * Names stay names. This is the national memorial, not a join from this
+ * place's record, and wall names do not follow `/entity/ent_…`.
  *
  * Converted to the v9 room kit (SP-22). Renders through Room, RoomHeader and
  * OffRamp with the standard reading-room design language. The
@@ -22,11 +20,9 @@
 import type { Metadata } from 'next';
 import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { matchMemorialNamesToEntities } from '../../components/patterns/memorial-wall/memorial-entity-links';
 import { MemorialWallAtmosphere } from '../../components/patterns/memorial-wall/MemorialWallAtmosphere';
-import { MEMORIAL_NAMES } from '../../components/patterns/memorial-wall/memorial-names';
-import { listPublicEntityViews } from '../../lib/public-data/source';
-import { OffRamp, Room, RoomHeader } from '../../components/room';
+import { Room, RoomHeader } from '../../components/room';
+import { WalkOffRamp } from '../walk-off-ramp';
 import { MemorialSections } from './MemorialSections';
 import { MemorialScrollCue } from './MemorialScrollCue';
 import {
@@ -44,20 +40,7 @@ import './memorial-edition.css';
 
 void React;
 
-/*
- * Must stay dynamic, same constraint as /library: rendering reads the live public catalog, and
- * the `Build and Typecheck` CI job builds without database secrets, so prerendering fails the
- * export with `[public-data] postgres live catalog unavailable`.
- *
- * Tried and reverted on 2026-08-10 along with /library; see the longer note there. The premise
- * that this was a Firebase App Hosting quirk is wrong: Vercel does have DATABASE_URL at build,
- * but the CI gate does not, and that gate is required. `revalidate` on a route with no dynamic
- * segment means prerender at build, so there is no ISR variant that avoids the catalog read.
- *
- * Known cost: dynamic responses carry `private, no-cache, no-store`, so this route is a CDN miss
- * on every request.
- */
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/memorial',
@@ -65,21 +48,13 @@ export const metadata: Metadata = buildStaticPageMetadata({
   description: MEMORIAL_PAGE_DESCRIPTION,
 });
 
-export default async function MemorialPage() {
-  const { data: entities } = await listPublicEntityViews();
-  const entityLinksByName = Object.fromEntries(
-    matchMemorialNamesToEntities(
-      MEMORIAL_NAMES,
-      entities.map((entity) => ({ id: entity.id, displayName: entity.displayName })),
-    ),
-  );
-
+export default function MemorialPage() {
   return (
     <div className={memorialEditionRootClassName()} data-memorial-edition="v6">
       <MemorialWallAtmosphere
         seedKey={MEMORIAL_EDITION_WALL_SEED}
         messageLines={MEMORIAL_HELD_MESSAGE_LINES}
-        entityLinksByName={entityLinksByName}
+        entityLinksByName={{}}
       />
       {/* Positioned by MemorialWallAtmosphere at runtime, anchored to the held
           message's actual measured bottom edge — a sibling of the wall (not
@@ -103,19 +78,11 @@ export default async function MemorialPage() {
           />
         </div>
 
-        <MemorialSections entityLinksByName={entityLinksByName} />
+        <MemorialSections />
 
-        <OffRamp
-          title="Go from here"
-          actions={[
-            { label: 'Open the Atlas', href: '/', emphasis: 'copper' },
-            { label: 'Read the index', href: '/records' },
-          ]}
-        >
-          The map places what can be placed and the index lists everything. These rooms hold the
-          context: how records get in, how confidence is measured, and which pieces speak to each
-          other.
-        </OffRamp>
+        <WalkOffRamp>
+          Names, held quietly. This is the national memorial, not one library&apos;s list.
+        </WalkOffRamp>
       </Room>
     </div>
   );

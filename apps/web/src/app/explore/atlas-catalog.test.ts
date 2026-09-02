@@ -12,9 +12,11 @@ import {
   ATLAS_CATALOG_PATH,
   buildAtlasCatalogPayload,
 } from './atlas-catalog';
+import { toFirstPaintPins, toFirstPaintShell } from '../../lib/map-experience/first-paint-pins';
 import { buildAtlasShell, buildExploreViewModel } from './explore-view-model';
 import {
   assembleExploreViewModel,
+  firstPaintCatalog,
   toAtlasShellModel,
   toSerializableExploreViewModel,
 } from './explore-view-model-wire';
@@ -74,7 +76,42 @@ test('the catalog is CDN-cacheable and served from a fixed path', () => {
 test('the Atlas page never puts the catalog back in the initial prop', async () => {
   const { readFileSync } = await import('node:fs');
   const pageSource = readFileSync(new URL('../page.tsx', import.meta.url), 'utf8');
+  const explorePage = readFileSync(new URL('./page.tsx', import.meta.url), 'utf8');
+  const atlasHome = readFileSync(new URL('../atlas-home.tsx', import.meta.url), 'utf8');
+  const pageImports = pageSource
+    .split('\n')
+    .filter((line) => line.startsWith('import '))
+    .join('\n');
   assert.doesNotMatch(pageSource, /toSerializableExploreViewModel/);
   assert.doesNotMatch(pageSource, /buildExploreViewModelAsync/);
-  assert.match(pageSource, /AtlasLoader/);
+  assert.doesNotMatch(pageSource, /wantsAtlasInstrument|atlas=1/);
+  assert.match(pageImports, /DoorHome/);
+  assert.match(pageSource, /DoorHome/);
+  assert.doesNotMatch(pageSource, /AtlasHome/);
+  assert.match(explorePage, /AtlasHome/);
+  assert.match(atlasHome, /AtlasLoader/);
+  assert.match(atlasHome, /toFirstPaintPins/);
+  assert.match(atlasHome, /FirstPaintPinPlate/);
+  assert.match(atlasHome, /ExploreMapUnderlay/);
+  assert.doesNotMatch(atlasHome, /Opening the map/);
+  assert.doesNotMatch(atlasHome, /ds-explore__walks/);
+  assert.doesNotMatch(atlasHome, /pins=\{\{ type: 'FeatureCollection'/);
+});
+
+test('first-paint catalog is the pin collection, not the history edge catalog', () => {
+  const { shell, noscriptFeatures } = buildAtlasShell({}, entities, 'none');
+  const pins = toFirstPaintPins(noscriptFeatures);
+  const paint = firstPaintCatalog(pins, 'none');
+  assert.equal(paint.schemaVersion, 1);
+  assert.equal(paint.source.featureCollection.features.length, noscriptFeatures.length);
+  assert.ok(paint.source.featureCollection.features.length > 0);
+  assert.deepEqual(paint.edgeLineCatalog.allTime.edges, []);
+  assert.deepEqual(paint.citesEdge, {});
+  const assembled = assembleExploreViewModel(shell, paint);
+  assert.equal(assembled.source.featureCollection.features.length, noscriptFeatures.length);
+  const firstPaintShell = toFirstPaintShell(shell);
+  const document = `${JSON.stringify(firstPaintShell)}${JSON.stringify(pins)}`;
+  assert.doesNotMatch(document, /42Cb1758/);
+  assert.doesNotMatch(document, /Grade A/);
+  assert.doesNotMatch(document, /ent_/);
 });

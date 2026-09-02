@@ -14,7 +14,8 @@ import {
 import { listErrataEntries } from '../../lib/trust/errata-seed';
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
 import { ErrataSections } from './ErrataSections';
-import { OffRamp, Room, RoomHeader } from '../../components/room';
+import { Room, RoomHeader } from '../../components/room';
+import { WalkOffRamp } from '../walk-off-ramp';
 import '../reading-room.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
@@ -48,15 +49,15 @@ export default function ErrataPage() {
 
       <ErrataSections entries={entries} />
 
-      <OffRamp
-        title="Verify in the archive"
-        actions={[
-          { label: 'Request a correction', href: '/corrections', emphasis: 'copper' },
+      <WalkOffRamp
+        title="Mistakes, published"
+        extra={[
+          { label: 'Request a correction', href: '/corrections' },
           { label: 'How we correct the record', href: '/methodology' },
         ]}
       >
-        Every change documented here can be found in the live archive.
-      </OffRamp>
+        Every change documented here stays readable.
+      </WalkOffRamp>
     </Room>
   );
 }

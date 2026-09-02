@@ -11,9 +11,11 @@
  * after `/history` became a redirect, so every page on the site shipped a link into a 308.
  *
  * ONE TABLE, FIVE READERS: the breadcrumb chain (`room-trail.ts`), the /library hub, the site
- * footer, the command palette's Go section, and the sitemap. `destination-registry.test.ts`
- * fails when a route classified in `surface-classes.ts` has no entry here, which is what makes
- * "a new public route cannot be missing from the library" a test rather than a habit.
+ * footer, the command palette's Go section (the same three room groups), and the sitemap.
+ * `destination-registry.test.ts` fails when a route classified in `surface-classes.ts` has no
+ * entry here, which is what makes "a new public route cannot be missing from the library" a
+ * test rather than a habit. Atlas and Records stay in the table; Find chrome (command bar +
+ * footer Find column) exposes them while Rooms / browsableDestinations stay editorial.
  *
  * WHAT IS NOT HERE. Endpoints — redirects, JSON, feeds, crawler files. They render no chrome and
  * are no reader's destination; `ENDPOINT_ROUTES` in `surface-classes.ts` is their list. A route
@@ -25,10 +27,8 @@ import { CLASSIFIED_PATHS, surfaceClassFor, type SurfaceClass } from './surface-
 /**
  * The three card groups the library hub renders, in order, plus `find`.
  *
- * `find` is the archive's two ways into the records themselves — the map and the index. They are
- * deliberately NOT cards in the library: the library is the room for everything that is not the
- * map, so the map and the index sit in its off-ramp instead. They carry a group anyway because
- * the palette and the footer do list them.
+ * `find` is home, the map, and the index. They are deliberately NOT cards in the library:
+ * the library lists the rooms. Home is the door. Atlas and records stay off the room chrome.
  */
 export const DESTINATION_GROUPS = ['find', 'read', 'check', 'take-part'] as const;
 export type DestinationGroup = (typeof DESTINATION_GROUPS)[number];
@@ -36,9 +36,32 @@ export type DestinationGroup = (typeof DESTINATION_GROUPS)[number];
 /** The heading each group renders under in the library hub. `find` has none; see above. */
 export const GROUP_HEADINGS: Readonly<Record<DestinationGroup, string | null>> = Object.freeze({
   find: null,
-  read: 'Read',
-  check: 'Check the archive',
-  'take-part': 'Take part',
+  read: 'Where to begin',
+  check: 'How it decides',
+  'take-part': 'Add to it',
+});
+
+/**
+ * Library Hub page copy (v10). Footer and the Library menu keep {@link GROUP_HEADINGS};
+ * the hub page uses these longer headings plus standfirsts so it reads as knowledge kinds,
+ * not a settings menu.
+ */
+export const LIBRARY_GROUP_COPY: Readonly<
+  Record<DestinationGroup, { readonly heading: string | null; readonly standfirst: string | null }>
+> = Object.freeze({
+  find: { heading: null, standfirst: null },
+  read: {
+    heading: 'Rooms for reading',
+    standfirst: 'Narrative, law, data, books, and the memorial wall.',
+  },
+  check: {
+    heading: 'How a record gets in',
+    standfirst: 'Methods, origin, and the log of what we corrected.',
+  },
+  'take-part': {
+    heading: 'Add what is missing',
+    standfirst: 'Leads, corrections, and how to reach the archive.',
+  },
 });
 
 /** The library hub's card groups, in render order. */
@@ -111,19 +134,28 @@ const DESTINATIONS: readonly Destination[] = [
   /* ---- find: the two ways into the records, plus the library itself ---- */
   {
     path: '/',
-    label: 'Atlas',
+    label: 'Home',
     parent: null,
-    kind: 'MAP',
-    description: 'Every record that can be placed, on the plate, in time.',
+    kind: 'PLACE',
     group: 'find',
     crawl: { changeFrequency: 'daily', priority: 1 },
+  },
+  {
+    path: '/explore',
+    label: 'Atlas',
+    parent: '/',
+    kind: 'MAP',
+    description: 'The map.',
+    menuLine: 'The map',
+    group: 'find',
+    crawl: { changeFrequency: 'daily', priority: 0.9 },
   },
   {
     path: '/library',
     label: 'The library',
     parent: '/',
     kind: 'HUB',
-    description: 'Everything that is not the map, in one place.',
+    description: 'The rooms.',
     group: 'find',
     crawl: { changeFrequency: 'monthly', priority: 0.8 },
   },
@@ -132,7 +164,7 @@ const DESTINATIONS: readonly Destination[] = [
     label: 'Records',
     parent: '/library',
     kind: 'INDEX',
-    description: 'The whole archive as a list you can filter, page and cite.',
+    description: 'The archive as a list.',
     group: 'find',
     crawl: { changeFrequency: 'daily', priority: 0.9 },
   },
@@ -185,7 +217,6 @@ const DESTINATIONS: readonly Destination[] = [
     kind: 'CATALOGUE',
     description: 'Documented challenges to titles, recorded as challenges rather than as verdicts.',
     menuLine: 'Documented challenges',
-    group: 'read',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
   {
@@ -201,6 +232,16 @@ const DESTINATIONS: readonly Destination[] = [
   },
 
   /* ---- check the archive ---- */
+  {
+    path: '/about',
+    label: 'About',
+    parent: '/library',
+    kind: 'FRAMING',
+    description: 'What this is for, who it is for, and what it refuses to do.',
+    menuLine: 'What this refuses to do',
+    group: 'check',
+    crawl: { changeFrequency: 'monthly', priority: 0.5 },
+  },
   {
     path: '/methodology',
     label: 'Methodology',
@@ -224,16 +265,6 @@ const DESTINATIONS: readonly Destination[] = [
     menuLine: 'Mistakes, published',
     group: 'check',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
-  },
-  {
-    path: '/about',
-    label: 'About',
-    parent: '/library',
-    kind: 'FRAMING',
-    description: 'What this is for, who it is for, and what it refuses to do.',
-    menuLine: 'What this refuses to do',
-    group: 'check',
-    crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
 
   /* ---- take part ---- */
@@ -320,6 +351,7 @@ const DESTINATION_BY_PATH: ReadonlyMap<string, Destination> = new Map(
 export const DYNAMIC_PARENTS: readonly (readonly [string, string])[] = [
   ['/corrections/status/', '/corrections'],
   ['/stories/', '/stories'],
+  ['/place/', '/'],
   ['/entity/', '/'],
   ['/books/', '/books'],
   ['/law/', '/law'],
@@ -346,9 +378,12 @@ export function destinationsInGroup(group: DestinationGroup): readonly Destinati
   return DESTINATIONS.filter((destination) => destination.group === group);
 }
 
-/** Every destination a reader can be sent to by name — the palette's Go section. */
+/**
+ * The one room list: the same three groups as `/about`, Rooms, and the editorial footer columns.
+ * Atlas, Records, and the library hub stay off Rooms; Find chrome lists them separately.
+ */
 export function browsableDestinations(): readonly Destination[] {
-  return DESTINATIONS.filter((destination) => destination.group !== undefined);
+  return LIBRARY_CARD_GROUPS.flatMap((group) => destinationsInGroup(group));
 }
 
 /** The card title: the verb form when there is one, the crumb label otherwise. */
@@ -390,11 +425,11 @@ export function parentPathFor(pathname: string): string | null {
 }
 
 /**
- * The three footer columns, derived rather than authored.
+ * The footer columns, derived rather than authored.
  *
- * The derivation is the whole point: the footer used to be its own list, which is how it went on
- * linking `/history` for months after that route became a redirect. Now a route joins the footer
- * by having a group, and leaves it by losing one.
+ * Find (Home / Atlas / Library / Records) leads; the three editorial groups follow. A route
+ * joins the footer by having a group, and leaves it by losing one — so `/history` cannot linger
+ * after it becomes a redirect.
  */
 export type FooterColumn = {
   readonly title: string;
@@ -409,10 +444,18 @@ export function footerColumns(): readonly FooterColumn[] {
       .map((destination) => ({ href: destination.path, label: destination.label })),
   });
 
+  /* Find stays in the footer and the command bar; Rooms / browsableDestinations stay editorial. */
   return [
-    column('Explore', ['find', 'read']),
-    column('Trust', ['check']),
-    column('Contribute', ['take-part']),
+    {
+      title: 'Find',
+      items: destinationsInGroup('find').map((destination) => ({
+        href: destination.path,
+        label: destination.label === 'The library' ? 'Library' : destination.label,
+      })),
+    },
+    column(GROUP_HEADINGS.read ?? 'Where to begin', ['read']),
+    column(GROUP_HEADINGS.check ?? 'How it decides', ['check']),
+    column(GROUP_HEADINGS['take-part'] ?? 'Add to it', ['take-part']),
   ];
 }
 

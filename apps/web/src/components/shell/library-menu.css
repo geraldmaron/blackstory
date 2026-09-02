@@ -47,17 +47,11 @@
   z-index: var(--ds-z-modal-sheet);
   top: calc(100% + 10px);
   right: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  column-gap: var(--ds-space-6);
-  align-items: start;
-  width: min(660px, calc(100vw - var(--ds-space-4) * 2));
+  width: min(440px, calc(100vw - var(--ds-space-4) * 2));
   padding: var(--ds-space-6);
-  background: color-mix(in srgb, var(--ds-surface) 96%, transparent);
-  backdrop-filter: blur(12px);
+  background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
-  box-shadow: 0 24px 60px -28px rgb(0 0 0 / 70%);
 }
 
 /* Read takes the first column; check and take-part stack in the second. Two short lists beside
@@ -82,6 +76,8 @@
   margin-bottom: var(--ds-space-3);
   font-size: 12px;
   color: var(--ds-ink-muted);
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .ds-libmenu__list {
@@ -98,6 +94,8 @@
   color: var(--ds-ink);
   font-size: 13.5px;
   text-decoration: none;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .ds-libmenu__item:hover {
@@ -109,68 +107,42 @@
   color: var(--ds-ink-muted);
 }
 
-.ds-libmenu__direct {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-3);
-  padding-left: var(--ds-space-6);
-  border-left: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
-}
-
-.ds-libmenu__card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: var(--ds-space-4);
-  background: var(--ds-canvas);
-  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
-  border-radius: var(--ds-radius-md);
+.ds-libmenu__hub {
+  display: block;
+  margin-top: var(--ds-space-5);
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
   color: var(--ds-ink);
+  font-size: 13.5px;
   text-decoration: none;
 }
 
-.ds-libmenu__card:hover {
-  border-color: var(--ds-accent-graphic);
+.ds-libmenu__hub:hover {
+  color: var(--ds-accent);
 }
 
-.ds-libmenu__card-kind {
-  font-size: 12px;
-  color: var(--ds-ink-muted);
-}
-
-.ds-libmenu__card-title {
-  font-family: var(--ds-font-display);
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-}
-
-.ds-libmenu__card-desc {
-  font-size: 12.5px;
-  line-height: 1.45;
-  color: var(--ds-ink-muted);
-}
-
-.ds-libmenu__foot {
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--ds-ink-muted);
+.ds-libmenu__hub:focus-visible {
+  outline: 2px solid var(--ds-accent-graphic);
+  outline-offset: 2px;
 }
 
 /* Narrow: the panel spans the bar and the three columns stack. A 660px mega-menu on a phone is a
-   page, and this one would cover the surface it was opened from. */
+   page, and this one would cover the surface it was opened from. The stacked command bar raises
+   --ds-island-height; the Atlas gutter token does not, so the sheet would sit under the bar. */
 @media (max-width: 60rem) {
+  .ds-libmenu__trigger,
+  .ds-libmenu__item {
+    min-height: 44px;
+  }
+
   .ds-libmenu__panel {
     position: fixed;
-    top: calc(var(--ds-atlas-top) - 8px);
+    top: calc(var(--ds-island-height) + var(--ds-space-2) + var(--ds-space-2));
     right: var(--ds-space-2);
     left: var(--ds-space-2);
     width: auto;
-    max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-space-4));
+    max-height: calc(100dvh - var(--ds-island-height) - var(--ds-space-2) - var(--ds-space-4) * 2);
     overflow-y: auto;
-    grid-template-columns: 1fr;
-    row-gap: var(--ds-space-5);
   }
 
   .ds-libmenu__rooms {
@@ -184,11 +156,24 @@
   .ds-libmenu__group + .ds-libmenu__group {
     margin-top: var(--ds-space-5);
   }
+}
 
-  .ds-libmenu__direct {
-    padding-left: 0;
-    border-left: 0;
-    border-top: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
-    padding-top: var(--ds-space-5);
+@media (max-width: 819px) {
+  /* Rooms stays on the phone bar. Panel sits below the stacked
+     island, not over the trigger, and scrolls if the three groups run long. */
+  .ds-libmenu__trigger {
+    padding: 0 var(--ds-space-2);
+    font-size: 12px;
+    gap: 0;
+  }
+
+  .ds-libmenu__trigger svg {
+    display: none;
+  }
+
+  .ds-libmenu__panel {
+    top: var(--ds-island-clearance);
+    padding: var(--ds-space-4);
+    max-height: calc(100dvh - var(--ds-island-clearance) - var(--ds-space-3));
   }
 }

@@ -48,6 +48,7 @@ import {
 import { mapProjectionToPublicEntityView, type PublicProjectionInput } from './map-projection';
 import { mapPublicSearchProjection } from './map-search-index';
 import { collectOneHopNeighborIds, collectTwoHopNeighborIds } from './neighbor-ids';
+import { searchIndexReadyForRecords } from '../records/build-records-index';
 import {
   fetchReleaseEntitiesListArtifact,
   fetchReleaseSearchIndexArtifact,
@@ -297,22 +298,35 @@ async function loadLiveEntitiesForRelease(
 async function loadLiveSearchIndexForRelease(
   releaseId: string,
 ): Promise<readonly PublicSearchIndexDoc[] | undefined> {
+  let artifactMapped: readonly PublicSearchIndexDoc[] | undefined;
   if (shouldPreferReleaseArtifacts()) {
     const artifact = await fetchReleaseSearchIndexArtifact(releaseId);
     if (artifact && artifact.docs.length > 0) {
       const mapped = searchDocsFromArtifact(artifact.docs);
-      if (mapped.length > 0) return mapped;
+      // Prefer an artifact that already carries confidenceTier (Records slim). After a
+      // facets-only SQL backfill the CDN blob can lag; falling through to Postgres avoids a
+      // full release_entities hydrate while still serving search from the slim index.
+      if (mapped.length > 0 && searchIndexReadyForRecords(mapped)) {
+        return mapped;
+      }
+      if (mapped.length > 0) {
+        artifactMapped = mapped;
+        console.warn(
+          `[public-data] search-index artifact missing confidenceTier coverage; preferring Postgres for ${releaseId}`,
+        );
+      }
+    } else {
+      console.warn(
+        `[public-data] full Postgres search-index pull for ${releaseId} (artifact unusable)`,
+      );
     }
-    console.warn(
-      `[public-data] full Postgres search-index pull for ${releaseId} (artifact unusable)`,
-    );
   }
 
   const projectionDocs = await listPublicSearchIndexDocs(releaseId);
   if (projectionDocs.length > 0) {
     return projectionDocs.map(mapPublicSearchProjection);
   }
-  return undefined;
+  return artifactMapped;
 }
 
 /**
@@ -422,12 +436,12 @@ function cachedLiveSearchIndex(
   activatedAt: string,
 ): Promise<readonly PublicSearchIndexDoc[] | undefined> {
   return cacheLiveCatalog({
-    kind: 'search-index',
+    kind: 'search-index-v2',
     releaseId,
     activatedAt,
     memory: liveSearchIndexMemory,
     load: () => loadLiveSearchIndexForRelease(releaseId),
-    nextCacheKeyPrefix: 'public-release-search-index',
+    nextCacheKeyPrefix: 'public-release-search-index-v2',
   });
 }
 
@@ -453,12 +467,18 @@ async function loadLiveEntity(entityId: string): Promise<PublicEntityView | unde
 
   try {
     const oneHopIds = collectOneHopNeighborIds(entity);
-    const oneHopProjections = await fetchPublicEntityProjectionsByIds(active.releaseId, oneHopIds);
+    const oneHopProjections =
+      oneHopIds.length > 0
+        ? await fetchPublicEntityProjectionsByIds(active.releaseId, oneHopIds)
+        : [];
     const oneHopViews = oneHopProjections.map((item) =>
       mapProjectionToPublicEntityView(item as PublicProjectionInput),
     );
     const twoHopIds = collectTwoHopNeighborIds(entityId, oneHopIds, oneHopViews);
-    const twoHopProjections = await fetchPublicEntityProjectionsByIds(active.releaseId, twoHopIds);
+    const twoHopProjections =
+      twoHopIds.length > 0
+        ? await fetchPublicEntityProjectionsByIds(active.releaseId, twoHopIds)
+        : [];
     const twoHopViews = twoHopProjections.map((item) =>
       mapProjectionToPublicEntityView(item as PublicProjectionInput),
     );

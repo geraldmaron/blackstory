@@ -67,9 +67,9 @@ test('empty and whitespace-only fields are omitted', () => {
 });
 
 test('href omits the query string when nothing is selected', () => {
-  assert.equal(buildShareHref({}), '/');
-  assert.equal(buildShareHref({ record: 'x' }), '/?selected=x');
-  assert.equal(buildShareHref({ record: 'x' }, '/'), '/?selected=x');
+  assert.equal(buildShareHref({}), '/explore');
+  assert.equal(buildShareHref({ record: 'x' }), '/explore?selected=x');
+  assert.equal(buildShareHref({ record: 'x' }, '/explore'), '/explore?selected=x');
 });
 
 test('values are URL encoded on the way out and decoded on the way back', () => {

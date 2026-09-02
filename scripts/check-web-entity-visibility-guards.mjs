@@ -80,20 +80,17 @@ function assertDynamicAfterImports(source, label) {
 function main() {
   const errors = [];
 
-  // --- Route ownership: no explore page, and it owns /explore/api ---
+  // --- Route ownership: Door at `/`, Atlas at `/explore`, live JSON at `/explore/api` ---
   //
-  // `/` is the Atlas, at `app/page.tsx`, carrying its own `force-dynamic` (RUNTIME
-  // DATABASE_URL — no group layout owns it). `/explore` is a plain redirect route with no page
-  // of its own; `/explore/api` is the live JSON refine endpoint at `app/explore/api/route.ts`.
-  // Route ownership stays exclusive: the Atlas must not sprout a second explore page, a stale
-  // duplicate homepage, or a competing `app/explore/page.tsx`.
+  // `/` is the Door (`DoorHome`, ISR). `/explore` is the Atlas instrument (`AtlasHome`,
+  // force-dynamic — searchParams filters). Exactly one explore page; no stale `(map)` group.
   const explorePages = walkFiles(APP_DIR).filter((f) =>
     /(^|\/)explore\/page\.tsx$/.test(relativeAppPath(f)),
   );
-  if (explorePages.length > 0) {
+  if (explorePages.length !== 1) {
     errors.push(
-      `Expected no explore/page.tsx under apps/web/src/app (/explore only redirects to / — the ` +
-        `Atlas page lives at app/page.tsx); found: ${explorePages.map(relativeAppPath).join(', ')}`,
+      `Expected exactly one explore/page.tsx (Atlas instrument); found ${explorePages.length}: ` +
+        `${explorePages.map(relativeAppPath).join(', ') || '(none)'}`,
     );
   }
 
@@ -129,18 +126,32 @@ function main() {
 
   // --- No seed bake at build (RUNTIME DATABASE_URL) ---
   //
-  // `/` stays force-dynamic: it reads searchParams for the Atlas filters, so App Router renders
-  // it per request regardless, and the declaration keeps that explicit.
-  //
-  // `/entity/[id]` is ISR since 2026-08-09. force-dynamic there cost a CDN MISS on 100% of
-  // entity requests (Next sends no-store on dynamic responses, overriding the s-maxage=3600 this
-  // route declares in next.config.mjs). The no-seed-bake guarantee did not come from
-  // force-dynamic and does not depend on it: it now comes from generateStaticParams returning []
-  // unconditionally, so the build has no id to bake. That is stricter than before, when the
-  // enumeration was still present and merely ignored.
+  // `/` is ISR (Door pin plate). `/explore` is force-dynamic (Atlas filters via searchParams).
+  // `/entity/[id]` is ISR. force-dynamic on entity pages cost a CDN MISS on 100% of requests.
+  // The no-seed-bake guarantee comes from generateStaticParams returning [] unconditionally.
   if (homeSource !== undefined) {
+    const homeLabel = relativeAppPath(home);
+    if (!/^export\s+const\s+revalidate\s*=\s*\d+/m.test(homeSource)) {
+      errors.push(`${homeLabel}: missing export const revalidate (Door ISR)`);
+    }
+    if (/^export\s+const\s+dynamic\s*=/m.test(homeSource)) {
+      errors.push(`${homeLabel}: must not declare force-dynamic — the Door is ISR`);
+    }
+    if (!/DoorHome/.test(homeSource)) {
+      errors.push(`${homeLabel}: must mount DoorHome, not the Atlas instrument`);
+    }
+    if (/AtlasHome|HomeFirstPaint|wantsAtlasInstrument/.test(homeSource)) {
+      errors.push(`${homeLabel}: must not mount the Atlas instrument`);
+    }
+  }
+
+  if (explorePages.length === 1) {
     try {
-      assertDynamicAfterImports(homeSource, relativeAppPath(home));
+      const exploreSource = readFileSync(explorePages[0], 'utf8');
+      assertDynamicAfterImports(exploreSource, relativeAppPath(explorePages[0]));
+      if (!/AtlasHome/.test(exploreSource)) {
+        errors.push(`${relativeAppPath(explorePages[0])}: must mount AtlasHome`);
+      }
     } catch (error) {
       errors.push(error instanceof Error ? error.message : String(error));
     }
@@ -184,7 +195,7 @@ function main() {
   }
 
   console.log(
-    'check-web-entity-visibility-guards: ok (no stray explore page, / and /explore/api owned, force-dynamic after imports)',
+    'check-web-entity-visibility-guards: ok (Door at /, Atlas at /explore, /explore/api owned, segment config after imports)',
   );
 }
 

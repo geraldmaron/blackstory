@@ -94,6 +94,14 @@ describe('instrument shell layout', () => {
   it('locks the instrument to the viewport (not a footer-over-map document)', () => {
     assert.match(
       shellCss,
+      /html:has\(\[data-surface='instrument'\]\)\s*\{[^}]*overflow:\s*hidden/s,
+    );
+    assert.match(
+      shellCss,
+      /\.ds-map-stage\[data-plate-posture='live'\]\s*\{[^}]*touch-action:\s*none/s,
+    );
+    assert.match(
+      shellCss,
       /\.ds-shell:has\(\[data-surface='instrument'\]\)\s*\{[^}]*height:\s*100dvh[^}]*overflow:\s*hidden/s,
     );
     assert.match(
@@ -136,11 +144,12 @@ describe('horizontal overflow guards', () => {
   const baseCss = readFileSync(join(here, '../../../../packages/ui/src/styles/base.css'), 'utf8');
   const mapSurfacesCss = readFileSync(join(here, 'explore/explore.css'), 'utf8');
 
-  it('clips document and shell sideways overflow without orphaning overflow-y', () => {
+  it('clips document sideways overflow without clipping the shell or orphaning overflow-y', () => {
     assert.match(baseCss, /html\s*\{[^}]*overflow-x:\s*clip/s);
     assert.match(baseCss, /html\s*\{[^}]*overflow-y:\s*auto/s);
     assert.match(baseCss, /body\s*\{[^}]*overflow-x:\s*clip/s);
-    assert.match(shellCss, /\.ds-shell\s*\{[^}]*overflow-x:\s*clip/s);
+    assert.match(shellCss, /\.ds-shell\s*\{[^}]*max-width:\s*100%[^}]*min-width:\s*0/s);
+    assert.doesNotMatch(shellCss, /\.ds-shell\s*\{[^}]*overflow-x:\s*clip/s);
   });
 
   it('does not size explore chrome with 100vw (scrollbar gutter / hide-translate overflow)', () => {
@@ -175,6 +184,42 @@ describe('horizontal overflow guards', () => {
     );
     assert.doesNotMatch(mapSurfacesCss, /backdrop-filter/);
     assert.doesNotMatch(mapSurfacesCss, /\.ds-explore-stage__instruments\s*\{[^}]*--ds-fixed-/s);
+  });
+
+  it('Atlas chrome is matte surface, not shop blur or elevation', () => {
+    const commandBarCss = readFileSync(join(here, '../components/shell/command-bar.css'), 'utf8');
+    const lensCss = readFileSync(join(here, '../components/map-experience/lens-panel.css'), 'utf8');
+    const resultsCss = readFileSync(
+      join(here, '../components/map-experience/results-rail.css'),
+      'utf8',
+    );
+    const sheetCss = readFileSync(
+      join(here, '../components/map-experience/record-sheet.css'),
+      'utf8',
+    );
+    const cameraCss = readFileSync(
+      join(here, '../components/map-experience/camera-console.css'),
+      'utf8',
+    );
+    const atlasCss = readFileSync(join(here, 'explore/atlas.css'), 'utf8');
+    const timeCss = readFileSync(join(here, '../components/map-experience/time-panel.css'), 'utf8');
+    for (const [name, source] of [
+      ['command-bar', commandBarCss],
+      ['lens', lensCss],
+      ['results', resultsCss],
+      ['sheet', sheetCss],
+      ['camera', cameraCss],
+      ['atlas', atlasCss],
+      ['time', timeCss],
+    ] as const) {
+      assert.doesNotMatch(source, /backdrop-filter/, `${name} must not blur`);
+      assert.doesNotMatch(source, /box-shadow:\s*0\s+\d+px/, `${name} must not elevate`);
+      assert.doesNotMatch(
+        source,
+        /color-mix\(in srgb, var\(--ds-surface\) 94%/,
+        `${name} stays opaque`,
+      );
+    }
   });
 });
 
@@ -225,6 +270,7 @@ describe('the plate is styled globally, not from the route group', () => {
     // `.ds-shell`, not a descendant of the group's `.ds-map-surface`. Every plate rule left in
     // the group's sheet was a rule that had silently stopped matching.
     assert.match(shellCss, /\.ds-map-stage\s*\{[^}]*position:\s*fixed/s);
+    assert.match(shellCss, /\.ds-map-stage\s*\{[^}]*isolation:\s*isolate/s);
     assert.match(shellCss, /\.ds-map-stage__canvas\s*\{/);
     assert.doesNotMatch(mapSurfacesCss, /\.ds-map-stage\b/);
   });

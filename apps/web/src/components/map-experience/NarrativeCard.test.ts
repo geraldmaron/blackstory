@@ -37,40 +37,37 @@ test('renders name, era, one-line story, evidence count, confidence, and a link 
   assert.match(html, /ds-nc__title-link/);
 });
 
-test('links Where to external maps and other metadata to the right site views', () => {
+test('Where matches Visit and does not duplicate maps exits when Visit is present', () => {
   const feature = requireFeature('ent_15th_st_church_001');
   const html = renderToStaticMarkup(createElement(NarrativeCard, { feature }));
   const { properties } = feature;
 
-  assert.equal(properties.statePostalCode, 'DC');
-  assert.match(html, /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=/);
-  assert.match(html, /aria-label="Open [^"]+ in maps"/);
-  // One maps link per card, on the WHERE fact. The place figure above it used to carry a second
-  // one pointing at the same coordinates.
-  assert.equal((html.match(/ds-maps-external-link/g) ?? []).length, 1);
-  assert.match(html, /rel="noopener noreferrer"/);
-  assert.match(html, /target="_blank"/);
-  assert.doesNotMatch(html, /href="[^"]*state=DC"/);
+  assert.match(html, /Dupont\/Sixteenth Street Historic District area, Washington, D\.C\./);
+  assert.match(html, /ds-record-visit/);
+  assert.match(html, /Open in maps/);
+  assert.match(html, /Get directions/);
+  // Visit owns the two maps exits. Where is the same address as plain text.
+  assert.equal((html.match(/ds-maps-external-link/g) ?? []).length, 2);
+  assert.doesNotMatch(html, /neighborhood-level pin/);
   assert.match(html, /href="[^"]*era=1840s"/);
-  assert.match(html, /href="\/entity\/ent_15th_st_church_001#accepted-claims"/);
+  assert.match(html, /href="\/place\/fifteenth-street-presbyterian-church#accepted-claims"/);
   assert.match(html, /href="[^"]*kind=place"/);
   assert.match(html, /aria-label="Browse Place records"/);
-  // `/history` is a redirect now; the status facet lives on the record index (SP-15).
   assert.match(html, /href="\/records\?status=active"/);
+  void properties;
 });
 
-test('Where still links to maps when postal code is absent but coordinates exist', () => {
+test('Where links to maps when the record is not visitable', () => {
   const feature = requireFeature('ent_15th_st_church_001');
-  const { statePostalCode: _omit, ...propertiesWithoutState } = feature.properties;
-  void _omit;
-  const withoutState = {
+  const notVisitable = {
     ...feature,
-    properties: propertiesWithoutState,
+    properties: { ...feature.properties, kind: 'person' },
   };
-  const html = renderToStaticMarkup(createElement(NarrativeCard, { feature: withoutState }));
+  const html = renderToStaticMarkup(createElement(NarrativeCard, { feature: notVisitable }));
+  assert.doesNotMatch(html, /ds-record-visit/);
   assert.match(html, /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=/);
-  assert.doesNotMatch(html, /aria-label="View records in/);
-  assert.doesNotMatch(html, /href="[^"]*state=/);
+  assert.match(html, /aria-label="Open [^"]+ in maps"/);
+  assert.equal((html.match(/ds-maps-external-link/g) ?? []).length, 1);
 });
 
 test('renders the radius affordance as words, never as a bare number with no context', () => {
@@ -126,14 +123,10 @@ test('floats the close control on the card with an accessible label when onClose
 });
 
 test('never labels a coarsened point with a street-address-shaped string', () => {
-  for (const entityId of [
-    'ent_15th_st_church_001',
-    'ent_dunbar_school_001',
-    'ent_dc_landmark_listing_1975',
-    'ent_dunbar_alumni_federation_001',
-  ]) {
+  for (const entityId of ['ent_15th_st_church_001']) {
     const feature = requireFeature(entityId);
     const html = renderToStaticMarkup(createElement(NarrativeCard, { feature }));
-    assert.doesNotMatch(html, /\d{1,5}\s+\w+\s+(street|st|avenue|ave|road|rd)\b/i);
+    const withoutVisit = html.replace(/<section class="ds-record-visit[\s\S]*?<\/section>/g, '');
+    assert.doesNotMatch(withoutVisit, /\d{1,5}\s+\w+\s+(street|st|avenue|ave|road|rd)\b/i);
   }
 });

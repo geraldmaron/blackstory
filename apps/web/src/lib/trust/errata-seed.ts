@@ -32,8 +32,8 @@ const EDITORIAL_ERRATA: readonly ErrataEntry[] = [
     changeType: 'correction',
     headline: 'Dunbar rename statement clarified',
     summary:
-      'Corrected short-statement wording so the 1916 rename is not read as a founding date. Full methodology and entity records remain the public sources of truth.',
-    affectedUrl: '/entity/ent_dunbar_school_001',
+      'Corrected short-statement wording so the 1916 rename is not read as a founding date. The methodology and the place record stay the public sources of truth.',
+    affectedUrl: '/place/paul-laurence-dunbar-high-school',
     affectedFactId: 'BB-F-000003',
   },
   {

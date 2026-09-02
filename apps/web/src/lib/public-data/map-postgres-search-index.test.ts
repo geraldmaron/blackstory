@@ -32,7 +32,33 @@ test('mapPostgresSearchIndexRow builds a valid doc from denormalized columns', (
   assert.equal(doc!.displayName, 'Example Place');
   assert.equal(doc!.relatedCount, 2);
   assert.equal(doc!.claimCount, 3);
+  assert.equal(doc!.confidenceTier, undefined);
   assert.deepEqual(doc!.topicTags, ['civil-rights']);
+});
+
+test('mapPostgresSearchIndexRow reads confidenceTier from facets', () => {
+  const doc = mapPostgresSearchIndexRow({
+    id: 'ent_graded_001',
+    release_id: 'rel_live_001',
+    entity_id: 'ent_graded_001',
+    name: 'Graded Place',
+    name_lower: 'graded place',
+    aliases: [],
+    topics: [],
+    kind: 'place',
+    status: null,
+    geohash: null,
+    related_count: 0,
+    claim_count: 2,
+    facets: {
+      eraBuckets: [],
+      recordMaturity: 'partial_enrichment',
+      researchCoverage: 'partial',
+      confidenceTier: 'medium',
+    },
+  });
+  assert.ok(doc);
+  assert.equal(doc!.confidenceTier, 'medium');
 });
 
 test('mapPostgresSearchIndexRow recovers displayName from name_lower when name is null', () => {

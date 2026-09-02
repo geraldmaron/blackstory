@@ -46,6 +46,32 @@ test('data page keeps section anchors for on-page navigation', () => {
   }
 });
 
+test('data user-facing copy does not leak Phase 1 or warehouse', () => {
+  const strings = [
+    DATA_PAGE_DESCRIPTION,
+    DATA_INTRO.kicker,
+    DATA_INTRO.lede,
+    ...DATA_ORIENTATION_BEATS.flatMap((beat) => [beat.kicker, beat.body]),
+    ...Object.values(DATA_SECTION_COPY).flatMap((section) => [
+      section.kicker,
+      section.title,
+      section.lede,
+    ]),
+    ...DATA_PAGE_SECTIONS.map((section) => section.label),
+  ];
+  for (const value of strings) {
+    assert.doesNotMatch(value, /Phase 1|warehouse|fixture-backed/i);
+  }
+  assert.doesNotMatch(copySource, /Phase 1|warehouse|fixture-backed/i);
+  assert.doesNotMatch(pageSource, /Phase 1|warehouse|fixture-backed/i);
+  assert.doesNotMatch(sectionsSource, /Phase 1|warehouse|fixture-backed/i);
+  assert.doesNotMatch(sectionsSource, /href="\/explore"|href="\/records"/);
+  assert.doesNotMatch(pageSource, /The place is the door back|Back to the place/);
+  assert.doesNotMatch(copySource, /The place is the door back/);
+  assert.doesNotMatch(sectionsSource, /Mosaic credits|ATMOSPHERE_ATTRIBUTION|mosaic-credits/);
+  assert.doesNotMatch(pageSource, /Mosaic credits|ATMOSPHERE_ATTRIBUTION|mosaic-credits/);
+});
+
 test('data user-facing copy avoids em dashes', () => {
   const strings = [
     DATA_PAGE_DESCRIPTION,

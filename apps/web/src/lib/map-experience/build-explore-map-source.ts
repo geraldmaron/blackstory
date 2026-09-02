@@ -22,10 +22,13 @@ import {
 } from '@repo/domain/map/map-source';
 import type { GeoPrecisionTier } from '@repo/domain/geography/display-radius';
 import type { PublicClaimView, PublicEntityView } from '../../data/public-seed';
+import { visitContactClaimsForMap } from '../geography/public-visit-contact';
 import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './entity-geo';
 import { resolveEntityEraBuckets } from './entity-era-facts';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
 import { displayEncodingFor, kindFamilyFor, resolveMapTone } from './kind-encoding';
+import { staysOffPublicMap, atlasWalkHref } from '../place/public-place-path';
+import { instrumentRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
 
 export type ConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
 
@@ -76,6 +79,20 @@ export type ExploreMapFeatureProperties = {
   readonly stateName?: string;
   /** Public location prose from the release (never a redacted residential exact). */
   readonly locationLabel?: string;
+  /** Jurisdiction for composing a fuller visit address line on the sheet. */
+  readonly jurisdictionLabel?: string;
+  /**
+   * Visit-contact claims only (website / phone / hours). Full claim lists stay on the entity
+   * page; the map payload keeps this lean subset for RecordSheet / NarrativeCard visit blocks.
+   */
+  readonly visitClaims?: readonly Pick<
+    PublicClaimView,
+    'id' | 'predicate' | 'object' | 'citationLabel' | 'citationHref'
+  >[];
+  readonly livingStatus?: string;
+  readonly sensitivityClass?: string;
+  /** Door Journey: true only for allowlisted atlas walks, not every `/place/` link. */
+  readonly holdingWalk?: true;
 };
 
 export type ExploreMapFeature = {
@@ -203,7 +220,11 @@ function toMapSourceInput(entity: PublicEntityView, anchor: EntityGeoAnchor): Ma
   };
 }
 
-function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): ExploreMapFeature {
+function enrichFeature(
+  feature: MapPointFeature,
+  entity: PublicEntityView,
+  collisions: ReadonlyMap<string, number>,
+): ExploreMapFeature {
   const tier = geoPrecisionTierForPublicPrecision(feature.properties.precision);
   const radius = resolveDisplayRadiusMeters(tier, {
     ...(feature.properties.statePostalCode
@@ -224,13 +245,23 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
     claims: entity.claims,
   });
 
+  const href = instrumentRecordHref(entity, collisions);
+  const walkHref = atlasWalkHref({
+    displayName: entity.displayName,
+    kind: entity.kind,
+    entityId: entity.id,
+  });
+  const holdingWalk = walkHref !== undefined && walkHref === href;
+  const visitClaims = visitContactClaimsForMap(entity.claims);
+  const jurisdiction = entity.jurisdictionLabel.trim();
+
   return {
     type: 'Feature',
     id: feature.id,
     geometry: feature.geometry,
     properties: {
       entityId: entity.id,
-      href: `/entity/${entity.id}`,
+      href,
       kind: feature.properties.kind,
       displayName: feature.properties.displayName,
       oneLineStory: sanitizePublicProseText(entity.summary),
@@ -257,6 +288,13 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
       ...(entity.locationLabel.trim().length > 0
         ? { locationLabel: entity.locationLabel.trim() }
         : {}),
+      ...(jurisdiction.length > 0 ? { jurisdictionLabel: jurisdiction } : {}),
+      ...(visitClaims.length > 0 ? { visitClaims } : {}),
+      ...(entity.livingStatus !== undefined ? { livingStatus: entity.livingStatus } : {}),
+      ...(entity.sensitivityClass !== undefined
+        ? { sensitivityClass: entity.sensitivityClass }
+        : {}),
+      ...(holdingWalk ? { holdingWalk: true as const } : {}),
     },
   };
 }
@@ -280,6 +318,7 @@ export function buildExploreMapSource(
   let skippedNoAnchor = 0;
 
   for (const entity of entities) {
+    if (staysOffPublicMap(entity)) continue;
     // Live projections carry their own public-precision anchor; the repo-side table is the
     // fallback for bundled seed fixtures only (see entity-geo.ts's retirement note).
     const anchor = entity.geoAnchor ?? resolveAnchor(entity.id);
@@ -297,6 +336,7 @@ export function buildExploreMapSource(
     redactLocation: redactLocationForPublic,
   });
 
+  const collisions = placeSlugCollisionCounts(entities);
   const features = built.featureCollection.features.map((feature) => {
     const entity = entityById.get(feature.properties.entityId);
     if (!entity) {
@@ -304,7 +344,7 @@ export function buildExploreMapSource(
         `buildExploreMapSource: feature "${feature.id}" has no matching active-release entity`,
       );
     }
-    return enrichFeature(feature, entity);
+    return enrichFeature(feature, entity, collisions);
   });
 
   return {

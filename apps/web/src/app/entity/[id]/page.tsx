@@ -1,24 +1,19 @@
 /**
- * Entity detail page for place/school/event/institution public records.
+ * Entity detail page for public records.
  *
- * On the v9 room kit (a Record room with a right rail), not the retired v6 edition stack. The
- * split is the point: the rail holds the apparatus a reader consults: the glance facts, the
- * map and its precision caveat, the sources, the provenance and the research gaps, and the
- * column holds only what a person reads, so the record opens on its own history rather than on
- * four numbered boxes of metadata. The measure and the centring come from the `record` surface
- * class, which is why this route no longer sets a width of its own.
+ * Standable place/school/event/institution records 308 to `/place/{slug}` (collision form
+ * when names collide). People, street-precision residences, and other non-standable records
+ * still render here. Door Rest pin walks stay on the stand allowlist; Place itself resolves
+ * the wider corpus via the search index.
  *
- * Must stay dynamic: App Hosting mounts DATABASE_URL at RUNTIME only. Build-time static
- * `/entity/[id]` for seed-cluster ids previously baked `seed-snapshot` while non-seed ids
- * still read live Postgres (`rel_seed_001`). Same class of split as the map hero.
+ * On the v9 room kit (a Record room with a right rail), not the retired v6 edition stack.
  */
 
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { MapsExternalLink } from '../../../components/map-experience/MapsExternalLink';
+import { notFound, permanentRedirect } from 'next/navigation';
 import type { PublicEntityView } from '../../../data/public-seed';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
-import { RecordPlacePreview } from '../../../components/patterns/RecordPlacePreview';
+import { RecordVisitBlock } from '../../../components/patterns/RecordVisitBlock';
 import '../../../components/entity/entity-page.css';
 import { EntityMastMedia } from '../../../components/entity/EntityMastMedia';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
@@ -26,13 +21,13 @@ import { EntityTopicTags } from '../../../components/entity/EntityTopicTags';
 import { HowToReadThisRecord } from '../../../components/trust';
 import {
   Breadcrumb,
-  Precision,
   Room,
   SourceList,
   TrustBlock,
   type RoomSource,
 } from '../../../components/room';
 import { KindGlyph } from '../../../components/map-experience/KindGlyph';
+import { MapsExternalLink } from '../../../components/map-experience/MapsExternalLink';
 import {
   RECORD_GAP_COPY,
   THIN_RECORD_COPY,
@@ -41,6 +36,7 @@ import {
 import { humanizeToken } from '../../../components/entity/format';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
 import { buildExternalMapsSearchUrl } from '../../../lib/geography/external-maps-url';
+import { shouldShowVisitBlock } from '../../../lib/geography/visit-handoff';
 import {
   buildExploreHref,
   defaultExploreOverlayState,
@@ -53,6 +49,8 @@ import { resolveEntityCrossReferences } from '../../../lib/theme-impact/source';
 import { resolveCitesEdgeIndex } from '../../../lib/articles/source';
 import { storiesCiting } from '../../../lib/release/build-cites-edge';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
+import { canStandHere, isInternalRecordLabel } from '../../../lib/place/public-place-path';
+import { placeHrefForEntity, placeSlugCollisionCounts } from '../../../lib/place/place-slug';
 import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './adapters';
 import { buildEntityAnatomyInputs } from './entity-anatomy-facts';
 import { deriveRecordStanding, isThinRecord } from './entity-view-model';
@@ -209,6 +207,18 @@ export default async function EntityPage({ params }: EntityPageProps) {
     notFound();
   }
 
+  // Standable records use the human `/place/{slug}` address. Collisions carry `--{id}`.
+  if (canStandHere(entity) && !isInternalRecordLabel(entity.displayName)) {
+    let collisions: ReadonlyMap<string, number> | undefined;
+    try {
+      const index = await getPublicSearchIndex();
+      collisions = placeSlugCollisionCounts(index.data);
+    } catch {
+      collisions = undefined;
+    }
+    permanentRedirect(placeHrefForEntity(entity, collisions));
+  }
+
   const standingLabel = deriveRecordStanding(entity);
   const jurisdictionLabel = isDisplayableJurisdictionLabel(entity.jurisdictionLabel)
     ? entity.jurisdictionLabel.trim()
@@ -217,10 +227,19 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const displayClaims = withoutSummaryEchoClaims(entity.claims, entity.summary);
   const evidenceClaims = toEvidenceClaimInputs(displayClaims);
   const geoAnchor = entity.geoAnchor ?? geoAnchorFor(entity.id);
-  const mapsHref = buildExternalMapsSearchUrl({
+  const visitInput = {
+    displayName: entity.displayName,
+    locationLabel: entity.locationLabel,
+    jurisdictionLabel: entity.jurisdictionLabel,
+    locationPrecision: entity.locationPrecision,
+    kind: entity.kind,
+    claims: entity.claims,
+    ...(entity.status !== undefined ? { status: entity.status } : {}),
+    ...(entity.livingStatus !== undefined ? { livingStatus: entity.livingStatus } : {}),
+    ...(entity.sensitivityClass !== undefined ? { sensitivityClass: entity.sensitivityClass } : {}),
+    ...(entity.placeAdvisories !== undefined ? { placeAdvisories: entity.placeAdvisories } : {}),
     ...(geoAnchor ? { lat: geoAnchor.lat, lng: geoAnchor.lng } : {}),
-    query: entity.locationLabel,
-  });
+  };
   const entityLinkCatalog = entityLinkCatalogFromNeighbors(entity);
   const exploreHref = buildExploreHref({
     filters: {
@@ -241,6 +260,16 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const citingStories = storiesCiting(await resolveCitesEdgeIndex(), entity.id);
 
   const anatomyInputs = buildEntityAnatomyInputs(entity, mapTone);
+  const publicAddress = anatomyInputs.whereLabel;
+  const showVisit = shouldShowVisitBlock(visitInput);
+  const whereMapsHref =
+    !showVisit && geoAnchor
+      ? buildExternalMapsSearchUrl({
+          lat: geoAnchor.lat,
+          lng: geoAnchor.lng,
+          query: publicAddress,
+        })
+      : undefined;
   const sources = toRoomSources(entity.claims);
   // Rubric sentences, whole. They used to be truncated into chips next to the title.
   const inclusionBasis = entity.notabilityLabels ?? [];
@@ -263,38 +292,12 @@ export default async function EntityPage({ params }: EntityPageProps) {
    */
   const rail = (
     <>
-      {geoAnchor ? (
-        <section className="ds-record-rail-block" aria-labelledby="where-heading">
-          <h2 className="ds-visually-hidden" id="where-heading">
-            Where this is
-          </h2>
-          {/* A static locator, not the borrowed plate. The plate is `position: fixed` and chases
-              its slot's rect on every scroll frame, which is fine for a full-column reading moment
-              and visibly wrong in a 240px rail; the caveat directly below also holds this record to
-              city precision, which a live street camera contradicts by rendering. See
-              `RecordLocator` for the full argument. */}
-          <RecordPlacePreview
-            lat={geoAnchor.lat}
-            lng={geoAnchor.lng}
-            label={entity.locationLabel}
-          />
-          <Precision
-            resolution={`${entity.locationPrecision} precision`}
-            caveat="The archive never draws a point sharper than the source supports."
-          />
-          <p className="ds-record-rail-block__actions">
-            {mapsHref ? (
-              <MapsExternalLink
-                className="ds-cta ds-cta--quiet"
-                href={mapsHref}
-                placeLabel={entity.locationLabel}
-                title={`Open ${entity.locationLabel} in your maps app`}
-              >
-                Open in maps
-              </MapsExternalLink>
-            ) : null}
-          </p>
-        </section>
+      {showVisit ? (
+        <RecordVisitBlock
+          className="ds-record-visit--rail"
+          showLocator={geoAnchor !== undefined}
+          {...visitInput}
+        />
       ) : null}
 
       <nav className="ds-record-toc" aria-label="On this record">
@@ -438,7 +441,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
                   <KindGlyph kind={entity.kind} {...(mapTone ? { mapTone } : {})} size={12} />
                   {anatomyInputs.kindLabel}
                 </span>
-                {[anatomyInputs.whereLabel, anatomyInputs.eraLabel, standingLabel]
+                {[publicAddress, anatomyInputs.eraLabel, standingLabel]
                   .filter((fact): fact is string => fact !== undefined)
                   .map((fact) => (
                     <span key={fact}>{fact}</span>
@@ -470,7 +473,19 @@ export default async function EntityPage({ params }: EntityPageProps) {
             </div>
             <div>
               <dt>Where</dt>
-              <dd>{anatomyInputs.whereLabel}</dd>
+              <dd>
+                {whereMapsHref ? (
+                  <MapsExternalLink
+                    href={whereMapsHref}
+                    placeLabel={publicAddress}
+                    title={`Where: ${publicAddress}. Open in your maps app.`}
+                  >
+                    {publicAddress}
+                  </MapsExternalLink>
+                ) : (
+                  publicAddress
+                )}
+              </dd>
             </div>
             <div>
               <dt>Era</dt>
@@ -506,6 +521,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
       {entity.sensitivity ? (
         <EntitySensitivityBanner sensitivity={entity.sensitivity} entityKind={entity.kind} />
       ) : null}
+
+      {showVisit ? <RecordVisitBlock className="ds-record-visit--main" {...visitInput} /> : null}
 
       <EntityRoomSections
         entity={entity}

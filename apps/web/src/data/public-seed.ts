@@ -13,6 +13,7 @@ import {
   composeContinueLearningStubs,
 } from '@repo/domain/learning-index';
 import type { DatePrecision } from '@repo/domain/era';
+import type { PlaceAdvisoryRecord } from '@repo/domain/advisory';
 import {
   NOTABILITY_RUBRIC,
   type EntitySensitivity,
@@ -135,6 +136,10 @@ export type PublicEntityView = {
   /** Derived current lifecycle status label (e.g. "active", "in_force"), when the entity kind
    * carries one. Never hand-edited — derived via @repo/domain's `currentEntityStatus`. */
   readonly status?: string;
+  /** Living status for person-kind records; used by visit-contact policy gates. */
+  readonly livingStatus?: 'living' | 'deceased' | 'unknown';
+  /** Present-day place advisories when the release projection carries them. */
+  readonly placeAdvisories?: readonly PlaceAdvisoryRecord[];
   /** Time-scoped status-lifecycle designations for place/school/institution kinds omitted
    * for `event` (see `eventWindow`). `status` above is always `currentStatus(statusHistory)`,
    * never an independent hand-set value. */
@@ -322,8 +327,8 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
     notabilityLabels: [NOTABILITY_RUBRIC.first_to_do_x],
     topicTags: ['education', 'schools', 'preservation'],
     jurisdictionLabel: 'Washington, D.C.',
-    locationPrecision: 'campus',
-    locationLabel: 'New Jersey Avenue NW campus, Truxton Circle (campus-level pin)',
+    locationPrecision: 'institution',
+    locationLabel: 'Paul Laurence Dunbar High School, 101 N Street NW, Washington, D.C.',
     relevanceExplanation:
       'Included as the first public high school for Black students in the United States, with a ' +
       'documented multi-era campus history from its 1870 founding through today.',
@@ -413,8 +418,8 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
     notabilityLabels: [NOTABILITY_RUBRIC.landmark_or_national_register],
     topicTags: ['landmark', 'preservation', 'history'],
     jurisdictionLabel: 'Washington, D.C.',
-    locationPrecision: 'campus',
-    locationLabel: 'Paul Laurence Dunbar High School campus (schematic)',
+    locationPrecision: 'institution',
+    locationLabel: 'Paul Laurence Dunbar High School, 101 N Street NW, Washington, D.C.',
     relevanceExplanation:
       'Included as a formal landmark-designation event with documented listing evidence, tying the ' +
       'connected school’s historical significance to an official public record.',
@@ -459,8 +464,8 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
     notabilityLabels: [NOTABILITY_RUBRIC.community_anchor],
     topicTags: ['alumni', 'preservation', 'community'],
     jurisdictionLabel: 'Washington, D.C.',
-    locationPrecision: 'city',
-    locationLabel: 'Washington, D.C. (city-level pin; no specific street address documented)',
+    locationPrecision: 'institution',
+    locationLabel: 'Paul Laurence Dunbar High School, 101 N Street NW, Washington, D.C.',
     relevanceExplanation:
       'Included as a community-anchor institution with a documented, ongoing role preserving the ' +
       'connected school’s history and legacy.',

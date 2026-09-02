@@ -58,6 +58,9 @@ import { usePaletteData } from './hooks/use-palette-data';
 import { useReaderActions } from './hooks/use-reader-actions';
 import { useCommandContext } from './hooks/use-command-context';
 import { useStoryRunner } from './hooks/use-story-runner';
+import { useExploreUrlSync } from './hooks/use-explore-url-sync';
+import { atlasWalkHref } from '../../lib/place/public-place-path';
+import { placeArrivalQuery } from '../../lib/discovery/discovery-arrival';
 import './atlas.css';
 
 void React;
@@ -218,6 +221,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     setDecade,
     topicId,
     setTopicId,
+    status,
     layerMode,
     setLayerMode,
     layers,
@@ -234,6 +238,33 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     constraints,
     resetLens,
   } = useLensFilters(view, toasts);
+
+  const holdingPlaceArrival = useMemo(() => {
+    return placeArrivalQuery(
+      {
+        ...(kindFamily ? { kind: kindFamily } : {}),
+        ...(decade !== null ? { era: eraBucketFor(decade) } : {}),
+        ...(stateCode ? { state: stateCode } : {}),
+        ...(topicId ? { topic: topicId } : {}),
+        ...(status ? { status } : {}),
+        ...(evidenceFloor === 'A' || evidenceFloor === 'B' || evidenceFloor === 'C'
+          ? { evidence: evidenceFloor }
+          : {}),
+      },
+      'map',
+    );
+  }, [decade, evidenceFloor, kindFamily, stateCode, status, topicId]);
+
+  useExploreUrlSync(view.viewState, {
+    stateCode,
+    kindFamily,
+    evidenceFloor,
+    topicId,
+    status,
+    layerMode,
+    satellite: layers.satellite,
+    selectedId,
+  });
   useMapSync(stage, view, filtered, layers.pins, layers.satellite, selectedId, stateCode);
 
   // The Lens's own population-layer choice overrides the URL-seeded `view.viewState.layerMode`
@@ -246,6 +277,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       jurisdictionAreaFeatures: [],
       layerMode,
       densityLevels: view.densityLevels,
+      clusteringEnabled: view.viewState.group,
       satellite: layers.satellite,
       historyEdgesEnabled: false,
       historyEdgeCollection: view.edgeLineCollection,
@@ -259,6 +291,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     stage,
     view.densityLevels,
     view.edgeLineCollection,
+    view.viewState.group,
     view.viewState.popGeo,
   ]);
 
@@ -300,6 +333,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       view.edgeLineCatalog.allTime.edges,
       view.citesEdge,
       view.allFeatures,
+      holdingPlaceArrival,
     );
   const { copy, citationFor, nearMe } = useReaderActions(toasts, camera);
   const { paletteRecords, destinations, paletteStates, featureById } = usePaletteData(
@@ -373,7 +407,6 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         mode={mode}
         onModeChange={setMode}
         onOpenPalette={() => setPaletteOpen(true)}
-        recordCount={view.allFeatures.length}
         savedCount={collection.records.length}
         onOpenSaved={() => setSavedOpen(true)}
         onOpenShortcuts={() => setShortcutsOpen(true)}
@@ -590,7 +623,8 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           // swallowed: the palette closed and nothing opened, which reads as a broken search.
           // Every record has a page even when it has no pin, so fall through to it.
           setPaletteOpen(false);
-          window.location.assign(`/entity/${record.id}`);
+          const walk = atlasWalkHref({ displayName: record.name, entityId: record.id });
+          if (walk) window.location.assign(walk);
         }}
         onJumpToState={(paletteState) => {
           const match = stateOptions.find((option) => option.label === paletteState.name);
@@ -617,7 +651,12 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
             return;
           }
           // Same as the palette: a saved record whose pin is not in this projection still opens.
-          window.location.assign(`/entity/${record.id}`);
+          const walk = atlasWalkHref({
+            displayName: record.name,
+            kind: record.kind,
+            entityId: record.id,
+          });
+          if (walk) window.location.assign(walk);
         }}
         onRemove={(id) => persist(unsaveRecord(collection, id))}
         onClear={() => persist(clearCollection())}

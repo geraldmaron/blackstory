@@ -58,7 +58,7 @@ export function formatEvidenceScoreLabel(
   const rounded = score.toFixed(2);
   const label = calibration.calibrated
     ? `Calibrated confidence: ${CONFIDENCE_LEVEL_TEXT[level]} (${rounded})${
-        calibration.calibrationMethodNote ? ` \u2014 ${calibration.calibrationMethodNote}` : ''
+        calibration.calibrationMethodNote ? `: ${calibration.calibrationMethodNote}` : ''
       }`
     : `Evidence score: ${CONFIDENCE_LEVEL_TEXT[level]} (${rounded} of 1.00)`;
   assertNoUncalibratedProbabilityLanguage(label, calibration.calibrated);
@@ -79,7 +79,7 @@ export const EVIDENCE_DIMENSION_COPY: Readonly<
   Record<EvidenceDimensionKey, EvidenceDimensionCopy>
 > = {
   confidence: {
-    label: 'Confidence \u2014 evidence score',
+    label: 'Confidence: evidence score',
     description:
       'How strong the supporting evidence is for this specific claim: source authority, ' +
       'directness, independent corroborating lineages, and extraction quality, weighted and ' +
@@ -89,7 +89,7 @@ export const EVIDENCE_DIMENSION_COPY: Readonly<
   relevance: {
     label: 'Relevance',
     description:
-      'Whether this record belongs in BlackStory at all \u2014 its connection to documented ' +
+      'Whether this record belongs in BlackStory at all: its connection to documented ' +
       'Black history against the constitution relevance gates. Distinct from how confident any ' +
       'single claim on the record is.',
   },
@@ -102,7 +102,7 @@ export const EVIDENCE_DIMENSION_COPY: Readonly<
   researchCoverage: {
     label: 'Research coverage',
     description:
-      'How much of this record has been researched so far \u2014 a statement about research ' +
+      'How much of this record has been researched so far: a statement about research ' +
       'completeness, not about the certainty of any individual claim already found.',
   },
 } as const;

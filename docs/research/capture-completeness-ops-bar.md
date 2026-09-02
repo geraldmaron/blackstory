@@ -122,9 +122,9 @@ explicitly overrides.
    and research-only URLs.
 3. **Budget** — allocate ≤ **1,500** `source_fetch` requests per day for SPN backfill (leaves
    headroom below soft shutdown for link-health sweeps and discovery adapters).
-4. **Capture** — route through the existing Wayback capture gate (`captureUrlToEvidencePointer`);
-   persist rows to `bb_evidence.source_captures` and attach `waybackCaptureUrl` on the citation
-   capture pointer. Never fabricate pointers when SPN fails closed.
+4. **Capture** — route live Save Page Now through `capture-backfill --commit --wayback` (domain
+   SPN2 client + operator-cli SafeHttpClient). Persist rows to `bb_evidence.source_captures` and
+   attach the snapshot URL on `storage_object`. Never fabricate pointers when SPN fails closed.
 5. **Re-measure** — repeat until `meetsBar` or the remaining gaps are documented blockers (robots,
    paywall, 404 at capture time).
 6. **Stop** — when `evaluateDailyBudget` reports `disable_source_fetch`, halt SPN entirely until

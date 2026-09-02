@@ -108,9 +108,9 @@ export function buildDarkArchiveStyle(
         source: 'entities',
         paint: {
           'circle-radius': 4,
-          'circle-color': brandPalette.copperPin,
+          'circle-color': brandPalette.pageSand,
           'circle-stroke-width': 1.5,
-          'circle-stroke-color': brandPalette.archivePaper,
+          'circle-stroke-color': brandPalette.copperPin,
         },
       },
     ],

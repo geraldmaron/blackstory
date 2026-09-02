@@ -40,7 +40,7 @@ describe('MapInsetMoment', () => {
 
   it('links into /explore with the entity pre-selected via the shared selected= convention', () => {
     const html = renderToStaticMarkup(<MapInsetMoment {...baseProps} />);
-    assert.match(html, /href="\/\?[^"]*selected=ent_15th_st_church_001[^"]*"/);
+    assert.match(html, /href="\/explore\?[^"]*selected=ent_15th_st_church_001[^"]*"/);
   });
 
   it('renders identically regardless of theme class on an ancestor (both themes safe)', () => {

@@ -40,7 +40,7 @@ export type SearchPageParam = (typeof SEARCH_PAGE_PARAM_ALLOWLIST)[number];
 const VIEWPORT_POLICY_DROPPED = new Set<string>(EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS);
 
 /**
- * Allowed filter/selection keys on the map surface (`/` and `/explore`).
+ * Allowed filter/selection keys on the map surface (`/explore`).
  *
  * Generated from `EXPLORE_URL_PARAM_KEYS`, the URL parser's own key set, rather than retyped, so
  * the allowlist and the parser cannot drift: a key added to `parseExploreSearchParams` is
@@ -106,6 +106,31 @@ export type StoriesPageParam = (typeof STORIES_PAGE_PARAM_ALLOWLIST)[number];
 export const CORRECTIONS_PAGE_PARAM_ALLOWLIST = ['target', 'targetType'] as const;
 
 export type CorrectionsPageParam = (typeof CORRECTIONS_PAGE_PARAM_ALLOWLIST)[number];
+
+/**
+ * Allowed arrival keys on `/place/{slug}`.
+ *
+ * Place is a reading room that must preserve DiscoveryState when the reader arrives from
+ * Records (`from=list`) or the Atlas (`from=map`). Matched with an empty allowlist, the edge
+ * 308s every arrival query away before the page runs — so return links cannot restore the
+ * narrowing the reader already chose. Keep this list aligned with
+ * `discoveryFromSearchParams` / `recordsArrivalQuery`.
+ */
+export const PLACE_PAGE_PARAM_ALLOWLIST = [
+  'from',
+  'q',
+  'kind',
+  'era',
+  'state',
+  'topic',
+  'theme',
+  'status',
+  'evidence',
+  'floor',
+  'selected',
+] as const;
+
+export type PlacePageParam = (typeof PLACE_PAGE_PARAM_ALLOWLIST)[number];
 
 // HISTORY_PAGE_PARAM_ALLOWLIST stood here for the /history decade stepper and its selection
 // params. Both the stepper and the browse UI are gone (repo-92n2.27), and /history left the

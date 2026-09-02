@@ -20,6 +20,7 @@ export function useMapSync(
       jurisdictionAreaFeatures: [],
       layerMode: view.viewState.layerMode,
       densityLevels: view.densityLevels,
+      clusteringEnabled: view.viewState.group,
       satellite,
       historyEdgesEnabled: false,
       historyEdgeCollection: view.edgeLineCollection,
@@ -31,6 +32,7 @@ export function useMapSync(
     stage,
     view.densityLevels,
     view.edgeLineCollection,
+    view.viewState.group,
     view.viewState.layerMode,
   ]);
 

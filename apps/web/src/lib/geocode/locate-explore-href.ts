@@ -8,6 +8,7 @@ import { DEFAULT_EXPLORE_FILTERS } from '../map-experience/filters';
 import type { ExploreRadiusPresetId } from '../map-experience/explore-place-radius';
 import { resolveExploreAddressCamera } from '../map-experience/resolve-explore-address-camera';
 import { buildExploreHref, defaultExploreOverlayState } from '../map-experience/url-state';
+import { ATLAS_INSTRUMENT_HREF } from '../nav/atlas-door';
 import type { LocateResolution } from './locate-client';
 
 /** Default place-search radius when handing off from `/locate` to `/explore`. */
@@ -51,5 +52,5 @@ export function buildLocateExploreHref(resolution: LocateResolution): string {
     });
   }
 
-  return '/';
+  return ATLAS_INSTRUMENT_HREF;
 }

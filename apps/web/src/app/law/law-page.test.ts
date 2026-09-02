@@ -21,7 +21,8 @@ test('law browse page renders through the room kit, with no edition chrome left'
   // `data-law-edition="v6"` marked the per-route chrome the shared kit replaces.
   assert.doesNotMatch(browsePageSource, /data-law-edition="v6"/);
   assert.match(browsePageSource, /from '\.\.\/\.\.\/components\/room'/);
-  assert.match(browsePageSource, /<Room rail={rail}>/);
+  assert.match(browsePageSource, /<Room>/);
+  assert.doesNotMatch(browsePageSource, /\/explore/);
   assert.match(browsePageSource, /<RoomHeader/);
   assert.doesNotMatch(browsePageSource, /ds-page__title/);
 });

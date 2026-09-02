@@ -28,7 +28,7 @@ test('renders resolved jurisdiction names and a link to explore with radius, nev
   const html = renderToStaticMarkup(createElement(LocationResolutionPanel, { result }));
   assert.match(html, /Washington, District of Columbia, District of Columbia/);
   assert.match(html, /us-11-001/);
-  assert.match(html, /href="\/\?/);
+  assert.match(html, /href="\/explore\?/);
   assert.match(html, /radius=10mi/);
   assert.match(html, /Explore nearby \(10 mi\)/);
   assert.doesNotMatch(html, /href="\/search"/);

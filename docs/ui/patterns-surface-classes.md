@@ -30,9 +30,9 @@ Verdicts and URL dispositions are in [`design-direction-v9-surfaces.md`](./desig
 
 | Route | Note |
 |---|---|
-| `/` | The Atlas. Canonical is always bare `/`. |
+| `/` | Front door: the Atlas / map of the archive. A leftover `?atlas=1` is not a second door. |
 | `/story` | New. Six chapters at `/story#chapter-{id}` inside one document. |
-| `/explore` | 308 to `/` carrying the full query string. |
+| `/explore` | Atlas instrument (catalog + map). Not a query on `/`. |
 | `/locate` | 308 to `/?find=place`. Folds into the Lens Where group and a narrow place sheet. |
 
 Pattern: [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md). Design law: [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md).

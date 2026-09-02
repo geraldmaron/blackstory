@@ -1,27 +1,14 @@
 /**
- * Command bar — fixed top, z 50. Brand, the search trigger, two modes, tools.
+ * Command bar — fixed top, z 50. Brand, search, Find (Door / Atlas / Records), Rooms, tools.
  *
- * The centre slot is the single biggest change in v9. v6's shell carried fourteen destinations,
- * six of them top-level and one of them a `MORE` menu hiding nine more. Navigation moves into the
- * palette; the bar carries two modes (design-direction-v9-atlas.md §5.1).
- *
- * Destinations that leave the bar do not leave the site. They stay reachable from the palette and
- * from the site footer, and `CommandBar` deliberately does not render a nav menu of its own so
- * there is no third place for that list to drift.
- *
- * The one exception is Library, and it is a hub rather than a destination: `/library` is where the
- * other eleven rooms are listed, generated from the same registry the palette and the footer read.
- * Without it the bar offered no route off the Atlas at all, and eleven editorial rooms sat behind a
- * keyboard shortcut a first-time reader has no reason to know about. One link to the index is not
- * the fourteen-item menu v9 removed — it is the thing that makes removing it survivable.
- *
- * Branding comes from `BRAND_ASSETS` through the shell's own wordmark classes, so the Atlas bar
- * and the site header render the same artwork with the same light/dark swap.
+ * The Door Journey lives on `/`. Atlas is the map instrument on `/explore`. Journey is no longer
+ * a separate Atlas mode in the bar — the main-page experience is the fold.
  */
 'use client';
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { BRAND_ASSETS } from '@repo/config';
 import { cx, ShellWordmark } from '@repo/ui';
 import { CommandBarSearch } from './CommandBarSearch';
@@ -41,27 +28,29 @@ function SearchGlyph() {
   );
 }
 
-/** The count is a promise the surface can keep only where it has the index loaded. */
-function searchLabel(recordCount: number | undefined): string {
-  return recordCount === undefined
-    ? 'Search records, places, eras'
-    : `Search ${recordCount.toLocaleString('en-US')} records, places, eras`;
+/** Search greets the reader. The catalog count is not that greeting. */
+function searchLabel(): string {
+  return 'Search records, places, eras';
+}
+
+function pathIsCurrent(pathname: string, href: string): boolean {
+  if (href === '/') return pathname === '/';
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export type CommandBarProps = {
   /**
-   * Present only on the Atlas, where Atlas and Journey are two views of one surface. Every other
-   * room renders the same bar without them: a reading room has no story to switch into, and a
-   * toggle that navigates instead of switching would be lying about what it does.
+   * Present when the Atlas instrument mounts this bar (palette / saved / shortcuts). Off the
+   * Atlas the bar shows Find links instead.
    */
   readonly mode?: AtlasMode;
   readonly onModeChange?: (mode: AtlasMode) => void;
   /**
    * Opens the palette, which needs a client record index only the Atlas has. Off the Atlas the
-   * search slot becomes a real link to /records rather than a button that cannot do anything.
+   * search slot becomes a real combobox against /search/api.
    */
   readonly onOpenPalette?: () => void;
-  /** Record count for the search placeholder. Reads as a promise the surface can keep. */
+  /** Kept so existing Atlas callers compile. Search no longer greets with this count. */
   readonly recordCount?: number;
   readonly savedCount?: number;
   readonly onOpenSaved?: () => void;
@@ -74,21 +63,18 @@ export function CommandBar({
   mode,
   onModeChange,
   onOpenPalette,
-  recordCount,
   savedCount = 0,
   onOpenSaved,
   onOpenShortcuts,
   onToggleTheme,
   className,
 }: CommandBarProps) {
+  const pathname = usePathname() || '/';
+  const onAtlas = Boolean(mode && onModeChange);
+
   return (
     <header className={cx('ds-bar', className)}>
-      {/* The same brand component the site header and the admin shell render, so the Atlas
-          cannot drift to its own artwork or its own light/dark pairing. */}
       <Link className="ds-bar__brand ds-shell-wordmark" href="/" aria-label="BlackStory · home">
-        {/* Wordmark only. The `ATLAS` tag that used to sit beside it named one of the two modes
-            the bar already carries as a control, so the same word appeared twice, three inches
-            apart, meaning two different things. */}
         <ShellWordmark lockup={BRAND_ASSETS.lockup} symbol={BRAND_ASSETS.symbol} />
       </Link>
 
@@ -100,70 +86,62 @@ export function CommandBar({
           aria-label="Search records, places and actions"
         >
           <SearchGlyph />
-          <span className="ds-bar__search-text">{searchLabel(recordCount)}</span>
+          <span className="ds-bar__search-text">{searchLabel()}</span>
           <kbd className="ds-kbd">⌘K</kbd>
         </button>
       ) : (
-        /* Off the Atlas the slot is a live combobox against /search/api, not a link. It used to
-           be an anchor to /records: identical in look and position to the Atlas's search, and
-           impossible to type into, so on twelve of the thirteen rooms searching meant navigating
-           somewhere else first. `<noscript>` keeps the old link for a reader without JS. */
         <>
-          <CommandBarSearch placeholder={searchLabel(recordCount)} />
+          <CommandBarSearch placeholder={searchLabel()} />
           <noscript>
             <Link className="ds-bar__search" href="/records" aria-label="Search the record index">
               <SearchGlyph />
-              <span className="ds-bar__search-text">{searchLabel(recordCount)}</span>
+              <span className="ds-bar__search-text">{searchLabel()}</span>
             </Link>
           </noscript>
         </>
       )}
 
       <div className="ds-bar__tools">
-        <nav className="ds-bar__modes" aria-label="Sections">
-          {mode && onModeChange ? (
-            <>
-              <button
-                type="button"
-                onClick={() => onModeChange('atlas')}
-                aria-current={mode === 'atlas' ? 'true' : undefined}
-              >
-                Atlas
-              </button>
-              <button
-                type="button"
-                onClick={() => onModeChange('story')}
-                aria-current={mode === 'story' ? 'true' : undefined}
-              >
-                Journey
-              </button>
-            </>
-          ) : (
-            /* Off the Atlas the two modes are still offered, as links rather than toggles: there is
-               no surface here to switch, so each one navigates to the Atlas and arrives in the mode
-               it names. Dropping Journey outside the map would make it look like a feature of one
-               page rather than a way into the archive.
+        {onAtlas ? (
+          <nav className="ds-bar__modes" aria-label="Sections">
+            <span className="ds-bar__mode-link" aria-current="page">
+              Atlas
+            </span>
+            <Link
+              className="ds-bar__mode-link"
+              href="/"
+              aria-current={pathIsCurrent(pathname, '/') ? 'page' : undefined}
+            >
+              Door
+            </Link>
+          </nav>
+        ) : (
+          <nav className="ds-bar__modes" aria-label="Find">
+            <Link
+              className="ds-bar__mode-link"
+              href="/"
+              aria-current={pathIsCurrent(pathname, '/') ? 'page' : undefined}
+            >
+              Door
+            </Link>
+            <Link
+              className="ds-bar__mode-link"
+              href="/explore"
+              aria-current={pathIsCurrent(pathname, '/explore') ? 'page' : undefined}
+            >
+              Atlas
+            </Link>
+            <Link
+              className="ds-bar__mode-link"
+              href="/records"
+              aria-current={pathIsCurrent(pathname, '/records') ? 'page' : undefined}
+            >
+              Records
+            </Link>
+          </nav>
+        )}
 
-               A fragment, not a query param: `/` normalizes its query at the edge against the
-               explore allowlist, so `?mode=journey` would be stripped before the page ever ran
-               and the link would land on a plain Atlas. A fragment never reaches the server, so it
-               cannot be stripped and cannot split the cache key either. */
-            <>
-              <Link className="ds-bar__mode-link ds-bar__mode-link--first" href="/">
-                Atlas
-              </Link>
-              <Link className="ds-bar__mode-link" href="/#journey">
-                Journey
-              </Link>
-            </>
-          )}
-        </nav>
-
-        {/* Library sits outside the mode group. Atlas and Journey are two views of one surface;
-            the library is every other room, and it opens rather than navigates — a reader
-            choosing a room wants to see the rooms first. Every entry inside is a real link,
-            including /library itself, so nothing here is unreachable to a crawler. */}
-        <LibraryMenu recordCount={recordCount} />
+        <LibraryMenu />
 
         {onOpenSaved ? (
           <button

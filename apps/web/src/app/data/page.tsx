@@ -1,6 +1,6 @@
 /**
- * Data page: national Census population plus Phase 1 / theme-impact indicator visualizations
- * (wealth, housing, justice). Charts wire to warehouse observations or verified fixtures.
+ * Data page: national Census population plus published indicator charts
+ * (wealth, housing, justice). Every chart names its source.
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
@@ -9,11 +9,9 @@ import { buildStateFipsNameMap } from '@repo/domain/statistics/public-data-summa
 import {
   getHistoricalStatePopulationCoverage,
   getNationalPopulationTimelineSnapshot,
-  getPhase1IndicatorCoverageSummary,
   getStatePopulationChanges,
   type HistoricalStatePopulationCoverage,
   type NationalPopulationTimelineSnapshot,
-  type Phase1IndicatorCoverageSummary,
   type StatePopulationChange,
 } from '../../lib/demographics/public-stats-source';
 import { getDataPageIndicatorBundle } from '../../lib/demographics/data-page-indicators';
@@ -22,7 +20,8 @@ import '../../components/data/data-charts.css';
 import './data-page.css';
 import { DATA_INTRO, DATA_PAGE_DESCRIPTION } from './data-copy';
 import { DataSections } from './DataSections';
-import { OffRamp, Room, RoomHeader } from '../../components/room';
+import { Room, RoomHeader } from '../../components/room';
+import { WalkOffRamp } from '../walk-off-ramp';
 import '../reading-room.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
@@ -43,21 +42,14 @@ async function safe<T>(promise: Promise<T | undefined | null>): Promise<T | unde
 const STATE_NAME_BY_FIPS = buildStateFipsNameMap(US_STATES);
 
 export default async function DataPage() {
-  const [
-    timelineSnapshot,
-    stateChanges2010to2020,
-    historicalStateCoverage,
-    phase1Indicators,
-    indicators,
-  ] = await Promise.all([
-    safe(getNationalPopulationTimelineSnapshot()),
-    safe(getStatePopulationChanges('2010', '2020')),
-    safe(getHistoricalStatePopulationCoverage()),
-    safe(getPhase1IndicatorCoverageSummary()),
-    safe(getDataPageIndicatorBundle()),
-  ]);
+  const [timelineSnapshot, stateChanges2010to2020, historicalStateCoverage, indicators] =
+    await Promise.all([
+      safe(getNationalPopulationTimelineSnapshot()),
+      safe(getStatePopulationChanges('2010', '2020')),
+      safe(getHistoricalStatePopulationCoverage()),
+      safe(getDataPageIndicatorBundle()),
+    ]);
 
-  const phase1 = phase1Indicators as Phase1IndicatorCoverageSummary | undefined;
   const historicalStates = historicalStateCoverage as HistoricalStatePopulationCoverage | undefined;
   const timeline = (timelineSnapshot ?? undefined) as
     NationalPopulationTimelineSnapshot | undefined;
@@ -106,18 +98,11 @@ export default async function DataPage() {
         stateChanges={stateChanges}
         stateNameByFips={STATE_NAME_BY_FIPS}
         historicalStates={historicalStates}
-        phase1Indicators={phase1}
         indicators={indicators}
         populationGeneratedAt={timeline?.generatedAt}
       />
 
-      <OffRamp
-        title="Go to the record index"
-        actions={[{ label: 'Search the record index', href: '/records', emphasis: 'copper' }]}
-      >
-        Every number here is a national or Phase 1 series. For the records behind a place, use the
-        record index.
-      </OffRamp>
+      <WalkOffRamp>Every number here is a national series.</WalkOffRamp>
     </Room>
   );
 }

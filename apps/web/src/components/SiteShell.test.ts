@@ -12,10 +12,9 @@ import { surfaceClassFor } from '../lib/nav/surface-classes';
 const here = dirname(fileURLToPath(import.meta.url));
 
 test('only the Atlas resolves to the instrument class', () => {
-  assert.equal(surfaceClassFor('/'), 'instrument');
-  // `/explore` 308s to `/` and never renders, so it must not be treated as a live surface —
-  // a stale instrument verdict here would strip the header from a route that does not exist.
-  assert.equal(surfaceClassFor('/explore'), null);
+  assert.equal(surfaceClassFor('/'), 'reading');
+  assert.equal(surfaceClassFor('/', 'atlas=1'), 'reading');
+  assert.equal(surfaceClassFor('/explore'), 'instrument');
   assert.equal(surfaceClassFor('/explore/api'), null);
   assert.equal(surfaceClassFor('/locate'), 'utility');
   assert.equal(surfaceClassFor('/stories'), 'reading');
@@ -24,8 +23,10 @@ test('only the Atlas resolves to the instrument class', () => {
 test('the two shell gates read the same registry, so they cannot disagree', () => {
   const header = readFileSync(join(here, 'SiteShellHeader.tsx'), 'utf8');
   const footer = readFileSync(join(here, 'SiteShellFooter.tsx'), 'utf8');
-  assert.match(header, /surfaceClassFor\(pathname\) === 'instrument'/);
-  assert.match(footer, /surfaceClassFor\(pathname\) === 'instrument'/);
+  assert.match(header, /useSurfaceClass/);
+  assert.match(footer, /useSurfaceClass/);
+  assert.match(header, /=== 'instrument'/);
+  assert.match(footer, /=== 'instrument'/);
 });
 
 test('SiteHeader uses the theme-paired lockup on every route it renders on', () => {

@@ -65,6 +65,18 @@ test('every multi-column rule is inside a min-width query', () => {
   assert.doesNotMatch(beforeFirstQuery, /grid-template-columns:\s*repeat\(/);
 });
 
+test('about is a room on the walk, not the old board', () => {
+  assert.doesNotMatch(pageSource, /Open the Atlas|ATLAS_INSTRUMENT/);
+  assert.doesNotMatch(pageSource, /The Atlas answers where and when/);
+  assert.doesNotMatch(pageSource, /Banned books/);
+  assert.doesNotMatch(pageSource, /['"`]\/banned-books/);
+  assert.doesNotMatch(pageSource, /Mosaic credits|ATMOSPHERE_ATTRIBUTION|mosaic-credits/);
+  assert.match(pageSource, /WalkOffRamp/);
+  assert.match(pageSource, /ABOUT_ORIGIN/);
+  assert.match(pageSource, /ABOUT_PILLARS/);
+  assert.match(pageSource, /ABOUT_REFUSALS/);
+});
+
 test('user-facing copy avoids em dashes', () => {
   const strings = [
     ...ABOUT_ORIGIN,

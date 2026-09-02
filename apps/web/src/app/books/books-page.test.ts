@@ -29,6 +29,18 @@ test('books browse page renders through the room kit, with the catalog pulse kep
   assert.match(browseSource, /BooksCatalogPulse/);
 });
 
+test('books browse holds the door without shipping a finished Banned books walk room', () => {
+  assert.match(browseSource, /WalkOffRamp/);
+  assert.match(browseSource, /showPath=\{false\}/);
+  assert.doesNotMatch(browseSource, /Open the Atlas|ATLAS_INSTRUMENT|label: 'The place'/);
+  assert.doesNotMatch(browseSource, /['"`]\/banned-books/);
+  assert.doesNotMatch(browseSource, /Archive texture|Mosaic credits|ATMOSPHERE_ATTRIBUTION/);
+  assert.doesNotMatch(browseSource, /Straight to the records|The Atlas answers where and when/);
+  assert.doesNotMatch(browseSource, /\/explore/);
+  assert.match(detailSource, /WalkOffRamp/);
+  assert.doesNotMatch(detailSource, /Open the Atlas|ATLAS_INSTRUMENT|label: 'The place'/);
+});
+
 test('books detail page uses anatomy strip and cover art without gutter mosaic', () => {
   assert.doesNotMatch(detailSource, /EditionAtmosphereMosaic/);
   assert.doesNotMatch(detailSource, /BOOKS_EDITION_MOSAIC_SEED/);

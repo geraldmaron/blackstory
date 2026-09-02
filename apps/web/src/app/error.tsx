@@ -8,7 +8,8 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { Notice } from '@repo/ui';
 import { sanitizeClientErrorDisplay } from '../lib/runtime-hardening/error-surface';
-import { Room, RoomHeader } from '../components/room';
+import { Room } from '../components/room/Room';
+import { RoomHeader } from '../components/room/RoomHeader';
 import './utility.css';
 
 export default function Error({

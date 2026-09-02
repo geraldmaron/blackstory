@@ -6,23 +6,16 @@
  * and does not say, and a "Show the numbers" disclosure holding the table. No value is
  * hover-only or colour-only: every series here is readable from the disclosure table alone.
  *
- * The kind composition graph that design-direction-v9-surfaces.md originally sent here from
- * /history does not exist. `HistoryGraphPanel` was already a `@deprecated` pass-through with no
- * graph body, and the document's own correction (repo-92n2.27) records that it was deleted, not
- * moved, because the composition facet it would have shown already lives on /records as a
- * crawlable facet. The composition card below renders the unavailable state design law defines
- * for exactly this case: a source line and a Notice, never a fabricated chart.
+ * The kind composition graph that once lived here does not exist. This page keeps the
+ * national series. It does not send a reader to the record list for a counted breakdown.
  */
 import type { ReactNode } from 'react';
-import Link from 'next/link';
 import type {
   HistoricalStatePopulationCoverage,
   NationalPopulationTimelineRow,
-  Phase1IndicatorCoverageSummary,
   StatePopulationChange,
 } from '@repo/domain/statistics/public-data-summaries';
 import type { DataPageIndicatorBundle } from '@repo/domain/statistics/data-page-series';
-import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataStatStrip } from '../../components/data/DataStatStrip';
 import { GroupedBarIndicatorChart } from '../../components/data/GroupedBarIndicatorChart';
@@ -59,7 +52,6 @@ export type DataSectionsProps = {
   readonly stateChanges: readonly StatePopulationChange[];
   readonly stateNameByFips: Readonly<Record<string, string>>;
   readonly historicalStates: HistoricalStatePopulationCoverage | undefined;
-  readonly phase1Indicators: Phase1IndicatorCoverageSummary | undefined;
   readonly indicators: DataPageIndicatorBundle;
   readonly populationGeneratedAt?: string | undefined;
 };
@@ -124,8 +116,8 @@ function ChartCard({
             <DataTable caption={table.caption} columns={table.columns} rows={table.rows} />
           ) : (
             <p>
-              No numeric series is attached to this card. See the kind facet on{' '}
-              <Link href="/records">the record index</Link> for the counted breakdown.
+              No numeric series is attached to this card. The counted breakdown of the archive is
+              not a chart on this page.
             </p>
           )}
         </Disclosure>
@@ -182,14 +174,13 @@ export function DataSections({
   stateChanges,
   stateNameByFips,
   historicalStates,
-  phase1Indicators,
   indicators,
   populationGeneratedAt,
 }: DataSectionsProps) {
   const servedFromNote =
     indicators.servedFrom === 'fixture'
-      ? 'Charts below use verified Phase 1 fixtures until live warehouse rows replace them.'
-      : 'Charts below read from the reference indicator warehouse when available.';
+      ? 'Charts below use published reference figures, and name their sources.'
+      : 'Charts below read published series when they are available, and name their sources.';
 
   return (
     <div className="ds-data-edition__stack">
@@ -228,10 +219,6 @@ export function DataSections({
             ))}
           </ul>
         </nav>
-        <p className="ds-data-edition__credit">
-          Archive texture · symbolic atmosphere.{' '}
-          <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
-        </p>
       </article>
 
       <ChartCard
@@ -316,8 +303,7 @@ export function DataSections({
           </>
         ) : (
           <p className="ds-data-edition__empty">
-            Census population figures are not available on this release. Open{' '}
-            <Link href="/">the map</Link> for place layers.
+            Census population figures are not available on this release.
           </p>
         )}
       </ChartCard>
@@ -363,7 +349,7 @@ export function DataSections({
         asOf={formatAsOf(indicators.generatedAt)}
         limits={
           <>
-            Cook County is the Phase 1 place spine: decennial homeownership, mortgage denial rates
+            Cook County is the first county spine: decennial homeownership, mortgage denial rates
             and HUD cost burden. These are published rates for the censuses and years shown, with
             nothing interpolated between them. A rate is only as good as the survey behind it; it
             does not trace an individual household&apos;s path.
@@ -414,54 +400,6 @@ export function DataSections({
       >
         <RacePairComparisonChart series={indicators.imprisonmentComparison} />
         <GroupedBarIndicatorChart series={indicators.federalDrugSentences} />
-      </ChartCard>
-
-      <ChartCard
-        id="composition"
-        kicker="Records"
-        title="Kind composition"
-        sourceLabel="Record index (/records)"
-        asOf="Not published as a chart on this release"
-        limits={
-          <>
-            This card once pointed at a kind composition graph inherited from the retired /history
-            route. That graph was already a placeholder with no chart of its own, so it has been
-            retired rather than rebuilt here: the composition it would have shown, how many records
-            of each kind, already renders as a crawlable, linkable facet on the record index, which
-            is where /history&apos;s redirect sends every bookmark. Nothing about record kinds is
-            hidden; it lives at a different address.
-          </>
-        }
-        table={null}
-      >
-        {phase1Indicators ? (
-          <DataStatStrip
-            labelledBy="composition-heading"
-            sources={[{ label: 'Phase 1 indicator catalog', url: '/methodology' }]}
-            items={[
-              {
-                id: 'p1-metrics',
-                value: phase1Indicators.metricCount.toLocaleString('en-US'),
-                label: 'Curated metrics defined',
-                note: phase1Indicators.themes.join(', '),
-              },
-              {
-                id: 'p1-obs',
-                value: phase1Indicators.sampleObservationCount.toLocaleString('en-US'),
-                label: 'Warehouse observations loaded',
-                note:
-                  phase1Indicators.sampleObservationCount === 0
-                    ? 'Catalog and fixtures until ingest completes'
-                    : 'bb_reference statistical observations',
-              },
-            ]}
-          />
-        ) : (
-          <p className="ds-data-edition__empty">
-            No chart renders here. Open <Link href="/records">the record index</Link> for the kind
-            breakdown.
-          </p>
-        )}
       </ChartCard>
 
       <article className="ds-data-edition__panel" aria-labelledby="themes-heading" id="themes">

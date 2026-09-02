@@ -1,12 +1,18 @@
 /**
  * sitemap helpers derive URL entries from active release projections.
- * Consumed by apps/web/src/app/sitemap.ts; keeps release-scoped routing logic testable.
+ * Consumed by `app/sitemap.xml/route.ts`; keeps release-scoped routing logic testable.
  */
 import type { MetadataRoute } from 'next';
 import { crawlableDestinations } from '../nav/destination-registry';
+import { canStandHere } from '../place/public-place-path';
+import { placeHrefForEntity, placeSlugCollisionCounts } from '../place/place-slug';
 
 export type SitemapEntityEntry = {
   readonly id: string;
+  readonly displayName?: string;
+  readonly kind?: string;
+  readonly summary?: string;
+  readonly locationPrecision?: string;
   readonly updatedAt?: string;
 };
 
@@ -44,8 +50,27 @@ function toAbsolute(siteUrl: string, path: string): string {
   return new URL(path, siteUrl).toString();
 }
 
+function recordPath(entity: SitemapEntityEntry, collisions: ReadonlyMap<string, number>): string {
+  const displayName = entity.displayName?.trim() ?? '';
+  if (
+    displayName.length > 0 &&
+    canStandHere({
+      displayName,
+      kind: entity.kind ?? 'place',
+      summary: entity.summary ?? displayName,
+      ...(entity.locationPrecision !== undefined
+        ? { locationPrecision: entity.locationPrecision }
+        : {}),
+    })
+  ) {
+    return placeHrefForEntity({ id: entity.id, displayName }, collisions);
+  }
+  return `/entity/${entity.id}`;
+}
+
 /**
- * Builds sitemap entries for static routes plus entity pages from the active release catalog.
+ * Builds sitemap entries for static routes plus record pages from the active release catalog.
+ * Standable records emit `/place/{slug}`; the rest keep `/entity/{id}`.
  */
 export function buildPublicSitemapEntries(
   options: BuildSitemapOptions = {},
@@ -59,12 +84,65 @@ export function buildPublicSitemapEntries(
     priority: route.priority,
   }));
 
-  const entityEntries: MetadataRoute.Sitemap = (options.entities ?? []).map((entity) => ({
-    url: toAbsolute(siteUrl, `/entity/${entity.id}`),
+  const entities = options.entities ?? [];
+  const collisions = placeSlugCollisionCounts(
+    entities.flatMap((entity) =>
+      entity.displayName?.trim() ? [{ displayName: entity.displayName }] : [],
+    ),
+  );
+
+  const entityEntries: MetadataRoute.Sitemap = entities.map((entity) => ({
+    url: toAbsolute(siteUrl, recordPath(entity, collisions)),
     lastModified: entity.updatedAt ?? releaseStamp,
     changeFrequency: 'weekly',
     priority: 0.8,
   }));
 
   return [...staticEntries, ...entityEntries];
+}
+
+/**
+ * What the CDN is told for `/sitemap.xml`. Same shape as `/atlas/catalog`: a force-dynamic
+ * route handler keeps this header (dynamic *pages* get `no-store`). Crawlers hit this URL
+ * constantly; one origin build per hour is enough for a release-scoped URL list.
+ */
+export const SITEMAP_CACHE_CONTROL =
+  'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400';
+
+function escapeXml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&apos;');
+}
+
+function lastmodIso(value: MetadataRoute.Sitemap[number]['lastModified']): string | undefined {
+  if (value === undefined) return undefined;
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return undefined;
+  return date.toISOString();
+}
+
+/** Serialize the App Router sitemap array to protocol XML. */
+export function serializeSitemapXml(entries: MetadataRoute.Sitemap): string {
+  const urls = entries
+    .map((entry) => {
+      const lastmod = lastmodIso(entry.lastModified);
+      const changefreq = entry.changeFrequency;
+      const priority = entry.priority;
+      return [
+        '<url>',
+        `<loc>${escapeXml(entry.url)}</loc>`,
+        lastmod ? `<lastmod>${lastmod}</lastmod>` : '',
+        changefreq ? `<changefreq>${changefreq}</changefreq>` : '',
+        priority !== undefined ? `<priority>${priority}</priority>` : '',
+        '</url>',
+      ]
+        .filter((part) => part.length > 0)
+        .join('');
+    })
+    .join('');
+  return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`;
 }

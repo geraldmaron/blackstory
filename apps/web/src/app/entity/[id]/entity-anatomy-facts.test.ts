@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { getPublicEntity } from '../../../data/public-seed';
 import { buildEntityAnatomyInputs, buildEntityAnatomyPlace } from './entity-anatomy-facts';
+import { buildVisitHandoff } from '../../../lib/geography/visit-handoff';
 
 function requireEntity(id: string) {
   const entity = getPublicEntity(id);
@@ -17,12 +18,16 @@ test('buildEntityAnatomyInputs resolves era from structured buckets before Undat
   const inputs = buildEntityAnatomyInputs(entity, undefined);
   assert.notEqual(inputs.eraLabel, 'Undated');
   assert.match(inputs.evidenceLabel, /source/);
+  assert.equal(
+    inputs.whereLabel,
+    'Dupont/Sixteenth Street Historic District area, Washington, D.C.',
+  );
 });
 
 test('buildEntityAnatomyInputs falls back to Place withheld when jurisdiction unknown', () => {
   const entity = requireEntity('ent_15th_st_church_001');
   const inputs = buildEntityAnatomyInputs({ ...entity, jurisdictionLabel: 'Unknown' }, undefined);
-  assert.equal(inputs.whereLabel, entity.locationLabel);
+  assert.equal(inputs.whereLabel, 'Dupont/Sixteenth Street Historic District area');
 });
 
 test('buildEntityAnatomyInputs does not treat United States as a place', () => {
@@ -31,7 +36,7 @@ test('buildEntityAnatomyInputs does not treat United States as a place', () => {
     { ...entity, jurisdictionLabel: 'United States' },
     undefined,
   );
-  assert.equal(inputs.whereLabel, entity.locationLabel);
+  assert.equal(inputs.whereLabel, 'Dupont/Sixteenth Street Historic District area');
 });
 
 test('buildEntityAnatomyPlace returns undefined without geo anchor', () => {
@@ -47,4 +52,22 @@ test('buildEntityAnatomyPlace carries precision caption when geo exists', () => 
   assert.equal(place.lat, anchor.lat);
   assert.equal(place.precision, entity.locationPrecision);
   assert.ok(place.precisionCaption);
+  assert.equal(place.label, buildEntityAnatomyInputs(entity, undefined).whereLabel);
+});
+
+test('Where and Visit resolve the same public address line', () => {
+  const entity = requireEntity('ent_15th_st_church_001');
+  const where = buildEntityAnatomyInputs(entity, undefined).whereLabel;
+  const visit = buildVisitHandoff({
+    displayName: entity.displayName,
+    locationLabel: entity.locationLabel,
+    jurisdictionLabel: entity.jurisdictionLabel,
+    locationPrecision: entity.locationPrecision,
+    kind: entity.kind,
+    claims: entity.claims,
+    ...(entity.status !== undefined ? { status: entity.status } : {}),
+    ...(entity.geoAnchor ? { lat: entity.geoAnchor.lat, lng: entity.geoAnchor.lng } : {}),
+  });
+  assert.equal(where, visit.addressLine);
+  assert.doesNotMatch(where, /pin|schematic/i);
 });

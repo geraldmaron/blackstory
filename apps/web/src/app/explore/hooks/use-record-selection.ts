@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, type Dispatch, type SetStateAction } from 'react';
+import { useCallback, useEffect, useMemo, useRef, type Dispatch, type SetStateAction } from 'react';
 import type { SheetRecord } from '../../../components/map-experience/RecordSheet';
 import type { MapStageHandle } from '../../../components/map-stage/MapStage';
 import type { CameraApi } from '../../../lib/map-experience/camera-moves';
@@ -12,7 +12,14 @@ import {
   buildSheetConnections,
   buildSheetSources,
 } from '../../../lib/map-experience/build-sheet-detail';
+import { buildVisitHandoffFromMapFeature } from '../../../lib/geography/visit-handoff';
+import { withQuery } from '../../../lib/discovery/discovery-arrival';
 import { anatomyPrecisionFor, eraFor } from './atlas-feature-helpers';
+import {
+  resolveExplorePinEntityId,
+  subscribeExplorePinSelect,
+  type ExplorePinSelectTarget,
+} from '../../../lib/map-experience/explore-pin-select';
 
 /**
  * The selected record: its index in the current sort order, the sheet's view of it, and the
@@ -36,6 +43,8 @@ export function useRecordSelection(
   citesEdge: CitesEdgeIndex = {},
   /** Every feature in the catalog, so a connection can resolve to a record the lens filtered out. */
   allFeatures: readonly ExploreMapFeature[] = sorted,
+  /** Place arrival query (`from=map` + DiscoveryState filters). Empty when unnarrowed. */
+  placeArrivalQuery = '',
 ) {
   /*
    * Connections must resolve against the whole catalog, not the current lens. A record founded by
@@ -65,10 +74,14 @@ export function useRecordSelection(
     [camera, featuresById, setSelectedId],
   );
 
-  const selectedFeature = useMemo(
-    () => sorted.find((feature) => feature.properties.entityId === selectedId) ?? null,
-    [selectedId, sorted],
-  );
+  const selectedFeature = useMemo(() => {
+    if (selectedId === undefined) return null;
+    return (
+      sorted.find((feature) => feature.properties.entityId === selectedId) ??
+      featuresById.get(selectedId) ??
+      null
+    );
+  }, [featuresById, selectedId, sorted]);
 
   const selectedIndex = useMemo(
     () => sorted.findIndex((feature) => feature.properties.entityId === selectedId),
@@ -82,7 +95,7 @@ export function useRecordSelection(
       const [lng, lat] = feature.geometry.coordinates;
       camera.flyToRecord({ center: [lng, lat], place: placeLabelFor(feature) });
     },
-    [camera],
+    [camera, setSelectedId],
   );
 
   const stepRecord = useCallback(
@@ -96,11 +109,37 @@ export function useRecordSelection(
     [select, selectedIndex, sorted],
   );
 
-  /** Selecting a pin on the plate selects the same record in the rail. */
+  /** Pin clicks stay on the plate and open the record sheet. Place pages are a sheet CTA. */
   useEffect(
-    () => stage.subscribe('select', (entityId) => setSelectedId(entityId)),
+    () =>
+      stage.subscribe('select', (entityId) => {
+        setSelectedId(entityId);
+      }),
     [setSelectedId, stage],
   );
+
+  const lastUnderlayPinRef = useRef<ExplorePinSelectTarget | null>(null);
+
+  useEffect(
+    () =>
+      subscribeExplorePinSelect((target) => {
+        lastUnderlayPinRef.current = target;
+        const entityId = resolveExplorePinEntityId(target, allFeatures);
+        if (entityId) selectById(entityId);
+      }),
+    [allFeatures, selectById],
+  );
+
+  // First-paint discs carry `pin-N`. When the catalog replaces that source, keep the
+  // open sheet on the same geography instead of dropping a now-unknown id.
+  useEffect(() => {
+    if (selectedId === undefined || !selectedId.startsWith('pin-')) return;
+    if (featuresById.has(selectedId)) return;
+    const target = lastUnderlayPinRef.current;
+    if (!target) return;
+    const entityId = resolveExplorePinEntityId(target, allFeatures);
+    if (entityId) selectById(entityId);
+  }, [allFeatures, featuresById, selectById, selectedId]);
 
   const sheetRecord = useMemo<SheetRecord | null>(() => {
     if (!selectedFeature) return null;
@@ -130,7 +169,7 @@ export function useRecordSelection(
       anatomyPlace: {
         lng: selectedFeature.geometry.coordinates[0],
         lat: selectedFeature.geometry.coordinates[1],
-        label: selectedFeature.properties.locationLabel ?? placeLabelFor(selectedFeature),
+        label: placeLabelFor(selectedFeature),
         precision: anatomyPrecisionFor(selectedFeature.properties.precision),
       },
       era: eraFor(selectedFeature),
@@ -146,7 +185,9 @@ export function useRecordSelection(
        * false about a record whose page cites a source.
        */
       sourceCount: sources,
-      href: selectedFeature.properties.href,
+      ...(selectedFeature.properties.href
+        ? { href: withQuery(selectedFeature.properties.href, placeArrivalQuery) }
+        : {}),
       sources: buildSheetSources(allTimeEdges, selectedFeature.properties.entityId),
       connections: buildSheetConnections(
         allTimeEdges,
@@ -158,13 +199,40 @@ export function useRecordSelection(
             name: feature.properties.displayName,
             kind: feature.properties.kind,
             ...(feature.properties.mapTone ? { mapTone: feature.properties.mapTone } : {}),
-            ...(feature.properties.href ? { href: feature.properties.href } : {}),
+            ...(feature.properties.href
+              ? { href: withQuery(feature.properties.href, placeArrivalQuery) }
+              : {}),
           };
         },
       ),
       citingStories: storiesCiting(citesEdge, selectedFeature.properties.entityId),
+      visitInput: buildVisitHandoffFromMapFeature({
+        displayName: selectedFeature.properties.displayName,
+        locationPrecision: selectedFeature.properties.precision,
+        kind: selectedFeature.properties.kind,
+        lat: selectedFeature.geometry.coordinates[1],
+        lng: selectedFeature.geometry.coordinates[0],
+        ...(selectedFeature.properties.locationLabel !== undefined
+          ? { locationLabel: selectedFeature.properties.locationLabel }
+          : {}),
+        ...(selectedFeature.properties.jurisdictionLabel !== undefined
+          ? { jurisdictionLabel: selectedFeature.properties.jurisdictionLabel }
+          : {}),
+        ...(selectedFeature.properties.status !== undefined
+          ? { status: selectedFeature.properties.status }
+          : {}),
+        ...(selectedFeature.properties.livingStatus !== undefined
+          ? { livingStatus: selectedFeature.properties.livingStatus }
+          : {}),
+        ...(selectedFeature.properties.sensitivityClass !== undefined
+          ? { sensitivityClass: selectedFeature.properties.sensitivityClass }
+          : {}),
+        ...(selectedFeature.properties.visitClaims !== undefined
+          ? { claims: selectedFeature.properties.visitClaims }
+          : {}),
+      }),
     };
-  }, [allTimeEdges, citesEdge, featuresById, selectedFeature]);
+  }, [allTimeEdges, citesEdge, featuresById, placeArrivalQuery, selectedFeature]);
 
   return {
     selectedFeature,

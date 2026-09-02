@@ -11,7 +11,7 @@ import {
   geoPrecisionTierForPublicPrecision,
   radiusAffordanceLabel,
 } from '../../../lib/map-experience/geo-precision';
-import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
+import { resolvePublicAddressLine } from '../../../lib/geography/public-address';
 import type { ConfidenceTierKey } from '../../../lib/map-experience/confidence-icons';
 
 const CONFIDENCE_GRADE: Record<ConfidenceTierKey, string> = {
@@ -34,14 +34,13 @@ export type EntityAnatomyInputs = {
 };
 
 function whereLabelFor(entity: PublicEntityView): string {
-  if (isDisplayableJurisdictionLabel(entity.jurisdictionLabel)) {
-    return entity.jurisdictionLabel.trim();
-  }
-  const location = entity.locationLabel.trim();
-  if (location.length > 0 && !/^unknown$/iu.test(location)) {
-    return location;
-  }
-  return 'Place withheld';
+  return resolvePublicAddressLine({
+    displayName: entity.displayName,
+    locationLabel: entity.locationLabel,
+    jurisdictionLabel: entity.jurisdictionLabel,
+    locationPrecision: entity.locationPrecision,
+    kind: entity.kind,
+  });
 }
 
 export function buildEntityAnatomyInputs(
@@ -86,7 +85,13 @@ export function buildEntityAnatomyPlace(
   return {
     lat: geoAnchor.lat,
     lng: geoAnchor.lng,
-    label: entity.locationLabel,
+    label: resolvePublicAddressLine({
+      displayName: entity.displayName,
+      locationLabel: entity.locationLabel,
+      jurisdictionLabel: entity.jurisdictionLabel,
+      locationPrecision: entity.locationPrecision,
+      kind: entity.kind,
+    }),
     precision: entity.locationPrecision,
     precisionCaption: radiusAffordanceLabel(tier, undefined),
   };

@@ -53,16 +53,7 @@ export function redirectsForNextConfig() {
     { source: '/legal', destination: '/law', permanent: true },
     { source: '/legal/:path*', destination: '/law/:path*', permanent: true },
 
-    // Both land on the Atlas, which is `/`. Next carries the query string through a redirect
-    // automatically, so an `/explore?state=OK&era=1920s` bookmark keeps its constraints — the
-    // param vocabularies are identical because `query-normalization.ts` runs `/` and `/explore`
-    // through the same allowlist and the same parse/build pair.
-    //
-    // Exact `/explore` only, never `/explore/:path*`: `/explore/api` is the Atlas's refine
-    // endpoint and must keep answering on its own URL.
-    { source: '/explore', destination: '/', permanent: true },
-    // A config rule rather than a page-level `redirect()` call: permanent instead of temporary,
-    // and one less render.
-    { source: '/map', destination: '/', permanent: true },
+    // `/map` is the old name for the Atlas. `/` is the map door; `/explore` still renders it.
+    { source: '/map', destination: '/explore', permanent: true },
   ];
 }

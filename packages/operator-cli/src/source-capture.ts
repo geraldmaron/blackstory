@@ -14,6 +14,7 @@
  */
 import { createHash } from 'node:crypto';
 import type { SafeFetchResult } from '@repo/security/url-safety';
+import type { WaybackAnchor } from './wayback-anchor.js';
 
 /** The three cited-URL surfaces the backfill walks. */
 export type CaptureSurface = 'entity' | 'packet' | 'article';
@@ -163,6 +164,8 @@ export type CaptureDeps = {
   /** Deterministic id + clock for reproducible tests. */
   readonly newId: (prefix: string, seed: string) => string;
   readonly now: () => string;
+  /** Optional SPN2 secondary anchor; absent means --wayback skipped (no keys or not requested). */
+  readonly waybackAnchor?: WaybackAnchor;
 };
 
 export type CaptureOutcome = {

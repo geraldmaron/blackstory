@@ -42,7 +42,7 @@ export function useSavedCollection(toasts: UseToasts) {
             place: placeLabelFor(feature),
             era: eraFor(feature),
             grade: gradeForConfidence(feature.properties.confidenceTier),
-            href: feature.properties.href,
+            href: feature.properties.href || '/',
             lng,
             lat,
             savedAt: new Date().toISOString(),

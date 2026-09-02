@@ -1,16 +1,31 @@
 /**
- * The public place line for a feature: released prose first, then the state, then an explicit
- * admission that no location is published. Never a coordinate — a record whose location is
- * withheld must read as withheld, not as a blank.
+ * The public place line for a map feature. Same composer as entity-page Where and Visit:
+ * `resolvePublicAddressLine`. Never a coordinate. Withheld labels fall back to the state name,
+ * then "Place withheld".
  *
- * Its own module, importing the feature type and nothing else, because four surfaces render it
- * (camera announcements, the record sheet, the results rail, the palette index) and two of them
- * are client components. `build-explore-map-source.ts`, where the type lives, reaches
- * `@repo/domain/editorial` and through it `node:crypto`, so a value import from there drags the
- * confidence engine into the browser bundle and the build fails on an unhandled `node:` scheme.
+ * Kept off `build-explore-map-source.ts` because that module reaches `node:crypto` through the
+ * editorial package; this file is imported by client Atlas chrome.
  */
+import { resolvePublicAddressLine } from '../geography/public-address';
 import type { ExploreMapFeature } from './build-explore-map-source';
 
 export function placeLabelFor(feature: ExploreMapFeature): string {
-  return feature.properties.locationLabel ?? feature.properties.stateName ?? 'Place not published';
+  const { properties } = feature;
+  const line = resolvePublicAddressLine({
+    displayName: properties.displayName,
+    locationLabel: properties.locationLabel ?? '',
+    locationPrecision: properties.precision,
+    kind: properties.kind,
+    ...(properties.jurisdictionLabel !== undefined
+      ? { jurisdictionLabel: properties.jurisdictionLabel }
+      : {}),
+  });
+  if (line !== 'Place withheld') {
+    return line;
+  }
+  const stateName = properties.stateName?.trim();
+  if (stateName) {
+    return stateName;
+  }
+  return 'Place withheld';
 }

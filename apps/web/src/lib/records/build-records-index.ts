@@ -11,7 +11,9 @@
  * public geo anchor for, so an index built from it would silently omit every record without
  * coordinates — and "what is documented about X, including the things we cannot place" is the
  * exact question this room exists to answer (design-direction-v9-surfaces.md §4.2, and the
- * epic's first binding correction). So rows are built from `PublicEntityView` directly.
+ * epic's first binding correction). So rows are built from a catalog that keeps ungeocoded
+ * records: full `PublicEntityView` today, or the search_index slim when `confidenceTier` is
+ * projected on active-release docs.
  *
  * The filter VOCABULARY, though, must not drift from the Lens. Every label and bucket here is
  * derived by calling the same shared modules the Atlas calls — `kindFamilyFor`,
@@ -23,9 +25,14 @@ import {
   findUsStateByPostalCode,
   findUsStateFromJurisdictionLabel,
 } from '@repo/domain/map/geography';
+import type { PublicSearchIndexDoc } from '@repo/domain/search';
 import type { PublicEntityView } from '../../data/public-seed';
 import { highestConfidence, type ConfidenceTier } from '../map-experience/build-explore-map-source';
 import { resolveEntityEraBuckets } from '../map-experience/entity-era-facts';
+import { geoAnchorFor } from '../map-experience/entity-geo';
+import { mapListContinuityLabel } from '../discovery/continuity-label';
+import { canStandHere, staysOffPublicMap } from '../place/public-place-path';
+import { placeHrefForEntity, placeSlugCollisionCounts } from '../place/place-slug';
 import {
   EVIDENCE_FLOORS,
   floorLabel,
@@ -42,6 +49,26 @@ import {
   resolveMapTone,
   type MapKindFamily,
 } from '../map-experience/kind-encoding';
+
+/** Arrival query Place pages understand (`from=list` + shared DiscoveryState keys). */
+function recordsArrivalQuery(query: RecordsQuery): string {
+  const params = new URLSearchParams();
+  params.set('from', 'list');
+  if (query.q.length > 0) params.set('q', query.q);
+  if (query.kind.length > 0) params.set('kind', query.kind);
+  if (query.era.length > 0) params.set('era', query.era);
+  if (query.state.length > 0) params.set('state', query.state);
+  if (query.topic.length > 0) params.set('topic', query.topic);
+  if (query.status.length > 0) params.set('status', query.status);
+  if (query.evidence.length > 0) params.set('evidence', query.evidence);
+  // Bare from=list is enough to mark the handoff; keep it even when unnarrowed.
+  return params.toString();
+}
+
+function withArrivalQuery(href: string, query: string): string {
+  if (query.length === 0) return href;
+  return href.includes('?') ? `${href}&${query}` : `${href}?${query}`;
+}
 
 /** 100 per page, stated in the design law. Page two is its own URL, never client state. */
 export const RECORDS_PAGE_SIZE = 100;
@@ -140,6 +167,8 @@ export type RecordsIndex = {
   /** Hands the current narrowing to the Atlas, with the reason string the off-ramp reads out. */
   readonly atlasHref: string;
   readonly atlasReason: string;
+  /** Matched records that carry a public map anchor (honest Atlas continuity). */
+  readonly mappableMatched: number;
 };
 
 function humanize(value: string): string {
@@ -204,14 +233,44 @@ type RecordFacts = {
   readonly stateName: string | undefined;
   readonly status: string;
   readonly haystack: string;
+  readonly mappable: boolean;
 };
 
-function toFacts(entity: PublicEntityView): RecordFacts {
-  const mapTone = resolveMapTone({
-    topicTags: entity.topicTags,
-    ...(entity.topicIds !== undefined ? { topicIds: entity.topicIds } : {}),
-    displayName: entity.displayName,
-  });
+/**
+ * Minimal catalog row for Records. Full entities and search_index docs both adapt into this.
+ * Keeps ungeocoded records (unlike ExploreMapFeature).
+ */
+export type RecordsCatalogEntry = {
+  readonly id: string;
+  readonly displayName: string;
+  readonly kind: string;
+  readonly summary: string;
+  readonly jurisdictionLabel: string;
+  readonly locationLabel: string;
+  readonly topicTags: readonly string[];
+  readonly topicIds?: readonly string[];
+  readonly eraBuckets?: readonly string[];
+  readonly status?: string;
+  readonly confidenceTier: ConfidenceTier;
+  readonly mappable: boolean;
+  readonly locationPrecision?: string;
+};
+
+/** True when search_index docs carry projected confidence (backfill or new publishes). */
+export function searchIndexReadyForRecords(
+  docs: readonly PublicSearchIndexDoc[],
+  /** Require this share of docs to carry an explicit tier before leaving full-entity hydrate. */
+  minCoverage = 0.95,
+): boolean {
+  if (docs.length === 0) return false;
+  let withTier = 0;
+  for (const doc of docs) {
+    if (doc.confidenceTier !== undefined) withTier += 1;
+  }
+  return withTier / docs.length >= minCoverage;
+}
+
+export function recordsCatalogFromEntity(entity: PublicEntityView): RecordsCatalogEntry {
   const eraBuckets = resolveEntityEraBuckets({
     ...(entity.eraBuckets !== undefined ? { eraBuckets: entity.eraBuckets } : {}),
     ...(entity.era !== undefined ? { era: entity.era } : {}),
@@ -219,23 +278,87 @@ function toFacts(entity: PublicEntityView): RecordFacts {
     ...(entity.statusHistory !== undefined ? { statusHistory: entity.statusHistory } : {}),
     claims: entity.claims,
   });
-  const confidenceTier = highestConfidence(entity.claims);
-  const state = findUsStateFromJurisdictionLabel(entity.jurisdictionLabel);
-  const location = entity.locationLabel.trim();
-  const place = location.length > 0 ? location : entity.jurisdictionLabel.trim();
-  const topicSource = entity.topicIds ?? entity.topicTags;
+  return {
+    id: entity.id,
+    displayName: entity.displayName,
+    kind: entity.kind,
+    summary: entity.summary,
+    jurisdictionLabel: entity.jurisdictionLabel,
+    locationLabel: entity.locationLabel,
+    topicTags: entity.topicTags,
+    ...(entity.topicIds !== undefined ? { topicIds: entity.topicIds } : {}),
+    eraBuckets,
+    ...(entity.status !== undefined ? { status: entity.status } : {}),
+    confidenceTier: highestConfidence(entity.claims),
+    mappable: carriesPublicMapAnchor(entity),
+    ...(entity.locationPrecision !== undefined
+      ? { locationPrecision: entity.locationPrecision }
+      : {}),
+  };
+}
+
+export function recordsCatalogFromSearchDoc(doc: PublicSearchIndexDoc): RecordsCatalogEntry {
+  const summary = doc.summary?.trim() ?? '';
+  const jurisdictionLabel = doc.jurisdictionState?.trim() ?? '';
+  return {
+    id: doc.id,
+    displayName: doc.displayName,
+    kind: doc.kind,
+    summary,
+    jurisdictionLabel,
+    locationLabel: '',
+    topicTags: doc.topicTags,
+    ...(doc.topicIds !== undefined ? { topicIds: doc.topicIds } : {}),
+    eraBuckets: doc.eraBuckets,
+    ...(doc.status !== undefined ? { status: doc.status } : {}),
+    confidenceTier: doc.confidenceTier ?? 'unrated',
+    mappable:
+      !staysOffPublicMap({ displayName: doc.displayName }) &&
+      typeof doc.geohash === 'string' &&
+      doc.geohash.length > 0,
+  };
+}
+
+function carriesPublicMapAnchor(entity: PublicEntityView): boolean {
+  if (staysOffPublicMap(entity)) return false;
+  return entity.geoAnchor !== undefined || geoAnchorFor(entity.id) !== undefined;
+}
+
+function toFacts(entry: RecordsCatalogEntry, collisions: ReadonlyMap<string, number>): RecordFacts {
+  const mapTone = resolveMapTone({
+    topicTags: entry.topicTags,
+    ...(entry.topicIds !== undefined ? { topicIds: entry.topicIds } : {}),
+    displayName: entry.displayName,
+  });
+  const eraBuckets = entry.eraBuckets ?? [];
+  const confidenceTier = entry.confidenceTier;
+  const state = findUsStateFromJurisdictionLabel(entry.jurisdictionLabel);
+  const location = entry.locationLabel.trim();
+  const place = location.length > 0 ? location : entry.jurisdictionLabel.trim();
+  const topicSource = entry.topicIds ?? entry.topicTags;
+  const standable = canStandHere({
+    displayName: entry.displayName,
+    kind: entry.kind,
+    summary: entry.summary.length > 0 ? entry.summary : entry.displayName,
+    ...(entry.locationPrecision !== undefined
+      ? { locationPrecision: entry.locationPrecision }
+      : {}),
+  });
+  const href = standable
+    ? placeHrefForEntity({ id: entry.id, displayName: entry.displayName }, collisions)
+    : `/entity/${entry.id}`;
 
   return {
     row: {
-      id: entity.id,
-      href: `/entity/${entity.id}`,
-      name: entity.displayName,
+      id: entry.id,
+      href,
+      name: entry.displayName,
       // An honest blank, not an invented place: some records genuinely have no located anchor,
       // and that is the population this index exists to keep visible.
       place: place.length > 0 ? place : 'Place not recorded',
       era: eraBuckets[0] ?? 'Undated',
-      kindFamily: kindFamilyFor(entity.kind),
-      kind: entity.kind,
+      kindFamily: kindFamilyFor(entry.kind),
+      kind: entry.kind,
       mapTone,
       grade: gradeForConfidence(confidenceTier),
       gradeDescription: gradeDescription(gradeForConfidence(confidenceTier)),
@@ -245,9 +368,46 @@ function toFacts(entity: PublicEntityView): RecordFacts {
     confidenceTier,
     statePostal: state === undefined ? undefined : state.postalCode,
     stateName: state === undefined ? undefined : state.name,
-    status: entity.status ?? '',
-    haystack: `${entity.displayName} ${entity.summary} ${place}`.toLowerCase(),
+    status: entry.status ?? '',
+    haystack: `${entry.displayName} ${entry.summary} ${place}`.toLowerCase(),
+    mappable: entry.mappable,
   };
+}
+
+function isRecordsCatalogEntry(value: unknown): value is RecordsCatalogEntry {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'confidenceTier' in value &&
+    'mappable' in value &&
+    'jurisdictionLabel' in value &&
+    'locationLabel' in value
+  );
+}
+
+function isSearchIndexDoc(value: unknown): value is PublicSearchIndexDoc {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'releaseId' in value &&
+    'nameLower' in value &&
+    'claimCount' in value
+  );
+}
+
+function toRecordsCatalog(
+  catalog:
+    readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[],
+): readonly RecordsCatalogEntry[] {
+  if (catalog.length === 0) return [];
+  const first = catalog[0];
+  if (isRecordsCatalogEntry(first)) {
+    return catalog as readonly RecordsCatalogEntry[];
+  }
+  if (isSearchIndexDoc(first)) {
+    return (catalog as readonly PublicSearchIndexDoc[]).map(recordsCatalogFromSearchDoc);
+  }
+  return (catalog as readonly PublicEntityView[]).map(recordsCatalogFromEntity);
 }
 
 function matchesExcept(
@@ -322,12 +482,17 @@ function compareGroups(a: RecordsGroup, b: RecordsGroup): number {
  * Facet counts are computed with that facet's own constraint lifted, which is what makes the
  * chip bar usable: with `kind=people` active, the Places chip still shows how many records you
  * would get by switching to it, rather than zero.
+ *
+ * Accepts either full entities (tests + pre-backfill fallback) or slim search_index docs.
  */
 export function buildRecordsIndex(
-  entities: readonly PublicEntityView[],
+  catalog:
+    readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[],
   query: RecordsQuery,
 ): RecordsIndex {
-  const facts = entities.map(toFacts);
+  const entries = toRecordsCatalog(catalog);
+  const collisions = placeSlugCollisionCounts(entries);
+  const facts = entries.map((entry) => toFacts(entry, collisions));
   const stateNames = new Map<string, string>();
   for (const record of facts) {
     if (record.statePostal !== undefined && record.stateName !== undefined) {
@@ -336,6 +501,7 @@ export function buildRecordsIndex(
   }
 
   const matched = facts.filter((record) => matchesExcept(record, query, 'none'));
+  const mappableMatched = matched.filter((record) => record.mappable).length;
 
   const facets = Object.fromEntries(
     RECORDS_FILTER_KEYS.map((key) => {
@@ -379,7 +545,11 @@ export function buildRecordsIndex(
   const pageCount = Math.max(1, Math.ceil(matched.length / RECORDS_PAGE_SIZE));
   const page = Math.min(query.page, pageCount);
   const start = (page - 1) * RECORDS_PAGE_SIZE;
-  const rows = matched.slice(start, start + RECORDS_PAGE_SIZE).map((record) => record.row);
+  const discoveryQuery = recordsArrivalQuery(query);
+  const rows = matched.slice(start, start + RECORDS_PAGE_SIZE).map((record) => ({
+    ...record.row,
+    href: withArrivalQuery(record.row.href, discoveryQuery),
+  }));
 
   const constraints: RecordsConstraint[] = [];
   if (query.q.length > 0) {
@@ -417,11 +587,6 @@ export function buildRecordsIndex(
       }))
       .sort(compareGroups);
 
-  const constraintWords =
-    constraints.length === 0
-      ? 'every record in the release'
-      : constraints.map((constraint) => constraint.label).join(', ');
-
   return {
     query: { ...query, page },
     rows,
@@ -442,26 +607,74 @@ export function buildRecordsIndex(
     constraints,
     clearAllHref: '/records',
     atlasHref: buildAtlasHref(query),
-    atlasReason: `Showing ${constraintWords} that carry a place.`,
+    atlasReason: mapListContinuityLabel(matched.length, mappableMatched),
+    mappableMatched,
+  };
+}
+
+export type RecordsNeighborLink = {
+  readonly id: string;
+  readonly name: string;
+  readonly href: string;
+};
+
+export type RecordsNeighbors = {
+  readonly previous?: RecordsNeighborLink;
+  readonly next?: RecordsNeighborLink;
+  readonly index: number;
+  readonly total: number;
+};
+
+/**
+ * Prev/next within the Records narrowing (same order as the list), for Place discovery stepping.
+ * Does not build facets — filter + adjacency only.
+ */
+export function findRecordsNeighbors(
+  catalog:
+    readonly PublicEntityView[] | readonly PublicSearchIndexDoc[] | readonly RecordsCatalogEntry[],
+  query: RecordsQuery,
+  entityId: string,
+  arrivalQuery = '',
+): RecordsNeighbors | undefined {
+  const entries = toRecordsCatalog(catalog);
+  const collisions = placeSlugCollisionCounts(entries);
+  const matched = entries
+    .map((entry) => toFacts(entry, collisions))
+    .filter((record) => matchesExcept(record, query, 'none'));
+  const index = matched.findIndex((record) => record.row.id === entityId);
+  if (index < 0 || matched.length === 0) return undefined;
+
+  const linkAt = (at: number): RecordsNeighborLink | undefined => {
+    const row = matched[at]?.row;
+    if (!row) return undefined;
+    return {
+      id: row.id,
+      name: row.name,
+      href: withArrivalQuery(row.href, arrivalQuery),
+    };
+  };
+
+  const previous = index > 0 ? linkAt(index - 1) : undefined;
+  const next = index < matched.length - 1 ? linkAt(index + 1) : undefined;
+
+  return {
+    ...(previous !== undefined ? { previous } : {}),
+    ...(next !== undefined ? { next } : {}),
+    index,
+    total: matched.length,
   };
 }
 
 /**
- * Hands the current narrowing to the Atlas. Every key is checked against `EXPLORE_URL_PARAM_KEYS`
- * by `query-normalization`, so a param this function invents is stripped by middleware before the
- * Atlas ever sees it — silently widening the set the reader thought they were carrying over.
+ * Hands the current narrowing to the Atlas. Every key must stay inside
+ * `EXPLORE_URL_PARAM_KEYS` / the edge allowlist — a param this function invents is stripped by
+ * middleware before the Atlas ever sees it, silently widening the set.
  *
  * One constraint does NOT cross, and the off-ramp copy says so rather than pretending: `q`,
- * because the Atlas has no text constraint at all.
+ * because the Atlas has no text pin filter.
  *
- * `topic` becomes `theme`, which is the Lens's name for the same controlled topic id.
- *
- * `evidence` becomes `floor`. SP-16 (repo-92n2.16) landed the evidence floor on the Lens as its
- * own predicate, separate from the Lens's pre-existing exact-match `confidence` tier — routing a
- * floor through `confidence` would map "B and up" onto `confidence=medium` and drop every grade A
- * record, the opposite of what the reader asked for (see `evidence-grade.ts`'s
- * `applyEvidenceFloor`). `floor` carries the same `EvidenceFloor` vocabulary this module already
- * uses (`'C' | 'B' | 'A'`), unencoded, so `?floor=B` and "B and up" here name the same set.
+ * `topic` becomes `theme` (Lens name for the same controlled topic id).
+ * `evidence` becomes `floor` (and-up grade predicate; not exact-match `confidence`).
  */
 export function buildAtlasHref(query: RecordsQuery): string {
   const params = new URLSearchParams();
@@ -472,7 +685,7 @@ export function buildAtlasHref(query: RecordsQuery): string {
   if (query.status.length > 0) params.set('status', query.status);
   if (query.evidence.length > 0) params.set('floor', query.evidence);
   const search = params.toString();
-  return search.length > 0 ? `/?${search}` : '/';
+  return search.length > 0 ? `/explore?${search}` : '/explore';
 }
 
 /** Exported for the drift test: the postal codes this index can actually filter on. */

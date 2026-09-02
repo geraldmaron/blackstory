@@ -1,5 +1,4 @@
 import type { Marker } from 'maplibre-gl';
-import { brandPalette } from '@repo/ui';
 import type { ExploreMapFeatureCollection } from '../../lib/map-experience/build-explore-map-source';
 
 export function clearMarkers(markers: Marker[]): void {
@@ -14,19 +13,13 @@ export function applyEntityMarkerElementProps(
   label: string,
   isSelected: boolean,
 ): void {
+  el.classList.add('ds-first-paint-pin', 'ds-first-paint-pin--link');
+  el.classList.toggle('ds-first-paint-pin--walk', feature.properties.holdingWalk === true);
+  el.classList.toggle('ds-first-paint-pin--focus', isSelected);
   el.classList.toggle('ds-map-entity-marker--selected', isSelected);
   if (el.getAttribute('aria-label') !== label) {
     el.setAttribute('aria-label', label);
     el.title = label;
-  }
-  // Mirror the GL circle kind shade so the hit-target disc matches KindBadge / explore-point
-  // (transparent overlays previously left only the sand halo readable as "the" circle color).
-  const shade =
-    typeof feature.properties.shade === 'string' && feature.properties.shade.length > 0
-      ? feature.properties.shade
-      : brandPalette.copperPin;
-  if (el.style.getPropertyValue('--ds-map-entity-shade') !== shade) {
-    el.style.setProperty('--ds-map-entity-shade', shade);
   }
   if (el.dataset.kind !== feature.properties.kind) {
     el.dataset.kind = feature.properties.kind;
@@ -56,5 +49,6 @@ export function syncSelectedEntityMarkerClass(
       selectedEntityId.length > 0 &&
       el.dataset.entityId === selectedEntityId;
     el.classList.toggle('ds-map-entity-marker--selected', isSelected);
+    el.classList.toggle('ds-first-paint-pin--focus', isSelected);
   }
 }

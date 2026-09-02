@@ -8,23 +8,122 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
+import { instrumentRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
+import { atlasWalkHref } from '../place/public-place-path';
 import { buildExploreMapSource, buildJurisdictionAreaFeatures } from './build-explore-map-source';
 import { geoAnchorFor } from './entity-geo';
 import { displayEncodingFor, kindFamilyFor } from './kind-encoding';
 
-test('every active-release entity with a resolvable anchor becomes a linked, enriched feature', () => {
+test('every active-release entity with a resolvable anchor becomes an enriched feature', () => {
   const entities = listPublicEntities();
+  const collisions = placeSlugCollisionCounts(entities);
   const source = buildExploreMapSource(entities);
 
   assert.equal(source.featureCollection.features.length, entities.length);
   for (const feature of source.featureCollection.features) {
     const entity = entities.find((candidate) => candidate.id === feature.properties.entityId);
     assert.ok(entity);
-    assert.equal(feature.properties.href, `/entity/${entity!.id}`);
+    const href = instrumentRecordHref(entity, collisions);
+    assert.equal(feature.properties.href, href);
+    if (href.startsWith('/place/')) {
+      assert.doesNotMatch(feature.properties.href, /\/entity\//);
+    }
     assert.equal(feature.properties.oneLineStory, entity!.summary);
     assert.equal(feature.properties.evidenceCount, entity!.claims.length);
     assert.deepEqual(feature.properties.eraBuckets, entity!.eraBuckets ?? []);
+    if (entity!.jurisdictionLabel.trim().length > 0) {
+      assert.equal(feature.properties.jurisdictionLabel, entity!.jurisdictionLabel.trim());
+    }
   }
+});
+
+test('visitClaims on map features carry only website, phone, and hours predicates', () => {
+  const entities = listPublicEntities().map((entity) =>
+    entity.id === 'ent_dunbar_school_001'
+      ? {
+          ...entity,
+          locationPrecision: 'institution' as const,
+          claims: [
+            ...entity.claims,
+            {
+              id: 'claim_visit_phone',
+              predicate: 'visitorPhone',
+              object: '(202) 555-0140',
+              confidenceScore: 0.7,
+              confidenceLevel: 'medium' as const,
+              citationSource: 'School visitor page',
+              citationLabel: 'School visitor page',
+            },
+          ],
+        }
+      : entity,
+  );
+  const source = buildExploreMapSource(entities);
+  const dunbar = source.featureCollection.features.find(
+    (feature) => feature.properties.entityId === 'ent_dunbar_school_001',
+  );
+  assert.ok(dunbar);
+  assert.ok(dunbar.properties.visitClaims);
+  assert.equal(dunbar.properties.visitClaims.length, 1);
+  assert.equal(dunbar.properties.visitClaims[0]?.predicate, 'visitorPhone');
+});
+
+test('holdingWalk marks only allowlisted atlas walks, not every /place/ href', () => {
+  const base = listPublicEntities()[0]!;
+  const nonWalkPlace: PublicEntityView = {
+    ...base,
+    id: 'ent_test_archie_edwards',
+    kind: 'place',
+    displayName: 'Archie Edwards Alpha Tonsorial Palace',
+    summary: 'A documented barbershop and gathering place in Washington, D.C.',
+  };
+  const source = buildExploreMapSource([nonWalkPlace], {
+    geoAnchorFor: (id) =>
+      id === nonWalkPlace.id
+        ? { lat: 38.91, lng: -77.03, geohash: 'dqcj', matchMethod: 'geocode_other' }
+        : geoAnchorFor(id),
+  });
+  const feature = source.featureCollection.features[0]!;
+  assert.match(feature.properties.href, /^\/place\//);
+  assert.notEqual(feature.properties.holdingWalk, true);
+
+  const entities = listPublicEntities();
+  const catalog = buildExploreMapSource(entities);
+  for (const entry of catalog.featureCollection.features) {
+    if (entry.properties.holdingWalk !== true) continue;
+    const entity = entities.find((candidate) => candidate.id === entry.properties.entityId);
+    assert.ok(entity);
+    assert.equal(
+      atlasWalkHref({
+        displayName: entity!.displayName,
+        kind: entity!.kind,
+        entityId: entity!.id,
+      }),
+      entry.properties.href,
+    );
+  }
+});
+
+test('a standable published place gets a /place/ href on the Atlas instrument', () => {
+  const base = listPublicEntities()[0]!;
+  const palace: PublicEntityView = {
+    ...base,
+    id: 'ent_test_archie_edwards',
+    kind: 'place',
+    displayName: 'Archie Edwards Alpha Tonsorial Palace',
+    summary: 'A documented barbershop and gathering place in Washington, D.C.',
+  };
+  const source = buildExploreMapSource([palace], {
+    geoAnchorFor: (id) =>
+      id === palace.id
+        ? { lat: 38.91, lng: -77.03, geohash: 'dqcj', matchMethod: 'geocode_other' }
+        : geoAnchorFor(id),
+  });
+  assert.equal(source.featureCollection.features.length, 1);
+  assert.equal(
+    source.featureCollection.features[0]!.properties.href,
+    '/place/archie-edwards-alpha-tonsorial-palace',
+  );
 });
 
 test('feature shade/glyph/kindFamily match displayEncodingFor and kindFamilyFor', () => {
@@ -114,4 +213,33 @@ test('jurisdiction-scoped area records build polygon geometry, never point geome
 test('jurisdictionAreaFeatures defaults to empty — no area-record kind exists in the active release yet', () => {
   const source = buildExploreMapSource(listPublicEntities());
   assert.deepEqual(source.jurisdictionAreaFeatures, []);
+});
+
+test('James H. Dillard House stays off the public map', () => {
+  const base = listPublicEntities()[0]!;
+  const house: PublicEntityView = {
+    ...base,
+    id: 'nrhp-dillard-house',
+    kind: 'place',
+    displayName: 'James H. Dillard House',
+    locationPrecision: 'city',
+  };
+  const university: PublicEntityView = {
+    ...base,
+    id: 'ent_dillard_university_001',
+    kind: 'place',
+    displayName: 'Dillard University',
+    locationPrecision: 'campus',
+  };
+  const source = buildExploreMapSource([house, university], {
+    geoAnchorFor: () => ({
+      lat: 29.93,
+      lng: -90.12,
+      geohash: 'djfq',
+      matchMethod: 'geocode_other',
+    }),
+  });
+  assert.equal(source.featureCollection.features.length, 1);
+  assert.equal(source.featureCollection.features[0]!.properties.displayName, 'Dillard University');
+  assert.equal(source.featureCollection.features[0]!.properties.href, '/place/dillard-university');
 });

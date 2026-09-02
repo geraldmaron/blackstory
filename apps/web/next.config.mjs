@@ -131,10 +131,8 @@ const nextConfig = {
         ],
       },
       {
-        // INERT while `/` is force-dynamic, which it must stay: the Atlas reads searchParams for
-        // its state/era/kind/topic filters, and App Router renders any searchParams-reading page
-        // per request. Kept, not deleted, because it is the intended posture the moment `/` can
-        // stop being dynamic (see repo-ajb0 for the partial-prerender option).
+        // Live: `/` is ISR (`revalidate = 300`), so this header can reach Vercel. Cloudflare
+        // still overrides the HTML TTL to one hour for the bare path (`override_origin`).
         source: '/',
         headers: [
           {
@@ -153,6 +151,8 @@ const nextConfig = {
         ],
       },
       {
+        // INERT while `/explore` is force-dynamic (it reads searchParams). Facet query is
+        // allowlisted; do not ignore query at Cloudflare or one state's Atlas is served to all.
         source: '/explore',
         headers: [
           {

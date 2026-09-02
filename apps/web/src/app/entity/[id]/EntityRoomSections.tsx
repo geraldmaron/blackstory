@@ -30,7 +30,12 @@ import { EntityEvidencePanel } from '../../../components/evidence';
 import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { Connections, type RoomConnection } from '../../../components/room';
+import { RelationshipConstellation } from '../../../components/patterns/RelationshipConstellation';
+import { RecordArchiveSources } from '../../../components/patterns/RecordArchiveSources';
 import { humanizeToken } from '../../../components/entity/format';
+import { resolveInternetArchiveSources } from '../../../lib/geography/internet-archive-sources';
+import { neighborHref } from '../../../lib/place/public-place-path';
+import { firstPaintRelatedHeading, firstPaintRelation } from '../../home-first-paint-surface';
 
 void React;
 
@@ -70,6 +75,14 @@ export function recordSectionIndex({
       count: evidenceClaims.length,
     });
   }
+  const archiveSources = resolveInternetArchiveSources(entity.claims);
+  if (archiveSources.length > 0) {
+    sections.push({
+      id: 'record-archive-heading',
+      label: 'Archived copies',
+      count: archiveSources.length,
+    });
+  }
   if (hasStatusFor(entity)) {
     sections.push({
       id: 'status-heading',
@@ -79,12 +92,20 @@ export function recordSectionIndex({
   if (entity.timeline.length > 0) {
     sections.push({ id: 'timeline-heading', label: 'Timeline', count: entity.timeline.length });
   }
-  const connectionCount = toConnections(entity).length;
+  const connectionCount = toConnections(entity, false).length;
   if (connectionCount > 0) {
     sections.push({
       id: 'related-heading',
       label: 'Records this one touches',
       count: connectionCount,
+    });
+  }
+  const continueCount = toSuggestedConnections(entity, false).length;
+  if (continueCount > 0) {
+    sections.push({
+      id: 'continue-heading',
+      label: 'Worth investigating next',
+      count: continueCount,
     });
   }
   if (crossReferences.length > 0) {
@@ -102,6 +123,8 @@ export type EntityRoomSectionsProps = {
   readonly evidenceClaims: readonly EvidenceClaimInput[];
   readonly entityLinkCatalog: readonly EntityLinkCatalogEntry[];
   readonly crossReferences?: readonly EntityCrossReferenceSurface[];
+  /** First paint: human place lines, no status chrome, no catalog related heading. */
+  readonly firstPaint?: boolean;
 };
 
 /**
@@ -122,13 +145,39 @@ function hasStatusFor(entity: PublicEntityView): boolean {
     : Boolean(entity.status) || (entity.statusHistory?.length ?? 0) > 0;
 }
 
-function toConnections(entity: PublicEntityView): readonly RoomConnection[] {
-  return (entity.relatedNeighbors ?? []).map((neighbor) => ({
+function toConnections(entity: PublicEntityView, firstPaint: boolean): readonly RoomConnection[] {
+  return (entity.relatedNeighbors ?? []).flatMap((neighbor) => {
+    const relation = firstPaint
+      ? firstPaintRelation(neighbor, entity)
+      : neighbor.viaEvent
+        ? `both appear in ${neighbor.viaEvent.displayName}`
+        : relationPhrase(neighbor.relationType, neighbor.direction);
+    const href = neighborHref(neighbor);
+    if (firstPaint && (relation === undefined || relation.length === 0)) {
+      return [{ name: neighbor.displayName, relation: '', href }];
+    }
+    return [
+      {
+        name: neighbor.displayName,
+        relation: relation ?? '',
+        href,
+      },
+    ];
+  });
+}
+
+function toSuggestedConnections(
+  entity: PublicEntityView,
+  firstPaint: boolean,
+): readonly RoomConnection[] {
+  return (entity.continueLearning ?? []).map((neighbor) => ({
     name: neighbor.displayName,
-    relation: neighbor.viaEvent
-      ? `both appear in ${neighbor.viaEvent.displayName}`
-      : relationPhrase(neighbor.relationType, neighbor.direction),
-    href: `/entity/${neighbor.id}`,
+    relation: firstPaint
+      ? (firstPaintRelation(neighbor, entity) ?? '')
+      : neighbor.viaEvent
+        ? `both appear in ${neighbor.viaEvent.displayName}`
+        : relationPhrase(neighbor.relationType, neighbor.direction),
+    href: neighborHref(neighbor),
   }));
 }
 
@@ -137,11 +186,16 @@ export function EntityRoomSections({
   evidenceClaims,
   entityLinkCatalog,
   crossReferences = [],
+  firstPaint = false,
 }: EntityRoomSectionsProps) {
   const hasContext = entity.historicalContext.trim().length > 0;
-  const hasStatus = hasStatusFor(entity);
-  const connections = toConnections(entity);
-  const continueLearning = entity.continueLearning ?? [];
+  const hasStatus = firstPaint ? false : hasStatusFor(entity);
+  const connections = toConnections(entity, firstPaint);
+  const continueLearning = toSuggestedConnections(entity, firstPaint);
+  const archiveSources = resolveInternetArchiveSources(entity.claims);
+  const relatedHeading = firstPaint
+    ? firstPaintRelatedHeading(entity.relatedNeighbors ?? [])
+    : 'Records this one touches';
 
   return (
     <>
@@ -160,6 +214,12 @@ export function EntityRoomSections({
                   text={paragraph}
                   skipEntityIds={[entity.id]}
                   catalog={entityLinkCatalog}
+                  {...(firstPaint
+                    ? {
+                        hrefFor: (entry: { readonly label: string }) =>
+                          neighborHref({ displayName: entry.label, kind: 'place' }),
+                      }
+                    : {})}
                 />
               ))}
           </div>
@@ -194,6 +254,12 @@ export function EntityRoomSections({
         </section>
       ) : null}
 
+      {archiveSources.length > 0 ? (
+        <section className="ds-record-beat" aria-labelledby="record-archive-heading">
+          <RecordArchiveSources sources={archiveSources} />
+        </section>
+      ) : null}
+
       {hasStatus ? (
         <section className="ds-record-beat" aria-labelledby="status-heading">
           <h2 className="ds-record-beat__heading" id="status-heading">
@@ -212,28 +278,27 @@ export function EntityRoomSections({
         </section>
       ) : null}
 
-      {connections.length > 0 ? (
+      {connections.length > 0 && relatedHeading ? (
         <section className="ds-record-beat" aria-labelledby="related-heading">
           <h2 className="ds-record-beat__heading" id="related-heading">
-            Records this one touches
+            {relatedHeading}
           </h2>
-          <Connections connections={connections} />
-          {continueLearning.length > 0 ? (
-            <>
-              <h3 className="ds-record-beat__subheading" id="continue-heading">
-                One step further
-              </h3>
-              <Connections
-                connections={continueLearning.map((neighbor) => ({
-                  name: neighbor.displayName,
-                  relation: neighbor.viaEvent
-                    ? `both appear in ${neighbor.viaEvent.displayName}`
-                    : relationPhrase(neighbor.relationType, neighbor.direction),
-                  href: `/entity/${neighbor.id}`,
-                }))}
-              />
-            </>
-          ) : null}
+          <p className="ds-record-beat__standfirst">
+            Typed connections from the archive. Nearby on the map is not the same as related.
+          </p>
+          <RelationshipConstellation centerLabel={entity.displayName} edges={connections} />
+        </section>
+      ) : null}
+
+      {continueLearning.length > 0 ? (
+        <section className="ds-record-beat" aria-labelledby="continue-heading">
+          <h2 className="ds-record-beat__heading" id="continue-heading">
+            Worth investigating next
+          </h2>
+          <p className="ds-record-beat__standfirst">
+            Leads from this record. They are not proven the same way as a typed connection.
+          </p>
+          <Connections connections={continueLearning} />
         </section>
       ) : null}
 

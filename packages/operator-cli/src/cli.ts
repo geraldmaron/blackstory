@@ -68,6 +68,9 @@ import {
 } from './source-capture.js';
 import { createSupabaseStorage, supabaseStorageConfigFromEnv } from './supabase-storage.js';
 import { runCaptureBackfill, persistCapture } from './capture-backfill.js';
+import { waybackCredentialsFromEnv } from './wayback-credentials.js';
+import { createWaybackAnchor } from './wayback-anchor.js';
+import { waybackSafeHttpClient } from './wayback-http.js';
 
 /**
  * Capture blob sink selection: Supabase Storage when SUPABASE_URL + SUPABASE_SECRET_KEY are
@@ -149,6 +152,7 @@ const BOOLEAN_FLAGS = new Set([
   '--include-curated',
   '--omit-raw-model',
   '--queue-survivors',
+  '--wayback',
   // Accepted uniformly on every verb (repo-xez5.9): every command already prints JSON by
   // default (see the file header comment), so this flag is a no-op that makes the contract
   // explicit and machine-discoverable rather than switching a text-mode command to JSON.
@@ -844,14 +848,23 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
       case 'capture-backfill': {
         // Anti-rot/anti-spoof: snapshot every cited URL. Safe by default (dry-run
         // inventory + coverage report); --commit performs SSRF-safe fetches + writes.
+        // --wayback POSTs successful captures to SPN2 when IA keys are present.
         const pool = getOpsPostgresPool(process.env);
         const commit = flags.booleans.has('--commit');
+        const wayback = flags.booleans.has('--wayback');
         const maxRaw = optionalFlag(flags, '--max-captures');
         const maxCaptures = maxRaw === undefined ? undefined : Number.parseInt(maxRaw, 10);
         if (maxCaptures !== undefined && (!Number.isFinite(maxCaptures) || maxCaptures < 0)) {
           throw new Error('--max-captures must be a non-negative integer');
         }
+        const maxEntitiesRaw = optionalFlag(flags, '--max-entities');
+        const maxEntities =
+          maxEntitiesRaw === undefined ? undefined : Number.parseInt(maxEntitiesRaw, 10);
+        if (maxEntities !== undefined && (!Number.isFinite(maxEntities) || maxEntities < 0)) {
+          throw new Error('--max-entities must be a non-negative integer');
+        }
         const fetchDependencies = deps.fetchDependencies ?? createNodeSafeFetchDependencies();
+        const waybackCredentials = wayback ? waybackCredentialsFromEnv(process.env) : undefined;
         const captureDeps: CaptureDeps = {
           fetchUrl: (url) => runQuickAddFetch(url, fetchDependencies),
           storage: captureStorageFromEnv(process.env),
@@ -859,10 +872,24 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           newId: (prefix, seed) =>
             `${prefix}_${createHash('sha1').update(seed).digest('hex').slice(0, 16)}`,
           now: () => new Date().toISOString(),
+          ...(waybackCredentials
+            ? {
+                waybackAnchor: createWaybackAnchor({
+                  client: waybackSafeHttpClient,
+                  credentials: waybackCredentials,
+                  now: () => new Date().toISOString(),
+                }),
+              }
+            : {}),
         };
         const report = await runCaptureBackfill(
           pool,
-          { commit, ...(maxCaptures !== undefined ? { maxCaptures } : {}) },
+          {
+            commit,
+            ...(maxCaptures !== undefined ? { maxCaptures } : {}),
+            ...(maxEntities !== undefined ? { maxEntities } : {}),
+            ...(wayback ? { wayback: true } : {}),
+          },
           captureDeps,
         );
         stdout(JSON.stringify({ command: 'capture-backfill', ...report }, null, 2));
@@ -1771,11 +1798,12 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
       }
       default: {
         stderr(
-          'Usage: operator-cli <preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read> [flags]\n' +
+          'Usage: operator-cli <preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read|capture-backfill> [flags]\n' +
             'Every command accepts --json (no-op: output is always JSON) and every id-bearing command uses --entity-id / --case-id for its target.\n' +
             'For model-report: [--since <ISO date>] [--json]\n' +
             'For harness-run: --theme <theme> --metro <metro> [--connectors dpla,nps_network_to_freedom,web_search] [--enrich] [--provider openrouter|ollama|mock] [--progress-path <file>]\n' +
             'For backfill-entity/prose-run: --entity-id <id> [--title ...] [--summary ...] [--provider mock|openrouter|ollama|hybrid] [--commit]\n' +
+            'For capture-backfill: [--commit] [--wayback] [--max-captures N] [--max-entities N]\n' +
             'For expand: --entity-id <id> [--depth N] — stub pending repo-xez5.4\n' +
             'For graylist-read: [--limit N] — Postgres quarantine only, see docs/research/research-operations.md\n',
         );

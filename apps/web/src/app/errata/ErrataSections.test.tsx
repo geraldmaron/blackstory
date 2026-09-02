@@ -18,7 +18,7 @@ const SAMPLE_ENTRIES: readonly ErrataEntry[] = [
     changeType: 'correction',
     headline: 'Fixed a wrong date',
     summary: 'The original entry cited the wrong year for the ordinance.',
-    affectedUrl: '/entity/ent_sample_001',
+    affectedUrl: '/place/paul-laurence-dunbar-high-school',
   },
   {
     id: 'errata_sample_note',
@@ -42,7 +42,7 @@ test('every row shows date, record link, statement and phase', () => {
   assert.match(html, /ds-errata__row-date"[^>]*>2026-08-01</);
   assert.match(
     html,
-    /<a class="ds-errata__row-id" href="\/entity\/ent_sample_001">errata_sample_correction</,
+    /<a class="ds-errata__row-id" href="\/place\/paul-laurence-dunbar-high-school">Paul Laurence Dunbar High School</,
   );
   assert.match(
     html,
@@ -50,15 +50,16 @@ test('every row shows date, record link, statement and phase', () => {
   );
   assert.match(html, /ds-errata__row-phase">Correction</);
 
-  // An entry with no affected record still renders a plain, unlinked id, not a broken anchor.
-  assert.match(html, /<span class="ds-errata__row-id">errata_sample_note<\/span>/);
+  // An entry with no affected record still renders a plain label, not a shop id.
+  assert.match(html, /<span class="ds-errata__row-id">This archive<\/span>/);
+  assert.doesNotMatch(html, /errata_sample_correction|errata_sample_note/);
   assert.match(html, /ds-errata__row-phase">Editor&#x27;s note</);
 });
 
 test("rows render in the order the entries arrive (reverse chronological is the caller's job)", () => {
   const html = renderToStaticMarkup(<ErrataSections entries={SAMPLE_ENTRIES} />);
-  const correctionIndex = html.indexOf('errata_sample_correction');
-  const noteIndex = html.indexOf('errata_sample_note');
+  const correctionIndex = html.indexOf('Fixed a wrong date');
+  const noteIndex = html.indexOf('Reworded a caption');
   assert.ok(correctionIndex < noteIndex && correctionIndex >= 0);
 });
 

@@ -12,11 +12,9 @@
   gap: var(--ds-space-3);
   height: 64px;
   padding: 0 var(--ds-space-3);
-  background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
-  backdrop-filter: blur(8px);
+  background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
-  box-shadow: 0 10px 30px -20px rgb(0 0 0 / 45%);
 }
 
 /*
@@ -32,6 +30,10 @@
  * puts `ds-bar--room` on every non-Atlas bar, which is exactly the set that scrolls; until now
  * that modifier resolved to no rule at all.
  */
+.ds-bar--room {
+  background: var(--ds-surface);
+}
+
 .ds-bar--room::before {
   content: '';
   position: fixed;
@@ -183,7 +185,6 @@
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
   background: var(--ds-surface);
-  box-shadow: 0 18px 40px -24px rgb(0 0 0 / 55%);
 }
 
 .ds-bar__search-list .ds-typeahead__option {
@@ -249,6 +250,17 @@
   font-family: inherit;
   font-size: 0.78125rem;
   cursor: pointer;
+}
+
+/* Active Find link mirrors the Atlas mode copper ink (flat matte, no shadow). */
+.ds-bar__mode-link[aria-current='page'],
+.ds-bar__mode-link[aria-current='true'] {
+  background: var(--ds-accent-graphic);
+  color: var(--ds-fixed-ink);
+}
+
+span.ds-bar__mode-link {
+  cursor: default;
 }
 
 /* An anchor in a row of buttons, so it needs the line box the others get from being buttons. */
@@ -375,7 +387,9 @@
 @media (max-width: 559px) {
   .ds-bar {
     gap: var(--ds-space-2);
-    padding: 0 var(--ds-space-2);
+    padding: 0 var(--ds-space-3);
+    left: var(--ds-space-3);
+    right: var(--ds-space-3);
   }
 
   /* Glyph alone. The button keeps its full hit area and its aria-label, so the control is the
@@ -411,7 +425,7 @@
    * structure and its `id="bar-search"` are untouched.
    */
   .ds-bar:has(.ds-bar__search--live) {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: 2.25rem minmax(0, 1fr);
     height: auto;
     padding-block: var(--ds-space-2);
     row-gap: var(--ds-space-2);
@@ -452,6 +466,85 @@
   .ds-bar__mode-link {
     padding: 0 0.5rem;
     font-size: 0.6875rem;
+  }
+}
+
+@media (max-width: 819px) {
+  /*
+   * Flex-wrap sent Rooms onto a later row, and html/body overflow-x clip
+   * sheared that row off the door. Named areas keep brand + Rooms on row
+   * 1 and search on row 2, so Rooms cannot leave the island.
+   */
+  :root:root {
+    --ds-island-height: 6.25rem;
+    --ds-island-gap: var(--ds-space-2);
+  }
+
+  .ds-bar,
+  .ds-bar:has(.ds-bar__search--live) {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    grid-template-areas:
+      'brand tools'
+      'search search';
+    align-items: center;
+    box-sizing: border-box;
+    min-width: 0;
+    width: auto;
+    max-width: none;
+    height: auto;
+    left: var(--ds-space-3);
+    right: var(--ds-space-3);
+    column-gap: var(--ds-space-2);
+    row-gap: var(--ds-space-1);
+    padding-block: var(--ds-space-1);
+  }
+
+  .ds-bar__brand {
+    grid-area: brand;
+    --ds-bar-symbol-size: 2rem;
+    width: 2rem;
+    max-width: 2rem;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .ds-bar__brand .ds-shell-wordmark__img--symbol,
+  .ds-bar__brand .ds-shell-wordmark__img--lockup {
+    width: 2rem;
+    max-width: 2rem;
+  }
+
+  .ds-bar__tools {
+    grid-area: tools;
+    display: flex;
+    justify-content: flex-end;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .ds-bar__tool {
+    display: none;
+  }
+
+  .ds-bar__search,
+  .ds-bar__search--live {
+    grid-area: search;
+    min-width: 0;
+    width: 100%;
+    max-width: none;
+  }
+
+  .ds-bar:has(.ds-bar__search--live) .ds-bar__brand {
+    grid-area: brand;
+  }
+
+  .ds-bar:has(.ds-bar__search--live) .ds-bar__tools {
+    grid-area: tools;
+  }
+
+  .ds-bar:has(.ds-bar__search--live) .ds-bar__search--live {
+    grid-area: search;
   }
 }
 

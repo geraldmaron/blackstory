@@ -21,9 +21,14 @@ import {
   type RecordAnatomyFact,
   type RecordAnatomyPlace,
 } from '../patterns/RecordAnatomyPanel';
+import { RecordVisitBlock } from '../patterns/RecordVisitBlock';
+import type { VisitHandoffInput } from '../../lib/geography/visit-handoff';
+import { shouldShowVisitBlock } from '../../lib/geography/visit-handoff';
 import type { ConfidenceTierKey } from '../../lib/map-experience/confidence-icons';
 import { KindGlyph } from './KindGlyph';
 import './record-sheet.css';
+import '../patterns/record-visit.css';
+import '../patterns/record-archive.css';
 
 void React;
 
@@ -90,6 +95,8 @@ export type SheetRecord = {
    */
   readonly citingStories?: readonly SheetCitingStory[];
   readonly anatomyPlace?: RecordAnatomyPlace;
+  /** Compact visit block input when the plate carries enough public geo fields. */
+  readonly visitInput?: VisitHandoffInput;
 };
 
 export type RecordSheetProps = {
@@ -287,8 +294,15 @@ export function RecordSheet({
           className="ds-sheet__anatomy"
           facts={anatomyFacts(record)}
           {...(record.anatomyPlace ? { place: record.anatomyPlace } : {})}
+          linkWhereToMaps={
+            !(record.visitInput !== undefined && shouldShowVisitBlock(record.visitInput))
+          }
           aria-label={`Anatomy of ${record.name}`}
         />
+
+        {record.visitInput && shouldShowVisitBlock(record.visitInput) ? (
+          <RecordVisitBlock className="ds-sheet__visit" compact {...record.visitInput} />
+        ) : null}
 
         <p className="ds-sheet__precision">
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -306,8 +320,8 @@ export function RecordSheet({
         <div className="ds-sheet__actions">
           {/*
            * Opening the record is the primary action, and it takes the one filled slot the accent
-           * hierarchy allows (§8) — so `Fly to place`, which keeps the reader where they already
-           * are, drops to the plain treatment.
+           * hierarchy allows (§8). Fly to place is the in-app camera job (hairline secondary),
+           * distinct from Visit's quiet external maps exits. Save / Cite / Share stay text-quiet.
            */}
           {record.href ? (
             <a className="ds-sheet__action ds-sheet__action--primary" href={record.href}>
@@ -328,7 +342,7 @@ export function RecordSheet({
           {onSave ? (
             <button
               type="button"
-              className="ds-sheet__action"
+              className="ds-sheet__action ds-sheet__action--quiet"
               onClick={onSave}
               aria-pressed={saved}
             >
@@ -336,12 +350,20 @@ export function RecordSheet({
             </button>
           ) : null}
           {onCite ? (
-            <button type="button" className="ds-sheet__action" onClick={onCite}>
+            <button
+              type="button"
+              className="ds-sheet__action ds-sheet__action--quiet"
+              onClick={onCite}
+            >
               Cite
             </button>
           ) : null}
           {onShare ? (
-            <button type="button" className="ds-sheet__action" onClick={onShare}>
+            <button
+              type="button"
+              className="ds-sheet__action ds-sheet__action--quiet"
+              onClick={onShare}
+            >
               Share
             </button>
           ) : null}

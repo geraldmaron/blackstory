@@ -102,6 +102,7 @@ export function useCommandContext({
       closeSheet: () => setSelectedId(undefined),
       setMode,
       openLibrary: () => router.push('/library'),
+      openDoor: () => router.push('/'),
       togglePlayback: () => {},
       toggleTheme: () => {
         toggleDocumentTheme();

@@ -11,6 +11,7 @@ import {
   exploreHrefForState,
   searchHrefForStatus,
 } from './metadata-hrefs';
+import { ATLAS_INSTRUMENT_HREF } from '../nav/atlas-door';
 import { parseExploreSearchParams } from './url-state';
 
 function parseExploreHref(href: string) {
@@ -20,7 +21,7 @@ function parseExploreHref(href: string) {
 
 test('exploreHrefForState normalizes postal code and includes state (camera from state param)', () => {
   const href = exploreHrefForState(' tx ');
-  assert.equal(href, '/?state=TX');
+  assert.equal(href, '/explore?state=TX');
 
   const parsed = parseExploreHref(href);
   assert.equal(parsed.state, 'TX');
@@ -38,15 +39,15 @@ test('exploreHrefForState normalizes postal code and includes state (camera from
   assert.equal(parsed.showKey, false);
 });
 
-test('exploreHrefForState returns bare /explore for empty or unknown postal codes', () => {
-  assert.equal(exploreHrefForState(''), '/');
-  assert.equal(exploreHrefForState('   '), '/');
-  assert.equal(exploreHrefForState('ZZ'), '/');
+test('exploreHrefForState returns the Atlas instrument for empty or unknown postal codes', () => {
+  assert.equal(exploreHrefForState(''), ATLAS_INSTRUMENT_HREF);
+  assert.equal(exploreHrefForState('   '), ATLAS_INSTRUMENT_HREF);
+  assert.equal(exploreHrefForState('ZZ'), ATLAS_INSTRUMENT_HREF);
 });
 
 test('exploreHrefForEra filters explore to one era bucket', () => {
   const href = exploreHrefForEra('1860s');
-  assert.equal(href, '/?era=1860s');
+  assert.equal(href, '/explore?era=1860s');
 
   const parsed = parseExploreHref(href);
   assert.equal(parsed.filters.era, '1860s');
@@ -54,13 +55,13 @@ test('exploreHrefForEra filters explore to one era bucket', () => {
 });
 
 test('exploreHrefForEra returns /explore when era bucket is empty', () => {
-  assert.equal(exploreHrefForEra(''), '/');
-  assert.equal(exploreHrefForEra('   '), '/');
+  assert.equal(exploreHrefForEra(''), ATLAS_INSTRUMENT_HREF);
+  assert.equal(exploreHrefForEra('   '), ATLAS_INSTRUMENT_HREF);
 });
 
 test('exploreHrefForKind filters explore to one entity kind', () => {
   const href = exploreHrefForKind('place');
-  assert.equal(href, '/?kind=place');
+  assert.equal(href, '/explore?kind=place');
 
   const parsed = parseExploreHref(href);
   assert.equal(parsed.filters.kind, 'place');
@@ -68,7 +69,7 @@ test('exploreHrefForKind filters explore to one entity kind', () => {
 });
 
 test('exploreHrefForKind returns /explore when kind is empty', () => {
-  assert.equal(exploreHrefForKind(''), '/');
+  assert.equal(exploreHrefForKind(''), ATLAS_INSTRUMENT_HREF);
 });
 
 test('searchHrefForStatus emits /search links only for known non-all status tokens', () => {
@@ -106,11 +107,11 @@ test('eraFactLink handles undated, single-bucket, and multi-bucket labels', () =
 
   assert.deepEqual(eraFactLink(['1860s']), {
     label: '1860s',
-    href: '/?era=1860s',
+    href: '/explore?era=1860s',
   });
 
   assert.deepEqual(eraFactLink(['1860s', '1890s', '1920s']), {
     label: '1860s-1920s',
-    href: '/?era=1860s',
+    href: '/explore?era=1860s',
   });
 });

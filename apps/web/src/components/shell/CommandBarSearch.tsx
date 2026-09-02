@@ -31,6 +31,7 @@ import {
   subscribeToPaletteSeed,
 } from '../../lib/shell/palette-seed';
 import { TypeaheadCombobox, type TypeaheadSuggestion } from '../typeahead/TypeaheadCombobox';
+import { instrumentRecordHref } from '../../lib/place/place-slug';
 
 void React;
 
@@ -51,12 +52,15 @@ type SearchApiResult = {
 
 /**
  * The search index keys records as `releaseId:entityId`, and the entity route is keyed by the
- * entity id alone. `/records` rows already link with the trailing segment, so this matches them
- * rather than inventing a second convention.
+ * entity id alone. Standable kinds open Place; people and statutes go to those rooms.
  */
-function entityHrefFrom(id: string): string {
+function recordHrefFrom(id: string, kind: string | undefined, displayName: string): string {
   const entityId = id.includes(':') ? id.slice(id.lastIndexOf(':') + 1) : id;
-  return `/entity/${entityId}`;
+  return instrumentRecordHref({
+    id: entityId,
+    displayName,
+    kind: kind ?? 'place',
+  });
 }
 
 export function CommandBarSearch({ placeholder }: CommandBarSearchProps) {
@@ -109,7 +113,11 @@ export function CommandBarSearch({ placeholder }: CommandBarSearchProps) {
             id: result.id,
             primary: result.displayName,
             ...(typeof result.kind === 'string' ? { secondary: result.kind } : {}),
-            href: entityHrefFrom(result.id),
+            href: recordHrefFrom(
+              result.id,
+              typeof result.kind === 'string' ? result.kind : undefined,
+              result.displayName,
+            ),
           },
         ];
       });

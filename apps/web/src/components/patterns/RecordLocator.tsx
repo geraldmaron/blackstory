@@ -41,6 +41,11 @@ export type RecordLocatorProps = {
   readonly lng: number;
   /** Named in the accessible label, because the graphic itself carries no text. */
   readonly label: string;
+  /**
+   * When set, this is the accessible name. Empty means silent.
+   * The default sentence is for record anatomy, not the first-paint door.
+   */
+  readonly accessibleName?: string;
   readonly className?: string;
 };
 
@@ -49,21 +54,25 @@ export type RecordLocatorProps = {
  * failure — the catalog is not promised to be domestic. A record in Liberia renders its place
  * block without a locator instead of being pinned somewhere plausible-looking off Maine.
  */
-export function RecordLocator({ lat, lng, label, className }: RecordLocatorProps) {
+export function RecordLocator({ lat, lng, label, accessibleName, className }: RecordLocatorProps) {
   const pin = locatorPinPercent(lng, lat);
   if (!pin) return null;
+
+  const name =
+    accessibleName !== undefined
+      ? accessibleName.trim()
+      : `Locator map of the United States with ${label} marked.`;
 
   return (
     <div
       className={className ? `ds-locator ${className}` : 'ds-locator'}
-      role="img"
-      aria-label={`Locator map of the United States with ${label} marked.`}
+      {...(name.length > 0 ? { role: 'img', 'aria-label': name } : { 'aria-hidden': true })}
     >
       <span className="ds-locator__ground" aria-hidden="true" />
       <span
         className="ds-locator__pin"
         aria-hidden="true"
-        style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
+        style={{ left: `${pin.x.toFixed(4)}%`, top: `${pin.y.toFixed(4)}%` }}
       />
     </div>
   );

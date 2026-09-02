@@ -14,6 +14,18 @@
  * redirect for months.
  */
 
+/**
+ * The product line. The door mast is this string. `/about` uses the full lede.
+ * Do not retype either. Scribe locked the mast; paint imports it.
+ */
+export const ABOUT_LINE =
+  'BlackStory is a place-connected archive of Black history: people, places, and events pinned to where they happened, with the source attached to every claim.';
+
+/** Brand support line. Keep on the door under the product name. */
+export const ABOUT_SUPPORT_LINE = 'People. Places. Evidence. Context.';
+
+export const ABOUT_LEDE = `${ABOUT_LINE} I built it with the tools and records available to me, and it is unfinished on purpose.`;
+
 /** Why this exists, in the maker's own voice. Rendered as consecutive paragraphs. */
 export const ABOUT_ORIGIN = [
   "I'm not an institution. I'm one person with a laptop, a stack of evenings, and access to more public records than any generation before mine could have searched in a lifetime.",
@@ -40,6 +52,12 @@ export const ABOUT_PILLARS = [
     body: 'Street-level residences stay off the public map. Living people stay protected. Presence is never framed as deficit.',
   },
 ] as const;
+
+/** Origin paragraph the door steals. You walk past the place. Do not retype. */
+export const ABOUT_WALK_PAST = ABOUT_ORIGIN[1];
+
+/** Presence pillar body. Not a remote museum shelf. Do not retype. */
+export const ABOUT_ON_THE_GROUND = ABOUT_PILLARS[0].body;
 
 /**
  * What the archive will not do.

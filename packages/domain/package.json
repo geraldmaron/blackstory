@@ -79,6 +79,11 @@
       "types": "./dist/disclaimers.d.ts",
       "import": "./dist/disclaimers.js"
     },
+    "./advisory": {
+      "development": "./src/advisory.ts",
+      "types": "./dist/advisory.d.ts",
+      "import": "./dist/advisory.js"
+    },
     "./facts": {
       "development": "./src/facts/index.ts",
       "types": "./dist/facts/index.d.ts",

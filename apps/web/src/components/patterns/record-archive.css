@@ -1,0 +1,130 @@
+/**
+ * Internet Archive reader and contribution handoff on record pages.
+ */
+
+.ds-record-archive {
+  display: grid;
+  gap: var(--ds-space-3);
+}
+
+.ds-record-archive__heading {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-muted);
+}
+
+.ds-record-archive__lede {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-sm);
+  color: var(--ds-muted);
+}
+
+.ds-record-archive__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.ds-record-archive__item {
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+.ds-record-archive__link {
+  font-family: var(--ds-font-serif);
+  font-size: var(--ds-text-md);
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ds-record-archive__detail {
+  font-size: var(--ds-text-xs);
+  color: var(--ds-muted);
+}
+
+.ds-record-archive-contrib {
+  display: grid;
+  gap: var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-sm);
+  color: var(--ds-muted);
+}
+
+.ds-record-archive-contrib--compact {
+  margin: 0;
+}
+
+.ds-record-archive-contrib__heading {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-muted);
+}
+
+.ds-record-visit__visitor {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.ds-record-visit__visitor-title {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-muted);
+}
+
+.ds-record-visit__visitor-list {
+  margin: 0;
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.ds-record-visit__visitor-row {
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+.ds-record-visit__visitor-row dt {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-muted);
+}
+
+.ds-record-visit__visitor-row dd {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-sm);
+  color: var(--ds-ink);
+}
+
+.ds-record-visit__visitor-row a {
+  color: inherit;
+}
+
+.ds-record-visit__visitor-source {
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-xs);
+  color: var(--ds-muted);
+}
+
+.ds-record-visit--compact {
+  gap: var(--ds-space-2);
+}
+
+.ds-record-visit--compact .ds-record-visit__actions {
+  gap: var(--ds-space-1);
+}

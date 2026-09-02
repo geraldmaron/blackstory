@@ -106,7 +106,8 @@ export function mapPostgresSearchIndexRow(
     row.id;
 
   const doc: Record<string, unknown> = {
-    id: row.id,
+    // Public docs key by entity id. The SQL primary key may be `releaseId:entityId`.
+    id: entityId,
     releaseId: row.release_id,
     kind,
     displayName,
@@ -131,7 +132,12 @@ export function mapPostgresSearchIndexRow(
     relatedCount:
       row.related_count ?? (typeof facets.relatedCount === 'number' ? facets.relatedCount : 0),
     claimCount: row.claim_count ?? (typeof facets.claimCount === 'number' ? facets.claimCount : 0),
-    entityId,
+    ...(facets.confidenceTier === 'high' ||
+    facets.confidenceTier === 'medium' ||
+    facets.confidenceTier === 'low' ||
+    facets.confidenceTier === 'unrated'
+      ? { confidenceTier: facets.confidenceTier }
+      : {}),
     ...(typeof facets.summary === 'string' ? { summary: facets.summary } : {}),
     ...(typeof row.status === 'string'
       ? { status: row.status }
@@ -144,7 +150,7 @@ export function mapPostgresSearchIndexRow(
     ...(typeof facets.sensitivityClass === 'string'
       ? { sensitivityClass: facets.sensitivityClass }
       : {}),
-    ...(typeof row.geohash === 'string' ? { geohash: row.geohash } : {}),
+    ...(typeof row.geohash === 'string' && row.geohash.length > 0 ? { geohash: row.geohash } : {}),
     ...(toIso(facets.createdAt) !== undefined ? { createdAt: toIso(facets.createdAt) } : {}),
   };
 

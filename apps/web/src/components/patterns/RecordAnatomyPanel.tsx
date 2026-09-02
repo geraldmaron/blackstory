@@ -4,6 +4,7 @@
  */
 import React from 'react';
 import { buildExternalMapsSearchUrl } from '../../lib/geography/external-maps-url';
+import { resolvePublicAddressLine } from '../../lib/geography/public-address';
 import { MapsExternalLink } from '../map-experience/MapsExternalLink';
 import { EditionFactIcon, type EditionFactIconProps } from './EditionFactIcon';
 import { RecordPlacePreview } from './RecordPlacePreview';
@@ -36,23 +37,44 @@ export type RecordAnatomyPanelProps = {
   readonly place?: RecordAnatomyPlace;
   readonly className?: string;
   readonly 'aria-label'?: string;
+  /**
+   * When false, Where stays plain text. Use that when a Visit block on the same surface
+   * already owns Open in maps / Get directions.
+   */
+  readonly linkWhereToMaps?: boolean;
 };
+
+function whereMapsQuery(fact: RecordAnatomyFact, place: RecordAnatomyPlace): string {
+  if (typeof fact.value === 'string' && fact.value.trim().length > 0) {
+    return fact.value.trim();
+  }
+  return resolvePublicAddressLine({
+    locationLabel: place.label,
+    locationPrecision: place.precision,
+    kind: 'place',
+  });
+}
 
 function whereFactValue(
   fact: RecordAnatomyFact,
   place: RecordAnatomyPlace | undefined,
+  linkWhereToMaps: boolean,
 ): React.ReactNode {
-  if (fact.key !== 'where' || !place) {
+  if (fact.key !== 'where' || !place || !linkWhereToMaps) {
     return fact.value;
   }
 
-  const href = buildExternalMapsSearchUrl({ lat: place.lat, lng: place.lng });
+  const query = whereMapsQuery(fact, place);
+  const href = buildExternalMapsSearchUrl({
+    lat: place.lat,
+    lng: place.lng,
+    query,
+  });
   if (!href) {
     return fact.value;
   }
 
-  const placeLabel =
-    typeof fact.value === 'string' && fact.value.trim().length > 0 ? fact.value : place.label;
+  const placeLabel = query;
 
   return (
     <MapsExternalLink
@@ -86,6 +108,7 @@ export function RecordAnatomyPanel({
   place,
   className,
   'aria-label': ariaLabel = 'Record at a glance',
+  linkWhereToMaps = true,
 }: RecordAnatomyPanelProps) {
   const rootClass = className ? `ds-record-anatomy ${className}` : 'ds-record-anatomy';
 
@@ -103,7 +126,9 @@ export function RecordAnatomyPanel({
                 />
                 {fact.label}
               </dt>
-              <dd className="ds-record-anatomy__fact-value">{whereFactValue(fact, place)}</dd>
+              <dd className="ds-record-anatomy__fact-value">
+                {whereFactValue(fact, place, linkWhereToMaps)}
+              </dd>
             </div>
           ))}
         </dl>

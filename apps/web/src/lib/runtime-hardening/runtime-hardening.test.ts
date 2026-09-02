@@ -141,14 +141,12 @@ test('Atlas and entity route segment config stays after all imports', () => {
   assertSegmentConfigAfterImports(
     readFileSync(join(APP_ROOT, 'page.tsx'), 'utf8'),
     'page.tsx',
-    'dynamic',
-    /force-dynamic/,
+    'revalidate',
+    /300/,
   );
 });
 
-test('the Atlas is one route — `/` — with no page rendering at /explore', () => {
-  // `/` IS the Atlas and `/explore` 308s to it, so a second page file claiming /explore would
-  // shadow that redirect and quietly resurrect the surface the redirect exists to retire.
+test('the Atlas is `/`; `/explore` may still mount the same instrument', () => {
   const explorePages = collectAppRouteFiles(APP_ROOT).filter((file) =>
     /(^|\/)explore\/page\.tsx$/.test(
       file
@@ -157,7 +155,11 @@ test('the Atlas is one route — `/` — with no page rendering at /explore', ()
         .join('/'),
     ),
   );
-  assert.deepEqual(explorePages, [], `no page may render at /explore: ${explorePages.join(', ')}`);
+  assert.equal(explorePages.length, 1, '/explore may still render the instrument');
+
+  const home = readFileSync(join(APP_ROOT, 'page.tsx'), 'utf8');
+  assert.match(home, /DoorHome/);
+  assert.doesNotMatch(home, /AtlasHome|HomeFirstPaint|wantsAtlasInstrument|atlas=1/);
 
   assert.equal(
     existsSync(join(APP_ROOT, '(map)')),
@@ -165,7 +167,6 @@ test('the Atlas is one route — `/` — with no page rendering at /explore', ()
     'stale apps/web/src/app/(map)/ route group must not exist',
   );
   assert.equal(existsSync(join(APP_ROOT, 'page.tsx')), true);
-  // /explore/api keeps its URL — the redirect is the exact path only.
   assert.equal(existsSync(join(APP_ROOT, 'explore/api/route.ts')), true);
 });
 

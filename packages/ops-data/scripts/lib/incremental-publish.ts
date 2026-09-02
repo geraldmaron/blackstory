@@ -933,6 +933,7 @@ export function toSearchIndexRow(
       keywords: searchIndex.keywords ?? [],
       researchCoverage: searchIndex.researchCoverage,
       recordMaturity: searchIndex.recordMaturity,
+      confidenceTier: searchIndex.confidenceTier,
     },
   };
 }

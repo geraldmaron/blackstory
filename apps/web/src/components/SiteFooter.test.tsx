@@ -17,13 +17,19 @@ describe('SiteFooter', () => {
     assert.match(html, /class="ds-shell-footer"/);
     assert.match(html, /class="ds-shell-footer__card"/);
     assert.match(html, /class="ds-shell-footer__wordmark"/);
+    assert.match(html, /aria-label="BlackStory"/);
+    assert.match(html, /href="\/"/);
     assert.match(html, new RegExp(`>${PRODUCT_NAME}<`));
     assert.match(html, /People\. Places\. Evidence\. Context\./);
     assert.match(html, /History, pinned to place\./);
     assert.match(html, /aria-label="Footer"/);
-    assert.match(html, /class="ds-shell-footer__column-title">Explore</);
-    assert.match(html, /class="ds-shell-footer__column-title">Trust</);
-    assert.match(html, /class="ds-shell-footer__column-title">Contribute</);
+    assert.match(html, /class="ds-shell-footer__column-title">Find</);
+    assert.match(html, /class="ds-shell-footer__column-title">Where to begin</);
+    assert.match(html, /class="ds-shell-footer__column-title">How it decides</);
+    assert.match(html, /class="ds-shell-footer__column-title">Add to it</);
+    assert.match(html, /href="\/explore"/);
+    assert.match(html, /href="\/records"/);
+    assert.doesNotMatch(html, /Banned books|\/banned-books|\/journey/);
   });
 
   it('offers a staff sign-in handoff when an admin origin is configured', () => {

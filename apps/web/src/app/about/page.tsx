@@ -23,18 +23,23 @@ import React from 'react';
 import Link from 'next/link';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { MakerCredit } from '../../components/MakerCredit';
-import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
+import { WalkOffRamp } from '../walk-off-ramp';
 import {
   cardTitleFor,
   destinationsInGroup,
   type Destination,
 } from '../../lib/nav/destination-registry';
-import { ABOUT_CONTRIBUTE, ABOUT_ORIGIN, ABOUT_PILLARS, ABOUT_REFUSALS } from './about-copy';
+import {
+  ABOUT_CONTRIBUTE,
+  ABOUT_LEDE,
+  ABOUT_ORIGIN,
+  ABOUT_PILLARS,
+  ABOUT_REFUSALS,
+} from './about-copy';
 import {
   CardGrid,
   GroupHeading,
   MapMoment,
-  OffRamp,
   Prose,
   Room,
   RoomCard,
@@ -83,7 +88,7 @@ export default function AboutPage() {
             Doing my part, and making room for <em>yours</em>.
           </>
         }
-        lede="BlackStory is a place-connected archive of Black history: people, places, and events pinned to where they happened, with the source attached to every claim. I built it with the tools and records available to me, and it is unfinished on purpose."
+        lede={ABOUT_LEDE}
         showPath={false}
       />
 
@@ -99,7 +104,6 @@ export default function AboutPage() {
       <MapMoment
         camera={{ center: [-96.5, 38.6], zoom: 3.4 }}
         note="Records sit in every region of the country. That is a claim this archive has to keep county by county rather than assert once, so the map is the evidence for it and not an illustration of it."
-        atlasHref="/"
       />
 
       <section className="ds-about-page__section" aria-labelledby="pillars-heading">
@@ -167,23 +171,15 @@ export default function AboutPage() {
         <CardGrid>{[...readRooms, ...checkRooms].map(destinationCard)}</CardGrid>
       </section>
 
-      <OffRamp
+      <WalkOffRamp
         title="No account required"
-        actions={[
-          { label: 'Open the Atlas', href: '/', emphasis: 'copper' },
-          { label: 'Search the records', href: '/records' },
-          { label: 'Submit a lead', href: '/submit' },
-        ]}
+        extra={[{ label: 'Submit a lead', href: '/submit' }]}
       >
-        Every public page works without signing in. Sharing your location on the map is optional and
-        under your control. Reading here does not require creating an identity with us.
-      </OffRamp>
+        Every public page works without signing in. Reading here does not require creating an
+        identity with us.
+      </WalkOffRamp>
 
       <div className="ds-about-page__foot">
-        <p className="ds-about-page__credit">
-          Archive texture, symbolic atmosphere.{' '}
-          <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
-        </p>
         <MakerCredit variant="inline" />
       </div>
     </Room>

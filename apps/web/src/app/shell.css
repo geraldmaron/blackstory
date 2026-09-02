@@ -26,11 +26,12 @@
   flex-direction: column;
   min-height: 100vh;
   max-width: 100%;
-  overflow-x: clip;
+  min-width: 0;
 }
 
 .ds-shell-body {
   flex: 1 0 auto;
+  min-width: 0;
   /* Theme-aware shell bar — document pages clear it themselves. */
   padding-top: calc(var(--ds-island-clearance));
 }
@@ -47,6 +48,11 @@
    the map is the product. Reading, Record and Utility surfaces are ordinary documents. —— */
 .ds-shell-body:has([data-surface='instrument']) {
   padding-top: 0;
+}
+
+html:has([data-surface='instrument']) {
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 .ds-shell:has([data-surface='instrument']) {
@@ -138,6 +144,16 @@
   letter-spacing: -0.03em;
   line-height: 1.08;
   color: var(--ds-ink);
+}
+
+.ds-shell-footer__wordmark a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-shell-footer__wordmark a:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 3px;
 }
 
 .ds-shell-footer__tagline {
@@ -326,7 +342,7 @@
 
 @media (min-width: 40rem) {
   .ds-shell-footer__columns {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .ds-shell-footer__meta-row {
@@ -337,6 +353,10 @@
 }
 
 @media (min-width: 64rem) {
+  .ds-shell-footer__columns {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
   .ds-shell-footer__inner {
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.55fr);
     align-items: start;
@@ -1836,8 +1856,15 @@
   inset: 0;
   z-index: var(--ds-z-map-plate);
   height: 100dvh;
+  /* Trap MapLibre canvas + HTML markers (`.maplibregl-marker` uses will-change/transform)
+     so they cannot paint above Atlas instrument chrome in a sibling stacking context. */
+  isolation: isolate;
   /* Pre-style-load flash — dark ocean by default; light theme matches Archive Paper. */
   background: #080606;
+}
+
+.ds-map-stage[data-plate-posture='live'] {
+  touch-action: none;
 }
 
 /* —— Plate posture ————————————————————————————————————————————————————————————
@@ -2123,23 +2150,24 @@ body:has(.ds-explore-stage[data-results='open']) {
   }
 }
 
-/* Kind-colored hit-target disc aligned with GL `explore-point` / KindBadge shade.
-   `--ds-map-entity-shade` is set per feature in MapStage.syncCircularMarkers from the same
-   `displayEncodingFor` hex carried on GeoJSON `properties.shade`. Fill opacity matches
-   ENTITY_POINT_FILL_OPACITY in explore-style.ts (52%). */
+/* Explore hit-target buttons reuse first-paint pin discs (see entity-marker-sync.ts). */
 .ds-map-entity-marker {
   position: relative;
-  width: 1.125rem;
-  height: 1.125rem;
   padding: 0;
-  border: 1.5px solid color-mix(in srgb, var(--ds-map-entity-shade, #b86b2a) 70%, #f4efe5);
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--ds-map-entity-shade, #b86b2a) 52%, transparent);
+  border: 0;
   cursor: pointer;
 }
 
+/* Enlarge invisible hit pad without changing the visible disc (WCAG target size). */
+.ds-map-entity-marker::after {
+  content: '';
+  position: absolute;
+  inset: -0.4375rem;
+  border-radius: 999px;
+}
+
 /* Selected orientation ring — copper pulse; static when reduced-motion is preferred. */
-.ds-map-entity-marker--selected::after {
+.ds-map-entity-marker--selected:not(.ds-first-paint-pin--focus)::after {
   content: '';
   position: absolute;
   inset: -0.35rem;
@@ -2163,7 +2191,7 @@ body:has(.ds-explore-stage[data-results='open']) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ds-map-entity-marker--selected::after {
+  .ds-map-entity-marker--selected:not(.ds-first-paint-pin--focus)::after {
     animation: none;
     opacity: 0.85;
     transform: scale(1.2);
@@ -2185,12 +2213,12 @@ body:has(.ds-explore-stage[data-results='open']) {
   height: 0.875rem;
   border: 2px solid var(--ds-canvas);
   border-radius: 50%;
-  background: var(--ds-accent);
+  background: var(--ds-accent-graphic);
 }
 
 .ds-map-search-center-marker__stem {
   width: 2px;
   height: 0.625rem;
   margin-top: -1px;
-  background: var(--ds-accent);
+  background: var(--ds-accent-graphic);
 }

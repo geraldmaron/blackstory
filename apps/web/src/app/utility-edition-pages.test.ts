@@ -40,7 +40,7 @@ for (const page of ROOM_KIT_PAGES) {
     // Depth-agnostic: these rooms sit anywhere from the app root (`not-found.tsx`) to four
     // levels down (`corrections/status/[receiptCode]`), so pinning the `../` count would fail
     // a correct conversion for the wrong reason.
-    assert.match(source, /from '(?:\.\.\/)+components\/room'/);
+    assert.match(source, /from '(?:\.\.\/)+components\/room(?:'|\/(?:Room|RoomHeader)')/);
     assert.match(source, /<Room/);
     assert.match(source, /<RoomHeader/);
     // The v6 shell must be gone rather than merely unused: two chromes on one page is the drift
@@ -78,10 +78,13 @@ test('not-found offers the four exits the design law names, and no gallery', () 
   const source = readFileSync(join(appDir, 'not-found.tsx'), 'utf8')
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/^[ \t]*\/\/.*$/gm, '');
-  // design-direction-v9-surfaces.md §"/_not-found": the palette, the Atlas, Chapters, /records.
+  // Recovery goes to the stand the reader left. Atlas is the old board.
   assert.match(source, /href="\/"/);
+  assert.match(source, /loadWalkBackPlace/);
+  assert.doesNotMatch(source, /The place/);
   assert.match(source, /href="\/stories"/);
   assert.match(source, /⌘K/);
+  assert.doesNotMatch(source, /Open the Atlas|ATLAS_INSTRUMENT/);
   // The `/design-system` exit sent a reader who mistyped a chapter slug to a component gallery.
   // Its removal is the criterion, so an assertion that it stays removed is the guard.
   assert.doesNotMatch(source, /design-system/);

@@ -1,0 +1,205 @@
+/**
+ * Visit block on entity and place pages: address, standing, contact, and maps handoff.
+ * Address is a supporting fact (body/UI scale), not a hero. Maps exits are quiet text links.
+ */
+
+.ds-record-visit {
+  display: grid;
+  gap: var(--ds-space-3);
+}
+
+.ds-record-visit__heading {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+/*
+ * Address is a supporting fact under the Visit kicker, not a headline. Body/UI scale and
+ * regular weight so it never overpowers the section label or standing copy.
+ */
+.ds-record-visit__address {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-2);
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--ds-ink);
+}
+
+.ds-record-visit__address-text {
+  min-width: 0;
+}
+
+.ds-record-visit__icon {
+  flex: 0 0 auto;
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-top: 0.2em;
+  color: var(--ds-ink-muted);
+}
+
+.ds-record-visit__standing {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.75rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-record-visit__visitor {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+.ds-record-visit__visitor-title {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-record-visit__visitor-list {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+}
+
+.ds-record-visit__visitor-row {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.ds-record-visit__visitor-row dt {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-record-visit__visitor-row dt .ds-record-visit__icon {
+  margin-top: 0;
+}
+
+.ds-record-visit__visitor-row dd {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding-left: calc(0.875rem + var(--ds-space-2));
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ds-ink);
+}
+
+.ds-record-visit__visitor-row dd a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.ds-record-visit__visitor-row dd a:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-copper));
+  outline-offset: 2px;
+}
+
+.ds-record-visit__visitor-source {
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-record-visit__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-1) var(--ds-space-4);
+}
+
+/*
+ * Quiet text handoffs. Min 44px hit height for WCAG; no pill fill, no copper wash.
+ * External maps exits stay secondary to sheet content and to in-app "Fly to place".
+ */
+.ds-record-visit__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ds-ink-muted);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+
+.ds-record-visit__link:hover,
+.ds-record-visit__link:focus-visible {
+  color: var(--ds-accent);
+}
+
+.ds-record-visit__link:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-copper));
+  outline-offset: 2px;
+}
+
+.ds-record-visit--compact {
+  gap: var(--ds-space-2);
+}
+
+.ds-record-visit--compact .ds-record-visit__address {
+  font-size: 0.8125rem;
+  font-weight: 400;
+}
+
+.ds-record-visit--compact .ds-record-visit__link {
+  min-height: 2.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.ds-record-visit--rail {
+  gap: var(--ds-space-2);
+}
+
+@media (max-width: 67.99rem) {
+  .ds-record-visit--rail {
+    display: none;
+  }
+}
+
+@media (min-width: 68rem) {
+  .ds-record-visit--main {
+    display: none;
+  }
+}
+
+.ds-record-visit--rail .ds-record-visit__heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

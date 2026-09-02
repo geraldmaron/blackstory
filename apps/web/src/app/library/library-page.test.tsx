@@ -39,10 +39,20 @@ describe('/library · the room renders without JavaScript', () => {
     }
   });
 
-  it('the off-ramp offers links, not a palette button that would be dead without JS', () => {
-    assert.match(pageSource, /href: '\/'/);
-    assert.match(pageSource, /href: '\/records'/);
+  it('the way back is the map, not a palette button or the old board', () => {
+    assert.match(pageSource, /WalkOffRamp/);
+    assert.doesNotMatch(pageSource, /ATLAS_INSTRUMENT|Open the Atlas/);
     assert.doesNotMatch(pageSource, /onOpenPalette|setPaletteOpen/);
+    assert.doesNotMatch(pageSource, /getSharedPublicEntities|buildRecordsIndex|releaseFacts/);
+    assert.doesNotMatch(pageSource, /Straight to the records|The Atlas answers where and when/);
+    assert.doesNotMatch(pageSource, /Everything that is not the map/);
+    assert.doesNotMatch(pageSource, /challenged titles|Banned books/);
+  });
+
+  it('is a room on the door, not another first-paint', () => {
+    assert.doesNotMatch(pageSource, /HomeFirstPaint|loadHomeFirstPaint|loadWalkBackPlace/);
+    assert.doesNotMatch(pageSource, /DoorRooms|EntityRoomSections|selectDoorRooms/);
+    assert.doesNotMatch(pageSource, /['"`]\/books['"`]|['"`]\/banned-books/);
   });
 });
 

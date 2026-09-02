@@ -124,11 +124,24 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
     ],
   },
   {
+    /**
+     * DOWNGRADED TO OPTIONAL 2026-08-25. A tabletop exercise is a team practice: its value is
+     * rehearsing handoff, escalation and who-calls-it under pressure, and none of those exist for
+     * a single operator who is already every role in the runbook. Kept as a gate rather than
+     * deleted so the decision artifact still shows it was considered and consciously not required
+     * — a gate that silently disappears reads, later, like one that was never thought about.
+     *
+     * This is NOT a judgement that incident readiness does not matter. `beta-disable-path-ready`
+     * and `restore-rehearsal-complete` are machine gates covering the two things a solo operator
+     * actually needs under pressure: a way to turn the site off and a proven restore. Both pass.
+     * If this ever becomes a team, make this required again.
+     */
     id: 'incident-exercise-complete',
-    title: 'Incident exercise complete',
+    title: 'Incident exercise complete (optional for solo operation)',
     kind: 'human',
-    required: true,
-    description: 'Operator attests tabletop or live incident exercise completed for beta launch.',
+    required: false,
+    description:
+      'Operator attests tabletop or live incident exercise completed for beta launch. Optional while BlackStory is operated by one person.',
     evidence: [
       {
         type: 'doc',

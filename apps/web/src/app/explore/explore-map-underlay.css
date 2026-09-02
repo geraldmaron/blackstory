@@ -1,0 +1,88 @@
+/**
+ * Explore first-paint geography. Same Albers board as the Door / record locator so pin
+ * percents land on the states they belong to, and state hairlines are visible before MapLibre.
+ */
+
+.ds-explore-underlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--ds-z-map-plate);
+  display: grid;
+  place-items: center;
+  background: var(--ds-canvas);
+  pointer-events: auto;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ds-explore-underlay.is-dragging {
+  cursor: grabbing;
+}
+
+.ds-explore-underlay__gestures {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.ds-explore-underlay__canvas {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transform-origin: 0 0;
+}
+
+.ds-explore-underlay__board {
+  position: relative;
+  width: min(100vw, calc(100dvh * 960 / 500));
+  aspect-ratio: 960 / 500;
+  max-height: 100dvh;
+}
+
+.ds-explore-underlay__ground {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-color: var(--ds-ink-muted);
+  -webkit-mask-image: url('/geo/us-locator.svg');
+  mask-image: url('/geo/us-locator.svg');
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.ds-explore-underlay .ds-first-paint-plate {
+  position: absolute;
+  inset: 0;
+  z-index: 1; /* local: pins over the locator ground inside the board */
+  pointer-events: none;
+}
+
+.ds-explore-underlay .ds-first-paint-pin {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Generous hit pad — discs stay small (WCAG target size). */
+.ds-explore-underlay .ds-first-paint-pin::after {
+  content: '';
+  position: absolute;
+  inset: -0.7rem;
+  border-radius: 999px;
+}
+
+/*
+ * Hide only when the live plate has geography, not when MapLibre stamps an empty canvas.
+ * `visibility` plus `pointer-events: none` so wheel/drag/pinch reach MapLibre underneath.
+ */
+body:has(.ds-map-stage[data-plate-ready]) .ds-explore-underlay {
+  visibility: hidden;
+  pointer-events: none;
+}

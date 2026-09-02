@@ -43,6 +43,10 @@ One canvas, two modes (Atlas and Story), no page-to-page reload of the plate.
 | Palette and overlays | 90 | Command palette, shortcuts, collections. |
 | Toasts | 95 | Bottom centre, above the Time panel. |
 
+**Pointer-events contract (map stays operable):** Hover and touch on the plate itself pan, zoom and wheel-zoom. That is the common full-viewport map pattern: chrome keeps its own hits, gaps hand the gesture to the canvas. `.ds-atlas`, `.ds-shell`, `.ds-shell-body`, and the Instrument route wrappers are `pointer-events: none`. `pointer-events` is not inherited, so every covering ancestor has to opt out or the auto parent still eats the gesture. Only interactive surfaces re-enable hits (command bar, Lens, Results, Record sheet, Time, Camera, dock, notice, legend, Story scroll root, palette / shortcuts / saved overlays, offline banner). Full-bleed chrome (annotation, spotlight, readout) and the toast stack stay `none` so pan/zoom reaches the plate in the gaps; individual toasts set `auto` on themselves. Record sheet is non-modal (`aria-modal="false"`) for the same reason.
+
+**First paint is a map, not pins on empty canvas.** `/explore` first HTML is the Albers US locator (`/geo/us-locator.svg`) with state hairlines and the pin plate. MapLibre starts as ocean-only; hiding that locator when `.maplibregl-canvas` appears leaves a blank plate. Hand off when `.ds-map-stage[data-plate-ready]` is set: the first `idle` after style apply, or when state polygons land, whichever is first. After handoff, camera moves, uncovered pin and cluster clicks, and MapLibre pan/zoom own the plate. If WebGL never arrives, the locator stays and still takes wheel, drag, pinch, and pin clicks. Pin discs on that locator are hit targets: a tap that does not pan opens the record sheet (opaque `pin-N` ids match catalog geography; shop tokens stay off the first document). Majority record discs are Page Sand on Door, Explore, MapFrame, and the live plate; copper stays on holding walks and the selected pin. A pin or cluster click opens the record sheet on the plate (not a place or entity page). Cluster clicks resolve one leaf so a national aggregate still opens a card.
+
 **Banned** (carried from `brand.md`): gradients as decoration, glows, bevels, 3D chrome, `backdrop-filter` blur on instrument panels, sepia, alarm hues, crime-heat rendering.
 
 **Permitted, and only here:** one soft tinted shadow on panels that float *over the map*. Five opaque panels over a live basemap with no elevation cue read as debris. Shadow carries z-order, never decoration, and is absent on paper-on-paper surfaces.
@@ -193,7 +197,9 @@ Moves refused by the dignity gate render disabled with a `title` explaining why.
 
 430px, radius-lg, 3px copper left rule. **Non-modal** `role="dialog"`: the map stays pannable behind it. This is the pattern's sharpest break from v6, which used a modal `<dialog>` that froze the canvas.
 
-Order, fixed: top strip (`RECORD` · prev / `n of N` / next / close) · kicker (kind glyph · Kind · place · era) · name (Sora 27px) · story (Source Serif 4, 15.5px) · **2×2 anatomy** (reuse `RecordAnatomyPanel`, do not rebuild) · precision note · four actions (Fly to place, Save, Cite, Share) · numbered sources · documented connections.
+Order, fixed: top strip (`RECORD` · prev / `n of N` / next / close) · kicker (kind glyph · Kind · place · era) · name (Sora 27px) · story (Source Serif 4, 15.5px) · **anatomy** (reuse `RecordAnatomyPanel`, do not rebuild) · compact Visit block when geo resolves · precision note · actions (Open record primary; Fly to place secondary; Save / Cite / Share quiet text) · numbered sources · documented connections.
+
+Visit maps exits inside the sheet are quiet text (see [`patterns-visit-handoff.md`](./patterns-visit-handoff.md)); they must not compete with Fly to place as twin primaries.
 
 The precision note is mandatory and reads exactly:
 

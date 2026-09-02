@@ -12,6 +12,29 @@ import {
   viewportForState,
 } from './url-state';
 
+test('an empty explore state links to /explore, which still mounts the instrument', () => {
+  assert.equal(
+    buildExploreHref({
+      filters: {
+        era: 'all',
+        kind: 'all',
+        tone: 'all',
+        theme: 'all',
+        status: 'all',
+        confidence: 'all',
+      },
+      layerMode: 'presence',
+      group: true,
+      sat: false,
+      lines: false,
+      showFilters: false,
+      showResults: false,
+      showKey: false,
+    }),
+    '/explore',
+  );
+});
+
 test('an empty query string parses to the "all" default filter state with no viewport/selection', () => {
   const parsed = parseExploreSearchParams({});
   assert.deepEqual(parsed.filters, {
@@ -25,7 +48,7 @@ test('an empty query string parses to the "all" default filter state with no vie
   assert.equal(parsed.viewport, undefined);
   assert.equal(parsed.selected, undefined);
   assert.equal(parsed.layerMode, 'presence');
-  assert.equal(parsed.group, false);
+  assert.equal(parsed.group, true);
   assert.equal(parsed.lines, false);
   assert.equal(parsed.decade, undefined);
   assert.equal(parsed.edge, undefined);
@@ -59,8 +82,8 @@ test('round-trips a full view state through build -> parse', () => {
   };
 
   const href = buildExploreHref(state);
-  assert.match(href, /^\/\?/);
-  assert.doesNotMatch(href, /group=/);
+  assert.match(href, /^\/explore\?/);
+  assert.match(href, /group=0/);
   // Intentional deep links may still carry camera; live explore pan/zoom does not rewrite it.
   assert.match(href, /lat=38\.9072/);
   assert.match(href, /lng=-77\.0369/);
@@ -94,7 +117,7 @@ test('shareable explore URLs without an intentional camera omit lat/lng/zoom', (
       confidence: 'all',
     },
     layerMode: 'presence',
-    group: false,
+    group: true,
     sat: false,
     lines: false,
     showFilters: false,
@@ -119,7 +142,7 @@ test('default filter values are omitted from the query string (minimal shareable
       confidence: 'all',
     },
     layerMode: 'presence',
-    group: false,
+    group: true,
     sat: false,
     lines: false,
     showFilters: false,
@@ -141,7 +164,7 @@ test('layerMode=off is emitted; presence (default) is omitted', () => {
         confidence: 'all',
       },
       layerMode: 'off',
-      group: false,
+      group: true,
       sat: false,
       lines: false,
       showFilters: false,
@@ -161,7 +184,7 @@ test('layerMode=off is emitted; presence (default) is omitted', () => {
         confidence: 'all',
       },
       layerMode: 'presence',
-      group: false,
+      group: true,
       sat: false,
       lines: false,
       showFilters: false,
@@ -190,7 +213,7 @@ test('population modes round-trip decade params', () => {
     layerMode: 'blackShare' as const,
     popGeo: 'county' as const,
     popDecade: '2010' as const,
-    group: false,
+    group: true,
     sat: false,
     lines: false,
     showFilters: false,
@@ -217,7 +240,7 @@ test('population modes round-trip decade params', () => {
     popGeo: 'county' as const,
     popFrom: '2000' as const,
     popTo: '2020' as const,
-    group: false,
+    group: true,
     sat: false,
     lines: false,
     showFilters: false,
@@ -261,7 +284,7 @@ test('state historical share coerces county geo and round-trips popGeo=state', (
     layerMode: 'blackShare',
     popGeo: 'state',
     popDecade: '1870',
-    group: false,
+    group: true,
     sat: false,
     lines: false,
     showFilters: false,
@@ -272,16 +295,16 @@ test('state historical share coerces county geo and round-trips popGeo=state', (
   assert.match(qs, /popDecade=1870/);
 });
 
-test('group=1 turns nearby-point grouping on; omitted group defaults off', () => {
+test('group=0 disables nearby-point grouping; omitted group defaults on', () => {
   assert.equal(parseExploreSearchParams({ group: '1' }).group, true);
   assert.equal(parseExploreSearchParams({ group: 'true' }).group, true);
   assert.equal(parseExploreSearchParams({ group: '0' }).group, false);
   assert.equal(parseExploreSearchParams({ group: 'false' }).group, false);
-  assert.equal(parseExploreSearchParams({}).group, false);
+  assert.equal(parseExploreSearchParams({}).group, true);
 });
 
-test('buildExploreSearchParams emits group=1 only when grouping is on', () => {
-  assert.match(
+test('buildExploreSearchParams emits group=0 only when grouping is off', () => {
+  assert.equal(
     buildExploreSearchParams({
       filters: {
         era: 'all',
@@ -299,9 +322,9 @@ test('buildExploreSearchParams emits group=1 only when grouping is on', () => {
       showResults: false,
       showKey: false,
     }),
-    /^group=1$/,
+    '',
   );
-  assert.equal(
+  assert.match(
     buildExploreSearchParams({
       filters: {
         era: 'all',
@@ -319,7 +342,7 @@ test('buildExploreSearchParams emits group=1 only when grouping is on', () => {
       showResults: false,
       showKey: false,
     }),
-    '',
+    /^group=0$/,
   );
 });
 
@@ -339,7 +362,7 @@ test('absent panel params default map-first (all chrome collapsed)', () => {
         confidence: 'all',
       },
       layerMode: 'presence',
-      group: false,
+      group: true,
       sat: false,
       lines: false,
       showFilters: false,
@@ -361,7 +384,7 @@ test('panels= still opens listed chrome on the way in', () => {
       confidence: 'all',
     },
     layerMode: 'presence' as const,
-    group: false,
+    group: true,
     sat: false,
     lines: false,
     showFilters: true,
@@ -393,7 +416,7 @@ test('open panels are never serialized back out (chrome is not shareable state)'
       confidence: 'all',
     },
     layerMode: 'presence' as const,
-    group: false,
+    group: true,
     sat: false,
     lines: false,
   };
@@ -436,7 +459,7 @@ test('legacy hidePanels= still parses (start open, hide listed)', () => {
         confidence: 'all',
       },
       layerMode: 'presence',
-      group: false,
+      group: true,
       sat: false,
       lines: false,
       showFilters: true,
@@ -508,7 +531,7 @@ test('round-trips radius and near place-search params', () => {
     radius: '10mi' as const,
     near: 'Palm Beach County, Florida',
     layerMode: 'presence' as const,
-    group: false,
+    group: true,
     sat: false,
     lines: false,
     showFilters: false,
@@ -536,4 +559,30 @@ test('parseExploreSearchParams ignores an invalid radius token', () => {
   });
   assert.equal(parsed.radius, undefined);
   assert.ok(parsed.viewport);
+});
+
+test('evidence floor round-trips on explore URLs (Records→Atlas handoff)', () => {
+  const qs = buildExploreSearchParams({
+    filters: {
+      era: 'all',
+      kind: 'all',
+      tone: 'all',
+      theme: 'all',
+      status: 'all',
+      confidence: 'all',
+    },
+    layerMode: 'presence',
+    group: true,
+    sat: false,
+    lines: false,
+    showFilters: false,
+    showResults: false,
+    showKey: false,
+    floor: 'B',
+    state: 'OK',
+  });
+  assert.equal(qs, 'state=OK&floor=B');
+  const parsed = parseExploreSearchParams(Object.fromEntries(new URLSearchParams(qs)));
+  assert.equal(parsed.floor, 'B');
+  assert.equal(parsed.state, 'OK');
 });

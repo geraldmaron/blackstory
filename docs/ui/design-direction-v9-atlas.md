@@ -1,8 +1,12 @@
 # BlackStory design direction v9: Atlas edition
 
-**Status:** binding (2026-07-30).
+**Status:** superseded (2026-08-31) by [`design-direction-v10.md`](./design-direction-v10.md).  
+**Kept as provenance.** Do not restore Instrument chrome on `/` from this document.  
+Live Atlas instrument scope is `/explore` only. Product thesis amended: relationships are the product; the map is the spatial spine.
+
+**Historical status:** binding (2026-07-30) until v10.  
 **Source mockup:** [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html). Runnable, MapLibre-backed, owner-reviewed. The same build now carries the room layer for the four non-instrument surface classes.
-**Companion:** [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md). This document governs the instrument surface class: `/` (the Atlas) and `/story`, with `/explore` and `/locate` resolving into them. That document governs every other public surface and the shell they share, and it resolves all 47 public routes. They are read together, and neither is complete alone.
+**Companion:** [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) — also superseded by v10 for route membership.
 **Supersedes:** `design-direction-v6-home.md` (all), `design-direction-v6-explore.md` (all), `design-direction-v6-search.md` (already a redirect stub). Every other v6 surface doc is superseded by the companion, not by this one. None is deleted: they stay in `docs/ui/` as the provenance record, and [`README.md`](./README.md) marks each one superseded in the pattern index.
 **Unchanged and still binding:** [`brand.md`](./brand.md) tokens, palette, type, dignity law; [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md); [`patterns-map-canvas.md`](./patterns-map-canvas.md); ADR-017 map handoff; WCAG AA floor.
 
@@ -37,7 +41,7 @@ v9 keeps the archive's voice and every dignity rule. It changes the **shape of t
 
 Design goals, in priority order:
 
-1. **Land in the tool.** No throat-clearing. First paint is a live map with records already on it.
+1. **Land on the map.** First paint of `/` is the Atlas (filter bar, map, records list), not one featured place and not a loading count of the archive. A place is a page you walk into. Do not hide the catalog behind `?atlas=1`. The camera console stays docked until asked.
 2. **Search-first, not nav-first.** `⌘K` is the primary affordance. Navigation is a consequence of search, not a menu.
 3. **Motion that explains.** Camera moves are how the archive *argues*. Static is the exception, reserved for dignity-sensitive content.
 4. **Evidence stays legible.** Kind / Where / Era / Evidence anatomy, confidence grades, precision honesty, all carried forward unchanged.

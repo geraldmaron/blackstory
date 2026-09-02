@@ -50,7 +50,6 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
   const {
     query,
     rows,
-    totalMatched,
     totalAll,
     page,
     pageCount,
@@ -97,8 +96,8 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
         title="Records"
         lede={
           <>
-            Every record in the release as a list. The Atlas shows you where things are. This shows
-            you what there is.
+            Every record in the release as a list. The map shows where a record sits. This list
+            shows what the archive holds.
           </>
         }
         meta={[
@@ -265,19 +264,9 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           { href: '/submit', label: 'Submit a record we are missing' },
         ]}
       >
-        {atlasReason} A record without a documented location has no pin, so the Atlas will show
-        fewer than the {totalMatched.toLocaleString('en-US')} listed here.
-        {query.q.length > 0 || query.evidence.length > 0 ? (
-          <>
-            {' '}
-            The Atlas has no{' '}
-            {query.q.length > 0 && query.evidence.length > 0
-              ? 'text search and no evidence floor'
-              : query.q.length > 0
-                ? 'text search'
-                : 'evidence floor'}{' '}
-            yet, so that part of this narrowing stays here.
-          </>
+        {atlasReason}
+        {query.q.length > 0 ? (
+          <> The Atlas has no text search, so that part of this narrowing stays here.</>
         ) : null}
       </OffRamp>
     </Room>

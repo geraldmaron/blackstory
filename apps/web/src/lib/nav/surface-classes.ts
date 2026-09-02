@@ -16,8 +16,10 @@
  *
  * Endpoints (redirects, JSON, feeds, crawler files) have no class. They render no chrome, so
  * `surfaceClassFor` returns `null` and nothing is emitted.
+ *
+ * `/` is the door: the locked about mast plus the pin plate. `/explore` mounts the
+ * Atlas instrument. A place is `/place/{slug}`.
  */
-
 /** The four rendered surface classes. Endpoints are represented by `null`. */
 export type SurfaceClass = 'instrument' | 'reading' | 'record' | 'utility';
 
@@ -26,9 +28,10 @@ export type SurfaceClass = 'instrument' | 'reading' | 'record' | 'utility';
  * (`/stories/mosaic-credits` is Utility) can never be swallowed by its parent's prefix rule.
  */
 const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
-  // Instrument — the map is the content. Story is a mode of `/`, not a path of its own, so it is
-  // not classified here; see the deprecation note in `destination-registry.ts`.
-  ['/', 'instrument'],
+  // Front door: locked about mast plus the pin plate. Same room chrome as the archive.
+  // `/explore` is the live catalog instrument. Story is a mode of the Atlas, not a path.
+  ['/', 'reading'],
+  ['/explore', 'instrument'],
 
   // Reading room — one scrolling, measure-limited column on paper.
   // `/library` is the hub the rest of this list hangs off: it renders cards, not records, but it
@@ -64,6 +67,7 @@ const SURFACE_CLASS_PREFIXES: readonly (readonly [string, SurfaceClass])[] = [
   // both are API-only directories, and the appeal and abuse forms are mounted inside the receipt
   // status page. Classifying them promised chrome for two URLs that 404 (SP-19, repo-92n2.19).
   ['/stories/', 'reading'],
+  ['/place/', 'record'],
   ['/entity/', 'record'],
   ['/books/', 'record'],
   ['/law/', 'record'],
@@ -78,9 +82,9 @@ export const ENDPOINT_ROUTES: readonly string[] = [
   '/facts',
   '/search',
   '/map',
-  '/explore',
   '/history',
   '/explore/api',
+  '/atlas/catalog',
   '/search/api',
   '/locate/api',
   '/submit/api',
@@ -112,8 +116,12 @@ function normalizePath(pathname: string): string {
  * Unknown paths land on the 404, which is a Utility surface, so they resolve to `utility`
  * rather than to nothing: a reader who mistypes a URL still gets the utility chrome instead
  * of a page with no class and therefore no shell rules.
+ *
+ * `search` is accepted so older call sites keep compiling. It does not change the class:
+ * `/` is always the reading door. `?atlas=1` is not a second home. The Atlas
+ * instrument is `/explore`.
  */
-export function surfaceClassFor(pathname: string): SurfaceClass | null {
+export function surfaceClassFor(pathname: string, _search?: string): SurfaceClass | null {
   const path = normalizePath(pathname);
   if (ENDPOINT_ROUTE_SET.has(path)) return null;
 

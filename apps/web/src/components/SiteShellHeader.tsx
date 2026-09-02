@@ -9,9 +9,8 @@
  *
  * The Atlas still mounts its own `CommandBar` inside `AtlasExperience`, because there the bar needs
  * the mode toggle, the palette, the saved drawer and the shortcut sheet, all of which are that
- * surface's client state. This renders the same component without them: brand, a search slot that
- * links to the record index, Atlas, Library, and the theme switch. Same component, same position,
- * same artwork — the parts that cannot work off the Atlas are absent rather than inert.
+ * surface's client state. This renders the same component without them: brand, search, Find
+ * (Atlas / Records), Rooms, and the theme switch. Same component, same position, same artwork.
  *
  * The gate reads the surface class registry, the same table `shell.css` and the footer read, so the
  * three cannot disagree about which surface is the Instrument. It stays a render gate rather than a
@@ -20,14 +19,29 @@
 
 'use client';
 
+import { Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import { toggleDocumentTheme } from '@repo/ui';
 import { surfaceClassFor } from '../lib/nav/surface-classes';
+import { useSurfaceClass } from '../lib/nav/use-surface-class';
 import { CommandBar } from './shell/CommandBar';
 
 export function SiteShellHeader() {
+  return (
+    <Suspense fallback={<SiteShellHeaderFromPath />}>
+      <SiteShellHeaderFromSearch />
+    </Suspense>
+  );
+}
+
+function SiteShellHeaderFromPath() {
   const pathname = usePathname() || '/';
   if (surfaceClassFor(pathname) === 'instrument') return null;
+  return <CommandBar className="ds-bar--room" onToggleTheme={toggleDocumentTheme} />;
+}
+
+function SiteShellHeaderFromSearch() {
+  if (useSurfaceClass() === 'instrument') return null;
   // No `recordCount`: the count is a promise only a surface holding the index can keep, and a
   // reading room does not load one. The placeholder drops the number rather than inventing it.
   return <CommandBar className="ds-bar--room" onToggleTheme={toggleDocumentTheme} />;

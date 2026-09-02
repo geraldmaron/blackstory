@@ -248,6 +248,22 @@ export type ReleaseEntityProjectionFields = {
   readonly recordUpdatedAt: string;
 };
 
+/** Highest accepted-claim confidence on a record. Letter grades derive at read time; never invent grade from claim count. */
+export type ReleaseConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
+
+/**
+ * Max claim confidence for search_index / Records evidence floors.
+ * Matches Atlas `highestConfidence`: one high claim is A-band even when other claims are low.
+ */
+export function highestClaimConfidenceTier(
+  claims: readonly { readonly confidenceLevel?: string }[],
+): ReleaseConfidenceTier {
+  if (claims.some((claim) => claim.confidenceLevel === 'high')) return 'high';
+  if (claims.some((claim) => claim.confidenceLevel === 'medium')) return 'medium';
+  if (claims.some((claim) => claim.confidenceLevel === 'low')) return 'low';
+  return 'unrated';
+}
+
 export type ReleaseSearchIndexFields = {
   readonly id: string;
   readonly releaseId: string;
@@ -270,6 +286,8 @@ export type ReleaseSearchIndexFields = {
   readonly researchCoverage: ReleaseResearchCoverage;
   readonly relatedCount: number;
   readonly claimCount: number;
+  /** Highest claim confidence — evidence floor input for Records slim; not a public ranking score. */
+  readonly confidenceTier: ReleaseConfidenceTier;
 };
 
 export type ReleaseBuildFailureReason =
@@ -1033,6 +1051,7 @@ export function buildReleaseEntityArtifacts(
     researchCoverage,
     relatedCount: related.length,
     claimCount: claims.length,
+    confidenceTier: highestClaimConfidenceTier(claims),
   };
 
   return { ok: true, projection, searchIndex };

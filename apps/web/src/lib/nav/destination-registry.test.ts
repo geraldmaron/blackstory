@@ -95,6 +95,7 @@ describe('destination registry · coverage', () => {
 
   it('an entity goes up to the Atlas and a record goes up to its catalogue', () => {
     assert.equal(parentPathFor('/entity/tulsa-greenwood'), '/');
+    assert.equal(parentPathFor('/place/paul-laurence-dunbar-high-school'), '/');
     assert.equal(parentPathFor('/books/beloved'), '/books');
     assert.equal(parentPathFor('/law/plessy'), '/law');
     assert.equal(parentPathFor('/stories/redlining'), '/stories');
@@ -160,11 +161,62 @@ describe('destination registry · the footer is derived, not authored', () => {
     }
   });
 
-  it('lists the library and the record index, and no longer lists /history', () => {
-    const hrefs = footerColumns().flatMap((column) => column.items.map((item) => item.href));
-    assert.ok(hrefs.includes('/library'));
+  it('the locked chrome is the about groups, in that order', () => {
+    assert.deepEqual(
+      destinationsInGroup('read').map((destination) => destination.path),
+      ['/stories', '/law', '/data', '/memorial'],
+    );
+    assert.deepEqual(
+      destinationsInGroup('check').map((destination) => destination.path),
+      ['/about', '/methodology', '/errata'],
+    );
+    assert.deepEqual(
+      destinationsInGroup('take-part').map((destination) => destination.path),
+      ['/submit', '/corrections', '/support'],
+    );
+  });
+
+  it('puts Find in the footer; Rooms palette stays editorial without Atlas or records', () => {
+    const columns = footerColumns();
+    const find = columns.find((column) => column.title === 'Find');
+    assert.ok(find);
+    assert.deepEqual(
+      find.items.map((item) => item.href),
+      ['/', '/explore', '/library', '/records'],
+    );
+    const hrefs = columns.flatMap((column) => column.items.map((item) => item.href));
+    const palette = browsableDestinations().map((destination) => destination.path);
+    assert.ok(hrefs.includes('/stories'));
+    assert.ok(hrefs.includes('/about'));
+    assert.ok(hrefs.includes('/submit'));
+    assert.ok(hrefs.includes('/explore'));
     assert.ok(hrefs.includes('/records'));
     assert.ok(!hrefs.includes('/history'));
+    assert.ok(!hrefs.includes('/banned-books'));
+    assert.ok(!palette.includes('/explore'));
+    assert.ok(!palette.includes('/records'));
+    assert.ok(!palette.includes('/library'));
+    for (const path of palette) {
+      assert.ok(hrefs.includes(path), `${path} missing from footer`);
+    }
+  });
+
+  it('does not invent a second home lede', () => {
+    const home = destinationFor('/');
+    assert.ok(home);
+    assert.equal(home.description, undefined);
+    assert.equal(home.menuLine, undefined);
+    const atlas = destinationFor('/explore');
+    assert.equal(atlas?.description, 'The map.');
+  });
+
+  it('does not ship /books as a walk room, and never lists /banned-books', () => {
+    assert.equal(destinationFor('/books')?.group, undefined);
+    assert.ok(!destinationsInGroup('read').some((destination) => destination.path === '/books'));
+    const hrefs = footerColumns().flatMap((column) => column.items.map((item) => item.href));
+    assert.ok(!hrefs.includes('/books'));
+    assert.ok(!hrefs.includes('/banned-books'));
+    assert.equal(destinationFor('/banned-books'), undefined);
   });
 
   it('lists every carded destination exactly once', () => {

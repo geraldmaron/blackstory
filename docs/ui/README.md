@@ -6,16 +6,20 @@ Shared kit: `@repo/ui` (`packages/ui`). Binding brand source: root `brand/`. Tok
 
 ## Read these first
 
-v9 replaced a per-route design doc set with two documents and a pattern layer.
+v10 is the authoritative product architecture. It amends the door-tip implementation
+(`/` is the Door; `/explore` is the Atlas instrument) and supersedes v9’s
+“Instrument on `/`” product shape.
 
 | Document | Governs | Status |
 |---|---|---|
+| [`PROTECTED-EXPERIENCES.md`](./PROTECTED-EXPERIENCES.md) | Memorial, evidence honesty, precision, dignity, public access, brand integrity. Overrides aesthetics. | Binding (2026-08-31) |
+| [`design-direction-v10.md`](./design-direction-v10.md) | Product thesis, visual models, surface law, KEEP AS IS, authority order. | Binding (2026-08-31) |
 | [`brand.md`](./brand.md) | Signature, palette, type, dignity law. Where this doc and the brand pack disagree, the pack wins. | Binding |
-| [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md) | The Instrument surface class: `/` and `/story`. | Binding (2026-07-30) |
-| [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) | Every other public surface, the shell they share, and a verdict for all 47 public routes. | Proposed (2026-07-30), binding on owner approval |
 | [`story.md`](./story.md) | Voice and microcopy, all user-facing copy. | Binding |
+| [`v10/`](./v10/) | Inventory, research, DiscoveryState, Place anatomy, schema/cost, reconciliation, plan. | Binding companions |
 
-The two v9 direction docs are read together. Neither is complete alone.
+**Do not** rebuild first paint as a live WebGL cockpit on `/` because a v9 doc says so.
+Live instrument chrome belongs on `/explore`. See [`v10/design-doc-reconciliation.md`](./v10/design-doc-reconciliation.md).
 
 ## Pattern index
 
@@ -48,6 +52,7 @@ The two v9 direction docs are read together. Neither is complete alone.
 | **Map canvas lifecycle** | [`patterns-map-canvas.md`](./patterns-map-canvas.md) | `map-libre-lifecycle.ts`, `MapStage.tsx`, `EntityLocationMap.tsx` | Binding (cross-browser WebGL) |
 | **Edition fact icon** | [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md) | [`patterns-registry.md`](./patterns-registry.md) | Reusable |
 | **Browse mode** | [`patterns-browse-mode.md`](./patterns-browse-mode.md) | [`patterns-registry.md`](./patterns-registry.md) | Reusable |
+| **Relationship constellation** | [`patterns-relationship-constellation.md`](./patterns-relationship-constellation.md) | `RelationshipConstellation.tsx` | Reusable (Place typed edges) |
 | **Footer** | [`patterns-site-footer.md`](./patterns-site-footer.md) | `SiteFooter.tsx`, `shell.css` `.ds-shell-footer*` | Reusable. Rewritten from the destination registry in SP-15 |
 | **Utility edition** | [`patterns-utility-edition.md`](./patterns-utility-edition.md) | `components/patterns/utility-edition/*` | Reusable. Folded into the Utility surface class by v9 surfaces section 2.4 |
 | **Cinematic map backdrop** | [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) | `components/patterns/cinematic-map/*`, `MapStage.tsx`, `camera-presets.ts`, mobile `AppBottomSheet.tsx` + `mapCamera.ts` | Binding on mobile. On web, replaced by the Framed plate posture |
@@ -64,7 +69,7 @@ None of these is deleted. They record why v9 exists and what was rejected. Do no
 | [`design-direction-v5.md`](./design-direction-v5.md) | v6, then v9 | Historical |
 | [`blap-design-direction-v4.md`](./blap-design-direction-v4.md) | v5 | Historical |
 | [`design-direction-v6-home.md`](./design-direction-v6-home.md) | v9 Atlas | `/` |
-| [`design-direction-v6-explore.md`](./design-direction-v6-explore.md) | v9 Atlas | `/explore`, 308 to `/` |
+| [`design-direction-v6-explore.md`](./design-direction-v6-explore.md) | v9 Atlas → **v10** | `/explore` is the live Instrument (not a 308 to `/`) |
 | [`design-direction-v6-search.md`](./design-direction-v6-search.md) | v9 Atlas | `/search`, redirect |
 | [`design-direction-v6-history.md`](./design-direction-v6-history.md) | v9 surfaces | `/history`, resolves to `/records` |
 | [`design-direction-v6-stories.md`](./design-direction-v6-stories.md) | v9 chapters | `/stories`, 308 to `/chapters`. `app/stories` does not exist |
@@ -202,7 +207,7 @@ Routes that **do not exist**: `app/stories`, `app/themes`, `app/topics`, `app/ar
 | `/ai.txt` | `app/ai.txt/route.ts` |
 | `/.well-known/security.txt` | `app/.well-known/security.txt/route.ts` |
 | `/robots.txt` | `app/robots.ts` |
-| `/sitemap.xml` | `app/sitemap.ts` |
+| `/sitemap.xml` | `app/sitemap.xml/route.ts` |
 
 Sample entity ids: `ent_seed_place_001`, `ent_seed_school_001`. Data is labeled as seed/sample, not live projections.
 

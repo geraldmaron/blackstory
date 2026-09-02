@@ -56,3 +56,8 @@ test('errata.css is retired', () => {
   assert.doesNotMatch(pageSource, /errata\.css/);
   assert.doesNotMatch(sectionsSource, /errata\.css/);
 });
+
+test('errata does not print shop record ids', () => {
+  assert.doesNotMatch(sectionsSource, />\{entry\.id\}</);
+  assert.doesNotMatch(pageSource, /confidenceNote|counterClaims|home-server/);
+});

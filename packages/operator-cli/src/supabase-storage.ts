@@ -9,7 +9,8 @@
  * the upload is a single authenticated HTTP call, and the transport is injected for tests.
  *
  * Idempotent by construction: the object key is the sha256 of the raw bytes, and an
- * "already exists" (409) response is treated as stored — same content, same object.
+ * "already exists" response is treated as stored — same content, same object. Storage
+ * sometimes wraps that as HTTP 400 with `code: KeyAlreadyExists` rather than HTTP 409.
  */
 import type { CaptureStorage } from './source-capture.js';
 
@@ -34,6 +35,22 @@ export function supabaseStorageConfigFromEnv(
   return { url, secretKey, bucket: env.SUPABASE_CAPTURE_BUCKET?.trim() || 'raw-sources' };
 }
 
+/** True when Storage rejected the write because that content-addressed key is already there. */
+async function isAlreadyExistsResponse(response: Response): Promise<boolean> {
+  if (response.status === 409) return true;
+  const detail = await response
+    .clone()
+    .text()
+    .catch(() => '');
+  if (!detail) return false;
+  try {
+    const body = JSON.parse(detail) as { code?: unknown; statusCode?: unknown };
+    return body.code === 'KeyAlreadyExists' || String(body.statusCode) === '409';
+  } catch {
+    return /KeyAlreadyExists|already exists/i.test(detail);
+  }
+}
+
 export function createSupabaseStorage(config: SupabaseStorageConfig): CaptureStorage {
   const base = config.url.replace(/\/+$/, '');
   const transport = config.transport ?? fetch;
@@ -51,8 +68,10 @@ export function createSupabaseStorage(config: SupabaseStorageConfig): CaptureSto
         },
         body: text,
       });
-      // 409 Duplicate = the content-addressed object already exists; identical by definition.
-      if (!response.ok && response.status !== 409) {
+      // Duplicate is success: same hash, same object. Storage may send HTTP 409,
+      // or HTTP 400 with a JSON body `{ statusCode: "409", code: "KeyAlreadyExists" }`.
+      const alreadyExists = response.status === 409 || (await isAlreadyExistsResponse(response));
+      if (!response.ok && !alreadyExists) {
         const detail = await response.text().catch(() => '');
         throw new Error(
           `supabase storage upload failed (${response.status}) for ${path}: ${detail.slice(0, 200)}`,
@@ -67,7 +86,7 @@ export function createSupabaseStorage(config: SupabaseStorageConfig): CaptureSto
         contentType,
         byteLength,
         snapshotBytes: text.length,
-        deduplicated: response.status === 409,
+        deduplicated: alreadyExists,
       };
     },
   };

@@ -14,7 +14,7 @@ import {
   searchHrefForStatus,
 } from '../../lib/map-experience/metadata-hrefs';
 import { entityEraFact } from '../../lib/map-experience/entity-era-facts';
-import { exploreWhereMapsLink } from '../../lib/map-experience/explore-where-maps-link';
+import { placeLabelFor } from '../../lib/map-experience/place-label';
 import { radiusAffordanceLabel } from '../../lib/map-experience/geo-precision';
 import {
   RecordAnatomyPanel,
@@ -25,6 +25,11 @@ import {
   RecordBrowseControls,
   type RecordBrowseControlsProps,
 } from '../patterns/RecordBrowseControls';
+import { RecordVisitBlock } from '../patterns/RecordVisitBlock';
+import {
+  buildVisitHandoffFromMapFeature,
+  shouldShowVisitBlock,
+} from '../../lib/geography/visit-handoff';
 import { ConfidenceMark } from './ConfidenceMark';
 import { KindBadge } from './KindBadge';
 import { StatusMark } from './StatusMark';
@@ -47,8 +52,7 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
   const era = entityEraFact({
     eraBuckets: properties.eraBuckets,
   });
-  const whereMaps = exploreWhereMapsLink(feature);
-  const whereLabel = whereMaps?.label ?? 'Place withheld';
+  const whereLabel = placeLabelFor(feature);
   const statusHref =
     properties.status !== undefined ? searchHrefForStatus(properties.status) : undefined;
   const evidenceLabel = `${properties.evidenceCount} accepted claim${properties.evidenceCount === 1 ? '' : 's'}`;
@@ -57,10 +61,28 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
   const anatomyPlace: RecordAnatomyPlace = {
     lat,
     lng,
-    label: properties.displayName,
+    label: whereLabel,
     precision: mapPrecision,
     precisionCaption: radiusAffordanceLabel(properties.geoPrecisionTier, properties.radiusMeters),
   };
+  const visitInput = buildVisitHandoffFromMapFeature({
+    displayName: properties.displayName,
+    locationPrecision: properties.precision,
+    kind: properties.kind,
+    lat,
+    lng,
+    ...(properties.locationLabel !== undefined ? { locationLabel: properties.locationLabel } : {}),
+    ...(properties.jurisdictionLabel !== undefined
+      ? { jurisdictionLabel: properties.jurisdictionLabel }
+      : {}),
+    ...(properties.status !== undefined ? { status: properties.status } : {}),
+    ...(properties.livingStatus !== undefined ? { livingStatus: properties.livingStatus } : {}),
+    ...(properties.sensitivityClass !== undefined
+      ? { sensitivityClass: properties.sensitivityClass }
+      : {}),
+    ...(properties.visitClaims !== undefined ? { claims: properties.visitClaims } : {}),
+  });
+  const showVisit = shouldShowVisitBlock(visitInput);
   const kindIcon =
     properties.mapTone !== undefined
       ? { variant: 'record-kind' as const, kind: properties.kind, mapTone: properties.mapTone }
@@ -105,7 +127,7 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
     {
       key: 'evidence',
       label: 'Evidence',
-      value: (
+      value: properties.href ? (
         <Link
           className="ds-record-anatomy__fact-link"
           href={entityEvidenceHref(properties.href)}
@@ -113,6 +135,8 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
         >
           {evidenceLabel}
         </Link>
+      ) : (
+        evidenceLabel
       ),
       icon: { variant: 'record-evidence', tier: properties.confidenceTier },
     },
@@ -168,15 +192,21 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
       </div>
 
       <h3 className="ds-nc__title" id="ds-nc-title">
-        <Link className="ds-nc__title-link" href={properties.href} scroll={false}>
-          {properties.displayName}
-        </Link>
+        {properties.href ? (
+          <Link className="ds-nc__title-link" href={properties.href} scroll={false}>
+            {properties.displayName}
+          </Link>
+        ) : (
+          properties.displayName
+        )}
       </h3>
       <p className="ds-nc__story" id="ds-nc-story">
         {properties.oneLineStory}
       </p>
 
-      <RecordAnatomyPanel facts={anatomyFacts} place={anatomyPlace} />
+      <RecordAnatomyPanel facts={anatomyFacts} place={anatomyPlace} linkWhereToMaps={!showVisit} />
+
+      {showVisit ? <RecordVisitBlock className="ds-nc__visit" compact {...visitInput} /> : null}
 
       <dl className="ds-nc__facts">
         <div className="ds-nc__fact">
@@ -221,9 +251,11 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
         </p>
       ) : null}
 
-      <Link className="ds-cta ds-cta--copper ds-nc__action" href={properties.href} scroll={false}>
-        Open full record
-      </Link>
+      {properties.href ? (
+        <Link className="ds-cta ds-cta--copper ds-nc__action" href={properties.href} scroll={false}>
+          Open full record
+        </Link>
+      ) : null}
     </article>
   );
 }

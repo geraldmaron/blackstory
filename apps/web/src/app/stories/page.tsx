@@ -14,13 +14,13 @@
  */
 import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
+import { WalkOffRamp } from '../walk-off-ramp';
 import { listPublicArticleListItems } from '../../lib/articles/source';
 import { RECORDS_PAGE_SIZE } from '../../lib/records/build-records-index';
 import {
   CardGrid,
   GroupHeading,
   Note,
-  OffRamp,
   RailGroup,
   Room,
   RoomCard,
@@ -348,15 +348,10 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
         </nav>
       ) : null}
 
-      <OffRamp
-        title="Go straight to the archive"
-        actions={[
-          { label: 'Open the Atlas', href: '/', emphasis: 'copper' },
-          { label: 'Search the archive', href: '/records' },
-        ]}
-      >
-        Every figure and quotation in these stories cites its record.
-      </OffRamp>
+      <WalkOffRamp>
+        This is the national archive of chapters. A record names Stories only when it already cites
+        one.
+      </WalkOffRamp>
     </Room>
   );
 }

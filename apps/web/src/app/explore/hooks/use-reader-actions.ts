@@ -32,7 +32,7 @@ export function useReaderActions(toasts: UseToasts, camera: CameraApi) {
       era: eraFor(feature),
       grade: grade ?? 'not graded',
       sourceCount: feature.properties.evidenceCount,
-      url: `https://blackstory.org${feature.properties.href}`,
+      url: `https://blackstory.org${feature.properties.href || '/'}`,
       accessed: new Date(),
     });
   }, []);

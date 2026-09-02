@@ -30,6 +30,7 @@
  * detail is still one tap away on both surfaces; it is just not offered twice.
  */
 import React from 'react';
+import { InteractiveRecordLocator } from './InteractiveRecordLocator';
 import { RecordLocator } from './RecordLocator';
 import './record-locator.css';
 
@@ -48,12 +49,38 @@ export type RecordPlacePreviewProps = {
   readonly lat: number;
   readonly lng: number;
   readonly label: string;
+  readonly accessibleName?: string;
+  /** Place-page stand: pan/zoom the national locator. Rail and sheet slots stay static. */
+  readonly interactive?: boolean;
+  /** Live Atlas handoff when the locator is interactive. */
+  readonly atlasHref?: string;
 };
 
-export function RecordPlacePreview({ lat, lng, label }: RecordPlacePreviewProps) {
+export function RecordPlacePreview({
+  lat,
+  lng,
+  label,
+  accessibleName,
+  interactive = false,
+  atlasHref,
+}: RecordPlacePreviewProps) {
+  const sharedProps = {
+    lat,
+    lng,
+    label,
+    ...(accessibleName !== undefined ? { accessibleName } : {}),
+  } as const;
+
   return (
     <figure className="ds-record-anatomy__place">
-      <RecordLocator lat={lat} lng={lng} label={label} />
+      {interactive ? (
+        <InteractiveRecordLocator
+          {...sharedProps}
+          {...(atlasHref !== undefined ? { atlasHref } : {})}
+        />
+      ) : (
+        <RecordLocator {...sharedProps} />
+      )}
       {/* The words are the content and the locator is the illustration — the same contract
           `MapMoment` held, and the reason it required its caption. A record whose coordinates fall
           outside the projection renders no locator at all, and this line is then the whole block,

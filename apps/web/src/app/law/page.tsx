@@ -7,16 +7,13 @@
 import type { Metadata } from 'next';
 import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
+import { WalkOffRamp } from '../walk-off-ramp';
 import { LAW_EDITION_BROWSE_LEDE } from './law-copy';
 import { buildLawBrowseViewModel, type RawLawBrowseParams } from './law-view-model';
 import { loadLegalCatalog } from '../../lib/legal/public-source';
-import {
-  LawBrowseSections,
-  jurisdictionLabel,
-  statePostalForJurisdiction,
-} from './LawBrowseSections';
+import { LawBrowseSections } from './LawBrowseSections';
 import { humanizeLegalKind } from '../../components/legal';
-import { Room, RoomHeader, OffRamp, RailGroup } from '../../components/room';
+import { Room, RoomHeader } from '../../components/room';
 import '../reading-room.css';
 
 void React;
@@ -49,38 +46,8 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
         `${count} ${humanizeLegalKind(kind).toLowerCase()}${count === 1 ? '' : 's'}`,
     );
 
-  const jurisdictionCounts = new Map<
-    string,
-    { readonly label: string; readonly postal: string | undefined; count: number }
-  >();
-  for (const snapshot of catalog) {
-    const label = jurisdictionLabel(snapshot.jurisdictionId);
-    const postal = statePostalForJurisdiction(snapshot.jurisdictionId);
-    const existing = jurisdictionCounts.get(label);
-    if (existing) existing.count += 1;
-    else jurisdictionCounts.set(label, { label, postal, count: 1 });
-  }
-  const byJurisdiction = [...jurisdictionCounts.values()]
-    .sort((a, b) => b.count - a.count)
-    .map((entry) => ({
-      label: entry.label,
-      count: entry.count,
-      href: entry.postal ? `/?state=${entry.postal}` : '/',
-    }));
-
-  const rail = (
-    <>
-      <p className="ds-room-note">
-        These jurisdiction links hand the reader to the Atlas by place of authority alone. The
-        archive does not document that any specific record was decided under, or is otherwise
-        connected to, a given law.
-      </p>
-      <RailGroup title="By jurisdiction" entries={byJurisdiction} limit={12} />
-    </>
-  );
-
   return (
-    <Room rail={rail}>
+    <Room>
       <RoomHeader
         pathname="/law"
         kicker="Reference"
@@ -92,9 +59,8 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
         lede={
           <>
             {LAW_EDITION_BROWSE_LEDE} This catalogue holds the statutes, regulations, constitutional
-            amendments and landmark decisions themselves. It does not hold the entity records the
-            Atlas maps; the two are linked only by jurisdiction and era, never by a documented
-            connection.
+            amendments and landmark decisions themselves. It is linked to a place only by
+            jurisdiction and era, never by a documented evidentiary join.
           </>
         }
         meta={[`${catalog.length.toLocaleString('en-US')} law entries`, ...kindMeta]}
@@ -102,20 +68,9 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
 
       <LawBrowseSections view={view} catalog={catalog} />
 
-      <OffRamp
-        title={
-          <>
-            Or go straight to the <em>records</em>
-          </>
-        }
-        actions={[
-          { label: 'Open the Atlas', href: '/', emphasis: 'copper' },
-          { label: 'Search the archive', href: '/records' },
-        ]}
-      >
-        Press <kbd className="ds-kbd">⌘</kbd>
-        <kbd className="ds-kbd">K</kbd> to search laws and records from anywhere.
-      </OffRamp>
+      <WalkOffRamp>
+        This catalogue is jurisdictional. It does not invent a documented join to a record.
+      </WalkOffRamp>
     </Room>
   );
 }

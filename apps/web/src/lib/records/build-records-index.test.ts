@@ -18,8 +18,10 @@ import {
   RECORDS_PAGE_SIZE,
   buildAtlasHref,
   buildRecordsIndex,
+  findRecordsNeighbors,
   parseRecordsQuery,
   recordsHref,
+  searchIndexReadyForRecords,
   EMPTY_RECORDS_QUERY,
 } from './build-records-index';
 
@@ -202,7 +204,7 @@ describe('/records · the Atlas handoff', () => {
   it('maps topic onto the Lens name for the same thing', () => {
     assert.equal(
       buildAtlasHref({ ...EMPTY_RECORDS_QUERY, topic: 'abolition' }),
-      '/?theme=abolition',
+      '/explore?theme=abolition',
     );
   });
 
@@ -212,7 +214,7 @@ describe('/records · the Atlas handoff', () => {
       q: 'tulsa',
       state: 'OK',
     });
-    assert.equal(href, '/?state=OK');
+    assert.equal(href, '/explore?state=OK');
   });
 
   it('sends the evidence floor as `floor`, now that SP-16 landed it on the Lens', () => {
@@ -221,11 +223,11 @@ describe('/records · the Atlas handoff', () => {
       evidence: 'B',
       state: 'OK',
     });
-    assert.equal(href, '/?state=OK&floor=B');
+    assert.equal(href, '/explore?state=OK&floor=B');
   });
 
-  it('an unnarrowed index hands over bare /', () => {
-    assert.equal(buildAtlasHref(EMPTY_RECORDS_QUERY), '/');
+  it('an unnarrowed index hands over the Atlas instrument', () => {
+    assert.equal(buildAtlasHref(EMPTY_RECORDS_QUERY), '/explore');
   });
 });
 
@@ -273,5 +275,130 @@ describe('/records · filter vocabulary does not drift from the Lens', () => {
   it('the filter key list and the facet map cannot fall out of step', () => {
     const model = buildRecordsIndex([entity({ id: 'a' })], EMPTY_RECORDS_QUERY);
     assert.deepEqual(Object.keys(model.facets).sort(), [...RECORDS_FILTER_KEYS].sort());
+  });
+});
+
+describe('/records · place hrefs and map continuity', () => {
+  it('standable records link to /place; people stay on /entity', () => {
+    const entities = [
+      entity({
+        id: 'ent_school_a',
+        kind: 'school',
+        displayName: 'Union School',
+        summary: 'A documented school.',
+      }),
+      entity({
+        id: 'ent_school_b',
+        kind: 'school',
+        displayName: 'Union School',
+        summary: 'Another documented school.',
+      }),
+      entity({
+        id: 'ent_person_a',
+        kind: 'person',
+        displayName: 'Example Person',
+        summary: 'A named person.',
+      } as unknown as EntityOverrides),
+    ];
+    const model = buildRecordsIndex(entities, EMPTY_RECORDS_QUERY);
+    const byId = new Map(model.rows.map((row) => [row.id, row]));
+    assert.equal(byId.get('ent_school_a')?.href, '/place/union-school--ent_school_a?from=list');
+    assert.equal(byId.get('ent_school_b')?.href, '/place/union-school--ent_school_b?from=list');
+    assert.equal(byId.get('ent_person_a')?.href, '/entity/ent_person_a?from=list');
+    assert.equal(typeof model.mappableMatched, 'number');
+    assert.match(model.atlasReason, /records match/i);
+  });
+
+  it('findRecordsNeighbors steps within the same narrowing and keeps arrival query', () => {
+    const entities = [
+      entity({
+        id: 'ent_a',
+        kind: 'place',
+        displayName: 'Alpha Place',
+        summary: 'First.',
+        jurisdictionLabel: 'Washington, D.C.',
+      }),
+      entity({
+        id: 'ent_b',
+        kind: 'place',
+        displayName: 'Beta Place',
+        summary: 'Second.',
+        jurisdictionLabel: 'Washington, D.C.',
+      }),
+      entity({
+        id: 'ent_c',
+        kind: 'place',
+        displayName: 'Gamma Place',
+        summary: 'Third.',
+        jurisdictionLabel: 'Oklahoma',
+      }),
+    ];
+    const neighbors = findRecordsNeighbors(
+      entities,
+      { ...EMPTY_RECORDS_QUERY, state: 'DC' },
+      'ent_a',
+      'from=list&state=DC',
+    );
+    assert.equal(neighbors?.total, 2);
+    assert.equal(neighbors?.index, 0);
+    assert.equal(neighbors?.previous, undefined);
+    assert.equal(neighbors?.next?.id, 'ent_b');
+    assert.match(neighbors?.next?.href ?? '', /from=list/);
+    assert.match(neighbors?.next?.href ?? '', /state=DC/);
+  });
+
+  it('builds from search_index docs when confidenceTier is projected', () => {
+    const docs = [
+      {
+        id: 'ent_a',
+        releaseId: 'rel_1',
+        kind: 'place',
+        displayName: 'Alpha Place',
+        nameLower: 'alpha place',
+        aliases: [],
+        summary: 'First.',
+        topicTags: [],
+        eraBuckets: ['1920s'],
+        notabilityBasis: [],
+        notabilityLabels: [],
+        recordMaturity: 'partial_enrichment',
+        researchCoverage: 'partial' as const,
+        relatedCount: 0,
+        claimCount: 1,
+        confidenceTier: 'high' as const,
+        jurisdictionState: 'Washington, D.C.',
+        geohash: 'dqcjq',
+      },
+      {
+        id: 'ent_b',
+        releaseId: 'rel_1',
+        kind: 'person',
+        displayName: 'Example Person',
+        nameLower: 'example person',
+        aliases: [],
+        summary: 'A named person.',
+        topicTags: [],
+        eraBuckets: [],
+        notabilityBasis: [],
+        notabilityLabels: [],
+        recordMaturity: 'partial_enrichment',
+        researchCoverage: 'minimal' as const,
+        relatedCount: 0,
+        claimCount: 1,
+        confidenceTier: 'medium' as const,
+      },
+    ];
+    assert.equal(searchIndexReadyForRecords(docs), true);
+    const { confidenceTier: _confidenceTier, ...withoutConfidenceTier } = docs[0]!;
+    assert.equal(searchIndexReadyForRecords([withoutConfidenceTier]), false);
+    const model = buildRecordsIndex(docs, EMPTY_RECORDS_QUERY);
+    assert.equal(model.totalAll, 2);
+    assert.equal(model.rows.find((row) => row.id === 'ent_a')?.grade, 'A');
+    assert.equal(
+      model.rows.find((row) => row.id === 'ent_a')?.href,
+      '/place/alpha-place?from=list',
+    );
+    assert.equal(model.rows.find((row) => row.id === 'ent_b')?.href, '/entity/ent_b?from=list');
+    assert.equal(model.mappableMatched, 1);
   });
 });

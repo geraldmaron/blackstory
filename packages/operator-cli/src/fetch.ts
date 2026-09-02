@@ -7,10 +7,9 @@
  * requires, and calls that real function the SSRF-safe DNS pinning, redirect re-validation,
  * response-size/content-type limits, and sandboxed parsing all stay in `@repo/security`.
  *
- * Wayback capture: NOT wired. Nothing in this repo calls the Internet Archive's Save Page Now
- * API yet (see `packages/domain/src/provenance/capture.ts` `SourceCapture.snapshotStorageObject`
- * models a pointer to a *selective* stored snapshot, but no writer populates it from Wayback).
- * `planSelectiveCapture` below only documents where that call would go; it never fakes one.
+ * Wayback capture: `capture-backfill --wayback` posts successful local captures to
+ * Save Page Now (SPN2) when INTERNET_ARCHIVE_ACCESS_KEY/SECRET_KEY are set. This intake
+ * path does not call Wayback. `planSelectiveCapture` only documents that split.
  */
 import { lookup } from 'node:dns/promises';
 import { request as httpRequest, type IncomingMessage } from 'node:http';
@@ -182,8 +181,7 @@ export function planSelectiveCapture(result: Extract<SafeFetchResult, { ok: true
     waybackIntegration: 'not_wired',
     contentHash: result.contentHash,
     notes:
-      'No Wayback/Save-Page-Now call is made. When a real archival writer exists, it should ' +
-      'populate SourceCapture.snapshotStorageObject (packages/domain/src/provenance/capture.ts) ' +
-      'via buildCaptureAfterDedup once this proposal is promoted to a registered source item.',
+      'No Wayback/Save-Page-Now call is made from research-intake. capture-backfill --wayback ' +
+      'is the SPN2 writer; it populates source_captures.storage_object when archive.org keys are set.',
   };
 }

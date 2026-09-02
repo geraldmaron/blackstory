@@ -1,25 +1,29 @@
 /**
- * Fetches the Atlas catalog (`GET /atlas/catalog`), joins it to the shell the page rendered, and
- * mounts `AtlasExperience` with the same `initial` prop it has always taken.
+ * Joins the pin collection already on the page to the Atlas shell, mounts
+ * `AtlasExperience`, and hydrates instruments from `GET /atlas/catalog`.
  *
- * The page cannot carry the catalog itself without putting ~15 MB of uncacheable RSC payload on
- * every request (see `atlas-catalog.ts`). So the page renders in tens of KB, the plate is already
- * on screen underneath, and this island fills the instruments in when the catalog arrives — from
- * the CDN on a warm path, from the browser cache on a client-side return to `/`.
+ * The catalog is ~15 MB (see `atlas-catalog.ts`) and must not ride every
+ * `/explore` request as RSC. The plate cannot wait for it either: first paint
+ * is the pins `AtlasHome` already built from `getSharedPublicEntities`.
+ * Instruments fill in when the catalog arrives — from the CDN on a warm path,
+ * from the browser cache on a client-side return to `/explore`.
  *
- * The last catalog is also kept in module memory: navigating away and back within one session
- * re-mounts this component, and a 1 MB re-parse for bytes already in hand is not a cost worth
- * paying. Keyed by URL so a future versioned path cannot serve a stale shape.
+ * The last catalog is also kept in module memory: navigating away and back within
+ * one session re-mounts this component, and a 1 MB re-parse for bytes already in
+ * hand is not a cost worth paying. Keyed by URL so a future versioned path cannot
+ * serve a stale shape. First-paint pins are never stored as that catalog.
  */
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Notice } from '@repo/ui';
 import { hasMaintenanceBypassHint } from '../../lib/maintenance/maintenance-bypass-hint';
+import type { ExploreMapFeatureCollection } from '../../lib/map-experience/build-explore-map-source';
 import { AtlasExperience } from './AtlasExperience';
 import {
   ATLAS_CATALOG_PATH,
   assembleExploreViewModel,
+  firstPaintCatalog,
   type AtlasCatalogPayload,
   type AtlasShellModel,
 } from './explore-view-model-wire';
@@ -49,52 +53,60 @@ async function fetchAtlasCatalog(url: string, signal: AbortSignal): Promise<Atla
 
 export type AtlasLoaderProps = {
   readonly shell: AtlasShellModel;
+  /** Pin feature collection already in the first HTML document. */
+  readonly pins: ExploreMapFeatureCollection;
   /** Overridable for tests and previews; defaults to the live route. */
   readonly catalogUrl?: string;
 };
 
-type LoadState =
-  | { readonly status: 'loading' }
-  | { readonly status: 'error' }
-  | { readonly status: 'ready'; readonly catalog: AtlasCatalogPayload };
-
-export function AtlasLoader({ shell, catalogUrl = ATLAS_CATALOG_PATH }: AtlasLoaderProps) {
-  const [state, setState] = useState<LoadState>(() =>
-    lastCatalog?.url === catalogUrl
-      ? { status: 'ready', catalog: lastCatalog.payload }
-      : { status: 'loading' },
+export function AtlasLoader({ shell, pins, catalogUrl = ATLAS_CATALOG_PATH }: AtlasLoaderProps) {
+  const firstPaint = useMemo(
+    () => firstPaintCatalog(pins, shell.dataSource),
+    [pins, shell.dataSource],
   );
+  const [catalog, setCatalog] = useState<AtlasCatalogPayload | undefined>(() =>
+    lastCatalog?.url === catalogUrl ? lastCatalog.payload : undefined,
+  );
+  const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    if (state.status === 'ready') return;
+    if (lastCatalog?.url === catalogUrl) {
+      setCatalog(lastCatalog.payload);
+      setError(false);
+      return;
+    }
     const controller = new AbortController();
     let cancelled = false;
-    setState({ status: 'loading' });
+    setError(false);
     fetchAtlasCatalog(catalogUrl, controller.signal).then(
-      (catalog) => {
-        if (!cancelled) setState({ status: 'ready', catalog });
+      (payload) => {
+        if (!cancelled) {
+          setCatalog(payload);
+          setError(false);
+        }
       },
       () => {
-        if (!cancelled) setState({ status: 'error' });
+        if (!cancelled) setError(true);
       },
     );
     return () => {
       cancelled = true;
       controller.abort();
     };
-    // `attempt` is the retry handle; `state.status` is deliberately not a dependency, or the
-    // transition to 'loading' above would re-run this effect and abort its own fetch.
   }, [catalogUrl, attempt]);
 
-  if (state.status === 'ready') {
-    return <AtlasExperience initial={assembleExploreViewModel(shell, state.catalog)} />;
-  }
+  const active = catalog ?? firstPaint;
+  const hasPins = pins.features.length > 0 || catalog !== undefined;
 
-  if (state.status === 'error') {
+  if (error && !hasPins) {
     return (
       <div className="ds-atlas ds-atlas--pending" data-atlas-catalog="error">
-        <Notice tone="error" title="The Atlas could not load its records" className="ds-atlas__pending">
+        <Notice
+          tone="error"
+          title="The Atlas could not load its records"
+          className="ds-atlas__pending"
+        >
           <p>The record catalog did not arrive. Check your connection and try again.</p>
           <p>
             <button
@@ -110,11 +122,5 @@ export function AtlasLoader({ shell, catalogUrl = ATLAS_CATALOG_PATH }: AtlasLoa
     );
   }
 
-  return (
-    <div className="ds-atlas ds-atlas--pending" data-atlas-catalog="loading">
-      <p className="ds-atlas__pending ds-atlas__readout" role="status" aria-live="polite">
-        Loading {shell.totalMatched.toLocaleString()} records…
-      </p>
-    </div>
-  );
+  return <AtlasExperience initial={assembleExploreViewModel(shell, active)} />;
 }

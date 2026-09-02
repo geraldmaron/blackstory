@@ -66,6 +66,32 @@ test('a 409 duplicate is success — same hash, same object', async () => {
   assert.equal(object.deduplicated, true);
 });
 
+test('HTTP 400 with KeyAlreadyExists is the same duplicate, not a hard fail', async () => {
+  const storage = createSupabaseStorage({
+    url: 'https://ref.supabase.co',
+    secretKey: 'k',
+    bucket: 'raw-sources',
+    transport: (async () =>
+      new Response(
+        JSON.stringify({
+          statusCode: '409',
+          error: 'Duplicate',
+          message: 'The resource already exists',
+          code: 'KeyAlreadyExists',
+        }),
+        { status: 400 },
+      )) as typeof fetch,
+  });
+  const object = await storage.store({
+    url: 'https://example.org/doc',
+    sha256: SHA,
+    contentType: 'text/plain',
+    byteLength: 10,
+    text: 'x',
+  });
+  assert.equal(object.deduplicated, true);
+});
+
 test('a non-409 error throws with status, never the secret', async () => {
   const storage = createSupabaseStorage({
     url: 'https://ref.supabase.co',

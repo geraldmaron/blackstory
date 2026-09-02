@@ -253,111 +253,127 @@ export function LensPanel({
           </div>
         </div>
 
-        {topicOptions.length > 0 ? (
+        <details
+          className="ds-lens__advanced"
+          {...(Boolean(topicId) ||
+          evidenceFloor !== 'any' ||
+          layerMode === 'blackShare' ||
+          layerMode === 'blackChange' ||
+          layers.routes ||
+          layers.satellite ||
+          !layers.pins ||
+          !layers.labels
+            ? { open: true }
+            : {})}
+        >
+          <summary className="ds-lens__advanced-summary">More filters</summary>
+
+          {topicOptions.length > 0 ? (
+            <div className="ds-lens__group">
+              <div className="ds-lens__group-head">
+                <span className="ds-lens__group-label">Topic</span>
+                <span className="ds-lens__hint">{topicOptions.length} shown</span>
+              </div>
+              <div className="ds-lens__chips" role="group" aria-label="Topic">
+                {topicOptions.map((topic) => {
+                  const pressed = topicId === topic.id;
+                  return (
+                    <button
+                      key={topic.id}
+                      type="button"
+                      className="ds-lens__chip"
+                      aria-pressed={pressed}
+                      onClick={() => onTopicChange(pressed ? null : topic.id)}
+                    >
+                      {topic.label}
+                      <span className="ds-lens__chip-count">
+                        {topic.count.toLocaleString('en-US')}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
+
           <div className="ds-lens__group">
             <div className="ds-lens__group-head">
-              <span className="ds-lens__group-label">Topic</span>
-              <span className="ds-lens__hint">{topicOptions.length} shown</span>
+              <span className="ds-lens__group-label">Evidence floor</span>
+              <span className="ds-lens__hint">
+                {evidenceFloor === 'any' ? 'Any grade' : floorLabel(evidenceFloor)}
+              </span>
             </div>
-            <div className="ds-lens__chips" role="group" aria-label="Topic">
-              {topicOptions.map((topic) => {
-                const pressed = topicId === topic.id;
-                return (
-                  <button
-                    key={topic.id}
-                    type="button"
-                    className="ds-lens__chip"
-                    aria-pressed={pressed}
-                    onClick={() => onTopicChange(pressed ? null : topic.id)}
-                  >
-                    {topic.label}
-                    <span className="ds-lens__chip-count">
-                      {topic.count.toLocaleString('en-US')}
-                    </span>
-                  </button>
-                );
-              })}
+            <div className="ds-lens__chips" role="group" aria-label="Minimum evidence grade">
+              {EVIDENCE_FLOORS.map((floor) => (
+                <button
+                  key={floor}
+                  type="button"
+                  className="ds-lens__chip"
+                  aria-pressed={evidenceFloor === floor}
+                  onClick={() => onEvidenceFloorChange(floor)}
+                >
+                  {floor === 'any' ? null : <GradeDot grade={floorGrade(floor)} />}
+                  {floorLabel(floor)}
+                </button>
+              ))}
             </div>
           </div>
-        ) : null}
 
-        <div className="ds-lens__group">
-          <div className="ds-lens__group-head">
-            <span className="ds-lens__group-label">Evidence floor</span>
-            <span className="ds-lens__hint">
-              {evidenceFloor === 'any' ? 'Any grade' : floorLabel(evidenceFloor)}
-            </span>
-          </div>
-          <div className="ds-lens__chips" role="group" aria-label="Minimum evidence grade">
-            {EVIDENCE_FLOORS.map((floor) => (
+          <div className="ds-lens__group">
+            <div className="ds-lens__group-head">
+              <span className="ds-lens__group-label">Layers</span>
+            </div>
+            <div className="ds-lens__chips" role="group" aria-label="Map layers">
+              {(Object.keys(LAYER_LABELS) as readonly LensLayerKey[]).map((layer) => (
+                <button
+                  key={layer}
+                  type="button"
+                  className="ds-lens__chip"
+                  aria-pressed={layers[layer]}
+                  onClick={() => onLayerToggle(layer)}
+                >
+                  {LAYER_LABELS[layer]}
+                </button>
+              ))}
+            </div>
+            {onShowLegend ? (
               <button
-                key={floor}
                 type="button"
-                className="ds-lens__chip"
-                aria-pressed={evidenceFloor === floor}
-                onClick={() => onEvidenceFloorChange(floor)}
+                className="ds-lens__link ds-lens__show-legend"
+                onClick={onShowLegend}
               >
-                {floor === 'any' ? null : <GradeDot grade={floorGrade(floor)} />}
-                {floorLabel(floor)}
+                Show the legend
               </button>
-            ))}
+            ) : null}
           </div>
-        </div>
 
-        <div className="ds-lens__group">
-          <div className="ds-lens__group-head">
-            <span className="ds-lens__group-label">Layers</span>
+          <div className="ds-lens__group">
+            <div className="ds-lens__group-head">
+              <span className="ds-lens__group-label">Population layer</span>
+            </div>
+            <div className="ds-lens__chips" role="group" aria-label="Population layer">
+              {POPULATION_LAYER_MODES.map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  className="ds-lens__chip"
+                  aria-pressed={layerMode === mode}
+                  onClick={() => onLayerModeChange(layerMode === mode ? 'off' : mode)}
+                >
+                  {POPULATION_LAYER_LABELS[mode]}
+                </button>
+              ))}
+            </div>
+            {layerMode === 'blackShare' || layerMode === 'blackChange' ? (
+              <p className="ds-lens__note">
+                Published Census decennial counts, not modeled story density. Record presence and
+                population share are two different measures and are not directly comparable: one
+                counts documented entities in this archive, the other counts residents in a census
+                year.
+              </p>
+            ) : null}
           </div>
-          <div className="ds-lens__chips" role="group" aria-label="Map layers">
-            {(Object.keys(LAYER_LABELS) as readonly LensLayerKey[]).map((layer) => (
-              <button
-                key={layer}
-                type="button"
-                className="ds-lens__chip"
-                aria-pressed={layers[layer]}
-                onClick={() => onLayerToggle(layer)}
-              >
-                {LAYER_LABELS[layer]}
-              </button>
-            ))}
-          </div>
-          {onShowLegend ? (
-            <button
-              type="button"
-              className="ds-lens__link ds-lens__show-legend"
-              onClick={onShowLegend}
-            >
-              Show the legend
-            </button>
-          ) : null}
-        </div>
-
-        <div className="ds-lens__group">
-          <div className="ds-lens__group-head">
-            <span className="ds-lens__group-label">Population layer</span>
-          </div>
-          <div className="ds-lens__chips" role="group" aria-label="Population layer">
-            {POPULATION_LAYER_MODES.map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                className="ds-lens__chip"
-                aria-pressed={layerMode === mode}
-                onClick={() => onLayerModeChange(layerMode === mode ? 'off' : mode)}
-              >
-                {POPULATION_LAYER_LABELS[mode]}
-              </button>
-            ))}
-          </div>
-          {layerMode === 'blackShare' || layerMode === 'blackChange' ? (
-            <p className="ds-lens__note">
-              Published Census decennial counts, not modeled story density. Record presence and
-              population share are two different measures and are not directly comparable: one
-              counts documented entities in this archive, the other counts residents in a census
-              year.
-            </p>
-          ) : null}
-        </div>
+        </details>
 
         <hr className="ds-lens__rule" />
 

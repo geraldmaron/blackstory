@@ -19,8 +19,8 @@ function countOccurrences(source: string, pattern: RegExp): number {
 
 test('every chart card renders through the shared ChartCard anatomy', () => {
   const cardCount = countOccurrences(sectionsSource, /<ChartCard\b/g);
-  // Population, wealth, housing, justice, and the retired kind-composition card.
-  assert.equal(cardCount, 5);
+  // Population, wealth, housing, justice. Kind composition is not a chart on this page.
+  assert.equal(cardCount, 4);
 });
 
 test('every ChartCard instance is passed a source label, an as-of line, and limits copy', () => {
@@ -49,14 +49,15 @@ test('ChartCard renders the four elements in order: chart slot, source, as-of, l
   assert.ok(disclosureIndex > limitsIndex, '"Show the numbers" disclosure must be last');
 });
 
-test('the kind composition card states it is unavailable rather than rendering an empty frame', () => {
-  assert.match(sectionsSource, /id="composition"/);
-  assert.match(sectionsSource, /kind composition graph/i);
-  assert.match(sectionsSource, /record index/);
+test('kind composition is not a chart on this page, and the page does not send a reader to the list', () => {
+  assert.doesNotMatch(sectionsSource, /id="composition"/);
+  assert.doesNotMatch(sectionsSource, /href="\/records"|href="\/explore"/);
 });
 
-test('the data page off-ramp points only at /records, not a fabricated Atlas population handoff', () => {
+test('the data page off-ramp stays on the walk, not a fabricated Atlas population handoff', () => {
   const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
-  assert.match(pageSource, /href: '\/records'/);
+  assert.match(pageSource, /WalkOffRamp/);
+  assert.doesNotMatch(pageSource, /href: '\/records'/);
+  assert.doesNotMatch(pageSource, /\/explore/);
   assert.doesNotMatch(pageSource, /population.*decade|decade.*population/is);
 });

@@ -65,6 +65,31 @@ export async function fetchPublicEntityProjection(
   return projection !== undefined ? parseEntityProjection(projection) : undefined;
 }
 
+export async function fetchPublicEntityProjectionsByIds(
+  releaseId: string,
+  entityIds: readonly string[],
+  query: PostgresQueryFn = queryPostgres,
+): Promise<readonly NonNullable<ReturnType<typeof parseEntityProjection>>[]> {
+  const unique = [...new Set(entityIds.map((id) => id.trim()).filter((id) => id.length > 0))];
+  if (unique.length === 0) return [];
+
+  const entities: NonNullable<ReturnType<typeof parseEntityProjection>>[] = [];
+  for (let offset = 0; offset < unique.length; offset += POSTGRES_ENTITY_BATCH_SIZE) {
+    const chunk = unique.slice(offset, offset + POSTGRES_ENTITY_BATCH_SIZE);
+    const rows = (await query(
+      `SELECT projection
+       FROM bb_public.release_entities
+       WHERE release_id = $1 AND entity_id = ANY($2::text[])`,
+      [releaseId, chunk],
+    )) as ProjectionRow[];
+    for (const row of rows) {
+      const parsed = parseEntityProjection(row.projection);
+      if (parsed) entities.push(parsed);
+    }
+  }
+  return entities;
+}
+
 export async function listPublicEntityProjections(
   releaseId: string,
   query: PostgresQueryFn = queryPostgres,

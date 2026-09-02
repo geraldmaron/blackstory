@@ -6,6 +6,7 @@ import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { EmptyState, Notice } from '@repo/ui';
 import { Room, RoomHeader } from '../../components/room';
+import { WalkOffRamp } from '../walk-off-ramp';
 import '../utility.css';
 import { SubmitLeadForm } from './SubmitLeadForm';
 
@@ -39,13 +40,13 @@ export default function SubmitLeadPage() {
       <SubmitLeadForm />
 
       <EmptyState title="What happens after you submit">
-        A lead is never auto-published. It is reviewed independently by several moderators (the
-        Zooniverse/Caesar pattern; see{' '}
-        <a href="/methodology">how disputes and review are handled</a>
-        ); if they agree it is legitimate, it becomes a private research candidate. If they
-        disagree, a human expert resolves it. Disagreement is never silently averaged away. Only the
-        standard research and promotion pipeline can ever make anything from this lane public.
+        A lead is never published on arrival. Several people read it independently. If they agree it
+        is worth pursuing, it becomes a private research candidate. If they disagree, a person
+        decides. Disagreement is never silently averaged away. See{' '}
+        <a href="/methodology">how a record gets in</a>.
       </EmptyState>
+
+      <WalkOffRamp>Nothing you send here is public on arrival.</WalkOffRamp>
     </Room>
   );
 }
