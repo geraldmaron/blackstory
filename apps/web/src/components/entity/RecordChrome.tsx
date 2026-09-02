@@ -6,9 +6,14 @@
  * Every icon here travels with a visible word (WCAG 1.4.1): a pill is icon plus label, a tile
  * is icon plus label plus value, a meter is bars plus the word it measures. Icons come from the
  * same Font Awesome sets the Atlas already uses (`kind-icons.ts`, `status-icons.ts`,
- * `confidence-icons.ts`), so a person is the same glyph on the map, in the rail and on the page.
+ * `confidence-icons.ts`), so a person carries the same icon here as on any labelled badge.
  *
-
+ * The map itself, and the narrow chrome that sits beside it, deliberately do not use these icons.
+ * A results row gives the kind an 18px column with no room for a word, so it draws the geometric
+ * shape channel (`KindGlyph`) that the map markers paint, and a grade there is a dot whose fill
+ * treatment carries the grade in greyscale (`GradeDot`). Those are the non-colour signal, not old
+ * styling waiting to be replaced. See `docs/ui/patterns-map-entity-encoding.md`.
+ *
  * Server-safe: no client state, no effects.
  *
  * The atoms' stylesheet travels with the component (`record-chrome.css`), so a surface that

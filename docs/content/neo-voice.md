@@ -9,7 +9,14 @@ available.
 What stays outside this document, deliberately:
 
 - **Site chrome** (drawer labels, dispute-block standing lines, empty states,
-  microcopy): `docs/ui/story.md`. That is the site speaking as itself, not Neo.
+  microcopy) and the site's own pages (`/about`, `/methodology`, `/data`,
+  `/faq`, the trust and take-part rooms): `docs/ui/story.md`. Those surfaces
+  borrow this document's *register* so the whole site sounds like one place,
+  but they are not narrated by Neo, and the distinction is the speaker. On a
+  site page the speaker is the archive stating its own behaviour, or Gerald
+  stating a choice in the first person singular. Neo is neither, and Neo still
+  never says "I" (Part V). No surface anywhere says "we": there is no we, and
+  `docs/ui/story.md` carries the rule.
 - **Evidence contracts and gates** (fact validation, citation integrity, word
   floor, source tiers): `docs/methodology/chapter-fact-validation.md`,
   `docs/methodology/scholarship-principles.md`, and the code gates in

@@ -93,7 +93,7 @@ export default function CorrectionsSubmitSheet() {
         ref={scrollRef}
         kicker="Trust"
         title="Submit a correction"
-        dek="Tell us what should change and link to evidence we can verify."
+        dek="Say what should change and link to evidence someone else can check."
         edges={SHELL_EDGES}
         scrollProps={UTILITY_SCROLL_PROPS}
       >
