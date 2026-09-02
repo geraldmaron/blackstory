@@ -66,6 +66,24 @@ export function cityStateFromJurisdiction(label: string | null): {
   return parts[0] ? { city: parts[0] } : {};
 }
 
+/**
+ * E.164 from whatever the source stored. Wikidata P1329 values arrive as display strings such
+ * as "+1-212-491-2200"; the backfill kept the display form only, so derive the E.164 form here
+ * when the number already carries its country code. Anything without a leading + is left out
+ * rather than guessed.
+ */
+export function phoneFromRow(row: {
+  readonly phone_e164: string | null;
+  readonly phone_display: string | null;
+}): { readonly phone?: { readonly e164: string; readonly display: string } } {
+  const display = row.phone_display?.trim();
+  if (!display) return {};
+  const e164 =
+    row.phone_e164?.trim() || (display.startsWith('+') ? display.replace(/[^\d+]/g, '') : '');
+  if (!/^\+\d{8,15}$/.test(e164)) return {};
+  return { phone: { e164, display } };
+}
+
 /** Raw visit from canonical rows, before the tier gate. Empty → undefined. */
 export function rawVisitFromRow(row: Row): PublicVisit | undefined {
   const address = {
@@ -76,9 +94,7 @@ export function rawVisitFromRow(row: Row): PublicVisit | undefined {
   const hasAddress = Boolean(row.street || row.postal_code);
   const visit: PublicVisit = {
     ...(hasAddress ? { address } : {}),
-    ...(row.phone_e164 && row.phone_display
-      ? { phone: { e164: row.phone_e164, display: row.phone_display } }
-      : {}),
+    ...phoneFromRow(row),
     ...(row.website ? { website: row.website } : {}),
     ...(row.hours ? { hours: row.hours } : {}),
     ...(row.visitability &&

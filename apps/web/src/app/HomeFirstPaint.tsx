@@ -121,6 +121,7 @@ export function HomeFirstPaint({
       locationLabel: lead.locationLabel,
       jurisdictionLabel: lead.jurisdictionLabel,
       locationPrecision: lead.locationPrecision,
+      ...(lead.visit !== undefined ? { visit: lead.visit } : {}),
       kind: lead.kind,
       claims: lead.claims,
       ...(lead.status !== undefined ? { status: lead.status } : {}),
