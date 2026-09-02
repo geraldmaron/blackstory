@@ -1089,6 +1089,22 @@ a.ds-rec-pill:focus-visible {
 }
 
 /* —— narrow ——————————————————————————————————————————————————————————————————— */
+@media (max-width: 47.9375rem) {
+  /* The credit's corner is the lede's corner on a phone. Give the overlay a floor for it and
+     run it the width of the plate, under the last line, instead of over it. */
+  .ds-record-mast[data-media='photo'] .ds-record-mast__over {
+    padding-bottom: calc(var(--ds-space-8) + 3.25rem);
+  }
+
+  .ds-record-mast[data-media='photo'] .ds-entity-photo__credit,
+  .ds-record-mast[data-media='photo'] .ds-entity-mark__context {
+    right: var(--ds-gutter);
+    left: var(--ds-gutter);
+    max-width: none;
+    text-align: left;
+  }
+}
+
 @media (max-width: 559px) {
   .ds-record-mast,
   .ds-record-mast__over,
