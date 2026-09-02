@@ -86,6 +86,35 @@ export type PublicRevisionMetadata = {
   readonly recordUpdatedAt: string;
 };
 
+/**
+ * Reader-facing "go visit this place" contract shipped by the release builder
+ * (`publicVisitForTier`, packages/domain/src/geography/visit.ts). Already gated by location
+ * precision, entity kind, and living status at publish time — the web read path prefers this
+ * over claim-mining (`lib/geography/public-visit-contact.ts`) when present, but never re-applies
+ * that gate itself.
+ */
+export type PublicVisitAddressView = {
+  readonly street?: string;
+  readonly city?: string;
+  readonly state?: string;
+  readonly postalCode?: string;
+  readonly line?: string;
+};
+
+export type PublicVisitPhoneView = {
+  readonly e164: string;
+  readonly display: string;
+};
+
+export type PublicVisitView = {
+  readonly address?: PublicVisitAddressView;
+  readonly phone?: PublicVisitPhoneView;
+  readonly website?: string;
+  readonly hours?: string;
+  readonly visitability?: 'open_to_public' | 'exterior_only' | 'private' | 'demolished' | 'unknown';
+  readonly sources?: readonly string[];
+};
+
 /** Rights-cleared optional hero image for learning-index entity pages. */
 export type PublicEntityPrimaryImageView = {
   readonly url: string;
@@ -178,6 +207,9 @@ export type PublicEntityView = {
   /** City, campus, or neighborhood — never street or residence. */
   readonly locationPrecision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution';
   readonly locationLabel: string;
+  /** Release-shipped visit contract; see `PublicVisitView` above. Absent on records that predate
+   * the release builder wiring this up, or that have nothing publishable once gated. */
+  readonly visit?: PublicVisitView;
   readonly relevanceExplanation: string;
   /** Concise framing of this record's place within documented Black history general context,
    * not new unsourced facts about this specific record (those live in `claims`). Guards against a

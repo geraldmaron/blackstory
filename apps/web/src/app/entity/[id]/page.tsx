@@ -238,6 +238,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
     ...(entity.livingStatus !== undefined ? { livingStatus: entity.livingStatus } : {}),
     ...(entity.sensitivityClass !== undefined ? { sensitivityClass: entity.sensitivityClass } : {}),
     ...(entity.placeAdvisories !== undefined ? { placeAdvisories: entity.placeAdvisories } : {}),
+    ...(entity.visit !== undefined ? { visit: entity.visit } : {}),
     ...(geoAnchor ? { lat: geoAnchor.lat, lng: geoAnchor.lng } : {}),
   };
   const entityLinkCatalog = entityLinkCatalogFromNeighbors(entity);

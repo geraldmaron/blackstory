@@ -141,3 +141,37 @@ test('entity projection still rejects a summary below the 120-char substance flo
   const result = publicEntityProjectionSchema.safeParse({ ...baseEntity, summary: 'Too short.' });
   assert.equal(result.success, false);
 });
+
+test('entity projection accepts a full visit block', () => {
+  const result = publicEntityProjectionSchema.safeParse({
+    ...baseEntity,
+    visit: {
+      address: {
+        street: '1530 6th Avenue North',
+        city: 'Birmingham',
+        state: 'AL',
+        postalCode: '35203',
+        line: '1530 6th Avenue North, Birmingham, AL 35203',
+      },
+      phone: { e164: '+12053281000', display: '(205) 328-1000' },
+      website: 'https://example.org',
+      hours: 'Tue–Sat 10am–5pm',
+      visitability: 'open_to_public',
+      sources: ['claim-1'],
+    },
+  });
+  assert.equal(result.success, true);
+});
+
+test('entity projection accepts an absent visit block', () => {
+  const result = publicEntityProjectionSchema.safeParse(baseEntity);
+  assert.equal(result.success, true);
+});
+
+test('entity projection rejects an invalid visit visitability value', () => {
+  const result = publicEntityProjectionSchema.safeParse({
+    ...baseEntity,
+    visit: { visitability: 'sometimes' },
+  });
+  assert.equal(result.success, false);
+});

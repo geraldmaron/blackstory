@@ -57,6 +57,7 @@ import { evaluateFactPublishGate } from '../facts/publish-gate.js';
 import type { FactCitation } from '../facts/citation.js';
 import { isValidTopicId } from '../taxonomy/topics.js';
 import { buildGeoPointFields, type GeoPointFields } from '../geography/geohash.js';
+import { publicVisitForTier, type PublicVisit } from '../geography/visit.js';
 import {
   evaluateGeoIntegrityPublishGate,
   type StateBoundaryIndex,
@@ -118,6 +119,13 @@ export type ReleaseSourceEntity = {
   readonly livingStatus?: 'living' | 'deceased' | 'unknown';
   /** Bootstrap catalog related shortcuts; prefer `ReleaseBuildContext.relatedEntries` from graph. */
   readonly related?: readonly ReleaseSourceRelatedEntry[];
+  /**
+   * Raw visit-contact input (address/phone/website/hours/visitability), pre-gating. Prefer
+   * `ReleaseBuildContext.visitOverride` when the caller has looked up
+   * `bb_canonical.entity_visit` + `entity_locations.street`/`postal_code` for a canonical
+   * entity — same precedence as `locationOverride` above.
+   */
+  readonly visit?: PublicVisit;
 };
 
 export type ReleaseClaimProjection = {
@@ -156,6 +164,14 @@ export type ReleaseBuildContext = {
     readonly matchMethod?: string;
     readonly locationLabel?: string;
   };
+  /**
+   * Canonical visit-contact input (`bb_canonical.entity_visit` joined with
+   * `entity_locations.street`/`postal_code`), when the caller looked one up. Wins over
+   * `entry.visit` — same precedence as `locationOverride` above. Gated through
+   * `publicVisitForTier` before it reaches the projection; this is raw input, not the
+   * already-filtered public shape.
+   */
+  readonly visitOverride?: PublicVisit;
   /**
    * Latest admin bulk catalog decision for this entity (apps/admin's catalog-decisions-store),
    * when the caller looked one up. A `flag_for_retraction` decision fails this entity closed —
@@ -217,6 +233,8 @@ export type ReleaseEntityProjectionFields = {
   readonly claims: readonly ReleaseClaimProjection[];
   readonly jurisdictionLabel: string;
   readonly locationLabel: string;
+  /** Reader-facing visit contract, gated by `publicVisitForTier` on precision/kind/living status. */
+  readonly visit?: PublicVisit;
   readonly status?: string;
   /** Time-scoped lifecycle designations that back `status`. Present when derived or authored. */
   readonly statusHistory?: readonly {
@@ -969,6 +987,13 @@ export function buildReleaseEntityArtifacts(
   );
   const publicStatus = resolvedStatus.status;
   const publicStatusHistory = resolvedStatus.statusHistory;
+  const resolvedLivingStatus = resolvedStatus.livingStatus ?? entry.livingStatus;
+  const visit = publicVisitForTier(
+    context.visitOverride ?? entry.visit,
+    locationPrecision,
+    entry.kind,
+    resolvedLivingStatus,
+  );
   /*
    * Derive era once, here, so the entity projection and the search index cannot disagree.
    * Previously both copied `entry.eraBuckets` verbatim; catalog entries that carry only a dated
@@ -1001,6 +1026,7 @@ export function buildReleaseEntityArtifacts(
     claims,
     jurisdictionLabel: entry.jurisdictionLabel,
     locationLabel,
+    ...(visit !== undefined ? { visit } : {}),
     ...(publicStatus !== undefined ? { status: publicStatus } : {}),
     ...(publicStatusHistory !== undefined && publicStatusHistory.length > 0
       ? { statusHistory: publicStatusHistory }
