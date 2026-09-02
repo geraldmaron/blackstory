@@ -168,7 +168,7 @@ describe('destination registry · the footer is derived, not authored', () => {
     );
     assert.deepEqual(
       destinationsInGroup('check').map((destination) => destination.path),
-      ['/about', '/methodology', '/errata'],
+      ['/about', '/faq', '/methodology', '/errata'],
     );
     assert.deepEqual(
       destinationsInGroup('take-part').map((destination) => destination.path),

@@ -11,7 +11,13 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { ABOUT_CONTRIBUTE, ABOUT_ORIGIN, ABOUT_PILLARS, ABOUT_REFUSALS } from './about-copy';
+import {
+  ABOUT_CONTRIBUTE,
+  ABOUT_NEO,
+  ABOUT_ORIGIN,
+  ABOUT_PILLARS,
+  ABOUT_REFUSALS,
+} from './about-copy';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
@@ -77,13 +83,57 @@ test('about is a room on the walk, not the old board', () => {
   assert.match(pageSource, /ABOUT_REFUSALS/);
 });
 
+test('the page discloses how the long-form writing is made, including the AI use', () => {
+  // The disclosure is the point of the section: a reader who finds out elsewhere that the prose
+  // is drafted with AI has been misled by this page's silence. It also has to state the limit,
+  // because "AI writes it" without "AI cannot lower the evidence bar" is the wrong half.
+  assert.match(pageSource, /ABOUT_NEO/);
+  const neo = [...ABOUT_NEO.rules, ...ABOUT_NEO.human, ABOUT_NEO.hand].join(' ');
+  assert.match(neo, /\bAI\b/, 'the section says plainly that AI is used');
+  assert.match(neo, /neo-voice\.md/, 'the voice document is named, so the claim is checkable');
+  assert.match(neo, /evidence gate/, 'the section states the bar the voice cannot move');
+  assert.match(neo, /not a generated image/, 'the hand-drawn cover commitment is stated');
+  // Measured in the rendered body, not in the file. The import block is alphabetised, so
+  // ABOUT_NEO always precedes ABOUT_ORIGIN there and an indexOf over the whole source would
+  // report the opposite of what the page actually renders.
+  const body = pageSource.slice(pageSource.indexOf('export default function'));
+  assert.ok(
+    body.indexOf('ABOUT_NEO') > body.indexOf('ABOUT_ORIGIN'),
+    'the person comes before the machinery',
+  );
+});
+
+test('nothing on this page speaks as an institutional "we"', () => {
+  // One person runs this. A first-person plural on the about page is the one lie a reader can
+  // catch immediately, and it was there in the off-ramp ("an identity with us").
+  const strings = [
+    ...ABOUT_ORIGIN,
+    ...ABOUT_REFUSALS,
+    ...ABOUT_NEO.rules,
+    ...ABOUT_NEO.human,
+    ABOUT_NEO.hand,
+    ABOUT_CONTRIBUTE.lede,
+    ABOUT_CONTRIBUTE.terms,
+    ABOUT_CONTRIBUTE.direct,
+    ...ABOUT_PILLARS.map((pillar) => pillar.body),
+  ];
+  for (const value of strings) {
+    assert.doesNotMatch(value, /\b(we|our|ours)\b/i, `institutional plural in: ${value}`);
+  }
+});
+
 test('user-facing copy avoids em dashes', () => {
   const strings = [
     ...ABOUT_ORIGIN,
     ...ABOUT_REFUSALS,
+    ...ABOUT_NEO.rules,
+    ...ABOUT_NEO.human,
+    ABOUT_NEO.heading,
+    ABOUT_NEO.hand,
     ABOUT_CONTRIBUTE.heading,
     ABOUT_CONTRIBUTE.lede,
     ABOUT_CONTRIBUTE.terms,
+    ABOUT_CONTRIBUTE.direct,
     ...ABOUT_PILLARS.flatMap((pillar) => [pillar.kicker, pillar.title, pillar.body]),
   ];
   for (const value of strings) {

@@ -44,7 +44,7 @@ test('helper text is the Content brief, not a style memo', () => {
     COVER_BRIEF_HELPERS.metaphor,
     'the picture that asks the question. If you can google it, start over.',
   );
-  assert.equal(COVER_BRIEF_HELPERS.refuse, "name the stock photo so we don't ship it.");
+  assert.equal(COVER_BRIEF_HELPERS.refuse, 'name the stock photo so it never ships.');
 });
 
 test('recipe enum is closed', () => {

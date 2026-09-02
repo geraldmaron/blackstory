@@ -243,6 +243,17 @@ const DESTINATIONS: readonly Destination[] = [
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
   {
+    path: '/faq',
+    label: 'Questions',
+    parent: '/library',
+    kind: 'ANSWERS',
+    description:
+      'Who runs this, how AI is and is not used, what a grade means, and what to do when a record is wrong.',
+    menuLine: 'Plain answers',
+    group: 'check',
+    crawl: { changeFrequency: 'monthly', priority: 0.5 },
+  },
+  {
     path: '/methodology',
     label: 'Methodology',
     parent: '/library',

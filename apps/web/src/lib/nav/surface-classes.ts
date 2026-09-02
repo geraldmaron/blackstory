@@ -52,6 +52,7 @@ const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
   ['/data', 'reading'],
   ['/memorial', 'reading'],
   ['/about', 'reading'],
+  ['/faq', 'reading'],
   ['/methodology', 'reading'],
   ['/errata', 'reading'],
 
