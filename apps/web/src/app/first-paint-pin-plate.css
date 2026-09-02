@@ -13,22 +13,6 @@
   --ds-first-paint-pin-size-zoomed-link: 0.625rem;
   --ds-first-paint-pin-size-zoomed-walk: 0.75rem;
   --ds-first-paint-pin-size-zoomed-focus: 1.125rem;
-  /*
-   * The board's ground is the live plate's ground. The locator SVG is a mask (land alpha 0.32,
-   * hairlines 1), so the ink is chosen to land on `--ds-map-land` through that alpha over the
-   * ground; hairlines read as the plate's state bounds. Light: the plate's background is land and
-   * states are drawn by line, so the board is land with line-2 states. Dark: the plate reads as
-   * near-black water with sepia land; #9a8a6d at 0.32 over --ds-map-water is --ds-map-land.
-   */
-  --ds-first-paint-ground: var(--ds-map-land);
-  --ds-first-paint-ground-ink: var(--ds-map-line-2);
-  --ds-first-paint-cluster-ink: var(--ds-accent-graphic);
-  --ds-first-paint-cluster-text: var(--ds-map-halo);
-}
-
-[data-theme='dark'] {
-  --ds-first-paint-ground: var(--ds-map-water);
-  --ds-first-paint-ground-ink: #9a8a6d;
 }
 
 body:has(.ds-door) {

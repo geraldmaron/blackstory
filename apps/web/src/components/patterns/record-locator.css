@@ -15,7 +15,7 @@
   aspect-ratio: 960 / 500;
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-sm);
-  background: var(--ds-canvas);
+  background: var(--ds-first-paint-ground);
   overflow: hidden;
 }
 
@@ -107,7 +107,7 @@
 .ds-locator__ground {
   position: absolute;
   inset: 0;
-  background-color: var(--ds-ink-muted);
+  background-color: var(--ds-first-paint-ground-ink);
   -webkit-mask-image: url('/geo/us-locator.svg');
   mask-image: url('/geo/us-locator.svg');
   -webkit-mask-size: contain;
