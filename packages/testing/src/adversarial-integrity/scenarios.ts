@@ -265,6 +265,7 @@ export const runLivingAddressAttemptsScenario = runner('living_address_attempts'
     geohash: 'dr5ru7',
     precision: 'street_address',
     livingStatus: 'living',
+    kind: 'person',
     occupiedPrivateResidence: true,
   });
   if (!redacted) {
@@ -294,7 +295,7 @@ export const runLivingAddressAttemptsScenario = runner('living_address_attempts'
 
   return [
     {
-      attackBlocked: redacted.precision !== 'street_address' && serializationBlocked,
+      attackBlocked: redacted.precision !== 'address' && serializationBlocked,
       publicContentMutated: false,
       controls: [
         {
