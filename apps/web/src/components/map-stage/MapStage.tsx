@@ -173,7 +173,7 @@ import { surfaceClassFor, type SurfaceClass } from '../../lib/nav/surface-classe
 import { useSurfaceClass } from '../../lib/nav/use-surface-class';
 import { defaultPostureFor, framedClaimAllowed, type PlatePosture } from './plate-posture';
 import { createFramedSlotRegistry } from './framed-slot-registry';
-import { insetIsPaintable, plateInsetForSlot, resolvePlatePosture } from './plate-frame';
+import { boxIsPaintable, plateBoxForSlot, resolvePlatePosture, type PlateBox } from './plate-frame';
 import { applyGesturesForPosture, lockGestures, rotateGestureAllowed } from './gesture-lock';
 import {
   attachSafariTwistRotate,
@@ -489,6 +489,19 @@ export function MapStageProvider({
   const heldSlotRef = useRef<string | null>(null);
   /** The moment the camera last flew to, so a scroll frame does not restart the flight. */
   const lastFramedMomentRef = useRef<string | null>(null);
+  /**
+   * The document-space box last written to the plate, so a scroll frame that changes nothing
+   * writes nothing.
+   *
+   * `plateBoxForSlot` is stable across a scroll — that is the point of positioning in document
+   * space — so during a gesture every frame recomputes the same four numbers. Writing them anyway
+   * would dirty style on the plate sixty times a second and, worse, invite a `map.resize()` per
+   * frame: MapLibre re-measures its container and reallocates the WebGL drawing buffer, which is
+   * what made the map flash inside its own frame mid-scroll. Comparing first means the geometry
+   * is touched only when the slot genuinely moves or resizes — a reflow, a drawer, a window
+   * resize — and a scroll gesture costs one rect read and nothing else.
+   */
+  const lastFramedBoxRef = useRef<PlateBox | null>(null);
   const reducedMotionRef = useRef<ReducedMotionListener | null>(null);
   const pathname = usePathname();
   /**
@@ -1670,6 +1683,7 @@ export function MapStageProvider({
         heldSlotRef.current = null;
       }
       lastFramedMomentRef.current = null;
+      lastFramedBoxRef.current = null;
       releasePlateSlot(plate);
       // Leaving Framed goes to Live (Instrument, fully steered), Ambient (Door, drag/zoom-adjust
       // on a precise pointer) or Parked (locked, so an unpainted plate cannot be reached by the
@@ -1684,22 +1698,35 @@ export function MapStageProvider({
     }
 
     if (frame === null) return;
-    const inset = plateInsetForSlot(frame.rect, {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-    // A slot scrolled entirely out of view: hold the claim (the reader is still inside this
-    // moment's document position) but stop painting, so a zero-height canvas never gets resized
-    // and the plate does not sit uncovered at its resting full-viewport box.
-    if (!insetIsPaintable(inset)) {
+    // Document space, not viewport space: the plate is `position: absolute` while it holds a slot,
+    // so these four numbers hold still through a scroll and the browser moves plate and slot
+    // together. See `plateBoxForSlot`.
+    const box = plateBoxForSlot(frame.rect, document.documentElement.getBoundingClientRect());
+    // A zero-area slot (a collapsed container, a measurement taken mid-reflow): hold the claim —
+    // the reader is still inside this moment's document position — but stop painting, so a
+    // zero-height canvas never gets resized and the plate does not sit uncovered at its resting
+    // full-viewport box.
+    if (!boxIsPaintable(box)) {
+      lastFramedBoxRef.current = null;
       releasePlateSlot(plate);
       return;
     }
 
-    plate.style.setProperty('--ds-plate-frame-top', `${inset.top}px`);
-    plate.style.setProperty('--ds-plate-frame-left', `${inset.left}px`);
-    plate.style.setProperty('--ds-plate-frame-width', `${inset.width}px`);
-    plate.style.setProperty('--ds-plate-frame-height', `${inset.height}px`);
+    const last = lastFramedBoxRef.current;
+    const moved =
+      last === null ||
+      last.top !== box.top ||
+      last.left !== box.left ||
+      last.width !== box.width ||
+      last.height !== box.height;
+    const resized = last === null || last.width !== box.width || last.height !== box.height;
+    if (moved) {
+      lastFramedBoxRef.current = box;
+      plate.style.setProperty('--ds-plate-frame-top', `${box.top}px`);
+      plate.style.setProperty('--ds-plate-frame-left', `${box.left}px`);
+      plate.style.setProperty('--ds-plate-frame-width', `${box.width}px`);
+      plate.style.setProperty('--ds-plate-frame-height', `${box.height}px`);
+    }
     // The marker CSS keys on, distinguishing "holding a slot" from the record page's resting
     // Framed posture. Written last, so the geometry is never applied without its rect.
     plate.dataset.plateSlot = '1';
@@ -1711,7 +1738,9 @@ export function MapStageProvider({
     const map = mapRef.current;
     if (!map) return;
     lockGestures(map);
-    map.resize();
+    // Only a real size change needs the drawing buffer re-measured. A scroll no longer produces
+    // one at all, which is the point: MapLibre never resizes mid-gesture.
+    if (resized) map.resize();
 
     if (lastFramedMomentRef.current === frame.id) return;
     lastFramedMomentRef.current = frame.id;

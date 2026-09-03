@@ -8,9 +8,11 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { insetIsPaintable, plateInsetForSlot, resolvePlatePosture } from './plate-frame';
+import { boxIsPaintable, plateBoxForSlot, resolvePlatePosture } from './plate-frame';
 
-const VIEWPORT = { width: 1280, height: 800 };
+/** `document.documentElement`'s rect at scroll offset 0 and at 600px down the page. */
+const AT_TOP = { top: 0, left: 0 };
+const SCROLLED = { top: -600, left: 0 };
 
 test('a reading room parks until a moment claims the plate, and parks again when it leaves', () => {
   const resting = { surface: 'reading' as const, hasLiveMoment: false, claimGranted: false };
@@ -58,30 +60,39 @@ test('a utility surface is never woken by a stray moment', () => {
   );
 });
 
-test('a fully visible slot maps to its own rect', () => {
-  const inset = plateInsetForSlot({ top: 120, left: 200, width: 640, height: 360 }, VIEWPORT);
-  assert.deepEqual(inset, { top: 120, left: 200, width: 640, height: 360 });
-  assert.ok(insetIsPaintable(inset));
+test('a slot maps to its own box in document space', () => {
+  const box = plateBoxForSlot({ top: 120, left: 200, width: 640, height: 360 }, AT_TOP);
+  assert.deepEqual(box, { top: 120, left: 200, width: 640, height: 360 });
+  assert.ok(boxIsPaintable(box));
 });
 
-test('a slot scrolled half off the top clamps instead of painting above the fold', () => {
-  const inset = plateInsetForSlot({ top: -180, left: 200, width: 640, height: 360 }, VIEWPORT);
-  assert.equal(inset.top, 0, 'a fixed plate given a negative top paints over the command bar');
-  assert.equal(
-    inset.height,
-    180,
-    'the visible remainder, so the map is framed rather than stretched',
-  );
-  assert.ok(insetIsPaintable(inset));
+test('the same slot yields the same box at any scroll offset', () => {
+  // The whole reason the plate is positioned in document space: the box does not move while the
+  // reader scrolls, so there is nothing for a main-thread write to lag behind and no frame in
+  // which the map sits off its own frame. A slot 120px down the page reads `top: 720` in the
+  // viewport once the reader is 600px down, and both describe the same document position.
+  const atTop = plateBoxForSlot({ top: 120, left: 200, width: 640, height: 360 }, AT_TOP);
+  const scrolled = plateBoxForSlot({ top: -480, left: 200, width: 640, height: 360 }, SCROLLED);
+  assert.deepEqual(scrolled, atTop);
 });
 
-test('a slot below the fold yields a zero-area inset the caller can refuse to paint', () => {
-  const inset = plateInsetForSlot({ top: 900, left: 200, width: 640, height: 360 }, VIEWPORT);
-  assert.equal(inset.height, 0);
-  assert.equal(insetIsPaintable(inset), false);
+test('a slot half off the top keeps its full box rather than clamping', () => {
+  // A fixed plate had to clamp here, and resizing the box mid-scroll moved the map's own edge.
+  // An absolute plate is clipped by the viewport like any other document content.
+  const box = plateBoxForSlot({ top: -180, left: 200, width: 640, height: 360 }, AT_TOP);
+  assert.deepEqual(box, { top: -180, left: 200, width: 640, height: 360 });
+  assert.ok(boxIsPaintable(box));
 });
 
-test('a slot wider than the viewport clamps on both axes', () => {
-  const inset = plateInsetForSlot({ top: 40, left: -60, width: 1600, height: 300 }, VIEWPORT);
-  assert.deepEqual(inset, { top: 40, left: 0, width: 1280, height: 300 });
+test('a slot below the fold is still a full box, because it scrolls with the page', () => {
+  const box = plateBoxForSlot({ top: 900, left: 200, width: 640, height: 360 }, AT_TOP);
+  assert.equal(box.top, 900);
+  assert.equal(box.height, 360);
+  assert.ok(boxIsPaintable(box));
+});
+
+test('a zero-area slot yields a box the caller can refuse to paint', () => {
+  const box = plateBoxForSlot({ top: 120, left: 200, width: 640, height: 0 }, AT_TOP);
+  assert.equal(box.height, 0);
+  assert.equal(boxIsPaintable(box), false);
 });

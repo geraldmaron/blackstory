@@ -1926,6 +1926,14 @@ html:has([data-surface='instrument']) {
    `inset: auto` first, because `inset: 0` above sets all four physical sides — leaving it in
    place would pin right and bottom and the width/height below would be ignored. */
 .ds-map-stage[data-plate-slot] {
+  /* `absolute`, NOT `fixed`, and this is the whole fix for the map flashing inside its frame on
+     scroll. A fixed plate has to be re-pinned to the slot's viewport rect on every scroll frame,
+     from a main-thread rect read while the document scrolls on the compositor — so it sat a few
+     pixels off its own frame for the length of every gesture, and the page ground flashed along
+     the top or bottom edge. Positioned absolutely in document space, the plate and the slot are
+     in the same coordinate space and the browser scrolls them together: nothing to chase, nothing
+     to lag, and the box's size holds still (see `plateBoxForSlot`). */
+  position: absolute;
   inset: auto;
   top: var(--ds-plate-frame-top);
   left: var(--ds-plate-frame-left);
