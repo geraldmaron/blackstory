@@ -424,7 +424,16 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   const sheetOpen = sheetRecord !== null && !selection.ambient;
   /* The sheet's mast reads the same photo index the pin hover card does, fetched once, lazily,
      the first time a sheet opens. See `use-photo-index.ts`. */
-  const sheetPhotos = usePhotoIndex('/atlas/photos', sheetOpen);
+  /*
+   * The rail's thumbnails ride on the same index, and still never on load: the fetch starts on
+   * the first sign a reader is looking at records (a sheet opening, a pin hovered, or the pointer
+   * or focus entering the rail), and every row that has a photo fills in from then on.
+   */
+  const [railTouched, setRailTouched] = useState(false);
+  const sheetPhotos = usePhotoIndex(
+    '/atlas/photos',
+    sheetOpen || railTouched || atlasPinPhotoTarget !== null,
+  );
   const sheetPhoto = sheetOpen && sheetRecord ? (sheetPhotos?.[sheetRecord.id] ?? null) : null;
 
   const showLens = panels.lens && !chromeHidden && mode === 'atlas';
@@ -534,6 +543,8 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
 
       {showResults ? (
         <ResultsRail
+          photos={sheetPhotos}
+          onIntent={() => setRailTouched(true)}
           features={sorted}
           total={view.allFeatures.length}
           selectedId={selectedId}

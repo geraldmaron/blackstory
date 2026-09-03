@@ -126,6 +126,29 @@
   color: var(--ds-ink-muted);
 }
 
+/* A row with a photo widens the first column to a 36px thumbnail; every other row keeps the
+   18px glyph column, so the two kinds of row still share one left text edge per column. */
+.ds-results__row--photo {
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+}
+
+.ds-results__thumb {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+  overflow: hidden;
+}
+
+.ds-results__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
 .ds-results__row:hover .ds-results__glyph,
 .ds-results__row--selected .ds-results__glyph {
   color: var(--ds-accent);

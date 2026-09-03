@@ -15,6 +15,7 @@ import {
   DATA_READING_RULES,
   DATA_SECTION_COPY,
 } from './data-copy';
+import { DATA_PAGE_INDICATOR_FIXTURE_BUNDLE } from '@repo/domain/statistics/data-page-series';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
@@ -96,4 +97,34 @@ test('data user-facing copy avoids em dashes', () => {
 
 test('the reading rules are not numbered: they hold at once', () => {
   assert.doesNotMatch(sectionsSource, /DATA_READING_RULES\.map\([\s\S]{0,400}index \+ 1/);
+});
+
+test('the indicator fixture captions the figures print verbatim keep the same voice', () => {
+  const bundle = DATA_PAGE_INDICATOR_FIXTURE_BUNDLE;
+  const series = [
+    bundle.wealthComparison,
+    bundle.wealthTrend,
+    bundle.imprisonmentComparison,
+    bundle.cookHomeownership,
+    bundle.hmdaDenialRates,
+    bundle.federalDrugSentences,
+    bundle.costBurdenComparison,
+  ].filter((entry): entry is NonNullable<typeof entry> => entry !== undefined);
+  for (const entry of series) {
+    const strings = [
+      entry.title,
+      entry.caption,
+      entry.geographyLabel,
+      'referencePeriod' in entry ? entry.referencePeriod : '',
+      'ratioLabel' in entry ? (entry.ratioLabel ?? '') : '',
+    ];
+    for (const value of strings) {
+      assert.doesNotMatch(value, /—|–/, `${entry.id}: dashes belong to the voice rule`);
+      assert.doesNotMatch(
+        value,
+        /Phase 1|warehouse|fixture-backed/i,
+        `${entry.id}: internal vocabulary`,
+      );
+    }
+  }
 });

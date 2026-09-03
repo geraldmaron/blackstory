@@ -22,6 +22,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { cx } from '@repo/ui';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 import { gradeForConfidence } from '../../lib/map-experience/evidence-grade';
+import type { PhotoIndex } from '../../lib/map-experience/use-photo-index';
 import { placeDetail, placeLabelFor } from '../../lib/map-experience/place-label';
 import { GradeDot } from './GradeDot';
 import { KindGlyph } from './KindGlyph';
@@ -59,6 +60,14 @@ export type ResultsRailProps = {
   readonly constraints?: readonly ResultsConstraint[];
   /** Rendered in place of the list when nothing matches. Never a bare "no results". */
   readonly emptyState?: React.ReactNode;
+  /**
+   * The surface's photo index, when the reader has already caused it to load. A row whose
+   * record is in it shows the photo as a thumbnail in the glyph column; every other row keeps
+   * the kind glyph. Fails closed: no index, no photo, no placeholder.
+   */
+  readonly photos?: PhotoIndex | null;
+  /** Fires once the pointer or focus first enters the rail: the caller's cue to load photos. */
+  readonly onIntent?: () => void;
   readonly className?: string;
 };
 
@@ -99,6 +108,8 @@ export function ResultsRail({
   onHide,
   constraints,
   emptyState,
+  photos,
+  onIntent,
   className,
 }: ResultsRailProps) {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
@@ -142,7 +153,12 @@ export function ResultsRail({
   const rows = features.slice(range.first, range.last);
 
   return (
-    <section className={cx('ds-results', className)} aria-label="Records in view">
+    <section
+      className={cx('ds-results', className)}
+      aria-label="Records in view"
+      onPointerEnter={onIntent}
+      onFocus={onIntent}
+    >
       <header className="ds-results__head">
         <h2 className="ds-results__title">Records</h2>
         <span className="ds-results__count">
@@ -216,6 +232,7 @@ export function ResultsRail({
               const selected = id === selectedId;
               const saved = savedIds?.has(id) ?? false;
               const grade = gradeForConfidence(feature.properties.confidenceTier);
+              const photo = photos?.[id];
 
               return (
                 <div
@@ -225,7 +242,11 @@ export function ResultsRail({
                   aria-posinset={index + 1}
                   aria-setsize={features.length}
                   tabIndex={selected ? 0 : -1}
-                  className={cx('ds-results__row', selected && 'ds-results__row--selected')}
+                  className={cx(
+                    'ds-results__row',
+                    selected && 'ds-results__row--selected',
+                    photo && 'ds-results__row--photo',
+                  )}
                   style={{ transform: `translateY(${index * RESULTS_ROW_HEIGHT}px)` }}
                   onClick={() => onSelect(feature)}
                   onKeyDown={(event) => {
@@ -235,12 +256,28 @@ export function ResultsRail({
                     }
                   }}
                 >
-                  <KindGlyph
-                    kind={feature.properties.kind}
-                    {...(feature.properties.mapTone ? { mapTone: feature.properties.mapTone } : {})}
-                    size={13}
-                    className="ds-results__glyph"
-                  />
+                  {photo ? (
+                    /*
+                     * The thumbnail takes the glyph's column, not a new one: the row's anatomy
+                     * stays `glyph · text · save` and its height stays fixed, which is what the
+                     * windowing depends on. The kind is still stated in the meta line's glyph
+                     * for the map, so the row loses no channel. Decorative: the name beside it
+                     * is the accessible identity.
+                     */
+                    <span className="ds-results__thumb" aria-hidden="true">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL, the record's own photo */}
+                      <img src={photo.url} alt="" loading="lazy" decoding="async" />
+                    </span>
+                  ) : (
+                    <KindGlyph
+                      kind={feature.properties.kind}
+                      {...(feature.properties.mapTone
+                        ? { mapTone: feature.properties.mapTone }
+                        : {})}
+                      size={13}
+                      className="ds-results__glyph"
+                    />
+                  )}
 
                   <span className="ds-results__text">
                     <span className="ds-results__name">{feature.properties.displayName}</span>
