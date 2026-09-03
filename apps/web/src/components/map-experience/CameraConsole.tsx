@@ -69,9 +69,9 @@ function compassPointFor(bearing: number): (typeof COMPASS_POINTS)[number] {
 }
 
 /**
- * The compass: a 22px dial matching the zoom stepper's own footprint, needle rotated opposite
- * bearing so it always points true north. Click straightens the plate — `resetBearing` holds
- * center/zoom/pitch, so this never reframes, only unrotates.
+ * The compass: a 44px dial matching the zoom stepper's own footprint (WCAG 2.5.5), needle
+ * rotated opposite bearing so it always points true north. Click straightens the plate —
+ * `resetBearing` holds center/zoom/pitch, so this never reframes, only unrotates.
  */
 function Compass({ bearing, onReset }: { readonly bearing: number; readonly onReset: () => void }) {
   const rounded = Math.round(((bearing % 360) + 360) % 360);
@@ -84,8 +84,8 @@ function Compass({ bearing, onReset }: { readonly bearing: number; readonly onRe
       aria-label={`Reset map to north (currently facing ${compassPointFor(bearing)}, ${rounded} degrees)`}
     >
       <svg
-        width="14"
-        height="14"
+        width="18"
+        height="18"
         viewBox="0 0 16 16"
         fill="none"
         aria-hidden="true"
@@ -230,7 +230,7 @@ export function CameraConsole({
           onClick={() => onZoom(-1)}
           aria-label="Zoom out"
         >
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M4 8h8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
           </svg>
         </button>
@@ -240,7 +240,7 @@ export function CameraConsole({
           onClick={() => onZoom(1)}
           aria-label="Zoom in"
         >
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M4 8h8M8 4v8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
           </svg>
         </button>

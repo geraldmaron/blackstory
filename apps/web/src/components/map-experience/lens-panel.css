@@ -11,7 +11,7 @@
   z-index: var(--ds-z-atlas-instruments);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  width: 300px;
+  width: var(--ds-rail-w);
   max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom));
   /* One panel recipe shared by all four Explore instruments: opaque surface, one hairline,
      radius-md. */

@@ -5,10 +5,11 @@
  */
 .ds-pin-photo-card {
   position: fixed;
-  z-index: 45; /* local: above the record sheet (--ds-z-record-sheet, 40) so a hovered pin's photo
-    is never hidden behind an open sheet; below the command bar (--ds-z-command-bar, 50) and every
-    overlay above it, since those are reader-opened and should never be upstaged by a hover card. */
-  width: 168px;
+  /* above the record sheet (--ds-z-record-sheet, 40) so a hovered pin's photo is never hidden
+     behind an open sheet; below the command bar (--ds-z-command-bar, 50) and every overlay above
+     it, since those are reader-opened and should never be upstaged by a hover card. */
+  z-index: var(--ds-z-pin-photo-card);
+  width: var(--ds-pin-photo-card-w);
   pointer-events: none;
   background: var(--ds-surface-raised);
   border: var(--ds-border-width) solid var(--ds-rule);

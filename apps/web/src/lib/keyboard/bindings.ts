@@ -30,12 +30,25 @@ export type GlobalBinding = {
   readonly id: string;
   readonly title: string;
   readonly keys: KeyChord;
-  readonly section: 'Find' | 'View';
+  readonly section: 'Find' | 'Camera' | 'View';
 };
 
 export const GLOBAL_BINDINGS: readonly GlobalBinding[] = [
   { id: 'global.palette', title: 'Command palette', keys: ['⌘', 'K'], section: 'Find' },
   { id: 'global.shortcuts', title: 'Keyboard shortcuts', keys: ['?'], section: 'View' },
+  /*
+   * MapLibre's own keyboard handler, not a registry command: it never runs through
+   * `CommandContext`, MapLibre reads it straight off the canvas the moment the plate has focus.
+   * `map.keyboard.enable()` (gesture-lock.ts, `live` posture) has always turned this on — nothing
+   * here changes the binding — but with no line in this sheet a keyboard-only or switch user had
+   * no way to discover that the map answers the keyboard at all (WCAG 2.1.1 is about operability,
+   * not just capability). Rotate and tilt only move while `dragRotate`/pitch are unlocked, which
+   * `live` always is.
+   */
+  { id: 'global.map-pan', title: 'Pan the map', keys: ['←', '↑', '→', '↓'], section: 'Camera' },
+  { id: 'global.map-zoom', title: 'Zoom the map', keys: ['+', '−'], section: 'Camera' },
+  { id: 'global.map-rotate', title: 'Rotate the map', keys: ['⇧', '←', '→'], section: 'Camera' },
+  { id: 'global.map-tilt', title: 'Tilt the map', keys: ['⇧', '↑', '↓'], section: 'Camera' },
 ];
 
 /**

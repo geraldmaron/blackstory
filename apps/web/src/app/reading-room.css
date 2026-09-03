@@ -875,7 +875,7 @@ a.ds-errata__row-id {
   text-align: right;
 }
 
-@media (max-width: 48rem) {
+@media (max-width: 47.9375rem) {
   /* Under this measure five columns cannot hold their own. The title takes the full line and
      the three data fields share the second, still on the list's shared tracks so author, year
      and states line up down the page exactly as they do on the wide layout. */

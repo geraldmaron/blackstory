@@ -1509,13 +1509,13 @@ html:has([data-surface='instrument']) {
   place-items: center;
   aspect-ratio: 4 / 3;
   width: 100%;
-  background: #f4efe5;
+  background: var(--ds-canvas);
 }
 
 /* The monogram mark itself is drawn for a light card; on a dark canvas its own light frame reads
    as a stray pale rectangle rather than a themed placeholder. */
 [data-theme='dark'] .ds-entity-mark__frame {
-  background: #2a2622;
+  background: var(--ds-surface-raised);
 }
 
 .ds-entity-mark__svg {
@@ -1883,7 +1883,7 @@ html:has([data-surface='instrument']) {
      so they cannot paint above Explore instrument chrome in a sibling stacking context. */
   isolation: isolate;
   /* Pre-style-load flash — dark ocean by default; light theme matches Archive Paper. */
-  background: #080606;
+  background: var(--ds-map-water);
 }
 
 .ds-map-stage[data-plate-posture='live'] {
@@ -1970,7 +1970,7 @@ body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
 }
 
 [data-theme='light'] .ds-map-stage {
-  background: #f4efe5;
+  background: var(--ds-canvas);
 }
 
 /* MapLibre's own container (MapStage.tsx's `containerRef`) — never the plate above. MapLibre
@@ -2075,29 +2075,30 @@ body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
   outline-offset: var(--ds-focus-offset);
 }
 
-/* Recolor the +/− glyphs — paper on dark, ink on light. */
+/* Recolor the +/− glyphs — paper on dark, ink on light. The glyph itself is a fixed-color
+   mask (any opaque stroke works, since only its alpha channel is used); the visible color
+   comes from --ds-ink via background-color, so it now tracks the token instead of duplicating
+   its two theme values as literal hex inside the data-URI. */
+.ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,
+.ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+  background-color: var(--ds-ink);
+  background-image: none;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
 .ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%23f4efe5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 .ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%23f4efe5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-}
-
-[data-theme='light']
-  .ds-map-stage
-  .maplibregl-ctrl
-  button.maplibregl-ctrl-zoom-in
-  .maplibregl-ctrl-icon {
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-}
-
-[data-theme='light']
-  .ds-map-stage
-  .maplibregl-ctrl
-  button.maplibregl-ctrl-zoom-out
-  .maplibregl-ctrl-icon {
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 /* Hero / non-explore: pinch-only on touch-scale — no +/- affordance to tap through.
