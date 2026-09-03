@@ -52,10 +52,10 @@ export default function EntityDetailRoute() {
 
   const [deps, setDeps] = useState<EntityDataDeps | undefined>(undefined);
   useEffect(() => {
-    let cancelled = false;
+    let canceled = false;
     createRuntimeEntityDataDeps()
       .then((resolved) => {
-        if (!cancelled) setDeps(resolved);
+        if (!canceled) setDeps(resolved);
       })
       .catch(() => {
         // Leave `deps` undefined — the screen shows its own loading state indefinitely only if
@@ -64,7 +64,7 @@ export default function EntityDetailRoute() {
         // place to eventually surface that, not a client-side crash here.
       });
     return () => {
-      cancelled = true;
+      canceled = true;
     };
   }, []);
 

@@ -32,7 +32,7 @@ export interface TransportRetryPolicy {
   readonly maxAttempts: number;
   readonly baseDelayMs: number;
   readonly maxDelayMs: number;
-  /** Absolute cap on any single `Retry-After` we will honour (anti-DoS). */
+  /** Absolute cap on any single `Retry-After` we will honor (anti-DoS). */
   readonly maxRetryAfterMs: number;
 }
 

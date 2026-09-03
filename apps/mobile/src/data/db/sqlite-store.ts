@@ -2,7 +2,7 @@
  * expo-sqlite-backed `CacheStore` (MOB-009 §3).
  *
  * Translates the row/meta port into SQL against the schema in `schema.ts`. This
- * is the one place raw SQL lives. Its ON-DEVICE behaviour (real WAL durability,
+ * is the one place raw SQL lives. Its ON-DEVICE behavior (real WAL durability,
  * a genuine mid-write process kill, actual file corruption) can only be proven
  * on a device/emulator; that integration test is DEFERRED to MOB-019's device
  * matrix (documented, not faked). The SAFETY LOGIC that sits above it — the

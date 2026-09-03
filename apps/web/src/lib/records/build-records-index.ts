@@ -175,7 +175,7 @@ function humanize(value: string): string {
 }
 
 /**
- * Normalizes raw search params. Anything unrecognised collapses to the empty string rather than
+ * Normalizes raw search params. Anything unrecognized collapses to the empty string rather than
  * throwing, because this route is reachable from bookmarks and from three redirect families, and
  * a stale param must narrow nothing rather than 500.
  */

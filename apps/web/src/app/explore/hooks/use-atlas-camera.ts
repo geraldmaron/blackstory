@@ -31,6 +31,10 @@ export function useAtlasCamera(
 ) {
   const [readout, setReadout] = useState('');
   const [spotlight, setSpotlight] = useState<{ x: number; y: number; radius: number } | null>(null);
+  /** The compass needle's live value — every rotate frame, not just settled ones (`rotate` fires
+   * far more often than `viewport`; see that event's own doc comment in `listener-store.ts`). */
+  const [bearing, setBearing] = useState(0);
+  useEffect(() => stage.subscribe('rotate', setBearing), [stage]);
 
   const paddingRef = useRef({ lens: false, results: false, sheet: false });
   paddingRef.current = {
@@ -113,5 +117,5 @@ export function useAtlasCamera(
     [camera],
   );
 
-  return { camera, readout, spotlight, setSpotlight, runMove } as const;
+  return { camera, readout, spotlight, setSpotlight, runMove, bearing } as const;
 }

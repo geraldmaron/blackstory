@@ -66,7 +66,7 @@ export function groupFirstPaintPins(
   const exclude = options.exclude ?? new Set<number>();
   const radiusSq = radius * radius;
 
-  // Board-unit coordinates, bucketed into radius-sized cells so neighbour lookup is local.
+  // Board-unit coordinates, bucketed into radius-sized cells so neighbor lookup is local.
   const units: (readonly [number, number] | null)[] = points.map((point, index) => {
     if (!point || exclude.has(index)) return null;
     return [(point.x / 100) * BOARD_WIDTH, (point.y / 100) * BOARD_HEIGHT] as const;

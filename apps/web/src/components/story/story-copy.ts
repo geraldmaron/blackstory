@@ -105,7 +105,7 @@ export const STORY_COPY: readonly ChapterCopy[] = [
     heading: 'Watch the record {accent}.',
     accent: 'fill',
     prose:
-      'Scrub from the 1630s to the 2020s and the map fills unevenly. Thin colonial entries in the tidewater. A thickening through Reconstruction. A hard cluster around the twentieth century civil rights record, where documenting and organising ran together.',
+      'Scrub from the 1630s to the 2020s and the map fills unevenly. Thin colonial entries in the tidewater. A thickening through Reconstruction. A hard cluster around the twentieth century civil rights record, where documenting and organizing ran together.',
     facts: [
       { value: '1630s', label: 'earliest in this release' },
       { value: '2020s', label: 'latest in this release' },
@@ -128,7 +128,7 @@ export function copyFor(id: string): ChapterCopy | undefined {
   return STORY_COPY.find((chapter) => chapter.id === id);
 }
 
-/** Splits a heading on its `{accent}` slot so the surface can italicise exactly one word. */
+/** Splits a heading on its `{accent}` slot so the surface can italicize exactly one word. */
 export function headingParts(copy: ChapterCopy): {
   readonly before: string;
   readonly accent: string;

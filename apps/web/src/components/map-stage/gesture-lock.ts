@@ -56,3 +56,70 @@ export function lockGestures(map: GestureTarget): void {
 export function unlockGestures(map: GestureTarget): void {
   for (const key of GESTURE_KEYS) map[key].enable();
 }
+
+/**
+ * The Door's ambient posture: the plate is painted full-viewport like Live, but a chapter, not
+ * the reader, still owns the camera. `scrollZoom` stays off unconditionally — the wheel must
+ * always reach the document, on every device, or the single defect the `ambient` posture exists
+ * to prevent (a full-bleed map eating the page's scroll) comes right back.
+ *
+ * Everything else hands back to the reader, but only where doing so cannot reintroduce that same
+ * defect through a different gesture: on a precise pointer (mouse, trackpad) a drag is not a
+ * scroll, so `dragPan`, `dragRotate`, `touchZoomRotate`, `doubleClickZoom` and `keyboard` are safe
+ * to release, and a reader can now catch and correct a chapter flight that overshoots. On a coarse
+ * (touch) primary pointer this stays a full lock, because a one-finger drag on touch IS the scroll
+ * gesture — releasing `dragPan` there would trade the wheel-jack defect for the identical one on
+ * touch, just with the finger instead of the wheel.
+ */
+export function lockGesturesAmbient(
+  map: GestureTarget,
+  { pointerFine }: { readonly pointerFine: boolean },
+): void {
+  if (!pointerFine) {
+    lockGestures(map);
+    return;
+  }
+  map.scrollZoom.disable();
+  map.dragPan.enable();
+  map.dragRotate.enable();
+  map.touchZoomRotate.enable();
+  map.doubleClickZoom.enable();
+  map.keyboard.enable();
+}
+
+/** The four postures resolve to one of the three gesture states above. One switch, called from
+ * every `MapStage` site that reacts to a posture change, so the branches cannot drift apart the
+ * way three separately hand-written `if (posture === 'live') ... else ...` call sites eventually
+ * would the first time a fifth posture or a new gesture rule is added. */
+export function applyGesturesForPosture(
+  map: GestureTarget,
+  posture: 'live' | 'ambient' | 'framed' | 'parked',
+  { pointerFine }: { readonly pointerFine: boolean },
+): void {
+  if (posture === 'live') {
+    unlockGestures(map);
+    return;
+  }
+  if (posture === 'ambient') {
+    lockGesturesAmbient(map, { pointerFine });
+    return;
+  }
+  lockGestures(map);
+}
+
+/**
+ * Whether the custom rotate gestures (Shift+drag, Safari two-finger twist —
+ * `custom-rotate-gestures.ts`) should be attached for this posture. Deliberately identical to
+ * `dragRotate`'s own enablement above: these are additional ways to trigger the same rotation
+ * `dragRotate` already performs, not a separate capability, so a plate that has handed rotation
+ * back to the reader hands it back through every path at once, and a plate that has not stays
+ * silent on all of them.
+ */
+export function rotateGestureAllowed(
+  posture: 'live' | 'ambient' | 'framed' | 'parked',
+  { pointerFine }: { readonly pointerFine: boolean },
+): boolean {
+  if (posture === 'live') return true;
+  if (posture === 'ambient') return pointerFine;
+  return false;
+}

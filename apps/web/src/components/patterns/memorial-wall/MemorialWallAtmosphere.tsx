@@ -259,7 +259,7 @@ function getHeaderBox(root: HTMLElement): { left: number; bottom: number } | nul
  *
  * Both are scoped to their actual rectangles rather than banded across the full
  * width. A full-width band from the canvas top to the bottom of the title was
- * the previous behaviour, and it wrote off the entire top fifth of the wall —
+ * the previous behavior, and it wrote off the entire top fifth of the wall —
  * including the large open area to the right of the title, where there is
  * nothing to collide with. The names are the substance of this page and they
  * should use the space they have; only the two things a name would actually sit

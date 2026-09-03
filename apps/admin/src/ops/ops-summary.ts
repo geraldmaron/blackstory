@@ -2,7 +2,7 @@
  * Server-side operations dashboard helpers: queue counts from Postgres stores
  * and non-secret environment posture for the admin home screen.
  */
-import { tryListAdminResearchCases } from '../cases/research-case-store';
+import { tryCountAdminResearchCases } from '../cases/research-case-store';
 import { adminPublicSiteOrigin } from '../lib/sibling-origins';
 import { listStoryPackets, type StoryPacketListItem } from '../stories/story-packet-store';
 
@@ -59,15 +59,16 @@ export async function loadOpsQueueSummary(): Promise<OpsQueueSummary> {
 async function loadResearchCaseQueueSummary(): Promise<
   Pick<OpsQueueSummary, 'researchCasePending' | 'researchCaseSource'>
 > {
-  const items = await tryListAdminResearchCases({
-    states: ['candidate', 'relevance_review', 'insufficient_evidence'],
-    limit: 200,
-  });
-  if (items === null) {
+  const pending = await tryCountAdminResearchCases([
+    'candidate',
+    'relevance_review',
+    'insufficient_evidence',
+  ]);
+  if (pending === null) {
     return { researchCaseSource: 'unavailable' };
   }
   return {
-    researchCasePending: items.length,
+    researchCasePending: pending,
     researchCaseSource: 'live',
   };
 }

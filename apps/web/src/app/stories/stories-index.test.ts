@@ -2,7 +2,7 @@
  * `/stories` index logic: notice states, query parsing, href building, filtering, search,
  * sorting, pagination and the rail groups.
  *
- * Two behaviours here are load-bearing and easy to regress silently. The unavailable
+ * Two behaviors here are load-bearing and easy to regress silently. The unavailable
  * (load failure) state and the none-published state must read differently: one is a fault
  * on our side, the other an honest statement that the release has nothing here yet.
  * Collapsing them would tell a reader whose connection to the live record failed that the
@@ -74,7 +74,7 @@ describe('/stories · the two notice states differ', () => {
 });
 
 describe('/stories · query parsing', () => {
-  it('collapses unrecognised values to the chapters default rather than throwing, since bookmarks reach here', () => {
+  it('collapses unrecognized values to the chapters default rather than throwing, since bookmarks reach here', () => {
     const query = parseStoriesQuery({ kind: 'nonsense', sort: 'sideways', page: 'abc' });
     assert.equal(query.kind, 'chapter');
     assert.equal(query.sort, 'collection');

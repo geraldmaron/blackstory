@@ -126,6 +126,17 @@ export async function loadResearchCaseDocument(
   return buildResearchCaseDocument(cases[0]!, historyRows, checklistRows);
 }
 
+/** Exact count for a set of states — unlike listCaseIdsPostgres, not bounded by a page limit. */
+export async function countCasesByStatePostgres(
+  states: readonly ResearchCaseState[],
+): Promise<number> {
+  const rows = await queryPostgres<{ readonly count: string }>(
+    `SELECT count(*)::text AS count FROM bb_research.cases WHERE state = ANY($1::text[])`,
+    [states],
+  );
+  return Number(rows[0]?.count ?? 0);
+}
+
 export async function listCaseIdsPostgres(input: {
   readonly states?: readonly ResearchCaseState[];
   readonly limit: number;

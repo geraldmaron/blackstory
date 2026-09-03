@@ -36,7 +36,7 @@ export const OPENFREEMAP_SOURCE_ID = 'openfreemap';
  *
  * Chosen over Esri World Imagery and MapTiler because it needs no API key, no account and no
  * billing, and because it is US federal work: public domain, so nothing here depends on a
- * commercial licence that could change under the archive. Coverage is the United States only,
+ * commercial license that could change under the archive. Coverage is the United States only,
  * which is exactly the extent this map flies over (`US_CONUS_BOUNDS` bounds the camera).
  *
  * The service is an ArcGIS MapServer tile endpoint, so the path is `{z}/{y}/{x}` — row before
@@ -176,7 +176,7 @@ export const CONFIDENCE_TIER_COLOR: Readonly<Record<string, string>> = {
 export const LIGHT_PLATE_OCEAN = '#FFFFFF';
 
 /**
- * Plate colour for a scheme.
+ * Plate color for a scheme.
  *
  * `land`, `water`, `stateBounds` and `countyLine` come from `mapPalettes` in `@repo/ui`, which is
  * the source of truth for the plate: MapLibre styles are JSON, not CSS, so the TypeScript export
@@ -283,15 +283,15 @@ export type MapPlate = { readonly [K in keyof ReturnType<typeof plateForScheme>]
  * The plate's ink was contrast-held against two flat fills (`land`, `water`) — that is what
  * design law §3's ΔL* contract measures against, and `map-contrast.test.ts` enforces. Aerial
  * imagery has no such fill: one label can cross a white roof, a black shadow and a green field
- * inside its own bounding box, so no ink colour is safe against it on its own.
+ * inside its own bounding box, so no ink color is safe against it on its own.
  *
  * Two mechanisms, in this order:
  *
  * 1. Knock the imagery back before anything is drawn on it. The raster layer sits ABOVE the
- *    existing `background` layer and is deliberately not opaque, so the plate colour underneath
+ *    existing `background` layer and is deliberately not opaque, so the plate color underneath
  *    shows through as a scrim: on dark it pulls the imagery toward the archive's near-black, on
  *    light toward white. That compresses the imagery's luminance range from both ends, which is
- *    what makes a fixed ink colour viable at all. Desaturating does the same job in the colour
+ *    what makes a fixed ink color viable at all. Desaturating does the same job in the color
  *    channel and buys something else besides — kind shade is an ENCODING channel on this map, and
  *    a fully saturated aerial competes with the copper pins for the eye.
  *

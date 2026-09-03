@@ -48,11 +48,55 @@ const REFUSAL_NOTE =
 export type CameraConsoleProps = {
   readonly onMove: (move: CameraMove) => void;
   readonly onZoom: (delta: 1 | -1) => void;
+  /** Live camera bearing in degrees, for the compass needle. */
+  readonly bearing: number;
+  /** Straightens the plate to north. Never gated — see `Compass` below. */
+  readonly onResetBearing: () => void;
   /** The record the camera is acting on, if any. Drives the dignity gate. */
   readonly activeRecord?: RecordLike | null;
   readonly spotlit?: boolean;
   readonly className?: string;
 };
+
+/** Nearest compass point for the bearing readout — "N", "NE", "E", … — so the header carries a
+ * word, not just a rotating needle, for a reader who cannot read the needle's angle at a glance. */
+const COMPASS_POINTS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] as const;
+
+function compassPointFor(bearing: number): (typeof COMPASS_POINTS)[number] {
+  const normalized = ((bearing % 360) + 360) % 360;
+  const index = Math.round(normalized / 45) % COMPASS_POINTS.length;
+  return COMPASS_POINTS[index] ?? 'N';
+}
+
+/**
+ * The compass: a 22px dial matching the zoom stepper's own footprint, needle rotated opposite
+ * bearing so it always points true north. Click straightens the plate — `resetBearing` holds
+ * center/zoom/pitch, so this never reframes, only unrotates.
+ */
+function Compass({ bearing, onReset }: { readonly bearing: number; readonly onReset: () => void }) {
+  const rounded = Math.round(((bearing % 360) + 360) % 360);
+  return (
+    <button
+      type="button"
+      className="ds-camera__compass"
+      onClick={onReset}
+      title={`Bearing ${rounded}° · click to reset to north`}
+      aria-label={`Reset map to north (currently facing ${compassPointFor(bearing)}, ${rounded} degrees)`}
+    >
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 16 16"
+        fill="none"
+        aria-hidden="true"
+        style={{ transform: `rotate(${-bearing}deg)` }}
+      >
+        <path d="M8 1.4 11 8.6 8 7.1 5 8.6z" fill="currentColor" />
+        <path d="M8 14.6 5 8.6 8 10.1 11 8.6z" fill="currentColor" opacity="0.4" />
+      </svg>
+    </button>
+  );
+}
 
 function commandFor(move: string): Command | undefined {
   return COMMANDS.find((command) => command.id === `camera.${move}`);
@@ -144,6 +188,8 @@ function MoveIcon({ move }: { readonly move: (typeof KEYED_CAMERA_MOVES)[number]
 export function CameraConsole({
   onMove,
   onZoom,
+  bearing,
+  onResetBearing,
   activeRecord,
   spotlit = false,
   className,
@@ -177,6 +223,7 @@ export function CameraConsole({
     <section className={cx('ds-camera', className)} aria-label="Camera">
       <header className="ds-camera__head">
         <span className="ds-camera__kicker">Camera</span>
+        <Compass bearing={bearing} onReset={onResetBearing} />
         <button
           type="button"
           className="ds-camera__zoom"

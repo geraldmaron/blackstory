@@ -165,7 +165,7 @@ describe('room kit · the trail is computed, never hand-written', () => {
     }
   });
 
-  it('an unrecognised path still ends at a non-link final step', () => {
+  it('an unrecognized path still ends at a non-link final step', () => {
     const trail = resolveTrail('/nope', 'Not found');
     assert.equal(trail.at(-1)?.href, null);
   });
@@ -314,7 +314,7 @@ describe('room kit · evidence blocks', () => {
     assert.match(html, /This is not the address of the event\./);
   });
 
-  it('TrustBlock and Anatomy render label/value pairs in a labelled group', () => {
+  it('TrustBlock and Anatomy render label/value pairs in a labeled group', () => {
     const trust = renderToStaticMarkup(
       <TrustBlock facts={[{ label: 'Evidence grade', value: 'B' }]} />,
     );
@@ -377,7 +377,7 @@ describe('room kit · index, table and utility blocks', () => {
     assert.match(html, /href="\/submit"/);
   });
 
-  it('a DataTable scrolls inside its own labelled, focusable container', () => {
+  it('a DataTable scrolls inside its own labeled, focusable container', () => {
     const html = renderToStaticMarkup(
       <DataTable
         caption="Population by decade"
@@ -625,7 +625,7 @@ describe('room kit · a slot that is laid out but not visible is not a candidate
     assert.equal(momentIsVisible(shown), true);
   });
 
-  it('keeps rect-only behaviour where checkVisibility is unsupported, rather than losing every moment', () => {
+  it('keeps rect-only behavior where checkVisibility is unsupported, rather than losing every moment', () => {
     assert.equal(momentIsVisible({} as unknown as Element), true);
   });
 });

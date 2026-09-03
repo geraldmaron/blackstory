@@ -47,9 +47,27 @@ test('DoorImmersive scrolls chapters and drives the shared plate', () => {
   assert.match(immersive, /Open Explore/);
   // The one persistent plate, never a second MapLibre instance and never the map's story runner.
   assert.match(immersive, /useMapStage\(\)/);
-  assert.match(immersive, /stage\.patchData\(nationalFieldPatch\(pins, \{ densityLevels \}\)\)/);
+  assert.match(
+    immersive,
+    /stage\.patchData\(\s*nationalFieldPatch\(sweptPins, \{ densityLevels \}\)/,
+  );
   assert.match(immersive, /focus\.camera/);
   assert.doesNotMatch(immersive, /useStoryRunner|from 'maplibre-gl'|new maplibregl/);
+});
+
+test('the sweep chapter clears the plate first, then fills it cumulatively', () => {
+  // Chapter 5 is "watch the record fill": an empty country, held, then four centuries arriving
+  // on it. A sweep that opened on the first decade with every other pin still up would be a
+  // histogram scrub, not a fill.
+  assert.match(immersive, /onClear: \(\) => setSweepDecade\(decadeRange\.from - 10\)/);
+  assert.match(immersive, /clearHoldMs:/);
+  assert.match(immersive, /onDecade: setSweepDecade/);
+  // Cumulative, not a one-decade window: a record enters at its earliest decade and stays.
+  assert.match(immersive, /decade !== null && decade <= sweepDecade/);
+  // The whole archive comes back when the sweep lands, undated records included.
+  assert.match(immersive, /onDone: \(\) => setSweepDecade\(null\)/);
+  // The clearing frame crossdissolves; removing pins from the source is otherwise instant.
+  assert.match(immersive, /clearingPlateRef\.current \? \{ fade: true \} : undefined/);
 });
 
 test('the Door and Explore rest on one national-field patch', () => {
@@ -92,15 +110,15 @@ test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
   assert.match(css, /container-type:\s*size/);
   assert.match(css, /aspect-ratio:\s*960\s*\/\s*500/);
   assert.match(css, /min\(100cqw,\s*calc\(100cqh \* 960 \/ 500\)\)/);
-  // Opening invitation card stays vertically centred in the viewport chapter.
+  // Opening invitation card stays vertically centered in the viewport chapter.
   assert.match(
     css,
-    /\.ds-door-journey__chapter--centre\.ds-door-journey__chapter--rest[\s\S]*align-content:\s*center/,
+    /\.ds-door-journey__chapter--center\.ds-door-journey__chapter--rest[\s\S]*align-content:\s*center/,
   );
   assert.match(css, /ds-door-journey__chapter--rest/);
   assert.match(
     css,
-    /\.ds-door-journey__chapter--rest \.ds-door-journey__card[\s\S]*max-height:\s*min\(26rem/,
+    /\.ds-door-journey__chapter--rest \.ds-door-journey__card[\s\S]*max-height:\s*min\(31rem/,
   );
   assert.match(css, /@media \(max-height: 52rem\)/);
   assert.match(css, /\.ds-door__field-chrome[\s\S]*top:\s*var\(--ds-space-4\)/);

@@ -1,7 +1,7 @@
 /**
  * The live reduced-motion read.
  *
- * The behaviour under test is that a preference flipped mid-session is visible to the next camera
+ * The behavior under test is that a preference flipped mid-session is visible to the next camera
  * decision without a reload. A one-shot query read cannot do that, which is why this module exists
  * alongside `prefersReducedMotion()` rather than replacing it.
  */

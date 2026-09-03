@@ -77,7 +77,7 @@ export const STORY_FACTS: readonly StoryFact[] = [
   {
     id: 'first-and-second',
     prose:
-      'There were two waves, not one. The first, roughly 1910 to 1940, was pulled north by wartime factory labour shortages. The second, after 1940, was larger, ran further west, and met a housing market that had spent the interval learning how to exclude.',
+      'There were two waves, not one. The first, roughly 1910 to 1940, was pulled north by wartime factory labor shortages. The second, after 1940, was larger, ran further west, and met a housing market that had spent the interval learning how to exclude.',
     figures: [
       { value: '1910 to 1940', label: 'first wave' },
       { value: '1940 to 1970', label: 'second wave' },
@@ -89,7 +89,7 @@ export const STORY_FACTS: readonly StoryFact[] = [
   {
     id: 'mechanical-picker',
     prose:
-      'The mechanical cotton picker did in a generation what no argument had. One machine could do the work of dozens of hands, and the plantation labour system that had held people in place stopped needing them. Departure was a decision, but the ground it was made on had moved.',
+      'The mechanical cotton picker did in a generation what no argument had. One machine could do the work of dozens of hands, and the plantation labor system that had held people in place stopped needing them. Departure was a decision, but the ground it was made on had moved.',
     figures: [
       { value: '1944', label: 'first commercial picker' },
       { value: 'Delta', label: 'where it landed first' },
@@ -101,7 +101,7 @@ export const STORY_FACTS: readonly StoryFact[] = [
   {
     id: 'restrictive-covenants',
     prose:
-      'Arrival was not admission. Deeds across northern and western cities carried covenants barring sale or occupancy by Black buyers, and they were enforced by neighbours and by courts until Shelley v. Kraemer in 1948. Where a family could land was written into the paperwork of the land itself.',
+      'Arrival was not admission. Deeds across northern and western cities carried covenants barring sale or occupancy by Black buyers, and they were enforced by neighbors and by courts until Shelley v. Kraemer in 1948. Where a family could land was written into the paperwork of the land itself.',
     figures: [
       { value: '1948', label: 'Shelley v. Kraemer' },
       { value: 'Deeds', label: 'where the bar was written' },
@@ -113,7 +113,7 @@ export const STORY_FACTS: readonly StoryFact[] = [
   {
     id: 'holc-maps',
     prose:
-      'The Home Owners Loan Corporation graded neighbourhoods for mortgage risk in the 1930s and coloured the Black ones red. The maps were internal, but the practice they described outlived them by decades and shaped which blocks got loans, which got repairs, and which got nothing.',
+      'The Home Owners Loan Corporation graded neighborhoods for mortgage risk in the 1930s and colored the Black ones red. The maps were internal, but the practice they described outlived them by decades and shaped which blocks got loans, which got repairs, and which got nothing.',
     figures: [
       { value: '1935 to 1940', label: 'the surveys' },
       { value: '239', label: 'cities mapped' },
@@ -137,7 +137,7 @@ export const STORY_FACTS: readonly StoryFact[] = [
   {
     id: 'great-migration-west',
     prose:
-      'The wartime shipyards pulled the migration west. Oakland, Richmond, Portland and Los Angeles took hundreds of thousands of people from Texas, Louisiana and Arkansas in a few years, into cities with almost no existing Black neighbourhoods and almost no housing willing to hold them.',
+      'The wartime shipyards pulled the migration west. Oakland, Richmond, Portland and Los Angeles took hundreds of thousands of people from Texas, Louisiana and Arkansas in a few years, into cities with almost no existing Black neighborhoods and almost no housing willing to hold them.',
     figures: [
       { value: '1942 to 1945', label: 'the shipyard years' },
       { value: 'Bay Area', label: 'fastest growth' },
@@ -176,7 +176,7 @@ export const STORY_FACTS: readonly StoryFact[] = [
       'Between 1912 and 1932 nearly five thousand schools were built for Black children across the rural South, funded partly by Julius Rosenwald and substantially by the communities themselves, who raised money they were already being taxed for. The buildings are gone in most counties. The subscription lists are not.',
     figures: [
       { value: '4,978', label: 'schools built' },
-      { value: '1912 to 1932', label: 'the programme' },
+      { value: '1912 to 1932', label: 'the program' },
     ],
     source: 'Fisk University Rosenwald Fund Card File Database.',
     camera: { center: [-86.8, 32.4], zoom: 6.2 },
@@ -197,10 +197,10 @@ export const STORY_FACTS: readonly StoryFact[] = [
   {
     id: 'freedmens-bureau',
     prose:
-      'The Freedmen’s Bureau recorded labour contracts, marriages, rations and complaints between 1865 and 1872. It is the densest surviving documentation of the first years after emancipation, and for many families it holds the earliest record in which they appear by full name.',
+      'The Freedmen’s Bureau recorded labor contracts, marriages, rations and complaints between 1865 and 1872. It is the densest surviving documentation of the first years after emancipation, and for many families it holds the earliest record in which they appear by full name.',
     figures: [
       { value: '1865 to 1872', label: 'the Bureau years' },
-      { value: 'Labour contracts', label: 'the bulk of it' },
+      { value: 'Labor contracts', label: 'the bulk of it' },
     ],
     source: 'Freedmen’s Bureau Records, National Archives (Record Group 105).',
     camera: { center: [-77.03, 38.9], zoom: 9.4 },

@@ -1,7 +1,7 @@
 /**
  * Camera console — bottom right, z 20.
  *
- * Positioned clear of the time panel: the time panel is centred at `min(760px, 100vw - 24px)`, so
+ * Positioned clear of the time panel: the time panel is centered at `min(760px, 100vw - 24px)`, so
  * on a narrow viewport the console stacks above it rather than overlapping.
  */
 
@@ -52,6 +52,29 @@
 .ds-camera__zoom:hover {
   color: var(--ds-ink);
   border-color: var(--ds-border-strong);
+}
+
+/* Same footprint as the zoom stepper's own buttons — one dial in a row of squares reads as an
+   addition to that instrument, not a second one. */
+.ds-camera__compass {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-full, 50%);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+}
+
+.ds-camera__compass:hover {
+  color: var(--ds-copper-graphic, var(--ds-ink));
+  border-color: var(--ds-border-strong);
+}
+
+.ds-camera__compass svg {
+  transition: transform 80ms linear;
 }
 
 .ds-camera__grid {

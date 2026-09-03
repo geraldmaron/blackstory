@@ -1,5 +1,5 @@
 /**
- * Toast stack for the Explore surface. Bottom centre, above the Time panel.
+ * Toast stack for the Explore surface. Bottom center, above the Time panel.
  *
  * `role="status"` + `aria-live="polite"` on the region, not on each toast, so a screen reader
  * announces new entries without re-reading the whole stack. Toasts never carry the only copy of

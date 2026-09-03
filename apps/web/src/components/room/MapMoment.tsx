@@ -111,7 +111,7 @@ export type MomentCandidate = {
  *
  * `checkVisibility` is the only check that catches it, because the drawer hides its content
  * with `content-visibility` rather than `display: none`. Browsers without it keep the old
- * rect-only behaviour rather than losing every moment.
+ * rect-only behavior rather than losing every moment.
  */
 export function momentIsVisible(element: Element): boolean {
   const check = (
@@ -296,7 +296,7 @@ export function MapMomentStage({ children }: MapMomentStageProps) {
       observerRef.current = null;
       if (frameRef.current) {
         window.cancelAnimationFrame(frameRef.current);
-        // Cleared, not just cancelled: `queue` treats a non-zero id as "a sync is already
+        // Cleared, not just canceled: `queue` treats a non-zero id as "a sync is already
         // pending" and would refuse to schedule another one for the life of the page.
         frameRef.current = 0;
       }

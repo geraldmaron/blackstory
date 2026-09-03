@@ -432,7 +432,7 @@ export function parentPathFor(pathname: string): string | null {
     if (path.startsWith(prefix)) return parent;
   }
 
-  // An unrecognised path is still somewhere: it hangs off Explore rather than off nothing.
+  // An unrecognized path is still somewhere: it hangs off Explore rather than off nothing.
   return path === '/' ? null : '/';
 }
 

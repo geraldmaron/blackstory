@@ -11,7 +11,12 @@ import type { AtlasMode } from '../../../components/shell/CommandBar';
 import type { LensLayers } from '../../../components/map-experience/LensPanel';
 import type { MapStageHandle } from '../../../components/map-stage/MapStage';
 import type { CameraApi } from '../../../lib/map-experience/camera-moves';
-import { sweep, type SweepHandle } from '../../../lib/map-experience/decade-transition';
+import {
+  sweep,
+  SWEEP_CLEAR_HOLD_MS,
+  type SweepHandle,
+} from '../../../lib/map-experience/decade-transition';
+import { DECADE_LAYER_FADE_MS } from '../../map/decade-layer-transition';
 import { prefersReducedMotion } from '../../../lib/map-experience/camera-presets';
 import { placeLabelFor } from '../../../lib/map-experience/place-label';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
@@ -35,7 +40,7 @@ export function useStoryRunner(
   setSelectedId: Dispatch<SetStateAction<string | undefined>>,
   setLayers: Dispatch<SetStateAction<LensLayers>>,
   setSpotlight: Dispatch<SetStateAction<{ x: number; y: number; radius: number } | null>>,
-  setDecade: Dispatch<SetStateAction<number | null>>,
+  setSweepDecade: Dispatch<SetStateAction<number | null>>,
   mode: AtlasMode,
 ) {
   /**
@@ -48,14 +53,17 @@ export function useStoryRunner(
   const stopSweep = useCallback(() => {
     sweepRef.current?.cancel();
     sweepRef.current = null;
-  }, []);
+    // A canceled sweep must not leave the plate half-filled. Whatever it was holding back, the
+    // reader gets the whole archive again.
+    setSweepDecade(null);
+  }, [setSweepDecade]);
 
   /**
    * The record chapter 2 shows and the fact chapter 3 shows, drawn once per mount rather than per
    * render. Re-rolling on every render would change the card under the reader mid-sentence, and
    * re-rolling on every chapter change would mean scrolling back up produced a different archive.
    *
-   * `Math.random` is read here, in an effect-free initialiser, rather than inside the pure pickers,
+   * `Math.random` is read here, in an effect-free initializer, rather than inside the pure pickers,
    * so both remain reproducible in a test.
    */
   const [storyRoll] = useState(() => ({
@@ -132,22 +140,33 @@ export function useStoryRunner(
           sweepRef.current = sweep({
             from: first.decade,
             to: last.decade,
-            onDecade: setDecade,
-            // The sweep ends on the last decade, which would leave the plate filtered to it. All
-            // time is what the chapter is arguing for, so the histogram returns there.
-            onDone: () => setDecade(null),
+            // "Watch the record fill" is the chapter's claim, so it has to start from an empty
+            // country. One decade before the first is a cursor no record can be earlier than,
+            // which clears the plate through the same crossfade every other decade change uses.
+            onClear: () => setSweepDecade(first.decade - 10),
+            // Long enough for the clearing crossdissolve to land before the first decade
+            // arrives, so the reader actually sees the empty country the chapter is about.
+            // Under reduced motion the plate snaps clear and only the short beat is needed.
+            clearHoldMs: prefersReducedMotion()
+              ? SWEEP_CLEAR_HOLD_MS
+              : DECADE_LAYER_FADE_MS + SWEEP_CLEAR_HOLD_MS,
+            onDecade: setSweepDecade,
+            // The sweep ends on the last decade, which would leave the plate filtered to records
+            // dated at or before it and drop every undated one. All time is what the chapter is
+            // arguing for, so the whole archive comes back.
+            onDone: () => setSweepDecade(null),
             reducedMotion: prefersReducedMotion(),
           });
         }
       } else {
-        setDecade(null);
+        setSweepDecade(null);
       }
     },
     [
       camera,
       decadeBars,
       featureById,
-      setDecade,
+      setSweepDecade,
       setLayers,
       setSelectedId,
       setSpotlight,

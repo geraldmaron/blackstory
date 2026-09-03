@@ -162,7 +162,7 @@ Unchanged from [`neo-voice.md`](../content/neo-voice.md) and [`story.md`](./stor
 
 - One `h1` per page, then `h2` and `h3` from the heading blocks with no skipped levels.
 - Hero and card media are decorative; the title carries the accessible name.
-- Artifact drawers are real disclosures with a labelled control naming what is inside.
+- Artifact drawers are real disclosures with a labeled control naming what is inside.
 - Citation superscripts are links with an accessible name that says what they point at, not a bare number.
 - Every reference has a return control back to the sentence.
 - `scroll-margin` under the fixed bar on every anchored heading.

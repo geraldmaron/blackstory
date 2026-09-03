@@ -61,19 +61,19 @@ export function useSearch(options: UseSearchOptions = {}): UseSearchResult {
   // the test-injection path (`options.runtime`) -- it is intentionally not a reactive dependency.
   useEffect(() => {
     mountedRef.current = true;
-    let cancelled = false;
+    let canceled = false;
     (async () => {
       const resolved = runtime ?? (await getSearchRuntime());
-      if (cancelled) return;
+      if (canceled) return;
       setRuntimeState(resolved);
       const list = await resolved.recentSearches.list();
-      if (!cancelled) setRecentSearches(list);
+      if (!canceled) setRecentSearches(list);
     })().catch(() => {
       // Runtime construction failure (e.g. SQLite unavailable in a hostile environment) degrades
       // to browse mode with no recent searches, never a crash.
     });
     return () => {
-      cancelled = true;
+      canceled = true;
       mountedRef.current = false;
       controllerRef.current?.dispose();
     };

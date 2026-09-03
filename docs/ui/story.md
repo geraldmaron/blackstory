@@ -108,7 +108,7 @@ Site chrome borrows Neo's register but is not narrated by Neo; see the speaker
 rule below.
 
 **The speaker: there is no "we".** BlackStory is one person's project, and
-first-person plural on any reader-facing surface claims an organisation that
+first-person plural on any reader-facing surface claims an organization that
 does not exist. Every page has exactly two possible speakers and a reader
 should be able to tell from the sentence which one is talking:
 

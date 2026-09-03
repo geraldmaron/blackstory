@@ -7,7 +7,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { LayerModelControl } from './LayerModelControl';
 
-test('exposes a radiogroup labelled Map data model', () => {
+test('exposes a radiogroup labeled Map data model', () => {
   const noop = () => {};
   const html = renderToStaticMarkup(
     createElement(LayerModelControl, {

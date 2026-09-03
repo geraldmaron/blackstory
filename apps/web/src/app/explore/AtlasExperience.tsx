@@ -9,7 +9,7 @@
  * The camera reaches the plate through `MapStage.getMap()`, narrow on purpose: preset framing
  * still goes through `flyPreset` (ADR-017), and this handle is only what `camera-moves.ts` needs.
  *
- * This file is the orchestrator (WP-23): render plus wiring. Every piece of state and behaviour
+ * This file is the orchestrator (WP-23): render plus wiring. Every piece of state and behavior
  * lives in a hook under `explore/hooks/` — the lens, the camera, the selection, the saved
  * collection, the story runner, the palette index, the command context.
  */
@@ -225,6 +225,8 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     setEvidenceFloor,
     decade,
     setDecade,
+    sweepDecade,
+    setSweepDecade,
     topicId,
     setTopicId,
     status,
@@ -271,7 +273,26 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     satellite: layers.satellite,
     selectedId,
   });
-  useMapSync(stage, view, filtered, layers.pins, layers.satellite, selectedId, stateCode);
+  /**
+   * The one frame of the story's decade sweep where the plate is deliberately empty: the cursor
+   * sits before the archive's first decade, so nothing matches. That frame crossdissolves rather
+   * than snapping, because chapter 4 opens by clearing the country and a hard cut there reads as
+   * the map having broken. Every later frame of the sweep only *adds* pins, and adding is what
+   * the per-decade crossfade already handles.
+   */
+  const sweepClearingPlate =
+    sweepDecade !== null && (decadeBars[0] === undefined || sweepDecade < decadeBars[0].decade);
+
+  useMapSync(
+    stage,
+    view,
+    filtered,
+    layers.pins,
+    layers.satellite,
+    selectedId,
+    stateCode,
+    sweepClearingPlate,
+  );
 
   // The Lens's own population-layer choice overrides the URL-seeded `view.viewState.layerMode`
   // once the reader touches it. `useMapSync` (outside this package's file lock) still runs its
@@ -357,7 +378,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   }, [atlasHoverTarget, selectedId]);
 
   const [legendOpen, setLegendOpen] = useState(false);
-  const { camera, readout, spotlight, setSpotlight, runMove } = useAtlasCamera(
+  const { camera, readout, spotlight, setSpotlight, runMove, bearing } = useAtlasCamera(
     stage,
     panels,
     chromeHidden,
@@ -391,7 +412,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     setAmbientSelectedId,
     setLayers,
     setSpotlight,
-    setDecade,
+    setSweepDecade,
     mode,
   );
   const commandContext = useCommandContext({
@@ -591,6 +612,8 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
                 if (!map) return;
                 map.easeTo({ zoom: map.getZoom() + delta, duration: 260 } as never);
               }}
+              bearing={bearing}
+              onResetBearing={() => camera.resetBearing({ trigger: 'reader' })}
               activeRecord={selectedFeature?.properties ?? null}
               spotlit={camera.isSpotlit()}
             />
@@ -610,8 +633,21 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
        */}
       {(narrow || !panels.lens || !panels.results) && !chromeHidden ? (
         <div className="ds-atlas__dock" data-switcher={narrow ? 'true' : undefined}>
-          {NARROW_INSTRUMENTS.map(({ key, label }) =>
-            narrow || !panels[key] ? (
+          {NARROW_INSTRUMENTS.map(({ key, label }) => {
+            if (!(narrow || !panels[key])) return null;
+            // A hidden Lens/Results is a peek, not a blank chip: the reader closed the panel, not
+            // its state, so the dock keeps reporting what that state is — the literal "closed but
+            // still visible" instrument the chip was always meant to be, just without a live
+            // count to prove it before now.
+            const detail =
+              key === 'lens'
+                ? constraints.length === 0
+                  ? 'no filters'
+                  : `${constraints.length} filter${constraints.length === 1 ? '' : 's'}`
+                : key === 'results'
+                  ? `${sorted.length} of ${view.allFeatures.length}`
+                  : null;
+            return (
               <button
                 key={key}
                 type="button"
@@ -619,10 +655,11 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
                 aria-pressed={narrow ? panels[key] : undefined}
                 onClick={() => (narrow && panels[key] ? hidePanel(key) : restorePanel(key))}
               >
-                {label}
+                <span className="ds-atlas__dock-label">{label}</span>
+                {detail ? <span className="ds-atlas__dock-detail">{detail}</span> : null}
               </button>
-            ) : null,
-          )}
+            );
+          })}
         </div>
       ) : null}
 

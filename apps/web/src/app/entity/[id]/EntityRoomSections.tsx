@@ -4,7 +4,7 @@
  * This replaces the v6 edition stack, which rendered every beat as a numbered panel (00 RECORD,
  * 01 ANATOMY, 02 CONTEXT, 03 RELEVANCE, 04 STATUS, 05 CLAIMS, 06 PROVENANCE) inside its own
  * bordered card. Six chapter numbers is a promise of six chapters, and most records have one
- * sourced paragraph and a location, so the page read as a filing cabinet: identical grey boxes,
+ * sourced paragraph and a location, so the page read as a filing cabinet: identical gray boxes,
  * each announcing itself, several of them apologising for being empty.
  *
  * What is here instead: the orientation facts move to the masthead and the fact strip (see

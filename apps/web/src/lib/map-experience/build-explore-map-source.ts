@@ -51,6 +51,15 @@ export type ExploreMapFeatureProperties = {
   readonly geoPrecisionTier: GeoPrecisionTier;
   readonly radiusMeters?: number;
   readonly eraBuckets: readonly string[];
+  /**
+   * The earliest decade this record is documented in, as a start year (1920 for the 1920s.)
+   *
+   * Redundant with `eraBuckets` wherever the buckets are carried, and set on its own for the
+   * Door's first-paint pins, whose buckets are stripped out of the first document. The Door's
+   * decade sweep needs one number per pin and nothing else, and one number is a great deal
+   * cheaper on a document that already carries four thousand of them.
+   */
+  readonly earliestDecade?: number;
   readonly status?: string;
   /** Count of this record's own already-publicly-enumerated accepted claims (see the entity
    * page's "Accepted claims" section) a transparency affordance, not a hidden ranking input. */

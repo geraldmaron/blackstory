@@ -6,9 +6,9 @@
  * ORIGIN, the human half of the Neo section, and the contribute invitation are first person:
  * one person started this, one person runs it, and the limits on that are his to state.
  * PILLARS, REFUSALS and the rules half of the Neo section are impersonal, because they are
- * behaviour the code enforces rather than promises the author makes. A reader should be able to
+ * behavior the code enforces rather than promises the author makes. A reader should be able to
  * tell, from the writing alone, which sentences are a person talking and which are the archive's
- * behaviour. Nothing on this page says "we": there is no we.
+ * behavior. Nothing on this page says "we": there is no we.
  *
  * SHARED STRINGS. `ABOUT_WALK_PAST` and `ABOUT_ON_THE_GROUND` are declared as their own constants
  * and then placed into the lists below, rather than read back out by index. The index form broke

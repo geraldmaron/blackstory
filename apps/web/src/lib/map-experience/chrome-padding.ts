@@ -66,7 +66,7 @@ export function chromePadding(state: ChromeState): ChromeInset {
     bottom = Math.round(Math.min(WIDE_BOTTOM_MAX, viewportHeight * WIDE_BOTTOM_RATIO));
   }
 
-  // Horizontal clamp: scale both sides by the same factor so the camera stays centred on the
+  // Horizontal clamp: scale both sides by the same factor so the camera stays centered on the
   // free area rather than drifting toward whichever panel happened to be narrower.
   const maxHorizontal = viewportWidth * MAX_AXIS_SHARE;
   if (left + right > maxHorizontal) {

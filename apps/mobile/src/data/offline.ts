@@ -6,11 +6,11 @@
  * release-cache.ts). This module owns ONLY the connectivity source; it builds no
  * UI (MOB-012+ renders the banner). It is abstracted behind `Connectivity` so
  * the fallback logic is testable without the native NetInfo module and so a
- * hostile network that merely drops packets (T7) is modelled the same as a
+ * hostile network that merely drops packets (T7) is modeled the same as a
  * clean offline transition.
  *
  * Honesty invariant (T7): being offline NEVER silently mutates cached data or
- * marks it current. It only flips `degraded` so every served surface is labelled
+ * marks it current. It only flips `degraded` so every served surface is labeled
  * "last updated <fetchedAt>".
  */
 

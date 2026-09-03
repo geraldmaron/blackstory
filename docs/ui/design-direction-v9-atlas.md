@@ -59,7 +59,7 @@ One canvas, two modes, no page-to-page reload of the map plate.
 |---|---|---|
 | Map plate | 0 | Fixed full-viewport MapLibre. Single mount, persists across mode changes (ADR-017). |
 | Annotation overlay | 5 | SVG, `pointer-events: none`. Migration arcs, leader lines, callouts. Reprojected on `move`. |
-| Spotlight | 6 | Radial CSS mask over a canvas-coloured plate. Dims everything outside the focus radius. |
+| Spotlight | 6 | Radial CSS mask over a canvas-colored plate. Dims everything outside the focus radius. |
 | Grain | 7 | Archive texture, `mix-blend-mode: overlay`, opacity ≤ .3. Carried from v6 atmosphere. |
 | Instruments | 20 | Opaque `--ds-surface` panels. Lens, Results, Time, Camera, Dock. |
 | Record sheet | 40 | Right-anchored slab, radius-lg, 3px copper left rule. |
@@ -208,7 +208,7 @@ Colour key moves into the palette (`⌘K` → "legend") and the record sheet, wh
 Width `344px` (316 compact). Header: `RECORDS` + `n of N` + sort toggle (`OLDEST`/`NEWEST`) + hide.
 
 Row anatomy, `grid-template-columns: 18px 1fr auto`:
-- Kind glyph (shape carries the signal; colour never alone)
+- Kind glyph (shape carries the signal; color never alone)
 - Name, 13.5px, weight 550
 - Meta line: place (truncating) · era · grade dot + letter. Mono, 10px, `nowrap`
 - Save affordance, opacity 0 until row hover or already-saved
@@ -229,9 +229,11 @@ One control owns "when", carried from v6 §4.4. Selecting a decade sets the pin 
 
 ### 5.5 Camera console (bottom right, z 20)
 
-`CAMERA` mono header with a compact zoom stepper, then a 3×2 grid of move buttons, each with its keyboard chip. Active move gets `--copper-wash` for 2.2s.
+`CAMERA` mono header with a compact zoom stepper and a compass, then a 3×2 grid of move buttons, each with its keyboard chip. Active move gets `--copper-wash` for 2.2s.
 
-**The default MapLibre `NavigationControl` is removed.** Zoom and pitch live in this console so the map keeps one control vocabulary. Attribution moves to a bottom-left pill.
+**The default MapLibre `NavigationControl` is removed.** Zoom, bearing and pitch live in this console so the map keeps one control vocabulary. Attribution moves to a bottom-left pill.
+
+**Compass** (header, beside the zoom stepper): a 22px dial whose needle tracks live bearing. Click straightens the plate to north (`resetBearing`, holds center/zoom/pitch) — a correction, not one of the six gated moves, so it is never refused by the dignity gate and does not occupy a grid slot. This is the one addition to the console's vocabulary since v9: continuous manual rotation has no cross-browser trackpad gesture to rely on (only Safari's WebKit exposes real two-finger twist; Chrome/Firefox/Edge report trackpad two-finger motion only as aggregate wheel deltas, with no rotation component at all), so the console is the only place a reader can discover and reset rotation on every browser. Shift+drag and — where the platform supports it — native two-finger twist both rotate the plate directly; the compass is their shared readout and their undo, not a second way to *start* rotating.
 
 ### 5.6 Record sheet (right, z 40)
 
@@ -268,7 +270,7 @@ Scroll-driven cinema over the same persistent map plate. Six chapters. This repl
 | 1 | Where the record is thickest | `[-90.05, 32.3] z5.1 p34 b-14` | Spotlight the Delta at 20% radius. Presence facts. |
 | 2 | One record, up close | `[-86.81, 33.52] z13.4 p56 b24` | Push to A.G. Gaston Motel. Pin marker. Anatomy facts. |
 | 3 | The Great Migration | `[-88.2, 37.6] z4.05 p42` | Draw 7 corridor arcs with 130ms stagger and endpoint labels. |
-| 4 | Four centuries in ten seconds | `[-95.2, 39.2] z3.5 p0` | Decade sweep, 190ms per decade, pins refilling. |
+| 4 | Four centuries in ten seconds | `[-95.2, 39.2] z3.5 p0` | Plate crossdissolves to empty, holds, then the decade sweep refills it cumulatively at 190ms per decade. |
 | 5 | Your turn | `[-96.5, 38.6] z3.4 p0` | Hand off to Atlas or Near me. |
 
 Mechanics:
@@ -321,7 +323,7 @@ v6 rationed copper by count. v9 assigns it by **role**, which is what actually c
 | Structure | `--rule` / `--rule-2` | Hairlines, panel borders, gridlines |
 | Evidence | `--ok` / `--warn` / `--note` | Grade A / B / C, **always paired with a glyph shape** |
 
-Hard rules kept from v6: raw Copper Pin never carries body-size text on light canvas; colour is never the only signal; confidence stays glyph-encoded.
+Hard rules kept from v6: raw Copper Pin never carries body-size text on light canvas; color is never the only signal; confidence stays glyph-encoded.
 
 ---
 
@@ -349,7 +351,7 @@ Not allowed: mono and serif in the same line; three families inside one card com
 - Camera readout is `role="status" aria-live="polite"`
 - Palette is `role="dialog" aria-modal="true"` with focus trap and restore
 - Record sheet is a non-modal `role="dialog"`; the map stays operable behind it
-- `prefers-reduced-motion` honoured at the CSS level (`.01ms` durations) **and** the camera level
+- `prefers-reduced-motion` honored at the CSS level (`.01ms` durations) **and** the camera level
 - Map failure degrades to the accessible record list; never a blank screen
 - All contrast ≥ 4.5:1 for text, ≥ 3:1 for UI boundaries, verified in both themes
 
@@ -373,7 +375,7 @@ Not allowed: mono and serif in the same line; three families inside one card com
 | Save / cite / share | Absent | First-class, keyboard-driven |
 | Legend | Color key tab | Palette + sheet, at point of use |
 
-**Carried forward unchanged:** brand tokens, type registers, 44px targets, dignity and precision rules, cognitive-accessibility labelled-facts law, record anatomy, reduced-motion respect, WCAG AA floor, official brand artwork paths, ADR-017 handoff, shareable-URL-without-viewport rule.
+**Carried forward unchanged:** brand tokens, type registers, 44px targets, dignity and precision rules, cognitive-accessibility labeled-facts law, record anatomy, reduced-motion respect, WCAG AA floor, official brand artwork paths, ADR-017 handoff, shareable-URL-without-viewport rule.
 
 ---
 

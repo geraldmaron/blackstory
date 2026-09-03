@@ -131,7 +131,7 @@
 /*
  * Camera readout, bottom-left. Transient, `role="status"`. §5.7.
  *
- * It used to sit centred above the time panel, which is dead centre of the plate — the one place
+ * It used to sit centered above the time panel, which is dead center of the plate — the one place
  * a reader is looking. It is plate metadata, so it joins the plate's own metadata corner: stacked
  * above the dock chips and the attribution, all three on the same left gutter.
  */
@@ -161,7 +161,7 @@
 
 /*
  * Dock, bottom left: chips to restore a hidden panel (§5.7). It sits above the attribution rather
- * than beside it — both belong bottom-left, but attribution is a licence obligation that has to
+ * than beside it — both belong bottom-left, but attribution is a license obligation that has to
  * stay legible, so the dock yields the corner.
  */
 .ds-atlas__dock {
@@ -180,9 +180,14 @@
  * happen on the one control that undoes the reader's last action.
  */
 .ds-atlas__dock button {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
   min-height: 44px;
   min-width: 44px;
-  padding: 0 var(--ds-space-3);
+  padding: var(--ds-space-1) var(--ds-space-3);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-full);
   background: var(--ds-surface);
@@ -194,6 +199,19 @@
 
 .ds-atlas__dock button:hover {
   border-color: var(--ds-border-strong);
+}
+
+.ds-atlas__dock-label {
+  line-height: 1;
+}
+
+/* The peek — what a hidden Lens/Results still says about itself while closed: filter and result
+   counts, so the chip is a live instrument reading, not just a label that remembers a name. */
+.ds-atlas__dock-detail {
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  line-height: 1;
+  color: var(--ds-ink-muted);
 }
 
 /*
@@ -225,6 +243,13 @@
   background: var(--ds-accent);
   color: var(--ds-canvas);
   font-weight: 500;
+}
+
+.ds-atlas__dock[data-switcher] button[aria-pressed='true'] .ds-atlas__dock-detail {
+  /* The muted mono gray has poor contrast on the accent fill; the pressed chip's own (already
+     light) ink color reads fine at the smaller size instead. */
+  color: inherit;
+  opacity: 0.75;
 }
 
 @media (max-width: 819px) {
@@ -317,7 +342,7 @@
 /*
  * Before the catalog arrives (`AtlasLoader`): the plate is already on screen underneath, so the
  * pending state is one small status pill where the camera readout normally sits, not a blank
- * page. The error state reuses the design-system notice, centred, and is the only interactive
+ * page. The error state reuses the design-system notice, centered, and is the only interactive
  * child, so it takes its events back the same way every instrument does.
  */
 .ds-atlas--pending .ds-atlas__pending {

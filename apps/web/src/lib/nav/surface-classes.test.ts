@@ -46,7 +46,7 @@ describe('surface class resolution', () => {
     assert.equal(surfaceClassFor('/explore?state=DC'), 'instrument');
   });
 
-  it('does not classify /story, which was deprecated in favour of the Explore story mode', () => {
+  it('does not classify /story, which was deprecated in favor of the Explore story mode', () => {
     // A classified path with no registry entry fails the coverage test, and a registry entry for
     // a route that never renders puts a 404 in the palette. Story is neither: it is a mode of
     // `/explore`.

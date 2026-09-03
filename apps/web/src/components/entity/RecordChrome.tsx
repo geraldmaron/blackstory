@@ -6,7 +6,7 @@
  * Every icon here travels with a visible word (WCAG 1.4.1): a pill is icon plus label, a tile
  * is icon plus label plus value, a meter is bars plus the word it measures. Icons come from the
  * same Font Awesome sets Explore already uses (`kind-icons.ts`, `status-icons.ts`,
- * `confidence-icons.ts`), so a person carries the same icon here as on any labelled badge.
+ * `confidence-icons.ts`), so a person carries the same icon here as on any labeled badge.
  *
  * The map itself, and the narrow chrome that sits beside it, deliberately do not use these icons.
  * A results row gives the kind an 18px column with no room for a word, so it draws the geometric

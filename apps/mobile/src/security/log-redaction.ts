@@ -42,7 +42,7 @@ const SENSITIVE_KEY_PATTERNS: readonly RegExp[] = [
 
 /**
  * Value-level patterns for sensitive data that might appear under an
- * innocuous or unknown key (defence in depth against mis-keyed leaks).
+ * innocuous or unknown key (defense in depth against mis-keyed leaks).
  */
 const SENSITIVE_VALUE_PATTERNS: readonly RegExp[] = [
   // JWT-shaped token (three base64url segments) — App Check tokens.

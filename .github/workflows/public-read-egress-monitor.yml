@@ -9,7 +9,7 @@
 # Same shape and same reasoning as canonical-convergence-monitor.yml: a scheduled check that
 # FAILS on breach, because GitHub notifies watchers of scheduled-workflow failures by default.
 # It is read-only against the database apart from its own watermark row in
-# bb_ops.public_read_egress_watermark, and it never changes application behaviour.
+# bb_ops.public_read_egress_watermark, and it never changes application behavior.
 #
 # Requires the HOSTED_DATABASE_URL secret (the same one canonical-convergence-monitor.yml uses).
 # If it is ever removed, this job fails closed with a clear message rather than reporting green.

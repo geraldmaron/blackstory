@@ -153,7 +153,7 @@ test('every label halo widens over imagery, in both schemes', () => {
 
 test('label and boundary ink is re-toned for imagery, in the direction the scheme needs', () => {
   // Light lifts the imagery toward white and inks it black; dark pulls it toward the archive's
-  // near-black and inks it paper. Asserting they merely "differ" would pass if both went grey.
+  // near-black and inks it paper. Asserting they merely "differ" would pass if both went gray.
   const lightInk = layerById(build(true, 'light'), 'plate-place-city').paint?.['text-color'];
   const darkInk = layerById(build(true, 'dark'), 'plate-place-city').paint?.['text-color'];
   assert.equal(lightInk, '#0A0A0A');

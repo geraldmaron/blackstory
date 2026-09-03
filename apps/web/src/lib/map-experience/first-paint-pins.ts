@@ -120,10 +120,27 @@ export function resolveDoorPinTarget(
   return placeHref.length > 0 ? placeHref : null;
 }
 
+/** The record's earliest documented decade, as a start year, from its era buckets. */
+function earliestDecadeOf(eraBuckets: readonly string[]): number | null {
+  let earliest: number | null = null;
+  for (const bucket of eraBuckets) {
+    const year = Number.parseInt(bucket, 10);
+    if (!Number.isFinite(year)) continue;
+    if (earliest === null || year < earliest) earliest = year;
+  }
+  return earliest;
+}
+
 function firstPaintProperties(
   properties: ExploreMapFeatureProperties,
   pinId: string,
 ): ExploreMapFeatureProperties {
+  /*
+   * The era buckets themselves stay out of the first document: they are a list per pin across
+   * four thousand pins, and nothing on first paint reads them. The Door's decade sweep does need
+   * to know when each pin enters the record, so the one number it needs rides along instead.
+   */
+  const earliestDecade = earliestDecadeOf(properties.eraBuckets);
   return {
     entityId: pinId,
     href: publicPinHref(properties),
@@ -133,6 +150,7 @@ function firstPaintProperties(
     precision: properties.precision,
     geoPrecisionTier: properties.geoPrecisionTier,
     eraBuckets: [],
+    ...(earliestDecade !== null ? { earliestDecade } : {}),
     evidenceCount: 0,
     confidenceTier: 'unrated',
     topicTags: [],

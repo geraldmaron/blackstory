@@ -61,7 +61,7 @@ The Atlas and Story. The map is the content: one full viewport live plate with o
 
 **Chrome.** Command bar, Lens, Results rail, Time, Camera console, Dock, readout, legend overlay, attribution pill, record sheet in its over-plate posture, palette, shortcut sheet, collections drawer, toasts, onboarding hint. No site header. A footer only at the end of Story's outro.
 
-**Map behaviour.** Live. Reader driven pan and zoom, all seven camera moves subject to both the move-level dignity gate and the new composition-level gate, decade sweep, corridor arcs, spotlight. Camera padding follows open panels via `chrome-padding.ts`. Presence only in the sweep, never harm density. No memorial names are painted on the plate.
+**Map behavior.** Live. Reader driven pan and zoom, all seven camera moves subject to both the move-level dignity gate and the new composition-level gate, decade sweep, corridor arcs, spotlight. Camera padding follows open panels via `chrome-padding.ts`. Presence only in the sweep, never harm density. No memorial names are painted on the plate.
 
 **Entry and exit.** Enter from anywhere with the `A` key, the bar's brand lockup, the palette's Go section, or any deep link. Leave by opening a record (`Enter` goes to `/entity/[id]`), by a palette destination, or through Story's outro footer. `ESC` unwinds palette, then overlay, then spotlight, then sheet, and never navigates. Single-key camera and time bindings are live only while focus is inside the instrument's `main` landmark.
 
@@ -71,7 +71,7 @@ Long form, catalogue and index editorial on paper. One scrolling, measure limite
 
 **Chrome.** Command bar (slim), reading progress rule, record sheet in its in-document posture, palette, collections, toasts, site footer. No Lens, Results, Time or Camera console.
 
-**Map behaviour.** Parked by default. One Framed slot at a time: a map moment scrolled into view borrows the persistent plate, flies to its subject at stored precision, and releases it on exit. Reduced motion cuts instead of flying. No spotlight, no orbit, no sweep, no push in.
+**Map behavior.** Parked by default. One Framed slot at a time: a map moment scrolled into view borrows the persistent plate, flies to its subject at stored precision, and releases it on exit. Reduced motion cuts instead of flying. No spotlight, no orbit, no sweep, no push in.
 
 **Entry and exit.** Enter from the palette, the footer, an Atlas record's related links, or a catalogue card. Every reading room closes with a records off ramp into the Atlas or `/records`. The `A` key opens the page's subject on the Atlas; `ESC` closes an open record sheet and returns focus to the chip that opened it.
 
@@ -81,7 +81,7 @@ One catalogued thing with a place, an era and evidence: an entity, a banned book
 
 **Chrome.** Command bar, framed place or jurisdiction plate, record anatomy in inline rows, trust block, sources, connections, chapters that cite this record, session prev and next, palette, collections, toasts, footer.
 
-**Map behaviour.** Framed. The persistent plate insets into the record's place frame and flies there at stored precision, never sharper, with the coarsening stated. Gestures locked until the reader presses **Explore this place**, which hands the plate to the Atlas. Violence adjacent records get a plain `flyTo` and nothing else; person records never get spotlight.
+**Map behavior.** Framed. The persistent plate insets into the record's place frame and flies there at stored precision, never sharper, with the coarsening stated. Gestures locked until the reader presses **Explore this place**, which hands the plate to the Atlas. Violence adjacent records get a plain `flyTo` and nothing else; person records never get spotlight.
 
 **Entry and exit.** Enter from an Atlas row or sheet, a palette record hit, a `/records` row, a catalogue card, a chapter citation, or an external link. `J` and `K` step the result set the reader arrived with, `A` returns to the Atlas with this record selected, browser back returns to the referring surface with scroll restored. Deep anchors are URL fragments, never query params.
 
@@ -91,7 +91,7 @@ Task surfaces: forms, receipts, legal text, credits, fixtures and failure states
 
 **Chrome.** Command bar, utility edition card stack, palette, toasts, footer. No instruments, no plate, no atmosphere beyond the shared grain.
 
-**Map behaviour.** Parked and hidden. No camera work and no GL cost while the surface is on screen.
+**Map behavior.** Parked and hidden. No camera work and no GL cost while the surface is on screen.
 
 **Entry and exit.** Enter from the palette, the footer, a contextual call to action, or a redirect. Every utility ends with at least one named next step, never a bare confirmation. Only chorded bindings are live here by construction, so no unmodified key can fire while a reader is filling a form. The `A` key is disabled where there is no subject.
 
@@ -99,7 +99,7 @@ Task surfaces: forms, receipts, legal text, credits, fixtures and failure states
 
 Non rendered public routes: redirects, JSON and text responses, feeds and crawler files. No chrome by definition. They are listed because the resolution map has to cover the whole public surface, and because three of the site's live defects live here.
 
-**Chrome.** None. **Map behaviour.** None.
+**Chrome.** None. **Map behavior.** None.
 
 **Entry and exit.** Reached by the Atlas client, a crawler, a feed reader, or a stale bookmark. Human facing endpoints are linked from the surface that owns them; redirects land the reader on a working surface with their intent preserved in the query string.
 
@@ -426,7 +426,7 @@ Each of these gets a pattern doc under `docs/ui/` and a row in [`README.md`](./R
 | **Reading room chrome** | Measure limited paper column, progress rule, hairline section rules, one `h1`, and a mandatory records off ramp in the foot of every instance so no editorial surface is a dead end. |
 | **Jurisdiction plate** | For records whose Where is a jurisdiction rather than a point, render the outline rather than a pin, with a precision note that says a jurisdiction is not a location. |
 | **Composition dignity gate** | The archive refuses to compose a harm-density image, not just to dramatise one record. Under a violence-constrained lens, area fills and choropleths refuse to paint, records stay discrete points, unselected spotlight and trace are refused, and every refusal states its reason in visible text. |
-| **Encoding key completeness** | Any channel the map uses to carry meaning must appear in the legend with a text label and, for a tier, its numeric range. A fill with no shape channel and no key is colour-only encoding and does not ship. |
+| **Encoding key completeness** | Any channel the map uses to carry meaning must appear in the legend with a text label and, for a tier, its numeric range. A fill with no shape channel and no key is color-only encoding and does not ship. |
 | **Destination registry** | One list of public destinations consumed by the palette, the footer, the `/about` destinations block and the sitemap, with a test that fails when a public route is missing and a test that fails when the sitemap emits a duplicate `url`. |
 | **Deep anchors are fragments** | A highlighted claim or source anchor is a URL fragment, never a query param, so it survives middleware, stays out of the CDN cache key and cannot fragment the canonical. |
 | **Generated allowlists** | Any list that must mirror another list is generated from it and guarded by a drift test. Applies to the query allowlist against the URL parser, the shortcut sheet against the command registry, the sitemap against the destination registry, and `/ai.txt` against `robots.ts`. |
@@ -521,7 +521,7 @@ Twenty packages. SP-01 to SP-03 extend the mock (room layer and registry, palett
 - [ ] `/records?page=N` is self-canonical with rel prev and next; every page is in the sitemap
 - [ ] `/story` renders six server-rendered chapters, `/story#chapter-4` activates that chapter, and `?mode=story` 308s here
 - [ ] The Time panel's play control drives the decade sweep; under reduced motion playback is replaced by decade stepping
-- [ ] Enabling Reduce Motion mid-session changes camera behaviour without a reload
+- [ ] Enabling Reduce Motion mid-session changes camera behavior without a reload
 - [ ] A violence-constrained lens refuses the density and choropleth layers with the reason in visible text
 - [ ] `/memorial` has four real inbound links and a persistent in-page control that stops the wall
 - [ ] Every legend tier carries a text label and, for a tier, its numeric range

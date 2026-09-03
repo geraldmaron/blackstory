@@ -10,7 +10,13 @@ import { CameraConsole, type CameraConsoleProps } from './CameraConsole';
 import { COMMANDS, KEYED_CAMERA_MOVES } from '../patterns/command-palette/command-registry';
 
 function consoleProps(overrides: Partial<CameraConsoleProps> = {}): CameraConsoleProps {
-  return { onMove: () => {}, onZoom: () => {}, ...overrides };
+  return {
+    onMove: () => {},
+    onZoom: () => {},
+    bearing: 0,
+    onResetBearing: () => {},
+    ...overrides,
+  };
 }
 
 test('all six keyed moves render', () => {
@@ -38,6 +44,30 @@ test('zoom lives in the console, so the map keeps one control vocabulary', () =>
   const html = renderToStaticMarkup(createElement(CameraConsole, consoleProps()));
   assert.match(html, /aria-label="Zoom in"/);
   assert.match(html, /aria-label="Zoom out"/);
+});
+
+test('the compass sits in the header, not the six-move grid', () => {
+  const html = renderToStaticMarkup(createElement(CameraConsole, consoleProps({ bearing: 0 })));
+  assert.match(html, /class="ds-camera__head"[^]*ds-camera__compass[^]*ds-camera__grid/);
+});
+
+test('the compass reports the live bearing and never disables, regardless of the active record', () => {
+  const html = renderToStaticMarkup(
+    createElement(
+      CameraConsole,
+      consoleProps({
+        bearing: 47,
+        activeRecord: { kind: 'event', mapTone: 'massacre', displayName: 'Lynching of a man' },
+      }),
+    ),
+  );
+  assert.match(html, /aria-label="Reset map to north \(currently facing NE, 47 degrees\)"/);
+  assert.doesNotMatch(html, /class="ds-camera__compass" disabled/);
+});
+
+test('the compass needle rotates opposite bearing so it always points true north', () => {
+  const html = renderToStaticMarkup(createElement(CameraConsole, consoleProps({ bearing: 90 })));
+  assert.match(html, /rotate\(-90deg\)/);
 });
 
 test('with no record selected every move is available', () => {

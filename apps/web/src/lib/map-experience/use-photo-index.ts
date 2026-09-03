@@ -40,12 +40,12 @@ export function usePhotoIndex(url: string, enabled: boolean): PhotoIndex | null 
 
   useEffect(() => {
     if (!enabled) return;
-    let cancelled = false;
+    let canceled = false;
     loadPhotoIndex(url).then((data) => {
-      if (!cancelled && data) setIndex(data);
+      if (!canceled && data) setIndex(data);
     });
     return () => {
-      cancelled = true;
+      canceled = true;
     };
   }, [url, enabled]);
 

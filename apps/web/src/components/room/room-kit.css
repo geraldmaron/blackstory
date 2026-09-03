@@ -77,7 +77,7 @@
 @media (min-width: 68rem) {
   .ds-room__body--railed {
     /* The first track is the column's own measure, not `1fr`. With `1fr` the track ate every
-       spare pixel, `justify-content` had nothing left to centre, and the column — pinned to the
+       spare pixel, `justify-content` had nothing left to center, and the column — pinned to the
        end of that oversized track — sat hard against the rail with the whole surplus dumped in
        the left margin. Sizing the track to the measure makes the pair intrinsically wide, so it
        centres in the viewport the way an unrailed room already does. */
@@ -106,7 +106,7 @@
 /*
  * Below the breakpoint the rail stacks into the doc column's own full-width grid track, and
  * without a measure of its own it rendered edge to edge: a "See it on the map" list or a
- * provenance block spanning the whole viewport directly under prose capped and centred at 680px
+ * provenance block spanning the whole viewport directly under prose capped and centered at 680px
  * — the widest thing on the page sitting right under the narrowest. The rail is the same content
  * offered a second way (see the doc comment above); stacked, it reads as a continuation of that
  * column and takes the column's own measure and centring rather than the viewport's.
@@ -1317,7 +1317,7 @@ a.ds-room-chip {
   transition: border-color var(--ds-duration-base) ease;
 }
 
-/* Live is signalled by the copper edge AND by the tag text, never by colour alone. */
+/* Live is signaled by the copper edge AND by the tag text, never by colour alone. */
 .ds-mapmoment[data-live='1'] .ds-mapmoment__plate {
   border-color: var(--ds-accent-graphic);
   /*

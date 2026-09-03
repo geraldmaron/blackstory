@@ -16,7 +16,7 @@
  *
  * The chapter had two competing widths: the room's doc track at `--room-doc-w: 900px` and the
  * article's own `--ds-content-max` (38rem = 608px). The prose therefore rendered 608px wide,
- * centred inside a 900px track, while the masthead ran full-bleed and the rail sat off past the
+ * centered inside a 900px track, while the masthead ran full-bleed and the rail sat off past the
  * track's end — so nothing on the page shared a left edge and the whole column read as though it
  * had been dropped in at random. The redesign comp names this exact defect and specifies one
  * 680px measure, which is what both variables are set to here.

@@ -2,7 +2,7 @@
  * The Lens handoff builder — the one typed path a reading room uses to hand a subject to
  * Explore (docs/ui/patterns-lens-handoff.md §1-2). No surface hand writes an Explore href: a hand
  * written one drifts from `EXPLORE_URL_PARAM_KEYS` the moment that allowlist changes, and the
- * reader silently loses whatever param the middleware does not recognise.
+ * reader silently loses whatever param the middleware does not recognize.
  *
  * `/law` and `/law/[slug]` are this module's first two consumers (SP-11d, SP-12c). Both need a
  * reason string that names jurisdiction and era without asserting the archive documented cause

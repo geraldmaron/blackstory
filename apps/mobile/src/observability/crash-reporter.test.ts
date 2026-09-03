@@ -90,7 +90,7 @@ describe('reportError — redaction pipeline is mandatory (privacy invariant 7)'
     expect(serialized).not.toContain('eyJhbGciOiJIUzI1NiJ9');
   });
 
-  it('scrubs a sensitive value smuggled under an innocuous key (defence in depth)', () => {
+  it('scrubs a sensitive value smuggled under an innocuous key (defense in depth)', () => {
     reportError(new Error('x'), {
       context: {
         debugField:

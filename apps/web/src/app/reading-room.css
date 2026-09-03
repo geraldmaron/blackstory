@@ -368,7 +368,7 @@ a.ds-errata__row-id {
   border-top: var(--ds-border-width) solid var(--room-rule-2);
 }
 
-/* The Lookup section nests Identifiers and Provenance as their own labelled sub-sections
+/* The Lookup section nests Identifiers and Provenance as their own labeled sub-sections
    (`ids-heading`, `provenance-heading`). Unstyled, they inherited no separation either, so
    "Purchase and identifiers", "Identifiers" and "Provenance" ran together as one block. A
    lighter echo of the section rule reads them as two distinct fact groups under the same

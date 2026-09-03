@@ -12,9 +12,10 @@
  */
 'use client';
 
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { cx } from '@repo/ui';
-import { CHAPTER_INTERSECTION_THRESHOLD, type StoryChapter } from '../../lib/story/chapters';
+import type { StoryChapter } from '../../lib/story/chapters';
+import { useChapterObserver } from '../../lib/story/use-chapter-observer';
 import { COLD_OPEN_WORDS, copyFor, headingParts } from './story-copy';
 import type { StoryRecordSpotlight } from '../../lib/story/pick-story-record';
 import type { StoryFact } from '../../lib/story/story-facts';
@@ -125,36 +126,8 @@ export function StoryMode({
   className,
 }: StoryModeProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const onChapterRef = useRef(onChapter);
-  onChapterRef.current = onChapter;
-  // The observer resolves an index back to a chapter, so it has to read the same running order the
-  // renderer used rather than the authored pool.
-  const chaptersRef = useRef(chapters);
-  chaptersRef.current = chapters;
 
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!active || !root || typeof IntersectionObserver === 'undefined') return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // Most-visible wins. Two chapters can cross the threshold at once mid-scroll, and firing
-        // both would hand the camera two destinations in the same frame.
-        const winner = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (!winner) return;
-        const index = Number((winner.target as HTMLElement).dataset.chapter);
-        const chapter = chaptersRef.current[index];
-        if (chapter) onChapterRef.current(chapter);
-      },
-      { root, threshold: CHAPTER_INTERSECTION_THRESHOLD },
-    );
-
-    for (const section of root.querySelectorAll('[data-chapter]')) observer.observe(section);
-    return () => observer.disconnect();
-    // Re-observes when the running order changes: the sections themselves are different elements.
-  }, [active, chapters]);
+  useChapterObserver(rootRef, chapters, onChapter, { active, scrollRoot: 'self' });
 
   const scrollToChapter = useCallback(
     (index: number) => {
@@ -182,7 +155,7 @@ export function StoryMode({
         return (
           <section
             key={chapter.id}
-            className={cx('ds-story__chapter', chapter.centred && 'ds-story__chapter--centred')}
+            className={cx('ds-story__chapter', chapter.centered && 'ds-story__chapter--centered')}
             data-chapter={chapter.index}
             aria-labelledby={`ds-story-heading-${chapter.id}`}
           >
@@ -196,7 +169,7 @@ export function StoryMode({
                 </>
               ) : (
                 <>
-                  {chapter.centred ? null : (
+                  {chapter.centered ? null : (
                     <span className="ds-story__index" aria-hidden="true">
                       {String(chapter.index).padStart(2, '0')}
                     </span>

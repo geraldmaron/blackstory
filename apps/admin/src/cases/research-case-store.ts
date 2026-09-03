@@ -16,6 +16,7 @@ import {
 import { ledgerPaths } from '@repo/data-access';
 import { commitWithAuditPostgres } from '@/lib/postgres-commit';
 import {
+  countCasesByStatePostgres,
   listCaseIdsPostgres,
   loadResearchCaseDocument,
   writeResearchCasePostgres,
@@ -99,6 +100,17 @@ export async function tryListAdminResearchCases(
     return await listAdminResearchCases(options);
   } catch (error) {
     console.error('admin researchCases list failed', error);
+    return null;
+  }
+}
+
+export async function tryCountAdminResearchCases(
+  states: readonly ResearchCaseState[] = INBOX_CASE_STATES,
+): Promise<number | null> {
+  try {
+    return await countCasesByStatePostgres(states);
+  } catch (error) {
+    console.error('admin researchCases count failed', error);
     return null;
   }
 }

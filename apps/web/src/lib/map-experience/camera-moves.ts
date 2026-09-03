@@ -46,6 +46,10 @@ export const CAMERA_MOVE_DURATIONS = {
 /** Pitch the tilt move toggles between. */
 const TILT_PITCH = 55;
 const TILT_FLAT_THRESHOLD = 20;
+
+/** How long `resetBearing`'s ease takes to bring the plate back to north. Shorter than `tilt`'s
+ * — this is a correction, not a establishing move, and should read as a snap-back, not a shot. */
+const RESET_BEARING_DURATION_MS = 500;
 /** Orbit raises the plate before rotating, so the rotation reads as orbit rather than spin. */
 const ORBIT_PITCH = 46;
 const ORBIT_PITCH_THRESHOLD = 24;
@@ -148,6 +152,9 @@ export type CameraApi = {
   spotlight(options?: SpotlightOptions): void;
   trace(options?: TraceOptions): void;
   flyToRecord(record: RecordTarget, options?: MoveOptions): void;
+  /** Straightens the plate to north, holding center/zoom/pitch. Ungated — never refused by the
+   * dignity gate. */
+  resetBearing(options?: MoveOptions): void;
   /** Cancels any in-flight scripted move. Reader input always wins (§4.2 rule 7). */
   cancel(): void;
   /** True while the spotlight mask is up. */
@@ -250,7 +257,7 @@ export function createCamera(deps: CameraDeps): CameraApi {
       duration: durationFor(options?.durationMs, CAMERA_MOVE_DURATIONS.push),
       essential: isEssential(options),
     });
-    announce(`Push in · ${options?.label ?? 'centre'}`);
+    announce(`Push in · ${options?.label ?? 'center'}`);
   }
 
   function orbit(options?: OrbitOptions): void {
@@ -329,6 +336,23 @@ export function createCamera(deps: CameraDeps): CameraApi {
     announce(count === undefined ? 'Trace · corridors' : `Trace · ${count} corridors`);
   }
 
+  /**
+   * Straightens the plate to north, holding center, zoom and pitch. Not one of the six gated
+   * moves (design-direction-v9-atlas.md §5.5's grid is locked to those six) — this is the
+   * compass control's own action, and it is never refused: undoing a rotation is not camera
+   * drama, it is returning the map to its resting orientation.
+   */
+  function resetBearing(options?: MoveOptions): void {
+    cancel();
+    map.easeTo({
+      bearing: 0,
+      duration: durationFor(options?.durationMs, RESET_BEARING_DURATION_MS),
+      easing: CAMERA_EASING_SLOW_OUT,
+      essential: isEssential(options),
+    });
+    announce('North · reset');
+  }
+
   function flyToRecord(record: RecordTarget, options?: MoveOptions): void {
     cancel();
     map.flyTo({
@@ -354,6 +378,7 @@ export function createCamera(deps: CameraDeps): CameraApi {
     spotlight,
     trace,
     flyToRecord,
+    resetBearing,
     cancel,
     isSpotlit: () => spotlit,
   };

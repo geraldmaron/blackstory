@@ -37,7 +37,7 @@ describe('createDebouncer — rapid typing collapses to one call', () => {
     const debouncer = createDebouncer<string>((v) => fired.push(v), 300, timers);
 
     // Simulate keystrokes 50ms apart -- each one well within the 300ms window, so every prior
-    // pending timer is cancelled and replaced.
+    // pending timer is canceled and replaced.
     debouncer.schedule('h');
     timers.advance(50);
     debouncer.schedule('he');

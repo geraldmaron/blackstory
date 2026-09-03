@@ -73,12 +73,12 @@ export function useOrderedEntityIds(
   );
 
   useEffect(() => {
-    let cancelled = false;
+    let canceled = false;
     void loadOrderedEntityIds(deps, entity, currentId).then((ids) => {
-      if (!cancelled) setOrderedIds(ids);
+      if (!canceled) setOrderedIds(ids);
     });
     return () => {
-      cancelled = true;
+      canceled = true;
     };
   }, [currentId, deps, entity]);
 

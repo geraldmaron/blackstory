@@ -65,7 +65,7 @@ const KIND_LABELS: Record<string, string> = { chapter: 'Chapter', article: 'Entr
 
 /**
  * What the lead is leading on. The lead story is whatever sits at the top of the current view, so
- * the flag has to name the sort that put it there rather than assert an editorial judgement the
+ * the flag has to name the sort that put it there rather than assert an editorial judgment the
  * page has not made: under "newest" it is the newest chapter, under a collection order it is
  * where the collection starts.
  */

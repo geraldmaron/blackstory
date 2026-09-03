@@ -7,7 +7,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { RelationshipConstellation } from './RelationshipConstellation';
 
-test('renders typed edges as diagram nodes and a labelled list', () => {
+test('renders typed edges as diagram nodes and a labeled list', () => {
   const html = renderToStaticMarkup(
     createElement(RelationshipConstellation, {
       centerLabel: 'Dunbar High School',

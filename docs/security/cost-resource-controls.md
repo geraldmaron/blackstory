@@ -45,7 +45,7 @@ no changed file can reach that project's deployed bundle.
 Measured against Aug 2026 history (per commit): **60% of commits skippable for web, 78% for admin**.
 Realized saving depends on push granularity — the rule is evaluated per *deployment*, so a push
 batching one relevant commit with twenty irrelevant ones still builds. A day-batched simulation
-skips only 2 of 21 days. Actual behaviour sits between those bounds.
+skips only 2 of 21 days. Actual behavior sits between those bounds.
 
 The script **fails open**: every uncertain branch builds. A needless build costs cents; a wrongly
 skipped build means production silently does not get the fix and nothing reports it.
@@ -53,8 +53,8 @@ skipped build means production silently does not get the fix and nothing reports
 ## Cloudflare edge cache posture
 
 `blackstory.app` is **Cloudflare-proxied** (orange cloud) in front of Vercel, on the **Free**
-plan. Zone `653abe0dbd1b10d22411306cb1f645be`. The cutover runbook's DNS row said grey cloud /
-DNS-only until 2026-08-24; that was stale, and it mattered — grey cloud would make every rule
+plan. Zone `653abe0dbd1b10d22411306cb1f645be`. The cutover runbook's DNS row said gray cloud /
+DNS-only until 2026-08-24; that was stale, and it mattered — gray cloud would make every rule
 below a no-op.
 
 **Cache rule** (ruleset `fbba310d91a3483f88cc5686b25684e1`, phase `http_request_cache_settings`):
@@ -96,7 +96,7 @@ than deleted so its intent can be recovered before someone re-creates it.
 
 Two things that settle long-standing questions:
 
-**Vercel DOES honour a route handler's `s-maxage`** (`repo-27nn`). The whole 2026-08-22 shell/catalog
+**Vercel DOES honor a route handler's `s-maxage`** (`repo-27nn`). The whole 2026-08-22 shell/catalog
 split rested on that premise and it had never been tested, because a dynamic *page* has its header
 overwritten with `no-store`. A route handler keeps its own. Confirmed.
 

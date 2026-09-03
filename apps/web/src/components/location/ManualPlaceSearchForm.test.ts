@@ -1,6 +1,6 @@
 /**
  * SSR markup smoke test for ManualPlaceSearchForm (always-available re-entry point).
- * Confirms the address/ZIP field is properly labelled (WCAG: `<label for>` bound to the input)
+ * Confirms the address/ZIP field is properly labeled (WCAG: `<label for>` bound to the input)
  * and that helper text / disabled state render.
  */
 import assert from 'node:assert/strict';
@@ -15,7 +15,7 @@ const { createElement } = React;
 // `./LocationConsentButton.test.ts`'s identical note.
 (globalThis as Record<string, unknown>).React = React;
 
-test('renders a labelled address/ZIP search field with a submit action', () => {
+test('renders a labeled address/ZIP search field with a submit action', () => {
   const html = renderToStaticMarkup(createElement(ManualPlaceSearchForm, { onSubmit: () => {} }));
   assert.match(html, /<label[^>]*for="locate-address"/);
   assert.match(html, /<input[^>]*id="locate-address"/);

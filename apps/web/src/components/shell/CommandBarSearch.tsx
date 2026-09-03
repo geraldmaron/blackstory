@@ -12,7 +12,7 @@
  * limits are the endpoint's rather than a second implementation's.
  *
  * Explore keeps its palette: there, a record selection also has to move the map, which is a
- * behaviour this component deliberately does not know about.
+ * behavior this component deliberately does not know about.
  *
  * It does own `⌘K` and `/` off Explore, and that is not a convenience. The palette's own opener
  * lives inside `CommandPalette`, which only Explore mounts, so on the other twelve rooms the
