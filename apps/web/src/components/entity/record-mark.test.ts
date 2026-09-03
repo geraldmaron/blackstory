@@ -8,6 +8,7 @@ import {
   RECORD_MARK_CAPTION_DATA_SAVER,
   RECORD_MARK_CAPTION_UNAVAILABLE,
   entityPrimaryImageAlt,
+  isPortraitPrimaryImage,
   kindLabelForMark,
   primaryImageCreditCaption,
   primaryImageFocalClass,
@@ -140,6 +141,22 @@ test('primaryImageSourceLine omits the license segment when absent', () => {
     sourcePageUrl: 'https://commons.wikimedia.org/wiki/File:Rosa_Parks.jpg',
   });
   assert.equal(line?.label, 'Source: Wikimedia Commons');
+});
+
+test('isPortraitPrimaryImage flags a source photo too tall to cover-crop into the masthead banner', () => {
+  // David Paterson's pinned Wikimedia photo (repo-observed regression): a portrait close to 3:4
+  // cover-cropped into the wide masthead band showed only forehead and hairline.
+  assert.equal(isPortraitPrimaryImage(1105, 1570), true);
+  assert.equal(isPortraitPrimaryImage(1600, 900), false, 'a 16:9 landscape photo is not portrait');
+  assert.equal(isPortraitPrimaryImage(1000, 1000), false, 'a square photo stays on the cover crop');
+});
+
+test('isPortraitPrimaryImage is false when dimensions are not yet known', () => {
+  // Pinned Wikimedia thumbnails fetched at view time do not carry dimensions ahead of render;
+  // the masthead must default to the existing cover-crop rather than guess.
+  assert.equal(isPortraitPrimaryImage(undefined, undefined), false);
+  assert.equal(isPortraitPrimaryImage(1105, undefined), false);
+  assert.equal(isPortraitPrimaryImage(undefined, 1570), false);
 });
 
 test('primaryImageSourceLine is undefined for legacy images with no pin fields', () => {

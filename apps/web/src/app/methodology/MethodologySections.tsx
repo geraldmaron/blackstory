@@ -11,6 +11,13 @@ import { formatCitation } from '../../lib/citation/format';
 import { GroupHeading, Note, Prose, RoomHeader } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import {
+  EvidenceConvergenceDiagram,
+  MapPrecisionDiagram,
+  RecordDataModelDiagram,
+  RecordIntakeDiagram,
+  SiteStructureDiagram,
+} from './MethodologyDiagrams';
+import {
   DIGNITY_RULES,
   EVIDENCE_GRADE_DEFINITIONS,
   LIMITATION_RULES,
@@ -19,6 +26,7 @@ import {
   METHODOLOGY_MISSION_BEATS,
   METHODOLOGY_PAGE_SECTIONS,
   METHODOLOGY_PUBLISH_RULES,
+  METHODOLOGY_STRUCTURE_LEDE,
   VERIFICATION_STEPS,
 } from './methodology-copy';
 
@@ -80,6 +88,7 @@ export function MethodologySections() {
             person is me.
           </p>
         </Prose>
+        <RecordIntakeDiagram />
         <ul className="ds-stack">
           {METHODOLOGY_MISSION_BEATS.map((beat) => (
             <li key={beat.kicker}>
@@ -120,6 +129,7 @@ export function MethodologySections() {
             </li>
           ))}
         </ul>
+        <EvidenceConvergenceDiagram />
         <Notice tone="warning" title="Crime statistics never enter this score">
           A record&apos;s grade is measured on independence and proximity to the event alone. Crime
           statistics and violence-adjacent framing never factor into it.
@@ -144,12 +154,24 @@ export function MethodologySections() {
             are not drawn at all.
           </p>
         </Prose>
+        <MapPrecisionDiagram />
         <ol className="ds-stack" aria-label="Map dignity rules">
           {DIGNITY_RULES.map((rule) => (
             <li key={rule}>{rule}</li>
           ))}
         </ol>
         <Note kind="LIMITATIONS">{LIMITATION_RULES.join(' ')}</Note>
+      </section>
+
+      <section aria-labelledby="how-it-holds-together-heading" id="how-it-holds-together">
+        <GroupHeading>
+          <span id="how-it-holds-together-heading">How it holds together</span>
+        </GroupHeading>
+        <Prose>
+          <p>{METHODOLOGY_STRUCTURE_LEDE}</p>
+        </Prose>
+        <RecordDataModelDiagram />
+        <SiteStructureDiagram />
       </section>
 
       <section aria-labelledby="living-person-protection-heading" id="living-person-protection">

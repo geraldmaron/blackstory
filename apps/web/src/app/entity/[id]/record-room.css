@@ -7,13 +7,13 @@
  * with `RecordChrome.tsx`.
  *
  * ONE SCALE. Every size in the record is one of the `--rec-*` tokens, which now live beside the
- * component that spends them (`components/entity/record-chrome.css`) so the Atlas sheet can wear
+ * component that spends them (`components/entity/record-chrome.css`) so the Explore sheet can wear
  * the same pills. The page used to carry eleven distinct body sizes between the masthead and the
  * footer, which is the specific reason it read as assembled rather than designed. A block that
  * needs a new size adds a token there, not a literal here.
  *
  * ONE ICON LANGUAGE. Pills, tiles, beat headings and apparatus titles all draw from
- * `RecordChrome.tsx`, which draws from the Atlas's own kind / status / confidence icon sets, so
+ * `RecordChrome.tsx`, which draws from Explore's own kind / status / confidence icon sets, so
  * a person is the same glyph on the map, in the pill and on the tile.
  *
  * Not a `*-edition.css`: `room-kit.test.tsx` forbids per-route edition chrome under app/.
@@ -57,6 +57,39 @@
   height: 100%;
   min-height: 0;
   border-radius: 0;
+}
+
+/*
+ * A tall source photo (portrait aspect, most person headshots and many press photos) cannot
+ * cover-crop into this wide banner without losing the subject: the visible window shrinks to a
+ * sliver of the image's height, and no single guessed focal percentage can promise the subject
+ * stays in frame. `isPortraitPrimaryImage` (record-mark.ts) flags these ahead of paint whenever
+ * the source dimensions are known, so instead of guessing a crop, the whole photograph is kept:
+ * a blurred, darkened cover fill of the same image carries the edge-to-edge banner, and the
+ * sharp photo sits over it at `contain`, centered and complete.
+ */
+.ds-record-mast[data-media='photo'] .ds-entity-photo--portrait {
+  background: var(--ds-ink);
+}
+
+.ds-record-mast[data-media='photo'] .ds-entity-photo--portrait .ds-entity-photo__backdrop {
+  position: absolute;
+  z-index: 0; /* local: behind the sharp contain-fit photo within this masthead figure only */
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: blur(36px) brightness(0.5) saturate(1.05);
+  transform: scale(1.15);
+}
+
+.ds-record-mast[data-media='photo'] .ds-entity-photo--portrait .ds-entity-photo__img {
+  position: relative;
+  z-index: 1; /* local: above the blurred backdrop within this masthead figure only */
+  object-fit: contain;
+  object-position: center;
+  background: transparent;
 }
 
 /*

@@ -199,3 +199,15 @@ export function primaryImageFocalClass(
 ): 'ds-entity-photo--focal-upper' | 'ds-entity-photo--focal-center' {
   return kind === 'person' ? 'ds-entity-photo--focal-upper' : 'ds-entity-photo--focal-center';
 }
+
+/**
+ * True when the source photo is tall enough that cover-cropping it into the masthead's wide
+ * banner would lose the subject: the crop window becomes a sliver of the image's height, and no
+ * single guessed focal percentage keeps a face (or anything else) in frame. Below this ratio the
+ * masthead switches from a cropped fill to a letterboxed photo over a blurred fill of itself, so
+ * the whole photograph stays visible regardless of where the subject sits in the frame.
+ */
+export function isPortraitPrimaryImage(width?: number, height?: number): boolean {
+  if (!width || !height) return false;
+  return width / height < 0.9;
+}

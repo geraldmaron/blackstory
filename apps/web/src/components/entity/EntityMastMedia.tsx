@@ -6,12 +6,13 @@
  */
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { PublicEntityPrimaryImageView } from '../../data/public-seed';
 import { buildEntityMastImageCandidates } from './entity-mast-image-candidates';
 import { EntityRecordMark } from './EntityRecordMark';
 import {
   entityPrimaryImageAlt,
+  isPortraitPrimaryImage,
   primaryImageCreditCaption,
   primaryImageFocalClass,
   primaryImageSourceLine,
@@ -57,10 +58,30 @@ export function EntityMastMedia({
   hideCredit = false,
 }: EntityMastMediaProps) {
   const [phase, setPhase] = useState<MastPhase>(() => initialPhase(primaryImage));
+  // Known up front whenever the catalog recorded the source dimensions. Pinned Wikimedia
+  // thumbnails (fetched by the reader's own browser) do not carry them ahead of render, so this
+  // starts optimistic (false) and the tracked <img>'s onLoad below corrects it once the real
+  // pixels are known, rather than risk a cover-crop that could cut off the subject.
+  const [portrait, setPortrait] = useState(() =>
+    isPortraitPrimaryImage(primaryImage?.width, primaryImage?.height),
+  );
+  const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     setPhase(initialPhase(primaryImage));
+    setPortrait(isPortraitPrimaryImage(primaryImage?.width, primaryImage?.height));
   }, [primaryImage]);
+
+  // A cached image can finish loading before this effect (or the onLoad prop below) attaches:
+  // the browser fires its native `load` event on its own schedule, not React's. Checking
+  // `.complete` here catches that race; onLoad below covers the image that is still in flight.
+  useEffect(() => {
+    const el = imgRef.current;
+    if (!el || portrait || !el.complete) return;
+    if (isPortraitPrimaryImage(el.naturalWidth, el.naturalHeight)) {
+      setPortrait(true);
+    }
+  });
 
   useEffect(() => {
     const saveData =
@@ -102,15 +123,27 @@ export function EntityMastMedia({
     ...(image.license !== undefined ? { license: image.license } : {}),
   });
   const focalClass = primaryImageFocalClass(kind);
+  const orientationClass = portrait ? ' ds-entity-photo--portrait' : '';
 
   return (
     <figure
-      className={`ds-entity-photo ${focalClass}`}
+      className={`ds-entity-photo ${focalClass}${orientationClass}`}
       {...(hideCredit ? {} : { 'aria-describedby': creditId })}
     >
+      {portrait ? (
+        // eslint-disable-next-line @next/next/no-img-element -- decorative blurred fill of the same photo, never the tracked/error-handled one
+        <img
+          key={`${src}-backdrop`}
+          src={src}
+          alt=""
+          aria-hidden="true"
+          className="ds-entity-photo__backdrop"
+        />
+      ) : null}
       {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL may be external */}
       <img
         key={src}
+        ref={imgRef}
         src={src}
         alt={alt}
         width={image.width}
@@ -119,6 +152,13 @@ export function EntityMastMedia({
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
         {...(priority ? { fetchPriority: 'high' as const } : {})}
+        onLoad={(event) => {
+          if (portrait) return;
+          const el = event.currentTarget;
+          if (isPortraitPrimaryImage(el.naturalWidth, el.naturalHeight)) {
+            setPortrait(true);
+          }
+        }}
         onError={() => {
           setPhase((current) => {
             if (current.kind !== 'photo') {

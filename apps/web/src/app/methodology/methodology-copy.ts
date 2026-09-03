@@ -43,9 +43,13 @@ export const METHODOLOGY_PAGE_SECTIONS = [
   { id: 'how-a-record-gets-in', label: 'How a record gets in' },
   { id: 'evidence-grades', label: 'Evidence grades' },
   { id: 'how-a-point-is-drawn', label: 'How a point is drawn' },
+  { id: 'how-it-holds-together', label: 'How it holds together' },
   { id: 'living-person-protection', label: 'Living person protection' },
   { id: 'see-it-applied', label: 'See it applied' },
 ] as const;
+
+export const METHODOLOGY_STRUCTURE_LEDE =
+  'Two structures underneath everything above: how one record is put together, and how the site lets you reach it.';
 
 /** The grades in plain English. Shop field names stay off this page. */
 export const EVIDENCE_GRADE_DEFINITIONS = {

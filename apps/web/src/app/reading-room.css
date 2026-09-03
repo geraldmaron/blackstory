@@ -1030,3 +1030,36 @@ a.ds-errata__row-id {
   }
 }
 /* —— end /law browse index rows —————————————————————————————————————————————— */
+
+/* —— /methodology hand-drawn figures ————————————————————————————————————————
+ * Bounded figures in the reading column, styled after the room kit's own MapMoment
+ * plate (hairline border, sunk ground, mono caption with a left rule) rather than the
+ * superseded v6 copper-mosaic sketch. SVG shapes and text sizing live in
+ * MethodologyDiagrams.tsx; this sheet only owns the frame and the caption. */
+.ds-mdiag {
+  margin: var(--ds-space-8) 0;
+}
+
+.ds-mdiag__frame {
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  background: var(--room-sunk);
+}
+
+.ds-mdiag__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: var(--ds-ink);
+}
+
+.ds-mdiag__figcaption {
+  margin-bottom: var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+/* —— end /methodology hand-drawn figures ————————————————————————————————————— */
