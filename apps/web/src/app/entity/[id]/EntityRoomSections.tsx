@@ -34,7 +34,7 @@ import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel'
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { RecordBeatHead } from '../../../components/entity/RecordChrome';
 import { Connections, type RoomConnection } from '../../../components/room';
-import { RelationshipMap } from '../../../components/patterns/RelationshipMap';
+import { RelationshipTree } from '../../../components/patterns/RelationshipTree';
 import { RecordArchiveSources } from '../../../components/patterns/RecordArchiveSources';
 import { humanizeToken } from '../../../components/entity/format';
 import { resolveInternetArchiveSources } from '../../../lib/geography/internet-archive-sources';
@@ -96,10 +96,10 @@ export function recordSectionIndex({
   if (entity.timeline.length > 0) {
     sections.push({ id: 'timeline-heading', label: 'Timeline', count: entity.timeline.length });
   }
-  // One beat when the record has a graph, two when it falls back to the flat lists. The map
+  // One beat when the record has a graph, two when it falls back to the flat lists. The tree
   // already contains everything "Worth investigating next" used to list separately (those were
-  // the second hop), so shipping both would restore the duplication the map removes.
-  const graph = mapGraphFor(entity);
+  // the records one step further out), so shipping both would restore the duplication it removes.
+  const graph = treeGraphFor(entity);
   if (graph) {
     sections.push({
       id: 'related-heading',
@@ -156,7 +156,7 @@ export function renderedBeatCount({
   if (evidenceClaims.length > 0) count += 1;
   if (!firstPaint && hasStatusFor(entity)) count += 1;
   if (entity.timeline.length > 0) count += 1;
-  if (mapGraphFor(entity)) {
+  if (treeGraphFor(entity)) {
     count += 1;
   } else {
     const relatedHeading = firstPaint
@@ -190,12 +190,12 @@ function relationPhrase(relationType: string, direction: 'outgoing' | 'incoming'
 }
 
 /**
- * Map node relations in the door's human vocabulary, keyed by node id.
+ * Connection relations in the door's human vocabulary, keyed by record id.
  *
  * `firstPaintRelation` returns undefined when the stored token would not survive being read
- * aloud; those nodes are simply left out of the map, which then shows the record's name with no
- * phrase under it. Built here rather than passed as a callback because the map is a client
- * component and a server surface cannot hand it a function.
+ * aloud; those records are simply left out, and the tree then shows the record's name with no
+ * phrase above it. Built here rather than passed as a callback so the shape stays serialisable
+ * across the server boundary.
  */
 function firstPaintNodeLabels(entity: PublicEntityView): Record<string, string> {
   const labels: Record<string, string> = {};
@@ -220,17 +220,17 @@ function firstPaintNodeLabels(entity: PublicEntityView): Record<string, string> 
 /**
  * The relationship graph, when it is worth drawing.
  *
- * A one-node graph is a sentence, not a map. It would spend a framed canvas, a time axis and a
- * depth control on a single link. Those records keep the flat lists, which say the same thing in
- * a line. Shared by the section index, the beat count and the column, so the rail cannot promise
- * a beat the column does not render.
+ * A one-node graph is a sentence, not a web. It would spend a framed panel on a single link, and
+ * those records keep the flat lists, which say the same thing in a line. Shared by the section
+ * index, the beat count and the column, so the rail cannot promise a beat the column does not
+ * render.
  *
- * The door and place surfaces get the map too. They are the same record column under a different
+ * The door and place surfaces get the tree too. They are the same record column under a different
  * vocabulary, and they carried the same two overlapping lists, so exempting them would have left
  * the duplication standing on the surface it was actually reported from. What changes there is
  * the wording, through `firstPaintNodeLabel`, not the picture.
  */
-function mapGraphFor(entity: PublicEntityView): RelationshipGraph | undefined {
+function treeGraphFor(entity: PublicEntityView): RelationshipGraph | undefined {
   const graph = entity.relationshipGraph;
   if (!graph || graph.nodes.length < 2) return undefined;
   return graph;
@@ -288,7 +288,7 @@ export function EntityRoomSections({
 }: EntityRoomSectionsProps) {
   const hasContext = entity.historicalContext.trim().length > 0;
   const hasStatus = firstPaint ? false : hasStatusFor(entity);
-  const mapGraph = mapGraphFor(entity);
+  const treeGraph = treeGraphFor(entity);
   const connections = toConnections(entity, firstPaint);
   const continueLearning = toSuggestedConnections(entity, firstPaint);
   const archiveSources = resolveInternetArchiveSources(entity.claims);
@@ -395,18 +395,18 @@ export function EntityRoomSections({
         </section>
       ) : null}
 
-      {mapGraph ? (
+      {treeGraph ? (
         <section className="ds-record-beat" aria-labelledby="related-heading">
           <RecordBeatHead
             id="related-heading"
             index={nextIndex()}
             icon="related"
             title={firstPaint ? 'How this place connects' : 'How this record connects'}
-            count={mapGraph.nodes.length}
+            count={treeGraph.nodes.length}
           />
-          <RelationshipMap
+          <RelationshipTree
             centerLabel={entity.displayName}
-            graph={mapGraph}
+            graph={treeGraph}
             {...(firstPaint ? { labels: firstPaintNodeLabels(entity) } : {})}
           />
         </section>

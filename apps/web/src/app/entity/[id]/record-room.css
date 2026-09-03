@@ -617,37 +617,27 @@
   line-height: 1.55;
 }
 
-/* Relationship map: the room's type scale, so the map's nodes match the beats around them. */
-.ds-record-beat .ds-relmap__frame {
+/* Connection tree: the room's type scale, so the cards match the beats around them. */
+.ds-record-beat .ds-reltree__root {
   background: color-mix(in srgb, var(--ds-canvas) 94%, var(--ds-ink));
+  border-color: var(--room-rule-2);
 }
 
-.ds-record-beat .ds-relmap__lanes {
-  background: transparent;
-  border-right-color: var(--room-rule-2);
-}
-
-.ds-record-beat .ds-relmap__lane-label,
-.ds-record-beat .ds-relmap__node-rel,
-.ds-record-beat .ds-relmap__node-year,
-.ds-record-beat .ds-relmap__count,
-.ds-record-beat .ds-relmap__depth-btn {
+.ds-record-beat .ds-reltree__relation,
+.ds-record-beat .ds-reltree__meta,
+.ds-record-beat .ds-reltree__more-toggle {
   font-size: var(--rec-eyebrow);
   letter-spacing: 0.04em;
 }
 
-.ds-record-beat .ds-relmap__node {
+.ds-record-beat .ds-reltree__card {
   background: var(--ds-surface);
 }
 
-.ds-record-beat .ds-relmap__node-name {
+.ds-record-beat .ds-reltree__name {
   font-family: var(--ds-font-sans);
   font-size: var(--rec-meta);
   font-weight: 600;
-}
-
-.ds-record-beat .ds-relmap__node--center {
-  border-color: var(--ds-accent-graphic);
 }
 
 .ds-record-beat .ds-room-conns {
