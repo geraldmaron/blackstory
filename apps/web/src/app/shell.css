@@ -1935,18 +1935,24 @@ html:has([data-surface='instrument']) {
   overflow: hidden;
 }
 
-/* The cover below exists because a Live plate under a reading room reads straight through the
-   prose column. A plate holding a slot is the opposite case: it is inside a box the document
-   gave it, and covering it would paint over the thing the moment exists to show. */
-body:not(:has([data-surface='instrument'])) .ds-map-stage[data-plate-slot]::after {
-  content: none;
-}
-
-/* The Door is the other surface whose plate is content: the same clustered field the
+/* The Door is one of the surfaces whose plate is content: the same clustered field the
    Instrument shows, painted full-bleed under the scroll chapters (posture `ambient`), so it is
    excluded from the cover below rather than overridden after it — `:has()` and `:not()` take the
-   specificity of their argument, and two equal rules would leave the winner to file order. */
-body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])) .ds-map-stage::after {
+   specificity of their argument, and two equal rules would leave the winner to file order.
+
+   A PLATE HOLDING A SLOT IS THE OTHER, AND IT IS GATED THE SAME WAY, FOR THE SAME REASON. The
+   cover exists because a Live plate under a reading room reads straight through the prose column.
+   A plate holding a slot is the opposite case: it is inside a box the document gave it, and
+   covering it paints over the thing the moment exists to show. That used to be a separate
+   `content: none` override written above this rule, and it never won: both selectors compute to
+   (0,3,2) — `:not(:has([data-surface='…']))` contributes its argument's (0,1,0), same as
+   `[data-plate-slot]` — so equal specificity left it to file order and the cover, being later,
+   painted `--ds-canvas` over every MapMoment on every reading surface. Every moment on /about,
+   /methodology, /data and /memorial rendered as an empty box in the page's own color, with the
+   copper edge and the PLATE · LIVE tag around nothing. Gating this selector cannot be undone by
+   ordering the way an override could. */
+body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
+  .ds-map-stage:not([data-plate-slot])::after {
   content: '';
   position: absolute;
   inset: 0;
