@@ -34,9 +34,9 @@ test('decade morph duration is a slow ambient dissolve (~1.6s), not the 480ms UI
   assert.equal(decadeLayerFadeDurationMs(true), 0);
 });
 
-test('the Atlas must not request the ambient morph on patchData', () => {
+test('Explore must not request the ambient morph on patchData', () => {
   // The 1.6s dual-buffer dissolve reads as lag on a decade or filter click, which is a direct
-  // interaction. The Atlas's decade crossfade is the 420ms pin transition in
+  // interaction. Explore's decade crossfade is the 420ms pin transition in
   // decade-transition.ts; the ambient morph belongs to surfaces that move the camera on their
   // own. The helpers below stay exercised by the unit tests in this file.
   const atlasSource = readFileSync(

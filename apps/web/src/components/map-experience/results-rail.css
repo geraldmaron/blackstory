@@ -15,7 +15,7 @@
   width: 344px;
   /* The right column's floor, not the shared one: the camera console sits under this rail. */
   max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom-right));
-  /* One panel recipe shared by all four Atlas instruments — see lens-panel.css. */
+  /* One panel recipe shared by all four Explore instruments — see lens-panel.css. */
   background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
@@ -33,7 +33,7 @@
 .ds-results__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1.1875rem; /* 19px — the shared Atlas instrument title size */
+  font-size: 1.1875rem; /* 19px — the shared Explore instrument title size */
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--ds-ink);
@@ -124,6 +124,29 @@
 
 .ds-results__glyph {
   color: var(--ds-ink-muted);
+}
+
+/* A row with a photo widens the first column to a 36px thumbnail; every other row keeps the
+   18px glyph column, so the two kinds of row still share one left text edge per column. */
+.ds-results__row--photo {
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+}
+
+.ds-results__thumb {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+  overflow: hidden;
+}
+
+.ds-results__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
 }
 
 .ds-results__row:hover .ds-results__glyph,

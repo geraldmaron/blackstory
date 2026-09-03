@@ -4,7 +4,7 @@
  * Must not statically generate at build: App Hosting mounts DATABASE_URL at runtime only, and a
  * baked sitemap would ship the 4-entity seed plus localhost. Being dynamic does not stop the
  * CDN from caching it: a route handler keeps `Cache-Control`, which is the same reason the
- * Atlas catalog moved off `/`. Uses the thin search index, not the hydrated entity catalog.
+ * Explore catalog moved off `/`. Uses the thin search index, not the hydrated entity catalog.
  */
 import { getPublicActiveReleaseMeta, getPublicSearchIndex } from '../../lib/public-data/source';
 import { shouldUseLivePublicProjections } from '../../lib/public-data/live-policy';

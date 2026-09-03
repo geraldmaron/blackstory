@@ -11,6 +11,13 @@ import { formatCitation } from '../../lib/citation/format';
 import { GroupHeading, Note, Prose, RoomHeader } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import {
+  EvidenceConvergenceDiagram,
+  MapPrecisionDiagram,
+  RecordDataModelDiagram,
+  RecordIntakeDiagram,
+  SiteStructureDiagram,
+} from './MethodologyDiagrams';
+import {
   DIGNITY_RULES,
   EVIDENCE_GRADE_DEFINITIONS,
   LIMITATION_RULES,
@@ -19,6 +26,7 @@ import {
   METHODOLOGY_MISSION_BEATS,
   METHODOLOGY_PAGE_SECTIONS,
   METHODOLOGY_PUBLISH_RULES,
+  METHODOLOGY_STRUCTURE_LEDE,
   VERIFICATION_STEPS,
 } from './methodology-copy';
 
@@ -44,7 +52,7 @@ export function MethodologySections() {
         kicker="Receipt"
         title={
           <>
-            How we <em>work</em>.
+            How the archive <em>works</em>.
           </>
         }
         lede={METHODOLOGY_INTRO_LEDE}
@@ -74,10 +82,13 @@ export function MethodologySections() {
         </GroupHeading>
         <Prose>
           <p>
-            Discovery finds candidates. People verify. A publish gate decides what reaches a public
-            page. A model never writes the public record alone.
+            Candidates come in from research runs, and every one of them is pinned to somewhere real
+            before it can publish: a state, a city, a campus, a documented site. Nothing reaches a
+            public page on a model&apos;s say-so. A person reads it first, and on this project that
+            person is me.
           </p>
         </Prose>
+        <RecordIntakeDiagram />
         <ul className="ds-stack">
           {METHODOLOGY_MISSION_BEATS.map((beat) => (
             <li key={beat.kicker}>
@@ -106,8 +117,8 @@ export function MethodologySections() {
         </GroupHeading>
         <Prose>
           <p>
-            How sure we are is never color alone. Every grade carries a mark, a text label, and the
-            definition below it.
+            A grade is never a color on its own. Each one carries a mark, a label in words, and the
+            definition printed under it.
           </p>
         </Prose>
         <ul className="ds-stack">
@@ -118,6 +129,7 @@ export function MethodologySections() {
             </li>
           ))}
         </ul>
+        <EvidenceConvergenceDiagram />
         <Notice tone="warning" title="Crime statistics never enter this score">
           A record&apos;s grade is measured on independence and proximity to the event alone. Crime
           statistics and violence-adjacent framing never factor into it.
@@ -136,17 +148,30 @@ export function MethodologySections() {
         </GroupHeading>
         <Prose>
           <p>
-            Place is how this archive is organized, and also where harm is easiest to cause. A
-            record is shown no sharper than its sources support. Exact residential addresses are
-            never drawn on public pages.
+            Place is how this archive is organized. It is also the field most likely to put a living
+            person on a map at their own front door, so it carries the strictest rules on the site.
+            A record is drawn no sharper than its sources support, and exact residential addresses
+            are not drawn at all.
           </p>
         </Prose>
+        <MapPrecisionDiagram />
         <ol className="ds-stack" aria-label="Map dignity rules">
           {DIGNITY_RULES.map((rule) => (
             <li key={rule}>{rule}</li>
           ))}
         </ol>
         <Note kind="LIMITATIONS">{LIMITATION_RULES.join(' ')}</Note>
+      </section>
+
+      <section aria-labelledby="how-it-holds-together-heading" id="how-it-holds-together">
+        <GroupHeading>
+          <span id="how-it-holds-together-heading">How it holds together</span>
+        </GroupHeading>
+        <Prose>
+          <p>{METHODOLOGY_STRUCTURE_LEDE}</p>
+        </Prose>
+        <RecordDataModelDiagram />
+        <SiteStructureDiagram />
       </section>
 
       <section aria-labelledby="living-person-protection-heading" id="living-person-protection">
@@ -156,9 +181,9 @@ export function MethodologySections() {
         <Prose>
           <p>{METHODOLOGY_DIGNITY_LINE}</p>
           <p>
-            Unknown living status is treated as living. The people this policy exists for are named
-            on <Link href="/memorial">the memorial wall</Link>, held still on request, never painted
-            as ambient texture on a map.
+            When the sources do not say whether someone is living, the archive treats them as living
+            and publishes accordingly. Some of the people this rule exists for are named on{' '}
+            <Link href="/memorial">the memorial wall</Link>, which holds a name and nothing else.
           </p>
         </Prose>
       </section>

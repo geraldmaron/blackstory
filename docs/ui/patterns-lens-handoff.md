@@ -8,11 +8,11 @@ Builds on ADR-017 (no viewport in a shareable URL) and [`patterns-atlas-instrume
 
 ## 1. The rule
 
-**A typed builder turns any surface's subject into an Atlas deep link plus a mandatory human readable reason string that the Atlas renders in its results header. No surface hand writes an Atlas URL.**
+**A typed builder turns any surface's subject into an Explore deep link plus a mandatory human readable reason string that the map renders in its results header. No surface hand writes an Explore URL.**
 
 Two things break without it.
 
-A hand written Atlas URL drifts from the parser. That has already happened: `buildExploreSearchParams` emits `tone`, `panels`, `radius` and `near`, none of which is in the allowlist, in violation of the comment in that file saying the two must stay aligned. The middleware strips them, and the reader lands on a filter they did not ask for.
+A hand written Explore URL drifts from the parser. That has already happened: `buildExploreSearchParams` emits `tone`, `panels`, `radius` and `near`, none of which is in the allowlist, in violation of the comment in that file saying the two must stay aligned. The middleware strips them, and the reader lands on a filter they did not ask for.
 
 A filter with no stated reason is an unattributed claim. If `/law/[slug]` links to "records in this jurisdiction and era" without saying what that link is built from, the reader reads cause and effect. The archive did not document cause and effect; it documented a jurisdiction and a decade. **A reason string that implies causation the archive has not documented fails the type.**
 
@@ -20,7 +20,7 @@ A filter with no stated reason is an unattributed claim. If `/law/[slug]` links 
 
 ## 2. The handoff, out
 
-A reading room hands a filter to the Atlas by calling the builder with a subject and a reason. The builder returns a URL, the Atlas parses it, applies the lens, and renders the reason in the results header where the reader can see what narrowed the set and clear it.
+A reading room hands a filter to the map by calling the builder with a subject and a reason. The builder returns a URL, the map parses it, applies the lens, and renders the reason in the results header where the reader can see what narrowed the set and clear it.
 
 Named handoffs in this release:
 
@@ -28,13 +28,13 @@ Named handoffs in this release:
 |---|---|---|
 | `/chapters/[slug]` | "The records behind this chapter" | the chapter, as a named collection |
 | `/chapters` | "See every place these chapters touch" | the published chapter set |
-| `/records` | "See these on the Atlas" | the exact filter currently applied |
+| `/records` | "See these on the map" | the exact filter currently applied |
 | `/books` right rail | "Where books are challenged" | the state |
 | `/law` right rail | "By jurisdiction" | the jurisdiction |
 | `/law/[slug]` | "Records in this jurisdiction and era" | jurisdiction and era, explicitly not causation |
 | `/entity/[id]` topic tags | the topic name | the topic |
 | `/methodology` | `A` | the evidence floor set to A only |
-| `/data` | "See this on the Atlas" | the population layer at the matching decade |
+| `/data` | "See this on the map" | the population layer at the matching decade |
 | Record pages | **Explore this place** | the record, selected |
 
 `/data`'s handoff ships only once the Lens exposes the population layer with its comparability note. Until then `/data` stays self contained, rather than dropping a reader on an unlabelled choropleth with no way back to pins.
@@ -65,7 +65,7 @@ Viewport keys are never in the URL at all. `lat`, `lng` and `zoom` are dropped b
 
 `?collection={slug}` loads an authored record set into the global collections drawer and fits the camera. **This is how a chapter hands its evidence to the instrument.**
 
-The collections store is global and localStorage backed, and Saved sits in the command bar on every surface. So a record saved on the Atlas is still saved on a chapter, and a citation copied from a book uses the same formatter as one copied from a pin.
+The collections store is global and localStorage backed, and Saved sits in the command bar on every surface. So a record saved on the map is still saved on a chapter, and a citation copied from a book uses the same formatter as one copied from a pin.
 
 ---
 
@@ -88,7 +88,7 @@ Beyond the cites edge, every record page links to its law, its jurisdiction reco
 A handoff that cannot be walked back is a trapdoor.
 
 - Browser back returns to the referring surface with scroll restored.
-- The Atlas results header names the surface the constraint came from, so "clear" has a subject.
+- The map results header names the surface the constraint came from, so "clear" has a subject.
 - A record opened from a room and then closed returns focus to the row or chip that opened it.
 - `ESC` unwinds palette, then overlay, then spotlight, then sheet, and **never navigates**.
 
@@ -98,7 +98,7 @@ A handoff that cannot be walked back is a trapdoor.
 
 **Do**
 
-- Build every Atlas URL through the typed builder
+- Build every Explore URL through the typed builder
 - Write a reason string that names what narrowed the set
 - Render every narrowing param as a clearable chip
 - Generate the allowlist from the parser's key set, with a two-way drift test
@@ -106,7 +106,7 @@ A handoff that cannot be walked back is a trapdoor.
 
 **Don't**
 
-- Hand write an Atlas href anywhere in `src`
+- Hand write an Explore href anywhere in `src`
 - Write a reason string that implies causation the archive has not documented
 - Put a viewport, or `panels`, in a shareable URL
 - Emit a param the allowlist does not carry, or parse one the builder cannot emit
@@ -126,7 +126,7 @@ A handoff that cannot be walked back is a trapdoor.
 | Collections store | `lib/collections/store.ts` | Pending (SP-17) |
 | Cites edge | `lib/release/build-cites-edge.ts` | Pending (SP-20) |
 
-Existing call sites to extend rather than duplicate: `MapInsetMoment` already builds an Atlas href through `buildExploreHref` with `selected=<entityId>`, which is the convention entity and story "View on map" controls use. Extend that path; do not add a second builder beside it.
+Existing call sites to extend rather than duplicate: `MapInsetMoment` already builds an Explore href through `buildExploreHref` with `selected=<entityId>`, which is the convention entity and story "View on map" controls use. Extend that path; do not add a second builder beside it.
 
 ---
 
@@ -138,6 +138,6 @@ Existing call sites to extend rather than duplicate: `MapInsetMoment` already bu
 | No viewport | No viewport key can be emitted into a shareable URL |
 | Reason string type | A reason string implying undocumented causation fails to typecheck |
 | Chips | A topic or status deep link shows an active clearable chip naming the constraint |
-| Reverse edge | Opening a cited record on the Atlas shows its sources, its connections with relations in words, and the chapters that cite it |
+| Reverse edge | Opening a cited record on the map shows its sources, its connections with relations in words, and the chapters that cite it |
 | No redirect links | No internal link points at a redirect |
 | Palette coverage | Redlining, sundown town, restrictive covenant and Great Migration each return at least one record or chapter |

@@ -15,7 +15,6 @@ const RECORD: SheetRecord = {
   id: 'ent_gaston_motel',
   name: 'A.G. Gaston Motel',
   kind: 'place',
-  kindLabel: 'Place',
   place: 'Birmingham, Alabama',
   era: '1950s',
   story: 'Built in 1954, it became the campaign headquarters of the 1963 Birmingham movement.',
@@ -72,9 +71,10 @@ test('precisionNote is the single definition of that sentence', () => {
   );
 });
 
-test('the documented order holds: kicker, name, story, anatomy, precision, actions, sources', () => {
+test('the documented order holds: pills, name, story, anatomy, precision, actions, sources', () => {
   const html = render({ onFlyToPlace: () => {} });
   const order = [
+    'Record at a glance',
     'A.G. Gaston Motel',
     'campaign headquarters',
     'Evidence',
@@ -90,12 +90,46 @@ test('the documented order holds: kicker, name, story, anatomy, precision, actio
   }
 });
 
-test('the anatomy grid is the shared one, with all four facts', () => {
+test('kind, era and grade are pills; the anatomy carries only Where and Evidence', () => {
   const html = render();
-  for (const label of ['Kind', 'Where', 'Era', 'Evidence']) {
+
+  // The pill row is the record page's own `ds-rec-pills`, so a reader who opens the full record
+  // meets the same three pills in the same order.
+  assert.match(html, /ds-rec-pills[^>]*aria-label="Record at a glance"/);
+  for (const word of ['Place', '1950s', 'Grade A']) {
+    assert.match(
+      html,
+      new RegExp(`ds-rec-pill__label">${word}<`),
+      `the pill row is missing ${word}`,
+    );
+  }
+
+  for (const label of ['Where', 'Evidence']) {
     assert.match(html, new RegExp(`>${label}<`), `anatomy is missing ${label}`);
   }
   assert.match(html, /Grade A · 6 sources/);
+
+  // Kind and Era are stated once, as pills. An anatomy row for either would print the same fact
+  // twice on one card, which is what the mono kicker used to do.
+  for (const label of ['Kind', 'Era']) {
+    assert.doesNotMatch(
+      html,
+      new RegExp(`fact-label"[^>]*>(<svg[\\s\\S]*?</svg>)?${label}<`),
+      `${label} is repeated in the anatomy`,
+    );
+  }
+});
+
+test('Where drops an address head that merely restates the name', () => {
+  const html = render({
+    record: {
+      ...RECORD,
+      name: '100 Block North Greenwood Avenue',
+      place: '100 Block North Greenwood Avenue, Tulsa, Oklahoma',
+    },
+  });
+  assert.match(html, /fact-value">Tulsa, Oklahoma</);
+  assert.doesNotMatch(html, /fact-value">100 Block North Greenwood Avenue, Tulsa/);
 });
 
 test('sources are numbered', () => {
@@ -111,7 +145,7 @@ test('a record with genuinely no sources says why rather than showing an empty l
 });
 
 test('the plate never claims a cited record has no sources', () => {
-  // The Atlas passes a count without the citations, because the map payload is a count and a
+  // Explore passes a count without the citations, because the map payload is a count and a
   // confidence tier rather than a bibliography. The plate used to read "0 sources / no sources
   // are published for this record yet" directly beneath its own "Grade A · 1 source".
   const html = render({
@@ -244,7 +278,7 @@ test('the story count is stated alongside the heading', () => {
   );
 });
 
-test('a connection with no page of its own still offers selection when the Atlas can select', () => {
+test('a connection with no page of its own still offers selection when Explore can select', () => {
   const html = render({ onSelectConnection: () => {} });
   assert.match(html, /ds-sheet__connection-select/);
 });
@@ -315,4 +349,27 @@ test('without an href the sheet offers no dead link, and the primary slot stays 
   assert.equal(html.includes('Open record'), false);
   assert.equal(html.includes('ds-sheet__name-link'), false);
   assert.match(html, /ds-sheet__action ds-sheet__action--primary[^>]*>Fly to place</);
+});
+
+test('a record with a rights-cleared photo opens on it, credit printed, before the pills', () => {
+  const html = render({
+    photo: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Gaston_Motel.jpg',
+      alt: 'The A.G. Gaston Motel, Birmingham',
+      credit: 'Photo: Carol M. Highsmith, Library of Congress',
+    },
+  });
+  const mast = html.indexOf('ds-sheet__mast');
+  const pills = html.indexOf('Record at a glance');
+  assert.ok(mast >= 0, 'the mast is missing');
+  assert.ok(mast < pills, 'the photo must come before the pills');
+  assert.match(html, /alt="The A\.G\. Gaston Motel, Birmingham"/);
+  assert.match(html, /Carol M\. Highsmith/);
+  assert.match(html, /data-media="photo"/);
+});
+
+test('a record without a photo has no mast at all, not a placeholder', () => {
+  const html = render();
+  assert.doesNotMatch(html, /ds-sheet__mast/);
+  assert.match(html, /data-media="none"/);
 });

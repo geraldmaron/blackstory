@@ -100,10 +100,32 @@ it lands, not just a runbook entry).
 
 ## Editorial voice guide
 
-**Register:** short declarative sentences first, structure second. State
-facts plainly; don't hedge unless the hedge is the fact ("unknown" is a
-real, complete answer). No marketing superlatives ("groundbreaking,"
-"revolutionary," "the definitive source").
+**Register:** Neo's, from `docs/content/neo-voice.md`. Short declarative
+sentences first, structure second. State facts plainly; don't hedge unless the
+hedge is the fact ("unknown" is a real, complete answer). No marketing
+superlatives ("groundbreaking," "revolutionary," "the definitive source").
+Site chrome borrows Neo's register but is not narrated by Neo; see the speaker
+rule below.
+
+**The speaker: there is no "we".** BlackStory is one person's project, and
+first-person plural on any reader-facing surface claims an organisation that
+does not exist. Every page has exactly two possible speakers and a reader
+should be able to tell from the sentence which one is talking:
+
+- **The archive**, for anything the software does or refuses to do. "The
+  archive never draws a point sharper than its source supports."
+- **Gerald, as "I"**, for a choice, a commitment, a limit, or an admission by
+  the person who runs it. "I read every lead before anything is published."
+
+Neo is neither of those and never says "I" in published prose. When neither
+speaker fits a sentence, write it impersonally. "We" meaning people in general
+is not automatically wrong, but it must not end up doing the project's talking.
+
+**Machine tells to avoid.** Copy that arrives in three-item kicker-plus-body
+sets, a fresh aphorism in every line, repeated "X, not Y" constructions, and
+parallel headings reads as generated even when a person wrote it. Vary the
+counts, keep at most one epigram a page, and let most sentences simply carry
+information.
 
 **Microcopy standards:**
 
@@ -116,7 +138,7 @@ real, complete answer). No marketing superlatives ("groundbreaking,"
 | Corrections | Neutral, procedural tone; a correction is normal system function, not an admission of failure. | "Submit a correction" / "Under review" / "Resolved — record updated." |
 | Legal/procedural status | Use only the constitution's `legalStatusVocabulary` (alleged, charged, indicted, arraigned, convicted, acquitted, dismissed, settled_civil, ruled, enacted, repealed, unknown_procedural) — never a conclusory label like "guilty," "the criminal," or "proven murderer" (see `unsupportedProceduralLanguage` in `packages/schemas/constitution/policy.v1.json`, enforced by `@repo/schemas`/`@repo/constitution`). | "Charged, 1952. Case dismissed, 1953." not "Innocent." |
 | Living persons | Never state or imply a current residential address; unknown living status is written as living, not as "presumed deceased" or similar. | "Current status: living (protected)." not a street-level location. |
-| Seed/sample data | Always disclosed plainly wherever fixtures stand in for live data (see `SeedDataNotice`) — never presented as if it were a live release. | "Sample seed data — not a live release." |
+| Seed/sample data | Always disclosed plainly wherever fixtures stand in for live data, never presented as if it were a live release. The public site is Postgres-backed and no longer ships a seed-notice component. | "Sample seed data, not a live release." |
 
 **Never:** exclamation points in body copy; rhetorical questions as
 headlines; "unlock," "discover" (implies gamification); crime-statistic

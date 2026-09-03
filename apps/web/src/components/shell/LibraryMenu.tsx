@@ -1,6 +1,6 @@
 /**
- * The one room menu. Same groups as `/about`. Atlas, Explore, Records,
- * Journey, and Banned books stay off it. `/library` is a room, not this control.
+ * The one room menu. Same groups as `/about`. Explore, Records,
+ * Journey, and Banned books stay off it. `/rooms` is a room, not this control.
  *
  * A native `<details>`, not a scripted popover: the bar is rendered on every
  * route including ones that have not hydrated, and a menu that needs JavaScript

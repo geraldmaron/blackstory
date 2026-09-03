@@ -8,21 +8,21 @@
 
 | Tab | Route | Web peer | Disposition |
 |---|---|---|---|
-| Explore | `/explore` | Atlas `/explore` | Keep; sync DiscoveryState vocabulary |
+| Explore | `/explore` | Explore `/explore` | Keep; sync DiscoveryState vocabulary |
 | History | `/history` | Records `/records` (+ legacy history redirect) | Keep as find-in-time; expand facets toward Records |
 | Stories | `/learn` | Stories `/stories` | Keep Stories label; optional `/stories` alias later |
-| More | `/more` | Library `/library` | Keep as overflow; optional Library rename |
+| More | `/more` | Rooms `/rooms` | Keep as overflow; optional Rooms rename |
 | Legacy Search | `/search` → `/history` | `/search` → `/records` | Keep deep-link redirect |
 
 ## Rest / Engaged
 
-Mobile still uses cinematic Rest→Invite→Engaged (`cinematic-map-state.ts`). Web Door uses HTML pin plate + reading chrome; web Instrument is `/explore`. Do not shrink desktop Atlas panels onto mobile; keep bottom-sheet patterns.
+Mobile still uses cinematic Rest→Invite→Engaged (`cinematic-map-state.ts`). Web Door uses HTML pin plate + reading chrome; web Instrument is `/explore`. Do not shrink desktop map panels onto mobile; keep bottom-sheet patterns.
 
 ## Terminology drift to close
 
 | Concept | Web | Mobile | Unify toward |
 |---|---|---|---|
-| Map instrument | Atlas | Explore | Atlas (copy) |
+| Map instrument | Explore | Explore | Explore (copy) |
 | Entity index | Records | History | Records / find-in-time |
 | Topic | `topic` / Explore `theme` | `theme` | DiscoveryState `topic` (URL alias `theme` on Explore) |
 | Evidence | Records `evidence` → Explore `floor` | `confidence` only | Floor + separate exact tier |

@@ -34,8 +34,8 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
       <Room>
         <RoomHeader pathname="/corrections/status" kicker="Trust" title="Correction status" />
         <Notice tone="error" title="Receipt not found">
-          We could not find a correction with that receipt code. Check the code and try again —
-          there is no way to browse other submissions.
+          No correction matches that receipt code. Check the code and try again. There is no way to
+          browse other people’s submissions.
         </Notice>
         <EmptyState
           title="Need to submit a correction?"

@@ -2,8 +2,8 @@
  * `/` is the Door Immersive Journey: scroll chapters zoom the national pin field.
  *
  * Chapter order, rotating facts, and the evidence spotlight are rolled once per request
- * (same pickers as Atlas StoryMode) so visits vary without loading MapLibre. Pins with
- * public hrefs are clickable. Atlas instrument stays on `/explore`.
+ * (same pickers as Explore StoryMode) so visits vary without loading MapLibre. Pins with
+ * public hrefs are clickable. Explore instrument stays on `/explore`.
  */
 import React from 'react';
 import { loadDoorPinPlate } from '../lib/map-experience/door-catalog';

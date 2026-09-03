@@ -1,82 +1,82 @@
 /**
- * User-facing copy constants for the Data v6 edition page. Centralizes strings for
- * tests (em-dash guard) and keeps page/section JSX readable.
+ * User-facing copy for `/data`. Centralised so the voice tests (no em dashes, no internal
+ * vocabulary) can read every string in one place, and so the section JSX stays readable.
+ *
+ * Speaker: the archive describing what its figures do and do not carry. No first person here.
+ * Every sentence about a number is a sentence about a published series, never about the
+ * archive's own catalogue: the counted breakdown of records is not a figure on this page.
  */
 
 export const DATA_PAGE_DESCRIPTION =
-  'National Census population and published indicator charts: wealth, housing, credit, and justice figures behind the BlackStory archive, each with sources you can open.';
+  'Census counts of the Black population by decade, 1790 to 2020, alongside published wealth, housing, credit and justice indicators. Every figure names the series behind it and shows the numbers.';
 
 export const DATA_INTRO = {
-  kicker: 'Numbers',
-  lede: 'National Census context plus curated indicators for wealth, housing, credit, and justice. Every chart names its source.',
+  kicker: 'Reference ledger',
+  lede: 'Census counts by decade, and published indicator series for wealth, housing, credit and justice. Every figure names its source, states its limits, and shows the numbers behind it.',
 } as const;
 
-export const DATA_ORIENTATION_BEATS = [
-  {
-    kicker: 'National first',
-    body: 'Census sections show the country-wide picture. Indicator charts zoom into published series we also use in archival research.',
-  },
-  {
-    kicker: 'Sources visible',
-    body: 'Every figure links to where it came from. Charts that use published reference figures say so.',
-  },
-  {
-    kicker: 'Gaps are not silence',
-    body: 'Uneven coverage means the feed is incomplete, not that nothing happened. Juxtaposition is not causation.',
-  },
-] as const;
-
+/**
+ * The page in order. `reading` closes the page: the rules for reading a figure sit after the
+ * figures, where a reader who has just met one has a reason to want them.
+ */
 export const DATA_PAGE_SECTIONS = [
-  { id: 'orientation', label: 'Start here' },
   { id: 'population', label: 'Population' },
   { id: 'wealth', label: 'Wealth' },
   { id: 'housing', label: 'Housing and credit' },
   { id: 'justice', label: 'Justice' },
-  { id: 'themes', label: 'Coverage' },
-  { id: 'next', label: 'Next step' },
+  { id: 'reading', label: 'How to read' },
 ] as const;
 
+export type DataPageSectionId = (typeof DATA_PAGE_SECTIONS)[number]['id'];
+
 export const DATA_SECTION_COPY = {
-  orientation: {
-    index: '01',
-    kicker: 'Orientation',
-    title: 'How to read these numbers',
-    lede: 'Census decades anchor the national story. Published indicators (ACS, NHGIS, HMDA, CHAS, BJS, SCF, USSC, and more) show curated metrics we place beside archive evidence.',
-  },
   population: {
-    index: '02',
-    kicker: 'U.S. Census',
+    kicker: 'U.S. Census, 1790 to 2020',
     title: 'Black population over time',
-    lede: 'How many Black Americans the Census counted each decade from 1790 to 2020: the spine for national context before place-specific indicators.',
+    lede: 'How many Black Americans each decennial census counted, what share of the country that was, and where the count moved between 2010 and 2020.',
   },
   wealth: {
-    index: '03',
-    kicker: 'Survey of Consumer Finances',
-    title: 'Wealth gap at a glance',
-    lede: 'Median family net worth from the Federal Reserve triennial survey: a national juxtaposition when asking how housing-credit eras relate to wealth.',
+    kicker: 'Federal Reserve, Survey of Consumer Finances',
+    title: 'The wealth gap',
+    lede: 'Median family net worth, Black and White, in the latest survey wave and across every wave since 1989. A gap measured at a point in time, in 2022 dollars.',
   },
   housing: {
-    index: '04',
-    kicker: 'NHGIS · HMDA · CHAS',
-    title: 'Housing, credit, and cost burden',
-    lede: 'Cook County is the first county spine: decennial homeownership (NHGIS), mortgage denial rates (HMDA), and HUD CHAS cost burden from the Consolidated Plan.',
+    kicker: 'NHGIS, HMDA and HUD CHAS',
+    title: 'Housing, credit and cost burden',
+    lede: 'Cook County, Illinois is the first county covered: decennial homeownership by householder race, mortgage denial rates, and the share of households paying more than they can afford.',
   },
   justice: {
-    index: '05',
-    kicker: 'BJS · USSC',
+    kicker: 'Bureau of Justice Statistics and U.S. Sentencing Commission',
     title: 'Imprisonment and federal drug sentences',
-    lede: 'State imprisonment rates (BJS) and federal cocaine sentencing averages (USSC Quick Facts): context for drug-policy eras, not proof that any single law caused a number.',
+    lede: 'State imprisonment rates by race, and average federal sentence lengths for crack and powder cocaine, as each agency published them.',
   },
-  themes: {
-    index: '06',
-    kicker: 'Coverage',
-    title: 'Curated indicator coverage',
-    lede: 'These indicators sit beside artifacts and policy eras in research packets. Data shows the numbers; Methodology explains how we juxtapose them without causal overclaim.',
-  },
-  next: {
-    index: '07',
-    kicker: 'Next step',
-    title: 'Dig into a place',
-    lede: 'Methodology explains how we read these numbers next to a record.',
+  reading: {
+    kicker: 'Limits',
+    title: 'How to read these figures',
+    lede: 'Three rules hold for every figure on this page. The full argument for what a number is allowed to support is on Methodology.',
   },
 } as const;
+
+/**
+ * The reading rules. Not numbered: they hold at once, not in sequence.
+ */
+export const DATA_READING_RULES = [
+  {
+    kicker: 'Published, not derived',
+    body: 'Every series here is published by the agency named beneath it. Nothing is drawn from the archive of records, and nothing is interpolated between the years an agency reported.',
+  },
+  {
+    kicker: 'Comparison, never cause',
+    body: 'Two bars side by side name a gap. They do not explain it. The statutes, deeds and underwriting records that explain a gap are on the place and record pages.',
+  },
+  {
+    kicker: 'Definitions move',
+    body: 'Race categories on the census changed in 2000, when a person could mark more than one race. A count before that line and a count after it are not the same measurement, and the figures mark the line rather than smoothing across it.',
+  },
+] as const;
+
+/** Where the reading rules send a reader who wants the full argument. */
+export const DATA_READING_LINKS = [
+  { href: '/methodology', label: 'Methodology' },
+  { href: '/stories', label: 'Stories that use these numbers' },
+] as const;

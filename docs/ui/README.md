@@ -7,7 +7,7 @@ Shared kit: `@repo/ui` (`packages/ui`). Binding brand source: root `brand/`. Tok
 ## Read these first
 
 v10 is the authoritative product architecture. It amends the door-tip implementation
-(`/` is the Door; `/explore` is the Atlas instrument) and supersedes v9’s
+(`/` is the Door; `/explore` is the Explore instrument) and supersedes v9’s
 “Instrument on `/`” product shape.
 
 | Document | Governs | Status |
@@ -69,7 +69,7 @@ None of these is deleted. They record why v9 exists and what was rejected. Do no
 | [`design-direction-v5.md`](./design-direction-v5.md) | v6, then v9 | Historical |
 | [`blap-design-direction-v4.md`](./blap-design-direction-v4.md) | v5 | Historical |
 | [`design-direction-v6-home.md`](./design-direction-v6-home.md) | v9 Atlas | `/` |
-| [`design-direction-v6-explore.md`](./design-direction-v6-explore.md) | v9 Atlas → **v10** | `/explore` is the live Instrument (not a 308 to `/`) |
+| [`design-direction-v6-explore.md`](./design-direction-v6-explore.md) | v9 Explore → **v10** | `/explore` is the live Instrument (not a 308 to `/`) |
 | [`design-direction-v6-search.md`](./design-direction-v6-search.md) | v9 Atlas | `/search`, redirect |
 | [`design-direction-v6-history.md`](./design-direction-v6-history.md) | v9 surfaces | `/history`, resolves to `/records` |
 | [`design-direction-v6-stories.md`](./design-direction-v6-stories.md) | v9 chapters | `/stories`, 308 to `/chapters`. `app/stories` does not exist |
@@ -82,7 +82,7 @@ None of these is deleted. They record why v9 exists and what was rejected. Do no
 | [`design-direction-v6-methodology.md`](./design-direction-v6-methodology.md) | v9 surfaces | `/methodology` |
 | [`design-direction-v6-entity.md`](./design-direction-v6-entity.md) | v9 surfaces, v9 record page | `/entity/[id]` |
 
-The v6 supersessions listed against `design-direction-v9-surfaces.md` take effect on that document's approval. The three listed against v9 Atlas are in effect now.
+The v6 supersessions listed against `design-direction-v9-surfaces.md` take effect on that document's approval. The three listed against v9 Explore are in effect now.
 
 **Component registry:** [`patterns-registry.md`](./patterns-registry.md) for import paths and adopters of `components/patterns/*`.
 

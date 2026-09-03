@@ -38,7 +38,7 @@ describe('DiscoveryState map/list continuity', () => {
     assert.equal(href.includes('confidence='), false);
   });
 
-  it('keeps floor through edge allowlist normalization (Records→Atlas handoff bug)', () => {
+  it('keeps floor through edge allowlist normalization (Records→Explore handoff bug)', () => {
     const href = buildAtlasHref({
       ...EMPTY_RECORDS_QUERY,
       state: 'OK',

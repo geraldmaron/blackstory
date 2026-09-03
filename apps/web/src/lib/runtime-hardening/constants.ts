@@ -111,7 +111,7 @@ export type CorrectionsPageParam = (typeof CORRECTIONS_PAGE_PARAM_ALLOWLIST)[num
  * Allowed arrival keys on `/place/{slug}`.
  *
  * Place is a reading room that must preserve DiscoveryState when the reader arrives from
- * Records (`from=list`) or the Atlas (`from=map`). Matched with an empty allowlist, the edge
+ * Records (`from=list`) or Explore (`from=map`). Matched with an empty allowlist, the edge
  * 308s every arrival query away before the page runs — so return links cannot restore the
  * narrowing the reader already chose. Keep this list aligned with
  * `discoveryFromSearchParams` / `recordsArrivalQuery`.

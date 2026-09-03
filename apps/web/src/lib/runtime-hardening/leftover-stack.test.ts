@@ -134,11 +134,11 @@ test('CSP allows blackstory-app and leftover GCS; no other supabase.co host', ()
   }
 });
 
-test('first paint no longer boots the full catalog: `/` is the Door, Atlas stays on /explore', () => {
+test('first paint no longer boots the full catalog: `/` is the Door, Explore stays on /explore', () => {
   // The 2026-08-28 leftover this test originally documented ("Loading 4,101 records…" from
   // buildAtlasShell(getSharedPublicEntities()) on `/`) was fixed: `/` renders DoorHome under
-  // ISR and never mounts the Atlas instrument. Guard the fix, and keep the catalog route's
-  // cache contract, which the Atlas on /explore still depends on.
+  // ISR and never mounts the Explore instrument. Guard the fix, and keep the catalog route's
+  // cache contract, which Explore on /explore still depends on.
   const page = readFileSync(join(SRC_ROOT, 'app/page.tsx'), 'utf8');
   const shell = readFileSync(join(SRC_ROOT, 'app/explore/explore-view-model.ts'), 'utf8');
   const catalogRoute = readFileSync(join(SRC_ROOT, 'app/atlas/catalog/route.ts'), 'utf8');

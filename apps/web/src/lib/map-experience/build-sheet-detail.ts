@@ -1,5 +1,5 @@
 /**
- * The record sheet's sources and connections, derived on the client from data the Atlas already
+ * The record sheet's sources and connections, derived on the client from data the map already
  * holds.
  *
  * The sheet used to hardcode `sources: []` and `connections: []`, so it always fell through to

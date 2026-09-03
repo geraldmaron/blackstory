@@ -14,7 +14,7 @@
  *     than 55% on screen. A small tile in a long rail crosses that line constantly, so the map
  *     appeared, vanished back to idle text, and reappeared as the reader scrolled past its own
  *     record. Content that flickers is not content.
- *  3. The moment's chrome — the PLATE · LIVE tag, MapLibre's attribution, the Atlas hand-off pill —
+ *  3. The moment's chrome — the PLATE · LIVE tag, MapLibre's attribution, the Explore hand-off pill —
  *     is sized for a figure several hundred pixels wide. At rail width they overlapped each other
  *     and covered the map they were annotating.
  *

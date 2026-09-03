@@ -561,7 +561,7 @@ test('parseExploreSearchParams ignores an invalid radius token', () => {
   assert.ok(parsed.viewport);
 });
 
-test('evidence floor round-trips on explore URLs (Records→Atlas handoff)', () => {
+test('evidence floor round-trips on explore URLs (Records→Explore handoff)', () => {
   const qs = buildExploreSearchParams({
     filters: {
       era: 'all',

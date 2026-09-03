@@ -8,7 +8,7 @@ import { selectPageField } from './select-page-field';
 const PAGE_FIELD_BASE = '/brand/atmosphere/page-field';
 
 test('map paths return null', () => {
-  // `/` is the Atlas. The `/explore` forms stay covered because the page-field opt-out has to
+  // `/` is the Door. The `/explore` forms stay covered because the page-field opt-out has to
   // hold for a cached URL arriving before the redirect resolves.
   assert.equal(selectPageField('/'), null);
   assert.equal(selectPageField('/explore'), null);

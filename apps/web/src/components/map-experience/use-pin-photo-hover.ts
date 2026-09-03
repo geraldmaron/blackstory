@@ -1,6 +1,6 @@
 /**
  * Delegated hover/focus tracking for `.ds-first-paint-pin[data-entity-id]` markup — the Door's
- * static pin plate (`FirstPaintPinPlate`). The Atlas's own MapLibre entity markers use the same
+ * static pin plate (`FirstPaintPinPlate`). The map's own MapLibre entity markers use the same
  * class and `data-entity-id`/`data-pin-name` attributes (`entity-marker-sync.ts`), but MapStage
  * owns that DOM directly and reports hover through its own `pinHover` event instead of this hook.
  *

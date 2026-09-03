@@ -75,8 +75,8 @@ export function ErrataSections({ entries }: { readonly entries: readonly ErrataE
   if (entries.length === 0) {
     return (
       <p className="ds-errata__empty" role="status">
-        No corrections have been published yet. The log opened on {ERRATA_LOG_OPENED_DATE} and will
-        list every correction, clarification, update and editor's note as soon as one is made.
+        No corrections have been published yet. The log opened on {ERRATA_LOG_OPENED_DATE}, and the
+        first correction, clarification, update or editor's note will be listed here.
       </p>
     );
   }

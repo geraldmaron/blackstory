@@ -1,5 +1,5 @@
 /**
- * The Atlas catalog: the release-wide, reader-independent half of the Explore view model, served
+ * The Explore catalog: the release-wide, reader-independent half of the Explore view model, served
  * by `GET /atlas/catalog` and fetched once by the client.
  *
  * Why this exists (Vercel bill, 2026-08-22). `/` used to render the whole thing into its own HTML

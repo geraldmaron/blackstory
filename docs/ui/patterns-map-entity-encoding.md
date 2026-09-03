@@ -104,7 +104,7 @@ Other facets (Tone, Era, Theme, Status, Confidence, Where) unchanged.
 
 ## First-paint pin plate (Door + Explore bootstrap)
 
-Before MapLibre paints, `/` (Door) and `/explore` (Atlas) render the same HTML pin plate (`FirstPaintPinPlate`, `first-paint-pin-plate.css`). This is **not** the kind-encoded Explore stack; it is a lightweight national field.
+Before MapLibre paints, `/` (Door) and `/explore` (Explore) render the same HTML pin plate (`FirstPaintPinPlate`, `first-paint-pin-plate.css`). This is **not** the kind-encoded Explore stack; it is a lightweight national field.
 
 | Role | Visual | Token |
 |---|---|---|

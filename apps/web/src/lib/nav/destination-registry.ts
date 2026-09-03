@@ -2,7 +2,7 @@
  * The destination registry: every public rendered route, once, with the facts every consumer of
  * the site's navigation needs.
  *
- * Design law: docs/ui/design-direction-v9-surfaces.md §4 (resolution map) and §4.2 (/library).
+ * Design law: docs/ui/design-direction-v9-surfaces.md §4 (resolution map) and §4.2 (/rooms).
  *
  * WHY THIS EXISTS. Before it, the same set of routes was written out five times — the breadcrumb
  * table in `room-trail.ts`, `PRIMARY_NAV`/`OVERFLOW_NAV`/`FOOTER_NAV_COLUMNS` in the shared shell
@@ -10,11 +10,11 @@
  * lists is five chances to disagree, and they did: the footer still pointed at `/history` months
  * after `/history` became a redirect, so every page on the site shipped a link into a 308.
  *
- * ONE TABLE, FIVE READERS: the breadcrumb chain (`room-trail.ts`), the /library hub, the site
+ * ONE TABLE, FIVE READERS: the breadcrumb chain (`room-trail.ts`), the /rooms hub, the site
  * footer, the command palette's Go section (the same three room groups), and the sitemap.
  * `destination-registry.test.ts` fails when a route classified in `surface-classes.ts` has no
- * entry here, which is what makes "a new public route cannot be missing from the library" a
- * test rather than a habit. Atlas and Records stay in the table; Find chrome (command bar +
+ * entry here, which is what makes "a new public route cannot be missing from Rooms" a
+ * test rather than a habit. Explore and Records stay in the table; Find chrome (command bar +
  * footer Find column) exposes them while Rooms / browsableDestinations stay editorial.
  *
  * WHAT IS NOT HERE. Endpoints — redirects, JSON, feeds, crawler files. They render no chrome and
@@ -25,15 +25,15 @@
 import { CLASSIFIED_PATHS, surfaceClassFor, type SurfaceClass } from './surface-classes';
 
 /**
- * The three card groups the library hub renders, in order, plus `find`.
+ * The three card groups Rooms renders, in order, plus `find`.
  *
- * `find` is home, the map, and the index. They are deliberately NOT cards in the library:
- * the library lists the rooms. Home is the door. Atlas and records stay off the room chrome.
+ * `find` is home, the map, and the index. They are deliberately NOT cards in Rooms:
+ * Rooms lists the rooms. Home is the door. Explore and records stay off the room chrome.
  */
 export const DESTINATION_GROUPS = ['find', 'read', 'check', 'take-part'] as const;
 export type DestinationGroup = (typeof DESTINATION_GROUPS)[number];
 
-/** The heading each group renders under in the library hub. `find` has none; see above. */
+/** The heading each group renders under in Rooms. `find` has none; see above. */
 export const GROUP_HEADINGS: Readonly<Record<DestinationGroup, string | null>> = Object.freeze({
   find: null,
   read: 'Where to begin',
@@ -42,7 +42,7 @@ export const GROUP_HEADINGS: Readonly<Record<DestinationGroup, string | null>> =
 });
 
 /**
- * Library Hub page copy (v10). Footer and the Library menu keep {@link GROUP_HEADINGS};
+ * Rooms Hub page copy (v10). Footer and the Rooms menu keep {@link GROUP_HEADINGS};
  * the hub page uses these longer headings plus standfirsts so it reads as knowledge kinds,
  * not a settings menu.
  */
@@ -64,14 +64,14 @@ export const LIBRARY_GROUP_COPY: Readonly<
   },
 });
 
-/** The library hub's card groups, in render order. */
+/** Rooms' card groups, in render order. */
 export const LIBRARY_CARD_GROUPS: readonly DestinationGroup[] = ['read', 'check', 'take-part'];
 
 export type Destination = {
   readonly path: string;
   /** Breadcrumb and nav label. Short: it appears mid-sentence in a chain. */
   readonly label: string;
-  /** Parent path for the breadcrumb chain, or null for the Atlas itself. */
+  /** Parent path for the breadcrumb chain, or null for Explore itself. */
   readonly parent: string | null;
   /**
    * Card title, when a card wants a verb the breadcrumb should not have. "Submit" is the right
@@ -80,14 +80,14 @@ export type Destination = {
   readonly cardTitle?: string;
   /**
    * What sort of thing this room is. No longer printed as a card kicker: a three-up card had no
-   * room for it. `/library` cases it into `RoomCard`'s `tag`, which takes the index row's third
+   * room for it. `/rooms` cases it into `RoomCard`'s `tag`, which takes the index row's third
    * column, and the mobile app and the palette still read the field as stored.
    */
   readonly kind?: string;
   /** One line. Two lines is a summary, and a card is not a summary. */
   readonly description?: string;
   /**
-   * Three or four words, for the bar's Library menu.
+   * Three or four words, for the bar's Rooms menu.
    *
    * Not the same string as {@link Destination.description}: a menu row is 195px wide and a
    * sentence wraps to four lines in it, which turned an eleven-room menu into a panel taller
@@ -122,16 +122,16 @@ export type Destination = {
 };
 
 /**
- * Every rendered public route. Order within a group is the order the library and the footer
+ * Every rendered public route. Order within a group is the order Rooms and the footer
  * render, so it is editorial, not alphabetical.
  *
  * The parents follow `SURF_PARENT` in `.design-mocks/blackstory-atlas-v9.html`: a reading or
- * utility room goes up to the library, a record goes up to its catalogue, and an entity goes up
- * to the Atlas — an entity is a point on the map a reader most likely arrived at from the map,
+ * utility room goes up to Rooms, a record goes up to its catalogue, and an entity goes up
+ * to Explore — an entity is a point on the map a reader most likely arrived at from the map,
  * and /records is one way of listing entities rather than the place they live.
  */
 const DESTINATIONS: readonly Destination[] = [
-  /* ---- find: the two ways into the records, plus the library itself ---- */
+  /* ---- find: the two ways into the records, plus Rooms itself ---- */
   {
     path: '/',
     label: 'Home',
@@ -151,8 +151,8 @@ const DESTINATIONS: readonly Destination[] = [
     crawl: { changeFrequency: 'daily', priority: 0.9 },
   },
   {
-    path: '/library',
-    label: 'The library',
+    path: '/rooms',
+    label: 'Rooms',
     parent: '/',
     kind: 'HUB',
     description: 'The rooms.',
@@ -162,23 +162,23 @@ const DESTINATIONS: readonly Destination[] = [
   {
     path: '/records',
     label: 'Records',
-    parent: '/library',
+    parent: '/rooms',
     kind: 'INDEX',
     description: 'The archive as a list.',
     group: 'find',
     crawl: { changeFrequency: 'daily', priority: 0.9 },
   },
-  // `/story` and `/journey` are deliberately absent. Story/Journey is a MODE of the Atlas, not a
+  // `/story` and `/journey` are deliberately absent. Story/Journey is a MODE of Explore, not a
   // room: `StoryMode` is mounted inside `AtlasExperience`. `/journey` is a dead address (HTTP 404
   // on apex and www, verified 2026-08-28). A registry entry for a path that never renders would
-  // put it back in the palette, the footer, the library, and the sitemap as a destination that
+  // put it back in the palette, the footer, Rooms, and the sitemap as a destination that
   // 404s. Do not add either path until a first-paint branch actually ships the room.
 
   /* ---- read ---- */
   {
     path: '/stories',
     label: 'Stories',
-    parent: '/library',
+    parent: '/rooms',
     kind: 'LONG FORM',
     description:
       'The archive argued rather than listed. Sourced narrative that names the records it rests on.',
@@ -189,7 +189,7 @@ const DESTINATIONS: readonly Destination[] = [
   {
     path: '/law',
     label: 'Law',
-    parent: '/library',
+    parent: '/rooms',
     kind: 'REFERENCE',
     description:
       'The statutes and rulings that shaped what could be built, owned, attended and voted for.',
@@ -201,7 +201,7 @@ const DESTINATIONS: readonly Destination[] = [
   {
     path: '/data',
     label: 'Data',
-    parent: '/library',
+    parent: '/rooms',
     kind: 'INDICATORS',
     description:
       'National series with their sources attached, and a plain account of what each one cannot tell you.',
@@ -213,7 +213,7 @@ const DESTINATIONS: readonly Destination[] = [
   {
     path: '/books',
     label: 'Banned books',
-    parent: '/library',
+    parent: '/rooms',
     kind: 'CATALOGUE',
     description: 'Documented challenges to titles, recorded as challenges rather than as verdicts.',
     menuLine: 'Documented challenges',
@@ -222,7 +222,7 @@ const DESTINATIONS: readonly Destination[] = [
   {
     path: '/memorial',
     label: 'Memorial',
-    parent: '/library',
+    parent: '/rooms',
     kind: 'NAMES',
     description: 'Names, held quietly. No imagery of harm, no counts presented as a score.',
     modifier: 'STILL',
@@ -235,7 +235,7 @@ const DESTINATIONS: readonly Destination[] = [
   {
     path: '/about',
     label: 'About',
-    parent: '/library',
+    parent: '/rooms',
     kind: 'FRAMING',
     description: 'What this is for, who it is for, and what it refuses to do.',
     menuLine: 'What this refuses to do',
@@ -243,9 +243,20 @@ const DESTINATIONS: readonly Destination[] = [
     crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
   {
+    path: '/faq',
+    label: 'Questions',
+    parent: '/rooms',
+    kind: 'ANSWERS',
+    description:
+      'Who runs this, how AI is and is not used, what a grade means, and what to do when a record is wrong.',
+    menuLine: 'Plain answers',
+    group: 'check',
+    crawl: { changeFrequency: 'monthly', priority: 0.5 },
+  },
+  {
     path: '/methodology',
     label: 'Methodology',
-    parent: '/library',
+    parent: '/rooms',
     kind: 'TRANSPARENCY',
     description:
       'How a record gets in, what the evidence grades mean, and why a point is never drawn sharper than its source.',
@@ -257,7 +268,7 @@ const DESTINATIONS: readonly Destination[] = [
   {
     path: '/errata',
     label: 'Errata',
-    parent: '/library',
+    parent: '/rooms',
     kind: 'CORRECTIONS',
     description:
       'The mistakes the archive found and fixed, published rather than quietly overwritten.',
@@ -271,7 +282,7 @@ const DESTINATIONS: readonly Destination[] = [
   {
     path: '/submit',
     label: 'Submit',
-    parent: '/library',
+    parent: '/rooms',
     cardTitle: 'Submit a lead',
     kind: 'CONTRIBUTE',
     description:
@@ -284,7 +295,7 @@ const DESTINATIONS: readonly Destination[] = [
   {
     path: '/corrections',
     label: 'Corrections',
-    parent: '/library',
+    parent: '/rooms',
     cardTitle: 'Request a correction',
     kind: 'CORRECT',
     description: 'Tell the archive it is wrong. You get a receipt code and a tracked outcome.',
@@ -296,7 +307,7 @@ const DESTINATIONS: readonly Destination[] = [
   {
     path: '/support',
     label: 'Support',
-    parent: '/library',
+    parent: '/rooms',
     kind: 'HELP',
     description: 'How to get an answer, and how long it should take.',
     menuLine: 'Keep this running',
@@ -318,13 +329,13 @@ const DESTINATIONS: readonly Destination[] = [
   {
     path: '/privacy',
     label: 'Privacy',
-    parent: '/library',
+    parent: '/rooms',
     crawl: { changeFrequency: 'monthly', priority: 0.3 },
   },
   {
     path: '/locate',
     label: 'Locate',
-    parent: '/library',
+    parent: '/rooms',
     crawl: { changeFrequency: 'monthly', priority: 0.7 },
   },
   {
@@ -334,7 +345,7 @@ const DESTINATIONS: readonly Destination[] = [
     // this is NOT paired with a robots.txt Disallow.
     path: '/design-system',
     label: 'Design system',
-    parent: '/library',
+    parent: '/rooms',
     noIndex: true,
   },
 ];
@@ -380,7 +391,7 @@ export function destinationsInGroup(group: DestinationGroup): readonly Destinati
 
 /**
  * The one room list: the same three groups as `/about`, Rooms, and the editorial footer columns.
- * Atlas, Records, and the library hub stay off Rooms; Find chrome lists them separately.
+ * Explore, Records, and Rooms itself stay off this list; Find chrome lists them separately.
  */
 export function browsableDestinations(): readonly Destination[] {
   return LIBRARY_CARD_GROUPS.flatMap((group) => destinationsInGroup(group));
@@ -421,14 +432,14 @@ export function parentPathFor(pathname: string): string | null {
     if (path.startsWith(prefix)) return parent;
   }
 
-  // An unrecognised path is still somewhere: it hangs off the Atlas rather than off nothing.
+  // An unrecognised path is still somewhere: it hangs off Explore rather than off nothing.
   return path === '/' ? null : '/';
 }
 
 /**
  * The footer columns, derived rather than authored.
  *
- * Find (Home / Atlas / Library / Records) leads; the three editorial groups follow. A route
+ * Find (Home / Explore / Rooms / Records) leads; the three editorial groups follow. A route
  * joins the footer by having a group, and leaves it by losing one — so `/history` cannot linger
  * after it becomes a redirect.
  */
@@ -451,7 +462,7 @@ export function footerColumns(): readonly FooterColumn[] {
       title: 'Find',
       items: destinationsInGroup('find').map((destination) => ({
         href: destination.path,
-        label: destination.label === 'The library' ? 'Library' : destination.label,
+        label: destination.label,
       })),
     },
     column(GROUP_HEADINGS.read ?? 'Where to begin', ['read']),

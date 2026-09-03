@@ -1,7 +1,7 @@
 /**
  * Instant loading state for `/explore`.
  *
- * The Atlas route is `force-dynamic` (see page.tsx): every visit renders the shell from the
+ * The Explore route is `force-dynamic` (see page.tsx): every visit renders the shell from the
  * in-process catalog, and a cold instance first has to load that catalog (CDN artifact, or
  * Postgres if the artifact is unusable), which can take several seconds. Without this file
  * Next shows nothing at all while that RSC payload streams, so a click on "Explore" reads as

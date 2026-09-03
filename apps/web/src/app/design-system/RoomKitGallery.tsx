@@ -126,8 +126,8 @@ export function RoomKitGallery() {
           </h2>
           <p>
             Nothing here is a summary of somebody else&apos;s article. Each chapter is built out of
-            the same records the Atlas holds, which means you can leave the prose at any point and
-            go look at the thing itself.
+            the same records the map holds, which means you can leave the prose at any point and go
+            look at the thing itself.
           </p>
           <ul>
             <li>The measure at 66 characters, set by the surface class.</li>
@@ -299,7 +299,7 @@ export function RoomKitGallery() {
         tokens={['--room-sunk', '--ds-accent-graphic', '--ds-radius-md', '--ds-rule']}
       >
         {/* Inside a stage, so both states are inspectable: scroll one of these past the halfway
-            mark and it takes the plate — copper edge, tag, and the Atlas hand-off appear, while
+            mark and it takes the plate — copper edge, tag, and the Explore hand-off appear, while
             the other returns to idle. Exactly one is ever live, which is the rule /law,
             /methodology and chapter detail depend on.
 

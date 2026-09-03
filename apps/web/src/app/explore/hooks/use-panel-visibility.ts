@@ -29,7 +29,7 @@ function isNarrowViewport(): boolean {
 }
 
 /**
- * The Atlas's chrome-visibility state: which mode it's in, which overlays are open, and which
+ * Explore's chrome-visibility state: which mode it's in, which overlays are open, and which
  * side panels show. Split from the record/lens/camera state because none of it depends on the
  * data — it is purely about what's on screen.
  */
@@ -51,9 +51,12 @@ export function usePanelVisibility() {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [savedOpen, setSavedOpen] = useState(false);
   /**
-   * Both panels open is the wide default. On a narrow viewport they would cover the plate
-   * between them, so the surface opens on the map and the dock chips bring an instrument
-   * in when asked. Server-rendered as the wide layout and corrected after mount.
+   * All four open is the wide default. On a narrow viewport four panels would cover the plate
+   * between them, so only Lens (the filters) stays open; Results, Decade and Camera collapse
+   * to the dock and the reader brings one in when asked. Landing on Explore with every panel
+   * collapsed read as "just a map, no controls" (repo report, 2026-09-02) — Lens is the one
+   * panel a reader expects the instrument to open on. Server-rendered as the wide layout and
+   * corrected after mount.
    */
   const [panels, setPanels] = useState<PanelVisibility>({
     lens: true,
@@ -73,7 +76,7 @@ export function usePanelVisibility() {
       setNarrow(isNarrow);
       setBothColumns(wideQuery.matches);
       setPanels({
-        lens: !isNarrow,
+        lens: true,
         results: !isNarrow,
         decade: !isNarrow,
         camera: !isNarrow,

@@ -1,14 +1,23 @@
 /**
  * The record page's chrome vocabulary: pills, fact tiles, meters, beat headings and apparatus
- * titles. One set of parts, one type scale (`record-room.css`), so the masthead, the strip, the
+ * titles. One set of parts, one type scale (`record-chrome.css`), so the masthead, the strip, the
  * column and the band read as one instrument rather than five components that met on a page.
  *
  * Every icon here travels with a visible word (WCAG 1.4.1): a pill is icon plus label, a tile
  * is icon plus label plus value, a meter is bars plus the word it measures. Icons come from the
- * same Font Awesome sets the Atlas already uses (`kind-icons.ts`, `status-icons.ts`,
- * `confidence-icons.ts`), so a person is the same glyph on the map, in the rail and on the page.
+ * same Font Awesome sets Explore already uses (`kind-icons.ts`, `status-icons.ts`,
+ * `confidence-icons.ts`), so a person carries the same icon here as on any labelled badge.
+ *
+ * The map itself, and the narrow chrome that sits beside it, deliberately do not use these icons.
+ * A results row gives the kind an 18px column with no room for a word, so it draws the geometric
+ * shape channel (`KindGlyph`) that the map markers paint, and a grade there is a dot whose fill
+ * treatment carries the grade in greyscale (`GradeDot`). Those are the non-colour signal, not old
+ * styling waiting to be replaced. See `docs/ui/patterns-map-entity-encoding.md`.
  *
  * Server-safe: no client state, no effects.
+ *
+ * The atoms' stylesheet travels with the component (`record-chrome.css`), so a surface that
+ * renders a pill gets a styled pill without knowing which route it is on.
  */
 import React, { type ReactNode } from 'react';
 import Link from 'next/link';
@@ -39,6 +48,7 @@ import { iconWithFallback } from '../../lib/map-experience/icon-fallback';
 import { displayEncodingFor } from '../../lib/map-experience/kind-encoding';
 import { kindIconFor } from '../../lib/map-experience/kind-icons';
 import { statusIconFor } from '../../lib/map-experience/status-icons';
+import './record-chrome.css';
 
 void React;
 
@@ -292,23 +302,27 @@ export function RecordFactTile({
 }: RecordFactTileProps) {
   return (
     <div className={cx('ds-rec-tile', className)}>
-      <span className="ds-rec-tile__plate" aria-hidden="true">
+      {/*
+        The icon rides on the label rather than in a plate of its own. Five plated icons inside
+        five bordered boxes put three nested containers around every fact, which is what made a
+        row of five short strings feel heavier than the name above it.
+      */}
+      <dt className="ds-rec-tile__label">
         <FontAwesomeIcon
           icon={icon}
           className="ds-rec-tile__icon"
           {...(iconColor ? { style: { color: iconColor } } : {})}
+          aria-hidden="true"
         />
-      </span>
-      <div className="ds-rec-tile__text">
-        <dt className="ds-rec-tile__label">{label}</dt>
-        <dd className="ds-rec-tile__value">{value}</dd>
-        {support !== undefined || meter ? (
-          <dd className="ds-rec-tile__support">
-            {meter ? <RecordMeter {...meter} /> : null}
-            {support !== undefined ? <span>{support}</span> : null}
-          </dd>
-        ) : null}
-      </div>
+        {label}
+      </dt>
+      <dd className="ds-rec-tile__value">{value}</dd>
+      {support !== undefined || meter ? (
+        <dd className="ds-rec-tile__support">
+          {meter ? <RecordMeter {...meter} /> : null}
+          {support !== undefined ? <span>{support}</span> : null}
+        </dd>
+      ) : null}
     </div>
   );
 }

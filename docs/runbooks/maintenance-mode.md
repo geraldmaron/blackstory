@@ -65,7 +65,7 @@ https://<site>/?maintenance_bypass=<token>
 
 The edge swaps it for an HttpOnly cookie valid for 30 days and redirects to the same URL without
 the parameter, so the token does not linger in the address bar, in a `Referer`, or in a pasted
-link. After that the whole site works normally in that browser, including the Atlas.
+link. After that the whole site works normally in that browser, including the map.
 
 For scripts and uptime checks that cannot hold a cookie, send the header instead:
 

@@ -1,7 +1,7 @@
 /**
- * Production MapLibre style builder for the `/explore` national map — the production evolution
- * of `dark-archive-style.ts`. Only type-level `maplibre-gl` imports (same convention as the demo
- * style), so this module has zero runtime WebGL dependency and is safe to unit test in plain Node.
+ * Production MapLibre style builder for the `/explore` national map. It replaced the demo-stage
+ * `dark-archive-style.ts`, which is gone. Only type-level `maplibre-gl` imports, so this module
+ * has zero runtime WebGL dependency and is safe to unit test in plain Node.
  *
  * Every color comes from `../../lib/map-experience/dignity-style.ts` (which reuses
  * `@repo/ui`'s brand palette). This file introduces no new hues, so the dignity rule

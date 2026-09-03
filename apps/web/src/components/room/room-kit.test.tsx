@@ -40,7 +40,7 @@ const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../.
  * and the test fails in both directions — a file here that no longer exists is a stale
  * exemption, a file on disk that is not here is the v6 system growing back.
  *
- * One entry outlives the three surface packages by design: `explore-*` belongs to the Atlas
+ * One entry outlives the three surface packages by design: `explore-*` belongs to Explore
  * until SP-16 closes. The `history-*` pair left with repo-92n2.27, which deleted the orphaned
  * render components now that /history is a redirect endpoint.
  */
@@ -117,27 +117,27 @@ describe('room kit · the v6 edition system stays retired', () => {
 });
 
 describe('room kit · the trail is computed, never hand-written', () => {
-  // SP-21 (repo-92n2.29) shipped /library, so a reading room's parent is the library rather than
-  // the Atlas — matching `SURF_PARENT` in the mock, where library is the default up-link. These
-  // chains were one step short while the route was held. The Atlas root itself is resolved but
+  // SP-21 (repo-92n2.29) shipped /rooms, so a reading room's parent is Rooms rather than
+  // the site root — matching `SURF_PARENT` in the mock, where Rooms is the default up-link. These
+  // chains were one step short while the route was held. The site root itself is resolved but
   // not rendered as a step (see resolveTrail).
-  it('a reading room hangs off the library', () => {
+  it('a reading room hangs off Rooms', () => {
     assert.deepEqual(resolveTrail('/books'), [
-      { label: 'The library', href: '/library' },
+      { label: 'Rooms', href: '/rooms' },
       { label: 'Banned books', href: null },
     ]);
   });
 
-  it("a record's parent is its catalogue, not the Atlas", () => {
+  it("a record's parent is its catalogue, not the site root", () => {
     assert.deepEqual(resolveTrail('/books/the-bluest-eye', 'The Bluest Eye'), [
-      { label: 'The library', href: '/library' },
+      { label: 'Rooms', href: '/rooms' },
       { label: 'Banned books', href: '/books' },
       { label: 'The Bluest Eye', href: null },
     ]);
   });
 
-  it("an entity's parent is the Atlas, not /records — a record is a point, not a row", () => {
-    // The Atlas root is not a rendered step, so an entity's chain is the entity alone.
+  it("an entity's parent is the site root, not /records — a record is a point, not a row", () => {
+    // The site root is not a rendered step, so an entity's chain is the entity alone.
     assert.deepEqual(resolveTrail('/entity/abc', 'Isaac McGhie'), [
       { label: 'Isaac McGhie', href: null },
     ]);
@@ -145,7 +145,7 @@ describe('room kit · the trail is computed, never hand-written', () => {
 
   it('a nested utility room keeps every intermediate step', () => {
     assert.deepEqual(resolveTrail('/corrections/status/AB12', 'AB12'), [
-      { label: 'The library', href: '/library' },
+      { label: 'Rooms', href: '/rooms' },
       { label: 'Corrections', href: '/corrections' },
       { label: 'AB12', href: null },
     ]);
@@ -155,12 +155,12 @@ describe('room kit · the trail is computed, never hand-written', () => {
     assert.deepEqual(resolveTrail('/books/?sort=year', 'Books'), resolveTrail('/books', 'Books'));
   });
 
-  it('the Atlas root is never rendered as a crumb step', () => {
-    for (const path of ['/books', '/library', '/entity/abc', '/corrections/status/AB12']) {
+  it('the site root is never rendered as a crumb step', () => {
+    for (const path of ['/books', '/rooms', '/entity/abc', '/corrections/status/AB12']) {
       const trail = resolveTrail(path, 'Here');
       assert.ok(
         trail.every((step) => step.href !== '/'),
-        `${path} must not render an Atlas step`,
+        `${path} must not render a site-root step`,
       );
     }
   });
@@ -218,7 +218,7 @@ describe('room kit · RoomHeader is the only header a room renders', () => {
     const html = renderToStaticMarkup(<Breadcrumb pathname="/law" />);
     assert.match(html, /aria-current="page"/);
     assert.match(html, /ds-room-crumb__here[^>]*>Law/);
-    assert.match(html, /href="\/library"/);
+    assert.match(html, /href="\/rooms"/);
     assert.doesNotMatch(html, /href="\/"/);
   });
 });
@@ -529,7 +529,7 @@ describe('room kit · map moment', () => {
     assert.doesNotMatch(html, /Plate · Live/);
   });
 
-  it('the Atlas hand-off renders only when a destination is given', () => {
+  it('the Explore hand-off renders only when a destination is given', () => {
     const without = renderToStaticMarkup(
       <MapMoment camera={{ center: [-90, 35] }} note="A place." />,
     );

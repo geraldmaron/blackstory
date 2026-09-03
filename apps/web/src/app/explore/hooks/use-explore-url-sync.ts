@@ -1,5 +1,5 @@
 /**
- * Keep the Atlas address bar in sync with live Lens narrowing (v10 DiscoveryState).
+ * Keep the Explore address bar in sync with live Lens narrowing (v10 DiscoveryState).
  *
  * Uses `history.replaceState` so changing filters does not remount the map. Viewport
  * (lat/lng/zoom) stays out of the bar (ADR-017). Panel chrome stays out too.

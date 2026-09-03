@@ -38,7 +38,7 @@ test('a refused claim leaves the plate at rest rather than in a half-framed stat
   );
 });
 
-test('the Atlas refuses a moment claim and keeps steering', () => {
+test('Explore refuses a moment claim and keeps steering', () => {
   // A record sheet floating over the live plate mounts a place block. It cannot borrow the plate
   // it is floating over, so the plate stays Live and the block renders its static fallback.
   assert.equal(

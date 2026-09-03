@@ -12,7 +12,7 @@
  * reader with no JavaScript, the caption still carries the point.
  *
  * The component survives as a thin adapter rather than the article rendering `MapMoment` directly,
- * because the `mapInset` block carries an `entityId` and the Atlas hand-off has to be built from
+ * because the `mapInset` block carries an `entityId` and the Explore hand-off has to be built from
  * it — `selected=<entityId>` is the same convention entity and story pages use. That is real
  * mapping logic and it belongs somewhere; a wrapper this size is cheaper than teaching `ArticleBody`
  * the explore URL vocabulary.

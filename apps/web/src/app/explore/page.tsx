@@ -1,5 +1,5 @@
 /**
- * Atlas instrument. `/` is the Door (about framing + pin plate). This route is the live catalog.
+ * Explore instrument. `/` is the Door (about framing + pin plate). This route is the live catalog.
  */
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { AtlasHome } from '../atlas-home';

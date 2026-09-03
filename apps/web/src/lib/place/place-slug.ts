@@ -3,7 +3,7 @@
  *
  * Slugs come from the published display name. When two release records share a name,
  * the address is `{slug}--{entityId}` so the page never invents a wrong stand.
- * Door pin walks still use the stand allowlist; this module opens Place and the Atlas
+ * Door pin walks still use the stand allowlist; this module opens Place and the Explore
  * instrument to the corpus.
  */
 import type { PublicSearchIndexDoc } from '@repo/domain/search';
@@ -89,7 +89,7 @@ export function placeHrefForEntity(
 }
 
 /**
- * Atlas instrument / search / map pin deep link. Standable records go to Place. Named people open
+ * Explore instrument / search / map pin deep link. Standable records go to Place. Named people open
  * their entity record (the memorial wall is a room, not a substitute for one pin). Statutes go to
  * `/law`. Door Rest pin walks still use `atlasWalkHref` (stand allowlist) separately.
  */

@@ -172,6 +172,9 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         <p className="ds-article-mast__lede">{doc.summary}</p>
         <p className="ds-article-mast__byline">
           <span>
+            Authored by <Link href="/about#neo-heading">Neo</Link>
+          </span>
+          <span>
             Published <span className="ds-mono">{doc.publishedAt}</span>
           </span>
           {doc.updatedAt ? (

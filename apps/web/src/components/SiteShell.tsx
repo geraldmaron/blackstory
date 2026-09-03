@@ -1,7 +1,7 @@
 /**
  * App shell wrapper: header, offline notice, main body slot, and document footer.
  *
- * The Atlas (`/explore`) is the instrument: no site header, no mega footer, its own
+ * Explore (`/explore`) is the instrument: no site header, no mega footer, its own
  * command bar. The door (`/`) is a reading surface: same room chrome as the archive,
  * mast plus plate in the page. `SiteShellHeader` and `SiteShellFooter` read the same
  * surface-class registry so they cannot disagree.

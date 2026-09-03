@@ -51,7 +51,7 @@ export const DEFAULT_EXPLORE_FILTERS: ExploreFilterState = {
 };
 
 /**
- * Single kind-filter matcher shared by the Atlas and `/records`.
+ * Single kind-filter matcher shared by Explore and `/records`.
  * Accepts only the five map kind families (`people`) and micro-kinds (`school`).
  * Legacy `/history` category ids (`law`, `works`) are remapped at the redirect boundary only.
  */
@@ -67,7 +67,7 @@ export function kindMatchesPublicFilter(featureKind: string, filterKind: string)
   return false;
 }
 
-/** Human label for an active kind constraint chip across Atlas and Records. */
+/** Human label for an active kind constraint chip across Explore and Records. */
 export function kindFilterLabel(filterKind: string): string {
   const value = filterKind.trim();
   if (isKnownMapKindFamily(value)) return kindFamilyEncodingFor(value).label;

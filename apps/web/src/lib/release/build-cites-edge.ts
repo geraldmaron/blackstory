@@ -2,7 +2,7 @@
  * The story-cites-record edge.
  *
  * The thesis of v9 is that every record links back to the writing about it. The record side of
- * that link had no implementation: an entity could be pinned on the Atlas, opened, and read in
+ * that link had no implementation: an entity could be pinned on Explore, opened, and read in
  * full without ever learning which story put it there. This module derives that edge from the
  * article projection the release already publishes, so it costs one pass over documents the
  * server is loading anyway rather than a new pipeline stage.

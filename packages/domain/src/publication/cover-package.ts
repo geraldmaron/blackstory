@@ -19,7 +19,7 @@ export type CoverRecipe = (typeof COVER_RECIPES)[number];
 export const COVER_BRIEF_HELPERS = {
   situation: 'who is this for, and what are they stuck in? A person, not a topic.',
   metaphor: 'the picture that asks the question. If you can google it, start over.',
-  refuse: "name the stock photo so we don't ship it.",
+  refuse: 'name the stock photo so it never ships.',
 } as const;
 
 export type CoverBriefField = keyof typeof COVER_BRIEF_HELPERS;

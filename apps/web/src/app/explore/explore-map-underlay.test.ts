@@ -31,7 +31,7 @@ describe('explore map underlay', () => {
     );
     assert.match(
       css,
-      /\.ds-explore-underlay__ground[\s\S]*background-color:\s*var\(--ds-ink-muted\)/,
+      /\.ds-explore-underlay__ground[\s\S]*background-color:\s*var\(--ds-first-paint-ground-ink\)/,
     );
     assert.doesNotMatch(css, /radial-gradient|linear-gradient|box-shadow|backdrop-filter/);
   });

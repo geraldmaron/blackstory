@@ -152,7 +152,7 @@ export function useRecordSelection(
   const sheetRecord = useMemo<SheetRecord | null>(() => {
     if (!selectedFeature) return null;
     // A reader who clicks a pin during story mode is asking for the same detail a click gets in
-    // Atlas mode. The sheet renders on both a chapter's left and right layouts; when it would sit
+    // Explore mode. The sheet renders on both a chapter's left and right layouts; when it would sit
     // on the same side as the current chapter card, StoryMode forces every chapter card to the
     // opposite side for as long as the sheet is open (see `.ds-story--sheet-open` in
     // story-mode.css) rather than the sheet giving way — the reader asked to see the record.
@@ -162,7 +162,6 @@ export function useRecordSelection(
       id: selectedFeature.properties.entityId,
       name: selectedFeature.properties.displayName,
       kind: selectedFeature.properties.kind,
-      kindLabel: selectedFeature.properties.kindFamily,
       ...(selectedFeature.properties.mapTone
         ? { mapTone: selectedFeature.properties.mapTone }
         : {}),

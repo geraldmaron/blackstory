@@ -11,7 +11,7 @@ import { surfaceClassFor } from '../lib/nav/surface-classes';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-test('only the Atlas resolves to the instrument class', () => {
+test('only Explore resolves to the instrument class', () => {
   assert.equal(surfaceClassFor('/'), 'door');
   assert.equal(surfaceClassFor('/', 'atlas=1'), 'door');
   assert.equal(surfaceClassFor('/explore'), 'instrument');

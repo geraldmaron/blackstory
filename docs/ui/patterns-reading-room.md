@@ -20,11 +20,11 @@ Top to bottom, in one column:
 
 1. **Command bar**, slim. Mounted above the route, never unmounted.
 2. **Reading progress rule.** A 2px copper hairline pinned under the bar, filling as the column scrolls. Present on every Reading room; absent everywhere else.
-3. **Crumb.** Atlas / parent chain / here. Every step is a live control, so up is always one click. The parent is where a reader would expect "up" to go, which is not always the index.
+3. **Crumb.** Explore / parent chain / here. Every step is a live control, so up is always one click. The parent is where a reader would expect "up" to go, which is not always the index.
 4. **Surface header.** Mono kicker, Sora title, serif lede, then a mono meta line carrying the route path and any as-of stamp.
 5. **The column.** `min(720px, 100% - gutters)`. Source Serif 4 body at roughly a 66 character measure. Hairline section rules rather than a stack of identical cards. Exactly one `h1`.
 6. **Right rail**, on wide viewports only. Grouped links that stay inside the room. It never sends a reader who wanted a different chapter out to the map.
-7. **Records off ramp.** Mandatory. Every instance ends with a named handoff into the Atlas or `/records`.
+7. **Records off ramp.** Mandatory. Every instance ends with a named handoff into the map or `/records`.
 8. **Site footer.**
 
 Column width is the only thing the class varies: 720px default, and the record and utility classes narrow it. A catalogue index widens its rows, not its measure.
@@ -37,7 +37,7 @@ Column width is the only thing the class varies: 720px default, and the record a
 
 **Absent:** Lens, Results rail, Time panel, Camera console, dock, readout, legend overlay.
 
-The record sheet is the same component the Atlas renders, in its second posture: anchored in the reading column rather than floating over the plate, with "Fly to place" swapping to "Open on the Atlas". No surface forks the preview.
+The record sheet is the same component the map renders, in its second posture: anchored in the reading column rather than floating over the plate, with "Fly to place" swapping to "Open on the map". No surface forks the preview.
 
 ---
 
@@ -58,12 +58,12 @@ Every map moment carries a caption that stands alone. If the caption needs the m
 
 ## 5. Entry and exit
 
-**Enter** from the palette, the footer, an Atlas record's related links, or a catalogue card.
+**Enter** from the palette, the footer, a map record's related links, or a catalogue card.
 
 **Exit** is never optional:
 
-- Every Reading room closes with a records off ramp into the Atlas or `/records`.
-- `A` opens the page's subject on the Atlas, through the lens handoff builder with its reason string (see [`patterns-lens-handoff.md`](./patterns-lens-handoff.md)).
+- Every Reading room closes with a records off ramp into the map or `/records`.
+- `A` opens the page's subject on the map, through the lens handoff builder with its reason string (see [`patterns-lens-handoff.md`](./patterns-lens-handoff.md)).
 - `ESC` closes an open record sheet and returns focus to the chip that opened it.
 - Browser back returns to the referring surface with scroll restored.
 

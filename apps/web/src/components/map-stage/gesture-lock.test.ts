@@ -3,7 +3,7 @@
  *
  * The point of the structural `GestureTarget` type is that this runs under `node:test` with no
  * WebGL and no MapLibre. The asymmetry case below is the one that matters: a handler disabled on
- * entry and forgotten on exit leaves the Atlas subtly dead, panning but refusing to rotate, with
+ * entry and forgotten on exit leaves Explore subtly dead, panning but refusing to rotate, with
  * nothing on screen pointing at the cause.
  */
 import assert from 'node:assert/strict';

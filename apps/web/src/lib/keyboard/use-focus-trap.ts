@@ -86,7 +86,7 @@ export type FocusTrapOptions = {
  * level. Returns the elements it changed, for the caller to restore.
  *
  * The level walk is the part that is easy to get wrong. Inerting only the overlay's own siblings
- * looks right and tests green, but the Atlas mounts its map canvas from the root layout — a
+ * looks right and tests green, but Explore mounts its map canvas from the root layout — a
  * different subtree entirely — so the dialog's siblings do not include the stage it is covering.
  * Every ancestor level has to be swept, or `aria-modal` is asserting something the document does
  * not do.

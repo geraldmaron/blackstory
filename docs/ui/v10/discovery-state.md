@@ -44,14 +44,14 @@ Source: `apps/web/src/lib/map-experience/url-state.ts`, `filters.ts`.
 
 Map-only chrome (not DiscoveryState): `layerMode`, `popGeo`, `popDecade`, `group`, `sat`, `lines`, `decade` (edge decade), `edge`, panel chrome, camera.
 
-## Primary vs advanced (Atlas Rest → Explore)
+## Primary vs advanced (Explore Rest → Explore)
 
 | Tier | Filters |
 |---|---|
 | Primary (Explore first layer) | search/query, era, geography/state, kind |
 | Advanced | topic/theme, evidence/confidence, status, population layers, relationship lines |
 
-Rest (Door) exposes search + invitation into Explore/Records/Library — not the full Lens.
+Rest (Door) exposes search + invitation into Explore/Records/Rooms — not the full Lens.
 
 ## Map/List continuity
 
@@ -77,9 +77,9 @@ Do not materialize every Cartesian filter combination.
 - `apps/web/src/lib/discovery/continuity-label.ts` — leaf continuity copy (avoids Records↔Discovery cycle)
 - `apps/web/src/lib/discovery/discovery-arrival.ts` — client-safe Place arrival query (`from=map|list`)
 - Explore `floor` is in `EXPLORE_URL_PARAM_KEYS`, parsed/serialized, and seeds the Lens
-- Records→Atlas `buildAtlasHref` evidence handoff survives middleware
+- Records→map `buildExploreHref` evidence handoff survives middleware
 - Place arrival params allowlisted (`PLACE_PAGE_PARAM_ALLOWLIST`); Records rows carry `from=list`
-- Atlas pin/sheet walks append `from=map` + live Lens narrowing
+- map pin/sheet walks append `from=map` + live Lens narrowing
 - Lens changes rewrite `/explore?…` via `useExploreUrlSync` (floor included; no lat/lng/zoom)
 - Lens primary Where/Kind; topic/evidence/layers/population under More filters (opens when advanced active)
 - Records off-ramp uses `mapListContinuityLabel(matched, mappable)`

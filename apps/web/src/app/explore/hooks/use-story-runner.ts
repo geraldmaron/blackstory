@@ -159,7 +159,7 @@ export function useStoryRunner(
   );
 
   /**
-   * Leaving the story must not strand its beats on the Atlas. A spotlight mask, a corridor layer or
+   * Leaving the story must not strand its beats on Explore. A spotlight mask, a corridor layer or
    * a stepping histogram left running would read as the map having broken, not as the story having
    * ended.
    */
@@ -168,7 +168,7 @@ export function useStoryRunner(
     stopSweep();
     setSpotlight(null);
     // The corridor chapter turns the routes layer on. Left on, it draws six arcs and their labels
-    // across an Atlas the reader never asked to annotate, and the lens toggle reads as already-on.
+    // across a map the reader never asked to annotate, and the lens toggle reads as already-on.
     setLayers((current) => (current.routes ? { ...current, routes: false } : current));
   }, [mode, setLayers, setSpotlight, stopSweep]);
 

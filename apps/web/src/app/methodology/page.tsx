@@ -21,7 +21,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
   path: '/methodology',
   title: 'Methodology',
   description:
-    'How BlackStory decides what qualifies, verifies sources, protects living people, handles corrections, and publishes confidence you can check yourself. History should not be erased, should not be hard to find, and should be accessible because it is about you.',
+    'How BlackStory decides what qualifies as a record, checks it against independent sources, grades how sure the evidence is, keeps the addresses of living people off the map, and corrects itself in the open.',
 });
 
 /**

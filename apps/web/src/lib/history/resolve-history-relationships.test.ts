@@ -32,7 +32,7 @@ test('resolveHistoryRelationships extracts evidence-backed edges from catalog re
 });
 
 test('history graph connection count follows visible published edges, not a hard cap', () => {
-  // The same slice -> nodes -> edges -> connection-count pipeline the Atlas reads (build-history-graph
+  // The same slice -> nodes -> edges -> connection-count pipeline Explore reads (build-history-graph
   // via explore-view-model), rather than the deleted /history/api view-model chain (repo-92n2.36).
   const entities = listPublicEntities();
   const entitiesById = new Map(entities.map((entity) => [entity.id, entity]));

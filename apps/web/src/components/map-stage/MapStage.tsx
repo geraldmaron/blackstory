@@ -1258,7 +1258,7 @@ export function MapStageProvider({
           // Dev-only escape hatch for in-browser inspection and perf traces.
           (window as unknown as Record<string, unknown>).__bpMapStage = map;
         }
-        // No `NavigationControl`. Zoom and pitch live in the Atlas camera console, so the map
+        // No `NavigationControl`. Zoom and pitch live in the Explore camera console, so the map
         // keeps one control vocabulary (design-direction-v9-atlas.md §5.5). Attribution stays:
         // it is a licence obligation, not chrome we get to choose.
         map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');

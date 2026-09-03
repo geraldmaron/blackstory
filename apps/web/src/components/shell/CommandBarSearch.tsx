@@ -1,7 +1,7 @@
 /**
  * The bar's search, as a real search.
  *
- * Off the Atlas this slot used to be an anchor to /records: it looked exactly like the Atlas's
+ * Off Explore this slot used to be an anchor to /records: it looked exactly like Explore's
  * search field, in the same place, at the same size, and typing into it was impossible because
  * it was a link. On twelve of the thirteen rooms the only way to search was to navigate away
  * first. This makes it a live combobox instead, so a reader types where the search box is and
@@ -11,11 +11,11 @@
  * reader sees here is the ranking they get on the results page, and the guardrails and rate
  * limits are the endpoint's rather than a second implementation's.
  *
- * The Atlas keeps its palette: there, a record selection also has to move the map, which is a
+ * Explore keeps its palette: there, a record selection also has to move the map, which is a
  * behaviour this component deliberately does not know about.
  *
- * It does own `⌘K` and `/` off the Atlas, and that is not a convenience. The palette's own opener
- * lives inside `CommandPalette`, which only the Atlas mounts, so on the other twelve rooms the
+ * It does own `⌘K` and `/` off Explore, and that is not a convenience. The palette's own opener
+ * lives inside `CommandPalette`, which only Explore mounts, so on the other twelve rooms the
  * shortcut the bar advertises did nothing at all — including on the root error boundary, where a
  * thrown segment leaves search as the only way out of the page. The handler below is deliberately
  * a shell-level listener rather than something a room opts into, because the room is exactly what

@@ -50,6 +50,28 @@
   padding-top: 0;
 }
 
+/*
+ * The static map ground shared by every Albers locator surface — the Door board, the Explore
+ * first-paint underlay and the record locator — is the live plate's ground. The locator SVG is a
+ * mask (land alpha 0.32, hairlines 1), so the ink is chosen to land on `--ds-map-land` through
+ * that alpha over the ground, and hairlines read as the plate's state bounds. Light: the plate's
+ * background is land and states are drawn by line, so the board is land with line-2 states.
+ * Dark: the plate reads as near-black water with sepia land; #9a8a6d at 0.32 over
+ * --ds-map-water is --ds-map-land. One pattern on every surface, so no page opens on a map the
+ * plate then replaces with a different one.
+ */
+:root {
+  --ds-first-paint-ground: var(--ds-map-land);
+  --ds-first-paint-ground-ink: var(--ds-map-line-2);
+  --ds-first-paint-cluster-ink: var(--ds-accent-graphic);
+  --ds-first-paint-cluster-text: var(--ds-map-halo);
+}
+
+[data-theme='dark'] {
+  --ds-first-paint-ground: var(--ds-map-water);
+  --ds-first-paint-ground-ink: #9a8a6d;
+}
+
 html:has([data-surface='instrument']) {
   overflow: hidden;
   overscroll-behavior: none;
@@ -96,9 +118,9 @@ html:has([data-surface='instrument']) {
 
 /* Document surfaces keep the shared primary nav in full. Header chrome follows [data-theme]
    via `@repo/ui` shell-header.css, the same tokens on every class; nothing here strips nav,
-   the mobile menu or the CTA. The Atlas renders its own command bar instead of this header,
+   the mobile menu or the CTA. Explore renders its own command bar instead of this header,
    and that swap is a render gate in SiteShellHeader reading the same registry — not a
-   display:none, so the Atlas never ships a second hidden navigation. */
+   display:none, so Explore never ships a second hidden navigation. */
 
 .ds-shell-offline {
   padding: calc(var(--ds-island-clearance)) 0 0;
@@ -1858,7 +1880,7 @@ html:has([data-surface='instrument']) {
   z-index: var(--ds-z-map-plate);
   height: 100dvh;
   /* Trap MapLibre canvas + HTML markers (`.maplibregl-marker` uses will-change/transform)
-     so they cannot paint above Atlas instrument chrome in a sibling stacking context. */
+     so they cannot paint above Explore instrument chrome in a sibling stacking context. */
   isolation: isolate;
   /* Pre-style-load flash — dark ocean by default; light theme matches Archive Paper. */
   background: #080606;
@@ -1882,8 +1904,8 @@ html:has([data-surface='instrument']) {
    Nothing enforced that. The plate is `position: fixed` on every route and the room sheets set
    no background of their own, so once the Instrument had built MapLibre the live plate stayed
    lit under every subsequent route — state abbreviation labels and record clusters read
-   straight through the prose column on /library, /about, /methodology and every record page.
-   It only reproduces after visiting the Atlas first: on a cold load of a reading room GL was
+   straight through the prose column on /rooms, /about, /methodology and every record page.
+   It only reproduces after visiting Explore first: on a cold load of a reading room GL was
    never constructed, so the plate showed its flat paper fallback and the bug stayed invisible.
 
    Covering the plate rather than hiding it keeps the persistence contract in ADR-017 — the
@@ -2138,9 +2160,9 @@ body:has(.ds-explore-stage[data-results='open']) {
 }
 
 /*
- * The Atlas's narrow layout puts the dock switcher on the bottom edge, where the attribution was.
+ * The map's narrow layout puts the dock switcher on the bottom edge, where the attribution was.
  * Attribution is a licence obligation, so it moves up rather than being covered: dock height plus
- * its offset and a gap. The Atlas is the only surface with that bar, hence `:has(.ds-atlas)`.
+ * its offset and a gap. Explore is the only surface with that bar, hence `:has(.ds-atlas)`.
  */
 @media (max-width: 819px) {
   body:has([data-surface='instrument']):has(.ds-atlas) {

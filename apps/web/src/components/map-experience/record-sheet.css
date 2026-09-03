@@ -2,9 +2,13 @@
  * Record sheet — right slab, z 40, above the instruments and below the palette.
  *
  * Built as one of the instruments rather than as a modal that arrived over them: same matte
- * surface, hairline, and radius as the lens and the results rail. What marks it as the
- * thing the reader is currently holding is the accent dot in its own header, not a copper spine
- * down its edge.
+ * surface, hairline and radius as the lens and the results rail. What marks it as the thing the
+ * reader is currently holding is the photograph it opens on, when the release has one, and the
+ * copper kicker in its own header when it does not.
+ *
+ * Anatomy, top to bottom: top strip (Record · position · step · close), mast (the photo, credit
+ * printed on it), identity (pills, name, story), the place and evidence rows, the visit block,
+ * the precision note, the actions, then Sources, Documented connections and Cited in.
  */
 
 .ds-sheet {
@@ -13,7 +17,7 @@
   /*
    * The sheet takes the results rail's slot. It is the same object in the same place: opening a
    * record replaces the list it was chosen from, and closing it puts the list back. Above
-   * `--ds-atlas-both-columns` the two coexist and the sheet moves one column left — see below.
+   * 1150px the two coexist and the sheet moves one column left — see below.
    */
   right: var(--ds-space-4);
   bottom: var(--ds-atlas-bottom);
@@ -21,12 +25,6 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   width: min(430px, calc(100vw - var(--ds-space-4) * 2));
-  /*
-   * The sheet is one of the Atlas's instruments and is built like the rest of them: the same
-   * matte surface, hairline, and radius. It used to be a blurred panel with a 3px copper spine,
-   * which read as a modal that had arrived from somewhere else.
-   * The record it holds is marked by the accent dot in its own header instead.
-   */
   background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
@@ -106,26 +104,76 @@
   overscroll-behavior: contain;
 }
 
-.ds-sheet__kicker {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 5px;
+/* ---- mast ---------------------------------------------------------------- */
+
+/*
+ * The photo bleeds to the sheet's edges: negative margins undo the body padding so the mast is
+ * the sheet's own top edge, the way the place page's mast is the page's. The identity block
+ * below keeps the padding, so the name sits on the surface, not on the picture.
+ */
+.ds-sheet__mast {
+  position: relative;
+  margin: calc(var(--ds-space-5) * -1) calc(var(--ds-space-5) * -1) 0;
+  background: var(--ds-canvas);
+  /* Deliberately no `overflow: hidden`. In a grid row the figure's automatic minimum size is
+     zero once it becomes a scroll container, and Chrome then sized the row to the caption alone
+     and drew the identity block under the picture. Nothing here needs clipping: the image is a
+     block and the credit is inside it. */
+}
+
+/* The image carries the ratio, not the figure, so the row has an intrinsic height to measure. */
+.ds-sheet__photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.ds-sheet__credit {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
   margin: 0;
+  padding: var(--ds-space-6) var(--ds-space-4) var(--ds-space-2);
+  background: linear-gradient(to top, color-mix(in srgb, #0a0a0a 72%, transparent), transparent);
   font-family: var(--ds-font-mono);
   font-size: 0.625rem;
-  letter-spacing: 0.06em;
-  color: var(--ds-ink-muted);
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  color: #f4efe5;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 0.4);
+}
+
+/* When there is a mast, the body's first gap is the mast's own bottom; pull the identity up
+   a step so the pills sit close under the picture. */
+.ds-sheet__body[data-media='photo'] .ds-sheet__identity {
+  margin-top: calc(var(--ds-space-2) * -1);
+}
+
+.ds-sheet__identity {
+  display: grid;
+  gap: var(--ds-space-2);
+}
+
+/*
+ * The pill row is `ds-rec-pills` from the record chrome, so kind, era and grade look here exactly
+ * as they look on the record page. Only the bottom margin is the sheet's own.
+ */
+.ds-sheet__pills {
+  margin: 0 0 var(--ds-space-1);
 }
 
 .ds-sheet__name {
-  margin: 10px 0 0;
+  margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1.6875rem;
+  font-size: 1.75rem;
   font-weight: 600;
-  line-height: 1.14;
+  line-height: 1.1;
   letter-spacing: -0.03em;
   color: var(--ds-ink);
+  text-wrap: balance;
 }
 
 /*
@@ -140,13 +188,15 @@
 .ds-sheet__name-link:hover,
 .ds-sheet__name-link:focus-visible {
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: var(--ds-accent-graphic);
 }
 
 .ds-sheet__story {
   margin: 0;
   font-family: var(--ds-font-editorial);
-  font-size: 0.96875rem;
+  font-size: 1rem;
   line-height: 1.58;
   color: var(--ds-ink);
 }
@@ -159,7 +209,7 @@
  * The facts, as a list of rows rather than a two-column data grid.
  *
  * The shared anatomy panel draws a mono-caps label column beside an editorial value column, which
- * is right under a record page's masthead and wrong in a 388px instrument: the label column set
+ * is right under a record page's masthead and wrong in a 430px instrument: the label column set
  * the measure, so "New Jersey Ave NW campus" wrapped over three lines beside the word WHERE. Here
  * each fact is one row, label left and value right, divided by the same hairline the rest of the
  * sheet already uses.
@@ -241,13 +291,13 @@
   justify-content: center;
   min-height: 2.5rem;
   text-decoration: none;
-  padding: 0 var(--ds-space-3);
+  padding: 0 var(--ds-space-4);
   border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-sm);
+  border-radius: var(--ds-radius-full, 999px);
   background: transparent;
   color: var(--ds-ink);
   font-family: inherit;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
 }
@@ -266,13 +316,13 @@
 .ds-sheet__action--primary {
   border-color: var(--ds-accent-graphic);
   background: var(--ds-accent-graphic);
-  color: var(--ds-inverse-ink);
+  color: var(--ds-fixed-ink, var(--ds-inverse-ink));
 }
 
 .ds-sheet__action--primary:hover {
   background: var(--ds-accent);
   border-color: var(--ds-accent);
-  color: var(--ds-inverse-ink);
+  color: var(--ds-fixed-ink, var(--ds-inverse-ink));
 }
 
 /* Quiet text peers (Save / Cite / Share): content stays louder than chrome. */
@@ -320,10 +370,12 @@
 .ds-sheet__group {
   display: grid;
   gap: var(--ds-space-2);
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
 /* Sans, sentence case, ink. Accent mono caps made "SOURCES" the loudest thing in a panel whose
-   subject is the record above it, and there are two of them. */
+   subject is the record above it, and there are three of them. */
 .ds-sheet__group-label {
   display: flex;
   align-items: baseline;
@@ -479,5 +531,9 @@
     right: var(--ds-space-2);
     bottom: var(--ds-space-2);
     width: auto;
+  }
+
+  .ds-sheet__mast {
+    aspect-ratio: 16 / 9;
   }
 }

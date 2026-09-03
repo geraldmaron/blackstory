@@ -35,8 +35,8 @@ export type GestureTarget = {
 
 /**
  * Named rather than inlined so `lockGestures` and `unlockGestures` cannot drift apart. The failure
- * mode this prevents is asymmetry: a handler disabled on entry and forgotten on exit leaves the
- * Atlas subtly dead — the map pans but will not rotate, and nothing points at the cause.
+ * mode this prevents is asymmetry: a handler disabled on entry and forgotten on exit leaves
+ * Explore subtly dead — the map pans but will not rotate, and nothing points at the cause.
  */
 const GESTURE_KEYS = [
   'scrollZoom',

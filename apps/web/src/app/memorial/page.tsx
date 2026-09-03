@@ -81,7 +81,7 @@ export default function MemorialPage() {
         <MemorialSections />
 
         <WalkOffRamp>
-          Names, held quietly. This is the national memorial, not one library&apos;s list.
+          This wall is national. The names on it stay names, with no record page attached.
         </WalkOffRamp>
       </Room>
     </div>

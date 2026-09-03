@@ -53,7 +53,7 @@ test('state-only fallback links to explore without a finite radius', () => {
   );
 });
 
-test('falls back to the Atlas instrument when neither coords nor state can be framed', () => {
+test('falls back to the Explore instrument when neither coords nor state can be framed', () => {
   const href = buildLocateExploreHref({
     match: {},
     jurisdictionIds: { countryId: 'us' },

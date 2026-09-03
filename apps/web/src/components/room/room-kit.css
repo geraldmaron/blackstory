@@ -345,7 +345,7 @@
 /* —— CardGrid / RoomCard ———————————————————————————————————————————————————
    Ink direction: a card is no longer a box. The border, background, radius and hover lift all
    come off; a RoomCard becomes a row separated from the next by a single bottom hairline
-   (the `index` shape, which every caller now takes including /library) or a column entry in a
+   (the `index` shape, which every caller now takes including /rooms) or a column entry in a
    three-fixed-column grid (the `hub` shape, kept on the surface for a genuinely wide flat set
    but currently unused). Kind used to be a tag drawn on the card; it is implied by the group the
    card sits in, so `RoomCard`'s `kind` prop stops rendering and a hub row that wants to say what
@@ -583,7 +583,7 @@
   margin-block: var(--ds-space-8);
 }
 
-/* —— RecordRef: prose that reaches back into the Atlas ————————————————————— */
+/* —— RecordRef: prose that reaches back into the map ————————————————————— */
 .ds-room-rref {
   display: inline;
   padding: 0;
@@ -1329,7 +1329,7 @@ a.ds-room-chip {
    * slot kept its opaque idle ground when live, which meant the map was positioned perfectly
    * over the slot and then covered by it: every MapMoment on every reading surface rendered
    * an empty box. Dropping the ground here lets the plate show through without touching the
-   * z-order that protects the rest of the page. The tag and the Atlas control sit at local
+   * z-order that protects the rest of the page. The tag and the Explore control sit at local
    * `z-index: 2`, so they stay above the map.
    */
   background: transparent;
@@ -1349,7 +1349,7 @@ a.ds-room-chip {
   color: var(--room-ink-4);
   transition: opacity var(--ds-duration-base) ease;
   /* Decorative text that covers the whole slot. Left interactive it swallowed clicks meant for
-     the Atlas control beneath it, including once it had faded to nothing on a live moment. */
+     the Explore control beneath it, including once it had faded to nothing on a live moment. */
   pointer-events: none;
 }
 
@@ -1379,7 +1379,7 @@ a.ds-room-chip {
   opacity: 1;
 }
 
-/* The Atlas hand-off. Hidden until the moment is live, because a control that opens "this view"
+/* The Explore hand-off. Hidden until the moment is live, because a control that opens "this view"
    is a lie when the plate is somewhere else on the page. `visibility` rather than `opacity`
    alone: an invisible control must also leave the tab order. */
 .ds-mapmoment__open {

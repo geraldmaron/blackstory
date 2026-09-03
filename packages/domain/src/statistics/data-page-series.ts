@@ -1,5 +1,5 @@
 /**
- * Public `/data` indicator series — chart-ready bundles aligned with Phase 1 / theme-impact
+ * Public `/data` indicator series: chart-ready bundles aligned with the theme-impact
  * metric ids. Pure types and builders; apps/web reads Postgres or falls back to fixtures.
  */
 import type { ThemeImpactThemeId } from './theme-impact-questions.js';
@@ -111,7 +111,7 @@ const USSC = {
   url: 'https://www.ussc.gov/research/quick-facts',
 } as const;
 
-/** Verified from Phase 1 reference fixtures via domain mappers (2026-07-22). */
+/** Verified against the published reference figures via domain mappers (2026-07-22). */
 export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
   generatedAt: '2026-07-22T00:00:00.000Z',
   servedFrom: 'fixture',
@@ -119,7 +119,7 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
     id: 'wealth-scf-median-nation',
     title: 'Median family net worth, Black vs White',
     caption:
-      'National median family net worth from the Survey of Consumer Finances, latest survey wave, in 2022 dollars. Wealth is measured at a point in time — not income — and reflects decades of policy and market context.',
+      'National median family net worth from the Survey of Consumer Finances, latest survey wave, in 2022 dollars. Wealth is measured at a point in time, not income, and reflects decades of policy and market context.',
     geographyLabel: 'United States',
     referencePeriod: '2022',
     primary: { label: 'Black families', value: 44_900, unit: 'usd' },
@@ -134,7 +134,7 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
     id: 'wealth-scf-median-trend-nation',
     title: 'Median family net worth since 1989',
     caption:
-      'Every Survey of Consumer Finances wave, in 2022 dollars. The gap never closes: Black family wealth loses its 1990s and 2000s gains to the Great Recession and only passes its 2007 level after 2019. The Fed cautions that the 1989 Black sample is small — read that first pair as rough.',
+      'Every Survey of Consumer Finances wave, in 2022 dollars. The gap never closes: Black family wealth loses its 1990s and 2000s gains to the Great Recession and only passes its 2007 level after 2019. The Fed cautions that the 1989 Black sample is small, so read that first pair as rough.',
     geographyLabel: 'United States',
     unit: 'usd',
     yAxisLabel: 'Median net worth (2022 dollars)',
@@ -164,7 +164,7 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
     id: 'justice-bjs-imprisonment-md',
     title: 'State imprisonment rate, Black vs White residents',
     caption:
-      'Maryland prisoners under state jurisdiction per 100,000 non-Hispanic Black and White residents — derived from BJS National Prisoner Statistics counts and Census population estimates. Rates are context for policy eras — not proof that any single law caused the gap.',
+      'Maryland prisoners under state jurisdiction per 100,000 non-Hispanic Black and White residents, derived from BJS National Prisoner Statistics counts and Census population estimates. Rates are context for policy eras, not proof that any single law caused the gap.',
     geographyLabel: 'Maryland',
     referencePeriod: '2023',
     primary: { label: 'Black residents', value: 648, unit: 'per_100k' },
@@ -200,7 +200,7 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
     id: 'credit-hmda-denial-cook',
     title: 'Mortgage denial rate by applicant race, Cook County',
     caption:
-      'Share of home mortgage applications denied — denials divided by originations, approvals not accepted, and denials (HMDA actions taken 1–3), all loan purposes — for Black and White applicants. County aggregates — not individual lending decisions.',
+      'Share of home mortgage applications denied: denials divided by originations, approvals not accepted, and denials (HMDA actions taken 1 to 3), all loan purposes, for Black and White applicants. County aggregates, not individual lending decisions.',
     geographyLabel: 'Cook County, Illinois',
     unit: 'percent',
     yAxisLabel: 'Denial rate',
@@ -224,7 +224,7 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
     id: 'justice-ussc-crack-powder-nation',
     title: 'Federal cocaine trafficking sentences, crack vs powder',
     caption:
-      'Average sentence length in months for federal crack and powder cocaine trafficking offenses (USSC Quick Facts). The 100-to-1 powder–crack weight ratio era is history; gaps narrowed but did not vanish overnight.',
+      'Average sentence length in months for federal crack and powder cocaine trafficking offenses (USSC Quick Facts). The 100-to-1 powder-to-crack weight ratio era is history; gaps narrowed but did not vanish overnight.',
     geographyLabel: 'United States (federal)',
     unit: 'months',
     yAxisLabel: 'Average sentence (months)',
@@ -245,9 +245,9 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
     id: 'housing-chas-cost-burden-cook',
     title: 'Cost-burdened households, Black vs White',
     caption:
-      'Share of occupied households paying more than 30% of income on housing (HUD CHAS Table 20, suburban Cook jurisdiction in the Consolidated Plan). Place-specific affordability context — not a national average.',
+      'Share of occupied households paying more than 30% of income on housing (HUD CHAS Table 20, suburban Cook jurisdiction in the Consolidated Plan). Place-specific affordability context, not a national average.',
     geographyLabel: 'Suburban Cook County, Illinois',
-    referencePeriod: '2016–2020 ACS',
+    referencePeriod: '2016 to 2020 ACS',
     primary: { label: 'Black non-Hispanic householders', value: 44.6, unit: 'percent' },
     comparison: { label: 'White non-Hispanic householders', value: 31.3, unit: 'percent' },
     ratioLabel: 'Black minus White burden gap',
@@ -492,7 +492,7 @@ export function mergeDataPageIndicatorBundle(
   let costBurdenComparison = base.costBurdenComparison;
   // Pinned: the 2016-2020 vintage is the suburban-Cook Table 20 tabulation the card's
   // caption describes (and carries verifiable household counts). The 2017-2021 rows in
-  // the warehouse are a different universe (all Cook County, CHAS Table 9) — do not mix.
+  // the warehouse are a different universe (all Cook County, CHAS Table 9); do not mix.
   const chasPair = latestPairedObservations(
     rows,
     'hud-chas-cost-burden-black-county',

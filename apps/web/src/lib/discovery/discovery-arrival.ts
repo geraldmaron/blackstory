@@ -1,7 +1,7 @@
 /**
  * Place arrival query helpers (v10 DiscoveryState handoff).
  *
- * Leaf module on purpose: Atlas (`'use client'`) appends these params when walking into a
+ * Leaf module on purpose: Explore (`'use client'`) appends these params when walking into a
  * Place. It must not import `discovery-state.ts`, which pulls Records href builders and
  * server-only domain packages into the client bundle.
  */

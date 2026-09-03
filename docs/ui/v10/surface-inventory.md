@@ -9,16 +9,16 @@
 
 | Route | Surface class | Current purpose | Current modules | Problems (source) | Disposition | Target visual model |
 |---|---|---|---|---|---|---|
-| `/` | `reading` | Door: about framing + HTML pin plate | `page.tsx`, `door-home.tsx`, pin plate | v9 docs claimed Instrument here | **Keep** Rest Door | Atlas Door |
-| `/explore` | `instrument` | Live Atlas | `explore/*`, MapStage, Lens, Results | Cockpit density; floor handoff fixed | **Redesign** progressive Explore/Focus | Atlas Instrument |
+| `/` | `reading` | Door: about framing + HTML pin plate | `page.tsx`, `door-home.tsx`, pin plate | v9 docs claimed Instrument here | **Keep** Rest Door | Explore Door |
+| `/explore` | `instrument` | Live map | `explore/*`, MapStage, Lens, Results | Cockpit density; floor handoff fixed | **Redesign** progressive Explore/Focus | Explore Instrument |
 | `/place/[slug]` | `record` | Holding place walks only (~10) | `HomeFirstPaint`, `EntityRoomSections` | Thinned anatomy; tiny hold set | **Redesign** full Place for corpus | Place Record |
 | `/entity/[id]` | `record` | Full record room; 308 to `/place` only when place holds | `entity/[id]/page.tsx` | Sitemap still lists `/entity/*` | **Keep** interim; expand Place | Place Record |
 | `/records` | `reading` | Crawlable non-spatial index | `records/*`, `build-records-index` | Full-catalog hydrate cost | **Keep** + slim projection | Reference Ledger / index |
-| `/library` | `reading` | Knowledge hub beyond map | `library/page.tsx` | Must not read as settings | **Keep** restrained hub (v10 framing + group standfirsts) | Library Hub |
+| `/rooms` | `reading` | Knowledge hub beyond map | `rooms/page.tsx` | Must not read as settings | **Keep** restrained hub (v10 framing + group standfirsts) | Rooms Hub |
 | `/stories` | `reading` | Editorial index | `stories/page.tsx` | Docs said `/chapters` | **Redesign** editorial archive | Story Spine (index) |
 | `/stories/[slug]` | `reading` | Chapter/article | story components | Spine/map moments incomplete | **Redesign** | Story Spine |
 | `/stories/mosaic-credits` | `utility` | Mosaic rights | mosaic-credits page | — | **Keep** | Utility Desk |
-| `/books` | `reading` | Challenged titles index | books index | Off library chrome by design | **Keep**/enrich | Archive Shelf |
+| `/books` | `reading` | Challenged titles index | books index | Off rooms chrome by design | **Keep**/enrich | Archive Shelf |
 | `/books/[slug]` | `record` | Book detail | book detail | — | **Keep**/enrich | Archive Shelf |
 | `/law` | `reading` | Law index | law browse | — | **Keep**/enrich | Reference Ledger |
 | `/law/[slug]` | `record` | Law detail | law detail | No shared RecordAnatomy yet | **Keep**/enrich anatomy | Reference Ledger |
@@ -52,7 +52,7 @@ See [`mobile-inventory.md`](./mobile-inventory.md).
 | Kind | Meaning |
 |---|---|
 | Source-validated | Confirmed in app routes / `surface-classes.ts` / page modules |
-| Rendered | Live HTTP 200 smoke 2026-08-31 on Door, Library, Records, Explore, Place (Dunbar + Church); entity→Place 308; Records→Atlas `floor=B` handoff |
+| Rendered | Live HTTP 200 smoke 2026-08-31 on Door, Rooms, Records, Explore, Place (Dunbar + Church); entity→Place 308; Records→map `floor=B` handoff |
 | Hypothesis | Browser light/dark screenshot QA still pending |
 
 Memorial protected files listed in [`../PROTECTED-EXPERIENCES.md`](../PROTECTED-EXPERIENCES.md).

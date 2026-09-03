@@ -1,5 +1,5 @@
 /**
- * Atlas pointer-events contract: wrappers pass through; only interactive surfaces take hits.
+ * Explore pointer-events contract: wrappers pass through; only interactive surfaces take hits.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -10,8 +10,8 @@ import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 const atlasCss = readFileSync(join(here, 'atlas.css'), 'utf8');
 
-describe('atlas pointer-events', () => {
-  it('keeps the atlas wrapper pass-through so map gaps stay pannable', () => {
+describe('Explore pointer-events', () => {
+  it('keeps the Explore wrapper pass-through so map gaps stay pannable', () => {
     assert.match(atlasCss, /\.ds-atlas\s*\{[^}]*pointer-events:\s*none/s);
     assert.doesNotMatch(atlasCss, /\.ds-atlas\s*>\s*\*\s*\{[^}]*pointer-events:\s*auto/s);
   });

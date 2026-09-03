@@ -13,7 +13,7 @@ One MapLibre plate mounts once in the root layout and never unmounts. It has exa
 | Posture | Where | Geometry | Gestures | Camera |
 |---|---|---|---|---|
 | **Live** | Instrument | Fixed, full viewport, z 0 | Reader driven | All moves, subject to both dignity gates |
-| **Ambient** | Door | Fixed, full viewport, z 0, same style and markers as Live | Locked; clicks and taps still reach clusters and pins | The scroll chapters' own `flyTo`, the same flights the Atlas story mode makes |
+| **Ambient** | Door | Fixed, full viewport, z 0, same style and markers as Live | Locked; clicks and taps still reach clusters and pins | The scroll chapters' own `flyTo`, the same flights the Explore story mode makes |
 | **Framed** | Record page, chapter map moment | Inset into a bounded in-flow slot, z 26 | Locked until **Explore this place** | `flyTo` at stored precision only |
 | **Parked** | Reading room by default, Utility always | Not painted, no GL cost on screen | None | None |
 
@@ -54,7 +54,7 @@ Two reasons, both load-bearing:
 
 **Release on exit is mandatory.** When the last Framed slot leaves the viewport, or the reader navigates away, the plate returns to Parked and every gesture handler is restored. A plate left locked after its slot is gone is the same defect as a plate left framed at a stale rect.
 
-The reader's way out is a named control: **Explore this place** on a record page, or the map moment's open control in a chapter. Both hand the plate to the Atlas through the lens handoff builder (see [`patterns-lens-handoff.md`](./patterns-lens-handoff.md)), where it becomes Live and the reader gets the whole instrument.
+The reader's way out is a named control: **Explore this place** on a record page, or the map moment's open control in a chapter. Both hand the plate to the map through the lens handoff builder (see [`patterns-lens-handoff.md`](./patterns-lens-handoff.md)), where it becomes Live and the reader gets the whole instrument.
 
 Gate gesture and camera work on the map object existing, not on its `load` event. `load` is the right gate for reading rendered features and the wrong one for camera and resize: both are safe as soon as the object exists, and gating them on load leaves every map moment permanently inert behind a slow style fetch.
 
@@ -77,7 +77,7 @@ Dignity travels with it. A violence-adjacent subject gets a plain cut with no pi
 - keeps its caption, which is what actually carries the point
 - states plainly that the map is unavailable, in words, in the slot
 - leaves the posture Parked rather than framing nothing
-- keeps its "open on the Atlas" control, because that path may still work
+- keeps its "open on the map" control, because that path may still work
 
 An empty bordered rectangle inside a paragraph reads as a broken image and tells the reader nothing about whether the archive still knows where the subject is. Every map moment is authored so its caption stands alone.
 

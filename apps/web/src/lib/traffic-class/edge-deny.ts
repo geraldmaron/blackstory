@@ -2,7 +2,7 @@
  * Edge cheap-deny for named AI-training crawlers on expensive origin paths.
  *
  * robots.txt is courtesy. These routes are the ones that actually burn Vercel CPU,
- * Postgres, and CDN origin: the Atlas catalog JSON, the sitemap (discovery amplifier),
+ * Postgres, and CDN origin: the Explore catalog JSON, the sitemap (discovery amplifier),
  * refine/search/geocode APIs, and force-dynamic `/explore`. Search crawlers
  * (Googlebot, Bingbot) are not denied.
  */

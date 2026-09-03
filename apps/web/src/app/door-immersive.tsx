@@ -4,8 +4,8 @@
  * One visit rolls chapters / facts / spotlight on the server so SSR and hydrate match.
  * Document scroll so the wheel works over the map; IntersectionObserver picks the chapter.
  *
- * THE MAP IS THE ATLAS'S MAP. The Door hands the persistent `MapStage` the same national-field
- * patch the Atlas rests on (`nationalFieldPatch`: grouped at national zoom, the same style, the
+ * THE MAP IS EXPLORE'S MAP. The Door hands the persistent `MapStage` the same national-field
+ * patch Explore rests on (`nationalFieldPatch`: grouped at national zoom, the same style, the
  * same entity markers) and flies its camera per chapter. The static Albers pin board underneath
  * is first paint and the no-JS / no-WebGL field: it hands over the moment the plate stamps
  * `data-plate-ready` (door-home.css). Until then the layout zoom on the board still tracks the
@@ -24,6 +24,7 @@ import type { ExploreMapFeatureCollection } from '../lib/map-experience/build-ex
 import type { StateDensityLevel } from '../lib/map-experience/density';
 import { CAMERA_EASING_SLOW_OUT } from '../lib/map-experience/camera-presets';
 import { CAMERA_FLY_CURVE } from '../lib/map-experience/camera-moves';
+import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { nationalFieldPatch } from '../lib/map-experience/national-field';
 import { CHAPTER_INTERSECTION_THRESHOLD, type StoryChapter } from '../lib/story/chapters';
 import type { StoryRecordSpotlight } from '../lib/story/pick-story-record';
@@ -43,8 +44,15 @@ void React;
 
 const RECORD_CHAPTER_ID = 'one-record';
 
-/** Same flight the Atlas story mode gives a chapter (`use-story-runner.ts`). */
+/** Same flight the Explore story mode gives a chapter (`use-story-runner.ts`). */
 const CHAPTER_FLIGHT_MS = 1600;
+
+/** The national chapters: flat, unrotated, and no closer than the story's opening zoom. */
+const NATIONAL_CAMERA_MAX_ZOOM = 3.6;
+
+function isNationalCamera(camera: DoorFocusCamera): boolean {
+  return camera.pitch === 0 && camera.bearing === 0 && camera.zoom <= NATIONAL_CAMERA_MAX_ZOOM;
+}
 
 const DOOR_COLD_OPEN_PROSE =
   'Every record in this archive is tied to a place you can stand in. Scroll to move the field. Grouped pins split as you get closer; any pin you can reach opens a record.';
@@ -109,7 +117,7 @@ function openDoorPin(href: string, push: (href: string) => void): void {
 
 export type DoorImmersiveProps = {
   readonly pins: ExploreMapFeatureCollection;
-  /** Per-state presence tiers, so the plate opens on the same tint the Atlas does. */
+  /** Per-state presence tiers, so the plate opens on the same tint Explore does. */
   readonly densityLevels: readonly StateDensityLevel[];
   readonly chapters: readonly StoryChapter[];
   readonly factByChapterId: Readonly<Record<string, StoryFact>>;
@@ -199,7 +207,7 @@ export function DoorImmersive({
       : null;
 
   /* —— The live plate ————————————————————————————————————————————————————————————————
-     The same field the Atlas paints. `patchData` is also what wakes the shared plate on this
+     The same field Explore paints. `patchData` is also what wakes the shared plate on this
      surface (MapStage builds MapLibre on first contact), so the Door pays for the map exactly
      once, at the moment it asks for it, and shares the instance with `/explore` afterwards. */
   useEffect(() => {
@@ -211,13 +219,36 @@ export function DoorImmersive({
   useEffect(() => stage.subscribe('viewport', () => setPlateLive(true)), [stage]);
   useEffect(() => stage.subscribe('error', () => setPlateLive(false)), [stage]);
 
-  /** Chapter camera. The chapter's own MapLibre spec, flown the way the Atlas story flies it. */
+  /**
+   * True once THIS mount has pointed the shared plate at its own camera. `plateLive` alone is
+   * stale on arrival: the plate is a persistent singleton (MapStage.tsx), and `subscribe`
+   * replays the last viewport it ever reported — from whatever page was live before this one —
+   * the instant this effect subscribes. Gating the board→plate handoff (door-home.css) on that
+   * would swap to the live canvas while it is still showing the previous page's camera and data,
+   * which is the map flash this state exists to prevent. `pageReady` starts false on every mount
+   * and only flips once `flyTo` below has actually been issued for this page's own chapter.
+   */
+  const [pageReady, setPageReady] = useState(false);
+
+  /** Chapter camera. The chapter's own MapLibre spec, flown the way the Explore story flies it. */
   const camera: DoorFocusCamera = focus.camera;
   useEffect(() => {
     if (!plateLive) return;
     const map = stage.getMap();
     if (!map) return;
     map.stop();
+    /*
+     * A national chapter frames the same field the Albers board draws: CONUS fitted to the
+     * viewport through the Atlas's own national preset. A fixed zoom here (3.35) framed the
+     * country smaller and higher than the board's contain-fit, so the board→plate handoff read
+     * as a second, differently framed map arriving rather than the first one settling. Chapters
+     * with a tilt or a place camera keep the chapter's own spec.
+     */
+    if (isNationalCamera(camera)) {
+      stage.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
+      setPageReady(true);
+      return;
+    }
     map.flyTo({
       center: [camera.center[0], camera.center[1]],
       zoom: camera.zoom,
@@ -229,6 +260,7 @@ export function DoorImmersive({
       // Ambient: a scroll-driven move must stay suppressible under reduced motion.
       essential: false,
     } as never);
+    setPageReady(true);
   }, [camera, plateLive, reducedMotion, stage]);
 
   /** The spotlight record's copper ring, on the plate as on the board. */
@@ -306,6 +338,7 @@ export function DoorImmersive({
         aria-label="National pin field"
         ref={pinFieldRef}
         data-plate={plateLive ? 'live' : 'board'}
+        data-page-ready={pageReady ? '1' : undefined}
       >
         <div className="ds-door__board-frame">
           <div className="ds-door__board-host">

@@ -56,7 +56,7 @@ export const MAP_FAILURE_COPY: Record<MapFailureMode, MapFailureCopy> = {
   'map-canvas-unavailable': {
     title: 'Map canvas could not start',
     description:
-      'The map could not render on this device. Browse records in the list below while we recover.',
+      'The map could not render on this device. The records below are the same set, in a list.',
     retryable: true,
   },
 };

@@ -5,7 +5,7 @@
  * Nothing on this surface requires JavaScript. Filter chips are anchors, rows are anchors, the
  * search field is a plain GET form, and prev/next are real anchors in the server HTML. That is
  * the acceptance criterion, and it is also the reason this room is the archive's crawlable
- * index rather than a second view of the Atlas.
+ * index rather than a second view of the map.
  */
 
 import React from 'react';
@@ -115,6 +115,12 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
         `<details>`, so the vocabulary is one click away rather than gone, and the whole thing
         still works with JavaScript off: a disclosure is markup, and every chip inside it is a
         GET link.
+
+        The shared `name` makes them an exclusive accordion. That is the fix for what this row
+        looked like before: six independent disclosures, each opening a panel anchored to its own
+        narrow pill, all able to be open at once. They overlapped, clipped their own labels, and
+        the reader could not tell whose vocabulary was on screen. One at a time is also the
+        honest model, since the facets narrow one set together rather than side by side.
       */}
       <div className="ds-records-controls">
         <form className="ds-records-find" action="/records" method="get" role="search">
@@ -150,7 +156,7 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
           if (options.length === 0) return null;
           const active = options.find((option) => option.id === query[key]);
           return (
-            <details className="ds-records-facet" key={key}>
+            <details className="ds-records-facet" key={key} name="records-facet">
               <summary className="ds-records-facet__pill" data-active={active ? 'true' : undefined}>
                 {FILTER_GROUP_LABELS[key]}
                 {active ? <span className="ds-records-facet__value">{active.label}</span> : null}
@@ -261,7 +267,7 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
         actions={[
           { href: atlasHref, label: 'Open this selection in Explore', emphasis: 'copper' },
           { href: '/methodology', label: 'How a record gets in' },
-          { href: '/submit', label: 'Submit a record we are missing' },
+          { href: '/submit', label: 'Submit a record the archive is missing' },
         ]}
       >
         {atlasReason}

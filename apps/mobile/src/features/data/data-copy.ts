@@ -30,7 +30,7 @@ export const DATA_SECTION_COPY = {
     index: '01',
     kicker: 'Orientation',
     title: 'How to read these numbers',
-    lede: 'Census decades anchor the national story; Phase 1 indicators show curated metrics we place beside archive evidence.',
+    lede: 'Census decades carry the national picture. The Phase 1 indicators are published series the archive reads beside its own records.',
   },
   population: {
     index: '02',
@@ -66,6 +66,6 @@ export const DATA_SECTION_COPY = {
     index: '07',
     kicker: 'Next step',
     title: 'Dig into a place',
-    lede: 'Open the map for county layers; Methodology explains how we read outside statistics.',
+    lede: 'Open the map for county layers. Methodology sets out how outside statistics are read next to a record.',
   },
 } as const;

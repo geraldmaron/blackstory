@@ -22,7 +22,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
   path: '/errata',
   title: 'Errata',
   description:
-    'Reverse-chronological log of corrections, clarifications, updates, and editor notes. Fixed fully, quickly, and without defensiveness.',
+    'Reverse-chronological log of corrections, clarifications, updates, and editor notes on published BlackStory records. Every change keeps its date.',
 });
 
 export default function ErrataPage() {
@@ -36,7 +36,7 @@ export default function ErrataPage() {
         pathname="/errata"
         kicker="Corrections"
         title="Errata log"
-        lede="Errors are fixed fully, quickly, and ungrudgingly. Every change is timestamped, categorized, and preserved. Nothing is silently edited."
+        lede="Every correction to a published record lands here, with the date it was made and what it changed. Nothing on this site is edited quietly."
       />
       <p className="ds-errata__feedbar" aria-label="Subscribe to the errata log">
         <a className="ds-room-chip" href="/errata/feed.json">
@@ -53,10 +53,10 @@ export default function ErrataPage() {
         title="Mistakes, published"
         extra={[
           { label: 'Request a correction', href: '/corrections' },
-          { label: 'How we correct the record', href: '/methodology' },
+          { label: 'How a correction is handled', href: '/methodology' },
         ]}
       >
-        Every change documented here stays readable.
+        Each entry keeps its date, the record it changed, and what changed about it.
       </WalkOffRamp>
     </Room>
   );

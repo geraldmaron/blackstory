@@ -18,7 +18,7 @@
  * genuinely about a camera arriving — which is what it was designed for.
  *
  * THE SHARED-SURFACE CASE, which used to need special handling and no longer does.
- * `RecordAnatomyPanel` renders on the record page AND inside the Atlas's record sheet, which floats
+ * `RecordAnatomyPanel` renders on the record page AND inside Explore's record sheet, which floats
  * over the live plate. A sheet cannot borrow the plate it is floating over, so the old version had
  * to pass an idle line explaining that the map was never coming. A locator has nothing to borrow,
  * so both surfaces now render the same thing and the explanation is gone rather than reworded.
@@ -52,7 +52,7 @@ export type RecordPlacePreviewProps = {
   readonly accessibleName?: string;
   /** Place-page stand: pan/zoom the national locator. Rail and sheet slots stay static. */
   readonly interactive?: boolean;
-  /** Live Atlas handoff when the locator is interactive. */
+  /** Live Explore handoff when the locator is interactive. */
   readonly atlasHref?: string;
 };
 

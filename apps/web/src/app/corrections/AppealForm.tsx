@@ -99,8 +99,8 @@ export function AppealForm({ receiptCode }: { readonly receiptCode?: string | un
   if (state.status === 'success') {
     return (
       <Notice tone="warning" title="Appeal received">
-        Your appeal for receipt <code>{state.receiptCode}</code> has re-entered review. Check the
-        same receipt’s status page for updates — we never publish moderation details.
+        Your appeal for receipt <code>{state.receiptCode}</code> has re-entered review. The same
+        receipt’s status page carries any update. Moderation details are never published.
       </Notice>
     );
   }

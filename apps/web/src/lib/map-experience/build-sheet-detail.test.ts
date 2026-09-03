@@ -1,5 +1,5 @@
 /**
- * Sheet sources and connections, derived from the history-graph edges the Atlas already ships.
+ * Sheet sources and connections, derived from the history-graph edges the map already ships.
  *
  * The two assertions that matter to a reader: a source backing three relationships is listed
  * once (a bibliography, not a tally), and the connection carries the relation in words so the row

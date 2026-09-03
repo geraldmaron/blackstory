@@ -24,7 +24,7 @@ body:has(.ds-door) {
   position: fixed;
   inset: 0;
   /*
-   * Same tier as `.ds-map-stage` (`--ds-z-map-plate`), never above Atlas chrome.
+   * Same tier as `.ds-map-stage` (`--ds-z-map-plate`), never above Explore chrome.
    * A literal `z-index: 2` here sat above `.ds-atlas` (`--ds-z-content` = 1), so SSR pins
    * painted over Lens, Record sheet, Records rail, Timeline, and Camera — including after
    * instruments hydrated. Door re-tiers the plate locally inside `.ds-door__board`.
@@ -71,6 +71,54 @@ body:has(.ds-door) {
   outline: 2px solid var(--ds-accent);
   outline-offset: 3px;
   z-index: 3; /* local: focus pin above other discs within the plate */
+}
+
+/*
+ * A pin the board has folded into a cluster (first-paint-clusters.ts). It stays in the DOM in
+ * index order for the pin-id and photo-index contracts, but neither paints nor takes focus.
+ */
+.ds-first-paint-plate .ds-first-paint-pin--grouped {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/*
+ * The board's count discs: the live plate's clusters at the national frame (copper family
+ * shade, count as the non-color signal, radius stepping at 10 / 50 / 200 — `CLUSTER_RADIUS_BY_COUNT`
+ * shrunk to the national zoom the way explore-style.ts shrinks it).
+ */
+.ds-first-paint-plate .ds-first-paint-cluster {
+  position: absolute;
+  z-index: 2; /* local: count discs over single pins within the plate */
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: var(--ds-first-paint-cluster-size, 0.75rem);
+  height: var(--ds-first-paint-cluster-size, 0.75rem);
+  border-radius: 999px;
+  background: var(--ds-first-paint-cluster-ink);
+  color: var(--ds-first-paint-cluster-text);
+  font-family: var(--ds-font-mono);
+  font-size: 0.5rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.ds-first-paint-plate .ds-first-paint-cluster[data-tier='2'] {
+  --ds-first-paint-cluster-size: 0.9375rem;
+}
+
+.ds-first-paint-plate .ds-first-paint-cluster[data-tier='3'] {
+  --ds-first-paint-cluster-size: 1.125rem;
+  font-size: 0.5625rem;
+}
+
+.ds-first-paint-plate .ds-first-paint-cluster[data-tier='4'] {
+  --ds-first-paint-cluster-size: 1.375rem;
+  font-size: 0.625rem;
 }
 
 /*

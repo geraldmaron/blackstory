@@ -1,0 +1,180 @@
+/**
+ * The record chrome atoms: the scale, pills, meters and small titles that `RecordChrome.tsx`
+ * renders. Lifted out of `record-room.css` so the Atlas record sheet can wear the same parts as
+ * the record page — a kind pill is the same pill whether the reader met the record on the map or
+ * on its own page, which is the whole point of having one vocabulary.
+ *
+ * The component owns this file rather than each route importing it, the same arrangement
+ * `RecordAnatomyPanel` uses and for the same reason: a route that forgets the import gets
+ * unstyled chrome.
+ *
+ * Hosts declare the scale. `.ds-room` is the record page, `.ds-sheet` the Atlas sheet; both carry
+ * the `--rec-*` tokens so an atom sized in them works in either. Room-kit tokens are referenced
+ * with a fallback, because outside the room they are not defined.
+ */
+
+/* —— the scale ————————————————————————————————————————————————————————————————— */
+.ds-room,
+.ds-sheet {
+  --rec-eyebrow: 0.6875rem; /* mono caps: labels, indices, counts */
+  --rec-meta: 0.8125rem; /* sans: supporting lines, TOC, file rows */
+  --rec-body: 0.96875rem; /* editorial: claims, notes */
+  --rec-lede: clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem);
+  --rec-value: 1.0625rem; /* display: tile values */
+  --rec-h3: 0.875rem; /* sans 600: small titles */
+  --rec-h2: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem); /* display 600: beat headings */
+  --rec-title: clamp(2.125rem, 1.4rem + 3.6vw, 3.625rem);
+  --rec-pill-h: 1.75rem;
+  --rec-plate: 2.25rem; /* icon plates on tiles and beat headings */
+  --rec-plate-sm: 1.75rem;
+  --rec-tone-high: var(--ds-confidence-high-fg);
+  --rec-tone-high-bar: var(--ds-confidence-high-border);
+  --rec-tone-medium: var(--ds-confidence-medium-fg);
+  --rec-tone-medium-bar: var(--ds-confidence-medium-border);
+  --rec-tone-low: var(--ds-confidence-low-fg);
+  --rec-tone-low-bar: var(--ds-confidence-low-border);
+}
+
+/* —— shared atoms —————————————————————————————————————————————————————————————— */
+
+/* A small count beside a title: mono, hairline, never a badge shouting. */
+.ds-rec-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.25rem;
+  margin-left: var(--ds-space-2);
+  padding: 0 0.4rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  font-family: var(--ds-font-mono);
+  font-size: var(--rec-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: var(--room-ink-3, var(--ds-ink-muted));
+  vertical-align: middle;
+}
+
+.ds-rec-inline-icon {
+  width: 0.8125rem;
+  height: 0.8125rem;
+  margin-right: 0.45em;
+  vertical-align: -0.1em;
+}
+
+/* Pill: icon plus word. Surface-coloured; only the icon takes a tone. */
+.ds-rec-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: var(--rec-pill-h);
+  padding: 0 0.7rem 0 0.55rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  background: color-mix(in srgb, var(--ds-surface) 92%, transparent);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-meta);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+a.ds-rec-pill:hover,
+a.ds-rec-pill:focus-visible {
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+.ds-rec-pill__icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex: none;
+  color: var(--room-ink-3, var(--ds-ink-muted));
+}
+
+.ds-rec-pill--status[data-variant='active'] .ds-rec-pill__icon,
+.ds-rec-pill--status[data-variant='living'] .ds-rec-pill__icon,
+.ds-rec-pill--status[data-variant='in_force'] .ds-rec-pill__icon {
+  color: var(--ds-accent);
+}
+
+.ds-rec-pill--era .ds-rec-pill__icon {
+  color: var(--ds-accent-graphic);
+}
+
+.ds-rec-pill--grade[data-variant='high'] .ds-rec-pill__icon {
+  color: var(--rec-tone-high);
+}
+
+.ds-rec-pill--grade[data-variant='medium'] .ds-rec-pill__icon {
+  color: var(--rec-tone-medium);
+}
+
+.ds-rec-pill--grade[data-variant='low'] .ds-rec-pill__icon {
+  color: var(--rec-tone-low);
+}
+
+.ds-rec-pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin: 0 0 var(--ds-space-4);
+}
+
+/* Meter: three bars. Colour carries the tone, the aria-label carries the word. */
+.ds-rec-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  vertical-align: middle;
+}
+
+.ds-rec-meter__seg {
+  display: inline-block;
+  width: 0.875rem;
+  height: 0.3125rem;
+  border-radius: 2px;
+  background: var(--room-rule-2, var(--ds-rule));
+}
+
+.ds-rec-meter--high .ds-rec-meter__seg--on {
+  background: var(--rec-tone-high-bar);
+}
+
+.ds-rec-meter--medium .ds-rec-meter__seg--on {
+  background: var(--rec-tone-medium-bar);
+}
+
+.ds-rec-meter--low .ds-rec-meter__seg--on {
+  background: var(--rec-tone-low-bar);
+}
+
+.ds-rec-meter--unrated .ds-rec-meter__seg--on,
+.ds-rec-meter--coverage .ds-rec-meter__seg--on {
+  background: var(--ds-accent-graphic);
+}
+
+/* Small title: an icon and a word, for the rail and the apparatus. */
+.ds-rec-small-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 var(--ds-space-3);
+  font-family: var(--ds-font-sans);
+  font-size: var(--rec-h3);
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ds-ink);
+}
+
+.ds-rec-small-title__icon {
+  width: 0.8125rem;
+  height: 0.8125rem;
+  flex: none;
+  color: var(--ds-accent-graphic);
+}

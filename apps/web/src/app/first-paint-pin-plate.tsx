@@ -7,6 +7,10 @@ import React from 'react';
 import type { ExploreMapFeatureCollection } from '../lib/map-experience/build-explore-map-source';
 import { locatorPinPercent } from '../lib/map-experience/albers-usa';
 import { isPinPlateWalk, isShopToken } from '../lib/map-experience/first-paint-pins';
+import {
+  firstPaintClusterTier,
+  groupFirstPaintPins,
+} from '../lib/map-experience/first-paint-clusters';
 import './first-paint-pin-plate.css';
 
 void React;
@@ -49,15 +53,39 @@ export function FirstPaintPinPlate({
     .filter(Boolean)
     .join(' ');
 
+  /*
+   * Group the board the way the live plate groups the national frame (first-paint-clusters.ts),
+   * so the handoff is one pattern settling rather than 4,101 loose discs replaced by copper
+   * count discs. Every pin stays in the DOM in index order — `firstPaintPinId` and the Door photo
+   * index are index-aligned — a grouped pin is only hidden. Walks and the focus record stay
+   * single, as they read on the plate.
+   */
+  const projected = pins.features.map((feature) => {
+    const [lng, lat] = feature.geometry.coordinates;
+    return locatorPinPercent(lng, lat);
+  });
+  const exclude = new Set<number>();
+  pins.features.forEach((feature, index) => {
+    if (isPinPlateWalk(feature, linkRecords)) exclude.add(index);
+    if (
+      focusEntityId !== null &&
+      focusEntityId.length > 0 &&
+      feature.properties.entityId === focusEntityId
+    ) {
+      exclude.add(index);
+    }
+  });
+  const grouping = groupFirstPaintPins(projected, { exclude });
+
   return (
     <div className={plateClasses} aria-label="Documented places">
       {pins.features.map((feature, index) => {
         const [lng, lat] = feature.geometry.coordinates;
-        const projected = locatorPinPercent(lng, lat);
-        if (!projected) return null;
+        const projectedPin = projected[index];
+        if (!projectedPin) return null;
         const style = {
-          left: `${projected.x.toFixed(4)}%`,
-          top: `${projected.y.toFixed(4)}%`,
+          left: `${projectedPin.x.toFixed(4)}%`,
+          top: `${projectedPin.y.toFixed(4)}%`,
         };
         const walk = isPinPlateWalk(feature, linkRecords);
         const focused =
@@ -66,11 +94,13 @@ export function FirstPaintPinPlate({
           feature.properties.entityId === focusEntityId;
         const href = feature.properties.href;
         const canLink = Boolean(href) && (linkRecords || walk);
+        const grouped = grouping.grouped.has(index);
         const className = [
           'ds-first-paint-pin',
           walk ? 'ds-first-paint-pin--walk' : '',
           focused ? 'ds-first-paint-pin--focus' : '',
           canLink ? 'ds-first-paint-pin--link' : '',
+          grouped ? 'ds-first-paint-pin--grouped' : '',
         ]
           .filter(Boolean)
           .join(' ');
@@ -103,6 +133,17 @@ export function FirstPaintPinPlate({
           />
         );
       })}
+      {grouping.clusters.map((cluster) => (
+        <span
+          key={`cluster-${cluster.x}-${cluster.y}`}
+          className="ds-first-paint-cluster"
+          data-tier={firstPaintClusterTier(cluster.count)}
+          aria-hidden="true"
+          style={{ left: `${cluster.x.toFixed(4)}%`, top: `${cluster.y.toFixed(4)}%` }}
+        >
+          {cluster.count}
+        </span>
+      ))}
     </div>
   );
 }

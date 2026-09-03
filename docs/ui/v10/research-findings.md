@@ -6,7 +6,7 @@
 
 | Pattern | Source/example | User problem | Applicable to Blackstory? | Why | Risks | Adopt / reject |
 |---|---|---|---|---|---|---|
-| Map + list as dual views; list is source of truth for a11y | [Accessible Maps (Accessibility.build)](https://accessibility.build/guides/accessible-maps); WCAG 2.2 | Task achievable without pixels | Yes | Atlas already has Results rail + `/records`; Rest must not hide non-map path | Treating map as only discovery surface | **Adopt** — strengthen map↔list continuity and live-region count announcements |
+| Map + list as dual views; list is source of truth for a11y | [Accessible Maps (Accessibility.build)](https://accessibility.build/guides/accessible-maps); WCAG 2.2 | Task achievable without pixels | Yes | The map already has Results rail + `/records`; Rest must not hide non-map path | Treating map as only discovery surface | **Adopt** — strengthen map↔list continuity and live-region count announcements |
 | Relationships as typed digraph; edges are the non-visual map | [a11ybob: How an accessible map is built](https://a11ybob.com/maps/how-its-built); Data Navigator (VIS 2023) | Sighted users infer edges; AT users need them explicit | Yes | Thesis: relationships are the product; DB already has 20 relationship types | Drawing proximity lines as evidence | **Adopt** — constellation + semantic list; never proximity-as-related |
 | Viewport alt/summary for geovis | AltGeoViz (arXiv 2406.13853) | Screen-reader spatial pattern literacy | Partial | Useful for Explore Focus summaries | Over-claiming spatial stats from sparse pins | **Adopt lightly** — announce filtered count + selected place; skip dense auto-pattern claims unless measured |
 | Progressive disclosure / Rest→Engage | Existing mobile Rest/Engaged; door tip `/` vs `/explore` | First-time users crushed by cockpit | Yes | Door tip already separated Door from Instrument | Re-merging Instrument onto `/` under v9 docs | **Adopt** — formalize Rest/Explore/Focus/Journey |
@@ -26,7 +26,7 @@
 
 1. Dual map/list with list parity is mandatory.
 2. Typed relationship graph is a first-class UX surface, not decoration.
-3. Progressive Atlas states replace “Instrument on first paint.”
+3. Progressive map states replace “Instrument on first paint.”
 4. Motion and View Transitions are explanatory PE only.
 5. Release catalog architecture stays until measurement says otherwise.
 6. Trendy chrome and implied relationships are out.

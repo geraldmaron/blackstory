@@ -103,7 +103,7 @@ export function historyKindsForCategory(categoryId: string): readonly string[] {
 }
 
 /**
- * Remaps `/history` browse category ids onto the five-family vocabulary Atlas and Records share.
+ * Remaps `/history` browse category ids onto the five-family vocabulary Explore and Records share.
  * Used only at the `/history` → `/records` redirect boundary — not in live filter matchers.
  */
 export const HISTORY_KIND_TO_RECORDS_KIND: Readonly<Record<string, string>> = Object.freeze({
@@ -111,7 +111,7 @@ export const HISTORY_KIND_TO_RECORDS_KIND: Readonly<Record<string, string>> = Ob
   works: 'sources',
 });
 
-/** Normalize an incoming `/history` kind param for `/records` / Atlas URLs. */
+/** Normalize an incoming `/history` kind param for `/records` / Explore URLs. */
 export function historyKindToRecordsKind(kind: string): string {
   const trimmed = kind.trim();
   if (!trimmed || trimmed === 'all') return trimmed;

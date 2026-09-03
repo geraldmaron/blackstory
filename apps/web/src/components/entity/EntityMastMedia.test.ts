@@ -55,6 +55,35 @@ test('EntityMastMedia falls back to the EntityRecordMark when no primaryImage is
   assert.match(html, /svg|role="img"/i);
 });
 
+test('EntityMastMedia letterboxes a known-portrait photo instead of cover-cropping it', () => {
+  const html = renderToStaticMarkup(
+    createElement(EntityMastMedia, {
+      entityId: 'ent_david_paterson_001',
+      entityName: 'David Paterson',
+      kind: 'person',
+      primaryImage: { ...PINNED_IMAGE, width: 1105, height: 1570 },
+    }),
+  );
+  assert.match(html, /ds-entity-photo--portrait/);
+  assert.match(html, /ds-entity-photo__backdrop/);
+  // The decorative backdrop carries no accessible name; the tracked photo keeps the real alt.
+  assert.match(html, /<img[^>]*alt=""[^>]*class="ds-entity-photo__backdrop"/);
+  assert.match(html, /alt="Rosa Parks, seated, 1955\."/);
+});
+
+test('EntityMastMedia keeps the existing cover crop for a landscape photo', () => {
+  const html = renderToStaticMarkup(
+    createElement(EntityMastMedia, {
+      entityId: 'ent_wide_photo',
+      entityName: 'Wide Photo Entity',
+      kind: 'event',
+      primaryImage: { ...PINNED_IMAGE, width: 1600, height: 900 },
+    }),
+  );
+  assert.doesNotMatch(html, /ds-entity-photo--portrait/);
+  assert.doesNotMatch(html, /ds-entity-photo__backdrop/);
+});
+
 test('EntityMastMedia omits the source link for a legacy image with no pin fields', () => {
   const html = renderToStaticMarkup(
     createElement(EntityMastMedia, {

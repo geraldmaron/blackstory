@@ -5,7 +5,6 @@
  */
 import React from 'react';
 import {
-  RECORD_MARK_SHAPE_META,
   kindLabelForMark,
   recordMarkAlt,
   recordMarkCaption,
@@ -89,10 +88,15 @@ export function EntityRecordMark({
           </p>
         ) : null}
       </div>
+      {/*
+        The caption states why there is no photograph, and stops there. It used to append the
+        placeholder's own shape ("· Arch"), which reads as a truncated credit and answers a
+        question no reader has: the shape is a house device, not a fact about the record. The
+        shape is still named for assistive tech through the graphic's alt text.
+      */}
       {hideCaption ? null : (
         <figcaption id={captionId} className="ds-entity-photo__credit ds-sans">
           {caption}
-          <span className="ds-mono"> · {RECORD_MARK_SHAPE_META[shape].label}</span>
         </figcaption>
       )}
     </figure>

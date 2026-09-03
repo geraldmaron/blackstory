@@ -1,187 +1,23 @@
 /**
  * The record room's own rules, over `record-page.css` (which is itself a thin layer over the
  * shared kit). Everything structural — measure, centring, rail placement, prose, sources,
- * connections — comes from the kit. This file owns the record chrome: the masthead, the pills,
- * the fact tiles and meters, the beats and their headings, the rail's table of contents and
- * record file, and the apparatus band.
+ * connections — comes from the kit. This file owns the record's own furniture: the masthead, the
+ * fact tiles, the beats and their headings, the rail's table of contents and record file, and the
+ * apparatus band. The atoms those are built from — the scale, pills, meters, small titles — live
+ * with `RecordChrome.tsx`.
  *
- * ONE SCALE. Every size in the record is one of the `--rec-*` tokens below. The page used to
- * carry eleven distinct body sizes between the masthead and the footer (12px, 12.5px, 13px,
- * 13.5px, 15.5px, 16px, 17px, 19px, 0.8125rem, 0.9375rem, 1.0625rem), which is the specific
- * reason it read as assembled rather than designed. A block that needs a new size adds a token
- * here, not a literal there.
+ * ONE SCALE. Every size in the record is one of the `--rec-*` tokens, which now live beside the
+ * component that spends them (`components/entity/record-chrome.css`) so the Explore sheet can wear
+ * the same pills. The page used to carry eleven distinct body sizes between the masthead and the
+ * footer, which is the specific reason it read as assembled rather than designed. A block that
+ * needs a new size adds a token there, not a literal here.
  *
  * ONE ICON LANGUAGE. Pills, tiles, beat headings and apparatus titles all draw from
- * `RecordChrome.tsx`, which draws from the Atlas's own kind / status / confidence icon sets, so
+ * `RecordChrome.tsx`, which draws from Explore's own kind / status / confidence icon sets, so
  * a person is the same glyph on the map, in the pill and on the tile.
  *
  * Not a `*-edition.css`: `room-kit.test.tsx` forbids per-route edition chrome under app/.
  */
-
-/* —— the scale ————————————————————————————————————————————————————————————————— */
-.ds-room {
-  --rec-eyebrow: 0.6875rem; /* mono caps: labels, indices, counts */
-  --rec-meta: 0.8125rem; /* sans: supporting lines, TOC, file rows */
-  --rec-body: 0.96875rem; /* editorial: claims, notes */
-  --rec-lede: clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem);
-  --rec-value: 1.0625rem; /* display: tile values */
-  --rec-h3: 0.875rem; /* sans 600: small titles */
-  --rec-h2: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem); /* display 600: beat headings */
-  --rec-title: clamp(2.125rem, 1.4rem + 3.6vw, 3.625rem);
-  --rec-pill-h: 1.75rem;
-  --rec-plate: 2.25rem; /* icon plates on tiles and beat headings */
-  --rec-plate-sm: 1.75rem;
-  --rec-tone-high: var(--ds-confidence-high-fg);
-  --rec-tone-high-bar: var(--ds-confidence-high-border);
-  --rec-tone-medium: var(--ds-confidence-medium-fg);
-  --rec-tone-medium-bar: var(--ds-confidence-medium-border);
-  --rec-tone-low: var(--ds-confidence-low-fg);
-  --rec-tone-low-bar: var(--ds-confidence-low-border);
-}
-
-/* —— shared atoms —————————————————————————————————————————————————————————————— */
-
-/* A small count beside a title: mono, hairline, never a badge shouting. */
-.ds-rec-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.5rem;
-  height: 1.25rem;
-  margin-left: var(--ds-space-2);
-  padding: 0 0.4rem;
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-full);
-  font-family: var(--ds-font-mono);
-  font-size: var(--rec-eyebrow);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  line-height: 1;
-  color: var(--room-ink-3);
-  vertical-align: middle;
-}
-
-.ds-rec-inline-icon {
-  width: 0.8125rem;
-  height: 0.8125rem;
-  margin-right: 0.45em;
-  vertical-align: -0.1em;
-}
-
-/* Pill: icon plus word. Surface-coloured; only the icon takes a tone. */
-.ds-rec-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  height: var(--rec-pill-h);
-  padding: 0 0.7rem 0 0.55rem;
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-full);
-  background: color-mix(in srgb, var(--ds-surface) 92%, transparent);
-  color: var(--ds-ink);
-  font-family: var(--ds-font-sans);
-  font-size: var(--rec-meta);
-  font-weight: 500;
-  line-height: 1;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-a.ds-rec-pill:hover,
-a.ds-rec-pill:focus-visible {
-  border-color: var(--ds-accent-graphic);
-  color: var(--ds-accent);
-}
-
-.ds-rec-pill__icon {
-  width: 0.75rem;
-  height: 0.75rem;
-  flex: none;
-  color: var(--room-ink-3);
-}
-
-.ds-rec-pill--status[data-variant='active'] .ds-rec-pill__icon,
-.ds-rec-pill--status[data-variant='living'] .ds-rec-pill__icon,
-.ds-rec-pill--status[data-variant='in_force'] .ds-rec-pill__icon {
-  color: var(--ds-accent);
-}
-
-.ds-rec-pill--era .ds-rec-pill__icon {
-  color: var(--ds-accent-graphic);
-}
-
-.ds-rec-pill--grade[data-variant='high'] .ds-rec-pill__icon {
-  color: var(--rec-tone-high);
-}
-
-.ds-rec-pill--grade[data-variant='medium'] .ds-rec-pill__icon {
-  color: var(--rec-tone-medium);
-}
-
-.ds-rec-pill--grade[data-variant='low'] .ds-rec-pill__icon {
-  color: var(--rec-tone-low);
-}
-
-.ds-rec-pills {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ds-space-2);
-  margin: 0 0 var(--ds-space-4);
-}
-
-/* Meter: three bars. Colour carries the tone, the aria-label carries the word. */
-.ds-rec-meter {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  vertical-align: middle;
-}
-
-.ds-rec-meter__seg {
-  display: inline-block;
-  width: 0.875rem;
-  height: 0.3125rem;
-  border-radius: 2px;
-  background: var(--room-rule-2);
-}
-
-.ds-rec-meter--high .ds-rec-meter__seg--on {
-  background: var(--rec-tone-high-bar);
-}
-
-.ds-rec-meter--medium .ds-rec-meter__seg--on {
-  background: var(--rec-tone-medium-bar);
-}
-
-.ds-rec-meter--low .ds-rec-meter__seg--on {
-  background: var(--rec-tone-low-bar);
-}
-
-.ds-rec-meter--unrated .ds-rec-meter__seg--on,
-.ds-rec-meter--coverage .ds-rec-meter__seg--on {
-  background: var(--ds-accent-graphic);
-}
-
-/* Small title: an icon and a word, for the rail and the apparatus. */
-.ds-rec-small-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0 0 var(--ds-space-3);
-  font-family: var(--ds-font-sans);
-  font-size: var(--rec-h3);
-  font-weight: 600;
-  letter-spacing: 0;
-  color: var(--ds-ink);
-}
-
-.ds-rec-small-title__icon {
-  width: 0.8125rem;
-  height: 0.8125rem;
-  flex: none;
-  color: var(--ds-accent-graphic);
-}
 
 /* —— the masthead ——————————————————————————————————————————————————————————————
    The record's own photograph at the width of the page, with the record written over it. */
@@ -221,6 +57,39 @@ a.ds-rec-pill:focus-visible {
   height: 100%;
   min-height: 0;
   border-radius: 0;
+}
+
+/*
+ * A tall source photo (portrait aspect, most person headshots and many press photos) cannot
+ * cover-crop into this wide banner without losing the subject: the visible window shrinks to a
+ * sliver of the image's height, and no single guessed focal percentage can promise the subject
+ * stays in frame. `isPortraitPrimaryImage` (record-mark.ts) flags these ahead of paint whenever
+ * the source dimensions are known, so instead of guessing a crop, the whole photograph is kept:
+ * a blurred, darkened cover fill of the same image carries the edge-to-edge banner, and the
+ * sharp photo sits over it at `contain`, centered and complete.
+ */
+.ds-record-mast[data-media='photo'] .ds-entity-photo--portrait {
+  background: var(--ds-ink);
+}
+
+.ds-record-mast[data-media='photo'] .ds-entity-photo--portrait .ds-entity-photo__backdrop {
+  position: absolute;
+  z-index: 0; /* local: behind the sharp contain-fit photo within this masthead figure only */
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: blur(36px) brightness(0.5) saturate(1.05);
+  transform: scale(1.15);
+}
+
+.ds-record-mast[data-media='photo'] .ds-entity-photo--portrait .ds-entity-photo__img {
+  position: relative;
+  z-index: 1; /* local: above the blurred backdrop within this masthead figure only */
+  object-fit: contain;
+  object-position: center;
+  background: transparent;
 }
 
 /*
@@ -370,40 +239,62 @@ a.ds-rec-pill:focus-visible {
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
+/*
+ * The fact band: one instrument, five columns, hairline dividers.
+ *
+ * It was five bordered, filled, rounded boxes, each holding a filled rounded plate around its
+ * icon. Three nested containers per fact, for values as short as "Person" and "1940s", which
+ * made a row of five short strings carry more weight on the page than the name above it. Worse,
+ * once the tiles stopped stretching to the tallest one they became five different heights, and a
+ * ragged row of boxes reads as a mistake rather than a set.
+ *
+ * Both problems have the same answer. The boxes come off and the band takes their place: equal
+ * columns divided by the same hairline the beats and the record file already use, stretched to a
+ * common height so the dividers run the full depth and every column shares one baseline grid.
+ * Uniform by construction rather than by matching numbers. The icon moves onto the label line at
+ * eyebrow size, which is the only place it was doing work: naming which fact this is.
+ */
 .ds-rec-facts__tiles {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--ds-space-3);
+  align-items: stretch;
   margin: 0;
+  border-top: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
 }
 
 .ds-rec-tile {
   display: flex;
-  align-items: flex-start;
-  gap: var(--ds-space-3);
+  flex-direction: column;
+  gap: 0.3rem;
   min-width: 0;
-  padding: var(--ds-space-4);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
+  padding: var(--ds-space-4) var(--ds-space-4) var(--ds-space-4) 0;
 }
 
-.ds-rec-tile__plate {
-  display: inline-flex;
+/* Dividers between columns, never on the outside: the band's own rules close it. */
+.ds-rec-tile + .ds-rec-tile {
+  padding-left: var(--ds-space-4);
+  border-left: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
+}
+
+.ds-rec-tile__label {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  flex: none;
-  width: var(--rec-plate);
-  height: var(--rec-plate);
-  border-radius: var(--ds-radius-sm);
-  background: color-mix(in srgb, var(--ds-canvas) 88%, var(--ds-ink));
-  border: var(--ds-border-width) solid var(--room-rule-2);
+  gap: 0.4rem;
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: var(--rec-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--room-ink-3, var(--ds-ink-muted));
 }
 
 .ds-rec-tile__icon {
-  width: 1rem;
-  height: 1rem;
-  color: var(--room-ink-3);
+  width: 0.75rem;
+  height: 0.75rem;
+  flex: none;
+  color: var(--room-ink-3, var(--ds-ink-muted));
 }
 
 .ds-rec-tile--evidence-high .ds-rec-tile__icon {
@@ -418,33 +309,25 @@ a.ds-rec-pill:focus-visible {
   color: var(--rec-tone-low);
 }
 
-.ds-rec-tile__text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
-}
-
-.ds-rec-tile__label {
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--rec-eyebrow);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--room-ink-4);
-}
-
+/*
+ * Two lines, then an ellipsis. The band is a glance; a value that needs more than two lines is
+ * a value that belongs further down the page. The full string stays on the link's title, and a
+ * visitable record prints its address in full in the visit block.
+ */
 .ds-rec-tile__value {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: break-word;
   margin: 0;
-  font-family: var(--ds-font-display);
+  font-family: var(--ds-font-sans);
   font-size: var(--rec-value);
   font-weight: 600;
   line-height: 1.25;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
   color: var(--ds-ink);
-  overflow-wrap: anywhere;
-  text-wrap: balance;
 }
 
 .ds-rec-tile__value a {
@@ -456,27 +339,29 @@ a.ds-rec-pill:focus-visible {
 .ds-rec-tile__value a:focus-visible {
   color: var(--ds-accent);
   text-decoration: underline;
-  text-underline-offset: 0.15em;
 }
 
 .ds-rec-tile__support {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
-  margin: 0.15rem 0 0;
+  gap: 0.4rem;
+  margin: auto 0 0;
   font-family: var(--ds-font-sans);
   font-size: var(--rec-meta);
-  line-height: 1.35;
-  color: var(--room-ink-3);
+  line-height: 1.4;
+  color: var(--room-ink-3, var(--ds-ink-muted));
 }
 
+/*
+ * The three actions sat flush: the row was a plain block, so the buttons were inline boxes with
+ * nothing between them and their rounded ends touched. A row is a row.
+ */
 .ds-rec-facts__actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--ds-space-2);
-  margin-top: var(--ds-space-4);
+  gap: var(--ds-space-3);
 }
 
 .ds-rec-facts__actions .ds-cta {
@@ -488,14 +373,29 @@ a.ds-rec-pill:focus-visible {
     padding-inline: var(--ds-gutter);
   }
 
-  .ds-rec-facts__tiles {
-    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-  }
-}
-
-@media (max-width: 40rem) {
+  /*
+   * Below the rail breakpoint the band becomes a list. Five columns at this width would give
+   * each fact about 90px, and an auto-fit grid would wrap into rows whose vertical dividers
+   * start mid-band, drawing a rule against nothing. A stacked list keeps the same hairline
+   * vocabulary and turns it the only way that stays true when the columns run out.
+   */
   .ds-rec-facts__tiles {
     grid-template-columns: 1fr;
+  }
+
+  .ds-rec-tile {
+    padding: var(--ds-space-3) 0;
+  }
+
+  .ds-rec-tile + .ds-rec-tile {
+    padding-left: 0;
+    border-left: 0;
+    border-top: var(--ds-border-width) solid var(--room-rule-2, var(--ds-rule));
+  }
+
+  /* Stacked, the support line sits under its value rather than at the foot of a column. */
+  .ds-rec-tile__support {
+    margin-top: 0;
   }
 }
 

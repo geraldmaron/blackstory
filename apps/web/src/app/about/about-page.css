@@ -5,10 +5,15 @@
  * here is the two lists this page alone renders (pillars and refusals) plus the foot credits.
  * Nothing here restyles a kit component.
  *
- * MOBILE FIRST. The previous version declared `repeat(3, ...)` on the pillars and `repeat(2, ...)`
+ * MOBILE FIRST. An earlier version declared `repeat(3, ...)` on the pillars and `repeat(2, ...)`
  * on the destinations with no media query anywhere in the file, so both held their desktop column
- * count down to 375px and the pillar bodies wrapped to two or three words per line. Every
- * multi-column rule here is inside a `min-width` query and the single-column case is the default.
+ * count down to 375px and the pillar bodies wrapped to two or three words per line. Any
+ * multi-column rule here has to sit inside a `min-width` query, with single column as the default.
+ *
+ * THE PILLARS ARE A LIST, NOT A ROW OF THREE. They used to be three equal cards in three equal
+ * columns, which is the shape that made the page read as generated. There are four now and they
+ * are deliberately different lengths, so they stack as a hairline list at every width, the same
+ * treatment the refusals get.
  *
  * ONE RULE PER SELECTOR. The previous version declared `.ds-about-page__mission` three times with
  * conflicting `grid-template-columns`, and applied it to the section wrapper while styling it as a
@@ -20,7 +25,7 @@
 }
 
 /* —— Pillars ——————————————————————————————————————————————————————————————
-   Not numbered: the three commitments hold at once, so an order would be a false claim. */
+   Not numbered: the rules hold at once, so an order would be a false claim. */
 
 .ds-about-page__pillars {
   list-style: none;
@@ -59,6 +64,7 @@
 
 .ds-about-page__pillar-body {
   margin: 0;
+  max-width: 62ch;
   font-family: var(--ds-font-sans);
   font-size: 0.9375rem;
   line-height: 1.55;
@@ -125,27 +131,4 @@
 .ds-about-page__credit a:hover,
 .ds-about-page__credit a:focus-visible {
   color: var(--ds-ink);
-}
-
-/* —— Wide viewports ————————————————————————————————————————————————————————
-   The pillars go three-up only when three columns still leave a readable measure. Below this the
-   stacked list with its hairline rules is the better reading, not a fallback. */
-
-@media (min-width: 60rem) {
-  .ds-about-page__pillars {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--ds-space-5);
-  }
-
-  .ds-about-page__pillar {
-    padding-block: 0;
-    padding-inline-end: var(--ds-space-5);
-    border-top: none;
-    border-inline-end: var(--ds-border-width) solid var(--ds-rule);
-  }
-
-  .ds-about-page__pillar:last-child {
-    padding-inline-end: 0;
-    border-inline-end: none;
-  }
 }

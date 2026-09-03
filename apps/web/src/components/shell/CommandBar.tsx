@@ -1,8 +1,8 @@
 /**
- * Command bar — fixed top, z 50. Brand, search, Find (Door / Atlas / Records), Rooms, tools.
+ * Command bar — fixed top, z 50. Brand, search, Find (Door / Explore / Records), Rooms, tools.
  *
- * The Door Journey lives on `/`. Atlas is the map instrument on `/explore`. Journey is no longer
- * a separate Atlas mode in the bar — the main-page experience is the fold.
+ * The Door Journey lives on `/`. Explore is the map instrument on `/explore`. Journey is no longer
+ * a separate Explore mode in the bar — the main-page experience is the fold.
  */
 'use client';
 
@@ -52,17 +52,17 @@ function pathIsCurrent(pathname: string, href: string): boolean {
 
 export type CommandBarProps = {
   /**
-   * Present when the Atlas instrument mounts this bar (palette / saved / shortcuts). Off the
-   * Atlas the bar shows Find links instead.
+   * Present when the Explore instrument mounts this bar (palette / saved / shortcuts). Off
+   * Explore the bar shows Find links instead.
    */
   readonly mode?: AtlasMode;
   readonly onModeChange?: (mode: AtlasMode) => void;
   /**
-   * Opens the palette, which needs a client record index only the Atlas has. Off the Atlas the
+   * Opens the palette, which needs a client record index only Explore has. Off Explore the
    * search slot becomes a real combobox against /search/api.
    */
   readonly onOpenPalette?: () => void;
-  /** Kept so existing Atlas callers compile. Search no longer greets with this count. */
+  /** Kept so existing Explore callers compile. Search no longer greets with this count. */
   readonly recordCount?: number;
   readonly savedCount?: number;
   readonly onOpenSaved?: () => void;

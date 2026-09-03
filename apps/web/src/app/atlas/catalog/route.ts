@@ -1,9 +1,9 @@
 /**
- * `GET /atlas/catalog` — the release-wide half of the Atlas view model as JSON, CDN-cached.
+ * `GET /atlas/catalog` — the release-wide half of the Explore view model as JSON, CDN-cached.
  *
  * Dynamic on purpose: a statically rendered route handler would be built at `next build`, and the
  * `Build and Typecheck` CI job builds without database secrets (the same constraint that keeps
- * `/library` dynamic). Being dynamic does not stop the CDN from caching it: the no-store that
+ * `/rooms` dynamic). Being dynamic does not stop the CDN from caching it: the no-store that
  * Next forces onto dynamic *pages* does not apply to a route handler that sets its own
  * `Cache-Control`, which is the whole reason the catalog moved here from `/`. See
  * `explore/atlas-catalog.ts` for the cost history.
@@ -21,7 +21,7 @@ export async function GET(): Promise<Response> {
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
       'Cache-Control': ATLAS_CATALOG_CACHE_CONTROL,
-      // Data for the Atlas, not a page. Nothing to index.
+      // Data for Explore, not a page. Nothing to index.
       'X-Robots-Tag': 'noindex',
     },
   });

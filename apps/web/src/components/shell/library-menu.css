@@ -1,5 +1,5 @@
 /**
- * The Library menu's panel. Sits under the bar's right end, at the overlay tier: it is a
+ * The Rooms menu's panel. Sits under the bar's right end, at the overlay tier: it is a
  * reader-summoned list over whatever the surface is showing, not part of the surface.
  */
 
@@ -128,7 +128,7 @@
 
 /* Narrow: the panel spans the bar and the three columns stack. A 660px mega-menu on a phone is a
    page, and this one would cover the surface it was opened from. The stacked command bar raises
-   --ds-island-height; the Atlas gutter token does not, so the sheet would sit under the bar. */
+   --ds-island-height; the Explore gutter token does not, so the sheet would sit under the bar. */
 @media (max-width: 60rem) {
   .ds-libmenu__trigger,
   .ds-libmenu__item {

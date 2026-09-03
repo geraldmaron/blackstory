@@ -58,7 +58,7 @@ DNS-only until 2026-08-24; that was stale, and it mattered — grey cloud would 
 below a no-op.
 
 **Cache rule** (ruleset `fbba310d91a3483f88cc5686b25684e1`, phase `http_request_cache_settings`):
-`/`, `/library`, `/memorial`, excluding requests carrying the `rsc` header, are edge-cached for
+`/`, `/rooms`, `/memorial`, excluding requests carrying the `rsc` header, are edge-cached for
 one hour with `browser_ttl: respect_origin` and `status_code_ttl` `200-226 -> 3600`,
 `300-526 -> 0`.
 
@@ -120,7 +120,7 @@ downstream untouched, so no visitor caches a dynamic page locally.
 `/methodology`, `/submit`, `/entity/`, `/books/`, `/law/`, `/stories/`, `/chapters/` — same `rsc`
 bypass — with **`edge_ttl: respect_origin`** rather than the `override_origin` the first rule uses.
 
-The two groups need opposite treatment, which is why they are two rules and not one. `/library`
+The two groups need opposite treatment, which is why they are two rules and not one. `/rooms`
 and `/memorial` are `force-dynamic` and send `no-store`, so the edge must *override* the origin
 or nothing caches. `/` is ISR (`revalidate = 300`) and stays in the same override rule so the
 front door still caches for an hour at Cloudflare. The other ISR surfaces already declare
@@ -133,7 +133,7 @@ should *respect* it and keep one source of truth in the app.
 prefix cannot force-cache something the app said not to.
 
 Verified after deploy: `/methodology`, `/entity/[id]` and `/submit` each go `MISS` then `HIT`; `/`
-and `/library` still `HIT` (no regression); an entity page with `rsc: 1` returns `DYNAMIC`;
+and `/rooms` still `HIT` (no regression); an entity page with `rsc: 1` returns `DYNAMIC`;
 `/corrections` and `/records` stay `DYNAMIC`, correctly excluded.
 
 Before this, every one of 4,107 entity pages was served from Vercel on every request despite the

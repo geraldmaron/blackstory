@@ -98,7 +98,7 @@ export type LensPanelProps = {
   readonly onLayerToggle: (layer: LensLayerKey) => void;
 
   /** Population layer model: `off` for none, or one of the two comparability-noted choropleths.
-   * `presence` is deliberately not offered here — it is the default map shading the Atlas already
+   * `presence` is deliberately not offered here — it is the default map shading Explore already
    * carries, not a reader-facing "population" choice. */
   readonly layerMode: ExploreLayerMode;
   readonly onLayerModeChange: (mode: ExploreLayerMode) => void;

@@ -109,5 +109,5 @@ test('cost burden merge stays pinned to the suburban Cook 2016-2020 vintage', ()
   ]);
   assert.equal(merged.costBurdenComparison.primary.value, 44.6);
   assert.equal(merged.costBurdenComparison.comparison.value, 31.3);
-  assert.equal(merged.costBurdenComparison.referencePeriod, '2016–2020 ACS');
+  assert.equal(merged.costBurdenComparison.referencePeriod, '2016 to 2020 ACS');
 });
