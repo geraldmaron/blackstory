@@ -117,7 +117,7 @@ function conicEqualAreaRaw(
   return { x: r * Math.sin(lambda * n), y: r0 - r * Math.cos(lambda * n) };
 }
 
-/** Longitude after the conic's rotation, normalised back into [-180, 180]. */
+/** Longitude after the conic's rotation, normalized back into [-180, 180]. */
 function rotateLongitude(lng: number, delta: number): number {
   const rotated = (lng + delta) % 360;
   if (rotated > 180) return rotated - 360;
@@ -131,7 +131,7 @@ function projectThrough(conic: Conic, lng: number, lat: number): LocatorPoint {
     rotateLongitude(lng, conic.rotateLambda) * RADIANS,
     lat * RADIANS,
   );
-  // d3 folds `center` into the translate: the projected centre must land on the translate point,
+  // d3 folds `center` into the translate: the projected center must land on the translate point,
   // and the y axis flips because SVG counts downward while the conic counts up.
   const origin = conicEqualAreaRaw(
     conic.parallels,

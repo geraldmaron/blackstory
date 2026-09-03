@@ -9,6 +9,7 @@ import {
   type EvidenceFloor,
 } from '../../../lib/map-experience/evidence-grade';
 import { decadeDensityBars } from '../../../lib/map-experience/decade-density';
+import { earliestDecadeFor } from '../../../lib/map-experience/decade-transition';
 import {
   buildTopicCounts,
   effectiveTopicIds,
@@ -52,6 +53,16 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
   });
   const [evidenceFloor, setEvidenceFloor] = useState<EvidenceFloor>(view.viewState.floor ?? 'any');
   const [decade, setDecade] = useState<number | null>(null);
+  /**
+   * The story sweep's cursor: show every record whose era had begun by this decade, cumulatively.
+   *
+   * Deliberately not the `decade` filter above. That one is the reader's own instrument and it is
+   * a *window* — click the 1920s bar and you get the 1920s. The sweep is an argument about the
+   * record accumulating, so it needs the opposite semantics, and folding the two together would
+   * mean the histogram chip lied about what the map was showing. A value below the archive's
+   * first decade empties the plate, which is how chapter 4 opens.
+   */
+  const [sweepDecade, setSweepDecade] = useState<number | null>(null);
   const [topicId, setTopicId] = useState<string | null>(
     view.viewState.filters.theme !== 'all' ? view.viewState.filters.theme : null,
   );
@@ -86,8 +97,23 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
       const bucket = eraBucketFor(decade);
       features = features.filter((feature) => feature.properties.eraBuckets.includes(bucket));
     }
+    if (sweepDecade !== null) {
+      features = features.filter((feature) => {
+        const earliest = earliestDecadeFor(feature);
+        return earliest !== null && earliest <= sweepDecade;
+      });
+    }
     return applyEvidenceFloor(features, evidenceFloor);
-  }, [decade, evidenceFloor, kindFamily, stateCode, status, topicId, view.allFeatures]);
+  }, [
+    decade,
+    evidenceFloor,
+    kindFamily,
+    stateCode,
+    status,
+    sweepDecade,
+    topicId,
+    view.allFeatures,
+  ]);
 
   const topicCounts = useMemo<readonly TopicCount[]>(
     () => buildTopicCounts(view.allFeatures),
@@ -226,6 +252,8 @@ export function useLensFilters(view: ExploreViewModel, toasts: UseToasts) {
     setEvidenceFloor,
     decade,
     setDecade,
+    sweepDecade,
+    setSweepDecade,
     topicId,
     setTopicId,
     status,

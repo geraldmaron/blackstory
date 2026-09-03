@@ -48,3 +48,38 @@ export function collectTwoHopNeighborIds(
   }
   return candidates;
 }
+
+/**
+ * Third-hop candidate ids, for the record room's relationship map only.
+ *
+ * The outer ring is the one that explodes, so this is capped harder than the second hop rather
+ * than more generously: it buys one extra `getAll` per record page and nothing else, and the map
+ * draws whatever that budget paid for (`buildRelationshipGraph` drops edges pointing at records
+ * it was not given). `alreadyFetched` must contain the center plus every 1-hop and 2-hop id, so a
+ * record already on the map is never refetched to sit on it a second time.
+ */
+export function collectThreeHopNeighborIds(
+  alreadyFetched: readonly string[],
+  twoHopNeighbors: readonly RelatedEdgeLike[],
+): readonly string[] {
+  const excluded = new Set<string>(alreadyFetched);
+  const candidates: string[] = [];
+  const fetchCap = RELATIONSHIP_MAP_THIRD_HOP_FETCH_CAP;
+
+  for (const neighbor of twoHopNeighbors) {
+    for (const edge of neighbor.related ?? []) {
+      if (excluded.has(edge.id)) continue;
+      excluded.add(edge.id);
+      candidates.push(edge.id);
+      if (candidates.length >= fetchCap) return candidates;
+    }
+  }
+  return candidates;
+}
+
+/**
+ * Ids fetched for the map's third ring. Twice the display cap so the ring has something to
+ * choose from after `buildRelationshipGraph` sorts by date, and no more than that — this is a
+ * live Postgres round-trip on every record page.
+ */
+export const RELATIONSHIP_MAP_THIRD_HOP_FETCH_CAP = 24;

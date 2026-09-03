@@ -10,10 +10,10 @@
  * PATH 1 (this script, deterministic, no model):
  *   - nrhp-nomination: the National Register nomination form from NPGallery. Public domain,
  *     10-70k characters of real narrative per property. Richest source we have.
- *   - wikipedia: broad coverage for everything else, CC BY-SA, licence recorded per row.
+ *   - wikipedia: broad coverage for everything else, CC BY-SA, license recorded per row.
  *
  * PATH 2 (search-driven agent collection for entities still thin after PATH 1) is deliberately
- * NOT in this script: it needs judgement per entity and is run as a separate pass over the
+ * NOT in this script: it needs judgment per entity and is run as a separate pass over the
  * `no-evidence` rows this sweep reports.
  *
  * Discipline enforced here, not left to the caller:
@@ -213,7 +213,7 @@ function evidenceId(entityId: string, collector: string, sourceUrl: string): str
 /**
  * A collector declining to produce evidence, with the reason. Distinct from a thrown Error:
  * "NPS has no nomination for this refnum" is an expected outcome that tells us about source
- * coverage, while "our parser did not recognise the form vintage" is a gap we can close. Both
+ * coverage, while "our parser did not recognize the form vintage" is a gap we can close. Both
  * used to collapse into a bare `null` and were indistinguishable in the run report, which made
  * the sweep's real yield impossible to reason about.
  */

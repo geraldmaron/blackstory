@@ -11,12 +11,24 @@
  * so there is nowhere to put one.
  */
 
+import type { ExploreMapFeature } from './build-explore-map-source';
+
 /** Pin opacity crossfade, in ms. Long enough to read as a change, short enough to scrub through. */
 export const DECADE_TRANSITION_MS = 420;
 
 /** Sweep step under normal motion, and under reduced motion. §5.4 / §6 chapter 4. */
 export const SWEEP_STEP_MS = 190;
 export const SWEEP_STEP_REDUCED_MS = 400;
+
+/**
+ * The beat between clearing the plate and the first decade landing on it.
+ *
+ * Chapter 4 argues that the record *fills*, so it has to start from nothing: the plate empties,
+ * the reader sees an empty country, and then four centuries arrive on it. That only reads if the
+ * clearing crossfade has finished before the first decade appears, which is why this is a full
+ * `DECADE_TRANSITION_MS` plus a short beat rather than one more sweep step.
+ */
+export const SWEEP_CLEAR_HOLD_MS = DECADE_TRANSITION_MS + 180;
 
 /** Paint properties added to every pin layer so a decade change crossfades rather than snapping. */
 export const DECADE_TRANSITION_PAINT = {
@@ -30,6 +42,14 @@ export type SweepOptions = {
   /** Last decade start year, inclusive. */
   readonly to: number;
   readonly onDecade: (decade: number) => void;
+  /**
+   * Empty the plate before the first decade lands. When given, the sweep opens by calling this,
+   * holds for `clearHoldMs`, and only then emits `from`. Without it the sweep opens on `from`
+   * synchronously, which is what the histogram scrubber wants and what the story chapter does not.
+   */
+  readonly onClear?: () => void;
+  /** How long the cleared plate is held before the first decade. Ignored without `onClear`. */
+  readonly clearHoldMs?: number;
   readonly onDone?: () => void;
   readonly reducedMotion?: boolean;
   /** Overrides the per-decade interval. Mostly for tests; the defaults are the design law's. */
@@ -63,7 +83,8 @@ export function sweepIntervalMs(reducedMotion: boolean): number {
  * Steps decades in order, emitting each one.
  *
  * The first decade is emitted synchronously. A sweep whose opening frame is one interval late
- * reads as a stall, and the reader has already pressed play.
+ * reads as a stall, and the reader has already pressed play. The one exception is a sweep that
+ * was asked to clear the plate first (`onClear`): there the pause is the point, not a stall.
  */
 export function sweep(options: SweepOptions): SweepHandle {
   const schedule = options.scheduler ?? ((cb: () => void, ms: number) => setTimeout(cb, ms));
@@ -98,8 +119,14 @@ export function sweep(options: SweepOptions): SweepHandle {
     pending = schedule(step, interval);
   }
 
-  if (running) step();
-  else options.onDone?.();
+  if (!running) {
+    options.onDone?.();
+  } else if (options.onClear) {
+    options.onClear();
+    pending = schedule(step, options.clearHoldMs ?? SWEEP_CLEAR_HOLD_MS);
+  } else {
+    step();
+  }
 
   return {
     cancel: () => {
@@ -109,4 +136,25 @@ export function sweep(options: SweepOptions): SweepHandle {
     },
     isRunning: () => running,
   };
+}
+
+/**
+ * The first decade this record is on the map for, or null when it carries no dated era bucket.
+ *
+ * Used by the story sweep, which fills the plate cumulatively rather than showing one decade at a
+ * time: a record enters at its earliest decade and stays. Undated records return null and sit out
+ * the sweep entirely rather than being drawn from the first frame, which would put them in the
+ * 1630s — a date the archive does not claim for them.
+ */
+export function earliestDecadeFor(feature: ExploreMapFeature): number | null {
+  const carried = feature.properties.earliestDecade;
+  if (typeof carried === 'number' && Number.isFinite(carried)) return carried;
+
+  let earliest: number | null = null;
+  for (const bucket of feature.properties.eraBuckets) {
+    const year = Number.parseInt(bucket, 10);
+    if (!Number.isFinite(year)) continue;
+    if (earliest === null || year < earliest) earliest = year;
+  }
+  return earliest;
 }

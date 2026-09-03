@@ -3,7 +3,7 @@
 **Status:** Adopted 2026-09-02 (owner decision, epic repo-trn4, WS1 repo-wqcn). Replaces the
 precision half of the "dignity rules" that lived only in `packages/schemas/constitution/policy.v1.json`
 and `packages/security/src/redaction.ts`.
-**Research record:** the primary-source pass behind this document is summarised in §5; every
+**Research record:** the primary-source pass behind this document is summarized in §5; every
 claim there names the page opened and the date.
 
 ## 1. The rule
@@ -18,17 +18,17 @@ by practitioners." Everything else, including occupied private homes, is publish
 address in the nomination and the weekly Federal Register list.
 
 BlackStory previously did the reverse: it prohibited street addresses and exact coordinates at the
-constitution layer and coarsened anything it did not recognise. That was a pattern of our own
+constitution layer and coarsened anything it did not recognize. That was a pattern of our own
 making. The world already has one, and readers who want to stand where history happened are served
 by it.
 
 ## 2. Tiers
 
 Public precision is one controlled list, coarsest to finest. Every raw value that reaches the
-publish path is normalised onto it by `normalizePublicPrecision` in
+publish path is normalized onto it by `normalizePublicPrecision` in
 `packages/domain-core/src/geography/precision.ts`; unknown values fall to `city`, never sharper.
 
-| Tier | Meaning | Coordinates published | Raw synonyms normalised here |
+| Tier | Meaning | Coordinates published | Raw synonyms normalized here |
 |---|---|---|---|
 | `none` | withheld entirely | none | |
 | `country` | | 0 decimals | |
@@ -72,7 +72,7 @@ review process and BlackStory does not. Three controls stand in for it:
    that used to gate publish (`release-builder.ts`) are removed; a test asserts every published
    precision is a tier from §2.
 3. **A request path.** Withholding on request is a class (`withheld_on_request`) any operator can
-   set from a correction receipt, and it is honoured before any other rule.
+   set from a correction receipt, and it is honored before any other rule.
 
 ## 5. Sources
 

@@ -9,7 +9,7 @@ import type { ExploreMapFeature } from './build-explore-map-source';
 /** Movement below this is a pin select, not a map pan. */
 export const EXPLORE_PIN_CLICK_SLOP_PX = 8;
 
-/** Degrees; about a metre, enough to survive attribute string round-trip. */
+/** Degrees; about a meter, enough to survive attribute string round-trip. */
 const POINT_MATCH_EPSILON = 1e-5;
 
 export type ExplorePinSelectTarget = {

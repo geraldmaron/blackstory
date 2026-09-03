@@ -8,7 +8,7 @@
  */
 
 /* —— the control line: find field and facets, side by side ————————————————————
-   The room used to open on a panel of six labelled chip rows, which cost most of a screen before
+   The room used to open on a panel of six labeled chip rows, which cost most of a screen before
    the first record. One line instead: a GET search field that takes the spare width, then one
    disclosure per facet. Both halves work with JavaScript off. */
 /* The tray below is positioned against this row, so it needs to be the containing block. */

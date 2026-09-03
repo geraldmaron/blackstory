@@ -23,7 +23,7 @@ test('chapters are contiguous from the cold open, with no gap or repeat in the s
   });
   const ids = new Set(STORY_CHAPTERS.map((chapter) => chapter.id));
   assert.equal(ids.size, STORY_CHAPTERS.length, 'two chapters share an id');
-  assert.equal(STORY_CHAPTERS[0]?.centred, true, 'the cold open is a centred chapter');
+  assert.equal(STORY_CHAPTERS[0]?.centered, true, 'the cold open is a centered chapter');
 });
 
 test('every chapter camera is inside the envelope MapLibre will accept', () => {
@@ -92,7 +92,7 @@ test('every chapter declares a stage the running order knows how to place', () =
   assert.equal(STORY_CHAPTERS.filter((chapter) => chapter.stage === 'closing').length, 1);
 });
 
-test('the intersection threshold fires a chapter before it is centred, but not at the edge', () => {
+test('the intersection threshold fires a chapter before it is centered, but not at the edge', () => {
   assert.ok(CHAPTER_INTERSECTION_THRESHOLD > 0.25);
   assert.ok(CHAPTER_INTERSECTION_THRESHOLD < 0.5);
 });

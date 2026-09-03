@@ -16,7 +16,7 @@
  * all the safety-critical policy logic (drop-and-rebuild migration, LRU, stamp
  * invalidation, never-cache enforcement) becomes testable in the node test
  * runner without a native SQLite engine. The raw-SQL translation lives in one
- * thin adapter whose device-level behaviour is covered by an integration test
+ * thin adapter whose device-level behavior is covered by an integration test
  * deferred to MOB-019 (see sqlite-store.ts header).
  */
 

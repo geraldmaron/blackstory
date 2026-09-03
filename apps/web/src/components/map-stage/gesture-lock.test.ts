@@ -8,7 +8,15 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { lockGestures, unlockGestures, type GestureTarget } from './gesture-lock';
+import {
+  applyGesturesForPosture,
+  lockGestures,
+  lockGesturesAmbient,
+  rotateGestureAllowed,
+  unlockGestures,
+  type GestureTarget,
+} from './gesture-lock';
+import { wheelRotateDeltaPx } from './custom-rotate-gestures';
 
 const GESTURE_NAMES = [
   'scrollZoom',
@@ -94,4 +102,88 @@ test('a plate locked then unlocked then locked again ends locked', () => {
   unlockGestures(target);
   lockGestures(target);
   for (const name of GESTURE_NAMES) assert.equal(target.state[name], false);
+});
+
+test('ambient on a coarse (touch) pointer is a full lock: a one-finger drag is the scroll gesture there', () => {
+  const target = createFakeTarget();
+  lockGesturesAmbient(target, { pointerFine: false });
+  for (const name of GESTURE_NAMES) {
+    assert.equal(target.state[name], false, `${name} was left enabled on touch ambient`);
+  }
+});
+
+test('ambient on a precise pointer keeps the wheel off but hands drag, pinch, dblclick and keyboard back', () => {
+  const target = createFakeTarget();
+  lockGesturesAmbient(target, { pointerFine: true });
+  assert.equal(target.state.scrollZoom, false, 'the wheel must always reach the document');
+  assert.equal(target.state.dragPan, true);
+  assert.equal(target.state.dragRotate, true);
+  assert.equal(target.state.touchZoomRotate, true);
+  assert.equal(target.state.doubleClickZoom, true);
+  assert.equal(target.state.keyboard, true);
+});
+
+test('applyGesturesForPosture: live unlocks everything, regardless of pointer', () => {
+  const target = createFakeTarget();
+  lockGestures(target);
+  applyGesturesForPosture(target, 'live', { pointerFine: false });
+  for (const name of GESTURE_NAMES) assert.equal(target.state[name], true);
+});
+
+test('applyGesturesForPosture: framed and parked are always a full lock, regardless of pointer', () => {
+  for (const posture of ['framed', 'parked'] as const) {
+    for (const pointerFine of [true, false]) {
+      const target = createFakeTarget();
+      applyGesturesForPosture(target, posture, { pointerFine });
+      for (const name of GESTURE_NAMES) {
+        assert.equal(target.state[name], false, `${posture}/pointerFine=${pointerFine}: ${name}`);
+      }
+    }
+  }
+});
+
+test('applyGesturesForPosture: ambient defers to the pointer-fine rule', () => {
+  const touch = createFakeTarget();
+  applyGesturesForPosture(touch, 'ambient', { pointerFine: false });
+  assert.equal(touch.state.dragPan, false);
+
+  const mouse = createFakeTarget();
+  applyGesturesForPosture(mouse, 'ambient', { pointerFine: true });
+  assert.equal(mouse.state.dragPan, true);
+  assert.equal(mouse.state.scrollZoom, false);
+});
+
+test('rotateGestureAllowed matches dragRotate exactly across every posture/pointer combination', () => {
+  // The custom rotate gestures are additional triggers for the same rotation dragRotate already
+  // performs — this is the asymmetry guard for that pairing, same shape as the lock/unlock one
+  // above.
+  for (const posture of ['live', 'ambient', 'framed', 'parked'] as const) {
+    for (const pointerFine of [true, false]) {
+      const target = createFakeTarget();
+      applyGesturesForPosture(target, posture, { pointerFine });
+      assert.equal(
+        rotateGestureAllowed(posture, { pointerFine }),
+        target.state.dragRotate,
+        `${posture}/pointerFine=${pointerFine}`,
+      );
+    }
+  }
+});
+
+test('a wheel rotation reads the dominant axis, in pixels', () => {
+  // A trackpad swipe with Shift held lands on deltaX in some engines and deltaY in others.
+  assert.equal(wheelRotateDeltaPx({ deltaX: 40, deltaY: 2 }), 40);
+  assert.equal(wheelRotateDeltaPx({ deltaX: -3, deltaY: 26 }), 26);
+  assert.equal(wheelRotateDeltaPx({ deltaX: 0, deltaY: 0 }), 0);
+});
+
+test('line and page wheel modes are normalized to pixels', () => {
+  assert.equal(wheelRotateDeltaPx({ deltaX: 0, deltaY: 3, deltaMode: 1 }), 48);
+  assert.equal(wheelRotateDeltaPx({ deltaX: 0, deltaY: 1, deltaMode: 2 }), 400);
+  assert.equal(wheelRotateDeltaPx({ deltaX: 0, deltaY: 12, deltaMode: 0 }), 12);
+});
+
+test('a non-finite wheel delta turns nothing', () => {
+  assert.equal(wheelRotateDeltaPx({ deltaX: Number.NaN, deltaY: 0 }), 0);
+  assert.equal(wheelRotateDeltaPx({ deltaX: 0, deltaY: Number.POSITIVE_INFINITY }), 0);
 });

@@ -31,7 +31,7 @@ Do not send a Sonnet package to Haiku. Packages are marked; the mark is binding.
 > **Read first, in this order:**
 > 1. `docs/ui/design-direction-v9-atlas.md` — the binding design law
 > 2. `docs/ui/brand.md` — tokens, palette, type, dignity rules (still binding, unchanged)
-> 3. `.design-mocks/blackstory-atlas-v9.html` — the reference implementation. Open it in a browser. Your output should match its behaviour, not its code structure.
+> 3. `.design-mocks/blackstory-atlas-v9.html` — the reference implementation. Open it in a browser. Your output should match its behavior, not its code structure.
 > 4. The specific files listed in your work package
 >
 > **Repo rules, non-negotiable:**
@@ -97,8 +97,8 @@ P5  Consolidation      WP-23 … WP-28     decompose monoliths, mount, retire v6
 
 > **Amended 2026-07-30.** P5 originally ran WP-23 … WP-26 and made WP-23 responsible for both
 > decomposing `ExploreMapExperience.tsx` *and* composing the new instruments into it. Those two
-> jobs contradict each other: WP-23 is specified behaviour-preserving with "an edited existing
-> test is the stop signal" (§5), but mounting chrome that a surface has never had is a behaviour
+> jobs contradict each other: WP-23 is specified behavior-preserving with "an edited existing
+> test is the stop signal" (§5), but mounting chrome that a surface has never had is a behavior
 > change and will require editing existing tests. An agent following the original package could
 > not satisfy both halves.
 >
@@ -391,7 +391,7 @@ Row grid `18px 1fr auto`: kind glyph · name + meta · save. Meta is a single no
 
 Per design doc §5.4. Replaces the v6 scrolling decade-tab rail.
 
-`decade-density.ts` is pure: takes decade counts, returns normalised bar heights with a documented floor so a one-record decade is still visible.
+`decade-density.ts` is pure: takes decade counts, returns normalized bar heights with a documented floor so a one-record decade is still visible.
 
 The panel:
 - `role="slider"` with `aria-valuemin` / `aria-valuemax` / `aria-valuenow` / `aria-valuetext`
@@ -402,7 +402,7 @@ The panel:
 
 **Carried from v6, still binding:** decade views show status as-of that decade from published status history. Never present-day status backfilled.
 
-**Test:** density normalisation — a decade with 1 record and a decade with 340 both produce a visible bar; the floor is respected; ordering is chronological.
+**Test:** density normalization — a decade with 1 record and a decade with 340 both produce a visible bar; the floor is respected; ordering is chronological.
 
 ---
 
@@ -484,7 +484,7 @@ Per design doc §7. `localStorage`-backed, schema-versioned so a future migratio
 - Drawer lists saved records with kind glyph, place, era, grade
 - `Copy all citations`, `Copy as GeoJSON`, `Clear list`
 
-**Test:** store round-trips, tolerates corrupt JSON without throwing, and honours the schema version.
+**Test:** store round-trips, tolerates corrupt JSON without throwing, and honors the schema version.
 
 ---
 
@@ -509,7 +509,7 @@ Deep link carries `record`, `state`, `era`, `grade`, `kind`. It must **not** car
 **Depends on:** nothing.
 **Touches:** `apps/web/src/components/patterns/Toast.tsx` (new), `toast.css` (new), `skeleton.css` (new).
 
-- Toast: 2.6s plain, 6s with an action, `role="status" aria-live="polite"`, stacks bottom-centre above the Time panel
+- Toast: 2.6s plain, 6s with an action, `role="status" aria-live="polite"`, stacks bottom-center above the Time panel
 - Skeleton: `.sk` shimmer, 1.4s linear. Never a spinner.
 - Empty state: names the cause and offers the fix. `"No records match this lens. Widen the evidence floor or clear the decade."` plus a reset button. Never a bare "no results".
 
@@ -558,14 +558,14 @@ Cold open: `History happened here.` split into word spans with 130ms stagger, `t
 
 2,207 lines to an orchestrator under 400. Extract state into hooks under `app/explore/hooks/`.
 
-**Decomposition only. Do not mount anything new.** This package reorganises the code that is
+**Decomposition only. Do not mount anything new.** This package reorganizes the code that is
 already there and nothing else. It does not import `LensPanel`, `ResultsRail`, `TimePanel`,
 `CommandPalette`, `AnnotationOverlay`, `CameraConsole`, `RecordSheet` or `createCamera`. Mounting
 those is WP-27, and keeping the two apart is what makes this diff reviewable: a 1,800-line
 restructure with feature changes folded in cannot be bisected when something regresses.
 
 **Behaviour-preserving only.** Every existing test must pass untouched; if a test needs editing,
-you have changed behaviour — stop and file a bead instead. That stop signal is only meaningful
+you have changed behavior — stop and file a bead instead. That stop signal is only meaningful
 because this package adds no features, which is why its dependency list is now empty.
 
 ---
@@ -575,7 +575,7 @@ because this package adds no features, which is why its dependency list is now e
 **Depends on:** WP-23.
 **Touches:** `apps/web/src/components/map-stage/MapStage.tsx` and new sibling modules.
 
-2,087 lines. Split along: style building, source syncing, lifecycle (`map-libre-lifecycle.ts` already exists — use it), camera, event wiring. Same behaviour-preserving constraint as WP-23.
+2,087 lines. Split along: style building, source syncing, lifecycle (`map-libre-lifecycle.ts` already exists — use it), camera, event wiring. Same behavior-preserving constraint as WP-23.
 
 ---
 
@@ -654,7 +654,7 @@ The `--ds-map-*` roles ship and are contract-tested, but no style builder reads 
 still renders `plateForScheme()`'s palette from `dignity-style.ts`. The legibility defect the whole
 plate rework exists to fix is therefore still on screen.
 
-Make `mapPalettes` from `packages/ui/src/tokens/colors.ts` the single source for plate colour and
+Make `mapPalettes` from `packages/ui/src/tokens/colors.ts` the single source for plate color and
 delete the duplicate literals. MapLibre styles are JSON, not CSS, so the TypeScript export is the
 source of truth and `tokens.css` is the mirror — not the other way round.
 
@@ -695,7 +695,7 @@ Waves are gates. Run `pnpm lint && pnpm typecheck && pnpm test:js && pnpm test:a
 | `fitBounds` throwing and killing map init | WP-03's clamp plus try/catch fallback in WP-05. Cost real debug time in the mock; do not skip. |
 | Motion harming reduced-motion or vestibular users | Reduced motion collapses at both CSS and camera level. `M` gives an in-app calm toggle independent of OS setting. |
 | Route loss during consolidation | WP-25 gates on the README pattern table plus a redirect test. |
-| Monolith refactors changing behaviour | WP-23 and WP-24 are behaviour-preserving; an edited existing test is the stop signal. That signal only works because neither package mounts anything new — adoption is WP-27, where test edits are expected. |
+| Monolith refactors changing behavior | WP-23 and WP-24 are behavior-preserving; an edited existing test is the stop signal. That signal only works because neither package mounts anything new — adoption is WP-27, where test edits are expected. |
 | Packages that build modules nothing ever renders | WP-27 owns mounting and WP-28 owns the plate. Both were missing from the original plan, and without them every P0 to P4 package ships code no reader reaches. Treat "built and tested" as unfinished until one of those two consumes it. |
 | Results rail repeating the `/history` 4,078-node problem | WP-12 requires windowing, called out explicitly. |
 | Two agents colliding on a file | The `Touches` list is the lock. One writer per file per wave. |

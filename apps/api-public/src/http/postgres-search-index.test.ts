@@ -1,5 +1,5 @@
 /**
- * repo-n7p6.28 — pins the behaviour that let a living-status bug hide for a whole release.
+ * repo-n7p6.28 — pins the behavior that let a living-status bug hide for a whole release.
  *
  * `bb_public.search_index` keeps the whole search document in its `facets` jsonb column AND a few
  * denormalized scalar columns beside it (`kind`, `status`, `name`, ...). When the blob is a full

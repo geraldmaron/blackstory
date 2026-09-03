@@ -62,7 +62,7 @@ test('data page keeps section anchors for the section rail', () => {
   assert.match(sectionsSource, /DataPageNav sections=\{DATA_PAGE_SECTIONS\}/);
 });
 
-test('the headline band links into the figures it summarises', () => {
+test('the headline band links into the figures it summarizes', () => {
   for (const anchor of [
     '#population-count',
     '#wealth-gap',

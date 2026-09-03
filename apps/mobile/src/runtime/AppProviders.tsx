@@ -101,7 +101,7 @@ export function AppProviders({ children, runtime: injected }: AppProvidersProps)
     if (injected) {
       return;
     }
-    let cancelled = false;
+    let canceled = false;
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
     let retryInterval: ReturnType<typeof setInterval> | undefined;
     void (async () => {
@@ -133,15 +133,15 @@ export function AppProviders({ children, runtime: injected }: AppProvidersProps)
                   'set apps/mobile/.env.local API_BASE_URL to your LAN http://IP:8080, then restart Metro.'),
           );
         }
-        if (!cancelled) setLoadedRuntime(runtimeWithSync);
+        if (!canceled) setLoadedRuntime(runtimeWithSync);
 
-        if (!cancelled && syncResult.status === 'offline' && usesLocalDevApi()) {
+        if (!canceled && syncResult.status === 'offline' && usesLocalDevApi()) {
           // api-public is often started after Metro; poll bootstrap so the banner
           // clears without requiring an app restart when the local API comes up.
           const scheduleRetry = () => {
-            if (cancelled) return;
+            if (canceled) return;
             void refreshBootstrapSync(runtimeWithSync, (retryResult) => {
-              if (cancelled) return;
+              if (canceled) return;
               setLoadedRuntime((prev) =>
                 prev ? { ...prev, lastBootstrapSync: retryResult } : prev,
               );
@@ -158,17 +158,17 @@ export function AppProviders({ children, runtime: injected }: AppProvidersProps)
         console.warn('[blackstory] AppProviders init failed; attempting degraded runtime', err);
         try {
           const fallback = await getAppRuntime();
-          if (!cancelled) {
+          if (!canceled) {
             setLoadedRuntime({ ...fallback, lastBootstrapSync: { status: 'offline', stamp: undefined } });
           }
         } catch (fallbackErr) {
           console.warn('[blackstory] runtime unavailable; features run without shared providers', fallbackErr);
-          if (!cancelled) setLoadedRuntime(null);
+          if (!canceled) setLoadedRuntime(null);
         }
       }
     })();
     return () => {
-      cancelled = true;
+      canceled = true;
       if (retryTimer) clearTimeout(retryTimer);
       if (retryInterval) clearInterval(retryInterval);
     };

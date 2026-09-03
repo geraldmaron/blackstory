@@ -112,7 +112,7 @@ test('entries missing required fields are dropped, the rest survive', () => {
   );
 });
 
-test('an entry missing an optional field is normalised, not discarded', () => {
+test('an entry missing an optional field is normalized, not discarded', () => {
   const partial = JSON.stringify({
     version: 1,
     records: [{ id: 'x', name: 'Partial', href: '/entity/x' }],

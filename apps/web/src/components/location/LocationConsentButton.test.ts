@@ -21,7 +21,7 @@ const { createElement } = React;
 // Binding the global here is test-only.
 (globalThis as Record<string, unknown>).React = React;
 
-test('renders an idle, enabled button labelled "Use my current location"', () => {
+test('renders an idle, enabled button labeled "Use my current location"', () => {
   const html = renderToStaticMarkup(
     createElement(LocationConsentButton, { onResolved: () => {}, onDenied: () => {} }),
   );

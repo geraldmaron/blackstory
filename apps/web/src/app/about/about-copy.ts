@@ -6,9 +6,9 @@
  * ORIGIN, the human half of the Neo section, and the contribute invitation are first person:
  * one person started this, one person runs it, and the limits on that are his to state.
  * PILLARS, REFUSALS and the rules half of the Neo section are impersonal, because they are
- * behaviour the code enforces rather than promises the author makes. A reader should be able to
+ * behavior the code enforces rather than promises the author makes. A reader should be able to
  * tell, from the writing alone, which sentences are a person talking and which are the archive's
- * behaviour. Nothing on this page says "we": there is no we.
+ * behavior. Nothing on this page says "we": there is no we.
  *
  * SHARED STRINGS. `ABOUT_WALK_PAST` and `ABOUT_ON_THE_GROUND` are declared as their own constants
  * and then placed into the lists below, rather than read back out by index. The index form broke
@@ -35,7 +35,7 @@ export const ABOUT_LEDE = `${ABOUT_LINE} I built it with the tools and records a
 
 /** Origin paragraph the door steals. You walk past the place. Do not retype. */
 export const ABOUT_WALK_PAST =
-  "That access started to feel like an obligation. Most of us walk past documented Black history every day without knowing it's there: a school, a street, a building, a court case that decided what the people around us were allowed to do. The records exist. They're just scattered across archives, agency databases, court reporters, and library catalogues that don't talk to each other.";
+  "That access started to feel like an obligation. Most of us walk past documented Black history every day without knowing it's there: a school, a street, a building, a court case that decided what the people around us were allowed to do. The records exist. They're just scattered across archives, agency databases, court reporters, and library catalogs that don't talk to each other.";
 
 /** Why this exists, in the maker's own voice. Rendered as consecutive paragraphs. */
 export const ABOUT_ORIGIN = [

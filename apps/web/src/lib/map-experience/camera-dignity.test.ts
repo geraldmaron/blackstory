@@ -141,7 +141,7 @@ test('no record at all means the move is about geography and is permitted', () =
   }
 });
 
-test('matching is case insensitive, since topic slugs are not normalised upstream', () => {
+test('matching is case insensitive, since topic slugs are not normalized upstream', () => {
   assert.ok(isViolenceAdjacent({ kind: 'event', topicTags: ['Lynching'] }));
   assert.ok(isViolenceAdjacent({ kind: 'event', topicIds: ['RACIAL_VIOLENCE'] }));
 });

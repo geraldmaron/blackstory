@@ -119,7 +119,7 @@ const nextConfig = {
       // you these rules work when on Vercel they do not.
       //
       // Practical rule: making a route cacheable is a route-segment-config change (ISR), not a
-      // header change. The header is what the CDN then honours.
+      // header change. The header is what the CDN then honors.
       {
         // Live: /entity/[id] became ISR (revalidate=3600), so this is now the served header.
         source: '/entity/:id',

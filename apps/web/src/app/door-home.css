@@ -1,7 +1,7 @@
 /**
  * Door Journey layout for `/`. Immersive scroll chapters over a fixed national pin field.
  * Flat matte only: no shadow, glow, or glass. Tokens only. No radial scrims (brand forbids
- * decorative gradients); centred chapters use an opaque surface plate instead.
+ * decorative gradients); centered chapters use an opaque surface plate instead.
  *
  * Board reuses `public/geo/us-locator.svg` (Albers USA) as a CSS mask under layout zoom
  * (width/height/left/top). The board host is contained to the locator's 960x500 so pin
@@ -134,6 +134,22 @@
   color: var(--ds-ink-muted);
 }
 
+/*
+ * The rotate hint. Hidden wherever rotation is not actually handed back: the ambient posture
+ * keeps a full gesture lock on a coarse primary pointer, because a one-finger drag on touch IS
+ * the page's scroll (gesture-lock.ts). A hint for a gesture the plate refuses is worse than no
+ * hint, so the media query matches the lock rather than restating it in prose.
+ */
+.ds-door__field-caption--gesture {
+  text-transform: lowercase;
+}
+
+@media (pointer: coarse) {
+  .ds-door__field-caption--gesture {
+    display: none;
+  }
+}
+
 .ds-door__live {
   position: absolute;
   width: 1px;
@@ -221,7 +237,7 @@ html:has(.ds-door) {
   justify-items: end;
 }
 
-.ds-door-journey__chapter--centre {
+.ds-door-journey__chapter--center {
   justify-items: center;
   text-align: center;
 }
@@ -231,7 +247,7 @@ html:has(.ds-door) {
   padding-bottom: var(--ds-space-6);
 }
 
-.ds-door-journey__chapter--centre.ds-door-journey__chapter--rest {
+.ds-door-journey__chapter--center.ds-door-journey__chapter--rest {
   align-content: center;
 }
 
@@ -252,7 +268,7 @@ html:has(.ds-door) {
   pointer-events: auto;
 }
 
-.ds-door-journey__chapter--centre .ds-door-journey__card {
+.ds-door-journey__chapter--center .ds-door-journey__card {
   width: min(32rem, 100%);
   border-left-width: var(--ds-border-width);
   border-left-color: var(--ds-rule);
@@ -265,16 +281,36 @@ html:has(.ds-door) {
   display: flex;
   flex-direction: column;
   width: min(30rem, 100%);
-  max-height: min(26rem, calc(100dvh - var(--ds-island-clearance) - var(--ds-space-6)));
-  padding: var(--ds-space-5);
+  max-height: min(31rem, calc(100dvh - var(--ds-island-clearance) - var(--ds-space-6)));
+  padding: var(--ds-space-6);
   overflow: hidden;
 }
 
+/* The centered `--center` rule above trades this card's side accent for a plain thin rule so a
+   centered box reads symmetric — which is right for it, but left the reader's first card with no
+   accent at all, just a flat panel. A top rule reads as a masthead on a centered box the way a
+   side rule reads on a left/right one, so it gets its presence back without breaking symmetry or
+   reaching for the shadow/glow/gradient the flat-matte law above rules out. */
+.ds-door-journey__chapter--center.ds-door-journey__chapter--rest .ds-door-journey__card {
+  border-top: 3px solid var(--ds-accent-graphic);
+}
+
+/* Gap owns the rhythm between eyebrow / brand / support / heading / prose;
+   each child's own margin is zeroed below so the two never stack. */
 .ds-door-journey__chapter--rest .ds-door-journey__copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-4);
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
+}
+
+.ds-door-journey__chapter--rest .ds-door-journey__eyebrow,
+.ds-door-journey__chapter--rest .ds-door-journey__support,
+.ds-door-journey__chapter--rest .ds-door-journey__prose {
+  margin: 0;
 }
 
 .ds-door-journey__chapter--rest .ds-door-journey__lockup {
@@ -282,7 +318,7 @@ html:has(.ds-door) {
 }
 
 .ds-door-journey__chapter--rest .ds-door-journey__cold {
-  margin-top: var(--ds-space-3);
+  margin: 0;
   font-size: clamp(1.5rem, 2.6vw, 2rem);
 }
 
@@ -293,7 +329,7 @@ html:has(.ds-door) {
 
 .ds-door-journey__chapter--rest .ds-door-journey__actions {
   flex-shrink: 0;
-  margin-top: var(--ds-space-4);
+  margin-top: var(--ds-space-6);
 }
 
 @media (min-width: 900px) {
@@ -396,6 +432,125 @@ html:has(.ds-door) {
   color: var(--ds-ink);
 }
 
+/* Cold-open subject morph — History → His Story → … → Black Story.
+   Flat matte only: opacity + width. No scale on the S (keeps the baseline stable).
+   Split easing is gentler than the global snap ease so the letter does not jump. */
+.ds-hero-headline-morph {
+  --ds-hero-morph-ease: cubic-bezier(0.33, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: nowrap;
+}
+
+.ds-hero-headline-morph__prefix {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  min-width: max-content;
+}
+
+.ds-hero-headline-morph__prefix-out {
+  position: absolute;
+  inset: 0 auto auto 0;
+  white-space: nowrap;
+  animation: ds-hero-prefix-out var(--ds-duration-slow) var(--ds-hero-morph-ease) both;
+}
+
+.ds-hero-headline-morph__prefix-in {
+  white-space: nowrap;
+}
+
+.ds-hero-headline-morph__prefix-out + .ds-hero-headline-morph__prefix-in {
+  animation: ds-hero-prefix-in var(--ds-duration-slow) var(--ds-hero-morph-ease) both;
+}
+
+.ds-hero-headline-morph__gap {
+  display: inline-block;
+  width: 0;
+  flex: 0 0 auto;
+  transition: width var(--ds-hero-split-ms, 1200ms) var(--ds-hero-morph-ease);
+}
+
+.ds-hero-headline-morph[data-split='true'] .ds-hero-headline-morph__gap {
+  width: 0.28em;
+}
+
+/* Clip-slot opens; the S glyph itself never scales or reflows off the baseline. */
+.ds-hero-headline-morph__s-slot {
+  display: inline-block;
+  overflow: hidden;
+  width: 0;
+  flex: 0 0 auto;
+  vertical-align: baseline;
+  transition: width var(--ds-hero-split-ms, 1200ms) var(--ds-hero-morph-ease);
+}
+
+.ds-hero-headline-morph[data-split='true'] .ds-hero-headline-morph__s-slot {
+  width: 0.72em;
+}
+
+.ds-hero-headline-morph__s {
+  display: inline-block;
+  opacity: 0;
+  text-transform: uppercase;
+  line-height: inherit;
+  vertical-align: baseline;
+  transition: opacity var(--ds-hero-split-ms, 1200ms) var(--ds-hero-morph-ease);
+}
+
+.ds-hero-headline-morph[data-split='true'] .ds-hero-headline-morph__s {
+  opacity: 1;
+}
+
+.ds-hero-headline-morph__story {
+  display: inline-flex;
+  align-items: baseline;
+  flex: 0 0 auto;
+}
+
+.ds-hero-headline-morph__tail {
+  display: inline-block;
+  line-height: inherit;
+  vertical-align: baseline;
+}
+
+.ds-hero-headline-morph__trailer {
+  color: inherit;
+}
+
+@keyframes ds-hero-prefix-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ds-hero-prefix-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-hero-headline-morph__gap,
+  .ds-hero-headline-morph__s-slot,
+  .ds-hero-headline-morph__s {
+    transition: none;
+  }
+
+  .ds-hero-headline-morph__prefix-out,
+  .ds-hero-headline-morph__prefix-out + .ds-hero-headline-morph__prefix-in {
+    animation: none;
+  }
+}
+
 .ds-door-journey__index {
   display: block;
   margin: 0 0 var(--ds-space-2);
@@ -439,7 +594,7 @@ html:has(.ds-door) {
   color: var(--ds-ink);
 }
 
-.ds-door-journey__chapter--centre .ds-door-journey__prose {
+.ds-door-journey__chapter--center .ds-door-journey__prose {
   margin-inline: auto;
   max-width: 44ch;
 }
@@ -498,7 +653,7 @@ html:has(.ds-door) {
   justify-content: inherit;
 }
 
-.ds-door-journey__chapter--centre .ds-door-journey__actions {
+.ds-door-journey__chapter--center .ds-door-journey__actions {
   justify-content: center;
 }
 
@@ -516,8 +671,8 @@ html:has(.ds-door) {
   }
 
   .ds-door-journey__chapter--rest .ds-door-journey__card {
-    padding: var(--ds-space-4) var(--ds-space-5);
-    max-height: min(22rem, calc(100dvh - var(--ds-island-clearance) - var(--ds-space-5)));
+    padding: var(--ds-space-5);
+    max-height: min(32rem, calc(100dvh - var(--ds-island-clearance) - var(--ds-space-5)));
   }
 
   .ds-door-journey__lockup {
@@ -685,7 +840,7 @@ body:has(.ds-door) .ds-door-journey {
 
   .ds-door-journey__chapter--start,
   .ds-door-journey__chapter--end,
-  .ds-door-journey__chapter--centre {
+  .ds-door-journey__chapter--center {
     justify-items: stretch;
     align-content: start;
   }
@@ -716,11 +871,11 @@ body:has(.ds-door) .ds-door-journey {
     font-size: 0.875rem;
   }
 
-  .ds-door-journey__chapter--centre {
+  .ds-door-journey__chapter--center {
     text-align: left;
   }
 
-  .ds-door-journey__chapter--centre .ds-door-journey__actions {
+  .ds-door-journey__chapter--center .ds-door-journey__actions {
     justify-content: flex-start;
   }
 

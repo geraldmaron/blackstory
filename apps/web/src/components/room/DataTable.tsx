@@ -3,7 +3,7 @@
  *
  * The wrapper is not optional and is not a caller's responsibility: a wide table that pushes
  * the document sideways is the specific bug this component exists to make unrepeatable. The
- * scroll container is focusable and labelled so a keyboard reader can reach the overflow.
+ * scroll container is focusable and labeled so a keyboard reader can reach the overflow.
  */
 
 import React from 'react';

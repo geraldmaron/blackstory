@@ -273,7 +273,7 @@ test('submission path creates a queue contract and validation never publishes di
 });
 
 test('sandbox extraction strips script content whose end tag carries whitespace', async () => {
-  // `</script >` is a valid end tag browsers honour. The filter missed it, so the element's
+  // `</script >` is a valid end tag browsers honor. The filter missed it, so the element's
   // contents survived into extractedText, the text this scanner reports as the safe, tag-free
   // rendering of a fetched document (CodeQL js/bad-tag-filter).
   const html = '<html><body>visible<script>secretPayload()</script >tail</body></html>';
@@ -289,7 +289,7 @@ test('sandbox extraction still strips a plain script end tag', async () => {
   assert.equal(result.extractedText.includes('.a{}'), false);
 });
 
-test('sandbox extraction strips every end-tag shape a browser honours', async () => {
+test('sandbox extraction strips every end-tag shape a browser honors', async () => {
   // An end tag runs to the first `>`, so all of these close the element.
   const shapes = ['</script>', '</script >', '</script\t\n bar>', '</SCRIPT foo=bar>'];
   for (const close of shapes) {

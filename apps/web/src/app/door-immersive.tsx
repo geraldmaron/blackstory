@@ -26,10 +26,19 @@ import { CAMERA_EASING_SLOW_OUT } from '../lib/map-experience/camera-presets';
 import { CAMERA_FLY_CURVE } from '../lib/map-experience/camera-moves';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { nationalFieldPatch } from '../lib/map-experience/national-field';
-import { CHAPTER_INTERSECTION_THRESHOLD, type StoryChapter } from '../lib/story/chapters';
+import {
+  earliestDecadeFor,
+  sweep,
+  SWEEP_CLEAR_HOLD_MS,
+  type SweepHandle,
+} from '../lib/map-experience/decade-transition';
+import { DECADE_LAYER_FADE_MS } from './map/decade-layer-transition';
+import type { StoryChapter } from '../lib/story/chapters';
+import { useChapterObserver } from '../lib/story/use-chapter-observer';
 import type { StoryRecordSpotlight } from '../lib/story/pick-story-record';
 import type { StoryFact } from '../lib/story/story-facts';
-import { COLD_OPEN_WORDS, copyFor, headingParts } from '../components/story/story-copy';
+import { copyFor, headingParts } from '../components/story/story-copy';
+import { HeroHeadlineMorph } from '../components/story/HeroHeadlineMorph';
 import {
   PinPhotoLayer,
   type PinPhotoHoverTarget,
@@ -46,6 +55,25 @@ const RECORD_CHAPTER_ID = 'one-record';
 
 /** Same flight the Explore story mode gives a chapter (`use-story-runner.ts`). */
 const CHAPTER_FLIGHT_MS = 1600;
+
+/**
+ * The decade range the sweep runs over, taken from the pins actually on the plate rather than
+ * from the release's own first and last decade. The chapter's claim is about *this* field
+ * filling up, so a decade with nothing on this plate is a frame with nothing to show.
+ */
+function sweepRange(
+  pins: ExploreMapFeatureCollection,
+): { readonly from: number; readonly to: number } | null {
+  let from: number | null = null;
+  let to: number | null = null;
+  for (const feature of pins.features) {
+    const decade = earliestDecadeFor(feature);
+    if (decade === null) continue;
+    if (from === null || decade < from) from = decade;
+    if (to === null || decade > to) to = decade;
+  }
+  return from === null || to === null ? null : { from, to };
+}
 
 /** The national chapters: flat, unrotated, and no closer than the story's opening zoom. */
 const NATIONAL_CAMERA_MAX_ZOOM = 3.6;
@@ -139,8 +167,6 @@ export function DoorImmersive({
   placeCount,
 }: DoorImmersiveProps) {
   const journeyRef = useRef<HTMLDivElement | null>(null);
-  const chaptersRef = useRef(chapters);
-  chaptersRef.current = chapters;
 
   const pinFieldRef = useRef<HTMLElement | null>(null);
   const boardPhotoTarget = usePinPhotoHoverAnchor(pinFieldRef);
@@ -162,24 +188,57 @@ export function DoorImmersive({
   const [focus, setFocus] = useState<DoorFocusFrame>(initialFocus);
   const [reducedMotion, setReducedMotion] = useState(false);
 
+  /**
+   * The decade the sweep chapter has filled the plate up to, or null when no sweep is running.
+   *
+   * Chapter 5 says "watch the record fill", so it has to be watchable: the plate crossdissolves
+   * to an empty country, holds there, and then takes the archive back one decade at a time,
+   * cumulatively. A cursor before the first decade matches nothing, which is the cleared frame.
+   */
+  const [sweepDecade, setSweepDecade] = useState<number | null>(null);
+  const sweepRef = useRef<SweepHandle | null>(null);
+  const stopSweep = useCallback(() => {
+    sweepRef.current?.cancel();
+    sweepRef.current = null;
+    setSweepDecade(null);
+  }, []);
+  // Scrolling away mid-sweep, or leaving the Door entirely, must not strand a half-filled plate.
+  useEffect(() => stopSweep, [stopSweep]);
+
+  const decadeRange = useMemo(() => sweepRange(pins), [pins]);
+
+  /** What the plate shows this frame: the whole field, or the archive as of the swept decade. */
+  const sweptPins = useMemo<ExploreMapFeatureCollection>(() => {
+    if (sweepDecade === null) return pins;
+    return {
+      ...pins,
+      features: pins.features.filter((feature) => {
+        const decade = earliestDecadeFor(feature);
+        return decade !== null && decade <= sweepDecade;
+      }),
+    };
+  }, [pins, sweepDecade]);
+
+  /**
+   * The one frame the plate crossdissolves rather than snapping: the cleared one. Removing
+   * features from a GeoJSON source is otherwise instant, and a country's worth of pins vanishing
+   * between frames reads as a fault rather than as the record being rewound. Every later frame
+   * only adds pins, which the per-decade pin crossfade already covers.
+   */
+  const clearingPlate =
+    sweepDecade !== null && (decadeRange === null || sweepDecade < decadeRange.from);
+  const clearingPlateRef = useRef(clearingPlate);
+  clearingPlateRef.current = clearingPlate;
+
   useEffect(() => {
     setReducedMotion(prefersReducedMotion());
   }, []);
 
-  useEffect(() => {
-    if (typeof IntersectionObserver === 'undefined') return;
-    const scope = journeyRef.current;
-    if (!scope) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const winner = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (!winner) return;
-        const index = Number((winner.target as HTMLElement).dataset.chapter);
-        const chapter = chaptersRef.current[index];
-        if (!chapter) return;
+  useChapterObserver(
+    journeyRef,
+    chapters,
+    useCallback(
+      (chapter: StoryChapter) => {
         setFocus(
           resolveDoorFocus({
             chapter,
@@ -188,18 +247,30 @@ export function DoorImmersive({
             spotlightLngLat,
           }),
         );
-      },
-      {
-        // Document scroll: observe against the viewport, not a nested scrollport.
-        threshold: CHAPTER_INTERSECTION_THRESHOLD,
-      },
-    );
 
-    for (const section of scope.querySelectorAll('[data-chapter]')) {
-      observer.observe(section);
-    }
-    return () => observer.disconnect();
-  }, [chapters, factByChapterId, spotlight, spotlightLngLat]);
+        stopSweep();
+        if (!chapter.sweep || decadeRange === null) return;
+        const calm = prefersReducedMotion();
+        sweepRef.current = sweep({
+          from: decadeRange.from,
+          to: decadeRange.to,
+          onClear: () => setSweepDecade(decadeRange.from - 10),
+          // Long enough for the clearing crossdissolve to land before the first decade arrives,
+          // so the reader actually sees the empty country the chapter is about. Under reduced
+          // motion the plate clears in a cut and only the short beat is needed.
+          clearHoldMs: calm ? SWEEP_CLEAR_HOLD_MS : DECADE_LAYER_FADE_MS + SWEEP_CLEAR_HOLD_MS,
+          onDecade: setSweepDecade,
+          // The last decade is not the end of the argument: the whole archive comes back, which
+          // also returns every undated record the sweep had to leave out.
+          onDone: () => setSweepDecade(null),
+          reducedMotion: calm,
+        });
+      },
+      [decadeRange, factByChapterId, spotlight, spotlightLngLat, stopSweep],
+    ),
+    // Document scroll: observe against the viewport, not a nested scrollport.
+    { scrollRoot: 'document' },
+  );
 
   const focusPinId =
     focus.focusEntityId !== null && spotlight !== null && focus.focusEntityId === spotlight.entityId
@@ -211,8 +282,11 @@ export function DoorImmersive({
      surface (MapStage builds MapLibre on first contact), so the Door pays for the map exactly
      once, at the moment it asks for it, and shares the instance with `/explore` afterwards. */
   useEffect(() => {
-    stage.patchData(nationalFieldPatch(pins, { densityLevels }));
-  }, [densityLevels, pins, stage]);
+    stage.patchData(
+      nationalFieldPatch(sweptPins, { densityLevels }),
+      clearingPlateRef.current ? { fade: true } : undefined,
+    );
+  }, [densityLevels, sweptPins, stage]);
 
   /** True once the plate has reported a viewport, which it only does after MapLibre `load`. */
   const [plateLive, setPlateLive] = useState(false);
@@ -245,7 +319,18 @@ export function DoorImmersive({
      * with a tilt or a place camera keep the chapter's own spec.
      */
     if (isNationalCamera(camera)) {
-      stage.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
+      /*
+       * Pitch and bearing are passed even though a national chapter authors them both as 0.
+       * Scroll is expected to run backwards as well as forwards, and a preset frame that names
+       * only center and zoom leaves MapLibre holding the previous chapter's attitude — so
+       * scrolling up from a tilted, turned chapter to the flat top of the page kept the tilt and
+       * the turn, and the field stayed contorted with nothing on screen left to explain it.
+       */
+      stage.flyPreset(
+        'national',
+        { bounds: US_CONUS_BOUNDS },
+        { mode: 'ease', pitch: camera.pitch, bearing: camera.bearing },
+      );
       setPageReady(true);
       return;
     }
@@ -361,6 +446,15 @@ export function DoorImmersive({
             <span className="ds-door__legend ds-door__legend--walk" aria-hidden="true" />
             walk
           </p>
+          {/*
+            Rotation is available here (`gesture-lock.ts`'s ambient posture hands `dragRotate`
+            back on a precise pointer) but nothing said so, and the gesture a reader reaches for
+            first is a trackpad twist, which no browser outside Safari reports to a page at all.
+            Naming the modifier is the whole fix: shift plus a drag or a two-finger swipe.
+          */}
+          <p className="ds-door__field-caption ds-door__field-caption--gesture">
+            shift + drag or swipe to turn the map
+          </p>
         </div>
         <p className="ds-door__live" aria-live="polite">
           {focus.placeLabel}
@@ -375,7 +469,7 @@ export function DoorImmersive({
           const { before, accent, after } = headingParts(copy);
           const isOpen = chapter.index === 0;
           const isClose = chapter.index === chapters.length - 1;
-          const side = chapter.centred ? 'centre' : chapter.index % 2 === 0 ? 'end' : 'start';
+          const side = chapter.centered ? 'center' : chapter.index % 2 === 0 ? 'end' : 'start';
           const spotlightHref =
             chapter.id === RECORD_CHAPTER_ID && spotlight
               ? `/entity/${encodeURIComponent(spotlight.entityId)}`
@@ -424,18 +518,14 @@ export function DoorImmersive({
                         <span className="ds-door-journey__presence-n">{placeCount}</span> places on
                         the field
                       </p>
-                      <h2
+                      <HeroHeadlineMorph
                         className="ds-door-journey__cold"
                         id={`door-journey-heading-${chapter.id}`}
-                      >
-                        {COLD_OPEN_WORDS.map((word) => (
-                          <span key={word}>{word} </span>
-                        ))}
-                      </h2>
+                      />
                     </>
                   ) : (
                     <>
-                      {chapter.centred ? null : (
+                      {chapter.centered ? null : (
                         <span className="ds-door-journey__index" aria-hidden="true">
                           {String(chapter.index).padStart(2, '0')}
                         </span>

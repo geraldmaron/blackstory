@@ -69,7 +69,7 @@ function isSortKey(value: string): value is StorySortKey {
 
 /**
  * Normalizes raw search params the same way `parseRecordsQuery` does: anything
- * unrecognised collapses to the default rather than throwing, because this route is
+ * unrecognized collapses to the default rather than throwing, because this route is
  * reachable from bookmarks, old links and crawlers.
  */
 export function parseStoriesQuery(
@@ -83,7 +83,7 @@ export function parseStoriesQuery(
   const rawPage = Number.parseInt(one('page'), 10);
   const rawSort = one('sort');
   const rawKind = one('kind');
-  // `kind=all` is the only way to reach the unfiltered view; anything unrecognised
+  // `kind=all` is the only way to reach the unfiltered view; anything unrecognized
   // (including no param at all) falls back to the chapters default rather than "all".
   const kind =
     rawKind === 'all'
@@ -428,7 +428,7 @@ export const STORY_SORT_LABELS: Record<StorySortKey, string> = {
  * engaged — the field-level narrowing that makes shelf browsing dishonest about what changed
  * (shelves have their own count order and per-collection position order). Deliberately excludes
  * the kind chip: a collection like the presidents is entirely `article`, so gating shelf mode on
- * `kind === 'chapter'` (the old behaviour) meant its shelf could never render at all — the
+ * `kind === 'chapter'` (the old behavior) meant its shelf could never render at all — the
  * default view filtered every one of its members out before the shelf builder ever saw them, and
  * clicking the "Entries" chip to actually find them dropped into the flat grid instead, since any
  * kind other than the default counted as "narrowed". A reader could see "The presidents on the

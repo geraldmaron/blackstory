@@ -2,7 +2,7 @@
 
 **Status: In build (v9).** The pattern the Instrument surface class is made of: `/` (the Explore map) and `/story`. Extracted from the runnable reference build [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) and governed by [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md), binding since 2026-07-30. Work packages and sequencing live in [`v9-atlas-implementation-plan.md`](./v9-atlas-implementation-plan.md).
 
-Builds on, and does not replace: [`patterns-map-canvas.md`](./patterns-map-canvas.md) (persistent `MapStage`, ADR-017), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (pin colour and shape), [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) (the 2×2 fact grid), [`brand.md`](./brand.md) (flat matte, copper discipline, dignity law).
+Builds on, and does not replace: [`patterns-map-canvas.md`](./patterns-map-canvas.md) (persistent `MapStage`, ADR-017), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (pin color and shape), [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) (the 2×2 fact grid), [`brand.md`](./brand.md) (flat matte, copper discipline, dignity law).
 
 **Where the other four surface classes live.** This pattern covers the Instrument only. [`patterns-surface-classes.md`](./patterns-surface-classes.md) names all five classes and which routes are in each; [`patterns-plate-posture.md`](./patterns-plate-posture.md) governs the plate everywhere the Instrument is not; [`patterns-reading-room.md`](./patterns-reading-room.md) and [`patterns-record-page.md`](./patterns-record-page.md) carry the editorial and record surfaces; [`patterns-lens-handoff.md`](./patterns-lens-handoff.md) is how they hand a filter back to this instrument.
 
@@ -35,13 +35,13 @@ One canvas, two modes (Explore and Story), no page-to-page reload of the plate.
 |---|---|---|
 | Map plate | 0 | Fixed full-viewport MapLibre. Single mount, persists across mode changes (ADR-017). |
 | Annotation overlay | 5 | SVG, `pointer-events: none`. Reprojected on `move`. |
-| Spotlight | 6 | Radial CSS mask over a canvas-coloured plate. |
+| Spotlight | 6 | Radial CSS mask over a canvas-colored plate. |
 | Grain | 7 | Archive texture, `mix-blend-mode: overlay`, opacity ≤ .3. |
 | Instruments | 20 | Opaque `--ds-surface` panels: Lens, Results, Time, Camera, Dock. |
 | Record sheet | 40 | Right-anchored slab, 3px copper left rule. |
 | Command bar | 50 | Fixed top. |
 | Palette and overlays | 90 | Command palette, shortcuts, collections. |
-| Toasts | 95 | Bottom centre, above the Time panel. |
+| Toasts | 95 | Bottom center, above the Time panel. |
 
 **Pointer-events contract (map stays operable):** Hover and touch on the plate itself pan, zoom and wheel-zoom. That is the common full-viewport map pattern: chrome keeps its own hits, gaps hand the gesture to the canvas. `.ds-atlas`, `.ds-shell`, `.ds-shell-body`, and the Instrument route wrappers are `pointer-events: none`. `pointer-events` is not inherited, so every covering ancestor has to opt out or the auto parent still eats the gesture. Only interactive surfaces re-enable hits (command bar, Lens, Results, Record sheet, Time, Camera, dock, notice, legend, Story scroll root, palette / shortcuts / saved overlays, offline banner). Full-bleed chrome (annotation, spotlight, readout) and the toast stack stay `none` so pan/zoom reaches the plate in the gaps; individual toasts set `auto` on themselves. Record sheet is non-modal (`aria-modal="false"`) for the same reason.
 
@@ -98,7 +98,7 @@ Clamp:             if left+right > w*0.5, scale both by k = (w*0.5)/(left+right)
 Vertical guard:    if top+bottom > h*0.5, fall back to 40/40
 ```
 
-Both sides scale by the **same** factor so the camera stays centred on the free area instead of drifting toward whichever panel is narrower. The vertical guard applies on the narrow branch too: a short landscape viewport hits it before any desktop size does, and a throw there is just as fatal.
+Both sides scale by the **same** factor so the camera stays centered on the free area instead of drifting toward whichever panel is narrower. The vertical guard applies on the narrow branch too: a short landscape viewport hits it before any desktop size does, and a throw there is just as fatal.
 
 `fitBounds` is additionally wrapped in try/catch with an `easeTo` fallback to `[-96.5, 38.6] z3.6`, so a clamp miss degrades to a plain ease rather than taking the map down.
 
@@ -142,7 +142,7 @@ Five instruments, each independently hideable to a dock chip.
 | Centre | **`⌘K` trigger**, pill, `max-width: 520px`, right-aligned `⌘K` kbd chip |
 | Right | Mode switch (Explore / Story), divider, Saved with count badge, Shortcuts, Theme |
 
-The centre slot is the single most important change in v9: navigation moves into the palette, and the bar carries two modes instead of fourteen destinations. Below 820px, drop the mode-switch labels and the `ATLAS` tag.
+The center slot is the single most important change in v9: navigation moves into the palette, and the bar carries two modes instead of fourteen destinations. Below 820px, drop the mode-switch labels and the `ATLAS` tag.
 
 **No wordmark in the bar, and the symbol is sized by its visible mark, not its box.** Typing the wordmark beside a symbol render is a reconstructed lockup, which [`brand.md`](./brand.md) lists under Misuse (never). The symbol PNG is a 512x512 box holding a 181x292 mark, so visible height is box height x 0.57 and visible width is box height x 0.35. A 40px box in the 56px bar and a 36px box in the 50px compact bar clear brand.md's 20px compact-mark minimum; the 32px primary-mark minimum needs a 57px box, which does not fit. Full derivation and the lockup arithmetic are in [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md) section 5.1.
 
@@ -166,7 +166,7 @@ Row grid `18px 1fr auto`: kind glyph · name (13.5px, weight 550) + meta line ·
 
 **The rail must window or virtualise.** It carries the full 4,078-record set. `/history` currently renders 4,078 anchors in one document; do not repeat that.
 
-### 6.4 Time (bottom centre, z 20)
+### 6.4 Time (bottom center, z 20)
 
 Width `min(760px, 100vw - 24px)`. Implemented in [`TimePanel.tsx`](../../apps/web/src/components/map-experience/TimePanel.tsx) over [`decade-density.ts`](../../apps/web/src/lib/map-experience/decade-density.ts).
 
@@ -179,7 +179,7 @@ Replaces v6's horizontally scrolling decade-tab rail, which required scrolling t
 - `role="slider"` with `aria-valuemin` / `valuemax` / `valuenow` / `valuetext`
 - Pointer-capture drag to scrub, `←`/`→` to step, `SPACE` to play/pause, `Home`/`End` to jump
 
-**Density normalisation** carries a floor so a one-record decade stays visible against a 340-record peak: `height = 17 + (count/max) × 83` percent. The floor is honest in one specific way: a decade with **zero** records gets height zero, not the floor. Lifting an empty decade to a visible bar draws presence that is not in the archive, which is a worse lie than the one the floor fixes.
+**Density normalization** carries a floor so a one-record decade stays visible against a 340-record peak: `height = 17 + (count/max) × 83` percent. The floor is honest in one specific way: a decade with **zero** records gets height zero, not the floor. Lifting an empty decade to a visible bar draws presence that is not in the archive, which is a worse lie than the one the floor fixes.
 
 **One control owns "when."** Selecting a decade sets the pin filter and the relationship-line slice. No second decade control anywhere.
 
@@ -210,7 +210,7 @@ Opening hides Results and flies the camera to the pin. Closing restores Results.
 ### 6.7 Dock, readout, attribution
 
 - **Dock** (bottom left): chips restoring any hidden panel
-- **Readout** (bottom centre, above Time): transient camera status, `role="status"`, 2.4s
+- **Readout** (bottom center, above Time): transient camera status, `role="status"`, 2.4s
 - **Attribution** (bottom-left pill): OpenFreeMap · © OpenStreetMap, mono 9px
 
 ---
@@ -255,12 +255,14 @@ Scroll-driven cinema over the same persistent plate. Six chapters. `Intersection
 | 1 | Where the record is thickest | `[-90.05, 32.3] z5.1 p34 b-14` | Spotlight the Delta at 20% radius |
 | 2 | One record, up close | `[-86.81, 33.52] z13.4 p56 b24` | Push to A.G. Gaston Motel |
 | 3 | The Great Migration | `[-88.2, 37.6] z4.05 p42` | Draw 7 corridor arcs, 130ms stagger |
-| 4 | Four centuries in ten seconds | `[-95.2, 39.2] z3.5 p0` | Decade sweep, 190ms per decade |
+| 4 | Four centuries in ten seconds | `[-95.2, 39.2] z3.5 p0` | Clear to an empty plate, then a cumulative decade sweep, 190ms per decade |
 | 5 | Your turn | `[-96.5, 38.6] z3.4 p0` | Hand off to Atlas or Near me |
 
-Chapter specs live as **data**, not markup: camera, spotlight, routes, focus and sweep flags per chapter. Chapter cards alternate left and right; cold open and outro centre. A right-edge progress rail shows chapter labels on hover.
+Chapter specs live as **data**, not markup: camera, spotlight, routes, focus and sweep flags per chapter. Chapter cards alternate left and right; cold open and outro center. A right-edge progress rail shows chapter labels on hover.
 
 **Reduced motion:** chapters still advance, the camera cuts instead of flying, the sweep runs at 400ms instead of 190ms, and kinetic type is disabled. Chapters advancing is functional; how they arrive is decoration.
+
+**The sweep accumulates, and it starts from nothing.** The chapter opens by crossdissolving the plate to empty and holding it there, then steps forward one decade at a time, each frame showing every record whose era had begun by that decade. A record enters at its earliest documented decade and stays. Undated records sit the sweep out rather than being drawn in the first frame, and the whole archive returns when the sweep lands. This is not the Time panel's decade filter, which is a window on one decade and stays that way.
 
 **The sweep renders presence only.** It must never encode harm density, and the dignity gate applies to every camera spec a chapter fires.
 
@@ -296,7 +298,7 @@ Global handler rules:
 - Palette is `role="dialog" aria-modal="true"` with focus trap and restore to the trigger.
 - Record sheet is a **non-modal** `role="dialog"`. The map stays operable behind it.
 - Toast region is `role="status" aria-live="polite"` on the *region*, not per toast, so a new entry does not re-announce the stack.
-- `prefers-reduced-motion` is honoured at the CSS level (`.01ms` durations) **and** the camera level. `M` gives an in-app calm toggle independent of the OS setting.
+- `prefers-reduced-motion` is honored at the CSS level (`.01ms` durations) **and** the camera level. `M` gives an in-app calm toggle independent of the OS setting.
 - Map failure degrades to the accessible record list. Never a blank screen.
 - Contrast: ≥ 4.5:1 text, ≥ 3:1 UI boundaries, verified in both themes.
 
@@ -316,7 +318,7 @@ Separation between adjacent roles is a **contract**, asserted in `packages/ui/sr
 | label / land | 40 ΔL\* |
 | label-hi on land | 4.5:1 WCAG contrast |
 
-**Separation uses CIE L\***, not WCAG relative luminance. Y is compressed near black, so on a dark plate two visibly different colours sit a fraction of a Y point apart and any Y-based threshold is unreachable by construction. Text contrast still uses the WCAG ratio, which is what WCAG defines.
+**Separation uses CIE L\***, not WCAG relative luminance. Y is compressed near black, so on a dark plate two visibly different colors sit a fraction of a Y point apart and any Y-based threshold is unreachable by construction. Text contrast still uses the WCAG ratio, which is what WCAG defines.
 
 If a token fails one of these, **the token is wrong**. Do not loosen a threshold to make a value pass.
 
@@ -352,9 +354,9 @@ Deep links serialize to the params `/explore` already parses (`selected`, `confi
 
 - Start wide before going deep, every time
 - Let the padding clamp decide framing, and wrap every `fitBounds`
-- Route new camera behaviour through `createCamera` so the gate and the curve apply
+- Route new camera behavior through `createCamera` so the gate and the curve apply
 - Keep corridor data out of the overlay component
-- Give a toast an action when the change is destructive, and honour the undo
+- Give a toast an action when the change is destructive, and honor the undo
 
 **Don't**
 

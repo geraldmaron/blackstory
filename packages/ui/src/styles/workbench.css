@@ -106,7 +106,7 @@
   background: var(--ds-canvas);
 }
 
-/* The cursor row is marked with a border, not colour alone, so it survives greyscale and
+/* The cursor row is marked with a border, not color alone, so it survives greyscale and
    high-contrast modes where a tint would vanish. */
 .ds-datatable__row--cursor {
   box-shadow: inset 3px 0 0 0 var(--ds-accent);
@@ -197,7 +197,7 @@
   background: var(--ds-canvas);
 }
 
-/* Active facets are marked by weight and a rule, not colour alone. */
+/* Active facets are marked by weight and a rule, not color alone. */
 .ds-facet__option--active {
   background: var(--ds-canvas);
   box-shadow: inset 2px 0 0 0 var(--ds-accent);
@@ -365,8 +365,8 @@
 
 .ds-command-palette {
   width: min(100% - 2rem, 36rem);
-  /* Anchored high rather than centred: the eye is already at the top of the shell when ⌘K
-     fires, and a centred panel makes every invocation a saccade down and back. */
+  /* Anchored high rather than centered: the eye is already at the top of the shell when ⌘K
+     fires, and a centered panel makes every invocation a saccade down and back. */
   margin: min(12vh, 6rem) auto auto;
   padding: 0;
   border: var(--ds-border-width) solid var(--ds-border-strong);
@@ -430,7 +430,7 @@
   font-size: 0.9375rem;
 }
 
-/* The highlighted row carries a rule as well as a tint, so it survives greyscale and
+/* The highlighted row carries a rule as well as a tint, so it survives grayscale and
    high-contrast modes where the fill alone would vanish. */
 .ds-command-palette__option.is-active {
   background: var(--ds-canvas);
@@ -629,7 +629,7 @@
   color: var(--ds-ink-muted);
 }
 
-/* Carries a word as well as a colour: failure must survive greyscale. */
+/* Carries a word as well as a color: failure must survive greyscale. */
 .ds-inline-edit__error {
   color: var(--ds-error-fg);
   font-weight: 600;

@@ -139,7 +139,7 @@ Enforced structurally, not by review: the `/about` destinations block is the ado
 
 **Don't**
 
-- Gate shell behaviour on a client route predicate, which cannot be read on first paint
+- Gate shell behavior on a client route predicate, which cannot be read on first paint
 - Add a `:has()` selector keyed on a marker attribute a route happens to set
 - Give a route two classes, or a class no route uses
 - Let an unmodified key fire on a Reading room, a Record page or a Utility surface

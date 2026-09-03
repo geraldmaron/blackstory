@@ -2,7 +2,7 @@
  * Great Migration corridors, as documented aggregate streams between origin and destination
  * metros.
  *
- * These are not routes anyone travelled. They are a summary of where a documented migration
+ * These are not routes anyone traveled. They are a summary of where a documented migration
  * stream began and ended, drawn as a single arc between two metro centroids. The shape of this
  * module is deliberate: there is no waypoint, path or per-person field, and `granularity` is a
  * literal type, so a caller cannot widen a corridor into an itinerary without changing the type
@@ -22,7 +22,7 @@ export type MigrationCorridor = {
   readonly id: string;
   readonly from: MetroAnchor;
   readonly to: MetroAnchor;
-  /** Fixed: corridors summarise streams between metros, never individual journeys. */
+  /** Fixed: corridors summarize streams between metros, never individual journeys. */
   readonly granularity: 'metro-to-metro';
   readonly note: string;
 };

@@ -104,6 +104,7 @@ import type {
 import {
   MAP_MAX_ZOOM,
   MAP_MIN_ZOOM,
+  prefersFinePointer,
   prefersReducedMotion,
   type CameraPresetName,
 } from '../../lib/map-experience/camera-presets';
@@ -172,12 +173,22 @@ import { surfaceClassFor, type SurfaceClass } from '../../lib/nav/surface-classe
 import { useSurfaceClass } from '../../lib/nav/use-surface-class';
 import { defaultPostureFor, framedClaimAllowed, type PlatePosture } from './plate-posture';
 import { createFramedSlotRegistry } from './framed-slot-registry';
-import { insetIsPaintable, plateInsetForSlot, resolvePlatePosture } from './plate-frame';
-import { lockGestures, unlockGestures } from './gesture-lock';
+import { boxIsPaintable, plateBoxForSlot, resolvePlatePosture, type PlateBox } from './plate-frame';
+import { applyGesturesForPosture, lockGestures, rotateGestureAllowed } from './gesture-lock';
+import {
+  attachSafariTwistRotate,
+  attachShiftDragRotate,
+  attachShiftWheelRotate,
+  type RotateGestureHandle,
+} from './custom-rotate-gestures';
 import { createReducedMotionListener, type ReducedMotionListener } from './reduced-motion-listener';
 // The plate is the subscriber half of the seam `MapMoment` documents: the stage publishes which
 // moment is live and where, and never touches a map itself.
-import { resolveMomentCamera, useMapMomentFrame } from '../room/MapMoment';
+import {
+  resolveMomentCamera,
+  useMapMomentFrame,
+  useReportMapAvailability,
+} from '../room/MapMoment';
 
 /**
  * Give the slot geometry back, so the plate returns to its resting full-viewport box and the
@@ -478,6 +489,19 @@ export function MapStageProvider({
   const heldSlotRef = useRef<string | null>(null);
   /** The moment the camera last flew to, so a scroll frame does not restart the flight. */
   const lastFramedMomentRef = useRef<string | null>(null);
+  /**
+   * The document-space box last written to the plate, so a scroll frame that changes nothing
+   * writes nothing.
+   *
+   * `plateBoxForSlot` is stable across a scroll — that is the point of positioning in document
+   * space — so during a gesture every frame recomputes the same four numbers. Writing them anyway
+   * would dirty style on the plate sixty times a second and, worse, invite a `map.resize()` per
+   * frame: MapLibre re-measures its container and reallocates the WebGL drawing buffer, which is
+   * what made the map flash inside its own frame mid-scroll. Comparing first means the geometry
+   * is touched only when the slot genuinely moves or resizes — a reflow, a drawer, a window
+   * resize — and a scroll gesture costs one rect read and nothing else.
+   */
+  const lastFramedBoxRef = useRef<PlateBox | null>(null);
   const reducedMotionRef = useRef<ReducedMotionListener | null>(null);
   const pathname = usePathname();
   /**
@@ -500,11 +524,20 @@ export function MapStageProvider({
   /** The posture as of the last render, readable from the async mount path below. */
   const postureRef = useRef<PlatePosture>(posture);
   postureRef.current = posture;
+  /** The custom rotate gestures currently attached (`custom-rotate-gestures.ts`), or all null
+   * when the posture has them detached. One ref, not three independent booleans, so the set
+   * attaches and detaches together — see that module's doc comment for why they are one
+   * capability. */
+  const rotateGesturesRef = useRef<{
+    shift: RotateGestureHandle | null;
+    wheel: RotateGestureHandle | null;
+    twist: RotateGestureHandle | null;
+  }>({ shift: null, wheel: null, twist: null });
   const mapRef = useRef<MapLibreMap | null>(null);
   const maplibreglRef = useRef<MaplibreModule['default'] | null>(null);
   const markersRef = useRef<Marker[]>([]);
   const searchCenterMarkerRef = useRef<Marker | null>(null);
-  /** Soft opacity pulse on the GL selected ring — cancelled when selection clears. */
+  /** Soft opacity pulse on the GL selected ring — canceled when selection clears. */
   const selectedPulseRafRef = useRef<number | null>(null);
   const stateLabelMarkersRef = useRef<
     Map<string, { readonly marker: Marker; readonly element: HTMLDivElement }>
@@ -513,6 +546,9 @@ export function MapStageProvider({
   const lastViewportRef = useRef<ExploreViewportFrame | undefined>(undefined);
   const [mapAvailable, setMapAvailable] = useState(true);
   const mapAvailableRef = useRef(true);
+  // Published to every MapMoment through MapMomentStage, so a moment refuses LIVE rather than
+  // going transparent under a tag that says the map is there — see repo-kz9z.
+  useReportMapAvailability(mapAvailable);
   /**
    * GL lifecycle, held in refs rather than closure locals because construction no longer happens
    * inside the effect that tears it down — `ensureMap` can fire from any handle call, while the
@@ -564,7 +600,7 @@ export function MapStageProvider({
   const decadeFadeGenerationRef = useRef(0);
   /** True while a dual-buffer morph is staging, dissolving, or promoting. */
   const decadeDissolveInFlightRef = useRef(false);
-  /** Active rAF morph handle — cancelled when a newer decade patch supersedes. */
+  /** Active rAF morph handle — canceled when a newer decade patch supersedes. */
   const decadeMorphAnimationRef = useRef<DecadeMorphAnimationHandle | null>(null);
   /** Settled per-state fill colors — colorA source for the next decade lerp. */
   const settledDensityFillByFipsRef = useRef<Map<string, string>>(new Map());
@@ -1047,7 +1083,7 @@ export function MapStageProvider({
           activeDensityMorphRef.current = [];
         }
         // Drop mid-morph dual-buffer pin paint/data before the snap apply — otherwise a
-        // cancelled dissolve can leave every entity in a partial-lit incoming stack.
+        // canceled dissolve can leave every entity in a partial-lit incoming stack.
         if (map && mapStyleReadyRef.current) {
           setDecadeCrossfadeTransitions(map, 0);
           restoreDecadeFadePaintFromStyle(map, configRef.current.style);
@@ -1150,6 +1186,34 @@ export function MapStageProvider({
       console.error('[MapStage] resize failed', error);
     }
   }, []);
+
+  /**
+   * Attaches or detaches Shift+drag and Safari two-finger-twist rotate to match the posture's
+   * `dragRotate` state, exactly as `applyGesturesForPosture` does for MapLibre's own handlers.
+   * Called from every site that calls `applyGesturesForPosture` — paired the same way that
+   * function's own doc comment pairs `lockGestures`/`unlockGestures`, so these cannot drift
+   * out of sync with native rotate and go on answering a posture that no longer steers.
+   */
+  const syncRotateGestures = useCallback(
+    (map: MapLibreMap, posture: PlatePosture, pointerFine: boolean) => {
+      const container = containerRef.current;
+      const current = rotateGesturesRef.current;
+      const allowed = container !== null && rotateGestureAllowed(posture, { pointerFine });
+      if (allowed && !current.shift) {
+        current.shift = attachShiftDragRotate(map, container);
+        current.wheel = attachShiftWheelRotate(map, container);
+        current.twist = attachSafariTwistRotate(map, container);
+      } else if (!allowed && current.shift) {
+        current.shift.detach();
+        current.wheel?.detach();
+        current.twist?.detach();
+        current.shift = null;
+        current.wheel = null;
+        current.twist = null;
+      }
+    },
+    [],
+  );
 
   const setSearchCenterMarker = useCallback(
     (marker: ExploreSearchCenterMarkerInput) => {
@@ -1260,7 +1324,7 @@ export function MapStageProvider({
         }
         // No `NavigationControl`. Zoom and pitch live in the Explore camera console, so the map
         // keeps one control vocabulary (design-direction-v9-atlas.md §5.5). Attribution stays:
-        // it is a licence obligation, not chrome we get to choose.
+        // it is a license obligation, not chrome we get to choose.
         map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
         map.on('error', (event) => {
           console.error('[MapStage]', event.error);
@@ -1294,11 +1358,12 @@ export function MapStageProvider({
       syncStateLabelTheme(readDocumentColorScheme());
       updateStateLabelOpacity(activeMap.getZoom());
 
-      // MapLibre constructs with every gesture on. Only the Live posture steers; a plate built
-      // on the Door (ambient) or into a moment (framed) must start locked, or the first wheel
-      // over the map zooms the plate instead of scrolling the document that asked for it.
-      if (postureRef.current === 'live') unlockGestures(activeMap);
-      else lockGestures(activeMap);
+      // MapLibre constructs with every gesture on. Only Live starts fully steered; a plate built
+      // on the Door (ambient) hands back drag/zoom-adjust on a precise pointer only, and one built
+      // into a moment (framed) starts fully locked — either way, the first wheel over the map
+      // must still scroll the document that asked for it.
+      applyGesturesForPosture(activeMap, postureRef.current, { pointerFine: prefersFinePointer() });
+      syncRotateGestures(activeMap, postureRef.current, prefersFinePointer());
 
       syncEntityMarkers();
       lastViewportRef.current = readViewport(activeMap);
@@ -1460,6 +1525,11 @@ export function MapStageProvider({
         syncEntityMarkers();
         requestCountyPolygonLoad(activeMap, configRef.current);
       });
+      // Every rotate frame, not just `moveend` — the compass needle (`CameraConsole`) tracks a
+      // live drag/twist, and `viewport` only fires once the gesture settles.
+      activeMap.on('rotate', () => {
+        notify(listenersRef.current, 'rotate', activeMap.getBearing());
+      });
 
       // Cursor affordance uses the same padded hit as selection so a near-miss still
       // reads as a pin, not empty plate.
@@ -1486,7 +1556,7 @@ export function MapStageProvider({
      * on the same instance in development, and the refs survive that round trip. Without this
      * reset the simulated unmount below left `cancelledRef` true for the life of the page: the
      * first `patchData` had already started the `maplibre-gl` import, the import resolved into a
-     * cancelled provider and returned, and no later call could retry because `initStartedRef`
+     * canceled provider and returned, and no later call could retry because `initStartedRef`
      * was still set. The chunk loaded, the plate never built, and every dev session showed the
      * Albers underlay in place of the map — a failure invisible in production, where StrictMode
      * does not double-invoke.
@@ -1512,6 +1582,10 @@ export function MapStageProvider({
       clearSearchCenterMarker();
       for (const { marker } of stateLabelMarkersRef.current.values()) marker.remove();
       stateLabelMarkersRef.current.clear();
+      rotateGesturesRef.current.shift?.detach();
+      rotateGesturesRef.current.wheel?.detach();
+      rotateGesturesRef.current.twist?.detach();
+      rotateGesturesRef.current = { shift: null, wheel: null, twist: null };
       mapRef.current?.remove();
       mapRef.current = null;
       maplibreglRef.current = null;
@@ -1560,9 +1634,9 @@ export function MapStageProvider({
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    if (posture === 'live') unlockGestures(map);
-    else lockGestures(map);
-  }, [posture]);
+    applyGesturesForPosture(map, posture, { pointerFine: prefersFinePointer() });
+    syncRotateGestures(map, posture, prefersFinePointer());
+  }, [posture, syncRotateGestures]);
 
   /** A live read of the reduced-motion preference for the camera path below. */
   useEffect(() => {
@@ -1590,6 +1664,8 @@ export function MapStageProvider({
     const plate = plateRef.current;
     if (!plate) return;
 
+    if (!mapAvailable) return;
+
     const claimGranted =
       frame !== null && framedClaimAllowed(surfaceClass) && framedSlotsRef.current.claim(frame.id);
     if (claimGranted && frame !== null) heldSlotRef.current = frame.id;
@@ -1607,35 +1683,50 @@ export function MapStageProvider({
         heldSlotRef.current = null;
       }
       lastFramedMomentRef.current = null;
+      lastFramedBoxRef.current = null;
       releasePlateSlot(plate);
-      // Only the Instrument steers. Returning to Live is the one transition that gives gestures
-      // back; Parked keeps them locked so an unpainted plate cannot be reached by the keyboard.
+      // Leaving Framed goes to Live (Instrument, fully steered), Ambient (Door, drag/zoom-adjust
+      // on a precise pointer) or Parked (locked, so an unpainted plate cannot be reached by the
+      // keyboard) — never back to Framed itself, which the block above already returned out of.
       const map = mapRef.current;
       if (map) {
-        if (next === 'live') unlockGestures(map);
-        else lockGestures(map);
+        applyGesturesForPosture(map, next, { pointerFine: prefersFinePointer() });
+        syncRotateGestures(map, next, prefersFinePointer());
       }
       setPosture((current) => (current === next ? current : next));
       return;
     }
 
     if (frame === null) return;
-    const inset = plateInsetForSlot(frame.rect, {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-    // A slot scrolled entirely out of view: hold the claim (the reader is still inside this
-    // moment's document position) but stop painting, so a zero-height canvas never gets resized
-    // and the plate does not sit uncovered at its resting full-viewport box.
-    if (!insetIsPaintable(inset)) {
+    // Document space, not viewport space: the plate is `position: absolute` while it holds a slot,
+    // so these four numbers hold still through a scroll and the browser moves plate and slot
+    // together. See `plateBoxForSlot`.
+    const box = plateBoxForSlot(frame.rect, document.documentElement.getBoundingClientRect());
+    // A zero-area slot (a collapsed container, a measurement taken mid-reflow): hold the claim —
+    // the reader is still inside this moment's document position — but stop painting, so a
+    // zero-height canvas never gets resized and the plate does not sit uncovered at its resting
+    // full-viewport box.
+    if (!boxIsPaintable(box)) {
+      lastFramedBoxRef.current = null;
       releasePlateSlot(plate);
       return;
     }
 
-    plate.style.setProperty('--ds-plate-frame-top', `${inset.top}px`);
-    plate.style.setProperty('--ds-plate-frame-left', `${inset.left}px`);
-    plate.style.setProperty('--ds-plate-frame-width', `${inset.width}px`);
-    plate.style.setProperty('--ds-plate-frame-height', `${inset.height}px`);
+    const last = lastFramedBoxRef.current;
+    const moved =
+      last === null ||
+      last.top !== box.top ||
+      last.left !== box.left ||
+      last.width !== box.width ||
+      last.height !== box.height;
+    const resized = last === null || last.width !== box.width || last.height !== box.height;
+    if (moved) {
+      lastFramedBoxRef.current = box;
+      plate.style.setProperty('--ds-plate-frame-top', `${box.top}px`);
+      plate.style.setProperty('--ds-plate-frame-left', `${box.left}px`);
+      plate.style.setProperty('--ds-plate-frame-width', `${box.width}px`);
+      plate.style.setProperty('--ds-plate-frame-height', `${box.height}px`);
+    }
     // The marker CSS keys on, distinguishing "holding a slot" from the record page's resting
     // Framed posture. Written last, so the geometry is never applied without its rect.
     plate.dataset.plateSlot = '1';
@@ -1647,7 +1738,9 @@ export function MapStageProvider({
     const map = mapRef.current;
     if (!map) return;
     lockGestures(map);
-    map.resize();
+    // Only a real size change needs the drawing buffer re-measured. A scroll no longer produces
+    // one at all, which is the point: MapLibre never resizes mid-gesture.
+    if (resized) map.resize();
 
     if (lastFramedMomentRef.current === frame.id) return;
     lastFramedMomentRef.current = frame.id;

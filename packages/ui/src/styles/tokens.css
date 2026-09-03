@@ -205,6 +205,13 @@
    */
   --ds-atlas-bottom-right: 202px;
 
+  /* Fixed instrument-panel widths (map-experience lens-panel/results-rail/pin-photo-card).
+     Named to match the design mock's --rail-w/--results-w; the photo card has no mock
+     counterpart so it gets its own token rather than borrowing an unrelated one. */
+  --ds-rail-w: 300px;
+  --ds-results-w: 344px;
+  --ds-pin-photo-card-w: 168px;
+
   --ds-radius-sm: 8px;
   --ds-radius-md: 14px;
   --ds-radius-lg: 28px;
@@ -285,6 +292,8 @@
 
   /* Band C — shell/portal overlay chrome. */
   --ds-z-record-sheet: 40;
+  --ds-z-pin-photo-card: 45; /* map-experience pin-photo-card.css: above the record sheet so a
+                                 hovered pin's photo card is never trapped under it */
   --ds-z-command-bar: 50;
   --ds-z-command-overlay: 60; /* command bar's own dropdown and the command palette */
   --ds-z-shell-header: 80;

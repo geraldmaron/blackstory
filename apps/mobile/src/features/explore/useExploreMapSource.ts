@@ -142,7 +142,7 @@ export function useExploreMapSource(
       return;
     }
 
-    let cancelled = false;
+    let canceled = false;
 
     void (async () => {
       setFetchedState((prev) => ({
@@ -153,7 +153,7 @@ export function useExploreMapSource(
       }));
 
       const result = await fetchMapSource(deps!);
-      if (cancelled) return;
+      if (canceled) return;
       setFetchedState(toViewState(result, retry));
       if (result.status === 'ready' && !result.fromCache) {
         refreshBootstrapSyncRef.current();
@@ -161,7 +161,7 @@ export function useExploreMapSource(
     })();
 
     return () => {
-      cancelled = true;
+      canceled = true;
     };
   }, [staticState, deps, retry, tick]);
 

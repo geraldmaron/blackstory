@@ -97,7 +97,7 @@ The v6 supersessions listed against `design-direction-v9-surfaces.md` take effec
 3. **Implement** under `apps/web/src/components/patterns/` when reusable across routes; otherwise in the surface folder with a doc citation.
 4. **Register** a row in [`patterns-registry.md`](./patterns-registry.md) and the table above.
 5. **Styles.** Flat matte, `--ds-*` tokens, light and dark, copper discipline per [`brand.md`](./brand.md). No raw hex in component CSS; new tokens go in `packages/ui/src/styles/tokens.css` and are mirrored in `packages/ui/src/tokens/colors.ts`.
-6. **A11y.** WCAG 2.2 AA, `:focus-visible`, no colour-alone signals, 44px touch targets on controls.
+6. **A11y.** WCAG 2.2 AA, `:focus-visible`, no color-alone signals, 44px touch targets on controls.
 7. **Copy.** No em dashes and no en dashes on touched surfaces; evidence-before-assertion tone per [`story.md`](./story.md).
 8. **Tests.** Pure helpers and non-trivial interaction (see `browse-mode.test.tsx`). New test files under `apps/web` must be registered in `apps/web/package.json`'s `test` script: it is a hand-maintained file list, not a glob, and an unregistered test silently never runs.
 9. **Same change.** Never merge UI without updating the binding doc when the pattern changes.
@@ -112,7 +112,7 @@ Where this doc and `@repo/ui` disagree on tokens, **the kit wins**. Where a patt
 
 - **Palette (v3):** Archive Paper `#F4EFE5` canvas + Surface `#FBF8F2` / Black Ink primary; Copper Pin accent with copper text pairs `#8E4F2A` (light) and `#D07A32` (dark); light and dark themes via `data-theme`; radii 8/16/28px (sm/md/lg). Bevels, shadows, gradients and glows stay banned, with one v9 carve-out: a single soft tinted shadow on panels that float over the map plate, for z-order only.
 - **Map plate roles (v9):** `--ds-map-*` land, water, green, line, line-2, road, label, label-hi, halo, contract-tested for CIE L\* separation in both themes.
-- **Status colors:** warning, confidence, dispute, error only, re-derived to harmonize with the accent palette, always with a text or mono cue and never colour-alone.
+- **Status colors:** warning, confidence, dispute, error only, re-derived to harmonize with the accent palette, always with a text or mono cue and never color-alone.
 - **Typography (v3):** Sora + Inter + Source Serif 4 + IBM Plex Mono, all free and open source.
 - **Tokens:** grid, spacing, elevation, border, icon, motion, focus, pigment-anchored data-viz.
 - **Components:** Card, Citation, Confidence, Timeline, MapFrame, ResultList, FilterBar, Dialog, Notice, EmptyState, Button, ThemeToggle, Toast, skeletons.
@@ -133,7 +133,7 @@ In Next apps, add `@repo/ui` to `transpilePackages` and prefer `next/font` varia
 - Visible `:focus-visible` rings; skip link becomes visible on focus
 - `prefers-reduced-motion` collapses animation and transition durations
 - Dialog uses native `<dialog>` (modal focus + Escape)
-- Filters use labelled native controls inside a `<fieldset>`
+- Filters use labeled native controls inside a `<fieldset>`
 - Public shell: landmarks (`header` / `main` / `footer` / `nav`), skip link, responsive menu via `<details>`
 
 ### Commands

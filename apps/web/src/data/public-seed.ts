@@ -159,6 +159,53 @@ export type RelatedNeighborView = {
   };
 };
 
+/**
+ * Path-preserving relationship graph, mirroring `@repo/domain-core`'s `RelationshipGraph`
+ * (packages/domain-core/src/learning-index/relationship-graph.ts), which is the source of truth.
+ * Redeclared rather than imported for the same reason `PublicRelatedEntry` above is: this file is
+ * a standalone web-app seed catalog that predates projections and does not import @repo/domain
+ * types. Structurally identical, so the two assign to each other without a cast.
+ */
+export type RelationshipGraphNodeView = {
+  readonly id: string;
+  readonly displayName: string;
+  readonly kind: string;
+  readonly summary: string;
+  readonly hop: number;
+  readonly relationType: string;
+  readonly direction: 'outgoing' | 'incoming';
+  /** The node this one was first reached through. Absent at hop 1. */
+  readonly viaId?: string;
+  // `| undefined` on these two matches how the domain type spells them (an indexed access into
+  // `LearningRelatedEdge`), which `exactOptionalPropertyTypes` treats as distinct from a plain
+  // optional. Without it the graph cannot cross the boundary without a cast.
+  readonly viaEvent?: RelatedViaEventView | undefined;
+  readonly timespan?:
+    | {
+        readonly label?: string;
+        readonly validFrom?: string;
+        readonly validTo?: string | null;
+      }
+    | undefined;
+  /** Sortable year for the time axis. Absent means undated — never guessed. */
+  readonly year?: number;
+};
+
+export type RelationshipGraphLinkView = {
+  readonly source: string;
+  readonly target: string;
+  readonly relationType: string;
+  /** True for the edge that first reached `target`; false for a loop-closing cross-link. */
+  readonly spine: boolean;
+};
+
+export type RelationshipGraph = {
+  readonly centerId: string;
+  readonly centerYear?: number;
+  readonly nodes: readonly RelationshipGraphNodeView[];
+  readonly links: readonly RelationshipGraphLinkView[];
+};
+
 export type PublicEntityView = {
   readonly id: string;
   readonly kind: PublicEntityKind;
@@ -256,6 +303,15 @@ export type PublicEntityView = {
   readonly relatedNeighbors?: readonly RelatedNeighborView[];
   /** Capped 2-hop continue-learning stubs (composed at read time, not stored). */
   readonly continueLearning?: readonly RelatedNeighborView[];
+  /**
+   * Path-preserving 3-hop graph for the record room's relationship map (composed at read time).
+   *
+   * Supersedes `relatedNeighbors` + `continueLearning` *for the map only*: those two stay because
+   * other surfaces (the first-paint home, `EntityRelatedList`, the section index) read them as
+   * flat lists. The difference is that this keeps `viaId` and the cross-links, so the same records
+   * can be drawn as one connected web instead of two lists that repeat each other.
+   */
+  readonly relationshipGraph?: RelationshipGraph;
 };
 
 function confidenceLevel(score: number): 'high' | 'medium' | 'low' {

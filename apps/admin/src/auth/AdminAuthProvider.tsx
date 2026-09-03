@@ -42,33 +42,33 @@ export function AdminAuthProvider({ children }: { readonly children: ReactNode }
   // The role is only trustworthy from the server, which reads app_metadata.bb_role off a
   // verified token. Never read it from the client session object, which the browser holds.
   useEffect(() => {
-    let cancelled = false;
+    let canceled = false;
     if (!user) {
       setRole(null);
       return;
     }
     void (async () => {
       const token = await getAdminIdToken();
-      if (!token || cancelled) return;
+      if (!token || canceled) return;
       const response = await fetch('/api/auth/me', {
         headers: { Authorization: `Bearer ${token}` },
       }).catch(() => null);
-      if (cancelled || !response?.ok) return;
+      if (canceled || !response?.ok) return;
       const body = (await response.json().catch(() => null)) as { role?: StaffRole } | null;
-      if (!cancelled) setRole(body?.role ?? null);
+      if (!canceled) setRole(body?.role ?? null);
     })();
     return () => {
-      cancelled = true;
+      canceled = true;
     };
   }, [user]);
 
   useEffect(() => {
-    let cancelled = false;
+    let canceled = false;
     const unsubscribe = subscribeAdminAuth((next) => {
-      if (cancelled) return;
+      if (canceled) return;
       if (next && !next.email) {
         void signOutAdmin().then(() => {
-          if (!cancelled) {
+          if (!canceled) {
             setUser(null);
             setReady(true);
           }
@@ -80,7 +80,7 @@ export function AdminAuthProvider({ children }: { readonly children: ReactNode }
     });
 
     return () => {
-      cancelled = true;
+      canceled = true;
       unsubscribe();
     };
   }, []);

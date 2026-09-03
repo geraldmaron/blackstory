@@ -8,7 +8,7 @@ updates:
   - package-ecosystem: npm
     directory: /
     # apps/mobile is NOT part of the root pnpm workspace (pnpm-workspace.yaml `!apps/mobile`)
-    # and carries its own npm lockfile. Dependabot does not honour that negation, so without
+    # and carries its own npm lockfile. Dependabot does not honor that negation, so without
     # this exclusion it edits apps/mobile/package.json from the root entry and never updates
     # apps/mobile/package-lock.json — every such PR then fails `npm ci` with EUSAGE
     # ("lock file's X does not satisfy Y"). The `/apps/mobile` entry below owns those bumps.

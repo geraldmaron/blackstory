@@ -155,7 +155,7 @@ The Framed plate sits above the document layer because it is inset into that lay
 | One context | Exactly one WebGL context exists on a record page, verified in the browser |
 | One Framed slot | A second Framed request while one is live is refused |
 | Release | A Framed plate returns to Parked and re-enables every gesture on exit |
-| Reduced motion | Enabling Reduce Motion mid-session changes camera behaviour without a reload |
+| Reduced motion | Enabling Reduce Motion mid-session changes camera behavior without a reload |
 | Failure | A Framed slot with no plate renders its caption and its unavailable line, not an empty box |
 
 New test files under `apps/web` **must be registered** in `apps/web/package.json`'s `test` script. It is a hand-maintained file list, not a glob, and an unregistered test silently never runs.

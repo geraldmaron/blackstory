@@ -16,6 +16,18 @@ export type MapStageFlyOptions = {
    * against a URL viewport (deep link, back/forward), where a swooping arc would read as an
    * unrequested flight rather than a restored view. */
   readonly mode?: 'fly' | 'ease';
+  /**
+   * Camera attitude to land in, when the caller's framing is not merely a center/zoom.
+   *
+   * Omitted, MapLibre keeps whatever pitch/bearing the camera already holds — which is correct
+   * for a reader who tilted the plate by hand and then asked for a preset frame, and wrong for
+   * any surface whose frames are authored. The Door's chapters author all four numbers, so a
+   * scroll back up to a flat national chapter has to be able to say "flat", or the tilt and
+   * rotation of the tilted chapter it came from survive the move and the field stays contorted
+   * at the top of the page (repo-lk7p8).
+   */
+  readonly pitch?: number;
+  readonly bearing?: number;
   /** Override uniform preset padding — e.g. clear the right results rail for a selected point. */
   readonly padding?:
     | number
@@ -83,8 +95,14 @@ export function runFlyPreset(
   // ease/fly would double-shift (hero west coast pinned to the copy divider).
   const motionPadding = boundsFitted ? { top: 0, bottom: 0, left: 0, right: 0 } : padding;
 
+  /** Only the attitude the caller actually authored — an absent one stays untouched. */
+  const attitude = {
+    ...(options?.pitch === undefined ? {} : { pitch: options.pitch }),
+    ...(options?.bearing === undefined ? {} : { bearing: options.bearing }),
+  };
+
   if (reduced || preset.duration <= 0) {
-    map.jumpTo({ center, zoom, padding: motionPadding });
+    map.jumpTo({ center, zoom, padding: motionPadding, ...attitude });
     return true;
   }
   if ((options?.mode ?? 'fly') === 'ease') {
@@ -92,6 +110,7 @@ export function runFlyPreset(
       center,
       zoom,
       padding: motionPadding,
+      ...attitude,
       duration: preset.duration,
       easing: preset.easing,
       essential: true,
@@ -101,6 +120,7 @@ export function runFlyPreset(
       center,
       zoom,
       padding: motionPadding,
+      ...attitude,
       duration: preset.duration,
       curve: preset.curve,
       speed: preset.speed,

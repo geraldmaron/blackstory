@@ -140,7 +140,7 @@ export function surfaceClassFor(pathname: string, _search?: string): SurfaceClas
     if (path.startsWith(prefix)) return surface;
   }
 
-  // `/_not-found` and anything genuinely unrecognised.
+  // `/_not-found` and anything genuinely unrecognized.
   return 'utility';
 }
 

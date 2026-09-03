@@ -155,3 +155,12 @@ export function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
+
+/** True when the primary pointer is precise (a mouse or trackpad), false for a coarse/touch
+ * primary pointer and any non-DOM environment. Gates the Door's ambient gesture unlock: a
+ * one-finger drag IS the scroll gesture on touch, so drag can only be handed back on a device
+ * where dragging the map and scrolling the page are two different gestures. */
+export function prefersFinePointer(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+  return window.matchMedia('(pointer: fine)').matches;
+}

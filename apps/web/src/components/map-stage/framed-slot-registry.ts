@@ -29,7 +29,7 @@ export type FramedSlotRegistry = {
 };
 
 /**
- * Two behaviours here are the whole point of the module, and both are things a three-line
+ * Two behaviors here are the whole point of the module, and both are things a three-line
  * implementation gets wrong:
  *
  * 1. `claim` by the CURRENT holder returns `true`, not `false`. A moment re-registers on every

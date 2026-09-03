@@ -50,10 +50,10 @@ export function useContentPage(section: CatalogSectionId, slug: string): UseCont
   const [state, setState] = useState<UseContentPageState>({ status: 'loading' });
 
   useEffect(() => {
-    let cancelled = false;
+    let canceled = false;
 
     void (async () => {
-      if (!cancelled) setState({ status: 'loading' });
+      if (!canceled) setState({ status: 'loading' });
 
       try {
         const { store, connectivity } = await getRuntimeHandles();
@@ -64,16 +64,16 @@ export function useContentPage(section: CatalogSectionId, slug: string): UseCont
           activeStamp: async () => (await store.getMeta(META_KEYS.releaseStamp)) ?? UNBOOTSTRAPPED_STAMP,
         });
         const result = await repository.getPage(section, slug);
-        if (!cancelled) setState(result);
+        if (!canceled) setState(result);
       } catch {
         // Never let a native-module init failure surface as a crash — an explicit error state
         // instead (ADR-022 §3 "no silent failures", extended to "no silent crashes" either).
-        if (!cancelled) setState({ status: 'error' });
+        if (!canceled) setState({ status: 'error' });
       }
     })();
 
     return () => {
-      cancelled = true;
+      canceled = true;
     };
   }, [section, slug]);
 

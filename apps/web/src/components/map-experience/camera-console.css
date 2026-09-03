@@ -1,7 +1,7 @@
 /**
  * Camera console — bottom right, z 20.
  *
- * Positioned clear of the time panel: the time panel is centred at `min(760px, 100vw - 24px)`, so
+ * Positioned clear of the time panel: the time panel is centered at `min(760px, 100vw - 24px)`, so
  * on a narrow viewport the console stacks above it rather than overlapping.
  */
 
@@ -12,7 +12,10 @@
   z-index: var(--ds-z-atlas-instruments);
   display: grid;
   gap: var(--ds-space-2);
-  width: 210px;
+  /* 248px, not 210px: the header row now holds three 44px touch targets (compass, zoom out,
+     zoom in) plus their gaps (WCAG 2.5.5), and the kicker needs enough of the remaining width
+     that "Camera" does not wrap onto a second line. */
+  width: 248px;
   padding: var(--ds-space-3);
   /* One panel recipe shared by all four Explore instruments — see lens-panel.css. */
   background: var(--ds-surface);
@@ -40,8 +43,9 @@
 .ds-camera__zoom {
   display: inline-grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
+  /* 44px WCAG 2.5.5 minimum touch target — was 22px. */
+  width: 44px;
+  height: 44px;
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-sm);
   background: var(--ds-surface-raised);
@@ -52,6 +56,30 @@
 .ds-camera__zoom:hover {
   color: var(--ds-ink);
   border-color: var(--ds-border-strong);
+}
+
+/* Same footprint as the zoom stepper's own buttons — one dial in a row of squares reads as an
+   addition to that instrument, not a second one. */
+.ds-camera__compass {
+  display: inline-grid;
+  place-items: center;
+  /* 44px WCAG 2.5.5 minimum touch target — was 22px, matching the zoom stepper's own footprint. */
+  width: 44px;
+  height: 44px;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-full, 50%);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+}
+
+.ds-camera__compass:hover {
+  color: var(--ds-copper-graphic, var(--ds-ink));
+  border-color: var(--ds-border-strong);
+}
+
+.ds-camera__compass svg {
+  transition: transform 80ms linear;
 }
 
 .ds-camera__grid {
@@ -74,7 +102,8 @@
   grid-template-columns: 14px minmax(0, 1fr) auto;
   align-items: center;
   gap: 6px;
-  min-height: 34px;
+  /* 44px WCAG 2.5.5 minimum touch target — was 34px. */
+  min-height: 44px;
   padding: 0 7px;
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-sm);

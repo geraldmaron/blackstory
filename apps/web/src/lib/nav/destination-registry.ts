@@ -214,7 +214,7 @@ const DESTINATIONS: readonly Destination[] = [
     path: '/books',
     label: 'Banned books',
     parent: '/rooms',
-    kind: 'CATALOGUE',
+    kind: 'CATALOG',
     description: 'Documented challenges to titles, recorded as challenges rather than as verdicts.',
     menuLine: 'Documented challenges',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },
@@ -432,7 +432,7 @@ export function parentPathFor(pathname: string): string | null {
     if (path.startsWith(prefix)) return parent;
   }
 
-  // An unrecognised path is still somewhere: it hangs off Explore rather than off nothing.
+  // An unrecognized path is still somewhere: it hangs off Explore rather than off nothing.
   return path === '/' ? null : '/';
 }
 

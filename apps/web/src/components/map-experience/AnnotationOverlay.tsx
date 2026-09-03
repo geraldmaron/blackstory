@@ -15,7 +15,7 @@
  * instead of tearing open a gap.
  *
  * **The caption is not decoration.** Seven arcs drawn across the country read as routes people
- * travelled unless something says otherwise. The honesty line from design-direction-v9-atlas.md §6
+ * traveled unless something says otherwise. The honesty line from design-direction-v9-atlas.md §6
  * ships with the graphic, in the same component, so the two cannot be separated by a later edit.
  *
  * See docs/ui/patterns-atlas-instrument.md.
@@ -38,7 +38,7 @@ export const ARC_DRAW_MS = 1100;
 const DESTINATION_REVEAL_MS = 780;
 const REVEAL_MS = 500;
 
-/** Vertical nudge so a label sits on the dot's optical centre rather than its baseline. */
+/** Vertical nudge so a label sits on the dot's optical center rather than its baseline. */
 const LABEL_BASELINE_OFFSET = 3.5;
 /** Horizontal gap between a dot and its label. */
 const LABEL_GAP = 8;

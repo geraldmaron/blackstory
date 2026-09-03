@@ -103,7 +103,7 @@ const SECTION_TITLES = {
 } as const;
 
 /**
- * Where the query lands inside the text, for the `<mark>`. Returns null when the normalised query
+ * Where the query lands inside the text, for the `<mark>`. Returns null when the normalized query
  * cannot be located verbatim — a query whose internal whitespace was collapsed, for instance.
  * A missing highlight is a cosmetic loss; a wrong one is a lie about why the row matched.
  */

@@ -7,7 +7,7 @@
  * FilterBar's submit button) but they are not variants of each other.
  *
  * It renders as a `<form>` when given an `action`, so search survives with JavaScript off and
- * leaves a shareable URL — that progressive-enhancement behaviour is why the two admin surfaces
+ * leaves a shareable URL — that progressive-enhancement behavior is why the two admin surfaces
  * that grew their own `story-review__toolbar` did it as a plain GET form, and it is preserved
  * here rather than traded for a click handler.
  */
@@ -96,7 +96,7 @@ export type ToolbarFieldProps = {
   readonly className?: string;
 };
 
-/** A labelled control inside a Toolbar. The label is never optional, only ever invisible. */
+/** A labeled control inside a Toolbar. The label is never optional, only ever invisible. */
 export function ToolbarField({ label, children, labelHidden, className }: ToolbarFieldProps) {
   return (
     <label className={cx('ds-toolbar__field', className)}>

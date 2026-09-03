@@ -27,7 +27,7 @@ export function DialogFixture() {
       >
         <p>
           Dialogs use the native <code className="ds-mono">&lt;dialog&gt;</code> element for focus
-          management, Escape to dismiss, and a labelled title.
+          management, Escape to dismiss, and a labeled title.
         </p>
       </Dialog>
     </div>

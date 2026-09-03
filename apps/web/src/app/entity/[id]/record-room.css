@@ -617,65 +617,27 @@
   line-height: 1.55;
 }
 
-/* Connections: the constellation's diagram nodes and list rows on the same scale. */
-.ds-record-beat .ds-constellation__diagram {
-  padding: var(--ds-space-4);
-  border-radius: var(--ds-radius-md);
+/* Connection tree: the room's type scale, so the cards match the beats around them. */
+.ds-record-beat .ds-reltree__root {
   background: color-mix(in srgb, var(--ds-canvas) 94%, var(--ds-ink));
+  border-color: var(--room-rule-2);
 }
 
-.ds-record-beat .ds-constellation__center {
-  display: inline-flex;
-  align-items: center;
-  height: var(--rec-pill-h);
-  padding: 0 0.8rem;
-  margin-bottom: var(--ds-space-2);
-  border: var(--ds-border-width) solid var(--ds-accent-graphic);
-  border-radius: var(--ds-radius-full);
-  font-family: var(--ds-font-sans);
-  font-size: var(--rec-meta);
-  font-weight: 600;
+.ds-record-beat .ds-reltree__relation,
+.ds-record-beat .ds-reltree__meta,
+.ds-record-beat .ds-reltree__more-toggle {
+  font-size: var(--rec-eyebrow);
+  letter-spacing: 0.04em;
 }
 
-.ds-record-beat .ds-constellation__node {
+.ds-record-beat .ds-reltree__card {
   background: var(--ds-surface);
-  border-radius: var(--ds-radius-sm);
 }
 
-.ds-record-beat .ds-constellation__rel {
-  font-size: var(--rec-eyebrow);
-  letter-spacing: 0.04em;
-}
-
-.ds-record-beat .ds-constellation__name,
-.ds-record-beat .ds-constellation__link-name {
+.ds-record-beat .ds-reltree__name {
   font-family: var(--ds-font-sans);
   font-size: var(--rec-meta);
   font-weight: 600;
-}
-
-.ds-record-beat .ds-constellation__link-rel {
-  font-size: var(--rec-eyebrow);
-  letter-spacing: 0.04em;
-  color: var(--ds-accent);
-}
-
-/* The diagram is the picture; the list is the links. Two columns so the two together do not
-   run a screen and a half for six connections. */
-.ds-record-beat .ds-constellation__list {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: var(--ds-space-6);
-  border-top-color: var(--room-rule-2);
-}
-
-.ds-record-beat .ds-constellation__list > li {
-  border-bottom-color: var(--room-rule-2);
-}
-
-@media (max-width: 40rem) {
-  .ds-record-beat .ds-constellation__list {
-    grid-template-columns: 1fr;
-  }
 }
 
 .ds-record-beat .ds-room-conns {

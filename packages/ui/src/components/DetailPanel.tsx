@@ -1,7 +1,7 @@
 /**
- * The record half of a workbench: a labelled panel of read-only facts about one row.
+ * The record half of a workbench: a labeled panel of read-only facts about one row.
  *
- * The shape it standardises is the empty case. Every operator surface that grew its own detail
+ * The shape it standardizes is the empty case. Every operator surface that grew its own detail
  * markup also grew its own way of saying "nothing recorded" — a bare `—`, a sentence, or an
  * omitted section that leaves the reader unsure whether the field is empty or the query failed.
  * `DetailField` makes absence explicit and identical everywhere, because on a canonical record

@@ -86,6 +86,34 @@ export function resolveMomentCamera(
   };
 }
 
+/**
+ * Whether this moment should claim LIVE, and what its slot should say if it cannot.
+ *
+ * Pure, for the same reason `resolveMomentCamera` is: `data-live` and the idle line drive render
+ * output, but the condition that decides them cannot be exercised by scrolling anything through
+ * this repo's SSR test harness (see repo-urqy). Split out here, "a moment refuses LIVE when the
+ * plate cannot paint" is an assertion over a function call rather than a browser fact this test
+ * suite cannot produce.
+ *
+ * `mapCanPaint` is the seam: {@link useReportMapAvailability} publishes it from MapStage, which is
+ * the only thing that knows whether the plate has a working GL context. A stage being MOUNTED
+ * only says a plate could in principle be borrowed; it says nothing about whether this one can
+ * currently paint. Conflating the two is the exact bug this function exists to keep from coming
+ * back — see repo-kz9z: a moment held the LIVE tag and the copper edge over a transparent box on
+ * any run where the plate had already failed.
+ */
+export function resolveMomentVisibility(input: {
+  readonly plateAvailable: boolean;
+  readonly mapCanPaint: boolean;
+  readonly isLiveCandidate: boolean;
+}): { readonly live: boolean; readonly unavailable: boolean } {
+  const mapUnavailable = !input.plateAvailable || !input.mapCanPaint;
+  return {
+    live: !mapUnavailable && input.isLiveCandidate,
+    unavailable: mapUnavailable,
+  };
+}
+
 /* —— arbitration ——————————————————————————————————————————————————————————— */
 
 /** Below this share of a slot on screen, a moment does not take the plate. */
@@ -111,7 +139,7 @@ export type MomentCandidate = {
  *
  * `checkVisibility` is the only check that catches it, because the drawer hides its content
  * with `content-visibility` rather than `display: none`. Browsers without it keep the old
- * rect-only behaviour rather than losing every moment.
+ * rect-only behavior rather than losing every moment.
  */
 export function momentIsVisible(element: Element): boolean {
   const check = (
@@ -174,8 +202,16 @@ export type MomentFrame = {
 
 type StageValue = {
   readonly liveId: string | null;
+  /**
+   * Whether the plate itself can paint right now, published by MapStage — not whether a
+   * MapMomentStage is mounted. Defaults `true`: most readers have a working plate, and a moment
+   * must not spend a render believing the map is gone before MapStage has had a chance to say
+   * otherwise. See {@link useReportMapAvailability}.
+   */
+  readonly mapAvailable: boolean;
   readonly register: (id: string, entry: MomentRegistration) => () => void;
   readonly subscribe: (listener: (frame: MomentFrame | null) => void) => () => void;
+  readonly reportMapAvailable: (available: boolean) => void;
 };
 
 type MomentRegistration = {
@@ -204,8 +240,16 @@ export function MapMomentStage({ children }: MapMomentStageProps) {
   const registry = useRef(new Map<string, MomentRegistration>());
   const listeners = useRef(new Set<(frame: MomentFrame | null) => void>());
   const [liveId, setLiveId] = useState<string | null>(null);
+  const [mapAvailable, setMapAvailable] = useState(true);
   const frameRef = useRef(0);
   const observerRef = useRef<ResizeObserver | null>(null);
+
+  // MapStage is the only thing that knows whether the plate can actually paint (WebGL support,
+  // a lost context, a style that failed to load). Reported here rather than imported, per the
+  // component's own doc comment: the kit contributes a slot, not a map.
+  const reportMapAvailable = useCallback((available: boolean) => {
+    setMapAvailable((current) => (current === available ? current : available));
+  }, []);
 
   const register = useCallback((id: string, entry: MomentRegistration) => {
     registry.current.set(id, entry);
@@ -296,7 +340,7 @@ export function MapMomentStage({ children }: MapMomentStageProps) {
       observerRef.current = null;
       if (frameRef.current) {
         window.cancelAnimationFrame(frameRef.current);
-        // Cleared, not just cancelled: `queue` treats a non-zero id as "a sync is already
+        // Cleared, not just canceled: `queue` treats a non-zero id as "a sync is already
         // pending" and would refuse to schedule another one for the life of the page.
         frameRef.current = 0;
       }
@@ -304,8 +348,8 @@ export function MapMomentStage({ children }: MapMomentStageProps) {
   }, []);
 
   const value = useMemo<StageValue>(
-    () => ({ liveId, register, subscribe }),
-    [liveId, register, subscribe],
+    () => ({ liveId, mapAvailable, register, subscribe, reportMapAvailable }),
+    [liveId, mapAvailable, register, subscribe, reportMapAvailable],
   );
 
   return <MapMomentStageContext.Provider value={value}>{children}</MapMomentStageContext.Provider>;
@@ -327,6 +371,24 @@ export function useMapMomentFrame(listener: (frame: MomentFrame | null) => void)
     if (!stage) return;
     return stage.subscribe((frame) => listenerRef.current(frame));
   }, [stage]);
+}
+
+/**
+ * Publish whether the plate can actually paint right now. MapStage is the intended caller: it
+ * already tracks this as `mapAvailable` on its own handle (no WebGL, a lost context, a style
+ * that failed to load), and this is the seam that carries that fact to every `MapMoment` without
+ * the kit importing MapStage. A moment reads it back to refuse the LIVE tag and the "scroll to
+ * bring the map here" idle line when the plate has nothing to show even if a moment IS live —
+ * see repo-kz9z.
+ *
+ * A no-op when no `MapMomentStage` is mounted, so a caller does not have to guard for it.
+ */
+export function useReportMapAvailability(available: boolean): void {
+  const stage = useContext(MapMomentStageContext);
+  const reportMapAvailable = stage?.reportMapAvailable;
+  useEffect(() => {
+    reportMapAvailable?.(available);
+  }, [reportMapAvailable, available]);
 }
 
 /* —— the moment ———————————————————————————————————————————————————————————— */
@@ -384,7 +446,11 @@ export function MapMoment({
   // No stage mounted means no plate can be borrowed. That is the §10 degrade, not an error state:
   // the slot keeps its caption and says plainly that the map is not there.
   const plateAvailable = stage !== null;
-  const live = plateAvailable && stage.liveId === reactId;
+  const { live, unavailable } = resolveMomentVisibility({
+    plateAvailable,
+    mapCanPaint: plateAvailable && stage.mapAvailable,
+    isLiveCandidate: plateAvailable && stage.liveId === reactId,
+  });
 
   return (
     <figure
@@ -398,9 +464,9 @@ export function MapMoment({
         </span>
         <div className="ds-mapmoment__idle">
           <span>
-            {plateAvailable
-              ? (idle ?? 'Scroll to bring the map here')
-              : 'The map is unavailable. The caption below carries the point.'}
+            {unavailable
+              ? 'The map is unavailable. The caption below carries the point.'
+              : (idle ?? 'Scroll to bring the map here')}
           </span>
         </div>
         {atlasHref === undefined ? null : (

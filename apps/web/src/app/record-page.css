@@ -18,8 +18,8 @@
    *
    * A record has three blocks wider than the reading column — the masthead, the fact strip and
    * the apparatus band — and each of them used to pick its own inset: the masthead's text sat on
-   * `--ds-gutter` (24px from the viewport edge), the apparatus centred itself at 1180px, and the
-   * column-plus-rail pair centred at its own intrinsic width. On a 1680px viewport that put the
+   * `--ds-gutter` (24px from the viewport edge), the apparatus centered itself at 1180px, and the
+   * column-plus-rail pair centered at its own intrinsic width. On a 1680px viewport that put the
    * title at x=24, the apparatus at x=250 and the first line of the record at x=334 — three left
    * edges down one page, which is what made the surface read as unaligned parts rather than one
    * document, and what pushed the masthead type out to the bezel.

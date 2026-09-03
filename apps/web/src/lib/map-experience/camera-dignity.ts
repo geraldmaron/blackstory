@@ -9,7 +9,7 @@
  * reused rather than reimplemented, so a record cannot read as `massacre` for painting and as
  * something else for camera purposes. The one thing tone does not carry is lynching: the
  * `MapSemanticTone` union is massacre / plantation / epicenter, and §4.3 names lynching
- * explicitly, so lynching and its neighbours are matched from topic slugs using the same
+ * explicitly, so lynching and its neighbors are matched from topic slugs using the same
  * substring technique `mapToneFromTopics` already uses on the same fields.
  */
 

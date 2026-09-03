@@ -178,7 +178,7 @@ export default function DesignSystemPage() {
 
       <section className="ds-gallery-section" aria-labelledby="results-heading">
         <h2 id="results-heading">Filters & results</h2>
-        <p>Native labelled controls and a keyboard-reachable result list.</p>
+        <p>Native labeled controls and a keyboard-reachable result list.</p>
         <FilterBar
           legend="Filter historical places"
           fields={[

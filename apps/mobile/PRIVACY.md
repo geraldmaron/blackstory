@@ -32,9 +32,11 @@ those aggregated declarations must match; MOB-020 confirms the final aggregated
 ## Client attestation (no Firebase App Check)
 
 Every API request carries `X-BlackStory-Client: mobile/<version>; api=<major>`.
-The server validates this header against the Postgres-backed client registry —
-there is no Firebase App Check token, no `@react-native-firebase/*` dependency,
-and no attestation JWT in logs (invariant 7; `src/security/log-redaction.ts`).
+The server validates this header with a stateless format check
+(`packages/security/src/client-attestation.ts`) — there is no database lookup
+against a client registry, no Firebase App Check token, no
+`@react-native-firebase/*` dependency, and no attestation JWT in logs
+(invariant 7; `src/security/log-redaction.ts`).
 
 ## Dev-console observability (MOB-018)
 

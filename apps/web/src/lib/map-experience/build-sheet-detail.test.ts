@@ -3,7 +3,7 @@
  *
  * The two assertions that matter to a reader: a source backing three relationships is listed
  * once (a bibliography, not a tally), and the connection carries the relation in words so the row
- * states what the archive documented rather than just naming a neighbouring record.
+ * states what the archive documented rather than just naming a neighboring record.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

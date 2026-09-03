@@ -111,7 +111,7 @@ const STOPWORDS = new Set([
   'school',
   'hall',
   'center',
-  'centre',
+  'center',
   'park',
   'company',
   'no',
@@ -212,7 +212,7 @@ export function titleNamesSubject(title: string | null, tokens: readonly string[
  * place-word filtering below is blind to it. "Abbeville Colored School" in Abbeville reduces to no
  * distinctive tokens at all once "colored", "school" and the place word "abbeville" are removed —
  * yet its attached document is titled "Abbeville Colored School", which is as right as a document
- * can be. Whole-phrase containment recognises that without weakening anything: "Caswell County,
+ * can be. Whole-phrase containment recognizes that without weakening anything: "Caswell County,
  * North Carolina" does not contain "caswell county training school".
  */
 export function titleCarriesWholeName(title: string | null, displayName: string): boolean {

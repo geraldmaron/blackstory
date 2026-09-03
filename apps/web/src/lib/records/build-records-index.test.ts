@@ -190,7 +190,7 @@ describe('/records · filtering', () => {
     assert.equal(model.clearAllHref, '/records');
   });
 
-  it('an unrecognised param narrows nothing rather than emptying the room', () => {
+  it('an unrecognized param narrows nothing rather than emptying the room', () => {
     const model = buildRecordsIndex(entities, {
       ...EMPTY_RECORDS_QUERY,
       ...parseRecordsQuery({ kind: 'wombats' }),

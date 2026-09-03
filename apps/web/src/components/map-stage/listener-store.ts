@@ -12,6 +12,11 @@ export type MapStageEvents = {
    * equivalent opt-in. */
   activate: [viewport: ExploreViewportFrame];
   viewport: [viewport: ExploreViewportFrame];
+  /** Camera bearing, in degrees — fired on every native `rotate` frame (drag, twist, or a
+   * scripted move), not just on `moveend` like `viewport`. Kept separate from `viewport` so the
+   * compass needle can track a live rotate-drag without waking every `viewport` subscriber (URL
+   * sync included) on each frame. */
+  rotate: [bearing: number];
   error: [];
   /** An entity marker gained/lost hover intent (after the caller's own delay) or DOM focus.
    * `null` clears it — same "current value, not a delta" convention as the other selection
@@ -32,6 +37,7 @@ export function makeListenerStore(): {
     edgeSelect: new Set(),
     activate: new Set(),
     viewport: new Set(),
+    rotate: new Set(),
     error: new Set(),
     pinHover: new Set(),
   };

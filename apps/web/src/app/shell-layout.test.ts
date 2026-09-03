@@ -284,12 +284,26 @@ describe('the plate is styled globally, not from the route group', () => {
     // excluded from the cover in the same rule rather than uncovered by a second one.
     assert.match(
       shellCss,
-      /body:not\(:has\(\[data-surface='instrument'\]\)\):not\(:has\(\[data-surface='door'\]\)\)\s+\.ds-map-stage::after\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
+      /body:not\(:has\(\[data-surface='instrument'\]\)\):not\(:has\(\[data-surface='door'\]\)\)\s+\.ds-map-stage:not\(\[data-plate-slot\]\)::after\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
     );
     // Covered, not hidden: ADR-017 keeps the MapLibre instance alive across navigation.
     assert.doesNotMatch(
       shellCss,
       /body:not\(:has\(\[data-surface='instrument'\]\)\)\s+\.ds-map-stage\s*\{[^}]*display:\s*none/s,
+    );
+  });
+
+  it('never covers a plate that is holding a MapMoment slot', () => {
+    // Regression: a plate holding a slot was uncovered by a SECOND rule setting `content: none`,
+    // and that rule lost. Both selectors computed to (0,3,2) — `:not(:has([data-surface='…']))`
+    // contributes its argument's (0,1,0), exactly as `[data-plate-slot]` does — so the cover won
+    // on file order alone and painted `--ds-canvas` over every MapMoment on every reading
+    // surface: a copper-edged, PLATE · LIVE-tagged box in the page's own color, with no map.
+    // The cover must therefore be GATED, never overridden after the fact.
+    assert.match(shellCss, /\.ds-map-stage:not\(\[data-plate-slot\]\)::after/);
+    assert.doesNotMatch(
+      shellCss,
+      /\.ds-map-stage\[data-plate-slot\]::after\s*\{[^}]*content:\s*none/s,
     );
   });
 

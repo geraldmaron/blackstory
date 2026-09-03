@@ -261,7 +261,7 @@ function DeltaFigure({
           {latest.label}: {latest.value}.
         </>
       }
-      caption="Absolute change in the Black population between adjacent censuses, with the change in share of the U.S. total in percentage points. A change that crosses the 2000 definition line is labelled, not smoothed."
+      caption="Absolute change in the Black population between adjacent censuses, with the change in share of the U.S. total in percentage points. A change that crosses the 2000 definition line is labeled, not smoothed."
       sources={sources}
       ariaLabel="Black population change between recent censuses"
       textAlternative={

@@ -41,7 +41,7 @@ The record sheet is the same component the map renders, in its second posture: a
 
 ---
 
-## 4. Map behaviour
+## 4. Map behavior
 
 Parked by default. One Framed slot at a time. Full law in [`patterns-plate-posture.md`](./patterns-plate-posture.md); the parts a Reading room author needs:
 
@@ -78,7 +78,7 @@ Only chorded bindings are live on this class. `A` and `ESC` are the exceptions t
 - **Filters are GET links.** On `/records`, every filter is a link, every row is a link, every page step is an anchor: nothing on that surface requires JS.
 - **Distinct notices for distinct states.** "Temporarily unavailable" and "none published yet" are different facts and get different sentences.
 - **Nothing that proves the archive corrects itself hides behind a click.** `/errata` is a plain list, not a set of disclosures.
-- **A number gets a plain language reading of what it does and does not say.** On `/data`, each chart carries a mono source label, a mono as-of line, that reading, and a "Show the numbers" disclosure, so no value is hover only or colour only.
+- **A number gets a plain language reading of what it does and does not say.** On `/data`, each chart carries a mono source label, a mono as-of line, that reading, and a "Show the numbers" disclosure, so no value is hover only or color only.
 - **Copy law holds:** no em dashes, sentence case body, mono uppercase for slugs only, people named with role and place.
 
 ---
@@ -90,7 +90,7 @@ Only chorded bindings are live on this class. `A` and `ESC` are the exceptions t
 - `:focus-visible`, 2px `--copper` at 2px offset, everywhere.
 - Cover art and decorative media are `aria-hidden`; the title carries the accessible name.
 - A typeahead uses the same keyboard contract as the palette.
-- No colour-alone signal. A linked name and a plain-text name differ in words, not only in colour.
+- No color-alone signal. A linked name and a plain-text name differ in words, not only in color.
 - Anchored sections carry `scroll-margin` under the fixed bar.
 - Any surface that auto-plays for more than five seconds carries a persistent in-page stop, whether or not an OS motion preference is set. `prefers-reduced-motion` sets the initial state; it never removes the control.
 

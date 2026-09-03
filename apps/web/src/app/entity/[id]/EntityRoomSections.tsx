@@ -4,7 +4,7 @@
  * This replaces the v6 edition stack, which rendered every beat as a numbered panel (00 RECORD,
  * 01 ANATOMY, 02 CONTEXT, 03 RELEVANCE, 04 STATUS, 05 CLAIMS, 06 PROVENANCE) inside its own
  * bordered card. Six chapter numbers is a promise of six chapters, and most records have one
- * sourced paragraph and a location, so the page read as a filing cabinet: identical grey boxes,
+ * sourced paragraph and a location, so the page read as a filing cabinet: identical gray boxes,
  * each announcing itself, several of them apologising for being empty.
  *
  * What is here instead: the orientation facts move to the masthead and the fact strip (see
@@ -22,7 +22,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Timeline } from '@repo/ui';
-import type { PublicEntityView } from '../../../data/public-seed';
+import type { PublicEntityView, RelationshipGraph } from '../../../data/public-seed';
 import type { EvidenceClaimInput } from '../../../lib/evidence';
 import {
   entityCrossReferenceHref,
@@ -34,7 +34,7 @@ import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel'
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
 import { RecordBeatHead } from '../../../components/entity/RecordChrome';
 import { Connections, type RoomConnection } from '../../../components/room';
-import { RelationshipConstellation } from '../../../components/patterns/RelationshipConstellation';
+import { RelationshipTree } from '../../../components/patterns/RelationshipTree';
 import { RecordArchiveSources } from '../../../components/patterns/RecordArchiveSources';
 import { humanizeToken } from '../../../components/entity/format';
 import { resolveInternetArchiveSources } from '../../../lib/geography/internet-archive-sources';
@@ -96,21 +96,33 @@ export function recordSectionIndex({
   if (entity.timeline.length > 0) {
     sections.push({ id: 'timeline-heading', label: 'Timeline', count: entity.timeline.length });
   }
-  const connectionCount = toConnections(entity, false).length;
-  if (connectionCount > 0) {
+  // One beat when the record has a graph, two when it falls back to the flat lists. The tree
+  // already contains everything "Worth investigating next" used to list separately (those were
+  // the records one step further out), so shipping both would restore the duplication it removes.
+  const graph = treeGraphFor(entity);
+  if (graph) {
     sections.push({
       id: 'related-heading',
-      label: 'Records this one touches',
-      count: connectionCount,
+      label: 'How this record connects',
+      count: graph.nodes.length,
     });
-  }
-  const continueCount = toSuggestedConnections(entity, false).length;
-  if (continueCount > 0) {
-    sections.push({
-      id: 'continue-heading',
-      label: 'Worth investigating next',
-      count: continueCount,
-    });
+  } else {
+    const connectionCount = toConnections(entity, false).length;
+    if (connectionCount > 0) {
+      sections.push({
+        id: 'related-heading',
+        label: 'Records this one touches',
+        count: connectionCount,
+      });
+    }
+    const continueCount = toSuggestedConnections(entity, false).length;
+    if (continueCount > 0) {
+      sections.push({
+        id: 'continue-heading',
+        label: 'Worth investigating next',
+        count: continueCount,
+      });
+    }
   }
   if (crossReferences.length > 0) {
     sections.push({
@@ -144,11 +156,15 @@ export function renderedBeatCount({
   if (evidenceClaims.length > 0) count += 1;
   if (!firstPaint && hasStatusFor(entity)) count += 1;
   if (entity.timeline.length > 0) count += 1;
-  const relatedHeading = firstPaint
-    ? firstPaintRelatedHeading(entity.relatedNeighbors ?? [])
-    : 'Records this one touches';
-  if (toConnections(entity, firstPaint).length > 0 && relatedHeading) count += 1;
-  if (toSuggestedConnections(entity, firstPaint).length > 0) count += 1;
+  if (treeGraphFor(entity)) {
+    count += 1;
+  } else {
+    const relatedHeading = firstPaint
+      ? firstPaintRelatedHeading(entity.relatedNeighbors ?? [])
+      : 'Records this one touches';
+    if (toConnections(entity, firstPaint).length > 0 && relatedHeading) count += 1;
+    if (toSuggestedConnections(entity, firstPaint).length > 0) count += 1;
+  }
   if (crossReferences.length > 0) count += 1;
   return count;
 }
@@ -171,6 +187,53 @@ export type EntityRoomSectionsProps = {
 function relationPhrase(relationType: string, direction: 'outgoing' | 'incoming'): string {
   const relation = humanizeToken(relationType).toLowerCase();
   return direction === 'incoming' ? `${relation}, from their record` : relation;
+}
+
+/**
+ * Connection relations in the door's human vocabulary, keyed by record id.
+ *
+ * `firstPaintRelation` returns undefined when the stored token would not survive being read
+ * aloud; those records are simply left out, and the tree then shows the record's name with no
+ * phrase above it. Built here rather than passed as a callback so the shape stays serialisable
+ * across the server boundary.
+ */
+function firstPaintNodeLabels(entity: PublicEntityView): Record<string, string> {
+  const labels: Record<string, string> = {};
+  for (const node of entity.relationshipGraph?.nodes ?? []) {
+    const phrase = firstPaintRelation(
+      {
+        id: node.id,
+        displayName: node.displayName,
+        kind: node.kind,
+        summary: node.summary,
+        relationType: node.relationType,
+        direction: node.direction,
+        ...(node.viaEvent !== undefined ? { viaEvent: node.viaEvent } : {}),
+      },
+      entity,
+    );
+    if (phrase !== undefined && phrase.length > 0) labels[node.id] = phrase;
+  }
+  return labels;
+}
+
+/**
+ * The relationship graph, when it is worth drawing.
+ *
+ * A one-node graph is a sentence, not a web. It would spend a framed panel on a single link, and
+ * those records keep the flat lists, which say the same thing in a line. Shared by the section
+ * index, the beat count and the column, so the rail cannot promise a beat the column does not
+ * render.
+ *
+ * The door and place surfaces get the tree too. They are the same record column under a different
+ * vocabulary, and they carried the same two overlapping lists, so exempting them would have left
+ * the duplication standing on the surface it was actually reported from. What changes there is
+ * the wording, through `firstPaintNodeLabel`, not the picture.
+ */
+function treeGraphFor(entity: PublicEntityView): RelationshipGraph | undefined {
+  const graph = entity.relationshipGraph;
+  if (!graph || graph.nodes.length < 2) return undefined;
+  return graph;
 }
 
 /** Shared by the section index and the component, so the rail and the column cannot disagree. */
@@ -225,6 +288,7 @@ export function EntityRoomSections({
 }: EntityRoomSectionsProps) {
   const hasContext = entity.historicalContext.trim().length > 0;
   const hasStatus = firstPaint ? false : hasStatusFor(entity);
+  const treeGraph = treeGraphFor(entity);
   const connections = toConnections(entity, firstPaint);
   const continueLearning = toSuggestedConnections(entity, firstPaint);
   const archiveSources = resolveInternetArchiveSources(entity.claims);
@@ -331,33 +395,52 @@ export function EntityRoomSections({
         </section>
       ) : null}
 
-      {connections.length > 0 && relatedHeading ? (
+      {treeGraph ? (
         <section className="ds-record-beat" aria-labelledby="related-heading">
           <RecordBeatHead
             id="related-heading"
             index={nextIndex()}
             icon="related"
-            title={relatedHeading}
-            count={connections.length}
-            standfirst="Typed connections from the archive. Nearby on the map is not the same as related."
+            title={firstPaint ? 'How this place connects' : 'How this record connects'}
+            count={treeGraph.nodes.length}
           />
-          <RelationshipConstellation centerLabel={entity.displayName} edges={connections} />
+          <RelationshipTree
+            centerLabel={entity.displayName}
+            graph={treeGraph}
+            {...(firstPaint ? { labels: firstPaintNodeLabels(entity) } : {})}
+          />
         </section>
-      ) : null}
+      ) : (
+        <>
+          {connections.length > 0 && relatedHeading ? (
+            <section className="ds-record-beat" aria-labelledby="related-heading">
+              <RecordBeatHead
+                id="related-heading"
+                index={nextIndex()}
+                icon="related"
+                title={relatedHeading}
+                count={connections.length}
+                standfirst="Typed connections from the archive. Nearby on the map is not the same as related."
+              />
+              <Connections connections={connections} />
+            </section>
+          ) : null}
 
-      {continueLearning.length > 0 ? (
-        <section className="ds-record-beat" aria-labelledby="continue-heading">
-          <RecordBeatHead
-            id="continue-heading"
-            index={nextIndex()}
-            icon="continue"
-            title="Worth investigating next"
-            count={continueLearning.length}
-            standfirst="Leads from this record. They are not proven the same way as a typed connection."
-          />
-          <Connections connections={continueLearning} />
-        </section>
-      ) : null}
+          {continueLearning.length > 0 ? (
+            <section className="ds-record-beat" aria-labelledby="continue-heading">
+              <RecordBeatHead
+                id="continue-heading"
+                index={nextIndex()}
+                icon="continue"
+                title="Worth investigating next"
+                count={continueLearning.length}
+                standfirst="Leads from this record. They are not proven the same way as a typed connection."
+              />
+              <Connections connections={continueLearning} />
+            </section>
+          ) : null}
+        </>
+      )}
 
       {crossReferences.length > 0 ? (
         <section className="ds-record-beat" aria-labelledby="appears-in-heading">

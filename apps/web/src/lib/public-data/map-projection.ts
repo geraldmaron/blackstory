@@ -117,7 +117,7 @@ function locationPrecisionFromProjection(
   const normalized = normalizePublicPrecision(precision);
   // 'none' and 'country' are withheld/too-coarse-to-render tiers that never carry a map pin;
   // PublicEntityView.locationPrecision only ever renders a real geo anchor, so both fall to
-  // the same 'city' floor as an unrecognised raw value.
+  // the same 'city' floor as an unrecognized raw value.
   if (normalized === 'none' || normalized === 'country') {
     return 'city';
   }

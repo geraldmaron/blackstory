@@ -2,8 +2,10 @@
 
 Client-side security primitives for the native reader. Attestation is via the
 `X-BlackStory-Client` header (`mobile/<version>; api=<major>`), validated
-server-side against the Postgres-backed client registry — not Firebase App
-Check. **Client headers are attestation signals, not authorization**
+server-side with a stateless format check
+(`packages/security/src/client-attestation.ts`) — not Firebase App Check, and
+not a database lookup: no client registry exists on the server. **Client
+headers are attestation signals, not authorization**
 (invariant 6, ADR-010): nothing here gates data access. The server
 (`apps/api-public` + `@repo/security`) stays authoritative.
 
@@ -26,5 +28,5 @@ introduced.
 ## What needs a real device + real backend (not simulable here)
 
 MOB-019 / MOB-021 must provide live evidence for attestation bypass and
-MITM/replay against the real Postgres-backed client registry. This bead covers
-only what is testable client-side.
+MITM/replay against the real stateless header check. This bead covers only
+what is testable client-side.

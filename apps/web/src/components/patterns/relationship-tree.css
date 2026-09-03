@@ -1,0 +1,287 @@
+/**
+ * RelationshipTree — the record's connections as a branching web.
+ *
+ * There is no canvas here and no absolute positioning. Every card is sized by its own text, the
+ * connecting lines live in a gutter to the left of the cards that no text ever enters, and the
+ * indent carries distance from the record. That is why nothing can overlap anything: there is no
+ * geometry to collide with.
+ *
+ * The lit chain is `:has()`, not JavaScript. Pointing at a record raises every rail and card
+ * between it and the record at the top; browsers without `:has()` still light the card itself.
+ */
+
+.ds-reltree {
+  --reltree-rail: color-mix(in srgb, var(--ds-ink-muted) 42%, transparent);
+  --reltree-lit: var(--ds-accent);
+  /* Where a branch's elbow meets its card: the vertical centre of the card's first text line. */
+  --reltree-elbow: 1.55rem;
+  --reltree-indent: 1.6rem;
+
+  display: grid;
+  /* `minmax(0, 1fr)`, not `1fr`: cards are `max-content` wide, and a default `auto` track would
+     let the widest name in the archive set the width of the whole panel and burst the column. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ds-space-3);
+  margin: 0;
+}
+
+.ds-reltree__lede {
+  margin: 0;
+  max-width: 66ch;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+.ds-reltree__root {
+  min-width: 0;
+  padding: var(--ds-space-4) var(--ds-space-4) var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface, var(--ds-canvas));
+}
+
+/* The record itself ------------------------------------------------------------------------ */
+
+.ds-reltree__center {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-2);
+  margin: 0 0 var(--ds-space-2);
+  padding-bottom: var(--ds-space-2);
+}
+
+.ds-reltree__center-name {
+  font-family: var(--ds-font-display, var(--ds-font-sans));
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ds-ink);
+}
+
+/* Branches --------------------------------------------------------------------------------- */
+
+.ds-reltree__children {
+  margin: 0;
+  padding: 0 0 0 var(--reltree-indent);
+  list-style: none;
+}
+
+.ds-reltree__children--top {
+  padding-left: 0.35rem;
+}
+
+.ds-reltree__branch {
+  position: relative;
+  min-width: 0;
+  padding-left: 1.35rem;
+}
+
+/* The rail: down from the level above, stopping at this branch's elbow when it is the last. */
+.ds-reltree__branch::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--reltree-rail);
+}
+
+.ds-reltree__branch:last-child::before {
+  bottom: auto;
+  height: var(--reltree-elbow);
+}
+
+/* The elbow into the card. */
+.ds-reltree__branch::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: var(--reltree-elbow);
+  width: 0.95rem;
+  height: 1px;
+  background: var(--reltree-rail);
+}
+
+/* Cards ------------------------------------------------------------------------------------ */
+
+.ds-reltree__card {
+  display: grid;
+  gap: 0.15rem;
+  width: max-content;
+  max-width: min(100%, 34rem);
+  margin: 0.35rem 0;
+  padding: 0.5rem 0.75rem 0.55rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-left: 2px solid color-mix(in srgb, var(--ds-accent) 55%, transparent);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.ds-reltree__branch--d2 > .ds-reltree__card {
+  border-left-color: color-mix(in srgb, var(--ds-accent) 32%, transparent);
+}
+
+.ds-reltree__branch--d3 > .ds-reltree__card {
+  border-left-color: color-mix(in srgb, var(--ds-accent) 18%, transparent);
+}
+
+.ds-reltree__relation,
+.ds-reltree__name,
+.ds-reltree__loop {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ds-reltree__relation {
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  color: var(--ds-accent);
+}
+
+.ds-reltree__name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ds-ink);
+}
+
+.ds-reltree__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: var(--ds-ink-muted);
+}
+
+.ds-reltree__kind + .ds-reltree__year::before {
+  content: '·';
+  margin-right: 0.45rem;
+  opacity: 0.6;
+}
+
+.ds-reltree__loop {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-style: italic;
+  color: var(--ds-ink-muted);
+}
+
+.ds-reltree__card:hover,
+.ds-reltree__card:focus-visible {
+  border-color: var(--ds-accent);
+  background: color-mix(in srgb, var(--ds-accent) 7%, var(--ds-canvas));
+}
+
+.ds-reltree__card:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
+/* The lit chain: every rail and card between the pointed-at record and the record at the top. */
+.ds-reltree__branch:has(.ds-reltree__card:hover),
+.ds-reltree__branch:has(.ds-reltree__card:focus-visible) {
+  --reltree-rail: var(--reltree-lit);
+}
+
+.ds-reltree__branch:has(.ds-reltree__card:hover) > .ds-reltree__card,
+.ds-reltree__branch:has(.ds-reltree__card:focus-visible) > .ds-reltree__card {
+  border-color: var(--ds-accent);
+}
+
+/* Disclosure ------------------------------------------------------------------------------- */
+
+.ds-reltree__more {
+  margin: 0 0 0.25rem;
+}
+
+.ds-reltree__more-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  /* Indented to where the records it holds will appear, so the row belongs to the card above it
+     and not to the branch that follows. */
+  padding: 0 0.65rem 0 var(--reltree-indent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+  list-style: none;
+}
+
+.ds-reltree__more-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.ds-reltree__more-toggle::before {
+  content: '+';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.ds-reltree__more[open] > .ds-reltree__more-toggle::before {
+  content: '−';
+}
+
+.ds-reltree__more-toggle:hover {
+  color: var(--ds-ink);
+}
+
+.ds-reltree__more-toggle:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
+.ds-reltree__more-close,
+.ds-reltree__more[open] > .ds-reltree__more-toggle .ds-reltree__more-open {
+  display: none;
+}
+
+.ds-reltree__more[open] > .ds-reltree__more-toggle .ds-reltree__more-close {
+  display: inline;
+}
+
+@media (max-width: 34rem) {
+  .ds-reltree {
+    --reltree-indent: 0.9rem;
+  }
+
+  .ds-reltree__root {
+    padding: var(--ds-space-3) var(--ds-space-3) var(--ds-space-2);
+  }
+
+  .ds-reltree__branch {
+    padding-left: 1rem;
+  }
+
+  .ds-reltree__branch::after {
+    width: 0.65rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-reltree__card {
+    transition: none;
+  }
+}

@@ -110,7 +110,7 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
 
       {/*
         One control line: the find field and every facet, side by side. The filters used to be a
-        panel of six labelled chip rows, which cost most of a screen before the first record —
+        panel of six labeled chip rows, which cost most of a screen before the first record —
         on a 1440 canvas the index opened on its own controls. Each facet is now a native
         `<details>`, so the vocabulary is one click away rather than gone, and the whole thing
         still works with JavaScript off: a disclosure is markup, and every chip inside it is a

@@ -1,5 +1,5 @@
 /**
- * Toast stack behaviour: an actionable toast outlives a report-only one, and a repeated action
+ * Toast stack behavior: an actionable toast outlives a report-only one, and a repeated action
  * refreshes rather than stacks.
  */
 import assert from 'node:assert/strict';

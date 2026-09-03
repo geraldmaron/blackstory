@@ -1509,13 +1509,13 @@ html:has([data-surface='instrument']) {
   place-items: center;
   aspect-ratio: 4 / 3;
   width: 100%;
-  background: #f4efe5;
+  background: var(--ds-canvas);
 }
 
 /* The monogram mark itself is drawn for a light card; on a dark canvas its own light frame reads
    as a stray pale rectangle rather than a themed placeholder. */
 [data-theme='dark'] .ds-entity-mark__frame {
-  background: #2a2622;
+  background: var(--ds-surface-raised);
 }
 
 .ds-entity-mark__svg {
@@ -1883,7 +1883,7 @@ html:has([data-surface='instrument']) {
      so they cannot paint above Explore instrument chrome in a sibling stacking context. */
   isolation: isolate;
   /* Pre-style-load flash — dark ocean by default; light theme matches Archive Paper. */
-  background: #080606;
+  background: var(--ds-map-water);
 }
 
 .ds-map-stage[data-plate-posture='live'] {
@@ -1926,6 +1926,14 @@ html:has([data-surface='instrument']) {
    `inset: auto` first, because `inset: 0` above sets all four physical sides — leaving it in
    place would pin right and bottom and the width/height below would be ignored. */
 .ds-map-stage[data-plate-slot] {
+  /* `absolute`, NOT `fixed`, and this is the whole fix for the map flashing inside its frame on
+     scroll. A fixed plate has to be re-pinned to the slot's viewport rect on every scroll frame,
+     from a main-thread rect read while the document scrolls on the compositor — so it sat a few
+     pixels off its own frame for the length of every gesture, and the page ground flashed along
+     the top or bottom edge. Positioned absolutely in document space, the plate and the slot are
+     in the same coordinate space and the browser scrolls them together: nothing to chase, nothing
+     to lag, and the box's size holds still (see `plateBoxForSlot`). */
+  position: absolute;
   inset: auto;
   top: var(--ds-plate-frame-top);
   left: var(--ds-plate-frame-left);
@@ -1935,18 +1943,24 @@ html:has([data-surface='instrument']) {
   overflow: hidden;
 }
 
-/* The cover below exists because a Live plate under a reading room reads straight through the
-   prose column. A plate holding a slot is the opposite case: it is inside a box the document
-   gave it, and covering it would paint over the thing the moment exists to show. */
-body:not(:has([data-surface='instrument'])) .ds-map-stage[data-plate-slot]::after {
-  content: none;
-}
-
-/* The Door is the other surface whose plate is content: the same clustered field the
+/* The Door is one of the surfaces whose plate is content: the same clustered field the
    Instrument shows, painted full-bleed under the scroll chapters (posture `ambient`), so it is
    excluded from the cover below rather than overridden after it — `:has()` and `:not()` take the
-   specificity of their argument, and two equal rules would leave the winner to file order. */
-body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])) .ds-map-stage::after {
+   specificity of their argument, and two equal rules would leave the winner to file order.
+
+   A PLATE HOLDING A SLOT IS THE OTHER, AND IT IS GATED THE SAME WAY, FOR THE SAME REASON. The
+   cover exists because a Live plate under a reading room reads straight through the prose column.
+   A plate holding a slot is the opposite case: it is inside a box the document gave it, and
+   covering it paints over the thing the moment exists to show. That used to be a separate
+   `content: none` override written above this rule, and it never won: both selectors compute to
+   (0,3,2) — `:not(:has([data-surface='…']))` contributes its argument's (0,1,0), same as
+   `[data-plate-slot]` — so equal specificity left it to file order and the cover, being later,
+   painted `--ds-canvas` over every MapMoment on every reading surface. Every moment on /about,
+   /methodology, /data and /memorial rendered as an empty box in the page's own color, with the
+   copper edge and the PLATE · LIVE tag around nothing. Gating this selector cannot be undone by
+   ordering the way an override could. */
+body:not(:has([data-surface='instrument'])):not(:has([data-surface='door']))
+  .ds-map-stage:not([data-plate-slot])::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -1964,7 +1978,7 @@ body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])) .ds
 }
 
 [data-theme='light'] .ds-map-stage {
-  background: #f4efe5;
+  background: var(--ds-canvas);
 }
 
 /* MapLibre's own container (MapStage.tsx's `containerRef`) — never the plate above. MapLibre
@@ -2026,9 +2040,20 @@ body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])) .ds
   color: var(--ds-ink);
 }
 
+/*
+ * MapLibre's own stylesheet hardcodes `.maplibregl-ctrl-attrib.maplibregl-compact` to a fixed
+ * white pill (`background-color:#fff`), at the same specificity (two chained classes) as the
+ * theme override above (two classes, but a descendant selector). Same specificity means whichever
+ * rule is later in the built stylesheet wins — a coin flip this app does not control — so in dark
+ * mode the control could paint an opaque white bar with illegible near-white text on it. Chaining
+ * `.maplibregl-compact` here raises this rule to three classes, guaranteeing it wins over the
+ * library's default regardless of load order.
+ */
 .ds-map-stage .maplibregl-ctrl-attrib.maplibregl-compact {
   min-height: 1.75rem;
   padding: 0;
+  background-color: color-mix(in srgb, var(--ds-surface) 92%, transparent);
+  color: var(--ds-ink);
 }
 
 .ds-map-stage .maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-button {
@@ -2058,29 +2083,30 @@ body:not(:has([data-surface='instrument'])):not(:has([data-surface='door'])) .ds
   outline-offset: var(--ds-focus-offset);
 }
 
-/* Recolor the +/− glyphs — paper on dark, ink on light. */
+/* Recolor the +/− glyphs — paper on dark, ink on light. The glyph itself is a fixed-color
+   mask (any opaque stroke works, since only its alpha channel is used); the visible color
+   comes from --ds-ink via background-color, so it now tracks the token instead of duplicating
+   its two theme values as literal hex inside the data-URI. */
+.ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,
+.ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+  background-color: var(--ds-ink);
+  background-image: none;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
 .ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%23f4efe5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 .ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%23f4efe5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-}
-
-[data-theme='light']
-  .ds-map-stage
-  .maplibregl-ctrl
-  button.maplibregl-ctrl-zoom-in
-  .maplibregl-ctrl-icon {
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-}
-
-[data-theme='light']
-  .ds-map-stage
-  .maplibregl-ctrl
-  button.maplibregl-ctrl-zoom-out
-  .maplibregl-ctrl-icon {
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 /* Hero / non-explore: pinch-only on touch-scale — no +/- affordance to tap through.
@@ -2161,7 +2187,7 @@ body:has(.ds-explore-stage[data-results='open']) {
 
 /*
  * The map's narrow layout puts the dock switcher on the bottom edge, where the attribution was.
- * Attribution is a licence obligation, so it moves up rather than being covered: dock height plus
+ * Attribution is a license obligation, so it moves up rather than being covered: dock height plus
  * its offset and a gap. Explore is the only surface with that bar, hence `:has(.ds-atlas)`.
  */
 @media (max-width: 819px) {

@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import type { ExploreMapFeature } from './build-explore-map-source';
 import {
   DECADE_TRANSITION_MS,
   DECADE_TRANSITION_PAINT,
   decadesBetween,
+  earliestDecadeFor,
   sweep,
+  SWEEP_CLEAR_HOLD_MS,
   SWEEP_STEP_MS,
   SWEEP_STEP_REDUCED_MS,
   sweepIntervalMs,
@@ -129,7 +132,7 @@ test('cancel stops the sweep and leaves no timer behind', () => {
   handle.cancel();
   clock.drain();
 
-  assert.deepEqual(seen, [1630], 'a cancelled sweep kept emitting');
+  assert.deepEqual(seen, [1630], 'a canceled sweep kept emitting');
   assert.equal(handle.isRunning(), false);
   assert.equal(clock.pending(), 0);
 });
@@ -163,4 +166,96 @@ test('a sweep over the whole release terminates', () => {
   clock.drain(500);
   assert.equal(count, 40, '1630s to 2020s is 40 decades');
   assert.equal(clock.pending(), 0);
+});
+
+test('a sweep asked to clear opens on an empty plate, not on the first decade', () => {
+  const clock = fakeClock();
+  const events: string[] = [];
+
+  sweep({
+    from: 1900,
+    to: 1920,
+    onClear: () => events.push('clear'),
+    onDecade: (decade) => events.push(String(decade)),
+    scheduler: clock.scheduler,
+    cancelScheduled: clock.cancelScheduled,
+  });
+
+  assert.deepEqual(events, ['clear'], 'a decade landed before the plate had cleared');
+  clock.drain();
+  assert.deepEqual(events, ['clear', '1900', '1910', '1920']);
+});
+
+test('the cleared plate is held long enough to be seen', () => {
+  const delays: number[] = [];
+  sweep({
+    from: 1900,
+    to: 1920,
+    onClear: () => {},
+    onDecade: () => {},
+    scheduler: (_callback, delayMs) => {
+      delays.push(delayMs);
+      return 0;
+    },
+    cancelScheduled: () => {},
+  });
+
+  assert.deepEqual(delays, [SWEEP_CLEAR_HOLD_MS]);
+  assert.ok(SWEEP_CLEAR_HOLD_MS > DECADE_TRANSITION_MS, 'the clearing crossfade would be cut off');
+});
+
+test('an explicit clear hold overrides the default', () => {
+  const delays: number[] = [];
+  sweep({
+    from: 1900,
+    to: 1920,
+    onClear: () => {},
+    clearHoldMs: 2200,
+    onDecade: () => {},
+    scheduler: (_callback, delayMs) => {
+      delays.push(delayMs);
+      return 0;
+    },
+    cancelScheduled: () => {},
+  });
+
+  assert.deepEqual(delays, [2200]);
+});
+
+test('cancelling during the cleared hold leaves no timer and emits no decade', () => {
+  const clock = fakeClock();
+  const seen: number[] = [];
+  const handle = sweep({
+    from: 1630,
+    to: 2020,
+    onClear: () => {},
+    onDecade: (decade) => seen.push(decade),
+    scheduler: clock.scheduler,
+    cancelScheduled: clock.cancelScheduled,
+  });
+
+  handle.cancel();
+  clock.drain();
+
+  assert.deepEqual(seen, []);
+  assert.equal(handle.isRunning(), false);
+  assert.equal(clock.pending(), 0);
+});
+
+function featureWithEras(eraBuckets: readonly string[]): ExploreMapFeature {
+  return { properties: { eraBuckets } } as unknown as ExploreMapFeature;
+}
+
+test('the earliest decade is the earliest bucket, whatever order they arrive in', () => {
+  assert.equal(earliestDecadeFor(featureWithEras(['1960s', '1870s', '1950s'])), 1870);
+  assert.equal(earliestDecadeFor(featureWithEras(['1630s'])), 1630);
+});
+
+test('an undated record has no earliest decade, so the sweep can leave it out', () => {
+  assert.equal(earliestDecadeFor(featureWithEras([])), null);
+  assert.equal(earliestDecadeFor(featureWithEras(['Undated'])), null);
+});
+
+test('an undated bucket alongside dated ones does not win', () => {
+  assert.equal(earliestDecadeFor(featureWithEras(['Undated', '1910s'])), 1910);
 });

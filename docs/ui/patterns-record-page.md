@@ -38,7 +38,7 @@ Column width narrows to 680px. Body prose keeps its measure; the anatomy rows an
 
 ---
 
-## 3. Map behaviour
+## 3. Map behavior
 
 Framed, always. The persistent plate insets into the record's place frame and flies there at stored precision, never sharper, with the coarsening stated in the frame.
 
@@ -57,7 +57,7 @@ Framed, always. The persistent plate insets into the record's place frame and fl
 
 > **The affiliate block is the only commercial element on the site and it must never read as evidence.** It is marked as affiliate in plain words and visually separated from the sources block.
 
-**`/law/[slug]`** leads with a framed jurisdiction plate showing the state or federal outline the law governs, **never a point**, with a precision note that reads that a law has a jurisdiction rather than a location. Then mono `LAW` kicker, Sora title, official citation in mono, serif plain language explainer, the anatomy panel, official source links as numbered rows, then "Records in this jurisdiction and era" labelled exactly that, then prev and next.
+**`/law/[slug]`** leads with a framed jurisdiction plate showing the state or federal outline the law governs, **never a point**, with a precision note that reads that a law has a jurisdiction rather than a location. Then mono `LAW` kicker, Sora title, official citation in mono, serif plain language explainer, the anatomy panel, official source links as numbered rows, then "Records in this jurisdiction and era" labeled exactly that, then prev and next.
 
 > **No push in and no orbit on a law.** The dignity gate's spirit applies to abstractions too.
 
@@ -95,7 +95,7 @@ A pin on a jurisdiction record is a false claim with a coordinate attached. A bo
 
 - Every record page carries a correction path. A record with no way to dispute it is an assertion, not evidence.
 - Colour is never the only signal; confidence stays glyph encoded.
-- A coarsened point is never labelled as an exact address.
+- A coarsened point is never labeled as an exact address.
 - A refused camera move states its reason in visible text.
 - No red or alarm hues for violence-adjacent records, and no crime-heat rendering.
 - A person is always identified with role, place and year, never anonymous decoration.

@@ -368,7 +368,7 @@ a.ds-errata__row-id {
   border-top: var(--ds-border-width) solid var(--room-rule-2);
 }
 
-/* The Lookup section nests Identifiers and Provenance as their own labelled sub-sections
+/* The Lookup section nests Identifiers and Provenance as their own labeled sub-sections
    (`ids-heading`, `provenance-heading`). Unstyled, they inherited no separation either, so
    "Purchase and identifiers", "Identifiers" and "Provenance" ran together as one block. A
    lighter echo of the section rule reads them as two distinct fact groups under the same
@@ -875,7 +875,7 @@ a.ds-errata__row-id {
   text-align: right;
 }
 
-@media (max-width: 48rem) {
+@media (max-width: 47.9375rem) {
   /* Under this measure five columns cannot hold their own. The title takes the full line and
      the three data fields share the second, still on the list's shared tracks so author, year
      and states line up down the page exactly as they do on the wide layout. */

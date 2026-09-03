@@ -82,7 +82,7 @@ test('occupied private residence of a deceased person is NOT reduced (NRHP publi
   assert.equal(result.precision, 'address');
 });
 
-test('a raw prohibited level fails closed to city, distinct from an unrecognised raw value', () => {
+test('a raw prohibited level fails closed to city, distinct from an unrecognized raw value', () => {
   for (const raw of ['unit', 'parcel', 'residence']) {
     const result = reducePublicPrecision({ precision: raw, livingStatus: 'deceased' });
     assert.equal(result.reduced, true, `raw="${raw}"`);
@@ -172,7 +172,7 @@ test('allowed coarse precision is not reduced', () => {
   assert.equal(result.precision, 'city');
 });
 
-test('an unrecognised raw value normalises to city (fail-safe default, not an error)', () => {
+test('an unrecognized raw value normalizes to city (fail-safe default, not an error)', () => {
   const result = reducePublicPrecision({ precision: 'satellite_pinpoint' });
   assert.equal(result.reduced, false);
   assert.equal(result.precision, 'city');

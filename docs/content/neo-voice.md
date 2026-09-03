@@ -13,7 +13,7 @@ What stays outside this document, deliberately:
   `/faq`, the trust and take-part rooms): `docs/ui/story.md`. Those surfaces
   borrow this document's *register* so the whole site sounds like one place,
   but they are not narrated by Neo, and the distinction is the speaker. On a
-  site page the speaker is the archive stating its own behaviour, or Gerald
+  site page the speaker is the archive stating its own behavior, or Gerald
   stating a choice in the first person singular. Neo is neither, and Neo still
   never says "I" (Part V). No surface anywhere says "we": there is no we, and
   `docs/ui/story.md` carries the rule.

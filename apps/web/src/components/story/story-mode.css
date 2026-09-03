@@ -54,16 +54,16 @@
   justify-items: end;
 }
 
-.ds-story__chapter--centred {
+.ds-story__chapter--centered {
   justify-items: center;
   text-align: center;
 }
 
 /* The record sheet is a fixed right-side panel (record-sheet.css `.ds-sheet`). Opening it while
    an even ("right") chapter card is up would put both on the same edge, so every chapter moves
-   left for as long as the sheet is open — centred chapters (cold open, close) are unaffected,
+   left for as long as the sheet is open — centered chapters (cold open, close) are unaffected,
    since they carry no record selection of their own. */
-.ds-story--sheet-open .ds-story__chapter:not(.ds-story__chapter--centred) {
+.ds-story--sheet-open .ds-story__chapter:not(.ds-story__chapter--centered) {
   justify-items: start;
 }
 
@@ -76,7 +76,7 @@
 }
 
 /* The cold open and the outro are text on the plate, not a panel over it. */
-.ds-story__chapter--centred .ds-story__card {
+.ds-story__chapter--centered .ds-story__card {
   width: min(620px, 100%);
   background: transparent;
   border: 0;
@@ -90,11 +90,11 @@
  * prose and the citation line were unreadable against it. A radial scrim keeps the map legible
  * through the type instead of putting a panel back.
  */
-.ds-story__chapter--centred {
+.ds-story__chapter--centered {
   position: relative;
 }
 
-.ds-story__chapter--centred::before {
+.ds-story__chapter--centered::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -107,7 +107,7 @@
   );
 }
 
-.ds-story__chapter--centred .ds-story__card {
+.ds-story__chapter--centered .ds-story__card {
   position: relative;
 }
 
@@ -155,7 +155,7 @@
   color: var(--ds-ink);
 }
 
-.ds-story__chapter--centred .ds-story__prose {
+.ds-story__chapter--centered .ds-story__prose {
   margin-inline: auto;
   max-width: 44ch;
 }
@@ -205,7 +205,7 @@
   margin-top: var(--ds-space-6);
 }
 
-.ds-story__chapter--centred .ds-story__actions {
+.ds-story__chapter--centered .ds-story__actions {
   justify-content: center;
 }
 

@@ -258,6 +258,29 @@ test('tilt toggles between the flat and cinematic plate', () => {
   assert.equal(tilted.announcements[0], 'Tilt · flat');
 });
 
+test('resetBearing eases bearing to zero, touching nothing else', () => {
+  const h = harness({ bearing: 137, zoom: 8.2, pitch: 40 });
+  h.camera.resetBearing();
+  assert.equal(h.calls.length, 1);
+  assert.equal(h.calls[0]?.method, 'easeTo');
+  assert.equal(h.calls[0]?.options.bearing, 0);
+  assert.equal(h.calls[0]?.options.zoom, undefined, 'zoom must be left alone');
+  assert.equal(h.calls[0]?.options.pitch, undefined, 'pitch must be left alone');
+  assert.equal(h.announcements[0], 'North · reset');
+});
+
+test('resetBearing is never refused — undoing a rotation is not camera drama', () => {
+  const h = harness();
+  h.camera.resetBearing();
+  assert.equal(h.calls.length, 1, 'must not be silently gated like the dignity-checked moves');
+});
+
+test('resetBearing collapses to zero duration under reduced motion, like every other move', () => {
+  const h = harness({ reducedMotion: true });
+  h.camera.resetBearing();
+  assert.equal(h.calls[0]?.options.duration, 0);
+});
+
 test('spotlight isolates without moving the camera', () => {
   const h = harness();
   h.camera.spotlight({ center: [-90.05, 32.3], radiusPercent: 20 });
@@ -313,7 +336,7 @@ test('cancel stops the map and drops a staged orbit', () => {
 
   h.camera.cancel();
   h.runPending();
-  assert.equal(h.calls.length, staged, 'a cancelled orbit must not rotate later');
+  assert.equal(h.calls.length, staged, 'a canceled orbit must not rotate later');
   assert.ok(h.stopped() > 0);
 });
 

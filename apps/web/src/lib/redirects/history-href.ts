@@ -58,7 +58,7 @@ export function mapHistoryQueryToRecordsHref(raw: RawHistoryRedirectParams): str
   }
 
   // An explicit `era` is already in the destination vocabulary, so it wins. Two temporal
-  // constraints cannot merge into one param, and dropping the reader's explicit one to honour a
+  // constraints cannot merge into one param, and dropping the reader's explicit one to honor a
   // derived one would widen the result set they asked to narrow.
   const explicitEra = (firstValue(raw.era) ?? '').trim();
   const era =

@@ -85,7 +85,7 @@ export type TimelineChangeLike = {
 
 /**
  * Strip items for the most recent `limit` adjacent-decade changes from the merged 1790–2020
- * timeline. A change that crosses the 2000 measurement-regime boundary is labelled as not
+ * timeline. A change that crosses the 2000 measurement-regime boundary is labeled as not
  * directly comparable rather than presented as a clean delta.
  */
 export function timelineChangeStripItems(
