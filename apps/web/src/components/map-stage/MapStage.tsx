@@ -184,7 +184,11 @@ import {
 import { createReducedMotionListener, type ReducedMotionListener } from './reduced-motion-listener';
 // The plate is the subscriber half of the seam `MapMoment` documents: the stage publishes which
 // moment is live and where, and never touches a map itself.
-import { resolveMomentCamera, useMapMomentFrame } from '../room/MapMoment';
+import {
+  resolveMomentCamera,
+  useMapMomentFrame,
+  useReportMapAvailability,
+} from '../room/MapMoment';
 
 /**
  * Give the slot geometry back, so the plate returns to its resting full-viewport box and the
@@ -529,6 +533,9 @@ export function MapStageProvider({
   const lastViewportRef = useRef<ExploreViewportFrame | undefined>(undefined);
   const [mapAvailable, setMapAvailable] = useState(true);
   const mapAvailableRef = useRef(true);
+  // Published to every MapMoment through MapMomentStage, so a moment refuses LIVE rather than
+  // going transparent under a tag that says the map is there — see repo-kz9z.
+  useReportMapAvailability(mapAvailable);
   /**
    * GL lifecycle, held in refs rather than closure locals because construction no longer happens
    * inside the effect that tears it down — `ensureMap` can fire from any handle call, while the
@@ -1643,6 +1650,8 @@ export function MapStageProvider({
   useMapMomentFrame((frame) => {
     const plate = plateRef.current;
     if (!plate) return;
+
+    if (!mapAvailable) return;
 
     const claimGranted =
       frame !== null && framedClaimAllowed(surfaceClass) && framedSlotsRef.current.claim(frame.id);

@@ -245,7 +245,7 @@ export const STORY_FACTS: readonly StoryFact[] = [
   {
     id: 'hbcus',
     prose:
-      'The historically Black colleges founded after emancipation are among the best documented institutions in this archive, because they kept registers, catalogues and alumni records continuously for a century and more. They anchor the map in places where almost nothing else was written down.',
+      'The historically Black colleges founded after emancipation are among the best documented institutions in this archive, because they kept registers, catalogs and alumni records continuously for a century and more. They anchor the map in places where almost nothing else was written down.',
     figures: [
       { value: 'After 1865', label: 'most were founded' },
       { value: 'Registers', label: 'what they kept' },

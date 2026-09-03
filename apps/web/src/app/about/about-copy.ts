@@ -35,7 +35,7 @@ export const ABOUT_LEDE = `${ABOUT_LINE} I built it with the tools and records a
 
 /** Origin paragraph the door steals. You walk past the place. Do not retype. */
 export const ABOUT_WALK_PAST =
-  "That access started to feel like an obligation. Most of us walk past documented Black history every day without knowing it's there: a school, a street, a building, a court case that decided what the people around us were allowed to do. The records exist. They're just scattered across archives, agency databases, court reporters, and library catalogues that don't talk to each other.";
+  "That access started to feel like an obligation. Most of us walk past documented Black history every day without knowing it's there: a school, a street, a building, a court case that decided what the people around us were allowed to do. The records exist. They're just scattered across archives, agency databases, court reporters, and library catalogs that don't talk to each other.";
 
 /** Why this exists, in the maker's own voice. Rendered as consecutive paragraphs. */
 export const ABOUT_ORIGIN = [

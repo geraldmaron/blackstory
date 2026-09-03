@@ -373,9 +373,11 @@ Metro should log `[blackstory] apiBaseUrl=…` and
 
 The app attests to `apps/api-public` and `apps/api-submissions` via the
 `X-BlackStory-Client: mobile/<version>; api=<major>` header on every request.
-Server-side validation uses the Postgres-backed client registry — there is **no**
-Firebase App Check, no `@react-native-firebase/*` dependency, and no
-GoogleService config in this app.
+Server-side validation is a stateless format check
+(`packages/security/src/client-attestation.ts`) — there is **no** database
+lookup against a client registry, no Firebase App Check, no
+`@react-native-firebase/*` dependency, and no GoogleService config in this
+app.
 
 Crash/perf signals go to the **dev console only** (`__DEV__`) through the
 redacting wrapper in `src/observability/crash-reporter.ts`. Production builds

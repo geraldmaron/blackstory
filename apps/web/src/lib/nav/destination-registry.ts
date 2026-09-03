@@ -214,7 +214,7 @@ const DESTINATIONS: readonly Destination[] = [
     path: '/books',
     label: 'Banned books',
     parent: '/rooms',
-    kind: 'CATALOGUE',
+    kind: 'CATALOG',
     description: 'Documented challenges to titles, recorded as challenges rather than as verdicts.',
     menuLine: 'Documented challenges',
     crawl: { changeFrequency: 'weekly', priority: 0.6 },

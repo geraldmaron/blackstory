@@ -58,7 +58,7 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
         }
         lede={
           <>
-            {LAW_EDITION_BROWSE_LEDE} This catalogue holds the statutes, regulations, constitutional
+            {LAW_EDITION_BROWSE_LEDE} This catalog holds the statutes, regulations, constitutional
             amendments and landmark decisions themselves. It is linked to a place only by
             jurisdiction and era, never by a documented evidentiary join.
           </>
@@ -69,7 +69,7 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
       <LawBrowseSections view={view} catalog={catalog} />
 
       <WalkOffRamp>
-        This catalogue is jurisdictional. It does not invent a documented join to a record.
+        This catalog is jurisdictional. It does not invent a documented join to a record.
       </WalkOffRamp>
     </Room>
   );

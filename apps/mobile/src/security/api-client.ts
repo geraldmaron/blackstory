@@ -4,8 +4,10 @@
  * Thin security wrapper that, on EVERY outgoing request to `apps/api-public`,
  * attaches the client version-floor header `X-BlackStory-Client:
  * mobile/<version>; api=<major>` (ADR-021 §2 / handlers.ts
- * `parseClientApiVersion`). Server-side attestation validates this header via
- * the Postgres-backed client registry — not Firebase App Check.
+ * `parseClientApiVersion`). Server-side attestation validates this header with
+ * a stateless format check (`packages/security/src/client-attestation.ts`) —
+ * not Firebase App Check, and not a database lookup: no client registry
+ * exists on the server.
  *
  * Design invariants:
  *   - The version header is attached on EVERY request — never silently omitted.

@@ -27,7 +27,13 @@ import { HairlineIndex } from './HairlineIndex';
 import { DataTable } from './DataTable';
 import { Disclosure, Field, UtilityCard, UtilityStep } from './Utility';
 import { EmptyList, OffRamp, RecordNav } from './RoomFoot';
-import { MapMoment, momentIsVisible, pickLiveMoment, resolveMomentCamera } from './MapMoment';
+import {
+  MapMoment,
+  momentIsVisible,
+  pickLiveMoment,
+  resolveMomentCamera,
+  resolveMomentVisibility,
+} from './MapMoment';
 
 void React;
 
@@ -181,7 +187,7 @@ describe('room kit · RoomHeader is the only header a room renders', () => {
     const html = renderToStaticMarkup(
       <RoomHeader
         pathname="/books"
-        kicker="Catalogue"
+        kicker="Catalog"
         title="Banned books"
         lede="Every title removed from a public shelf, with the order that removed it."
         meta={['1,204 titles', '1963 to 2024']}
@@ -192,7 +198,7 @@ describe('room kit · RoomHeader is the only header a room renders', () => {
     // The kicker renders again, above the title and in sentence case. It was muted while the
     // register was mono-caps, which shouted over the title; the register changed, so the line
     // came back rather than the prop staying dead on twelve callers.
-    assert.match(html, /<p class="ds-room-header__kicker">Catalogue<\/p>/);
+    assert.match(html, /<p class="ds-room-header__kicker">Catalog<\/p>/);
     assert.match(html, /<h1 class="ds-room-header__title">Banned books<\/h1>/);
     assert.match(html, /ds-room-header__lede/);
     assert.match(html, /1,204 titles/);
@@ -570,6 +576,63 @@ describe('room kit · map moment', () => {
     assert.equal(resolved.move, 'fly');
     assert.equal(resolved.pitch, 40);
     assert.equal(resolved.bearing, -12);
+  });
+});
+
+describe('room kit · map moment visibility', () => {
+  // repo-kz9z: MapMoment derived LIVE from `stage.liveId === reactId` alone, so on a browser with
+  // no WebGL — or any run where MapStage called `markMapUnavailable()` — a moment still went
+  // transparent and printed PLATE · LIVE over an empty box. These pin the fix at the seam, since
+  // no test in this file can drive an actual WebGL failure through SSR.
+  it('a stage being mounted is not the same as the plate being able to paint', () => {
+    const resolved = resolveMomentVisibility({
+      plateAvailable: true,
+      mapCanPaint: false,
+      isLiveCandidate: true,
+    });
+    assert.equal(resolved.live, false);
+    assert.equal(resolved.unavailable, true);
+  });
+
+  it('claims live only once the stage says the map can actually paint', () => {
+    const resolved = resolveMomentVisibility({
+      plateAvailable: true,
+      mapCanPaint: true,
+      isLiveCandidate: true,
+    });
+    assert.equal(resolved.live, true);
+    assert.equal(resolved.unavailable, false);
+  });
+
+  it('being the live candidate does not matter once the map cannot paint', () => {
+    // The exact case that reads wrong without the fix: this moment IS the one holding the slot,
+    // but the plate behind it has nothing to show.
+    const resolved = resolveMomentVisibility({
+      plateAvailable: true,
+      mapCanPaint: false,
+      isLiveCandidate: true,
+    });
+    assert.equal(resolved.live, false);
+  });
+
+  it('no stage mounted is unavailable the same way a failed plate is', () => {
+    const resolved = resolveMomentVisibility({
+      plateAvailable: false,
+      mapCanPaint: false,
+      isLiveCandidate: false,
+    });
+    assert.equal(resolved.live, false);
+    assert.equal(resolved.unavailable, true);
+  });
+
+  it('an idle moment on a healthy plate is neither live nor unavailable', () => {
+    const resolved = resolveMomentVisibility({
+      plateAvailable: true,
+      mapCanPaint: true,
+      isLiveCandidate: false,
+    });
+    assert.equal(resolved.live, false);
+    assert.equal(resolved.unavailable, false);
   });
 });
 

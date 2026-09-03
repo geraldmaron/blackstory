@@ -85,7 +85,7 @@ export function RoomKitGallery() {
       >
         <RoomHeader
           pathname="/books"
-          kicker="Catalogue"
+          kicker="Catalog"
           title={
             <>
               Banned <em>books</em>
