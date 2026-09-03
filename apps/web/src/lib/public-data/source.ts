@@ -19,8 +19,9 @@ import type { PublicSearchIndexDoc } from '@repo/domain/search';
 import type { PublicEntityProjectionDoc } from '@repo/schemas';
 import {
   buildRelatedNeighborStubs,
+  buildRelationshipGraph,
   composeContinueLearningStubs,
-  type NeighborLookup,
+  type RelationshipGraphLookup,
 } from '@repo/domain/learning-index';
 import type { PublicEntityView, RelatedNeighborView } from '../../data/public-seed';
 import { buildGraphTimeline, isUndatedTimelineEntry } from '../../data/entity-graph-seed';
@@ -38,7 +39,11 @@ import { isPostgresPublicDataMisconfigured, shouldPreferReleaseArtifacts } from 
 import { createReleaseScopedCache } from './release-scoped-cache';
 import { mapProjectionToPublicEntityView, type PublicProjectionInput } from './map-projection';
 import { mapPublicSearchProjection } from './map-search-index';
-import { collectOneHopNeighborIds, collectTwoHopNeighborIds } from './neighbor-ids';
+import {
+  collectOneHopNeighborIds,
+  collectThreeHopNeighborIds,
+  collectTwoHopNeighborIds,
+} from './neighbor-ids';
 import { searchIndexReadyForRecords } from '../records/build-records-index';
 import {
   fetchReleaseEntitiesListArtifact,
@@ -122,13 +127,16 @@ export const getPublicActiveReleaseMeta = cache(
   },
 );
 
-function toNeighborLookup(entity: PublicEntityView): NeighborLookup {
+function toNeighborLookup(entity: PublicEntityView): RelationshipGraphLookup {
   return {
     id: entity.id,
     displayName: entity.displayName,
     kind: entity.kind,
     summary: entity.summary,
     ...(entity.related !== undefined ? { related: entity.related } : {}),
+    // Era buckets are the relationship map's fallback date when an edge carries no timespan of
+    // its own. Unused by the 1-hop/2-hop stub composers, which ignore extra lookup fields.
+    ...(entity.eraBuckets !== undefined ? { eraBuckets: entity.eraBuckets } : {}),
   };
 }
 
@@ -155,12 +163,12 @@ function asRelatedNeighborViews(
  * and shared across every entity in the pass.
  */
 type CatalogLookups = {
-  readonly neighborsById: Map<string, NeighborLookup>;
+  readonly neighborsById: Map<string, RelationshipGraphLookup>;
   readonly displayNameById: Map<string, { readonly displayName: string }>;
 };
 
 function buildCatalogLookups(catalog: readonly PublicEntityView[]): CatalogLookups {
-  const neighborsById = new Map<string, NeighborLookup>();
+  const neighborsById = new Map<string, RelationshipGraphLookup>();
   const displayNameById = new Map<string, { readonly displayName: string }>();
   for (const item of catalog) {
     neighborsById.set(item.id, toNeighborLookup(item));
@@ -195,6 +203,10 @@ export function hydrateEntityLearningLinks(
   const continueLearning = asRelatedNeighborViews(
     composeContinueLearningStubs(entity.id, relatedNeighbors, shared.neighborsById),
   );
+  // Path-preserving 3-hop walk for the record room's relationship map. Shares the catalog the
+  // stub composers already use, so a whole-catalog pass costs no extra reads; the single-entity
+  // path pays for its third ring once, in `loadLiveEntity`.
+  const relationshipGraph = buildRelationshipGraph(entity.id, shared.neighborsById);
 
   if (hadNeighbor && priorNeighbor !== undefined) {
     shared.neighborsById.set(entity.id, priorNeighbor);
@@ -231,6 +243,7 @@ export function hydrateEntityLearningLinks(
     timeline,
     ...(relatedNeighbors.length > 0 ? { relatedNeighbors } : {}),
     ...(continueLearning.length > 0 ? { continueLearning } : {}),
+    ...(relationshipGraph.nodes.length > 0 ? { relationshipGraph } : {}),
   };
 }
 
@@ -381,7 +394,22 @@ async function loadLiveEntity(entityId: string): Promise<PublicEntityView | unde
     const twoHopViews = twoHopProjections.map((item) =>
       mapProjectionToPublicEntityView(item as PublicProjectionInput),
     );
-    const catalog = [entity, ...oneHopViews, ...twoHopViews];
+    // Third ring, for the relationship map only. One extra batched `getAll`, hard-capped by
+    // `collectThreeHopNeighborIds`; a failure here is caught with the rest and degrades the map
+    // to two rings rather than failing the page.
+    const threeHopIds = collectThreeHopNeighborIds(
+      [entityId, ...oneHopIds, ...twoHopIds],
+      twoHopViews,
+    );
+    const threeHopProjections =
+      threeHopIds.length > 0
+        ? await fetchPublicEntityProjectionsByIds(active.releaseId, threeHopIds)
+        : [];
+    const threeHopViews = threeHopProjections.map((item) =>
+      mapProjectionToPublicEntityView(item as PublicProjectionInput),
+    );
+
+    const catalog = [entity, ...oneHopViews, ...twoHopViews, ...threeHopViews];
     return hydrateEntityLearningLinks(entity, catalog);
   } catch (error) {
     // Never mix Dunbar seed neighbors into a live entity — hydrate with the entity alone.

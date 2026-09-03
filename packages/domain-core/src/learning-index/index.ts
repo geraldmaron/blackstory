@@ -280,3 +280,6 @@ export function composeContinueLearningStubs(
 
   return candidates.slice(0, cap);
 }
+
+/** Path-preserving 3-hop relationship graph for the record room map. */
+export * from './relationship-graph.js';
