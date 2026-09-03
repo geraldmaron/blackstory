@@ -38,7 +38,7 @@ function siteOrigin(): string {
 
 /**
  * The absolute form of a public path, for the routes that build their own `alternates` rather
- * than going through {@link buildStaticPageMetadata} — the Atlas, which must not carry a title,
+ * than going through {@link buildStaticPageMetadata} — Explore, which must not carry a title,
  * and `/records`, whose canonical carries a narrowing. A relative canonical is only resolved by
  * Next when `metadataBase` is set, and it is not; a relative one would emit as-is and mean
  * nothing to a crawler, so absolute is the whole site's convention.

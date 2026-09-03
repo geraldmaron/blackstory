@@ -24,7 +24,7 @@ body:has(.ds-door) {
   position: fixed;
   inset: 0;
   /*
-   * Same tier as `.ds-map-stage` (`--ds-z-map-plate`), never above Atlas chrome.
+   * Same tier as `.ds-map-stage` (`--ds-z-map-plate`), never above Explore chrome.
    * A literal `z-index: 2` here sat above `.ds-atlas` (`--ds-z-content` = 1), so SSR pins
    * painted over Lens, Record sheet, Records rail, Timeline, and Camera — including after
    * instruments hydrated. Door re-tiers the plate locally inside `.ds-door__board`.

@@ -10,7 +10,7 @@ Builds on, and does not replace: [`patterns-record-anatomy.md`](./patterns-recor
 
 ## 1. What it is
 
-One catalogued thing with a place, an era and evidence: an entity, a banned book, a law. **The Atlas record sheet, unfolded into a durable, crawlable, citable page.**
+One catalogued thing with a place, an era and evidence: an entity, a banned book, a law. **The map record sheet, unfolded into a durable, crawlable, citable page.**
 
 **Same anatomy component as the sheet, never a fork.** The sheet and the page render one `RecordAnatomyPanel`, and their citation strings are byte identical because both call `lib/citation/format`. A citation a reader copies from a pin and a citation they copy from the page must be the same string, or the archive has two answers to the same question.
 
@@ -42,7 +42,7 @@ Column width narrows to 680px. Body prose keeps its measure; the anatomy rows an
 
 Framed, always. The persistent plate insets into the record's place frame and flies there at stored precision, never sharper, with the coarsening stated in the frame.
 
-- **Gestures are locked** until the reader presses **Explore this place**, which hands the plate to the Atlas through the lens handoff builder.
+- **Gestures are locked** until the reader presses **Explore this place**, which hands the plate to the map through the lens handoff builder.
 - **Violence adjacent records get a plain `flyTo` and nothing else.** The dramatising moves render disabled with the reason in visible text, not in a `title` attribute.
 - **Person records never get spotlight.** A spotlight may isolate a region; it may never isolate an individual person record.
 - A jurisdiction is not a location. See section 5.
@@ -79,15 +79,15 @@ A pin on a jurisdiction record is a false claim with a coordinate attached. A bo
 
 ## 6. Entry and exit
 
-**Enter** from an Atlas row or sheet, a palette record hit, a `/records` row, a catalogue card, a chapter citation, or an external link.
+**Enter** from a map row or sheet, a palette record hit, a `/records` row, a catalogue card, a chapter citation, or an external link.
 
 **Exit:**
 
 - `J` and `K` step the result set the reader arrived with, chorded on this class.
-- `A` returns to the Atlas with this record selected.
-- **Explore this place** hands the Framed plate to the Atlas and unlocks it.
+- `A` returns to the map with this record selected.
+- **Explore this place** hands the Framed plate to the map and unlocks it.
 - Browser back returns to the referring surface with scroll restored.
-- Session prev and next, an Atlas return and a correction path are all mandatory.
+- Session prev and next, a map return and a correction path are all mandatory.
 
 ---
 

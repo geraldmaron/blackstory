@@ -1,5 +1,5 @@
 /**
- * The shared typeahead tier, which the Atlas palette and the books typeahead both rank with.
+ * The shared typeahead tier, which the Explore palette and the books typeahead both rank with.
  *
  * The token tier exists because every matcher built on this helper used to fail on the most
  * ordinary way a person searches for a person. "calvin shirley" is not a contiguous substring of

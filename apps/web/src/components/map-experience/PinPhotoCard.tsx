@@ -1,5 +1,5 @@
 /**
- * A small photo card anchored to one map pin — the Door, the Atlas, and (once `RecordSheet`
+ * A small photo card anchored to one map pin — the Door, Explore, and (once `RecordSheet`
  * grows one) the record sheet's own mast all render this same component, so the photo reads the
  * same wherever a pin can offer one. "The photo belongs to the pin": this is never a tile band, a
  * grid, or a gallery — one card, for one pin, at a time.

@@ -200,7 +200,7 @@ describe('/records · filtering', () => {
   });
 });
 
-describe('/records · the Atlas handoff', () => {
+describe('/records · the Explore handoff', () => {
   it('maps topic onto the Lens name for the same thing', () => {
     assert.equal(
       buildAtlasHref({ ...EMPTY_RECORDS_QUERY, topic: 'abolition' }),
@@ -208,7 +208,7 @@ describe('/records · the Atlas handoff', () => {
     );
   });
 
-  it('never sends q, because the Atlas has no text constraint at all', () => {
+  it('never sends q, because Explore has no text constraint at all', () => {
     const href = buildAtlasHref({
       ...EMPTY_RECORDS_QUERY,
       q: 'tulsa',
@@ -226,7 +226,7 @@ describe('/records · the Atlas handoff', () => {
     assert.equal(href, '/explore?state=OK&floor=B');
   });
 
-  it('an unnarrowed index hands over the Atlas instrument', () => {
+  it('an unnarrowed index hands over the Explore instrument', () => {
     assert.equal(buildAtlasHref(EMPTY_RECORDS_QUERY), '/explore');
   });
 });

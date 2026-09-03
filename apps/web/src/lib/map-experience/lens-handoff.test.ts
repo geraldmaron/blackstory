@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { buildLensHandoff, CausalReasonStringError } from './lens-handoff';
 
-test('buildLensHandoff builds an Atlas href through buildExploreHref', () => {
+test('buildLensHandoff builds an Explore href through buildExploreHref', () => {
   const handoff = buildLensHandoff(
     { state: 'AL', era: '1960s' },
     'Records in this jurisdiction and era.',

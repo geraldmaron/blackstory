@@ -113,7 +113,7 @@ export function recordsQueryFromDiscovery(state: DiscoveryState): RecordsQuery {
 }
 
 /**
- * Builds an Explore view state for handoff. Text search (`query`) does not cross: the Atlas has
+ * Builds an Explore view state for handoff. Text search (`query`) does not cross: Explore has
  * no text pin filter. Callers must disclose that in off-ramp copy (Records already does).
  */
 export function exploreViewFromDiscovery(state: DiscoveryState): ExploreViewState {
@@ -143,7 +143,7 @@ export function listHrefFromDiscovery(state: DiscoveryState): string {
   return recordsHref(recordsQueryFromDiscovery(state));
 }
 
-/** `/explore` href carrying DiscoveryState narrowing that the Atlas understands. */
+/** `/explore` href carrying DiscoveryState narrowing that Explore understands. */
 export function mapHrefFromDiscovery(state: DiscoveryState): string {
   return buildExploreHref(exploreViewFromDiscovery(state));
 }
@@ -210,7 +210,7 @@ export type PlaceDiscoveryReturn = {
   readonly positionLabel?: string;
 };
 
-/** DiscoveryState → Place arrival query (server/adapters; Atlas uses discovery-arrival directly). */
+/** DiscoveryState → Place arrival query (server/adapters; Explore uses discovery-arrival directly). */
 export function placeArrivalQuery(state: DiscoveryState, from: 'map' | 'list'): string {
   const kind = firstOf(state.kind);
   const era = firstOf(state.era);
@@ -233,7 +233,7 @@ export function placeArrivalQuery(state: DiscoveryState, from: 'map' | 'list'): 
 }
 
 /**
- * Return paths from a Place page. Always selects this place on the Atlas; preserves shared
+ * Return paths from a Place page. Always selects this place on Explore; preserves shared
  * narrowing when the arrival URL carried DiscoveryState.
  */
 export function placeDiscoveryReturn(

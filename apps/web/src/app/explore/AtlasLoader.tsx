@@ -1,5 +1,5 @@
 /**
- * Joins the pin collection already on the page to the Atlas shell, mounts
+ * Joins the pin collection already on the page to the Explore shell, mounts
  * `AtlasExperience`, and hydrates instruments from `GET /atlas/catalog`.
  *
  * The catalog is ~15 MB (see `atlas-catalog.ts`) and must not ride every
@@ -36,7 +36,7 @@ async function fetchAtlasCatalog(url: string, signal: AbortSignal): Promise<Atla
   if (lastCatalog?.url === url) return lastCatalog.payload;
   // `omit` is the normal path: the catalog is public, CDN-cached, and has no business seeing a
   // cookie. The one exception is an operator holding a maintenance bypass, whose credential has
-  // to ride along or the wall answers this fetch with a 503 and the Atlas comes up empty behind
+  // to ride along or the wall answers this fetch with a 503 and Explore comes up empty behind
   // its own bypass. The hint cookie only exists while the wall is up.
   const credentials = hasMaintenanceBypassHint() ? 'same-origin' : 'omit';
   const response = await fetch(url, { signal, credentials });

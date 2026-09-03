@@ -54,7 +54,7 @@ export function matchesPaletteOpen(stroke: KeyStroke): boolean {
 }
 
 /**
- * The attribute that marks the Instrument's keyboard scope. The Atlas root carries it; nothing
+ * The attribute that marks the Instrument's keyboard scope. The Explore root carries it; nothing
  * else does.
  *
  * Single-key bindings are a property of the surface, not of the document. `W` means "fly wide"
@@ -122,7 +122,7 @@ let singleKeyEnabled: boolean | null = null;
 
 function readSingleKeySetting(): boolean {
   try {
-    // Default on. The bare keys are the Atlas's advertised interface, and a surface that opens
+    // Default on. The bare keys are the map's advertised interface, and a surface that opens
     // with its own shortcut sheet inert would read as broken rather than as considerate.
     return window.localStorage.getItem(SINGLE_KEY_STORAGE_KEY) !== 'off';
   } catch {
@@ -250,7 +250,7 @@ export function resolveEscape(open: Partial<Record<EscapeLayer, boolean>>): Esca
  *
  * 1. A keystroke aimed at a text field is never consumed — the reader typing "w" into search must
  *    not fly the camera wide.
- * 2. A bare key is consumed only inside the Instrument's scope. Off the Atlas there is no camera,
+ * 2. A bare key is consumed only inside the Instrument's scope. Off Explore there is no camera,
  *    no timeline and no selected record for these commands to act on.
  * 3. A bare key is consumed only while the reader's single-key setting is on.
  *

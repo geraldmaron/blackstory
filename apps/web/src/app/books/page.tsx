@@ -3,7 +3,7 @@
  * requests against titles, not a ranked or curated "controversial books" list.
  * Preserves the browse URL contract (`q`, `state`, `author`, `sort`, `dir`, `page`).
  *
- * The way back is the place the reader left. Atlas and the record index stay off
+ * The way back is the place the reader left. Explore and the record index stay off
  * this page. State facets stay on `/books`.
  */
 import type { Metadata } from 'next';

@@ -141,7 +141,7 @@ test('/legal keeps its slug rather than dumping every statute on the index', () 
   assert.equal(rule?.destination, '/law/:path*');
 });
 
-test('/map lands on the Atlas instrument; /explore renders it', () => {
+test('/map lands on the Explore instrument; /explore renders it', () => {
   const map = RULES.find((entry) => entry.source === '/map');
   const explore = RULES.find((entry) => entry.source === '/explore');
   assert.ok(map, '/map must have a config rule');
@@ -151,7 +151,7 @@ test('/map lands on the Atlas instrument; /explore renders it', () => {
 });
 
 test('the /explore rule is the exact path, so /explore/api keeps answering', () => {
-  // A `/explore/:path*` rule would swallow the Atlas's own refine endpoint, whose entire
+  // A `/explore/:path*` rule would swallow the map's own refine endpoint, whose entire
   // contract is its query string.
   for (const rule of RULES) {
     assert.ok(!rule.source.startsWith('/explore/'), `${rule.source} would capture /explore/api`);

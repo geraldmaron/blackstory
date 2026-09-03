@@ -1,9 +1,9 @@
 /**
- * The bar search off the Atlas, and the reason ⌘K still works when a segment has thrown.
+ * The bar search off Explore, and the reason ⌘K still works when a segment has thrown.
  *
  * The error boundary renders inside `ds-shell-body`, below the shell header. So the shortcut
  * survives a thrown segment if and only if two things hold: the handler lives in the header's
- * search rather than in the palette the Atlas mounts, and nothing between the root layout and
+ * search rather than in the palette Explore mounts, and nothing between the root layout and
  * that header can throw on its own. Both are asserted here — the second as a source guard,
  * because a data dependency added to the shell would break the 404 and the error page silently
  * and there is no DOM harness in this package to catch it at runtime.
@@ -46,7 +46,7 @@ describe('bar search', () => {
     assert.match(markup, /value=""/);
   });
 
-  it('owns the palette chord off the Atlas', () => {
+  it('owns the palette chord off Explore', () => {
     const source = read('components/shell/CommandBarSearch.tsx');
     // The same definition the palette's own opener reads. A second literal `⌘K` check here is
     // how the two drift into disagreeing about what opens search.
@@ -108,7 +108,7 @@ describe('the shell above the error boundary', () => {
 });
 
 describe('Journey is not advertised as a room', () => {
-  it('the off-Atlas bar does not link to /journey or /#journey', () => {
+  it('the off-Explore bar does not link to /journey or /#journey', () => {
     // Verified 2026-08-28: /journey is HTTP 404 on apex and www. About already refuses to
     // list unfinished rooms. A CommandBar href would undo that.
     const source = code('components/shell/CommandBar.tsx');

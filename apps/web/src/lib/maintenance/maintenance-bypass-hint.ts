@@ -6,7 +6,7 @@
  * credentials at all: `AtlasLoader` requests `/atlas/catalog` with `credentials: 'omit'`, because
  * that route is CDN-cached public data with no reason to see a cookie. Behind the wall that fetch
  * arrives anonymous, gets a 503, and the operator who just bypassed the wall lands on a homepage
- * whose Atlas cannot load — the bypass restores the page and not the thing on it.
+ * whose map cannot load — the bypass restores the page and not the thing on it.
  *
  * This non-secret companion cookie closes that gap without touching the cached path in normal
  * operation. It carries no credential, only the fact that one exists; script reads it and, on that

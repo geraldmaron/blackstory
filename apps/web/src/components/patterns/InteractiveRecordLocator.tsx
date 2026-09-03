@@ -22,7 +22,7 @@ export type InteractiveRecordLocatorProps = {
   readonly lng: number;
   readonly label: string;
   readonly accessibleName?: string;
-  /** Hand off to the Live Atlas instrument for street-level exploration. */
+  /** Hand off to the live Explore instrument for street-level exploration. */
   readonly atlasHref?: string;
   readonly className?: string;
 };

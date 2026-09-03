@@ -53,7 +53,10 @@ export function redirectsForNextConfig() {
     { source: '/legal', destination: '/law', permanent: true },
     { source: '/legal/:path*', destination: '/law/:path*', permanent: true },
 
-    // `/map` is the old name for the Atlas. `/` is the map door; `/explore` still renders it.
+    // `/map` is the old name for Explore. `/` is the map door; `/explore` still renders it.
     { source: '/map', destination: '/explore', permanent: true },
+
+    // `/library` is the old name for Rooms.
+    { source: '/library', destination: '/rooms', permanent: true },
   ];
 }

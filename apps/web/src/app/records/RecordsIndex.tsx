@@ -5,7 +5,7 @@
  * Nothing on this surface requires JavaScript. Filter chips are anchors, rows are anchors, the
  * search field is a plain GET form, and prev/next are real anchors in the server HTML. That is
  * the acceptance criterion, and it is also the reason this room is the archive's crawlable
- * index rather than a second view of the Atlas.
+ * index rather than a second view of the map.
  */
 
 import React from 'react';

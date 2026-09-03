@@ -47,7 +47,7 @@ export type CommandContext = {
 
   /* View */
   readonly setMode: (mode: 'atlas' | 'story') => void;
-  /** Leaves the instrument for the library hub. A navigation, not a mode change. */
+  /** Leaves the instrument for Rooms. A navigation, not a mode change. */
   readonly openLibrary: () => void;
   /** Leaves the instrument for the Door Journey on `/`. */
   readonly openDoor: () => void;
@@ -214,7 +214,7 @@ export const COMMANDS: readonly Command[] = [
   },
   {
     id: 'view.library',
-    title: 'Open the library',
+    title: 'Open Rooms',
     // `L` alone, which does not collide with `⌘L` (copy share link): `chordKey` compares the
     // full chord, and the duplicate check in `bindings.test.ts` proves it.
     section: 'View',

@@ -1,5 +1,5 @@
 /**
- * AI-training crawlers must not pull the Atlas catalog or other origin-expensive routes.
+ * AI-training crawlers must not pull the Explore catalog or other origin-expensive routes.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

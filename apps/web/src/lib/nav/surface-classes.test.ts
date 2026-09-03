@@ -37,7 +37,7 @@ function concretePath(route: string): string {
 }
 
 describe('surface class resolution', () => {
-  it('puts the front door on its own class and /explore on the Atlas instrument', () => {
+  it('puts the front door on its own class and /explore on the Explore instrument', () => {
     assert.equal(surfaceClassFor('/'), 'door');
     assert.equal(surfaceClassFor('/', 'atlas=1'), 'door');
     assert.equal(surfaceClassFor('/?atlas=1'), 'door');
@@ -46,7 +46,7 @@ describe('surface class resolution', () => {
     assert.equal(surfaceClassFor('/explore?state=DC'), 'instrument');
   });
 
-  it('does not classify /story, which was deprecated in favour of the Atlas story mode', () => {
+  it('does not classify /story, which was deprecated in favour of the Explore story mode', () => {
     // A classified path with no registry entry fails the coverage test, and a registry entry for
     // a route that never renders puts a 404 in the palette. Story is neither: it is a mode of
     // `/explore`.

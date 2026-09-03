@@ -1,5 +1,5 @@
 /**
- * Atlas instrument for `/explore` (and `/map` → `/explore`).
+ * Explore instrument for `/explore` (and `/map` → `/explore`).
  * First paint is the US locator (state hairlines) plus the pin plate, then the
  * live catalog shell. Kind / Tone / Era belong here, not on `/`. Shop tokens
  * stay off the first HTML document.

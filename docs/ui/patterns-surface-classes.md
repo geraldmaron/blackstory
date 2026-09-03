@@ -31,9 +31,9 @@ Verdicts and URL dispositions are in [`design-direction-v9-surfaces.md`](./desig
 
 | Route | Note |
 |---|---|
-| `/` | Front door: the Atlas / map of the archive. A leftover `?atlas=1` is not a second door. |
+| `/` | Front door: the Explore map of the archive. A leftover `?atlas=1` is not a second door. |
 | `/story` | New. Six chapters at `/story#chapter-{id}` inside one document. |
-| `/explore` | Atlas instrument (catalog + map). Not a query on `/`. |
+| `/explore` | Explore instrument (catalog + map). Not a query on `/`. |
 | `/locate` | 308 to `/?find=place`. Folds into the Lens Where group and a narrow place sheet. |
 
 Pattern: [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md). Design law: [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md).
@@ -100,7 +100,7 @@ No chrome by definition: redirects, JSON and text responses, feeds and crawler f
 | Reading progress rule | No | Yes | No | No |
 | Lens, Results, Time, Camera console | Yes | No | No | No |
 | Record sheet posture | Over the plate | In document | In document | Not rendered |
-| Mandatory exit | Palette, `A`, record open | Records off ramp | Session prev and next, Atlas return, correction path | At least one named next step |
+| Mandatory exit | Palette, `A`, record open | Records off ramp | Session prev and next, map return, correction path | At least one named next step |
 
 Every class carries the command bar, the palette, the collections drawer, the toast stack and the keyboard layer, because all five mount once above every route and never unmount.
 
@@ -120,10 +120,10 @@ The `A` key is disabled on any surface with no subject, and the shortcut sheet s
 
 ## 5. No class is a dead end
 
-- Every Reading room ends in a records off ramp into the Atlas or `/records`.
+- Every Reading room ends in a records off ramp into the map or `/records`.
 - Every Utility surface ends with at least one named next step, never a bare confirmation.
-- Every Record page carries session prev and next, an Atlas return and a correction path.
-- The Atlas and `/records` empty states name `/submit` rather than saying "no results".
+- Every Record page carries session prev and next, a map return and a correction path.
+- The map and `/records` empty states name `/submit` rather than saying "no results".
 
 Enforced structurally, not by review: the `/about` destinations block is the adoption gate, and a route not in the palette, the footer and that block is not shipped. A registry test fails when a public route is absent.
 

@@ -76,8 +76,8 @@ export function proxy(request: NextRequest) {
  * outright — so the fold cost two hops and lost the decade on the way. `/search` stays matched:
  * it carries a free-text `q` that has to be sanitised before it is echoed anywhere.
  *
- * `/explore` is the Atlas instrument (not a redirect to `/`). It keeps its facet allowlist.
- * `/` is the Door and has an empty allowlist, so leftover Atlas params 308 away instead of
+ * `/explore` is the Explore instrument (not a redirect to `/`). It keeps its facet allowlist.
+ * `/` is the Door and has an empty allowlist, so leftover Explore params 308 away instead of
  * fragmenting the Cloudflare HTML cache. `/atlas/catalog` and `/sitemap.xml` take no query:
  * cache-busting `?x=` 308s to the bare path. Search/refine/geocode APIs stay out so their
  * contracts are not stripped.

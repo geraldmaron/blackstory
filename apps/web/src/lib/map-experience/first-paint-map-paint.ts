@@ -25,7 +25,7 @@ export const FIRST_PAINT_RECORD_FILL_OPACITY = 1;
 /** Holding walks use solid graphic copper like `--ds-accent-graphic`. */
 export const FIRST_PAINT_WALK_FILL_OPACITY = 1;
 
-/** MapLibre: true when the feature is an allowlisted atlas walk (same rule as Door `holdingWalk`). */
+/** MapLibre: true when the feature is an allowlisted Explore walk (same rule as Door `holdingWalk`). */
 export function holdingPlaceWalkExpression(): ExpressionSpecification {
   return ['==', ['get', 'holdingWalk'], true] as unknown as ExpressionSpecification;
 }
@@ -94,7 +94,7 @@ function topLevelZoomStops(expression: unknown): readonly (readonly [number, unk
  * interpolates (county-proportionate scaling), so wrapping those in a second zoom interpolate was
  * rejected at `addLayer` with "Only one zoom-based step or interpolate subexpression may be used".
  * That rejection is silent to the reader: the style never applies, the plate never stamps
- * `data-plate-ready`, the Albers underlay stays up and the Atlas reads as the Door with the
+ * `data-plate-ready`, the Albers underlay stays up and Explore reads as the Door with the
  * instruments floating over a static pin field. So a zoom-scaled kind expression is folded here:
  * its stops are spliced into this interpolate after the handoff zoom, and its value AT the
  * handoff is the last stop at or below it (MapLibre's own flat extrapolation past a final stop —

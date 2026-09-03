@@ -6,7 +6,7 @@
  *
  * The whole article list (~48 docs, ~220KB) is one release-scoped read shared across
  * requests (see `release-scoped-cache.ts`). Every surface that used to issue its own query
- * per render — the `/stories` index, the cites edge on every record page and the Atlas
+ * per render — the `/stories` index, the cites edge on every record page and the Explore
  * catalog, the story lead on `/` and `/place`, the by-slug detail read — is now a lookup over
  * that one cached list. Before this (pg_stat_statements, 2026-07-20 → 2026-09-02) the list
  * query had run 478k times: once per dynamic request, with only per-request memoisation.
@@ -135,7 +135,7 @@ async function loadEntities(entityIds: readonly string[]): Promise<readonly Publ
 /**
  * The chapter-cites-record index for the active release.
  *
- * `cache()`-wrapped because every record surface in a render wants it (the Atlas sheet for the
+ * `cache()`-wrapped because every record surface in a render wants it (the Explore sheet for the
  * whole catalog, `/entity/[id]` for one record); the underlying article list is the shared
  * cross-request read above, so this costs a fold over ~48 docs, not a query. Degrades to an
  * empty index rather than throwing: a record page whose chapter list is missing is worse than

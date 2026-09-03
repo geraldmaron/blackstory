@@ -1,5 +1,5 @@
 /**
- * `/library` room contracts (SP-21, repo-92n2.29).
+ * `/rooms` room contracts (SP-21, repo-92n2.29).
  *
  * The room's *content* is not asserted here — it is generated from the destination registry, and
  * `lib/nav/destination-registry.test.ts` is what proves no public route is missing from it.
@@ -18,7 +18,7 @@ import { LIBRARY_CARD_GROUPS, destinationsInGroup } from '../../lib/nav/destinat
 
 const pageSource = readFileSync(join(import.meta.dirname, 'page.tsx'), 'utf8');
 
-describe('/library · the room renders without JavaScript', () => {
+describe('/rooms · the room renders without JavaScript', () => {
   it('is a server component: no "use client", no event handlers', () => {
     assert.doesNotMatch(pageSource, /['"]use client['"]/);
     assert.doesNotMatch(pageSource, /onClick=/);
@@ -33,7 +33,7 @@ describe('/library · the room renders without JavaScript', () => {
         assert.doesNotMatch(
           pageSource,
           new RegExp(`href="${destination.path}"`),
-          `${destination.path} is hand-linked in the library; it should come from the registry`,
+          `${destination.path} is hand-linked in the rooms hub; it should come from the registry`,
         );
       }
     }
@@ -56,12 +56,12 @@ describe('/library · the room renders without JavaScript', () => {
   });
 });
 
-describe('/library · the room is reachable', () => {
+describe('/rooms · the room is reachable', () => {
   it('L opens it, and the shortcut sheet says so because it renders the same registry', () => {
     const command = COMMANDS.find((entry) => entry.id === 'view.library');
-    assert.notEqual(command, undefined, 'no command opens the library');
+    assert.notEqual(command, undefined, 'no command opens Rooms');
     assert.deepEqual(command?.keys, ['L']);
-    assert.equal(command?.title, 'Open the library');
+    assert.equal(command?.title, 'Open Rooms');
 
     // The sheet renders `COMMANDS` grouped by section, so being in a real section is what puts
     // this row in front of a reader. A command in no rendered section is invisible.
@@ -74,15 +74,15 @@ describe('/library · the room is reachable', () => {
   });
 
   it('is the first breadcrumb step for a reading room and a utility room alike', () => {
-    // The Atlas root is resolved as a parent but not rendered as a step, so the library leads.
+    // The map root is resolved as a parent but not rendered as a step, so Rooms leads.
     for (const path of ['/books', '/methodology', '/corrections', '/submit']) {
       const trail = resolveTrail(path);
-      assert.equal(trail[0]?.label, 'The library');
-      assert.equal(trail[0]?.href, '/library', 'the library step must be a working link');
+      assert.equal(trail[0]?.label, 'Rooms');
+      assert.equal(trail[0]?.href, '/rooms', 'the rooms step must be a working link');
     }
   });
 
-  it('the library does not parent itself', () => {
-    assert.deepEqual(resolveTrail('/library'), [{ label: 'The library', href: null }]);
+  it('Rooms does not parent itself', () => {
+    assert.deepEqual(resolveTrail('/rooms'), [{ label: 'Rooms', href: null }]);
   });
 });

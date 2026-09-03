@@ -1,7 +1,7 @@
 /**
  * The reliable photo set: which entities in the active release carry a rights-cleared image, and
- * the small view of it a pin card needs. Shared by `GET /atlas/photos` (entity-id keyed, for the
- * Atlas) and `GET /door/photos` (pin-id keyed, for the Door — see that route's module comment for
+ * the small view of it a pin card needs. Shared by `GET /atlas/photos` (entity-id keyed, for
+ * Explore) and `GET /door/photos` (pin-id keyed, for the Door — see that route's module comment for
  * why it stays a second, smaller endpoint instead of reusing this one's keys).
  *
  * The set today (WS6): every entity carrying `projection.primaryImage` — currently the existing

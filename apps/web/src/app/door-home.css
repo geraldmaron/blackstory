@@ -190,7 +190,7 @@
   text-underline-offset: 0.15em;
 }
 
-/* Document snap while Door is mounted — scoped so Atlas / other routes are untouched. */
+/* Document snap while Door is mounted — scoped so Explore / other routes are untouched. */
 html:has(.ds-door) {
   scroll-snap-type: y proximity;
 }
@@ -542,7 +542,7 @@ html:has(.ds-door) {
 
 /*
  * The live plate. `/` is the `door` surface: the shared MapLibre plate paints full-bleed in its
- * `ambient` posture (shell.css) with the same clustered field the Atlas draws. The static board
+ * `ambient` posture (shell.css) with the same clustered field Explore draws. The static board
  * above is first paint and the no-WebGL field; once the plate stamps `data-plate-ready` the board
  * steps aside and the canvas behind it is the map.
  *

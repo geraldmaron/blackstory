@@ -265,7 +265,7 @@ export function isFirstPaintWalk(feature: ExploreMapFeature): boolean {
 
 /**
  * Pin-plate walk styling. Explore first paint: any holding `/place/` href. Door link plate:
- * only allowlisted atlas walks (`holdingWalk`), not every linkable `/place/` record.
+ * only allowlisted Explore walks (`holdingWalk`), not every linkable `/place/` record.
  */
 export function isPinPlateWalk(feature: ExploreMapFeature, linkRecords: boolean): boolean {
   if (linkRecords) {

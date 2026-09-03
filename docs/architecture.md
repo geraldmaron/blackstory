@@ -23,7 +23,7 @@ Firebase App Hosting or Firestore as SoR are leftover.
 That is production today. It is not yet the first-run sat below.
 
 **Intended first-run**, sat 2026-08-28 on isolated branch `cursor/first-paint-local-119c` at
-localhost:3048 (commit `0dfc8f5a`): Greenwood first; header rooms are Atlas and Library only;
+localhost:3048 (commit `0dfc8f5a`): Greenwood first; header rooms are Explore and Rooms only;
 no Journey room; no Grade A; no "2 sources"; `/?atlas=1` 308s home. That chrome is not live
 until that isolated work lands. Do not invent a Journey page. Do not restyle first paint here.
 

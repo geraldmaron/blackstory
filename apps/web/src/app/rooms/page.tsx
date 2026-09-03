@@ -1,5 +1,5 @@
 /**
- * `/library` — knowledge hub beyond the map (v10 Library Hub).
+ * `/rooms` — knowledge hub beyond the map (v10 Rooms Hub).
  *
  * Cards come from `lib/nav/destination-registry.ts`, never hand-written.
  * One column of destinations reads as a table of contents, not a settings menu.
@@ -17,13 +17,13 @@ import {
 import { CardGrid, GroupHeading, Room, RoomCard, RoomHeader } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import '../reading-room.css';
-import './library.css';
+import './rooms.css';
 
 void React;
 
 export const metadata: Metadata = buildStaticPageMetadata({
-  path: '/library',
-  title: 'The library',
+  path: '/rooms',
+  title: 'Rooms',
   description:
     'What kinds of knowledge live beyond the map: stories, law, data, memorial, and the methods that keep records honest.',
 });
@@ -32,9 +32,9 @@ export default function LibraryPage() {
   return (
     <Room>
       <RoomHeader
-        pathname="/library"
+        pathname="/rooms"
         kicker="Beyond the map"
-        title="The library"
+        title="Rooms"
         lede="What kinds of knowledge live beyond the map. Each room below is a different way into the archive."
         showPath={false}
       />

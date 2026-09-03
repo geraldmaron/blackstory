@@ -29,7 +29,7 @@ function isNarrowViewport(): boolean {
 }
 
 /**
- * The Atlas's chrome-visibility state: which mode it's in, which overlays are open, and which
+ * Explore's chrome-visibility state: which mode it's in, which overlays are open, and which
  * side panels show. Split from the record/lens/camera state because none of it depends on the
  * data — it is purely about what's on screen.
  */

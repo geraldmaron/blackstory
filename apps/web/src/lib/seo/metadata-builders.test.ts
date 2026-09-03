@@ -81,7 +81,7 @@ test('every static room emits an absolute self-canonical', () => {
   // A relative canonical is only resolved by Next when `metadataBase` is set, and it is not; it
   // would emit verbatim and tell a crawler nothing. Sixteen rooms shipped with no canonical at
   // all before SP-19, so every filter and tracking permutation of them was a separate URL.
-  for (const path of ['/about', '/books', '/stories', '/law', '/memorial', '/library']) {
+  for (const path of ['/about', '/books', '/stories', '/law', '/memorial', '/rooms']) {
     const metadata = buildStaticPageMetadata({ path, title: 'Room', description: 'A room.' });
     const canonical = metadata.alternates?.canonical;
     assert.equal(typeof canonical, 'string');
@@ -95,7 +95,7 @@ test('every static room routes its head through the builder', () => {
   // exports a bare `metadata` object skips both silently — that is how sixteen rooms came to ship
   // without canonicals — so the adoption is asserted rather than left to review.
   //
-  // Excluded: the Atlas and /records build `alternates` directly (one must carry no title, the
+  // Excluded: Explore and /records build `alternates` directly (one must carry no title, the
   // other's canonical carries a narrowing), and /history and /search are redirect routes whose
   // metadata never reaches a reader.
   const appDir = join(import.meta.dirname, '../../app');
@@ -113,7 +113,7 @@ test('every static room routes its head through the builder', () => {
         continue;
       }
       if (item.name !== 'page.tsx') continue;
-      // The Atlas (`app/page.tsx`) builds `alternates` directly — it must carry no `title`, which
+      // Explore (`app/page.tsx`) builds `alternates` directly — it must carry no `title`, which
       // `buildStaticPageMetadata` always sets — so it is excluded the same way `/records` is.
       if (dir === appDir) continue;
       const source = readFileSync(join(dir, item.name), 'utf8');

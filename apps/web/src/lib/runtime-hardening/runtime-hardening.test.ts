@@ -128,7 +128,7 @@ function assertSegmentConfigAfterImports(
   );
 }
 
-test('Atlas and entity route segment config stays after all imports', () => {
+test('Explore and entity route segment config stays after all imports', () => {
   // The ordering rule is about Next parsing route segment config, not about which config it is:
   // placing the export between import statements previously broke entity RSC. It applies to the
   // entity route's `revalidate` exactly as it did to its former `dynamic`.
@@ -146,7 +146,7 @@ test('Atlas and entity route segment config stays after all imports', () => {
   );
 });
 
-test('the Atlas is `/`; `/explore` may still mount the same instrument', () => {
+test('Explore is `/`; `/explore` may still mount the same instrument', () => {
   const explorePages = collectAppRouteFiles(APP_ROOT).filter((file) =>
     /(^|\/)explore\/page\.tsx$/.test(
       file

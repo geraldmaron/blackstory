@@ -91,7 +91,7 @@ export type ExploreMapFeatureProperties = {
   >[];
   readonly livingStatus?: string;
   readonly sensitivityClass?: string;
-  /** Door Journey: true only for allowlisted atlas walks, not every `/place/` link. */
+  /** Door Journey: true only for allowlisted Explore walks, not every `/place/` link. */
   readonly holdingWalk?: true;
 };
 

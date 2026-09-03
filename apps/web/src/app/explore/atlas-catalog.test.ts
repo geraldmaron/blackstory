@@ -73,7 +73,7 @@ test('the catalog is CDN-cacheable and served from a fixed path', () => {
   assert.doesNotMatch(ATLAS_CATALOG_CACHE_CONTROL, /no-store|private/);
 });
 
-test('the Atlas page never puts the catalog back in the initial prop', async () => {
+test('the Explore page never puts the catalog back in the initial prop', async () => {
   const { readFileSync } = await import('node:fs');
   const pageSource = readFileSync(new URL('../page.tsx', import.meta.url), 'utf8');
   const explorePage = readFileSync(new URL('./page.tsx', import.meta.url), 'utf8');

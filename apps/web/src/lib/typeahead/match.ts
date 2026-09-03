@@ -24,7 +24,7 @@ function matchesAllTokens(query: string, haystack: string): boolean {
  * Returns match tier or 0 when no match.
  *
  * The token tier sits below a contiguous substring and above no-match. Without it, every matcher
- * built on this helper (the Atlas palette, the books typeahead) failed on a first-name/last-name
+ * built on this helper (the Explore palette, the books typeahead) failed on a first-name/last-name
  * query against any record carrying a title or a middle initial: "calvin shirley" is not a
  * substring of "Dr. Calvin H. Shirley", so the palette answered "Nothing matches that" for a
  * record it holds. Mirrors `TIER_NAME_TOKENS` in @repo/domain's search ranking, so the palette

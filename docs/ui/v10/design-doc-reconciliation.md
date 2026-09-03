@@ -27,7 +27,7 @@ Goal: one authoritative current design contract. Stale docs must not instruct ag
 | [`design-direction-v10.md`](../design-direction-v10.md) | (new) | Door ≠ Instrument; relationships thesis | **Binding** |
 | [`brand.md`](../brand.md) | Palette, type, dignity | Unchanged | **Binding** |
 | [`story.md`](../story.md) | Voice/microcopy | Unchanged | **Binding** |
-| [`design-direction-v9-atlas.md`](../design-direction-v9-atlas.md) | `/` is Atlas; “map is the product”; first paint live MapLibre | `/` is Door (`DoorHome`); Atlas on `/explore`; `/` surface class `reading` | **Superseded** by v10 for product shape; map plate tokens / dignity / instrument chrome details **Amended** into Atlas Instrument on `/explore` only |
+| [`design-direction-v9-atlas.md`](../design-direction-v9-atlas.md) | `/` is Explore; “map is the product”; first paint live MapLibre | `/` is Door (`DoorHome`); Explore on `/explore`; `/` surface class `reading` | **Superseded** by v10 for product shape; map plate tokens / dignity / instrument chrome details **Amended** into Explore Instrument on `/explore` only |
 | [`design-direction-v9-surfaces.md`](../design-direction-v9-surfaces.md) | Proposed; `/story`, `/chapters`, Instrument includes `/` | Code: `/stories`, `/library`, `/place`, `/` reading | **Superseded** — surface class membership follows `surface-classes.ts` + v10 |
 | [`patterns-surface-classes.md`](../patterns-surface-classes.md) | Instrument includes `/` and `/story` | Code registry differs | **Amended** — align membership to code; keep class semantics |
 | [`patterns-atlas-instrument.md`](../patterns-atlas-instrument.md) | Instruments on Atlas | Valid for `/explore` | **Amended** — scope = `/explore` (+ framed story moments), not `/` |
@@ -45,8 +45,8 @@ Goal: one authoritative current design contract. Stale docs must not instruct ag
 
 ## Top contradictions that cause thrash
 
-1. **“First paint is the live Atlas instrument on `/`.”**  
-   Docs: v9 Atlas. Code: Door + HTML pin plate; WebGL Atlas on `/explore`.  
+1. **”First paint is the live Explore instrument on `/`.”**  
+   Docs: v9 Explore. Code: Door + HTML pin plate; WebGL map on `/explore`.  
    **Resolution:** v10 Rest on Door; Instrument only after Explore engagement.
 
 2. **“`/stories` is a redirect to `/chapters`.”**  
@@ -70,4 +70,4 @@ Goal: one authoritative current design contract. Stale docs must not instruct ag
 - Update `docs/ui/README.md` “Read these first” to v10.
 - Update `.cursor/rules/ui-design-patterns.mdc`.
 - Update `AGENTS.md` UI section to cite v10.
-- Mark v9 Atlas/surfaces headers as superseded (leave files for provenance).
+- Mark v9 Explore/surfaces headers as superseded (leave files for provenance).

@@ -37,7 +37,7 @@ export const OPENFREEMAP_SOURCE_ID = 'openfreemap';
  * Chosen over Esri World Imagery and MapTiler because it needs no API key, no account and no
  * billing, and because it is US federal work: public domain, so nothing here depends on a
  * commercial licence that could change under the archive. Coverage is the United States only,
- * which is exactly the extent this atlas flies over (`US_CONUS_BOUNDS` bounds the camera).
+ * which is exactly the extent this map flies over (`US_CONUS_BOUNDS` bounds the camera).
  *
  * The service is an ArcGIS MapServer tile endpoint, so the path is `{z}/{y}/{x}` — row before
  * column, the reverse of the XYZ convention. Getting that backwards yields tiles that load

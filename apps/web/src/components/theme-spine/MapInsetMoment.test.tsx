@@ -2,7 +2,7 @@
  * Unit coverage for the theme-spine MapInsetMoment.
  *
  * SP-08 turned this from a second MapLibre mount into an adapter over the room kit's `MapMoment`:
- * it contributes a slot the persistent plate moves into, and the Atlas hand-off built from the
+ * it contributes a slot the persistent plate moves into, and the Explore hand-off built from the
  * block's `entityId`. The assertions follow — what is checked is the caption, the hand-off URL and
  * the absence of a second map, not a panel's aria-label.
  */

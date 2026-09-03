@@ -31,7 +31,7 @@ export default function robots(): MetadataRoute.Robots {
     // with noindex instead, which a crawler can only read if it is allowed to fetch the page.
     host: siteUrl(),
     // Pointing at the sitemap here is how a crawler finds the registry-derived URL list without
-    // having to walk in from the Atlas.
+    // having to walk in from Explore.
     sitemap: new URL('/sitemap.xml', siteUrl()).toString(),
   };
 }

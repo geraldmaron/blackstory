@@ -32,7 +32,7 @@ export type PlateInset = {
  * `FramedSlotRegistry` — a refused claim is a real outcome (two stages mounted at once, see that
  * module) and the plate must fall back to its resting posture rather than fight for the slot.
  *
- * The Instrument case is the one worth stating plainly: a moment CAN mount on the Atlas, inside
+ * The Instrument case is the one worth stating plainly: a moment CAN mount on Explore, inside
  * the record sheet that floats over the live plate. `framedClaimAllowed` already refuses it, and
  * the result is that the sheet's place block renders its static fallback while the plate keeps
  * steering underneath. A sheet cannot borrow the plate it is floating over.

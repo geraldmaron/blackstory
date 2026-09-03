@@ -1,7 +1,7 @@
 /**
  * `/` is the door: existing about framing above the existing HTML pin plate.
  * People need to know what they are walking into, then walk into a place.
- * The Atlas instrument stays on `/explore`. This page does not mount it.
+ * The Explore instrument stays on `/explore`. This page does not mount it.
  */
 import type { Metadata } from 'next';
 import { absolutePublicUrl } from '../lib/seo/metadata-builders';

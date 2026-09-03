@@ -1,13 +1,13 @@
 /**
- * Atlas surface chrome: the layers the instruments float in, and the two small pieces that have
+ * Explore surface chrome: the layers the instruments float in, and the two small pieces that have
  * no component of their own (the spotlight mask and the camera readout).
  *
  * Everything here is `position: fixed` over the persistent map plate. The page itself does not
- * scroll in Atlas mode: the map is the document.
+ * scroll in Explore mode: the map is the document.
  */
 
 /*
- * The shell layers between the plate and the Atlas.
+ * The shell layers between the plate and Explore.
  *
  * `.ds-map-stage` and the Explore locator underlay sit at `--ds-z-map-plate` (0). `.ds-atlas`
  * sits at `--ds-z-content` (1) so Lens / Record sheet / Records / Timeline / Camera always paint
@@ -23,7 +23,7 @@
  * Without the pointer-events pass-through, the route wrapper consumed every click aimed at the
  * map — pins were unselectable and the camera could not be panned by hand.
  *
- * Scoped with `:has(.ds-atlas)` so only the Atlas makes these wrappers transparent. On the reading
+ * Scoped with `:has(.ds-atlas)` so only Explore makes these wrappers transparent. On the reading
  * and utility rooms the same wrappers carry scrolling text, and explore.css's standing warning
  * applies there: a text column over the live plate must keep its own events, or a swipe pans the
  * map instead of the document.

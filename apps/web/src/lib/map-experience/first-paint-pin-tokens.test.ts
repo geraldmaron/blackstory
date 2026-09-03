@@ -81,7 +81,7 @@ test('majority pins use Page Sand on Door, Explore, and every first-paint surfac
   assert.doesNotMatch(pinPlateCss, /color-mix\(in srgb, var\(--ds-ink\)/);
 });
 
-test('SSR pin plate sits at map-plate tier under Atlas instrument chrome', () => {
+test('SSR pin plate sits at map-plate tier under Explore instrument chrome', () => {
   // A literal z-index: 2 above .ds-atlas (--ds-z-content = 1) painted pins over Lens/sheet/rail.
   assert.match(pinPlateCss, /^\s*z-index:\s*var\(--ds-z-map-plate\);/m);
   assert.match(pinPlateCss, /\.ds-first-paint-plate\s*\{[^}]*z-index:\s*var\(--ds-z-map-plate\)/s);

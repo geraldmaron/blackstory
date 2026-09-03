@@ -1,20 +1,20 @@
 /**
  * Site header for the public shell.
  *
- * One bar, every surface. The site used to run two navigation patterns at once: the Atlas rendered
+ * One bar, every surface. The site used to run two navigation patterns at once: Explore rendered
  * `components/shell/CommandBar.tsx` and every other room rendered `SiteHeader`, a fourteen-item bar
  * with a `MORE` menu hiding nine of them. A reader crossing from the map to a reading room met a
  * different header, in a different place, with a different set of destinations — and the two
  * disagreed about what the site contained.
  *
- * The Atlas still mounts its own `CommandBar` inside `AtlasExperience`, because there the bar needs
+ * Explore still mounts its own `CommandBar` inside `AtlasExperience`, because there the bar needs
  * the mode toggle, the palette, the saved drawer and the shortcut sheet, all of which are that
  * surface's client state. This renders the same component without them: brand, search, Find
- * (Atlas / Records), Rooms, and the theme switch. Same component, same position, same artwork.
+ * (Explore / Records), Rooms, and the theme switch. Same component, same position, same artwork.
  *
  * The gate reads the surface class registry, the same table `shell.css` and the footer read, so the
  * three cannot disagree about which surface is the Instrument. It stays a render gate rather than a
- * `display: none` so the Atlas ships no second, hidden navigation.
+ * `display: none` so Explore ships no second, hidden navigation.
  */
 
 'use client';

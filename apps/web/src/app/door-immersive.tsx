@@ -4,8 +4,8 @@
  * One visit rolls chapters / facts / spotlight on the server so SSR and hydrate match.
  * Document scroll so the wheel works over the map; IntersectionObserver picks the chapter.
  *
- * THE MAP IS THE ATLAS'S MAP. The Door hands the persistent `MapStage` the same national-field
- * patch the Atlas rests on (`nationalFieldPatch`: grouped at national zoom, the same style, the
+ * THE MAP IS EXPLORE'S MAP. The Door hands the persistent `MapStage` the same national-field
+ * patch Explore rests on (`nationalFieldPatch`: grouped at national zoom, the same style, the
  * same entity markers) and flies its camera per chapter. The static Albers pin board underneath
  * is first paint and the no-JS / no-WebGL field: it hands over the moment the plate stamps
  * `data-plate-ready` (door-home.css). Until then the layout zoom on the board still tracks the
@@ -44,7 +44,7 @@ void React;
 
 const RECORD_CHAPTER_ID = 'one-record';
 
-/** Same flight the Atlas story mode gives a chapter (`use-story-runner.ts`). */
+/** Same flight the Explore story mode gives a chapter (`use-story-runner.ts`). */
 const CHAPTER_FLIGHT_MS = 1600;
 
 /** The national chapters: flat, unrotated, and no closer than the story's opening zoom. */
@@ -117,7 +117,7 @@ function openDoorPin(href: string, push: (href: string) => void): void {
 
 export type DoorImmersiveProps = {
   readonly pins: ExploreMapFeatureCollection;
-  /** Per-state presence tiers, so the plate opens on the same tint the Atlas does. */
+  /** Per-state presence tiers, so the plate opens on the same tint Explore does. */
   readonly densityLevels: readonly StateDensityLevel[];
   readonly chapters: readonly StoryChapter[];
   readonly factByChapterId: Readonly<Record<string, StoryFact>>;
@@ -207,7 +207,7 @@ export function DoorImmersive({
       : null;
 
   /* —— The live plate ————————————————————————————————————————————————————————————————
-     The same field the Atlas paints. `patchData` is also what wakes the shared plate on this
+     The same field Explore paints. `patchData` is also what wakes the shared plate on this
      surface (MapStage builds MapLibre on first contact), so the Door pays for the map exactly
      once, at the moment it asks for it, and shares the instance with `/explore` afterwards. */
   useEffect(() => {
@@ -230,7 +230,7 @@ export function DoorImmersive({
    */
   const [pageReady, setPageReady] = useState(false);
 
-  /** Chapter camera. The chapter's own MapLibre spec, flown the way the Atlas story flies it. */
+  /** Chapter camera. The chapter's own MapLibre spec, flown the way the Explore story flies it. */
   const camera: DoorFocusCamera = focus.camera;
   useEffect(() => {
     if (!plateLive) return;

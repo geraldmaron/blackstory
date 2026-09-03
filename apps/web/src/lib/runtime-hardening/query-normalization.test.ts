@@ -224,7 +224,7 @@ test('panel chrome is not shareable state: panels= and hidePanels= normalize awa
   assert.equal(normalizeQueryString('/explore', { panels: 'filters', state: 'dc' }), 'state=DC');
 });
 
-test('`/` is the Door: Atlas query 308s away so it cannot bust the HTML cache', () => {
+test('`/` is the Door: Explore query 308s away so it cannot bust the HTML cache', () => {
   const bag = {
     era: '1970s',
     kind: 'school',
@@ -347,7 +347,7 @@ test('normalizeQueryString does not keep a named stand on `/`', () => {
   );
 });
 
-test('buildNormalizedUrl issues canonical Atlas URLs on /explore', () => {
+test('buildNormalizedUrl issues canonical Explore URLs on /explore', () => {
   const normalized = buildNormalizedUrl(
     new URL('https://example.com/explore?utm_source=x&state=va&group=true&lines=1'),
   );

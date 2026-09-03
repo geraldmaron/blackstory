@@ -39,7 +39,7 @@ test('exploreHrefForState normalizes postal code and includes state (camera from
   assert.equal(parsed.showKey, false);
 });
 
-test('exploreHrefForState returns the Atlas instrument for empty or unknown postal codes', () => {
+test('exploreHrefForState returns the Explore instrument for empty or unknown postal codes', () => {
   assert.equal(exploreHrefForState(''), ATLAS_INSTRUMENT_HREF);
   assert.equal(exploreHrefForState('   '), ATLAS_INSTRUMENT_HREF);
   assert.equal(exploreHrefForState('ZZ'), ATLAS_INSTRUMENT_HREF);

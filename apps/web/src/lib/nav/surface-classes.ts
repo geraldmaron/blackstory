@@ -18,7 +18,7 @@
  * `surfaceClassFor` returns `null` and nothing is emitted.
  *
  * `/` is the door: the locked about mast plus the pin plate. `/explore` mounts the
- * Atlas instrument. A place is `/place/{slug}`.
+ * Explore instrument. A place is `/place/{slug}`.
  */
 /**
  * The five rendered surface classes. Endpoints are represented by `null`.
@@ -37,14 +37,14 @@ export type SurfaceClass = 'door' | 'instrument' | 'reading' | 'record' | 'utili
  */
 const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
   // Front door: scroll chapters over the shared ambient map plate. Same bar as the archive.
-  // `/explore` is the live catalog instrument. Story is a mode of the Atlas, not a path.
+  // `/explore` is the live catalog instrument. Story is a mode of Explore, not a path.
   ['/', 'door'],
   ['/explore', 'instrument'],
 
   // Reading room — one scrolling, measure-limited column on paper.
-  // `/library` is the hub the rest of this list hangs off: it renders cards, not records, but it
+  // `/rooms` is the hub the rest of this list hangs off: it renders cards, not records, but it
   // is the same measure-limited column on paper, so it is a Reading room and not a fifth class.
-  ['/library', 'reading'],
+  ['/rooms', 'reading'],
   ['/records', 'reading'],
   ['/stories', 'reading'],
   ['/books', 'reading'],
@@ -127,7 +127,7 @@ function normalizePath(pathname: string): string {
  * of a page with no class and therefore no shell rules.
  *
  * `search` is accepted so older call sites keep compiling. It does not change the class:
- * `/` is always the door. `?atlas=1` is not a second home. The Atlas instrument is `/explore`.
+ * `/` is always the door. `?atlas=1` is not a second home. The Explore instrument is `/explore`.
  */
 export function surfaceClassFor(pathname: string, _search?: string): SurfaceClass | null {
   const path = normalizePath(pathname);

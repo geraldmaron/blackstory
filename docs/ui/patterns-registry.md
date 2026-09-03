@@ -30,9 +30,9 @@ These carry no folder of their own. They are law about how routes, the shell and
 | Utility edition (compact pages) | [`patterns-utility-edition.md`](./patterns-utility-edition.md) | `utility-edition/*` | `UtilityEditionShell`, `UtilityEditionIntro`, `UtilityEditionBodyPanel`, `UtilityEditionErrorView`, chrome helpers |
 | Map entity encoding | [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) | `kind-encoding.ts`, `marker-size.ts`, `explore-style.ts`, `MapExperienceLegend.tsx` | `kindFamilyFor`, `KIND_FAMILY_ENTRIES`, `displayEncodingFor`, legend Color key |
 | Map canvas lifecycle | [`patterns-map-canvas.md`](./patterns-map-canvas.md) | `map-libre-lifecycle.ts`, `hero-map-inset.ts`, `MapStage.tsx`, `EntityLocationMap.tsx` | `bindMapResizeLifecycle`, `waitForContainerLayout`, `isWebGlAvailable` |
-| Atlas instrument (v9) | [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md) | `components/shell/CommandBar.tsx`, `map-experience/{TimePanel,LensPanel,ResultsRail,CameraConsole,RecordSheet}.tsx`, `time-panel.css`, `patterns/Toast.tsx`, `toast.ts`, `toast.css`, `patterns/EmptyState.tsx`, `empty-state.ts`, `empty-state.css`, `patterns/skeleton.css`, `lib/map-experience/{camera-moves,camera-dignity,chrome-padding,label-expression,migration-corridors,decade-density,decade-transition}.ts`, `lib/citation/format.ts`, `lib/share/deep-link.ts`, `lib/keyboard/bindings.ts`, `lib/collections/store.ts` | `TimePanel`, `ToastStack`, `useToasts`, `EmptyState`, `createCamera`, `allowedMovesFor`, `chromePadding`, `MAP_LABEL_NAME_FIELD`, `MIGRATION_CORRIDORS`, `decadeDensityBars`, `formatCitation`, `buildShareHref` |
+| Explore instrument (v9) | [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md) | `components/shell/CommandBar.tsx`, `map-experience/{TimePanel,LensPanel,ResultsRail,CameraConsole,RecordSheet}.tsx`, `time-panel.css`, `patterns/Toast.tsx`, `toast.ts`, `toast.css`, `patterns/EmptyState.tsx`, `empty-state.ts`, `empty-state.css`, `patterns/skeleton.css`, `lib/map-experience/{camera-moves,camera-dignity,chrome-padding,label-expression,migration-corridors,decade-density,decade-transition}.ts`, `lib/citation/format.ts`, `lib/share/deep-link.ts`, `lib/keyboard/bindings.ts`, `lib/collections/store.ts` | `TimePanel`, `ToastStack`, `useToasts`, `EmptyState`, `createCamera`, `allowedMovesFor`, `chromePadding`, `MAP_LABEL_NAME_FIELD`, `MIGRATION_CORRIDORS`, `decadeDensityBars`, `formatCitation`, `buildShareHref` |
 | Cinematic map backdrop | [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) | `cinematic-map/*` (`CinematicMapProvider.tsx`, `useCinematicMap.ts`, `ExploreMapControl.tsx`, `CinematicScrim.tsx`, `CinematicMapClose.tsx`, `MapIntroBeat.tsx`, `cinematic-map.css`) | `CinematicMapProvider`, `useCinematicMap`, `ExploreMapControl`, `CinematicScrim`, `MapIntroBeat` |
-| Home featured set | [`design-direction-v6-home.md`](./design-direction-v6-home.md) § beat 02 (superseded by v9 Atlas) | `home-featured-set.ts` | `toHomeFeaturedEntity`, `buildHomeFeaturedCarouselSet` |
+| Home featured set | [`design-direction-v6-home.md`](./design-direction-v6-home.md) § beat 02 (superseded by v9 Explore) | `home-featured-set.ts` | `toHomeFeaturedEntity`, `buildHomeFeaturedCarouselSet` |
 
 ## Import paths
 
@@ -71,14 +71,14 @@ import '@/components/article/article.css';
 import { MapInsetMoment } from '@/components/theme-spine/MapInsetMoment';
 import '@/components/theme-spine/theme-spine.css';
 
-// Lens handoff: never hand write an Atlas href, build it
+// Lens handoff: never hand write an Explore href, build it
 import {
   buildExploreHref,
   defaultExploreOverlayState,
 } from '@/lib/map-experience/url-state';
 import { DEFAULT_EXPLORE_FILTERS } from '@/lib/map-experience/filters';
 
-// Atlas instrument: the shared instrument parts
+// Explore instrument: the shared instrument parts
 import { TimePanel } from '@/components/map-experience/TimePanel';
 import { EmptyState } from '@/components/patterns/EmptyState';
 import { ToastStack } from '@/components/patterns/Toast';

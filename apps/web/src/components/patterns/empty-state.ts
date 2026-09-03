@@ -1,5 +1,5 @@
 /**
- * Empty-state copy for the Atlas lens.
+ * Empty-state copy for the Explore lens.
  *
  * An empty result set is a fact about the reader's filters, not about the archive. The copy has to
  * name the cause and offer the specific loosening that would refill the view, because a bare

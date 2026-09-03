@@ -26,7 +26,7 @@ import {
 export type QueryParamBag = Record<string, string | string[] | undefined>;
 
 /**
- * The Atlas instrument answers on `/explore`. `/` is the Door and has no map-query
+ * The Explore instrument answers on `/explore`. `/` is the Door and has no map-query
  * vocabulary — leftover `state`/`era` keys 308 away so they cannot bust the Cloudflare
  * HTML cache on the front door.
  */
@@ -100,7 +100,7 @@ function allowlistedBag(pathname: string, bag: QueryParamBag): QueryParamBag {
 
 /**
  * Returns a stable query string containing only allowed, non-tracking params.
- * The Atlas (`/explore`) goes through parse→build so revisit URLs match what the
+ * Explore (`/explore`) goes through parse→build so revisit URLs match what the
  * client writes (`layerMode=presence`, uppercase state). `/` is the Door and has no
  * query vocabulary.
  * Empty string means no query component should appear in cache keys or redirects.

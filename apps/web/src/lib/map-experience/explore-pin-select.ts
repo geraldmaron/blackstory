@@ -1,7 +1,7 @@
 /**
  * Explore pin clicks: first-paint discs use opaque `pin-N` ids, so geography
  * (lng/lat on the disc) matches the catalog entity once it arrives. The locator
- * underlay emits a select; the Atlas sheet subscribes.
+ * underlay emits a select; the Explore sheet subscribes.
  */
 
 import type { ExploreMapFeature } from './build-explore-map-source';

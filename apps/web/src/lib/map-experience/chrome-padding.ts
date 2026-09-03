@@ -1,5 +1,5 @@
 /**
- * Camera padding for the Atlas instrument chrome.
+ * Camera padding for the Explore instrument chrome.
  *
  * MapLibre throws `Map cannot fit within canvas with the given bounds, padding, and/or offset`
  * when the requested padding leaves no room on the canvas, and that throw kills map init

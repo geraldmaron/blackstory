@@ -5,7 +5,7 @@
  * It is pure and synchronous so the page can be a plain server component and every test runs
  * without a database.
  *
- * WHY IT DOES NOT BUILD ON `ExploreMapFeature`. The obvious shortcut is to reuse the Atlas's
+ * WHY IT DOES NOT BUILD ON `ExploreMapFeature`. The obvious shortcut is to reuse Explore's
  * feature collection, which already carries kind family, era buckets, place and confidence. It is
  * the wrong source: `buildExploreMapSource` only emits a feature for an entity it can resolve a
  * public geo anchor for, so an index built from it would silently omit every record without
@@ -16,7 +16,7 @@
  * projected on active-release docs.
  *
  * The filter VOCABULARY, though, must not drift from the Lens. Every label and bucket here is
- * derived by calling the same shared modules the Atlas calls — `kindFamilyFor`,
+ * derived by calling the same shared modules Explore calls — `kindFamilyFor`,
  * `kindFamilyEncodingFor`, `resolveEntityEraBuckets`, `highestConfidence`, `getTopicLabel` — never
  * by a local copy of the list. `build-records-index.test.ts` asserts that on drift.
  */
@@ -115,7 +115,7 @@ export type RecordsRow = {
   readonly place: string;
   readonly era: string;
   readonly kindFamily: MapKindFamily;
-  /** Raw kind and tone, so the row can draw the same `KindGlyph` the Atlas results rail draws. */
+  /** Raw kind and tone, so the row can draw the same `KindGlyph` the Explore results rail draws. */
   readonly kind: string;
   readonly mapTone: string | undefined;
   /** `null` is an honest ungraded record, never silently promoted to C. */
@@ -159,10 +159,10 @@ export type RecordsIndex = {
   readonly stateGroups: readonly RecordsGroup[];
   readonly constraints: readonly RecordsConstraint[];
   readonly clearAllHref: string;
-  /** Hands the current narrowing to the Atlas, with the reason string the off-ramp reads out. */
+  /** Hands the current narrowing to Explore, with the reason string the off-ramp reads out. */
   readonly atlasHref: string;
   readonly atlasReason: string;
-  /** Matched records that carry a public map anchor (honest Atlas continuity). */
+  /** Matched records that carry a public map anchor (honest Explore continuity). */
   readonly mappableMatched: number;
 };
 
@@ -666,12 +666,12 @@ export function findRecordsNeighbors(
 }
 
 /**
- * Hands the current narrowing to the Atlas. Every key must stay inside
+ * Hands the current narrowing to Explore. Every key must stay inside
  * `EXPLORE_URL_PARAM_KEYS` / the edge allowlist — a param this function invents is stripped by
- * middleware before the Atlas ever sees it, silently widening the set.
+ * middleware before Explore ever sees it, silently widening the set.
  *
  * One constraint does NOT cross, and the off-ramp copy says so rather than pretending: `q`,
- * because the Atlas has no text pin filter.
+ * because Explore has no text pin filter.
  *
  * `topic` becomes `theme` (Lens name for the same controlled topic id).
  * `evidence` becomes `floor` (and-up grade predicate; not exact-match `confidence`).

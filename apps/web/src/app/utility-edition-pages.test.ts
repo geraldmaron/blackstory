@@ -88,7 +88,7 @@ test('not-found offers the four exits the design law names, and no gallery', () 
   // The `/design-system` exit sent a reader who mistyped a chapter slug to a component gallery.
   // Its removal is the criterion, so an assertion that it stays removed is the guard.
   assert.doesNotMatch(source, /design-system/);
-  // `/explore` folded into the Atlas in SP-07. A 404 that still names it teaches a route that
+  // `/explore` folded into the map in SP-07. A 404 that still names it teaches a route that
   // 308s, which is the exact failure this page exists to end.
   assert.doesNotMatch(source, /Explore/);
 });

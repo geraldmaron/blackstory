@@ -4,7 +4,7 @@
  * then "Place withheld".
  *
  * Kept off `build-explore-map-source.ts` because that module reaches `node:crypto` through the
- * editorial package; this file is imported by client Atlas chrome.
+ * editorial package; this file is imported by client Explore chrome.
  */
 import { resolvePublicAddressLine } from '../geography/public-address';
 import type { ExploreMapFeature } from './build-explore-map-source';

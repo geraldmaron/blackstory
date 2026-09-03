@@ -40,7 +40,7 @@ describe('surface class is the only shell switch', () => {
   it('reads data-surface, never a marker class a route happens to set', () => {
     // `.ds-explore-stage` and `.ds-home-hero` were the two markers shell layout used to key
     // off. Both are rules that silently stop applying the moment the markup changes, which is
-    // exactly what happened when `/` became the Atlas.
+    // exactly what happened when `/` became Explore.
     assert.doesNotMatch(shellCss, /\.ds-shell:has\(\.ds-explore-stage\)/);
     assert.doesNotMatch(shellCss, /\.ds-shell:has\(\.ds-home-hero\)/);
     assert.doesNotMatch(shellCss, /\.ds-shell-body:has\(\.ds-home-hero\)/);
@@ -186,7 +186,7 @@ describe('horizontal overflow guards', () => {
     assert.doesNotMatch(mapSurfacesCss, /\.ds-explore-stage__instruments\s*\{[^}]*--ds-fixed-/s);
   });
 
-  it('Atlas chrome is matte surface, not shop blur or elevation', () => {
+  it('Explore chrome is matte surface, not shop blur or elevation', () => {
     const commandBarCss = readFileSync(join(here, '../components/shell/command-bar.css'), 'utf8');
     const lensCss = readFileSync(join(here, '../components/map-experience/lens-panel.css'), 'utf8');
     const resultsCss = readFileSync(
@@ -278,8 +278,8 @@ describe('the plate is styled globally, not from the route group', () => {
   it('covers the plate on every surface class but the Instrument', () => {
     // Regression: the plate is fixed on every route and the room sheets set no background, so
     // once the Instrument built MapLibre the live map stayed lit under every subsequent route
-    // and state labels read through the prose column. Only reproduces after visiting the Atlas
-    // first, which is why a cold load of /library looked fine.
+    // and state labels read through the prose column. Only reproduces after visiting Explore
+    // first, which is why a cold load of /rooms looked fine.
     // The Door is the one other surface whose plate is content (posture `ambient`), so it is
     // excluded from the cover in the same rule rather than uncovered by a second one.
     assert.match(

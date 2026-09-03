@@ -1,6 +1,6 @@
 /**
- * The Lens handoff builder — the one typed path a reading room uses to hand a subject to the
- * Atlas (docs/ui/patterns-lens-handoff.md §1-2). No surface hand writes an Atlas href: a hand
+ * The Lens handoff builder — the one typed path a reading room uses to hand a subject to
+ * Explore (docs/ui/patterns-lens-handoff.md §1-2). No surface hand writes an Explore href: a hand
  * written one drifts from `EXPLORE_URL_PARAM_KEYS` the moment that allowlist changes, and the
  * reader silently loses whatever param the middleware does not recognise.
  *
@@ -76,7 +76,7 @@ function assertNotCausal(reason: string): void {
 }
 
 /**
- * Builds an Atlas deep link plus the mandatory reason string the results header renders. The
+ * Builds an Explore deep link plus the mandatory reason string the results header renders. The
  * href always goes through `buildExploreHref`, so it can never emit a param outside
  * `EXPLORE_URL_PARAM_KEYS` and can never carry a viewport key (ADR-017).
  */

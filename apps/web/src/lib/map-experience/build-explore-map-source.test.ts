@@ -68,7 +68,7 @@ test('visitClaims on map features carry only website, phone, and hours predicate
   assert.equal(dunbar.properties.visitClaims[0]?.predicate, 'visitorPhone');
 });
 
-test('holdingWalk marks only allowlisted atlas walks, not every /place/ href', () => {
+test('holdingWalk marks only allowlisted Explore walks, not every /place/ href', () => {
   const base = listPublicEntities()[0]!;
   const nonWalkPlace: PublicEntityView = {
     ...base,
@@ -104,7 +104,7 @@ test('holdingWalk marks only allowlisted atlas walks, not every /place/ href', (
   }
 });
 
-test('a standable published place gets a /place/ href on the Atlas instrument', () => {
+test('a standable published place gets a /place/ href on the Explore instrument', () => {
   const base = listPublicEntities()[0]!;
   const palace: PublicEntityView = {
     ...base,

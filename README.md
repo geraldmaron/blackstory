@@ -20,7 +20,7 @@ Checked against live https://blackstory.app/ headers and CSP, not against a bill
 
 **Live** https://blackstory.app/ (verified 2026-08-28) is still the old catalog filter board (Kind / Tone / Era / Theme / Status / Confidence / Where), about 4,100 released records. That is production today. It does not yet look like the first-run sat below.
 
-**Intended first-run**, sat 2026-08-28 on isolated branch `cursor/first-paint-local-119c` at localhost:3048 (commit `0dfc8f5a`): Greenwood first; header rooms are Atlas and Library only; no Journey room; no Grade A; no "2 sources"; `/?atlas=1` 308s home. That chrome is not live until that isolated work lands. Do not invent a Journey page here. Do not restyle first paint on this branch.
+**Intended first-run**, sat 2026-08-28 on isolated branch `cursor/first-paint-local-119c` at localhost:3048 (commit `0dfc8f5a`): Greenwood first; header rooms are Explore and Rooms only; no Journey room; no Grade A; no "2 sources"; `/?atlas=1` 308s home. That chrome is not live until that isolated work lands. Do not invent a Journey page here. Do not restyle first paint on this branch.
 
 `/journey` is not a live room. Verified 2026-08-28: `https://blackstory.app/journey` and `https://www.blackstory.app/journey` return HTTP 404 (`x-matched-path: /404`). Do not list Journey as a room. `/about` "Where to begin" already omits unfinished rooms. There is no public Journey source beyond that 404.
 
@@ -90,7 +90,7 @@ cp -f .env.example .env.local
 # Public web (preferred launcher sets data-source env coherently)
 pnpm dev:web
 # http://localhost:3048/
-# http://localhost:3048/explore   # live catalog needs postgres + DATABASE_URL
+# http://localhost:3048/explore   # live catalog (Explore) needs postgres + DATABASE_URL
 # Without those env vars you get the small Dunbar seed catalog
 
 # Mobile — prod-like local QA (embedded bundle, no Metro; **agent default**)

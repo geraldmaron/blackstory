@@ -25,8 +25,8 @@ export function usePaletteData(
   );
 
   /**
-   * The same three room groups as `/about`, the footer, and Rooms. Atlas, Records,
-   * and the library hub stay off this list so the palette is not a second menu.
+   * The same three room groups as `/about`, the footer, and Rooms. Explore, Records,
+   * and the rooms hub stay off this list so the palette is not a second menu.
    */
   const destinations = useMemo<readonly PaletteDestination[]>(
     () =>

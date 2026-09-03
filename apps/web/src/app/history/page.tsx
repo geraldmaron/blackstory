@@ -1,5 +1,5 @@
 /**
- * `/history` no longer renders. The decade stepper is the Atlas Time panel, the kind composition
+ * `/history` no longer renders. The decade stepper is the Explore Time panel, the kind composition
  * graph belongs to `/data`, and the record list is `/records`, so this route survives only to
  * keep every `/history` bookmark and cached 308 resolving — `decade` mapped to `era`, in one hop.
  *

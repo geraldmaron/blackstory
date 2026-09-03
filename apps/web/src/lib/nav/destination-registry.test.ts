@@ -4,7 +4,7 @@
  * The coverage suite is the acceptance criterion "a registry test fails when a public route is
  * absent" and "a registry test fails when a public reading room, record class or utility route
  * has no card here". It reads the classified-route list from `surface-classes.ts` rather than
- * restating it, so adding a route to the site and forgetting the library fails here.
+ * restating it, so adding a route to the site and forgetting Rooms fails here.
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -54,7 +54,7 @@ describe('destination registry · coverage', () => {
     }
   });
 
-  it('the parent chain terminates at the Atlas from every destination', () => {
+  it('the parent chain terminates at Explore from every destination', () => {
     for (const destination of allDestinations()) {
       let cursor: string | null = destination.path;
       let hops = 0;
@@ -62,15 +62,15 @@ describe('destination registry · coverage', () => {
         cursor = parentPathFor(cursor);
         hops += 1;
       }
-      assert.equal(cursor, '/', `${destination.path} does not resolve up to the Atlas`);
+      assert.equal(cursor, '/', `${destination.path} does not resolve up to Explore`);
     }
   });
 
-  it('/library exists and is the parent of every reading and utility room', () => {
-    assert.notEqual(destinationFor('/library'), undefined);
+  it('/rooms exists and is the parent of every reading and utility room', () => {
+    assert.notEqual(destinationFor('/rooms'), undefined);
 
-    // The rooms the mock parents through the library. Records is included: the index is one of
-    // the library's own answers to "which room", even though it also appears in the off-ramp.
+    // The rooms the mock parents through Rooms. Records is included: the index is one of
+    // Rooms' own answers to "which room", even though it also appears in the off-ramp.
     for (const path of [
       '/records',
       '/stories',
@@ -87,13 +87,13 @@ describe('destination registry · coverage', () => {
     ]) {
       assert.equal(
         destinationFor(path)?.parent,
-        '/library',
-        `${path} should resolve up through the library`,
+        '/rooms',
+        `${path} should resolve up through Rooms`,
       );
     }
   });
 
-  it('an entity goes up to the Atlas and a record goes up to its catalogue', () => {
+  it('an entity goes up to Explore and a record goes up to its catalogue', () => {
     assert.equal(parentPathFor('/entity/tulsa-greenwood'), '/');
     assert.equal(parentPathFor('/place/paul-laurence-dunbar-high-school'), '/');
     assert.equal(parentPathFor('/books/beloved'), '/books');
@@ -176,13 +176,13 @@ describe('destination registry · the footer is derived, not authored', () => {
     );
   });
 
-  it('puts Find in the footer; Rooms palette stays editorial without Atlas or records', () => {
+  it('puts Find in the footer; Rooms palette stays editorial without Explore or records', () => {
     const columns = footerColumns();
     const find = columns.find((column) => column.title === 'Find');
     assert.ok(find);
     assert.deepEqual(
       find.items.map((item) => item.href),
-      ['/', '/explore', '/library', '/records'],
+      ['/', '/explore', '/rooms', '/records'],
     );
     const hrefs = columns.flatMap((column) => column.items.map((item) => item.href));
     const palette = browsableDestinations().map((destination) => destination.path);
@@ -195,7 +195,7 @@ describe('destination registry · the footer is derived, not authored', () => {
     assert.ok(!hrefs.includes('/banned-books'));
     assert.ok(!palette.includes('/explore'));
     assert.ok(!palette.includes('/records'));
-    assert.ok(!palette.includes('/library'));
+    assert.ok(!palette.includes('/rooms'));
     for (const path of palette) {
       assert.ok(hrefs.includes(path), `${path} missing from footer`);
     }

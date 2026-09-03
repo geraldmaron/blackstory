@@ -1,6 +1,6 @@
-# Atlas Instrument
+# Explore Instrument
 
-**Status: In build (v9).** The pattern the Instrument surface class is made of: `/` (the Atlas) and `/story`. Extracted from the runnable reference build [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) and governed by [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md), binding since 2026-07-30. Work packages and sequencing live in [`v9-atlas-implementation-plan.md`](./v9-atlas-implementation-plan.md).
+**Status: In build (v9).** The pattern the Instrument surface class is made of: `/` (the Explore map) and `/story`. Extracted from the runnable reference build [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) and governed by [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md), binding since 2026-07-30. Work packages and sequencing live in [`v9-atlas-implementation-plan.md`](./v9-atlas-implementation-plan.md).
 
 Builds on, and does not replace: [`patterns-map-canvas.md`](./patterns-map-canvas.md) (persistent `MapStage`, ADR-017), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (pin colour and shape), [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) (the 2×2 fact grid), [`brand.md`](./brand.md) (flat matte, copper discipline, dignity law).
 
@@ -29,7 +29,7 @@ Only on a surface whose `data-surface` is `instrument`: `/` and `/story`, with `
 
 ## 2. Canvas law: the layer stack
 
-One canvas, two modes (Atlas and Story), no page-to-page reload of the plate.
+One canvas, two modes (Explore and Story), no page-to-page reload of the plate.
 
 | Layer | z | Rule |
 |---|---|---|
@@ -140,7 +140,7 @@ Five instruments, each independently hideable to a dock chip.
 |---|---|
 | Left | Official symbol artwork alone, from `BRAND_ASSETS.symbol`, light and dark pair swapping on `data-theme`, then the `ATLAS` mono tag |
 | Centre | **`⌘K` trigger**, pill, `max-width: 520px`, right-aligned `⌘K` kbd chip |
-| Right | Mode switch (Atlas / Story), divider, Saved with count badge, Shortcuts, Theme |
+| Right | Mode switch (Explore / Story), divider, Saved with count badge, Shortcuts, Theme |
 
 The centre slot is the single most important change in v9: navigation moves into the palette, and the bar carries two modes instead of fourteen destinations. Below 820px, drop the mode-switch labels and the `ATLAS` tag.
 

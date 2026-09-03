@@ -47,7 +47,7 @@ export type DoorRedirectTableCache = {
 export type DoorPinPlateCache = DoorRedirectTableCache & {
   readonly pins: ExploreMapFeatureCollection;
   readonly features: readonly ExploreMapFeature[];
-  /** Per-state presence tiers for the live plate — the same tint the Atlas opens on. */
+  /** Per-state presence tiers for the live plate — the same tint Explore opens on. */
   readonly densityLevels: readonly StateDensityLevel[];
 };
 

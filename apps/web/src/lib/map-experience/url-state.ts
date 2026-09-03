@@ -18,7 +18,7 @@
  * CTA at `/place/{slug}` (legacy `/entity/[id]` 308s there), not by pin/list selection alone.
  *
  * Evidence floor: `floor=A|B|C` is the Lens “and up” predicate (SP-16). It is distinct from
- * exact-match `confidence=`. Records→Atlas handoff writes `floor`; without this key in the
+ * exact-match `confidence=`. Records→Explore handoff writes `floor`; without this key in the
  * parser/allowlist, middleware stripped it and silently widened the set.
  */
 import { isPopulationDecade } from '@repo/domain/demographics/population-decades';

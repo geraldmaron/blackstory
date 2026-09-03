@@ -13,7 +13,7 @@
   grid-template-rows: auto minmax(0, 1fr);
   width: 300px;
   max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom));
-  /* One panel recipe shared by all four Atlas instruments: opaque surface, one hairline,
+  /* One panel recipe shared by all four Explore instruments: opaque surface, one hairline,
      radius-md. */
   background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border);
@@ -34,7 +34,7 @@
 .ds-lens__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1.1875rem; /* 19px — the shared Atlas instrument title size */
+  font-size: 1.1875rem; /* 19px — the shared Explore instrument title size */
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--ds-ink);

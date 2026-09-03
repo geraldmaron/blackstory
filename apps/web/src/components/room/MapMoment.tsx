@@ -351,7 +351,7 @@ export type MapMomentProps = {
    *
    * The default suits a moment in a scrolling chapter, where the plate genuinely does arrive on
    * scroll. It is wrong in the two places where the plate is never coming: a record sheet floating
-   * over the live Atlas (`framedClaimAllowed` refuses the claim there, deliberately) and any slot
+   * over the live map (`framedClaimAllowed` refuses the claim there, deliberately) and any slot
    * on a Utility surface. Those callers pass their own line rather than telling the reader to
    * scroll for something that will not happen.
    *

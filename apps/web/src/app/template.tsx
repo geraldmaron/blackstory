@@ -3,7 +3,7 @@
  *
  * Next.js re-instantiates this template on client navigations so a short enter
  * animation can run without touching persistent chrome (header/footer in layout.tsx).
- * The Atlas instrument (`/explore`) emits `data-surface="instrument"`; shell.css disables
+ * The Explore instrument (`/explore`) emits `data-surface="instrument"`; shell.css disables
  * the transition there so the shared MapLibre canvas is never crossfaded (ADR-017).
  * `/` is the reading Door, not the instrument. Opacity fades (exit or enter) were removed:
  * they blanked loading UI before slow RSC/compile finished (story ↔ entity navigations

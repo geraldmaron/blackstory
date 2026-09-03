@@ -1,7 +1,7 @@
 /**
  * The door is an immersive Journey: scroll snaps chapters and flies the shared map plate.
- * It is not the Atlas instrument (no lens, no rail, no sheet) and not a second map: the plate
- * it drives is the one `MapStage`, handed the same national-field patch the Atlas rests on.
+ * It is not the Explore instrument (no lens, no rail, no sheet) and not a second map: the plate
+ * it drives is the one `MapStage`, handed the same national-field patch Explore rests on.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -22,7 +22,7 @@ const immersive = readFileSync(
   'utf8',
 );
 
-test('`/` mounts DoorImmersive over the pin plate, not the Atlas instrument', () => {
+test('`/` mounts DoorImmersive over the pin plate, not the Explore instrument', () => {
   assert.match(page, /DoorHome/);
   assert.doesNotMatch(page, /AtlasHome|AtlasLoader|AtlasExperience/);
   assert.match(door, /DoorImmersive/);
@@ -45,14 +45,14 @@ test('DoorImmersive scrolls chapters and drives the shared plate', () => {
   assert.match(immersive, /scrollIntoView/);
   assert.match(immersive, />\s*Begin\s*</);
   assert.match(immersive, /Open Explore/);
-  // The one persistent plate, never a second MapLibre instance and never the Atlas's story runner.
+  // The one persistent plate, never a second MapLibre instance and never the map's story runner.
   assert.match(immersive, /useMapStage\(\)/);
   assert.match(immersive, /stage\.patchData\(nationalFieldPatch\(pins, \{ densityLevels \}\)\)/);
   assert.match(immersive, /focus\.camera/);
   assert.doesNotMatch(immersive, /useStoryRunner|from 'maplibre-gl'|new maplibregl/);
 });
 
-test('the Door and the Atlas rest on one national-field patch', () => {
+test('the Door and Explore rest on one national-field patch', () => {
   const field = readFileSync(
     fileURLToPath(new URL('../lib/map-experience/national-field.ts', import.meta.url)),
     'utf8',

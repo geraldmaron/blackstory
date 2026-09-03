@@ -25,9 +25,9 @@
  * by nothing. The bar's own translucency is deliberate (the page should show through it,
  * blurred); the bare strip above it is not.
  *
- * Scoped to `--room` rather than `.ds-bar`, because the Atlas is a full-bleed map that does not
+ * Scoped to `--room` rather than `.ds-bar`, because Explore is a full-bleed map that does not
  * scroll and would only gain an opaque band across the top of the instrument. `SiteShellHeader`
- * puts `ds-bar--room` on every non-Atlas bar, which is exactly the set that scrolls; until now
+ * puts `ds-bar--room` on every non-Explore bar, which is exactly the set that scrolls; until now
  * that modifier resolved to no rule at all.
  */
 .ds-bar--room {
@@ -143,7 +143,7 @@
 }
 
 /* ---- the live search combobox -------------------------------------------
-   Same pill, same place, same size as the Atlas's palette trigger, but a real input with a
+   Same pill, same place, same size as the map's palette trigger, but a real input with a
    result list under it. The wrapper keeps the pill; the input inside is unstyled so the caret
    sits where the placeholder was. */
 .ds-bar__search--live {
@@ -252,7 +252,7 @@
   cursor: pointer;
 }
 
-/* Active Find link mirrors the Atlas mode copper ink (flat matte, no shadow). */
+/* Active Find link mirrors the Explore mode copper ink (flat matte, no shadow). */
 .ds-bar__mode-link[aria-current='page'],
 .ds-bar__mode-link[aria-current='true'] {
   background: var(--ds-accent-graphic);
@@ -279,10 +279,10 @@ span.ds-bar__mode-link {
  * current surface and starts being a link off it. It therefore belongs only to a link that follows
  * a button, not to `.ds-bar__mode-link` as such.
  *
- * On every room the bar renders without mode toggles, so Atlas, Story and Library are all three
+ * On every room the bar renders without mode toggles, so Explore, Story and Rooms are all three
  * mode-links — the old blanket `border-left` drew a rule before each of them, including one on
- * Atlas that sat a couple of pixels inside the group's own border and read as a stray line. The
- * sibling selector keeps the separator on the Atlas surface (where Library really does follow two
+ * Explore that sat a couple of pixels inside the group's own border and read as a stray line. The
+ * sibling selector keeps the separator on the Explore surface (where Rooms really does follow two
  * buttons) and leaves the room bar as three evenly spaced peers.
  */
 .ds-bar__modes button + .ds-bar__mode-link {
@@ -342,7 +342,7 @@ span.ds-bar__mode-link {
 /* ---- narrow -------------------------------------------------------------- */
 
 /*
- * Below 820px the wordmark drops to the symbol. The modes stay: Atlas, Story and Library are how
+ * Below 820px the wordmark drops to the symbol. The modes stay: Explore, Story and Rooms are how
  * a reader moves between the three things this site is, and on a phone the palette shortcut that
  * used to be their only replacement does not exist. They compact instead of disappearing.
  *
@@ -412,7 +412,7 @@ span.ds-bar__mode-link {
   /*
    * The live field gets its own row.
    *
-   * The rules above collapse the *button* variant (Atlas) to a glyph, which is what frees the
+   * The rules above collapse the *button* variant (Explore) to a glyph, which is what frees the
    * row for the modes. The live-input variant every other room renders has no label span to
    * hide, so it stayed a full input in the `minmax(0, 1fr)` middle track while brand and tools
    * kept their intrinsic widths on either side. At 375px those two take ~300px and the input

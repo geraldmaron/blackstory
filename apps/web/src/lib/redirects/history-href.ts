@@ -6,7 +6,7 @@
  * transform a value. A config rule would also match first and leave no later hook, so the route
  * can never be deleted — cached 308s from every other fold point at it.
  *
- * The destination is always `/records`. Resolving to `/records` for some params and to the Atlas
+ * The destination is always `/records`. Resolving to `/records` for some params and to Explore
  * for others would mean the same bookmark lands in two different rooms depending on an
  * incidental extra key.
  */

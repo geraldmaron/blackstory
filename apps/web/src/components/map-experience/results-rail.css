@@ -15,7 +15,7 @@
   width: 344px;
   /* The right column's floor, not the shared one: the camera console sits under this rail. */
   max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom-right));
-  /* One panel recipe shared by all four Atlas instruments — see lens-panel.css. */
+  /* One panel recipe shared by all four Explore instruments — see lens-panel.css. */
   background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
@@ -33,7 +33,7 @@
 .ds-results__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: 1.1875rem; /* 19px — the shared Atlas instrument title size */
+  font-size: 1.1875rem; /* 19px — the shared Explore instrument title size */
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--ds-ink);

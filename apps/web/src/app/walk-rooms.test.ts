@@ -1,6 +1,6 @@
 /**
  * Archive rooms on the walk share one way back to the map.
- * Atlas is not a room. `/banned-books` is not a path. Shop leaks stay off the copy.
+ * Explore is not a room. `/banned-books` is not a path. Shop leaks stay off the copy.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -21,7 +21,7 @@ const WALK_ROOMS = [
   'submit/page.tsx',
   'corrections/CorrectionsSections.tsx',
   'support/page.tsx',
-  'library/page.tsx',
+  'rooms/page.tsx',
   'privacy/page.tsx',
 ] as const;
 
@@ -32,14 +32,14 @@ const WALK_COPY = [
   'law/LawBrowseSections.tsx',
 ] as const;
 
-test('each walk room comes back to the map and does not sell Atlas or a missing path', () => {
+test('each walk room comes back to the map and does not sell Explore or a missing path', () => {
   for (const relative of WALK_ROOMS) {
     const source = readFileSync(join(here, relative), 'utf8');
     assert.match(source, /WalkOffRamp/, `${relative} uses the shared way back`);
     assert.doesNotMatch(
       source,
       /Open the Atlas|ATLAS_INSTRUMENT|href=["'`]\/explore|href: ['"`]\/explore/,
-      `${relative} must not sell Atlas`,
+      `${relative} must not sell Explore`,
     );
     assert.doesNotMatch(
       source,

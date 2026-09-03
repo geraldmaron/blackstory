@@ -52,7 +52,7 @@ test('endpoints park', () => {
 });
 
 test('a slot claim is refused on the Instrument', () => {
-  // RecordAnatomyPanel is shared between the record page and the Atlas record sheet. A sheet
+  // RecordAnatomyPanel is shared between the record page and the Explore record sheet. A sheet
   // floating over the live plate cannot borrow the plate it floats over, and this refusal is what
   // makes that case degrade to a static block without the caller knowing which surface it is on.
   assert.equal(framedClaimAllowed('instrument'), false);

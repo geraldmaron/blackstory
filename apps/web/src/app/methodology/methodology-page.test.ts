@@ -54,7 +54,7 @@ test('methodology links to /memorial by name', () => {
   assert.match(sectionsSource, /href="\/memorial"/);
 });
 
-test('methodology stays on the server and does not sell the Atlas as a room', () => {
+test('methodology stays on the server and does not sell Explore as a room', () => {
   assert.doesNotMatch(sectionsSource, /'use client'/);
   assert.doesNotMatch(sectionsSource, /Open the Atlas|ATLAS_INSTRUMENT/);
   assert.doesNotMatch(sectionsSource, /ResearchPipelineSketch|home-server/);

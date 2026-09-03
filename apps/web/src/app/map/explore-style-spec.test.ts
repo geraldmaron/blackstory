@@ -4,7 +4,7 @@
  * `buildExploreMapStyle` is a pure builder: nothing in it checks the expressions it assembles,
  * and MapLibre only rejects an invalid one at `addLayer`, in the browser, inside a `try/catch`
  * whose only output is a console line. That is how a nested zoom `interpolate` shipped to
- * production and left the Atlas painting nothing but its Albers underlay. Running the same
+ * production and left Explore painting nothing but its Albers underlay. Running the same
  * validator MapLibre uses (`@maplibre/maplibre-gl-style-spec`, the version `maplibre-gl`
  * itself depends on) over every layer-mode / clustering / basemap combination the surfaces
  * actually request makes that class of failure a test failure instead of a silent plate.

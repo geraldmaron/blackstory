@@ -14,7 +14,7 @@
   gap: var(--ds-space-2);
   width: 210px;
   padding: var(--ds-space-3);
-  /* One panel recipe shared by all four Atlas instruments — see lens-panel.css. */
+  /* One panel recipe shared by all four Explore instruments — see lens-panel.css. */
   background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
@@ -31,7 +31,7 @@
 .ds-camera__kicker {
   flex: 1;
   font-family: var(--ds-font-display);
-  font-size: 1.1875rem; /* 19px — the shared Atlas instrument title size */
+  font-size: 1.1875rem; /* 19px — the shared Explore instrument title size */
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--ds-ink);
