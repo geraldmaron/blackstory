@@ -178,6 +178,7 @@ import { applyGesturesForPosture, lockGestures, rotateGestureAllowed } from './g
 import {
   attachSafariTwistRotate,
   attachShiftDragRotate,
+  attachShiftWheelRotate,
   type RotateGestureHandle,
 } from './custom-rotate-gestures';
 import { createReducedMotionListener, type ReducedMotionListener } from './reduced-motion-listener';
@@ -506,14 +507,15 @@ export function MapStageProvider({
   /** The posture as of the last render, readable from the async mount path below. */
   const postureRef = useRef<PlatePosture>(posture);
   postureRef.current = posture;
-  /** The custom rotate gestures currently attached (`custom-rotate-gestures.ts`), or both null
-   * when the posture has them detached. One ref, not two independent booleans, so the pair
+  /** The custom rotate gestures currently attached (`custom-rotate-gestures.ts`), or all null
+   * when the posture has them detached. One ref, not three independent booleans, so the set
    * attaches and detaches together — see that module's doc comment for why they are one
    * capability. */
   const rotateGesturesRef = useRef<{
     shift: RotateGestureHandle | null;
+    wheel: RotateGestureHandle | null;
     twist: RotateGestureHandle | null;
-  }>({ shift: null, twist: null });
+  }>({ shift: null, wheel: null, twist: null });
   const mapRef = useRef<MapLibreMap | null>(null);
   const maplibreglRef = useRef<MaplibreModule['default'] | null>(null);
   const markersRef = useRef<Marker[]>([]);
@@ -1179,11 +1181,14 @@ export function MapStageProvider({
       const allowed = container !== null && rotateGestureAllowed(posture, { pointerFine });
       if (allowed && !current.shift) {
         current.shift = attachShiftDragRotate(map, container);
+        current.wheel = attachShiftWheelRotate(map, container);
         current.twist = attachSafariTwistRotate(map, container);
       } else if (!allowed && current.shift) {
         current.shift.detach();
+        current.wheel?.detach();
         current.twist?.detach();
         current.shift = null;
+        current.wheel = null;
         current.twist = null;
       }
     },
@@ -1558,8 +1563,9 @@ export function MapStageProvider({
       for (const { marker } of stateLabelMarkersRef.current.values()) marker.remove();
       stateLabelMarkersRef.current.clear();
       rotateGesturesRef.current.shift?.detach();
+      rotateGesturesRef.current.wheel?.detach();
       rotateGesturesRef.current.twist?.detach();
-      rotateGesturesRef.current = { shift: null, twist: null };
+      rotateGesturesRef.current = { shift: null, wheel: null, twist: null };
       mapRef.current?.remove();
       mapRef.current = null;
       maplibreglRef.current = null;

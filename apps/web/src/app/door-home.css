@@ -134,6 +134,22 @@
   color: var(--ds-ink-muted);
 }
 
+/*
+ * The rotate hint. Hidden wherever rotation is not actually handed back: the ambient posture
+ * keeps a full gesture lock on a coarse primary pointer, because a one-finger drag on touch IS
+ * the page's scroll (gesture-lock.ts). A hint for a gesture the plate refuses is worse than no
+ * hint, so the media query matches the lock rather than restating it in prose.
+ */
+.ds-door__field-caption--gesture {
+  text-transform: lowercase;
+}
+
+@media (pointer: coarse) {
+  .ds-door__field-caption--gesture {
+    display: none;
+  }
+}
+
 .ds-door__live {
   position: absolute;
   width: 1px;

@@ -435,6 +435,15 @@ export function DoorImmersive({
             <span className="ds-door__legend ds-door__legend--walk" aria-hidden="true" />
             walk
           </p>
+          {/*
+            Rotation is available here (`gesture-lock.ts`'s ambient posture hands `dragRotate`
+            back on a precise pointer) but nothing said so, and the gesture a reader reaches for
+            first is a trackpad twist, which no browser outside Safari reports to a page at all.
+            Naming the modifier is the whole fix: shift plus a drag or a two-finger swipe.
+          */}
+          <p className="ds-door__field-caption ds-door__field-caption--gesture">
+            shift + drag or swipe to turn the map
+          </p>
         </div>
         <p className="ds-door__live" aria-live="polite">
           {focus.placeLabel}

@@ -16,6 +16,7 @@ import {
   unlockGestures,
   type GestureTarget,
 } from './gesture-lock';
+import { wheelRotateDeltaPx } from './custom-rotate-gestures';
 
 const GESTURE_NAMES = [
   'scrollZoom',
@@ -167,4 +168,22 @@ test('rotateGestureAllowed matches dragRotate exactly across every posture/point
       );
     }
   }
+});
+
+test('a wheel rotation reads the dominant axis, in pixels', () => {
+  // A trackpad swipe with Shift held lands on deltaX in some engines and deltaY in others.
+  assert.equal(wheelRotateDeltaPx({ deltaX: 40, deltaY: 2 }), 40);
+  assert.equal(wheelRotateDeltaPx({ deltaX: -3, deltaY: 26 }), 26);
+  assert.equal(wheelRotateDeltaPx({ deltaX: 0, deltaY: 0 }), 0);
+});
+
+test('line and page wheel modes are normalized to pixels', () => {
+  assert.equal(wheelRotateDeltaPx({ deltaX: 0, deltaY: 3, deltaMode: 1 }), 48);
+  assert.equal(wheelRotateDeltaPx({ deltaX: 0, deltaY: 1, deltaMode: 2 }), 400);
+  assert.equal(wheelRotateDeltaPx({ deltaX: 0, deltaY: 12, deltaMode: 0 }), 12);
+});
+
+test('a non-finite wheel delta turns nothing', () => {
+  assert.equal(wheelRotateDeltaPx({ deltaX: Number.NaN, deltaY: 0 }), 0);
+  assert.equal(wheelRotateDeltaPx({ deltaX: 0, deltaY: Number.POSITIVE_INFINITY }), 0);
 });

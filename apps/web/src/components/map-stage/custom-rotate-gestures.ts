@@ -6,21 +6,25 @@
  * platform, not MapLibre configuration: outside Safari, no browser exposes trackpad two-finger
  * *rotation* (twist) to web content at all — Chrome, Firefox and Edge only ever report the
  * aggregate as `wheel` deltas, which is why "twist to rotate" cannot be the map's only rotate
- * path. Two triggers close that gap without conflicting with `dragRotate`:
+ * path. Three triggers close that gap without conflicting with `dragRotate`:
  *
  *   - Shift+drag: a `wheel`-free, purely synthetic gesture built from `pointer` events, so it
  *     works identically in every browser.
+ *   - Shift+wheel: the trackpad answer everywhere twist is unavailable. A two-finger swipe with
+ *     Shift held arrives as an ordinary `wheel` event in every engine, which is the only form a
+ *     trackpad gesture takes outside Safari. Same modifier as the drag on purpose: one key means
+ *     rotate, and the reader does not have to know whether they are holding a mouse or not.
  *   - Safari's native `gesturestart`/`gesturechange` events: real per-frame twist rotation,
  *     free correctness on exactly the platform (Mac trackpad + WebKit) that actually reports it.
  *
- * Both are gated by `rotateGestureAllowed` (`gesture-lock.ts`) at every call site — the same
+ * All three are gated by `rotateGestureAllowed` (`gesture-lock.ts`) at every call site — the same
  * posture rule that governs `dragRotate` itself, so a plate that has not handed rotation back to
  * the reader does not hand it back through a side door.
  *
- * No `node:test` coverage here, matching `state-labels.ts`'s `buildStateLabelElement`: every
- * export below calls `document.createElement`-adjacent DOM APIs (`PointerEvent`,
- * `setPointerCapture`, `GestureEvent`) that plain Node has no implementation for. Verified in the
- * browser instead.
+ * The `attach*` functions carry no `node:test` coverage, matching `state-labels.ts`'s
+ * `buildStateLabelElement`: each one reaches for DOM APIs (`PointerEvent`, `setPointerCapture`,
+ * `GestureEvent`, a non-passive `wheel` listener) that plain Node has no implementation for, and
+ * they are verified in the browser instead. `wheelRotateDeltaPx` is pure and is tested.
  */
 
 /** What these gestures need off the live map. Structural, matching `gesture-lock.ts`'s own
@@ -39,6 +43,30 @@ export type RotateGestureHandle = {
  * typical viewport (~1200px) covers a bit more than one full turn — enough range to feel free,
  * not so much that a small drag overshoots past usable framing. */
 const SHIFT_DRAG_DEGREES_PER_PIXEL = 0.35;
+
+/**
+ * Degrees of bearing per pixel of Shift+wheel delta. Lower than the drag rate: a trackpad swipe
+ * keeps emitting deltas after the fingers lift (kinetic scrolling), so the same rate that feels
+ * right under a held pointer overshoots badly under a flick.
+ */
+const SHIFT_WHEEL_DEGREES_PER_PIXEL = 0.2;
+
+/** `deltaMode` is lines or pages on some mice; normalize both to pixels before scaling. */
+const WHEEL_LINE_HEIGHT_PX = 16;
+const WHEEL_PAGE_HEIGHT_PX = 400;
+
+/** A wheel event's rotation intent: the dominant axis, in pixels. */
+export function wheelRotateDeltaPx(event: {
+  readonly deltaX: number;
+  readonly deltaY: number;
+  readonly deltaMode?: number;
+}): number {
+  const raw = Math.abs(event.deltaX) >= Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+  if (!Number.isFinite(raw)) return 0;
+  if (event.deltaMode === 1) return raw * WHEEL_LINE_HEIGHT_PX;
+  if (event.deltaMode === 2) return raw * WHEEL_PAGE_HEIGHT_PX;
+  return raw;
+}
 
 /**
  * Shift+drag rotate. Listens on `pointerdown`/`pointermove`/`pointerup` rather than MapLibre's
@@ -94,6 +122,41 @@ export function attachShiftDragRotate(
       container.removeEventListener('pointermove', onPointerMove, { capture: true });
       container.removeEventListener('pointerup', endDrag, { capture: true });
       container.removeEventListener('pointercancel', endDrag, { capture: true });
+    },
+  };
+}
+
+/**
+ * Shift+wheel rotate: the trackpad path in every browser that is not Safari.
+ *
+ * A bare wheel is left completely alone — on the Door the wheel is the page's scroll and jacking
+ * it is the one defect the ambient posture exists to prevent (`gesture-lock.ts`). Only a
+ * Shift-held wheel is claimed, and a Ctrl-held one is refused outright: that is what a trackpad
+ * pinch arrives as, and pinch is zoom's, not rotation's.
+ *
+ * Shift held with a two-finger swipe is reported on `deltaX` by some engines and `deltaY` by
+ * others, which is why the dominant axis decides rather than a fixed one.
+ */
+export function attachShiftWheelRotate(
+  map: RotateTarget,
+  container: HTMLElement,
+): RotateGestureHandle {
+  const onWheel = (event: WheelEvent) => {
+    if (!event.shiftKey || event.ctrlKey || event.metaKey) return;
+    const delta = wheelRotateDeltaPx(event);
+    if (delta === 0) return;
+    map.setBearing(map.getBearing() - delta * SHIFT_WHEEL_DEGREES_PER_PIXEL);
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  // Not passive: this gesture's whole job is to take the wheel away from the document, which a
+  // passive listener is not allowed to do.
+  container.addEventListener('wheel', onWheel, { capture: true, passive: false });
+
+  return {
+    detach() {
+      container.removeEventListener('wheel', onWheel, { capture: true });
     },
   };
 }
