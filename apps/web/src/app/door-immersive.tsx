@@ -319,7 +319,18 @@ export function DoorImmersive({
      * with a tilt or a place camera keep the chapter's own spec.
      */
     if (isNationalCamera(camera)) {
-      stage.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
+      /*
+       * Pitch and bearing are passed even though a national chapter authors them both as 0.
+       * Scroll is expected to run backwards as well as forwards, and a preset frame that names
+       * only center and zoom leaves MapLibre holding the previous chapter's attitude — so
+       * scrolling up from a tilted, turned chapter to the flat top of the page kept the tilt and
+       * the turn, and the field stayed contorted with nothing on screen left to explain it.
+       */
+      stage.flyPreset(
+        'national',
+        { bounds: US_CONUS_BOUNDS },
+        { mode: 'ease', pitch: camera.pitch, bearing: camera.bearing },
+      );
       setPageReady(true);
       return;
     }
