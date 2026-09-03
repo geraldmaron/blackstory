@@ -145,7 +145,7 @@ test('a record with genuinely no sources says why rather than showing an empty l
 });
 
 test('the plate never claims a cited record has no sources', () => {
-  // The Atlas passes a count without the citations, because the map payload is a count and a
+  // Explore passes a count without the citations, because the map payload is a count and a
   // confidence tier rather than a bibliography. The plate used to read "0 sources / no sources
   // are published for this record yet" directly beneath its own "Grade A · 1 source".
   const html = render({
@@ -278,7 +278,7 @@ test('the story count is stated alongside the heading', () => {
   );
 });
 
-test('a connection with no page of its own still offers selection when the Atlas can select', () => {
+test('a connection with no page of its own still offers selection when Explore can select', () => {
   const html = render({ onSelectConnection: () => {} });
   assert.match(html, /ds-sheet__connection-select/);
 });
@@ -349,4 +349,27 @@ test('without an href the sheet offers no dead link, and the primary slot stays 
   assert.equal(html.includes('Open record'), false);
   assert.equal(html.includes('ds-sheet__name-link'), false);
   assert.match(html, /ds-sheet__action ds-sheet__action--primary[^>]*>Fly to place</);
+});
+
+test('a record with a rights-cleared photo opens on it, credit printed, before the pills', () => {
+  const html = render({
+    photo: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Gaston_Motel.jpg',
+      alt: 'The A.G. Gaston Motel, Birmingham',
+      credit: 'Photo: Carol M. Highsmith, Library of Congress',
+    },
+  });
+  const mast = html.indexOf('ds-sheet__mast');
+  const pills = html.indexOf('Record at a glance');
+  assert.ok(mast >= 0, 'the mast is missing');
+  assert.ok(mast < pills, 'the photo must come before the pills');
+  assert.match(html, /alt="The A\.G\. Gaston Motel, Birmingham"/);
+  assert.match(html, /Carol M\. Highsmith/);
+  assert.match(html, /data-media="photo"/);
+});
+
+test('a record without a photo has no mast at all, not a placeholder', () => {
+  const html = render();
+  assert.doesNotMatch(html, /ds-sheet__mast/);
+  assert.match(html, /data-media="none"/);
 });

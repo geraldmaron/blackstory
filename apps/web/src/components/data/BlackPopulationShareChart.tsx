@@ -4,48 +4,54 @@
  * "Black alone" multiple-race methodology) so it never visually implies perfect comparability
  * across a definition change. Table alternative carries every value.
  */
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import type { NationalPopulationTimelineRow } from '@repo/domain/statistics/public-data-summaries';
 import { DataChartFrame } from './DataChartFrame';
-import {
-  CHART_HEIGHT,
-  CHART_MARGIN,
-  CHART_WIDTH,
-  formatSharePct,
-  plotHeight,
-  plotWidth,
-  scaleLinear,
-} from './chart-utils';
+import { formatSharePct, scaleLinear } from './chart-utils';
+
+/* A half-width figure draws in a narrower box so its labels stay legible beside a sibling. */
+const GEOMETRY = {
+  wide: { width: 640, height: 280, margin: { top: 20, right: 20, bottom: 56, left: 80 } },
+  half: { width: 480, height: 260, margin: { top: 16, right: 16, bottom: 48, left: 56 } },
+} as const;
 
 export type BlackPopulationShareChartProps = {
   readonly rows: readonly NationalPopulationTimelineRow[];
   readonly sources: readonly { readonly label: string; readonly url: string }[];
+  readonly reading?: ReactNode;
+  readonly figureLabel?: string;
+  readonly span?: 'wide' | 'half';
+  readonly id?: string;
 };
 
 function shareValue(row: NationalPopulationTimelineRow): number {
   return row.blackShareOfTotalPct ?? 0;
 }
 
-export function BlackPopulationShareChart({ rows, sources }: BlackPopulationShareChartProps) {
+export function BlackPopulationShareChart({
+  rows,
+  sources,
+  reading,
+  figureLabel,
+  span,
+  id,
+}: BlackPopulationShareChartProps) {
   if (rows.length === 0) {
     return null;
   }
 
+  const {
+    width: CHART_WIDTH,
+    height: CHART_HEIGHT,
+    margin: CHART_MARGIN,
+  } = GEOMETRY[span === 'half' ? 'half' : 'wide'];
+  const plotW = CHART_WIDTH - CHART_MARGIN.left - CHART_MARGIN.right;
+  const plotH = CHART_HEIGHT - CHART_MARGIN.top - CHART_MARGIN.bottom;
   const shares = rows.map(shareValue);
   const domainMin = Math.max(0, Math.floor(Math.min(...shares) - 1));
   const domainMax = Math.ceil(Math.max(...shares) + 1);
-  const xScale = scaleLinear(
-    0,
-    rows.length - 1,
-    CHART_MARGIN.left,
-    CHART_MARGIN.left + plotWidth(),
-  );
-  const yScale = scaleLinear(
-    domainMin,
-    domainMax,
-    CHART_MARGIN.top + plotHeight(),
-    CHART_MARGIN.top,
-  );
+  const xScale = scaleLinear(0, rows.length - 1, CHART_MARGIN.left, CHART_MARGIN.left + plotW);
+  const yScale = scaleLinear(domainMin, domainMax, CHART_MARGIN.top + plotH, CHART_MARGIN.top);
   const yTicks = [domainMin, (domainMin + domainMax) / 2, domainMax];
 
   // Split the polyline into segments broken at every definition boundary (2000).
@@ -60,11 +66,20 @@ export function BlackPopulationShareChart({ rows, sources }: BlackPopulationShar
   });
   if (current.length > 0) segments.push(current.join(' '));
 
-  const labelEvery = (index: number) => index % 2 === 0 || index === rows.length - 1;
+  // Label every fourth decade and the last one, and skip a regular label that would sit on top
+  // of the last: "2010 2020" at half width set as one word.
+  const labelStep = span === 'half' ? 4 : 2;
+  const labelEvery = (index: number) =>
+    index === rows.length - 1 ||
+    (index % labelStep === 0 && rows.length - 1 - index >= Math.ceil(labelStep / 2));
 
   return (
     <DataChartFrame
       title="Share of the U.S. that is Black, 1790 to 2020"
+      {...(reading !== undefined ? { reading } : {})}
+      {...(figureLabel !== undefined ? { figureLabel } : {})}
+      {...(span !== undefined ? { span } : {})}
+      {...(id !== undefined ? { id } : {})}
       caption={
         'Black share of the total U.S. population in each census. The line breaks at 2000, when ' +
         '“Black alone” and multiple-race answers began, a definition change, not a missing year.'
@@ -133,11 +148,16 @@ export function BlackPopulationShareChart({ rows, sources }: BlackPopulationShar
         {rows.map((row, index) => (
           <g key={row.decade}>
             <circle
+              className="ds-data-chart__mark"
               cx={xScale(index)}
               cy={yScale(shareValue(row))}
-              r={3}
+              r={4}
               fill="var(--ds-accent-graphic)"
-            />
+              stroke="var(--ds-surface)"
+              strokeWidth={2}
+            >
+              <title>{`${row.decade}: ${formatSharePct(row.blackPopulation, row.totalPopulation)}`}</title>
+            </circle>
             {labelEvery(index) ? (
               <text
                 className="ds-data-chart__axis-label"
@@ -153,9 +173,9 @@ export function BlackPopulationShareChart({ rows, sources }: BlackPopulationShar
         <text
           className="ds-data-chart__axis-label"
           x={12}
-          y={CHART_MARGIN.top + plotHeight() / 2}
+          y={CHART_MARGIN.top + plotH / 2}
           textAnchor="middle"
-          transform={`rotate(-90 12 ${CHART_MARGIN.top + plotHeight() / 2})`}
+          transform={`rotate(-90 12 ${CHART_MARGIN.top + plotH / 2})`}
         >
           Share of population
         </text>

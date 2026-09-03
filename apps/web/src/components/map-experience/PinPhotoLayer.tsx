@@ -1,19 +1,19 @@
 /**
  * Fetches a surface's pin photo index (lazily, once, on the first hover/focus intent) and mounts
  * one `PinPhotoCard` near whichever pin currently has hover/focus — never more than one. Shared by
- * the Door (`DoorImmersive`, fed by `usePinPhotoHoverAnchor`) and the Atlas (`AtlasExperience`,
+ * the Door (`DoorImmersive`, fed by `usePinPhotoHoverAnchor`) and Explore (`AtlasExperience`,
  * fed by `MapStage`'s `pinHover` event); both pass a hover target shaped the same way and their
  * own surface's photo endpoint (`/door/photos` or `/atlas/photos`).
  *
  * Portaled to `document.body` and positioned in viewport pixels from the anchor pin's own
  * `getBoundingClientRect()`, so it renders correctly regardless of any transform/zoom context the
- * anchor sits inside (the Door's layout-zoomed board, the Atlas's MapLibre canvas).
+ * anchor sits inside (the Door's layout-zoomed board, Explore's MapLibre canvas).
  */
 'use client';
 
-import React, { useEffect, useRef, useState, type CSSProperties } from 'react';
+import React, { useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
-import type { PinPhotoView } from '../../lib/map-experience/entity-photo-index';
+import { usePhotoIndex } from '../../lib/map-experience/use-photo-index';
 import { PinPhotoCard } from './PinPhotoCard';
 
 void React;
@@ -57,26 +57,10 @@ export type PinPhotoLayerProps = {
 };
 
 export function PinPhotoLayer({ target, photosUrl }: PinPhotoLayerProps) {
-  const [photos, setPhotos] = useState<Readonly<Record<string, PinPhotoView>> | null>(null);
+  // One shared, lazy fetch per surface (`use-photo-index.ts`): the record sheet's mast reads the
+  // same index, so the hover card and the sheet never request it twice. Fails closed to no card.
+  const photos = usePhotoIndex(photosUrl, target !== null);
   const [exhaustedKey, setExhaustedKey] = useState<string | null>(null);
-  const fetchStartedRef = useRef(false);
-
-  useEffect(() => {
-    if (!target || fetchStartedRef.current) return;
-    fetchStartedRef.current = true;
-    let cancelled = false;
-    fetch(photosUrl)
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data: Readonly<Record<string, PinPhotoView>> | null) => {
-        if (!cancelled && data) setPhotos(data);
-      })
-      .catch(() => {
-        // Fail closed: no card is exactly as before this feature existed.
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [target, photosUrl]);
 
   if (typeof document === 'undefined') return null;
   if (!target || !photos) return null;

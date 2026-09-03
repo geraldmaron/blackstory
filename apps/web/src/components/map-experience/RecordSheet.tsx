@@ -20,11 +20,22 @@
  *
  * The precision note is not optional and not editorial. It is the archive stating what its own
  * pin means, and it renders for every record including ones with a well-known address.
+ *
+ * The mast. When the release carries a rights-cleared photograph for the record, the sheet opens
+ * on it, the way the place page does: the photo is the first thing a reader sees, with the credit
+ * printed on it, and the pills and name sit directly beneath. It is the same photo, the same
+ * candidate chain and the same credit logic as the place page's mast and the pin hover card, so a
+ * reader who meets the picture on a pin, in the sheet and on the page meets one picture. Without
+ * a photo there is no mast at all: a symbolic mark in a 430px instrument is 170px of house
+ * device, and the sheet is better served by the name arriving sooner.
  */
 'use client';
 
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { cx } from '@repo/ui';
+import type { PinPhotoView } from '../../lib/map-experience/entity-photo-index';
+import { buildEntityMastImageCandidates } from '../entity/entity-mast-image-candidates';
+import { entityPrimaryImageAlt, primaryImageCreditCaption } from '../entity/record-mark';
 import {
   RecordAnatomyPanel,
   type RecordAnatomyFact,
@@ -106,7 +117,7 @@ export type SheetRecord = {
   readonly connections: readonly SheetConnection[];
   /**
    * Stories that cite this record (SP-20). Optional so every existing caller keeps compiling
-   * and simply renders no citation list; the Atlas and `/entity/[id]` supply it.
+   * and simply renders no citation list; Explore and `/entity/[id]` supply it.
    */
   readonly citingStories?: readonly SheetCitingStory[];
   readonly anatomyPlace?: RecordAnatomyPlace;
@@ -116,6 +127,8 @@ export type SheetRecord = {
 
 export type RecordSheetProps = {
   readonly record: SheetRecord | null;
+  /** The record's rights-cleared photo from the surface's photo index, when it has one. */
+  readonly photo?: PinPhotoView | null;
   readonly onClose: () => void;
   /** Position within the current lens, 1-based. */
   readonly position?: { readonly index: number; readonly total: number };
@@ -125,7 +138,7 @@ export type RecordSheetProps = {
   readonly saved?: boolean;
   readonly onCite?: () => void;
   readonly onShare?: () => void;
-  /** Selects a connected record on the plate instead of navigating away from the Atlas. */
+  /** Selects a connected record on the plate instead of navigating away from the map. */
   readonly onSelectConnection?: (entityId: string) => void;
   readonly className?: string;
 };
@@ -159,8 +172,53 @@ function gradeWordOf(evidenceLabel: string): string {
   return evidenceLabel.split(' · ')[0] ?? evidenceLabel;
 }
 
+/**
+ * The photo mast. Walks the same candidate chain as `EntityMastMedia`; when every candidate has
+ * failed it renders nothing, and the sheet closes up as if the record had no photo.
+ */
+function SheetMast({
+  entityId,
+  entityName,
+  photo,
+}: {
+  readonly entityId: string;
+  readonly entityName: string;
+  readonly photo: PinPhotoView;
+}) {
+  const candidates = React.useMemo(() => buildEntityMastImageCandidates(photo.url), [photo.url]);
+  const [urlIndex, setUrlIndex] = useState(0);
+
+  useEffect(() => {
+    setUrlIndex(0);
+  }, [photo.url, entityId]);
+
+  if (candidates.length === 0 || urlIndex >= candidates.length) return null;
+
+  const src = candidates[urlIndex]!;
+  const alt = entityPrimaryImageAlt(photo.alt, entityName);
+  const caption = primaryImageCreditCaption({ credit: photo.credit, rightsStatus: 'licensed' });
+
+  return (
+    <figure className="ds-sheet__mast">
+      {/* eslint-disable-next-line @next/next/no-img-element -- public CDN URL, the record's own photo */}
+      <img
+        key={src}
+        className="ds-sheet__photo"
+        src={src}
+        alt={alt}
+        decoding="async"
+        onError={() => setUrlIndex((current) => current + 1)}
+      />
+      {caption.creditText ? (
+        <figcaption className="ds-sheet__credit">{caption.creditText}</figcaption>
+      ) : null}
+    </figure>
+  );
+}
+
 export function RecordSheet({
   record,
+  photo,
   onClose,
   position,
   onStep,
@@ -277,8 +335,12 @@ export function RecordSheet({
         </button>
       </div>
 
-      <div className="ds-sheet__body">
-        <div>
+      <div className="ds-sheet__body" data-media={photo ? 'photo' : 'none'}>
+        {photo ? (
+          <SheetMast key={record.id} entityId={record.id} entityName={record.name} photo={photo} />
+        ) : null}
+
+        <div className="ds-sheet__identity">
           <div className="ds-rec-pills ds-sheet__pills" aria-label="Record at a glance">
             <RecordKindPill
               kind={record.kind}
@@ -461,7 +523,7 @@ export function RecordSheet({
                      * A real anchor even when selecting in place is the primary action: the
                      * connected record HAS a page, and a reader who middle-clicks or copies the
                      * link should get it. The click handler intercepts the plain left-click only,
-                     * because staying on the Atlas and flying to the neighbour is the better
+                     * because staying on the map and flying to the neighbour is the better
                      * answer for the reader who is comparing two pins.
                      */
                     <a

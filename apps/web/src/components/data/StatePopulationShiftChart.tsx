@@ -2,7 +2,7 @@
  * Diverging horizontal bar chart of state-level Black population movers for one decade pair.
  * Gains extend right, losses extend left — presence framing, no crime-heat red.
  */
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { DataChartFrame } from './DataChartFrame';
 import { CHART_MARGIN, CHART_WIDTH, formatChartCount, scaleLinear } from './chart-utils';
 import {
@@ -20,12 +20,18 @@ const CENTER_GUTTER = 8;
 // than the numeric axis labels the shared CHART_MARGIN.left is sized for — use a wider
 // label column here so long names don't get clipped against the SVG's left edge.
 const LABEL_MARGIN_LEFT = 152;
+// Space reserved beyond the longest bar for its value label, so the label never clips.
+const VALUE_LABEL_ROOM = 64;
 
 export type StatePopulationShiftChartProps = {
   readonly fromDecade: string;
   readonly toDecade: string;
   readonly changes: readonly StateChangeLike[];
   readonly stateNameByFips: Readonly<Record<string, string>>;
+  readonly sources?: readonly { readonly label: string; readonly url: string }[];
+  readonly reading?: ReactNode;
+  readonly figureLabel?: string;
+  readonly id?: string;
 };
 
 function formatSignedPp(value: number): string {
@@ -78,12 +84,15 @@ function StateShiftBars({
               {row.stateName}
             </text>
             <rect
+              className="ds-data-chart__mark"
               x={barX}
               y={y - 10}
               width={Math.max(magnitude, 1)}
               height={20}
-              fill={isGain ? 'var(--ds-accent-graphic)' : 'var(--ds-accent-muted)'}
-            />
+              fill={isGain ? 'var(--ds-accent-graphic)' : 'var(--ds-viz-3)'}
+            >
+              <title>{formatStateChangeLine(row, row.stateName)}</title>
+            </rect>
             <text
               className="ds-data-chart__axis-label"
               x={isGain ? barX + magnitude + 6 : barX - 6}
@@ -104,6 +113,10 @@ export function StatePopulationShiftChart({
   toDecade,
   changes,
   stateNameByFips,
+  sources,
+  reading,
+  figureLabel,
+  id,
 }: StatePopulationShiftChartProps) {
   const rows = buildStateShiftBarRows(changes, stateNameByFips);
   if (rows.length === 0) {
@@ -114,17 +127,21 @@ export function StatePopulationShiftChart({
   const plotHeight = rows.length * ROW_HEIGHT;
   const plotWidth = CHART_WIDTH - LABEL_MARGIN_LEFT - CHART_MARGIN.right;
   const centerX = LABEL_MARGIN_LEFT + plotWidth / 2;
-  const barMaxWidth = plotWidth / 2 - CENTER_GUTTER;
+  const barMaxWidth = plotWidth / 2 - CENTER_GUTTER - VALUE_LABEL_ROOM;
   const viewHeight = CHART_MARGIN.top + plotHeight + CHART_MARGIN.bottom;
 
   return (
     <DataChartFrame
-      title={`Where Black population rose or fell, ${fromDecade}–${toDecade}`}
+      title={`Where Black population rose or fell, ${fromDecade} to ${toDecade}`}
+      {...(sources !== undefined ? { sources } : {})}
+      {...(reading !== undefined ? { reading } : {})}
+      {...(figureLabel !== undefined ? { figureLabel } : {})}
+      {...(id !== undefined ? { id } : {})}
       caption={`States with the largest gains or losses in Black population between ${fromDecade} and ${toDecade}. Bars go right for gains and left for losses. Share change is percentage points of each state’s total population.`}
       ariaLabel={`Diverging bar chart of state Black population change from ${fromDecade} to ${toDecade}`}
       textAlternative={
         <table className="ds-data-chart__table">
-          <caption>{`Where Black population rose or fell, ${fromDecade}–${toDecade}`}</caption>
+          <caption>{`Where Black population rose or fell, ${fromDecade} to ${toDecade}`}</caption>
           <thead>
             <tr>
               <th scope="col">State or territory</th>
@@ -145,7 +162,7 @@ export function StatePopulationShiftChart({
       }
     >
       <svg
-        className="ds-data-chart__svg"
+        className="ds-data-chart__svg ds-data-chart__svg--ledger"
         viewBox={`0 0 ${CHART_WIDTH} ${viewHeight}`}
         role="img"
         aria-hidden="true"
@@ -179,7 +196,7 @@ export function StatePopulationShiftChart({
         <li className="ds-data-chart__legend-item">
           <span
             className="ds-data-chart__legend-swatch"
-            style={{ background: 'var(--ds-accent-muted)' }}
+            style={{ background: 'var(--ds-viz-3)' }}
           />
           Black population losses
         </li>

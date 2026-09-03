@@ -1,50 +1,161 @@
 /**
- * Styles for server-rendered SVG charts on the public `/data` page — flat matte fills,
- * hairline rules, mono axis labels, copper data marks only.
+ * The Data Figure (`.ds-datafig`) and the marks inside it. Flat matte fills, hairline rules,
+ * mono axis labels, brand series colours only (ink, copper, stone, sand via `--ds-viz-*`).
+ *
+ * A figure is not a card. It sits on the page ground with one hairline above it, the way a
+ * figure sits in a printed report: the frame is the rule, the title and the source line. A
+ * boxed panel per chart, inside a boxed panel per section, is what this file replaced.
  */
 
-.ds-data-section__viz {
+/* —— the figure ————————————————————————————————————————————————————————————— */
+
+.ds-datafig {
   display: grid;
-  gap: var(--ds-space-8);
-  margin-top: var(--ds-space-6);
-}
-
-@media (min-width: 48rem) {
-  .ds-data-section__viz--pair {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.ds-data-chart {
+  gap: var(--ds-space-4);
   margin: 0;
-  padding: var(--ds-space-5) 0 0;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
+  padding-top: var(--ds-space-5);
   min-width: 0;
   max-width: 100%;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  scroll-margin-top: 112px;
 }
 
-.ds-data-chart__title {
-  margin: 0 0 var(--ds-space-4);
+.ds-datafig__head {
+  display: grid;
+  gap: var(--ds-space-2);
+  max-width: 60ch;
+}
+
+.ds-datafig__label {
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-datafig__title {
+  font-family: var(--ds-font-display);
+  font-size: 1.1875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ds-ink);
+  text-wrap: balance;
+}
+
+.ds-datafig__reading {
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--ds-ink);
+}
+
+.ds-datafig__viz {
+  min-width: 0;
+  max-width: 100%;
+  /* Nested chart scroll only: the figure must never widen the page. */
+  overflow-x: auto;
+}
+
+.ds-datafig__caption {
+  margin: 0;
+  max-width: 62ch;
+  font-family: var(--ds-font-editorial);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+.ds-datafig__caption .ds-data-chart__meta {
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
-  font-weight: 500;
+  color: var(--ds-ink-muted);
+}
+
+.ds-datafig__source.ds-citation--compact {
+  margin-top: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+}
+
+.ds-datafig__source.ds-citation--compact .ds-citation__label {
+  font-size: 0.625rem;
+}
+
+/* The numbers: a native disclosure, closed by default. The summary reads like the source line
+   above it so the figure's foot is one quiet mono register, with the copper mark the only cue. */
+.ds-datafig__numbers {
+  margin: 0;
+}
+
+.ds-datafig__numbers-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  padding: 6px 0;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 
-.ds-data-chart__viz {
-  min-width: 0;
-  max-width: 100%;
-  /* Nested chart scroll only — must not widen the page. */
+.ds-datafig__numbers-summary::-webkit-details-marker {
+  display: none;
+}
+
+.ds-datafig__numbers-summary::before {
+  content: '+';
+  color: var(--ds-accent);
+  font-size: 0.875rem;
+}
+
+.ds-datafig__numbers[open] > .ds-datafig__numbers-summary::before {
+  content: '–';
+}
+
+.ds-datafig__numbers-summary:hover {
+  color: var(--ds-ink);
+}
+
+.ds-datafig__numbers-summary:focus-visible {
+  outline: var(--ds-focus-width, 2px) solid var(--ds-focus-ring, var(--ds-accent));
+  outline-offset: 2px;
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-datafig__numbers-body {
+  margin-top: var(--ds-space-3);
   overflow-x: auto;
 }
+
+/* —— the marks —————————————————————————————————————————————————————————————— */
 
 .ds-data-chart__svg {
   display: block;
   width: 100%;
-  max-width: min(100%, 40rem);
   height: auto;
+  overflow: visible;
+}
+
+.ds-data-chart__svg--wide {
+  max-width: 100%;
+}
+
+/* 24 decades in a 960-wide viewBox: let the spine render close to 1:1 so the mono labels stay
+   legible instead of downscaling to six pixels. */
+.ds-data-chart__svg--spine {
+  max-width: 100%;
+}
+
+/* The state ledger is a 640-wide viewBox of 28px rows; stretched across a 900px measure the
+   rows read as a poster. Cap it near 1:1. */
+.ds-data-chart__svg--ledger {
+  max-width: min(100%, 44rem);
 }
 
 .ds-data-chart__axis-label {
@@ -58,10 +169,24 @@
   stroke-width: 1;
 }
 
+/* Hover layer: the SVG marks carry a native `<title>`; on pointer hover the mark lifts a step
+   so the reader can see which bar the tooltip names. */
+.ds-data-chart__mark {
+  transition: opacity var(--ds-duration-fast, 120ms) var(--ds-easing, ease);
+}
+
+.ds-data-chart__svg:hover .ds-data-chart__mark {
+  opacity: 0.72;
+}
+
+.ds-data-chart__svg .ds-data-chart__mark:hover {
+  opacity: 1;
+}
+
 .ds-data-chart__legend {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--ds-space-4);
+  gap: var(--ds-space-2) var(--ds-space-4);
   margin: var(--ds-space-3) 0 0;
   padding: 0;
   list-style: none;
@@ -72,141 +197,79 @@
   align-items: center;
   gap: var(--ds-space-2);
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: var(--ds-ink-muted);
 }
 
 .ds-data-chart__legend-swatch {
   flex: 0 0 auto;
-  width: 0.75rem;
-  height: 0.75rem;
-  border: var(--ds-border-width) solid var(--ds-rule);
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 2px;
 }
 
-.ds-data-chart__caption {
-  margin: var(--ds-space-4) 0 0;
-  color: var(--ds-ink-muted);
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-
-.ds-data-chart__source {
-  margin-top: var(--ds-space-2);
-}
-
+/* The table inside the numbers disclosure. */
 .ds-data-chart__table {
   width: 100%;
   border-collapse: collapse;
   font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-data-chart__table caption {
+  padding-bottom: var(--ds-space-2);
+  text-align: left;
+  font-family: var(--ds-font-sans);
   font-size: 0.8125rem;
+  color: var(--ds-ink-muted);
 }
 
 .ds-data-chart__table th,
 .ds-data-chart__table td {
-  padding: var(--ds-space-2) var(--ds-space-3);
-  border: var(--ds-border-width) solid var(--ds-rule);
+  padding: 6px var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.ds-data-chart__table td,
+.ds-data-chart__table tbody th {
+  text-align: right;
+}
+
+.ds-data-chart__table tbody th:first-child,
+.ds-data-chart__table td:first-child {
   text-align: left;
 }
 
-.ds-data-chart__table th {
+.ds-data-chart__table thead th {
   color: var(--ds-ink-muted);
   font-weight: 500;
-}
-
-.ds-data-comparability-note {
-  margin-top: var(--ds-space-4);
-  color: var(--ds-ink-muted);
-  font-size: 0.875rem;
-  line-height: 1.5;
-  max-width: 42rem;
-}
-
-.ds-data-state-shift {
-  margin-top: var(--ds-space-8);
-  padding-top: var(--ds-space-6);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-data-opportunity-charts {
-  display: grid;
-  gap: var(--ds-space-8);
-}
-
-.ds-data-state-shift__title {
-  margin: 0 0 var(--ds-space-2);
-  font-size: 0.9375rem;
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  line-height: 1.35;
-}
-
-.ds-data-state-shift__lede {
-  margin: 0 0 var(--ds-space-5);
-  max-width: 40rem;
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-
-.ds-data-state-shift__columns {
-  display: grid;
-  gap: var(--ds-space-6);
-}
-
-@media (min-width: 48rem) {
-  .ds-data-state-shift__columns {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.ds-data-state-shift__kicker {
-  margin: 0 0 var(--ds-space-3);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--ds-ink-muted);
+  font-size: 0.625rem;
 }
 
-.ds-data-state-shift__list {
-  margin: 0;
-  padding-left: 1.25rem;
-  font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
-  line-height: 1.55;
-  color: var(--ds-ink);
-}
-
-.ds-data-state-shift__list li + li {
-  margin-top: var(--ds-space-2);
-}
-
-.ds-data-chart__svg--wide {
-  max-width: min(100%, 45rem);
-}
-
-/*
- * Spine chart (Black population by decade): viewBox is 960 wide to fit 24 census
- * decades. Capping at 40rem forced a ~0.57 downscale, shrinking mono axis labels to
- * ~6px. Let it render close to 1:1 so the section's primary chart stays legible.
- */
-.ds-data-chart__svg--spine {
-  max-width: min(100%, 60rem);
+.ds-data-chart__table thead th:not(:first-child) {
+  text-align: right;
 }
 
 .ds-data-chart__meta {
   font-family: var(--ds-font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
 }
+
+/* —— the race pair: two horizontal bars and a ratio ————————————————————————— */
 
 .ds-data-chart__pair-bars {
   display: grid;
-  gap: var(--ds-space-4);
-  max-width: 40rem;
+  gap: var(--ds-space-3);
 }
 
 .ds-data-chart__pair-row {
   display: grid;
-  grid-template-columns: minmax(6rem, 8rem) 1fr minmax(5rem, 7rem);
+  grid-template-columns: minmax(7rem, 11rem) 1fr minmax(5.5rem, 7rem);
   gap: var(--ds-space-3);
   align-items: center;
 }
@@ -214,7 +277,7 @@
 @media (max-width: 36rem) {
   .ds-data-chart__pair-row {
     grid-template-columns: 1fr;
-    gap: var(--ds-space-2);
+    gap: var(--ds-space-1);
   }
 }
 
@@ -226,26 +289,51 @@
 }
 
 .ds-data-chart__pair-track {
-  min-height: 1.25rem;
+  min-height: 1.5rem;
   background: var(--ds-surface-raised, var(--ds-surface));
-  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: 2px;
 }
 
 .ds-data-chart__pair-bar {
   display: block;
-  min-height: 1.25rem;
+  min-height: 1.5rem;
+  border-radius: 2px;
 }
 
 .ds-data-chart__pair-value {
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  color: var(--ds-ink-muted);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
   text-align: right;
 }
 
 .ds-data-chart__ratio {
-  margin: var(--ds-space-3) 0 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-2);
+  margin: var(--ds-space-4) 0 0;
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
   color: var(--ds-ink-muted);
+}
+
+.ds-data-chart__ratio-value {
+  font-family: var(--ds-font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ds-ink);
+}
+
+.ds-data-page__theme-link {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-data-chart__mark {
+    transition-duration: 0.01ms;
+  }
 }

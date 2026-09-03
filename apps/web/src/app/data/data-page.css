@@ -1,145 +1,343 @@
 /**
- * `/data` layout — the wrapper/scaffolding classes DataSections.tsx renders around kit
- * components (GroupHeading, UtilityCard, Note, Disclosure, DataTable) that already carry their
- * own styling from room-kit.css. This file owns only what those components don't: panel framing
- * per the Ink "chart frames follow the panel recipe" direction, the beat grid, the on-page nav,
- * and the couple of plain-text lines (credit, empty state) — none of which had any CSS at all
- * before this file existed.
+ * `/data` — the reference ledger's own layout, over the room kit.
  *
- * Named data-page.css, not data-edition.css: room-kit.test.tsx's structural guard forbids new
- * `*-edition.css` files under `app/`. This sheet happens to style classes an earlier pass named
- * `ds-data-edition__*`; renaming all seventeen JSX class references was out of scope for
- * supplying the CSS that was missing for every one of them.
+ * Three things live here that no other room has: the headline band (four figures a reader can
+ * take away without opening a chart), the sticky section rail, and the section anatomy that
+ * holds figures in a one- or two-column grid. The figures themselves are drawn by
+ * `components/data/data-charts.css`; this sheet only places them.
+ *
+ * Named data-page.css, not data-edition.css: room-kit.test.tsx forbids new `*-edition.css`
+ * files under `app/`.
  */
 
-.ds-data-edition__stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-10);
-}
-
-/* Chart frames follow the panel recipe: panel ground, one hairline, radius-md. */
-.ds-data-edition__panel {
-  padding: var(--ds-space-6);
-  background: var(--ds-surface);
-  border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-md);
-}
-
-/* ChartCard's heading is one text node, "{kicker} · {title}" (e.g. "BJS · USSC ·
-   Imprisonment and federal drug sentences"), with no element boundary CSS can use to keep the
-   kicker and its separator from being orphaned alone on the first line at narrow widths.
-   text-wrap: balance distributes the line breaks evenly instead, so "BJS · USSC ·" never sits
-   alone above the title. Unsupported browsers fall back to normal wrapping, which is the
-   pre-existing behaviour. */
-.ds-data-edition__panel .ds-room-grouphd {
-  text-wrap: balance;
-}
-
-.ds-data-edition__viz {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-5);
-  margin-block: var(--ds-space-4);
-}
-
-/* Same 1px-gap-as-hairline technique as the kit's TrustBlock/Anatomy and the article stat
-   rail: the gap is the rule color showing through between cells. */
-.ds-data-edition__beat-grid {
+/* —— the headline band ——————————————————————————————————————————————————————
+   Four numbers, each a link into the figure that carries it. Mono value in the display face at
+   a size the page never reaches again, then a sans label and a mono source line. The band is
+   hairline-ruled like a table: it is the page's own table of contents, in numbers. */
+.ds-data-headlines {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  grid-template-columns: 1fr;
+  margin: var(--ds-space-8) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--ds-border-width) solid var(--ds-ink);
+}
+
+@media (min-width: 40rem) {
+  .ds-data-headlines {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--ds-space-8);
+  }
+}
+
+@media (min-width: 64rem) {
+  .ds-data-headlines {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--ds-space-6);
+  }
+}
+
+.ds-data-headline {
+  display: block;
+  min-width: 0;
+  padding: var(--ds-space-5) 0 var(--ds-space-5);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-data-headline:hover .ds-data-headline__value,
+.ds-data-headline:focus-visible .ds-data-headline__value {
+  color: var(--ds-accent);
+}
+
+.ds-data-headline:focus-visible {
+  outline: var(--ds-focus-width, 2px) solid var(--ds-focus-ring, var(--ds-accent));
+  outline-offset: 4px;
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-data-headline__value {
+  display: block;
+  font-family: var(--ds-font-display);
+  font-size: clamp(2rem, 1.4rem + 2.2vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+  transition: color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-data-headline__unit {
+  font-size: 0.5em;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ds-ink-muted);
+  margin-left: 0.15em;
+}
+
+.ds-data-headline__label {
+  display: block;
+  margin-top: var(--ds-space-3);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--ds-ink);
+}
+
+.ds-data-headline__source {
+  display: block;
+  margin-top: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: var(--ds-ink-muted);
+}
+
+/* —— the section rail ———————————————————————————————————————————————————————
+   Sticky under the command bar. A running head, not a menu: mono caps, hairline below, the
+   current section in ink with a copper underline. */
+.ds-data-nav {
+  position: sticky;
+  top: 64px;
+  z-index: var(--ds-z-content, 1);
+  margin: var(--ds-space-8) calc(var(--ds-gutter) * -1) 0;
+  padding: 0 var(--ds-gutter);
+  background: color-mix(in srgb, var(--ds-canvas) 92%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-data-nav__list {
+  display: flex;
+  gap: var(--ds-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.ds-data-nav__list::-webkit-scrollbar {
+  display: none;
+}
+
+.ds-data-nav__link {
+  display: inline-block;
+  padding: 12px 0 10px;
+  border-bottom: 2px solid transparent;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ds-ink-muted);
+  text-decoration: none;
+  transition:
+    color var(--ds-duration-fast) var(--ds-easing),
+    border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-data-nav__link:hover {
+  color: var(--ds-ink);
+}
+
+.ds-data-nav__link[aria-current='location'] {
+  color: var(--ds-ink);
+  border-bottom-color: var(--ds-accent-graphic);
+}
+
+.ds-data-nav__link:focus-visible {
+  outline: var(--ds-focus-width, 2px) solid var(--ds-focus-ring, var(--ds-accent));
+  outline-offset: 2px;
+  border-radius: var(--ds-radius-sm);
+}
+
+/* —— a section ————————————————————————————————————————————————————————————— */
+.ds-data-section {
+  margin-top: var(--ds-space-14, 72px);
+  scroll-margin-top: 120px;
+}
+
+.ds-data-section__head {
+  display: grid;
+  gap: var(--ds-space-2);
+  max-width: 62ch;
+  margin-bottom: var(--ds-space-6);
+}
+
+.ds-data-section__kicker {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-room .ds-data-section__title {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: var(--ds-font-display);
+  font-size: clamp(1.625rem, 1.3rem + 1.2vw, 2.125rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: var(--ds-ink);
+}
+
+.ds-data-section__lede {
+  margin: var(--ds-space-1) 0 0;
+  font-family: var(--ds-font-editorial);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--room-ink-2, var(--ds-ink));
+}
+
+.ds-data-section__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: var(--ds-space-2) 0 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: var(--ds-ink-muted);
+}
+
+/* The figure grid: one column, or two where the section asks for it and the room is wide.
+   A half figure shares a row; a wide figure always spans. */
+.ds-data-section__figures {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ds-space-8) var(--ds-space-8);
+}
+
+@media (min-width: 56rem) {
+  .ds-data-section__figures {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ds-data-section__figures > .ds-datafig:not(.ds-datafig--half) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* —— the change ledger: three decade deltas as a figure body ——————————————— */
+.ds-data-deltas {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-data-delta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--ds-space-1) var(--ds-space-4);
+  padding: var(--ds-space-3) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-data-delta:last-child {
+  border-bottom: 0;
+}
+
+.ds-data-delta__label {
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  color: var(--ds-ink);
+}
+
+.ds-data-delta__value {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  align-self: center;
+  font-family: var(--ds-font-display);
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+  text-align: right;
+}
+
+.ds-data-delta__note {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
+/* —— the reading rules —————————————————————————————————————————————————————— */
+.ds-data-rules {
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 1px;
-  margin: var(--ds-space-6) 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
   background: var(--ds-rule);
   border: var(--ds-border-width) solid var(--ds-rule);
-  border-radius: var(--ds-radius-sm);
+  border-radius: var(--ds-radius-md);
   overflow: hidden;
 }
 
-.ds-data-edition__beat {
-  padding: var(--ds-space-3) var(--ds-space-4);
-  background: var(--ds-surface-raised);
+@media (min-width: 48rem) {
+  .ds-data-rules {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
-.ds-data-edition__beat-kicker {
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ds-accent);
+.ds-data-rule {
+  padding: var(--ds-space-5);
+  background: var(--ds-surface);
 }
 
-.ds-data-edition__beat-body {
-  margin: 4px 0 0;
-  font-family: var(--ds-font-sans);
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: var(--ds-ink-muted);
-}
-
-.ds-data-edition__nav {
-  margin-top: var(--ds-space-6);
-  padding-top: var(--ds-space-5);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-}
-
-.ds-data-edition__nav-title {
+.ds-data-rule__kicker {
   margin: 0 0 var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-family: var(--ds-font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ds-ink);
+}
+
+.ds-data-rule__body {
+  margin: 0;
+  font-family: var(--ds-font-editorial);
+  font-size: 0.9375rem;
+  line-height: 1.55;
   color: var(--ds-ink-muted);
 }
 
-.ds-data-edition__nav-list {
+.ds-data-reading__links {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--ds-space-2) var(--ds-space-4);
+  gap: var(--ds-space-2);
+  margin: var(--ds-space-6) 0 0;
+}
+
+.ds-data-empty {
   margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ds-data-edition__nav-link {
+  padding: var(--ds-space-5);
+  border: var(--ds-border-width) dashed var(--ds-rule);
+  border-radius: var(--ds-radius-md);
   font-family: var(--ds-font-sans);
-  font-size: 13.5px;
-  color: var(--ds-accent);
-  text-decoration: none;
-}
-
-.ds-data-edition__nav-link:hover {
-  text-decoration: underline;
-}
-
-.ds-data-edition__credit {
-  margin: var(--ds-space-5) 0 0;
-  font-family: var(--ds-font-mono);
-  font-size: 10.5px;
-  color: var(--ds-ink-muted);
-}
-
-.ds-data-edition__credit a {
-  color: var(--ds-accent);
-}
-
-.ds-data-edition__empty {
-  margin: 0;
-  font-family: var(--ds-font-sans);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.5;
   color: var(--ds-ink-muted);
 }
 
-.ds-data-edition__empty a {
-  color: var(--ds-accent);
-}
-
-@media (max-width: 30rem) {
-  .ds-data-edition__beat-grid {
-    grid-template-columns: 1fr;
+@media (prefers-reduced-motion: reduce) {
+  .ds-data-headline,
+  .ds-data-headline__value,
+  .ds-data-nav__link {
+    transition-duration: 0.01ms;
   }
 }

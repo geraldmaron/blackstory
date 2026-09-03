@@ -1,424 +1,451 @@
 /**
- * Data page body: chart stack rendered through the v9 room kit.
+ * `/data` body: the headline band, the section rail, four sections of figures, and the reading
+ * rules.
  *
- * Each chart lives in its own card, and every card carries, in this order: the chart as static
- * SVG, a mono source label, a mono as-of line, a plain-language reading of what the chart does
- * and does not say, and a "Show the numbers" disclosure holding the table. No value is
- * hover-only or colour-only: every series here is readable from the disclosure table alone.
+ * Every figure renders through `DataChartFrame`, which is the Data Figure anatomy: label, title,
+ * reading, graphic, caption, source, numbers. This file decides which figures a section holds,
+ * writes each figure's reading sentence from the data it was given, and places the figures in a
+ * one- or two-column grid. It draws no chart of its own.
  *
- * The kind composition graph that once lived here does not exist. This page keeps the
- * national series. It does not send a reader to the record list for a counted breakdown.
+ * The section carries the as-of date once, in its head. The figure carries the source, because
+ * two figures in one section can come from two agencies and a source line that names both under
+ * each is a source line that names neither.
  */
-import type { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
+import Link from 'next/link';
 import type {
-  HistoricalStatePopulationCoverage,
   NationalPopulationTimelineRow,
   StatePopulationChange,
 } from '@repo/domain/statistics/public-data-summaries';
-import type { DataPageIndicatorBundle } from '@repo/domain/statistics/data-page-series';
+import type {
+  DataPageGroupedBarSeries,
+  DataPageIndicatorBundle,
+  DataPageRacePairSeries,
+} from '@repo/domain/statistics/data-page-series';
 import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
-import { DataStatStrip } from '../../components/data/DataStatStrip';
+import { DataChartFrame } from '../../components/data/DataChartFrame';
 import { GroupedBarIndicatorChart } from '../../components/data/GroupedBarIndicatorChart';
 import { PopulationByDecadeChart } from '../../components/data/PopulationByDecadeChart';
-import { RacePairComparisonChart } from '../../components/data/RacePairComparisonChart';
-import { StatePopulationShift } from '../../components/data/StatePopulationShift';
-import { formatDataPageValue } from '../../components/data/chart-utils';
-import type { DataSourceRef } from '../../components/data/SourceFootnote';
-import { humanSourceLabel } from '../../components/data/SourceFootnote';
-import '../../components/data/data-charts.css';
-import { DATA_ORIENTATION_BEATS, DATA_PAGE_SECTIONS, DATA_SECTION_COPY } from './data-copy';
 import {
-  DataTable,
-  Disclosure,
-  GroupHeading,
-  Note,
-  Prose,
-  UtilityCard,
-  type DataTableColumn,
-} from '../../components/room';
+  isRatioLabel,
+  RacePairComparisonChart,
+} from '../../components/data/RacePairComparisonChart';
+import { StatePopulationShiftChart } from '../../components/data/StatePopulationShiftChart';
+import { formatDataPageValue, formatSharePct } from '../../components/data/chart-utils';
+import { rankStateMovers } from '../../components/data/population-change';
+import type { DataSourceRef } from '../../components/data/SourceFootnote';
+import '../../components/data/data-charts.css';
+import {
+  DATA_PAGE_SECTIONS,
+  DATA_READING_LINKS,
+  DATA_READING_RULES,
+  DATA_SECTION_COPY,
+  type DataPageSectionId,
+} from './data-copy';
+import { DataPageNav } from './DataPageNav';
 
-export type DataStatStripItem = {
+void React;
+
+export type DataHeadline = {
+  readonly id: string;
+  /** The number, already formatted. */
+  readonly value: string;
+  /** A short unit or qualifier printed small beside the value: "%", "×", "million". */
+  readonly unit?: string;
+  readonly label: string;
+  readonly source: string;
+  /** Anchor of the figure or section that carries this number. */
+  readonly href: string;
+};
+
+export type DataDeltaItem = {
   readonly id: string;
   readonly value: string;
   readonly label: string;
   readonly note?: string;
-  readonly sources?: readonly DataSourceRef[];
 };
 
 export type DataSectionsProps = {
+  readonly headlines: readonly DataHeadline[];
   readonly timelineRows: readonly NationalPopulationTimelineRow[];
   readonly chartSources: readonly DataSourceRef[];
-  readonly changeStripItems: readonly DataStatStripItem[];
+  readonly deltaItems: readonly DataDeltaItem[];
   readonly stateChanges: readonly StatePopulationChange[];
   readonly stateNameByFips: Readonly<Record<string, string>>;
-  readonly historicalStates: HistoricalStatePopulationCoverage | undefined;
   readonly indicators: DataPageIndicatorBundle;
-  readonly populationGeneratedAt?: string | undefined;
+  readonly populationAsOf: string;
+  readonly indicatorsAsOf: string;
 };
 
-function formatAsOf(value: string | undefined): string {
-  if (!value) return 'Release date not recorded for this series';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+/* —— readings: one sentence per figure, written from the data ————————————— */
+
+function formatMillions(value: number): string {
+  return `${(value / 1_000_000).toLocaleString('en-US', { maximumFractionDigits: 1 })} million`;
 }
 
-function sourceLabelLine(sources: readonly DataSourceRef[]): string {
-  if (sources.length === 0) return 'Source not recorded for this series';
-  const labels = sources.map((source) => humanSourceLabel(source.label));
-  return Array.from(new Set(labels)).join('; ');
-}
-
-type ChartTable = {
-  readonly caption: string;
-  readonly columns: readonly DataTableColumn[];
-  readonly rows: readonly Readonly<Record<string, ReactNode>>[];
-};
-
-/**
- * Every chart card, in order: chart (static SVG, rendered by the caller), source label, as-of
- * line, a plain-language limits sentence, then "Show the numbers".
- */
-function ChartCard({
-  id,
-  kicker,
-  title,
-  sourceLabel,
-  asOf,
-  limits,
-  table,
-  children,
-}: {
-  readonly id: string;
-  readonly kicker: string;
-  readonly title: string;
-  readonly sourceLabel: string;
-  readonly asOf: string;
-  readonly limits: ReactNode;
-  readonly table: ChartTable | null;
-  readonly children: ReactNode;
-}) {
-  const headingId = `${id}-heading`;
+function populationReading(rows: readonly NationalPopulationTimelineRow[]): ReactNode {
+  const first = rows[0];
+  const last = rows.at(-1);
+  if (!first || !last) return null;
   return (
-    <article className="ds-data-edition__panel" aria-labelledby={headingId} id={id}>
-      <GroupHeading>
-        <span id={headingId}>
-          {kicker} · {title}
-        </span>
-      </GroupHeading>
-      <UtilityCard>
-        <div className="ds-data-edition__viz">{children}</div>
-        <Note kind="SOURCE">{sourceLabel}</Note>
-        <Note kind="AS OF">{asOf}</Note>
-        <p>{limits}</p>
-        <Disclosure summary="Show the numbers">
-          {table ? (
-            <DataTable caption={table.caption} columns={table.columns} rows={table.rows} />
-          ) : (
-            <p>
-              No numeric series is attached to this card. The counted breakdown of the archive is
-              not a chart on this page.
-            </p>
-          )}
-        </Disclosure>
-      </UtilityCard>
-    </article>
+    <>
+      The {first.decade} census counted {first.blackPopulation.toLocaleString('en-US')} Black
+      people. The {last.decade} census counted {formatMillions(last.blackPopulation)}, or{' '}
+      {formatSharePct(last.blackPopulation, last.totalPopulation)} of the country.
+    </>
   );
 }
 
-function racePairRows(series: {
-  readonly primary: {
-    readonly label: string;
-    readonly value: number;
-    readonly unit: 'usd' | 'percent' | 'per_100k' | 'months';
-  };
-  readonly comparison: {
-    readonly label: string;
-    readonly value: number;
-    readonly unit: 'usd' | 'percent' | 'per_100k' | 'months';
-  };
-}) {
-  return [
-    {
-      group: series.primary.label,
-      value: formatDataPageValue(series.primary.value, series.primary.unit),
-    },
-    {
-      group: series.comparison.label,
-      value: formatDataPageValue(series.comparison.value, series.comparison.unit),
-    },
-  ];
+function shareReading(rows: readonly NationalPopulationTimelineRow[]): ReactNode {
+  if (rows.length === 0) return null;
+  const peak = rows.reduce((best, row) =>
+    (row.blackShareOfTotalPct ?? 0) > (best.blackShareOfTotalPct ?? 0) ? row : best,
+  );
+  const trough = rows.reduce((best, row) =>
+    (row.blackShareOfTotalPct ?? 100) < (best.blackShareOfTotalPct ?? 100) ? row : best,
+  );
+  const last = rows.at(-1)!;
+  return (
+    <>
+      The share peaked at {formatSharePct(peak.blackPopulation, peak.totalPopulation)} in{' '}
+      {peak.decade}, fell to {formatSharePct(trough.blackPopulation, trough.totalPopulation)} in{' '}
+      {trough.decade}, and stood at {formatSharePct(last.blackPopulation, last.totalPopulation)} in{' '}
+      {last.decade}.
+    </>
+  );
 }
 
-function groupedBarRows(series: {
-  readonly unit: 'usd' | 'percent' | 'per_100k' | 'months';
-  readonly series: readonly { readonly id: string; readonly label: string }[];
-  readonly points: readonly {
-    readonly period: string;
-    readonly values: Readonly<Record<string, number>>;
-  }[];
-}) {
-  return series.points.map((point) => {
-    const row: Record<string, ReactNode> = { period: point.period };
-    for (const def of series.series) {
-      row[def.id] = formatDataPageValue(point.values[def.id] ?? 0, series.unit);
-    }
-    return row;
-  });
+function stateShiftReading(
+  changes: readonly StatePopulationChange[],
+  stateNameByFips: Readonly<Record<string, string>>,
+): ReactNode {
+  const { gains, losses } = rankStateMovers(changes, 1);
+  const gain = gains[0];
+  const loss = losses[0];
+  if (!gain && !loss) return null;
+  const name = (fips: string) => stateNameByFips[fips] ?? `State ${fips}`;
+  return (
+    <>
+      {gain ? (
+        <>
+          {name(gain.stateFips)} added the most Black residents,{' '}
+          {gain.blackAbsoluteChange.toLocaleString('en-US')}.
+        </>
+      ) : null}
+      {gain && loss ? ' ' : null}
+      {loss ? (
+        <>
+          {name(loss.stateFips)} lost the most,{' '}
+          {Math.abs(loss.blackAbsoluteChange).toLocaleString('en-US')}.
+        </>
+      ) : null}
+    </>
+  );
 }
+
+function pairReading(series: DataPageRacePairSeries, verb: string): ReactNode {
+  const ratio = series.ratioValue;
+  return (
+    <>
+      {series.primary.label} {verb} {formatDataPageValue(series.primary.value, series.primary.unit)}
+      ; {series.comparison.label.charAt(0).toLowerCase() + series.comparison.label.slice(1)},{' '}
+      {formatDataPageValue(series.comparison.value, series.comparison.unit)}
+      {ratio !== undefined && isRatioLabel(series.ratioLabel) ? (
+        <>
+          . That is a ratio of {ratio.toLocaleString('en-US')} to 1 in {series.geographyLabel},{' '}
+          {series.referencePeriod}.
+        </>
+      ) : ratio !== undefined ? (
+        <>
+          , a gap of {ratio.toLocaleString('en-US')} percentage points in {series.geographyLabel},{' '}
+          {series.referencePeriod}.
+        </>
+      ) : (
+        <>
+          , in {series.geographyLabel}, {series.referencePeriod}.
+        </>
+      )}
+    </>
+  );
+}
+
+function groupedReading(series: DataPageGroupedBarSeries): ReactNode {
+  const last = series.points.at(-1);
+  const first = series.points[0];
+  if (!last || !first) return null;
+  const parts = series.series.map(
+    (def) => `${def.label}, ${formatDataPageValue(last.values[def.id] ?? 0, series.unit)}`,
+  );
+  return (
+    <>
+      In {last.period}: {parts.join('; ')}. The series runs from {first.period} to {last.period} in{' '}
+      {series.geographyLabel}.
+    </>
+  );
+}
+
+/* —— blocks ————————————————————————————————————————————————————————————————— */
+
+function Headlines({ items }: { readonly items: readonly DataHeadline[] }) {
+  if (items.length === 0) return null;
+  return (
+    <ol className="ds-data-headlines" aria-label="Headline figures">
+      {items.map((item) => (
+        <li key={item.id}>
+          <a className="ds-data-headline" href={item.href}>
+            <span className="ds-data-headline__value">
+              {item.value}
+              {item.unit ? <span className="ds-data-headline__unit">{item.unit}</span> : null}
+            </span>
+            <span className="ds-data-headline__label">{item.label}</span>
+            <span className="ds-data-headline__source">{item.source}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function Section({
+  id,
+  meta,
+  children,
+}: {
+  readonly id: DataPageSectionId;
+  readonly meta: readonly string[];
+  readonly children: ReactNode;
+}) {
+  const copy = DATA_SECTION_COPY[id];
+  const headingId = `${id}-heading`;
+  return (
+    <section className="ds-data-section" id={id} aria-labelledby={headingId}>
+      <header className="ds-data-section__head">
+        <p className="ds-data-section__kicker">{copy.kicker}</p>
+        <h2 className="ds-data-section__title" id={headingId}>
+          {copy.title}
+        </h2>
+        <p className="ds-data-section__lede">{copy.lede}</p>
+        {meta.length > 0 ? (
+          <p className="ds-data-section__meta">
+            {meta.map((fact) => (
+              <span key={fact}>{fact}</span>
+            ))}
+          </p>
+        ) : null}
+      </header>
+      {children}
+    </section>
+  );
+}
+
+/** The change ledger: recent decade deltas as a figure body, so it carries the same anatomy. */
+function DeltaFigure({
+  items,
+  sources,
+  figureLabel,
+}: {
+  readonly items: readonly DataDeltaItem[];
+  readonly sources: readonly DataSourceRef[];
+  readonly figureLabel: string;
+}) {
+  if (items.length === 0) return null;
+  const latest = items.at(-1)!;
+  return (
+    <DataChartFrame
+      id="population-change"
+      title="Change by decade, most recent censuses"
+      figureLabel={figureLabel}
+      span="half"
+      reading={
+        <>
+          {latest.label}: {latest.value}.
+        </>
+      }
+      caption="Absolute change in the Black population between adjacent censuses, with the change in share of the U.S. total in percentage points. A change that crosses the 2000 definition line is labelled, not smoothed."
+      sources={sources}
+      ariaLabel="Black population change between recent censuses"
+      textAlternative={
+        <table className="ds-data-chart__table">
+          <caption>Change by decade, most recent censuses</caption>
+          <thead>
+            <tr>
+              <th scope="col">Decades</th>
+              <th scope="col">Change</th>
+              <th scope="col">Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) => (
+              <tr key={item.id}>
+                <th scope="row">{item.label}</th>
+                <td>{item.value}</td>
+                <td>{item.note ?? ''}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      }
+    >
+      <ol className="ds-data-deltas" aria-hidden="true">
+        {items.map((item) => (
+          <li key={item.id} className="ds-data-delta">
+            <span className="ds-data-delta__label">{item.label}</span>
+            <span className="ds-data-delta__value">{item.value}</span>
+            {item.note ? <p className="ds-data-delta__note">{item.note}</p> : null}
+          </li>
+        ))}
+      </ol>
+    </DataChartFrame>
+  );
+}
+
+/* —— the page body —————————————————————————————————————————————————————————— */
 
 export function DataSections({
+  headlines,
   timelineRows,
   chartSources,
-  changeStripItems,
+  deltaItems,
   stateChanges,
   stateNameByFips,
-  historicalStates,
   indicators,
-  populationGeneratedAt,
+  populationAsOf,
+  indicatorsAsOf,
 }: DataSectionsProps) {
-  const servedFromNote =
-    indicators.servedFrom === 'fixture'
-      ? 'Charts below use published reference figures, and name their sources.'
-      : 'Charts below read published series when they are available, and name their sources.';
+  const hasPopulation = timelineRows.length > 0;
+  const indicatorMeta = [`As of ${indicatorsAsOf}`];
 
   return (
-    <div className="ds-data-edition__stack">
-      <article
-        className="ds-data-edition__panel"
-        aria-labelledby="orientation-heading"
-        id="orientation"
-      >
-        <GroupHeading>
-          <span id="orientation-heading">{DATA_SECTION_COPY.orientation.title}</span>
-        </GroupHeading>
-        <Prose>
-          <p>
-            {DATA_SECTION_COPY.orientation.lede} {servedFromNote}
-          </p>
-        </Prose>
-        <ul className="ds-data-edition__beat-grid">
-          {DATA_ORIENTATION_BEATS.map((beat) => (
-            <li key={beat.kicker} className="ds-data-edition__beat">
-              <p className="ds-data-edition__beat-kicker">{beat.kicker}</p>
-              <p className="ds-data-edition__beat-body">{beat.body}</p>
-            </li>
-          ))}
-        </ul>
-        <nav className="ds-data-edition__nav" aria-labelledby="data-toc-title">
-          <p className="ds-data-edition__nav-title" id="data-toc-title">
-            On this page
-          </p>
-          <ul className="ds-data-edition__nav-list">
-            {DATA_PAGE_SECTIONS.filter((section) => section.id !== 'orientation').map((section) => (
-              <li key={section.id}>
-                <a className="ds-data-edition__nav-link" href={`#${section.id}`}>
-                  {section.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </article>
+    <>
+      <Headlines items={headlines} />
+      <DataPageNav sections={DATA_PAGE_SECTIONS} />
 
-      <ChartCard
-        id="population"
-        kicker={DATA_SECTION_COPY.population.kicker}
-        title={DATA_SECTION_COPY.population.title}
-        sourceLabel={sourceLabelLine(chartSources)}
-        asOf={formatAsOf(populationGeneratedAt)}
-        limits={
-          <>
-            This chart shows how many Black Americans the decennial census counted each decade, 1790
-            to 2020. Race categories on the census have changed, so a count in 1940 and a count in
-            2020 are not the same measurement. The chart marks the 2000 boundary rather than
-            smoothing across it, and it does not say why a state&apos;s count moved: that argument
-            needs records, not a count.
-          </>
-        }
-        table={
-          timelineRows.length > 0
-            ? {
-                caption: 'Black population by decade, 1790 to 2020',
-                columns: [
-                  { key: 'decade', label: 'Decade' },
-                  { key: 'black', label: 'Black population', numeric: true },
-                  { key: 'total', label: 'Total population', numeric: true },
-                  { key: 'share', label: 'Share', numeric: true },
-                ],
-                rows: timelineRows.map((row) => ({
-                  decade: `${row.decade}${row.southernUndercountCaveat ? ' (undercount noted)' : ''}`,
-                  black: row.blackPopulation.toLocaleString('en-US'),
-                  total: row.totalPopulation.toLocaleString('en-US'),
-                  share:
-                    row.totalPopulation > 0
-                      ? `${((row.blackPopulation / row.totalPopulation) * 100).toFixed(1)}%`
-                      : '—',
-                })),
-              }
-            : null
-        }
-      >
-        {timelineRows.length > 0 ? (
-          <>
-            <PopulationByDecadeChart rows={timelineRows} sources={chartSources} />
-            <BlackPopulationShareChart rows={timelineRows} sources={chartSources} />
-            {changeStripItems.length > 0 ? (
-              <DataStatStrip labelledBy="population-heading" items={changeStripItems} />
-            ) : null}
+      <Section id="population" meta={[`As of ${populationAsOf}`, '1790 to 2020, every census']}>
+        {hasPopulation ? (
+          <div className="ds-data-section__figures">
+            <PopulationByDecadeChart
+              id="population-count"
+              figureLabel="Figure 1"
+              rows={timelineRows}
+              sources={chartSources}
+              reading={populationReading(timelineRows)}
+            />
+            <BlackPopulationShareChart
+              id="population-share"
+              figureLabel="Figure 2"
+              span="half"
+              rows={timelineRows}
+              sources={chartSources}
+              reading={shareReading(timelineRows)}
+            />
+            <DeltaFigure items={deltaItems} sources={chartSources} figureLabel="Figure 3" />
             {stateChanges.length > 0 ? (
-              <StatePopulationShift
+              <StatePopulationShiftChart
+                id="population-states"
+                figureLabel="Figure 4"
                 fromDecade="2010"
                 toDecade="2020"
                 changes={stateChanges}
                 stateNameByFips={stateNameByFips}
-                labelledBy="population-heading"
+                sources={chartSources}
+                reading={stateShiftReading(stateChanges, stateNameByFips)}
               />
             ) : null}
-            {historicalStates ? (
-              <DataStatStrip
-                labelledBy="population-heading"
-                sources={[
-                  {
-                    label: 'U.S. Census Bureau, Working Paper 56 (state tables 15 to 65)',
-                    url: historicalStates.sourceUrl,
-                  },
-                ]}
-                items={[
-                  {
-                    id: 'hist-state-rows',
-                    value: historicalStates.rowCount.toLocaleString('en-US'),
-                    label: 'State-by-decade records',
-                    note: `${historicalStates.decadeMin} to ${historicalStates.decadeMax}`,
-                  },
-                  {
-                    id: 'hist-state-count',
-                    value: historicalStates.stateCount.toLocaleString('en-US'),
-                    label: 'States and D.C. included',
-                    note: 'Not every state appears in every decade',
-                  },
-                ]}
-              />
-            ) : null}
-          </>
+          </div>
         ) : (
-          <p className="ds-data-edition__empty">
-            Census population figures are not available on this release.
+          <p className="ds-data-empty">
+            Census population figures are not available on this release. The indicator sections
+            below are unaffected.
           </p>
         )}
-      </ChartCard>
+      </Section>
 
-      <ChartCard
-        id="wealth"
-        kicker={DATA_SECTION_COPY.wealth.kicker}
-        title={DATA_SECTION_COPY.wealth.title}
-        sourceLabel={sourceLabelLine(indicators.wealthComparison.sources)}
-        asOf={formatAsOf(indicators.generatedAt)}
-        limits={
-          <>
-            Median family net worth from the Federal Reserve&apos;s triennial survey: a national
-            juxtaposition, not a place-specific measurement. It names a gap; it does not name a
-            cause. Reading a cause needs the statutes, deeds and underwriting records the archive
-            holds elsewhere.
-          </>
-        }
-        table={{
-          caption: indicators.wealthComparison.title,
-          columns: [
-            { key: 'group', label: 'Group' },
-            { key: 'value', label: 'Value', numeric: true },
-          ],
-          rows: racePairRows(indicators.wealthComparison),
-        }}
-      >
-        <RacePairComparisonChart series={indicators.wealthComparison} />
-        {indicators.wealthTrend ? (
-          <GroupedBarIndicatorChart series={indicators.wealthTrend} />
-        ) : null}
-      </ChartCard>
+      <Section id="wealth" meta={indicatorMeta}>
+        <div className="ds-data-section__figures">
+          <RacePairComparisonChart
+            id="wealth-gap"
+            figureLabel="Figure 5"
+            span="half"
+            series={indicators.wealthComparison}
+            reading={pairReading(indicators.wealthComparison, 'held a median')}
+          />
+          {indicators.wealthTrend ? (
+            <GroupedBarIndicatorChart
+              id="wealth-trend"
+              figureLabel="Figure 6"
+              span="half"
+              series={indicators.wealthTrend}
+              reading={groupedReading(indicators.wealthTrend)}
+            />
+          ) : null}
+        </div>
+      </Section>
 
-      <ChartCard
-        id="housing"
-        kicker={DATA_SECTION_COPY.housing.kicker}
-        title={DATA_SECTION_COPY.housing.title}
-        sourceLabel={sourceLabelLine([
-          ...indicators.cookHomeownership.sources,
-          ...indicators.hmdaDenialRates.sources,
-          ...indicators.costBurdenComparison.sources,
-        ])}
-        asOf={formatAsOf(indicators.generatedAt)}
-        limits={
-          <>
-            Cook County is the first county spine: decennial homeownership, mortgage denial rates
-            and HUD cost burden. These are published rates for the censuses and years shown, with
-            nothing interpolated between them. A rate is only as good as the survey behind it; it
-            does not trace an individual household&apos;s path.
-          </>
-        }
-        table={{
-          caption: indicators.cookHomeownership.title,
-          columns: [
-            { key: 'period', label: 'Period' },
-            ...indicators.cookHomeownership.series.map((def) => ({
-              key: def.id,
-              label: def.label,
-              numeric: true,
-            })),
-          ],
-          rows: groupedBarRows(indicators.cookHomeownership),
-        }}
-      >
-        <GroupedBarIndicatorChart series={indicators.cookHomeownership} />
-        <GroupedBarIndicatorChart series={indicators.hmdaDenialRates} />
-        <RacePairComparisonChart series={indicators.costBurdenComparison} />
-      </ChartCard>
+      <Section id="housing" meta={indicatorMeta}>
+        <div className="ds-data-section__figures">
+          <GroupedBarIndicatorChart
+            id="housing-ownership"
+            figureLabel="Figure 7"
+            span="half"
+            series={indicators.cookHomeownership}
+            reading={groupedReading(indicators.cookHomeownership)}
+          />
+          <GroupedBarIndicatorChart
+            id="housing-denials"
+            figureLabel="Figure 8"
+            span="half"
+            series={indicators.hmdaDenialRates}
+            reading={groupedReading(indicators.hmdaDenialRates)}
+          />
+          <RacePairComparisonChart
+            id="housing-cost-burden"
+            figureLabel="Figure 9"
+            series={indicators.costBurdenComparison}
+            reading={pairReading(indicators.costBurdenComparison, 'cost-burdened at')}
+          />
+        </div>
+      </Section>
 
-      <ChartCard
-        id="justice"
-        kicker={DATA_SECTION_COPY.justice.kicker}
-        title={DATA_SECTION_COPY.justice.title}
-        sourceLabel={sourceLabelLine([
-          ...indicators.imprisonmentComparison.sources,
-          ...indicators.federalDrugSentences.sources,
-        ])}
-        asOf={formatAsOf(indicators.generatedAt)}
-        limits={
-          <>
-            State imprisonment rates and federal cocaine sentencing averages give context for
-            drug-policy eras. They are not proof that any single law caused a number: that argument
-            has to be made with the statute text and the record it produced.
-          </>
-        }
-        table={{
-          caption: indicators.imprisonmentComparison.title,
-          columns: [
-            { key: 'group', label: 'Group' },
-            { key: 'value', label: 'Value', numeric: true },
-          ],
-          rows: racePairRows(indicators.imprisonmentComparison),
-        }}
-      >
-        <RacePairComparisonChart series={indicators.imprisonmentComparison} />
-        <GroupedBarIndicatorChart series={indicators.federalDrugSentences} />
-      </ChartCard>
+      <Section id="justice" meta={indicatorMeta}>
+        <div className="ds-data-section__figures">
+          <RacePairComparisonChart
+            id="justice-imprisonment"
+            figureLabel="Figure 10"
+            span="half"
+            series={indicators.imprisonmentComparison}
+            reading={pairReading(indicators.imprisonmentComparison, 'imprisoned at')}
+          />
+          <GroupedBarIndicatorChart
+            id="justice-sentences"
+            figureLabel="Figure 11"
+            span="half"
+            series={indicators.federalDrugSentences}
+            reading={groupedReading(indicators.federalDrugSentences)}
+          />
+        </div>
+      </Section>
 
-      <article className="ds-data-edition__panel" aria-labelledby="themes-heading" id="themes">
-        <GroupHeading>
-          <span id="themes-heading">{DATA_SECTION_COPY.themes.title}</span>
-        </GroupHeading>
-        <Prose>
-          <p>{DATA_SECTION_COPY.themes.lede}</p>
-        </Prose>
-      </article>
-
-      <article className="ds-data-edition__panel" aria-labelledby="next-heading" id="next">
-        <GroupHeading>
-          <span id="next-heading">{DATA_SECTION_COPY.next.title}</span>
-        </GroupHeading>
-        <Prose>
-          <p>{DATA_SECTION_COPY.next.lede}</p>
-        </Prose>
-      </article>
-    </div>
+      <Section id="reading" meta={[]}>
+        <ul className="ds-data-rules" aria-label="Rules for reading these figures">
+          {DATA_READING_RULES.map((rule) => (
+            <li key={rule.kicker} className="ds-data-rule">
+              <h3 className="ds-data-rule__kicker">{rule.kicker}</h3>
+              <p className="ds-data-rule__body">{rule.body}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="ds-data-reading__links">
+          {DATA_READING_LINKS.map((link, index) => (
+            <Link
+              key={link.href}
+              className={index === 0 ? 'ds-cta ds-cta--copper' : 'ds-cta ds-cta--quiet'}
+              href={link.href}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </p>
+      </Section>
+    </>
   );
 }

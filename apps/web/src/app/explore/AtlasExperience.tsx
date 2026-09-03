@@ -1,5 +1,5 @@
 /**
- * The Atlas — the composition that makes everything P0 to P4 built reachable, mounted over the
+ * Explore — the composition that makes everything P0 to P4 built reachable, mounted over the
  * persistent `MapStage` canvas in place of the v6 chrome it replaced (WP-27).
  *
  * Deliberately does not: own record data (the view model is built on the server and hydrated here
@@ -37,6 +37,7 @@ import { LensPanel, type LensLayerKey } from '../../components/map-experience/Le
 import { MapExperienceLegend } from '../../components/map-experience/MapExperienceLegend';
 import { ResultsRail, type ResultsConstraint } from '../../components/map-experience/ResultsRail';
 import { RecordSheet } from '../../components/map-experience/RecordSheet';
+import { usePhotoIndex } from '../../lib/map-experience/use-photo-index';
 import {
   PinPhotoLayer,
   type PinPhotoHoverTarget,
@@ -205,7 +206,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
 
   /**
    * Leaving the story must not strand its selection either. An ambient selection that survived
-   * into the Atlas would ring a pin with no sheet attached, and no sheet means no close control —
+   * into Explore would ring a pin with no sheet attached, and no sheet means no close control —
    * a highlight the reader cannot dismiss. Scoped to ambient selections so a `?selected=` URL,
    * which arrives with `ambient: false`, is never cleared by a mode change.
    */
@@ -421,6 +422,10 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
 
   /** The sheet is open only for a selection the reader made. See `selection.ambient` above. */
   const sheetOpen = sheetRecord !== null && !selection.ambient;
+  /* The sheet's mast reads the same photo index the pin hover card does, fetched once, lazily,
+     the first time a sheet opens. See `use-photo-index.ts`. */
+  const sheetPhotos = usePhotoIndex('/atlas/photos', sheetOpen);
+  const sheetPhoto = sheetOpen && sheetRecord ? (sheetPhotos?.[sheetRecord.id] ?? null) : null;
 
   const showLens = panels.lens && !chromeHidden && mode === 'atlas';
   /*
@@ -436,7 +441,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
 
   return (
     /* `data-key-scope` is what makes the bare camera, time and record keys legal here and nowhere
-       else. `handleKeyStroke` walks up from the keystroke's target looking for it, so the Atlas
+       else. `handleKeyStroke` walks up from the keystroke's target looking for it, so Explore
        marking its own root is the entire scope contract — no route check, no second list. */
     <div
       className="ds-atlas"
@@ -628,6 +633,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
 
       <RecordSheet
         record={sheetOpen ? sheetRecord : null}
+        photo={sheetPhoto}
         onClose={() => setSelectedId(undefined)}
         {...(selectedIndex >= 0
           ? { position: { index: selectedIndex + 1, total: sorted.length } }
@@ -662,7 +668,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
             return;
           }
           // The palette searches the whole index, but only records with a map feature in the
-          // current projection can be selected on the Atlas. Without this the click was
+          // current projection can be selected on the map. Without this the click was
           // swallowed: the palette closed and nothing opened, which reads as a broken search.
           // Every record has a page even when it has no pin, so fall through to it.
           setPaletteOpen(false);

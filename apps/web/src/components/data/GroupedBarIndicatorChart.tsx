@@ -3,24 +3,42 @@
  * homeownership, HMDA denial rates, USSC sentences. Server-rendered SVG, no client libs.
  */
 import Link from 'next/link';
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import type { DataPageGroupedBarSeries } from '@repo/domain/statistics/data-page-series';
 import { DataChartFrame } from './DataChartFrame';
 import { chapterHrefForTheme, formatDataPageValue, niceMax, scaleLinear } from './chart-utils';
 
 export type GroupedBarIndicatorChartProps = {
   readonly series: DataPageGroupedBarSeries;
+  readonly reading?: ReactNode;
+  readonly figureLabel?: string;
+  readonly span?: 'wide' | 'half';
+  readonly id?: string;
 };
 
-const WIDTH = 720;
-const HEIGHT = 300;
-const MARGIN = { top: 20, right: 16, bottom: 56, left: 72 } as const;
+/* A wide figure draws at 720 across; a half-width figure at 480 so its mono labels render
+   near 1:1 instead of downscaling to six pixels beside its sibling. */
+const GEOMETRY = {
+  wide: { width: 720, height: 300, margin: { top: 20, right: 16, bottom: 56, left: 72 } },
+  half: { width: 480, height: 280, margin: { top: 20, right: 12, bottom: 48, left: 60 } },
+} as const;
 
-export function GroupedBarIndicatorChart({ series }: GroupedBarIndicatorChartProps) {
+export function GroupedBarIndicatorChart({
+  series,
+  reading,
+  figureLabel,
+  span,
+  id,
+}: GroupedBarIndicatorChartProps) {
   if (series.points.length === 0 || series.series.length === 0) {
     return null;
   }
 
+  const {
+    width: WIDTH,
+    height: HEIGHT,
+    margin: MARGIN,
+  } = GEOMETRY[span === 'half' ? 'half' : 'wide'];
   const allValues = series.points.flatMap((point) =>
     series.series.map((def) => point.values[def.id] ?? 0),
   );
@@ -38,6 +56,10 @@ export function GroupedBarIndicatorChart({ series }: GroupedBarIndicatorChartPro
   return (
     <DataChartFrame
       title={series.title}
+      {...(reading !== undefined ? { reading } : {})}
+      {...(figureLabel !== undefined ? { figureLabel } : {})}
+      {...(span !== undefined ? { span } : {})}
+      {...(id !== undefined ? { id } : {})}
       caption={
         <>
           {series.caption} <span className="ds-data-chart__meta">{series.geographyLabel}</span>
@@ -121,12 +143,15 @@ export function GroupedBarIndicatorChart({ series }: GroupedBarIndicatorChartPro
                 return (
                   <rect
                     key={def.id}
+                    className="ds-data-chart__mark"
                     x={barX}
                     y={barTop}
                     width={barWidth}
                     height={Math.max(0, zeroY - barTop)}
                     fill={def.fill}
-                  />
+                  >
+                    <title>{`${point.period} · ${def.label}: ${formatDataPageValue(value, series.unit)}`}</title>
+                  </rect>
                 );
               })}
               <text

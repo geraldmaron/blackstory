@@ -11,7 +11,7 @@
  * documented Southern undercount. A screen-reader table carries every value, including the
  * free/enslaved split.
  */
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import type { NationalPopulationTimelineRow } from '@repo/domain/statistics/public-data-summaries';
 import { DataChartFrame } from './DataChartFrame';
 import { formatChartCount, formatSharePct, niceMax, scaleLinear } from './chart-utils';
@@ -26,6 +26,9 @@ const FILL_BLACK_TOTAL = 'var(--ds-viz-1)';
 export type PopulationByDecadeChartProps = {
   readonly rows: readonly NationalPopulationTimelineRow[];
   readonly sources: readonly { readonly label: string; readonly url: string }[];
+  readonly reading?: ReactNode;
+  readonly figureLabel?: string;
+  readonly id?: string;
 };
 
 // Wider than the shared 640 so 24 decades breathe; scales responsively via viewBox.
@@ -35,7 +38,13 @@ const MARGIN = { top: 24, right: 20, bottom: 64, left: 84 } as const;
 const PLOT_W = WIDTH - MARGIN.left - MARGIN.right;
 const PLOT_H = HEIGHT - MARGIN.top - MARGIN.bottom;
 
-export function PopulationByDecadeChart({ rows, sources }: PopulationByDecadeChartProps) {
+export function PopulationByDecadeChart({
+  rows,
+  sources,
+  reading,
+  figureLabel,
+  id,
+}: PopulationByDecadeChartProps) {
   if (rows.length === 0) {
     return null;
   }
@@ -54,6 +63,9 @@ export function PopulationByDecadeChart({ rows, sources }: PopulationByDecadeCha
   return (
     <DataChartFrame
       title="Black population by decade, 1790 to 2020"
+      {...(reading !== undefined ? { reading } : {})}
+      {...(figureLabel !== undefined ? { figureLabel } : {})}
+      {...(id !== undefined ? { id } : {})}
       caption={
         'Enslaved and free counts are stacked for 1790 to 1860 (they add up to the Black total). ' +
         'From 1870 the Black total is a single bar. The dashed line marks the 2000 switch to ' +
@@ -198,12 +210,15 @@ export function PopulationByDecadeChart({ rows, sources }: PopulationByDecadeCha
                 return (
                   <rect
                     key={segment.key}
+                    className="ds-data-chart__mark"
                     x={barX}
                     y={top}
                     width={barWidth}
                     height={Math.max(0, bottom - top)}
                     fill={segment.fill}
-                  />
+                  >
+                    <title>{`${row.decade} · ${segment.key === 'enslaved' ? 'Enslaved' : segment.key === 'free' ? 'Free' : 'Black population'}: ${formatChartCount(segment.to - segment.from)}`}</title>
+                  </rect>
                 );
               })}
               {showLabel ? (
