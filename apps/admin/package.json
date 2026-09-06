@@ -16,7 +16,7 @@
     "@repo/domain": "workspace:*",
     "@repo/operator-cli": "workspace:*",
     "@repo/ui": "workspace:*",
-    "@supabase/ssr": "^0.12.4",
+    "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.110.8",
     "next": "^16.2.12",
     "pg": "^8.16.3",
