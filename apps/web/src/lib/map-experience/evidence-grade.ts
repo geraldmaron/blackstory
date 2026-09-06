@@ -44,6 +44,23 @@ export function gradeDescription(grade: EvidenceGrade | null): string {
   return grade === null ? 'Evidence not graded' : `Evidence grade ${grade}`;
 }
 
+/*
+ * An evidence label is built as "<grade word> · <count>" — "Grade A · 2 sources". Three surfaces
+ * (record sheet, narrative card, book record panel) print the grade and the count separately, so
+ * the split lives here rather than being re-derived with a different `split()` in each of them.
+ */
+
+/** "Grade A · 2 sources" → "Grade A". Returns the whole label when there is no count. */
+export function evidenceGradeWord(evidenceLabel: string): string {
+  return evidenceLabel.split(' · ')[0] ?? evidenceLabel;
+}
+
+/** "Grade A · 2 sources" → "2 sources". Undefined when the label carries no count. */
+export function evidenceCountPhrase(evidenceLabel: string): string | undefined {
+  const tail = evidenceLabel.split(' · ').slice(1).join(' · ').trim();
+  return tail.length > 0 ? tail : undefined;
+}
+
 /** The floor chip's own label. */
 export function floorLabel(floor: EvidenceFloor): string {
   if (floor === 'any') return 'Any';

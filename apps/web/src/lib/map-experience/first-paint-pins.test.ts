@@ -15,11 +15,9 @@ import { listPublicEntities } from '../../data/public-seed';
 import { atlasWalkHref, isHoldingPlaceHref } from '../place/public-place-path';
 import { buildExploreMapSource } from './build-explore-map-source';
 import {
-  conusPinPercent,
   DOOR_MOBILE_NATIONAL_PIN_CAP,
   firstPaintWalksFirst,
   isFirstPaintWalk,
-  isPinPlateWalk,
   resolveDoorPinTarget,
   resolveDoorFocusPinId,
   thinDoorNationalPins,
@@ -27,6 +25,7 @@ import {
   toFirstPaintPins,
   toFirstPaintShell,
 } from './first-paint-pins';
+import { conusPinPercent } from './conus-mercator';
 import type { ExploreMapFeature } from './build-explore-map-source';
 
 function leakyFeature(
@@ -179,17 +178,14 @@ test('Door link pins expose public hrefs and opaque entity redirects', () => {
   });
   const features = [...source.featureCollection.features, entityOnly];
   const pins = toDoorLinkPins(features);
-  const html = renderToStaticMarkup(
-    createElement(FirstPaintPinPlate, { pins, linkRecords: true, focusEntityId: null }),
-  );
-  const walkCount = pins.features.filter((feature) => isPinPlateWalk(feature, true)).length;
+  // The Door hands these to the live plate: a marker click opens the pin's href (repo-18ma2).
+  const walkCount = pins.features.filter(
+    (feature) => feature.properties.holdingWalk === true,
+  ).length;
   const linkCount = pins.features.filter((feature) => feature.properties.href.length > 0).length;
-  const anchors = html.match(/<a\b/g) ?? [];
   assert.ok(linkCount > walkCount);
   assert.ok(walkCount > 0);
-  assert.equal(anchors.length, linkCount);
-  assert.doesNotMatch(html, /href="\/entity\//);
-  assert.match(html, /href="\/door\/pin\/pin-4"/);
+  assert.ok(pins.features.every((feature) => !feature.properties.href.startsWith('/entity/')));
 
   const target = resolveDoorPinTarget('pin-4', features);
   assert.equal(target, '/entity/ent_howard_theatre_001');
@@ -273,10 +269,14 @@ test('the first-paint shell drops shop tokens, including leftover facet labels',
   assert.equal(cleaned.totalMatched, 4101);
 });
 
-test('CONUS projection keeps a Florida pin on the plate', () => {
-  const { left, top } = conusPinPercent(-80.14, 26.12);
-  assert.ok(left > 50 && left < 100);
-  assert.ok(top > 50 && top < 100);
+test('the first-paint projection keeps a Florida pin on the board and inside the plate frame', () => {
+  // Web Mercator over the CONUS bounds box (conus-mercator.ts): the plate's own projection.
+  const keys = conusPinPercent(-81.8, 24.55);
+  assert.ok(keys);
+  assert.ok(keys.x > 70 && keys.x < 80, String(keys.x));
+  assert.ok(keys.y > 95 && keys.y <= 100, String(keys.y));
+  // Alaska is off the plate's opening frame, so it is off the board — not pinned to an edge.
+  assert.equal(conusPinPercent(-149.9, 61.2), null);
 });
 
 test('first-paint plate projects pins with Albers locator percents, not CONUS clamp', () => {

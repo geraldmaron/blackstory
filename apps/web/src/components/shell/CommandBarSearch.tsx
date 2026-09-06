@@ -48,6 +48,13 @@ type SearchApiResult = {
   readonly displayName?: unknown;
   readonly kind?: unknown;
   readonly matchedText?: unknown;
+  /**
+   * Set server-side only for a law/case result the legal catalog could resolve by exact title
+   * match (repo-skocy). Absent — never `undefined` explicitly — for everything else, including
+   * a law/case result that DIDN'T resolve: those still fall through to `recordHrefFrom` below,
+   * which sends them to `/law` exactly as before this field existed.
+   */
+  readonly href?: unknown;
 };
 
 /**
@@ -89,12 +96,16 @@ export function CommandBarSearch({ placeholder }: CommandBarSearchProps) {
   }, []);
 
   const suggestRemote = useCallback(
-    async (query: string): Promise<readonly TypeaheadSuggestion[]> => {
+    async (query: string, signal: AbortSignal): Promise<readonly TypeaheadSuggestion[]> => {
       const response = await fetch(`/search/api?q=${encodeURIComponent(query)}`, {
         headers: { accept: 'application/json' },
+        signal,
       });
       if (!response.ok) {
-        return [];
+        // Thrown, not swallowed. Returning `[]` here is what made a 429 read as an empty archive:
+        // the endpoint's anonymous quota is a per-minute window, so the reader most likely to be
+        // told "no matches" was the one searching hardest.
+        throw new Error(`search_unavailable_${response.status}`);
       }
       const payload: unknown = await response.json();
       const results =
@@ -113,11 +124,14 @@ export function CommandBarSearch({ placeholder }: CommandBarSearchProps) {
             id: result.id,
             primary: result.displayName,
             ...(typeof result.kind === 'string' ? { secondary: result.kind } : {}),
-            href: recordHrefFrom(
-              result.id,
-              typeof result.kind === 'string' ? result.kind : undefined,
-              result.displayName,
-            ),
+            href:
+              typeof result.href === 'string'
+                ? result.href
+                : recordHrefFrom(
+                    result.id,
+                    typeof result.kind === 'string' ? result.kind : undefined,
+                    result.displayName,
+                  ),
           },
         ];
       });
@@ -126,24 +140,35 @@ export function CommandBarSearch({ placeholder }: CommandBarSearchProps) {
   );
 
   return (
-    <TypeaheadCombobox
-      /* The seed arrives from a client effect on the 404, after this component has already
-         mounted holding an empty field, and `defaultValue` is read once. Keying on the seed
-         remounts the combobox so the new default takes — which is also what discards it again
-         when the reader navigates off the 404 and the seed clears. */
-      key={seed}
-      defaultValue={seed}
-      id={BAR_SEARCH_INPUT_ID}
-      name="q"
-      label="Search records, places and eras"
-      hideLabel
-      placeholder={placeholder}
-      className="ds-bar__search ds-bar__search--live"
-      inputClassName="ds-bar__search-input"
-      listLabel="Matching records"
-      listClassName="ds-bar__search-list"
-      minChars={2}
-      suggestRemote={suggestRemote}
-    />
+    /* A real GET form, because Enter has to mean something. The field advertises
+       `enterKeyHint="search"` and, unwrapped, a reader who typed a phrase and pressed Enter got
+       nothing at all — on the twelve rooms where this is the only search, that was the whole
+       search. Submitting lands on `/records`, which owns the full result list, its facets and
+       pagination, and reads `q` from the URL. `display: contents` keeps the form out of the bar's
+       three-column grid, so the pill stays exactly where it was.
+
+       The combobox only calls `preventDefault` on Enter when a suggestion is highlighted, so
+       arrow-then-Enter still opens that record and plain Enter falls through to this submit. */
+    <form action="/records" method="get" role="search" className="ds-bar__search-form">
+      <TypeaheadCombobox
+        /* The seed arrives from a client effect on the 404, after this component has already
+           mounted holding an empty field, and `defaultValue` is read once. Keying on the seed
+           remounts the combobox so the new default takes — which is also what discards it again
+           when the reader navigates off the 404 and the seed clears. */
+        key={seed}
+        defaultValue={seed}
+        id={BAR_SEARCH_INPUT_ID}
+        name="q"
+        label="Search records, places and eras"
+        hideLabel
+        placeholder={placeholder}
+        className="ds-bar__search ds-bar__search--live"
+        inputClassName="ds-bar__search-input"
+        listLabel="Matching records"
+        listClassName="ds-bar__search-list"
+        minChars={2}
+        suggestRemote={suggestRemote}
+      />
+    </form>
   );
 }

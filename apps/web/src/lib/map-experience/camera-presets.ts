@@ -139,6 +139,14 @@ export function cameraPresetFor(name: CameraPresetName, reducedMotion: boolean):
 export const MAP_MIN_ZOOM = 3;
 export const MAP_MAX_ZOOM = 14;
 
+/**
+ * The frame a plate opens on before any surface has asked for one: CONUS fitted to the canvas
+ * with this much clearance (`MapStage`'s constructor). Explore's first-paint board is drawn at
+ * the same fit (explore-map-underlay.css, pinned by explore-map-underlay.test.ts), which is why
+ * the number lives here and not in either of them.
+ */
+export const PLATE_OPENING_PADDING_PX = 32;
+
 /** Zoom level `MapStage` lands a `point` flight at when arriving on a single entity — a
  * campus/neighborhood-scale framing close enough to read the pin's radius-affordance halo.
  * Never implies rooftop precision; always ≤ `MAP_MAX_ZOOM`. */

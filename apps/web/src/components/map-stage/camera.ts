@@ -1,6 +1,7 @@
 import type { Map as MapLibreMap } from 'maplibre-gl';
 import {
   cameraPresetFor,
+  MAP_MIN_ZOOM,
   prefersReducedMotion,
   type CameraPresetName,
 } from '../../lib/map-experience/camera-presets';
@@ -14,8 +15,20 @@ export type MapStageFlyOptions = {
   /** `'fly'` (default): cinematic arc, used for hero-engagement descents. `'ease'`: linear
    * pan/zoom with the same authored duration/easing but no arc — used to reconcile the camera
    * against a URL viewport (deep link, back/forward), where a swooping arc would read as an
-   * unrequested flight rather than a restored view. */
-  readonly mode?: 'fly' | 'ease';
+   * unrequested flight rather than a restored view. `'cut'`: no motion at all — the preset frame
+   * lands in one step, motion preference aside. For a frame the reader must not see arrive: the
+   * Door's first frame after mount, and a window resize, where the plate has to follow the
+   * layout the way the layout itself moves (repo-18ma2). */
+  readonly mode?: 'fly' | 'ease' | 'cut';
+  /**
+   * `'fit'`: a bounds fit may sink the plate's zoom floor to the fitted zoom. The Door's phone
+   * strip is shorter than the country at the Instrument's national floor (`MAP_MIN_ZOOM`), and a
+   * zoom the transform clamps under a center computed for the unclamped zoom lands the country
+   * outside the strip (repo-18ma2). The floor goes back to `MAP_MIN_ZOOM` as soon as a fit no
+   * longer needs less, and whenever the plate leaves the Door's ambient posture (MapStage.tsx);
+   * reader-driven zoom is locked on the strip anyway.
+   */
+  readonly zoomFloor?: 'fit';
   /**
    * Camera attitude to land in, when the caller's framing is not merely a center/zoom.
    *
@@ -85,6 +98,7 @@ export function runFlyPreset(
       center = lngLatTuple(camera.center);
       zoom = camera.zoom;
       boundsFitted = true;
+      if (options?.zoomFloor === 'fit') map.setMinZoom(Math.min(MAP_MIN_ZOOM, zoom));
     } else {
       center = [(west + east) / 2, (south + north) / 2];
       zoom = 3.4;
@@ -101,7 +115,7 @@ export function runFlyPreset(
     ...(options?.bearing === undefined ? {} : { bearing: options.bearing }),
   };
 
-  if (reduced || preset.duration <= 0) {
+  if (reduced || preset.duration <= 0 || options?.mode === 'cut') {
     map.jumpTo({ center, zoom, padding: motionPadding, ...attitude });
     return true;
   }

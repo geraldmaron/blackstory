@@ -77,3 +77,25 @@
 .ds-search-page .ds-typeahead--mast .ds-typeahead__list {
   top: calc(100% + var(--ds-space-2));
 }
+
+/*
+ * Shown in place of the list when a remote lookup failed. It sits where the list would, so the
+ * reader looks in one place for the answer either way, and it is not inside the listbox: a note
+ * is not an option, and putting it there would make it arrowable and announce a match count of
+ * one for a message.
+ */
+.ds-typeahead__note {
+  position: absolute;
+  z-index: var(--ds-z-typeahead);
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-ui);
+  font-size: 0.8125rem;
+}

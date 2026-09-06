@@ -30,6 +30,7 @@ import type { PublicReadSource } from '../../lib/public-data/source';
 import type { CitesEdgeIndex } from '../../lib/release/build-cites-edge';
 import { pickExploreEdgeSlice, type ExploreEdgeLineCatalog } from './explore-edge-catalog';
 import type { ExploreViewModel } from './explore-view-model';
+import type { PaletteRecord } from '../../components/patterns/command-palette/CommandPalette';
 
 /** Where the client fetches the catalog from. One path, one cache key. */
 export const ATLAS_CATALOG_PATH = '/atlas/catalog';
@@ -74,6 +75,10 @@ export function firstPaintCatalog(
     edgeLineCatalog: EMPTY_EDGE_CATALOG,
     availableDecades: [],
     citesEdge: {},
+    // Unmapped entities are already absent from first paint's own pin collection, so this is a
+    // real empty state, not a placeholder: `GET /atlas/catalog` fills it the same way it fills
+    // the history edge catalog.
+    unmappedPaletteRecords: [],
   };
 }
 
@@ -92,6 +97,9 @@ export type AtlasCatalogPayload = {
   readonly edgeLineCatalog: ExploreEdgeLineCatalog;
   readonly availableDecades: readonly string[];
   readonly citesEdge: CitesEdgeIndex;
+  /** See `ExploreViewModel`'s field of the same name (repo-jnmwu). Release-wide like every
+   * other field here — derived from `source` alone, never from the reader's request. */
+  readonly unmappedPaletteRecords: readonly PaletteRecord[];
 };
 
 /** The per-request half: everything in the view model the catalog does not carry. */
@@ -104,6 +112,7 @@ export type AtlasShellModel = Omit<
   | 'historyEdges'
   | 'edgeLineCollection'
   | 'selectedEdge'
+  | 'unmappedPaletteRecords'
 >;
 
 export function toSerializableExploreViewModel(
@@ -125,6 +134,7 @@ export function toAtlasShellModel(view: ExploreViewModel): AtlasShellModel {
     historyEdges: _historyEdges,
     edgeLineCollection: _edgeLineCollection,
     selectedEdge: _selectedEdge,
+    unmappedPaletteRecords: _unmappedPaletteRecords,
     ...shell
   } = view;
   return shell;
@@ -149,6 +159,7 @@ export function assembleExploreViewModel(
     edgeLineCatalog: catalog.edgeLineCatalog,
     availableDecades: catalog.availableDecades,
     citesEdge: catalog.citesEdge,
+    unmappedPaletteRecords: catalog.unmappedPaletteRecords,
     historyEdges: active.edges,
     edgeLineCollection: active.lineCollection,
     ...(selectedEdge ? { selectedEdge } : {}),

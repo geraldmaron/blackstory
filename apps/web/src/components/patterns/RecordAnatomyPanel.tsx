@@ -5,6 +5,7 @@
 import React from 'react';
 import { buildExternalMapsSearchUrl } from '../../lib/geography/external-maps-url';
 import { resolvePublicAddressLine } from '../../lib/geography/public-address';
+import { RecordMeter, type RecordMeterProps } from '../entity/RecordChrome';
 import { MapsExternalLink } from '../map-experience/MapsExternalLink';
 import { EditionFactIcon, type EditionFactIconProps } from './EditionFactIcon';
 import { RecordPlacePreview } from './RecordPlacePreview';
@@ -22,6 +23,15 @@ export type RecordAnatomyFact = {
   readonly label: string;
   readonly value: React.ReactNode;
   readonly icon: EditionFactIconProps;
+  /**
+   * Optional graded bars under the value, same component and tone scale the record page's fact
+   * tile uses. A grade is an assessment on a three-step scale, and a card that prints only the
+   * word "Grade A" makes the reader carry that scale in their head; the record page never asked
+   * them to. Off by default: Where and Era are not scaled quantities.
+   */
+  readonly meter?: RecordMeterProps;
+  /** One quiet line under the value — the source count behind a grade, a precision note. */
+  readonly support?: React.ReactNode;
 };
 
 export type RecordAnatomyPlace = {
@@ -128,7 +138,15 @@ export function RecordAnatomyPanel({
                 {fact.label}
               </dt>
               <dd className="ds-record-anatomy__fact-value">
-                {whereFactValue(fact, place, linkWhereToMaps)}
+                <span className="ds-record-anatomy__fact-head">
+                  {whereFactValue(fact, place, linkWhereToMaps)}
+                  {fact.meter ? (
+                    <RecordMeter {...fact.meter} className="ds-record-anatomy__fact-meter" />
+                  ) : null}
+                </span>
+                {fact.support ? (
+                  <span className="ds-record-anatomy__fact-support">{fact.support}</span>
+                ) : null}
               </dd>
             </div>
           ))}

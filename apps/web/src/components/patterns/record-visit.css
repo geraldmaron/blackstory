@@ -121,17 +121,14 @@
   color: var(--ds-ink-muted);
 }
 
-.ds-record-visit__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--ds-space-1) var(--ds-space-4);
+/*
+ * The one in-app exit: the archive's own map. External providers are the segmented controls
+ * above it (`maps-handoff.css`); this stays a text link so the two never read as one menu.
+ */
+.ds-record-visit__inapp {
+  margin: 0;
 }
 
-/*
- * Quiet text handoffs. Min 44px hit height for WCAG; no pill fill, no copper wash.
- * External maps exits stay secondary to sheet content and to in-app "Fly to place".
- */
 .ds-record-visit__link {
   display: inline-flex;
   align-items: center;
@@ -159,6 +156,17 @@
 .ds-record-visit__link:focus-visible {
   outline: 2px solid var(--ds-focus-ring, var(--ds-copper));
   outline-offset: 2px;
+}
+
+/*
+ * Precision belongs to this block, so it is set on the block's own small-mono step — the same
+ * 11px the Visit kicker and the source lines use. It arrived at 10.5px from the room kit, a
+ * third scale in a section that already had two, which is what made the sentence read as debris
+ * dropped between the address and the exits.
+ */
+.ds-record-visit .ds-room-precision {
+  font-size: 0.6875rem;
+  line-height: 1.5;
 }
 
 .ds-record-visit--compact {

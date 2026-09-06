@@ -21,10 +21,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cx } from '@repo/ui';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
-import { gradeForConfidence } from '../../lib/map-experience/evidence-grade';
+import {
+  gradeDescription,
+  gradeForConfidence,
+  gradeLabel,
+} from '../../lib/map-experience/evidence-grade';
 import type { PhotoIndex } from '../../lib/map-experience/use-photo-index';
 import { placeDetail, placeLabelFor } from '../../lib/map-experience/place-label';
-import { GradeDot } from './GradeDot';
+import { meterLevelForTier, RecordMeter } from '../entity/RecordChrome';
 import { KindGlyph } from './KindGlyph';
 import './results-rail.css';
 
@@ -247,6 +251,7 @@ export function ResultsRail({
                     selected && 'ds-results__row--selected',
                     photo && 'ds-results__row--photo',
                   )}
+                  data-grade={feature.properties.confidenceTier}
                   style={{ transform: `translateY(${index * RESULTS_ROW_HEIGHT}px)` }}
                   onClick={() => onSelect(feature)}
                   onKeyDown={(event) => {
@@ -287,10 +292,25 @@ export function ResultsRail({
                         ·
                       </span>
                       <span className="ds-results__era">{eraLabel(feature)}</span>
-                      <span className="ds-results__sep" aria-hidden="true">
-                        ·
+                      {/*
+                       * The grade is the record's assessment, not a third piece of metadata, so
+                       * it leaves the middot chain and takes the right edge of the row. Down a
+                       * scrolling rail the marks line up in one column a reader can read
+                       * vertically; chained after "Undated ·" they read as trivia of equal
+                       * weight to the era, which is what made this the weakest grade in the
+                       * product once the sheet and the record page both grew a meter.
+                       */}
+                      <span className="ds-results__grade">
+                        <RecordMeter
+                          className="ds-results__grade-meter"
+                          level={meterLevelForTier(feature.properties.confidenceTier)}
+                          tone={feature.properties.confidenceTier}
+                          label={gradeDescription(grade)}
+                        />
+                        <span className="ds-results__grade-letter" aria-hidden="true">
+                          {gradeLabel(grade)}
+                        </span>
                       </span>
-                      <GradeDot grade={grade} withLetter />
                     </span>
                   </span>
 

@@ -36,6 +36,13 @@ export async function DoorHome() {
 
   return (
     <main id="main" className="ds-door">
+      {/* The plate is the only map on `/` (repo-18ma2): without JavaScript there is no map at
+          all, so say so once and point at the index that needs none. */}
+      <noscript>
+        <p className="ds-door__noscript">
+          The map on this page needs JavaScript. <a href="/records">Browse the records</a> instead.
+        </p>
+      </noscript>
       <DoorImmersive
         pins={pins}
         densityLevels={densityLevels}

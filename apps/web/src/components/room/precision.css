@@ -1,0 +1,41 @@
+/*
+ * Precision — what a coordinate does and does not claim.
+ *
+ * This lives beside the atom rather than inside `room-kit.css` because `Precision` is rendered
+ * on surfaces that are not rooms. The kit reaches a page only through `reading-room.css`,
+ * `record-page.css` or `utility.css`, and the record sheet is an overlay on the map surface,
+ * which imports none of them: the sentence rendered there at the UA's 16px sans, a third larger
+ * than the links beneath it, while the same sentence on a record page was 10.5px mono. Same
+ * component, two surfaces, no shared styling.
+ *
+ * `Evidence.tsx` imports this file, so the sentence is styled wherever it is drawn.
+ * `room-kit.css` imports it too, so a room still gets it from the kit alone.
+ */
+
+.ds-room-precision {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-2);
+  /* `--room-ink-4` is scoped to `.ds-room`; the fallback keeps this correct for callers outside
+     a room wrapper too (the record sheet renders as a standalone aside, not inside `.ds-room`). */
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--room-ink-4, var(--ds-ink-subtle));
+}
+
+.ds-room-precision svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--room-ink-4, var(--ds-ink-subtle));
+}
+
+/* Boxed variant: same sentence, set off in a small card where a bare line would blend into the
+   surrounding facts. Compact cards (record sheet, narrative card) use this instead of a second
+   precision implementation. */
+.ds-room-precision--boxed {
+  padding: var(--ds-space-3);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+  font-size: 0.6875rem;
+}

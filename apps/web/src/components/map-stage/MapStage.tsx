@@ -104,6 +104,7 @@ import type {
 import {
   MAP_MAX_ZOOM,
   MAP_MIN_ZOOM,
+  PLATE_OPENING_PADDING_PX,
   prefersFinePointer,
   prefersReducedMotion,
   type CameraPresetName,
@@ -308,6 +309,8 @@ export type AtlasCameraTarget = {
   getBearing(): number;
   getPitch(): number;
   getCenter(): { lng: number; lat: number };
+  /** The element MapLibre draws in — the box a surface frames its camera against. */
+  getContainer(): HTMLElement;
   stop(): unknown;
 };
 
@@ -623,8 +626,23 @@ export function MapStageProvider({
     if (!mapAvailableRef.current) return;
     mapAvailableRef.current = false;
     setMapAvailable(false);
+    plateReadyRef.current = false;
     plateRef.current?.removeAttribute('data-plate-ready');
     notify(listenersRef.current, 'error');
+  }, []);
+
+  /** True once `data-plate-ready` is stamped; cleared only when the plate fails. */
+  const plateReadyRef = useRef(false);
+  /**
+   * Reveal the plate: stamp `data-plate-ready` (the first-paint boards and the Door's cover key
+   * their fade on it) and tell subscribers. Once per plate life — the three callers (first `idle`
+   * after load, the 1800ms fallback, state polygons landing) race, and only the first counts.
+   */
+  const markPlateReady = useCallback(() => {
+    if (cancelledRef.current || plateReadyRef.current) return;
+    plateReadyRef.current = true;
+    stampPlateReady(plateRef.current);
+    notify(listenersRef.current, 'ready');
   }, []);
 
   const syncEntityMarkers = useCallback(() => {
@@ -667,7 +685,11 @@ export function MapStageProvider({
   const updateStateLabelOpacity = useCallback((zoom: number) => {
     const opacity = String(stateLabels.stateLabelOpacityForZoom(zoom));
     for (const [, entry] of stateLabelMarkersRef.current) {
-      entry.element.style.opacity = opacity;
+      // Through the marker, never `element.style.opacity`: a MapLibre marker owns its element's
+      // inline opacity and rewrites it on every map update (terrain occlusion), so a value written
+      // straight to the element held for one frame and the fade never happened at any zoom
+      // (repo-27uao).
+      entry.marker.setOpacity(opacity);
     }
   }, []);
 
@@ -807,7 +829,7 @@ export function MapStageProvider({
           )
             .then((joined) => {
               settledDensityFillByFipsRef.current = indexDensityFillColors(joined);
-              if (joined.features.length > 0) stampPlateReady(plateRef.current);
+              if (joined.features.length > 0) markPlateReady();
             })
             .catch((error) => {
               console.error('[MapStage] state polygon load failed', error);
@@ -1252,6 +1274,9 @@ export function MapStageProvider({
       if (event === 'viewport' && lastViewportRef.current) {
         (handler as (viewport: ExploreViewportFrame) => void)(lastViewportRef.current);
       }
+      if (event === 'ready' && plateReadyRef.current) {
+        (handler as () => void)();
+      }
       return () => {
         set.delete(handler);
       };
@@ -1314,7 +1339,7 @@ export function MapStageProvider({
           // The national frame is the resting camera for every surface, so a provider mounted
           // without a `bounds` prop opens on the same view rather than on MapLibre's [0,0].
           bounds: (bounds ?? US_CONUS_BOUNDS) as [number, number, number, number],
-          fitBoundsOptions: { padding: 32 },
+          fitBoundsOptions: { padding: PLATE_OPENING_PADDING_PX },
         });
 
         mapRef.current = map;
@@ -1457,12 +1482,8 @@ export function MapStageProvider({
         applyStyleAndData();
         // Hide the Albers locator once the live plate has painted so camera moves and
         // uncovered pin/cluster clicks hit MapLibre, not the underlay.
-        activeMap.once('idle', () => {
-          if (!cancelledRef.current) stampPlateReady(plateRef.current);
-        });
-        window.setTimeout(() => {
-          if (!cancelledRef.current) stampPlateReady(plateRef.current);
-        }, 1800);
+        activeMap.once('idle', markPlateReady);
+        window.setTimeout(markPlateReady, 1800);
         const canvas = activeMap.getCanvas();
         contextRecoveryRef.current = bindWebGlContextRecovery(
           canvas,
@@ -1636,6 +1657,9 @@ export function MapStageProvider({
     if (!map) return;
     applyGesturesForPosture(map, posture, { pointerFine: prefersFinePointer() });
     syncRotateGestures(map, posture, prefersFinePointer());
+    // The Door's phone strip may have sunk the zoom floor below the Instrument's national floor
+    // (camera.ts, `zoomFloor: 'fit'`); every other posture gets the floor back.
+    if (posture !== 'ambient') map.setMinZoom(MAP_MIN_ZOOM);
   }, [posture, syncRotateGestures]);
 
   /** A live read of the reduced-motion preference for the camera path below. */

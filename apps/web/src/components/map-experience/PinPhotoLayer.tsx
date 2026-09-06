@@ -1,13 +1,13 @@
 /**
  * Fetches a surface's pin photo index (lazily, once, on the first hover/focus intent) and mounts
  * one `PinPhotoCard` near whichever pin currently has hover/focus — never more than one. Shared by
- * the Door (`DoorImmersive`, fed by `usePinPhotoHoverAnchor`) and Explore (`AtlasExperience`,
- * fed by `MapStage`'s `pinHover` event); both pass a hover target shaped the same way and their
- * own surface's photo endpoint (`/door/photos` or `/atlas/photos`).
+ * the Door (`DoorImmersive`) and Explore (`AtlasExperience`), both fed by `MapStage`'s `pinHover`
+ * event; each passes a hover target shaped the same way and its own surface's photo endpoint
+ * (`/door/photos` or `/atlas/photos`).
  *
  * Portaled to `document.body` and positioned in viewport pixels from the anchor pin's own
- * `getBoundingClientRect()`, so it renders correctly regardless of any transform/zoom context the
- * anchor sits inside (the Door's layout-zoomed board, Explore's MapLibre canvas).
+ * `getBoundingClientRect()`, so it renders correctly regardless of any transform context the
+ * anchor sits inside (MapLibre's marker layer on either surface).
  */
 'use client';
 

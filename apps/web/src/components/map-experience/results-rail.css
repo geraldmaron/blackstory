@@ -190,9 +190,52 @@
   text-overflow: ellipsis;
 }
 
-.ds-results__era,
-.ds-results__meta .ds-grade {
+.ds-results__era {
   flex: none;
+}
+
+/*
+ * The grade takes the row's right edge rather than trailing the middot chain, so the marks form
+ * one column down the scroller that a reader can read vertically. `margin-left: auto` also keeps
+ * a fixed gap off the era no matter how far the place truncates.
+ */
+.ds-results__grade {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 5px;
+  margin-left: auto;
+  padding-left: var(--ds-space-2);
+}
+
+/*
+ * The same three-segment meter the record sheet and the record page draw, sized for a 54px row.
+ * Segment count is the non-colour channel (map-entity-encoding.md: colour is never the only
+ * signal), so an ungraded record is honestly three empty segments rather than a fourth colour.
+ */
+.ds-results__grade-meter .ds-rec-meter__seg {
+  width: 7px;
+  height: 3px;
+  border-radius: 1px;
+}
+
+.ds-results__grade-letter {
+  min-width: 0.5rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  text-align: right;
+}
+
+.ds-results__row[data-grade='high'] .ds-results__grade-letter {
+  color: var(--ds-confidence-high-fg);
+}
+
+.ds-results__row[data-grade='medium'] .ds-results__grade-letter {
+  color: var(--ds-confidence-medium-fg);
+}
+
+.ds-results__row[data-grade='low'] .ds-results__grade-letter {
+  color: var(--ds-confidence-low-fg);
 }
 
 .ds-results__sep {

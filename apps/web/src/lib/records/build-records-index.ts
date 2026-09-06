@@ -121,6 +121,9 @@ export type RecordsRow = {
   /** `null` is an honest ungraded record, never silently promoted to C. */
   readonly grade: EvidenceGrade | null;
   readonly gradeDescription: string;
+  /** The stored tier behind the letter, so the row can draw the same evidence meter the Explore
+   *  results rail, the record sheet and the record page draw. */
+  readonly confidenceTier: ConfidenceTier;
 };
 
 export type RecordsFacet = {
@@ -357,6 +360,7 @@ function toFacts(entry: RecordsCatalogEntry, collisions: ReadonlyMap<string, num
       mapTone,
       grade: gradeForConfidence(confidenceTier),
       gradeDescription: gradeDescription(gradeForConfidence(confidenceTier)),
+      confidenceTier,
     },
     eraBuckets,
     topicIds: topicSource.filter(isValidTopicId),

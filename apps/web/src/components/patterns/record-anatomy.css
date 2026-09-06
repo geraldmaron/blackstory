@@ -74,6 +74,8 @@
 }
 
 .ds-record-anatomy__fact-value {
+  display: grid;
+  gap: 0.2rem;
   min-width: 0;
   margin: 0;
   font-family: var(--ds-font-editorial);
@@ -81,6 +83,32 @@
   font-weight: 500;
   line-height: 1.45;
   overflow-wrap: break-word;
+}
+
+/*
+ * Value and meter share a baseline row so the bars read as a reading of the word beside them,
+ * not as a separate fact. `flex-wrap` keeps the bars with the value on a narrow card instead of
+ * letting them overhang the column.
+ */
+.ds-record-anatomy__fact-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-width: 0;
+}
+
+.ds-record-anatomy__fact-meter {
+  flex: 0 0 auto;
+}
+
+/* The count behind the grade. Mono, because it is data about the record, not part of its name. */
+.ds-record-anatomy__fact-support {
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--ds-ink-muted);
 }
 
 .ds-record-anatomy__fact-link {

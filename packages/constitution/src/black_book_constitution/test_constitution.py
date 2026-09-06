@@ -19,17 +19,19 @@ from black_book_constitution import (
 def test_loads_versioned_product_constitution() -> None:
     reset_product_constitution_cache()
     policy = load_product_constitution()
-    assert policy["policyVersion"] == "1.0.0"
-    assert get_policy_version() == "1.0.0"
+    assert policy["policyVersion"] == "1.1.0"
+    assert get_policy_version() == "1.1.0"
 
 
 def test_every_evaluation_records_policy_version() -> None:
+    """The claim is that an evaluation stamps the active version, not which version that is."""
+    expected = get_policy_version()
     living = evaluate_living_status("unknown")
     precision = evaluate_public_precision("city")
     procedural = evaluate_procedural_language("Court ruled on the ordinance.", "ruled")
-    assert living["policyVersion"] == "1.0.0"
-    assert precision["policyVersion"] == "1.0.0"
-    assert procedural["policyVersion"] == "1.0.0"
+    assert living["policyVersion"] == expected
+    assert precision["policyVersion"] == expected
+    assert procedural["policyVersion"] == expected
 
 
 def test_living_and_unknown_treated_as_living() -> None:
@@ -39,9 +41,16 @@ def test_living_and_unknown_treated_as_living() -> None:
 
 
 def test_prohibited_location_precision_rejected() -> None:
-    result = evaluate_public_precision("street_address")
+    result = evaluate_public_precision("residence")
     assert result["allowed"] is False
     assert result["reason"] == "prohibited_location_precision"
+
+
+def test_precision_level_the_policy_does_not_name_is_rejected_too() -> None:
+    """Fail closed on an unrecognised level rather than treating silence as permission."""
+    result = evaluate_public_precision("street_address")
+    assert result["allowed"] is False
+    assert result["reason"] == "unknown_precision_level"
 
 
 def test_unsupported_procedural_language_rejected() -> None:
@@ -84,7 +93,7 @@ def test_ugc_living_person_rules_extends_constitution_without_version_bump() -> 
     """additive extension, mirrors how  added sensitivityRules at 1.0.0."""
     reset_product_constitution_cache()
     policy = load_product_constitution()
-    assert policy["policyVersion"] == "1.0.0"
+    assert policy["policyVersion"] == get_policy_version()
     rules = policy["ugcLivingPersonRules"]
     assert rules["crossSourceProfileAggregationProhibited"] is True
     assert rules["deanonymizationProhibited"] is True

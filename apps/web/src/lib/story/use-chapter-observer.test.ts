@@ -7,7 +7,11 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { pickWinnerChapterIndex, type ChapterIntersectionEntry } from './use-chapter-observer';
+import {
+  chapterInViewFromRects,
+  pickWinnerChapterIndex,
+  type ChapterIntersectionEntry,
+} from './use-chapter-observer';
 
 function entry(
   chapterIndex: number,
@@ -39,4 +43,29 @@ test('two chapters crossing threshold in the same batch: the more-visible one wi
 
 test('a non-intersecting entry never outranks an intersecting one, regardless of ratio', () => {
   assert.equal(pickWinnerChapterIndex([entry(0, 0.95, false), entry(1, 0.1, true)]), 1);
+});
+
+test('the chapter in view from rects is the most-visible one past the threshold (repo-27uao)', () => {
+  // A 900px viewport scrolled so chapter 2 fills it and chapter 3's top 200px show.
+  const rects = [
+    { chapterIndex: 0, top: -1800, bottom: -900 },
+    { chapterIndex: 1, top: -900, bottom: 0 },
+    { chapterIndex: 2, top: 0, bottom: 700 },
+    { chapterIndex: 3, top: 700, bottom: 1600 },
+  ];
+  assert.equal(chapterInViewFromRects(rects, 900), 2);
+  // Nothing far enough in: the caller keeps its opening chapter.
+  assert.equal(chapterInViewFromRects([{ chapterIndex: 4, top: 800, bottom: 1700 }], 900), null);
+  assert.equal(chapterInViewFromRects(rects, 0), null);
+  // At the top of the page the opening chapter wins outright.
+  assert.equal(
+    chapterInViewFromRects(
+      [
+        { chapterIndex: 0, top: 0, bottom: 900 },
+        { chapterIndex: 1, top: 900, bottom: 1800 },
+      ],
+      900,
+    ),
+    0,
+  );
 });

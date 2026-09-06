@@ -44,6 +44,36 @@ export function pickWinnerChapterIndex(
   return winner ? winner.chapterIndex : null;
 }
 
+/**
+ * The chapter in view right now, from the sections' own boxes: the same most-visible rule the
+ * observer applies to its batches, applied to `getBoundingClientRect` results. For a page that
+ * mounts already scrolled — a reload, a restored history entry — so the surface can frame the
+ * chapter the reader is actually on before the plate's first frame, instead of framing the
+ * opening chapter and then flying (repo-27uao). `null` when nothing crosses the threshold.
+ */
+export function chapterInViewFromRects(
+  rects: readonly {
+    readonly chapterIndex: number;
+    readonly top: number;
+    readonly bottom: number;
+  }[],
+  viewportHeight: number,
+): number | null {
+  if (!(viewportHeight > 0)) return null;
+  return pickWinnerChapterIndex(
+    rects.map((rect) => {
+      const height = rect.bottom - rect.top;
+      const visible = Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0));
+      const intersectionRatio = height > 0 ? visible / height : 0;
+      return {
+        chapterIndex: rect.chapterIndex,
+        intersectionRatio,
+        isIntersecting: intersectionRatio >= CHAPTER_INTERSECTION_THRESHOLD,
+      };
+    }),
+  );
+}
+
 export type ChapterObserverOptions = {
   /** Set false to tear the observer down without unmounting the caller (StoryMode toggles this
    * off when the surface is not the active mode). Defaults to true. */

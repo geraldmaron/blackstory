@@ -18,6 +18,10 @@
  * still resolving through `--ds-*`, which is what makes the kit theme-flip correctly.
  */
 
+/* Atom stylesheets the kit re-exports. `@import` is only legal ahead of the rules below, which
+   is why this sits above the token block rather than beside the section it belongs to. */
+@import './precision.css';
+
 .ds-room {
   /* Mock --ink-2: body prose, one step down from a heading but not yet muted. */
   --room-ink-2: color-mix(in srgb, var(--ds-ink) 88%, var(--ds-canvas));
@@ -695,22 +699,9 @@
   color: var(--room-ink-3);
 }
 
-/* —— Precision: what this coordinate does and does not claim ——————————————— */
-.ds-room-precision {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--ds-space-2);
-  font-family: var(--ds-font-mono);
-  font-size: 10.5px;
-  line-height: 1.55;
-  color: var(--room-ink-4);
-}
-
-.ds-room-precision svg {
-  flex: none;
-  margin-top: 1px;
-  color: var(--room-ink-4);
-}
+/* —— Precision: what this coordinate does and does not claim ——————————————————
+   Drawn in `precision.css`, imported at the top of this file. It lives beside the atom because
+   `Precision` also renders on the map surface, which imports no room stylesheet at all. */
 
 /* —— TrustBlock ——————————————————————————————————————————————————————————— */
 .ds-room-trust {

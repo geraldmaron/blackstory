@@ -46,6 +46,14 @@ export type PaletteRecord = {
   readonly name: string;
   /** "Birmingham, Alabama". Shown as the row's second line. */
   readonly place: string;
+  /**
+   * The raw entity kind ("person", "law", "case", …), never displayed. `kindLabel` below is the
+   * shown string; this is what `AtlasExperience`'s open-record fallback passes to
+   * `atlasWalkHref` so a record with no map feature routes the way its kind already does
+   * everywhere else (a law to `/law`, a person to `/memorial`) instead of guessing at a place
+   * page.
+   */
+  readonly kind?: string;
   /** Human topic labels, not slugs: a query reads "restrictive covenant", never the id. */
   readonly topics?: readonly string[];
   /** "School", "Massacre" — the same label the record mark paints. */

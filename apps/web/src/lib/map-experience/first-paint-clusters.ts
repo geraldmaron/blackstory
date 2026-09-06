@@ -1,27 +1,44 @@
 /**
- * Server-side grouping for the first-paint pin plate, so the static board reads as the same
- * pattern the live plate settles into. MapLibre aggregates nearby records at national zoom
- * (`EXPLORE_CLUSTER_CONFIG`, radius 52px, min 2); before it has painted, the Albers board used to
- * show all 4,101 records as loose discs, then the plate replaced them with copper count discs.
- * Two entity patterns, one after the other, on every load. This groups the board's pins the same
- * way — greedy, by index, within one radius — so the handoff is the same map settling, not a
- * different map arriving.
+ * Server-side clustering for Explore's first-paint board — MapLibre's own algorithm and
+ * parameters, so the board's copper count discs ARE the plate's clusters, not an imitation.
  *
- * Coordinates are the plate's own: percent of the 960×500 Albers locator (`locatorPinPercent`).
- * The radius is expressed in board units at a representative desktop width so the grouping
- * density matches the live plate at the national frame without knowing the viewport.
+ * MapLibre clusters a GeoJSON source in its worker with `supercluster` (`geojson_source.ts`:
+ * `extent: EXTENT` (8192), `radius: clusterRadius × EXTENT / tileSize`, `minPoints`,
+ * `maxZoom: clusterMaxZoom`, `log: false`) and draws, at any camera zoom, the clusters of the
+ * integer tile zoom below it. The board runs the same library with the same numbers over the same
+ * pin collection the plate opens on (`firstPaintCatalog`), at the tile zooms the plate's opening
+ * frame can land in, so every disc — position, count and membership — is the disc the plate will
+ * paint at the handoff (repo-27uao). Before this the board grouped greedily by index within a
+ * scaled radius, which put a different pattern of discs on screen from the plate's on every load.
  */
+import Supercluster, { type PointFeature } from 'supercluster';
+import { EXPLORE_CLUSTER_CONFIG } from './dignity-style';
 
-export type FirstPaintPoint = {
-  /** Percent across the 960-unit board. */
-  readonly x: number;
-  /** Percent down the 500-unit board. */
-  readonly y: number;
-};
+/** MapLibre's vector-tile extent, and the tile size its `clusterRadius` is authored against. */
+const MAPLIBRE_TILE_EXTENT = 8192;
+const MAPLIBRE_TILE_SIZE = 512;
+
+/** `clusterRadius` in tile units, exactly as `GeoJSONSource._pixelsToTileUnits` scales it. */
+export const FIRST_PAINT_CLUSTER_RADIUS_TILE_UNITS =
+  (EXPLORE_CLUSTER_CONFIG.clusterRadius * MAPLIBRE_TILE_EXTENT) / MAPLIBRE_TILE_SIZE;
+
+/** Same floor as `EXPLORE_CLUSTER_CONFIG.clusterMinPoints`. */
+export const FIRST_PAINT_CLUSTER_MIN_POINTS = EXPLORE_CLUSTER_CONFIG.clusterMinPoints;
+
+/**
+ * The tile zooms the plate's opening frame lands in. The constructor fits CONUS to the canvas
+ * (`PLATE_OPENING_PADDING_PX`), which is zoom 3.x on a laptop and clamps to the national floor on
+ * a phone; from roughly 1400×800 the fit crosses 4. The board carries both patterns and
+ * explore-map-underlay.css shows the one the viewport is in.
+ */
+export const FIRST_PAINT_CLUSTER_ZOOMS = [3, 4] as const;
+export type FirstPaintClusterZoom = (typeof FIRST_PAINT_CLUSTER_ZOOMS)[number];
+
+export type FirstPaintPoint = { readonly lng: number; readonly lat: number };
 
 export type FirstPaintCluster = {
-  readonly x: number;
-  readonly y: number;
+  readonly lng: number;
+  readonly lat: number;
   readonly count: number;
 };
 
@@ -31,97 +48,50 @@ export type FirstPaintGrouping = {
   readonly grouped: ReadonlySet<number>;
 };
 
-const BOARD_WIDTH = 960;
-const BOARD_HEIGHT = 500;
+type PinProperties = { readonly pinIndex: number };
+
+const WHOLE_WORLD: [number, number, number, number] = [-180, -85, 180, 85];
 
 /**
- * Live cluster radius (52px) at a 1280px-wide plate, in board units: 52 × 960 / 1280. Wider
- * viewports group a little more loosely than the plate will, narrower a little more tightly;
- * either way the board and the plate agree on the pattern, which is what the reader sees.
- */
-export const FIRST_PAINT_CLUSTER_RADIUS_UNITS = 39;
-
-/** Same floor as `EXPLORE_CLUSTER_CONFIG.clusterMinPoints`. */
-export const FIRST_PAINT_CLUSTER_MIN_POINTS = 2;
-
-function round(value: number): number {
-  return Math.round(value * 10000) / 10000;
-}
-
-/**
- * Groups pins within `radiusUnits` of one another. `null` entries (unprojected pins) and any
- * index in `exclude` (walks, the focus pin) are never grouped. Deterministic: seeds are taken in
- * index order and each pin joins the first cluster that reaches it.
+ * Clusters `points` the way the plate does at tile zoom `zoom`. `null` entries (unprojected
+ * pins) are never grouped. Deterministic for a given input order, like the plate's worker.
  */
 export function groupFirstPaintPins(
   points: readonly (FirstPaintPoint | null)[],
-  options: {
-    readonly radiusUnits?: number;
-    readonly minPoints?: number;
-    readonly exclude?: ReadonlySet<number>;
-  } = {},
+  zoom: number,
 ): FirstPaintGrouping {
-  const radius = options.radiusUnits ?? FIRST_PAINT_CLUSTER_RADIUS_UNITS;
-  const minPoints = options.minPoints ?? FIRST_PAINT_CLUSTER_MIN_POINTS;
-  const exclude = options.exclude ?? new Set<number>();
-  const radiusSq = radius * radius;
-
-  // Board-unit coordinates, bucketed into radius-sized cells so neighbor lookup is local.
-  const units: (readonly [number, number] | null)[] = points.map((point, index) => {
-    if (!point || exclude.has(index)) return null;
-    return [(point.x / 100) * BOARD_WIDTH, (point.y / 100) * BOARD_HEIGHT] as const;
+  const index = new Supercluster<PinProperties, PinProperties>({
+    radius: FIRST_PAINT_CLUSTER_RADIUS_TILE_UNITS,
+    extent: MAPLIBRE_TILE_EXTENT,
+    maxZoom: EXPLORE_CLUSTER_CONFIG.clusterMaxZoom,
+    minPoints: FIRST_PAINT_CLUSTER_MIN_POINTS,
+    log: false,
   });
-  const cells = new Map<string, number[]>();
-  const cellKey = (ux: number, uy: number) =>
-    `${Math.floor(ux / radius)}:${Math.floor(uy / radius)}`;
-  units.forEach((unit, index) => {
-    if (!unit) return;
-    const key = cellKey(unit[0], unit[1]);
-    const bucket = cells.get(key);
-    if (bucket) bucket.push(index);
-    else cells.set(key, [index]);
-  });
-
-  const grouped = new Set<number>();
-  const clusters: FirstPaintCluster[] = [];
-
-  units.forEach((seed, seedIndex) => {
-    if (!seed || grouped.has(seedIndex)) return;
-    const members: number[] = [];
-    const cx = Math.floor(seed[0] / radius);
-    const cy = Math.floor(seed[1] / radius);
-    for (let dx = -1; dx <= 1; dx += 1) {
-      for (let dy = -1; dy <= 1; dy += 1) {
-        const bucket = cells.get(`${cx + dx}:${cy + dy}`);
-        if (!bucket) continue;
-        for (const candidate of bucket) {
-          if (grouped.has(candidate)) continue;
-          const unit = units[candidate];
-          if (!unit) continue;
-          const ddx = unit[0] - seed[0];
-          const ddy = unit[1] - seed[1];
-          if (ddx * ddx + ddy * ddy <= radiusSq) members.push(candidate);
-        }
-      }
-    }
-    if (members.length < minPoints) return;
-    let sumX = 0;
-    let sumY = 0;
-    for (const member of members) {
-      grouped.add(member);
-      const point = points[member];
-      if (point) {
-        sumX += point.x;
-        sumY += point.y;
-      }
-    }
-    clusters.push({
-      x: round(sumX / members.length),
-      y: round(sumY / members.length),
-      count: members.length,
+  const features: PointFeature<PinProperties>[] = [];
+  points.forEach((point, pinIndex) => {
+    if (!point) return;
+    features.push({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [point.lng, point.lat] },
+      properties: { pinIndex },
     });
   });
+  index.load(features);
 
+  const clusters: FirstPaintCluster[] = [];
+  const singles = new Set<number>();
+  for (const feature of index.getClusters(WHOLE_WORLD, zoom)) {
+    const [lng, lat] = feature.geometry.coordinates as [number, number];
+    if ('cluster' in feature.properties && feature.properties.cluster) {
+      clusters.push({ lng, lat, count: feature.properties.point_count });
+    } else {
+      singles.add((feature.properties as PinProperties).pinIndex);
+    }
+  }
+  const grouped = new Set<number>();
+  points.forEach((point, pinIndex) => {
+    if (point && !singles.has(pinIndex)) grouped.add(pinIndex);
+  });
   return { clusters, grouped };
 }
 

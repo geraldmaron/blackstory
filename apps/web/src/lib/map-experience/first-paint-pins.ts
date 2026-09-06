@@ -7,7 +7,6 @@
  * plate without a walk. This is not a second map source; it is the same pin
  * collection with internal labels stripped at the page boundary.
  */
-import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import {
   atlasWalkHref,
   isHoldingPlaceHref,
@@ -262,34 +261,9 @@ export function toFirstPaintShell<T extends { readonly viewState: { readonly sel
   return stripShopTokensFromJson(next as T);
 }
 
-/** Project a lng/lat onto the national plate as CSS percent. */
-export function conusPinPercent(
-  lng: number,
-  lat: number,
-): { readonly left: number; readonly top: number } {
-  const [west, south, east, north] = US_CONUS_BOUNDS;
-  const x = (lng - west) / (east - west);
-  const y = (north - lat) / (north - south);
-  return {
-    left: Math.min(100, Math.max(0, x * 100)),
-    top: Math.min(100, Math.max(0, y * 100)),
-  };
-}
-
 /** True when this first-paint pin is a holding `/place/` walk. */
 export function isFirstPaintWalk(feature: ExploreMapFeature): boolean {
   return isHoldingPlaceHref(feature.properties.href);
-}
-
-/**
- * Pin-plate walk styling. Explore first paint: any holding `/place/` href. Door link plate:
- * only allowlisted Explore walks (`holdingWalk`), not every linkable `/place/` record.
- */
-export function isPinPlateWalk(feature: ExploreMapFeature, linkRecords: boolean): boolean {
-  if (linkRecords) {
-    return feature.properties.holdingWalk === true;
-  }
-  return isFirstPaintWalk(feature);
 }
 
 /** Resolve a release entity id to the opaque first-paint pin id (`pin-N`). */

@@ -15,6 +15,9 @@ import { MIGRATION_CORRIDORS } from '../../../lib/map-experience/migration-corri
 import type { LensLayers } from '../../../components/map-experience/LensPanel';
 import type { PanelVisibility } from './use-panel-visibility';
 
+/** A beat between the plate being revealed and the establishing shot starting on it. */
+const ESTABLISHING_SHOT_DELAY_MS = 400;
+
 /**
  * The camera: the move library bound to the live `MapStage` handle, the announcement readout,
  * the spotlight mask, and the establishing shot that frames the archive on first paint.
@@ -94,14 +97,29 @@ export function useAtlasCamera(
     return () => clearTimeout(timer);
   }, [readout]);
 
-  /** The establishing shot. Start wide, then go deep (§4.2 rule 2), once the canvas has size. */
+  /**
+   * The establishing shot. Start wide, then go deep (§4.2 rule 2) — once the plate has been
+   * revealed, not once the canvas has size. The first-paint board is drawn at the plate's opening
+   * frame (explore-map-underlay.css), so the handoff is two identical pictures crossfading; a
+   * shot that started before the reveal was seen mid-flight through that fade, and on a cold load
+   * the old 400ms-after-mount timer fired before MapLibre existed and the shot never ran at all
+   * (repo-27uao). `ready` replays for a plate revealed on an earlier page, so arriving from the
+   * Door still gets the shot. Under reduced motion the shot is a cut and takes no beat.
+   */
   const framed = useRef(false);
   useEffect(() => {
-    if (framed.current || !stage.mapAvailable) return;
-    framed.current = true;
-    const timer = setTimeout(() => camera.wide({ trigger: 'ambient' }), 400);
-    return () => clearTimeout(timer);
-  }, [camera, stage.mapAvailable]);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const unsubscribe = stage.subscribe('ready', () => {
+      if (framed.current) return;
+      framed.current = true;
+      const delay = prefersReducedMotion() ? 0 : ESTABLISHING_SHOT_DELAY_MS;
+      timer = setTimeout(() => camera.wide({ trigger: 'ambient' }), delay);
+    });
+    return () => {
+      unsubscribe();
+      if (timer !== undefined) clearTimeout(timer);
+    };
+  }, [camera, stage]);
 
   const runMove = useCallback(
     (move: CameraMove) => {

@@ -40,25 +40,13 @@ test('first-paint pin plate declares shared size tokens', () => {
   for (const value of Object.values(FIRST_PAINT_PIN_SIZE_REM.national)) {
     assert.match(pinPlateCss, new RegExp(value.replace('.', '\\.')));
   }
-  for (const value of Object.values(FIRST_PAINT_PIN_SIZE_REM.doorNational)) {
-    assert.match(pinPlateCss, new RegExp(value.replace('.', '\\.')));
-  }
-  for (const value of Object.values(FIRST_PAINT_PIN_SIZE_REM.doorMobileNational)) {
-    assert.match(pinPlateCss, new RegExp(value.replace('.', '\\.')));
-  }
-  for (const value of Object.values(FIRST_PAINT_PIN_SIZE_REM.doorMobileZoomed)) {
-    assert.match(pinPlateCss, new RegExp(value.replace('.', '\\.')));
-  }
-  for (const value of Object.values(FIRST_PAINT_PIN_SIZE_REM.zoomed)) {
-    assert.match(pinPlateCss, new RegExp(value.replace('.', '\\.')));
-  }
   assert.match(pinPlateCss, /--ds-first-paint-pin-size:/);
   assert.match(pinPlateCss, /--ds-accent-graphic/);
 });
 
-test('door-home does not duplicate first-paint pin size rules', () => {
-  assert.doesNotMatch(doorCss, /body:has\(\.ds-door\)\s+\.ds-first-paint-pin\s*\{[^}]*width:/);
-  assert.doesNotMatch(doorCss, /\.ds-door__board\.is-zoomed\s+\.ds-first-paint-pin/);
+test('door-home carries no pin-plate rules: the Door has no static board (repo-18ma2)', () => {
+  assert.doesNotMatch(doorCss, /ds-first-paint-pin/);
+  assert.doesNotMatch(doorCss, /ds-door__board/);
 });
 
 test('MapStage loads first-paint pin plate CSS for Explore HTML markers', () => {

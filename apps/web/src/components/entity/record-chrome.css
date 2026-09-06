@@ -107,15 +107,15 @@ a.ds-rec-pill:focus-visible {
 }
 
 .ds-rec-pill--grade[data-variant='high'] .ds-rec-pill__icon {
-  color: var(--rec-tone-high);
+  color: var(--rec-tone-high, var(--ds-confidence-high-fg));
 }
 
 .ds-rec-pill--grade[data-variant='medium'] .ds-rec-pill__icon {
-  color: var(--rec-tone-medium);
+  color: var(--rec-tone-medium, var(--ds-confidence-medium-fg));
 }
 
 .ds-rec-pill--grade[data-variant='low'] .ds-rec-pill__icon {
-  color: var(--rec-tone-low);
+  color: var(--rec-tone-low, var(--ds-confidence-low-fg));
 }
 
 .ds-rec-pills {
@@ -126,7 +126,16 @@ a.ds-rec-pill:focus-visible {
   margin: 0 0 var(--ds-space-4);
 }
 
-/* Meter: three bars. Colour carries the tone, the aria-label carries the word. */
+/*
+ * Meter: three bars. Colour carries the tone, the aria-label carries the word, and the number
+ * of filled bars carries it again without colour.
+ *
+ * Every `--rec-tone-*` here is read with its global fallback, the same way this file already
+ * reads room-kit tokens. The tone aliases are declared on `.ds-room` and `.ds-sheet` only, so
+ * a meter drawn anywhere else — the results rail is the first — resolved them to nothing and
+ * painted three invisible bars. The aliases are colour, not part of the host's type scale, so
+ * falling back to the `--ds-confidence-*` token they point at is exact, not approximate.
+ */
 .ds-rec-meter {
   display: inline-flex;
   align-items: center;
@@ -143,15 +152,15 @@ a.ds-rec-pill:focus-visible {
 }
 
 .ds-rec-meter--high .ds-rec-meter__seg--on {
-  background: var(--rec-tone-high-bar);
+  background: var(--rec-tone-high-bar, var(--ds-confidence-high-border));
 }
 
 .ds-rec-meter--medium .ds-rec-meter__seg--on {
-  background: var(--rec-tone-medium-bar);
+  background: var(--rec-tone-medium-bar, var(--ds-confidence-medium-border));
 }
 
 .ds-rec-meter--low .ds-rec-meter__seg--on {
-  background: var(--rec-tone-low-bar);
+  background: var(--rec-tone-low-bar, var(--ds-confidence-low-border));
 }
 
 .ds-rec-meter--unrated .ds-rec-meter__seg--on,

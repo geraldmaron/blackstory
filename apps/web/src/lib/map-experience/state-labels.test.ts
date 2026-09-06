@@ -8,6 +8,8 @@
  * exercised here plain Node has no DOM; see that function's doc comment in `state-labels.ts`.
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { US_STATES } from '@repo/domain/map/geography';
 import {
@@ -17,6 +19,8 @@ import {
   stateLabelColors,
   stateLabelOpacityForZoom,
   stateLabelPoints,
+  STATE_LABEL_APPEAR_END_ZOOM,
+  STATE_LABEL_APPEAR_START_ZOOM,
 } from './state-labels';
 import { brandPalette, darkTheme } from '@repo/ui';
 
@@ -70,7 +74,7 @@ test('the documented AK/HI/FL/MI overrides are actually applied, not the raw bbo
 });
 
 test('opacity is fully visible at/below the fade-start zoom and fully hidden at/above the fade-end zoom', () => {
-  assert.equal(stateLabelOpacityForZoom(0), 1);
+  assert.equal(stateLabelOpacityForZoom(STATE_LABEL_APPEAR_END_ZOOM), 1);
   assert.equal(stateLabelOpacityForZoom(STATE_LABEL_FADE_START_ZOOM), 1);
   assert.equal(stateLabelOpacityForZoom(STATE_LABEL_FADE_END_ZOOM), 0);
   assert.equal(stateLabelOpacityForZoom(12), 0);
@@ -115,4 +119,28 @@ test('stateLabelColors follows light vs dark theme tokens', () => {
   const dark = stateLabelColors('dark');
   assert.equal(dark.default, darkTheme.inkMuted);
   assert.equal(dark.selected, brandPalette.copperDark);
+});
+
+test('labels fade out under the national floor, where the plate is at continental scale', () => {
+  // repo-27uao: the Door's phone strip fits the whole country into a strip; abbreviations
+  // overlap there, and no mature map draws region names at that scale.
+  assert.equal(STATE_LABEL_APPEAR_END_ZOOM, 3);
+  assert.equal(stateLabelOpacityForZoom(0), 0);
+  assert.equal(stateLabelOpacityForZoom(STATE_LABEL_APPEAR_START_ZOOM), 0);
+  assert.equal(stateLabelOpacityForZoom(2.15), 0);
+  const midpoint = (STATE_LABEL_APPEAR_START_ZOOM + STATE_LABEL_APPEAR_END_ZOOM) / 2;
+  assert.ok(Math.abs(stateLabelOpacityForZoom(midpoint) - 0.5) < 1e-9);
+  assert.equal(stateLabelOpacityForZoom(STATE_LABEL_APPEAR_END_ZOOM), 1);
+  assert.equal(stateLabelOpacityForZoom(3.5), 1);
+});
+
+test('MapStage applies the fade through the marker, which owns its element’s inline opacity', () => {
+  const mapStage = readFileSync(
+    fileURLToPath(new URL('../../components/map-stage/MapStage.tsx', import.meta.url)),
+    'utf8',
+  );
+  assert.match(mapStage, /entry\.marker\.setOpacity\(opacity\)/);
+  // A MapLibre marker rewrites `element.style.opacity` on every update; writing it directly
+  // held for one frame and no label ever faded (repo-27uao).
+  assert.doesNotMatch(mapStage, /entry\.element\.style\.opacity/);
 });

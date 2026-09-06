@@ -17,6 +17,10 @@ export type MapStageEvents = {
    * compass needle can track a live rotate-drag without waking every `viewport` subscriber (URL
    * sync included) on each frame. */
   rotate: [bearing: number];
+  /** The plate has painted geography and stamped `data-plate-ready` (MapStage.tsx). Fires once
+   * per plate life; `subscribe` replays it to a late subscriber, the way `viewport` replays,
+   * because the plate outlives pages and is usually already revealed when a page arrives. */
+  ready: [];
   error: [];
   /** An entity marker gained/lost hover intent (after the caller's own delay) or DOM focus.
    * `null` clears it — same "current value, not a delta" convention as the other selection
@@ -38,6 +42,7 @@ export function makeListenerStore(): {
     activate: new Set(),
     viewport: new Set(),
     rotate: new Set(),
+    ready: new Set(),
     error: new Set(),
     pinHover: new Set(),
   };

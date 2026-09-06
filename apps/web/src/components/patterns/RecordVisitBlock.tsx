@@ -5,12 +5,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { MapsExternalLink } from '../map-experience/MapsExternalLink';
-import {
-  externalMapsDirectionsLabel,
-  externalMapsLinkLabel,
-} from '../../lib/geography/external-maps-url';
 import { buildVisitHandoff, type VisitHandoffInput } from '../../lib/geography/visit-handoff';
+import { MapsHandoff } from './MapsHandoff';
 import type { PublicVisitContactField } from '../../lib/geography/public-visit-contact';
 import { iconWithFallback } from '../../lib/map-experience/icon-fallback';
 import { Precision } from '../room';
@@ -149,57 +145,37 @@ export function RecordVisitBlock({
         />
       ) : null}
       {/*
-       * Maps exits are quiet text links, never copper pills. External handoff and in-app
-       * "Fly to place" (sheet) are different jobs; twin primary CTAs for "go to place" compete.
+       * Both maps apps, same destination: a reader picks the one on their phone. The exits are
+       * quiet, never copper — an external handoff is not the primary action of any view it sits
+       * on, and "Fly to place" / "See it on the map" are the in-app job it must not compete with.
        */}
-      <div className="ds-record-visit__actions" role="group" aria-label="Maps handoff">
-        {/* Both maps apps, same destination string: a reader picks the one on their phone. */}
-        {visit.appleMapsSearchHref ? (
-          <MapsExternalLink
-            className="ds-record-visit__link"
-            href={visit.appleMapsSearchHref}
-            placeLabel={mapsLabel}
-            title={`${externalMapsLinkLabel(mapsLabel)} (Apple Maps)`}
-          >
-            Apple Maps
-          </MapsExternalLink>
-        ) : null}
-        {visit.mapsSearchHref ? (
-          <MapsExternalLink
-            className="ds-record-visit__link"
-            href={visit.mapsSearchHref}
-            placeLabel={mapsLabel}
-            title={`${externalMapsLinkLabel(mapsLabel)} (Google Maps)`}
-          >
-            Google Maps
-          </MapsExternalLink>
-        ) : null}
-        {visit.appleMapsDirectionsHref ? (
-          <MapsExternalLink
-            className="ds-record-visit__link"
-            href={visit.appleMapsDirectionsHref}
-            placeLabel={mapsLabel}
-            title={`${externalMapsDirectionsLabel(mapsLabel)} (Apple Maps)`}
-          >
-            Directions (Apple)
-          </MapsExternalLink>
-        ) : null}
-        {visit.mapsDirectionsHref ? (
-          <MapsExternalLink
-            className="ds-record-visit__link"
-            href={visit.mapsDirectionsHref}
-            placeLabel={mapsLabel}
-            title={`${externalMapsDirectionsLabel(mapsLabel)} (Google Maps)`}
-          >
-            Directions (Google)
-          </MapsExternalLink>
-        ) : null}
-        {atlasHref ? (
+      <MapsHandoff
+        className={compact ? 'ds-maps-handoff--compact' : ''}
+        placeLabel={mapsLabel}
+        providers={[
+          {
+            key: 'apple',
+            placeHref: visit.appleMapsSearchHref,
+            directionsHref: visit.appleMapsDirectionsHref,
+          },
+          {
+            key: 'google',
+            placeHref: visit.mapsSearchHref,
+            directionsHref: visit.mapsDirectionsHref,
+          },
+        ]}
+      />
+      {/*
+       * The archive's own map is a different destination from a provider's, so it stays a text
+       * link rather than joining the provider controls: same row would read as a third provider.
+       */}
+      {atlasHref ? (
+        <p className="ds-record-visit__inapp">
           <Link className="ds-record-visit__link" href={atlasHref} scroll={false}>
-            See on map
+            See this place on the archive map
           </Link>
-        ) : null}
-      </div>
+        </p>
+      ) : null}
     </section>
   );
 }

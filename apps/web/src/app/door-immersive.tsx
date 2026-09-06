@@ -4,19 +4,23 @@
  * One visit rolls chapters / facts / spotlight on the server so SSR and hydrate match.
  * Document scroll so the wheel works over the map; IntersectionObserver picks the chapter.
  *
- * THE MAP IS EXPLORE'S MAP. The Door hands the persistent `MapStage` the same national-field
- * patch Explore rests on (`nationalFieldPatch`: grouped at national zoom, the same style, the
- * same entity markers) and flies its camera per chapter. The static Albers pin board underneath
- * is first paint and the no-JS / no-WebGL field: it hands over the moment the plate stamps
- * `data-plate-ready` (door-home.css). Until then the layout zoom on the board still tracks the
- * chapters, so a slow connection reads the same journey at lower fidelity rather than a blank.
+ * THE MAP IS EXPLORE'S MAP, AND IT IS THE ONLY MAP HERE. The Door hands the persistent `MapStage`
+ * the same national-field patch Explore rests on (`nationalFieldPatch`: grouped at national zoom,
+ * the same style, the same entity markers) and flies its camera per chapter. There is no static
+ * board underneath any more (repo-18ma2): a server-rendered Albers pin board fading into a Web
+ * Mercator plate read as an old map replaced by a new one on every load. The field is the page's
+ * own ground until the plate has painted, and then it is the plate.
  *
- * Pins with public hrefs stay clickable on both: the board's discs are links, and a marker or
- * cluster on the live plate goes through the stage's own `select` and cluster-expand paths.
+ * The camera is framed against the Door's map window (`.ds-door__window`: below the bar on a
+ * desktop, the sticky strip on a phone), not against the whole canvas, and re-framed whenever that
+ * window changes — a resize moves the map the way it moves the layout (door-field-frame.ts).
+ *
+ * Pins with public hrefs stay clickable: a marker or cluster on the live plate goes through the
+ * stage's own `select` and cluster-expand paths.
  */
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { BRAND_ASSETS } from '@repo/config';
@@ -34,7 +38,7 @@ import {
 } from '../lib/map-experience/decade-transition';
 import { DECADE_LAYER_FADE_MS } from './map/decade-layer-transition';
 import type { StoryChapter } from '../lib/story/chapters';
-import { useChapterObserver } from '../lib/story/use-chapter-observer';
+import { chapterInViewFromRects, useChapterObserver } from '../lib/story/use-chapter-observer';
 import type { StoryRecordSpotlight } from '../lib/story/pick-story-record';
 import type { StoryFact } from '../lib/story/story-facts';
 import { copyFor, headingParts } from '../components/story/story-copy';
@@ -43,11 +47,15 @@ import {
   PinPhotoLayer,
   type PinPhotoHoverTarget,
 } from '../components/map-experience/PinPhotoLayer';
-import { usePinPhotoHoverAnchor } from '../components/map-experience/use-pin-photo-hover';
 import { useMapStage } from '../components/map-stage/MapStage';
 import { ABOUT_SUPPORT_LINE } from './about/about-copy';
 import { resolveDoorFocus, type DoorFocusCamera, type DoorFocusFrame } from './door-focus';
-import { FirstPaintPinPlate } from './first-paint-pin-plate';
+import {
+  doorFrameOffset,
+  doorFramePadding,
+  sameDoorFrameBox,
+  type DoorFrameBox,
+} from './door-field-frame';
 
 void React;
 
@@ -80,6 +88,27 @@ const NATIONAL_CAMERA_MAX_ZOOM = 3.6;
 
 function isNationalCamera(camera: DoorFocusCamera): boolean {
   return camera.pitch === 0 && camera.bearing === 0 && camera.zoom <= NATIONAL_CAMERA_MAX_ZOOM;
+}
+
+function boxOf(element: HTMLElement | null): DoorFrameBox | null {
+  if (!element) return null;
+  const rect = element.getBoundingClientRect();
+  return { top: rect.top, left: rect.left, width: rect.width, height: rect.height };
+}
+
+/** The boxes a frame is computed against; a frame is only recomputed when one of them moves. */
+type DoorFrameBoxes = {
+  readonly window: DoorFrameBox | null;
+  readonly plate: DoorFrameBox | null;
+  readonly chrome: DoorFrameBox | null;
+};
+
+function sameDoorFrameBoxes(a: DoorFrameBoxes, b: DoorFrameBoxes): boolean {
+  return (
+    sameDoorFrameBox(a.window, b.window) &&
+    sameDoorFrameBox(a.plate, b.plate) &&
+    sameDoorFrameBox(a.chrome, b.chrome)
+  );
 }
 
 const DOOR_COLD_OPEN_PROSE =
@@ -143,6 +172,9 @@ function openDoorPin(href: string, push: (href: string) => void): void {
   push(href);
 }
 
+/** What the field reports about the plate: nothing yet, this mount's frame landed, or no plate. */
+type DoorPlateState = 'pending' | 'live' | 'unavailable';
+
 export type DoorImmersiveProps = {
   readonly pins: ExploreMapFeatureCollection;
   /** Per-state presence tiers, so the plate opens on the same tint Explore does. */
@@ -167,9 +199,10 @@ export function DoorImmersive({
   placeCount,
 }: DoorImmersiveProps) {
   const journeyRef = useRef<HTMLDivElement | null>(null);
-
-  const pinFieldRef = useRef<HTMLElement | null>(null);
-  const boardPhotoTarget = usePinPhotoHoverAnchor(pinFieldRef);
+  /** The map window: the part of the plate the reader sees on this surface (door-home.css). */
+  const windowRef = useRef<HTMLDivElement | null>(null);
+  /** The field chrome along the window's top edge; the country is framed below it. */
+  const chromeRef = useRef<HTMLDivElement | null>(null);
 
   const stage = useMapStage();
   const router = useRouter();
@@ -187,6 +220,8 @@ export function DoorImmersive({
 
   const [focus, setFocus] = useState<DoorFocusFrame>(initialFocus);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const reducedMotionRef = useRef(false);
+  reducedMotionRef.current = reducedMotion;
 
   /**
    * The decade the sweep chapter has filled the plate up to, or null when no sweep is running.
@@ -234,11 +269,50 @@ export function DoorImmersive({
     setReducedMotion(prefersReducedMotion());
   }, []);
 
+  /**
+   * The chapter the plate is currently framing. The observer fires for the chapter already in
+   * view too — on mount, and again when a fast scroll settles on the chapter it started from —
+   * and re-resolving the same chapter would restart its flight (and, on the sweep chapter, the
+   * sweep) for nothing. The opening chapter is framed on mount, so it starts as the last one.
+   */
+  const lastChapterIdRef = useRef<string>(chapters[0]!.id);
+
+  /**
+   * A page that mounts already scrolled — a reload, a restored history entry — frames the chapter
+   * the reader is on before the plate's first frame, instead of framing the opening chapter and
+   * then flying (repo-27uao). A layout effect, so it runs before the passive effects that land
+   * the first frame, and after the sections have their boxes. The sweep chapter is left to the
+   * observer: its camera is the national frame either way, and the sweep has to start from the
+   * observer's own batch the way it does from a scroll.
+   */
+  useLayoutEffect(() => {
+    const scope = journeyRef.current;
+    if (!scope) return;
+    const rects = [...scope.querySelectorAll<HTMLElement>('[data-chapter]')].map((section) => {
+      const rect = section.getBoundingClientRect();
+      return { chapterIndex: Number(section.dataset.chapter), top: rect.top, bottom: rect.bottom };
+    });
+    const index = chapterInViewFromRects(rects, window.innerHeight);
+    const chapter = index === null ? undefined : chapters[index];
+    if (!chapter || chapter.sweep || chapter.id === lastChapterIdRef.current) return;
+    lastChapterIdRef.current = chapter.id;
+    setFocus(
+      resolveDoorFocus({
+        chapter,
+        spotlight,
+        fact: factByChapterId[chapter.id],
+        spotlightLngLat,
+      }),
+    );
+  }, [chapters, factByChapterId, spotlight, spotlightLngLat]);
+
   useChapterObserver(
     journeyRef,
     chapters,
     useCallback(
       (chapter: StoryChapter) => {
+        if (chapter.id === lastChapterIdRef.current) return;
+        lastChapterIdRef.current = chapter.id;
         setFocus(
           resolveDoorFocus({
             chapter,
@@ -288,67 +362,162 @@ export function DoorImmersive({
     );
   }, [densityLevels, sweptPins, stage]);
 
-  /** True once the plate has reported a viewport, which it only does after MapLibre `load`. */
+  /** True once the plate has reported a viewport, which it only does once MapLibre has built. */
   const [plateLive, setPlateLive] = useState(false);
-  useEffect(() => stage.subscribe('viewport', () => setPlateLive(true)), [stage]);
-  useEffect(() => stage.subscribe('error', () => setPlateLive(false)), [stage]);
+  /** True once the plate has said it cannot paint at all (no WebGL, or the context is gone). */
+  const [plateUnavailable, setPlateUnavailable] = useState(false);
+  useEffect(
+    () =>
+      stage.subscribe('viewport', () => {
+        setPlateLive(true);
+        setPlateUnavailable(false);
+      }),
+    [stage],
+  );
+  useEffect(
+    () =>
+      stage.subscribe('error', () => {
+        setPlateLive(false);
+        setPlateUnavailable(true);
+      }),
+    [stage],
+  );
 
   /**
-   * True once THIS mount has pointed the shared plate at its own camera. `plateLive` alone is
+   * True once THIS mount has landed its own frame on the shared plate. `plateLive` alone is
    * stale on arrival: the plate is a persistent singleton (MapStage.tsx), and `subscribe`
    * replays the last viewport it ever reported — from whatever page was live before this one —
-   * the instant this effect subscribes. Gating the board→plate handoff (door-home.css) on that
-   * would swap to the live canvas while it is still showing the previous page's camera and data,
-   * which is the map flash this state exists to prevent. `pageReady` starts false on every mount
-   * and only flips once `flyTo` below has actually been issued for this page's own chapter.
+   * the instant this effect subscribes. Revealing the plate on that (door-home.css) would show
+   * the previous page's camera for a frame. `framed` starts false on every mount and only flips
+   * once the first frame below has actually been applied for this page's own chapter.
    */
-  const [pageReady, setPageReady] = useState(false);
+  const [framed, setFramed] = useState(false);
+  /** The first frame after mount is a cut, so a warm plate is never seen arriving from elsewhere. */
+  const firstFrameRef = useRef(true);
+  const cameraRef = useRef<DoorFocusCamera>(focus.camera);
+  cameraRef.current = focus.camera;
+  /** The boxes the last frame was computed against, so a resize only refits when they moved. */
+  const lastFrameBoxesRef = useRef<DoorFrameBoxes>({ window: null, plate: null, chrome: null });
+  const measureFrameBoxes = useCallback(
+    (map: { getContainer(): HTMLElement }): DoorFrameBoxes => ({
+      window: boxOf(windowRef.current),
+      // MapLibre's own container: on the Door the whole viewport (posture `ambient`, shell.css).
+      plate: boxOf(map.getContainer()),
+      chrome: boxOf(chromeRef.current),
+    }),
+    [],
+  );
+
+  /**
+   * Point the plate at the current frame, framed against the map window.
+   *
+   * A national chapter fits CONUS inside the window through the Atlas's own national preset,
+   * with the window's insets as the fit's padding (`doorFramePadding`), so the country sits
+   * below the bar and the field chrome on a desktop and inside the strip on a phone rather than
+   * centered on a canvas the reader only partly sees. The strip is shorter than the country at the Instrument's
+   * national zoom floor, so the fit may sink the floor to what it needs (`zoomFloor: 'fit'`,
+   * camera.ts). Pitch and bearing are passed even though a national chapter
+   * authors them as 0: scrolling back up from a tilted chapter has to be able to say "flat", or
+   * the tilt and the turn survive the move (repo-lk7p8). A place chapter keeps the chapter's own
+   * spec and lands the place at the window's center through `offset`.
+   *
+   * `cut` lands the frame in one step — the first frame after mount, and every refit after a
+   * resize, where the plate has to keep step with a layout that does not animate its own reflow.
+   */
+  const applyCamera = useCallback(
+    (cut: boolean): boolean => {
+      const map = stage.getMap();
+      if (!map) return false;
+      const camera = cameraRef.current;
+      const boxes = measureFrameBoxes(map);
+      lastFrameBoxesRef.current = boxes;
+      const { window: windowBox, plate: plateBox, chrome: chromeBox } = boxes;
+      map.stop();
+      if (isNationalCamera(camera)) {
+        const padding =
+          windowBox && plateBox ? doorFramePadding(windowBox, plateBox, chromeBox) : null;
+        stage.flyPreset(
+          'national',
+          { bounds: US_CONUS_BOUNDS },
+          {
+            mode: cut ? 'cut' : 'ease',
+            pitch: camera.pitch,
+            bearing: camera.bearing,
+            zoomFloor: 'fit',
+            ...(padding ? { padding } : {}),
+          },
+        );
+        return true;
+      }
+      const offset = windowBox && plateBox ? doorFrameOffset(windowBox, plateBox) : null;
+      const target = {
+        center: [camera.center[0], camera.center[1]],
+        zoom: camera.zoom,
+        pitch: camera.pitch,
+        bearing: camera.bearing,
+        ...(offset ? { offset: [offset[0], offset[1]] } : {}),
+      };
+      if (cut || reducedMotionRef.current) {
+        map.easeTo({ ...target, duration: 0 } as never);
+        return true;
+      }
+      map.flyTo({
+        ...target,
+        duration: CHAPTER_FLIGHT_MS,
+        curve: CAMERA_FLY_CURVE,
+        easing: CAMERA_EASING_SLOW_OUT,
+        // Ambient: a scroll-driven move must stay suppressible under reduced motion.
+        essential: false,
+      } as never);
+      return true;
+    },
+    [measureFrameBoxes, stage],
+  );
 
   /** Chapter camera. The chapter's own MapLibre spec, flown the way the Explore story flies it. */
   const camera: DoorFocusCamera = focus.camera;
   useEffect(() => {
     if (!plateLive) return;
-    const map = stage.getMap();
-    if (!map) return;
-    map.stop();
-    /*
-     * A national chapter frames the same field the Albers board draws: CONUS fitted to the
-     * viewport through the Atlas's own national preset. A fixed zoom here (3.35) framed the
-     * country smaller and higher than the board's contain-fit, so the board→plate handoff read
-     * as a second, differently framed map arriving rather than the first one settling. Chapters
-     * with a tilt or a place camera keep the chapter's own spec.
-     */
-    if (isNationalCamera(camera)) {
-      /*
-       * Pitch and bearing are passed even though a national chapter authors them both as 0.
-       * Scroll is expected to run backwards as well as forwards, and a preset frame that names
-       * only center and zoom leaves MapLibre holding the previous chapter's attitude — so
-       * scrolling up from a tilted, turned chapter to the flat top of the page kept the tilt and
-       * the turn, and the field stayed contorted with nothing on screen left to explain it.
-       */
-      stage.flyPreset(
-        'national',
-        { bounds: US_CONUS_BOUNDS },
-        { mode: 'ease', pitch: camera.pitch, bearing: camera.bearing },
-      );
-      setPageReady(true);
-      return;
-    }
-    map.flyTo({
-      center: [camera.center[0], camera.center[1]],
-      zoom: camera.zoom,
-      pitch: camera.pitch,
-      bearing: camera.bearing,
-      duration: reducedMotion ? 0 : CHAPTER_FLIGHT_MS,
-      curve: CAMERA_FLY_CURVE,
-      easing: CAMERA_EASING_SLOW_OUT,
-      // Ambient: a scroll-driven move must stay suppressible under reduced motion.
-      essential: false,
-    } as never);
-    setPageReady(true);
-  }, [camera, plateLive, reducedMotion, stage]);
+    if (!applyCamera(firstFrameRef.current)) return;
+    firstFrameRef.current = false;
+    setFramed(true);
+  }, [applyCamera, camera, plateLive]);
 
-  /** The spotlight record's copper ring, on the plate as on the board. */
+  /**
+   * Re-frame when the map window or the canvas changes: a window resize, the bar wrapping, a
+   * phone's toolbar collapsing (`100dvh`), the strip/full-bleed breakpoint. A cut, not a flight,
+   * one per animation frame however many events a drag produces, and only when a box actually
+   * moved — a sub-pixel jitter is not a resize (`sameDoorFrameBox`).
+   */
+  useEffect(() => {
+    if (!plateLive) return;
+    const target = windowRef.current;
+    if (!target || typeof ResizeObserver === 'undefined') return;
+    let frame: number | null = null;
+    const refit = () => {
+      if (frame !== null) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = null;
+        const map = stage.getMap();
+        if (!map) return;
+        if (sameDoorFrameBoxes(measureFrameBoxes(map), lastFrameBoxesRef.current)) return;
+        // MapLibre re-measures its own container on its own observer; measure first so the fit
+        // is computed against the canvas as it is now, not as it was a frame ago.
+        stage.resize();
+        applyCamera(true);
+      });
+    };
+    const observer = new ResizeObserver(refit);
+    observer.observe(target);
+    window.addEventListener('resize', refit);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', refit);
+      if (frame !== null) window.cancelAnimationFrame(frame);
+    };
+  }, [applyCamera, measureFrameBoxes, plateLive, stage]);
+
+  /** The spotlight record's copper ring on the plate. */
   useEffect(() => {
     if (!plateLive) return;
     stage.applyViewState({
@@ -358,7 +527,7 @@ export function DoorImmersive({
     });
   }, [focusPinId, plateLive, stage]);
 
-  /** A marker click on the live plate opens the record the board's link would have opened. */
+  /** A marker click on the live plate opens the record the pin's href names. */
   const hrefByPinId = useMemo(() => {
     const byId = new Map<string, string>();
     for (const feature of pins.features) {
@@ -376,18 +545,17 @@ export function DoorImmersive({
     [hrefByPinId, router, stage],
   );
 
-  /** Pin photos rise from live markers exactly as they rise from the board's discs. */
-  const [plateHoverTarget, setPlateHoverTarget] = useState<PinPhotoHoverTarget | null>(null);
+  /** Pin photos rise from live markers. */
+  const [pinPhotoTarget, setPinPhotoTarget] = useState<PinPhotoHoverTarget | null>(null);
   useEffect(
     () =>
       stage.subscribe('pinHover', (target) =>
-        setPlateHoverTarget(
+        setPinPhotoTarget(
           target ? { key: target.entityId, name: target.name, rect: target.rect } : null,
         ),
       ),
     [stage],
   );
-  const pinPhotoTarget = boardPhotoTarget ?? plateHoverTarget;
 
   const scrollToChapter = useCallback(
     (index: number) => {
@@ -400,61 +568,43 @@ export function DoorImmersive({
     [reducedMotion],
   );
 
-  /*
-   * The static board's layout zoom (width/height/left/top), not transform: scale.
-   * CSS scale rasterizes the masked locator + pins into a bitmap and looks soft when zoomed.
-   * Growing the board in layout keeps the locator mask crisp. Only the field until the plate
-   * is live; the plate's camera takes the same frame from `focus.camera`.
-   */
-  const boardStyle = {
-    width: `${focus.scale * 100}%`,
-    height: `${focus.scale * 100}%`,
-    left: `calc(${focus.originX}% * (1 - ${focus.scale}))`,
-    top: `calc(${focus.originY}% * (1 - ${focus.scale}))`,
-    transition: reducedMotion
-      ? 'none'
-      : 'width 1.15s cubic-bezier(0.22, 1, 0.36, 1), height 1.15s cubic-bezier(0.22, 1, 0.36, 1), left 1.15s cubic-bezier(0.22, 1, 0.36, 1), top 1.15s cubic-bezier(0.22, 1, 0.36, 1)',
-  } as const;
+  const plateState: DoorPlateState = plateUnavailable ? 'unavailable' : framed ? 'live' : 'pending';
 
   return (
     <>
-      <aside
-        className="ds-door__field"
-        aria-label="National pin field"
-        ref={pinFieldRef}
-        data-plate={plateLive ? 'live' : 'board'}
-        data-page-ready={pageReady ? '1' : undefined}
-      >
-        <div className="ds-door__board-frame">
-          <div className="ds-door__board-host">
-            <div
-              className={`ds-door__board${focus.scale > 1.05 ? ' is-zoomed' : ''}`}
-              style={boardStyle}
-            >
-              <div className="ds-door__ground" aria-hidden="true">
-                {/* Land colour via CSS mask (RecordLocator pattern); canvas shows through as field. */}
-                <div className="ds-door__ground-map" />
-              </div>
-              <FirstPaintPinPlate pins={pins} linkRecords focusEntityId={focusPinId} />
-            </div>
-          </div>
-        </div>
-        <div className="ds-door__field-chrome">
-          <p className="ds-door__field-caption">
-            <span className="ds-door__legend ds-door__legend--ink" aria-hidden="true" />
-            {placeCount} places · click a pin
-            <span className="ds-door__legend ds-door__legend--walk" aria-hidden="true" />
-            walk
-          </p>
-          {/*
-            Rotation is available here (`gesture-lock.ts`'s ambient posture hands `dragRotate`
-            back on a precise pointer) but nothing said so, and the gesture a reader reaches for
-            first is a trackpad twist, which no browser outside Safari reports to a page at all.
-            Naming the modifier is the whole fix: shift plus a drag or a two-finger swipe.
-          */}
-          <p className="ds-door__field-caption ds-door__field-caption--gesture">
-            shift + drag or swipe to turn the map
-          </p>
+      <aside className="ds-door__field" aria-label="National pin field" data-plate={plateState}>
+        {/* The map window. Measured for the camera frame (door-field-frame.ts); the plate shows
+            through it once this mount has framed it. Nothing is drawn in it. */}
+        <div className="ds-door__window" ref={windowRef} aria-hidden="true" />
+        <div className="ds-door__field-chrome" ref={chromeRef}>
+          {plateUnavailable ? (
+            /* No plate here (no WebGL, or a context that could not be recovered). The pin count
+               and the rotate hint would describe a map that is not there; say so once, where the
+               map would be, and point at the index that needs no map. */
+            <p className="ds-door__field-note" role="status">
+              The map could not start in this browser.{' '}
+              <Link href="/records">Browse the records</Link> instead.
+            </p>
+          ) : (
+            <>
+              <p className="ds-door__field-caption">
+                <span className="ds-door__legend ds-door__legend--ink" aria-hidden="true" />
+                {placeCount} places · click a pin
+                <span className="ds-door__legend ds-door__legend--walk" aria-hidden="true" />
+                walk
+              </p>
+              {/*
+                Rotation is available here (`gesture-lock.ts`'s ambient posture hands `dragRotate`
+                back on a precise pointer) but nothing said so, and the gesture a reader reaches
+                for first is a trackpad twist, which no browser outside Safari reports to a page
+                at all. Naming the modifier is the whole fix: shift plus a drag or a two-finger
+                swipe.
+              */}
+              <p className="ds-door__field-caption ds-door__field-caption--gesture">
+                shift + drag or swipe to turn the map
+              </p>
+            </>
+          )}
         </div>
         <p className="ds-door__live" aria-live="polite">
           {focus.placeLabel}
