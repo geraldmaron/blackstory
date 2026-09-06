@@ -42,6 +42,16 @@ export type SearchRouteDependencies = {
   readonly integrityGuard: SearchRequestIntegrityGuard;
   readonly rateLimitGuard: ReturnType<typeof createSearchRateLimitGuard>;
   readonly searchIndex: readonly PublicSearchIndexDoc[];
+  /**
+   * Resolves `/law/{slug}` for a law/case result (repo-skocy), or `undefined` to leave that
+   * result's href unresolved. Optional and omitted in most tests: production wires the real
+   * legal-catalog-backed resolver in `route.ts`; a test that doesn't care about law/case hrefs
+   * gets today's behavior (no `href` field) with no changes to its own fixtures.
+   */
+  readonly resolveLawCaseHref?: (result: {
+    readonly kind: string;
+    readonly displayName: string;
+  }) => Promise<string | undefined>;
 };
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
@@ -189,9 +199,24 @@ export async function handleSearchRequest(
       });
     }
 
+    // Only the results on THIS page, and only when the page actually holds a law/case row —
+    // skips the legal-catalog read entirely for the overwhelming majority of searches that
+    // never touch it, on the most rate-limited endpoint in the app.
+    const resolveLawCaseHref = deps.resolveLawCaseHref;
+    const results =
+      resolveLawCaseHref && result.results.some((row) => row.kind === 'law' || row.kind === 'case')
+        ? await Promise.all(
+            result.results.map(async (row) => {
+              if (row.kind !== 'law' && row.kind !== 'case') return row;
+              const href = await resolveLawCaseHref(row);
+              return href !== undefined ? { ...row, href } : row;
+            }),
+          )
+        : result.results;
+
     return NextResponse.json(
       {
-        results: result.results,
+        results,
         facets: result.facets,
         totalMatched: result.totalMatched,
         hasMore: result.hasMore,

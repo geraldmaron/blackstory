@@ -48,6 +48,13 @@ type SearchApiResult = {
   readonly displayName?: unknown;
   readonly kind?: unknown;
   readonly matchedText?: unknown;
+  /**
+   * Set server-side only for a law/case result the legal catalog could resolve by exact title
+   * match (repo-skocy). Absent — never `undefined` explicitly — for everything else, including
+   * a law/case result that DIDN'T resolve: those still fall through to `recordHrefFrom` below,
+   * which sends them to `/law` exactly as before this field existed.
+   */
+  readonly href?: unknown;
 };
 
 /**
@@ -117,11 +124,14 @@ export function CommandBarSearch({ placeholder }: CommandBarSearchProps) {
             id: result.id,
             primary: result.displayName,
             ...(typeof result.kind === 'string' ? { secondary: result.kind } : {}),
-            href: recordHrefFrom(
-              result.id,
-              typeof result.kind === 'string' ? result.kind : undefined,
-              result.displayName,
-            ),
+            href:
+              typeof result.href === 'string'
+                ? result.href
+                : recordHrefFrom(
+                    result.id,
+                    typeof result.kind === 'string' ? result.kind : undefined,
+                    result.displayName,
+                  ),
           },
         ];
       });

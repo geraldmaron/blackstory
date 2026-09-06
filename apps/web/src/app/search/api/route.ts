@@ -9,6 +9,7 @@
  * when available, otherwise the bundled snapshot). See `./handler` for the full request flow.
  */
 import { getPublicSearchIndex } from '../../../lib/public-data/source';
+import { resolveLawCaseHref } from '../../../lib/search/law-case-href';
 import {
   createSearchRequestIntegrityGuard,
   type SearchRequestIntegrityGuard,
@@ -27,5 +28,6 @@ export async function GET(request: Request): Promise<Response> {
     integrityGuard: defaultIntegrityGuard,
     rateLimitGuard: defaultRateLimitGuard,
     searchIndex: index.data,
+    resolveLawCaseHref,
   });
 }
