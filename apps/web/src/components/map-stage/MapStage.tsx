@@ -308,6 +308,8 @@ export type AtlasCameraTarget = {
   getBearing(): number;
   getPitch(): number;
   getCenter(): { lng: number; lat: number };
+  /** The element MapLibre draws in — the box a surface frames its camera against. */
+  getContainer(): HTMLElement;
   stop(): unknown;
 };
 

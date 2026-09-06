@@ -9,10 +9,11 @@
  * lost a coast or two (repo-18ma2).
  *
  * So the frame is derived from the window's own rect, every time it changes. `doorFramePadding`
- * turns the window into `cameraForBounds` padding (the plate fits CONUS inside the window, with a
- * little clearance); `doorFrameOffset` turns it into the `flyTo` offset a place chapter needs so
- * the place lands in the middle of the window rather than the middle of the canvas. Both are
- * plain arithmetic over two rects so they can be pinned under `node:test` without a DOM.
+ * turns the window into `cameraForBounds` padding (the plate fits CONUS inside the window, below
+ * the field chrome, with a small margin); `doorFrameOffset` turns it into the `flyTo` offset a
+ * place chapter needs so the place lands in the middle of the window rather than the middle of
+ * the canvas. Both are plain arithmetic over rects so they can be pinned under `node:test`
+ * without a DOM.
  */
 
 export type DoorFrameBox = {
@@ -29,12 +30,12 @@ export type DoorFramePadding = {
   readonly left: number;
 };
 
-/** Clearance inside the window, as a share of its shorter side. */
-export const DOOR_FRAME_INSET_RATIO = 0.1;
+/** Margin inside the window, as a share of its shorter side. */
+export const DOOR_FRAME_MARGIN_RATIO = 0.05;
 /** Never tighter than this: a phone strip still gets a hairline of ocean around the coasts. */
-export const DOOR_FRAME_INSET_MIN_PX = 12;
-/** Never looser than the national preset's own padding (`CAMERA_PRESETS.national.padding`). */
-export const DOOR_FRAME_INSET_MAX_PX = 64;
+export const DOOR_FRAME_MARGIN_MIN_PX = 12;
+/** Never looser than this: the field chrome, not the margin, is what keeps the country down. */
+export const DOOR_FRAME_MARGIN_MAX_PX = 32;
 /** A padded box smaller than this is a collapsed strip or a mid-reflow read, not a frame. */
 export const DOOR_FRAME_MIN_BOX_PX = 48;
 
@@ -49,29 +50,36 @@ function isPaintable(box: DoorFrameBox): boolean {
   );
 }
 
-/** The clearance the window asks for, from its own shorter side. */
-export function doorFrameInset(window: DoorFrameBox): number {
-  const raw = Math.round(Math.min(window.width, window.height) * DOOR_FRAME_INSET_RATIO);
-  return Math.min(DOOR_FRAME_INSET_MAX_PX, Math.max(DOOR_FRAME_INSET_MIN_PX, raw));
+/** The margin the window asks for, from its own shorter side. */
+export function doorFrameMargin(window: DoorFrameBox): number {
+  const raw = Math.round(Math.min(window.width, window.height) * DOOR_FRAME_MARGIN_RATIO);
+  return Math.min(DOOR_FRAME_MARGIN_MAX_PX, Math.max(DOOR_FRAME_MARGIN_MIN_PX, raw));
 }
 
 /**
  * `cameraForBounds` padding that fits a bounds box inside `window`, on a plate whose canvas
- * occupies `plate`. Both rects are in the same coordinate space (viewport pixels from
- * `getBoundingClientRect`). `null` when either rect is degenerate or the window leaves the plate
- * less than `DOOR_FRAME_MIN_BOX_PX` to draw in, which callers treat as "keep the current frame".
+ * occupies `plate`, below whatever field `chrome` sits along the window's top edge (the pin
+ * count and the rotate hint on a desktop; nothing on a phone, where the chrome is hidden and
+ * measures as an empty box). All rects share one coordinate space (viewport pixels from
+ * `getBoundingClientRect`). `null` when a rect is degenerate or the window leaves the plate less
+ * than `DOOR_FRAME_MIN_BOX_PX` to draw in, which callers treat as "keep the current frame".
  */
 export function doorFramePadding(
   window: DoorFrameBox,
   plate: DoorFrameBox,
+  chrome: DoorFrameBox | null = null,
 ): DoorFramePadding | null {
   if (!isPaintable(window) || !isPaintable(plate)) return null;
-  const inset = doorFrameInset(window);
+  const margin = doorFrameMargin(window);
+  const chromeBand =
+    chrome !== null && isPaintable(chrome)
+      ? Math.max(0, chrome.top + chrome.height - window.top)
+      : 0;
   const padding = {
-    top: Math.max(0, window.top - plate.top + inset),
-    left: Math.max(0, window.left - plate.left + inset),
-    right: Math.max(0, plate.left + plate.width - (window.left + window.width) + inset),
-    bottom: Math.max(0, plate.top + plate.height - (window.top + window.height) + inset),
+    top: Math.max(0, window.top - plate.top + chromeBand + margin),
+    left: Math.max(0, window.left - plate.left + margin),
+    right: Math.max(0, plate.left + plate.width - (window.left + window.width) + margin),
+    bottom: Math.max(0, plate.top + plate.height - (window.top + window.height) + margin),
   };
   if (
     plate.width - padding.left - padding.right < DOOR_FRAME_MIN_BOX_PX ||

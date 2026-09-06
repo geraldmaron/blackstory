@@ -660,9 +660,34 @@ body:has(.ds-map-stage[data-plate-ready]) .ds-door__field[data-plate='live'] {
   background: transparent;
 }
 
-/* No plate to caption: the pin count and the rotate hint describe a map that is not there. */
-.ds-door__field[data-plate='unavailable'] .ds-door__field-chrome {
-  display: none;
+/*
+ * No plate: one line where the map would be (`data-plate='unavailable'`, door-immersive.tsx) or,
+ * without JavaScript, one line at the top of the door (door-home.tsx). Both point at `/records`.
+ */
+.ds-door__field-note,
+.ds-door__noscript {
+  margin: 0;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  font-family: var(--ds-font-ui);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--ds-ink);
+  pointer-events: auto;
+}
+
+.ds-door__field-note a,
+.ds-door__noscript a {
+  color: var(--ds-accent-text);
+}
+
+.ds-door__noscript {
+  position: relative;
+  z-index: 2; /* local: above the fixed field, with the chapters */
+  width: fit-content;
+  margin: var(--ds-space-4) var(--ds-space-6) 0;
 }
 
 /*
@@ -737,7 +762,8 @@ body:has(.ds-door) .ds-door-journey {
     height: 100%;
   }
 
-  .ds-door__field-chrome {
+  /* The captions are desktop chrome; the no-plate note still shows where the map would be. */
+  .ds-door__field-caption {
     display: none;
   }
 

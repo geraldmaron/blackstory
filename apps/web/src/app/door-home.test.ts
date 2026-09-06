@@ -64,8 +64,12 @@ test('the Door has one map: no static board, no layout zoom, no pin plate (repo-
 
 test('the plate is framed against the Door window and re-framed on resize', () => {
   assert.match(immersive, /ds-door__window/);
-  assert.match(immersive, /doorFramePadding\(windowBox, plateBox\)/);
+  assert.match(immersive, /doorFramePadding\(windowBox, plateBox, chromeBox\)/);
   assert.match(immersive, /doorFrameOffset\(windowBox, plateBox\)/);
+  // The canvas box comes from MapLibre's own container through the stage handle, never from a
+  // class-name query into another component's DOM.
+  assert.match(immersive, /boxOf\(map\.getContainer\(\)\)/);
+  assert.doesNotMatch(immersive, /querySelector[^\n]*ds-map-stage/);
   // A national chapter is the Atlas's own national preset, fitted inside the window.
   assert.match(immersive, /stage\.flyPreset\(\s*'national',\s*\{ bounds: US_CONUS_BOUNDS \}/);
   assert.match(immersive, /mode: cut \? 'cut' : 'ease'/);
@@ -97,11 +101,6 @@ test('the reveal waits for both the plate and this mount, and never gates on a s
   assert.match(
     css,
     /\.ds-door__field\s*\{[^}]*transition:\s*background-color var\(--ds-duration-base\)/,
-  );
-  // No plate, no caption about pins that are not there.
-  assert.match(
-    css,
-    /\.ds-door__field\[data-plate='unavailable'\] \.ds-door__field-chrome\s*\{[^}]*display:\s*none/,
   );
 });
 
@@ -202,4 +201,24 @@ test('Door pins carry a public href for every record, and never an entity id', (
     }),
     '/place/dillard-high-school-old',
   );
+});
+
+test('a reader without a plate is told so, where the map would be, and sent to the index', () => {
+  // No WebGL: the field says so instead of captioning pins that are not there.
+  assert.match(
+    immersive,
+    /plateUnavailable \? \([\s\S]*ds-door__field-note[\s\S]*href="\/records"/,
+  );
+  // No JavaScript: the server component says so above the chapters.
+  assert.match(
+    door,
+    /<noscript>[\s\S]*ds-door__noscript[\s\S]*href="\/records"[\s\S]*<\/noscript>/,
+  );
+  assert.match(css, /\.ds-door__field-note,\s*\.ds-door__noscript\s*\{/);
+  // On a phone the captions hide, but the note must not.
+  assert.match(
+    css,
+    /@media \(max-width: 899px\)[\s\S]*\.ds-door__field-caption\s*\{\s*display:\s*none/,
+  );
+  assert.doesNotMatch(css, /\.ds-door__field-chrome\s*\{\s*display:\s*none/);
 });

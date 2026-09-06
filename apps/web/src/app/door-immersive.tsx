@@ -90,20 +90,25 @@ function isNationalCamera(camera: DoorFocusCamera): boolean {
   return camera.pitch === 0 && camera.bearing === 0 && camera.zoom <= NATIONAL_CAMERA_MAX_ZOOM;
 }
 
-/** The box the plate paints in. On the Door it is the whole viewport (posture `ambient`). */
-function measurePlateBox(): DoorFrameBox {
-  const canvas = document.querySelector<HTMLElement>('.ds-map-stage__canvas');
-  const rect = canvas?.getBoundingClientRect();
-  if (rect && rect.width > 0 && rect.height > 0) {
-    return { top: rect.top, left: rect.left, width: rect.width, height: rect.height };
-  }
-  return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
-}
-
 function boxOf(element: HTMLElement | null): DoorFrameBox | null {
   if (!element) return null;
   const rect = element.getBoundingClientRect();
   return { top: rect.top, left: rect.left, width: rect.width, height: rect.height };
+}
+
+/** The boxes a frame is computed against; a frame is only recomputed when one of them moves. */
+type DoorFrameBoxes = {
+  readonly window: DoorFrameBox | null;
+  readonly plate: DoorFrameBox | null;
+  readonly chrome: DoorFrameBox | null;
+};
+
+function sameDoorFrameBoxes(a: DoorFrameBoxes, b: DoorFrameBoxes): boolean {
+  return (
+    sameDoorFrameBox(a.window, b.window) &&
+    sameDoorFrameBox(a.plate, b.plate) &&
+    sameDoorFrameBox(a.chrome, b.chrome)
+  );
 }
 
 const DOOR_COLD_OPEN_PROSE =
@@ -196,6 +201,8 @@ export function DoorImmersive({
   const journeyRef = useRef<HTMLDivElement | null>(null);
   /** The map window: the part of the plate the reader sees on this surface (door-home.css). */
   const windowRef = useRef<HTMLDivElement | null>(null);
+  /** The field chrome along the window's top edge; the country is framed below it. */
+  const chromeRef = useRef<HTMLDivElement | null>(null);
 
   const stage = useMapStage();
   const router = useRouter();
@@ -361,18 +368,24 @@ export function DoorImmersive({
   const cameraRef = useRef<DoorFocusCamera>(focus.camera);
   cameraRef.current = focus.camera;
   /** The boxes the last frame was computed against, so a resize only refits when they moved. */
-  const lastFrameBoxesRef = useRef<{
-    readonly window: DoorFrameBox | null;
-    readonly plate: DoorFrameBox | null;
-  }>({ window: null, plate: null });
+  const lastFrameBoxesRef = useRef<DoorFrameBoxes>({ window: null, plate: null, chrome: null });
+  const measureFrameBoxes = useCallback(
+    (map: { getContainer(): HTMLElement }): DoorFrameBoxes => ({
+      window: boxOf(windowRef.current),
+      // MapLibre's own container: on the Door the whole viewport (posture `ambient`, shell.css).
+      plate: boxOf(map.getContainer()),
+      chrome: boxOf(chromeRef.current),
+    }),
+    [],
+  );
 
   /**
    * Point the plate at the current frame, framed against the map window.
    *
    * A national chapter fits CONUS inside the window through the Atlas's own national preset,
    * with the window's insets as the fit's padding (`doorFramePadding`), so the country sits
-   * below the bar on a desktop and inside the strip on a phone rather than centered on a canvas
-   * the reader only partly sees. The strip is shorter than the country at the Instrument's
+   * below the bar and the field chrome on a desktop and inside the strip on a phone rather than
+   * centered on a canvas the reader only partly sees. The strip is shorter than the country at the Instrument's
    * national zoom floor, so the fit may sink the floor to what it needs (`zoomFloor: 'fit'`,
    * camera.ts). Pitch and bearing are passed even though a national chapter
    * authors them as 0: scrolling back up from a tilted chapter has to be able to say "flat", or
@@ -387,12 +400,13 @@ export function DoorImmersive({
       const map = stage.getMap();
       if (!map) return false;
       const camera = cameraRef.current;
-      const windowBox = boxOf(windowRef.current);
-      const plateBox = measurePlateBox();
-      lastFrameBoxesRef.current = { window: windowBox, plate: plateBox };
+      const boxes = measureFrameBoxes(map);
+      lastFrameBoxesRef.current = boxes;
+      const { window: windowBox, plate: plateBox, chrome: chromeBox } = boxes;
       map.stop();
       if (isNationalCamera(camera)) {
-        const padding = windowBox ? doorFramePadding(windowBox, plateBox) : null;
+        const padding =
+          windowBox && plateBox ? doorFramePadding(windowBox, plateBox, chromeBox) : null;
         stage.flyPreset(
           'national',
           { bounds: US_CONUS_BOUNDS },
@@ -406,7 +420,7 @@ export function DoorImmersive({
         );
         return true;
       }
-      const offset = windowBox ? doorFrameOffset(windowBox, plateBox) : null;
+      const offset = windowBox && plateBox ? doorFrameOffset(windowBox, plateBox) : null;
       const target = {
         center: [camera.center[0], camera.center[1]],
         zoom: camera.zoom,
@@ -428,7 +442,7 @@ export function DoorImmersive({
       } as never);
       return true;
     },
-    [stage],
+    [measureFrameBoxes, stage],
   );
 
   /** Chapter camera. The chapter's own MapLibre spec, flown the way the Explore story flies it. */
@@ -455,13 +469,9 @@ export function DoorImmersive({
       if (frame !== null) return;
       frame = window.requestAnimationFrame(() => {
         frame = null;
-        const last = lastFrameBoxesRef.current;
-        if (
-          sameDoorFrameBox(boxOf(windowRef.current), last.window) &&
-          sameDoorFrameBox(measurePlateBox(), last.plate)
-        ) {
-          return;
-        }
+        const map = stage.getMap();
+        if (!map) return;
+        if (sameDoorFrameBoxes(measureFrameBoxes(map), lastFrameBoxesRef.current)) return;
         // MapLibre re-measures its own container on its own observer; measure first so the fit
         // is computed against the canvas as it is now, not as it was a frame ago.
         stage.resize();
@@ -476,7 +486,7 @@ export function DoorImmersive({
       window.removeEventListener('resize', refit);
       if (frame !== null) window.cancelAnimationFrame(frame);
     };
-  }, [applyCamera, plateLive, stage]);
+  }, [applyCamera, measureFrameBoxes, plateLive, stage]);
 
   /** The spotlight record's copper ring on the plate. */
   useEffect(() => {
@@ -537,22 +547,35 @@ export function DoorImmersive({
         {/* The map window. Measured for the camera frame (door-field-frame.ts); the plate shows
             through it once this mount has framed it. Nothing is drawn in it. */}
         <div className="ds-door__window" ref={windowRef} aria-hidden="true" />
-        <div className="ds-door__field-chrome">
-          <p className="ds-door__field-caption">
-            <span className="ds-door__legend ds-door__legend--ink" aria-hidden="true" />
-            {placeCount} places · click a pin
-            <span className="ds-door__legend ds-door__legend--walk" aria-hidden="true" />
-            walk
-          </p>
-          {/*
-            Rotation is available here (`gesture-lock.ts`'s ambient posture hands `dragRotate`
-            back on a precise pointer) but nothing said so, and the gesture a reader reaches for
-            first is a trackpad twist, which no browser outside Safari reports to a page at all.
-            Naming the modifier is the whole fix: shift plus a drag or a two-finger swipe.
-          */}
-          <p className="ds-door__field-caption ds-door__field-caption--gesture">
-            shift + drag or swipe to turn the map
-          </p>
+        <div className="ds-door__field-chrome" ref={chromeRef}>
+          {plateUnavailable ? (
+            /* No plate here (no WebGL, or a context that could not be recovered). The pin count
+               and the rotate hint would describe a map that is not there; say so once, where the
+               map would be, and point at the index that needs no map. */
+            <p className="ds-door__field-note" role="status">
+              The map could not start in this browser.{' '}
+              <Link href="/records">Browse the records</Link> instead.
+            </p>
+          ) : (
+            <>
+              <p className="ds-door__field-caption">
+                <span className="ds-door__legend ds-door__legend--ink" aria-hidden="true" />
+                {placeCount} places · click a pin
+                <span className="ds-door__legend ds-door__legend--walk" aria-hidden="true" />
+                walk
+              </p>
+              {/*
+                Rotation is available here (`gesture-lock.ts`'s ambient posture hands `dragRotate`
+                back on a precise pointer) but nothing said so, and the gesture a reader reaches
+                for first is a trackpad twist, which no browser outside Safari reports to a page
+                at all. Naming the modifier is the whole fix: shift plus a drag or a two-finger
+                swipe.
+              */}
+              <p className="ds-door__field-caption ds-door__field-caption--gesture">
+                shift + drag or swipe to turn the map
+              </p>
+            </>
+          )}
         </div>
         <p className="ds-door__live" aria-live="polite">
           {focus.placeLabel}
