@@ -25,7 +25,7 @@
     "@repo/domain": "workspace:*",
     "@repo/schemas": "workspace:*",
     "@repo/security": "workspace:*",
-    "firebase": "^12.16.0",
+    "firebase": "^12.18.0",
     "firebase-admin": "^14.2.0",
     "pg": "^8.16.3",
     "unpdf": "1.6.2",
