@@ -142,6 +142,15 @@
   white-space: nowrap;
 }
 
+/*
+ * The bar's search is a real GET form so Enter reaches `/records`. `display: contents` keeps the
+ * form element out of the bar's `auto minmax(0, 1fr) auto` grid: the pill inside stays the middle
+ * column, exactly where it sat when it was an unwrapped div.
+ */
+.ds-bar__search-form {
+  display: contents;
+}
+
 /* ---- the live search combobox -------------------------------------------
    Same pill, same place, same size as the map's palette trigger, but a real input with a
    result list under it. The wrapper keeps the pill; the input inside is unstyled so the caret
@@ -221,6 +230,30 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ds-ink-muted);
+}
+
+/*
+ * The "suggestions are unavailable" note, in the same place and the same pill as the list it
+ * stands in for — the reader looks in one spot for the answer either way.
+ *
+ * Styled here rather than inherited from `typeahead.css`, because the bar does not load that
+ * sheet: it re-states every `.ds-typeahead__*` rule it needs under `.ds-bar__search-list` above,
+ * and `typeahead.css` is imported by the books catalogue alone. A note styled only there would
+ * render unpositioned inside the pill on all twelve rooms where this bar is the only search.
+ */
+.ds-bar__search--live .ds-typeahead__note {
+  position: absolute;
+  top: calc(100% + var(--ds-space-2));
+  left: 0;
+  right: 0;
+  z-index: var(--ds-z-command-overlay);
+  margin: 0;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface);
+  color: var(--ds-ink-muted);
+  font-size: 0.8125rem;
 }
 
 /* ---- tools --------------------------------------------------------------- */

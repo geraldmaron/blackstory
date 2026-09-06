@@ -46,6 +46,36 @@ describe('bar search', () => {
     assert.match(markup, /value=""/);
   });
 
+  it('submits to /records, so Enter means something on every room off Explore', () => {
+    // The regression this locks: the field advertised `enterKeyHint="search"` and sat outside any
+    // form, so a reader who typed a phrase and pressed Enter got nothing at all. On the twelve
+    // rooms where this is the only search, that was the whole search.
+    const markup = renderToStaticMarkup(<CommandBarSearch placeholder="Search" />);
+    assert.match(markup, /<form[^>]*action="\/records"/);
+    assert.match(markup, /<form[^>]*method="get"/);
+    assert.match(markup, /<form[^>]*role="search"/);
+    // Without `name="q"` the submit lands on a bare /records and drops what the reader typed.
+    assert.match(markup, /name="q"/);
+  });
+
+  it('reports a failed lookup as a failure, never as an empty archive', () => {
+    const source = code('components/shell/CommandBarSearch.tsx');
+    // `/search/api` rate-limits anonymous callers per minute. Returning `[]` on a non-OK response
+    // rendered a 429 as "No matching suggestions" — the reader searching hardest was the one told
+    // the archive holds nothing.
+    assert.match(source, /if \(!response\.ok\)/);
+    assert.match(source, /throw new Error/);
+    assert.doesNotMatch(source, /if \(!response\.ok\) \{\s*return \[\];/);
+  });
+
+  it('hands the abort signal to fetch so a superseded lookup is cancelled', () => {
+    const source = code('components/shell/CommandBarSearch.tsx');
+    // The endpoint caps concurrent in-flight requests per caller. A lookup the reader has already
+    // typed past, still running, is a slot their next keystroke gets denied for.
+    assert.match(source, /signal: AbortSignal/);
+    assert.match(source, /\bsignal,/);
+  });
+
   it('owns the palette chord off Explore', () => {
     const source = read('components/shell/CommandBarSearch.tsx');
     // The same definition the palette's own opener reads. A second literal `⌘K` check here is

@@ -224,7 +224,21 @@ export const DEFAULT_ENDPOINT_QUOTA_MATRIX: Record<
     service: policy(300, 6, 300, 60_000, 12_000, 16, 'static_read'),
   },
   search: {
-    anonymous: policy(8, 0.15, 8, 60_000, 40, 1, 'expensive_read'),
+    // Burst shape unchanged (8 tokens, 8/min): that is the enumeration defense and it holds.
+    // The daily cap and the concurrency cap moved, because neither was defending against
+    // enumeration and both were denying real reading.
+    //
+    // dailyCap 40 -> 150. The key is per client IP, so 40 was 40 searches per DAY for everyone
+    // behind one address — a school, a library, a newsroom, which is this archive's audience.
+    // A reader working through a topic exhausted it in one sitting and the endpoint then served
+    // them 429 until the UTC day rolled over. 150 stays below `authenticated` (180) and below the
+    // static-read tier (`entityRetrieval`, 300), so both quota-ordering invariants still hold; the
+    // per-minute ceiling, not the daily one, is what bounds a scraper.
+    //
+    // maxConcurrency 1 -> 2. One in-flight request per caller meant the typeahead lookup a reader
+    // had already moved past could deny the search they submitted on top of it. Two lets a
+    // superseded lookup drain while the real query runs, and stays below `authenticated` (3).
+    anonymous: policy(8, 0.15, 8, 60_000, 150, 2, 'expensive_read'),
     authenticated: policy(24, 0.5, 24, 60_000, 180, 3, 'expensive_read'),
     admin: policy(48, 1, 48, 60_000, 500, 5, 'expensive_read'),
     service: policy(120, 2.5, 120, 60_000, 2_000, 10, 'expensive_read'),
