@@ -17,6 +17,7 @@
 // barrel-importing here would drag a Node-only module into the browser bundle.
 import { US_STATES, type UsStateInfo } from '@repo/domain/map/geography';
 import { brandPalette, darkTheme, mapPalettes } from '@repo/ui';
+import { MAP_MIN_ZOOM } from './camera-presets';
 import { type MapColorScheme } from './dignity-style';
 
 export type StateLabelPoint = {
@@ -67,10 +68,25 @@ export function stateLabelPoints(): readonly StateLabelPoint[] {
 export const STATE_LABEL_FADE_START_ZOOM = 5.6;
 export const STATE_LABEL_FADE_END_ZOOM = 6.2;
 
-/** 1 at/below the fade-start zoom, 0 at/above the fade-end zoom, linear in between. Shaped like
- * a MapLibre `interpolate` stop pair so the same curve could drive a `text-opacity` paint
- * property directly if this ever migrates off HTML markers onto a symbol layer. */
+/**
+ * The band's lower edge. Below the Instrument's national floor (`MAP_MIN_ZOOM`) the plate is at
+ * continental scale — the Door's phone strip fits the whole country into a couple of hundred
+ * pixels (repo-27uao) — and two-letter labels overlap each other across the Northeast. No mature
+ * map draws region names at that scale, so the labels fade out under the floor and are gone by
+ * `STATE_LABEL_APPEAR_START_ZOOM`.
+ */
+export const STATE_LABEL_APPEAR_START_ZOOM = 2.4;
+export const STATE_LABEL_APPEAR_END_ZOOM = MAP_MIN_ZOOM;
+
+/** 0 below the appear band, 1 across the visible band, 0 above the fade band, linear in the two
+ * ramps. Shaped like MapLibre `interpolate` stops so the same curve could drive a `text-opacity`
+ * paint property directly if this ever migrates off HTML markers onto a symbol layer. */
 export function stateLabelOpacityForZoom(zoom: number): number {
+  if (zoom <= STATE_LABEL_APPEAR_START_ZOOM) return 0;
+  if (zoom < STATE_LABEL_APPEAR_END_ZOOM) {
+    const span = STATE_LABEL_APPEAR_END_ZOOM - STATE_LABEL_APPEAR_START_ZOOM;
+    return (zoom - STATE_LABEL_APPEAR_START_ZOOM) / span;
+  }
   if (zoom <= STATE_LABEL_FADE_START_ZOOM) return 1;
   if (zoom >= STATE_LABEL_FADE_END_ZOOM) return 0;
   const span = STATE_LABEL_FADE_END_ZOOM - STATE_LABEL_FADE_START_ZOOM;

@@ -1,6 +1,13 @@
 /**
  * First-paint pin plate. Explore's server-rendered national field and the live plate's HTML
  * entity markers share Page Sand majority discs; copper marks walks, active, and focus.
+ *
+ * The board's discs are sized to the plate's at the opening frame (repo-27uao): a single is
+ * `markerRadius(0, 'unrated') × markerZoomScale(zoom)` (marker-size.ts) and a count disc is
+ * `CLUSTER_RADIUS_BY_COUNT × the national shrink` (explore-style.ts), each taken at the middle of
+ * the tile-zoom band the viewport is in — 3.5 for the band the constructor fit lands in on a
+ * laptop or a phone, 4.5 from the viewport where the fit crosses zoom 4 (see the media query at
+ * the end, pinned against `conusBoxPxAtZoom` by explore-map-underlay.test.ts).
  */
 
 :root {
@@ -10,6 +17,18 @@
   --ds-first-paint-pin-size-link: 0.5rem;
   --ds-first-paint-pin-size-walk: 0.5625rem;
   --ds-first-paint-pin-size-focus: 0.875rem;
+}
+
+/* The board's own sizes: the plate's discs at zoom 3.5 (the zoom-3 tile band). A count disc is
+   `CLUSTER_RADIUS_BY_COUNT` (10/14/18/22) × the national shrink, 0.45 at zoom 3 rising to 0.85 at
+   5.5 — 0.53 at 3.5, so 10.6 / 14.8 / 19.1 / 23.3px across. */
+.ds-first-paint-plate {
+  --ds-first-paint-board-pin: 0.25rem;
+  --ds-first-paint-board-walk: 0.375rem;
+  --ds-first-paint-board-cluster-1: 0.6625rem;
+  --ds-first-paint-board-cluster-2: 0.925rem;
+  --ds-first-paint-board-cluster-3: 1.19rem;
+  --ds-first-paint-board-cluster-4: 1.46rem;
 }
 
 .ds-first-paint-plate {
@@ -29,8 +48,8 @@
   position: absolute;
   transform: translate(-50%, -50%);
   box-sizing: border-box;
-  width: var(--ds-first-paint-pin-size);
-  height: var(--ds-first-paint-pin-size);
+  width: var(--ds-first-paint-board-pin);
+  height: var(--ds-first-paint-board-pin);
   padding: 0;
   border: 0;
   border-radius: 999px;
@@ -44,25 +63,27 @@
 }
 
 .ds-first-paint-plate .ds-first-paint-pin--walk {
-  width: var(--ds-first-paint-pin-size-walk);
-  height: var(--ds-first-paint-pin-size-walk);
+  width: var(--ds-first-paint-board-walk);
+  height: var(--ds-first-paint-board-walk);
   background: var(--ds-accent-graphic);
   --ds-map-entity-shade: var(--ds-accent-graphic);
 }
 
 /*
- * A pin the board has folded into a cluster (first-paint-clusters.ts). It stays in the DOM in
- * index order for the pin-id contract, but neither paints nor takes focus.
+ * A pin the plate folds into a cluster at the tile zoom the viewport is in
+ * (first-paint-clusters.ts). It stays in the DOM in index order for the pin-id contract, but
+ * neither paints nor takes focus. The zoom-3 pattern is the default; the media query at the
+ * end swaps to the zoom-4 pattern where the plate's own fit would.
  */
-.ds-first-paint-plate .ds-first-paint-pin--grouped {
+.ds-first-paint-plate .ds-first-paint-pin--in-z3 {
   visibility: hidden;
   pointer-events: none;
 }
 
 /*
- * The board's count discs: the live plate's clusters at the national frame (copper family
- * shade, count as the non-color signal, radius stepping at 10 / 50 / 200 — `CLUSTER_RADIUS_BY_COUNT`
- * shrunk to the national zoom the way explore-style.ts shrinks it).
+ * The board's count discs: the plate's clusters (copper family shade, count as the non-color
+ * signal, radius stepping at 10 / 50 / 200 — `CLUSTER_RADIUS_BY_COUNT` shrunk to the opening
+ * zoom the way explore-style.ts shrinks it). The count is set at the plate's own text size.
  */
 .ds-first-paint-plate .ds-first-paint-cluster {
   position: absolute;
@@ -70,13 +91,13 @@
   display: grid;
   place-items: center;
   box-sizing: border-box;
-  width: var(--ds-first-paint-cluster-size, 0.75rem);
-  height: var(--ds-first-paint-cluster-size, 0.75rem);
+  width: var(--ds-first-paint-board-cluster-1);
+  height: var(--ds-first-paint-board-cluster-1);
   border-radius: 999px;
   background: var(--ds-first-paint-cluster-ink);
   color: var(--ds-first-paint-cluster-text);
   font-family: var(--ds-font-mono);
-  font-size: 0.5rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -85,17 +106,63 @@
 }
 
 .ds-first-paint-plate .ds-first-paint-cluster[data-tier='2'] {
-  --ds-first-paint-cluster-size: 0.9375rem;
+  width: var(--ds-first-paint-board-cluster-2);
+  height: var(--ds-first-paint-board-cluster-2);
 }
 
 .ds-first-paint-plate .ds-first-paint-cluster[data-tier='3'] {
-  --ds-first-paint-cluster-size: 1.125rem;
-  font-size: 0.5625rem;
+  width: var(--ds-first-paint-board-cluster-3);
+  height: var(--ds-first-paint-board-cluster-3);
 }
 
 .ds-first-paint-plate .ds-first-paint-cluster[data-tier='4'] {
-  --ds-first-paint-cluster-size: 1.375rem;
-  font-size: 0.625rem;
+  width: var(--ds-first-paint-board-cluster-4);
+  height: var(--ds-first-paint-board-cluster-4);
+}
+
+.ds-first-paint-plate .ds-first-paint-cluster[data-zoom='4'] {
+  display: none;
+}
+
+/*
+ * The zoom-4 tile band. The constructor fits CONUS inside 32px of clearance (`PLATE_OPENING_PADDING_PX`);
+ * the fitted zoom crosses 4 once the box can be 1335.75px wide (`conusBoxPxAtZoom(4)`), which the
+ * viewport allows from 1400×797. From there the plate draws the zoom-4 clusters, so the board
+ * does too, at the plate's zoom-4.5 sizes.
+ */
+@media (min-width: 1400px) and (min-height: 797px) {
+  .ds-first-paint-plate {
+    /* Zoom 4.5: shrink 0.69, so 13.8 / 19.3 / 24.8 / 30.4px across. */
+    --ds-first-paint-board-pin: 0.34rem;
+    --ds-first-paint-board-walk: 0.46rem;
+    --ds-first-paint-board-cluster-1: 0.8625rem;
+    --ds-first-paint-board-cluster-2: 1.21rem;
+    --ds-first-paint-board-cluster-3: 1.55rem;
+    --ds-first-paint-board-cluster-4: 1.9rem;
+  }
+
+  .ds-first-paint-plate .ds-first-paint-pin--in-z3 {
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .ds-first-paint-plate
+    .ds-first-paint-pin--in-z3:not(.ds-first-paint-pin--walk):not(.ds-first-paint-pin--link) {
+    pointer-events: none;
+  }
+
+  .ds-first-paint-plate .ds-first-paint-pin--in-z4 {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .ds-first-paint-plate .ds-first-paint-cluster[data-zoom='3'] {
+    display: none;
+  }
+
+  .ds-first-paint-plate .ds-first-paint-cluster[data-zoom='4'] {
+    display: grid;
+  }
 }
 
 /*

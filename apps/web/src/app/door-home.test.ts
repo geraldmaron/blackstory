@@ -87,6 +87,15 @@ test('the plate is framed against the Door window and re-framed on resize', () =
   assert.match(immersive, /sameDoorFrameBox/);
   // The observer re-firing for the chapter already in view must not restart its flight.
   assert.match(immersive, /if \(chapter\.id === lastChapterIdRef\.current\) return;/);
+  // A reload scrolled to a later chapter frames that chapter first, as a cut, not a flight.
+  assert.match(
+    immersive,
+    /useLayoutEffect\(\(\) => \{[\s\S]*chapterInViewFromRects\(rects, window\.innerHeight\)/,
+  );
+  assert.match(
+    immersive,
+    /if \(!chapter \|\| chapter\.sweep \|\| chapter\.id === lastChapterIdRef\.current\) return;/,
+  );
 });
 
 test('the reveal waits for both the plate and this mount, and never gates on a stale attribute', () => {

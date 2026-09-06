@@ -104,7 +104,7 @@ Other facets (Tone, Era, Theme, Status, Confidence, Where) unchanged.
 
 ## First-paint pin plate (Explore bootstrap)
 
-Before MapLibre paints, `/explore` renders an HTML pin plate (`FirstPaintPinPlate`, `first-paint-pin-plate.css`) over the Albers underlay. This is **not** the kind-encoded Explore stack; it is a lightweight national field, and it is also what a reader without JavaScript or WebGL keeps.
+Before MapLibre paints, `/explore` renders an HTML pin plate (`FirstPaintPinPlate`, `first-paint-pin-plate.css`) over the Web Mercator CONUS board (`conus-mercator.ts`), at the plate's own opening frame and with the plate's own clusters (`first-paint-clusters.ts`). This is **not** the kind-encoded Explore stack; it is the national field the plate settles into, and it is also what a reader without JavaScript or WebGL keeps.
 
 `/` (the Door) does not render it. The Door's only map is the live plate, framed to the Door's own map window (`door-field-frame.ts`); a static Albers board under a Mercator plate read as a second, older map on every load (repo-18ma2).
 

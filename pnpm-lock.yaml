@@ -290,6 +290,9 @@ importers:
       react-dom:
         specifier: ^19.2.7
         version: 19.2.7(react@19.2.7)
+      supercluster:
+        specifier: ^9.1.0
+        version: 9.1.0
     devDependencies:
       '@maplibre/maplibre-gl-style-spec':
         specifier: 24.10.0
@@ -4656,6 +4659,9 @@ packages:
         optional: true
       babel-plugin-macros:
         optional: true
+
+  supercluster@9.1.0:
+    resolution: {integrity: sha512-WMhsJPm8Tf9f5mKxJ1D0mB5tbCMOFi8wTrm/LGnsJHGg8xkeNT/TWDZuFauOGRISnclbYgnxD7g3xJAfQO3FLg==}
 
   superstatic@10.0.0:
     resolution: {integrity: sha512-4xIenBdrIIYuqXrIVx/lejyCh4EJwEMPCwfk9VGFfRlhZcdvzTd3oVOUILrAGfC4pFUWixzPgaOVzAEZgeYI3w==}
@@ -9592,6 +9598,11 @@ snapshots:
     dependencies:
       client-only: 0.0.1
       react: 19.2.7
+
+  supercluster@9.1.0:
+    dependencies:
+      '@types/geojson': 7946.0.16
+      kdbush: 4.1.0
 
   superstatic@10.0.0:
     dependencies:

@@ -1,14 +1,20 @@
 /**
- * Explore first-paint geography. Same Albers board as the Door / record locator so pin
- * percents land on the states they belong to, and state hairlines are visible before MapLibre.
+ * Explore first-paint geography: the CONUS board in Web Mercator, laid over the exact frame the
+ * live plate opens on, so the plate's reveal is a crossfade between two identical maps and not
+ * one map replaced by another (repo-27uao).
+ *
+ * The frame is MapStage's constructor fit: `US_CONUS_BOUNDS` inside `PLATE_OPENING_PADDING_PX`
+ * (32px) of clearance on every side, centered — never smaller than the box at the national floor
+ * (zoom 3, `conusBoxPxAtZoom(3)` = 667.88px across), which is what the plate clamps to on a
+ * phone, where the country then overflows the viewport on the plate and on the board alike.
+ * explore-map-underlay.test.ts pins every number here against those modules.
  */
 
 .ds-explore-underlay {
   position: fixed;
   inset: 0;
   z-index: var(--ds-z-map-plate);
-  display: grid;
-  place-items: center;
+  overflow: hidden;
   background: var(--ds-first-paint-ground);
   pointer-events: auto;
   touch-action: none;
@@ -36,24 +42,33 @@
   position: absolute;
   inset: 0;
   display: grid;
+  /* Both: the item inside its track, and the track inside the canvas. At the national floor the
+     board is wider than a phone, the auto track grows with it, and a start-aligned track would
+     pin the board's left edge to the viewport's while the plate centers the country. */
   place-items: center;
+  place-content: center;
   transform-origin: 0 0;
 }
 
+/* The plate's opening frame. `aspect-ratio` is the bounds box's Mercator aspect (960 / 526.29). */
 .ds-explore-underlay__board {
   position: relative;
-  width: min(100vw, calc(100dvh * 960 / 500));
-  aspect-ratio: 960 / 500;
-  max-height: 100dvh;
+  flex: none;
+  width: max(667.88px, min(calc(100vw - 64px), calc((100dvh - 64px) * 1.824078)));
+  aspect-ratio: 960 / 526.29;
 }
 
+/*
+ * The board as a mask, not a tinted plate: SVG alpha (land 0.32, hairlines 1) paints the plate's
+ * own land ink, so the board and the plate share one ground colour in both themes.
+ */
 .ds-explore-underlay__ground {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background-color: var(--ds-first-paint-ground-ink);
-  -webkit-mask-image: url('/geo/us-locator.svg');
-  mask-image: url('/geo/us-locator.svg');
+  -webkit-mask-image: url('/geo/us-conus-mercator.svg');
+  mask-image: url('/geo/us-conus-mercator.svg');
   -webkit-mask-size: contain;
   mask-size: contain;
   -webkit-mask-repeat: no-repeat;
@@ -65,7 +80,7 @@
 .ds-explore-underlay .ds-first-paint-plate {
   position: absolute;
   inset: 0;
-  z-index: 1; /* local: pins over the locator ground inside the board */
+  z-index: 1; /* local: pins over the board ground */
   pointer-events: none;
 }
 

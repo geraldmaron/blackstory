@@ -15,7 +15,6 @@ import { listPublicEntities } from '../../data/public-seed';
 import { atlasWalkHref, isHoldingPlaceHref } from '../place/public-place-path';
 import { buildExploreMapSource } from './build-explore-map-source';
 import {
-  conusPinPercent,
   DOOR_MOBILE_NATIONAL_PIN_CAP,
   firstPaintWalksFirst,
   isFirstPaintWalk,
@@ -26,6 +25,7 @@ import {
   toFirstPaintPins,
   toFirstPaintShell,
 } from './first-paint-pins';
+import { conusPinPercent } from './conus-mercator';
 import type { ExploreMapFeature } from './build-explore-map-source';
 
 function leakyFeature(
@@ -269,10 +269,14 @@ test('the first-paint shell drops shop tokens, including leftover facet labels',
   assert.equal(cleaned.totalMatched, 4101);
 });
 
-test('CONUS projection keeps a Florida pin on the plate', () => {
-  const { left, top } = conusPinPercent(-80.14, 26.12);
-  assert.ok(left > 50 && left < 100);
-  assert.ok(top > 50 && top < 100);
+test('the first-paint projection keeps a Florida pin on the board and inside the plate frame', () => {
+  // Web Mercator over the CONUS bounds box (conus-mercator.ts): the plate's own projection.
+  const keys = conusPinPercent(-81.8, 24.55);
+  assert.ok(keys);
+  assert.ok(keys.x > 70 && keys.x < 80, String(keys.x));
+  assert.ok(keys.y > 95 && keys.y <= 100, String(keys.y));
+  // Alaska is off the plate's opening frame, so it is off the board — not pinned to an edge.
+  assert.equal(conusPinPercent(-149.9, 61.2), null);
 });
 
 test('first-paint plate projects pins with Albers locator percents, not CONUS clamp', () => {

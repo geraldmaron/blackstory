@@ -20,7 +20,7 @@
  */
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { BRAND_ASSETS } from '@repo/config';
@@ -38,7 +38,7 @@ import {
 } from '../lib/map-experience/decade-transition';
 import { DECADE_LAYER_FADE_MS } from './map/decade-layer-transition';
 import type { StoryChapter } from '../lib/story/chapters';
-import { useChapterObserver } from '../lib/story/use-chapter-observer';
+import { chapterInViewFromRects, useChapterObserver } from '../lib/story/use-chapter-observer';
 import type { StoryRecordSpotlight } from '../lib/story/pick-story-record';
 import type { StoryFact } from '../lib/story/story-facts';
 import { copyFor, headingParts } from '../components/story/story-copy';
@@ -276,6 +276,35 @@ export function DoorImmersive({
    * sweep) for nothing. The opening chapter is framed on mount, so it starts as the last one.
    */
   const lastChapterIdRef = useRef<string>(chapters[0]!.id);
+
+  /**
+   * A page that mounts already scrolled — a reload, a restored history entry — frames the chapter
+   * the reader is on before the plate's first frame, instead of framing the opening chapter and
+   * then flying (repo-27uao). A layout effect, so it runs before the passive effects that land
+   * the first frame, and after the sections have their boxes. The sweep chapter is left to the
+   * observer: its camera is the national frame either way, and the sweep has to start from the
+   * observer's own batch the way it does from a scroll.
+   */
+  useLayoutEffect(() => {
+    const scope = journeyRef.current;
+    if (!scope) return;
+    const rects = [...scope.querySelectorAll<HTMLElement>('[data-chapter]')].map((section) => {
+      const rect = section.getBoundingClientRect();
+      return { chapterIndex: Number(section.dataset.chapter), top: rect.top, bottom: rect.bottom };
+    });
+    const index = chapterInViewFromRects(rects, window.innerHeight);
+    const chapter = index === null ? undefined : chapters[index];
+    if (!chapter || chapter.sweep || chapter.id === lastChapterIdRef.current) return;
+    lastChapterIdRef.current = chapter.id;
+    setFocus(
+      resolveDoorFocus({
+        chapter,
+        spotlight,
+        fact: factByChapterId[chapter.id],
+        spotlightLngLat,
+      }),
+    );
+  }, [chapters, factByChapterId, spotlight, spotlightLngLat]);
 
   useChapterObserver(
     journeyRef,
