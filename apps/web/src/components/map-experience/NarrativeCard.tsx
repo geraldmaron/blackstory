@@ -25,6 +25,8 @@ import {
   RecordBrowseControls,
   type RecordBrowseControlsProps,
 } from '../patterns/RecordBrowseControls';
+import { gradeDescription, gradeForConfidence } from '../../lib/map-experience/evidence-grade';
+import { meterLevelForTier } from '../entity/RecordChrome';
 import { RecordVisitBlock } from '../patterns/RecordVisitBlock';
 import {
   buildVisitHandoffFromMapFeature,
@@ -127,6 +129,11 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
     {
       key: 'evidence',
       label: 'Evidence',
+      /*
+       * This card's label is a claim count, not a grade word, so the value keeps it whole. The
+       * meter is what adds the grade: the count says how much was found, the bars say how
+       * strongly it is held, and the card previously showed only the first of those.
+       */
       value: properties.href ? (
         <Link
           className="ds-record-anatomy__fact-link"
@@ -138,6 +145,11 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
       ) : (
         evidenceLabel
       ),
+      meter: {
+        level: meterLevelForTier(properties.confidenceTier),
+        tone: properties.confidenceTier,
+        label: gradeDescription(gradeForConfidence(properties.confidenceTier)),
+      },
       icon: { variant: 'record-evidence', tier: properties.confidenceTier },
     },
   ];

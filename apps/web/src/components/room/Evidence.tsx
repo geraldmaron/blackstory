@@ -5,11 +5,16 @@
  * from the design law are enforced by the markup rather than left to a caller:
  * a Connection states the relation in words and never renders a bare arrow, and a Precision
  * line always says what the coordinate does *not* claim.
+ *
+ * Precision's stylesheet travels with it. The rest of these blocks are only ever drawn inside a
+ * room, which loads the kit; Precision is also drawn on the map surface, which loads no room
+ * stylesheet, so relying on the route to have imported the kit left it unstyled there.
  */
 
 import React from 'react';
 import type { ReactNode } from 'react';
 import { cx } from '@repo/ui';
+import './precision.css';
 
 void React;
 

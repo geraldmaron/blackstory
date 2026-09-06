@@ -44,6 +44,17 @@ export type VisitHandoffInput = {
   readonly visit?: PublicVisitView;
 };
 
+/**
+ * "county precision", "street address precision" — the archive's one phrasing for how finely a
+ * location is known. Shared by the full record page and every compact card so the same fact never
+ * reads as two different sentences depending on which surface drew the pin.
+ */
+export function precisionResolutionLabel(locationPrecision: string): string {
+  return locationPrecision === 'address'
+    ? 'street address precision'
+    : `${locationPrecision.replace(/[_-]+/g, ' ')} precision`;
+}
+
 export type VisitHandoff = {
   readonly addressLine: string;
   /** Google Maps search and directions. */
@@ -187,10 +198,7 @@ export function buildVisitHandoff(input: VisitHandoffInput): VisitHandoff {
     })();
   return {
     addressLine,
-    precisionLabel:
-      input.locationPrecision === 'address'
-        ? 'street address precision'
-        : `${input.locationPrecision.replace(/[_-]+/g, ' ')} precision`,
+    precisionLabel: precisionResolutionLabel(input.locationPrecision),
     ...(mapsSearchHref ? { mapsSearchHref } : {}),
     ...(mapsDirectionsHref ? { mapsDirectionsHref } : {}),
     ...(appleMapsSearchHref ? { appleMapsSearchHref } : {}),

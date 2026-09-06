@@ -9,7 +9,8 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import { precisionNote, RecordSheet, type RecordSheetProps, type SheetRecord } from './RecordSheet';
+import { precisionResolutionLabel } from '../../lib/geography/visit-handoff';
+import { RecordSheet, type RecordSheetProps, type SheetRecord } from './RecordSheet';
 
 const RECORD: SheetRecord = {
   id: 'ent_gaston_motel',
@@ -53,7 +54,7 @@ test('the precision note renders verbatim', () => {
   const html = render();
   assert.match(
     html,
-    /Rendered at locality precision\. The archive never draws a point sharper than the source supports\./,
+    /Located to locality precision\. The archive never draws a point sharper than the source supports\./,
   );
 });
 
@@ -61,14 +62,11 @@ test('the precision note renders for every record, not only imprecise ones', () 
   const html = render({
     record: { ...RECORD, precision: 'address' },
   });
-  assert.match(html, /Rendered at address precision\./);
+  assert.match(html, /Located to street address precision\./);
 });
 
-test('precisionNote is the single definition of that sentence', () => {
-  assert.equal(
-    precisionNote('county'),
-    'Rendered at county precision. The archive never draws a point sharper than the source supports.',
-  );
+test('precisionResolutionLabel is the single definition of that phrase, shared with the full record page', () => {
+  assert.equal(precisionResolutionLabel('county'), 'county precision');
 });
 
 test('the documented order holds: pills, name, story, anatomy, precision, actions, sources', () => {
@@ -78,7 +76,7 @@ test('the documented order holds: pills, name, story, anatomy, precision, action
     'A.G. Gaston Motel',
     'campaign headquarters',
     'Evidence',
-    'Rendered at locality precision',
+    'Located to locality precision',
     'Fly to place',
     'Sources',
   ];
@@ -107,7 +105,14 @@ test('kind, era and grade are pills; the anatomy carries only Where and Evidence
   for (const label of ['Where', 'Evidence']) {
     assert.match(html, new RegExp(`>${label}<`), `anatomy is missing ${label}`);
   }
-  assert.match(html, /Grade A · 6 sources/);
+  // The grade is the word, the three-step meter that places it on the scale, and the count as a
+  // quiet line — the record page's treatment. One string saying "Grade A · 6 sources" asked the
+  // reader to know the scale by heart and hid the count inside the headline.
+  assert.match(html, /fact-head">Grade A</);
+  assert.match(html, /ds-record-anatomy__fact-meter/);
+  assert.match(html, /ds-rec-meter--high/);
+  assert.match(html, /fact-support">6 sources</);
+  assert.doesNotMatch(html, /Grade A · 6 sources/);
 
   // Kind and Era are stated once, as pills. An anatomy row for either would print the same fact
   // twice on one card, which is what the mono kicker used to do.
@@ -128,8 +133,8 @@ test('Where drops an address head that merely restates the name', () => {
       place: '100 Block North Greenwood Avenue, Tulsa, Oklahoma',
     },
   });
-  assert.match(html, /fact-value">Tulsa, Oklahoma</);
-  assert.doesNotMatch(html, /fact-value">100 Block North Greenwood Avenue, Tulsa/);
+  assert.match(html, /fact-head">Tulsa, Oklahoma</);
+  assert.doesNotMatch(html, /fact-head">100 Block North Greenwood Avenue, Tulsa/);
 });
 
 test('sources are numbered', () => {
@@ -207,11 +212,26 @@ test('visit maps exits stay quiet text; fly stays a sheet action', () => {
     onFlyToPlace: () => {},
   });
   assert.match(html, /ds-sheet__visit/);
-  assert.match(html, /ds-record-visit__link/);
-  assert.match(html, /Apple Maps/);
-  assert.match(html, /Google Maps/);
+  // One segmented control per provider, brand mark plus provider name, not a run of text links.
+  assert.match(html, /ds-maps-handoff__provider/);
+  assert.match(html, /data-icon="apple"/);
+  assert.match(html, /data-icon="google"/);
+  assert.match(html, /ds-maps-handoff__name">Apple Maps</);
+  assert.match(html, /ds-maps-handoff__name">Google Maps</);
   assert.match(html, /Fly to place/);
-  assert.doesNotMatch(html, /ds-cta/);
+
+  // Each exit says which provider and which action it is. They all used to carry the same
+  // accessible name, "Open <place> in maps", four times over.
+  assert.match(html, /aria-label="Open [^"]+ in Apple Maps"/);
+  assert.match(html, /aria-label="Get directions to [^"]+ in Google Maps"/);
+
+  // The weight rule that the old text links were protecting: an external handoff is never the
+  // filled action of a view. It may wear the quiet pill; it may not wear copper.
+  assert.match(html, /ds-cta--quiet/);
+  assert.doesNotMatch(html, /ds-cta--copper/);
+
+  // The separator that stranded a middot at the end of a wrapped line is gone with the run.
+  assert.doesNotMatch(html, /Directions \(Apple\)/);
 });
 
 test('save reports whether the record is already saved', () => {

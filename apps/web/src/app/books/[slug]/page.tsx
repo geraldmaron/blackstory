@@ -11,6 +11,13 @@ import {
   buildEntityAnatomyInputs,
   buildEntityAnatomyPlace,
 } from '../../entity/[id]/entity-anatomy-facts';
+import { meterLevelForTier } from '../../../components/entity/RecordChrome';
+import {
+  evidenceCountPhrase,
+  evidenceGradeWord,
+  gradeDescription,
+  gradeForConfidence,
+} from '../../../lib/map-experience/evidence-grade';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
 import { resolvePublicEntityView } from '../../../lib/public-data/source';
 import { loadBannedBooksListing } from '../../../lib/banned-books/public-source';
@@ -99,7 +106,14 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
           {
             key: 'evidence',
             label: 'Evidence',
-            value: anatomyInputs.evidenceLabel,
+            /* Same grade treatment as the record sheet and the record page. */
+            value: evidenceGradeWord(anatomyInputs.evidenceLabel),
+            support: evidenceCountPhrase(anatomyInputs.evidenceLabel),
+            meter: {
+              level: meterLevelForTier(anatomyInputs.evidenceTier),
+              tone: anatomyInputs.evidenceTier,
+              label: gradeDescription(gradeForConfidence(anatomyInputs.evidenceTier)),
+            },
             icon: { variant: 'record-evidence', tier: anatomyInputs.evidenceTier },
           },
         ];

@@ -43,10 +43,18 @@ import {
 } from '../patterns/RecordAnatomyPanel';
 import { RecordVisitBlock } from '../patterns/RecordVisitBlock';
 import type { VisitHandoffInput } from '../../lib/geography/visit-handoff';
-import { shouldShowVisitBlock } from '../../lib/geography/visit-handoff';
+import { precisionResolutionLabel, shouldShowVisitBlock } from '../../lib/geography/visit-handoff';
 import type { ConfidenceTierKey } from '../../lib/map-experience/confidence-icons';
-import { placeDetail } from '../../lib/map-experience/place-label';
 import {
+  evidenceCountPhrase,
+  evidenceGradeWord,
+  gradeDescription,
+  gradeForConfidence,
+} from '../../lib/map-experience/evidence-grade';
+import { placeDetail } from '../../lib/map-experience/place-label';
+import { Precision } from '../room';
+import {
+  meterLevelForTier,
   RecordGradePill,
   RecordKindPill,
   RecordPill,
@@ -58,11 +66,6 @@ import '../patterns/record-visit.css';
 import '../patterns/record-archive.css';
 
 void React;
-
-/** The one sentence the archive owes a reader about any pin it draws. */
-export function precisionNote(precision: string): string {
-  return `Rendered at ${precision} precision. The archive never draws a point sharper than the source supports.`;
-}
 
 export type SheetSource = {
   readonly id: string;
@@ -161,15 +164,22 @@ function anatomyFacts(record: SheetRecord): readonly RecordAnatomyFact[] {
     {
       key: 'evidence',
       label: 'Evidence',
-      value: record.evidenceLabel,
+      /*
+       * The grade gets the record page's treatment: the word, the three-step meter that says
+       * where it sits on the scale, and the source count as a quiet line under it. The sheet
+       * used to print the whole thing as one string ("Grade A · 2 sources"), which asked the
+       * reader to know the scale by heart and buried the count inside the headline.
+       */
+      value: evidenceGradeWord(record.evidenceLabel),
+      support: evidenceCountPhrase(record.evidenceLabel),
+      meter: {
+        level: meterLevelForTier(record.confidenceTier),
+        tone: record.confidenceTier,
+        label: gradeDescription(gradeForConfidence(record.confidenceTier)),
+      },
       icon: { variant: 'record-evidence', tier: record.confidenceTier },
     },
   ];
-}
-
-/** "Grade A · 6 sources" carries the grade in its head; the pill wants only that word. */
-function gradeWordOf(evidenceLabel: string): string {
-  return evidenceLabel.split(' · ')[0] ?? evidenceLabel;
 }
 
 /**
@@ -350,7 +360,7 @@ export function RecordSheet({
               {record.era}
             </RecordPill>
             <RecordGradePill tier={record.confidenceTier}>
-              {gradeWordOf(record.evidenceLabel)}
+              {evidenceGradeWord(record.evidenceLabel)}
             </RecordGradePill>
           </div>
           {/*
@@ -386,18 +396,17 @@ export function RecordSheet({
           <RecordVisitBlock className="ds-sheet__visit" compact {...record.visitInput} />
         ) : null}
 
-        <p className="ds-sheet__precision">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <circle cx="8" cy="8" r="6.2" stroke="currentColor" strokeWidth="1.3" />
-            <path
-              d="M8 7.2v4M8 4.9v.9"
-              stroke="currentColor"
-              strokeWidth="1.4"
-              strokeLinecap="round"
-            />
-          </svg>
-          <span>{precisionNote(record.precision)}</span>
-        </p>
+        {/*
+         * The archive's one precision sentence (`components/room`'s `Precision`), boxed for a
+         * small card. Not optional and not editorial: it renders for every record, including ones
+         * with a well-known address, because it states what THIS pin means, not how well-known the
+         * place is.
+         */}
+        <Precision
+          className="ds-room-precision--boxed"
+          resolution={precisionResolutionLabel(record.precision)}
+          caveat="The archive never draws a point sharper than the source supports."
+        />
 
         <div className="ds-sheet__actions">
           {/*
