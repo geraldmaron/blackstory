@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from black_book_constitution import get_policy_version
 from black_book_research.adapters.candidates import stamp_candidate_provenance
 from black_book_research.adapters.types import (
     ADAPTER_CANDIDATE_SCHEMA_VERSION,
@@ -158,7 +159,7 @@ def test_included_candidate_has_relevance_evidence() -> None:
     assessment = evaluate_candidate_relevance(candidate, assessed_at=FIXED_NOW)
     assert assessment.decision == "include"
     assert assessment.passes is True
-    assert assessment.policy_version == "1.0.0"
+    assert assessment.policy_version == get_policy_version()
     assert assessment.evidence
     assert len(assessment.feature_values) == 5
     assert assessment.why_this_appears.startswith("Included because")
