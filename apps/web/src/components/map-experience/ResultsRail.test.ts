@@ -138,6 +138,22 @@ test('the meta line shows place, era and grade', () => {
   assert.match(html, /Evidence grade A/);
 });
 
+test('the grade is the row\u2019s own mark, not the last link in the middot chain', () => {
+  const html = renderToStaticMarkup(
+    createElement(ResultsRail, railProps({ features: [feature(0)], total: 1 })),
+  );
+
+  // The same three-segment meter the record sheet and the record page draw. A dot trailing
+  // "Undated \u00b7" read as metadata of equal weight to the era.
+  assert.match(html, /ds-results__grade\b/);
+  assert.match(html, /ds-results__grade-meter/);
+  assert.match(html, /ds-rec-meter--high/);
+  assert.equal((html.match(/ds-rec-meter__seg--on/g) ?? []).length, 3);
+
+  // One separator between place and era, and none before the grade.
+  assert.equal((html.match(/ds-results__sep/g) ?? []).length, 1);
+});
+
 test('an ungraded record says so rather than borrowing a letter', () => {
   const html = renderToStaticMarkup(
     createElement(
@@ -147,6 +163,27 @@ test('an ungraded record says so rather than borrowing a letter', () => {
   );
   assert.match(html, /Evidence not graded/);
   assert.equal(/Evidence grade [ABC]/.test(html), false);
+
+  // Honestly empty rather than a fourth colour: three segments, none filled. Nobody assessed
+  // this record, which is not the same claim as a weak assessment.
+  assert.match(html, /ds-results__grade-meter/);
+  assert.equal((html.match(/ds-rec-meter__seg--on/g) ?? []).length, 0);
+  assert.equal((html.match(/ds-rec-meter__seg\b/g) ?? []).length, 3);
+});
+
+test('a lower grade fills fewer segments, so the scale survives greyscale', () => {
+  const forTier = (confidenceTier: 'high' | 'medium' | 'low') =>
+    renderToStaticMarkup(
+      createElement(
+        ResultsRail,
+        railProps({ features: [feature(0, { confidenceTier })], total: 1 }),
+      ),
+    );
+
+  const filled = (html: string) => (html.match(/ds-rec-meter__seg--on/g) ?? []).length;
+  assert.equal(filled(forTier('high')), 3);
+  assert.equal(filled(forTier('medium')), 2);
+  assert.equal(filled(forTier('low')), 1);
 });
 
 test('an empty result set renders the teaching empty state, never a bare list', () => {

@@ -212,6 +212,12 @@
 /* —— the grade dot ——————————————————————————————————————————————————————————
    Grade is never colour alone: the tier word sits beside the dot in mono, which is what makes
    the row readable to a screen reader and to a reader who cannot separate the hues. */
+/*
+ * The evidence mark: the shared three-segment meter plus the letter, the same pairing the Explore
+ * results rail, the record sheet and the record page draw. This index used to own a third grade
+ * treatment whose A was copper — the accent colour, not the confidence scale — so the same record
+ * carried a different grade language on every surface a reader could meet it.
+ */
 .ds-records-grade {
   display: inline-flex;
   align-items: center;
@@ -219,37 +225,31 @@
   font-family: var(--ds-font-mono);
   font-size: 10.5px;
   letter-spacing: 0.06em;
-  color: var(--room-ink-4);
+  color: var(--room-ink-4, var(--ds-ink-subtle));
 }
 
-.ds-records-grade::before {
-  content: '';
-  display: block;
+.ds-records-grade__meter .ds-rec-meter__seg {
   width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: currentcolor;
+  height: 3px;
+  border-radius: 1px;
 }
 
-.ds-records-grade--A {
-  color: var(--ds-accent);
+.ds-records-grade__letter {
+  min-width: 0.5rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
-.ds-records-grade--B {
-  color: var(--ds-warning-border);
+.ds-records-grade__letter[data-grade='high'] {
+  color: var(--ds-confidence-high-fg);
 }
 
-/* C and ungraded are both drawn as an outline, because neither is a positive assertion of
-   strength. They differ in the letter, which is the channel that survives greyscale. */
-.ds-records-grade--C,
-.ds-records-grade--none {
-  color: var(--room-ink-4);
+.ds-records-grade__letter[data-grade='medium'] {
+  color: var(--ds-confidence-medium-fg);
 }
 
-.ds-records-grade--C::before,
-.ds-records-grade--none::before {
-  background: transparent;
-  box-shadow: inset 0 0 0 1.5px currentcolor;
+.ds-records-grade__letter[data-grade='low'] {
+  color: var(--ds-confidence-low-fg);
 }
 
 /* —— the pager: real anchors, never a client-side page counter ————————————————— */

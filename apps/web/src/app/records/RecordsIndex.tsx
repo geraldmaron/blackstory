@@ -17,6 +17,7 @@ import {
   Room,
   RoomHeader,
 } from '../../components/room';
+import { meterLevelForTier, RecordMeter } from '../../components/entity/RecordChrome';
 import { KindGlyph } from '../../components/map-experience/KindGlyph';
 import type { RecordsIndex as RecordsIndexModel } from '../../lib/records/build-records-index';
 import { RECORDS_FILTER_KEYS } from '../../lib/records/build-records-index';
@@ -213,13 +214,26 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
               size={13}
             />
           ),
+          /*
+           * The same evidence meter the Explore rail, the record sheet and the record page draw.
+           * This index used to own a third grade treatment whose A was copper, which read as the
+           * accent rather than as the confidence scale and matched nothing else in the product.
+           */
           grade: (
-            <span
-              className={`ds-records-grade ds-records-grade--${row.grade ?? 'none'}`}
-              title={row.gradeDescription}
-            >
-              <span className="ds-visually-hidden">{row.gradeDescription}</span>
-              <span aria-hidden="true">{row.grade ?? '·'}</span>
+            <span className="ds-records-grade" title={row.gradeDescription}>
+              <RecordMeter
+                className="ds-records-grade__meter"
+                level={meterLevelForTier(row.confidenceTier)}
+                tone={row.confidenceTier}
+                label={row.gradeDescription}
+              />
+              <span
+                className="ds-records-grade__letter"
+                data-grade={row.confidenceTier}
+                aria-hidden="true"
+              >
+                {row.grade ?? '·'}
+              </span>
             </span>
           ),
         }))}
