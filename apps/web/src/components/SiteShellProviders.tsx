@@ -3,25 +3,27 @@
 /**
  * Client map providers for the public shell.
  *
- * Map moment and MapLibre providers load without SSR so utility routes do not evaluate their
- * hooks during static prerender.
+ * `MapMomentStage` and `MapStageProvider` mount synchronously (no `next/dynamic`, no
+ * `ssr: false`) so the shell they wrap — header, search, footer — is present in the
+ * server-rendered HTML on every route, including a reader with JavaScript disabled and a
+ * crawler that never runs it. Both providers are pure over their render path: no browser
+ * global is read outside a `useEffect`, and neither takes props this shell has to await (see
+ * each component's own doc comment — `MapStageProvider` always mounts "bare", built from no
+ * server data). There is nothing here for SSR to fail on.
+ *
+ * The actual MapLibre instance stays client-only by construction, not by this boundary:
+ * `MapStage.tsx` dynamically `import()`s `maplibre-gl` itself, inside a mount effect, which is
+ * the one and only place the library's runtime is ever loaded (ADR-017). Removing `ssr: false`
+ * here does not pull WebGL into the server bundle — it only lets the surrounding markup (the
+ * plate's own inert `<div>`, the header, the footer) render up front.
  */
 
-import dynamic from 'next/dynamic';
 import type { ReactNode } from 'react';
+import { MapMomentStage } from './room/MapMoment';
+import { MapStageProvider } from './map-stage/MapStage';
 import { OfflineNotice } from './OfflineNotice';
 import { SiteShellFooter } from './SiteShellFooter';
 import { SiteShellHeader } from './SiteShellHeader';
-
-const MapMomentStage = dynamic(
-  () => import('./room/MapMoment').then((module) => ({ default: module.MapMomentStage })),
-  { ssr: false },
-);
-
-const MapStageProvider = dynamic(
-  () => import('./map-stage/MapStage').then((module) => ({ default: module.MapStageProvider })),
-  { ssr: false },
-);
 
 export type SiteShellProvidersProps = {
   readonly children: ReactNode;
