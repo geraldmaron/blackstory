@@ -1,19 +1,17 @@
 /**
  * The door is an immersive Journey: scroll snaps chapters and flies the shared map plate.
- * It is not the Explore instrument (no lens, no rail, no sheet) and not a second map: the plate
- * it drives is the one `MapStage`, handed the same national-field patch Explore rests on.
+ * It is not the Explore instrument (no lens, no rail, no sheet) and it has one map, not two:
+ * the plate it drives is the one `MapStage`, handed the same national-field patch Explore rests
+ * on. The static Albers board that used to sit under the plate is gone (repo-18ma2).
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createElement } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { listPublicEntities } from '../data/public-seed';
 import { buildExploreMapSource } from '../lib/map-experience/build-explore-map-source';
 import { toDoorLinkPins } from '../lib/map-experience/first-paint-pins';
 import { atlasWalkHref } from '../lib/place/public-place-path';
-import { FirstPaintPinPlate } from './first-paint-pin-plate';
 
 const page = readFileSync(fileURLToPath(new URL('./page.tsx', import.meta.url)), 'utf8');
 const door = readFileSync(fileURLToPath(new URL('./door-home.tsx', import.meta.url)), 'utf8');
@@ -21,8 +19,9 @@ const immersive = readFileSync(
   fileURLToPath(new URL('./door-immersive.tsx', import.meta.url)),
   'utf8',
 );
+const css = readFileSync(fileURLToPath(new URL('./door-home.css', import.meta.url)), 'utf8');
 
-test('`/` mounts DoorImmersive over the pin plate, not the Explore instrument', () => {
+test('`/` mounts DoorImmersive over the shared plate, not the Explore instrument', () => {
   assert.match(page, /DoorHome/);
   assert.doesNotMatch(page, /AtlasHome|AtlasLoader|AtlasExperience/);
   assert.match(door, /DoorImmersive/);
@@ -41,7 +40,6 @@ test('DoorImmersive scrolls chapters and drives the shared plate', () => {
   assert.match(immersive, /'use client'/);
   assert.match(immersive, /IntersectionObserver/);
   assert.match(immersive, /resolveDoorFocus/);
-  assert.match(immersive, /linkRecords/);
   assert.match(immersive, /scrollIntoView/);
   assert.match(immersive, />\s*Begin\s*</);
   assert.match(immersive, /Open Explore/);
@@ -53,6 +51,58 @@ test('DoorImmersive scrolls chapters and drives the shared plate', () => {
   );
   assert.match(immersive, /focus\.camera/);
   assert.doesNotMatch(immersive, /useStoryRunner|from 'maplibre-gl'|new maplibregl/);
+});
+
+test('the Door has one map: no static board, no layout zoom, no pin plate (repo-18ma2)', () => {
+  assert.doesNotMatch(immersive, /FirstPaintPinPlate|usePinPhotoHoverAnchor|locatorPinPercent/);
+  assert.doesNotMatch(immersive, /ds-door__board|ds-door__ground|focus\.scale|is-zoomed/);
+  assert.doesNotMatch(css, /ds-door__board|ds-door__ground|us-locator\.svg|ds-first-paint/);
+  assert.doesNotMatch(css, /container-type|aspect-ratio:\s*960/);
+  assert.doesNotMatch(immersive, /data-page-ready/);
+  assert.doesNotMatch(css, /data-page-ready/);
+});
+
+test('the plate is framed against the Door window and re-framed on resize', () => {
+  assert.match(immersive, /ds-door__window/);
+  assert.match(immersive, /doorFramePadding\(windowBox, plateBox\)/);
+  assert.match(immersive, /doorFrameOffset\(windowBox, plateBox\)/);
+  // A national chapter is the Atlas's own national preset, fitted inside the window.
+  assert.match(immersive, /stage\.flyPreset\(\s*'national',\s*\{ bounds: US_CONUS_BOUNDS \}/);
+  assert.match(immersive, /mode: cut \? 'cut' : 'ease'/);
+  assert.match(immersive, /pitch: camera\.pitch,\s*bearing: camera\.bearing/);
+  // The phone strip is shorter than the country at the Instrument's floor; the fit may sink it.
+  assert.match(immersive, /zoomFloor: 'fit'/);
+  // The first frame after mount is a cut, so a warm plate is never seen arriving from elsewhere.
+  assert.match(immersive, /firstFrameRef = useRef\(true\)/);
+  assert.match(immersive, /applyCamera\(firstFrameRef\.current\)/);
+  // Resize follows the layout: observe the window, one refit per frame, cut not flight.
+  assert.match(immersive, /new ResizeObserver\(refit\)/);
+  assert.match(immersive, /window\.addEventListener\('resize', refit\)/);
+  assert.match(immersive, /requestAnimationFrame/);
+  assert.match(immersive, /stage\.resize\(\);\s*applyCamera\(true\)/);
+  assert.match(immersive, /sameDoorFrameBox/);
+  // The observer re-firing for the chapter already in view must not restart its flight.
+  assert.match(immersive, /if \(chapter\.id === lastChapterIdRef\.current\) return;/);
+});
+
+test('the reveal waits for both the plate and this mount, and never gates on a stale attribute', () => {
+  // This mount's own signal, stamped only after its first frame has landed.
+  assert.match(immersive, /data-plate=\{plateState\}/);
+  assert.match(immersive, /plateUnavailable \? 'unavailable' : framed \? 'live' : 'pending'/);
+  assert.match(
+    css,
+    /body:has\(\.ds-map-stage\[data-plate-ready\]\) \.ds-door__field\[data-plate='live'\]\s*\{[^}]*background:\s*transparent/,
+  );
+  assert.match(css, /\.ds-door__field\s*\{[^}]*background:\s*var\(--ds-canvas\)/);
+  assert.match(
+    css,
+    /\.ds-door__field\s*\{[^}]*transition:\s*background-color var\(--ds-duration-base\)/,
+  );
+  // No plate, no caption about pins that are not there.
+  assert.match(
+    css,
+    /\.ds-door__field\[data-plate='unavailable'\] \.ds-door__field-chrome\s*\{[^}]*display:\s*none/,
+  );
 });
 
 test('the sweep chapter clears the plate first, then fills it cumulatively', () => {
@@ -89,27 +139,15 @@ test('the Door and Explore rest on one national-field patch', () => {
 });
 
 test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
-  const css = readFileSync(fileURLToPath(new URL('./door-home.css', import.meta.url)), 'utf8');
   assert.match(css, /html:has\(\.ds-door\)[\s\S]*scroll-snap-type:\s*y\s+proximity/);
-  assert.match(css, /ds-door__board-frame/);
   assert.match(css, /\.ds-door__field[\s\S]*position:\s*fixed/);
-  assert.match(css, /\.ds-door__ground[\s\S]*background:\s*var\(--ds-canvas\)/);
-  assert.match(css, /\.ds-door__ground-map[\s\S]*mask-image:\s*url\('\/geo\/us-locator\.svg'\)/);
-  assert.match(
-    css,
-    /\.ds-door__ground-map[\s\S]*background-color:\s*var\(--ds-first-paint-ground-ink\)/,
-  );
+  assert.match(css, /\.ds-door__window\s*\{[^}]*position:\s*absolute/);
+  assert.match(css, /\.ds-door__window\s*\{[^}]*pointer-events:\s*none/);
   // Page Sand / copper wash behind the map was the distracting orange field.
-  assert.doesNotMatch(css, /\.ds-door__ground[\s\S]*--ds-accent-muted/);
   assert.doesNotMatch(css, /mix-blend-mode:\s*multiply/);
   assert.doesNotMatch(css, /radial-gradient|linear-gradient|box-shadow|backdrop-filter/);
   // Nested overflow scrollport was the bug: wheel only hit cards. Document scrolls instead.
   assert.doesNotMatch(css, /\.ds-door-journey\s*\{[^}]*overflow-y:\s*auto/);
-  // Pin percents are Albers 960x500; contain the board so mask-size:contain and pins share a box.
-  assert.match(css, /ds-door__board-host/);
-  assert.match(css, /container-type:\s*size/);
-  assert.match(css, /aspect-ratio:\s*960\s*\/\s*500/);
-  assert.match(css, /min\(100cqw,\s*calc\(100cqh \* 960 \/ 500\)\)/);
   // Opening invitation card stays vertically centered in the viewport chapter.
   assert.match(
     css,
@@ -128,38 +166,19 @@ test('immersive CSS uses document snap over a fixed full-bleed plate', () => {
   );
   // Mobile chapters are in document flow; nested card scroll would steal the page wheel.
   assert.match(css, /@media \(max-width: 899px\)[\s\S]*max-height:\s*none/);
-  // Land mask on the pin plate made link hits fail (mask alpha ~0.32).
-  assert.doesNotMatch(
+  // On a phone the strip is the window; the camera frames the country inside its padding.
+  assert.match(
     css,
-    /body:has\(\.ds-door\)\s+\.ds-first-paint-plate\s*\{[^}]*mask-image:\s*url\(/,
+    /@media \(max-width: 899px\)[\s\S]*\.ds-door__window\s*\{[^}]*position:\s*relative/,
   );
-});
-
-test('DoorImmersive layout-zooms the plate (no transform:scale blur)', () => {
-  assert.match(immersive, /width: `\$\{focus\.scale \* 100\}%`/);
-  assert.match(immersive, /ds-door-journey__chapter--rest/);
-  assert.match(immersive, /ds-door-journey__copy/);
-  assert.match(immersive, /ds-door__board-host/);
-  assert.match(immersive, /ds-door__board-frame/);
-  assert.doesNotMatch(immersive, /transform:\s*`scale/);
 });
 
 test('door-home CSS switches mobile typography and gutters', () => {
-  const css = readFileSync(fileURLToPath(new URL('./door-home.css', import.meta.url)), 'utf8');
-  const pinCss = readFileSync(
-    fileURLToPath(new URL('./first-paint-pin-plate.css', import.meta.url)),
-    'utf8',
-  );
   assert.match(css, /ds-door-journey__cold[\s\S]*clamp\(/);
   assert.match(css, /var\(--ds-gutter\)/);
-  assert.match(pinCss, /max-width: 899px/);
-  assert.match(pinCss, /--ds-first-paint-pin-size:\s*0\.1875rem/);
-  assert.match(pinCss, /\.ds-door__board\.is-zoomed/);
-  assert.doesNotMatch(pinCss, /ds-door__board:not\(\.is-zoomed\)/);
-  assert.doesNotMatch(pinCss, /ds-first-paint-plate--door-mobile/);
 });
 
-test('DoorImmersive renders one full pin plate for every record', () => {
+test('DoorImmersive hands every record to the plate', () => {
   assert.match(immersive, /spotlightPinId/);
   assert.doesNotMatch(immersive, /catalogFeatures/);
   assert.doesNotMatch(immersive, /resolveDoorFocusPinId/);
@@ -167,20 +186,14 @@ test('DoorImmersive renders one full pin plate for every record', () => {
   assert.doesNotMatch(immersive, /ds-first-paint-plate--door-mobile/);
 });
 
-test('Door pin plate can link every public record', () => {
+test('Door pins carry a public href for every record, and never an entity id', () => {
   const features = buildExploreMapSource(listPublicEntities()).featureCollection.features;
   const pins = toDoorLinkPins(features);
-  const html = renderToStaticMarkup(
-    createElement(FirstPaintPinPlate, { pins, linkRecords: true, focusEntityId: null }),
-  );
-  assert.match(html, /ds-first-paint-plate--records/);
-  assert.match(html, /ds-first-paint-pin--link/);
-  assert.match(html, /ds-first-paint-pin--walk/);
+  // A marker click on the plate opens `hrefByPinId`; every pin has somewhere to go.
   const linkPins = pins.features.filter((feature) => feature.properties.href.length > 0);
-  const anchors = html.match(/<a\b/g) ?? [];
-  assert.equal(anchors.length, linkPins.length);
   assert.equal(linkPins.length, pins.features.length);
-  assert.doesNotMatch(html, /href="\/entity\//);
+  assert.ok(pins.features.every((feature) => !feature.properties.href.startsWith('/entity/')));
+  assert.ok(pins.features.some((feature) => feature.properties.holdingWalk === true));
   assert.equal(
     atlasWalkHref({
       displayName: 'Dillard High School, Old',

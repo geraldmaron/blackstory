@@ -9,26 +9,6 @@ export const FIRST_PAINT_PIN_SIZE_REM = {
     walk: '0.5625rem',
     focus: '0.875rem',
   },
-  doorNational: {
-    record: '0.5rem',
-    walk: '0.75rem',
-  },
-  doorMobileNational: {
-    record: '0.1875rem',
-    link: '0.1875rem',
-    walk: '0.25rem',
-    focus: '0.4375rem',
-  },
-  doorMobileZoomed: {
-    link: '0.3125rem',
-    walk: '0.375rem',
-    focus: '0.5625rem',
-  },
-  zoomed: {
-    link: '0.625rem',
-    walk: '0.75rem',
-    focus: '1.125rem',
-  },
 } as const;
 
 /** MapLibre HTML hit-target — matches largest first-paint walk disc (`0.5625rem` @ 16px). */

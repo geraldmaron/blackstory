@@ -19,7 +19,6 @@ import {
   DOOR_MOBILE_NATIONAL_PIN_CAP,
   firstPaintWalksFirst,
   isFirstPaintWalk,
-  isPinPlateWalk,
   resolveDoorPinTarget,
   resolveDoorFocusPinId,
   thinDoorNationalPins,
@@ -179,17 +178,14 @@ test('Door link pins expose public hrefs and opaque entity redirects', () => {
   });
   const features = [...source.featureCollection.features, entityOnly];
   const pins = toDoorLinkPins(features);
-  const html = renderToStaticMarkup(
-    createElement(FirstPaintPinPlate, { pins, linkRecords: true, focusEntityId: null }),
-  );
-  const walkCount = pins.features.filter((feature) => isPinPlateWalk(feature, true)).length;
+  // The Door hands these to the live plate: a marker click opens the pin's href (repo-18ma2).
+  const walkCount = pins.features.filter(
+    (feature) => feature.properties.holdingWalk === true,
+  ).length;
   const linkCount = pins.features.filter((feature) => feature.properties.href.length > 0).length;
-  const anchors = html.match(/<a\b/g) ?? [];
   assert.ok(linkCount > walkCount);
   assert.ok(walkCount > 0);
-  assert.equal(anchors.length, linkCount);
-  assert.doesNotMatch(html, /href="\/entity\//);
-  assert.match(html, /href="\/door\/pin\/pin-4"/);
+  assert.ok(pins.features.every((feature) => !feature.properties.href.startsWith('/entity/')));
 
   const target = resolveDoorPinTarget('pin-4', features);
   assert.equal(target, '/entity/ent_howard_theatre_001');

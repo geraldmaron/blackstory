@@ -1,16 +1,17 @@
 /**
- * Door Journey layout for `/`. Immersive scroll chapters over a fixed national pin field.
+ * Door Journey layout for `/`. Immersive scroll chapters over the fixed national plate.
  * Flat matte only: no shadow, glow, or glass. Tokens only. No radial scrims (brand forbids
  * decorative gradients); centered chapters use an opaque surface plate instead.
  *
- * Board reuses `public/geo/us-locator.svg` (Albers USA) as a CSS mask under layout zoom
- * (width/height/left/top). The board host is contained to the locator's 960x500 so pin
- * percents land on the states (same law as RecordLocator / Explore). Land colour is
- * `--ds-ink-muted` on `--ds-canvas` — never Page Sand / accent wash. Never transform:scale
- * the plate — that rasterizes and blurs.
+ * The map is the shared MapLibre plate (shell.css `.ds-map-stage`, posture `ambient`) and it is
+ * the only map on this surface (repo-18ma2). `.ds-door__field` is the part of it the reader sees:
+ * full-bleed below the bar on a desktop, a sticky strip above the chapters on a phone. Its
+ * `.ds-door__window` is measured by door-immersive.tsx to frame the camera (door-field-frame.ts);
+ * nothing is drawn in it. Until this mount has framed the plate and the plate has painted, the
+ * field and the page keep the canvas colour over it, then fade to let it through.
  *
  * Scroll model: the document scrolls. The plate is position:fixed full-bleed. Door chrome is
- * pointer-events:none except cards and pin links so the wheel and pin hits work over the map.
+ * pointer-events:none except cards so the wheel and marker hits work over the map.
  * Snap uses proximity; Begin uses scrollIntoView({ behavior: 'smooth' }).
  */
 
@@ -21,11 +22,11 @@
   max-width: 100%;
   min-width: 0;
   background: var(--ds-canvas);
-  /* Empty Door chrome must not eat pin hits or the wheel; cards/pins re-enable. */
+  /* Empty Door chrome must not eat marker hits or the wheel; cards re-enable. */
   pointer-events: none;
 }
 
-/* Full-bleed plate: fixed under chapters; does not scroll. */
+/* Full-bleed field: fixed under chapters; does not scroll. */
 .ds-door__field {
   position: fixed;
   top: var(--ds-island-clearance);
@@ -33,73 +34,20 @@
   bottom: 0;
   left: 0;
   z-index: 0; /* local: fixed pin field under the scroll journey */
+  background: var(--ds-canvas);
+  /* The reveal is a fade, not a cut; reduced motion collapses the duration. */
+  transition: background-color var(--ds-duration-base) var(--ds-easing);
   pointer-events: none;
 }
 
-.ds-door__board-frame {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  box-sizing: border-box;
-  overflow: hidden;
-  background: var(--ds-first-paint-ground);
-  container-type: size;
-  /* Handoff to the live plate is a fade, not a cut; reduced motion collapses the duration. */
-  transition:
-    opacity var(--ds-duration-base) var(--ds-easing),
-    visibility 0s linear var(--ds-duration-base);
-}
-
 /*
- * Pin percents are Albers coordinates on the 960x500 locator. Stretching that board to the
- * viewport made mask-size:contain letterbox the land while pins still used the stretched box,
- * so records sat in the ocean. Same contain rule as RecordLocator / Explore underlay: crop
- * the room, do not restretch the canvas. Zoom % is relative to this host.
+ * The map window. Only measured (door-immersive.tsx reads its rect to frame the plate's camera);
+ * it paints nothing, and it takes no hits so marker clicks reach the plate through it.
  */
-.ds-door__board-host {
-  position: relative;
-  box-sizing: border-box;
-  width: min(100%, calc((100dvh - var(--ds-island-clearance)) * 960 / 500));
-  aspect-ratio: 960 / 500;
-  max-height: 100%;
-}
-
-@supports (width: 1cqh) {
-  .ds-door__board-host {
-    width: min(100cqw, calc(100cqh * 960 / 500));
-  }
-}
-
-.ds-door__board {
-  position: absolute;
-  inset: 0;
-  box-sizing: border-box;
-}
-
-.ds-door__ground {
-  position: absolute;
-  inset: 0;
-  background: var(--ds-first-paint-ground);
-}
-
-/*
- * Locator as a mask, not a tinted multiply plate: SVG alpha (land 0.32, hairlines 1) paints
- * `--ds-ink-muted` so both themes stay quiet and on-brand. Copper stays on pins only.
- */
-.ds-door__ground-map {
+.ds-door__window {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-color: var(--ds-first-paint-ground-ink);
-  -webkit-mask-image: url('/geo/us-locator.svg');
-  mask-image: url('/geo/us-locator.svg');
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
 }
 
 .ds-door__field-chrome {
@@ -697,29 +645,24 @@ html:has(.ds-door) {
 
 /*
  * The live plate. `/` is the `door` surface: the shared MapLibre plate paints full-bleed in its
- * `ambient` posture (shell.css) with the same clustered field Explore draws. The static board
- * above is first paint and the no-WebGL field; once the plate stamps `data-plate-ready` the board
- * steps aside and the canvas behind it is the map.
+ * `ambient` posture (shell.css) with the same clustered field Explore draws. Until it is ready
+ * the field and the page hold the canvas colour over it, so a cold load shows a quiet ground and
+ * then the finished map, never the map assembling in pieces.
  *
- * `data-plate-ready` lives on the persistent plate (MapStage.tsx) and outlives any one page —
- * it is still set from a prior visit to `/explore` the instant this route mounts. Gating on it
- * alone swapped to the live canvas before this page had pointed it at its own camera/data,
- * flashing the previous page's map for a frame. `.ds-door__field[data-page-ready]` is this
- * mount's own signal (door-immersive.tsx) and only appears once THIS page has issued its flyTo.
+ * Two signals, both required. `data-plate-ready` lives on the persistent plate (MapStage.tsx)
+ * and outlives any one page — it is still set from a prior visit to `/explore` the instant this
+ * route mounts, so on its own it would reveal the previous page's camera for a frame.
+ * `.ds-door__field[data-plate='live']` is this mount's own signal (door-immersive.tsx) and only
+ * appears once THIS page has landed its first frame on the plate.
  */
-body:has(.ds-map-stage[data-plate-ready]) .ds-door:has(.ds-door__field[data-page-ready]),
-body:has(.ds-map-stage[data-plate-ready]) .ds-door__field[data-page-ready] {
+body:has(.ds-map-stage[data-plate-ready]) .ds-door:has(.ds-door__field[data-plate='live']),
+body:has(.ds-map-stage[data-plate-ready]) .ds-door__field[data-plate='live'] {
   background: transparent;
 }
 
-body:has(.ds-map-stage[data-plate-ready]) .ds-door__field[data-page-ready] .ds-door__board-frame {
-  opacity: 0;
-  visibility: hidden;
-}
-
-/* Marker and cluster clicks have to reach the plate through the Door's own layers. */
-body:has(.ds-map-stage[data-plate-ready]) .ds-door__field[data-page-ready] {
-  pointer-events: none;
+/* No plate to caption: the pin count and the rotate hint describe a map that is not there. */
+.ds-door__field[data-plate='unavailable'] .ds-door__field-chrome {
+  display: none;
 }
 
 /*
@@ -749,42 +692,14 @@ body:has(.ds-door) .ds-shell-footer {
   display: none;
 }
 
-/* Let map gaps reach pin links; cards/pins re-enable pointer events themselves. */
+/* Let map gaps reach the plate; cards re-enable pointer events themselves. */
 body:has(.ds-door) .ds-shell-page-transition__content {
   pointer-events: none;
 }
 
-body:has(.ds-door) .ds-first-paint-plate {
-  position: absolute;
-  inset: 0;
-  z-index: 2; /* local: pin plate over the ground layer inside the board */
-  /* No land mask here: CSS mask alpha (~0.32 on land) made pin links unhittable. */
-  pointer-events: none;
-  -webkit-mask-image: none;
-  mask-image: none;
-}
-
-/* Pin disc sizes: first-paint-pin-plate.css (--ds-first-paint-pin-* tokens). */
-body:has(.ds-door) .ds-first-paint-pin--walk {
-  z-index: 1; /* local: copper walks above ink dots within the pin plate */
-}
-
-body:has(.ds-door) .ds-door__board .ds-first-paint-pin--link,
-body:has(.ds-door) .ds-door__board .ds-first-paint-pin--walk {
-  pointer-events: auto;
-}
-
-/* Generous hit pad — pins stay small visually (WCAG target size). Sizes live in first-paint-pin-plate.css. */
-body:has(.ds-door) .ds-first-paint-pin--link::after {
-  content: '';
-  position: absolute;
-  inset: -0.7rem;
-  border-radius: 999px;
-}
-
-/* Pin field sits above chapter gaps so links receive clicks; cards stay above via journey z. */
+/* The field sits above chapter gaps; cards stay above via journey z. */
 body:has(.ds-door) .ds-door__field {
-  z-index: 1; /* local: pin field above page content gaps for link hit-testing */
+  z-index: 1; /* local: field above page content gaps */
 }
 
 body:has(.ds-door) .ds-door-journey {
@@ -810,17 +725,16 @@ body:has(.ds-door) .ds-door-journey {
   }
 
   /* With the plate live the sticky field is a window onto the full-bleed map, not a panel. */
-  body:has(.ds-map-stage[data-plate-ready]) .ds-door__field[data-page-ready] {
+  body:has(.ds-map-stage[data-plate-ready]) .ds-door__field[data-plate='live'] {
     border-bottom-color: transparent;
   }
 
-  .ds-door__board-frame {
+  /* The window is the strip's content box: the camera frames the country inside the padding. */
+  .ds-door__window {
     position: relative;
     inset: auto;
     width: 100%;
     height: 100%;
-    border-radius: var(--ds-radius-sm);
-    overflow: hidden;
   }
 
   .ds-door__field-chrome {

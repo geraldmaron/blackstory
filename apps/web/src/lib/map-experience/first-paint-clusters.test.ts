@@ -76,6 +76,6 @@ test('the pin plate groups its board the way the live plate groups the national 
   assert.match(plate, /grouped \? 'ds-first-paint-pin--grouped' : ''/);
   assert.match(plate, /className="ds-first-paint-cluster"/);
   assert.match(plate, /data-tier=\{firstPaintClusterTier\(cluster\.count\)\}/);
-  // Walks and the focus record read as singles on the plate, so they stay singles on the board.
-  assert.match(plate, /if \(isPinPlateWalk\(feature, linkRecords\)\) exclude\.add\(index\)/);
+  // Walks read as singles on the plate, so they stay singles on the board.
+  assert.match(plate, /if \(isFirstPaintWalk\(feature\)\) exclude\.add\(index\)/);
 });

@@ -1636,6 +1636,9 @@ export function MapStageProvider({
     if (!map) return;
     applyGesturesForPosture(map, posture, { pointerFine: prefersFinePointer() });
     syncRotateGestures(map, posture, prefersFinePointer());
+    // The Door's phone strip may have sunk the zoom floor below the Instrument's national floor
+    // (camera.ts, `zoomFloor: 'fit'`); every other posture gets the floor back.
+    if (posture !== 'ambient') map.setMinZoom(MAP_MIN_ZOOM);
   }, [posture, syncRotateGestures]);
 
   /** A live read of the reduced-motion preference for the camera path below. */

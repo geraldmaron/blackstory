@@ -102,18 +102,19 @@ Other facets (Tone, Era, Theme, Status, Confidence, Where) unchanged.
 
 ---
 
-## First-paint pin plate (Door + Explore bootstrap)
+## First-paint pin plate (Explore bootstrap)
 
-Before MapLibre paints, `/` (Door) and `/explore` (Explore) render the same HTML pin plate (`FirstPaintPinPlate`, `first-paint-pin-plate.css`). This is **not** the kind-encoded Explore stack; it is a lightweight national field.
+Before MapLibre paints, `/explore` renders an HTML pin plate (`FirstPaintPinPlate`, `first-paint-pin-plate.css`) over the Albers underlay. This is **not** the kind-encoded Explore stack; it is a lightweight national field, and it is also what a reader without JavaScript or WebGL keeps.
+
+`/` (the Door) does not render it. The Door's only map is the live plate, framed to the Door's own map window (`door-field-frame.ts`); a static Albers board under a Mercator plate read as a second, older map on every load (repo-18ma2).
 
 | Role | Visual | Token |
 |---|---|---|
 | Record disc | Page Sand disc | `--ds-first-paint-pin-ink` (`--ds-accent-muted`) / `--ds-first-paint-pin-size` |
-| Linked record (Door `--records`) | Slightly larger Page Sand disc | `--ds-first-paint-pin-ink-link` / `--ds-first-paint-pin-size-link` |
-| Holding walk / focus | Copper disc | `--ds-accent-graphic`; focus adds `--ds-surface` outline |
-| Layout-zoom (Door chapters) | Step up link/walk/focus sizes | `--ds-first-paint-pin-size-zoomed-*` on `.ds-door__board.is-zoomed` |
+| Holding walk | Copper disc, and the plate's only link | `--ds-accent-graphic` / `--ds-first-paint-pin-size-walk` |
+| Grouped record | Hidden; a copper count disc stands in | `--ds-first-paint-cluster-ink` / `--ds-first-paint-cluster-size` |
 
-Door scopes larger national discs via `body:has(.ds-door)` variable overrides only; `door-home.css` owns hit pads and plate layout, not duplicate size rules. Rem values are exported from `first-paint-pin-tokens.ts` for drift tests.
+Rem values are exported from `first-paint-pin-tokens.ts` for drift tests.
 
 **Related but distinct:**
 

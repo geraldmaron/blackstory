@@ -1,6 +1,6 @@
 /**
- * First-paint pin plate. Door, Explore, and HTML map markers share Page Sand
- * majority discs; copper marks walks, active, and focus.
+ * First-paint pin plate. Explore's server-rendered national field and the live plate's HTML
+ * entity markers share Page Sand majority discs; copper marks walks, active, and focus.
  */
 
 :root {
@@ -10,14 +10,6 @@
   --ds-first-paint-pin-size-link: 0.5rem;
   --ds-first-paint-pin-size-walk: 0.5625rem;
   --ds-first-paint-pin-size-focus: 0.875rem;
-  --ds-first-paint-pin-size-zoomed-link: 0.625rem;
-  --ds-first-paint-pin-size-zoomed-walk: 0.75rem;
-  --ds-first-paint-pin-size-zoomed-focus: 1.125rem;
-}
-
-body:has(.ds-door) {
-  --ds-first-paint-pin-size: 0.5rem;
-  --ds-first-paint-pin-size-walk: 0.75rem;
 }
 
 .ds-first-paint-plate {
@@ -27,7 +19,7 @@ body:has(.ds-door) {
    * Same tier as `.ds-map-stage` (`--ds-z-map-plate`), never above Explore chrome.
    * A literal `z-index: 2` here sat above `.ds-atlas` (`--ds-z-content` = 1), so SSR pins
    * painted over Lens, Record sheet, Records rail, Timeline, and Camera — including after
-   * instruments hydrated. Door re-tiers the plate locally inside `.ds-door__board`.
+   * instruments hydrated.
    */
   z-index: var(--ds-z-map-plate);
   pointer-events: none;
@@ -58,24 +50,9 @@ body:has(.ds-door) {
   --ds-map-entity-shade: var(--ds-accent-graphic);
 }
 
-.ds-first-paint-plate--records .ds-first-paint-pin--link:not(.ds-first-paint-pin--walk) {
-  width: var(--ds-first-paint-pin-size-link);
-  height: var(--ds-first-paint-pin-size-link);
-  background: var(--ds-first-paint-pin-ink-link);
-}
-
-.ds-first-paint-plate .ds-first-paint-pin--focus {
-  width: var(--ds-first-paint-pin-size-focus);
-  height: var(--ds-first-paint-pin-size-focus);
-  background: var(--ds-accent-graphic);
-  outline: 2px solid var(--ds-accent);
-  outline-offset: 3px;
-  z-index: 3; /* local: focus pin above other discs within the plate */
-}
-
 /*
  * A pin the board has folded into a cluster (first-paint-clusters.ts). It stays in the DOM in
- * index order for the pin-id and photo-index contracts, but neither paints nor takes focus.
+ * index order for the pin-id contract, but neither paints nor takes focus.
  */
 .ds-first-paint-plate .ds-first-paint-pin--grouped {
   visibility: hidden;
@@ -123,37 +100,10 @@ body:has(.ds-door) {
 
 /*
  * Instrument `/explore`: keep the SSR pin plate under chrome. Geography lives on
- * `.ds-explore-underlay`. Door keeps its own absolute plate inside the board (door-home.css).
+ * `.ds-explore-underlay`.
  */
-body:has([data-surface='instrument']):not(:has(.ds-door)) .ds-first-paint-plate {
+body:has([data-surface='instrument']) .ds-first-paint-plate {
   z-index: var(--ds-z-map-plate);
-}
-
-@media (max-width: 899px) {
-  body:has(.ds-door) {
-    --ds-first-paint-pin-size: 0.1875rem;
-    --ds-first-paint-pin-size-link: 0.1875rem;
-    --ds-first-paint-pin-size-walk: 0.25rem;
-    --ds-first-paint-pin-size-focus: 0.4375rem;
-    --ds-first-paint-pin-size-zoomed-link: 0.3125rem;
-    --ds-first-paint-pin-size-zoomed-walk: 0.375rem;
-    --ds-first-paint-pin-size-zoomed-focus: 0.5625rem;
-  }
-}
-
-.ds-door__board.is-zoomed .ds-first-paint-pin--link:not(.ds-first-paint-pin--focus) {
-  width: var(--ds-first-paint-pin-size-zoomed-link);
-  height: var(--ds-first-paint-pin-size-zoomed-link);
-}
-
-.ds-door__board.is-zoomed .ds-first-paint-pin--walk:not(.ds-first-paint-pin--focus) {
-  width: var(--ds-first-paint-pin-size-zoomed-walk);
-  height: var(--ds-first-paint-pin-size-zoomed-walk);
-}
-
-.ds-door__board.is-zoomed .ds-first-paint-pin--focus {
-  width: var(--ds-first-paint-pin-size-zoomed-focus);
-  height: var(--ds-first-paint-pin-size-zoomed-focus);
 }
 
 /* Explore live map HTML markers — same discs as the plate (MapStage entity-marker-sync.ts). */

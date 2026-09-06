@@ -281,17 +281,6 @@ export function isFirstPaintWalk(feature: ExploreMapFeature): boolean {
   return isHoldingPlaceHref(feature.properties.href);
 }
 
-/**
- * Pin-plate walk styling. Explore first paint: any holding `/place/` href. Door link plate:
- * only allowlisted Explore walks (`holdingWalk`), not every linkable `/place/` record.
- */
-export function isPinPlateWalk(feature: ExploreMapFeature, linkRecords: boolean): boolean {
-  if (linkRecords) {
-    return feature.properties.holdingWalk === true;
-  }
-  return isFirstPaintWalk(feature);
-}
-
 /** Resolve a release entity id to the opaque first-paint pin id (`pin-N`). */
 export function resolveDoorFocusPinId(
   catalogEntityId: string | null,
