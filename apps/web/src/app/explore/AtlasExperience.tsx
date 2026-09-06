@@ -718,9 +718,16 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           // The palette searches the whole index, but only records with a map feature in the
           // current projection can be selected on the map. Without this the click was
           // swallowed: the palette closed and nothing opened, which reads as a broken search.
-          // Every record has a page even when it has no pin, so fall through to it.
+          // Every record has a page even when it has no pin, so fall through to it. `kind`
+          // matters here (repo-jnmwu): the palette's corpus now includes entities that were
+          // never mappable at all — mostly laws, cases, and national organizations — and
+          // without it every one of them fell into the place-page guess below and 404'd.
           setPaletteOpen(false);
-          const walk = atlasWalkHref({ displayName: record.name, entityId: record.id });
+          const walk = atlasWalkHref({
+            displayName: record.name,
+            entityId: record.id,
+            ...(record.kind !== undefined ? { kind: record.kind } : {}),
+          });
           if (walk) window.location.assign(walk);
         }}
         onJumpToState={(paletteState) => {

@@ -35,7 +35,9 @@ import {
   type ExploreMapFeature,
   type ExploreMapSource,
 } from '../../lib/map-experience/build-explore-map-source';
+import { buildUnmappedPaletteRecords } from '../../lib/map-experience/build-palette-records';
 import type { PublicReadSource } from '../../lib/public-data/source';
+import type { PaletteRecord } from '../../components/patterns/command-palette/CommandPalette';
 import type { CitesEdgeIndex } from '../../lib/release/build-cites-edge';
 import {
   pickExploreEdgeSlice,
@@ -72,6 +74,14 @@ export type ExploreViewModel = {
    * instead of holding a spinner over an answer that is usually empty.
    */
   readonly citesEdge: CitesEdgeIndex;
+  /**
+   * Palette records for entities `exploreMapSourceFor` had no map feature for — mostly laws,
+   * cases, and national organizations with no resolvable `geoAnchor` (repo-jnmwu). Release-wide
+   * and reader-independent, so it rides the catalog half of the wire split like `citesEdge`
+   * rather than the per-request shell. See `build-palette-records.ts`'s
+   * `buildUnmappedPaletteRecords`.
+   */
+  readonly unmappedPaletteRecords: readonly PaletteRecord[];
 };
 
 /** Prefer each entity's published geoAnchor (national catalog). Seed-table fallback
@@ -163,6 +173,7 @@ export function buildExploreViewModel(
   const selectedEdge = viewState.edge
     ? active.edges.find((edge) => edge.edgeId === viewState.edge)
     : undefined;
+  const mappedEntityIds = new Set(allFeatures.map((feature) => feature.properties.entityId));
 
   return {
     viewState,
@@ -179,6 +190,7 @@ export function buildExploreViewModel(
     historyEdges: active.edges,
     edgeLineCollection: active.lineCollection,
     citesEdge,
+    unmappedPaletteRecords: buildUnmappedPaletteRecords(entities, mappedEntityIds),
     ...(selectedEdge ? { selectedEdge } : {}),
   };
 }

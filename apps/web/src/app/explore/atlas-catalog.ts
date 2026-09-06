@@ -20,6 +20,7 @@ import { resolveCitesEdgeIndex } from '../../lib/articles/source';
 import type { PublicReadSource } from '../../lib/public-data/source';
 import type { CitesEdgeIndex } from '../../lib/release/build-cites-edge';
 import { exploreMapSourceFor } from '../../lib/map-experience/build-explore-map-source';
+import { buildUnmappedPaletteRecords } from '../../lib/map-experience/build-palette-records';
 import { buildEdgeLineCatalog } from './explore-view-model';
 import type { AtlasCatalogPayload } from './explore-view-model-wire';
 
@@ -43,6 +44,9 @@ export function buildAtlasCatalogPayload(
 ): AtlasCatalogPayload {
   const source = exploreMapSourceFor(entities);
   const { edgeLineCatalog, availableDecades } = buildEdgeLineCatalog(artifact, entities);
+  const mappedEntityIds = new Set(
+    source.featureCollection.features.map((feature) => feature.properties.entityId),
+  );
   return {
     schemaVersion: 1,
     releaseId: source.releaseId,
@@ -52,6 +56,7 @@ export function buildAtlasCatalogPayload(
     edgeLineCatalog,
     availableDecades,
     citesEdge,
+    unmappedPaletteRecords: buildUnmappedPaletteRecords(entities, mappedEntityIds),
   };
 }
 

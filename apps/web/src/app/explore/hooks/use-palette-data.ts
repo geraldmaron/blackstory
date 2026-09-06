@@ -18,10 +18,18 @@ export function usePaletteData(
    * build moved to `build-palette-records.ts` so what the index carries has a test over real
    * release features — a subject missing from the index is a subject the palette cannot find,
    * and that is not a fact a component test can establish.
+   *
+   * `view.unmappedPaletteRecords` is the other half of that same corpus (repo-jnmwu): entities
+   * `exploreMapSourceFor` never turned into a map feature at all — mostly laws, cases, and
+   * national organizations with no resolvable `geoAnchor` — precomputed server-side by
+   * `buildUnmappedPaletteRecords` because it needs the full, unfiltered entity list this hook
+   * never holds a client copy of. Without it, the palette answered a query differently than
+   * `/search/api` did everywhere else on the site, for no reason a reader could see: the record
+   * was real, indexed, and simply missing from this one search box.
    */
   const paletteRecords = useMemo<readonly PaletteRecord[]>(
-    () => buildPaletteRecords(view.allFeatures),
-    [view.allFeatures],
+    () => [...buildPaletteRecords(view.allFeatures), ...view.unmappedPaletteRecords],
+    [view.allFeatures, view.unmappedPaletteRecords],
   );
 
   /**

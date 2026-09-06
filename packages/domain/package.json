@@ -59,6 +59,11 @@
       "types": "./dist/taxonomy/topics.d.ts",
       "import": "./dist/taxonomy/topics.js"
     },
+    "./relevance/notability-gate": {
+      "development": "./src/relevance/notability-gate.ts",
+      "types": "./dist/relevance/notability-gate.d.ts",
+      "import": "./dist/relevance/notability-gate.js"
+    },
     "./trust": {
       "development": "./src/trust/index.ts",
       "types": "./dist/trust/index.d.ts",
