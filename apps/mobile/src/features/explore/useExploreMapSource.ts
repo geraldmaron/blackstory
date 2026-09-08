@@ -97,7 +97,12 @@ export function useExploreMapSource(
   const runtime = useAppRuntimeOptional();
   const refreshBootstrapSync = useRefreshBootstrapSync();
   const refreshBootstrapSyncRef = useRef(refreshBootstrapSync);
-  refreshBootstrapSyncRef.current = refreshBootstrapSync;
+  // Kept current in an effect rather than during render. It is only read from the
+  // fetch effect below, which is declared after this one and so always sees the
+  // value from the same commit.
+  useEffect(() => {
+    refreshBootstrapSyncRef.current = refreshBootstrapSync;
+  }, [refreshBootstrapSync]);
   const forceDemo = options.forceDemo === true;
   const [tick, setTick] = useState(0);
 

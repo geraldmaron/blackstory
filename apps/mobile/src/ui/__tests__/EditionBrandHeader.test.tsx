@@ -14,6 +14,7 @@ jest.mock('../tokens', () => {
 });
 
 jest.mock('expo-image', () => {
+  /* eslint-disable @typescript-eslint/no-require-imports */
   const React = require('react');
   const { View } = require('react-native');
   return {

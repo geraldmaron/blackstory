@@ -223,16 +223,21 @@ export function resolveMapTone(source: MapToneSource): MapSemanticTone | undefin
   return undefined;
 }
 
-export const KIND_ENCODING_ENTRIES: ReadonlyArray<
-  readonly [kind: MapKind, entry: KindEncodingEntry]
-> = KNOWN_KINDS.map((kind) => [kind, MAP_KIND_ENCODING[kind]] as const);
+export const KIND_ENCODING_ENTRIES: readonly (readonly [
+  kind: MapKind,
+  entry: KindEncodingEntry,
+])[] = KNOWN_KINDS.map((kind) => [kind, MAP_KIND_ENCODING[kind]] as const);
 
-export const KIND_FAMILY_ENTRIES: ReadonlyArray<
-  readonly [family: MapKindFamily, entry: KindFamilyEncodingEntry]
-> = KNOWN_KIND_FAMILIES.map((family) => [family, MAP_KIND_FAMILY_ENCODING[family]] as const);
+export const KIND_FAMILY_ENTRIES: readonly (readonly [
+  family: MapKindFamily,
+  entry: KindFamilyEncodingEntry,
+])[] = KNOWN_KIND_FAMILIES.map(
+  (family) => [family, MAP_KIND_FAMILY_ENCODING[family]] as const,
+);
 
-export const SEMANTIC_TONE_ENTRIES: ReadonlyArray<
-  readonly [tone: MapSemanticTone, entry: SemanticToneEncodingEntry]
-> = (Object.keys(MAP_SEMANTIC_TONE_ENCODING) as MapSemanticTone[]).map(
+export const SEMANTIC_TONE_ENTRIES: readonly (readonly [
+  tone: MapSemanticTone,
+  entry: SemanticToneEncodingEntry,
+])[] = (Object.keys(MAP_SEMANTIC_TONE_ENCODING) as MapSemanticTone[]).map(
   (tone) => [tone, MAP_SEMANTIC_TONE_ENCODING[tone]] as const,
 );

@@ -5,7 +5,7 @@
  */
 import { brandCore } from '@/ui';
 
-export const CLUSTER_RADIUS_BY_COUNT: ReadonlyArray<readonly [minCount: number, radius: number]> = [
+export const CLUSTER_RADIUS_BY_COUNT: readonly (readonly [minCount: number, radius: number])[] = [
   [0, 10],
   [10, 14],
   [50, 18],

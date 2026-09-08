@@ -6,8 +6,7 @@
  * Theme resolution follows the web bootstrap: explicit OS light/dark when
  * available; Archive Paper (light) when the scheme is null or unspecified.
  */
-import { useColorScheme, type ColorSchemeName } from 'react-native';
-import type { ViewStyle } from 'react-native';
+import { useColorScheme, type ColorSchemeName, type ViewStyle } from 'react-native';
 import {
   brandCore,
   confidenceColors,

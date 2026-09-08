@@ -51,6 +51,10 @@ cp -rf source dest          # NOT: cp -r source dest
 
 **Path B (hot reload only):** `pnpm dev:mobile` / `pnpm dev:mobile:verify` when actively editing JS. Never claim mobile healthy from `127.0.0.1:8081` `/status` alone while the iOS dev client may still target another LAN port (`:8082`, `:8083`). Path B verify must pass LAN bundle smoke + simulator packager alignment.
 
+Static gates run from `apps/mobile` on its own npm graph, not through root `pnpm lint` (which
+excludes `apps/mobile/**`): `npm run lint` (ESLint, warnings fail), `npm run typecheck`, `npm test`.
+CI runs all three in the Mobile Lint / Mobile Typecheck / Mobile Unit Tests jobs.
+
 See `apps/mobile/README.md` for setup (`API_BASE_URL=http://127.0.0.1:8080` in `apps/mobile/.env.local`).
 
 ## BlackStory research lanes

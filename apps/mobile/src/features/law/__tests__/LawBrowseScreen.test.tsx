@@ -3,6 +3,8 @@
  */
 import { fireEvent, render } from '@testing-library/react-native';
 
+import { LawBrowseScreen } from '../LawBrowseScreen';
+
 const mockPush = jest.fn();
 
 jest.mock('expo-router', () => ({
@@ -11,8 +13,6 @@ jest.mock('expo-router', () => ({
     replace: jest.fn(),
   },
 }));
-
-import { LawBrowseScreen } from '../LawBrowseScreen';
 
 describe('LawBrowseScreen', () => {
   beforeEach(() => {

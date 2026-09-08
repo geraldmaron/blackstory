@@ -1,6 +1,13 @@
 /**
  * Unit tests for the Explore map source hook — live fetch, __DEV__ demo fallback, retry.
  */
+import { act, renderHook, waitFor } from '@testing-library/react-native';
+import { resolveApiBaseUrl } from '@/security';
+import type { MapSourceV1 } from '@repo/public-contracts/v1/map';
+import { DEMO_MAP_SOURCE } from '@/features/map/demoMapSource';
+import { useExploreMapSource } from '../useExploreMapSource';
+import type { MapSourceDeps } from '../map-source-client';
+
 jest.mock('@/runtime', () => {
   const refreshBootstrapSync = jest.fn();
   return {
@@ -13,13 +20,6 @@ jest.mock('@/security', () => ({
   DEFAULT_API_BASE_URL: 'https://api.example.com',
   resolveApiBaseUrl: jest.fn(() => 'https://api.example.com'),
 }));
-
-import { act, renderHook, waitFor } from '@testing-library/react-native';
-import { resolveApiBaseUrl } from '@/security';
-import type { MapSourceV1 } from '@repo/public-contracts/v1/map';
-import { DEMO_MAP_SOURCE } from '@/features/map/demoMapSource';
-import { useExploreMapSource } from '../useExploreMapSource';
-import type { MapSourceDeps } from '../map-source-client';
 
 const livePayload: MapSourceV1 = {
   releaseId: 'rel_hook',

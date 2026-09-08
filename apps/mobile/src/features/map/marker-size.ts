@@ -24,7 +24,7 @@ export const CONFIDENCE_SIZE_MODIFIER: Readonly<
  * Zoom-keyed scale — shrinks at national frame, presence at state/locality.
  * National floor stays above dust-speck (~0.55) so CONUS still reads as a plate of pins.
  */
-export const MARKER_ZOOM_SCALE_STOPS: ReadonlyArray<readonly [zoom: number, scale: number]> = [
+export const MARKER_ZOOM_SCALE_STOPS: readonly (readonly [zoom: number, scale: number])[] = [
   [3, 0.55],
   [5.5, 0.9],
   [9, 1.15],
@@ -97,9 +97,10 @@ export function markerStrokeWidthAtZoom(baseWidth: number, zoom: number): number
   return baseWidth * markerZoomScale(zoom);
 }
 
-export const MARKER_RADIUS_EVIDENCE_STOPS: ReadonlyArray<
-  readonly [evidenceCount: number, radius: number]
-> = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256].map(
+export const MARKER_RADIUS_EVIDENCE_STOPS: readonly (readonly [
+  evidenceCount: number,
+  radius: number,
+])[] = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256].map(
   (count) => [count, evidenceBaseRadius(count)] as const,
 );
 

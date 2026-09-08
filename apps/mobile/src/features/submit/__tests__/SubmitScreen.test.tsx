@@ -4,6 +4,8 @@
 import { Linking } from 'react-native';
 import { fireEvent, render } from '@testing-library/react-native';
 
+import { SubmitScreen } from '../SubmitScreen';
+
 const mockPush = jest.fn();
 
 jest.mock('expo-router', () => ({
@@ -12,8 +14,6 @@ jest.mock('expo-router', () => ({
     replace: jest.fn(),
   },
 }));
-
-import { SubmitScreen } from '../SubmitScreen';
 
 describe('SubmitScreen', () => {
   beforeEach(() => {

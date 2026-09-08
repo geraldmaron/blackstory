@@ -3,10 +3,9 @@
  */
 import { useLocalSearchParams } from 'expo-router';
 import { ThemesDetailScreen, parseThemeId } from '@/features/themes';
-import { EmptyState, ScreenCanvas } from '@/ui';
+import { EmptyState, ScreenCanvas, screenScrollInsets, space } from '@/ui';
 import { useEditionStackBack } from '@/shell/use-edition-stack-back';
 import { ScrollView, StyleSheet } from 'react-native';
-import { screenScrollInsets, space } from '@/ui';
 
 export default function ThemesDetailRoute() {
   const params = useLocalSearchParams<{ themeId?: string | string[] }>();

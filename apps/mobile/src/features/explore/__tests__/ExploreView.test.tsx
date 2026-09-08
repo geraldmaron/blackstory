@@ -165,7 +165,6 @@ jest.mock('@gorhom/bottom-sheet', () => {
 
 jest.mock('react-native-reanimated', () => {
   /* eslint-disable @typescript-eslint/no-require-imports */
-  const React = require('react');
   const { View } = require('react-native');
   const fadeBuilder: Record<string, (...args: unknown[]) => unknown> = {};
   fadeBuilder.duration = () => fadeBuilder;

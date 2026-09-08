@@ -11,6 +11,22 @@
 import { act, fireEvent, render } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 
+ 
+import { MapScreen } from '../MapScreen';
+import { DEFAULT_MAP_GLYPHS_URL, MAP_LABEL_TEXT_FONT } from '../mapConfig';
+import { CLUSTER_CAMERA_ZOOM_STEP } from '../clusterCamera';
+import {
+  EXPLORE_MAP_VIEW_PADDING,
+  MAP_MAX_ZOOM,
+  MAP_MIN_ZOOM,
+  PRESET_ZOOM,
+  US_CAMERA_MAX_BOUNDS,
+} from '../mapCamera';
+import { ENTITY_CLUSTER_RADIUS_EXPR } from '../mapStyle';
+import { ENTITY_SELECTED_PULSE_STATIC_OPACITY } from '../entity-paint';
+import { DIGNITY_PALETTE } from '../dignity-palette';
+import { MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM } from '../MapAttribution';
+
 const mockFlyTo = jest.fn();
 const mockEaseTo = jest.fn();
 const mockFitBounds = jest.fn();
@@ -99,22 +115,6 @@ jest.mock('@maplibre/maplibre-react-native', () => {
       React.createElement(View, { testID: 'maplibre-layer', accessibilityLabel: JSON.stringify(style) }),
   };
 });
-
-// eslint-disable-next-line import/first
-import { MapScreen } from '../MapScreen';
-import { DEFAULT_MAP_GLYPHS_URL, MAP_LABEL_TEXT_FONT } from '../mapConfig';
-import { CLUSTER_CAMERA_ZOOM_STEP } from '../clusterCamera';
-import {
-  EXPLORE_MAP_VIEW_PADDING,
-  MAP_MAX_ZOOM,
-  MAP_MIN_ZOOM,
-  PRESET_ZOOM,
-  US_CAMERA_MAX_BOUNDS,
-} from '../mapCamera';
-import { ENTITY_CLUSTER_RADIUS_EXPR } from '../mapStyle';
-import { ENTITY_SELECTED_PULSE_STATIC_OPACITY } from '../entity-paint';
-import { DIGNITY_PALETTE } from '../dignity-palette';
-import { MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM } from '../MapAttribution';
 
 beforeEach(() => {
   mockFlyTo.mockClear();

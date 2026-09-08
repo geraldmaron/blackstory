@@ -3,6 +3,8 @@
  */
 import { render } from '@testing-library/react-native';
 
+import { ThemesDetailScreen } from '../ThemesDetailScreen';
+
 jest.mock('expo-router', () => ({
   router: {
     push: jest.fn(),
@@ -11,14 +13,13 @@ jest.mock('expo-router', () => ({
 }));
 
 jest.mock('expo-image', () => {
+  /* eslint-disable @typescript-eslint/no-require-imports */
   const React = require('react');
   const { View } = require('react-native');
   return {
     Image: () => React.createElement(View, { testID: 'expo-image' }),
   };
 });
-
-import { ThemesDetailScreen } from '../ThemesDetailScreen';
 
 describe('ThemesDetailScreen', () => {
   it('renders redlining packets with method stance', async () => {

@@ -92,10 +92,11 @@ export function EntityPreviewSheet({
 }: EntityPreviewSheetProps) {
   const theme = useThemeColors();
   const { ref: sheetRef, focus } = useAccessibilityFocus();
+  const featureId = feature?.entityId;
 
   useEffect(() => {
-    if (feature) focus();
-  }, [feature?.entityId, focus]);
+    if (featureId) focus();
+  }, [featureId, focus]);
 
   if (!feature) return null;
 

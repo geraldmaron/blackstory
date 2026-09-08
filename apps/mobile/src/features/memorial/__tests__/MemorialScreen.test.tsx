@@ -3,6 +3,9 @@
  */
 import { fireEvent, render } from '@testing-library/react-native';
 
+import { MemorialScreen } from '../MemorialScreen';
+import { openExternalMaps } from '@/features/entity/maps-handoff';
+
 const mockPush = jest.fn();
 
 jest.mock('expo-router', () => ({
@@ -15,9 +18,6 @@ jest.mock('expo-router', () => ({
 jest.mock('@/features/entity/maps-handoff', () => ({
   openExternalMaps: jest.fn(async () => 'opened'),
 }));
-
-import { MemorialScreen } from '../MemorialScreen';
-import { openExternalMaps } from '@/features/entity/maps-handoff';
 
 describe('MemorialScreen', () => {
   beforeEach(() => {
