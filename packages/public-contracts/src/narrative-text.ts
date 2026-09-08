@@ -36,7 +36,7 @@ export function containsInternalId(value: string | undefined): boolean {
  */
 export function stripInternalIds(body: string): string {
   const stripped = body
-    .replace(/\s*Basis:[^.]*\.?/gi, '')
+    .replace(/Basis:[^.]*\.?/gi, '')
     .replace(/\s*,?\s*ongoing as of this release\.?/gi, '')
     .replace(INTERNAL_ID, '')
     .replace(/\s+([.,;])/g, '$1')
