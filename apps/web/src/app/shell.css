@@ -1739,14 +1739,18 @@ html:has([data-surface='instrument']) {
 }
 
 /* External maps deep links — inherit meta/link styling; underline on hover/focus.
- * When also a `.ds-cta`, leave color to the CTA recipe (copper/ink). */
-.ds-maps-external-link:not(.ds-cta) {
+ * When also a `.ds-cta`, leave color to the CTA recipe (copper/ink). When also a
+ * `.ds-record-visit__link`, leave color and underline to that recipe (record-visit.css) instead:
+ * the visit block's maps row is styled as quiet links from the outset, not on hover, and this
+ * reset was winning on specificity and silently stripping that styling down to plain inherited
+ * text for four of its five links. */
+.ds-maps-external-link:not(.ds-cta):not(.ds-record-visit__link) {
   color: inherit;
   text-decoration: none;
 }
 
-.ds-maps-external-link:not(.ds-cta):hover,
-.ds-maps-external-link:not(.ds-cta):focus-visible {
+.ds-maps-external-link:not(.ds-cta):not(.ds-record-visit__link):hover,
+.ds-maps-external-link:not(.ds-cta):not(.ds-record-visit__link):focus-visible {
   color: var(--ds-accent);
   text-decoration: underline;
   text-decoration-thickness: 1px;
