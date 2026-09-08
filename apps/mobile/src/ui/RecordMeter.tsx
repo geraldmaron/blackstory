@@ -18,6 +18,7 @@ import {
   evidenceMeterLabel,
   gradeForConfidence,
   gradeLabel,
+  meterLevelForCoverage,
   meterLevelForTier,
   type ConfidenceTier,
 } from '@repo/public-contracts/evidence';
@@ -25,11 +26,24 @@ import {
 import { Text } from './Text';
 import { space, useConfidenceColors, useThemeColors } from './tokens';
 
-export type RecordMeterProps = {
-  readonly tier: ConfidenceTier | string;
-  /** Source count, when the surface actually knows it. Omitted, the label says nothing about it. */
-  readonly sourceCount?: number;
-  /** Hide the letter only where a titled Evidence field already carries it. */
+export type ResearchCoverageLevel = 'minimal' | 'partial' | 'substantial';
+
+type RecordMeterSubject =
+  | {
+      readonly tier: ConfidenceTier | string;
+      /** Source count, when the surface knows it. Omitted, the label says nothing about it. */
+      readonly sourceCount?: number;
+      readonly coverage?: never;
+    }
+  /*
+   * Research coverage is how much of a record has been worked, not how well its claims are
+   * supported. Same three bars, deliberately not the confidence palette: reading a full coverage
+   * meter as "grade A" would turn "we have looked at all of this" into "all of this is proven".
+   */
+  | { readonly coverage: ResearchCoverageLevel; readonly tier?: never; readonly sourceCount?: never };
+
+export type RecordMeterProps = RecordMeterSubject & {
+  /** Hide the letter only where a titled Evidence field already carries it. Coverage has none. */
   readonly showLetter?: boolean;
   /**
    * True inside a row that already speaks the whole record in one label. Nesting a second
@@ -46,22 +60,27 @@ const FILLED_BORDER_BY_TIER = { high: 'high', medium: 'medium', low: 'low' } as 
 export function RecordMeter({
   tier,
   sourceCount,
+  coverage,
   showLetter = true,
   decorative = false,
   testID,
 }: RecordMeterProps) {
   const theme = useThemeColors();
   const confidence = useConfidenceColors();
-  const level = meterLevelForTier(tier);
-  const grade = gradeForConfidence(tier);
+  const isCoverage = coverage !== undefined;
+  const level = isCoverage ? meterLevelForCoverage(coverage) : meterLevelForTier(tier ?? 'unrated');
+  const grade = isCoverage ? null : gradeForConfidence(tier ?? 'unrated');
   const filledKey = FILLED_BORDER_BY_TIER[tier as keyof typeof FILLED_BORDER_BY_TIER];
-  const filled = filledKey ? confidence[filledKey].border : theme.inkMuted;
+  const filled = isCoverage ? theme.accentGraphic : filledKey ? confidence[filledKey].border : theme.inkMuted;
+  const label = isCoverage
+    ? `Research coverage: ${coverage}`
+    : evidenceMeterLabel(tier ?? 'unrated', sourceCount);
 
   return (
     <View
       accessible={!decorative}
       accessibilityRole={decorative ? undefined : 'image'}
-      accessibilityLabel={decorative ? undefined : evidenceMeterLabel(tier, sourceCount)}
+      accessibilityLabel={decorative ? undefined : label}
       accessibilityElementsHidden={decorative}
       importantForAccessibility={decorative ? 'no-hide-descendants' : undefined}
       style={styles.mark}
@@ -78,7 +97,7 @@ export function RecordMeter({
           />
         ))}
       </View>
-      {showLetter ? (
+      {showLetter && !isCoverage ? (
         <Text variant="code" colorRole="inkMuted" style={styles.letter}>
           {gradeLabel(grade)}
         </Text>

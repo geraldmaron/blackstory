@@ -1,11 +1,27 @@
 /**
- * Beat 09: record maturity and revision provenance.
+ * Provenance: how far this record has been worked, and when it last changed.
+ *
+ * This beat used to be a paragraph — "Maturity: Partial Enrichment. Research coverage: Minimal.
+ * Maturity labels follow the product constitution vocabulary." — which buried two labelled facts
+ * inside a sentence and then explained the vocabulary to a reader who never asked. Both facts are
+ * fields, so they are rows in the same rhythm the anatomy beat uses, and coverage carries the
+ * shared meter. The vocabulary sentence is gone: it addressed the archive, not the reader.
  */
-import { View } from 'react-native';
-import { Text, space } from '@/ui';
+import { StyleSheet, View } from 'react-native';
+
+import { RecordMeter, Text, space } from '@/ui';
 import { EntityEditionPanel } from '../EntityEditionPanel';
+import { RecordBeatRow } from '../RecordBeatRow';
 import { formatIsoDate, humanizeToken } from '../format';
 import type { Entity } from '../types';
+
+const COVERAGE_LEVELS = ['minimal', 'partial', 'substantial'] as const;
+type CoverageLevel = (typeof COVERAGE_LEVELS)[number];
+
+function coverageLevel(value: string | undefined): CoverageLevel | undefined {
+  const normalized = value?.trim().toLowerCase();
+  return COVERAGE_LEVELS.find((level) => level === normalized);
+}
 
 function tracked(value: string): string {
   return value.trim().length > 0 ? formatIsoDate(value) : 'Not yet tracked';
@@ -17,31 +33,80 @@ export type ProvenanceSectionProps = {
 };
 
 export function ProvenanceSection({ entity, index }: ProvenanceSectionProps) {
+  const coverage = coverageLevel(entity.researchCoverage);
+
   return (
     <EntityEditionPanel
       index={index}
       kicker="Provenance"
-      title="Record maturity and revision"
+      title="How complete this record is"
       testID="entity-provenance-section"
     >
-      <Text variant="editorial">
-        {`Maturity: ${humanizeToken(entity.recordMaturity || 'unknown')}. Research coverage: ${humanizeToken(entity.researchCoverage || 'unknown')}. Maturity labels follow the product constitution vocabulary.`}
-      </Text>
+      <View style={styles.rows}>
+        <RecordBeatRow
+          label="Maturity"
+          value={humanizeToken(entity.recordMaturity || 'unknown')}
+          testID="entity-provenance-maturity"
+        />
+        <RecordBeatRow
+          label="Coverage"
+          value={humanizeToken(entity.researchCoverage || 'unknown')}
+          testID="entity-provenance-coverage"
+          {...(coverage
+            ? {
+                trailing: (
+                  <RecordMeter coverage={coverage} decorative testID="entity-provenance-coverage-meter" />
+                ),
+              }
+            : {})}
+        />
+      </View>
 
-      {entity.revision.releaseId ? (
-        <Text variant="code" colorRole="inkMuted">
-          {entity.revision.releaseId}
-        </Text>
-      ) : null}
-
-      <View style={{ gap: space['1'] }}>
-        <Text variant="bodySmall" colorRole="inkMuted">
-          Record last updated: {tracked(entity.revision.recordUpdatedAt)}
-        </Text>
-        <Text variant="bodySmall" colorRole="inkMuted">
-          Release generated: {tracked(entity.revision.generatedAt)}
-        </Text>
+      <View style={styles.rows}>
+        {entity.revision.releaseId ? (
+          <RecordBeatRow
+            label="Release"
+            valueNode={
+              <Text variant="code" colorRole="inkMuted" style={styles.dataValue}>
+                {entity.revision.releaseId}
+              </Text>
+            }
+            testID="entity-provenance-release"
+          />
+        ) : null}
+        <RecordBeatRow
+          label="Updated"
+          valueNode={
+            <Text variant="code" colorRole="inkMuted" style={styles.dataValue}>
+              {tracked(entity.revision.recordUpdatedAt)}
+            </Text>
+          }
+          testID="entity-provenance-updated"
+        />
+        <RecordBeatRow
+          label="Generated"
+          valueNode={
+            <Text variant="code" colorRole="inkMuted" style={styles.dataValue}>
+              {tracked(entity.revision.generatedAt)}
+            </Text>
+          }
+          testID="entity-provenance-generated"
+        />
       </View>
     </EntityEditionPanel>
   );
 }
+
+const styles = StyleSheet.create({
+  rows: {
+    flexDirection: 'column',
+    gap: space['2'],
+    minWidth: 0,
+  },
+  dataValue: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 'auto',
+    minWidth: 0,
+  },
+});

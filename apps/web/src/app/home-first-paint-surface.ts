@@ -12,6 +12,10 @@ import {
   publicPlaceSlug,
 } from '../lib/place/public-place-path';
 import type { StoryCitation } from '../lib/release/build-cites-edge';
+import {
+  containsInternalId as sharedContainsInternalId,
+  stripInternalIds,
+} from '@repo/public-contracts/narrative-text';
 import { isInternalRecordLabel } from './home-first-paint';
 
 const CHURCH_SLUG = 'fifteenth-street-presbyterian-church';
@@ -49,12 +53,18 @@ export const ARCHIVE_DOOR_ROOMS: readonly DoorRoom[] = [
   { id: 'errata', label: 'Errata', href: '/errata' },
 ];
 
+/*
+ * The id vocabulary and the strip both live in `@repo/public-contracts/narrative-text` now: the
+ * record page needs the same hygiene on both platforms, and the Door was the only surface that
+ * had it. `isInternalRecordLabel` stays local — it is this surface's own list of labels that read
+ * as records rather than as places.
+ */
 export function containsInternalId(value: string | undefined): boolean {
   if (value === undefined) return false;
   const trimmed = value.trim();
   if (trimmed.length === 0) return false;
   if (isInternalRecordLabel(trimmed)) return true;
-  return /\b(?:ent|disc|art|pkg|rec|src|claim)_[a-z0-9_]+/i.test(trimmed);
+  return sharedContainsInternalId(trimmed);
 }
 
 export function humanPlaceLine(entity: PublicEntityView): string | undefined {
@@ -126,15 +136,7 @@ export function firstPaintRelation(
 const STATUS_CHROME =
   /^(status:|current status)|in effect from|\bongoing\b|^active$|^historic$|^unknown$/i;
 
-function sanitizeTimelineBody(body: string): string {
-  return body
-    .replace(/\s*Basis:[^.]*\.?/gi, '')
-    .replace(/\s*ongoing as of this release\.?/gi, '')
-    .replace(/\b(?:ent|disc|art|pkg|rec|src|claim)_[a-z0-9_]+/gi, '')
-    .replace(/\s*,\s*$/g, '')
-    .replace(/\s{2,}/g, ' ')
-    .trim();
-}
+const sanitizeTimelineBody = stripInternalIds;
 
 function isStatusChrome(value: string): boolean {
   return STATUS_CHROME.test(value.trim());

@@ -3,6 +3,8 @@
  * AnatomySection and unit tests. Mirrors web `entity-anatomy-facts.ts` without
  * React or `@repo/domain` imports.
  */
+import { evidenceLabel as buildEvidenceLabel } from '@repo/public-contracts/evidence';
+
 import { humanizeToken } from './format';
 import type { Claim, Entity, LocationPrecision } from './types';
 
@@ -23,13 +25,6 @@ export type RecordAnatomyPlace = {
   readonly label: string;
   readonly precision?: LocationPrecision;
   readonly precisionCaption?: string;
-};
-
-const CONFIDENCE_GRADE: Readonly<Record<ConfidenceTierKey, string>> = {
-  high: 'Grade A',
-  medium: 'Grade B',
-  low: 'Grade C',
-  unrated: 'Unrated',
 };
 
 function isDisplayableJurisdictionLabel(label: string): boolean {
@@ -103,9 +98,12 @@ export function buildEntityAnatomyInputs(entity: Entity): EntityAnatomyInputs {
   const era = entityEraFact(entity);
   const evidenceTier = highestConfidence(entity.claims);
   const claimCount = entity.claims.length;
-  const grade = CONFIDENCE_GRADE[evidenceTier];
-  const evidenceLabel =
-    claimCount === 0 ? grade : `${grade} · ${claimCount} source${claimCount === 1 ? '' : 's'}`;
+  // A record with no accepted claims says the grade and stops. "Grade A · 0 sources" would be a
+  // count of something the reader can then go and fail to find.
+  const evidenceLabel = buildEvidenceLabel(
+    evidenceTier,
+    claimCount === 0 ? undefined : claimCount,
+  );
 
   return {
     kind: entity.kind,

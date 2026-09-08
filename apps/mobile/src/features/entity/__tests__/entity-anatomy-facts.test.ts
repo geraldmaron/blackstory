@@ -43,10 +43,13 @@ describe('buildEntityAnatomyInputs', () => {
     expect(buildEntityAnatomyInputs(entity).whereLabel).toBe('Historic Dunbar neighborhood');
   });
 
-  it('shows Grade only when there are zero claims', () => {
+  it('names the grade and no count when there are zero claims', () => {
     const raw = { ...fullEntityFixture('place'), claims: [] };
     const entity = normalizeEntity(raw)!;
-    expect(buildEntityAnatomyInputs(entity).evidenceLabel).toBe('Unrated');
+    // "Not graded", the shared vocabulary's word, replaces this module's own "Unrated" — the
+    // record page and the site now read the same tier the same way. And no "· 0 sources": that
+    // would be a count of something the reader can go and fail to find.
+    expect(buildEntityAnatomyInputs(entity).evidenceLabel).toBe('Not graded');
   });
 });
 

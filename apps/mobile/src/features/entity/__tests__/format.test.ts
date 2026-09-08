@@ -1,4 +1,12 @@
-import { datePrecisionCaption, formatEvidenceScoreLabel, formatFetchedAt, formatIsoDate, humanizeToken } from '../format';
+import {
+  datePrecisionCaption,
+  formatEvidenceScoreLabel,
+  formatEvidenceScoreValue,
+  formatFetchedAt,
+  formatIsoDate,
+  formatSourceName,
+  humanizeToken,
+} from '../format';
 
 describe('formatEvidenceScoreLabel — matches web wording exactly', () => {
   it('reads "Evidence score: <level> (<score> of 1.00)", never a probability', () => {
@@ -57,5 +65,33 @@ describe('formatFetchedAt — deterministic, locale-independent', () => {
 
   it('never throws on a non-finite input', () => {
     expect(formatFetchedAt(Number.NaN)).toBe('an unknown time');
+  });
+});
+
+describe('formatEvidenceScoreValue — the number without the level', () => {
+  it('prints the score alone, so a claim row does not say the level twice', () => {
+    expect(formatEvidenceScoreValue(0.85)).toBe('0.85 of 1.00');
+  });
+
+  it('clamps out-of-range and non-finite scores rather than printing them', () => {
+    expect(formatEvidenceScoreValue(1.4)).toBe('1.00 of 1.00');
+    expect(formatEvidenceScoreValue(-2)).toBe('0.00 of 1.00');
+    expect(formatEvidenceScoreValue(Number.NaN)).toBe('0.00 of 1.00');
+  });
+});
+
+describe('formatSourceName — the source, not the connector that fetched it', () => {
+  it('drops the connector suffix', () => {
+    expect(formatSourceName('wikipedia_api')).toBe('Wikipedia');
+    expect(formatSourceName('loc_web')).toBe('Loc');
+    expect(formatSourceName('nara_v1')).toBe('Nara');
+  });
+
+  it('keeps a multi-word source readable', () => {
+    expect(formatSourceName('national_archives_api')).toBe('National Archives');
+  });
+
+  it('leaves a source that is only a suffix alone rather than blanking it', () => {
+    expect(formatSourceName('_api')).toBe('_api');
   });
 });

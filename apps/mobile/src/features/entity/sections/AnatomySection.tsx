@@ -1,10 +1,14 @@
 /**
- * v6 record anatomy panel (beat 01): place preview, Kind / Where / Era /
- * Evidence facts with EditionFactIcon labels, and maps hand-off CTAs.
+ * Record anatomy (beat 01): place preview, then Kind / Where / Era / Evidence as labelled rows,
+ * and the maps hand-off.
+ *
+ * Evidence carries the shared meter beside its grade, so the record page states its assessment
+ * the way the map sheet, the rail row and the site all state it. The grade word used to come from
+ * a third private copy of the tier vocabulary living in `entity-anatomy-facts.ts`.
  */
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
-import { Button, Notice, Text, space } from '@/ui';
+import { StyleSheet, View } from 'react-native';
+import { Button, Notice, RecordMeter, Text, space } from '@/ui';
 import { EntityEditionPanel } from '../EntityEditionPanel';
 import {
   buildEntityAnatomyInputs,
@@ -14,6 +18,11 @@ import {
 import { openExternalMaps } from '../maps-handoff';
 import type { Entity } from '../types';
 import { EditionFactIcon, type EditionFactIconProps } from '../edition-fact-icon';
+import {
+  RecordBeatRow,
+  recordBeatLabelColumnWidth,
+  recordBeatRowStyle,
+} from '../RecordBeatRow';
 import { RecordPlacePreview } from '../record-place-preview';
 
 export type AnatomySectionProps = {
@@ -61,6 +70,7 @@ function factsFor(entity: Entity): readonly AnatomyFact[] {
 export function AnatomySection({ entity, onBackToMap }: AnatomySectionProps) {
   const [mapsError, setMapsError] = useState<string | undefined>(undefined);
   const place = buildEntityAnatomyPlace(entity);
+  const inputs = buildEntityAnatomyInputs(entity);
   const facts = factsFor(entity);
   const hasPublicAnchor = place !== undefined;
 
@@ -101,46 +111,41 @@ export function AnatomySection({ entity, onBackToMap }: AnatomySectionProps) {
 
       <View style={styles.factsList} accessibilityLabel="Record anatomy">
         {facts.map((fact) => (
-          <View
+          <RecordBeatRow
             key={fact.key}
-            style={styles.factRow}
+            label={fact.label}
+            leading={<EditionFactIcon {...fact.icon} />}
+            value={fact.value}
             testID={`entity-anatomy-fact-${fact.key}`}
-          >
-            <View style={styles.labelCluster} testID={`entity-anatomy-fact-label-${fact.key}`}>
-              <EditionFactIcon {...fact.icon} />
-              <Text variant="caption" colorRole="inkSubtle" style={styles.labelText}>
-                {fact.label}
-              </Text>
-            </View>
-            {fact.key === 'where' && hasPublicAnchor ? (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={`Where: ${fact.value}. Open in Maps at public precision.`}
-                hitSlop={8}
-                onPress={() => {
-                  void handleOpenInMaps();
-                }}
-                style={({ pressed }) => [
-                  styles.factValue,
-                  styles.whereValue,
-                  pressed ? styles.wherePressed : null,
-                ]}
-              >
-                <Text variant="editorial" colorRole="accent">
-                  {fact.value}
-                </Text>
-              </Pressable>
-            ) : (
-              <Text variant="editorial" colorRole="ink" style={styles.factValue}>
-                {fact.value}
-              </Text>
-            )}
-          </View>
+            labelTestID={`entity-anatomy-fact-label-${fact.key}`}
+            {...(fact.key === 'evidence'
+              ? {
+                  trailing: (
+                    <RecordMeter
+                      tier={inputs.evidenceTier}
+                      showLetter={false}
+                      decorative
+                      testID="entity-anatomy-evidence-meter"
+                    />
+                  ),
+                }
+              : {})}
+            {...(fact.key === 'where' && hasPublicAnchor
+              ? {
+                  onPress: () => {
+                    void handleOpenInMaps();
+                  },
+                  accessibilityLabel: `Where: ${fact.value}. Open in Maps at public precision.`,
+                }
+              : {})}
+          />
         ))}
       </View>
 
+      {/* A sentence, so it is set in the body face. Mono is for data and citations; three lines
+          of monospaced prose read as a console log sitting under the record. */}
       {place?.precisionCaption ? (
-        <Text variant="code" colorRole="inkMuted">
+        <Text variant="bodySmall" colorRole="inkMuted">
           {place.precisionCaption}
         </Text>
       ) : null}
@@ -173,52 +178,15 @@ export function AnatomySection({ entity, onBackToMap }: AnatomySectionProps) {
   );
 }
 
-/** Exported for layout contract tests — inline icon + label + value on one row. */
-export const anatomyFactRowStyle = {
-  flexDirection: 'row',
-  flexWrap: 'nowrap',
-  alignItems: 'baseline',
-} as const;
-
-/** Fixed label column so values align vertically (matches web grid max-content column). */
-export const anatomyFactLabelColumnWidth = 92;
+/** The row layout is `RecordBeatRow`'s now; these stay as the anatomy beat's contract names. */
+export const anatomyFactRowStyle = recordBeatRowStyle;
+export const anatomyFactLabelColumnWidth = recordBeatLabelColumnWidth;
 
 const styles = StyleSheet.create({
   factsList: {
     flexDirection: 'column',
     gap: space['2'],
     minWidth: 0,
-  },
-  factRow: {
-    ...anatomyFactRowStyle,
-    gap: space['3'],
-    width: '100%',
-    minWidth: 0,
-  },
-  labelCluster: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexShrink: 0,
-    width: anatomyFactLabelColumnWidth,
-    gap: space['2'],
-  },
-  factValue: {
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 'auto',
-    minWidth: 0,
-  },
-  labelText: {
-    flexShrink: 0,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-  },
-  whereValue: {
-    minHeight: 44,
-    justifyContent: 'center',
-  },
-  wherePressed: {
-    opacity: 0.6,
   },
   actions: {
     flexDirection: 'row',

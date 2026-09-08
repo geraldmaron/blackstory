@@ -41,6 +41,39 @@ export function humanizeToken(value: string): string {
     .join(' ');
 }
 
+/**
+ * The score on its own: `"0.85 of 1.00"`.
+ *
+ * The full sentence from `formatEvidenceScoreLabel` names the level as well, and a claim row that
+ * shows the meter, the grade word AND that sentence says "high" three times. The sentence still
+ * goes to assistive tech, where the bars mean nothing; the visible line takes the number only.
+ */
+export function formatEvidenceScoreValue(score: number): string {
+  const bounded = Number.isFinite(score) ? Math.min(1, Math.max(0, score)) : 0;
+  return `${bounded.toFixed(2)} of 1.00`;
+}
+
+/**
+ * A citation's source, as a reader would name it: `"wikipedia_api"` -> `"Wikipedia"`.
+ *
+ * The wire carries the connector that fetched the source, not the source. Printing the token
+ * under the link showed the reader our plumbing — and "Wikipedia" twice, once as a link and once
+ * as `wikipedia_api`.
+ */
+const CONNECTOR_SUFFIXES = ['_api', '_web', '_feed', '_v1', '_v2', '_client'] as const;
+
+export function formatSourceName(source: string): string {
+  let token = source.trim().toLowerCase();
+  for (const suffix of CONNECTOR_SUFFIXES) {
+    if (token.endsWith(suffix)) {
+      token = token.slice(0, -suffix.length);
+      break;
+    }
+  }
+  if (token.length === 0) return source.trim();
+  return humanizeToken(token);
+}
+
 /** `"2026-06-01T00:00:00.000Z"` -> `"2026-06-01"`. Ported verbatim from
  * `apps/web/src/lib/evidence/format.ts`'s `formatIsoDate`. Falls back to the raw string for any
  * value that is not an ISO-8601 date-time. */

@@ -22,6 +22,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Timeline } from '@repo/ui';
+import { containsInternalId, stripInternalIds } from '@repo/public-contracts/narrative-text';
 import type { PublicEntityView, RelationshipGraph } from '../../../data/public-seed';
 import type { EvidenceClaimInput } from '../../../lib/evidence';
 import {
@@ -279,6 +280,18 @@ function toSuggestedConnections(
   }));
 }
 
+/**
+ * The record page prints the archive's own claim ids in its chronology, because the generator
+ * appends "Basis: <claim ids>" to a dated statement. The Door has stripped that since it shipped;
+ * this beat never did, so the same sentence read clean on the home page and leaked here.
+ */
+function readableTimeline(items: PublicEntityView['timeline']): PublicEntityView['timeline'] {
+  return items.map((item) => {
+    const body = stripInternalIds(item.body);
+    return { ...item, body: containsInternalId(body) ? '' : body };
+  });
+}
+
 export function EntityRoomSections({
   entity,
   evidenceClaims,
@@ -391,7 +404,7 @@ export function EntityRoomSections({
             title="Timeline"
             count={entity.timeline.length}
           />
-          <Timeline labelledBy="timeline-heading" items={entity.timeline} />
+          <Timeline labelledBy="timeline-heading" items={readableTimeline(entity.timeline)} />
         </section>
       ) : null}
 
