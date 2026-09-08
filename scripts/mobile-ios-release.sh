@@ -14,6 +14,13 @@
 #   API_BASE_URL — baked at build time via app.config.ts / .env.local
 set -euo pipefail
 
+# CocoaPods reads paths through Ruby's unicode_normalize, which raises
+# `Encoding::CompatibilityError` outright when the locale is not UTF-8 — and then crashes again
+# inside its own error reporter, so the only visible symptom is a Ruby backtrace with no cause.
+# A login shell usually sets this; an agent or CI shell often does not.
+export LANG="${LANG:-en_US.UTF-8}"
+export LC_ALL="${LC_ALL:-$LANG}"
+
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
