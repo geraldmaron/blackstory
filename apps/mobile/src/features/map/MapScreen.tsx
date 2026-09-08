@@ -173,14 +173,19 @@ export type MapScreenProps = {
   /** Collapse camera animation to an instant jump (OS reduce-motion). */
   readonly reduceMotion?: boolean;
   /**
-   * Cinematic Map Backdrop gesture lock (docs/ui/patterns-cinematic-map.md §2
-   * rule 2, §5b). When false (Rest), the map is inert to touch — pan/zoom/
-   * rotate/pitch are disabled and feature/cluster presses are no-ops — so the
-   * bottom sheet fully owns the gesture surface. When true (Engaged), the map
-   * gets live hands-on gestures. Default true so surfaces that don't adopt the
-   * pattern (or MOB-011 tests) keep the map always interactive.
+   * Pan / zoom / rotate / pitch. Default true, and Explore never turns it off.
+   *
+   * This used to be a posture lock: at Rest the map disabled every gesture, swallowed pin
+   * presses, and hid itself from assistive tech until the reader pressed a dedicated button.
+   * A reader's first deliberate pan got no response at all, which is indistinguishable from a
+   * map that has failed. Chrome posture and gesture availability are two different things, and
+   * only the first belongs to the reader's explicit control (see `ExploreView`).
+   *
+   * The prop stays so a surface that genuinely must present a still plate — a story's map
+   * moment, a printed-frame preview — can say so, rather than inheriting a gesture surface it
+   * has no chrome for.
    */
-  readonly interactive?: boolean;
+  readonly gesturesEnabled?: boolean;
   /**
    * When false, skips the in-map attribution pill so a parent (Explore) can
    * host it as a sibling under the bottom sheet. Default true (MOB-011).
@@ -235,7 +240,7 @@ export function MapScreen({
   selectedEntityId,
   cameraCommand,
   reduceMotion = false,
-  interactive = true,
+  gesturesEnabled = true,
   showAttribution = true,
   onMapEngineFailure,
 }: MapScreenProps) {
@@ -357,9 +362,8 @@ export function MapScreen({
       lngLat?: unknown;
     }>,
   ): void {
-    // Rest is locked (spec §2 rule 2): no selection through the map canvas
-    // until Engaged hands over live gestures.
-    if (!interactive) return;
+    // Selection is always available. A pin is the map's primary affordance: a reader who taps
+    // one and gets nothing has been told the map is broken, whatever posture the chrome is in.
     const feature = event?.nativeEvent?.features?.[0];
     if (!feature) return;
     const props = (feature.properties ?? {}) as Record<string, unknown>;
@@ -402,10 +406,6 @@ export function MapScreen({
     <View
       style={styles.container}
       testID="map-screen"
-      // Locked map is inert to assistive tech until Engaged hands over
-      // gestures (spec §4): screen readers / keyboard focus skip the canvas.
-      accessibilityElementsHidden={!interactive}
-      importantForAccessibility={interactive ? 'auto' : 'no-hide-descendants'}
     >
       <Map
         style={StyleSheet.absoluteFill}
@@ -418,12 +418,12 @@ export function MapScreen({
           setEngineFailed(true);
           onMapEngineFailure?.();
         }}
-        dragPan={interactive}
-        touchZoom={interactive}
-        doubleTapZoom={interactive}
-        doubleTapHoldZoom={interactive}
-        touchRotate={interactive}
-        touchPitch={interactive}
+        dragPan={gesturesEnabled}
+        touchZoom={gesturesEnabled}
+        doubleTapZoom={gesturesEnabled}
+        doubleTapHoldZoom={gesturesEnabled}
+        touchRotate={gesturesEnabled}
+        touchPitch={gesturesEnabled}
         testID="maplibre-map"
       >
         <Camera

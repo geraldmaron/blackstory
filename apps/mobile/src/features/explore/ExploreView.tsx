@@ -114,20 +114,19 @@ export function ExploreView({
 
   const allFeatures = useMemo(() => toExploreFeatures(source), [source]);
   const [state, dispatch] = useReducer(exploreReducer, filters, initialExploreState);
-  // Cinematic Map Backdrop rest|invite|engaged toggle (docs/ui/patterns-cinematic-map.md
-  // §2, §5b; repo-4v3a.8). Reuses the mobile state core from repo-4v3a.7 for the
-  // lock/engage transitions only — camera + single-feature selection already flow
-  // through `exploreReducer` above (its `presetRequested`/`entitySelected` actions
-  // already produce one-shot tokened `cameraCommand`s via `mapCamera.ts`), so this
-  // reducer is not asked to duplicate that; it only tracks Rest vs Engaged so the
-  // map's gesture lock (`MapScreen`'s `interactive` prop) and the Explore/Close
-  // chrome know which state they're in. Invite is unused here per the bead (ship
-  // Rest -> Engaged first).
+  // Chrome posture, and nothing else. `engaged` means the reader asked for more map: the
+  // floating chrome and instruments recede and a collapse control appears. It does NOT mean the
+  // map became touchable — the map is touchable in every posture, because a map that ignores a
+  // deliberate pan has told the reader it is broken.
+  //
+  // Camera and single-feature selection flow through `exploreReducer` above, whose
+  // `presetRequested` / `entitySelected` actions already produce one-shot tokened
+  // `cameraCommand`s via `mapCamera.ts`. This reducer is not asked to duplicate that.
   const [cinematic, cinematicDispatch] = useReducer(
     cinematicMapReducer,
     CINEMATIC_MAP_INITIAL_STATE,
   );
-  const mapEngaged = cinematic.state === 'engaged';
+  const mapImmersive = cinematic.state === 'engaged';
   const [instrumentsOpen, setInstrumentsOpen] = useState(false);
   // Single controlled source of truth for the sheet snap (the gesture is
   // authoritative — see `onSnapIndexChange`). A separate `recordsExpanded`
@@ -306,26 +305,23 @@ export function ExploreView({
     dispatch({ type: 'entitySelected', entityId: next.entityId, point: next.coordinates });
   }, [listFeatures, selectedIndex]);
 
-  // Rest -> Engaged (spec §2 rule 3): "Explore the map" lives in the sheet
-  // (ExploreRecordsRail header). Collapse the sheet toward peek so the map
-  // takes the majority of the surface once it goes live.
-  const handleMapEngage = useCallback(() => {
+  // Browse -> Immersive. The control lives in the sheet header (`ExploreRecordsRail`); the
+  // sheet drops to peek and the instruments close so the map takes the majority of the surface.
+  const handleEnterImmersiveMap = useCallback(() => {
     cinematicDispatch({ type: 'engage' });
     setInstrumentsOpen(false);
     setSnapIndex(EXPLORE_SHEET_PEEK);
   }, []);
 
-  // Any state -> Rest (spec §2 rule 4): relock, deselect, and restore the
-  // surface's home camera preset. Reuses exploreReducer's own preset action
-  // (and therefore mapCamera.ts's cameraForPreset) rather than inventing a
-  // second camera-command source.
-  const handleMapClose = useCallback(() => {
+  // Immersive -> Browse. Restores the chrome and nothing else.
+  //
+  // This used to also deselect the record and fly the camera back to the national preset. That
+  // made the exit destructive: a reader who expanded the map, panned to a county and selected a
+  // school lost both the school and the county for pressing the one control that looked like
+  // "give me the chrome back". Immersive is a posture, so leaving it returns a posture.
+  const handleExitImmersiveMap = useCallback(() => {
     cinematicDispatch({ type: 'close' });
-    if (state.selectedId) {
-      dispatch({ type: 'entityDeselected' });
-    }
-    dispatch({ type: 'presetRequested', preset: 'national' });
-    setSnapIndex(EXPLORE_SHEET_PEEK);
+    setSnapIndex(state.selectedId ? EXPLORE_SHEET_HALF : EXPLORE_SHEET_PEEK);
   }, [state.selectedId]);
 
   return (
@@ -346,7 +342,7 @@ export function ExploreView({
           selectedEntityId={state.selectedId}
           cameraCommand={cameraCommand}
           showAttribution={false}
-          interactive={mapEngaged}
+          gesturesEnabled
           onViewportChange={(bbox) => dispatch({ type: 'viewportChanged', bbox })}
           onFeaturePress={(entityId) => {
             const feature = catalogFeatures.find((f) => f.entityId === entityId);
@@ -357,13 +353,13 @@ export function ExploreView({
           }}
         />
 
-        {mapLive && mapEngaged ? (
+        {mapLive && mapImmersive ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Close map"
-            accessibilityHint="Relocks the map and returns to the records sheet"
-            testID="explore-map-close"
-            onPress={handleMapClose}
+            accessibilityLabel="Show the records list"
+            accessibilityHint="Brings back the filters and the records sheet. Your selection and the map view are kept."
+            testID="explore-map-collapse"
+            onPress={handleExitImmersiveMap}
             style={({ pressed }) => [
               styles.closeControl,
               {
@@ -384,7 +380,7 @@ export function ExploreView({
           compact
         />
 
-        {mapLive && !mapEngaged ? (
+        {mapLive && !mapImmersive ? (
           <ExploreFloatingChrome
             inViewCount={listFeatures.length}
             releaseCount={allFeatures.length}
@@ -401,7 +397,7 @@ export function ExploreView({
           />
         ) : null}
 
-        {mapLive && !mapEngaged && instrumentsOpen ? (
+        {mapLive && !mapImmersive && instrumentsOpen ? (
           <Animated.View
             style={[
               styles.instrumentsOverlay,
@@ -466,7 +462,7 @@ export function ExploreView({
                   point: feature.coordinates,
                 })
               }
-              onExplore={mapLive && !mapEngaged ? handleMapEngage : undefined}
+              onExpandMap={mapLive && !mapImmersive ? handleEnterImmersiveMap : undefined}
             />
           )}
         </ExploreBottomSheet>

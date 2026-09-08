@@ -35,11 +35,10 @@ export type ExploreRecordsRailProps = {
   readonly emptyDescription?: string;
   readonly testID?: string;
   /**
-   * Cinematic Map Backdrop "Explore the map" control (spec §2 rule 3, §5b).
-   * Omitted while the map is already Engaged — the sheet is collapsed toward
-   * peek and Close (floating, top-trailing) is the way back, not this list.
+   * Enters the immersive map posture. Omitted while the map is already immersive — the sheet is
+   * collapsed toward peek and the floating control at the top is the way back, not this list.
    */
-  readonly onExplore?: () => void;
+  readonly onExpandMap?: () => void;
 };
 
 const RecordRow = memo(function RecordRow({
@@ -107,7 +106,7 @@ export function ExploreRecordsRail({
   emptyTitle = 'No places nearby',
   emptyDescription = 'Pan or zoom the map, or clear a filter, to see pins here.',
   testID = 'explore-records-rail',
-  onExplore,
+  onExpandMap,
 }: ExploreRecordsRailProps) {
   const theme = useThemeColors();
   const headerCount = formatExploreCountLabel({
@@ -141,7 +140,7 @@ export function ExploreRecordsRail({
           accessibilityRole="header"
           accessibilityLabel={headerCount.accessibilityLabel}
         />
-        {onExplore ? null : (
+        {onExpandMap ? null : (
           <View style={styles.inviteRow}>
             <Ionicons
               name="chevron-up"
@@ -162,12 +161,13 @@ export function ExploreRecordsRail({
             </Text>
           </View>
         )}
-        {onExplore ? (
+        {onExpandMap ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Explore the map"
-            testID="explore-map-engage"
-            onPress={onExplore}
+            accessibilityLabel="Expand the map"
+            accessibilityHint="Hides the filters and this list so the map fills the screen"
+            testID="explore-map-expand"
+            onPress={onExpandMap}
             style={({ pressed }) => [
               styles.exploreButton,
               { backgroundColor: pressed ? theme.accentGraphic : theme.accent },
@@ -181,7 +181,7 @@ export function ExploreRecordsRail({
               importantForAccessibility="no-hide-descendants"
             />
             <Text variant="code" style={{ color: theme.inverseInk }}>
-              Explore the map
+              Expand the map
             </Text>
           </Pressable>
         ) : null}
@@ -189,7 +189,7 @@ export function ExploreRecordsRail({
     ),
     [
       headerCount.accessibilityLabel,
-      onExplore,
+      onExpandMap,
       theme.accent,
       theme.accentGraphic,
       theme.border,

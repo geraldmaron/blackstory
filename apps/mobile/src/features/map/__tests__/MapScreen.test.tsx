@@ -306,8 +306,8 @@ describe('MapScreen — ready state', () => {
   });
 });
 
-describe('MapScreen — Cinematic Map Backdrop gesture lock (interactive prop)', () => {
-  it('defaults to interactive (dragPan/touchZoom on) for surfaces that omit the prop', async () => {
+describe('MapScreen — gestures and assistive tech', () => {
+  it('defaults to live gestures for surfaces that omit the prop', async () => {
     const { getByTestId } = await render(<MapScreen />);
     const map = getByTestId('maplibre-map');
     expect(map.props.dragPan).toBe(true);
@@ -316,8 +316,8 @@ describe('MapScreen — Cinematic Map Backdrop gesture lock (interactive prop)',
     expect(map.props.touchPitch).toBe(true);
   });
 
-  it('locks all touch gestures when interactive=false (Rest)', async () => {
-    const { getByTestId } = await render(<MapScreen interactive={false} />);
+  it('stills every gesture only when a surface explicitly asks for a still plate', async () => {
+    const { getByTestId } = await render(<MapScreen gesturesEnabled={false} />);
     const map = getByTestId('maplibre-map', { includeHiddenElements: true });
     expect(map.props.dragPan).toBe(false);
     expect(map.props.touchZoom).toBe(false);
@@ -327,19 +327,24 @@ describe('MapScreen — Cinematic Map Backdrop gesture lock (interactive prop)',
     expect(map.props.touchPitch).toBe(false);
   });
 
-  it('hides the locked map from assistive tech (spec §4)', async () => {
-    const { getByTestId } = await render(<MapScreen interactive={false} />);
-    const screen = getByTestId('map-screen', { includeHiddenElements: true });
-    expect(screen.props.accessibilityElementsHidden).toBe(true);
-    expect(screen.props.importantForAccessibility).toBe('no-hide-descendants');
+  it('never hides the canvas from assistive tech, in any posture', async () => {
+    const live = await render(<MapScreen />);
+    const liveScreen = live.getByTestId('map-screen');
+    expect(liveScreen.props.accessibilityElementsHidden).toBeUndefined();
+    expect(liveScreen.props.importantForAccessibility).toBeUndefined();
+
+    const still = await render(<MapScreen gesturesEnabled={false} />);
+    const stillScreen = still.getByTestId('map-screen');
+    expect(stillScreen.props.accessibilityElementsHidden).toBeUndefined();
+    expect(stillScreen.props.importantForAccessibility).toBeUndefined();
   });
 
-  it('ignores feature presses while locked (Rest never selects through the canvas)', async () => {
+  it('selects a pin even on a still plate — a tapped pin always answers', async () => {
     const onFeaturePress = jest.fn();
     const { getByTestId } = await render(
-      <MapScreen interactive={false} onFeaturePress={onFeaturePress} />,
+      <MapScreen gesturesEnabled={false} onFeaturePress={onFeaturePress} />,
     );
-    fireEvent(getByTestId('maplibre-geojson-source', { includeHiddenElements: true }), 'press', {
+    fireEvent(getByTestId('maplibre-geojson-source'), 'press', {
       nativeEvent: {
         features: [
           {
@@ -351,12 +356,12 @@ describe('MapScreen — Cinematic Map Backdrop gesture lock (interactive prop)',
         lngLat: [-77.04, 38.9],
       },
     });
-    expect(onFeaturePress).not.toHaveBeenCalled();
+    expect(onFeaturePress).toHaveBeenCalledWith('ent_leaf');
   });
 
-  it('ignores cluster presses while locked', async () => {
-    const { getByTestId } = await render(<MapScreen interactive={false} />);
-    fireEvent(getByTestId('maplibre-geojson-source', { includeHiddenElements: true }), 'press', {
+  it('expands a cluster on press even on a still plate', async () => {
+    const { getByTestId } = await render(<MapScreen gesturesEnabled={false} />);
+    fireEvent(getByTestId('maplibre-geojson-source'), 'press', {
       nativeEvent: {
         features: [
           {
@@ -368,7 +373,7 @@ describe('MapScreen — Cinematic Map Backdrop gesture lock (interactive prop)',
         lngLat: [-95.37, 29.76],
       },
     });
-    expect(mockFlyTo).not.toHaveBeenCalled();
+    expect(mockFlyTo).toHaveBeenCalled();
   });
 });
 
