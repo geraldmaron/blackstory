@@ -10,6 +10,7 @@ import {
   buildReleaseNotabilityBasis,
   computeReleaseResearchCoverage,
   formatClaimInclusionNote,
+  highestClaimConfidenceTier,
   inferNotabilityCriterionFromClaim,
   resolveReleaseClaimId,
   resolveReleaseEntityReferences,
@@ -524,12 +525,14 @@ test('buildReleaseEntityArtifacts produces a full projection + search doc for a 
   assert.ok(result.projection.notabilityBasis[0]!.evidenceIds.length > 0);
   assert.equal(result.projection.researchCoverage, 'minimal');
   assert.equal(result.searchIndex.claimCount, 1);
-  assert.equal(result.searchIndex.confidenceTier, 'high');
+  // One claim is one lineage, so this record is uncorroborated and cannot publish at the top
+  // tier even though its only claim is graded high. See `highestClaimConfidenceTier`.
+  assert.equal(result.searchIndex.confidenceTier, 'medium');
   assert.deepEqual(result.searchIndex.notabilityBasis, result.projection.notabilityBasis);
   assert.equal(result.searchIndex.researchCoverage, result.projection.researchCoverage);
 });
 
-test('buildReleaseEntityArtifacts projects medium confidenceTier from claim levels', () => {
+test('buildReleaseEntityArtifacts caps an uncorroborated record below its strongest claim', () => {
   const entry = baseEntry({
     claims: [
       {
@@ -551,8 +554,56 @@ test('buildReleaseEntityArtifacts projects medium confidenceTier from claim leve
   const result = buildReleaseEntityArtifacts(entry, CONTEXT);
   assert.equal(result.ok, true);
   if (!result.ok) return;
-  assert.equal(result.searchIndex.confidenceTier, 'medium');
+  // Both claims cite src_example: one lineage, so the medium strongest claim steps down to low.
+  assert.equal(result.searchIndex.confidenceTier, 'low');
   assert.equal(result.searchIndex.claimCount, 2);
+});
+
+test('buildReleaseEntityArtifacts publishes the top tier once a second lineage corroborates', () => {
+  const entry = baseEntry({
+    claims: [
+      {
+        predicate: 'founded',
+        object: '1870',
+        confidenceLevel: 'high',
+        citationSource: 'npgallery.nps.gov',
+        citationLabel: 'National Register nomination',
+      },
+      {
+        predicate: 'located_in',
+        object: 'Washington, D.C.',
+        confidenceLevel: 'high',
+        citationSource: 'catalog.archives.gov',
+        citationLabel: 'National Archives',
+      },
+    ],
+  });
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.searchIndex.confidenceTier, 'high');
+});
+
+test('highestClaimConfidenceTier does not let one publisher corroborate itself', () => {
+  // The facet written here must agree with `recordConfidenceTier` in
+  // `@repo/public-contracts/evidence`, which cannot be imported across the client/server
+  // boundary — so the shared cases are asserted on both sides.
+  assert.equal(
+    highestClaimConfidenceTier([
+      { confidenceLevel: 'high', citationSource: 'wikipedia_api' },
+      { confidenceLevel: 'high', citationSource: 'en.wikipedia.org' },
+    ]),
+    'medium',
+  );
+  assert.equal(
+    highestClaimConfidenceTier([
+      { confidenceLevel: 'high', citationSource: 'www.nps.gov' },
+      { confidenceLevel: 'high', citationSource: 'nps.gov' },
+    ]),
+    'medium',
+  );
+  assert.equal(highestClaimConfidenceTier([]), 'unrated');
+  assert.equal(highestClaimConfidenceTier([{ confidenceLevel: 'high' }]), 'unrated');
 });
 
 test('buildReleaseEntityArtifacts: every published location precision is a controlled public tier', () => {

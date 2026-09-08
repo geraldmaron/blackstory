@@ -32,7 +32,8 @@ describe('AnatomySection', () => {
     expect(getByText('Evidence')).toBeTruthy();
     expect(getByText('Place')).toBeTruthy();
     expect(getByText('Reconstruction')).toBeTruthy();
-    expect(getByText(/Grade A · 2 sources/)).toBeTruthy();
+    // One citation source across both claims: uncorroborated, so grade B, not A.
+    expect(getByText(/Grade B · 2 sources/)).toBeTruthy();
   });
 
   it('shows Place not pinned when geo is absent', async () => {
@@ -75,7 +76,7 @@ describe('AnatomySection evidence', () => {
     expect(
       getByTestId('entity-anatomy-evidence-meter', { includeHiddenElements: true }),
     ).toBeTruthy();
-    // The row's own value carries "Grade A"; the meter beside it must not repeat the letter.
+    // The row's own value carries the grade; the meter beside it must not repeat the letter.
     expect(getByText(/^Grade [ABC] · \d+ sources?$|^Not graded$/)).toBeTruthy();
   });
 });

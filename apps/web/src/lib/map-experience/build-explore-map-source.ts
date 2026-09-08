@@ -22,6 +22,7 @@ import {
 } from '@repo/domain/map/map-source';
 import type { GeoPrecisionTier } from '@repo/domain/geography/display-radius';
 import type { PublicClaimView, PublicEntityView } from '../../data/public-seed';
+import { recordConfidenceTier, type ConfidenceTier } from '@repo/public-contracts/evidence';
 import { visitContactClaimsForMap } from '../geography/public-visit-contact';
 import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './entity-geo';
 import { resolveEntityEraBuckets } from './entity-era-facts';
@@ -30,16 +31,17 @@ import { displayEncodingFor, kindFamilyFor, resolveMapTone } from './kind-encodi
 import { staysOffPublicMap, atlasWalkHref } from '../place/public-place-path';
 import { instrumentRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
 
-export type ConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
+export type { ConfidenceTier };
 
-/** Highest confidence tier among an entity's accepted claims a transparency affordance about
- * how strongly evidenced the record is, never a numeric score (ranking-signal ban). */
-export function highestConfidence(claims: readonly PublicClaimView[]): ConfidenceTier {
-  if (claims.some((claim) => claim.confidenceLevel === 'high')) return 'high';
-  if (claims.some((claim) => claim.confidenceLevel === 'medium')) return 'medium';
-  if (claims.some((claim) => claim.confidenceLevel === 'low')) return 'low';
-  return 'unrated';
-}
+/**
+ * A transparency affordance about how strongly evidenced a record is, never a numeric score
+ * (ranking-signal ban).
+ *
+ * This used to be a local bare-maximum over claim levels. It is now the shared rule, which also
+ * accounts for corroboration — see `recordConfidenceTier`. Re-exported here because Explore,
+ * Records and the record page all reached for it under this name.
+ */
+export { recordConfidenceTier } from '@repo/public-contracts/evidence';
 
 export type ExploreMapFeatureProperties = {
   readonly entityId: string;
@@ -282,7 +284,7 @@ function enrichFeature(
       // `notabilityLabels` deliberately not carried: nothing on a map surface reads it, and the
       // labels are full rubric sentences repeated per record (1.8 MB across the catalog).
       evidenceCount: entity.claims.length,
-      confidenceTier: highestConfidence(entity.claims),
+      confidenceTier: recordConfidenceTier(entity.claims),
       topicTags: entity.topicTags,
       ...(entity.topicIds !== undefined ? { topicIds: entity.topicIds } : {}),
       ...(mapTone !== undefined ? { mapTone } : {}),

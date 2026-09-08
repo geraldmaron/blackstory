@@ -32,34 +32,63 @@ function connectionString(): string {
   return value;
 }
 
-/** Same precedence as release-builder `highestClaimConfidenceTier`. */
-const COMPUTED_TIER = `
+/** The record's claims, as an array whatever the projection holds. */
+const CLAIMS = `
+  case when jsonb_typeof(re.projection->'claims') = 'array'
+    then re.projection->'claims' else '[]'::jsonb end
+`;
+
+/**
+ * Distinct citation lineages on the record.
+ *
+ * Mirrors `claimLineageKey` in release-builder and `citationLineageKey` in
+ * `@repo/public-contracts/evidence`: subdomain prefixes dropped, the Wikipedia family collapsed
+ * to one key, so a single publisher spelled several ways cannot corroborate itself.
+ */
+const LINEAGE_COUNT = `(
+  select count(distinct
+    case when lower(claim->>'citationSource') like '%wikipedia%' then 'wikipedia'
+      else regexp_replace(lower(claim->>'citationSource'), '^(www|en|en\\.m|m)\\.', '')
+    end)
+  from jsonb_array_elements(${CLAIMS}) claim
+  where coalesce(btrim(claim->>'citationSource'), '') <> ''
+)`;
+
+const STRONGEST_TIER = `
   case
     when exists (
-      select 1
-      from jsonb_array_elements(
-        case when jsonb_typeof(re.projection->'claims') = 'array'
-          then re.projection->'claims' else '[]'::jsonb end
-      ) claim
+      select 1 from jsonb_array_elements(${CLAIMS}) claim
       where claim->>'confidenceLevel' = 'high'
     ) then 'high'
     when exists (
-      select 1
-      from jsonb_array_elements(
-        case when jsonb_typeof(re.projection->'claims') = 'array'
-          then re.projection->'claims' else '[]'::jsonb end
-      ) claim
+      select 1 from jsonb_array_elements(${CLAIMS}) claim
       where claim->>'confidenceLevel' = 'medium'
     ) then 'medium'
     when exists (
-      select 1
-      from jsonb_array_elements(
-        case when jsonb_typeof(re.projection->'claims') = 'array'
-          then re.projection->'claims' else '[]'::jsonb end
-      ) claim
+      select 1 from jsonb_array_elements(${CLAIMS}) claim
       where claim->>'confidenceLevel' = 'low'
     ) then 'low'
     else 'unrated'
+  end
+`;
+
+/**
+ * Same rule as release-builder `highestClaimConfidenceTier`: the strongest claim on the record,
+ * capped by corroboration. A record cited to a single lineage cannot hold the top tier, however
+ * authoritative that lineage is — the bare maximum this replaced graded 4,152 of 4,167 published
+ * records `high` and made the reader-facing meter meaningless (repo-ngojq).
+ *
+ * Records prefers this facet over full-entity hydrate whenever the search index carries it, so
+ * this expression and the TypeScript rule have to agree or Records and Explore will show
+ * different grades for the same record.
+ */
+const COMPUTED_TIER = `
+  case
+    when (${STRONGEST_TIER}) = 'unrated' then 'unrated'
+    when (${LINEAGE_COUNT}) = 0 then 'unrated'
+    when (${LINEAGE_COUNT}) > 1 then (${STRONGEST_TIER})
+    when (${STRONGEST_TIER}) = 'high' then 'medium'
+    else 'low'
   end
 `;
 

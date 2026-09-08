@@ -143,3 +143,83 @@ export function applyEvidenceFloor<
   if (floor === 'any') return features;
   return features.filter((feature) => meetsEvidenceFloor(feature.properties.confidenceTier, floor));
 }
+
+/**
+ * A claim, as much of one as grading needs.
+ *
+ * The archive spells a citation two ways and both reach this module: the stored projection and
+ * web's `PublicClaimProjectionDoc` keep `citationSource` flat, while the wire `ClaimV1` and the
+ * phone's `Claim` nest the same string under `citation.source`. Reading both here is what keeps
+ * the rule single. An adapter at each call site would be five chances to map it wrong, and a
+ * missed one fails silently — every record would look uncorroborated and the whole archive would
+ * drop a grade.
+ */
+export type EvidenceClaimInput = {
+  readonly confidenceLevel?: string;
+  readonly citationSource?: string;
+  readonly citation?: { readonly source?: string };
+};
+
+/**
+ * The lineage a citation belongs to, for corroboration counting.
+ *
+ * Two citations corroborate each other only when they are independent, and the source string is
+ * not a reliable identity on its own: the archive stores one publisher under several spellings
+ * (`wikipedia_api`, `wikipedia.org`, `en.wikipedia.org`, `en.m.wikipedia.org`). Counting those as
+ * four sources would let a single publisher corroborate itself up to grade A.
+ *
+ * Subdomain prefixes are dropped and the Wikipedia family collapses to one key, matching the
+ * confidence engine's `lineageRootId` rule that syndicated copies count once.
+ */
+export function citationLineageKey(claim: EvidenceClaimInput): string | null {
+  const raw = (claim.citationSource ?? claim.citation?.source ?? '').trim().toLowerCase();
+  if (raw.length === 0) return null;
+  if (raw.includes('wikipedia')) return 'wikipedia';
+  return raw.replace(/^(?:www|en|en\.m|m)\./u, '');
+}
+
+/** Distinct independent lineages cited across a record's claims. */
+export function independentLineageCount(claims: readonly EvidenceClaimInput[]): number {
+  const lineages = new Set<string>();
+  for (const claim of claims) {
+    const key = citationLineageKey(claim);
+    if (key !== null) lineages.add(key);
+  }
+  return lineages.size;
+}
+
+/** The strongest claim tier present, ignoring corroboration. */
+function strongestClaimTier(claims: readonly EvidenceClaimInput[]): ConfidenceTier {
+  if (claims.some((claim) => claim.confidenceLevel === 'high')) return 'high';
+  if (claims.some((claim) => claim.confidenceLevel === 'medium')) return 'medium';
+  if (claims.some((claim) => claim.confidenceLevel === 'low')) return 'low';
+  return 'unrated';
+}
+
+/**
+ * The evidence tier for a whole record: its strongest claim, capped by corroboration.
+ *
+ * The rule used to be the bare maximum, which is why 4,152 of 4,167 published records graded A
+ * and the meter carried no signal at all. The maximum is not so much wrong as answering a
+ * different question — "is any single claim here well sourced?" — while a reader looking at a
+ * record-level grade is asking "is this record well supported?". Those come apart exactly where
+ * it matters: 57% of the archive rests on one source, and 398 records were grading A on
+ * Wikipedia alone.
+ *
+ * So a record cited to a single lineage cannot reach A, however authoritative that lineage is.
+ * That standard is not invented here. It is what the confidence engine
+ * (`calculateClaimConfidence`) already encodes, where one lineage scores 0.4 on
+ * `lineageIndependence` and cannot clear the 0.75 publish threshold; this is the same rule
+ * applied at the level a reader actually sees.
+ *
+ * A record with no citations is `unrated`, never `low` — nobody assessed it, which is not the
+ * same as assessing it poorly.
+ */
+export function recordConfidenceTier(claims: readonly EvidenceClaimInput[]): ConfidenceTier {
+  const strongest = strongestClaimTier(claims);
+  if (strongest === 'unrated') return 'unrated';
+  if (independentLineageCount(claims) === 0) return 'unrated';
+  if (independentLineageCount(claims) > 1) return strongest;
+  // One lineage: a single publisher, uncorroborated. Step down one grade.
+  return strongest === 'high' ? 'medium' : 'low';
+}

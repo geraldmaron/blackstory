@@ -3,10 +3,13 @@
  * AnatomySection and unit tests. Mirrors web `entity-anatomy-facts.ts` without
  * React or `@repo/domain` imports.
  */
-import { evidenceLabel as buildEvidenceLabel } from '@repo/public-contracts/evidence';
+import {
+  evidenceLabel as buildEvidenceLabel,
+  recordConfidenceTier,
+} from '@repo/public-contracts/evidence';
 
 import { humanizeToken } from './format';
-import type { Claim, Entity, LocationPrecision } from './types';
+import type { Entity, LocationPrecision } from './types';
 
 export type ConfidenceTierKey = 'high' | 'medium' | 'low' | 'unrated';
 
@@ -85,18 +88,11 @@ export function entityEraFact(entity: Entity): { readonly label: string } {
   return { label: 'Undated' };
 }
 
-/** Highest confidence tier among accepted claims — never a numeric score. */
-export function highestConfidence(claims: readonly Claim[]): ConfidenceTierKey {
-  if (claims.some((claim) => claim.confidenceLevel === 'high')) return 'high';
-  if (claims.some((claim) => claim.confidenceLevel === 'medium')) return 'medium';
-  if (claims.some((claim) => claim.confidenceLevel === 'low')) return 'low';
-  return 'unrated';
-}
 
 export function buildEntityAnatomyInputs(entity: Entity): EntityAnatomyInputs {
   const kindLabel = humanizeToken(entity.kind);
   const era = entityEraFact(entity);
-  const evidenceTier = highestConfidence(entity.claims);
+  const evidenceTier = recordConfidenceTier(entity.claims);
   const claimCount = entity.claims.length;
   // A record with no accepted claims says the grade and stops. "Grade A · 0 sources" would be a
   // count of something the reader can then go and fail to find.

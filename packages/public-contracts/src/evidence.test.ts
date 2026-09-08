@@ -17,6 +17,7 @@ import {
   meetsEvidenceFloor,
   meterLevelForCoverage,
   meterLevelForTier,
+  recordConfidenceTier,
 } from './evidence.js';
 
 test('a tier maps to one letter, and unrated to none', () => {
@@ -70,4 +71,82 @@ test('the floor predicate keeps stronger grades rather than matching exactly', (
   ];
   assert.deepEqual(applyEvidenceFloor(features, 'B'), [features[0], features[1]]);
   assert.equal(applyEvidenceFloor(features, 'any').length, 3);
+});
+
+test('recordConfidenceTier caps an uncorroborated record one grade below its strongest claim', () => {
+  // The archive's real failure: one authoritative-looking source, graded A on its own say-so.
+  assert.equal(
+    recordConfidenceTier([
+      { confidenceLevel: 'high', citationSource: 'wikipedia_api' },
+      { confidenceLevel: 'high', citationSource: 'wikipedia_api' },
+    ]),
+    'medium',
+  );
+});
+
+test('recordConfidenceTier keeps grade A once a second independent lineage corroborates', () => {
+  assert.equal(
+    recordConfidenceTier([
+      { confidenceLevel: 'high', citationSource: 'wikipedia_api' },
+      { confidenceLevel: 'high', citationSource: 'npgallery.nps.gov' },
+    ]),
+    'high',
+  );
+});
+
+test('recordConfidenceTier does not let one publisher corroborate itself', () => {
+  // Four spellings of Wikipedia are one lineage, not four sources.
+  assert.equal(
+    recordConfidenceTier([
+      { confidenceLevel: 'high', citationSource: 'wikipedia_api' },
+      { confidenceLevel: 'high', citationSource: 'wikipedia.org' },
+      { confidenceLevel: 'high', citationSource: 'en.wikipedia.org' },
+      { confidenceLevel: 'high', citationSource: 'en.m.wikipedia.org' },
+    ]),
+    'medium',
+  );
+  // Same for a bare subdomain prefix on any other host.
+  assert.equal(
+    recordConfidenceTier([
+      { confidenceLevel: 'high', citationSource: 'www.nps.gov' },
+      { confidenceLevel: 'high', citationSource: 'nps.gov' },
+    ]),
+    'medium',
+  );
+});
+
+test('recordConfidenceTier reads the nested wire citation shape too', () => {
+  // ClaimV1 and the phone's Claim nest what the projection keeps flat. Both must grade alike,
+  // or the same record reads as two different assessments depending on the screen.
+  assert.equal(
+    recordConfidenceTier([
+      { confidenceLevel: 'high', citation: { source: 'wikipedia_api' } },
+      { confidenceLevel: 'high', citation: { source: 'npgallery.nps.gov' } },
+    ]),
+    'high',
+  );
+  assert.equal(
+    recordConfidenceTier([
+      { confidenceLevel: 'high', citation: { source: 'catalog.archives.gov' } },
+    ]),
+    'medium',
+  );
+});
+
+test('recordConfidenceTier reports unrated for a record nobody assessed', () => {
+  assert.equal(recordConfidenceTier([]), 'unrated');
+  // A claim with no citation at all cannot be graded, and is not therefore a low grade.
+  assert.equal(recordConfidenceTier([{ confidenceLevel: 'high' }]), 'unrated');
+  assert.equal(recordConfidenceTier([{ citationSource: 'nps.gov' }]), 'unrated');
+});
+
+test('recordConfidenceTier floors at low rather than inventing a fourth grade', () => {
+  assert.equal(
+    recordConfidenceTier([{ confidenceLevel: 'low', citationSource: 'nps.gov' }]),
+    'low',
+  );
+  assert.equal(
+    recordConfidenceTier([{ confidenceLevel: 'medium', citationSource: 'nps.gov' }]),
+    'low',
+  );
 });
