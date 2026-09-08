@@ -25,6 +25,8 @@ import { exploreStoryMeta } from './explore-story-meta';
 import { formatExploreCountLabel } from './explore-count-label';
 
 export type ExploreRecordsRailProps = {
+  /** Reports the header's laid-out height so the sheet can size its peek detent to it. */
+  readonly onHeaderLayout?: (height: number) => void;
   readonly features: readonly ExploreFeature[];
   readonly selectedId?: string;
   /** "Nearby" once the map reports a region; "All pinned" before that. */
@@ -124,6 +126,7 @@ export function ExploreRecordsRail({
   emptyDescription = 'Pan or zoom the map, or clear a filter, to see pins here.',
   testID = 'explore-records-rail',
   onExpandMap,
+  onHeaderLayout,
 }: ExploreRecordsRailProps) {
   const theme = useThemeColors();
   const headerCount = formatExploreCountLabel({
@@ -146,7 +149,10 @@ export function ExploreRecordsRail({
 
   const listHeader = useMemo(
     () => (
-      <View style={[styles.header, { borderBottomColor: theme.border }]}>
+      <View
+        style={[styles.header, { borderBottomColor: theme.border }]}
+        onLayout={(event) => onHeaderLayout?.(event.nativeEvent.layout.height)}
+      >
         {/* Carries the count/scope label as its own accessible "header" landmark
             (a11y contract §4) without swallowing the Explore/Close button below
             into one opaque VoiceOver stop — an `accessible` container would make
@@ -207,6 +213,7 @@ export function ExploreRecordsRail({
     [
       headerCount.accessibilityLabel,
       onExpandMap,
+      onHeaderLayout,
       theme.accent,
       theme.accentGraphic,
       theme.border,

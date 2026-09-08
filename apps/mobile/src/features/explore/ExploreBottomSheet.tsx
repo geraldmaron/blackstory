@@ -5,12 +5,13 @@
  * Pin Pulse detents (11/34/52): map owns first glance; native Explore also lifts
  * the sheet with tab-bar `bottomInset`. `bottomInset` still clears the edition tab bar.
  */
-import type { ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { AppBottomSheet } from '@/ui/AppBottomSheet';
 import {
   EXPLORE_SHEET_FULL_FRACTION,
   EXPLORE_SHEET_HALF_FRACTION,
   EXPLORE_SHEET_PEEK_FRACTION,
+  explorePeekHeightPx,
 } from './explore-sheet-layout';
 
 /** Snap indices: 0 = peek, 1 = half, 2 = full browse. */
@@ -28,6 +29,23 @@ export const EXPLORE_SHEET_SNAP_POINTS = [
   pct(EXPLORE_SHEET_HALF_FRACTION),
   pct(EXPLORE_SHEET_FULL_FRACTION),
 ] as const;
+
+/**
+ * Snap points with peek sized to the header the sheet actually shows.
+ *
+ * gorhom takes a mixed list, so peek is a point height while half and full stay proportional —
+ * those two are deliberately a share of the screen (the map keeps the majority), while peek is
+ * the height of one header and has no business scaling with the phone.
+ */
+export function exploreSheetSnapPoints(
+  peekHeaderHeight: number | undefined,
+): readonly (string | number)[] {
+  return [
+    explorePeekHeightPx(peekHeaderHeight),
+    pct(EXPLORE_SHEET_HALF_FRACTION),
+    pct(EXPLORE_SHEET_FULL_FRACTION),
+  ];
+}
 
 /** Peek height as a percentage string (instruments panel + attribution clearance). */
 export const EXPLORE_SHEET_PEEK_HEIGHT: `${number}%` = pct(EXPLORE_SHEET_PEEK_FRACTION);
@@ -57,6 +75,8 @@ export type ExploreBottomSheetProps = {
    * so browse scrolling and sheet snap gestures stay in sync.
    */
   readonly sheetList?: boolean;
+  /** Measured rail-header height; peek is sized to it. Undefined until first layout. */
+  readonly peekHeaderHeight?: number;
   /** Fired when the sheet settles on peek / half / full. */
   readonly onSnapIndexChange?: (index: number) => void;
 };
@@ -70,15 +90,17 @@ export function ExploreBottomSheet({
   bottomInset = EXPLORE_SHEET_BOTTOM_INSET,
   scrollable = false,
   sheetList = false,
+  peekHeaderHeight,
   onSnapIndexChange,
 }: ExploreBottomSheetProps) {
   const resolvedIndex =
     snapIndex ?? (hasSelection ? EXPLORE_SHEET_HALF : EXPLORE_SHEET_PEEK);
+  const snapPoints = useMemo(() => exploreSheetSnapPoints(peekHeaderHeight), [peekHeaderHeight]);
 
   return (
     <AppBottomSheet
       snapIndex={resolvedIndex}
-      snapPoints={EXPLORE_SHEET_SNAP_POINTS}
+      snapPoints={snapPoints}
       reduceMotion={reduceMotion}
       bottomInset={bottomInset}
       scrollable={scrollable}

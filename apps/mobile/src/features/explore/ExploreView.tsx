@@ -18,7 +18,6 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { useEditionTabBarInset } from '@/shell/edition-chrome';
 import {
   ApiStatusBanner,
   ScreenCanvas,
@@ -108,7 +107,6 @@ export function ExploreView({
 }: ExploreViewProps) {
   const osReduceMotion = useReduceMotion();
   const reduceMotion = reduceMotionProp ?? osReduceMotion;
-  const tabBarHeight = useEditionTabBarInset();
   const theme = useThemeColors();
   const [mapAreaHeight, setMapAreaHeight] = useState(0);
 
@@ -133,6 +131,15 @@ export function ExploreView({
   // boolean used to disagree with the gesture and yank the sheet back to full
   // when the user dragged it to half; that derived-vs-gesture conflict is gone.
   const [snapIndex, setSnapIndex] = useState(EXPLORE_SHEET_PEEK);
+  // Peek is sized to the rail header rather than to a share of the screen (repo-pmi5n). Rounded
+  // before it lands in state so a sub-pixel layout jitter cannot re-snap the sheet on every pass.
+  const [peekHeaderHeight, setPeekHeaderHeight] = useState<number | undefined>(undefined);
+  const handleHeaderLayout = useCallback((height: number) => {
+    setPeekHeaderHeight((current) => {
+      const next = Math.round(height);
+      return current === next ? current : next;
+    });
+  }, []);
   const [chromeHeight, setChromeHeight] = useState(0);
   const prevSelectedIdRef = useRef<string | null>(null);
   /** Optimistic chip apply awaiting URL/`filters` prop catch-up. */
@@ -142,9 +149,13 @@ export function ExploreView({
     () =>
       attributionBottomAbovePeekSheet({
         mapAreaHeight,
-        tabBarInset: tabBarHeight,
+        // The tab screen's content area already stops at the tab bar, so the pill clears the
+        // sheet alone. Adding the tab-bar height here counted it twice, the same double count
+        // that lifted the sheet a whole tab bar off the bottom (repo-pmi5n).
+        tabBarInset: 0,
+        ...(peekHeaderHeight === undefined ? {} : { peekHeaderHeight }),
       }),
-    [mapAreaHeight, tabBarHeight],
+    [mapAreaHeight, peekHeaderHeight],
   );
 
   const handleMapAreaLayout = useCallback((event: LayoutChangeEvent) => {
@@ -421,7 +432,7 @@ export function ExploreView({
           snapIndex={sheetSnapIndex}
           hasSelection={Boolean(selectedFeature)}
           reduceMotion={reduceMotion}
-          bottomInset={tabBarHeight}
+          peekHeaderHeight={peekHeaderHeight}
           scrollable={Boolean(selectedFeature)}
           sheetList={!selectedFeature}
           onSnapIndexChange={(index) => {
@@ -463,19 +474,11 @@ export function ExploreView({
                 })
               }
               onExpandMap={mapLive && !mapImmersive ? handleEnterImmersiveMap : undefined}
+              onHeaderLayout={handleHeaderLayout}
             />
           )}
         </ExploreBottomSheet>
 
-        {/* Floor: prevents dark map tiles from bleeding into the tab-bar gap
-            left by gorhom's bottomInset. Sits below the sheet, above the map. */}
-        <View
-          style={[
-            styles.tabBarFloor,
-            { height: tabBarHeight, backgroundColor: theme.surface },
-          ]}
-          pointerEvents="none"
-        />
       </View>
     </ScreenCanvas>
   );
@@ -483,13 +486,6 @@ export function ExploreView({
 
 const styles = StyleSheet.create({
   mapArea: { flex: 1, position: 'relative' },
-  tabBarFloor: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    // backgroundColor + height are set inline from theme + tabBarHeight
-  },
   closeControl: {
     position: 'absolute',
     right: space['2'],

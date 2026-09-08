@@ -2,6 +2,7 @@
  * Explore bottom sheet host: v7 prototype detents and controlled snap wiring.
  */
 import { render } from '@testing-library/react-native';
+import { EXPLORE_SHEET_PEEK_FALLBACK_PX } from '../explore-sheet-layout';
 import { Text } from 'react-native';
 
 const mockBottomSheetProps: Record<string, unknown>[] = [];
@@ -68,9 +69,26 @@ describe('ExploreBottomSheet — Pin Pulse detents', () => {
       </ExploreBottomSheet>,
     );
     expect(mockBottomSheetProps[0]?.snapIndex).toBe(2);
-    expect(mockBottomSheetProps[0]?.snapPoints).toEqual(EXPLORE_SHEET_SNAP_POINTS);
+    // Peek is a point height, not a share of the screen (repo-pmi5n); half and full stay
+    // proportional because the map is meant to keep the majority of the surface.
+    expect(mockBottomSheetProps[0]?.snapPoints).toEqual([
+      EXPLORE_SHEET_PEEK_FALLBACK_PX,
+      '34%',
+      '52%',
+    ]);
     expect(mockBottomSheetProps[0]?.bottomInset).toBe(0);
     expect(mockBottomSheetProps[0]?.onSnapIndexChange).toBe(onSnapIndexChange);
+  });
+
+  it('sizes the peek detent to the measured header rather than a screen fraction', async () => {
+    await render(
+      <ExploreBottomSheet peekHeaderHeight={61}>
+        <Text>Browse</Text>
+      </ExploreBottomSheet>,
+    );
+    // 44dp handle + the header the sheet actually shows. Nothing else is visible at peek, so
+    // nothing else is reserved — that reserve was the empty band above the tab bar.
+    expect(mockBottomSheetProps[0]?.snapPoints).toEqual([105, '34%', '52%']);
   });
 
   it('forwards scrollable preview mode and tab bar inset', async () => {
