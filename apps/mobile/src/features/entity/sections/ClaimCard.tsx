@@ -44,7 +44,8 @@ export function ClaimCard({ claim, isOnline }: ClaimCardProps) {
         accessible
         accessibilityLabel={formatEvidenceScoreLabel(claim.confidenceScore, claim.confidenceLevel)}
       >
-        <RecordMeter tier={claim.confidenceLevel} decorative />
+        {/* The grade word is right there; a letter on the meter would print "A" twice. */}
+        <RecordMeter tier={claim.confidenceLevel} showLetter={false} decorative />
         <Text variant="caption" colorRole="inkMuted">
           {evidenceLabel(claim.confidenceLevel)}
         </Text>
