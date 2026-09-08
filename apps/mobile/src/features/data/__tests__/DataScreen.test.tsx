@@ -69,6 +69,6 @@ describe('DataScreen', () => {
     fireEvent.press(getByText('Explore the map'));
     expect(mockPush).toHaveBeenCalledWith('/explore');
     fireEvent.press(getByText('Read methodology'));
-    expect(mockPush).toHaveBeenCalledWith('/learn/methodology');
+    expect(mockPush).toHaveBeenCalledWith('/methodology');
   });
 });

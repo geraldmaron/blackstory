@@ -1,6 +1,9 @@
 /**
- * Legacy Search tab route — redirects to History (web `/search` → `/history`). Kept so old
- * deep links and in-app `/search` pushes normalize without orphan UI.
+ * Legacy `/search` tab route — normalizes to Records, where search lives.
+ *
+ * Kept as a route rather than a config rule because `q` and `kind` have to survive the hop; a
+ * published deep link that loses the reader's query is worse than a dead one, because it looks
+ * like the archive found nothing.
  */
 import { Redirect, useLocalSearchParams } from 'expo-router';
 
@@ -14,7 +17,7 @@ export default function SearchRedirectScreen() {
   return (
     <Redirect
       href={{
-        pathname: '/history',
+        pathname: '/records',
         params: {
           ...(q ? { q } : {}),
           ...(kind ? { kind } : {}),

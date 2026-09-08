@@ -19,7 +19,7 @@ import { normalizeTypedContentPage } from './content-blocks';
 import type { CatalogSectionId } from './content-catalog';
 import { ContentRenderer } from './ContentRenderer';
 import { isContentVersionStale } from './legal-version';
-import { isLongformSection } from './story-index';
+import { isNarrativeSection } from './sections';
 import { useContentPage } from './useContentPage';
 
 export interface ContentPageScreenProps {
@@ -69,7 +69,7 @@ export function ContentPageScreen({
 }: ContentPageScreenProps) {
   const navigation = useNavigation();
   const state = useContentPage(section, slug);
-  const longform = isLongformSection(section);
+  const longform = isNarrativeSection(section);
 
   const resolvedTitle =
     state.status === 'ok'

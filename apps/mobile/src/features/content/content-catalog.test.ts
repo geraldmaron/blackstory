@@ -38,13 +38,17 @@ describe('CONTENT_CATALOG', () => {
   });
 
   it('findCatalogEntry finds a known entry and returns undefined for an unknown slug', () => {
-    expect(findCatalogEntry('legal', 'privacy')).toBeDefined();
-    expect(findCatalogEntry('legal', 'not-a-real-slug')).toBeUndefined();
+    expect(findCatalogEntry('privacy', 'privacy')).toBeDefined();
+    expect(findCatalogEntry('privacy', 'not-a-real-slug')).toBeUndefined();
   });
 
   it('listCatalogEntries returns only entries for the requested section', () => {
-    const legalEntries = listCatalogEntries('legal');
-    expect(legalEntries.length).toBeGreaterThan(0);
-    expect(legalEntries.every((entry) => entry.section === 'legal')).toBe(true);
+    const storyEntries = listCatalogEntries('stories');
+    expect(storyEntries.length).toBeGreaterThan(0);
+    expect(storyEntries.every((entry) => entry.section === 'stories')).toBe(true);
+    // Privacy and Terms are their own sections now. "Legal" held both, and meant product policy
+    // while `/law` meant historical statute — one word for two unrelated domains.
+    expect(listCatalogEntries('privacy').length).toBe(1);
+    expect(listCatalogEntries('terms').length).toBe(1);
   });
 });

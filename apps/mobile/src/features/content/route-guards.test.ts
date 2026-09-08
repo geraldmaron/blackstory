@@ -6,12 +6,16 @@ import { KNOWN_SECTION_ROUTE_IDS, parseSectionParam, parseSlugParam } from './ro
 
 describe('parseSectionParam', () => {
   it('resolves a known section id', () => {
-    expect(parseSectionParam('history')?.routeId).toBe('history');
-    expect(parseSectionParam('legal')?.routeId).toBe('legal');
+    expect(parseSectionParam('stories')?.routeId).toBe('stories');
+    expect(parseSectionParam('methodology')?.routeId).toBe('methodology');
+    // The retired sections resolve to nothing, so a stale deep link cannot reach a lookup.
+    for (const retired of ['history', 'topics', 'myths', 'facts', 'legal']) {
+      expect(parseSectionParam(retired)).toBeUndefined();
+    }
   });
 
   it('takes the first value of a repeated/array param', () => {
-    expect(parseSectionParam(['history', 'legal'])?.routeId).toBe('history');
+    expect(parseSectionParam(['stories', 'methodology'])?.routeId).toBe('stories');
   });
 
   it('returns undefined for an unknown section id', () => {
@@ -37,23 +41,24 @@ describe('parseSectionParam', () => {
 });
 
 describe('parseSlugParam', () => {
-  const legalRow = parseSectionParam('legal')!;
-  const historyRow = parseSectionParam('history')!;
+  const privacyRow = parseSectionParam('privacy')!;
+  const storiesRow = parseSectionParam('stories')!;
 
   it('resolves a real slug that exists under the given section', () => {
-    expect(parseSlugParam('privacy', legalRow)).toBe('privacy');
+    expect(parseSlugParam('privacy', privacyRow)).toBe('privacy');
+    expect(parseSlugParam('dunbar-founded-1916', storiesRow)).toBe('dunbar-founded-1916');
   });
 
   it('returns undefined for a slug that does not exist under that section', () => {
-    expect(parseSlugParam('privacy', historyRow)).toBeUndefined();
-    expect(parseSlugParam('not-a-real-slug', legalRow)).toBeUndefined();
+    expect(parseSlugParam('privacy', storiesRow)).toBeUndefined();
+    expect(parseSlugParam('not-a-real-slug', privacyRow)).toBeUndefined();
   });
 
   it('returns undefined for malformed/hostile input', () => {
-    expect(parseSlugParam(undefined, legalRow)).toBeUndefined();
-    expect(parseSlugParam('../../../etc/passwd', legalRow)).toBeUndefined();
-    expect(parseSlugParam('privacy/../terms', legalRow)).toBeUndefined();
-    expect(parseSlugParam('a'.repeat(500), legalRow)).toBeUndefined();
-    expect(parseSlugParam({ toString: () => 'privacy' }, legalRow)).toBeUndefined();
+    expect(parseSlugParam(undefined, privacyRow)).toBeUndefined();
+    expect(parseSlugParam('../../../etc/passwd', privacyRow)).toBeUndefined();
+    expect(parseSlugParam('privacy/../terms', privacyRow)).toBeUndefined();
+    expect(parseSlugParam('a'.repeat(500), privacyRow)).toBeUndefined();
+    expect(parseSlugParam({ toString: () => 'privacy' }, privacyRow)).toBeUndefined();
   });
 });

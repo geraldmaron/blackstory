@@ -136,7 +136,7 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
                 <LedgerRow
                   key={`${link.agencyUrl}-${index}`}
                   title={plainDashCopy(link.label)}
-                  leading={<NavIcon name="corrections" size={20} />}
+                  leading={<NavIcon name="correction" size={20} />}
                   showChevron
                   showDivider={index < explainer.rightsToday.length - 1}
                   onPress={() => void openHref(link.agencyUrl, link.label)}
@@ -168,7 +168,7 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
                   <LedgerRow
                     key={`${term.term}-${index}`}
                     title={plainDashCopy(term.term)}
-                    leading={<NavIcon name="lawRef" size={20} />}
+                    leading={<NavIcon name="law" size={20} />}
                     showChevron
                     showDivider={index < (explainer.termOfArtLinks?.length ?? 0) - 1}
                     onPress={() => void openHref(term.wexUrl, term.term)}

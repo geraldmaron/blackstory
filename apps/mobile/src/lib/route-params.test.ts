@@ -207,12 +207,12 @@ describe('parseFilterState', () => {
 });
 
 describe('isSafeInternalPath / parseReturnTo (open-redirect defense)', () => {
-  it('accepts the four tab roots, legacy Search, and Data', () => {
+  it('accepts the four tab roots, the legacy search root, and Data', () => {
     expect(isSafeInternalPath('/explore')).toBe(true);
-    expect(isSafeInternalPath('/history')).toBe(true);
-    expect(isSafeInternalPath('/search')).toBe(true);
-    expect(isSafeInternalPath('/learn')).toBe(true);
+    expect(isSafeInternalPath('/stories')).toBe(true);
+    expect(isSafeInternalPath('/records')).toBe(true);
     expect(isSafeInternalPath('/more')).toBe(true);
+    expect(isSafeInternalPath('/search')).toBe(true);
     expect(isSafeInternalPath('/data')).toBe(true);
   });
 
@@ -264,7 +264,9 @@ describe('isUrlLengthSafe', () => {
 
 describe('parseRestoredRoute (cold-start / process-restoration safety)', () => {
   it('restores a valid persisted static route', () => {
-    expect(parseRestoredRoute({ pathname: '/search' })).toEqual({ pathname: '/history' });
+    // A restored `/search` normalizes to Records, where search now lives.
+    expect(parseRestoredRoute({ pathname: '/search' })).toEqual({ pathname: '/records' });
+    expect(parseRestoredRoute({ pathname: '/stories' })).toEqual({ pathname: '/stories' });
   });
 
   it('restores a valid persisted entity route', () => {

@@ -53,7 +53,7 @@ export interface ContentPageV1 {
  * withheldReason). Used here as OPTIONAL, LOCAL editorial metadata attached to a handful of
  * catalog entries (methodology, legal) that want to show "primary sources" — this is NOT a wire
  * field of `ContentPageV1` (which carries no citations today); it is this feature's own
- * `LearnContentEntry` wrapper (see `content-catalog.ts`) reusing the real, already-production
+ * `ContentEntry` wrapper (see `content-catalog.ts`) reusing the real, already-production
  * citation shape rather than inventing a new one.
  */
 export interface CitationV1 {

@@ -80,7 +80,7 @@ export function activeFilterChips(
     chips.push({
       key: 'era',
       label: filters.era,
-      iconName: 'history',
+      iconName: 'time',
     });
   }
 
@@ -88,7 +88,7 @@ export function activeFilterChips(
     chips.push({
       key: 'theme',
       label: facetDisplayLabel('theme', filters.theme, facetOptions),
-      iconName: 'themes',
+      iconName: 'collection',
     });
   }
 

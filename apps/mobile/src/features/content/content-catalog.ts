@@ -1,5 +1,5 @@
 /**
- * Bundled Learn/More content catalog (MOB-015).
+ * The bundled publication catalog: narrative Stories and the supporting reference pages.
  *
  * Every entry is shaped as a real `ContentPageV1` (content-types.ts) — the same shape
  * `packages/public-contracts/src/v1/content.ts` defines for web's `/stories`, and the shape this
@@ -22,15 +22,40 @@
  */
 import type { CitationV1, ContentPageV1 } from './content-types';
 
-export type LearnCatalogSectionId = 'history' | 'topics' | 'myths' | 'methodology';
-export type MoreCatalogSectionId = 'about' | 'facts' | 'legal' | 'errata';
-export type CatalogSectionId = LearnCatalogSectionId | MoreCatalogSectionId;
+/**
+ * The narrative partition. One id, not three.
+ *
+ * It used to be `history | topics | myths`, which put three parallel content trees in front of a
+ * reader for what is one publication surface. History is an era facet, a topic is a tag, and a
+ * myth correction is an editorial FORMAT — so the distinction that actually matters survives as
+ * {@link ContentEntry.format} rather than as three destinations.
+ */
+export type StoryCatalogSectionId = 'stories';
 
-/** "Privacy" is a More-tab navigation shortcut straight to the `legal/privacy` catalog entry, not
- * its own catalog section — see `sections.ts`'s `MORE_SECTIONS` for the row that resolves it. */
+/** The supporting reference pages. Each is one page, addressed by its own route. */
+export type SupportingCatalogSectionId =
+  | 'about'
+  | 'methodology'
+  | 'errata'
+  | 'privacy'
+  | 'terms';
 
-export interface LearnContentEntry {
+export type CatalogSectionId = StoryCatalogSectionId | SupportingCatalogSectionId;
+
+/**
+ * The editorial format of a narrative piece.
+ *
+ * `myth` is not a section and not a tag: a myth correction has a shape — the claim, why it is
+ * repeated, what the record actually shows, the evidence — and that shape is what a reader is
+ * choosing when they open one. Naming it here is what let the old `/myths` surface be retired
+ * without losing the content or the distinction.
+ */
+export type StoryFormat = 'chapter' | 'entry' | 'myth';
+
+export interface ContentEntry {
   readonly section: CatalogSectionId;
+  /** Present exactly on narrative entries. */
+  readonly format?: StoryFormat;
   readonly page: ContentPageV1;
   /** Local editorial "primary sources" metadata (real `CitationV1` shape, see content-types.ts),
    * NOT a wire field of `ContentPageV1`. */
@@ -44,10 +69,11 @@ export interface LearnContentEntry {
 
 const BUNDLED_CONTENT_VERSION = 'content-v1';
 
-export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
-  // --- History -------------------------------------------------------------------------------
+export const CONTENT_CATALOG: readonly ContentEntry[] = [
+  // --- Stories: chapters -------------------------------------------------------------------------------
   {
-    section: 'history',
+    section: 'stories',
+    format: 'chapter',
     contentVersion: BUNDLED_CONTENT_VERSION,
     page: {
       slug: 'basement-to-m-street',
@@ -75,7 +101,8 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
     },
   },
   {
-    section: 'history',
+    section: 'stories',
+    format: 'chapter',
     contentVersion: BUNDLED_CONTENT_VERSION,
     page: {
       slug: 'naming-dunbar-1916',
@@ -98,7 +125,8 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
 
   // --- Topics (web: /topics permanently redirects to /stories — same content, same catalog) ---
   {
-    section: 'topics',
+    section: 'stories',
+    format: 'entry',
     contentVersion: BUNDLED_CONTENT_VERSION,
     page: {
       slug: 'same-footprint-new-walls',
@@ -119,9 +147,10 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
     },
   },
 
-  // --- Myths -----------------------------------------------------------------------------------
+  // --- Stories: myth corrections -----------------------------------------------------------------------------------
   {
-    section: 'myths',
+    section: 'stories',
+    format: 'myth',
     contentVersion: BUNDLED_CONTENT_VERSION,
     page: {
       slug: 'dunbar-founded-1916',
@@ -149,7 +178,7 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
     contentVersion: BUNDLED_CONTENT_VERSION,
     requiresCitation: true,
     sources: [
-      { source: 'BlackStory', label: 'Full methodology (web)', href: 'https://blackbook.app/methodology' },
+      { source: 'BlackStory', label: 'Full methodology (web)', href: 'https://blackstory.app/methodology' },
     ],
     page: {
       slug: 'overview',
@@ -171,6 +200,12 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
           heading: 'Verification & triangulation',
           paragraphs: [
             'Every published fact passes an independent citation-completeness gate: structured references, supporting excerpts, retrieval dates, and archived captures for web sources. Triangulation means at least two independent lineages before a fact reaches corroborated grade; syndicated copies do not inflate scores.',
+          ],
+        },
+        {
+          heading: 'What a fact carries',
+          paragraphs: [
+            'Every fact on BlackStory carries its own citations and a status: published, corrected, superseded, or deprecated. Open a record to see its full evidence and its revision history. This is the one claim the old Quick facts digest made, and it belongs here, where a reader goes to ask how the archive decides.',
           ],
         },
         {
@@ -219,35 +254,18 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
     },
   },
 
-  // --- Facts (a bounded digest, not the full faceted fact browser — see MOB-015 report) ---------
+  // --- Product policy. Not Law: `/law` is historical statute, this is what the app does. ---
   {
-    section: 'facts',
-    contentVersion: BUNDLED_CONTENT_VERSION,
-    page: {
-      slug: 'quick-facts',
-      title: 'Quick facts',
-      dek: 'A short digest of individually cited facts. Open a record for full evidence and revision history.',
-      publishedAt: '2026-07-01',
-      eraLabel: '',
-      placeLabel: '',
-      relatedEntityIds: ['ent_dunbar_school_001'],
-      relatedFactIds: ['BB-F-000001', 'BB-F-000002', 'BB-F-000003', 'BB-F-000004', 'BB-F-000005'],
-      body: [
-        {
-          paragraphs: [
-            'Every fact on BlackStory carries its own citations and a status: published, corrected, superseded, or deprecated. This digest links to a handful of cited facts related to entries elsewhere in Learn. Open a fact record for its full evidence and revision history.',
-          ],
-        },
-      ],
-    },
-  },
-
-  // --- Legal (privacy + terms) --------------------------------------------------------------------
-  {
-    section: 'legal',
+    section: 'privacy',
     contentVersion: BUNDLED_CONTENT_VERSION,
     requiresCitation: true,
-    sources: [{ source: 'BlackStory', label: 'Full privacy policy (web)', href: 'https://blackbook.app/legal/privacy' }],
+    sources: [
+      {
+        source: 'BlackStory',
+        label: 'Full privacy policy (web)',
+        href: 'https://blackstory.app/privacy',
+      },
+    ],
     page: {
       slug: 'privacy',
       title: 'Privacy',
@@ -274,10 +292,10 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
     },
   },
   {
-    section: 'legal',
+    section: 'terms',
     contentVersion: BUNDLED_CONTENT_VERSION,
     requiresCitation: true,
-    sources: [{ source: 'BlackStory', label: 'Full terms of service (web)', href: 'https://blackbook.app/legal/terms' }],
+    sources: [{ source: 'BlackStory', label: 'Full terms of service (web)', href: 'https://blackstory.app/terms' }],
     page: {
       slug: 'terms',
       title: 'Terms of service',
@@ -328,10 +346,10 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
   },
 ];
 
-export function listCatalogEntries(section: CatalogSectionId): readonly LearnContentEntry[] {
+export function listCatalogEntries(section: CatalogSectionId): readonly ContentEntry[] {
   return CONTENT_CATALOG.filter((entry) => entry.section === section);
 }
 
-export function findCatalogEntry(section: CatalogSectionId, slug: string): LearnContentEntry | undefined {
+export function findCatalogEntry(section: CatalogSectionId, slug: string): ContentEntry | undefined {
   return CONTENT_CATALOG.find((entry) => entry.section === section && entry.page.slug === slug);
 }

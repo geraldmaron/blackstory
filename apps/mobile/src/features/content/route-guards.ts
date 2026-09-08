@@ -1,14 +1,14 @@
 /**
- * Route-parameter validation for `/learn/[section]` and `/learn/[section]/[slug]` (MOB-015).
+ * Route-parameter validation for the content routes: `/stories/[slug]` and the supporting pages.
  *
  * A small, self-contained duplicate of the validation shape `apps/mobile/src/app/_lib/
  * route-params.ts` already establishes for `/entity/[id]` (first-of-array on a possibly-repeated
  * param, bounded length, decode-then-check rather than pattern-match-the-raw-string) — kept local
  * rather than imported so this feature stays self-contained within its exclusive ownership
- * (`apps/mobile/src/features/learn/**`), the same "small enough to duplicate" call this bead's
- * brief makes for the citation link-safety check.
+ * (`apps/mobile/src/features/content/**`), the same "small enough to duplicate" call made for the
+ * citation link-safety check.
  */
-import { ALL_SECTIONS, findSectionRow, type LearnMoreSectionRow } from './sections';
+import { ALL_SECTIONS, findSectionRow, type SectionRow } from './sections';
 import { CONTENT_CATALOG } from './content-catalog';
 
 const MAX_PARAM_LENGTH = 100;
@@ -28,7 +28,7 @@ function safeDecode(value: string): string | null {
 
 /** Validates a `[section]` route param against the known section registry (`sections.ts`). Never
  * returns a raw, un-vetted string — only an actual row from the fixed table, or `undefined`. */
-export function parseSectionParam(raw: unknown): LearnMoreSectionRow | undefined {
+export function parseSectionParam(raw: unknown): SectionRow | undefined {
   const value = firstOf(raw);
   if (typeof value !== 'string' || value.length === 0 || value.length > MAX_PARAM_LENGTH) return undefined;
   const decoded = safeDecode(value);
@@ -39,7 +39,7 @@ export function parseSectionParam(raw: unknown): LearnMoreSectionRow | undefined
 /** Validates a `[slug]` route param: bounded, allowlisted charset, and — critically — must
  * resolve to an actual catalog entry under the given section before it is trusted for a lookup.
  * A malformed/unknown slug returns `undefined` rather than being handed to a catalog query. */
-export function parseSlugParam(raw: unknown, row: LearnMoreSectionRow): string | undefined {
+export function parseSlugParam(raw: unknown, row: SectionRow): string | undefined {
   const value = firstOf(raw);
   if (typeof value !== 'string' || value.length === 0 || value.length > MAX_PARAM_LENGTH) return undefined;
   const decoded = safeDecode(value);

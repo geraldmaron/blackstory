@@ -91,7 +91,7 @@ export function DataScreen() {
               label="Juxtaposition rules"
               variant="ghost"
               density="compact"
-              onPress={() => router.push('/learn/methodology' as never)}
+              onPress={() => router.push('/methodology')}
               accessibilityHint="Opens methodology"
             />
           </View>
@@ -208,7 +208,7 @@ export function DataScreen() {
               summary="How records are researched and verified"
               leading={<NavIcon name="methodology" size={20} />}
               showChevron
-              onPress={() => router.push('/learn/methodology' as never)}
+              onPress={() => router.push('/methodology')}
               accessibilityLabel="Read methodology"
               showDivider
             />

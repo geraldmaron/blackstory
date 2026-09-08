@@ -49,7 +49,7 @@ export function SubmitScreen() {
           <LedgerRow
             title="Submit a correction"
             summary="Report an error or missing citation on a published record"
-            leading={<NavIcon name="corrections" size={20} />}
+            leading={<NavIcon name="correction" size={20} />}
             showChevron
             showDivider={false}
             onPress={() => router.push('/corrections/submit' as never)}

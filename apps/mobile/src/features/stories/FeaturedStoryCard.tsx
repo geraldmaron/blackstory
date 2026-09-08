@@ -5,10 +5,10 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { RecordFactStrip, Text, space, useThemeColors } from '@/ui';
 import { plainRangeText } from '../record-facts/record-facts';
-import type { LearnContentEntry } from './content-catalog';
+import type { ContentEntry } from '@/features/content';
 
 export interface FeaturedStoryCardProps {
-  readonly entry: LearnContentEntry;
+  readonly entry: ContentEntry;
   readonly onPress: () => void;
 }
 

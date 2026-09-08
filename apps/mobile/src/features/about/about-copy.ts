@@ -63,16 +63,17 @@ export const ABOUT_DESTINATIONS = [
     icon: 'explore' as const,
   },
   {
-    href: '/history',
-    label: 'Search',
-    detail: 'Find people, places, and events by name or keyword.',
-    icon: 'search' as const,
+    href: '/records',
+    label: 'Records',
+    detail:
+      'The archive as a list. Browse by era, kind and place, or search by name or keyword.',
+    icon: 'records' as const,
   },
   {
-    href: '/history',
-    label: 'History',
-    detail: 'Follow connections across time and place.',
-    icon: 'history' as const,
+    href: '/stories',
+    label: 'Stories',
+    detail: 'Chapters and shorter entries that name the records they stand on.',
+    icon: 'stories' as const,
   },
   {
     href: '/data',
@@ -84,7 +85,7 @@ export const ABOUT_DESTINATIONS = [
     href: '/law',
     label: 'Law',
     detail: 'Plain-language entry points to landmark civil-rights statutes and decisions.',
-    icon: 'lawRef' as const,
+    icon: 'law' as const,
   },
   {
     href: '/submit',

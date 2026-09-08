@@ -20,6 +20,11 @@
       "types": "./dist/destinations.d.ts",
       "import": "./dist/destinations.js"
     },
+    "./discovery": {
+      "development": "./src/discovery.ts",
+      "types": "./dist/discovery.d.ts",
+      "import": "./dist/discovery.js"
+    },
     "./v1/pagination": {
       "development": "./src/v1/pagination.ts",
       "types": "./dist/v1/pagination.d.ts",
@@ -98,7 +103,7 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "check-boundary": "node scripts/check-boundary.mjs",
-    "test": "node scripts/check-boundary.mjs && node --conditions development --import tsx --test src/version.test.ts src/errors.test.ts src/destinations.test.ts src/v1/pagination.test.ts src/v1/citation.test.ts src/v1/claim.test.ts src/v1/timeline.test.ts src/v1/revision.test.ts src/v1/media.test.ts src/v1/related.test.ts src/v1/entity.test.ts src/v1/map.test.ts src/v1/search.test.ts src/v1/bootstrap.test.ts src/v1/content.test.ts src/v1/corrections.test.ts src/v1/compatibility.test.ts",
+    "test": "node scripts/check-boundary.mjs && node --conditions development --import tsx --test src/version.test.ts src/errors.test.ts src/destinations.test.ts src/discovery.test.ts src/v1/pagination.test.ts src/v1/citation.test.ts src/v1/claim.test.ts src/v1/timeline.test.ts src/v1/revision.test.ts src/v1/media.test.ts src/v1/related.test.ts src/v1/entity.test.ts src/v1/map.test.ts src/v1/search.test.ts src/v1/bootstrap.test.ts src/v1/content.test.ts src/v1/corrections.test.ts src/v1/compatibility.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

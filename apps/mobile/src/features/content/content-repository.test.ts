@@ -35,7 +35,7 @@ function makeRepo(opts: { online: boolean; stamp: string }) {
 describe('content repository — offline cache behavior', () => {
   it('fetches a known page online and reports source "network"', async () => {
     const { repo } = makeRepo({ online: true, stamp: STAMP_A });
-    const result = await repo.getPage('legal', 'privacy');
+    const result = await repo.getPage('privacy', 'privacy');
     expect(result.status).toBe('ok');
     if (result.status === 'ok') {
       expect(result.source).toBe('network');
@@ -46,17 +46,17 @@ describe('content repository — offline cache behavior', () => {
 
   it('returns "not-found" for an unknown slug while online', async () => {
     const { repo } = makeRepo({ online: true, stamp: STAMP_A });
-    const result = await repo.getPage('legal', 'does-not-exist');
+    const result = await repo.getPage('privacy', 'does-not-exist');
     expect(result.status).toBe('not-found');
   });
 
   it('serves cached content offline after a prior online fetch, explicitly labeled degraded (offline legal access)', async () => {
     const { repo, setOnline } = makeRepo({ online: true, stamp: STAMP_A });
-    const online = await repo.getPage('legal', 'privacy');
+    const online = await repo.getPage('privacy', 'privacy');
     expect(online.status).toBe('ok');
 
     setOnline(false);
-    const offline = await repo.getPage('legal', 'privacy');
+    const offline = await repo.getPage('privacy', 'privacy');
     expect(offline.status).toBe('ok');
     if (offline.status === 'ok') {
       expect(offline.source).toBe('cache');
@@ -68,34 +68,34 @@ describe('content repository — offline cache behavior', () => {
 
   it('reports an explicit "offline-miss" rather than a silent failure when nothing is cached yet', async () => {
     const { repo } = makeRepo({ online: false, stamp: STAMP_A });
-    const result = await repo.getPage('legal', 'privacy');
+    const result = await repo.getPage('privacy', 'privacy');
     expect(result.status).toBe('offline-miss');
   });
 
   it('drops a cached row written under a superseded release stamp (ADR-022 §4 global invalidation), reporting offline-miss rather than stale content', async () => {
     const { repo, setOnline, setStamp } = makeRepo({ online: true, stamp: STAMP_A });
-    await repo.getPage('legal', 'privacy'); // cached under STAMP_A
+    await repo.getPage('privacy', 'privacy'); // cached under STAMP_A
 
     setStamp(STAMP_B); // simulate a new release becoming active
     setOnline(false);
-    const result = await repo.getPage('legal', 'privacy');
+    const result = await repo.getPage('privacy', 'privacy');
     // The real release-cache.read() drops rows from a superseded stamp and reports a miss (T5) —
     // this is production behavior, not something this repository re-implements.
     expect(result.status).toBe('offline-miss');
   });
 
-  it('methodology and history pages are independently cache-addressable (no key collision across sections)', async () => {
+  it('methodology and story pages are independently cache-addressable (no key collision across sections)', async () => {
     const { repo, setOnline } = makeRepo({ online: true, stamp: STAMP_A });
     await repo.getPage('methodology', 'overview');
-    await repo.getPage('history', 'basement-to-m-street');
+    await repo.getPage('stories', 'basement-to-m-street');
     setOnline(false);
     const methodology = await repo.getPage('methodology', 'overview');
-    const history = await repo.getPage('history', 'basement-to-m-street');
+    const story = await repo.getPage('stories', 'basement-to-m-street');
     expect(methodology.status).toBe('ok');
-    expect(history.status).toBe('ok');
-    if (methodology.status === 'ok' && history.status === 'ok') {
+    expect(story.status).toBe('ok');
+    if (methodology.status === 'ok' && story.status === 'ok') {
       expect(methodology.value.page.slug).toBe('overview');
-      expect(history.value.page.slug).toBe('basement-to-m-street');
+      expect(story.value.page.slug).toBe('basement-to-m-street');
     }
   });
 });

@@ -72,7 +72,7 @@ export default function FiltersSheet() {
         onFiltersChange={syncLive}
         onClear={clear}
         onDone={done}
-        onOpenPlaceFind={() => router.push('/history')}
+        onOpenPlaceFind={() => router.push('/records')}
         description="Narrow the map and list by kind family and decade. Changes apply right away."
       />
     </ScreenCanvas>

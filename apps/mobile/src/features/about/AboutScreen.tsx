@@ -65,7 +65,7 @@ export function AboutScreen() {
             label="Methodology"
             variant="ghost"
             density="compact"
-            onPress={() => router.push('/learn/methodology' as never)}
+            onPress={() => router.push('/methodology')}
             accessibilityHint="Opens how records are researched"
           />
         </View>
@@ -158,14 +158,14 @@ export function AboutScreen() {
               summary="How records are researched and verified"
               leading={<NavIcon name="methodology" size={20} />}
               showChevron
-              onPress={() => router.push('/learn/methodology' as never)}
+              onPress={() => router.push('/methodology')}
               accessibilityLabel="Read the methodology"
               showDivider
             />
             <LedgerRow
               title="Corrections"
               summary="Challenge a claim that looks wrong"
-              leading={<NavIcon name="corrections" size={20} />}
+              leading={<NavIcon name="correction" size={20} />}
               showChevron
               onPress={() => router.push('/corrections/submit' as never)}
               accessibilityLabel="Corrections"
@@ -176,7 +176,7 @@ export function AboutScreen() {
               summary="Published corrections and change log"
               leading={<NavIcon name="errata" size={20} />}
               showChevron
-              onPress={() => router.push('/learn/errata' as never)}
+              onPress={() => router.push('/errata')}
               accessibilityLabel="Errata"
               showDivider={false}
             />
@@ -224,7 +224,7 @@ export function AboutScreen() {
               label="Read stories"
               variant="ghost"
               density="compact"
-              onPress={() => router.push('/learn' as never)}
+              onPress={() => router.push('/stories')}
               accessibilityHint="Opens the Stories tab"
             />
           </View>

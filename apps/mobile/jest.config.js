@@ -17,6 +17,8 @@ module.exports = {
   moduleNameMapper: {
     '^@repo/public-contracts/version$': path.join(publicContractsSrc, 'version.ts'),
     '^@repo/public-contracts/errors$': path.join(publicContractsSrc, 'errors.ts'),
+    '^@repo/public-contracts/destinations$': path.join(publicContractsSrc, 'destinations.ts'),
+    '^@repo/public-contracts/discovery$': path.join(publicContractsSrc, 'discovery.ts'),
     '^@repo/public-contracts/v1/(.*)$': path.join(publicContractsSrc, 'v1', '$1.ts'),
     // file: linked public-contracts has no nested node_modules in CI; resolve zod from mobile.
     '^zod$': require.resolve('zod'),

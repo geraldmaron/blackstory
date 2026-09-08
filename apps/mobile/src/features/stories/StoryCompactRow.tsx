@@ -3,10 +3,10 @@
  */
 import { LedgerRow, NavIcon } from '@/ui';
 import { plainRangeText } from '../record-facts/record-facts';
-import type { LearnContentEntry } from './content-catalog';
+import type { ContentEntry } from '@/features/content';
 
 export interface StoryCompactRowProps {
-  readonly entry: LearnContentEntry;
+  readonly entry: ContentEntry;
   readonly onPress: () => void;
   readonly showDivider?: boolean;
   readonly indexLabel?: string;

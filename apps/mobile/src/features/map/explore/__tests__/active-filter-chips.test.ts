@@ -30,7 +30,7 @@ describe('activeFilterChips', () => {
     const chips = activeFilterChips({ kind: 'places', era: '1950s' }, FACETS);
     expect(chips).toEqual([
       { key: 'kind', label: 'Places', iconName: 'place' },
-      { key: 'era', label: '1950s', iconName: 'history' },
+      { key: 'era', label: '1950s', iconName: 'time' },
     ]);
     expect(activeFilterCount({ kind: 'places', era: '1950s', tone: 'plantation' })).toBe(3);
   });

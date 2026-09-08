@@ -134,7 +134,7 @@ export function BooksDetailScreen({ slug }: BooksDetailScreenProps) {
                   .filter(Boolean)
                   .join(' · ')}
                 summary={challenge.citation.label}
-                leading={<NavIcon name="lawRef" size={20} />}
+                leading={<NavIcon name="law" size={20} />}
                 showDivider={index < activeChallenges.length - 1}
                 onPress={() => void openHref(challenge.citation.href, challenge.citation.label)}
                 accessibilityLabel={`${challenge.state}. ${challenge.citation.label}. Opens citation.`}
