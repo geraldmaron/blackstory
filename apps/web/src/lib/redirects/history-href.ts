@@ -11,10 +11,9 @@
  * incidental extra key.
  */
 
-import { historyKindToRecordsKind } from '../history/filters';
+import { decadeParamToEra } from '@repo/public-contracts/discovery';
 
-/** `/history` accepts `1930s`; a bare `1930` is the shape people type and bookmark. */
-const DECADE_LABEL_PATTERN = /^(\d{4})s?$/;
+import { historyKindToRecordsKind } from '../history/filters';
 
 export type RawHistoryRedirectParams = Readonly<
   Record<string, string | readonly string[] | undefined>
@@ -27,19 +26,13 @@ function firstValue(raw: string | readonly string[] | undefined): string | undef
 }
 
 /**
- * Normalise a `decade` param to an era bucket label: `1930` and `1930s` both yield `1930s`.
- * Anything else yields undefined, so a junk decade drops out rather than becoming a chip that
- * matches no record.
+ * The decade-to-era transform, from the shared discovery vocabulary.
+ *
+ * Re-exported rather than reimplemented: the native `/history` screen performs the same hop, and
+ * two copies of "what counts as a valid decade" is how a link shared from the phone and the same
+ * link opened on the site end up on different views.
  */
-export function decadeParamToEra(raw: string | undefined): string | undefined {
-  const trimmed = (raw ?? '').trim();
-  if (!trimmed || trimmed === 'all') return undefined;
-  const match = DECADE_LABEL_PATTERN.exec(trimmed);
-  if (!match) return undefined;
-  const startYear = Number.parseInt(match[1]!, 10);
-  if (startYear % 10 !== 0) return undefined;
-  return `${startYear}s`;
-}
+export { decadeParamToEra };
 
 /** Build the one-hop `/records` href for incoming `/history` searchParams. */
 export function mapHistoryQueryToRecordsHref(raw: RawHistoryRedirectParams): string {

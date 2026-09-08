@@ -35,11 +35,12 @@
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
-    "zod": "^3.25.76",
     "@repo/domain": "workspace:*",
     "@repo/observability": "workspace:*",
+    "@repo/public-contracts": "workspace:*",
     "@repo/security": "workspace:*",
-    "@repo/testing": "workspace:*"
+    "@repo/testing": "workspace:*",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@repo/ops-data": "workspace:*",

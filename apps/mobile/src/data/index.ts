@@ -10,6 +10,10 @@
  * barrel does not eagerly load a native module — tests import the specific pure
  * modules directly.
  */
+import { openCache, type OpenCacheResult } from './open-cache';
+import { createSqliteStore } from './db/sqlite-store';
+import { openMobileDatabase, deleteMobileDatabase } from './db/sqlite-database';
+
 export { createTransport, createSupersedingRunner, TransportError, MAX_RESPONSE_BYTES, DEFAULT_RETRY_POLICY, parseRetryAfter } from './transport';
 export type { Transport, ReadResult, ReadOptions, TransportRetryPolicy } from './transport';
 
@@ -52,10 +56,6 @@ export type { SecretStore, SecretKey, SecretBackend } from './secure-store';
 export { createMobileQueryClient, createSqlitePersister, shouldPersistQuery, mobileDehydrateOptions } from './query-client';
 
 export type { BootstrapResponseV1, EntityV1, ReleaseManifestView, ManifestArtifactHashRef } from './contracts';
-
-import { openCache, type OpenCacheResult } from './open-cache';
-import { createSqliteStore } from './db/sqlite-store';
-import { openMobileDatabase, deleteMobileDatabase } from './db/sqlite-database';
 
 /**
  * Opens the real on-disk cache with the full degradation ladder (open-cache.ts).

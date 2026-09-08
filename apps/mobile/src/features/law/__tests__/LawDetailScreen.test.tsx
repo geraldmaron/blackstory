@@ -3,6 +3,8 @@
  */
 import { render } from '@testing-library/react-native';
 
+import { LawDetailScreen } from '../LawDetailScreen';
+
 jest.mock('expo-router', () => ({
   router: {
     push: jest.fn(),
@@ -13,8 +15,6 @@ jest.mock('expo-router', () => ({
 jest.mock('@/features/entity/linking', () => ({
   openExternalLink: jest.fn(async () => 'opened'),
 }));
-
-import { LawDetailScreen } from '../LawDetailScreen';
 
 describe('LawDetailScreen', () => {
   it('renders explainer sections for a known slug', async () => {

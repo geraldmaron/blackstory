@@ -12,9 +12,9 @@ import {
   mapSourceV1Schema,
   type MapFeatureV1,
   type MapSourceV1,
-  type ConfidenceTierV1,
   type GeoPrecisionTierV1,
 } from '@repo/public-contracts/v1/map';
+import { recordConfidenceTier } from '@repo/public-contracts/evidence';
 import type { EntityV1 } from '@repo/public-contracts/v1/entity';
 
 /** Mirrors web `MAP_KIND_ENCODING` shades/glyphs (flat copper family — no heatmap). */
@@ -51,12 +51,11 @@ export function geoPrecisionTierForPublicPrecision(precision: string): GeoPrecis
   }
 }
 
-export function highestConfidence(claims: EntityV1['claims']): ConfidenceTierV1 {
-  if (claims.some((claim) => claim.confidenceLevel === 'high')) return 'high';
-  if (claims.some((claim) => claim.confidenceLevel === 'medium')) return 'medium';
-  if (claims.some((claim) => claim.confidenceLevel === 'low')) return 'low';
-  return 'unrated';
-}
+/**
+ * Re-exported so `/v1/map` grades a record exactly as the site and the phone do. A local copy is
+ * what let the wire drift from the surfaces that read it.
+ */
+export { recordConfidenceTier } from '@repo/public-contracts/evidence';
 
 function encodingFor(kind: string): { shade: string; glyph: string } {
   return KIND_ENCODING[kind] ?? DEFAULT_ENCODING;
@@ -132,7 +131,7 @@ export function buildMapSourceV1(
         ...(entity.status !== undefined ? { status: entity.status } : {}),
         notabilityLabels: [...(entity.notabilityLabels ?? [])],
         evidenceCount: entity.claims.length,
-        confidenceTier: highestConfidence(entity.claims),
+        confidenceTier: recordConfidenceTier(entity.claims),
         topicTags: [...entity.topicTags],
         ...(entity.topicIds !== undefined ? { topicIds: [...entity.topicIds] } : {}),
         shade: encoding.shade,

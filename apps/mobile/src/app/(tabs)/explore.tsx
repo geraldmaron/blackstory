@@ -39,7 +39,7 @@ export default function ExploreScreen() {
       filters={filters}
       selectedParam={rawParams.selected}
       onOpenEntity={(id) => router.push({ pathname: '/entity/[id]', params: { id } })}
-      onOpenSearch={() => router.push('/history')}
+      onOpenSearch={() => router.push('/records')}
       onSelectionChange={(entityId) => {
         if (entityId) {
           router.setParams({ selected: entityId });

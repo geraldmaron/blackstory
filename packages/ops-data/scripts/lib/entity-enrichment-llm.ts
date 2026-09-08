@@ -146,27 +146,52 @@ export const ENTITY_ENRICHMENT_RESPONSE_SCHEMA = {
   },
 } as const;
 
-export const ENTITY_ENRICHMENT_SYSTEM_PROMPT =
-  'You write short factual entries for a Black history catalog, using ONLY the evidence documents ' +
-  'supplied in the user message. State only facts present in that evidence. Every sentence of fact ' +
-  'in "summary" and "historicalContext" must be traceable to at least one citation whose quote is ' +
-  "copied verbatim from a supplied evidence document's text. Never invent dates, names, events, or " +
-  'quotes not present in the evidence. If the evidence does not support a historicalContext ' +
-  'paragraph beyond the summary, return null for it and an empty citations array rather than padding ' +
-  'with generic prose. What an entry is FOR is significance: who the subject mattered to, what ' +
-  'happened there, which people, congregations, schools, businesses, or movements it served, and ' +
-  'why it is recognized as Black heritage. It is NOT a description of physical fabric. National ' +
-  'Register nominations spend most of their length on materials, plan, dimensions, and style; treat ' +
-  'that as background and draw on it only where the fabric carries the significance itself — a ' +
-  'building designed or built by Black architects or craftsmen, a form that records how the space ' +
-  'was actually used. Open the summary on significance, never on construction description. If the ' +
-  'supplied evidence establishes nothing about Black history beyond the bare fact of listing, write ' +
-  'only what the evidence supports and return null for historicalContext: a short honest entry is ' +
-  'correct, a padded architectural one is not. ' +
-  'Privacy: never state a street address, house number, coordinate pair, or ' +
-  'other parcel-precise location in any output field — for people (living or possibly living) and ' +
-  'address-restricted places this is a hard safety rule, and neighborhood- or city-level wording is ' +
-  'always sufficient. Return JSON only.';
+/**
+ * The standing contract for the drafter: what to write from, what an entry is for, and what it
+ * must never do. Subject-specific constraints live in the user prompt, next to the evidence.
+ *
+ * Written as labelled sections rather than one paragraph. It was a single ~350-word run-on
+ * string in which the grounding rules, the editorial brief, the thin-evidence protocol and the
+ * privacy rule ran together with no separation — the hardest constraints buried mid-sentence
+ * between advice about architectural style. Sections do not change a single rule; they make each
+ * one findable, and they let the trust-critical ones lead.
+ */
+export const ENTITY_ENRICHMENT_SYSTEM_PROMPT = [
+  'You write short factual entries for a Black history catalog.',
+
+  'GROUNDING. These are absolute.\n' +
+    '1. Use ONLY the evidence documents supplied in the user message, and state only facts ' +
+    'present in that evidence.\n' +
+    '2. Every sentence of fact in "summary" and "historicalContext" must be traceable to at ' +
+    "least one citation whose quote is copied verbatim from a supplied evidence document's " +
+    'text.\n' +
+    '3. Never invent dates, names, events, or quotes that are not present in the evidence.',
+
+  'WHAT AN ENTRY IS FOR. Significance, not fabric.\n' +
+    'An entry says who the subject mattered to, what happened there, which people, ' +
+    'congregations, schools, businesses, or movements it served, and why it is recognized as ' +
+    'Black heritage. It is NOT a description of physical fabric, and the summary opens on ' +
+    'significance, never on construction description.\n' +
+    'National Register nominations spend most of their length on materials, plan, dimensions ' +
+    'and style. Treat that as background, and draw on it only where the fabric carries the ' +
+    'significance itself — a building designed or built by Black architects or craftsmen, a ' +
+    'form that records how the space was actually used.',
+
+  'WHEN THE EVIDENCE IS THIN. Say less; never pad.\n' +
+    'If the evidence does not support a historicalContext paragraph beyond the summary, return ' +
+    'null for "historicalContext" and an empty "historicalContextCitations" array rather than ' +
+    'padding with generic prose. If the supplied evidence establishes nothing about Black ' +
+    'history beyond the bare fact of listing, write only what the evidence supports and return ' +
+    'null for "historicalContext". A short honest entry is correct; a padded architectural one ' +
+    'is not.',
+
+  'PRIVACY. A hard safety rule.\n' +
+    'Never state a street address, house number, coordinate pair, or other parcel-precise ' +
+    'location in any output field. This binds for people (living or possibly living) and for ' +
+    'address-restricted places. Neighborhood- or city-level wording is always sufficient.',
+
+  'OUTPUT. Return JSON only.',
+].join('\n\n');
 
 export function buildEnrichmentUserPrompt(
   subject: EnrichmentSubject,
@@ -208,7 +233,6 @@ export function buildEnrichmentUserPrompt(
           'classification means in plain words ("recognized for its Black heritage") or leave it out',
         'topicIds must only use ids from allowedTopicIds; omit if none clearly apply',
         'eraBuckets must be decade labels ("1950s") grounded in a year present in the evidence',
-        'if evidence is too thin for historicalContext, set it to null and historicalContextCitations to []',
         ...(addressGuardApplies(subject)
           ? [
               'PRIVACY (hard rule for this subject): never state a street address, house number, ' +

@@ -7,6 +7,8 @@ import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
+import { primaryNavDestinations } from '../../lib/nav/destination-registry';
+
 const here = dirname(fileURLToPath(import.meta.url));
 
 test('the phone bar keeps Rooms on the first row instead of clipping it', () => {
@@ -26,14 +28,35 @@ test('the phone bar keeps Rooms on the first row instead of clipping it', () => 
   assert.match(block, /height:\s*auto/);
 });
 
-test('reading bars keep Door, Explore, and Records in Find; Explore bars keep a Door exit', () => {
+test('the bar renders the product axes and never a hand-written list', () => {
   const source = readFileSync(join(here, 'CommandBar.tsx'), 'utf8');
-  assert.match(source, /href="\/explore"/);
-  assert.match(source, /href="\/records"/);
-  assert.match(source, /href="\/"/);
-  assert.match(source, /\n\s*Door\n/);
-  assert.match(source, /\n\s*Explore\n/);
+  // Derived, not authored. This bar was the last hand-kept nav on the site, and what it left out
+  // was Stories — one of the four ways into the product — reachable only through Rooms.
+  assert.match(source, /primaryNavDestinations/);
   assert.match(source, /aria-label="Find"/);
+  assert.match(source, /<RoomsMenu \/>/);
+  // Home is the brand lockup, not a nav item beside Explore.
+  assert.match(source, /ds-bar__brand[\s\S]*href="\/"/);
+  assert.doesNotMatch(source, /\n\s*Door\n/);
   assert.doesNotMatch(source, />\s*Journey\s*</);
   assert.doesNotMatch(source, /onModeChange!\('story'\)/);
+  // A literal axis href inside the nav is a second registry waiting to drift from the first.
+  // Scoped to the nav element: the no-JS search fallback legitimately links `/records` as the
+  // place a reader searches when the combobox cannot mount.
+  const navStart = source.indexOf('aria-label="Find"');
+  const nav = source.slice(navStart, source.indexOf('</nav>', navStart));
+  for (const axis of ['/explore', '/stories', '/records']) {
+    assert.doesNotMatch(
+      nav,
+      new RegExp(`href="${axis}"`),
+      `${axis} must come from the registry, not a literal`,
+    );
+  }
+});
+
+test('the bar names exactly the four axes, in product order', () => {
+  assert.deepEqual(
+    primaryNavDestinations().map((axis) => axis.label),
+    ['Explore', 'Stories', 'Records', 'Rooms'],
+  );
 });

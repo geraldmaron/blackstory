@@ -4,7 +4,7 @@
  */
 import type { RecordAnatomyPlace } from '../../../components/patterns/RecordAnatomyPanel';
 import type { PublicEntityView } from '../../../data/public-seed';
-import { highestConfidence } from '../../../lib/map-experience/build-explore-map-source';
+import { recordConfidenceTier } from '../../../lib/map-experience/build-explore-map-source';
 import { entityEraFact } from '../../../lib/map-experience/entity-era-facts';
 import { displayEncodingFor } from '../../../lib/map-experience/kind-encoding';
 import {
@@ -81,7 +81,7 @@ export function buildEntityAnatomyInputs(
     ...(entity.statusHistory !== undefined ? { statusHistory: entity.statusHistory } : {}),
     claims: entity.claims,
   });
-  const evidenceTier = highestConfidence(entity.claims);
+  const evidenceTier = recordConfidenceTier(entity.claims);
   const claimCount = entity.claims.length;
   const grade = CONFIDENCE_GRADE[evidenceTier];
   const evidenceLabel =

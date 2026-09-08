@@ -266,6 +266,9 @@ importers:
       '@repo/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@repo/public-contracts':
+        specifier: workspace:*
+        version: link:../../packages/public-contracts
       '@repo/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -333,6 +336,9 @@ importers:
       '@repo/observability':
         specifier: workspace:*
         version: link:../observability
+      '@repo/public-contracts':
+        specifier: workspace:*
+        version: link:../public-contracts
       '@repo/security':
         specifier: workspace:*
         version: link:../security

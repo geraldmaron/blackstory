@@ -19,6 +19,7 @@
     "@fortawesome/react-fontawesome": "^3.5.0",
     "@repo/config": "workspace:*",
     "@repo/domain": "workspace:*",
+    "@repo/public-contracts": "workspace:*",
     "@repo/schemas": "workspace:*",
     "@repo/security": "workspace:*",
     "@repo/ui": "workspace:*",

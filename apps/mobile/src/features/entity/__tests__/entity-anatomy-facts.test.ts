@@ -14,7 +14,9 @@ describe('buildEntityAnatomyInputs', () => {
     const entity = normalizeEntity(fullEntityFixture('place'))!;
     const inputs = buildEntityAnatomyInputs(entity);
     expect(inputs.eraLabel).toBe('Reconstruction');
-    expect(inputs.evidenceLabel).toMatch(/Grade A · \d+ sources/);
+    // Every claim in the full fixture cites BASE_CITATION, so the record rests on one lineage
+    // and cannot be grade A however its claims are graded — see `recordConfidenceTier`.
+    expect(inputs.evidenceLabel).toMatch(/Grade B · \d+ sources/);
     expect(inputs.whereLabel).toBe('Dunbar County, GA');
   });
 
@@ -43,10 +45,13 @@ describe('buildEntityAnatomyInputs', () => {
     expect(buildEntityAnatomyInputs(entity).whereLabel).toBe('Historic Dunbar neighborhood');
   });
 
-  it('shows Grade only when there are zero claims', () => {
+  it('names the grade and no count when there are zero claims', () => {
     const raw = { ...fullEntityFixture('place'), claims: [] };
     const entity = normalizeEntity(raw)!;
-    expect(buildEntityAnatomyInputs(entity).evidenceLabel).toBe('Unrated');
+    // "Not graded", the shared vocabulary's word, replaces this module's own "Unrated" — the
+    // record page and the site now read the same tier the same way. And no "· 0 sources": that
+    // would be a count of something the reader can go and fail to find.
+    expect(buildEntityAnatomyInputs(entity).evidenceLabel).toBe('Not graded');
   });
 });
 

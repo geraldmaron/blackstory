@@ -58,7 +58,7 @@ stale native directory is never a source of truth.
 
 `expo prebuild` bakes `PRODUCT_BUNDLE_IDENTIFIER` into the generated Xcode project. Changing
 `APP_VARIANT` in `.env.local` afterwards does **not** rewrite it, so a directory prebuilt under
-`preview` keeps `app.blackbook.mobile.preview` even when `.env.local` reads `development`.
+`preview` keeps `app.blackstory.mobile.preview` even when `.env.local` reads `development`.
 
 `scripts/mobile-ios-release.sh` handles this deliberately: `prebuilt_bundle_id()` reads the
 baked identifier out of `ios/*.xcodeproj/project.pbxproj` and prefers it over the
@@ -99,7 +99,7 @@ npx expo run:ios
 npx expo start --dev-client
 ```
 
-Launch **BlackStory (Dev)** (`app.blackbook.mobile.dev`) from the Simulator home screen or
+Launch **BlackStory (Dev)** (`app.blackstory.mobile.dev`) from the Simulator home screen or
 Xcode — not Expo Go. RN Firebase / App Check is not in this app; `USE_FRAMEWORKS=static`
 is only for MapLibre.
 
@@ -212,7 +212,7 @@ Dev). That service reads `bb_public.*` when
 | **Web Explore** | Server-side Postgres in Next.js — unrelated to mobile’s API host. |
 
 **Defaults:** `app.config.ts` and preview/production `eas.json` bake
-`https://api.blackbook.app`. Development EAS profile leaves `API_BASE_URL`
+`https://api.blackstory.app`. Development EAS profile leaves `API_BASE_URL`
 unset, so local `expo start` uses that same default. As of 2026-07-22 that
 host is **NXDOMAIN** and Cloud Run has no `black-book-api-public` service —
 bootstrap/search/entity/map fail with network errors (logged in Metro); Explore

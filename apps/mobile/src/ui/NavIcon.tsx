@@ -1,6 +1,10 @@
 /**
  * Brand navigation glyphs for tabs and menu rows — Ionicons at a fixed 22dp box with copper
- * accent when selected. Replaces broken placeholder triangles from unset tabBarIcon slots.
+ * accent when selected.
+ *
+ * The names here are the SEMANTIC ids from `@repo/public-contracts/destinations`, and this file
+ * is the only place in the native app allowed to know an Ionicon name. Web maps the same ids to
+ * its own glyphs, so the two surfaces cannot end up drawing different pictures for one idea.
  */
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
@@ -9,24 +13,28 @@ import { useThemeColors } from './tokens';
 
 export type NavIconName =
   | 'explore'
-  | 'search'
-  | 'history'
   | 'stories'
+  | 'records'
+  | 'rooms'
   | 'more'
+  | 'search'
   | 'about'
-  | 'facts'
-  | 'legal'
+  | 'questions'
   | 'privacy'
   | 'errata'
-  | 'myths'
   | 'methodology'
-  | 'corrections'
+  | 'correction'
   | 'data'
   | 'books'
-  | 'themes'
-  | 'lawRef'
+  | 'collection'
   | 'submit'
+  | 'support'
   | 'memorial'
+  | 'time'
+  | 'evidence'
+  | 'source'
+  | 'design'
+  | 'home'
   | 'story'
   | 'place'
   | 'school'
@@ -45,24 +53,28 @@ type IonName = keyof typeof Ionicons.glyphMap;
 
 const OUTLINE: Record<NavIconName, IonName> = {
   explore: 'map-outline',
-  search: 'search-outline',
-  history: 'time-outline',
   stories: 'book-outline',
+  records: 'list-outline',
+  rooms: 'grid-outline',
   more: 'ellipsis-horizontal',
+  search: 'search-outline',
   about: 'information-circle-outline',
-  facts: 'list-outline',
-  legal: 'document-text-outline',
+  questions: 'help-circle-outline',
   privacy: 'shield-checkmark-outline',
   errata: 'create-outline',
-  myths: 'help-circle-outline',
   methodology: 'flask-outline',
-  corrections: 'chatbox-ellipses-outline',
+  correction: 'chatbox-ellipses-outline',
   data: 'bar-chart-outline',
   books: 'library-outline',
-  themes: 'layers-outline',
-  lawRef: 'scale-outline',
+  collection: 'layers-outline',
   submit: 'send-outline',
+  support: 'heart-outline',
   memorial: 'flower-outline',
+  time: 'time-outline',
+  evidence: 'shield-outline',
+  source: 'link-outline',
+  design: 'color-palette-outline',
+  home: 'home-outline',
   story: 'newspaper-outline',
   place: 'location-outline',
   school: 'school-outline',
@@ -80,10 +92,10 @@ const OUTLINE: Record<NavIconName, IonName> = {
 
 const FILLED: Partial<Record<NavIconName, IonName>> = {
   explore: 'map',
-  search: 'search',
-  history: 'time',
   stories: 'book',
+  records: 'list',
   more: 'ellipsis-horizontal',
+  search: 'search',
 };
 
 export type NavIconProps = {

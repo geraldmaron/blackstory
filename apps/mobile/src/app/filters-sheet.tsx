@@ -21,7 +21,7 @@ import { buildExploreFacetOptions } from '@/features/explore/explore-filter';
 import {
   ExploreFiltersPanel,
   filterStateFromPanel,
-} from '@/features/map/explore/ExploreFiltersPanel';
+} from '@/features/explore/ExploreFiltersPanel';
 
 export default function FiltersSheet() {
   const rawParams = useLocalSearchParams();
@@ -72,7 +72,7 @@ export default function FiltersSheet() {
         onFiltersChange={syncLive}
         onClear={clear}
         onDone={done}
-        onOpenPlaceFind={() => router.push('/history')}
+        onOpenPlaceFind={() => router.push('/records')}
         description="Narrow the map and list by kind family and decade. Changes apply right away."
       />
     </ScreenCanvas>

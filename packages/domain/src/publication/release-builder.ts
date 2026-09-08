@@ -275,16 +275,50 @@ export type ReleaseEntityProjectionFields = {
 export type ReleaseConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
 
 /**
- * Max claim confidence for search_index / Records evidence floors.
- * Matches Atlas `highestConfidence`: one high claim is A-band even when other claims are low.
+ * The lineage a citation belongs to, for corroboration counting. One publisher spelled several
+ * ways (`wikipedia_api`, `en.wikipedia.org`) is one lineage, not several.
+ */
+function claimLineageKey(citationSource: string | undefined): string | null {
+  const raw = (citationSource ?? '').trim().toLowerCase();
+  if (raw.length === 0) return null;
+  if (raw.includes('wikipedia')) return 'wikipedia';
+  return raw.replace(/^(?:www|en|en\.m|m)\./u, '');
+}
+
+/**
+ * Record confidence for the search_index facet that Records reads its evidence floors from.
+ *
+ * The strongest claim on the record, capped by corroboration: a record cited to a single lineage
+ * cannot reach the top tier, however authoritative that lineage is. It used to be the bare
+ * maximum, which published 4,152 of 4,167 records at the top grade and made the reader-facing
+ * meter meaningless.
+ *
+ * This deliberately restates `recordConfidenceTier` from `@repo/public-contracts/evidence`
+ * rather than importing it: `@repo/domain` takes no dependency on the public contracts package,
+ * the same client/server boundary `mobile-bootstrap.ts` documents. The two must agree — the
+ * facet written here and the tier computed at read time grade the same records, and Records
+ * prefers this facet when the search index carries it, so a drift between them shows up as
+ * Records and Explore disagreeing about the same record.
  */
 export function highestClaimConfidenceTier(
-  claims: readonly { readonly confidenceLevel?: string }[],
+  claims: readonly { readonly confidenceLevel?: string; readonly citationSource?: string }[],
 ): ReleaseConfidenceTier {
-  if (claims.some((claim) => claim.confidenceLevel === 'high')) return 'high';
-  if (claims.some((claim) => claim.confidenceLevel === 'medium')) return 'medium';
-  if (claims.some((claim) => claim.confidenceLevel === 'low')) return 'low';
-  return 'unrated';
+  const strongest: ReleaseConfidenceTier = claims.some((claim) => claim.confidenceLevel === 'high')
+    ? 'high'
+    : claims.some((claim) => claim.confidenceLevel === 'medium')
+      ? 'medium'
+      : claims.some((claim) => claim.confidenceLevel === 'low')
+        ? 'low'
+        : 'unrated';
+  if (strongest === 'unrated') return 'unrated';
+  const lineages = new Set<string>();
+  for (const claim of claims) {
+    const key = claimLineageKey(claim.citationSource);
+    if (key !== null) lineages.add(key);
+  }
+  if (lineages.size === 0) return 'unrated';
+  if (lineages.size > 1) return strongest;
+  return strongest === 'high' ? 'medium' : 'low';
 }
 
 export type ReleaseSearchIndexFields = {

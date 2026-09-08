@@ -17,11 +17,11 @@ jest.mock('../tokens', () => {
 describe('ScreenHeader', () => {
   it('renders kicker, title, and dek', async () => {
     const { getByText } = await render(
-      <ScreenHeader kicker="Find in time" title="History" dek="Search records by keyword." />,
+      <ScreenHeader kicker="The archive" title="Records" dek="Search records by keyword." />,
     );
 
-    expect(getByText('Find in time')).toBeTruthy();
-    expect(getByText('History')).toBeTruthy();
+    expect(getByText("The archive")).toBeTruthy();
+    expect(getByText("Records")).toBeTruthy();
     expect(getByText('Search records by keyword.')).toBeTruthy();
   });
 
@@ -33,13 +33,13 @@ describe('ScreenHeader', () => {
   it('renders dense titles at Ledger masthead scale with trailing actions', async () => {
     const { getByText, getByLabelText } = await render(
       <ScreenHeader
-        kicker="Find in time"
-        title="History"
+        kicker="The archive"
+        title="Records"
         trailing={<Text accessibilityLabel="Developer menu">Dev</Text>}
       />,
     );
 
-    expect(getByText('History')).toBeTruthy();
+    expect(getByText("Records")).toBeTruthy();
     expect(getByLabelText('Developer menu')).toBeTruthy();
   });
 

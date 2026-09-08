@@ -32,7 +32,8 @@ describe('AnatomySection', () => {
     expect(getByText('Evidence')).toBeTruthy();
     expect(getByText('Place')).toBeTruthy();
     expect(getByText('Reconstruction')).toBeTruthy();
-    expect(getByText(/Grade A · 2 sources/)).toBeTruthy();
+    // One citation source across both claims: uncorroborated, so grade B, not A.
+    expect(getByText(/Grade B · 2 sources/)).toBeTruthy();
   });
 
   it('shows Place not pinned when geo is absent', async () => {
@@ -65,5 +66,17 @@ describe('AnatomySection', () => {
     expect(getAllByLabelText(/Open Historic Dunbar neighborhood in Maps/).length).toBeGreaterThan(0);
     fireEvent.press(getByLabelText(/View Full Fixture Record \(place\) on the national map/));
     expect(onBackToMap).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('AnatomySection evidence', () => {
+  it('draws the shared meter beside the grade, and prints the letter once', async () => {
+    const entity = normalizeEntity(fullEntityFixture('place'))!;
+    const { getByTestId, getByText } = await render(<AnatomySection entity={entity} />);
+    expect(
+      getByTestId('entity-anatomy-evidence-meter', { includeHiddenElements: true }),
+    ).toBeTruthy();
+    // The row's own value carries the grade; the meter beside it must not repeat the letter.
+    expect(getByText(/^Grade [ABC] · \d+ sources?$|^Not graded$/)).toBeTruthy();
   });
 });

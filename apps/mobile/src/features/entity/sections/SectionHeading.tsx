@@ -2,8 +2,14 @@
  * Section heading with an explicit, testable heading LEVEL (1 = screen title, 2 = major
  * section, 3 = a nested sub-section within one).
  *
- * Ledger Line scale: level 1 = 17 Inter Medium entityTitle; level 2 = 13 rowTitle;
- * level 3 = caption.
+ * Scale: level 1 = 26 title, level 2 = 20 subtitle, level 3 = 13 rowTitle, over a 17 editorial
+ * body. It used to be 17 / 13 / 12 over that same 17 body, which put every section heading BELOW
+ * its own prose in size — a heading smaller than the paragraph it introduces reads as a stray
+ * label, not as structure, and the record's own name read at the same size as its summary.
+ *
+ * `fieldLabel` is the label-over-value presentation: a beat whose heading names a field
+ * (a claim's predicate, a provenance key) sets its heading in the same uppercase caption the
+ * anatomy facts use, so one rhythm covers every label on the page.
  *
  * WHY A CUSTOM LEVEL, NOT A NATIVE ONE: this Expo/React Native SDK (56) exposes no
  * cross-platform "heading level" accessibility prop (unlike web's `<h1>`–`<h6>` or ARIA
@@ -17,25 +23,49 @@
  * authoring structure is sound, not that iOS/Android surface a level number (they do not, on
  * this SDK).
  */
+import { StyleSheet } from 'react-native';
+
 import { Text, type TextRole } from '@/ui';
 
 export type SectionHeadingLevel = 1 | 2 | 3;
 
 export type SectionHeadingProps = {
   readonly level: SectionHeadingLevel;
+  /** Set the heading as a field label rather than a section title. */
+  readonly fieldLabel?: boolean;
   readonly children: string;
 };
 
 const VARIANT_BY_LEVEL: Record<SectionHeadingLevel, TextRole> = {
-  1: 'entityTitle',
-  2: 'rowTitle',
-  3: 'caption',
+  1: 'title',
+  2: 'subtitle',
+  3: 'rowTitle',
 };
 
-export function SectionHeading({ level, children }: SectionHeadingProps) {
+export function SectionHeading({ level, fieldLabel = false, children }: SectionHeadingProps) {
+  if (fieldLabel) {
+    return (
+      <Text
+        variant="caption"
+        colorRole="inkSubtle"
+        isHeading
+        style={styles.fieldLabel}
+        testID={`heading-level-${level}`}
+      >
+        {children}
+      </Text>
+    );
+  }
   return (
     <Text variant={VARIANT_BY_LEVEL[level]} isHeading testID={`heading-level-${level}`}>
       {children}
     </Text>
   );
 }
+
+const styles = StyleSheet.create({
+  fieldLabel: {
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+});

@@ -25,6 +25,8 @@
  * instead of hand-mirroring it.
  */
 
+import { decadeParamToEra as sharedDecadeParamToEra } from '@repo/public-contracts/discovery';
+
 import {
   MOBILE_LEGACY_SEARCH_ROUTE,
   MOBILE_TAB_ROOTS,
@@ -512,4 +514,16 @@ export function parseRestoredRoute(persisted: unknown): RestoredRoute {
   if (!isSafeInternalPath(candidate)) return SAFE_DEFAULT_ROUTE;
 
   return { pathname: normalizeMobileTabRoot(candidate) };
+}
+
+/**
+ * The decade-to-era transform a legacy `/history` deep link carries across the hop to Records.
+ *
+ * The shared implementation lives in `@repo/public-contracts/discovery`, so the phone and the
+ * site agree on what a valid decade is. This wrapper only unwraps Expo Router's
+ * `string | string[]` param shape.
+ */
+export function decadeParamToEra(raw: string | readonly string[] | undefined): string | undefined {
+  const first = Array.isArray(raw) ? raw[0] : raw;
+  return sharedDecadeParamToEra(typeof first === 'string' ? first : undefined);
 }

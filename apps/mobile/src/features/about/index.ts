@@ -1,5 +1,5 @@
 /**
- * About feature barrel — native storytelling screen for `/learn/about`.
+ * About feature barrel — native storytelling screen for `/about`.
  */
 export { AboutScreen } from './AboutScreen';
 export {

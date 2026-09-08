@@ -13,7 +13,10 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   width: var(--ds-results-w);
-  /* The right column's floor, not the shared one: the camera console sits under this rail. */
+  /* The right column's floor, not the shared one: the camera console sits under this rail.
+     The value is measured from the console itself (`syncCameraConsoleClearance` in
+     CameraConsole.tsx) — the console's height moves with its content, so a constant here was
+     wrong in both directions. tokens.css holds the first-paint default. */
   max-height: calc(100dvh - var(--ds-atlas-top) - var(--ds-atlas-bottom-right));
   /* One panel recipe shared by all four Explore instruments — see lens-panel.css. */
   background: var(--ds-surface);

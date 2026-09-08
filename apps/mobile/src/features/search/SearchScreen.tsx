@@ -1,7 +1,8 @@
 /**
- * History / find-in-time screen (MOB-013). Tab route at `(tabs)/history`; legacy `/search`
- * redirects here. Ledger Line: dense masthead, search + chips + results on canvas
- * with hairline section labels — no nested LiftedSurface / indexed panels.
+ * The archive as a findable list (MOB-013) — the Records tab, and the phone's home for search.
+ * The legacy `/search` and `/history` routes redirect here, carrying `q`, `kind` and `era`.
+ * Ledger Line: dense masthead, search + chips + results on canvas with hairline section
+ * labels — no nested LiftedSurface / indexed panels.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -32,7 +33,7 @@ import { ScreenHeader } from '@/ui/ScreenHeader';
 import { Text } from '@/ui/Text';
 import { MIN_TOUCH_TARGET, radius, space, typeScale, useScreenScrollInsets, useThemeColors } from '@/ui';
 import { parseEntityId } from '@/lib/route-params';
-import { BrowseCategoryList } from './BrowseCategoryList';
+import { BrowseCategoryList, showCategoryOnMap } from './BrowseCategoryList';
 import { useSearch } from './useSearch';
 import { MAX_RAW_INPUT_LENGTH, MIN_QUERY_LENGTH } from './query-normalization';
 import { SearchResultCard, toSearchResultCardProps } from './SearchResultCard';
@@ -47,6 +48,11 @@ export interface SearchScreenProps {
   /** Live map feature count for the active release (geo-anchored records). */
   readonly pinnedRecordCount?: number;
   readonly archiveScopeLabel?: string;
+}
+
+/** One address key for both directions of the param sync, so an echo compares equal to itself. */
+function paramsKey(query: string | undefined, kind: string | undefined): string {
+  return `${query ?? ''}${kind ?? ''}`;
 }
 
 function formatRelativeTime(fetchedAt: number, now: number): string {
@@ -91,11 +97,31 @@ export function SearchScreen({
   const lastParamsRef = useRef<string | null>(null);
   useEffect(() => {
     if (state.kind === 'browse') return;
-    const key = `${settledQuery ?? ''}${settledKind ?? ''}`;
+    const key = paramsKey(settledQuery, settledKind);
     if (lastParamsRef.current === key) return;
     lastParamsRef.current = key;
     router.setParams({ q: settledQuery, ...(settledKind ? { kind: settledKind } : {}) });
   }, [state.kind, settledQuery, settledKind]);
+
+  // The reverse direction. `initialQuery` / `initialKind` seed state at mount only, and a deep
+  // link can land on a Records tab that is already mounted — which is exactly what the `/search`
+  // and `/history` redirects do. Without this the link arrives, the tab shows, and the reader's
+  // query is gone: the failure those redirects exist to prevent.
+  //
+  // Two changes must NOT re-seed. The echo written just above is this screen's own address
+  // update, and adopting it would revert a reader who has kept typing since the query settled;
+  // `lastParamsRef` identifies it. An absent param is a plain tab press, and clearing the field
+  // on one would lose work the reader can see.
+  const incomingParamsKey = paramsKey(initialQuery, initialKind);
+  const lastIncomingParamsRef = useRef(incomingParamsKey);
+  useEffect(() => {
+    if (incomingParamsKey.length === 0) return;
+    if (incomingParamsKey === lastIncomingParamsRef.current) return;
+    lastIncomingParamsRef.current = incomingParamsKey;
+    if (incomingParamsKey === lastParamsRef.current) return;
+    setDraft(initialQuery ?? '');
+    setFilterKind(initialKind);
+  }, [incomingParamsKey, initialQuery, initialKind, setDraft, setFilterKind]);
 
   const [now] = useState(() => Date.now());
 
@@ -150,9 +176,9 @@ export function SearchScreen({
       >
         <ApiStatusBanner compact />
         <ScreenHeader
-          kicker="Find in time"
-          title="History"
-          dek="Names, places, and events. Filter by kind, then open a pin or show it on the map."
+          kicker="The archive"
+          title="Records"
+          dek="Every documented person, place, event and institution. Browse by kind, or search by name."
           compact
           dense
           trailing={typeof __DEV__ !== 'undefined' && __DEV__ ? <DevMenuHeaderButton /> : undefined}
@@ -211,6 +237,7 @@ export function SearchScreen({
             recentSearches={recentSearches}
             pinnedRecordCount={pinnedRecordCount}
             archiveScopeLabel={archiveScopeLabel}
+            onSelectCategory={setFilterKind}
             onSelectRecent={selectRecentSearch}
             onRemoveRecent={removeRecentSearch}
             onClearRecent={clearRecentSearches}
@@ -261,6 +288,15 @@ export function SearchScreen({
             <LedgerSectionLabel ruleAbove meta={`${cardData.length} shown`}>
               Results
             </LedgerSectionLabel>
+            {filterKind ? (
+              <Button
+                label="Show these on the map"
+                variant="ghost"
+                density="compact"
+                onPress={() => showCategoryOnMap(filterKind)}
+                accessibilityHint="Opens Explore with this kind filter applied"
+              />
+            ) : null}
             {state.freshness.degraded ? (
               <Notice
                 tone="info"
@@ -375,6 +411,7 @@ function BrowseModePanels({
   recentSearches,
   pinnedRecordCount,
   archiveScopeLabel,
+  onSelectCategory,
   onSelectRecent,
   onRemoveRecent,
   onClearRecent,
@@ -383,6 +420,7 @@ function BrowseModePanels({
   recentSearches: readonly { readonly term: string; readonly savedAt: number }[];
   pinnedRecordCount?: number;
   archiveScopeLabel: string;
+  onSelectCategory: (kind: string) => void;
   onSelectRecent: (term: string) => void;
   onRemoveRecent: (term: string) => void;
   onClearRecent: () => void;
@@ -407,7 +445,7 @@ function BrowseModePanels({
             Keep typing to search ({MIN_QUERY_LENGTH}+ characters).
           </Text>
         ) : null}
-        <BrowseCategoryList categories={BROWSE_CATEGORIES} />
+        <BrowseCategoryList categories={BROWSE_CATEGORIES} onSelectCategory={onSelectCategory} />
       </View>
 
       {recentSearches.length > 0 ? (

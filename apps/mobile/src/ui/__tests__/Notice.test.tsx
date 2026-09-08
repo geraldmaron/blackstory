@@ -3,7 +3,7 @@ import type { TextStyle, ViewStyle } from 'react-native';
 import { Notice } from '../Notice';
 import { space } from '../tokens';
 
-function flattenStyle(style: ViewStyle | TextStyle | undefined): Array<ViewStyle | TextStyle> {
+function flattenStyle(style: ViewStyle | TextStyle | undefined): (ViewStyle | TextStyle)[] {
   if (!style) return [];
   const items = Array.isArray(style) ? style : [style];
   return items.flatMap((item) =>

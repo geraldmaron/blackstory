@@ -1,14 +1,26 @@
 /**
- * One claim: predicate heading, object text, evidence-score badge + label, citation (or a "no
- * source" fallback for the adversarial "claim with no citation" case), a preserved-contradiction
+ * One claim: predicate as a field label, the value in the editorial face, ONE evidence line, a
+ * citation (or a "no source" fallback for the adversarial "claim with no citation" case), a
+ * preserved-contradiction
  * notice whose alternates are ALWAYS rendered alongside the primary value (never silently
  * resolved — the whole point of `dispute` being part of the public contract), revision history,
  * and a retraction notice. Mirrors web's `EvidenceCard.tsx` section-for-section.
+ *
+ * The evidence line used to be a large confidence pill next to the sentence "Evidence score: high
+ * (0.85 of 1.00)" — the word "high" printed twice, in two type sizes, for one fact. It is now the
+ * shared meter with its grade letter, then the number, on one line. The full sentence still goes
+ * to assistive tech, where bars say nothing.
  */
-import { View } from 'react-native';
-import { Badge, Notice, Text, space } from '@/ui';
+import { StyleSheet, View } from 'react-native';
+import { evidenceLabel } from '@repo/public-contracts/evidence';
+import { Notice, RecordMeter, Text, space } from '@/ui';
 import { CitationLink } from '../CitationLink';
-import { formatEvidenceScoreLabel, formatIsoDate, humanizeToken } from '../format';
+import {
+  formatEvidenceScoreLabel,
+  formatEvidenceScoreValue,
+  formatIsoDate,
+  humanizeToken,
+} from '../format';
 import type { Claim } from '../types';
 import { SectionHeading } from './SectionHeading';
 
@@ -20,13 +32,25 @@ export type ClaimCardProps = {
 export function ClaimCard({ claim, isOnline }: ClaimCardProps) {
   return (
     <View style={{ gap: space['2'] }} accessible={false}>
-      <SectionHeading level={3}>{humanizeToken(claim.predicate)}</SectionHeading>
-      <Text variant="body">{claim.object}</Text>
+      <SectionHeading level={3} fieldLabel>
+        {humanizeToken(claim.predicate)}
+      </SectionHeading>
+      <Text variant="editorial" colorRole="ink">
+        {claim.object}
+      </Text>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space['2'], flexWrap: 'wrap' }}>
-        <Badge kind="confidence" level={claim.confidenceLevel} />
+      <View
+        style={styles.evidenceLine}
+        accessible
+        accessibilityLabel={formatEvidenceScoreLabel(claim.confidenceScore, claim.confidenceLevel)}
+      >
+        {/* The grade word is right there; a letter on the meter would print "A" twice. */}
+        <RecordMeter tier={claim.confidenceLevel} showLetter={false} decorative />
         <Text variant="caption" colorRole="inkMuted">
-          {formatEvidenceScoreLabel(claim.confidenceScore, claim.confidenceLevel)}
+          {evidenceLabel(claim.confidenceLevel)}
+        </Text>
+        <Text variant="code" colorRole="inkSubtle">
+          {formatEvidenceScoreValue(claim.confidenceScore)}
         </Text>
       </View>
 
@@ -86,3 +110,12 @@ export function ClaimCard({ claim, isOnline }: ClaimCardProps) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  evidenceLine: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: space['2'],
+  },
+});

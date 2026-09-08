@@ -199,11 +199,19 @@
   --ds-atlas-bottom: 168px;
   /*
    * The right column's own floor. The camera console lives under the results rail, not under the
-   * time panel, and it is taller than the time panel's band: 174px of console plus its 16px
+   * time panel, and it is taller than the time panel's band: 218px of console plus its 16px
    * offset and a 12px gap. Without this the rail ran to the shared floor and the console's top
    * corner sat inside it.
+   *
+   * This is the first-paint default only. The console is not a fixed 218px — the dignity gate's
+   * refusal note adds 68px whenever the selected record is violence-adjacent, and the console is
+   * not always mounted at all. A hand-kept number was wrong in both directions (it still said
+   * 174px after the WCAG 2.5.5 touch-target bump grew the console, and the rail's bottom rows
+   * sat under the console), so `syncCameraConsoleClearance` in CameraConsole.tsx measures the
+   * console and overrides this on the root — the same clearance pattern the command bar uses for
+   * `--ds-island-clearance`.
    */
-  --ds-atlas-bottom-right: 202px;
+  --ds-atlas-bottom-right: 246px;
 
   /* Fixed instrument-panel widths (map-experience lens-panel/results-rail/pin-photo-card).
      Named to match the design mock's --rail-w/--results-w; the photo card has no mock

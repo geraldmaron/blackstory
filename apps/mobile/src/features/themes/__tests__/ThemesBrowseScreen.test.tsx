@@ -3,6 +3,8 @@
  */
 import { fireEvent, render } from '@testing-library/react-native';
 
+import { ThemesBrowseScreen } from '../ThemesBrowseScreen';
+
 const mockPush = jest.fn();
 
 jest.mock('expo-router', () => ({
@@ -13,14 +15,13 @@ jest.mock('expo-router', () => ({
 }));
 
 jest.mock('expo-image', () => {
+  /* eslint-disable @typescript-eslint/no-require-imports */
   const React = require('react');
   const { View } = require('react-native');
   return {
     Image: () => React.createElement(View, { testID: 'expo-image' }),
   };
 });
-
-import { ThemesBrowseScreen } from '../ThemesBrowseScreen';
 
 describe('ThemesBrowseScreen', () => {
   beforeEach(() => {

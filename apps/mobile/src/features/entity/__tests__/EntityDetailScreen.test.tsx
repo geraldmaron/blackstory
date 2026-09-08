@@ -18,6 +18,7 @@ import {
 import { buildIntroMetaLine } from '../sections/IntroSection';
 
 jest.mock('expo-image', () => {
+  /* eslint-disable @typescript-eslint/no-require-imports */
   const React = require('react');
   const { View: RNView } = require('react-native');
   return {
@@ -248,6 +249,6 @@ describe('EntityDetailScreen — v6 edition beats', () => {
     expect(getByTestId('entity-anatomy-section')).toBeTruthy();
     expect(getByTestId('entity-provenance-section')).toBeTruthy();
     expect(getByText('00 · Record')).toBeTruthy();
-    expect(getByText('Record maturity and revision')).toBeTruthy();
+    expect(getByText('How complete this record is')).toBeTruthy();
   });
 });

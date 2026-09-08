@@ -154,13 +154,19 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 28,
   },
+  /*
+   * The point is a rotated square tucked under the head, so its width at the head's own centre
+   * line has to stay inside the circle — a 24pt square at top 40 pushed two corners past the
+   * edge and they read as shoulders rather than a teardrop. 22pt clears it and still leaves
+   * ~10pt of point below the head.
+   */
   pinPoint: {
     position: 'absolute',
     top: 40,
-    width: 24,
-    height: 24,
+    width: 22,
+    height: 22,
     transform: [{ rotate: '45deg' }],
-    borderRadius: 4,
+    borderRadius: 3,
   },
   pinCore: {
     position: 'absolute',

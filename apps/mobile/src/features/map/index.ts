@@ -1,9 +1,16 @@
 /**
- * Native map feature (MOB-011). Self-contained map surface that MOB-012 wires
- * into the Explore route. See MapScreen.tsx for why this is a feature component
- * rather than a route-tree edit.
+ * Generally reusable map machinery: the renderer, the basemap, camera primitives, attribution,
+ * failure classification, and the paint rules a map surface needs.
+ *
+ * It owns NOTHING that is specific to Explore. It used to: `features/map/explore/` held the
+ * bottom sheet, the records rail, the filters panel, the instruments panel and the preview sheet,
+ * and this barrel re-exported them — so Explore was split across two ownership trees that each
+ * imported from the other, and "where does the records rail live" had two answers.
+ *
+ * Explore's own chrome is `features/explore`. A second map surface would reuse this file and
+ * none of that.
  */
-export { MapScreen, type MapScreenProps } from './MapScreen';
+export { MapScreen, type MapScreenProps, type MapCameraCommand } from './MapScreen';
 export {
   MapAttribution,
   MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM,
@@ -48,18 +55,6 @@ export {
   type MapPointFeature,
   type MapPointFeatureProperties,
 } from './demoMapSource';
-export {
-  EntityPreviewSheet,
-  featureMetaLine,
-  featureKindSlug,
-  featureAtAGlanceFacts,
-} from './explore';
-export type {
-  EntityPreviewSheetProps,
-  EntityPreviewPreviewFeature,
-  AtAGlanceFact,
-  PreviewMetaFeature,
-} from './explore';
 export {
   CINEMATIC_MAP_INITIAL_STATE,
   cinematicMapReducer,

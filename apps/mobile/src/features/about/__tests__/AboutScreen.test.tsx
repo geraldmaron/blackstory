@@ -55,7 +55,7 @@ describe('AboutScreen', () => {
   it('navigates Methodology and Data destinations', async () => {
     const { getByText, getAllByText } = await render(<AboutScreen />);
     fireEvent.press(getAllByText('Methodology')[0]!);
-    expect(mockPush).toHaveBeenCalledWith('/learn/methodology');
+    expect(mockPush).toHaveBeenCalledWith('/methodology');
     fireEvent.press(getByText('Data'));
     expect(mockPush).toHaveBeenCalledWith('/data');
   });

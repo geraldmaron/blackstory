@@ -17,7 +17,7 @@
  *
  * The filter VOCABULARY, though, must not drift from the Lens. Every label and bucket here is
  * derived by calling the same shared modules Explore calls — `kindFamilyFor`,
- * `kindFamilyEncodingFor`, `resolveEntityEraBuckets`, `highestConfidence`, `getTopicLabel` — never
+ * `kindFamilyEncodingFor`, `resolveEntityEraBuckets`, `recordConfidenceTier`, `getTopicLabel` — never
  * by a local copy of the list. `build-records-index.test.ts` asserts that on drift.
  */
 import { getTopicLabel, isValidTopicId } from '@repo/domain/taxonomy/topics';
@@ -27,7 +27,10 @@ import {
 } from '@repo/domain/map/geography';
 import type { PublicSearchIndexDoc } from '@repo/domain/search';
 import type { PublicEntityView } from '../../data/public-seed';
-import { highestConfidence, type ConfidenceTier } from '../map-experience/build-explore-map-source';
+import {
+  recordConfidenceTier,
+  type ConfidenceTier,
+} from '../map-experience/build-explore-map-source';
 import { resolveEntityEraBuckets } from '../map-experience/entity-era-facts';
 import { geoAnchorFor } from '../map-experience/entity-geo';
 import { mapListContinuityLabel } from '../discovery/continuity-label';
@@ -287,7 +290,7 @@ export function recordsCatalogFromEntity(entity: PublicEntityView): RecordsCatal
     ...(entity.topicIds !== undefined ? { topicIds: entity.topicIds } : {}),
     eraBuckets,
     ...(entity.status !== undefined ? { status: entity.status } : {}),
-    confidenceTier: highestConfidence(entity.claims),
+    confidenceTier: recordConfidenceTier(entity.claims),
     mappable: carriesPublicMapAnchor(entity),
     ...(entity.locationPrecision !== undefined
       ? { locationPrecision: entity.locationPrecision }

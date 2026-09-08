@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, useThemeColors, space } from '@/ui';
 import { OFFLINE_CITATION_COPY, UNSAFE_LINK_COPY } from './copy';
+import { formatSourceName } from './format';
 import { isSafeExternalUrl, openExternalLink } from './linking';
 import type { Citation } from './types';
 
@@ -21,6 +22,11 @@ export function CitationLink({ citation, isOnline }: CitationLinkProps) {
   const theme = useThemeColors();
   const [notice, setNotice] = useState<string | undefined>(undefined);
   const hasSafeHref = Boolean(citation.href) && isSafeExternalUrl(citation.href);
+  const sourceName = formatSourceName(citation.source);
+  // "Wikipedia" over "Wikipedia" is not attribution, it is a repeat. The second line earns its
+  // place only when the source names something the label does not.
+  const showSource =
+    sourceName.length > 0 && sourceName.toLowerCase() !== citation.label.trim().toLowerCase();
 
   const handlePress = async () => {
     if (!citation.href) return;
@@ -36,23 +42,27 @@ export function CitationLink({ citation, isOnline }: CitationLinkProps) {
       {hasSafeHref ? (
         <Pressable
           accessibilityRole="link"
-          accessibilityLabel={`${citation.label}, ${citation.source}`}
+          accessibilityLabel={`${citation.label}, ${sourceName}`}
           hitSlop={8}
           onPress={handlePress}
         >
           <Text variant="bodySmall" style={{ color: theme.accent, textDecorationLine: 'underline' }}>
             {citation.label}
           </Text>
-          <Text variant="caption" colorRole="inkMuted">
-            {citation.source}
-          </Text>
+          {showSource ? (
+            <Text variant="caption" colorRole="inkMuted">
+              {sourceName}
+            </Text>
+          ) : null}
         </Pressable>
       ) : (
-        <View accessible accessibilityLabel={`${citation.label}, ${citation.source}`}>
+        <View accessible accessibilityLabel={`${citation.label}, ${sourceName}`}>
           <Text variant="bodySmall">{citation.label}</Text>
-          <Text variant="caption" colorRole="inkMuted">
-            {citation.source}
-          </Text>
+          {showSource ? (
+            <Text variant="caption" colorRole="inkMuted">
+              {sourceName}
+            </Text>
+          ) : null}
         </View>
       )}
       {citation.withheldReason ? (

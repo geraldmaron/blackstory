@@ -17,6 +17,7 @@ import { mapHistoryQueryToRecordsHref, decadeParamToEra } from './history-href';
 import { redirectsForNextConfig } from './next-config-redirects.mjs';
 import { THEME_CHAPTER_SLUGS } from './theme-alias-table.mjs';
 import { mapSearchQueryToRecordsHref } from '../search/search-href';
+import { LEGACY_ALIASES, canonicalPathForLegacy } from '@repo/public-contracts/destinations';
 
 const RULES = redirectsForNextConfig();
 
@@ -123,8 +124,8 @@ test('every folded path reaches its surface in exactly one hop', () => {
     ['/themes/unknown-theme', '/stories'],
     ['/topics', '/stories'],
     ['/topics/anything', '/stories'],
-    ['/myths', '/methodology'],
-    ['/myths/anything', '/methodology'],
+    ['/myths', '/stories'],
+    ['/myths/anything', '/stories'],
     ['/legal', '/law'],
     ['/map', '/explore'],
   ] as const;
@@ -255,4 +256,44 @@ test('no rule redirects away from a route that still has a page', () => {
       );
     }
   }
+});
+
+test('every legacy alias in the semantic catalog is honored by the redirect table', () => {
+  // The catalog is the shared statement of what an old address means; this table is the web
+  // mechanism that honors it. Native honors the same catalog through deep-link normalization.
+  // Without this test the two can disagree, which is how `/myths` spent months resolving to
+  // Methodology on the site while the product model said it was a Story.
+  for (const alias of LEGACY_ALIASES) {
+    const { final, hops } = resolve(alias.from);
+    if (hops === 0) {
+      // `/history` and `/search` deliberately have no config rule: both carry a query value a
+      // config rule cannot read (`decade` becomes `era`, and `q` has to survive), so the
+      // filesystem route runs and does the transform. The catalog annotates both.
+      assert.ok(
+        ['/history', '/search'].includes(alias.from),
+        `${alias.from} is a catalog alias with no redirect rule`,
+      );
+      continue;
+    }
+    assert.equal(final, alias.to, `${alias.from} should resolve to ${alias.to}`);
+    assert.equal(hops, 1, `${alias.from} should take exactly one hop, took ${hops}`);
+  }
+});
+
+test('no redirect destination is itself a legacy alias', () => {
+  for (const rule of RULES) {
+    const target = destinationPath(rule.destination).replace(/\/:[A-Za-z]+\*?$/, '');
+    assert.equal(
+      canonicalPathForLegacy(target),
+      null,
+      `${rule.source} lands on ${target}, which is itself a legacy address`,
+    );
+  }
+});
+
+test('the value-transform routes still resolve to Records', () => {
+  // Asserted here rather than left implicit above: these two are the reason the table is not
+  // simply generated from the catalog.
+  assert.equal(canonicalPathForLegacy('/history'), '/records');
+  assert.equal(canonicalPathForLegacy('/search'), '/records');
 });

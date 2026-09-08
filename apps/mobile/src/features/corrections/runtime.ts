@@ -22,7 +22,7 @@ function resolveSubmissionsBaseUrl(): string {
   return (
     (extra?.submissionsBaseUrl as string | undefined) ??
     (extra?.apiBaseUrl as string | undefined) ??
-    'https://api.blackbook.app'
+    'https://api.blackstory.app'
   );
 }
 

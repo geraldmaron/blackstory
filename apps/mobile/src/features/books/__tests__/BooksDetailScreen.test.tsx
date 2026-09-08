@@ -3,6 +3,8 @@
  */
 import { fireEvent, render } from '@testing-library/react-native';
 
+import { BooksDetailScreen } from '../BooksDetailScreen';
+
 const mockPush = jest.fn();
 const mockReplace = jest.fn();
 
@@ -16,8 +18,6 @@ jest.mock('expo-router', () => ({
 jest.mock('@/features/entity/linking', () => ({
   openExternalLink: jest.fn(async () => 'opened'),
 }));
-
-import { BooksDetailScreen } from '../BooksDetailScreen';
 
 describe('BooksDetailScreen', () => {
   beforeEach(() => {

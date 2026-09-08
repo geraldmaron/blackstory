@@ -47,3 +47,24 @@ export const BOOKS_DETAIL = {
   missingTitle: 'Book not found',
   missingBody: 'That catalog entry is not in this release. Return to Banned books and pick another title.',
 } as const;
+
+/**
+ * Reader-facing names for identifier systems.
+ *
+ * `identifier.system` is a connector key. Printing it raw put `isbn-13` and `open-library` on the
+ * detail screen as if they were English, the same class of leak as the `wikipedia_api` citation
+ * token the record page used to show. `humanizeToken` cannot help here: it would title-case these
+ * into "Isbn 13", so the acronyms need naming outright. The list is a closed enum of six.
+ */
+export const BOOK_IDENTIFIER_SYSTEM_LABELS: Readonly<Record<string, string>> = {
+  'isbn-13': 'ISBN-13',
+  'isbn-10': 'ISBN-10',
+  asin: 'ASIN',
+  oclc: 'OCLC',
+  'open-library': 'Open Library',
+  other: 'Catalog id',
+} as const;
+
+export function bookIdentifierSystemLabel(system: string): string {
+  return BOOK_IDENTIFIER_SYSTEM_LABELS[system] ?? BOOK_IDENTIFIER_SYSTEM_LABELS.other!;
+}

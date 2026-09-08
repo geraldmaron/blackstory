@@ -207,7 +207,7 @@ export function ThemesDetailScreen({ themeId }: ThemesDetailScreenProps) {
               label={THEMES_DETAIL.methodologyCta}
               variant="ghost"
               density="compact"
-              onPress={() => router.push('/learn/methodology' as never)}
+              onPress={() => router.push('/methodology')}
             />
           </View>
         </View>

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, type Dispatch, type SetStateAc
 import type { SheetRecord } from '../../../components/map-experience/RecordSheet';
 import type { MapStageHandle } from '../../../components/map-stage/MapStage';
 import type { CameraApi } from '../../../lib/map-experience/camera-moves';
-import { gradeForConfidence } from '../../../lib/map-experience/evidence-grade';
+import { evidenceLabel } from '../../../lib/map-experience/evidence-grade';
 import { placeLabelFor } from '../../../lib/map-experience/place-label';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
 import type { HistoryEdgeView } from '../../../lib/history/build-history-graph';
@@ -156,7 +156,6 @@ export function useRecordSelection(
     // on the same side as the current chapter card, StoryMode forces every chapter card to the
     // opposite side for as long as the sheet is open (see `.ds-story--sheet-open` in
     // story-mode.css) rather than the sheet giving way — the reader asked to see the record.
-    const grade = gradeForConfidence(selectedFeature.properties.confidenceTier);
     const sources = selectedFeature.properties.evidenceCount;
     return {
       id: selectedFeature.properties.entityId,
@@ -183,7 +182,7 @@ export function useRecordSelection(
       story: selectedFeature.properties.oneLineStory,
       precision: selectedFeature.properties.geoPrecisionTier,
       confidenceTier: selectedFeature.properties.confidenceTier,
-      evidenceLabel: `${grade ? `Grade ${grade}` : 'Not graded'} · ${sources} ${sources === 1 ? 'source' : 'sources'}`,
+      evidenceLabel: evidenceLabel(selectedFeature.properties.confidenceTier, sources),
       /*
        * The count travels even though the citations do not: the map payload is a count and a
        * confidence tier, not a bibliography (see ExploreMapFeatureProperties). Passing only

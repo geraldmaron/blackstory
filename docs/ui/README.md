@@ -38,10 +38,10 @@ Live instrument chrome belongs on `/explore`. See [`v10/design-doc-reconciliatio
 
 | Surface | Binding doc | Code | Status |
 |---|---|---|---|
-| **Atlas** (`/`, `/story`) | [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md) | `app/page.tsx`, `app/explore/*`, `components/story/*` | Binding (supersedes v6 home, explore, search) |
-| **Chapters** (`/chapters`, `/chapters/[slug]`) | [`design-direction-v9-chapters.md`](./design-direction-v9-chapters.md) | `app/chapters/*`, `components/article/*`, `lib/articles/*` | Binding (v9). Chrome still v6 |
+| **Door** (`/`) and **Explore** (`/explore`) | [`design-direction-v10.md`](./design-direction-v10.md) | `app/page.tsx`, `app/explore/*` | Binding. v9's "Atlas on `/`" is superseded: `/` is the Door, `/explore` is the instrument |
+| **Stories** (`/stories`, `/stories/[slug]`) | [`design-direction-v9-chapters.md`](./design-direction-v9-chapters.md) | `app/stories/*`, `components/article/*`, `lib/articles/*` | Binding for the reading treatment ONLY. Its route names (`/chapters`) and its "chapters are the index" premise are retired: `/stories` is the one publication surface and a chapter is one editorial kind within it |
 | **Every other public route** | [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) | see its section 4 resolution map | Proposed, binding on owner approval |
-| **Mobile shell** (`@repo/mobile`) | [`design-direction-v6-mobile.md`](./design-direction-v6-mobile.md) | `apps/mobile/src/app/(tabs)/*`, `apps/mobile/src/shell/*`, `apps/mobile/src/ui/*` | Binding. **Ledger Line** polish (see [`mobile-polish-mockups.html`](./mobile-polish-mockups.html)) |
+| **Mobile shell** (`@repo/mobile`) | [`design-direction-v6-mobile.md`](./design-direction-v6-mobile.md) | `apps/mobile/src/app/(tabs)/*`, `apps/mobile/src/shell/*`, `apps/mobile/src/ui/*` | Binding for **Ledger Line** treatment (see [`mobile-polish-mockups.html`](./mobile-polish-mockups.html)). Its IA is retired: the tabs are Explore / Stories / Records / More, composed from the destination catalog, not History / Stories(`/learn`) / More |
 
 ### Reusable component patterns
 
@@ -68,12 +68,12 @@ None of these is deleted. They record why v9 exists and what was rejected. Do no
 |---|---|---|
 | [`design-direction-v5.md`](./design-direction-v5.md) | v6, then v9 | Historical |
 | [`blap-design-direction-v4.md`](./blap-design-direction-v4.md) | v5 | Historical |
-| [`design-direction-v6-home.md`](./design-direction-v6-home.md) | v9 Atlas | `/` |
+| [`design-direction-v6-home.md`](./design-direction-v6-home.md) | **v10** | `/` is the Door, not a live cockpit |
 | [`design-direction-v6-explore.md`](./design-direction-v6-explore.md) | v9 Explore → **v10** | `/explore` is the live Instrument (not a 308 to `/`) |
-| [`design-direction-v6-search.md`](./design-direction-v6-search.md) | v9 Atlas | `/search`, redirect |
-| [`design-direction-v6-history.md`](./design-direction-v6-history.md) | v9 surfaces | `/history`, resolves to `/records` |
-| [`design-direction-v6-stories.md`](./design-direction-v6-stories.md) | v9 chapters | `/stories`, 308 to `/chapters`. `app/stories` does not exist |
-| [`design-direction-v6-themes.md`](./design-direction-v6-themes.md) | v9 chapters | `/themes`, 308 to `/chapters`. `app/themes` does not exist |
+| [`design-direction-v6-search.md`](./design-direction-v6-search.md) | v10 Records | `/search` resolves to `/records`; search is a capability of the archive, not a surface |
+| [`design-direction-v6-history.md`](./design-direction-v6-history.md) | v10 Records | `/history` resolves to `/records`; chronology is an era facet, not a destination |
+| [`design-direction-v6-stories.md`](./design-direction-v6-stories.md) | v10 Stories | `/stories` is the one publication surface; `/chapters` is the 308 now, not the destination |
+| [`design-direction-v6-themes.md`](./design-direction-v6-themes.md) | v10 Stories | `/themes` 308s to `/stories`; a theme is a Story tag and collection, not a surface |
 | [`design-direction-v6-about.md`](./design-direction-v6-about.md) | v9 surfaces | `/about` |
 | [`design-direction-v6-books.md`](./design-direction-v6-books.md) | v9 surfaces | `/books`, `/books/[slug]` |
 | [`design-direction-v6-data.md`](./design-direction-v6-data.md) | v9 surfaces | `/data` |
@@ -149,95 +149,27 @@ pnpm --filter @repo/web exec next dev --port 3048
 
 ## Public routes
 
-Verified against `apps/web/src/app/` on 2026-07-30. Surface classes are from [`patterns-surface-classes.md`](./patterns-surface-classes.md); a class in parentheses is the v9 resolution, not what ships today.
+**There is no route table here any more.** There was one, verified against `apps/web/src/app/` on
+2026-07-30, and by 2026-09-07 it said `/` was the Atlas instrument, `/explore` folded into `/`,
+`/chapters` was the publication index, `/stories` did not exist, and `/records`, `/rooms` and
+`/faq` were absent entirely. Every one of those was wrong, and a doc marked binding that describes
+the previous generation of the product is worse than no doc: an agent can read it and confidently
+rebuild what was removed.
 
-### Rendered pages
+The routes are data, not prose. Read them from the source that the site itself renders from:
 
-| Route | File | Class | Purpose |
-|---|---|---|---|
-| `/` | `app/page.tsx` | Instrument | The Atlas. Live map, records already on it |
-| `/explore` | `app/explore/page.tsx` | Instrument | Folds into `/`; becomes a 308 |
-| `/chapters` | `app/chapters/page.tsx` | Reading room | Long-form publication index. Destination for the articles, stories, themes and topics redirect families |
-| `/chapters/[slug]` | `app/chapters/[slug]/page.tsx` | Reading room | Chapter detail with inline citations and numbered references |
-| `/chapters/mosaic-credits` | `app/chapters/mosaic-credits/page.tsx` | Utility | Rights clearance for the atmosphere tiles |
-| `/books` | `app/books/page.tsx` | Reading room | Banned and challenged books catalogue |
-| `/books/[slug]` | `app/books/[slug]/page.tsx` | Record page | One title, its challenges and jurisdictions |
-| `/law` | `app/law/page.tsx` | Reading room | Plain-language law reference |
-| `/law/[slug]` | `app/law/[slug]/page.tsx` | Record page | One statute or ruling |
-| `/entity/[id]` | `app/entity/[id]/page.tsx` | Record page | Record detail. `force-dynamic` |
-| `/data` | `app/data/page.tsx` | Reading room | National Census and Phase 1 indicators |
-| `/memorial` | `app/memorial/page.tsx` | Reading room | The names wall and the full list |
-| `/about` | `app/about/page.tsx` | Reading room | Product thesis and the destinations block |
-| `/methodology` | `app/methodology/page.tsx` | Reading room | Evidence pipeline, definitions, confidence, dignity |
-| `/errata` | `app/errata/page.tsx` | Reading room | Corrections log, plus two feeds |
-| `/history` | `app/history/page.tsx` | Reading room | Temporal browse. Resolves to `/records` under v9; the route file can never be deleted |
-| `/locate` | `app/locate/page.tsx` | Instrument | Find your jurisdiction. Folds into the Lens Where group |
-| `/corrections` | `app/corrections/page.tsx` | Utility | Correction intake, appeal and abuse report |
-| `/corrections/status/[receiptCode]` | `app/corrections/status/[receiptCode]/page.tsx` | Utility | Public phase of one submission. Out of the sitemap |
-| `/submit` | `app/submit/page.tsx` | Utility | Submit a lead |
-| `/support` | `app/support/page.tsx` | Utility | Three named paths and a role mailbox |
-| `/privacy` | `app/privacy/page.tsx` | Utility | Privacy policy in the methodology voice |
-| `/design-system` | `app/design-system/page.tsx` | Utility | Component fixtures. Publicly linked, so it must not 404 |
-| `/map` | `app/map/page.tsx` | Endpoint | Page-level redirect to `/explore`. Becomes a permanent config rule to `/` |
-| `/search` | `app/search/page.tsx` | Endpoint | Filesystem redirect, currently shadowed by the config rule below |
-| 404 | `app/not-found.tsx` | Utility | Genuinely unknown paths only |
-| error boundary | `app/error.tsx` | Utility | Renders in place of whatever threw, URL preserved |
-| entity loading | `app/entity/[id]/loading.tsx` | Record page | Streams at `/entity/[id]` while the record loads |
-
-New under v9 and not built yet: `/records` (Reading room, the crawlable non-spatial index) and `/story` (Instrument, the six-chapter narrative). Both are in [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) section 4.
-
-Routes that **do not exist**: `app/stories`, `app/themes`, `app/topics`, `app/articles`, `app/records`, `app/story`, `app/facts`, `app/myths`, `app/legal`. Every one of them is a redirect source only.
-
-### Endpoints
-
-| Route | File |
+| Question | Source of truth |
 |---|---|
-| `/explore/api` | `app/explore/api/route.ts` |
-| `/history/api` | `app/history/api/route.ts` |
-| `/search/api` | `app/search/api/route.ts` |
-| `/locate/api` | `app/locate/api/route.ts` |
-| `/submit/api` | `app/submit/api/route.ts` |
-| `/corrections/api` | `app/corrections/api/route.ts` |
-| `/corrections/abuse/api` | `app/corrections/abuse/api/route.ts` |
-| `/corrections/appeal/api` | `app/corrections/appeal/api/route.ts` |
-| `/corrections/status/api` | `app/corrections/status/api/route.ts` |
-| `/api/request-integrity` | `app/api/request-integrity/route.ts` |
-| `/errata/feed.json` | `app/errata/feed.json/route.ts` |
-| `/errata/feed.xml` | `app/errata/feed.xml/route.ts` |
-| `/ai.txt` | `app/ai.txt/route.ts` |
-| `/.well-known/security.txt` | `app/.well-known/security.txt/route.ts` |
-| `/robots.txt` | `app/robots.ts` |
-| `/sitemap.xml` | `app/sitemap.xml/route.ts` |
+| What destinations exist, and what is each one for? | `@repo/public-contracts/destinations` — id, label, canonical path, parent, family, icon |
+| Which surface class does a route render as? | `apps/web/src/lib/nav/surface-classes.ts` |
+| What does the card, the crumb, the menu and the sitemap say? | `apps/web/src/lib/nav/destination-registry.ts` |
+| Which old addresses still resolve, and why? | `LEGACY_ALIASES` in the destinations catalog, honored by `apps/web/src/lib/redirects/next-config-redirects.mjs` |
+| Which tabs and More rows does the phone render? | `apps/mobile/src/shell/mobile-nav.ts`, composed from the same catalog |
 
-Sample entity ids: `ent_seed_place_001`, `ent_seed_school_001`. Data is labeled as seed/sample, not live projections.
+Those files are covered by tests that fail when they disagree with each other: no shell destination
+may be a legacy alias, no canonical path may be aliased, every redirect must resolve in one hop,
+and every classified route must have a registry entry.
 
-### Redirects
-
-**Source of truth: `apps/web/next.config.mjs`.** Every rule below is `permanent: true`, which emits 308. Order matters where a specific rule precedes a catch-all, and the file's comments say so.
-
-| Source | Destination |
-|---|---|
-| `/articles/:slug` | `/chapters/:slug` |
-| `/articles` | `/chapters` |
-| `/stories` | `/chapters` |
-| `/stories/mosaic-credits` | `/chapters/mosaic-credits` (must precede the `/stories/:path*` catch-all) |
-| `/stories/:path*` | `/chapters` |
-| `/themes` | `/chapters` |
-| `/themes/redlining`, `/themes/redlining/:path*` | `/chapters/buying-a-home` (must precede the `/themes/:path*` catch-all) |
-| `/themes/wealth_gap`, `/themes/wealth_gap/:path*` | `/chapters/the-gap-that-never-closed` (same) |
-| `/themes/:path*` | `/chapters` |
-| `/topics`, `/topics/:path*` | `/chapters` |
-| `/facts`, `/facts/:path*` | `/history` |
-| `/search` | `/history` |
-| `/myths`, `/myths/:path*` | `/methodology` |
-| `/legal` | `/law` |
-| `/legal/:path*` | `/law/:path*` |
-
-Outside the config, two filesystem routes redirect at page level: `app/map/page.tsx` calls `redirect('/explore')`, and `app/search/page.tsx` maps its query through `mapSearchQueryToHistoryHref` (unreachable today, because the config rule for `/search` runs first).
-
-Under v9, `/facts` and `/facts/:path*` repoint straight to `/records` so they do not become a chain through `/history`; `/search`'s config rule is removed so the filesystem route runs and emits `/records` in one hop; `/map` becomes a permanent config rule to `/`; `/explore` gains a 308 to `/` with its query string; and the theme alias pairs are replaced by a generated table. See [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) section 4.
-
----
 
 ## Known gaps
 

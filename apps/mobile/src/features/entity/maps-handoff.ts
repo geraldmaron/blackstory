@@ -34,7 +34,6 @@ export function buildMapsHandoffUris(
   label?: string,
 ): readonly string[] {
   if (!isFiniteCoord(lat) || !isFiniteCoord(lng)) return [];
-  const coords = `${lat},${lng}`;
   const query = mapsQuery(lat, lng, label);
   const geoUri =
     typeof label === 'string' && label.trim().length > 0

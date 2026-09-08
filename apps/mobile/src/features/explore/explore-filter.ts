@@ -236,11 +236,11 @@ export const EXPLORE_FACET_ROWS = [
   { key: 'status', label: 'Status', field: 'status' },
   { key: 'confidence', label: 'Confidence', field: 'confidence' },
   { key: 'state', label: 'Where', field: 'state' },
-] as const satisfies ReadonlyArray<{
+] as const satisfies readonly {
   readonly key: keyof ExploreFacetOptions;
   readonly label: string;
   readonly field: keyof ExploreFacetOptions;
-}>;
+}[];
 
 export function buildExploreFacetOptions(
   features: readonly ExploreFeature[],

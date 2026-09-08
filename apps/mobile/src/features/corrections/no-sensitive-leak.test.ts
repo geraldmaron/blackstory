@@ -63,7 +63,7 @@ describe('A. no correction content or receipt reaches any console sink', () => {
       contactConsent: true,
     };
     const deps: CorrectionClientDeps = {
-      baseUrl: 'https://submissions.blackbook.app',
+      baseUrl: 'https://submissions.blackstory.app',
       clientVersion: '1.0.0',
       fetch: (async () =>
         makeResponse(202, { accepted: true, receiptCode: RECEIPT, statusHref: '/x' })) as unknown as typeof fetch,

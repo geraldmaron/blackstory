@@ -65,7 +65,7 @@ function ThemeRows({
           title={row.title}
           slug={`${row.priorityLabel} · ${row.statusLabel}`}
           summary={row.lede}
-          leading={<NavIcon name="themes" size={20} />}
+          leading={<NavIcon name="collection" size={20} />}
           showChevron={row.available}
           showDivider={index < rows.length - 1}
           onPress={
@@ -111,7 +111,7 @@ export function ThemesBrowseScreen() {
             label={THEMES_METHOD.methodologyCta}
             variant="ghost"
             density="compact"
-            onPress={() => router.push('/learn/methodology' as never)}
+            onPress={() => router.push('/methodology')}
           />
         </View>
 
@@ -119,7 +119,7 @@ export function ThemesBrowseScreen() {
           <LedgerSectionLabel>Catalog pulse</LedgerSectionLabel>
           <RecordFactStrip
             facts={[
-              { key: 'themes', label: 'Themes', value: String(pulse.themeCount) },
+              { key: 'collection', label: 'Themes', value: String(pulse.themeCount) },
               { key: 'p0', label: 'P0 live', value: String(pulse.p0Count) },
               { key: 'packets', label: 'Packets', value: String(pulse.packetCount) },
               {

@@ -35,7 +35,8 @@ export type AppBottomSheetProps = {
   readonly reduceMotion?: boolean;
   /** Clears map attribution / safe areas under the sheet. */
   readonly bottomInset?: number;
-  readonly snapPoints?: readonly string[];
+  /** Mixed list: a point height for a content-sized detent, a percentage for a proportional one. */
+  readonly snapPoints?: readonly (string | number)[];
   readonly testID?: string;
   readonly accessibilityLabel?: string;
   /** Fired when the sheet settles on a snap index (0=peek, 1=half, 2=full). */

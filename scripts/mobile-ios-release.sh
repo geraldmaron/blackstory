@@ -14,6 +14,13 @@
 #   API_BASE_URL — baked at build time via app.config.ts / .env.local
 set -euo pipefail
 
+# CocoaPods reads paths through Ruby's unicode_normalize, which raises
+# `Encoding::CompatibilityError` outright when the locale is not UTF-8 — and then crashes again
+# inside its own error reporter, so the only visible symptom is a Ruby backtrace with no cause.
+# A login shell usually sets this; an agent or CI shell often does not.
+export LANG="${LANG:-en_US.UTF-8}"
+export LC_ALL="${LC_ALL:-$LANG}"
+
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
@@ -36,7 +43,7 @@ EOF
     ;;
 esac
 
-IOS_BUNDLE_ID="app.blackbook.mobile.dev"
+IOS_BUNDLE_ID="app.blackstory.mobile.dev"
 MOBILE_DIR="$ROOT/apps/mobile"
 ENV_LOCAL="$MOBILE_DIR/.env.local"
 
@@ -56,9 +63,9 @@ load_mobile_env() {
     export APP_VARIANT="${APP_VARIANT:-development}"
   fi
   case "$APP_VARIANT" in
-    preview) IOS_BUNDLE_ID="app.blackbook.mobile.preview" ;;
-    production) IOS_BUNDLE_ID="app.blackbook.mobile" ;;
-    *) IOS_BUNDLE_ID="app.blackbook.mobile.dev" ;;
+    preview) IOS_BUNDLE_ID="app.blackstory.mobile.preview" ;;
+    production) IOS_BUNDLE_ID="app.blackstory.mobile" ;;
+    *) IOS_BUNDLE_ID="app.blackstory.mobile.dev" ;;
   esac
 
   local prebuilt
@@ -145,6 +152,16 @@ case "$MODE" in
       cd "$MOBILE_DIR"
       npx expo run:ios --configuration Release --no-bundler
     )
+    # `set -e` is not enough here. `expo run:ios` catches a failed `pod install`, prints a
+    # warning, and exits 0 — so on 2026-09-07 this script printed "Release build installed"
+    # three times while nothing had been built and the app on the simulator was days stale.
+    # A build gate that reports success without an artifact is worse than no gate, so assert
+    # the app is actually on the device before claiming anything.
+    if ! xcrun simctl get_app_container booted "$IOS_BUNDLE_ID" app >/dev/null 2>&1; then
+      echo "mobile-ios-release: build reported success but $IOS_BUNDLE_ID is NOT installed." >&2
+      echo "mobile-ios-release: check the log above for a swallowed 'pod install' or xcodebuild failure." >&2
+      exit 1
+    fi
     # expo run:ios opens a dev-client deep link after install; Release uses the embedded
     # bundle on a direct launch. Relaunch cleanly so we never stick on a stale packager port.
     launch_release_app

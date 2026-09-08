@@ -15,13 +15,23 @@ module.exports = {
     '/node_modules/@react-native/babel-preset/',
   ],
   moduleNameMapper: {
-    '^@repo/public-contracts/version$': path.join(publicContractsSrc, 'version.ts'),
-    '^@repo/public-contracts/errors$': path.join(publicContractsSrc, 'errors.ts'),
-    '^@repo/public-contracts/v1/(.*)$': path.join(publicContractsSrc, 'v1', '$1.ts'),
+    // Every public-contracts export maps to `./src/<subpath>.ts`, so this is one rule rather than
+    // a hand-kept list. The list version silently failed to resolve each new export until someone
+    // added a line here, which is a mirror of the package's own exports map and drifts the same
+    // way every other mirror in this repo has.
+    '^@repo/public-contracts/(.+)$': path.join(publicContractsSrc, '$1.ts'),
     // file: linked public-contracts has no nested node_modules in CI; resolve zod from mobile.
     '^zod$': require.resolve('zod'),
     // Reanimated boots a native Worklets runtime on import, which does not exist under Jest.
     '^react-native-reanimated$': path.join(__dirname, 'test/mocks/react-native-reanimated.js'),
+    // MapLibre ships untransformed native-component modules, so importing it under Jest throws
+    // "Cannot use import statement outside a module". Any suite reaching MapScreen transitively
+    // (the record page embeds a still map plate) needs this; suites asserting camera calls still
+    // declare their own jest.mock factory, which takes precedence.
+    '^@maplibre/maplibre-react-native$': path.join(
+      __dirname,
+      'test/mocks/maplibre-react-native.js',
+    ),
   },
   // Resolve NodeNext-style `.js` specifiers inside public-contracts source to `.ts`.
   resolver: path.join(__dirname, 'jest.resolver.cjs'),

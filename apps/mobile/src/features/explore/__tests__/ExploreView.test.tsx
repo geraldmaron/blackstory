@@ -165,7 +165,6 @@ jest.mock('@gorhom/bottom-sheet', () => {
 
 jest.mock('react-native-reanimated', () => {
   /* eslint-disable @typescript-eslint/no-require-imports */
-  const React = require('react');
   const { View } = require('react-native');
   const fadeBuilder: Record<string, (...args: unknown[]) => unknown> = {};
   fadeBuilder.duration = () => fadeBuilder;
@@ -333,19 +332,18 @@ describe('ExploreView — records rail', () => {
   });
 });
 
-describe('ExploreView — Cinematic Map Backdrop (Rest -> Engaged -> Close)', () => {
-  it('starts locked (Rest) with the map non-interactive and shows Explore the map in the sheet', async () => {
+describe('ExploreView — map posture (browse <-> immersive)', () => {
+  it('gives the map live gestures in browse posture, alongside the full chrome', async () => {
     const { getByTestId, queryByTestId } = await render(
       <ExploreView onOpenEntity={noop} reduceMotion />,
     );
-    expect(getByTestId('maplibre-map', { includeHiddenElements: true }).props.dragPan).toBe(
-      false,
-    );
-    expect(getByTestId('explore-map-engage')).toBeTruthy();
-    expect(queryByTestId('explore-map-close')).toBeNull();
+    expect(getByTestId('maplibre-map').props.dragPan).toBe(true);
+    expect(getByTestId('explore-floating-chrome')).toBeTruthy();
+    expect(getByTestId('explore-map-expand')).toBeTruthy();
+    expect(queryByTestId('explore-map-collapse')).toBeNull();
   });
 
-  it('unlocks the map and collapses the sheet toward peek on Explore the map', async () => {
+  it('recedes the chrome and collapses the sheet toward peek on Expand the map', async () => {
     const { getByTestId, queryByTestId } = await render(
       <ExploreView onOpenEntity={noop} reduceMotion />,
     );
@@ -356,44 +354,62 @@ describe('ExploreView — Cinematic Map Backdrop (Rest -> Engaged -> Close)', ()
     expect(getByTestId('sheet-controlled-index')).toHaveTextContent('2');
 
     await act(async () => {
-      fireEvent.press(getByTestId('explore-map-engage'));
+      fireEvent.press(getByTestId('explore-map-expand'));
     });
 
+    // The map was already live; expanding is about surface, not permission.
     expect(getByTestId('maplibre-map').props.dragPan).toBe(true);
     expect(getByTestId('sheet-controlled-index')).toHaveTextContent('0');
-    expect(getByTestId('explore-map-close')).toBeTruthy();
-    expect(queryByTestId('explore-map-engage')).toBeNull();
-    // The mast (search/instruments/records/national) yields to the single Close
-    // control while Engaged (spec §2 rule 3: "Engage is one control").
+    expect(getByTestId('explore-map-collapse')).toBeTruthy();
+    expect(queryByTestId('explore-map-expand')).toBeNull();
     expect(queryByTestId('explore-floating-chrome')).toBeNull();
   });
 
-  it('relocks the map, deselects, and restores the home preset on Close', async () => {
+  it('keeps the map live and the selection intact when the chrome comes back', async () => {
     const { getByTestId, queryByTestId, findByTestId } = await render(
       <ExploreView selectedParam="ent_fixture_place_dc" onOpenEntity={noop} reduceMotion />,
     );
     expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
 
-    // Deselect first so the records rail (which hosts Explore the map) shows.
+    // Drop to peek so the records rail (which hosts Expand the map) shows.
     await act(async () => {
       fireEvent.press(getByTestId('sheet-settle-peek'));
     });
-    expect(queryByTestId('entity-preview-sheet')).toBeNull();
 
     await act(async () => {
-      fireEvent.press(getByTestId('explore-map-engage'));
+      fireEvent.press(getByTestId('explore-map-expand'));
     });
     expect(getByTestId('maplibre-map').props.dragPan).toBe(true);
 
     await act(async () => {
-      fireEvent.press(getByTestId('explore-map-close'));
+      fireEvent.press(getByTestId('explore-map-collapse'));
     });
 
-    expect(getByTestId('maplibre-map', { includeHiddenElements: true }).props.dragPan).toBe(
-      false,
+    expect(getByTestId('maplibre-map').props.dragPan).toBe(true);
+    expect(queryByTestId('explore-map-collapse')).toBeNull();
+    expect(getByTestId('explore-map-expand')).toBeTruthy();
+    expect(getByTestId('explore-floating-chrome')).toBeTruthy();
+  });
+
+  it('selects a record from a pin press while the full chrome is up', async () => {
+    const { getByTestId, findByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
     );
-    expect(queryByTestId('explore-map-close')).toBeNull();
-    expect(getByTestId('explore-map-engage')).toBeTruthy();
+    await act(async () => {
+      fireEvent(getByTestId('maplibre-geojson-source'), 'press', {
+        nativeEvent: {
+          features: [
+            {
+              type: 'Feature',
+              geometry: { type: 'Point', coordinates: [-77.0369, 38.9072] },
+              properties: { entityId: 'ent_fixture_place_dc' },
+            },
+          ],
+          lngLat: [-77.0369, 38.9072],
+        },
+      });
+    });
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
   });
 });
 

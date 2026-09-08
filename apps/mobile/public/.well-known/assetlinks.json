@@ -3,7 +3,7 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "app.blackbook.mobile",
+      "package_name": "app.blackstory.mobile",
       "sha256_cert_fingerprints": [
         "TODO_REPLACE_WITH_REAL_RELEASE_SIGNING_SHA256_FINGERPRINT"
       ]

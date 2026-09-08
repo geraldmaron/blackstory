@@ -10,8 +10,16 @@ import { createApiClient, type ApiClient } from './api-client';
 /** The `/vN` major this build targets. Bump alongside the wire contract. */
 const API_MAJOR = 1;
 
-/** Production default baked into `app.config.ts` when `API_BASE_URL` is unset. */
-export const DEFAULT_API_BASE_URL = 'https://api.blackbook.app';
+/**
+ * Production default, mirroring `app.config.ts` when `API_BASE_URL` is unset.
+ *
+ * `api.blackstory.app` is the host the published contract advertises
+ * (`apps/api-public/openapi/public-v1.openapi.yaml`). It is not provisioned yet — but neither was
+ * the old `api.blackbook.app`, which never resolved and belonged to a domain that is registrar
+ * parking rather than this product, so a production build falling back to it could not have
+ * reached the API at all. Keep this in step with `app.config.ts`'s own default.
+ */
+export const DEFAULT_API_BASE_URL = 'https://api.blackstory.app';
 
 /**
  * Resolve the public API origin this build will call (`apps/api-public`).
@@ -35,7 +43,7 @@ export function createDefaultApiClient(baseUrl?: string): ApiClient {
   const resolvedBase = resolveApiBaseUrl(baseUrl);
   if (typeof __DEV__ !== 'undefined' && __DEV__) {
     // Loud on purpose: Dev pointing at an unreachable host (e.g. NXDOMAIN
-    // api.blackbook.app before DNS/deploy) looks like "no Supabase data".
+    // api.blackstory.app before DNS/deploy) looks like "no Supabase data".
     console.info(`[blackstory] apiBaseUrl=${resolvedBase}`);
   }
   return createApiClient({

@@ -90,10 +90,35 @@ z 3   .ds-cinematic-rail    Explore-the-map control (sticky), Close (Engaged onl
 
 ## 5b. Sheet & pointer-events (mobile)
 
-- Map plate is the base layer; content rides in `AppBottomSheet` (`apps/mobile/src/ui/AppBottomSheet.tsx`) via the Explore wrapper (`apps/mobile/src/features/map/explore/ExploreBottomSheet.tsx`).
-- Rest = sheet at peek/half snap over a locked map; the sheet owns vertical scroll, the map does not capture drags behind it.
-- Engaged = sheet collapses toward peek and the map gains gestures; **Explore the map** lives in the sheet, **Close** floats top-trailing.
+- Map plate is the base layer; content rides in `AppBottomSheet` (`apps/mobile/src/ui/AppBottomSheet.tsx`) via the Explore wrapper (`apps/mobile/src/features/explore/ExploreBottomSheet.tsx`).
+- The sheet owns vertical scroll inside its own body; the map owns the canvas above and behind it.
+- Browse = sheet at peek/half over a **live** map. Immersive = sheet collapses toward peek and the chrome recedes; **Expand the map** lives in the sheet header, the collapse control floats top-trailing.
 - Pass `reduceMotion` from `useReduceMotion.ts` into `AppBottomSheet` and every camera call.
+
+### The lock does not apply to a map-led screen
+
+Section 2 rule 1 locks the map because on web the plate is a **backdrop inside a scrolling
+document**: a live map there eats the wheel and the page stops scrolling. That is a real
+constraint and the Door still depends on it.
+
+Native Explore is not that surface. The map is the screen, there is no document scroll to
+protect, and the bottom sheet already owns its own gesture area. Applying the backdrop lock there
+produced a map that ignored a deliberate pan, swallowed pin taps, and hid its own canvas from
+VoiceOver and TalkBack until the reader found a button — three ways of telling a reader the map
+had failed.
+
+So on a map-led screen:
+
+- gestures are **always live**; nothing gates pan, zoom, rotate or pitch on a posture flag;
+- a pin press **always** selects, in every posture;
+- the canvas is **never** hidden from assistive tech;
+- `rest` / `engaged` describe **chrome posture only** — how much surface the map gets — and the
+  reader controls that with one explicit control in each direction;
+- leaving the immersive posture restores chrome and **keeps** the selection and the camera. An
+  exit that also deselects and flies home is not an exit, it is a reset.
+
+`MapScreen`'s `gesturesEnabled` prop (default true) exists for a genuine still plate — a story's
+map moment, a printed-frame preview — not for a posture.
 
 ---
 
@@ -119,7 +144,8 @@ Selection paint (both platforms) must go through the map's **feature-state / ded
 ## 7. Do / Don't
 
 **Do**
-- Load into Rest; keep the map locked until the reader taps Explore.
+- On a scrolling editorial surface, load into Rest and keep the map locked until the reader taps Explore.
+- On a map-led screen, keep gestures live from first paint and let posture control chrome, not permission.
 - Mount the map once and reuse it (`MapStage`); animate the camera, never remount.
 - Toggle selection on a single feature; keep neighbors untouched.
 - Give every camera move a reduced-motion cut with identical framing.
@@ -136,8 +162,8 @@ Selection paint (both platforms) must go through the map's **feature-state / ded
 ## 8. Copy
 
 Per [`story.md`](./story.md): evidence-before-assertion, sentence case, no em dashes on the surface.
-- Engage control: **Explore the map**.
-- Close control: **Close** (icon ✕ with `aria-label="Close map"`).
+- Web engage control: **Explore the map**. Close control: **Close** (icon ✕ with `aria-label="Close map"`).
+- Native posture controls: **Expand the map**, and a collapse control labelled **Show the records list** — it names what comes back, not what is being left.
 - Invite beats: name a place and what happened there; the map is the index, not decoration.
 
 ---
@@ -146,7 +172,8 @@ Per [`story.md`](./story.md): evidence-before-assertion, sentence case, no em da
 
 - Pure state machine (`rest → invite → engaged → rest`) and single-feature selection reducer — unit tested (mirror `browse-mode.test.tsx`).
 - Reduced-motion branch: assert cuts (`jumpTo`/instant) replace flights.
-- Pointer-events: assert markers are inert in Rest and live in Engaged.
+- Pointer-events (scrolling surfaces): assert markers are inert in Rest and live in Engaged.
+- Map-led screens: assert the opposite — gestures live in every posture, a pin press selects in every posture, and the canvas is never hidden from assistive tech.
 - A11y: focus moves to Close on engage and back on close; Escape closes (web).
 
 ---

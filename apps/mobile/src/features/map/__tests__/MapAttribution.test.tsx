@@ -6,6 +6,7 @@ import { StyleSheet } from 'react-native';
 
 import { themeColors } from '@/ui/tokens';
 import { MapAttribution } from '../MapAttribution';
+import { MAP_GHOST_BG, MAP_INK_MUTED } from '../map-plate-ink';
 
 jest.mock('@/ui/tokens', () => {
   const actual = jest.requireActual('@/ui/tokens');
@@ -37,7 +38,7 @@ describe('MapAttribution', () => {
     expect(getByTestId('map-attribution-toggle').props.accessibilityState?.expanded).toBe(true);
   });
 
-  it('uses opaque Surface and theme muted ink when expanded', async () => {
+  it('uses the plate ghost fill and map ink when expanded, never an opaque surface', async () => {
     const { getByTestId, getByText } = await render(<MapAttribution />);
     await act(async () => {
       fireEvent.press(getByTestId('map-attribution-toggle'));
@@ -47,11 +48,15 @@ describe('MapAttribution', () => {
     const flat = StyleSheet.flatten(chip.props.style);
     const label = StyleSheet.flatten(getByText(/OpenStreetMap/).props.style);
 
-    expect(flat.backgroundColor).toBe(themeColors.light.surface);
-    expect(label.color).toBe(themeColors.light.inkMuted);
+    // The chip sits on the dark archive plate beside Explore's other controls, which are all
+    // translucent. An opaque theme surface here rendered as a solid white block — the heaviest
+    // element on the map, for its least important control.
+    expect(flat.backgroundColor).toBe(MAP_GHOST_BG);
+    expect(flat.backgroundColor).not.toBe(themeColors.light.surface);
+    expect(label.color).toBe(MAP_INK_MUTED);
   });
 
-  it('keeps the Surface chip in compact mode with shorter copy when expanded', async () => {
+  it('keeps the ghost chip in compact mode with shorter copy when expanded', async () => {
     const { getByTestId, getByText, queryByText } = await render(<MapAttribution compact />);
     await act(async () => {
       fireEvent.press(getByTestId('map-attribution-toggle'));
@@ -61,8 +66,8 @@ describe('MapAttribution', () => {
     const flat = StyleSheet.flatten(chip.props.style);
     const label = StyleSheet.flatten(getByText(/OpenStreetMap/).props.style);
 
-    expect(flat.backgroundColor).toBe(themeColors.light.surface);
-    expect(label.color).toBe(themeColors.light.inkMuted);
+    expect(flat.backgroundColor).toBe(MAP_GHOST_BG);
+    expect(label.color).toBe(MAP_INK_MUTED);
     // Compact drops the OpenMapTiles tag so the chip does not crowd the sheet handle.
     expect(queryByText(/OpenMapTiles/)).toBeNull();
   });

@@ -292,7 +292,7 @@ export function createSearchController(
 
   function setQuery(query: string, filterKind: string | undefined): void {
     const gen = bumpGeneration(); // always bump: cancels whatever (search or load-more) was in flight
-    if (getSearchMode(query) === 'browse') {
+    if (getSearchMode(query, filterKind) === 'browse') {
       setState({ kind: 'browse' });
       return;
     }

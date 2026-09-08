@@ -76,15 +76,21 @@ function resolveSampleRate(raw: string | undefined): number {
   return value;
 }
 
-// Bundle / application identifiers per mobile-identity.md's proposed scheme.
-// These are *proposed* identifiers (dev/preview safe to reference; the bare
-// production id `app.blackbook.mobile` is referenced only, never submitted
-// to a store — mobile-identity.md human gate #4 must clear availability
-// first).
+// Bundle / application identifiers.
+//
+// These carry the product's own name because NOTHING IS PROVISIONED YET: as of 2026-09-07 every
+// box in `docs/mobile/release/store-account-checklist.md` is unchecked — no Apple Developer
+// account, no App Store Connect record, no Play Console account, no claimed id. Store ids are
+// permanent once created, so the only cheap moment to fix a scaffold-era name is before that
+// happens, and this is that moment. The old scheme was `app.blackbook.mobile*`, from the
+// pre-rebrand working name.
+//
+// Availability is still an owner gate (repo-fsxq): confirm `app.blackstory.mobile` is unclaimed
+// in App Store Connect and Play Console before the first submit.
 const BUNDLE_IDS: Record<AppVariant, string> = {
-  development: 'app.blackbook.mobile.dev',
-  preview: 'app.blackbook.mobile.preview',
-  production: 'app.blackbook.mobile',
+  development: 'app.blackstory.mobile.dev',
+  preview: 'app.blackstory.mobile.preview',
+  production: 'app.blackstory.mobile',
 };
 
 // Display name carries an environment suffix for dev/preview so a device
@@ -109,7 +115,13 @@ const appName = APP_NAMES[APP_VARIANT];
 // src/security/bootstrap.ts + src/features/corrections/runtime.ts). Set per
 // EAS profile via the non-secret `env` blocks in eas.json; a production build
 // is rejected above if handed a cleartext (http) origin.
-const DEFAULT_API_BASE_URL = 'https://api.blackbook.app';
+// `api.blackstory.app` is the host the published contract advertises
+// (`apps/api-public/openapi/public-v1.openapi.yaml`). It is NOT provisioned yet — neither it nor
+// the old `api.blackbook.app` resolves in DNS (checked 2026-09-07), and `blackbook.app` itself
+// resolves to registrar parking, not to this product. A production build pointed at the old host
+// could not have reached the API at all. Provisioning the real host is an owner gate; naming the
+// right one here is not.
+const DEFAULT_API_BASE_URL = 'https://api.blackstory.app';
 const API_BASE_URL = resolveHttpUrl('API_BASE_URL', process.env.API_BASE_URL, DEFAULT_API_BASE_URL);
 const SUBMISSIONS_BASE_URL = resolveHttpUrl(
   'SUBMISSIONS_BASE_URL',
@@ -187,7 +199,8 @@ const config: ExpoConfig = {
   // Custom URL scheme fallback per mobile-identity.md: `blackstory://`,
   // deliberately distinct from the reverse-DNS bundle id for readability in
   // support docs/marketing. Universal links / associated domains
-  // (`blackbook.app`) are deferred to MOB-008/MOB-020 per that doc.
+  // (`blackstory.app`) still need the real assetlinks.json / AASA to be served, which is an
+  // owner gate (repo-fsxq) rather than a config value.
   scheme: 'blackstory',
   userInterfaceStyle: 'automatic',
   // EAS Update runtime-compatibility fence (ADR-023 §2): a JS bundle only ever
@@ -244,7 +257,7 @@ const config: ExpoConfig = {
     // emit the Associated Domains entitlement, which then fails Ad Hoc signing
     // when EXPO_NO_CAPABILITY_SYNC=1 (profile lacks the capability).
     ...(APP_VARIANT === 'production'
-      ? { associatedDomains: ['applinks:blackbook.app'] as const }
+      ? { associatedDomains: ['applinks:blackstory.app'] as const }
       : {}),
   },
   android: {
@@ -263,7 +276,7 @@ const config: ExpoConfig = {
     //
     // Android App Links (MOB-008), the Android analogue of iOS associatedDomains above:
     // autoVerify asks Android to verify this app against the real assetlinks.json served
-    // from https://blackbook.app/.well-known/assetlinks.json before treating the app as the
+    // from https://blackstory.app/.well-known/assetlinks.json before treating the app as the
     // default handler for that host — see apps/mobile/public/.well-known/README.md for
     // what's templated vs. real (this needs a real Android signing SHA-256, mobile-identity.md
     // human gate #2, which doesn't exist yet). Production-only, same rationale as iOS.
@@ -273,7 +286,7 @@ const config: ExpoConfig = {
             {
               action: 'VIEW',
               autoVerify: true,
-              data: [{ scheme: 'https', host: 'blackbook.app' }],
+              data: [{ scheme: 'https', host: 'blackstory.app' }],
               category: ['BROWSABLE', 'DEFAULT'],
             },
           ]

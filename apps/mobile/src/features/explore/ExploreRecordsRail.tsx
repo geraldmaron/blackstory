@@ -1,0 +1,363 @@
+/**
+ * Explore records rail — Pin Pulse browse list: kind glyph, title, one caption
+ * (where · era). Copper left rule on selection. BottomSheetFlatList owns scroll.
+ */
+import { memo, useCallback, useMemo } from 'react';
+import { Pressable, StyleSheet, View, type ListRenderItemInfo } from 'react-native';
+import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import { Ionicons } from '@expo/vector-icons';
+import { evidenceMeterLabel } from '@repo/public-contracts/evidence';
+
+import {
+  NavIcon,
+  navIconForEntityKind,
+  RecordMeter,
+  Text,
+  space,
+  radius,
+  useThemeColors,
+  MIN_TOUCH_TARGET,
+} from '@/ui';
+import { exploreContentInset } from './explore-chrome';
+import type { ExploreFeature } from '@/features/explore/explore-feature';
+import type { FilterState } from '@/lib/route-params';
+import { exploreStoryMeta } from './explore-story-meta';
+import { formatExploreCountLabel } from './explore-count-label';
+
+export type ExploreRecordsRailProps = {
+  /** Reports the header's laid-out height so the sheet can size its peek detent to it. */
+  readonly onHeaderLayout?: (height: number) => void;
+  readonly features: readonly ExploreFeature[];
+  readonly selectedId?: string;
+  /** "Nearby" once the map reports a region; "All pinned" before that. */
+  readonly scopeLabel?: string;
+  /** Full loaded release total for dual count copy when viewport-scoped. */
+  readonly releaseCount?: number;
+  readonly filters?: FilterState;
+  readonly onSelect: (feature: ExploreFeature) => void;
+  readonly onUserScroll?: () => void;
+  readonly emptyTitle?: string;
+  readonly emptyDescription?: string;
+  readonly testID?: string;
+  /**
+   * Enters the immersive map posture. Omitted while the map is already immersive — the sheet is
+   * collapsed toward peek and the floating control at the top is the way back, not this list.
+   */
+  readonly onExpandMap?: () => void;
+};
+
+const RecordRow = memo(function RecordRow({
+  feature,
+  selected,
+  onSelect,
+}: {
+  readonly feature: ExploreFeature;
+  readonly selected: boolean;
+  readonly onSelect: (feature: ExploreFeature) => void;
+}) {
+  const theme = useThemeColors();
+  const story = exploreStoryMeta(feature);
+  // The row is one accessible element, so the meter is decorative and the sentence it would have
+  // spoken is composed into the row's own label instead.
+  const a11yMeta = [
+    story.caption,
+    evidenceMeterLabel(story.confidenceTier, story.sourceCount),
+  ]
+    .filter(Boolean)
+    .join('. ');
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      accessibilityLabel={`${feature.label}${a11yMeta ? `. ${a11yMeta}` : ''}${
+        selected ? '. Selected' : ''
+      }`}
+      onPress={() => onSelect(feature)}
+      style={({ pressed }) => [
+        styles.row,
+        {
+          borderLeftColor: selected ? theme.accent : 'transparent',
+          backgroundColor: pressed ? theme.surfaceRaised : theme.surface,
+          borderBottomColor: theme.border,
+        },
+      ]}
+    >
+      <View style={[styles.kindGlyph, { borderColor: theme.border, backgroundColor: theme.surfaceRaised }]}>
+        <NavIcon name={navIconForEntityKind(feature.kind)} size={18} selected={selected} />
+      </View>
+      <View style={styles.rowText}>
+        <Text variant="rowTitle" numberOfLines={1} style={styles.rowTitle}>
+          {feature.label}
+        </Text>
+        {story.caption ? (
+          <Text variant="caption" colorRole="inkMuted" numberOfLines={1}>
+            {story.caption}
+          </Text>
+        ) : null}
+      </View>
+      <View style={styles.rowTrailing}>
+        <RecordMeter
+          tier={story.confidenceTier}
+          {...(story.sourceCount !== undefined ? { sourceCount: story.sourceCount } : {})}
+          decorative
+        />
+        <Ionicons
+          name="chevron-forward"
+          size={16}
+          color={selected ? theme.accent : theme.inkSubtle}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        />
+      </View>
+    </Pressable>
+  );
+});
+
+export function ExploreRecordsRail({
+  features,
+  selectedId,
+  scopeLabel = 'Nearby',
+  releaseCount,
+  filters = {},
+  onSelect,
+  onUserScroll,
+  emptyTitle = 'No places nearby',
+  emptyDescription = 'Pan or zoom the map, or clear a filter, to see pins here.',
+  testID = 'explore-records-rail',
+  onExpandMap,
+  onHeaderLayout,
+}: ExploreRecordsRailProps) {
+  const theme = useThemeColors();
+  const headerCount = formatExploreCountLabel({
+    inViewCount: features.length,
+    releaseCount: releaseCount ?? features.length,
+    scopeLabel,
+    filters,
+  });
+
+  const renderItem = useCallback(
+    ({ item }: ListRenderItemInfo<ExploreFeature>) => (
+      <RecordRow
+        feature={item}
+        selected={item.entityId === selectedId}
+        onSelect={onSelect}
+      />
+    ),
+    [onSelect, selectedId],
+  );
+
+  const listHeader = useMemo(
+    () => (
+      <View
+        style={[styles.header, { borderBottomColor: theme.border }]}
+        onLayout={(event) => onHeaderLayout?.(event.nativeEvent.layout.height)}
+      >
+        {/* Carries the count/scope label as its own accessible "header" landmark
+            (a11y contract §4) without swallowing the Explore/Close button below
+            into one opaque VoiceOver stop — an `accessible` container would make
+            the button unreachable in tab order (spec §4). */}
+        <View
+          style={styles.headerLabel}
+          accessible
+          accessibilityRole="header"
+          accessibilityLabel={headerCount.accessibilityLabel}
+        />
+        {onExpandMap ? null : (
+          <View style={styles.inviteRow}>
+            <Ionicons
+              name="chevron-up"
+              size={14}
+              color={theme.accent}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            />
+            <Ionicons
+              name="location-outline"
+              size={14}
+              color={theme.inkMuted}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            />
+            <Text variant="code" colorRole="inkMuted" style={styles.rowLabel}>
+              Pull up for places
+            </Text>
+          </View>
+        )}
+        {onExpandMap ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Expand the map"
+            accessibilityHint="Hides the filters and this list so the map fills the screen"
+            testID="explore-map-expand"
+            onPress={onExpandMap}
+            style={({ pressed }) => [
+              styles.exploreButton,
+              { backgroundColor: pressed ? theme.accentGraphic : theme.accent },
+            ]}
+          >
+            <Ionicons
+              name="navigate-outline"
+              size={16}
+              color={theme.inverseInk}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            />
+            <Text variant="code" style={[styles.rowLabel, { color: theme.inverseInk }]}>
+              Expand the map
+            </Text>
+          </Pressable>
+        ) : null}
+      </View>
+    ),
+    [
+      headerCount.accessibilityLabel,
+      onExpandMap,
+      onHeaderLayout,
+      theme.accent,
+      theme.accentGraphic,
+      theme.border,
+      theme.inkMuted,
+      theme.inverseInk,
+    ],
+  );
+
+  const listEmpty = useMemo(
+    () => (
+      <View testID="explore-records-empty" style={styles.emptyWrap}>
+        <View
+          style={[styles.emptyGlyph, { borderColor: theme.border, backgroundColor: theme.surfaceRaised }]}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          <Ionicons name="map-outline" size={22} color={theme.inkMuted} />
+        </View>
+        <Text variant="subtitle" style={styles.emptyTitle}>
+          {emptyTitle}
+        </Text>
+        <Text variant="body" colorRole="inkMuted" style={styles.emptyDescription}>
+          {emptyDescription}
+        </Text>
+      </View>
+    ),
+    [emptyDescription, emptyTitle, theme.border, theme.inkMuted, theme.surfaceRaised],
+  );
+
+  return (
+    <BottomSheetFlatList
+      style={styles.root}
+      testID={testID}
+      accessibilityRole="list"
+      accessibilityLabel="Places visible on the map"
+      data={features}
+      keyExtractor={(item) => item.id}
+      renderItem={renderItem}
+      ListHeaderComponent={listHeader}
+      ListEmptyComponent={listEmpty}
+      onScrollBeginDrag={onUserScroll}
+      keyboardShouldPersistTaps="handled"
+      initialNumToRender={12}
+      windowSize={7}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: space['2'],
+    paddingHorizontal: exploreContentInset,
+    paddingVertical: space['2'],
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    minHeight: MIN_TOUCH_TARGET,
+  },
+  // Zero-size: exists only to carry the "header" a11y role/label without
+  // taking layout space or intercepting touches.
+  headerLabel: {
+    position: 'absolute',
+    width: 0,
+    height: 0,
+  },
+  exploreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space['1'],
+    paddingHorizontal: space['3'],
+    minHeight: MIN_TOUCH_TARGET,
+    borderRadius: radius.sm,
+    flexShrink: 1,
+  },
+  inviteRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space['1'],
+    flexShrink: 1,
+  },
+  // Mono labels sit in a row beside fixed-size icons. Without `flexShrink` the
+  // text box keeps its full intrinsic width at accessibility content sizes and
+  // runs off the right edge instead of wrapping ("Pull up for places" lost its
+  // last word off-screen at accessibility-extra-large).
+  rowLabel: {
+    flexShrink: 1,
+  },
+  emptyWrap: {
+    flexGrow: 1,
+    minHeight: 120,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: exploreContentInset,
+    paddingVertical: space['4'],
+    gap: space['2'],
+  },
+  emptyGlyph: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.sm,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: space['1'],
+  },
+  emptyTitle: {
+    textAlign: 'center',
+  },
+  emptyDescription: {
+    textAlign: 'center',
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space['2'],
+    borderLeftWidth: 3,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: exploreContentInset,
+    paddingVertical: space['2'],
+    minHeight: MIN_TOUCH_TARGET,
+  },
+  kindGlyph: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.sm,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rowText: {
+    flex: 1,
+    gap: 2,
+    minWidth: 0,
+  },
+  rowTitle: {
+    flexShrink: 1,
+  },
+  rowTrailing: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: space['2'],
+  },
+});

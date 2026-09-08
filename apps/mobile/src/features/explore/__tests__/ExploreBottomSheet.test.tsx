@@ -1,0 +1,113 @@
+/**
+ * Explore bottom sheet host: v7 prototype detents and controlled snap wiring.
+ */
+import { render } from '@testing-library/react-native';
+import { EXPLORE_SHEET_PEEK_FALLBACK_PX } from '../explore-sheet-layout';
+import { Text } from 'react-native';
+
+const mockBottomSheetProps: Record<string, unknown>[] = [];
+
+jest.mock('@/ui/AppBottomSheet', () => {
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    AppBottomSheet: (props: Record<string, unknown>) => {
+      mockBottomSheetProps.push(props);
+      return React.createElement(
+        View,
+        { testID: props.testID as string },
+        props.children as never,
+      );
+    },
+  };
+});
+
+// eslint-disable-next-line import/first
+import {
+  ExploreBottomSheet,
+  EXPLORE_SHEET_BOTTOM_INSET,
+  EXPLORE_SHEET_HALF,
+  EXPLORE_SHEET_PEEK,
+  EXPLORE_SHEET_PEEK_HEIGHT,
+  EXPLORE_SHEET_SNAP_POINTS,
+} from '../ExploreBottomSheet';
+
+beforeEach(() => {
+  mockBottomSheetProps.length = 0;
+});
+
+describe('ExploreBottomSheet — Pin Pulse detents', () => {
+  it('uses map-first snap points 11% / 34% / 52%', async () => {
+    expect(EXPLORE_SHEET_SNAP_POINTS).toEqual(['11%', '34%', '52%']);
+    expect(EXPLORE_SHEET_PEEK_HEIGHT).toBe('11%');
+    expect(EXPLORE_SHEET_BOTTOM_INSET).toBe(0);
+  });
+
+  it('defaults to peek when idle and half when a record is selected', async () => {
+    await render(
+      <ExploreBottomSheet>
+        <Text>Nearby</Text>
+      </ExploreBottomSheet>,
+    );
+    expect(mockBottomSheetProps[0]?.snapIndex).toBe(EXPLORE_SHEET_PEEK);
+
+    mockBottomSheetProps.length = 0;
+    await render(
+      <ExploreBottomSheet hasSelection>
+        <Text>Preview</Text>
+      </ExploreBottomSheet>,
+    );
+    expect(mockBottomSheetProps[0]?.snapIndex).toBe(EXPLORE_SHEET_HALF);
+  });
+
+  it('forwards controlled snapIndex and onSnapIndexChange', async () => {
+    const onSnapIndexChange = jest.fn();
+    await render(
+      <ExploreBottomSheet snapIndex={2} onSnapIndexChange={onSnapIndexChange}>
+        <Text>Browse</Text>
+      </ExploreBottomSheet>,
+    );
+    expect(mockBottomSheetProps[0]?.snapIndex).toBe(2);
+    // Peek is a point height, not a share of the screen (repo-pmi5n); half and full stay
+    // proportional because the map is meant to keep the majority of the surface.
+    expect(mockBottomSheetProps[0]?.snapPoints).toEqual([
+      EXPLORE_SHEET_PEEK_FALLBACK_PX,
+      '34%',
+      '52%',
+    ]);
+    expect(mockBottomSheetProps[0]?.bottomInset).toBe(0);
+    expect(mockBottomSheetProps[0]?.onSnapIndexChange).toBe(onSnapIndexChange);
+  });
+
+  it('sizes the peek detent to the measured header rather than a screen fraction', async () => {
+    await render(
+      <ExploreBottomSheet peekHeaderHeight={61}>
+        <Text>Browse</Text>
+      </ExploreBottomSheet>,
+    );
+    // 44dp handle + the header the sheet actually shows. Nothing else is visible at peek, so
+    // nothing else is reserved — that reserve was the empty band above the tab bar.
+    expect(mockBottomSheetProps[0]?.snapPoints).toEqual([105, '34%', '52%']);
+  });
+
+  it('forwards scrollable preview mode and tab bar inset', async () => {
+    await render(
+      <ExploreBottomSheet scrollable bottomInset={83}>
+        <Text>Preview</Text>
+      </ExploreBottomSheet>,
+    );
+    expect(mockBottomSheetProps[0]?.scrollable).toBe(true);
+    expect(mockBottomSheetProps[0]?.bottomInset).toBe(83);
+  });
+
+  it('forwards sheetList rail mode for BottomSheetFlatList hosts', async () => {
+    await render(
+      <ExploreBottomSheet sheetList>
+        <Text>Rail</Text>
+      </ExploreBottomSheet>,
+    );
+    expect(mockBottomSheetProps[0]?.sheetList).toBe(true);
+    expect(mockBottomSheetProps[0]?.scrollable).toBe(false);
+  });
+});

@@ -2,7 +2,7 @@
  * Unit tests for mobile elevation token API — flat matte default.
  */
 import { brandCore } from '../generated/colors.generated';
-import { getShadowStyle, type ShadowLevel } from '../elevation';
+import { getShadowStyle } from '../elevation';
 
 describe('elevation tokens', () => {
   describe('getShadowStyle', () => {

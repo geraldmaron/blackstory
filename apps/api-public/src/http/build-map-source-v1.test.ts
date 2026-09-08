@@ -9,7 +9,7 @@ import { makeEntity } from './entity-fixture.js';
 import {
   buildMapSourceV1,
   geoPrecisionTierForPublicPrecision,
-  highestConfidence,
+  recordConfidenceTier,
 } from './build-map-source-v1.js';
 
 test('geoPrecisionTierForPublicPrecision maps public precision vocabulary', () => {
@@ -20,14 +20,26 @@ test('geoPrecisionTierForPublicPrecision maps public precision vocabulary', () =
   assert.equal(geoPrecisionTierForPublicPrecision('weird'), 'unknown');
 });
 
-test('highestConfidence prefers the strongest claim tier', () => {
-  assert.equal(highestConfidence([]), 'unrated');
+test('recordConfidenceTier prefers the strongest claim tier once corroborated', () => {
+  assert.equal(recordConfidenceTier([]), 'unrated');
   assert.equal(
-    highestConfidence([
-      { confidenceLevel: 'low' },
-      { confidenceLevel: 'high' },
+    recordConfidenceTier([
+      { confidenceLevel: 'low', citation: { source: 'nps.gov' } },
+      { confidenceLevel: 'high', citation: { source: 'catalog.archives.gov' } },
     ] as EntityV1['claims']),
     'high',
+  );
+});
+
+test('recordConfidenceTier caps a single-source record below grade A on the wire', () => {
+  // The wire must grade a record exactly as the site and the phone do; a local maximum here is
+  // what let 4,152 of 4,161 map features ship as grade A.
+  assert.equal(
+    recordConfidenceTier([
+      { confidenceLevel: 'high', citation: { source: 'wikipedia_api' } },
+      { confidenceLevel: 'high', citation: { source: 'en.wikipedia.org' } },
+    ] as EntityV1['claims']),
+    'medium',
   );
 });
 

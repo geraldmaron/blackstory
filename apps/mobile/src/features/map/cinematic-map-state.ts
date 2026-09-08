@@ -6,10 +6,14 @@
  * cannot drift between platforms, and stays unit-testable in plain Node
  * alongside this repo's other pure map modules (`mapCamera.ts`, `clusterCamera.ts`).
  *
- * Three states only (spec §1): `rest` (locked, default) -> `invite` (optional
- * scroll/beat-driven, still locked) -> `engaged` (hands-on). `close()` always
- * returns to `rest` and clears selection, regardless of which state it is
- * called from (spec §2 rule 4).
+ * Three states only (spec §1): `rest` (default) -> `invite` (optional scroll/beat-driven) ->
+ * `engaged`. `close()` always returns to `rest` and clears selection, regardless of which state
+ * it is called from (spec §2 rule 4).
+ *
+ * On web these states also gate the map's pointer events, because there the plate is a backdrop
+ * inside a scrolling document. On a map-led screen they are chrome posture only: `engaged` means
+ * the reader asked for more map, never that the map became touchable (spec §5b). `ExploreView`
+ * therefore reads `state` and ignores `selectedEntityId`, which the Explore reducer owns.
  *
  * Selection is single-feature (spec §2 rule 5): `selectedEntityId` holds at
  * most one id, and `select`/`deselect` never touch anything else in state.
@@ -34,7 +38,7 @@ export const CINEMATIC_MAP_INITIAL_STATE: CinematicMapReducerState = {
 export type CinematicMapAction =
   /** Rest -> Invite (scroll/beat-driven intro begins). No-op once past Rest. */
   | { readonly type: 'invite' }
-  /** Rest|Invite -> Engaged (the reader tapped "Explore the map"). No-op if already Engaged. */
+  /** Rest|Invite -> Engaged (the reader asked for more map). No-op if already Engaged. */
   | { readonly type: 'engage' }
   /** Any state -> Rest. Always deselects (spec §2 rule 4: relock deselects + restores home). */
   | { readonly type: 'close' }

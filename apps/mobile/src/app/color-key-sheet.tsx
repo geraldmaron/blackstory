@@ -3,7 +3,7 @@
  */
 import { router } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
-import { MapColorKey } from '@/features/map/explore/MapColorKey';
+import { MapColorKey } from '@/features/explore/MapColorKey';
 import { ScreenCanvas } from '@/ui';
 import { useEditionStackBack } from '@/shell/use-edition-stack-back';
 

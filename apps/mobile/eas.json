@@ -19,7 +19,7 @@
       "autoIncrement": true,
       "env": {
         "APP_VARIANT": "preview",
-        "API_BASE_URL": "https://api.blackbook.app",
+        "API_BASE_URL": "https://api.blackstory.app",
         "EAS_PROJECT_ID": "51a35884-e6b5-43b6-b95b-c5a7460fa665"
       }
     },
@@ -29,7 +29,7 @@
       "autoIncrement": true,
       "env": {
         "APP_VARIANT": "production",
-        "API_BASE_URL": "https://api.blackbook.app",
+        "API_BASE_URL": "https://api.blackstory.app",
         "EAS_PROJECT_ID": "51a35884-e6b5-43b6-b95b-c5a7460fa665"
       }
     }

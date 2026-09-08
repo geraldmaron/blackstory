@@ -51,6 +51,10 @@ cp -rf source dest          # NOT: cp -r source dest
 
 **Path B (hot reload only):** `pnpm dev:mobile` / `pnpm dev:mobile:verify` when actively editing JS. Never claim mobile healthy from `127.0.0.1:8081` `/status` alone while the iOS dev client may still target another LAN port (`:8082`, `:8083`). Path B verify must pass LAN bundle smoke + simulator packager alignment.
 
+Static gates run from `apps/mobile` on its own npm graph, not through root `pnpm lint` (which
+excludes `apps/mobile/**`): `npm run lint` (ESLint, warnings fail), `npm run typecheck`, `npm test`.
+CI runs all three in the Mobile Lint / Mobile Typecheck / Mobile Unit Tests jobs.
+
 See `apps/mobile/README.md` for setup (`API_BASE_URL=http://127.0.0.1:8080` in `apps/mobile/.env.local`).
 
 ## BlackStory research lanes
@@ -131,8 +135,12 @@ reserved for the moment of orientation (active locations, selected filters, prim
 evidence markers). Raw Copper Pin never carries body-size text on light canvas. Dark theme is
 first-class, not an afterthought.
 
-**Type.** Sora SemiBold headlines; Inter UI/body; Source Serif 4 editorial/longform; IBM Plex Mono
-for data, citations, dates, confidence, and technical labels. All open-source; no licensed fonts.
+**Type.** Schibsted Grotesk SemiBold display; Geist UI/body; Newsreader editorial/longform; Geist
+Mono for data, citations, dates, confidence, and technical labels. All open-source; no licensed
+fonts. The binding source is `brand/tokens/typography.json`, which `packages/ui/src/styles/
+tokens.css` and `apps/mobile/scripts/generate-brand-tokens.ts` both generate from — this line
+described the pre-migration families (Sora / Inter / Source Serif 4 / IBM Plex Mono) for months
+after neither the tokens nor the native font loader used them.
 
 **Shape.** Radii 8/16/28px (sm/md/lg). Flat matte fills only — no bevels, shadows, glows,
 gradients, 3D, or ornamental motion, anywhere, ever.

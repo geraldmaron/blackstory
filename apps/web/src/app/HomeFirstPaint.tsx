@@ -62,10 +62,16 @@ function DoorRooms({ rooms }: { readonly rooms: ReturnType<typeof selectDoorRoom
   if (rooms.length === 0) return null;
   return (
     <nav className="ds-home-door-rooms" aria-label="Archive">
-      {rooms.map((room, index) => (
+      {rooms.map((room) => (
+        // Stories is the one room that is not on every place's door — it exists only when this
+        // record already names a chapter, which is a real reason to lead with it. Law, Data,
+        // Memorial, Methodology and Errata are the same five links on every place (see the module
+        // doc above), so none of them is more "current" than another: copper on one of them by
+        // array position read as a false active-tab state that had nothing to do with the place
+        // on screen.
         <Link
           key={room.id}
-          className={index === 0 ? 'ds-cta ds-cta--copper' : 'ds-cta ds-cta--quiet'}
+          className={room.id === 'stories' ? 'ds-cta ds-cta--copper' : 'ds-cta ds-cta--quiet'}
           href={room.href}
         >
           {room.label}
@@ -75,20 +81,27 @@ function DoorRooms({ rooms }: { readonly rooms: ReturnType<typeof selectDoorRoom
   );
 }
 
-function WalkOnPlace({
-  place,
+function WalkOnPlaces({
+  places,
   collisions,
 }: {
-  readonly place: PublicEntityView;
+  readonly places: readonly PublicEntityView[];
   readonly collisions: ReadonlyMap<string, number>;
 }) {
-  const href = instrumentRecordHref(place, collisions) || placeHref(place.displayName);
+  if (places.length === 0) return null;
   return (
-    <p className="ds-home-walk-on">
-      <Link className="ds-cta ds-cta--copper" href={href}>
-        {place.displayName}
-      </Link>
-    </p>
+    // Peer suggestions, not the page's primary action — quiet like Data/Memorial/Methodology/
+    // Errata above, so a stack of them doesn't compete with the one copper off-ramp below.
+    <nav className="ds-home-walk-on" aria-label="Also documented">
+      {places.map((place) => {
+        const href = instrumentRecordHref(place, collisions) || placeHref(place.displayName);
+        return (
+          <Link key={place.id} className="ds-cta ds-cta--quiet" href={href}>
+            {place.displayName}
+          </Link>
+        );
+      })}
+    </nav>
   );
 }
 
@@ -301,9 +314,7 @@ export function HomeFirstPaint({
           />
         </section>
 
-        {nextPlaces.map((place) => (
-          <WalkOnPlace key={place.id} place={place} collisions={collisions} />
-        ))}
+        <WalkOnPlaces places={nextPlaces} collisions={collisions} />
 
         <DoorRooms rooms={rooms} />
 

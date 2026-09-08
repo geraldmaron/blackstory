@@ -1,14 +1,67 @@
 /**
- * Native Explore experience (MOB-012): map edition chrome, filters, and entity
- * preview built on MOB-011's map feature. The Explore route imports
- * `ExploreView`; everything else is the pure, individually-tested core.
+ * The Explore experience: the map-led instrument, its chrome, its filters, its records rail and
+ * its preview — everything that is Explore rather than "a map".
+ *
+ * Generally reusable map machinery stays in `features/map`. This feature used to be split across
+ * both trees, with `features/map/explore/` holding half the chrome and each barrel re-exporting
+ * from the other; the route imported `ExploreView` from here and the sheet from there.
  */
 export { ExploreView, type ExploreViewProps } from './ExploreView';
 export {
   EntityPreviewSheet,
   type EntityPreviewSheetProps,
   type EntityPreviewPreviewFeature,
-} from '@/features/map/explore';
+} from './EntityPreviewSheet';
+export {
+  formatExploreCountLabel,
+  EXPLORE_SCOPE_NEARBY,
+  EXPLORE_SCOPE_ALL_PINNED,
+  type ExploreCountLabel,
+  type ExploreCountLabelInput,
+} from './explore-count-label';
+export {
+  shouldShowSparseViewportCoach,
+  SPARSE_VIEWPORT_COACH_COPY,
+  type SparseViewportCoachInput,
+} from './sparse-viewport-coach';
+export { exploreStoryMeta, type ExploreStoryMeta } from './explore-story-meta';
+export {
+  activeFilterChips,
+  activeFilterCount,
+  clearFilterKey,
+  type ActiveFilterChip,
+} from './active-filter-chips';
+export { ExploreChromeFrame, ExploreListChrome } from './explore-chrome';
+export {
+  featureMetaLine,
+  featureKindSlug,
+  featureAtAGlanceFacts,
+  type AtAGlanceFact,
+  type PreviewMetaFeature,
+} from './explore-meta';
+export {
+  ExploreFiltersPanel,
+  filterStateFromPanel,
+  EXPLORE_ERA_OPTIONS,
+  type ExploreFiltersPanelProps,
+  type ExploreEraOption,
+} from './ExploreFiltersPanel';
+export { MapColorKey, type MapColorKeyProps } from './MapColorKey';
+export { ExploreRecordsRail, type ExploreRecordsRailProps } from './ExploreRecordsRail';
+export {
+  ExploreInstrumentsPanel,
+  type ExploreInstrumentsPanelProps,
+  type ExploreInstrumentsTab,
+} from './ExploreInstrumentsPanel';
+export {
+  ExploreEditionSegmentTabs,
+  ExploreEditionKicker,
+  ExploreFacetRow,
+  ExplorePanelHeader,
+  ExploreRestoreChip,
+  ExploreInstrumentsFrame,
+} from './explore-edition-chrome';
+export { exploreRecordFacts } from './explore-preview-facts';
 export { useReduceMotion } from './useReduceMotion';
 export {
   useExploreMapSource,

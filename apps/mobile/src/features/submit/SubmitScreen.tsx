@@ -17,7 +17,8 @@ import {
   space,
 } from '@/ui';
 
-const CANONICAL_WEB_ORIGIN = 'https://blackbook.app';
+// The live public site. See `features/entity/share.ts` for why this is not `blackstory.app`.
+const CANONICAL_WEB_ORIGIN = 'https://blackstory.app';
 
 export const SUBMIT_INTRO = {
   kicker: 'Contribute',
@@ -49,7 +50,7 @@ export function SubmitScreen() {
           <LedgerRow
             title="Submit a correction"
             summary="Report an error or missing citation on a published record"
-            leading={<NavIcon name="corrections" size={20} />}
+            leading={<NavIcon name="correction" size={20} />}
             showChevron
             showDivider={false}
             onPress={() => router.push('/corrections/submit' as never)}

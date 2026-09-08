@@ -171,7 +171,7 @@ export function LawBrowseScreen() {
                 title={row.title}
                 slug={`${row.kindLabel} · ${row.statusLabel}`}
                 summary={`${row.citation}${row.topicsLabel ? ` · ${row.topicsLabel}` : ''}`}
-                leading={<NavIcon name="lawRef" size={20} />}
+                leading={<NavIcon name="law" size={20} />}
                 showChevron
                 showDivider={index < rows.length - 1}
                 onPress={() => router.push(`/law/${row.slug}` as never)}

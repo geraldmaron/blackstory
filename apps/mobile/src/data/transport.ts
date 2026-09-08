@@ -149,7 +149,6 @@ export function createTransport(deps: TransportDeps): Transport {
     const headers: Record<string, string> = {};
     if (options.etag) headers['If-None-Match'] = options.etag;
 
-    let lastError: unknown;
     for (let attempt = 1; attempt <= policy.maxAttempts; attempt++) {
       if (options.signal?.aborted) {
         throw new TransportError('request aborted before send', { kind: 'aborted', attempts: attempt - 1 });
@@ -166,7 +165,6 @@ export function createTransport(deps: TransportDeps): Transport {
           throw new TransportError('request aborted', { kind: 'aborted', attempts: attempt });
         }
         // Network-level failure: retryable.
-        lastError = err;
         if (attempt < policy.maxAttempts) {
           await sleep(backoffMs(attempt, undefined));
           continue;

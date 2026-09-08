@@ -143,21 +143,31 @@ export function CorrectionForm({ entityId, scrollRef, onSubmit, onAccepted }: Co
   // Focus chain: record id → URL → contact.
   const urlRef = useRef<TextInput>(null);
   const contactRef = useRef<TextInput>(null);
-  const fieldRefs = {
-    targetType: useRef<View>(null),
-    category: useRef<View>(null),
-    targetRecordId: useRef<View>(null),
-    statement: useRef<View>(null),
-    sourceUrl: useRef<View>(null),
-    contact: useRef<View>(null),
-    contactConsent: useRef<View>(null),
-    privacyConsent: useRef<View>(null),
-  } satisfies Record<FieldAnchorKey, RefObject<View | null>>;
+  // One named ref per anchorable field rather than a record built in render: the
+  // scroll-to-issue map is only needed after a failed submit, and assembling it
+  // here would have the render pass read out of a ref container.
+  const targetTypeRef = useRef<View>(null);
+  const categoryRef = useRef<View>(null);
+  const targetRecordIdRef = useRef<View>(null);
+  const statementRef = useRef<View>(null);
+  const sourceUrlRef = useRef<View>(null);
+  const contactFieldRef = useRef<View>(null);
+  const contactConsentRef = useRef<View>(null);
+  const privacyConsentRef = useRef<View>(null);
 
   function reportIssues(nextIssues: readonly CorrectionFieldIssue[]) {
     setIssues(nextIssues);
     announceFirstIssue(nextIssues);
-    scrollToFirstIssue(nextIssues, scrollRef, fieldRefs);
+    scrollToFirstIssue(nextIssues, scrollRef, {
+      targetType: targetTypeRef,
+      category: categoryRef,
+      targetRecordId: targetRecordIdRef,
+      statement: statementRef,
+      sourceUrl: sourceUrlRef,
+      contact: contactFieldRef,
+      contactConsent: contactConsentRef,
+      privacyConsent: privacyConsentRef,
+    } satisfies Record<FieldAnchorKey, RefObject<View | null>>);
   }
 
   function patch(next: Partial<CorrectionFormState>) {
@@ -204,7 +214,7 @@ export function CorrectionForm({ entityId, scrollRef, onSubmit, onAccepted }: Co
     <View style={{ gap: space['3'] }}>
       <Notice tone="info" title={CORRECTION_PRIVACY_NOTICE.title} description={CORRECTION_PRIVACY_NOTICE.body} />
 
-      <Field ref={fieldRefs.targetType} label="What are you correcting?" error={issueFor(issues, 'targetType')}>
+      <Field ref={targetTypeRef} label="What are you correcting?" error={issueFor(issues, 'targetType')}>
         <ChipRow<CorrectionTargetType>
           values={Object.keys(CORRECTION_TARGET_LABELS) as CorrectionTargetType[]}
           selected={state.targetType || undefined}
@@ -213,7 +223,7 @@ export function CorrectionForm({ entityId, scrollRef, onSubmit, onAccepted }: Co
         />
       </Field>
 
-      <Field ref={fieldRefs.category} label="Category" error={issueFor(issues, 'category')}>
+      <Field ref={categoryRef} label="Category" error={issueFor(issues, 'category')}>
         <ChipRow<CorrectionCategory>
           values={Object.keys(CORRECTION_CATEGORY_LABELS) as CorrectionCategory[]}
           selected={state.category || undefined}
@@ -222,7 +232,7 @@ export function CorrectionForm({ entityId, scrollRef, onSubmit, onAccepted }: Co
         />
       </Field>
 
-      <Field ref={fieldRefs.targetRecordId} label="Record identifier" error={issueFor(issues, 'targetRecordId')}>
+      <Field ref={targetRecordIdRef} label="Record identifier" error={issueFor(issues, 'targetRecordId')}>
         <CorrectionTextField
           value={state.targetRecordId}
           onChangeText={(t) => patch({ targetRecordId: t })}
@@ -238,7 +248,7 @@ export function CorrectionForm({ entityId, scrollRef, onSubmit, onAccepted }: Co
         />
       </Field>
 
-      <Field ref={fieldRefs.statement} label="Describe the correction" error={issueFor(issues, 'statement')}>
+      <Field ref={statementRef} label="Describe the correction" error={issueFor(issues, 'statement')}>
         <CorrectionTextField
           value={state.statement}
           onChangeText={(t) => patch({ statement: t })}
@@ -252,7 +262,7 @@ export function CorrectionForm({ entityId, scrollRef, onSubmit, onAccepted }: Co
         />
       </Field>
 
-      <Field ref={fieldRefs.sourceUrl} label="Supporting HTTPS source URL" error={issueFor(issues, 'sourceUrl')}>
+      <Field ref={sourceUrlRef} label="Supporting HTTPS source URL" error={issueFor(issues, 'sourceUrl')}>
         <CorrectionTextField
           ref={urlRef}
           value={state.sourceUrl}
@@ -271,7 +281,7 @@ export function CorrectionForm({ entityId, scrollRef, onSubmit, onAccepted }: Co
         />
       </Field>
 
-      <Field ref={fieldRefs.contact} label="Contact (optional)" error={issueFor(issues, 'contact')}>
+      <Field ref={contactFieldRef} label="Contact (optional)" error={issueFor(issues, 'contact')}>
         <CorrectionTextField
           ref={contactRef}
           value={state.contact}
@@ -289,7 +299,7 @@ export function CorrectionForm({ entityId, scrollRef, onSubmit, onAccepted }: Co
         />
       </Field>
 
-      <View ref={fieldRefs.contactConsent}>
+      <View ref={contactConsentRef}>
         <Checkbox
           checked={state.contactConsent}
           onToggle={() => patch({ contactConsent: !state.contactConsent })}
@@ -298,7 +308,7 @@ export function CorrectionForm({ entityId, scrollRef, onSubmit, onAccepted }: Co
         />
       </View>
 
-      <View ref={fieldRefs.privacyConsent}>
+      <View ref={privacyConsentRef}>
         <Checkbox
           checked={state.privacyConsent}
           onToggle={() => patch({ privacyConsent: !state.privacyConsent })}

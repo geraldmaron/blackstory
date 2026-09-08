@@ -1,28 +1,35 @@
 /**
- * History tab — unified find-in-time surface (v6 mobile shell). Search merged here per
- * web `/history`; implementation reuses `SearchScreen` until the full history edition ships.
+ * Legacy `/history` tab route — normalizes to Records.
+ *
+ * History was find-in-time: a search over the archive with a decade filter, which is what
+ * Records is. The `decade` param carries over as `era`, the same value transform the web route
+ * performs, so a link shared from either surface lands on the same view.
  */
-import { useLocalSearchParams } from 'expo-router';
+import { Redirect, useLocalSearchParams } from 'expo-router';
 
-import { parseFilterState, parseSearchQuery } from '@/lib/route-params';
-import { SearchScreen } from '@/features/search';
-import { useExploreMapSource } from '@/features/explore';
+import { decadeParamToEra, parseFilterState, parseSearchQuery } from '@/lib/route-params';
 
-export default function HistoryTabScreen() {
-  const params = useLocalSearchParams<{ q?: string | string[]; kind?: string | string[] }>();
-  const initialQuery = parseSearchQuery(params.q);
-  const { kind: initialKind } = parseFilterState(params as Record<string, unknown>);
-  const mapSource = useExploreMapSource();
-  const pinnedRecordCount =
-    mapSource.loadState.kind === 'ready' ? mapSource.source.features.length : undefined;
-  const archiveScopeLabel = mapSource.usingDemo ? 'Demo fixtures' : 'Active release';
+export default function HistoryRedirectScreen() {
+  const params = useLocalSearchParams<{
+    q?: string | string[];
+    kind?: string | string[];
+    decade?: string | string[];
+    era?: string | string[];
+  }>();
+  const q = parseSearchQuery(params.q);
+  const { kind } = parseFilterState(params as Record<string, unknown>);
+  const era = decadeParamToEra(params.decade) ?? parseSearchQuery(params.era);
 
   return (
-    <SearchScreen
-      initialQuery={initialQuery || undefined}
-      initialKind={initialKind}
-      pinnedRecordCount={pinnedRecordCount}
-      archiveScopeLabel={archiveScopeLabel}
+    <Redirect
+      href={{
+        pathname: '/records',
+        params: {
+          ...(q ? { q } : {}),
+          ...(kind ? { kind } : {}),
+          ...(era ? { era } : {}),
+        },
+      }}
     />
   );
 }

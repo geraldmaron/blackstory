@@ -223,7 +223,7 @@ export function MemorialScreen() {
               label={MEMORIAL_ACTIONS.methodology}
               variant="secondary"
               density="compact"
-              onPress={() => router.push('/learn/methodology' as never)}
+              onPress={() => router.push('/methodology')}
             />
             <Button
               label={MEMORIAL_ACTIONS.submit}

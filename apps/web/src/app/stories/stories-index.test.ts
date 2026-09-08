@@ -74,15 +74,18 @@ describe('/stories · the two notice states differ', () => {
 });
 
 describe('/stories · query parsing', () => {
-  it('collapses unrecognized values to the chapters default rather than throwing, since bookmarks reach here', () => {
+  it('collapses unrecognized values to all Stories rather than throwing, since bookmarks reach here', () => {
     const query = parseStoriesQuery({ kind: 'nonsense', sort: 'sideways', page: 'abc' });
-    assert.equal(query.kind, 'chapter');
+    assert.equal(query.kind, '');
     assert.equal(query.sort, 'collection');
     assert.equal(query.page, 1);
   });
 
-  it('defaults to chapters when no kind param is present', () => {
-    assert.equal(parseStoriesQuery({}).kind, 'chapter');
+  it('bare /stories means every published Story, not chapters only', () => {
+    // The route is named `/stories`. Defaulting to `chapter` hid every Entry from a reader who
+    // did not know to append `kind=all`, while the page's own copy promised they would not have
+    // to know which editorial contract an answer was written under.
+    assert.equal(parseStoriesQuery({}).kind, '');
   });
 
   it('accepts the real kinds and sorts', () => {
@@ -90,8 +93,9 @@ describe('/stories · query parsing', () => {
     assert.equal(parseStoriesQuery({ sort: 'title' }).sort, 'title');
   });
 
-  it('reaches the unfiltered "All" view only via the explicit kind=all sentinel', () => {
+  it('still accepts kind=all, because it is a published URL', () => {
     assert.equal(parseStoriesQuery({ kind: 'all' }).kind, '');
+    assert.equal(parseStoriesQuery({ kind: '' }).kind, '');
   });
 
   it('takes the first value when a param repeats', () => {
@@ -113,8 +117,10 @@ describe('/stories · href building', () => {
     assert.equal(storiesHref({ kind: 'article', page: 3 }), '/stories?kind=article&page=3');
   });
 
-  it('renders the explicit "All" kind as kind=all, since an omitted kind means chapters', () => {
-    assert.equal(storiesHref({ kind: '' }), '/stories?kind=all');
+  it('never generates kind=all: the default kind is every Story and stays out of the URL', () => {
+    assert.equal(storiesHref({ kind: '' }), '/stories');
+    assert.equal(storiesHref({ kind: 'chapter' }), '/stories?kind=chapter');
+    assert.equal(storiesHref({ kind: 'article' }), '/stories?kind=article');
   });
 });
 
@@ -143,11 +149,11 @@ describe('/stories · filtering and search', () => {
   // filtering on its own, across both kinds, so they start from the explicit "All" kind instead.
   const ALL = { ...EMPTY, kind: '' };
 
-  it('defaults to chapters only, since that is now the index default', () => {
+  it('the default view is every kind, not chapters only', () => {
     const rows = filterItems(items, EMPTY);
     assert.deepEqual(
       rows.map((row) => row.id),
-      ['c1'],
+      ['c1', 'p16', 'p40'],
     );
   });
 
@@ -187,7 +193,9 @@ describe('/stories · filtering and search', () => {
     assert.equal(hasActiveNarrowing({ ...EMPTY, q: 'x' }), true);
     assert.equal(hasActiveNarrowing({ ...EMPTY, collection: 'presidents' }), true);
     assert.equal(hasActiveNarrowing({ ...EMPTY, kind: 'article' }), true);
-    assert.equal(hasActiveNarrowing(ALL), true);
+    assert.equal(hasActiveNarrowing({ ...EMPTY, kind: 'chapter' }), true);
+    // ALL is the default view now, so it is not a narrowing.
+    assert.equal(hasActiveNarrowing(ALL), false);
   });
 });
 
@@ -275,9 +283,9 @@ describe('/stories · rail groups and chips', () => {
         ['Entries', 1],
       ],
     );
-    // EMPTY now defaults to chapters, not All.
-    assert.equal(chips[0]?.active, false);
-    assert.equal(chips[1]?.active, true);
+    // EMPTY is the All view, so All is the engaged chip.
+    assert.equal(chips[0]?.active, true);
+    assert.equal(chips[1]?.active, false);
   });
 
   it('marks the engaged chip as current for assistive technology', () => {
@@ -287,18 +295,18 @@ describe('/stories · rail groups and chips', () => {
   });
 
   it('builds collection, era, tag and place groups that link back into the index across both kinds', () => {
-    // These rail links always carry kind=all: they group across both editorial kinds (e.g.
-    // "Presidential records" is entirely `article`), so they must not fall through to the
-    // chapters default.
+    // These rail links carry no kind at all now: the default view is every kind, so a grouping
+    // that is entirely `article` (like "Presidential records") resolves correctly without an
+    // override. They used to need an explicit `kind=all`.
     assert.deepEqual(buildCollectionGroups(items), [
-      { label: 'Presidential records', href: '/stories?kind=all&collection=presidents', count: 1 },
+      { label: 'Presidential records', href: '/stories?collection=presidents', count: 1 },
     ]);
     assert.deepEqual(buildTagGroups(items), [
-      { label: 'Founding era', href: '/stories?kind=all&tag=Founding+era', count: 1 },
+      { label: 'Founding era', href: '/stories?tag=Founding+era', count: 1 },
     ]);
     assert.equal(buildEraGroups(items).length, 2);
     assert.deepEqual(buildPlaceGroups(items), [
-      { label: 'US', href: '/stories?kind=all&place=US', count: 2 },
+      { label: 'US', href: '/stories?place=US', count: 2 },
     ]);
   });
 });
@@ -340,8 +348,25 @@ describe('/stories · shelves', () => {
     );
   });
 
-  it('the lead story is the most recently published item in view', () => {
-    assert.equal(pickLeadStory(items)?.slug, 'u1');
+  it('the lead story is the most recent Chapter, not merely the most recent item', () => {
+    // Straight newest-first made the flagship of the whole publication whichever short Entry
+    // happened to be published last. A Chapter is the deep narrative form and leads when one
+    // exists; `u1` is newer here but is not a chapter.
+    const newerEntry = item({
+      id: 'e9',
+      slug: 'lincoln',
+      kind: 'article',
+      publishedAt: '2026-01-01',
+    });
+    const entryOnly = [
+      item({ id: 'e1', slug: 'e1', kind: 'article', publishedAt: '2024-01-01' }),
+      item({ id: 'e2', slug: 'e2', kind: 'article', publishedAt: '2025-01-01' }),
+    ];
+    // `u1` is the newest chapter in `items`; `lincoln` is newer still but is an Entry.
+    assert.equal(pickLeadStory([...items, newerEntry])?.slug, 'u1');
+    // With no chapter in view — a reader narrowed to Entries — the newest item leads.
+    assert.equal(pickLeadStory(entryOnly)?.slug, 'e2');
+    assert.equal(pickLeadStory([]), undefined);
   });
 
   it('shelves show in the unnarrowed, collection-sorted browse state, for any kind chip', () => {
@@ -388,7 +413,7 @@ describe('/stories · shelves, the uncollected remainder and collection navigati
       shelves.map((shelf) => [shelf.id, shelf.count, shelf.members.map((m) => m.slug)]),
       [['presidents', 3, ['washington', 'adams']]],
     );
-    assert.equal(shelves[0]?.href, '/stories?kind=all&collection=presidents');
+    assert.equal(shelves[0]?.href, '/stories?collection=presidents');
   });
 
   it('the uncollected list is everything with no collection, and nothing else', () => {
