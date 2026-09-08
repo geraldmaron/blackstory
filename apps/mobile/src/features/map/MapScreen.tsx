@@ -295,9 +295,9 @@ export function MapScreen({
    * on the national bounds forever. Framing at mount removes the race rather than papering over
    * it with a retry.
    *
-   * Captured in a ref so it stays genuinely initial: later commands belong to the effect.
+   * Held in lazy state so it stays genuinely initial: later commands belong to the effect.
    */
-  const initialViewStateRef = useRef(
+  const [initialViewState] = useState(() =>
     cameraCommand?.kind === 'center'
       ? {
           center: [cameraCommand.center[0], cameraCommand.center[1]] as [number, number],
@@ -313,7 +313,6 @@ export function MapScreen({
           padding: { ...EXPLORE_MAP_VIEW_PADDING },
         },
   );
-  const initialViewState = initialViewStateRef.current;
 
   // Apply a one-shot camera command exactly once per token. Guarded so a mocked
   // (null-ref) map in tests and a missing command are both no-ops.
