@@ -142,9 +142,11 @@ describe('room kit · the trail is computed, never hand-written', () => {
     ]);
   });
 
-  it("an entity's parent is the site root, not /records — a record is a point, not a row", () => {
-    // The site root is not a rendered step, so an entity's chain is the entity alone.
+  it("an entity's parent is Records — the catalogue that lists it", () => {
+    // It used to be the site root, from the Atlas generation where the map was the one way in
+    // (a720e176). That left a reader on a record page with no step up into the archive at all.
     assert.deepEqual(resolveTrail('/entity/abc', 'Isaac McGhie'), [
+      { label: 'Records', href: '/records' },
       { label: 'Isaac McGhie', href: null },
     ]);
   });

@@ -1,8 +1,13 @@
 /**
- * Command bar — fixed top, z 50. Brand, search, Find (Door / Explore / Records), Rooms, tools.
+ * Command bar — fixed top, z 50. Brand, search, the four product axes, Rooms, tools.
  *
- * The Door Journey lives on `/`. Explore is the map instrument on `/explore`. Journey is no longer
- * a separate Explore mode in the bar — the main-page experience is the fold.
+ * The axes are derived from the destination registry rather than written out here. This bar was
+ * the last hand-kept nav list on the site: it named Door, Explore and Records, which meant
+ * Stories — one of the four ways into the product — was reachable only through the Rooms menu,
+ * and the bar could not notice when a route it named stopped existing.
+ *
+ * Home is the brand lockup on the left, on every surface. It is not a nav item: a "Door" link
+ * beside Explore read as a fifth destination competing with the archive.
  */
 'use client';
 
@@ -12,10 +17,20 @@ import { usePathname } from 'next/navigation';
 import { BRAND_ASSETS } from '@repo/config';
 import { cx, ShellWordmark } from '@repo/ui';
 import { CommandBarSearch } from './CommandBarSearch';
-import { LibraryMenu } from './LibraryMenu';
+import { RoomsMenu } from './RoomsMenu';
+import { primaryNavDestinations } from '../../lib/nav/destination-registry';
 import './command-bar.css';
 
 void React;
+
+/**
+ * Explore, Stories, Records — the three axes the bar renders as plain links. Rooms is the fourth
+ * and renders as {@link RoomsMenu}, a disclosure whose panel lists the rooms and links the hub;
+ * a separate `Rooms` link beside it would be the same destination twice.
+ *
+ * Computed once at module scope: the registry is static data and this bar mounts on every route.
+ */
+const AXES = primaryNavDestinations().filter((axis) => axis.path !== '/rooms');
 
 /** Writes measured command-bar clearance to the document root for Door/room layout tokens. */
 export function syncCommandBarClearance(bar: HTMLElement): void {
@@ -130,47 +145,29 @@ export function CommandBar({
       )}
 
       <div className="ds-bar__tools">
-        {onAtlas ? (
-          <nav className="ds-bar__modes" aria-label="Sections">
-            <span className="ds-bar__mode-link" aria-current="page">
-              Explore
-            </span>
-            <Link
-              className="ds-bar__mode-link"
-              href="/"
-              aria-current={pathIsCurrent(pathname, '/') ? 'page' : undefined}
-            >
-              Door
-            </Link>
-          </nav>
-        ) : (
-          <nav className="ds-bar__modes" aria-label="Find">
-            <Link
-              className="ds-bar__mode-link"
-              href="/"
-              aria-current={pathIsCurrent(pathname, '/') ? 'page' : undefined}
-            >
-              Door
-            </Link>
-            <Link
-              className="ds-bar__mode-link"
-              href="/explore"
-              prefetch={false}
-              aria-current={pathIsCurrent(pathname, '/explore') ? 'page' : undefined}
-            >
-              Explore
-            </Link>
-            <Link
-              className="ds-bar__mode-link"
-              href="/records"
-              aria-current={pathIsCurrent(pathname, '/records') ? 'page' : undefined}
-            >
-              Records
-            </Link>
-          </nav>
-        )}
-
-        <LibraryMenu />
+        <nav className="ds-bar__modes" aria-label="Find">
+          {AXES.map((axis) => {
+            const current = pathIsCurrent(pathname, axis.path);
+            // On the Explore instrument the bar names the surface the reader is standing on
+            // rather than offering it as a link back to itself.
+            return current && axis.path === '/explore' ? (
+              <span key={axis.path} className="ds-bar__mode-link" aria-current="page">
+                {axis.label}
+              </span>
+            ) : (
+              <Link
+                key={axis.path}
+                className="ds-bar__mode-link"
+                href={axis.path}
+                {...(axis.path === '/explore' ? { prefetch: false } : {})}
+                aria-current={current ? 'page' : undefined}
+              >
+                {axis.label}
+              </Link>
+            );
+          })}
+          <RoomsMenu />
+        </nav>
 
         {onOpenSaved ? (
           <button

@@ -5,7 +5,10 @@
  * individually cited call-outs, published in ordered collections).
  *
  * Both kinds share this index on purpose. A reader looking for what the archive says
- * about a subject should not have to know which contract the answer was written under.
+ * about a subject should not have to know which contract the answer was written under —
+ * which is why bare `/stories` is every published Story. It used to default to chapters, so
+ * the page hid every Entry from a reader who did not know to append `kind=all`, and the
+ * promise above was false on the surface that made it.
  *
  * Every control here is a link or a form GET, so narrowing is bookmarkable, shareable and
  * crawlable, and the page works with JavaScript off. Windowing reuses the Results rail law
@@ -64,23 +67,12 @@ type StoriesPageProps = {
 const KIND_LABELS: Record<string, string> = { chapter: 'Chapter', article: 'Entry' };
 
 /**
- * What the lead is leading on. The lead story is whatever sits at the top of the current view, so
- * the flag has to name the sort that put it there rather than assert an editorial judgment the
- * page has not made: under "newest" it is the newest chapter, under a collection order it is
- * where the collection starts.
+ * The lead only renders in the default browse state — `showsShelves` requires the collection
+ * sort — so the flag is always "Start here". It used to switch on the sort, which read as though
+ * a reader could reach the lead under "newest" or "title"; they cannot, and a flag naming a sort
+ * that is never in force is a claim the page does not make.
  */
-function leadFlag(sort: string): string {
-  switch (sort) {
-    case 'newest':
-      return 'Newest';
-    case 'oldest':
-      return 'Earliest';
-    case 'title':
-      return 'First alphabetically';
-    default:
-      return 'Start here';
-  }
-}
+const LEAD_FLAG = 'Start here';
 
 export default async function StoriesIndexPage({ searchParams }: StoriesPageProps) {
   const query = parseStoriesQuery(await searchParams);
@@ -154,11 +146,9 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
           <form className="ds-stories-form" method="get" action="/stories" role="search">
             {/* Narrowing already in the URL rides along as hidden fields, so submitting the
                 search box refines the current view instead of silently resetting it. */}
-            {/* 'chapter' is the default and needs no param; '' is the explicit "All" view
-                and must round-trip as kind=all, not an empty/absent field. */}
-            {query.kind !== 'chapter' ? (
-              <input type="hidden" name="kind" value={query.kind === '' ? 'all' : query.kind} />
-            ) : null}
+            {/* '' is every Story and is the default, so it needs no param; a named kind rides
+                along so the search refines the kind in view rather than widening it. */}
+            {query.kind.length > 0 ? <input type="hidden" name="kind" value={query.kind} /> : null}
             {query.collection.length > 0 ? (
               <input type="hidden" name="collection" value={query.collection} />
             ) : null}
@@ -216,7 +206,7 @@ export default async function StoriesIndexPage({ searchParams }: StoriesPageProp
               <div className="ds-stories-lead__copy">
                 {/* The lead is the current view's top item, so what makes it the lead is the
                     sort in force, not an editor's flag. The pill says which. */}
-                <p className="ds-stories-lead__flag">{leadFlag(query.sort)}</p>
+                <p className="ds-stories-lead__flag">{LEAD_FLAG}</p>
                 <p className="ds-stories-lead__meta">
                   {/* The collection leads, because it is the thing a reader can follow from
                       here; the kind and the era are what the row already is. */}

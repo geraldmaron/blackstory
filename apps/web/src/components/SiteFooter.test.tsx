@@ -24,12 +24,18 @@ describe('SiteFooter', () => {
     assert.match(html, /History, pinned to place\./);
     assert.match(html, /aria-label="Footer"/);
     assert.match(html, /class="ds-shell-footer__column-title">Find</);
-    assert.match(html, /class="ds-shell-footer__column-title">Where to begin</);
+    assert.match(html, /class="ds-shell-footer__column-title">Read deeper</);
     assert.match(html, /class="ds-shell-footer__column-title">How it decides</);
     assert.match(html, /class="ds-shell-footer__column-title">Add to it</);
     assert.match(html, /href="\/explore"/);
+    assert.match(html, /href="\/stories"/);
     assert.match(html, /href="\/records"/);
-    assert.doesNotMatch(html, /Banned books|\/banned-books|\/journey/);
+    assert.match(html, /href="\/rooms"/);
+    // Banned books is a shipped reading room and belongs in the footer; `/banned-books` is a
+    // path that has never existed and must never be linked.
+    assert.match(html, />Banned books</);
+    assert.doesNotMatch(html, /\/banned-books|\/journey/);
+    assert.doesNotMatch(html, /href="\/chapters"|href="\/library"|href="\/history"/);
   });
 
   it('offers a staff sign-in handoff when an admin origin is configured', () => {

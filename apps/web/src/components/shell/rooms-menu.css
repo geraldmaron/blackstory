@@ -3,11 +3,11 @@
  * reader-summoned list over whatever the surface is showing, not part of the surface.
  */
 
-.ds-libmenu {
+.ds-roomsmenu {
   position: relative;
 }
 
-.ds-libmenu__trigger {
+.ds-roomsmenu__trigger {
   display: inline-flex;
   align-items: center;
   gap: var(--ds-space-2);
@@ -22,27 +22,27 @@
   white-space: nowrap;
 }
 
-.ds-libmenu__trigger::-webkit-details-marker {
+.ds-roomsmenu__trigger::-webkit-details-marker {
   display: none;
 }
 
-.ds-libmenu__trigger:hover {
+.ds-roomsmenu__trigger:hover {
   border-color: var(--ds-border-strong);
   color: var(--ds-ink);
 }
 
 /* Open: the trigger takes the accent wash, so the bar says which control the panel belongs to. */
-.ds-libmenu[open] > .ds-libmenu__trigger {
+.ds-roomsmenu[open] > .ds-roomsmenu__trigger {
   background: color-mix(in oklab, var(--ds-accent) 14%, transparent);
   border-color: var(--ds-accent-graphic);
   color: var(--ds-ink);
 }
 
-.ds-libmenu[open] > .ds-libmenu__trigger svg {
+.ds-roomsmenu[open] > .ds-roomsmenu__trigger svg {
   transform: rotate(180deg);
 }
 
-.ds-libmenu__panel {
+.ds-roomsmenu__panel {
   position: absolute;
   z-index: var(--ds-z-modal-sheet);
   top: calc(100% + 10px);
@@ -56,22 +56,22 @@
 
 /* Read takes the first column; check and take-part stack in the second. Two short lists beside
    one long one, rather than three rows that make the panel taller than the surface behind it. */
-.ds-libmenu__rooms {
+.ds-roomsmenu__rooms {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: var(--ds-space-6);
   align-items: start;
 }
 
-.ds-libmenu__group:nth-child(n + 2) {
+.ds-roomsmenu__group:nth-child(n + 2) {
   grid-column: 2;
 }
 
-.ds-libmenu__group:nth-child(n + 3) {
+.ds-roomsmenu__group:nth-child(n + 3) {
   margin-top: var(--ds-space-5);
 }
 
-.ds-libmenu__grouphd {
+.ds-roomsmenu__grouphd {
   display: block;
   margin-bottom: var(--ds-space-3);
   font-size: 12px;
@@ -80,12 +80,12 @@
   white-space: normal;
 }
 
-.ds-libmenu__list {
+.ds-roomsmenu__list {
   display: flex;
   flex-direction: column;
 }
 
-.ds-libmenu__item {
+.ds-roomsmenu__item {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -98,16 +98,16 @@
   white-space: normal;
 }
 
-.ds-libmenu__item:hover {
+.ds-roomsmenu__item:hover {
   color: var(--ds-accent);
 }
 
-.ds-libmenu__item small {
+.ds-roomsmenu__item small {
   font-size: 12px;
   color: var(--ds-ink-muted);
 }
 
-.ds-libmenu__hub {
+.ds-roomsmenu__hub {
   display: block;
   margin-top: var(--ds-space-5);
   padding-top: var(--ds-space-4);
@@ -117,11 +117,11 @@
   text-decoration: none;
 }
 
-.ds-libmenu__hub:hover {
+.ds-roomsmenu__hub:hover {
   color: var(--ds-accent);
 }
 
-.ds-libmenu__hub:focus-visible {
+.ds-roomsmenu__hub:focus-visible {
   outline: 2px solid var(--ds-accent-graphic);
   outline-offset: 2px;
 }
@@ -130,12 +130,12 @@
    page, and this one would cover the surface it was opened from. The stacked command bar raises
    --ds-island-height; the Explore gutter token does not, so the sheet would sit under the bar. */
 @media (max-width: 60rem) {
-  .ds-libmenu__trigger,
-  .ds-libmenu__item {
+  .ds-roomsmenu__trigger,
+  .ds-roomsmenu__item {
     min-height: 44px;
   }
 
-  .ds-libmenu__panel {
+  .ds-roomsmenu__panel {
     position: fixed;
     top: calc(var(--ds-island-height) + var(--ds-space-2) + var(--ds-space-2));
     right: var(--ds-space-2);
@@ -145,15 +145,15 @@
     overflow-y: auto;
   }
 
-  .ds-libmenu__rooms {
+  .ds-roomsmenu__rooms {
     grid-template-columns: 1fr;
   }
 
-  .ds-libmenu__group:nth-child(n + 2) {
+  .ds-roomsmenu__group:nth-child(n + 2) {
     grid-column: 1;
   }
 
-  .ds-libmenu__group + .ds-libmenu__group {
+  .ds-roomsmenu__group + .ds-roomsmenu__group {
     margin-top: var(--ds-space-5);
   }
 }
@@ -161,17 +161,17 @@
 @media (max-width: 819px) {
   /* Rooms stays on the phone bar. Panel sits below the stacked
      island, not over the trigger, and scrolls if the three groups run long. */
-  .ds-libmenu__trigger {
+  .ds-roomsmenu__trigger {
     padding: 0 var(--ds-space-2);
     font-size: 12px;
     gap: 0;
   }
 
-  .ds-libmenu__trigger svg {
+  .ds-roomsmenu__trigger svg {
     display: none;
   }
 
-  .ds-libmenu__panel {
+  .ds-roomsmenu__panel {
     top: var(--ds-island-clearance);
     padding: var(--ds-space-4);
     max-height: calc(100dvh - var(--ds-island-clearance) - var(--ds-space-3));

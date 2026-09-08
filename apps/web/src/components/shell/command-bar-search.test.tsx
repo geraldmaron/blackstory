@@ -89,16 +89,17 @@ describe('bar search', () => {
 });
 
 describe('CommandBar destinations', () => {
-  it('keeps Door, Explore, and Records in Find; Explore bars keep a Door exit', () => {
+  it('renders the four product axes in Find, and home only as the brand lockup', () => {
     const source = code('components/shell/CommandBar.tsx');
     assert.doesNotMatch(source, /href=["'`]\/(?:explore)?#journey["'`]/);
     assert.doesNotMatch(source, /href=["'`]\/journey["'`]/);
-    assert.match(source, /href="\/explore"/);
+    assert.match(source, /primaryNavDestinations/);
     assert.match(source, /syncCommandBarClearance/);
-    assert.match(source, /href="\/records"/);
-    assert.match(source, /href="\/"/);
+    assert.match(source, /ds-bar__brand[\s\S]*href="\/"/);
     assert.match(source, /aria-label="Find"/);
+    assert.match(source, /<RoomsMenu \/>/);
     assert.doesNotMatch(source, />\s*Journey\s*</);
+    assert.doesNotMatch(source, /\n\s*Door\n/);
     assert.doesNotMatch(source, /onModeChange!\('story'\)/);
   });
 

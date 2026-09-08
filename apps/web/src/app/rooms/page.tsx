@@ -9,8 +9,8 @@ import type { Metadata } from 'next';
 import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import {
-  LIBRARY_CARD_GROUPS,
-  LIBRARY_GROUP_COPY,
+  ROOMS_CARD_GROUPS,
+  ROOMS_GROUP_COPY,
   cardTitleFor,
   destinationsInGroup,
 } from '../../lib/nav/destination-registry';
@@ -28,7 +28,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
     'What kinds of knowledge live beyond the map: stories, law, data, memorial, and the methods that keep records honest.',
 });
 
-export default function LibraryPage() {
+export default function RoomsPage() {
   return (
     <Room>
       <RoomHeader
@@ -39,15 +39,15 @@ export default function LibraryPage() {
         showPath={false}
       />
 
-      {LIBRARY_CARD_GROUPS.map((group) => {
-        const copy = LIBRARY_GROUP_COPY[group];
+      {ROOMS_CARD_GROUPS.map((group) => {
+        const copy = ROOMS_GROUP_COPY[group];
         return (
-          <section key={group} className="ds-library-group" aria-labelledby={`library-${group}`}>
+          <section key={group} className="ds-rooms-group" aria-labelledby={`rooms-`}>
             <GroupHeading>
-              <span id={`library-${group}`}>{copy.heading}</span>
+              <span id={`rooms-`}>{copy.heading}</span>
             </GroupHeading>
             {copy.standfirst ? (
-              <p className="ds-library-group__standfirst">{copy.standfirst}</p>
+              <p className="ds-rooms-group__standfirst">{copy.standfirst}</p>
             ) : null}
             <CardGrid>
               {destinationsInGroup(group).map((destination) => (

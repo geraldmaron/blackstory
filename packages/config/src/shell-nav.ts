@@ -1,7 +1,28 @@
 /**
- * Shared public-shell navigation IA (primary + overflow + footer columns).
- * Used by web and admin so both surfaces render the same theme-aware shell bar.
+ * Shell-bar navigation, derived from the semantic destination catalog.
+ *
+ * This file is an ADAPTER, not a registry. The product's destinations, their canonical paths and
+ * their families live once in `@repo/public-contracts/destinations`; everything here is the
+ * shell bar's own composition of that table — which axes are always visible, what the overflow
+ * disclosure holds, and how the footer columns group.
+ *
+ * WHY IT IS NO LONGER A LIST. It used to be one, hand-kept, and it drifted: it went on emitting
+ * `/chapters` and `/library` for months after both became permanent redirects, so the top nav on
+ * every page of the site pointed into a 308. A hand-kept list cannot notice that a route it names
+ * has stopped existing. A derived one cannot name a route that does not exist.
+ *
+ * Admin reads `PRIMARY_NAV` for its cross-app chrome; the public web app derives its own nav from
+ * the same catalog through `apps/web/src/lib/nav/destination-registry.ts`, which adds the web-only
+ * presentation (crawl facts, card copy, surface class) the catalog deliberately refuses to hold.
  */
+
+import {
+  allSemanticDestinations,
+  primaryAxes,
+  semanticDestinationsInFamily,
+  type DestinationFamily,
+  type SemanticDestination,
+} from '@repo/public-contracts/destinations';
 
 import { trimTrailingSlashes } from './trim.js';
 
@@ -10,40 +31,34 @@ export type ShellNavItem = {
   readonly label: string;
 };
 
-/**
- * Always-visible top-level nav — sans caps; active route gets a copper underline.
- * Journey order: act (Explore) → read (Chapters) → go deep (Library) → meta (About last).
- *
- * Explore is the map instrument on `/explore`. `/` is the Door (immersive pin plate); the brand
- * lockup already links home, so the first nav item opens the map readers expect when they
- * press "Explore".
- */
-export const PRIMARY_NAV: readonly ShellNavItem[] = [
-  { href: '/explore', label: 'Explore' },
-  { href: '/chapters', label: 'Chapters' },
-  // Was `/history`, which became a permanent redirect to `/records` — so the top nav on every
-  // page of the site pointed into a 308. The v9 replacement is the library hub (SP-21): it is
-  // the room every reading and utility surface parents through, and it names `/records` first.
-  { href: '/library', label: 'Library' },
-  { href: '/about', label: 'About' },
-] as const;
+const toItem = (destination: SemanticDestination): ShellNavItem => ({
+  href: destination.path,
+  label: destination.label,
+});
 
 /**
- * Overflow routes: desktop "More" disclosure + mobile drawer.
- * Grouped to mirror the footer IA: archive reference (Data → Memorial), then trust
- * (Methodology → Errata), then contribute (Submit) — keep additions inside their group.
+ * Always-visible top-level nav: the four product axes, in product order.
+ *
+ * Home is deliberately absent. The brand lockup already links home on every surface, and a fifth
+ * primary item is how the last generation of this menu grew an About tab that competed with the
+ * archive for the reader's attention.
+ */
+export const PRIMARY_NAV: readonly ShellNavItem[] = primaryAxes().map(toItem);
+
+const family = (name: DestinationFamily): readonly ShellNavItem[] =>
+  semanticDestinationsInFamily(name)
+    .filter((destination) => destination.browsable)
+    .map(toItem);
+
+/**
+ * Overflow routes: desktop "More" disclosure + mobile drawer. The supporting rooms, grouped the
+ * way Rooms and the footer group them — read deeper, then trust, then take part.
  */
 export const OVERFLOW_NAV: readonly ShellNavItem[] = [
-  { href: '/records', label: 'Records' },
-  { href: '/data', label: 'Data' },
-  { href: '/law', label: 'Law' },
-  { href: '/books', label: 'Banned books' },
-  { href: '/memorial', label: 'Memorial' },
-  { href: '/methodology', label: 'Methodology' },
-  { href: '/corrections', label: 'Corrections' },
-  { href: '/errata', label: 'Errata' },
-  { href: '/submit', label: 'Submit' },
-] as const;
+  ...family('read'),
+  ...family('trust'),
+  ...family('participate'),
+];
 
 export type FooterNavColumn = {
   readonly title: string;
@@ -51,43 +66,23 @@ export type FooterNavColumn = {
 };
 
 /**
- * Three mono-caps footer columns per the v3 shell contract.
+ * Footer columns for the admin shell, which has no access to the web app's registry.
  *
- * The public web footer no longer reads this: it derives its columns from
- * `apps/web/src/lib/nav/destination-registry.ts`, so a route joins the footer by existing rather
- * than by being remembered. This list remains for the admin shell, which has no access to the
- * web app's registry, and is kept in step by `shell-nav.test.ts`.
+ * The public web footer derives its own columns from `destination-registry.ts`, so a route joins
+ * the footer by existing rather than by being remembered. Both derive from the same catalog, and
+ * `shell-nav.test.ts` fails if either can name a destination the catalog does not hold.
  */
 export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
-  {
-    title: 'Explore',
-    items: [
-      { href: '/explore', label: 'Explore' },
-      { href: '/library', label: 'Library' },
-      { href: '/records', label: 'Records' },
-      { href: '/chapters', label: 'Chapters' },
-      { href: '/data', label: 'Data' },
-      { href: '/law', label: 'Law' },
-      { href: '/books', label: 'Banned books' },
-    ],
-  },
-  {
-    title: 'Trust',
-    items: [
-      { href: '/methodology', label: 'Methodology' },
-      { href: '/memorial', label: 'Memorial' },
-      { href: '/errata', label: 'Errata' },
-      { href: '/corrections', label: 'Corrections' },
-    ],
-  },
-  {
-    title: 'Contribute',
-    items: [
-      { href: '/submit', label: 'Submit' },
-      { href: '/about', label: 'About' },
-    ],
-  },
-] as const;
+  { title: 'Find', items: PRIMARY_NAV },
+  { title: 'Read deeper', items: family('read') },
+  { title: 'How it decides', items: family('trust') },
+  { title: 'Add to it', items: family('participate') },
+];
+
+/** Every public destination as a flat list, for consumers that want the whole surface. */
+export const ALL_SHELL_DESTINATIONS: readonly ShellNavItem[] = allSemanticDestinations()
+  .filter((destination) => destination.isPublic)
+  .map(toItem);
 
 export function isShellNavActive(pathname: string, href: string): boolean {
   if (href === '/') return pathname === '/';

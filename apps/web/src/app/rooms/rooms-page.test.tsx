@@ -14,7 +14,7 @@ import { describe, it } from 'node:test';
 import { COMMANDS } from '../../components/patterns/command-palette/command-registry';
 import { GLOBAL_BINDINGS } from '../../lib/keyboard/bindings';
 import { resolveTrail } from '../../components/room/room-trail';
-import { LIBRARY_CARD_GROUPS, destinationsInGroup } from '../../lib/nav/destination-registry';
+import { ROOMS_CARD_GROUPS, destinationsInGroup } from '../../lib/nav/destination-registry';
 
 const pageSource = readFileSync(join(import.meta.dirname, 'page.tsx'), 'utf8');
 
@@ -28,7 +28,7 @@ describe('/rooms · the room renders without JavaScript', () => {
     assert.match(pageSource, /destinationsInGroup\(group\)/);
     // A hand-written card is the failure this room exists to prevent, so the room must not
     // contain a literal href for any of the routes it lists.
-    for (const group of LIBRARY_CARD_GROUPS) {
+    for (const group of ROOMS_CARD_GROUPS) {
       for (const destination of destinationsInGroup(group)) {
         assert.doesNotMatch(
           pageSource,

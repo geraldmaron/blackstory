@@ -47,8 +47,12 @@ export function redirectsForNextConfig() {
     { source: '/facts', destination: '/records', permanent: true },
     { source: '/facts/:path*', destination: '/records', permanent: true },
 
-    { source: '/myths', destination: '/methodology', permanent: true },
-    { source: '/myths/:path*', destination: '/methodology', permanent: true },
+    // A myth correction is a narrative evidence format — the claim, why it is repeated, what
+    // the record actually shows — so its home is Stories. It used to land on Methodology, which
+    // answers a different question: Methodology is how the archive knows, and a myth correction
+    // is whether a historical claim is true. A reader who bookmarked `/myths` wanted the second.
+    { source: '/myths', destination: '/stories', permanent: true },
+    { source: '/myths/:path*', destination: '/stories', permanent: true },
 
     { source: '/legal', destination: '/law', permanent: true },
     { source: '/legal/:path*', destination: '/law/:path*', permanent: true },

@@ -52,9 +52,12 @@ export type StoriesQuery = {
 
 const EMPTY_STORIES_QUERY: StoriesQuery = {
   q: '',
-  // Chapters are the default view; `kind: ''` is reserved for an explicit "All" narrowing
-  // (URL param `kind=all`), not the unset state.
-  kind: 'chapter',
+  // `''` is every published Story, and it is the unset state. The route is named `/stories`, so
+  // bare `/stories` has to mean all of them: defaulting to `chapter` meant the index silently
+  // hid every Entry unless a reader knew to append `kind=all`, and the page's own doc comment
+  // promised the opposite — that a reader should not have to know which editorial contract an
+  // answer was written under.
+  kind: '',
   collection: '',
   tag: '',
   era: '',
@@ -83,14 +86,9 @@ export function parseStoriesQuery(
   const rawPage = Number.parseInt(one('page'), 10);
   const rawSort = one('sort');
   const rawKind = one('kind');
-  // `kind=all` is the only way to reach the unfiltered view; anything unrecognized
-  // (including no param at all) falls back to the chapters default rather than "all".
-  const kind =
-    rawKind === 'all'
-      ? ''
-      : (STORY_KINDS as readonly string[]).includes(rawKind)
-        ? rawKind
-        : 'chapter';
+  // Absent, empty, `all`, or anything unrecognized all resolve to the full Story universe.
+  // `kind=all` stays accepted because it is a published URL, but it is no longer generated.
+  const kind = (STORY_KINDS as readonly string[]).includes(rawKind) ? rawKind : '';
   return {
     q: one('q').slice(0, 120),
     kind,
@@ -108,10 +106,9 @@ export function storiesHref(query: Partial<StoriesQuery>): string {
   const merged = { ...EMPTY_STORIES_QUERY, ...query };
   const params = new URLSearchParams();
   if (merged.q.length > 0) params.set('q', merged.q);
-  // '' is the explicit "All" narrowing and must round-trip as `kind=all`; `chapter` is the
-  // default and stays out of the URL like the other default values below.
-  if (merged.kind === '') params.set('kind', 'all');
-  else if (merged.kind !== 'chapter') params.set('kind', merged.kind);
+  // '' is the default — all Stories — and stays out of the URL like every other default below.
+  // `kind=all` is still parsed for the sake of published links, but never generated.
+  if (merged.kind.length > 0) params.set('kind', merged.kind);
   if (merged.collection.length > 0) params.set('collection', merged.collection);
   if (merged.tag.length > 0) params.set('tag', merged.tag);
   if (merged.era.length > 0) params.set('era', merged.era);
@@ -253,15 +250,15 @@ function buildGroups(
 }
 
 // Rail links (era/place/collection/tag) group across both editorial kinds — a collection like
-// "The presidency" is entirely `article`, so these must carry an explicit kind: '' (renders as
-// `kind=all`) rather than falling through to the chapters default, or they'd resolve to an
-// empty result for any all-entry grouping.
+// "The presidency" is entirely `article` — so they carry the default kind and emit no `kind`
+// param at all. They used to need an explicit override, because the default was `chapter` and an
+// all-entry grouping resolved to an empty result.
 
 export function buildEraGroups(items: readonly PublicArticleListItemDoc[]): readonly RailEntry[] {
   return buildGroups(
     items,
     (item) => item.eraLabel,
-    (era) => storiesHref({ era, kind: '' }),
+    (era) => storiesHref({ era }),
   );
 }
 
@@ -269,7 +266,7 @@ export function buildPlaceGroups(items: readonly PublicArticleListItemDoc[]): re
   return buildGroups(
     items,
     (item) => item.placeLabel,
-    (place) => storiesHref({ place, kind: '' }),
+    (place) => storiesHref({ place }),
   );
 }
 
@@ -290,7 +287,7 @@ export function buildCollectionGroups(
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .map(([id, count]) => ({
       label: labels.get(id) ?? id,
-      href: storiesHref({ collection: id, kind: '' }),
+      href: storiesHref({ collection: id }),
       count,
     }));
 }
@@ -328,7 +325,7 @@ export function buildCollectionShelves(
       id,
       label: labels.get(id) ?? id,
       count: members.length,
-      href: storiesHref({ collection: id, kind: '' }),
+      href: storiesHref({ collection: id }),
       members: sortItems(members, 'collection').slice(0, membersPerShelf),
     }));
 }
@@ -363,10 +360,22 @@ export function uncollectedItems(
  * story in view. Deterministic and reads from data already on hand — no new field, no
  * editorial "featured" flag to maintain.
  */
+/**
+ * The "Start here" piece: the newest Chapter, falling back to the newest item of any kind.
+ *
+ * Deterministic, and deliberately kind-aware. Straight newest-first made the flagship of the
+ * whole publication whichever short Entry happened to be published last — with 45 Entries and 3
+ * Chapters in the release, a reader's first impression of a long-form archive was a single
+ * presidential summary. A Chapter is the deep narrative form, so it leads when one exists.
+ *
+ * `items` arrives already filtered, so a reader who narrows to Entries still gets an Entry lead:
+ * there is no Chapter in that set to prefer.
+ */
 export function pickLeadStory(
   items: readonly PublicArticleListItemDoc[],
 ): PublicArticleListItemDoc | undefined {
-  return sortItems(items, 'newest')[0];
+  const newest = sortItems(items, 'newest');
+  return newest.find((item) => (item.kind ?? 'chapter') === 'chapter') ?? newest[0];
 }
 
 export function buildTagGroups(items: readonly PublicArticleListItemDoc[]): readonly RailEntry[] {
@@ -376,7 +385,7 @@ export function buildTagGroups(items: readonly PublicArticleListItemDoc[]): read
   }
   return [...counts.entries()]
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .map(([tag, count]) => ({ label: tag, href: storiesHref({ tag, kind: '' }), count }));
+    .map(([tag, count]) => ({ label: tag, href: storiesHref({ tag }), count }));
 }
 
 /** Kind chips, with live counts, so a reader can see both contracts exist. */
@@ -456,10 +465,10 @@ export function showsShelves(query: StoriesQuery): boolean {
 
 /** True when any narrowing control is engaged — drives the "clear" affordance. */
 export function hasActiveNarrowing(query: StoriesQuery): boolean {
-  // 'chapter' is the default view, not a narrowing; 'article' and '' (all) both are. This is
-  // broader than `hasFieldNarrowing` on purpose: the Clear affordance resets the kind chip too,
-  // even though the kind chip no longer gates shelf mode above.
-  return query.kind !== 'chapter' || hasFieldNarrowing(query);
+  // '' (all Stories) is the default view, not a narrowing; either named kind is. Broader than
+  // `hasFieldNarrowing` on purpose: the Clear affordance resets the kind chip too, even though
+  // the kind chip does not gate shelf mode.
+  return query.kind !== '' || hasFieldNarrowing(query);
 }
 
 type StoriesNotice = { readonly title: string; readonly body: string };
