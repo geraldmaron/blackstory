@@ -1,7 +1,8 @@
 /**
- * History / find-in-time screen (MOB-013). Tab route at `(tabs)/history`; legacy `/search`
- * redirects here. Ledger Line: dense masthead, search + chips + results on canvas
- * with hairline section labels — no nested LiftedSurface / indexed panels.
+ * The archive as a findable list (MOB-013) — the Records tab, and the phone's home for search.
+ * The legacy `/search` and `/history` routes redirect here, carrying `q`, `kind` and `era`.
+ * Ledger Line: dense masthead, search + chips + results on canvas with hairline section
+ * labels — no nested LiftedSurface / indexed panels.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -49,6 +50,11 @@ export interface SearchScreenProps {
   readonly archiveScopeLabel?: string;
 }
 
+/** One address key for both directions of the param sync, so an echo compares equal to itself. */
+function paramsKey(query: string | undefined, kind: string | undefined): string {
+  return `${query ?? ''}${kind ?? ''}`;
+}
+
 function formatRelativeTime(fetchedAt: number, now: number): string {
   const diffMs = Math.max(0, now - fetchedAt);
   const minutes = Math.floor(diffMs / 60_000);
@@ -91,11 +97,31 @@ export function SearchScreen({
   const lastParamsRef = useRef<string | null>(null);
   useEffect(() => {
     if (state.kind === 'browse') return;
-    const key = `${settledQuery ?? ''}${settledKind ?? ''}`;
+    const key = paramsKey(settledQuery, settledKind);
     if (lastParamsRef.current === key) return;
     lastParamsRef.current = key;
     router.setParams({ q: settledQuery, ...(settledKind ? { kind: settledKind } : {}) });
   }, [state.kind, settledQuery, settledKind]);
+
+  // The reverse direction. `initialQuery` / `initialKind` seed state at mount only, and a deep
+  // link can land on a Records tab that is already mounted — which is exactly what the `/search`
+  // and `/history` redirects do. Without this the link arrives, the tab shows, and the reader's
+  // query is gone: the failure those redirects exist to prevent.
+  //
+  // Two changes must NOT re-seed. The echo written just above is this screen's own address
+  // update, and adopting it would revert a reader who has kept typing since the query settled;
+  // `lastParamsRef` identifies it. An absent param is a plain tab press, and clearing the field
+  // on one would lose work the reader can see.
+  const incomingParamsKey = paramsKey(initialQuery, initialKind);
+  const lastIncomingParamsRef = useRef(incomingParamsKey);
+  useEffect(() => {
+    if (incomingParamsKey.length === 0) return;
+    if (incomingParamsKey === lastIncomingParamsRef.current) return;
+    lastIncomingParamsRef.current = incomingParamsKey;
+    if (incomingParamsKey === lastParamsRef.current) return;
+    setDraft(initialQuery ?? '');
+    setFilterKind(initialKind);
+  }, [incomingParamsKey, initialQuery, initialKind, setDraft, setFilterKind]);
 
   const [now] = useState(() => Date.now());
 
