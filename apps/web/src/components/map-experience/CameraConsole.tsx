@@ -32,6 +32,50 @@ void React;
 /** How long the active move stays washed in copper. §5.5. */
 const ACTIVE_WASH_MS = 2200;
 
+/** Air between the console's top edge and the results rail's floor. `--ds-space-3`. */
+const CONSOLE_GAP_PX = 12;
+
+/** The rail's own floor when no console sits under it. `--ds-space-4`, the bottom gutter. */
+const BARE_GUTTER_PX = 16;
+
+/**
+ * The results rail's floor, given the console's footprint — its top edge's distance from the
+ * bottom of the viewport, which is the console's own height plus whatever offset it sits at.
+ *
+ * Footprint rather than height because the offset is not one number: the console sits at
+ * `var(--ds-space-4)` on a wide viewport and clears the dock at `calc(var(--ds-space-2) + 66px)`
+ * below 820px. Reading the rendered position covers both without this file knowing either.
+ */
+export function cameraConsoleClearance(footprintPx: number): string {
+  return `${Math.round(footprintPx) + CONSOLE_GAP_PX}px`;
+}
+
+/**
+ * Writes the console's measured clearance to the document root, so the results rail's floor
+ * tracks the console instead of a constant kept by hand.
+ *
+ * The constant kept drifting because the console's height is not a constant: the WCAG 2.5.5
+ * touch-target bump grew it by 44px and the token was not updated with it, and the dignity gate's
+ * refusal note adds another 68px whenever the selected record is violence-adjacent. Measuring is
+ * the same move `syncCommandBarClearance` makes for `--ds-island-clearance`.
+ *
+ * Passing `null` — the console unmounting, on chrome-hidden or Story mode or a dock toggle —
+ * drops the floor back to the plain bottom gutter, so the rail is not reserving room under
+ * itself for an instrument that is no longer on the plate.
+ */
+export function syncCameraConsoleClearance(element: HTMLElement | null): void {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+  if (!element) {
+    root.style.setProperty('--ds-atlas-bottom-right', `${BARE_GUTTER_PX}px`);
+    return;
+  }
+  // `100dvh` is what the rail subtracts from, so pair the measurement with `innerHeight`.
+  const footprint = window.innerHeight - element.getBoundingClientRect().top;
+  if (!Number.isFinite(footprint) || footprint <= 0) return;
+  root.style.setProperty('--ds-atlas-bottom-right', cameraConsoleClearance(footprint));
+}
+
 const MOVE_LABELS: Readonly<Record<(typeof KEYED_CAMERA_MOVES)[number], string>> = {
   wide: 'Wide',
   push: 'Push in',
@@ -196,6 +240,7 @@ export function CameraConsole({
 }: CameraConsoleProps) {
   const [recent, setRecent] = useState<CameraMove | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const consoleRef = useRef<HTMLElement>(null);
 
   useEffect(
     () => () => {
@@ -203,6 +248,22 @@ export function CameraConsole({
     },
     [],
   );
+
+  // The results rail sits directly above this console in the right column and sizes itself from
+  // `--ds-atlas-bottom-right`. Observe rather than re-run on prop change: the refusal note is the
+  // biggest height change, but the panel also reflows when a move label wraps at a narrow width.
+  useEffect(() => {
+    const element = consoleRef.current;
+    if (!element) return;
+    syncCameraConsoleClearance(element);
+    if (typeof ResizeObserver === 'undefined') return () => syncCameraConsoleClearance(null);
+    const observer = new ResizeObserver(() => syncCameraConsoleClearance(element));
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+      syncCameraConsoleClearance(null);
+    };
+  }, []);
 
   const run = useCallback(
     (move: CameraMove) => {
@@ -220,7 +281,7 @@ export function CameraConsole({
   const anyRefused = KEYED_CAMERA_MOVES.some((move) => !allowed.has(move));
 
   return (
-    <section className={cx('ds-camera', className)} aria-label="Camera">
+    <section ref={consoleRef} className={cx('ds-camera', className)} aria-label="Camera">
       <header className="ds-camera__head">
         <span className="ds-camera__kicker">Camera</span>
         <Compass bearing={bearing} onReset={onResetBearing} />

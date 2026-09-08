@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import { CameraConsole, type CameraConsoleProps } from './CameraConsole';
+import { CameraConsole, cameraConsoleClearance, type CameraConsoleProps } from './CameraConsole';
 import { COMMANDS, KEYED_CAMERA_MOVES } from '../patterns/command-palette/command-registry';
 
 function consoleProps(overrides: Partial<CameraConsoleProps> = {}): CameraConsoleProps {
@@ -130,4 +130,23 @@ test('spotlight reports whether it is currently up', () => {
   assert.match(on, /aria-pressed="true"/);
   const off = renderToStaticMarkup(createElement(CameraConsole, consoleProps()));
   assert.match(off, /aria-pressed="false"/);
+});
+
+/**
+ * The results rail's floor is derived from this console's measured footprint, not from a number
+ * kept by hand. The hand-kept number is exactly what broke: it stayed at a 174px console after the
+ * WCAG 2.5.5 bump grew the panel to 218px, and the rail's bottom rows rendered under the console.
+ */
+test('the rail floor clears the console it sits above, at either height the console takes', () => {
+  // Measured at 1440x900: a 218px console at a 16px offset, and 286px once the refusal note is
+  // on. Both are footprints the rail has to clear, which is why the value is measured, not typed.
+  assert.equal(cameraConsoleClearance(218 + 16), '246px');
+  assert.equal(cameraConsoleClearance(286 + 16), '314px');
+});
+
+test('the clearance always exceeds the footprint, never merely equals it', () => {
+  for (const footprint of [120, 234, 302, 400]) {
+    const clearance = Number.parseInt(cameraConsoleClearance(footprint), 10);
+    assert.ok(clearance > footprint, `clearance ${clearance} does not clear ${footprint}px`);
+  }
 });
