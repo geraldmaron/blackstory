@@ -1,7 +1,7 @@
 /**
  * Entity detail — canonical mobile counterpart of web's `/entity/[id]` (`apps/web/src/app/entity/[id]`),
  * reachable as a stack push from Explore, Search, Learn, or More. This is also the universal-link
- * target for `https://blackbook.app/entity/{id}` (see app.config.ts's `associatedDomains`/
+ * target for `https://blackstory.app/entity/{id}` (see app.config.ts's `associatedDomains`/
  * `intentFilters`); an app-not-installed open of that same URL falls through to the web route,
  * which is the correct, inherent Universal Links / App Links behavior (no mobile-side code
  * needed for that fallback — see apps/mobile/public/.well-known/README.md).

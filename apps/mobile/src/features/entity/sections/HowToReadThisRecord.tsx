@@ -17,7 +17,7 @@ export function HowToReadThisRecord({ onMethodologyPress }: HowToReadThisRecordP
       </Text>
       <View style={styles.linkRow}>
         <Link
-          href="https://blackbook.app/methodology"
+          href="https://blackstory.app/methodology"
           textRole="bodySmall"
           {...(onMethodologyPress ? { onPress: onMethodologyPress } : {})}
         >

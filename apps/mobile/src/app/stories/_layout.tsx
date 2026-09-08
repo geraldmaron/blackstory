@@ -16,6 +16,8 @@ export default function StoriesStackLayout() {
         title: 'Stories',
       }}
     >
+      {/* `title` is the human word, never the route pattern: this stack has no `index`, so an
+          unnamed screen falls back to the segment and the header reads "stories". */}
       <Stack.Screen name="[slug]" options={{ title: 'Story', headerBackTitle: 'Stories' }} />
     </Stack>
   );

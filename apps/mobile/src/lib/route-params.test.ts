@@ -252,8 +252,8 @@ describe('isSafeInternalPath / parseReturnTo (open-redirect defense)', () => {
 
 describe('isUrlLengthSafe', () => {
   it('accepts a normal-length URL and rejects an overlong one', () => {
-    expect(isUrlLengthSafe('https://blackbook.app/explore')).toBe(true);
-    expect(isUrlLengthSafe('https://blackbook.app/entity/' + 'a'.repeat(MAX_URL_LENGTH))).toBe(false);
+    expect(isUrlLengthSafe('https://blackstory.app/explore')).toBe(true);
+    expect(isUrlLengthSafe('https://blackstory.app/entity/' + 'a'.repeat(MAX_URL_LENGTH))).toBe(false);
   });
 
   it('rejects non-string / empty input', () => {

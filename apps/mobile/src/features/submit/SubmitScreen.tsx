@@ -17,7 +17,8 @@ import {
   space,
 } from '@/ui';
 
-const CANONICAL_WEB_ORIGIN = 'https://blackbook.app';
+// The live public site. See `features/entity/share.ts` for why this is not `blackstory.app`.
+const CANONICAL_WEB_ORIGIN = 'https://blackstory.app';
 
 export const SUBMIT_INTRO = {
   kicker: 'Contribute',

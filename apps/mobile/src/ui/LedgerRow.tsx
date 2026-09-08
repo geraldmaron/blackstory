@@ -71,7 +71,12 @@ export function LedgerRow({
           {title}
         </Text>
         {summary ? (
-          <Text variant="editorial" colorRole="inkMuted" numberOfLines={2}>
+          // `caption`, not `editorial`. A row's supporting line was set in Newsreader at 17/27
+          // under a 13/18 sans title — larger than the title it supports, in a different family,
+          // so the hierarchy read backwards on every screen that uses this row. The editorial
+          // serif is the reading register: it belongs to a Story's body, not to a navigation
+          // row's gloss.
+          <Text variant="caption" colorRole="inkMuted" numberOfLines={2}>
             {summary}
           </Text>
         ) : null}

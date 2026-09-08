@@ -31,8 +31,8 @@ describe('shareEntity', () => {
     const result = await shareEntity('ent_valid_001', 'Valid Entity');
     expect(result).toBe('shared');
     const [payload] = spy.mock.calls[0]!;
-    expect(payload.url).toBe('https://blackbook.app/entity/ent_valid_001');
-    expect(payload.message).toContain('https://blackbook.app/entity/ent_valid_001');
+    expect(payload.url).toBe('https://blackstory.app/entity/ent_valid_001');
+    expect(payload.message).toContain('https://blackstory.app/entity/ent_valid_001');
     expect(payload.url).not.toMatch(/^blackstory:/);
   });
 

@@ -150,9 +150,9 @@ export function SearchScreen({
       >
         <ApiStatusBanner compact />
         <ScreenHeader
-          kicker="Find in time"
-          title="History"
-          dek="Names, places, and events. Filter by kind, then open a pin or show it on the map."
+          kicker="The archive"
+          title="Records"
+          dek="Every documented person, place, event and institution. Browse by kind, or search by name."
           compact
           dense
           trailing={typeof __DEV__ !== 'undefined' && __DEV__ ? <DevMenuHeaderButton /> : undefined}

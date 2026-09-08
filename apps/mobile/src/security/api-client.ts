@@ -20,7 +20,7 @@
 export const CLIENT_VERSION_HEADER = 'X-BlackStory-Client';
 
 export interface ApiClientConfig {
-  /** Base URL of `apps/api-public`, e.g. `https://api.blackbook.app`. */
+  /** Base URL of `apps/api-public`, e.g. `https://api.blackstory.app`. */
   readonly baseUrl: string;
   /** App version string, e.g. `1.0.0` (from `Constants.expoConfig.version`). */
   readonly clientVersion: string;

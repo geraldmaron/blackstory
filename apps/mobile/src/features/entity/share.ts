@@ -1,7 +1,7 @@
 /**
  * Share action for the entity detail screen (MOB-014).
  *
- * Always shares the CANONICAL WEB URL (`https://blackbook.app/entity/{id}`), never the app's
+ * Always shares the CANONICAL WEB URL (`https://blackstory.app/entity/{id}`), never the app's
  * own `blackstory://` deep-link scheme: a recipient who does not have the app installed must
  * still be able to open the shared link (it falls through to the web route per the universal
  * links doctrine already documented in `src/app/entity/[id].tsx`'s header comment), whereas a
@@ -11,7 +11,14 @@
 import { Share } from 'react-native';
 import { parseEntityId } from '@/lib/route-params';
 
-export const CANONICAL_WEB_ORIGIN = 'https://blackbook.app';
+/**
+ * The live public site. Every share hands this URL to someone who may not have the app.
+ *
+ * It was `blackbook.app`, the pre-rebrand working name — a domain that resolves to registrar
+ * parking rather than to this product (checked 2026-09-07). Every record shared from the app
+ * handed out a link to a page that is not BlackStory.
+ */
+export const CANONICAL_WEB_ORIGIN = 'https://blackstory.app';
 
 /** Builds the canonical, shareable web URL for an entity. Returns `undefined` for an id that
  * does not pass the same validation the route itself applies — never builds a share URL from

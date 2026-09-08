@@ -131,8 +131,12 @@ reserved for the moment of orientation (active locations, selected filters, prim
 evidence markers). Raw Copper Pin never carries body-size text on light canvas. Dark theme is
 first-class, not an afterthought.
 
-**Type.** Sora SemiBold headlines; Inter UI/body; Source Serif 4 editorial/longform; IBM Plex Mono
-for data, citations, dates, confidence, and technical labels. All open-source; no licensed fonts.
+**Type.** Schibsted Grotesk SemiBold display; Geist UI/body; Newsreader editorial/longform; Geist
+Mono for data, citations, dates, confidence, and technical labels. All open-source; no licensed
+fonts. The binding source is `brand/tokens/typography.json`, which `packages/ui/src/styles/
+tokens.css` and `apps/mobile/scripts/generate-brand-tokens.ts` both generate from — this line
+described the pre-migration families (Sora / Inter / Source Serif 4 / IBM Plex Mono) for months
+after neither the tokens nor the native font loader used them.
 
 **Shape.** Radii 8/16/28px (sm/md/lg). Flat matte fills only — no bevels, shadows, glows,
 gradients, 3D, or ornamental motion, anywhere, ever.

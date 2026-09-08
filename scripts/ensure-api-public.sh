@@ -66,7 +66,7 @@ if [[ -z "$configured_api_url" ]]; then
   exit 0
 fi
 
-if [[ "$configured_api_url" == https://api.blackbook.app* ]]; then
+if [[ "$configured_api_url" == https://api.blackstory.app* ]]; then
   echo "ensure-api-public: API_BASE_URL points at production — skipping local api-public"
   exit 0
 fi

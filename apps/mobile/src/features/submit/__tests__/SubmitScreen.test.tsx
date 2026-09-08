@@ -32,7 +32,7 @@ describe('SubmitScreen', () => {
     const spy = jest.spyOn(Linking, 'openURL').mockResolvedValue(true as never);
     const { getByText } = await render(<SubmitScreen />);
     fireEvent.press(getByText('Open lead form on web'));
-    expect(spy).toHaveBeenCalledWith('https://blackbook.app/submit');
+    expect(spy).toHaveBeenCalledWith('https://blackstory.app/submit');
     spy.mockRestore();
   });
 });

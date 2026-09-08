@@ -13,7 +13,7 @@ import {
 } from './client';
 import type { CorrectionFormState } from './validation';
 
-const BASE = 'https://submissions.blackbook.app';
+const BASE = 'https://submissions.blackstory.app';
 const RECEIPT = 'BB-COR-ABCDEF0123456789';
 
 const validForm: CorrectionFormState = {

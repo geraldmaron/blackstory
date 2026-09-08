@@ -111,7 +111,7 @@ export function ThemesBrowseScreen() {
             label={THEMES_METHOD.methodologyCta}
             variant="ghost"
             density="compact"
-            onPress={() => router.push('/learn/methodology' as never)}
+            onPress={() => router.push('/methodology')}
           />
         </View>
 

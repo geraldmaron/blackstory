@@ -14,7 +14,7 @@ export const ENDPOINT_FILE = path.join(REPO_ROOT, '.local', 'metro-endpoint.json
 export const DEFAULT_METRO_PORT = 8081;
 export const DEFAULT_SCAN_PORTS = [8081, 8082, 8083];
 export const APP_SCHEME = 'blackstory';
-export const IOS_BUNDLE_ID = 'app.blackbook.mobile.dev';
+export const IOS_BUNDLE_ID = 'app.blackstory.mobile.dev';
 
 export function detectLanIp() {
   for (const iface of ['en0', 'en1', 'en2']) {
