@@ -33,7 +33,7 @@ import { ScreenHeader } from '@/ui/ScreenHeader';
 import { Text } from '@/ui/Text';
 import { MIN_TOUCH_TARGET, radius, space, typeScale, useScreenScrollInsets, useThemeColors } from '@/ui';
 import { parseEntityId } from '@/lib/route-params';
-import { BrowseCategoryList } from './BrowseCategoryList';
+import { BrowseCategoryList, showCategoryOnMap } from './BrowseCategoryList';
 import { useSearch } from './useSearch';
 import { MAX_RAW_INPUT_LENGTH, MIN_QUERY_LENGTH } from './query-normalization';
 import { SearchResultCard, toSearchResultCardProps } from './SearchResultCard';
@@ -237,6 +237,7 @@ export function SearchScreen({
             recentSearches={recentSearches}
             pinnedRecordCount={pinnedRecordCount}
             archiveScopeLabel={archiveScopeLabel}
+            onSelectCategory={setFilterKind}
             onSelectRecent={selectRecentSearch}
             onRemoveRecent={removeRecentSearch}
             onClearRecent={clearRecentSearches}
@@ -287,6 +288,15 @@ export function SearchScreen({
             <LedgerSectionLabel ruleAbove meta={`${cardData.length} shown`}>
               Results
             </LedgerSectionLabel>
+            {filterKind ? (
+              <Button
+                label="Show these on the map"
+                variant="ghost"
+                density="compact"
+                onPress={() => showCategoryOnMap(filterKind)}
+                accessibilityHint="Opens Explore with this kind filter applied"
+              />
+            ) : null}
             {state.freshness.degraded ? (
               <Notice
                 tone="info"
@@ -401,6 +411,7 @@ function BrowseModePanels({
   recentSearches,
   pinnedRecordCount,
   archiveScopeLabel,
+  onSelectCategory,
   onSelectRecent,
   onRemoveRecent,
   onClearRecent,
@@ -409,6 +420,7 @@ function BrowseModePanels({
   recentSearches: readonly { readonly term: string; readonly savedAt: number }[];
   pinnedRecordCount?: number;
   archiveScopeLabel: string;
+  onSelectCategory: (kind: string) => void;
   onSelectRecent: (term: string) => void;
   onRemoveRecent: (term: string) => void;
   onClearRecent: () => void;
@@ -433,7 +445,7 @@ function BrowseModePanels({
             Keep typing to search ({MIN_QUERY_LENGTH}+ characters).
           </Text>
         ) : null}
-        <BrowseCategoryList categories={BROWSE_CATEGORIES} />
+        <BrowseCategoryList categories={BROWSE_CATEGORIES} onSelectCategory={onSelectCategory} />
       </View>
 
       {recentSearches.length > 0 ? (

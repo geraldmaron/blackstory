@@ -118,6 +118,14 @@ export type SearchMode = 'browse' | 'query';
  * still-real request for a 0-1 character string. At/above the threshold, it is "query" mode.
  * Pure and total -- never throws, always resolves to one of the two literal modes.
  */
-export function getSearchMode(normalizedQuery: string): SearchMode {
-  return normalizedQuery.length >= MIN_QUERY_LENGTH ? 'query' : 'browse';
+export function getSearchMode(
+  normalizedQuery: string,
+  filterKind?: string | undefined,
+): SearchMode {
+  if (normalizedQuery.length >= MIN_QUERY_LENGTH) return 'query';
+  // A kind on its own is a constraint, so it is a query. Treating it as browse is what sent a
+  // reader who tapped "Places" out to the Explore map: Records had no way to list a kind without
+  // typing, so the only thing a category row could do was leave the tab (repo-awboi). The server
+  // has always answered `q=&kind=place`; only the client refused to ask.
+  return filterKind !== undefined && filterKind.trim().length > 0 ? 'query' : 'browse';
 }
