@@ -37,6 +37,7 @@ export { LedgerRow, type LedgerRowProps } from './LedgerRow';
 export { LedgerSectionLabel, type LedgerSectionLabelProps } from './LedgerSectionLabel';
 export { EditionFactCell, type EditionFactCellProps } from './EditionFactCell';
 export { RecordFactStrip, type RecordFactStripItem, type RecordFactStripProps } from './RecordFactStrip';
+export { RecordMeter, type RecordMeterProps } from './RecordMeter';
 export {
   UtilityScreenShell,
   type UtilityScreenShellProps,

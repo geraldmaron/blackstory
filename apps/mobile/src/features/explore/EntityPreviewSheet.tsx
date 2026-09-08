@@ -1,8 +1,11 @@
 /**
- * Explore entity preview (Pin Pulse story card): kind glyph, clear title hierarchy,
- * story line, icon meta chips (where / era / evidence / confidence), linked theme
- * hooks, and Open place. Hosted by the Explore sheet. Drives assistive-tech focus
- * on selection change (MOB-017).
+ * Explore entity preview (Pin Pulse story card): kind glyph, clear title hierarchy, story line,
+ * meta chips (where / era / evidence), linked theme hooks, and Open place. Hosted by the Explore
+ * sheet. Drives assistive-tech focus on selection change.
+ *
+ * Evidence is the shared meter plus the shared label, not a "High confidence" chip beside a
+ * "3 claims" chip. The card is `accessible` with one composed label, so the meter is decorative
+ * here and the sentence rides in `factsSummary`.
  */
 import { useEffect } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
@@ -11,6 +14,7 @@ import {
   Button,
   NavIcon,
   navIconForEntityKind,
+  RecordMeter,
   Text,
   useAccessibilityFocus,
   useThemeColors,
@@ -121,7 +125,7 @@ export function EntityPreviewSheet({
     Number.isFinite(mapCoords[0]) &&
     Number.isFinite(mapCoords[1]);
   const hasMetaChips = Boolean(
-    storyMeta.where || storyMeta.era || storyMeta.evidence || storyMeta.confidence || storyMeta.status,
+    storyMeta.where || storyMeta.era || storyMeta.evidence || storyMeta.status,
   );
   const linkedThemes = storyMeta.themes;
 
@@ -239,10 +243,25 @@ export function EntityPreviewSheet({
                 <MetaChip icon="time-outline" label={storyMeta.era} color={theme.inkMuted} />
               ) : null}
               {storyMeta.evidence ? (
-                <MetaChip icon="document-text-outline" label={storyMeta.evidence} color={theme.inkMuted} />
-              ) : null}
-              {storyMeta.confidence ? (
-                <MetaChip icon="shield-checkmark-outline" label={storyMeta.confidence} color={theme.inkMuted} />
+                <View style={styles.evidenceChip}>
+                  <RecordMeter
+                    tier={storyMeta.confidenceTier}
+                    {...(storyMeta.sourceCount !== undefined
+                      ? { sourceCount: storyMeta.sourceCount }
+                      : {})}
+                    showLetter={false}
+                    decorative
+                    testID="entity-preview-evidence-meter"
+                  />
+                  <Text
+                    variant="caption"
+                    colorRole="inkMuted"
+                    numberOfLines={1}
+                    style={styles.metaChipLabel}
+                  >
+                    {storyMeta.evidence}
+                  </Text>
+                </View>
               ) : null}
             </View>
           ) : null}
@@ -341,6 +360,11 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: space['2'],
     alignItems: 'center',
+  },
+  evidenceChip: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: space['1'],
   },
   metaChip: {
     flexDirection: 'row',

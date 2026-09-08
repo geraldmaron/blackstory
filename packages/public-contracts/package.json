@@ -20,6 +20,11 @@
       "types": "./dist/destinations.d.ts",
       "import": "./dist/destinations.js"
     },
+    "./evidence": {
+      "development": "./src/evidence.ts",
+      "types": "./dist/evidence.d.ts",
+      "import": "./dist/evidence.js"
+    },
     "./discovery": {
       "development": "./src/discovery.ts",
       "types": "./dist/discovery.d.ts",

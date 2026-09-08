@@ -15,11 +15,11 @@ module.exports = {
     '/node_modules/@react-native/babel-preset/',
   ],
   moduleNameMapper: {
-    '^@repo/public-contracts/version$': path.join(publicContractsSrc, 'version.ts'),
-    '^@repo/public-contracts/errors$': path.join(publicContractsSrc, 'errors.ts'),
-    '^@repo/public-contracts/destinations$': path.join(publicContractsSrc, 'destinations.ts'),
-    '^@repo/public-contracts/discovery$': path.join(publicContractsSrc, 'discovery.ts'),
-    '^@repo/public-contracts/v1/(.*)$': path.join(publicContractsSrc, 'v1', '$1.ts'),
+    // Every public-contracts export maps to `./src/<subpath>.ts`, so this is one rule rather than
+    // a hand-kept list. The list version silently failed to resolve each new export until someone
+    // added a line here, which is a mirror of the package's own exports map and drifts the same
+    // way every other mirror in this repo has.
+    '^@repo/public-contracts/(.+)$': path.join(publicContractsSrc, '$1.ts'),
     // file: linked public-contracts has no nested node_modules in CI; resolve zod from mobile.
     '^zod$': require.resolve('zod'),
     // Reanimated boots a native Worklets runtime on import, which does not exist under Jest.

@@ -1,7 +1,14 @@
 /**
- * Builds RecordFactStrip items from Explore map features for list rows and preview
- * sheets — Kind / Where / Era / Evidence anatomy aligned with web v6 result meta.
+ * Builds RecordFactStrip items from Explore map features for list rows and preview sheets —
+ * Kind / Where / Era / Evidence.
+ *
+ * Evidence is one fact, not two, and it is phrased by `@repo/public-contracts/evidence` — the
+ * same module the site prints from. This file used to build its own: "3 claims" for the count and
+ * "High confidence" for the tier, so a record the site called "Grade A · 3 sources" arrived on the
+ * phone as two unrelated strings, neither of which named a grade.
  */
+import { evidenceLabel } from '@repo/public-contracts/evidence';
+
 import type { RecordFactStripItem } from '@/ui';
 import { recordEraLabel, recordKindLabel } from '@/features/record-facts/record-facts';
 import { kindFamilyEncodingFor, isKnownMapKindFamily } from '@/features/map/kind-encoding';
@@ -26,20 +33,20 @@ function whereLabel(feature: PreviewFactFeature): string | undefined {
   return undefined;
 }
 
-function evidenceLabel(feature: PreviewFactFeature): string | undefined {
-  const count = feature.properties.evidenceCount;
-  if (typeof count !== 'number' || count < 0) return undefined;
-  return count === 1 ? '1 claim' : `${count} claims`;
+/** The record's confidence tier, defaulted to `unrated` — the honest reading of "no tier". */
+export function featureConfidenceTier(feature: PreviewFactFeature): string {
+  return feature.properties.confidenceTier?.trim().toLowerCase() || 'unrated';
 }
 
-function confidenceLabel(feature: PreviewFactFeature): string | undefined {
-  const tier = feature.properties.confidenceTier?.trim().toLowerCase();
-  if (!tier) return undefined;
-  if (tier === 'high') return 'High confidence';
-  if (tier === 'medium') return 'Medium confidence';
-  if (tier === 'low') return 'Low confidence';
-  if (tier === 'unrated') return 'Unrated';
-  return undefined;
+/** Source count when the feature carries one. Absent is not zero. */
+export function featureSourceCount(feature: PreviewFactFeature): number | undefined {
+  const count = feature.properties.evidenceCount;
+  if (typeof count !== 'number' || !Number.isFinite(count) || count < 0) return undefined;
+  return count;
+}
+
+function featureEvidenceLabel(feature: PreviewFactFeature): string {
+  return evidenceLabel(featureConfidenceTier(feature), featureSourceCount(feature));
 }
 
 function kindLabelFor(feature: PreviewFactFeature): string {
@@ -70,15 +77,7 @@ export function exploreRecordFacts(feature: PreviewFactFeature): readonly Record
     facts.push({ key: 'where', label: 'Where', value: where });
   }
 
-  const evidence = evidenceLabel(feature);
-  if (evidence) {
-    facts.push({ key: 'evidence', label: 'Evidence', value: evidence });
-  }
-
-  const confidence = confidenceLabel(feature);
-  if (confidence) {
-    facts.push({ key: 'confidence', label: 'Confidence', value: confidence });
-  }
+  facts.push({ key: 'evidence', label: 'Evidence', value: featureEvidenceLabel(feature) });
 
   return facts;
 }

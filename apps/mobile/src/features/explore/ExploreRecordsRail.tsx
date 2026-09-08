@@ -6,9 +6,12 @@ import { memo, useCallback, useMemo } from 'react';
 import { Pressable, StyleSheet, View, type ListRenderItemInfo } from 'react-native';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
+import { evidenceMeterLabel } from '@repo/public-contracts/evidence';
+
 import {
   NavIcon,
   navIconForEntityKind,
+  RecordMeter,
   Text,
   space,
   radius,
@@ -52,7 +55,14 @@ const RecordRow = memo(function RecordRow({
 }) {
   const theme = useThemeColors();
   const story = exploreStoryMeta(feature);
-  const a11yMeta = [story.caption, story.evidence].filter(Boolean).join('. ');
+  // The row is one accessible element, so the meter is decorative and the sentence it would have
+  // spoken is composed into the row's own label instead.
+  const a11yMeta = [
+    story.caption,
+    evidenceMeterLabel(story.confidenceTier, story.sourceCount),
+  ]
+    .filter(Boolean)
+    .join('. ');
 
   return (
     <Pressable
@@ -84,13 +94,20 @@ const RecordRow = memo(function RecordRow({
           </Text>
         ) : null}
       </View>
-      <Ionicons
-        name="chevron-forward"
-        size={16}
-        color={selected ? theme.accent : theme.inkSubtle}
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-      />
+      <View style={styles.rowTrailing}>
+        <RecordMeter
+          tier={story.confidenceTier}
+          {...(story.sourceCount !== undefined ? { sourceCount: story.sourceCount } : {})}
+          decorative
+        />
+        <Ionicons
+          name="chevron-forward"
+          size={16}
+          color={selected ? theme.accent : theme.inkSubtle}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        />
+      </View>
     </Pressable>
   );
 });
@@ -321,5 +338,10 @@ const styles = StyleSheet.create({
   },
   rowTitle: {
     flexShrink: 1,
+  },
+  rowTrailing: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: space['2'],
   },
 });

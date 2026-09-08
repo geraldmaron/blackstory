@@ -93,7 +93,7 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
     expect(onOpenEntity).toHaveBeenCalledWith('ent_a');
   });
 
-  it('shows confidence and linked theme hooks when present on the feature', async () => {
+  it('shows the evidence grade and linked theme hooks when present on the feature', async () => {
     const { getByLabelText, getByTestId } = await render(
       <EntityPreviewSheet
         feature={{
@@ -115,8 +115,11 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
     );
 
     const summary = getByLabelText(/Pinned place: Bethel AME Church\./);
-    expect(summary.props.accessibilityLabel).toMatch(/Confidence: High confidence/);
-    expect(summary.props.accessibilityLabel).toMatch(/Evidence: 4 claims/);
+    // One evidence fact, in the language the site prints — not "High confidence" beside
+    // "4 claims", neither of which named a grade.
+    expect(summary.props.accessibilityLabel).toMatch(/Evidence: Grade A · 4 sources/);
+    expect(summary.props.accessibilityLabel).not.toMatch(/claims/);
+    expect(getByTestId('entity-preview-evidence-meter', { includeHiddenElements: true })).toBeTruthy();
     expect(getByTestId('entity-preview-linked')).toHaveTextContent(/education · faith/);
   });
 });

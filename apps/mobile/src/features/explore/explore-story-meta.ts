@@ -1,15 +1,24 @@
 /**
- * Compact place/era/evidence/confidence lines for Explore rail rows and preview
- * chips — one story beat per row, not a label-over-value fact grid wall.
+ * Compact place/era/evidence lines for Explore rail rows and preview chips — one story beat per
+ * row, not a label-over-value fact grid wall.
+ *
+ * Evidence travels as both the printed label and the tier behind it, so a row can draw the shared
+ * meter (`RecordMeter`) instead of restating the grade in words a second time.
  */
 import type { PreviewFactFeature } from './explore-preview-facts';
-import { exploreRecordFacts } from './explore-preview-facts';
+import {
+  exploreRecordFacts,
+  featureConfidenceTier,
+  featureSourceCount,
+} from './explore-preview-facts';
 
 export type ExploreStoryMeta = {
   readonly where?: string;
   readonly era?: string;
   readonly evidence?: string;
-  readonly confidence?: string;
+  /** The tier and count behind the label, so a row can draw the meter rather than reprint words. */
+  readonly confidenceTier: string;
+  readonly sourceCount?: number;
   readonly status?: string;
   /** Theme / topic hooks for the preview "Linked" line. */
   readonly themes?: readonly string[];
@@ -35,13 +44,14 @@ function statusLabel(feature: PreviewFactFeature): string | undefined {
   return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
-/** Sparse where / era / evidence / confidence for icon chips and rail captions. */
+/** Sparse where / era / evidence for icon chips and rail captions. */
 export function exploreStoryMeta(feature: PreviewFactFeature): ExploreStoryMeta {
   const facts = exploreRecordFacts(feature);
   const where = facts.find((f) => f.key === 'where')?.value;
   const era = facts.find((f) => f.key === 'era')?.value;
   const evidence = facts.find((f) => f.key === 'evidence')?.value;
-  const confidence = facts.find((f) => f.key === 'confidence')?.value;
+  const confidenceTier = featureConfidenceTier(feature);
+  const sourceCount = featureSourceCount(feature);
   const status = statusLabel(feature);
   const themes = themeHooks(feature);
 
@@ -50,7 +60,8 @@ export function exploreStoryMeta(feature: PreviewFactFeature): ExploreStoryMeta 
     ...(where ? { where } : {}),
     ...(era ? { era } : {}),
     ...(evidence ? { evidence } : {}),
-    ...(confidence ? { confidence } : {}),
+    confidenceTier,
+    ...(sourceCount !== undefined ? { sourceCount } : {}),
     ...(status ? { status } : {}),
     ...(themes.length > 0 ? { themes } : {}),
     caption,

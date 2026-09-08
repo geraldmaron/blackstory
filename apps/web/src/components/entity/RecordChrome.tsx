@@ -252,30 +252,13 @@ export function RecordMeter({ level, of = 3, tone, label, className }: RecordMet
   );
 }
 
-/** Filled segments for a confidence tier. Unrated is honestly empty, never a fourth colour. */
-export function meterLevelForTier(tier: ConfidenceTierKey): number {
-  switch (tier) {
-    case 'high':
-      return 3;
-    case 'medium':
-      return 2;
-    case 'low':
-      return 1;
-    default:
-      return 0;
-  }
-}
-
-export function meterLevelForCoverage(level: 'minimal' | 'partial' | 'substantial'): number {
-  switch (level) {
-    case 'substantial':
-      return 3;
-    case 'partial':
-      return 2;
-    default:
-      return 1;
-  }
-}
+/*
+ * Segment counts come from `@repo/public-contracts/evidence`, which the phone reads too. They are
+ * re-exported here because every caller in this app already imports its record chrome from this
+ * module, and a second import path for the same fact is how the two platforms drifted apart in
+ * the first place.
+ */
+export { meterLevelForTier, meterLevelForCoverage } from '@repo/public-contracts/evidence';
 
 /* —— fact tile ————————————————————————————————————————————————————————————————— */
 
