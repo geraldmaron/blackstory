@@ -19,7 +19,7 @@ import {
   space,
 } from '@/ui';
 import { openExternalLink } from '@/features/entity/linking';
-import { BOOKS_DETAIL } from './books-copy';
+import { BOOKS_DETAIL, bookIdentifierSystemLabel } from './books-copy';
 import {
   authorNames,
   getBookBySlug,
@@ -163,7 +163,9 @@ export function BooksDetailScreen({ slug }: BooksDetailScreenProps) {
           <LedgerSectionLabel ruleAbove>{BOOKS_DETAIL.lookupTitle}</LedgerSectionLabel>
           {book.identifiers.length > 0 ? (
             <Text variant="caption" colorRole="inkMuted">
-              {book.identifiers.map((id) => `${id.system}: ${id.value}`).join(' · ')}
+              {book.identifiers
+                .map((id) => `${bookIdentifierSystemLabel(id.system)}: ${id.value}`)
+                .join(' · ')}
             </Text>
           ) : null}
           {book.purchaseLinks
@@ -172,7 +174,6 @@ export function BooksDetailScreen({ slug }: BooksDetailScreenProps) {
               <LedgerRow
                 key={`${link.retailer}-${index}`}
                 title={plainDashCopy(link.label)}
-                slug={link.retailer}
                 leading={<NavIcon name="books" size={20} />}
                 showChevron
                 showDivider={index < list.length - 1}
