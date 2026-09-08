@@ -179,7 +179,7 @@ export function ExploreRecordsRail({
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
             />
-            <Text variant="code" colorRole="inkMuted">
+            <Text variant="code" colorRole="inkMuted" style={styles.rowLabel}>
               Pull up for places
             </Text>
           </View>
@@ -203,7 +203,7 @@ export function ExploreRecordsRail({
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
             />
-            <Text variant="code" style={{ color: theme.inverseInk }}>
+            <Text variant="code" style={[styles.rowLabel, { color: theme.inverseInk }]}>
               Expand the map
             </Text>
           </Pressable>
@@ -290,11 +290,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: space['3'],
     minHeight: MIN_TOUCH_TARGET,
     borderRadius: radius.sm,
+    flexShrink: 1,
   },
   inviteRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: space['1'],
+    flexShrink: 1,
+  },
+  // Mono labels sit in a row beside fixed-size icons. Without `flexShrink` the
+  // text box keeps its full intrinsic width at accessibility content sizes and
+  // runs off the right edge instead of wrapping ("Pull up for places" lost its
+  // last word off-screen at accessibility-extra-large).
+  rowLabel: {
+    flexShrink: 1,
   },
   emptyWrap: {
     flexGrow: 1,

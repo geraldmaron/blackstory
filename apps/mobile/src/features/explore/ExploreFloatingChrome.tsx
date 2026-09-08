@@ -158,9 +158,15 @@ export function ExploreFloatingChrome({
             accessibilityElementsHidden
             importantForAccessibility="no-hide-descendants"
           />
+          {/* Deliberately no `numberOfLines`: this chip shares a fixed-width row
+              with four icon buttons that do not scale, so on one line the text
+              box shrinks until the release total is truncated away ("4,154 /
+              4,161" reads "4,154 /..." at accessibility-extra-large and
+              "4,154..." one size up) — dropping the very number the chip exists
+              to show (explore-count-label.ts). Wrapping trades a taller chip for
+              keeping both counts at every Dynamic Type size. */}
           <Text
             variant="caption"
-            numberOfLines={1}
             style={[styles.countInline, { color: chrome.mapAccent }]}
           >
             {countLabel.railInline}
