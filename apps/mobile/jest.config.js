@@ -24,6 +24,14 @@ module.exports = {
     '^zod$': require.resolve('zod'),
     // Reanimated boots a native Worklets runtime on import, which does not exist under Jest.
     '^react-native-reanimated$': path.join(__dirname, 'test/mocks/react-native-reanimated.js'),
+    // MapLibre ships untransformed native-component modules, so importing it under Jest throws
+    // "Cannot use import statement outside a module". Any suite reaching MapScreen transitively
+    // (the record page embeds a still map plate) needs this; suites asserting camera calls still
+    // declare their own jest.mock factory, which takes precedence.
+    '^@maplibre/maplibre-react-native$': path.join(
+      __dirname,
+      'test/mocks/maplibre-react-native.js',
+    ),
   },
   // Resolve NodeNext-style `.js` specifiers inside public-contracts source to `.ts`.
   resolver: path.join(__dirname, 'jest.resolver.cjs'),

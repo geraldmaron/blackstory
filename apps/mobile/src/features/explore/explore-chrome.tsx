@@ -9,38 +9,30 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { screenScrollInsets } from '@/ui/ScreenCanvas';
-import { brandCore, themeColors } from '@/ui/tokens';
 import { useThemeColors } from '@/ui';
+import {
+  MAP_INK,
+  MAP_INK_MUTED,
+  MAP_GHOST_BG,
+  MAP_GHOST_ACTIVE,
+  MAP_ACCENT,
+} from '@/features/map/map-plate-ink';
 
 const ACCENT_WIDTH = 3;
 
 /** Horizontal inset for Explore chrome and sheet bodies — matches tab screen gutters. */
 export const exploreContentInset = screenScrollInsets.paddingHorizontal;
 
-/**
- * Small hex → `rgba()` helper so ghost fills read as "brand token at alpha"
- * instead of hand-copied rgba triples that silently drift from the palette.
+/*
+ * Plate ink/ghost fills now live in `features/map/map-plate-ink.ts` so that map-layer modules
+ * (MapAttribution, the zoom controls) can reach them without importing upward from
+ * `features/explore/`. Re-exported here so existing Explore imports keep working.
  */
-export function withAlpha(hex: string, alpha: number): string {
-  const normalized = hex.replace('#', '');
-  const r = parseInt(normalized.slice(0, 2), 16);
-  const g = parseInt(normalized.slice(2, 4), 16);
-  const b = parseInt(normalized.slice(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
-/**
- * Fixed ink on the dark archive map plate (ADR-013). The plate stays on the
- * dark register regardless of device theme, so these are token references at
- * fixed alpha — Archive Paper for ink, the dark accent-graphic for copper.
- */
-const MAP_INK = brandCore.archivePaper;
-const MAP_INK_MUTED = withAlpha(brandCore.archivePaper, 0.68);
-const MAP_GHOST_BG = withAlpha(brandCore.archivePaper, 0.08);
-const MAP_ACCENT = themeColors.dark.accentGraphic;
-const MAP_GHOST_ACTIVE = withAlpha(MAP_ACCENT, 0.28);
-/** Pressed feedback fill for ghost controls on the dark plate. */
-export const MAP_GHOST_PRESSED = withAlpha(brandCore.archivePaper, 0.14);
+export {
+  withAlpha,
+  MAP_GHOST_PRESSED,
+  MAP_GHOST_BORDER,
+} from '@/features/map/map-plate-ink';
 
 export type ExploreChromeColors = ReturnType<typeof useExploreChromeColors>;
 

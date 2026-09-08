@@ -22,7 +22,8 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { duration, MIN_TOUCH_TARGET, radius, space, Text, useThemeColors } from '@/ui';
+import { duration, MIN_TOUCH_TARGET, radius, space, Text } from '@/ui';
+import { MAP_GHOST_BG, MAP_GHOST_BORDER, MAP_GHOST_PRESSED, MAP_INK_MUTED } from './map-plate-ink';
 import {
   MAP_ATTRIBUTION_LINES,
   MAP_ATTRIBUTION_LINES_COMPACT,
@@ -65,7 +66,6 @@ export function MapAttribution({
   reduceMotion = false,
   compact = false,
 }: MapAttributionProps = {}) {
-  const theme = useThemeColors();
   const [expanded, setExpanded] = useState(false);
   const lines = compact ? MAP_ATTRIBUTION_LINES_COMPACT : MAP_ATTRIBUTION_LINES;
   const visibleText = lines.join(' · ');
@@ -83,7 +83,15 @@ export function MapAttribution({
         compact ? styles.containerCompact : null,
         {
           bottom,
-          backgroundColor: theme.surface,
+          /*
+           * Ghost fill, not `theme.surface`. This sits on the dark archive plate beside Explore's
+           * other map controls, which are all translucent; an opaque light surface here rendered
+           * as a solid white block — the heaviest thing on the map, for the least important
+           * control on it. Collapsed, that block is a 44pt square holding one small glyph.
+           */
+          backgroundColor: MAP_GHOST_BG,
+          borderColor: MAP_GHOST_BORDER,
+          borderWidth: StyleSheet.hairlineWidth,
           borderRadius: radius.sm,
         },
         style,
@@ -94,7 +102,7 @@ export function MapAttribution({
         {expanded ? (
           <Text
             variant="code"
-            style={[styles.label, compact ? styles.labelCompact : null, { color: theme.inkMuted }]}
+            style={[styles.label, compact ? styles.labelCompact : null, { color: MAP_INK_MUTED }]}
             testID="map-attribution-text"
           >
             {visibleText}
@@ -110,14 +118,14 @@ export function MapAttribution({
           onPress={() => setExpanded((open) => !open)}
           style={({ pressed }) => [
             styles.toggle,
-            pressed ? { backgroundColor: theme.surfacePressed } : null,
+            pressed ? { backgroundColor: MAP_GHOST_PRESSED } : null,
           ]}
           testID="map-attribution-toggle"
         >
           <Ionicons
             name="information-circle-outline"
             size={ATTRIBUTION_ICON_SIZE}
-            color={theme.inkMuted}
+            color={MAP_INK_MUTED}
             accessibilityElementsHidden
             importantForAccessibility="no"
           />

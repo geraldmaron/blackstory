@@ -10,7 +10,7 @@
  * Explore's own chrome is `features/explore`. A second map surface would reuse this file and
  * none of that.
  */
-export { MapScreen, type MapScreenProps } from './MapScreen';
+export { MapScreen, type MapScreenProps, type MapCameraCommand } from './MapScreen';
 export {
   MapAttribution,
   MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM,

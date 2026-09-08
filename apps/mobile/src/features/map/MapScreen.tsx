@@ -25,7 +25,7 @@
  * live clustering, and camera motion remain device/Maestro evidence (ADR-024).
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, View, type NativeSyntheticEvent } from 'react-native';
+import { Pressable, StyleSheet, View, type NativeSyntheticEvent } from 'react-native';
 import {
   Camera,
   GeoJSONSource,
@@ -35,7 +35,14 @@ import {
   type GeoJSONSourceRef,
   type ViewStateChangeEvent,
 } from '@maplibre/maplibre-react-native';
-import { ErrorState, duration } from '@/ui';
+import { ErrorState, duration, MIN_TOUCH_TARGET, radius, space } from '@/ui';
+import { Ionicons } from '@expo/vector-icons';
+import {
+  MAP_GHOST_BG,
+  MAP_GHOST_BORDER,
+  MAP_GHOST_PRESSED,
+  MAP_INK,
+} from './map-plate-ink';
 import { MapAttribution } from './MapAttribution';
 import {
   buildBasemapStyle,
@@ -192,6 +199,13 @@ export type MapScreenProps = {
    */
   readonly showAttribution?: boolean;
   /**
+   * Draw the +/- zoom controls. Defaults to `gesturesEnabled`: a surface a reader can pan and
+   * pinch gets buttons too, and a still plate gets neither. Pinch was previously the ONLY way to
+   * change zoom, which is a two-hand gesture and has no discoverable affordance — a reader who
+   * cannot pinch (motor impairment, one hand occupied, a phone in a case) had no way in.
+   */
+  readonly showZoomControls?: boolean;
+  /**
    * When the native map fails to load (WebGL / style / tile engine), surfaces a
    * degraded state. List/metrics chrome stays mounted in Explore (ADR-024 §7).
    */
@@ -242,12 +256,16 @@ export function MapScreen({
   reduceMotion = false,
   gesturesEnabled = true,
   showAttribution = true,
+  showZoomControls,
   onMapEngineFailure,
 }: MapScreenProps) {
   const cameraRef = useRef<CameraRef>(null);
   const sourceRef = useRef<GeoJSONSourceRef>(null);
   const appliedTokenRef = useRef<number | null>(null);
   const zoomRef = useRef(PRESET_ZOOM.national);
+  const initialFramedTokenRef = useRef<number | null>(
+    cameraCommand?.kind === 'center' ? cameraCommand.token : null,
+  );
   const [engineFailed, setEngineFailed] = useState(false);
 
   const encodedSource = useMemo(() => enrichMapFeatureCollection(source), [source]);
@@ -266,6 +284,37 @@ export function MapScreen({
     [selectedEntityId],
   );
 
+  /*
+   * Frame the FIRST render from a center command when one is already present, instead of leaving
+   * it to the imperative effect below.
+   *
+   * That effect no-ops when `cameraRef.current` is still null — true on mount, before the native
+   * camera attaches — and only retries when the token changes. Explore never noticed because a
+   * reader's selection mints a new token after the map is up. A surface that mounts with one
+   * fixed command and never changes it (the record page's still plate) got a silent no-op and sat
+   * on the national bounds forever. Framing at mount removes the race rather than papering over
+   * it with a retry.
+   *
+   * Captured in a ref so it stays genuinely initial: later commands belong to the effect.
+   */
+  const initialViewStateRef = useRef(
+    cameraCommand?.kind === 'center'
+      ? {
+          center: [cameraCommand.center[0], cameraCommand.center[1]] as [number, number],
+          zoom: cameraCommand.zoom,
+        }
+      : {
+          bounds: [US_BOUNDS[0], US_BOUNDS[1], US_BOUNDS[2], US_BOUNDS[3]] as [
+            number,
+            number,
+            number,
+            number,
+          ],
+          padding: { ...EXPLORE_MAP_VIEW_PADDING },
+        },
+  );
+  const initialViewState = initialViewStateRef.current;
+
   // Apply a one-shot camera command exactly once per token. Guarded so a mocked
   // (null-ref) map in tests and a missing command are both no-ops.
   useEffect(() => {
@@ -274,6 +323,8 @@ export function MapScreen({
     if (!command || !camera) return;
     if (appliedTokenRef.current === command.token) return;
     appliedTokenRef.current = command.token;
+    // Already framed by initialViewState — animating to it again would be a visible no-op jump.
+    if (initialFramedTokenRef.current === command.token) return;
 
     const animationDuration = reduceMotion
       ? duration.durationInstant
@@ -338,6 +389,27 @@ export function MapScreen({
     vectorTileUrl,
     glyphsUrl,
   });
+
+  /**
+   * Step the camera one zoom level about its current centre. `zoomTo` (not `flyTo`) because a
+   * button press should not also move the centre — the reader is asking for closer, not
+   * elsewhere. Clamped to the same ceiling/floor the gesture handler uses, so a button can never
+   * reach a precision the redacted release artifact does not support (mapCamera.ts).
+   */
+  function zoomBy(step: number): void {
+    const camera = cameraRef.current;
+    if (!camera) return;
+    const next = Math.min(MAP_MAX_ZOOM, Math.max(MAP_MIN_ZOOM, zoomRef.current + step));
+    if (next === zoomRef.current) return;
+    try {
+      camera.zoomTo(next, {
+        duration: reduceMotion ? duration.durationInstant : duration.durationFast,
+      });
+      zoomRef.current = next;
+    } catch {
+      /* camera not ready; ignore — next press can retry */
+    }
+  }
 
   function expandTowardCluster(center: LngLat): void {
     const camera = cameraRef.current;
@@ -428,10 +500,7 @@ export function MapScreen({
       >
         <Camera
           ref={cameraRef}
-          initialViewState={{
-            bounds: [US_BOUNDS[0], US_BOUNDS[1], US_BOUNDS[2], US_BOUNDS[3]],
-            padding: { ...EXPLORE_MAP_VIEW_PADDING },
-          }}
+          initialViewState={initialViewState}
           minZoom={MAP_MIN_ZOOM}
           maxZoom={MAP_MAX_ZOOM}
           maxBounds={[
@@ -531,14 +600,95 @@ export function MapScreen({
           <SelectedPulseRing filter={selectedEntityFilter} reduceMotion={reduceMotion} />
         </GeoJSONSource>
       </Map>
-      {showAttribution ? <MapAttribution /> : null}
+      {showAttribution ? (
+        /*
+         * A still plate is a small frame, not a full screen: the default 18% bottom offset is
+         * sized to clear Explore's peek sheet and leaves the chip floating in the middle of a
+         * 168pt locator. Hug the bottom edge there, and use the compact copy so one licensing
+         * pill does not become the loudest thing in the frame.
+         */
+        <MapAttribution
+          compact={!gesturesEnabled}
+          {...(gesturesEnabled ? {} : { bottom: space['1'] })}
+        />
+      ) : null}
+      {showZoomControls ?? gesturesEnabled ? (
+        <View style={styles.zoomControls} pointerEvents="box-none">
+          <MapZoomButton
+            icon="add"
+            label="Zoom in"
+            onPress={() => zoomBy(1)}
+            position="top"
+          />
+          <MapZoomButton
+            icon="remove"
+            label="Zoom out"
+            onPress={() => zoomBy(-1)}
+            position="bottom"
+          />
+        </View>
+      ) : null}
     </View>
+  );
+}
+
+/**
+ * One zoom step. Ghost fill on the dark plate so it reads as part of the same control family as
+ * Explore's mast buttons rather than a second visual language (map-plate-ink.ts). The pair is
+ * drawn as one stacked slab with a divider — two separate floating circles at this size read as
+ * unrelated buttons.
+ */
+function MapZoomButton({
+  icon,
+  label,
+  onPress,
+  position,
+}: {
+  readonly icon: 'add' | 'remove';
+  readonly label: string;
+  readonly onPress: () => void;
+  readonly position: 'top' | 'bottom';
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      testID={`map-zoom-${icon === 'add' ? 'in' : 'out'}`}
+      style={({ pressed }) => [
+        styles.zoomButton,
+        position === 'top' ? styles.zoomButtonTop : styles.zoomButtonBottom,
+        { backgroundColor: pressed ? MAP_GHOST_PRESSED : MAP_GHOST_BG },
+      ]}
+    >
+      <Ionicons name={icon} size={20} color={MAP_INK} accessibilityElementsHidden />
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
   errorContainer: { flex: 1, justifyContent: 'center' },
+  zoomControls: {
+    position: 'absolute',
+    right: space['4'],
+    top: '38%',
+    borderRadius: radius.sm,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: MAP_GHOST_BORDER,
+    overflow: 'hidden',
+  },
+  zoomButton: {
+    width: MIN_TOUCH_TARGET,
+    height: MIN_TOUCH_TARGET,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  zoomButtonTop: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: MAP_GHOST_BORDER,
+  },
+  zoomButtonBottom: {},
 });
 
 export { EXPLORE_MAP_VIEW_PADDING, MAP_MAX_ZOOM, MAP_MIN_ZOOM, US_BOUNDS, US_CAMERA_MAX_BOUNDS };
