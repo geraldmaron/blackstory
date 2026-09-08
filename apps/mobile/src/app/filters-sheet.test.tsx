@@ -23,7 +23,7 @@ jest.mock('expo-router', () => ({
 // eslint-disable-next-line import/first
 import FiltersSheet from './filters-sheet';
 // eslint-disable-next-line import/first
-import { EXPLORE_ERA_OPTIONS } from '@/features/map/explore/ExploreFiltersPanel';
+import { EXPLORE_ERA_OPTIONS } from '@/features/explore/ExploreFiltersPanel';
 
 beforeEach(() => {
   mockNavigate.mockClear();

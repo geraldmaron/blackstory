@@ -6,7 +6,7 @@ import { Text } from 'react-native';
 
 const mockBottomSheetProps: Record<string, unknown>[] = [];
 
-jest.mock('../../../../ui/AppBottomSheet', () => {
+jest.mock('@/ui/AppBottomSheet', () => {
   /* eslint-disable @typescript-eslint/no-require-imports */
   const React = require('react');
   const { View } = require('react-native');

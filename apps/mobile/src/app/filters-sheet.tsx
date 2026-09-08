@@ -21,7 +21,7 @@ import { buildExploreFacetOptions } from '@/features/explore/explore-filter';
 import {
   ExploreFiltersPanel,
   filterStateFromPanel,
-} from '@/features/map/explore/ExploreFiltersPanel';
+} from '@/features/explore/ExploreFiltersPanel';
 
 export default function FiltersSheet() {
   const rawParams = useLocalSearchParams();

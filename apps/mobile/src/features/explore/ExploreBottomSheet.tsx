@@ -6,7 +6,7 @@
  * the sheet with tab-bar `bottomInset`. `bottomInset` still clears the edition tab bar.
  */
 import type { ReactNode } from 'react';
-import { AppBottomSheet } from '../../../ui/AppBottomSheet';
+import { AppBottomSheet } from '@/ui/AppBottomSheet';
 import {
   EXPLORE_SHEET_FULL_FRACTION,
   EXPLORE_SHEET_HALF_FRACTION,

@@ -37,17 +37,17 @@ import {
   type MapLoadState,
 } from '@/features/map';
 import { DEMO_MAP_SOURCE } from '@/features/map';
-import { EntityPreviewSheet } from '@/features/map/explore';
+import { EntityPreviewSheet } from '@/features/explore';
 import {
   ExploreBottomSheet,
   EXPLORE_SHEET_FULL,
   EXPLORE_SHEET_HALF,
   EXPLORE_SHEET_PEEK,
-} from '@/features/map/explore/ExploreBottomSheet';
-import { ExploreFloatingChrome } from '@/features/map/explore/ExploreFloatingChrome';
-import { ExploreInstrumentsPanel } from '@/features/map/explore/ExploreInstrumentsPanel';
-import { ExploreRecordsRail } from '@/features/map/explore/ExploreRecordsRail';
-import { attributionBottomAbovePeekSheet } from '@/features/map/explore/explore-sheet-layout';
+} from '@/features/explore/ExploreBottomSheet';
+import { ExploreFloatingChrome } from '@/features/explore/ExploreFloatingChrome';
+import { ExploreInstrumentsPanel } from '@/features/explore/ExploreInstrumentsPanel';
+import { ExploreRecordsRail } from '@/features/explore/ExploreRecordsRail';
+import { attributionBottomAbovePeekSheet } from '@/features/explore/explore-sheet-layout';
 import type { FilterState } from '@/lib/route-params';
 import {
   exploreReducer,
