@@ -85,6 +85,7 @@ export const DIGNITY_PALETTE = {
   kindCase: '#7BA8D4',
   kindPublication: '#5C6B4E',
   kindArtifact: '#A68968',
+  kindInvention: '#6BA894',
   kindMovement: '#C4683A',
   kindOther: brandPalette.stone,
 

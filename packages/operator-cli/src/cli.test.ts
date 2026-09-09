@@ -429,3 +429,196 @@ test('enrichment-run --output writes full JSON sync and prints compact stdout su
   );
   assert.match(readFileSync(`${outputPath}.progress.ndjson`, 'utf8'), /enrichment\.progress\.v1/);
 });
+
+/**
+ * harness-run's web_search connector, end to end through the lead boundary.
+ *
+ * The enrichment bridge turns a subject's `cites` into a citationUrl and its `description` into the
+ * text claims are drawn from, so the property under test is that neither can be populated from a
+ * search result alone: a lead has to survive a real fetch first.
+ */
+function harnessSearchProvider(
+  results: readonly { url: string; title?: string; content?: string }[],
+) {
+  return {
+    available: true as const,
+    provider: 'searxng' as const,
+    config: {
+      provider: 'searxng' as const,
+      apiKey: '',
+      storageTermsConfirmed: false,
+      planTermsVersion: 'searxng-self-hosted-research-2026-07',
+      baseUrl: 'http://127.0.0.1:8888',
+    },
+    client: async (request: { readonly url: string }) => ({
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+      bodyText: JSON.stringify({ results }),
+      finalUrl: request.url,
+    }),
+  };
+}
+
+/** Serves page text for the URLs in `pages`; anything else is unreachable. */
+function harnessPageTransport(pages: Readonly<Record<string, string>>) {
+  const requested: string[] = [];
+  return {
+    requested,
+    dependencies: {
+      resolveHost: async () => [{ address: '93.184.216.34', family: 4 as const }],
+      transport: async (request: { readonly url: string }) => {
+        requested.push(request.url);
+        const text = pages[request.url];
+        if (text === undefined) throw new Error('unreachable page');
+        async function* body(): AsyncGenerator<Uint8Array> {
+          yield new TextEncoder().encode(text);
+        }
+        return {
+          status: 200,
+          headers: { 'content-type': 'text/plain' },
+          remoteAddress: '93.184.216.34',
+          body: body(),
+        };
+      },
+    },
+  };
+}
+
+function harnessProgress(errors: readonly string[]): Record<string, unknown>[] {
+  return errors
+    .flatMap((line) => line.split('\n'))
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith('{'))
+    .flatMap((line) => {
+      try {
+        return [JSON.parse(line) as Record<string, unknown>];
+      } catch {
+        return [];
+      }
+    });
+}
+
+test('harness-run web_search only makes a subject from a lead that was actually fetched', async () => {
+  const out = capture();
+  const reachable = 'https://www.nps.gov/places/reachable.htm';
+  const pageText =
+    'The Oak Street Meeting Hall served as a mutual-aid and organizing space from 1921 until the ' +
+    'urban renewal clearances of 1964, and the congregation kept its minute books throughout.';
+  const transport = harnessPageTransport({ [reachable]: pageText });
+  const code = await runCli(
+    [
+      'harness-run',
+      '--theme',
+      'mutual aid',
+      '--metro',
+      'Chicago',
+      '--connectors',
+      'web_search',
+      '--provider',
+      'mock',
+      ...BASE_FLAGS,
+    ],
+    {
+      stdout: out.stdout,
+      stderr: out.stderr,
+      searchProvider: harnessSearchProvider([
+        { url: reachable, title: 'Oak Street Meeting Hall', content: 'An engine blurb.' },
+        // A lead that cannot be fetched must not become a subject, however good the blurb looks.
+        {
+          url: 'https://www.nps.gov/places/unreachable.htm',
+          title: 'Looks Authoritative',
+          content: 'A very promising blurb about a page that does not answer.',
+        },
+      ]),
+      fetchDependencies: transport.dependencies,
+    },
+  );
+  assert.equal(code, 0);
+
+  const progress = harnessProgress(out.errors);
+  const leadStage = progress.find((entry) => entry.stage === 'web_search.leads');
+  assert.ok(leadStage, 'the run must report the leads it received');
+  assert.equal(leadStage.leadCount, 2);
+
+  const fetchedStage = progress.find((entry) => entry.stage === 'web_search.fetched');
+  assert.ok(fetchedStage, 'the run must report how many leads survived the fetch');
+  assert.equal(fetchedStage.leadCount, 2);
+  assert.equal(fetchedStage.fetchedCount, 1);
+  assert.equal(fetchedStage.droppedUnfetchable, 1);
+
+  // Both leads were attempted; only the one that answered carried on.
+  assert.ok(transport.requested.includes(reachable));
+  assert.ok(transport.requested.includes('https://www.nps.gov/places/unreachable.htm'));
+
+  // WHICH lead became the subject, not just how many: dropping the fetched one and keeping the
+  // unreachable one scores the same on counts.
+  assert.deepEqual(fetchedStage.citedUrls, [reachable]);
+  assert.equal(fetchedStage.descriptionSource, 'fetched_page');
+
+  const connectorsComplete = progress.find((entry) => entry.stage === 'connectors.complete');
+  assert.ok(connectorsComplete);
+  assert.equal(connectorsComplete.rawSubjectsCount, 1);
+
+  // The subject's own content, from the run JSON: the description must be the text that was read,
+  // and the engine's blurb must appear nowhere. Putting the blurb back in `description` is a
+  // count-neutral regression, so only this assertion catches it.
+  const runJson = JSON.parse(out.lines.join('\n')) as {
+    rawSubjects: readonly {
+      readonly title: string;
+      readonly description: string;
+      readonly cites: readonly string[];
+      readonly rawRecord?: Record<string, unknown>;
+    }[];
+  };
+  assert.equal(runJson.rawSubjects.length, 1);
+  const subject = runJson.rawSubjects[0]!;
+  assert.match(subject.description, /Oak Street Meeting Hall served as a mutual-aid/u);
+  assert.deepEqual(subject.cites, [reachable]);
+  const serialized = JSON.stringify(runJson);
+  assert.ok(!serialized.includes('An engine blurb.'), 'the engine blurb must not reach the output');
+  assert.ok(
+    !serialized.includes('A very promising blurb'),
+    'an unfetched lead must leave no trace in the output',
+  );
+  assert.ok(
+    !serialized.includes('Looks Authoritative'),
+    'an unfetched lead title must not persist',
+  );
+  assert.ok(
+    !serialized.includes('engineDescription'),
+    'no engine-supplied field may be written to the run JSON',
+  );
+});
+
+test('harness-run web_search reports an unavailable provider and still exits cleanly', async () => {
+  const out = capture();
+  const code = await runCli(
+    [
+      'harness-run',
+      '--theme',
+      'mutual aid',
+      '--metro',
+      'Chicago',
+      '--connectors',
+      'web_search',
+      '--provider',
+      'mock',
+      ...BASE_FLAGS,
+    ],
+    {
+      stdout: out.stdout,
+      stderr: out.stderr,
+      searchProvider: {
+        available: false,
+        reason: 'No search provider configured: set SEARXNG_BASE_URL for the operator instance',
+      },
+    },
+  );
+  assert.equal(code, 0);
+  const progress = harnessProgress(out.errors);
+  const unavailable = progress.find((entry) => entry.stage === 'web_search.unavailable');
+  assert.ok(unavailable, 'an unavailable provider must be reported, not silently skipped');
+  assert.match(String(unavailable.reason), /SEARXNG_BASE_URL/u);
+  const connectorsComplete = progress.find((entry) => entry.stage === 'connectors.complete');
+  assert.equal(connectorsComplete?.rawSubjectsCount, 0);
+});

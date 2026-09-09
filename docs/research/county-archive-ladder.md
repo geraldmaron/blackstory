@@ -6,7 +6,11 @@ A place-connected research-discovery methodology that harvests Black-history mic
 
 Federal aggregators (DPLA, Internet Archive, Chronicling America) skew toward nationally digitized material. State/county archives describe their holdings in EAD finding aids and expose them over OAI-PMH, but rarely surface in national search. The County Archive Ladder "climbs" each archive: list collections for a jurisdiction → extract component-level candidates from each finding aid → run them through the standard discovery pipeline → rank survivors by catalog-relative obscurity.
 
-Records here are a `scholarly` source class in the research kernel (`packages/research-kernel/profiles/black-history.v1.json` → `sourceFitness` `scholarly` = fitness `strong`). We store **metadata, canonical finding-aid URLs, and capped scope-and-content snippets only** — never bulk OCR or full container-list text.
+Records here are a `scholarly` source class in the research kernel (`packages/research-kernel/profiles/black-history.v1.json` → `sourceFitness` `scholarly` = fitness `strong`). That profile table is doctrine, not enforcement: `sourceFitness` is a typed field on the profile contract (`packages/research-kernel/src/generated/contracts.ts`) that nothing reads at scoring time, and the adapter only stamps the string onto a candidate payload.
+
+The enforced rule is `assessSourceFitness(sourceClass, assertionClass)` in `packages/domain-core/src/claims/source-fitness.ts`, which scores the (document kind, assertion kind) pair rather than the host, returning `{ fitness, rationale, limitations }` over `authoritative | strong | conditional | leadOnly | unfit`. Under it the ladder's two rungs score differently, which is the point of climbing: the aid is `archival_finding_aid` (`conditional` by default, `strong` for a record fact, `leadOnly` for a superlative or for technical scope), and the collection it describes is `archival_manuscript` (`strong` by default, `authoritative` for lived experience, `strong` for community identity and relationships). A component-level candidate harvested from an aid is a lead about a box, not a finding from it.
+
+We store **metadata, canonical finding-aid URLs, and capped scope-and-content snippets only**, never bulk OCR or full container-list text.
 
 ## Source registry (`adapters/finding-aid/`)
 

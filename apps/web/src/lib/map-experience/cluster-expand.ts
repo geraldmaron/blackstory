@@ -39,7 +39,14 @@ export function clusterCenterFromCoordinates(
 /** MapLibre `clusterProperties` counters for dominant kind-family paint. */
 export function exploreClusterProperties(): Record<string, ExpressionSpecification> {
   const properties: Record<string, ExpressionSpecification> = {};
-  for (const family of ['people', 'places', 'organizations', 'events', 'sources'] as const) {
+  for (const family of [
+    'people',
+    'places',
+    'organizations',
+    'events',
+    'sources',
+    'inventions',
+  ] as const) {
     properties[`${family}_n`] = [
       '+',
       ['case', ['==', ['get', 'kindFamily'], family], 1, 0],

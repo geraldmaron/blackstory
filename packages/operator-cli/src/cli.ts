@@ -36,7 +36,19 @@ import {
   type EditorialProgressEvent,
 } from './editorial-run.js';
 import { prepareEditorialPacketIntake } from './editorial-intake.js';
+import {
+  RESEARCH_MATURITY_STATES,
+  assessResearchMaturity,
+  blockersToNextState,
+  type ResearchMaturity,
+} from '@repo/domain';
 import { runEnrichmentJudge } from './enrichment-run.js';
+import {
+  auditReleasedEntities,
+  snapshotForReleasedEntity,
+  type ReleasedClaim,
+} from './research-quality-audit.js';
+import { describePlan, planEnrichment, targetIsAbove } from './enrichment-plan.js';
 import { createLlmProvider } from './llm-provider.js';
 import { loadPendingEditorialItems } from './pending-list.js';
 import {
@@ -113,13 +125,10 @@ import {
   type AdjudicatedRelationship,
 } from '@repo/research-harness';
 import { assertPostgresOpsDataSource, editorialCatalogFromError } from './ops-data-source-gate.js';
-import {
-  buildBraveWebSearchUrl,
-  parseBraveSearchResponse,
-  buildSearxngSearchUrl,
-  parseSearxngSearchResponse,
-  type WebSearchRawResult,
-} from '@repo/domain';
+import { describeRoutedSearch } from '@repo/domain';
+import { runSearchQueries, type ResolvedSearchProvider } from './search-routing.js';
+import { gatherSourceSnippetsFromUrls } from './research-source-gather.js';
+import { deriveSuggestedTitle } from './fetch.js';
 
 export type CliDependencies = {
   readonly store?: AtomicStore;
@@ -135,6 +144,12 @@ export type CliDependencies = {
   readonly createLiveStore?: () => Promise<AtomicStore>;
   /** Overrides the real DNS/HTTP dependencies `research-intake` passes to `runQuickAddFetch`. */
   readonly fetchDependencies?: SafeFetchDependencies;
+  /**
+   * Overrides provider resolution for the verbs that search. Supplying it skips the environment
+   * reads and the client construction, which is what makes a search-bearing verb testable without
+   * a SearXNG instance.
+   */
+  readonly searchProvider?: ResolvedSearchProvider;
 };
 
 type Flags = {
@@ -1203,54 +1218,81 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         }
 
         if (connectorList.includes('web_search')) {
+          // A search result is a LEAD, and the enrichment bridge turns a subject's `cites` into
+          // citationUrl and its `description` into the text claims are drawn from. So a lead must
+          // be fetched through safe-fetch before it can become a subject at all: only a page that
+          // answered becomes one, carrying the text that was actually read and the URL that
+          // actually served it.
           const searchQuery = `${theme} ${metro} historical sites`;
           try {
-            const searxngBaseUrl = process.env.SEARXNG_BASE_URL;
-            const braveApiKey = process.env.BRAVE_SEARCH_API_KEY;
-            let rawResults: readonly WebSearchRawResult[];
-            let servedBy: 'searxng' | 'brave' | 'mock';
-            if (searxngBaseUrl) {
-              // Project's chosen web-search provider (see provider-decision.ts): self-hosted
-              // SearXNG on Corsair, preferred over commercial Brave/Exa keys.
-              const res = await fetch(
-                buildSearxngSearchUrl({ baseUrl: searxngBaseUrl, query: searchQuery }),
-              );
-              const json: unknown = await res.json();
-              rawResults = parseSearxngSearchResponse(json).results;
-              servedBy = 'searxng';
-            } else if (braveApiKey) {
-              const res = await fetch(buildBraveWebSearchUrl({ query: searchQuery }), {
-                headers: { 'X-Subscription-Token': braveApiKey },
-              });
-              const json: unknown = await res.json();
-              rawResults = parseBraveSearchResponse(json).results;
-              servedBy = 'brave';
-            } else {
-              rawResults = [
-                {
-                  title: 'Mock Discovery Site',
-                  description: `Mock finding for ${searchQuery}`,
-                  url: 'https://example.com/mock',
-                },
-              ];
-              servedBy = 'mock';
-            }
-            reportHarnessProgress({
-              stage: 'web_search.servedBy',
-              servedBy,
-              resultCount: rawResults.length,
+            const searchResult = await runSearchQueries({
+              queries: [{ query: searchQuery, seeking: 'historic site page' }],
+              environment: process.env,
+              executedAt: new Date().toISOString(),
+              maxLeadsPerQuery: 5,
+              ...(deps.searchProvider !== undefined ? { resolved: deps.searchProvider } : {}),
             });
-            const webSubjects: HarnessRawSubject[] = rawResults
-              .slice(0, 5)
-              .map((result, index) => ({
-                id: `web-${index}`,
-                connectorKind: 'web_search',
-                title: result.title ?? 'Unknown Page',
-                description: result.description ?? '',
-                cites: [result.url],
-                rawRecord: { ...result, servedBy },
-              }));
-            rawSubjects = [...rawSubjects, ...webSubjects];
+            if (!searchResult.available) {
+              reportHarnessProgress({
+                stage: 'web_search.unavailable',
+                reason: searchResult.reason,
+              });
+            } else {
+              reportHarnessProgress({
+                stage: 'web_search.leads',
+                servedBy: searchResult.provider,
+                leadCount: searchResult.leads.length,
+                duplicatePagesDropped: searchResult.duplicateLeadsDropped,
+                skipped: searchResult.skipped.length,
+                budgetEnforced: searchResult.budgetEnforced,
+                note: describeRoutedSearch(searchResult),
+              });
+              // The gather step is the boundary. Anything a lead promised and the page does not
+              // deliver is dropped here rather than downstream.
+              const gathered = await gatherSourceSnippetsFromUrls(
+                searchResult.leads.map((lead) => lead.url),
+                deps.fetchDependencies !== undefined
+                  ? { dependencies: deps.fetchDependencies }
+                  : {},
+              );
+              const leadByUrl = new Map(searchResult.leads.map((lead) => [lead.url, lead]));
+              reportHarnessProgress({
+                stage: 'web_search.fetched',
+                leadCount: searchResult.leads.length,
+                fetchedCount: gathered.length,
+                droppedUnfetchable: searchResult.leads.length - gathered.length,
+                // Which URLs became subjects, and that the text came from the page rather than the
+                // engine. Counts alone make a reverted mapping invisible: putting the blurb back in
+                // `description` changes no count.
+                citedUrls: gathered.map((snippet) => snippet.finalUrl ?? snippet.url),
+                descriptionSource: 'fetched_page',
+              });
+              // A subject is built from the FETCHED page and nothing else. The engine's title and
+              // blurb are its output rather than the document's, they carry no retrieval
+              // provenance, and this record is written to the run JSON and the progress file —
+              // which is persistence, whatever the storage-rights flag says. So neither string
+              // appears here, not even labelled: a label does not stop a write.
+              const webSubjects: HarnessRawSubject[] = gathered.map((snippet, index) => {
+                const lead = leadByUrl.get(snippet.url);
+                const citedUrl = snippet.finalUrl ?? snippet.url;
+                return {
+                  id: `web-${index}`,
+                  connectorKind: 'web_search',
+                  title: deriveSuggestedTitle(snippet.text),
+                  description: snippet.excerpt,
+                  // The URL that actually answered, after any redirect.
+                  cites: [citedUrl],
+                  rawRecord: {
+                    servedBy: searchResult.provider,
+                    // Our own query, our own URLs. No engine prose.
+                    queryText: lead?.queryText ?? searchQuery,
+                    leadUrl: snippet.url,
+                    fetchedUrl: citedUrl,
+                  },
+                };
+              });
+              rawSubjects = [...rawSubjects, ...webSubjects];
+            }
           } catch (err) {
             stderr(`Warning: Web search failed: ${String(err)}\n`);
           }
@@ -1796,15 +1838,146 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         );
         return 0;
       }
+      case 'enrich-entity': {
+        // The deep-research path's PLANNER. It reads a record, works out what is missing, and
+        // emits the evidence needs and bounded queries that would close the gap.
+        //
+        // IT DOES NOT EXECUTE. There is no --commit, deliberately: the search, fetch, capture,
+        // selector and claim-extraction stages are not built, and a --commit that staged an
+        // empty result would be the same lie `enrichment-run` tells by relabelling the
+        // editorial judge. A query emitted here is a lead. Nothing it returns is evidence until
+        // it has been independently resolved and fetched through the safe-fetch path.
+        const entityId = requireFlag(flags, '--entity-id');
+        const targetRaw = optionalFlag(flags, '--target-maturity') ?? 'corroborated';
+        if (!(RESEARCH_MATURITY_STATES as readonly string[]).includes(targetRaw)) {
+          throw new Error(
+            `--target-maturity must be one of ${RESEARCH_MATURITY_STATES.join(', ')}`,
+          );
+        }
+        const targetMaturity = targetRaw as ResearchMaturity;
+        const pool = getOpsPostgresPool(process.env);
+        const { rows } = await pool.query(
+          `SELECT re.entity_id, re.kind, re.display_name, re.summary,
+                  COALESCE(re.claims, '[]'::jsonb) AS claims
+             FROM bb_public.release_entities re
+             JOIN bb_public.active_release ar ON ar.release_id = re.release_id
+            WHERE re.entity_id = $1`,
+          [entityId],
+        );
+        const row = rows[0];
+        if (row === undefined) throw new Error(`No released entity ${entityId}`);
+        const released = {
+          entityId: String(row.entity_id),
+          kind: String(row.kind),
+          displayName: String(row.display_name ?? entityId),
+          summary: (row.summary as string | null) ?? null,
+          claims: (row.claims as ReleasedClaim[]) ?? [],
+        };
+        const snapshot = snapshotForReleasedEntity(released);
+        const assessment = assessResearchMaturity({ record: snapshot, identityResolved: true });
+        const plan = planEnrichment({
+          entityId: released.entityId,
+          currentMaturity: assessment.maturity,
+          targetMaturity,
+          deficits: assessment.evidenceDeficits,
+          context: { subjectName: released.displayName },
+        });
+        stdout(
+          JSON.stringify(
+            {
+              verb: 'enrich-entity',
+              status: 'planned',
+              executed: false,
+              entityId: released.entityId,
+              displayName: released.displayName,
+              maturity: assessment.maturity,
+              targetMaturity,
+              targetIsAbove: targetIsAbove(assessment.maturity, targetMaturity),
+              priority: assessment.priority,
+              summary: describePlan(plan),
+              blockersToNextState: blockersToNextState(assessment),
+              plan,
+            },
+            null,
+            2,
+          ),
+        );
+        return 0;
+      }
+      case 'research-quality-audit': {
+        // Read-only. No --commit exists and none should: this measures the released catalog,
+        // it never changes it. See research-quality-audit.ts for why the source-class mapping
+        // is a heuristic and which way it errs.
+        const releaseFlag = optionalFlag(flags, '--release-id');
+        const kindFilter = optionalFlag(flags, '--kind');
+        const entityFilter = optionalFlag(flags, '--entity-id');
+        const deficitFilter = optionalFlag(flags, '--deficit');
+        const limitRaw = optionalFlag(flags, '--limit');
+        const limit = limitRaw ? Number(limitRaw) : undefined;
+        if (limit !== undefined && (!Number.isFinite(limit) || limit < 1)) {
+          throw new Error('--limit must be a positive number');
+        }
+        const pool = getOpsPostgresPool(process.env);
+        const releaseId =
+          releaseFlag ??
+          (await pool.query('SELECT release_id FROM bb_public.active_release LIMIT 1')).rows[0]
+            ?.release_id;
+        if (releaseId === undefined) throw new Error('No active release and no --release-id given');
+
+        const conditions = ['release_id = $1'];
+        const params: unknown[] = [releaseId];
+        if (kindFilter !== undefined) {
+          params.push(kindFilter);
+          conditions.push(`kind = $${params.length}`);
+        }
+        if (entityFilter !== undefined) {
+          params.push(entityFilter);
+          conditions.push(`entity_id = $${params.length}`);
+        }
+        let sql = `SELECT entity_id, kind, display_name, summary, COALESCE(claims, '[]'::jsonb) AS claims
+             FROM bb_public.release_entities
+            WHERE ${conditions.join(' AND ')}
+            ORDER BY entity_id`;
+        if (limit !== undefined) {
+          params.push(limit);
+          sql += ` LIMIT $${params.length}`;
+        }
+        const { rows } = await pool.query(sql, params);
+        const entities = rows.map((row: Record<string, unknown>) => ({
+          entityId: String(row.entity_id),
+          kind: String(row.kind),
+          displayName: String(row.display_name ?? ''),
+          summary: (row.summary as string | null) ?? null,
+          claims: (row.claims as ReleasedClaim[]) ?? [],
+        }));
+        // Per-entity rows are returned when the caller narrowed the query; a full-catalog run
+        // reports distributions, because 4,000 rows of JSON is not a report.
+        const includeEntities =
+          entityFilter !== undefined || deficitFilter !== undefined || limit !== undefined;
+        const report = auditReleasedEntities(String(releaseId), entities, { includeEntities });
+        const filtered =
+          deficitFilter !== undefined && report.entities !== undefined
+            ? {
+                ...report,
+                entities: report.entities.filter((entity) =>
+                  entity.deficits.includes(deficitFilter as never),
+                ),
+              }
+            : report;
+        stdout(JSON.stringify(filtered, null, 2));
+        return 0;
+      }
       default: {
         stderr(
-          'Usage: operator-cli <preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read|capture-backfill> [flags]\n' +
+          'Usage: operator-cli <preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read|quarantine-triage|capture-backfill|research-quality-audit|enrich-entity> [flags]\n' +
             'Every command accepts --json (no-op: output is always JSON) and every id-bearing command uses --entity-id / --case-id for its target.\n' +
             'For model-report: [--since <ISO date>] [--json]\n' +
             'For harness-run: --theme <theme> --metro <metro> [--connectors dpla,nps_network_to_freedom,web_search] [--enrich] [--provider openrouter|ollama|mock] [--progress-path <file>]\n' +
             'For backfill-entity/prose-run: --entity-id <id> [--title ...] [--summary ...] [--provider mock|openrouter|ollama|hybrid] [--commit]\n' +
             'For capture-backfill: [--commit] [--wayback] [--max-captures N] [--max-entities N]\n' +
-            'For expand: --entity-id <id> [--depth N] — stub pending repo-xez5.4\n' +
+            'For expand: --entity-id <id> [--depth N] [--commit] — live Wikidata traversal; stages landscape_candidates, never bb_canonical\n' +
+            'For enrich-entity: --entity-id <id> [--target-maturity seeded|grounded|corroborated|contextualized|deep_research|reference] — PLANS research; it does not execute, and has no --commit\n' +
+            'For research-quality-audit: [--release-id <id>] [--kind <kind>] [--entity-id <id>] [--deficit <code>] [--limit N] — read-only; narrow the query to get per-entity rows\n' +
             'For graylist-read: [--limit N] — Postgres quarantine only, see docs/research/research-operations.md\n',
         );
         return command ? 1 : 0;

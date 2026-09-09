@@ -41,6 +41,7 @@ export const ENTITY_KINDS = [
   'law',
   'publication',
   'artifact',
+  'invention',
   'other',
 ] as const;
 
@@ -58,6 +59,7 @@ const CLASS_BY_KIND: Readonly<Record<EntityKind, string | null>> = {
   law: 'legal',
   publication: 'work',
   artifact: 'work',
+  invention: 'work',
   // The 14 `other` rows carry no class today; inventing one would misfile them in the facets.
   other: null,
 };

@@ -24,7 +24,7 @@ and the view-models: `apps/web/src/app/entity/[id]/entity-anatomy-facts.ts`,
 | `historicalContext` | Missing era/place paragraph | `prose-run` / `backfill-entity`, citation-gated |
 | `topicTags` / `topicIds` | Topics missing | Canonical classification, then re-publish. Do not invent a parallel taxonomy column. |
 | `primaryImage` | Largest live gap (~95% blank at last audit) | Image lane below |
-| `related` | Related rail empty | `propose-edge` (see below). `expand` is still a stub. |
+| `related` | Related rail empty | `propose-edge` (see below). `expand` finds candidates; it does not make edges. |
 
 Minimum publishable *case* (identity, relevance, source citation, public summary, rights
 clearance) is [`blackstory-case-drafting`](../case-drafting/SKILL.md). Geography, dates,
@@ -49,8 +49,11 @@ scrape Wikimedia and assume public domain.
 
 ## Related entities
 
-`propose-edge` is the verb. `expand` returns `not_implemented` until the network engine
-exists.
+`propose-edge` is the verb that proposes an edge. `expand` is a different job: it traverses
+Wikidata from the entity's QID and stages neighbors in `bb_research.landscape_candidates` as
+pending candidates, which a reviewer still has to turn into edges. It fills the research queue,
+not the related rail. See `docs/research/research-operations.md` for its flags and its two
+current wiring gaps.
 
 - `--from-entity-id` / `--to-entity-id` / `--type` / `--source-url`
 - Caused or enabled edges require `--causal-scope` (`systemic_consensus` with a consensus

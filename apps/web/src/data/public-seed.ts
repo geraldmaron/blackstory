@@ -12,6 +12,7 @@ import {
   buildRelatedNeighborStubs,
   composeContinueLearningStubs,
 } from '@repo/domain/learning-index';
+import type { ClaimRoleV1 } from '@repo/public-contracts/v1/claim';
 import type { DatePrecision } from '@repo/domain/era';
 import type { PublicPrecisionTier } from '@repo/domain';
 import type { PlaceAdvisoryRecord } from '@repo/domain/advisory';
@@ -43,7 +44,13 @@ export type PublicClaimView = {
   readonly citationHref?: string;
   readonly citationLabel: string;
   readonly independentLineageCount?: number;
-  readonly claimRole?: string;
+  /**
+   * Narrow to the wire vocabulary rather than `string`. A loose type here compiled only while
+   * @repo/domain's build output was stale: `ReleaseSourceClaim.claimRole` is `ClaimRole`, and a
+   * `string` cannot satisfy it. The looseness also let a typo through as a valid role, which
+   * silently degrades the record grade to its predicate fallback.
+   */
+  readonly claimRole?: ClaimRoleV1;
   readonly disputed?: boolean;
   readonly disputeNote?: string;
 };

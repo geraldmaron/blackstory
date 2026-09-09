@@ -13,6 +13,7 @@ import {
   faGavel,
   faHouse,
   faLandmark,
+  faLightbulb,
   faLocationDot,
   faPeopleGroup,
   faSchool,
@@ -35,6 +36,7 @@ const KIND_ICONS: Readonly<Record<MapKind, IconDefinition>> = {
   publication: faBookOpen,
   artifact: faBoxArchive,
   movement: faFlag,
+  invention: faLightbulb,
   other: faCircle,
 };
 

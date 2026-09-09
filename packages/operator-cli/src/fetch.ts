@@ -142,7 +142,12 @@ export type CitationPrefill = {
   readonly excerpt: string;
 };
 
-function deriveSuggestedTitle(extractedText: string, maxLength = 120): string {
+/**
+ * First sentence of the retrieved text, as a stand-in title. Exported because a caller that has
+ * fetched a page must not fall back to a search engine's title: the engine's strings are its
+ * output, not the document's, and they carry no retrieval provenance.
+ */
+export function deriveSuggestedTitle(extractedText: string, maxLength = 120): string {
   const firstLine = extractedText.split(/(?<=[.!?])\s|\n/u)[0]?.trim() ?? '';
   const trimmed = firstLine || extractedText.trim();
   return trimmed.length <= maxLength ? trimmed : `${trimmed.slice(0, maxLength - 1).trimEnd()}…`;

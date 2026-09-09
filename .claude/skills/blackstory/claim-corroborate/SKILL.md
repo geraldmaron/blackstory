@@ -50,8 +50,19 @@ found", not an error to paper over.
 Tier-1 hosts live in `packages/ops-data/scripts/lib/tier1-sources.ts`. Do not invent a second
 list.
 
-Independent lineage is counted by `lineageRootId`. Five syndicated copies with one root are
-one lineage, not five.
+Independent lineage is counted by `lineageRootId`, and that id names the underlying **work**,
+not the host serving it (`resolveSourceLineage`,
+`packages/domain-core/src/claims/lineage.ts`). Five syndicated copies with one root are one
+lineage, not five; a patent read at the Patent Office and at a mirror is one lineage, not two;
+every Wikimedia spelling collapses onto one bridge key that counts as zero corroborating
+lineages. A lineage inferred from the host alone is flagged `inferred`, which is a guess rather
+than a finding.
+
+Fitness is claim-relative: `assessSourceFitness(sourceClass, assertionClass)`
+(`packages/domain-core/src/claims/source-fitness.ts`) scores the document kind against the
+assertion kind. Ask what the claim needs the document to prove before deciding the citation is
+enough. A patent is `authoritative` for who filed what and when, and `unfit` as evidence of the
+filer's race, of firstness, or of adoption.
 
 ## Superlatives
 

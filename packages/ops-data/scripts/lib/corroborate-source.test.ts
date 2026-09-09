@@ -3,6 +3,8 @@
  * SearXNG query breadth, and same-lineage rejection used by corroborate-source.ts.
  */
 import assert from 'node:assert/strict';
+import { createServer } from 'node:http';
+import type { AddressInfo } from 'node:net';
 import { test } from 'node:test';
 import { collectTier1TrailLinks, collectTier2TrailLinks } from './citation-trail.ts';
 import {
@@ -13,6 +15,8 @@ import {
   looksLikeSettlementArticle,
   pickIndependentTier1SearchHit,
   pickIndependentTier2SearchHit,
+  searchAndFetch,
+  SEARXNG_MIN_SPACING_MS,
   sharesNameToken,
   stripDescriptiveLocationClause,
 } from './corroborate-source.ts';
@@ -366,4 +370,379 @@ test('wikipedia detection rejects a host that merely contains the domain', () =>
   assert.equal(isWikipediaHost('https://www.wikidata.org/wiki/Q1'), true);
   assert.equal(isWikipediaHost('https://wikipedia.org.attacker.example/'), false);
   assert.equal(isWikipediaHost('https://example.com/?ref=wikipedia.org'), false);
+});
+
+/**
+ * searchAndFetch: the provider call, the result fetch, and the boundary between them.
+ *
+ * Both network steps are injected, so nothing here touches DNS or the internet. The cases that
+ * matter are the failures: this function degrades every one of them to "no corroboration", which is
+ * right for an optional enrichment step and dangerous if it happens silently — a whole overnight
+ * batch of empty results reads as a corpus with nothing to find.
+ */
+type WarnCapture = { readonly lines: string[]; restore: () => void };
+
+function captureWarnings(): WarnCapture {
+  const lines: string[] = [];
+  const original = console.warn;
+  console.warn = (...args: unknown[]) => {
+    lines.push(args.map(String).join(' '));
+  };
+  return { lines, restore: () => (console.warn = original) };
+}
+
+const SEARXNG_BASE = 'http://127.0.0.1:8888';
+
+function jsonClient(body: unknown, status = 200) {
+  const urls: string[] = [];
+  return {
+    urls,
+    client: async (request: { readonly url: string }) => {
+      urls.push(request.url);
+      return {
+        status,
+        headers: { 'content-type': 'application/json' },
+        bodyText: JSON.stringify(body),
+        finalUrl: request.url,
+      };
+    },
+  };
+}
+
+/** Serves page text for known URLs; anything else is unreachable, as safe-fetch would report. */
+function pageFetcher(pages: Readonly<Record<string, string>>) {
+  const requested: string[] = [];
+  return {
+    requested,
+    fetchPage: async (url: string) => {
+      requested.push(url);
+      const text = pages[url];
+      return text === undefined ? undefined : { html: `<html>${text}</html>`, text };
+    },
+  };
+}
+
+const NPS_HIT = 'https://www.nps.gov/places/corroborating-page.htm';
+const NPS_TEXT =
+  'The Oak Street Meeting Hall operated as a mutual aid society hall in Chicago from 1921, and ' +
+  'the congregation preserved its minute books through the 1964 clearances.';
+
+test('searchAndFetch returns a corroborating source when the endpoint answers and the page is fetched', async () => {
+  const search = jsonClient({ results: [{ url: NPS_HIT, title: 'Oak Street Meeting Hall' }] });
+  const pages = pageFetcher({ [NPS_HIT]: NPS_TEXT });
+  const result = await searchAndFetch(
+    '"Oak Street Meeting Hall" site:nps.gov',
+    SEARXNG_BASE,
+    (results) => results[0],
+    'search',
+    undefined,
+    { searchClient: search.client, fetchPage: pages.fetchPage, minSpacingMs: 0 },
+  );
+  assert.ok(result);
+  assert.equal(result.url, NPS_HIT);
+  assert.equal(result.title, 'Oak Street Meeting Hall');
+  assert.equal(result.method, 'search');
+  assert.equal(result.text, NPS_TEXT);
+  // The query reaches the provider through the shared URL builder, as JSON.
+  assert.equal(search.urls.length, 1);
+  assert.match(search.urls[0]!, /^http:\/\/127\.0\.0\.1:8888\/search\?/u);
+  assert.match(search.urls[0]!, /format=json/u);
+  // The RESULT url goes through the page fetcher, never through the search client.
+  assert.deepEqual(pages.requested, [NPS_HIT]);
+});
+
+test('searchAndFetch names a non-2xx from the endpoint instead of returning a bare empty result', async () => {
+  const warn = captureWarnings();
+  try {
+    const search = jsonClient({}, 502);
+    const pages = pageFetcher({});
+    const result = await searchAndFetch(
+      'anything',
+      SEARXNG_BASE,
+      (results) => results[0],
+      'search',
+      undefined,
+      { searchClient: search.client, fetchPage: pages.fetchPage, minSpacingMs: 0 },
+    );
+    assert.equal(result, undefined);
+    assert.equal(pages.requested.length, 0);
+    assert.ok(
+      warn.lines.some((line) => line.includes('[corroborate-source]') && line.includes('502')),
+      `expected a warning naming the status; got ${JSON.stringify(warn.lines)}`,
+    );
+  } finally {
+    warn.restore();
+  }
+});
+
+test('searchAndFetch names a fail-closed refusal from the client, so a batch cannot silently zero out', async () => {
+  const warn = captureWarnings();
+  try {
+    const pages = pageFetcher({});
+    const result = await searchAndFetch(
+      'anything',
+      SEARXNG_BASE,
+      (results) => results[0],
+      'search',
+      undefined,
+      {
+        // The shapes the origin-pinned client refuses: an HTML error page, a redirect, an
+        // oversized body, a base URL resolving somewhere public.
+        searchClient: async () => {
+          throw new Error(
+            'Operator search endpoint returned content-type "text/html"; expected one of application/json',
+          );
+        },
+        fetchPage: pages.fetchPage,
+        minSpacingMs: 0,
+      },
+    );
+    assert.equal(result, undefined);
+    assert.ok(
+      warn.lines.some(
+        (line) => line.includes('[corroborate-source]') && line.includes('text/html'),
+      ),
+      `expected a warning naming the refusal; got ${JSON.stringify(warn.lines)}`,
+    );
+  } finally {
+    warn.restore();
+  }
+});
+
+test('searchAndFetch makes exactly one provider call per query, with no retry on failure', async () => {
+  const warn = captureWarnings();
+  try {
+    let calls = 0;
+    await searchAndFetch('anything', SEARXNG_BASE, (results) => results[0], 'search', undefined, {
+      searchClient: async () => {
+        calls += 1;
+        throw new Error('engines suspended');
+      },
+      fetchPage: async () => undefined,
+      minSpacingMs: 0,
+    });
+    // A retry here would fire inside the 4s spacing that exists because concurrent bursts suspend
+    // every upstream engine this instance queries.
+    assert.equal(calls, 1);
+  } finally {
+    warn.restore();
+  }
+});
+
+test('searchAndFetch returns nothing when the picker rejects every result, and says nothing about it', async () => {
+  const warn = captureWarnings();
+  try {
+    const search = jsonClient({ results: [{ url: 'https://en.wikipedia.org/wiki/X' }] });
+    const pages = pageFetcher({});
+    const result = await searchAndFetch(
+      'anything',
+      SEARXNG_BASE,
+      (results) => pickIndependentTier1SearchHit(results),
+      'search',
+      undefined,
+      { searchClient: search.client, fetchPage: pages.fetchPage, minSpacingMs: 0 },
+    );
+    assert.equal(result, undefined);
+    assert.equal(pages.requested.length, 0);
+    // An unusable result set is a normal outcome, not a fault: no warning.
+    assert.deepEqual(warn.lines, []);
+  } finally {
+    warn.restore();
+  }
+});
+
+test('searchAndFetch drops a hit whose page cannot be fetched', async () => {
+  const search = jsonClient({ results: [{ url: NPS_HIT }] });
+  const pages = pageFetcher({});
+  const result = await searchAndFetch(
+    'anything',
+    SEARXNG_BASE,
+    (results) => results[0],
+    'search',
+    undefined,
+    { searchClient: search.client, fetchPage: pages.fetchPage, minSpacingMs: 0 },
+  );
+  assert.equal(result, undefined);
+  assert.deepEqual(pages.requested, [NPS_HIT]);
+});
+
+test('searchAndFetch drops a reachable page that does not mention the subject', async () => {
+  const search = jsonClient({ results: [{ url: NPS_HIT }] });
+  // A soft-404: 200 with a "page not found" template, which is why reachability is not enough.
+  const pages = pageFetcher({ [NPS_HIT]: 'The page you requested could not be located.' });
+  const result = await searchAndFetch(
+    '"Oak Street Meeting Hall"',
+    SEARXNG_BASE,
+    (results) => results[0],
+    'search',
+    'Oak Street Meeting Hall',
+    { searchClient: search.client, fetchPage: pages.fetchPage, minSpacingMs: 0 },
+  );
+  assert.equal(result, undefined);
+});
+
+test('searchAndFetch keeps a reachable page that does mention the subject', async () => {
+  const search = jsonClient({ results: [{ url: NPS_HIT }] });
+  const pages = pageFetcher({ [NPS_HIT]: NPS_TEXT });
+  const result = await searchAndFetch(
+    '"Oak Street Meeting Hall"',
+    SEARXNG_BASE,
+    (results) => results[0],
+    'search',
+    'Oak Street Meeting Hall',
+    { searchClient: search.client, fetchPage: pages.fetchPage, minSpacingMs: 0 },
+  );
+  assert.ok(result);
+  assert.equal(result.url, NPS_HIT);
+});
+
+test('searchAndFetch reports a malformed response body rather than throwing into the caller', async () => {
+  const warn = captureWarnings();
+  try {
+    const result = await searchAndFetch(
+      'anything',
+      SEARXNG_BASE,
+      (results) => results[0],
+      'search',
+      undefined,
+      {
+        searchClient: async (request) => ({
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+          bodyText: 'not json at all',
+          finalUrl: request.url,
+        }),
+        fetchPage: async () => undefined,
+        minSpacingMs: 0,
+      },
+    );
+    assert.equal(result, undefined);
+    assert.ok(warn.lines.some((line) => line.includes('[corroborate-source]')));
+  } finally {
+    warn.restore();
+  }
+});
+
+/*
+ * NOT COVERED HERE, and it is a real gap rather than an oversight: the public entry points
+ * `findCorroboratingTier1Source` and `findAnySource` both try the Wikipedia API before the search
+ * path, and that call is a bare `fetch` with no seam. A test driving either of them makes a live
+ * external request, so the search path is covered through `searchAndFetch` directly instead. The
+ * two tier helpers above it are one-line wrappers that pass the dependency bag through.
+ */
+test('the real inter-query spacing is four seconds and queries are serialized', async () => {
+  // Worth paying the real gap once. The spacing is the only thing stopping a concurrent batch from
+  // suspending every upstream engine, and a test that always overrode it would let the default be
+  // lowered to nothing without a single failure.
+  assert.equal(SEARXNG_MIN_SPACING_MS, 4_000);
+
+  const order: string[] = [];
+  const started: number[] = [];
+  const runOne = (label: string) =>
+    searchAndFetch(label, SEARXNG_BASE, (results) => results[0], 'search', undefined, {
+      searchClient: async (request) => {
+        started.push(Date.now());
+        order.push(label);
+        return {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+          bodyText: JSON.stringify({ results: [] }),
+          finalUrl: request.url,
+        };
+      },
+      fetchPage: async () => undefined,
+    });
+
+  const begin = Date.now();
+  await Promise.all([runOne('first'), runOne('second')]);
+  // Two concurrent callers, one queue: the second query waits out the full gap behind the first.
+  assert.deepEqual(order, ['first', 'second']);
+  assert.ok(
+    started[1]! - started[0]! >= SEARXNG_MIN_SPACING_MS - 50,
+    `second query started ${started[1]! - started[0]!}ms after the first`,
+  );
+  assert.ok(Date.now() - begin >= SEARXNG_MIN_SPACING_MS - 50);
+});
+
+test('with no injected client, searchAndFetch builds the real origin-pinned client', async () => {
+  // Every other test here injects searchClient, which leaves searchClientFor and the client cache —
+  // the only path production takes — unexecuted. This one takes it, against a loopback server on an
+  // ephemeral port, so the claim that no bare fetch remains is actually covered.
+  const server = createServer((request, response) => {
+    if (request.url?.startsWith('/search')) {
+      response.writeHead(200, { 'content-type': 'application/json' });
+      response.end(JSON.stringify({ results: [{ url: NPS_HIT, title: 'Oak Street' }] }));
+      return;
+    }
+    response.writeHead(404, { 'content-type': 'application/json' });
+    response.end('{}');
+  });
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const { port } = server.address() as AddressInfo;
+  try {
+    const pages = pageFetcher({ [NPS_HIT]: NPS_TEXT });
+    const result = await searchAndFetch(
+      '"Oak Street Meeting Hall"',
+      `http://127.0.0.1:${port}`,
+      (results) => results[0],
+      'search',
+      undefined,
+      { fetchPage: pages.fetchPage, minSpacingMs: 0 },
+    );
+    assert.ok(result, 'the real client must reach the loopback endpoint');
+    assert.equal(result.url, NPS_HIT);
+  } finally {
+    const closed = new Promise<void>((resolve) => server.close(() => resolve()));
+    server.closeAllConnections?.();
+    await closed;
+  }
+});
+
+test('with no injected client, a non-JSON response is refused by the real client', async () => {
+  // Proves the pinned client's content-type rule is the one in force on the production path, not
+  // just on an injected stand-in.
+  const warn = captureWarnings();
+  const server = createServer((_request, response) => {
+    response.writeHead(200, { 'content-type': 'text/html' });
+    response.end('<html>sign in</html>');
+  });
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const { port } = server.address() as AddressInfo;
+  try {
+    const result = await searchAndFetch(
+      'anything',
+      `http://127.0.0.1:${port}`,
+      (results) => results[0],
+      'search',
+      undefined,
+      { fetchPage: async () => undefined, minSpacingMs: 0 },
+    );
+    assert.equal(result, undefined);
+    assert.ok(
+      warn.lines.some((line) => line.includes('text/html')),
+      `expected the refusal to be named; got ${JSON.stringify(warn.lines)}`,
+    );
+  } finally {
+    warn.restore();
+    const closed = new Promise<void>((resolve) => server.close(() => resolve()));
+    server.closeAllConnections?.();
+    await closed;
+  }
+});
+
+test('a 502 from the endpoint is issued exactly once, with no status-based retry', async () => {
+  const warn = captureWarnings();
+  try {
+    const search = jsonClient({}, 502);
+    const pages = pageFetcher({});
+    await searchAndFetch('anything', SEARXNG_BASE, (results) => results[0], 'search', undefined, {
+      searchClient: search.client,
+      fetchPage: pages.fetchPage,
+      minSpacingMs: 0,
+    });
+    // 502 is the status a retry loop chases; the 4s spacing exists because bursts suspend engines.
+    assert.equal(search.urls.length, 1);
+  } finally {
+    warn.restore();
+  }
 });

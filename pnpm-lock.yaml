@@ -534,6 +534,9 @@ importers:
       '@repo/research-harness':
         specifier: workspace:*
         version: link:../research-harness
+      '@repo/research-kernel':
+        specifier: workspace:*
+        version: link:../research-kernel
       '@repo/security':
         specifier: workspace:*
         version: link:../security

@@ -88,7 +88,7 @@ All commands: `node --conditions development --import tsx packages/operator-cli/
 | capture-backfill | Snapshot cited URLs into `source_captures`; `--wayback` secondary-anchors at Save Page Now | `capture-backfill [--commit] [--wayback] [--max-captures 25]` |
 | case-drafting (`attach-evidence`) | Check if a research case is review-ready; fill missing evidence | `attach-evidence --case-id "<id>" --description "<what this fills>" --source-url "<url>" --operator-id "$USER" --session-id "<id>"` |
 | triage-graylist (`graylist-read`, `attach-evidence`) | Walk parked/weak-signal candidates; corroborate or recommend | `graylist-read --limit 20` (Postgres only — see doc); `attach-evidence` to corroborate |
-| expand (stub) | Grow an entity's network outward from an id — pending repo-xez5.4 | `expand --entity-id <id> --depth 1` |
+| expand | Traverse Wikidata from a seed entity's QID; stage neighbors as review candidates | `expand --entity-id <id> --depth 1 [--commit]` |
 
 ## Brand Language
 

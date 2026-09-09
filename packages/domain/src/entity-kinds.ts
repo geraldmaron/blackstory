@@ -19,6 +19,19 @@ export const ENTITY_KINDS = [
   'publication',
   'artifact',
   'movement',
+  /**
+   * A technology or process a reader recognises as a thing: Latimer's carbon-manufacturing
+   * process, Matzeliger's lasting machine, Morgan's three-position traffic signal, the
+   * West/Sessler electret microphone.
+   *
+   * Deliberately NOT `artifact`, which is an object, and deliberately not defined as "a thing
+   * with a patent". Patent access was unequal, enslaved people could not exercise patent
+   * ownership as free citizens did, and Black inventors faced exclusion, appropriation,
+   * concealed identity, employer ownership and innovation that never entered the patent system
+   * at all. An invention with no patent is still an invention; the patent is a receipt, not the
+   * definition. Banneker's clock is the case that keeps this honest.
+   */
+  'invention',
   'other',
 ] as const;
 

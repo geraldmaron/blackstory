@@ -62,12 +62,56 @@ test('dcpreservation + hmdb.org clears standardPublish via tier-2 corroboration'
   assert.equal(result.independentLineageCount, 2);
 });
 
-test('wikipedia-only stays below standardPublish', () => {
+test('wikipedia-only scores below a real single source, not level with one', () => {
+  // 0.66, where a lone reputable_secondary host scores 0.72. Those two used to be the same
+  // number, which was the tell: a bridge and a heritage-inventory record are not equally good
+  // evidence, and the old rule could not say so because it counted a hostname as a lineage.
+  // A bridge contributes no corroborating lineage at all, so lineageIndependence is 0 here.
   const result = computeClaimConfidence('claim-wiki-only', [
     { url: WIKIPEDIA, textContainsSubjectName: true },
   ]);
-  assert.equal(result.score, 0.72);
+  assert.equal(result.score, 0.66);
+  assert.equal(result.independentLineageCount, 0);
   assert.equal(result.passesPublishThreshold, false);
+});
+
+test('adding a bridge to a real source neither lifts nor drags the score', () => {
+  // Both halves matter. A bridge must not be what carries a claim over the publish line, and
+  // citing one must not PENALISE a record either — that is how "more research made the record
+  // less publishable" happened before.
+  const npsAlone = computeClaimConfidence('claim-nps', [
+    { url: NPS_GOV, textContainsSubjectName: true },
+  ]);
+  const npsPlusBridge = computeClaimConfidence('claim-nps-wiki', [
+    { url: NPS_GOV, textContainsSubjectName: true },
+    { url: WIKIPEDIA, textContainsSubjectName: true },
+  ]);
+  assert.equal(npsPlusBridge.score, npsAlone.score);
+  assert.equal(npsPlusBridge.independentLineageCount, 1);
+});
+
+test('one authority under two hostnames is one lineage, not two', () => {
+  // nps.gov and npgallery.nps.gov are the Park Service twice. Under the hostname rule they
+  // corroborated each other.
+  const result = computeClaimConfidence('claim-nps-twice', [
+    { url: NPS_GOV, textContainsSubjectName: true },
+    {
+      url: 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/12345_text',
+      textContainsSubjectName: true,
+    },
+  ]);
+  assert.equal(result.independentLineageCount, 1);
+});
+
+test('one patent read at the Patent Office and at a mirror is one lineage', () => {
+  const result = computeClaimConfidence('claim-patent', [
+    { url: 'https://patents.google.com/patent/US252386A/en', textContainsSubjectName: true },
+    {
+      url: 'https://ppubs.uspto.gov/pubwebapp/x?patentNumber=252386',
+      textContainsSubjectName: true,
+    },
+  ]);
+  assert.equal(result.independentLineageCount, 1);
 });
 
 test('wikipedia + nps.gov clears standardPublish', () => {

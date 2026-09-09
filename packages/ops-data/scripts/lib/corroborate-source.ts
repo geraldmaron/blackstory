@@ -18,14 +18,26 @@
  *     fails (dcpreservation.org, hmdb.org, dclibrary.org, blackpast.org).
  *  5. Tier-2 SearXNG — same curated secondary hosts, different hostname only.
  *
- * All mechanisms fetch through fetch-page.ts's safe-fetch (SSRF-safe,
- * DNS-pinned) — every URL here is scraped from an untrusted page or search
- * result. Best-effort throughout: any step unreachable or empty just means no
- * corroboration was found there, never an error.
+ * Two kinds of network call, held to two different standards, and the split matters:
+ *  - Every RESULT url goes through fetch-page.ts's safe-fetch (SSRF-safe, DNS-pinned), because it
+ *    was scraped from an untrusted page or a search response.
+ *  - The search endpoint itself is the operator's own private instance, which that same SSRF policy
+ *    refuses by design, so it goes through the origin-pinned client in `@repo/security/url-safety`.
+ *
+ * Best-effort throughout: any step unreachable or empty just means no corroboration was found
+ * there, never an error. Failures are LOGGED rather than swallowed silently, because a batch of
+ * empty results and a batch whose search endpoint was refusing every query look identical
+ * otherwise, and they mean entirely different things.
  */
 import { buildSearxngSearchUrl, parseSearxngSearchResponse } from '@repo/domain';
+import {
+  createOperatorEndpointClient,
+  OperatorEndpointError,
+  type OperatorEndpointClient,
+  type OperatorEndpointDenialReason,
+} from '@repo/security/url-safety';
 import { collectTier1TrailLinks, collectTier2TrailLinks } from './citation-trail.ts';
-import { fetchPage } from './fetch-page.ts';
+import { fetchPage, type FetchedPage } from './fetch-page.ts';
 import {
   hostLineageKey,
   isReputableSecondaryHost,
@@ -438,15 +450,26 @@ async function findViaWikipediaApi(
  * SearXNG query in this process is serialized through one queue with a hard
  * minimum spacing, independent of caller concurrency.
  */
-const SEARXNG_MIN_SPACING_MS = 4_000;
+export const SEARXNG_MIN_SPACING_MS = 4_000;
 let searxngQueue: Promise<void> = Promise.resolve();
 
-function throttledSearxngCall<T>(run: () => Promise<T>): Promise<T> {
+/**
+ * Serializes every SearXNG query in this process with a minimum gap, whatever the caller's
+ * concurrency. `spacingMs` exists only so a test suite does not pay the real gap per case — the
+ * same reason `withRetry` in `@repo/domain`'s http-port takes an injectable `sleep`. Production
+ * leaves it unset; lowering it in a real run is the burst the comment above describes.
+ */
+function throttledSearxngCall<T>(
+  run: () => Promise<T>,
+  spacingMs: number = SEARXNG_MIN_SPACING_MS,
+): Promise<T> {
   const result = searxngQueue.then(run);
   searxngQueue = result
     .then(() => undefined)
     .catch(() => undefined)
-    .then(() => new Promise((resolve) => setTimeout(resolve, SEARXNG_MIN_SPACING_MS)));
+    // NOT unref'd: the next call in the queue awaits this promise, so a timer the event loop is
+    // free to skip would deadlock every later query rather than merely delaying process exit.
+    .then(() => new Promise<void>((resolve) => setTimeout(resolve, spacingMs)));
   return result;
 }
 
@@ -567,28 +590,108 @@ export function pickIndependentTier2SearchHit(
   });
 }
 
-async function searchAndFetch(
+/**
+ * Seams for the two network steps, so this module's search path can be tested without an
+ * instance and without reaching the internet. Production leaves both unset.
+ */
+export type CorroborationSearchDependencies = {
+  /** Overrides the origin-pinned client built from the base URL. */
+  readonly searchClient?: OperatorEndpointClient;
+  /** Overrides the safe-fetch of a RESULT url. */
+  readonly fetchPage?: (url: string) => Promise<FetchedPage | undefined>;
+  /**
+   * Shortens the inter-query gap. For tests only: the real 4s spacing is what keeps this process
+   * from suspending the upstream engines, so a production caller must never set it.
+   */
+  readonly minSpacingMs?: number;
+};
+
+/**
+ * One client per base URL for the life of the process.
+ *
+ * The endpoint is the operator's own and private — loopback or Tailscale — which the SSRF policy
+ * in `@repo/security` refuses by design, since every other caller of that policy hands it a URL
+ * scraped from a page. This client is the narrow exception: one fixed origin, a JSON content-type,
+ * a byte cap, a timeout, no redirect followed, and no retries.
+ *
+ * No retries matters more here than anywhere else in the codebase. The 4s spacing above exists
+ * because a concurrent burst suspends every upstream engine this instance queries; a retry loop
+ * inside the transport would fire those bursts from inside that spacing and undo it.
+ *
+ * Construction resolves DNS, so the promise is cached rather than the client. A rejection is cached
+ * only when it cannot change: a base URL that is misconfigured — public, credential-bearing,
+ * malformed — will fail identically on every query, and caching that avoids 182 identical failures
+ * and 182 identical log lines in one batch. A resolution failure is the opposite; it is usually a
+ * momentary resolver blip, and caching it would let one bad second zero out an entire overnight
+ * run. That one is dropped from the cache so the next subject tries again.
+ */
+const searchClients = new Map<string, Promise<OperatorEndpointClient>>();
+
+/** Reasons that describe the configuration itself, and so cannot change within a process. */
+const PERMANENT_ENDPOINT_REASONS = new Set<OperatorEndpointDenialReason>([
+  'base_url_unparseable',
+  'base_url_scheme_not_http',
+  'base_url_opaque_origin',
+  'base_url_carries_credentials',
+  'base_url_carries_query_or_fragment',
+  'base_url_address_is_public',
+]);
+
+function searchClientFor(baseUrl: string): Promise<OperatorEndpointClient> {
+  const cached = searchClients.get(baseUrl);
+  if (cached !== undefined) return cached;
+  const building = createOperatorEndpointClient({ baseUrl })
+    .then((endpoint) => endpoint.client)
+    .catch((error: unknown) => {
+      const permanent =
+        error instanceof OperatorEndpointError && PERMANENT_ENDPOINT_REASONS.has(error.reason);
+      if (!permanent) searchClients.delete(baseUrl);
+      throw error;
+    });
+  searchClients.set(baseUrl, building);
+  return building;
+}
+
+export async function searchAndFetch(
   query: string,
   searxngBaseUrl: string,
   pick: (results: readonly SearchHit[]) => SearchHit | undefined,
   method: CorroboratingSource['method'],
   subjectName?: string,
+  dependencies: CorroborationSearchDependencies = {},
 ): Promise<CorroboratingSource | undefined> {
   const hit = await throttledSearxngCall(async () => {
+    const searchUrl = buildSearxngSearchUrl({ baseUrl: searxngBaseUrl, query });
     try {
-      const searchUrl = buildSearxngSearchUrl({ baseUrl: searxngBaseUrl, query });
-      // Fixed operator-configured endpoint, not attacker-controlled content — the
-      // RESULT urls it returns are untrusted and go through fetchPage below.
-      const response = await fetch(searchUrl, { signal: AbortSignal.timeout(15_000) });
-      if (!response.ok) return undefined;
-      const batch = parseSearxngSearchResponse(await response.json());
+      const client = dependencies.searchClient ?? (await searchClientFor(searxngBaseUrl));
+      const response = await client({
+        url: searchUrl,
+        method: 'GET',
+        allowedContentTypes: ['application/json', 'text/json'],
+      });
+      if (response.status < 200 || response.status >= 300) {
+        // Named, because "no corroboration found" and "the search endpoint answered 502" look
+        // identical in a batch summary and mean entirely different things.
+        console.warn(`[corroborate-source] search endpoint returned ${response.status}: ${query}`);
+        return undefined;
+      }
+      const batch = parseSearxngSearchResponse(JSON.parse(response.bodyText));
       return pick(batch.results);
-    } catch {
+    } catch (error) {
+      // Every failure here still degrades to "no corroboration", which is the right behaviour for
+      // an optional enrichment step. What it must not do is degrade SILENTLY: a fail-closed
+      // refusal — a public base URL, an HTML error page, a redirect — would otherwise zero out a
+      // whole overnight batch and read as a corpus with nothing to find.
+      console.warn(
+        `[corroborate-source] search failed (${
+          error instanceof Error ? error.message : String(error)
+        }): ${query}`,
+      );
       return undefined;
     }
-  });
+  }, dependencies.minSpacingMs);
   if (!hit) return undefined;
-  const page = await fetchPage(hit.url);
+  const page = await (dependencies.fetchPage ?? fetchPage)(hit.url);
   if (!page) return undefined;
   if (subjectName !== undefined && !pageMentionsSubject(subjectName, page.text)) return undefined;
   return {
@@ -603,12 +706,15 @@ async function findViaTier1Search(
   subjectName: string,
   searxngBaseUrl: string,
   excludeUrls: readonly string[] = [],
+  dependencies: CorroborationSearchDependencies = {},
 ): Promise<CorroboratingSource | undefined> {
   return searchAndFetch(
     buildTier1SearxngQuery(subjectName),
     searxngBaseUrl,
     (results) => pickIndependentTier1SearchHit(results, excludeUrls),
     'search',
+    undefined,
+    dependencies,
   );
 }
 
@@ -616,12 +722,15 @@ async function findViaTier2Search(
   subjectName: string,
   searxngBaseUrl: string,
   excludeUrls: readonly string[] = [],
+  dependencies: CorroborationSearchDependencies = {},
 ): Promise<CorroboratingSource | undefined> {
   return searchAndFetch(
     buildTier2SearxngQuery(subjectName),
     searxngBaseUrl,
     (results) => pickIndependentTier2SearchHit(results, excludeUrls),
     'tier2_search',
+    undefined,
+    dependencies,
   );
 }
 
@@ -640,13 +749,21 @@ export async function findAnySource(
     readonly searxngBaseUrl?: string;
     readonly context?: string;
     readonly kind?: string;
+    readonly dependencies?: CorroborationSearchDependencies;
   } = {},
 ): Promise<CorroboratingSource | undefined> {
   const viaWikipedia = await findViaWikipediaApi(subjectName, options.context, options.kind);
   if (viaWikipedia) return viaWikipedia;
   const baseUrl = options.searxngBaseUrl ?? process.env.SEARXNG_BASE_URL;
   if (!baseUrl) return undefined;
-  return searchAndFetch(`"${subjectName}"`, baseUrl, (results) => results[0], 'search');
+  return searchAndFetch(
+    `"${subjectName}"`,
+    baseUrl,
+    (results) => results[0],
+    'search',
+    undefined,
+    options.dependencies ?? {},
+  );
 }
 
 /**
@@ -659,7 +776,10 @@ export async function findAnySource(
 export async function findCorroboratingTier1Source(
   subjectName: string,
   originalSource: { readonly html?: string; readonly url?: string; readonly text?: string },
-  options: { readonly searxngBaseUrl?: string } = {},
+  options: {
+    readonly searxngBaseUrl?: string;
+    readonly dependencies?: CorroborationSearchDependencies;
+  } = {},
 ): Promise<CorroboratingSource | undefined> {
   const excludeUrls = originalSource.url ? [originalSource.url] : [];
 
@@ -680,7 +800,12 @@ export async function findCorroboratingTier1Source(
   const baseUrl = options.searxngBaseUrl ?? process.env.SEARXNG_BASE_URL;
 
   if (baseUrl) {
-    const viaTier1Search = await findViaTier1Search(subjectName, baseUrl, excludeUrls);
+    const viaTier1Search = await findViaTier1Search(
+      subjectName,
+      baseUrl,
+      excludeUrls,
+      options.dependencies ?? {},
+    );
     if (viaTier1Search) return viaTier1Search;
   }
 
@@ -696,7 +821,7 @@ export async function findCorroboratingTier1Source(
   }
 
   if (!baseUrl) return undefined;
-  return findViaTier2Search(subjectName, baseUrl, excludeUrls);
+  return findViaTier2Search(subjectName, baseUrl, excludeUrls, options.dependencies ?? {});
 }
 
 export { collectTier1TrailLinks, collectTier2TrailLinks } from './citation-trail.ts';

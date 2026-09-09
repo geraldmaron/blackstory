@@ -35,9 +35,43 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts <ver
   `harness-run`) take a JSON file (`--batch`/`--subjects`/`--topics`) because their unit of
   work is a set, not a single id — that's a real shape difference, not an inconsistency to
   paper over.
-- **No personal host/IP.** Local/Corsair LLM or search endpoints are configured via
-  `RESEARCH_LOCAL_LLM_HOST` / `RESEARCH_SEARXNG_HOST` (see `.env.corsair.example`, repo-xez5.1).
-  Do not hardcode an operator's Tailscale IP or hostname in any command, doc, or example below.
+- **No personal host/IP.** The variable code actually reads for search is `SEARXNG_BASE_URL`,
+  a full base URL rather than a host. `.env.corsair.example` also defines
+  `RESEARCH_SEARXNG_HOST`, but no code reads it: it is a bare host that
+  `scripts/run-scheduled-searxng-discovery.sh` uses to build `SEARXNG_BASE_URL` when localhost
+  isn't listening. The local-LLM pair works the same way: `RESEARCH_LOCAL_LLM_HOST` is a script
+  input, `OLLAMA_BASE_URL` is what the code reads. Set the base URL, not the alias, and
+  do not hardcode an operator's Tailscale IP or hostname in any command, doc, or example below.
+- **Reaching a search provider.** Two things are true at once and the split between them is the
+  whole design. The operator's SearXNG is *private on purpose* — loopback, or a Tailscale
+  `100.64.0.0/10` address — so `executeSafeFetch` refuses it, correctly: every other caller of
+  that function hands it a URL scraped from a web page, and such a URL must never reach an
+  internal service. A *search result*, by contrast, is an untrusted URL and belongs on the full
+  safe-fetch path.
+
+  So the provider call uses `createOperatorEndpointClient`
+  (`packages/security/src/url-safety/search-endpoint-client.ts`): one configured origin, compared
+  as scheme/host/port rather than as a string, resolved once and pinned, JSON content-types only,
+  a byte cap, a timeout, no redirect ever followed, and no retries (pacing belongs to the caller
+  that knows the campaign). It **requires** the configured address to be one the SSRF policy
+  rejects, so a `SEARXNG_BASE_URL` pointed at a public host fails at startup with a message naming
+  `evaluateExternalUrl` + `resolveAndPinDestination` as the path to use instead. Brave is a public
+  API and therefore takes the ordinary DNS-pinned route, not this client.
+
+  Queries go through `runRoutedWebSearch` (`@repo/domain`), which returns **leads**, not sources.
+  A lead carries a URL, a title and the engine's blurb, and deliberately has no text field: the
+  blurb is not the page. A lead becomes evidence only after an independent fetch through
+  `gatherSourceSnippetsFromUrls`, and `assertStorageTermsConfirmed` still stands between a result
+  and a persisted row. A run without a campaign budget reports `budgetEnforced: false` rather than
+  implying a guard ran.
+
+  The CLI resolves all of this in `packages/operator-cli/src/search-routing.ts`. A verb asks for
+  queries and gets leads; it does not read search env vars itself.
+  `packages/ops-data/scripts/lib/corroborate-source.ts` reaches the same client directly, because it
+  is a script rather than a verb and its own 4s inter-query throttle owns the pacing — which is why
+  the client itself never retries. No web-search query anywhere uses bare `fetch`.
+  `packages/operator-cli/src/worker-preflight.ts` also reads `SEARXNG_BASE_URL`, but only to probe
+  the instance's health endpoint; it issues no queries.
 - **Ledger logging.** `packages/operator-cli/src/model-routing.ts` (repo-xez5.2) is the one
   reviewed module for which model tier a lane uses, and
   `packages/operator-cli/src/model-invocation-log.ts` is the writer for
@@ -418,21 +452,57 @@ sanctioned write path); call this "resolving" or "closing" an item — only a re
 
 ---
 
-## expand (new, repo-xez5.9 — stub)
+## expand
 
-**When to use:** grow an entity's network of related entities outward from a starting id.
-**Not implemented yet** — full traversal depends on repo-xez5.4 (entity network expansion
-engine), which does not exist yet. This command documents the intended interface and returns
-`status: "not_implemented"` rather than faking a result:
+**When to use:** grow an entity's network outward from a starting id and stage the neighbors
+as reviewable candidates.
 
 ```bash
 node --conditions development --import tsx packages/operator-cli/src/bin.ts expand \
-  --entity-id ent_example_001 --depth 1 --json
+  --entity-id ent_example_001 --depth 1 --max-candidates 50 --json
 ```
 
-Intended interface once repo-xez5.4 lands: `{ entityId, neighbors: [{ entityId,
-relationshipType, edgeConfidence }], frontier }`, sourced from real relationship edges
-(`propose-edge`'s domain, `RelationshipType`/`RelationshipRole`), never fabricated.
+The seed is read from `bb_canonical.entities`. The row's `identifiers` must carry a Wikidata
+QID, or the command fails with `Entity <id> has no Wikidata QID in identifiers`
+(`expand-verb.ts`, `loadExpansionSeed`). Traversal is live Wikidata, not a fixture
+(`entity-network-expansion.ts`): forward claims come off the seed's own `Special:EntityData`
+document (P108 employer, P69 educated at → `member_of`, P463 member of, P485 archives at →
+`other`), and the claims Wikidata records only on the *neighbor's* item (P112 founded by, P50
+author) come from the public SPARQL service. `--depth 2` expands each first-hop neighbor once,
+applying the person forward-property set to all of them because the neighbor's canonical kind
+isn't resolved at that point; any `--depth` other than `2` is treated as `1`.
+`--max-candidates` (default 50) caps the whole run across hops. A neighbor reached by two
+properties is deduped, keeping the first hypothesis and merging both provenance hops.
+
+A dry run prints `{ verb, entityId, depth, status: "dry_run", candidateCount, seed,
+candidates }`. Each candidate carries `qid`, `label`, `hop`, a `hypothesis` (a
+`relationshipType` from the `docs/relationship-taxonomy.md` vocabulary, a `direction`, and,
+where a Wikidata property has no exact taxonomy type, a `note` explaining the mapping), and
+`provenance` hops naming the source QID, the property, and the Wikidata item URL.
+
+`--commit` opens a transaction, records a `bb_research.source_program_runs` row
+(`wikidata-network-expansion`), and inserts `bb_research.landscape_candidates` rows with
+`lane = 'wikidata'`, `research_lane_only = true`, `status = 'pending'`. Output becomes
+`{ verb, entityId, depth, status: "staged", candidateCount, stagedCount, seed }`. Nothing
+reaches `bb_canonical.*`: `entity-network-expansion.test.ts` asserts the staging function has
+no code path that could.
+
+**Current limitations.** Both are wiring gaps in the CLI call site, not missing engine work:
+
+- The CLI calls `expandEntityNetwork(seed, config)` and leaves the module's injectable fetcher
+  at its default, so live traffic goes out through a bare global `fetch` rather than the
+  SSRF-safe path the rest of the CLI uses. The tests inject a mock fetcher; the shipped command
+  does not inject anything.
+- The CLI passes neither the traversal's `meta` out-param nor `seedBirthDeathYears` to
+  `stageNetworkCandidates`, so the seed's P569/P570 birth and death years are read during
+  traversal and then dropped. Staged rows carry no `seed_birth_year`/`seed_death_year`, which
+  is exactly what a reviewer would use to reject an anachronistic neighbor.
+
+**Do:** read the dry run before committing; treat a staged row as a hypothesis for the normal
+review path.
+
+**Never:** call a staged candidate an edge. `propose-edge` is the verb that proposes one, and a
+candidate is not a relationship until a reviewer says so.
 
 ---
 

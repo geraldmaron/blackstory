@@ -103,6 +103,7 @@ export function lineageIndependenceFromCount(independentLineageCount: number): n
 type LineageAggregate = {
   lineageRootId: string;
   evidenceId: string;
+  bridge: boolean;
   sourceAuthority: number;
   directness: number;
   temporalProximity: number;
@@ -144,6 +145,7 @@ export function uniqueLineageAggregates(
     const candidate: LineageAggregate = {
       lineageRootId: link.lineageRootId,
       evidenceId: link.evidenceId,
+      bridge: link.bridgeSource === true,
       sourceAuthority: sourceAuthorityForClassification(link.sourceClassification),
       directness: link.directness,
       temporalProximity: link.temporalProximity,
@@ -189,15 +191,35 @@ export function calculateClaimConfidence(input: ConfidenceEngineInput): Confiden
     blockSyndicatedCopiesAsIndependent: blockSyndicated,
   });
 
-  const independentLineageCount = supporting.length;
+  /**
+   * A bridge may carry a claim and never corroborates one.
+   *
+   * Two consequences, and both matter:
+   *
+   *  - Bridges never count toward independent lineage. A Wikipedia article plus a government
+   *    record is one corroborating lineage, not two, so the bridge can never be the thing that
+   *    lifts a claim over the publish threshold.
+   *  - When real evidence is present, bridges are dropped from the quality aggregates entirely.
+   *    Averaging a bridge's authority into a government record's would make a claim score LOWER
+   *    for having cited an extra source, which is how "more research made the record less
+   *    publishable" happened before. A bridge should neither lift nor drag.
+   *
+   * When a bridge is ALL there is, it stays in the aggregates: a bridge-carried claim is worth
+   * more than no claim, and scoring it zero would misrepresent it as unevidenced rather than
+   * as thinly evidenced.
+   */
+  const corroborating = supporting.filter((s) => !s.bridge);
+  const scored = corroborating.length > 0 ? corroborating : supporting;
+
+  const independentLineageCount = corroborating.length;
   const components: ConfidenceComponents = {
-    sourceAuthority: round4(mean(supporting.map((s) => s.sourceAuthority))),
-    directness: round4(mean(supporting.map((s) => s.directness))),
+    sourceAuthority: round4(mean(scored.map((s) => s.sourceAuthority))),
+    directness: round4(mean(scored.map((s) => s.directness))),
     lineageIndependence: round4(lineageIndependenceFromCount(independentLineageCount)),
-    temporalProximity: round4(mean(supporting.map((s) => s.temporalProximity))),
-    geographicPrecision: round4(mean(supporting.map((s) => s.geographicPrecision))),
-    entityMatchQuality: round4(mean(supporting.map((s) => s.entityMatchQuality))),
-    extractionQuality: round4(mean(supporting.map((s) => s.extractionQuality))),
+    temporalProximity: round4(mean(scored.map((s) => s.temporalProximity))),
+    geographicPrecision: round4(mean(scored.map((s) => s.geographicPrecision))),
+    entityMatchQuality: round4(mean(scored.map((s) => s.entityMatchQuality))),
+    extractionQuality: round4(mean(scored.map((s) => s.extractionQuality))),
     contradictionPenalty: round4(
       clamp01(
         Math.min(
@@ -229,7 +251,7 @@ export function calculateClaimConfidence(input: ConfidenceEngineInput): Confiden
     supportingEvidenceCount: input.evidenceLinks.filter((l) => l.role === 'supporting').length,
     contradictingEvidenceCount: input.evidenceLinks.filter((l) => l.role === 'contradicting')
       .length,
-    contributingEvidenceIds: supporting.map((s) => s.evidenceId),
+    contributingEvidenceIds: scored.map((s) => s.evidenceId),
     calculatedAt,
     passesPublishThreshold: thresholdEval.passesPublishThreshold,
     threshold: thresholdEval.threshold,

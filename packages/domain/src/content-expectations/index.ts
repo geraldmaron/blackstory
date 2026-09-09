@@ -93,6 +93,20 @@ export const CONTENT_EXPECTATIONS: Record<EntityKind, ContentExpectationSpec> = 
   publication: { appliesTo: 'publication', ...BASELINE },
   artifact: { appliesTo: 'artifact', ...BASELINE },
   movement: { appliesTo: 'movement', ...BASELINE, minNarrativeParagraphs: 2 },
+  /**
+   * Two distinct sources, because an invention record's whole job is to say what the
+   * contribution actually was, and one source is how "patented an improved process for
+   * manufacturing carbon conductors" becomes "invented the light bulb". The technical record
+   * and the historical account answer different questions and both are needed.
+   */
+  invention: {
+    appliesTo: 'invention',
+    ...BASELINE,
+    minNarrativeParagraphs: 2,
+    requiresImpactStatement: true,
+    minDistinctSources: 2,
+    minResearchCoverage: 'partial',
+  },
   other: { appliesTo: 'other', ...BASELINE, minResearchCoverage: 'minimal' },
 };
 

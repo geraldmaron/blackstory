@@ -49,7 +49,7 @@ export const ENTITY_TYPES_BY_CLASS: Readonly<Record<EntityClass, readonly string
   ],
   event: ['event'],
   legal: ['law', 'case'],
-  work: ['publication', 'artifact'],
+  work: ['publication', 'artifact', 'invention'],
   movement: ['movement'],
 };
 
@@ -76,7 +76,7 @@ export type EntityClassification = {
  *   land in is the whole point, rather than inventing a class that exists only to hold it.
  * - `law` / `case` -> legal (not `event`): both are static legal-status entities, not multi-actor
  *   happenings.
- * - `publication` / `artifact` -> work: both are authored/created things, distinct from the
+ * - `publication` / `artifact` / `invention` -> work: all are created things, distinct from the
  *   organizations or people that made them.
  * - `other` -> intentionally unmapped (returns `undefined`). None of the 7 coarse classes fit a
  *   catch-all kind by definition; silently bucketing `other` into an arbitrary class would just
@@ -94,6 +94,9 @@ const KIND_TO_CLASSIFICATION: Readonly<Partial<Record<EntityKind, EntityClassifi
   case: { entityClass: 'legal', entityTypes: ['case'] },
   publication: { entityClass: 'work', entityTypes: ['publication'] },
   artifact: { entityClass: 'work', entityTypes: ['artifact'] },
+  // An invention is a created thing, like a publication or an artifact, and unlike the people
+  // and companies that made it. It stays in `work` rather than earning an eighth class.
+  invention: { entityClass: 'work', entityTypes: ['invention'] },
   movement: { entityClass: 'movement', entityTypes: ['movement'] },
 };
 

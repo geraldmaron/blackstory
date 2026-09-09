@@ -62,5 +62,8 @@ export function redirectsForNextConfig() {
 
     // `/library` is the old name for Rooms.
     { source: '/library', destination: '/rooms', permanent: true },
+
+    // The inventions index is the Records kind filter, not a second catalog.
+    { source: '/inventions', destination: '/records?kind=inventions', permanent: true },
   ];
 }

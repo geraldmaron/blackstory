@@ -2,7 +2,10 @@
  * Discovery campaign dispatcher — Cloud Scheduler / GHA / Cloud Run Job entry.
  *
  * Gates: roster registration + research-campaigns kill switch. Loads fixture payloads by
- * default; live mode accepts injected file paths via env (SafeHttpClient fetch not wired yet).
+ * default; live mode accepts injected file paths via env. The live web-search branch calls the
+ * operator's own SearXNG through an origin-pinned client from `@repo/security/url-safety` rather
+ * than a bare `fetch` — that endpoint is private by design, so the SSRF path refuses it, but the
+ * content-type, byte cap, timeout and no-redirect rules all still apply.
  * Private candidates only — never publishes.
  */
 import { readFileSync } from 'node:fs';
@@ -35,8 +38,13 @@ import {
   DISCOVERY_CAMPAIGN_WIKIMEDIA_FEDERAL_JOB_ID,
   runDiscoveryCampaignWikimediaFederalJob,
 } from './jobs/discovery-campaign-wikimedia-federal.js';
+import { createOperatorEndpointClient } from '@repo/security/url-safety';
 import type { JobRunRecord } from './run-record.js';
-import type { DiscoveryCampaignResult, ResolutionProfile } from '@repo/domain';
+import type {
+  DiscoveryCampaignResult,
+  ResolutionProfile,
+  RoutedSearchHttpClient,
+} from '@repo/domain';
 
 export const DISCOVERY_DISPATCHER_VERSION = 'discovery-dispatcher.v1' as const;
 
@@ -97,6 +105,12 @@ export type DispatchDiscoveryCampaignInput = {
    * Omit on Cloud Functions to keep scheduler payloads small.
    */
   readonly includeCampaign?: boolean;
+  /**
+   * Transport for the live web-search branch. Defaults to an origin-pinned operator-endpoint client
+   * built from SEARXNG_BASE_URL; injected so the live branch is reachable by a test without a
+   * network.
+   */
+  readonly searchHttpClient?: RoutedSearchHttpClient;
 };
 
 const RESEARCH_CAMPAIGNS_KILL_SWITCH = 'research-campaigns' as const;
@@ -341,11 +355,23 @@ async function runFixtureOrLiveJob(
         const headers: Record<string, string> = { Accept: 'application/json' };
         const token = env.SEARXNG_AUTH_TOKEN?.trim();
         if (token) headers.Authorization = `Bearer ${token}`;
-        const response = await fetch(url, { headers });
-        if (!response.ok) {
+        // The endpoint is ours and private, so executeSafeFetch refuses it by design — but private
+        // is not unchecked. This client holds the origin, the JSON content-type, a byte cap, a
+        // timeout, and a refusal to follow any redirect. Built per dispatch because the base URL
+        // comes from the environment.
+        const searchClient =
+          input.searchHttpClient ??
+          (await createOperatorEndpointClient({ baseUrl: searxngBase })).client;
+        const response = await searchClient({
+          url,
+          method: 'GET',
+          headers,
+          allowedContentTypes: ['application/json', 'text/json'],
+        });
+        if (response.status < 200 || response.status >= 300) {
           throw new Error(`SearXNG HTTP ${response.status} for ${url}`);
         }
-        searchResponseRaw = await response.json();
+        searchResponseRaw = JSON.parse(response.bodyText) as unknown;
         providerConfig = {
           provider: 'searxng',
           apiKey: token || '',

@@ -79,6 +79,118 @@ test('fixture web-search dispatch succeeds with test storage terms', async () =>
   assert.ok((result.summary.survivors ?? 0) >= 1);
 });
 
+/**
+ * The live web-search branch, covered through the injected search client so no network is needed.
+ * These assert routing and failure surfacing, not that a SearXNG instance is up.
+ */
+const LIVE_SEARCH_ENV = {
+  SEARXNG_BASE_URL: 'http://127.0.0.1:8888',
+  DISCOVERY_STORAGE_TERMS_CONFIRMED: 'true',
+  DISCOVERY_SEARXNG_QUERY: 'Montgomery County Alabama African American',
+} as const;
+
+test('live web-search dispatch routes through the injected search client', async () => {
+  const requests: {
+    url: string;
+    headers?: Readonly<Record<string, string>>;
+    allowedContentTypes?: readonly string[];
+  }[] = [];
+  const result = await dispatchDiscoveryCampaign({
+    jobId: 'discovery-campaign-web-search',
+    mode: 'live',
+    killSwitchEngaged: false,
+    nowIso: FIXED_NOW,
+    jobRunId: 'run_test_web_live',
+    maxCandidates: 10,
+    environment: { ...LIVE_SEARCH_ENV, SEARXNG_AUTH_TOKEN: 'proxy-secret' },
+    searchHttpClient: async (request) => {
+      requests.push({
+        url: request.url,
+        ...(request.headers ? { headers: request.headers } : {}),
+        ...(request.allowedContentTypes
+          ? { allowedContentTypes: request.allowedContentTypes }
+          : {}),
+      });
+      return {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+        bodyText: JSON.stringify({
+          results: [
+            {
+              url: 'https://www.nps.gov/places/freedom-riders-national-monument.htm',
+              title: 'Freedom Riders National Monument',
+              content: 'A Park Service account of the 1961 Freedom Riders bus burning in Anniston.',
+            },
+          ],
+        }),
+        finalUrl: request.url,
+      };
+    },
+  });
+  assert.equal(result.status, 'success');
+  assert.equal(requests.length, 1);
+  // The query reached the provider through the one routed URL builder.
+  assert.match(requests[0]!.url, /^http:\/\/127\.0\.0\.1:8888\/search\?/u);
+  assert.match(requests[0]!.url, /format=json/u);
+  // A reverse-proxy shared secret must survive; executeSafeFetch could not have carried it.
+  assert.equal(requests[0]!.headers?.Authorization, 'Bearer proxy-secret');
+  // JSON only, so an HTML error page cannot be parsed as a result set. Asserted rather than
+  // described: the client's default allowlist is the same two values, so deleting the dispatcher's
+  // declaration would change no behaviour and nothing would surface it.
+  assert.deepEqual(requests[0]!.allowedContentTypes, ['application/json', 'text/json']);
+});
+
+test('live web-search dispatch surfaces a provider failure instead of reporting success', async () => {
+  const result = await dispatchDiscoveryCampaign({
+    jobId: 'discovery-campaign-web-search',
+    mode: 'live',
+    killSwitchEngaged: false,
+    nowIso: FIXED_NOW,
+    jobRunId: 'run_test_web_live_err',
+    environment: LIVE_SEARCH_ENV,
+    searchHttpClient: async (request) => ({
+      status: 502,
+      headers: { 'content-type': 'application/json' },
+      bodyText: '{}',
+      finalUrl: request.url,
+    }),
+  });
+  assert.equal(result.status, 'error');
+  assert.match(String(result.summary.message), /SearXNG HTTP 502/u);
+});
+
+test('live web-search dispatch propagates a client refusal rather than swallowing it', async () => {
+  const result = await dispatchDiscoveryCampaign({
+    jobId: 'discovery-campaign-web-search',
+    mode: 'live',
+    killSwitchEngaged: false,
+    nowIso: FIXED_NOW,
+    jobRunId: 'run_test_web_live_refused',
+    environment: LIVE_SEARCH_ENV,
+    searchHttpClient: async () => {
+      throw new Error('Operator search endpoint returned 302; redirects are never followed');
+    },
+  });
+  assert.equal(result.status, 'error');
+  assert.match(String(result.summary.message), /redirects are never followed/u);
+});
+
+test('live web-search dispatch still refuses to run without confirmed storage terms', async () => {
+  const result = await dispatchDiscoveryCampaign({
+    jobId: 'discovery-campaign-web-search',
+    mode: 'live',
+    killSwitchEngaged: false,
+    nowIso: FIXED_NOW,
+    jobRunId: 'run_test_web_live_nogate',
+    environment: { SEARXNG_BASE_URL: 'http://127.0.0.1:8888' },
+    searchHttpClient: async () => {
+      throw new Error('must not be called');
+    },
+  });
+  assert.equal(result.status, 'error');
+  assert.match(String(result.summary.message), /DISCOVERY_STORAGE_TERMS_CONFIRMED/u);
+});
+
 test('engaged kill switch skips without running campaign', async () => {
   const result = await dispatchDiscoveryCampaign({
     jobId: 'discovery-campaign-rss',

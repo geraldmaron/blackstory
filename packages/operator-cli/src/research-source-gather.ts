@@ -7,7 +7,7 @@
  * bare `fetch()` against URLs scraped from untrusted pages.
  */
 import type { SafeFetchDependencies, SafeFetchResult } from '@repo/security/url-safety';
-import { lookupSourceTier } from '@repo/domain';
+import { dedupeUrlsByPage, lookupSourceTier, urlDedupeKey } from '@repo/domain';
 import { createNodeSafeFetchDependencies, runQuickAddFetch } from './fetch.js';
 import { mapPool } from './map-pool.js';
 
@@ -101,7 +101,21 @@ export function wrapPrefetchedSourceSnippet(
   };
 }
 
-/** Dedupes URLs, fetches in bounded parallel, preserves input order for hits. */
+/**
+ * Dedupes by page, fetches in bounded parallel, preserves input order for hits.
+ *
+ * Deduped TWICE, on purpose, because one page can hide behind two different strings at two
+ * different moments:
+ *
+ *  1. Before fetching, on a canonical page key rather than the raw string. `https://nps.gov/x` and
+ *     `https://NPS.gov/x?utm_source=y` are one page, and a raw-string key would fetch it twice and
+ *     return two snippets.
+ *  2. After fetching, on `finalUrl`. Two genuinely different URLs can redirect to one document, and
+ *     no canonicalization before the request can know that — only the response can.
+ *
+ * Duplicate counting is not untidiness here. Independence is the entire basis of corroboration, and
+ * a duplicate that looks independent is worse than an obvious one.
+ */
 export async function gatherSourceSnippetsFromUrls(
   urls: readonly string[],
   options: GatherSourceSnippetsOptions = {},
@@ -109,14 +123,7 @@ export async function gatherSourceSnippetsFromUrls(
   const dependencies = options.dependencies ?? createNodeSafeFetchDependencies();
   const maxChars = options.maxChars ?? MAX_TEXT_CHARS;
   const concurrency = options.concurrency ?? 3;
-  const seen = new Set<string>();
-  const uniqueUrls: string[] = [];
-  for (const url of urls) {
-    const trimmed = url.trim();
-    if (!trimmed || seen.has(trimmed)) continue;
-    seen.add(trimmed);
-    uniqueUrls.push(trimmed);
-  }
+  const uniqueUrls = dedupeUrlsByPage(urls);
   if (uniqueUrls.length === 0) return [];
 
   const results = await mapPool(
@@ -124,7 +131,18 @@ export async function gatherSourceSnippetsFromUrls(
     (url) => gatherSourceSnippet(url, dependencies, maxChars),
     { concurrency },
   );
-  return results.filter((snippet): snippet is GatheredSourceSnippet => snippet !== undefined);
+
+  const seenPages = new Set<string>();
+  const deduped: GatheredSourceSnippet[] = [];
+  for (const snippet of results) {
+    if (snippet === undefined) continue;
+    // The redirect target is what was actually read, so it is what identity is judged on.
+    const key = urlDedupeKey(snippet.finalUrl ?? snippet.url) ?? `raw:${snippet.url}`;
+    if (seenPages.has(key)) continue;
+    seenPages.add(key);
+    deduped.push(snippet);
+  }
+  return deduped;
 }
 
 /** Builds LLM-ready snippet strings from gathered pages. */

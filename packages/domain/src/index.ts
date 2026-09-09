@@ -112,6 +112,31 @@ export {
 } from './living.js';
 export type { LivingStatus, LivingStatusDerivationSignal } from './living.js';
 
+export {
+  INVENTION_PATENT_RELATIONS,
+  INVENTOR_RESOLUTION_STATES,
+  IP_STATUSES,
+  PATENT_SOURCE_SYSTEMS,
+  assertCanonicalPatentValid,
+  assertSoleInventorClaimSupported,
+  isIntellectualPropertyStatus,
+  isMultiInventor,
+  isPatentSourceSystem,
+  normalizePatentNumber,
+  patentIdFor,
+  unresolvedInventors,
+} from './invention/patent.js';
+export type {
+  CanonicalPatent,
+  IntellectualPropertyStatus,
+  InventionFields,
+  InventionPatentLink,
+  InventionPatentRelation,
+  InventorResolutionState,
+  PatentInventorAssociation,
+  PatentSourceSystem,
+} from './invention/patent.js';
+
 export { ENTITY_KINDS, isEntityKind } from './entity-kinds.js';
 export type { EntityKind } from './entity-kinds.js';
 
@@ -227,6 +252,9 @@ export type {
 export {
   RELATIONSHIP_TYPES,
   RELATIONSHIP_ROLES,
+  ORIGINATION_RELATIONSHIP_TYPES,
+  BOUNDED_CONTRIBUTION_RELATIONSHIP_TYPES,
+  isOriginationRelationshipType,
   assertRelationshipHasEvidence,
   RELATIONSHIP_TYPE_SEMANTICS,
   CAUSAL_HISTORICAL_RELATIONSHIP_TYPES,
@@ -626,6 +654,37 @@ export {
   assertNarrativeMayCiteClaim,
   narrativeMayCiteClaim,
   assertClaimMayPublish,
+  BRIDGE_LINEAGE_KEY,
+  SOURCE_LINEAGE_KINDS,
+  authorityForHost,
+  isSameLineage,
+  resolveSourceLineage,
+  sourceLineageKey,
+  ASSERTION_CLASSES,
+  FITNESS_LEVELS,
+  HIGH_IMPACT_ASSERTION_CLASSES,
+  SOURCE_CLASSES,
+  assessSourceFitness,
+  isAssertionClass,
+  isBridgeSourceClass,
+  isHighImpactAssertion,
+  isSourceClass,
+  isUnfitFor,
+  sourceAuthorityForFitness,
+  BOUNDED_ATTRIBUTION_TERMS,
+  BROAD_ATTRIBUTION_TERMS,
+  COMMERCIAL_TERMS,
+  IMPACT_TERMS,
+  SUPERLATIVE_TERMS,
+  assertionClassesInText,
+  boundedAlternativesFor,
+  checkAttribution,
+  checkCommunityIdentityEvidence,
+  findAttributionMarkers,
+  highImpactAssertionsInText,
+  makesBroadAttribution,
+  makesSuperlativeClaim,
+  patentTitleSuggestsImprovement,
 } from './claims/index.js';
 export type {
   ClaimId,
@@ -649,7 +708,47 @@ export type {
   ConnectionStrengthMeasurement,
   ContradictionSet,
   PublicationThresholdResult,
+  SourceLineage,
+  SourceLineageInput,
+  SourceLineageKind,
+  AssertionClass,
+  Fitness,
+  FitnessAssessment,
+  SourceClass,
+  AttributionCheckInput,
+  AttributionFinding,
+  AttributionMarker,
 } from './claims/index.js';
+
+// Research maturity and the deficit taxonomy: whether the research was actually done, which is
+// a different measurement from claim confidence and from field completeness.
+export {
+  RESEARCH_DEFICIT_CODES,
+  RESEARCH_EVALUATOR_VERSION,
+  RESEARCH_GATE_IDS,
+  RESEARCH_MATURITY_STATES,
+  assessResearchMaturity,
+  blockersToNextState,
+  citedLineageKeys,
+  corroboratingLineageKeys,
+  describeMaturity,
+  detectDeficits,
+  enrichmentPriority,
+  nextMaturityState,
+} from './research/index.js';
+export type {
+  ClaimSnapshot,
+  EnrichmentPriority,
+  EvidenceSnapshot,
+  MaturityEvaluationInput,
+  RecordSnapshot,
+  ResearchBlocker,
+  ResearchDeficit,
+  ResearchDeficitCode,
+  ResearchGateId,
+  ResearchMaturity,
+  ResearchMaturityAssessment,
+} from './research/index.js';
 
 export {
   AUDIT_EVENT_ACTIONS,
@@ -672,6 +771,7 @@ export type {
 } from './audit/index.js';
 
 export * from './adapters/index.js';
+export { dedupeUrlsByPage, urlDedupeKey } from './urls/canonical-key.js';
 export * from './submissions/index.js';
 export * from './external-data-sources.js';
 export * from './banned-books/index.js';

@@ -16,6 +16,7 @@
  */
 import {
   calculateClaimConfidence,
+  resolveSourceLineage,
   type ClaimEvidenceLink,
   type ConfidenceEngineResult,
 } from '@repo/domain';
@@ -107,6 +108,19 @@ export type SourceForConfidence = {
   /** Whether the fetched page text actually contains the subject's name — a cheap
    *  directness/entity-match proxy without full NLP entailment checking. */
   readonly textContainsSubjectName?: boolean;
+  /**
+   * The underlying work this source reproduces, where the pipeline knows it.
+   *
+   * Set this for a syndicated story or a reprint. Nothing in three newspaper URLs says they
+   * are carrying one wire report, so provenance is the only way that gets collapsed.
+   */
+  readonly upstreamWorkId?: string | undefined;
+  /**
+   * Set only when provenance confirms this document was created independently of others from
+   * the same authority — two separately authored collections at one archive, not two pages of
+   * one report.
+   */
+  readonly independentCreation?: { readonly documentId: string } | undefined;
 };
 
 function scoreDimension(textContainsSubjectName: boolean | undefined): number {
@@ -115,6 +129,25 @@ function scoreDimension(textContainsSubjectName: boolean | undefined): number {
   return textContainsSubjectName ? 0.85 : 0.6;
 }
 
+/**
+ * Dimensions this function does not measure.
+ *
+ * These four carry defaults below, which the score needs and which are not measurements. A
+ * document's own date is not stored anywhere in bb_evidence (every timestamp there is a system
+ * time), place precision is not read off the evidence, and extraction quality describes a
+ * selector this path does not create. Naming them lets the research maturity gates tell an
+ * assessed record from one that merely scored — without changing what the published score is.
+ *
+ * `directness` and `entityMatchQuality` are omitted from this list because they ARE derived
+ * from something observed, even if only from whether the subject's name appears in the fetched
+ * text. That proxy is weak, and it is a different problem from never having looked.
+ */
+const UNASSESSED_BY_THIS_PATH: readonly string[] = [
+  'temporalProximity',
+  'geographicPrecision',
+  'extractionQuality',
+];
+
 function buildEvidenceLink(
   claimId: string,
   source: SourceForConfidence,
@@ -122,21 +155,22 @@ function buildEvidenceLink(
   now: string,
 ): ClaimEvidenceLink {
   const dimensionScore = scoreDimension(source.textContainsSubjectName);
+  // Lineage is the underlying work, not the host serving it. `resolveSourceLineage` collapses
+  // a patent read at the Patent Office and at a mirror, collapses an authority's subdomains,
+  // and puts every Wikipedia spelling on one bridge key.
+  const lineage = resolveSourceLineage({
+    url: source.url,
+    upstreamWorkId: source.upstreamWorkId,
+    independentCreation: source.independentCreation,
+  });
   return {
     id: `${claimId}-evidence-${index}`,
     claimId,
     claimVersionId: `${claimId}-v1`,
     evidenceId: source.url,
     role: 'supporting',
-    // Different hosts are different lineage roots — the whole point of
-    // corroboration is that they're INDEPENDENT, not copies of each other.
-    lineageRootId: (() => {
-      try {
-        return new URL(source.url).hostname;
-      } catch {
-        return source.url;
-      }
-    })(),
+    lineageRootId: lineage.key,
+    bridgeSource: lineage.bridge,
     credible: true,
     sourceClassification: classifySourceForConfidence(source.url),
     directness: dimensionScore,
@@ -144,6 +178,7 @@ function buildEvidenceLink(
     geographicPrecision: 0.7,
     entityMatchQuality: dimensionScore,
     extractionQuality: 0.8,
+    unassessedDimensions: UNASSESSED_BY_THIS_PATH,
     createdAt: now,
   };
 }

@@ -35,6 +35,53 @@ export {
 export type { ClaimEvidenceRole, ClaimEvidenceLink } from './evidence-link.js';
 
 export {
+  BRIDGE_LINEAGE_KEY,
+  SOURCE_LINEAGE_KINDS,
+  authorityForHost,
+  isSameLineage,
+  resolveSourceLineage,
+  sourceLineageKey,
+} from './lineage.js';
+export type { SourceLineage, SourceLineageInput, SourceLineageKind } from './lineage.js';
+
+export {
+  ASSERTION_CLASSES,
+  FITNESS_LEVELS,
+  HIGH_IMPACT_ASSERTION_CLASSES,
+  SOURCE_CLASSES,
+  assessSourceFitness,
+  isAssertionClass,
+  isBridgeSourceClass,
+  isHighImpactAssertion,
+  isSourceClass,
+  isUnfitFor,
+  sourceAuthorityForFitness,
+} from './source-fitness.js';
+export type { AssertionClass, Fitness, FitnessAssessment, SourceClass } from './source-fitness.js';
+
+export {
+  BOUNDED_ATTRIBUTION_TERMS,
+  BROAD_ATTRIBUTION_TERMS,
+  COMMERCIAL_TERMS,
+  IMPACT_TERMS,
+  SUPERLATIVE_TERMS,
+  assertionClassesInText,
+  boundedAlternativesFor,
+  checkAttribution,
+  checkCommunityIdentityEvidence,
+  findAttributionMarkers,
+  highImpactAssertionsInText,
+  makesBroadAttribution,
+  makesSuperlativeClaim,
+  patentTitleSuggestsImprovement,
+} from './attribution.js';
+export type {
+  AttributionCheckInput,
+  AttributionFinding,
+  AttributionMarker,
+} from './attribution.js';
+
+export {
   CONFIDENCE_COMPONENT_WEIGHTS,
   sourceAuthorityForClassification,
   lineageIndependenceFromCount,

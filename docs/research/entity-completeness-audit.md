@@ -4,6 +4,20 @@ Date: 2026-07-24. All numbers below queried directly against Supabase project
 `twykhihqkcldpreuovay` (`bb_canonical`, `bb_public`, `bb_publication`). No canonical data was
 written; all backfill/discovery output is staged (review-gated), not published.
 
+> **Note added later: this audit measures display completeness, not research depth.** The two
+> are separate measurements with separate instruments, and a record can score full marks here
+> and be entirely unresearched. Completeness asks how many rendered fields are populated, which
+> is what everything below counts. Research depth asks whether the research was actually done,
+> and it is derived by `assessResearchMaturity`
+> (`packages/domain-core/src/research/maturity.ts`) over six states from `seeded` to
+> `reference`, from 17 gates fed by 29 named deficits
+> (`packages/domain-core/src/research/deficits.ts`). Claim confidence is a third measurement
+> again: it scores the evidence for one claim, not the state of a record. A field filled from a
+> single templated import counts as complete and stays `seeded`. Do not read a high completeness
+> number in this document as evidence that a record is well researched, and do not close a
+> maturity blocker by populating a field. See
+> [confidence-lineage.md](confidence-lineage.md) for how depth is derived.
+
 **Correction, same day, post-audit follow-up:** the `taxonomy` finding below (§2, §6.2) measured
 `bb_public.release_entities.taxonomy`, a denormalized column. The web/API actually serve
 `release_entities.projection->>'topicIds'`/`'topicTags'` (`apps/api-public`,

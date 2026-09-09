@@ -186,3 +186,36 @@ export async function fetchBraveWebSearchBudgeted(
   const candidates = await fetchBraveWebSearch(input);
   return { candidates, budgetDecision };
 }
+
+export type FetchSearxngWebSearchBudgetedInput = FetchSearxngWebSearchInput & {
+  readonly budgetPolicy: WebSearchCampaignBudgetPolicy;
+  readonly budgetState: WebSearchBudgetState;
+  readonly evaluateDailyBudget: DailyBudgetEvaluator;
+};
+
+export type FetchSearxngWebSearchBudgetedResult = {
+  readonly candidates: readonly WebSearchCandidateRecord[];
+  readonly budgetDecision: WebSearchBudgetDecision;
+};
+
+/**
+ * Budget-gated SearXNG fetch. SearXNG is the provider `./provider-decision.ts` selects, so this is
+ * the variant a campaign with a query budget reaches for. Same fail-closed shape as the Brave
+ * wrapper above: the budget is evaluated before any network call, and a denial throws.
+ */
+export async function fetchSearxngWebSearchBudgeted(
+  input: FetchSearxngWebSearchBudgetedInput,
+): Promise<FetchSearxngWebSearchBudgetedResult> {
+  const budgetDecision = evaluateWebSearchQueryBudget({
+    policy: input.budgetPolicy,
+    state: input.budgetState,
+    evaluateDailyBudget: input.evaluateDailyBudget,
+  });
+  if (!budgetDecision.allowed) {
+    throw new Error(
+      `Web search query budget denied: ${budgetDecision.reason ?? 'budget exceeded'}`,
+    );
+  }
+  const candidates = await fetchSearxngWebSearch(input);
+  return { candidates, budgetDecision };
+}

@@ -42,6 +42,7 @@ test('historyKindToRecordsKind remaps history-only categories at the redirect bo
   assert.equal(historyKindToRecordsKind('works'), 'sources');
   assert.equal(historyKindToRecordsKind('people'), 'people');
   assert.equal(historyKindToRecordsKind('place'), 'place');
+  assert.equal(historyKindToRecordsKind('inventions'), 'inventions');
   assert.equal(historyKindToRecordsKind('all'), 'all');
   assert.equal(historyKindToRecordsKind(''), '');
 });
