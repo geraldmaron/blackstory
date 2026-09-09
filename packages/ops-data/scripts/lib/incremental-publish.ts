@@ -200,7 +200,7 @@ export function inferEntityClassForCanonical(kind: string): string | null {
   if (kind === 'organization' || kind === 'institution' || kind === 'school') return 'organization';
   if (kind === 'event') return 'event';
   if (kind === 'law' || kind === 'case') return 'legal';
-  if (kind === 'publication' || kind === 'artifact') return 'work';
+  if (kind === 'publication' || kind === 'artifact' || kind === 'invention') return 'work';
   if (kind === 'movement') return 'movement';
   return null;
 }

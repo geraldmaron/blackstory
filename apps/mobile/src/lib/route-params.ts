@@ -53,13 +53,14 @@ export const MAX_ERA_LENGTH = 20;
 export const ENTITY_KINDS = CONTRACT_ENTITY_KINDS;
 export type EntityKind = (typeof ENTITY_KINDS)[number];
 
-/** Five kind families for v6 map + filter facet (web Explore parity). */
+/** Kind families for the map + filter facet (web Explore parity). */
 export const KIND_FAMILIES = [
   'people',
   'places',
   'organizations',
   'events',
   'sources',
+  'inventions',
 ] as const;
 export type KindFamily = (typeof KIND_FAMILIES)[number];
 

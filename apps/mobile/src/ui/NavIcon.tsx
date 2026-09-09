@@ -47,6 +47,7 @@ export type NavIconName =
   | 'organization'
   | 'publication'
   | 'artifact'
+  | 'invention'
   | 'other';
 
 type IonName = keyof typeof Ionicons.glyphMap;
@@ -87,6 +88,7 @@ const OUTLINE: Record<NavIconName, IonName> = {
   organization: 'people-outline',
   publication: 'newspaper-outline',
   artifact: 'cube-outline',
+  invention: 'bulb-outline',
   other: 'ellipse-outline',
 };
 
@@ -151,6 +153,8 @@ export function navIconForEntityKind(kind: string): NavIconName {
       return 'publication';
     case 'artifact':
       return 'artifact';
+    case 'invention':
+      return 'invention';
     default:
       return 'other';
   }

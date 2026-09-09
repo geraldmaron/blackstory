@@ -30,11 +30,18 @@ export type MapKind =
   | 'publication'
   | 'artifact'
   | 'movement'
+  | 'invention'
   | 'other';
 
 export type MapSemanticTone = 'massacre' | 'plantation' | 'epicenter';
 
-export type MapKindFamily = 'people' | 'places' | 'organizations' | 'events' | 'sources';
+export type MapKindFamily =
+  | 'people'
+  | 'places'
+  | 'organizations'
+  | 'events'
+  | 'sources'
+  | 'inventions';
 
 export type KindFamilyEncodingEntry = KindEncodingEntry & {
   readonly kinds: readonly MapKind[];
@@ -52,6 +59,7 @@ export const MAP_KIND_ENCODING: Readonly<Record<MapKind, KindEncodingEntry>> = {
   publication: { shade: DIGNITY_PALETTE.kindPublication, glyph: 'square', label: 'Publication' },
   artifact: { shade: DIGNITY_PALETTE.kindArtifact, glyph: 'circle', label: 'Artifact' },
   movement: { shade: DIGNITY_PALETTE.kindMovement, glyph: 'diamond', label: 'Movement' },
+  invention: { shade: DIGNITY_PALETTE.kindInvention, glyph: 'diamond', label: 'Invention' },
   other: { shade: DIGNITY_PALETTE.kindOther, glyph: 'circle', label: 'Other' },
 };
 
@@ -81,6 +89,7 @@ const KIND_TO_FAMILY: Readonly<Record<MapKind, MapKindFamily>> = {
   law: 'sources',
   publication: 'sources',
   artifact: 'sources',
+  invention: 'inventions',
   other: 'sources',
 };
 
@@ -114,6 +123,12 @@ export const MAP_KIND_FAMILY_ENCODING: Readonly<Record<MapKindFamily, KindFamily
     glyph: 'square',
     label: 'Sources',
     kinds: ['law', 'publication', 'artifact', 'other'],
+  },
+  inventions: {
+    shade: DIGNITY_PALETTE.kindInvention,
+    glyph: 'diamond',
+    label: 'Inventions',
+    kinds: ['invention'],
   },
 };
 

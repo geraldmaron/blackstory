@@ -24,6 +24,7 @@ const KIND_LABELS: Record<KindFamily, string> = {
   organizations: kindFamilyEncodingFor('organizations').label,
   events: kindFamilyEncodingFor('events').label,
   sources: kindFamilyEncodingFor('sources').label,
+  inventions: kindFamilyEncodingFor('inventions').label,
 };
 
 const KIND_ICONS: Record<KindFamily, NavIconName> = {
@@ -32,6 +33,7 @@ const KIND_ICONS: Record<KindFamily, NavIconName> = {
   organizations: 'organization',
   events: 'event',
   sources: 'publication',
+  inventions: 'invention',
 };
 
 function facetDisplayLabel(

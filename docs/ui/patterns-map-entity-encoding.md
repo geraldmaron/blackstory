@@ -22,7 +22,7 @@ Map paint and the instrument Color key list the **same** families, tones, size s
 
 ## Kind families (map color)
 
-Five groups share one shade each. Micro-kinds remain in data, badges, and spotlight copy.
+Six groups share one shade each. Micro-kinds remain in data, badges, and spotlight copy.
 
 | Family | Label | Micro-kinds | Shade token | Representative glyph |
 |---|---|---|---|---|
@@ -31,6 +31,7 @@ Five groups share one shade each. Micro-kinds remain in data, badges, and spotli
 | `organizations` | Organizations | organization, institution, movement | `kindOrganization` | ring |
 | `events` | Events | event, case | `kindEvent` | diamond |
 | `sources` | Sources | law, publication, artifact, other | `kindLaw` | square |
+| `inventions` | Inventions | invention | `kindInvention` | diamond |
 
 **Paint:** `displayEncodingFor()` writes `properties.shade` from family (or tone override).  
 **Glyph:** still per micro-kind (`properties.glyph`) for WCAG non-color channel.

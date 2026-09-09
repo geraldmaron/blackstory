@@ -283,6 +283,9 @@ test('kindMatchesPublicFilter accepts families and micro-kinds only', () => {
   assert.equal(kindMatchesPublicFilter('movement', 'organizations'), true);
   assert.equal(kindMatchesPublicFilter('case', 'events'), true);
   assert.equal(kindMatchesPublicFilter('publication', 'sources'), true);
+  assert.equal(kindMatchesPublicFilter('invention', 'inventions'), true);
+  assert.equal(kindMatchesPublicFilter('invention', 'invention'), true);
+  assert.equal(kindMatchesPublicFilter('person', 'invention'), false);
   // Legacy /history category ids are not filter vocabulary.
   assert.equal(kindMatchesPublicFilter('publication', 'works'), false);
   assert.equal(kindMatchesPublicFilter('case', 'law'), false);

@@ -39,6 +39,8 @@ const entityKindSchema = z.enum([
   'publication',
   'artifact',
   'movement',
+  // A technology or process, not an artifact. Must stay in lockstep with ENTITY_KINDS.
+  'invention',
   'other',
 ]);
 

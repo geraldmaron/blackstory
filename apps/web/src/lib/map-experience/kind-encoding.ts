@@ -1,9 +1,9 @@
 /**
  * Kind + kind-family + semantic-tone encoding for the explore map.
  *
- * **Map color (primary):** five kind families share one shade each (People, Places,
- * Organizations, Events, Sources). Micro-kinds still exist in data and badges; paint
- * uses the family shade so the canvas and Color key stay aligned.
+ * **Map color (primary):** six kind families share one shade each (People, Places,
+ * Organizations, Events, Sources, Inventions). Micro-kinds still exist in data and
+ * badges; paint uses the family shade so the canvas and Color key stay aligned.
  *
  * **Shape (secondary):** each micro-kind keeps a glyph (`circle` / `square` / `diamond`
  * / `ring`) so color is never the only signal (WCAG 1.4.1). MapLibre circle layers echo
@@ -43,12 +43,14 @@ export type MapKind =
   | 'publication'
   | 'artifact'
   | 'movement'
+  | 'invention'
   | 'other';
 
 export type MapSemanticTone = 'massacre' | 'plantation' | 'epicenter';
 
-/** Higher-level map + filter grouping — five families, one shade each on the canvas. */
-export type MapKindFamily = 'people' | 'places' | 'organizations' | 'events' | 'sources';
+/** Higher-level map + filter grouping — six families, one shade each on the canvas. */
+export type MapKindFamily =
+  'people' | 'places' | 'organizations' | 'events' | 'sources' | 'inventions';
 
 export type KindFamilyEncodingEntry = KindEncodingEntry & {
   /** Micro-kinds rolled into this family (for filter + legend prose). */
@@ -67,6 +69,7 @@ export const MAP_KIND_ENCODING: Readonly<Record<MapKind, KindEncodingEntry>> = {
   publication: { shade: DIGNITY_PALETTE.kindPublication, glyph: 'square', label: 'Publication' },
   artifact: { shade: DIGNITY_PALETTE.kindArtifact, glyph: 'circle', label: 'Artifact' },
   movement: { shade: DIGNITY_PALETTE.kindMovement, glyph: 'diamond', label: 'Movement' },
+  invention: { shade: DIGNITY_PALETTE.kindInvention, glyph: 'diamond', label: 'Invention' },
   other: { shade: DIGNITY_PALETTE.kindOther, glyph: 'circle', label: 'Other' },
 };
 
@@ -96,6 +99,7 @@ const KIND_TO_FAMILY: Readonly<Record<MapKind, MapKindFamily>> = {
   law: 'sources',
   publication: 'sources',
   artifact: 'sources',
+  invention: 'inventions',
   other: 'sources',
 };
 
@@ -130,6 +134,12 @@ export const MAP_KIND_FAMILY_ENCODING: Readonly<Record<MapKindFamily, KindFamily
     label: 'Sources',
     kinds: ['law', 'publication', 'artifact', 'other'],
   },
+  inventions: {
+    shade: DIGNITY_PALETTE.kindInvention,
+    glyph: 'diamond',
+    label: 'Inventions',
+    kinds: ['invention'],
+  },
 };
 
 const KNOWN_KINDS = Object.keys(MAP_KIND_ENCODING) as readonly MapKind[];
@@ -147,7 +157,7 @@ export function isKnownMapKindFamily(value: string): value is MapKindFamily {
   return (KNOWN_KIND_FAMILIES as readonly string[]).includes(value);
 }
 
-/** Resolve the five-family bucket used for map shade and the Kind filter facet. */
+/** Resolve the family bucket used for map shade and the Kind filter facet. */
 export function kindFamilyFor(kind: string): MapKindFamily {
   if (isKnownMapKind(kind)) return KIND_TO_FAMILY[kind];
   return 'sources';

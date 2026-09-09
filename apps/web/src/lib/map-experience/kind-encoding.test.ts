@@ -39,6 +39,7 @@ const DOMAIN_KINDS: readonly MapKind[] = [
   'publication',
   'artifact',
   'movement',
+  'invention',
   'other',
 ];
 
