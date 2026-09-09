@@ -67,8 +67,9 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts <ver
 
   The CLI resolves all of this in `packages/operator-cli/src/search-routing.ts`. A verb asks for
   queries and gets leads; it does not read search env vars itself.
-  `packages/ops-data/scripts/lib/corroborate-source.ts` is the remaining exception and still calls
-  `fetch` directly — see repo-8tnss for the preconditions its migration needs.
+  `packages/ops-data/scripts/lib/corroborate-source.ts` reaches the same client directly, because it
+  is a script rather than a verb and its own 4s inter-query throttle owns the pacing — which is why
+  the client itself never retries. No web-search query anywhere uses bare `fetch`.
   `packages/operator-cli/src/worker-preflight.ts` also reads `SEARXNG_BASE_URL`, but only to probe
   the instance's health endpoint; it issues no queries.
 - **Ledger logging.** `packages/operator-cli/src/model-routing.ts` (repo-xez5.2) is the one
