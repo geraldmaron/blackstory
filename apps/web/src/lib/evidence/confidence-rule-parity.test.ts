@@ -68,23 +68,29 @@ const PREDICATES = [
   'was lynched',
 ] as const;
 
+/** Stated role, including absent — the case where both sides fall back to the predicate. */
+const CLAIM_ROLES = [undefined, 'record_index', 'evidence'] as const;
+
 type FlatClaim = {
   readonly confidenceLevel?: string;
   readonly citationSource?: string;
   readonly predicate?: string;
+  readonly claimRole?: string;
 };
 
 function claimsFor(
   level: string | undefined,
   sources: readonly (string | undefined)[],
   predicate: string | undefined,
+  claimRole: string | undefined,
 ): FlatClaim[] {
   const base = {
     ...(level !== undefined ? { confidenceLevel: level } : {}),
     ...(predicate !== undefined ? { predicate } : {}),
+    ...(claimRole !== undefined ? { claimRole } : {}),
   };
   if (sources.length === 0) {
-    return level === undefined && predicate === undefined ? [] : [base];
+    return level === undefined && predicate === undefined && claimRole === undefined ? [] : [base];
   }
   return sources.map((source) => ({
     ...base,
@@ -98,21 +104,26 @@ describe('evidence · the record tier rule does not drift between its two implem
     for (const level of LEVELS) {
       for (const sources of CITATION_SETS) {
         for (const predicate of PREDICATES) {
-          const claims = claimsFor(level, sources, predicate);
-          const label =
-            `level=${String(level)} predicate=${String(predicate)} ` +
-            `sources=[${sources.map(String).join(', ')}]`;
-          assert.equal(
-            recordConfidenceTier(claims),
-            highestClaimConfidenceTier(claims),
-            `public-contracts and domain disagree for ${label}`,
-          );
-          compared += 1;
+          for (const claimRole of CLAIM_ROLES) {
+            const claims = claimsFor(level, sources, predicate, claimRole);
+            const label =
+              `level=${String(level)} predicate=${String(predicate)} ` +
+              `role=${String(claimRole)} sources=[${sources.map(String).join(', ')}]`;
+            assert.equal(
+              recordConfidenceTier(claims),
+              highestClaimConfidenceTier(claims),
+              `public-contracts and domain disagree for ${label}`,
+            );
+            compared += 1;
+          }
         }
       }
     }
     // A corpus that silently emptied would pass every assertion above.
-    assert.equal(compared, LEVELS.length * CITATION_SETS.length * PREDICATES.length);
+    assert.equal(
+      compared,
+      LEVELS.length * CITATION_SETS.length * PREDICATES.length * CLAIM_ROLES.length,
+    );
   });
 
   it('agrees on mixed-strength records, where the cap and the maximum pull apart', () => {

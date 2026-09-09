@@ -158,8 +158,10 @@ export type EvidenceClaimInput = {
   readonly confidenceLevel?: string;
   readonly citationSource?: string;
   readonly citation?: { readonly source?: string };
-  /** What the claim asserts. Reveals whether it is the record's own index row. */
+  /** What the claim asserts. The migration bridge for claims published without `claimRole`. */
   readonly predicate?: string;
+  /** Whether this claim is the record's own index row or evidence about its subject. */
+  readonly claimRole?: string;
 };
 
 /**
@@ -182,18 +184,16 @@ export function citationLineageKey(claim: EvidenceClaimInput): string | null {
   return raw.replace(/^(?:www|en|en\.m|m)\./u, '');
 }
 
+/** The claim is the record's own index row, not a source about its subject. */
+export const CLAIM_ROLE_RECORD_INDEX = 'record_index';
+
 /**
  * Predicates the landscape publisher synthesises from a record's own index row.
  *
- * `incremental-publish.ts` builds these from the registry fields of the row the record was
- * created from — `refnum`, `listedDateSerial`, `areaOfSignificance`, or the summary — and cites
- * them to that row's canonical URL. They are the record's provenance, not a second opinion about
- * it, and a record cited to its own index row has been corroborated by nothing.
- *
- * The projection carries no provenance flag, so the predicate is the surviving trace of the
- * distinction the publisher already makes between the claims it synthesised and the documents it
- * read. Every other predicate in the archive asserts something about the subject and can
- * corroborate. repo-6jizv tracks marking this at publish time instead of inferring it here.
+ * This is the bridge for claims published before `claimRole` existed, not the rule. The publisher
+ * now states the role outright, because inferring provenance from a predicate vocabulary means a
+ * new lane with different predicates is silently mis-graded. Once no published claim is missing
+ * `claimRole` this set and its branch come out (repo-6qjv0).
  */
 const RECORD_PROVENANCE_PREDICATES: ReadonlySet<string> = new Set([
   'listing',
@@ -201,8 +201,16 @@ const RECORD_PROVENANCE_PREDICATES: ReadonlySet<string> = new Set([
   'documented_site',
 ]);
 
-/** True when a claim is the record's own index row rather than evidence about its subject. */
+/**
+ * True when a claim is the record's own index row rather than evidence about its subject.
+ *
+ * `incremental-publish.ts` builds those from the registry fields of the row the record was
+ * created from and cites them to that row's canonical URL, so they are the record's provenance.
+ * A record cited to its own index row has been corroborated by nothing.
+ */
 function isRecordProvenanceClaim(claim: EvidenceClaimInput): boolean {
+  const role = (claim.claimRole ?? '').trim().toLowerCase();
+  if (role.length > 0) return role === CLAIM_ROLE_RECORD_INDEX;
   return RECORD_PROVENANCE_PREDICATES.has((claim.predicate ?? '').trim().toLowerCase());
 }
 

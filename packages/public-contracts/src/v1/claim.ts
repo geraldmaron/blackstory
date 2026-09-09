@@ -18,6 +18,10 @@ import { z } from 'zod';
 import { boundedArray, idString, nonEmptyText } from '../internal/primitives.js';
 import { citationV1Schema } from './citation.js';
 
+export const CLAIM_ROLES = ['record_index', 'evidence'] as const;
+export const claimRoleV1Schema = z.enum(CLAIM_ROLES);
+export type ClaimRoleV1 = (typeof CLAIM_ROLES)[number];
+
 export const CONFIDENCE_LEVELS = ['high', 'medium', 'low'] as const;
 export const confidenceLevelSchema = z.enum(CONFIDENCE_LEVELS);
 export type ConfidenceLevelV1 = (typeof CONFIDENCE_LEVELS)[number];
@@ -70,6 +74,10 @@ export const claimV1Schema = z.object({
    * rollup (no supporting/contradicting-evidence counts, those are ranking-adjacent internal
    * signals). Matches `PublicClaimView.independentLineageCount`. */
   independentLineageCount: z.number().int().min(0).max(100_000).optional(),
+  /** Whether the claim is the record's own index row or evidence about its subject. The record
+   * tier excludes `record_index` from corroboration; a record cannot corroborate itself. Optional
+   * because claims published before the role existed do not carry it. */
+  claimRole: claimRoleV1Schema.optional(),
   dispute: claimDisputeV1Schema.optional(),
   revisionHistory: boundedArray(claimRevisionEntryV1Schema, 200).optional(),
   retraction: claimRetractionV1Schema.optional(),

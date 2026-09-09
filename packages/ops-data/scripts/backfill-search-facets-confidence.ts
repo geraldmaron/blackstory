@@ -64,16 +64,21 @@ const CITED_LINEAGE_COUNT = `(
 /**
  * Lineages allowed to corroborate. Mirrors `corroboratingLineageCount` in
  * `@repo/public-contracts/evidence`: Wikipedia carries a claim but never corroborates one, and a
- * record's own index row (the predicates `incremental-publish.ts` synthesises from the landscape
- * row and cites to its canonical URL) is provenance, not a second opinion.
+ * record's own index row is provenance, not a second opinion. The row states its own role in
+ * `claimRole`; the predicate list is the bridge for claims published before that field existed
+ * and comes out with its TypeScript twin (repo-6qjv0).
  */
 const CORROBORATING_LINEAGE_COUNT = `(
   select count(distinct ${LINEAGE_KEY})
   from jsonb_array_elements(${CLAIMS}) claim
   where coalesce(btrim(claim->>'citationSource'), '') <> ''
     and ${LINEAGE_KEY} <> 'wikipedia'
-    and lower(btrim(coalesce(claim->>'predicate', '')))
-        not in ('listing', 'significant for', 'documented_site')
+    and case
+          when coalesce(btrim(claim->>'claimRole'), '') <> ''
+            then lower(btrim(claim->>'claimRole')) <> 'record_index'
+          else lower(btrim(coalesce(claim->>'predicate', '')))
+               not in ('listing', 'significant for', 'documented_site')
+        end
 )`;
 
 const STRONGEST_TIER = `

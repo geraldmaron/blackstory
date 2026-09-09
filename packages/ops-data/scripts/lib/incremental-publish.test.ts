@@ -667,7 +667,8 @@ test('buildReleaseSourceFromLandscape cites the evidence documents an enriched r
   const nomination = entry!.claims!.find((claim) => claim.predicate === 'source states');
   assert.ok(nomination, 'expected a claim citing the nomination form');
   assert.equal(nomination!.object, 'the hall served as the social center of the Black community');
-  assert.equal(nomination!.confidenceLevel, 'high', 'tier1 is authoritative');
+  assert.equal(nomination!.confidenceLevel, 'high', 'a government record is authoritative');
+  assert.equal(nomination!.claimRole, 'evidence', 'a document read is evidence, not provenance');
   assert.equal(nomination!.citationLabel, 'National Register nomination — Example Hall');
 
   // Match on the parsed host, not a substring of the URL. `includes('en.wikipedia.org')` also
@@ -680,7 +681,11 @@ test('buildReleaseSourceFromLandscape cites the evidence documents an enriched r
   );
   assert.equal(nomination!.predicate, 'source states');
   assert.ok(wiki);
-  assert.equal(wiki!.confidenceLevel, 'medium', 'tier2 corroborates, it does not authorize');
+  // Not 'medium'. Wikipedia does not corroborate at all — `claim-corroborate` puts a Wikipedia
+  // claim at `low`, and the record tier drops its lineage from the corroborating count outright.
+  // The old expectation here said "tier2 corroborates", which is the belief that carried 335
+  // records to grade A (repo-goyut, repo-hqwt9).
+  assert.equal(wiki!.confidenceLevel, 'low', 'Wikipedia carries a claim, it does not corroborate');
 });
 
 test('evidence citations never duplicate a document already cited', () => {

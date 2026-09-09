@@ -167,6 +167,44 @@ test('recordConfidenceTier does not let a record corroborate itself with its own
   );
 });
 
+test('recordConfidenceTier believes claimRole over the predicate that stood in for it', () => {
+  // The predicate list only ever described one publisher's vocabulary. A lane that states the
+  // role outright must be graded by what it says, or the bridge silently mis-grades it.
+  const statedEvidence = [
+    // `listing` would read as provenance under the bridge; the role says otherwise.
+    {
+      confidenceLevel: 'high',
+      predicate: 'listing',
+      claimRole: 'evidence',
+      citationSource: 'catalog.archives.gov',
+    },
+    {
+      confidenceLevel: 'high',
+      predicate: 'source states',
+      claimRole: 'evidence',
+      citationSource: 'npgallery.nps.gov',
+    },
+  ];
+  assert.equal(recordConfidenceTier(statedEvidence), 'high');
+
+  // And the reverse: a predicate the bridge would wave through, stated as the index row.
+  const statedIndex = [
+    {
+      confidenceLevel: 'high',
+      predicate: 'source states',
+      claimRole: 'record_index',
+      citationSource: 'catalog.archives.gov',
+    },
+    {
+      confidenceLevel: 'high',
+      predicate: 'source states',
+      claimRole: 'evidence',
+      citationSource: 'npgallery.nps.gov',
+    },
+  ];
+  assert.equal(recordConfidenceTier(statedIndex), 'medium');
+});
+
 test('recordConfidenceTier does not let one publisher corroborate itself', () => {
   // Four spellings of Wikipedia are one lineage, not four sources.
   assert.equal(

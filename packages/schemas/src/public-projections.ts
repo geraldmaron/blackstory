@@ -158,6 +158,12 @@ export const publicClaimProjectionSchema = z.object({
   citationHref: z.string().url().optional(),
   citationLabel: z.string().min(1),
   independentLineageCount: z.number().int().nonnegative().optional(),
+  /**
+   * Whether the claim is the record's own index row or evidence about its subject. Optional
+   * because claims published before the role existed do not carry it; the record tier falls back
+   * to the predicate for those (repo-6qjv0).
+   */
+  claimRole: z.enum(['record_index', 'evidence']).optional(),
 });
 export type PublicClaimProjectionDoc = z.infer<typeof publicClaimProjectionSchema>;
 

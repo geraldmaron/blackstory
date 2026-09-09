@@ -43,6 +43,7 @@ export type PublicClaimView = {
   readonly citationHref?: string;
   readonly citationLabel: string;
   readonly independentLineageCount?: number;
+  readonly claimRole?: string;
   readonly disputed?: boolean;
   readonly disputeNote?: string;
 };
