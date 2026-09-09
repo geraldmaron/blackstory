@@ -158,6 +158,8 @@ export type EvidenceClaimInput = {
   readonly confidenceLevel?: string;
   readonly citationSource?: string;
   readonly citation?: { readonly source?: string };
+  /** What the claim asserts. Reveals whether it is the record's own index row. */
+  readonly predicate?: string;
 };
 
 /**
@@ -171,19 +173,74 @@ export type EvidenceClaimInput = {
  * Subdomain prefixes are dropped and the Wikipedia family collapses to one key, matching the
  * confidence engine's `lineageRootId` rule that syndicated copies count once.
  */
+export const WIKIPEDIA_LINEAGE_KEY = 'wikipedia';
+
 export function citationLineageKey(claim: EvidenceClaimInput): string | null {
   const raw = (claim.citationSource ?? claim.citation?.source ?? '').trim().toLowerCase();
   if (raw.length === 0) return null;
-  if (raw.includes('wikipedia')) return 'wikipedia';
+  if (raw.includes('wikipedia') || raw.includes('wikidata')) return WIKIPEDIA_LINEAGE_KEY;
   return raw.replace(/^(?:www|en|en\.m|m)\./u, '');
 }
 
-/** Distinct independent lineages cited across a record's claims. */
-export function independentLineageCount(claims: readonly EvidenceClaimInput[]): number {
+/**
+ * Predicates the landscape publisher synthesises from a record's own index row.
+ *
+ * `incremental-publish.ts` builds these from the registry fields of the row the record was
+ * created from — `refnum`, `listedDateSerial`, `areaOfSignificance`, or the summary — and cites
+ * them to that row's canonical URL. They are the record's provenance, not a second opinion about
+ * it, and a record cited to its own index row has been corroborated by nothing.
+ *
+ * The projection carries no provenance flag, so the predicate is the surviving trace of the
+ * distinction the publisher already makes between the claims it synthesised and the documents it
+ * read. Every other predicate in the archive asserts something about the subject and can
+ * corroborate. repo-6jizv tracks marking this at publish time instead of inferring it here.
+ */
+const RECORD_PROVENANCE_PREDICATES: ReadonlySet<string> = new Set([
+  'listing',
+  'significant for',
+  'documented_site',
+]);
+
+/** True when a claim is the record's own index row rather than evidence about its subject. */
+function isRecordProvenanceClaim(claim: EvidenceClaimInput): boolean {
+  return RECORD_PROVENANCE_PREDICATES.has((claim.predicate ?? '').trim().toLowerCase());
+}
+
+/**
+ * Distinct lineages cited anywhere on the record, provenance and Wikipedia included.
+ *
+ * This answers whether anyone assessed the record at all, which is a different question to
+ * whether it is corroborated. A record cited only to Wikipedia has been assessed, and so is
+ * graded rather than reported `unrated`.
+ */
+export function citedLineageCount(claims: readonly EvidenceClaimInput[]): number {
   const lineages = new Set<string>();
   for (const claim of claims) {
     const key = citationLineageKey(claim);
     if (key !== null) lineages.add(key);
+  }
+  return lineages.size;
+}
+
+/**
+ * Distinct lineages that are allowed to corroborate the record.
+ *
+ * Two exclusions. Neither is invented here, and neither can be expressed by the host string
+ * alone, which is why counting hosts kept overstating the archive:
+ *
+ * - Wikipedia may carry a claim and may never corroborate one. `claim-corroborate` lists
+ *   counting it as the second lineage under Never, and `isWikipediaHost` already keeps it out of
+ *   every corroboration path on the ingest side. It reached grade A on 335 records here.
+ * - A record's own index row is not a source about the record. Counting it let 784 records reach
+ *   grade A on a single federal listing served by two agencies: the NARA catalog entry the record
+ *   was seeded from, and the NPS nomination form carrying that same reference number.
+ */
+export function corroboratingLineageCount(claims: readonly EvidenceClaimInput[]): number {
+  const lineages = new Set<string>();
+  for (const claim of claims) {
+    if (isRecordProvenanceClaim(claim)) continue;
+    const key = citationLineageKey(claim);
+    if (key !== null && key !== WIKIPEDIA_LINEAGE_KEY) lineages.add(key);
   }
   return lineages.size;
 }
@@ -212,14 +269,21 @@ function strongestClaimTier(claims: readonly EvidenceClaimInput[]): ConfidenceTi
  * `lineageIndependence` and cannot clear the 0.75 publish threshold; this is the same rule
  * applied at the level a reader actually sees.
  *
+ * Counting citation hosts was still too generous, because two of them are not second opinions:
+ * Wikipedia, which may carry a claim but never corroborate one, and the record's own index row.
+ * `corroboratingLineageCount` excludes both, which is what separates the lineages that can
+ * support a grade from the lineages that merely exist. Grade A is 572 records under this rule,
+ * from 1,807 when any two hosts counted (repo-goyut, repo-6jizv).
+ *
  * A record with no citations is `unrated`, never `low` — nobody assessed it, which is not the
- * same as assessing it poorly.
+ * same as assessing it poorly. That test uses `citedLineageCount`, so a record carrying only
+ * Wikipedia or only its index row is graded, and graded low, rather than reported unassessed.
  */
 export function recordConfidenceTier(claims: readonly EvidenceClaimInput[]): ConfidenceTier {
   const strongest = strongestClaimTier(claims);
   if (strongest === 'unrated') return 'unrated';
-  if (independentLineageCount(claims) === 0) return 'unrated';
-  if (independentLineageCount(claims) > 1) return strongest;
-  // One lineage: a single publisher, uncorroborated. Step down one grade.
+  if (citedLineageCount(claims) === 0) return 'unrated';
+  if (corroboratingLineageCount(claims) > 1) return strongest;
+  // At most one lineage that can corroborate. Step down one grade.
   return strongest === 'high' ? 'medium' : 'low';
 }

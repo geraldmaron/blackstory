@@ -54,17 +54,40 @@ const CITATION_SETS: readonly (readonly (string | undefined)[])[] = [
   [undefined, 'npgallery.nps.gov'],
 ];
 
-type FlatClaim = { readonly confidenceLevel?: string; readonly citationSource?: string };
+/**
+ * Predicates that decide whether a claim is the record's own index row or evidence about its
+ * subject. The first three are the provenance set both implementations exclude from
+ * corroboration; the rest must not be treated as provenance.
+ */
+const PREDICATES = [
+  undefined,
+  'listing',
+  'significant for',
+  'documented_site',
+  'source states',
+  'was lynched',
+] as const;
+
+type FlatClaim = {
+  readonly confidenceLevel?: string;
+  readonly citationSource?: string;
+  readonly predicate?: string;
+};
 
 function claimsFor(
   level: string | undefined,
   sources: readonly (string | undefined)[],
+  predicate: string | undefined,
 ): FlatClaim[] {
+  const base = {
+    ...(level !== undefined ? { confidenceLevel: level } : {}),
+    ...(predicate !== undefined ? { predicate } : {}),
+  };
   if (sources.length === 0) {
-    return level === undefined ? [] : [{ confidenceLevel: level }];
+    return level === undefined && predicate === undefined ? [] : [base];
   }
   return sources.map((source) => ({
-    ...(level !== undefined ? { confidenceLevel: level } : {}),
+    ...base,
     ...(source !== undefined ? { citationSource: source } : {}),
   }));
 }
@@ -74,18 +97,22 @@ describe('evidence · the record tier rule does not drift between its two implem
     let compared = 0;
     for (const level of LEVELS) {
       for (const sources of CITATION_SETS) {
-        const claims = claimsFor(level, sources);
-        const label = `level=${String(level)} sources=[${sources.map(String).join(', ')}]`;
-        assert.equal(
-          recordConfidenceTier(claims),
-          highestClaimConfidenceTier(claims),
-          `public-contracts and domain disagree for ${label}`,
-        );
-        compared += 1;
+        for (const predicate of PREDICATES) {
+          const claims = claimsFor(level, sources, predicate);
+          const label =
+            `level=${String(level)} predicate=${String(predicate)} ` +
+            `sources=[${sources.map(String).join(', ')}]`;
+          assert.equal(
+            recordConfidenceTier(claims),
+            highestClaimConfidenceTier(claims),
+            `public-contracts and domain disagree for ${label}`,
+          );
+          compared += 1;
+        }
       }
     }
     // A corpus that silently emptied would pass every assertion above.
-    assert.equal(compared, LEVELS.length * CITATION_SETS.length);
+    assert.equal(compared, LEVELS.length * CITATION_SETS.length * PREDICATES.length);
   });
 
   it('agrees on mixed-strength records, where the cap and the maximum pull apart', () => {
@@ -103,6 +130,34 @@ describe('evidence · the record tier rule does not drift between its two implem
         { confidenceLevel: 'low', citationSource: 'britannica.com' },
       ],
       [{ confidenceLevel: 'high' }, { citationSource: 'npgallery.nps.gov' }],
+      // The NRHP shape: index row, the nomination form it points at, and a Wikipedia mention.
+      [
+        { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
+        {
+          confidenceLevel: 'high',
+          predicate: 'significant for',
+          citationSource: 'catalog.archives.gov',
+        },
+        {
+          confidenceLevel: 'high',
+          predicate: 'source states',
+          citationSource: 'npgallery.nps.gov',
+        },
+        {
+          confidenceLevel: 'medium',
+          predicate: 'source states',
+          citationSource: 'en.wikipedia.org',
+        },
+      ],
+      [
+        { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
+        {
+          confidenceLevel: 'high',
+          predicate: 'source states',
+          citationSource: 'npgallery.nps.gov',
+        },
+        { confidenceLevel: 'high', predicate: 'source states', citationSource: 'blackpast.org' },
+      ],
     ];
     for (const claims of mixed) {
       assert.equal(
