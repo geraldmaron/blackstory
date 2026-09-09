@@ -11,6 +11,9 @@ import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
+// The room moved out of the route file: Next lets a page export only its own known members,
+// and `/invention/{slug}` renders the same room.
+const roomSource = readFileSync(join(here, 'EntityRecordRoom.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'EntityRoomSections.tsx'), 'utf8');
 const placeSource = readFileSync(
   join(here, '../../../components/patterns/RecordPlacePreview.tsx'),
@@ -24,8 +27,9 @@ const mediaSource = readFileSync(
 test('standable records 308 to /place; non-standable records still render here', () => {
   assert.match(pageSource, /permanentRedirect\(publicRecordHref/);
   assert.match(pageSource, /canStandHere/);
-  assert.match(pageSource, /<Room/);
+  assert.match(roomSource, /<Room/);
   assert.doesNotMatch(pageSource, /getSharedPublicEntities|listPublicEntityViews\(/);
+  assert.doesNotMatch(roomSource, /getSharedPublicEntities|listPublicEntityViews\(/);
 });
 
 test('a beat renders only when the record has that content', () => {
@@ -78,14 +82,29 @@ test('entity map fail-closed: the place block still makes its point with no plat
 });
 
 test('entity page renders visit handoff for geo-anchored records', () => {
-  assert.match(pageSource, /RecordVisitBlock/);
-  assert.match(pageSource, /buildEntityAnatomyInputs/);
-  assert.match(pageSource, /whereLabel/);
-  assert.match(pageSource, /shouldShowVisitBlock/);
-  assert.match(pageSource, /placeAdvisories/);
-  assert.match(pageSource, /claims: entity\.claims/);
-  assert.match(pageSource, /MapsExternalLink/);
-  assert.match(pageSource, /linkWhereToMaps|whereMapsHref|showVisit/);
+  assert.match(roomSource, /RecordVisitBlock/);
+  assert.match(roomSource, /buildEntityAnatomyInputs/);
+  assert.match(roomSource, /whereLabel/);
+  assert.match(roomSource, /shouldShowVisitBlock/);
+  assert.match(roomSource, /placeAdvisories/);
+  assert.match(roomSource, /claims: entity\.claims/);
+  assert.match(roomSource, /MapsExternalLink/);
+  assert.match(roomSource, /linkWhereToMaps|whereMapsHref|showVisit/);
+});
+
+test('the record room is shared with the invention family, not copied', () => {
+  // An invention needs a room that carries an inventor, a patent receipt and an impact beat.
+  // Rendering a thinner page there would trade one misrepresentation for another.
+  assert.match(roomSource, /export async function EntityRecordRoom/);
+  assert.match(pageSource, /EntityRecordRoom\(\{ entity \}\)/);
+  const inventionSource = readFileSync(join(here, '../../invention/[slug]/page.tsx'), 'utf8');
+  assert.match(inventionSource, /EntityRecordRoom\(\{ entity \}\)/);
+  assert.match(inventionSource, /familyForKind/);
+});
+
+test('impact renders as its own beat and collapses when absent', () => {
+  assert.match(sectionsSource, /entity\.impactStatement \?/);
+  assert.match(sectionsSource, /What it changed/);
 });
 
 test('entity column renders archived Internet Archive sources when cited', () => {

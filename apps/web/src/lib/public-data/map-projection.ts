@@ -84,6 +84,7 @@ export type PublicProjectionInput = {
   readonly sensitivityClass?: string;
   readonly topicTags?: readonly string[];
   readonly historicalContext?: string;
+  readonly impactStatement?: string;
   readonly extendedNarrative?: string;
   readonly primaryImage?: {
     readonly url: string;
@@ -403,6 +404,15 @@ export function mapProjectionToPublicEntityView(
      * disclosed once, in the record's own "Still being researched" list.
      */
     historicalContext: projection.historicalContext ?? '',
+    /**
+     * Optional, unlike historicalContext: the impact beat collapses when absent rather than
+     * printing a heading over nothing. CONTENT_EXPECTATIONS requires it for law, case and
+     * invention, so an empty one on those kinds is a research gap the audit reports, not a
+     * rendering decision to paper over here.
+     */
+    ...(projection.impactStatement !== undefined && projection.impactStatement.trim().length > 0
+      ? { impactStatement: sanitizePublicProseText(projection.impactStatement) }
+      : {}),
     ...(projection.extendedNarrative !== undefined
       ? { extendedNarrative: sanitizePublicProseText(projection.extendedNarrative) }
       : {}),

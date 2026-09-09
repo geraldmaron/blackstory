@@ -345,6 +345,37 @@ export function EntityRoomSections({
         </section>
       ) : null}
 
+      {/*
+        What followed from the record, as its own beat rather than a paragraph buried in context.
+        `historicalContext` answers "what was going on around this"; impact answers "what changed
+        because of it", and on an invention that is the question a reader actually arrives with.
+        The beat collapses when the statement is absent, so a record that has not been researched
+        to that bar does not print a heading over nothing.
+      */}
+      {entity.impactStatement ? (
+        <section className="ds-record-beat" aria-labelledby="impact-heading">
+          <RecordBeatHead
+            id="impact-heading"
+            index={nextIndex()}
+            icon="context"
+            title="What it changed"
+          />
+          <div className="ds-room-prose">
+            {entity.impactStatement
+              .split(/\n\s*\n/)
+              .filter((paragraph) => paragraph.trim().length > 0)
+              .map((paragraph, index) => (
+                <LinkedProse
+                  key={`impact-${index}`}
+                  text={paragraph}
+                  skipEntityIds={[entity.id]}
+                  catalog={entityLinkCatalog}
+                />
+              ))}
+          </div>
+        </section>
+      ) : null}
+
       {entity.extendedNarrative ? (
         <section className="ds-record-beat" aria-labelledby="further-heading">
           <RecordBeatHead

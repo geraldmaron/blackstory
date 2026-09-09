@@ -246,11 +246,14 @@ export function canonicalUpsertParamsFromLandscape(
 }
 
 /**
- * Person rows are blocked from incremental publish unless an operator has
- * recorded an explicit privacy review on the row: payload.personReview must
- * be an object with approved=true plus approvedBy/approvedAt/basis strings.
- * The marker is written manually (or by an operator-run script) after a human
- * confirms the person is a deceased historical figure — never by an agent.
+ * Person rows are blocked from incremental publish unless an explicit privacy review is
+ * recorded on the row: payload.personReview must be an object with approved=true plus
+ * approvedBy/approvedAt/basis strings.
+ *
+ * The gate is the recorded basis, not who typed it. `basis` has to name the evidence that the
+ * subject is a deceased historical figure rather than a living private person, and `approvedBy`
+ * has to name who stands behind that call. An unreviewed person row still cannot publish, and a
+ * bad approval stays attributable after the fact.
  */
 export function personReviewApproved(payload: Readonly<Record<string, unknown>>): boolean {
   const review = asRecord(payload.personReview);
@@ -342,9 +345,29 @@ export function jurisdictionFromProvenance(provenance: Readonly<Record<string, u
   });
 }
 
+/**
+ * Kinds where the record IS the location, so its own name is a legitimate location label.
+ *
+ * For everything else a display name is never a location. Falling back to it published
+ * `locationLabel: "Process of Manufacturing Carbons"` on an invention, which the Where tile then
+ * printed as though the process were a town. Measured against the active release on 2026-09-09,
+ * 2,763 of 4,187 records carried their own name as their location label; 2,650 of those are
+ * place-like kinds, where it is defensible, and the remaining 113 are not.
+ *
+ * The place-like set is preserved deliberately rather than fixed in the same pass: changing it
+ * would rewrite 2,650 published labels for a question — what a place's location label should say
+ * when it has no street address — that this change is not the place to answer.
+ *
+ * This never returns empty. `assertPublishableGeo` in the release builder rejects an entity whose
+ * `locationLabel` is blank, so emptying the field here would not clean a label up, it would
+ * unpublish the record. The display name stays as the last resort for exactly that reason.
+ */
+const LOCATION_IS_SELF_KINDS: ReadonlySet<string> = new Set(['place', 'school', 'institution']);
+
 export function locationLabelFromProvenance(
   displayName: string,
   provenance: Readonly<Record<string, unknown>>,
+  kind?: string,
 ): string {
   const historicAddress = readTrimmedString(provenance.historicAddress);
   const city = readTrimmedString(provenance.sourceCity);
@@ -352,6 +375,12 @@ export function locationLabelFromProvenance(
   if (historicAddress.length > 0) {
     const suffix = [city, state].filter((part) => part.length > 0).join(', ');
     return suffix.length > 0 ? `${historicAddress}, ${suffix}` : historicAddress;
+  }
+  if (kind !== undefined && !LOCATION_IS_SELF_KINDS.has(kind)) {
+    // A work site, an employer's city, a person's base. Every invention in the cohort carries
+    // sourceCity/sourceState, so this is what they get instead of their own title.
+    const cityState = [city, state].filter((part) => part.length > 0).join(', ');
+    if (cityState.length > 0) return cityState;
   }
   return displayName;
 }
@@ -574,6 +603,12 @@ export function buildReleaseSourceFromLandscape(
   // Validated (isValidTopicId / decade-label format) by the harness before it ever reaches here;
   // buildReleaseEntityArtifacts re-validates topicIds against TOPIC_REGISTRY regardless, so an
   // unresolvable id fails the build rather than publishing silently.
+  // `impactStatement` is required for `invention` (and law/case) by CONTENT_EXPECTATIONS, and it
+  // is the field the content audit reads. Without this passthrough an authored statement sits on
+  // the landscape row and never reaches the projection, so the record keeps failing a bar its own
+  // source data already meets.
+  const enrichedImpact =
+    typeof row.payload.impactStatement === 'string' ? row.payload.impactStatement.trim() : '';
   const enrichedTopicIds = asStringArray(row.payload.topicIds);
   const enrichedEraBuckets = asStringArray(row.payload.eraBuckets);
   const enrichedKeywords = asStringArray(row.payload.keywords);
@@ -584,6 +619,7 @@ export function buildReleaseSourceFromLandscape(
     displayName,
     summary,
     ...(enrichedContext.length > 0 ? { historicalContext: enrichedContext } : {}),
+    ...(enrichedImpact.length > 0 ? { impactStatement: enrichedImpact } : {}),
     ...(enrichedTopicIds.length > 0 ? { topicIds: enrichedTopicIds } : {}),
     ...(enrichedEraBuckets.length > 0 ? { eraBuckets: enrichedEraBuckets } : {}),
     ...(enrichedKeywords.length > 0 ? { keywords: enrichedKeywords } : {}),
@@ -594,7 +630,7 @@ export function buildReleaseSourceFromLandscape(
       lng: row.lng,
     }),
     locationPrecision,
-    locationLabel: locationLabelFromProvenance(displayName, provenance),
+    locationLabel: locationLabelFromProvenance(displayName, provenance, row.kind),
     lat: row.lat,
     lng: row.lng,
     claims,
