@@ -645,6 +645,43 @@ test("highestClaimConfidenceTier excludes Wikipedia and the record's own index r
   );
 });
 
+test('highestClaimConfidenceTier believes claimRole over the predicate bridge', () => {
+  assert.equal(
+    highestClaimConfidenceTier([
+      {
+        confidenceLevel: 'high',
+        predicate: 'listing',
+        claimRole: 'evidence',
+        citationSource: 'catalog.archives.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        predicate: 'source states',
+        claimRole: 'evidence',
+        citationSource: 'npgallery.nps.gov',
+      },
+    ]),
+    'high',
+  );
+  assert.equal(
+    highestClaimConfidenceTier([
+      {
+        confidenceLevel: 'high',
+        predicate: 'source states',
+        claimRole: 'record_index',
+        citationSource: 'catalog.archives.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        predicate: 'source states',
+        claimRole: 'evidence',
+        citationSource: 'npgallery.nps.gov',
+      },
+    ]),
+    'medium',
+  );
+});
+
 test('buildReleaseEntityArtifacts: every published location precision is a controlled public tier', () => {
   const rawPrecisions = [
     'site',

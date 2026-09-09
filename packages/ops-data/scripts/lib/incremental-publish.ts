@@ -20,7 +20,7 @@ import {
   findTemplateSummarySignature,
 } from '@repo/domain';
 import { SUMMARY_MIN_CHARS, SUMMARY_MAX_CHARS } from './entity-enrichment-llm.ts';
-import { computeClaimConfidence } from '../lib/confidence.ts';
+import { computeClaimConfidence, confidenceLevelForSource } from '../lib/confidence.ts';
 import { lintPublishStatus, type PublishStatusLintReport } from './publish-status-linter.ts';
 import { buildNrhpListingFactObject, buildNrhpSignificanceObject } from './nrhp-area-labels.ts';
 
@@ -482,10 +482,11 @@ export function buildReleaseSourceFromLandscape(
                   ? (row.payload.listedDateSerial as string | null)
                   : undefined,
             }),
-            confidenceLevel: 'high',
+            confidenceLevel: confidenceLevelForSource(canonicalUrl),
             citationSource: hostname,
             citationHref: canonicalUrl,
             citationLabel: hostname,
+            claimRole: 'record_index',
           },
           {
             predicate: 'significant for',
@@ -495,20 +496,22 @@ export function buildReleaseSourceFromLandscape(
                   ? row.payload.areaOfSignificance
                   : undefined,
             }),
-            confidenceLevel: 'high',
+            confidenceLevel: confidenceLevelForSource(canonicalUrl),
             citationSource: hostname,
             citationHref: canonicalUrl,
             citationLabel: hostname,
+            claimRole: 'record_index',
           },
         ]
       : [
           {
             predicate: 'documented_site',
             object: summary,
-            confidenceLevel: 'high',
+            confidenceLevel: confidenceLevelForSource(canonicalUrl),
             citationSource: hostname,
             citationHref: canonicalUrl,
             citationLabel: hostname,
+            claimRole: 'record_index',
           },
         ];
 
@@ -549,13 +552,14 @@ export function buildReleaseSourceFromLandscape(
     evidenceClaims.push({
       predicate: 'source states',
       object: quote,
-      // tier2 (Wikipedia and similar) is corroborating, not authoritative; tier1 (the nomination
-      // form, a government record) is. Publishing both at 'high' would erase that distinction in
-      // the confidence floor and in what a reader is told about the evidence.
-      confidenceLevel: raw.sourceTier === 'tier1' ? 'high' : 'medium',
+      // Graded by what the document is, not by which sweep found it. The binary this replaced
+      // never emitted `low`, so a Wikipedia page and a state archive's finding aid shipped as the
+      // same `medium` and the meter had two values to render three segments with (repo-hqwt9).
+      confidenceLevel: confidenceLevelForSource(sourceUrl),
       citationSource: evidenceHost,
       citationHref: sourceUrl,
       citationLabel: label,
+      claimRole: 'evidence',
     });
   }
   claims.push(...evidenceClaims);

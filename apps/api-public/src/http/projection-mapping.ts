@@ -151,6 +151,7 @@ function mapClaims(claims: readonly PublicClaimProjectionDoc[] | undefined): Cla
     ...(claim.independentLineageCount !== undefined
       ? { independentLineageCount: claim.independentLineageCount }
       : {}),
+    ...(claim.claimRole !== undefined ? { claimRole: claim.claimRole } : {}),
   }));
 }
 

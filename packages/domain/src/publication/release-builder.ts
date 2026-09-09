@@ -79,6 +79,8 @@ export type ReleaseSourceClaim = {
   readonly citationHref?: string;
   readonly citationLabel: string;
   readonly independentLineageCount?: number;
+  /** `record_index` for a claim built from the record's own index row; `evidence` otherwise. */
+  readonly claimRole?: ClaimRole;
 };
 
 export type ReleaseSourceRelatedEntry = {
@@ -138,6 +140,7 @@ export type ReleaseClaimProjection = {
   readonly citationHref?: string;
   readonly citationLabel: string;
   readonly independentLineageCount?: number;
+  readonly claimRole?: ClaimRole;
 };
 
 export type ReleaseResearchCoverage = 'minimal' | 'partial' | 'substantial';
@@ -280,16 +283,43 @@ export type ReleaseConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
  */
 const WIKIPEDIA_LINEAGE_KEY = 'wikipedia';
 
+/** Whether a claim is the record's own index row or evidence about its subject. */
+export type ClaimRole = 'record_index' | 'evidence';
+
+export const CLAIM_ROLE_RECORD_INDEX: ClaimRole = 'record_index';
+
 /**
- * Predicates the landscape publisher synthesises from a record's own index row, which are the
- * record's provenance rather than a second opinion about it. Mirrors
- * `RECORD_PROVENANCE_PREDICATES` in `@repo/public-contracts/evidence`.
+ * Bridge for claims published before `claimRole` existed. Mirrors
+ * `RECORD_PROVENANCE_PREDICATES` in `@repo/public-contracts/evidence`, and comes out with it
+ * once no published claim is missing the role (repo-8dmey).
  */
 const RECORD_PROVENANCE_PREDICATES: ReadonlySet<string> = new Set([
   'listing',
   'significant for',
   'documented_site',
 ]);
+
+/**
+ * The role a claim published before `claimRole` existed would have been given.
+ *
+ * Exported so the one-off migration that stamps the field onto already-published claims uses
+ * this rule rather than restating it in SQL, which is how the tier rule ended up with three
+ * copies in the first place.
+ */
+export function claimRoleForPredicate(predicate: string | undefined): ClaimRole {
+  return RECORD_PROVENANCE_PREDICATES.has((predicate ?? '').trim().toLowerCase())
+    ? 'record_index'
+    : 'evidence';
+}
+
+function isRecordIndexClaim(claim: {
+  readonly predicate?: string;
+  readonly claimRole?: string;
+}): boolean {
+  const role = (claim.claimRole ?? '').trim().toLowerCase();
+  if (role.length > 0) return role === CLAIM_ROLE_RECORD_INDEX;
+  return claimRoleForPredicate(claim.predicate) === CLAIM_ROLE_RECORD_INDEX;
+}
 
 function claimLineageKey(citationSource: string | undefined): string | null {
   const raw = (citationSource ?? '').trim().toLowerCase();
@@ -322,6 +352,7 @@ export function highestClaimConfidenceTier(
     readonly confidenceLevel?: string;
     readonly citationSource?: string;
     readonly predicate?: string;
+    readonly claimRole?: string;
   }[],
 ): ReleaseConfidenceTier {
   const strongest: ReleaseConfidenceTier = claims.some((claim) => claim.confidenceLevel === 'high')
@@ -341,7 +372,7 @@ export function highestClaimConfidenceTier(
     if (key === null) continue;
     cited.add(key);
     if (key === WIKIPEDIA_LINEAGE_KEY) continue;
-    if (RECORD_PROVENANCE_PREDICATES.has((claim.predicate ?? '').trim().toLowerCase())) continue;
+    if (isRecordIndexClaim(claim)) continue;
     corroborating.add(key);
   }
   if (cited.size === 0) return 'unrated';
@@ -415,6 +446,7 @@ function buildClaimProjections(entry: ReleaseSourceEntity): readonly ReleaseClai
     ...(claim.independentLineageCount !== undefined
       ? { independentLineageCount: claim.independentLineageCount }
       : {}),
+    ...(claim.claimRole !== undefined ? { claimRole: claim.claimRole } : {}),
   }));
 }
 

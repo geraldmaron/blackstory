@@ -48,6 +48,29 @@ function hostMatches(hostname: string, domain: string): boolean {
   return hostname === domain || hostname.endsWith(`.${domain}`);
 }
 
+/**
+ * The display register a claim earns from its source alone.
+ *
+ * This replaces the publisher's binary `sourceTier === 'tier1' ? 'high' : 'medium'`, which never
+ * emitted `low` and so rendered a three-segment meter from a two-value vocabulary: 10,572 of
+ * 11,555 published claims were `high` and none were `low` (repo-hqwt9).
+ *
+ * - A government or military record is the archive's primary evidence. `high`.
+ * - Wikipedia and Wikidata are bridge sources. `claim-corroborate` puts a Wikipedia-only claim at
+ *   `low` outright, and 2,049 published claims cited Wikipedia at `high`.
+ * - Everything else is `medium`, INCLUDING hosts the classifier cannot place. That is deliberate
+ *   and conservative in the honest direction: the unclassified tail here is dominated by state
+ *   historical societies, state encyclopedias, NPR and the Smithsonian, and calling those `low`
+ *   would understate real evidence far more often than `medium` overstates it. Promoting the
+ *   deserving ones to `high` is per-host editorial review, the same dated operator review that
+ *   built `REPUTABLE_SECONDARY_HOST_SUFFIXES`, and is not a thing to infer in code.
+ */
+export function confidenceLevelForSource(url: string | undefined): 'high' | 'medium' | 'low' {
+  if (url === undefined || url.trim().length === 0) return 'low';
+  if (isWikipediaHost(url)) return 'low';
+  return classifySourceForConfidence(url) === 'government_record' ? 'high' : 'medium';
+}
+
 /** Maps a source URL to the product constitution's sourceClassifications vocabulary. */
 export function classifySourceForConfidence(url: string): string {
   let hostname: string;

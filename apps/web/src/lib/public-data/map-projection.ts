@@ -52,6 +52,7 @@ export type PublicProjectionInput = {
     readonly citationHref?: string;
     readonly citationLabel: string;
     readonly independentLineageCount?: number;
+    readonly claimRole?: string;
   }[];
   readonly status?: string;
   /** Time-scoped lifecycle designations that back `status` when the release builder shipped them. */
@@ -146,6 +147,9 @@ function mapClaims(claims: PublicProjectionInput['claims']): PublicEntityView['c
     ...(claim.independentLineageCount !== undefined
       ? { independentLineageCount: claim.independentLineageCount }
       : {}),
+    // Load-bearing for the record tier: dropping it here would silently downgrade the rule to
+    // its predicate fallback on every entity the site renders.
+    ...(claim.claimRole !== undefined ? { claimRole: claim.claimRole } : {}),
   }));
 }
 
