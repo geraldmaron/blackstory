@@ -186,3 +186,38 @@ export async function fetchBraveWebSearchBudgeted(
   const candidates = await fetchBraveWebSearch(input);
   return { candidates, budgetDecision };
 }
+
+export type FetchSearxngWebSearchBudgetedInput = FetchSearxngWebSearchInput & {
+  readonly budgetPolicy: WebSearchCampaignBudgetPolicy;
+  readonly budgetState: WebSearchBudgetState;
+  readonly evaluateDailyBudget: DailyBudgetEvaluator;
+};
+
+export type FetchSearxngWebSearchBudgetedResult = {
+  readonly candidates: readonly WebSearchCandidateRecord[];
+  readonly budgetDecision: WebSearchBudgetDecision;
+};
+
+/**
+ * The SearXNG half of the budget guard, which was missing.
+ *
+ * `provider-decision.ts` chose SearXNG, and only Brave had a budgeted wrapper — so the guard could
+ * not be applied to the provider the project actually uses, whatever a caller intended. Same
+ * fail-closed shape: the budget is evaluated before any network call and a denial throws.
+ */
+export async function fetchSearxngWebSearchBudgeted(
+  input: FetchSearxngWebSearchBudgetedInput,
+): Promise<FetchSearxngWebSearchBudgetedResult> {
+  const budgetDecision = evaluateWebSearchQueryBudget({
+    policy: input.budgetPolicy,
+    state: input.budgetState,
+    evaluateDailyBudget: input.evaluateDailyBudget,
+  });
+  if (!budgetDecision.allowed) {
+    throw new Error(
+      `Web search query budget denied: ${budgetDecision.reason ?? 'budget exceeded'}`,
+    );
+  }
+  const candidates = await fetchSearxngWebSearch(input);
+  return { candidates, budgetDecision };
+}

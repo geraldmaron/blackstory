@@ -77,11 +77,26 @@ export {
   fetchBraveWebSearch,
   fetchBraveWebSearchBudgeted,
   fetchSearxngWebSearch,
+  fetchSearxngWebSearchBudgeted,
   type FetchBraveWebSearchInput,
   type FetchBraveWebSearchBudgetedInput,
   type FetchBraveWebSearchBudgetedResult,
   type FetchSearxngWebSearchInput,
+  type FetchSearxngWebSearchBudgetedInput,
+  type FetchSearxngWebSearchBudgetedResult,
 } from './fetch-search.js';
+
+export {
+  runRoutedWebSearch,
+  describeRoutedSearch,
+  type RoutedSearchHttpClient,
+  type RoutedSearchQuery,
+  type RoutedSearchBudget,
+  type RunRoutedWebSearchInput,
+  type RoutedWebSearchResult,
+  type SearchLead,
+  type SkippedQuery,
+} from './routed-search.js';
 
 export {
   ingestWebSearchCandidatesThroughPipeline,

@@ -771,6 +771,7 @@ export type {
 } from './audit/index.js';
 
 export * from './adapters/index.js';
+export { dedupeUrlsByPage, urlDedupeKey } from './urls/canonical-key.js';
 export * from './submissions/index.js';
 export * from './external-data-sources.js';
 export * from './banned-books/index.js';
