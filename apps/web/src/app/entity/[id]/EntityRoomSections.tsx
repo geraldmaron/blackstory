@@ -70,6 +70,11 @@ export function recordSectionIndex({
   if (entity.historicalContext.trim().length > 0) {
     sections.push({ id: 'context-heading', label: 'The history here' });
   }
+  // Must stay in the same order as the beats rendered below: the rail numbers what the document
+  // numbers, and a beat missing here shifts every number after it out of agreement with the page.
+  if (entity.impactStatement) {
+    sections.push({ id: 'impact-heading', label: 'What it changed' });
+  }
   if (entity.extendedNarrative) {
     sections.push({ id: 'further-heading', label: 'Further reading' });
   }
@@ -339,6 +344,37 @@ export function EntityRoomSections({
                           neighborHref({ displayName: entry.label, kind: 'place' }),
                       }
                     : {})}
+                />
+              ))}
+          </div>
+        </section>
+      ) : null}
+
+      {/*
+        What followed from the record, as its own beat rather than a paragraph buried in context.
+        `historicalContext` answers "what was going on around this"; impact answers "what changed
+        because of it", and on an invention that is the question a reader actually arrives with.
+        The beat collapses when the statement is absent, so a record that has not been researched
+        to that bar does not print a heading over nothing.
+      */}
+      {entity.impactStatement ? (
+        <section className="ds-record-beat" aria-labelledby="impact-heading">
+          <RecordBeatHead
+            id="impact-heading"
+            index={nextIndex()}
+            icon="context"
+            title="What it changed"
+          />
+          <div className="ds-room-prose">
+            {entity.impactStatement
+              .split(/\n\s*\n/)
+              .filter((paragraph) => paragraph.trim().length > 0)
+              .map((paragraph, index) => (
+                <LinkedProse
+                  key={`impact-${index}`}
+                  text={paragraph}
+                  skipEntityIds={[entity.id]}
+                  catalog={entityLinkCatalog}
                 />
               ))}
           </div>

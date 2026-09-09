@@ -77,6 +77,7 @@ const SURFACE_CLASS_PREFIXES: readonly (readonly [string, SurfaceClass])[] = [
   // status page. Classifying them promised chrome for two URLs that 404 (SP-19, repo-92n2.19).
   ['/stories/', 'reading'],
   ['/place/', 'record'],
+  ['/invention/', 'record'],
   ['/entity/', 'record'],
   ['/books/', 'record'],
   ['/law/', 'record'],

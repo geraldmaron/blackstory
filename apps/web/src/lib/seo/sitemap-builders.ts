@@ -5,7 +5,7 @@
 import type { MetadataRoute } from 'next';
 import { crawlableDestinations } from '../nav/destination-registry';
 import { canStandHere } from '../place/public-place-path';
-import { placeHrefForEntity, placeSlugCollisionCounts } from '../place/place-slug';
+import { publicRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
 
 export type SitemapEntityEntry = {
   readonly id: string;
@@ -63,14 +63,19 @@ function recordPath(entity: SitemapEntityEntry, collisions: ReadonlyMap<string, 
         : {}),
     })
   ) {
-    return placeHrefForEntity({ id: entity.id, displayName }, collisions);
+    return publicRecordHref(
+      { id: entity.id, displayName, ...(entity.kind !== undefined ? { kind: entity.kind } : {}) },
+      collisions,
+    );
   }
   return `/entity/${entity.id}`;
 }
 
 /**
  * Builds sitemap entries for static routes plus record pages from the active release catalog.
- * Standable records emit `/place/{slug}`; the rest keep `/entity/{id}`.
+ * Standable records emit their family address — `/place/{slug}`, or `/invention/{slug}` for an
+ * invention; the rest keep `/entity/{id}`. The sitemap never advertises a URL that redirects, so
+ * an invention must be listed in its own family, not at the place address that now 308s away.
  */
 export function buildPublicSitemapEntries(
   options: BuildSitemapOptions = {},

@@ -67,7 +67,9 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
   if (path === '/corrections') {
     return CORRECTIONS_PAGE_PARAM_ALLOWLIST;
   }
-  if (path.startsWith('/place/')) {
+  // `/invention/` is the same reading room as `/place/` and carries the same DiscoveryState,
+  // so it must keep the same arrival keys or the edge strips return state before the page runs.
+  if (path.startsWith('/place/') || path.startsWith('/invention/')) {
     return PLACE_PAGE_PARAM_ALLOWLIST;
   }
   return [];

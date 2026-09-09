@@ -1,7 +1,7 @@
 /**
- * `/entity/{id}` renders the record room for non-holding records, and 308s to
- * `/place/{slug}` only when that place address actually holds. Column rules for
- * `EntityRoomSections` still apply on first paint.
+ * `/entity/{id}` renders the record room for non-holding records, and 308s to the record's
+ * own family (`/place/{slug}`, or `/invention/{slug}` for an invention) only when that address
+ * actually holds. Column rules for `EntityRoomSections` still apply on first paint.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -11,6 +11,9 @@ import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
+// The room moved out of the route file: Next lets a page export only its own known members,
+// and `/invention/{slug}` renders the same room.
+const roomSource = readFileSync(join(here, 'EntityRecordRoom.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'EntityRoomSections.tsx'), 'utf8');
 const placeSource = readFileSync(
   join(here, '../../../components/patterns/RecordPlacePreview.tsx'),
@@ -22,10 +25,11 @@ const mediaSource = readFileSync(
 );
 
 test('standable records 308 to /place; non-standable records still render here', () => {
-  assert.match(pageSource, /permanentRedirect\(placeHrefForEntity/);
+  assert.match(pageSource, /permanentRedirect\(publicRecordHref/);
   assert.match(pageSource, /canStandHere/);
-  assert.match(pageSource, /<Room/);
+  assert.match(roomSource, /<Room/);
   assert.doesNotMatch(pageSource, /getSharedPublicEntities|listPublicEntityViews\(/);
+  assert.doesNotMatch(roomSource, /getSharedPublicEntities|listPublicEntityViews\(/);
 });
 
 test('a beat renders only when the record has that content', () => {
@@ -78,14 +82,48 @@ test('entity map fail-closed: the place block still makes its point with no plat
 });
 
 test('entity page renders visit handoff for geo-anchored records', () => {
-  assert.match(pageSource, /RecordVisitBlock/);
-  assert.match(pageSource, /buildEntityAnatomyInputs/);
-  assert.match(pageSource, /whereLabel/);
-  assert.match(pageSource, /shouldShowVisitBlock/);
-  assert.match(pageSource, /placeAdvisories/);
-  assert.match(pageSource, /claims: entity\.claims/);
-  assert.match(pageSource, /MapsExternalLink/);
-  assert.match(pageSource, /linkWhereToMaps|whereMapsHref|showVisit/);
+  assert.match(roomSource, /RecordVisitBlock/);
+  assert.match(roomSource, /buildEntityAnatomyInputs/);
+  assert.match(roomSource, /whereLabel/);
+  assert.match(roomSource, /shouldShowVisitBlock/);
+  assert.match(roomSource, /placeAdvisories/);
+  assert.match(roomSource, /claims: entity\.claims/);
+  assert.match(roomSource, /MapsExternalLink/);
+  assert.match(roomSource, /linkWhereToMaps|whereMapsHref|showVisit/);
+});
+
+test('the record room is shared with the invention family, not copied', () => {
+  // An invention needs a room that carries an inventor, a patent receipt and an impact beat.
+  // Rendering a thinner page there would trade one misrepresentation for another.
+  assert.match(roomSource, /export async function EntityRecordRoom/);
+  assert.match(pageSource, /EntityRecordRoom\(\{ entity \}\)/);
+  const inventionSource = readFileSync(join(here, '../../invention/[slug]/page.tsx'), 'utf8');
+  assert.match(inventionSource, /EntityRecordRoom\(\{ entity \}\)/);
+  assert.match(inventionSource, /familyForKind/);
+});
+
+test('impact renders as its own beat and collapses when absent', () => {
+  assert.match(sectionsSource, /entity\.impactStatement \?/);
+  assert.match(sectionsSource, /What it changed/);
+});
+
+test('the rail numbers what the document numbers', () => {
+  // recordSectionIndex builds the "On this record" rail; the beats build the page. A beat present
+  // in one and missing from the other shifts every number after it, which is how the impact beat
+  // first shipped: the document read 01..05 and the rail read 01..04 for the same page.
+  const index = sectionsSource.slice(
+    sectionsSource.indexOf('export function recordSectionIndex'),
+    sectionsSource.indexOf('export function EntityRoomSections'),
+  );
+  const railOrder = [...index.matchAll(/label: (?:'([^']+)'|[^\n]*?'([^']+)')/g)]
+    .map((match) => match[1] ?? match[2])
+    .filter((label): label is string => label !== undefined);
+  const beatOrder = ['The history here', 'What it changed'];
+  assert.deepEqual(
+    railOrder.filter((label) => beatOrder.includes(label)),
+    beatOrder,
+    'impact follows context in the rail, as it does in the document',
+  );
 });
 
 test('entity column renders archived Internet Archive sources when cited', () => {

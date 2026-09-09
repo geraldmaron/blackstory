@@ -41,6 +41,21 @@ export function placeHref(displayName: string): string {
   return `/place/${publicPlaceSlug(displayName)}`;
 }
 
+/**
+ * Inventions address `/invention/{slug}`, not `/place/{slug}`.
+ *
+ * An invention is a `work`, not a stand: Latimer's carbon-manufacturing process happens at no
+ * coordinate a reader can walk to, and Banneker's clock is the case that keeps that honest. It
+ * rode the place family only because `canStandHere` admits anything that is not a person and
+ * carries a summary, which is a test for "not a living private person", not a test for "is a
+ * place". The slug rule is shared with Place so one published name resolves the same way in
+ * either family, and `/place/{slug}` permanently redirects any invention that still holds an
+ * indexed place address.
+ */
+export function inventionHref(displayName: string): string {
+  return `/invention/${publicPlaceSlug(displayName)}`;
+}
+
 /** Cookie set when a reader stands at a named place. Rooms no longer print that name as the site back. */
 export const STAND_COOKIE = 'bs-stand';
 
@@ -94,8 +109,9 @@ export function placePageHolds(input: {
 /**
  * Address a neighbor from the place door. People and statutes go to the named
  * rooms, not a fabricated place page and never `/entity/ent_…` for those kinds.
- * Standable neighbors keep `/place/{slug}`. Non-standable records with an id
- * open `/entity/{id}` so the constellation never invents a Place that 404s.
+ * Inventions go to their own family. Standable neighbors keep `/place/{slug}`.
+ * Non-standable records with an id open `/entity/{id}` so the constellation never
+ * invents a Place that 404s.
  */
 export function neighborHref(neighbor: {
   readonly displayName: string;
@@ -105,6 +121,7 @@ export function neighborHref(neighbor: {
 }): string {
   if (neighbor.kind === 'person') return '/memorial';
   if (neighbor.kind === 'law' || neighbor.kind === 'case') return '/law';
+  if (neighbor.kind === 'invention') return inventionHref(neighbor.displayName);
   if (neighbor.id !== undefined) {
     if (staysOffPublicMap({ displayName: neighbor.displayName })) {
       return `/entity/${neighbor.id}`;
@@ -140,8 +157,9 @@ export function isHoldingPlaceHref(href: string): boolean {
 
 /**
  * Walk from the home map. `/place/{slug}` only when that slug holds on the place
- * page. People and statutes go to those rooms. Everything else stays on the plate.
- * Never `/entity/…`, and never a slug invented from a catalog id or a published name.
+ * page. People, statutes and inventions go to those rooms. Everything else stays on
+ * the plate. Never `/entity/…`, and never a slug invented from a catalog id or a
+ * published name.
  */
 export function atlasWalkHref(input: {
   readonly displayName: string;
@@ -152,6 +170,9 @@ export function atlasWalkHref(input: {
   if (staysOffPublicMap(input)) return undefined;
   if (input.kind === 'person') return '/memorial';
   if (input.kind === 'law' || input.kind === 'case') return '/law';
+  // Before the invention family existed this fell through to `placePageHolds`, which is false
+  // for every invention, so an invention pin had no walk at all. Its record is the walk.
+  if (input.kind === 'invention') return inventionHref(input.displayName);
   if (
     !placePageHolds({
       displayName: input.displayName,

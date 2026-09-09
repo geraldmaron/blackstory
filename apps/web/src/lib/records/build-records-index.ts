@@ -35,7 +35,7 @@ import { resolveEntityEraBuckets } from '../map-experience/entity-era-facts';
 import { geoAnchorFor } from '../map-experience/entity-geo';
 import { mapListContinuityLabel } from '../discovery/continuity-label';
 import { canStandHere, staysOffPublicMap } from '../place/public-place-path';
-import { placeHrefForEntity, placeSlugCollisionCounts } from '../place/place-slug';
+import { publicRecordHref, placeSlugCollisionCounts } from '../place/place-slug';
 import {
   EVIDENCE_FLOORS,
   floorLabel,
@@ -346,7 +346,10 @@ function toFacts(entry: RecordsCatalogEntry, collisions: ReadonlyMap<string, num
       : {}),
   });
   const href = standable
-    ? placeHrefForEntity({ id: entry.id, displayName: entry.displayName }, collisions)
+    ? publicRecordHref(
+        { id: entry.id, displayName: entry.displayName, kind: entry.kind },
+        collisions,
+      )
     : `/entity/${entry.id}`;
 
   return {

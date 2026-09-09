@@ -120,28 +120,74 @@ const sensitivityClassSchema = z.enum([
   'enslaver_or_segregationist',
 ]);
 
-const relationshipTypeSchema = z.enum([
-  'located_at',
-  'occurred_at',
-  'attended',
-  'founded',
-  'employed_by',
-  'member_of',
-  'related_to',
-  'depicts',
-  'cites',
-  'governed_by',
-  'part_of',
-  'successor_of',
-  'caused',
-  'enabled',
-  'influenced',
-  'participated_in',
-  'overturned',
-  'commemorates',
-  'authored',
-  'other',
-]);
+/**
+ * The read side of the relationship vocabulary. Mirrors RELATIONSHIP_TYPES in
+ * `packages/domain-core/src/relationship.ts` and the `entity_relationships_relationship_type_check`
+ * constraint; @repo/schemas deliberately depends on nothing but zod, so the list is restated here
+ * rather than imported.
+ *
+ * `.catch('other')` is the important part, and it is here because this schema deleted 24 live
+ * records on 2026-09-09. Migration 20260908120000 widened the database constraint to admit the
+ * invention contribution predicates; this enum still held the 20 values it shipped with. The
+ * moment `invented` edges were written, `parseEntityProjection` failed for every entity that had
+ * one — Latimer, Morgan, Banneker and 21 others — and a record that fails to parse does not
+ * degrade, it 404s. Same class of bug as the summary ceiling documented below: a read-side check
+ * that unpublishes a record instead of flagging it.
+ *
+ * An unknown relationship type is now a display problem (`relationPhrase` falls back to generic
+ * wording), not a missing page. Adding a value here upgrades the wording; forgetting to costs
+ * nothing.
+ */
+const relationshipTypeSchema = z
+  .enum([
+    // Structural and biographical.
+    'located_at',
+    'occurred_at',
+    'attended',
+    'founded',
+    'employed_by',
+    'member_of',
+    'related_to',
+    'depicts',
+    'cites',
+    'governed_by',
+    'part_of',
+    'successor_of',
+    'served_as',
+    'succeeded',
+    'challenged_law',
+    'funded_by',
+    'published',
+    // Historical causation.
+    'caused',
+    'enabled',
+    'influenced',
+    'participated_in',
+    'overturned',
+    'commemorates',
+    'authored',
+    // Invention contribution.
+    'invented',
+    'co_invented',
+    'improved',
+    'developed',
+    'designed',
+    'led_development_of',
+    'built_on',
+    // Commercial and institutional context.
+    'commercialized',
+    'assigned_to',
+    'licensed_to',
+    'manufactured_by',
+    'demonstrated_at',
+    // The human network around the work.
+    'collaborated_with',
+    'mentored_by',
+    'litigated_with',
+    'documented_by',
+    'other',
+  ])
+  .catch('other');
 
 export const publicActiveReleaseSchema = z.object({
   releaseId: z.string().min(1),

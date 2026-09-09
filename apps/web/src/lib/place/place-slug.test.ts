@@ -6,11 +6,13 @@ import { describe, it } from 'node:test';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
 import { buildExploreMapSource } from '../map-experience/build-explore-map-source';
 import {
+  inventionHrefForEntity,
   isResolvablePlaceSlug,
   instrumentRecordHref,
   parsePlaceAddress,
   placeHrefForEntity,
   placeSlugCollisionCounts,
+  publicRecordHref,
 } from './place-slug';
 
 describe('place slug addresses', () => {
@@ -37,6 +39,50 @@ describe('place slug addresses', () => {
     const collisions = placeSlugCollisionCounts(entities);
     assert.equal(placeHrefForEntity(entities[0]!, collisions), '/place/union-school--ent_a');
     assert.equal(placeHrefForEntity(entities[2]!, collisions), '/place/unique-hall');
+  });
+
+  it('addresses an invention in its own family, not Place', () => {
+    const invention = {
+      id: 'inv_latimer_carbon_process',
+      displayName: 'Process of Manufacturing Carbons',
+      kind: 'invention',
+    };
+    assert.equal(
+      publicRecordHref(invention),
+      '/invention/process-of-manufacturing-carbons',
+      'an invention is a work, not a stand',
+    );
+    assert.equal(
+      instrumentRecordHref(invention),
+      '/invention/process-of-manufacturing-carbons',
+      'the invention branch runs ahead of canStandHere, which would admit it to Place',
+    );
+  });
+
+  it('keeps every non-invention kind on the place family', () => {
+    for (const kind of ['place', 'school', 'institution', 'organization', 'event']) {
+      assert.equal(
+        publicRecordHref({ id: 'ent_a', displayName: 'Union Hall', kind }),
+        '/place/union-hall',
+        `${kind} still addresses Place`,
+      );
+    }
+    assert.equal(publicRecordHref({ id: 'ent_a', displayName: 'Union Hall' }), '/place/union-hall');
+  });
+
+  it('disambiguates an invention on the shared collision map', () => {
+    const entities = [
+      { id: 'inv_a', displayName: 'Traffic Signal', kind: 'invention' },
+      { id: 'ent_b', displayName: 'Traffic Signal', kind: 'place' },
+    ];
+    const collisions = placeSlugCollisionCounts(entities);
+    // Collision counts stay shared across families: the slug resolver searches the whole
+    // release, so a name ambiguous anywhere is disambiguated in both families.
+    assert.equal(
+      inventionHrefForEntity(entities[0]!, collisions),
+      '/invention/traffic-signal--inv_a',
+    );
+    assert.equal(publicRecordHref(entities[1]!, collisions), '/place/traffic-signal--ent_b');
   });
 
   it('routes instrument deep links by kind', () => {

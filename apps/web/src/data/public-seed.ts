@@ -282,6 +282,11 @@ export type PublicEntityView = {
    * not new unsourced facts about this specific record (those live in `claims`). Guards against a
    * page reading as a generic biography unrelated to place/Black history. */
   readonly historicalContext: string;
+  /**
+   * What this record meant for Black Americans and what followed from it. Required for law,
+   * case and invention by CONTENT_EXPECTATIONS; absent elsewhere, and the beat collapses.
+   */
+  readonly impactStatement?: string;
   /** Optional multi-paragraph further reading; omit UI when absent. */
   readonly extendedNarrative?: string;
   /** Optional rights-cleared primary image; omit UI when absent. */
