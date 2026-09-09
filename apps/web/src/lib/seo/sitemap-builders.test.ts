@@ -198,14 +198,18 @@ test('an invention is advertised in its own family, never at a place address', (
       },
     ],
   });
-  const urls = entries.map((entry) => entry.url);
+  // A Set, not `urls.includes(...)`: array-includes is an exact match, but CodeQL's
+  // incomplete-url-substring-sanitization rule cannot tell it from String.includes and reads it
+  // as a substring test on a URL. `has` says exactly what the assertion means and is not
+  // ambiguous to either reader.
+  const urls = new Set(entries.map((entry) => entry.url));
   assert.ok(
-    urls.includes('https://blackbook.example/invention/process-of-manufacturing-carbons'),
+    urls.has('https://blackbook.example/invention/process-of-manufacturing-carbons'),
     'the invention is crawlable in its own family',
   );
   assert.ok(
-    !urls.some((url) => url.includes('/place/process-of-manufacturing-carbons')),
+    ![...urls].some((url) => new URL(url).pathname.startsWith('/place/process-of-manufacturing')),
     'the sitemap must not advertise the place address, which now permanently redirects',
   );
-  assert.ok(urls.includes('https://blackbook.example/place/fifteenth-street-presbyterian-church'));
+  assert.ok(urls.has('https://blackbook.example/place/fifteenth-street-presbyterian-church'));
 });
