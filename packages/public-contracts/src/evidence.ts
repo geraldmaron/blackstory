@@ -193,7 +193,7 @@ export const CLAIM_ROLE_RECORD_INDEX = 'record_index';
  * This is the bridge for claims published before `claimRole` existed, not the rule. The publisher
  * now states the role outright, because inferring provenance from a predicate vocabulary means a
  * new lane with different predicates is silently mis-graded. Once no published claim is missing
- * `claimRole` this set and its branch come out (repo-6qjv0).
+ * `claimRole` this set and its branch come out (repo-8dmey).
  */
 const RECORD_PROVENANCE_PREDICATES: ReadonlySet<string> = new Set([
   'listing',

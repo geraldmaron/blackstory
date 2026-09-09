@@ -66,7 +66,7 @@ const CITED_LINEAGE_COUNT = `(
  * `@repo/public-contracts/evidence`: Wikipedia carries a claim but never corroborates one, and a
  * record's own index row is provenance, not a second opinion. The row states its own role in
  * `claimRole`; the predicate list is the bridge for claims published before that field existed
- * and comes out with its TypeScript twin (repo-6qjv0).
+ * and comes out with its TypeScript twin (repo-8dmey).
  */
 const CORROBORATING_LINEAGE_COUNT = `(
   select count(distinct ${LINEAGE_KEY})

@@ -161,7 +161,7 @@ export const publicClaimProjectionSchema = z.object({
   /**
    * Whether the claim is the record's own index row or evidence about its subject. Optional
    * because claims published before the role existed do not carry it; the record tier falls back
-   * to the predicate for those (repo-6qjv0).
+   * to the predicate for those (repo-8dmey).
    */
   claimRole: z.enum(['record_index', 'evidence']).optional(),
 });

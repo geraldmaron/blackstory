@@ -1074,7 +1074,7 @@ export const publicClaimProjectionSchema = z.object({
   citationLabel: z.string().min(1),
   independentLineageCount: z.number().int().nonnegative().optional(),
   /** Whether the claim is the record's own index row or evidence about its subject. Optional
-   * because claims published before the role existed do not carry it (repo-6qjv0). */
+   * because claims published before the role existed do not carry it (repo-8dmey). */
   claimRole: z.enum(['record_index', 'evidence']).optional(),
 });
 

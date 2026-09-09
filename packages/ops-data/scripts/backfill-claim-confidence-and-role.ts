@@ -8,7 +8,7 @@
  *   `low`: 10,572 claims `high`, 983 `medium`, none `low`. A three-segment reader-facing meter
  *   was being rendered from a two-value vocabulary, and 2,049 claims cited Wikipedia at `high`
  *   when `claim-corroborate` puts a Wikipedia claim at `low`.
- * - **repo-6qjv0.** Whether a claim is the record's own index row was inferred from its
+ * - **repo-8dmey.** Whether a claim is the record's own index row was inferred from its
  *   predicate. The publisher now states it in `claimRole`; this stamps the same answer onto the
  *   existing rows so the inference can eventually come out.
  *

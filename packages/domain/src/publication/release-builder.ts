@@ -291,7 +291,7 @@ export const CLAIM_ROLE_RECORD_INDEX: ClaimRole = 'record_index';
 /**
  * Bridge for claims published before `claimRole` existed. Mirrors
  * `RECORD_PROVENANCE_PREDICATES` in `@repo/public-contracts/evidence`, and comes out with it
- * once no published claim is missing the role (repo-6qjv0).
+ * once no published claim is missing the role (repo-8dmey).
  */
 const RECORD_PROVENANCE_PREDICATES: ReadonlySet<string> = new Set([
   'listing',
