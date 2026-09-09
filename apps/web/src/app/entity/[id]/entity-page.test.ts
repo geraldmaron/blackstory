@@ -107,6 +107,25 @@ test('impact renders as its own beat and collapses when absent', () => {
   assert.match(sectionsSource, /What it changed/);
 });
 
+test('the rail numbers what the document numbers', () => {
+  // recordSectionIndex builds the "On this record" rail; the beats build the page. A beat present
+  // in one and missing from the other shifts every number after it, which is how the impact beat
+  // first shipped: the document read 01..05 and the rail read 01..04 for the same page.
+  const index = sectionsSource.slice(
+    sectionsSource.indexOf('export function recordSectionIndex'),
+    sectionsSource.indexOf('export function EntityRoomSections'),
+  );
+  const railOrder = [...index.matchAll(/label: (?:'([^']+)'|[^\n]*?'([^']+)')/g)]
+    .map((match) => match[1] ?? match[2])
+    .filter((label): label is string => label !== undefined);
+  const beatOrder = ['The history here', 'What it changed'];
+  assert.deepEqual(
+    railOrder.filter((label) => beatOrder.includes(label)),
+    beatOrder,
+    'impact follows context in the rail, as it does in the document',
+  );
+});
+
 test('entity column renders archived Internet Archive sources when cited', () => {
   assert.match(sectionsSource, /RecordArchiveSources/);
   assert.match(sectionsSource, /resolveInternetArchiveSources/);

@@ -70,6 +70,11 @@ export function recordSectionIndex({
   if (entity.historicalContext.trim().length > 0) {
     sections.push({ id: 'context-heading', label: 'The history here' });
   }
+  // Must stay in the same order as the beats rendered below: the rail numbers what the document
+  // numbers, and a beat missing here shifts every number after it out of agreement with the page.
+  if (entity.impactStatement) {
+    sections.push({ id: 'impact-heading', label: 'What it changed' });
+  }
   if (entity.extendedNarrative) {
     sections.push({ id: 'further-heading', label: 'Further reading' });
   }
