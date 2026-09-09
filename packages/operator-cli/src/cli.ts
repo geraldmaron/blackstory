@@ -125,13 +125,9 @@ import {
   type AdjudicatedRelationship,
 } from '@repo/research-harness';
 import { assertPostgresOpsDataSource, editorialCatalogFromError } from './ops-data-source-gate.js';
-import {
-  buildBraveWebSearchUrl,
-  parseBraveSearchResponse,
-  buildSearxngSearchUrl,
-  parseSearxngSearchResponse,
-  type WebSearchRawResult,
-} from '@repo/domain';
+import { describeRoutedSearch } from '@repo/domain';
+import { runSearchQueries, type ResolvedSearchProvider } from './search-routing.js';
+import { gatherSourceSnippetsFromUrls } from './research-source-gather.js';
 
 export type CliDependencies = {
   readonly store?: AtomicStore;
@@ -147,6 +143,12 @@ export type CliDependencies = {
   readonly createLiveStore?: () => Promise<AtomicStore>;
   /** Overrides the real DNS/HTTP dependencies `research-intake` passes to `runQuickAddFetch`. */
   readonly fetchDependencies?: SafeFetchDependencies;
+  /**
+   * Overrides provider resolution for the verbs that search. Supplying it skips the environment
+   * reads and the client construction, which is what makes a search-bearing verb testable without
+   * a SearXNG instance.
+   */
+  readonly searchProvider?: ResolvedSearchProvider;
 };
 
 type Flags = {
@@ -1215,54 +1217,73 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         }
 
         if (connectorList.includes('web_search')) {
+          // A search result is a LEAD, and the enrichment bridge turns a subject's `cites` into
+          // citationUrl and its `description` into the text claims are drawn from. So a lead must
+          // be fetched through safe-fetch before it can become a subject at all: only a page that
+          // answered becomes one, carrying the text that was actually read and the URL that
+          // actually served it.
           const searchQuery = `${theme} ${metro} historical sites`;
           try {
-            const searxngBaseUrl = process.env.SEARXNG_BASE_URL;
-            const braveApiKey = process.env.BRAVE_SEARCH_API_KEY;
-            let rawResults: readonly WebSearchRawResult[];
-            let servedBy: 'searxng' | 'brave' | 'mock';
-            if (searxngBaseUrl) {
-              // Project's chosen web-search provider (see provider-decision.ts): self-hosted
-              // SearXNG on Corsair, preferred over commercial Brave/Exa keys.
-              const res = await fetch(
-                buildSearxngSearchUrl({ baseUrl: searxngBaseUrl, query: searchQuery }),
-              );
-              const json: unknown = await res.json();
-              rawResults = parseSearxngSearchResponse(json).results;
-              servedBy = 'searxng';
-            } else if (braveApiKey) {
-              const res = await fetch(buildBraveWebSearchUrl({ query: searchQuery }), {
-                headers: { 'X-Subscription-Token': braveApiKey },
-              });
-              const json: unknown = await res.json();
-              rawResults = parseBraveSearchResponse(json).results;
-              servedBy = 'brave';
-            } else {
-              rawResults = [
-                {
-                  title: 'Mock Discovery Site',
-                  description: `Mock finding for ${searchQuery}`,
-                  url: 'https://example.com/mock',
-                },
-              ];
-              servedBy = 'mock';
-            }
-            reportHarnessProgress({
-              stage: 'web_search.servedBy',
-              servedBy,
-              resultCount: rawResults.length,
+            const searchResult = await runSearchQueries({
+              queries: [{ query: searchQuery, seeking: 'historic site page' }],
+              environment: process.env,
+              executedAt: new Date().toISOString(),
+              maxLeadsPerQuery: 5,
+              ...(deps.searchProvider !== undefined ? { resolved: deps.searchProvider } : {}),
             });
-            const webSubjects: HarnessRawSubject[] = rawResults
-              .slice(0, 5)
-              .map((result, index) => ({
-                id: `web-${index}`,
-                connectorKind: 'web_search',
-                title: result.title ?? 'Unknown Page',
-                description: result.description ?? '',
-                cites: [result.url],
-                rawRecord: { ...result, servedBy },
-              }));
-            rawSubjects = [...rawSubjects, ...webSubjects];
+            if (!searchResult.available) {
+              reportHarnessProgress({
+                stage: 'web_search.unavailable',
+                reason: searchResult.reason,
+              });
+            } else {
+              reportHarnessProgress({
+                stage: 'web_search.leads',
+                servedBy: searchResult.provider,
+                leadCount: searchResult.leads.length,
+                duplicatePagesDropped: searchResult.duplicateLeadsDropped,
+                skipped: searchResult.skipped.length,
+                budgetEnforced: searchResult.budgetEnforced,
+                note: describeRoutedSearch(searchResult),
+              });
+              // The gather step is the boundary. Anything a lead promised and the page does not
+              // deliver is dropped here rather than downstream.
+              const gathered = await gatherSourceSnippetsFromUrls(
+                searchResult.leads.map((lead) => lead.url),
+                deps.fetchDependencies !== undefined
+                  ? { dependencies: deps.fetchDependencies }
+                  : {},
+              );
+              const leadByUrl = new Map(searchResult.leads.map((lead) => [lead.url, lead]));
+              reportHarnessProgress({
+                stage: 'web_search.fetched',
+                leadCount: searchResult.leads.length,
+                fetchedCount: gathered.length,
+                droppedUnfetchable: searchResult.leads.length - gathered.length,
+              });
+              const webSubjects: HarnessRawSubject[] = gathered.map((snippet, index) => {
+                const lead = leadByUrl.get(snippet.url);
+                const citedUrl = snippet.finalUrl ?? snippet.url;
+                return {
+                  id: `web-${index}`,
+                  connectorKind: 'web_search',
+                  title: lead?.title ?? 'Unknown Page',
+                  // Retrieved page text, not the engine's blurb.
+                  description: snippet.excerpt,
+                  // The URL that actually answered, after any redirect.
+                  cites: [citedUrl],
+                  rawRecord: {
+                    servedBy: searchResult.provider,
+                    queryText: lead?.queryText ?? searchQuery,
+                    leadUrl: snippet.url,
+                    fetchedUrl: citedUrl,
+                    // Kept separate and labelled so nothing downstream can read it as page text.
+                    engineDescription: lead?.engineDescription ?? null,
+                  },
+                };
+              });
+              rawSubjects = [...rawSubjects, ...webSubjects];
+            }
           } catch (err) {
             stderr(`Warning: Web search failed: ${String(err)}\n`);
           }
