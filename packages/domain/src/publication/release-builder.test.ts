@@ -70,6 +70,43 @@ test('inferNotabilityCriterionFromClaim recognizes a documented "first" claim', 
   );
 });
 
+test('an invention falls back to documented_contribution, never documented_site', () => {
+  // The old fallback rested on "every record is, by construction, a documented site". That
+  // stopped being true when `invention` became a kind, and the rubric text it selected told a
+  // reader that Latimer's carbon-manufacturing process was a sit-in lunch counter's kind of thing.
+  assert.equal(
+    inferNotabilityCriterionFromClaim(
+      'documented_contribution',
+      'US 252,386, titled "Process of Manufacturing Carbons," names Lewis H. Latimer.',
+      'invention',
+    ),
+    'documented_contribution',
+  );
+  // Every other kind is untouched.
+  assert.equal(
+    inferNotabilityCriterionFromClaim(
+      'documented_site',
+      'A church that stood through it.',
+      'place',
+    ),
+    'documented_site',
+  );
+  assert.equal(
+    inferNotabilityCriterionFromClaim('documented_site', 'A church that stood through it.'),
+    'documented_site',
+  );
+  // A keyword match still wins over the kind fallback: Jennings's grant is the earliest known US
+  // patent to a Black inventor, and that is a documented first whatever the record's kind.
+  assert.equal(
+    inferNotabilityCriterionFromClaim(
+      'documented_contribution',
+      'often cited as the first US patent issued to a Black inventor',
+      'invention',
+    ),
+    'first_to_do_x',
+  );
+});
+
 test('inferNotabilityCriterionFromClaim recognizes a landmark/register claim', () => {
   assert.equal(
     inferNotabilityCriterionFromClaim(

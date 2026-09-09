@@ -44,6 +44,8 @@ const NOTABILITY_COPY: Readonly<Record<string, string>> = {
     'The entity carries a documented landmark or National Register designation with a citable authority record.',
   documented_site:
     'The entity is a documented site of a historically significant event or practice with primary-source evidence tying the site to the event.',
+  documented_contribution:
+    'The entity is a documented contribution to a field — an invention, process, method, or design — evidenced by the grant that records it, or by contemporary accounts where no grant was available to its maker.',
   first_to_do_x:
     'The entity is documented as the first of its kind to accomplish a historically significant milestone.',
   community_anchor:

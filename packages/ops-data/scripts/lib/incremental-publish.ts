@@ -534,7 +534,11 @@ export function buildReleaseSourceFromLandscape(
         ]
       : [
           {
-            predicate: 'documented_site',
+            // The predicate is the lead of the inclusion note `buildNotabilityBasisNote` writes
+            // ("Documented site <summary>."), so an invention published under `documented_site`
+            // asserted in its own basis note that it was a place. An invention is a contribution;
+            // `buildReleaseNotabilityBasis` reads the same word back as its criterion.
+            predicate: row.kind === 'invention' ? 'documented_contribution' : 'documented_site',
             object: summary,
             confidenceLevel: confidenceLevelForSource(canonicalUrl),
             citationSource: hostname,

@@ -132,6 +132,7 @@ export const NOTABILITY_CRITERIA = [
   'court_precedent',
   'movement_significance',
   'documented_site',
+  'documented_contribution',
   'community_anchor',
   'only_or_oldest',
 ] as const;
@@ -186,6 +187,12 @@ export const NOTABILITY_RUBRIC: Readonly<Record<NotabilityCriterion, string>> = 
     'The entity is a documented site of a historically significant event or practice (a sit-in ' +
     'lunch counter, a Freedom School, a documented station on the Underground Railroad) with ' +
     'primary-source evidence tying the site to the event.',
+  documented_contribution:
+    'The entity is a documented contribution to a field — an invention, process, method, or ' +
+    'design — evidenced either by the grant that records it or, where the patent system was ' +
+    'closed to the person who made it, by contemporary accounts of the work itself. A patent is ' +
+    'a receipt, not the definition: Benjamin Banneker built a striking clock in the 1750s, and ' +
+    'no grant was available to him for it.',
   community_anchor:
     'The entity served as a long-standing, evidenced community anchor institution (a ' +
     'historically Black church, fraternal lodge, HBCU, mutual aid society) with a documented ' +
