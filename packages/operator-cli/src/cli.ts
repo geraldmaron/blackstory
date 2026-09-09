@@ -128,6 +128,7 @@ import { assertPostgresOpsDataSource, editorialCatalogFromError } from './ops-da
 import { describeRoutedSearch } from '@repo/domain';
 import { runSearchQueries, type ResolvedSearchProvider } from './search-routing.js';
 import { gatherSourceSnippetsFromUrls } from './research-source-gather.js';
+import { deriveSuggestedTitle } from './fetch.js';
 
 export type CliDependencies = {
   readonly store?: AtomicStore;
@@ -1261,24 +1262,27 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
                 fetchedCount: gathered.length,
                 droppedUnfetchable: searchResult.leads.length - gathered.length,
               });
+              // A subject is built from the FETCHED page and nothing else. The engine's title and
+              // blurb are its output rather than the document's, they carry no retrieval
+              // provenance, and this record is written to the run JSON and the progress file —
+              // which is persistence, whatever the storage-rights flag says. So neither string
+              // appears here, not even labelled: a label does not stop a write.
               const webSubjects: HarnessRawSubject[] = gathered.map((snippet, index) => {
                 const lead = leadByUrl.get(snippet.url);
                 const citedUrl = snippet.finalUrl ?? snippet.url;
                 return {
                   id: `web-${index}`,
                   connectorKind: 'web_search',
-                  title: lead?.title ?? 'Unknown Page',
-                  // Retrieved page text, not the engine's blurb.
+                  title: deriveSuggestedTitle(snippet.text),
                   description: snippet.excerpt,
                   // The URL that actually answered, after any redirect.
                   cites: [citedUrl],
                   rawRecord: {
                     servedBy: searchResult.provider,
+                    // Our own query, our own URLs. No engine prose.
                     queryText: lead?.queryText ?? searchQuery,
                     leadUrl: snippet.url,
                     fetchedUrl: citedUrl,
-                    // Kept separate and labelled so nothing downstream can read it as page text.
-                    engineDescription: lead?.engineDescription ?? null,
                   },
                 };
               });

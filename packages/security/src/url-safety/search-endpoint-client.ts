@@ -187,6 +187,27 @@ function normalizeOrigin(
   };
 }
 
+/**
+ * A loggable description of a configured base URL, with anything secret removed.
+ *
+ * Scheme, host and port only. Userinfo, query and fragment are exactly the parts that can carry a
+ * credential, and they are also the parts this module refuses — so an error about them must not
+ * reproduce them. An unparseable value is described by shape rather than content, because a string
+ * that failed to parse is also a string nobody has inspected.
+ */
+function describeBaseUrl(raw: string): string {
+  try {
+    const parsed = new URL(raw.trim());
+    const auth =
+      parsed.username !== '' || parsed.password !== '' ? ' with credentials removed' : '';
+    const query = parsed.search !== '' ? ' with a query string' : '';
+    const fragment = parsed.hash !== '' ? ' with a fragment' : '';
+    return `${parsed.protocol}//${parsed.hostname}${parsed.port ? `:${parsed.port}` : ''}${auth}${query}${fragment}`;
+  } catch {
+    return `an unparseable value of ${raw.trim().length} characters`;
+  }
+}
+
 function sameOrigin(left: NormalizedOrigin, right: NormalizedOrigin): boolean {
   return (
     left.protocol === right.protocol && left.hostname === right.hostname && left.port === right.port
@@ -232,14 +253,18 @@ export async function createOperatorEndpointClient(
   };
   const base = normalizeOrigin(input.baseUrl, 'base');
   if (!base.ok) {
+    // The raw value is never echoed. One of the reasons this rejects is that the URL carries
+    // credentials, and a message naming the reason while printing the password would put the
+    // password wherever the caller logs it — which for a cached rejection is every query.
     throw new OperatorEndpointError(
-      `Operator search endpoint base URL rejected: ${base.reason} (${input.baseUrl})`,
+      `Operator search endpoint base URL rejected: ${base.reason} (${describeBaseUrl(input.baseUrl)})`,
       base.reason,
     );
   }
   if (base.url.search !== '' || base.url.hash !== '') {
     throw new OperatorEndpointError(
-      `Operator search endpoint base URL must be an origin with no query or fragment: ${input.baseUrl}`,
+      'Operator search endpoint base URL must be an origin with no query or fragment: ' +
+        describeBaseUrl(input.baseUrl),
       'base_url_carries_query_or_fragment',
     );
   }
@@ -252,6 +277,16 @@ export async function createOperatorEndpointClient(
     try {
       const answers = await (input.resolveHost ?? nodeResolveHost)(hostname);
       addresses = [...new Set(answers.map((answer) => canonicalHostname(answer.address)))].sort();
+      // isPublicIpAddress returns false for anything that is not an IP, so a resolver answering
+      // with a name would pass the non-public check below and then become the pinned address.
+      // Fail closed on it instead: only a literal address can be pinned.
+      const notAnAddress = addresses.find((address) => isIP(address) === 0);
+      if (notAnAddress !== undefined) {
+        throw new OperatorEndpointError(
+          `Resolver returned "${notAnAddress}" for ${hostname}, which is not an IP address`,
+          'base_url_resolution_failed',
+        );
+      }
     } catch {
       addresses = [];
     }
@@ -350,7 +385,9 @@ function performRequest(input: {
         // SNI and Host stay the configured hostname even though the socket goes to the pinned
         // address, so a TLS-fronted instance still validates.
         servername: input.protocol === 'https:' ? input.hostname : undefined,
-        headers: { host: input.hostname, ...input.headers },
+        // Pinned Host last, so a caller-supplied `host` cannot override the origin this client
+        // is pinned to.
+        headers: { ...input.headers, host: input.hostname },
         timeout: input.limits.timeoutMs,
       },
       (response) => {

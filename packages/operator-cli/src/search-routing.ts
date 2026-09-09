@@ -30,8 +30,11 @@ import {
   type WebSearchProvider,
   type WebSearchProviderConfig,
 } from '@repo/domain';
-import { createOperatorEndpointClient, evaluateExternalUrl } from '@repo/security/url-safety';
-import { resolveAndPinDestination } from '@repo/security/url-safety';
+import {
+  createOperatorEndpointClient,
+  evaluateExternalUrl,
+  resolveAndPinDestination,
+} from '@repo/security/url-safety';
 
 const BRAVE_API_HOST = 'api.search.brave.com';
 const BRAVE_TIMEOUT_MS = 15_000;
@@ -79,6 +82,7 @@ const braveSearchClient: RoutedSearchHttpClient = async (request) => {
   if (!destination.allowed) {
     throw new Error(`Brave search URL rejected by safe-fetch DNS pinning: ${destination.reason}`);
   }
+  const allowedContentTypes = request.allowedContentTypes ?? ['application/json', 'text/json'];
   const target = new URL(destination.value.normalizedUrl);
   return new Promise((resolve, reject) => {
     const clientRequest = httpsRequest(
@@ -88,7 +92,8 @@ const braveSearchClient: RoutedSearchHttpClient = async (request) => {
         path: `${target.pathname}${target.search}`,
         method: 'GET',
         servername: destination.value.hostname,
-        headers: { host: destination.value.hostname, ...(request.headers ?? {}) },
+        // Pinned Host last: a caller-supplied `host` must not override the allowlisted one.
+        headers: { ...(request.headers ?? {}), host: destination.value.hostname },
         timeout: BRAVE_TIMEOUT_MS,
       },
       (response) => {
@@ -106,6 +111,19 @@ const braveSearchClient: RoutedSearchHttpClient = async (request) => {
           const headers: Record<string, string | undefined> = {};
           for (const [key, value] of Object.entries(response.headers)) {
             headers[key.toLowerCase()] = Array.isArray(value) ? value.join(', ') : value;
+          }
+          // The caller declares what it will accept; honour it rather than trusting the body to
+          // be what was asked for. wayback-http.ts and the operator-endpoint client both assert
+          // this, and a Brave error page served as HTML must not be parsed as a result set.
+          const essence = (headers['content-type'] ?? '').split(';', 1)[0]!.trim().toLowerCase();
+          if (essence === '' || !allowedContentTypes.some((c) => c.toLowerCase() === essence)) {
+            reject(
+              new Error(
+                `Brave search returned content-type "${headers['content-type'] ?? 'none'}"; ` +
+                  `expected one of ${allowedContentTypes.join(', ')}`,
+              ),
+            );
+            return;
           }
           resolve({
             status: response.statusCode ?? 0,

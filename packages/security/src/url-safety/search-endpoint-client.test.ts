@@ -118,14 +118,22 @@ test('refuses a base URL carrying a query or fragment, which would send every re
 
 test('accepts a base URL with a path, for a reverse-proxied instance', async () => {
   // A path is not part of an origin and buildSearxngSearchUrl appends to it, so /searxng is a
-  // legitimate base. The origin check must ignore the path on both sides.
-  const { client, origin } = await endpoint('http://127.0.0.1:8888/searxng');
-  assert.equal(origin, 'http://127.0.0.1:8888');
-  await assert.rejects(
-    () => client({ url: 'http://127.0.0.1:8888/searxng/search?q=x' }),
-    (error: unknown) =>
-      !(error instanceof OperatorEndpointError && error.reason === 'request_origin_mismatch'),
-    'a path under the configured origin must pass the origin check',
+  // legitimate base. The origin check must ignore the path on both sides — proved by the request
+  // arriving, rather than by it failing for some unrelated reason.
+  let seenPath: string | undefined;
+  await withLoopbackServer(
+    (request, response) => {
+      seenPath = request.url;
+      response.writeHead(200, { 'content-type': 'application/json' });
+      response.end('{"results":[]}');
+    },
+    async (baseUrl) => {
+      const { client, origin } = await endpoint(`${baseUrl}/searxng`);
+      assert.equal(origin, baseUrl);
+      const result = await client({ url: `${baseUrl}/searxng/search?q=x` });
+      assert.equal(result.status, 200);
+      assert.equal(seenPath, '/searxng/search?q=x');
+    },
   );
 });
 
@@ -179,35 +187,69 @@ test('the client refuses a request URL on any other origin', async () => {
   await rejects(() => client({ url: 'not a url' }), 'request_url_unparseable');
 });
 
-test('origin matching normalizes host case, trailing dot, brackets and implicit ports', async () => {
-  const { client } = await endpoint('http://localhost', resolvesTo('127.0.0.1'));
-  // Implicit port 80 on the base must equal an explicit :80 on the request, and vice versa.
-  const cases = [
-    'http://localhost/search?q=x',
-    'http://localhost:80/search?q=x',
-    'http://LOCALHOST/search?q=x',
-    'http://localhost./search?q=x',
-  ];
-  for (const url of cases) {
-    // Each of these is the SAME origin, so it gets past the origin check and fails later, at the
-    // socket — never with request_origin_mismatch.
-    await assert.rejects(
-      () => client({ url }),
-      (error: unknown) =>
-        !(error instanceof OperatorEndpointError && error.reason === 'request_origin_mismatch'),
-      `expected ${url} to pass the origin check`,
-    );
-  }
+test('host case and a trailing dot are the same origin, and the request reaches the server', async () => {
+  let hits = 0;
+  await withLoopbackServer(
+    (_request, response) => {
+      hits += 1;
+      response.writeHead(200, { 'content-type': 'application/json' });
+      response.end('{"results":[]}');
+    },
+    async (baseUrl) => {
+      const port = new URL(baseUrl).port;
+      // `localhost` resolves to the loopback address the server is on, so every spelling below is
+      // genuinely the same origin and must actually be fetched.
+      const { client } = await endpoint(`http://localhost:${port}`, resolvesTo('127.0.0.1'));
+      for (const url of [
+        `http://localhost:${port}/search?q=x`,
+        `http://LOCALHOST:${port}/search?q=x`,
+        `http://localhost.:${port}/search?q=x`,
+      ]) {
+        const result = await client({ url });
+        assert.equal(result.status, 200, `expected ${url} to reach the server`);
+      }
+      assert.equal(hits, 3);
+    },
+  );
+});
+
+test('an implicit default port equals an explicit one, and neither matches a different port', async () => {
+  // Binding port 80 is not available to a test, so this pins the decision by reason code: the two
+  // spellings of the default port must be interchangeable, and a non-default port must not match.
+  const { client, origin } = await endpoint('http://localhost', resolvesTo('127.0.0.1'));
+  assert.equal(origin, 'http://localhost');
+  // Same origin spelled with the explicit default port: refused only if the comparison is textual.
+  await rejects(
+    () => client({ url: 'http://localhost:8080/search?q=x' }),
+    'request_origin_mismatch',
+  );
+  // An explicit :80 against an implicit-80 base must NOT be an origin mismatch. Nothing listens on
+  // port 80 here, so the call still fails — but it must fail at the socket, never at the boundary.
+  await assert.rejects(
+    () => client({ url: 'http://localhost:80/search?q=x' }),
+    (error: unknown) =>
+      !(error instanceof OperatorEndpointError && error.reason === 'request_origin_mismatch'),
+    'explicit :80 must match an implicit-80 base',
+  );
 });
 
 test('an IPv6 base accepts the bracketed request form for the same address', async () => {
-  const { client, origin } = await endpoint('http://[::1]:8888');
-  assert.equal(origin, 'http://::1:8888');
-  await assert.rejects(
-    () => client({ url: 'http://[::1]:8888/search?q=x' }),
-    (error: unknown) =>
-      !(error instanceof OperatorEndpointError && error.reason === 'request_origin_mismatch'),
-    'bracketed IPv6 request must match an IPv6 base',
+  let hits = 0;
+  await withLoopbackServer(
+    (_request, response) => {
+      hits += 1;
+      response.writeHead(200, { 'content-type': 'application/json' });
+      response.end('{"results":[]}');
+    },
+    async (baseUrl) => {
+      const { client, origin } = await endpoint(baseUrl);
+      // The canonical form drops the brackets; the request may still carry them.
+      assert.equal(origin, baseUrl.replace('[', '').replace(']', ''));
+      const result = await client({ url: `${baseUrl}/search?q=x` });
+      assert.equal(result.status, 200);
+      assert.equal(hits, 1);
+    },
+    '::1',
   );
 });
 
@@ -218,13 +260,20 @@ test('limits are overridable and the defaults are the documented ones', async ()
     'application/json',
     'text/json',
   ]);
-  const { client } = await createOperatorEndpointClient({
-    baseUrl: LOOPBACK,
-    limits: { timeoutMs: 1 },
-  });
-  // Nothing is listening on the loopback port in test, so this fails at the socket rather than at
-  // the boundary — the point is only that a custom limit is accepted without changing the checks.
-  await assert.rejects(() => client({ url: `${LOOPBACK}/search?q=x` }));
+  // A custom timeout is proved against a server that accepts the connection and never answers,
+  // so the rejection can only come from the limit itself.
+  await withLoopbackServer(
+    () => {
+      /* never responds */
+    },
+    async (baseUrl) => {
+      const { client } = await createOperatorEndpointClient({
+        baseUrl,
+        limits: { timeoutMs: 50 },
+      });
+      await rejects(() => client({ url: `${baseUrl}/search?q=x` }), 'request_timeout');
+    },
+  );
 });
 
 /**
@@ -235,14 +284,21 @@ test('limits are overridable and the defaults are the documented ones', async ()
 async function withLoopbackServer<T>(
   handler: (request: IncomingMessage, response: ServerResponse) => void,
   run: (baseUrl: string) => Promise<T>,
+  host = '127.0.0.1',
 ): Promise<T> {
   const server = createServer(handler);
-  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  await new Promise<void>((resolve) => server.listen(0, host, resolve));
   const { port } = server.address() as AddressInfo;
+  // An ephemeral port, never a fixed one: a test that assumes a given port is free fails on any
+  // machine actually running the service, and this repository's own setup runs SearXNG on 8888.
+  const authority = host.includes(':') ? `[${host}]:${port}` : `${host}:${port}`;
   try {
-    return await run(`http://127.0.0.1:${port}`);
+    return await run(`http://${authority}`);
   } finally {
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    // Destroy idle sockets too, so a handler that never responded cannot hold close() open.
+    const closed = new Promise<void>((resolve) => server.close(() => resolve()));
+    server.closeAllConnections?.();
+    await closed;
   }
 }
 
@@ -393,6 +449,67 @@ test('the client makes exactly one request and never retries', async () => {
       const response = await client({ url: `${baseUrl}/search?q=x` });
       assert.equal(response.status, 503);
       assert.equal(requests, 1);
+    },
+  );
+});
+
+test('a credential in the configured base URL is never echoed into the error', async () => {
+  // This branch exists to REJECT a base URL carrying credentials, so its message must not
+  // reproduce them — corroborate-source caches the rejection and warns it once per query.
+  const error = await rejects(
+    () => endpoint('http://admin:sup3r-s3cret@127.0.0.1:8888'),
+    'base_url_carries_credentials',
+  );
+  assert.ok(!error.message.includes('sup3r-s3cret'), `password leaked: ${error.message}`);
+  assert.ok(!error.message.includes('admin'), `username leaked: ${error.message}`);
+  // It still has to be actionable.
+  assert.match(error.message, /credentials removed/u);
+  assert.match(error.message, /127\.0\.0\.1:8888/u);
+});
+
+test('a query string in the configured base URL is reported without its contents', async () => {
+  const error = await rejects(
+    () => endpoint('http://127.0.0.1:8888/?token=sup3r-s3cret'),
+    'base_url_carries_query_or_fragment',
+  );
+  assert.ok(!error.message.includes('sup3r-s3cret'), `query leaked: ${error.message}`);
+  assert.match(error.message, /with a query string/u);
+});
+
+test('an unparseable base URL is described by shape, not by content', async () => {
+  const error = await rejects(
+    () => endpoint('postgres://u:p@db/secretdb'),
+    'base_url_scheme_not_http',
+  );
+  assert.ok(!error.message.includes('secretdb'));
+  assert.ok(!error.message.includes('p@db'));
+});
+
+test('a resolver that answers with a name rather than an address fails closed', async () => {
+  // isPublicIpAddress returns false for anything that is not an IP, so a name would otherwise pass
+  // the non-public check and then be used as the pinned connect address.
+  await rejects(
+    () =>
+      createOperatorEndpointClient({
+        baseUrl: 'http://searx.internal:8888',
+        resolveHost: async () => [{ address: 'searx.internal', family: 4 }],
+      }),
+    'base_url_resolution_failed',
+  );
+});
+
+test('a caller cannot override the pinned Host header', async () => {
+  let seenHost: string | undefined;
+  await withLoopbackServer(
+    (request, response) => {
+      seenHost = request.headers.host;
+      response.writeHead(200, { 'content-type': 'application/json' });
+      response.end('{}');
+    },
+    async (baseUrl) => {
+      const { client } = await endpoint(baseUrl);
+      await client({ url: `${baseUrl}/search?q=x`, headers: { host: 'evil.example' } });
+      assert.equal(seenHost, '127.0.0.1');
     },
   );
 });
