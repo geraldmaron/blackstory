@@ -145,6 +145,8 @@ lane_gate() {
     mobile) echo "$MOBILE" ;;
     unit-py) [[ "$CODE" == true && "$PYTHON" == true ]] && echo true || echo false ;;
     governance) echo true ;;  # ungated in ci.yml
+    # security.yml gates this on security_code, which every code path and packages/security set.
+    security-policy) echo "$SECURITY_CODE" ;;
     *) echo false ;;
   esac
 }
@@ -162,6 +164,7 @@ lane_ci_job() {
     build-typecheck) echo "Build and Typecheck" ;;
     e2e) echo "E2E Harness" ;;
     governance) echo "Governance" ;;
+    security-policy) echo "security.yml: Security / Policy and API Security" ;;
   esac
 }
 
@@ -197,10 +200,21 @@ run_lane() {
       pnpm test:e2e ;;
     governance)
       node scripts/validate-github-governance.mjs ;;
+    security-policy)
+      # security.yml's "Policy and API Security" job. The only lane in that workflow that needs no
+      # GitHub token, so it is the one that must not be left out of a local check.
+      pnpm --filter @repo/testing test:security \
+        && pnpm --filter @repo/testing exec node --import tsx --test \
+          src/security-gates/security-gates.test.ts \
+        && pnpm exec tsc --noEmit --strict --exactOptionalPropertyTypes \
+          --target ES2022 --module NodeNext --moduleResolution NodeNext --skipLibCheck \
+          packages/testing/src/security-gates/contracts.ts \
+          packages/testing/src/security-gates/fixtures.ts \
+          packages/testing/src/security-gates/index.ts ;;
   esac
 }
 
-ALL_LANES=(install validate unit-js-packages unit-js-apps mobile unit-py contract-security-a11y coverage build-typecheck e2e governance)
+ALL_LANES=(install validate unit-js-packages unit-js-apps mobile unit-py contract-security-a11y coverage build-typecheck e2e governance security-policy)
 
 if ! check_toolchain "$@"; then
   echo >&2
@@ -234,8 +248,11 @@ done
 cat <<'NOTE'
 
 Not reproducible locally — these run in CI only, so a green run here is not a green PR:
-  * security.yml: CodeQL analysis, SBOM generation, gitleaks secret scan, dependency review.
-    They need GitHub tokens, the Actions runner image, and the full fetch history.
+  * security.yml: CodeQL (javascript-typescript and python), SBOM generation, gitleaks secret scan,
+    dependency review. They need GitHub tokens, the Actions runner image, and full fetch history.
+    security.yml's Policy and API Security job DOES run here — it is the security-policy lane below.
+  * security.yml's Filesystem Vulnerabilities, Image and Signature, and DAST Staging are
+    workflow_dispatch-only, so they do not gate a pull request at all.
   * Integration Postgres (ci.yml): gated on the repo variable ENABLE_POSTGRES_CI and needs the
     postgis service container. Not a required check. Run it with `pnpm db:up` first if wanted.
   * Ubuntu-vs-macOS differences: case-sensitive filesystem, glibc, and the pinned runner Node.
