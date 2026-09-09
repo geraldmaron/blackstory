@@ -7,6 +7,7 @@ import { listPublicEntities } from '../../data/public-seed';
 import {
   atlasWalkHref,
   canStandHere,
+  inventionHref,
   isHoldingPlaceHref,
   isInternalRecordLabel,
   isPublicPlaceSlug,
@@ -160,4 +161,24 @@ test('the home-map walk uses a holding slug, never a slugified name or /entity/'
   assert.equal(isHoldingPlaceHref('/place/dillard-high-school-old'), true);
   assert.equal(isHoldingPlaceHref('/place/42Cb1758'), false);
   assert.equal(isHoldingPlaceHref('/entity/ent_dunbar_school_001'), false);
+});
+
+test('an invention addresses its own family from every door', () => {
+  const invention = {
+    id: 'inv_banneker_striking_clock',
+    displayName: 'Striking Clock',
+    kind: 'invention',
+    summary: 'A wooden striking clock built without a model to copy.',
+  };
+  assert.equal(inventionHref('Striking Clock'), '/invention/striking-clock');
+
+  // `canStandHere` still admits an invention — it only asks "not a living private person, with
+  // a summary" — so the family branch, not the stand test, is what keeps it off Place.
+  assert.equal(canStandHere(invention), true);
+
+  assert.equal(neighborHref(invention), '/invention/striking-clock');
+  assert.equal(atlasWalkHref(invention), '/invention/striking-clock');
+
+  // The invention family is not a holding place walk, so a pin can never treat it as one.
+  assert.equal(isHoldingPlaceHref('/invention/striking-clock'), false);
 });

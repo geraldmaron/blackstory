@@ -69,7 +69,7 @@ import { resolveCitesEdgeIndex } from '../../../lib/articles/source';
 import { storiesCiting } from '../../../lib/release/build-cites-edge';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
 import { canStandHere, isInternalRecordLabel } from '../../../lib/place/public-place-path';
-import { placeHrefForEntity, placeSlugCollisionCounts } from '../../../lib/place/place-slug';
+import { publicRecordHref, placeSlugCollisionCounts } from '../../../lib/place/place-slug';
 import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './adapters';
 import { buildEntityAnatomyInputs, whereTileLabel } from './entity-anatomy-facts';
 import { deriveRecordStanding, isThinRecord } from './entity-view-model';
@@ -249,7 +249,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
     } catch {
       collisions = undefined;
     }
-    permanentRedirect(placeHrefForEntity(entity, collisions));
+    permanentRedirect(publicRecordHref(entity, collisions));
   }
 
   const standingLabel = deriveRecordStanding(entity);

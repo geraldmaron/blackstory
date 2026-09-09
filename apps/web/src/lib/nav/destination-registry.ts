@@ -287,6 +287,7 @@ export const DYNAMIC_PARENTS: readonly (readonly [string, string])[] = [
   // return state, not hierarchy. With Records a top-level axis rather than a room inside Rooms,
   // the catalogue that lists a record is the honest parent.
   ['/place/', '/records'],
+  ['/invention/', '/records'],
   ['/entity/', '/records'],
   ['/books/', '/books'],
   ['/law/', '/law'],

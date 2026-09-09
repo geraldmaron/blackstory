@@ -1,7 +1,7 @@
 /**
- * `/entity/{id}` renders the record room for non-holding records, and 308s to
- * `/place/{slug}` only when that place address actually holds. Column rules for
- * `EntityRoomSections` still apply on first paint.
+ * `/entity/{id}` renders the record room for non-holding records, and 308s to the record's
+ * own family (`/place/{slug}`, or `/invention/{slug}` for an invention) only when that address
+ * actually holds. Column rules for `EntityRoomSections` still apply on first paint.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -22,7 +22,7 @@ const mediaSource = readFileSync(
 );
 
 test('standable records 308 to /place; non-standable records still render here', () => {
-  assert.match(pageSource, /permanentRedirect\(placeHrefForEntity/);
+  assert.match(pageSource, /permanentRedirect\(publicRecordHref/);
   assert.match(pageSource, /canStandHere/);
   assert.match(pageSource, /<Room/);
   assert.doesNotMatch(pageSource, /getSharedPublicEntities|listPublicEntityViews\(/);

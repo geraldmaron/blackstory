@@ -178,3 +178,34 @@ test('sitemap route is a CDN-cached handler over the thin search index', () => {
   assert.match(SITEMAP_CACHE_CONTROL, /s-maxage=\d+/);
   assert.doesNotMatch(SITEMAP_CACHE_CONTROL, /no-store|private/);
 });
+
+test('an invention is advertised in its own family, never at a place address', () => {
+  const entries = buildPublicSitemapEntries({
+    siteUrl: 'https://blackbook.example',
+    releaseGeneratedAt: '2026-07-17T00:00:00.000Z',
+    entities: [
+      {
+        id: 'inv_latimer_carbon_process',
+        displayName: 'Process of Manufacturing Carbons',
+        kind: 'invention',
+        summary: 'Latimer’s carbon-manufacturing process for incandescent lamp filaments.',
+      },
+      {
+        id: 'ent_15th_st_church_001',
+        displayName: 'Fifteenth Street Presbyterian Church',
+        kind: 'place',
+        summary: 'A congregation that stood through emancipation and after.',
+      },
+    ],
+  });
+  const urls = entries.map((entry) => entry.url);
+  assert.ok(
+    urls.includes('https://blackbook.example/invention/process-of-manufacturing-carbons'),
+    'the invention is crawlable in its own family',
+  );
+  assert.ok(
+    !urls.some((url) => url.includes('/place/process-of-manufacturing-carbons')),
+    'the sitemap must not advertise the place address, which now permanently redirects',
+  );
+  assert.ok(urls.includes('https://blackbook.example/place/fifteenth-street-presbyterian-church'));
+});

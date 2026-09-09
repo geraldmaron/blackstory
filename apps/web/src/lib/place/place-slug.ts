@@ -1,5 +1,6 @@
 /**
- * Place address resolution for `/place/{slug}`.
+ * Public record address resolution: `/place/{slug}`, and `/invention/{slug}` for the one kind
+ * that owns a family of its own.
  *
  * Slugs come from the published display name. When two release records share a name,
  * the address is `{slug}--{entityId}` so the page never invents a wrong stand.
@@ -14,6 +15,9 @@ import {
   publicPlaceSlug,
   staysOffPublicMap,
 } from './public-place-path';
+
+/** The one kind that addresses a family of its own rather than `/place/{slug}`. */
+const INVENTION_KIND = 'invention';
 
 const PLACE_KIND_RANK: Readonly<Record<string, number>> = {
   place: 0,
@@ -89,9 +93,44 @@ export function placeHrefForEntity(
 }
 
 /**
+ * Public invention href for one entity. Same slug and same collision rule as Place, so a name
+ * that disambiguates in one family disambiguates identically in the other.
+ */
+export function inventionHrefForEntity(
+  entity: { readonly id: string; readonly displayName: string },
+  collisions?: ReadonlyMap<string, number>,
+): string {
+  const base = publicPlaceSlug(entity.displayName);
+  if ((collisions?.get(base) ?? 1) > 1) {
+    return `/invention/${base}--${entity.id}`;
+  }
+  return `/invention/${base}`;
+}
+
+/**
+ * The public address of a record, chosen by kind. This is the one place that decides which
+ * family a published record belongs to, so the Records index, the sitemap and the
+ * `/entity/{id}` redirect cannot drift into disagreeing about where a record lives.
+ *
+ * Collision counts stay shared across families on purpose: `resolvePlaceSlugFromSearchIndex`
+ * searches the whole release by slug, so a name that is ambiguous anywhere is disambiguated
+ * everywhere rather than resolving to a different record depending on which family asked.
+ */
+export function publicRecordHref(
+  entity: { readonly id: string; readonly displayName: string; readonly kind?: string },
+  collisions?: ReadonlyMap<string, number>,
+): string {
+  if (entity.kind === INVENTION_KIND) {
+    return inventionHrefForEntity(entity, collisions);
+  }
+  return placeHrefForEntity(entity, collisions);
+}
+
+/**
  * Explore instrument / search / map pin deep link. Standable records go to Place. Named people open
  * their entity record (the memorial wall is a room, not a substitute for one pin). Statutes go to
- * `/law`. Door Rest pin walks still use `atlasWalkHref` (stand allowlist) separately.
+ * `/law`, inventions to `/invention`. Door Rest pin walks still use `atlasWalkHref` (stand
+ * allowlist) separately.
  */
 export function instrumentRecordHref(
   entity: {
@@ -107,6 +146,9 @@ export function instrumentRecordHref(
   if (staysOffPublicMap(entity)) return '';
   if (entity.kind === 'person') return `/entity/${entity.id}`;
   if (entity.kind === 'law' || entity.kind === 'case') return '/law';
+  // Ahead of `canStandHere`, which admits an invention only because it is not a person and
+  // carries a summary. An invention is a work, not a stand.
+  if (entity.kind === INVENTION_KIND) return inventionHrefForEntity(entity, collisions);
   const summary = entity.summary?.trim() || entity.displayName;
   if (
     !canStandHere({
