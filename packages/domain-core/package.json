@@ -35,10 +35,35 @@
       "types": "./dist/claims/evidence-link.d.ts",
       "import": "./dist/claims/evidence-link.js"
     },
+    "./claims/attribution": {
+      "development": "./src/claims/attribution.ts",
+      "types": "./dist/claims/attribution.d.ts",
+      "import": "./dist/claims/attribution.js"
+    },
+    "./claims/lineage": {
+      "development": "./src/claims/lineage.ts",
+      "types": "./dist/claims/lineage.d.ts",
+      "import": "./dist/claims/lineage.js"
+    },
+    "./claims/source-fitness": {
+      "development": "./src/claims/source-fitness.ts",
+      "types": "./dist/claims/source-fitness.d.ts",
+      "import": "./dist/claims/source-fitness.js"
+    },
     "./claims/measurements": {
       "development": "./src/claims/measurements.ts",
       "types": "./dist/claims/measurements.d.ts",
       "import": "./dist/claims/measurements.js"
+    },
+    "./research/deficits": {
+      "development": "./src/research/deficits.ts",
+      "types": "./dist/research/deficits.d.ts",
+      "import": "./dist/research/deficits.js"
+    },
+    "./research/maturity": {
+      "development": "./src/research/maturity.ts",
+      "types": "./dist/research/maturity.d.ts",
+      "import": "./dist/research/maturity.js"
     },
     "./provenance/rights": {
       "development": "./src/provenance/rights.ts",

@@ -15,8 +15,27 @@ export type ClaimEvidenceLink = {
   /**
    * Lineage root for syndication counting. Prefer evidence.lineageRootId from;
    * required here so confidence can dedupe without a join.
+   *
+   * This must name the underlying WORK, not the host serving it. Build it with
+   * `resolveSourceLineage` from ./lineage.js rather than reaching for a hostname: a hostname
+   * makes one wire story on five mastheads look like five independent lineages and a patent
+   * read on two sites look like two.
    */
   readonly lineageRootId: string;
+  /**
+   * True for reference bridges (Wikipedia, Wikidata, a search result). A bridge may carry a
+   * claim and never corroborates one, so it does not count toward independent lineage — and,
+   * when real evidence is also attached, it does not dilute that evidence's quality either.
+   */
+  readonly bridgeSource?: boolean;
+  /**
+   * Dimensions that were never assessed for this link, as opposed to assessed and scored low.
+   *
+   * A link that carries `temporalProximity: 0.7` because nobody looked is not making a
+   * measurement, and a record built on such links has not been researched however high it
+   * scores. Recording the difference is what lets the maturity gates tell them apart.
+   */
+  readonly unassessedDimensions?: readonly string[];
   /** Whether this link is treated as credible for confidence contradiction preservation. */
   readonly credible: boolean;
   readonly sourceClassification: string;
