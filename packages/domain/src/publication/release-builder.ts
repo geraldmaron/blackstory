@@ -278,10 +278,23 @@ export type ReleaseConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
  * The lineage a citation belongs to, for corroboration counting. One publisher spelled several
  * ways (`wikipedia_api`, `en.wikipedia.org`) is one lineage, not several.
  */
+const WIKIPEDIA_LINEAGE_KEY = 'wikipedia';
+
+/**
+ * Predicates the landscape publisher synthesises from a record's own index row, which are the
+ * record's provenance rather than a second opinion about it. Mirrors
+ * `RECORD_PROVENANCE_PREDICATES` in `@repo/public-contracts/evidence`.
+ */
+const RECORD_PROVENANCE_PREDICATES: ReadonlySet<string> = new Set([
+  'listing',
+  'significant for',
+  'documented_site',
+]);
+
 function claimLineageKey(citationSource: string | undefined): string | null {
   const raw = (citationSource ?? '').trim().toLowerCase();
   if (raw.length === 0) return null;
-  if (raw.includes('wikipedia')) return 'wikipedia';
+  if (raw.includes('wikipedia') || raw.includes('wikidata')) return WIKIPEDIA_LINEAGE_KEY;
   return raw.replace(/^(?:www|en|en\.m|m)\./u, '');
 }
 
@@ -293,6 +306,10 @@ function claimLineageKey(citationSource: string | undefined): string | null {
  * maximum, which published 4,152 of 4,167 records at the top grade and made the reader-facing
  * meter meaningless.
  *
+ * Two citations do not count toward corroboration, because neither is a second opinion: Wikipedia
+ * (which may carry a claim but never corroborate one) and the record's own index row. Counting
+ * them held grade A at 1,807 records; excluding them lands it at 572 (repo-goyut, repo-6jizv).
+ *
  * This deliberately restates `recordConfidenceTier` from `@repo/public-contracts/evidence`
  * rather than importing it: `@repo/domain` takes no dependency on the public contracts package,
  * the same client/server boundary `mobile-bootstrap.ts` documents. The two must agree — the
@@ -301,7 +318,11 @@ function claimLineageKey(citationSource: string | undefined): string | null {
  * Records and Explore disagreeing about the same record.
  */
 export function highestClaimConfidenceTier(
-  claims: readonly { readonly confidenceLevel?: string; readonly citationSource?: string }[],
+  claims: readonly {
+    readonly confidenceLevel?: string;
+    readonly citationSource?: string;
+    readonly predicate?: string;
+  }[],
 ): ReleaseConfidenceTier {
   const strongest: ReleaseConfidenceTier = claims.some((claim) => claim.confidenceLevel === 'high')
     ? 'high'
@@ -311,13 +332,20 @@ export function highestClaimConfidenceTier(
         ? 'low'
         : 'unrated';
   if (strongest === 'unrated') return 'unrated';
-  const lineages = new Set<string>();
+  // Cited answers "was this assessed"; corroborating answers "is it supported". A record holding
+  // only Wikipedia or only its own index row is graded low, never reported unassessed.
+  const cited = new Set<string>();
+  const corroborating = new Set<string>();
   for (const claim of claims) {
     const key = claimLineageKey(claim.citationSource);
-    if (key !== null) lineages.add(key);
+    if (key === null) continue;
+    cited.add(key);
+    if (key === WIKIPEDIA_LINEAGE_KEY) continue;
+    if (RECORD_PROVENANCE_PREDICATES.has((claim.predicate ?? '').trim().toLowerCase())) continue;
+    corroborating.add(key);
   }
-  if (lineages.size === 0) return 'unrated';
-  if (lineages.size > 1) return strongest;
+  if (cited.size === 0) return 'unrated';
+  if (corroborating.size > 1) return strongest;
   return strongest === 'high' ? 'medium' : 'low';
 }
 

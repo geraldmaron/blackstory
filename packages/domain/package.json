@@ -154,6 +154,11 @@
       "types": "./dist/publication/cover-package.d.ts",
       "import": "./dist/publication/cover-package.js"
     },
+    "./publication/release-builder": {
+      "development": "./src/publication/release-builder.ts",
+      "types": "./dist/publication/release-builder.d.ts",
+      "import": "./dist/publication/release-builder.js"
+    },
     "./publication/public-story-seed": {
       "development": "./src/publication/public-story-seed.ts",
       "types": "./dist/publication/public-story-seed.d.ts",

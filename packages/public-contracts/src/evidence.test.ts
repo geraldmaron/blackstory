@@ -87,10 +87,83 @@ test('recordConfidenceTier caps an uncorroborated record one grade below its str
 test('recordConfidenceTier keeps grade A once a second independent lineage corroborates', () => {
   assert.equal(
     recordConfidenceTier([
-      { confidenceLevel: 'high', citationSource: 'wikipedia_api' },
       { confidenceLevel: 'high', citationSource: 'npgallery.nps.gov' },
+      { confidenceLevel: 'high', citationSource: 'blackpast.org' },
     ]),
     'high',
+  );
+});
+
+test('recordConfidenceTier does not let Wikipedia be the lineage that lifts a record to A', () => {
+  // `claim-corroborate` lists counting Wikipedia as the second lineage under Never. It carried
+  // 335 records to grade A before this (repo-goyut).
+  assert.equal(
+    recordConfidenceTier([
+      { confidenceLevel: 'high', citationSource: 'npgallery.nps.gov' },
+      { confidenceLevel: 'medium', citationSource: 'en.wikipedia.org' },
+    ]),
+    'medium',
+  );
+  // Wikidata is the same lineage, not a third opinion.
+  assert.equal(
+    recordConfidenceTier([
+      { confidenceLevel: 'high', citationSource: 'npgallery.nps.gov' },
+      { confidenceLevel: 'high', citationSource: 'en.wikipedia.org' },
+      { confidenceLevel: 'high', citationSource: 'wikidata.org' },
+    ]),
+    'medium',
+  );
+  // But a Wikipedia-only record has still been assessed. Graded low, never reported unrated.
+  assert.equal(
+    recordConfidenceTier([{ confidenceLevel: 'medium', citationSource: 'wikipedia_api' }]),
+    'low',
+  );
+});
+
+test('recordConfidenceTier does not let a record corroborate itself with its own index row', () => {
+  // The real shape of nrhp-black-heritage-00000006: the listing and significance claims are the
+  // NARA catalog row the record was seeded from, and the nomination form is the one document
+  // anyone actually read. One corroborating lineage, so it cannot reach A (repo-6jizv).
+  assert.equal(
+    recordConfidenceTier([
+      { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
+      {
+        confidenceLevel: 'high',
+        predicate: 'significant for',
+        citationSource: 'catalog.archives.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        predicate: 'source states',
+        citationSource: 'npgallery.nps.gov',
+      },
+      {
+        confidenceLevel: 'medium',
+        predicate: 'source states',
+        citationSource: 'en.wikipedia.org',
+      },
+    ]),
+    'medium',
+  );
+  // Two documents read, neither of them the index row: genuinely corroborated.
+  assert.equal(
+    recordConfidenceTier([
+      { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
+      {
+        confidenceLevel: 'high',
+        predicate: 'source states',
+        citationSource: 'npgallery.nps.gov',
+      },
+      { confidenceLevel: 'high', predicate: 'source states', citationSource: 'blackpast.org' },
+    ]),
+    'high',
+  );
+  // A record carrying nothing but its index row is graded, not reported unassessed.
+  assert.equal(
+    recordConfidenceTier([
+      { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
+    ]),
+    'medium',
   );
 });
 
@@ -120,7 +193,7 @@ test('recordConfidenceTier reads the nested wire citation shape too', () => {
   // or the same record reads as two different assessments depending on the screen.
   assert.equal(
     recordConfidenceTier([
-      { confidenceLevel: 'high', citation: { source: 'wikipedia_api' } },
+      { confidenceLevel: 'high', citation: { source: 'blackpast.org' } },
       { confidenceLevel: 'high', citation: { source: 'npgallery.nps.gov' } },
     ]),
     'high',

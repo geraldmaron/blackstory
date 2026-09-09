@@ -5,8 +5,10 @@
  * `/records` can slim off full `release_entities` hydrate. Older rows only carry `claim_count`,
  * which must never be treated as a grade.
  *
- * Derivation matches `highestClaimConfidenceTier` in `@repo/domain` publication release-builder:
- * high > medium > low > unrated.
+ * Derivation matches `highestClaimConfidenceTier` in `@repo/domain` publication release-builder,
+ * which in turn restates `recordConfidenceTier` in `@repo/public-contracts/evidence`: the
+ * strongest claim on the record, capped unless two lineages that are allowed to corroborate
+ * support it. Wikipedia and the record's own index row are not among them.
  *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a && export DATABASE_SSL=1
@@ -45,13 +47,33 @@ const CLAIMS = `
  * `@repo/public-contracts/evidence`: subdomain prefixes dropped, the Wikipedia family collapsed
  * to one key, so a single publisher spelled several ways cannot corroborate itself.
  */
-const LINEAGE_COUNT = `(
-  select count(distinct
-    case when lower(claim->>'citationSource') like '%wikipedia%' then 'wikipedia'
-      else regexp_replace(lower(claim->>'citationSource'), '^(www|en|en\\.m|m)\\.', '')
-    end)
+const LINEAGE_KEY = `
+  case when lower(claim->>'citationSource') like '%wikipedia%'
+         or lower(claim->>'citationSource') like '%wikidata%' then 'wikipedia'
+    else regexp_replace(lower(btrim(claim->>'citationSource')), '^(www|en|en\\.m|m)\\.', '')
+  end
+`;
+
+/** Every lineage cited, Wikipedia and provenance included. Decides graded vs `unrated`. */
+const CITED_LINEAGE_COUNT = `(
+  select count(distinct ${LINEAGE_KEY})
   from jsonb_array_elements(${CLAIMS}) claim
   where coalesce(btrim(claim->>'citationSource'), '') <> ''
+)`;
+
+/**
+ * Lineages allowed to corroborate. Mirrors `corroboratingLineageCount` in
+ * `@repo/public-contracts/evidence`: Wikipedia carries a claim but never corroborates one, and a
+ * record's own index row (the predicates `incremental-publish.ts` synthesises from the landscape
+ * row and cites to its canonical URL) is provenance, not a second opinion.
+ */
+const CORROBORATING_LINEAGE_COUNT = `(
+  select count(distinct ${LINEAGE_KEY})
+  from jsonb_array_elements(${CLAIMS}) claim
+  where coalesce(btrim(claim->>'citationSource'), '') <> ''
+    and ${LINEAGE_KEY} <> 'wikipedia'
+    and lower(btrim(coalesce(claim->>'predicate', '')))
+        not in ('listing', 'significant for', 'documented_site')
 )`;
 
 const STRONGEST_TIER = `
@@ -78,6 +100,11 @@ const STRONGEST_TIER = `
  * authoritative that lineage is — the bare maximum this replaced graded 4,152 of 4,167 published
  * records `high` and made the reader-facing meter meaningless (repo-ngojq).
  *
+ * Corroboration then excludes two citations that are not second opinions: Wikipedia, which may
+ * carry a claim but never corroborate one, and the record's own index row, which let 784 records
+ * reach the top tier on one federal listing served by two agencies. Top tier is 572 records under
+ * this expression, from 1,807 when any two hosts counted (repo-goyut, repo-6jizv).
+ *
  * Records prefers this facet over full-entity hydrate whenever the search index carries it, so
  * this expression and the TypeScript rule have to agree or Records and Explore will show
  * different grades for the same record.
@@ -85,8 +112,8 @@ const STRONGEST_TIER = `
 const COMPUTED_TIER = `
   case
     when (${STRONGEST_TIER}) = 'unrated' then 'unrated'
-    when (${LINEAGE_COUNT}) = 0 then 'unrated'
-    when (${LINEAGE_COUNT}) > 1 then (${STRONGEST_TIER})
+    when (${CITED_LINEAGE_COUNT}) = 0 then 'unrated'
+    when (${CORROBORATING_LINEAGE_COUNT}) > 1 then (${STRONGEST_TIER})
     when (${STRONGEST_TIER}) = 'high' then 'medium'
     else 'low'
   end

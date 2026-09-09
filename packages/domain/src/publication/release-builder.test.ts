@@ -606,6 +606,45 @@ test('highestClaimConfidenceTier does not let one publisher corroborate itself',
   assert.equal(highestClaimConfidenceTier([{ confidenceLevel: 'high' }]), 'unrated');
 });
 
+test("highestClaimConfidenceTier excludes Wikipedia and the record's own index row", () => {
+  // Wikipedia carries a claim and never corroborates one (repo-goyut).
+  assert.equal(
+    highestClaimConfidenceTier([
+      { confidenceLevel: 'high', citationSource: 'npgallery.nps.gov' },
+      { confidenceLevel: 'medium', citationSource: 'en.wikipedia.org' },
+    ]),
+    'medium',
+  );
+  // nrhp-black-heritage-00000006: the listing claims are the NARA row the record was seeded
+  // from, so the nomination form is the only document corroborating anything (repo-6jizv).
+  assert.equal(
+    highestClaimConfidenceTier([
+      { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
+      {
+        confidenceLevel: 'high',
+        predicate: 'significant for',
+        citationSource: 'catalog.archives.gov',
+      },
+      { confidenceLevel: 'high', predicate: 'source states', citationSource: 'npgallery.nps.gov' },
+    ]),
+    'medium',
+  );
+  // Two documents read, neither the index row.
+  assert.equal(
+    highestClaimConfidenceTier([
+      { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
+      { confidenceLevel: 'high', predicate: 'source states', citationSource: 'npgallery.nps.gov' },
+      { confidenceLevel: 'high', predicate: 'source states', citationSource: 'blackpast.org' },
+    ]),
+    'high',
+  );
+  // Wikipedia alone is an assessment, so it grades rather than reporting unrated.
+  assert.equal(
+    highestClaimConfidenceTier([{ confidenceLevel: 'medium', citationSource: 'wikipedia_api' }]),
+    'low',
+  );
+});
+
 test('buildReleaseEntityArtifacts: every published location precision is a controlled public tier', () => {
   const rawPrecisions = [
     'site',
