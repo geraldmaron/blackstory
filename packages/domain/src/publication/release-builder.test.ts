@@ -8,6 +8,8 @@ import {
   buildNotabilityBasisNote,
   buildReleaseEntityArtifacts,
   buildReleaseNotabilityBasis,
+  isAccusationPredicate,
+  isRacialTerrorClaim,
   computeReleaseResearchCoverage,
   formatClaimInclusionNote,
   highestClaimConfidenceTier,
@@ -186,6 +188,140 @@ test('formatClaimInclusionNote / buildNotabilityBasisNote read as prose, not pre
       },
     ]),
     "Served as the campaign's headquarters.",
+  );
+});
+
+test('a lynching claim is documented_racial_terror, never documented_site', () => {
+  // Alma Howze's live record said her basis for inclusion was that she is "a documented site of
+  // a historically significant event or practice (a sit-in lunch counter, a Freedom School...)".
+  assert.equal(
+    inferNotabilityCriterionFromClaim(
+      'was lynched on',
+      'December 20, 1918, in Shubuta, Mississippi',
+      'person',
+    ),
+    'documented_racial_terror',
+  );
+  assert.equal(
+    inferNotabilityCriterionFromClaim(
+      'was a victim of',
+      'racial terror lynching in the Jim Crow South',
+      'person',
+    ),
+    'documented_racial_terror',
+  );
+});
+
+test('racial terror is decided before first_to_do_x, so a killing never reads as an achievement', () => {
+  assert.equal(
+    inferNotabilityCriterionFromClaim('was the first Black man lynched in', 'the county', 'person'),
+    'documented_racial_terror',
+  );
+});
+
+test('a place name containing "lynch" is not a racial-terror claim', () => {
+  assert.notEqual(
+    inferNotabilityCriterionFromClaim('was founded in', 'Lynchburg, Virginia', 'place'),
+    'documented_racial_terror',
+  );
+});
+
+test('someone who campaigned against lynching is not filed as a victim of it', () => {
+  // Every one of these is a real record the first version of this matcher reclassified, because
+  // it read the claim object as well as the predicate. Ida B. Wells reported on lynching; the
+  // Richmond Planet campaigned against it. The criterion is for the people who were killed.
+  assert.equal(
+    isRacialTerrorClaim('launched_crusade', 'After a white mob lynched her friend Thomas Moss'),
+    false,
+  );
+  assert.equal(
+    isRacialTerrorClaim(
+      'published_from',
+      "Under Mitchell's editorship the Planet campaigned against lynching",
+    ),
+    false,
+  );
+  assert.equal(
+    isRacialTerrorClaim(
+      'advocated for due process by condemning the lynching of Wright Smith',
+      'condemned lynching',
+    ),
+    false,
+  );
+  assert.equal(isRacialTerrorClaim('experienced racial violence in', '1923'), false);
+});
+
+test('a death that is not racial terror does not become racial terror', () => {
+  // Doris Miller died aboard the USS Liscome Bay. A bare "killed" verb matched him once.
+  assert.equal(isRacialTerrorClaim('was killed in action', 'at Pearl Harbor'), false);
+  // A hanging can be a judicial execution — the memorial source data carries Nat Turner that way.
+  assert.equal(isRacialTerrorClaim('was executed after', 'the 1831 rebellion'), false);
+});
+
+test('a racial-terror killing is recognized from the predicate alone', () => {
+  assert.equal(isRacialTerrorClaim('was lynched on', 'October 20, 1875'), true);
+  assert.equal(
+    isRacialTerrorClaim('was the victim of a hate crime resulting in federal convictions', ''),
+    true,
+  );
+  assert.equal(
+    isRacialTerrorClaim(
+      'died as a result of racial terror lynching',
+      'in the post-Reconstruction South',
+    ),
+    true,
+  );
+});
+
+test('buildReleaseNotabilityBasis refuses an accusation against the subject as an inclusion basis', () => {
+  const entry = baseEntry({
+    displayName: 'Alma Howze',
+    claims: [
+      {
+        predicate: 'was lynched on',
+        object: 'December 20, 1918, in Shubuta, Mississippi',
+        confidenceLevel: 'high',
+        citationSource: 'Source A',
+        citationLabel: 'Citation A',
+      },
+      {
+        predicate: 'was accused of',
+        object: 'alleged murder of a dentist',
+        confidenceLevel: 'medium',
+        citationSource: 'Source B',
+        citationLabel: 'Citation B',
+      },
+    ],
+  });
+  const basis = buildReleaseNotabilityBasis(entry);
+  assert.equal(basis.length, 1, 'the accusation must not become a basis record');
+  assert.equal(basis[0]!.criterion, 'documented_racial_terror');
+  assert.doesNotMatch(basis.map((b) => b.note).join(' '), /accus|alleg/i);
+});
+
+test('an arrest is not an accusation — a civil-rights record keeps it as a basis', () => {
+  assert.equal(isAccusationPredicate('was arrested at'), false);
+  assert.equal(isAccusationPredicate('resulting in federal convictions'), false);
+  assert.equal(isAccusationPredicate('used convict labor during Reconstruction'), false);
+  assert.equal(isAccusationPredicate('was accused of'), true);
+  assert.equal(isAccusationPredicate('was falsely accused of'), true);
+  assert.equal(isAccusationPredicate('followed accusation of'), true);
+});
+
+test('a claim object that merely repeats the subject name does not become part of the sentence', () => {
+  const claims = [
+    {
+      id: 'claim_1',
+      predicate: 'was lynched',
+      object: 'Gus Roberson',
+      citationSource: 'Source A',
+      citationLabel: 'Citation A',
+      confidenceLevel: 'high' as const,
+    },
+  ];
+  assert.equal(
+    buildNotabilityBasisNote('was lynched', claims as never, 'Gus Roberson'),
+    'Was lynched.',
   );
 });
 

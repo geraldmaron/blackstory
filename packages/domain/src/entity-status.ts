@@ -133,6 +133,7 @@ export const NOTABILITY_CRITERIA = [
   'movement_significance',
   'documented_site',
   'documented_contribution',
+  'documented_racial_terror',
   'community_anchor',
   'only_or_oldest',
 ] as const;
@@ -197,6 +198,14 @@ export const NOTABILITY_RUBRIC: Readonly<Record<NotabilityCriterion, string>> = 
     'The entity served as a long-standing, evidenced community anchor institution (a ' +
     'historically Black church, fraternal lodge, HBCU, mutual aid society) with a documented ' +
     'multi-decade role in a specific community.',
+  documented_racial_terror:
+    'The entity is a person killed in a documented act of racial terror — a lynching or other ' +
+    'extrajudicial racial killing — or the event or place where such a killing is documented. ' +
+    'The basis for inclusion is the killing and its documentation, never an accusation made ' +
+    "against the person killed: the Equal Justice Initiative's Lynching in America research " +
+    'records that nearly every victim was killed without being legally convicted of any ' +
+    'offense, and that such accusations were routinely fabricated and rarely investigated. ' +
+    'The record names the person so the killing is not anonymous.',
   only_or_oldest:
     'The entity is documented as the only or oldest surviving example of its kind in a defined ' +
     'scope (oldest Black-owned business in a city, only remaining Rosenwald school in a county) ' +

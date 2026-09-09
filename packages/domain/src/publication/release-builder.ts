@@ -486,12 +486,82 @@ function claimToFactCitationStandIn(claim: ReleaseSourceClaim): FactCitation {
  * earliest known US patent to a Black inventor, and `first_to_do_x` is the honest criterion for
  * it whatever the record's kind.
  */
+/**
+ * Whether a claim records a racial-terror killing OF THIS RECORD'S OWN SUBJECT.
+ *
+ * The verb is matched against the PREDICATE alone, never the object. Matching the whole claim
+ * text instead swept in everyone who fought lynching alongside everyone killed by it: on the
+ * active release it reclassified Ida B. Wells (predicate `launched_crusade`), the NAACP
+ * (`pursued`), Mary Church Terrell, the Richmond Planet and the Savannah Tribune, because their
+ * claims name lynching for the reason those records exist — they campaigned against it. Filing
+ * the chronicler under the same criterion as the murdered is its own category error.
+ *
+ * `lynched` is the only verb that stands alone, in any position — a past participle in a
+ * predicate always means this. The noun `lynching` deliberately does NOT stand alone, because
+ * that is how a campaigner's predicate reads ("condemning the lynching of Wright Smith"). `killed` is deliberately absent and `hanged`
+ * never stands alone: "was killed in action" is Doris Miller, who died aboard the USS Liscome
+ * Bay, and a hanging can be a judicial execution — the memorial source data carries Nat Turner
+ * on exactly that distinction. Those verbs must bring racial-terror context with them.
+ *
+ * Verified against every claim predicate in rel_20260723_authority_net_001 on 2026-09-09: it
+ * matches all 32 records in the lynching cohort plus James G. Patterson (`was lynched on`, a
+ * Reconstruction-era record outside that cohort), and nothing else.
+ */
+const RACIAL_TERROR_KILLED_PREDICATE =
+  /\blynched\b|\b(?:was|were)\s+(?:hanged|hung|burned\s+alive|murdered|beaten\s+to\s+death)\b|reclassified\s+as\s+a\s+lynching|\bis\s+a\s+documented\s+instance\s+of\b.*\blynch|\bbody\s+was\s+(?:found|recovered)\b|\bhad\s+body\s+recovered\b/i;
+
+/** Harm verbs that only mean racial terror when the claim supplies the context. */
+const RACIAL_TERROR_HARMED_PREDICATE =
+  /\b(?:was|were)\s+(?:the\s+|a\s+)?victims?\s+of\b|\bdied\s+(?:as\s+a\s+result\s+of|by|from|in)\b/i;
+
+/** `lynch\w*` cannot match Lynchburg: the city needs `lynchb`, and \w* is preceded by a boundary. */
+const RACIAL_TERROR_CONTEXT =
+  /(?:lynch\w*|racial\s+terror|racial\s+violence|\bmob\b|hate\s+crime)/i;
+
+/** True when this claim records a racial-terror killing of the record's own subject. */
+export function isRacialTerrorClaim(predicate: string, object: string): boolean {
+  if (RACIAL_TERROR_KILLED_PREDICATE.test(predicate)) return true;
+  return (
+    RACIAL_TERROR_HARMED_PREDICATE.test(predicate) &&
+    RACIAL_TERROR_CONTEXT.test(`${predicate} ${object}`)
+  );
+}
+
+/**
+ * A claim that records an ACCUSATION against the record's own subject. Such a claim may be true
+ * record content and still be disqualified from `notabilityBasis`, which answers "why is this in
+ * the catalog" — an allegation is never that answer.
+ *
+ * The rule is general, but it exists because of what it was doing to memorial records. Alma Howze
+ * was lynched from the Shubuta bridge in 1918, pregnant, alongside her sister and two brothers,
+ * after being charged with murder and taken from the jail before any trial. Her published
+ * inclusion basis read "Was accused of alleged murder of a dentist." — the mob's own pretext,
+ * printed as this catalog's reason for naming her. The Equal Justice Initiative's Lynching in
+ * America records that nearly every victim was killed without being legally convicted of any
+ * offense and that such accusations were routinely fabricated and rarely investigated.
+ *
+ * Matches the accusation verbs only. `arrested` and `convicted` are deliberately NOT here: for a
+ * civil-rights record an arrest is frequently the honorable fact ("arrested at the sit-in"), and
+ * "resulting in federal convictions" describes the killers, not the victim.
+ */
+const ACCUSATION_CLAIM =
+  /\b(accused|accusation|alleged|allegedly|charged with|indicted|suspected)\b/i;
+
+/** True when this claim predicate records an accusation against the subject. */
+export function isAccusationPredicate(predicate: string): boolean {
+  return ACCUSATION_CLAIM.test(predicate);
+}
+
 export function inferNotabilityCriterionFromClaim(
   predicate: string,
   object: string,
   kind?: string,
 ): NotabilityCriterion {
   const text = `${predicate} ${object}`.toLowerCase();
+  // Checked before every other branch. A claim that records someone's killing must never be
+  // classified as anything else — least of all `first_to_do_x`, which a phrase like "the first
+  // Black man lynched in the county" would otherwise match and turn a murder into an achievement.
+  if (isRacialTerrorClaim(predicate, object)) return 'documented_racial_terror';
   if (/\bfirst\b/.test(text)) return 'first_to_do_x';
   if (/national register|national historic landmark|\blandmark\b/.test(text)) {
     return 'landmark_or_national_register';
@@ -541,9 +611,17 @@ export function formatClaimInclusionNote(predicate: string, object: string): str
 export function buildNotabilityBasisNote(
   predicate: string,
   predicateClaims: readonly ReleaseClaimProjection[],
+  subjectName?: string,
 ): string {
   const [sample] = predicateClaims;
-  const note = formatClaimInclusionNote(predicate, sample?.object ?? '');
+  const object = sample?.object ?? '';
+  // Some lanes store the subject's own name as the claim object, which this function otherwise
+  // renders as a sentence by joining it to the predicate: "Was lynched Gus Roberson." Dropping a
+  // self-naming object leaves "Was lynched." — which is the sentence that was meant.
+  const subject = subjectName?.trim().toLowerCase();
+  const isSelfNaming =
+    subject !== undefined && subject.length > 0 ? object.trim().toLowerCase() === subject : false;
+  const note = formatClaimInclusionNote(predicate, isSelfNaming ? '' : object);
   const hasCitation = predicateClaims.some((claim) => claim.citationSource.trim().length > 0);
   if (!hasCitation) {
     const stem = note.replace(/[.!?]$/, '');
@@ -565,6 +643,10 @@ export function buildReleaseNotabilityBasis(
 ): readonly NotabilityBasisRecord[] {
   const byPredicate = new Map<string, ReleaseClaimProjection[]>();
   for (const claim of claims) {
+    // An accusation against the subject is not a reason the subject is in the catalog (see
+    // isAccusationPredicate). The claim itself is untouched — it stays in `claims`, where the
+    // record can carry it in context; it is only barred from becoming an inclusion basis.
+    if (isAccusationPredicate(claim.predicate)) continue;
     const bucket = byPredicate.get(claim.predicate);
     if (bucket) {
       bucket.push(claim);
@@ -573,20 +655,35 @@ export function buildReleaseNotabilityBasis(
     }
   }
 
+  // A record carrying any racial-terror claim is a record about a killing, and that is its reason
+  // for inclusion. `documented_site` is only ever reached as a fallback — the inference has no
+  // positive branch for it — and repo-9ki8 established that the rubric reserves it for sites, so
+  // on this record it is both a fallback AND the sentence that told a reader Alma Howze is a
+  // documented site. Fall back to the criterion that is actually true here instead. Criteria the
+  // inference positively identified (a landmark listing, a documented first) are left alone.
+  const isRacialTerrorRecord = claims.some((claim) =>
+    isRacialTerrorClaim(claim.predicate, claim.object),
+  );
+  const fallback: NotabilityCriterion =
+    entry.kind === 'invention'
+      ? 'documented_contribution'
+      : isRacialTerrorRecord
+        ? 'documented_racial_terror'
+        : 'documented_site';
+
   const records: NotabilityBasisRecord[] = [];
   for (const [predicate, predicateClaims] of byPredicate) {
     const evidenceIds = predicateClaims
       .filter((claim) => claim.citationSource.trim().length > 0)
       .map((claim) => claim.id);
     const [sample] = predicateClaims;
-    const criterion = sample
+    const inferred = sample
       ? inferNotabilityCriterionFromClaim(predicate, sample.object, entry.kind)
-      : entry.kind === 'invention'
-        ? 'documented_contribution'
-        : 'documented_site';
+      : fallback;
+    const criterion = inferred === 'documented_site' ? fallback : inferred;
     records.push({
       criterion,
-      note: buildNotabilityBasisNote(predicate, predicateClaims),
+      note: buildNotabilityBasisNote(predicate, predicateClaims, entry.displayName),
       evidenceIds,
     });
   }

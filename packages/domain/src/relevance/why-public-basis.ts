@@ -20,6 +20,7 @@ export const NOTABILITY_CRITERION_LABELS: Readonly<Record<NotabilityCriterion, s
   movement_significance: 'Movement significance',
   documented_site: 'Documented site',
   documented_contribution: 'Documented contribution',
+  documented_racial_terror: 'Documented racial terror',
   community_anchor: 'Community anchor',
   only_or_oldest: 'Only or oldest of its kind',
 };
