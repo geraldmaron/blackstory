@@ -199,11 +199,9 @@ export type FetchSearxngWebSearchBudgetedResult = {
 };
 
 /**
- * The SearXNG half of the budget guard, which was missing.
- *
- * `provider-decision.ts` chose SearXNG, and only Brave had a budgeted wrapper — so the guard could
- * not be applied to the provider the project actually uses, whatever a caller intended. Same
- * fail-closed shape: the budget is evaluated before any network call and a denial throws.
+ * Budget-gated SearXNG fetch. SearXNG is the provider `./provider-decision.ts` selects, so this is
+ * the variant a campaign with a query budget reaches for. Same fail-closed shape as the Brave
+ * wrapper above: the budget is evaluated before any network call, and a denial throws.
  */
 export async function fetchSearxngWebSearchBudgeted(
   input: FetchSearxngWebSearchBudgetedInput,

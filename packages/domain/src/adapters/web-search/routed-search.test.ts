@@ -3,7 +3,8 @@
  *
  * The assertions that matter most here are about what a lead is NOT: it carries no page text, it
  * never becomes a candidate record, and the absence of a budget is reported rather than assumed.
- * Those are the three ways this module could quietly turn back into the thing it replaced.
+ * Each of those three is a property a future change could quietly drop while every other test in
+ * this file kept passing.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

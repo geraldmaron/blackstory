@@ -80,9 +80,8 @@ test('fixture web-search dispatch succeeds with test storage terms', async () =>
 });
 
 /**
- * The live web-search branch had no test at all, because it called a bare global `fetch` and
- * there was nothing to inject. These cover it through the injected origin-pinned client, with no
- * network: the point is that the branch is now reachable by a test, not that SearXNG is up.
+ * The live web-search branch, covered through the injected search client so no network is needed.
+ * These assert routing and failure surfacing, not that a SearXNG instance is up.
  */
 const LIVE_SEARCH_ENV = {
   SEARXNG_BASE_URL: 'http://127.0.0.1:8888',

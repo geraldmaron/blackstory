@@ -7,27 +7,21 @@
  * somewhere else, 404, or serve a login wall. A record that cites a search result cites a search
  * engine's guess about a page nobody retrieved.
  *
- * The repository had this backwards in the one place it mattered most: `harness-run` pushed raw
- * search-result URLs into `HarnessRawSubject.cites` and handed the search blurb to a model, which
- * was then asked to emit `citationUrl` picked "from cites list". A result became a citation without
- * anything ever fetching it.
- *
  * So this returns `SearchLead`, a type that cannot be mistaken for evidence, and deliberately does
- * NOT build `WebSearchCandidateRecord`s. That matters for the storage-rights gate as well as for
- * honesty: `assertStorageTermsConfirmed` guards PERSISTING a result, and holding leads in memory
- * for the length of one research step is not persistence. Keeping leads out of the normalizer means
- * the gate stays exactly where it belongs — between a result and a row — instead of being weakened
- * into a check on whether a query may run. The discovery campaign, which really does persist
- * candidates, still goes through `fetchSearxngWebSearch` and still trips the gate.
+ * NOT build `WebSearchCandidateRecord`s. That boundary protects the storage-rights gate as much as
+ * it protects the record: `assertStorageTermsConfirmed` guards PERSISTING a result, and holding
+ * leads in memory for the length of one research step is not persistence. Keeping leads out of the
+ * normalizer keeps that gate where it belongs — between a result and a row — rather than weakening
+ * it into a check on whether a query may run. A caller that genuinely persists candidates, like the
+ * discovery campaign, goes through `fetchSearxngWebSearch` and does trip the gate.
  *
  * THE BUDGET IS OPTIONAL AND ITS ABSENCE IS REPORTED. `evaluateWebSearchQueryBudget` needs a
- * campaign's query count and a monthly spend figure, and today no production caller holds either:
- * the overnight enrichment runner caps queries with an env variable instead. Demanding budget state
- * here would mean every caller inventing a campaign it does not have, and a guard over invented
- * numbers is worse than no guard because it reads as enforcement. Instead a caller that HAS a
- * campaign passes one and every query is gated before the socket opens; a caller that does not gets
- * `budgetEnforced: false` in the result, so the gap shows up in output rather than in nobody's
- * memory.
+ * campaign's query count and a monthly spend figure. A caller that holds neither — one capped by an
+ * env variable or by the size of its work list — would have to invent a campaign to satisfy a
+ * mandatory guard, and a guard over invented numbers is worse than no guard because it reads as
+ * enforcement. So a caller that has a campaign passes one and every query is gated before the socket
+ * opens, and a caller that does not gets `budgetEnforced: false` in the result, which puts the gap
+ * in the run output instead of in nobody's memory.
  */
 import {
   evaluateWebSearchQueryBudget,

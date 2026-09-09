@@ -106,9 +106,9 @@ export type DispatchDiscoveryCampaignInput = {
    */
   readonly includeCampaign?: boolean;
   /**
-   * Transport for the live web-search branch. Defaults to an origin-pinned operator-endpoint
-   * client built from SEARXNG_BASE_URL. Injected so the live branch can be tested at all: it was
-   * a bare global `fetch` before, which is exactly why nothing covered it.
+   * Transport for the live web-search branch. Defaults to an origin-pinned operator-endpoint client
+   * built from SEARXNG_BASE_URL; injected so the live branch is reachable by a test without a
+   * network.
    */
   readonly searchHttpClient?: RoutedSearchHttpClient;
 };
@@ -355,10 +355,10 @@ async function runFixtureOrLiveJob(
         const headers: Record<string, string> = { Accept: 'application/json' };
         const token = env.SEARXNG_AUTH_TOKEN?.trim();
         if (token) headers.Authorization = `Bearer ${token}`;
-        // Origin-pinned rather than a bare fetch: the endpoint is ours and private, so
-        // executeSafeFetch refuses it by design, but "private" is not "unchecked". The client
-        // holds the origin, the JSON content-type, a byte cap, a timeout, and a refusal to follow
-        // any redirect. It is built per dispatch because the base URL comes from env.
+        // The endpoint is ours and private, so executeSafeFetch refuses it by design — but private
+        // is not unchecked. This client holds the origin, the JSON content-type, a byte cap, a
+        // timeout, and a refusal to follow any redirect. Built per dispatch because the base URL
+        // comes from the environment.
         const searchClient =
           input.searchHttpClient ??
           (await createOperatorEndpointClient({ baseUrl: searxngBase })).client;
