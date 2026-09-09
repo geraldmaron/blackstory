@@ -1,8 +1,8 @@
 /**
- * GroupHeading, CardGrid and RoomCard — the catalogue block shared by every room that lists
+ * GroupHeading, CardGrid and RoomCard — the catalog block shared by every room that lists
  * things: chapters, books, laws, datasets, the rooms hub.
  *
- * A RoomCard is a link, not a button with an onClick: a catalogue entry is a destination and
+ * A RoomCard is a link, not a button with an onClick: a catalog entry is a destination and
  * has to be openable in a new tab, copyable and crawlable.
  */
 
@@ -28,7 +28,7 @@ export type CardGridProps = {
    * `'index'` (default): one column, each RoomCard a hairline row. `'hub'`: three fixed columns.
    *
    * `/rooms` used the hub shape and no longer does. Three columns of five destinations reads
-   * as a card wall, and a hub's reader is choosing a room rather than scanning a catalogue of
+   * as a card wall, and a hub's reader is choosing a room rather than scanning a catalog of
    * like things; one column of five reads as a table of contents, which is what a hub is. The
    * variant stays on the surface because a genuinely wide, flat set may still want it.
    */
@@ -45,9 +45,9 @@ export function CardGrid({ children, variant = 'index', className }: CardGridPro
 }
 
 /**
- * A card's hero image. Optional, and only for catalogues whose entries are authored with one:
+ * A card's hero image. Optional, and only for catalogs whose entries are authored with one:
  * a chapter has a hero, a law does not. `alt` is required rather than optional because a
- * catalogue of images with no alt text is a catalogue a screen reader cannot browse.
+ * catalog of images with no alt text is a catalog a screen reader cannot browse.
  */
 export type RoomCardMedia = {
   readonly url: string;

@@ -164,7 +164,7 @@
  *
  * It used to be six trays, each anchored to its own pill with `width: max-content` and a
  * 28rem cap. A pill is about 80px wide and a vocabulary is not, so every tray ran far past its
- * pill and straight across its neighbours. With the disclosures independent, all six could be
+ * pill and straight across its neighbors. With the disclosures independent, all six could be
  * open at once, and the row became a stack of half-legible panels with their labels cut off.
  *
  * Spanning the row fixes both halves. Nothing overlaps, because only one facet opens at a time
@@ -210,12 +210,12 @@
 }
 
 /* —— the grade dot ——————————————————————————————————————————————————————————
-   Grade is never colour alone: the tier word sits beside the dot in mono, which is what makes
+   Grade is never color alone: the tier word sits beside the dot in mono, which is what makes
    the row readable to a screen reader and to a reader who cannot separate the hues. */
 /*
  * The evidence mark: the shared three-segment meter plus the letter, the same pairing the Explore
  * results rail, the record sheet and the record page draw. This index used to own a third grade
- * treatment whose A was copper — the accent colour, not the confidence scale — so the same record
+ * treatment whose A was copper — the accent color, not the confidence scale — so the same record
  * carried a different grade language on every surface a reader could meet it.
  */
 .ds-records-grade {

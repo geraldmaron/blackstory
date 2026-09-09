@@ -323,7 +323,7 @@ export async function persistReleaseGraphArtifact(
 ): Promise<{ readonly adjacencyRows: number; readonly decadeRows: number }> {
   await client.query('BEGIN');
   try {
-    // Session default statement_timeout cancelled the bulk DELETE mid-transaction on 2026-08-19
+    // Session default statement_timeout canceled the bulk DELETE mid-transaction on 2026-08-19
     // (SQLSTATE 57014 "while deleting tuple ... release_graph_adjacency") once the table had
     // accumulated dead tuples from earlier aborted rebuilds. SET LOCAL scopes the override to
     // this transaction only — the session default is restored at COMMIT/ROLLBACK.

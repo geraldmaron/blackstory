@@ -330,14 +330,14 @@ a { color: inherit; }
 
 .rule { height: 1px; background: var(--rule-2); border: 0; margin: 0; }
 
-/* evidence grade dot — glyph + colour, never colour alone */
+/* evidence grade dot — glyph + color, never color alone */
 .grade { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em; }
 .grade i { width: 7px; height: 7px; border-radius: 50%; display: block; }
 .grade.a { color: var(--ok); } .grade.a i { background: var(--ok); }
 .grade.b { color: var(--warn); } .grade.b i { background: var(--warn); box-shadow: inset 0 0 0 1.5px var(--surface); }
 .grade.c { color: var(--note); } .grade.c i { background: transparent; box-shadow: inset 0 0 0 1.5px currentColor; }
 
-/* kind family glyph — shape carries the signal, not colour */
+/* kind family glyph — shape carries the signal, not color */
 .kglyph { width: 16px; height: 16px; flex: none; color: var(--ink-3); }
 [data-sel='1'] .kglyph, .row:hover .kglyph { color: var(--copper); }
 
@@ -933,8 +933,8 @@ mark { background: color-mix(in oklab, var(--copper-graphic) 26%, transparent); 
    ROOMS — the rest of the site, attached to the same instrument.
 
    Three surface classes share one scrolling layer (#doc):
-     read     reading room   long-form and catalogue editorial on paper
-     record   record page    one catalogued thing, the sheet unfolded and durable
+     read     reading room   long-form and catalog editorial on paper
+     record   record page    one catalogd thing, the sheet unfolded and durable
      utility  task surface   forms, receipts, legal text, failure states
 
    The map plate has three postures, set on <html data-plate>:
@@ -1143,7 +1143,7 @@ mark { background: color-mix(in oklab, var(--copper-graphic) 26%, transparent); 
   max-width: 40em;
 }
 
-/* ---- catalogue cards ------------------------------------------------------ */
+/* ---- catalog cards ------------------------------------------------------ */
 .cards {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
   gap: var(--s3); margin: var(--s6) 0;
@@ -1440,7 +1440,7 @@ mark { background: color-mix(in oklab, var(--copper-graphic) 26%, transparent); 
     <div id="resultlist" class="scroll" role="listbox" aria-label="Records"></div>
   </section>
 
-  <!-- ---- TIME (bottom centre) ---- -->
+  <!-- ---- TIME (bottom center) ---- -->
   <section id="time" class="panel" aria-label="Time">
     <div class="time-hd">
       <span class="lbl">When</span>
@@ -1676,7 +1676,7 @@ mark { background: color-mix(in oklab, var(--copper-graphic) 26%, transparent); 
       <div class="idx">04</div>
       <div class="kick">Four centuries in ten seconds</div>
       <h2>Watch the record <em>fill in</em>.</h2>
-      <p>Scrub from the 1630s to the 2020s and the map fills unevenly. Thin colonial entries in the tidewater. A thickening through Reconstruction. A hard cluster around the twentieth century civil rights record, where documentation and organising ran together.</p>
+      <p>Scrub from the 1630s to the 2020s and the map fills unevenly. Thin colonial entries in the tidewater. A thickening through Reconstruction. A hard cluster around the twentieth century civil rights record, where documentation and organizing ran together.</p>
       <div class="facts">
         <div><div class="v">1630s</div><div class="l">earliest</div></div>
         <div><div class="v">2020s</div><div class="l">latest</div></div>
@@ -1819,7 +1819,7 @@ mark { background: color-mix(in oklab, var(--copper-graphic) 26%, transparent); 
 
 <!-- ==========================================================================
      LEGEND — every channel the plate uses to carry meaning has a key.
-     Colour is never the only signal, so the key leads with shape.
+     Color is never the only signal, so the key leads with shape.
      ====================================================================== -->
 <div class="ov" id="legendov" role="dialog" aria-modal="true" aria-labelledby="legendtitle">
   <div class="ov-card">
@@ -1902,10 +1902,10 @@ const R = [
     s:'On January 8 to 10, 1811, enslaved men led by Charles Deslondes marched from plantations near LaPlace toward New Orleans in the largest slave revolt in United States history.',
     sources:['Louisiana State Museum, collection record','Historic New Orleans Collection','Louisiana Endowment for the Humanities, 64 Parishes'] },
   { id:'ent_abyssinian_baptist_001', n:'Abyssinian Baptist Church', k:'place', st:'New York', pl:'Harlem, New York', c:[-73.942,40.813], d:1800, g:'A', src:5, prec:'locality',
-    s:'Founded in 1808 when Black worshippers left First Baptist Church of New York over segregated seating, Abyssinian moved to Harlem in 1923 and became a centre of political organising.',
+    s:'Founded in 1808 when Black worshippers left First Baptist Church of New York over segregated seating, Abyssinian moved to Harlem in 1923 and became a center of political organizing.',
     sources:['National Register of Historic Places, nomination file','Schomburg Center for Research in Black Culture','New York City Landmarks Preservation Commission'] },
   { id:'gap_abiel_smith_school', n:'Abiel Smith School', k:'school', st:'Massachusetts', pl:'Boston, Massachusetts', c:[-71.065,42.360], d:1830, g:'A', src:4, prec:'locality',
-    s:'Founded in 1835, the Abiel Smith School was the first public school building for free Black children in Boston, and later a centre of the campaign against segregated schooling.',
+    s:'Founded in 1835, the Abiel Smith School was the first public school building for free Black children in Boston, and later a center of the campaign against segregated schooling.',
     sources:['National Park Service, Boston African American National Historic Site','Massachusetts Historical Society','National Register of Historic Places, nomination file'] },
   { id:'ent_gaston_motel_001', n:'A.G. Gaston Motel', k:'place', st:'Alabama', pl:'Birmingham, Alabama', c:[-86.815,33.516], d:1950, g:'A', src:6, prec:'locality',
     s:'Built in 1954 by Black businessman A.G. Gaston, this Birmingham motel served as campaign headquarters for the 1963 Birmingham movement. Room 30 was the planning room.',
@@ -1914,7 +1914,7 @@ const R = [
     s:'The 1963 bombing of the 16th Street Baptist Church in Birmingham killed four young Black girls and became a turning point in national support for the Civil Rights Act.',
     sources:['Federal Bureau of Investigation, case file summary','Birmingham Civil Rights Institute','Encyclopedia of Alabama','Library of Congress, Prints and Photographs'] },
   { id:'gap_18th_and_vine_jazz_district', n:'18th and Vine Jazz District', k:'place', st:'Missouri', pl:'Kansas City, Missouri', c:[-94.558,39.092], d:1920, g:'A', src:5, prec:'locality',
-    s:'The 18th and Vine district in Kansas City is internationally recognised as an origin point of a distinct jazz idiom, and was the commercial centre of Black Kansas City under segregation.',
+    s:'The 18th and Vine district in Kansas City is internationally recognized as an origin point of a distinct jazz idiom, and was the commercial center of Black Kansas City under segregation.',
     sources:['American Jazz Museum','National Register of Historic Places, nomination file','Missouri State Historical Society'] },
   { id:'nrhp-black-heritage-100006631', n:'100 Block North Greenwood Avenue', k:'place', st:'Oklahoma', pl:'Tulsa, Oklahoma', c:[-95.987,36.160], d:1920, g:'A', src:4, prec:'locality',
     s:'The surviving block of North Greenwood Avenue is the last standing commercial fabric of the Greenwood district destroyed in the 1921 Tulsa race massacre.',
@@ -1932,7 +1932,7 @@ const R = [
     s:'Opened in 1870 as the Preparatory High School for Colored Youth, Dunbar was the first public high school for Black students in the United States and sent graduates to elite colleges for decades.',
     sources:['District of Columbia Public Schools archive','Moorland-Spingarn Research Center, Howard University','National Register of Historic Places, nomination file'] },
   { id:'fifteenth_street_presbyterian_dc', n:'Fifteenth Street Presbyterian Church', k:'place', st:'District of Columbia', pl:'Washington, D.C.', c:[-77.035,38.905], d:1840, g:'A', src:4, prec:'locality',
-    s:'Organised in 1841, the church was a station on escape routes north and later a base for Francis Grimké, one of the founders of the Niagara Movement.',
+    s:'Organized in 1841, the church was a station on escape routes north and later a base for Francis Grimké, one of the founders of the Niagara Movement.',
     sources:['Moorland-Spingarn Research Center, Howard University','Historical Society of Washington, D.C.','National Register of Historic Places, nomination file'] },
   { id:'sundown_scottsdale_az', n:'Scottsdale, Arizona', k:'place', st:'Arizona', pl:'Scottsdale, Arizona', c:[-111.926,33.494], d:1950, g:'A', src:3, prec:'locality',
     s:'Scottsdale operated as a sundown town in the mid twentieth century. In 1959 Boston Red Sox player Pumpsie Green was forced to live in Phoenix during spring training because local hotels would not house him.',
@@ -1953,10 +1953,10 @@ const R = [
     s:'A Black town destroyed by a white mob in January 1923. In 1994 Florida passed a reparations bill awarding compensation to survivors, one of the first state acts of its kind.',
     sources:['Florida Board of Regents, 1993 documented history report','State Archives of Florida','Florida Legislature, 1994 session records'] },
   { id:'ent_1199seiu_healthcare_workers_001', n:'1199SEIU United Healthcare Workers East', k:'org', st:'New York', pl:'New York, New York', c:[-73.984,40.765], d:1930, g:'B', src:3, prec:'locality',
-    s:'Founded in New York City in 1932 as a pharmacists’ union, Local 1199 expanded in the late 1950s into hospital organising and became a significant funder of civil rights campaigns.',
+    s:'Founded in New York City in 1932 as a pharmacists’ union, Local 1199 expanded in the late 1950s into hospital organizing and became a significant funder of civil rights campaigns.',
     sources:['Kheel Center for Labor-Management Documentation, Cornell University','Tamiment Library, New York University','1199SEIU archive'] },
   { id:'gap_10th_u_s_cavalry', n:'10th U.S. Cavalry', k:'org', st:'Kansas', pl:'Fort Leavenworth, Kansas', c:[-94.920,39.355], d:1860, g:'A', src:5, prec:'locality',
-    s:'Organised at Fort Leavenworth in 1866, the 10th Cavalry was one of the first peacetime Black regiments in the U.S. Army and served across the western plains and in Cuba.',
+    s:'Organized at Fort Leavenworth in 1866, the 10th Cavalry was one of the first peacetime Black regiments in the U.S. Army and served across the western plains and in Cuba.',
     sources:['National Archives, Regimental Returns','U.S. Army Center of Military History','Kansas Historical Society'] },
   { id:'nrhp-black-heritage-94000456', n:'Aberdeen Gardens', k:'place', st:'Virginia', pl:'Hampton, Virginia', c:[-76.376,37.023], d:1930, g:'A', src:4, prec:'locality',
     s:'A New Deal resettlement community designed by a Black architect and built by Black workers for Black families, one of the few such projects completed as planned.',
@@ -1980,7 +1980,7 @@ const R = [
     s:'The second Morrill Act of 1890 required Southern states to fund Black colleges to keep federal agricultural money, creating a system of nineteen institutions still operating today.',
     sources:['U.S. Statutes at Large, 26 Stat. 417','U.S. Department of Agriculture, NIFA','Association of Public and Land-grant Universities'] },
   { id:'divine-nine-person-pbs-a-langston-taylor', n:'A. Langston Taylor', k:'person', st:'District of Columbia', pl:'Washington, D.C.', c:[-77.020,38.923], d:1910, g:'B', src:3, prec:'locality',
-    s:'Founder of Phi Beta Sigma Fraternity, established in 1914 at Howard University on the principle that the organisation should be a part of the general community rather than apart from it.',
+    s:'Founder of Phi Beta Sigma Fraternity, established in 1914 at Howard University on the principle that the organization should be a part of the general community rather than apart from it.',
     sources:['Moorland-Spingarn Research Center, Howard University','Phi Beta Sigma Fraternity archive'] },
   { id:'ent_authority_net_abraham_hall', n:'Abraham Hall', k:'place', st:'Maryland', pl:'Rossville, Maryland', c:[-76.845,39.037], d:1880, g:'B', src:3, prec:'locality',
     s:'Built in 1889 by the Benevolent Sons and Daughters of Abraham, the hall served in turn as a lodge, a school, and a house of worship for a freedmen’s community.',
@@ -2159,7 +2159,7 @@ function fc(list) {
 function initMap() {
   if (typeof maplibregl === 'undefined') return failMap();
   try {
-    /* Construct on a plain centre/zoom. fitBounds with instrument padding runs
+    /* Construct on a plain center/zoom. fitBounds with instrument padding runs
        once the canvas has a real size, in reveal(). */
     map = new maplibregl.Map({
       container: 'map', style: buildStyle(),
@@ -2232,7 +2232,7 @@ const cam = {
     const c = target || (S.sel ? S.sel.c : map.getCenter().toArray());
     map.flyTo({ center: c, zoom: Math.max(map.getZoom() + 2.6, 8.4), pitch: 48, bearing: map.getBearing(),
                 curve: 1.42, speed: 0.85, duration: reduce ? 0 : dur, essential: true });
-    say('Push in · ' + (S.sel ? S.sel.pl : 'centre'));
+    say('Push in · ' + (S.sel ? S.sel.pl : 'center'));
   },
   /* slow orbit — gravitas, scale */
   orbit(deg = 60, dur = 5200) {
@@ -3146,7 +3146,7 @@ function wire() {
    decides which one applies:
      live    full viewport, reader driven        Atlas and Story
      framed  inset into a bounded slot, locked   map moments, record places
-     parked  out of the way, no GL cost visible  reading, catalogues, forms
+     parked  out of the way, no GL cost visible  reading, catalogs, forms
    ========================================================================== */
 
 /* @@SURFACE-CONTENT-START@@ */
@@ -4160,8 +4160,8 @@ const SURF_DATA = [
   },
 ];
 
-/* ---- surfaces-catalogue.js ---- */
-const SURF_CATALOGUE = [
+/* ---- surfaces-catalog.js ---- */
+const SURF_CATALOG = [
   {
     id: 'books',
     path: '/books',
@@ -4835,7 +4835,7 @@ const SURF_LIBRARY = [{
         <span class="meta">READING ROOM · TABULAR</span>
       </button>
       <button class="card2" data-go="books">
-        <span class="k">CATALOGUE</span><h3>Banned books</h3>
+        <span class="k">CATALOG</span><h3>Banned books</h3>
         <p>Documented challenges to titles, recorded as challenges rather than as verdicts.</p>
         <span class="meta">READING ROOM</span>
       </button>
@@ -4901,7 +4901,7 @@ const SURFACES = [].concat(
   typeof SURF_CHAPTERS   !== 'undefined' ? SURF_CHAPTERS   : [],
   typeof SURF_LAW        !== 'undefined' ? SURF_LAW        : [],
   typeof SURF_DATA       !== 'undefined' ? SURF_DATA       : [],
-  typeof SURF_CATALOGUE  !== 'undefined' ? SURF_CATALOGUE  : [],
+  typeof SURF_CATALOG  !== 'undefined' ? SURF_CATALOG  : [],
   typeof SURF_UTILITY    !== 'undefined' ? SURF_UTILITY    : []
 ).map(s => (s.path.startsWith('/entity/') ? { ...s, rec: s.path.slice('/entity/'.length) } : s));
 
@@ -5165,12 +5165,12 @@ function updateProgress() {
 }
 
 /* ---- wiring --------------------------------------------------------------- */
-/* ---- legend: shape first, colour second, never colour alone -------------- */
+/* ---- legend: shape first, color second, never color alone -------------- */
 function buildLegend() {
   const kinds = Object.entries(KINDS).map(([k, v]) =>
     `<div class="legrow"><span class="sym">${kglyph(k, 'kglyph')}</span>
        <span><span class="t">${v.label}</span>
-       <span class="d">${R.filter(r => r.k === k).length} in this sample · the glyph carries the kind, not the colour</span></span></div>`).join('');
+       <span class="d">${R.filter(r => r.k === k).length} in this sample · the glyph carries the kind, not the color</span></span></div>`).join('');
 
   const grades = [
     ['A', 'Corroborated', 'Two or more independent sources agree. Filled dot.'],
@@ -5193,8 +5193,8 @@ function buildLegend() {
        <section><h3>Kind</h3>${kinds}</section>
        <section><h3>Evidence</h3>${grades}</section>
        <section><h3>Layers</h3>${layers}</section>
-       <div class="legnote">Colour is never the only signal. Every encoding above is carried by a shape
-       as well, so the plate stays readable in either theme and without colour vision.</div>
+       <div class="legnote">Color is never the only signal. Every encoding above is carried by a shape
+       as well, so the plate stays readable in either theme and without color vision.</div>
      </div>`;
 }
 

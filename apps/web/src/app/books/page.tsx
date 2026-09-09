@@ -1,5 +1,5 @@
 /**
- * Public banned-books catalogue index at `/books`. Records documented removal
+ * Public banned-books catalog index at `/books`. Records documented removal
  * requests against titles, not a ranked or curated "controversial books" list.
  * Preserves the browse URL contract (`q`, `state`, `author`, `sort`, `dir`, `page`).
  *

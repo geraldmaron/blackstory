@@ -1,5 +1,5 @@
 /**
- * SP-11c acceptance: `/books` catalogue index on the v9 room kit.
+ * SP-11c acceptance: `/books` catalog index on the v9 room kit.
  *
  * Renders the pieces that can be rendered in isolation (`HairlineIndex` wired the way
  * `BooksBrowseSections` wires it, and `BooksCoverArt`) and reads the page source for the parts
@@ -70,7 +70,7 @@ test('the browse sections build the shared HairlineIndex filters, not a bespoke 
   assert.doesNotMatch(sectionsSource, /ds-books-edition/);
 });
 
-test('no link on the catalogue page points at /history or another redirect endpoint', () => {
+test('no link on the catalog page points at /history or another redirect endpoint', () => {
   for (const source of [pageSource, sectionsSource]) {
     assert.doesNotMatch(source, /href=["'`]\/history/);
     assert.doesNotMatch(source, /href=["'`]\/explore/);

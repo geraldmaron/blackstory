@@ -163,7 +163,7 @@ Selection paint (both platforms) must go through the map's **feature-state / ded
 
 Per [`story.md`](./story.md): evidence-before-assertion, sentence case, no em dashes on the surface.
 - Web engage control: **Explore the map**. Close control: **Close** (icon ✕ with `aria-label="Close map"`).
-- Native posture controls: **Expand the map**, and a collapse control labelled **Show the records list** — it names what comes back, not what is being left.
+- Native posture controls: **Expand the map**, and a collapse control labeled **Show the records list** — it names what comes back, not what is being left.
 - Invite beats: name a place and what happened there; the map is the index, not decoration.
 
 ---

@@ -29,7 +29,7 @@ export type PublicPrecisionLevel = string;
 /**
  * Controlled public precision tier list, coarsest to finest, per
  * `docs/security/location-precision-standard.md` §2. This is the ONE list every raw precision
- * value is normalised onto before it reaches a public surface or the redaction engine.
+ * value is normalized onto before it reaches a public surface or the redaction engine.
  */
 export const PUBLIC_PRECISION_TIERS = [
   'none',
@@ -51,7 +51,7 @@ export function isPublicPrecisionTier(value: string): value is PublicPrecisionTi
 }
 
 /**
- * Raw precision synonyms normalised onto the controlled tier list, per the standard §2 table.
+ * Raw precision synonyms normalized onto the controlled tier list, per the standard §2 table.
  * A raw value not present here and not already a controlled tier falls back to `city` in
  * {@link normalizePublicPrecision} (unknown -> city, never sharper).
  */
@@ -74,7 +74,7 @@ const PUBLIC_PRECISION_SYNONYMS: Readonly<Record<string, PublicPrecisionTier>> =
 };
 
 /**
- * Normalise any raw precision value onto the controlled public tier list (§2). Unknown raw
+ * Normalize any raw precision value onto the controlled public tier list (§2). Unknown raw
  * values fall to `city`, never to a finer tier than the standard's fail-safe default.
  */
 export function normalizePublicPrecision(raw: string | undefined): PublicPrecisionTier {

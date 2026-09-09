@@ -97,7 +97,7 @@ function reduceTo(current: PublicPrecisionTier, target: PublicPrecisionTier): Pu
  * 1. `withheld_on_request` always wins — an operator/owner/descendant request to withhold.
  * 2. A raw prohibited level (unit/parcel/exact_coordinates/residence) fails closed to `city`,
  *    checked against the RAW input so it is distinguishable from an ordinary unknown-value
- *    normalisation.
+ *    normalization.
  * 3. The living-residence rule: only when `livingStatus` is living or unknown (fail-safe
  *    default), AND only on the biographical axis (`kind === 'person'`, or a place whose
  *    `sensitivityClass` is `living_residence`) — NRHP does not cap an occupied building on the
@@ -105,7 +105,7 @@ function reduceTo(current: PublicPrecisionTier, target: PublicPrecisionTier): Pu
  * 4. `restricted_site` (and its legacy alias `sensitive_site`) caps to `city`.
  * 5. `memorial_site`, `violence_associated`, `enslaver_or_segregationist`,
  *    `perpetrator_associated` — no reduction; these classes publish at source precision.
- * 6. Otherwise the raw precision is normalised onto the controlled tier list and kept as-is.
+ * 6. Otherwise the raw precision is normalized onto the controlled tier list and kept as-is.
  */
 export function reducePublicPrecision(input: PrecisionReductionInput): PrecisionReductionResult {
   const policy = loadProductConstitution();
@@ -136,7 +136,7 @@ export function reducePublicPrecision(input: PrecisionReductionInput): Precision
     return reduce('none', 'withheld_on_request');
   }
 
-  // 2. A raw prohibited level fails closed, checked against the RAW value (not the normalised
+  // 2. A raw prohibited level fails closed, checked against the RAW value (not the normalized
   // one — normalizePublicPrecision would otherwise silently collapse this into an ordinary
   // "unknown value -> city" case with the wrong reason code).
   const rawTrimmed = input.precision.trim().toLowerCase();

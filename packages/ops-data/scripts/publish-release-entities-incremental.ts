@@ -713,7 +713,7 @@ async function main(): Promise<void> {
       // repo-66mv1: ReleaseSourceEntity carries no relationship edges, so every row this run
       // rebuilt from source just wrote `related: []` — a republish silently stripped the
       // connections off already-live records and the "How this record connects" beat vanished.
-      // Re-derive from canonical here, after the commit, so co-published neighbours are visible
+      // Re-derive from canonical here, after the commit, so co-published neighbors are visible
       // to the both-endpoints-released join, and before the graph rebuild below, which reads
       // projection.related. This is the same shape as the taxonomy re-sync above and for the same
       // reason: canonical knows something the source row never carried.

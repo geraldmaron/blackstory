@@ -73,7 +73,7 @@ const DERIVE_SQL = `
   -- whose only specific type sorts later ('successor_of'). No pair in the active release is in
   -- that state today — measured 2026-09-09, 110 multi-type pairs involve related_to and
   -- alphabetical picks it for zero of them — so this clause changes nothing now and exists so a
-  -- later edge type cannot quietly acquire the behaviour. RELATIONSHIP_TYPE_SEMANTICS defines
+  -- later edge type cannot quietly acquire the behavior. RELATIONSHIP_TYPE_SEMANTICS defines
   -- related_to as a "symmetric/loose association with no stronger typed fit", so it is the
   -- vocabulary's own fallback and must lose to every specific type. Sorting it last reads that
   -- definition rather than ranking the others: where two
@@ -131,7 +131,7 @@ export async function planReleaseRelatedSync(
       entries = [];
       byEntity.set(row.entity_id, entries);
     }
-    // Dedup: one entry per neighbour, first (alphabetically stable) edge wins. Matches what
+    // Dedup: one entry per neighbor, first (alphabetically stable) edge wins. Matches what
     // backfill-release-related-from-edges has always emitted; widening it to multi-edge is a
     // separate decision about how the connects beat should read, not a side effect of this sync.
     if (!entries.some((entry) => entry.id === row.other_id)) {

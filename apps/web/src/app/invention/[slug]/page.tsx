@@ -9,7 +9,7 @@
  * It renders the RECORD room, not Place's map-led first-paint room. The question a reader brings
  * to an invention is who made it, what it was, and what changed — inventor, patent receipt,
  * impact beat, sources — and the first-paint room answers where something is instead. The pin
- * still exists on the record where the cohort documented a work site, labelled as the work site.
+ * still exists on the record where the cohort documented a work site, labeled as the work site.
  *
  * A slug that resolves to anything other than an invention permanently redirects to `/place/`,
  * which is the mirror of the invention redirect the place page does.

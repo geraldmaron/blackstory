@@ -92,7 +92,7 @@ export default async function DataPage() {
   /*
    * The headline band: four numbers a reader can take away, each linking to the figure that
    * carries it. Written here, not in the sections, because they are the page's own summary of
-   * the data it was handed, and a section should not have to know what its neighbours show.
+   * the data it was handed, and a section should not have to know what its neighbors show.
    */
   const homeLast = indicators.cookHomeownership.points.at(-1);
   const homeGap =

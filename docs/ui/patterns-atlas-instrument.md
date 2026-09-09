@@ -139,7 +139,7 @@ Five instruments, each independently hideable to a dock chip.
 | Zone | Contents |
 |---|---|
 | Left | Official symbol artwork alone, from `BRAND_ASSETS.symbol`, light and dark pair swapping on `data-theme`, then the `ATLAS` mono tag |
-| Centre | **`⌘K` trigger**, pill, `max-width: 520px`, right-aligned `⌘K` kbd chip |
+| Center | **`⌘K` trigger**, pill, `max-width: 520px`, right-aligned `⌘K` kbd chip |
 | Right | Mode switch (Explore / Story), divider, Saved with count badge, Shortcuts, Theme |
 
 The center slot is the single most important change in v9: navigation moves into the palette, and the bar carries two modes instead of fourteen destinations. Below 820px, drop the mode-switch labels and the `ATLAS` tag.
@@ -156,7 +156,7 @@ Group order: Where (state select, Near me) · Kind (five family chips with live 
 
 Filters auto-apply. No Apply button. Reset offers undo via toast. A scrollable panel gets a bottom fade when content continues below the fold.
 
-Colour key moves into the palette and the record sheet, where the encoding is actually being read.
+Color key moves into the palette and the record sheet, where the encoding is actually being read.
 
 ### 6.3 Results (right, z 20)
 
@@ -330,7 +330,7 @@ If a token fails one of these, **the token is wrong**. Do not loosen a threshold
 
 These are the difference between a site and a tool, and all of them ship in v1.
 
-| Capability | Trigger | Behaviour |
+| Capability | Trigger | Behavior |
 |---|---|---|
 | Command palette | `⌘K`, `/`, click | Records, state jumps, actions. Fuzzy. Matched substring in `<mark>` |
 | Save / collect | `S`, row bookmark | Badge count in bar, undo toast |

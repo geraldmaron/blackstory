@@ -37,7 +37,7 @@ export function trimChars(value: string, chars: string): string {
   return trimLeadingChars(trimTrailingChars(value, chars), chars);
 }
 
-/** Remove trailing `/` characters. The common case: normalising an origin or a slug. */
+/** Remove trailing `/` characters. The common case: normalizing an origin or a slug. */
 export function trimTrailingSlashes(value: string): string {
   return trimTrailingChars(value, '/');
 }

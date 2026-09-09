@@ -1,5 +1,5 @@
 /**
- * Density normalisation. The load-bearing case is the sparse decade: the archive's earliest
+ * Density normalization. The load-bearing case is the sparse decade: the archive's earliest
  * decades carry one or two records each, and a proportional bar would render them invisible
  * against a mid-century peak of several hundred.
  */

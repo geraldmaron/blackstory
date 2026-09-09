@@ -164,14 +164,14 @@ test('an ungraded record says so rather than borrowing a letter', () => {
   assert.match(html, /Evidence not graded/);
   assert.equal(/Evidence grade [ABC]/.test(html), false);
 
-  // Honestly empty rather than a fourth colour: three segments, none filled. Nobody assessed
+  // Honestly empty rather than a fourth color: three segments, none filled. Nobody assessed
   // this record, which is not the same claim as a weak assessment.
   assert.match(html, /ds-results__grade-meter/);
   assert.equal((html.match(/ds-rec-meter__seg--on/g) ?? []).length, 0);
   assert.equal((html.match(/ds-rec-meter__seg\b/g) ?? []).length, 3);
 });
 
-test('a lower grade fills fewer segments, so the scale survives greyscale', () => {
+test('a lower grade fills fewer segments, so the scale survives grayscale', () => {
   const forTier = (confidenceTier: 'high' | 'medium' | 'low') =>
     renderToStaticMarkup(
       createElement(

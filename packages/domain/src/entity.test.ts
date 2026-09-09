@@ -10,8 +10,8 @@ import { ENTITY_KINDS } from './entity-kinds.js';
 const NOW = '2026-07-17T00:00:00.000Z';
 
 test('ENTITY_KINDS carries all 13 kinds including invention', () => {
-  // `invention` is its own kind rather than a flavour of `artifact`, because an artifact is an
-  // object and an invention is the technology or process a reader recognises. It also does not
+  // `invention` is its own kind rather than a flavor of `artifact`, because an artifact is an
+  // object and an invention is the technology or process a reader recognizes. It also does not
   // require a patent to exist.
   assert.equal(ENTITY_KINDS.length, 13);
   assert.ok(ENTITY_KINDS.includes('movement'));

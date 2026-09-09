@@ -1826,7 +1826,7 @@ const RAW_BOOKS: BannedBookRecord[] = [
       },
       {
         label:
-          'Pennsylvania school district reverses ban on books by authors of color after backlash from students',
+          'Pennsylvania school district reverses ban on books by authors of colour after backlash from students',
         href: 'https://www.seattletimes.com/nation-world/pennsylvania-school-district-reverses-ban-on-books-by-authors-of-color-after-backlash-from-students/',
         publisher: 'The Seattle Times',
         publishedAt: '2021-09-21',

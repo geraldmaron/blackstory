@@ -283,7 +283,7 @@ test('lot-and-block plat descriptions are redacted', () => {
 });
 
 test('bare decimal coordinate pairs are redacted even with no label in front of them', () => {
-  // COORDINATE_RE only fires on a labelled coordinate ("Latitude 34.05"), so an unlabelled
+  // COORDINATE_RE only fires on a labeled coordinate ("Latitude 34.05"), so an unlabeled
   // pair leaked straight through.
   const text = 'Coordinates: 34.052235, -118.243683';
   const result = redactStreetAddresses(text);

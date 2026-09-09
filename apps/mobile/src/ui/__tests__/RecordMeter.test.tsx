@@ -1,7 +1,7 @@
 /**
  * The meter is the phone's half of one shared evidence language, so these assert the two rules
  * that language rests on: unrated fills nothing and is never a fourth grade, and the mark never
- * speaks in colour alone.
+ * speaks in color alone.
  */
 import { render } from '@testing-library/react-native';
 
@@ -30,7 +30,7 @@ describe('RecordMeter', () => {
     expect(getByText('·')).toBeTruthy();
   });
 
-  it('carries the letter beside the bars, so colour is never the only cue', async () => {
+  it('carries the letter beside the bars, so color is never the only cue', async () => {
     const { getByText } = await render(<RecordMeter tier="high" />);
     expect(getByText('A')).toBeTruthy();
   });

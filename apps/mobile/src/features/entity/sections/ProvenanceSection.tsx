@@ -2,7 +2,7 @@
  * Provenance: how far this record has been worked, and when it last changed.
  *
  * This beat used to be a paragraph — "Maturity: Partial Enrichment. Research coverage: Minimal.
- * Maturity labels follow the product constitution vocabulary." — which buried two labelled facts
+ * Maturity labels follow the product constitution vocabulary." — which buried two labeled facts
  * inside a sentence and then explained the vocabulary to a reader who never asked. Both facts are
  * fields, so they are rows in the same rhythm the anatomy beat uses, and coverage carries the
  * shared meter. The vocabulary sentence is gone: it addressed the archive, not the reader.

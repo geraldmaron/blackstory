@@ -150,7 +150,7 @@ export const ENTITY_ENRICHMENT_RESPONSE_SCHEMA = {
  * The standing contract for the drafter: what to write from, what an entry is for, and what it
  * must never do. Subject-specific constraints live in the user prompt, next to the evidence.
  *
- * Written as labelled sections rather than one paragraph. It was a single ~350-word run-on
+ * Written as labeled sections rather than one paragraph. It was a single ~350-word run-on
  * string in which the grounding rules, the editorial brief, the thin-evidence protocol and the
  * privacy rule ran together with no separation — the hardest constraints buried mid-sentence
  * between advice about architectural style. Sections do not change a single rule; they make each

@@ -678,7 +678,7 @@ export async function searchAndFetch(
       const batch = parseSearxngSearchResponse(JSON.parse(response.bodyText));
       return pick(batch.results);
     } catch (error) {
-      // Every failure here still degrades to "no corroboration", which is the right behaviour for
+      // Every failure here still degrades to "no corroboration", which is the right behavior for
       // an optional enrichment step. What it must not do is degrade SILENTLY: a fail-closed
       // refusal — a public base URL, an HTML error page, a redirect — would otherwise zero out a
       // whole overnight batch and read as a corpus with nothing to find.

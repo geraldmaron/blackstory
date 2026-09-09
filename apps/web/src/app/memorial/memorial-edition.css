@@ -293,7 +293,7 @@
 
 /* Quiet "this one goes further" cue: exact-match names with a real entity page (~3% of the
    list). No accent on this surface, so the signal is the underline alone — every name still
-   gets exactly the same ink color, which is the point of a memorial that plays no favourites. */
+   gets exactly the same ink color, which is the point of a memorial that plays no favorites. */
 .ds-memorial-edition__name-link {
   color: var(--ds-ink);
   text-decoration-thickness: 1px;

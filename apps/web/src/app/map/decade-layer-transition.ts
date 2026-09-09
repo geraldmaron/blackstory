@@ -340,7 +340,7 @@ export function runDecadeMorphAnimation(options: {
   readonly onProgress?: (easedProgress: number) => void;
 }): DecadeMorphAnimationHandle {
   let rafId = 0;
-  let cancelled = false;
+  let canceled = false;
   let settle: (() => void) | undefined;
   const done = new Promise<void>((resolve) => {
     settle = resolve;
@@ -360,7 +360,7 @@ export function runDecadeMorphAnimation(options: {
 
   const start = performance.now();
   const tick = (now: number) => {
-    if (cancelled || !options.isCurrent()) {
+    if (canceled || !options.isCurrent()) {
       finish();
       return;
     }
@@ -378,7 +378,7 @@ export function runDecadeMorphAnimation(options: {
 
   return {
     cancel: () => {
-      cancelled = true;
+      canceled = true;
       finish();
     },
     done,

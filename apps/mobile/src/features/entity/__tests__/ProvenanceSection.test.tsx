@@ -1,5 +1,5 @@
 /**
- * Provenance beat: labelled rows, a coverage meter, and no vocabulary lecture.
+ * Provenance beat: labeled rows, a coverage meter, and no vocabulary lecture.
  */
 import { render } from '@testing-library/react-native';
 
@@ -30,7 +30,7 @@ describe('ProvenanceSection', () => {
     ).toBeTruthy();
   });
 
-  it('keeps the revision dates as labelled rows', async () => {
+  it('keeps the revision dates as labeled rows', async () => {
     const entity = normalizeEntity(fullEntityFixture('place'))!;
     const { getByTestId } = await render(<ProvenanceSection entity={entity} index="09" />);
     expect(getByTestId('entity-provenance-updated')).toBeTruthy();

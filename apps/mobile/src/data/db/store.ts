@@ -12,7 +12,7 @@
  *     cross-launch offline read (ADR-022 rollback-considerations: "Disabling
  *     the persistent cache degrades to online-only fetching").
  *
- * Modelling the port at THIS level (rows + meta, not raw SQL) is deliberate:
+ * Modeling the port at THIS level (rows + meta, not raw SQL) is deliberate:
  * all the safety-critical policy logic (drop-and-rebuild migration, LRU, stamp
  * invalidation, never-cache enforcement) becomes testable in the node test
  * runner without a native SQLite engine. The raw-SQL translation lives in one

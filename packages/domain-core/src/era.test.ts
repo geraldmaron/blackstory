@@ -95,7 +95,7 @@ test('isDecadeAtOrBeforeCurrent accepts only started decades', () => {
 /*
  * Era evidence. The NRHP case these guard: the NPS weekly-list feed publishes a listing date
  * and no period of significance, so a site's only structured date is the year its paperwork
- * cleared. Reading that as the site's era labelled a lowcountry cemetery "2000s".
+ * cleared. Reading that as the site's era labeled a lowcountry cemetery "2000s".
  */
 
 const NRHP_CLAIMS = [

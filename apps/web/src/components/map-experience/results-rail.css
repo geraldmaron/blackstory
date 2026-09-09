@@ -213,8 +213,8 @@
 
 /*
  * The same three-segment meter the record sheet and the record page draw, sized for a 54px row.
- * Segment count is the non-colour channel (map-entity-encoding.md: colour is never the only
- * signal), so an ungraded record is honestly three empty segments rather than a fourth colour.
+ * Segment count is the non-color channel (map-entity-encoding.md: color is never the only
+ * signal), so an ungraded record is honestly three empty segments rather than a fourth color.
  */
 .ds-results__grade-meter .ds-rec-meter__seg {
   width: 7px;

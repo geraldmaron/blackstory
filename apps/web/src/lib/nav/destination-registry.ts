@@ -274,18 +274,18 @@ const DESTINATION_BY_PATH: ReadonlyMap<string, Destination> = new Map(
 );
 
 /**
- * Parents for dynamic segments, longest prefix first. A record's parent is its catalogue, which
+ * Parents for dynamic segments, longest prefix first. A record's parent is its catalog, which
  * is what makes "every record links back to the room that lists it" hold without any record page
  * knowing where it sits.
  */
 export const DYNAMIC_PARENTS: readonly (readonly [string, string])[] = [
   ['/corrections/status/', '/corrections'],
   ['/stories/', '/stories'],
-  // A record's catalogue is Records, on both the entity and the place address. It used to be the
+  // A record's catalog is Records, on both the entity and the place address. It used to be the
   // door, on the theory that a reader most likely arrived from the map — but a breadcrumb states
   // where a page SITS, not how the reader got there, and the way back to a map selection is
   // return state, not hierarchy. With Records a top-level axis rather than a room inside Rooms,
-  // the catalogue that lists a record is the honest parent.
+  // the catalog that lists a record is the honest parent.
   ['/place/', '/records'],
   ['/invention/', '/records'],
   ['/entity/', '/records'],

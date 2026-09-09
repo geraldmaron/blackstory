@@ -388,7 +388,7 @@ mobile risk, because OTA reaches every device without a store gate.
 - **Channel/rollout discipline and rollback.** Updates go through preview → staged rollout, not an
   instant 100% production push (mirrors invariant 4: immutable artifacts, atomic activation, proven
   rollback). A malicious or bad update is revertible by re-pointing the channel to the last
-  known-good bundle — the mobile analogue of ADR-010's "restore last known-good release."
+  known-good bundle — the mobile analog of ADR-010's "restore last known-good release."
 - **Publish only from CI with scoped credentials**, so human laptops do not hold standing publish
   power (MOB-019).
 

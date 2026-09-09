@@ -8,7 +8,7 @@ The class covers the 11 routes listed in [`patterns-surface-classes.md`](./patte
 
 ## 1. What it is
 
-Long form, catalogue and index editorial on paper. One scrolling, measure limited column. **The plate is never behind body text.** Geography appears only as bounded, in-flow map moments the reader scrolls to.
+Long form, catalog and index editorial on paper. One scrolling, measure limited column. **The plate is never behind body text.** Geography appears only as bounded, in-flow map moments the reader scrolls to.
 
 The class also carries the record index, because a browsable list of what the archive contains is editorial, not instrumentation. The map answers "what happened near here" well and "what is documented about X" badly. Routing both through the instrument leaves the archive with no browsable, crawlable, non-spatial index at all, which is the defect `/records` exists to fix.
 
@@ -27,7 +27,7 @@ Top to bottom, in one column:
 7. **Records off ramp.** Mandatory. Every instance ends with a named handoff into the map or `/records`.
 8. **Site footer.**
 
-Column width is the only thing the class varies: 720px default, and the record and utility classes narrow it. A catalogue index widens its rows, not its measure.
+Column width is the only thing the class varies: 720px default, and the record and utility classes narrow it. A catalog index widens its rows, not its measure.
 
 ---
 
@@ -58,7 +58,7 @@ Every map moment carries a caption that stands alone. If the caption needs the m
 
 ## 5. Entry and exit
 
-**Enter** from the palette, the footer, a map record's related links, or a catalogue card.
+**Enter** from the palette, the footer, a map record's related links, or a catalog card.
 
 **Exit** is never optional:
 

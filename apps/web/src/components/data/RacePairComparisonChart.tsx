@@ -16,7 +16,7 @@ export type RacePairComparisonChartProps = {
   readonly id?: string;
 };
 
-/* Colour follows the entity across the page: the Black series is ink (viz-1) and the White
+/* Color follows the entity across the page: the Black series is ink (viz-1) and the White
    series copper (viz-2) here, exactly as the grouped-bar fixtures assign them. */
 /**
  * A series' `ratioLabel` is either a true ratio ("White-to-Black wealth ratio") or a difference in

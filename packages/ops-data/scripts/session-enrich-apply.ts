@@ -157,7 +157,7 @@ async function main(): Promise<void> {
   }
   console.log(`Model recorded: ${SESSION_MODEL_ID} (cost_usd=0, session-drafted)`);
 
-  // A refusal is only a judgement about the entity if the evidence was really the entity's. A row
+  // A refusal is only a judgment about the entity if the evidence was really the entity's. A row
   // whose evidence has since been quarantined as mis-attached (repo-pjob) has nothing left to have
   // been judged, so recording it terminal would close a record that was never actually researched.
   // fetchEnrichmentSubjects reports exactly that condition, so the guard is free.
@@ -166,7 +166,7 @@ async function main(): Promise<void> {
   // not caught yet still has its evidence attached and so passes the check above — repo-nlcq is a
   // measured example, an entity named after its own county whose county article defeats both
   // automated layers. The human-in-the-loop drafter that read the document IS the detector in
-  // that case, so an explicit MIS-ATTACHED verdict has to be honoured here or the terminal status
+  // that case, so an explicit MIS-ATTACHED verdict has to be honored here or the terminal status
   // silently closes exactly the records it was designed to protect.
   const isMisattachedVerdict = (reason: string): boolean => /^\s*MIS-ATTACHED\b/iu.test(reason);
   const noEvidence = new Set(skippedNoEvidence);

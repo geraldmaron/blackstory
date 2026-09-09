@@ -10,7 +10,7 @@
  * `helperText`.
  *
  * Built on `@repo/ui`'s `FilterBar` (native fieldset/legend/label markup, no bespoke input)
- * rather than a hand-rolled `<input>`, so labelling/keyboard behavior matches every other filter
+ * rather than a hand-rolled `<input>`, so labeling/keyboard behavior matches every other filter
  * control in this app.
  */
 import React from 'react';

@@ -16,7 +16,7 @@
  * - `unrated` has no letter and no filled segment. A record nobody assessed is not a D. Inventing
  *   a fourth grade for it presents absence of assessment as a low assessment.
  * - The meter is never the only cue. Every renderer pairs it with the letter or the sentence,
- *   because colour alone is not information.
+ *   because color alone is not information.
  */
 
 import type { ConfidenceTierV1 } from './v1/map.js';
@@ -57,7 +57,7 @@ export function gradeDescription(grade: EvidenceGrade | null): string {
   return grade === null ? 'Evidence not graded' : `Evidence grade ${grade}`;
 }
 
-/** Filled segments for a confidence tier. Unrated is honestly empty, never a fourth colour. */
+/** Filled segments for a confidence tier. Unrated is honestly empty, never a fourth color. */
 export function meterLevelForTier(tier: ConfidenceTier | string): number {
   switch (tier) {
     case 'high':

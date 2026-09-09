@@ -1,5 +1,5 @@
 /**
- * Trailing-slash trimming, shared by the modules in this package that normalise an origin.
+ * Trailing-slash trimming, shared by the modules in this package that normalize an origin.
  *
  * `value.replace(/\/+$/, '')` is the obvious spelling and is quadratic on input ending in a long
  * run of slashes (CodeQL js/polynomial-redos). These values come from deploy configuration, so

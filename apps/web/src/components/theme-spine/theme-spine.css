@@ -46,7 +46,7 @@
 /*
  * Vertical chronological rail. The continuous hairline is drawn on the list itself so it
  * spans every row without absolute positioning per item; rows lay out with grid, so a long
- * document title wraps under itself instead of colliding with its neighbours.
+ * document title wraps under itself instead of colliding with its neighbors.
  */
 .ds-era-timeline__list {
   position: relative;
@@ -69,7 +69,7 @@
 }
 
 /*
- * The tick straddles the rail. Offset by the list's own left padding so it centres on the
+ * The tick straddles the rail. Offset by the list's own left padding so it centers on the
  * border regardless of the space token's value, and nudged down to sit on the date's cap
  * height rather than its baseline.
  */

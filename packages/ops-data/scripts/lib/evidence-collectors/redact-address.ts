@@ -71,7 +71,7 @@ const COORDINATE_RE =
 
 /**
  * A bare decimal coordinate pair with no keyword in front of it — "34.052235, -118.243683".
- * COORDINATE_RE only fires on a labelled coordinate, so this shape leaked straight through.
+ * COORDINATE_RE only fires on a labeled coordinate, so this shape leaked straight through.
  */
 const BARE_COORDINATE_PAIR_RE = /-?\b\d{1,3}\.\d{4,8}\s*,\s*-?\d{1,3}\.\d{4,8}\b/gu;
 

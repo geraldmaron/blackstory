@@ -1164,7 +1164,7 @@ export function buildReleaseEntityArtifacts(
   );
   /*
    * The ONE engine on the publish path (`docs/security/location-precision-standard.md` §4):
-   * every entity's raw/authored precision is normalised onto the controlled public tier list
+   * every entity's raw/authored precision is normalized onto the controlled public tier list
    * and reduced per the standard's §3 conditions (living-residence, restricted/sensitive site,
    * withheld-on-request, ...) right here, so nothing downstream re-derives or re-decides this.
    * The reduced tier and its reason (when any rule fired) are both written onto the projection.

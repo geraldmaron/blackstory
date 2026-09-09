@@ -475,7 +475,7 @@ export function buildReleaseSourceFromLandscape(
   // A geocode fallback (e.g. reconcile-nrhp-county-locations.ts) records the real precision
   // of its coordinates here so the map renders an honest radius affordance instead of a
   // sharpened pin implying site-level accuracy the source data doesn't have. Per
-  // docs/security/location-precision-standard.md §2, every raw precision is normalised onto
+  // docs/security/location-precision-standard.md §2, every raw precision is normalized onto
   // the controlled public tier list before it ever reaches the release builder. When there is
   // no geocode precision at all, a row carrying a street-address string (historicAddress) is
   // "address" tier; otherwise it fails safe to "city" (never the old bare "site" default,

@@ -1,5 +1,5 @@
 /**
- * Record anatomy (beat 01): place preview, then Kind / Where / Era / Evidence as labelled rows,
+ * Record anatomy (beat 01): place preview, then Kind / Where / Era / Evidence as labeled rows,
  * and the maps hand-off.
  *
  * Evidence carries the shared meter beside its grade, so the record page states its assessment

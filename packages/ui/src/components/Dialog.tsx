@@ -1,5 +1,5 @@
 /**
- * Modal dialog built on the native <dialog> element with Escape close and labelled title.
+ * Modal dialog built on the native <dialog> element with Escape close and labeled title.
  */
 
 'use client';

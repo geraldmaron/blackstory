@@ -121,7 +121,7 @@ test('planReleaseRelatedSync leaves a correct list alone regardless of stored or
   assert.equal(plan.unchanged, 1);
 });
 
-test('planReleaseRelatedSync emits one entry per neighbour when several edges join the same pair', async () => {
+test('planReleaseRelatedSync emits one entry per neighbor when several edges join the same pair', async () => {
   const client = fakeClient(
     [
       {

@@ -13,7 +13,7 @@ import { DetailField, DetailPanel } from './DetailPanel.tsx';
 import { InlineEdit } from './InlineEdit.tsx';
 import { Toolbar, ToolbarField } from './Toolbar.tsx';
 
-test('Toolbar without an action is a labelled toolbar, not an unnamed div', () => {
+test('Toolbar without an action is a labeled toolbar, not an unnamed div', () => {
   const html = renderToStaticMarkup(createElement(Toolbar, { label: 'View controls' }, 'controls'));
   assert.match(html, /role="toolbar"/);
   assert.match(html, /aria-label="View controls"/);
@@ -44,7 +44,7 @@ test('ToolbarField keeps its label for screen readers even when visually hidden'
   assert.match(html, />Search</);
 });
 
-test('DetailPanel is a labelled section with a definition list of fields', () => {
+test('DetailPanel is a labeled section with a definition list of fields', () => {
   const html = renderToStaticMarkup(
     createElement(DetailPanel, {
       title: 'Record',

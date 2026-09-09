@@ -5,7 +5,7 @@
  * rules. Never writes anywhere: this lane is brand-new candidates (not yet in the catalog),
  * so the output is a review packet file for a human to read before anything is promoted to
  * landscape_candidates — a materially bigger, more sensitive step than the entity-enrichment
- * lane's session-enrich-apply.ts (which only fills fields on already-catalogued entities).
+ * lane's session-enrich-apply.ts (which only fills fields on already-catalogd entities).
  *
  * Usage:
  *   node --conditions development --import tsx \

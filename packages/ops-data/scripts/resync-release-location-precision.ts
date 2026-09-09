@@ -18,7 +18,7 @@
  *
  * Source of truth per row: bb_canonical.entity_locations (role precedence current > approximate >
  * historical, then most recently updated). Rows with no canonical location keep their published
- * point and are only re-normalised through the engine.
+ * point and are only re-normalized through the engine.
  *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a
@@ -85,7 +85,7 @@ type Row = {
 };
 
 /**
- * Key-order-independent serialisation. jsonb returns object keys in its own order (shortest
+ * Key-order-independent serialization. jsonb returns object keys in its own order (shortest
  * first, then bytewise), which is never the insertion order of the rebuilt object, so a plain
  * JSON.stringify comparison reports every row as changed.
  */

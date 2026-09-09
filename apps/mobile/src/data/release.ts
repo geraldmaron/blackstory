@@ -3,7 +3,7 @@
  *
  * VENDORED from `packages/domain/src/publication/mobile-bootstrap.ts`
  * (`isReleaseStampStale`) because `@repo/domain` is not importable from
- * `apps/mobile` today (see contracts.ts INTEGRATION GAP). Kept behaviourally
+ * `apps/mobile` today (see contracts.ts INTEGRATION GAP). Kept behaviorally
  * identical: the stamp is the AUTHORITATIVE freshness signal for immutable
  * release content — a mismatch hard-invalidates release-coupled cache
  * regardless of TTL, and an absent client stamp (first launch, or a wiped

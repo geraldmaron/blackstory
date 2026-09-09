@@ -11,7 +11,7 @@
  * in @repo/domain-core/claims/source-fitness holds that table; this module holds the record.
  *
  * INVENTOR NAMES ARE STORED AS PUBLISHED. "Jan E. Matzeliger" on the face of a patent is a
- * historical fact about the document, and normalising it away loses the evidence. Resolution to
+ * historical fact about the document, and normalizing it away loses the evidence. Resolution to
  * a canonical person is a separate, reversible act with its own confidence — and `unresolved`
  * is a legitimate resting state, not a null waiting to be guessed at.
  */
@@ -30,7 +30,7 @@ export type PatentSourceSystem = (typeof PATENT_SOURCE_SYSTEMS)[number];
  *
  * `unresolved` is the honest state for a name the catalog has not matched to a person, and it
  * must survive: a patent naming four inventors of whom one is in the catalog still names four.
- * `not_in_scope` marks a real person deliberately not modelled — a co-inventor outside the
+ * `not_in_scope` marks a real person deliberately not modeled — a co-inventor outside the
  * catalog's subject matter, who must still appear so the attribution stays truthful.
  */
 export const INVENTOR_RESOLUTION_STATES = ['resolved', 'unresolved', 'not_in_scope'] as const;
@@ -162,7 +162,7 @@ export function isMultiInventor(patent: CanonicalPatent): boolean {
  * Guard a sole-inventor attribution against the document.
  *
  * The West/Sessler, Sampson/Miley, Brown/Brown and Jones/Numero cases all fail here. Centring
- * the contributor a Black-history catalog exists to cover is editorial judgement and entirely
+ * the contributor a Black-history catalog exists to cover is editorial judgment and entirely
  * legitimate; dropping the others from the record is an error about the past.
  */
 export function assertSoleInventorClaimSupported(

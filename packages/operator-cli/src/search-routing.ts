@@ -112,7 +112,7 @@ const braveSearchClient: RoutedSearchHttpClient = async (request) => {
           for (const [key, value] of Object.entries(response.headers)) {
             headers[key.toLowerCase()] = Array.isArray(value) ? value.join(', ') : value;
           }
-          // The caller declares what it will accept; honour it rather than trusting the body to
+          // The caller declares what it will accept; honor it rather than trusting the body to
           // be what was asked for. wayback-http.ts and the operator-endpoint client both assert
           // this, and a Brave error page served as HTML must not be parsed as a result set.
           const essence = (headers['content-type'] ?? '').split(';', 1)[0]!.trim().toLowerCase();

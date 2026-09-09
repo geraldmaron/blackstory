@@ -6,7 +6,7 @@
  * required follow-up step: reach for it to preview or fix the active release out of band, not to
  * finish a publish.
  *
- * Two behaviours changed when the mapping moved into the shared module, both deliberate:
+ * Two behaviors changed when the mapping moved into the shared module, both deliberate:
  *  - it is authoritative, replacing `related[]` instead of only filling an empty one, which is the
  *    only way to reach a list that is stale rather than absent (the entity-merge case);
  *  - BACKFILL_RELATED_REFRESH_ENTITY_IDS is therefore gone — it existed solely to force past the

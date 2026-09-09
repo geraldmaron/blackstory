@@ -75,7 +75,7 @@ function ProviderControl({
 
   /*
    * The pair is a visual grouping, not a semantic one: both links already name their provider and
-   * their action, so a nested `role="group"` labelled "Apple Maps" only made a screen reader say
+   * their action, so a nested `role="group"` labeled "Apple Maps" only made a screen reader say
    * the provider three times before the reader reached a link.
    */
   return (

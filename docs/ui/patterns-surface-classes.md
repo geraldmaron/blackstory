@@ -46,7 +46,7 @@ Pattern: [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md). Desig
 | `/history` | Thin server route that maps decade to era and redirects to `/records`, always. Can never be deleted: cached permanent redirects point at it. |
 | `/chapters` | The publication index. |
 | `/chapters/[slug]` | Chapter detail. Keeps `generateStaticParams`. |
-| `/books` | Banned and challenged books catalogue. |
+| `/books` | Banned and challenged books catalog. |
 | `/law` | Plain language law reference. |
 | `/data` | Charts on paper, plus the kind composition graph rescued from `/history`. |
 | `/memorial` | The wall, with the plate Parked and hidden. |
@@ -112,7 +112,7 @@ Every class carries the command bar, the palette, the collections drawer, the to
 
 A typing-target check is not a WCAG 2.1.4 mechanism and does not count. `isTypingTarget` checks `tagName` and `isContentEditable` and nothing else, which satisfies none of the three mechanisms the success criterion names. Scoping camera, time and record keys to the Instrument's `main` landmark is mechanism three, and it removes the failure on `/corrections` and `/submit` by construction rather than leaving those surfaces one forgotten setting away from firing camera moves into a half-filled form.
 
-The global "Single-key shortcuts on/off" control still ships, in the shortcut sheet header and as a palette command, persisted beside `ds-theme`. It is the second line of defence, not the mechanism.
+The global "Single-key shortcuts on/off" control still ships, in the shortcut sheet header and as a palette command, persisted beside `ds-theme`. It is the second line of defense, not the mechanism.
 
 The `A` key is disabled on any surface with no subject, and the shortcut sheet says so.
 

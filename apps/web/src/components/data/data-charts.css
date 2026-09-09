@@ -1,6 +1,6 @@
 /**
  * The Data Figure (`.ds-datafig`) and the marks inside it. Flat matte fills, hairline rules,
- * mono axis labels, brand series colours only (ink, copper, stone, sand via `--ds-viz-*`).
+ * mono axis labels, brand series colors only (ink, copper, stone, sand via `--ds-viz-*`).
  *
  * A figure is not a card. It sits on the page ground with one hairline above it, the way a
  * figure sits in a printed report: the frame is the rule, the title and the source line. A

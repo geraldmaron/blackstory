@@ -93,7 +93,7 @@ function notesFor(attempt: EnrichmentAttempt, reviewSample: boolean): Record<str
  *
  * NOT to be used for a mis-attached document (repo-pjob). "This evidence says nothing about Black
  * history" and "this evidence is about a different subject entirely" look identical to a drafter
- * and are opposite facts: the first is a finished judgement about the entity, the second is a
+ * and are opposite facts: the first is a finished judgment about the entity, the second is a
  * retrieval bug where the entity was never researched at all. Marking the second terminal would
  * permanently close a record whose real nomination was simply never fetched. Those belong in the
  * identity gate and leave the row with no captured evidence at all.
@@ -104,7 +104,7 @@ export async function applyLaneSignificanceRefusal(
     readonly entityId: string;
     /** The drafter's stated reason — kept verbatim; it is the whole audit trail for the decision. */
     readonly reason: string;
-    /** Digest of the evidence this judgement was made about. Null only if the row has none. */
+    /** Digest of the evidence this judgment was made about. Null only if the row has none. */
     readonly evidenceDigest: string | null;
     readonly modelId: string;
   },

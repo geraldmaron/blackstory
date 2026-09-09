@@ -425,7 +425,7 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<
   },
   licensed_to: {
     direction: 'fromEntity was LICENSED_TO toEntity under a recorded arrangement.',
-    temporalSemantics: 'validFrom/validTo bound the licence term where known.',
+    temporalSemantics: 'validFrom/validTo bound the license term where known.',
     requiresTemporalContext: false,
   },
   manufactured_by: {

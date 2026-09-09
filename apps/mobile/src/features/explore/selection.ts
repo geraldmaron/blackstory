@@ -9,7 +9,7 @@
  * withdrawn or released-out between sessions its id no longer appears among the
  * available features, and restoration falls back to "no selection" gracefully —
  * it never hands a stale id to the entity route or crashes. This is the Explore
- * analogue of ADR-004/MOB-005 release-stamp invalidation at the selection layer.
+ * analog of ADR-004/MOB-005 release-stamp invalidation at the selection layer.
  */
 import { parseEntityId } from '@/lib/route-params';
 import type { ExploreFeature } from './explore-feature';

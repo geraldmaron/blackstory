@@ -136,7 +136,7 @@ test('live web-search dispatch routes through the injected search client', async
   assert.equal(requests[0]!.headers?.Authorization, 'Bearer proxy-secret');
   // JSON only, so an HTML error page cannot be parsed as a result set. Asserted rather than
   // described: the client's default allowlist is the same two values, so deleting the dispatcher's
-  // declaration would change no behaviour and nothing would surface it.
+  // declaration would change no behavior and nothing would surface it.
   assert.deepEqual(requests[0]!.allowedContentTypes, ['application/json', 'text/json']);
 });
 

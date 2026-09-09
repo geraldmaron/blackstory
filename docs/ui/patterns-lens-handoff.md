@@ -37,7 +37,7 @@ Named handoffs in this release:
 | `/data` | "See this on the map" | the population layer at the matching decade |
 | Record pages | **Explore this place** | the record, selected |
 
-`/data`'s handoff ships only once the Lens exposes the population layer with its comparability note. Until then `/data` stays self contained, rather than dropping a reader on an unlabelled choropleth with no way back to pins.
+`/data`'s handoff ships only once the Lens exposes the population layer with its comparability note. Until then `/data` stays self contained, rather than dropping a reader on an unlabeled choropleth with no way back to pins.
 
 ---
 

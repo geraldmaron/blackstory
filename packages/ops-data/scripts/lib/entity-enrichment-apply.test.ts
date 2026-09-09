@@ -114,7 +114,7 @@ describe('applyLaneSignificanceRefusal', () => {
     assert.match(sql, /status = 'no-lane-significance'/u);
   });
 
-  it('records the evidence digest the judgement was made about, so it can be reopened', async () => {
+  it('records the evidence digest the judgment was made about, so it can be reopened', async () => {
     const { params } = await capture({ reason: 'purely architectural', evidenceDigest: 'abc123' });
     assert.equal(params[2], 'abc123');
   });

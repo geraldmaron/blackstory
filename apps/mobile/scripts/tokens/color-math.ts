@@ -57,7 +57,7 @@ export function contrastRatio(a: Hex, b: Hex): number {
 }
 
 /**
- * Deterministically mixes `hex` toward `towards` in fixed small steps until
+ * Deterministically mixes `hex` toward `toward` in fixed small steps until
  * the result clears `minRatio` contrast against `bg`, or gives up after
  * exhausting the mix range (throws — the two source colors genuinely cannot
  * be reconciled and the caller needs a different anchor color). Used to
@@ -65,17 +65,17 @@ export function contrastRatio(a: Hex, b: Hex): number {
  * raw brand-guide value, does not itself clear the bar (logos/brand marks
  * are WCAG 1.4.11-exempt; a reused UI graphic role is not).
  */
-export function ensureContrast(hex: Hex, bg: Hex, minRatio: number, towards: Hex): Hex {
+export function ensureContrast(hex: Hex, bg: Hex, minRatio: number, toward: Hex): Hex {
   const STEP = 0.02;
   let candidate = hex;
   for (let t = 0; t <= 1; t += STEP) {
-    candidate = mix(hex, towards, t);
+    candidate = mix(hex, toward, t);
     if (contrastRatio(candidate, bg) >= minRatio) {
       return candidate;
     }
   }
   throw new Error(
-    `color-math.ensureContrast: could not reach ${minRatio}:1 mixing ${hex} toward ${towards} against ${bg}.`,
+    `color-math.ensureContrast: could not reach ${minRatio}:1 mixing ${hex} toward ${toward} against ${bg}.`,
   );
 }
 

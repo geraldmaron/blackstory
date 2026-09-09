@@ -208,7 +208,7 @@ describe('parseCollegeNavigatorFacts', () => {
 
   it('ignores the search-form checkbox option that also names the HBCU marker', () => {
     // The fixture's boilerplate <option> contains the literal HBCU string; a naive scan of the
-    // WHOLE document for that string alone (rather than requiring the labelled block too) would
+    // WHOLE document for that string alone (rather than requiring the labeled block too) would
     // still find it, so this only proves the fixture is a faithful stand-in — the real guard
     // here is the IPEDS-ID echo-back and header parse, exercised by the other tests above.
     assert.ok(SHORTER_COLLEGE_HTML.includes('<option value="4">Historically Black'));

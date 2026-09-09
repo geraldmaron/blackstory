@@ -4,7 +4,7 @@
  * Positioned clear of the time panel: the time panel is centered at `min(760px, 100vw - 24px)`, so
  * on a narrow viewport the console stacks above it rather than overlapping.
  *
- * This panel's height is load-bearing for its neighbour: the results rail sits directly above it
+ * This panel's height is load-bearing for its neighbor: the results rail sits directly above it
  * and takes its floor from `--ds-atlas-bottom-right`, which CameraConsole.tsx measures off this
  * box. Anything here that changes the console's height changes the rail — which is why the rail
  * reads a measurement rather than a number someone has to remember to update.

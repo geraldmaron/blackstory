@@ -7,7 +7,7 @@
  * random, so server and client render the same path) and bows each edge with a cubic curve.
  * Text is always placed from the *unperturbed* box geometry with enough interior padding to
  * clear the largest possible wobble, so the hand-drawn jitter can never push a label into a
- * neighbour or outside its box.
+ * neighbor or outside its box.
  */
 import React from 'react';
 

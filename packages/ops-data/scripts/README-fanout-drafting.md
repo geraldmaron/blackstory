@@ -86,7 +86,7 @@ From the repo root, with `set -a && source apps/web/.env.local && set +a` and
    which **passed the validator** because every clause was citable. Only a human read caught it.
 
    Mechanically, a deferred subject writes no file, so `session-enrich-collect.ts` reports it under
-   `NO OUTPUT AT ALL — a drafter likely died`. That is the right behaviour reached by the wrong
+   `NO OUTPUT AT ALL — a drafter likely died`. That is the right behavior reached by the wrong
    path; read that line as "deferred or died" until collect learns about an explicit
    `defer-N.json`.
 
@@ -102,7 +102,7 @@ From the repo root, with `set -a && source apps/web/.env.local && set +a` and
    ```
 
    The second command is a dry run. Read the summaries it prints before applying — the validator
-   checks that prose is *sourced*, never that it is *good*, and that judgement stays with a person.
+   checks that prose is *sourced*, never that it is *good*, and that judgment stays with a person.
 
 5. **Apply.** Set `SESSION_ENRICH_MODEL_ID` so the internal ledger records the provenance
    accurately; it defaults to a hardcoded value that may not reflect what actually ran, and the
@@ -178,7 +178,7 @@ The validator checks that prose is *sourced*. It cannot check that the prose is 
 subject, and that gap has a specific, repeatable shape.
 
 Cato Hill Historic District is the clean example. Its tier-1 nomination documents an Irish, then
-French-Canadian, then Central European mill neighbourhood in Woonsocket and contains no Black
+French-Canadian, then Central European mill neighborhood in Woonsocket and contains no Black
 content whatsoever. Its entire Black connection is one sentence in a Wikipedia-derived tier-2 stub:
 the hill is named for Cato Aldrich, an African American who bought the land from the family that
 founded the town. A drafter turned that into a valid entry — the naming fact is genuinely citable —

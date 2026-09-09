@@ -27,7 +27,7 @@ def test_parser_is_deterministic_and_records_atomicity_uncertainty() -> None:
 
 
 def test_escaped_pipe_is_preserved() -> None:
-    parsed = parse_claim_lines(r"entity-1 | catalogued as | A \| B")
+    parsed = parse_claim_lines(r"entity-1 | catalogd as | A \| B")
     assert parsed[0].object == "A | B"
 
 

@@ -147,7 +147,7 @@ export type SemanticDestination = {
  * Every public destination, in product order: the axes first, then the rooms by family.
  *
  * PARENTS ENCODE THE PRODUCT, NOT THE OLD MENU. Stories and Records are top-level axes, so they
- * parent to the door and not to Rooms — modelling them as Rooms children was the old Library
+ * parent to the door and not to Rooms — modeling them as Rooms children was the old Library
  * hierarchy surviving inside a renamed surface, and it told a reader that the archive index was
  * a supporting page.
  */

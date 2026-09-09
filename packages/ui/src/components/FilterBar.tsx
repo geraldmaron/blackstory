@@ -1,5 +1,5 @@
 /**
- * Native filter controls (fieldset + labelled inputs) for result refinement.
+ * Native filter controls (fieldset + labeled inputs) for result refinement.
  */
 
 'use client';

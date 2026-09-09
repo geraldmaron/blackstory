@@ -36,7 +36,7 @@ export const PERSISTENT_PLATE_LAYER_IDS = [
   // toggle has to re-push it, or the dark plate's scrim stays over the light one.
   'plate-satellite',
   // Base cartography: land, water, country border and city names all carry theme-dependent
-  // paint, so a light/dark toggle has to push their colours the same way it pushes the streets'.
+  // paint, so a light/dark toggle has to push their colors the same way it pushes the streets'.
   'plate-landcover',
   'plate-water',
   'plate-boundary-country',

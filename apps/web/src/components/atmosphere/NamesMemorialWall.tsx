@@ -130,12 +130,12 @@ export function NamesMemorialWall({
   useEffect(() => {
     if (prefersReducedMotion() || saveDataEnabled()) return;
 
-    let cancelled = false;
+    let canceled = false;
     const busy = new Set<number>();
     const timeoutIds: number[] = [];
 
     const runBreath = (staggerIndex: number) => {
-      if (cancelled) return;
+      if (canceled) return;
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
       if (prefersReducedMotion() || saveDataEnabled()) return;
 
@@ -148,7 +148,7 @@ export function NamesMemorialWall({
       const clearId = window.setTimeout(
         () => {
           busy.delete(swap.cellIndex);
-          if (cancelled) return;
+          if (canceled) return;
           setGlyphs((prev) =>
             prev.map((glyph, index) =>
               index === swap.cellIndex ? { ...glyph, fading: false } : glyph,
@@ -161,7 +161,7 @@ export function NamesMemorialWall({
     };
 
     const runBatch = () => {
-      if (cancelled) return;
+      if (canceled) return;
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
       const batch = memorialBreathBatchSize(seedKey, tickRef.current + 1);
       for (let i = 0; i < batch; i += 1) {
@@ -175,7 +175,7 @@ export function NamesMemorialWall({
     timeoutIds.push(kickId);
 
     return () => {
-      cancelled = true;
+      canceled = true;
       clearInterval(intervalId);
       for (const id of timeoutIds) window.clearTimeout(id);
     };

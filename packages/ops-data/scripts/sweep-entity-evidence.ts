@@ -52,7 +52,7 @@ import { redactStreetAddresses } from './lib/evidence-collectors/redact-address.
 import { checkSubjectIdentity } from './lib/evidence-collectors/subject-identity.ts';
 import { assessText, stripUnstorableCharacters } from './lib/evidence-collectors/text-quality.ts';
 import {
-  WIKIPEDIA_LICENCE,
+  WIKIPEDIA_LICENSE,
   lookupWikipediaArticle,
   lookupWikipediaArticleByTitle,
 } from './lib/evidence-collectors/wikipedia.ts';
@@ -110,7 +110,7 @@ const FETCH_DELAY_MS = Number.parseInt(flag('delay-ms', '750'), 10);
 /**
  * repo-75et (PATH 2) — candidate URLs found by a search step this script does not itself run.
  * This script has no LLM/search access of its own (PATH 1 is deliberately deterministic, no
- * model); PATH 2 needs judgement per entity per the epic's own charter, so search happens in a
+ * model); PATH 2 needs judgment per entity per the epic's own charter, so search happens in a
  * separate pass (a subagent, or any process with real web-search access) that writes
  * `{ [entityId]: string[] }` to this file. What THIS script does with those URLs is unchanged
  * from every other collector here: fetch via the same safe-fetch path, gate via the same
@@ -362,7 +362,7 @@ async function collectWikipedia(row: CandidateRow): Promise<EvidenceRow | null> 
     status: quality.usable ? 'captured' : 'quarantined',
     provenance: {
       pageId: article.pageId,
-      licence: WIKIPEDIA_LICENCE,
+      licence: WIKIPEDIA_LICENSE,
       publisher: 'Wikipedia contributors',
       attributionRequired: true,
       identity: article.identity,
@@ -600,7 +600,7 @@ async function collectPersonWikipedia(row: CandidateRow): Promise<EvidenceRow | 
     qualityScore: quality.score,
     status: quality.usable ? 'captured' : 'quarantined',
     provenance: {
-      licence: WIKIPEDIA_LICENCE,
+      licence: WIKIPEDIA_LICENSE,
       publisher: 'Wikipedia contributors',
       attributionRequired: true,
       identityAnchor: 'canonicalUrl (assigned from Wikidata QID at discovery)',
@@ -844,7 +844,7 @@ async function sweepEntity(
       if (found !== null) evidence.push(finalizeEvidenceRow(row, found));
     } catch (error) {
       // One collector declining or failing must not lose the others' results, and must not
-      // abort the batch. Skips and errors are labelled differently so the run report separates
+      // abort the batch. Skips and errors are labeled differently so the run report separates
       // "the source has nothing" from "our code broke".
       const prefix = error instanceof SkipReason ? 'skip' : 'error';
       notes.push(`${name}: ${prefix} — ${(error as Error).message}`);

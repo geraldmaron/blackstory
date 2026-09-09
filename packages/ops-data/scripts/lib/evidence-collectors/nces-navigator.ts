@@ -19,7 +19,7 @@
  * rendered on every institution page) plus JS/analytics chrome. Regex tag-stripping over that
  * produces no genuinely quotable prose — the page has none; it is a data table, not an article —
  * and safeFetchPage's Trafilatura extraction (tuned for article bodies) fares no better against a
- * page that IS a form. So this collector parses the labelled fact table directly (institution
+ * page that IS a form. So this collector parses the labeled fact table directly (institution
  * name, address, type/control, HBCU designation, awards offered, enrollment, campus setting) and
  * SYNTHESIZES 1-4 short factual sentences from those structured fields — not scraped verbatim
  * prose, because the page carries none to scrape.
@@ -144,14 +144,14 @@ const HBCU_MARKER = 'Historically Black College or University';
  * "Specialized Mission" <select> whose options literally include the string
  * "Historically Black College or University" as a filter choice — present on EVERY institution's
  * page, HBCU or not. A `html.includes(HBCU_MARKER)` check over the whole document is always true
- * and verifies nothing; the designation only means something read out of this specific labelled
+ * and verifies nothing; the designation only means something read out of this specific labeled
  * block in the institution's own characteristics list.
  */
 const OTHER_CHARACTERISTICS_RE =
   /Other Characteristics<\/div>([\s\S]*?)<div style="font-weight:bold;padding-top:6px">/u;
 
 /**
- * Parses the labelled fact table on a College Navigator page. Returns null (never a partial or
+ * Parses the labeled fact table on a College Navigator page. Returns null (never a partial or
  * best-effort object) when the page does not corroborate `expectedUnitId` as an HBCU — see module
  * docs for the three fail-closed checks.
  */
@@ -231,7 +231,7 @@ function formatList(items: readonly string[]): string {
 
 /**
  * Synthesizes 2-4 short factual sentences from parsed table fields — never scraped verbatim text,
- * since the page carries none. Every clause traces to one labelled field, so a reviewer can check
+ * since the page carries none. Every clause traces to one labeled field, so a reviewer can check
  * any sentence against the same table a human would read on nces.ed.gov.
  *
  * `facts.address` has already had USPS directional abbreviations expanded (N -> North, etc — see

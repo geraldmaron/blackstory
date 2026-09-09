@@ -2,7 +2,7 @@
  * Source lineage: which underlying work a citation traces back to.
  *
  * The confidence engine dedupes supporting evidence by `lineageRootId` so that syndicated
- * copies count once. That defence only works if the id names the WORK. Until now every
+ * copies count once. That defense only works if the id names the WORK. Until now every
  * production caller set it to `new URL(url).hostname`, which gets the answer wrong in both
  * directions: five newspapers carrying one wire story looked like five independent lineages,
  * a patent read on uspto.gov and on patents.google.com looked like two, and `nps.gov` and
@@ -21,7 +21,7 @@
  *      id, a NARA catalog id. These collapse mirrors across hosts, which is the case that
  *      matters most for patent research.
  *   3. Bridge sources (Wikipedia, Wikidata) collapse to one key and are marked `bridge`, so a
- *      caller can honour the standing rule that a bridge may carry a claim and never
+ *      caller can honor the standing rule that a bridge may carry a claim and never
  *      corroborates one.
  *   4. Otherwise the issuing authority — the publisher family behind the host.
  *

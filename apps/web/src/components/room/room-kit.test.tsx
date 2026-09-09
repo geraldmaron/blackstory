@@ -134,7 +134,7 @@ describe('room kit · the trail is computed, never hand-written', () => {
     ]);
   });
 
-  it("a record's parent is its catalogue, not the site root", () => {
+  it("a record's parent is its catalog, not the site root", () => {
     assert.deepEqual(resolveTrail('/books/the-bluest-eye', 'The Bluest Eye'), [
       { label: 'Rooms', href: '/rooms' },
       { label: 'Banned books', href: '/books' },
@@ -142,7 +142,7 @@ describe('room kit · the trail is computed, never hand-written', () => {
     ]);
   });
 
-  it("an entity's parent is Records — the catalogue that lists it", () => {
+  it("an entity's parent is Records — the catalog that lists it", () => {
     // It used to be the site root, from the Atlas generation where the map was the one way in
     // (a720e176). That left a reader on a record page with no step up into the archive at all.
     assert.deepEqual(resolveTrail('/entity/abc', 'Isaac McGhie'), [
@@ -231,8 +231,8 @@ describe('room kit · RoomHeader is the only header a room renders', () => {
   });
 });
 
-describe('room kit · catalogue blocks', () => {
-  it('a RoomCard is a link, so a catalogue entry is a destination; kind no longer renders as a tag', () => {
+describe('room kit · catalog blocks', () => {
+  it('a RoomCard is a link, so a catalog entry is a destination; kind no longer renders as a tag', () => {
     const html = renderToStaticMarkup(
       <CardGrid>
         <RoomCard
@@ -460,7 +460,7 @@ describe('room kit · the ways a room ends', () => {
     assert.match(html, /aria-label="Where to go next"/);
   });
 
-  it('RecordNav renders nothing when the session has no neighbours', () => {
+  it('RecordNav renders nothing when the session has no neighbors', () => {
     assert.equal(renderToStaticMarkup(<RecordNav />), '');
   });
 

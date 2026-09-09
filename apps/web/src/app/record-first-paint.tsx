@@ -3,7 +3,7 @@
  *
  * Both families resolve the same published name the same way and render the same room. What
  * differs is which family owns the record: a place stands somewhere, an invention does not.
- * Splitting the families without splitting this module keeps one behaviour — arrival query
+ * Splitting the families without splitting this module keeps one behavior — arrival query
  * handling, list prev/next, discovery return — rather than two that drift.
  *
  * A record requested from the wrong family permanently redirects to its own, carrying the slug

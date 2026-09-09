@@ -4,7 +4,7 @@
  * `KindBadge` is the labeled form: icon plus the kind's name, for cards and entity pages. The
  * v9 lens chips and results rows have a 16–18px column and their label is the record's own name,
  * so they need the shape alone. Both read the same `MapEntityGlyph` vocabulary out of
- * `kind-encoding.ts` — circle / square / diamond / ring — which is the non-colour signal the map
+ * `kind-encoding.ts` — circle / square / diamond / ring — which is the non-color signal the map
  * markers already paint (WCAG 1.4.1, docs/ui/patterns-map-entity-encoding.md).
  *
  * Shade is applied by the caller through `currentColor` rather than baked in: inside a selected

@@ -11,7 +11,7 @@
  * This is the same shape as `.github/workflows/canonical-convergence-monitor.yml`, and for the
  * same stated reason: a scheduled check that FAILS on breach, because GitHub notifies watchers
  * of scheduled-workflow failures by default. It is read-only apart from its own watermark row,
- * and it never changes application behaviour.
+ * and it never changes application behavior.
  *
  * HOW IT DECIDES. pg_stat_statements counters are cumulative since `stats_reset`, so a
  * threshold on raw totals cannot distinguish a spike today from one three weeks ago. Each run

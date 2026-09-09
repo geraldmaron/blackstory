@@ -3,7 +3,7 @@
  *
  * The NRHP nomination form is the deepest source but it only exists for NRHP places. Persons,
  * organizations, and the non-NRHP lanes need a second source, and Wikipedia is the one with
- * broad coverage, a stable API, and a licence we can actually carry (CC BY-SA 4.0, recorded in
+ * broad coverage, a stable API, and a license we can actually carry (CC BY-SA 4.0, recorded in
  * provenance on every row so WS4's output can be attributed).
  *
  * Two rules from the WS3 spec are enforced here rather than left to the caller:
@@ -35,8 +35,14 @@ export { isDisambiguationExtract };
 
 const API = 'https://en.wikipedia.org/w/api.php';
 
-/** Wikipedia text is CC BY-SA 4.0; stored verbatim, so the licence travels with the row. */
-export const WIKIPEDIA_LICENCE = 'CC BY-SA 4.0';
+/**
+ * Wikipedia text is CC BY-SA 4.0; stored verbatim, so the license travels with the row.
+ *
+ * Written into `provenance` under the key `licence`, not `license`. The British spelling is a
+ * data contract, not prose: 2,622 rows in bb_research.entity_evidence already carry that key.
+ * Renaming it in code alone would split the column between two spellings. See repo-pck8y.
+ */
+export const WIKIPEDIA_LICENSE = 'CC BY-SA 4.0';
 
 export type WikipediaArticle = {
   readonly title: string;

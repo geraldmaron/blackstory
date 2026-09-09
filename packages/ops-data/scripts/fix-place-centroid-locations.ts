@@ -108,8 +108,8 @@ async function fetchPlaces(stateFips: string): Promise<GazetteerPlace[]> {
   });
 }
 
-/** Metres between two points, for reporting how far off the stored value was. */
-function metresBetween(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+/** Meters between two points, for reporting how far off the stored value was. */
+function metersBetween(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
   const toRad = (deg: number) => (deg * Math.PI) / 180;
   const dLat = toRad(b.lat - a.lat);
   const dLng = toRad(b.lng - a.lng);
@@ -175,7 +175,7 @@ async function main(): Promise<void> {
       const prefixes = geohashPrefixes(geohash);
 
       for (const row of current.rows) {
-        const drift = metresBetween(
+        const drift = metersBetween(
           { lat: Number(row.lat), lng: Number(row.lng) },
           { lat: place.lat, lng: place.lng },
         );

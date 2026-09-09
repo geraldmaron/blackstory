@@ -1,9 +1,9 @@
 /**
  * Lens — one scrolling panel, left edge, z 20.
  *
- * v6 put filters and the colour key behind segmented tabs, which hid half the instrument behind a
+ * v6 put filters and the color key behind segmented tabs, which hid half the instrument behind a
  * click. v9 removes the tabs: six hairline-separated groups in one scroll, everything visible at
- * once (design-direction-v9-atlas.md §5.2). The colour key is gone from here entirely — it lives
+ * once (design-direction-v9-atlas.md §5.2). The color key is gone from here entirely — it lives
  * in the palette and the record sheet, where the encoding is actually being read.
  *
  * Filters auto-apply. There is no Apply button, carried from v6: a filter you have to confirm is a

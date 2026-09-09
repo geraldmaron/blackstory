@@ -109,7 +109,7 @@
 }
 
 /*
- * Spotlight, z 6. A radial mask over a canvas-coloured plate: everything outside the focus radius
+ * Spotlight, z 6. A radial mask over a canvas-colored plate: everything outside the focus radius
  * dims. It is not a camera move and does not touch the map, which is why the reader can spotlight
  * a region without losing their bearings.
  */
@@ -274,7 +274,7 @@
 }
 
 /*
- * "Show the legend" overlay (§5.2, §7 quality-of-life "Colour key ... palette and the record
+ * "Show the legend" overlay (§5.2, §7 quality-of-life "Color key ... palette and the record
  * sheet"). Sits at the palette/overlays tier (z 90): it is a reader-summoned reference panel over
  * the instruments, not a floating instrument of its own.
  */

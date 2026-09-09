@@ -47,7 +47,7 @@ def test_prohibited_location_precision_rejected() -> None:
 
 
 def test_precision_level_the_policy_does_not_name_is_rejected_too() -> None:
-    """Fail closed on an unrecognised level rather than treating silence as permission."""
+    """Fail closed on an unrecognized level rather than treating silence as permission."""
     result = evaluate_public_precision("street_address")
     assert result["allowed"] is False
     assert result["reason"] == "unknown_precision_level"

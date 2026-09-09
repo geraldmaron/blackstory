@@ -4,7 +4,7 @@ import { join } from 'path';
 /**
  * Adversarial guard (MOB-010): the bead EXPLICITLY FORBIDS adding
  * certificate pinning or root/jailbreak detection as a client-side substitute
- * for the server-side controls. These are not defences on an untrusted client
+ * for the server-side controls. These are not defenses on an untrusted client
  * (a rooted device defeats them, threat-model T1) and they add native surface,
  * fragility, and a false sense of security. The real controls are
  * server-authoritative validation + App Check as a signal, not a gate.

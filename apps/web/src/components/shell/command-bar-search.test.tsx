@@ -68,7 +68,7 @@ describe('bar search', () => {
     assert.doesNotMatch(source, /if \(!response\.ok\) \{\s*return \[\];/);
   });
 
-  it('hands the abort signal to fetch so a superseded lookup is cancelled', () => {
+  it('hands the abort signal to fetch so a superseded lookup is canceled', () => {
     const source = code('components/shell/CommandBarSearch.tsx');
     // The endpoint caps concurrent in-flight requests per caller. A lookup the reader has already
     // typed past, still running, is a slot their next keystroke gets denied for.

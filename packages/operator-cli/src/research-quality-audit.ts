@@ -18,7 +18,7 @@
  *
  * HEURISTICS ARE MARKED AS SUCH. The released projection stores a citation host and label, not
  * a document class, so `sourceClassForCitation` infers one. That inference is the weakest link
- * in this audit and it is deliberately conservative: an unrecognised host lands at
+ * in this audit and it is deliberately conservative: an unrecognized host lands at
  * `modern_reputable_secondary`, the same honest middle the publish-time classifier chose,
  * because calling a state historical society a lead would understate real evidence more often
  * than calling an unknown blog a secondary source overstates it.
@@ -183,7 +183,7 @@ export function assertionClassForClaim(claim: ReleasedClaim): AssertionClass {
  *  - document dates: no column exists anywhere in bb_evidence, so `documentDate` is undefined.
  *  - assessed dimensions: the publish path defaults three of them, so none are claimed.
  * Each of those produces a real deficit rather than a silent pass, which is the intended
- * behaviour: "we have not recorded this" and "this is fine" must not look the same.
+ * behavior: "we have not recorded this" and "this is fine" must not look the same.
  */
 export function snapshotForReleasedEntity(entity: ReleasedEntity): RecordSnapshot {
   const claims: ClaimSnapshot[] = entity.claims.map((claim, index) => {

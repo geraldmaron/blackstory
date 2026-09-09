@@ -1,5 +1,5 @@
 /**
- * Degraded snapshot-mode signalling for Explore. `/explore` is server-rendered directly from
+ * Degraded snapshot-mode signaling for Explore. `/explore` is server-rendered directly from
  * the bundled snapshot catalog (`../../data/public-seed.ts`); the dynamic `/explore/api` refine
  * endpoint (viewport/filter re-query) is a progressive enhancement layered on top of that render,
  * never a requirement for the page to function. This module is the single source of truth for what

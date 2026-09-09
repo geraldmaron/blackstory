@@ -344,7 +344,7 @@ html:has([data-surface='instrument']) {
   outline-offset: 3px;
 }
 
-/* Mirrors --inline. The footer variant carried no rule of its own: its colour states came only
+/* Mirrors --inline. The footer variant carried no rule of its own: its color states came only
    from `.ds-shell-footer .ds-maker-credit__link`, so the modifier depended on being nested
    inside the site footer to render at all, and MakerCredit.test.tsx asserts the class is
    emitted — the test passed while the style was missing. */

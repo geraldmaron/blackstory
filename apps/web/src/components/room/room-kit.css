@@ -14,7 +14,7 @@
  * this one.
  *
  * TOKENS. The mock's four ink steps map onto the app's three plus one derived tint; nothing
- * here hardcodes a colour. The aliases below exist so the rules read like the mock while
+ * here hardcodes a color. The aliases below exist so the rules read like the mock while
  * still resolving through `--ds-*`, which is what makes the kit theme-flip correctly.
  */
 
@@ -84,7 +84,7 @@
        spare pixel, `justify-content` had nothing left to center, and the column — pinned to the
        end of that oversized track — sat hard against the rail with the whole surplus dumped in
        the left margin. Sizing the track to the measure makes the pair intrinsically wide, so it
-       centres in the viewport the way an unrailed room already does. */
+       centers in the viewport the way an unrailed room already does. */
     /* The rail was 15rem (240px). At that width the chapter's contents entries could not fit a
        section title on one line, and widening it to the comps' 300px is what lets them wrap to
        two readable lines rather than clip. Declared as a variable so a room whose rail carries
@@ -1308,7 +1308,7 @@ a.ds-room-chip {
   transition: border-color var(--ds-duration-base) ease;
 }
 
-/* Live is signaled by the copper edge AND by the tag text, never by colour alone. */
+/* Live is signaled by the copper edge AND by the tag text, never by color alone. */
 .ds-mapmoment[data-live='1'] .ds-mapmoment__plate {
   border-color: var(--ds-accent-graphic);
   /*

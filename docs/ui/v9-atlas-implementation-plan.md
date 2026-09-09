@@ -15,8 +15,8 @@ Each work package (WP) is scoped to **one agent, one session, one commit**. A WP
 
 | Tier | Give it | Rationale |
 |---|---|---|
-| **Haiku** | Pure functions, token tables, CSS extraction, data builders, unit tests against a stated contract, doc and copy sweeps | Output is fully determined by the spec. No design judgement required. |
-| **Sonnet** | React components, state wiring, camera choreography, a11y semantics, integration, monolith decomposition | Requires holding several files in context and making local judgement calls. |
+| **Haiku** | Pure functions, token tables, CSS extraction, data builders, unit tests against a stated contract, doc and copy sweeps | Output is fully determined by the spec. No design judgment required. |
+| **Sonnet** | React components, state wiring, camera choreography, a11y semantics, integration, monolith decomposition | Requires holding several files in context and making local judgment calls. |
 
 Do not send a Sonnet package to Haiku. Packages are marked; the mark is binding.
 
@@ -564,7 +564,7 @@ already there and nothing else. It does not import `LensPanel`, `ResultsRail`, `
 those is WP-27, and keeping the two apart is what makes this diff reviewable: a 1,800-line
 restructure with feature changes folded in cannot be bisected when something regresses.
 
-**Behaviour-preserving only.** Every existing test must pass untouched; if a test needs editing,
+**Behavior-preserving only.** Every existing test must pass untouched; if a test needs editing,
 you have changed behavior — stop and file a bead instead. That stop signal is only meaningful
 because this package adds no features, which is why its dependency list is now empty.
 
@@ -631,7 +631,7 @@ Mount, in this order, verifying in a browser after each:
    sets.
 5. Retire the v6 chrome the above replaces. Delete it; do not leave both mounted behind a flag.
 
-**Behaviour changes here, and that is the point.** Existing tests for the v6 chrome will fail
+**Behavior changes here, and that is the point.** Existing tests for the v6 chrome will fail
 because that chrome is gone. Editing or deleting those tests is expected in this package and only
 in this package — the WP-23 stop signal does not apply. What must not change: record data, status
 derivation, evidence grading, or any URL that previously resolved.

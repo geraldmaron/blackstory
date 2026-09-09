@@ -128,7 +128,7 @@ test('buildArchiveBaseStyle paints the pre-load frame from the scheme land token
   }
 
   // The plate's background is LAND: the tiles' `water` source-layer paints the oceans and
-  // lakes over it. A water-coloured pre-load frame would flash the inverse of the map that is
+  // lakes over it. A water-colored pre-load frame would flash the inverse of the map that is
   // about to arrive — a continent-shaped hole rather than a continent.
   assert.equal(backgroundColor('light'), mapPalettes.light.land);
   assert.equal(backgroundColor('dark'), mapPalettes.dark.land);

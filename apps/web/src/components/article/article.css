@@ -533,7 +533,7 @@
  *
  * This ramp reaches near-opacity by the time it is under the text block and only thins above
  * it, so the picture still reads at the top of the plate while every line of type keeps a dark
- * ground beneath it whatever the image happens to be doing there. The floor is a real colour
+ * ground beneath it whatever the image happens to be doing there. The floor is a real color
  * rather than a percentage of one so the guarantee does not depend on the photograph.
  */
 .ds-article-mast[data-media='photo'] .ds-article-mast__over {
@@ -558,7 +558,7 @@
  * The two quiet lines stop being quiet over a photograph. Muted ink is a step down from body
  * copy against the canvas, and against the top of a bright hero (a 1937 security map is mostly
  * yellow and red) it is a step down from nothing. They keep their size and their weight; only
- * the colour comes back up, because that is the part the photograph took away.
+ * the color comes back up, because that is the part the photograph took away.
  */
 .ds-article-mast[data-media='photo'] .ds-article-mast__facts,
 .ds-article-mast[data-media='photo'] .ds-article-mast__byline {
