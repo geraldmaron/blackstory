@@ -52,7 +52,13 @@ const METADATA_HOSTS = new Set([
   'instance-data.ec2.internal',
 ]);
 
-function canonicalHostname(hostname: string): string {
+/**
+ * Lower-cases a hostname, unwraps IPv6 brackets, and drops a trailing dot, so that two spellings
+ * of one host compare equal. Exported because the operator-endpoint client
+ * (./search-endpoint-client.ts) must compare origins the same way this module does — a second
+ * copy of this function is how a case or bracket mismatch becomes a hole.
+ */
+export function canonicalHostname(hostname: string): string {
   const unwrapped =
     hostname.startsWith('[') && hostname.endsWith(']') ? hostname.slice(1, -1) : hostname;
   return unwrapped.toLowerCase().replace(/\.$/u, '');

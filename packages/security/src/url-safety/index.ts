@@ -4,3 +4,4 @@
 export * from './fetch.js';
 export * from './policy.js';
 export * from './queue.js';
+export * from './search-endpoint-client.js';
