@@ -154,14 +154,22 @@ export function applyEvidenceFloor<
  * missed one fails silently — every record would look uncorroborated and the whole archive would
  * drop a grade.
  */
+/**
+ * Every field here is `?: T | undefined` rather than `?: T`, and the difference is load-bearing
+ * under `exactOptionalPropertyTypes: true`. A caller holding a claim whose `claimRole` is typed
+ * `string | undefined` — which is what every stored claim shape produces, because the field is
+ * optional in the wire contract — cannot pass it to a parameter declared `?: string`. That is
+ * what broke the api-public build: the reader-facing rule accepted a shape no reader could
+ * actually construct.
+ */
 export type EvidenceClaimInput = {
-  readonly confidenceLevel?: string;
-  readonly citationSource?: string;
-  readonly citation?: { readonly source?: string };
+  readonly confidenceLevel?: string | undefined;
+  readonly citationSource?: string | undefined;
+  readonly citation?: { readonly source?: string | undefined } | undefined;
   /** What the claim asserts. The migration bridge for claims published without `claimRole`. */
-  readonly predicate?: string;
+  readonly predicate?: string | undefined;
   /** Whether this claim is the record's own index row or evidence about its subject. */
-  readonly claimRole?: string;
+  readonly claimRole?: string | undefined;
 };
 
 /**

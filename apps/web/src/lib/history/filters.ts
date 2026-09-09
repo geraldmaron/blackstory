@@ -77,7 +77,10 @@ export const HISTORY_KIND_CATEGORIES = [
   },
   { id: 'events', label: 'Events & movements', kinds: ['event', 'movement'] },
   { id: 'law', label: 'Law & courts', kinds: ['law', 'case'] },
-  { id: 'works', label: 'Works & other', kinds: ['publication', 'artifact', 'other'] },
+  // `invention` rolls up with works rather than earning its own chip: it classifies as a
+  // created thing alongside publication and artifact, and the released catalog holds none yet.
+  // Give it a chip of its own once the inventor campaign has populated it.
+  { id: 'works', label: 'Works & other', kinds: ['publication', 'artifact', 'invention', 'other'] },
 ] as const;
 
 export type HistoryKindCategoryId = (typeof HISTORY_KIND_CATEGORIES)[number]['id'];

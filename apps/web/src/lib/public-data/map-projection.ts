@@ -12,6 +12,7 @@ import {
   type NotabilityCriterion,
   type StatusHistoryEntry,
 } from '@repo/domain';
+import { CLAIM_ROLES, type ClaimRoleV1 } from '@repo/public-contracts/v1/claim';
 import { sanitizePublicProseText } from '@repo/domain/editorial';
 import { isDatePrecision, resolveEraBucketsFromEvidence } from '@repo/domain/era';
 import { findUsStateForPoint, isDisplayableJurisdictionLabel } from '@repo/domain/map/geography';
@@ -148,9 +149,17 @@ function mapClaims(claims: PublicProjectionInput['claims']): PublicEntityView['c
       ? { independentLineageCount: claim.independentLineageCount }
       : {}),
     // Load-bearing for the record tier: dropping it here would silently downgrade the rule to
-    // its predicate fallback on every entity the site renders.
-    ...(claim.claimRole !== undefined ? { claimRole: claim.claimRole } : {}),
+    // its predicate fallback on every entity the site renders. The stored value is untrusted
+    // text, so it is checked against the wire vocabulary rather than cast: an out-of-vocabulary
+    // role falls back to the predicate deliberately, which is the same outcome as before but
+    // reached by a decision rather than by a lie about the type.
+    ...(isClaimRoleV1(claim.claimRole) ? { claimRole: claim.claimRole } : {}),
   }));
+}
+
+/** True when a stored claim role is one the wire contract actually defines. */
+function isClaimRoleV1(value: string | undefined): value is ClaimRoleV1 {
+  return value !== undefined && (CLAIM_ROLES as readonly string[]).includes(value);
 }
 
 function mapStatusHistory(

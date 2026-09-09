@@ -36,8 +36,19 @@ import {
   type EditorialProgressEvent,
 } from './editorial-run.js';
 import { prepareEditorialPacketIntake } from './editorial-intake.js';
+import {
+  RESEARCH_MATURITY_STATES,
+  assessResearchMaturity,
+  blockersToNextState,
+  type ResearchMaturity,
+} from '@repo/domain';
 import { runEnrichmentJudge } from './enrichment-run.js';
-import { auditReleasedEntities, type ReleasedClaim } from './research-quality-audit.js';
+import {
+  auditReleasedEntities,
+  snapshotForReleasedEntity,
+  type ReleasedClaim,
+} from './research-quality-audit.js';
+import { describePlan, planEnrichment, targetIsAbove } from './enrichment-plan.js';
 import { createLlmProvider } from './llm-provider.js';
 import { loadPendingEditorialItems } from './pending-list.js';
 import {
@@ -1797,6 +1808,72 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         );
         return 0;
       }
+      case 'enrich-entity': {
+        // The deep-research path's PLANNER. It reads a record, works out what is missing, and
+        // emits the evidence needs and bounded queries that would close the gap.
+        //
+        // IT DOES NOT EXECUTE. There is no --commit, deliberately: the search, fetch, capture,
+        // selector and claim-extraction stages are not built, and a --commit that staged an
+        // empty result would be the same lie `enrichment-run` tells by relabelling the
+        // editorial judge. A query emitted here is a lead. Nothing it returns is evidence until
+        // it has been independently resolved and fetched through the safe-fetch path.
+        const entityId = requireFlag(flags, '--entity-id');
+        const targetRaw = optionalFlag(flags, '--target-maturity') ?? 'corroborated';
+        if (!(RESEARCH_MATURITY_STATES as readonly string[]).includes(targetRaw)) {
+          throw new Error(
+            `--target-maturity must be one of ${RESEARCH_MATURITY_STATES.join(', ')}`,
+          );
+        }
+        const targetMaturity = targetRaw as ResearchMaturity;
+        const pool = getOpsPostgresPool(process.env);
+        const { rows } = await pool.query(
+          `SELECT re.entity_id, re.kind, re.display_name, re.summary,
+                  COALESCE(re.claims, '[]'::jsonb) AS claims
+             FROM bb_public.release_entities re
+             JOIN bb_public.active_release ar ON ar.release_id = re.release_id
+            WHERE re.entity_id = $1`,
+          [entityId],
+        );
+        const row = rows[0];
+        if (row === undefined) throw new Error(`No released entity ${entityId}`);
+        const released = {
+          entityId: String(row.entity_id),
+          kind: String(row.kind),
+          displayName: String(row.display_name ?? entityId),
+          summary: (row.summary as string | null) ?? null,
+          claims: (row.claims as ReleasedClaim[]) ?? [],
+        };
+        const snapshot = snapshotForReleasedEntity(released);
+        const assessment = assessResearchMaturity({ record: snapshot, identityResolved: true });
+        const plan = planEnrichment({
+          entityId: released.entityId,
+          currentMaturity: assessment.maturity,
+          targetMaturity,
+          deficits: assessment.evidenceDeficits,
+          context: { subjectName: released.displayName },
+        });
+        stdout(
+          JSON.stringify(
+            {
+              verb: 'enrich-entity',
+              status: 'planned',
+              executed: false,
+              entityId: released.entityId,
+              displayName: released.displayName,
+              maturity: assessment.maturity,
+              targetMaturity,
+              targetIsAbove: targetIsAbove(assessment.maturity, targetMaturity),
+              priority: assessment.priority,
+              summary: describePlan(plan),
+              blockersToNextState: blockersToNextState(assessment),
+              plan,
+            },
+            null,
+            2,
+          ),
+        );
+        return 0;
+      }
       case 'research-quality-audit': {
         // Read-only. No --commit exists and none should: this measures the released catalog,
         // it never changes it. See research-quality-audit.ts for why the source-class mapping
@@ -1862,13 +1939,14 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
       }
       default: {
         stderr(
-          'Usage: operator-cli <preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read|quarantine-triage|capture-backfill|research-quality-audit> [flags]\n' +
+          'Usage: operator-cli <preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read|quarantine-triage|capture-backfill|research-quality-audit|enrich-entity> [flags]\n' +
             'Every command accepts --json (no-op: output is always JSON) and every id-bearing command uses --entity-id / --case-id for its target.\n' +
             'For model-report: [--since <ISO date>] [--json]\n' +
             'For harness-run: --theme <theme> --metro <metro> [--connectors dpla,nps_network_to_freedom,web_search] [--enrich] [--provider openrouter|ollama|mock] [--progress-path <file>]\n' +
             'For backfill-entity/prose-run: --entity-id <id> [--title ...] [--summary ...] [--provider mock|openrouter|ollama|hybrid] [--commit]\n' +
             'For capture-backfill: [--commit] [--wayback] [--max-captures N] [--max-entities N]\n' +
             'For expand: --entity-id <id> [--depth N] [--commit] — live Wikidata traversal; stages landscape_candidates, never bb_canonical\n' +
+            'For enrich-entity: --entity-id <id> [--target-maturity seeded|grounded|corroborated|contextualized|deep_research|reference] — PLANS research; it does not execute, and has no --commit\n' +
             'For research-quality-audit: [--release-id <id>] [--kind <kind>] [--entity-id <id>] [--deficit <code>] [--limit N] — read-only; narrow the query to get per-entity rows\n' +
             'For graylist-read: [--limit N] — Postgres quarantine only, see docs/research/research-operations.md\n',
         );
