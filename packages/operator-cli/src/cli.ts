@@ -1261,6 +1261,11 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
                 leadCount: searchResult.leads.length,
                 fetchedCount: gathered.length,
                 droppedUnfetchable: searchResult.leads.length - gathered.length,
+                // Which URLs became subjects, and that the text came from the page rather than the
+                // engine. Counts alone make a reverted mapping invisible: putting the blurb back in
+                // `description` changes no count.
+                citedUrls: gathered.map((snippet) => snippet.finalUrl ?? snippet.url),
+                descriptionSource: 'fetched_page',
               });
               // A subject is built from the FETCHED page and nothing else. The engine's title and
               // blurb are its output rather than the document's, they carry no retrieval

@@ -90,6 +90,13 @@ export type SkippedQuery = {
 export type RoutedWebSearchResult = {
   readonly provider: WebSearchProvider;
   readonly leads: readonly SearchLead[];
+  /**
+   * Requests that actually reached the provider, including those that failed. This is the number
+   * that corresponds to rate limit and spend; `queriesIssued` counts only the ones that came back
+   * usable, and reporting only the latter tells an operator 0 when ten requests went out.
+   */
+  readonly queriesSent: number;
+  /** Requests that returned a parseable result set. */
   readonly queriesIssued: number;
   readonly skipped: readonly SkippedQuery[];
   /**
@@ -178,6 +185,7 @@ export async function runRoutedWebSearch(
   const budgetDecisions: WebSearchBudgetDecision[] = [];
   const seenPages = new Set<string>();
   let duplicateLeadsDropped = 0;
+  let queriesSent = 0;
   let queriesIssued = 0;
   let budgetState = input.budget?.state;
 
@@ -214,7 +222,18 @@ export async function runRoutedWebSearch(
       }
     }
 
+    // Charged BEFORE the request, not after a successful one. A query that reached the provider
+    // has spent its quota whatever it came back with, so counting only successes let a failing
+    // endpoint issue unbounded requests under a cap that reported itself as enforced.
+    if (budgetState !== undefined) {
+      budgetState = {
+        queriesIssuedThisCampaign: budgetState.queriesIssuedThisCampaign + 1,
+        queriesIssuedThisMonth: budgetState.queriesIssuedThisMonth + 1,
+      };
+    }
+
     let batch: WebSearchParsedBatch;
+    queriesSent += 1;
     try {
       const response = await input.client({
         url: buildUrl(input, query),
@@ -241,12 +260,6 @@ export async function runRoutedWebSearch(
     }
 
     queriesIssued += 1;
-    if (budgetState !== undefined) {
-      budgetState = {
-        queriesIssuedThisCampaign: budgetState.queriesIssuedThisCampaign + 1,
-        queriesIssuedThisMonth: budgetState.queriesIssuedThisMonth + 1,
-      };
-    }
 
     let keptForThisQuery = 0;
     for (const result of batch.results) {
@@ -277,6 +290,7 @@ export async function runRoutedWebSearch(
   return {
     provider: input.config.provider,
     leads,
+    queriesSent,
     queriesIssued,
     skipped,
     budgetEnforced: input.budget !== undefined,
@@ -294,7 +308,12 @@ export async function runRoutedWebSearch(
  */
 export function describeRoutedSearch(result: RoutedWebSearchResult): string {
   const parts = [
-    `${result.provider}: ${result.queriesIssued} quer${result.queriesIssued === 1 ? 'y' : 'ies'} issued`,
+    `${result.provider}: ${result.queriesSent} request(s) sent`,
+    // Stated separately whenever they differ: "3 sent, 0 usable" and "3 sent, 3 usable" are very
+    // different runs, and only the first number bears on rate limits and spend.
+    ...(result.queriesIssued === result.queriesSent
+      ? []
+      : [`${result.queriesIssued} returned a usable result set`]),
     `${result.leads.length} lead(s)`,
   ];
   if (result.duplicateLeadsDropped > 0) {

@@ -550,9 +550,44 @@ test('harness-run web_search only makes a subject from a lead that was actually 
   assert.ok(transport.requested.includes(reachable));
   assert.ok(transport.requested.includes('https://www.nps.gov/places/unreachable.htm'));
 
+  // WHICH lead became the subject, not just how many: dropping the fetched one and keeping the
+  // unreachable one scores the same on counts.
+  assert.deepEqual(fetchedStage.citedUrls, [reachable]);
+  assert.equal(fetchedStage.descriptionSource, 'fetched_page');
+
   const connectorsComplete = progress.find((entry) => entry.stage === 'connectors.complete');
   assert.ok(connectorsComplete);
   assert.equal(connectorsComplete.rawSubjectsCount, 1);
+
+  // The subject's own content, from the run JSON: the description must be the text that was read,
+  // and the engine's blurb must appear nowhere. Putting the blurb back in `description` is a
+  // count-neutral regression, so only this assertion catches it.
+  const runJson = JSON.parse(out.lines.join('\n')) as {
+    rawSubjects: readonly {
+      readonly title: string;
+      readonly description: string;
+      readonly cites: readonly string[];
+      readonly rawRecord?: Record<string, unknown>;
+    }[];
+  };
+  assert.equal(runJson.rawSubjects.length, 1);
+  const subject = runJson.rawSubjects[0]!;
+  assert.match(subject.description, /Oak Street Meeting Hall served as a mutual-aid/u);
+  assert.deepEqual(subject.cites, [reachable]);
+  const serialized = JSON.stringify(runJson);
+  assert.ok(!serialized.includes('An engine blurb.'), 'the engine blurb must not reach the output');
+  assert.ok(
+    !serialized.includes('A very promising blurb'),
+    'an unfetched lead must leave no trace in the output',
+  );
+  assert.ok(
+    !serialized.includes('Looks Authoritative'),
+    'an unfetched lead title must not persist',
+  );
+  assert.ok(
+    !serialized.includes('engineDescription'),
+    'no engine-supplied field may be written to the run JSON',
+  );
 });
 
 test('harness-run web_search reports an unavailable provider and still exits cleanly', async () => {

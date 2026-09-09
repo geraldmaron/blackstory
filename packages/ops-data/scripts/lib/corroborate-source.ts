@@ -32,7 +32,9 @@
 import { buildSearxngSearchUrl, parseSearxngSearchResponse } from '@repo/domain';
 import {
   createOperatorEndpointClient,
+  OperatorEndpointError,
   type OperatorEndpointClient,
+  type OperatorEndpointDenialReason,
 } from '@repo/security/url-safety';
 import { collectTier1TrailLinks, collectTier2TrailLinks } from './citation-trail.ts';
 import { fetchPage, type FetchedPage } from './fetch-page.ts';
@@ -465,7 +467,9 @@ function throttledSearxngCall<T>(
   searxngQueue = result
     .then(() => undefined)
     .catch(() => undefined)
-    .then(() => new Promise((resolve) => setTimeout(resolve, spacingMs)));
+    // NOT unref'd: the next call in the queue awaits this promise, so a timer the event loop is
+    // free to skip would deadlock every later query rather than merely delaying process exit.
+    .then(() => new Promise<void>((resolve) => setTimeout(resolve, spacingMs)));
   return result;
 }
 
@@ -614,16 +618,36 @@ export type CorroborationSearchDependencies = {
  * because a concurrent burst suspends every upstream engine this instance queries; a retry loop
  * inside the transport would fire those bursts from inside that spacing and undo it.
  *
- * Construction resolves DNS, so the promise is cached rather than the client — and a cached
- * REJECTION is also correct: a base URL pointing somewhere public should fail the same way on
- * every query rather than being retried 182 times in a batch.
+ * Construction resolves DNS, so the promise is cached rather than the client. A rejection is cached
+ * only when it cannot change: a base URL that is misconfigured — public, credential-bearing,
+ * malformed — will fail identically on every query, and caching that avoids 182 identical failures
+ * and 182 identical log lines in one batch. A resolution failure is the opposite; it is usually a
+ * momentary resolver blip, and caching it would let one bad second zero out an entire overnight
+ * run. That one is dropped from the cache so the next subject tries again.
  */
 const searchClients = new Map<string, Promise<OperatorEndpointClient>>();
+
+/** Reasons that describe the configuration itself, and so cannot change within a process. */
+const PERMANENT_ENDPOINT_REASONS = new Set<OperatorEndpointDenialReason>([
+  'base_url_unparseable',
+  'base_url_scheme_not_http',
+  'base_url_opaque_origin',
+  'base_url_carries_credentials',
+  'base_url_carries_query_or_fragment',
+  'base_url_address_is_public',
+]);
 
 function searchClientFor(baseUrl: string): Promise<OperatorEndpointClient> {
   const cached = searchClients.get(baseUrl);
   if (cached !== undefined) return cached;
-  const building = createOperatorEndpointClient({ baseUrl }).then((endpoint) => endpoint.client);
+  const building = createOperatorEndpointClient({ baseUrl })
+    .then((endpoint) => endpoint.client)
+    .catch((error: unknown) => {
+      const permanent =
+        error instanceof OperatorEndpointError && PERMANENT_ENDPOINT_REASONS.has(error.reason);
+      if (!permanent) searchClients.delete(baseUrl);
+      throw error;
+    });
   searchClients.set(baseUrl, building);
   return building;
 }

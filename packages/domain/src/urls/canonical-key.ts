@@ -60,7 +60,12 @@ export function urlDedupeKey(rawUrl: string): string | undefined {
   const search = parsed.searchParams.toString();
 
   // Only the root is safe to treat as slash-insensitive.
-  const pathname = parsed.pathname === '/' ? '' : parsed.pathname;
+  // %2f and %2F are the same octet, so the hex digits are upper-cased to one spelling. The escape
+  // itself is preserved: decoding it would merge a literal slash with an encoded one.
+  const pathname =
+    parsed.pathname === '/'
+      ? ''
+      : parsed.pathname.replace(/%[0-9a-f]{2}/gu, (escape) => escape.toUpperCase());
 
   return `${parsed.protocol}//${hostname}${parsed.port ? `:${parsed.port}` : ''}${pathname}${
     search ? `?${search}` : ''

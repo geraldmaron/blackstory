@@ -3,6 +3,8 @@
  * SearXNG query breadth, and same-lineage rejection used by corroborate-source.ts.
  */
 import assert from 'node:assert/strict';
+import { createServer } from 'node:http';
+import type { AddressInfo } from 'node:net';
 import { test } from 'node:test';
 import { collectTier1TrailLinks, collectTier2TrailLinks } from './citation-trail.ts';
 import {
@@ -660,4 +662,87 @@ test('the real inter-query spacing is four seconds and queries are serialized', 
     `second query started ${started[1]! - started[0]!}ms after the first`,
   );
   assert.ok(Date.now() - begin >= SEARXNG_MIN_SPACING_MS - 50);
+});
+
+test('with no injected client, searchAndFetch builds the real origin-pinned client', async () => {
+  // Every other test here injects searchClient, which leaves searchClientFor and the client cache —
+  // the only path production takes — unexecuted. This one takes it, against a loopback server on an
+  // ephemeral port, so the claim that no bare fetch remains is actually covered.
+  const server = createServer((request, response) => {
+    if (request.url?.startsWith('/search')) {
+      response.writeHead(200, { 'content-type': 'application/json' });
+      response.end(JSON.stringify({ results: [{ url: NPS_HIT, title: 'Oak Street' }] }));
+      return;
+    }
+    response.writeHead(404, { 'content-type': 'application/json' });
+    response.end('{}');
+  });
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const { port } = server.address() as AddressInfo;
+  try {
+    const pages = pageFetcher({ [NPS_HIT]: NPS_TEXT });
+    const result = await searchAndFetch(
+      '"Oak Street Meeting Hall"',
+      `http://127.0.0.1:${port}`,
+      (results) => results[0],
+      'search',
+      undefined,
+      { fetchPage: pages.fetchPage, minSpacingMs: 0 },
+    );
+    assert.ok(result, 'the real client must reach the loopback endpoint');
+    assert.equal(result.url, NPS_HIT);
+  } finally {
+    const closed = new Promise<void>((resolve) => server.close(() => resolve()));
+    server.closeAllConnections?.();
+    await closed;
+  }
+});
+
+test('with no injected client, a non-JSON response is refused by the real client', async () => {
+  // Proves the pinned client's content-type rule is the one in force on the production path, not
+  // just on an injected stand-in.
+  const warn = captureWarnings();
+  const server = createServer((_request, response) => {
+    response.writeHead(200, { 'content-type': 'text/html' });
+    response.end('<html>sign in</html>');
+  });
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const { port } = server.address() as AddressInfo;
+  try {
+    const result = await searchAndFetch(
+      'anything',
+      `http://127.0.0.1:${port}`,
+      (results) => results[0],
+      'search',
+      undefined,
+      { fetchPage: async () => undefined, minSpacingMs: 0 },
+    );
+    assert.equal(result, undefined);
+    assert.ok(
+      warn.lines.some((line) => line.includes('text/html')),
+      `expected the refusal to be named; got ${JSON.stringify(warn.lines)}`,
+    );
+  } finally {
+    warn.restore();
+    const closed = new Promise<void>((resolve) => server.close(() => resolve()));
+    server.closeAllConnections?.();
+    await closed;
+  }
+});
+
+test('a 502 from the endpoint is issued exactly once, with no status-based retry', async () => {
+  const warn = captureWarnings();
+  try {
+    const search = jsonClient({}, 502);
+    const pages = pageFetcher({});
+    await searchAndFetch('anything', SEARXNG_BASE, (results) => results[0], 'search', undefined, {
+      searchClient: search.client,
+      fetchPage: pages.fetchPage,
+      minSpacingMs: 0,
+    });
+    // 502 is the status a retry loop chases; the 4s spacing exists because bursts suspend engines.
+    assert.equal(search.urls.length, 1);
+  } finally {
+    warn.restore();
+  }
 });

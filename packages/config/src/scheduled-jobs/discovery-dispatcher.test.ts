@@ -90,7 +90,11 @@ const LIVE_SEARCH_ENV = {
 } as const;
 
 test('live web-search dispatch routes through the injected search client', async () => {
-  const requests: { url: string; headers?: Readonly<Record<string, string>> }[] = [];
+  const requests: {
+    url: string;
+    headers?: Readonly<Record<string, string>>;
+    allowedContentTypes?: readonly string[];
+  }[] = [];
   const result = await dispatchDiscoveryCampaign({
     jobId: 'discovery-campaign-web-search',
     mode: 'live',
@@ -103,6 +107,9 @@ test('live web-search dispatch routes through the injected search client', async
       requests.push({
         url: request.url,
         ...(request.headers ? { headers: request.headers } : {}),
+        ...(request.allowedContentTypes
+          ? { allowedContentTypes: request.allowedContentTypes }
+          : {}),
       });
       return {
         status: 200,
@@ -127,8 +134,10 @@ test('live web-search dispatch routes through the injected search client', async
   assert.match(requests[0]!.url, /format=json/u);
   // A reverse-proxy shared secret must survive; executeSafeFetch could not have carried it.
   assert.equal(requests[0]!.headers?.Authorization, 'Bearer proxy-secret');
-  // JSON only, so an HTML error page cannot be parsed as a result set.
-  assert.ok(requests[0]!.headers !== undefined);
+  // JSON only, so an HTML error page cannot be parsed as a result set. Asserted rather than
+  // described: the client's default allowlist is the same two values, so deleting the dispatcher's
+  // declaration would change no behaviour and nothing would surface it.
+  assert.deepEqual(requests[0]!.allowedContentTypes, ['application/json', 'text/json']);
 });
 
 test('live web-search dispatch surfaces a provider failure instead of reporting success', async () => {

@@ -32,6 +32,7 @@ import {
   evaluateWebSearchQueryBudget,
   fetchBraveWebSearch,
   fetchBraveWebSearchBudgeted,
+  fetchSearxngWebSearchBudgeted,
   ingestWebSearchCandidatesThroughPipeline,
   normalizeWebSearchResult,
   parseBraveSearchResponse,
@@ -82,6 +83,10 @@ function unconfirmedConfig(): WebSearchProviderConfig {
 
 function confirmedConfig(): WebSearchProviderConfig {
   return { ...unconfirmedConfig(), storageTermsConfirmed: true };
+}
+
+function searxngRegistryEntry(): SourceRegistryEntry {
+  return { ...braveRegistryEntry(), id: 'searxng_search', adapterId: 'searxng-search' };
 }
 
 function braveRegistryEntry(): SourceRegistryEntry {
@@ -760,4 +765,47 @@ test('a real -backed DailyBudgetEvaluator (thin wrapper over the real evaluateDa
     evaluateDailyBudget: realBackedEvaluator,
   });
   assert.equal(allowed.allowed, true, '500 cents against a 100000-cent cap must be allowed');
+});
+
+// fetchSearxngWebSearchBudgeted: the SearXNG half of the budget guard. SearXNG is the provider
+// provider-decision.ts selects, so a budget wrapper that was never exercised is the one most likely
+// to be wrong when a campaign finally holds state.
+test('fetchSearxngWebSearchBudgeted refuses to call the network when the budget denies', async () => {
+  let calls = 0;
+  const client = async (): Promise<SafeHttpResponse> => {
+    calls += 1;
+    throw new Error('must not be called');
+  };
+  await assert.rejects(
+    () =>
+      fetchSearxngWebSearchBudgeted({
+        query: 'anything',
+        config: {
+          provider: 'searxng',
+          apiKey: '',
+          storageTermsConfirmed: true,
+          planTermsVersion: 'searxng-self-hosted-research-2026-07',
+          baseUrl: 'http://127.0.0.1:8888',
+        },
+        registryEntry: searxngRegistryEntry(),
+        runId: 'run_budget_denied',
+        capturedAt: '2026-09-08T12:00:00.000Z',
+        client,
+        budgetPolicy: {
+          maxQueriesPerCampaign: 1,
+          monthlySpendCapUsdCents: 10_000,
+          costPerQueryUsdCents: 1,
+          monthlyBudgetCategory: 'research_campaign',
+        },
+        budgetState: { queriesIssuedThisCampaign: 1, queriesIssuedThisMonth: 1 },
+        evaluateDailyBudget: () => ({
+          allowed: true,
+          percentUsed: 1,
+          softShutdownTriggered: false,
+          hardStopTriggered: false,
+        }),
+      }),
+    /campaign_query_budget_exceeded/u,
+  );
+  assert.equal(calls, 0, 'the budget must be evaluated before the socket opens');
 });

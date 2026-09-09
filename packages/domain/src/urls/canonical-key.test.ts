@@ -74,3 +74,10 @@ test('dedupeUrlsByPage does not merge two different malformed entries', () => {
   const deduped = dedupeUrlsByPage(['not a url', 'also not a url']);
   assert.deepEqual(deduped, ['not a url', 'also not a url']);
 });
+
+test('urlDedupeKey treats percent-encoding case as the same octet', () => {
+  // %2F and %2f encode one character, so two spellings are one page.
+  assert.equal(urlDedupeKey('https://nps.gov/a%2Fb'), urlDedupeKey('https://nps.gov/a%2fb'));
+  // The escape is preserved rather than decoded: an encoded slash is not a path separator.
+  assert.notEqual(urlDedupeKey('https://nps.gov/a%2Fb'), urlDedupeKey('https://nps.gov/a/b'));
+});

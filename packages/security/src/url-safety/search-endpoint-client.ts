@@ -53,6 +53,7 @@ export type OperatorEndpointDenialReason =
   | 'request_method_not_get'
   | 'request_url_unparseable'
   | 'request_origin_mismatch'
+  | 'request_path_outside_base'
   | 'response_redirect'
   | 'response_content_type_not_allowed'
   | 'response_too_large'
@@ -95,13 +96,21 @@ export type OperatorEndpointClient = (
 ) => Promise<OperatorEndpointResponse>;
 
 export type OperatorEndpointLimits = {
+  /** Socket inactivity bound. */
   readonly timeoutMs: number;
+  /**
+   * Elapsed-time bound for the whole request. Separate from `timeoutMs` because a server that
+   * emits one byte just inside the idle window never trips it, and every caller here chains
+   * queries through a single queue where one stalled request stops the rest.
+   */
+  readonly maxDurationMs: number;
   readonly maxResponseBytes: number;
   readonly defaultAllowedContentTypes: readonly string[];
 };
 
 export const DEFAULT_OPERATOR_ENDPOINT_LIMITS: OperatorEndpointLimits = {
   timeoutMs: 15_000,
+  maxDurationMs: 30_000,
   maxResponseBytes: 4 * 1024 * 1024,
   defaultAllowedContentTypes: ['application/json', 'text/json'],
 };
@@ -120,6 +129,8 @@ export type OperatorEndpoint = {
   readonly client: OperatorEndpointClient;
   /** The single origin this client will talk to, normalized. */
   readonly origin: string;
+  /** The path prefix every request must sit under. `/` when the base URL carried no path. */
+  readonly basePath: string;
   /** Resolved once at construction and never re-resolved, so DNS cannot change under the check. */
   readonly pinnedAddress: string;
 };
@@ -206,6 +217,11 @@ function describeBaseUrl(raw: string): string {
   } catch {
     return `an unparseable value of ${raw.trim().length} characters`;
   }
+}
+
+/** True when `pathname` is the base path itself or a segment beneath it — never a prefix match. */
+function pathIsUnder(pathname: string, basePath: string): boolean {
+  return pathname === basePath || pathname.startsWith(`${basePath}/`);
 }
 
 function sameOrigin(left: NormalizedOrigin, right: NormalizedOrigin): boolean {
@@ -311,7 +327,11 @@ export async function createOperatorEndpointClient(
     );
   }
   const pinnedAddress = addresses[0]!;
-  const origin = `${protocol}//${hostname}${port === defaultPort(protocol) ? '' : `:${port}`}`;
+  // Bracket an IPv6 literal so `origin` is a parseable URL rather than an ambiguous string.
+  const origin = `${protocol}//${hostHeaderValue(hostname, port, protocol)}`;
+  // A reverse proxy on this host:port commonly fronts other services — /grafana, /prometheus — so
+  // the pin covers the path prefix as well as the origin.
+  const basePath = base.url.pathname.replace(/\/+$/u, '');
 
   const client: OperatorEndpointClient = async (request) => {
     if (request.method !== undefined && request.method !== 'GET') {
@@ -327,28 +347,50 @@ export async function createOperatorEndpointClient(
         target.reason,
       );
     }
+    if (basePath !== '' && !pathIsUnder(target.url.pathname, basePath)) {
+      throw new OperatorEndpointError(
+        `Operator search endpoint client refuses path ${target.url.pathname}; it may only call ` +
+          `${origin}${basePath}`,
+        'request_path_outside_base',
+      );
+    }
     if (!sameOrigin(target.value, base.value)) {
       throw new OperatorEndpointError(
-        `Operator search endpoint client refuses ${target.value.protocol}//${target.value.hostname}:${target.value.port}; ` +
+        `Operator search endpoint client refuses ${target.value.protocol}//` +
+          `${hostHeaderValue(target.value.hostname, target.value.port, target.value.protocol)}; ` +
           `it may only call ${origin}`,
         'request_origin_mismatch',
       );
     }
     const allowedContentTypes = request.allowedContentTypes ?? limits.defaultAllowedContentTypes;
-    const response = await performRequest({
-      url: target.url,
-      hostname,
-      port,
-      pinnedAddress,
-      protocol,
-      headers: { accept: 'application/json', ...(request.headers ?? {}) },
-      limits,
-    });
+    let abort: (() => void) | undefined;
+    const response = await withDuration(
+      performRequest({
+        url: target.url,
+        hostname,
+        port,
+        pinnedAddress,
+        protocol,
+        headers: { accept: 'application/json', ...(request.headers ?? {}) },
+        limits,
+        onStart: (cancel) => {
+          abort = cancel;
+        },
+      }),
+      limits.maxDurationMs,
+      () => abort?.(),
+    );
     if (REDIRECT_STATUSES.has(response.status)) {
       throw new OperatorEndpointError(
         `Operator search endpoint returned ${response.status}; redirects are never followed`,
         'response_redirect',
       );
+    }
+    // A non-2xx is handed back for the caller to interpret, and deliberately NOT run through the
+    // content-type check below: an error page is expected to be HTML, and reporting a 502 as a
+    // content-type refusal sends whoever reads the log after the wrong problem.
+    if (response.status < 200 || response.status >= 300) {
+      return response;
     }
     if (!contentTypeAllowed(response.headers, allowedContentTypes)) {
       throw new OperatorEndpointError(
@@ -361,7 +403,44 @@ export async function createOperatorEndpointClient(
     return response;
   };
 
-  return { client, origin, pinnedAddress };
+  return { client, origin, basePath: basePath === '' ? '/' : basePath, pinnedAddress };
+}
+
+/**
+ * The Host header value for an origin: the hostname, bracketed when it is an IPv6 literal, plus the
+ * port whenever it is not the default for the scheme. A reverse-proxied instance routes on this, so
+ * dropping the port sends every request to whatever that proxy serves on its default vhost.
+ */
+function hostHeaderValue(hostname: string, port: number, protocol: 'http:' | 'https:'): string {
+  const authority = isIP(hostname) === 6 ? `[${hostname}]` : hostname;
+  return port === defaultPort(protocol) ? authority : `${authority}:${port}`;
+}
+
+/** Bounds the whole request in elapsed time, not just socket inactivity. */
+async function withDuration<T>(
+  operation: Promise<T>,
+  maxDurationMs: number,
+  onTimeout: () => void,
+): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      operation,
+      new Promise<never>((_resolve, reject) => {
+        timer = setTimeout(() => {
+          onTimeout();
+          reject(
+            new OperatorEndpointError(
+              `Operator search endpoint exceeded ${maxDurationMs}ms for the whole request`,
+              'request_timeout',
+            ),
+          );
+        }, maxDurationMs);
+      }),
+    ]);
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+  }
 }
 
 /** Connects to the pinned address and never re-resolves the hostname. */
@@ -373,6 +452,8 @@ function performRequest(input: {
   readonly protocol: 'http:' | 'https:';
   readonly headers: Readonly<Record<string, string>>;
   readonly limits: OperatorEndpointLimits;
+  /** Hands back a canceller so the elapsed-time guard can tear the socket down. */
+  readonly onStart?: (cancel: () => void) => void;
 }): Promise<OperatorEndpointResponse> {
   return new Promise((resolve, reject) => {
     const requester = input.protocol === 'https:' ? httpsRequest : httpRequest;
@@ -386,8 +467,11 @@ function performRequest(input: {
         // address, so a TLS-fronted instance still validates.
         servername: input.protocol === 'https:' ? input.hostname : undefined,
         // Pinned Host last, so a caller-supplied `host` cannot override the origin this client
-        // is pinned to.
-        headers: { ...input.headers, host: input.hostname },
+        // is pinned to. It carries the port: a reverse-proxied instance routes on it.
+        headers: {
+          ...input.headers,
+          host: hostHeaderValue(input.hostname, input.port, input.protocol),
+        },
         timeout: input.limits.timeoutMs,
       },
       (response) => {
@@ -426,6 +510,7 @@ function performRequest(input: {
       ),
     );
     clientRequest.on('error', reject);
+    input.onStart?.(() => clientRequest.destroy());
     clientRequest.end();
   });
 }

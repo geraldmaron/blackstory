@@ -73,10 +73,20 @@ test('a lead carries the engine blurb under a name that cannot be read as page c
   // The need travels with the lead, so a lead can be traced to the gap that asked for it.
   assert.equal(lead.needId, 'need_x');
   assert.equal(lead.seeking, 'patent');
-  // No field a claim extractor could mistake for retrieved text.
-  assert.ok(!('text' in lead), 'a lead must not carry page text');
-  assert.ok(!('snippet' in lead), 'a lead must not carry a snippet');
-  assert.ok(!('excerpt' in lead), 'a lead must not carry an excerpt');
+  // An exact key set, not a denylist of three names. A denylist admits whatever name is added
+  // next, and the field that matters downstream is whichever one the harness hands to a model:
+  // emitting `description` alongside `engineDescription` would reopen the regression while a
+  // text/snippet/excerpt denylist stayed green.
+  assert.deepEqual(Object.keys(lead).sort(), [
+    'engineDescription',
+    'executedAt',
+    'needId',
+    'provider',
+    'queryText',
+    'seeking',
+    'title',
+    'url',
+  ]);
 });
 
 test('leads are produced with storageTermsConfirmed false, because nothing is persisted', async () => {
@@ -90,6 +100,9 @@ test('leads are produced with storageTermsConfirmed false, because nothing is pe
     executedAt: EXECUTED_AT,
   });
   assert.equal(result.leads.length, 1);
+  // No query was skipped, so the lead really came from the provider rather than from a gate failure
+  // being recorded per-query while leads arrived from somewhere else.
+  assert.deepEqual(result.skipped, []);
 });
 
 test('the same page returned by two queries is one lead', async () => {
@@ -145,6 +158,67 @@ test('one failing query does not discard the others', async () => {
   assert.deepEqual(result.skipped, [
     { query: 'first', reason: 'provider_error', detail: 'engines suspended' },
   ]);
+});
+
+test('a 5xx is issued exactly once — the status a retry loop would chase', async () => {
+  let calls = 0;
+  const client: RoutedSearchHttpClient = async (request) => {
+    calls += 1;
+    return {
+      status: 503,
+      headers: { 'content-type': 'application/json' },
+      bodyText: '{}',
+      finalUrl: request.url,
+    };
+  };
+  const result = await runRoutedWebSearch({
+    queries: [{ query: 'one' }],
+    config: SEARXNG,
+    client,
+    executedAt: EXECUTED_AT,
+  });
+  assert.equal(calls, 1);
+  assert.equal(result.queriesIssued, 0);
+});
+
+test('a campaign budget charges the attempt, so a failing endpoint cannot exceed the cap', async () => {
+  // Charging only successful queries let a broken endpoint issue unbounded requests while the run
+  // reported its budget as enforced. The cap bounds REQUESTS, not useful answers.
+  let calls = 0;
+  const client: RoutedSearchHttpClient = async () => {
+    calls += 1;
+    throw new Error('engines suspended');
+  };
+  const result = await runRoutedWebSearch({
+    queries: Array.from({ length: 10 }, (_v, index) => ({ query: `q${index}` })),
+    config: SEARXNG,
+    client,
+    executedAt: EXECUTED_AT,
+    budget: {
+      policy: {
+        maxQueriesPerCampaign: 3,
+        monthlySpendCapUsdCents: 10_000,
+        costPerQueryUsdCents: 1,
+        monthlyBudgetCategory: 'research_campaign',
+      },
+      state: { queriesIssuedThisCampaign: 0, queriesIssuedThisMonth: 0 },
+      evaluateDailyBudget: () => ({
+        allowed: true,
+        percentUsed: 1,
+        softShutdownTriggered: false,
+        hardStopTriggered: false,
+      }),
+    },
+  });
+  assert.equal(calls, 3, `a cap of 3 must bound requests; ${calls} went out`);
+  assert.equal(result.budgetEnforced, true);
+  assert.ok(result.skipped.some((entry) => entry.reason === 'budget_denied'));
+  // What an operator reads must match what the network saw: three requests were sent and none came
+  // back usable, and reporting only the second number would say 0 after spending 3.
+  assert.equal(result.queriesSent, 3);
+  assert.equal(result.queriesIssued, 0);
+  assert.match(describeRoutedSearch(result), /3 request\(s\) sent/u);
+  assert.match(describeRoutedSearch(result), /0 returned a usable result set/u);
 });
 
 test('a non-success status is recorded, not parsed', async () => {

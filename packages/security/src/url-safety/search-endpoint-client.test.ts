@@ -243,8 +243,9 @@ test('an IPv6 base accepts the bracketed request form for the same address', asy
     },
     async (baseUrl) => {
       const { client, origin } = await endpoint(baseUrl);
-      // The canonical form drops the brackets; the request may still carry them.
-      assert.equal(origin, baseUrl.replace('[', '').replace(']', ''));
+      // Brackets are kept, so `origin` stays a parseable URL for an IPv6 literal.
+      assert.equal(origin, baseUrl);
+      assert.equal(new URL(origin).hostname, '[::1]');
       const result = await client({ url: `${baseUrl}/search?q=x` });
       assert.equal(result.status, 200);
       assert.equal(hits, 1);
@@ -326,7 +327,7 @@ test('a JSON response comes back with its body, status, headers and final URL', 
       // The Authorization header must survive: a reverse-proxied instance needs it, and
       // executeSafeFetch hard-codes its headers and cannot carry one.
       assert.equal(seen.headers?.authorization, 'Bearer token-abc');
-      assert.equal(seen.headers?.host, '127.0.0.1');
+      assert.equal(seen.headers?.host, new URL(baseUrl).host);
     },
   );
 });
@@ -336,18 +337,25 @@ test('a redirect is refused and its Location is never followed', async () => {
   await withLoopbackServer(
     (request, response) => {
       if (request.url?.startsWith('/search')) {
-        response.writeHead(302, { location: 'http://127.0.0.1:1/elsewhere' });
+        // The target is a path on the SAME origin and on a server that is listening, so a client
+        // that followed it would be observed. A redirect pointing somewhere unreachable would make
+        // this counter unable to move however the client behaved.
+        response.writeHead(302, { location: '/elsewhere' });
         response.end();
         return;
       }
       followed += 1;
       response.writeHead(200, { 'content-type': 'application/json' });
-      response.end('{}');
+      response.end('{"followed":true}');
     },
     async (baseUrl) => {
       const { client } = await endpoint(baseUrl);
       await rejects(() => client({ url: `${baseUrl}/search?q=x` }), 'response_redirect');
       assert.equal(followed, 0, 'the client must not request the redirect target');
+      // Prove the target really was reachable, so the zero above means "declined", not "could not".
+      const direct = await client({ url: `${baseUrl}/elsewhere` });
+      assert.equal(direct.status, 200);
+      assert.equal(followed, 1);
     },
   );
 });
@@ -402,22 +410,31 @@ test('the caller may widen the content-type allowlist for one request', async ()
   );
 });
 
-test('a body over the byte cap is cut off rather than buffered', async () => {
-  await withLoopbackServer(
-    (_request, response) => {
-      response.writeHead(200, { 'content-type': 'application/json' });
-      // Well past the cap set below, written in chunks so the limit trips mid-stream.
-      for (let index = 0; index < 40; index += 1) response.write('x'.repeat(1024));
-      response.end();
-    },
-    async (baseUrl) => {
-      const { client } = await createOperatorEndpointClient({
-        baseUrl,
-        limits: { maxResponseBytes: 2048 },
-      });
-      await rejects(() => client({ url: `${baseUrl}/search?q=x` }), 'response_too_large');
-    },
-  );
+test('the byte cap admits a body under it and refuses one over it', async () => {
+  // Both sides of the boundary, so the cap is pinned to a size rather than to the existence of an
+  // error: a client that buffered without limit would pass the second case.
+  const serveBytes = (count: number) => (_r: IncomingMessage, response: ServerResponse) => {
+    response.writeHead(200, { 'content-type': 'application/json' });
+    for (let index = 0; index < count; index += 1) response.write('x'.repeat(1024));
+    response.end();
+  };
+
+  await withLoopbackServer(serveBytes(1), async (baseUrl) => {
+    const { client } = await createOperatorEndpointClient({
+      baseUrl,
+      limits: { maxResponseBytes: 4096 },
+    });
+    const ok = await client({ url: `${baseUrl}/search?q=x` });
+    assert.equal(ok.bodyText.length, 1024, 'a body under the cap must arrive whole');
+  });
+
+  await withLoopbackServer(serveBytes(40), async (baseUrl) => {
+    const { client } = await createOperatorEndpointClient({
+      baseUrl,
+      limits: { maxResponseBytes: 4096 },
+    });
+    await rejects(() => client({ url: `${baseUrl}/search?q=x` }), 'response_too_large');
+  });
 });
 
 test('a 500 from the endpoint is returned, not thrown: the caller decides what it means', async () => {
@@ -498,6 +515,40 @@ test('a resolver that answers with a name rather than an address fails closed', 
   );
 });
 
+test('the Host header carries the port, so a reverse-proxied instance routes correctly', async () => {
+  let seenHost: string | undefined;
+  await withLoopbackServer(
+    (request, response) => {
+      seenHost = request.headers.host;
+      response.writeHead(200, { 'content-type': 'application/json' });
+      response.end('{}');
+    },
+    async (baseUrl) => {
+      const { client } = await endpoint(baseUrl);
+      await client({ url: `${baseUrl}/search?q=x` });
+      // Not the bare hostname: a proxy that routes on Host would otherwise serve its default vhost.
+      assert.equal(seenHost, new URL(baseUrl).host);
+      assert.match(String(seenHost), /:\d+$/u);
+    },
+  );
+});
+
+test('a non-2xx is returned as a status, not reported as a content-type problem', async () => {
+  // An error page is expected to be HTML. Blaming the content type sends whoever reads the log
+  // after the wrong problem.
+  await withLoopbackServer(
+    (_request, response) => {
+      response.writeHead(502, { 'content-type': 'text/html' });
+      response.end('<html>bad gateway</html>');
+    },
+    async (baseUrl) => {
+      const { client } = await endpoint(baseUrl);
+      const result = await client({ url: `${baseUrl}/search?q=x` });
+      assert.equal(result.status, 502);
+    },
+  );
+});
+
 test('a caller cannot override the pinned Host header', async () => {
   let seenHost: string | undefined;
   await withLoopbackServer(
@@ -509,7 +560,8 @@ test('a caller cannot override the pinned Host header', async () => {
     async (baseUrl) => {
       const { client } = await endpoint(baseUrl);
       await client({ url: `${baseUrl}/search?q=x`, headers: { host: 'evil.example' } });
-      assert.equal(seenHost, '127.0.0.1');
+      assert.equal(seenHost, new URL(baseUrl).host);
+      assert.notEqual(seenHost, 'evil.example');
     },
   );
 });
