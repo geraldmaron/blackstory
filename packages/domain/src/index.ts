@@ -708,7 +708,47 @@ export type {
   ConnectionStrengthMeasurement,
   ContradictionSet,
   PublicationThresholdResult,
+  SourceLineage,
+  SourceLineageInput,
+  SourceLineageKind,
+  AssertionClass,
+  Fitness,
+  FitnessAssessment,
+  SourceClass,
+  AttributionCheckInput,
+  AttributionFinding,
+  AttributionMarker,
 } from './claims/index.js';
+
+// Research maturity and the deficit taxonomy: whether the research was actually done, which is
+// a different measurement from claim confidence and from field completeness.
+export {
+  RESEARCH_DEFICIT_CODES,
+  RESEARCH_EVALUATOR_VERSION,
+  RESEARCH_GATE_IDS,
+  RESEARCH_MATURITY_STATES,
+  assessResearchMaturity,
+  blockersToNextState,
+  citedLineageKeys,
+  corroboratingLineageKeys,
+  describeMaturity,
+  detectDeficits,
+  enrichmentPriority,
+  nextMaturityState,
+} from './research/index.js';
+export type {
+  ClaimSnapshot,
+  EnrichmentPriority,
+  EvidenceSnapshot,
+  MaturityEvaluationInput,
+  RecordSnapshot,
+  ResearchBlocker,
+  ResearchDeficit,
+  ResearchDeficitCode,
+  ResearchGateId,
+  ResearchMaturity,
+  ResearchMaturityAssessment,
+} from './research/index.js';
 
 export {
   AUDIT_EVENT_ACTIONS,

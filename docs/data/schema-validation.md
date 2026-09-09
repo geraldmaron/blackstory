@@ -3,6 +3,11 @@
 Generated against repo sources on 2026-07-20. **Remote apply completed** on
 `blackstory-app` (`twykhihqkcldpreuovay`) after human approval (repo-iy1g).
 
+This is a point-in-time record of one validation run, not a live view of the schema. The
+coverage counts below are as of that run; the current figures are in the note under the table.
+For the schema as it stands, read [postgres-schema.md](postgres-schema.md), which is the more
+current companion doc. The invariant table further down still holds.
+
 ## Coverage
 
 | Check | Result |
@@ -12,8 +17,16 @@ Generated against repo sources on 2026-07-20. **Remote apply completed** on
 | `entityEmbeddings`, `holcAreas`, `claimPromotions`, `publicationCandidates` | PASS |
 | Public graph subcollections | PASS → `release_graph_*` |
 | DDL `CREATE TABLE` for mapped names | PASS |
-| Remote tables with RLS | PASS (62 `bb_*` base tables) |
-| Migration files | 12 under `supabase/migrations/` (incl. advisor remediation) |
+| Remote tables with RLS | PASS (62 `bb_*` base tables, as of 2026-07-20) |
+| Migration files | 12 under `supabase/migrations/` (incl. advisor remediation), as of 2026-07-20 |
+
+**Where those two counts stand now (measured 2026-09-08 against `supabase/migrations/` in this
+repo, not against the remote):** 49 migration files, and 126 distinct `bb_*` tables created and
+not later dropped: 34 in `bb_research`, 23 each in `bb_canonical` and `bb_reference`, 17 in
+`bb_ops`, 14 in `bb_evidence`, 11 in `bb_public`, 2 in `bb_publication`, 1 each in `bb_audit`
+and `bb_submissions`. The RLS PASS above was a remote check against the 12-file schema and has
+not been re-run against the 37 migrations added since, so treat it as covering the original
+schema only.
 
 ## Invariant encoding
 

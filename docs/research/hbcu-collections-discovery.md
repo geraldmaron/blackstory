@@ -2,13 +2,22 @@
 
 Discovery methodology for HBCU special collections and university archives — Howard's Moorland-Spingarn Research Center, Fisk's John Hope and Aurelia E. Franklin Library, Tuskegee's University Archives, Hampton's University Archives, and the cross-institution HBCU Library Alliance Digital Collection. These repositories are among the richest Black history sources in existence and are largely **absent from federal aggregator databases**: some surface through DPLA hubs, others only through standalone EAD finding aids or local digital repositories. Discovery produces **private research candidates only** — never public entities (ADR-009).
 
-## Doctrine: scholarly class, strong for synthesis — still evidence before assertion
+## Doctrine: a finding aid points at evidence, and fitness depends on the claim
 
-Research-kernel profile `packages/research-kernel/profiles/black-history.v1.json` maps sourceClass `scholarly` → claimClass `historical-synthesis` → fitness **`strong`**, with the limitation "Capture cited primary evidence for consequential atomic claims where available." University special collections are that source class, so:
+Research-kernel profile `packages/research-kernel/profiles/black-history.v1.json` maps sourceClass `scholarly` → claimClass `historical-synthesis` → fitness `strong`, with the limitation "Capture cited primary evidence for consequential atomic claims where available." Read that table as doctrine, not as enforcement: `sourceFitness` is a typed field on the profile contract (`packages/research-kernel/src/generated/contracts.ts`) that nothing reads at scoring time, and the adapters below only stamp the string onto a candidate payload.
+
+The rule that is enforced is `assessSourceFitness(sourceClass, assertionClass)` in `packages/domain-core/src/claims/source-fitness.ts`. It is claim-relative: fitness is a property of the (document kind, assertion kind) pair, never of the host. It returns `{ fitness, rationale, limitations }` over `authoritative | strong | conditional | leadOnly | unfit`, and `sourceAuthorityForFitness` turns that into the authority component of a confidence score, with `unfit` a floor of zero so unfit sources can never accumulate into a supported claim.
+
+For this lane, the resolver draws the line this section was already reaching for:
+
+- The finding aid itself is `archival_finding_aid`: `conditional` by default, `strong` for a record fact, `leadOnly` for a superlative or for technical scope. A finding-aid abstract is a pointer to evidence, not evidence itself, and it now scores that way.
+- The holdings it describes are `archival_manuscript`: `strong` by default, `authoritative` for lived experience, `strong` for community identity and for relationships, `conditional` for a superlative. The upgrade comes from reading the box, not from citing the aid.
+
+Registration is unchanged:
 
 - `registerHbcuCollectionSource` wraps `registerSource` with research-kernel `sourceClass: 'scholarly'` (constants + contract notes carry it; `HBCU_COLLECTIONS_SOURCE_CLASS`).
-- Evidence-source classification is the constitution token `primary_archival` — finding aids describe primary archival holdings.
-- "Strong" applies to the *institution's descriptive synthesis*, not to any downstream claim: candidates remain private leads until the normal claim/evidence/review pipeline runs. A finding-aid abstract is a pointer to evidence, not evidence itself.
+- Evidence-source classification is the constitution token `primary_archival`, because finding aids describe primary archival holdings.
+- Candidates stay private leads until the normal claim/evidence/review pipeline runs (ADR-009).
 
 ## Invariants
 

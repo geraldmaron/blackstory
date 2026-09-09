@@ -37,6 +37,7 @@ import {
 } from './editorial-run.js';
 import { prepareEditorialPacketIntake } from './editorial-intake.js';
 import { runEnrichmentJudge } from './enrichment-run.js';
+import { auditReleasedEntities, type ReleasedClaim } from './research-quality-audit.js';
 import { createLlmProvider } from './llm-provider.js';
 import { loadPendingEditorialItems } from './pending-list.js';
 import {
@@ -1796,15 +1797,79 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         );
         return 0;
       }
+      case 'research-quality-audit': {
+        // Read-only. No --commit exists and none should: this measures the released catalog,
+        // it never changes it. See research-quality-audit.ts for why the source-class mapping
+        // is a heuristic and which way it errs.
+        const releaseFlag = optionalFlag(flags, '--release-id');
+        const kindFilter = optionalFlag(flags, '--kind');
+        const entityFilter = optionalFlag(flags, '--entity-id');
+        const deficitFilter = optionalFlag(flags, '--deficit');
+        const limitRaw = optionalFlag(flags, '--limit');
+        const limit = limitRaw ? Number(limitRaw) : undefined;
+        if (limit !== undefined && (!Number.isFinite(limit) || limit < 1)) {
+          throw new Error('--limit must be a positive number');
+        }
+        const pool = getOpsPostgresPool(process.env);
+        const releaseId =
+          releaseFlag ??
+          (await pool.query('SELECT release_id FROM bb_public.active_release LIMIT 1')).rows[0]
+            ?.release_id;
+        if (releaseId === undefined) throw new Error('No active release and no --release-id given');
+
+        const conditions = ['release_id = $1'];
+        const params: unknown[] = [releaseId];
+        if (kindFilter !== undefined) {
+          params.push(kindFilter);
+          conditions.push(`kind = $${params.length}`);
+        }
+        if (entityFilter !== undefined) {
+          params.push(entityFilter);
+          conditions.push(`entity_id = $${params.length}`);
+        }
+        let sql = `SELECT entity_id, kind, display_name, summary, COALESCE(claims, '[]'::jsonb) AS claims
+             FROM bb_public.release_entities
+            WHERE ${conditions.join(' AND ')}
+            ORDER BY entity_id`;
+        if (limit !== undefined) {
+          params.push(limit);
+          sql += ` LIMIT $${params.length}`;
+        }
+        const { rows } = await pool.query(sql, params);
+        const entities = rows.map((row: Record<string, unknown>) => ({
+          entityId: String(row.entity_id),
+          kind: String(row.kind),
+          displayName: String(row.display_name ?? ''),
+          summary: (row.summary as string | null) ?? null,
+          claims: (row.claims as ReleasedClaim[]) ?? [],
+        }));
+        // Per-entity rows are returned when the caller narrowed the query; a full-catalog run
+        // reports distributions, because 4,000 rows of JSON is not a report.
+        const includeEntities =
+          entityFilter !== undefined || deficitFilter !== undefined || limit !== undefined;
+        const report = auditReleasedEntities(String(releaseId), entities, { includeEntities });
+        const filtered =
+          deficitFilter !== undefined && report.entities !== undefined
+            ? {
+                ...report,
+                entities: report.entities.filter((entity) =>
+                  entity.deficits.includes(deficitFilter as never),
+                ),
+              }
+            : report;
+        stdout(JSON.stringify(filtered, null, 2));
+        return 0;
+      }
       default: {
         stderr(
-          'Usage: operator-cli <preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read|capture-backfill> [flags]\n' +
+          'Usage: operator-cli <preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read|quarantine-triage|capture-backfill|research-quality-audit> [flags]\n' +
             'Every command accepts --json (no-op: output is always JSON) and every id-bearing command uses --entity-id / --case-id for its target.\n' +
             'For model-report: [--since <ISO date>] [--json]\n' +
             'For harness-run: --theme <theme> --metro <metro> [--connectors dpla,nps_network_to_freedom,web_search] [--enrich] [--provider openrouter|ollama|mock] [--progress-path <file>]\n' +
             'For backfill-entity/prose-run: --entity-id <id> [--title ...] [--summary ...] [--provider mock|openrouter|ollama|hybrid] [--commit]\n' +
             'For capture-backfill: [--commit] [--wayback] [--max-captures N] [--max-entities N]\n' +
-            'For expand: --entity-id <id> [--depth N] — stub pending repo-xez5.4\n' +
+            'For expand: --entity-id <id> [--depth N] [--commit] — live Wikidata traversal; stages landscape_candidates, never bb_canonical\n' +
+            'For research-quality-audit: [--release-id <id>] [--kind <kind>] [--entity-id <id>] [--deficit <code>] [--limit N] — read-only; narrow the query to get per-entity rows\n' +
             'For graylist-read: [--limit N] — Postgres quarantine only, see docs/research/research-operations.md\n',
         );
         return command ? 1 : 0;

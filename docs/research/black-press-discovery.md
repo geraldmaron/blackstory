@@ -4,7 +4,14 @@ Discovery methodology for digitized Black newspapers — the Chicago Defender, P
 
 ## Doctrine: leads, not facts
 
-Research-kernel profile `packages/research-kernel/profiles/black-history.v1.json` maps sourceClass `news-index-summary-or-search-result` → claimClass `historical-assertion` → fitness **`leadOnly`** with the limitation "Capture and assess the underlying evidence before acceptance." Black-press OCR mentions are exactly that source class, so:
+Research-kernel profile `packages/research-kernel/profiles/black-history.v1.json` maps sourceClass `news-index-summary-or-search-result` → claimClass `historical-assertion` → fitness `leadOnly` with the limitation "Capture and assess the underlying evidence before acceptance." That table is doctrine, not enforcement: `sourceFitness` is a typed field on the profile contract (`packages/research-kernel/src/generated/contracts.ts`) that nothing reads at scoring time, and the adapter only stamps the string onto a candidate payload.
+
+The enforced rule is `assessSourceFitness(sourceClass, assertionClass)` in `packages/domain-core/src/claims/source-fitness.ts`, which is claim-relative: fitness belongs to the (document kind, assertion kind) pair, never to the host. It returns `{ fitness, rationale, limitations }` over `authoritative | strong | conditional | leadOnly | unfit`, and `sourceAuthorityForFitness` turns that into the authority component of a confidence score, with `unfit` a floor of zero rather than a small number. This lane straddles two of its classes, and the difference is the whole methodology:
+
+- An OCR keyword hit in an index is `search_result_lead`: `leadOnly` by default, and `unfit` for a superlative, an invention attribution, a community-identity claim, or a bare record fact. It tells you where to look and nothing more, whatever the paper.
+- The article, once actually read, is `contemporaneous_newspaper`: `conditional` by default, `strong` for chronology, `conditional` for commercial impact, community identity and lived experience, `leadOnly` for technical scope and for superlatives. Its recorded limitations are the ones this corpus lives with: period racial prejudice shapes both coverage and omission, promotional copy is often printed as reporting, and technical detail is frequently misunderstood.
+
+Black-press OCR mentions enter as the first class, so:
 
 - Every candidate is stamped `sourceClass: 'news-index-summary-or-search-result'`, `sourceFitness: 'leadOnly'`, `leadRoute: 'relevance_review'` on its payload.
 - Evidence-source classification is the constitution token `news_reportage` — a `LOW_AUTHORITY_SOURCE_TIER` (`relevance/gates.ts`), so leads can never independently reach `include` and are eligible for authority harvest.
