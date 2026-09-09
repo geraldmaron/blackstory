@@ -3,6 +3,10 @@
  * `ENTITY_KINDS` allow-list `apps/mobile/src/lib/route-params.ts` already validates route
  * params against -- not a separately-invented vocabulary -- so a category chip always navigates
  * to a `kind` value Explore's own filter parsing already accepts.
+ *
+ * `LABELS` is an exhaustive `Record<EntityKind, string>` on purpose: because the kind list is now
+ * imported from the contract rather than copied, adding a kind upstream fails the typecheck here
+ * until someone writes its label, instead of silently dropping a category from the browse screen.
  */
 import { ENTITY_KINDS, type EntityKind } from '@/lib/route-params';
 
@@ -23,6 +27,7 @@ const LABELS: Record<EntityKind, string> = {
   publication: 'Publications',
   artifact: 'Artifacts',
   movement: 'Movements',
+  invention: 'Inventions',
   other: 'Other',
 };
 

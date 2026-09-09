@@ -20,24 +20,16 @@
  * `normalize.ts` for the defensive runtime narrowing that stands in for schema validation here).
  */
 
+import { ENTITY_KINDS as CONTRACT_ENTITY_KINDS } from '@repo/public-contracts/v1/entity';
 // ---------------------------------------------------------------------------
-// Enums (mirrored verbatim from public-contracts)
+// Enums (imported from public-contracts, never copied)
 // ---------------------------------------------------------------------------
 
-export const ENTITY_KINDS = [
-  'person',
-  'place',
-  'school',
-  'organization',
-  'institution',
-  'event',
-  'law',
-  'case',
-  'publication',
-  'artifact',
-  'movement',
-  'other',
-] as const;
+/**
+ * Re-exported from the contract rather than transcribed. The previous copy here and the one in
+ * lib/route-params.ts had both gone stale on the same value, which is what a verbatim mirror does.
+ */
+export const ENTITY_KINDS = CONTRACT_ENTITY_KINDS;
 export type EntityKind = (typeof ENTITY_KINDS)[number];
 
 export const LOCATION_PRECISIONS = ['city', 'neighborhood', 'campus', 'institution'] as const;

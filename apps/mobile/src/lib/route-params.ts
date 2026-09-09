@@ -12,20 +12,16 @@
  * Lives under `src/lib/` (not `src/app/`) so Expo Router never treats this module as a
  * route file or warns about a missing default export.
  *
- * Dependency note: this module intentionally imports nothing beyond the TypeScript standard
- * library. `packages/public-contracts/src/v1/entity.ts` defines the canonical entity id shape
- * server-side (`idString(200)`: trimmed, non-empty, <=200 chars, via zod) — this module's
- * length bound mirrors that, but apps/mobile does not currently depend on
- * `@repo/public-contracts` or `zod` (apps/mobile manages its own npm lockfile with no workspace
- * symlink to `packages/*`, per the package-scope note in
- * docs/mobile/decisions/mobile-identity.md), and adding a new dependency means editing
- * `apps/mobile/package.json`, which is outside this bead's exclusive ownership
- * (`apps/mobile/src/app/**` and `apps/mobile/app.config.ts` only). A future bead that wires
- * apps/mobile into the pnpm workspace should consider importing the real contract schema here
- * instead of hand-mirroring it.
+ * Dependency note: this module imports `@repo/public-contracts` for the values that must not
+ * drift — the entity-kind list above, and the decade/era helper — and nothing else. Numeric bounds
+ * below are still stated locally because the canonical ones live inside zod schemas rather than as
+ * exported constants; where a bound is mirrored, the comment names what it mirrors. Importing a
+ * LIST is the part that matters: a hand-copied enum drifts without any test noticing, because a
+ * test over the local copy only proves the copy agrees with itself.
  */
 
 import { decadeParamToEra as sharedDecadeParamToEra } from '@repo/public-contracts/discovery';
+import { ENTITY_KINDS as CONTRACT_ENTITY_KINDS } from '@repo/public-contracts/v1/entity';
 
 import {
   MOBILE_LEGACY_SEARCH_ROUTE,
@@ -49,23 +45,12 @@ export const MAX_SEARCH_QUERY_LENGTH = 200;
 export const MAX_ERA_LENGTH = 20;
 
 /**
- * Mirrors packages/public-contracts/src/v1/entity.ts's `ENTITY_KINDS`. Kept as a manually
- * synced literal list rather than an import — see the dependency note above.
+ * The canonical kind list, imported rather than mirrored. A hand-synced copy drifts silently: this
+ * one missed `invention` when the kind was added, so the mobile app would have rejected every
+ * invention route while its own test suite stayed green, because a test over a local literal only
+ * ever proves the literal agrees with itself.
  */
-export const ENTITY_KINDS = [
-  'person',
-  'place',
-  'school',
-  'organization',
-  'institution',
-  'event',
-  'law',
-  'case',
-  'publication',
-  'artifact',
-  'movement',
-  'other',
-] as const;
+export const ENTITY_KINDS = CONTRACT_ENTITY_KINDS;
 export type EntityKind = (typeof ENTITY_KINDS)[number];
 
 /** Five kind families for v6 map + filter facet (web Explore parity). */
