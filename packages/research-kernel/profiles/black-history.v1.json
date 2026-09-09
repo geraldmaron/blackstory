@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "black-history",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "Black history research",
   "scope": {
     "geography": "United States",
@@ -23,7 +23,8 @@
       "event",
       "movement",
       "office",
-      "instrument"
+      "instrument",
+      "invention"
     ],
     "relationshipPredicates": [
       "served_as",
@@ -35,9 +36,32 @@
       "founded",
       "member_of",
       "published",
-      "occurred_at"
+      "occurred_at",
+      "invented",
+      "co_invented",
+      "improved",
+      "developed",
+      "designed",
+      "led_development_of",
+      "built_on",
+      "commercialized",
+      "assigned_to",
+      "licensed_to",
+      "manufactured_by",
+      "demonstrated_at",
+      "collaborated_with",
+      "mentored_by",
+      "litigated_with",
+      "documented_by"
     ],
-    "claimClasses": ["standard", "highImpact", "legal", "sensitive", "livingPerson"]
+    "claimClasses": [
+      "standard",
+      "highImpact",
+      "legal",
+      "sensitive",
+      "livingPerson",
+      "inventionAttribution"
+    ]
   },
   "sensitivityRules": [
     "Treat unknown living status as living for privacy decisions",
@@ -80,6 +104,63 @@
       "limitations": [
         "Evaluate authorship, chronology, coordination, copying, and shared upstream sources"
       ]
+    },
+    {
+      "sourceClass": "patent-specification",
+      "claimClass": "filing-record-fact",
+      "fitness": "authoritative",
+      "limitations": [
+        "Records inventors as filed, which is not always who did the work",
+        "The inventor address is an address at filing, not where invention occurred"
+      ]
+    },
+    {
+      "sourceClass": "patent-specification",
+      "claimClass": "technical-scope",
+      "fitness": "authoritative",
+      "limitations": ["Bounds the claimed mechanism only; it does not bound the wider technology"]
+    },
+    {
+      "sourceClass": "patent-specification",
+      "claimClass": "community-identity",
+      "fitness": "unfit",
+      "limitations": [
+        "The Patent Office did not record inventor race; a patent cannot answer this at all"
+      ]
+    },
+    {
+      "sourceClass": "patent-specification",
+      "claimClass": "superlative",
+      "fitness": "unfit",
+      "limitations": ["A grant is not a finding of priority over a field"]
+    },
+    {
+      "sourceClass": "patent-interference-record",
+      "claimClass": "superlative",
+      "fitness": "strong",
+      "limitations": ["Settles priority only between the parties to the interference"]
+    },
+    {
+      "sourceClass": "historical-compilation",
+      "claimClass": "community-identity",
+      "fitness": "strong",
+      "limitations": [
+        "Baker-era lists are known to be incomplete, and the incompleteness is itself evidence"
+      ]
+    },
+    {
+      "sourceClass": "modern-reputable-secondary",
+      "claimClass": "invention-attribution",
+      "fitness": "leadOnly",
+      "limitations": [
+        "The common carrier of invention myths; may raise an attribution, never settle one"
+      ]
+    },
+    {
+      "sourceClass": "contemporaneous-trade-press",
+      "claimClass": "commercial-impact",
+      "fitness": "strong",
+      "limitations": ["Advertising and editorial are not always separable"]
     }
   ],
   "queryPacks": {
@@ -104,6 +185,38 @@
       "challenged law",
       "participated in",
       "funded by"
+    ],
+    "inventionTechnicalReceipt": [
+      "patent number",
+      "patent title with inventor",
+      "patent full text",
+      "file wrapper",
+      "interference record"
+    ],
+    "inventionIdentity": [
+      "Black inventor compilation",
+      "Henry Baker list",
+      "institutional historical biography",
+      "museum curatorial history",
+      "contemporary Black press"
+    ],
+    "inventionPriorArt": [
+      "history before this inventor",
+      "prior art for this patent",
+      "patent dispute",
+      "interference proceeding",
+      "competing claimant"
+    ],
+    "inventionPlace": [
+      "workshop",
+      "laboratory",
+      "factory",
+      "demonstration site",
+      "company facility"
+    ],
+    "inventionMyth": [
+      "the broad attribution as it circulates publicly",
+      "what the patent actually covers"
     ]
   },
   "riskClasses": [

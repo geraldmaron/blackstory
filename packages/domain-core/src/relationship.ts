@@ -35,10 +35,65 @@ export const RELATIONSHIP_TYPES = [
   'commemorates',
   // stress-test amendment: creation attribution, distinct from `founded` (orgs/institutions only).
   'authored',
+  // Invention contribution. The whole reason these are separate edges rather than one
+  // `contributed_to` with a note is that "Lewis Latimer invented the light bulb" and "Lewis
+  // Latimer developed and patented an improved process for manufacturing carbon conductors used
+  // in incandescent lamps" must not be the same row with different prose. `invented` and
+  // `co_invented` are high-impact and carry the corroboration gate; `improved`, `developed` and
+  // `designed` are the bounded edges most inventor records should actually be using.
+  'invented',
+  'co_invented',
+  'improved',
+  'developed',
+  'designed',
+  'led_development_of',
+  'built_on',
+  // Commercial and institutional context around an invention.
+  'commercialized',
+  'assigned_to',
+  'licensed_to',
+  'manufactured_by',
+  'demonstrated_at',
+  // Human network around the work. `documented_by` is how a compiler such as Henry E. Baker
+  // relates to the inventors he recorded, which is a historical relationship in its own right.
+  'collaborated_with',
+  'mentored_by',
+  'litigated_with',
+  'documented_by',
   'other',
 ] as const;
 
 export type RelationshipType = (typeof RELATIONSHIP_TYPES)[number];
+
+/**
+ * Contribution edges that assert origination and therefore take the high-impact corroboration
+ * gate: two genuinely independent lineages, one of them fit to settle an attribution.
+ *
+ * A patent grant is not on that list of fit sources. It records what an applicant filed, which
+ * is why a bare patent supports `improved` or `developed` and not `invented`.
+ */
+export const ORIGINATION_RELATIONSHIP_TYPES: readonly RelationshipType[] = [
+  'invented',
+  'co_invented',
+];
+
+export function isOriginationRelationshipType(type: RelationshipType): boolean {
+  return ORIGINATION_RELATIONSHIP_TYPES.includes(type);
+}
+
+/**
+ * Bounded contribution edges: true of someone who did not originate the category.
+ *
+ * Reach for one of these first. Most inventor records in a patent-derived corpus belong here,
+ * because most patents are improvements within a field that already existed.
+ */
+export const BOUNDED_CONTRIBUTION_RELATIONSHIP_TYPES: readonly RelationshipType[] = [
+  'improved',
+  'developed',
+  'designed',
+  'led_development_of',
+  'built_on',
+];
 
 /**
  * Role qualifier on the `attended` edge distinguishing
@@ -313,6 +368,97 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<
       'fromEntity (person/organization) AUTHORED toEntity (publication/artifact) — creation ' +
       'attribution, distinct from `founded`, which stays reserved for organizations/institutions.',
     temporalSemantics: 'validFrom may record the publication/creation date; not required.',
+    requiresTemporalContext: false,
+  },
+  invented: {
+    direction:
+      'fromEntity (a person) INVENTED toEntity (an invention), claiming origination of the thing itself.',
+    temporalSemantics:
+      'validFrom is when the work was done, which is usually earlier than any patent date and is frequently unknown.',
+    requiresTemporalContext: false,
+  },
+  co_invented: {
+    direction:
+      'fromEntity CO_INVENTED toEntity alongside other named contributors, each of whom carries their own edge.',
+    temporalSemantics: 'As `invented`.',
+    requiresTemporalContext: false,
+  },
+  improved: {
+    direction:
+      'fromEntity IMPROVED toEntity: a bounded contribution to something that already existed. The honest edge for most patents.',
+    temporalSemantics: 'validFrom/validTo bound when the improvement was made.',
+    requiresTemporalContext: false,
+  },
+  developed: {
+    direction:
+      'fromEntity DEVELOPED toEntity: substantive work realising a technology, without claiming to have originated the category.',
+    temporalSemantics: 'validFrom/validTo bound the development period.',
+    requiresTemporalContext: false,
+  },
+  designed: {
+    direction: 'fromEntity DESIGNED toEntity: responsibility for the form or arrangement.',
+    temporalSemantics: 'validFrom/validTo bound the design work.',
+    requiresTemporalContext: false,
+  },
+  led_development_of: {
+    direction:
+      'fromEntity LED_DEVELOPMENT_OF toEntity: direction of a team effort, which is a different claim from personal authorship.',
+    temporalSemantics: 'validFrom/validTo bound the period of leadership.',
+    requiresTemporalContext: false,
+  },
+  built_on: {
+    direction:
+      'fromEntity BUILT_ON toEntity: this work depends on identified prior art. The edge that makes an improvement legible as an improvement.',
+    temporalSemantics: 'The prior work necessarily precedes; no window is required.',
+    requiresTemporalContext: false,
+  },
+  commercialized: {
+    direction: 'fromEntity COMMERCIALIZED toEntity: brought it to market or into production.',
+    temporalSemantics: 'validFrom/validTo bound the commercial activity.',
+    requiresTemporalContext: false,
+  },
+  assigned_to: {
+    direction:
+      'fromEntity (an invention or patent) was ASSIGNED_TO toEntity (a company or person) as recorded.',
+    temporalSemantics: 'validFrom is the assignment date where the record gives one.',
+    requiresTemporalContext: false,
+  },
+  licensed_to: {
+    direction: 'fromEntity was LICENSED_TO toEntity under a recorded arrangement.',
+    temporalSemantics: 'validFrom/validTo bound the licence term where known.',
+    requiresTemporalContext: false,
+  },
+  manufactured_by: {
+    direction: 'fromEntity was MANUFACTURED_BY toEntity (a company or facility).',
+    temporalSemantics: 'validFrom/validTo bound the production period.',
+    requiresTemporalContext: false,
+  },
+  demonstrated_at: {
+    direction:
+      'fromEntity was DEMONSTRATED_AT toEntity (a place or event). Often the best-evidenced place anchor an invention has.',
+    temporalSemantics: 'validFrom is the demonstration date.',
+    requiresTemporalContext: false,
+  },
+  collaborated_with: {
+    direction: 'fromEntity COLLABORATED_WITH toEntity on shared work. Symmetric in meaning.',
+    temporalSemantics: 'validFrom/validTo bound the collaboration.',
+    requiresTemporalContext: false,
+  },
+  mentored_by: {
+    direction: 'fromEntity was MENTORED_BY toEntity.',
+    temporalSemantics: 'validFrom/validTo bound the relationship.',
+    requiresTemporalContext: false,
+  },
+  litigated_with: {
+    direction:
+      'fromEntity LITIGATED_WITH toEntity over priority, infringement or rights. Symmetric in meaning; the outcome belongs in evidence, not in the direction.',
+    temporalSemantics: 'validFrom/validTo bound the proceedings.',
+    requiresTemporalContext: false,
+  },
+  documented_by: {
+    direction:
+      'fromEntity was DOCUMENTED_BY toEntity (a person or institution that recorded them). How Henry E. Baker relates to the inventors he compiled, which is itself a historical relationship.',
+    temporalSemantics: 'validFrom is when the documentation was made.',
     requiresTemporalContext: false,
   },
   other: {

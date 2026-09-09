@@ -112,6 +112,31 @@ export {
 } from './living.js';
 export type { LivingStatus, LivingStatusDerivationSignal } from './living.js';
 
+export {
+  INVENTION_PATENT_RELATIONS,
+  INVENTOR_RESOLUTION_STATES,
+  IP_STATUSES,
+  PATENT_SOURCE_SYSTEMS,
+  assertCanonicalPatentValid,
+  assertSoleInventorClaimSupported,
+  isIntellectualPropertyStatus,
+  isMultiInventor,
+  isPatentSourceSystem,
+  normalizePatentNumber,
+  patentIdFor,
+  unresolvedInventors,
+} from './invention/patent.js';
+export type {
+  CanonicalPatent,
+  IntellectualPropertyStatus,
+  InventionFields,
+  InventionPatentLink,
+  InventionPatentRelation,
+  InventorResolutionState,
+  PatentInventorAssociation,
+  PatentSourceSystem,
+} from './invention/patent.js';
+
 export { ENTITY_KINDS, isEntityKind } from './entity-kinds.js';
 export type { EntityKind } from './entity-kinds.js';
 
@@ -227,6 +252,9 @@ export type {
 export {
   RELATIONSHIP_TYPES,
   RELATIONSHIP_ROLES,
+  ORIGINATION_RELATIONSHIP_TYPES,
+  BOUNDED_CONTRIBUTION_RELATIONSHIP_TYPES,
+  isOriginationRelationshipType,
   assertRelationshipHasEvidence,
   RELATIONSHIP_TYPE_SEMANTICS,
   CAUSAL_HISTORICAL_RELATIONSHIP_TYPES,

@@ -9,9 +9,13 @@ import { ENTITY_KINDS } from './entity-kinds.js';
 
 const NOW = '2026-07-17T00:00:00.000Z';
 
-test('ENTITY_KINDS carries all 12 kinds including the new movement kind', () => {
-  assert.equal(ENTITY_KINDS.length, 12);
+test('ENTITY_KINDS carries all 13 kinds including invention', () => {
+  // `invention` is its own kind rather than a flavour of `artifact`, because an artifact is an
+  // object and an invention is the technology or process a reader recognises. It also does not
+  // require a patent to exist.
+  assert.equal(ENTITY_KINDS.length, 13);
   assert.ok(ENTITY_KINDS.includes('movement'));
+  assert.ok(ENTITY_KINDS.includes('invention'));
 });
 
 test('currentEntityStatus derives place-like status from the open-ended statusHistory record', () => {
