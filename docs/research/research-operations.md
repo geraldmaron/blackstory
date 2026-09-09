@@ -36,15 +36,41 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts <ver
   work is a set, not a single id — that's a real shape difference, not an inconsistency to
   paper over.
 - **No personal host/IP.** The variable code actually reads for search is `SEARXNG_BASE_URL`,
-  a full base URL rather than a host. Its readers are `packages/operator-cli/src/cli.ts`,
-  `packages/operator-cli/src/worker-preflight.ts`,
-  `packages/config/src/scheduled-jobs/discovery-dispatcher.ts`, and
-  `packages/ops-data/scripts/lib/corroborate-source.ts`. `.env.corsair.example` also defines
+  a full base URL rather than a host. `.env.corsair.example` also defines
   `RESEARCH_SEARXNG_HOST`, but no code reads it: it is a bare host that
   `scripts/run-scheduled-searxng-discovery.sh` uses to build `SEARXNG_BASE_URL` when localhost
   isn't listening. The local-LLM pair works the same way: `RESEARCH_LOCAL_LLM_HOST` is a script
   input, `OLLAMA_BASE_URL` is what the code reads. Set the base URL, not the alias, and
   do not hardcode an operator's Tailscale IP or hostname in any command, doc, or example below.
+- **Reaching a search provider.** Two things are true at once and the split between them is the
+  whole design. The operator's SearXNG is *private on purpose* — loopback, or a Tailscale
+  `100.64.0.0/10` address — so `executeSafeFetch` refuses it, correctly: every other caller of
+  that function hands it a URL scraped from a web page, and such a URL must never reach an
+  internal service. A *search result*, by contrast, is an untrusted URL and belongs on the full
+  safe-fetch path.
+
+  So the provider call uses `createOperatorEndpointClient`
+  (`packages/security/src/url-safety/search-endpoint-client.ts`): one configured origin, compared
+  as scheme/host/port rather than as a string, resolved once and pinned, JSON content-types only,
+  a byte cap, a timeout, no redirect ever followed, and no retries (pacing belongs to the caller
+  that knows the campaign). It **requires** the configured address to be one the SSRF policy
+  rejects, so a `SEARXNG_BASE_URL` pointed at a public host fails at startup with a message naming
+  `evaluateExternalUrl` + `resolveAndPinDestination` as the path to use instead. Brave is a public
+  API and therefore takes the ordinary DNS-pinned route, not this client.
+
+  Queries go through `runRoutedWebSearch` (`@repo/domain`), which returns **leads**, not sources.
+  A lead carries a URL, a title and the engine's blurb, and deliberately has no text field: the
+  blurb is not the page. A lead becomes evidence only after an independent fetch through
+  `gatherSourceSnippetsFromUrls`, and `assertStorageTermsConfirmed` still stands between a result
+  and a persisted row. A run without a campaign budget reports `budgetEnforced: false` rather than
+  implying a guard ran.
+
+  The CLI resolves all of this in `packages/operator-cli/src/search-routing.ts`. A verb asks for
+  queries and gets leads; it does not read search env vars itself.
+  `packages/ops-data/scripts/lib/corroborate-source.ts` is the remaining exception and still calls
+  `fetch` directly — see repo-8tnss for the preconditions its migration needs.
+  `packages/operator-cli/src/worker-preflight.ts` also reads `SEARXNG_BASE_URL`, but only to probe
+  the instance's health endpoint; it issues no queries.
 - **Ledger logging.** `packages/operator-cli/src/model-routing.ts` (repo-xez5.2) is the one
   reviewed module for which model tier a lane uses, and
   `packages/operator-cli/src/model-invocation-log.ts` is the writer for
