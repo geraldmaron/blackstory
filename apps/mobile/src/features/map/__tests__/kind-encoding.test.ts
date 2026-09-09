@@ -15,6 +15,7 @@ describe('kindFamilyFor', () => {
     expect(kindFamilyFor('movement')).toBe('organizations');
     expect(kindFamilyFor('case')).toBe('events');
     expect(kindFamilyFor('publication')).toBe('sources');
+    expect(kindFamilyFor('invention')).toBe('inventions');
   });
 });
 
@@ -33,13 +34,14 @@ describe('displayEncodingFor', () => {
 });
 
 describe('MAP_KIND_FAMILY_ENCODING', () => {
-  it('lists five families matching web v6', () => {
+  it('lists six families matching web Explore', () => {
     expect(Object.keys(MAP_KIND_FAMILY_ENCODING)).toEqual([
       'people',
       'places',
       'organizations',
       'events',
       'sources',
+      'inventions',
     ]);
   });
 });

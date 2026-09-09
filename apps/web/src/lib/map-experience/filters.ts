@@ -52,7 +52,7 @@ export const DEFAULT_EXPLORE_FILTERS: ExploreFilterState = {
 
 /**
  * Single kind-filter matcher shared by Explore and `/records`.
- * Accepts only the five map kind families (`people`) and micro-kinds (`school`).
+ * Accepts map kind families (`people`, `inventions`) and micro-kinds (`school`).
  * Legacy `/history` category ids (`law`, `works`) are remapped at the redirect boundary only.
  */
 export function kindMatchesPublicFilter(featureKind: string, filterKind: string): boolean {

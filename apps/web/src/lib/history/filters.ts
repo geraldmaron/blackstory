@@ -55,10 +55,8 @@ export const HISTORY_FILTER_GROUPS = {
 } as const;
 
 /**
- * Consolidated record-type taxonomy (repo-k1t9). The published release spans 11 of the 12
- * canonical entity kinds (see `@repo/domain` ENTITY_KINDS), which renders as a wall of ~11
- * kind chips. To keep the primary type filter scannable, related kinds roll up into a small
- * set of high-level categories; the raw kinds stay reachable via an advanced disclosure.
+ * Consolidated record-type taxonomy (repo-k1t9). Related canonical kinds roll up into a
+ * small set of high-level categories; the raw kinds stay reachable via an advanced disclosure.
  *
  * Data basis (active release, 1375 records, 2026-07-24):
  *   place 565 · person 394 · event 79 · institution 79 · school 77 · organization 57 ·
@@ -80,6 +78,7 @@ export const HISTORY_KIND_CATEGORIES = [
   // Invention has its own Records/Explore family (`inventions`). This legacy bucket is only
   // the old /history remap, and it no longer claims invention.
   { id: 'works', label: 'Works & other', kinds: ['publication', 'artifact', 'other'] },
+  { id: 'inventions', label: 'Inventions', kinds: ['invention'] },
 ] as const;
 
 export type HistoryKindCategoryId = (typeof HISTORY_KIND_CATEGORIES)[number]['id'];
@@ -105,7 +104,7 @@ export function historyKindsForCategory(categoryId: string): readonly string[] {
 }
 
 /**
- * Remaps `/history` browse category ids onto the five-family vocabulary Explore and Records share.
+ * Remaps `/history` browse category ids onto the kind-family vocabulary Explore and Records share.
  * Used only at the `/history` → `/records` redirect boundary — not in live filter matchers.
  */
 export const HISTORY_KIND_TO_RECORDS_KIND: Readonly<Record<string, string>> = Object.freeze({

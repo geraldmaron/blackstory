@@ -35,6 +35,7 @@ test('clusterCenterFromCoordinates rejects invalid coordinates', () => {
 
 test('exploreClusterProperties tracks per-family counts for dominant paint', () => {
   const props = exploreClusterProperties();
-  assert.equal(Object.keys(props).length, 5);
+  assert.equal(Object.keys(props).length, 6);
+  assert.ok(props.inventions_n);
   assert.deepEqual(props.people_n, ['+', ['case', ['==', ['get', 'kindFamily'], 'people'], 1, 0]]);
 });

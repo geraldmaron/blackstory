@@ -30,6 +30,7 @@ const ENTITY_KINDS = new Set<string>([
   'publication',
   'artifact',
   'movement',
+  'invention',
   'other',
 ]);
 

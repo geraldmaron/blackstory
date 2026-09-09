@@ -38,6 +38,8 @@ export const entityKindSchema = z.enum([
   // 12th kind: sustained, multi-actor, multi-decade phenomena (Civil Rights Movement,
   // Great Migration, Black Power, Black Arts Movement, etc.) distinct from a single `event`.
   'movement',
+  // A technology or process, not an artifact. Must stay in lockstep with ENTITY_KINDS.
+  'invention',
   'other',
 ]);
 
