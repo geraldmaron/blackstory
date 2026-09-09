@@ -98,6 +98,13 @@ const statusHistoryEntrySchema = z.object({
   basisClaimIds: z.array(z.string().min(1)).default([]),
 });
 
+/**
+ * Mirrors NOTABILITY_CRITERIA in `packages/domain/src/entity-status.ts`, restated here because
+ * @repo/schemas depends on nothing but zod. `documented_contribution` is the invention basis: an
+ * invention is not a site, and `documented_site` was the honest-but-wrong fallback it inherited.
+ *
+ * Read the `.catch` on the ARRAY below before adding a value here.
+ */
 const notabilityBasisRecordSchema = z.object({
   criterion: z.enum([
     'first_to_do_x',
@@ -106,6 +113,7 @@ const notabilityBasisRecordSchema = z.object({
     'court_precedent',
     'movement_significance',
     'documented_site',
+    'documented_contribution',
     'community_anchor',
     'only_or_oldest',
   ]),
@@ -251,7 +259,19 @@ export const publicEntityProjectionSchema = z.object({
   statusProvenance: z.enum(['canonical', 'derived_heuristic']).optional(),
   eraBuckets: z.array(z.string().min(1)).optional(),
   notabilityLabels: z.array(z.string().min(1)).optional(),
-  notabilityBasis: z.array(notabilityBasisRecordSchema).optional(),
+  /**
+   * `.catch([])` for the same reason the relationship enum carries one: a criterion this list has
+   * not caught up to must not delete the record that uses it. On 2026-09-09 a vocabulary widened
+   * in the database and not here took 39 live records off the site, because a projection that
+   * fails to parse does not degrade — it 404s.
+   *
+   * The cost of the catch is that the "Why this is here" block collapses for a record whose basis
+   * this parser cannot read. Showing no inclusion reason is recoverable and visible; showing the
+   * page not at all is neither. It is deliberately array-level rather than per-entry: a criterion
+   * we cannot name must not be silently rewritten into one we can, which is what a per-entry
+   * fallback would do.
+   */
+  notabilityBasis: z.array(notabilityBasisRecordSchema).catch([]).optional(),
   researchCoverage: z.enum(['minimal', 'partial', 'substantial']).optional(),
   generatedAt: z.string().datetime().optional(),
   recordUpdatedAt: z.string().datetime().optional(),

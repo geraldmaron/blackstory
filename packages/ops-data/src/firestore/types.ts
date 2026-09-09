@@ -230,6 +230,13 @@ export const statusHistoryEntrySchema = z.object({
 
 export type StatusHistoryEntryDoc = z.infer<typeof statusHistoryEntrySchema>;
 
+/**
+ * Mirrors NOTABILITY_CRITERIA in `packages/domain/src/entity-status.ts`, restated here to match
+ * this file's convention. Third copy of the same vocabulary; when it drifts from @repo/schemas
+ * the api-public build fails, because `mapProjectionToEntityV1` takes its projection type from
+ * this package. That is the good outcome — the relationship vocabulary drifted the other way and
+ * cost 39 live records instead.
+ */
 export const notabilityCriterionSchema = z.enum([
   'first_to_do_x',
   'major_honor_or_hall_of_fame',
@@ -237,6 +244,7 @@ export const notabilityCriterionSchema = z.enum([
   'court_precedent',
   'movement_significance',
   'documented_site',
+  'documented_contribution',
   'community_anchor',
   'only_or_oldest',
 ]);

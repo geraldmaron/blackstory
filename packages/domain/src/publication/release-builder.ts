@@ -471,14 +471,25 @@ function claimToFactCitationStandIn(claim: ReleaseSourceClaim): FactCitation {
  * Best-effort, honest keyword mapping from a claim's own predicate+object text to the closest
  * matching `NotabilityCriterion`. This never OVERCLAIMS: a criterion is only assigned when the
  * claim text itself contains a reasonably unambiguous marker for it (e.g. "first", "national
- * register", "hall of fame", "only"/"oldest"); every other claim honestly falls back to
- * `documented_site` the broadest criterion that is always true of every record in this catalog
- * (each is, by construction, a documented site/entity in the active public release) rather than
- * inventing a more specific rubric match the source text doesn't support.
+ * register", "hall of fame", "only"/"oldest"); every other claim honestly falls back to the
+ * broadest criterion that is true of the record, rather than inventing a more specific rubric
+ * match the source text doesn't support.
+ *
+ * The fallback depends on `kind`. It was `documented_site` for everything, on the reasoning that
+ * every record in this catalog is "by construction, a documented site/entity in the active public
+ * release". That stopped being true when `invention` became a kind: an invention happens at no
+ * site a reader can walk to, so the fallback printed "a documented site of a historically
+ * significant event or practice (a sit-in lunch counter, a Freedom School…)" on Latimer's carbon
+ * process. Inventions fall back to `documented_contribution` instead.
+ *
+ * The keyword matches still run first for every kind, and correctly: Jennings's grant is the
+ * earliest known US patent to a Black inventor, and `first_to_do_x` is the honest criterion for
+ * it whatever the record's kind.
  */
 export function inferNotabilityCriterionFromClaim(
   predicate: string,
   object: string,
+  kind?: string,
 ): NotabilityCriterion {
   const text = `${predicate} ${object}`.toLowerCase();
   if (/\bfirst\b/.test(text)) return 'first_to_do_x';
@@ -490,7 +501,7 @@ export function inferNotabilityCriterionFromClaim(
   }
   if (/\bonly\b|\boldest\b/.test(text)) return 'only_or_oldest';
   if (/precedent|supreme court|ruled|struck down|upheld/.test(text)) return 'court_precedent';
-  return 'documented_site';
+  return kind === 'invention' ? 'documented_contribution' : 'documented_site';
 }
 
 /** True when `criterion` is a member of the closed `NotabilityCriterion` enum this domain
@@ -569,8 +580,10 @@ export function buildReleaseNotabilityBasis(
       .map((claim) => claim.id);
     const [sample] = predicateClaims;
     const criterion = sample
-      ? inferNotabilityCriterionFromClaim(predicate, sample.object)
-      : 'documented_site';
+      ? inferNotabilityCriterionFromClaim(predicate, sample.object, entry.kind)
+      : entry.kind === 'invention'
+        ? 'documented_contribution'
+        : 'documented_site';
     records.push({
       criterion,
       note: buildNotabilityBasisNote(predicate, predicateClaims),
