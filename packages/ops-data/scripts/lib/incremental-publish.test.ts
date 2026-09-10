@@ -17,9 +17,11 @@ import {
   MERGED_EVIDENCE_QUOTE_MAX_CHARS,
   parseCanonicalStatusSnapshot,
   toReleaseEntityRow,
+  toSearchIndexRow,
   type LandscapePublishRow,
 } from './incremental-publish.ts';
 import { buildReleaseEntityArtifacts, deriveCatalogEntityStatus } from '@repo/domain';
+import { mapPostgresSearchIndexRow } from '@repo/schemas';
 
 /** Parsed host, or null for anything unparseable — never a substring test on the raw URL. */
 const hostOf = (url: string): string | null => {
@@ -1039,4 +1041,94 @@ test('gateLandscapePublishCandidate: the index claim still does not count itself
   if (!result.eligible) return;
   // Unchanged from before the fix: a lone government citation, one lineage, no corroborator.
   assert.equal(result.confidence, 0.77);
+});
+
+/**
+ * The writer/reader round-trip for `search_index.facets`.
+ *
+ * This test exists because the two halves drifted apart silently. `toSearchIndexRow` carried five
+ * keys; `mapPostgresSearchIndexRow` reads eleven that no column backs, and `upsertSearchIndex`
+ * writes `facets = EXCLUDED.facets` — a whole-object replace. A key the writer omitted was
+ * therefore deleted from every row republished through this path, and nothing failed: the reader
+ * defaults an absent facet instead of rejecting the row, so `/records` printed "Place not
+ * recorded" over records whose own entity page printed a city.
+ *
+ * Asserting through the real reader rather than against a literal is the point. A future facet
+ * key added to `mapPostgresSearchIndexRow` and not to `toSearchIndexRow` should fail here.
+ */
+test('toSearchIndexRow: facets survive a round-trip through the search-doc reader', () => {
+  const gate = gateLandscapePublishCandidate({
+    row: enrichedRow(),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(gate.eligible, true);
+  if (!gate.eligible) return;
+  const built = buildArtifactsForEntry({
+    entry: gate.entry,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+
+  const projection = built.entityRow.projection as { readonly jurisdictionLabel?: string };
+  // The record under test must actually have a jurisdiction, or the assertion below proves nothing.
+  assert.ok(
+    projection.jurisdictionLabel && projection.jurisdictionLabel.length > 0,
+    'fixture must carry a jurisdictionLabel',
+  );
+
+  const doc = mapPostgresSearchIndexRow({
+    ...built.searchRow,
+    aliases: [...built.searchRow.aliases],
+    topics: [...built.searchRow.topics],
+  });
+  assert.ok(doc, 'search row must parse as a public search doc');
+
+  // The reported defect: /records reads this and nothing else for its place column.
+  assert.equal(doc.jurisdictionState, projection.jurisdictionLabel);
+  // Lost by the same omission, on the same records, for the same reason.
+  assert.ok(Array.isArray(doc.topicIds));
+  assert.ok(Array.isArray(doc.mentionedEntityIds));
+  assert.ok(Array.isArray(doc.notabilityBasis));
+  assert.ok(Array.isArray(doc.notabilityLabels));
+});
+
+/**
+ * The one-directional rule the backfill depends on: a record with no jurisdiction of its own must
+ * leave the facet absent rather than write an empty string over it. `''` would satisfy
+ * `typeof facets.jurisdictionState === 'string'` in the reader and publish a blank place.
+ */
+test('toSearchIndexRow: an empty jurisdiction omits the facet rather than blanking it', () => {
+  const row = toSearchIndexRow(
+    {
+      id: 'ent_test',
+      releaseId: 'rel_seed_001',
+      kind: 'invention',
+      displayName: 'Test Record',
+      nameLower: 'test record',
+      aliases: [],
+      summary: 'Summary.',
+      topicTags: [],
+      topicIds: [],
+      mentionedEntityIds: [],
+      keywords: [],
+      jurisdictionState: '   ',
+      eraBuckets: [],
+      notabilityBasis: [],
+      notabilityLabels: [],
+      recordMaturity: 'minimum_record',
+      researchCoverage: 'minimal',
+      relatedCount: 0,
+      claimCount: 0,
+      confidenceTier: 'unrated',
+    },
+    'dqcjq',
+  );
+  assert.equal(
+    Object.hasOwn(row.facets as Record<string, unknown>, 'jurisdictionState'),
+    false,
+    'a whitespace-only jurisdiction must not be written',
+  );
 });
