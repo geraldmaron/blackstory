@@ -21,10 +21,21 @@
  *   - facet-only: the facet has values the projection lacks;
  *   - both-set-and-differing: both carry values and they disagree.
  * Measured on 2026-09-10 across the active release, `topicIds` and `mentionedEntityIds` are
- * clean on both counts, but `notabilityBasis` and `notabilityLabels` each have 52 rows where
- * both sides are set and disagree. That is the reason this script reports rather than resolves:
- * 52 records disagree about why they are in the archive, and picking a winner by script is an
- * editorial decision, not a data-sync one. Those rows are skipped and counted.
+ * clean on both counts. `notabilityBasis` and `notabilityLabels` each had 52 disagreeing rows,
+ * all of them person records, and those were read individually rather than left as a standing
+ * warning. The finding: 48 of 52 label conflicts and 45 of 52 basis conflicts are not
+ * disagreements at all — the facet is a strict SUBSET of the projection, a stale snapshot taken
+ * before the projection gained entries. Of the 7 genuine basis orphans, every one carries
+ * `evidenceIds: []`, and four of them (the four girls killed in the 16th Street Baptist Church
+ * bombing) duplicate a `movement_significance` criterion the projection already states WITH
+ * evidence. So the projection won all 52, and `OVERWRITE_CONFLICTS=1` exists to say so.
+ *
+ * Two of the orphans carried substance the projection genuinely lacks — Ell Persons's lynching
+ * catalyzing the Memphis NAACP branch, and Vernon Dahmer's Forrest County NAACP presidency and
+ * poll-tax offer. Both are true and sourceable, and both are being restored through enrichment
+ * WITH evidence rather than preserved here as unevidenced prose (repo-9u3di, repo-eimm4). A
+ * third, Emmett Till's, was not merely unevidenced but over-scoped: NPS attributes the
+ * "catalyst" framing to activists' own retrospective testimony, not as its own finding.
  *
  * SCOPE
  * `FACET_KEYS` and `KIND` keep a run small enough to verify. The catalog-wide population is
@@ -48,6 +59,15 @@ import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.BACKFILL_SEARCH_FACETS_PROJECTION_APPLY === '1';
+/**
+ * Also resolve rows where BOTH sides carry values and they disagree, projection winning.
+ *
+ * Separate from APPLY because it discards published facet content rather than filling a hole.
+ * Do not set it without reading the disagreeing rows first. The 52 person records reviewed on
+ * 2026-09-10 were safe to resolve this way (see the header), but that was a finding about those
+ * rows, not a property of the operation.
+ */
+const OVERWRITE_CONFLICTS = process.env.OVERWRITE_CONFLICTS === '1';
 
 /**
  * Array facets the search-doc reader can only get from `facets`.
@@ -149,16 +169,29 @@ async function main(): Promise<void> {
       console.log(
         `${key}\n  stale (projection set, facet empty): ${counts.stale}` +
           `\n  left untouched — facet set, projection empty: ${counts.facet_only}` +
-          `\n  left untouched — both set and disagreeing:   ${counts.differ}`,
+          `\n  ${OVERWRITE_CONFLICTS ? 'OVERWRITING' : 'left untouched'} — both set and disagreeing:   ${counts.differ}`,
       );
-      if (counts.differ > 0) {
-        console.log('  ^ a disagreement is an editorial call, not a sync; not resolved here.');
+      if (counts.differ > 0 && !OVERWRITE_CONFLICTS) {
+        console.log(
+          '  ^ reviewed separately; pass OVERWRITE_CONFLICTS=1 to resolve to projection.',
+        );
       }
 
       if (DRY_RUN || !APPLY) {
         console.log('');
         continue;
       }
+
+      /*
+       * `stale` alone never touches a row whose facet already has values, which is what keeps a
+       * plain run safe. OVERWRITE_CONFLICTS widens it to the disagreeing rows as well, and is a
+       * separate flag because that is a genuinely different operation: it discards published
+       * facet content rather than filling a hole.
+       */
+      const target = OVERWRITE_CONFLICTS
+        ? `(${stale}) OR (${projSet} AND ${facetSet}
+             AND re.projection->'${key}' IS DISTINCT FROM si.facets->'${key}')`
+        : stale;
 
       const updated = await client.query(
         `UPDATE bb_public.search_index si
@@ -169,7 +202,7 @@ async function main(): Promise<void> {
             AND re.entity_id = si.entity_id
             AND si.release_id = r.release_id
             AND jsonb_typeof(si.facets) = 'object'
-            AND ${stale}${kindClause}`,
+            AND (${target})${kindClause}`,
       );
       totalUpdated += updated.rowCount ?? 0;
       console.log(`  applied: ${updated.rowCount ?? 0} rows\n`);
