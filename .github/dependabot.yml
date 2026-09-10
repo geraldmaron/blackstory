@@ -64,9 +64,11 @@ updates:
       # Needs react-native-worklets 0.12.x; SDK 57 pins 0.10.1.
       - dependency-name: 'react-native-reanimated'
         versions: ['>=4.6.0']
-      # Needs react 19.2.8; SDK 57 pins react 19.2.3.
+      # react-test-renderer pins an exact-ish peer on react, and SDK 57 pins react 19.2.3, so
+      # every version above that fails install. 19.2.8 and 19.2.7 were both tried and both
+      # resolved to a react this project does not have.
       - dependency-name: 'react-test-renderer'
-        versions: ['>=19.2.8']
+        versions: ['>19.2.3']
       # eslint-plugin-import and eslint-plugin-react do not declare eslint 10 support, and
       # eslint-config-expo pulls both. The root workspace is already on eslint 10.
       - dependency-name: 'eslint'
