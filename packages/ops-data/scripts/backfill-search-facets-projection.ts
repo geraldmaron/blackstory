@@ -53,6 +53,14 @@
  *   FACET_KEYS=topicIds,notabilityBasis,notabilityLabels KIND=invention \
  *   DRY_RUN=0 BACKFILL_SEARCH_FACETS_PROJECTION_APPLY=1 node --conditions development \
  *     --import tsx packages/ops-data/scripts/backfill-search-facets-projection.ts
+ *
+ * THEN REPUBLISH THE ARTIFACTS. Writing the rows does not finish the job:
+ *   gh workflow run publish-release-catalog-artifacts.yml --ref main
+ * Production serves prebuilt entities.json / search-index.json from the CDN
+ * (`APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL`), and the guard that is supposed to stop a stale
+ * artifact only checks that its releaseId matches the active-release pointer. A backfill does
+ * not change the release id, so the pre-backfill artifact passes and keeps serving until the
+ * daily 09:17 UTC tick. On 2026-09-10 that cost half an hour of blaming the read cache.
  */
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
