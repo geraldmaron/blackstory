@@ -329,7 +329,7 @@ jobs:
             if (!process.env.ZAP_AUTH_HEADER_VALUE || process.env.ZAP_AUTH_HEADER_VALUE === "Bearer ") process.exit(1);
           '
       - name: Run authorized ZAP baseline against staging only
-        uses: zaproxy/action-baseline@f948cb8d66e25e330a23e64e3fc72a5c0018b16d # resolved 2026-07-17
+        uses: zaproxy/action-baseline@8e809c982d8155eda2594e5732ae1b580ed276f9 # resolved 2026-07-17
         with:
           target: ${{ inputs.staging_base_url }}
           fail_action: true
