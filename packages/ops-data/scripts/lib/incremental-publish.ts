@@ -426,7 +426,13 @@ function corroboratingSourcesForLandscape(row: LandscapePublishRow): readonly st
     const url = typeof raw.sourceUrl === 'string' ? raw.sourceUrl.trim() : '';
     if (url.startsWith('https://')) urls.add(url);
   }
-  if (row.canonical_url) urls.delete(row.canonical_url);
+  // The canonical document corroborates claims taken from other documents; a claim's own
+  // citation is excluded per-claim in minClaimConfidence, which is the only self-corroboration
+  // guard needed. Deleting the canonical URL here as a second guard instead penalized every
+  // OTHER claim: an evidence claim taken from a second document could no longer be corroborated
+  // by the record's own canonical source. lineage resolution (resolveSourceLineage) already
+  // collapses a canonical page and an evidence page from the same authority onto one lineage, so
+  // a record with two pages from one institution gains nothing from including both here.
   return [...urls];
 }
 
