@@ -56,52 +56,58 @@ answer identically.
 - `vercel git connect` against this repository succeeds and `vercel git disconnect` reverses it,
   so step 2 below is a proven command rather than a guess. It is left disconnected on purpose.
 
-## Deploys happen on push, once one setting is right
+## Deploys happen on push
 
 Like `blackstory` and `blackstory-admin`, this deploys through Vercel's Git integration: push to
 `main` builds production, push to `staging` builds a preview, and
 `scripts/vercel-ignore-build.sh api-public` skips the build when the diff cannot reach it. No
 workflow and no CLI deploy is involved — the CLI deploys in this repo's history were verification
-only.
+only, and a CLI deploy from this subdirectory does not work anyway (it uploads only the subfolder,
+so `cd ../..` escapes the checkout).
 
-That flow depends on **Root Directory = `apps/api-public`**. `vercel.json` uses `cd ../..` to reach
-the workspace root, and Vercel only starts there when Root Directory says so. It is also where
-Vercel looks for `vercel.json` and for the `api/` function directory at all, so with the default
-Root Directory of `.` the config is never read, the function is never found, and the install step
-walks out of the checkout with `ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND`.
+**Root Directory is `apps/api-public`, set 2026-09-10.** This is what makes the rest work: Vercel
+reads `vercel.json` from the Root Directory, looks for the `api/` function directory there, and
+starts the build there so `cd ../..` reaches the workspace root. At the default `.` none of that
+happens.
 
-Root Directory is the one thing here with no CLI or config surface — not in `vercel.json`, not in
-`vercel project`, dashboard or REST API only. Git is deliberately left **disconnected** until it is
-set, because a connected project with the wrong root fails on every push to both branches.
-
-### Step 1 — set Root Directory (dashboard, once)
-
-Vercel → `blackstory-api` → Settings → Build & Deployment → Root Directory → `apps/api-public`.
-Confirm Production Branch is `main`.
-
-### Step 2 — connect git (one command)
+It is the one setting with no CLI or `vercel.json` surface. It was set through the REST API using
+the token the Vercel CLI already holds:
 
 ```bash
-cd apps/api-public && vercel git connect https://github.com/geraldmaron/blackstory --yes
+TOKEN=$(python3 -c "import json,os;print(json.load(open(os.path.expanduser('~/Library/Application Support/com.vercel.cli/auth.json')))['token'])")
+curl -sS -X PATCH "https://api.vercel.com/v9/projects/blackstory-api?teamId=team_DldsFiy3ArSsA0sJvIXr2zId" \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"rootDirectory":"apps/api-public"}'
 ```
 
-Pass the URL explicitly: run from a subdirectory, the CLI does not find the repository on its own
-and reports "No local Git repository found".
+Git is connected. Verified 2026-09-10 by pushing an empty commit to `staging` and watching Vercel
+build a Ready preview from the repository.
 
-### Step 3 — environment variables
+## Remaining steps
 
-Set on Production, and on Preview if previews should read real data:
+### Environment variables
 
-- `PUBLIC_DATA_SOURCE=postgres`
-- `DATABASE_URL` — the read credential, not admin's write-capable one.
+`PUBLIC_DATA_SOURCE=postgres` is set on Production and Preview. `DATABASE_URL` is not — it is a
+production credential and belongs to the operator:
 
-Without these the API boots and serves an empty in-memory catalog rather than failing, so check
-`/v1/bootstrap` returns real data. `/v1/health` returning 200 proves nothing about the database.
+```bash
+cd ~/Developer/Projects/blackstory/apps/api-public && set -a && . ../web/.env.local && set +a \
+  && printf '%s' "$DATABASE_URL" | vercel env add DATABASE_URL production --force --yes \
+  && printf '%s' "$DATABASE_URL" | vercel env add DATABASE_URL preview staging --force --yes
+```
 
-### Step 4 — domain
+`preview` needs its branch named or the CLI prompts. Without `DATABASE_URL` the API boots and
+serves an empty in-memory catalog rather than failing, so check `/v1/bootstrap` returns real data.
+`/v1/health` returning 200 proves nothing about the database.
 
-Vercel → Settings → Domains → add `api.blackstory.app`, then add the `CNAME` Vercel asks for at
-Cloudflare, **DNS-only (grey cloud)**, not proxied.
+### Domain
+
+`vercel domains add api.blackstory.app` refuses while the project's latest **production**
+deployment is in an errored state — the message is "Your project's latest production deployment
+has errored. Therefore, the domain cannot be assigned." A push to `main` that builds green clears
+it. Then add the `CNAME` Vercel asks for at Cloudflare, **DNS-only (grey cloud)**, not proxied:
+`blackstory.app` sits on Cloudflare nameservers (`langston`/`marjory.ns.cloudflare.com`), not
+Vercel's, so Vercel cannot create the record itself.
 
 Deployment protection needs no change: `ssoProtection` is `all_except_custom_domains`, so
 `api.blackstory.app` is anonymous while the `*.vercel.app` URLs stay behind SSO. A 302 to a Vercel
