@@ -36,6 +36,11 @@
  * Anything resolved at step 3 or 4 carries `inferred: true`, which is what the
  * `host_based_lineage_suspect` deficit reads. Host stays useful metadata; it stops being the
  * answer.
+ *
+ * `isPatentDocumentUrl` exposes the patent-mirror detection behind step 2 on its own, so a
+ * caller that needs "is this a patent document" without a full lineage resolution — the
+ * confidence classifier in `@repo/ops-data` is the current one — reuses the same regexes rather
+ * than duplicating them.
  */
 
 /**
@@ -185,15 +190,22 @@ function normalizePatentNumber(raw: string): string | undefined {
   return `${series}${digits}`;
 }
 
+/** Registrable-domain suffixes that mirror US patent documents. */
+const PATENT_MIRROR_SUFFIXES: readonly string[] = [
+  'patents.google.com',
+  'uspto.gov',
+  'freepatentsonline.com',
+  'patentimages.storage.googleapis.com',
+  'patentsview.org',
+];
+
+function isPatentMirrorHost(hostname: string): boolean {
+  return PATENT_MIRROR_SUFFIXES.some((suffix) => hostMatches(hostname, suffix));
+}
+
 /** Patent hosts whose URLs carry a resolvable patent number. */
 function patentWorkFromUrl(url: URL, hostname: string): string | undefined {
-  const patentHost =
-    hostMatches(hostname, 'patents.google.com') ||
-    hostMatches(hostname, 'uspto.gov') ||
-    hostMatches(hostname, 'freepatentsonline.com') ||
-    hostMatches(hostname, 'patentimages.storage.googleapis.com') ||
-    hostMatches(hostname, 'patentsview.org');
-  if (!patentHost) return undefined;
+  if (!isPatentMirrorHost(hostname)) return undefined;
 
   // patents.google.com/patent/US252386A/en  |  patentimages.../US252386.pdf
   const pathMatch = /\/(?:patent|patents)\/([A-Z]{0,2}[A-Z0-9,-]{2,20})/iu.exec(url.pathname);
@@ -206,13 +218,40 @@ function patentWorkFromUrl(url: URL, hostname: string): string | undefined {
     undefined;
   // patentimages.storage.googleapis.com/pdfs/US252386.pdf
   const fromFile = /\/([A-Z]{2}[A-Z0-9]{2,15})\.pdf$/iu.exec(url.pathname)?.[1];
+  // freepatentsonline.com/4723129.html — the number stands alone as the filename, with no
+  // /patent/ path segment at all.
+  const fromFreePatentsOnlineFile = hostMatches(hostname, 'freepatentsonline.com')
+    ? /\/([A-Z]{0,2}[A-Z0-9]{2,15})\.html?$/iu.exec(url.pathname)?.[1]
+    : undefined;
 
-  for (const candidate of [fromPath, fromQuery, fromFile]) {
+  for (const candidate of [fromPath, fromQuery, fromFile, fromFreePatentsOnlineFile]) {
     if (candidate === undefined) continue;
     const normalized = normalizePatentNumber(candidate);
     if (normalized !== undefined) return `work:patent:us:${normalized}`;
   }
   return undefined;
+}
+
+/**
+ * True when `url` resolves to an individual patent document on a known patent mirror — not the
+ * mirror's home page, not a search or listing page, and not an unrelated path on that host.
+ *
+ * This is what `classifySourceForConfidence` (in `@repo/ops-data`) uses to grade a patent
+ * `government_record` wherever it is read. The classification is of the DOCUMENT — a
+ * government grant, the same one whichever mirror serves it — not of the mirror. A search page
+ * (`patents.google.com/?q=...`) or the mirror's home page carries no resolvable patent number
+ * and correctly returns `false` here, the same test `patentWorkFromUrl` already applies to keep
+ * such pages out of the lineage system.
+ */
+export function isPatentDocumentUrl(url: string): boolean {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return false;
+  }
+  const hostname = parsed.hostname.toLowerCase().replace(/\.$/u, '');
+  return patentWorkFromUrl(parsed, hostname) !== undefined;
 }
 
 /**

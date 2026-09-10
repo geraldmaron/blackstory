@@ -20,6 +20,7 @@ import {
   type ClaimEvidenceLink,
   type ConfidenceEngineResult,
 } from '@repo/domain';
+import { isPatentDocumentUrl } from '@repo/domain-core/claims/lineage';
 import { isReputableSecondaryHost, isTier1Host, isWikipediaHost } from './tier1-sources.ts';
 
 /**
@@ -56,7 +57,10 @@ function hostMatches(hostname: string, domain: string): boolean {
  * emitted `low` and so rendered a three-segment meter from a two-value vocabulary: 10,572 of
  * 11,555 published claims were `high` and none were `low` (repo-hqwt9).
  *
- * - A government or military record is the archive's primary evidence. `high`.
+ * - A government or military record is the archive's primary evidence. `high`. A patent
+ *   document is one of these on any mirror that serves it (patents.google.com,
+ *   patentimages.storage.googleapis.com, freepatentsonline.com, patentsview.org), not only on
+ *   uspto.gov — see `classifySourceForConfidence`.
  * - Wikipedia and Wikidata are bridge sources. `claim-corroborate` puts a Wikipedia-only claim at
  *   `low` outright, and 2,049 published claims cited Wikipedia at `high`.
  * - Everything else is `medium`, INCLUDING hosts the classifier cannot place. That is deliberate
@@ -85,6 +89,15 @@ export function classifySourceForConfidence(url: string): string {
     GOVERNMENT_DOMAINS.some((domain) => hostMatches(hostname, domain))
   )
     return 'government_record';
+  // A patent specification is the same government grant whichever mirror serves it —
+  // `resolveSourceLineage` (packages/domain-core/src/claims/lineage.ts) already collapses
+  // uspto.gov and patents.google.com onto one lineage for exactly this reason. This
+  // classification follows the same logic: it grades the DOCUMENT, not the host serving it, so
+  // a patent read on patents.google.com must not grade lower than the identical text read on
+  // uspto.gov. `isPatentDocumentUrl` only matches an individual patent document (a resolvable
+  // patent number) — a search page or the mirror's home page falls through to the classification
+  // below, same as any other unrecognized page on that host.
+  if (isPatentDocumentUrl(url)) return 'government_record';
   if (
     ARCHIVAL_DOMAINS.some((domain) => hostMatches(hostname, domain)) ||
     hostUnderTld(hostname, 'edu')

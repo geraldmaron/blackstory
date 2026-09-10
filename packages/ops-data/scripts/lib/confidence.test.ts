@@ -4,7 +4,11 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { classifySourceForConfidence, computeClaimConfidence } from './confidence.ts';
+import {
+  classifySourceForConfidence,
+  computeClaimConfidence,
+  confidenceLevelForSource,
+} from './confidence.ts';
 
 const DC_PRESERVATION = 'https://historicsites.dcpreservation.org/site/123-example-historic-place';
 const NPS_GOV = 'https://www.nps.gov/places/example-historic-site.htm';
@@ -30,6 +34,35 @@ test('classifySourceForConfidence keeps gov and wikipedia behavior', () => {
   assert.equal(classifySourceForConfidence(NPS_GOV), 'government_record');
   assert.equal(classifySourceForConfidence(WIKIPEDIA), 'reputable_secondary');
   assert.equal(classifySourceForConfidence('https://example.com/article'), 'unknown');
+});
+
+test('a US patent document grades government_record and high on any mirror, uspto.gov included', () => {
+  // The lineage system already treats these as one work (packages/domain-core/src/claims/
+  // lineage.ts); the confidence classification has to agree, or the same document grades
+  // differently depending on which mirror happened to be fetched.
+  assert.equal(
+    classifySourceForConfidence('https://patents.google.com/patent/US252386A/en'),
+    'government_record',
+  );
+  assert.equal(confidenceLevelForSource('https://patents.google.com/patent/US252386A/en'), 'high');
+  assert.equal(
+    classifySourceForConfidence('https://ppubs.uspto.gov/pubwebapp/rest/patents/html/252386'),
+    'government_record',
+  );
+  assert.equal(
+    classifySourceForConfidence('https://www.freepatentsonline.com/4723129.html'),
+    'government_record',
+  );
+});
+
+test('a patent mirror search page, listing, or home page is not a government record', () => {
+  // Classifying the DOCUMENT, not the mirror: a search query names no document at all.
+  assert.notEqual(
+    classifySourceForConfidence('https://patents.google.com/?q=latimer'),
+    'government_record',
+  );
+  assert.equal(classifySourceForConfidence('https://patents.google.com/?q=latimer'), 'unknown');
+  assert.notEqual(classifySourceForConfidence('https://patents.google.com/'), 'government_record');
 });
 
 test('historicsites.dcpreservation.org alone scores 0.72 — below standardPublish', () => {

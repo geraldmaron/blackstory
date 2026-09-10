@@ -596,6 +596,9 @@ importers:
       '@repo/domain':
         specifier: workspace:*
         version: link:../domain
+      '@repo/domain-core':
+        specifier: workspace:*
+        version: link:../domain-core
       '@repo/schemas':
         specifier: workspace:*
         version: link:../schemas

@@ -19,6 +19,10 @@ implement:
 
 - `classifySourceForConfidence` maps Wikipedia to `reputable_secondary` — a real classification,
   not a rejection.
+- A US patent document classifies as `government_record` on any mirror that serves it
+  (patents.google.com, patentimages.storage.googleapis.com, freepatentsonline.com,
+  patentsview.org, uspto.gov) — the classification is of the document, a government grant, not
+  of the host reading it back.
 - `isWikipediaHost` excludes it from every corroboration path in `corroborate-source.ts`.
   Wikipedia is a *bridge* to Tier-1 references, never returned as evidence itself.
 - A Wikipedia-only claim contributes **no** corroborating lineage, so the formula caps it below
