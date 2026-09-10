@@ -589,6 +589,40 @@ export function isRacialTerrorClaim(predicate: string, object: string): boolean 
 }
 
 /**
+ * Killing under a claim of authority: by police, by someone acting under a claim of authority or
+ * self-defense, or by a private individual. Checked only AFTER racial terror, which is what keeps
+ * the lynching cohort out of it — Albert Gooden's body was recovered "by sheriff's deputies", and
+ * a sheriff in a claim does not make a 1900 lynching a police killing.
+ */
+const AUTHORITY_KILLING_CONTEXT =
+  /\bpolice\b|\bofficers?\b|\bNYPD\b|\bpatrolm[ae]n\b|\btroopers?\b|\bdeputies\b|\bhighway\s+patrol\b|\bneighborhood[\s-]?watch\b|\bstand[\s-]your[\s-]ground\b|\bchokehold\b|\bin\s+custody\b|\bno-knock\b|\bsearch\s+warrant\b/i;
+
+/**
+ * True when the record is about a killing by police or by someone claiming authority to use force.
+ *
+ * A SEPARATE criterion from `documented_racial_terror`, not an extension of it, and the separation
+ * is the point. The two rest on different documentary records — the Equal Justice Initiative's
+ * lynching research on one side, investigations, grand jury proceedings, federal findings and
+ * consent decrees on the other. Collapsing a killing by the state into "racial terror" makes a
+ * category claim this catalog cannot source; leaving Breonna Taylor under `movement_significance`
+ * said her reason for being here was a role she played in a movement, when she was asleep in her
+ * apartment. Ratified 2026-09-09; see docs/methodology/notability-rubric.md.
+ *
+ * Order is load-bearing: `isRacialTerrorRecord` is asked first everywhere this is used.
+ */
+export function isRacialKillingRecord(
+  entry: Pick<ReleaseSourceEntity, 'kind' | 'displayName' | 'summary'>,
+  claims: readonly ReleaseClaimProjection[],
+): boolean {
+  if (!claims.some((claim) => isKillingPredicate(claim.predicate))) return false;
+  const context = [
+    entry.summary ?? '',
+    ...claims.map((claim) => `${claim.predicate} ${claim.object}`),
+  ].join(' ');
+  return AUTHORITY_KILLING_CONTEXT.test(context);
+}
+
+/**
  * True when the RECORD is about a documented act of racial terror, read from everything the
  * record carries rather than from one claim at a time.
  *
@@ -633,6 +667,26 @@ export function isRacialTerrorRecord(
 }
 
 /** True when this claim predicate is the one that records the killing, on such a record. */
+/**
+ * Any predicate that records the subject's death, whatever killed them. Two jobs, both of which
+ * need the broad reading:
+ *
+ *   Half the `documented_racial_killing` test, alongside the authority context. `died` is far too
+ *   generic to stand alone — everyone dies — but it is the word these records actually use: Eric
+ *   Garner's claim is `died | after a chokehold during an arrest` and Jordan Neely's is
+ *   `died | Jordan Neely`. Neither says "killed" anywhere.
+ *
+ *   Which claims survive M1 on a killing record. With the narrower racial-terror set here, Jordan
+ *   Neely kept publishing "Boarded northbound F train." and "Stopped at Broadway-Lafayette Street
+ *   station." as reasons he is in this catalog.
+ *
+ * This is NOT the racial-terror test. That one is deliberately stricter, because "was killed in
+ * action" is Doris Miller.
+ */
+export function isKillingPredicate(predicate: string): boolean {
+  return /\bkilled\b|\bshot\b|\bdied\b|\bvictims?\s+of\b/iu.test(predicateWords(predicate));
+}
+
 export function isRacialTerrorKillingPredicate(predicate: string): boolean {
   return (
     RACIAL_TERROR_KILLED_PREDICATE.test(predicate) ||
@@ -665,6 +719,94 @@ export function isAccusationPredicate(predicate: string): boolean {
   return ACCUSATION_CLAIM.test(predicate);
 }
 
+/**
+ * Predicates that record a judicial decision. `court_precedent` already covered these and the
+ * ladder simply never matched their phrasing: on the active release 42 case records opened
+ * "Decided on" and 30 "Held that", while the ladder tested only
+ * /precedent|supreme court|ruled|struck down|upheld/. Twenty-one PLACES were filed as judicial
+ * precedents and four actual court cases were.
+ */
+const JUDICIAL_DECISION_PREDICATE =
+  /\bdecided\s+on\b|\bissued\s+ruling\b|\baffirmed\b|\breversed\b|\boverturned\b|\bcertiorari\b|\bremand\w*\b|\bdissent\w*\b/i;
+
+/**
+ * A court's holding, matched across predicate AND object because the two halves carry one phrase:
+ * the 30 case records read `held | that Alabama's law...`. Bare `held` cannot be the test — Anna
+ * M. Dumas's "Held office until 1885." made a Reconstruction officeholder a judicial precedent.
+ */
+const JUDICIAL_HOLDING = /\bheld\s+that\b/i;
+
+/**
+ * Predicates that record a law being made. Deliberately separate from the judicial set: the Civil
+ * Rights Act of 1964 is not a judicial decision, and filing it under `court_precedent` would state
+ * something false about every statute, amendment and executive order in the catalog.
+ */
+const ENACTMENT_PREDICATE =
+  /\bsigned\s+on\b|\bratified\s+on\b|\benacted\s+on\b|\bapproved\s+on\b|\bissued\s+on\b|\bcodified\s+as\b|\bpassed\s+by\b|\brepealed\b|\bauthorized\s+the\b|\bprohibits\b|\brequires\b/i;
+
+/**
+ * Predicates that record holding office. Only half the test — the OBJECT has to name a public
+ * office, because `served_as` is equally "served as chief of neurosurgery at the Children's
+ * Hospital of Michigan". Alexa Canady is in this catalog as a documented first, not as an
+ * officeholder, and this rule must not claim otherwise.
+ */
+const OFFICE_PREDICATE =
+  /\bserved\s+(?:as|in|during)\b|\brepresented\b|\b(?:was|were)\s+elected\b|\bheld\s+office\b|\bserved\s+as\s+member\s+of\b|\bappointed\s+(?:as|to)\b/i;
+
+/** A public office, named. Legislative, executive, judicial, military commission, or local. */
+const PUBLIC_OFFICE_OBJECT =
+  /\bhouse\s+of\s+(?:representatives|delegates)\b|\bstate\s+(?:senate|house|representative|senator)\b|\b(?:u\.?s\.?|united\s+states)\s+(?:senate|congress|representative|senator|congressman)\b|\bgeneral\s+assembly\b|\blegislature\b|\bcity\s+council\b|\balderman\b|\bcouncilman\b|\bmayor\b|\bgovernor\b|\battorney\s+general\b|\bsecretary\s+of\b|\bjustice\s+of\s+the\s+peace\b|\bconstable\b|\bsheriff\b|\bcoroner\b|\bregister\s+of\b|\bcommissioner\b|\bdelegate\b|\bmagistrate\b|\bcabinet\b|\bambassador\b|\bjudge\b|\bReconstruction\s+era\b|\bconstitutional\s+convention\b/i;
+
+/**
+ * A museum, archive, library or research center of Black history — the keeping half of
+ * `black_press_or_archive`. The making half is `kind === 'publication'`, which needs no keyword.
+ */
+const ARCHIVE_NAME =
+  /\bmuseum\b|\barchives?\b|\bresearch\s+center\b|\bcultural\s+center\b|\bheritage\s+center\b|\bhistory\s+center\b|\blibrary\b|\bcollection\b/i;
+
+/**
+ * A long-standing community institution, in the words the rubric already uses: a historically
+ * Black church, a fraternal lodge, an HBCU, a mutual aid society. `community_anchor` was in use
+ * FOUR times in the whole catalog, all on people, and never once on a school, institution or
+ * organization — the three kinds its ratified text is written about.
+ */
+const COMMUNITY_ANCHOR_NAME =
+  /\bA\.?M\.?E\.?\b|\bbaptist\b|\bchurch\b|\bchapel\b|\bcongregation\b|\blodge\b|\bmasonic\b|\bfraternity\b|\bsorority\b|\bRosenwald\b|\bhistorically\s+black\s+(?:college|universit)\w*\b|\bHBCU\b|\bmutual\s+aid\b|\bbenevolent\b|\bfreedmen'?s?\b|\bnormal\s+(?:school|institute)\b/i;
+
+/**
+ * A named movement, or the organizing done inside one. The rubric text already names "person,
+ * organization, event, place, or a movement-kind entity itself"; the criterion was in use on 36
+ * records, every one of them a person.
+ */
+const MOVEMENT_NAME =
+  /\bcivil\s+rights\s+movement\b|\bgreat\s+migration\b|\bblack\s+power\b|\bblack\s+arts\b|\bharlem\s+renaissance\b|\bunderground\s+railroad\b|\babolition\w*\b|\bfreedom\s+(?:rides?|riders?|summer|vote|school)\b|\bsit-?ins?\b|\bboycott\b|\bdesegregat\w*\b|\bvoter\s+registration\b|\bmarch\s+on\s+washington\b/i;
+
+/**
+ * The kind IS the criterion for these, and kind is structured data rather than free-text prose.
+ * That matters: there are 1,580 distinct claim predicates behind the fallback basis records, so a
+ * keyword ladder cannot reach the tail, and the kinds listed here are the ones where a fallback
+ * states something true of every record of that kind.
+ *
+ * Deliberately absent: person, school, institution, organization, event. Each is heterogeneous —
+ * Little Rock Central High School is a school whose honest basis really is `documented_site`, and
+ * the `organization` kind holds movement orgs, fraternities and USCT regiments together. Those
+ * kinds get positive matching only, and whatever does not match keeps `documented_site` until
+ * repo-o6k0c retires it against a measured residual rather than an assumed one.
+ */
+/** Kinds whose records can carry a movement role — the kinds `movement_significance` names. */
+const MOVEMENT_ANCHOR_KINDS = new Set(['organization', 'event', 'person']);
+
+/** Kinds `community_anchor` is written about: a church, a lodge, an HBCU, a mutual aid society. */
+const COMMUNITY_ANCHOR_KINDS = new Set(['school', 'institution', 'organization']);
+
+const KIND_FALLBACK: Readonly<Record<string, NotabilityCriterion>> = {
+  invention: 'documented_contribution',
+  case: 'court_precedent',
+  law: 'enacted_law',
+  publication: 'black_press_or_archive',
+  movement: 'movement_significance',
+};
+
 export function inferNotabilityCriterionFromClaim(
   predicate: string,
   object: string,
@@ -684,7 +826,36 @@ export function inferNotabilityCriterionFromClaim(
   }
   if (/\bonly\b|\boldest\b/.test(text)) return 'only_or_oldest';
   if (/precedent|supreme court|ruled|struck down|upheld/.test(text)) return 'court_precedent';
-  return kind === 'invention' ? 'documented_contribution' : 'documented_site';
+  if (JUDICIAL_DECISION_PREDICATE.test(predicate) || JUDICIAL_HOLDING.test(text)) {
+    return 'court_precedent';
+  }
+  if (ENACTMENT_PREDICATE.test(predicate)) return 'enacted_law';
+  // A patent on a PERSON record. `documented_contribution` was in use on 19 records, every one of
+  // them kind `invention` and none of them a person, so Elijah McCoy, Granville Woods, Garrett
+  // Morgan and Marie Van Brittan Brown were not filed as contributors to anything.
+  if (/\bpatented\b|\binvented\b|\bdesigned\b.*\bpatent\b/.test(predicate)) {
+    return 'documented_contribution';
+  }
+  if (OFFICE_PREDICATE.test(predicate) && PUBLIC_OFFICE_OBJECT.test(object)) {
+    return 'elected_or_appointed_office';
+  }
+  // The name-based matchers are gated to the kinds each criterion's ratified text is written
+  // about. Without the gate, "A church that stood through it." on a PLACE became a
+  // `community_anchor` — a criterion that demands "a documented multi-decade role in a specific
+  // community", which one clause mentioning a church does not evidence. A criterion is only as
+  // honest as the narrowest claim it will accept.
+  //
+  // `place` is absent from all three on purpose. Places already reach `documented_site` and
+  // `landmark_or_national_register` honestly, and the ruling scoped the rubric decision to
+  // non-place records.
+  if (MOVEMENT_ANCHOR_KINDS.has(kind ?? '') && MOVEMENT_NAME.test(text)) {
+    return 'movement_significance';
+  }
+  if (kind === 'institution' && ARCHIVE_NAME.test(text)) return 'black_press_or_archive';
+  if (COMMUNITY_ANCHOR_KINDS.has(kind ?? '') && COMMUNITY_ANCHOR_NAME.test(text)) {
+    return 'community_anchor';
+  }
+  return KIND_FALLBACK[kind ?? ''] ?? 'documented_site';
 }
 
 /** True when `criterion` is a member of the closed `NotabilityCriterion` enum this domain
@@ -763,21 +934,46 @@ export function buildReleaseNotabilityBasis(
   // Tulsa Race Massacre is a racial-terror record whose claims are `occurred in` and `targeted`,
   // and dropping those would leave it with no basis at all.
   const racialTerrorRecord = isRacialTerrorRecord(entry, claims);
-  const hasKillingClaim =
-    racialTerrorRecord && claims.some((claim) => isRacialTerrorKillingPredicate(claim.predicate));
-  const basisClaims = hasKillingClaim
-    ? claims.filter(
-        (claim) =>
-          isRacialTerrorKillingPredicate(claim.predicate) ||
-          // A criterion the inference positively identified is never discarded. Elmer Jackson was
-          // one of three men lynched in Duluth in 1920, "the only widely known lynching of African
-          // Americans in Minnesota" — an `only_or_oldest` basis an earlier draft of this rule
-          // dropped, along with a documented first on Ben Pettigrew's record and on James
-          // Dillard's. Only the metadata predicates go.
-          inferNotabilityCriterionFromClaim(claim.predicate, claim.object, entry.kind) !==
-            'documented_site',
-      )
-    : claims;
+
+  // A criterion the inference positively identifies. Elmer Jackson's `only_or_oldest` — one of
+  // three men lynched in Duluth in 1920, the only widely known lynching in Minnesota — is one of
+  // these, and an earlier draft of the metadata rule discarded it along with the date.
+  const identifies = (claim: ReleaseClaimProjection): boolean =>
+    inferNotabilityCriterionFromClaim(claim.predicate, claim.object, entry.kind) !==
+    'documented_site';
+
+  /*
+   * M1. A basis record answers "why is this record in the catalog". One record per distinct claim
+   * predicate encoded the assumption that every claim is such an answer, and most are not:
+   * "Architectural style Greek Revival.", "Collection size more than 35,000 artifacts.", "Buried
+   * at Lincoln Cemetery.", "Boarded northbound F train." The Tulsa Race Massacre published six.
+   *
+   * Three cases, in this order, and the order is what keeps it honest:
+   *
+   *   A killing record states the killing. The date and the street it happened on are record
+   *   content, not reasons — Susie Jackson's page said "Date June 17, 2015." and "Location 110
+   *   Calhoun Street." were why she is in this catalog.
+   *
+   *   A racial-terror record with no killing PREDICATE keeps everything. The Elaine Massacre's
+   *   claims are `resulted in` and `listed on`; keeping only what the inference identifies would
+   *   leave the National Register listing and drop the massacre, so the record would stop saying
+   *   why it exists. This case exists because that regression shipped twice in draft.
+   *
+   *   Everything else keeps the identified claims, or all of them when nothing is identified. The
+   *   second half matters: a record with no basis cannot publish, and that residual is the
+   *   measurement repo-o6k0c retires `documented_site` against. It must not be hidden here.
+   */
+  const racialKillingRecord = !racialTerrorRecord && isRacialKillingRecord(entry, claims);
+
+  const basisClaims =
+    racialTerrorRecord || racialKillingRecord
+      ? claims.some((claim) => isKillingPredicate(claim.predicate))
+        ? claims.filter((claim) => isKillingPredicate(claim.predicate) || identifies(claim))
+        : claims
+      : (() => {
+          const identified = claims.filter(identifies);
+          return identified.length > 0 ? identified : claims;
+        })();
 
   const byPredicate = new Map<string, ReleaseClaimProjection[]>();
   for (const claim of basisClaims) {
@@ -799,12 +995,11 @@ export function buildReleaseNotabilityBasis(
   // on this record it is both a fallback AND the sentence that told a reader Alma Howze is a
   // documented site. Fall back to the criterion that is actually true here instead. Criteria the
   // inference positively identified (a landmark listing, a documented first) are left alone.
-  const fallback: NotabilityCriterion =
-    entry.kind === 'invention'
-      ? 'documented_contribution'
-      : racialTerrorRecord
-        ? 'documented_racial_terror'
-        : 'documented_site';
+  const fallback: NotabilityCriterion = racialTerrorRecord
+    ? 'documented_racial_terror'
+    : racialKillingRecord
+      ? 'documented_racial_killing'
+      : (KIND_FALLBACK[entry.kind] ?? 'documented_site');
 
   const records: NotabilityBasisRecord[] = [];
   for (const [predicate, predicateClaims] of byPredicate) {

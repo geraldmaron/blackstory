@@ -589,6 +589,25 @@
   border-top: var(--ds-border-width) solid var(--room-rule-2);
 }
 
+/*
+ * The base `.ds-qualify-list` is the editorial numbered list: a serif point list whose
+ * `li::before` paints `counter(ds-qualify, decimal-leading-zero)` absolutely at `left: 0`, sitting
+ * in a gutter the base rule reserves with `padding-left: var(--ds-space-12)`.
+ *
+ * The record room demotes that list to a compact meta register — sans, `--rec-meta`, `--room-ink-2`
+ * — and the rule above resets the `padding` SHORTHAND, which silently drops that gutter. The
+ * counter kept its `position: absolute; left: 0` and painted straight over the row: the status
+ * history read "Active — 1750, ongoing" with an orange "01" on top of it.
+ *
+ * The counter goes rather than the gutter coming back. Numbering is what the editorial list is
+ * for; a status history in the record room is a compact meta list beside a Timeline beat that
+ * already carries the sequence with dates and markers, so the number was chrome even when it was
+ * not overlapping anything.
+ */
+.ds-record-beat .ds-qualify-list > li::before {
+  content: none;
+}
+
 /* Timeline: copper markers, mono dates, the kit's line. */
 .ds-record-beat .ds-timeline {
   border-left-color: var(--room-rule-2);

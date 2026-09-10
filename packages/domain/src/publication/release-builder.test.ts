@@ -151,9 +151,20 @@ test('buildReleaseNotabilityBasis groups claims by predicate with real evidenceI
     ],
   });
   const basis = buildReleaseNotabilityBasis(entry);
-  assert.equal(basis.length, 2);
-  const foundedBasis = basis.find((b) => b.evidenceIds.length === 2);
-  assert.ok(foundedBasis, 'expected a basis record covering both founded_year claims');
+  // One record, not two: the National Register listing is a reason this place is in the catalog
+  // and "Founded year 1900." is not. See M1 in buildReleaseNotabilityBasis.
+  assert.equal(basis.length, 1);
+  assert.equal(basis[0]!.criterion, 'landmark_or_national_register');
+
+  // Grouping, evidenceIds and note prose are observable on a record where nothing is positively
+  // identified, so every claim survives and the fallback speaks.
+  const unidentified = baseEntry({
+    claims: entry.claims!.filter((claim) => claim.predicate === 'founded_year'),
+  });
+  const fallbackBasis = buildReleaseNotabilityBasis(unidentified);
+  assert.equal(fallbackBasis.length, 1);
+  const foundedBasis = fallbackBasis.find((b) => b.evidenceIds.length === 2);
+  assert.ok(foundedBasis, 'expected one basis record covering both founded_year claims');
   assert.equal(foundedBasis!.criterion, 'documented_site');
   assert.match(foundedBasis!.note, /^Founded year 1900\./);
   assert.doesNotMatch(foundedBasis!.note, /Cited from/i);

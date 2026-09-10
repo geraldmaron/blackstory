@@ -7,7 +7,7 @@
  *   DRY_RUN=0 APPLY=1 node --conditions development --import tsx packages/ops-data/scripts/stage-invention-cohort.ts
  */
 import pg from 'pg';
-import { SUMMARY_MAX_CHARS, SUMMARY_MIN_CHARS } from './lib/entity-enrichment-llm.ts';
+import { validateInventionCohort } from './lib/invention-cohort-validate.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import { INVENTION_COHORT } from './data/invention-cohort.ts';
 
@@ -17,24 +17,48 @@ const RUN_ID = 'run_invention_cohort_2026_09';
 const PROGRAM_ID = 'invention-cohort';
 const LANE = 'invention-cohort';
 
-function assertCohortBounds(): void {
-  for (const row of INVENTION_COHORT) {
-    if (row.summary.length < SUMMARY_MIN_CHARS || row.summary.length > SUMMARY_MAX_CHARS) {
-      throw new Error(
-        `${row.id} summary length ${row.summary.length} outside ${SUMMARY_MIN_CHARS}..${SUMMARY_MAX_CHARS}`,
-      );
-    }
-    if (row.historicalContext.trim().length === 0) {
-      throw new Error(`${row.id} is missing historicalContext`);
-    }
-    if (row.evidence.length === 0) {
-      throw new Error(`${row.id} has no evidence citation`);
-    }
+/**
+ * What a re-stage does to a candidate's review status.
+ *
+ * Re-staging is how a corrected record reaches readers, so a row whose content actually moved
+ * has to go back to `pending` and be looked at again. A row that did not move must not: resetting
+ * an accepted candidate that nobody edited would drop already-published records back into the
+ * review queue every time one sibling in the cohort is corrected, and the queue would stop
+ * meaning anything.
+ *
+ * The comparison is `IS DISTINCT FROM` rather than `<>` so a null on either side compares as a
+ * difference instead of swallowing the row. `payload` is jsonb, whose key order is normalized by
+ * the type, so an unchanged payload compares equal however the script serialized it.
+ */
+const STATUS_ON_CONFLICT = `CASE
+             WHEN landscape_candidates.display_name IS DISTINCT FROM EXCLUDED.display_name
+               OR landscape_candidates.summary IS DISTINCT FROM EXCLUDED.summary
+               OR landscape_candidates.canonical_url IS DISTINCT FROM EXCLUDED.canonical_url
+               OR landscape_candidates.lat IS DISTINCT FROM EXCLUDED.lat
+               OR landscape_candidates.lng IS DISTINCT FROM EXCLUDED.lng
+               OR landscape_candidates.provenance IS DISTINCT FROM EXCLUDED.provenance
+               OR landscape_candidates.payload IS DISTINCT FROM EXCLUDED.payload
+             THEN 'pending'
+             ELSE landscape_candidates.status
+           END`;
+
+/**
+ * Refuse to stage a cohort with a mechanical defect.
+ *
+ * Every problem is reported at once rather than throwing on the first, so an author fixing a
+ * batch gets the whole list from one run.
+ */
+function assertCohortValid(): void {
+  const problems = validateInventionCohort(INVENTION_COHORT);
+  if (problems.length > 0) {
+    throw new Error(
+      `invention cohort has ${problems.length} problem(s):\n  ${problems.join('\n  ')}`,
+    );
   }
 }
 
 async function main(): Promise<void> {
-  assertCohortBounds();
+  assertCohortValid();
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) throw new Error('DATABASE_URL is required');
 
@@ -80,7 +104,7 @@ async function main(): Promise<void> {
            lat = EXCLUDED.lat,
            lng = EXCLUDED.lng,
            canonical_url = EXCLUDED.canonical_url,
-           status = 'pending',
+           status = ${STATUS_ON_CONFLICT},
            provenance = EXCLUDED.provenance,
            payload = EXCLUDED.payload,
            updated_at = now()`,

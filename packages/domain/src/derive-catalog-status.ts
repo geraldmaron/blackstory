@@ -85,7 +85,40 @@ function isDeceasedByLifeRange(text: string): boolean {
   return Number(match[2]) <= new Date().getFullYear() - 2;
 }
 
+/**
+ * The decade an authored era bucket names, when the entry carries one.
+ *
+ * Separate from the general scan because for some kinds the authored era is the answer and a
+ * year found in prose is noise. See `earliestYear`.
+ */
+function authoredEraYear(entry: CatalogStatusSource): string | undefined {
+  const years: string[] = [];
+  for (const era of entry.eraBuckets ?? []) {
+    const m = /(\d{4})/.exec(era);
+    if (m?.[1]) years.push(m[1]);
+  }
+  years.sort();
+  return years[0];
+}
+
 function earliestYear(entry: CatalogStatusSource): string | undefined {
+  // An invention record is a receipt for one grant, and its era is the decade of that grant —
+  // an authored fact, not a guess. Scanning its prose for an earlier year gets the answer
+  // backwards, because saying what a grant is NOT is how these records stay honest: the
+  // car-coupling record names Eli Janney's 1873 patent precisely to place the 1897 grant as an
+  // improvement inside a field that already existed. Taking the minimum year turns that
+  // disclaimer into the record's own start date and re-attributes to the inventor the very
+  // priority the sentence was written to disclaim. A record that names prior art would be
+  // punished for naming it while a vaguer one went free.
+  //
+  // Only inventions take this branch. For a place, "founded in 1885" with an era bucket of
+  // 1890s is ordinary, and the prose year is the better answer.
+  if (entry.kind === 'invention') {
+    const era = authoredEraYear(entry);
+    if (era !== undefined) return era;
+    // No authored era. Fall through: a scanned year beats no date at all.
+  }
+
   const years: string[] = [];
   for (const era of entry.eraBuckets ?? []) {
     const m = /(\d{4})/.exec(era);

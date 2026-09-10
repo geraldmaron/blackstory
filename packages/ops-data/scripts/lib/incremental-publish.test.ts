@@ -13,6 +13,7 @@ import {
   incrementalPublishProvenancePatch,
   jurisdictionFromPlace,
   jurisdictionFromProvenance,
+  MERGED_EVIDENCE_QUOTE_MAX_CHARS,
   parseCanonicalStatusSnapshot,
   toReleaseEntityRow,
   type LandscapePublishRow,
@@ -721,6 +722,76 @@ test('evidence citations never duplicate a document already cited', () => {
     claim.citationHref?.includes('npgallery'),
   );
   assert.equal(nominationClaims.length, 1);
+  // One document is still one claim, but the second passage is carried rather than discarded.
+  assert.equal(nominationClaims[0]?.object, 'first quote … second quote');
+});
+
+test('a second passage from one document is merged into its claim, not dropped', () => {
+  const encyclopedia = 'https://encyclopediaofalabama.org/article/andrew-jackson-beard/';
+  const entry = buildReleaseSourceFromLandscape(
+    nrhpRow({
+      canonical_url: 'https://patents.google.com/patent/US594059A',
+      payload: {
+        evidenceCitations: [
+          {
+            sourceUrl: encyclopedia,
+            title: 'Encyclopedia of Alabama',
+            quote: 'walking the streets of Birmingham',
+          },
+          {
+            sourceUrl: encyclopedia,
+            title: 'Encyclopedia of Alabama',
+            quote: 'patented by Eli Janney in 1873',
+          },
+        ],
+      },
+    }),
+  );
+  const cited = entry!.claims!.filter((claim) => claim.citationHref === encyclopedia);
+  // The grade is bought with documents, so one document still buys exactly one claim.
+  assert.equal(cited.length, 1);
+  assert.equal(
+    cited[0]?.object,
+    'walking the streets of Birmingham … patented by Eli Janney in 1873',
+  );
+});
+
+test('the same passage cited twice is not repeated inside the merged claim', () => {
+  const url = 'https://www.nps.gov/articles/example.htm';
+  const entry = buildReleaseSourceFromLandscape(
+    nrhpRow({
+      canonical_url: 'https://catalog.archives.gov/id/77843341',
+      payload: {
+        evidenceCitations: [
+          { sourceUrl: url, title: 'NPS', quote: 'the same sentence' },
+          { sourceUrl: url, title: 'NPS', quote: 'The same sentence.' },
+        ],
+      },
+    }),
+  );
+  const cited = entry!.claims!.filter((claim) => claim.citationHref === url);
+  assert.equal(cited.length, 1);
+  assert.equal(cited[0]?.object, 'the same sentence');
+});
+
+test('merging stops at the cap, so a document cited many times is not a wall of quotations', () => {
+  const url = 'https://www.nps.gov/articles/long.htm';
+  const long = 'q'.repeat(400);
+  const entry = buildReleaseSourceFromLandscape(
+    nrhpRow({
+      canonical_url: 'https://catalog.archives.gov/id/77843341',
+      payload: {
+        evidenceCitations: [
+          { sourceUrl: url, title: 'NPS', quote: long },
+          { sourceUrl: url, title: 'NPS', quote: 'b'.repeat(400) },
+        ],
+      },
+    }),
+  );
+  const cited = entry!.claims!.filter((claim) => claim.citationHref === url);
+  assert.equal(cited.length, 1);
+  assert.equal(cited[0]?.object, long, 'the passage that would breach the cap is dropped');
+  assert.ok((cited[0]?.object.length ?? 0) <= MERGED_EVIDENCE_QUOTE_MAX_CHARS);
 });
 
 test('a malformed or empty evidence citation is dropped, never published as a broken link', () => {

@@ -285,3 +285,54 @@ test('an undated demolition of a different subject stays active (repo-rlq1)', ()
   });
   assert.equal(derived.status, 'active');
 });
+
+test('an invention dates from its authored era, not from prior art named in the summary', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'inv_beard_car_coupling',
+    kind: 'invention',
+    displayName: 'Car-Coupling Improvement',
+    summary:
+      'US 594,059, titled "Car-coupling," names Andrew Jackson Beard and was granted on 23 November 1897. Automatic car coupling was patented by Eli Janney in 1873; this grant sits inside that existing field as an improvement, not as its origin.',
+    eraBuckets: ['1890s'],
+  });
+  // 1873 is Janney's year. Stamping it on Beard would re-attribute the priority the sentence
+  // exists to disclaim.
+  assert.equal(derived.statusHistory?.[0]?.validFrom, '1890');
+});
+
+test('an invention ignores a biographical year in its historical context', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'inv_boykin_precision_resistor',
+    kind: 'invention',
+    displayName: 'Wire-Type Precision Resistor',
+    summary: 'US 2,891,227 names Otis F. Boykin and was granted on 16 June 1959.',
+    historicalContext:
+      'Boykin moved to Chicago after graduating in 1941 and built his career there.',
+    eraBuckets: ['1950s'],
+  });
+  assert.equal(derived.statusHistory?.[0]?.validFrom, '1950');
+});
+
+test('an invention with no authored era still takes a year from its prose', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'inv_undated_example',
+    kind: 'invention',
+    displayName: 'Undated Device',
+    summary: 'The device is documented in an 1888 trade catalog.',
+  });
+  // A scanned year beats no date at all; the rule removes noise, it does not remove dates.
+  assert.equal(derived.statusHistory?.[0]?.validFrom, '1888');
+});
+
+test('a place still prefers the earlier prose year over its era bucket', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_place_example',
+    kind: 'place',
+    displayName: 'Example Church',
+    summary: 'The congregation was founded in 1885 and still operates today.',
+    eraBuckets: ['1890s'],
+  });
+  // The invention rule is deliberately kind-scoped: for a place, "founded in 1885" is the
+  // better answer than the decade bucket it was filed under.
+  assert.equal(derived.statusHistory?.[0]?.validFrom, '1885');
+});

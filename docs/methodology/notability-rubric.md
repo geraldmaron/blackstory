@@ -8,8 +8,10 @@
 
 # Notability rubric: what "why is this here" is allowed to say
 
-**Status:** Ruling. Adopted 2026-09-09. §E arm 1 and 2 applied (`repo-90g0i`, 57 records);
-everything else is still unapplied — see *Sequencing*.
+**Status:** Ruling. Adopted 2026-09-09, and **applied** the same day — vocabulary (`repo-tfqrm`),
+positive matching and mechanism (`repo-teb1z`, 3,304 records), and the dignity slice ahead of both
+(`repo-90g0i`, 57 records). One step remains: `repo-o6k0c`, retiring `documented_site` as a
+fallback against the residual this left. See *Sequencing*.
 **Measured against:** active release `rel_20260723_authority_net_001`, 2026-09-09, 4,191 records
 and 10,522 basis records.
 **Re-measure with:** `packages/ops-data/scripts/audit-notability-basis.ts`
@@ -17,6 +19,15 @@ and 10,522 basis records.
 `packages/domain/src/entity-status.ts`, bead `repo-kdmrc`
 
 ## The ruling in one paragraph
+
+> **Applied 2026-09-09.** `documented_site` fell from 6,589 basis records to 1,767 and total basis
+> records from 10,427 to 6,155. `enacted_law` 135, `court_precedent` 46 → 139,
+> `movement_significance` 30 → 106, `black_press_or_archive` 52, `community_anchor` 4 → 49,
+> `elected_or_appointed_office` 36, `documented_contribution` 19 → 35, `documented_racial_killing`
+> 11. No criterion lost a record. `documented_racial_killing` was ratified by the maintainer before
+> it was applied, and its text was extended to cover the event where such killings are documented,
+> mirroring the clause `documented_racial_terror` already carried — otherwise the Orangeburg
+> Massacre would have stayed a documented site while its three victims read as police killings.
 
 `documented_site` is not a default and never was one. It is a positive claim that a reader can
 walk to a place where something documented happened, and it is currently printed as the stated
@@ -249,15 +260,21 @@ last, and only after measurement.
    defect the racial-terror pass was raised for, on a cohort that pass could not reach, and it
    does not wait for the rest of the ruling. `repo-90g0i` is **done** — 57 records, applied and
    verified on the page. `repo-39h6s` (agency inversion) is still open.
-2. **Vocabulary** — `repo-tfqrm`. Add the four criteria to all four copies that must agree —
+2. **Vocabulary** — `repo-tfqrm`, **done**. Add the four criteria to all four copies that must agree —
    `packages/domain/src/entity-status.ts`, `packages/schemas/src/public-projections.ts`,
    `packages/ops-data/src/firestore/types.ts`, and `NOTABILITY_CRITERION_LABELS` in
    `packages/domain/src/relevance/why-public-basis.ts`. Missing the fourth 404s records; see
    `repo-8x306`.
-3. **Positive matching + M1 + M3** — `repo-teb1z`. Apply A–F. Re-run
-   `audit-notability-basis.ts` and report the residual.
-4. **M2 only then** — `repo-o6k0c` — against a measured residual rather than an estimated one.
-   Records that still have no honest basis are a research gap to fill, not a default to invent.
+3. **Positive matching + M1 + M3** — `repo-teb1z`, **done**. Applied as a MERGE, never a
+   replace: a straight recompute took `first_to_do_x` off Carter G. Woodson and Hattie McDaniel
+   and `major_honor_or_hall_of_fame` off Denzel Washington and Katherine Johnson, because the
+   published basis is not always derived from claims — earlier passes hand-authored criteria that
+   no keyword reproduces. Every non-fallback criterion a record already carries is kept; only the
+   `documented_site` records are up for replacement.
+4. **M2 only then** — `repo-o6k0c`, the one step left — against a measured residual rather than
+   an estimated one. That residual is now known: 1,767 basis records across place 1,009, person
+   260, institution 132, event 104, school 102, organization 100, other 40. Records that still
+   have no honest basis are a research gap to fill, not a default to invent.
 
 Republishing rebuilds `related[]` — see `repo-66mv1` and commit `0f15aed3`.
 
