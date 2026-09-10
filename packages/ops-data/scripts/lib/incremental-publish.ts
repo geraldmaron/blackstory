@@ -4,6 +4,7 @@
  */
 import {
   buildReleaseEntityArtifacts,
+  deriveCatalogEntityStatus,
   findUsStateByPostalCode,
   findUsStateForPoint,
   findUsStateFromJurisdictionLabel,
@@ -452,6 +453,56 @@ function minClaimConfidence(entry: ReleaseSourceEntity, row?: LandscapePublishRo
   return Number.isFinite(min) ? min : 0;
 }
 
+const GRANT_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/u;
+
+/**
+ * An authored `statusHistory` for an invention row whose landscape payload carries a full grant
+ * date, or `undefined` when it does not (or the kind is not `invention`).
+ *
+ * A grant date is a sourced fact about exactly when this record's lifecycle starts — sharper
+ * than the era-bucket decade `earliestYear` falls back to in `deriveCatalogEntityStatus`
+ * (packages/domain/src/derive-catalog-status.ts). This builds the authored entry that function's
+ * existing pass-through already honors ("If the entry already has statusHistory ... pass
+ * through") instead of adding a second invention-specific branch there: the status LABEL still
+ * comes from the same heuristic every invention has always used, and only the date moves from
+ * the decade to the day the grant states.
+ */
+function inventionGrantStatusHistory(
+  row: LandscapePublishRow,
+  fields: {
+    readonly summary: string;
+    readonly historicalContext?: string;
+    readonly eraBuckets?: readonly string[];
+  },
+): ReleaseSourceEntity['statusHistory'] {
+  if (row.kind !== 'invention') return undefined;
+  const grantDate = typeof row.payload.grantDate === 'string' ? row.payload.grantDate.trim() : '';
+  if (!GRANT_DATE_PATTERN.test(grantDate)) return undefined;
+
+  const fallback = deriveCatalogEntityStatus({
+    id: row.id,
+    kind: row.kind,
+    summary: fields.summary,
+    ...(fields.historicalContext !== undefined
+      ? { historicalContext: fields.historicalContext }
+      : {}),
+    ...(fields.eraBuckets !== undefined ? { eraBuckets: fields.eraBuckets } : {}),
+  });
+  const status = fallback.statusHistory?.[0]?.status ?? fallback.status;
+  // `unknown` (and the person-only living/deceased values, unreachable for kind 'invention')
+  // are not a lifecycle status this history can carry; leave the fallback path to report them.
+  if (typeof status !== 'string' || status === 'unknown') return undefined;
+
+  return [
+    {
+      status,
+      validFrom: grantDate,
+      datePrecision: 'day',
+      basisClaimIds: [],
+    },
+  ];
+}
+
 export function buildReleaseSourceFromLandscape(
   row: LandscapePublishRow,
 ): ReleaseSourceEntity | null {
@@ -666,6 +717,11 @@ export function buildReleaseSourceFromLandscape(
   const enrichedTopicIds = asStringArray(row.payload.topicIds);
   const enrichedEraBuckets = asStringArray(row.payload.eraBuckets);
   const enrichedKeywords = asStringArray(row.payload.keywords);
+  const grantStatusHistory = inventionGrantStatusHistory(row, {
+    summary,
+    ...(enrichedContext.length > 0 ? { historicalContext: enrichedContext } : {}),
+    ...(enrichedEraBuckets.length > 0 ? { eraBuckets: enrichedEraBuckets } : {}),
+  });
 
   return {
     id: row.id,
@@ -677,6 +733,7 @@ export function buildReleaseSourceFromLandscape(
     ...(enrichedTopicIds.length > 0 ? { topicIds: enrichedTopicIds } : {}),
     ...(enrichedEraBuckets.length > 0 ? { eraBuckets: enrichedEraBuckets } : {}),
     ...(enrichedKeywords.length > 0 ? { keywords: enrichedKeywords } : {}),
+    ...(grantStatusHistory !== undefined ? { statusHistory: grantStatusHistory } : {}),
     ...(livingStatus !== undefined ? { livingStatus } : {}),
     jurisdictionLabel: jurisdictionFromPlace({
       ...placeFieldsFromLandscape(row),

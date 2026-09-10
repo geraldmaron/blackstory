@@ -54,6 +54,15 @@ export type InventionCohortRecord = {
   readonly era: string;
   readonly canonicalUrl: string;
   readonly patentNumber?: string;
+  /**
+   * The date printed on the grant, ISO `YYYY-MM-DD`.
+   *
+   * Absent for a contribution with no grant at all (Banneker's clock predates the patent system
+   * as it applied to him) and for a record whose own sources state only a year, or no date, for
+   * the grant — the era bucket is what those records can honestly claim, and this field stays
+   * undefined rather than sharpen a date beyond what the source supports.
+   */
+  readonly grantDate?: string;
   readonly evidence: readonly {
     readonly sourceUrl: string;
     readonly title: string;
@@ -81,6 +90,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1880s',
     canonicalUrl: 'https://patents.google.com/patent/US252386A',
     patentNumber: '252386',
+    grantDate: '1882-01-17',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US252386A',
@@ -108,6 +118,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1920s',
     canonicalUrl: 'https://patents.google.com/patent/US1475024A',
     patentNumber: '1475024',
+    grantDate: '1923-11-20',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US1475024A',
@@ -135,6 +146,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1910s',
     canonicalUrl: 'https://patents.google.com/patent/US1090936A',
     patentNumber: '1090936',
+    grantDate: '1914-10-20',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US1090936A',
@@ -163,6 +175,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1960s',
     canonicalUrl: 'https://patents.google.com/patent/US3118022A',
     patentNumber: '3118022',
+    grantDate: '1964-01-14',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US3118022A',
@@ -191,6 +204,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1970s',
     canonicalUrl: 'https://patents.google.com/patent/US3591860A',
     patentNumber: '3591860',
+    grantDate: '1971-07-06',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US3591860A',
@@ -216,6 +230,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1890s',
     canonicalUrl: 'https://patents.google.com/patent/US473653A',
     patentNumber: '473653',
+    grantDate: '1892-04-26',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US473653A',
@@ -243,6 +258,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1880s',
     canonicalUrl: 'https://patents.google.com/patent/US386289A',
     patentNumber: '386289',
+    grantDate: '1888-07-17',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US386289A',
@@ -274,6 +290,10 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1920s',
     canonicalUrl: 'https://patents.google.com/patent/US1522176A',
     patentNumber: '1522176',
+    // Carver holds two evidenced grants here, US 1,522,176 (6 January 1925) and US 1,541,478
+    // (9 June 1925); the summary names a third, US 1,632,365, with no evidence citation behind
+    // it. This record uses the earlier of the two evidenced grants rather than the uncited one.
+    grantDate: '1925-01-06',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US1522176A',
@@ -332,6 +352,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1920s',
     canonicalUrl: 'https://patents.google.com/patent/US1693515A',
     patentNumber: '1693515',
+    grantDate: '1928-11-27',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US1693515A',
@@ -449,6 +470,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1960s',
     canonicalUrl: 'https://patents.google.com/patent/US3482037A',
     patentNumber: '3482037',
+    grantDate: '1969-12-02',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US3482037A',
@@ -476,6 +498,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1980s',
     canonicalUrl: 'https://patents.google.com/patent/US4744360A',
     patentNumber: '4744360',
+    grantDate: '1988-05-17',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US4744360A',
@@ -503,6 +526,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1880s',
     canonicalUrl: 'https://patents.google.com/patent/US322177A',
     patentNumber: '322177',
+    grantDate: '1885-07-14',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US322177A',
@@ -616,6 +640,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '2000s',
     canonicalUrl: 'https://patents.google.com/patent/US7599359B1',
     patentNumber: '7599359',
+    grantDate: '2009-10-06',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US7599359B1',
@@ -647,6 +672,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1890s',
     canonicalUrl: 'https://patents.google.com/patent/US524042A',
     patentNumber: '524042',
+    grantDate: '1894-08-07',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US524042A',
@@ -678,6 +704,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1880s',
     canonicalUrl: 'https://patents.google.com/patent/US305474A',
     patentNumber: '305474',
+    grantDate: '1884-09-23',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US305474A',
@@ -709,6 +736,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1890s',
     canonicalUrl: 'https://patents.google.com/patent/US614335A',
     patentNumber: '614335',
+    grantDate: '1898-11-15',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US614335A',
@@ -743,6 +771,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1880s',
     canonicalUrl: 'https://patents.google.com/patent/US373383A',
     patentNumber: '373383',
+    grantDate: '1887-11-15',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US373383A',
@@ -774,6 +803,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1880s',
     canonicalUrl: 'https://patents.google.com/patent/US274207A',
     patentNumber: '274207',
+    grantDate: '1883-03-20',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US274207A',
@@ -808,6 +838,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1870s',
     canonicalUrl: 'https://patents.google.com/patent/US129843A',
     patentNumber: '129843',
+    grantDate: '1872-07-23',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US129843A',
@@ -839,6 +870,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1880s',
     canonicalUrl: 'https://patents.google.com/patent/US371207A',
     patentNumber: '371207',
+    grantDate: '1887-10-11',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US371207A',
@@ -869,6 +901,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1890s',
     canonicalUrl: 'https://patents.google.com/patent/US576395A',
     patentNumber: '576395',
+    grantDate: '1897-02-02',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US576395A',
@@ -900,6 +933,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1890s',
     canonicalUrl: 'https://patents.google.com/patent/US594059A',
     patentNumber: '594059',
+    grantDate: '1897-11-23',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US594059A',
@@ -938,6 +972,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1950s',
     canonicalUrl: 'https://patents.google.com/patent/US2891227A',
     patentNumber: '2891227',
+    grantDate: '1959-06-16',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US2891227A',
@@ -971,6 +1006,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1980s',
     canonicalUrl: 'https://patents.google.com/patent/US4229761A',
     patentNumber: '4229761',
+    grantDate: '1980-10-21',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US4229761A',
@@ -1003,6 +1039,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     era: '1980s',
     canonicalUrl: 'https://patents.google.com/patent/US4591071A',
     patentNumber: '4591071',
+    grantDate: '1986-05-27',
     evidence: [
       {
         sourceUrl: 'https://patents.google.com/patent/US4591071A',

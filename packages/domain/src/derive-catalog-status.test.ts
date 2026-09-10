@@ -336,3 +336,22 @@ test('a place still prefers the earlier prose year over its era bucket', () => {
   // better answer than the decade bucket it was filed under.
   assert.equal(derived.statusHistory?.[0]?.validFrom, '1885');
 });
+
+test('an invention with an authored day-precision validFrom passes through unchanged and is not overridden by the era branch', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'inv_latimer_carbon_process',
+    kind: 'invention',
+    displayName: 'Process of Manufacturing Carbons',
+    summary:
+      'US 252,386, titled "Process of Manufacturing Carbons," names Lewis H. Latimer and was granted on 17 January 1882.',
+    eraBuckets: ['1880s'],
+    statusHistory: [
+      { status: 'active', validFrom: '1882-01-17', datePrecision: 'day', basisClaimIds: [] },
+    ],
+  });
+  // The authored day-precision date sourced to the grant wins outright; the era-bucket fallback
+  // (which would answer '1880') never runs once statusHistory is already present.
+  assert.equal(derived.statusHistory?.[0]?.validFrom, '1882-01-17');
+  assert.equal(derived.statusHistory?.[0]?.datePrecision, 'day');
+  assert.equal(derived.status, 'active');
+});

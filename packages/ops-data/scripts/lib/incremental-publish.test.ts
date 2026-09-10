@@ -18,7 +18,7 @@ import {
   toReleaseEntityRow,
   type LandscapePublishRow,
 } from './incremental-publish.ts';
-import { buildReleaseEntityArtifacts } from '@repo/domain';
+import { buildReleaseEntityArtifacts, deriveCatalogEntityStatus } from '@repo/domain';
 
 /** Parsed host, or null for anything unparseable — never a substring test on the raw URL. */
 const hostOf = (url: string): string | null => {
@@ -73,6 +73,27 @@ const enrichedRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePub
     ...overrides,
   });
 
+/** An invention-cohort landscape row, for the grant-date statusHistory tests below. */
+const inventionRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublishRow => ({
+  id: 'inv_example_device',
+  lane: 'invention-cohort',
+  kind: 'invention',
+  display_name: 'Example Device',
+  summary:
+    'US 1,475,024, titled "Example Device," names A. Example and was granted on 20 November 1923. '.repeat(
+      4,
+    ),
+  lat: 41.4993,
+  lng: -81.6944,
+  canonical_url: 'https://patents.google.com/patent/US1475024A',
+  source_item_id: 'inv_example_device',
+  provenance: {},
+  payload: { eraBuckets: ['1920s'] },
+  exact_in_release: false,
+  name_overlap: false,
+  ...overrides,
+});
+
 test('jurisdictionFromProvenance maps DC to full label', () => {
   assert.equal(
     jurisdictionFromProvenance({ sourceCity: 'Washington', sourceState: 'DC' }),
@@ -124,6 +145,33 @@ test('buildReleaseSourceFromLandscape produces claims from canonical_url', () =>
     entry?.claims?.[0]?.citationHref,
     'https://historicsites.dcpreservation.org/items/show/1055',
   );
+});
+
+test('buildReleaseSourceFromLandscape anchors an invention with payload.grantDate to a day-precision statusHistory', () => {
+  const entry = buildReleaseSourceFromLandscape(
+    inventionRow({ payload: { eraBuckets: ['1920s'], grantDate: '1923-11-20' } }),
+  );
+  assert.ok(entry);
+  assert.equal(entry?.statusHistory?.length, 1);
+  assert.equal(entry?.statusHistory?.[0]?.validFrom, '1923-11-20');
+  assert.equal(entry?.statusHistory?.[0]?.datePrecision, 'day');
+});
+
+test('buildReleaseSourceFromLandscape leaves an invention row without payload.grantDate to fall back to the era year', () => {
+  const entry = buildReleaseSourceFromLandscape(
+    inventionRow({ payload: { eraBuckets: ['1920s'] } }),
+  );
+  assert.ok(entry);
+  assert.equal(entry?.statusHistory, undefined);
+
+  const derived = deriveCatalogEntityStatus({
+    id: entry!.id,
+    kind: entry!.kind,
+    summary: entry!.summary,
+    ...(entry!.eraBuckets !== undefined ? { eraBuckets: entry!.eraBuckets } : {}),
+  });
+  assert.equal(derived.statusHistory?.[0]?.validFrom, '1920');
+  assert.equal(derived.statusHistory?.[0]?.datePrecision, 'year');
 });
 
 test('gateLandscapePublishCandidate rejects person privacy holds', () => {

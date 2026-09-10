@@ -89,6 +89,66 @@ test('an X-patent keeps its series letter', () => {
   );
 });
 
+test('a grantDate that agrees with the summary and falls inside the era is accepted', () => {
+  const problems = validateInventionRow(
+    validRow({
+      summary:
+        'US 1,475,024, titled "Traffic signal," names Garrett A. Morgan and was granted on 20 November 1923. '.repeat(
+          4,
+        ),
+      era: '1920s',
+      grantDate: '1923-11-20',
+    }),
+  );
+  assert.deepEqual(problems, []);
+});
+
+test('a grantDate that does not read like YYYY-MM-DD is reported', () => {
+  const problems = validateInventionRow(validRow({ grantDate: '11/20/1923' }));
+  assert.deepEqual(problems, [
+    'inv_example_device: grantDate 11/20/1923 must read like YYYY-MM-DD',
+  ]);
+});
+
+test('a grantDate naming a calendar date that does not exist is reported', () => {
+  const problems = validateInventionRow(validRow({ grantDate: '1923-02-30' }));
+  assert.deepEqual(problems, [
+    'inv_example_device: grantDate 1923-02-30 is not a real calendar date',
+  ]);
+});
+
+test('a grantDate whose year falls outside the record era decade is reported', () => {
+  const problems = validateInventionRow(validRow({ era: '1920s', grantDate: '1931-01-01' }));
+  assert.deepEqual(problems, ['inv_example_device: grantDate 1931-01-01 falls outside era 1920s']);
+});
+
+test('a grantDate that disagrees with the summary\'s "granted on" date is reported', () => {
+  const problems = validateInventionRow(
+    validRow({
+      summary:
+        'US 1,475,024, titled "Traffic signal," names Garrett A. Morgan and was granted on 20 November 1923. '.repeat(
+          4,
+        ),
+      era: '1920s',
+      grantDate: '1923-11-21',
+    }),
+  );
+  assert.deepEqual(problems, [
+    'inv_example_device: grantDate 1923-11-21 disagrees with the summary\'s "granted on" date 1923-11-20',
+  ]);
+});
+
+test('a summary with no "granted on" phrase has nothing to cross-check a grantDate against', () => {
+  const problems = validateInventionRow(
+    validRow({
+      summary: 'A'.repeat(500),
+      era: '1920s',
+      grantDate: '1923-11-20',
+    }),
+  );
+  assert.deepEqual(problems, []);
+});
+
 test('an empty evidence quote is reported, because an uncheckable citation is not evidence', () => {
   const problems = validateInventionRow(
     validRow({

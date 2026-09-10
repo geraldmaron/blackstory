@@ -111,8 +111,16 @@ function earliestYear(entry: CatalogStatusSource): string | undefined {
   // priority the sentence was written to disclaim. A record that names prior art would be
   // punished for naming it while a vaguer one went free.
   //
-  // Only inventions take this branch. For a place, "founded in 1885" with an era bucket of
-  // 1890s is ordinary, and the prose year is the better answer.
+  // Only inventions take this branch, and only as a fallback: a record carrying a structured
+  // grant date (invention-cohort.ts's `grantDate`, threaded through as an authored day-precision
+  // `statusHistory` entry — see `buildReleaseSourceFromLandscape` in
+  // packages/ops-data/scripts/lib/incremental-publish.ts) never reaches `earliestYear` at all,
+  // because the pass-through above already returned. This era-decade branch is what is left for
+  // an invention with no structured date — Banneker's clock, Carruthers's camera, Jennings's
+  // dry-scouring process — where the decade is the sharpest honest answer.
+  //
+  // For a place, "founded in 1885" with an era bucket of 1890s is ordinary, and the prose year is
+  // the better answer.
   if (entry.kind === 'invention') {
     const era = authoredEraYear(entry);
     if (era !== undefined) return era;

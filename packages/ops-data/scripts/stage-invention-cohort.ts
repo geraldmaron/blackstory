@@ -37,6 +37,7 @@ const OWNED_PAYLOAD_KEYS = [
   'geocode',
   'evidenceCitations',
   'patentNumber',
+  'grantDate',
 ] as const;
 
 const PAYLOAD_ON_CONFLICT = mergedPayloadSql(OWNED_PAYLOAD_KEYS);
@@ -136,6 +137,7 @@ async function main(): Promise<void> {
             geocode: { precision: 'city' },
             evidenceCitations: row.evidence,
             patentNumber: row.patentNumber,
+            grantDate: row.grantDate,
           }),
         ],
       );

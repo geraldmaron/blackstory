@@ -21,6 +21,53 @@ const ERA_PATTERN = /^\d{4}s$/u;
 const STATE_PATTERN = /^[A-Z]{2}$/u;
 /** Digits, or a series letter and digits: `X3306` and `D7` are not patents 3306 and 7. */
 const PATENT_PATTERN = /^(?:[A-Z]{1,2})?\d+$/u;
+const GRANT_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/u;
+
+/** English month names, for parsing the "granted on <D Month YYYY>" phrase in a summary. */
+const MONTH_NAMES: Readonly<Record<string, number>> = {
+  january: 1,
+  february: 2,
+  march: 3,
+  april: 4,
+  may: 5,
+  june: 6,
+  july: 7,
+  august: 8,
+  september: 9,
+  october: 10,
+  november: 11,
+  december: 12,
+};
+
+const GRANTED_ON_PATTERN = /\bgranted on (\d{1,2}) ([A-Za-z]+) (\d{4})\b/u;
+
+/**
+ * The ISO date a summary's own "granted on <D Month YYYY>" phrase states, or `null` when the
+ * summary carries no such phrase (a year-only or dateless grant, which this check has nothing to
+ * cross-check against).
+ */
+function grantDateFromSummary(summary: string): string | null {
+  const match = GRANTED_ON_PATTERN.exec(summary);
+  if (!match) return null;
+  const [, day, monthName, year] = match;
+  const month = MONTH_NAMES[(monthName ?? '').toLowerCase()];
+  if (month === undefined) return null;
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+/** Whether an ISO `YYYY-MM-DD` string names a calendar date that actually exists. */
+function isRealCalendarDate(isoDate: string): boolean {
+  const [yearStr, monthStr, dayStr] = isoDate.split('-');
+  const year = Number(yearStr);
+  const month = Number(monthStr);
+  const day = Number(dayStr);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  return (
+    parsed.getUTCFullYear() === year &&
+    parsed.getUTCMonth() === month - 1 &&
+    parsed.getUTCDate() === day
+  );
+}
 
 /**
  * British spellings that the American-English rule forbids in published prose.
@@ -112,6 +159,30 @@ export function validateInventionRow(row: InventionCohortRecord): readonly strin
   }
 
   if (!ERA_PATTERN.test(row.era)) say(`era ${row.era} must read like "1880s"`);
+
+  if (row.grantDate !== undefined) {
+    if (!GRANT_DATE_PATTERN.test(row.grantDate)) {
+      say(`grantDate ${row.grantDate} must read like YYYY-MM-DD`);
+    } else if (!isRealCalendarDate(row.grantDate)) {
+      say(`grantDate ${row.grantDate} is not a real calendar date`);
+    } else {
+      const decadeMatch = ERA_PATTERN.test(row.era) ? /^(\d{4})s$/u.exec(row.era) : null;
+      if (decadeMatch?.[1]) {
+        const decadeStart = Number(decadeMatch[1]);
+        const grantYear = Number(row.grantDate.slice(0, 4));
+        if (grantYear < decadeStart || grantYear > decadeStart + 9) {
+          say(`grantDate ${row.grantDate} falls outside era ${row.era}`);
+        }
+      }
+
+      const summaryDate = grantDateFromSummary(row.summary);
+      if (summaryDate !== null && summaryDate !== row.grantDate) {
+        say(
+          `grantDate ${row.grantDate} disagrees with the summary's "granted on" date ${summaryDate}`,
+        );
+      }
+    }
+  }
   if (!STATE_PATTERN.test(row.state)) say(`state ${row.state} must be a two-letter code`);
   if (row.city.trim().length === 0) say('city is empty');
   if (!Number.isFinite(row.lat) || row.lat < 17 || row.lat > 72) say(`lat ${row.lat} is off-map`);
