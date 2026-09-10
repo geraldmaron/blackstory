@@ -26,6 +26,15 @@ import { buildNrhpListingFactObject, buildNrhpSignificanceObject } from './nrhp-
 
 export const INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR = 0.75;
 
+/**
+ * Ceiling on one claim's merged quotations from a single document.
+ *
+ * A claim's object is shown to a reader as the sentence the record rests on. Several passages
+ * from one document can be worth showing; a dozen is a wall of text, not evidence. Passages past
+ * this length are dropped, which is what happened to every repeat passage before merging existed.
+ */
+export const MERGED_EVIDENCE_QUOTE_MAX_CHARS = 600;
+
 export type LandscapePublishRow = {
   readonly id: string;
   readonly lane: string;
@@ -570,14 +579,46 @@ export function buildReleaseSourceFromLandscape(
   // meant to make honest. The object is the verbatim quote the draft anchored on, which is
   // already validated as a substring of that document's captured text — so the claim a reader
   // sees is the exact sentence the prose rests on, not a restatement of it.
+  // A second quote from a document already cited is MERGED into that document's claim, not
+  // dropped. One archival document routinely supports several distinct points, and discarding
+  // the later ones threw away evidence a record had actually done the work to find: the
+  // car-coupling record cites its state encyclopedia twice, once for a disputed injury account
+  // and once for "it should not be confused with the Janney Coupler" — the sourced form of that
+  // record's whole origin guard, which never reached a reader.
+  //
+  // Merging rather than appending a claim is what keeps the count above honest. Claim count is
+  // what grades a record substantial, so eight claims quoting one PDF would buy a grade that one
+  // document did not earn. One document still means one claim; it may now carry more than one of
+  // the passages it was cited for, joined by an ellipsis in the ordinary way of quoting
+  // non-contiguous text.
   const evidenceClaims: ReleaseSourceClaim[] = [];
+  const claimByDocument = new Map<string, number>();
+  const quotesByDocument = new Map<string, Set<string>>();
   const seenEvidenceDocuments = new Set([documentKey(canonicalUrl)].filter(Boolean) as string[]);
   for (const raw of asRecordArray(row.payload.evidenceCitations)) {
     const sourceUrl = typeof raw.sourceUrl === 'string' ? raw.sourceUrl.trim() : '';
     const quote = typeof raw.quote === 'string' ? raw.quote.trim() : '';
     if (sourceUrl.length === 0 || quote.length === 0) continue;
     const key = documentKey(sourceUrl);
-    if (key === null || seenEvidenceDocuments.has(key)) continue;
+    if (key === null) continue;
+
+    const existingIndex = claimByDocument.get(key);
+    if (existingIndex !== undefined) {
+      const seenQuotes = quotesByDocument.get(key);
+      const existing = evidenceClaims[existingIndex];
+      if (!seenQuotes || !existing || seenQuotes.has(normalizeProse(quote))) continue;
+      // Cap the merged object so a document cited many times publishes a readable claim rather
+      // than a wall of quotations. Later passages are dropped at the cap, as before.
+      const merged = `${existing.object} … ${quote}`;
+      if (merged.length > MERGED_EVIDENCE_QUOTE_MAX_CHARS) continue;
+      seenQuotes.add(normalizeProse(quote));
+      evidenceClaims[existingIndex] = { ...existing, object: merged };
+      continue;
+    }
+
+    // The canonical url's own document is seeded above: the record-index claim already cites it,
+    // and a second claim on the same document would be the record citing itself.
+    if (seenEvidenceDocuments.has(key)) continue;
     seenEvidenceDocuments.add(key);
     let evidenceHost = 'source';
     try {
@@ -589,6 +630,8 @@ export function buildReleaseSourceFromLandscape(
       typeof raw.title === 'string' && raw.title.trim().length > 0
         ? raw.title.trim()
         : evidenceHost;
+    claimByDocument.set(key, evidenceClaims.length);
+    quotesByDocument.set(key, new Set([normalizeProse(quote)]));
     evidenceClaims.push({
       predicate: 'source states',
       object: quote,
