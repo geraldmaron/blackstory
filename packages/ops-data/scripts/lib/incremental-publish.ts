@@ -1099,12 +1099,57 @@ export function toSearchIndexRow(
     geohash,
     related_count: searchIndex.relatedCount ?? 0,
     claim_count: searchIndex.claimCount ?? 0,
+    /**
+     * Every field the search-doc reader can reach ONLY through `facets`.
+     *
+     * `search_index` has columns for name, kind, status, topics, aliases, geohash and the two
+     * counts, so those stay out of here — `mapPostgresSearchIndexRow`
+     * (`packages/schemas/src/search-index-row.ts`) prefers the column and the duplicate would
+     * only be a second copy to keep in sync. Everything below has no column, which makes this
+     * object the record's only carrier for it.
+     *
+     * That is the load-bearing half. `upsertSearchIndex` writes `facets = EXCLUDED.facets`, a
+     * whole-object replace, so a key missing here is not merely unset — it is *deleted* from any
+     * row this publisher touches again. The first five keys were the whole list, and the six
+     * added below were dropped on every incremental publish. The reader's fallbacks made the
+     * loss silent rather than loud: `jurisdictionState` simply went absent, and `/records`
+     * printed the literal "Place not recorded" over a record whose own entity page prints its
+     * city (repo-2t04.14). The 32-record invention cohort published exclusively through this path
+     * and so lost all six at 100%; kinds that predate it lost them only on rows republished
+     * since, which is the partial drift
+     * `backfill-search-facets-jurisdiction.ts` was written to mop up. That backfill treats the
+     * release projection as the authority and copies it back onto the search doc; keeping this
+     * list complete is what stops it from being needed again.
+     *
+     * Two reader keys are deliberately absent. `campaignIds` is not on
+     * `ReleaseSearchIndexFields` at all, so there is nothing here to carry, and the reader
+     * already defaults it to `[]`. `summary` is a size decision rather than an oversight: it is
+     * absent from all but seven rows catalog-wide, so adding it on this path alone would make
+     * summary search work for incrementally published records and no others, while adding
+     * several MB to the index. Both are tracked separately rather than settled here.
+     */
     facets: {
       eraBuckets: searchIndex.eraBuckets ?? [],
       keywords: searchIndex.keywords ?? [],
       researchCoverage: searchIndex.researchCoverage,
       recordMaturity: searchIndex.recordMaturity,
       confidenceTier: searchIndex.confidenceTier,
+      topicIds: searchIndex.topicIds ?? [],
+      mentionedEntityIds: searchIndex.mentionedEntityIds ?? [],
+      notabilityBasis: searchIndex.notabilityBasis ?? [],
+      notabilityLabels: searchIndex.notabilityLabels ?? [],
+      /*
+       * Omitted rather than written empty, for the same one-directional reason the backfill
+       * gives: a record whose projection states no jurisdiction must not blank a facet that
+       * some earlier pass got right. `ReleaseSearchIndexFields.jurisdictionState` is a required
+       * string, so "absent" arrives here as `''`.
+       */
+      ...(searchIndex.jurisdictionState.trim().length > 0
+        ? { jurisdictionState: searchIndex.jurisdictionState.trim() }
+        : {}),
+      ...(searchIndex.sensitivityClass !== undefined
+        ? { sensitivityClass: searchIndex.sensitivityClass }
+        : {}),
     },
   };
 }
