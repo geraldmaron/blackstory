@@ -54,6 +54,20 @@ export type InventorCohortRecord = {
     readonly title: string;
     readonly quote: string;
   }[];
+  /**
+   * Browse-facet topic ids for this record. Defaults to `['invention']` when absent.
+   *
+   * When this cohort adopts a seed person record that already has claims live on
+   * `bb_public.release_entities` (same entity id, republished rather than created), list that
+   * live record's topic ids here — otherwise the republish overwrites them with the bare
+   * `['invention']` default and the record's other browse facets (e.g. business, women,
+   * community) silently drop off.
+   */
+  readonly topicIds?: readonly string[];
+  /** Search keywords carried onto the published record when present. */
+  readonly keywords?: readonly string[];
+  /** Related entity ids carried onto the published record when present. */
+  readonly mentionedEntityIds?: readonly string[];
 };
 
 export const INVENTOR_COHORT: readonly InventorCohortRecord[] = [

@@ -564,6 +564,30 @@ test('buildReleaseSourceFromLandscape carries enrichment topicIds/eraBuckets/key
   assert.deepEqual(entry!.keywords, ['Gardner Bishop', 'Bolling v. Sharpe']);
 });
 
+test('buildReleaseSourceFromLandscape carries payload.mentionedEntityIds onto the entry', () => {
+  // A cohort-adopted seed record's related entity ids have to survive a republish the same way
+  // topicIds/keywords do, or adopting the row silently drops them (repo-n7p6, mentionedEntityIds
+  // used to be hardcoded to []).
+  const entry = buildReleaseSourceFromLandscape(
+    enrichedRow({
+      payload: {
+        historicalContext: 'x',
+        mentionedEntityIds: ['ent_naacp_001', 'ent_some_org_002'],
+      },
+    }),
+  );
+  assert.ok(entry);
+  assert.deepEqual(entry!.mentionedEntityIds, ['ent_naacp_001', 'ent_some_org_002']);
+});
+
+test('buildReleaseSourceFromLandscape publishes an empty mentionedEntityIds when the payload has none', () => {
+  const entry = buildReleaseSourceFromLandscape(
+    enrichedRow({ payload: { historicalContext: 'x' } }),
+  );
+  assert.ok(entry);
+  assert.deepEqual(entry!.mentionedEntityIds, []);
+});
+
 test('buildReleaseSourceFromLandscape ignores non-string entries and a missing field', () => {
   const entry = buildReleaseSourceFromLandscape(
     enrichedRow({ payload: { historicalContext: 'x', topicIds: ['music', 42, null] } }),

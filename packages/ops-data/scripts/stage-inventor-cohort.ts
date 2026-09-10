@@ -28,6 +28,7 @@
  * (e.g. the recorded `basis` text needs correcting), set PERSON_REVIEW_REWRITE=1.
  */
 import pg from 'pg';
+import { isValidTopicId } from '@repo/domain';
 import { SUMMARY_MAX_CHARS, SUMMARY_MIN_CHARS } from './lib/entity-enrichment-llm.ts';
 import { mergedPayloadSql, statusOnConflictSql } from './lib/landscape-candidate-upsert.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
@@ -58,6 +59,8 @@ const OWNED_PAYLOAD_KEYS = [
   'geocode',
   'evidenceCitations',
   'namedOn',
+  'keywords',
+  'mentionedEntityIds',
 ] as const;
 
 /**
@@ -97,6 +100,12 @@ function assertCohortBounds(): void {
     }
     if (row.evidence.length === 0) {
       throw new Error(`${row.id} has no evidence citation`);
+    }
+    const unresolvedTopics = (row.topicIds ?? []).filter((id) => !isValidTopicId(id));
+    if (unresolvedTopics.length > 0) {
+      throw new Error(
+        `${row.id} topicIds do not resolve against TOPIC_REGISTRY: ${unresolvedTopics.join(', ')}`,
+      );
     }
   }
 }
@@ -174,12 +183,16 @@ async function main(): Promise<void> {
             city: row.city,
             state: row.state,
             historicalContext: row.historicalContext,
-            topicIds: ['invention'],
+            topicIds: row.topicIds ?? ['invention'],
             eraBuckets: [row.era],
             confidence: 0.82,
             geocode: { precision: 'city' },
             evidenceCitations: row.evidence,
             namedOn: row.namedOn,
+            ...(row.keywords !== undefined ? { keywords: row.keywords } : {}),
+            ...(row.mentionedEntityIds !== undefined
+              ? { mentionedEntityIds: row.mentionedEntityIds }
+              : {}),
             personReview: {
               approved: true,
               approvedBy: APPROVED_BY,

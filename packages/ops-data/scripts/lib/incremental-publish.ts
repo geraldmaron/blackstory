@@ -717,6 +717,11 @@ export function buildReleaseSourceFromLandscape(
   const enrichedTopicIds = asStringArray(row.payload.topicIds);
   const enrichedEraBuckets = asStringArray(row.payload.eraBuckets);
   const enrichedKeywords = asStringArray(row.payload.keywords);
+  // Same passthrough for related entity ids. `resolveReleaseEntityReferences` deliberately does
+  // not validate these against the release or canonical graph (see release-builder.ts's header
+  // doc comment): legacy-tag placeholder strings pending real entity resolution are expected,
+  // so no existence check is added here either.
+  const enrichedMentionedEntityIds = asStringArray(row.payload.mentionedEntityIds);
   const grantStatusHistory = inventionGrantStatusHistory(row, {
     summary,
     ...(enrichedContext.length > 0 ? { historicalContext: enrichedContext } : {}),
@@ -745,7 +750,7 @@ export function buildReleaseSourceFromLandscape(
     lat: row.lat,
     lng: row.lng,
     claims,
-    mentionedEntityIds: [],
+    mentionedEntityIds: enrichedMentionedEntityIds,
   };
 }
 
