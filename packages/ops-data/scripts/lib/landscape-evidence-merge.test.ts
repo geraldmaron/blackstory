@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { evidenceDocumentKey, mergeEvidenceCitations } from './landscape-evidence-merge.ts';
+import {
+  applyProseCorrections,
+  evidenceDocumentKey,
+  mergeEvidenceCitations,
+} from './landscape-evidence-merge.ts';
 
 const existing = [
   {
@@ -57,4 +61,23 @@ test('a citation without https, without a quote, or with a broken URL is skipped
 test('the document key ignores www and a trailing slash but keeps the query', () => {
   assert.equal(evidenceDocumentKey('https://www.hmdb.org/m.asp/?m=1'), 'hmdb.org/m.asp?m=1');
   assert.equal(evidenceDocumentKey('nope'), null);
+});
+
+test('a prose correction applies once and is refused when its anchor is missing or ambiguous', () => {
+  const text = 'In 1927 she joined the paper. In 1927 she left.';
+  const ok = applyProseCorrections('In 1927 she joined the paper.', [
+    { current: 'In 1927 she joined', suggested: 'In 1928 she joined' },
+  ]);
+  assert.equal(ok.text, 'In 1928 she joined the paper.');
+  assert.equal(ok.applied, 1);
+  const refused = applyProseCorrections(text, [
+    { current: 'In 1927', suggested: 'In 1928' },
+    { current: 'never here', suggested: 'x' },
+  ]);
+  assert.equal(refused.applied, 0);
+  assert.equal(refused.text, text);
+  assert.deepEqual(
+    refused.refused.map((r) => r.split(':')[0]),
+    ['ambiguous', 'not found'],
+  );
 });

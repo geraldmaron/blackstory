@@ -103,3 +103,30 @@ export function mergeEvidenceCitations(
   }
   return { citations, added, skipped };
 }
+
+/**
+ * Apply exact-substring prose corrections to a stored text. A `current` that does not occur
+ * exactly once is refused: zero matches means the text moved since the reviewer read it, more
+ * than one means the correction is ambiguous. Either way the text is left alone and the reason
+ * returned, so a stale correction never lands on the wrong sentence.
+ */
+export function applyProseCorrections(
+  text: string,
+  corrections: readonly { readonly current: string; readonly suggested: string }[],
+): { readonly text: string; readonly applied: number; readonly refused: readonly string[] } {
+  let out = text;
+  let applied = 0;
+  const refused: string[] = [];
+  for (const correction of corrections) {
+    const occurrences = out.split(correction.current).length - 1;
+    if (occurrences !== 1) {
+      refused.push(
+        `${occurrences === 0 ? 'not found' : 'ambiguous'}: ${correction.current.slice(0, 80)}`,
+      );
+      continue;
+    }
+    out = out.replace(correction.current, correction.suggested);
+    applied += 1;
+  }
+  return { text: out, applied, refused };
+}
