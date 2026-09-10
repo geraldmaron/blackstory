@@ -178,7 +178,7 @@
     "@repo/domain-core": "workspace:*",
     "@repo/schemas": "workspace:*",
     "@repo/security": "workspace:*",
-    "edtf": "^4.11.0",
+    "edtf": "^4.11.1",
     "zipcodes": "^8.0.0"
   },
   "devDependencies": {

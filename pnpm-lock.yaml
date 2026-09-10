@@ -405,8 +405,8 @@ importers:
         specifier: workspace:*
         version: link:../security
       edtf:
-        specifier: ^4.11.0
-        version: 4.11.0
+        specifier: ^4.11.1
+        version: 4.11.1
       zipcodes:
         specifier: ^8.0.0
         version: 8.0.0
@@ -2846,8 +2846,8 @@ packages:
   ecdsa-sig-formatter@1.0.11:
     resolution: {integrity: sha512-nagl3RYrbNv6kQkeJIpt6NJZy8twLB/2vtz6yN9Z4vRKHN4/QZJIEbqohALSgwKdnksuY3k5Addp5lg8sVoVcQ==}
 
-  edtf@4.11.0:
-    resolution: {integrity: sha512-fGuQ6JAh6r+bWfm9dhwBOaJYktIzTuP0yPyFw9fEAhtWRdmL0TymCsIH7r8HwMG4itEsj3Yx13knvSy0pxKlYw==}
+  edtf@4.11.1:
+    resolution: {integrity: sha512-NL3rTbpWtMVIL7d4JdO8UqO4r4QI0/8OxgpsV5BLCkFwzqcRtxIeZQDxMZn6i+oi0fecVz0mRc2QjcGUpgG9bg==}
 
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
@@ -7270,7 +7270,7 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
 
-  edtf@4.11.0:
+  edtf@4.11.1:
     dependencies:
       nearley: 2.20.1
     optionalDependencies:
