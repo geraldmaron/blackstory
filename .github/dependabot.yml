@@ -51,6 +51,20 @@ updates:
       - dependencies
       - javascript
       - mobile
+    # apps/mobile tracks Expo SDK 57's pinned version set. These three bumps resolve against
+    # peers Expo does not ship yet, so npm fails at install and no amount of rebasing helps;
+    # they are held until an SDK upgrade moves the pins, not because the versions are bad.
+    ignore:
+      # Needs react-native-worklets 0.12.x; SDK 57 pins 0.10.1.
+      - dependency-name: 'react-native-reanimated'
+        versions: ['>=4.6.0']
+      # Needs react 19.2.8; SDK 57 pins react 19.2.3.
+      - dependency-name: 'react-test-renderer'
+        versions: ['>=19.2.8']
+      # eslint-plugin-import and eslint-plugin-react do not declare eslint 10 support, and
+      # eslint-config-expo pulls both. The root workspace is already on eslint 10.
+      - dependency-name: 'eslint'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: pip
     directory: /
