@@ -10,8 +10,18 @@
  * The function collects every problem instead of throwing on the first, because a cohort author
  * fixing twelve records wants twelve messages, not twelve runs.
  */
+import { CONTENT_EXPECTATIONS, resolveSourceLineage } from '@repo/domain';
 import type { InventionCohortRecord } from '../data/invention-cohort.ts';
 import { SUMMARY_MAX_CHARS, SUMMARY_MIN_CHARS } from './entity-enrichment-llm.ts';
+
+/**
+ * The floor `distinctEvidenceLineages` is checked against, read from the same spec the
+ * publish-side content-expectations gate uses (`packages/domain/src/content-expectations`) so
+ * the two never drift apart. See that file's comment on `invention` for why the number is 2: an
+ * invention record's whole job is to say what the contribution actually was, and one source is
+ * how a process patent becomes a household-name myth.
+ */
+const INVENTION_MIN_DISTINCT_LINEAGES = CONTENT_EXPECTATIONS.invention.minDistinctSources;
 
 /** Predicates the contribution vocabulary allows, mirrored here so the check is self-contained. */
 const PREDICATES = new Set(['invented', 'co_invented', 'improved']);
@@ -123,6 +133,44 @@ export function distinctEvidenceHosts(row: InventionCohortRecord): readonly stri
   return [...hosts].sort();
 }
 
+/**
+ * The subset of a cohort record `distinctEvidenceLineages` needs. Structural rather than
+ * `InventionCohortRecord` itself so `stage-inventor-cohort.ts`'s person rows — a different shape,
+ * with no `contributors` or `impactStatement` — can reuse the same lineage counting instead of a
+ * second copy of it.
+ */
+export type EvidenceLineageSource = {
+  readonly canonicalUrl: string;
+  readonly evidence: readonly { readonly sourceUrl: string }[];
+};
+
+/**
+ * Distinct lineages backing a row: the underlying works and authorities it cites, not the hosts
+ * that happen to serve them.
+ *
+ * `distinctEvidenceHosts` is a coarse proxy that undercounts in one direction only — two hosts
+ * are never one publisher when they should be one. It overcounts in the other: `uspto.gov` and
+ * `patents.google.com` are two hosts for one grant, so a row citing only those looked like two
+ * sources when it had one. `resolveSourceLineage` (`@repo/domain-core/claims/lineage`) is the
+ * actual answer — it collapses a patent mirror and the Patent Office onto one work key, collapses
+ * an authority's subdomains onto one authority key, and flags Wikipedia and its siblings as a
+ * bridge that may carry a claim but never corroborates one. This is what the invention floor in
+ * `CONTENT_EXPECTATIONS` actually checks.
+ *
+ * `canonicalUrl` is included alongside `row.evidence`: the canonical page is a document the
+ * record cites too, and a row whose only evidence citation duplicates its own canonical URL has
+ * exactly one source, not two.
+ */
+export function distinctEvidenceLineages(row: EvidenceLineageSource): readonly string[] {
+  const keys = new Set<string>();
+  const urls = [row.canonicalUrl, ...row.evidence.map((citation) => citation.sourceUrl)];
+  for (const url of urls) {
+    const lineage = resolveSourceLineage({ url });
+    if (!lineage.bridge) keys.add(lineage.key);
+  }
+  return [...keys].sort();
+}
+
 /** Every mechanical problem in one row, as messages already prefixed with the row id. */
 export function validateInventionRow(row: InventionCohortRecord): readonly string[] {
   const problems: string[] = [];
@@ -209,6 +257,13 @@ export function validateInventionRow(row: InventionCohortRecord): readonly strin
       say(`evidence sourceUrl is not https: ${citation.sourceUrl}`);
     if (citation.title.trim().length === 0) say('an evidence citation has an empty title');
     if (citation.quote.trim().length === 0) say(`evidence ${citation.title} has an empty quote`);
+  }
+
+  const lineages = distinctEvidenceLineages(row);
+  if (lineages.length < INVENTION_MIN_DISTINCT_LINEAGES) {
+    say(
+      `cites ${lineages.length} independent publisher(s); the invention floor is ${INVENTION_MIN_DISTINCT_LINEAGES} (a patent mirror and the patent office are one, Wikipedia is none)`,
+    );
   }
 
   return problems;

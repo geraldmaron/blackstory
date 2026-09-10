@@ -30,9 +30,10 @@
 import pg from 'pg';
 import { isValidTopicId } from '@repo/domain';
 import { SUMMARY_MAX_CHARS, SUMMARY_MIN_CHARS } from './lib/entity-enrichment-llm.ts';
+import { distinctEvidenceLineages } from './lib/invention-cohort-validate.ts';
 import { mergedPayloadSql, statusOnConflictSql } from './lib/landscape-candidate-upsert.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
-import { INVENTOR_COHORT } from './data/inventor-cohort.ts';
+import { INVENTOR_COHORT, type InventorCohortRecord } from './data/inventor-cohort.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.APPLY === '1';
@@ -110,6 +111,19 @@ function assertCohortBounds(): void {
   }
 }
 
+/**
+ * Distinct evidence lineages for a person row, for the dry-run log only.
+ *
+ * Unlike `invention` in `CONTENT_EXPECTATIONS`, `person` inherits the baseline
+ * `minDistinctSources: 1` — a floor every row with any citation clears trivially, not a bar this
+ * cohort has to be checked against. There is nothing here to fail on. The count is still worth a
+ * reviewer's eye, so it rides along on the log line rather than being computed and thrown away.
+ */
+function lineageSummary(row: InventorCohortRecord): string {
+  const count = distinctEvidenceLineages(row).length;
+  return `${count} lineage${count === 1 ? '' : 's'}`;
+}
+
 async function main(): Promise<void> {
   assertCohortBounds();
   const connectionString = process.env.DATABASE_URL;
@@ -144,7 +158,7 @@ async function main(): Promise<void> {
 
     for (const row of INVENTOR_COHORT) {
       console.log(
-        `  ${row.id}  ${row.summary.length}c  ${row.displayName}  (${row.namedOn.join(', ')})`,
+        `  ${row.id}  ${row.summary.length}c  ${row.displayName}  ${lineageSummary(row)}  (${row.namedOn.join(', ')})`,
       );
       if (DRY_RUN || !APPLY) continue;
       await client.query(

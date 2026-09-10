@@ -3,11 +3,18 @@ import test from 'node:test';
 import { INVENTION_COHORT, type InventionCohortRecord } from '../data/invention-cohort.ts';
 import {
   distinctEvidenceHosts,
+  distinctEvidenceLineages,
   validateInventionCohort,
   validateInventionRow,
 } from './invention-cohort-validate.ts';
 
-/** A row that passes every check, so each test can break exactly one thing. */
+/**
+ * A row that passes every check, so each test can break exactly one thing.
+ *
+ * Two evidence lineages by default — the patent itself and an independent second source — so
+ * that a test overriding some unrelated field doesn't also trip the two-lineage floor and gain
+ * an unwanted extra message.
+ */
 function validRow(overrides: Partial<InventionCohortRecord> = {}): InventionCohortRecord {
   return {
     id: 'inv_example_device',
@@ -28,6 +35,11 @@ function validRow(overrides: Partial<InventionCohortRecord> = {}): InventionCoho
         sourceUrl: 'https://patents.google.com/patent/US1475024A',
         title: 'US 1,475,024',
         quote: 'Traffic signal',
+      },
+      {
+        sourceUrl: 'https://www.si.edu/spotlight/example',
+        title: 'A second, independent source',
+        quote: 'Independent account',
       },
     ],
     ...overrides,
@@ -183,4 +195,56 @@ test('distinctEvidenceHosts counts one publisher for two patents on the same mir
     }),
   );
   assert.deepEqual(hosts, ['nps.gov', 'patents.google.com']);
+});
+
+test('a row citing only patents.google.com and uspto.gov for the same grant is reported (one lineage)', () => {
+  const problems = validateInventionRow(
+    validRow({
+      canonicalUrl: 'https://patents.google.com/patent/US1475024A',
+      patentNumber: '1475024',
+      evidence: [
+        { sourceUrl: 'https://patents.google.com/patent/US1475024A', title: 'a', quote: 'q' },
+        { sourceUrl: 'https://www.uspto.gov/patft/?docId=US1475024', title: 'b', quote: 'q' },
+      ],
+    }),
+  );
+  assert.deepEqual(problems, [
+    'inv_example_device: cites 1 independent publisher(s); the invention floor is 2 (a patent mirror and the patent office are one, Wikipedia is none)',
+  ]);
+});
+
+test('a row citing the patent plus nps.gov passes', () => {
+  const problems = validateInventionRow(
+    validRow({
+      evidence: [
+        { sourceUrl: 'https://patents.google.com/patent/US1475024A', title: 'a', quote: 'q' },
+        { sourceUrl: 'https://www.nps.gov/people/example.htm', title: 'b', quote: 'q' },
+      ],
+    }),
+  );
+  assert.deepEqual(problems, []);
+});
+
+test('a row citing the patent plus en.wikipedia.org is reported, because Wikipedia is a bridge, not a lineage', () => {
+  const problems = validateInventionRow(
+    validRow({
+      evidence: [
+        { sourceUrl: 'https://patents.google.com/patent/US1475024A', title: 'a', quote: 'q' },
+        { sourceUrl: 'https://en.wikipedia.org/wiki/Example', title: 'b', quote: 'q' },
+      ],
+    }),
+  );
+  assert.deepEqual(problems, [
+    'inv_example_device: cites 1 independent publisher(s); the invention floor is 2 (a patent mirror and the patent office are one, Wikipedia is none)',
+  ]);
+});
+
+test('distinctEvidenceLineages counts two NASA subdomains as one lineage', () => {
+  const lineages = distinctEvidenceLineages(
+    validRow({
+      canonicalUrl: 'https://www.nasa.gov/people/example/',
+      evidence: [{ sourceUrl: 'https://ntrs.nasa.gov/citations/12345', title: 'a', quote: 'q' }],
+    }),
+  );
+  assert.deepEqual(lineages, ['authority:nasa']);
 });
