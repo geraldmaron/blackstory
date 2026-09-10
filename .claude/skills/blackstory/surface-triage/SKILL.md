@@ -54,10 +54,22 @@ Work outward from the data. Stop at the first layer that is wrong.
    falls back to the facet**. Confirm against the file, not against a comment: at least one
    repair script still documents a reader behavior that has since been consolidated away, and its
    drift count over-reports by thousands because of it.
-5. **Is the page just stale?** `release-scoped-cache.ts` holds release-wide reads for 30 minutes,
-   and ops repair scripts upsert under the same release id without bumping `activated_at`. So a
-   correct fix shows an unchanged page for up to half an hour. This is documented behavior, not
-   a failed fix.
+5. **Is the page reading Postgres at all?** This is the step that costs the most time when it is
+   skipped, because every layer below it can be correct while the site shows the old value.
+   Production sets `APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL`, and `shouldPreferReleaseArtifacts`
+   then serves prebuilt `entities.json` / `search-index.json` from the CDN instead of the
+   database. The staleness guard only checks that the artifact's `releaseId` matches the live
+   active-release pointer — and an in-place backfill does not change the release id, so a stale
+   artifact passes that check and keeps serving. **Any ops-data backfill must be followed by
+   `gh workflow run publish-release-catalog-artifacts.yml --ref main`.** Otherwise the daily
+   09:17 UTC tick is the only thing that will republish it, and prod serves yesterday's catalog
+   until then. Verify the artifact itself, not just the database:
+   `…/storage/v1/object/public/public-media/public/releases/{releaseId}/search-index.json`.
+6. **Is the page just stale?** Only after the artifact is confirmed current. `release-scoped-cache.ts`
+   holds release-wide reads for 30 minutes and does not watch the database, so a correct fix shows
+   an unchanged page for up to half an hour after the artifact republishes. Note this is a
+   *second* layer, not an alternative explanation to the artifact one — reaching for it first is
+   how you end up waiting half an hour for a cache that was never the problem.
 
 ## Verify below the cache
 
@@ -78,7 +90,9 @@ separately once the TTL lapses, and report the two facts as two facts.
 Prefer a **facet copy from the projection** over a republish. The projection is already correct,
 so a copy needs no builder run and cannot alter prose, claims, status, or geometry; a republish
 rebuilds all of it to fix a facet. `backfill-search-facets-projection.ts` takes `FACET_KEYS` and
-`KIND` and carries the guardrails; the four single-key siblings predate it.
+`KIND` and carries the guardrails; the four single-key siblings predate it. Whichever you run,
+the job is not finished when the rows are written — dispatch the catalog-artifact workflow, or
+production keeps serving the pre-backfill snapshot.
 
 Every one of these scripts rests on the drift being **one-directional** — the projection set, the
 facet empty, and nothing set on both sides that disagrees. That is not a formality. Verify it per
@@ -126,4 +140,6 @@ that, not the raw count.
 - **Never** write `''` where a value is absent. An empty string satisfies the reader's
   `typeof === 'string'` check and publishes a blank over a value some earlier pass got right.
   Omit the key.
-- **Never** report the live page as proof while the 30-minute TTL is open.
+- **Never** report the live page as proof while the 30-minute TTL is open, and never explain a
+  stale page by that TTL until you have confirmed the CDN artifact is current. The TTL is the
+  explanation that sounds right and is usually second in line.
