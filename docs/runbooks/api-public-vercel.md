@@ -51,28 +51,67 @@ answer identically.
 - Driving the built bundle at `.vercel/output/functions/api/index.func/api/index.js` directly:
   `GET /v1/health` → 200 with the real service payload, `GET /v1/nope` → structured 404 with a
   request id.
-- Project `blackstory-api` exists under `geraldmarons-projects`.
+- Project `blackstory-api` exists under `geraldmarons-projects`, with the build, install and
+  output settings above already applied.
+- `vercel git connect` against this repository succeeds and `vercel git disconnect` reverses it,
+  so step 2 below is a proven command rather than a guess. It is left disconnected on purpose.
 
-## Remaining steps (owner — console and credentials)
+## Deploys happen on push, once one setting is right
 
-1. **Connect the project to git.** Vercel → `blackstory-api` → Settings → Git: connect
-   `geraldmaron/blackstory`, Production Branch `main`, **Root Directory `apps/api-public`**.
-   Root Directory is the one that matters: `vercel.json` uses `cd ../..` to reach the workspace
-   root, which only resolves when Vercel checks out the whole repo and starts there. A CLI deploy
-   from the subfolder uploads only that subfolder and fails with
-   `ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND`.
-2. **Environment variables** (Production, and Preview if you want previews to read real data):
-   - `PUBLIC_DATA_SOURCE=postgres`
-   - `DATABASE_URL` — the read credential, not admin's write-capable one.
-   Without these the API boots and serves an empty in-memory catalog rather than failing, so
-   confirm `/v1/bootstrap` returns real data, not just that `/v1/health` is 200.
-3. **Deployment protection.** Previews are protected by default, which is right. Production must
-   be reachable anonymously or the API does not work — confirm before pointing the app at it.
-4. **Domain.** Vercel → Settings → Domains → add `api.blackstory.app`. Vercel will ask for a
-   `CNAME` record; add it at Cloudflare, **DNS-only (grey cloud)**, not proxied.
-5. **Ingress matrix.** `infra/gcp/armor/ingress-matrix.json` still names `api.blackbook.app` and
-   `submit.blackbook.app`. It governs Cloud Armor, which no longer fronts anything here — fold it
-   into the GCP wind-down rather than repointing it.
+Like `blackstory` and `blackstory-admin`, this deploys through Vercel's Git integration: push to
+`main` builds production, push to `staging` builds a preview, and
+`scripts/vercel-ignore-build.sh api-public` skips the build when the diff cannot reach it. No
+workflow and no CLI deploy is involved — the CLI deploys in this repo's history were verification
+only.
+
+That flow depends on **Root Directory = `apps/api-public`**. `vercel.json` uses `cd ../..` to reach
+the workspace root, and Vercel only starts there when Root Directory says so. It is also where
+Vercel looks for `vercel.json` and for the `api/` function directory at all, so with the default
+Root Directory of `.` the config is never read, the function is never found, and the install step
+walks out of the checkout with `ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND`.
+
+Root Directory is the one thing here with no CLI or config surface — not in `vercel.json`, not in
+`vercel project`, dashboard or REST API only. Git is deliberately left **disconnected** until it is
+set, because a connected project with the wrong root fails on every push to both branches.
+
+### Step 1 — set Root Directory (dashboard, once)
+
+Vercel → `blackstory-api` → Settings → Build & Deployment → Root Directory → `apps/api-public`.
+Confirm Production Branch is `main`.
+
+### Step 2 — connect git (one command)
+
+```bash
+cd apps/api-public && vercel git connect https://github.com/geraldmaron/blackstory --yes
+```
+
+Pass the URL explicitly: run from a subdirectory, the CLI does not find the repository on its own
+and reports "No local Git repository found".
+
+### Step 3 — environment variables
+
+Set on Production, and on Preview if previews should read real data:
+
+- `PUBLIC_DATA_SOURCE=postgres`
+- `DATABASE_URL` — the read credential, not admin's write-capable one.
+
+Without these the API boots and serves an empty in-memory catalog rather than failing, so check
+`/v1/bootstrap` returns real data. `/v1/health` returning 200 proves nothing about the database.
+
+### Step 4 — domain
+
+Vercel → Settings → Domains → add `api.blackstory.app`, then add the `CNAME` Vercel asks for at
+Cloudflare, **DNS-only (grey cloud)**, not proxied.
+
+Deployment protection needs no change: `ssoProtection` is `all_except_custom_domains`, so
+`api.blackstory.app` is anonymous while the `*.vercel.app` URLs stay behind SSO. A 302 to a Vercel
+login on a `.vercel.app` preview is that working, not a fault.
+
+### Not a step: the ingress matrix
+
+`infra/gcp/armor/ingress-matrix.json` still names `api.blackbook.app` and `submit.blackbook.app`.
+It governs Cloud Armor, which fronts nothing here. Fold it into the GCP wind-down rather than
+repointing it at a live host.
 
 ## Known difference from a long-lived host
 
