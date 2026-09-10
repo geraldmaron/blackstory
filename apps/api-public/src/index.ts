@@ -1,5 +1,5 @@
 /**
- * Public read/search/location API entrypoint (Cloud Run target).
+ * Public read/search/location API surface.
  * Read-only posture enforced via @repo/config surface capabilities.
  */
 import { buildSurfaceHealth, parseNodeEnv } from '@repo/config';

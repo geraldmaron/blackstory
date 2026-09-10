@@ -77,10 +77,10 @@ set. Historical ADR-005 text is in git history.
 - **App data access:** Postgres via server `DATABASE_URL` / `@repo/data-access` on Vercel.
   PostgREST published views remain the developer-read design. `@repo/firebase` keeps App Check
   helper types only. Do not add Firestore SoR access.
-- **Public web:** Vercel for `apps/web`. Admin is its own Vercel project. Firebase App Hosting
-  backends for web and admin were deleted. Cloud Run for the in-repo APIs is leftover target
-  text; this repo has no verified production Cloud Run deploy for them
-  (`docs/runbooks/api-public-cloud-run.md`).
+- **Public web:** Vercel for `apps/web`. Admin is its own Vercel project, and `apps/api-public`
+  is a third (`blackstory-api`, to be served at `api.blackstory.app`). Firebase App Hosting
+  backends for web and admin were deleted. Cloud Run is not a target for anything here
+  (`docs/runbooks/api-public-vercel.md`).
 - **Auth / abuse:** Supabase Auth for admin (`app_metadata.bb_role`); request-integrity / client
   headers for public mutations. App Check is retired on the public request path.
 - **Jobs / CI:** Discovery on GitHub Actions. WIF apply under `infra/gcp/wif/` is leftover
