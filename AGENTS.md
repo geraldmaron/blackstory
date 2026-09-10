@@ -67,11 +67,15 @@ Two skill kinds live under `.claude/skills/blackstory/`:
   duplicate command flags.
 - **Judgment playbooks** (`entity-verify`, `claim-corroborate`, `entity-complete`,
   `entity-relate`, `coverage-target`, `publish-preview`, `neo-voice`, `prose-review`,
-  `ringer-review`) carry decision order, source ladders, and Do/Never. They have no
-  operator-cli verb of their own.
+  `ringer-review`, `surface-triage`) carry decision order, source ladders, and Do/Never. They
+  have no operator-cli verb of their own.
 
 `blackstory-locate` Census-geocodes a sourced address (no LLM). Finding the place, confirming
 which namesake, and assigning era is `blackstory-entity-verify`.
+
+`blackstory-surface-triage` is the other direction: the data exists and a published surface
+disagrees with it. It carries the projection / search-doc split, the `facets` whole-object
+replace, and the 30-minute release cache that makes a correct fix look like no fix.
 
 All commands: `node --conditions development --import tsx packages/operator-cli/src/bin.ts <verb> [flags]`. Every verb accepts `--json`; entity targets use `--entity-id`, case targets use `--case-id`. Read the operations doc before running a verb.
 
