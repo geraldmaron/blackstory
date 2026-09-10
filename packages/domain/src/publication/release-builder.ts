@@ -530,22 +530,19 @@ const RACIAL_TERROR_CONTEXT =
  * discuss a mob without being about a killing — and the record must independently carry a killing
  * predicate before any of this is consulted.
  *
- * `emanuel nine` is a named victim cohort rather than a description of violence, and it is here
- * for one record. Eight of the nine people murdered at Emanuel AME name the attack somewhere;
- * Sharonda Coleman-Singleton's says only `killed`, `member of`, `killed during | Bible study`,
- * `killed on` and `listed as | Emanuel Nine` — it never names who killed her or that it was
- * racial. Without this term she alone would keep publishing as a documented site while her eight
- * siblings were repaired, which is the defect this whole pass exists to end. The durable fix is on
- * her record, not in this expression; enumerating cohorts here does not scale and must not become
- * the pattern. Same shape as `reclassified as a lynching` above, and held to the same standard:
- * a proper noun for a specific documented massacre, never a description that could sweep.
+ * This carried `emanuel nine` for one release. Sharonda Coleman-Singleton's record named neither
+ * her killer nor the attack, so she alone would have kept publishing as a documented site while
+ * her eight siblings were repaired. Naming a victim cohort in a general expression does not scale,
+ * and the term is gone now that her record carries the claim the other eight always had
+ * (repo-00gxb). If a cohort ever has to be named here again, treat it as a record defect with a
+ * deadline, not a rule.
  *
  * Verified across rel_20260723_authority_net_001 on 2026-09-09: Ida B. Wells (`launched_crusade`,
  * `resided_at`), the Richmond Planet (`founded`, `published_from`), Mary Church Terrell and
  * T. Thomas Fortune carry no killing predicate and are untouched.
  */
 const RACIAL_TERROR_RECORD_CONTEXT =
-  /white[\s-]?supremacis[tm]|white\s+mobs?|white\s+militia|ku\s+klux\s+klan|\bklan\b|lynch\w*|racial\s+terror|racial\s+violence|racist\s+attack|emanuel\s+nine/i;
+  /white[\s-]?supremacis[tm]|white\s+mobs?|white\s+militia|ku\s+klux\s+klan|\bklan\b|lynch\w*|racial\s+terror|racial\s+violence|racist\s+attack/i;
 
 /**
  * A predicate recording that the record's own subject was killed, WITHOUT saying by whom.

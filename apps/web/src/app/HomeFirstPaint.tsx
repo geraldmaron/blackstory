@@ -20,6 +20,7 @@ import { placeDiscoveryReturn } from '../lib/discovery/discovery-state';
 import type { PublicEntityView } from '../data/public-seed';
 import {
   RecordBeatHead,
+  RecordSmallTitle,
   RecordKindPill,
   RecordPill,
   recordSectionIcon,
@@ -151,6 +152,7 @@ export function HomeFirstPaint({
     };
     const displayClaims = withoutSummaryEchoClaims(lead.claims, lead.summary);
     const evidenceClaims = toEvidenceClaimInputs(displayClaims);
+    const inclusionBasis = lead.notabilityLabels ?? [];
     const sourceCount = citedSourceCount(displayClaims);
     const returns =
       discovery ??
@@ -277,6 +279,25 @@ export function HomeFirstPaint({
             icon="trust"
             title="Can I trust this"
           />
+          {/*
+           * The inclusion basis, which `/entity/{id}` has always shown in its apparatus band and
+           * this room did not. Nearly every visitable record redirects here from there, so the
+           * archive's auditable answer to "why is this record in the catalog" — the one thing the
+           * rubric exists to publish — was invisible on most of the catalog. It reads before the
+           * measurements: why the record is here, then how well it is evidenced.
+           */}
+          {inclusionBasis.length > 0 ? (
+            <>
+              <RecordSmallTitle icon="why" id="why-heading">
+                Why this is here
+              </RecordSmallTitle>
+              <ul className="ds-record-rail-block__reasons" aria-labelledby="why-heading">
+                {inclusionBasis.map((reason) => (
+                  <li key={reason}>{reason}</li>
+                ))}
+              </ul>
+            </>
+          ) : null}
           <TrustBlock
             label="How this record stands"
             facts={[
