@@ -10,6 +10,7 @@ import {
   buildReleaseNotabilityBasis,
   isAccusationPredicate,
   isRacialTerrorClaim,
+  isRacialTerrorRecord,
   computeReleaseResearchCoverage,
   formatClaimInclusionNote,
   highestClaimConfidenceTier,
@@ -306,6 +307,310 @@ test('an arrest is not an accusation — a civil-rights record keeps it as a bas
   assert.equal(isAccusationPredicate('was accused of'), true);
   assert.equal(isAccusationPredicate('was falsely accused of'), true);
   assert.equal(isAccusationPredicate('followed accusation of'), true);
+});
+
+test('the Emanuel Nine are a racial-terror record even when no single claim says so', () => {
+  // Tywanza Sanders's live record carried the predicate `killed` six times, his own name as every
+  // object, and no context at all — the massacre is named only in his summary. Read one claim at a
+  // time there is nothing to match, which is why the lynching pass published all nine of the
+  // Emanuel Nine as documented SITES.
+  const claims = [
+    {
+      id: 'claim_1',
+      predicate: 'killed',
+      object: 'Tywanza Sanders',
+      citationSource: 'Source A',
+      citationLabel: 'Citation A',
+      confidenceLevel: 'high' as const,
+    },
+  ];
+  assert.equal(isRacialTerrorClaim('killed', 'Tywanza Sanders'), false);
+  assert.equal(
+    isRacialTerrorRecord(
+      {
+        kind: 'person',
+        displayName: 'Tywanza Sanders',
+        summary: 'Among the nine victims killed during the white-supremacist massacre at Emanuel.',
+      },
+      claims as never,
+    ),
+    true,
+  );
+});
+
+test('a killing record states the killing, not the date and street it happened on', () => {
+  const entry = baseEntry({
+    kind: 'person',
+    displayName: 'Susie Jackson',
+    summary: 'Killed in the white-supremacist massacre at Emanuel AME in Charleston.',
+    claims: [
+      {
+        predicate: 'killed',
+        object: 'Susie Jackson',
+        confidenceLevel: 'high',
+        citationSource: 'Source A',
+        citationLabel: 'Citation A',
+      },
+      {
+        predicate: 'date',
+        object: 'June 17, 2015',
+        confidenceLevel: 'high',
+        citationSource: 'Source A',
+        citationLabel: 'Citation A',
+      },
+      {
+        predicate: 'location',
+        object: '110 Calhoun Street',
+        confidenceLevel: 'high',
+        citationSource: 'Source A',
+        citationLabel: 'Citation A',
+      },
+    ],
+  });
+  const basis = buildReleaseNotabilityBasis(entry);
+  assert.equal(basis.length, 1, 'the date and the street are not reasons she is in the catalog');
+  assert.equal(basis[0]!.criterion, 'documented_racial_terror');
+  assert.equal(basis[0]!.note, 'Killed.');
+});
+
+test('dropping the metadata off a killing record never drops a documented first', () => {
+  // Both regressions the live dry run caught. Elmer Jackson was one of three men lynched in Duluth
+  // in 1920; his `only_or_oldest` basis records the only widely known lynching in Minnesota, and a
+  // first draft of the metadata rule discarded it along with the date and the street.
+  const entry = baseEntry({
+    kind: 'person',
+    displayName: 'Elmer Jackson',
+    summary: 'Lynched by a white mob in Duluth, Minnesota, on June 15, 1920.',
+    claims: [
+      {
+        predicate: 'was lynched on',
+        object: 'June 15, 1920, in Duluth, Minnesota, by a white mob',
+        confidenceLevel: 'high',
+        citationSource: 'Source A',
+        citationLabel: 'Citation A',
+      },
+      {
+        predicate: 'is one of the victims of the only widely known lynching of',
+        object: 'African Americans in Minnesota',
+        confidenceLevel: 'high',
+        citationSource: 'Source A',
+        citationLabel: 'Citation A',
+      },
+      {
+        predicate: 'date',
+        object: 'June 15, 1920',
+        confidenceLevel: 'high',
+        citationSource: 'Source A',
+        citationLabel: 'Citation A',
+      },
+    ],
+  });
+  const criteria = buildReleaseNotabilityBasis(entry).map((b) => b.criterion);
+  assert.ok(criteria.includes('documented_racial_terror'));
+  assert.ok(criteria.includes('only_or_oldest'), 'the superlative must survive the metadata drop');
+  assert.equal(criteria.length, 2, 'the bare date is not a reason he is in the catalog');
+});
+
+test('a massacre with a landmark listing keeps both the listing and the killing', () => {
+  // The Elaine Massacre and Ell Persons's lynching site are NRHP-listed. A draft of the metadata
+  // rule kept only the listing and silently dropped the racial-terror basis — the massacre stopped
+  // being the reason the record existed, which is the exact defect this pass is here to fix.
+  const entry = baseEntry({
+    kind: 'event',
+    displayName: 'Elaine Massacre',
+    summary: 'Black sharecroppers organized in Phillips County; white mobs and federal troops.',
+    claims: [
+      {
+        predicate: 'resulted in',
+        object: 'Estimates of Black residents killed by white mobs range into the hundreds',
+        confidenceLevel: 'high',
+        citationSource: 'Source A',
+        citationLabel: 'Citation A',
+      },
+      {
+        predicate: 'listed on',
+        object: 'the National Register of Historic Places',
+        confidenceLevel: 'high',
+        citationSource: 'Source A',
+        citationLabel: 'Citation A',
+      },
+    ],
+  });
+  const criteria = buildReleaseNotabilityBasis(entry).map((b) => b.criterion);
+  assert.ok(criteria.includes('documented_racial_terror'), 'the massacre is why the record exists');
+  assert.ok(criteria.includes('landmark_or_national_register'));
+});
+
+test('the Klan naming a victim is racial terror, not movement significance', () => {
+  const claims = [
+    {
+      id: 'claim_1',
+      predicate: 'killed_in',
+      object: '16th Street Baptist Church bombing',
+      citationSource: 'Source A',
+      citationLabel: 'Citation A',
+      confidenceLevel: 'high' as const,
+    },
+    {
+      id: 'claim_2',
+      predicate: 'victim_of',
+      object: 'Ku Klux Klan',
+      citationSource: 'Source A',
+      citationLabel: 'Citation A',
+      confidenceLevel: 'high' as const,
+    },
+  ];
+  assert.equal(
+    isRacialTerrorRecord(
+      { kind: 'person', displayName: 'Denise McNair', summary: 'Killed in Birmingham in 1963.' },
+      claims as never,
+    ),
+    true,
+  );
+});
+
+test('a massacre is a racial-terror record although it carries no killing predicate', () => {
+  // The Tulsa Race Massacre's claims are `occurred in`, `targeted`, `estimated deaths` and
+  // `destroyed`. Nothing there says anyone was killed in a predicate a test can read.
+  const claims = [
+    {
+      id: 'claim_1',
+      predicate: 'occurred in',
+      object: 'Greenwood District, Tulsa, Oklahoma',
+      citationSource: 'Source A',
+      citationLabel: 'Citation A',
+      confidenceLevel: 'high' as const,
+    },
+    {
+      id: 'claim_2',
+      predicate: 'perpetrators',
+      object: 'White mob',
+      citationSource: 'Source A',
+      citationLabel: 'Citation A',
+      confidenceLevel: 'high' as const,
+    },
+  ];
+  assert.equal(
+    isRacialTerrorRecord(
+      { kind: 'event', displayName: 'Tulsa Race Massacre', summary: 'A two-day attack.' },
+      claims as never,
+    ),
+    true,
+  );
+});
+
+test('a killing by police is not swept into racial terror', () => {
+  // Orangeburg, Breonna Taylor, Trayvon Martin and Eric Garner rest on a different documentary
+  // record and get `documented_racial_killing` once it is ratified. Until then they must not be
+  // relabelled by this rule — the perpetrator half of the test is what holds the line.
+  assert.equal(
+    isRacialTerrorRecord(
+      {
+        kind: 'event',
+        displayName: 'Orangeburg Massacre',
+        summary: 'Highway patrolmen opened fire on Black students protesting segregation.',
+      },
+      [
+        {
+          id: 'c1',
+          predicate: 'killed',
+          object: 'Samuel Hammond, Henry Smith and Delano Middleton',
+          citationSource: 'S',
+          citationLabel: 'C',
+          confidenceLevel: 'high' as const,
+        },
+      ] as never,
+    ),
+    false,
+  );
+  assert.equal(
+    isRacialTerrorRecord(
+      {
+        kind: 'person',
+        displayName: 'Breonna Taylor',
+        summary: 'Killed by Louisville Metro Police serving a search warrant; fueled protests.',
+      },
+      [
+        {
+          id: 'c1',
+          predicate: 'killed_during',
+          object: 'the service of a Louisville Metro Police search warrant',
+          citationSource: 'S',
+          citationLabel: 'C',
+          confidenceLevel: 'high' as const,
+        },
+      ] as never,
+    ),
+    false,
+  );
+});
+
+test('widening the window to the whole record still does not file the chronicler as the victim', () => {
+  // Ida B. Wells's record is saturated with lynching; requiring a killing predicate is what keeps
+  // her out. Same for the Richmond Planet, which campaigned against it for decades.
+  assert.equal(
+    isRacialTerrorRecord(
+      {
+        kind: 'person',
+        displayName: 'Ida B. Wells',
+        summary: 'Her 1892 anti-lynching crusade, launched after a white mob murdered her friends.',
+      },
+      [
+        {
+          id: 'c1',
+          predicate: 'launched_crusade',
+          object: 'After a white mob lynched her friend Thomas Moss',
+          citationSource: 'S',
+          citationLabel: 'C',
+          confidenceLevel: 'high' as const,
+        },
+      ] as never,
+    ),
+    false,
+  );
+  assert.equal(
+    isRacialTerrorRecord(
+      {
+        kind: 'publication',
+        displayName: 'Richmond Planet',
+        summary: 'Under Mitchell the Planet used its pages for antilynching campaigns.',
+      },
+      [
+        {
+          id: 'c1',
+          predicate: 'published_from',
+          object: 'the Planet campaigned against lynching and reported on disfranchisement',
+          citationSource: 'S',
+          citationLabel: 'C',
+          confidenceLevel: 'high' as const,
+        },
+      ] as never,
+    ),
+    false,
+  );
+});
+
+test('a sailor killed in action is not a racial-terror record', () => {
+  assert.equal(
+    isRacialTerrorRecord(
+      {
+        kind: 'person',
+        displayName: 'Doris Miller',
+        summary: 'Awarded the Navy Cross for Pearl Harbor; killed aboard the USS Liscome Bay.',
+      },
+      [
+        {
+          id: 'c1',
+          predicate: 'was killed in action',
+          object: 'aboard the USS Liscome Bay',
+          citationSource: 'S',
+          citationLabel: 'C',
+          confidenceLevel: 'high' as const,
+        },
+      ] as never,
+    ),
+    false,
+  );
 });
 
 test('a claim object that merely repeats the subject name does not become part of the sentence', () => {

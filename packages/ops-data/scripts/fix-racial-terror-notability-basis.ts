@@ -28,9 +28,25 @@
  * published claims, so this script cannot drift from the builder — there is no second copy of the
  * grouping, inference or note rules here.
  *
- * SCOPE. Only rows whose recomputed basis differs AND that carry a racial-terror or accusation
- * claim. The wider catalog-of-638 `documented_site` category error is repo-kdmrc proper and needs
- * a rubric decision per kind, which this does not make.
+ * SECOND PASS, repo-90g0i. The first pass read one claim at a time, which cannot see a record
+ * whose sentences are split across claims. Three cohorts carrying the identical defect were left
+ * behind and are now in scope, via `isRacialTerrorRecord`:
+ *
+ *   - All nine of the Emanuel Nine, murdered at Emanuel AME on 17 June 2015. Susie Jackson's
+ *     published reasons for inclusion were "Killed Susie Jackson.", "Date June 17, 2015.",
+ *     "Location 110 Calhoun Street." and "Group Emanuel Nine." Tywanza Sanders's record carries
+ *     `killed` six times and no context at all — the massacre is named only in his summary.
+ *   - Denise McNair, Addie Mae Collins, Carole Robertson and Cynthia Wesley, killed in the 16th
+ *     Street Baptist Church bombing, filed under `movement_significance`: "played a documented,
+ *     non-incidental role in a named movement." They were eleven and fourteen.
+ *   - Every massacre. `documented_racial_terror` was in use on 136 people and ZERO events, though
+ *     its ratified text covers "the event or place where such a killing is documented."
+ *
+ * SCOPE. Only rows whose recomputed basis differs AND that are a racial-terror record or carry an
+ * accusation. A killing by police or by a civilian claiming authority is deliberately OUT: the
+ * Orangeburg Massacre, Breonna Taylor, Trayvon Martin and Eric Garner rest on a different
+ * documentary record and get `documented_racial_killing` once ratified. The wider catalog-wide
+ * `documented_site` category error is repo-kdmrc and docs/methodology/notability-rubric.md.
  *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a
@@ -46,7 +62,7 @@ import pg from 'pg';
 import {
   buildReleaseNotabilityBasis,
   isAccusationPredicate,
-  isRacialTerrorClaim,
+  isRacialTerrorRecord,
   NOTABILITY_RUBRIC,
   type NotabilityBasisRecord,
   type ReleaseClaimProjection,
@@ -70,6 +86,7 @@ type Row = {
   readonly entity_id: string;
   readonly display_name: string;
   readonly kind: string;
+  readonly summary: string | null;
   readonly claims: readonly ReleaseClaimProjection[] | null;
   readonly projection: Record<string, unknown> | null;
   readonly taxonomy: Record<string, unknown> | null;
@@ -100,7 +117,7 @@ async function main(): Promise<void> {
     if (!releaseId) throw new Error('No active release');
 
     const { rows } = await client.query<Row>(
-      `SELECT entity_id, display_name, kind, claims, projection, taxonomy
+      `SELECT entity_id, display_name, kind, summary, claims, projection, taxonomy
          FROM bb_public.release_entities WHERE release_id = $1 ORDER BY entity_id`,
       [releaseId],
     );
@@ -126,18 +143,17 @@ async function main(): Promise<void> {
             .filter((p) => typeof p === 'string' && isAccusationPredicate(p)),
         ),
       ];
-      const hasRacialTerror = claims.some((c) =>
-        isRacialTerrorClaim(c.predicate ?? '', c.object ?? ''),
-      );
-      // Scope guard: this pass is the dignity slice, not the catalog-wide rubric decision.
-      if (droppedAccusations.length === 0 && !hasRacialTerror) continue;
-
-      // Only `kind` and `displayName` are read by the basis builder; the rest of
-      // ReleaseSourceEntity is not consulted on this path.
+      // Only `kind`, `displayName` and `summary` are read on this path; the rest of
+      // ReleaseSourceEntity is not consulted by the basis builder.
       const entry = {
         kind: row.kind,
         displayName: row.display_name,
+        summary: row.summary ?? '',
       } as unknown as ReleaseSourceEntity;
+
+      const hasRacialTerror = isRacialTerrorRecord(entry, claims);
+      // Scope guard: this pass is the dignity slice, not the catalog-wide rubric decision.
+      if (droppedAccusations.length === 0 && !hasRacialTerror) continue;
       const after = buildReleaseNotabilityBasis(entry, claims);
       const before = Array.isArray(row.projection?.notabilityBasis)
         ? (row.projection.notabilityBasis as NotabilityBasisRecord[])
@@ -172,19 +188,26 @@ async function main(): Promise<void> {
     console.log(`Release: ${releaseId}`);
     console.log(`In scope and already correct: ${inScopeUnchanged}`);
     console.log(`To change: ${changes.length}`);
-    for (const change of changes.slice(0, 12)) {
+    // A dry run prints every change. The point of the dry run is that a person reads the whole
+    // list before it is written — the racial-terror rule is a judgment about how this catalog
+    // names the dead, and a truncated preview is how a false positive ships.
+    const preview = DRY_RUN || !APPLY ? changes : changes.slice(0, 12);
+    for (const change of preview) {
       const beforeCriteria = [...new Set(change.before.map((b) => b.criterion))].join(', ');
       const afterCriteria = [...new Set(change.after.map((b) => b.criterion))].join(', ');
       console.log(`\n  ${change.row.display_name} (${change.row.entity_id})`);
       console.log(`    criteria : ${beforeCriteria || '(none)'} -> ${afterCriteria}`);
       console.log(`    basis    : ${change.before.length} -> ${change.after.length} record(s)`);
+      for (const record of change.after) console.log(`      · ${record.note.slice(0, 110)}`);
       if (change.droppedAccusations.length > 0) {
         console.log(
           `    no longer a reason for inclusion: ${change.droppedAccusations.join('; ')}`,
         );
       }
     }
-    if (changes.length > 12) console.log(`\n  ...and ${changes.length - 12} more`);
+    if (preview.length < changes.length) {
+      console.log(`\n  ...and ${changes.length - preview.length} more`);
+    }
 
     if (wouldEmpty.length > 0) {
       console.log(`\nNOT WRITTEN — every basis record would be dropped, leaving no evidenced`);

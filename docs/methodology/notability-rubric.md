@@ -8,7 +8,8 @@
 
 # Notability rubric: what "why is this here" is allowed to say
 
-**Status:** Ruling. Adopted 2026-09-09. Not yet applied to code or data — see *Sequencing*.
+**Status:** Ruling. Adopted 2026-09-09. §E arm 1 and 2 applied (`repo-90g0i`, 57 records);
+everything else is still unapplied — see *Sequencing*.
 **Measured against:** active release `rel_20260723_authority_net_001`, 2026-09-09, 4,191 records
 and 10,522 basis records.
 **Re-measure with:** `packages/ops-data/scripts/audit-notability-basis.ts`
@@ -174,7 +175,13 @@ as ratified, need no amendment, and should be applied:
 1. **White-supremacist attacks.** The Emanuel Nine, the four girls killed at 16th Street Baptist
    Church, Vernon Dahmer, Emmett Till.
 2. **Events.** The Tulsa Race Massacre, the Colfax Massacre, the Ocoee massacre, the 1866 Memphis
-   massacre, East St. Louis, Orangeburg. The criterion is used on zero events today.
+   massacre, East St. Louis, Elaine, Rosewood, Wilmington 1898. The criterion is used on zero
+   events today.
+
+   **Corrected 2026-09-09 while applying `repo-90g0i`:** this list first included the Orangeburg
+   Massacre. It should not have. Orangeburg was state highway patrolmen firing on student
+   protesters, so by this ruling's own distinction it belongs with Breonna Taylor under
+   `documented_racial_killing`, not with Tulsa. The applied matcher excludes it.
 
 Killings by police, or by a civilian claiming authority to use force, are a **separate criterion,
 not an extension of that one**:
@@ -240,7 +247,8 @@ last, and only after measurement.
 1. **Now, ahead of everything.** The Emanuel Nine, the 16th Street Baptist Church four, and the
    agency inversion on killing records ("Fired 41 shots" on Amadou Diallo). This is the same
    defect the racial-terror pass was raised for, on a cohort that pass could not reach, and it
-   does not wait for the rest of the ruling. Beads `repo-90g0i` and `repo-39h6s`.
+   does not wait for the rest of the ruling. `repo-90g0i` is **done** — 57 records, applied and
+   verified on the page. `repo-39h6s` (agency inversion) is still open.
 2. **Vocabulary** — `repo-tfqrm`. Add the four criteria to all four copies that must agree —
    `packages/domain/src/entity-status.ts`, `packages/schemas/src/public-projections.ts`,
    `packages/ops-data/src/firestore/types.ts`, and `NOTABILITY_CRITERION_LABELS` in
