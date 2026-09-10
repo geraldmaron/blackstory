@@ -54,11 +54,13 @@ import {
   MEDIA_RIGHTS_STATUSES,
   RELATION_DIRECTIONS,
   REVISION_CHANGE_KINDS,
+  CLAIM_ROLES,
   type Claim,
   type ClaimDispute,
   type ClaimDisputeAlternate,
   type ClaimRetraction,
   type ClaimRevisionEntry,
+  type ClaimRole,
   type Citation,
   type ConfidenceLevel,
   type DatePrecision,
@@ -119,6 +121,17 @@ function enumOr<T extends string>(value: unknown, allowed: readonly T[], fallbac
 
 function datePrecisionOr(value: unknown, fallback: DatePrecision = 'circa'): DatePrecision {
   return enumOr(value, DATE_PRECISIONS, fallback);
+}
+
+/**
+ * True when a stored claim role is one the wire contract actually defines — mirrors web's
+ * `isClaimRoleV1` in `apps/web/src/lib/public-data/map-projection.ts`. Unlike the other enum
+ * fields on `Claim`, an out-of-vocabulary role is not coerced to a fallback value; it is
+ * OMITTED, so `recordConfidenceTier`'s predicate-based fallback (`RECORD_PROVENANCE_PREDICATES`)
+ * still applies rather than being overridden by a lie about the role.
+ */
+function isClaimRoleV1(value: string | undefined): value is ClaimRole {
+  return value !== undefined && (CLAIM_ROLES as readonly string[]).includes(value);
 }
 
 // ---------------------------------------------------------------------------
@@ -217,6 +230,7 @@ export function normalizeClaim(value: unknown): Claim | null {
   }
 
   const lineageCount = num(value.independentLineageCount);
+  const claimRole = optionalStr(value.claimRole, 32);
 
   return {
     id,
@@ -229,6 +243,10 @@ export function normalizeClaim(value: unknown): Claim | null {
     ...(normalizeDispute(value.dispute) ? { dispute: normalizeDispute(value.dispute) } : {}),
     ...(revisionHistory.length > 0 ? { revisionHistory } : {}),
     ...(normalizeRetraction(value.retraction) ? { retraction: normalizeRetraction(value.retraction) } : {}),
+    // Load-bearing for the record tier (see `recordConfidenceTier`): carried through only when
+    // it is a role the wire contract defines, never coerced — an out-of-vocabulary value falls
+    // back to the predicate heuristic instead of being fabricated into a valid-looking role.
+    ...(isClaimRoleV1(claimRole) ? { claimRole } : {}),
   };
 }
 

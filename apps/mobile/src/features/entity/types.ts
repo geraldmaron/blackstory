@@ -21,6 +21,7 @@
  */
 
 import { ENTITY_KINDS as CONTRACT_ENTITY_KINDS } from '@repo/public-contracts/v1/entity';
+import { CLAIM_ROLES as CONTRACT_CLAIM_ROLES } from '@repo/public-contracts/v1/claim';
 // ---------------------------------------------------------------------------
 // Enums (imported from public-contracts, never copied)
 // ---------------------------------------------------------------------------
@@ -31,6 +32,12 @@ import { ENTITY_KINDS as CONTRACT_ENTITY_KINDS } from '@repo/public-contracts/v1
  */
 export const ENTITY_KINDS = CONTRACT_ENTITY_KINDS;
 export type EntityKind = (typeof ENTITY_KINDS)[number];
+
+/** Whether a claim is the record's own index row or evidence about its subject — see
+ * `@repo/public-contracts/evidence`'s `recordConfidenceTier` for why the distinction matters:
+ * an index row cannot corroborate itself. */
+export const CLAIM_ROLES = CONTRACT_CLAIM_ROLES;
+export type ClaimRole = (typeof CLAIM_ROLES)[number];
 
 export const LOCATION_PRECISIONS = ['city', 'neighborhood', 'campus', 'institution'] as const;
 export type LocationPrecision = (typeof LOCATION_PRECISIONS)[number];
@@ -140,6 +147,10 @@ export interface Claim {
   readonly dispute?: ClaimDispute;
   readonly revisionHistory?: readonly ClaimRevisionEntry[];
   readonly retraction?: ClaimRetraction;
+  /** Present only when the stored value is one of the wire's `CLAIM_ROLES` — see
+   * `isClaimRoleV1` in `normalize.ts`. Load-bearing for `recordConfidenceTier`: without it, a
+   * record's own index row counts as corroboration of itself. */
+  readonly claimRole?: ClaimRole;
 }
 
 // ---------------------------------------------------------------------------
