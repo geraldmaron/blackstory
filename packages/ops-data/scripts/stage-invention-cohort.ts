@@ -7,7 +7,7 @@
  *   DRY_RUN=0 APPLY=1 node --conditions development --import tsx packages/ops-data/scripts/stage-invention-cohort.ts
  */
 import pg from 'pg';
-import { SUMMARY_MAX_CHARS, SUMMARY_MIN_CHARS } from './lib/entity-enrichment-llm.ts';
+import { validateInventionCohort } from './lib/invention-cohort-validate.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import { INVENTION_COHORT } from './data/invention-cohort.ts';
 
@@ -17,24 +17,23 @@ const RUN_ID = 'run_invention_cohort_2026_09';
 const PROGRAM_ID = 'invention-cohort';
 const LANE = 'invention-cohort';
 
-function assertCohortBounds(): void {
-  for (const row of INVENTION_COHORT) {
-    if (row.summary.length < SUMMARY_MIN_CHARS || row.summary.length > SUMMARY_MAX_CHARS) {
-      throw new Error(
-        `${row.id} summary length ${row.summary.length} outside ${SUMMARY_MIN_CHARS}..${SUMMARY_MAX_CHARS}`,
-      );
-    }
-    if (row.historicalContext.trim().length === 0) {
-      throw new Error(`${row.id} is missing historicalContext`);
-    }
-    if (row.evidence.length === 0) {
-      throw new Error(`${row.id} has no evidence citation`);
-    }
+/**
+ * Refuse to stage a cohort with a mechanical defect.
+ *
+ * Every problem is reported at once rather than throwing on the first, so an author fixing a
+ * batch gets the whole list from one run.
+ */
+function assertCohortValid(): void {
+  const problems = validateInventionCohort(INVENTION_COHORT);
+  if (problems.length > 0) {
+    throw new Error(
+      `invention cohort has ${problems.length} problem(s):\n  ${problems.join('\n  ')}`,
+    );
   }
 }
 
 async function main(): Promise<void> {
-  assertCohortBounds();
+  assertCohortValid();
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) throw new Error('DATABASE_URL is required');
 

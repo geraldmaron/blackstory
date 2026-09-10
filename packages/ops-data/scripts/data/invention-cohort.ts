@@ -598,28 +598,35 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
   },
   {
     id: 'inv_croak_voip_packet',
-    displayName: 'Voice-over-Packet Method',
+    displayName: 'End-to-End Network Performance Monitoring',
     summary:
-      'Marian R. Croak is named on patents for transmitting voice over a packet network, including US 7,599,359, from work at AT&T in Murray Hill, New Jersey. Those grants cover specific methods for carrying voice on a packet network. They do not say she invented the internet, or the telephone. This record is that voice-over-packet method, not a category. Other inventors named on a given grant remain part of that receipt.',
+      'US 7,599,359, titled "Method and apparatus for monitoring end-to-end performance in a network," names Marian Croak and Hossein Eslambolchi and was granted on 6 October 2009, assigned to AT&T. The specification describes measuring how a network performs end to end, which is the problem that had to be answered before voice would carry acceptably over packet networks. The National Inventors Hall of Fame names this grant on Croak\'s 2022 induction for VoIP work. It does not establish that she invented voice over the internet, the internet, or the telephone, and Eslambolchi is named on it beside her.',
     historicalContext:
-      'VoIP is a field. A patent is a method inside it. The public wording stays with the method the grant describes. Murray Hill is the laboratory city, not a filing address treated as the workshop.',
+      'Croak spent three decades filing at Bell Labs and AT&T, so any single grant understates the portfolio while a phrase like "invented VoIP" overstates what any one grant covers. This record holds the document the Hall of Fame itself points at, and holds it at its own scope: a monitoring method, with both inventors named. Murray Hill is the laboratory city the work is tied to, not a filing address treated as the workshop.',
     impactStatement:
-      'Carrying voice over packet networks underlies most calling now, including the video calls that held families and schools together when meeting in person stopped. Croak also holds patents on donation by text message, used to move relief money quickly after disasters, and she holds one of the larger US patent portfolios credited to a Black woman.',
+      'Reliable measurement is what let carriers move voice onto packet networks at all, and that shift underlies most calling now, including the video calls that held families and schools together when meeting in person stopped. Croak also worked on a text-to-donate system for charities, which the Hall of Fame records raising $130,000 after Hurricane Katrina in 2005 and $43 million after the 2010 earthquake in Haiti. She is one of the few Black engineers whose telecommunications work is documented at this depth, and the receipts are the reason it can be stated at all.',
     contributors: [
       { name: 'Marian R. Croak', predicate: 'co_invented', entityId: 'ent_marian_croak_001' },
+      { name: 'Hossein Eslambolchi', predicate: 'co_invented' },
     ],
     city: 'Murray Hill',
     state: 'NJ',
     lat: 40.6954,
     lng: -74.401,
     era: '2000s',
-    canonicalUrl: 'https://patents.google.com/patent/US7599359B2',
+    canonicalUrl: 'https://patents.google.com/patent/US7599359B1',
     patentNumber: '7599359',
     evidence: [
       {
-        sourceUrl: 'https://patents.google.com/patent/US7599359B2',
+        sourceUrl: 'https://patents.google.com/patent/US7599359B1',
         title: 'US 7,599,359',
-        quote: 'Method and apparatus for monitoring the quality of VoIP calls',
+        quote: 'Method and apparatus for monitoring end-to-end performance in a network',
+      },
+      {
+        sourceUrl: 'https://www.invent.org/inductees/marian-croak',
+        title: 'Marian Croak — National Inventors Hall of Fame',
+        quote:
+          'Engineer Marian Croak has worked on advancing Voice over Internet Protocol (VoIP) technologies, converting voice data into digital signals that can be easily transmitted over the internet rather than using traditional phone lines.',
       },
     ],
   },
