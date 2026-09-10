@@ -196,7 +196,7 @@ test('normalizePublicPrecision passes through every controlled tier unchanged', 
   }
 });
 
-test('normalizePublicPrecision normalises every raw value seen in live bb_public data', () => {
+test('normalizePublicPrecision normalizes every raw value seen in live bb_public data', () => {
   const cases: Record<string, string> = {
     site: 'site',
     county: 'county',
@@ -226,7 +226,7 @@ test('normalizePublicPrecision normalises every raw value seen in live bb_public
   }
 });
 
-test('normalizePublicPrecision: street_address synonym normalises to address', () => {
+test('normalizePublicPrecision: street_address synonym normalizes to address', () => {
   assert.equal(normalizePublicPrecision('street_address'), 'address');
 });
 

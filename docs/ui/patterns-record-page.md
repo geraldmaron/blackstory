@@ -4,13 +4,13 @@
 
 The class covers four surfaces: `/entity/[id]`, `/books/[slug]`, `/law/[slug]`, and the entity loading state.
 
-Builds on, and does not replace: [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) (the fact grid), [`patterns-plate-posture.md`](./patterns-plate-posture.md) (the Framed plate), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (glyph and colour).
+Builds on, and does not replace: [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) (the fact grid), [`patterns-plate-posture.md`](./patterns-plate-posture.md) (the Framed plate), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (glyph and color).
 
 ---
 
 ## 1. What it is
 
-One catalogued thing with a place, an era and evidence: an entity, a banned book, a law. **The map record sheet, unfolded into a durable, crawlable, citable page.**
+One catalogd thing with a place, an era and evidence: an entity, a banned book, a law. **The map record sheet, unfolded into a durable, crawlable, citable page.**
 
 **Same anatomy component as the sheet, never a fork.** The sheet and the page render one `RecordAnatomyPanel`, and their citation strings are byte identical because both call `lib/citation/format`. A citation a reader copies from a pin and a citation they copy from the page must be the same string, or the archive has two answers to the same question.
 
@@ -63,7 +63,7 @@ Framed, always. The persistent plate insets into the record's place frame and fl
 
 > **The link from a law to records is constructed from jurisdiction and era, not from a documented edge.** The label must never imply causation, and the lens handoff builder refuses a reason string that does.
 
-Laws have no geo anchor in the catalogue today. If the state code to polygon join is not ready, this route ships **without the plate** rather than with a fabricated one.
+Laws have no geo anchor in the catalog today. If the state code to polygon join is not ready, this route ships **without the plate** rather than with a fabricated one.
 
 **The entity loading state** is the record page's own skeleton, not a different page. The framed plate renders its parked state, and the kicker, name, summary and anatomy rows render as shimmer blocks at the exact geometry they will occupy, so nothing reflows when the record arrives. Nothing is interactive except the command bar, which stays fully live during the wait. `aria-busy` on the region with a single polite "Opening record" announcement, not one per shimmer block. Reduced motion renders the blocks static, read from the live media query rather than a one-shot boot value. **Never a spinner.**
 
@@ -79,7 +79,7 @@ A pin on a jurisdiction record is a false claim with a coordinate attached. A bo
 
 ## 6. Entry and exit
 
-**Enter** from a map row or sheet, a palette record hit, a `/records` row, a catalogue card, a chapter citation, or an external link.
+**Enter** from a map row or sheet, a palette record hit, a `/records` row, a catalog card, a chapter citation, or an external link.
 
 **Exit:**
 
@@ -94,7 +94,7 @@ A pin on a jurisdiction record is a false claim with a coordinate attached. A bo
 ## 7. Accessibility and dignity
 
 - Every record page carries a correction path. A record with no way to dispute it is an assertion, not evidence.
-- Colour is never the only signal; confidence stays glyph encoded.
+- Color is never the only signal; confidence stays glyph encoded.
 - A coarsened point is never labeled as an exact address.
 - A refused camera move states its reason in visible text.
 - No red or alarm hues for violence-adjacent records, and no crime-heat rendering.

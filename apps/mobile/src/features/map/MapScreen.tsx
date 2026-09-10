@@ -390,8 +390,8 @@ export function MapScreen({
   });
 
   /**
-   * Step the camera one zoom level about its current centre. `zoomTo` (not `flyTo`) because a
-   * button press should not also move the centre — the reader is asking for closer, not
+   * Step the camera one zoom level about its current center. `zoomTo` (not `flyTo`) because a
+   * button press should not also move the center — the reader is asking for closer, not
    * elsewhere. Clamped to the same ceiling/floor the gesture handler uses, so a button can never
    * reach a precision the redacted release artifact does not support (mapCamera.ts).
    */

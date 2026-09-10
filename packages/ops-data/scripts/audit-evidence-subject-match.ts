@@ -43,7 +43,7 @@
  * Henry Street material sitting under Southwest Historic District, Charlottesville's Vinegar Hill
  * material under West Main Street. Every quote a drafter pulls from it is a genuine verbatim
  * substring, so `validateEnrichmentResponse` passes it, and the result is a sourced-looking
- * paragraph attributing a neighbouring place's history to this entity. Leaving the row
+ * paragraph attributing a neighboring place's history to this entity. Leaving the row
  * `status='captured'` is not neutral.
  *
  * Quarantining costs the ~10% that were usable. That trade is deliberate and cheap to reverse: the
@@ -250,7 +250,7 @@ type Row = {
  * a name that only repeats its location says nothing — which leaves that name one distinctive
  * token and too few for its co-occurrence rule. This audit then cleared the document because its
  * TITLE contains "caswell": the very token the gate had just discarded as meaningless. Stripping a
- * place word in one layer while honouring it in the other is what let the document through both.
+ * place word in one layer while honoring it in the other is what let the document through both.
  */
 export function placeWordsOf(row: Pick<Row, 'city' | 'county' | 'state'>): ReadonlySet<string> {
   return new Set(

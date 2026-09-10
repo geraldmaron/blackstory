@@ -78,7 +78,7 @@ describe('transport reads', () => {
     const r = await transport.readJson('/v1/entity/x');
     expect(r.kind).toBe('ok');
     expect(calls).toHaveLength(2);
-    expect(sleeps).toEqual([2000]); // Retry-After honoured, not jittered backoff
+    expect(sleeps).toEqual([2000]); // Retry-After honored, not jittered backoff
   });
 
   it('bounds a retry storm: fixed max attempts and bounded delays', async () => {

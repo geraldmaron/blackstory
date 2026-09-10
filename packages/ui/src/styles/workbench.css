@@ -106,7 +106,7 @@
   background: var(--ds-canvas);
 }
 
-/* The cursor row is marked with a border, not color alone, so it survives greyscale and
+/* The cursor row is marked with a border, not color alone, so it survives grayscale and
    high-contrast modes where a tint would vanish. */
 .ds-datatable__row--cursor {
   box-shadow: inset 3px 0 0 0 var(--ds-accent);
@@ -629,7 +629,7 @@
   color: var(--ds-ink-muted);
 }
 
-/* Carries a word as well as a color: failure must survive greyscale. */
+/* Carries a word as well as a color: failure must survive grayscale. */
 .ds-inline-edit__error {
   color: var(--ds-error-fg);
   font-weight: 600;

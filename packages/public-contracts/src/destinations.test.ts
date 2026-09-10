@@ -76,7 +76,7 @@ test('the door is not a primary nav item — it is reached through the brand loc
 });
 
 test('Stories and Records are top-level axes, not children of Rooms', () => {
-  // Modelling them under Rooms was the old Library hierarchy surviving a rename: it told a
+  // Modeling them under Rooms was the old Library hierarchy surviving a rename: it told a
   // reader the archive index was a supporting page rather than a way into the product.
   for (const path of ['/stories', '/records']) {
     const destination = semanticDestinationByPath(path);

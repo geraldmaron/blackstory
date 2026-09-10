@@ -35,7 +35,7 @@ fi
 # formatting drift that lands on staging/main turns the branch red for everyone. Check the
 # staged files here instead, where it costs a second and the fix is one command.
 # Staged-file scope keeps this fast; `--ignore-unknown` skips anything Prettier can't parse and
-# `.prettierignore` is still honoured. Set SKIP_PRETTIER=1 to bypass in an emergency.
+# `.prettierignore` is still honored. Set SKIP_PRETTIER=1 to bypass in an emergency.
 # NOTE: this reads files from the worktree, not the index, so a partially staged file
 # (`git add -p`) is judged on its full contents. ---
 if [ -z "$SKIP_PRETTIER" ]; then

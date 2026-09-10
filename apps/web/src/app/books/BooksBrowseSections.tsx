@@ -1,5 +1,5 @@
 /**
- * `/books` catalogue body: search, state facet chips in the room kit's own chip vocabulary
+ * `/books` catalog body: search, state facet chips in the room kit's own chip vocabulary
  * (the same `ds-room-chip` markup `/records` renders from the Lens, per
  * docs/ui/design-direction-v9-surfaces.md §4.2), and rip rows through `HairlineIndex`.
  *

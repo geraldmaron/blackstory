@@ -1,4 +1,4 @@
-cofips,county,state,year,type,filings,filing_rate,threatened,threatened_rate,judgements,judgement_rate
+cofips,county,state,year,type,filings,filing_rate,threatened,threatened_rate,judgments,judgement_rate
 13121,Fulton County,Georgia,2016,observed,37087,18.66,25471,12.82,,
 24033,Prince George's County,Maryland,2016,observed,45000,114.03,44000,111.5,,
 13121,Fulton County,Georgia,2018,estimated,100,8.4,90,7.5,,

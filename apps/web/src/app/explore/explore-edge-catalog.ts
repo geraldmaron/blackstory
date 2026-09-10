@@ -5,7 +5,7 @@
  * The catalog carries every edge ONCE (`allTime`) and each decade as a list of edge ids into
  * it. The earlier shape shipped a full `{ edges, lineCollection }` per decade, and because a
  * decade edge is byte-identical to its all-time counterpart (same relationship, same citations,
- * same geo anchors), that was the same 746 edges serialised ~40 times over — 7 MB of an 8.5 MB
+ * same geo anchors), that was the same 746 edges serialized ~40 times over — 7 MB of an 8.5 MB
  * catalog on the wire. Slicing here costs one pass over `allTime` per decade change.
  */
 import type { ExploreViewState } from '../../lib/map-experience/url-state';

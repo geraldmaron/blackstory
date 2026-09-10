@@ -17,7 +17,7 @@ describe('shouldPersistQuery (never-cache allow-list at the persist boundary)', 
     expect(shouldPersistQuery({ queryKey: ['correction-draft'] })).toBe(false);
   });
 
-  it('honours an explicit meta.persist === false opt-out', () => {
+  it('honors an explicit meta.persist === false opt-out', () => {
     expect(shouldPersistQuery({ queryKey: ['entity', 'e1'], meta: { persist: false } })).toBe(false);
   });
 });

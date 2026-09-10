@@ -65,7 +65,7 @@ One canvas, two modes, no page-to-page reload of the map plate.
 | Record sheet | 40 | Right-anchored slab, radius-lg, 3px copper left rule. |
 | Command bar | 50 | Fixed top. Brand, `⌘K` trigger, mode switch, tools. |
 | Palette / overlays | 90 | Command palette, shortcuts, collections. |
-| Toasts | 95 | Bottom centre, above the Time panel. |
+| Toasts | 95 | Bottom center, above the Time panel. |
 
 **Theme:** follows reader `data-theme`. Both light (Archive Paper) and dark (Black Ink) are first-class. No forced-dark cockpit; that v5 rule stays dead.
 
@@ -151,10 +151,10 @@ Camera drama is permitted for **geography and scale**. It is not permitted to dr
 | Zone | Contents |
 |---|---|
 | Left | Official symbol artwork alone, from `BRAND_ASSETS.symbol`, light and dark pair swapping on `data-theme`, then the `ATLAS` mono tag |
-| Centre | **`⌘K` trigger**: pill, `max-width: 520px`, placeholder `Search 4,078 records, places, eras…`, right-aligned `⌘K` kbd chip |
+| Center | **`⌘K` trigger**: pill, `max-width: 520px`, placeholder `Search 4,078 records, places, eras…`, right-aligned `⌘K` kbd chip |
 | Right | Mode switch (`Atlas` / `Story`), divider, Saved (with count badge), Shortcuts, Theme |
 
-The centre slot is the single most important change in v9. **Navigation moves into the palette.** The bar carries two modes, not fourteen destinations.
+The center slot is the single most important change in v9. **Navigation moves into the palette.** The bar carries two modes, not fourteen destinations.
 
 Mobile (<820px): drop the mode switch labels and the `ATLAS` tag; keep symbol + search + tools.
 
@@ -201,7 +201,7 @@ Group order, top to bottom:
 6. **Deepest coverage**: presence bars, state name + mono count, `--sand` track filling to `--copper-graphic` on hover
 7. **Reset lens**: ghost, full-width, left-aligned
 
-Colour key moves into the palette (`⌘K` → "legend") and the record sheet, where the encoding is actually being read.
+Color key moves into the palette (`⌘K` → "legend") and the record sheet, where the encoding is actually being read.
 
 ### 5.3 Results (right, z 20)
 
@@ -215,7 +215,7 @@ Row anatomy, `grid-template-columns: 18px 1fr auto`:
 
 Selected row: `--copper-wash` fill, 2.5px copper left rule, `aria-selected`.
 
-### 5.4 Time (bottom centre, z 20)
+### 5.4 Time (bottom center, z 20)
 
 Width `min(760px, 100vw - 24px)`.
 
@@ -255,7 +255,7 @@ Opening the sheet hides the Results rail and pushes the camera to the pin. Closi
 ### 5.7 Dock, readout, attribution
 
 - **Dock** (bottom left): chips to restore any hidden panel
-- **Readout** (bottom centre, above Time): transient camera status: `**Wide** · continental`, `**Fly to** · Birmingham, Alabama`. `role="status"`, `aria-live="polite"`. 2.4s.
+- **Readout** (bottom center, above Time): transient camera status: `**Wide** · continental`, `**Fly to** · Birmingham, Alabama`. `role="status"`, `aria-live="polite"`. 2.4s.
 - **Attribution** (bottom left pill): OpenFreeMap · © OpenStreetMap, mono 9px
 
 ---
@@ -276,7 +276,7 @@ Scroll-driven cinema over the same persistent map plate. Six chapters. This repl
 Mechanics:
 - `IntersectionObserver` on `.chapter`, `threshold: 0.42`, `root: #story`
 - Camera spec lives in `data-cam` as JSON; beats in `data-spot`, `data-routes`, `data-focus`, `data-sweep`
-- Chapter cards alternate left/right; cold open and outro centre
+- Chapter cards alternate left/right; cold open and outro center
 - Right-edge progress rail with chapter labels on hover
 - Reduced motion: chapters still advance, camera cuts, sweep runs at 400ms, no kinetic type
 
@@ -290,7 +290,7 @@ Mechanics:
 
 All of these ship in v1. They are the difference between a site and a tool.
 
-| Capability | Trigger | Behaviour |
+| Capability | Trigger | Behavior |
 |---|---|---|
 | Command palette | `⌘K`, `/`, click trigger | Records + state jumps + actions, fuzzy, `↑↓` navigate, `↵` open, `⌘↵` fly to, highlighted match via `<mark>` |
 | Shortcut sheet | `?` | Four columns: Find, Camera, Records, View |

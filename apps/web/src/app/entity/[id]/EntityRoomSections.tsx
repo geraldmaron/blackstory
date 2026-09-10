@@ -200,7 +200,7 @@ function relationPhrase(relationType: string, direction: 'outgoing' | 'incoming'
  *
  * `firstPaintRelation` returns undefined when the stored token would not survive being read
  * aloud; those records are simply left out, and the tree then shows the record's name with no
- * phrase above it. Built here rather than passed as a callback so the shape stays serialisable
+ * phrase above it. Built here rather than passed as a callback so the shape stays serializable
  * across the server boundary.
  */
 function firstPaintNodeLabels(entity: PublicEntityView): Record<string, string> {

@@ -49,14 +49,14 @@ function edgeId(from: string, to: string, type: string): string {
 
 export function planContributorEdges(): {
   readonly edges: readonly PlannedEdge[];
-  readonly unmodelled: readonly { readonly name: string; readonly invention: string }[];
+  readonly unmodeled: readonly { readonly name: string; readonly invention: string }[];
 } {
   const edges: PlannedEdge[] = [];
-  const unmodelled: { name: string; invention: string }[] = [];
+  const unmodeled: { name: string; invention: string }[] = [];
   for (const invention of INVENTION_COHORT) {
     for (const contributor of invention.contributors) {
       if (contributor.entityId === undefined) {
-        unmodelled.push({ name: contributor.name, invention: invention.displayName });
+        unmodeled.push({ name: contributor.name, invention: invention.displayName });
         continue;
       }
       edges.push({
@@ -69,14 +69,14 @@ export function planContributorEdges(): {
       });
     }
   }
-  return { edges, unmodelled };
+  return { edges, unmodeled };
 }
 
 async function main(): Promise<void> {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) throw new Error('DATABASE_URL is required');
 
-  const { edges, unmodelled } = planContributorEdges();
+  const { edges, unmodeled } = planContributorEdges();
   const { connectionString: cs, ssl } = normalizePgConnectionString(connectionString);
   const client = new pg.Client({ connectionString: cs, ...(ssl ? { ssl } : {}) });
   await client.connect();
@@ -111,9 +111,9 @@ async function main(): Promise<void> {
         );
       }
     }
-    if (unmodelled.length > 0) {
-      console.log(`\nnamed on the receipt, no person record by design (${unmodelled.length}):`);
-      for (const entry of unmodelled) {
+    if (unmodeled.length > 0) {
+      console.log(`\nnamed on the receipt, no person record by design (${unmodeled.length}):`);
+      for (const entry of unmodeled) {
         console.log(`  ${entry.name} — ${entry.invention}`);
       }
     }

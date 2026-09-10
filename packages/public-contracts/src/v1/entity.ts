@@ -50,7 +50,7 @@ export const ENTITY_KINDS = [
   'publication',
   'artifact',
   'movement',
-  // A technology or process a reader recognises as a thing, distinct from `artifact` (an
+  // A technology or process a reader recognizes as a thing, distinct from `artifact` (an
   // object). An invention needs no patent to exist: patent access was unequal, and innovation
   // that never entered the patent system is still innovation.
   'invention',

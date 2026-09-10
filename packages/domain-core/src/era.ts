@@ -159,7 +159,7 @@ export function deriveEraBuckets(span: EraSpan): readonly string[] {
  * (`scrape-nrhp-black-heritage-roster.ts`) publishes a `Listed Date` and no period of
  * significance, so `deriveCatalogEntityStatus` picks the listing year as `validFrom` and
  * every downstream era derivation reads it as the site's era. That is how a lowcountry
- * cemetery came to be labelled "2000s".
+ * cemetery came to be labeled "2000s".
  *
  * The rule below is deliberately evidence-based rather than source-based: a year is a
  * designation year when the record's own claims only ever mention it inside a designation

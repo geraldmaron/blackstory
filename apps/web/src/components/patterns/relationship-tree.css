@@ -13,7 +13,7 @@
 .ds-reltree {
   --reltree-rail: color-mix(in srgb, var(--ds-ink-muted) 42%, transparent);
   --reltree-lit: var(--ds-accent);
-  /* Where a branch's elbow meets its card: the vertical centre of the card's first text line. */
+  /* Where a branch's elbow meets its card: the vertical center of the card's first text line. */
   --reltree-elbow: 1.55rem;
   --reltree-indent: 1.6rem;
 

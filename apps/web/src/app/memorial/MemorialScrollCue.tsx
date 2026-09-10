@@ -158,7 +158,7 @@ export function MemorialScrollCue({
 
     // `scrollend` is the precise signal; the timeout covers browsers without it,
     // and the case where the scroll never starts (already at the destination, or
-    // cancelled before it moved) so no scrollend ever fires.
+    // canceled before it moved) so no scrollend ever fires.
     let fallback = 0;
     function schedule(delay = 700) {
       fallback = window.setTimeout(settle, delay);

@@ -20,7 +20,7 @@ export const ENTITY_KINDS = [
   'artifact',
   'movement',
   /**
-   * A technology or process a reader recognises as a thing: Latimer's carbon-manufacturing
+   * A technology or process a reader recognizes as a thing: Latimer's carbon-manufacturing
    * process, Matzeliger's lasting machine, Morgan's three-position traffic signal, the
    * West/Sessler electret microphone.
    *

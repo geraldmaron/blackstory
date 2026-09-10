@@ -12,7 +12,7 @@
  * the person, the park keeps the park.
  *
  * Every claim written here is copied from a claim already published in this catalog on a
- * neighbouring entity (the park, the Combahee raid, the Auburn home), with its citation. No new
+ * neighboring entity (the park, the Combahee raid, the Auburn home), with its citation. No new
  * sources, no new facts.
  *
  * The audit pass runs unconditionally and reports any other person record showing the same
@@ -59,7 +59,7 @@ type Claim = {
 };
 
 /**
- * Her life, from claims already published on neighbouring entities. Sources carried over
+ * Her life, from claims already published on neighboring entities. Sources carried over
  * unchanged: the park record (nps.gov/hatu), the Combahee raid record
  * (nps.gov/articles/000/we-called-ourselves-combee.htm), the Auburn home record (nps.gov/hart).
  */

@@ -53,7 +53,7 @@ describe('surface class resolution', () => {
     assert.ok(!CLASSIFIED_PATHS.includes('/story'));
   });
 
-  it('separates a catalogue index from its record pages', () => {
+  it('separates a catalog index from its record pages', () => {
     assert.equal(surfaceClassFor('/books'), 'reading');
     assert.equal(surfaceClassFor('/books/the-bluest-eye'), 'record');
     assert.equal(surfaceClassFor('/law'), 'reading');

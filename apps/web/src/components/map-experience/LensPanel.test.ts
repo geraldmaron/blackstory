@@ -1,7 +1,7 @@
 /**
  * Lens: the tabs are gone, every group is present in one pass, and the controls announce state.
  *
- * The "no tabs" assertion is the point of the package. v6 hid the colour key and half the filters
+ * The "no tabs" assertion is the point of the package. v6 hid the color key and half the filters
  * behind a segmented control; a regression that reintroduces tabs would look fine in a screenshot
  * and quietly undo the change, so the absence is asserted rather than assumed.
  */

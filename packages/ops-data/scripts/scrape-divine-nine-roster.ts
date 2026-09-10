@@ -396,7 +396,7 @@ function stripTags(html: string): string {
   return (
     html
       // `[^>]*` after the end-tag name: an end tag runs to the first `>`, so `</script >` and
-      // `</script\t\n bar>` close the element and browsers honour both. A stricter pattern leaves
+      // `</script\t\n bar>` close the element and browsers honor both. A stricter pattern leaves
       // the element's contents in the extracted text (CodeQL js/bad-tag-filter).
       .replace(/<script\b[^>]*>[\s\S]*?<\/script\b[^>]*>/giu, ' ')
       .replace(/<style\b[^>]*>[\s\S]*?<\/style\b[^>]*>/giu, ' ')

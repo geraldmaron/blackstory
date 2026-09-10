@@ -137,7 +137,7 @@ test('cancel stops the sweep and leaves no timer behind', () => {
   assert.equal(clock.pending(), 0);
 });
 
-test('cancelling a finished sweep is safe', () => {
+test('canceling a finished sweep is safe', () => {
   const clock = fakeClock();
   const handle = sweep({
     from: 1900,
@@ -222,7 +222,7 @@ test('an explicit clear hold overrides the default', () => {
   assert.deepEqual(delays, [2200]);
 });
 
-test('cancelling during the cleared hold leaves no timer and emits no decade', () => {
+test('canceling during the cleared hold leaves no timer and emits no decade', () => {
   const clock = fakeClock();
   const seen: number[] = [];
   const handle = sweep({

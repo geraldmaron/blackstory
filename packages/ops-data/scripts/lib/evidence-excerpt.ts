@@ -30,7 +30,7 @@
  * (Full note on how a passage is scored is on `scorePassage` below.) Taking matches in order fills the budget with the
  * first weak hit ("black walnut woodwork", "Black Heritage" on the Areas of Significance line) and
  * never reaches the narrative. Scoring by weighted term density puts the passage that discusses a
- * Black community ahead of the passage that mentions a colour.
+ * Black community ahead of the passage that mentions a color.
  */
 
 import { measureTextQuality, scoreTextQuality } from './evidence-collectors/text-quality.ts';
@@ -38,7 +38,7 @@ import { measureTextQuality, scoreTextQuality } from './evidence-collectors/text
 /**
  * Terms whose presence marks a passage as carrying the lane's subject matter, with a weight for
  * how strongly. Multi-word phrases score high because they are almost never incidental; the bare
- * colour words score low because a nomination form uses them for paint, walnut, and slate.
+ * color words score low because a nomination form uses them for paint, walnut, and slate.
  *
  * "black" at weight 1 earns its place despite the noise: period nominations write "blacks in
  * Charles Town" and "the black community" far more often than they write "African American", and
@@ -85,7 +85,7 @@ const LANE_TERM_WEIGHTS: ReadonlyArray<readonly [string, number]> = [
   ['negro', 2],
   ['negroes', 2],
   ['colored', 2],
-  ['coloured', 2],
+  ['colored', 2],
   ['mulatto', 2],
   ['ethnic heritage', 2],
   ['black', 1],
@@ -267,7 +267,7 @@ export function excerptForWindow(text: string, cap: number): EvidenceExcerpt {
     span.score = scorePassage(text.slice(span.start, span.end), span.terms, span.hits);
   }
 
-  // Highest-scoring first, so the budget buys narrative rather than whichever colour word the
+  // Highest-scoring first, so the budget buys narrative rather than whichever color word the
   // building inventory used earliest, or whichever caption list repeats a term the most.
   const byScore = [...merged].sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
@@ -305,7 +305,7 @@ export function excerptForWindow(text: string, cap: number): EvidenceExcerpt {
   for (const span of chosen) {
     const start = snap(text, span.start, -1);
     const end = snap(text, span.end, 1);
-    // A merge pass ran over the pre-snap spans, but snapping can still make two neighbours touch.
+    // A merge pass ran over the pre-snap spans, but snapping can still make two neighbors touch.
     if (start <= previousEnd) {
       if (end <= previousEnd) continue;
       const continuation = text.slice(previousEnd, end);

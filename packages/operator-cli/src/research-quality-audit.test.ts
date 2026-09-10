@@ -58,7 +58,7 @@ test('a patent host is a patent specification', () => {
   );
 });
 
-test('an unrecognised host lands in the middle, not at the bottom', () => {
+test('an unrecognized host lands in the middle, not at the bottom', () => {
   // Calling a state historical society a lead would understate real evidence more often than
   // calling an unknown blog a secondary source overstates it.
   assert.equal(

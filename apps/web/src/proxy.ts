@@ -1,7 +1,7 @@
 /**
  * Edge web security composed with query normalization, behind the maintenance wall.
  *
- * Was `middleware.ts`. Next 16 deprecated that file convention in favour of `proxy`; the rename is
+ * Was `middleware.ts`. Next 16 deprecated that file convention in favor of `proxy`; the rename is
  * the whole migration — same request object, same `config.matcher` semantics, same edge runtime.
  * Only the file name and the exported function name changed.
  */

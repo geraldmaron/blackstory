@@ -631,7 +631,7 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
         <EntitySessionNavClient currentId={entity.id} orderedIds={orderedIds} />
         {/*
           The topic and era chips are ways onward, not facts about this record, so they sit with
-          the other ways onward. They used to open the document column, a strip of unlabelled
+          the other ways onward. They used to open the document column, a strip of unlabeled
           chips between the actions and the first beat, restating an era the masthead pill had
           already stated and delaying the record's own first sentence.
         */}

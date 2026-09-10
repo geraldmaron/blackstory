@@ -558,7 +558,7 @@ export function MapStageProvider({
    * teardown still belongs to a single unmount effect.
    */
   const initStartedRef = useRef(false);
-  const cancelledRef = useRef(false);
+  const canceledRef = useRef(false);
   const resizeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const resizeLifecycleRef = useRef<ReturnType<typeof bindMapResizeLifecycle> | undefined>(
     undefined,
@@ -639,7 +639,7 @@ export function MapStageProvider({
    * after load, the 1800ms fallback, state polygons landing) race, and only the first counts.
    */
   const markPlateReady = useCallback(() => {
-    if (cancelledRef.current || plateReadyRef.current) return;
+    if (canceledRef.current || plateReadyRef.current) return;
     plateReadyRef.current = true;
     stampPlateReady(plateRef.current);
     notify(listenersRef.current, 'ready');
@@ -1296,7 +1296,7 @@ export function MapStageProvider({
    * when, a surface has spoken to the stage.
    */
   const ensureMap = useCallback(() => {
-    if (initStartedRef.current || cancelledRef.current) return;
+    if (initStartedRef.current || canceledRef.current) return;
     if (!containerRef.current || mapRef.current) return;
     initStartedRef.current = true;
     const container = containerRef.current;
@@ -1312,7 +1312,7 @@ export function MapStageProvider({
         // Two imports can be in flight at once (StrictMode re-runs the surface's first patch
         // after the re-arm above); whichever resolves second must not build a second map into
         // the same container.
-        if (cancelledRef.current || !container.isConnected || mapRef.current) return;
+        if (canceledRef.current || !container.isConnected || mapRef.current) return;
 
         // The style prop was built on the server, which cannot read `<html data-theme>`. Re-resolve
         // the plate against the document BEFORE the first frame so a light-theme reader never sees
@@ -1355,11 +1355,11 @@ export function MapStageProvider({
           console.error('[MapStage]', event.error);
         });
       } catch {
-        if (!cancelledRef.current) markMapUnavailable();
+        if (!canceledRef.current) markMapUnavailable();
         return;
       }
 
-      if (cancelledRef.current || !map) {
+      if (canceledRef.current || !map) {
         map?.remove();
         mapRef.current = null;
         return;
@@ -1488,10 +1488,10 @@ export function MapStageProvider({
         contextRecoveryRef.current = bindWebGlContextRecovery(
           canvas,
           () => {
-            if (!cancelledRef.current) markMapUnavailable();
+            if (!canceledRef.current) markMapUnavailable();
           },
           () => {
-            if (!cancelledRef.current) activeMap.resize();
+            if (!canceledRef.current) activeMap.resize();
           },
         );
         if (activeMap.getLayer(EXPLORE_STATE_DENSITY_LAYER_ID)) {
@@ -1575,17 +1575,17 @@ export function MapStageProvider({
     /*
      * Re-arm on (re)mount. React StrictMode runs this effect, its cleanup, then the effect again
      * on the same instance in development, and the refs survive that round trip. Without this
-     * reset the simulated unmount below left `cancelledRef` true for the life of the page: the
+     * reset the simulated unmount below left `canceledRef` true for the life of the page: the
      * first `patchData` had already started the `maplibre-gl` import, the import resolved into a
      * canceled provider and returned, and no later call could retry because `initStartedRef`
      * was still set. The chunk loaded, the plate never built, and every dev session showed the
      * Albers underlay in place of the map — a failure invisible in production, where StrictMode
      * does not double-invoke.
      */
-    cancelledRef.current = false;
+    canceledRef.current = false;
     initStartedRef.current = false;
     return () => {
-      cancelledRef.current = true;
+      canceledRef.current = true;
       pendingFlyRef.current = null;
       decadeFadeGenerationRef.current += 1;
       decadeDissolveInFlightRef.current = false;

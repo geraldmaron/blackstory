@@ -4,7 +4,7 @@
  *
  * Speaker: the archive describing what its figures do and do not carry. No first person here.
  * Every sentence about a number is a sentence about a published series, never about the
- * archive's own catalogue: the counted breakdown of records is not a figure on this page.
+ * archive's own catalog: the counted breakdown of records is not a figure on this page.
  */
 
 export const DATA_PAGE_DESCRIPTION =

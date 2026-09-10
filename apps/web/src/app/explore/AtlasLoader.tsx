@@ -77,21 +77,21 @@ export function AtlasLoader({ shell, pins, catalogUrl = ATLAS_CATALOG_PATH }: At
       return;
     }
     const controller = new AbortController();
-    let cancelled = false;
+    let canceled = false;
     setError(false);
     fetchAtlasCatalog(catalogUrl, controller.signal).then(
       (payload) => {
-        if (!cancelled) {
+        if (!canceled) {
           setCatalog(payload);
           setError(false);
         }
       },
       () => {
-        if (!cancelled) setError(true);
+        if (!canceled) setError(true);
       },
     );
     return () => {
-      cancelled = true;
+      canceled = true;
       controller.abort();
     };
   }, [catalogUrl, attempt]);

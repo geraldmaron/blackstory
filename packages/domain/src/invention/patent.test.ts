@@ -74,7 +74,7 @@ test('a genuinely single-inventor patent supports a sole attribution', () => {
   assert.doesNotThrow(() => assertSoleInventorClaimSupported(patent(), 'ent_latimer'));
 });
 
-test('a co-inventor outside the catalog is still modelled, not dropped', () => {
+test('a co-inventor outside the catalog is still modeled, not dropped', () => {
   // not_in_scope means "a real person we deliberately do not have a record for", which is very
   // different from the name never having existed.
   const gammaCell = patent({
@@ -133,7 +133,7 @@ test('a receipt must say what it was read from', () => {
 });
 
 test('the published inventor name is kept exactly, including its period spelling', () => {
-  // Normalising "Jan E. Matzeliger" away would lose evidence about the document.
+  // Normalizing "Jan E. Matzeliger" away would lose evidence about the document.
   const p = patent({
     patentNumber: '274207',
     title: 'Lasting-Machine',

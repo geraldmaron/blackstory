@@ -64,7 +64,7 @@
   vertical-align: -0.1em;
 }
 
-/* Pill: icon plus word. Surface-coloured; only the icon takes a tone. */
+/* Pill: icon plus word. Surface-colored; only the icon takes a tone. */
 .ds-rec-pill {
   display: inline-flex;
   align-items: center;
@@ -127,13 +127,13 @@ a.ds-rec-pill:focus-visible {
 }
 
 /*
- * Meter: three bars. Colour carries the tone, the aria-label carries the word, and the number
- * of filled bars carries it again without colour.
+ * Meter: three bars. Color carries the tone, the aria-label carries the word, and the number
+ * of filled bars carries it again without color.
  *
  * Every `--rec-tone-*` here is read with its global fallback, the same way this file already
  * reads room-kit tokens. The tone aliases are declared on `.ds-room` and `.ds-sheet` only, so
  * a meter drawn anywhere else — the results rail is the first — resolved them to nothing and
- * painted three invisible bars. The aliases are colour, not part of the host's type scale, so
+ * painted three invisible bars. The aliases are color, not part of the host's type scale, so
  * falling back to the `--ds-confidence-*` token they point at is exact, not approximate.
  */
 .ds-rec-meter {

@@ -60,7 +60,7 @@
 
 /*
  * The board as a mask, not a tinted plate: SVG alpha (land 0.32, hairlines 1) paints the plate's
- * own land ink, so the board and the plate share one ground colour in both themes.
+ * own land ink, so the board and the plate share one ground color in both themes.
  */
 .ds-explore-underlay__ground {
   position: absolute;

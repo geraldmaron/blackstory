@@ -245,6 +245,7 @@ export const notabilityCriterionSchema = z.enum([
   'movement_significance',
   'documented_site',
   'documented_contribution',
+  'documented_racial_terror',
   'community_anchor',
   'only_or_oldest',
 ]);

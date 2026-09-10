@@ -100,7 +100,7 @@ export type QualityVerdict = {
 };
 
 /**
- * Strips characters Postgres cannot store in a `text` column, and the neighbours that carry no
+ * Strips characters Postgres cannot store in a `text` column, and the neighbors that carry no
  * meaning alongside them.
  *
  * NUL (0x00) is the one that actually fails: a `text` value is a C string server-side, so a

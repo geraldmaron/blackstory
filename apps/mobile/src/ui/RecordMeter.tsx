@@ -7,7 +7,7 @@
  * the reader opened. The segment count, the letter and the spoken sentence all come from
  * `@repo/public-contracts/evidence` so that cannot happen again.
  *
- * Colour is never the only cue: the letter rides beside the bars, and the whole mark carries one
+ * Color is never the only cue: the letter rides beside the bars, and the whole mark carries one
  * `accessibilityLabel` sentence. `unrated` draws no filled segment and prints a middot, because a
  * record nobody assessed is not a weak record.
  */
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     width: 7,
   },
   letter: {
-    // The letter is the non-colour cue, so it stays legible at the smallest row density.
+    // The letter is the non-color cue, so it stays legible at the smallest row density.
     minWidth: 8,
     textAlign: 'center',
   },

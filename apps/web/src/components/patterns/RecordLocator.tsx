@@ -29,7 +29,7 @@
  * right there, and both of them work regardless of WebGL, posture, or which surface this is on.
  *
  * The ground is `public/geo/us-locator.svg` applied as a CSS mask, so it is fetched once for the
- * whole archive, costs the JS bundle nothing, and still takes its colour from a theme token.
+ * whole archive, costs the JS bundle nothing, and still takes its color from a theme token.
  */
 import React from 'react';
 import { locatorPinPercent } from '../../lib/map-experience/albers-usa';

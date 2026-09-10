@@ -100,7 +100,7 @@ describe('destination registry · coverage', () => {
     }
   });
 
-  it('a record goes up to the catalogue that lists it', () => {
+  it('a record goes up to the catalog that lists it', () => {
     // An entity and a place both parent to Records. A breadcrumb states where a page SITS; the
     // way back to a map selection is return state, not hierarchy.
     assert.equal(parentPathFor('/entity/tulsa-greenwood'), '/records');

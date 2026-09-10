@@ -323,7 +323,7 @@ export const SATELLITE_RASTER_PAINT = {
     'raster-saturation': -0.28,
     'raster-contrast': -0.08,
     'raster-brightness-min': 0,
-    // Caps snow, sand and bare roofs, which are what blow out under paper-coloured labels.
+    // Caps snow, sand and bare roofs, which are what blow out under paper-colored labels.
     'raster-brightness-max': 0.88,
   },
 } as const;
@@ -349,7 +349,7 @@ export const SATELLITE_STATE_FILL_OPACITY = 0.45;
  *
  * Only cartography ink moves. Pin, cluster and density encoding are untouched: they are the
  * archive's data, they already sit above everything, and changing them by basemap would mean the
- * same record read as a different colour depending on a toggle.
+ * same record read as a different color depending on a toggle.
  */
 export function plateOverImagery(scheme: MapColorScheme): MapPlate {
   const base = plateForScheme(scheme);
@@ -357,7 +357,7 @@ export function plateOverImagery(scheme: MapColorScheme): MapPlate {
     return {
       ...base,
       // Imagery is lifted toward white, so ink stays dark — but goes to full black rather than
-      // the plate's softer greys, which disappear into mid-tone terrain.
+      // the plate's softer grays, which disappear into mid-tone terrain.
       placeLabel: brandPalette.blackInk,
       placeLabelHi: brandPalette.blackInk,
       placeLabelHalo: LIGHT_PLATE_OCEAN,

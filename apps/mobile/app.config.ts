@@ -274,7 +274,7 @@ const config: ExpoConfig = {
     // uses http://10.0.2.2:8080 to reach the host machine's :8080.
     ...(APP_VARIANT !== 'production' ? { usesCleartextTraffic: true } : {}),
     //
-    // Android App Links (MOB-008), the Android analogue of iOS associatedDomains above:
+    // Android App Links (MOB-008), the Android analog of iOS associatedDomains above:
     // autoVerify asks Android to verify this app against the real assetlinks.json served
     // from https://blackstory.app/.well-known/assetlinks.json before treating the app as the
     // default handler for that host — see apps/mobile/public/.well-known/README.md for

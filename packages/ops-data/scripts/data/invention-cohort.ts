@@ -45,7 +45,7 @@ export type InventionCohortRecord = {
    * later slogan claims followed from it.
    */
   readonly impactStatement: string;
-  /** Everyone the grant or the historical account names, in the order this record centres them. */
+  /** Everyone the grant or the historical account names, in the order this record centers them. */
   readonly contributors: readonly InventionContributor[];
   readonly city: string;
   readonly state: string;
@@ -124,7 +124,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     historicalContext:
       'The safety hood and the traffic signal are separate contributions. Folding both into "Garrett Morgan invented safety equipment" erases the document each grant actually is. The hood is held here on its own.',
     impactStatement:
-      'The hood was built for breathing in smoke, and Morgan used it himself in the 1916 Cleveland waterworks tunnel rescue. Orders from fire departments are reported to have been cancelled once buyers learned he was Black. What the device did and how the market received its inventor are the same record, and separating them would flatter the period.',
+      'The hood was built for breathing in smoke, and Morgan used it himself in the 1916 Cleveland waterworks tunnel rescue. Orders from fire departments are reported to have been canceled once buyers learned he was Black. What the device did and how the market received its inventor are the same record, and separating them would flatter the period.',
     contributors: [
       { name: 'Garrett A. Morgan', predicate: 'invented', entityId: 'ent_garrett_morgan_001' },
     ],
@@ -321,7 +321,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     historicalContext:
       'Company assignment is a fact about ownership of the grant, not about who designed the machine. The patent prints Joyner as inventor and Walker Manufacturing as assignee. Both facts stay. Chicago is the city tied to that work.',
     impactStatement:
-      'The machine standardised a salon service in the Black beauty industry, one of the few sectors where Black women built independent businesses and trained one another into them. Joyner taught in that system for decades and helped organise a national cosmetology association, so the machine sits inside a training network rather than alone.',
+      'The machine standardized a salon service in the Black beauty industry, one of the few sectors where Black women built independent businesses and trained one another into them. Joyner taught in that system for decades and helped organize a national cosmetology association, so the machine sits inside a training network rather than alone.',
     contributors: [
       { name: 'Marjorie S. Joyner', predicate: 'invented', entityId: 'ent_marjorie_joyner_001' },
     ],
@@ -433,7 +433,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     historicalContext:
       'This is a co-invention test the grant itself settles: two names appear. The record may center Marie Van Brittan Brown and still has to keep Albert on the receipt. Queens is the city, not a residential street.',
     impactStatement:
-      'Camera, monitor, remote door release, alarm to police: that is still the shape of home security. Brown was a nurse on shift work in Queens, and the system answers a specific condition, which was how long police took to arrive in her neighbourhood. The invention is a response to unequal protection as much as a piece of hardware.',
+      'Camera, monitor, remote door release, alarm to police: that is still the shape of home security. Brown was a nurse on shift work in Queens, and the system answers a specific condition, which was how long police took to arrive in her neighborhood. The invention is a response to unequal protection as much as a piece of hardware.',
     contributors: [
       {
         name: 'Marie Van Brittan Brown',
@@ -519,7 +519,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     historicalContext:
       'The 1840s grant is a process apparatus for sugar refining. Later improvements by other people are not this patent. New Orleans is the city the historical account ties to the sugar work, not a plantation house treated as the invention site.',
     impactStatement:
-      'Multiple-effect evaporation cut the fuel and the labour that sugar refining took, and the principle is still standard in industrial evaporation. Rillieux was born in Louisiana to an enslaved mother, and the refineries his apparatus made profitable ran on enslaved labour. The record holds the engineering and that fact together, because the period did.',
+      'Multiple-effect evaporation cut the fuel and the labor that sugar refining took, and the principle is still standard in industrial evaporation. Rillieux was born in Louisiana to an enslaved mother, and the refineries his apparatus made profitable ran on enslaved labor. The record holds the engineering and that fact together, because the period did.',
     contributors: [
       { name: 'Norbert Rillieux', predicate: 'invented', entityId: 'ent_norbert_rillieux_001' },
     ],
@@ -546,7 +546,7 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
     historicalContext:
       'The Naval Research Laboratory is the institutional site of the work. A patent, where one exists, is a receipt for a narrower claim and is not required for this instrument to be an invention. Washington is city precision for the laboratory, not a street address.',
     impactStatement:
-      "The camera flew on Apollo 16 and returned the first far-ultraviolet images of Earth's outer atmosphere taken from the surface of the Moon. Carruthers spent decades afterward running science education programmes for Black students in Washington, D.C., which is the part of the record that reached people rather than instruments.",
+      "The camera flew on Apollo 16 and returned the first far-ultraviolet images of Earth's outer atmosphere taken from the surface of the Moon. Carruthers spent decades afterward running science education programs for Black students in Washington, D.C., which is the part of the record that reached people rather than instruments.",
     contributors: [
       {
         name: 'George R. Carruthers',

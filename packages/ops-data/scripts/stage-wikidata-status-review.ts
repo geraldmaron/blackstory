@@ -63,7 +63,7 @@ const FETCH_DELAY_MS = Number(process.env.WIKIDATA_FETCH_DELAY_MS ?? 400);
  * Optional comma-separated entity-id allowlist (repo-n7p6.23). Re-running the full sweep to
  * re-check a handful of repaired QIDs would re-stage every other unknown person alongside them,
  * churning the operator's review lane for no new information. Empty means "every unknown person",
- * the original behaviour.
+ * the original behavior.
  */
 const ONLY_ENTITY_IDS = new Set(
   (process.env.WIKIDATA_STATUS_REVIEW_ENTITY_IDS ?? '')

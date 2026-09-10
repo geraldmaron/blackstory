@@ -106,7 +106,7 @@ test('NOTABILITY_RUBRIC documents reviewable rubric text for every criterion', (
   // told a reader it was "a documented site of a historically significant event or practice (a
   // sit-in lunch counter, a Freedom School…)". Adding a criterion is a rubric decision, which is
   // why this count is pinned rather than derived.
-  assert.equal(NOTABILITY_CRITERIA.length, 9);
+  assert.equal(NOTABILITY_CRITERIA.length, 10);
   for (const criterion of NOTABILITY_CRITERIA) {
     assert.equal(typeof NOTABILITY_RUBRIC[criterion], 'string');
     assert.ok(NOTABILITY_RUBRIC[criterion].length > 20, `${criterion} rubric text is too thin`);

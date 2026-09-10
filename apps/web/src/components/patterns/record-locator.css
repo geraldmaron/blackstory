@@ -101,7 +101,7 @@
 
 /*
  * The ground is a mask, not an image: the SVG carries alpha (land at 0.32, state hairlines at 1)
- * and the colour comes from here, so the same one asset is correct in both themes instead of
+ * and the color comes from here, so the same one asset is correct in both themes instead of
  * needing a light copy and a dark copy that drift.
  */
 .ds-locator__ground {

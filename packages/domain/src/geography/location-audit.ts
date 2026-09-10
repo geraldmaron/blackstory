@@ -440,7 +440,7 @@ export function placeTitleCandidateFromLabel(locationLabel: string): string {
  */
 export function placeTitleCandidatesFromLabel(locationLabel: string): readonly string[] {
   const cleaned = locationLabel
-    // No `\s*` either side: the collapse below already normalises whitespace, and the two
+    // No `\s*` either side: the collapse below already normalizes whitespace, and the two
     // optional runs around the group were the ambiguity (CodeQL js/polynomial-redos).
     .replace(/\([^()]*\)/g, ' ')
     .replace(/\s+/g, ' ')

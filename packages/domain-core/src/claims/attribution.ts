@@ -11,7 +11,7 @@
  * model is the wrong instrument for a rule that must never drift.
  *
  * It reports; it does not rewrite. A finding here is a research task or a correction, not a
- * licence to auto-edit published prose.
+ * license to auto-edit published prose.
  */
 import {
   type AssertionClass,

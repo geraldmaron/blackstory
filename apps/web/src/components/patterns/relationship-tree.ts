@@ -11,7 +11,7 @@
  * What is here instead is a tree of the same graph. No pixels: the component renders nested lists
  * and the browser does the layout, so text wraps instead of clipping and nothing can overlap
  * anything. Distance from the record is carried by indentation and the line drawn into each card,
- * not by a labelled lane, so the word "hop" never has to appear.
+ * not by a labeled lane, so the word "hop" never has to appear.
  *
  *   Dunbar High School
  *   └── taught here ── Anna Cooper (1900)
@@ -100,7 +100,7 @@ function compare(a: RelationshipTreeNodeInput, b: RelationshipTreeNodeInput): nu
  * Attach every record to the record it was first reached through.
  *
  * `viaId` is the graph builder's answer to that, but it can point at a record that was capped out
- * of the payload. Those fall back to hanging off the centre rather than vanishing: a record with
+ * of the payload. Those fall back to hanging off the center rather than vanishing: a record with
  * a connection the archive knows about should appear, even when the link that found it did not
  * survive the fetch budget.
  */
@@ -120,7 +120,7 @@ export function buildRelationshipTree(
   }
 
   // A cycle in `viaId` would hang the walk below. Any node whose ancestry does not reach the
-  // centre within the graph's own depth is re-parented onto it.
+  // center within the graph's own depth is re-parented onto it.
   for (const node of graph.nodes) {
     let cursor = parentOf.get(node.id);
     let guard = 0;

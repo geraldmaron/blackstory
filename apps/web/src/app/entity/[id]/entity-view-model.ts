@@ -17,7 +17,7 @@ import { humanizeToken } from '../../../components/entity/format';
  *
  * It was also wrong for two whole vocabularies. The old rule was `status === 'active'`, but only
  * place-like kinds ever take that value: laws are `in_force`, people are `living`. Measured on
- * the active release, that mislabelled 66 in-force laws and cases as "Historical record", and no
+ * the active release, that mislabeled 66 in-force laws and cases as "Historical record", and no
  * living person could ever have come out as present-day.
  *
  * So this returns the record's own status vocabulary (the same terms `StatusMark` renders) and

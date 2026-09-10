@@ -179,10 +179,10 @@ export function LivingAtmosphereMosaic({
       return;
     }
 
-    let cancelled = false;
+    let canceled = false;
 
     const runSwap = async () => {
-      if (cancelled || document.visibilityState === 'hidden') return;
+      if (canceled || document.visibilityState === 'hidden') return;
 
       tickRef.current += 1;
       const swap = pickLivingTileSwap(
@@ -195,7 +195,7 @@ export function LivingAtmosphereMosaic({
       if (busySlotsRef.current.has(swap.slot)) return;
 
       const ok = await preloadImage(swap.tile.path);
-      if (cancelled || !ok) {
+      if (canceled || !ok) {
         if (!ok) setMosaicFailed(true);
         return;
       }
@@ -223,7 +223,7 @@ export function LivingAtmosphereMosaic({
 
       window.setTimeout(() => {
         busySlotsRef.current.delete(swap.slot);
-        if (cancelled) return;
+        if (canceled) return;
         setCells((prev) => {
           const next = prev.slice();
           const cell = next[swap.slot];
@@ -243,7 +243,7 @@ export function LivingAtmosphereMosaic({
     }, 900);
 
     return () => {
-      cancelled = true;
+      canceled = true;
       window.clearInterval(intervalId);
       window.clearTimeout(kickId);
     };

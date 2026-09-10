@@ -1,5 +1,5 @@
 /**
- * Decade density normalisation for the Time histogram.
+ * Decade density normalization for the Time histogram.
  *
  * The archive is extremely unevenly distributed across decades: the 1600s carry single records
  * and the mid-twentieth century carries hundreds. A purely proportional bar makes every early
@@ -40,7 +40,7 @@ export function decadeLabel(decade: number): string {
 }
 
 /**
- * Normalises decade counts into bar heights, chronologically ordered.
+ * Normalizes decade counts into bar heights, chronologically ordered.
  *
  * Input order is not trusted: callers assemble these from query results, and a histogram whose
  * bars are out of order is worse than no histogram.

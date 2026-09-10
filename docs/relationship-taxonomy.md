@@ -304,7 +304,7 @@ today — worth tracking, not necessarily deprecating:
   documented in code down to a "predecessor's statusHistory must never be read as the successor's
   current status" acceptance criterion in `graph/succession.ts`), but **zero fixture entities
   currently use it**. No org/place pair in the current catalog is authored as a succession. Likely
-  fine as-is (place annexation and org mergers are real, just not yet catalogued) but flagged since
+  fine as-is (place annexation and org mergers are real, just not yet catalogd) but flagged since
   it has no live example to point to.
 - **`authored`** — likewise well-specified (distinct from `founded`, reserved for
   publication/artifact creation) but **zero fixture usage** despite 21 `publication` entities and

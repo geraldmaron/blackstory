@@ -11,7 +11,7 @@
  * The map itself, and the narrow chrome that sits beside it, deliberately do not use these icons.
  * A results row gives the kind an 18px column with no room for a word, so it draws the geometric
  * shape channel (`KindGlyph`) that the map markers paint, and a grade there is a dot whose fill
- * treatment carries the grade in greyscale (`GradeDot`). Those are the non-colour signal, not old
+ * treatment carries the grade in grayscale (`GradeDot`). Those are the non-color signal, not old
  * styling waiting to be replaced. See `docs/ui/patterns-map-entity-encoding.md`.
  *
  * Server-safe: no client state, no effects.
@@ -268,7 +268,7 @@ export type RecordFactTileProps = {
   readonly value: ReactNode;
   /** One supporting line under the value: precision, decade span, source count. */
   readonly support?: ReactNode;
-  /** Icon colour (kind shade, confidence tone). Defaults to the muted ink. */
+  /** Icon color (kind shade, confidence tone). Defaults to the muted ink. */
   readonly iconColor?: string;
   readonly meter?: RecordMeterProps;
   readonly className?: string;

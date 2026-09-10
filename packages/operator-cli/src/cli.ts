@@ -1271,7 +1271,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
               // blurb are its output rather than the document's, they carry no retrieval
               // provenance, and this record is written to the run JSON and the progress file —
               // which is persistence, whatever the storage-rights flag says. So neither string
-              // appears here, not even labelled: a label does not stop a write.
+              // appears here, not even labeled: a label does not stop a write.
               const webSubjects: HarnessRawSubject[] = gathered.map((snippet, index) => {
                 const lead = leadByUrl.get(snippet.url);
                 const citedUrl = snippet.finalUrl ?? snippet.url;

@@ -429,7 +429,7 @@ export function isAssertionClass(value: string): value is AssertionClass {
 /**
  * How well this source class answers this assertion class.
  *
- * Throws on an unrecognised vocabulary rather than defaulting. A misspelled source class used
+ * Throws on an unrecognized vocabulary rather than defaulting. A misspelled source class used
  * to score 0.2 silently under the old `CLASSIFICATION_AUTHORITY[x] ?? unknown` lookup, which
  * turned a typo into a quiet downgrade instead of a failure.
  */

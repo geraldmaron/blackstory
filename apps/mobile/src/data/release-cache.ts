@@ -4,7 +4,7 @@
  * Sits above the `CacheStore` port and the cache policy. Responsibilities:
  *   - Write cached artifacts with the never-cache guard + size accounting +
  *     LRU eviction (ADR-022 §2).
- *   - Read cached artifacts, honouring release-stamp servability (§4): a row
+ *   - Read cached artifacts, honoring release-stamp servability (§4): a row
  *     written under a superseded stamp is NOT served and is dropped
  *     (threat-model T5 rollback-replay).
  *   - Artifact verification (§5): before committing a freshly-fetched artifact,

@@ -113,7 +113,7 @@ export async function parseTextOnly(
   const extractedText = contentType.includes('html')
     ? rawHtml
         // `[^>]*` after the end-tag name: an end tag runs to the first `>`, so `</script >` and
-        // `</script\t\n bar>` close the element and browsers honour both. A stricter pattern
+        // `</script\t\n bar>` close the element and browsers honor both. A stricter pattern
         // leaves the element's contents in the extracted text (CodeQL js/bad-tag-filter).
         .replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)\b[^>]*>/giu, ' ')
         .replace(/<[^>]+>/gu, ' ')

@@ -1,5 +1,5 @@
 /**
- * One labelled row of a record beat: label column, value, optional trailing mark.
+ * One labeled row of a record beat: label column, value, optional trailing mark.
  *
  * The record page had three different rhythms for what is the same thing — a field and its value.
  * Anatomy used an icon plus an uppercase caption over a 92dp column; provenance wrote its fields

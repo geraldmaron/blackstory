@@ -9,7 +9,7 @@
  * rate-limited mid-word. One request per pause spends it on searches instead.
  *
  * The controller each effect run creates is now handed to the suggestor, so a superseded request
- * is actually cancelled rather than merely ignored on arrival. The endpoint caps concurrent
+ * is actually canceled rather than merely ignored on arrival. The endpoint caps concurrent
  * in-flight requests per caller, so an abandoned request that keeps running is a slot the
  * reader's next keystroke gets denied for.
  *
@@ -126,19 +126,19 @@ export function TypeaheadCombobox({
     // it in a ref and aborted the *previous* controller on the way in, which left the final
     // keystroke's request running after unmount.
     const controller = new AbortController();
-    let cancelled = false;
+    let canceled = false;
 
     const timer = setTimeout(() => {
       void (async () => {
         try {
           const next = await suggestRemote(trimmed, controller.signal);
-          if (cancelled || controller.signal.aborted) return;
+          if (canceled || controller.signal.aborted) return;
           setSuggestions(next);
           setActiveIndex(-1);
           setUnavailable(false);
         } catch {
           // An abort lands here too, and an abort is not a failure: the reader simply kept typing.
-          if (cancelled || controller.signal.aborted) return;
+          if (canceled || controller.signal.aborted) return;
           setSuggestions([]);
           setActiveIndex(-1);
           setUnavailable(true);
@@ -147,7 +147,7 @@ export function TypeaheadCombobox({
     }, remoteDebounceMs);
 
     return () => {
-      cancelled = true;
+      canceled = true;
       clearTimeout(timer);
       controller.abort();
     };

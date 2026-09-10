@@ -70,7 +70,7 @@ function main(): void {
 
     if (existsSync(draftPath)) {
       // Passed through as the raw string, not re-serialized: the validator anchors citation
-      // quotes as verbatim substrings, and a JSON round-trip here could normalise a character
+      // quotes as verbatim substrings, and a JSON round-trip here could normalize a character
       // the subagent copied correctly out of the evidence.
       answers.push(
         JSON.stringify({ entityId: subject.entityId, rawContent: readFileSync(draftPath, 'utf8') }),

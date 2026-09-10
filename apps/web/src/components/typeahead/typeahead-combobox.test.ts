@@ -33,7 +33,7 @@ describe('typeahead request budget', () => {
 
   it('leaves the local lane undebounced', () => {
     // `suggestLocal` ranks an array already in memory. Delaying it would buy nothing and cost
-    // every keystroke on the books catalogue its responsiveness.
+    // every keystroke on the books catalog its responsiveness.
     const localBranch = code.slice(
       code.indexOf('if (suggestLocal)'),
       code.indexOf('if (!suggestRemote)'),

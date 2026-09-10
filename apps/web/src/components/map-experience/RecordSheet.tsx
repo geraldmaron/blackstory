@@ -532,7 +532,7 @@ export function RecordSheet({
                      * A real anchor even when selecting in place is the primary action: the
                      * connected record HAS a page, and a reader who middle-clicks or copies the
                      * link should get it. The click handler intercepts the plain left-click only,
-                     * because staying on the map and flying to the neighbour is the better
+                     * because staying on the map and flying to the neighbor is the better
                      * answer for the reader who is comparing two pins.
                      */
                     <a

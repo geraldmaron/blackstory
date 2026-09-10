@@ -73,7 +73,7 @@ export async function runCommonsMediaEnrichment(
       resolved.push({
         entity,
         // `.replace(/^Q/, 'Q')` used to follow this and replaced Q with itself: `toUpperCase()`
-        // has already normalised the prefix (CodeQL js/identity-replacement).
+        // has already normalized the prefix (CodeQL js/identity-replacement).
         wikidataId: entity.wikidataId.toUpperCase(),
         qidMatchMethod: 'trusted_identifier',
         enwikiTitle: enwikiTitleFromDisplayName(entity.displayName),

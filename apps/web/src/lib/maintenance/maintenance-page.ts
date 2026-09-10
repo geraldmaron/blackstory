@@ -24,7 +24,7 @@
  * not stop a download: the CSS approach fetched both the light and the dark art on every view,
  * 136 KB where 80 KB was needed, on the one page whose entire justification is cost.
  *
- * Colours are the brand tokens verbatim (brand/tokens/colors.json), duplicated as literals
+ * Colors are the brand tokens verbatim (brand/tokens/colors.json), duplicated as literals
  * because `@repo/ui`'s stylesheet is a CSS import that has no meaning inside an edge string.
  */
 

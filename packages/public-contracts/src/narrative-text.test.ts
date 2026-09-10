@@ -33,7 +33,7 @@ test('removes a bare id left in the middle of a sentence', () => {
   );
 });
 
-test('recognises an id, a bare id label, and neither', () => {
+test('recognizes an id, a bare id label, and neither', () => {
   assert.equal(containsInternalId('Basis: ent_greenwood_district_001_claim_0.'), true);
   assert.equal(containsInternalId('plantation_arlington_antebellum_home_gardens'), true);
   assert.equal(containsInternalId('Greenwood District'), false);

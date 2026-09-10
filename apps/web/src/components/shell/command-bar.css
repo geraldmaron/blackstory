@@ -238,7 +238,7 @@
  *
  * Styled here rather than inherited from `typeahead.css`, because the bar does not load that
  * sheet: it re-states every `.ds-typeahead__*` rule it needs under `.ds-bar__search-list` above,
- * and `typeahead.css` is imported by the books catalogue alone. A note styled only there would
+ * and `typeahead.css` is imported by the books catalog alone. A note styled only there would
  * render unpositioned inside the pill on all twelve rooms where this bar is the only search.
  */
 .ds-bar__search--live .ds-typeahead__note {
@@ -451,7 +451,7 @@ span.ds-bar__mode-link {
    * kept their intrinsic widths on either side. At 375px those two take ~300px and the input
    * was left around 60px: it rendered as "Sea" and could not be typed into usefully.
    *
-   * Stacking is the fix rather than shrinking the neighbours, because there is no width at
+   * Stacking is the fix rather than shrinking the neighbors, because there is no width at
    * which five controls and a usable text field share one 375px row. Brand and tools keep the
    * top row; the field spans the full width beneath them, which is the same shape the search
    * takes on every other mobile site and needs no new markup, so `CommandBarSearch`'s tested

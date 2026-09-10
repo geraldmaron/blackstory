@@ -8,7 +8,7 @@
  * full-bleed below the bar on a desktop, a sticky strip above the chapters on a phone. Its
  * `.ds-door__window` is measured by door-immersive.tsx to frame the camera (door-field-frame.ts);
  * nothing is drawn in it. Until this mount has framed the plate and the plate has painted, the
- * field and the page keep the canvas colour over it, then fade to let it through.
+ * field and the page keep the canvas color over it, then fade to let it through.
  *
  * Scroll model: the document scrolls. The plate is position:fixed full-bleed. Door chrome is
  * pointer-events:none except cards so the wheel and marker hits work over the map.
@@ -646,7 +646,7 @@ html:has(.ds-door) {
 /*
  * The live plate. `/` is the `door` surface: the shared MapLibre plate paints full-bleed in its
  * `ambient` posture (shell.css) with the same clustered field Explore draws. Until it is ready
- * the field and the page hold the canvas colour over it, so a cold load shows a quiet ground and
+ * the field and the page hold the canvas color over it, so a cold load shows a quiet ground and
  * then the finished map, never the map assembling in pieces.
  *
  * Two signals, both required. `data-plate-ready` lives on the persistent plate (MapStage.tsx)

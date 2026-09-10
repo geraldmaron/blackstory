@@ -2,10 +2,10 @@
  * Inventors named on the invention cohort who had no person record in this catalog.
  *
  * The first invention cohort named twenty contributions and linked none of them to a person,
- * because four of the people it centres were not in `bb_canonical.entities` at all: an invention
+ * because four of the people it centers were not in `bb_canonical.entities` at all: an invention
  * page could not reach its inventor, and the inventor had no page to reach. These four are the
  * gap. Every other name on those receipts either already has a record or is deliberately not
- * modelled (see `InventionContributor` in `./invention-cohort.ts`).
+ * modeled (see `InventionContributor` in `./invention-cohort.ts`).
  *
  * Scope discipline matches the invention cohort. Each summary says what the person is documented
  * to have done, and stops. Where a claim is commonly repeated but rests on the limits of the

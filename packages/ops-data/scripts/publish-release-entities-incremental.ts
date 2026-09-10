@@ -58,6 +58,7 @@ import {
   runPublishRegressionGates,
 } from './lib/publish-regression-gates.ts';
 import { applyReleaseTaxonomySync, planReleaseTaxonomySync } from './lib/release-taxonomy-sync.ts';
+import { applyReleaseRelatedSync, planReleaseRelatedSync } from './lib/release-related-sync.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(SCRIPT_DIR, '../../..');
@@ -706,6 +707,22 @@ async function main(): Promise<void> {
         await applyReleaseTaxonomySync(client, releaseId, taxonomyPlan);
         console.log(
           `Re-synced taxonomy from canonical for ${taxonomyPlan.changed.length} entities.`,
+        );
+      }
+
+      // repo-66mv1: ReleaseSourceEntity carries no relationship edges, so every row this run
+      // rebuilt from source just wrote `related: []` — a republish silently stripped the
+      // connections off already-live records and the "How this record connects" beat vanished.
+      // Re-derive from canonical here, after the commit, so co-published neighbors are visible
+      // to the both-endpoints-released join, and before the graph rebuild below, which reads
+      // projection.related. This is the same shape as the taxonomy re-sync above and for the same
+      // reason: canonical knows something the source row never carried.
+      const relatedPlan = await planReleaseRelatedSync(client, releaseId);
+      if (relatedPlan.changed.length > 0) {
+        await applyReleaseRelatedSync(client, releaseId, relatedPlan);
+        console.log(
+          `Re-synced related[] from canonical edges for ${relatedPlan.changed.length} entities` +
+            `${relatedPlan.repaired > 0 ? ` (${relatedPlan.repaired} had no connections at all)` : ''}.`,
         );
       }
 

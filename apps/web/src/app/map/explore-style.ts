@@ -731,7 +731,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
-        /* Aerial imagery, directly on top of the plate colour and under everything else.
+        /* Aerial imagery, directly on top of the plate color and under everything else.
            Deliberately translucent: the `background` layer beneath is what scrims it, which is
            the first half of the contrast strategy documented on `SATELLITE_RASTER_PAINT`.
 
@@ -892,7 +892,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
             : buildPresenceDensityFillColorExpression(plate, presenceFillActive),
           /* The state polygons stopped being the landmass when the tiles started supplying it,
              so this layer paints only when it is actually encoding something. An opaque
-             land-coloured fill over real cartography is not neutral: it erases the lakes,
+             land-colored fill over real cartography is not neutral: it erases the lakes,
              rivers and parks inside every state outline it covers. */
           'fill-opacity': statePopulationFillActive || presenceFillActive ? overlayFillOpacity : 0,
         },

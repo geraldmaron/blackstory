@@ -2748,7 +2748,7 @@ export const presidentArticles = [
         type: 'list' as const,
         style: 'bullet' as const,
         items: [
-          "Issued Executive Order 9808 on December 5, 1946, establishing the President's Committee on Civil Rights, whose 1947 report To Secure These Rights catalogued discrimination in voting, housing, education and public accommodations.[ref:app-eo-9808][ref:nps-truman-civil-rights]",
+          "Issued Executive Order 9808 on December 5, 1946, establishing the President's Committee on Civil Rights, whose 1947 report To Secure These Rights catalogd discrimination in voting, housing, education and public accommodations.[ref:app-eo-9808][ref:nps-truman-civil-rights]",
           'Signed Executive Order 9981 on July 26, 1948, directing equality of treatment and opportunity in the armed forces without regard to race, color, religion or national origin.[ref:nara-eo-9981][ref:nps-truman-civil-rights]',
           'Signed Executive Order 9980 the same day, July 26, 1948, requiring federal appointing officers to base personnel actions solely on merit and fitness and to prevent racial and religious discrimination.[ref:app-eo-9980][ref:trumanlib-eo-9980]',
           'Delivered a civil rights message to a joint session of Congress on February 2, 1948, asking for federal anti-lynching protection, voting rights protection and a permanent Fair Employment Practices Commission. Congress did not pass the package.[ref:nps-truman-civil-rights][ref:trumanlib-woodard]',
@@ -2990,7 +2990,7 @@ export const presidentArticles = [
       { type: 'heading', level: 2 as const, text: 'Where the record disagrees' },
       {
         type: 'paragraph',
-        text: 'The pace of Kennedy\'s housing order is contested. Kennedy had signalled during the 1960 campaign that housing discrimination could be ended by executive action, and EO 11063 was not signed until November 20, 1962; asked at the time why it took so long, he said he issued it when he thought it was in the public interest. Some accounts treat the delay as deliberate deference to Southern Democrats in Congress; others treat it as legislative sequencing. This entry did not verify the \'"stroke of the pen"/"Ink for Jack"\' campaign framing from a primary source.',
+        text: 'The pace of Kennedy\'s housing order is contested. Kennedy had signaled during the 1960 campaign that housing discrimination could be ended by executive action, and EO 11063 was not signed until November 20, 1962; asked at the time why it took so long, he said he issued it when he thought it was in the public interest. Some accounts treat the delay as deliberate deference to Southern Democrats in Congress; others treat it as legislative sequencing. This entry did not verify the \'"stroke of the pen"/"Ink for Jack"\' campaign framing from a primary source.',
       },
       {
         type: 'paragraph',

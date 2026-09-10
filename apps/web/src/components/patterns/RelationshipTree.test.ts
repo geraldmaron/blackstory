@@ -40,7 +40,7 @@ const GRAPH: RelationshipGraph = {
       id: 'p2',
       displayName: 'Mary Church Terrell',
       kind: 'person',
-      summary: 'An organiser.',
+      summary: 'An organizer.',
       hop: 1,
       relationType: 'taught_at',
       direction: 'incoming',
@@ -205,7 +205,7 @@ test('a small tree opens whole, with no disclosure rows to click', () => {
   assert.match(html, />Dunbar Alumni Federation</);
 });
 
-test('a dense record folds its deeper branches behind a labelled disclosure', () => {
+test('a dense record folds its deeper branches behind a labeled disclosure', () => {
   // Five first-level records carrying two apiece: enough to fold, and no branch so thin that
   // folding it would cost a click to reveal a single card.
   const nodes = Array.from({ length: 15 }, (_, index) => ({

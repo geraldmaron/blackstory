@@ -9,7 +9,7 @@
  * aerial imagery is not a flat fill, so every one of those guarantees lapses the moment this
  * toggle flips. These pin the compensations — scrim, re-inked cartography, widened halos, backed
  * off overlay tints — and pin the line they must not cross: record encoding is not a basemap
- * concern, so a pin's colour and size must be byte-identical either way.
+ * concern, so a pin's color and size must be byte-identical either way.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -187,7 +187,7 @@ test('the presence tint backs off over imagery instead of erasing it', () => {
 /* ---- the line the basemap must not cross --------------------------------------------------- */
 
 test('record encoding is identical with and without imagery', () => {
-  // The dignity rule this file must not quietly break: a record's colour and size encode evidence
+  // The dignity rule this file must not quietly break: a record's color and size encode evidence
   // and kind. If they moved with the basemap, the same pin would mean two different things
   // depending on a toggle, and the legend would be wrong on one of them.
   const encodingLayers = [

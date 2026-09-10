@@ -89,7 +89,7 @@
 }
 
 /*
- * The active row is marked by a filled surface and an accent edge, never by colour alone: the
+ * The active row is marked by a filled surface and an accent edge, never by color alone: the
  * palette is driven by arrow keys, so the cursor has to survive being read at a glance.
  */
 .ds-palette__row--active {
@@ -123,7 +123,7 @@
 
 /*
  * The matched substring. Underline as well as tint, so the reason a row matched survives both
- * a monochrome display and the readers who cannot separate the accent from the body colour.
+ * a monochrome display and the readers who cannot separate the accent from the body color.
  */
 .ds-palette__mark {
   background: transparent;

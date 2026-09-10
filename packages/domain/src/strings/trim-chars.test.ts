@@ -1,5 +1,5 @@
 /**
- * Behaviour of the trimming helpers that replaced `replace(/x+$/, '')` expressions across the
+ * Behavior of the trimming helpers that replaced `replace(/x+$/, '')` expressions across the
  * package, including the long-run input that made those expressions quadratic.
  */
 import assert from 'node:assert/strict';

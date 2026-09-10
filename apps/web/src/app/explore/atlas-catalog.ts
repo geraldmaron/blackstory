@@ -61,7 +61,7 @@ export function buildAtlasCatalogPayload(
 }
 
 /**
- * One serialised payload per catalog instance. `listPublicEntityViews` hands back the same array
+ * One serialized payload per catalog instance. `listPublicEntityViews` hands back the same array
  * reference for the life of its in-process TTL (30 min), so keying on the array means a burst of
  * CDN misses across regions builds and stringifies the 6 MB once per instance per TTL, not once
  * per miss. A WeakMap so a retired catalog takes its payload with it.

@@ -1,7 +1,7 @@
 /**
  * repo-n7p6.6 item 2 — one entity-timeline builder, shared by every public surface.
  *
- * Lifted verbatim (behaviour-preserving) from `apps/web/src/data/entity-graph-seed.ts`, where it
+ * Lifted verbatim (behavior-preserving) from `apps/web/src/data/entity-graph-seed.ts`, where it
  * was reachable only by the web app. `apps/api-public` hard-coded `timeline: []` because it had
  * no access to it, so the same record carried a timeline on the website and an empty one over the
  * API. The builder lives here now and both surfaces call it; the web module re-exports from this

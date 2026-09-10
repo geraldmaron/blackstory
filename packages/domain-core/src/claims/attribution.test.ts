@@ -171,7 +171,7 @@ test('"inventor of" is reported once, not also as "invented"', () => {
   assert.equal(markers[0]?.term, 'inventor of');
 });
 
-test('bounded verbs are recognised as attribution without being flagged as broad', () => {
+test('bounded verbs are recognized as attribution without being flagged as broad', () => {
   const markers = findAttributionMarkers('He co-invented and later commercialized the device.');
   assert.ok(markers.some((m) => m.kind === 'bounded'));
   assert.equal(

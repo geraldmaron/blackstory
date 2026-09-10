@@ -57,7 +57,7 @@ export type StoryChapter = {
   /** Which beat of the argument this chapter fills. */
   readonly stage: StoryStage;
   readonly camera: ChapterCamera;
-  /** Centred card, no index badge. The cold open and the outro. */
+  /** Centerd card, no index badge. The cold open and the outro. */
   readonly centered: boolean;
   /** Radial spotlight over the chapter's own center, as a percentage radius. */
   readonly spotlightRadiusPercent?: number;

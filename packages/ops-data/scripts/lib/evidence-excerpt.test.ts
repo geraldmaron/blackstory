@@ -54,7 +54,7 @@ test('the document opening is kept, so the criteria and period framing survive',
   assert.ok(excerpt.text.includes('evolving status and influence'));
 });
 
-test('a dense narrative passage outranks an incidental colour word', () => {
+test('a dense narrative passage outranks an incidental color word', () => {
   // The regression: "black walnut woodwork" appears first, so document-order selection spends the
   // budget on joinery and never reaches the settlement history.
   const incidental = 'Interior details include black walnut woodwork of paneled presses. ';
