@@ -630,4 +630,391 @@ export const INVENTION_COHORT: readonly InventionCohortRecord[] = [
       },
     ],
   },
+  {
+    id: 'inv_lee_kneading_machine',
+    displayName: 'Dough-Kneading Machine',
+    summary:
+      'US 524,042, titled "Kneading-machine," names Joseph Lee and was granted on 7 August 1894. The specification, filed as "Improvements in Kneading-Machines," describes pestles driven into a trough of dough while paired screw conveyors return displaced dough to the center, mechanizing kneading for hotels and bakeries. The roster\'s patent number and label hold up: this is the kneading machine, not the bread-crumbing machine some accounts also attach to Lee, a separate grant issued the following year. This record is the kneading machine the document describes, and it does not say Lee invented dough kneading.',
+    historicalContext:
+      'Lee is also credited with a bread-crumbing machine, US 540,553, granted the following year, and popular retellings fold the two devices into one another. Keeping this record to the kneading machine the grant actually describes is the discipline the mix-up needs. Auburndale, a village of Newton, is the residence the patent lists, and the Hall of Fame places his restaurant and hotel business in the Boston area; city precision is as far as the sourced record reaches, so it is as far as this record goes.',
+    impactStatement:
+      'The machine mechanized dough-kneading for the hotel and catering trade Lee built his career in, cutting labor his own kitchens had performed by hand. Born enslaved in South Carolina in 1849 and self-educated, he owned and operated restaurants, hotels and catering establishments around Boston by the early 1880s. His name went onto the list of ninety-two patents held by Black inventors that Henry E. Baker compiled and George Washington Murray read into the Congressional Record in 1894, the same year this grant issued. How widely other kitchens took up the design is not something the record here shows.',
+    contributors: [{ name: 'Joseph Lee', predicate: 'improved' }],
+    city: 'Auburndale',
+    state: 'MA',
+    lat: 42.3472,
+    lng: -71.2494,
+    era: '1890s',
+    canonicalUrl: 'https://patents.google.com/patent/US524042A',
+    patentNumber: '524042',
+    evidence: [
+      {
+        sourceUrl: 'https://patents.google.com/patent/US524042A',
+        title: 'US 524,042',
+        quote: 'Kneading-machine',
+      },
+      {
+        sourceUrl: 'https://www.invent.org/inductees/joseph-lee',
+        title: 'National Inventors Hall of Fame, Joseph Lee',
+        quote:
+          'He owned and operated a number of restaurants, hotels and catering establishments in the Boston area.',
+      },
+    ],
+  },
+  {
+    id: 'inv_reed_dough_kneader_roller',
+    displayName: 'Dough Kneader and Roller',
+    summary:
+      'US 305,474, titled "Dough kneader and roller," names Judy W. Reed and was granted on 23 September 1884. The specification, filed as "Improvements in Dough Kneaders and Rollers," describes a covered box that feeds dough through corrugated rollers for kneading and then plain rollers for flattening, with screws to regulate pressure. Reed is widely called the first Black woman to receive a US patent. That ranking rests on compilations, chiefly Henry E. Baker\'s, that their own compiler never presented as a complete census, and the Patent Office recorded no inventor\'s race. This record says first known, not first.',
+    historicalContext:
+      'Baker\'s lists were built from what he could confirm by correspondence, and later research has kept adding names he did not have. "First known" carries that limit forward instead of settling an ordering the surviving record cannot settle. The work is tied to Washington, D.C., the residence the patent itself lists and the city the historical accounts of Reed\'s life use.',
+    impactStatement:
+      "A kneader and roller that mixed dough more evenly and kept it covered from dust made a domestic and small-trade task faster for whoever operated it; the record does not show whether the design was manufactured or sold beyond the grant itself. Reed, an illiterate seamstress, signed the application with a mark rather than a signature, a fact documented by the Museum of Food and Drink's Legacy Quilt project, not inferred from the patent.",
+    contributors: [{ name: 'Judy W. Reed', predicate: 'improved' }],
+    city: 'Washington',
+    state: 'DC',
+    lat: 38.9072,
+    lng: -77.0369,
+    era: '1880s',
+    canonicalUrl: 'https://patents.google.com/patent/US305474A',
+    patentNumber: '305474',
+    evidence: [
+      {
+        sourceUrl: 'https://patents.google.com/patent/US305474A',
+        title: 'US 305,474',
+        quote: 'Dough kneader and roller',
+      },
+      {
+        sourceUrl: 'https://legacyquiltproject.mofad.org/quilt/judy-w-reed/',
+        title: 'Museum of Food and Drink, Legacy Quilt: Judy W. Reed',
+        quote:
+          'An illiterate seamstress from Washington, D.C., Reed signed her 1884 patent document with an "X."',
+      },
+    ],
+  },
+  {
+    id: 'inv_newman_hairbrush',
+    displayName: 'Hairbrush Improvement',
+    summary:
+      'US 614,335, titled "Brush," names Lyda D. Newman and was granted on 15 November 1898. The specification\'s object clause aims at a hair-brush that is "simple and durable in construction" and "arranged to permit of conveniently cleaning the brush whenever desired." It describes a back with a recessed chamber and a removable, slotted bristle-holder whose gaps let air and loose hair pass through for cleaning. The grant is an improvement to the hairbrush, not the invention of the brush, and it carries no claim about her later suffrage organizing, which is a separate documented part of her life. The work is associated with New York City, where she lived in Manhattan\'s San Juan Hill neighborhood.',
+    historicalContext:
+      'The title on the document is the single word "Brush," which reads as a claim to the whole category; the specification\'s own object clause narrows it to a hair-brush built for durability and cleaning, and the predicate here follows that narrower claim rather than the bare title. New York is the city her patent, her suffrage organizing, and the historical record all place her in.',
+    impactStatement:
+      "The removable, ventilated bristle-holder addressed a plain hygiene problem: bristles that trapped dust and hair and were hard to clean. The record does not show how widely the design sold. Newman went on to lead the Woman Suffrage Party's outreach to Black women in New York in the 1910s, organizing block by block in her own San Juan Hill neighborhood; that is documented civic work, not a claim this patent makes.",
+    contributors: [{ name: 'Lyda D. Newman', predicate: 'improved' }],
+    city: 'New York',
+    state: 'NY',
+    lat: 40.7128,
+    lng: -74.006,
+    era: '1890s',
+    canonicalUrl: 'https://patents.google.com/patent/US614335A',
+    patentNumber: '614335',
+    evidence: [
+      {
+        sourceUrl: 'https://patents.google.com/patent/US614335A',
+        title: 'US 614,335',
+        quote: 'Brush',
+      },
+      {
+        sourceUrl:
+          'https://www.uspto.gov/learning-and-resources/journeys-innovation/suffragist-inventors',
+        title: 'USPTO, Seeds of Change: Suffragist Inventors',
+        quote:
+          'In the 1910s, she led efforts by the Woman Suffrage Party (WSP) to involve Black women in the struggle for the vote.',
+      },
+    ],
+  },
+  {
+    id: 'inv_woods_railway_telegraphy',
+    displayName: 'Railway Telegraph System',
+    summary:
+      'US 373,383, titled "Railway Telegraphy," names Granville T. Woods and was granted on 15 November 1887. The specification describes a static-conduction system that lets telegraph wires strung beside a track carry signals to and from a moving train without interrupting their ordinary telegraph use. Woods held nearly sixty patents across his career; this grant documents one system inside that portfolio, not the whole of it, and the press label "the Black Edison" is not a finding this record repeats. Thomas Edison later sued over priority and lost; the grant does not show him taking the design.',
+    historicalContext:
+      'Woods\'s own filing lists him residing in Cincinnati, Ohio, assignor to the Woods Electric Company "of same place," and secondary accounts place the founding of that company in Cincinnati as well; he did not relocate to New York City until 1890, three years after this patent issued. This record anchors to Cincinnati rather than the later address. The scope discipline matters because Woods is popularly remembered through the "Black Edison" label and a single "invented the multiplex telegraph" shorthand that widens past what this specific grant claims: a static-conduction system for railway communication, not telegraphy in general and not every later train-signaling patent in his portfolio.',
+    impactStatement:
+      "The system let a stationary operator and a moving train exchange messages over ordinary trackside telegraph wire, without new equipment on the line itself, in an era when unreported train positions caused collisions. Thomas Edison challenged Woods's priority in court and lost, then offered Woods a position in Edison's own company; Woods declined it to remain independent. That sequence is what the record supports, not a story of Edison stealing the design. Woods went on to hold roughly sixty patents in total; this filing documents one system inside that body of work, not the whole of it.",
+    contributors: [
+      { name: 'Granville T. Woods', predicate: 'invented', entityId: 'ent_granville_woods_001' },
+    ],
+    city: 'Cincinnati',
+    state: 'OH',
+    lat: 39.1031,
+    lng: -84.512,
+    era: '1880s',
+    canonicalUrl: 'https://patents.google.com/patent/US373383A',
+    patentNumber: '373383',
+    evidence: [
+      {
+        sourceUrl: 'https://patents.google.com/patent/US373383A',
+        title: 'US 373,383',
+        quote: 'SPECIFICATION forming part of Letters Patent No. 373,383, dated November 15, 1887.',
+      },
+      {
+        sourceUrl: 'https://lemelson.mit.edu/resources/granville-woods',
+        title: 'Lemelson-MIT Program, Granville Woods',
+        quote:
+          "Woods eventually won, but Edison continued to pursue the telegraph by offering Woods a lucrative partnership in one of Edison's businesses. Woods refused, preferring to remain independent.",
+      },
+    ],
+  },
+  {
+    id: 'inv_matzeliger_lasting_machine',
+    displayName: 'Shoe Lasting Machine',
+    summary:
+      'US 274,207, titled "Lasting-Machine," names Jan Earnst Matzeliger and was granted on 20 March 1883. The specification describes a machine that holds a last, draws the leather upper over it, positions it at heel and toe, and drives the nails, work previously done by hand. Matzeliger assigned two-thirds of the patent to Melville S. Nichols and Charles H. Delnow, both of Lynn; the grant is not his alone to hold. Matzeliger died in 1889, one month short of 37, and the industry consolidation that followed the patent was not his doing.',
+    historicalContext:
+      'Lynn, Massachusetts is the shoe-factory city where Matzeliger built the machine while apprenticed in the trade, and the patent\'s own assignment clause records him signing away two-thirds of the grant to Nichols and Delnow before it issued. The scope discipline matters because popular retellings compress "patented a lasting machine" into "revolutionized the shoe industry" as if Matzeliger ran the company that followed. He did not: the Consolidated Lasting Machine Co. formed around his device, and after his 1889 death the United Shoe Machinery Co. absorbed the patent and his stock. That consolidation is a separate, later fact from the grant itself.',
+    impactStatement:
+      'A machine that could last roughly 700 pairs of shoes a day against about 50 by hand cut the labor cost of shoemaking sharply, and the National Inventors Hall of Fame credits the resulting price drop with making shoes affordable to far more people. Matzeliger held stock in the company formed to manufacture his machine, but he did not live to see what it became: he died of tuberculosis in 1889, a month before turning 37, and the United Shoe Machinery Co. took over his patent and stock afterward. The consolidation and the wealth it built belong to that later company, not to him.',
+    contributors: [{ name: 'Jan Earnst Matzeliger', predicate: 'invented' }],
+    city: 'Lynn',
+    state: 'MA',
+    lat: 42.4668,
+    lng: -70.9495,
+    era: '1880s',
+    canonicalUrl: 'https://patents.google.com/patent/US274207A',
+    patentNumber: '274207',
+    evidence: [
+      {
+        sourceUrl: 'https://patents.google.com/patent/US274207A',
+        title: 'US 274,207',
+        quote:
+          'JAN EARNST MATZELIGER, OF LYNN, MASSACHUSETTS, ASSIGNOR OF TWO-THIRDS TO MELVILLE S. NICHOLS AND CHARLES H. DELNOW, BOTH OF SAME PLACE.',
+      },
+      {
+        sourceUrl: 'https://www.invent.org/inductees/jan-ernst-matzeliger',
+        title: 'National Inventors Hall of Fame, Jan Ernst Matzeliger',
+        quote:
+          "The Consolidated Lasting Machine Co. was formed to manufacture the machines, and Matzeliger was given a large amount of the organization's stock. However, that same year, Matzeliger died of tuberculosis just one month before he would have turned 37. The United Shoe Machinery Co. then obtained his patent and company stock.",
+      },
+    ],
+  },
+  {
+    id: 'inv_mccoy_steam_lubricator',
+    displayName: 'Steam-Engine Lubricator',
+    summary:
+      'US 129,843, titled "Improvement in Lubricators for Steam-Engines," names Elijah McCoy and was granted on 23 July 1872. The title itself says improvement, and the specification describes an oil cup with a spring-loaded valve that feeds lubricant to a steam cylinder automatically, without stopping the engine. McCoy assigned the patent to himself and S. C. Hamlin, both of Ypsilanti. The phrase "the real McCoy" is often tied to this line of lubricators, but the derivation is disputed among historians and this record does not state it as settled.',
+    historicalContext:
+      'Ypsilanti is where McCoy lived when this patent issued in 1872; his move to Detroit came a decade later, in 1882, so this record anchors to Ypsilanti rather than the later city. The scope discipline matters twice here: the title\'s own word, improvement, is the bound this record keeps rather than a claim that McCoy invented engine lubrication outright, and the popular etymology of "the real McCoy" is repeated as settled fact far more often than the record supports. The National Inventors Hall of Fame states only that historians believe the phrase grew from his reputation, not that its origin is documented.',
+    impactStatement:
+      'An automatic lubricator meant a steam engine no longer had to be stopped to be oiled, and the National Inventors Hall of Fame credits the design with becoming standard equipment on long-distance locomotives, transatlantic ships and factory machinery. McCoy continued refining the lubricator and held more than fifty patents by the time of his death in 1929. Competitors sold inferior copies once the design proved itself, and that reputation contest is the documented context for "the real McCoy." The phrase\'s exact origin remains disputed rather than settled, and this record does not resolve it.',
+    contributors: [
+      { name: 'Elijah McCoy', predicate: 'improved', entityId: 'ent_elijah_mccoy_001' },
+    ],
+    city: 'Ypsilanti',
+    state: 'MI',
+    lat: 42.2411,
+    lng: -83.613,
+    era: '1870s',
+    canonicalUrl: 'https://patents.google.com/patent/US129843A',
+    patentNumber: '129843',
+    evidence: [
+      {
+        sourceUrl: 'https://patents.google.com/patent/US129843A',
+        title: 'US 129,843',
+        quote: 'IMPROVEMENT IN LUBRICATORS FOR STEAM-ENGINES.',
+      },
+      {
+        sourceUrl: 'https://www.invent.org/inductees/elijah-mccoy',
+        title: 'National Inventors Hall of Fame, Elijah McCoy',
+        quote:
+          'Historians believe that because McCoy\'s version of the "oil-drip cup" was the most effective and carried the strongest reputation, engineers began asking for "the real McCoy."',
+      },
+    ],
+  },
+  {
+    id: 'inv_miles_elevator_door',
+    displayName: 'Elevator Shaft-Door Mechanism',
+    summary:
+      'US 371,207, titled "Elevator," names Alexander Miles and was granted on 11 October 1887. The specification describes a mechanism for opening and closing the doors to an elevator shaft: a belt fixed to the cage engages drums at each floor, and spring-backed, roller-guided levers slide the shaft and cage doors open on arrival and shut on departure. It is a shaft-door mechanism, not a claim to the elevator itself, and not a claim to every automatic elevator door built after it. The work is tied to Miles\'s barbershop trade in Duluth, Minnesota.',
+    historicalContext:
+      'Two collapses are easy to make here: "Miles invented the elevator," which erases a machine that existed decades before this patent, and "Miles invented the automatic elevator door," which turns one belt-and-lever mechanism into the origin of a whole class of doors that other, later patents also claim. The grant is the narrower shaft-door mechanism the specification actually describes. Duluth is where Miles ran his barbershop in a hotel with its own elevator, the documented tie this record uses for the city, not a filing address treated as a workshop.',
+    impactStatement:
+      'The mechanism addressed a documented hazard: an elevator shaft left open at a floor where the car was not stopped. The National Inventors Hall of Fame credits Miles with that specific fix, work he carried out while running a barbershop trade in Duluth. No institutional account in this record measures how widely manufacturers adopted his particular belt-and-drum design, so this record does not claim wide adoption. What the document proves is the mechanism Miles patented, not the elevator industry that followed it.',
+    contributors: [{ name: 'Alexander Miles', predicate: 'invented' }],
+    city: 'Duluth',
+    state: 'MN',
+    lat: 46.7867,
+    lng: -92.1005,
+    era: '1880s',
+    canonicalUrl: 'https://patents.google.com/patent/US371207A',
+    patentNumber: '371207',
+    evidence: [
+      {
+        sourceUrl: 'https://patents.google.com/patent/US371207A',
+        title: 'US 371,207',
+        quote: 'Elevator',
+      },
+      {
+        sourceUrl: 'https://www.invent.org/inductees/alexander-miles-elevator',
+        title: 'National Inventors Hall of Fame, How Alexander Miles Opened Doors',
+        quote: 'allowed the elevator shaft doors to operate at the appropriate times',
+      },
+    ],
+  },
+  {
+    id: 'inv_cralle_ice_cream_disher',
+    displayName: 'Ice-Cream Mold and Disher',
+    summary:
+      'US 576,395, titled "Ice-cream mold and disher," names Alfred L. Cralle and was granted on 2 February 1897. The specification describes a one-hand device: a cone-shaped mold turns inside a band, a lever-driven rack rotates the mold against fixed internal blades that loosen the contents, and a spring resets the blades when the hand releases. It is that mold and disher, not the category of ice cream scoops generally. The device\'s commercial reach is not established here; the record does not say it was widely adopted or that Cralle profited from it. The work is tied to Pittsburgh, Pennsylvania.',
+    historicalContext:
+      'Calling this "the ice cream scoop" folds a specific one-hand mold-and-disher into a whole kitchen category that no single patent invented. The grant is the narrower device: a cone-shaped mold, a rack-and-lever drive, and internal blades that release on a spring. Cralle worked in the food and hotel trade in Pittsburgh; that documented occupation, not the filing address alone, is the tie this record uses for the city.',
+    impactStatement:
+      'Cralle is reported to have designed the mold and disher after watching servers struggle to dish ice cream one-handed. A Smithsonian account states that Cralle never received big bucks for his patent, and while several firms are reported to have shown interest in buying rights or arranging royalties, no institutional source in this record shows those deals closing or the device carrying his name into wide use. What the record supports is the patent and the trade that produced it, not a claim of commercial success.',
+    contributors: [{ name: 'Alfred L. Cralle', predicate: 'invented' }],
+    city: 'Pittsburgh',
+    state: 'PA',
+    lat: 40.4406,
+    lng: -79.9959,
+    era: '1890s',
+    canonicalUrl: 'https://patents.google.com/patent/US576395A',
+    patentNumber: '576395',
+    evidence: [
+      {
+        sourceUrl: 'https://patents.google.com/patent/US576395A',
+        title: 'US 576,395',
+        quote: 'Ice-cream mold and disher',
+      },
+      {
+        sourceUrl:
+          'https://www.smithsonianmag.com/smart-news/meet-the-black-inventor-who-developed-the-ice-cream-scoop-revolutionizing-a-beloved-frozen-treat-180985886/',
+        title: 'Smithsonian Magazine, Meet the Black Inventor Who Developed the Ice Cream Scoop',
+        quote: 'Cralle never received big bucks for his patent',
+      },
+    ],
+  },
+  {
+    id: 'inv_beard_car_coupling',
+    displayName: 'Car-Coupling Improvement',
+    summary:
+      'US 594,059, titled "Car-coupling," names Andrew Jackson Beard of Eastlake, Alabama, and was granted on 23 November 1897. The specification states that the invention "relates to improvements in that class of car-couplings" and describes a pivotal jaw and sliding lock engaged by an operating rod. Automatic car coupling was patented by Eli Janney in 1873; this grant sits inside that existing field as an improvement, not as its origin. Beard also holds a second, later coupling patent, US 624,901 of 1899. A widely repeated account has Beard losing a leg in a coupling accident; a state historical account records that claim as disputed, not settled.',
+    historicalContext:
+      "Two collapses sit inside this one grant. First, calling this patent the invention of the automatic railroad coupler erases Eli Janney's 1873 patent and every coupler granted between his and Beard's; the specification's own words, \"improvements in that class of car-couplings,\" are the bound this record keeps. Second, the widely told story that Beard lost a leg in a coupling accident is not settled: a state historical account sets a claim of severe injury against a family-interview biography that has him walking the streets of Birmingham, so this record states the injury as disputed rather than as the origin story behind the patent. Eastlake, the address the grant gives, is the East Lake area now inside Birmingham; the pin here uses Birmingham at city precision for that documented work site.",
+    impactStatement:
+      "Automatic coupling was federally mandated by the Safety Appliance Act of 1893, phased in through 1900 because manual coupling killed and maimed rail workers who had to step between moving cars; Beard's 1897 grant and his later 1899 grant, US 624,901, are improvements filed inside that already-mandated field, not its cause. The Encyclopedia of Alabama records that he sold the rights back to the railroad industry for $50,000, a substantial sum at the time, rather than manufacturing the device himself. The improvement he patented is what the document proves, not the disputed injury story attached to his name.",
+    contributors: [{ name: 'Andrew Jackson Beard', predicate: 'improved' }],
+    city: 'Birmingham',
+    state: 'AL',
+    lat: 33.5186,
+    lng: -86.8104,
+    era: '1890s',
+    canonicalUrl: 'https://patents.google.com/patent/US594059A',
+    patentNumber: '594059',
+    evidence: [
+      {
+        sourceUrl: 'https://patents.google.com/patent/US594059A',
+        title: 'US 594,059',
+        quote: 'Car-coupling',
+      },
+      {
+        sourceUrl: 'https://encyclopediaofalabama.org/article/andrew-jackson-beard/',
+        title: 'Encyclopedia of Alabama, Andrew Jackson Beard',
+        quote: 'often seen walking the streets of Birmingham',
+      },
+      {
+        sourceUrl: 'https://encyclopediaofalabama.org/article/andrew-jackson-beard/',
+        title: 'Encyclopedia of Alabama, Andrew Jackson Beard',
+        quote:
+          'it should not be confused with the Janney Coupler invented by Eli Janney and patented in 1873',
+      },
+    ],
+  },
+  {
+    id: 'inv_boykin_precision_resistor',
+    displayName: 'Wire-Type Precision Resistor',
+    summary:
+      'US 2,891,227, titled "Wire type precision resistor," names Otis F. Boykin and was granted on 16 June 1959. The specification describes a resistor wound in sections that alternate winding direction so their magnetic fields cancel, reducing inductance and letting a precise resistance value be set cheaply on automated machinery. Boykin went on to hold about a dozen resistor patents used across radios, televisions and computers. He is widely credited online with inventing the pacemaker or its control unit. This grant names a resistor. It does not mention a heart device, a pacemaker or any medical application, and nothing on its face supports that attribution.',
+    historicalContext:
+      'The pacemaker credit is a popular retelling that outruns the record: a control-unit resistor is not on the face of this 1959 grant, and no citation ties this specific patent to a named cardiac device. Widening a resistor patent into "invented the pacemaker" is the same move this archive rejects everywhere else, so it is rejected here. Boykin moved to Chicago after graduating in 1941 and built his career there, first as a laboratory assistant at Majestic Radio and TV Corp, later at P.J. Nilsen Research Labs, and then as co-founder of Boykin-Fruth Inc. Chicago is the city that career ties to, held here at city precision rather than a specific filing address.',
+    impactStatement:
+      "Boykin's resistors reached ordinary consumer electronics: radios, televisions and later computers used variations of his designs, and the winding method let manufacturers hit a precise resistance value without hand-tuning each part. He ran Boykin-Fruth Inc. with business partner Hal Fruth, an early Black-owned firm in an industry with very few Black engineers. What the record does not show is a documented link from this grant to a specific pacemaker model; that connection is not established here, and this record does not extend the resistor patent to cover it.",
+    contributors: [
+      { name: 'Otis F. Boykin', predicate: 'invented', entityId: 'ent_otis_boykin_001' },
+    ],
+    city: 'Chicago',
+    state: 'IL',
+    lat: 41.8781,
+    lng: -87.6298,
+    era: '1950s',
+    canonicalUrl: 'https://patents.google.com/patent/US2891227A',
+    patentNumber: '2891227',
+    evidence: [
+      {
+        sourceUrl: 'https://patents.google.com/patent/US2891227A',
+        title: 'US 2,891,227',
+        quote: 'Wire type precision resistor',
+      },
+      {
+        sourceUrl: 'https://www.invent.org/inductees/otis-boykin',
+        title: 'Otis Boykin | National Inventors Hall of Fame Inductee',
+        quote:
+          'He earned his first patent on a wire precision resistor, which enabled an exact amount of resistance that could be customized to meet a specific purpose.',
+      },
+    ],
+  },
+  {
+    id: 'inv_thomas_illusion_transmitter',
+    displayName: 'Illusion Transmitter',
+    summary:
+      'US 4,229,761, titled "Illusion transmitter," names Valerie L. Thomas and was granted on 21 October 1980. The specification describes an optical system: an illuminated object placed beyond the focal point of a parabolic mirror produces a real image, which a camera at the transmission site captures and sends to a receiver where a second parabolic mirror and projector reconstruct a three-dimensional-appearing illusion of the object. It is not a holographic camera and not a system for theatrical 3D movies; the patent describes mirror optics, and this record does not extend the grant to either popular claim.',
+    historicalContext:
+      'Calling this device the invention of 3D movies or of the hologram swaps a specific mirror-optics patent for two unrelated fields: holography is a distinct wavefront-recording technique, and theatrical 3D relies on stereoscopic projection, neither of which this specification describes. The scope stays with what the grant claims. Thomas built her documented career at NASA Goddard Space Flight Center, where she managed early Landsat image-processing software and later led operations for the Large Area Crop Inventory Experiment. Goddard is in Greenbelt, Maryland, which is the city this record uses at city precision, not a filing address.',
+    impactStatement:
+      'At NASA Goddard, Thomas managed development of the early Landsat image-processing systems and became the resident expert on the Computer Compatible Tapes used to store Landsat imagery, work documented by NASA itself. The illusion-transmitter patent sits alongside that career as a separate, individually credited grant. This record does not name a specific downstream product or industry built on the mirror system; no source fetched for this record documents one, and none is asserted here.',
+    contributors: [
+      { name: 'Valerie L. Thomas', predicate: 'invented', entityId: 'ent_valerie_thomas_001' },
+    ],
+    city: 'Greenbelt',
+    state: 'MD',
+    lat: 39.0043,
+    lng: -76.8755,
+    era: '1980s',
+    canonicalUrl: 'https://patents.google.com/patent/US4229761A',
+    patentNumber: '4229761',
+    evidence: [
+      {
+        sourceUrl: 'https://patents.google.com/patent/US4229761A',
+        title: 'US 4,229,761',
+        quote: 'Illusion transmitter',
+      },
+      {
+        sourceUrl:
+          'https://science.nasa.gov/missions/landsat/a-face-behind-landsat-images-meet-dr-valerie-l-thomas/',
+        title: 'A Face Behind Landsat Images: Meet Dr. Valerie L. Thomas',
+        quote:
+          'she managed the development of early Landsat image processing software systems and became the resident expert on the Computer Compatible Tapes, or CCTs',
+      },
+    ],
+  },
+  {
+    id: 'inv_johnson_squirt_gun',
+    displayName: 'Pressurized Squirt Gun',
+    summary:
+      'US 4,591,071, titled "Squirt gun," names Lonnie G. Johnson and was granted on 27 May 1986. The specification describes a toy with a pressurized chamber holding water and compressed air, a manually actuated pump beneath the barrel, and a trigger-actuated valve that releases a continuous high-velocity stream, plus an electronic and a water-driven sound generator for effect. Johnson later licensed this design to Larami Corp, which sold it as the Super Soaker. The grant is that toy patent. It does not cover, and this record does not claim, his separate engineering work for the Air Force or NASA.',
+    historicalContext:
+      "This patent is the receipt for a toy, and treating it as a stand-in for Johnson's engineering career would flatten a much longer record: he worked at Oak Ridge National Laboratory, served in the Air Force in space systems and as a flight test engineer on the B-2 stealth bomber program, and worked at NASA's Jet Propulsion Laboratory on the Galileo mission to Jupiter and later on the Mars Observer and Cassini projects. In 1989 he formed his own engineering firm, Johnson Research and Development Co. Inc., headquartered in Atlanta, and has run his inventing career from there since. Atlanta is the city this record uses because it is where his documented post-NASA engineering work is based, not because the 1986 patent names an Atlanta workshop.",
+    impactStatement:
+      "The toy this patent describes was licensed to Larami Corp and sold as the Super Soaker; this record does not state sales figures, because none are cited here to a named source. Johnson's engineering record independent of the toy is documented at Oak Ridge, in Air Force space-systems and stealth-bomber test work, and at NASA JPL on the Galileo, Mars Observer and Cassini missions. Both strands, the toy patent and the aerospace engineering career, are part of the record; this entry is the receipt for the former.",
+    contributors: [{ name: 'Lonnie G. Johnson', predicate: 'invented' }],
+    city: 'Atlanta',
+    state: 'GA',
+    lat: 33.749,
+    lng: -84.388,
+    era: '1980s',
+    canonicalUrl: 'https://patents.google.com/patent/US4591071A',
+    patentNumber: '4591071',
+    evidence: [
+      {
+        sourceUrl: 'https://patents.google.com/patent/US4591071A',
+        title: 'US 4,591,071',
+        quote: 'Squirt gun',
+      },
+      {
+        sourceUrl: 'https://www.invent.org/inductees/lonnie-johnson',
+        title: 'Lonnie Johnson | The National Inventors Hall of Fame',
+        quote:
+          "In 1979, he left the Air Force to become a systems engineer at NASA's Jet Propulsion Laboratory (JPL) to work on the Galileo mission.",
+      },
+    ],
+  },
 ];
