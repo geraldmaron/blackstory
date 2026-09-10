@@ -1,11 +1,14 @@
 # Universal Links / App Links — templated vs. real (MOB-008)
 
-This folder holds **local template fixtures**, not published files. Nothing here is served from
-`https://blackstory.app/.well-known/` yet — that requires publishing from wherever `blackstory.app`
-is actually hosted (Firebase Hosting per `apps/web`, or its own root), which is explicitly **not**
-done by this bead. `apps/web` is out of this bead's exclusive ownership, and per
-the (now-removed) identity decision record's open human gates, the real values these files need
-don't exist yet.
+This folder holds **local fixtures**, not published files. `blackstory.app` is `apps/web` on
+Vercel, and the served copies are route handlers there:
+
+- `apps/web/src/app/.well-known/apple-app-site-association/route.ts`
+- `apps/web/src/app/.well-known/assetlinks.json/route.ts`
+- both built from `apps/web/src/lib/config/app-links.ts`, which is the authoritative copy.
+
+Keep this folder in step with that module or delete the file that drifts. The values below are
+duplicated here only so the shapes are readable next to the Expo config that depends on them.
 
 ## What's real
 
@@ -19,13 +22,15 @@ don't exist yet.
 
 ## What's templated (TODO markers inline)
 
-- `apple-app-site-association` — the `appID` field needs a **real Apple Team ID**
-  (identity decision record's open human gate #1: Apple Developer Program account
-  not yet provisioned). The `paths` list mirrors the web route shapes this app mirrors
-  (`/explore`, `/search`, `/entity/*`, etc.) and excludes the web app's own API routes.
-- `assetlinks.json` — the `sha256_cert_fingerprints` entry needs the **real Android release
-  signing certificate's SHA-256 fingerprint**, which doesn't exist until a real signing identity
-  is provisioned (open human gate #2/#3: Google Play Console + EAS credentials).
+- `apple-app-site-association` — **no longer templated.** The Apple Team ID `4Q2XU7D33G` is real
+  (set 2026-07-22), so `blackstory.app/.well-known/apple-app-site-association` serves this for
+  real. The `paths` list mirrors the web route shapes this app mirrors (`/explore`, `/search`,
+  `/entity/*`, etc.) and excludes the web app's own API routes.
+- `assetlinks.json` — still templated. The `sha256_cert_fingerprints` entry needs the **real
+  Android release signing certificate's SHA-256 fingerprint**, which doesn't exist until a signing
+  identity is provisioned (Google Play Console + EAS credentials). The web route fails closed with
+  404 until `ANDROID_APP_LINKS_SHA256_FINGERPRINTS` is set in the deployed environment: a wrong
+  fingerprint is worse than an absent file, because Android caches the failed verification.
 
 ## Why this doesn't block engineering work
 
@@ -37,10 +42,9 @@ even attempts to claim `blackstory.app`.
 
 ## What "done" looks like later (not this bead)
 
-1. Real Apple Team ID and Android release signing SHA-256 exist (human gates cleared).
-2. This folder's two files are updated with real values and copied to wherever `blackstory.app`
-   actually serves `/.well-known/*` from (an `apps/web` — or Firebase Hosting — concern, not
-   `apps/mobile`'s).
+1. ~~Real Apple Team ID~~ (done 2026-07-22) and Android release signing SHA-256 exist.
+2. ~~Served from `blackstory.app`~~ (done: the `apps/web` routes above). The remaining step is
+   setting `ANDROID_APP_LINKS_SHA256_FINGERPRINTS` on Vercel once the signing identity exists.
 3. iOS/Android verify the association at install time; only then do `https://blackstory.app/*`
    links actually open the app instead of the browser. Until then, every `blackstory.app` link
    correctly opens as a normal web page — this is the inherent, correct behavior of Universal
