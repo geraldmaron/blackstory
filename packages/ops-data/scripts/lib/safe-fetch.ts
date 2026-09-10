@@ -148,6 +148,91 @@ export async function safeFetchText(
   return page ? { text: page.text, finalUrl: page.finalUrl } : undefined;
 }
 
+const JSON_CONTENT_TYPES = ['application/json', 'application/sparql-results+json'];
+
+export type SafeFetchJsonResult =
+  | { readonly ok: true; readonly value: unknown; readonly finalUrl: string }
+  | { readonly ok: false; readonly reason: string };
+
+/**
+ * Same DNS-pinned path as `safeFetchText`, for a public JSON API rather than a web page.
+ *
+ * Separate from `safeFetchPage` because that one hands the body to Trafilatura, which exists to
+ * pull prose out of a news page and has nothing to say about a SPARQL result set. This reads the
+ * decoded bytes and parses them as JSON.
+ *
+ * `userAgent` is passed through to the transport. Wikimedia's user-agent policy asks a script to
+ * name itself and give a contact address, and the shared default cannot carry one.
+ *
+ * Returns a reason instead of throwing, and the reason is the safe-fetch failure code
+ * (`content_type_not_allowed`, `transport_failed`, `duration_exceeded`, a policy denial) so a
+ * caller can tell "this host refused us" from "this host is not reachable at all".
+ */
+export async function safeFetchJson(
+  url: string,
+  options: {
+    readonly userAgent?: string;
+    readonly allowedContentTypes?: readonly string[];
+    readonly maxDurationMs?: number;
+  } = {},
+): Promise<SafeFetchJsonResult> {
+  const result: SafeFetchResult = await executeSafeFetch(
+    url,
+    { resolveHost, transport: performPinnedRequest, parser: parseTextOnly },
+    {
+      limits: {
+        allowedContentTypes: options.allowedContentTypes ?? JSON_CONTENT_TYPES,
+        ...(options.maxDurationMs === undefined ? {} : { maxDurationMs: options.maxDurationMs }),
+      },
+      ...(options.userAgent === undefined ? {} : { userAgent: options.userAgent }),
+    },
+  );
+  if (!result.ok) return { ok: false, reason: result.reason };
+  if (!result.parser.safe) return { ok: false, reason: 'malware_indicator' };
+  const body = (result.parser as ParserWithRawHtml).rawHtml;
+  try {
+    return { ok: true, value: JSON.parse(body) as unknown, finalUrl: result.finalUrl };
+  } catch {
+    return { ok: false, reason: 'invalid_json' };
+  }
+}
+
+/**
+ * Head-of-line liveness check: does this host still answer over HTTPS with a 2xx?
+ *
+ * Used by the source register's drift check. Any content type is acceptable — the question is
+ * whether the site is still there, not what it serves — so this reports the safe-fetch failure
+ * reason rather than a body. `content_type_not_allowed` counts as reachable: the response came
+ * back, we just did not want to read it.
+ */
+export async function safeFetchIsReachable(
+  url: string,
+  options: { readonly userAgent?: string; readonly maxDurationMs?: number } = {},
+): Promise<{ readonly reachable: boolean; readonly reason?: string }> {
+  const result: SafeFetchResult = await executeSafeFetch(
+    url,
+    { resolveHost, transport: performPinnedRequest, parser: parseTextOnly },
+    {
+      // The default 10s budget is a page-fetch budget. An institutional homepage that
+      // redirects once and then takes eight seconds to render is alive, not drifted, and a
+      // liveness check that says otherwise trains people to ignore it.
+      limits: { maxDurationMs: options.maxDurationMs ?? 30_000 },
+      ...(options.userAgent === undefined ? {} : { userAgent: options.userAgent }),
+    },
+  );
+  if (result.ok) {
+    const status = result.status ?? 200;
+    return status >= 200 && status < 300
+      ? { reachable: true }
+      : { reachable: false, reason: `http_${status}` };
+  }
+  // The response came back; we simply declined to read it. That is still a live host.
+  if (result.reason === 'content_type_not_allowed' || result.reason === 'response_too_large') {
+    return { reachable: true };
+  }
+  return { reachable: false, reason: result.reason };
+}
+
 /** Same as `safeFetchText` but also returns the raw HTML, for citation-link extraction. */
 export async function safeFetchPage(
   url: string,

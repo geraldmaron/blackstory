@@ -99,7 +99,40 @@ export function rankTier1Links(links: readonly string[]): readonly string[] {
   return [...links].sort((left, right) => tier1HostRank(right) - tier1HostRank(left));
 }
 
-/** Curated heritage/education hosts — same list as confidence.ts reputable_secondary mapping. */
+/**
+ * Curated heritage/education hosts — the FALLBACK behind the source register.
+ *
+ * `classifySourceForConfidence` asks `source-register.json` first. That file says why a host
+ * counts: a Wikidata item with a library or research authority identifier that names the host
+ * as its own official website. This list only records that somebody once decided a host counts,
+ * which is a backlog rather than a mechanism, and it is why the Academy of American Poets sat
+ * at `unknown` (authority 0.2) until a person typed it in.
+ *
+ * Migration run 2026-09-10 (`source-register.ts propose --from-list`): 21 of these hosts now
+ * carry register entries and keep their classification from there. The rest stayed here, for
+ * reasons the tool named:
+ *
+ * - The item exists and claims the host, but carries no authority identifier — the largest
+ *   group, and all of one kind. Most state encyclopedias are here (encyclopediaofalabama.org,
+ *   encyclopediavirginia.org, ncpedia.org, mnopedia.org, 64parishes.org,
+ *   connecticuthistory.org, philadelphiaencyclopedia.org), plus quincyhistory.org, mofad.org
+ *   and nbindustrial.org. These are real edited publications that no national library has
+ *   cataloged under their own name; only 64parishes.org has a publisher that does
+ *   (the Louisiana Endowment for the Humanities), so a publisher fallback would buy one host.
+ * - The item is not an institution in Wikidata's terms. The nine NPHC organizations are
+ *   collegiate fraternities and sororities; sabr.org is an "organization"; wlrn.org resolves to
+ *   a television station rather than its licensee; blackpast.org, hmdb.org and
+ *   tennesseeencyclopedia.net are websites or web projects; floridainvents.org is an award;
+ *   english-heritage.org.uk matched a podcast.
+ * - Nothing in Wikidata claims the host at all, or claims it only through a deep link:
+ *   apa1906.net, bwht.org, floridacivilrightsmuseum.org, floridastateparks.org, tshaonline.org,
+ *   scencyclopedia.org, ohiohistorycentral.org, kansapedia.org, thewestsidegazette.com,
+ *   heinzhistorycenter.emuseum.com.
+ *
+ * Adding a host here is still allowed and sometimes right, but it is the exception now: try
+ * `source-register.ts propose --host <host>` first, and record what came back.
+ * See docs/research/source-register.md.
+ */
 export const REPUTABLE_SECONDARY_HOST_SUFFIXES = [
   'dcpreservation.org',
   'hmdb.org',

@@ -9,6 +9,7 @@ import {
   computeClaimConfidence,
   confidenceLevelForSource,
 } from './confidence.ts';
+import { setSourceRegisterForTesting, type SourceRegisterFile } from './source-register.ts';
 
 const DC_PRESERVATION = 'https://historicsites.dcpreservation.org/site/123-example-historic-place';
 const NPS_GOV = 'https://www.nps.gov/places/example-historic-site.htm';
@@ -28,6 +29,70 @@ test('classifySourceForConfidence maps curated heritage hosts to reputable_secon
     classifySourceForConfidence('https://www.blackpast.org/african-american-history/example/'),
     'reputable_secondary',
   );
+});
+
+const TEST_REGISTER: SourceRegisterFile = {
+  version: 1,
+  entries: [
+    {
+      host: 'test-archive.example',
+      sourceClass: 'reputable_secondary',
+      orgType: 'archive',
+      label: 'Test State Archive',
+      basis: {
+        wikidata: 'Q1',
+        officialWebsite: 'https://test-archive.example/',
+        authorityIds: { lcnaf: 'n00000001' },
+        instanceOf: ['Q166118'],
+      },
+      reviewedBy: 'test',
+      reviewedAt: '2026-09-10T00:00:00.000Z',
+      verifiedAt: '2026-09-10T00:00:00.000Z',
+    },
+    {
+      // Deliberately a host the curated suffix list already calls reputable_secondary, so this
+      // proves which one the classifier asks first.
+      host: 'hmdb.org',
+      sourceClass: 'news_reportage',
+      orgType: 'news_publisher',
+      label: 'Not really a newspaper — ordering fixture',
+      basis: {
+        wikidata: 'Q2',
+        officialWebsite: 'https://hmdb.org/',
+        authorityIds: { viaf: '2' },
+        instanceOf: ['Q11032'],
+      },
+      reviewedBy: 'test',
+      reviewedAt: '2026-09-10T00:00:00.000Z',
+      verifiedAt: '2026-09-10T00:00:00.000Z',
+    },
+  ],
+};
+
+test('the classifier consults the source register, and consults it first', () => {
+  setSourceRegisterForTesting(TEST_REGISTER);
+  try {
+    // A host nothing else recognizes: without the register it would be `unknown` (authority
+    // 0.2), which is what put a state historical society below a crowd-edited marker database.
+    assert.equal(classifySourceForConfidence('https://example.com/article'), 'unknown');
+    assert.equal(
+      classifySourceForConfidence('https://test-archive.example/collections/1'),
+      'reputable_secondary',
+    );
+    // Subdomains of a registered host are covered; look-alikes are not.
+    assert.equal(
+      classifySourceForConfidence('https://digital.test-archive.example/item/9'),
+      'reputable_secondary',
+    );
+    assert.equal(
+      classifySourceForConfidence('https://test-archive.example.evil.example/item/9'),
+      'unknown',
+    );
+    // The register outranks the curated suffix list, including when it grades a host DOWN.
+    assert.equal(classifySourceForConfidence('https://www.hmdb.org/m.asp?m=1'), 'news_reportage');
+  } finally {
+    setSourceRegisterForTesting(undefined);
+  }
 });
 
 test('classifySourceForConfidence keeps gov and wikipedia behavior', () => {

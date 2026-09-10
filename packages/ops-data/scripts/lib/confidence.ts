@@ -21,6 +21,7 @@ import {
   type ConfidenceEngineResult,
 } from '@repo/domain';
 import { isPatentDocumentUrl } from '@repo/domain-core/claims/lineage';
+import { lookupSourceRegister } from './source-register.ts';
 import { isReputableSecondaryHost, isTier1Host, isWikipediaHost } from './tier1-sources.ts';
 
 /**
@@ -109,6 +110,14 @@ export function classifySourceForConfidence(url: string): string {
     return 'reputable_secondary';
   }
   if (isWikipediaHost(url)) return 'reputable_secondary';
+  // The source register (scripts/lib/source-register.json) is consulted before the curated
+  // suffix list, because a register entry says WHY a host counts — a Wikidata item with an
+  // authority-control identifier that names this host as its own official website — and the
+  // curated list only records that somebody once decided it did. Where both would answer, the
+  // one with a basis wins, and it can also grade a host DOWN: a newspaper registered here is
+  // news_reportage even though the curated list would have called it reputable_secondary.
+  const registered = lookupSourceRegister(hostname);
+  if (registered) return registered.sourceClass;
   if (isReputableSecondaryHost(url)) return 'reputable_secondary';
   const labels = hostname.split('.');
   if (NEWS_HOST_HINTS.some((hint) => labels.some((label) => label.includes(hint))))

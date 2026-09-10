@@ -1,0 +1,447 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "host": "acs.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "learned_society",
+      "label": "American Chemical Society",
+      "basis": {
+        "wikidata": "Q247556",
+        "officialWebsite": "http://www.acs.org",
+        "authorityIds": {
+          "lcnaf": "n78088941",
+          "viaf": "143644441",
+          "isni": "0000000109440166",
+          "ror": "059dqb057",
+          "grid": "grid.286879.a"
+        },
+        "instanceOf": ["Q163740", "Q45400320", "Q748019", "Q955824", "Q96888669"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "aip.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "archive",
+      "label": "American Institute of Physics",
+      "basis": {
+        "wikidata": "Q465230",
+        "officialWebsite": "https://www.aip.org/",
+        "authorityIds": {
+          "lcnaf": "n79078128",
+          "viaf": "150484606",
+          "isni": "0000000419371362",
+          "ror": "02q8vys74",
+          "grid": "grid.300943.d"
+        },
+        "instanceOf": ["Q163740", "Q166118", "Q2085381", "Q45400320", "Q748019"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "baseballhall.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "museum",
+      "label": "National Baseball Hall of Fame and Museum",
+      "basis": {
+        "wikidata": "Q809892",
+        "officialWebsite": "http://www.baseballhall.org/",
+        "authorityIds": {
+          "lcnaf": "n80046102",
+          "viaf": "141837746",
+          "isni": "0000000096060569",
+          "ror": "040nnqy18",
+          "grid": "grid.447130.5",
+          "imls": "8403601285"
+        },
+        "instanceOf": ["Q17000324", "Q42245028"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "chipublib.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "library",
+      "label": "Chicago Public Library",
+      "basis": {
+        "wikidata": "Q1060421",
+        "officialWebsite": "https://www.chipublib.org/",
+        "authorityIds": {
+          "lcnaf": "n79043473",
+          "viaf": "156023090",
+          "isni": "0000000121915611",
+          "ror": "00w19nh03",
+          "grid": "grid.446578.c"
+        },
+        "instanceOf": ["Q16860836", "Q26271642", "Q28564"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "clarabartonmuseum.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "museum",
+      "label": "Clara Barton Missing Soldiers Office Museum",
+      "basis": {
+        "wikidata": "Q123502975",
+        "officialWebsite": "https://clarabartonmuseum.org/",
+        "authorityIds": {
+          "imls": "8409400120"
+        },
+        "instanceOf": ["Q33506"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "computerhistory.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "museum",
+      "label": "Computer History Museum",
+      "basis": {
+        "wikidata": "Q964035",
+        "officialWebsite": "https://computerhistory.org/",
+        "authorityIds": {
+          "lcnaf": "nr2005026865",
+          "viaf": "136511450",
+          "isni": "0000000093036512",
+          "ror": "02kv35z70",
+          "grid": "grid.421446.1"
+        },
+        "instanceOf": ["Q1093436", "Q163740"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "dclibrary.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "library",
+      "label": "District of Columbia Public Library",
+      "basis": {
+        "wikidata": "Q5283432",
+        "officialWebsite": "http://www.dclibrary.org/",
+        "authorityIds": {
+          "lcnaf": "n50027688",
+          "viaf": "156955517",
+          "isni": "0000000404789045",
+          "ror": "00mfsk397",
+          "grid": "grid.431222.4"
+        },
+        "instanceOf": ["Q26271642", "Q28564"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "dcpreservation.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "historical_society",
+      "label": "DC Preservation League",
+      "basis": {
+        "wikidata": "Q97159107",
+        "officialWebsite": "https://www.dcpreservation.org/",
+        "authorityIds": {
+          "lcnaf": "n92052961",
+          "viaf": "150239816"
+        },
+        "instanceOf": ["Q163740", "Q89126428"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "heinzhistorycenter.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "historical_society",
+      "label": "Historical Society of Western Pennsylvania",
+      "basis": {
+        "wikidata": "Q5773957",
+        "officialWebsite": "http://www.heinzhistorycenter.org/",
+        "authorityIds": {
+          "lcnaf": "n82093860",
+          "viaf": "149825616",
+          "isni": "0000000100707493",
+          "ror": "04tj7ta70",
+          "grid": "grid.446873.a"
+        },
+        "instanceOf": ["Q163740", "Q5774403"]
+      },
+      "notes": "other items also claiming this host: Q5700701 (Heinz History Center)",
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "hnoc.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "museum",
+      "label": "The Historic New Orleans Collection",
+      "basis": {
+        "wikidata": "Q7739753",
+        "officialWebsite": "http://www.hnoc.org/",
+        "authorityIds": {
+          "lcnaf": "n50075342",
+          "viaf": "193984290",
+          "ror": "04yw7xm26"
+        },
+        "instanceOf": ["Q2085381", "Q33506", "Q41176"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "ieee.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "learned_society",
+      "label": "Institute of Electrical and Electronics Engineers",
+      "basis": {
+        "wikidata": "Q131566",
+        "officialWebsite": "https://www.ieee.org/",
+        "authorityIds": {
+          "lcnaf": "n79053217",
+          "viaf": "2094148574344024430008",
+          "isni": "0000000121063391",
+          "ror": "01n002310",
+          "grid": "grid.246210.3"
+        },
+        "instanceOf": [
+          "Q106760956",
+          "Q1328899",
+          "Q1391517",
+          "Q163740",
+          "Q2085381",
+          "Q45400320",
+          "Q708676",
+          "Q829080",
+          "Q955824",
+          "Q96888669"
+        ]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "invent.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "hall_of_fame",
+      "label": "National Inventors Hall of Fame",
+      "basis": {
+        "wikidata": "Q1366018",
+        "officialWebsite": "http://www.invent.org/",
+        "authorityIds": {
+          "isni": "0000000405331212",
+          "grid": "grid.486382.3"
+        },
+        "instanceOf": ["Q1046088", "Q11448906", "Q618779"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "kshs.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "museum",
+      "label": "Kansas Historical Society",
+      "basis": {
+        "wikidata": "Q6364992",
+        "officialWebsite": "http://www.kshs.org",
+        "authorityIds": {
+          "lcnaf": "n50056747",
+          "viaf": "157075017",
+          "isni": "0000000106744148",
+          "ror": "00s1xm844",
+          "grid": "grid.419724.d",
+          "imls": "8402000499"
+        },
+        "instanceOf": ["Q163740", "Q33506", "Q52341833", "Q5774403", "Q67378402"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "lynnmuseum.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "museum",
+      "label": "Lynn Heritage State Park",
+      "basis": {
+        "wikidata": "Q1148837",
+        "officialWebsite": "https://lynnmuseum.org/",
+        "authorityIds": {
+          "viaf": "315148114"
+        },
+        "instanceOf": ["Q33506", "Q37998360"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "mdhistory.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "museum",
+      "label": "Maryland Center for History and Culture",
+      "basis": {
+        "wikidata": "Q6781336",
+        "officialWebsite": "https://www.mdhistory.org/",
+        "authorityIds": {
+          "lcnaf": "n79091338",
+          "viaf": "125152994",
+          "isni": "0000000122272515",
+          "ror": "03c0rtn49",
+          "grid": "grid.447097.9",
+          "imls": "8402400312"
+        },
+        "instanceOf": ["Q163740", "Q16735822", "Q3152824", "Q5774403"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "mnhs.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "archive",
+      "label": "Minnesota Historical Society",
+      "basis": {
+        "wikidata": "Q1937351",
+        "officialWebsite": "http://www.mnhs.org/",
+        "authorityIds": {
+          "lcnaf": "n79007328",
+          "viaf": "151216514",
+          "isni": "0000000092231121",
+          "ror": "00avnw427",
+          "grid": "grid.446989.e",
+          "imls": "8402700300"
+        },
+        "instanceOf": ["Q163740", "Q27031009", "Q5774403"]
+      },
+      "notes": "other items also claiming this host: Q6868300 (Minnesota History Center)",
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "newhavenmuseum.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "museum",
+      "label": "New Haven Museum",
+      "basis": {
+        "wikidata": "Q7008533",
+        "officialWebsite": "http://www.newhavenmuseum.org",
+        "authorityIds": {
+          "lcnaf": "no2007004587",
+          "viaf": "158647590",
+          "isni": "0000000089303489"
+        },
+        "instanceOf": ["Q33506"]
+      },
+      "notes": "other items also claiming this host: Q72081271 (New Haven Colony Historical Society)",
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "nypl.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "library",
+      "label": "New York Public Library",
+      "basis": {
+        "wikidata": "Q219555",
+        "officialWebsite": "https://www.nypl.org",
+        "authorityIds": {
+          "lcnaf": "n79033065",
+          "viaf": "143013888",
+          "isni": "0000000121736162",
+          "ror": "02eysy271",
+          "grid": "grid.429888.7"
+        },
+        "instanceOf": ["Q163740", "Q26271642", "Q28564"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "poets.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "cultural_institution",
+      "label": "Academy of American Poets",
+      "basis": {
+        "wikidata": "Q282096",
+        "officialWebsite": "http://www.poets.org",
+        "authorityIds": {
+          "lcnaf": "n83028235",
+          "viaf": "143768473",
+          "isni": "0000000097226815",
+          "ror": "03zkdcr67",
+          "grid": "grid.453206.6"
+        },
+        "instanceOf": ["Q163740", "Q497893"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "samford.edu",
+      "sourceClass": "reputable_secondary",
+      "orgType": "university",
+      "label": "Samford University",
+      "basis": {
+        "wikidata": "Q6381586",
+        "officialWebsite": "http://samford.edu/",
+        "authorityIds": {
+          "lcnaf": "n50058974",
+          "viaf": "144735593",
+          "isni": "0000000107432197",
+          "ror": "0040cz635",
+          "grid": "grid.263055.7"
+        },
+        "instanceOf": ["Q1743327", "Q23002054", "Q3918"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    },
+    {
+      "host": "wisconsinhistory.org",
+      "sourceClass": "reputable_secondary",
+      "orgType": "archive",
+      "label": "Wisconsin Historical Society",
+      "basis": {
+        "wikidata": "Q321717",
+        "officialWebsite": "http://www.wisconsinhistory.org",
+        "authorityIds": {
+          "lcnaf": "n79045303",
+          "viaf": "149972538",
+          "isni": "0000000108053607",
+          "ror": "03kyxhh57",
+          "grid": "grid.431758.c",
+          "imls": "8405500736"
+        },
+        "instanceOf": ["Q163740", "Q52341833", "Q5774403", "Q7603363"]
+      },
+      "reviewedBy": "Gerald Dagher (Claude Code session dac5d62c, 2026-09-10)",
+      "reviewedAt": "2026-09-10T04:12:18.573Z",
+      "verifiedAt": "2026-09-10T04:11:11.854Z"
+    }
+  ]
+}
