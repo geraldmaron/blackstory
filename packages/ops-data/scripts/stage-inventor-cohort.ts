@@ -185,6 +185,7 @@ async function main(): Promise<void> {
               approvedBy: APPROVED_BY,
               approvedAt: new Date().toISOString(),
               basis: row.reviewBasis,
+              livingStatus: row.livingStatus ?? 'deceased',
             },
           }),
         ],
