@@ -2,11 +2,16 @@
 # Alerts enable automatically once the repo exists on GitHub with Dependabot allowed.
 # Grouped weekly bumps keep review load manageable; lockfiles stay the source of truth.
 
+# `main` is branch-protected and receives only deliberate staging -> main release PRs, so every
+# ecosystem below targets `staging`. Without `target-branch` Dependabot opens against the default
+# branch (`main`), where the bumps cannot be merged under that policy and simply accumulate.
+
 version: 2
 
 updates:
   - package-ecosystem: npm
     directory: /
+    target-branch: staging
     # apps/mobile is NOT part of the root pnpm workspace (pnpm-workspace.yaml `!apps/mobile`)
     # and carries its own npm lockfile. Dependabot does not honor that negation, so without
     # this exclusion it edits apps/mobile/package.json from the root entry and never updates
@@ -37,6 +42,7 @@ updates:
     # apps/mobile keeps its own npm lockfile — deliberately excluded from the root pnpm
     # workspace (pnpm-workspace.yaml `!apps/mobile`) — so it needs its own Dependabot entry.
     directory: /apps/mobile
+    target-branch: staging
     schedule:
       interval: weekly
       day: monday
@@ -45,9 +51,24 @@ updates:
       - dependencies
       - javascript
       - mobile
+    # apps/mobile tracks Expo SDK 57's pinned version set. These three bumps resolve against
+    # peers Expo does not ship yet, so npm fails at install and no amount of rebasing helps;
+    # they are held until an SDK upgrade moves the pins, not because the versions are bad.
+    ignore:
+      # Needs react-native-worklets 0.12.x; SDK 57 pins 0.10.1.
+      - dependency-name: 'react-native-reanimated'
+        versions: ['>=4.6.0']
+      # Needs react 19.2.8; SDK 57 pins react 19.2.3.
+      - dependency-name: 'react-test-renderer'
+        versions: ['>=19.2.8']
+      # eslint-plugin-import and eslint-plugin-react do not declare eslint 10 support, and
+      # eslint-config-expo pulls both. The root workspace is already on eslint 10.
+      - dependency-name: 'eslint'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: pip
     directory: /
+    target-branch: staging
     schedule:
       interval: weekly
       day: monday
@@ -58,6 +79,7 @@ updates:
 
   - package-ecosystem: github-actions
     directory: /
+    target-branch: staging
     schedule:
       interval: weekly
       day: monday
