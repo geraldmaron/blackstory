@@ -86,6 +86,32 @@ key on the population you intend to touch. `notabilityBasis` and `notabilityLabe
 rows where both sides are set and disagree, which is 52 records disagreeing about why they are in
 the archive. Picking a winner there is an editorial ruling, not a data sync.
 
+## Test containment before calling anything a conflict
+
+A repair script reporting N rows where "both sides are set and disagree" is not N editorial
+decisions, and should not be escalated as one. Sort the pile first, because most of it usually is
+not a disagreement:
+
+1. **Is the facet a strict subset of the projection?** Compare the arrays as sets. A facet
+   contained in the projection is a stale snapshot, not a conflict: the projection gained entries
+   and the facet never got them. Of 52 reviewed on 2026-09-10, 48 label and 45 basis conflicts
+   were pure containment. Nothing to weigh.
+2. **Is each true orphan evidenced?** An inclusion basis carrying `evidenceIds: []` does not get
+   synced forward whatever it says, because publishing an unevidenced basis is what the notability
+   gate exists to stop. Then check whether the projection already covers the same criterion *with*
+   evidence. Four of seven did, which makes them richer prose with no source, not lost substance.
+3. **Research what survives.** Two orphans held substance the projection genuinely lacked, about
+   people whose records were the poorer for it. That is a research task with a source ladder, not
+   a sync flag: restore it through the enrichment ledger with evidence attached, and let the sync
+   do the boring thing.
+4. **Check scope, not only truth.** One orphan was true and still wrong to publish: it stated as
+   fact a causal claim the primary source attributes to activists' own retrospective testimony.
+   That people said it is documented; that the source asserts it is not. Same discipline the
+   invention cohort applies when it declines to say Latimer invented the light bulb.
+
+The residue after that filter is usually one or two records and an afternoon of reading. Escalate
+that, not the raw count.
+
 ## Do / Never
 
 - **Do** measure per kind before believing a fix is scoped to one cohort. The reported kind is
