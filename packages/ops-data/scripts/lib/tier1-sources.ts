@@ -154,6 +154,56 @@ export const REPUTABLE_SECONDARY_HOST_SUFFIXES = [
   //   blog or aggregator.
   'thewestsidegazette.com',
   'wlrn.org',
+  // Source review 2026-09-10 (operator session, invention and research-case second-lineage
+  // passes). Each host below was fetched and read during that research; every one is the
+  // official site of a museum, archive, library special collection, state encyclopedia, hall
+  // of fame or scholarly society, and none is an aggregator or a personal site. Before this
+  // review they classified `unknown` (authority 0.2), so a claim from a state historical
+  // society scored below one from a crowd-sourced marker database, and adding one of them to a
+  // record LOWERED its minimum claim confidence. The classification stays reputable_secondary:
+  // corroboration still needs an independent second lineage before anything publishes.
+  // Halls of fame and invention programs:
+  'invent.org', // National Inventors Hall of Fame
+  'floridainvents.org', // Florida Inventors Hall of Fame
+  'samford.edu', // Alabama Men's Hall of Fame (Samford University hosts it)
+  // State and regional encyclopedias, all editorially reviewed:
+  'encyclopediaofalabama.org',
+  'encyclopediavirginia.org',
+  '64parishes.org', // Louisiana Endowment for the Humanities
+  'scencyclopedia.org',
+  'tshaonline.org', // Texas State Historical Association
+  'ncpedia.org',
+  'ohiohistorycentral.org',
+  'connecticuthistory.org', // Connecticut Humanities
+  'tennesseeencyclopedia.net', // Tennessee Historical Society
+  'philadelphiaencyclopedia.org', // Encyclopedia of Greater Philadelphia
+  'mnopedia.org', // Minnesota Historical Society
+  'kansapedia.org',
+  // State historical societies and archives not on .gov:
+  'mnhs.org',
+  'kshs.org',
+  'wisconsinhistory.org',
+  'hnoc.org', // Historic New Orleans Collection
+  'mdhistory.org', // Maryland Center for History and Culture
+  // Museums and library special collections:
+  'nypl.org', // New York Public Library, including the Schomburg Center
+  'chipublib.org', // Chicago Public Library, including the Harsh Research Collection
+  'heinzhistorycenter.org',
+  'heinzhistorycenter.emuseum.com',
+  'newhavenmuseum.org',
+  'nbindustrial.org', // New Britain Industrial Museum
+  'clarabartonmuseum.org',
+  'lynnmuseum.org',
+  'quincyhistory.org', // Quincy Historical Society
+  'mofad.org', // Museum of Food and Drink
+  'computerhistory.org',
+  'bwht.org', // Boston Women's Heritage Trail
+  'english-heritage.org.uk',
+  // Scholarly and professional societies:
+  'poets.org', // Academy of American Poets
+  'acs.org', // American Chemical Society
+  'aip.org', // American Institute of Physics
+  'ieee.org',
 ] as const;
 
 export function isReputableSecondaryHost(url: string | undefined): boolean {
