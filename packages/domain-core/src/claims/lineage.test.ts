@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import {
   BRIDGE_LINEAGE_KEY,
   authorityForHost,
+  isPatentDocumentUrl,
   isSameLineage,
   resolveSourceLineage,
   sourceLineageKey,
@@ -188,4 +189,31 @@ test('a National Archives catalog record is a work, and two ids are two works', 
   const b = sourceLineageKey({ url: 'https://catalog.archives.gov/id/67890' });
   assert.equal(a, 'work:nara:12345');
   assert.notEqual(a, b);
+});
+
+test('isPatentDocumentUrl finds a patent document on every mirror, and only a document', () => {
+  assert.equal(isPatentDocumentUrl('https://patents.google.com/patent/US252386A/en'), true);
+  assert.equal(
+    isPatentDocumentUrl('https://patentimages.storage.googleapis.com/pdfs/US252386.pdf'),
+    true,
+  );
+  assert.equal(
+    isPatentDocumentUrl(
+      'https://ppubs.uspto.gov/pubwebapp/rest/patents/html/252386?patentNumber=252386',
+    ),
+    true,
+  );
+  // freepatentsonline.com names the patent as the bare filename, with no /patent/ segment —
+  // the case that needed its own extraction rule alongside the shared patentWorkFromUrl paths.
+  assert.equal(isPatentDocumentUrl('https://www.freepatentsonline.com/4723129.html'), true);
+
+  // A search page, a listing, and the mirror's own home page name no document.
+  assert.equal(isPatentDocumentUrl('https://patents.google.com/?q=latimer'), false);
+  assert.equal(isPatentDocumentUrl('https://patents.google.com/'), false);
+  assert.equal(isPatentDocumentUrl('https://www.freepatentsonline.com/'), false);
+  assert.equal(isPatentDocumentUrl('https://www.freepatentsonline.com/search.html?q=x'), false);
+
+  // An unrelated URL, and an unparseable string, are both not a patent document.
+  assert.equal(isPatentDocumentUrl('https://www.nps.gov/articles/some-place.htm'), false);
+  assert.equal(isPatentDocumentUrl('not a url'), false);
 });

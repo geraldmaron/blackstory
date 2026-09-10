@@ -4,6 +4,7 @@
  */
 import {
   buildReleaseEntityArtifacts,
+  deriveCatalogEntityStatus,
   findUsStateByPostalCode,
   findUsStateForPoint,
   findUsStateFromJurisdictionLabel,
@@ -425,7 +426,13 @@ function corroboratingSourcesForLandscape(row: LandscapePublishRow): readonly st
     const url = typeof raw.sourceUrl === 'string' ? raw.sourceUrl.trim() : '';
     if (url.startsWith('https://')) urls.add(url);
   }
-  if (row.canonical_url) urls.delete(row.canonical_url);
+  // The canonical document corroborates claims taken from other documents; a claim's own
+  // citation is excluded per-claim in minClaimConfidence, which is the only self-corroboration
+  // guard needed. Deleting the canonical URL here as a second guard instead penalized every
+  // OTHER claim: an evidence claim taken from a second document could no longer be corroborated
+  // by the record's own canonical source. lineage resolution (resolveSourceLineage) already
+  // collapses a canonical page and an evidence page from the same authority onto one lineage, so
+  // a record with two pages from one institution gains nothing from including both here.
   return [...urls];
 }
 
@@ -450,6 +457,56 @@ function minClaimConfidence(entry: ReleaseSourceEntity, row?: LandscapePublishRo
     min = Math.min(min, result.score);
   }
   return Number.isFinite(min) ? min : 0;
+}
+
+const GRANT_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/u;
+
+/**
+ * An authored `statusHistory` for an invention row whose landscape payload carries a full grant
+ * date, or `undefined` when it does not (or the kind is not `invention`).
+ *
+ * A grant date is a sourced fact about exactly when this record's lifecycle starts — sharper
+ * than the era-bucket decade `earliestYear` falls back to in `deriveCatalogEntityStatus`
+ * (packages/domain/src/derive-catalog-status.ts). This builds the authored entry that function's
+ * existing pass-through already honors ("If the entry already has statusHistory ... pass
+ * through") instead of adding a second invention-specific branch there: the status LABEL still
+ * comes from the same heuristic every invention has always used, and only the date moves from
+ * the decade to the day the grant states.
+ */
+function inventionGrantStatusHistory(
+  row: LandscapePublishRow,
+  fields: {
+    readonly summary: string;
+    readonly historicalContext?: string;
+    readonly eraBuckets?: readonly string[];
+  },
+): ReleaseSourceEntity['statusHistory'] {
+  if (row.kind !== 'invention') return undefined;
+  const grantDate = typeof row.payload.grantDate === 'string' ? row.payload.grantDate.trim() : '';
+  if (!GRANT_DATE_PATTERN.test(grantDate)) return undefined;
+
+  const fallback = deriveCatalogEntityStatus({
+    id: row.id,
+    kind: row.kind,
+    summary: fields.summary,
+    ...(fields.historicalContext !== undefined
+      ? { historicalContext: fields.historicalContext }
+      : {}),
+    ...(fields.eraBuckets !== undefined ? { eraBuckets: fields.eraBuckets } : {}),
+  });
+  const status = fallback.statusHistory?.[0]?.status ?? fallback.status;
+  // `unknown` (and the person-only living/deceased values, unreachable for kind 'invention')
+  // are not a lifecycle status this history can carry; leave the fallback path to report them.
+  if (typeof status !== 'string' || status === 'unknown') return undefined;
+
+  return [
+    {
+      status,
+      validFrom: grantDate,
+      datePrecision: 'day',
+      basisClaimIds: [],
+    },
+  ];
 }
 
 export function buildReleaseSourceFromLandscape(
@@ -666,6 +723,16 @@ export function buildReleaseSourceFromLandscape(
   const enrichedTopicIds = asStringArray(row.payload.topicIds);
   const enrichedEraBuckets = asStringArray(row.payload.eraBuckets);
   const enrichedKeywords = asStringArray(row.payload.keywords);
+  // Same passthrough for related entity ids. `resolveReleaseEntityReferences` deliberately does
+  // not validate these against the release or canonical graph (see release-builder.ts's header
+  // doc comment): legacy-tag placeholder strings pending real entity resolution are expected,
+  // so no existence check is added here either.
+  const enrichedMentionedEntityIds = asStringArray(row.payload.mentionedEntityIds);
+  const grantStatusHistory = inventionGrantStatusHistory(row, {
+    summary,
+    ...(enrichedContext.length > 0 ? { historicalContext: enrichedContext } : {}),
+    ...(enrichedEraBuckets.length > 0 ? { eraBuckets: enrichedEraBuckets } : {}),
+  });
 
   return {
     id: row.id,
@@ -677,6 +744,7 @@ export function buildReleaseSourceFromLandscape(
     ...(enrichedTopicIds.length > 0 ? { topicIds: enrichedTopicIds } : {}),
     ...(enrichedEraBuckets.length > 0 ? { eraBuckets: enrichedEraBuckets } : {}),
     ...(enrichedKeywords.length > 0 ? { keywords: enrichedKeywords } : {}),
+    ...(grantStatusHistory !== undefined ? { statusHistory: grantStatusHistory } : {}),
     ...(livingStatus !== undefined ? { livingStatus } : {}),
     jurisdictionLabel: jurisdictionFromPlace({
       ...placeFieldsFromLandscape(row),
@@ -688,7 +756,7 @@ export function buildReleaseSourceFromLandscape(
     lat: row.lat,
     lng: row.lng,
     claims,
-    mentionedEntityIds: [],
+    mentionedEntityIds: enrichedMentionedEntityIds,
   };
 }
 

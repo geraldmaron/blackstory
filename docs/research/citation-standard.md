@@ -19,6 +19,10 @@ implement:
 
 - `classifySourceForConfidence` maps Wikipedia to `reputable_secondary` — a real classification,
   not a rejection.
+- A US patent document classifies as `government_record` on any mirror that serves it
+  (patents.google.com, patentimages.storage.googleapis.com, freepatentsonline.com,
+  patentsview.org, uspto.gov) — the classification is of the document, a government grant, not
+  of the host reading it back.
 - `isWikipediaHost` excludes it from every corroboration path in `corroborate-source.ts`.
   Wikipedia is a *bridge* to Tier-1 references, never returned as evidence itself.
 - A Wikipedia-only claim contributes **no** corroborating lineage, so the formula caps it below
@@ -49,6 +53,20 @@ The rule held; the machinery under it got more honest. Three parts:
   which was the tell: a bridge and a heritage-inventory record are not equally good evidence, and
   the old rule could not say so because it counted a hostname as a lineage. Both still sit under
   0.75; neither publishes alone.
+
+## Which hosts count as institutions
+
+The rule above turns on a source's class, and for most of the web that class came out `unknown`
+— authority 0.2. The only escape was a hand-typed list of host suffixes, so the Academy of
+American Poets and the Schomburg Center scored below a crowd-edited roadside-marker database, and
+adding one of them to a record could push it under the publish floor. That escape hatch is now
+the fallback, not the mechanism: `classifySourceForConfidence` first consults a **source
+register** of hosts backed by an authority-controlled Wikidata item that names the host as its
+own official website and carries an LCNAF, VIAF, ISNI, ROR, GRID or IMLS identifier. The register
+is produced and re-verified by a tool, refuses look-alike domains by construction, and never
+grants government authority off a government TLD. See
+[`source-register.md`](./source-register.md) for the acceptance rule, the propose/apply/verify
+workflow, and the drift policy.
 
 ## Fitness is claim-relative
 

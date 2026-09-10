@@ -23,6 +23,7 @@
     "@google/genai": "^2.12.0",
     "@repo/data-access": "workspace:*",
     "@repo/domain": "workspace:*",
+    "@repo/domain-core": "workspace:*",
     "@repo/schemas": "workspace:*",
     "@repo/security": "workspace:*",
     "firebase": "^12.16.0",

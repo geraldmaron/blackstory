@@ -20,6 +20,8 @@ import {
   type ClaimEvidenceLink,
   type ConfidenceEngineResult,
 } from '@repo/domain';
+import { isPatentDocumentUrl } from '@repo/domain-core/claims/lineage';
+import { lookupSourceRegister } from './source-register.ts';
 import { isReputableSecondaryHost, isTier1Host, isWikipediaHost } from './tier1-sources.ts';
 
 /**
@@ -56,7 +58,10 @@ function hostMatches(hostname: string, domain: string): boolean {
  * emitted `low` and so rendered a three-segment meter from a two-value vocabulary: 10,572 of
  * 11,555 published claims were `high` and none were `low` (repo-hqwt9).
  *
- * - A government or military record is the archive's primary evidence. `high`.
+ * - A government or military record is the archive's primary evidence. `high`. A patent
+ *   document is one of these on any mirror that serves it (patents.google.com,
+ *   patentimages.storage.googleapis.com, freepatentsonline.com, patentsview.org), not only on
+ *   uspto.gov — see `classifySourceForConfidence`.
  * - Wikipedia and Wikidata are bridge sources. `claim-corroborate` puts a Wikipedia-only claim at
  *   `low` outright, and 2,049 published claims cited Wikipedia at `high`.
  * - Everything else is `medium`, INCLUDING hosts the classifier cannot place. That is deliberate
@@ -85,6 +90,15 @@ export function classifySourceForConfidence(url: string): string {
     GOVERNMENT_DOMAINS.some((domain) => hostMatches(hostname, domain))
   )
     return 'government_record';
+  // A patent specification is the same government grant whichever mirror serves it —
+  // `resolveSourceLineage` (packages/domain-core/src/claims/lineage.ts) already collapses
+  // uspto.gov and patents.google.com onto one lineage for exactly this reason. This
+  // classification follows the same logic: it grades the DOCUMENT, not the host serving it, so
+  // a patent read on patents.google.com must not grade lower than the identical text read on
+  // uspto.gov. `isPatentDocumentUrl` only matches an individual patent document (a resolvable
+  // patent number) — a search page or the mirror's home page falls through to the classification
+  // below, same as any other unrecognized page on that host.
+  if (isPatentDocumentUrl(url)) return 'government_record';
   if (
     ARCHIVAL_DOMAINS.some((domain) => hostMatches(hostname, domain)) ||
     hostUnderTld(hostname, 'edu')
@@ -96,6 +110,14 @@ export function classifySourceForConfidence(url: string): string {
     return 'reputable_secondary';
   }
   if (isWikipediaHost(url)) return 'reputable_secondary';
+  // The source register (scripts/lib/source-register.json) is consulted before the curated
+  // suffix list, because a register entry says WHY a host counts — a Wikidata item with an
+  // authority-control identifier that names this host as its own official website — and the
+  // curated list only records that somebody once decided it did. Where both would answer, the
+  // one with a basis wins, and it can also grade a host DOWN: a newspaper registered here is
+  // news_reportage even though the curated list would have called it reputable_secondary.
+  const registered = lookupSourceRegister(hostname);
+  if (registered) return registered.sourceClass;
   if (isReputableSecondaryHost(url)) return 'reputable_secondary';
   const labels = hostname.split('.');
   if (NEWS_HOST_HINTS.some((hint) => labels.some((label) => label.includes(hint))))

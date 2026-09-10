@@ -69,6 +69,15 @@ export type SafeFetchResult =
       readonly ok: true;
       readonly finalUrl: string;
       readonly redirectCount: number;
+      /**
+       * Transport status of the final (non-redirect) response.
+       *
+       * Optional because the type predates it and existing test doubles build results without
+       * one; the state machine always sets it. A caller that only wants the body can ignore it,
+       * but a caller asking "is this site still alive" needs to tell 200 from 404 — a 404 page
+       * is text/html of the right size and otherwise looks like a successful fetch.
+       */
+      readonly status?: number;
       readonly contentType: string;
       readonly byteLength: number;
       readonly contentHash: string;
@@ -93,6 +102,16 @@ export type SafeFetchDependencies = {
 export type SafeFetchOptions = {
   readonly limits?: Partial<SafeFetchLimits>;
   readonly domainPolicy?: SourceDomainPolicy;
+  /**
+   * Replaces the outgoing `user-agent` value only.
+   *
+   * Deliberately a single string rather than a general header bag: the `host` header is what
+   * makes DNS pinning safe (it names the site while the socket goes to the pinned address), so
+   * no caller may set headers wholesale. Some public APIs require a descriptive agent that
+   * names the tool and a contact — Wikimedia's user-agent policy is the reason this exists —
+   * and a shared default cannot carry one caller's contact address.
+   */
+  readonly userAgent?: string;
 };
 
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
@@ -221,7 +240,7 @@ export async function executeSafeFetch(
             headers: {
               host: destination.value.hostname,
               accept: limits.allowedContentTypes.join(', '),
-              'user-agent': 'BlackBook-SafeFetcher/1.0',
+              'user-agent': options.userAgent ?? 'BlackBook-SafeFetcher/1.0',
             },
             signal: controller.signal,
           }),
@@ -294,6 +313,7 @@ export async function executeSafeFetch(
         ok: true,
         finalUrl: destination.value.normalizedUrl,
         redirectCount,
+        status: response.status,
         contentType,
         byteLength,
         contentHash: createHash('sha256').update(content).digest('hex'),

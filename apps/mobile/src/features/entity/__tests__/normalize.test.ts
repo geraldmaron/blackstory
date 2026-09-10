@@ -1,4 +1,4 @@
-import { normalizeEntity } from '../normalize';
+import { normalizeClaim, normalizeEntity } from '../normalize';
 import {
   ALL_KINDS,
   claimWithMalformedCitationUrl,
@@ -13,6 +13,11 @@ import {
   minimalEntityFixture,
 } from '../testFixtures';
 import { MAX_EXTENDED_NARRATIVE_CHARS } from '../types';
+import {
+  CLAIM_ROLE_RECORD_INDEX,
+  recordConfidenceTier,
+  type EvidenceClaimInput,
+} from '@repo/public-contracts/evidence';
 
 describe('normalizeEntity — fixture matrix', () => {
   it.each(ALL_KINDS)('normalizes a FULL fixture for kind=%s without dropping required content', (kind) => {
@@ -120,5 +125,92 @@ describe('normalizeEntity — adversarial cases', () => {
     }));
     const entity = normalizeEntity({ ...minimalEntityFixture('place'), claims: manyClaims });
     expect(entity!.claims).toHaveLength(10); // under the 500 bound — sanity check the cap logic runs, not the cap itself
+  });
+});
+
+describe('normalizeClaim — claimRole', () => {
+  const baseRawClaim = {
+    id: 'claim_role_test',
+    predicate: 'founded_by',
+    object: 'Founded by a coalition of formerly enslaved families in 1871.',
+    confidenceScore: 0.82,
+    confidenceLevel: 'high',
+  };
+
+  it('keeps claimRole when it is a valid wire value (record_index)', () => {
+    const claim = normalizeClaim({ ...baseRawClaim, claimRole: CLAIM_ROLE_RECORD_INDEX });
+    expect(claim).not.toBeNull();
+    expect(claim!.claimRole).toBe('record_index');
+  });
+
+  it('keeps claimRole when it is a valid wire value (evidence)', () => {
+    const claim = normalizeClaim({ ...baseRawClaim, claimRole: 'evidence' });
+    expect(claim).not.toBeNull();
+    expect(claim!.claimRole).toBe('evidence');
+  });
+
+  it('drops claimRole when it is not a value the wire contract defines', () => {
+    const claim = normalizeClaim({ ...baseRawClaim, claimRole: 'primary_source' });
+    expect(claim).not.toBeNull();
+    expect(claim!.claimRole).toBeUndefined();
+  });
+
+  it('leaves claimRole undefined when absent entirely', () => {
+    const claim = normalizeClaim({ ...baseRawClaim });
+    expect(claim).not.toBeNull();
+    expect(claim!.claimRole).toBeUndefined();
+  });
+
+  it('grades a record_index claim plus an evidence claim identically to grading the same claims directly against public-contracts — the index row no longer counts as corroboration', () => {
+    // Two independently-cited claims, both `high` confidence. Before claimRole survived
+    // normalization, `recordConfidenceTier` had no way to see the first row is the record's
+    // own index entry (its predicate is deliberately NOT one of the legacy
+    // `RECORD_PROVENANCE_PREDICATES` strings, so the predicate fallback in
+    // `packages/public-contracts/src/evidence.ts` cannot rescue it either) — both citations
+    // counted as corroboration and the record graded a bare `high`.
+    const rawIndexClaim = {
+      id: 'claim_index',
+      predicate: 'catalogued_as',
+      object: 'Listed in the National Register of Historic Places.',
+      confidenceScore: 0.82,
+      confidenceLevel: 'high',
+      citation: {
+        source: 'nara.gov',
+        label: 'NARA catalog entry',
+        href: 'https://catalog.archives.gov/id/1',
+      },
+      claimRole: CLAIM_ROLE_RECORD_INDEX,
+    };
+    const rawEvidenceClaim = {
+      id: 'claim_evidence',
+      predicate: 'founded_by',
+      object: 'Founded by a coalition of formerly enslaved families in 1871.',
+      confidenceScore: 0.82,
+      confidenceLevel: 'high',
+      citation: {
+        source: 'county-historical-society.org',
+        label: 'County Historical Society',
+        href: 'https://example.org/chs',
+      },
+      claimRole: 'evidence',
+    };
+
+    const entity = normalizeEntity({
+      ...minimalEntityFixture('place'),
+      claims: [rawIndexClaim, rawEvidenceClaim],
+    });
+    expect(entity).not.toBeNull();
+    expect(entity!.claims).toHaveLength(2);
+
+    const directInputs: EvidenceClaimInput[] = [rawIndexClaim, rawEvidenceClaim];
+
+    // Same tier whether public-contracts grades the mobile-normalized claims or the raw wire
+    // claims directly — normalization must not lose the signal `recordConfidenceTier` needs.
+    expect(recordConfidenceTier(entity!.claims)).toBe(recordConfidenceTier(directInputs));
+    // And that shared tier is the corroboration-aware one: the index row is excluded, leaving
+    // exactly one corroborating lineage, so the record steps down from `high` to `medium`
+    // rather than reaching `high` on two citations that are really one source plus its own
+    // index row.
+    expect(recordConfidenceTier(entity!.claims)).toBe('medium');
   });
 });

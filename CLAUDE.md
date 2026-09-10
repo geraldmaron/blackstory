@@ -58,6 +58,13 @@ assume. A one-line regex widening in that run would have rendered "pre-Columbian
 **MANDATORY WORKFLOW:**
 
 1. **File issues for remaining work** - Create issues for anything that needs follow-up
+   1a. **Then work the follow-ups you just filed.** A follow-up that is bounded data or
+   validation work inside the session's own epic (a second source, a dead link, a stale
+   facet, a floor that now passes, a record the pass could not reach) is the next step of
+   the same job, not a hand-off. Fan out and finish it in this session, measured the same
+   way, before closing out. File-and-stop only when the follow-up needs a human decision
+   (policy, scope, an irreversible change) or lies outside the epic, and say which. The
+   operator should never have to reply "now do the follow-ups".
 2. **Run quality gates** (if code changed) - Tests, linters, builds
 3. **Update issue status** - Close finished work, update in-progress items
 4. **PUSH TO REMOTE** - This is MANDATORY. Push to `staging`, never directly to `main`

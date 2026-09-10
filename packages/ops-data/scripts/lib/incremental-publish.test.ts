@@ -10,6 +10,7 @@ import {
   buildArtifactsForEntry,
   canonicalUpsertParamsFromLandscape,
   gateLandscapePublishCandidate,
+  INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR,
   incrementalPublishProvenancePatch,
   jurisdictionFromPlace,
   jurisdictionFromProvenance,
@@ -18,7 +19,7 @@ import {
   toReleaseEntityRow,
   type LandscapePublishRow,
 } from './incremental-publish.ts';
-import { buildReleaseEntityArtifacts } from '@repo/domain';
+import { buildReleaseEntityArtifacts, deriveCatalogEntityStatus } from '@repo/domain';
 
 /** Parsed host, or null for anything unparseable — never a substring test on the raw URL. */
 const hostOf = (url: string): string | null => {
@@ -73,6 +74,27 @@ const enrichedRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePub
     ...overrides,
   });
 
+/** An invention-cohort landscape row, for the grant-date statusHistory tests below. */
+const inventionRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublishRow => ({
+  id: 'inv_example_device',
+  lane: 'invention-cohort',
+  kind: 'invention',
+  display_name: 'Example Device',
+  summary:
+    'US 1,475,024, titled "Example Device," names A. Example and was granted on 20 November 1923. '.repeat(
+      4,
+    ),
+  lat: 41.4993,
+  lng: -81.6944,
+  canonical_url: 'https://patents.google.com/patent/US1475024A',
+  source_item_id: 'inv_example_device',
+  provenance: {},
+  payload: { eraBuckets: ['1920s'] },
+  exact_in_release: false,
+  name_overlap: false,
+  ...overrides,
+});
+
 test('jurisdictionFromProvenance maps DC to full label', () => {
   assert.equal(
     jurisdictionFromProvenance({ sourceCity: 'Washington', sourceState: 'DC' }),
@@ -124,6 +146,33 @@ test('buildReleaseSourceFromLandscape produces claims from canonical_url', () =>
     entry?.claims?.[0]?.citationHref,
     'https://historicsites.dcpreservation.org/items/show/1055',
   );
+});
+
+test('buildReleaseSourceFromLandscape anchors an invention with payload.grantDate to a day-precision statusHistory', () => {
+  const entry = buildReleaseSourceFromLandscape(
+    inventionRow({ payload: { eraBuckets: ['1920s'], grantDate: '1923-11-20' } }),
+  );
+  assert.ok(entry);
+  assert.equal(entry?.statusHistory?.length, 1);
+  assert.equal(entry?.statusHistory?.[0]?.validFrom, '1923-11-20');
+  assert.equal(entry?.statusHistory?.[0]?.datePrecision, 'day');
+});
+
+test('buildReleaseSourceFromLandscape leaves an invention row without payload.grantDate to fall back to the era year', () => {
+  const entry = buildReleaseSourceFromLandscape(
+    inventionRow({ payload: { eraBuckets: ['1920s'] } }),
+  );
+  assert.ok(entry);
+  assert.equal(entry?.statusHistory, undefined);
+
+  const derived = deriveCatalogEntityStatus({
+    id: entry!.id,
+    kind: entry!.kind,
+    summary: entry!.summary,
+    ...(entry!.eraBuckets !== undefined ? { eraBuckets: entry!.eraBuckets } : {}),
+  });
+  assert.equal(derived.statusHistory?.[0]?.validFrom, '1920');
+  assert.equal(derived.statusHistory?.[0]?.datePrecision, 'year');
 });
 
 test('gateLandscapePublishCandidate rejects person privacy holds', () => {
@@ -516,6 +565,30 @@ test('buildReleaseSourceFromLandscape carries enrichment topicIds/eraBuckets/key
   assert.deepEqual(entry!.keywords, ['Gardner Bishop', 'Bolling v. Sharpe']);
 });
 
+test('buildReleaseSourceFromLandscape carries payload.mentionedEntityIds onto the entry', () => {
+  // A cohort-adopted seed record's related entity ids have to survive a republish the same way
+  // topicIds/keywords do, or adopting the row silently drops them (repo-n7p6, mentionedEntityIds
+  // used to be hardcoded to []).
+  const entry = buildReleaseSourceFromLandscape(
+    enrichedRow({
+      payload: {
+        historicalContext: 'x',
+        mentionedEntityIds: ['ent_naacp_001', 'ent_some_org_002'],
+      },
+    }),
+  );
+  assert.ok(entry);
+  assert.deepEqual(entry!.mentionedEntityIds, ['ent_naacp_001', 'ent_some_org_002']);
+});
+
+test('buildReleaseSourceFromLandscape publishes an empty mentionedEntityIds when the payload has none', () => {
+  const entry = buildReleaseSourceFromLandscape(
+    enrichedRow({ payload: { historicalContext: 'x' } }),
+  );
+  assert.ok(entry);
+  assert.deepEqual(entry!.mentionedEntityIds, []);
+});
+
 test('buildReleaseSourceFromLandscape ignores non-string entries and a missing field', () => {
   const entry = buildReleaseSourceFromLandscape(
     enrichedRow({ payload: { historicalContext: 'x', topicIds: ['music', 42, null] } }),
@@ -841,4 +914,129 @@ test('gateLandscapePublishCandidate admits a null-context record that cites a re
     'no narrative paragraph — depth must not rely on one',
   );
   assert.equal(assessLandscapeDepth(entry!, row).deep, true);
+});
+
+/**
+ * A landscape row from a research case whose canonical document (nps.gov) is also the
+ * provenance `sourceUrl` — the shape a research-case promotion produces when the canonical link
+ * IS the source the record was built from. `corroboratingSourcesForLandscape` no longer deletes
+ * that URL out of the corroboration pool it just built.
+ */
+const researchCaseRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublishRow =>
+  baseRow({
+    id: 'ent_research_case_probe',
+    lane: 'research-cases',
+    display_name: 'Nicodemus AME Church',
+    summary:
+      'Nicodemus AME Church is a historic congregation in Nicodemus, Kansas, documented by the ' +
+      'National Park Service as part of the Nicodemus National Historic Site. The congregation ' +
+      'was organized by formerly enslaved settlers who founded the town in 1877, and the church ' +
+      'building itself has stood as a landmark of the settlement since the nineteenth century. ' +
+      'A roadside historical marker placed by the local historical society also records the ' +
+      "congregation's founding and its role in the town's early religious life, noting that the " +
+      'building has hosted continuous worship since its construction.',
+    lat: 39.75,
+    lng: -99.62,
+    canonical_url: 'https://www.nps.gov/nico/learn/historyculture/ame-church.htm',
+    provenance: { sourceUrl: 'https://www.nps.gov/nico/learn/historyculture/ame-church.htm' },
+    payload: {},
+    ...overrides,
+  });
+
+/**
+ * repo defect fix: a claim built from a second document (the marker database) used to lose the
+ * record's own canonical government page from its corroboration set, because
+ * `corroboratingSourcesForLandscape` deleted `canonical_url` out of the pool it had just built —
+ * a second self-corroboration guard on top of the per-claim filter `minClaimConfidence` already
+ * applies. Measured live on ent_research_case_20260902_nicodemus-ame-church: canonical nps.gov +
+ * evidence hmdb.org + wikipedia scored 0.720 (below the 0.75 floor) because the hmdb claim's only
+ * remaining corroborator was the Wikipedia bridge, which counts zero lineages. With the canonical
+ * document back in the pool, the same claim is corroborated by a second real authority
+ * (national-park-service) and clears the floor.
+ */
+test("gateLandscapePublishCandidate: a claim from a second document is corroborated by the record's own canonical government page", () => {
+  const row = researchCaseRow({
+    payload: {
+      evidenceCitations: [
+        {
+          sourceUrl: 'https://www.hmdb.org/m.asp?m=12345',
+          title: 'Nicodemus AME Church historical marker',
+          sourceTier: 'tier2',
+          quote: 'the congregation organized this church soon after the town was founded in 1877',
+        },
+      ],
+    },
+  });
+  const result = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_test',
+    generatedAt: '2026-09-09T00:00:00.000Z',
+  });
+  assert.equal(result.eligible, true);
+  if (!result.eligible) return;
+  assert.ok(
+    result.confidence >= INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR,
+    `expected confidence >= floor, got ${result.confidence}`,
+  );
+  assert.equal(result.confidence, 0.79);
+});
+
+/**
+ * A canonical page and its only evidence citation from the SAME authority (two different
+ * hmdb.org marker pages) still collapse onto one lineage — `resolveSourceLineage` groups by
+ * issuing authority, not by exact URL, so this is unaffected by removing the delete guard. A
+ * record with two pages from one institution gains nothing from counting both.
+ */
+test('gateLandscapePublishCandidate: canonical and evidence from the same authority still fail the floor (one lineage)', () => {
+  const row = researchCaseRow({
+    canonical_url: 'https://www.hmdb.org/m.asp?m=11111',
+    provenance: { sourceUrl: 'https://www.hmdb.org/m.asp?m=11111' },
+    payload: {
+      evidenceCitations: [
+        {
+          sourceUrl: 'https://www.hmdb.org/m.asp?m=12345',
+          title: 'Nicodemus AME Church historical marker',
+          sourceTier: 'tier2',
+          quote: 'the congregation organized this church soon after the town was founded in 1877',
+        },
+      ],
+    },
+  });
+  const result = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_test',
+    generatedAt: '2026-09-09T00:00:00.000Z',
+  });
+  assert.equal(result.eligible, false);
+  if (result.eligible) return;
+  assert.equal(result.reason, 'confidence_below_floor');
+  assert.equal(result.detail, 'confidence 0.720 < floor 0.75');
+});
+
+/**
+ * A row with only its own canonical citation — no evidence documents, no duplicated sourceUrl to
+ * corroborate from — is unaffected by removing the delete guard: `minClaimConfidence` already
+ * filters a claim's own citationHref out of its corroboration sources
+ * (`.filter((url) => url !== citationHref)`), so the index claim never counted itself before this
+ * fix and does not start counting itself now. Depth is cleared here via `historicalContext`
+ * rather than a second document, since a canonical-only row has no independent source.
+ */
+test('gateLandscapePublishCandidate: the index claim still does not count itself (canonical only)', () => {
+  const row = researchCaseRow({
+    provenance: {},
+    payload: {
+      historicalContext:
+        'The congregation organized this church soon after formerly enslaved settlers founded ' +
+        'Nicodemus in 1877.',
+    },
+  });
+  const result = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_test',
+    generatedAt: '2026-09-09T00:00:00.000Z',
+  });
+  assert.equal(result.eligible, true);
+  if (!result.eligible) return;
+  // Unchanged from before the fix: a lone government citation, one lineage, no corroborator.
+  assert.equal(result.confidence, 0.77);
 });

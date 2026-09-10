@@ -4,7 +4,12 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { classifySourceForConfidence, computeClaimConfidence } from './confidence.ts';
+import {
+  classifySourceForConfidence,
+  computeClaimConfidence,
+  confidenceLevelForSource,
+} from './confidence.ts';
+import { setSourceRegisterForTesting, type SourceRegisterFile } from './source-register.ts';
 
 const DC_PRESERVATION = 'https://historicsites.dcpreservation.org/site/123-example-historic-place';
 const NPS_GOV = 'https://www.nps.gov/places/example-historic-site.htm';
@@ -26,10 +31,103 @@ test('classifySourceForConfidence maps curated heritage hosts to reputable_secon
   );
 });
 
+const TEST_REGISTER: SourceRegisterFile = {
+  version: 1,
+  entries: [
+    {
+      host: 'test-archive.example',
+      sourceClass: 'reputable_secondary',
+      orgType: 'archive',
+      label: 'Test State Archive',
+      basis: {
+        wikidata: 'Q1',
+        officialWebsite: 'https://test-archive.example/',
+        authorityIds: { lcnaf: 'n00000001' },
+        instanceOf: ['Q166118'],
+      },
+      reviewedBy: 'test',
+      reviewedAt: '2026-09-10T00:00:00.000Z',
+      verifiedAt: '2026-09-10T00:00:00.000Z',
+    },
+    {
+      // Deliberately a host the curated suffix list already calls reputable_secondary, so this
+      // proves which one the classifier asks first.
+      host: 'hmdb.org',
+      sourceClass: 'news_reportage',
+      orgType: 'news_publisher',
+      label: 'Not really a newspaper — ordering fixture',
+      basis: {
+        wikidata: 'Q2',
+        officialWebsite: 'https://hmdb.org/',
+        authorityIds: { viaf: '2' },
+        instanceOf: ['Q11032'],
+      },
+      reviewedBy: 'test',
+      reviewedAt: '2026-09-10T00:00:00.000Z',
+      verifiedAt: '2026-09-10T00:00:00.000Z',
+    },
+  ],
+};
+
+test('the classifier consults the source register, and consults it first', () => {
+  setSourceRegisterForTesting(TEST_REGISTER);
+  try {
+    // A host nothing else recognizes: without the register it would be `unknown` (authority
+    // 0.2), which is what put a state historical society below a crowd-edited marker database.
+    assert.equal(classifySourceForConfidence('https://example.com/article'), 'unknown');
+    assert.equal(
+      classifySourceForConfidence('https://test-archive.example/collections/1'),
+      'reputable_secondary',
+    );
+    // Subdomains of a registered host are covered; look-alikes are not.
+    assert.equal(
+      classifySourceForConfidence('https://digital.test-archive.example/item/9'),
+      'reputable_secondary',
+    );
+    assert.equal(
+      classifySourceForConfidence('https://test-archive.example.evil.example/item/9'),
+      'unknown',
+    );
+    // The register outranks the curated suffix list, including when it grades a host DOWN.
+    assert.equal(classifySourceForConfidence('https://www.hmdb.org/m.asp?m=1'), 'news_reportage');
+  } finally {
+    setSourceRegisterForTesting(undefined);
+  }
+});
+
 test('classifySourceForConfidence keeps gov and wikipedia behavior', () => {
   assert.equal(classifySourceForConfidence(NPS_GOV), 'government_record');
   assert.equal(classifySourceForConfidence(WIKIPEDIA), 'reputable_secondary');
   assert.equal(classifySourceForConfidence('https://example.com/article'), 'unknown');
+});
+
+test('a US patent document grades government_record and high on any mirror, uspto.gov included', () => {
+  // The lineage system already treats these as one work (packages/domain-core/src/claims/
+  // lineage.ts); the confidence classification has to agree, or the same document grades
+  // differently depending on which mirror happened to be fetched.
+  assert.equal(
+    classifySourceForConfidence('https://patents.google.com/patent/US252386A/en'),
+    'government_record',
+  );
+  assert.equal(confidenceLevelForSource('https://patents.google.com/patent/US252386A/en'), 'high');
+  assert.equal(
+    classifySourceForConfidence('https://ppubs.uspto.gov/pubwebapp/rest/patents/html/252386'),
+    'government_record',
+  );
+  assert.equal(
+    classifySourceForConfidence('https://www.freepatentsonline.com/4723129.html'),
+    'government_record',
+  );
+});
+
+test('a patent mirror search page, listing, or home page is not a government record', () => {
+  // Classifying the DOCUMENT, not the mirror: a search query names no document at all.
+  assert.notEqual(
+    classifySourceForConfidence('https://patents.google.com/?q=latimer'),
+    'government_record',
+  );
+  assert.equal(classifySourceForConfidence('https://patents.google.com/?q=latimer'), 'unknown');
+  assert.notEqual(classifySourceForConfidence('https://patents.google.com/'), 'government_record');
 });
 
 test('historicsites.dcpreservation.org alone scores 0.72 — below standardPublish', () => {
