@@ -18,6 +18,31 @@ const PROGRAM_ID = 'invention-cohort';
 const LANE = 'invention-cohort';
 
 /**
+ * What a re-stage does to a candidate's review status.
+ *
+ * Re-staging is how a corrected record reaches readers, so a row whose content actually moved
+ * has to go back to `pending` and be looked at again. A row that did not move must not: resetting
+ * an accepted candidate that nobody edited would drop already-published records back into the
+ * review queue every time one sibling in the cohort is corrected, and the queue would stop
+ * meaning anything.
+ *
+ * The comparison is `IS DISTINCT FROM` rather than `<>` so a null on either side compares as a
+ * difference instead of swallowing the row. `payload` is jsonb, whose key order is normalized by
+ * the type, so an unchanged payload compares equal however the script serialized it.
+ */
+const STATUS_ON_CONFLICT = `CASE
+             WHEN landscape_candidates.display_name IS DISTINCT FROM EXCLUDED.display_name
+               OR landscape_candidates.summary IS DISTINCT FROM EXCLUDED.summary
+               OR landscape_candidates.canonical_url IS DISTINCT FROM EXCLUDED.canonical_url
+               OR landscape_candidates.lat IS DISTINCT FROM EXCLUDED.lat
+               OR landscape_candidates.lng IS DISTINCT FROM EXCLUDED.lng
+               OR landscape_candidates.provenance IS DISTINCT FROM EXCLUDED.provenance
+               OR landscape_candidates.payload IS DISTINCT FROM EXCLUDED.payload
+             THEN 'pending'
+             ELSE landscape_candidates.status
+           END`;
+
+/**
  * Refuse to stage a cohort with a mechanical defect.
  *
  * Every problem is reported at once rather than throwing on the first, so an author fixing a
@@ -79,7 +104,7 @@ async function main(): Promise<void> {
            lat = EXCLUDED.lat,
            lng = EXCLUDED.lng,
            canonical_url = EXCLUDED.canonical_url,
-           status = 'pending',
+           status = ${STATUS_ON_CONFLICT},
            provenance = EXCLUDED.provenance,
            payload = EXCLUDED.payload,
            updated_at = now()`,
