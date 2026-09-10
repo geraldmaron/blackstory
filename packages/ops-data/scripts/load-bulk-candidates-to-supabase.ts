@@ -35,6 +35,7 @@ import {
   type BulkLane,
   type BulkFixtureLoadPlan,
 } from './lib/bulk-candidates-supabase.ts';
+import { mergedPayloadSql } from './lib/landscape-candidate-upsert.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(SCRIPT_DIR, '../../..');
@@ -42,6 +43,29 @@ const CACHE_DIR = join(REPO_ROOT, '.cache/bulk-candidates-supabase');
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.LOAD_BULK_CANDIDATES_APPLY === '1';
+
+/**
+ * Payload keys this loader owns — exactly the fields of BulkFixtureCandidate that
+ * `mapBulkFixtureToLoadPlan` spreads into `payload` (see lib/bulk-candidates-supabase.ts). A
+ * landscape_candidates row loaded here can still be swept by the enrichment harness for any lane
+ * (entity-enrichment-selector.ts sweeps every lane unless filtered), which writes
+ * `payload.enrichment` onto the row after it is loaded. Re-running this loader to fix one row in a
+ * fixture must not wipe that out for the rest of the lane — see lib/landscape-candidate-upsert.ts.
+ */
+const OWNED_PAYLOAD_KEYS = [
+  'id',
+  'kind',
+  'displayName',
+  'summary',
+  'canonicalUrl',
+  'lat',
+  'lng',
+  'discoveredAt',
+  'researchLaneOnly',
+  'provenance',
+] as const;
+
+const PAYLOAD_ON_CONFLICT = mergedPayloadSql(OWNED_PAYLOAD_KEYS);
 
 type LaneArg = BulkLane | 'all';
 
@@ -245,7 +269,7 @@ async function upsertPlan(client: pg.PoolClient, plan: BulkFixtureLoadPlan): Pro
          lng = EXCLUDED.lng,
          canonical_url = EXCLUDED.canonical_url,
          provenance = EXCLUDED.provenance,
-         payload = EXCLUDED.payload,
+         payload = ${PAYLOAD_ON_CONFLICT},
          discovered_at = EXCLUDED.discovered_at,
          updated_at = now()`,
       values,

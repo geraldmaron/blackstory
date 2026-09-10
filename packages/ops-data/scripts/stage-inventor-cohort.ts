@@ -17,18 +17,66 @@
  *   set -a && source apps/web/.env.local && set +a && export DATABASE_SSL=1
  *   node --conditions development --import tsx packages/ops-data/scripts/stage-inventor-cohort.ts
  *   DRY_RUN=0 APPLY=1 node --conditions development --import tsx packages/ops-data/scripts/stage-inventor-cohort.ts
+ *
+ * On conflict, payload keys owned by this script (see OWNED_PAYLOAD_KEYS) are refreshed from the
+ * new row and every other key survives a re-stage untouched — see
+ * lib/landscape-candidate-upsert.ts for why. `personReview` is a deliberate exception: this script
+ * writes a fresh `approvedAt` every run, so if it won on every re-stage the way an owned key does,
+ * re-staging one corrected sibling would make every already-reviewed row in the cohort look
+ * edited. Instead, on conflict the stored `personReview` wins whenever one is already present, and
+ * only an absent stored value gets this run's. To deliberately overwrite a stored `personReview`
+ * (e.g. the recorded `basis` text needs correcting), set PERSON_REVIEW_REWRITE=1.
  */
 import pg from 'pg';
 import { SUMMARY_MAX_CHARS, SUMMARY_MIN_CHARS } from './lib/entity-enrichment-llm.ts';
+import { mergedPayloadSql, statusOnConflictSql } from './lib/landscape-candidate-upsert.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import { INVENTOR_COHORT } from './data/inventor-cohort.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.APPLY === '1';
 const APPROVED_BY = process.env.PERSON_REVIEW_APPROVED_BY?.trim() || '';
+const PERSON_REVIEW_REWRITE = process.env.PERSON_REVIEW_REWRITE === '1';
 const RUN_ID = 'run_inventor_cohort_2026_09';
 const PROGRAM_ID = 'inventor-cohort';
 const LANE = 'inventor-cohort';
+
+/**
+ * Payload keys this script owns — exactly the keys it writes into the payload JSON below, minus
+ * `personReview`, which gets its own CASE (see file header) rather than blanket refresh-on-every-
+ * conflict treatment. `personReview` must stay out of this list: mergedPayloadSql only subtracts
+ * owned keys from the stored payload, so leaving it out here is what allows the stored value to
+ * survive the subtraction step in the first place.
+ */
+const OWNED_PAYLOAD_KEYS = [
+  'city',
+  'state',
+  'historicalContext',
+  'topicIds',
+  'eraBuckets',
+  'confidence',
+  'geocode',
+  'evidenceCitations',
+  'namedOn',
+] as const;
+
+/**
+ * Merge owned keys as usual, but keep `personReview` out of the incoming (EXCLUDED.payload) side
+ * of that merge too — otherwise the general `||` merge would let this run's freshly-timestamped
+ * personReview win regardless of ownership, since `||` always prefers the right operand for any
+ * key present on both sides. The stripped-out key is restored just below with its own CASE.
+ */
+const PAYLOAD_MERGE_WITHOUT_PERSON_REVIEW = mergedPayloadSql(OWNED_PAYLOAD_KEYS, {
+  excludeFromIncoming: ['personReview'],
+});
+const PERSON_REVIEW_ON_CONFLICT = PERSON_REVIEW_REWRITE
+  ? "EXCLUDED.payload->'personReview'"
+  : `CASE
+               WHEN landscape_candidates.payload ? 'personReview' THEN landscape_candidates.payload->'personReview'
+               ELSE EXCLUDED.payload->'personReview'
+             END`;
+const PAYLOAD_ON_CONFLICT = `(${PAYLOAD_MERGE_WITHOUT_PERSON_REVIEW}) || jsonb_build_object('personReview', ${PERSON_REVIEW_ON_CONFLICT})`;
+const STATUS_ON_CONFLICT = statusOnConflictSql(OWNED_PAYLOAD_KEYS, undefined, PAYLOAD_ON_CONFLICT);
 
 function assertCohortBounds(): void {
   if (!DRY_RUN && APPLY && APPROVED_BY.length === 0) {
@@ -102,9 +150,9 @@ async function main(): Promise<void> {
            lat = EXCLUDED.lat,
            lng = EXCLUDED.lng,
            canonical_url = EXCLUDED.canonical_url,
-           status = 'pending',
+           status = ${STATUS_ON_CONFLICT},
            provenance = EXCLUDED.provenance,
-           payload = EXCLUDED.payload,
+           payload = ${PAYLOAD_ON_CONFLICT},
            updated_at = now()`,
         [
           row.id,
