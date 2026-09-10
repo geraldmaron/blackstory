@@ -134,8 +134,12 @@ export const NOTABILITY_CRITERIA = [
   'documented_site',
   'documented_contribution',
   'documented_racial_terror',
+  'documented_racial_killing',
   'community_anchor',
   'only_or_oldest',
+  'enacted_law',
+  'elected_or_appointed_office',
+  'black_press_or_archive',
 ] as const;
 
 export type NotabilityCriterion = (typeof NOTABILITY_CRITERIA)[number];
@@ -177,8 +181,11 @@ export const NOTABILITY_RUBRIC: Readonly<Record<NotabilityCriterion, string>> = 
     'Register of Historic Places, National Historic Landmark, or an equivalent state/local ' +
     'landmark register entry — with documented listing evidence.',
   court_precedent:
-    'The entity (case, law, person) is tied to a judicial decision that set binding or widely ' +
-    "cited precedent affecting Black Americans' rights or status.",
+    'The entity (case, law, person) is tied to a judicial decision — a ruling, an opinion, or a ' +
+    'trial — that set binding or widely cited precedent affecting Black Americans\u2019 rights ' +
+    'or status, or that was itself a documented turning point in how the law was applied to ' +
+    'Black Americans. The trial of Anthony Burns set no precedent and made the Fugitive Slave ' +
+    'Act visible in Boston; the Amistad and Creole cases are here on the same footing.',
   movement_significance:
     'The entity (person, organization, event, place, or a movement-kind entity itself) played a ' +
     'documented, non-incidental role in a named movement (Civil Rights Movement, Great ' +
@@ -210,6 +217,40 @@ export const NOTABILITY_RUBRIC: Readonly<Record<NotabilityCriterion, string>> = 
     'The entity is documented as the only or oldest surviving example of its kind in a defined ' +
     'scope (oldest Black-owned business in a city, only remaining Rosenwald school in a county) ' +
     'with evidence supporting the superlative claim.',
+  documented_racial_killing:
+    'The entity is a person killed in a documented killing in which race is a documented element ' +
+    'of the case \u2014 by police, by someone acting under a claim of authority or self-defense, ' +
+    'or by a private individual \u2014 or the event where such killings are documented. The ' +
+    'killing and the public record it produced are the reason the record exists. It is distinct from documented racial terror, which names the ' +
+    'lynching era and the white-supremacist attack: the two rest on different documentary ' +
+    'records, the Equal Justice Initiative\u2019s Lynching in America research on one side and ' +
+    'investigations, grand jury proceedings, federal findings and consent decrees on the other, ' +
+    'and each record cites its own. As with racial terror, the basis for inclusion is never an ' +
+    'accusation made against the person killed.',
+  enacted_law:
+    'The entity is a statute, constitutional amendment, executive order or ordinance whose ' +
+    'enactment or enforcement materially changed the legal status, rights or conditions of Black ' +
+    'Americans. The criterion is neutral as to direction and the record says which: the ' +
+    'Mississippi Black Codes of 1865, the Fugitive Slave Act of 1850 and the National Housing ' +
+    'Act of 1934 are here for the harm they codified, exactly as the Voting Rights Act of 1965 ' +
+    'is here for what it dismantled. A law is never filed under a criterion that reads as an ' +
+    'achievement.',
+  elected_or_appointed_office:
+    'The entity is a person documented as holding elected or appointed public office \u2014 ' +
+    'legislative, executive, judicial, or a commission \u2014 where the holding of that office ' +
+    'is itself the documented fact. Eric Foner\u2019s Freedom\u2019s Lawmakers establishes the ' +
+    'more than 1,500 Black officeholders of Reconstruction as a cohort recorded for the office ' +
+    'they held, from United States congressmen to justices of the peace and constables, rather ' +
+    'than for a separate achievement, and this criterion carries that reading forward. A ' +
+    'professional or institutional post is not public office and does not qualify here.',
+  black_press_or_archive:
+    'The entity created, preserved or interprets the documentary record of Black life: a ' +
+    'Black-owned or Black-edited newspaper, periodical or guide, or an archive, library, ' +
+    'research center or museum of Black history. These exist because the mainstream record ' +
+    'excluded, distorted or ignored Black Americans \u2014 Freedom\u2019s Journal opened in ' +
+    '1827 with \u201cWe wish to plead our own cause. Too long have others spoken for us.\u201d ' +
+    'The basis is the documented role in making or keeping that record, and it is a role this ' +
+    'catalog depends on: these are among the sources it cites.',
 };
 
 /**

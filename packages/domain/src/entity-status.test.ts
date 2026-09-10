@@ -101,12 +101,14 @@ test('hasRequiredNotabilityBasis requires at least one record', () => {
 });
 
 test('NOTABILITY_RUBRIC documents reviewable rubric text for every criterion', () => {
-  // 9 since `documented_contribution` (2026-09-09). An invention is not a site, and
-  // `documented_site` was the fallback every invention inherited, so Latimer's carbon process
-  // told a reader it was "a documented site of a historically significant event or practice (a
-  // sit-in lunch counter, a Freedom School…)". Adding a criterion is a rubric decision, which is
-  // why this count is pinned rather than derived.
-  assert.equal(NOTABILITY_CRITERIA.length, 10);
+  // Pinned rather than derived, because adding a criterion is a rubric decision and not a
+  // refactor. 9 at `documented_contribution`, 10 at `documented_racial_terror`, and 14 since the
+  // ruling in docs/methodology/notability-rubric.md (2026-09-09): `documented_site` was answering
+  // for 63% of every basis record in the catalog, so a statute read as a judicial decision, a
+  // Reconstruction officeholder read as a site, and the Chicago Defender had no home at all.
+  // `documented_racial_killing`, `enacted_law`, `elected_or_appointed_office` and
+  // `black_press_or_archive` are that decision. Change this number only alongside the ruling.
+  assert.equal(NOTABILITY_CRITERIA.length, 14);
   for (const criterion of NOTABILITY_CRITERIA) {
     assert.equal(typeof NOTABILITY_RUBRIC[criterion], 'string');
     assert.ok(NOTABILITY_RUBRIC[criterion].length > 20, `${criterion} rubric text is too thin`);

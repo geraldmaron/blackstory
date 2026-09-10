@@ -246,8 +246,12 @@ export const notabilityCriterionSchema = z.enum([
   'documented_site',
   'documented_contribution',
   'documented_racial_terror',
+  'documented_racial_killing',
   'community_anchor',
   'only_or_oldest',
+  'enacted_law',
+  'elected_or_appointed_office',
+  'black_press_or_archive',
 ]);
 
 export type NotabilityCriterionDoc = z.infer<typeof notabilityCriterionSchema>;

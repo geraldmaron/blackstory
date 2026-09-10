@@ -534,11 +534,18 @@ export function buildReleaseSourceFromLandscape(
         ]
       : [
           {
-            // The predicate is the lead of the inclusion note `buildNotabilityBasisNote` writes
-            // ("Documented site <summary>."), so an invention published under `documented_site`
-            // asserted in its own basis note that it was a place. An invention is a contribution;
-            // `buildReleaseNotabilityBasis` reads the same word back as its criterion.
-            predicate: row.kind === 'invention' ? 'documented_contribution' : 'documented_site',
+            // M3 (repo-teb1z). This predicate used to be the CRITERION NAME — `documented_site`,
+            // or `documented_contribution` on an invention — which closed a loop: the publisher
+            // wrote the word, `buildNotabilityBasisNote` led the inclusion note with it
+            // ("Documented site <summary>."), and `inferNotabilityCriterionFromClaim` read the
+            // same word back as the criterion it was supposed to determine. 238 basis records in
+            // the active release began literally "Documented site", including on people.
+            //
+            // A predicate describes what the claim says. This claim says the source states the
+            // summary, so that is what it says. The criterion is now decided by the inference and
+            // the kind, where it belongs, and a record whose only claim is this index row keeps a
+            // basis rather than a self-assertion — the honest residual that repo-o6k0c measures.
+            predicate: 'source states',
             object: summary,
             confidenceLevel: confidenceLevelForSource(canonicalUrl),
             citationSource: hostname,

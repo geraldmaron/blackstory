@@ -21,8 +21,12 @@ export const NOTABILITY_CRITERION_LABELS: Readonly<Record<NotabilityCriterion, s
   documented_site: 'Documented site',
   documented_contribution: 'Documented contribution',
   documented_racial_terror: 'Documented racial terror',
+  documented_racial_killing: 'Documented racial killing',
   community_anchor: 'Community anchor',
   only_or_oldest: 'Only or oldest of its kind',
+  enacted_law: 'Enacted law',
+  elected_or_appointed_office: 'Elected or appointed office',
+  black_press_or_archive: 'Black press or archive',
 };
 
 export type PublicNotabilityBasisItem = {
