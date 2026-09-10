@@ -4,8 +4,11 @@
  * The first invention cohort named twenty contributions and linked none of them to a person,
  * because four of the people it centers were not in `bb_canonical.entities` at all: an invention
  * page could not reach its inventor, and the inventor had no page to reach. The second cohort
- * named eight more. Every other name on those receipts either already has a record or is
- * deliberately not modeled (see `InventionContributor` in `./invention-cohort.ts`).
+ * named eight more. Marjorie Stewart Joyner is the one adopted seed record: she already had a
+ * person row from the seed release with no path to new evidence, so this cohort carries her with
+ * her live browse facets (`topicIds`, `keywords`, `mentionedEntityIds`) named on the record.
+ * Every other name on those receipts either already has a record or is deliberately not modeled
+ * (see `InventionContributor` in `./invention-cohort.ts`).
  *
  * Scope discipline matches the invention cohort. Each summary says what the person is documented
  * to have done, and stops. Where a claim is commonly repeated but rests on the limits of the
@@ -14,7 +17,7 @@
  *
  * `personReviewApproved` in `../lib/incremental-publish.ts` blocks every person row from
  * incremental publish until `payload.personReview` records approved/approvedBy/approvedAt/basis.
- * Eleven of the twelve are long-deceased historical figures, and each basis names the death date
+ * Twelve of the thirteen are long-deceased historical figures, and each basis names the death date
  * and where it is published, or, where no death date survives (Reed, Newman), the birth-era
  * evidence that rules out a living person. The staging script writes that marker rather than
  * leaving rows stranded pending on a fact nobody disputes. Lonnie G. Johnson is living: his row
@@ -301,6 +304,18 @@ export const INVENTOR_COHORT: readonly InventorCohortRecord[] = [
         quote:
           'Lee was a chef, baker, restaurateur, and hotelier. His patented designs for a dough-kneading machine and a device that makes breadcrumbs from stale bread have been used in major restaurants around the world.',
       },
+      {
+        sourceUrl: 'https://quincyhistory.org/blog/?p=594',
+        title: 'Joseph Lee: Restaurateur, Caterer, Hotelier, Inventor – Quincy Historical Society',
+        quote:
+          'He came to Massachusetts shortly after the end of the Civil War. He stayed only six months because he joined the United States Coast Survey. For the next decade he honed his kitchen knives onboard ships, providing meals for the crews.',
+      },
+      {
+        sourceUrl: 'https://quincyhistory.org/blog/?p=594',
+        title: 'Joseph Lee: Restaurateur, Caterer, Hotelier, Inventor – Quincy Historical Society',
+        quote:
+          'Lee returned to Massachusetts in 1877, where he opened the Hillside House at Weston. After that, he managed the Bellevue in Wellesley Hills until he was offered the job of managing the new Woodland Park Hotel in the Auburndale section of Newton.',
+      },
     ],
   },
   {
@@ -337,6 +352,13 @@ export const INVENTOR_COHORT: readonly InventorCohortRecord[] = [
         title: 'Museum of Food and Drink, Legacy Quilt: Judy W. Reed',
         quote:
           'An illiterate seamstress from Washington, D.C., Reed signed her 1884 patent document with an "X."',
+      },
+      {
+        sourceUrl:
+          'https://research.bowdoin.edu/zorina-khan/of-patents-and-prizes/black-woman-patent-attorney/',
+        title: 'A Pioneering Black Woman Patent Attorney',
+        quote:
+          'From a broader historical perspective, she was not the first black inventor (Thomas Jennings obtained a patent in 1821), nor the first black woman patentee (Judy W. Reed, in 1884, was prior).',
       },
     ],
   },
@@ -382,6 +404,14 @@ export const INVENTOR_COHORT: readonly InventorCohortRecord[] = [
         quote:
           'However, census records show that she spent most of her life living in New York City, working as a hairdresser.',
       },
+      {
+        sourceUrl:
+          'https://womenshistory.si.edu/blog/eight-womens-voting-history-stories-you-may-not-know',
+        title:
+          "Eight Women's Voting History Stories You May Not Know | Smithsonian American Women's History Museum",
+        quote:
+          "While living in New York City, Lyda Newman used her financial status to support her community and allow less fortunate women to take part in democracy. Newman's Negro Suffrage Headquarters supplied the space for Black women to be a vital part of the suffrage movement.",
+      },
     ],
   },
   {
@@ -417,6 +447,18 @@ export const INVENTOR_COHORT: readonly InventorCohortRecord[] = [
         title: 'Alexander Miles (1838-1918) - BlackPast',
         quote:
           "Despite John W. Meaker's patented invention of the first automatic elevator door system (U.S. Patent 147,853) in 1874, many elevators still required the doors and the shaft to be manually opened and closed.",
+      },
+      {
+        sourceUrl: 'https://lemelson.mit.edu/resources/alexander-miles',
+        title: 'Alexander Miles | Lemelson',
+        quote:
+          'Miles experienced great success as a barber in Duluth, opening a barbershop in the four-story St. Louis Hotel. He even used his savings to purchase a real estate office. His business achievements earned him a spot as the first Black member of the Duluth Chamber of Commerce.',
+      },
+      {
+        sourceUrl: 'https://lemelson.mit.edu/resources/alexander-miles',
+        title: 'Alexander Miles | Lemelson',
+        quote:
+          'In 1884, Miles built a three-story brownstone building in an area that became known as the “Miles Block.”',
       },
     ],
   },
@@ -462,6 +504,12 @@ export const INVENTOR_COHORT: readonly InventorCohortRecord[] = [
         title: 'Smithsonian Magazine, Meet the Black Inventor Who Developed the Ice Cream Scoop',
         quote: 'Cralle died in 1919.',
       },
+      {
+        sourceUrl: 'https://heinzhistorycenter.emuseum.com/objects/48740/scoop-ice-cream',
+        title: 'Scoop, Ice Cream – Works – Senator John Heinz History Center',
+        quote:
+          'While working as a porter in Pittsburgh, Cralle noticed that ice cream was difficult to dispense.  His invention, originally called an “Ice Cream Mold and Disher” was designed to be able to keep ice cream and other foods from sticking, and easy to operate with one hand.',
+      },
     ],
   },
   {
@@ -498,6 +546,17 @@ export const INVENTOR_COHORT: readonly InventorCohortRecord[] = [
         quote:
           'Reportedly having become paralyzed and impoverished in his last years, Beard died in the Jefferson County Alms House on May 10, 1921, and was buried in an unmarked grave in Woodlawn Cemetery.',
       },
+      {
+        sourceUrl: 'https://www.samford.edu/alabama-mens-hall-of-fame/inductees/Beard.html',
+        title: "Alabama Men's Hall of Fame, Andrew Jackson Beard",
+        quote:
+          'Andrew Jackson Beard was an inventor and entrepreneur from Jefferson County, Alabama. Born into slavery in 1849, Beard gained his freedom as a teenager and began working as a farmer and carpenter.',
+      },
+      {
+        sourceUrl: 'https://www.samford.edu/alabama-mens-hall-of-fame/inductees/Beard.html',
+        title: "Alabama Men's Hall of Fame, Andrew Jackson Beard",
+        quote: 'Beard is best known for inventing the "Jenny Coupler" in 1897.',
+      },
     ],
   },
   {
@@ -529,6 +588,96 @@ export const INVENTOR_COHORT: readonly InventorCohortRecord[] = [
         title: 'Lonnie Johnson - Lemelson-MIT Program',
         quote:
           'He went on to more formal training at Tuskegee University, where he earned a BS in Mechanical Engineering and an MS in Nuclear Engineering.',
+      },
+      {
+        sourceUrl: 'https://encyclopediaofalabama.org/article/lonnie-johnson/',
+        title: 'Lonnie Johnson - Encyclopedia of Alabama',
+        quote:
+          "He received a bachelor's degree in mechanical engineering in 1973 and a master's degree in nuclear engineering in 1975.",
+      },
+      {
+        sourceUrl: 'https://encyclopediaofalabama.org/article/lonnie-johnson/',
+        title: 'Lonnie Johnson - Encyclopedia of Alabama',
+        quote:
+          'During his various stints at JPL, he participated in development projects for several unmanned space missions, including the Mars Observer, the Cassini-Huygens mission to Saturn, and the Galileo mission to Jupiter.',
+      },
+      {
+        sourceUrl: 'https://encyclopediaofalabama.org/article/lonnie-johnson/',
+        title: 'Lonnie Johnson - Encyclopedia of Alabama',
+        quote:
+          'He eventually licensed production rights to the Larami Corporation (later acquired by Hasbro for its Nerf line of toys) in 1989.',
+      },
+    ],
+  },
+  {
+    // Adopted from the seed release: the live record's browse facets are carried on the record
+    // so a republish does not narrow them to the cohort default.
+    id: 'ent_marjorie_joyner_001',
+    displayName: 'Marjorie Stewart Joyner',
+    summary:
+      "Marjorie Stewart Joyner (1896-1994) was a beautician, salon owner and beauty-school executive in Chicago. She opened her own shop in 1916, trained at Madam C. J. Walker's school, and became the Walker company's vice president and national supervisor of its two hundred beauty schools, staying with the firm more than fifty years. On 27 November 1928 she received US 1,693,515 for a permanent waving machine: rods hung from a hood that waved several sections of hair at once instead of one curling iron at a time. The rights were assigned to the Madam C. J. Walker Manufacturing Company of Indianapolis and she received no substantial compensation for it. She helped write Illinois' first cosmetology laws in 1924, was a founding member of Mary McLeod Bethune's National Council of Negro Women in 1935, and founded the Alpha Chi Pi Omega Sorority and Fraternity in 1945.",
+    historicalContext:
+      'Joyner is usually told as the woman who invented the permanent wave and got nothing for it. The grant is narrower and the career is wider: the rights went to the Walker company before the machine reached a salon, and the fifty years of school supervision, the 1924 cosmetology statute and the associations she founded are separate documented work that the machine does not stand for. Bethune founded the National Council of Negro Women and Joyner was a founding member of it; Alpha Chi Pi Omega she founded herself. Chicago is the anchor because her own shop, the Walker schools she supervised and the residence line on the patent are all there, held at city precision.',
+    city: 'Chicago',
+    state: 'IL',
+    lat: 41.8781,
+    lng: -87.6298,
+    era: '1920s',
+    canonicalUrl: 'https://www.invent.org/inductees/marjorie-stewart-joyner',
+    namedOn: ['inv_joyner_permanent_wave_machine'],
+    topicIds: ['invention', 'business', 'women', 'community'],
+    keywords: ['permanent wave', 'Madam C.J. Walker'],
+    mentionedEntityIds: ['ent_madam_cj_walker_001'],
+    reviewBasis:
+      'Deceased historical figure: Marjorie Stewart Joyner died 27 December 1994. The Chicago Public Library\'s Vivian G. Harsh Research Collection finding aid for her papers records that she "passed away at the age of 95, on December 27,1994, in the South Side Chicago home she shared with her family for over sixty years," and the National Inventors Hall of Fame prints "Born Oct. 24, 1896 - Died Dec. 27, 1994" on her inductee page; no living-person privacy interest.',
+    evidence: [
+      {
+        sourceUrl: 'https://www.invent.org/inductees/marjorie-stewart-joyner',
+        title: 'Marjorie Stewart Joyner | National Inventors Hall of Fame',
+        quote:
+          'Marjorie Stewart Joyner invented a permanent wave machine and was a leading figure in the beauty industry as a beautician, salon owner, instructor and executive for the Madam C. J. Walker Manufacturing Co.',
+      },
+      {
+        sourceUrl: 'https://www.invent.org/inductees/marjorie-stewart-joyner',
+        title: 'Marjorie Stewart Joyner | National Inventors Hall of Fame',
+        quote:
+          'Joyner played an important role in this work, becoming the company vice president and national supervisor for 200 Walker Co. beauty schools. She remained affiliated with the company for more than 50 years.',
+      },
+      {
+        sourceUrl: 'https://www.invent.org/inductees/marjorie-stewart-joyner',
+        title: 'Marjorie Stewart Joyner | National Inventors Hall of Fame',
+        quote:
+          'To advance Black beauty culture professionals, in 1945 Joyner founded the Alpha Chi Pi Omega Sorority and Fraternity, and a year later, the United Beauty School Owners and Teachers Association.',
+      },
+      {
+        sourceUrl: 'https://www.chipublib.org/fa-marjorie-stewart-joyner-papers/',
+        title: 'Marjorie Stewart Joyner Papers | Chicago Public Library',
+        quote:
+          'Joyner quickly became Walker’s protegé, working as her agent until Walker’s death in 1919, and going on to become the national supervisor of the two hundred Mme. C.J. Walker Beauty Schools.',
+      },
+      {
+        sourceUrl: 'https://www.chipublib.org/fa-marjorie-stewart-joyner-papers/',
+        title: 'Marjorie Stewart Joyner Papers | Chicago Public Library',
+        quote:
+          'In 1924, Joyner helped to write Illinois’s first cosmetology laws and in 1928 she received a patent for her permanent wave machine, invented to make the process of hair straightening easier.',
+      },
+      {
+        sourceUrl: 'https://www.chipublib.org/fa-marjorie-stewart-joyner-papers/',
+        title: 'Marjorie Stewart Joyner Papers | Chicago Public Library',
+        quote:
+          'Marjorie Stewart Joyner passed away at the age of 95, on December 27,1994, in the South Side Chicago home she shared with her family for over sixty years.',
+      },
+      {
+        sourceUrl: 'https://lemelson.mit.edu/resources/marjorie-joyner',
+        title: 'Marjorie Joyner | Lemelson',
+        quote:
+          'Her rights to this and to the “Permanent Waving Machine” were assigned over to Madam Walker.',
+      },
+      {
+        sourceUrl: 'https://lemelson.mit.edu/resources/marjorie-joyner',
+        title: 'Marjorie Joyner | Lemelson',
+        quote:
+          'She patented the invention in 1928, receiving U.S. patent No. 1,693,515. In 1929, Joyner also patented a scalp protector to make the procedure more comfortable.',
       },
     ],
   },
