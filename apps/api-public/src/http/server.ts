@@ -123,14 +123,22 @@ function writeResponse(res: ServerResponse, method: string, response: ApiRespons
  * Builds the public API `node:http` server. All handler dependencies (data access, App Check guard,
  * rate limiter, search guard) are injected — construction touches no socket and no Firestore.
  */
-export function createPublicApiServer(
+/**
+ * The request handler on its own, separate from any listener.
+ *
+ * Two hosts need the same dispatch path: a long-lived `node:http` server (local dev, any
+ * container host) and a serverless function, which is handed an `(req, res)` pair and never
+ * owns a port. Exporting the handler rather than only the server is what lets one tested
+ * implementation serve both, instead of a second copy drifting behind this one.
+ */
+export function createPublicApiRequestHandler(
   deps: HandlerDeps,
   options: PublicApiServerOptions = {},
-): Server {
+): (req: IncomingMessage, res: ServerResponse) => void {
   const limits: PublicApiServerLimits = { ...DEFAULT_LIMITS, ...options.limits };
   const makeRequestId = options.requestIdFactory ?? newRequestId;
 
-  return createServer((req, res) => {
+  return (req, res) => {
     void handle(req, res).catch(() => {
       // Last-resort guard: never leak an error detail/stack to the client.
       const requestId = makeRequestId();
@@ -140,7 +148,7 @@ export function createPublicApiServer(
         errorResponse('INTERNAL', 'Unexpected server error.', { requestId }),
       );
     });
-  });
+  };
 
   async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const requestId = makeRequestId();
@@ -208,4 +216,11 @@ export function createPublicApiServer(
     const response = await dispatch(request, deps);
     writeResponse(res, method, response);
   }
+}
+
+export function createPublicApiServer(
+  deps: HandlerDeps,
+  options: PublicApiServerOptions = {},
+): Server {
+  return createServer(createPublicApiRequestHandler(deps, options));
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Vercel "Ignored Build Step" for the monorepo's two Vercel projects.
+# Vercel "Ignored Build Step" for the monorepo's three Vercel projects.
 #
 # WHY THIS EXISTS (Vercel bill, Aug 2026). Build CPU Minutes were $64.68 of a $234 invoice —
 # 12d 23h of build machine time, the second-largest line after the uncached `/` payload. Both
@@ -36,8 +36,8 @@
 set -uo pipefail
 
 APP="${1:-}"
-if [[ "$APP" != "web" && "$APP" != "admin" ]]; then
-  echo "vercel-ignore-build: expected 'web' or 'admin' as \$1, got '${APP}'. Building." >&2
+if [[ "$APP" != "web" && "$APP" != "admin" && "$APP" != "api-public" ]]; then
+  echo "vercel-ignore-build: expected 'web', 'admin' or 'api-public' as \$1, got '${APP}'. Building." >&2
   exit 1
 fi
 
@@ -61,7 +61,6 @@ SHARED_SKIP=(
   'apps/mobile/'
   'apps/docs/'
   'apps/api-internal/'
-  'apps/api-public/'
   'apps/api-submissions/'
   'packages/ops-data/'
   'packages/operator-cli/'
@@ -72,12 +71,14 @@ SHARED_SKIP=(
   'packages/firebase/'
 )
 
-# Each project is also unaffected by the other project's app directory.
-if [[ "$APP" == "web" ]]; then
-  SKIP=("${SHARED_SKIP[@]}" 'apps/admin/')
-else
-  SKIP=("${SHARED_SKIP[@]}" 'apps/web/')
-fi
+# Each project is also unaffected by the other projects' app directories. `apps/api-public/`
+# left the shared list when it became a deployed project of its own: it ships now, so a change
+# under it has to rebuild that project even though it still cannot reach web or admin.
+case "$APP" in
+  web) SKIP=("${SHARED_SKIP[@]}" 'apps/admin/' 'apps/api-public/') ;;
+  admin) SKIP=("${SHARED_SKIP[@]}" 'apps/web/' 'apps/api-public/') ;;
+  api-public) SKIP=("${SHARED_SKIP[@]}" 'apps/web/' 'apps/admin/') ;;
+esac
 
 EXPLAIN=0
 if [[ "${2:-}" == "--explain" ]]; then

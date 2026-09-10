@@ -1,7 +1,7 @@
 /**
  * ADR-004 release-catalog artifacts as a read-through cache for `apps/api-public` (repo-csw0).
  *
- * Cloud Run instances scale to zero, so every cold start previously pulled the full multi-MB
+ * Serverless instances scale to zero, so every cold start previously pulled the full multi-MB
  * entity catalog and search index out of Postgres. Those objects are release-versioned and
  * immutable, so they are served from the public-media CDN instead when an artifact origin is
  * configured.

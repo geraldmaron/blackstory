@@ -173,7 +173,7 @@ Read budgets and per-endpoint Postgres query costs are documented in [`read-budg
 |----------|------|
 | OpenAPI v1 wire contract | [`../../openapi/public-v1.openapi.yaml`](../../openapi/public-v1.openapi.yaml) |
 | Redacted response examples | [`../../fixtures/redacted-response-examples/`](../../fixtures/redacted-response-examples/) |
-| Cloud Run deploy runbook | [`../../../docs/runbooks/api-public-cloud-run.md`](../../../docs/runbooks/api-public-cloud-run.md) |
+| Deploy runbook | [`../../../docs/runbooks/api-public-vercel.md`](../../../docs/runbooks/api-public-vercel.md) |
 
 Examples are validated in CI by [`openapi-artifact.test.ts`](./openapi-artifact.test.ts) against
 the same `@repo/public-contracts` zod schemas handlers use at runtime.

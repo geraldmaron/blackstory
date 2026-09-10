@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm run build:foundation && pnpm --filter @repo/api-public... run build",
+  "outputDirectory": "public",
+  "ignoreCommand": "bash ../../scripts/vercel-ignore-build.sh api-public",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
+  ]
+}

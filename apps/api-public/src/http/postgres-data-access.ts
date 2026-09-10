@@ -121,7 +121,7 @@ export function createPostgresDataAccessReaders(
   // release — by far the most expensive query against Postgres (DB advisor: ~80% of all
   // query time in the project) because it re-runs on every request even though the underlying
   // data only changes when a release publishes. Cache it in-process, keyed by release id, for
-  // the life of this long-running Cloud Run instance — same TTL convention `apps/web` already
+  // the life of this warm instance — same TTL convention `apps/web` already
   // uses for its release-catalog cache.
   const projectionsCache = new Map<
     string,
