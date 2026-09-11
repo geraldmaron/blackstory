@@ -25,13 +25,13 @@
   },
   "dependencies": {
     "@repo/domain": "workspace:*",
-    "pg": "^8.16.3"
+    "pg": "^8.23.0"
   },
   "devDependencies": {
     "@repo/security": "workspace:*",
     "@repo/typescript-config": "workspace:^",
     "@types/node": "^26.1.1",
-    "@types/pg": "^8.15.4",
+    "@types/pg": "^8.23.1",
     "tsx": "^4.23.1",
     "typescript": "^5.8.3"
   }
