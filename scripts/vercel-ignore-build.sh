@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 #
-# Vercel "Ignored Build Step" for the monorepo's three Vercel projects.
+# Vercel "Ignored Build Step" for the monorepo's two Vercel projects.
 #
 # WHY THIS EXISTS (Vercel bill, Aug 2026). Build CPU Minutes were $64.68 of a $234 invoice —
-# 12d 23h of build machine time, the second-largest line after the uncached `/` payload. Both
-# Vercel projects rebuild on every push to `staging`, but most pushes cannot change either
-# deployed bundle: of 437 commits in Aug 2026, only 143 touched `apps/web`'s build graph and
-# only 62 touched `apps/admin`'s. The rest were beads bookkeeping, ops-data scripts, docs,
-# research packages and mobile — none of which ship in a Vercel deployment.
+# 12d 23h of build machine time, the second-largest line after the uncached `/` payload. Vercel
+# projects rebuild on every push to `staging`, but most pushes cannot change a deployed bundle:
+# of 437 commits in Aug 2026, only 143 touched `apps/web`'s build graph. The rest were beads
+# bookkeeping, ops-data scripts, docs, research packages and mobile — none of which ship in a
+# Vercel deployment.
+#
+# `apps/admin` used to be a third Vercel project here (retired: its routes now live inside
+# `apps/web` at `/admin`, gated by middleware rather than by being a separate deployable — see
+# `docs/security/service-surfaces.md`).
 #
 # CONTRACT (Vercel's, not ours, and it is backwards from what you expect):
 #   exit 0  -> SKIP the build
@@ -36,8 +40,8 @@
 set -uo pipefail
 
 APP="${1:-}"
-if [[ "$APP" != "web" && "$APP" != "admin" && "$APP" != "api-public" ]]; then
-  echo "vercel-ignore-build: expected 'web', 'admin' or 'api-public' as \$1, got '${APP}'. Building." >&2
+if [[ "$APP" != "web" && "$APP" != "api-public" ]]; then
+  echo "vercel-ignore-build: expected 'web' or 'api-public' as \$1, got '${APP}'. Building." >&2
   exit 1
 fi
 
@@ -71,13 +75,12 @@ SHARED_SKIP=(
   'packages/firebase/'
 )
 
-# Each project is also unaffected by the other projects' app directories. `apps/api-public/`
+# Each project is also unaffected by the other project's app directory. `apps/api-public/`
 # left the shared list when it became a deployed project of its own: it ships now, so a change
-# under it has to rebuild that project even though it still cannot reach web or admin.
+# under it has to rebuild that project even though it still cannot reach web.
 case "$APP" in
-  web) SKIP=("${SHARED_SKIP[@]}" 'apps/admin/' 'apps/api-public/') ;;
-  admin) SKIP=("${SHARED_SKIP[@]}" 'apps/web/' 'apps/api-public/') ;;
-  api-public) SKIP=("${SHARED_SKIP[@]}" 'apps/web/' 'apps/admin/') ;;
+  web) SKIP=("${SHARED_SKIP[@]}" 'apps/api-public/') ;;
+  api-public) SKIP=("${SHARED_SKIP[@]}" 'apps/web/') ;;
 esac
 
 EXPLAIN=0

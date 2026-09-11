@@ -3,7 +3,7 @@
  *
  * Before this module, the only working path from a research case to a canonical entity was an
  * untracked, gitignored script that ran raw SQL by hand. This is pure, DB-free logic two
- * functions a caller (apps/admin's promote-case.ts) must both pass before writing anything:
+ * functions a caller (apps/web/src/admin's promote-case.ts) must both pass before writing anything:
  *
  *  - `evaluateCasePromotionGate`: the *authority* check. Mirrors `evaluatePromotionGate`
  *    (./controls.ts)'s core invariant proposer and approver can never be the same identity

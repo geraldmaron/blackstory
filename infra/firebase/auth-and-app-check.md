@@ -31,7 +31,7 @@ human provider choice and a successful metrics-only rollout.**
 | Surface | Auth posture |
 |---------|----------------|
 | `apps/web` (public) | Prefer anonymous/read-only public access; Auth only if a reviewed product flow requires signed-in users |
-| `apps/admin` | Firebase Auth may identify the browser session, but **authorization is IAP + server roles** (BB-027), not client claims alone |
+| `/admin` (inside `apps/web`, was `apps/admin`) | This IAP + Firebase design was never built — the actual implementation is Supabase Auth + `app_metadata.bb_role`, no IAP, no Firebase; see `docs/security/service-surfaces.md` and `docs/security/admin-identity.md` |
 | APIs / workers | Service accounts + IAM; no end-user Firebase Auth tokens for server-to-server |
 
 ### Reproducible steps (human console / CLI)

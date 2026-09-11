@@ -12,9 +12,17 @@ jobs remain human provisioning steps (see [`infra/gcp/surfaces/README.md`](../..
 |---------------------|---------------|
 | Anonymous / public API traffic | Canonical writes, publication, quarantine reads |
 | Submissions API | Publication, canonical writes, evidence reads |
-| Public web bundle | Admin routes, internal APIs, publish helpers |
+| A bug in public (non-`/admin`) code inside the `apps/web` bundle | The `ADMIN_DATABASE_URL` write-capable credential, internal APIs, publish helpers |
 | End-user Firebase token on internal API | Any internal publication call |
-| Admin session without IAP | Console access |
+| `/admin` request without a valid Supabase session + staff `app_metadata.bb_role` | Console access |
+
+Admin moved from a separate Vercel deployable into `/admin` routes inside `apps/web` (2026-09-11;
+see `docs/decisions-carryover.md`). "Public web bundle must not gain admin routes" is no longer
+the boundary — admin routes are now *in* that bundle by design. What still has to hold is
+credential scope: `apps/web/src/admin/lib/canonical-postgres-client.ts` reads a distinct
+`ADMIN_DATABASE_URL`, never the public `DATABASE_URL`, and nothing outside
+`apps/web/src/admin/**` may import it —
+enforced by `apps/web/src/admin/canonical-write-boundary.test.ts`.
 
 ## Deployable surfaces
 
@@ -45,12 +53,12 @@ jobs remain human provisioning steps (see [`infra/gcp/surfaces/README.md`](../..
 - **Auth:** `service-identity` only; **rejects** `end-user-token` and `anonymous`
 - **Runtime guards:** `apps/api-internal/src/posture.ts`
 
-### Admin console (`apps/admin`)
+### Admin console (`/admin` inside `apps/web`)
 
-- **Hosting:** Vercel (standalone project, own `apps/admin/vercel.json`) since 2026-07-25 — see [firebase wind-down](../data/firebase-wind-down.md). Kept a separate Vercel project from `blackstory` for credential isolation: admin's write-capable `DATABASE_URL` lives in its own project env, never in the anonymous public site's runtime.
-- **Posture:** `iap-protected` — separate Next.js app from `apps/web`
-- **Invariant:** no imports from `apps/web` handlers (see `apps/admin/src/surface.test.ts`)
-- **SA:** `admin@black-book-efaaf.iam.gserviceaccount.com`
+- **Hosting:** Vercel, same project (`blackstory`) and deployment as the public site — folded in 2026-09-11. Was previously a standalone Vercel project (`apps/admin`, since 2026-07-25 — see [firebase wind-down](../data/firebase-wind-down.md)) kept separate specifically for DB credential isolation; that isolation is now enforced by credential scope instead of by process — see the threat model above.
+- **Posture:** staff-gated route group — `apps/web/src/middleware.ts` matches only `/admin/:path*` and requires a valid Supabase session with `app_metadata.bb_role` set (`apps/web/src/admin/proxy.ts`). `/admin/api/**` authenticates by bearer token instead (`apps/web/src/admin/auth/request-auth.ts`).
+- **Invariant:** only `apps/web/src/admin/**` may import the write-capable `canonical-postgres-client.ts` / `canonical-write.ts` (see `apps/web/src/admin/canonical-write-boundary.test.ts`). The old "no imports from apps/web" invariant is retired — admin routes are now part of apps/web by design.
+- **SA:** N/A — Vercel serverless, same as `apps/web` (see that entry above); the `admin@black-book-efaaf.iam.gserviceaccount.com` GCP service account predates the Vercel move and is not used by this surface.
 
 ## Typed capability matrix
 
@@ -82,7 +90,7 @@ accepts a forbidden auth mode.
 |-----------|----------|
 | Submissions cannot publish | `packages/config/src/surfaces.test.ts`, `apps/api-submissions/src/index.test.ts` |
 | Public API cannot write canonical data | `packages/config/src/surfaces.test.ts`, `apps/api-public/src/index.test.ts` |
-| Admin separate from public web | `apps/admin/src/surface.test.ts`, distinct app path + SA in matrix |
+| Admin write-capable credential scoped to `/admin` code only | `apps/web/src/admin/canonical-write-boundary.test.ts`, `apps/web/src/middleware.ts` matcher |
 | Internal API rejects end-user tokens | `packages/config/src/surfaces.test.ts`, `apps/api-internal/src/index.test.ts` |
 
 ## Related docs

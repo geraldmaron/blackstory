@@ -7,8 +7,10 @@ Scripts and schemas used by `.github/workflows/deploy-staging.yml`,
 Deploy workflows record Vercel expectations, run migrate/health/smoke gates, and write provenance —
 they do **not** promote Firebase App Hosting.
 
-**Admin** is the standalone Vercel project `apps/admin`. Firebase App Hosting
-`black-book-admin-production` is leftover / deleted. Do not recreate it.
+**Admin** is a `/admin` route group inside `apps/web`'s Vercel deployment (as of 2026-09-11; was
+the standalone Vercel project `apps/admin` before that). Firebase App Hosting
+`black-book-admin-production` is leftover / deleted. Do not recreate it, and there is no longer a
+separate admin deploy target to configure.
 
 (`promote-app-hosting.sh` / `promote-app-hosting-dry-run.sh` were removed; they only ever targeted
 retired public-web backends.)

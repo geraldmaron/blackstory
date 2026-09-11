@@ -115,7 +115,7 @@ in ownership, decision-making, and content — not consulted after the fact.
 **Binding rule, mapped onto this repo's existing staged-review pattern
 (`research-operations.md`):** story packets already pass through a human approval gate
 (`story-research-run --commit` → quarantine `story_packet` → **Story review** desk,
-`apps/admin/src/stories/story-review-queue.ts` / `story-review-copy.ts`) before a seed handoff
+`apps/web/src/admin/stories/story-review-queue.ts` / `story-review-copy.ts`) before a seed handoff
 is ever pasted into `public-story-seed.ts`. v1 community review is a **named advisory reader
 step inserted into that same lane**, not a parallel workflow: before a packet with sensitive
 subject matter (redlining, racial violence, forced displacement, family separation) moves from
@@ -151,7 +151,7 @@ list in `juxtaposition-not-causation.md`.
 
 ## Wiring: where this binds
 
-- **Story packet review** — `apps/admin/src/stories/story-review-copy.ts`
+- **Story packet review** — `apps/web/src/admin/stories/story-review-copy.ts`
   (`STORY_REVIEW_STEPS`) gains a step referencing this document's naming/agency and community-
   review principles; the review desk records a community-review note per §5.
 - **Theme publishability** — `packages/domain/src/statistics/theme-impact-packet.ts`. Note:

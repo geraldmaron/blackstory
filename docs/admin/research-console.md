@@ -1,20 +1,23 @@
 # Administration and research console
 
-The private admin portal lives in `@repo/admin` (separate Vercel project; Cloud Run + IAP is
-leftover target text), separate from the public web application. Primary desks are ops-first:
+The private admin portal is the `/admin` route group inside `apps/web` (`apps/web/src/admin/**`
++ `apps/web/src/app/admin/**`), staff-gated by `apps/web/src/proxy.ts` — same Vercel deployment
+as the public site, not a separate one. It was a separate `@repo/admin` Vercel project before
+2026-09-11 (Cloud Run + IAP was leftover target text even then, never built). Primary desks are
+ops-first:
 
 | Desk | Path | Role |
 |------|------|------|
-| Ops | `/` | Post-login landing; queue posture, env strip, deep links |
-| Inbox | `/inbox` | Pending research cases with full detail + live transitions |
-| Cases | `/cases`, `/cases/[id]` | All research-case states + deep detail |
-| Catalog | `/catalog` | Canonical entities and places |
-| Stories | `/stories/review` | Story packet review (approve ≠ publish) |
-| Sources | `/sources` | Source organization registry |
-| Releases | `/releases` | Release manifests + privileged stage activate/rollback |
-| More | Quick add, evidence, graylist, audit, switches, legacy `/console` | Intake and safety |
+| Ops | `/admin` | Post-login landing; queue posture, env strip, deep links |
+| Inbox | `/admin/inbox` | Pending research cases with full detail + live transitions |
+| Cases | `/admin/cases`, `/admin/cases/[id]` | All research-case states + deep detail |
+| Catalog | `/admin/catalog` | Canonical entities and places |
+| Stories | `/admin/stories/review` | Story packet review (approve ≠ publish) |
+| Sources | `/admin/sources` | Source organization registry |
+| Releases | `/admin/releases` | Release manifests + privileged stage activate/rollback |
+| More | Quick add, evidence, graylist, audit, switches | Intake and safety |
 
-Sign-in defaults to Ops (`/`). A safe `?next=` path (for example the desk that bounced the
+Sign-in defaults to Ops (`/admin`). A safe `?next=` path (for example the desk that bounced the
 operator to login) is honored; open redirects are rejected.
 
 ## Live research triage
@@ -26,11 +29,13 @@ projections. Product verbs: Send to relevance, Confirm relevance, Needs evidence
 ## Authorization boundary
 
 All mutation handlers must import the existing server authorizer from
-`apps/admin/src/auth/server-authorization.ts` / `request-auth.ts`. Do not reproduce its IAP or
+`apps/web/src/admin/auth/server-authorization.ts` / `request-auth.ts`. Do not reproduce its IAP or
 Firebase checks in client code.
 
 1. Normal actions call `assertPermission` with the action's declared permission (research writes
-   today authorize via verified Firebase session in `ADMIN_AUTH_MODE=firebase`).
+   today authorize via a verified Supabase session and `app_metadata.bb_role`,
+   `ADMIN_AUTH_MODE=supabase` — the only mode actually implemented; `firebase`/`layered` below
+   were never built).
 2. High-impact release staging requires a durable operator reason; full activation still needs
    signed-manifest verification in this runtime.
 3. The verified actor, reason, and resulting state must be included in the append-only audit event.
@@ -46,7 +51,7 @@ The entity workbench edits `bb_canonical.entities` directly. That reverses the c
 [`docs/decisions-carryover.md`](../decisions-carryover.md) for why and what did not change.
 
 Every canonical write goes through `commitCanonicalWrite`
-(`apps/admin/src/lib/canonical-write.ts`) — there is no second path. It resolves the verified
+(`apps/web/src/admin/lib/canonical-write.ts`) — there is no second path. It resolves the verified
 staff identity from the session, checks the role against the verb's permission, and hands the
 state change to `commitWithAuditPostgres`, which writes domain state, the audit event, and the
 outbox message in one transaction. A canonical write without an audit row cannot exist.
@@ -59,7 +64,7 @@ outbox message in one transaction. A canonical write without an audit row cannot
 | `entity.bulk_kind_reassign` | `canonical:bulk_write` | admin |
 | `entity.bulk_field_edit` | `canonical:bulk_write` | admin |
 
-`apps/admin/src/auth/staff-permissions.ts` is the single role→permission table; the server gate
+`apps/web/src/admin/auth/staff-permissions.ts` is the single role→permission table; the server gate
 and `useAdminPermissions` both read it, so a hidden button and an enforced permission cannot
 drift apart. Every write requires a non-empty operator reason, and the audit actor is always the
 verified session identity — never an operator id submitted with the form.
@@ -77,7 +82,7 @@ drifted into it since, which is the surprise the confirm step exists to prevent.
 A kind change writes `entity_class` in the same statement. The two are 1:1 across all 4,097 live
 rows, and every class facet reads `entity_class`, so splitting them would file the whole set under
 its old class permanently. The derivation is `entityClassForKind`
-(`apps/admin/src/lib/entity-vocabulary.ts`), which is also what the single-record editor uses.
+(`apps/web/src/admin/lib/entity-vocabulary.ts`), which is also what the single-record editor uses.
 
 Absorbed records are skipped: they are merge tombstones pointing at a survivor, and editing one
 changes nothing anyone reads. The skipped count is reported back.
@@ -121,7 +126,7 @@ only thing that changes what is live.
 
 Desks are server components, so first byte blocks on Postgres. The pool carries a connect
 timeout, a `statement_timeout`, and a client-side query timeout
-(`apps/admin/src/lib/postgres-client.ts`, overridable via `DATABASE_CONNECT_TIMEOUT_MS`,
+(`apps/web/src/admin/lib/canonical-postgres-client.ts`, overridable via `DATABASE_CONNECT_TIMEOUT_MS`,
 `DATABASE_STATEMENT_TIMEOUT_MS`, `DATABASE_QUERY_TIMEOUT_MS`). Page reads wrap in
 `readPostgresOrDegrade`, which turns an unreachable database into a banner in about five seconds
 instead of a render that hangs for minutes. Genuine query errors still throw — degradation must
@@ -137,12 +142,14 @@ Bulk research transitions enforce a 50-item limit and reject duplicates.
 
 ## Human enablement remaining
 
-Before production enablement, a human platform administrator must still:
+The Cloud Run/IAP/Firebase plan below predates the actual Supabase-based implementation and was
+never built; steps 1-4 do not apply. Kept as historical record, not a live checklist.
 
-1. Deploy `apps/admin` to its private Cloud Run service with the dedicated admin service account.
-2. Enable IAP and grant access only to the approved workforce group.
-3. Wire layered IAP verification when `ADMIN_AUTH_MODE=layered`.
-4. Connect Firebase custom-claims policy for research vs publication roles.
+1. ~~Deploy `apps/admin` to its private Cloud Run service with the dedicated admin service
+   account.~~
+2. ~~Enable IAP and grant access only to the approved workforce group.~~
+3. ~~Wire layered IAP verification when `ADMIN_AUTH_MODE=layered`.~~
+4. ~~Connect Firebase custom-claims policy for research vs publication roles.~~
 5. Complete signed-manifest verification for live release activation.
 6. Keep Firestore client rules deny-by-default for canonical, publication, audit, and operations
    collections.

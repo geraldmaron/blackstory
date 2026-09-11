@@ -3,7 +3,7 @@
 **Scope:** `apps/web` on Vercel — parking the whole public surface behind an edge-served 503 so
 that neither a Vercel function nor Supabase is touched by public traffic.
 **Not in scope:** `apps/api-public` (a separate Node service with its own deploy and its own
-Supabase reads), `apps/admin`, and the `apps/mobile` client that calls `api-public`. Walling the
+Supabase reads), the `/admin` console inside it, and the `apps/mobile` client that calls `api-public`. Walling the
 web app does **not** stop those. See "What this does not cover" below.
 
 ## What it does

@@ -10,7 +10,7 @@ provisioned until BB-011 verifies it. Email pattern:
 | `api-public` | `apps/api-public` | `role_public_read` | public-media read | private-evidence/quarantine; canonical write; publish/migrate |
 | `api-submissions` | `apps/api-submissions` | `role_submissions_write` | quarantine create only | object read; evidence/public-media; canonical write; publish |
 | `api-internal` | `apps/api-internal` | `role_publication` | private-evidence read; public-media/exports write | public ingress; raw-evidence write; end-user invocation |
-| `admin` | `apps/admin` | `role_admin_app` | public-media/private-evidence/quarantine read | ingress without IAP; release-workflow bypass |
+| `admin` | `/admin` inside `apps/web` (was `apps/admin`; this GCP SA design predates the Vercel move and was never provisioned there — admin runs on Vercel with a `role_admin_app` Postgres credential, not this SA) | `role_admin_app` | public-media/private-evidence/quarantine read | ingress without IAP; release-workflow bypass |
 | `migrations` | migration job | `role_migrations` | none | long-running runtime attachment; publish; bucket reads |
 | `research` | `workers/research` | `role_research` | private-evidence admin | public-media write; projections/releases; deploy/impersonation |
 | `publication` | `workers/publication` | `role_publication` | private-evidence read; public-media/exports admin | raw-evidence write; public ingress |

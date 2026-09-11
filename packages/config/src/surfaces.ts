@@ -96,7 +96,12 @@ export const SURFACE_DEFINITIONS: Readonly<Record<SurfaceId, SurfaceDefinition>>
   },
   admin: {
     id: 'admin',
-    appPath: 'apps/admin',
+    // A staff-gated route group inside apps/web (src/admin/**, routes under /admin), not a
+    // separate deployable — see docs/security/service-surfaces.md. serviceAccountId/runtime
+    // below predate that and are already stale (this surface runs on Vercel, not Cloud Run);
+    // left as-is rather than fixed opportunistically here, so this still reads as distinct from
+    // `web` below without claiming an accuracy this migration didn't set out to restore.
+    appPath: 'apps/web/src/admin',
     runtime: 'cloud-run',
     serviceAccountId: 'admin',
     networkPosture: 'iap-protected',

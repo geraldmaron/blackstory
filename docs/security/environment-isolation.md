@@ -64,6 +64,12 @@ Local development stays on `demo-repo` emulators — unaffected by any of the ab
 
 ### Admin console correction: Cloud Run + IAP, direct attachment
 
+> **Superseded.** The admin console never actually ran this way: it moved to Vercel on
+> 2026-07-25 (`docs/data/firebase-wind-down.md`) and, as of 2026-09-11, is a `/admin` route
+> group inside `apps/web` rather than any kind of separate service — see
+> `docs/security/service-surfaces.md`. This Cloud Run/IAP design below was not built; left as a
+> historical record of the design that was superseded before it shipped.
+
 The admin console (`apps/admin`) runs as a plain Cloud Run service in `blackbook-internal`, behind
 Identity-Aware Proxy **attached directly to the Cloud Run service** — no external HTTPS load balancer
 or serverless NEG is required; that pattern was only necessary before Google Cloud shipped direct IAP
@@ -283,11 +289,10 @@ Terraform is a plan scaffold only; do not apply it blindly to the live project.
      secrets, and org-policy inheritance before creating anything.
    - Decide whether to upgrade to Blaze. App Hosting backend inventory/creation is blocked until the
      project is on Blaze and `firebaseapphosting.googleapis.com` can be enabled.
-2. **Register Firebase apps**
+2. **Register Firebase apps** (superseded for admin — see note above; admin uses Supabase Auth,
+   not Firebase, and is not a separate app to register a client for)
    - Create one Firebase Web app for `apps/web` (suggested display name `BlackStory Web`).
-   - Create a separate Firebase Web app for `apps/admin` (suggested display name
-     `BlackStory Admin`) for Firebase Auth client configuration; do not share admin authorization
-     logic with the public app.
+   - ~~Create a separate Firebase Web app for `apps/admin`~~ — does not apply.
    - Record only Firebase's non-secret public web configuration through the approved config path.
      Do not create iOS/Android apps until those clients exist.
 3. **Create App Hosting backends**

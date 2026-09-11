@@ -22,22 +22,33 @@ Allowed (via server components / BFF calls to `api-public`):
 - Read released public projections
 - Search and location discovery (delegated to public read API)
 
-Denied at this surface:
+Denied at this surface, for every route outside `/admin`:
 
 - Canonical Firestore writes
 - Quarantine or submission writes (use `api-submissions`)
 - Publication or release activation (use `api-internal` via service identity)
-- Admin or research console routes (use `apps/admin` behind IAP)
+- Canonical Postgres writes (the `ADMIN_DATABASE_URL` credential is never read outside `src/admin/**` — see `canonical-write-boundary.test.ts`)
+
+`/admin` is the one route group that is exempt from the list above: it is a staff-gated
+workbench (entity canon, research cases, publication staging) behind `src/middleware.ts` and a
+Supabase session + `app_metadata.bb_role` check. See "Separation from admin" below.
 
 Typed definitions: `packages/config/src/surfaces.ts` (`web` entry).
 
-## Separation from admin
+## Admin (`/admin`)
 
-`apps/admin` is a **separate Next.js deployable** on port 3001 locally and a separate Vercel
-project in production. Do not add admin route handlers or research console pages to this app.
-Shared UI belongs in `packages/ui`; shared domain logic belongs in `packages/domain`. Firebase
-App Hosting `black-book-admin-production` and its Cloud Run twin were deleted; do not recreate
-them.
+As of 2026-09-11, admin routes live inside this app — `src/app/admin/**` for pages,
+`src/admin/**` for everything else (auth, data access, components), namespaced under one
+directory specifically so it stays legible as a distinct thing even though it's one app now.
+It was a separate Next.js deployable on port 3001 with its own Vercel project before this; that
+separation existed for DB credential isolation, which is now enforced by `ADMIN_DATABASE_URL`
+being a distinct credential that only `src/admin/**` ever reads
+(`src/admin/canonical-write-boundary.test.ts`), not by being a separate process. See
+`docs/security/service-surfaces.md`.
+
+Shared UI still belongs in `packages/ui`; shared domain logic still belongs in
+`packages/domain`. Firebase App Hosting `black-book-admin-production` and its Cloud Run twin
+were deleted before the Vercel move and were never recreated — don't recreate them now either.
 
 ## Maintenance mode
 

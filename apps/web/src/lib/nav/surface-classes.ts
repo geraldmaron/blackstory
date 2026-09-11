@@ -132,6 +132,13 @@ function normalizePath(pathname: string): string {
  */
 export function surfaceClassFor(pathname: string, _search?: string): SurfaceClass | null {
   const path = normalizePath(pathname);
+
+  // The staff console renders its own complete chrome (AdminAuthProvider + AdminShellChrome) from
+  // a nested layout and is not one of the five public surfaces at all — null here, like an
+  // endpoint, suppresses SiteShellHeader/SiteShellFooter without pretending /admin belongs to a
+  // public class it does not.
+  if (path === '/admin' || path.startsWith('/admin/')) return null;
+
   if (ENDPOINT_ROUTE_SET.has(path)) return null;
 
   const exact = SURFACE_CLASS_BY_PATH.get(path);

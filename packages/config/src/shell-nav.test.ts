@@ -21,7 +21,6 @@ import {
   FOOTER_NAV_COLUMNS,
   OVERFLOW_NAV,
   PRIMARY_NAV,
-  absolutizeShellNav,
   isShellNavActive,
 } from './shell-nav.ts';
 
@@ -121,14 +120,6 @@ test('a private destination never reaches shell chrome', () => {
   for (const item of everyShellItem) {
     assert.ok(!privatePaths.includes(item.href), `${item.href} is not public`);
   }
-});
-
-test('absolutizeShellNav prefixes relative hrefs with the public origin', () => {
-  const items = absolutizeShellNav(PRIMARY_NAV, 'http://localhost:3048/');
-  assert.equal(items[0]?.href, 'http://localhost:3048/explore');
-  assert.equal(items[1]?.href, 'http://localhost:3048/stories');
-  assert.equal(items[0]?.label, 'Explore');
-  assert.equal(items[1]?.label, 'Stories');
 });
 
 test('isShellNavActive understands absolute sibling hrefs', () => {

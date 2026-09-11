@@ -177,7 +177,7 @@ export type ReleaseBuildContext = {
    */
   readonly visitOverride?: PublicVisit;
   /**
-   * Latest admin bulk catalog decision for this entity (apps/admin's catalog-decisions-store),
+   * Latest admin bulk catalog decision for this entity (apps/web/src/admin's catalog-decisions-store),
    * when the caller looked one up. A `flag_for_retraction` decision fails this entity closed —
    * the same fail-closed shape as the other gates below, not a silent skip.
    */

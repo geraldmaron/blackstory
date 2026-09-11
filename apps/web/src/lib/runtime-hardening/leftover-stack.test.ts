@@ -6,10 +6,17 @@
  * optional GCS dual-serve for leftover image URLs. They fail if a second
  * Supabase project, a Firebase client, or a PostgREST/Realtime SDK lands on
  * this surface. They do not claim the org bill is zero.
+ *
+ * `@supabase/ssr`/`@supabase/supabase-js` are now real `apps/web` dependencies — `/admin`'s
+ * staff session auth needs them server-side. That does not put Supabase JS on a public page's
+ * render path: Next only ships what a page's own import graph pulls in, and only
+ * `src/admin/**`/`src/app/admin/**` import `@supabase/*`. The source-scan test below is scoped
+ * to exclude that namespace for exactly this reason; the dependency-name check is dropped
+ * because the package now legitimately carries the dependency.
  */
 import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { buildContentSecurityPolicy } from '../web-security/csp';
@@ -45,7 +52,7 @@ function collectSourceFiles(directory: string): string[] {
   return files;
 }
 
-test('public web package has no Firebase or Supabase JS SDK', () => {
+test('public web package has no Firebase SDK', () => {
   const pkg = JSON.parse(readFileSync(PACKAGE_JSON, 'utf8')) as {
     readonly dependencies?: Record<string, string>;
     readonly devDependencies?: Record<string, string>;
@@ -55,7 +62,6 @@ test('public web package has no Firebase or Supabase JS SDK', () => {
     assert.doesNotMatch(name, /^firebase(-admin)?$/);
     assert.doesNotMatch(name, /^@firebase\//);
     assert.doesNotMatch(name, /^@repo\/firebase$/);
-    assert.doesNotMatch(name, /^@supabase\//);
   }
   assert.ok(names.includes('next'), 'public web stays a Next/Vercel surface');
   assert.ok(names.includes('pg'), 'public catalog reads use node-pg, not PostgREST');
@@ -63,10 +69,22 @@ test('public web package has no Firebase or Supabase JS SDK', () => {
     names.includes('@vercel/analytics'),
     'Vercel analytics is the only first-party analytics SDK',
   );
+  // @supabase/ssr + @supabase/supabase-js are legitimate: /admin's staff session auth. Scoped
+  // to src/admin/** by the source-scan test below, not banned package-wide.
+  assert.ok(names.includes('@supabase/ssr'));
+  assert.ok(names.includes('@supabase/supabase-js'));
 });
 
-test('apps/web/src does not import Firebase clients or @supabase/*', () => {
-  const files = collectSourceFiles(SRC_ROOT);
+test('the public render path (everywhere outside /admin) imports no Firebase or @supabase/* client', () => {
+  const adminSrcPrefix = join(SRC_ROOT, 'admin') + sep;
+  const adminAppPrefix = join(SRC_ROOT, 'app', 'admin') + sep;
+  const middlewareFile = join(SRC_ROOT, 'middleware.ts');
+  const files = collectSourceFiles(SRC_ROOT).filter(
+    (file) =>
+      !file.startsWith(adminSrcPrefix) &&
+      !file.startsWith(adminAppPrefix) &&
+      file !== middlewareFile,
+  );
   assert.ok(files.length > 50, 'expected to scan the public web tree');
   for (const file of files) {
     const source = readFileSync(file, 'utf8');
@@ -77,6 +95,17 @@ test('apps/web/src does not import Firebase clients or @supabase/*', () => {
     );
     assert.doesNotMatch(source, SUPABASE_JS_IMPORT, `${file} must not import @supabase/*`);
   }
+});
+
+test('only /admin and its middleware entrypoint import @supabase/*', () => {
+  const adminFiles = [
+    ...collectSourceFiles(join(SRC_ROOT, 'admin')),
+    ...collectSourceFiles(join(SRC_ROOT, 'app', 'admin')),
+  ];
+  const usesSupabase = adminFiles.some((file) =>
+    SUPABASE_JS_IMPORT.test(readFileSync(file, 'utf8')),
+  );
+  assert.ok(usesSupabase, 'expected at least one /admin module to import @supabase/*');
 });
 
 test('public render-path bans cover leftover Firebase and Supabase JS clients', () => {

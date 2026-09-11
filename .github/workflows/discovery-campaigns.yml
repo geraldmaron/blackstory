@@ -9,7 +9,7 @@
 # Kill switch: the Firebase path read `killSwitches/{id}` from Firestore
 # (functions/src/kill-switch-env.ts) and failed closed (engaged) if the doc was missing.
 # This workflow reads the Postgres-native equivalent, `bb_ops.kill_switches`, via
-# apps/admin/scripts/check-kill-switch.mjs (same table apps/admin's /switches route reads),
+# apps/web/scripts/check-kill-switch.mjs (same table the /admin/switches route reads),
 # with the same fail-closed behavior, then passes the result to discovery-dispatch
 # via --kill-switch.
 #
@@ -126,7 +126,7 @@ jobs:
             echo "No DATABASE_URL secret configured; failing closed (engaged)."
             echo "state=engaged" >> "$GITHUB_OUTPUT"
           else
-            STATE="$(pnpm --filter @repo/admin exec node scripts/check-kill-switch.mjs research-campaigns)"
+            STATE="$(pnpm --filter @repo/web exec node scripts/check-kill-switch.mjs research-campaigns)"
             echo "kill switch state: $STATE"
             echo "state=$STATE" >> "$GITHUB_OUTPUT"
           fi

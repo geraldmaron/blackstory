@@ -84,7 +84,6 @@ jobs:
           echo "  - deploy-api-public → Cloud Run black-book-api-public"
           echo "  - deploy-api-submissions → Cloud Run black-book-api-submissions"
           echo "  - deploy-api-internal → Cloud Run black-book-api-internal (internal ingress)"
-          echo "  - admin → App Hosting black-book-admin-production (interim) → Cloud Run + IAP target"
           echo "See infra/gcp/surfaces/README.md for impersonation boundaries."
 
   record-vercel-production:
@@ -98,14 +97,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.gate.outputs.commit_sha }}
-      - name: Public web and admin are Vercel Production
+      - name: Public web is Vercel Production
         run: |
           SHA="${{ needs.gate.outputs.commit_sha }}"
-          echo "Public web Production: https://blackstory.app (Vercel)"
-          echo "Admin Production: separate Vercel project rooted at apps/admin (isolated write-capable DB env)"
+          echo "Public web Production: https://blackstory.app (Vercel; /admin is a route inside this same deployment)"
           echo "Expected git SHA on Production: ${SHA}"
-          echo "Confirm in Vercel dashboard that BOTH projects' Production points at this commit before treating health as authoritative."
-          echo "No Firebase App Hosting promote for public web or admin (admin re-targeted to Vercel 2026-07-25)."
+          echo "Confirm in Vercel dashboard that the blackstory project's Production points at this commit before treating health as authoritative."
+          echo "No Firebase App Hosting promote for public web."
 
   health-check:
     name: Health Check Production

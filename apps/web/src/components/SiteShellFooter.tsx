@@ -26,11 +26,13 @@ export function SiteShellFooter() {
 
 function SiteShellFooterFromPath() {
   const pathname = usePathname() || '/';
-  if (surfaceClassFor(pathname) === 'instrument') return null;
+  const surface = surfaceClassFor(pathname);
+  if (surface === 'instrument' || surface === null) return null;
   return <SiteFooter />;
 }
 
 function SiteShellFooterFromSearch() {
-  if (useSurfaceClass() === 'instrument') return null;
+  const surface = useSurfaceClass();
+  if (surface === 'instrument' || surface === null) return null;
   return <SiteFooter />;
 }

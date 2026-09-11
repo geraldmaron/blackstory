@@ -24,8 +24,6 @@ import {
   type SemanticDestination,
 } from '@repo/public-contracts/destinations';
 
-import { trimTrailingSlashes } from './trim.js';
-
 export type ShellNavItem = {
   readonly href: string;
   readonly label: string;
@@ -95,19 +93,4 @@ export function isShellNavActive(pathname: string, href: string): boolean {
     // fall through
   }
   return pathname === href || pathname.startsWith(`${href}/`);
-}
-
-/** Prefix relative shell hrefs with a public origin for cross-app admin chrome. */
-export function absolutizeShellNav(
-  items: readonly ShellNavItem[],
-  origin: string | null,
-): readonly ShellNavItem[] {
-  if (!origin) return items;
-  const base = trimTrailingSlashes(origin);
-  return items.map((item) => ({
-    ...item,
-    href: item.href.startsWith('http')
-      ? item.href
-      : `${base}${item.href.startsWith('/') ? item.href : `/${item.href}`}`,
-  }));
 }

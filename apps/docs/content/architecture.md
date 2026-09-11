@@ -50,7 +50,7 @@ docs on Vercel + Supabase does not close overages or standing bills.
 
 ```
 apps/web                 Public Next.js on Vercel (live: blackstory.app)
-apps/admin               Private admin / research console (separate Vercel project)
+                          (private admin/research console lives at /admin inside apps/web)
 apps/api-public          Public read / search / location (in-repo; Cloud Run deploy unverified)
 apps/api-submissions     Corrections / contribution intake (in-repo; Cloud Run deploy unverified)
 apps/api-internal        Publication / promotion (in-repo; Cloud Run deploy unverified)

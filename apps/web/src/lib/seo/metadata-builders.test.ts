@@ -96,10 +96,11 @@ test('every static room routes its head through the builder', () => {
   // without canonicals — so the adoption is asserted rather than left to review.
   //
   // Excluded: Explore and /records build `alternates` directly (one must carry no title, the
-  // other's canonical carries a narrowing), and /history and /search are redirect routes whose
-  // metadata never reaches a reader.
+  // other's canonical carries a narrowing), /history and /search are redirect routes whose
+  // metadata never reaches a reader, and /admin is a staff-gated console (`robots: noindex` in
+  // its own layout) with no public canonical to build.
   const appDir = join(import.meta.dirname, '../../app');
-  const exempt = new Set(['history', 'search', 'records']);
+  const exempt = new Set(['history', 'search', 'records', 'admin']);
 
   const walk = (dir: string): void => {
     for (const item of readdirSync(dir, { withFileTypes: true })) {

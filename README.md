@@ -44,8 +44,7 @@ Public clients read released projections only. Anonymous clients never write can
 
 | Path | Role |
 |------|------|
-| `apps/web` | Public Next.js app on **Vercel** (live at blackstory.app) |
-| `apps/admin` | Private admin and research console (separate Vercel project) |
+| `apps/web` | Public Next.js app on **Vercel** (live at blackstory.app); private admin/research console at `/admin`, staff-gated |
 | `apps/api-public` | Public read, search, and location API (in-repo; Cloud Run deploy unverified) |
 | `apps/api-submissions` | Corrections and contribution intake (in-repo; Cloud Run deploy unverified) |
 | `apps/api-internal` | Publication and internal control API (in-repo; Cloud Run deploy unverified) |
@@ -131,7 +130,6 @@ Independent deployable builds:
 
 ```bash
 pnpm --filter @repo/web build
-pnpm --filter @repo/admin build
 pnpm --filter @repo/api-public build
 pnpm --filter @repo/api-submissions build
 pnpm --filter @repo/api-internal build
@@ -145,7 +143,7 @@ Shared TypeScript and ESLint policy lives in `packages/typescript-config` and `p
 
 Product system of record is Supabase Postgres on `blackstory-app` (`https://twykhihqkcldpreuovay.supabase.co`). Schema and migrations: [`docs/data/postgres-schema.md`](./docs/data/postgres-schema.md), [`supabase/migrations/`](./supabase/migrations/). Decision: ADR-020 (removed 2026-07-24, see [`docs/decisions-carryover.md`](./docs/decisions-carryover.md)).
 
-Hosted public web reads `PUBLIC_DATA_SOURCE=postgres` with server-only `DATABASE_URL` on Vercel. Admin uses `ADMIN_DATA_SOURCE=postgres` on its own Vercel project. Public media is Supabase Storage (`public-media`). Live CSP still allows leftover GCS (`storage.googleapis.com`) for dual-serve objects.
+Hosted public web reads `PUBLIC_DATA_SOURCE=postgres` with server-only `DATABASE_URL` on Vercel. The admin console at `/admin` uses `ADMIN_DATA_SOURCE=postgres` with a separate `ADMIN_DATABASE_URL` credential in the same Vercel project — a distinct env var, not a distinct deployment. Public media is Supabase Storage (`public-media`). Live CSP still allows leftover GCS (`storage.googleapis.com`) for dual-serve objects.
 
 Firestore, Firebase App Hosting, and parked PostGIS are leftover. Historical ETL and wind-down notes: [`packages/migrate-firestore-postgres`](./packages/migrate-firestore-postgres/), [`docs/data/supabase-storage-cutover.md`](./docs/data/supabase-storage-cutover.md), [`docs/data/firebase-wind-down.md`](./docs/data/firebase-wind-down.md). Do not treat those files as the current SoR.
 
