@@ -38,15 +38,17 @@ Do not claim GitHub settings are live until `infra/github/scripts/check-governan
 
 Must match job `name:` values in `.github/workflows/ci.yml` and the ruleset:
 
-- Validate
-- Unit Tests (JS Packages)
-- Unit Tests (JS Apps)
+- Workspace Checks
+- Workspace Tests
 - Unit Tests (Python)
-- Contract Security Accessibility
-- Coverage
-- Build and Typecheck
-- E2E Harness
 - Governance
+
+Four, not the nine that stood here before. The seven pnpm lanes (Validate, Unit Tests (JS
+Packages), Unit Tests (JS Apps), Contract Security Accessibility, Coverage, Build and
+Typecheck, E2E Harness) were seven runners repeating one checkout and one install; they are
+now steps inside `Workspace Checks` and `Workspace Tests`. Every command still runs. The
+build stays in its own job on purpose: the test lanes have always run against an unbuilt
+workspace, and folding the build in with them would change what the suites resolve.
 
 ## Local validation
 

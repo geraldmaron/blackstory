@@ -27,12 +27,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  gate:
-    name: Gate / Pin Commit SHA
+  # One job, not five. gate, checkout-pinned, record-vercel-staging, provenance and
+  # e2e-smoke each took a fresh runner and re-checked-out the same pinned commit — five
+  # checkouts and five per-job billing roundings for about 79 seconds of real work, on
+  # 328 runs in thirty days. `checkout-pinned` was the clearest case: its only step was a
+  # checkout, and because every job gets its own runner, nothing downstream could use it.
+  #
+  # The one semantic change: assert-no-auto-rollout.mjs now runs against the PINNED commit
+  # rather than the default ref. On a push they are the same commit. On a workflow_dispatch
+  # of an older SHA it is the stricter reading — it asks whether the commit being deployed
+  # disables auto-promotion, not whether today's HEAD does.
+  deploy-staging:
+    name: Deploy Staging
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      commit_sha: ${{ steps.resolve.outputs.commit_sha }}
+    timeout-minutes: 20
+    env:
+      E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
+      CI_REQUIRE_E2E: ${{ vars.CI_REQUIRE_E2E }}
     steps:
       - name: Resolve pinned commit SHA
         id: resolve
@@ -56,53 +67,25 @@ jobs:
           echo "commit_sha=$SHA" >> "$GITHUB_OUTPUT"
           echo "Pinned deploy SHA: $SHA"
 
-      - name: Checkout policy files
+      - name: Checkout exact commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.resolve.outputs.commit_sha }}
+
       - name: Assert automatic production deploys disabled
         run: node infra/github/release-pipeline/assert-no-auto-rollout.mjs
 
-  checkout-pinned:
-    name: Checkout Pinned Commit
-    needs: gate
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Checkout exact commit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ needs.gate.outputs.commit_sha }}
-
-  record-vercel-staging:
-    name: Record Vercel Staging Expectation
-    needs: [gate, checkout-pinned]
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Checkout exact commit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ needs.gate.outputs.commit_sha }}
       - name: Public web staging is Vercel Preview from staging branch
         run: |
-          SHA="${{ needs.gate.outputs.commit_sha }}"
+          SHA="${{ steps.resolve.outputs.commit_sha }}"
           echo "Public web staging: Vercel Preview for git ref staging @ ${SHA}"
           echo "Alias: https://blackstory-git-staging-geraldmarons-projects.vercel.app"
           echo "No Firebase App Hosting promote for public web (ADR-027)."
 
-  provenance:
-    name: Write Staging Provenance
-    needs: [gate, record-vercel-staging]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Checkout exact commit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ needs.gate.outputs.commit_sha }}
       - name: Write and validate provenance
         env:
           PROVENANCE_ENVIRONMENT: staging
-          PROVENANCE_COMMIT_SHA: ${{ needs.gate.outputs.commit_sha }}
+          PROVENANCE_COMMIT_SHA: ${{ steps.resolve.outputs.commit_sha }}
           PROVENANCE_GIT_REF: ${{ github.ref }}
           PROVENANCE_REPOSITORY: ${{ github.repository }}
           PROVENANCE_REPOSITORY_ID: ${{ github.repository_id }}
@@ -118,27 +101,26 @@ jobs:
         run: |
           node infra/github/release-pipeline/write-provenance.mjs
           node infra/github/release-pipeline/validate-provenance.mjs artifacts/deployment-provenance.json
+
       - name: Upload staging provenance
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: staging-provenance-${{ needs.gate.outputs.commit_sha }}
+          name: staging-provenance-${{ steps.resolve.outputs.commit_sha }}
           path: artifacts/deployment-provenance.json
           if-no-files-found: error
 
-  e2e-smoke:
-    name: E2E Smoke Staging
-    needs: [gate, record-vercel-staging]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
-      CI_REQUIRE_E2E: ${{ vars.CI_REQUIRE_E2E }}
-    steps:
-      - name: Checkout exact commit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ needs.gate.outputs.commit_sha }}
+      # This says out loud what it has been doing silently. `vars.E2E_BASE_URL` is unset on
+      # this repository (actions/variables returns 0), so smoke-post-deploy.mjs has skipped on
+      # every one of the last 328 runs while the job reported green — a post-deploy gate that
+      # was never a gate. The notice makes that visible in the run summary instead of leaving
+      # a green check to imply staging was smoked. Set E2E_BASE_URL to turn it on, and
+      # CI_REQUIRE_E2E=1 to make a skip fail closed.
+      - name: Warn when the post-deploy smoke has nothing to hit
+        if: ${{ vars.E2E_BASE_URL == '' }}
+        run: echo "::warning title=Staging smoke did not run::vars.E2E_BASE_URL is unset, so the post-deploy smoke skipped. This job's green does NOT mean staging was verified."
+
       - name: Setup Node and pnpm
         uses: ./.github/actions/setup-node-pnpm
+
       - name: Post-deploy smoke (skip without E2E_BASE_URL; fail-closed when CI_REQUIRE_E2E=1)
         run: node scripts/release/smoke-post-deploy.mjs

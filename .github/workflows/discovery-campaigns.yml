@@ -40,17 +40,34 @@ on:
         options:
           - fixture
           - live
+  # Monthly, one roster job per day-of-month. The cadence below is DELIBERATELY not the
+  # one in functions/src/schedules.ts, and this is the one place the two diverge.
+  #
+  # The Firebase cadence these replaced — rss hourly, web-search daily, three weeklies —
+  # is ~790 runs a month. That was free while this repository is public and would be
+  # ~790 billed minutes a month the day it is not, more than a third of a GitHub Free
+  # allowance for one workflow. Discovery is a background harvest with no deadline, so
+  # the cadence is the cheap thing to give up rather than the roster.
+  #
+  # Each expression is distinct because DISCOVERY_JOB_ID below maps cron -> roster job id;
+  # two jobs sharing an expression would collapse into one id. Days are staggered so the
+  # five never contend, and the hours avoid the top-of-hour window where GitHub's
+  # scheduler queues longest.
+  #
+  # To run any job now, at either mode, use the workflow_dispatch inputs above. If the
+  # original cadence is ever needed again, it belongs on a real scheduler rather than on
+  # Actions minutes.
   schedule:
-    # discovery-campaign-rss — hourly (functions/src/schedules.ts: '0 * * * *')
-    - cron: '0 * * * *'
-    # community-obscurity-discovery — weekly, Sundays 10:00 UTC ('0 10 * * 0')
-    - cron: '0 10 * * 0'
-    # discovery-campaign-wikimedia-federal — weekly, Mondays 06:00 UTC ('0 6 * * 1')
-    - cron: '0 6 * * 1'
-    # discovery-campaign-archive-dpla — weekly, Tuesdays 07:00 UTC ('0 7 * * 2')
-    - cron: '0 7 * * 2'
-    # discovery-campaign-web-search — daily 08:30 UTC ('30 8 * * *')
-    - cron: '30 8 * * *'
+    # discovery-campaign-rss — was hourly ('0 * * * *')
+    - cron: '17 3 1 * *'
+    # community-obscurity-discovery — was weekly, Sundays 10:00 UTC ('0 10 * * 0')
+    - cron: '17 4 2 * *'
+    # discovery-campaign-wikimedia-federal — was weekly, Mondays 06:00 UTC ('0 6 * * 1')
+    - cron: '17 5 3 * *'
+    # discovery-campaign-archive-dpla — was weekly, Tuesdays 07:00 UTC ('0 7 * * 2')
+    - cron: '17 6 4 * *'
+    # discovery-campaign-web-search — was daily 08:30 UTC ('30 8 * * *')
+    - cron: '17 7 5 * *'
 
 permissions:
   contents: read
@@ -85,11 +102,11 @@ jobs:
       DISCOVERY_JOB_ID: >-
         ${{
           github.event_name != 'schedule' && inputs.job_id ||
-          github.event.schedule == '0 * * * *' && 'discovery-campaign-rss' ||
-          github.event.schedule == '0 10 * * 0' && 'community-obscurity-discovery' ||
-          github.event.schedule == '0 6 * * 1' && 'discovery-campaign-wikimedia-federal' ||
-          github.event.schedule == '0 7 * * 2' && 'discovery-campaign-archive-dpla' ||
-          github.event.schedule == '30 8 * * *' && 'discovery-campaign-web-search' ||
+          github.event.schedule == '17 3 1 * *' && 'discovery-campaign-rss' ||
+          github.event.schedule == '17 4 2 * *' && 'community-obscurity-discovery' ||
+          github.event.schedule == '17 5 3 * *' && 'discovery-campaign-wikimedia-federal' ||
+          github.event.schedule == '17 6 4 * *' && 'discovery-campaign-archive-dpla' ||
+          github.event.schedule == '17 7 5 * *' && 'discovery-campaign-web-search' ||
           'community-obscurity-discovery'
         }}
       DISCOVERY_MODE: ${{ github.event_name == 'schedule' && 'fixture' || inputs.mode }}

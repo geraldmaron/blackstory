@@ -154,15 +154,17 @@ lane_gate() {
 lane_ci_job() {
   case "$1" in
     install) echo "(every JS job's setup-node-pnpm step)" ;;
-    validate) echo "Validate" ;;
-    unit-js-packages) echo "Unit Tests (JS Packages)" ;;
-    unit-js-apps) echo "Unit Tests (JS Apps)" ;;
-    mobile) echo "Mobile Typecheck / Mobile Lint / Mobile Unit Tests" ;;
+    # The lanes below stay separate so a developer can run one of them alone; several
+    # now report under one CI job because ci.yml stopped giving each its own runner.
+    validate) echo "Workspace Checks (validate step)" ;;
+    unit-js-packages) echo "Workspace Tests (package tests step)" ;;
+    unit-js-apps) echo "Workspace Tests (app tests step)" ;;
+    mobile) echo "Mobile Checks" ;;
     unit-py) echo "Unit Tests (Python)" ;;
-    contract-security-a11y) echo "Contract Security Accessibility" ;;
-    coverage) echo "Coverage" ;;
-    build-typecheck) echo "Build and Typecheck" ;;
-    e2e) echo "E2E Harness" ;;
+    contract-security-a11y) echo "Workspace Tests (contract/security/a11y steps)" ;;
+    coverage) echo "Workspace Tests (coverage step)" ;;
+    build-typecheck) echo "Workspace Checks (build + typecheck steps)" ;;
+    e2e) echo "Workspace Tests (e2e step)" ;;
     governance) echo "Governance" ;;
     security-policy) echo "security.yml: Security / Policy and API Security" ;;
   esac
