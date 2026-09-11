@@ -187,7 +187,9 @@ Replaces v6's horizontally scrolling decade-tab rail, which required scrolling t
 
 ### 6.5 Camera console (bottom right, z 20)
 
-`CAMERA` mono header with a compact zoom stepper, then a 3×2 grid of move buttons each carrying its keyboard chip. Active move takes `--copper-wash` for 2.2s.
+`CAMERA` header with **Reset** (full establishing shot), compass (north only), and a compact zoom stepper, then a 3×2 grid of move buttons each carrying its keyboard chip. Active move takes `--copper-wash` for 2.2s.
+
+**Reset** runs the same move as **Wide** (`W`): CONUS fit, pitch 0, bearing 0, spotlight cleared. It sits in the header so a reader who twisted the plate with shift+drag (or zoomed/panned away) has an obvious escape without learning the cinematic grid first. **Compass** only unrotates and takes copper ink while bearing is off north.
 
 **The default MapLibre `NavigationControl` is removed.** Zoom and pitch live in this console so the map keeps one control vocabulary. Two zoom vocabularies on one map is the defect being fixed. Attribution moves to a bottom-left pill.
 
@@ -275,7 +277,7 @@ One source of truth for every binding. The palette, the camera console and the s
 | Group | Bindings |
 |---|---|
 | Find | `⌘K` / `/` palette · `?` shortcuts · `N` near me |
-| Camera | `W` wide · `P` push · `O` orbit · `T` tilt · `F` spotlight · `R` trace |
+| Camera | `W` reset / wide · `P` push · `O` orbit · `T` tilt · `F` spotlight · `R` trace |
 | Records | `J` / `K` step · `S` save · `C` cite · `⌘L` share link |
 | View | `D` theme · `⌥D` density · `M` motion · `\` hide chrome |
 | Time | `←` / `→` step decade · `SPACE` play/pause |

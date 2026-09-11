@@ -7,6 +7,10 @@
  * is still unmounted would leave the map with no zoom control at all
  * (design-direction-v9-atlas.md §5.5).
  *
+ * Header Reset runs the same establishing shot as Wide (`W`): CONUS, flat, north-up, spotlight
+ * cleared. Compass only unrotates. Shift+drag rotation is why both sit in the header — one fixes
+ * a twist without reframing; the other recovers from a lost camera.
+ *
  * The six moves and their key caps come from `command-registry.ts`, so the console, the palette
  * and the shortcut sheet cannot disagree about what `O` does.
  *
@@ -112,19 +116,35 @@ function compassPointFor(bearing: number): (typeof COMPASS_POINTS)[number] {
   return COMPASS_POINTS[index] ?? 'N';
 }
 
+/** Degrees away from north before the compass reads as "twisted" and takes copper ink. */
+const OFF_NORTH_DEG = 1;
+
+function isOffNorth(bearing: number): boolean {
+  const normalized = ((bearing % 360) + 360) % 360;
+  return normalized > OFF_NORTH_DEG && normalized < 360 - OFF_NORTH_DEG;
+}
+
 /**
  * The compass: a 44px dial matching the zoom stepper's own footprint (WCAG 2.5.5), needle
  * rotated opposite bearing so it always points true north. Click straightens the plate —
  * `resetBearing` holds center/zoom/pitch, so this never reframes, only unrotates.
+ *
+ * When the plate is twisted (shift+drag, orbit leftover), copper ink marks the dial so the
+ * north-only correction is visible without hunting for it.
  */
 function Compass({ bearing, onReset }: { readonly bearing: number; readonly onReset: () => void }) {
   const rounded = Math.round(((bearing % 360) + 360) % 360);
+  const twisted = isOffNorth(bearing);
   return (
     <button
       type="button"
-      className="ds-camera__compass"
+      className={cx('ds-camera__compass', twisted && 'ds-camera__compass--off-north')}
       onClick={onReset}
-      title={`Bearing ${rounded}° · click to reset to north`}
+      title={
+        twisted
+          ? `Facing ${compassPointFor(bearing)} · click to reset to north`
+          : `Bearing ${rounded}° · click to reset to north`
+      }
       aria-label={`Reset map to north (currently facing ${compassPointFor(bearing)}, ${rounded} degrees)`}
     >
       <svg
@@ -137,6 +157,32 @@ function Compass({ bearing, onReset }: { readonly bearing: number; readonly onRe
       >
         <path d="M8 1.4 11 8.6 8 7.1 5 8.6z" fill="currentColor" />
         <path d="M8 14.6 5 8.6 8 10.1 11 8.6z" fill="currentColor" opacity="0.4" />
+      </svg>
+    </button>
+  );
+}
+
+/**
+ * Full camera home: same move as Wide, exposed as an obvious Reset so a reader who twisted or
+ * zoomed the plate does not have to learn the cinematic vocabulary first.
+ */
+function ResetView({ onReset }: { readonly onReset: () => void }) {
+  return (
+    <button
+      type="button"
+      className="ds-camera__reset"
+      onClick={onReset}
+      title="Reset map view"
+      aria-label="Reset map view"
+    >
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path
+          d="M6 2.2H2.2V6M10 2.2h3.8V6M6 13.8H2.2V10M10 13.8h3.8V10"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </svg>
     </button>
   );
@@ -284,6 +330,7 @@ export function CameraConsole({
     <section ref={consoleRef} className={cx('ds-camera', className)} aria-label="Camera">
       <header className="ds-camera__head">
         <span className="ds-camera__kicker">Camera</span>
+        <ResetView onReset={() => run('wide')} />
         <Compass bearing={bearing} onReset={onResetBearing} />
         <button
           type="button"
