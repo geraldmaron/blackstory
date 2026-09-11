@@ -3,7 +3,7 @@
  * (a) confidence-engine authority signals see the small, additive
  * `citationRotRateAuthoritySignal` in packages/domain/src/confidence-engine/engine.ts, which
  * consumes the `rotRate` this module computes and (b) an admin dashboard tile
- * (apps/admin/src/app/citation-health/).
+ * (apps/web/src/app/admin/citation-health/).
  */
 import type { Citation } from './citation.js';
 

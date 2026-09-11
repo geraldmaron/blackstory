@@ -61,9 +61,12 @@ vercel promote <preview-deployment-url>
 
 Do not promote a second SHA on top until the first deployment finishes or fails.
 
-### Admin-only hotfix (interim App Hosting)
+### Admin-only hotfix (superseded — kept for history)
 
-When the fix is in `apps/admin` only (public web unchanged — no Vercel promote needed):
+This App Hosting rollout procedure was already leftover before admin moved to Vercel
+(2026-07-25), and now `/admin` (`apps/web/src/admin`, `apps/web/src/app/admin`) is a route group
+inside the single `apps/web` deployment — there is no separate admin target to roll out, and a
+fix there follows the same promote as any other `apps/web` hotfix, above. Does not apply.
 
 ```bash
 SHA="$(git rev-parse HEAD)"   # must be pushed to GitHub; firebase login first

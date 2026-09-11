@@ -27,15 +27,18 @@
         "strict_required_status_checks_policy": true,
         "do_not_enforce_on_create": false,
         "required_status_checks": [
-          { "context": "Validate" },
-          { "context": "Unit Tests (JS Packages)" },
-          { "context": "Unit Tests (JS Apps)" },
-          { "context": "Unit Tests (Python)" },
-          { "context": "Contract Security Accessibility" },
-          { "context": "Coverage" },
-          { "context": "Build and Typecheck" },
-          { "context": "E2E Harness" },
-          { "context": "Governance" }
+          {
+            "context": "Workspace Checks"
+          },
+          {
+            "context": "Workspace Tests"
+          },
+          {
+            "context": "Unit Tests (Python)"
+          },
+          {
+            "context": "Governance"
+          }
         ]
       }
     },

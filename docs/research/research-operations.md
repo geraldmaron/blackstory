@@ -285,9 +285,10 @@ OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \
 ```
 
 `--commit` stages quarantine `story_packet` proposals only. Human approval:
-`http://localhost:3001/login` → **Story review** (`/stories/review`) → approve returns seed
-handoff JSON to paste into `packages/firebase/src/firestore/public-story-seed.ts`. Nothing
-auto-publishes from the CLI or the portal.
+`http://localhost:3048/admin/login` → **Story review** (`/admin/stories/review`) → approve
+returns seed handoff JSON to paste into
+`packages/firebase/src/firestore/public-story-seed.ts`. Nothing auto-publishes from the CLI or
+the portal.
 
 **Never:** call promotion gates or release activation; paste unresolved/unpublished cites into
 seed stories; lead with graphic violence; invent market figures, continental claims, or family

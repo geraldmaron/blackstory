@@ -1,7 +1,7 @@
 /**
  * Loads a `KillSwitchSnapshot` (`@repo/config`) from `bb_ops.kill_switches` for the vector-search
  * endpoint's kill-switch check (`vector-search-kill-switch.ts`). Mirrors the read pattern in
- * `apps/admin/src/lib/postgres-ops-reads.ts` without a cross-app import each app keeps its own
+ * `apps/web/src/admin/lib/postgres-ops-reads.ts` without a cross-app import each app keeps its own
  * thin read over shared Postgres tables (mirrors `postgres-client.ts`'s existing convention).
  *
  * A missing/absent row means "no override configured" (`enabled: false`, not engaged) —

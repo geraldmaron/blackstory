@@ -237,3 +237,63 @@ paragraphs of real, quotable Black history about a **different** district — an
 genuine verbatim substring, so the validator passes it. That is how a sourced-looking entry ends up
 attributing Vinegar Hill's destruction to West Main Street. Refusing is the drafter's job; the
 harness cannot catch this one.
+
+## Strengthen operator prompt (Floor v2 + entity depth)
+
+Use this brief for every enrichment fan-out, including sundown and other framing-critical lanes.
+Pin field names literally. Score axes separately; never average them into one "quality" score.
+
+```
+Task: Strengthen an existing public entity so a reader can move place → person → institution →
+claim → evidence without hitting a hollow node. Stage only. Do not publish, git, or bd.
+
+Draft fields (literal projection keys):
+- summary: 400–900 characters (Floor v2). Sub-400 only with bestEffort:true and a non-empty
+  bestEffortReason after the evidence sweep is exhausted.
+- historicalContext: era/place framing paragraph; no new unsourced facts about this record.
+- topicIds / keywords: controlled vocabulary only (allowed topic ids from the prompt).
+- Every factual clause cites evidenceId + a verbatim quote substring from the handed evidence.
+
+Axes (independent):
+1. Summary depth — clear the 400–900 band or explicit best-effort.
+2. Character density — prefer naming people who already exist as entity endpoints; do not invent
+   person entities in this pass.
+3. Relationships — do not assert edges in prose that lack a typed, evidence-backed relationship.
+   Juxtaposition is the default; causal verbs only behind a gated causal claim.
+4. Accuracy — identity before significance; designation years are not era; refuse wrong-subject
+   evidence (tier-2 stub trap).
+5. Framing — agency over trauma-as-hook; document dated history; never characterize a place today
+   from a historical exclusion label alone.
+
+Outcomes: draft-N.json | refuse-N.json | defer (write nothing). Iterate check.mts until PASS.
+```
+
+## Sundown-town and racial-violence framing
+
+Highest hostile-scrutiny surface in the catalog. Beyond the standard harness:
+
+1. Every exclusion claim needs an institutional or scholarly source (Tougaloo / Loewen archive,
+   state historical society, newspaper record of the event). Wikipedia may carry; it never
+   corroborates alone.
+2. Frame as documented history with dates ("documented as a sundown town c.1905–1960s per
+   \<source\>"), never as a characterization of the town today.
+3. No lurid detail. Prefer significance and agency of people who lived, resisted, or rebuilt over
+   trauma-as-hook spectacle.
+4. If the evidence cannot corroborate the sundown designation itself, REFUSE and flag for editorial
+   review — do not best-effort a thin exclusion claim. Sundown refusals route to human review
+   (repo-qrkv pattern), not auto-terminal `no-lane-significance`.
+
+Public rails for these rules live on `/methodology` under Editorial standards.
+
+## Scope rulings still owned by a human (repo-qrkv)
+
+Do not invent a project rule for these. Until Gerald rules, park them:
+
+| Case | Open question |
+| --- | --- |
+| Tilghman High (Paducah KY) | Concrete-event vs symbolic: white school whose NRHP significance is Black education context |
+| Mahone's Tavern (Murfreesboro NC) | Site of suppression (Nat Turner pursuit) — in catalog or out? |
+| Trapp and Chandler Pottery | Capture failure, not an editorial refusal — re-sweep, do not refuse |
+
+Same-shape drafted records (e.g. East Nashville High) are not license to decide Tilghman; they are
+evidence the project needs one written standard.

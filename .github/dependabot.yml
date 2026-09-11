@@ -1,6 +1,16 @@
 # Dependabot version updates + security PR alerts (BB-009).
 # Alerts enable automatically once the repo exists on GitHub with Dependabot allowed.
-# Grouped weekly bumps keep review load manageable; lockfiles stay the source of truth.
+# Grouped monthly bumps keep review load manageable; lockfiles stay the source of truth.
+#
+# Every ecosystem groups on '*' split by update-type, so a cycle opens at most two PRs per
+# ecosystem instead of one per dependency. Ungrouped, the four entries below opened 34 PRs in
+# ten days and left 21 sitting open; each one re-ran CI (12 billable min across 14 jobs) and
+# Security (8 min) on every push and every rebase, and each merge to staging then fired a
+# staging deploy. That was ~72% of this repo's Actions consumption.
+#
+# `interval: monthly` applies to VERSION updates only. Dependabot SECURITY updates are a
+# separate feature driven by advisories, not by this schedule, so a vulnerability is still
+# patched the day it is published.
 
 # `main` is branch-protected and receives only deliberate staging -> main release PRs, so every
 # ecosystem below targets `staging`. Without `target-branch` Dependabot opens against the default
@@ -20,23 +30,20 @@ updates:
     exclude-paths:
       - apps/mobile/**
     schedule:
-      interval: weekly
-      day: monday
-    open-pull-requests-limit: 10
+      interval: monthly
+    open-pull-requests-limit: 4
     labels:
       - dependencies
       - javascript
+    # A catch-all rather than the former eslint-prettier / typescript-tooling pairs: those
+    # two grouped about a dozen packages and left the rest of the tree opening one PR each.
     groups:
-      eslint-prettier:
-        patterns:
-          - 'eslint*'
-          - 'prettier'
-          - '@typescript-eslint/*'
-      typescript-tooling:
-        patterns:
-          - 'typescript'
-          - 'tsx'
-          - '@types/*'
+      minor-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+      major:
+        patterns: ['*']
+        update-types: ['major']
     # TypeScript 7 is the native port, and @typescript-eslint 8.x crashes on load against it
     # ("Cannot read properties of undefined (reading 'Cjs')"), which takes `pnpm lint` and every
     # Validate job with it. Held until @typescript-eslint ships a release that supports it.
@@ -50,13 +57,19 @@ updates:
     directory: /apps/mobile
     target-branch: staging
     schedule:
-      interval: weekly
-      day: monday
-    open-pull-requests-limit: 10
+      interval: monthly
+    open-pull-requests-limit: 3
     labels:
       - dependencies
       - javascript
       - mobile
+    groups:
+      minor-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+      major:
+        patterns: ['*']
+        update-types: ['major']
     # apps/mobile tracks Expo SDK 57's pinned version set. These three bumps resolve against
     # peers Expo does not ship yet, so npm fails at install and no amount of rebasing helps;
     # they are held until an SDK upgrade moves the pins, not because the versions are bad.
@@ -78,22 +91,34 @@ updates:
     directory: /
     target-branch: staging
     schedule:
-      interval: weekly
-      day: monday
-    open-pull-requests-limit: 5
+      interval: monthly
+    open-pull-requests-limit: 2
     labels:
       - dependencies
       - python
+    groups:
+      minor-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+      major:
+        patterns: ['*']
+        update-types: ['major']
 
   - package-ecosystem: github-actions
     directory: /
     target-branch: staging
     schedule:
-      interval: weekly
-      day: monday
-    open-pull-requests-limit: 5
+      interval: monthly
+    open-pull-requests-limit: 2
     labels:
       - dependencies
       - github-actions
+    groups:
+      minor-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+      major:
+        patterns: ['*']
+        update-types: ['major']
     # Prefer Dependabot PRs that bump the pinned SHA comments in workflows.
     # Policy checker still requires immutable 40-char commit SHAs.

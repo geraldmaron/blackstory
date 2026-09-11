@@ -41,7 +41,11 @@ precedence rule. Firestore is leftover, not a current write path:
   loaded at runtime, not literals in source — so curation edits don't require a code deploy. See
   `docs/research/entity-source-drift-audit.md` for the audit and what was moved under this rule.
 
-## Case → canonical entity promotion authority lives in apps/admin (repo-k2kb, 2026-07-25)
+## Case → canonical entity promotion authority lives in the admin console (repo-k2kb, 2026-07-25)
+
+Note (2026-09-11): the admin console moved from its own `apps/admin` deployable into `/admin`
+routes inside `apps/web` (`apps/web/src/admin/**`); the auth-boundary argument below is unchanged,
+only the file paths are.
 
 **Problem:** the only working "research case → canonical entity" promotion path in the repo was
 an untracked, gitignored script (`.cache/promote-authority-net-2026-07-23.mjs`) that ran raw SQL
@@ -58,10 +62,10 @@ distinct call, distinct identity.
   `authorizeAdminRequest`) that operator-cli deliberately lacks. That's the natural home for an
   *approver* identity structurally separate from the *proposer* — operator-cli (or whatever
   assembled the candidate record) never carries approval authority.
-- New surface: `POST /api/research-cases/[id]/promote`
-  (`apps/admin/src/app/api/research-cases/[id]/promote/route.ts`), gated to the `admin`/
+- New surface: `POST /admin/api/research-cases/[id]/promote`
+  (`apps/web/src/app/admin/api/research-cases/[id]/promote/route.ts`), gated to the `admin`/
   `publication` roles, calling `promoteCaseToCanonical`
-  (`apps/admin/src/cases/promote-case.ts`).
+  (`apps/web/src/admin/cases/promote-case.ts`).
 - The gate itself (`evaluateCasePromotionGate`,
   `packages/domain/src/promotion/case-promotion.ts`) is deliberately **not** the existing
   `evaluatePromotionGate` (`packages/domain/src/promotion/controls.ts`): that gate operates on a
@@ -118,11 +122,11 @@ directly editable is the canonical record, not what the public site is currently
 **The controls that make the reversal acceptable:**
 
 - Every canonical write goes through `commitCanonicalWrite`
-  (`apps/admin/src/lib/canonical-write.ts`). There is no second path, and the state change is
+  (`apps/web/src/admin/lib/canonical-write.ts`). There is no second path, and the state change is
   handed to `commitWithAuditPostgres` — domain state, audit event, and outbox message are one
   transaction, so an unaudited canonical write cannot exist.
 - The verb decides the permission, and the permission table
-  (`apps/admin/src/auth/staff-permissions.ts`) is the single source both the server gate and the
+  (`apps/web/src/admin/auth/staff-permissions.ts`) is the single source both the server gate and the
   client's affordance-hiding hook read. Field edit needs `canonical:write` (admin, research);
   merge needs `canonical:merge` and bulk reassign needs `canonical:bulk_write` (admin only,
   because their blast radius is a filtered set rather than one field).
@@ -134,3 +138,44 @@ directly editable is the canonical record, not what the public site is currently
 **Residual risk, not yet closed:** the cookie-session path has no `auth_time`, so
 `assertRecentReauth` is not enforced on canonical merges and bulk edits the way it is specified for
 publish/retract/rights/policy/role changes. Tracked as a follow-up on repo-qv9h.
+
+## Addendum, 2026-09-11 (repo-z3g1f): admin console folded into apps/web, not a separate deployable
+
+**What changed.** `apps/admin` — a separate Next.js application with its own `package.json`, own
+port (3001), own Vercel project (`blackstory-admin`), own build/deploy pipeline, and own edge
+middleware — is retired. Its routes and code now live inside `apps/web`: pages at
+`apps/web/src/app/admin/**`, everything else (auth, data access, components) namespaced under
+`apps/web/src/admin/**`. There is one Next.js application and one Vercel deployment (`blackstory`)
+where there used to be two.
+
+**Why.** The operator's stated goal: stop maintaining the admin console as a second
+application/repository-shaped thing inside the monorepo. `docs/security/service-surfaces.md`
+previously documented "admin is a separate deployable" as load-bearing specifically for DB
+credential isolation (admin's write-capable `DATABASE_URL` never living in the process serving
+anonymous public traffic). That rationale was examined, not waived: the isolation now lives at
+the credential layer instead of the process layer.
+
+**What replaces the old invariant:**
+
+- `apps/web/src/admin/lib/canonical-postgres-client.ts` reads `ADMIN_DATABASE_URL` — a distinct
+  env var from the public read-only pool's `DATABASE_URL`/`APP_DATABASE_URL`
+  (`apps/web/src/lib/public-data/postgres-client.ts`), which is untouched by this change.
+- `apps/web/src/admin/canonical-write-boundary.test.ts` asserts nothing outside
+  `apps/web/src/admin/**` imports that module or `canonical-write.ts` — this is the automated
+  check that replaces the old `apps/admin/src/surface.test.ts` "no imports from apps/web"
+  assertion, which became meaningless once admin routes live inside apps/web by design.
+- `apps/web/src/middleware.ts` scopes the Supabase-session + `app_metadata.bb_role` edge gate to
+  `/admin/:path*` only — every other route in the app is ungated, same as before the merge.
+- The `admin` `SurfaceId` in `packages/config/src/surfaces.ts` still exists, distinct from `web`
+  (`appPath: 'apps/web/src/admin'` now, not a separate app); it is a capability/credential
+  identity, not a deployment identity.
+
+**What did not change:** `role_admin_app` (the Postgres role, `infra/database/ROLE_MATRIX.md`)
+and the `apps/admin` string used as `allowedSurfaces`/surface-constant identity in
+`packages/data-access/src/sql-connect/operations.ts` and `packages/ops-data/src/constants.ts` —
+those are logical authorization-capability identities, not literal deployment paths, and stay as
+they are on purpose.
+
+**Accepted, not closed:** `blackstory-admin`, the old Vercel project, is decommissioned once the
+merged `/admin` routes are verified working on `blackstory` in a deployed environment — that step
+needs a human with Vercel dashboard access and is tracked on repo-z3g1f, not assumed done here.

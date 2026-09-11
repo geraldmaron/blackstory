@@ -39,10 +39,13 @@ second-largest line, and one no evaluator in this document can see. Build spend 
 spike; it scales with commit velocity, and this repo ran 437 commits in Aug 2026.
 
 **Control:** [`scripts/vercel-ignore-build.sh`](../../scripts/vercel-ignore-build.sh), wired as
-`ignoreCommand` in both `apps/web/vercel.json` and `apps/admin/vercel.json`. It skips a build when
-no changed file can reach that project's deployed bundle.
+`ignoreCommand` in `apps/web/vercel.json` and `apps/api-public/vercel.json`. It skips a build when
+no changed file can reach that project's deployed bundle. (Historically also wired in
+`apps/admin/vercel.json`, before admin folded into `apps/web` on 2026-09-11 — see
+`docs/decisions-carryover.md`.)
 
-Measured against Aug 2026 history (per commit): **60% of commits skippable for web, 78% for admin**.
+Measured against Aug 2026 history (per commit), when admin was still a separate Vercel project:
+**60% of commits skippable for web, 78% for admin**.
 Realized saving depends on push granularity — the rule is evaluated per *deployment*, so a push
 batching one relevant commit with twenty irrelevant ones still builds. A day-batched simulation
 skips only 2 of 21 days. Actual behavior sits between those bounds.

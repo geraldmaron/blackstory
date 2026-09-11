@@ -112,7 +112,7 @@ export const COMMANDS: readonly Command[] = [
   /* ---- Camera ---- */
   {
     id: 'camera.wide',
-    title: 'Wide, all of it',
+    title: 'Reset map view',
     section: 'Camera',
     keys: ['W'],
     run: (context) => context.camera.wide({ trigger: 'reader' }),

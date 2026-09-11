@@ -208,7 +208,7 @@ The base image ships an older `/exec-daemon/node` (v22.14.0) that lacks `module.
 `export PATH="$(dirname "$(nvm which default)"):$PATH"` (after sourcing nvm).
 
 ### Running the web app without a database
-- `PUBLIC_DATA_SOURCE=seed DEV_NO_ADMIN=1 pnpm dev:web` starts `@repo/web` alone on port 3048 (`DEV_NO_ADMIN=1` skips the admin console, which needs a Supabase project).
+- `PUBLIC_DATA_SOURCE=seed pnpm dev:web` starts `@repo/web` on port 3048. `/admin` is a route group inside this same app (`apps/web/src/app/admin`, gated by `apps/web/src/middleware.ts`), not a separate server — there is nothing to skip. Visiting `/admin/**` without Supabase/Postgres env configured just fails the edge auth gate and redirects to `/admin/login`; it does not affect the public routes.
 - The live catalog/map pages (`/`, `/explore`, `/records`, `/memorial`, `/themes`) require live Postgres (`PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` + `DATABASE_SSL=1`). Without a DB they return HTTP 500: `apps/web/src/lib/public-data/source.ts` has no seed fallback, despite older README/`public-seed.ts` comments implying a "Dunbar seed" home page.
 - Editorial/utility pages render fine with no DB: `/about`, `/methodology`, `/stories`, `/data`, `/books`, `/law`, `/support`, `/privacy`, `/errata`, `/design-system`, `/corrections`, `/submit`, `/locate`.
 

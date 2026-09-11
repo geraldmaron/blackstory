@@ -16,13 +16,20 @@ import { isProductionPublicRuntime, sanitizeClientErrorDisplay } from './error-s
 
 const APP_ROOT = new URL('../../app', import.meta.url).pathname;
 
-function collectAppRouteFiles(directory: string): string[] {
+/**
+ * `app/admin/**` is deliberately excluded: it is a staff-gated console behind
+ * `middleware.ts` + a Supabase session check, not part of the public render path this guard
+ * protects, and it needs exactly the DB/model clients this list forbids. Its own boundary is
+ * `src/admin/canonical-write-boundary.test.ts`, not this one.
+ */
+function collectAppRouteFiles(directory: string, isRoot = true): string[] {
   const entries = readdirSync(directory, { withFileTypes: true });
   const files: string[] = [];
   for (const entry of entries) {
+    if (isRoot && entry.name === 'admin') continue;
     const fullPath = join(directory, entry.name);
     if (entry.isDirectory()) {
-      files.push(...collectAppRouteFiles(fullPath));
+      files.push(...collectAppRouteFiles(fullPath, false));
       continue;
     }
     if (/\.(tsx?)$/.test(entry.name) && !entry.name.endsWith('.test.ts')) {

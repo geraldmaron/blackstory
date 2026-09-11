@@ -24,7 +24,7 @@ Registered web apps (BB-011):
 | Display name | App ID | Surface |
 |--------------|--------|---------|
 | Black Book Web | `1:332234323945:web:17be349ebc9c029b3bfd78` | `apps/web` |
-| Black Book Admin | `1:332234323945:web:e1b31c78e32d95943bfd78` | `apps/admin` |
+| Black Book Admin | `1:332234323945:web:e1b31c78e32d95943bfd78` | `apps/web`'s `/admin` (was `apps/admin`); this registration predates the Vercel move and the actual admin console does not use Firebase Auth — see `docs/security/service-surfaces.md` |
 
 Full SDK identifiers: [`registered-apps.json`](./registered-apps.json). Typed accessors:
 `@repo/firebase`.
@@ -40,7 +40,8 @@ and `firebaseapphosting.googleapis.com` can be enabled.
 `black-book-web-production` and optional `black-book-web-staging` backends in console.
 
 **Admin:** Firebase App Hosting backend `black-book-admin-production` was deleted 2026-08-15.
-Admin is the standalone Vercel project `apps/admin`. Do not recreate App Hosting.
+Admin was the standalone Vercel project `apps/admin` from 2026-07-25; as of 2026-09-11 it is a
+`/admin` route group inside `apps/web`'s own Vercel deployment. Do not recreate App Hosting.
 
 ## Data plane (historical ADR-011)
 

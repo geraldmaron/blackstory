@@ -61,15 +61,15 @@ Workflow: `.github/workflows/ci.yml` (`name: CI`)
 
 | Check name |
 |------------|
-| Validate |
-| Unit Tests (JS Packages) |
-| Unit Tests (JS Apps) |
+| Workspace Checks |
+| Workspace Tests |
 | Unit Tests (Python) |
-| Contract Security Accessibility |
-| Coverage |
-| Build and Typecheck |
-| E2E Harness |
 | Governance |
+
+`Workspace Checks` runs validate, format check, build and typecheck. `Workspace Tests` runs
+the preflight guard, package and app unit tests, contract, security and accessibility, the
+coverage thresholds and the E2E harness. They were seven separate required checks until the
+per-job setup cost (4.4 of every 13.1 CI minutes) made the fan-out the expensive part.
 
 Job-level path filters skip heavy lanes on docs/brand/mobile-only changes; skipped required
 checks still count as success. Mobile Typecheck / Mobile Unit Tests are not required and

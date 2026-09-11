@@ -185,13 +185,18 @@ async function main() {
       }
     }
 
-    // Public web must never depend on server DB helpers.
-    if (workspace.name === '@repo/web' && dependencies.has('@repo/data-access')) {
-      errors.push('@repo/web cannot depend on @repo/data-access (no browser DB credentials)');
-    }
-
+    // The public pages of @repo/web must never reach a server DB helper that could land in
+    // a browser bundle. The staff-gated /admin route group (apps/web/src/admin/**,
+    // apps/web/src/app/admin/**) is the exception: since the admin-fold, it is server-only
+    // code that reads a distinct ADMIN_DATABASE_URL (docs/security/service-surfaces.md), so
+    // @repo/web legitimately depends on @repo/data-access now. The check below is file-level
+    // rather than a blanket package-level ban for exactly that reason.
     for (const file of await collectSourceFiles(path.join(workspace.directory, 'src'))) {
       const source = await readFile(file, 'utf8');
+      const relativeToSrc = path.relative(path.join(workspace.directory, 'src'), file);
+      const isStaffAdminPath =
+        relativeToSrc.startsWith(`admin${path.sep}`) ||
+        relativeToSrc.startsWith(`app${path.sep}admin${path.sep}`);
       for (const importedName of importsFrom(source)) {
         if (appNames.has(importedName)) {
           errors.push(
@@ -200,10 +205,11 @@ async function main() {
         }
         if (
           workspace.name === '@repo/web' &&
+          !isStaffAdminPath &&
           (importedName === '@repo/data-access' || importedName.startsWith('@repo/data-access/'))
         ) {
           errors.push(
-            `${path.relative(ROOT, file)} cannot import @repo/data-access in the public web app`,
+            `${path.relative(ROOT, file)} cannot import @repo/data-access outside the staff-gated /admin route group`,
           );
         }
       }

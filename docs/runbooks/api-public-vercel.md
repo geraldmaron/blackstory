@@ -16,7 +16,7 @@ moment. Pointing an un-upgradeable client at those couples a release you cannot 
 routes designed to be changed. A separate origin also keeps an anonymous read API outside the web
 app's cookie scope, where `__Host-` CSRF cookies and the request-integrity guard live.
 
-**Vercel, not Supabase Edge Functions.** `apps/admin` already establishes the pattern in this
+**Vercel, not Supabase Edge Functions.** `apps/web` (including its `/admin` console) already establishes the pattern in this
 repo: a separate Vercel project per app, chosen there for credential isolation. Same platform,
 same deploy-from-git, same certificate automation, one bill. Edge Functions would mean rewriting a
 `node:http` server for Deno and abandoning the 123 tests that cover it, for no gain.

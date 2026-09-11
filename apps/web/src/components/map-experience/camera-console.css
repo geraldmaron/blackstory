@@ -17,10 +17,9 @@
   z-index: var(--ds-z-atlas-instruments);
   display: grid;
   gap: var(--ds-space-2);
-  /* 248px, not 210px: the header row now holds three 44px touch targets (compass, zoom out,
-     zoom in) plus their gaps (WCAG 2.5.5), and the kicker needs enough of the remaining width
-     that "Camera" does not wrap onto a second line. */
-  width: 248px;
+  /* 296px: header holds four 44px targets (reset, compass, zoom out, zoom in) plus gaps
+     (WCAG 2.5.5), and the kicker still needs room so "Camera" does not wrap. */
+  width: 296px;
   padding: var(--ds-space-3);
   /* One panel recipe shared by all four Explore instruments — see lens-panel.css. */
   background: var(--ds-surface);
@@ -45,7 +44,8 @@
   color: var(--ds-ink);
 }
 
-.ds-camera__zoom {
+.ds-camera__zoom,
+.ds-camera__reset {
   display: inline-grid;
   place-items: center;
   /* 44px WCAG 2.5.5 minimum touch target — was 22px. */
@@ -58,7 +58,8 @@
   cursor: pointer;
 }
 
-.ds-camera__zoom:hover {
+.ds-camera__zoom:hover,
+.ds-camera__reset:hover {
   color: var(--ds-ink);
   border-color: var(--ds-border-strong);
 }
@@ -78,7 +79,8 @@
   cursor: pointer;
 }
 
-.ds-camera__compass:hover {
+.ds-camera__compass:hover,
+.ds-camera__compass--off-north {
   color: var(--ds-copper-graphic, var(--ds-ink));
   border-color: var(--ds-border-strong);
 }

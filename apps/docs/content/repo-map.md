@@ -18,8 +18,7 @@ record. See [Architecture](./architecture.md).
 
 | Path | Role |
 |------|------|
-| `apps/web` | Public Next.js app on Vercel (live at blackstory.app) |
-| `apps/admin` | Private Next.js admin and research console (separate Vercel project) |
+| `apps/web` | Public Next.js app on Vercel (live at blackstory.app); private admin/research console at `/admin`, staff-gated |
 | `apps/api-public` | Public read, search, and location API (in-repo; Cloud Run deploy unverified) |
 | `apps/api-submissions` | Corrections and contribution intake |
 | `apps/api-internal` | Publication and internal control API |

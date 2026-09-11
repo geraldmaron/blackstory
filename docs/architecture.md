@@ -14,7 +14,7 @@ Firebase App Hosting or Firestore as SoR are leftover.
 | Layer | Current | Leftover |
 |-------|---------|----------|
 | Public web | Vercel (Cloudflare in front) | Firebase App Hosting, Cloud Run for `apps/web` |
-| Admin | Separate Vercel project (`apps/admin/vercel.json`) | Deleted App Hosting / Cloud Run `black-book-admin-production` |
+| Admin | `/admin` route group inside `apps/web`, same Vercel project (since 2026-09-11) | Was a separate Vercel project (`apps/admin/vercel.json`); before that, deleted App Hosting / Cloud Run `black-book-admin-production` |
 | Data | Supabase Postgres `blackstory-app` (`twykhihqkcldpreuovay.supabase.co`) | Firestore, parked PostGIS / Cloud SQL |
 | Media | Supabase Storage `public-media` | GCS dual-serve (`storage.googleapis.com` still in CSP) |
 
@@ -49,8 +49,8 @@ workers, and admin tools.
 ## Surfaces
 
 ```
-apps/web                 Public Next.js on Vercel (live: blackstory.app)
-apps/admin               Private Next.js admin/research (separate Vercel project)
+apps/web                 Public Next.js on Vercel (live: blackstory.app); private admin/research
+                          console at /admin (apps/web/src/admin/**), staff-gated, same deployment
 apps/api-public          Public read/search/location API (in-repo; Cloud Run deploy unverified)
 apps/api-submissions     Corrections / contribution intake (in-repo; Cloud Run deploy unverified)
 apps/api-internal        Publication / promotion / internal control (in-repo; Cloud Run deploy unverified)
@@ -123,7 +123,8 @@ Single-project GCP design (partially applied): [`security/environment-isolation.
 Matrices and Terraform stubs: [`../infra/gcp/`](../infra/gcp/). Root `.firebaserc` was deleted in
 `repo-348e.8` (no Firestore/Firebase Hosting deploy target remains); the production Firebase
 project id (`black-book-efaaf`) that App Check still targets is documented in
-`infra/firebase/registered-apps.json` and `apps/admin`'s Cloud Run env, not in a `.firebaserc`.
+`infra/firebase/registered-apps.json`, not in a `.firebaserc` (the "Cloud Run env" this used to
+reference was leftover even before admin moved to Vercel, then inside `apps/web`).
 
 | Acceptance | Design enforcement |
 |------------|--------------------|

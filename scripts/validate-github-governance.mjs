@@ -24,15 +24,17 @@ const REQUIRED_FILES = [
   'infra/github/README.md',
 ];
 
+// Four, not nine. The seven pnpm lanes these named were seven fresh runners each
+// repeating the same checkout and install; they are now steps inside 'Workspace Checks'
+// (validate, format, build, typecheck) and 'Workspace Tests' (preflight, unit, contract,
+// security, a11y, coverage, e2e). Every command that ran before still runs — what changed
+// is how many runners pay to set up for it. This list, the ruleset payload in
+// infra/github/rulesets/main-protection.json, and the job display names in
+// .github/workflows/ci.yml are checked against each other below and must move together.
 const REQUIRED_CHECK_NAMES = [
-  'Validate',
-  'Unit Tests (JS Packages)',
-  'Unit Tests (JS Apps)',
+  'Workspace Checks',
+  'Workspace Tests',
   'Unit Tests (Python)',
-  'Contract Security Accessibility',
-  'Coverage',
-  'Build and Typecheck',
-  'E2E Harness',
   'Governance',
 ];
 

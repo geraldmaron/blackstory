@@ -1,12 +1,17 @@
 /**
- * Edge web security composed with query normalization, behind the maintenance wall.
+ * Edge web security composed with query normalization, behind the maintenance wall — plus the
+ * `/admin` staff-session gate.
  *
- * Was `middleware.ts`. Next 16 deprecated that file convention in favor of `proxy`; the rename is
- * the whole migration — same request object, same `config.matcher` semantics, same edge runtime.
- * Only the file name and the exported function name changed.
+ * Was `middleware.ts`. Next 16 deprecated that file convention in favor of `proxy`, and allows
+ * only one such entrypoint per app: there is no separate `middleware.ts` for `/admin` precisely
+ * because Next 16 refuses to build with both present. `/admin` routes moved inside this app from
+ * their own Next.js deployable (`apps/admin`) — see `docs/security/service-surfaces.md` — and
+ * their edge auth gate (`./admin/admin-auth-gate.ts`) composes here rather than living in a file
+ * of its own.
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
+import { adminAuthGate } from './admin/admin-auth-gate';
 import { handleMaintenance } from './lib/maintenance/maintenance-gate';
 import { denyExpensiveAiCrawler } from './lib/traffic-class/edge-deny';
 import { handleWebSecurity } from './lib/web-security/edge-security';
@@ -34,8 +39,10 @@ function attachStandCookie(request: NextRequest, response: NextResponse): NextRe
   return response;
 }
 
-export function proxy(request: NextRequest) {
-  // First, always. A walled request must not reach a route, a React render, or `bb_public`.
+export async function proxy(request: NextRequest): Promise<NextResponse> {
+  // First, always. A walled request must not reach a route, a React render, or `bb_public` —
+  // and that includes `/admin`: a maintenance window is not staff-exempt by default. Staff use
+  // the same MAINTENANCE_BYPASS_TOKEN cookie redemption as anyone let through on purpose.
   const maintenanceResponse = handleMaintenance(request);
   if (maintenanceResponse !== null) {
     return maintenanceResponse;
@@ -44,6 +51,14 @@ export function proxy(request: NextRequest) {
   const aiDeny = denyExpensiveAiCrawler(request);
   if (aiDeny !== null) {
     return aiDeny;
+  }
+
+  // `/admin` is a staff-gated console, not a public page: it gets the Supabase-session check
+  // instead of query normalization or a stand cookie, and returns here rather than falling
+  // through. `adminAuthGate` makes its own pass-through decision for `/admin/login` and
+  // `/admin/api/**` (bearer-token auth) via `isAuthGatedPath`.
+  if (request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/')) {
+    return adminAuthGate(request);
   }
 
   // Outside the security/normalization surface this is a bare pass-through, which is what these

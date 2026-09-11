@@ -45,12 +45,28 @@ jobs:
         id: detect
         uses: ./.github/actions/detect-changes
 
-  validate:
-    name: Validate
+  # Two pnpm jobs, not seven. Validate, Build and Typecheck, both Unit Tests lanes,
+  # Contract Security Accessibility, Coverage and E2E Harness each began with the same
+  # checkout + pnpm install, and that setup was 4.4 of the 13.1 minutes a CI run spent —
+  # 34% of it — paid once per job because each job gets a fresh runner. Seven lanes became
+  # two, so the workspace is installed twice instead of seven times.
+  #
+  # The split is deliberately checks-vs-tests rather than one job. Tests here have always
+  # run against an UNBUILT workspace, because the old lanes were independent and only
+  # `Build and Typecheck` ever ran `pnpm build`. Keeping the build in a separate job keeps
+  # that true: fold it in with the tests and every suite would start resolving dist/
+  # instead of source. It also keeps the two running in parallel, so wall-clock is close
+  # to what it was.
+  #
+  # What is lost is per-lane reporting: a red run now names the failing step rather than
+  # a failing check, and the job stops at the first failure instead of telling you that
+  # coverage AND a11y are both broken in one pass.
+  workspace-checks:
+    name: Workspace Checks
     needs: changes
     if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -60,50 +76,54 @@ jobs:
         run: pnpm validate
       - name: Format check
         run: pnpm format:check
+      - name: Build
+        run: pnpm build
+      - name: Typecheck
+        run: pnpm typecheck
 
-  unit-js-packages:
-    name: Unit Tests (JS Packages)
+  workspace-tests:
+    name: Workspace Tests
     needs: changes
     if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup Node and pnpm
         uses: ./.github/actions/setup-node-pnpm
+      # First, and unchanged: it fails closed on production identifiers, so nothing below
+      # it should run if it trips. It ran in three separate lanes before; once is enough.
       - name: Test preflight (fail closed on production identifiers)
         run: pnpm test:preflight
       - name: Run package tests
         run: pnpm -r --filter './packages/**' run --if-present test
-
-  unit-js-apps:
-    name: Unit Tests (JS Apps)
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup Node and pnpm
-        uses: ./.github/actions/setup-node-pnpm
-      - name: Test preflight (fail closed on production identifiers)
-        run: pnpm test:preflight
       - name: Run app tests
         run: pnpm -r --filter './apps/**' run --if-present test
+      - name: Contract tests
+        run: pnpm test:contract
+      - name: Security corpus and production guards
+        run: pnpm test:security
+      - name: Accessibility smoke fixtures
+        run: pnpm test:a11y
+      - name: Testing package coverage thresholds
+        run: pnpm test:coverage
+      - name: E2E harness (skip without E2E_BASE_URL; no silent retries)
+        run: pnpm test:e2e
 
   # apps/mobile is deliberately excluded from the root pnpm workspace
   # (see pnpm-workspace.yaml `!apps/mobile` and apps/mobile/README.md) and manages its
   # own npm-based dependency graph, so it cannot run through `pnpm -r --filter './apps/**'`
   # above. These three jobs are its dedicated npm-based lane; `npm ci` here never touches the
   # root pnpm-lock.yaml, so `pnpm install --frozen-lockfile` in `validate` above is unaffected.
-  mobile-typecheck:
-    name: Mobile Typecheck
+  # One job, not three: typecheck, lint and Jest each paid their own `npm ci` against the
+  # same isolated lockfile. Ordered cheapest first so a lint error does not wait on Jest.
+  mobile-checks:
+    name: Mobile Checks
     needs: changes
     if: needs.changes.outputs.mobile == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: apps/mobile
@@ -123,54 +143,10 @@ jobs:
         # intentionally gitignored (apps/mobile/.gitignore) so every clean checkout —
         # including CI — must recreate it before `tsc` can resolve `expo/types`.
         run: printf '/// <reference types="expo/types" />\n' > expo-env.d.ts
-      - name: Typecheck (app + test/tooling project)
-        run: npm run typecheck
-
-  mobile-lint:
-    name: Mobile Lint (ESLint)
-    needs: changes
-    if: needs.changes.outputs.mobile == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: apps/mobile
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-          cache-dependency-path: apps/mobile/package-lock.json
-      - name: Install mobile dependencies (npm, isolated lockfile)
-        run: npm ci --no-audit --no-fund
-      - name: Generate expo-env.d.ts (gitignored Expo type-reference shim)
-        run: printf '/// <reference types="expo/types" />\n' > expo-env.d.ts
       - name: ESLint (eslint-config-expo, warnings fail)
         run: npm run lint
-
-  mobile-unit-tests:
-    name: Mobile Unit Tests (Jest)
-    needs: changes
-    if: needs.changes.outputs.mobile == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: apps/mobile
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-          cache-dependency-path: apps/mobile/package-lock.json
-      - name: Install mobile dependencies (npm, isolated lockfile)
-        run: npm ci --no-audit --no-fund
+      - name: Typecheck (app + test/tooling project)
+        run: npm run typecheck
       - name: Jest (jest-expo preset)
         run: npm test -- --ci
 
@@ -208,38 +184,6 @@ jobs:
         run: pnpm test:preflight
       - name: Run pytest
         run: uv run pytest
-
-  contract-security-a11y:
-    name: Contract Security Accessibility
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup Node and pnpm
-        uses: ./.github/actions/setup-node-pnpm
-      - name: Contract tests
-        run: pnpm test:contract
-      - name: Security corpus and production guards
-        run: pnpm test:security
-      - name: Accessibility smoke fixtures
-        run: pnpm test:a11y
-
-  coverage:
-    name: Coverage
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup Node and pnpm
-        uses: ./.github/actions/setup-node-pnpm
-      - name: Testing package coverage thresholds
-        run: pnpm test:coverage
 
   # ADR-011 / D-014: Postgres is parked — job kept for optional revisit, not required.
   integration-postgres:
@@ -283,36 +227,6 @@ jobs:
           pnpm db:init
           pnpm db:verify
           pnpm test:db:integration
-
-  build-typecheck:
-    name: Build and Typecheck
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup Node and pnpm
-        uses: ./.github/actions/setup-node-pnpm
-      - name: Build
-        run: pnpm build
-      - name: Typecheck
-        run: pnpm typecheck
-
-  e2e-harness:
-    name: E2E Harness
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup Node and pnpm
-        uses: ./.github/actions/setup-node-pnpm
-      - name: E2E harness (skip without E2E_BASE_URL; no silent retries)
-        run: pnpm test:e2e
 
   governance:
     name: Governance

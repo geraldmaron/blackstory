@@ -178,7 +178,7 @@ with a distinct, fresh-authenticated approver identity.
 
 ### Admin console quick-add
 
-Navigate to `/quick-add` in `apps/admin`. Paste a URL, optionally add notes/location/era and
+Navigate to `/admin/quick-add`. Paste a URL, optionally add notes/location/era and
 your operator id, and submit. The route fetches through  safety, pre-fills a citation,
 notes the (currently unwired) Wayback capture point, and prepares a draft research case through
 the same `runResearchIntake` the CLI's `research-intake` command uses. The "Commit to
@@ -187,8 +187,8 @@ commit the exact prepared proposal via the CLI's `--commit` flag instead.
 
 **Known, documented gap (still true as of 2026-08-14; corrected below to match current auth
 architecture):** `/quick-add` does not yet read a verified administrator identity — no route
-under `apps/admin/src/app/quick-add/` calls `createServerAdminAuthorizer`
-(`apps/admin/src/auth/server-authorization.ts`) yet. That authorizer checks Postgres roles via
+under `apps/web/src/app/admin/quick-add/` calls `createServerAdminAuthorizer`
+(`apps/web/src/admin/auth/server-authorization.ts`) yet. That authorizer checks Postgres roles via
 `bb_auth.current_role()`, not IAP/Firebase — admin's auth boundary moved off Cloud IAP when
 Admin became a standalone Vercel project (2026-07-25). Until quick-add wires the authorizer in,
 the operator identifies themselves via a plain "Operator id" form field. Swap that for a verified
@@ -204,7 +204,7 @@ this runbook — follow it exactly:
    ```bash
    pnpm --filter @repo/operator-cli test
    pnpm --filter @repo/operator-cli typecheck
-   pnpm --filter @repo/admin typecheck
+   pnpm --filter @repo/web typecheck  # covers /admin — it is no longer a separate package
    ```
 3. **Update issue status** — close finished `bd` work, update in-progress items.
 4. **Push to remote** (mandatory — work is not done until this succeeds):

@@ -47,7 +47,6 @@ export function parseRuntimeEnvironment(
 }
 
 export * from './surfaces.js';
-export * from './sibling-origins.js';
 export * from './shell-nav.js';
 export * from './kill-switches.js';
 

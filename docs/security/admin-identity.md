@@ -1,12 +1,21 @@
 # Administrator identity and authorization
 
+> **This document does not match the current implementation and predates the 2026-09-11
+> admin-into-web merge — the gap is pre-existing, not something that migration introduced.** The
+> admin console actually runs on Supabase Auth (`ADMIN_AUTH_MODE=supabase`), authorizing on
+> `app_metadata.bb_role` (`admin`/`research`/`publication`/`security`), with no Google Cloud IAP
+> and no Firebase Authentication/MFA layer — see `docs/security/service-surfaces.md` and
+> `apps/web/src/admin/auth/`. Whether the IAP+Firebase+MFA design below is superseded, a future
+> target, or dead, is a call for a human, not inferred here. The one path reference below is
+> corrected to its current location; the rest of the document is left as written.
+
  implements administrator identity as two independent controls: Google Cloud IAP at the
 admin service boundary and Firebase Authentication inside the application. Neither control alone
 authorizes a request.
 
 ## Request authorization
 
-`apps/admin/src/auth/server-authorization.ts` is the server composition boundary. Every protected
+`apps/web/src/admin/auth/server-authorization.ts` is the server composition boundary. Every protected
 handler must call one of its assertions before reading administrative data or invoking an internal
 workflow:
 

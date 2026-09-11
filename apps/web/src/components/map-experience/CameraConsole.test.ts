@@ -46,9 +46,13 @@ test('zoom lives in the console, so the map keeps one control vocabulary', () =>
   assert.match(html, /aria-label="Zoom out"/);
 });
 
-test('the compass sits in the header, not the six-move grid', () => {
+test('the header exposes reset, compass, and zoom — not only the six-move grid', () => {
   const html = renderToStaticMarkup(createElement(CameraConsole, consoleProps({ bearing: 0 })));
-  assert.match(html, /class="ds-camera__head"[^]*ds-camera__compass[^]*ds-camera__grid/);
+  assert.match(
+    html,
+    /class="ds-camera__head"[^]*ds-camera__reset[^]*ds-camera__compass[^]*ds-camera__grid/,
+  );
+  assert.match(html, /aria-label="Reset map view"/);
 });
 
 test('the compass reports the live bearing and never disables, regardless of the active record', () => {
@@ -62,7 +66,13 @@ test('the compass reports the live bearing and never disables, regardless of the
     ),
   );
   assert.match(html, /aria-label="Reset map to north \(currently facing NE, 47 degrees\)"/);
-  assert.doesNotMatch(html, /class="ds-camera__compass" disabled/);
+  assert.match(html, /ds-camera__compass--off-north/);
+  assert.doesNotMatch(html, /class="ds-camera__compass[^"]*" disabled/);
+});
+
+test('the compass stays quiet when the plate is already north', () => {
+  const html = renderToStaticMarkup(createElement(CameraConsole, consoleProps({ bearing: 0 })));
+  assert.doesNotMatch(html, /ds-camera__compass--off-north/);
 });
 
 test('the compass needle rotates opposite bearing so it always points true north', () => {
