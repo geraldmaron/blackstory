@@ -19,6 +19,7 @@ import {
 } from './MethodologyDiagrams';
 import {
   DIGNITY_RULES,
+  EDITORIAL_STANDARDS,
   EVIDENCE_GRADE_DEFINITIONS,
   LIMITATION_RULES,
   METHODOLOGY_DIGNITY_LINE,
@@ -138,6 +139,27 @@ export function MethodologySections() {
           <p>Every citation on the site is built the same way, including this example:</p>
         </Prose>
         <Citation label="Example citation" source={EXAMPLE_CITATION} />
+      </section>
+
+      <section aria-labelledby="editorial-standards-heading" id="editorial-standards">
+        <GroupHeading>
+          <span id="editorial-standards-heading">Editorial standards</span>
+        </GroupHeading>
+        <Prose>
+          <p>
+            Accuracy is not enough on its own. These are the framing and corroboration rails a
+            hostile reader can hold any public record to, including enrichment drafts that have not
+            yet published.
+          </p>
+        </Prose>
+        <ul className="ds-stack">
+          {EDITORIAL_STANDARDS.map((item) => (
+            <li key={item.title}>
+              <strong>{item.title}</strong>
+              <p>{item.body}</p>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section aria-labelledby="how-a-point-is-drawn-heading" id="how-a-point-is-drawn">

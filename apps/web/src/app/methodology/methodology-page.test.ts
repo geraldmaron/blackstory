@@ -7,6 +7,7 @@ import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import {
+  EDITORIAL_STANDARDS,
   EVIDENCE_GRADE_DEFINITIONS,
   METHODOLOGY_DIGNITY_LINE,
   METHODOLOGY_INTRO_LEDE,
@@ -45,9 +46,17 @@ test('methodology renders grade marks and citation strings through the live reco
 test('methodology section names match the record page vocabulary', () => {
   assert.match(sectionsSource, /How a record gets in/);
   assert.match(sectionsSource, /What the evidence grades mean/);
+  assert.match(sectionsSource, /Editorial standards/);
   assert.match(sectionsSource, /Why a point is never drawn sharper than its source/);
   assert.match(sectionsSource, /Living person protection/);
   assert.match(sectionsSource, /See it applied/);
+});
+
+test('methodology publishes the Floor v2 and sundown framing rails', () => {
+  assert.equal(EDITORIAL_STANDARDS.length >= 5, true);
+  assert.match(copySource, /400 to 900 characters/);
+  assert.match(copySource, /Sundown towns and racial violence/);
+  assert.match(copySource, /Wikipedia and other aggregators may carry/);
 });
 
 test('methodology links to /memorial by name', () => {

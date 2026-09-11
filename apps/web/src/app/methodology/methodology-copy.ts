@@ -42,10 +42,35 @@ export const METHODOLOGY_DIGNITY_LINE =
 export const METHODOLOGY_PAGE_SECTIONS = [
   { id: 'how-a-record-gets-in', label: 'How a record gets in' },
   { id: 'evidence-grades', label: 'Evidence grades' },
+  { id: 'editorial-standards', label: 'Editorial standards' },
   { id: 'how-a-point-is-drawn', label: 'How a point is drawn' },
   { id: 'how-it-holds-together', label: 'How it holds together' },
   { id: 'living-person-protection', label: 'Living person protection' },
   { id: 'see-it-applied', label: 'See it applied' },
+] as const;
+
+/** Defensibility rails: what a hostile reader can hold any public record to. */
+export const EDITORIAL_STANDARDS = [
+  {
+    title: 'Two independent sources before a high-stakes claim stands alone',
+    body: 'Wikipedia and other aggregators may carry a claim into review, but they never corroborate alone. A second source must be able to disagree: a different custody, method, or institution. Superlatives and exclusion designations need an institutional or scholarly source.',
+  },
+  {
+    title: 'Quotes must match the evidence exactly',
+    body: 'Every factual enrichment field cites an evidence id and a verbatim quote from the text the drafter was handed. A quote that is not a substring of that evidence is rejected before it can stage.',
+  },
+  {
+    title: 'No evidence means refuse, not pad',
+    body: 'When captured sources cannot support a publishable entry, the record is refused or deferred. Thin template prose is not a substitute for a missing history.',
+  },
+  {
+    title: 'Summaries target 400 to 900 characters',
+    body: 'The editorial floor is 400 characters, with a hard ceiling at 900. A shorter summary is allowed only when an evidence sweep is exhausted and the draft records an explicit best-effort reason. Silence is not an exception.',
+  },
+  {
+    title: 'Sundown towns and racial violence are documented history, not spectacle',
+    body: 'Frame exclusion and violence from dated, sourced records. Prefer agency and significance over trauma as a hook. Do not use lurid detail, and never characterize a town today from a historical designation alone.',
+  },
 ] as const;
 
 export const METHODOLOGY_STRUCTURE_LEDE =

@@ -9,7 +9,7 @@ This document is the editorial and engineering contract for that surface.
 
 | Field | Required? | Role | Length / rules |
 |-------|-----------|------|----------------|
-| `summary` | **Yes** at release | Catalog lede, card one-liner, SEO description, search blurb | Target **120–280** characters; hard max **400**. Factual who/what/where/when. Not marketing fluff. Not assembled from claims. |
+| `summary` | **Yes** at release | Catalog lede, card one-liner, SEO description, search blurb | Editorial band **400–900** characters (Floor v2). Schema still parses from **120** so thin live rows do not 404 mid-campaign. Factual who/what/where/when. Not marketing fluff. Not assembled from claims. Sub-400 only with an explicit best-effort exception after evidence is exhausted. |
 | `topicTags` | Strongly preferred (≥1) | Discovery chips → search/explore theme filters | Controlled strings aligned with search theme facets. Empty only with gap honesty. |
 | `eraBuckets` / `notabilityLabels` | When present | Secondary chips (ADR-015) | Never numeric scores. |
 | `historicalContext` | Strongly preferred | Framing in Black-history place | Not new unsourced facts about this record (those live in `claims`). |
