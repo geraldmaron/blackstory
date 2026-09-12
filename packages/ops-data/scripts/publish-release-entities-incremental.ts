@@ -31,6 +31,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import type { PublicVisit } from '@repo/domain';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
   assessLandscapeDepth,
@@ -41,7 +42,9 @@ import {
   incrementalPublishProvenancePatch,
   liveClaimConfidence,
   parseCanonicalStatusSnapshot,
+  visitOverrideFromCanonicalRow,
   type CanonicalEntityPublishRow,
+  type CanonicalVisitRow,
   type LandscapePublishRow,
   type LivePublishedRow,
   type PublishGateSkipReason,
@@ -217,6 +220,35 @@ const CANONICAL_STATUS_BY_IDS_SQL = `
 SELECT id AS entity_id, living_status, status_history, kind_detail
 FROM bb_canonical.entities
 WHERE id = ANY($1::text[])
+`;
+
+/**
+ * Canonical visit-contact input for every entity this run is about to (re)build,
+ * so a lane republish stops silently dropping the phone/website/hours/street a backfill wrote
+ * onto `bb_canonical.entity_visit` / `entity_locations` — data the landscape row this run
+ * rebuilds `ReleaseSourceEntity` from never carries at all.
+ *
+ * Mirrors the join in sync-visit-to-projection.ts (the one-off script that, until now, was the
+ * only path that ever wrote `projection.visit`), anchored on the id list this run is evaluating
+ * rather than on already-published `bb_public.release_entities` rows — a republish candidate may
+ * not have one yet. `entity_locations` is joined LATERAL to take the most recently updated row
+ * per entity, same as that script.
+ */
+const CANONICAL_VISIT_BY_IDS_SQL = `
+SELECT ids.entity_id,
+       v.phone_e164, v.phone_display, v.website, v.hours, v.visitability, v.source_ids,
+       l.street, l.postal_code
+  FROM UNNEST($1::text[]) AS ids(entity_id)
+  LEFT JOIN bb_canonical.entity_visit v ON v.entity_id = ids.entity_id
+  LEFT JOIN LATERAL (
+    SELECT street, postal_code
+      FROM bb_canonical.entity_locations el
+     WHERE el.entity_id = ids.entity_id
+       AND (el.street IS NOT NULL OR el.postal_code IS NOT NULL)
+     ORDER BY el.updated_at DESC
+     LIMIT 1
+  ) l ON true
+ WHERE v.entity_id IS NOT NULL OR l.street IS NOT NULL OR l.postal_code IS NOT NULL
 `;
 
 /**
@@ -415,6 +447,8 @@ function preparePublish(input: {
   readonly allowRepublish?: boolean;
   /** The active-release row for this entity, when it is already live (repo-b4ad). */
   readonly livePublished?: LivePublishedRow;
+  /** Raw canonical visit-contact input for this entity, when one exists. */
+  readonly visitOverride?: PublicVisit;
 }): PreparedPublish | SkippedRow {
   if (input.fromLandscape && input.row) {
     // Computed here rather than in the batch load because the verdict needs the candidate row's
@@ -434,6 +468,7 @@ function preparePublish(input: {
       ...(liveDepth !== undefined ? { liveDepth } : {}),
       ...(liveConfidence !== undefined ? { liveConfidence } : {}),
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
+      ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
     });
     if (!gate.eligible) {
       return { id: input.entityId, reason: gate.reason, detail: gate.detail };
@@ -443,6 +478,7 @@ function preparePublish(input: {
       releaseId: input.releaseId,
       generatedAt: input.generatedAt,
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
+      ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
     });
     if (!built.ok) {
       return {
@@ -559,6 +595,12 @@ async function main(): Promise<void> {
       canonicalRes.rows.map((row) => [row.entity_id, parseCanonicalStatusSnapshot(row)]),
     );
 
+    const canonicalVisitRes = await client.query<{ entity_id: string } & CanonicalVisitRow>(
+      CANONICAL_VISIT_BY_IDS_SQL,
+      [sliced.map((item) => item.entityId)],
+    );
+    const canonicalVisitById = new Map(canonicalVisitRes.rows.map((row) => [row.entity_id, row]));
+
     const liveRes = await client.query<LivePublishedRow & { readonly entity_id: string }>(
       LIVE_PUBLISHED_BY_IDS_SQL,
       [sliced.map((item) => item.entityId)],
@@ -571,6 +613,11 @@ async function main(): Promise<void> {
     const lintReports: PublishStatusLintReport[] = [];
 
     for (const item of sliced) {
+      const canonicalVisitRow = canonicalVisitById.get(item.entityId);
+      const visitOverride =
+        item.row && canonicalVisitRow
+          ? visitOverrideFromCanonicalRow(item.row, canonicalVisitRow)
+          : undefined;
       const result = preparePublish({
         row: item.row,
         releaseId,
@@ -584,6 +631,7 @@ async function main(): Promise<void> {
         ...(canonicalById.get(item.entityId) !== undefined
           ? { canonicalStatus: canonicalById.get(item.entityId) }
           : {}),
+        ...(visitOverride !== undefined ? { visitOverride } : {}),
       });
       if ('reason' in result) {
         skipped.push(result);

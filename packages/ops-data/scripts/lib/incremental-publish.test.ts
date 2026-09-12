@@ -19,9 +19,15 @@ import {
   parseCanonicalStatusSnapshot,
   toReleaseEntityRow,
   toSearchIndexRow,
+  visitOverrideFromCanonicalRow,
+  type CanonicalVisitRow,
   type LandscapePublishRow,
 } from './incremental-publish.ts';
-import { buildReleaseEntityArtifacts, deriveCatalogEntityStatus } from '@repo/domain';
+import {
+  buildReleaseEntityArtifacts,
+  deriveCatalogEntityStatus,
+  type PublicVisit,
+} from '@repo/domain';
 import { mapPostgresSearchIndexRow } from '@repo/schemas';
 
 /** Parsed host, or null for anything unparseable — never a substring test on the raw URL. */
@@ -625,6 +631,106 @@ test('parseCanonicalStatusSnapshot maps bb_canonical row fields', () => {
     kind_detail: {},
   });
   assert.equal(snapshot?.livingStatus, 'deceased');
+});
+
+/** A fake `entity_visit` + `entity_locations` join result, as `preparePublish` would load it. */
+const canonicalVisitRow = (overrides: Partial<CanonicalVisitRow> = {}): CanonicalVisitRow => ({
+  phone_e164: '+12025551234',
+  phone_display: '(202) 555-1234',
+  website: 'https://example.org',
+  hours: 'Mon-Fri 9am-5pm',
+  visitability: 'open_to_public',
+  source_ids: ['claim-1'],
+  street: '1900 15th Street NW',
+  postal_code: '20009',
+  ...overrides,
+});
+
+test('visitOverrideFromCanonicalRow composes a raw PublicVisit from entity_visit + entity_locations columns', () => {
+  const visit = visitOverrideFromCanonicalRow(enrichedRow(), canonicalVisitRow());
+  assert.ok(visit);
+  assert.equal(visit?.address?.street, '1900 15th Street NW');
+  assert.equal(visit?.address?.city, 'Washington');
+  assert.equal(visit?.address?.state, 'District of Columbia');
+  assert.equal(visit?.address?.postalCode, '20009');
+  assert.deepEqual(visit?.phone, { e164: '+12025551234', display: '(202) 555-1234' });
+  assert.equal(visit?.website, 'https://example.org');
+  assert.equal(visit?.hours, 'Mon-Fri 9am-5pm');
+  assert.equal(visit?.visitability, 'open_to_public');
+  assert.deepEqual(visit?.sources, ['claim-1']);
+});
+
+test('visitOverrideFromCanonicalRow returns undefined when canonical has no visit or address data', () => {
+  const visit = visitOverrideFromCanonicalRow(
+    enrichedRow(),
+    canonicalVisitRow({
+      phone_e164: null,
+      phone_display: null,
+      website: null,
+      hours: null,
+      visitability: null,
+      source_ids: null,
+      street: null,
+      postal_code: null,
+    }),
+  );
+  assert.equal(visit, undefined);
+});
+
+/**
+ * A lane republish rebuilds `ReleaseSourceEntity` from the landscape row alone, which
+ * never carries phone/website/hours/street — that data lives only in
+ * `bb_canonical.entity_visit`/`entity_locations`. Before `visitOverride` was threaded through the
+ * gate and the artifact build, a republish of an already-live, already-enriched record silently
+ * dropped that block; this proves the same republish now carries it through when the caller
+ * supplies the canonical visit row it loaded, and confirms it does NOT appear without one.
+ */
+test('a lane republish preserves phone/website/hours/street via visitOverride from canonical tables', () => {
+  const row = enrichedRow();
+  const visitOverride = visitOverrideFromCanonicalRow(row, canonicalVisitRow());
+  assert.ok(visitOverride);
+
+  const gateWithoutOverride = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    allowRepublish: true,
+  });
+  assert.equal(gateWithoutOverride.eligible, true);
+  if (!gateWithoutOverride.eligible) return;
+  const builtWithoutOverride = buildArtifactsForEntry({
+    entry: gateWithoutOverride.entry,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(builtWithoutOverride.ok, true);
+  if (!builtWithoutOverride.ok) return;
+  // Confirms the bug this fixes: the landscape row alone rebuilds no visit block at all.
+  assert.equal((builtWithoutOverride.entityRow.projection as { visit?: unknown }).visit, undefined);
+
+  const gateWithOverride = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    allowRepublish: true,
+    visitOverride,
+  });
+  assert.equal(gateWithOverride.eligible, true);
+  if (!gateWithOverride.eligible) return;
+  const built = buildArtifactsForEntry({
+    entry: gateWithOverride.entry,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    visitOverride,
+  });
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const visit = (built.entityRow.projection as { visit?: PublicVisit }).visit;
+  assert.ok(visit);
+  assert.equal(visit?.phone?.display, '(202) 555-1234');
+  assert.equal(visit?.website, 'https://example.org');
+  assert.equal(visit?.hours, 'Mon-Fri 9am-5pm');
+  assert.equal(visit?.address?.street, '1900 15th Street NW');
 });
 
 test('buildArtifactsForEntry publishes canonical deceased even when personReview says living', () => {
