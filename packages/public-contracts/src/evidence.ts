@@ -166,7 +166,10 @@ export type EvidenceClaimInput = {
   readonly confidenceLevel?: string | undefined;
   readonly citationSource?: string | undefined;
   readonly citation?: { readonly source?: string | undefined } | undefined;
-  /** What the claim asserts. The migration bridge for claims published without `claimRole`. */
+  /**
+   * What the claim asserts. No longer read by this module — provenance is decided by `claimRole`
+   * alone — kept in the shape because every stored and wire claim carries one.
+   */
   readonly predicate?: string | undefined;
   /** Whether this claim is the record's own index row or evidence about its subject. */
   readonly claimRole?: string | undefined;
@@ -196,30 +199,18 @@ export function citationLineageKey(claim: EvidenceClaimInput): string | null {
 export const CLAIM_ROLE_RECORD_INDEX = 'record_index';
 
 /**
- * Predicates the landscape publisher synthesises from a record's own index row.
- *
- * This is the bridge for claims published before `claimRole` existed, not the rule. The publisher
- * now states the role outright, because inferring provenance from a predicate vocabulary means a
- * new lane with different predicates is silently mis-graded. Once no published claim is missing
- * `claimRole` this set and its branch come out (repo-8dmey).
- */
-const RECORD_PROVENANCE_PREDICATES: ReadonlySet<string> = new Set([
-  'listing',
-  'significant for',
-  'documented_site',
-]);
-
-/**
  * True when a claim is the record's own index row rather than evidence about its subject.
  *
  * `incremental-publish.ts` builds those from the registry fields of the row the record was
  * created from and cites them to that row's canonical URL, so they are the record's provenance.
  * A record cited to its own index row has been corroborated by nothing.
+ *
+ * Every published claim carries `claimRole` as of the 2026-09-09 migration. A claim missing it is
+ * treated as evidence rather than inferred from its predicate — predicate inference was a bridge
+ * for claims published before the field existed, and it comes out now that none are left.
  */
 function isRecordProvenanceClaim(claim: EvidenceClaimInput): boolean {
-  const role = (claim.claimRole ?? '').trim().toLowerCase();
-  if (role.length > 0) return role === CLAIM_ROLE_RECORD_INDEX;
-  return RECORD_PROVENANCE_PREDICATES.has((claim.predicate ?? '').trim().toLowerCase());
+  return (claim.claimRole ?? '').trim().toLowerCase() === CLAIM_ROLE_RECORD_INDEX;
 }
 
 /**
