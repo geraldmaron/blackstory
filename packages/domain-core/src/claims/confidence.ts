@@ -111,7 +111,29 @@ type LineageAggregate = {
   entityMatchQuality: number;
   extractionQuality: number;
   quality: number;
+  /** Dimension names this link's own record marked unassessed rather than measured. */
+  unassessedDimensions: readonly string[];
 };
+
+/**
+ * Dimensions that drop out of the weighted score, with their weight redistributed among the
+ * rest, when no scored link actually assessed them — rather than averaging in a link's
+ * placeholder value as though it were a measurement.
+ *
+ * Scoped to exactly these two: `directness`/`entityMatchQuality` are already derived from an
+ * observation (however weak) rather than a constant, and `geographicPrecision` has no assessed
+ * path yet at all, so renormalizing around it is a separate, deliberate step for whenever that
+ * lands — not a side effect of this one.
+ */
+const RENORMALIZABLE_DIMENSIONS = ['temporalProximity', 'extractionQuality'] as const;
+type RenormalizableDimension = (typeof RENORMALIZABLE_DIMENSIONS)[number];
+
+function assessedFor(
+  scored: readonly LineageAggregate[],
+  dimension: RenormalizableDimension,
+): LineageAggregate[] {
+  return scored.filter((link) => !link.unassessedDimensions.includes(dimension));
+}
 
 function linkQuality(link: ClaimEvidenceLink): number {
   const authority = sourceAuthorityForClassification(link.sourceClassification);
@@ -153,6 +175,7 @@ export function uniqueLineageAggregates(
       entityMatchQuality: link.entityMatchQuality,
       extractionQuality: link.extractionQuality,
       quality: linkQuality(link),
+      unassessedDimensions: link.unassessedDimensions ?? [],
     };
     const existing = byRoot.get(root);
     if (!existing || candidate.quality > existing.quality) {
@@ -212,14 +235,16 @@ export function calculateClaimConfidence(input: ConfidenceEngineInput): Confiden
   const scored = corroborating.length > 0 ? corroborating : supporting;
 
   const independentLineageCount = corroborating.length;
+  const temporalAssessed = assessedFor(scored, 'temporalProximity');
+  const extractionAssessed = assessedFor(scored, 'extractionQuality');
   const components: ConfidenceComponents = {
     sourceAuthority: round4(mean(scored.map((s) => s.sourceAuthority))),
     directness: round4(mean(scored.map((s) => s.directness))),
     lineageIndependence: round4(lineageIndependenceFromCount(independentLineageCount)),
-    temporalProximity: round4(mean(scored.map((s) => s.temporalProximity))),
+    temporalProximity: round4(mean(temporalAssessed.map((s) => s.temporalProximity))),
     geographicPrecision: round4(mean(scored.map((s) => s.geographicPrecision))),
     entityMatchQuality: round4(mean(scored.map((s) => s.entityMatchQuality))),
-    extractionQuality: round4(mean(scored.map((s) => s.extractionQuality))),
+    extractionQuality: round4(mean(extractionAssessed.map((s) => s.extractionQuality))),
     contradictionPenalty: round4(
       clamp01(
         Math.min(
@@ -230,14 +255,33 @@ export function calculateClaimConfidence(input: ConfidenceEngineInput): Confiden
     ),
   };
 
-  const weighted =
+  /**
+   * Weighted sum over only the dimensions actually in play, rescaled so their weights still
+   * sum to 1. `temporalProximity`/`extractionQuality` drop out entirely — weight included —
+   * when not one scored link assessed them, instead of averaging in a placeholder value that
+   * would read as a real (if middling) measurement.
+   */
+  let includedWeight =
+    CONFIDENCE_COMPONENT_WEIGHTS.sourceAuthority +
+    CONFIDENCE_COMPONENT_WEIGHTS.directness +
+    CONFIDENCE_COMPONENT_WEIGHTS.lineageIndependence +
+    CONFIDENCE_COMPONENT_WEIGHTS.geographicPrecision +
+    CONFIDENCE_COMPONENT_WEIGHTS.entityMatchQuality;
+  let weightedSum =
     components.sourceAuthority * CONFIDENCE_COMPONENT_WEIGHTS.sourceAuthority +
     components.directness * CONFIDENCE_COMPONENT_WEIGHTS.directness +
     components.lineageIndependence * CONFIDENCE_COMPONENT_WEIGHTS.lineageIndependence +
-    components.temporalProximity * CONFIDENCE_COMPONENT_WEIGHTS.temporalProximity +
     components.geographicPrecision * CONFIDENCE_COMPONENT_WEIGHTS.geographicPrecision +
-    components.entityMatchQuality * CONFIDENCE_COMPONENT_WEIGHTS.entityMatchQuality +
-    components.extractionQuality * CONFIDENCE_COMPONENT_WEIGHTS.extractionQuality;
+    components.entityMatchQuality * CONFIDENCE_COMPONENT_WEIGHTS.entityMatchQuality;
+  if (temporalAssessed.length > 0) {
+    includedWeight += CONFIDENCE_COMPONENT_WEIGHTS.temporalProximity;
+    weightedSum += components.temporalProximity * CONFIDENCE_COMPONENT_WEIGHTS.temporalProximity;
+  }
+  if (extractionAssessed.length > 0) {
+    includedWeight += CONFIDENCE_COMPONENT_WEIGHTS.extractionQuality;
+    weightedSum += components.extractionQuality * CONFIDENCE_COMPONENT_WEIGHTS.extractionQuality;
+  }
+  const weighted = includedWeight > 0 ? weightedSum / includedWeight : 0;
 
   const score = round4(clamp01(weighted - components.contradictionPenalty));
   const thresholdEval = evaluateClaimConfidence(score, input.claimClass, policy);

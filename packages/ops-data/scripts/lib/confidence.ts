@@ -143,6 +143,19 @@ export type SourceForConfidence = {
    * one report.
    */
   readonly independentCreation?: { readonly documentId: string } | undefined;
+  /**
+   * The source document's own creation or publication date (ISO 8601), when it is actually
+   * recorded — never a system capture timestamp. There is currently no bb_evidence column that
+   * supplies this, so every caller today leaves it unset; when a caller does set it,
+   * temporalProximity is scored from it instead of being recorded as unassessed.
+   */
+  readonly documentDate?: string | undefined;
+  /**
+   * The selector or field path that isolated the extracted passage, when the pipeline used a
+   * real one rather than a raw page fetch. When set, extractionQuality is scored instead of
+   * being recorded as unassessed.
+   */
+  readonly extractionSelector?: string | undefined;
 };
 
 function scoreDimension(textContainsSubjectName: boolean | undefined): number {
@@ -151,25 +164,6 @@ function scoreDimension(textContainsSubjectName: boolean | undefined): number {
   return textContainsSubjectName ? 0.85 : 0.6;
 }
 
-/**
- * Dimensions this function does not measure.
- *
- * These four carry defaults below, which the score needs and which are not measurements. A
- * document's own date is not stored anywhere in bb_evidence (every timestamp there is a system
- * time), place precision is not read off the evidence, and extraction quality describes a
- * selector this path does not create. Naming them lets the research maturity gates tell an
- * assessed record from one that merely scored — without changing what the published score is.
- *
- * `directness` and `entityMatchQuality` are omitted from this list because they ARE derived
- * from something observed, even if only from whether the subject's name appears in the fetched
- * text. That proxy is weak, and it is a different problem from never having looked.
- */
-const UNASSESSED_BY_THIS_PATH: readonly string[] = [
-  'temporalProximity',
-  'geographicPrecision',
-  'extractionQuality',
-];
-
 function buildEvidenceLink(
   claimId: string,
   source: SourceForConfidence,
@@ -177,6 +171,29 @@ function buildEvidenceLink(
   now: string,
 ): ClaimEvidenceLink {
   const dimensionScore = scoreDimension(source.textContainsSubjectName);
+  const hasDocumentDate = Boolean(source.documentDate?.trim());
+  const hasExtractionSelector = Boolean(source.extractionSelector?.trim());
+
+  /**
+   * Dimensions this evidence link does not measure.
+   *
+   * geographicPrecision is unconditional: place precision is not read off the evidence at all
+   * yet, so there is no per-source signal to check either way. temporalProximity and
+   * extractionQuality are conditional on the signal above — a document date or a real
+   * extraction selector — being present; without it, the dimension is named here rather than
+   * scored with a placeholder that would read as a measurement. The confidence engine
+   * (`@repo/domain-core`) renormalizes its weighted score around whichever of these two are
+   * actually assessed, and the research maturity gates read this same list to tell an assessed
+   * record from one that merely scored.
+   *
+   * `directness` and `entityMatchQuality` are never in this list: they ARE derived from
+   * something observed, even if only from whether the subject's name appears in the fetched
+   * text. That proxy is weak, and it is a different problem from never having looked.
+   */
+  const unassessedDimensions: string[] = ['geographicPrecision'];
+  if (!hasDocumentDate) unassessedDimensions.push('temporalProximity');
+  if (!hasExtractionSelector) unassessedDimensions.push('extractionQuality');
+
   // Lineage is the underlying work, not the host serving it. `resolveSourceLineage` collapses
   // a patent read at the Patent Office and at a mirror, collapses an authority's subdomains,
   // and puts every Wikipedia spelling on one bridge key.
@@ -196,11 +213,14 @@ function buildEvidenceLink(
     credible: true,
     sourceClassification: classifySourceForConfidence(source.url),
     directness: dimensionScore,
-    temporalProximity: 0.7,
+    // 0 when unassessed: the confidence engine excludes this dimension from the weighted score
+    // whenever it is unassessed, so this value is never averaged in as a measurement — but it
+    // must still stay a real number in [0, 1] to satisfy ClaimEvidenceLink.
+    temporalProximity: hasDocumentDate ? 0.7 : 0,
     geographicPrecision: 0.7,
     entityMatchQuality: dimensionScore,
-    extractionQuality: 0.8,
-    unassessedDimensions: UNASSESSED_BY_THIS_PATH,
+    extractionQuality: hasExtractionSelector ? 0.8 : 0,
+    unassessedDimensions,
     createdAt: now,
   };
 }
