@@ -97,7 +97,7 @@ is_python() {
   [[ "$1" =~ \.py$ ]] && return 0
   [[ "$1" =~ (^|/)python/ ]] && return 0
   [[ "$1" =~ ^workers/(research|security|publication)/ ]] && return 0
-  [[ "$1" =~ ^packages/(research-kernel|constitution)/ ]] && return 0
+  [[ "$1" =~ ^packages/(research-kernel|constitution)/(.*/)?(pyproject\.toml|uv\.lock|uv\.toml)$ ]] && return 0
   return 1
 }
 is_security_extra() {

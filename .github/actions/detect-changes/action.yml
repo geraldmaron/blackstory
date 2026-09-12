@@ -94,7 +94,7 @@ runs:
           [[ "$f" =~ \.py$ ]] && return 0
           [[ "$f" =~ (^|/)python/ ]] && return 0
           [[ "$f" =~ ^workers/(research|security|publication)/ ]] && return 0
-          [[ "$f" =~ ^packages/(research-kernel|constitution)/ ]] && return 0
+          [[ "$f" =~ ^packages/(research-kernel|constitution)/(.*/)?(pyproject\.toml|uv\.lock|uv\.toml)$ ]] && return 0
           return 1
         }
 
