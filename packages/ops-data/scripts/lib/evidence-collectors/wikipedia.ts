@@ -38,9 +38,9 @@ const API = 'https://en.wikipedia.org/w/api.php';
 /**
  * Wikipedia text is CC BY-SA 4.0; stored verbatim, so the license travels with the row.
  *
- * Written into `provenance` under the key `licence`, not `license`. The British spelling is a
- * data contract, not prose: 2,622 rows in bb_research.entity_evidence already carry that key.
- * Renaming it in code alone would split the column between two spellings. See repo-pck8y.
+ * Written into `provenance` under the key `license` (repo-pck8y, 2026-09-12): the 2,633 rows in
+ * bb_research.entity_evidence that carried the British-spelled `licence` key have been migrated,
+ * and this collector now writes the American spelling to match.
  */
 export const WIKIPEDIA_LICENSE = 'CC BY-SA 4.0';
 

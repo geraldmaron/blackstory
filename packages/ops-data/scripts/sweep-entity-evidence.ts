@@ -362,7 +362,7 @@ async function collectWikipedia(row: CandidateRow): Promise<EvidenceRow | null> 
     status: quality.usable ? 'captured' : 'quarantined',
     provenance: {
       pageId: article.pageId,
-      licence: WIKIPEDIA_LICENSE,
+      license: WIKIPEDIA_LICENSE,
       publisher: 'Wikipedia contributors',
       attributionRequired: true,
       identity: article.identity,
@@ -405,7 +405,7 @@ async function collectDcHpo(row: CandidateRow): Promise<EvidenceRow | null> {
     status: quality.usable ? 'captured' : 'quarantined',
     provenance: {
       publisher: 'DC Office of Planning, Historic Preservation Office',
-      licence: 'CC BY 4.0',
+      license: 'CC BY 4.0',
       quarantineReason: quality.usable ? undefined : quality.reason,
     },
   };
@@ -600,7 +600,7 @@ async function collectPersonWikipedia(row: CandidateRow): Promise<EvidenceRow | 
     qualityScore: quality.score,
     status: quality.usable ? 'captured' : 'quarantined',
     provenance: {
-      licence: WIKIPEDIA_LICENSE,
+      license: WIKIPEDIA_LICENSE,
       publisher: 'Wikipedia contributors',
       attributionRequired: true,
       identityAnchor: 'canonicalUrl (assigned from Wikidata QID at discovery)',
