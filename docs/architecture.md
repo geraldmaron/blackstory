@@ -68,6 +68,67 @@ infra/*                  Leftover Firebase/GCP scaffolding, GitHub, parked PostG
 `.github/workflows/discovery-campaigns.yml`. Do not add deployable microservices beyond this
 set. Historical ADR-005 text is in git history.
 
+## At-scale topology
+
+Request and data-flow topology for the live stack described above (Cloudflare in front of
+Vercel, Supabase as the sole data store, GitHub Actions driving the offline research/publication
+pipeline). No Kubernetes anywhere in this repo — confirmed by repo-wide grep, zero real hits —
+so there is no k8s diagram to pair with this one.
+
+```mermaid
+flowchart TB
+    CF["Cloudflare\nDNS + edge (blackstory.app)"]
+
+    subgraph Vercel["Vercel (git-deployed, separate projects)"]
+        WEB["apps/web\npublic site + /admin console\n(staff-gated, same deployment)"]
+        APIPUB["apps/api-public\nread / search / location API\n(project blackstory-api)"]
+        APISUB["apps/api-submissions\ncorrections / contribution intake"]
+        APIINT["apps/api-internal\npublication / promotion / control"]
+    end
+
+    subgraph CI["GitHub Actions"]
+        DISCO["discovery-campaigns.yml\nscheduled discovery"]
+    end
+
+    subgraph Workers["Offline workers"]
+        WRES["workers/research\nresearch compute"]
+        WPUB["workers/publication\nprojection, snapshot, indexing, release"]
+        WSEC["workers/security\nquarantine, content validation, integrity"]
+    end
+
+    subgraph Supabase["Supabase — project blackstory-app"]
+        PG[("Postgres\ncanonical write + bb_public projections")]
+        STORE[("Storage\npublic-media")]
+        REST["PostgREST\npublished-views read design"]
+    end
+
+    CF --> WEB
+    CF --> APIPUB
+    CF --> APISUB
+
+    WEB -->|"public read: released\nprojections only"| PG
+    APIPUB -->|"public read: released\nprojections only"| PG
+    APISUB -->|"intake write:\nquarantine only"| PG
+    APIINT -->|"promotion gate"| PG
+
+    DISCO --> WRES
+    WRES -->|"research / evidence\n(cannot publish)"| PG
+    WRES --> WPUB
+    WPUB -->|"promote + snapshot"| PG
+    WPUB --> WSEC
+    WSEC -->|"quarantine / validate"| PG
+
+    PG --- REST
+    WEB -.->|media| STORE
+    APIPUB -.->|media| STORE
+```
+
+Boundaries this diagram assumes (see the table below for the full list): canonical writes never
+originate from anonymous or public clients; public read paths (`apps/web`, `apps/api-public`)
+only ever serve released projections/snapshots, never live research state; research and LLM
+work cannot publish directly — `workers/publication` is the only promotion path; submissions
+intake writes to quarantine, not to canonical data.
+
 ## Platform (live vs leftover)
 
 - **Data:** Supabase Postgres on `blackstory-app` is the product system of record. Public media

@@ -10,11 +10,14 @@
 > **§3** (Firestore rules/indexes) — Firestore has no live database, rules, or indexes left
 > (`docs/data/firebase-wind-down.md`); **§5** (App Check) — the App Check code this section
 > configures was fully removed from the repo and replaced by client attestation
-> (`packages/security/src/client-attestation.ts`); **§9** (Admin: Cloud Run + IAP) — Admin is now
-> a standalone Vercel project (`apps/admin/vercel.json`), not Cloud Run/IAP. Sections 1, 2, 4, 6,
-> 7, 8, and 10 were not re-verified against current architecture in this pass — read each against
-> current reality (`docs/architecture.md`, `docs/data/firebase-wind-down.md`) before treating it as
-> an actionable plan.
+> (`packages/security/src/client-attestation.ts`); **§6** (Cloud Armor and protected public API
+> ingress) — leftover/archived, never applied: `api-public`/`api-submissions` run on Vercel, not
+> behind a GCP load balancer, so Cloud Armor "fronts nothing" here
+> (`docs/runbooks/api-public-vercel.md`, `docs/security/ingress-armor.md`); **§9** (Admin: Cloud
+> Run + IAP) — Admin is now a standalone Vercel project (`apps/admin/vercel.json`), not Cloud
+> Run/IAP. Sections 1, 2, 4, 7, 8, and 10 were not re-verified against current architecture in
+> this pass — read each against current reality (`docs/architecture.md`,
+> `docs/data/firebase-wind-down.md`) before treating it as an actionable plan.
 
 **Scope:** The single consolidated list of every "human cloud step remaining" note scattered
 across the close comments and READMEs of roughly a dozen closed beads

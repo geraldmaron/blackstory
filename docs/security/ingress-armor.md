@@ -1,7 +1,12 @@
 # Protected public API ingress and Cloud Armor
 
-> **Leftover GCP ingress design.** Current public web is Vercel (Cloudflare in front), not
-> App Hosting CDN. Cloud Run + Armor rows below are unverified leftover target text.
+> **Leftover GCP ingress design — never applied, not an actionable plan.** Current public web
+> is Vercel (Cloudflare in front), not App Hosting CDN, and `api-public`/`api-submissions` are
+> Vercel-hosted too: Cloud Armor here "fronts nothing" in production (see
+> [`../runbooks/api-public-vercel.md`](../runbooks/api-public-vercel.md)). The Cloud Run +
+> Armor rows below, the "Human provisioning" steps, and the validation commands describe a
+> GCP architecture that was designed but never built, not a deferred-but-live one. Current
+> stack: [`../data/firebase-wind-down.md`](../data/firebase-wind-down.md).
 
 **Status:** Design + declarative stubs in-repo. Live GCP resources are **not** provisioned by
 this bead.
@@ -133,7 +138,11 @@ node --test armor-policy.test.mjs
 
 Schema validation command in [`../../infra/gcp/armor/README.md`](../../infra/gcp/armor/README.md).
 
-## Human provisioning (ordered)
+## Human provisioning (ordered) — historical design, not a plan to execute
+
+The GCP surface this section describes was never built; `api-public`/`api-submissions` run on
+Vercel instead (see the banner above). Steps below are retained as a record of the original
+design, not instructions to carry out.
 
 1. Apply Cloud Armor policies (`policies/*.json`).
 2. Create serverless NEGs and backend services; enable CDN on public backend only.

@@ -1,5 +1,11 @@
 # Emergency deny runbook (BB-023)
 
+> **Leftover/archived — describes a GCP Cloud Armor architecture that was never applied.**
+> Public APIs run on Vercel, not behind this GCP load balancer/Armor design (see
+> [`../../docs/runbooks/api-public-vercel.md`](../../docs/runbooks/api-public-vercel.md) and
+> [`../../docs/data/firebase-wind-down.md`](../../docs/data/firebase-wind-down.md)). There is
+> no live policy to run this against.
+
 Activate a **global deny** at Cloud Armor priority **10** without redeploying application
 code or Cloud Run revisions. Rule 10 is pre-provisioned in both policies with default
 `action: allow`.

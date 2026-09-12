@@ -68,6 +68,17 @@ Optional inputs on `runDiscoveryCampaign`:
 - `catalog` — pass `ResolutionProfile[]` to attach `catalogMatch` on accepted/merged survivors and emit `reviewQueueItems` for ambiguous matches. Uses `resolveEntityCandidate` / `resolutionCandidateFromDiscovery`; never merges into a public entity.
 - `authorityHarvest: { enabled: true }` — for low-authority classifications (`community_oral` / `self_published` / `news_reportage`), harvest HTTPS URLs on curated authority hosts (NPS, NMAAHC, LOC, NARA, Wikidata, …) into `authorityFollowUps`. RSS items also carry capped `outboundLinkHints` extracted from feed HTML without storing full article bodies.
 
+Harvesting a `DiscoveryCampaignResult.authorityFollowUps` lead does not, by itself, put it in front of a
+researcher — `community-obscurity-run.ts`'s operator summary only ever counted the array
+(`authorityFollowUpTotal`). `packages/operator-cli/src/authority-followup-intake.ts` closes that gap: the
+`authority-followup-intake` CLI verb (`node --conditions development --import tsx
+packages/operator-cli/src/bin.ts authority-followup-intake --leads-file <path> [--max-leads N]
+[--commit] ...`) reads a `DiscoveryCampaignResult` (or a bare `AuthorityFollowUpLead[]`) from
+`--leads-file` and runs the existing single-URL `research-intake` path — `runResearchIntake`'s SSRF-safe
+fetch, citation prefill, and `prepareLeadIntake` draft-case creation — once per lead, titled from
+`lead.host` with a description noting the harvest reason and the parent candidate. It is safe by default
+like every other verb here: without `--commit` nothing is written, and no full lead text is republished.
+
 ## Curated community feeds (extra care)
 
 `packages/domain/src/adapters/rss/curated-feeds.ts` seeds vetted community feeds (currently **The American Blackstory**). Extra-care policy flags require authority harvest, prefer catalog propose-match, snippet-only storage, and `cannotPublishAlone`. Feeds register into the RSS feed registry via `seedCuratedCommunityFeeds` but do **not** auto-approve the RSS adapter policy.

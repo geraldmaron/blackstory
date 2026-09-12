@@ -1,5 +1,10 @@
 # Cloud CDN design for cacheable API responses (BB-023)
 
+> **Leftover/archived — describes a GCP Cloud Armor architecture that was never applied.**
+> Public APIs run on Vercel, not behind this GCP load balancer/CDN design (see
+> [`../../docs/runbooks/api-public-vercel.md`](../../docs/runbooks/api-public-vercel.md) and
+> [`../../docs/data/firebase-wind-down.md`](../../docs/data/firebase-wind-down.md)).
+
 **Status:** Design stub — CDN enabled on `api-public` only.
 
 ## Rationale

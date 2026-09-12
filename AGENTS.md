@@ -262,4 +262,13 @@ bd close <id>         # Complete work
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
+
+**Before opening a staging → main PR**, run `fnm exec --using=22 -- ./scripts/ci-local.sh`.
+`pnpm test` is not equivalent: CI decides which lanes run from the changed paths, and two of
+those predicates are easy to miss by inspection — touching `packages/public-contracts` fires
+the whole mobile lane (it is the mobile token source), and touching `packages/research-kernel`
+fires the Python lane (no `.py` file required). `scripts/ci-local.sh` mirrors
+`.github/workflows/ci.yml` lane-for-lane instead of guessing. The script requires Node 22
+(the repo's `.nvmrc`) because `node:test`'s reporter output format differs between Node 22 and
+24 — running it on 24 can pass locally and still not match what CI reports.
 <!-- END BEADS INTEGRATION -->

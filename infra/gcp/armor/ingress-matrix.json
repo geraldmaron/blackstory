@@ -10,6 +10,7 @@
   "adrRefs": ["ADR-005", "ADR-010"],
   "threatRefs": ["T-01", "T-19"],
   "notes": [
+    "LEFTOVER/ARCHIVED: describes a GCP Cloud Armor architecture that was never applied. api-public and api-submissions run on Vercel, not behind a GCP load balancer; see docs/runbooks/api-public-vercel.md and docs/data/firebase-wind-down.md for the current stack.",
     "Internet-facing public APIs terminate at a global external HTTP(S) load balancer with Cloud Armor.",
     "Cloud Run services use internal-and-cloud-load-balancing ingress; direct *.run.app URLs must fail for public APIs.",
     "Geographic restrictions default OFF; enable only with documented abuse evidence (see geo-controls.md).",
