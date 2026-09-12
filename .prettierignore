@@ -33,7 +33,8 @@ docs/index.html
 **/next-env.d.ts
 packages/data-access/generated
 
-# Isolated npm app outside the pnpm workspace; formatted via its own scripts.
+# Isolated npm app outside the pnpm workspace; formatted via its own `npm run format` /
+# `format:check` scripts (apps/mobile/package.json, apps/mobile/.prettierignore).
 apps/mobile
 
 # Captured artifacts, not source: design reference mocks and scratch proof output. Reformatting

@@ -116,8 +116,8 @@ jobs:
   # own npm-based dependency graph, so it cannot run through `pnpm -r --filter './apps/**'`
   # above. These three jobs are its dedicated npm-based lane; `npm ci` here never touches the
   # root pnpm-lock.yaml, so `pnpm install --frozen-lockfile` in `validate` above is unaffected.
-  # One job, not three: typecheck, lint and Jest each paid their own `npm ci` against the
-  # same isolated lockfile. Ordered cheapest first so a lint error does not wait on Jest.
+  # One job, not three: format, typecheck, lint and Jest each paid their own `npm ci` against
+  # the same isolated lockfile. Ordered cheapest first so a lint error does not wait on Jest.
   mobile-checks:
     name: Mobile Checks
     needs: changes
@@ -143,6 +143,8 @@ jobs:
         # intentionally gitignored (apps/mobile/.gitignore) so every clean checkout —
         # including CI — must recreate it before `tsc` can resolve `expo/types`.
         run: printf '/// <reference types="expo/types" />\n' > expo-env.d.ts
+      - name: Prettier (format:check)
+        run: npm run format:check
       - name: ESLint (eslint-config-expo, warnings fail)
         run: npm run lint
       - name: Typecheck (app + test/tooling project)
