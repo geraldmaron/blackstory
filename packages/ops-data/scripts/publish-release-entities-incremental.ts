@@ -31,13 +31,15 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
-import type { PublicVisit } from '@repo/domain';
+import type { PublicVisit, ReleaseSourceEntity } from '@repo/domain';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
   assessLandscapeDepth,
   buildArtifactsForEntry,
   buildLiveDepthEntry,
   canonicalUpsertParamsFromLandscape,
+  carryLiveClaims,
+  claimCountRegressed,
   gateLandscapePublishCandidate,
   incrementalPublishProvenancePatch,
   liveClaimConfidence,
@@ -495,8 +497,21 @@ function preparePublish(input: {
     if (!gate.eligible) {
       return { id: input.entityId, reason: gate.reason, detail: gate.detail };
     }
+    // A landscape row proves what a candidate can prove today, not what the record has
+    // accumulated, so building claims from it alone drops every separately-cited fact the record
+    // already publishes. The union keeps both; the regression check below is its control, not a
+    // second implementation (repo-cjlkp).
+    const carry = carryLiveClaims(gate.entry.claims ?? [], input.livePublished);
+    const entry: ReleaseSourceEntity = { ...gate.entry, claims: carry.claims };
+    if (claimCountRegressed(carry.claims, input.livePublished)) {
+      return {
+        id: input.entityId,
+        reason: 'claim_count_regression',
+        detail: `republish would publish ${carry.claims.length} claims where ${carry.liveCount} are live`,
+      };
+    }
     const built = buildArtifactsForEntry({
-      entry: gate.entry,
+      entry,
       releaseId: input.releaseId,
       generatedAt: input.generatedAt,
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),

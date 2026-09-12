@@ -67,7 +67,9 @@ export type PublishGateSkipReason =
   | 'summary_too_short'
   | 'template_only'
   | 'build_failed'
-  | 'confidence_below_floor';
+  | 'confidence_below_floor'
+  /** A republish would publish fewer claims than the record already carries (repo-cjlkp). */
+  | 'claim_count_regression';
 
 export type PublishGateResult =
   | {
@@ -970,6 +972,123 @@ export function buildLiveDepthEntry(row: LivePublishedRow): ReleaseSourceEntity 
  */
 export function liveClaimConfidence(row: LivePublishedRow): number {
   return minClaimConfidence(buildLiveDepthEntry(row));
+}
+
+/**
+ * The claims an already-published row carries, read back as source claims.
+ *
+ * A published claim is stored in the same shape it was built from — `predicate`, `object`,
+ * `confidenceLevel`, the three citation fields and `claimRole` — so a live row round-trips into
+ * `ReleaseSourceClaim` without reconstruction. The `id` rides along because
+ * `resolveReleaseClaimId` prefers a claim's own id over a positional one, which is what keeps a
+ * carried claim's id stable across a republish.
+ */
+export function liveSourceClaims(row: LivePublishedRow): readonly ReleaseSourceClaim[] {
+  return asRecordArray(row.claims)
+    .filter(
+      (claim) =>
+        typeof claim.predicate === 'string' &&
+        claim.predicate.trim().length > 0 &&
+        typeof claim.object === 'string' &&
+        claim.object.trim().length > 0,
+    )
+    .map((claim) => {
+      const level = claim.confidenceLevel;
+      return {
+        ...(typeof claim.id === 'string' && claim.id.length > 0 ? { id: claim.id } : {}),
+        predicate: String(claim.predicate),
+        object: String(claim.object),
+        confidenceLevel:
+          level === 'high' || level === 'medium' || level === 'low' ? level : ('low' as const),
+        citationSource: typeof claim.citationSource === 'string' ? claim.citationSource : 'source',
+        ...(typeof claim.citationHref === 'string' && claim.citationHref.length > 0
+          ? { citationHref: claim.citationHref }
+          : {}),
+        citationLabel:
+          typeof claim.citationLabel === 'string' && claim.citationLabel.length > 0
+            ? claim.citationLabel
+            : typeof claim.citationSource === 'string'
+              ? claim.citationSource
+              : 'source',
+        ...(claim.claimRole === 'record_index' || claim.claimRole === 'evidence'
+          ? { claimRole: claim.claimRole }
+          : {}),
+      } satisfies ReleaseSourceClaim;
+    });
+}
+
+/** Identity of a claim as a reader meets it: what it says, about what. */
+function claimIdentity(claim: ReleaseSourceClaim): string {
+  return `${claim.predicate.trim().toLowerCase()} ${claim.object.trim().toLowerCase()}`;
+}
+
+export type ClaimCarryResult = {
+  readonly claims: readonly ReleaseSourceClaim[];
+  /** Live claims the rebuild did not reproduce, kept rather than dropped. */
+  readonly carried: number;
+  readonly rebuilt: number;
+  readonly liveCount: number;
+};
+
+/**
+ * Union of what a republish rebuilds with what the record already publishes.
+ *
+ * A landscape row is a candidate's worth of evidence, not the record's history. Rebuilding claims
+ * from it alone republishes only what that row can currently prove, so a record that accumulated
+ * fine-grained, separately-cited facts (`founded | 1883`, `motive | Anti-Black racism`) loses them
+ * and keeps one coarse claim whose object is the whole summary. That trades evidence a reader can
+ * check for prose they cannot, which is the opposite of what the depth and confidence apparatus
+ * exists to protect — measured across the 26 curated gap_* candidates, a republish took 106
+ * published claims down to 27.
+ *
+ * So a rebuilt claim wins where both describe the same fact, and every live claim the rebuild did
+ * not reproduce is carried forward. Identity is the pair a reader actually reads — predicate and
+ * object, trimmed and case-folded — not the claim id, because the same fact re-cited from a fresh
+ * sweep is a new id for an old statement.
+ *
+ * The union never shrinks a record. `claimCountRegressed` is the control that says so out loud.
+ */
+export function carryLiveClaims(
+  rebuilt: readonly ReleaseSourceClaim[],
+  live: LivePublishedRow | undefined,
+): ClaimCarryResult {
+  const liveClaims = live === undefined ? [] : liveSourceClaims(live);
+  if (liveClaims.length === 0) {
+    return { claims: rebuilt, carried: 0, rebuilt: rebuilt.length, liveCount: 0 };
+  }
+
+  const seen = new Set(rebuilt.map(claimIdentity));
+  const carried: ReleaseSourceClaim[] = [];
+  for (const claim of liveClaims) {
+    const identity = claimIdentity(claim);
+    if (seen.has(identity)) continue;
+    seen.add(identity);
+    carried.push(claim);
+  }
+
+  return {
+    claims: [...rebuilt, ...carried],
+    carried: carried.length,
+    rebuilt: rebuilt.length,
+    liveCount: liveClaims.length,
+  };
+}
+
+/**
+ * Whether a republish would publish fewer claims than the record already carries.
+ *
+ * With `carryLiveClaims` applied this cannot happen, which is the point: it is a control on the
+ * carry rather than a second implementation of it. A true here means the union did not run, ran
+ * against the wrong live row, or a future change reintroduced the rebuild-only path — and the
+ * publisher refuses the record instead of quietly shipping the smaller set, because a claim that
+ * disappears leaves no trace on the page that it was ever there.
+ */
+export function claimCountRegressed(
+  published: readonly ReleaseSourceClaim[],
+  live: LivePublishedRow | undefined,
+): boolean {
+  if (live === undefined) return false;
+  return published.length < liveSourceClaims(live).length;
 }
 
 /**

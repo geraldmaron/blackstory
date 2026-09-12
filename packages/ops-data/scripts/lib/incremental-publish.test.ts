@@ -9,6 +9,9 @@ import {
   buildReleaseSourceFromLandscape,
   buildArtifactsForEntry,
   canonicalUpsertParamsFromLandscape,
+  carryLiveClaims,
+  claimCountRegressed,
+  liveSourceClaims,
   gateLandscapePublishCandidate,
   INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR,
   incrementalPublishProvenancePatch,
@@ -2018,4 +2021,121 @@ test('the round-trip check would catch a topics writer that drops real topics', 
     divergentFieldsForRow(divergenceRowFromBuild(built) as never).includes('search_index.topics'),
     'an empty topics column over real projection topics must be reported, not tolerated',
   );
+});
+
+// --- repo-cjlkp: a republish may not shrink a record's published evidence ---------------------
+
+const LIVE_CLAIM = {
+  id: 'claim_gap_tulsa_race_massacre_01',
+  predicate: 'occurred',
+  object: 'Tulsa Race Massacre',
+  claimRole: 'evidence',
+  citationHref: 'https://en.wikipedia.org/wiki/Tulsa_race_massacre',
+  citationLabel: 'Wikipedia',
+  citationSource: 'wikipedia_api',
+  confidenceLevel: 'low',
+};
+
+function liveRow(claims: readonly unknown[]) {
+  return { summary: 'A documented event.', claims, projection: null };
+}
+
+test('a live row round-trips into source claims, keeping its id', () => {
+  const claims = liveSourceClaims(liveRow([LIVE_CLAIM]));
+  assert.equal(claims.length, 1);
+  assert.equal(claims[0]!.id, 'claim_gap_tulsa_race_massacre_01');
+  assert.equal(claims[0]!.predicate, 'occurred');
+  assert.equal(claims[0]!.citationSource, 'wikipedia_api');
+  assert.equal(claims[0]!.claimRole, 'evidence');
+});
+
+test('a claim with no predicate or no object is not carried', () => {
+  const claims = liveSourceClaims(
+    liveRow([LIVE_CLAIM, { predicate: 'occurred', object: '   ' }, { object: 'orphan' }]),
+  );
+  assert.equal(claims.length, 1);
+});
+
+test('carrying keeps the fine-grained claims a rebuild would have dropped', () => {
+  // The shape the gap_* records actually have: a rebuild produces one coarse claim whose object is
+  // the summary, while the record already publishes several separately-cited facts.
+  const rebuilt = [
+    {
+      predicate: 'source states',
+      object: 'A long summary sentence about the massacre.',
+      confidenceLevel: 'low' as const,
+      citationSource: 'wikipedia_api',
+      citationLabel: 'Wikipedia',
+    },
+  ];
+  const live = liveRow([
+    LIVE_CLAIM,
+    { ...LIVE_CLAIM, id: 'claim_02', predicate: 'location', object: 'Greenwood District, Tulsa' },
+    { ...LIVE_CLAIM, id: 'claim_03', predicate: 'date', object: 'May 31 - June 1, 1921' },
+  ]);
+
+  const carry = carryLiveClaims(rebuilt, live);
+  assert.equal(carry.rebuilt, 1);
+  assert.equal(carry.carried, 3);
+  assert.equal(carry.claims.length, 4);
+  assert.ok(!claimCountRegressed(carry.claims, live));
+  // The rebuilt claim leads; the record's own facts survive behind it.
+  assert.equal(carry.claims[0]!.predicate, 'source states');
+  assert.deepEqual(
+    carry.claims.slice(1).map((c) => c.predicate),
+    ['occurred', 'location', 'date'],
+  );
+});
+
+test('a rebuilt claim wins over a live claim stating the same fact', () => {
+  const rebuilt = [
+    {
+      predicate: 'Occurred',
+      object: '  tulsa race massacre  ',
+      confidenceLevel: 'high' as const,
+      citationSource: 'okhistory.org',
+      citationLabel: 'Oklahoma Historical Society',
+    },
+  ];
+  const carry = carryLiveClaims(rebuilt, liveRow([LIVE_CLAIM]));
+
+  // Same predicate and object modulo case and padding, so it is one fact, not two.
+  assert.equal(carry.claims.length, 1);
+  assert.equal(carry.carried, 0);
+  assert.equal(carry.claims[0]!.citationSource, 'okhistory.org');
+});
+
+test('a record with nothing live carries nothing and is not a regression', () => {
+  const rebuilt = [
+    {
+      predicate: 'source states',
+      object: 'Something.',
+      confidenceLevel: 'low' as const,
+      citationSource: 'wikipedia_api',
+      citationLabel: 'Wikipedia',
+    },
+  ];
+  const carry = carryLiveClaims(rebuilt, undefined);
+  assert.equal(carry.claims.length, 1);
+  assert.equal(carry.carried, 0);
+  assert.equal(carry.liveCount, 0);
+  assert.equal(claimCountRegressed(carry.claims, undefined), false);
+});
+
+test('the regression control fires when the union is bypassed', () => {
+  // Exactly what the carry exists to prevent: publishing the rebuild alone.
+  const rebuiltOnly = [
+    {
+      predicate: 'source states',
+      object: 'A long summary sentence.',
+      confidenceLevel: 'low' as const,
+      citationSource: 'wikipedia_api',
+      citationLabel: 'Wikipedia',
+    },
+  ];
+  const live = liveRow([
+    LIVE_CLAIM,
+    { ...LIVE_CLAIM, id: 'claim_02', predicate: 'location', object: 'Greenwood District' },
+  ]);
+  assert.equal(claimCountRegressed(rebuiltOnly, live), true);
 });
