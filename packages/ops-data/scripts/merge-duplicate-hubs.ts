@@ -41,6 +41,53 @@ const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.MERGE_DUPLICATE_HUBS_APPLY === '1';
 const ACTOR_ID = process.env.OPERATOR_ID?.trim() || 'ops-data/merge-duplicate-hubs';
 
+/**
+ * Pairs to merge. Defaults to the WS4 hub set this script was written for; `MERGE_PAIRS` supplies
+ * others as one `absorbed>survivor[>reason]` entry PER LINE.
+ *
+ * One per line, not comma-separated: a merge reason is a sentence and sentences contain commas.
+ * The first version of this split on commas too and choked on its own first real reason.
+ *
+ * This exists because the script's safety properties are general but its pair list was not: after
+ * the cleanup deletes were scoped to the merge's own rows (02630381, repo-iypc) the machinery is
+ * safe for any pair, and the alternative was hand-written SQL per duplicate, which is how an
+ * unscoped delete gets written in the first place.
+ */
+function resolveMergePairs(): readonly HubMergePair[] {
+  const raw = process.env.MERGE_PAIRS?.trim();
+  if (!raw) return DEFAULT_HUB_MERGE_PAIRS;
+  const pairs = raw
+    .split(/\r?\n/u)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const [absorbedId, survivorId, reason] = entry.split('>').map((part) => part.trim());
+      if (!absorbedId || !survivorId) {
+        throw new Error(`MERGE_PAIRS entry "${entry}" is not "absorbed>survivor[>reason]"`);
+      }
+      if (absorbedId === survivorId) {
+        throw new Error(`MERGE_PAIRS entry "${entry}" merges an entity into itself`);
+      }
+      return {
+        absorbedId,
+        survivorId,
+        reason:
+          reason && reason.length > 0 ? reason : `Duplicate record merged into ${survivorId}.`,
+      };
+    });
+  const absorbed = new Set(pairs.map((pair) => pair.absorbedId));
+  if (absorbed.size !== pairs.length) throw new Error('MERGE_PAIRS repeats an absorbed id');
+  for (const pair of pairs) {
+    if (absorbed.has(pair.survivorId)) {
+      throw new Error(
+        `MERGE_PAIRS makes ${pair.survivorId} both a survivor and an absorbed record; ` +
+          'chain those as separate runs so each is auditable on its own.',
+      );
+    }
+  }
+  return pairs;
+}
+
 function connectionString(): string {
   const value =
     process.env.DATABASE_URL?.trim() ??
@@ -393,18 +440,19 @@ async function applyHubMerge(
 }
 
 async function main(): Promise<void> {
+  const PAIRS = resolveMergePairs();
   const { connectionString: cs, ssl } = normalizePgConnectionString(connectionString());
   const pool = new pg.Pool({ connectionString: cs, ssl });
   const client = await pool.connect();
 
   try {
     console.log('=== Hub duplicate merge ===');
-    console.log(`Pairs: ${DEFAULT_HUB_MERGE_PAIRS.length}`);
+    console.log(`Pairs: ${PAIRS.length}`);
     console.log(`Mode: ${DRY_RUN || !APPLY ? 'dry-run' : 'apply'}`);
 
     const coverageBefore = await loadEdgeCoverage(client);
     console.log(`Edge coverage before: ${formatEdgeCoverage(coverageBefore)}`);
-    const degreesBefore = await loadDegreeSnapshots(client, DEFAULT_HUB_MERGE_PAIRS);
+    const degreesBefore = await loadDegreeSnapshots(client, PAIRS);
     console.log(formatDegreeSnapshot('Relationship degree before', degreesBefore));
 
     const plan: Array<{
@@ -412,7 +460,7 @@ async function main(): Promise<void> {
       readonly skipReason?: string;
     }> = [];
 
-    for (const pair of DEFAULT_HUB_MERGE_PAIRS) {
+    for (const pair of PAIRS) {
       const absorbedExists = await entityExists(client, pair.absorbedId);
       const survivorExists = await entityExists(client, pair.survivorId);
       if (!absorbedExists || !survivorExists) {
@@ -479,7 +527,7 @@ async function main(): Promise<void> {
       throw error;
     }
 
-    const degreesAfter = await loadDegreeSnapshots(client, DEFAULT_HUB_MERGE_PAIRS);
+    const degreesAfter = await loadDegreeSnapshots(client, PAIRS);
     console.log(formatDegreeSnapshot('Relationship degree after', degreesAfter));
     const coverageAfter = await loadEdgeCoverage(client);
     console.log(`Edge coverage after: ${formatEdgeCoverage(coverageAfter)}`);
