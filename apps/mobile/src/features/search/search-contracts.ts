@@ -50,6 +50,9 @@ export function assertNoRankingSignal(results: readonly Record<string, unknown>[
 export interface SearchRequestParams {
   readonly query: string;
   readonly kind?: string;
+  /** Decade-bucket label (e.g. `1950s`), same vocabulary as `@repo/public-contracts/discovery`'s
+   * `decadeParamToEra` -- the `/history` and `/records` deep links carry this same shape. */
+  readonly era?: string;
   readonly cursor?: string;
   readonly pageSize?: number;
 }
@@ -64,6 +67,7 @@ export function buildSearchRequestPath(params: SearchRequestParams): string {
   const search = new URLSearchParams();
   search.set('q', params.query);
   if (params.kind) search.set('kind', params.kind);
+  if (params.era) search.set('era', params.era);
   if (params.pageSize !== undefined) search.set('pageSize', String(params.pageSize));
   if (params.cursor) search.set('cursor', params.cursor);
   return `${SEARCH_PATH}?${search.toString()}`;
@@ -73,6 +77,7 @@ export function buildSearchRequestPath(params: SearchRequestParams): string {
 export function buildQueryShapeKey(params: {
   readonly query: string;
   readonly kind?: string;
+  readonly era?: string;
 }): string {
-  return `q=${params.query}&kind=${params.kind ?? ''}`;
+  return `q=${params.query}&kind=${params.kind ?? ''}&era=${params.era ?? ''}`;
 }

@@ -386,6 +386,7 @@ const SEARCH_QUERY_KEYS = [
   'state',
   'precision',
   'releaseId',
+  'era',
   'sort',
   'pageSize',
   'cursor',

@@ -51,15 +51,21 @@ import type { SearchRuntime } from './search-runtime';
 export interface SearchScreenProps {
   readonly initialQuery?: string;
   readonly initialKind?: string;
+  /** Decade-bucket label (e.g. `1950s`) carried by a `/history` or `/records` deep link. */
+  readonly initialEra?: string;
   readonly runtime?: SearchRuntime;
   /** Live map feature count for the active release (geo-anchored records). */
   readonly pinnedRecordCount?: number;
   readonly archiveScopeLabel?: string;
 }
 
-/** One address key for both directions of the param sync, so an echo compares equal to itself. */
-function paramsKey(query: string | undefined, kind: string | undefined): string {
-  return `${query ?? ''}${kind ?? ''}`;
+/** One address key for every direction of the param sync, so an echo compares equal to itself. */
+function paramsKey(
+  query: string | undefined,
+  kind: string | undefined,
+  era: string | undefined,
+): string {
+  return `${query ?? ''}${kind ?? ''}${era ?? ''}`;
 }
 
 function formatRelativeTime(fetchedAt: number, now: number): string {
@@ -76,6 +82,7 @@ function formatRelativeTime(fetchedAt: number, now: number): string {
 export function SearchScreen({
   initialQuery,
   initialKind,
+  initialEra,
   runtime,
   pinnedRecordCount,
   archiveScopeLabel = 'Active release',
@@ -87,6 +94,8 @@ export function SearchScreen({
     setDraft,
     filterKind,
     setFilterKind,
+    filterEra,
+    setFilterEra,
     state,
     loadMore,
     retry,
@@ -94,32 +103,37 @@ export function SearchScreen({
     selectRecentSearch,
     removeRecentSearch,
     clearRecentSearches,
-  } = useSearch({ initialQuery, initialKind, runtime });
+  } = useSearch({ initialQuery, initialKind, initialEra, runtime });
 
   // Reflect the SETTLED query/filter back into the route params so the deep link stays shareable
   // — but only when they actually change. The controller cycles loading→results→loading per
   // keystroke burst; writing the same params on every one of those transitions is wasted work.
   const settledQuery = 'query' in state ? state.query : undefined;
   const settledKind = 'filterKind' in state ? state.filterKind : undefined;
+  const settledEra = 'filterEra' in state ? state.filterEra : undefined;
   const lastParamsRef = useRef<string | null>(null);
   useEffect(() => {
     if (state.kind === 'browse') return;
-    const key = paramsKey(settledQuery, settledKind);
+    const key = paramsKey(settledQuery, settledKind, settledEra);
     if (lastParamsRef.current === key) return;
     lastParamsRef.current = key;
-    router.setParams({ q: settledQuery, ...(settledKind ? { kind: settledKind } : {}) });
-  }, [state.kind, settledQuery, settledKind]);
+    router.setParams({
+      q: settledQuery,
+      ...(settledKind ? { kind: settledKind } : {}),
+      ...(settledEra ? { era: settledEra } : {}),
+    });
+  }, [state.kind, settledQuery, settledKind, settledEra]);
 
-  // The reverse direction. `initialQuery` / `initialKind` seed state at mount only, and a deep
-  // link can land on a Records tab that is already mounted — which is exactly what the `/search`
-  // and `/history` redirects do. Without this the link arrives, the tab shows, and the reader's
-  // query is gone: the failure those redirects exist to prevent.
+  // The reverse direction. `initialQuery` / `initialKind` / `initialEra` seed state at mount only,
+  // and a deep link can land on a Records tab that is already mounted — which is exactly what the
+  // `/search` and `/history` redirects do. Without this the link arrives, the tab shows, and the
+  // reader's query is gone: the failure those redirects exist to prevent.
   //
   // Two changes must NOT re-seed. The echo written just above is this screen's own address
   // update, and adopting it would revert a reader who has kept typing since the query settled;
   // `lastParamsRef` identifies it. An absent param is a plain tab press, and clearing the field
   // on one would lose work the reader can see.
-  const incomingParamsKey = paramsKey(initialQuery, initialKind);
+  const incomingParamsKey = paramsKey(initialQuery, initialKind, initialEra);
   const lastIncomingParamsRef = useRef(incomingParamsKey);
   useEffect(() => {
     if (incomingParamsKey.length === 0) return;
@@ -128,7 +142,8 @@ export function SearchScreen({
     if (incomingParamsKey === lastParamsRef.current) return;
     setDraft(initialQuery ?? '');
     setFilterKind(initialKind);
-  }, [incomingParamsKey, initialQuery, initialKind, setDraft, setFilterKind]);
+    setFilterEra(initialEra);
+  }, [incomingParamsKey, initialQuery, initialKind, initialEra, setDraft, setFilterKind, setFilterEra]);
 
   const [now] = useState(() => Date.now());
 

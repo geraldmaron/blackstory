@@ -18,6 +18,8 @@ import type { RecentSearchEntry } from './recent-searches';
 export interface UseSearchOptions {
   readonly initialQuery?: string;
   readonly initialKind?: string;
+  /** Decade-bucket label (e.g. `1950s`) a `/history`/`/records` deep link carries. */
+  readonly initialEra?: string;
   /** Test-only injection point -- production code always omits this and gets the lazily-built
    * real runtime from `getSearchRuntime()`. */
   readonly runtime?: SearchRuntime;
@@ -28,6 +30,8 @@ export interface UseSearchResult {
   readonly setDraft: (value: string) => void;
   readonly filterKind: string | undefined;
   readonly setFilterKind: (kind: string | undefined) => void;
+  readonly filterEra: string | undefined;
+  readonly setFilterEra: (era: string | undefined) => void;
   readonly state: SearchControllerState;
   readonly loadMore: () => void;
   readonly retry: () => void;
@@ -40,6 +44,7 @@ export interface UseSearchResult {
 export function useSearch(options: UseSearchOptions = {}): UseSearchResult {
   const [draft, setDraft] = useState(() => normalizeSearchQuery(options.initialQuery ?? ''));
   const [filterKind, setFilterKind] = useState<string | undefined>(options.initialKind);
+  const [filterEra, setFilterEra] = useState<string | undefined>(options.initialEra);
   const [state, setState] = useState<SearchControllerState>({ kind: 'browse' });
   const [recentSearches, setRecentSearches] = useState<readonly RecentSearchEntry[]>([]);
 
@@ -97,8 +102,8 @@ export function useSearch(options: UseSearchOptions = {}): UseSearchResult {
         },
       );
     }
-    controllerRef.current.setQuery(debouncedQuery, filterKind);
-  }, [runtime, debouncedQuery, filterKind]);
+    controllerRef.current.setQuery(debouncedQuery, filterKind, filterEra);
+  }, [runtime, debouncedQuery, filterKind, filterEra]);
 
   const loadMore = useCallback(() => controllerRef.current?.loadMore(), []);
   const retry = useCallback(() => controllerRef.current?.retry(), []);
@@ -130,6 +135,8 @@ export function useSearch(options: UseSearchOptions = {}): UseSearchResult {
       setDraft,
       filterKind,
       setFilterKind,
+      filterEra,
+      setFilterEra,
       state,
       loadMore,
       retry,
@@ -141,6 +148,7 @@ export function useSearch(options: UseSearchOptions = {}): UseSearchResult {
     [
       draft,
       filterKind,
+      filterEra,
       state,
       loadMore,
       retry,
