@@ -1,6 +1,6 @@
 {
   "version": "memorial-seed-2026-07-24",
-  "generatedAt": "2026-08-03T23:44:07.204Z",
+  "generatedAt": "2026-09-12T16:29:22.600Z",
   "incompleteByDesign": true,
   "names": [
     {
@@ -2026,7 +2026,13 @@
       "name": "George Bush III"
     },
     {
-      "name": "George Carter"
+      "name": "George Carter",
+      "entityId": "ent_research_case_20260902_george-carter-usct-mount-vernon",
+      "locationLabel": "Mount Vernon, NY",
+      "placeLabel": "Mount Vernon, New York",
+      "lat": 40.89278,
+      "lng": -73.82583,
+      "locationPrecision": "site"
     },
     {
       "name": "George Floyd"
@@ -2573,9 +2579,9 @@
       "entityId": "ent_james_west_001",
       "locationLabel": "Johns Hopkins University, Baltimore, Maryland",
       "placeLabel": "Baltimore, Maryland",
-      "lat": 39.3302,
-      "lng": -76.6219,
-      "locationPrecision": "campus"
+      "lat": 39.33,
+      "lng": -76.62,
+      "locationPrecision": "city"
     },
     {
       "name": "James Wilborn"
@@ -3718,7 +3724,7 @@
       "name": "Mary Turner"
     },
     {
-      "name": "Matthew Johnson#Shooting_of_Matthew_Johnson)"
+      "name": "Matthew Johnson"
     },
     {
       "name": "Matthew Tucker"

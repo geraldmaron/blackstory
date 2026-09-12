@@ -8,6 +8,7 @@ import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { themeImpactPacketToView } from '@repo/domain/statistics';
+import { stripInternalIds } from '@repo/public-contracts/narrative-text';
 import { normalizePgConnectionString } from '../../../packages/ops-data/scripts/lib/pg-connection.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -96,9 +97,25 @@ if (released.length === 0) {
   );
 }
 
+/**
+ * Released artifact summaries can carry the pipeline's own provenance parenthetical
+ * (e.g. "(evidence ev_fha_1938_para935 / claim_fha1938_para935; public domain)") — a note
+ * written for internal review, not a reader. The human citation already lives in
+ * `provenance.humanCitation`, so this is stripped here rather than shipped to the app.
+ */
+function withCleanArtifactSummaries(packet) {
+  return {
+    ...packet,
+    artifacts: packet.artifacts.map((artifact) => ({
+      ...artifact,
+      summary: stripInternalIds(artifact.summary),
+    })),
+  };
+}
+
 const releaseId = released[0].release_id;
 const packets = released.map((row) =>
-  themeImpactPacketToView(row.payload, { dataSource: 'release' }),
+  withCleanArtifactSummaries(themeImpactPacketToView(row.payload, { dataSource: 'release' })),
 );
 
 const snapshot = {

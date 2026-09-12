@@ -14,11 +14,19 @@
  * predicate for cases where the whole string is unusable and the right move is to render nothing.
  */
 
-/** Id shapes the archive publishes: `ent_…`, `claim_…`, and their siblings. */
-const INTERNAL_ID = /\b(?:ent|disc|art|pkg|rec|src|claim)_[a-z0-9_]+/gi;
+/** Id shapes the archive publishes: `ent_…`, `claim_…`, `ev_…`, and their siblings. */
+const INTERNAL_ID = /\b(?:ev|ent|disc|art|pkg|rec|src|claim)_[a-z0-9_]+/gi;
 
 /** A label that is an id and nothing else. */
 const INTERNAL_LABEL = /^[a-z0-9]+(?:_[a-z0-9]+){2,}$/i;
+
+/**
+ * A parenthetical that exists only to carry pipeline ids, e.g.
+ * "(evidence ev_fha_1938_para935 / claim_fha1938_para935; public domain)". Removed whole —
+ * the human citation a reader needs lives in a separate field, not in this aside.
+ */
+const INTERNAL_ID_PARENTHETICAL =
+  /\s*\([^()]*\b(?:ev|ent|disc|art|pkg|rec|src|claim)_[a-z0-9_]+\b[^()]*\)/gi;
 
 export function containsInternalId(value: string | undefined): boolean {
   if (value === undefined) return false;
@@ -37,6 +45,7 @@ export function containsInternalId(value: string | undefined): boolean {
 export function stripInternalIds(body: string): string {
   const stripped = body
     .replace(/Basis:[^.]*\.?/gi, '')
+    .replace(INTERNAL_ID_PARENTHETICAL, '')
     .replace(/\s*,?\s*ongoing as of this release\.?/gi, '')
     .replace(INTERNAL_ID, '')
     .replace(/\s+([.,;])/g, '$1')

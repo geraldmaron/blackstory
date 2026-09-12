@@ -1,6 +1,6 @@
 {
   "version": "theme-impact-rel_20260723_authority_net_001",
-  "generatedAt": "2026-07-28T14:40:17.737Z",
+  "generatedAt": "2026-09-12T16:30:10.133Z",
   "source": "supabase-active-release",
   "releaseId": "rel_20260723_authority_net_001",
   "releaseLabel": "Published release",
@@ -92,32 +92,32 @@
           "id": "obs:census-decennial-homeownership-black-nation:nation:US:1940",
           "metricId": "census-decennial-homeownership-black-nation",
           "label": "Black homeownership rate, United States, 1940",
-          "value": "23.6%",
-          "estimate": 23.6,
+          "value": "22.8%",
+          "estimate": 22.8,
           "unit": "percent",
           "referencePeriod": "1940",
           "provenance": {
             "source": "Census Bureau Historical Census of Housing Tables",
             "source_url": "https://www.census.gov/topics/housing/homeownership/data/historical.html",
             "retrieved_at": "2026-07-25T00:00:00.000Z",
-            "content_hash": "2b4ebfbc772bcb791bd65d1271f805afeaa6d29ba8385a4a18d0be8426657a8b",
-            "humanCitation": "U.S. Census Bureau, Historical Census of Housing Tables, Black household homeownership rate, United States, 1940."
+            "content_hash": "8cd9ead98ab26e4c3e57ab424467223ece2fa8b2a59ba64cbd92e3e1976de46b",
+            "humanCitation": "U.S. Census Bureau, 1940 Census of Housing, Vol. II, Table 1 (\"Negro\" occupied units, owner-occupied share), United States, 1940."
           }
         },
         {
           "id": "obs:census-decennial-homeownership-white_nh-nation:nation:US:1940",
           "metricId": "census-decennial-homeownership-white_nh-nation",
           "label": "White homeownership rate, United States, 1940",
-          "value": "53%",
-          "estimate": 53,
+          "value": "45.7%",
+          "estimate": 45.7,
           "unit": "percent",
           "referencePeriod": "1940",
           "provenance": {
             "source": "Census Bureau Historical Census of Housing Tables",
             "source_url": "https://www.census.gov/topics/housing/homeownership/data/historical.html",
             "retrieved_at": "2026-07-25T00:00:00.000Z",
-            "content_hash": "5d001dfc63705ffdf8ff8b6cf21db6d0be5e92beecaff2283af3e19276e71969",
-            "humanCitation": "U.S. Census Bureau, Historical Census of Housing Tables, White household homeownership rate, United States, 1940."
+            "content_hash": "30ab716c1b33a463fe680786837148812eca5abf08c210ef6ea2356bded74dd8",
+            "humanCitation": "U.S. Census Bureau, 1940 Census of Housing, Vol. II, Table 1 (white occupied units, owner-occupied share), United States, 1940."
           }
         },
         {
@@ -384,7 +384,7 @@
           "title": "FHA Underwriting Manual (1938), paragraph 935",
           "artifactClass": "primary_government_document",
           "dateLabel": "1938",
-          "summary": "Rule in force, 1938. Verbatim: \"Usually the protection from adverse influences afforded by these means includes prevention of the infiltration of business and industrial uses, lower class occupancy, and inharmonious racial groups.\" (evidence ev_fha_1938_para935 / claim_fha1938_para935; public domain).",
+          "summary": "Rule in force, 1938. Verbatim: \"Usually the protection from adverse influences afforded by these means includes prevention of the infiltration of business and industrial uses, lower class occupancy, and inharmonious racial groups.\" (public domain).",
           "provenance": {
             "source": "federal-housing-administration",
             "source_url": "https://fraser.stlouisfed.org/files/docs/publications/fha/1938feb_fha_underwritingmanual.pdf",
@@ -398,7 +398,7 @@
           "title": "HOLC Area D-30 area description (Near North Side, Chicago), Mar. 1940",
           "artifactClass": "cartographic_grade_map",
           "dateLabel": "1940-03",
-          "summary": "Rule in force, Chicago D-area. Verbatim area description: \"Negro population is largely concentrated south of Division St., and west of Wells St., but a continued infiltration of this race has caused an overflow north of that point; and it is reasonable to assume that the section may eventually become more negro than Italian.\" (evidence ev_holc_d30_nearnorth / claim_holc_d30; public domain).",
+          "summary": "Rule in force, Chicago D-area. Verbatim area description: \"Negro population is largely concentrated south of Division St., and west of Wells St., but a continued infiltration of this race has caused an overflow north of that point; and it is reasonable to assume that the section may eventually become more negro than Italian.\" (public domain).",
           "uncertaintyLabel": "HOLC vector derivatives are CC BY-NC-SA; BlackStory cites the area description and does not republish polygons on commercial public surfaces.",
           "provenance": {
             "source": "mapping-inequality-holc",
@@ -413,7 +413,7 @@
           "title": "Restrictive covenant at issue in Shelley v. Kraemer (St. Louis, recorded 1911)",
           "artifactClass": "primary_government_document",
           "dateLabel": "1911-02-16",
-          "summary": "Rule in force, covenant era. Verbatim: \". . . that hereafter no part of said property or any portion thereof shall be, for said term of Fifty-years, occupied by any person not of the Caucasian race, it being intended hereby to restrict the use of said property ... against the occupancy as owners or tenants of any portion of said property for resident or other purpose by people of the Negro or Mongolian Race.\" (evidence ev_shelley_covenant_st_louis / claim_shelley_covenant_stlouis; public domain). Judicial enforcement of such covenants was held unconstitutional in Shelley v. Kraemer (1948).",
+          "summary": "Rule in force, covenant era. Verbatim: \"... that hereafter no part of said property or any portion thereof shall be, for said term of Fifty-years, occupied by any person not of the Caucasian race, it being intended hereby to restrict the use of said property... against the occupancy as owners or tenants of any portion of said property for resident or other purpose by people of the Negro or Mongolian Race.\" (public domain). Judicial enforcement of such covenants was held unconstitutional in Shelley v. Kraemer (1948).",
           "provenance": {
             "source": "shelley-v-kraemer-record",
             "source_url": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep334/usrep334001/usrep334001.pdf",
@@ -550,7 +550,9 @@
           }
         }
       ],
-      "gapStates": ["insufficient_evidence"]
+      "gapStates": [
+        "insufficient_evidence"
+      ]
     },
     {
       "dataSource": "release",
@@ -773,7 +775,9 @@
           }
         }
       ],
-      "gapStates": ["insufficient_evidence"]
+      "gapStates": [
+        "insufficient_evidence"
+      ]
     },
     {
       "dataSource": "release",
@@ -1667,7 +1671,9 @@
           }
         }
       ],
-      "gapStates": ["insufficient_evidence"],
+      "gapStates": [
+        "insufficient_evidence"
+      ],
       "entityBinding": {
         "purpose": "story",
         "entityId": "ent_bronzeville_001"
@@ -2161,7 +2167,9 @@
           }
         }
       ],
-      "gapStates": ["insufficient_evidence"]
+      "gapStates": [
+        "insufficient_evidence"
+      ]
     },
     {
       "dataSource": "release",
@@ -2340,7 +2348,9 @@
           }
         }
       ],
-      "gapStates": ["insufficient_evidence"]
+      "gapStates": [
+        "insufficient_evidence"
+      ]
     },
     {
       "dataSource": "release",
@@ -3568,7 +3578,9 @@
           }
         }
       ],
-      "gapStates": ["insufficient_evidence"]
+      "gapStates": [
+        "insufficient_evidence"
+      ]
     },
     {
       "dataSource": "release",
@@ -3814,7 +3826,9 @@
           }
         }
       ],
-      "gapStates": ["insufficient_evidence"],
+      "gapStates": [
+        "insufficient_evidence"
+      ],
       "entityBinding": {
         "purpose": "story",
         "entityId": "ent_chicago_freedom_movement_001"
@@ -4108,7 +4122,9 @@
           }
         }
       ],
-      "gapStates": ["insufficient_evidence"]
+      "gapStates": [
+        "insufficient_evidence"
+      ]
     },
     {
       "dataSource": "release",
@@ -4283,7 +4299,7 @@
           "title": "Alabama literacy test specimen (mid-1960s)",
           "artifactClass": "primary_document_specimen",
           "dateLabel": "1965",
-          "summary": "Specimen registration test of the class barred by the 1965 Act. Question 1 verbatim: \"Has the following part of the U.S. Constitution been changed?\"",
+          "summary": "Specimen registration test of the class barred by the 1965 Act. Question 1 verbatim: \"Has the following part of the U.S. Constitution been changed?\".",
           "uncertaintyLabel": "Specimen archived by a civil-rights nonprofit, not an individual applicant record; Alabama form shown beside the Mississippi rate as an example of the class of device. Rights status unverified.",
           "provenance": {
             "source": "crmvet-archive",
@@ -4350,7 +4366,9 @@
           }
         }
       ],
-      "gapStates": ["insufficient_evidence"],
+      "gapStates": [
+        "insufficient_evidence"
+      ],
       "entityBinding": {
         "purpose": "story",
         "entityId": "ent_law_voting_rights_act_1965"
@@ -4536,7 +4554,7 @@
         {
           "id": "census-h5-median-hh-income-black-nation:nation:US:1972",
           "metricId": "census-h5-median-hh-income-black-nation",
-          "label": "Median household income, Black householders (1972, 2023 dollars)",
+          "label": "Median household income, Black householders (1972, 2024 dollars)",
           "value": "$37,250",
           "estimate": 37250,
           "unit": "USD",
@@ -4552,7 +4570,7 @@
         {
           "id": "spine:spine-median-hh-income-white-us:1972",
           "metricId": "census-h5-median-hh-income-white-nation",
-          "label": "Median household income, White householders (1972, 2023 dollars)",
+          "label": "Median household income, White householders (1972, 2024 dollars)",
           "value": "$64,730",
           "estimate": 64730,
           "unit": "USD",
@@ -4660,13 +4678,13 @@
         },
         {
           "id": "art_tulsa_tribune_1921_nab_negro",
-          "title": "\"Nab Negro for Attacking Girl in an Elevator,\" Tulsa Tribune (May 31, 1921)",
+          "title": "\"Nab Negro for Attacking Girl in Elevator,\" Tulsa Tribune (May 31, 1921)",
           "artifactClass": "newspaper_report",
           "dateLabel": "1921-05-31",
           "summary": "The afternoon story that put a crowd outside the Tulsa County Courthouse. It reported the arrest of Dick Rowland, a Black shoe shiner, \"charged with attempting to assault the 17-year-old white elevator girl in the Drexel Building.\" No record survives of what Sarah Page actually told police, and the case against Rowland was dismissed that September when she did not appear. Whether the same edition also carried a lynching editorial is disputed: eyewitness recollection says yes; the surviving copies are missing the pages that could settle it.",
           "provenance": {
             "source": "library-of-congress",
-            "source_url": "https://blogs.loc.gov/headlinesandheroes/2021/05/tulsa-race-massacre-newspaper-complicity-and-coverage/",
+            "source_url": "https://www.okhistory.org/research/forms/freport.pdf",
             "retrieved_at": "2026-07-27T00:00:00.000Z",
             "content_hash": "cbcafb2b447a3b228eb8fb7b238c21f1472ea70f8a0e0d4ddb676a3474b23f5d",
             "humanCitation": "Tulsa Tribune, May 31, 1921 (text via Gill 1946 transcription and June 1 State Edition; Library of Congress, Headlines & Heroes, 2021)."
@@ -4729,7 +4747,9 @@
           }
         }
       ],
-      "gapStates": ["insufficient_evidence"],
+      "gapStates": [
+        "insufficient_evidence"
+      ],
       "entityBinding": {
         "purpose": "story",
         "entityId": "ent_greenwood_district_001"
