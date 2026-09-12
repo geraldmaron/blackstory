@@ -30,7 +30,8 @@ function safeDecode(value: string): string | null {
  * returns a raw, un-vetted string — only an actual row from the fixed table, or `undefined`. */
 export function parseSectionParam(raw: unknown): SectionRow | undefined {
   const value = firstOf(raw);
-  if (typeof value !== 'string' || value.length === 0 || value.length > MAX_PARAM_LENGTH) return undefined;
+  if (typeof value !== 'string' || value.length === 0 || value.length > MAX_PARAM_LENGTH)
+    return undefined;
   const decoded = safeDecode(value);
   if (decoded === null) return undefined;
   return findSectionRow(decoded.trim());
@@ -41,12 +42,15 @@ export function parseSectionParam(raw: unknown): SectionRow | undefined {
  * A malformed/unknown slug returns `undefined` rather than being handed to a catalog query. */
 export function parseSlugParam(raw: unknown, row: SectionRow): string | undefined {
   const value = firstOf(raw);
-  if (typeof value !== 'string' || value.length === 0 || value.length > MAX_PARAM_LENGTH) return undefined;
+  if (typeof value !== 'string' || value.length === 0 || value.length > MAX_PARAM_LENGTH)
+    return undefined;
   const decoded = safeDecode(value);
   if (decoded === null) return undefined;
   const trimmed = decoded.trim();
   if (!SLUG_PATTERN.test(trimmed)) return undefined;
-  const exists = CONTENT_CATALOG.some((entry) => entry.section === row.catalogSection && entry.page.slug === trimmed);
+  const exists = CONTENT_CATALOG.some(
+    (entry) => entry.section === row.catalogSection && entry.page.slug === trimmed,
+  );
   return exists ? trimmed : undefined;
 }
 

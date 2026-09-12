@@ -84,11 +84,7 @@ jest.mock('@gorhom/bottom-sheet', () => {
         { testID: 'explore-bottom-sheet-host' },
         // Surface the controlled index so tests can assert what the derived
         // value settled on after a simulated gesture (no snap-back).
-        React.createElement(
-          Text,
-          { testID: 'sheet-controlled-index' },
-          String(index),
-        ),
+        React.createElement(Text, { testID: 'sheet-controlled-index' }, String(index)),
         // Simulated drag-settle triggers — fire the sheet's onChange the way the
         // gorhom sheet would when the user lifts their finger on a detent.
         React.createElement(Pressable, {
@@ -109,13 +105,8 @@ jest.mock('@gorhom/bottom-sheet', () => {
   );
   BottomSheet.displayName = 'BottomSheet';
 
-  const Passthrough = ({
-    children,
-    testID,
-  }: {
-    children?: unknown;
-    testID?: string;
-  }) => React.createElement(View, { testID }, children as never);
+  const Passthrough = ({ children, testID }: { children?: unknown; testID?: string }) =>
+    React.createElement(View, { testID }, children as never);
 
   const BottomSheetFlatList = (props: {
     testID?: string;
@@ -209,9 +200,7 @@ afterEach(async () => {
 
 describe('ExploreView — records rail', () => {
   it('renders the records rail at peek with count header', async () => {
-    const { getByTestId } = await render(
-      <ExploreView onOpenEntity={noop} reduceMotion />,
-    );
+    const { getByTestId } = await render(<ExploreView onOpenEntity={noop} reduceMotion />);
     expect(getByTestId('explore-records-rail')).toBeTruthy();
     expect(getByTestId('explore-mast-count').props.accessibilityLabel).toBe('All pinned, 3 pinned');
     expect(getByTestId('map-attribution')).toBeTruthy();
@@ -219,11 +208,7 @@ describe('ExploreView — records rail', () => {
 
   it('hides map attribution when a selection expands the sheet', async () => {
     const { queryByTestId, findByTestId } = await render(
-      <ExploreView
-        selectedParam="ent_fixture_place_dc"
-        onOpenEntity={noop}
-        reduceMotion
-      />,
+      <ExploreView selectedParam="ent_fixture_place_dc" onOpenEntity={noop} reduceMotion />,
     );
     expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
     expect(queryByTestId('map-attribution')).toBeNull();
@@ -239,9 +224,7 @@ describe('ExploreView — records rail', () => {
   });
 
   it('mast count matches the records rail header before viewport is reported', async () => {
-    const { getByTestId } = await render(
-      <ExploreView onOpenEntity={noop} reduceMotion />,
-    );
+    const { getByTestId } = await render(<ExploreView onOpenEntity={noop} reduceMotion />);
     const mast = getByTestId('explore-mast-count');
     const railHeader = within(getByTestId('explore-records-rail')).getByRole('header');
     expect(mast.props.accessibilityLabel).toBe('All pinned, 3 pinned');
@@ -249,9 +232,7 @@ describe('ExploreView — records rail', () => {
   });
 
   it('keeps the sheet where the gesture left it — no snap-back when dragged full → half', async () => {
-    const { getByTestId } = await render(
-      <ExploreView onOpenEntity={noop} reduceMotion />,
-    );
+    const { getByTestId } = await render(<ExploreView onOpenEntity={noop} reduceMotion />);
     // Expand the rail to full browse from the mast control.
     await act(async () => {
       fireEvent.press(getByTestId('explore-chip-records'));
@@ -275,11 +256,7 @@ describe('ExploreView — records rail', () => {
 
   it('dragging a selection preview below half dismisses the selection instead of snapping back', async () => {
     const { getByTestId, queryByTestId, findByTestId } = await render(
-      <ExploreView
-        selectedParam="ent_fixture_place_dc"
-        onOpenEntity={noop}
-        reduceMotion
-      />,
+      <ExploreView selectedParam="ent_fixture_place_dc" onOpenEntity={noop} reduceMotion />,
     );
     expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
     // A selection floors the sheet at half.
@@ -416,9 +393,7 @@ describe('ExploreView — map posture (browse <-> immersive)', () => {
 describe('ExploreView — entity preview sheet', () => {
   it('opens the preview sheet from the records rail and links to the full entity route', async () => {
     const onOpenEntity = jest.fn();
-    const utils = await render(
-      <ExploreView onOpenEntity={onOpenEntity} reduceMotion />,
-    );
+    const utils = await render(<ExploreView onOpenEntity={onOpenEntity} reduceMotion />);
     fireEvent.press(utils.getByLabelText(/Seed Historical Place/));
     expect(await utils.findByTestId('entity-preview-sheet')).toBeTruthy();
     fireEvent.press(await utils.findByLabelText(/Open place for/));
@@ -427,11 +402,7 @@ describe('ExploreView — entity preview sheet', () => {
 
   it('opens the preview sheet when a deep-linked selection is restored', async () => {
     const { findByTestId } = await render(
-      <ExploreView
-        selectedParam="ent_fixture_place_dc"
-        onOpenEntity={noop}
-        reduceMotion
-      />,
+      <ExploreView selectedParam="ent_fixture_place_dc" onOpenEntity={noop} reduceMotion />,
     );
     expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
   });
@@ -484,9 +455,7 @@ describe('ExploreView — empty + adversarial', () => {
         },
       ],
     };
-    const utils = await render(
-      <ExploreView source={hostile} onOpenEntity={noop} reduceMotion />,
-    );
+    const utils = await render(<ExploreView source={hostile} onOpenEntity={noop} reduceMotion />);
     expect(utils.getByTestId('explore-records-rail')).toBeTruthy();
   });
 });
@@ -512,9 +481,7 @@ describe('ExploreView — repeated mount/unmount (leak check)', () => {
 
     const CYCLES = 25;
     for (let i = 0; i < CYCLES; i += 1) {
-      const view = await render(
-        <ExploreView source={DEMO_MAP_SOURCE} onOpenEntity={noop} />,
-      );
+      const view = await render(<ExploreView source={DEMO_MAP_SOURCE} onOpenEntity={noop} />);
       await act(async () => {
         view.unmount();
       });

@@ -37,12 +37,7 @@ import {
 } from '@maplibre/maplibre-react-native';
 import { ErrorState, duration, MIN_TOUCH_TARGET, radius, space } from '@/ui';
 import { Ionicons } from '@expo/vector-icons';
-import {
-  MAP_GHOST_BG,
-  MAP_GHOST_BORDER,
-  MAP_GHOST_PRESSED,
-  MAP_INK,
-} from './map-plate-ink';
+import { MAP_GHOST_BG, MAP_GHOST_BORDER, MAP_GHOST_PRESSED, MAP_INK } from './map-plate-ink';
 import { MapAttribution } from './MapAttribution';
 import {
   buildBasemapStyle,
@@ -232,7 +227,12 @@ function lngLatFromPress(
   if (Array.isArray(lngLat) && lngLat.length >= 2) {
     const lng = lngLat[0];
     const lat = lngLat[1];
-    if (typeof lng === 'number' && typeof lat === 'number' && Number.isFinite(lng) && Number.isFinite(lat)) {
+    if (
+      typeof lng === 'number' &&
+      typeof lat === 'number' &&
+      Number.isFinite(lng) &&
+      Number.isFinite(lat)
+    ) {
       return [lng, lat];
     }
   }
@@ -474,10 +474,7 @@ export function MapScreen({
   }
 
   return (
-    <View
-      style={styles.container}
-      testID="map-screen"
-    >
+    <View style={styles.container} testID="map-screen">
       <Map
         style={StyleSheet.absoluteFill}
         mapStyle={JSON.stringify(style)}
@@ -537,17 +534,7 @@ export function MapScreen({
               style={{
                 textField: ['get', 'point_count_abbreviated'],
                 textFont: [...MAP_LABEL_TEXT_FONT],
-                textSize: [
-                  'interpolate',
-                  ['linear'],
-                  ['zoom'],
-                  3,
-                  10,
-                  6,
-                  11,
-                  9,
-                  12,
-                ],
+                textSize: ['interpolate', ['linear'], ['zoom'], 3, 10, 6, 11, 9, 12],
                 textColor: DIGNITY_PALETTE.clusterText,
                 // Counts sit on copper discs; must not suppress basemap state labels
                 // (California near west-coast clusters at national framing).
@@ -611,14 +598,9 @@ export function MapScreen({
           {...(gesturesEnabled ? {} : { bottom: space['1'] })}
         />
       ) : null}
-      {showZoomControls ?? gesturesEnabled ? (
+      {(showZoomControls ?? gesturesEnabled) ? (
         <View style={styles.zoomControls} pointerEvents="box-none">
-          <MapZoomButton
-            icon="add"
-            label="Zoom in"
-            onPress={() => zoomBy(1)}
-            position="top"
-          />
+          <MapZoomButton icon="add" label="Zoom in" onPress={() => zoomBy(1)} position="top" />
           <MapZoomButton
             icon="remove"
             label="Zoom out"

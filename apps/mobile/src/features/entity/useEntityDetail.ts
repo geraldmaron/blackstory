@@ -64,7 +64,10 @@ export function useEntityDetail(entityId: string | null, deps: EntityDataDeps | 
       // fetchEntityDetail is designed never to throw, but a screen must never crash even if a
       // future change to it regresses that guarantee.
       if (mounted.current) {
-        setState({ kind: 'error', message: 'Couldn’t load this record. Check your connection and try again.' });
+        setState({
+          kind: 'error',
+          message: 'Couldn’t load this record. Check your connection and try again.',
+        });
       }
     }
   }, [entityId]);

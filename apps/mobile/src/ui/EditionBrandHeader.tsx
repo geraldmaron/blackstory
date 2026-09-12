@@ -15,10 +15,7 @@ export type EditionBrandHeaderProps = ScreenHeaderProps & {
   readonly showBrand?: boolean;
 };
 
-export function EditionBrandHeader({
-  showBrand = true,
-  ...headerProps
-}: EditionBrandHeaderProps) {
+export function EditionBrandHeader({ showBrand = true, ...headerProps }: EditionBrandHeaderProps) {
   return (
     <View style={styles.block} testID="edition-brand-header">
       {showBrand ? (

@@ -116,7 +116,9 @@ function boundedStrArray(value: unknown, maxItems: number, maxLength: number): r
 }
 
 function enumOr<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
-  return typeof value === 'string' && (allowed as readonly string[]).includes(value) ? (value as T) : fallback;
+  return typeof value === 'string' && (allowed as readonly string[]).includes(value)
+    ? (value as T)
+    : fallback;
 }
 
 function datePrecisionOr(value: unknown, fallback: DatePrecision = 'circa'): DatePrecision {
@@ -147,7 +149,12 @@ export function normalizeCitation(value: unknown): Citation | undefined {
   // client's own allowlist rejects, even if it slipped through as a string.
   const href = rawHref && isSafeExternalUrl(rawHref) ? rawHref : undefined;
   const withheldReason = optionalStr(value.withheldReason, 500);
-  return { source, label, ...(href ? { href } : {}), ...(withheldReason ? { withheldReason } : {}) };
+  return {
+    source,
+    label,
+    ...(href ? { href } : {}),
+    ...(withheldReason ? { withheldReason } : {}),
+  };
 }
 
 function normalizeDisputeAlternate(value: unknown): ClaimDisputeAlternate | null {
@@ -192,7 +199,9 @@ function normalizeRevisionEntry(value: unknown): ClaimRevisionEntry | null {
     changedAt: str(value.changedAt, 64),
     changeKind: enumOr(value.changeKind, REVISION_CHANGE_KINDS, 'revised'),
     summary,
-    ...(optionalStr(value.policyVersion, 100) ? { policyVersion: optionalStr(value.policyVersion, 100) } : {}),
+    ...(optionalStr(value.policyVersion, 100)
+      ? { policyVersion: optionalStr(value.policyVersion, 100) }
+      : {}),
   };
 }
 
@@ -239,10 +248,14 @@ export function normalizeClaim(value: unknown): Claim | null {
     confidenceScore,
     confidenceLevel,
     ...(normalizeCitation(value.citation) ? { citation: normalizeCitation(value.citation) } : {}),
-    ...(lineageCount !== undefined ? { independentLineageCount: Math.max(0, Math.trunc(lineageCount)) } : {}),
+    ...(lineageCount !== undefined
+      ? { independentLineageCount: Math.max(0, Math.trunc(lineageCount)) }
+      : {}),
     ...(normalizeDispute(value.dispute) ? { dispute: normalizeDispute(value.dispute) } : {}),
     ...(revisionHistory.length > 0 ? { revisionHistory } : {}),
-    ...(normalizeRetraction(value.retraction) ? { retraction: normalizeRetraction(value.retraction) } : {}),
+    ...(normalizeRetraction(value.retraction)
+      ? { retraction: normalizeRetraction(value.retraction) }
+      : {}),
     // Load-bearing for the record tier (see `recordConfidenceTier`): carried through only when
     // it is a role the wire contract defines, never coerced — an out-of-vocabulary value falls
     // back to the predicate heuristic instead of being fabricated into a valid-looking role.
@@ -302,7 +315,9 @@ export function normalizeMedia(value: unknown): Media | undefined {
   if (!isObject(value)) return undefined;
   const url = optionalStr(value.url, 2000);
   const rightsStatusRaw = value.rightsStatus;
-  const rightsStatusValid = typeof rightsStatusRaw === 'string' && (MEDIA_RIGHTS_STATUSES as readonly string[]).includes(rightsStatusRaw);
+  const rightsStatusValid =
+    typeof rightsStatusRaw === 'string' &&
+    (MEDIA_RIGHTS_STATUSES as readonly string[]).includes(rightsStatusRaw);
   if (!url || !isSafeExternalUrl(url) || !rightsStatusValid) return undefined;
 
   const alt = optionalStr(value.alt, 500) ?? 'Untitled image';
@@ -384,8 +399,12 @@ function normalizeStatusHistoryEntry(value: unknown): StatusHistoryEntry | null 
   if (!status) return null;
   return {
     status,
-    ...(optionalStr(value.validFrom, 64) !== undefined ? { validFrom: optionalStr(value.validFrom, 64) } : {}),
-    ...(optionalStrOrNull(value.validTo, 64) !== undefined ? { validTo: optionalStrOrNull(value.validTo, 64) } : {}),
+    ...(optionalStr(value.validFrom, 64) !== undefined
+      ? { validFrom: optionalStr(value.validFrom, 64) }
+      : {}),
+    ...(optionalStrOrNull(value.validTo, 64) !== undefined
+      ? { validTo: optionalStrOrNull(value.validTo, 64) }
+      : {}),
     datePrecision: datePrecisionOr(value.datePrecision),
     basisClaimIds: boundedStrArray(value.basisClaimIds, MAX_BASIS_CLAIM_IDS, 200),
   };
@@ -394,10 +413,16 @@ function normalizeStatusHistoryEntry(value: unknown): StatusHistoryEntry | null 
 function normalizeEventWindow(value: unknown): EventWindow | undefined {
   if (!isObject(value)) return undefined;
   return {
-    ...(optionalStr(value.startAt, 64) !== undefined ? { startAt: optionalStr(value.startAt, 64) } : {}),
-    ...(optionalStrOrNull(value.endAt, 64) !== undefined ? { endAt: optionalStrOrNull(value.endAt, 64) } : {}),
+    ...(optionalStr(value.startAt, 64) !== undefined
+      ? { startAt: optionalStr(value.startAt, 64) }
+      : {}),
+    ...(optionalStrOrNull(value.endAt, 64) !== undefined
+      ? { endAt: optionalStrOrNull(value.endAt, 64) }
+      : {}),
     datePrecision: datePrecisionOr(value.datePrecision),
-    ...(optionalStr(value.eventType, 100) !== undefined ? { eventType: optionalStr(value.eventType, 100) } : {}),
+    ...(optionalStr(value.eventType, 100) !== undefined
+      ? { eventType: optionalStr(value.eventType, 100) }
+      : {}),
   };
 }
 
@@ -406,7 +431,11 @@ function normalizeSensitivity(value: unknown): EntitySensitivity | undefined {
   const cls = optionalStr(value.class, 100);
   const note = optionalStr(value.note, 2000);
   if (!cls || !note) return undefined;
-  return { class: cls, note, basisClaimIds: boundedStrArray(value.basisClaimIds, MAX_BASIS_CLAIM_IDS, 200) };
+  return {
+    class: cls,
+    note,
+    basisClaimIds: boundedStrArray(value.basisClaimIds, MAX_BASIS_CLAIM_IDS, 200),
+  };
 }
 
 function normalizeNotabilityBasisEntry(value: unknown): NotabilityBasisEntry | null {
@@ -414,15 +443,25 @@ function normalizeNotabilityBasisEntry(value: unknown): NotabilityBasisEntry | n
   const criterion = optionalStr(value.criterion, 100);
   const note = optionalStr(value.note, 2000);
   if (!criterion || !note) return null;
-  return { criterion, note, evidenceIds: boundedStrArray(value.evidenceIds, MAX_BASIS_CLAIM_IDS, 200) };
+  return {
+    criterion,
+    note,
+    evidenceIds: boundedStrArray(value.evidenceIds, MAX_BASIS_CLAIM_IDS, 200),
+  };
 }
 
 function normalizeGeoAnchor(value: unknown): GeoAnchor | undefined {
   if (!isObject(value)) return undefined;
   const lat = num(value.lat);
   const lng = num(value.lng);
-  if (lat === undefined || lng === undefined || lat < -90 || lat > 90 || lng < -180 || lng > 180) return undefined;
-  return { lat, lng, geohash: str(value.geohash, 20, ''), matchMethod: str(value.matchMethod, 100, '') };
+  if (lat === undefined || lng === undefined || lat < -90 || lat > 90 || lng < -180 || lng > 180)
+    return undefined;
+  return {
+    lat,
+    lng,
+    geohash: str(value.geohash, 20, ''),
+    matchMethod: str(value.matchMethod, 100, ''),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -516,7 +555,9 @@ export function normalizeEntity(value: unknown): Entity | null {
       : undefined;
   const locationPrecision =
     typeof value.locationPrecision === 'string' &&
-    (['city', 'neighborhood', 'campus', 'institution'] as readonly string[]).includes(value.locationPrecision)
+    (['city', 'neighborhood', 'campus', 'institution'] as readonly string[]).includes(
+      value.locationPrecision,
+    )
       ? (value.locationPrecision as Entity['locationPrecision'])
       : undefined;
 
@@ -531,7 +572,9 @@ export function normalizeEntity(value: unknown): Entity | null {
     eraBuckets: boundedStrArray(value.eraBuckets, MAX_ERA_BUCKETS, 20),
     notabilityLabels: boundedStrArray(value.notabilityLabels, MAX_NOTABILITY_LABELS, 300),
     ...(notabilityBasis.length > 0 ? { notabilityBasis } : {}),
-    ...(optionalStr(value.sensitivityClass, 100) ? { sensitivityClass: optionalStr(value.sensitivityClass, 100) } : {}),
+    ...(optionalStr(value.sensitivityClass, 100)
+      ? { sensitivityClass: optionalStr(value.sensitivityClass, 100) }
+      : {}),
     ...(sensitivity ? { sensitivity } : {}),
     topicTags: boundedStrArray(value.topicTags, MAX_TOPIC_TAGS, 100),
     topicIds: boundedStrArray(value.topicIds, MAX_TOPIC_IDS, 100),

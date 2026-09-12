@@ -13,7 +13,11 @@ import type {
 
 /** Replace em/en dashes in display strings (brand: no em dashes in UI copy). */
 export function plainDashCopy(value: string): string {
-  return value.replace(/\u2014/g, ' - ').replace(/\u2013/g, ' to ').replace(/\s{2,}/g, ' ').trim();
+  return value
+    .replace(/\u2014/g, ' - ')
+    .replace(/\u2013/g, ' to ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
 }
 
 function isPriority(value: unknown): value is ThemeImpactPriority {
@@ -50,9 +54,7 @@ function isSnapshot(value: unknown): value is ThemesCatalogSnapshot {
   if (value === null || typeof value !== 'object') return false;
   const snap = value as Record<string, unknown>;
   return (
-    typeof snap.version === 'string' &&
-    Array.isArray(snap.themes) &&
-    Array.isArray(snap.packets)
+    typeof snap.version === 'string' && Array.isArray(snap.themes) && Array.isArray(snap.packets)
   );
 }
 
@@ -69,13 +71,11 @@ export function loadThemesCatalog(): ThemesCatalogSnapshot {
       packets: [],
     };
   }
-  const themes = (catalogSeed.themes as readonly unknown[])
-    .filter(isThemeEntry)
-    .map((entry) => ({
-      ...entry,
-      title: plainDashCopy(entry.title),
-      lede: plainDashCopy(entry.lede),
-    }));
+  const themes = (catalogSeed.themes as readonly unknown[]).filter(isThemeEntry).map((entry) => ({
+    ...entry,
+    title: plainDashCopy(entry.title),
+    lede: plainDashCopy(entry.lede),
+  }));
   const packets = (catalogSeed.packets as readonly unknown[])
     .filter(isPacketView)
     .map((packet) => ({
@@ -88,8 +88,7 @@ export function loadThemesCatalog(): ThemesCatalogSnapshot {
     version: catalogSeed.version,
     generatedAt: catalogSeed.generatedAt,
     source: typeof catalogSeed.source === 'string' ? catalogSeed.source : 'curated-seed',
-    releaseId:
-      typeof catalogSeed.releaseId === 'string' ? catalogSeed.releaseId : 'unknown',
+    releaseId: typeof catalogSeed.releaseId === 'string' ? catalogSeed.releaseId : 'unknown',
     releaseLabel:
       typeof catalogSeed.releaseLabel === 'string'
         ? catalogSeed.releaseLabel
@@ -134,11 +133,15 @@ export function listCatalogRows(): readonly ThemesCatalogRow[] {
   return loadThemesCatalog().themes.map(toCatalogRow);
 }
 
-export function listP0Rows(rows: readonly ThemesCatalogRow[] = listCatalogRows()): readonly ThemesCatalogRow[] {
+export function listP0Rows(
+  rows: readonly ThemesCatalogRow[] = listCatalogRows(),
+): readonly ThemesCatalogRow[] {
   return rows.filter((row) => row.priority === 'P0');
 }
 
-export function listP1Rows(rows: readonly ThemesCatalogRow[] = listCatalogRows()): readonly ThemesCatalogRow[] {
+export function listP1Rows(
+  rows: readonly ThemesCatalogRow[] = listCatalogRows(),
+): readonly ThemesCatalogRow[] {
   return rows.filter((row) => row.priority === 'P1');
 }
 

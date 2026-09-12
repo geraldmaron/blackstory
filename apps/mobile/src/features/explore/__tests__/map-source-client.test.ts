@@ -3,7 +3,11 @@
  */
 import { applyFilters } from '../explore-filter';
 import { toExploreFeatures } from '../explore-feature';
-import { mapSourceV1ToFeatureCollection, fetchMapSource, type MapSourceDeps } from '../map-source-client';
+import {
+  mapSourceV1ToFeatureCollection,
+  fetchMapSource,
+  type MapSourceDeps,
+} from '../map-source-client';
 import type { MapSourceV1 } from '@repo/public-contracts/v1/map';
 
 describe('mapSourceV1ToFeatureCollection', () => {
@@ -259,7 +263,10 @@ describe('fetchMapSource', () => {
     const result = await fetchMapSource(
       makeDeps({
         transport: {
-          readJson: jest.fn(async () => ({ kind: 'ok' as const, data: { bad: true } })) as MapSourceDeps['transport']['readJson'],
+          readJson: jest.fn(async () => ({
+            kind: 'ok' as const,
+            data: { bad: true },
+          })) as MapSourceDeps['transport']['readJson'],
         },
         releaseCache: {
           getActiveStamp: jest.fn(async () => 'rel_stale'),

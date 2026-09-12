@@ -70,7 +70,11 @@ export function RecordBeatRow({
           {...(accessibilityLabel ? { accessibilityLabel } : {})}
           hitSlop={8}
           onPress={onPress}
-          style={({ pressed }) => [valueStyle, styles.pressableValue, pressed ? styles.pressed : null]}
+          style={({ pressed }) => [
+            valueStyle,
+            styles.pressableValue,
+            pressed ? styles.pressed : null,
+          ]}
         >
           {body}
         </Pressable>

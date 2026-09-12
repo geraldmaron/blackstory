@@ -97,18 +97,19 @@ describe('national west-coast clearance', () => {
     expect(nationalBoundsClearWestCoast()).toBe(true);
     expect(US_BOUNDS[0]).toBeLessThanOrEqual(WEST_COAST_CLEARANCE_LNG - 0.5);
     // Cape Mendocino-scale coast must be inside US_BBOX for isInBounds callers.
-    expect(isInBounds([WEST_COAST_CLEARANCE_LNG, 40.4], {
-      west: US_BOUNDS[0],
-      south: US_BOUNDS[1],
-      east: US_BOUNDS[2],
-      north: US_BOUNDS[3],
-    })).toBe(true);
+    expect(
+      isInBounds([WEST_COAST_CLEARANCE_LNG, 40.4], {
+        west: US_BOUNDS[0],
+        south: US_BOUNDS[1],
+        east: US_BOUNDS[2],
+        north: US_BOUNDS[3],
+      }),
+    ).toBe(true);
   });
 
   it('allows MAP_MIN_ZOOM low enough to frame CONUS on a portrait phone width', () => {
     // iPhone-class width minus left/right view padding (mast/peek are vertical).
-    const usableWidth =
-      390 - EXPLORE_MAP_VIEW_PADDING.left - EXPLORE_MAP_VIEW_PADDING.right;
+    const usableWidth = 390 - EXPLORE_MAP_VIEW_PADDING.left - EXPLORE_MAP_VIEW_PADDING.right;
     const required = minZoomToFrameLngSpan(boundsLngSpan(US_BOUNDS), usableWidth);
     expect(required).toBeLessThan(3);
     expect(MAP_MIN_ZOOM).toBeLessThanOrEqual(required);
@@ -137,7 +138,10 @@ describe('cameraForPreset', () => {
 
   it('never emits a zoom above MAP_MAX_ZOOM for any preset', () => {
     for (const preset of ['national', 'state', 'locality', 'point'] as const) {
-      const target = cameraForPreset(preset, { point: [-95.37, 29.76], coordinates: [[-95.37, 29.76]] });
+      const target = cameraForPreset(preset, {
+        point: [-95.37, 29.76],
+        coordinates: [[-95.37, 29.76]],
+      });
       if (target.kind === 'center') expect(target.zoom).toBeLessThanOrEqual(MAP_MAX_ZOOM);
     }
   });
@@ -166,11 +170,19 @@ describe('precision guards (de-redaction defense)', () => {
   it('counts decimal places and finds the coarsest', () => {
     expect(coordinateDecimals([-95.37, 29.76])).toBe(2);
     expect(coordinateDecimals([-95.369803, 29.76])).toBe(6);
-    expect(coarsestDecimals([[-95.37, 29.76], [-95.369803, 29.760427]])).toBe(2);
+    expect(
+      coarsestDecimals([
+        [-95.37, 29.76],
+        [-95.369803, 29.760427],
+      ]),
+    ).toBe(2);
   });
 
   it('flags a derived point that is MORE precise than the coarsest input', () => {
-    const sources: LngLat[] = [[-95.37, 29.76], [-77.04, 38.9]];
+    const sources: LngLat[] = [
+      [-95.37, 29.76],
+      [-77.04, 38.9],
+    ];
     expect(isNoMorePreciseThan([-86.205, 34.33], sources)).toBe(false); // 3 dp > 2 dp
     expect(isNoMorePreciseThan([-86.2, 34.3], sources)).toBe(true);
   });

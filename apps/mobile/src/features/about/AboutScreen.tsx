@@ -129,7 +129,10 @@ export function AboutScreen() {
                 style={[
                   styles.beat,
                   index < ABOUT_MISSION_BEATS.length - 1
-                    ? { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.border }
+                    ? {
+                        borderBottomWidth: StyleSheet.hairlineWidth,
+                        borderBottomColor: theme.border,
+                      }
                     : null,
                 ]}
                 accessibilityRole="text"

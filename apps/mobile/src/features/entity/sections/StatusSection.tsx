@@ -14,7 +14,10 @@ export type StatusSectionProps = {
   readonly index: string;
 };
 
-function formatEventWindowLabel(startAt: string | undefined, endAt: string | null | undefined): string {
+function formatEventWindowLabel(
+  startAt: string | undefined,
+  endAt: string | null | undefined,
+): string {
   if (!startAt) return 'Undated';
   if (!endAt) return startAt;
   return `${startAt} to ${endAt}`;
@@ -37,7 +40,9 @@ export function StatusSection({ entity, index }: StatusSectionProps) {
             <>
               <Text variant="body">
                 {formatEventWindowLabel(entity.eventWindow.startAt, entity.eventWindow.endAt)}
-                {entity.eventWindow.eventType ? ` · ${humanizeToken(entity.eventWindow.eventType)}` : ''}
+                {entity.eventWindow.eventType
+                  ? ` · ${humanizeToken(entity.eventWindow.eventType)}`
+                  : ''}
               </Text>
               <Text variant="caption" colorRole="inkMuted">
                 {datePrecisionCaption(entity.eventWindow.datePrecision)}

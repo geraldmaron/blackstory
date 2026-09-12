@@ -2,7 +2,11 @@
  * Unit tests for Data formatters and fixture snapshot integrity.
  */
 import { formatCount, formatDataValue } from '../format';
-import { DATA_INDICATOR_FIXTURE_BUNDLE, getDataPageModel, PHASE1_COVERAGE_SUMMARY } from '../indicator-snapshot';
+import {
+  DATA_INDICATOR_FIXTURE_BUNDLE,
+  getDataPageModel,
+  PHASE1_COVERAGE_SUMMARY,
+} from '../indicator-snapshot';
 
 describe('formatDataValue', () => {
   it('formats USD without cents', () => {

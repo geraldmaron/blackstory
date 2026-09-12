@@ -45,7 +45,11 @@ export interface ContentRendererProps {
   readonly onViewCurrent?: () => void;
   /** When true, title/dek/facts render in the parent edition panel instead. */
   readonly hideTitle?: boolean;
-  readonly headerFacts?: readonly { readonly key: string; readonly label: string; readonly value: string }[];
+  readonly headerFacts?: readonly {
+    readonly key: string;
+    readonly label: string;
+    readonly value: string;
+  }[];
 }
 
 function formatRelativeTime(fetchedAtMs: number, nowMs: number = Date.now()): string {
@@ -97,7 +101,13 @@ function Block({
 function SourcesList({ sources }: { readonly sources: readonly CitationV1[] }) {
   return (
     <View style={{ marginTop: space['4'], gap: space['1'] }} accessible={false}>
-      <Text variant="sectionLabel" colorRole="inkMuted" isHeading accessibilityRole="header" style={{ letterSpacing: 1, textTransform: 'uppercase' }}>
+      <Text
+        variant="sectionLabel"
+        colorRole="inkMuted"
+        isHeading
+        accessibilityRole="header"
+        style={{ letterSpacing: 1, textTransform: 'uppercase' }}
+      >
         Sources
       </Text>
       {sources.map((source, index) => {
@@ -138,17 +148,15 @@ export function ContentRenderer({
   const hasSources = Boolean(sources && sources.length > 0);
   const isLongform = presentation === 'longform';
   const showCacheNotice = cached && (!isLongform || cached.degraded);
-  const facts =
-    headerFacts ??
-    [
-      ...(page.eraLabel
-        ? [{ key: 'era', label: 'Era', value: plainRangeText(page.eraLabel) }]
-        : []),
-      ...(page.placeLabel ? [{ key: 'where', label: 'Where', value: page.placeLabel }] : []),
-    ];
+  const facts = headerFacts ?? [
+    ...(page.eraLabel ? [{ key: 'era', label: 'Era', value: plainRangeText(page.eraLabel) }] : []),
+    ...(page.placeLabel ? [{ key: 'where', label: 'Where', value: page.placeLabel }] : []),
+  ];
 
   return (
-    <View style={{ gap: isLongform ? space['2'] : space['1'], maxWidth: isLongform ? 672 : undefined }}>
+    <View
+      style={{ gap: isLongform ? space['2'] : space['1'], maxWidth: isLongform ? 672 : undefined }}
+    >
       {!hideTitle ? (
         <>
           <Text variant="entityTitle" isHeading>

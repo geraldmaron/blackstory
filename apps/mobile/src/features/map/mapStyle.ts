@@ -35,7 +35,10 @@ export {
   ENTITY_CLUSTER_LAYER_STYLE,
   kindColorExpression,
 } from './entity-paint';
-export { MARKER_RADIUS_MIN as ENTITY_POINT_RADIUS_MIN, MARKER_RADIUS_MAX as ENTITY_POINT_RADIUS_MAX } from './marker-size';
+export {
+  MARKER_RADIUS_MIN as ENTITY_POINT_RADIUS_MIN,
+  MARKER_RADIUS_MAX as ENTITY_POINT_RADIUS_MAX,
+} from './marker-size';
 /** Cluster radius zoom-scaled step expression (web v6: 10/14/18/22 at z≥9). */
 export const ENTITY_CLUSTER_RADIUS_EXPR = clusterRadiusZoomExpression();
 
@@ -154,17 +157,7 @@ function openMapTilesArchiveLayers(sourceId: string): readonly Record<string, un
       'source-layer': 'water',
       paint: {
         'line-color': DIGNITY_PALETTE.coastline,
-        'line-width': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          2,
-          0.7,
-          4,
-          1.05,
-          7,
-          1.35,
-        ],
+        'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.7, 4, 1.05, 7, 1.35],
         'line-opacity': 0.9,
       },
     },
@@ -173,24 +166,10 @@ function openMapTilesArchiveLayers(sourceId: string): readonly Record<string, un
       type: 'line',
       source: sourceId,
       'source-layer': 'boundary',
-      filter: [
-        'all',
-        ['<=', ['get', 'admin_level'], 4],
-        ['!=', ['get', 'maritime'], 1],
-      ],
+      filter: ['all', ['<=', ['get', 'admin_level'], 4], ['!=', ['get', 'maritime'], 1]],
       paint: {
         'line-color': DIGNITY_PALETTE.pointHalo,
-        'line-width': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          3,
-          0.55,
-          6,
-          0.9,
-          9,
-          1.15,
-        ],
+        'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.55, 6, 0.9, 9, 1.15],
         'line-opacity': 0.78,
       },
     },
@@ -204,17 +183,7 @@ function openMapTilesArchiveLayers(sourceId: string): readonly Record<string, un
       layout: { 'line-cap': 'round', 'line-join': 'round' },
       paint: {
         'line-color': DIGNITY_PALETTE.streetCasing,
-        'line-width': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          8,
-          1.2,
-          11,
-          2.4,
-          12,
-          3.2,
-        ],
+        'line-width': ['interpolate', ['linear'], ['zoom'], 8, 1.2, 11, 2.4, 12, 3.2],
       },
     },
     {
@@ -227,17 +196,7 @@ function openMapTilesArchiveLayers(sourceId: string): readonly Record<string, un
       layout: { 'line-cap': 'round', 'line-join': 'round' },
       paint: {
         'line-color': DIGNITY_PALETTE.street,
-        'line-width': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          8,
-          0.6,
-          11,
-          1.2,
-          12,
-          1.8,
-        ],
+        'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0.6, 11, 1.2, 12, 1.8],
       },
     },
     {
@@ -250,17 +209,7 @@ function openMapTilesArchiveLayers(sourceId: string): readonly Record<string, un
       layout: {
         'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
         'text-font': [...MAP_LABEL_TEXT_FONT],
-        'text-size': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          2,
-          11,
-          4,
-          12,
-          6,
-          12,
-        ],
+        'text-size': ['interpolate', ['linear'], ['zoom'], 2, 11, 4, 12, 6, 12],
         'text-transform': 'uppercase',
         'text-letter-spacing': 0.06,
         'text-max-width': 8,
@@ -289,17 +238,7 @@ function openMapTilesArchiveLayers(sourceId: string): readonly Record<string, un
       layout: {
         'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
         'text-font': [...MAP_LABEL_TEXT_FONT],
-        'text-size': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          5,
-          10,
-          9,
-          12,
-          12,
-          13,
-        ],
+        'text-size': ['interpolate', ['linear'], ['zoom'], 5, 10, 9, 12, 12, 13],
         'text-max-width': 8,
         'text-allow-overlap': false,
         'text-optional': true,
@@ -308,17 +247,7 @@ function openMapTilesArchiveLayers(sourceId: string): readonly Record<string, un
         'text-color': DIGNITY_PALETTE.placeLabel,
         'text-halo-color': DIGNITY_PALETTE.placeLabelHalo,
         'text-halo-width': 1,
-        'text-opacity': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          5,
-          0.45,
-          7,
-          0.7,
-          10,
-          0.85,
-        ],
+        'text-opacity': ['interpolate', ['linear'], ['zoom'], 5, 0.45, 7, 0.7, 10, 0.85],
       },
     },
     {
@@ -456,7 +385,10 @@ function isDensityKeyedColorRamp(color: unknown): boolean {
 /**
  * Dignity guard: no heatmap layer and no density-keyed color ramps on entity points.
  */
-export function assertNoHeatmapRegister(style: MapStyleSpec, pointPaint: Record<string, unknown>): void {
+export function assertNoHeatmapRegister(
+  style: MapStyleSpec,
+  pointPaint: Record<string, unknown>,
+): void {
   for (const layer of style.layers) {
     if ((layer as { type?: string }).type === 'heatmap') {
       throw new Error('Dignity invariant violated: heatmap layer is forbidden on the archive map.');

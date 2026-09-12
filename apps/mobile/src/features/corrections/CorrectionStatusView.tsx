@@ -96,7 +96,9 @@ function StatusOutcome({ result }: { readonly result: StatusResult }) {
     case 'not_found':
       return <Notice tone="warning" title="Not found" description={STATUS_NOT_FOUND_MESSAGE} />;
     case 'invalid_code':
-      return <Notice tone="warning" title="Check the code" description={STATUS_INVALID_CODE_MESSAGE} />;
+      return (
+        <Notice tone="warning" title="Check the code" description={STATUS_INVALID_CODE_MESSAGE} />
+      );
     case 'offline':
       return (
         <Notice

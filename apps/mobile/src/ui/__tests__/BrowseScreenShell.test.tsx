@@ -40,4 +40,3 @@ describe('BrowseScreenShell', () => {
     expect(getByText('Section body')).toBeTruthy();
   });
 });
-

@@ -100,7 +100,10 @@ const MORE_PRESENTATION: Readonly<Record<string, MoreRowPresentation>> = Object.
   errata: { line: 'Mistakes the archive found and published', route: '/errata' },
 
   submit: { line: 'Point the archive at something it has missed', route: '/submit' },
-  corrections: { line: 'Tell the archive it is wrong; you get a receipt', route: '/corrections/submit' },
+  corrections: {
+    line: 'Tell the archive it is wrong; you get a receipt',
+    route: '/corrections/submit',
+  },
   support: { line: 'How to get an answer, and how long it takes' },
 
   privacy: { line: 'What this app collects, and what it does not', route: '/privacy' },

@@ -16,9 +16,7 @@ export function FeaturedStoryCard({ entry, onPress }: FeaturedStoryCardProps) {
   const { page } = entry;
   const theme = useThemeColors();
   const facts = [
-    ...(page.eraLabel
-      ? [{ key: 'era', label: 'Era', value: plainRangeText(page.eraLabel) }]
-      : []),
+    ...(page.eraLabel ? [{ key: 'era', label: 'Era', value: plainRangeText(page.eraLabel) }] : []),
     ...(page.placeLabel ? [{ key: 'where', label: 'Where', value: page.placeLabel }] : []),
   ];
 
@@ -28,7 +26,10 @@ export function FeaturedStoryCard({ entry, onPress }: FeaturedStoryCardProps) {
       accessibilityLabel={`Featured story: ${page.title}`}
       onPress={onPress}
       android_ripple={{ color: theme.border }}
-      style={({ pressed }) => [styles.pressable, { backgroundColor: pressed ? theme.surfacePressed : 'transparent' }]}
+      style={({ pressed }) => [
+        styles.pressable,
+        { backgroundColor: pressed ? theme.surfacePressed : 'transparent' },
+      ]}
     >
       <View style={styles.inner}>
         {facts.length > 0 ? <RecordFactStrip facts={facts} valueVariant="bodySmall" /> : null}

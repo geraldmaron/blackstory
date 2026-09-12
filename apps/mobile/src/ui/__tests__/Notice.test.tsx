@@ -7,7 +7,9 @@ function flattenStyle(style: ViewStyle | TextStyle | undefined): (ViewStyle | Te
   if (!style) return [];
   const items = Array.isArray(style) ? style : [style];
   return items.flatMap((item) =>
-    item && typeof item === 'object' && !Array.isArray(item) ? [item] : flattenStyle(item as ViewStyle),
+    item && typeof item === 'object' && !Array.isArray(item)
+      ? [item]
+      : flattenStyle(item as ViewStyle),
   );
 }
 
@@ -30,7 +32,12 @@ describe('Notice', () => {
 
   it('applies compact spacing and readable description type', async () => {
     const { getByRole, getByText } = await render(
-      <Notice compact tone="warning" title="Live data unavailable" description="Start api-public" />,
+      <Notice
+        compact
+        tone="warning"
+        title="Live data unavailable"
+        description="Start api-public"
+      />,
     );
 
     const banner = getByRole('alert');

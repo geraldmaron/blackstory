@@ -4,9 +4,7 @@
     "target": {
       "namespace": "android_app",
       "package_name": "app.blackstory.mobile",
-      "sha256_cert_fingerprints": [
-        "TODO_REPLACE_WITH_REAL_RELEASE_SIGNING_SHA256_FINGERPRINT"
-      ]
+      "sha256_cert_fingerprints": ["TODO_REPLACE_WITH_REAL_RELEASE_SIGNING_SHA256_FINGERPRINT"]
     }
   }
 ]

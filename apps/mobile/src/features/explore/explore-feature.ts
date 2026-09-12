@@ -79,8 +79,8 @@ export type ExploreFeature = {
 
 /** Human subtitle for a row: "Kind · State" when both are known. */
 export function featureSubtitle(feature: ExploreFeature): string {
-  const parts = [feature.properties.stateName, capitalize(feature.kind)].filter(
-    (p): p is string => Boolean(p),
+  const parts = [feature.properties.stateName, capitalize(feature.kind)].filter((p): p is string =>
+    Boolean(p),
   );
   return parts.join(' · ');
 }
@@ -116,9 +116,7 @@ export function toExploreFeatures(source: MapFeatureCollection): readonly Explor
  * properties pass through unchanged so redaction guarantees stay intact.
  * Used so filtered catalog pins match the records rail / count mast.
  */
-export function toMapFeatureCollection(
-  features: readonly ExploreFeature[],
-): MapFeatureCollection {
+export function toMapFeatureCollection(features: readonly ExploreFeature[]): MapFeatureCollection {
   return {
     type: 'FeatureCollection',
     features: features.map((feature) => ({

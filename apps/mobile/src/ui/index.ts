@@ -13,7 +13,12 @@ export { Divider, type DividerProps } from './Divider';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { ErrorState, type ErrorStateProps } from './ErrorState';
 export { Image, type ImageProps } from './Image';
-export { EntityMark, type EntityMarkProps, type EntityMarkShape, type EntityMarkReason } from './EntityMark';
+export {
+  EntityMark,
+  type EntityMarkProps,
+  type EntityMarkShape,
+  type EntityMarkReason,
+} from './EntityMark';
 export { Logo, logoClearSpaceDp, type LogoProps } from './Logo';
 export { LiftedSurface, type LiftedSurfaceProps } from './LiftedSurface';
 export { ListRow, type ListRowProps, type ListRowDensity } from './ListRow';
@@ -36,7 +41,11 @@ export { EditionSurfaceStack, type EditionSurfaceStackProps } from './EditionSur
 export { LedgerRow, type LedgerRowProps } from './LedgerRow';
 export { LedgerSectionLabel, type LedgerSectionLabelProps } from './LedgerSectionLabel';
 export { EditionFactCell, type EditionFactCellProps } from './EditionFactCell';
-export { RecordFactStrip, type RecordFactStripItem, type RecordFactStripProps } from './RecordFactStrip';
+export {
+  RecordFactStrip,
+  type RecordFactStripItem,
+  type RecordFactStripProps,
+} from './RecordFactStrip';
 export { RecordMeter, type RecordMeterProps } from './RecordMeter';
 export {
   UtilityScreenShell,

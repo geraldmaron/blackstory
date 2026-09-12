@@ -7,17 +7,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import { Text, space, radius, MIN_TOUCH_TARGET, Z_LAYER } from '@/ui';
 import { hasActiveFilters, type FilterState } from '@/lib/route-params';
-import {
-  exploreContentInset,
-  useExploreChromeColors,
-  MAP_GHOST_PRESSED,
-} from './explore-chrome';
+import { exploreContentInset, useExploreChromeColors, MAP_GHOST_PRESSED } from './explore-chrome';
 import { formatExploreCountLabel } from './explore-count-label';
 import { activeFilterCount } from './active-filter-chips';
-import {
-  shouldShowSparseViewportCoach,
-  SPARSE_VIEWPORT_COACH_COPY,
-} from './sparse-viewport-coach';
+import { shouldShowSparseViewportCoach, SPARSE_VIEWPORT_COACH_COPY } from './sparse-viewport-coach';
 
 const ICON_SIZE = 18;
 const GHOST_SIZE = MIN_TOUCH_TARGET;
@@ -165,10 +158,7 @@ export function ExploreFloatingChrome({
               "4,154..." one size up) — dropping the very number the chip exists
               to show (explore-count-label.ts). Wrapping trades a taller chip for
               keeping both counts at every Dynamic Type size. */}
-          <Text
-            variant="caption"
-            style={[styles.countInline, { color: chrome.mapAccent }]}
-          >
+          <Text variant="caption" style={[styles.countInline, { color: chrome.mapAccent }]}>
             {countLabel.railInline}
           </Text>
         </View>
@@ -198,9 +188,7 @@ export function ExploreFloatingChrome({
           />
           <GhostIconButton
             icon="list-outline"
-            accessibilityLabel={
-              recordsExpanded ? 'Collapse records rail' : 'Expand records rail'
-            }
+            accessibilityLabel={recordsExpanded ? 'Collapse records rail' : 'Expand records rail'}
             onPress={() => onToggleRecords?.()}
             selected={recordsExpanded}
             testID="explore-chip-records"

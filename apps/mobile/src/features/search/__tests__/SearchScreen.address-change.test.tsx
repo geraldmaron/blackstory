@@ -8,7 +8,13 @@
  */
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { SearchScreen } from '../SearchScreen';
-import { buildRuntime, fakeReleaseCache, flushMicrotasks, makeControllableTransport, page } from '../test-support';
+import {
+  buildRuntime,
+  fakeReleaseCache,
+  flushMicrotasks,
+  makeControllableTransport,
+  page,
+} from '../test-support';
 
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), setParams: jest.fn() },
@@ -75,7 +81,9 @@ describe('SearchScreen — the address changing under a mounted screen', () => {
     await flushMicrotasks(10);
 
     expect(getByLabelText('Search').props.value).toBe('dunbar');
-    await waitFor(() => expect(calls.some((c) => c.includes('q=dunbar'))).toBe(true), { timeout: 2000 });
+    await waitFor(() => expect(calls.some((c) => c.includes('q=dunbar'))).toBe(true), {
+      timeout: 2000,
+    });
     expect(calls.some((c) => c.includes('kind=school'))).toBe(true);
     resolveNext(page());
     await waitFor(() => expect(getByLabelText('Schools, selected')).toBeTruthy());
@@ -94,7 +102,9 @@ describe('SearchScreen — the address changing under a mounted screen', () => {
     await flushMicrotasks(10);
 
     fireEvent.changeText(getByLabelText('Search'), 'dun');
-    await waitFor(() => expect(calls.some((c) => c.includes('q=dun'))).toBe(true), { timeout: 2000 });
+    await waitFor(() => expect(calls.some((c) => c.includes('q=dun'))).toBe(true), {
+      timeout: 2000,
+    });
     resolveNext(page());
     await waitFor(() =>
       expect(router.setParams).toHaveBeenCalledWith(expect.objectContaining({ q: 'dun' })),
@@ -107,7 +117,9 @@ describe('SearchScreen — the address changing under a mounted screen', () => {
     expect(getByLabelText('Search').props.value).toBe('dunbar');
 
     // Settle the request the second keystroke started, so it cannot resolve into the next test.
-    await waitFor(() => expect(calls.some((c) => c.includes('q=dunbar'))).toBe(true), { timeout: 2000 });
+    await waitFor(() => expect(calls.some((c) => c.includes('q=dunbar'))).toBe(true), {
+      timeout: 2000,
+    });
     resolveNext(page());
     await waitFor(() =>
       expect(router.setParams).toHaveBeenCalledWith(expect.objectContaining({ q: 'dunbar' })),
@@ -117,5 +129,4 @@ describe('SearchScreen — the address changing under a mounted screen', () => {
     await waitFor(() => expect(recentAdds).toContain('dunbar'));
     unmount();
   });
-
 });

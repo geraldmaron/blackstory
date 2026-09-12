@@ -75,10 +75,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  * misconfigured rate can never accidentally sample nothing or everything by
  * a floating-point edge case).
  */
-export function shouldSamplePerfTrace(
-  rate: number,
-  random: () => number = Math.random,
-): boolean {
+export function shouldSamplePerfTrace(rate: number, random: () => number = Math.random): boolean {
   if (!Number.isFinite(rate) || rate <= 0) {
     return false;
   }

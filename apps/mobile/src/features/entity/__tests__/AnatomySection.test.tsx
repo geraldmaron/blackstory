@@ -2,7 +2,11 @@
  * Record anatomy section: v6 edition panel, fact grid, place preview, maps hand-off.
  */
 import { fireEvent, render } from '@testing-library/react-native';
-import { AnatomySection, anatomyFactLabelColumnWidth, anatomyFactRowStyle } from '../sections/AnatomySection';
+import {
+  AnatomySection,
+  anatomyFactLabelColumnWidth,
+  anatomyFactRowStyle,
+} from '../sections/AnatomySection';
 import { normalizeEntity } from '../normalize';
 import { fullEntityFixture, minimalEntityFixture } from '../testFixtures';
 
@@ -63,7 +67,9 @@ describe('AnatomySection', () => {
     const { getAllByLabelText, getByLabelText } = await render(
       <AnatomySection entity={entity} onBackToMap={onBackToMap} />,
     );
-    expect(getAllByLabelText(/Open Historic Dunbar neighborhood in Maps/).length).toBeGreaterThan(0);
+    expect(getAllByLabelText(/Open Historic Dunbar neighborhood in Maps/).length).toBeGreaterThan(
+      0,
+    );
     fireEvent.press(getByLabelText(/View Full Fixture Record \(place\) on the national map/));
     expect(onBackToMap).toHaveBeenCalledTimes(1);
   });

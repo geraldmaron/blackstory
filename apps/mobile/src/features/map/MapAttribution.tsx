@@ -24,10 +24,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { duration, MIN_TOUCH_TARGET, radius, space, Text } from '@/ui';
 import { MAP_GHOST_BG, MAP_GHOST_BORDER, MAP_GHOST_PRESSED, MAP_INK_MUTED } from './map-plate-ink';
-import {
-  MAP_ATTRIBUTION_LINES,
-  MAP_ATTRIBUTION_LINES_COMPACT,
-} from './mapConfig';
+import { MAP_ATTRIBUTION_LINES, MAP_ATTRIBUTION_LINES_COMPACT } from './mapConfig';
 
 /**
  * Default bottom offset when Explore is not hosting the map (standalone MapScreen).

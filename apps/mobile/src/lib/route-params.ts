@@ -140,7 +140,8 @@ function looksLikeExternalTarget(value: string): boolean {
   if (normalized === '') return false;
   if (/^[a-z][a-z0-9+.-]*:/i.test(normalized)) return true; // any scheme prefix, e.g. https:, javascript:
   if (normalized.startsWith('//')) return true; // protocol-relative
-  if (normalized.startsWith('\\\\') || normalized.startsWith('/\\') || normalized.startsWith('\\/')) return true;
+  if (normalized.startsWith('\\\\') || normalized.startsWith('/\\') || normalized.startsWith('\\/'))
+    return true;
   return false;
 }
 
@@ -295,10 +296,7 @@ function parseEraParam(raw: unknown): string | undefined {
   return trimmed;
 }
 
-function parseSelectParam(
-  raw: unknown,
-  validate: (value: string) => boolean,
-): string | undefined {
+function parseSelectParam(raw: unknown, validate: (value: string) => boolean): string | undefined {
   const value = firstOf(raw);
   if (typeof value !== 'string') return undefined;
   const decoded = safeDecodeRepeated(value);

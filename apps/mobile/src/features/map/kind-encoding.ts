@@ -36,12 +36,7 @@ export type MapKind =
 export type MapSemanticTone = 'massacre' | 'plantation' | 'epicenter';
 
 export type MapKindFamily =
-  | 'people'
-  | 'places'
-  | 'organizations'
-  | 'events'
-  | 'sources'
-  | 'inventions';
+  'people' | 'places' | 'organizations' | 'events' | 'sources' | 'inventions';
 
 export type KindFamilyEncodingEntry = KindEncodingEntry & {
   readonly kinds: readonly MapKind[];
@@ -217,10 +212,7 @@ export type MapToneSource = {
 };
 
 export function resolveMapTone(source: MapToneSource): MapSemanticTone | undefined {
-  const fromTopics = mapToneFromTopics([
-    ...(source.topicTags ?? []),
-    ...(source.topicIds ?? []),
-  ]);
+  const fromTopics = mapToneFromTopics([...(source.topicTags ?? []), ...(source.topicIds ?? [])]);
   if (fromTopics) return fromTopics;
 
   const name = (source.displayName ?? '').trim();
@@ -246,9 +238,7 @@ export const KIND_ENCODING_ENTRIES: readonly (readonly [
 export const KIND_FAMILY_ENTRIES: readonly (readonly [
   family: MapKindFamily,
   entry: KindFamilyEncodingEntry,
-])[] = KNOWN_KIND_FAMILIES.map(
-  (family) => [family, MAP_KIND_FAMILY_ENCODING[family]] as const,
-);
+])[] = KNOWN_KIND_FAMILIES.map((family) => [family, MAP_KIND_FAMILY_ENCODING[family]] as const);
 
 export const SEMANTIC_TONE_ENTRIES: readonly (readonly [
   tone: MapSemanticTone,

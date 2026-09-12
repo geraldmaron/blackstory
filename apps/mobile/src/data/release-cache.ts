@@ -43,7 +43,10 @@ export interface CachedRead<T> {
 export const MAX_CACHED_ENTRY_BYTES = 4 * 1024 * 1024;
 
 export class ArtifactVerificationError extends Error {
-  constructor(readonly expected: string, readonly actual: string) {
+  constructor(
+    readonly expected: string,
+    readonly actual: string,
+  ) {
     super('artifact hash mismatch — rejecting fetched artifact, keeping last-known-good');
     this.name = 'ArtifactVerificationError';
   }

@@ -8,18 +8,9 @@
  * the general SQLite cache, crash breadcrumbs, or a URL/route param
  * (invariant 7).
  */
-export {
-  CorrectionForm,
-  type CorrectionFormProps,
-} from './CorrectionForm';
-export {
-  CorrectionReceipt,
-  type CorrectionReceiptProps,
-} from './CorrectionReceipt';
-export {
-  CorrectionStatusView,
-  type CorrectionStatusViewProps,
-} from './CorrectionStatusView';
+export { CorrectionForm, type CorrectionFormProps } from './CorrectionForm';
+export { CorrectionReceipt, type CorrectionReceiptProps } from './CorrectionReceipt';
+export { CorrectionStatusView, type CorrectionStatusViewProps } from './CorrectionStatusView';
 export {
   submitCorrection,
   lookupCorrectionStatus,

@@ -13,11 +13,7 @@ import { useAppRuntimeOptional, useRefreshBootstrapSync } from '@/runtime';
 import { DEFAULT_API_BASE_URL, resolveApiBaseUrl } from '@/security';
 import { DEMO_MAP_SOURCE, type MapFeatureCollection } from '@/features/map/demoMapSource';
 import type { MapLoadState } from '@/features/map/mapLoadState';
-import {
-  fetchMapSource,
-  type MapSourceDeps,
-  type MapSourceFetchResult,
-} from './map-source-client';
+import { fetchMapSource, type MapSourceDeps, type MapSourceFetchResult } from './map-source-client';
 
 export type ExploreMapSourceState = {
   readonly source: MapFeatureCollection;
@@ -46,10 +42,7 @@ function emptySource(): MapFeatureCollection {
   return { type: 'FeatureCollection', features: [] };
 }
 
-function toViewState(
-  result: MapSourceFetchResult,
-  retry: () => void,
-): ExploreMapSourceState {
+function toViewState(result: MapSourceFetchResult, retry: () => void): ExploreMapSourceState {
   if (result.status === 'ready') {
     return {
       source: result.source,

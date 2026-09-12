@@ -242,9 +242,7 @@ export const EXPLORE_FACET_ROWS = [
   readonly field: keyof ExploreFacetOptions;
 }[];
 
-export function buildExploreFacetOptions(
-  features: readonly ExploreFeature[],
-): ExploreFacetOptions {
+export function buildExploreFacetOptions(features: readonly ExploreFeature[]): ExploreFacetOptions {
   return {
     kind: toOptions(
       'kind',
@@ -253,7 +251,9 @@ export function buildExploreFacetOptions(
     ),
     tone: toOptions(
       'tone',
-      countBy(features, (feature) => (feature.properties.mapTone ? [feature.properties.mapTone] : [])),
+      countBy(features, (feature) =>
+        feature.properties.mapTone ? [feature.properties.mapTone] : [],
+      ),
       'All tones',
     ),
     era: toOptions(
@@ -279,7 +279,9 @@ export function buildExploreFacetOptions(
     state: toOptions(
       'state',
       countBy(features, (feature) =>
-        feature.properties.statePostalCode ? [feature.properties.statePostalCode.trim().toUpperCase()] : [],
+        feature.properties.statePostalCode
+          ? [feature.properties.statePostalCode.trim().toUpperCase()]
+          : [],
       ),
       'All states',
     ),

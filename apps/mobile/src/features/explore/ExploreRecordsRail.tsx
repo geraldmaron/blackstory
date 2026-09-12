@@ -59,10 +59,7 @@ const RecordRow = memo(function RecordRow({
   const story = exploreStoryMeta(feature);
   // The row is one accessible element, so the meter is decorative and the sentence it would have
   // spoken is composed into the row's own label instead.
-  const a11yMeta = [
-    story.caption,
-    evidenceMeterLabel(story.confidenceTier, story.sourceCount),
-  ]
+  const a11yMeta = [story.caption, evidenceMeterLabel(story.confidenceTier, story.sourceCount)]
     .filter(Boolean)
     .join('. ');
 
@@ -83,7 +80,12 @@ const RecordRow = memo(function RecordRow({
         },
       ]}
     >
-      <View style={[styles.kindGlyph, { borderColor: theme.border, backgroundColor: theme.surfaceRaised }]}>
+      <View
+        style={[
+          styles.kindGlyph,
+          { borderColor: theme.border, backgroundColor: theme.surfaceRaised },
+        ]}
+      >
         <NavIcon name={navIconForEntityKind(feature.kind)} size={18} selected={selected} />
       </View>
       <View style={styles.rowText}>
@@ -138,11 +140,7 @@ export function ExploreRecordsRail({
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<ExploreFeature>) => (
-      <RecordRow
-        feature={item}
-        selected={item.entityId === selectedId}
-        onSelect={onSelect}
-      />
+      <RecordRow feature={item} selected={item.entityId === selectedId} onSelect={onSelect} />
     ),
     [onSelect, selectedId],
   );
@@ -226,7 +224,10 @@ export function ExploreRecordsRail({
     () => (
       <View testID="explore-records-empty" style={styles.emptyWrap}>
         <View
-          style={[styles.emptyGlyph, { borderColor: theme.border, backgroundColor: theme.surfaceRaised }]}
+          style={[
+            styles.emptyGlyph,
+            { borderColor: theme.border, backgroundColor: theme.surfaceRaised },
+          ]}
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
         >

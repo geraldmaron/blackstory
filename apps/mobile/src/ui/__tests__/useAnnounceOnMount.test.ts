@@ -12,7 +12,9 @@ import { useAnnounceOnMount } from '../useAnnounceOnMount';
 // A single persistent spy, cleared (not restored) before every test — this preset backs
 // `AccessibilityInfo`'s methods with module-level jest mocks, so re-spying per test would leave
 // an earlier test's call history visible to a later one.
-const announce = jest.spyOn(AccessibilityInfo, 'announceForAccessibility').mockImplementation(() => {});
+const announce = jest
+  .spyOn(AccessibilityInfo, 'announceForAccessibility')
+  .mockImplementation(() => {});
 
 beforeEach(() => {
   announce.mockClear();
@@ -36,9 +38,12 @@ describe('useAnnounceOnMount', () => {
   });
 
   it('never re-announces when the message changes after the initial mount (a relative "ago" label ticking, for example)', async () => {
-    const { rerender } = await renderHook(({ message }: { message: string }) => useAnnounceOnMount(message), {
-      initialProps: { message: 'Correction received 1 minute ago' },
-    });
+    const { rerender } = await renderHook(
+      ({ message }: { message: string }) => useAnnounceOnMount(message),
+      {
+        initialProps: { message: 'Correction received 1 minute ago' },
+      },
+    );
     expect(announce).toHaveBeenCalledTimes(1);
 
     await rerender({ message: 'Correction received 2 minutes ago' });

@@ -94,9 +94,10 @@ describe('ExploreFiltersPanel — structure', () => {
     expect(places.props.accessibilityRole).toBe('radio');
     expect(places.props.accessibilityState?.selected).toBe(false);
     const styleProp = places.props.style;
-    const resolved =
-      typeof styleProp === 'function' ? styleProp({ pressed: false }) : styleProp;
-    const flat = Array.isArray(resolved) ? Object.assign({}, ...resolved.filter(Boolean)) : resolved;
+    const resolved = typeof styleProp === 'function' ? styleProp({ pressed: false }) : styleProp;
+    const flat = Array.isArray(resolved)
+      ? Object.assign({}, ...resolved.filter(Boolean))
+      : resolved;
     expect(flat.minHeight).toBe(44);
     expect(flat.minWidth).toBe(44);
 

@@ -61,9 +61,7 @@ export function mapSourceV1ToFeatureCollection(source: MapSourceV1): MapFeatureC
       ...(feature.properties.eraBuckets.length > 0
         ? { eraBuckets: feature.properties.eraBuckets }
         : {}),
-      ...(feature.properties.oneLineStory
-        ? { oneLineStory: feature.properties.oneLineStory }
-        : {}),
+      ...(feature.properties.oneLineStory ? { oneLineStory: feature.properties.oneLineStory } : {}),
       ...(feature.properties.topicTags.length > 0
         ? { topicTags: feature.properties.topicTags }
         : {}),
@@ -88,9 +86,7 @@ export async function fetchMapSource(deps: MapSourceDeps): Promise<MapSourceFetc
   const now = deps.now ?? Date.now;
   const isOnline = deps.connectivity.isOnline();
 
-  const readCache = async (
-    degraded: boolean,
-  ): Promise<MapSourceFetchResult | undefined> => {
+  const readCache = async (degraded: boolean): Promise<MapSourceFetchResult | undefined> => {
     const activeStamp = (await deps.releaseCache.getActiveStamp()) ?? '';
     const cached = await deps.releaseCache.read<unknown>(MAP_NAMESPACE, MAP_CACHE_KEY, {
       activeStamp,

@@ -7,8 +7,7 @@ export const BOOKS_PAGE_DESCRIPTION =
 export const BOOKS_INTRO = {
   kicker: 'Reference',
   title: 'Banned books',
-  lede:
-    'Challenged and restricted titles tied to Black history and related reading. Each entry carries cited challenge reports and a path to look up the book. Not a complete national census; status can change.',
+  lede: 'Challenged and restricted titles tied to Black history and related reading. Each entry carries cited challenge reports and a path to look up the book. Not a complete national census; status can change.',
 } as const;
 
 export const BOOKS_CATALOG = {
@@ -28,8 +27,7 @@ export const BOOKS_CATALOG = {
 export const BOOKS_ABOUT = {
   kicker: 'About',
   title: 'How to read this list',
-  lede:
-    'Entries document reported school and library restrictions with public citations. State codes follow cited public reports, not a claim of statewide removal. Bookshop.org links use BlackStory affiliate referral to support independent bookstores.',
+  lede: 'Entries document reported school and library restrictions with public citations. State codes follow cited public reports, not a claim of statewide removal. Bookshop.org links use BlackStory affiliate referral to support independent bookstores.',
 } as const;
 
 export const BOOKS_DETAIL = {
@@ -45,7 +43,8 @@ export const BOOKS_DETAIL = {
   relatedTitle: 'More in this catalog',
   entityCta: 'Open linked place record',
   missingTitle: 'Book not found',
-  missingBody: 'That catalog entry is not in this release. Return to Banned books and pick another title.',
+  missingBody:
+    'That catalog entry is not in this release. Return to Banned books and pick another title.',
 } as const;
 
 /**

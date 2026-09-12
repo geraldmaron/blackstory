@@ -42,7 +42,11 @@ function whereLabelFor(entity: Entity): string {
     return entity.jurisdictionLabel.trim();
   }
   const location = entity.locationLabel.trim();
-  if (location.length > 0 && !/^unknown$/iu.test(location) && location.toLowerCase() !== 'unknown location') {
+  if (
+    location.length > 0 &&
+    !/^unknown$/iu.test(location) &&
+    location.toLowerCase() !== 'unknown location'
+  ) {
     return location;
   }
   return 'Place withheld';
@@ -88,7 +92,6 @@ export function entityEraFact(entity: Entity): { readonly label: string } {
   return { label: 'Undated' };
 }
 
-
 export function buildEntityAnatomyInputs(entity: Entity): EntityAnatomyInputs {
   const kindLabel = humanizeToken(entity.kind);
   const era = entityEraFact(entity);
@@ -96,10 +99,7 @@ export function buildEntityAnatomyInputs(entity: Entity): EntityAnatomyInputs {
   const claimCount = entity.claims.length;
   // A record with no accepted claims says the grade and stops. "Grade A · 0 sources" would be a
   // count of something the reader can then go and fail to find.
-  const evidenceLabel = buildEvidenceLabel(
-    evidenceTier,
-    claimCount === 0 ? undefined : claimCount,
-  );
+  const evidenceLabel = buildEvidenceLabel(evidenceTier, claimCount === 0 ? undefined : claimCount);
 
   return {
     kind: entity.kind,
@@ -119,11 +119,7 @@ function precisionCaption(entity: Entity): string | undefined {
 
 export function buildEntityAnatomyPlace(entity: Entity): RecordAnatomyPlace | undefined {
   const anchor = entity.geoAnchor;
-  if (
-    anchor === undefined ||
-    !Number.isFinite(anchor.lat) ||
-    !Number.isFinite(anchor.lng)
-  ) {
+  if (anchor === undefined || !Number.isFinite(anchor.lat) || !Number.isFinite(anchor.lng)) {
     return undefined;
   }
   return {
@@ -131,6 +127,8 @@ export function buildEntityAnatomyPlace(entity: Entity): RecordAnatomyPlace | un
     lng: anchor.lng,
     label: entity.locationLabel.trim() || entity.displayName,
     ...(entity.locationPrecision !== undefined ? { precision: entity.locationPrecision } : {}),
-    ...(precisionCaption(entity) !== undefined ? { precisionCaption: precisionCaption(entity) } : {}),
+    ...(precisionCaption(entity) !== undefined
+      ? { precisionCaption: precisionCaption(entity) }
+      : {}),
   };
 }

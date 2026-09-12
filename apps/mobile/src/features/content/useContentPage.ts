@@ -15,7 +15,11 @@
  */
 import { useEffect, useState } from 'react';
 import { createReleaseCache, META_KEYS, type CacheStore, type Connectivity } from '@/data';
-import { createContentRepository, UNBOOTSTRAPPED_STAMP, type ContentReadResult } from './content-repository';
+import {
+  createContentRepository,
+  UNBOOTSTRAPPED_STAMP,
+  type ContentReadResult,
+} from './content-repository';
 import type { CatalogSectionId } from './content-catalog';
 
 interface RuntimeHandles {
@@ -37,9 +41,7 @@ async function getRuntimeHandles(): Promise<RuntimeHandles> {
 }
 
 export type UseContentPageState =
-  | { readonly status: 'loading' }
-  | { readonly status: 'error' }
-  | ContentReadResult;
+  { readonly status: 'loading' } | { readonly status: 'error' } | ContentReadResult;
 
 /**
  * Loads a content page by (section, slug), preferring the network when online and falling back
@@ -61,7 +63,8 @@ export function useContentPage(section: CatalogSectionId, slug: string): UseCont
         const repository = createContentRepository({
           cache,
           isOnline: () => connectivity.isOnline(),
-          activeStamp: async () => (await store.getMeta(META_KEYS.releaseStamp)) ?? UNBOOTSTRAPPED_STAMP,
+          activeStamp: async () =>
+            (await store.getMeta(META_KEYS.releaseStamp)) ?? UNBOOTSTRAPPED_STAMP,
         });
         const result = await repository.getPage(section, slug);
         if (!canceled) setState(result);

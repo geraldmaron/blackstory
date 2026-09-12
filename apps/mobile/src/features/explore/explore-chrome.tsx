@@ -28,11 +28,7 @@ export const exploreContentInset = screenScrollInsets.paddingHorizontal;
  * (MapAttribution, the zoom controls) can reach them without importing upward from
  * `features/explore/`. Re-exported here so existing Explore imports keep working.
  */
-export {
-  withAlpha,
-  MAP_GHOST_PRESSED,
-  MAP_GHOST_BORDER,
-} from '@/features/map/map-plate-ink';
+export { withAlpha, MAP_GHOST_PRESSED, MAP_GHOST_BORDER } from '@/features/map/map-plate-ink';
 
 export type ExploreChromeColors = ReturnType<typeof useExploreChromeColors>;
 
@@ -97,10 +93,7 @@ export function ExploreListChrome({
   const theme = useThemeColors();
 
   return (
-    <View
-      style={[styles.listChrome, { backgroundColor: theme.surface }, style]}
-      testID={testID}
-    >
+    <View style={[styles.listChrome, { backgroundColor: theme.surface }, style]} testID={testID}>
       {children}
     </View>
   );

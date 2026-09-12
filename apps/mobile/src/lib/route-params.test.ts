@@ -107,7 +107,9 @@ describe('parseSearchQuery', () => {
   it('rejects an overlong query outright rather than truncating', () => {
     const tooLong = 'a'.repeat(MAX_SEARCH_QUERY_LENGTH + 1);
     expect(parseSearchQuery(tooLong)).toBe('');
-    expect(parseSearchQuery('a'.repeat(MAX_SEARCH_QUERY_LENGTH))).toBe('a'.repeat(MAX_SEARCH_QUERY_LENGTH));
+    expect(parseSearchQuery('a'.repeat(MAX_SEARCH_QUERY_LENGTH))).toBe(
+      'a'.repeat(MAX_SEARCH_QUERY_LENGTH),
+    );
   });
 
   it('strips control characters (including CR/LF header-injection-shaped input) but keeps normal spaces', () => {
@@ -253,7 +255,9 @@ describe('isSafeInternalPath / parseReturnTo (open-redirect defense)', () => {
 describe('isUrlLengthSafe', () => {
   it('accepts a normal-length URL and rejects an overlong one', () => {
     expect(isUrlLengthSafe('https://blackstory.app/explore')).toBe(true);
-    expect(isUrlLengthSafe('https://blackstory.app/entity/' + 'a'.repeat(MAX_URL_LENGTH))).toBe(false);
+    expect(isUrlLengthSafe('https://blackstory.app/entity/' + 'a'.repeat(MAX_URL_LENGTH))).toBe(
+      false,
+    );
   });
 
   it('rejects non-string / empty input', () => {
@@ -276,7 +280,9 @@ describe('parseRestoredRoute (cold-start / process-restoration safety)', () => {
   });
 
   it('falls back to the safe default when the persisted entity id format is stale/invalid', () => {
-    expect(parseRestoredRoute({ pathname: '/entity/no longer valid id!!' })).toEqual(SAFE_DEFAULT_ROUTE);
+    expect(parseRestoredRoute({ pathname: '/entity/no longer valid id!!' })).toEqual(
+      SAFE_DEFAULT_ROUTE,
+    );
   });
 
   it('falls back to the safe default for a completely malformed blob, never throwing', () => {
@@ -290,7 +296,9 @@ describe('parseRestoredRoute (cold-start / process-restoration safety)', () => {
   });
 
   it('falls back to the safe default for an open-redirect-shaped persisted pathname', () => {
-    expect(parseRestoredRoute({ pathname: 'https://evil.example.com' })).toEqual(SAFE_DEFAULT_ROUTE);
+    expect(parseRestoredRoute({ pathname: 'https://evil.example.com' })).toEqual(
+      SAFE_DEFAULT_ROUTE,
+    );
     expect(parseRestoredRoute({ pathname: '//evil.example.com' })).toEqual(SAFE_DEFAULT_ROUTE);
   });
 

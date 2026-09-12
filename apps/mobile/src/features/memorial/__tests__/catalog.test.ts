@@ -15,7 +15,9 @@ describe('memorial catalog', () => {
     expect(snapshot.incompleteByDesign).toBe(true);
     expect(snapshot.names.length).toBeGreaterThanOrEqual(50);
     const names = listMemorialNames().map((row) => row.name);
-    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' })));
+    expect(names).toEqual(
+      [...names].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' })),
+    );
     expect(names).toContain('Trayvon Martin');
   });
 

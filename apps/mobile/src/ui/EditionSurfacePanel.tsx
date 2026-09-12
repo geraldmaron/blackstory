@@ -56,7 +56,9 @@ export function EditionSurfacePanel({
           </Text>
         ) : null}
         {children ? (
-          <View style={[styles.body, compact || dense ? styles.compactBody : undefined]}>{children}</View>
+          <View style={[styles.body, compact || dense ? styles.compactBody : undefined]}>
+            {children}
+          </View>
         ) : null}
       </View>
     </LiftedSurface>

@@ -24,7 +24,11 @@ export function CensusModelFrame() {
         <Text variant="sectionLabel" colorRole="inkMuted" style={styles.frameLabel}>
           Decade axis
         </Text>
-        <View style={styles.rail} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+        <View
+          style={styles.rail}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
           {DECADE_TICKS.map((tick, index) => {
             const height = 12 + ((index * 7) % 28);
             return (

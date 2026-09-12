@@ -208,7 +208,10 @@ export type CameraForPresetInput = {
  * ceiling zoom. Every returned zoom is clamped to `MAP_MAX_ZOOM` — the privacy
  * ceiling holds no matter what a caller asks for.
  */
-export function cameraForPreset(preset: CameraPreset, input: CameraForPresetInput = {}): CameraTarget {
+export function cameraForPreset(
+  preset: CameraPreset,
+  input: CameraForPresetInput = {},
+): CameraTarget {
   switch (preset) {
     case 'national':
       return { kind: 'bounds', bounds: US_BOUNDS };

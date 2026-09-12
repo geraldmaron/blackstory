@@ -5,14 +5,12 @@
 export const THEMES_INTRO = {
   kicker: 'Impact',
   title: 'Themes',
-  lede:
-    'Policy-impact reading room: canonical questions with cited packets, gap labels, and explicit juxtaposition (not causation). Coverage is incomplete by design.',
+  lede: 'Policy-impact reading room: canonical questions with cited packets, gap labels, and explicit juxtaposition (not causation). Coverage is incomplete by design.',
 } as const;
 
 export const THEMES_METHOD = {
   title: 'Juxtaposition, not causation',
-  body:
-    'Theme packets place policy eras beside observations and artifacts. Co-movement is not treated as proof of cause. Read Methodology for confidence grades, gap labels, and when impact language is allowed.',
+  body: 'Theme packets place policy eras beside observations and artifacts. Co-movement is not treated as proof of cause. Read Methodology for confidence grades, gap labels, and when impact language is allowed.',
   methodologyCta: 'Open Methodology',
 } as const;
 
@@ -50,13 +48,11 @@ export const THEMES_DETAIL = {
 export const THEMES_GAP_COPY = {
   insufficient_evidence: {
     title: 'Insufficient evidence',
-    body:
-      'This packet does not yet meet the citation or coverage bar for a full answer. What appears is labeled; gaps stay visible rather than filled with inference.',
+    body: 'This packet does not yet meet the citation or coverage bar for a full answer. What appears is labeled; gaps stay visible rather than filled with inference.',
   },
   modeled: {
     title: 'Modeled estimate',
-    body:
-      'At least one figure here is derived or modeled, not a direct primary count. Read the provenance list and method note before treating it as a raw observation.',
+    body: 'At least one figure here is derived or modeled, not a direct primary count. Read the provenance list and method note before treating it as a raw observation.',
   },
 } as const;
 

@@ -9,10 +9,7 @@ import type { EntityMarkShape } from '@/ui';
 import { EntityEditionPanel } from '../EntityEditionPanel';
 import { humanizeToken } from '../format';
 import type { Entity, EntityKind } from '../types';
-import {
-  deriveHistoricalFraming,
-  historicalFramingLabel,
-} from '../entity-view-model';
+import { deriveHistoricalFraming, historicalFramingLabel } from '../entity-view-model';
 
 /** Compact lockup width (guide digital minimum). */
 const BRAND_LOCKUP_WIDTH = 120;

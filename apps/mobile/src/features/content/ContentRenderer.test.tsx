@@ -23,11 +23,19 @@ const BASE_PAGE: ContentPageV1 = {
   ],
 };
 
-async function renderPage(page: ContentPageV1, extra: Partial<React.ComponentProps<typeof ContentRenderer>> = {}) {
+async function renderPage(
+  page: ContentPageV1,
+  extra: Partial<React.ComponentProps<typeof ContentRenderer>> = {},
+) {
   const { page: normalized, blocks, skippedSections } = normalizeTypedContentPage(page);
   if (!normalized) throw new Error('expected a valid page for this test');
   return render(
-    <ContentRenderer page={normalized} blocks={blocks} skippedSections={skippedSections} {...extra} />,
+    <ContentRenderer
+      page={normalized}
+      blocks={blocks}
+      skippedSections={skippedSections}
+      {...extra}
+    />,
   );
 }
 

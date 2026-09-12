@@ -95,9 +95,7 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
                 key: 'topics',
                 label: 'Topics',
                 value:
-                  entry.topics.length > 0
-                    ? entry.topics.map(topicLabel).join(', ')
-                    : 'None listed',
+                  entry.topics.length > 0 ? entry.topics.map(topicLabel).join(', ') : 'None listed',
               },
             ]}
           />
@@ -191,8 +189,8 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
         <View style={styles.section}>
           <LedgerSectionLabel ruleAbove>{LAW_DETAIL.provenanceTitle}</LedgerSectionLabel>
           <Text variant="caption" colorRole="inkMuted">
-            Citation: {plainDashCopy(entry.citation)}. Retrieved{' '}
-            {entry.retrievedAt.slice(0, 10)}. License: {entry.licenseTag}.
+            Citation: {plainDashCopy(entry.citation)}. Retrieved {entry.retrievedAt.slice(0, 10)}.
+            License: {entry.licenseTag}.
           </Text>
           <View style={styles.actions}>
             <Button

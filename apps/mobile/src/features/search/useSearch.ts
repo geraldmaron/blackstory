@@ -138,7 +138,17 @@ export function useSearch(options: UseSearchOptions = {}): UseSearchResult {
       removeRecentSearch,
       clearRecentSearches,
     }),
-    [draft, filterKind, state, loadMore, retry, recentSearches, selectRecentSearch, removeRecentSearch, clearRecentSearches],
+    [
+      draft,
+      filterKind,
+      state,
+      loadMore,
+      retry,
+      recentSearches,
+      selectRecentSearch,
+      removeRecentSearch,
+      clearRecentSearches,
+    ],
   );
 }
 

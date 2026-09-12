@@ -20,32 +20,38 @@ import {
 } from '@repo/public-contracts/evidence';
 
 describe('normalizeEntity — fixture matrix', () => {
-  it.each(ALL_KINDS)('normalizes a FULL fixture for kind=%s without dropping required content', (kind) => {
-    const entity = normalizeEntity(fullEntityFixture(kind));
-    expect(entity).not.toBeNull();
-    expect(entity!.kind).toBe(kind);
-    expect(entity!.claims.length).toBeGreaterThan(0);
-    expect(entity!.timeline.length).toBeGreaterThan(0);
-    expect(entity!.relatedNeighbors?.length).toBeGreaterThan(0);
-    expect(entity!.continueLearning?.length).toBeGreaterThan(0);
-    expect(entity!.primaryImage).toBeDefined();
-    expect(entity!.sensitivity).toBeDefined();
-  });
+  it.each(ALL_KINDS)(
+    'normalizes a FULL fixture for kind=%s without dropping required content',
+    (kind) => {
+      const entity = normalizeEntity(fullEntityFixture(kind));
+      expect(entity).not.toBeNull();
+      expect(entity!.kind).toBe(kind);
+      expect(entity!.claims.length).toBeGreaterThan(0);
+      expect(entity!.timeline.length).toBeGreaterThan(0);
+      expect(entity!.relatedNeighbors?.length).toBeGreaterThan(0);
+      expect(entity!.continueLearning?.length).toBeGreaterThan(0);
+      expect(entity!.primaryImage).toBeDefined();
+      expect(entity!.sensitivity).toBeDefined();
+    },
+  );
 
-  it.each(ALL_KINDS)('normalizes a MINIMAL fixture for kind=%s (every optional field absent) without crashing', (kind) => {
-    const entity = normalizeEntity(minimalEntityFixture(kind));
-    expect(entity).not.toBeNull();
-    expect(entity!.claims).toEqual([]);
-    expect(entity!.timeline).toEqual([]);
-    expect(entity!.primaryImage).toBeUndefined();
-    expect(entity!.sensitivity).toBeUndefined();
-    expect(entity!.statusHistory).toBeUndefined();
-    expect(entity!.eventWindow).toBeUndefined();
-    expect(entity!.extendedNarrative).toBeUndefined();
-    expect(entity!.relatedNeighbors).toBeUndefined();
-    expect(entity!.continueLearning).toBeUndefined();
-    expect(entity!.geoAnchor).toBeUndefined();
-  });
+  it.each(ALL_KINDS)(
+    'normalizes a MINIMAL fixture for kind=%s (every optional field absent) without crashing',
+    (kind) => {
+      const entity = normalizeEntity(minimalEntityFixture(kind));
+      expect(entity).not.toBeNull();
+      expect(entity!.claims).toEqual([]);
+      expect(entity!.timeline).toEqual([]);
+      expect(entity!.primaryImage).toBeUndefined();
+      expect(entity!.sensitivity).toBeUndefined();
+      expect(entity!.statusHistory).toBeUndefined();
+      expect(entity!.eventWindow).toBeUndefined();
+      expect(entity!.extendedNarrative).toBeUndefined();
+      expect(entity!.relatedNeighbors).toBeUndefined();
+      expect(entity!.continueLearning).toBeUndefined();
+      expect(entity!.geoAnchor).toBeUndefined();
+    },
+  );
 });
 
 describe('normalizeEntity — adversarial cases', () => {
@@ -61,13 +67,19 @@ describe('normalizeEntity — adversarial cases', () => {
   });
 
   it('drops a malformed citation href (javascript: scheme) rather than surfacing it as a link', () => {
-    const entity = normalizeEntity({ ...fullEntityFixture('place'), claims: [claimWithMalformedCitationUrl()] });
+    const entity = normalizeEntity({
+      ...fullEntityFixture('place'),
+      claims: [claimWithMalformedCitationUrl()],
+    });
     expect(entity!.claims[0]!.citation?.href).toBeUndefined();
     expect(entity!.claims[0]!.citation?.source).toBe('Hostile source');
   });
 
   it('tolerates a claim with no citation at all', () => {
-    const entity = normalizeEntity({ ...fullEntityFixture('place'), claims: [claimWithNoCitation()] });
+    const entity = normalizeEntity({
+      ...fullEntityFixture('place'),
+      claims: [claimWithNoCitation()],
+    });
     expect(entity!.claims).toHaveLength(1);
     expect(entity!.claims[0]!.citation).toBeUndefined();
   });

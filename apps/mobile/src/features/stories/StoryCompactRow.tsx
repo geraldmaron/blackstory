@@ -12,7 +12,12 @@ export interface StoryCompactRowProps {
   readonly indexLabel?: string;
 }
 
-export function StoryCompactRow({ entry, onPress, showDivider = true, indexLabel }: StoryCompactRowProps) {
+export function StoryCompactRow({
+  entry,
+  onPress,
+  showDivider = true,
+  indexLabel,
+}: StoryCompactRowProps) {
   const { page } = entry;
   const era = page.eraLabel ? plainRangeText(page.eraLabel) : '';
   const place = page.placeLabel ?? '';

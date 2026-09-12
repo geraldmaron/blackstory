@@ -57,14 +57,8 @@ function EditionStack() {
           headerShown: true,
         }}
       />
-      <Stack.Screen
-        name="books"
-        options={{ headerShown: false, title: 'Banned books' }}
-      />
-      <Stack.Screen
-        name="law"
-        options={{ headerShown: false, title: 'Law' }}
-      />
+      <Stack.Screen name="books" options={{ headerShown: false, title: 'Banned books' }} />
+      <Stack.Screen name="law" options={{ headerShown: false, title: 'Law' }} />
       <Stack.Screen
         name="memorial"
         options={{
@@ -73,10 +67,7 @@ function EditionStack() {
           headerShown: true,
         }}
       />
-      <Stack.Screen
-        name="themes"
-        options={{ headerShown: false, title: 'Themes' }}
-      />
+      <Stack.Screen name="themes" options={{ headerShown: false, title: 'Themes' }} />
       <Stack.Screen
         name="submit"
         options={{
@@ -88,30 +79,15 @@ function EditionStack() {
       {/* The Stories stack owns its own header; the group renders none of its own. Leaving a
           route unregistered here is what made `/stories/{slug}` show the raw segment "stories"
           as a title with a second back chevron under the stack's own. */}
-      <Stack.Screen
-        name="stories"
-        options={{ headerShown: false, title: 'Stories' }}
-      />
-      <Stack.Screen
-        name="about"
-        options={{ title: 'About', headerBackTitle: 'More' }}
-      />
+      <Stack.Screen name="stories" options={{ headerShown: false, title: 'Stories' }} />
+      <Stack.Screen name="about" options={{ title: 'About', headerBackTitle: 'More' }} />
       <Stack.Screen
         name="methodology"
         options={{ title: 'Methodology', headerBackTitle: 'More' }}
       />
-      <Stack.Screen
-        name="errata"
-        options={{ title: 'Errata', headerBackTitle: 'More' }}
-      />
-      <Stack.Screen
-        name="privacy"
-        options={{ title: 'Privacy', headerBackTitle: 'More' }}
-      />
-      <Stack.Screen
-        name="terms"
-        options={{ title: 'Terms', headerBackTitle: 'More' }}
-      />
+      <Stack.Screen name="errata" options={{ title: 'Errata', headerBackTitle: 'More' }} />
+      <Stack.Screen name="privacy" options={{ title: 'Privacy', headerBackTitle: 'More' }} />
+      <Stack.Screen name="terms" options={{ title: 'Terms', headerBackTitle: 'More' }} />
       {/* Legacy `/learn/...` addresses redirect on mount and render nothing. */}
       <Stack.Screen name="learn" options={{ headerShown: false }} />
       <Stack.Screen

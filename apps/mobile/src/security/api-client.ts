@@ -56,16 +56,10 @@ function joinUrl(baseUrl: string, path: string): string {
  */
 export function createApiClient(config: ApiClientConfig): ApiClient {
   const doFetch = config.fetch ?? globalThis.fetch;
-  const clientHeader = buildClientVersionHeader(
-    config.clientVersion,
-    config.apiMajor,
-  );
+  const clientHeader = buildClientVersionHeader(config.clientVersion, config.apiMajor);
 
   return {
-    async request(
-      path: string,
-      options: ApiRequestOptions = {},
-    ): Promise<Response> {
+    async request(path: string, options: ApiRequestOptions = {}): Promise<Response> {
       const headers: Record<string, string> = {
         ...options.headers,
         [CLIENT_VERSION_HEADER]: clientHeader,

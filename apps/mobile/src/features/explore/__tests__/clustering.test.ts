@@ -53,7 +53,9 @@ describe('two-interaction resolution', () => {
         const reNodes = clusterFeatures(pending.members, currentZoom);
         // After the zoom, every node is an individual point (names revealed).
         names.push(
-          ...reNodes.filter((n) => n.kind === 'point').map((n) => (n as { feature: { label: string } }).feature.label),
+          ...reNodes
+            .filter((n) => n.kind === 'point')
+            .map((n) => (n as { feature: { label: string } }).feature.label),
         );
         pending = reNodes.find((n): n is Cluster => n.kind === 'cluster');
       }

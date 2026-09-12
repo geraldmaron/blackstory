@@ -2,7 +2,12 @@
  * Deterministic filter tests (MOB-012 / Explore v7 Phase C). "Deterministic" = same inputs, same
  * ordered output and same count, every time.
  */
-import { applyFilters, buildExploreFacetOptions, countMatches, matchesFilters } from '../explore-filter';
+import {
+  applyFilters,
+  buildExploreFacetOptions,
+  countMatches,
+  matchesFilters,
+} from '../explore-filter';
 import { makeFeature, SEPARATED } from '../__fixtures__/features';
 
 describe('applyFilters — determinism + stable order', () => {

@@ -70,6 +70,9 @@ export function buildSearchRequestPath(params: SearchRequestParams): string {
 }
 
 /** Normalized query-shape hash input (query + filters; never raw text alone). */
-export function buildQueryShapeKey(params: { readonly query: string; readonly kind?: string }): string {
+export function buildQueryShapeKey(params: {
+  readonly query: string;
+  readonly kind?: string;
+}): string {
   return `q=${params.query}&kind=${params.kind ?? ''}`;
 }

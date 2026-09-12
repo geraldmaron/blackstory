@@ -48,11 +48,7 @@ import { ExploreInstrumentsPanel } from '@/features/explore/ExploreInstrumentsPa
 import { ExploreRecordsRail } from '@/features/explore/ExploreRecordsRail';
 import { attributionBottomAbovePeekSheet } from '@/features/explore/explore-sheet-layout';
 import type { FilterState } from '@/lib/route-params';
-import {
-  exploreReducer,
-  initialExploreState,
-  visibleFeatures,
-} from './explore-controller';
+import { exploreReducer, initialExploreState, visibleFeatures } from './explore-controller';
 import { applyFilters, sameFilterState } from './explore-filter';
 import { toExploreFeatures, toMapFeatureCollection } from './explore-feature';
 import { parseRestoredSelection } from './selection';
@@ -203,7 +199,11 @@ export function ExploreView({
     if (restored.selectedId) {
       const feature = allFeatures.find((f) => f.entityId === restored.selectedId);
       if (feature) {
-        dispatch({ type: 'entitySelected', entityId: feature.entityId, point: feature.coordinates });
+        dispatch({
+          type: 'entitySelected',
+          entityId: feature.entityId,
+          point: feature.coordinates,
+        });
       }
     }
   }, [selectedParam, allFeatures]);
@@ -240,34 +240,27 @@ export function ExploreView({
   // A selection floors the sheet at half; otherwise the gesture-controlled
   // `snapIndex` IS the sheet position. There is no separate boolean that can
   // recompute a different index and fight the drag.
-  const sheetSnapIndex = state.selectedId
-    ? Math.max(snapIndex, EXPLORE_SHEET_HALF)
-    : snapIndex;
+  const sheetSnapIndex = state.selectedId ? Math.max(snapIndex, EXPLORE_SHEET_HALF) : snapIndex;
   const recordsExpanded = sheetSnapIndex >= EXPLORE_SHEET_HALF;
   // Attribution and floating chrome are meaningless without a live basemap and
   // must not overlay MapScreen's error/loading state (the pill lands on the
   // retry button). Gate both on the map being live; the sheet always stays.
   const mapLive = loadState.kind === 'ready';
-  const attributionVisible =
-    mapLive && sheetSnapIndex <= EXPLORE_SHEET_PEEK && !instrumentsOpen;
+  const attributionVisible = mapLive && sheetSnapIndex <= EXPLORE_SHEET_PEEK && !instrumentsOpen;
   const instrumentsTop = space['1'] + chromeHeight + space['2'];
 
   const selectedFeature = state.selectedId
-    ? allFeatures.find((f) => f.entityId === state.selectedId) ?? null
+    ? (allFeatures.find((f) => f.entityId === state.selectedId) ?? null)
     : null;
 
   const selectedIndex = selectedFeature
     ? listFeatures.findIndex((f) => f.entityId === selectedFeature.entityId)
     : -1;
 
-  const cameraCommand = state.cameraCommand
-    ? { ...state.cameraCommand }
-    : null;
+  const cameraCommand = state.cameraCommand ? { ...state.cameraCommand } : null;
 
   const showDemoHint =
-    typeof __DEV__ !== 'undefined' &&
-    __DEV__ &&
-    (usingDemo || source === DEMO_MAP_SOURCE);
+    typeof __DEV__ !== 'undefined' && __DEV__ && (usingDemo || source === DEMO_MAP_SOURCE);
 
   const handleToggleInstruments = useCallback(() => {
     setInstrumentsOpen((open) => {
@@ -410,10 +403,7 @@ export function ExploreView({
 
         {mapLive && !mapImmersive && instrumentsOpen ? (
           <Animated.View
-            style={[
-              styles.instrumentsOverlay,
-              { top: instrumentsTop, bottom: attributionBottom },
-            ]}
+            style={[styles.instrumentsOverlay, { top: instrumentsTop, bottom: attributionBottom }]}
             pointerEvents="box-none"
             entering={reduceMotion ? undefined : FadeInDown.duration(duration.durationFast)}
             exiting={reduceMotion ? undefined : FadeOutUp.duration(duration.durationFast)}
@@ -478,7 +468,6 @@ export function ExploreView({
             />
           )}
         </ExploreBottomSheet>
-
       </View>
     </ScreenCanvas>
   );

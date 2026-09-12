@@ -137,15 +137,7 @@ export const DATA_INDICATOR_FIXTURE_BUNDLE: DataIndicatorBundle = {
 export const PHASE1_COVERAGE_SUMMARY: Phase1CoverageSummary = {
   metricCount: 32,
   sampleObservationCount: 0,
-  themes: [
-    'demography',
-    'wealth',
-    'housing',
-    'education',
-    'justice',
-    'labor',
-    'environment',
-  ],
+  themes: ['demography', 'wealth', 'housing', 'education', 'justice', 'labor', 'environment'],
 };
 
 export function getDataPageModel(): DataPageModel {

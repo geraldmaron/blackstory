@@ -42,8 +42,7 @@ describe('EmptyState', () => {
     const compact = await render(<EmptyState title="No results" compact />);
 
     // The glyph is the only element hidden from assistive tech in this primitive.
-    const isGlyph = (props: Record<string, unknown>) =>
-      props.accessibilityElementsHidden === true;
+    const isGlyph = (props: Record<string, unknown>) => props.accessibilityElementsHidden === true;
     expect(hostElementsWhere(full, isGlyph)).toHaveLength(1);
     expect(hostElementsWhere(compact, isGlyph)).toHaveLength(0);
 
@@ -86,8 +85,7 @@ describe('ErrorState', () => {
     const full = await render(<ErrorState title="Offline" />);
     const compact = await render(<ErrorState title="Offline" compact />);
 
-    const isGlyph = (props: Record<string, unknown>) =>
-      props.accessibilityElementsHidden === true;
+    const isGlyph = (props: Record<string, unknown>) => props.accessibilityElementsHidden === true;
     expect(hostElementsWhere(full, isGlyph)).toHaveLength(1);
     expect(hostElementsWhere(compact, isGlyph)).toHaveLength(0);
 

@@ -20,7 +20,10 @@ const base = (): ExploreState => initialExploreState();
 
 describe('no focus theft', () => {
   it('listScrolled is a pure no-op: no camera command, no viewport change', () => {
-    const start: ExploreState = { ...base(), viewport: { west: -100, south: 30, east: -80, north: 40 } };
+    const start: ExploreState = {
+      ...base(),
+      viewport: { west: -100, south: 30, east: -80, north: 40 },
+    };
     const next = exploreReducer(start, { type: 'listScrolled' });
     expect(next).toBe(start); // identical reference — nothing changed
     expect(next.cameraCommand).toBeUndefined();
@@ -63,7 +66,11 @@ describe('explicit intents move the camera', () => {
 
   it('camera command tokens strictly increase so each move fires once', () => {
     const s1 = exploreReducer(base(), { type: 'presetRequested', preset: 'national' });
-    const s2 = exploreReducer(s1, { type: 'entitySelected', entityId: 'b', point: [-95.37, 29.76] });
+    const s2 = exploreReducer(s1, {
+      type: 'entitySelected',
+      entityId: 'b',
+      point: [-95.37, 29.76],
+    });
     expect((s2.cameraCommand?.token ?? 0) > (s1.cameraCommand?.token ?? 0)).toBe(true);
   });
 });
@@ -97,7 +104,11 @@ describe('withdrawn selection after a release change', () => {
   });
 
   it('keeps a selection that still exists', () => {
-    let s = exploreReducer(base(), { type: 'entitySelected', entityId: 'a', point: [-77.04, 38.9] });
+    let s = exploreReducer(base(), {
+      type: 'entitySelected',
+      entityId: 'a',
+      point: [-77.04, 38.9],
+    });
     s = exploreReducer(s, { type: 'availableReconciled', available: SEPARATED });
     expect(s.selectedId).toBe('a');
   });

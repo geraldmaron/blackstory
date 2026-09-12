@@ -84,11 +84,7 @@ export {
   type ExploreAction,
   type CameraCommand,
 } from './explore-controller';
-export {
-  applyFilters,
-  matchesFilters,
-  countMatches,
-} from './explore-filter';
+export { applyFilters, matchesFilters, countMatches } from './explore-filter';
 export {
   clusterFeatures,
   resolveCluster,
@@ -110,8 +106,4 @@ export {
   type ExploreFeature,
   type ExploreFeatureProperties,
 } from './explore-feature';
-export {
-  parseRestoredSelection,
-  reconcileSelection,
-  type RestoredSelection,
-} from './selection';
+export { parseRestoredSelection, reconcileSelection, type RestoredSelection } from './selection';

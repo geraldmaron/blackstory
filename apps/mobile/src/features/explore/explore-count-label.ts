@@ -64,9 +64,7 @@ function singleCountRailPhrase(count: number, filters: FilterState): string {
   const isFiltered = hasActiveFilters(filters);
   if (count === 0) return isFiltered ? 'None filtered' : 'None';
   if (count === 1) return isFiltered ? '1 filtered' : '1 pinned';
-  return isFiltered
-    ? `${formatLocaleCount(count)} filtered`
-    : `${formatLocaleCount(count)} pinned`;
+  return isFiltered ? `${formatLocaleCount(count)} filtered` : `${formatLocaleCount(count)} pinned`;
 }
 
 /** Dual copy without repeating "nearby" when scopeLabel already carries that word. */
@@ -106,7 +104,9 @@ export function formatExploreCountLabel(input: ExploreCountLabelInput): ExploreC
         ? `1 nearby${filtered}`
         : `${formatLocaleCount(input.inViewCount)} nearby${filtered}`;
   const releasePhrase =
-    input.releaseCount === 1 ? '1 in release' : `${formatLocaleCount(input.releaseCount)} in release`;
+    input.releaseCount === 1
+      ? '1 in release'
+      : `${formatLocaleCount(input.releaseCount)} in release`;
   return {
     inline,
     railInline,

@@ -72,12 +72,7 @@ export function Logo({ variant = 'lockup', size, forceScheme }: LogoProps) {
       accessibilityLabel="BlackStory"
       style={{ width, height }}
     >
-      <Image
-        source={source}
-        contentFit="contain"
-        style={{ width, height }}
-        accessible={false}
-      />
+      <Image source={source} contentFit="contain" style={{ width, height }} accessible={false} />
     </View>
   );
 }

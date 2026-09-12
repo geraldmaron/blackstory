@@ -20,16 +20,23 @@ jest.mock('@maplibre/maplibre-react-native', () => {
   const React = require('react');
   const { View } = require('react-native');
   return {
-    Map: ({ children }: { children?: unknown }) => React.createElement(View, { testID: 'maplibre-map' }, children as never),
+    Map: ({ children }: { children?: unknown }) =>
+      React.createElement(View, { testID: 'maplibre-map' }, children as never),
     Camera: () => React.createElement(View, { testID: 'maplibre-camera' }),
     GeoJSONSource: ({ children, data }: { children?: unknown; data?: unknown }) =>
       React.createElement(
         View,
-        { testID: 'maplibre-geojson-source', accessibilityLabel: typeof data === 'string' ? data : JSON.stringify(data) },
+        {
+          testID: 'maplibre-geojson-source',
+          accessibilityLabel: typeof data === 'string' ? data : JSON.stringify(data),
+        },
         children as never,
       ),
     Layer: ({ style }: { style?: unknown }) =>
-      React.createElement(View, { testID: 'maplibre-layer', accessibilityLabel: JSON.stringify(style) }),
+      React.createElement(View, {
+        testID: 'maplibre-layer',
+        accessibilityLabel: JSON.stringify(style),
+      }),
   };
 });
 

@@ -84,10 +84,7 @@ function defaultSleep(ms: number): Promise<void> {
 }
 
 function isAbortError(err: unknown): boolean {
-  return (
-    err instanceof Error &&
-    (err.name === 'AbortError' || /abort/i.test(err.message))
-  );
+  return err instanceof Error && (err.name === 'AbortError' || /abort/i.test(err.message));
 }
 
 export interface Transport {
@@ -151,7 +148,10 @@ export function createTransport(deps: TransportDeps): Transport {
 
     for (let attempt = 1; attempt <= policy.maxAttempts; attempt++) {
       if (options.signal?.aborted) {
-        throw new TransportError('request aborted before send', { kind: 'aborted', attempts: attempt - 1 });
+        throw new TransportError('request aborted before send', {
+          kind: 'aborted',
+          attempts: attempt - 1,
+        });
       }
       let response: Response;
       try {
@@ -173,11 +173,20 @@ export function createTransport(deps: TransportDeps): Transport {
       }
 
       if (response.status === 304) {
-        return { kind: 'not-modified', status: 304, etag: response.headers.get('etag') ?? options.etag };
+        return {
+          kind: 'not-modified',
+          status: 304,
+          etag: response.headers.get('etag') ?? options.etag,
+        };
       }
       if (response.status >= 200 && response.status < 300) {
         const data = await enforceSizeAndParse<T>(response);
-        return { kind: 'ok', status: response.status, data, etag: response.headers.get('etag') ?? undefined };
+        return {
+          kind: 'ok',
+          status: response.status,
+          data,
+          etag: response.headers.get('etag') ?? undefined,
+        };
       }
 
       // Non-2xx.
@@ -210,7 +219,10 @@ export function createTransport(deps: TransportDeps): Transport {
 }
 
 /** Parses `Retry-After` (delta-seconds or an HTTP-date) into ms, or undefined. */
-export function parseRetryAfter(value: string | null, now: number = Date.now()): number | undefined {
+export function parseRetryAfter(
+  value: string | null,
+  now: number = Date.now(),
+): number | undefined {
   if (!value) return undefined;
   const seconds = Number(value);
   if (Number.isFinite(seconds)) {

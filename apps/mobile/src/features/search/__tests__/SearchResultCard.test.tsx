@@ -1,5 +1,9 @@
 import { fireEvent, render } from '@testing-library/react-native';
-import { SearchResultCard, toSearchResultCardProps, type SearchResultCardProps } from '../SearchResultCard';
+import {
+  SearchResultCard,
+  toSearchResultCardProps,
+  type SearchResultCardProps,
+} from '../SearchResultCard';
 import type { SearchResultV1 } from '../search-contracts';
 
 function baseResult(overrides: Partial<SearchResultV1> = {}): SearchResultV1 {
@@ -33,7 +37,9 @@ describe('toSearchResultCardProps — allow-list mapping negative test (MOB-013 
     expect(props).not.toHaveProperty('rank');
     expect(props).not.toHaveProperty('claimCount');
     expect(props).not.toHaveProperty('score');
-    expect(Object.keys(props).sort()).toEqual(['displayName', 'eraBuckets', 'explanation', 'id', 'kind'].sort());
+    expect(Object.keys(props).sort()).toEqual(
+      ['displayName', 'eraBuckets', 'explanation', 'id', 'kind'].sort(),
+    );
   });
 
   it('is a fixed, exhaustive allow-list mapping -- never `{...result}`', () => {
@@ -60,7 +66,9 @@ describe('toSearchResultCardProps — allow-list mapping negative test (MOB-013 
 describe('SearchResultCard — adversarial rendering (MOB-013 item 8: malicious snippets render inert)', () => {
   it('renders an XSS/HTML/script-shaped displayName as plain, inert text', async () => {
     const hostileName = '<script>alert(1)</script><img src=x onerror=alert(2)>';
-    const props = toSearchResultCardProps(baseResult({ displayName: hostileName, explanation: 'why' }));
+    const props = toSearchResultCardProps(
+      baseResult({ displayName: hostileName, explanation: 'why' }),
+    );
     const { getByText } = await render(<SearchResultCard {...props} />);
     // The exact hostile string appears as literal TEXT content -- React Native's <Text> never
     // interprets markup, and there is no dangerouslySetInnerHTML/WebView anywhere in this
@@ -78,7 +86,13 @@ describe('SearchResultCard — adversarial rendering (MOB-013 item 8: malicious 
   });
 
   it('never throws when rendering an empty or maximally long displayName', () => {
-    expect(() => render(<SearchResultCard {...toSearchResultCardProps(baseResult({ displayName: 'x'.repeat(300) }))} />)).not.toThrow();
+    expect(() =>
+      render(
+        <SearchResultCard
+          {...toSearchResultCardProps(baseResult({ displayName: 'x'.repeat(300) }))}
+        />,
+      ),
+    ).not.toThrow();
   });
 });
 

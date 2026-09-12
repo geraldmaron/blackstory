@@ -18,7 +18,14 @@ export type LinkProps = Omit<PressableProps, 'children' | 'style' | 'onPress'> &
   accessibilityLabel?: string;
 };
 
-export function Link({ href, children, onPress, textRole = 'body', accessibilityLabel, ...rest }: LinkProps) {
+export function Link({
+  href,
+  children,
+  onPress,
+  textRole = 'body',
+  accessibilityLabel,
+  ...rest
+}: LinkProps) {
   const theme = useThemeColors();
 
   const handlePress = () => {

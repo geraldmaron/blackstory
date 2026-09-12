@@ -120,7 +120,11 @@ export async function submitCorrection(
   if (response.status === 202) {
     const body = await readEnvelope(response);
     const accepted = body as unknown as CorrectionAcceptedResponse | undefined;
-    if (accepted?.accepted && typeof accepted.receiptCode === 'string' && isReceiptCodeShape(accepted.receiptCode)) {
+    if (
+      accepted?.accepted &&
+      typeof accepted.receiptCode === 'string' &&
+      isReceiptCodeShape(accepted.receiptCode)
+    ) {
       await persistReceiptCode(deps.secrets, accepted.receiptCode);
       return {
         status: 'accepted',
@@ -132,7 +136,12 @@ export async function submitCorrection(
   }
 
   if (response.status === 429) {
-    return { status: 'rate_limited', ...(parseRetryAfter(response) !== undefined ? { retryAfterSeconds: parseRetryAfter(response) } : {}) };
+    return {
+      status: 'rate_limited',
+      ...(parseRetryAfter(response) !== undefined
+        ? { retryAfterSeconds: parseRetryAfter(response) }
+        : {}),
+    };
   }
 
   if (response.status === 400) {
@@ -199,7 +208,12 @@ export async function lookupCorrectionStatus(
   }
 
   if (response.status === 429) {
-    return { status: 'rate_limited', ...(parseRetryAfter(response) !== undefined ? { retryAfterSeconds: parseRetryAfter(response) } : {}) };
+    return {
+      status: 'rate_limited',
+      ...(parseRetryAfter(response) !== undefined
+        ? { retryAfterSeconds: parseRetryAfter(response) }
+        : {}),
+    };
   }
 
   return { status: 'error' };

@@ -50,7 +50,12 @@ export function ListRow({
   const trailingContent =
     trailing ??
     (showChevron && interactive ? (
-      <Ionicons name="chevron-forward" size={18} color={theme.inkMuted} accessibilityElementsHidden />
+      <Ionicons
+        name="chevron-forward"
+        size={18}
+        color={theme.inkMuted}
+        accessibilityElementsHidden
+      />
     ) : null);
 
   const content = (

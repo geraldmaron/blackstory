@@ -12,16 +12,18 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 
-import { type FilterState, filterStateToRouteParams, parseFilterState, parseReturnTo } from '@/lib/route-params';
+import {
+  type FilterState,
+  filterStateToRouteParams,
+  parseFilterState,
+  parseReturnTo,
+} from '@/lib/route-params';
 import { ScreenCanvas } from '@/ui';
 import { useEditionStackBack } from '@/shell/use-edition-stack-back';
 import { DEMO_MAP_SOURCE } from '@/features/map/demoMapSource';
 import { toExploreFeatures } from '@/features/explore/explore-feature';
 import { buildExploreFacetOptions } from '@/features/explore/explore-filter';
-import {
-  ExploreFiltersPanel,
-  filterStateFromPanel,
-} from '@/features/explore/ExploreFiltersPanel';
+import { ExploreFiltersPanel, filterStateFromPanel } from '@/features/explore/ExploreFiltersPanel';
 
 export default function FiltersSheet() {
   const rawParams = useLocalSearchParams();

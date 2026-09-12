@@ -10,10 +10,7 @@ import { Platform } from 'react-native';
 
 import { cacheDiagnostics, type CacheStore, type Connectivity } from '../data';
 import { resolveObservabilityConfig } from './config';
-import {
-  setActiveReportContext,
-  setObservabilityConfig,
-} from './crash-reporter';
+import { setActiveReportContext, setObservabilityConfig } from './crash-reporter';
 import { buildReportContext, resolveRuntimeVersion, type ReportContext } from './report-context';
 
 function resolveBuildNumber(): string | undefined {

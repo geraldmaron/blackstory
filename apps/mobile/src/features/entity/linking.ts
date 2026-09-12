@@ -63,7 +63,10 @@ export type OpenLinkResult = 'opened' | 'blocked-unsafe-url' | 'offline' | 'fail
  * a returned status the caller renders as a message (see `CitationLink.tsx`), never a crash and
  * never a silent no-op the user can't distinguish from "nothing happened."
  */
-export async function openExternalLink(url: string, opts: { isOnline: boolean }): Promise<OpenLinkResult> {
+export async function openExternalLink(
+  url: string,
+  opts: { isOnline: boolean },
+): Promise<OpenLinkResult> {
   if (!isSafeExternalUrl(url)) return 'blocked-unsafe-url';
   if (!opts.isOnline) return 'offline';
   try {

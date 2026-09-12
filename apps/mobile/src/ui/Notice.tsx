@@ -19,7 +19,14 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { useReduceMotion } from '@/features/explore/useReduceMotion';
 
 import { Text } from './Text';
-import { duration, radius, space, useStatusColors, useThemeColors, type StatusName } from './tokens';
+import {
+  duration,
+  radius,
+  space,
+  useStatusColors,
+  useThemeColors,
+  type StatusName,
+} from './tokens';
 import { useAnnounceOnMount } from './useAnnounceOnMount';
 
 export type NoticeTone = StatusName | 'info';

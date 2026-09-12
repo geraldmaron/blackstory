@@ -18,11 +18,7 @@ import {
 import { openExternalMaps } from '../maps-handoff';
 import type { Entity } from '../types';
 import { EditionFactIcon, type EditionFactIconProps } from '../edition-fact-icon';
-import {
-  RecordBeatRow,
-  recordBeatLabelColumnWidth,
-  recordBeatRowStyle,
-} from '../RecordBeatRow';
+import { RecordBeatRow, recordBeatLabelColumnWidth, recordBeatRowStyle } from '../RecordBeatRow';
 import { RecordPlacePreview } from '../record-place-preview';
 
 export type AnatomySectionProps = {
@@ -87,7 +83,9 @@ export function AnatomySection({ entity, onBackToMap }: AnatomySectionProps) {
       ...(entity.displayName ? { label: entity.displayName } : {}),
     });
     if (result !== 'opened') {
-      setMapsError('Could not open Maps. Try again, or use View on national map inside BlackStory.');
+      setMapsError(
+        'Could not open Maps. Try again, or use View on national map inside BlackStory.',
+      );
     }
   }
 

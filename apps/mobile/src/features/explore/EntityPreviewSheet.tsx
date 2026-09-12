@@ -76,7 +76,11 @@ function MetaChip({
   readonly color: string;
 }) {
   return (
-    <View style={styles.metaChip} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <View
+      style={styles.metaChip}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+    >
       <Ionicons name={icon} size={14} color={color} />
       <Text variant="caption" colorRole="inkMuted" numberOfLines={1} style={styles.metaChipLabel}>
         {label}
@@ -110,9 +114,10 @@ export function EntityPreviewSheet({
   const dek = selected.properties.oneLineStory?.trim();
   const storyMeta = exploreStoryMeta(selected);
   const facts = exploreRecordFacts(selected);
-  const factsSummary = [`Kind: ${kindLabel}`, ...facts.map((fact) => `${fact.label}: ${fact.value}`)].join(
-    '. ',
-  );
+  const factsSummary = [
+    `Kind: ${kindLabel}`,
+    ...facts.map((fact) => `${fact.label}: ${fact.value}`),
+  ].join('. ');
   const canBrowse =
     browsePosition !== undefined &&
     browsePosition.total > 1 &&
@@ -158,7 +163,12 @@ export function EntityPreviewSheet({
           style={styles.card}
         >
           <View style={styles.headerRow}>
-            <View style={[styles.kindGlyph, { borderColor: theme.border, backgroundColor: theme.surfaceRaised }]}>
+            <View
+              style={[
+                styles.kindGlyph,
+                { borderColor: theme.border, backgroundColor: theme.surfaceRaised },
+              ]}
+            >
               <NavIcon name={navIconForEntityKind(feature.kind)} size={20} selected />
             </View>
             <View style={styles.headerText}>

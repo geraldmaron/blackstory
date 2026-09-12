@@ -9,7 +9,11 @@ export type { ReportErrorOptions, PerfTraceHandle } from './crash-reporter';
 export { initializeObservability, resolveReportContext, refreshReportContext } from './bootstrap';
 export type { ObservabilityInitResult } from './bootstrap';
 
-export { buildReportContext, resolveRuntimeVersion, reportContextToAttributes } from './report-context';
+export {
+  buildReportContext,
+  resolveRuntimeVersion,
+  reportContextToAttributes,
+} from './report-context';
 export type { ReportContext, BuildReportContextInput } from './report-context';
 
 export {

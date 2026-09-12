@@ -3,18 +3,8 @@
  * copper "Show on map". Compact Ledger density — no fact-grid wall or numbered index.
  */
 import { StyleSheet, View } from 'react-native';
-import {
-  Button,
-  LedgerRow,
-  NavIcon,
-  navIconForEntityKind,
-  space,
-} from '@/ui';
-import {
-  recordEraLabel,
-  recordKindLabel,
-  recordStatusLabel,
-} from '../record-facts/record-facts';
+import { Button, LedgerRow, NavIcon, navIconForEntityKind, space } from '@/ui';
+import { recordEraLabel, recordKindLabel, recordStatusLabel } from '../record-facts/record-facts';
 import type { SearchResultV1 } from './search-contracts';
 
 export interface SearchResultCardProps {

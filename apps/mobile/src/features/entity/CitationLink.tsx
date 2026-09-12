@@ -46,7 +46,10 @@ export function CitationLink({ citation, isOnline }: CitationLinkProps) {
           hitSlop={8}
           onPress={handlePress}
         >
-          <Text variant="bodySmall" style={{ color: theme.accent, textDecorationLine: 'underline' }}>
+          <Text
+            variant="bodySmall"
+            style={{ color: theme.accent, textDecorationLine: 'underline' }}
+          >
             {citation.label}
           </Text>
           {showSource ? (
@@ -71,7 +74,12 @@ export function CitationLink({ citation, isOnline }: CitationLinkProps) {
         </Text>
       ) : null}
       {notice ? (
-        <Text variant="caption" colorRole="inkMuted" style={styles.note} accessibilityLiveRegion="polite">
+        <Text
+          variant="caption"
+          colorRole="inkMuted"
+          style={styles.note}
+          accessibilityLiveRegion="polite"
+        >
           {notice}
         </Text>
       ) : null}

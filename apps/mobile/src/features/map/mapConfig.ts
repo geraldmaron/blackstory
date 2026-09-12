@@ -40,8 +40,7 @@ export const PROTOMAPS_ATTRIBUTION = 'Protomaps';
  * Pair with `MAP_LABEL_TEXT_FONT` (`Noto Sans Regular`) — OpenFreeMap serves
  * that stack; it does not serve Open Sans.
  */
-export const DEFAULT_MAP_GLYPHS_URL =
-  'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf';
+export const DEFAULT_MAP_GLYPHS_URL = 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf';
 
 /**
  * Default vector TileJSON — same OpenFreeMap planet source web Explore uses
@@ -107,8 +106,7 @@ export const MAP_VECTOR_TILE_URL: string =
  * Glyphs template for symbol layers. Defaults to OpenFreeMap; overridable via
  * `extra.map.glyphsUrl` when a self-hosted font pack is ready. Never empty.
  */
-export const MAP_GLYPHS_URL: string =
-  sanitizeHttpUrl(extra.glyphsUrl) ?? DEFAULT_MAP_GLYPHS_URL;
+export const MAP_GLYPHS_URL: string = sanitizeHttpUrl(extra.glyphsUrl) ?? DEFAULT_MAP_GLYPHS_URL;
 
 /**
  * Whether to attach the basemap tile source. Defaults to enabled (OpenFreeMap

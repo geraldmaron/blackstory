@@ -26,9 +26,7 @@ export type PreviewFactFeature = {
 };
 
 function whereLabel(feature: PreviewFactFeature): string | undefined {
-  const place =
-    feature.properties.stateName?.trim() ||
-    feature.properties.statePostalCode?.trim();
+  const place = feature.properties.stateName?.trim() || feature.properties.statePostalCode?.trim();
   if (place && place.length > 0) return place;
   return undefined;
 }

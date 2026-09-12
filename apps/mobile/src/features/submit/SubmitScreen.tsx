@@ -23,8 +23,7 @@ const CANONICAL_WEB_ORIGIN = 'https://blackstory.app';
 export const SUBMIT_INTRO = {
   kicker: 'Contribute',
   title: 'Submit',
-  lede:
-    'Help improve the archive. On mobile you can report an error in a published record now. New leads still use the moderated web form.',
+  lede: 'Help improve the archive. On mobile you can report an error in a published record now. New leads still use the moderated web form.',
 } as const;
 
 export function SubmitScreen() {

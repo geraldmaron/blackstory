@@ -28,7 +28,16 @@ import {
   isKnownMapKindFamily,
   kindEncodingFor,
 } from '@/features/map/kind-encoding';
-import { Button, NavIcon, Text, space, radius, useThemeColors, MIN_TOUCH_TARGET, type NavIconName } from '@/ui';
+import {
+  Button,
+  NavIcon,
+  Text,
+  space,
+  radius,
+  useThemeColors,
+  MIN_TOUCH_TARGET,
+  type NavIconName,
+} from '@/ui';
 import { ExploreFacetRow } from './explore-edition-chrome';
 import { activeFilterChips, clearFilterKey } from './active-filter-chips';
 
@@ -164,16 +173,8 @@ function FilterChip({
       style={({ pressed }) => [
         styles.chip,
         {
-          backgroundColor: selected
-            ? useCopper
-              ? theme.surfaceRaised
-              : theme.ink
-            : theme.surface,
-          borderColor: selected
-            ? useCopper
-              ? theme.accent
-              : theme.ink
-            : theme.border,
+          backgroundColor: selected ? (useCopper ? theme.surfaceRaised : theme.ink) : theme.surface,
+          borderColor: selected ? (useCopper ? theme.accent : theme.ink) : theme.border,
           opacity: pressed ? 0.85 : 1,
         },
       ]}
@@ -182,11 +183,7 @@ function FilterChip({
       <Text
         variant="caption"
         style={{
-          color: selected
-            ? useCopper
-              ? theme.accent
-              : theme.inverseInk
-            : theme.ink,
+          color: selected ? (useCopper ? theme.accent : theme.inverseInk) : theme.ink,
         }}
       >
         {label}
@@ -212,7 +209,10 @@ function ActiveFiltersStrip({
 
   return (
     <View
-      style={[styles.activeStrip, { borderColor: theme.border, backgroundColor: theme.surfaceRaised }]}
+      style={[
+        styles.activeStrip,
+        { borderColor: theme.border, backgroundColor: theme.surfaceRaised },
+      ]}
       testID="explore-active-filters"
       accessibilityRole="summary"
       accessibilityLabel={`Active filters: ${chips.map((chip) => chip.label).join(', ')}`}
@@ -262,7 +262,10 @@ function FilterGroup({
 }) {
   const theme = useThemeColors();
   return (
-    <View style={[styles.group, { borderColor: theme.border }]} testID={`filter-group-${title.toLowerCase()}`}>
+    <View
+      style={[styles.group, { borderColor: theme.border }]}
+      testID={`filter-group-${title.toLowerCase()}`}
+    >
       <Pressable
         onPress={onToggle}
         accessibilityRole="button"
@@ -297,11 +300,7 @@ function KindChipRow({
   readonly accentWhenSelected?: boolean;
 }) {
   return (
-    <View
-      style={styles.chipRow}
-      accessibilityRole="radiogroup"
-      accessibilityLabel="Record kind"
-    >
+    <View style={styles.chipRow} accessibilityRole="radiogroup" accessibilityLabel="Record kind">
       <FilterChip
         label="All kinds"
         selected={!kind}
@@ -341,18 +340,10 @@ function FacetChipRow({
 }) {
   const selectable = options.filter((option) => option.value !== 'all');
   const anyLabel =
-    facetKey === 'era'
-      ? 'Any decade'
-      : facetKey === 'state'
-        ? 'Any state'
-        : `Any ${facetKey}`;
+    facetKey === 'era' ? 'Any decade' : facetKey === 'state' ? 'Any state' : `Any ${facetKey}`;
 
   return (
-    <View
-      style={styles.chipRow}
-      accessibilityRole="radiogroup"
-      accessibilityLabel={facetKey}
-    >
+    <View style={styles.chipRow} accessibilityRole="radiogroup" accessibilityLabel={facetKey}>
       <FilterChip
         label={anyLabel}
         selected={!value}
@@ -379,7 +370,10 @@ function FacetChipRow({
 function PlaceFindHandoff({ onOpenPlaceFind }: { readonly onOpenPlaceFind?: () => void }) {
   const theme = useThemeColors();
   return (
-    <View style={[styles.placeFind, { borderColor: theme.border }]} testID="explore-place-find-handoff">
+    <View
+      style={[styles.placeFind, { borderColor: theme.border }]}
+      testID="explore-place-find-handoff"
+    >
       <Text variant="code" colorRole="inkMuted" style={styles.placeFindKicker}>
         Place find
       </Text>
@@ -423,7 +417,11 @@ function facetSummary(
       if (!value) {
         return options[facetKey].find((option) => option.value === 'all')?.label ?? 'All';
       }
-      return options[facetKey].find((option) => option.value === value)?.label.replace(/\s\(\d+\)$/, '') ?? value;
+      return (
+        options[facetKey]
+          .find((option) => option.value === value)
+          ?.label.replace(/\s\(\d+\)$/, '') ?? value
+      );
     }
     default:
       return 'All';
@@ -499,8 +497,10 @@ export function ExploreFiltersPanel({
               <FacetChipRow
                 facetKey="era"
                 value={filters.era}
-                options={facetOptions.era.filter((option) =>
-                  option.value === 'all' || EXPLORE_ERA_QUICK_OPTIONS.includes(option.value as never),
+                options={facetOptions.era.filter(
+                  (option) =>
+                    option.value === 'all' ||
+                    EXPLORE_ERA_QUICK_OPTIONS.includes(option.value as never),
                 )}
                 onChange={(era) => onFiltersChange(updateFilter(filters, 'era', era))}
                 accentWhenSelected
@@ -524,10 +524,7 @@ export function ExploreFiltersPanel({
 
   return (
     <View style={styles.root} testID="explore-filters-panel">
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-      >
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text variant="body" colorRole="inkMuted">
           {description}
         </Text>
@@ -573,7 +570,10 @@ export function ExploreFiltersPanel({
                 summary={facetSummary(key, filters, facetOptions)}
                 expanded={expanded}
                 onToggle={() =>
-                  setExtraOpen((current) => ({ ...current, [key]: !(current[key] ?? Boolean(filters[key])) }))
+                  setExtraOpen((current) => ({
+                    ...current,
+                    [key]: !(current[key] ?? Boolean(filters[key])),
+                  }))
                 }
                 accessibilityLabel={`${label} filters`}
               >

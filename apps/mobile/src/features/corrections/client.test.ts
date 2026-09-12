@@ -1,16 +1,13 @@
 import { createManualConnectivity } from '@/data/offline';
-import { createSecretStore, SECRET_KEYS, type SecretBackend, type SecretStore } from '@/data/secure-store';
+import {
+  createSecretStore,
+  SECRET_KEYS,
+  type SecretBackend,
+  type SecretStore,
+} from '@/data/secure-store';
 import { CLIENT_VERSION_HEADER } from '@/security/api-client';
-import {
-  CORRECTION_STATUS_PATH,
-  CORRECTION_SUBMIT_PATH,
-  IDEMPOTENCY_KEY_HEADER,
-} from './contract';
-import {
-  lookupCorrectionStatus,
-  submitCorrection,
-  type CorrectionClientDeps,
-} from './client';
+import { CORRECTION_STATUS_PATH, CORRECTION_SUBMIT_PATH, IDEMPOTENCY_KEY_HEADER } from './contract';
+import { lookupCorrectionStatus, submitCorrection, type CorrectionClientDeps } from './client';
 import type { CorrectionFormState } from './validation';
 
 const BASE = 'https://submissions.blackstory.app';
@@ -44,7 +41,11 @@ function fakeBackend(): SecretBackend {
   };
 }
 
-function makeResponse(status: number, body: unknown, headers: Record<string, string> = {}): Response {
+function makeResponse(
+  status: number,
+  body: unknown,
+  headers: Record<string, string> = {},
+): Response {
   const lower = Object.fromEntries(Object.entries(headers).map(([k, v]) => [k.toLowerCase(), v]));
   return {
     status,
@@ -140,7 +141,10 @@ describe('submitCorrection — validation, rate limit, network errors', () => {
   it('maps a server 400 validation_failed to invalid issues', async () => {
     const { deps, fetchMock } = makeDeps();
     fetchMock.mockResolvedValueOnce(
-      makeResponse(400, { error: 'validation_failed', issues: [{ field: 'statement', message: 'x' }] }),
+      makeResponse(400, {
+        error: 'validation_failed',
+        issues: [{ field: 'statement', message: 'x' }],
+      }),
     );
     const result = await submitCorrection(validForm, deps);
     expect(result).toMatchObject({ status: 'invalid' });
@@ -148,8 +152,13 @@ describe('submitCorrection — validation, rate limit, network errors', () => {
 
   it('maps 429 to a generic rate-limited result with retry-after', async () => {
     const { deps, fetchMock } = makeDeps();
-    fetchMock.mockResolvedValueOnce(makeResponse(429, { error: 'rate_limited' }, { 'retry-after': '42' }));
-    expect(await submitCorrection(validForm, deps)).toEqual({ status: 'rate_limited', retryAfterSeconds: 42 });
+    fetchMock.mockResolvedValueOnce(
+      makeResponse(429, { error: 'rate_limited' }, { 'retry-after': '42' }),
+    );
+    expect(await submitCorrection(validForm, deps)).toEqual({
+      status: 'rate_limited',
+      retryAfterSeconds: 42,
+    });
   });
 
   it('maps a network throw to a generic error', async () => {

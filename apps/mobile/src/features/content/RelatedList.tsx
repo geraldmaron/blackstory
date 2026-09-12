@@ -73,7 +73,9 @@ export function RelatedFactBadges({ factIds }: { readonly factIds: readonly stri
       >
         Cited facts ({factIds.length})
       </Text>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space['2'], marginTop: space['2'] }}>
+      <View
+        style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space['2'], marginTop: space['2'] }}
+      >
         {factIds.slice(0, RENDER_WINDOW).map((id) => (
           <Surface key={id} bordered paddingKey="2" radiusKey="full">
             <Text variant="caption">{id}</Text>

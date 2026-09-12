@@ -5,7 +5,9 @@ import { isSafeExternalHref, sanitizeExternalHref } from './link-safety';
 
 describe('sanitizeExternalHref', () => {
   it('allows a plain https URL unchanged', () => {
-    expect(sanitizeExternalHref('https://example.gov/report.pdf')).toBe('https://example.gov/report.pdf');
+    expect(sanitizeExternalHref('https://example.gov/report.pdf')).toBe(
+      'https://example.gov/report.pdf',
+    );
   });
 
   it('allows a plain http URL', () => {

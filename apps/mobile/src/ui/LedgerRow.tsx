@@ -50,7 +50,12 @@ export function LedgerRow({
   const trailingContent =
     trailing ??
     (showChevron && onPress ? (
-      <Ionicons name="chevron-forward" size={18} color={theme.inkMuted} accessibilityElementsHidden />
+      <Ionicons
+        name="chevron-forward"
+        size={18}
+        color={theme.inkMuted}
+        accessibilityElementsHidden
+      />
     ) : null);
 
   const content = (

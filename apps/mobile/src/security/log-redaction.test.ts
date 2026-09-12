@@ -1,9 +1,4 @@
-import {
-  redactForLog,
-  redactedLogLine,
-  isSensitiveKey,
-  REDACTED,
-} from './log-redaction';
+import { redactForLog, redactedLogLine, isSensitiveKey, REDACTED } from './log-redaction';
 
 describe('log redaction — sensitive categories never survive', () => {
   it('redacts search query text by key', () => {
@@ -78,9 +73,7 @@ describe('log redaction — sensitive categories never survive', () => {
   });
 
   it('scrubs sensitive values carried inside an Error message/stack', () => {
-    const err = new Error(
-      'request failed for query "Tulsa massacre" at 40.7128,-74.0060',
-    );
+    const err = new Error('request failed for query "Tulsa massacre" at 40.7128,-74.0060');
     const out = redactForLog(err) as Record<string, unknown>;
     // The lat,lng pattern in the message triggers whole-message redaction.
     expect(out.message).toBe(REDACTED);

@@ -5,9 +5,18 @@
  */
 import { createSearchController, type SearchControllerState } from '../search-controller';
 import { TransportError } from '@/data';
-import { buildRuntime, fakeReleaseCache, flushMicrotasks, makeControllableTransport, page } from '../test-support';
+import {
+  buildRuntime,
+  fakeReleaseCache,
+  flushMicrotasks,
+  makeControllableTransport,
+  page,
+} from '../test-support';
 
-function collectStates(): { states: SearchControllerState[]; onChange: (s: SearchControllerState) => void } {
+function collectStates(): {
+  states: SearchControllerState[];
+  onChange: (s: SearchControllerState) => void;
+} {
   const states: SearchControllerState[] = [];
   return { states, onChange: (s) => states.push(s) };
 }
@@ -93,13 +102,22 @@ describe('stale-page race guard (MOB-013 item 8: a slow earlier response cannot 
     controller.setQuery('second query', undefined); // generation 2, call[1]
     await flushMicrotasks();
 
-    expect(calls).toEqual(['/v1/search?q=first+query&pageSize=20', '/v1/search?q=second+query&pageSize=20']);
+    expect(calls).toEqual([
+      '/v1/search?q=first+query&pageSize=20',
+      '/v1/search?q=second+query&pageSize=20',
+    ]);
 
     // Resolve OUT OF ORDER: the newer request (call[1]) finishes first...
-    resolveCallAt(1, page({ results: [{ ...page().results[0], id: 'ent_second', displayName: 'Second Result' }] }));
+    resolveCallAt(
+      1,
+      page({ results: [{ ...page().results[0], id: 'ent_second', displayName: 'Second Result' }] }),
+    );
     await flushMicrotasks();
     // ...then the STALE first request (call[0]) resolves late.
-    resolveCallAt(0, page({ results: [{ ...page().results[0], id: 'ent_first', displayName: 'First Result' }] }));
+    resolveCallAt(
+      0,
+      page({ results: [{ ...page().results[0], id: 'ent_first', displayName: 'First Result' }] }),
+    );
     await flushMicrotasks();
 
     const final = states[states.length - 1];

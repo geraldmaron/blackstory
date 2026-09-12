@@ -6,8 +6,7 @@
 export const ABOUT_INTRO = {
   kicker: 'BlackStory',
   title: 'History, pinned to place.',
-  lede:
-    'A place-connected Black history research platform, so documented history stays findable, especially the history close to you. People. Places. Evidence. Context.',
+  lede: 'A place-connected Black history research platform, so documented history stays findable, especially the history close to you. People. Places. Evidence. Context.',
   supportLine: 'People. Places. Evidence. Context.',
 } as const;
 
@@ -65,8 +64,7 @@ export const ABOUT_DESTINATIONS = [
   {
     href: '/records',
     label: 'Records',
-    detail:
-      'The archive as a list. Browse by era, kind and place, or search by name or keyword.',
+    detail: 'The archive as a list. Browse by era, kind and place, or search by name or keyword.',
     icon: 'records' as const,
   },
   {

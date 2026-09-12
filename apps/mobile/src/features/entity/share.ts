@@ -38,7 +38,11 @@ export async function shareEntity(entityId: string, displayName: string): Promis
   const url = buildCanonicalEntityUrl(entityId);
   if (!url) return 'invalid-id';
   try {
-    const result = await Share.share({ message: `${displayName} — ${url}`, url, title: displayName });
+    const result = await Share.share({
+      message: `${displayName} — ${url}`,
+      url,
+      title: displayName,
+    });
     if (result.action === Share.dismissedAction) return 'dismissed';
     return 'shared';
   } catch {

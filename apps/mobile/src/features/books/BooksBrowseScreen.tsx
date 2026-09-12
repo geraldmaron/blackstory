@@ -29,12 +29,7 @@ import {
   MIN_TOUCH_TARGET,
 } from '@/ui';
 import { BOOKS_ABOUT, BOOKS_CATALOG, BOOKS_INTRO } from './books-copy';
-import {
-  catalogPulse,
-  filterCatalogRows,
-  listCatalogRows,
-  loadBooksCatalog,
-} from './catalog';
+import { catalogPulse, filterCatalogRows, listCatalogRows, loadBooksCatalog } from './catalog';
 
 export function BooksBrowseScreen() {
   const theme = useThemeColors();

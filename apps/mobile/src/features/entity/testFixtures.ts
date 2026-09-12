@@ -21,7 +21,11 @@ import { ENTITY_KINDS, type EntityKind } from './types';
  * actually arrives over the wire/from cache (untyped at this boundary). */
 export type RawEntity = Record<string, unknown>;
 
-const BASE_REVISION = { releaseId: 'rel_2026_07_19_01', generatedAt: '2026-07-19T00:00:00.000Z', recordUpdatedAt: '2026-07-18T12:00:00.000Z' };
+const BASE_REVISION = {
+  releaseId: 'rel_2026_07_19_01',
+  generatedAt: '2026-07-19T00:00:00.000Z',
+  recordUpdatedAt: '2026-07-18T12:00:00.000Z',
+};
 
 const BASE_CITATION = {
   source: 'Reputable Secondary',
@@ -48,8 +52,18 @@ function fullClaim(id: string, overrides: RawEntity = {}): RawEntity {
       ],
     },
     revisionHistory: [
-      { id: `${id}_rev1`, changedAt: '2025-01-01T00:00:00.000Z', changeKind: 'created', summary: 'Initial research pass.' },
-      { id: `${id}_rev2`, changedAt: '2026-02-01T00:00:00.000Z', changeKind: 'corrected', summary: 'Corrected founding-year citation.' },
+      {
+        id: `${id}_rev1`,
+        changedAt: '2025-01-01T00:00:00.000Z',
+        changeKind: 'created',
+        summary: 'Initial research pass.',
+      },
+      {
+        id: `${id}_rev2`,
+        changedAt: '2026-02-01T00:00:00.000Z',
+        changeKind: 'corrected',
+        summary: 'Corrected founding-year citation.',
+      },
     ],
     ...overrides,
   };
@@ -89,23 +103,56 @@ export function fullEntityFixture(kind: EntityKind, id = `ent_${kind}_full_001`)
     kind,
     displayName: `Full Fixture Record (${kind})`,
     summary: 'A short summary of this record for the entity mast.',
-    ...(isEvent ? {} : { status: 'active', statusHistory: [
-      { status: 'active', validFrom: '1871-01-01', validTo: null, datePrecision: 'year', basisClaimIds: ['claim_1'] },
-    ] }),
-    ...(isEvent ? { eventWindow: { startAt: '1871-01-01', endAt: '1871-06-01', datePrecision: 'month', eventType: 'founding_ceremony' } } : {}),
+    ...(isEvent
+      ? {}
+      : {
+          status: 'active',
+          statusHistory: [
+            {
+              status: 'active',
+              validFrom: '1871-01-01',
+              validTo: null,
+              datePrecision: 'year',
+              basisClaimIds: ['claim_1'],
+            },
+          ],
+        }),
+    ...(isEvent
+      ? {
+          eventWindow: {
+            startAt: '1871-01-01',
+            endAt: '1871-06-01',
+            datePrecision: 'month',
+            eventType: 'founding_ceremony',
+          },
+        }
+      : {}),
     eraBuckets: ['reconstruction'],
     notabilityLabels: ['First of its kind in the county'],
-    notabilityBasis: [{ criterion: 'firsts', note: 'First Black-owned institution of its kind in the county.', evidenceIds: ['claim_1'] }],
+    notabilityBasis: [
+      {
+        criterion: 'firsts',
+        note: 'First Black-owned institution of its kind in the county.',
+        evidenceIds: ['claim_1'],
+      },
+    ],
     sensitivityClass: 'ongoing_dispute',
-    sensitivity: { class: 'ongoing_dispute', note: 'Some details of this record remain actively contested by descendant communities.', basisClaimIds: ['claim_1'] },
+    sensitivity: {
+      class: 'ongoing_dispute',
+      note: 'Some details of this record remain actively contested by descendant communities.',
+      basisClaimIds: ['claim_1'],
+    },
     topicTags: ['education', 'reconstruction_era'],
     topicIds: ['topic_education'],
     jurisdictionLabel: 'Dunbar County, GA',
     locationPrecision: 'neighborhood',
     locationLabel: 'Historic Dunbar neighborhood',
-    relevanceExplanation: 'This record is included because it meets the documented-connection and notability bar for Black history.',
-    historicalContext: 'Established during Reconstruction as part of a broader wave of community self-organization.',
-    extendedNarrative: 'A longer passage of further reading for readers who want more than the summary and context provide.',
+    relevanceExplanation:
+      'This record is included because it meets the documented-connection and notability bar for Black history.',
+    historicalContext:
+      'Established during Reconstruction as part of a broader wave of community self-organization.',
+    extendedNarrative:
+      'A longer passage of further reading for readers who want more than the summary and context provide.',
     primaryImage: {
       url: 'https://images.example.org/entities/full-001/primary.jpg',
       alt: 'Black-and-white archival photograph of the founding structure.',
@@ -118,11 +165,20 @@ export function fullEntityFixture(kind: EntityKind, id = `ent_${kind}_full_001`)
     recordMaturity: 'developing',
     researchCoverage: 'partial',
     geoAnchor: { lat: 33.749, lng: -84.388, geohash: 'dnh0', matchMethod: 'geocoded_jurisdiction' },
-    claims: [fullClaim('claim_1'), fullClaim('claim_2', { dispute: undefined, citation: undefined, predicate: 'renamed_to' })],
-    timeline: [fullTimelineEvent('tl_1'), fullTimelineEvent('tl_2', { atLabel: 'Undated', at: undefined, datePrecision: 'circa' })],
+    claims: [
+      fullClaim('claim_1'),
+      fullClaim('claim_2', { dispute: undefined, citation: undefined, predicate: 'renamed_to' }),
+    ],
+    timeline: [
+      fullTimelineEvent('tl_1'),
+      fullTimelineEvent('tl_2', { atLabel: 'Undated', at: undefined, datePrecision: 'circa' }),
+    ],
     revision: BASE_REVISION,
     related: [{ id: 'ent_related_1', type: 'founded_alongside', direction: 'outgoing' }],
-    relatedNeighbors: [fullNeighbor('ent_neighbor_1'), fullNeighbor('ent_neighbor_2', { summary: '' })],
+    relatedNeighbors: [
+      fullNeighbor('ent_neighbor_1'),
+      fullNeighbor('ent_neighbor_2', { summary: '' }),
+    ],
     continueLearning: [fullNeighbor('ent_continue_1')],
   };
 }
@@ -160,7 +216,9 @@ export const ALL_KINDS: readonly EntityKind[] = ENTITY_KINDS;
 
 /** A claim whose citation carries a scheme this client must never open as a link. */
 export function claimWithMalformedCitationUrl(): RawEntity {
-  return fullClaim('claim_malformed_href', { citation: { source: 'Hostile source', label: 'Click here', href: 'javascript:alert(1)' } });
+  return fullClaim('claim_malformed_href', {
+    citation: { source: 'Hostile source', label: 'Click here', href: 'javascript:alert(1)' },
+  });
 }
 
 /** A claim with no citation at all (required on the wire, but a defensive fixture proves the
@@ -196,7 +254,7 @@ export function entityWithMaliciouslyLargeNarrative(): RawEntity {
 }
 
 const MALICIOUS_TEXT =
-  '<script>alert(1)</script> ‮gnitset‬   ${process.env.SECRET} \'; DROP TABLE entities; --';
+  "<script>alert(1)</script> ‮gnitset‬   ${process.env.SECRET} '; DROP TABLE entities; --";
 
 export function entityWithMaliciousText(): RawEntity {
   const base = fullEntityFixture('place', 'ent_place_malicious_001');
@@ -217,7 +275,10 @@ export function entityWithSelfReferencingNeighbor(): RawEntity {
   return {
     ...base,
     relatedNeighbors: [
-      fullNeighbor(id, { displayName: 'Full Fixture Record (place)', relationType: 'self_reference' }),
+      fullNeighbor(id, {
+        displayName: 'Full Fixture Record (place)',
+        relationType: 'self_reference',
+      }),
       fullNeighbor('ent_other_side_of_cycle', { relationType: 'mutually_related' }),
     ],
   };

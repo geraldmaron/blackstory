@@ -61,9 +61,7 @@ const hasDatabase = Boolean(
   process.env.DATABASE_URL?.trim() || process.env.APP_DATABASE_URL?.trim(),
 );
 
-const selected = only.length
-  ? SEEDS.filter((seed) => only.includes(seed.name))
-  : SEEDS;
+const selected = only.length ? SEEDS.filter((seed) => only.includes(seed.name)) : SEEDS;
 
 const unknown = only.filter((name) => !SEEDS.some((seed) => seed.name === name));
 if (unknown.length) {

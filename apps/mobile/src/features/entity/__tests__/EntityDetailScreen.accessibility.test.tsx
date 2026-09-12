@@ -22,7 +22,11 @@ function readyState(): EntityDetailState {
   const entity = normalizeEntity(fullEntityFixture('place'))!;
   return {
     kind: 'ready',
-    result: { status: 'ready', entity, freshness: { source: 'network', fetchedAt: 0, degraded: false } },
+    result: {
+      status: 'ready',
+      entity,
+      freshness: { source: 'network', fetchedAt: 0, degraded: false },
+    },
   };
 }
 

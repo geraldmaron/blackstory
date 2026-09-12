@@ -41,11 +41,7 @@ function failConfig(message: string): never {
  * Production MUST be https (never ship cleartext attestation/API traffic);
  * dev/preview may use http for a LAN/localhost host.
  */
-function resolveHttpUrl(
-  name: string,
-  raw: string | undefined,
-  fallback: string,
-): string {
+function resolveHttpUrl(name: string, raw: string | undefined, fallback: string): string {
   const value = (raw ?? '').trim() || fallback;
   let parsed: URL;
   try {

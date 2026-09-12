@@ -53,10 +53,7 @@ export function ScreenHeader({
   const tight = compact || dense;
 
   return (
-    <View
-      style={[styles.block, tight ? styles.compact : undefined]}
-      accessibilityRole="header"
-    >
+    <View style={[styles.block, tight ? styles.compact : undefined]} accessibilityRole="header">
       {kicker ? (
         <View style={styles.kickerRow}>
           <View

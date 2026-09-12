@@ -20,7 +20,8 @@ export type BannedBookCitation = {
 };
 
 export type BannedBookPurchaseLink = {
-  readonly retailer: 'bookshop' | 'amazon' | 'barnes-noble' | 'open-library' | 'publisher' | 'other';
+  readonly retailer:
+    'bookshop' | 'amazon' | 'barnes-noble' | 'open-library' | 'publisher' | 'other';
   readonly label: string;
   readonly href: string;
   readonly validatedAt?: string;

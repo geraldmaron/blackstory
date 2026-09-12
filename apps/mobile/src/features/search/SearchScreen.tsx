@@ -31,7 +31,14 @@ import { Notice } from '@/ui/Notice';
 import { ScreenCanvas } from '@/ui/ScreenCanvas';
 import { ScreenHeader } from '@/ui/ScreenHeader';
 import { Text } from '@/ui/Text';
-import { MIN_TOUCH_TARGET, radius, space, typeScale, useScreenScrollInsets, useThemeColors } from '@/ui';
+import {
+  MIN_TOUCH_TARGET,
+  radius,
+  space,
+  typeScale,
+  useScreenScrollInsets,
+  useThemeColors,
+} from '@/ui';
 import { parseEntityId } from '@/lib/route-params';
 import { BrowseCategoryList, showCategoryOnMap } from './BrowseCategoryList';
 import { useSearch } from './useSearch';
@@ -147,7 +154,10 @@ export function SearchScreen({
     () =>
       state.kind === 'results'
         ? state.results.map((r: SearchResultV1) =>
-            toSearchResultCardProps(r, { onPress: handlePressResult, onShowOnMap: handleShowOnMap }),
+            toSearchResultCardProps(r, {
+              onPress: handlePressResult,
+              onShowOnMap: handleShowOnMap,
+            }),
           )
         : [],
     [state],
@@ -191,7 +201,12 @@ export function SearchScreen({
           ]}
         >
           <View style={styles.searchRow}>
-            <Ionicons name="search-outline" size={18} color={theme.inkMuted} accessibilityElementsHidden />
+            <Ionicons
+              name="search-outline"
+              size={18}
+              color={theme.inkMuted}
+              accessibilityElementsHidden
+            />
             <TextInput
               value={draft}
               onChangeText={setDraft}
@@ -218,7 +233,12 @@ export function SearchScreen({
                   { backgroundColor: pressed ? theme.surfacePressed : 'transparent' },
                 ]}
               >
-                <Ionicons name="close-circle" size={20} color={theme.inkMuted} accessibilityElementsHidden />
+                <Ionicons
+                  name="close-circle"
+                  size={20}
+                  color={theme.inkMuted}
+                  accessibilityElementsHidden
+                />
               </Pressable>
             ) : null}
           </View>
@@ -269,7 +289,10 @@ export function SearchScreen({
           <ErrorState
             compact
             title="Search could not finish"
-            description={state.message || 'Something went wrong. Try again, or open Explore to browse by place.'}
+            description={
+              state.message ||
+              'Something went wrong. Try again, or open Explore to browse by place.'
+            }
             retry={{ label: 'Try again', onPress: retry }}
           />
         ) : null}
@@ -434,7 +457,9 @@ function BrowseModePanels({
     <>
       {archiveMeta ? (
         <View>
-          <LedgerSectionLabel meta={`${archiveScopeLabel} · ${archiveMeta}`}>Scale</LedgerSectionLabel>
+          <LedgerSectionLabel meta={`${archiveScopeLabel} · ${archiveMeta}`}>
+            Scale
+          </LedgerSectionLabel>
         </View>
       ) : null}
 

@@ -11,7 +11,6 @@
 import { act, fireEvent, render } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 
- 
 import { MapScreen } from '../MapScreen';
 import { DEFAULT_MAP_GLYPHS_URL, MAP_LABEL_TEXT_FONT } from '../mapConfig';
 import { CLUSTER_CAMERA_ZOOM_STEP } from '../clusterCamera';
@@ -112,7 +111,10 @@ jest.mock('@maplibre/maplibre-react-native', () => {
         children as never,
       ),
     Layer: ({ style }: { style?: unknown }) =>
-      React.createElement(View, { testID: 'maplibre-layer', accessibilityLabel: JSON.stringify(style) }),
+      React.createElement(View, {
+        testID: 'maplibre-layer',
+        accessibilityLabel: JSON.stringify(style),
+      }),
   };
 });
 
@@ -184,7 +186,9 @@ describe('MapScreen — ready state', () => {
 
   it('clamps the camera to CONUS maxBounds with a national minZoom floor', async () => {
     const { getByTestId } = await render(<MapScreen />);
-    const camera = JSON.parse(getByTestId('maplibre-camera').props.accessibilityLabel as string) as {
+    const camera = JSON.parse(
+      getByTestId('maplibre-camera').props.accessibilityLabel as string,
+    ) as {
       minZoom?: number;
       maxZoom?: number;
       maxBounds?: number[];
@@ -200,7 +204,10 @@ describe('MapScreen — ready state', () => {
     const { getAllByTestId } = await render(<MapScreen selectedEntityId="ent_selected" />);
     const layers = getAllByTestId('maplibre-layer');
     const strokes = layers
-      .map((node) => JSON.parse(node.props.accessibilityLabel as string) as { circleStrokeColor?: string })
+      .map(
+        (node) =>
+          JSON.parse(node.props.accessibilityLabel as string) as { circleStrokeColor?: string },
+      )
       .map((style) => style.circleStrokeColor)
       .filter((color): color is string => typeof color === 'string');
     expect(strokes).toContain(DIGNITY_PALETTE.selectedAccent);
@@ -211,7 +218,10 @@ describe('MapScreen — ready state', () => {
     const { getAllByTestId } = await render(<MapScreen />);
     const layers = getAllByTestId('maplibre-layer');
     const strokes = layers
-      .map((node) => JSON.parse(node.props.accessibilityLabel as string) as { circleStrokeColor?: string })
+      .map(
+        (node) =>
+          JSON.parse(node.props.accessibilityLabel as string) as { circleStrokeColor?: string },
+      )
       .map((style) => style.circleStrokeColor)
       .filter((color): color is string => typeof color === 'string');
     // The pulse ring is always mounted (never conditionally added), same
@@ -226,11 +236,14 @@ describe('MapScreen — ready state', () => {
     );
     const layers = getAllByTestId('maplibre-layer');
     const pulse = layers
-      .map((node) => JSON.parse(node.props.accessibilityLabel as string) as {
-        circleStrokeColor?: string;
-        circleStrokeOpacity?: number;
-        circleColor?: string;
-      })
+      .map(
+        (node) =>
+          JSON.parse(node.props.accessibilityLabel as string) as {
+            circleStrokeColor?: string;
+            circleStrokeOpacity?: number;
+            circleColor?: string;
+          },
+      )
       .find(
         (style) =>
           style.circleColor === 'transparent' &&

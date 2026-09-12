@@ -12,9 +12,7 @@ import { normalizePgConnectionString } from '../../../packages/ops-data/scripts/
 
 const here = dirname(fileURLToPath(import.meta.url));
 // `pg` is a dependency of ops-data, not the mobile app — resolve it from there.
-const requireFromOpsData = createRequire(
-  resolve(here, '../../../packages/ops-data/package.json'),
-);
+const requireFromOpsData = createRequire(resolve(here, '../../../packages/ops-data/package.json'));
 const pg = requireFromOpsData('pg');
 const outPath = resolve(here, '../src/features/themes/catalog-seed.json');
 
@@ -24,56 +22,49 @@ const THEME_IMPACT_CATALOG = [
     id: 'redlining',
     title: 'Housing segregation & redlining',
     priority: 'P0',
-    lede:
-      'Walk from a named beach in 1919 through federal maps, county instruments, and a South Side district you can still name. Metro readings where the record is densest; national wealth for scale.',
+    lede: 'Walk from a named beach in 1919 through federal maps, county instruments, and a South Side district you can still name. Metro readings where the record is densest; national wealth for scale.',
     available: true,
   },
   {
     id: 'drug_policy_state',
     title: 'Drug policy, sentencing & enforcement',
     priority: 'P0',
-    lede:
-      'Federal statutes read beside jail, sentencing, and imprisonment instruments, without speculative intelligence-market claims.',
+    lede: 'Federal statutes read beside jail, sentencing, and imprisonment instruments, without speculative intelligence-market claims.',
     available: true,
   },
   {
     id: 'urban_renewal',
     title: 'Urban renewal',
     priority: 'P1',
-    lede:
-      'Federal project records, reported family and housing fields, and later county demographics, with missing project fields kept unknown.',
+    lede: 'Federal project records, reported family and housing fields, and later county demographics, with missing project fields kept unknown.',
     available: true,
   },
   {
     id: 'mass_incarceration',
     title: 'Mass incarceration',
     priority: 'P1',
-    lede:
-      'National BJS-published adult imprisonment rates across a decade, then a distinct ACS-denominator state Black-White disparity cross-section for 2022-2023.',
+    lede: 'National BJS-published adult imprisonment rates across a decade, then a distinct ACS-denominator state Black-White disparity cross-section for 2022-2023.',
     available: true,
   },
   {
     id: 'environmental_racism',
     title: 'Environmental justice & unequal burden',
     priority: 'P1',
-    lede:
-      'An Illinois county test using ACS, CDC EJI, and EPA TRI data, including the mixed results that challenge a simple facility-count story.',
+    lede: 'An Illinois county test using ACS, CDC EJI, and EPA TRI data, including the mixed results that challenge a simple facility-count story.',
     available: true,
   },
   {
     id: 'school_segregation',
     title: 'School segregation & opportunity',
     priority: 'P1',
-    lede:
-      'How residential segregation feeds school opportunity. Metro attainment sits beside national BA+ shares and the desegregation record; district discipline series stay unloaded.',
+    lede: 'How residential segregation feeds school opportunity. Metro attainment sits beside national BA+ shares and the desegregation record; district discipline series stay unloaded.',
     available: true,
   },
   {
     id: 'voting_rights',
     title: 'Voting rights & political exclusion',
     priority: 'P1',
-    lede:
-      'Franchise rules from Reconstruction through the Voting Rights Act, with Census CPS A-1 national turnout for presidential years 1992-2020. State policy indexes remain cite-first.',
+    lede: 'Franchise rules from Reconstruction through the Voting Rights Act, with Census CPS A-1 national turnout for presidential years 1992-2020. State policy indexes remain cite-first.',
     available: true,
   },
 ];
@@ -100,7 +91,9 @@ const { rows: released } = await client.query(`
 await client.end();
 
 if (released.length === 0) {
-  throw new Error('active release contains no theme-impact packets — refusing to write an empty seed');
+  throw new Error(
+    'active release contains no theme-impact packets — refusing to write an empty seed',
+  );
 }
 
 const releaseId = released[0].release_id;
@@ -120,6 +113,4 @@ const snapshot = {
 
 mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, `${JSON.stringify(snapshot, null, 2)}\n`);
-console.log(
-  `Wrote ${outPath} (${THEME_IMPACT_CATALOG.length} themes, ${packets.length} packets)`,
-);
+console.log(`Wrote ${outPath} (${THEME_IMPACT_CATALOG.length} themes, ${packets.length} packets)`);

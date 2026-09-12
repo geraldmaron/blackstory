@@ -20,8 +20,8 @@ describe('ScreenHeader', () => {
       <ScreenHeader kicker="The archive" title="Records" dek="Search records by keyword." />,
     );
 
-    expect(getByText("The archive")).toBeTruthy();
-    expect(getByText("Records")).toBeTruthy();
+    expect(getByText('The archive')).toBeTruthy();
+    expect(getByText('Records')).toBeTruthy();
     expect(getByText('Search records by keyword.')).toBeTruthy();
   });
 
@@ -39,7 +39,7 @@ describe('ScreenHeader', () => {
       />,
     );
 
-    expect(getByText("Records")).toBeTruthy();
+    expect(getByText('Records')).toBeTruthy();
     expect(getByLabelText('Developer menu')).toBeTruthy();
   });
 

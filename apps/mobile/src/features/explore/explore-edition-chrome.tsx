@@ -115,10 +115,7 @@ export function ExploreFacetRow({ label, summary, children, testID }: ExploreFac
   const theme = useThemeColors();
 
   return (
-    <View
-      style={[styles.facetRow, { borderBottomColor: theme.border }]}
-      testID={testID}
-    >
+    <View style={[styles.facetRow, { borderBottomColor: theme.border }]} testID={testID}>
       <View style={styles.facetLabelBlock}>
         <Text variant="code" colorRole="inkMuted" style={styles.facetLabel}>
           {label.toUpperCase()}
@@ -178,10 +175,7 @@ export function ExplorePanelHeader({
           accessibilityLabel={hideLabel}
           onPress={onHide}
           hitSlop={8}
-          style={({ pressed }) => [
-            styles.hideButton,
-            { opacity: pressed ? 0.75 : 1 },
-          ]}
+          style={({ pressed }) => [styles.hideButton, { opacity: pressed ? 0.75 : 1 }]}
         >
           <Ionicons name="close" size={18} color={theme.accent} />
         </Pressable>

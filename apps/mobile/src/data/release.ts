@@ -24,10 +24,7 @@
  * current stamp. Deliberately an equality check, not an ordering check: rollback
  * to a prior release must invalidate identically to a roll-forward.
  */
-export function isReleaseStampStale(
-  clientStamp: string | undefined,
-  serverStamp: string,
-): boolean {
+export function isReleaseStampStale(clientStamp: string | undefined, serverStamp: string): boolean {
   return clientStamp !== serverStamp;
 }
 
@@ -37,9 +34,6 @@ export function isReleaseStampStale(
  * dropped/refetched before display (threat-model T5: "never renders cache data
  * from a superseded release as current").
  */
-export function isEntryServable(
-  entryStamp: string,
-  activeStamp: string,
-): boolean {
+export function isEntryServable(entryStamp: string, activeStamp: string): boolean {
   return entryStamp === activeStamp;
 }

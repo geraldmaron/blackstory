@@ -9,7 +9,9 @@ import { AccessibilityInfo } from 'react-native';
 import { EntityPreviewSheet } from '../EntityPreviewSheet';
 import type { ExploreFeature } from '@/features/explore/explore-feature';
 
-const sendEvent = jest.spyOn(AccessibilityInfo, 'sendAccessibilityEvent').mockImplementation(() => {});
+const sendEvent = jest
+  .spyOn(AccessibilityInfo, 'sendAccessibilityEvent')
+  .mockImplementation(() => {});
 
 beforeEach(() => {
   sendEvent.mockClear();
@@ -43,7 +45,11 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
 
   it('moves assistive-tech focus onto the sheet when a feature is first selected', async () => {
     await render(
-      <EntityPreviewSheet feature={feature('ent_a', 'Bethel AME Church')} onOpenEntity={jest.fn()} onClose={jest.fn()} />,
+      <EntityPreviewSheet
+        feature={feature('ent_a', 'Bethel AME Church')}
+        onOpenEntity={jest.fn()}
+        onClose={jest.fn()}
+      />,
     );
     expect(sendEvent).toHaveBeenCalledTimes(1);
     expect(sendEvent.mock.calls[0]![1]).toBe('focus');
@@ -51,19 +57,31 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
 
   it('moves focus again when the selection changes to a DIFFERENT feature, but not on an unrelated re-render of the same feature', async () => {
     const { rerender } = await render(
-      <EntityPreviewSheet feature={feature('ent_a', 'Bethel AME Church')} onOpenEntity={jest.fn()} onClose={jest.fn()} />,
+      <EntityPreviewSheet
+        feature={feature('ent_a', 'Bethel AME Church')}
+        onOpenEntity={jest.fn()}
+        onClose={jest.fn()}
+      />,
     );
     expect(sendEvent).toHaveBeenCalledTimes(1);
 
     // Same entity id, re-rendered (e.g. a parent re-render with no real selection change).
     await rerender(
-      <EntityPreviewSheet feature={feature('ent_a', 'Bethel AME Church')} onOpenEntity={jest.fn()} onClose={jest.fn()} />,
+      <EntityPreviewSheet
+        feature={feature('ent_a', 'Bethel AME Church')}
+        onOpenEntity={jest.fn()}
+        onClose={jest.fn()}
+      />,
     );
     expect(sendEvent).toHaveBeenCalledTimes(1);
 
     // A genuinely new selection.
     await rerender(
-      <EntityPreviewSheet feature={feature('ent_b', 'Greenwood District')} onOpenEntity={jest.fn()} onClose={jest.fn()} />,
+      <EntityPreviewSheet
+        feature={feature('ent_b', 'Greenwood District')}
+        onOpenEntity={jest.fn()}
+        onClose={jest.fn()}
+      />,
     );
     expect(sendEvent).toHaveBeenCalledTimes(2);
   });
@@ -119,7 +137,9 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
     // "4 claims", neither of which named a grade.
     expect(summary.props.accessibilityLabel).toMatch(/Evidence: Grade A · 4 sources/);
     expect(summary.props.accessibilityLabel).not.toMatch(/claims/);
-    expect(getByTestId('entity-preview-evidence-meter', { includeHiddenElements: true })).toBeTruthy();
+    expect(
+      getByTestId('entity-preview-evidence-meter', { includeHiddenElements: true }),
+    ).toBeTruthy();
     expect(getByTestId('entity-preview-linked')).toHaveTextContent(/education · faith/);
   });
 });

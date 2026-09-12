@@ -19,11 +19,7 @@ import {
 } from './generated/colors.generated';
 import { radius, type RadiusKey } from './generated/radius.generated';
 import { space, type SpaceKey } from './generated/spacing.generated';
-import {
-  duration,
-  easingStandardBezier,
-  easingStandardCss,
-} from './generated/motion.generated';
+import { duration, easingStandardBezier, easingStandardCss } from './generated/motion.generated';
 import {
   fontFamilies,
   typeScale,

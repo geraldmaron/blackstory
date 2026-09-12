@@ -18,7 +18,8 @@
  * both, by design, so the client must never imply it knows which).
  */
 
-export type RecordGapKind = 'claims' | 'related' | 'timeline' | 'statusHistory' | 'context' | 'relevance';
+export type RecordGapKind =
+  'claims' | 'related' | 'timeline' | 'statusHistory' | 'context' | 'relevance';
 
 export type RecordGapCopy = {
   readonly title: string;
@@ -101,7 +102,8 @@ export const GENERIC_ERROR_COPY = {
 
 export const OFFLINE_NO_CACHE_COPY = {
   title: 'You’re offline',
-  description: 'This record hasn’t been viewed on this device before, so it can’t be shown offline.',
+  description:
+    'This record hasn’t been viewed on this device before, so it can’t be shown offline.',
   retry: 'Try again',
 };
 

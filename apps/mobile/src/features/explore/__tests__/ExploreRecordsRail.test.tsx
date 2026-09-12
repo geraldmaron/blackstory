@@ -12,9 +12,7 @@ jest.mock('@gorhom/bottom-sheet', () => {
     BottomSheetFlatList: (props: Record<string, unknown>) => {
       const { ListHeaderComponent, ListEmptyComponent, ...rest } = props;
       const header =
-        typeof ListHeaderComponent === 'function'
-          ? ListHeaderComponent()
-          : ListHeaderComponent;
+        typeof ListHeaderComponent === 'function' ? ListHeaderComponent() : ListHeaderComponent;
       const data = rest.data as unknown[] | undefined;
       const empty =
         (!data || data.length === 0) && ListEmptyComponent
@@ -93,10 +91,7 @@ describe('ExploreRecordsRail', () => {
   it('calls onSelect when a row is pressed', async () => {
     const onSelect = jest.fn();
     const { getByLabelText } = await render(
-      <ExploreRecordsRail
-        features={[feature('ent_a', 'Howard Theatre')]}
-        onSelect={onSelect}
-      />,
+      <ExploreRecordsRail features={[feature('ent_a', 'Howard Theatre')]} onSelect={onSelect} />,
     );
     fireEvent.press(getByLabelText(/Howard Theatre/));
     expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ entityId: 'ent_a' }));

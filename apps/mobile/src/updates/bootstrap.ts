@@ -59,8 +59,7 @@ export async function checkForUpdate(): Promise<CheckForUpdateResult> {
 }
 
 export type ApplyUpdateResult =
-  | { readonly applied: true }
-  | { readonly applied: false; readonly reason: string };
+  { readonly applied: true } | { readonly applied: false; readonly reason: string };
 
 /**
  * Fetch a newer update and reload the app onto it. This is the client half

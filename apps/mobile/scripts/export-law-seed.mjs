@@ -17,9 +17,7 @@ import { normalizePgConnectionString } from '../../../packages/ops-data/scripts/
 
 const here = dirname(fileURLToPath(import.meta.url));
 // `pg` is a dependency of ops-data, not the mobile app — resolve it from there.
-const requireFromOpsData = createRequire(
-  resolve(here, '../../../packages/ops-data/package.json'),
-);
+const requireFromOpsData = createRequire(resolve(here, '../../../packages/ops-data/package.json'));
 const pg = requireFromOpsData('pg');
 const outPath = resolve(here, '../src/features/law/catalog-seed.json');
 

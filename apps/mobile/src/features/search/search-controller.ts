@@ -71,8 +71,18 @@ export type SearchControllerState =
       readonly loadingMore: boolean;
       readonly loadMoreError?: string;
     }
-  | { readonly kind: 'empty'; readonly query: string; readonly filterKind?: string; readonly degraded: boolean }
-  | { readonly kind: 'error'; readonly query: string; readonly filterKind?: string; readonly message: string }
+  | {
+      readonly kind: 'empty';
+      readonly query: string;
+      readonly filterKind?: string;
+      readonly degraded: boolean;
+    }
+  | {
+      readonly kind: 'error';
+      readonly query: string;
+      readonly filterKind?: string;
+      readonly message: string;
+    }
   | { readonly kind: 'offline-empty'; readonly query: string; readonly filterKind?: string };
 
 export interface SearchController {
@@ -184,7 +194,9 @@ async function fetchPage(
   });
 
   try {
-    const result = await runtime.run((signal) => runtime.transport.readJson<SearchResponseV1>(path, { signal }));
+    const result = await runtime.run((signal) =>
+      runtime.transport.readJson<SearchResponseV1>(path, { signal }),
+    );
     if (result.kind !== 'ok') {
       // We never send an `If-None-Match` for search requests, so a 304 is not expected on this
       // path; treat it the same as "no fresh data" rather than assuming a shape we didn't ask for.
@@ -210,7 +222,11 @@ async function fetchPage(
       // an offline copy of this particular page.
     }
 
-    return toFetchedPage(result.data, activeStamp, { source: 'network', fetchedAt, degraded: false });
+    return toFetchedPage(result.data, activeStamp, {
+      source: 'network',
+      fetchedAt,
+      degraded: false,
+    });
   } catch (err) {
     if (isSupersededAbort(err)) throw err;
     if (err instanceof RankingSignalLeakError) throw err;
@@ -249,7 +265,11 @@ export function createSearchController(
     return !disposed && gen === generation;
   }
 
-  async function runFreshQuery(query: string, filterKind: string | undefined, gen: number): Promise<void> {
+  async function runFreshQuery(
+    query: string,
+    filterKind: string | undefined,
+    gen: number,
+  ): Promise<void> {
     try {
       const page = await fetchPage(runtime, { query, kind: filterKind });
       if (!isCurrent(gen)) return; // superseded by a newer call -- discard even a "successful" result

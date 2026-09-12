@@ -16,7 +16,10 @@ describe('formatEvidenceScoreLabel — matches web wording exactly', () => {
   });
 
   it('never uses probability language', () => {
-    for (const label of [formatEvidenceScoreLabel(0.9, 'high'), formatEvidenceScoreLabel(0.1, 'low')]) {
+    for (const label of [
+      formatEvidenceScoreLabel(0.9, 'high'),
+      formatEvidenceScoreLabel(0.1, 'low'),
+    ]) {
       expect(label).not.toMatch(/\bprobability\b/i);
       expect(label).not.toMatch(/\bchance(?:s)? (?:of|that)\b/i);
       expect(label).not.toMatch(/\blikely to be true\b/i);
@@ -26,7 +29,9 @@ describe('formatEvidenceScoreLabel — matches web wording exactly', () => {
   it('clamps an out-of-range or non-finite score rather than throwing/producing NaN', () => {
     expect(formatEvidenceScoreLabel(5, 'high')).toBe('Evidence score: high (1.00 of 1.00)');
     expect(formatEvidenceScoreLabel(-3, 'low')).toBe('Evidence score: low (0.00 of 1.00)');
-    expect(formatEvidenceScoreLabel(Number.NaN, 'medium')).toBe('Evidence score: medium (0.00 of 1.00)');
+    expect(formatEvidenceScoreLabel(Number.NaN, 'medium')).toBe(
+      'Evidence score: medium (0.00 of 1.00)',
+    );
   });
 });
 

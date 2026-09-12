@@ -29,8 +29,7 @@ const config = getDefaultConfig(projectRoot);
 
 config.watchFolders = [...(config.watchFolders ?? []), publicContractsRoot, domainRoot];
 
-const preferSource =
-  process.env.NODE_ENV !== 'production' && process.env.EAS_BUILD !== 'true';
+const preferSource = process.env.NODE_ENV !== 'production' && process.env.EAS_BUILD !== 'true';
 
 config.resolver = {
   ...config.resolver,
@@ -44,11 +43,7 @@ config.resolver = {
     '@repo/domain': domainRoot,
   },
   unstable_enablePackageExports: true,
-  blockList: [
-    /\/__tests__\/.*/,
-    /\.test\.[jt]sx?$/,
-    /\.spec\.[jt]sx?$/,
-  ],
+  blockList: [/\/__tests__\/.*/, /\.test\.[jt]sx?$/, /\.spec\.[jt]sx?$/],
   // Never put `development` first on EAS/production — that forces src/*.ts and
   // breaks on `.js` import specifiers inside the package.
   unstable_conditionNames: preferSource

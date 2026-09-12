@@ -66,7 +66,11 @@ describe('A. no correction content or receipt reaches any console sink', () => {
       baseUrl: 'https://submissions.blackstory.app',
       clientVersion: '1.0.0',
       fetch: (async () =>
-        makeResponse(202, { accepted: true, receiptCode: RECEIPT, statusHref: '/x' })) as unknown as typeof fetch,
+        makeResponse(202, {
+          accepted: true,
+          receiptCode: RECEIPT,
+          statusHref: '/x',
+        })) as unknown as typeof fetch,
       secrets: createSecretStore(fakeBackend()),
     };
 
@@ -103,16 +107,24 @@ describe('B. route files never encode content/receipt into a URL or router nav',
     source: readFileSync(join(ROUTE_DIR, f), 'utf8'),
   }));
 
-  it.each(routeFiles)('$name does not pass receipt/statement/contact into a router navigation call', ({ source }) => {
-    // No router.push/replace/navigate/setParams call carrying a sensitive value.
-    expect(source).not.toMatch(/router\.(push|replace|navigate|setParams)\([^)]*(receipt|statement|contact)/i);
-    // No actual setParams(...) call at all (would push state into the URL).
-    expect(source).not.toMatch(/\.setParams\s*\(/);
-    // No `?receipt=` / `&receipt=` query-string construction.
-    expect(source).not.toMatch(/[?&]receipt=/i);
-  });
+  it.each(routeFiles)(
+    '$name does not pass receipt/statement/contact into a router navigation call',
+    ({ source }) => {
+      // No router.push/replace/navigate/setParams call carrying a sensitive value.
+      expect(source).not.toMatch(
+        /router\.(push|replace|navigate|setParams)\([^)]*(receipt|statement|contact)/i,
+      );
+      // No actual setParams(...) call at all (would push state into the URL).
+      expect(source).not.toMatch(/\.setParams\s*\(/);
+      // No `?receipt=` / `&receipt=` query-string construction.
+      expect(source).not.toMatch(/[?&]receipt=/i);
+    },
+  );
 
-  it.each(routeFiles)('$name does not read a receipt/statement/contact from route params', ({ source }) => {
-    expect(source).not.toMatch(/params\.(receipt|statement|contact)/i);
-  });
+  it.each(routeFiles)(
+    '$name does not read a receipt/statement/contact from route params',
+    ({ source }) => {
+      expect(source).not.toMatch(/params\.(receipt|statement|contact)/i);
+    },
+  );
 });

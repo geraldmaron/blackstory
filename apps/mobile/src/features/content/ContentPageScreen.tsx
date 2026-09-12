@@ -36,7 +36,12 @@ function ContentPageSkeleton() {
     <View
       style={[
         styles.skeletonBar,
-        { backgroundColor: theme.surfaceRaised, borderColor: theme.border, width: `${widthPct}%`, height },
+        {
+          backgroundColor: theme.surfaceRaised,
+          borderColor: theme.border,
+          width: `${widthPct}%`,
+          height,
+        },
         extra,
       ]}
       accessibilityElementsHidden
@@ -73,7 +78,7 @@ export function ContentPageScreen({
 
   const resolvedTitle =
     state.status === 'ok'
-      ? normalizeTypedContentPage(state.value.page).page?.title ?? fallbackTitle
+      ? (normalizeTypedContentPage(state.value.page).page?.title ?? fallbackTitle)
       : fallbackTitle;
 
   useLayoutEffect(() => {
@@ -113,10 +118,15 @@ export function ContentPageScreen({
             if (!page) {
               return <ErrorState title="This page could not be displayed" />;
             }
-            const versionStale = isContentVersionStale(state.value.contentVersion, currentContentVersion);
+            const versionStale = isContentVersionStale(
+              state.value.contentVersion,
+              currentContentVersion,
+            );
             const facts = [
               ...(page.eraLabel ? [{ key: 'era', label: 'Era', value: page.eraLabel }] : []),
-              ...(page.placeLabel ? [{ key: 'where', label: 'Where', value: page.placeLabel }] : []),
+              ...(page.placeLabel
+                ? [{ key: 'where', label: 'Where', value: page.placeLabel }]
+                : []),
             ];
 
             return (
@@ -130,13 +140,7 @@ export function ContentPageScreen({
                     dense
                   />
                 ) : (
-                  <ScreenHeader
-                    kicker="Document"
-                    title={page.title}
-                    dek={page.dek}
-                    compact
-                    dense
-                  />
+                  <ScreenHeader kicker="Document" title={page.title} dek={page.dek} compact dense />
                 )}
                 <ContentRenderer
                   page={page}

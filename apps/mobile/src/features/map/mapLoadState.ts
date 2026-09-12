@@ -12,10 +12,7 @@
  */
 
 export type MapFailureMode =
-  | 'provider-outage'
-  | 'corrupt-tiles'
-  | 'offline-cold-start'
-  | 'map-canvas-unavailable';
+  'provider-outage' | 'corrupt-tiles' | 'offline-cold-start' | 'map-canvas-unavailable';
 
 export type MapLoadState =
   | { readonly kind: 'loading' }
@@ -43,8 +40,7 @@ export const MAP_FAILURE_COPY: Record<MapFailureMode, MapFailureCopy> = {
   },
   'corrupt-tiles': {
     title: 'The map could not be loaded',
-    description:
-      'The map received an unexpected or incomplete response. Try again in a moment.',
+    description: 'The map received an unexpected or incomplete response. Try again in a moment.',
     retryable: true,
   },
   'offline-cold-start': {

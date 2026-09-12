@@ -17,11 +17,7 @@
 import { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { radius, Text, space, useThemeColors } from '@/ui';
-import {
-  MapScreen,
-  type MapCameraCommand,
-  type MapFeatureCollection,
-} from '@/features/map';
+import { MapScreen, type MapCameraCommand, type MapFeatureCollection } from '@/features/map';
 import type { RecordAnatomyPlace } from './entity-anatomy-facts';
 
 export type RecordPlacePreviewProps = {

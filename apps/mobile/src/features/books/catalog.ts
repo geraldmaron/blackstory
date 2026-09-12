@@ -3,22 +3,69 @@
  * Reads the on-device seed snapshot exported from the web curated catalog.
  */
 import catalogSeed from './catalog-seed.json';
-import type {
-  BannedBookRecord,
-  BannedBooksListingSnapshot,
-  BooksCatalogRow,
-} from './types';
+import type { BannedBookRecord, BannedBooksListingSnapshot, BooksCatalogRow } from './types';
 
 const USPS_STATE_CODES = new Set([
-  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA',
-  'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
-  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT',
-  'VA', 'WA', 'WV', 'WI', 'WY', 'DC',
+  'AL',
+  'AK',
+  'AZ',
+  'AR',
+  'CA',
+  'CO',
+  'CT',
+  'DE',
+  'FL',
+  'GA',
+  'HI',
+  'ID',
+  'IL',
+  'IN',
+  'IA',
+  'KS',
+  'KY',
+  'LA',
+  'ME',
+  'MD',
+  'MA',
+  'MI',
+  'MN',
+  'MS',
+  'MO',
+  'MT',
+  'NE',
+  'NV',
+  'NH',
+  'NJ',
+  'NM',
+  'NY',
+  'NC',
+  'ND',
+  'OH',
+  'OK',
+  'OR',
+  'PA',
+  'RI',
+  'SC',
+  'SD',
+  'TN',
+  'TX',
+  'UT',
+  'VT',
+  'VA',
+  'WA',
+  'WV',
+  'WI',
+  'WY',
+  'DC',
 ]);
 
 /** Replace em/en dashes in display strings (brand: no em dashes in UI copy). */
 export function plainDashCopy(value: string): string {
-  return value.replace(/\u2014/g, ' - ').replace(/\u2013/g, ' to ').replace(/\s{2,}/g, ' ').trim();
+  return value
+    .replace(/\u2014/g, ' - ')
+    .replace(/\u2013/g, ' to ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
 }
 
 function isBookRecord(value: unknown): value is BannedBookRecord {
@@ -128,13 +175,7 @@ export function filterCatalogRows(
   const sorted = [...rows].sort((a, b) => a.title.localeCompare(b.title));
   if (q.length === 0) return sorted;
   return sorted.filter((row) => {
-    const haystack = [
-      row.title,
-      row.authorNames,
-      row.summary,
-      row.statesLabel,
-      row.publishedDate,
-    ]
+    const haystack = [row.title, row.authorNames, row.summary, row.statesLabel, row.publishedDate]
       .join(' ')
       .toLowerCase();
     return haystack.includes(q);

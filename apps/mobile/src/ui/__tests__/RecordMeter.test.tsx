@@ -24,7 +24,9 @@ describe('RecordMeter', () => {
   });
 
   it('treats unrated as unassessed, not as a low grade', async () => {
-    const { getByLabelText, getByText } = await render(<RecordMeter tier="unrated" sourceCount={0} />);
+    const { getByLabelText, getByText } = await render(
+      <RecordMeter tier="unrated" sourceCount={0} />,
+    );
     expect(getByLabelText('Evidence not graded, 0 sources')).toBeTruthy();
     // The middot is the placeholder for "no letter". A "D" here would invent a fourth grade.
     expect(getByText('·')).toBeTruthy();

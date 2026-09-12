@@ -42,10 +42,7 @@ export function BooksDetailScreen({ slug }: BooksDetailScreenProps) {
     return (
       <ScreenCanvas edges={['left', 'right', 'bottom']}>
         <ScrollView contentContainerStyle={styles.content}>
-          <EmptyState
-            title={BOOKS_DETAIL.missingTitle}
-            description={BOOKS_DETAIL.missingBody}
-          />
+          <EmptyState title={BOOKS_DETAIL.missingTitle} description={BOOKS_DETAIL.missingBody} />
           <View style={{ alignItems: 'flex-start' }}>
             <Button
               label="Back to Banned books"
@@ -126,11 +123,7 @@ export function BooksDetailScreen({ slug }: BooksDetailScreenProps) {
               <LedgerRow
                 key={`${challenge.state}-${challenge.challengeYear ?? index}-${index}`}
                 title={challenge.state}
-                slug={[
-                  challenge.jurisdictionLabel,
-                  challenge.schoolYear,
-                  challenge.status,
-                ]
+                slug={[challenge.jurisdictionLabel, challenge.schoolYear, challenge.status]
                   .filter(Boolean)
                   .join(' · ')}
                 summary={challenge.citation.label}

@@ -79,11 +79,7 @@ export function __resetObservabilityForTests(): void {
 }
 
 function devLoggingEnabled(): boolean {
-  return (
-    activeConfig.observabilityEnabled &&
-    typeof __DEV__ !== 'undefined' &&
-    __DEV__
-  );
+  return activeConfig.observabilityEnabled && typeof __DEV__ !== 'undefined' && __DEV__;
 }
 
 function truncateString(text: string, max: number): string {
@@ -175,10 +171,7 @@ export interface ReportErrorOptions {
  * Report an error/exception. This function NEVER throws — every failure mode
  * degrades to a no-op. In `__DEV__`, emits a redacted console.error line.
  */
-export function reportError(
-  error: unknown,
-  options: ReportErrorOptions = {},
-): void {
+export function reportError(error: unknown, options: ReportErrorOptions = {}): void {
   try {
     if (!devLoggingEnabled()) {
       return;
@@ -203,19 +196,13 @@ export function reportError(
  * Attach a lightweight breadcrumb (not a full error) to the dev timeline.
  * Same redaction + size-cap + never-throw contract as `reportError`.
  */
-export function addBreadcrumb(
-  message: string,
-  data?: Record<string, unknown>,
-): void {
+export function addBreadcrumb(message: string, data?: Record<string, unknown>): void {
   try {
     if (!devLoggingEnabled()) {
       return;
     }
 
-    const safeMessage = truncateString(
-      redactSingleString(message),
-      MAX_BREADCRUMB_MESSAGE_LENGTH,
-    );
+    const safeMessage = truncateString(redactSingleString(message), MAX_BREADCRUMB_MESSAGE_LENGTH);
     const safeData = redactAndCapContext(data);
     const line = safeData ? `${safeMessage} ${JSON.stringify(safeData)}` : safeMessage;
 
@@ -287,7 +274,10 @@ export async function startPerfTrace(
       stop: () =>
         safelyAsync(async () => {
           const durationMs = Date.now() - startedAt;
-          console.debug('[BlackStory:perf:stop]', traceName, { durationMs, ...(safeContext ?? {}) });
+          console.debug('[BlackStory:perf:stop]', traceName, {
+            durationMs,
+            ...(safeContext ?? {}),
+          });
         }),
     };
   } catch {

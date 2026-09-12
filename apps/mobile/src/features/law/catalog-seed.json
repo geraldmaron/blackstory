@@ -10,10 +10,7 @@
       "kind": "constitutional-amendment",
       "lawStatus": "in_force",
       "jurisdictionId": "us",
-      "topics": [
-        "constitutional",
-        "criminal-justice"
-      ],
+      "topics": ["constitutional", "criminal-justice"],
       "citation": "U.S. Const. amend. XIII (proposed Jan. 31, 1865; ratified Dec. 6, 1865)",
       "sourceUrl": "https://www.archives.gov/milestone-documents/13th-amendment",
       "officialUrl": "https://www.archives.gov/milestone-documents/13th-amendment",
@@ -72,10 +69,7 @@
       "kind": "constitutional-amendment",
       "lawStatus": "in_force",
       "jurisdictionId": "us",
-      "topics": [
-        "constitutional",
-        "policing"
-      ],
+      "topics": ["constitutional", "policing"],
       "citation": "U.S. Const. amend. XIV (passed June 13, 1866; ratified July 9, 1868)",
       "sourceUrl": "https://www.archives.gov/milestone-documents/14th-amendment",
       "officialUrl": "https://www.archives.gov/milestone-documents/14th-amendment",
@@ -139,10 +133,7 @@
       "kind": "constitutional-amendment",
       "lawStatus": "in_force",
       "jurisdictionId": "us",
-      "topics": [
-        "voting",
-        "constitutional"
-      ],
+      "topics": ["voting", "constitutional"],
       "citation": "U.S. Const. amend. XV (passed Feb. 26, 1869; ratified Feb. 3, 1870)",
       "sourceUrl": "https://www.archives.gov/milestone-documents/15th-amendment",
       "officialUrl": "https://www.archives.gov/milestone-documents/15th-amendment",
@@ -201,10 +192,7 @@
       "kind": "federal-statute",
       "lawStatus": "amended",
       "jurisdictionId": "us",
-      "topics": [
-        "policing",
-        "employment"
-      ],
+      "topics": ["policing", "employment"],
       "citation": "42 U.S.C. § 1983 (R.S. § 1979; act of Apr. 20, 1871, ch. 22, § 1, 17 Stat. 13)",
       "sourceUrl": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section1983&num=0&edition=prelim",
       "officialUrl": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section1983&num=0&edition=prelim",
@@ -261,10 +249,7 @@
       "kind": "landmark-case",
       "lawStatus": "in_force",
       "jurisdictionId": "us",
-      "topics": [
-        "education",
-        "constitutional"
-      ],
+      "topics": ["education", "constitutional"],
       "citation": "347 U.S. 483 (1954)",
       "sourceUrl": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep347/usrep347483/usrep347483.pdf",
       "officialUrl": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep347/usrep347483/usrep347483.pdf",
@@ -327,11 +312,7 @@
       "kind": "federal-statute",
       "lawStatus": "amended",
       "jurisdictionId": "us",
-      "topics": [
-        "employment",
-        "education",
-        "housing"
-      ],
+      "topics": ["employment", "education", "housing"],
       "citation": "Pub. L. 88-352, 78 Stat. 241 (July 2, 1964)",
       "sourceUrl": "https://api.congress.gov/v3/law/88/pub/352",
       "officialUrl": "https://api.congress.gov/v3/law/88/pub/352",
@@ -389,9 +370,7 @@
       "kind": "federal-statute",
       "lawStatus": "amended",
       "jurisdictionId": "us",
-      "topics": [
-        "housing"
-      ],
+      "topics": ["housing"],
       "citation": "Pub. L. 90-284, tit. VIII, § 801, 82 Stat. 81 (Apr. 11, 1968) (codified as amended at 42 U.S.C. §§ 3601-3631)",
       "sourceUrl": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section3604&num=0&edition=prelim",
       "officialUrl": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section3604&num=0&edition=prelim",
@@ -464,9 +443,7 @@
       "kind": "state-statute",
       "lawStatus": "in_force",
       "jurisdictionId": "us-13",
-      "topics": [
-        "voting"
-      ],
+      "topics": ["voting"],
       "citation": "Election Integrity Act of 2021, S.B. 202, 2021-2022 Reg. Sess. (Ga. 2021) (codified as amended in O.C.G.A. tit. 21, ch. 2), effective Mar. 25, 2021",
       "sourceUrl": "https://www.legis.ga.gov/api/legislation/document/20212022/201498",
       "officialUrl": "https://www.legis.ga.gov/api/legislation/document/20212022/201498",
@@ -530,10 +507,7 @@
       "kind": "landmark-case",
       "lawStatus": "in_force",
       "jurisdictionId": "us",
-      "topics": [
-        "education",
-        "constitutional"
-      ],
+      "topics": ["education", "constitutional"],
       "citation": "600 U.S. 181 (2023) (No. 20-1199, decided June 29, 2023, with No. 21-707, SFFA v. University of North Carolina)",
       "sourceUrl": "https://www.supremecourt.gov/opinions/22pdf/20-1199_hgdj.pdf",
       "officialUrl": "https://www.supremecourt.gov/opinions/22pdf/20-1199_hgdj.pdf",
@@ -598,10 +572,7 @@
       "kind": "landmark-case",
       "lawStatus": "in_force",
       "jurisdictionId": "us",
-      "topics": [
-        "voting",
-        "constitutional"
-      ],
+      "topics": ["voting", "constitutional"],
       "citation": "570 U.S. 529 (2013)",
       "sourceUrl": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep570/usrep570529/usrep570529.pdf",
       "officialUrl": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep570/usrep570529/usrep570529.pdf",
@@ -656,9 +627,7 @@
       "kind": "federal-regulation",
       "lawStatus": "amended",
       "jurisdictionId": "us",
-      "topics": [
-        "employment"
-      ],
+      "topics": ["employment"],
       "citation": "29 C.F.R. pt. 1604 (source: 37 Fed. Reg. 6836, Apr. 5, 1972; authority: 42 U.S.C. § 2000e-12)",
       "sourceUrl": "https://www.ecfr.gov/current/title-29/subtitle-B/chapter-XIV/part-1604",
       "officialUrl": "https://www.ecfr.gov/current/title-29/subtitle-B/chapter-XIV/part-1604",
@@ -721,10 +690,7 @@
       "kind": "federal-statute",
       "lawStatus": "amended",
       "jurisdictionId": "us",
-      "topics": [
-        "voting",
-        "constitutional"
-      ],
+      "topics": ["voting", "constitutional"],
       "citation": "Pub. L. 89-110, 79 Stat. 437 (Aug. 6, 1965)",
       "sourceUrl": "https://api.congress.gov/v3/law/89/pub/110",
       "officialUrl": "https://api.congress.gov/v3/law/89/pub/110",

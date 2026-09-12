@@ -14,11 +14,7 @@ jest.mock('@/ui/AppBottomSheet', () => {
   return {
     AppBottomSheet: (props: Record<string, unknown>) => {
       mockBottomSheetProps.push(props);
-      return React.createElement(
-        View,
-        { testID: props.testID as string },
-        props.children as never,
-      );
+      return React.createElement(View, { testID: props.testID as string }, props.children as never);
     },
   };
 });

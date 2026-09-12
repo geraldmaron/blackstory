@@ -93,8 +93,7 @@ export function ExploreBottomSheet({
   peekHeaderHeight,
   onSnapIndexChange,
 }: ExploreBottomSheetProps) {
-  const resolvedIndex =
-    snapIndex ?? (hasSelection ? EXPLORE_SHEET_HALF : EXPLORE_SHEET_PEEK);
+  const resolvedIndex = snapIndex ?? (hasSelection ? EXPLORE_SHEET_HALF : EXPLORE_SHEET_PEEK);
   const snapPoints = useMemo(() => exploreSheetSnapPoints(peekHeaderHeight), [peekHeaderHeight]);
 
   return (

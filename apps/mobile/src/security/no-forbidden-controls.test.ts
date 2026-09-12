@@ -20,7 +20,10 @@ const SECURITY_DIR = __dirname;
 const FORBIDDEN_PATTERNS: readonly { name: string; pattern: RegExp }[] = [
   { name: 'certificate pinning (SSL pinning lib)', pattern: /ssl[-_]?pinning/i },
   { name: 'certificate pinning (TrustKit)', pattern: /trustkit/i },
-  { name: 'certificate pinning (pinned public key)', pattern: /pinnedPublicKey|publicKeyPin|pinnedCertificates/i },
+  {
+    name: 'certificate pinning (pinned public key)',
+    pattern: /pinnedPublicKey|publicKeyPin|pinnedCertificates/i,
+  },
   { name: 'root detection', pattern: /isRooted|rootBeer|detectRoot/i },
   { name: 'jailbreak detection', pattern: /isJailB|jailbreakDetect|jailMonkey/i },
   { name: 'emulator/frida detection substitute', pattern: /detectFrida|isEmulatorBlock/i },
@@ -48,13 +51,10 @@ describe('forbidden client-side security controls are absent (MOB-010)', () => {
     expect(files.length).toBeGreaterThan(0);
   });
 
-  it.each(FORBIDDEN_PATTERNS)(
-    'does not add $name',
-    ({ pattern }) => {
-      for (const file of files) {
-        const contents = readFileSync(file, 'utf8');
-        expect(contents).not.toMatch(pattern);
-      }
-    },
-  );
+  it.each(FORBIDDEN_PATTERNS)('does not add $name', ({ pattern }) => {
+    for (const file of files) {
+      const contents = readFileSync(file, 'utf8');
+      expect(contents).not.toMatch(pattern);
+    }
+  });
 });

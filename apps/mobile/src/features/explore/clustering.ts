@@ -16,7 +16,12 @@
  * as more precise than the data it summarizes. `assertClusterPrecisionSafe`
  * encodes this as a checkable guard, exercised by clustering.test.ts.
  */
-import { coarsenTo, coarsestDecimals, isNoMorePreciseThan, type LngLat } from '@/features/map/mapCamera';
+import {
+  coarsenTo,
+  coarsestDecimals,
+  isNoMorePreciseThan,
+  type LngLat,
+} from '@/features/map/mapCamera';
 import type { ExploreFeature } from './explore-feature';
 
 export type Cluster = {

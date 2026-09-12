@@ -9,13 +9,7 @@
  * Variants follow v6 copper discipline: primary = ink fill; accent = copper navigational CTA;
  * secondary/ghost for supporting actions.
  */
-import {
-  ActivityIndicator,
-  Pressable,
-  type PressableProps,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, type PressableProps, StyleSheet, View } from 'react-native';
 import { Text } from './Text';
 import { MIN_TOUCH_TARGET, radius, space, useThemeColors } from './tokens';
 
@@ -108,7 +102,10 @@ export function Button({
             importantForAccessibility="no-hide-descendants"
           />
         ) : null}
-        <Text variant={density === 'compact' ? 'bodySmall' : 'bodyEmphasis'} style={{ color: palette.fg }}>
+        <Text
+          variant={density === 'compact' ? 'bodySmall' : 'bodyEmphasis'}
+          style={{ color: palette.fg }}
+        >
           {label}
         </Text>
       </View>

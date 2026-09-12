@@ -106,12 +106,7 @@ export const MARKER_RADIUS_EVIDENCE_STOPS: readonly (readonly [
 
 export function markerRadiusEvidenceExpression(): readonly unknown[] {
   const stops = MARKER_RADIUS_EVIDENCE_STOPS.flatMap(([count, radius]) => [count, radius]);
-  return [
-    'interpolate',
-    ['linear'],
-    ['coalesce', ['get', 'evidenceCount'], 0],
-    ...stops,
-  ] as const;
+  return ['interpolate', ['linear'], ['coalesce', ['get', 'evidenceCount'], 0], ...stops] as const;
 }
 
 export function confidenceSizeModifierExpression(): readonly unknown[] {
@@ -155,11 +150,7 @@ export function markerRadiusExpression(): readonly unknown[] {
 }
 
 export function markerRadiusPlusExpression(offset: number): readonly unknown[] {
-  return zoomScaledRadiusExpression((dataRadius, scale) => [
-    '*',
-    ['+', dataRadius, offset],
-    scale,
-  ]);
+  return zoomScaledRadiusExpression((dataRadius, scale) => ['*', ['+', dataRadius, offset], scale]);
 }
 
 /**

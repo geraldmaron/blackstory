@@ -29,7 +29,9 @@ function makeFakeRuntime(): AppRuntime {
       restoreClient: async () => undefined,
       removeClient: async () => {},
     },
-    transport: { readJson: async () => ({ kind: 'ok', status: 200, data: {} }) } as unknown as AppRuntime['transport'],
+    transport: {
+      readJson: async () => ({ kind: 'ok', status: 200, data: {} }),
+    } as unknown as AppRuntime['transport'],
     releaseCache: {
       getActiveStamp: async () => 'rel',
       applyReleaseStamp: async () => 0,

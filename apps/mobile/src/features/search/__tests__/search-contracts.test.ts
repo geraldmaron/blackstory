@@ -13,7 +13,12 @@ describe('buildSearchRequestPath', () => {
   });
 
   it('includes q and, when provided, kind/cursor/pageSize', () => {
-    const path = buildSearchRequestPath({ query: 'tubman', kind: 'person', cursor: 'abc', pageSize: 10 });
+    const path = buildSearchRequestPath({
+      query: 'tubman',
+      kind: 'person',
+      cursor: 'abc',
+      pageSize: 10,
+    });
     const url = new URL(`https://example.test${path}`);
     expect(url.pathname).toBe('/v1/search');
     expect(url.searchParams.get('q')).toBe('tubman');

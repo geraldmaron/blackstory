@@ -33,7 +33,12 @@ describe('offline-first launch (no cache, no network) degrades gracefully', () =
         throw new Error('no connectivity');
       },
     };
-    const sync = createBootstrapSynchronizer({ transport: offlineTransport, cache, store, now: () => 1 });
+    const sync = createBootstrapSynchronizer({
+      transport: offlineTransport,
+      cache,
+      store,
+      now: () => 1,
+    });
 
     const result = await sync.sync();
     expect(result.status).toBe('offline');

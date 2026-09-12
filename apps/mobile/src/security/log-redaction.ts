@@ -90,11 +90,7 @@ export function redactedLogLine(payload: unknown): string {
   }
 }
 
-function redactValue(
-  value: unknown,
-  depth: number,
-  seen: WeakSet<object>,
-): unknown {
+function redactValue(value: unknown, depth: number, seen: WeakSet<object>): unknown {
   if (depth > MAX_DEPTH) {
     return REDACTED;
   }

@@ -33,12 +33,7 @@ import type { CitationV1, ContentPageV1 } from './content-types';
 export type StoryCatalogSectionId = 'stories';
 
 /** The supporting reference pages. Each is one page, addressed by its own route. */
-export type SupportingCatalogSectionId =
-  | 'about'
-  | 'methodology'
-  | 'errata'
-  | 'privacy'
-  | 'terms';
+export type SupportingCatalogSectionId = 'about' | 'methodology' | 'errata' | 'privacy' | 'terms';
 
 export type CatalogSectionId = StoryCatalogSectionId | SupportingCatalogSectionId;
 
@@ -178,7 +173,11 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
     contentVersion: BUNDLED_CONTENT_VERSION,
     requiresCitation: true,
     sources: [
-      { source: 'BlackStory', label: 'Full methodology (web)', href: 'https://blackstory.app/methodology' },
+      {
+        source: 'BlackStory',
+        label: 'Full methodology (web)',
+        href: 'https://blackstory.app/methodology',
+      },
     ],
     page: {
       slug: 'overview',
@@ -295,7 +294,13 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
     section: 'terms',
     contentVersion: BUNDLED_CONTENT_VERSION,
     requiresCitation: true,
-    sources: [{ source: 'BlackStory', label: 'Full terms of service (web)', href: 'https://blackstory.app/terms' }],
+    sources: [
+      {
+        source: 'BlackStory',
+        label: 'Full terms of service (web)',
+        href: 'https://blackstory.app/terms',
+      },
+    ],
     page: {
       slug: 'terms',
       title: 'Terms of service',
@@ -350,6 +355,9 @@ export function listCatalogEntries(section: CatalogSectionId): readonly ContentE
   return CONTENT_CATALOG.filter((entry) => entry.section === section);
 }
 
-export function findCatalogEntry(section: CatalogSectionId, slug: string): ContentEntry | undefined {
+export function findCatalogEntry(
+  section: CatalogSectionId,
+  slug: string,
+): ContentEntry | undefined {
   return CONTENT_CATALOG.find((entry) => entry.section === section && entry.page.slug === slug);
 }
