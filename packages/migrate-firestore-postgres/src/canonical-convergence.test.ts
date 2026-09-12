@@ -121,3 +121,44 @@ test('mirrored related entries collapse to one canonical relationship', () => {
   const plan = buildCanonicalConvergencePlan([left, right], []);
   assert.equal(plan.relationships.length, 1);
 });
+
+test('a derived status history is not carried into canonical', () => {
+  const plan = buildCanonicalConvergencePlan(
+    [
+      row({
+        projection: {
+          statusProvenance: 'derived_heuristic',
+          statusHistory: [
+            { status: 'active', validFrom: '1901', datePrecision: 'circa', basisClaimIds: [] },
+          ],
+        },
+      }),
+    ],
+    [],
+  );
+
+  assert.deepEqual(plan.entities[0]?.status_history, []);
+});
+
+test('an asserted status history is carried into canonical unchanged', () => {
+  const asserted = [
+    { status: 'historic', validFrom: '1952', datePrecision: 'year', basisClaimIds: ['claim_test'] },
+  ];
+  const plan = buildCanonicalConvergencePlan(
+    [row({ projection: { statusProvenance: 'canonical', statusHistory: asserted } })],
+    [],
+  );
+
+  assert.deepEqual(plan.entities[0]?.status_history, asserted);
+});
+
+test('a status history with no stated provenance is still carried', () => {
+  // Absent provenance is not evidence of derivation: 462 live rows carry a history this way and
+  // none of them holds a span citing nothing. Only a stated derivation is refused.
+  const history = [
+    { status: 'historic', validFrom: '1968', datePrecision: 'year', basisClaimIds: ['claim_test'] },
+  ];
+  const plan = buildCanonicalConvergencePlan([row({ projection: { statusHistory: history } })], []);
+
+  assert.deepEqual(plan.entities[0]?.status_history, history);
+});

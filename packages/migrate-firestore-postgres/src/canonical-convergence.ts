@@ -299,6 +299,36 @@ function asStringArray(value: unknown): string[] {
     : [];
 }
 
+/**
+ * The provenance a published status carries when it was DERIVED from the record rather than
+ * asserted by a source.
+ */
+const DERIVED_STATUS_PROVENANCE = 'derived_heuristic';
+
+/**
+ * The status history this reconciliation may carry into the canonical layer.
+ *
+ * Canonical holds what is asserted. A derived status is recomputed from the record's own claims
+ * every time it publishes, so importing one inverts the precedence the two layers depend on:
+ * `resolveReleaseProjectionStatus` reads canonical first, and a stored derivation then outranks
+ * the derivation that produced it. The inversion is permanent rather than temporary, because no
+ * later publish can reach past a canonical value to correct it — a repaired deriver simply never
+ * runs for that record.
+ *
+ * So a derived history is not importable, and the empty history leaves the record to its
+ * derivation, which is where a derived answer belongs. An asserted history imports as before.
+ *
+ * This governs only what the plan OFFERS. The upsert takes a status history solely when canonical
+ * holds `[]`, so refusing here can never clear a history that already exists — it prevents a guess
+ * from entering, and withdrawing the ones that already entered is a separate, evidence-gated act
+ * (see withdraw-laundered-active-status.ts, which may delete an unsupported assertion but may
+ * never substitute a new one).
+ */
+function importableStatusHistory(projection: JsonRecord): readonly unknown[] {
+  if (asString(projection.statusProvenance) === DERIVED_STATUS_PROVENANCE) return [];
+  return asArray(projection.statusHistory);
+}
+
 function asArray(value: unknown): readonly unknown[] {
   return Array.isArray(value) ? value : [];
 }
@@ -456,7 +486,7 @@ export function buildCanonicalConvergencePlan(
   for (const row of rows) {
     const projection = asRecord(row.projection);
     const location = asRecord(row.location);
-    const statusHistory = asArray(projection.statusHistory);
+    const statusHistory = importableStatusHistory(projection);
     const notabilityBasis = asArray(projection.notabilityBasis);
     const sensitivityClass = asString(projection.sensitivityClass);
     entities.push({
