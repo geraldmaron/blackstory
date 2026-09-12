@@ -7,18 +7,30 @@
 > web / Vercel guidance is current and now covers admin too.
 
 **Scope:** End-to-end release procedure for BlackStory — from merged PR through staging
-validation, progressive release metadata, protected production approval, deploy to each surface,
-post-deploy health checks, and rollback rehearsal.
+validation, the staging → main release merge, post-deploy health checks, and rollback rehearsal.
+
+**There is no manual Vercel promote gate.** Public web (and admin, which now deploys inside the
+same `apps/web` Vercel project) has no separate "Promote to Production" step. Vercel's git
+integration builds and aliases every commit landed on `main` straight to `blackstory.app` and
+`www.blackstory.app`, automatically, with no human step in between (confirmed 2026-08-05 on PR
+\#116 and again 2026-08-12 on PR \#130 — repo-8ary, repo-h1b2). **The real release gate is the
+staging → main PR itself** — the deliberate, separate action described in this repo's root
+`CLAUDE.md` under "Branching & Release Policy." Approve that PR only when `staging` is in a state
+you want live, because merging it **is** the production release.
 
 **Solo-dev hotfix loop (preferred for one-person prod bugs):** see
 [solo-dev-hotfix.md](./solo-dev-hotfix.md) — branch from `main`, tiny PR, preflight lockfile +
-`force-dynamic`, Vercel Preview → Production promote, smoke entity pages. Do **not** promote large
-divergent feature branches to fix web prod.
+`force-dynamic`, merge to `main`, smoke Production directly (merging already shipped it — there is
+no separate promote step to run first). Do **not** merge large divergent feature branches to fix
+web prod; the merge commit goes live immediately.
 
 **Repo acceptance:** Firestore migrate / surface deploy / rollback helpers stay **dry-run safe**.
-**Public web** deploys via **Vercel** git integration; Production promote is explicit.
-**Admin** is the standalone Vercel project `apps/admin`. App Hosting steps later in this file
-are leftover. Deploy workflows do not promote App Hosting.
+**Public web** (including admin) deploys via **Vercel** git integration on merge to `main` — no
+separate promote. `.github/workflows/deploy-production.yml` does not gate that traffic; it is a
+separately workflow-dispatched pipeline for provenance recording and optional post-hoc health/E2E
+checks against a pinned SHA, and its Cloud Run "surface" steps are a dry-run plan, not a live
+deploy (see its own "no live apply" comment). Deploy workflows do not promote App Hosting, which is
+retired.
 
 **Architecture anchors:** [ADR-006](../adr/ADR-006-github-actions-deployment.md),
 [ADR-027](../adr/ADR-027-vercel-public-web-hosting.md),
@@ -31,22 +43,25 @@ Postgres migrations parked).
 
 ```mermaid
 flowchart LR
-  PR[PR + CI] --> STG[Deploy Staging pinned SHA]
-  STG --> META[Progressive Release metadata]
-  META --> PROD[Deploy Production + approval]
-  PROD --> HC[Health + E2E smoke]
+  PR[Staging -> main PR review] --> MERGE[Merge to main]
+  MERGE --> WEB[Vercel auto-builds + auto-aliases to Production]
+  MERGE -.-> OPT[Optional: workflow_dispatch deploy-production.yml]
+  OPT --> HC[Health + E2E smoke, provenance]
   HC -->|fail| RB[Rollback dry-run / prior SHA]
-  HC -->|pass| DONE[Provenance + changelog artifacts]
 ```
+
+Public web (and admin) traffic changes at the `MERGE` step, not at `OPT`. The optional workflow
+records provenance and can run health/E2E checks against a pinned SHA after the fact; it is not
+what puts the merge commit in front of users.
 
 | Stage | Workflow | Gate |
 |-------|----------|------|
 | PR validation | `.github/workflows/ci.yml` | Required status checks (unchanged) |
 | Security scans | `.github/workflows/security.yml` | High/critical findings block release |
 | Staging deploy | `.github/workflows/deploy-staging.yml` | Pinned `commit_sha`; optional `staging` branch push |
-| Release metadata | `.github/workflows/progressive-release.yml` | Changelog + provenance for tested SHA |
-| Production deploy | `.github/workflows/deploy-production.yml` | Protected `production` environment approval |
-| Public web | Vercel git deploy + explicit Production promote | ADR-027 |
+| **Public web + admin release** | **Vercel git integration** | **staging → main PR review/merge (see CLAUDE.md Branching & Release Policy) — merge itself is the production deploy; no separate promote** |
+| Release metadata (optional, post-hoc) | `.github/workflows/progressive-release.yml` | Changelog + provenance for a pinned SHA |
+| Production pipeline (optional, post-hoc) | `.github/workflows/deploy-production.yml` | Protected `production` environment approval gates provenance/health checks only, not Vercel traffic |
 | Uptime canary | `.github/workflows/canary-uptime.yml` | Optional; reset baseline after verified deploy |
 
 ---
@@ -55,8 +70,10 @@ flowchart LR
 
 **Historical — App Hosting itself was deleted 2026-08-15 and admin moved into `apps/web` on
 2026-09-11 (repo-z3g1f); nothing below this line needs doing.** Public web (and admin, now part of
-the same deploy) Production traffic moves only through explicit **Vercel** promote at a pinned SHA
-(ADR-027).
+the same deploy) Production traffic moves automatically when a commit lands on `main` — Vercel's
+git integration builds and aliases it to Production with no explicit promote step (repo-8ary,
+repo-h1b2). What this AC actually guards is that nothing in this repo's own GitHub Actions
+workflows adds an *additional*, unattended auto-deploy path (App Hosting's old auto-rollout hooks).
 
 **Human steps (admin backend) — historical, App Hosting no longer exists:**
 
@@ -77,18 +94,23 @@ Public web App Hosting configs are retired; there is no `black-book-web-*` promo
 
 ## AC #2 — Deploy only the tested commit (pinned SHA)
 
-Never deploy `main` or `@latest` for Cloud Run / admin App Hosting. Every deploy workflow requires a
-full 40-character git SHA that passed CI on that exact commit.
+Never deploy `main` or `@latest` for Cloud Run. Every workflow_dispatch deploy workflow requires a
+full 40-character git SHA that passed CI on that exact commit — but public web has no such
+dispatch step; see below.
 
-**Public web (Vercel):**
+**Public web (Vercel) — merge is the deploy:**
 
-1. Merge PR to `main` — Vercel builds Preview automatically.
-2. Smoke Preview deployment.
-3. Explicit Production promote: Vercel dashboard → Promote to Production, or
-   `vercel promote <preview-deployment-url>`.
-4. Verify Production deployment SHA matches the tested commit.
+1. Merge the staging → main PR — this is the release action (CLAUDE.md Branching & Release
+   Policy); do it only when `staging` is in a state you want live.
+2. Vercel's git integration builds the merge commit and aliases it straight to
+   `blackstory.app` / `www.blackstory.app` as Production — automatically, within seconds, with no
+   dashboard step and no `vercel promote` command to run.
+3. Smoke Production directly (there is no separate Preview-then-promote step for `main`; Preview
+   builds only exist for non-`main` branches/PRs).
+4. Confirm the live SHA (Vercel dashboard deployment detail, or `x-vercel-id` / deployment API)
+   matches the merge commit — this is verification after the fact, not a gate before it.
 
-**Staging (admin / APIs):**
+**Staging (APIs):**
 
 ```bash
 gh workflow run deploy-staging.yml \
@@ -97,20 +119,20 @@ gh workflow run deploy-staging.yml \
 ```
 
 Requires GitHub Environment `staging` vars `GCP_WORKLOAD_IDENTITY_PROVIDER` and
-`GCP_SERVICE_ACCOUNT` (after `infra/github/scripts/apply-wif.sh --apply`). Public web staging is
-Vercel Preview from the `staging` branch — smoke Preview before any Production promote.
+`GCP_SERVICE_ACCOUNT` (after `infra/github/scripts/apply-wif.sh --apply`). Public web staging is a
+Vercel Preview built from the `staging` branch — smoke it before opening the staging → main PR.
 
 Admin has no separate rollout step: since 2026-09-11 (repo-z3g1f) `/admin` is a staff-gated route
-group inside `apps/web` itself, not a separate app or Vercel project — it promotes automatically
-with the same public web Vercel deploy below. (App Hosting `black-book-admin-production` was
-deleted 2026-08-15 and does not exist; do not run `firebase apphosting:rollouts:create` against
+group inside `apps/web` itself, not a separate app or Vercel project — it deploys automatically
+with the same public web Vercel build described above. (App Hosting `black-book-admin-production`
+was deleted 2026-08-15 and does not exist; do not run `firebase apphosting:rollouts:create` against
 it.) Credential isolation for admin's write-capable database access now lives at the credential
 layer (`ADMIN_DATABASE_URL`, distinct from the public `DATABASE_URL`), not the process layer.
 
-**Production (admin / APIs):**
+**Production pipeline (APIs; optional and post-hoc for public web):**
 
 ```bash
-TESTED_SHA="<40-char-sha-from-staging>"
+TESTED_SHA="<40-char-sha, e.g. the staging -> main merge commit>"
 gh workflow run progressive-release.yml \
   -f commit_sha="$TESTED_SHA" \
   -f confirm=release
@@ -121,15 +143,19 @@ gh workflow run deploy-production.yml \
   -f confirm=deploy
 ```
 
-Admin needs no separate promote — it is part of the same `apps/web` Vercel deployment (see note
-above). Download `deployment-provenance-<sha>` artifact and verify `git.commitSha` matches
-`TESTED_SHA`.
+For public web/admin this pipeline runs *after* the fact — the merge already shipped the SHA to
+Vercel Production. What it adds is provenance and optional health/E2E checks against that pinned
+SHA; its Cloud Run "surface deploy" step is a dry-run plan, not a live deploy. Download the
+`deployment-provenance-<sha>` artifact and verify `git.commitSha` matches `TESTED_SHA`.
 
 ---
 
-## AC #3 — Production requires protected environment approval
+## AC #3 — `deploy-production.yml` requires protected environment approval
 
-Configure the GitHub `production` environment before the first live deploy:
+This approval gates the optional, workflow_dispatch-only `deploy-production.yml` pipeline
+(provenance, changelog, and health/E2E checks). **It does not gate Vercel public web/admin
+traffic** — that already moved when the staging → main PR was merged, per AC #2. Configure the
+GitHub `production` environment before relying on this pipeline's checks:
 
 ```bash
 gh api --method PUT "repos/OWNER/REPO/environments/production" \
@@ -167,7 +193,8 @@ Before public web / API surfaces receive incompatible traffic:
 
 1. **Postgres migrations / schema** applied to the target Supabase project (when schema changed)
 2. **Storage rules** (if blob ACL changed) — still under `infra/firebase/`
-3. **Vercel Production promote** (pinned SHA) — when public web or admin changed (one deploy, one promote)
+3. **Merge staging → main** — when public web or admin changed, this one PR merge is the deploy
+   (Vercel builds and aliases it to Production automatically; there is no separate promote command)
 4. **Cloud Run / api-public deploy** with `PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` (if API changed)
 5. **Firestore rules/indexes** only when touching rollback/legacy surfaces (optional during wind-down)
 
@@ -178,8 +205,8 @@ Before public web / API surfaces receive incompatible traffic:
 firebase deploy --only storage \
   --project=black-book-efaaf --config=infra/firebase/firebase.json
 
-# Public web + admin (Vercel — one deploy, when either changed)
-vercel promote <tested-preview-deployment-url>
+# Public web + admin: no command here — merging the staging -> main PR (step 3 above)
+# already deployed it via Vercel's git integration.
 
 # Optional during wind-down only:
 # firebase deploy --only firestore:rules,firestore:indexes \
@@ -207,8 +234,10 @@ node infra/github/release-pipeline/release-pipeline.test.mjs
 **Operator rollback (live):**
 
 1. Engage publication kill switch — see [incident-response.md](./incident-response.md)
-2. **Public web + admin:** Vercel promote/redeploy prior known-good Production deployment SHA (one
-   deploy covers both — admin has no separate host to roll back)
+2. **Public web + admin:** on Vercel, redeploy/promote the prior known-good Production deployment
+   (dashboard "Instant Rollback" or `vercel promote <deployment-url>`) — this is a genuine rollback
+   action, distinct from the forward release path in AC #2, which has no equivalent manual step
+   (one deployment covers both surfaces — admin has no separate host to roll back)
 3. **APIs:** Re-run `deploy-production.yml` with `commit_sha=<prior-good-sha>`
 4. Repoint `publicMeta/activeRelease` if publication metadata changed — see
    [recovery-rollback-rehearsal.md](./recovery-rollback-rehearsal.md)
