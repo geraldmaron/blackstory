@@ -1,7 +1,7 @@
 /**
  * Backfill logic for `bb_reference.jurisdictions.location` on county rows that were loaded
  * before load-reference-counties.ts started writing that column (see that file's
- * upsertCountyBatch, and repo-kb5a: location was NULL for all 3,144 existing county rows).
+ * upsertCountyBatch; before that, location was NULL for all 3,144 existing county rows).
  *
  * Re-derives each row's bbox envelope from the same Census Gazetteer source the loader itself
  * uses, matched purely by the row's own GEOID (state_fips || county_fips) — no new data source,
