@@ -866,17 +866,96 @@ export function isNotabilityCriterion(value: string): value is NotabilityCriteri
  * without a colon so public copy reads as prose, not a field dump. Source names belong in the
  * citation list (evidenceIds), not inline in the note.
  */
+/**
+ * Function words carry no verb meaning, so a predicate and an object sharing one is not a repeat.
+ * Kept deliberately small: it exists only to find the VERB position at the front of a snake_case
+ * predicate key (`was_literate` -> `literate`), not to parse English.
+ */
+const PREDICATE_FUNCTION_WORDS = new Set([
+  'a',
+  'an',
+  'and',
+  'are',
+  'as',
+  'at',
+  'be',
+  'been',
+  'by',
+  'for',
+  'from',
+  'in',
+  'into',
+  'is',
+  'it',
+  'of',
+  'on',
+  'or',
+  'the',
+  'their',
+  'this',
+  'to',
+  'was',
+  'were',
+  'with',
+]);
+
+/** The predicate's first meaning-bearing word — the verb slot these catalog keys open with. */
+function predicateLeadWord(lead: string): string {
+  for (const word of lead.toLowerCase().split(/[^a-z']+/u)) {
+    if (word.length > 0 && !PREDICATE_FUNCTION_WORDS.has(word)) return word;
+  }
+  return '';
+}
+
+function sentenceCase(text: string): string {
+  return `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
+}
+
+function asSentence(text: string): string {
+  return /[.!?]$/.test(text) ? text : `${text}.`;
+}
+
 export function formatClaimInclusionNote(predicate: string, object: string): string {
   const lead = predicate.replaceAll('_', ' ').trim();
   const body = object.trim();
   if (lead.length === 0) {
     if (body.length === 0) return '';
-    return /[.!?]$/.test(body) ? body : `${body}.`;
+    return asSentence(body);
   }
-  const sentenceLead = `${lead.charAt(0).toUpperCase()}${lead.slice(1)}`;
+  const sentenceLead = sentenceCase(lead);
   if (body.length === 0) return `${sentenceLead}.`;
-  const sentence = `${sentenceLead} ${body}`;
-  return /[.!?]$/.test(sentence) ? sentence : `${sentence}.`;
+
+  /*
+   * repo-15slz. This function's contract is that objects are "lowercase continuations authored to
+   * follow those keys", and for most of the corpus they are — "Listed on the National Register",
+   * "Founded year 1900". But the enrichment lane writes objects as prose, and prose that opens by
+   * repeating the predicate's own verb stutters when the two are joined:
+   *
+   *   born_in            + "Born into slavery on April 5, 1856, ..."  -> "Born in Born into slavery ..."
+   *   delivered          + "Delivered the 'Atlanta Compromise' ..."   -> "Delivered Delivered the ..."
+   *   pulitzer_prizes    + "Pulitzer Prize for Drama for 'Fences' ..."-> "Pulitzer prizes Pulitzer Prize ..."
+   *
+   * When that happens the two sides are saying one thing twice, so keep the fuller of them and
+   * drop the other. Nothing is lost from the RECORD by choosing: the claim keeps both its
+   * predicate and its object and still renders in full under "what the sources say". Only this
+   * note — a one-sentence summary of why the record is in the catalog — stops repeating itself.
+   *
+   * Which side is fuller has to be measured, not assumed, because the repeat runs both ways.
+   * Usually the object is the prose and the predicate a short key. But sometimes the predicate is
+   * the whole statement and the object a stub restating it — "was the third Black man elected as
+   * alderman in Annapolis" + "third Black alderman" — and there, dropping the predicate would
+   * throw away the election and the town.
+   *
+   * Matching is on the predicate's FIRST meaning-bearing word only. Matching any shared word
+   * destroys real prose: "was first African American to hit a home run in" + "American League"
+   * shares "American", and collapsing that pair leaves the note reading "American League".
+   */
+  const objectLeadWord = body.match(/^[A-Za-z']+/u)?.[0]?.toLowerCase() ?? '';
+  if (objectLeadWord.length > 0 && predicateLeadWord(lead) === objectLeadWord) {
+    return asSentence(body.length >= lead.length ? sentenceCase(body) : sentenceLead);
+  }
+
+  return asSentence(`${sentenceLead} ${body}`);
 }
 
 /**

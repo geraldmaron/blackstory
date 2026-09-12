@@ -1719,3 +1719,87 @@ test('the racial-terror killing vocabulary counts as stating the killing', () =>
   assert.equal(isKillingPredicate('was lynched'), false);
   assert.equal(isRacialTerrorKillingPredicate('died'), false);
 });
+
+/*
+ * repo-15slz. Inclusion notes are built by joining a sentence-cased predicate to its claim object.
+ * That is right when the object is the lowercase continuation the format was designed for, and
+ * wrong when the object is prose that opens by repeating the predicate's own verb — which is how
+ * "Born in Born into slavery on April 5, 1856" reached the public "why this appears" surface.
+ *
+ * Every pair below is real, taken from the active release.
+ */
+test('an object that repeats the predicate verb does not stutter', () => {
+  for (const [predicate, object, expected] of [
+    [
+      'born_in',
+      'Born into slavery on April 5, 1856, in Hale’s Ford, Franklin County, Virginia.',
+      'Born into slavery on April 5, 1856, in Hale’s Ford, Franklin County, Virginia.',
+    ],
+    ['renamed', 'Renamed Livingstone College in 1887', 'Renamed Livingstone College in 1887.'],
+    [
+      'pulitzer_prizes',
+      "Pulitzer Prize for Drama for 'Fences' (1987) and 'The Piano Lesson' (1990)",
+      "Pulitzer Prize for Drama for 'Fences' (1987) and 'The Piano Lesson' (1990).",
+    ],
+    [
+      'developed_treatment',
+      'Developed the Ball Method for injectable chaulmoogra oil',
+      'Developed the Ball Method for injectable chaulmoogra oil.',
+    ],
+    [
+      'first_in_nation',
+      'First medical school for African Americans in the South',
+      'First medical school for African Americans in the South.',
+    ],
+  ] as const) {
+    assert.equal(formatClaimInclusionNote(predicate, object), expected);
+  }
+});
+
+test('when the predicate is the fuller statement, the stub object is dropped instead', () => {
+  // Collapsing toward the object here would throw away the election and the town.
+  assert.equal(
+    formatClaimInclusionNote(
+      'was the third Black man elected as alderman in Annapolis',
+      'third Black alderman',
+    ),
+    'Was the third Black man elected as alderman in Annapolis.',
+  );
+  assert.equal(
+    formatClaimInclusionNote('was born into slavery in North Carolina', 'born into slavery'),
+    'Was born into slavery in North Carolina.',
+  );
+  assert.equal(
+    formatClaimInclusionNote('was a rice plantation during the mid-1800s', 'rice plantation'),
+    'Was a rice plantation during the mid-1800s.',
+  );
+});
+
+test('a shared word that is not the predicate verb still joins normally', () => {
+  // "American" appears in both. Collapsing this pair would leave the note reading "American
+  // League", which is why matching is on the predicate's first meaning-bearing word alone.
+  assert.equal(
+    formatClaimInclusionNote('was first African American to hit a home run in', 'American League'),
+    'Was first African American to hit a home run in American League.',
+  );
+  assert.equal(
+    formatClaimInclusionNote(
+      'resettled liberated Africans after 1807',
+      'Africans freed by Royal Navy',
+    ),
+    'Resettled liberated Africans after 1807 Africans freed by Royal Navy.',
+  );
+});
+
+test('the continuation shape the format was designed for is unchanged', () => {
+  assert.equal(formatClaimInclusionNote('founded_year', '1900'), 'Founded year 1900.');
+  assert.equal(
+    formatClaimInclusionNote('listed_on', 'the National Register of Historic Places'),
+    'Listed on the National Register of Historic Places.',
+  );
+  assert.equal(formatClaimInclusionNote('served_as', ''), 'Served as.');
+  assert.equal(
+    formatClaimInclusionNote('', 'A bare object stands alone'),
+    'A bare object stands alone.',
+  );
+});
