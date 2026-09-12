@@ -7,8 +7,8 @@
  * `SubmissionKind`/`SubmissionInput`), tagged distinctly so a moderation queue can
  * special-case it, plus a documented SLA.
  *
- * `@repo/domain` cannot import `@repo/security` (security depends on domain, so
- * the reverse would be a circular workspace dependency). The shape below is intentionally
+ * This module produces a record shape rather than calling into `@repo/security`'s intake, so
+ * the data model stays independent of the intake implementation. The shape below is intentionally
  * structurally compatible with `SubmissionInput`
  * (`kind`/`title`/`statement`/`sourceUrls`/`targetRecordId`/`submitterContact`) so a future
  * integration can map one onto the other without redesigning either side. Do not build the

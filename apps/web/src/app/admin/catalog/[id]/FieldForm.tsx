@@ -44,8 +44,8 @@ export function FieldForm({
       submitLabel={submitLabel}
       pending={pending}
       disabled={disabled}
-      // The button used to just go dead when no reason was typed, with the explanation sitting
-      // in a paragraph at the top of the record — several fields away from what it was blocking.
+      // The reason the button is disabled rides on the button, not in a paragraph at the top of
+      // the record several fields away from what it is blocking.
       disabledReason="Give a reason for this change first."
       status={state.status === 'saved' ? 'saved' : state.status === 'error' ? 'error' : 'idle'}
       {...(state.status === 'saved' || state.status === 'error' ? { message: state.message } : {})}

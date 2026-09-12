@@ -1685,10 +1685,8 @@ test('a lynching record does not publish its own capture and interrogation as re
 
   /*
    * The published record also carries a `movement_significance` basis for the NAACP investigation
-   * that followed (repo-9u3di). A RECOMPUTE does not produce it and never did: `was followed by`
-   * infers `documented_site`, so `identifies()` is false for it. Before this fix that claim
-   * survived anyway — not as movement significance, but as a `documented_site` record, riding the
-   * same fall-through that promoted the capture and the interrogation.
+   * that followed (repo-9u3di). A RECOMPUTE does not produce it: `was followed by`
+   * infers `documented_site`, so `identifies()` is false for it.
    *
    * That basis comes from `apply-notability-rubric-ruling.ts`'s MERGE, which is why the bead calls
    * the merge safe and a straight recompute (fix-racial-terror-notability-basis.ts,

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Security-independent domain primitives shared by @repo/domain and @repo/security (living status, era/relationship vocabulary, claim confidence, public projection shapes). Exists to break the @repo/domain <-> @repo/security circular dependency: this package depends only on @repo/schemas, and both domain and security depend on it.",
+  "description": "Security-independent domain primitives shared by @repo/domain and @repo/security (living status, era/relationship vocabulary, claim confidence, public projection shapes). Depends only on @repo/schemas, so @repo/security can read these primitives without importing @repo/domain, which imports @repo/security (making the reverse edge a cycle).",
   "exports": {
     ".": {
       "development": "./src/index.ts",

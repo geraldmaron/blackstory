@@ -7,8 +7,8 @@
  * dependency-injected/port pattern as `../citations/link-health.ts`. If an equivalent adapter
  * client lands later, merging the two (retiring whichever is thinner) is a clean follow-up.
  *
- * Like `link-health.ts`, this module performs no network I/O itself and cannot import
- * `@repo/security` (circular dependency). `SpnFetchResult` is the same structural port
+ * Like `link-health.ts`, this module performs no network I/O itself: it takes its fetch as an
+ * injected port. `SpnFetchResult` is the same structural port
  * shape as `LinkCheckFetchResult`; the real POST to `https://web.archive.org/save/<url>` through
  * safe-fetch policy is wired in `packages/config/src/scheduled-jobs/jobs/citation-link-health-sweep.ts`.
  */

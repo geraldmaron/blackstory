@@ -1,8 +1,8 @@
 /**
  * Picks the record chapter 2 opens.
  *
- * The chapter used to be the A.G. Gaston Motel, hard-coded in prose. A story that shows the same
- * pin every time teaches the reader that the archive is an anecdote. Drawing a different record on
+ * The pin is drawn from the release, never hard-coded in prose. A story that shows the same pin
+ * every time teaches the reader that the archive is an anecdote. Drawing a different record on
  * each visit is the chapter's actual argument — *every* pin opens into evidence, not one famous
  * one — and it means the copy has to come from the record rather than from a writer.
  *

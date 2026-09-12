@@ -69,9 +69,8 @@ test('sanitizeRichText allows safe external https links', () => {
 });
 
 test('the attribute allowlist drops every dangerous attribute shape', () => {
-  // These used to be caught by blocklist regexes running before the allowlist rebuild. The
-  // rebuild is what actually removes them: RICH_TEXT_ALLOWED_ATTRS permits href/title/rel on
-  // `<a>` and nothing anywhere else, so anything not on the list is dropped by omission.
+  // Nothing here is caught by a blocklist regex: RICH_TEXT_ALLOWED_ATTRS permits href/title/rel
+  // on `<a>` and nothing anywhere else, so every attribute below is dropped by omission.
   const cases = [
     `<p onclick="alert(1)">x</p>`,
     `<p ONCLICK="alert(1)">x</p>`,

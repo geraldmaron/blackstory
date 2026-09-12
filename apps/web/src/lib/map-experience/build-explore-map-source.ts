@@ -37,9 +37,9 @@ export type { ConfidenceTier };
  * A transparency affordance about how strongly evidenced a record is, never a numeric score
  * (ranking-signal ban).
  *
- * This used to be a local bare-maximum over claim levels. It is now the shared rule, which also
- * accounts for corroboration — see `recordConfidenceTier`. Re-exported here because Explore,
- * Records and the record page all reached for it under this name.
+ * The tier is the shared rule in `@repo/public-contracts/evidence`, not a local bare-maximum
+ * over claim levels: it also accounts for corroboration — see `recordConfidenceTier`.
+ * Re-exported here because Explore, Records and the record page all reach for it under this name.
  */
 export { recordConfidenceTier } from '@repo/public-contracts/evidence';
 

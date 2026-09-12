@@ -2,10 +2,10 @@
  * Records tab — route param wiring (repo-vlf0w).
  *
  * `/history?decade=1950s` redirects to `/records?era=1950s` on the promise that a link shared
- * from either surface lands on the same view. Before this fix, this screen destructured only
- * `{ kind }` off `parseFilterState`'s result and never read `era` at all, so the promise held for
- * `q`/`kind` but not for `era`: the phone showed the unfiltered archive index where web's
- * `/records` would show the 1950s slice. This test never reaches the real search runtime/
+ * from either surface lands on the same view. That promise holds only if this screen reads `era`
+ * off `parseFilterState`'s result and not just `{ kind }`: a screen that drops `era` shows the
+ * unfiltered archive index where web's `/records` shows the 1950s slice. This test never reaches
+ * the real search runtime/
  * transport (that round trip is covered in `features/search/__tests__/SearchScreen.address-
  * change.test.tsx`); it only asserts that this screen reads `era` off the route and forwards it.
  */

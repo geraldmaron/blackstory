@@ -142,8 +142,8 @@ describe('room kit · the trail is computed, never hand-written', () => {
   });
 
   it("an entity's parent is Records — the catalog that lists it", () => {
-    // It used to be the site root, from the Atlas generation where the map was the one way in
-    // (a720e176). That left a reader on a record page with no step up into the archive at all.
+    // Not the site root: a reader on a record page needs a step up into the archive, and
+    // Records is the catalog that lists the record.
     assert.deepEqual(resolveTrail('/entity/abc', 'Isaac McGhie'), [
       { label: 'Records', href: '/records' },
       { label: 'Isaac McGhie', href: null },

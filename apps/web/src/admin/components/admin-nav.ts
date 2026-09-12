@@ -1,11 +1,11 @@
 /**
  * Single source of truth for admin information architecture.
  *
- * The shell used to carry seven primary links plus ten in More, with Inbox reachable three
- * separate ways. The fix is not a shorter list of the same links — it is grouping the surfaces by
- * the task an operator is doing, promoting one entry point per task to the bar, and making the
- * command palette the way you reach everything else. Adding a surface means adding it to a group
- * here; it lands in More and in the palette automatically, and nothing else needs editing.
+ * Surfaces are grouped by the task an operator is doing: one entry point per task is promoted to
+ * the bar, and the command palette is the way to reach everything else. A bar that lists every
+ * surface, with the same destination reachable several ways, is the shape this replaces. Adding a
+ * surface means adding it to a group here; it lands in More and in the palette automatically, and
+ * nothing else needs editing.
  */
 
 import type { CommandPaletteItem, ShellNavItem } from '@repo/ui';

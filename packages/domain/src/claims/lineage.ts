@@ -1,7 +1,10 @@
 /**
- * Re-export shim: implementation lives in @repo/domain-core/claims/lineage so that
- * @repo/security and @repo/domain can both resolve source lineage without the circular
- * dependency. Keep this file so relative imports of './claims/lineage.js' inside
- * @repo/domain keep working unchanged.
+ * Re-export shim: the implementation lives in @repo/domain-core/claims/lineage.
+ *
+ * That package holds the domain primitives `@repo/security` needs. `@repo/security` must not
+ * import `@repo/domain` — `@repo/domain` imports `@repo/security`, so the reverse edge would be a
+ * cycle — and `@repo/domain-core` depends on neither, so both can read it.
+ *
+ * Keep this file so relative imports of './claims/lineage.js' inside @repo/domain resolve.
  */
 export * from '@repo/domain-core/claims/lineage';

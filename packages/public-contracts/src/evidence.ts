@@ -6,10 +6,10 @@
  * three-segment meter, a letter, and a sentence. Those are spellings of one fact, and this module
  * owns the mapping so the site and the app cannot drift.
  *
- * It used to live in `apps/web/src/lib/map-experience/evidence-grade.ts`, where the phone could
- * not reach it. Native surfaces therefore invented their own vocabulary — "High confidence" as a
- * plain fact-strip string — while the site showed a graded meter, so the same record read as two
- * different assessments depending on which screen you opened.
+ * It lives here, in a package both platforms can reach, rather than inside `apps/web`. A mapping
+ * the phone cannot import is a mapping the phone reinvents — "High confidence" as a plain
+ * fact-strip string against the site's graded meter — and the same record then reads as two
+ * different assessments depending on which screen you open.
  *
  * Two rules the whole product depends on:
  *
@@ -263,12 +263,11 @@ function strongestClaimTier(claims: readonly EvidenceClaimInput[]): ConfidenceTi
 /**
  * The evidence tier for a whole record: its strongest claim, capped by corroboration.
  *
- * The rule used to be the bare maximum, which is why 4,152 of 4,167 published records graded A
- * and the meter carried no signal at all. The maximum is not so much wrong as answering a
+ * The rule is not the bare maximum over claims. The maximum is not so much wrong as answering a
  * different question — "is any single claim here well sourced?" — while a reader looking at a
  * record-level grade is asking "is this record well supported?". Those come apart exactly where
- * it matters: 57% of the archive rests on one source, and 398 records were grading A on
- * Wikipedia alone.
+ * it matters: 57% of the archive rests on one source, so a bare maximum grades 4,152 of 4,167
+ * published records A and the meter carries no signal at all, 398 of them on Wikipedia alone.
  *
  * So a record cited to a single lineage cannot reach A, however authoritative that lineage is.
  * That standard is not invented here. It is what the confidence engine

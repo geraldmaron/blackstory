@@ -6,10 +6,10 @@
  * without the graphic), the graphic, the caption stating the figure's limits, the source line,
  * and a native "Show the numbers" disclosure holding the full table.
  *
- * The table used to be visually hidden. It is now a disclosure, because a reader checking a
- * figure wants the numbers and a screen reader is served better by the reading sentence plus a
- * table they can open than by a hidden table they cannot find. The disclosure is a `<details>`
- * so it works before hydration and with JavaScript off.
+ * The table is a disclosure, not a visually hidden block: a reader checking a figure wants the
+ * numbers, and a screen reader is served better by the reading sentence plus a table they can
+ * open than by a hidden table they cannot find. The disclosure is a `<details>` so it works
+ * before hydration and with JavaScript off.
  *
  * Multi-source figures pass `sources`; single-source figures may pass `sourceLabel` and
  * `sourceUrl`. The figure never renders without a source line: a chart with no named series

@@ -148,12 +148,11 @@ function earliestYear(entry: CatalogStatusSource): string | undefined {
 /**
  * Claims a reader could check this status against — real claim ids only.
  *
- * This used to synthesize `${entry.id}_claim_${i}` for any claim arriving without an id, which
- * produced references to nothing: claims are minted as `claim_<entityId>_<nn>`, so the invented
- * ids matched no claim on the record. Measured on release rel_20260723_authority_net_001, 3,270
- * published records cite a basis that resolves to no claim at all — the audit trail from a status
- * back to its evidence was decorative. An unciteable claim is dropped instead; a status with an
- * empty basis is honestly unsupported, which is the signal callers need.
+ * A claim that arrives without an id is dropped, never given a synthesized one. Claims are
+ * minted as `claim_<entityId>_<nn>`, so an id invented here would match no claim on the record
+ * and the basis would cite nothing: on release rel_20260723_authority_net_001 that left 3,270
+ * published records citing a basis that resolves to no claim at all. A status with an empty basis
+ * is honestly unsupported, which is the signal callers need.
  */
 function basisClaimIds(entry: CatalogStatusSource): readonly string[] {
   const ids = (entry.claims ?? [])
@@ -183,18 +182,17 @@ function isUnresearchedRecord(entry: CatalogStatusSource): boolean {
 /**
  * Place-like standing. `undefined` when the record supports no answer either way.
  *
- * This used to end in a bare `return 'active'`, reached by anything whose text mentioned a
- * church, school, park, district or town, and by everything else that fell through. That made
- * "still operates today" the catalog's single largest assertion and its least evidenced: a
- * building listed in 2001 may have burned down in 2009, and a registry stub says nothing either
- * way.
+ * There is no bare `return 'active'` fall-through. A default of "still operates today", reached
+ * by anything whose text mentions a church, school, park, district or town, would be the
+ * catalog's single largest assertion and its least evidenced: a building listed in 2001 may have
+ * burned down in 2009, and a registry stub says nothing either way.
  *
- * The default survives for records that have actually been researched, where curated prose makes
- * it a reasonable reading. It does not survive for unresearched listings, which are exactly the
- * population that made the old default wrong at scale — 2,063 of them on that release. Dropping
- * the cue-free default outright was measured first and rejected: it also stripped `active` from
- * 564 curated records including the DuSable Museum and Ebenezer Baptist Church, because ACTIVE_RE
- * does not match plain present tense like "is a museum operated by the Oakland Public Library".
+ * The cue-free default is kept for records that have actually been researched, where curated
+ * prose makes it a reasonable reading, and withheld from unresearched listings — 2,063 of them on
+ * release rel_20260723_authority_net_001. Dropping it outright was measured and rejected: it also
+ * strips `active` from 564 curated records including the DuSable Museum and Ebenezer Baptist
+ * Church, because ACTIVE_RE does not match plain present tense like "is a museum operated by the
+ * Oakland Public Library".
  */
 function derivePlaceLike(entry: CatalogStatusSource): PlaceLikeStatus | undefined {
   const text = `${entry.summary ?? ''} ${entry.historicalContext ?? ''} ${entry.displayName ?? ''}`;

@@ -25,10 +25,10 @@ import type { CitationV1, ContentPageV1 } from './content-types';
 /**
  * The narrative partition. One id, not three.
  *
- * It used to be `history | topics | myths`, which put three parallel content trees in front of a
- * reader for what is one publication surface. History is an era facet, a topic is a tag, and a
- * myth correction is an editorial FORMAT — so the distinction that actually matters survives as
- * {@link ContentEntry.format} rather than as three destinations.
+ * `history | topics | myths` would put three parallel content trees in front of a reader for
+ * what is one publication surface. History is an era facet, a topic is a tag, and a myth
+ * correction is an editorial FORMAT — so the distinction that actually matters lives on
+ * {@link ContentEntry.format} rather than in three destinations.
  */
 export type StoryCatalogSectionId = 'stories';
 

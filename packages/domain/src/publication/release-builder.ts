@@ -990,9 +990,8 @@ export function buildNotabilityBasisNote(
 /**
  * Builds a REAL, evidence-backed `notabilityBasis` from an entry's own claims: one basis record
  * per distinct claim predicate, `evidenceIds` set to the ids of that predicate's claims that
- * carry a non-empty `citationSource`. This replaces the single hardcoded placeholder basis record
- * the fixture publish path used before this bead — every basis record here traces back to an
- * actual claim the entry declared, never a fabricated inclusion reason.
+ * carry a non-empty `citationSource`. Every basis record traces back to an actual claim the
+ * entry declared, never a placeholder or a fabricated inclusion reason.
  */
 export function buildReleaseNotabilityBasis(
   entry: ReleaseSourceEntity,

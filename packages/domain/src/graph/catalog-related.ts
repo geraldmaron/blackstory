@@ -171,8 +171,8 @@ export function extractCatalogRelationships(
     );
   }
 
-  // Additive, backward-compatible wiring of `mentionedEntityIds` (WS6 — see this module's header
-  // comment). Entities that carry no `mentionedEntityIds` behave exactly as before this pass.
+  // Additive wiring of `mentionedEntityIds` (see this module's header comment). An entity that
+  // carries no `mentionedEntityIds` contributes nothing here.
   const mentionIndex = buildMentionResolverIndex(entities);
   for (const entity of sortedEntities) {
     for (const token of entity.mentionedEntityIds ?? []) {

@@ -1,8 +1,7 @@
 /**
  * Case → canonical entity promotion authority (repo-k2kb).
  *
- * Before this module, the only working path from a research case to a canonical entity was an
- * untracked, gitignored script that ran raw SQL by hand. This is pure, DB-free logic two
+ * The tracked path from a research case to a canonical entity. This is pure, DB-free logic: two
  * functions a caller (apps/web/src/admin's promote-case.ts) must both pass before writing anything:
  *
  *  - `evaluateCasePromotionGate`: the *authority* check. Mirrors `evaluatePromotionGate`
@@ -12,10 +11,9 @@
  *    reputation) this pipeline has never populated; forcing case data into that shape would
  *    fabricate fields no one actually assessed. This is a smaller, honest gate for what this
  *    pipeline actually has.
- *  - `validateCanonicalPromotionRecord`: the *content* check ports the validation rules the
- *    ad hoc script enforced by hand (two independent source hosts, US coordinate bounds,
- *    well-formed decade buckets, non-trivial summary) so they run before every promotion, not
- *    just the one the script's author remembered to check manually.
+ *  - `validateCanonicalPromotionRecord`: the *content* check. Two independent source hosts, US
+ *    coordinate bounds, well-formed decade buckets, a non-trivial summary — enforced on every
+ *    promotion rather than left to whoever is running one.
  */
 
 /** Case states the ad hoc script treated as "ready" the enrichment tier is complete. */

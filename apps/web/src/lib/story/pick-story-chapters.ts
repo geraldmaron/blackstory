@@ -1,9 +1,9 @@
 /**
  * The running order for one visit.
  *
- * The story used to be a fixed six-chapter script: a reader who came back met the same sentences in
- * the same order, which is a brochure, not an archive. This draws a running order per visit so a
- * second read teaches something the first did not.
+ * The running order is drawn per visit, not a fixed script. A reader who comes back to the same
+ * sentences in the same order is reading a brochure, not an archive, so a second read has to be
+ * able to teach something the first did not.
  *
  * What varies is *which* points are made and how many: the context stage runs one or two chapters,
  * each carrying a different cited fact from the twenty in `story-facts.ts`, and the record chapter

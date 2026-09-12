@@ -1,9 +1,9 @@
 /**
  * The record's place, as a locator inset rather than a map.
  *
- * WHAT THIS REPLACED AND WHY. The WHERE block used to borrow the site's one persistent MapLibre
- * plate through a `MapMoment`. Three things were wrong with that, and only the third is a bug in
- * the ordinary sense:
+ * WHY A LOCATOR AND NOT A LIVE MAP. Borrowing the site's one persistent MapLibre plate through a
+ * `MapMoment` cannot serve this block. Three things stand against it, and only the third is a bug
+ * in the ordinary sense:
  *
  *  1. The plate is `position: fixed` and is moved onto the slot's rect inside a rAF callback, so
  *     it can never be locked to an in-flow box while the page scrolls — the browser scrolls on the
@@ -11,12 +11,12 @@
  *     lag is invisible. In a 240px rail tile it reads as the map sliding around inside its frame.
  *     No amount of tuning fixes it; it is what borrowing a fixed element costs.
  *  2. Ownership is by scroll proximity: `pickLiveMoment` hands the plate to whichever slot is more
- *     than 55% on screen. A small tile in a long rail crosses that line constantly, so the map
- *     appeared, vanished back to idle text, and reappeared as the reader scrolled past its own
- *     record. Content that flickers is not content.
+ *     than 55% on screen (`MOMENT_VISIBILITY_FLOOR`). A small tile in a long rail crosses that
+ *     line constantly, so the map would appear, vanish back to idle text, and reappear as the
+ *     reader scrolls past its own record. Content that flickers is not content.
  *  3. The moment's chrome — the PLATE · LIVE tag, MapLibre's attribution, the Explore hand-off pill —
- *     is sized for a figure several hundred pixels wide. At rail width they overlapped each other
- *     and covered the map they were annotating.
+ *     is sized for a figure several hundred pixels wide. At rail width it overlaps itself and
+ *     covers the map it annotates.
  *
  * Underneath all three is a question of instrument. The block answers "roughly where in the country
  * is this", and the caveat printed directly beneath it says the answer is held to city precision
@@ -25,8 +25,8 @@
  * what the archive can actually support, costs no GL context, and — being an ordinary block in the
  * document — cannot tear, blink, or lose a race with the scroll position.
  *
- * Street-level detail did not disappear with it: `Open in maps` and `View on the map` are still
- * right there, and both of them work regardless of WebGL, posture, or which surface this is on.
+ * Street-level detail stays one tap away: `Open in maps` and `See it on the map` sit right beside
+ * this block, and both of them work regardless of WebGL, posture, or which surface this is on.
  *
  * The ground is `public/geo/us-locator.svg` applied as a CSS mask, so it is fetched once for the
  * whole archive, costs the JS bundle nothing, and still takes its color from a theme token.

@@ -42,13 +42,11 @@ export async function generateStaticParams() {
   // Deliberately empty: prerender nothing, render every id on demand, then let `revalidate`
   // cache it. `dynamicParams = true` is what makes that safe.
   //
-  // This used to enumerate every id from the search index, guarded by a
-  // `shouldUseLivePublicProjections()` check for builds with no database. That was inert while
-  // the route was `force-dynamic` (Next ignores static params for a force-dynamic route). Under
-  // `revalidate` it would become live again, and on Vercel `DATABASE_URL` *is* present at build
-  // time, so the guard would pass and the build would pull the full catalog and prerender ~4,092
-  // entity pages. On-demand rendering reaches the same cached steady state without paying that
-  // at build, and keeps the no-database build safe for the same reason it was safe before.
+  // Enumerating every id from the search index here would prerender the whole catalog: under
+  // `revalidate` Next honors static params, and on Vercel `DATABASE_URL` *is* present at build
+  // time, so a `shouldUseLivePublicProjections()` guard would pass and the build would pull ~4,092
+  // entity pages. On-demand rendering reaches the same cached steady state without paying that at
+  // build, and it needs no database at build time at all.
   return [];
 }
 

@@ -1,33 +1,23 @@
 /**
  * A record's place block: a locator inset, the place in words, and the way out to a real map.
  *
- * WHAT CHANGED AND WHY. This block has now been through three implementations, and the third one
- * is the first that answers the question the block is actually asking.
+ * WHY A LOCATOR AND NOT A MAP. The block needs a locator, not a map. The caveat printed directly
+ * beneath it holds the record to city precision and refuses exact addresses; an interactive street
+ * camera contradicts that in the act of rendering. A static locator costs no GL context, no tiles,
+ * no fixed positioning and no plate arbitration. `MapMoment` keeps its job on the reading
+ * surfaces, where a moment is full-column, scroll-triggered, and genuinely about a camera
+ * arriving — which is what it was designed for. See `RecordLocator` for why a borrowed plate
+ * cannot serve a rail-width slot.
  *
- *   1. `EntityLocationMap` — a second MapLibre instance, so a record page held two GL contexts.
- *   2. A `MapMoment` borrowing the site's one persistent plate. That removed the second context
- *      but put a `position: fixed` element in a 240px rail slot, where it tore against the scroll,
- *      flickered in and out as the slot crossed the visibility floor, and wore chrome sized for a
- *      figure three times the width. See `RecordLocator` for the full account.
- *   3. A static locator. No GL, no tiles, no fixed positioning, no arbitration.
+ * THE SHARED-SURFACE CASE. `RecordAnatomyPanel` renders on the record page AND inside Explore's
+ * record sheet, which floats over the live plate. A sheet cannot borrow the plate it is floating
+ * over. A locator has nothing to borrow, so both surfaces render the same thing and neither needs
+ * a line explaining that a map is not coming.
  *
- * The through-line is that the block was being given a map when what it needed was a locator. The
- * caveat printed directly beneath it holds the record to city precision and refuses exact
- * addresses; an interactive street camera contradicts that in the act of rendering. `MapMoment`
- * keeps its job on the reading surfaces, where a moment is full-column, scroll-triggered, and
- * genuinely about a camera arriving — which is what it was designed for.
- *
- * THE SHARED-SURFACE CASE, which used to need special handling and no longer does.
- * `RecordAnatomyPanel` renders on the record page AND inside Explore's record sheet, which floats
- * over the live plate. A sheet cannot borrow the plate it is floating over, so the old version had
- * to pass an idle line explaining that the map was never coming. A locator has nothing to borrow,
- * so both surfaces now render the same thing and the explanation is gone rather than reworded.
- *
- * NO MAPS LINK OF ITS OWN. This block used to carry one, and on both surfaces it was the second
- * link to the same coordinates. `RecordAnatomyPanel` already wraps its own WHERE fact value in a
- * `MapsExternalLink`, and the record page already prints an `Open in maps` CTA directly beneath
- * this block — so the preview's copy sat between them saying the same thing a third time. Street
- * detail is still one tap away on both surfaces; it is just not offered twice.
+ * NO MAPS LINK OF ITS OWN. `RecordAnatomyPanel` wraps its own WHERE fact value in a
+ * `MapsExternalLink`, and the record page prints an `Open in maps` CTA directly beneath this
+ * block. A third link to the same coordinates here would repeat what both of those already say.
+ * Street detail stays one tap away on both surfaces; it is just not offered twice.
  */
 import React from 'react';
 import { InteractiveRecordLocator } from './InteractiveRecordLocator';

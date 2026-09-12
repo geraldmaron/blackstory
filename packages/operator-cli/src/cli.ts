@@ -563,8 +563,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         // Reads a DiscoveryCampaignResult (or a bare AuthorityFollowUpLead[]) from
         // --leads-file and runs the existing single-URL research-intake path once per lead,
         // reusing the exact SSRF-safe fetch / citation-prefill / draft-case plumbing above —
-        // no new fetch or commit logic. See authority-followup-intake.ts for why this exists:
-        // `authorityFollowUps` was previously only ever counted, never actually intake'd.
+        // no new fetch or commit logic. See authority-followup-intake.ts for why this exists.
         const leadsFilePath = requireFlag(flags, '--leads-file');
         const parsed: unknown = JSON.parse(readFile(leadsFilePath));
         const leads: readonly AuthorityFollowUpLead[] = Array.isArray(parsed)

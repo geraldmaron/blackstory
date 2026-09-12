@@ -1,18 +1,18 @@
 /**
  * A chapter's `mapInset` block, rendered as the room kit's map moment.
  *
- * WHAT CHANGED AND WHY (SP-08, repo-92n2.8). This used to mount `EntityLocationMap`, a second
- * MapLibre instance inside the article column. That cost a whole extra GL context per chapter that
- * happened to cite a place, and it put a live, independently-styled map behind prose — the thing
- * the plate postures exist to forbid. It now contributes a SLOT and a caption, and the one
- * persistent plate moves into that slot when the block scrolls into view.
+ * WHY NOT A MAP OF ITS OWN. A second MapLibre instance inside the article column costs a whole
+ * extra GL context for every chapter that cites a place, and it puts a live, independently-styled
+ * map behind prose — the thing the plate postures exist to forbid. So this block contributes a
+ * SLOT and a caption, and the one persistent plate moves into that slot when the block scrolls
+ * into view.
  *
  * This is where the Framed posture first runs for real: chapter detail is a Reading surface, so
  * the plate rests Parked and is borrowed only while a moment is live. Between moments, and for a
  * reader with no JavaScript, the caption still carries the point.
  *
- * The component survives as a thin adapter rather than the article rendering `MapMoment` directly,
- * because the `mapInset` block carries an `entityId` and the Explore hand-off has to be built from
+ * This is a thin adapter rather than the article rendering `MapMoment` directly, because the
+ * `mapInset` block carries an `entityId` and the Explore hand-off has to be built from
  * it — `selected=<entityId>` is the same convention entity and story pages use. That is real
  * mapping logic and it belongs somewhere; a wrapper this size is cheaper than teaching `ArticleBody`
  * the explore URL vocabulary.

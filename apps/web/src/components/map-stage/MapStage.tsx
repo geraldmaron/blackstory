@@ -8,14 +8,12 @@
  * once per page load: the WebGL context, loaded tiles, and camera all survive route changes by
  * construction, not by choreography.
  *
- * Refactored from the former `apps/web/src/app/map/ExploreMapCanvas.tsx` (deleted — its
- * instance-lifecycle code lives here now). Every mutation helper below (`applyGeographyStyle`,
- * `setSelectedStateFilter`, `setHistoryEdgeData`, `syncCircularMarkers`, …) is a straight port;
- * what changed is the OUTER shape: instead of a props-driven component that a page mounts and
- * unmounts, this is a long-lived provider whose imperative API (`patchData` / `applyViewState` /
- * `flyPreset` / `subscribe`) pages call through `useMapStage()`. Dignity redaction flow, cluster
- * config, and `activateOnBackgroundClick`-equivalent semantics are all unchanged in substance —
- * see this module's exports' own doc comments for what moved where.
+ * The outer shape is a long-lived provider, not a props-driven component a page mounts and
+ * unmounts: pages drive it through the imperative API (`patchData` / `applyViewState` /
+ * `flyPreset` / `subscribe`) that `useMapStage()` returns. The instance-lifecycle code and every
+ * mutation helper below (`applyGeographyStyle`, `setSelectedStateFilter`, `setHistoryEdgeData`,
+ * `syncCircularMarkers`, …) sit behind that API; each export's own doc comment states its
+ * contract.
  *
  * `maplibre-gl` (and its CSS) are only ever dynamically imported here — the app's ONE such
  * import (ADR-017 consequence).

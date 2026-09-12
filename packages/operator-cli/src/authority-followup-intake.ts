@@ -2,11 +2,11 @@
  * Bridges a discovery campaign's harvested authority-host follow-up leads
  * (`DiscoveryCampaignResult.authorityFollowUps`) into research intake.
  *
- * Before this module, `authorityFollowUps` was only ever counted
- * (`community-obscurity-run.ts`'s `authorityFollowUpTotal`) — the leads themselves never reached
- * research-intake, so a low-authority candidate that cited a real authority host produced a
- * number in a summary and nothing else. This closes that gap using only pieces that already
- * exist and are already tested: `runResearchIntake` (SSRF-safe fetch via
+ * Turns `authorityFollowUps` into intake rows, so a follow-up the harness emits becomes work
+ * rather than a counter: without this bridge the leads reach only
+ * `community-obscurity-run.ts`'s `authorityFollowUpTotal`, and a low-authority candidate that
+ * cited a real authority host would produce a number in a summary and nothing else. It uses only
+ * pieces that already exist and are already tested: `runResearchIntake` (SSRF-safe fetch via
  * `createNodeSafeFetchDependencies`, citation prefill, draft-case creation via
  * `prepareLeadIntake`, no full-text republication). No new fetch, quarantine, or catalog-write
  * logic lives here — this only loops the existing single-URL path once per lead, the same way

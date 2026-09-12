@@ -10,8 +10,7 @@
  * string-building functions (not the Firestore schema, loader, or resolver) because
  * `@repo/domain` cannot depend on `@repo/ops-data` — that package already depends
  * on `@repo/domain` at runtime, so the reverse edge would be a circular workspace
- * dependency (the same rule `../adapters/internet-archive/shared/http-port.ts` documents for
- * the domain/security edge). Any change to the id format in
+ * dependency. Any change to the id format in
  * `packages/ops-data/src/jurisdictions/schema.ts` must be mirrored here.
  *
  * The `us-{state}-place-{5-digit place FIPS}` city/place id below is a proposal, not yet

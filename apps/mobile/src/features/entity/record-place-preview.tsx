@@ -1,15 +1,14 @@
 /**
  * Place locator for record anatomy on mobile.
  *
- * This used to be a hand-drawn frame: a 12pt dot, a 2pt stem and the place name on an empty
- * surface, captioned "Map preview". Nothing about it was a map, so section 01 read as a map that
- * had failed to load — and the dot-and-stem, drawn as two separate Views with a negative margin,
- * did not even join up into a pin.
- *
- * It now renders the real map surface as a STILL PLATE: `gesturesEnabled={false}`, which is the
+ * This renders the real map surface as a STILL PLATE: `gesturesEnabled={false}`, which is the
  * case MapScreen's own prop doc reserves for "a printed-frame preview". No gestures, no zoom
- * controls, one pin, camera parked on the point. Pressing it still hands off to the OS maps app,
- * which is where panning and zooming belong for a single address.
+ * controls, one pin, camera parked on the point. Pressing it hands off to the OS maps app, which
+ * is where panning and zooming belong for a single address.
+ *
+ * A hand-drawn stand-in — a dot, a stem and the place name on an empty surface, captioned "Map
+ * preview" — is not the same affordance: nothing about it is a map, so section 01 reads as a map
+ * that has failed to load.
  *
  * Attribution stays on (MapScreen's default): it is a licensing obligation of the tiles, not
  * chrome we may drop because the frame is small.

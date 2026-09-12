@@ -2,8 +2,8 @@
  * Chronicling America (LoC historic newspapers) adapter types.
  *
  * Fixtures mimic the loc.gov JSON API search/item response shapes for the
- * `chronicling-america` collection. Live harvest is out of scope for this bead;
- * parsers are defensive so field renames on the LoC side do not poison batches.
+ * `chronicling-america` collection. This module defines types and parsers only; harvesting is
+ * not done here. Parsers are defensive so field renames on the LoC side do not poison batches.
  */
 import type { RightsPolicy } from '../../provenance/rights.js';
 import type { EvidenceSource } from '../../provenance/source.js';
@@ -21,10 +21,11 @@ export const CHRONICLING_AMERICA_SOURCE_ID = 'src_chronicling_america' as const;
 export const CHRONICLING_AMERICA_ORG_ID = 'org_loc' as const;
 
 /**
- * Campaign budget defaults aligned with `@repo/security` `DEFAULT_RESEARCH_CAMPAIGN_BUDGET`
- * and discovery roster caps (500 / 40 / 10 / retries 2). Documented in
- * `docs/research/chronicling-america-adapter.md`; not imported at runtime to avoid a
- * circular dependency on `@repo/security`.
+ * Campaign budget defaults aligned with discovery roster caps (500 / 40 / 10 / retries 2) and
+ * documented in `docs/research/chronicling-america-adapter.md`. `maxCandidates` matches
+ * `@repo/security`'s `DEFAULT_RESEARCH_CAMPAIGN_BUDGET.maxCandidatesPerRun`. Held as literals
+ * here so the adapter's budget is readable at the adapter; `chronicling-america.test.ts` pins
+ * the numbers.
  */
 export const CHRONICLING_AMERICA_CAMPAIGN_BUDGET = {
   maxCandidates: 500,

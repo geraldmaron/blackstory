@@ -319,10 +319,10 @@ export function ExploreView({
 
   // Immersive -> Browse. Restores the chrome and nothing else.
   //
-  // This used to also deselect the record and fly the camera back to the national preset. That
-  // made the exit destructive: a reader who expanded the map, panned to a county and selected a
-  // school lost both the school and the county for pressing the one control that looked like
-  // "give me the chrome back". Immersive is a posture, so leaving it returns a posture.
+  // It deliberately does not deselect the record or fly the camera back to the national preset:
+  // that would make the exit destructive, costing a reader who expanded the map, panned to a
+  // county and selected a school both the school and the county for pressing the one control that
+  // looks like "give me the chrome back". Immersive is a posture, so leaving it returns a posture.
   const handleExitImmersiveMap = useCallback(() => {
     cinematicDispatch({ type: 'close' });
     setSnapIndex(state.selectedId ? EXPLORE_SHEET_HALF : EXPLORE_SHEET_PEEK);

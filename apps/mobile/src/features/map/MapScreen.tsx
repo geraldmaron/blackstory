@@ -177,13 +177,12 @@ export type MapScreenProps = {
   /**
    * Pan / zoom / rotate / pitch. Default true, and Explore never turns it off.
    *
-   * This used to be a posture lock: at Rest the map disabled every gesture, swallowed pin
-   * presses, and hid itself from assistive tech until the reader pressed a dedicated button.
-   * A reader's first deliberate pan got no response at all, which is indistinguishable from a
-   * map that has failed. Chrome posture and gesture availability are two different things, and
-   * only the first belongs to the reader's explicit control (see `ExploreView`).
+   * This is not a posture lock. Chrome posture and gesture availability are two different
+   * things, and only the first belongs to the reader's explicit control (see `ExploreView`): a
+   * map that disables every gesture until a dedicated button is pressed gives a reader's first
+   * deliberate pan no response at all, which is indistinguishable from a map that has failed.
    *
-   * The prop stays so a surface that genuinely must present a still plate — a story's map
+   * The prop exists so a surface that genuinely must present a still plate — a story's map
    * moment, a printed-frame preview — can say so, rather than inheriting a gesture surface it
    * has no chrome for.
    */

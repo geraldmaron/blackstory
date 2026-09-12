@@ -1,6 +1,6 @@
 /**
- * Re-export shim: implementation lives in @repo/domain-core/claims/source-fitness. Claim-relative
- * source fitness is a primitive both @repo/domain and @repo/security need, so it sits in
- * domain-core for the same reason the confidence engine does.
+ * Re-export shim: the implementation lives in @repo/domain-core/claims/source-fitness.
+ * Claim-relative source fitness sits there because @repo/domain-core is the package both
+ * @repo/domain and @repo/security may depend on.
  */
 export * from '@repo/domain-core/claims/source-fitness';
