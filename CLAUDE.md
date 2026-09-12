@@ -142,6 +142,17 @@ prints "Ready", and is then killed by the first instance's lock. The port was ne
 The server is Postgres-backed (`dev-web.sh` loads `apps/web/.env.local` and sets
 `PUBLIC_DATA_SOURCE=postgres`), so a preview reflects live `bb_public` data, not seed.
 
+**A running server does not see a record you RENAME under it.** Entity routes resolve through
+`record-first-paint.tsx`'s slug path, which reads process-cached shared sources, so after an
+in-place `display_name` change the record's own page returns "Place not found" until the server
+restarts — even with the column, `projection.displayName`, `projection.nameLower` and
+`search_index.name` all correct and `parseEntityProjection` accepting the row. On 2026-09-12 that
+cost a long diagnosis before a restart proved the data had been right the whole time
+(repo-iejg8). Other edits do not behave this way: a republish through the incremental publisher,
+and a direct summary or topic write, were all picked up live in the same session. So a 404 on a
+just-renamed record is the cache, not your write — verify the row, then restart before hunting
+further.
+
 To run a one-off script against the same data, source the env and use the dev export condition —
 without `--conditions development` the workspace packages fail to resolve:
 
