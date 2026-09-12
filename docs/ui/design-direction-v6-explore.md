@@ -1,4 +1,4 @@
-> **SUPERSEDED.** This document is superseded by the v9 Atlas (design-direction-v9-atlas.md). Route today: /explore 308-redirects to /. It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
+> **SUPERSEDED.** This document is superseded by v10 (design-direction-v10.md), via v9 Explore (design-direction-v9-atlas.md). Route today: /explore is the live Instrument (not a 308 to /). It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
 
 # BlackStory design direction v6 — explore edition
 

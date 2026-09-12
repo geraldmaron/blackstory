@@ -48,11 +48,15 @@ Do not send a Sonnet package to Haiku. Packages are marked; the mark is binding.
 > - TypeScript is strict with `exactOptionalPropertyTypes`. Build conditional object properties with spread (`...(x ? { k: x } : {})`), not `k: x | undefined`.
 > - No em dashes in user-facing copy. Use "to" for ranges, middle dots for compound labels.
 >
-> **Definition of done — all five must pass before you close the bead:**
+> **Definition of done — all six must pass before you close the bead:**
 > ```bash
-> pnpm lint && pnpm typecheck && pnpm test:js && pnpm test:a11y && pnpm format:check
+> pnpm lint && pnpm typecheck && pnpm test:js && pnpm test:a11y && pnpm format:check && pnpm build
 > ```
-> `pnpm lint` runs with `--max-warnings 0`. A warning is a failure.
+> `pnpm lint` runs with `--max-warnings 0`. A warning is a failure. `pnpm build` is required because
+> lint/typecheck/test do not run a Next production build and have twice missed build-only failures
+> (bundler-only Node-built-in leakage from a `'use client'` boundary; Next's route-export allowlist,
+> which only fails through generated `.next` route types and is invisible when `.next` is stale) that
+> reached a release PR (see repo-z6mr).
 >
 > **Verification is not optional.** Run the dev server (`pnpm dev:web`, port 3048) and confirm your change in the browser at 375px, 768px and 1440px before claiming done. If you cannot verify something, say so explicitly and name the residual risk. Never report untested work as complete.
 >

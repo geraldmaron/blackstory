@@ -1,9 +1,10 @@
 # Runbook: Production release pipeline
 
 > **2026-08-15:** Admin App Hosting + Cloud Run `black-book-admin-production` are deleted. Do not
-> recreate them. Admin is the standalone Vercel project `apps/admin`. The Admin/App-Hosting and
-> Firestore-rules steps below are historical. Public web / Vercel guidance is current. Full rewrite
-> still tracked separately.
+> recreate them. **2026-09-11 (repo-z3g1f):** the standalone `apps/admin` Vercel project was itself
+> retired — admin is now a staff-gated route group inside `apps/web`, deployed with public web as
+> one Vercel project. The Admin/App-Hosting and Firestore-rules steps below are historical. Public
+> web / Vercel guidance is current and now covers admin too.
 
 **Scope:** End-to-end release procedure for BlackStory — from merged PR through staging
 validation, progressive release metadata, protected production approval, deploy to each surface,
@@ -52,16 +53,16 @@ flowchart LR
 
 ## AC #1 — Automatic App Hosting rollouts are disabled (admin)
 
-Automatic App Hosting rollouts **must remain disabled** in the Firebase console and in any
-GitHub→Firebase integration. Admin production traffic moves only through explicit Firebase CLI
-rollouts at a pinned SHA. Public web Production traffic moves only through explicit **Vercel**
-promote at a pinned SHA (ADR-027).
+**Historical — App Hosting itself was deleted 2026-08-15 and admin moved into `apps/web` on
+2026-09-11 (repo-z3g1f); nothing below this line needs doing.** Public web (and admin, now part of
+the same deploy) Production traffic moves only through explicit **Vercel** promote at a pinned SHA
+(ADR-027).
 
-**Human steps (admin backend):**
+**Human steps (admin backend) — historical, App Hosting no longer exists:**
 
-1. Open Firebase console → App Hosting → backend (`black-book-admin-production`).
-2. Confirm **automatic rollouts** / GitHub auto-deploy hooks are **off**.
-3. Record evidence (screenshot or CLI output) in the release ticket.
+1. ~~Open Firebase console → App Hosting → backend (`black-book-admin-production`).~~
+2. ~~Confirm **automatic rollouts** / GitHub auto-deploy hooks are **off**.~~
+3. ~~Record evidence (screenshot or CLI output) in the release ticket.~~
 
 **Repo enforcement:**
 
@@ -99,16 +100,12 @@ Requires GitHub Environment `staging` vars `GCP_WORKLOAD_IDENTITY_PROVIDER` and
 `GCP_SERVICE_ACCOUNT` (after `infra/github/scripts/apply-wif.sh --apply`). Public web staging is
 Vercel Preview from the `staging` branch — smoke Preview before any Production promote.
 
-When admin changed at the pinned SHA, roll out admin App Hosting locally (after `firebase login`):
-
-```bash
-firebase apphosting:rollouts:create black-book-admin-production \
-  --project=black-book-efaaf \
-  --git-commit="$(git rev-parse HEAD)" \
-  --force
-```
-
-Or push to the `staging` branch (uses `github.sha` from the push event for workflow provenance).
+Admin has no separate rollout step: since 2026-09-11 (repo-z3g1f) `/admin` is a staff-gated route
+group inside `apps/web` itself, not a separate app or Vercel project — it promotes automatically
+with the same public web Vercel deploy below. (App Hosting `black-book-admin-production` was
+deleted 2026-08-15 and does not exist; do not run `firebase apphosting:rollouts:create` against
+it.) Credential isolation for admin's write-capable database access now lives at the credential
+layer (`ADMIN_DATABASE_URL`, distinct from the public `DATABASE_URL`), not the process layer.
 
 **Production (admin / APIs):**
 
@@ -124,17 +121,9 @@ gh workflow run deploy-production.yml \
   -f confirm=deploy
 ```
 
-When admin changed, roll out admin App Hosting at the tested SHA (local Firebase CLI after
-`firebase login`):
-
-```bash
-firebase apphosting:rollouts:create black-book-admin-production \
-  --project=black-book-efaaf \
-  --git-commit="$TESTED_SHA" \
-  --force
-```
-
-Download `deployment-provenance-<sha>` artifact and verify `git.commitSha` matches `TESTED_SHA`.
+Admin needs no separate promote — it is part of the same `apps/web` Vercel deployment (see note
+above). Download `deployment-provenance-<sha>` artifact and verify `git.commitSha` matches
+`TESTED_SHA`.
 
 ---
 
@@ -168,19 +157,19 @@ Jobs with `environment: production` pause for required reviewers configured in
 
 Per [ADR-020](../decisions-carryover.md) (`docs/adr/` was purged 2026-07-24; the precedence rule is
 restated in `docs/decisions-carryover.md`), **Supabase Postgres** is the
-product system of record (`bb_public.*`). **Admin** interim host is App Hosting
-(`black-book-admin-production`); **Firebase Storage / GCS** remains the blob store. Firestore is
+product system of record (`bb_public.*`). **Admin** is a staff-gated route group inside `apps/web`
+(since 2026-09-11, repo-z3g1f) — it has no separate host or promote step, it deploys with public
+web. **Firebase Storage / GCS** remains the blob store. Firestore is
 wind-down / rollback only ([firebase-wind-down.md](../data/firebase-wind-down.md)) — not a live
 public-read backend. **Public web** is Vercel (ADR-027).
 
-Before admin App Hosting or API surfaces receive incompatible traffic:
+Before public web / API surfaces receive incompatible traffic:
 
 1. **Postgres migrations / schema** applied to the target Supabase project (when schema changed)
 2. **Storage rules** (if blob ACL changed) — still under `infra/firebase/`
-3. **Admin App Hosting explicit promote** (pinned SHA) — when admin changed
-4. **Vercel Production promote** (pinned SHA) — when public web changed
-5. **Cloud Run / api-public deploy** with `PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` (if API changed)
-6. **Firestore rules/indexes** only when touching rollback/legacy surfaces (optional during wind-down)
+3. **Vercel Production promote** (pinned SHA) — when public web or admin changed (one deploy, one promote)
+4. **Cloud Run / api-public deploy** with `PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` (if API changed)
+5. **Firestore rules/indexes** only when touching rollback/legacy surfaces (optional during wind-down)
 
 **Human commands (after checkout of pinned SHA):**
 
@@ -189,13 +178,7 @@ Before admin App Hosting or API surfaces receive incompatible traffic:
 firebase deploy --only storage \
   --project=black-book-efaaf --config=infra/firebase/firebase.json
 
-# Admin host (App Hosting — admin only; apphosting.admin.yaml)
-firebase apphosting:rollouts:create black-book-admin-production \
-  --project=black-book-efaaf \
-  --git-commit="$TESTED_SHA" \
-  --force
-
-# Public web (Vercel — when web changed)
+# Public web + admin (Vercel — one deploy, when either changed)
 vercel promote <tested-preview-deployment-url>
 
 # Optional during wind-down only:
@@ -224,10 +207,9 @@ node infra/github/release-pipeline/release-pipeline.test.mjs
 **Operator rollback (live):**
 
 1. Engage publication kill switch — see [incident-response.md](./incident-response.md)
-2. **Public web:** Vercel promote/redeploy prior known-good Production deployment SHA
-3. **Admin / APIs:** Re-run `deploy-production.yml` with `commit_sha=<prior-good-sha>` and roll
-   back admin App Hosting with `firebase apphosting:rollouts:create black-book-admin-production
-   --project=black-book-efaaf --git-commit=<prior-good-sha> --force`
+2. **Public web + admin:** Vercel promote/redeploy prior known-good Production deployment SHA (one
+   deploy covers both — admin has no separate host to roll back)
+3. **APIs:** Re-run `deploy-production.yml` with `commit_sha=<prior-good-sha>`
 4. Repoint `publicMeta/activeRelease` if publication metadata changed — see
    [recovery-rollback-rehearsal.md](./recovery-rollback-rehearsal.md)
 5. Run `canary-uptime.yml` with `reset_baseline: true` after verification

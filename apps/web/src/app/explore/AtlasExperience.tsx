@@ -273,6 +273,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     status,
     layerMode,
     satellite: layers.satellite,
+    lines: layers.routes,
     selectedId,
   });
   /**

@@ -1,4 +1,4 @@
-> **SUPERSEDED.** This document is superseded by the v9 Atlas (design-direction-v9-atlas.md). Route today: / is the Atlas. It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
+> **SUPERSEDED.** This document is superseded by v10 (design-direction-v10.md), via the v9 Atlas (design-direction-v9-atlas.md). Route today: / is the Door, not a live cockpit. It is kept as the provenance record; do not build from it. See the supersession table in docs/ui/README.md.
 
 # BlackStory design direction v6 — home edition
 

@@ -25,6 +25,7 @@ export type ExploreUrlSyncLens = {
   readonly status: string | null;
   readonly layerMode: ExploreLayerMode;
   readonly satellite: boolean;
+  readonly lines: boolean;
   readonly selectedId: string | undefined;
 };
 
@@ -47,8 +48,10 @@ export function exploreHrefFromLens(base: ExploreViewState, lens: ExploreUrlSync
     ...defaultExploreOverlayState(),
     layerMode: lens.layerMode,
     sat: lens.satellite,
+    // `group` stays base-only: GroupingToggle isn't rendered in production yet, so there is no
+    // live toggle to sync from (repo-i2n5). Revisit when it ships.
     group: base.group,
-    lines: base.lines,
+    lines: lens.lines,
     ...(lens.stateCode ? { state: lens.stateCode } : {}),
     ...(lens.evidenceFloor === 'A' || lens.evidenceFloor === 'B' || lens.evidenceFloor === 'C'
       ? { floor: lens.evidenceFloor }
