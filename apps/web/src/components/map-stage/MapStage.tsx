@@ -34,7 +34,6 @@ import {
 import type {
   GeoJSONSource,
   Map as MapLibreMap,
-  MapLayerMouseEvent,
   MapMouseEvent,
   Marker,
   StyleSpecification,
@@ -48,8 +47,6 @@ import {
   EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
-  EXPLORE_HISTORY_EDGES_LAYER_ID,
-  EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
@@ -169,6 +166,7 @@ import {
   type CameraFlyTarget,
   type MapStageFlyOptions,
 } from './camera';
+import { bindPlateCameraListeners, bindPlateClickListeners } from './event-wiring';
 import { usePathname } from 'next/navigation';
 import { surfaceClassFor, type SurfaceClass } from '../../lib/nav/surface-classes';
 import { useSurfaceClass } from '../../lib/nav/use-surface-class';
@@ -1447,36 +1445,6 @@ export function MapStageProvider({
         handleEntityPointerHit(hit);
       }
 
-      function handleStateClick(event: MapLayerMouseEvent) {
-        if (pointerHitAt(event.point)) return;
-        const postal = event.features?.[0]?.properties?.postalCode;
-        if (typeof postal === 'string' && postal.length > 0) {
-          notify(listenersRef.current, 'stateSelect', postal);
-        }
-      }
-
-      function handleEdgeClick(event: MapLayerMouseEvent) {
-        if (pointerHitAt(event.point)) return;
-        const edgeId = event.features?.[0]?.properties?.edgeId;
-        if (typeof edgeId === 'string' && edgeId.length > 0) {
-          notify(listenersRef.current, 'edgeSelect', edgeId);
-        }
-      }
-
-      function handleBackgroundClick(event: MapMouseEvent) {
-        if (pointerHitAt(event.point)) return;
-        const hitLayers = [
-          EXPLORE_STATE_DENSITY_LAYER_ID,
-          EXPLORE_HISTORY_EDGES_LAYER_ID,
-          EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
-        ].filter((id) => activeMap.getLayer(id));
-        const hits = hitLayers.length
-          ? activeMap.queryRenderedFeatures(event.point, { layers: hitLayers })
-          : [];
-        if (hits.length > 0) return;
-        notify(listenersRef.current, 'activate', readViewport(activeMap));
-      }
-
       activeMap.once('load', () => {
         mapStyleReadyRef.current = true;
         applyStyleAndData();
@@ -1494,26 +1462,13 @@ export function MapStageProvider({
             if (!canceledRef.current) activeMap.resize();
           },
         );
-        if (activeMap.getLayer(EXPLORE_STATE_DENSITY_LAYER_ID)) {
-          activeMap.on('click', EXPLORE_STATE_DENSITY_LAYER_ID, handleStateClick);
-          activeMap.on('mouseenter', EXPLORE_STATE_DENSITY_LAYER_ID, () => {
-            activeMap.getCanvas().style.cursor = 'pointer';
-          });
-          activeMap.on('mouseleave', EXPLORE_STATE_DENSITY_LAYER_ID, () => {
-            activeMap.getCanvas().style.cursor = '';
-          });
-        }
-        if (activeMap.getLayer(EXPLORE_HISTORY_EDGES_LAYER_ID)) {
-          activeMap.on('click', EXPLORE_HISTORY_EDGES_LAYER_ID, handleEdgeClick);
-          activeMap.on('mouseenter', EXPLORE_HISTORY_EDGES_LAYER_ID, () => {
-            activeMap.getCanvas().style.cursor = 'pointer';
-          });
-          activeMap.on('mouseleave', EXPLORE_HISTORY_EDGES_LAYER_ID, () => {
-            activeMap.getCanvas().style.cursor = '';
-          });
-        }
-        activeMap.on('click', handleEntityPointerClick);
-        activeMap.on('click', handleBackgroundClick);
+        bindPlateClickListeners(activeMap, {
+          pointerHitAt,
+          onEntityPointerClick: handleEntityPointerClick,
+          onStateSelect: (postalCode) => notify(listenersRef.current, 'stateSelect', postalCode),
+          onEdgeSelect: (edgeId) => notify(listenersRef.current, 'edgeSelect', edgeId),
+          onActivate: (viewport) => notify(listenersRef.current, 'activate', viewport),
+        });
         activeMap.resize();
         // Flush camera requested while the canvas was still constructing (e.g. locate → explore
         // deep link with radius bounds). Prefer the pending flight over the constructor CONUS frame.
@@ -1524,10 +1479,17 @@ export function MapStageProvider({
         }
       });
 
-      activeMap.on('moveend', () => {
-        lastViewportRef.current = readViewport(activeMap);
-        notify(listenersRef.current, 'viewport', lastViewportRef.current);
-        updateStateLabelOpacity(activeMap.getZoom());
+      bindPlateCameraListeners(activeMap, {
+        publishViewport: (viewport) => {
+          lastViewportRef.current = viewport;
+          notify(listenersRef.current, 'viewport', viewport);
+        },
+        applyZoomOpacity: updateStateLabelOpacity,
+        onZoomSettled: () => {
+          syncEntityMarkers();
+          requestCountyPolygonLoad(activeMap, configRef.current);
+        },
+        publishBearing: (bearing) => notify(listenersRef.current, 'rotate', bearing),
       });
       activeMap.on('zoom', () => {
         updateStateLabelOpacity(activeMap.getZoom());
@@ -1541,15 +1503,6 @@ export function MapStageProvider({
         ) {
           clearMarkers(markersRef.current);
         }
-      });
-      activeMap.on('zoomend', () => {
-        syncEntityMarkers();
-        requestCountyPolygonLoad(activeMap, configRef.current);
-      });
-      // Every rotate frame, not just `moveend` — the compass needle (`CameraConsole`) tracks a
-      // live drag/twist, and `viewport` only fires once the gesture settles.
-      activeMap.on('rotate', () => {
-        notify(listenersRef.current, 'rotate', activeMap.getBearing());
       });
 
       // Cursor affordance uses the same padded hit as selection so a near-miss still
