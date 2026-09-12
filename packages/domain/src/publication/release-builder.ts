@@ -959,10 +959,35 @@ export function buildReleaseNotabilityBasis(
    */
   const racialKillingRecord = !racialTerrorRecord && isRacialKillingRecord(entry, claims);
 
+  /*
+   * repo-oyxgh. "States the killing" has to mean it in the vocabulary the record actually uses.
+   * `isKillingPredicate` is the police-killing cohort's test (killed | shot | died | victim of)
+   * and matches none of a lynching record's predicates: Ell Persons's claims read `was lynched`,
+   * `was burned alive and dismembered`, `was subjected to`, `was captured by`. So the `.some()`
+   * below was false for him, M1 fell through to "keep everything", and a recompute promoted
+   * "Was subjected to brutal interrogation leading to a forced confession" and "Was captured by a
+   * lynch mob while in transit to stand trial" into this catalog's stated reasons for naming him.
+   * Those are things done TO him on the way to his murder, not why he is here.
+   *
+   * Measured on the active release 2026-09-12: 20 of the 32 `lynching_*` records had no claim
+   * matching `isKillingPredicate`, and all 20 are covered by the union below — none is left
+   * falling through.
+   *
+   * A union, not a replacement, and the two tests stay separate: `isRacialTerrorKillingPredicate`
+   * is deliberately the stricter one (it is what decides `documented_racial_terror` at all, where
+   * "was killed in action" is Doris Miller and a hanging can be a judicial execution), while
+   * `isKillingPredicate` is deliberately the broader one (Eric Garner's and Jordan Neely's claims
+   * say only `died`). Neither is a superset of the other, and this line needs both. It is applied
+   * ONLY here, not to `isRacialKillingRecord`'s classification, so nothing about which records
+   * count as racial-terror or racial-killing changes.
+   */
+  const statesTheKilling = (claim: ReleaseClaimProjection): boolean =>
+    isKillingPredicate(claim.predicate) || isRacialTerrorKillingPredicate(claim.predicate);
+
   const basisClaims =
     racialTerrorRecord || racialKillingRecord
-      ? claims.some((claim) => isKillingPredicate(claim.predicate))
-        ? claims.filter((claim) => isKillingPredicate(claim.predicate) || identifies(claim))
+      ? claims.some(statesTheKilling)
+        ? claims.filter((claim) => statesTheKilling(claim) || identifies(claim))
         : claims
       : (() => {
           const identified = claims.filter(identifies);

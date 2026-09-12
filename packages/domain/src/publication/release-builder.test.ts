@@ -8,6 +8,9 @@ import {
   buildNotabilityBasisNote,
   buildReleaseEntityArtifacts,
   buildReleaseNotabilityBasis,
+  isKillingPredicate,
+  inferNotabilityCriterionFromClaim,
+  isRacialTerrorKillingPredicate,
   isAccusationPredicate,
   isRacialTerrorClaim,
   isRacialTerrorRecord,
@@ -1585,4 +1588,134 @@ test('buildReleaseEntityArtifacts omits projection.visit entirely when nothing s
   assert.equal(result.ok, true);
   if (!result.ok) return;
   assert.equal(result.projection.visit, undefined);
+});
+
+/*
+ * repo-oyxgh. Ell Persons's real claim set from the active release, verbatim. `isKillingPredicate`
+ * is the police-killing cohort's vocabulary (killed | shot | died | victim of) and matches NONE of
+ * these, so M1's "does this record state its killing" test was false and the filter fell through
+ * to keeping every claim — which promoted what was done to him on the way to his murder into this
+ * catalog's stated reasons for naming him.
+ *
+ * Measured on the active release 2026-09-12: 20 of the 32 `lynching_*` records were in this state.
+ */
+const ellPersonsClaims = [
+  {
+    predicate: 'was lynched',
+    object: 'on May 22, 1917, in Memphis, Tennessee',
+    confidenceLevel: 'high' as const,
+    citationSource: 'https://lynchinginamerica.eji.org/',
+    citationLabel: 'Lynching in America',
+  },
+  {
+    predicate: 'was accused of',
+    object: 'raping and murdering 15-year-old Antoinette Rappel',
+    confidenceLevel: 'high' as const,
+    citationSource: 'https://example.org/accusation',
+    citationLabel: 'Contemporary press',
+  },
+  {
+    predicate: 'was subjected to',
+    object: 'brutal interrogation leading to a forced confession',
+    confidenceLevel: 'high' as const,
+    citationSource: 'https://example.org/interrogation',
+    citationLabel: 'Historical account',
+  },
+  {
+    predicate: 'was captured by',
+    object: 'a lynch mob while in transit to stand trial',
+    confidenceLevel: 'high' as const,
+    citationSource: 'https://example.org/capture',
+    citationLabel: 'Historical account',
+  },
+  {
+    predicate: 'was burned alive and dismembered',
+    object: 'in a public spectacle attended by a large crowd',
+    confidenceLevel: 'high' as const,
+    citationSource: 'https://example.org/spectacle',
+    citationLabel: 'Historical account',
+  },
+  {
+    predicate: 'was followed by',
+    object:
+      'the NAACP investigation of his lynching by field secretary James Weldon Johnson and the ' +
+      'chartering of the Memphis branch',
+    confidenceLevel: 'high' as const,
+    citationSource: 'https://example.org/naacp',
+    citationLabel: 'NAACP records',
+  },
+];
+
+test('a lynching record does not publish its own capture and interrogation as reasons it is in the catalog', () => {
+  const entry = baseEntry({
+    id: 'lynching_ell_persons_memphis_tennessee',
+    kind: 'person',
+    displayName: 'Ell Persons',
+    summary:
+      'Ell Persons was lynched near Memphis, Tennessee on May 22, 1917, burned alive before a ' +
+      'crowd of thousands after being taken from custody while in transit to stand trial.',
+    claims: ellPersonsClaims,
+  });
+  const basis = buildReleaseNotabilityBasis(entry);
+  const notes = basis.map((record) => record.note);
+
+  assert.ok(
+    !notes.some((note) => /subjected to/iu.test(note)),
+    `"was subjected to" must not be an inclusion reason — got ${JSON.stringify(notes)}`,
+  );
+  assert.ok(
+    !notes.some((note) => /captured by/iu.test(note)),
+    `"was captured by" must not be an inclusion reason — got ${JSON.stringify(notes)}`,
+  );
+  assert.ok(
+    !notes.some((note) => /accused of/iu.test(note)),
+    'the mob’s own pretext is never why this catalog names someone',
+  );
+
+  // What SHOULD survive: the killing itself, stated in the record's own vocabulary.
+  assert.ok(
+    notes.some((note) => /lynched/iu.test(note)),
+    `the lynching itself must remain a reason — got ${JSON.stringify(notes)}`,
+  );
+  assert.deepEqual(
+    basis.map((record) => record.criterion),
+    ['documented_racial_terror', 'documented_racial_terror'],
+    'the two killing claims, and nothing else',
+  );
+
+  /*
+   * The published record also carries a `movement_significance` basis for the NAACP investigation
+   * that followed (repo-9u3di). A RECOMPUTE does not produce it and never did: `was followed by`
+   * infers `documented_site`, so `identifies()` is false for it. Before this fix that claim
+   * survived anyway — not as movement significance, but as a `documented_site` record, riding the
+   * same fall-through that promoted the capture and the interrogation.
+   *
+   * That basis comes from `apply-notability-rubric-ruling.ts`'s MERGE, which is why the bead calls
+   * the merge safe and a straight recompute (fix-racial-terror-notability-basis.ts,
+   * fix-missing-killing-claims.ts) unsafe for this cohort. Asserted here so the next person
+   * comparing a recompute against what is live does not read the difference as a regression.
+   */
+  assert.equal(
+    inferNotabilityCriterionFromClaim('was followed by', ellPersonsClaims[5]!.object, 'person'),
+    'documented_site',
+  );
+});
+
+test('the racial-terror killing vocabulary counts as stating the killing', () => {
+  for (const predicate of [
+    'was lynched',
+    'was burned alive and dismembered',
+    'was hanged',
+    'was beaten to death',
+  ]) {
+    assert.equal(
+      isKillingPredicate(predicate) || isRacialTerrorKillingPredicate(predicate),
+      true,
+      `${predicate} must count as stating the killing`,
+    );
+  }
+  // Unchanged: the two tests stay separate, and this is why the fix is a union at the M1 filter
+  // rather than a widening of either one.
+  assert.equal(isKillingPredicate('was lynched'), false);
+  assert.equal(isRacialTerrorKillingPredicate('died'), false);
 });
