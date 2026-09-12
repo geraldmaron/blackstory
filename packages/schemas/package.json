@@ -9,6 +9,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./relationship-vocabulary": {
+      "development": "./src/relationship-vocabulary.ts",
+      "types": "./dist/relationship-vocabulary.d.ts",
+      "import": "./dist/relationship-vocabulary.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -19,7 +24,7 @@
     "prebuild": "node ./scripts/sync-policy-json.mjs",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/constitution.test.ts src/banned-books.test.ts src/public-projections.test.ts src/public-articles.test.ts",
+    "test": "node --conditions development --import tsx --test src/constitution.test.ts src/banned-books.test.ts src/public-projections.test.ts src/public-articles.test.ts src/relationship-vocabulary.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

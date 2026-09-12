@@ -9,10 +9,10 @@ an issue and fix this doc.
 
 **Authoritative sources** (read these, not a paraphrase, when in doubt):
 
+- `packages/schemas/src/relationship-vocabulary.ts` — `RELATIONSHIP_TYPES` (the vocabulary itself), `LEGACY_DB_RELATIONSHIP_TYPES`, `DB_RELATIONSHIP_TYPES`, and `relationshipTypeSchema` (the read-side gate). Every other module re-exports these; nothing restates them.
 - `packages/domain/src/relationship.ts` — `RelationshipType`, `RelationshipRole`, `EntityRelationship`, direction/temporal semantics (`RELATIONSHIP_TYPE_SEMANTICS`), evidence/role/temporal guardrails, causal-edge guardrail.
 - `packages/domain/src/entity-kinds.ts` — `EntityKind` vocabulary.
 - `packages/domain/src/graph/catalog-related.ts` — `CatalogRelatedEntry` (the authoring shape), dedup/canonical-direction logic, evidence-resolution/skip behavior.
-- `packages/firebase/src/firestore/types.ts` (`relationshipTypeSchema`, `entityRelationshipSchema`, `relationshipRoleSchema`, `relationshipWorkflowStatusSchema`, `relationshipPublicationStatusSchema`) — the Firestore-facing mirror of the same vocabulary.
 
 ---
 
@@ -42,7 +42,7 @@ Field by field:
 | Field | Type | Meaning |
 |---|---|---|
 | `id` | `string` | The **other** entity's id (the neighbor), not the current entity's own id. |
-| `type` | `RelationshipType` | One of the 20 values in §1.2. Must exist in `RELATIONSHIP_TYPES` or the entry is skipped (see §1.4). |
+| `type` | `RelationshipType` | One of the 36 values in §1.2. Must exist in `RELATIONSHIP_TYPES` or the entry is skipped (see §1.4). |
 | `direction` | `'outgoing' \| 'incoming'` | See §1.3 — which endpoint is `from` and which is `to`. |
 | `timespan` | `TemporalContext` (optional) | `{ label?, validFrom?, validTo? }` — see §1.5. |
 
@@ -57,14 +57,24 @@ contract's `related[]` shape unless/until that shape is extended.
 ```
 located_at, occurred_at, attended, founded, employed_by, member_of, related_to,
 depicts, cites, governed_by, part_of, successor_of, caused, enabled, influenced,
-participated_in, overturned, commemorates, authored, other
+participated_in, overturned, commemorates, authored, invented, co_invented,
+improved, developed, designed, led_development_of, built_on, commercialized,
+assigned_to, licensed_to, manufactured_by, demonstrated_at, collaborated_with,
+mentored_by, litigated_with, documented_by, other
 ```
 
-20 values total. `caused`, `enabled`, `influenced`, `participated_in`, `overturned`,
+36 values total. `caused`, `enabled`, `influenced`, `participated_in`, `overturned`,
 `commemorates` are documented as the "historical-causation edges"; `authored` is a
 creation-attribution edge distinct from `founded` (orgs/institutions only — `authored` is for
-publications/artifacts). Full per-type direction/temporal semantics table is in §2's matrix and
-verbatim in `RELATIONSHIP_TYPE_SEMANTICS`.
+publications/artifacts); `invented` through `documented_by` are the invention-contribution,
+commercial-context and human-network edges. Full per-type direction/temporal semantics table is
+in §2's matrix and verbatim in `RELATIONSHIP_TYPE_SEMANTICS`.
+
+The database CHECK constraint additionally admits five predicates nothing writes as a graph edge
+(`served_as`, `succeeded`, `challenged_law`, `funded_by`, `published`), listed as
+`LEGACY_DB_RELATIONSHIP_TYPES`. They have no direction or temporal semantics and are not
+authorable — the same names are real elsewhere as *claim* predicates, which is a different
+vocabulary.
 
 ### 1.3 Direction semantics
 

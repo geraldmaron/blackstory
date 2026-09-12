@@ -5,6 +5,10 @@
  */
 import { z } from 'zod';
 import {
+  relationshipTypeSchema,
+  type DbRelationshipType,
+} from '@repo/schemas/relationship-vocabulary';
+import {
   ACTOR_TYPES,
   AUDIT_EVENT_ACTIONS,
   OUTBOX_STATUSES,
@@ -417,72 +421,20 @@ export const canonicalEntitySchema = z.object({
 export type CanonicalEntityDoc = z.infer<typeof canonicalEntitySchema>;
 
 /**
- * The full relationship vocabulary. Direction and temporal semantics for every type are
- * documented in `@repo/domain`'s `RELATIONSHIP_TYPE_SEMANTICS`
- * (packages/domain-core/src/relationship.ts), hardcoded here rather than imported, to match this
- * file's existing convention (see the entityKindSchema comment above).
+ * The relationship vocabulary and its read-side gate, re-exported from
+ * `@repo/schemas/relationship-vocabulary` so this file holds no second copy of the list. Direction
+ * and temporal semantics for every write-side type are documented in `@repo/domain`'s
+ * `RELATIONSHIP_TYPE_SEMANTICS` (packages/domain-core/src/relationship.ts).
  *
- * Restating it is the convention, and on 2026-09-09 it cost 39 live records. This list, the one
- * in `@repo/schemas`, and the database constraint are three copies of the same vocabulary;
- * migration 20260908120000 widened the database and neither read-side copy followed, so the
- * moment `invented` edges were written every entity carrying one failed to parse and 404'd.
- *
- * `.catch('other')` is why that cannot repeat: a value this list has not caught up to now
- * degrades to a generic relation rather than deleting the record that uses it. Keep the list in
- * lockstep for the wording; rely on the catch for the safety.
+ * This is the one vocabulary in this file that is imported rather than hardcoded (see the
+ * `entityKindSchema` comment above for the convention it departs from). Restating it was the
+ * convention, and on 2026-09-09 it cost 39 live records: the database constraint widened, neither
+ * read-side copy followed, and every entity carrying an `invented` edge failed to parse and 404'd.
+ * The shared schema still carries a `.catch` seatbelt, which now warns with the unknown value.
  */
-export const relationshipTypeSchema = z
-  .enum([
-    // Structural and biographical.
-    'located_at',
-    'occurred_at',
-    'attended',
-    'founded',
-    'employed_by',
-    'member_of',
-    'related_to',
-    'depicts',
-    'cites',
-    'governed_by',
-    'part_of',
-    'successor_of',
-    'served_as',
-    'succeeded',
-    'challenged_law',
-    'funded_by',
-    'published',
-    // Historical causation.
-    'caused',
-    'enabled',
-    'influenced',
-    'participated_in',
-    'overturned',
-    'commemorates',
-    'authored',
-    // Invention contribution.
-    'invented',
-    'co_invented',
-    'improved',
-    'developed',
-    'designed',
-    'led_development_of',
-    'built_on',
-    // Commercial and institutional context.
-    'commercialized',
-    'assigned_to',
-    'licensed_to',
-    'manufactured_by',
-    'demonstrated_at',
-    // The human network around the work.
-    'collaborated_with',
-    'mentored_by',
-    'litigated_with',
-    'documented_by',
-    'other',
-  ])
-  .catch('other');
+export { relationshipTypeSchema };
 
-export type RelationshipTypeDoc = z.infer<typeof relationshipTypeSchema>;
+export type RelationshipTypeDoc = DbRelationshipType;
 
 /** Role qualifier valid ONLY on `type: 'attended'`; see
  * `@repo/domain`'s `assertRelationshipRoleValidForType`. */

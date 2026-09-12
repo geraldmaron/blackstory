@@ -10,60 +10,18 @@
  * `caused`/`enabled` consensus-causation intake guardrail. Graph-view materialization
  * (per-entity adjacency, per-decade views, all-time union, containment chains) lives in
  * `./graph/` and consumes `EntityRelationship` read-only — see `./graph/index.ts`.
+ *
+ * The vocabulary itself lives in `@repo/schemas/relationship-vocabulary`, the lowest package every
+ * consumer already depends on, and is re-exported here so `RELATIONSHIP_TYPES` keeps resolving
+ * from `@repo/domain-core` and `@repo/domain`. That package is also where the read-side zod gate
+ * and the CHECK-constraint parity test live; this file owns the semantics and the intake
+ * guardrails layered on top of the list.
  */
+import type { RelationshipType } from '@repo/schemas/relationship-vocabulary';
 import type { ConfidenceScore } from './claims/confidence.js';
 
-export const RELATIONSHIP_TYPES = [
-  'located_at',
-  'occurred_at',
-  'attended',
-  'founded',
-  'employed_by',
-  'member_of',
-  'related_to',
-  'depicts',
-  'cites',
-  'governed_by',
-  'part_of',
-  'successor_of',
-  // historical-causation edges.
-  'caused',
-  'enabled',
-  'influenced',
-  'participated_in',
-  'overturned',
-  'commemorates',
-  // stress-test amendment: creation attribution, distinct from `founded` (orgs/institutions only).
-  'authored',
-  // Invention contribution. The whole reason these are separate edges rather than one
-  // `contributed_to` with a note is that "Lewis Latimer invented the light bulb" and "Lewis
-  // Latimer developed and patented an improved process for manufacturing carbon conductors used
-  // in incandescent lamps" must not be the same row with different prose. `invented` and
-  // `co_invented` are high-impact and carry the corroboration gate; `improved`, `developed` and
-  // `designed` are the bounded edges most inventor records should actually be using.
-  'invented',
-  'co_invented',
-  'improved',
-  'developed',
-  'designed',
-  'led_development_of',
-  'built_on',
-  // Commercial and institutional context around an invention.
-  'commercialized',
-  'assigned_to',
-  'licensed_to',
-  'manufactured_by',
-  'demonstrated_at',
-  // Human network around the work. `documented_by` is how a compiler such as Henry E. Baker
-  // relates to the inventors he recorded, which is a historical relationship in its own right.
-  'collaborated_with',
-  'mentored_by',
-  'litigated_with',
-  'documented_by',
-  'other',
-] as const;
-
-export type RelationshipType = (typeof RELATIONSHIP_TYPES)[number];
+export { RELATIONSHIP_TYPES } from '@repo/schemas/relationship-vocabulary';
+export type { RelationshipType };
 
 /**
  * Contribution edges that assert origination and therefore take the high-impact corroboration
