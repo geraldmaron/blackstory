@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  placeExpectationFromProjection,
   checkPlaceIdentity,
   checkSubjectIdentity,
   containsWholeWord,
@@ -592,5 +593,65 @@ describe('checkSubjectIdentity requires a geography match for a common instituti
       { title: 'Lincoln University' },
     );
     assert.equal(identity.corroborated, true);
+  });
+});
+
+describe('placeExpectationFromProjection (repo-f85hp)', () => {
+  /*
+   * repo-f85hp. The curated records (lynching_*, gap_*, recon_*) have no landscape_candidates row,
+   * so the sweep builds a synthetic candidate from the published projection. It used to split
+   * `locationLabel` on the comma, which is prose about where a thing stands rather than an
+   * administrative place.
+   */
+  it('the place expectation comes from the jurisdiction, not from location prose', () => {
+    // Alma Howze's real projection shape: the row this bead was found on.
+    assert.deepEqual(
+      placeExpectationFromProjection({
+        jurisdictionLabel: 'Shubuta, Mississippi',
+        locationLabel: 'Hanging Bridge, Clarke County',
+      }),
+      { city: 'Shubuta', county: 'Clarke', state: 'Mississippi' },
+      'splitting locationLabel gave city "Hanging Bridge" and state "Clarke County", and the ' +
+        'identity gate then rejected a correct marker page with "identity not corroborated by place"',
+    );
+  });
+
+  it('a county is read out of location prose, which is where it actually appears', () => {
+    assert.deepEqual(
+      placeExpectationFromProjection({
+        jurisdictionLabel: 'Chaves County, New Mexico',
+        locationLabel: 'Blackdom Townsite historical marker, near Hagerman, Chaves County',
+      }),
+      { city: 'Chaves County', county: 'Chaves', state: 'New Mexico' },
+    );
+  });
+
+  it('an unqualified jurisdiction is a state, not a city', () => {
+    assert.deepEqual(placeExpectationFromProjection({ jurisdictionLabel: 'Massachusetts' }), {
+      state: 'Massachusetts',
+    });
+  });
+
+  it('location prose is the last resort, not the first', () => {
+    assert.deepEqual(
+      placeExpectationFromProjection({ jurisdictionLabel: null, locationLabel: 'Selma, Alabama' }),
+      { city: 'Selma', state: 'Alabama' },
+    );
+    assert.deepEqual(placeExpectationFromProjection({}), {});
+    assert.deepEqual(
+      placeExpectationFromProjection({ jurisdictionLabel: '  ', locationLabel: '  ' }),
+      {},
+    );
+  });
+
+  it('a multi-part jurisdiction keeps everything before the state as the city', () => {
+    assert.deepEqual(
+      placeExpectationFromProjection({ jurisdictionLabel: 'Washington, District of Columbia' }),
+      { city: 'Washington', state: 'District of Columbia' },
+    );
+    assert.deepEqual(
+      placeExpectationFromProjection({ jurisdictionLabel: 'Beacon Hill, Boston, Massachusetts' }),
+      { city: 'Beacon Hill, Boston', state: 'Massachusetts' },
+    );
   });
 });

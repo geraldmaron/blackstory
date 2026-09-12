@@ -361,6 +361,90 @@ function hasUsLocationSignal(documentText: string): boolean {
   return false;
 }
 
+/**
+ * "Shubuta, Mississippi" -> { city: 'Shubuta', state: 'Mississippi' }; a label with no comma stays
+ * unsplit as a city, which is what the visit path wants from it.
+ *
+ * Moved here from `lib/incremental-publish.ts` (repo-f85hp) so the publisher and the evidence
+ * sweep share one parse. This module has no imports, so it can be the shared home without
+ * dragging the publisher's dependencies into every collector. `cityStateFromJurisdiction` in
+ * sync-visit-to-projection.ts is still a third copy; that file runs `main()` at import, so
+ * folding it in is a separate change.
+ */
+export function cityStateFromJurisdictionLabel(label: string): {
+  readonly city?: string;
+  readonly state?: string;
+} {
+  const parts = label
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (parts.length >= 2) {
+    const state = parts[parts.length - 1];
+    const city = parts.slice(0, -1).join(', ');
+    return { city, ...(state ? { state } : {}) };
+  }
+  return parts[0] ? { city: parts[0] } : {};
+}
+
+const COUNTY_IN_LABEL = /\b([A-Z][\w'.-]*(?:\s+[A-Z][\w'.-]*)*)\s+County\b/u;
+
+/**
+ * The place half of a `SubjectExpectation`, derived from an already-published projection, for the
+ * curated records (`lynching_*`, `gap_*`, `recon_*`) that have no landscape_candidates row and so
+ * have no authored city/state for the sweep to use.
+ *
+ * repo-f85hp: the sweep used to split `locationLabel` on the comma. That field is PROSE about
+ * where a thing stands, not an administrative place — Alma Howze's reads "Hanging Bridge, Clarke
+ * County", which produced city "Hanging Bridge", state "Clarke County", and
+ * `checkSubjectIdentity` then rejected a correct James Madison University marker page with
+ * "identity not corroborated by place". `jurisdictionLabel` is the field that carries the
+ * administrative place, and hers reads "Shubuta, Mississippi". Verified against the real gate on
+ * the fetched page: corroborated=false from the old derivation, true with city Shubuta / county
+ * Clarke / state Mississippi.
+ *
+ * `locationLabel` is still read, but only for what it is actually good at: it is where a county
+ * name tends to appear ("Hanging Bridge, Clarke County", "Blackdom Townsite historical marker,
+ * near Hagerman, Chaves County"), and the county is a real signal for the place gate. It is also
+ * the last-resort source for city/state when there is no jurisdictionLabel at all.
+ *
+ * A single-part jurisdiction ("Massachusetts") is read as a STATE here, unlike
+ * `cityStateFromJurisdictionLabel`'s city-biased default: an unqualified jurisdiction label is a
+ * state, and calling it a city would have the place gate hunting for a town of that name.
+ */
+export function placeExpectationFromProjection(projection: {
+  readonly jurisdictionLabel?: string | null;
+  readonly locationLabel?: string | null;
+}): { readonly city?: string; readonly county?: string; readonly state?: string } {
+  const jurisdiction = (projection.jurisdictionLabel ?? '').trim();
+  const location = (projection.locationLabel ?? '').trim();
+
+  const split = jurisdiction.length > 0 ? cityStateFromJurisdictionLabel(jurisdiction) : undefined;
+  const fromJurisdiction =
+    split === undefined
+      ? {}
+      : split.state === undefined && split.city !== undefined
+        ? { state: split.city }
+        : split;
+
+  const fallback =
+    fromJurisdiction.city === undefined &&
+    fromJurisdiction.state === undefined &&
+    location.length > 0
+      ? cityStateFromJurisdictionLabel(location)
+      : {};
+
+  const county = COUNTY_IN_LABEL.exec(location)?.[1] ?? COUNTY_IN_LABEL.exec(jurisdiction)?.[1];
+
+  const city = fromJurisdiction.city ?? fallback.city;
+  const state = fromJurisdiction.state ?? fallback.state;
+  return {
+    ...(city !== undefined && city.length > 0 ? { city } : {}),
+    ...(county !== undefined && county.length > 0 ? { county } : {}),
+    ...(state !== undefined && state.length > 0 ? { state } : {}),
+  };
+}
+
 export type SubjectExpectation = {
   readonly displayName: string;
   readonly state?: string | undefined;

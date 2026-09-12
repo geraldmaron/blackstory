@@ -49,7 +49,10 @@ import {
   parseNomination,
 } from './lib/evidence-collectors/nrhp-nomination.ts';
 import { redactStreetAddresses } from './lib/evidence-collectors/redact-address.ts';
-import { checkSubjectIdentity } from './lib/evidence-collectors/subject-identity.ts';
+import {
+  checkSubjectIdentity,
+  placeExpectationFromProjection,
+} from './lib/evidence-collectors/subject-identity.ts';
 import { assessText, stripUnstorableCharacters } from './lib/evidence-collectors/text-quality.ts';
 import {
   WIKIPEDIA_LICENSE,
@@ -985,7 +988,9 @@ async function main(): Promise<void> {
     const fallback = await pool.query<{
       id: string;
       display_name: string;
-      payload: CandidateRow['payload'];
+      kind: string | null;
+      jurisdiction_label: string | null;
+      location_label: string | null;
       publicClaimCitationUrls: readonly string[];
     }>(
       `WITH active AS (
@@ -993,11 +998,9 @@ async function main(): Promise<void> {
        )
        SELECT re.entity_id AS id,
               re.projection->>'displayName' AS display_name,
-              jsonb_build_object(
-                'kind', re.projection->>'kind',
-                'city', split_part(re.projection->>'locationLabel', ', ', 1),
-                'state', split_part(re.projection->>'locationLabel', ', ', 2)
-              ) AS payload,
+              re.projection->>'kind' AS kind,
+              re.projection->>'jurisdictionLabel' AS jurisdiction_label,
+              re.projection->>'locationLabel' AS location_label,
               COALESCE(citations.urls, ARRAY[]::text[]) AS "publicClaimCitationUrls"
          FROM bb_public.release_entities re
          JOIN active a ON re.release_id = a.release_id
@@ -1019,7 +1022,18 @@ async function main(): Promise<void> {
         // exactly as they would for any other non-dc-sites row.
         lane: row.id.split(/[_-]/u)[0] ?? 'curated',
         display_name: row.display_name,
-        payload: row.payload,
+        // repo-f85hp: derived in TS, not by splitting one label in SQL. `locationLabel` is prose
+        // about where a thing stands ("Hanging Bridge, Clarke County"), not an administrative
+        // place, and splitting it on the comma gave `checkSubjectIdentity` city "Hanging Bridge"
+        // and state "Clarke County" — which is why a correct marker page for Alma Howze was
+        // rejected with "identity not corroborated by place".
+        payload: {
+          kind: row.kind ?? undefined,
+          ...placeExpectationFromProjection({
+            jurisdictionLabel: row.jurisdiction_label,
+            locationLabel: row.location_label,
+          }),
+        } as CandidateRow['payload'],
         publicClaimCitationUrls: row.publicClaimCitationUrls,
       });
       resolvedIds.add(row.id);

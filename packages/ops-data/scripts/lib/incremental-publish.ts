@@ -26,6 +26,7 @@ import { SUMMARY_MIN_CHARS, SUMMARY_MAX_CHARS } from './entity-enrichment-llm.ts
 import { computeClaimConfidence, confidenceLevelForSource } from '../lib/confidence.ts';
 import { lintPublishStatus, type PublishStatusLintReport } from './publish-status-linter.ts';
 import { searchTopicsFromProjection } from './projection-divergence.ts';
+import { cityStateFromJurisdictionLabel } from './evidence-collectors/subject-identity.ts';
 import { buildNrhpListingFactObject, buildNrhpSignificanceObject } from './nrhp-area-labels.ts';
 
 export const INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR = 0.75;
@@ -397,23 +398,11 @@ export type CanonicalVisitRow = {
  * of an already-published projection's `jurisdictionLabel`; this republish path has no published
  * projection to read yet, so it is given the label `jurisdictionFromPlace` is about to derive for
  * the same row instead (see `visitOverrideFromCanonicalRow` below).
+ *
+ * The parse itself now lives in `lib/evidence-collectors/subject-identity.ts` (repo-f85hp), which
+ * has no imports of its own and so can hold it for both the publisher and the evidence sweep
+ * without dragging this file's dependencies along.
  */
-function cityStateFromJurisdictionLabel(label: string): {
-  readonly city?: string;
-  readonly state?: string;
-} {
-  const parts = label
-    .split(',')
-    .map((part) => part.trim())
-    .filter(Boolean);
-  if (parts.length >= 2) {
-    const state = parts[parts.length - 1];
-    const city = parts.slice(0, -1).join(', ');
-    return { city, ...(state ? { state } : {}) };
-  }
-  return parts[0] ? { city: parts[0] } : {};
-}
-
 /**
  * E.164 from whatever the source stored. Mirrors `phoneFromRow` in sync-visit-to-projection.ts:
  * Wikidata P1329 values arrive as display strings such as "+1-212-491-2200"; anything without a
