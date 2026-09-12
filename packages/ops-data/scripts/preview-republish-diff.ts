@@ -22,6 +22,7 @@ import {
   buildLiveDepthEntry,
   gateLandscapePublishCandidate,
   liveClaimConfidence,
+  liveLocationFromRow,
   parseCanonicalStatusSnapshot,
   type LandscapePublishRow,
   type LivePublishedRow,
@@ -120,6 +121,9 @@ try {
     const canonicalStatus = canonicalById.get(row.id);
     const liveDepth = assessLandscapeDepth(buildLiveDepthEntry(live), row);
     const liveConfidence = liveClaimConfidence(live);
+    // Passed for the same reason liveDepth and liveConfidence are: a preview that withholds an
+    // input the publisher supplies reports rejections the publisher would not make (repo-lai8y).
+    const liveLocation = liveLocationFromRow(live);
     const gate = gateLandscapePublishCandidate({
       row,
       releaseId,
@@ -127,6 +131,7 @@ try {
       allowRepublish: true,
       liveDepth,
       liveConfidence,
+      ...(liveLocation !== undefined ? { liveLocation } : {}),
       ...(canonicalStatus !== undefined ? { canonicalStatus } : {}),
     });
     if (!gate.eligible) {
@@ -138,6 +143,7 @@ try {
       releaseId,
       generatedAt,
       ...(canonicalStatus !== undefined ? { canonicalStatus } : {}),
+      ...(gate.locationOverride !== undefined ? { locationOverride: gate.locationOverride } : {}),
     });
     if (!result.ok) {
       tally(gateRejects, `build:${result.reason}`);

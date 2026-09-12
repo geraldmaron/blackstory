@@ -15,6 +15,7 @@ import {
   jurisdictionFromPlace,
   jurisdictionFromProvenance,
   liveClaimConfidence,
+  liveLocationFromRow,
   MERGED_EVIDENCE_QUOTE_MAX_CHARS,
   parseCanonicalStatusSnapshot,
   toReleaseEntityRow,
@@ -22,6 +23,7 @@ import {
   visitOverrideFromCanonicalRow,
   type CanonicalVisitRow,
   type LandscapePublishRow,
+  type LiveLocationInheritance,
 } from './incremental-publish.ts';
 import {
   buildReleaseEntityArtifacts,
@@ -1383,5 +1385,355 @@ test('toSearchIndexRow: an empty jurisdiction omits the facet rather than blanki
     Object.hasOwn(row.facets as Record<string, unknown>, 'jurisdictionState'),
     false,
     'a whitespace-only jurisdiction must not be written',
+  );
+});
+
+/*
+ * repo-lai8y: the location gate's ADMISSION vs REGRESSION clause.
+ *
+ * `curatedLiveRow` is shaped on the real cohort this was written for — the curated one-off
+ * entities (gap_*, ent_*) that were never geocoded. Measured on all 57 of them in the active
+ * release: the landscape row carries null lat/lng and no place field of any kind (no geocode, no
+ * historicAddress, no sourceCity/sourceState), while the live record publishes a real point, a
+ * real precision tier, and real place prose. `baseRow` is the opposite case and stays the default:
+ * it carries coordinates AND a full historicAddress/city/state provenance.
+ */
+const curatedRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublishRow => ({
+  id: 'gap_boston_african_american_nhs',
+  lane: 'other',
+  kind: 'place',
+  display_name: 'Boston African American National Historic Site',
+  summary:
+    'The Boston African American National Historic Site preserves the Beacon Hill buildings that ' +
+    'housed the city’s nineteenth-century Black abolitionist community, including the African ' +
+    'Meeting House and the Abiel Smith School. The National Park Service administers the site ' +
+    'alongside the Black Heritage Trail, which links fourteen structures associated with the ' +
+    'organizing that made Boston a center of the antislavery movement. The park was authorized in ' +
+    '1980 and the buildings it interprets remain in use as museum and program space today.',
+  lat: null,
+  lng: null,
+  canonical_url: 'https://www.nps.gov/boaf/index.htm',
+  source_item_id: 'gap_boston_african_american_nhs',
+  provenance: {},
+  payload: {
+    historicalContext:
+      'The African Meeting House, built in 1806, is the oldest surviving Black church building ' +
+      'in the United States and was the hall where William Lloyd Garrison founded the New ' +
+      'England Anti-Slavery Society in 1832.',
+    confidence: 0.82,
+  },
+  exact_in_release: true,
+  name_overlap: false,
+  ...overrides,
+});
+
+/** The live projection for the row above, in the shape `liveLocationFromRow` reads. */
+const curatedLiveRow = () => ({
+  summary: 'Short stale summary.',
+  claims: [],
+  projection: {
+    location: {
+      lat: 42.360006,
+      lng: -71.065153,
+      geohash: 'drt2y',
+      geohashPrefixes: ['d', 'dr', 'drt', 'drt2', 'drt2y'],
+      precision: 'address',
+      matchMethod: 'geocode_other',
+    },
+    locationLabel: '46 Joy Street, Beacon Hill, Boston',
+    jurisdictionLabel: 'Boston, Massachusetts',
+  },
+});
+
+/**
+ * `liveLocationFromRow` is correctly typed `| undefined`, and `exactOptionalPropertyTypes` rejects
+ * that on the gate's optional `liveLocation`. The fixture always has a point, so assert it here
+ * once rather than spreading a conditional through every call site below.
+ */
+const curatedLiveLocation = (): LiveLocationInheritance => {
+  const live = liveLocationFromRow(curatedLiveRow());
+  assert.ok(live, 'the curated fixture must carry a live location');
+  return live;
+};
+
+test('liveLocationFromRow reads the point, precision, matchMethod and place prose', () => {
+  assert.deepEqual(liveLocationFromRow(curatedLiveRow()), {
+    lat: 42.360006,
+    lng: -71.065153,
+    precision: 'address',
+    matchMethod: 'geocode_other',
+    locationLabel: '46 Joy Street, Beacon Hill, Boston',
+    jurisdictionLabel: 'Boston, Massachusetts',
+  });
+});
+
+test('liveLocationFromRow offers nothing for a live row with no usable point', () => {
+  assert.equal(liveLocationFromRow({ summary: null, claims: [], projection: null }), undefined);
+  assert.equal(liveLocationFromRow({ summary: null, claims: [], projection: {} }), undefined);
+  assert.equal(
+    liveLocationFromRow({ summary: null, claims: [], projection: { location: {} } }),
+    undefined,
+    'a location object without coordinates is not a location',
+  );
+  assert.equal(
+    liveLocationFromRow({
+      summary: null,
+      claims: [],
+      projection: { location: { lat: '42.36', lng: -71.06 } },
+    }),
+    undefined,
+    'a stringified coordinate must not be inherited',
+  );
+});
+
+test('location gate still rejects a coordinate-less NEW candidate', () => {
+  const result = gateLandscapePublishCandidate({
+    row: curatedRow({ exact_in_release: false }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+  });
+  assert.equal(result.eligible, false);
+  assert.equal(result.eligible === false && result.reason, 'missing_location');
+});
+
+test('location gate rejects a coordinate-less row that is not live under its own id', () => {
+  const result = gateLandscapePublishCandidate({
+    row: curatedRow({ exact_in_release: false }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    allowRepublish: true,
+    liveLocation: curatedLiveLocation(),
+  });
+  assert.equal(result.eligible, false);
+  assert.equal(
+    result.eligible === false && result.reason,
+    'missing_location',
+    '--republish alone is not a licence to borrow another record’s point',
+  );
+});
+
+test('location gate fails closed when the caller loaded no live location', () => {
+  const result = gateLandscapePublishCandidate({
+    row: curatedRow(),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    allowRepublish: true,
+  });
+  assert.equal(result.eligible, false);
+  assert.equal(result.eligible === false && result.reason, 'missing_location');
+});
+
+test('republish keeps the location an already-live record publishes today', () => {
+  const result = gateLandscapePublishCandidate({
+    row: curatedRow(),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    allowRepublish: true,
+    liveLocation: curatedLiveLocation(),
+  });
+  assert.equal(result.eligible, true);
+  if (!result.eligible) return;
+  assert.equal(result.entry.lat, 42.360006);
+  assert.equal(result.entry.lng, -71.065153);
+  assert.equal(
+    result.entry.locationPrecision,
+    'address',
+    'the live tier describes the live point; re-deriving it from a row with no geocode and no ' +
+      'street address would publish "city" over an address-precision record',
+  );
+  assert.equal(result.entry.locationLabel, '46 Joy Street, Beacon Hill, Boston');
+  assert.equal(
+    result.entry.jurisdictionLabel,
+    'Boston, Massachusetts',
+    'findUsStateForPoint would answer "Massachusetts" and drop the city the page prints',
+  );
+  assert.deepEqual(result.locationOverride, {
+    lat: 42.360006,
+    lng: -71.065153,
+    precision: 'address',
+    matchMethod: 'geocode_other',
+    locationLabel: '46 Joy Street, Beacon Hill, Boston',
+  });
+});
+
+test('an inherited point does not overwrite place prose the landscape row supplies', () => {
+  const result = gateLandscapePublishCandidate({
+    row: curatedRow({
+      provenance: {
+        historicAddress: '46 Joy Street',
+        sourceCity: 'Boston',
+        sourceState: 'MA',
+      },
+    }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    allowRepublish: true,
+    liveLocation: curatedLiveLocation(),
+  });
+  assert.equal(result.eligible, true);
+  if (!result.eligible) return;
+  assert.equal(result.entry.lat, 42.360006, 'the point still comes from the live record');
+  assert.equal(result.entry.locationPrecision, 'address');
+  assert.equal(
+    result.entry.locationLabel,
+    '46 Joy Street, Boston, MA',
+    'a row that says where the record is stays the source of truth for what a reader is told',
+  );
+  assert.equal(result.entry.jurisdictionLabel, 'Boston, Massachusetts');
+  assert.equal(
+    result.locationOverride?.locationLabel,
+    undefined,
+    'the override must not re-assert a label the entry already owns',
+  );
+});
+
+test('a row with its own coordinates ignores the live location entirely', () => {
+  const result = gateLandscapePublishCandidate({
+    row: enrichedRow({ exact_in_release: true }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    allowRepublish: true,
+    liveLocation: curatedLiveLocation(),
+  });
+  assert.equal(result.eligible, true);
+  if (!result.eligible) return;
+  assert.equal(result.entry.lat, 38.915775, 'the landscape row wins when it has a point');
+  assert.equal(result.locationOverride, undefined);
+});
+
+test('an inherited location survives the real build, matchMethod included', () => {
+  const gate = gateLandscapePublishCandidate({
+    row: curatedRow(),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    allowRepublish: true,
+    liveLocation: curatedLiveLocation(),
+  });
+  assert.equal(gate.eligible, true);
+  if (!gate.eligible) return;
+
+  const built = buildArtifactsForEntry({
+    entry: gate.entry,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    ...(gate.locationOverride !== undefined ? { locationOverride: gate.locationOverride } : {}),
+  });
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+
+  const live = curatedLiveRow().projection;
+  const projection = built.entityRow.projection as {
+    readonly location: Record<string, unknown>;
+    readonly locationLabel: string;
+    readonly jurisdictionLabel: string;
+  };
+  assert.equal(projection.location.lat, live.location.lat);
+  assert.equal(projection.location.lng, live.location.lng);
+  assert.equal(projection.location.geohash, live.location.geohash);
+  assert.equal(projection.location.precision, live.location.precision);
+  assert.equal(
+    projection.location.matchMethod,
+    'geocode_other',
+    'matchMethod exists only on the override; dropping it republishes the point as manual_research',
+  );
+  assert.equal(projection.locationLabel, live.locationLabel);
+  assert.equal(projection.jurisdictionLabel, live.jurisdictionLabel);
+  assert.equal(built.entityRow.lat, live.location.lat);
+  assert.equal(built.entityRow.lng, live.location.lng);
+  assert.equal(built.searchRow.geohash, live.location.geohash);
+});
+
+test('the build a republish writes is the build the gate approved', () => {
+  const gate = gateLandscapePublishCandidate({
+    row: curatedRow(),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    allowRepublish: true,
+    liveLocation: curatedLiveLocation(),
+  });
+  assert.equal(gate.eligible, true);
+  if (!gate.eligible) return;
+
+  // What the caller writes when it forgets to forward the override. The entry alone still
+  // carries the right point, tier and labels — only matchMethod degrades — which is why
+  // `inheritLiveLocation` writes to both and not just the override.
+  const withoutOverride = buildArtifactsForEntry({
+    entry: gate.entry,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+  });
+  assert.equal(withoutOverride.ok, true);
+  if (!withoutOverride.ok) return;
+  const degraded = withoutOverride.entityRow.projection as {
+    readonly location: Record<string, unknown>;
+  };
+  assert.equal(degraded.location.lat, 42.360006);
+  assert.equal(degraded.location.precision, 'address');
+  assert.equal(degraded.location.matchMethod, 'manual_research');
+});
+
+test('a live location whose tier was reduced by a sensitivity rule is not inherited', () => {
+  const live = curatedLiveRow();
+  const reduced = {
+    ...live,
+    projection: {
+      ...live.projection,
+      location: { ...live.projection.location, precisionReductionReason: 'restricted_site' },
+    },
+  };
+  assert.equal(
+    liveLocationFromRow(reduced),
+    undefined,
+    'reducePublicPrecision re-derives from inputs a landscape row does not carry, so feeding its ' +
+      'own output back would republish the tier with the reason code silently dropped',
+  );
+
+  const result = gateLandscapePublishCandidate({
+    row: curatedRow(),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    allowRepublish: true,
+  });
+  assert.equal(result.eligible, false);
+  assert.equal(
+    result.eligible === false && result.reason,
+    'missing_location',
+    'the honest outcome is a skip, not a republish at a tier we cannot reproduce',
+  );
+});
+
+test('a state without a city does not overwrite the city the live record prints', () => {
+  const result = gateLandscapePublishCandidate({
+    row: curatedRow({ provenance: { sourceState: 'MA' } }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    allowRepublish: true,
+    liveLocation: curatedLiveLocation(),
+  });
+  assert.equal(result.eligible, true);
+  if (!result.eligible) return;
+  assert.equal(
+    result.entry.jurisdictionLabel,
+    'Boston, Massachusetts',
+    'jurisdictionFromPlace would answer the bare "Massachusetts" from a state-only row, which ' +
+      'does not contradict the live label — it just says less',
+  );
+  assert.equal(result.entry.locationLabel, '46 Joy Street, Beacon Hill, Boston');
+});
+
+test('a city named by the landscape row wins over the live jurisdiction', () => {
+  const result = gateLandscapePublishCandidate({
+    row: curatedRow({ provenance: { sourceCity: 'Cambridge', sourceState: 'MA' } }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    allowRepublish: true,
+    liveLocation: curatedLiveLocation(),
+  });
+  assert.equal(result.eligible, true);
+  if (!result.eligible) return;
+  assert.equal(
+    result.entry.jurisdictionLabel,
+    'Cambridge, Massachusetts',
+    'a row that names a city is at least as specific as the live label, so it stays authoritative',
   );
 });

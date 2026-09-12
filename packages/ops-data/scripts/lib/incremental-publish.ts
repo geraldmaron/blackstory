@@ -14,6 +14,7 @@ import {
   type CanonicalStatusSnapshot,
   type PublicVisit,
   type ReleaseEntityProjectionFields,
+  type ReleaseLocationOverride,
   type ReleaseSearchIndexFields,
   type ReleaseSourceClaim,
   type ReleaseSourceEntity,
@@ -67,7 +68,19 @@ export type PublishGateSkipReason =
   | 'confidence_below_floor';
 
 export type PublishGateResult =
-  | { readonly eligible: true; readonly entry: ReleaseSourceEntity; readonly confidence: number }
+  | {
+      readonly eligible: true;
+      readonly entry: ReleaseSourceEntity;
+      readonly confidence: number;
+      /**
+       * Set only when this candidate inherited an already-live record's location (repo-lai8y).
+       * The caller MUST forward it to `buildArtifactsForEntry`: the gate's own build is a probe,
+       * and the row it writes is built a second time by the caller. `matchMethod` exists nowhere
+       * on `ReleaseSourceEntity`, so an override dropped here republishes the point as
+       * `manual_research` regardless of how it was actually matched.
+       */
+      readonly locationOverride?: ReleaseLocationOverride;
+    }
   | { readonly eligible: false; readonly reason: PublishGateSkipReason; readonly detail: string };
 
 export type ReleaseEntityUpsertRow = {
@@ -142,12 +155,14 @@ function buildContext(input: {
   readonly generatedAt: string;
   readonly canonicalStatus?: CanonicalStatusSnapshot;
   readonly visitOverride?: PublicVisit;
+  readonly locationOverride?: ReleaseLocationOverride;
 }) {
   return {
     releaseId: input.releaseId,
     generatedAt: input.generatedAt,
     ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
     ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
+    ...(input.locationOverride !== undefined ? { locationOverride: input.locationOverride } : {}),
   };
 }
 
@@ -938,6 +953,134 @@ export function liveClaimConfidence(row: LivePublishedRow): number {
 }
 
 /**
+ * The location an already-live record publishes today, in the shape a republish needs to keep it.
+ * `ReleaseLocationOverride` covers the point; `jurisdictionLabel` rides along because the release
+ * builder takes that one from the source entry, not from the override.
+ */
+export type LiveLocationInheritance = ReleaseLocationOverride & {
+  readonly jurisdictionLabel?: string;
+};
+
+/**
+ * Reads the live projection's own published location off a `LivePublishedRow` (repo-lai8y), the
+ * third member of the `buildLiveDepthEntry` / `liveClaimConfidence` family: one reader per thing
+ * the gate wants to know about what is CURRENTLY public, so an audit and a publish cannot read
+ * the same live row differently.
+ *
+ * Returns undefined unless the projection carries a finite lat AND lng — the caller's fallback
+ * then has nothing to offer and the location gate fails closed exactly as before.
+ */
+export function liveLocationFromRow(row: LivePublishedRow): LiveLocationInheritance | undefined {
+  const projection = row.projection ?? {};
+  const location = asRecord(projection.location);
+  const lat = location.lat;
+  const lng = location.lng;
+  if (typeof lat !== 'number' || !Number.isFinite(lat)) return undefined;
+  if (typeof lng !== 'number' || !Number.isFinite(lng)) return undefined;
+  /*
+   * A live tier that was REDUCED (living residence, restricted site, withheld on request) cannot
+   * be inherited faithfully. `reducePublicPrecision` is the publish path's one engine for that
+   * decision and it re-derives from kind/livingStatus/sensitivityClass — inputs a landscape row
+   * does not carry (`buildReleaseSourceFromLandscape` never sets `sensitivityClass`). Feeding the
+   * already-reduced tier back in makes the rule a no-op, so the record would republish at the
+   * right tier with its `precisionReductionReason` silently dropped, breaking the standard's §4
+   * control that a location is published either at its source precision or with a reason code.
+   *
+   * So: fail closed. The record skips as `missing_location` and keeps its stale summary, which is
+   * the honest outcome for a record whose location we cannot reproduce. Zero of the 57 rows this
+   * was written for carry a reason code. If this ever does fire, the fix is to carry the
+   * sensitivity INPUTS onto the candidate, not to copy the engine's output past the engine.
+   */
+  if (readTrimmedString(location.precisionReductionReason).length > 0) return undefined;
+  const precision = readTrimmedString(location.precision);
+  const matchMethod = readTrimmedString(location.matchMethod);
+  const locationLabel = readTrimmedString(projection.locationLabel);
+  const jurisdictionLabel = readTrimmedString(projection.jurisdictionLabel);
+  return {
+    lat,
+    lng,
+    ...(precision.length > 0 ? { precision } : {}),
+    ...(matchMethod.length > 0 ? { matchMethod } : {}),
+    ...(locationLabel.length > 0 ? { locationLabel } : {}),
+    ...(jurisdictionLabel.length > 0 ? { jurisdictionLabel } : {}),
+  };
+}
+
+/**
+ * Applies an already-live record's location to a republish candidate whose landscape row carries
+ * no coordinates (repo-lai8y). Splits the decision the way the data splits:
+ *
+ *   POINT METADATA (lat/lng, precision, matchMethod) always comes from the live projection. A
+ *   precision tier and a match method describe a POINT, and the point here is the live one, so
+ *   re-deriving them from a row that has no coordinates describes someone else's point. Measured
+ *   on the 57 rows this was written for, every landscape row carries no geocode, no street
+ *   address and no city/state at all, so `buildReleaseSourceFromLandscape`'s derivation returns
+ *   'city' for all of them while their live records publish at neighborhood (4), campus (6),
+ *   institution (16), site (3), address (4) and country (1) — 34 rows whose published precision
+ *   a bare lat/lng inheritance would coarsen or sharpen against the point it describes.
+ *
+ *   PLACE PROSE (locationLabel, jurisdictionLabel) comes from the landscape row whenever that row
+ *   supplies a place field that derivation can actually use, and from the live projection
+ *   otherwise (see the per-field reasoning at the branch). A row that says where the record is stays the source
+ *   of truth for what a reader is told; a row that says nothing must not overwrite what the
+ *   record's own page already prints. On those same 57 rows nothing is supplied, so
+ *   'Boston, Massachusetts' would otherwise degrade to 'Massachusetts' (`jurisdictionFromPlace`
+ *   falling through to `findUsStateForPoint`) and '46 Joy Street, Beacon Hill, Boston' to the
+ *   record's own display name (`locationLabelFromProvenance`'s last resort).
+ *
+ * The same values are written onto BOTH the entry and the override rather than only the override.
+ * The release builder reads `locationOverride?.x ?? entry.x` for precision and label, so the two
+ * cannot disagree — and a caller that forgets to forward the override still republishes the right
+ * tier and label instead of a silently re-derived one.
+ */
+function inheritLiveLocation(input: {
+  readonly entry: ReleaseSourceEntity;
+  readonly row: LandscapePublishRow;
+  readonly live: LiveLocationInheritance;
+}): {
+  readonly entry: ReleaseSourceEntity;
+  readonly locationOverride: ReleaseLocationOverride;
+} {
+  const place = placeFieldsFromLandscape(input.row);
+  /*
+   * Decided per field, on what each derivation can actually produce from THIS row — not on one
+   * "does the row have place data" flag, which would let a row naming only a state overwrite a
+   * city-precise live label with the bare state name. Naming a state does not contradict
+   * 'Boston, Massachusetts'; it just says less, and a fallback that loses information is not a
+   * fallback.
+   *
+   *   jurisdiction: `jurisdictionFromPlace` returns 'City, State' only when the row names a city.
+   *     Without one it returns the state alone, or falls through to `findUsStateForPoint` — both
+   *     strictly less than what the live record already prints.
+   *
+   *   label: `locationLabelFromProvenance` returns the record's own display name when the row
+   *     gave it nothing to work with. Comparing against that is the tell, rather than guessing
+   *     which provenance fields it consulted for this kind.
+   */
+  const rowNamesJurisdiction = place.city.length > 0;
+  const rowNamesLocation = input.entry.locationLabel !== input.row.display_name.trim();
+  const locationLabel = rowNamesLocation ? undefined : input.live.locationLabel;
+  const jurisdictionLabel = rowNamesJurisdiction ? undefined : input.live.jurisdictionLabel;
+  return {
+    entry: {
+      ...input.entry,
+      lat: input.live.lat,
+      lng: input.live.lng,
+      ...(input.live.precision !== undefined ? { locationPrecision: input.live.precision } : {}),
+      ...(locationLabel !== undefined ? { locationLabel } : {}),
+      ...(jurisdictionLabel !== undefined ? { jurisdictionLabel } : {}),
+    },
+    locationOverride: {
+      lat: input.live.lat,
+      lng: input.live.lng,
+      ...(input.live.precision !== undefined ? { precision: input.live.precision } : {}),
+      ...(input.live.matchMethod !== undefined ? { matchMethod: input.live.matchMethod } : {}),
+      ...(locationLabel !== undefined ? { locationLabel } : {}),
+    },
+  };
+}
+
+/**
  * Rejects rows that carry nothing a reader could not get from the registry index entry itself.
  *
  * The lane importers publish prose generated from index fields — category, city, state, area of
@@ -1030,6 +1173,14 @@ export function gateLandscapePublishCandidate(input: {
    */
   readonly liveConfidence?: number;
   /**
+   * repo-lai8y: the location of what is CURRENTLY published for this entity, from
+   * `liveLocationFromRow(liveRow)`. Read ONLY when the landscape row carries no coordinates and
+   * this is a republish of that live row; see the location gate below. Omitting it leaves the
+   * gate failing closed on a coordinate-less row, which is what every non-republish caller
+   * (e.g. enrich-landscape-pending-corroboration.ts, which has no live state at all) wants.
+   */
+  readonly liveLocation?: LiveLocationInheritance;
+  /**
    * Raw (pre-gating) visit-contact input from `bb_canonical.entity_visit` +
    * `entity_locations.street`/`postal_code`, when the caller looked one up for this entity
    * (`visitOverrideFromCanonicalRow`). Wins over whatever `buildReleaseSourceFromLandscape`
@@ -1066,7 +1217,44 @@ export function gateLandscapePublishCandidate(input: {
       detail: 'Green Book lane requires living/residence review',
     };
   }
-  if (row.lat === null || row.lng === null) {
+  // Hoisted above the location gate (it was declared just below `name_overlap`) because the
+  // location gate is now the third check to ask the ADMISSION vs REGRESSION question.
+  const republishingLiveRow = input.allowRepublish === true && row.exact_in_release === true;
+
+  /*
+   * ADMISSION vs REGRESSION (repo-lai8y), the third gate to draw this distinction after depth
+   * (repo-b4ad) and confidence (repo-2t04.17).
+   *
+   *   new record   -> ADMISSION. Unchanged: no coordinates, no publish. The check exists for
+   *                   buildability, not editorial policy — `ReleaseEntityUpsertRow.lat/lng` are
+   *                   non-nullable and `buildGeoPointFields` THROWS on a non-finite lat/lng, so
+   *                   this gate is what turns that throw into an honest skip.
+   *
+   *   already live -> REGRESSION. The record already holds a place, and its own page prints it.
+   *                   This pass is correcting the record's PROSE, not its location, and a
+   *                   landscape row that never carried coordinates is not evidence that the
+   *                   place is gone — it is evidence that this lane never geocoded. Rejecting it
+   *                   here does not un-place anything; it only keeps the stale summary public.
+   *                   Same principle as commit 26a2d036, one layer earlier: a republished record
+   *                   keeps the place its own page prints.
+   *
+   * Measured 2026-09-12: 56 of the 661 staged republish candidates were skipped as
+   * missing_location, all 57 coordinate-less rows in that set are live, and all 57 live records
+   * carry a real projection.location — including the 24 gap_* drafts of repo-2t04.9, which had
+   * been blocked here since 2026-08-17.
+   *
+   * The fallback is deliberately narrow: it needs an explicit `--republish`, a row already live
+   * under its own id, and a live projection that actually carries a finite point. A caller that
+   * loads no live state cannot relax anything by accident, and a row WITH coordinates is
+   * untouched by this branch — the 477 candidates that already republished are unaffected.
+   */
+  const inheritedLocation =
+    (row.lat === null || row.lng === null) && republishingLiveRow ? input.liveLocation : undefined;
+  const locatedRow =
+    inheritedLocation === undefined
+      ? row
+      : { ...row, lat: inheritedLocation.lat, lng: inheritedLocation.lng };
+  if (locatedRow.lat === null || locatedRow.lng === null) {
     return { eligible: false, reason: 'missing_location', detail: 'missing lat/lng' };
   }
   if (row.exact_in_release && !input.allowRepublish) {
@@ -1094,7 +1282,6 @@ export function gateLandscapePublishCandidate(input: {
   // `re.entity_id <> lc.id AND re.entity_id <> lc.source_item_id`), so a genuine collision with a
   // DIFFERENT live entity still sets the flag. Skipping it here is a decision about what to do
   // with that flag on a republish, not a loosening of how it is computed.
-  const republishingLiveRow = input.allowRepublish === true && row.exact_in_release === true;
   if (row.name_overlap && !republishingLiveRow) {
     return {
       eligible: false,
@@ -1103,14 +1290,24 @@ export function gateLandscapePublishCandidate(input: {
     };
   }
 
-  const entry = buildReleaseSourceFromLandscape(row);
-  if (!entry) {
+  // `locatedRow` only ever differs from `row` in lat/lng, and only on the inheritance branch
+  // above. It is used HERE rather than for every later `row` read because this is the one call
+  // that reads the row's location: `assessLandscapeDepth` and the confidence engine below read
+  // canonical_url, payload and provenance, where the two rows are identical by construction.
+  const builtEntry = buildReleaseSourceFromLandscape(locatedRow);
+  if (!builtEntry) {
     return {
       eligible: false,
       reason: 'missing_canonical_url',
       detail: 'insufficient landscape fields to build release source',
     };
   }
+  const inherited =
+    inheritedLocation === undefined
+      ? undefined
+      : inheritLiveLocation({ entry: builtEntry, row, live: inheritedLocation });
+  const entry = inherited?.entry ?? builtEntry;
+  const locationOverride = inherited?.locationOverride;
   // Enrichment and landscape staging require summaries within the current editorial band
   // (repo-2t04.1: 400-900, was 220-400). Best-effort short drafts are validated and
   // ledger-flagged at draft time (entity-enrichment-llm.ts); this coarse length gate does not
@@ -1199,6 +1396,7 @@ export function gateLandscapePublishCandidate(input: {
       generatedAt: input.generatedAt,
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
       ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
+      ...(locationOverride !== undefined ? { locationOverride } : {}),
     }),
   );
   if (!build.ok) {
@@ -1209,7 +1407,12 @@ export function gateLandscapePublishCandidate(input: {
     };
   }
 
-  return { eligible: true, entry, confidence };
+  return {
+    eligible: true,
+    entry,
+    confidence,
+    ...(locationOverride !== undefined ? { locationOverride } : {}),
+  };
 }
 
 export function toReleaseEntityRow(
@@ -1322,6 +1525,8 @@ export function buildArtifactsForEntry(input: {
   readonly canonicalStatus?: CanonicalStatusSnapshot;
   /** See the matching field on `gateLandscapePublishCandidate`'s input. */
   readonly visitOverride?: PublicVisit;
+  /** `gateLandscapePublishCandidate`'s `locationOverride` result, forwarded verbatim. */
+  readonly locationOverride?: ReleaseLocationOverride;
 }): PublishArtifactsResult {
   const build = buildReleaseEntityArtifacts(
     input.entry,
@@ -1330,6 +1535,7 @@ export function buildArtifactsForEntry(input: {
       generatedAt: input.generatedAt,
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
       ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
+      ...(input.locationOverride !== undefined ? { locationOverride: input.locationOverride } : {}),
     }),
   );
   if (!build.ok) {

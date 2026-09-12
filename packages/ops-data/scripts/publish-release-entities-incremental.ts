@@ -41,6 +41,7 @@ import {
   gateLandscapePublishCandidate,
   incrementalPublishProvenancePatch,
   liveClaimConfidence,
+  liveLocationFromRow,
   parseCanonicalStatusSnapshot,
   visitOverrideFromCanonicalRow,
   type CanonicalEntityPublishRow,
@@ -327,6 +328,13 @@ type PreparedPublish = {
   readonly fromLandscape: boolean;
   readonly landscapeRow: LandscapePublishRow | null;
   readonly lintReport: PublishStatusLintReport;
+  /**
+   * repo-lai8y: this record's coordinates came from what it already publishes, not from its
+   * landscape row. Reported per id so a coordinate with no visible lineage on the landscape row
+   * is never silent — the one real objection to inheriting a location is that an auditor later
+   * cannot tell where the point came from.
+   */
+  readonly locationInherited?: boolean;
 };
 
 /** Reads one string field out of a stored projection, whose static type is `unknown` jsonb. */
@@ -468,6 +476,11 @@ function preparePublish(input: {
         : assessLandscapeDepth(buildLiveDepthEntry(input.livePublished), input.row);
     const liveConfidence =
       input.livePublished === undefined ? undefined : liveClaimConfidence(input.livePublished);
+    // repo-lai8y: the location this record already publishes, for the gate's regression clause on
+    // a landscape row that never carried coordinates. Read off the same live row as the depth and
+    // confidence verdicts above.
+    const liveLocation =
+      input.livePublished === undefined ? undefined : liveLocationFromRow(input.livePublished);
     const gate = gateLandscapePublishCandidate({
       row: input.row,
       releaseId: input.releaseId,
@@ -475,6 +488,7 @@ function preparePublish(input: {
       allowRepublish: input.allowRepublish ?? false,
       ...(liveDepth !== undefined ? { liveDepth } : {}),
       ...(liveConfidence !== undefined ? { liveConfidence } : {}),
+      ...(liveLocation !== undefined ? { liveLocation } : {}),
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
       ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
     });
@@ -487,6 +501,9 @@ function preparePublish(input: {
       generatedAt: input.generatedAt,
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
       ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
+      // Forwarded, not re-derived: the gate already decided this record's location and this build
+      // must produce the row the gate approved (`matchMethod` lives only here).
+      ...(gate.locationOverride !== undefined ? { locationOverride: gate.locationOverride } : {}),
     });
     if (!built.ok) {
       return {
@@ -503,6 +520,7 @@ function preparePublish(input: {
       fromLandscape: true,
       landscapeRow: input.row,
       lintReport: built.lintReport,
+      ...(gate.locationOverride !== undefined ? { locationInherited: true } : {}),
     };
   }
 
@@ -677,6 +695,8 @@ async function main(): Promise<void> {
       skipped: skipped.length,
       skipCounts: Object.fromEntries(skipCounts),
       publishedIds: prepared.map((row) => row.id),
+      // Full list, not a sample: see `PreparedPublish.locationInherited`.
+      locationInheritedIds: prepared.filter((row) => row.locationInherited).map((row) => row.id),
       skippedSample: skipped.slice(0, 20),
       // Recorded so an accepted coverage floor is auditable after the fact, not just a flag
       // someone typed once.

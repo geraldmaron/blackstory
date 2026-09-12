@@ -145,6 +145,27 @@ export type ReleaseClaimProjection = {
 
 export type ReleaseResearchCoverage = 'minimal' | 'partial' | 'substantial';
 
+/**
+ * A location supplied by the caller that wins over the source entry's own
+ * `lat`/`lng`/`locationPrecision`/`locationLabel`, plus the `matchMethod` the entry has no field
+ * for. One production caller supplies it today: the incremental publisher, inheriting the location
+ * an already-live record publishes, for a republish whose landscape row never carried coordinates
+ * (repo-lai8y). The field predates that and was written for a canonical EntityLocation
+ * (Census-validated) source, which nothing supplies yet — the doc on `ReleaseBuildContext` still
+ * describes that intent.
+ *
+ * `precision` travels with the point on purpose. A precision tier describes a POINT, so a caller
+ * that overrides the coordinates and leaves the tier to be re-derived elsewhere is describing
+ * someone else's point.
+ */
+export type ReleaseLocationOverride = {
+  readonly lat: number;
+  readonly lng: number;
+  readonly precision?: string;
+  readonly matchMethod?: string;
+  readonly locationLabel?: string;
+};
+
 export type ReleaseBuildContext = {
   readonly releaseId: string;
   /** ISO instant this release build ran at. Legitimately real: a fresh publish IS being
@@ -161,13 +182,7 @@ export type ReleaseBuildContext = {
    * Preferred coordinates from a canonical EntityLocation (Census-validated). When present,
    * these win over catalog fixture lat/lng (`manual_research` fallback).
    */
-  readonly locationOverride?: {
-    readonly lat: number;
-    readonly lng: number;
-    readonly precision?: string;
-    readonly matchMethod?: string;
-    readonly locationLabel?: string;
-  };
+  readonly locationOverride?: ReleaseLocationOverride;
   /**
    * Canonical visit-contact input (`bb_canonical.entity_visit` joined with
    * `entity_locations.street`/`postal_code`), when the caller looked one up. Wins over
