@@ -20,7 +20,7 @@
 import type { Metadata } from 'next';
 import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
-import { MemorialWallAtmosphere } from '../../components/patterns/memorial-wall/MemorialWallAtmosphere';
+import { MemorialWallSection } from '../../components/patterns/memorial-wall/MemorialWallAtmosphere';
 import { Room, RoomHeader } from '../../components/room';
 import { WalkOffRamp } from '../walk-off-ramp';
 import { MemorialSections } from './MemorialSections';
@@ -51,7 +51,7 @@ export const metadata: Metadata = buildStaticPageMetadata({
 export default function MemorialPage() {
   return (
     <div className={memorialEditionRootClassName()} data-memorial-edition="v6">
-      <MemorialWallAtmosphere
+      <MemorialWallSection
         seedKey={MEMORIAL_EDITION_WALL_SEED}
         messageLines={MEMORIAL_HELD_MESSAGE_LINES}
         entityLinksByName={{}}

@@ -229,9 +229,11 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     setSweepDecade,
     topicId,
     setTopicId,
+    activeTopicLabel,
     status,
     layerMode,
     setLayerMode,
+    areaFillPermitted,
     layers,
     setLayers,
     sort,
@@ -555,6 +557,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           }
           layerMode={layerMode}
           onLayerModeChange={setLayerMode}
+          areaFillPermitted={areaFillPermitted}
           presence={presence}
           onShowLegend={() => setLegendOpen(true)}
           onReset={resetLens}
@@ -615,6 +618,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
               bearing={bearing}
               onResetBearing={() => camera.resetBearing({ trigger: 'reader' })}
               activeRecord={selectedFeature?.properties ?? null}
+              lens={{ topicId, topicLabel: activeTopicLabel }}
               spotlit={camera.isSpotlit()}
             />
           ) : null}

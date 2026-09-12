@@ -90,6 +90,49 @@
   outline-offset: 2px;
 }
 
+/* "Hold the wall still" (repo-92n2.18). Fixed to the viewport rather than positioned within the
+   wall's own document flow: the packer's avoid-boxes only know about the header, the held
+   message and the scroll cue, and a name drawn through this control is exactly the "canvas
+   packed around real chrome" defect those boxes exist to prevent. Fixed positioning keeps it out
+   of that flow entirely rather than teaching the packer a fourth box. */
+.ds-memorial-edition__hold-wall {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: var(--ds-z-content);
+  padding: 0.625rem 1.125rem;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: 999px;
+  background: var(--ds-canvas);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+  transition:
+    border-color var(--ds-duration-fast, 0.15s) var(--ds-easing, ease),
+    background var(--ds-duration-fast, 0.15s) var(--ds-easing, ease),
+    color var(--ds-duration-fast, 0.15s) var(--ds-easing, ease);
+}
+
+.ds-memorial-edition__hold-wall:hover {
+  color: var(--ds-ink);
+  border-color: var(--ds-accent-graphic);
+  background: var(--ds-surface-raised);
+}
+
+.ds-memorial-edition__hold-wall:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
+  outline-offset: 2px;
+}
+
+.ds-memorial-edition__hold-wall[aria-pressed='true'] {
+  color: var(--ds-ink);
+  border-color: var(--ds-accent-graphic);
+}
+
 .ds-memorial-edition__scroll-cue-icon {
   flex-shrink: 0;
   width: 1rem;

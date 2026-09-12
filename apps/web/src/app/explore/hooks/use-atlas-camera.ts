@@ -10,7 +10,7 @@ import {
 import type { MapStageHandle } from '../../../components/map-stage/MapStage';
 import { createCamera, type CameraMove } from '../../../lib/map-experience/camera-moves';
 import { chromePadding } from '../../../lib/map-experience/chrome-padding';
-import { prefersReducedMotion } from '../../../lib/map-experience/camera-presets';
+import { useReducedMotion } from '../../../lib/motion/use-reduced-motion';
 import { MIGRATION_CORRIDORS } from '../../../lib/map-experience/migration-corridors';
 import type { LensLayers } from '../../../components/map-experience/LensPanel';
 import type { PanelVisibility } from './use-panel-visibility';
@@ -46,6 +46,18 @@ export function useAtlasCamera(
     sheet: sheetOpen,
   };
 
+  /**
+   * Live for the session (repo-92n2.18): a preference flip mid-session must change camera
+   * behaviour without a reload. `camera` below is a stable `useMemo` (deps `[stage, setLayers]`,
+   * not rebuilt on every render), so its `reducedMotion` callback reads this ref rather than
+   * closing over the hook's own render-time boolean directly — the same pattern `paddingRef`
+   * already uses just above for the same reason (a stable closure that still needs the latest
+   * value at call time, not the value from whenever the memo happened to last rebuild).
+   */
+  const reducedMotion = useReducedMotion();
+  const reducedMotionRef = useRef(reducedMotion);
+  reducedMotionRef.current = reducedMotion;
+
   const camera = useMemo(
     () =>
       createCamera({
@@ -68,7 +80,7 @@ export function useAtlasCamera(
             resultsOpen: paddingRef.current.results,
             sheetOpen: paddingRef.current.sheet,
           }),
-        reducedMotion: prefersReducedMotion,
+        reducedMotion: () => reducedMotionRef.current,
         announce: setReadout,
         setRoutes: (visible) => setLayers((current) => ({ ...current, routes: visible })),
         setSpotlight: (target) => {
@@ -112,7 +124,7 @@ export function useAtlasCamera(
     const unsubscribe = stage.subscribe('ready', () => {
       if (framed.current) return;
       framed.current = true;
-      const delay = prefersReducedMotion() ? 0 : ESTABLISHING_SHOT_DELAY_MS;
+      const delay = reducedMotionRef.current ? 0 : ESTABLISHING_SHOT_DELAY_MS;
       timer = setTimeout(() => camera.wide({ trigger: 'ambient' }), delay);
     });
     return () => {

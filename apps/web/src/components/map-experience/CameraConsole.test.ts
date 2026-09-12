@@ -160,3 +160,40 @@ test('the clearance always exceeds the footprint, never merely equals it', () =>
     assert.ok(clearance > footprint, `clearance ${clearance} does not clear ${footprint}px`);
   }
 });
+
+test('a violence-constrained lens refuses spotlight and trace with nothing selected', () => {
+  const html = renderToStaticMarkup(
+    createElement(
+      CameraConsole,
+      consoleProps({ lens: { topicId: 'lynching', topicLabel: 'Lynching' } }),
+    ),
+  );
+  // Wide, push, orbit, tilt and flyToRecord survive; spotlight and trace are refused.
+  assert.equal(html.match(/disabled=""/g)?.length, 2);
+  assert.match(html, /does not use camera drama on records of harm/);
+});
+
+test('a lens topic unrelated to violence refuses nothing with no record selected', () => {
+  const html = renderToStaticMarkup(
+    createElement(
+      CameraConsole,
+      consoleProps({ lens: { topicId: 'civil-rights', topicLabel: 'Civil rights movement' } }),
+    ),
+  );
+  assert.equal(html.includes('disabled'), false);
+});
+
+test('a violence-constrained lens still refuses the record-level moves it already refused', () => {
+  // Belt and suspenders: a violence-adjacent SELECTED record inside a violence-constrained lens
+  // does not somehow refuse fewer moves than the record-only case already did.
+  const html = renderToStaticMarkup(
+    createElement(
+      CameraConsole,
+      consoleProps({
+        activeRecord: { kind: 'event', mapTone: 'massacre', displayName: 'Lynching of a man' },
+        lens: { topicId: 'lynching', topicLabel: 'Lynching' },
+      }),
+    ),
+  );
+  assert.equal(html.match(/disabled=""/g)?.length, 4);
+});

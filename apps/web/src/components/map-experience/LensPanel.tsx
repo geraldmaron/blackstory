@@ -27,6 +27,7 @@ import {
   MAP_KIND_FAMILY_ENCODING,
   type MapKindFamily,
 } from '../../lib/map-experience/kind-encoding';
+import { AREA_FILL_REFUSAL_NOTE } from '../../lib/map-experience/lens-composition';
 import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
 import { GradeDot } from './GradeDot';
 import { KindFamilyGlyph } from './KindGlyph';
@@ -102,6 +103,11 @@ export type LensPanelProps = {
    * carries, not a reader-facing "population" choice. */
   readonly layerMode: ExploreLayerMode;
   readonly onLayerModeChange: (mode: ExploreLayerMode) => void;
+  /** Composition dignity gate (repo-92n2.18): false while the active topic is about racial
+   * violence — an area fill would read the harm itself as density. Defaults to true so an
+   * omitted prop never silently disables the population layer for a caller that hasn't wired
+   * this yet. */
+  readonly areaFillPermitted?: boolean;
 
   readonly presence: readonly PresenceRow[];
 
@@ -139,6 +145,7 @@ export function LensPanel({
   onLayerToggle,
   layerMode,
   onLayerModeChange,
+  areaFillPermitted = true,
   presence,
   onShowLegend,
   onReset,
@@ -352,19 +359,29 @@ export function LensPanel({
               <span className="ds-lens__group-label">Population layer</span>
             </div>
             <div className="ds-lens__chips" role="group" aria-label="Population layer">
-              {POPULATION_LAYER_MODES.map((mode) => (
-                <button
-                  key={mode}
-                  type="button"
-                  className="ds-lens__chip"
-                  aria-pressed={layerMode === mode}
-                  onClick={() => onLayerModeChange(layerMode === mode ? 'off' : mode)}
-                >
-                  {POPULATION_LAYER_LABELS[mode]}
-                </button>
-              ))}
+              {POPULATION_LAYER_MODES.map((mode) => {
+                // "Off" always stays available — the composition gate refuses a fill, never the
+                // ability to turn one off.
+                const refusedByGate = mode !== 'off' && !areaFillPermitted;
+                return (
+                  <button
+                    key={mode}
+                    type="button"
+                    className="ds-lens__chip"
+                    aria-pressed={layerMode === mode}
+                    disabled={refusedByGate}
+                    onClick={() => onLayerModeChange(layerMode === mode ? 'off' : mode)}
+                  >
+                    {POPULATION_LAYER_LABELS[mode]}
+                  </button>
+                );
+              })}
             </div>
-            {layerMode === 'blackShare' || layerMode === 'blackChange' ? (
+            {!areaFillPermitted ? (
+              <p className="ds-lens__note" role="note">
+                {AREA_FILL_REFUSAL_NOTE}
+              </p>
+            ) : layerMode === 'blackShare' || layerMode === 'blackChange' ? (
               <p className="ds-lens__note">
                 Published Census decennial counts, not modeled story density. Record presence and
                 population share are two different measures and are not directly comparable: one

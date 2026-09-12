@@ -17,7 +17,7 @@ import {
   type SweepHandle,
 } from '../../../lib/map-experience/decade-transition';
 import { DECADE_LAYER_FADE_MS } from '../../map/decade-layer-transition';
-import { prefersReducedMotion } from '../../../lib/map-experience/camera-presets';
+import { useReducedMotion } from '../../../lib/motion/use-reduced-motion';
 import { placeLabelFor } from '../../../lib/map-experience/place-label';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
 import type { DecadeBar } from '../../../lib/map-experience/decade-density';
@@ -49,6 +49,13 @@ export function useStoryRunner(
    * previous render's value and leave two sweeps stepping the histogram against each other.
    */
   const sweepRef = useRef<SweepHandle | null>(null);
+
+  /** Live for the session (repo-92n2.18): `runChapter` below closes over this directly, with
+   * `reducedMotion` in its own dependency array — unlike `useAtlasCamera`'s stable, rarely-rebuilt
+   * `camera` memo (which needs a ref to avoid a stale closure), `runChapter` is an ordinary
+   * `useCallback` that is expected to be recreated when an input changes, so adding this as a real
+   * dependency is enough for a preference flip mid-session to reach the next chapter run. */
+  const reducedMotion = useReducedMotion();
 
   const stopSweep = useCallback(() => {
     sweepRef.current?.cancel();
@@ -117,7 +124,7 @@ export function useStoryRunner(
           zoom: chapter.camera.zoom,
           pitch: chapter.camera.pitch,
           bearing: chapter.camera.bearing,
-          duration: prefersReducedMotion() ? 0 : 1600,
+          duration: reducedMotion ? 0 : 1600,
         } as never);
       }
 
@@ -147,7 +154,7 @@ export function useStoryRunner(
             // Long enough for the clearing crossdissolve to land before the first decade
             // arrives, so the reader actually sees the empty country the chapter is about.
             // Under reduced motion the plate snaps clear and only the short beat is needed.
-            clearHoldMs: prefersReducedMotion()
+            clearHoldMs: reducedMotion
               ? SWEEP_CLEAR_HOLD_MS
               : DECADE_LAYER_FADE_MS + SWEEP_CLEAR_HOLD_MS,
             onDecade: setSweepDecade,
@@ -155,7 +162,7 @@ export function useStoryRunner(
             // dated at or before it and drop every undated one. All time is what the chapter is
             // arguing for, so the whole archive comes back.
             onDone: () => setSweepDecade(null),
-            reducedMotion: prefersReducedMotion(),
+            reducedMotion,
           });
         }
       } else {
@@ -166,6 +173,7 @@ export function useStoryRunner(
       camera,
       decadeBars,
       featureById,
+      reducedMotion,
       setSweepDecade,
       setLayers,
       setSelectedId,

@@ -173,3 +173,34 @@ test('copy carries no em dash', () => {
   const html = renderToStaticMarkup(createElement(LensPanel, lensProps()));
   assert.equal(html.includes('—'), false);
 });
+
+test('a violence-constrained lens disables the density/choropleth chips, not "off"', () => {
+  const html = renderToStaticMarkup(
+    createElement(LensPanel, lensProps({ areaFillPermitted: false, layerMode: 'off' })),
+  );
+  // "Off" stays enabled: the gate refuses a fill, never the ability to turn one off.
+  assert.doesNotMatch(html, /"Off"[^]*?disabled=""/);
+  const disabledCount = (html.match(/disabled=""/g) ?? []).length;
+  assert.equal(disabledCount, 2, 'blackShare and blackChange must both be disabled');
+});
+
+test('a permitted lens leaves every population-layer chip enabled', () => {
+  const html = renderToStaticMarkup(
+    createElement(LensPanel, lensProps({ areaFillPermitted: true })),
+  );
+  assert.equal(html.includes('disabled=""'), false);
+});
+
+test('the refusal reason renders as a visible paragraph, not only a title attribute', () => {
+  const html = renderToStaticMarkup(
+    createElement(LensPanel, lensProps({ areaFillPermitted: false })),
+  );
+  assert.match(html, /class="ds-lens__note"[^>]*>Not available while a topic/);
+});
+
+test('the ordinary Census comparability note gives way to the refusal note under the gate', () => {
+  const html = renderToStaticMarkup(
+    createElement(LensPanel, lensProps({ areaFillPermitted: false, layerMode: 'blackShare' })),
+  );
+  assert.doesNotMatch(html, /Published Census decennial counts/);
+});
