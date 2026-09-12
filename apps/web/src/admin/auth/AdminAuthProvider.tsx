@@ -50,7 +50,7 @@ export function AdminAuthProvider({ children }: { readonly children: ReactNode }
     void (async () => {
       const token = await getAdminIdToken();
       if (!token || canceled) return;
-      const response = await fetch('/api/auth/me', {
+      const response = await fetch('/admin/api/auth/me', {
         headers: { Authorization: `Bearer ${token}` },
       }).catch(() => null);
       if (canceled || !response?.ok) return;

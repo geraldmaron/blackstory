@@ -197,7 +197,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
         if (!response.ok) throw new Error(body.error ?? `Transition failed (${response.status})`);
         setStatus(`${actionLabel(action)} recorded`);
       } else {
-        const response = await fetch('/api/research-cases/bulk-transition', {
+        const response = await fetch('/admin/api/research-cases/bulk-transition', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
