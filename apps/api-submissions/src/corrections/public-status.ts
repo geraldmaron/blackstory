@@ -3,7 +3,7 @@
  * intake route. Never exposes spam scores, campaign detection, duplicate lists, or other
  * moderation-sensitive data.
  */
-import type { SubmissionModerationState } from '@repo/security';
+import { assertPublicProjectionSafe, type SubmissionModerationState } from '@repo/security';
 
 export type PublicCorrectionPhase = 'received' | 'under_review' | 'closed';
 
@@ -14,6 +14,9 @@ export type PublicCorrectionStatus = {
   readonly updatedAt: string;
   readonly appealAvailable: boolean;
   readonly classificationDispute: boolean;
+  /** Present only when the correction was declined. Plain-language, derived from the stored
+   * closure classification below — never a moderator's internal notes verbatim. */
+  readonly outcomeReason?: string;
 };
 
 export type PublicClosureReason = 'resolved' | 'rejected' | 'withdrawn';
@@ -39,6 +42,15 @@ export function mapModerationToPublicPhase(
   return 'under_review';
 }
 
+/** Plain-language decline reason a submitter sees for a closed correction. Only `rejected`
+ * is a decline (`resolved` published the change; `withdrawn` was the submitter's own
+ * action) — a description of the stored closure classification, not the moderator's
+ * internal notes, which never leave the moderation state machine. */
+export function describeOutcomeReason(closureReason?: PublicClosureReason): string | undefined {
+  if (closureReason !== 'rejected') return undefined;
+  return 'The record was not changed after review.';
+}
+
 export function isAppealEligible(input: {
   readonly phase: PublicCorrectionPhase;
   readonly closureReason?: PublicClosureReason;
@@ -60,7 +72,8 @@ export function buildPublicCorrectionStatus(input: {
   readonly appealCount: number;
 }): PublicCorrectionStatus {
   const phase = mapModerationToPublicPhase(input.moderationState, input.closureReason);
-  return {
+  const outcomeReason = describeOutcomeReason(input.closureReason);
+  const status: PublicCorrectionStatus = {
     phase,
     receiptCode: input.receiptCode,
     submittedAt: input.submittedAt,
@@ -72,5 +85,8 @@ export function buildPublicCorrectionStatus(input: {
       appealCount: input.appealCount,
     }),
     classificationDispute: input.classificationDispute,
+    ...(outcomeReason ? { outcomeReason } : {}),
   };
+  assertPublicProjectionSafe(status);
+  return status;
 }

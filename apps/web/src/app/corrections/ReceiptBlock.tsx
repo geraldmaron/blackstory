@@ -60,12 +60,9 @@ export function ReceiptBlock({ receiptCode, phase, submittedAt, updatedAt }: Rec
             title="Outcome"
             done={closed}
             /*
-             * Neither line promises a reason on this page. `PublicCorrectionStatus` carries the
-             * receipt, the phase and two timestamps, and nothing else: the outcome reason is not
-             * part of the public payload, so "see the reason below" pointed at a paragraph that
-             * does not exist. The commitment that a reason is given at all lives under the
-             * receipt, where it belongs, and is a promise about being told rather than about
-             * this page.
+             * This step stays a generic label ("Closed") on purpose — it is the timeline, not
+             * the explanation. `PublicCorrectionStatus.outcomeReason` carries the plain-language
+             * decline reason and renders separately in `CorrectionStatusPanel`, not here.
              */
             detail={closed ? 'Closed' : 'Published or declined'}
           />
