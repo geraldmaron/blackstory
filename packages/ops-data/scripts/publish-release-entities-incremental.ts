@@ -50,6 +50,7 @@ import {
   type SearchIndexUpsertRow,
 } from './lib/incremental-publish.ts';
 import { mergePublishStatusLintReports } from './lib/publish-status-linter.ts';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import {
   formatReleaseGraphAuditLog,
   rebuildReleaseGraphForRelease,
@@ -758,6 +759,7 @@ async function main(): Promise<void> {
     console.log(
       `INCREMENTAL PUBLISH | committed: pending | published: ${prepared.length} | left_pending: ${pendingAfter}`,
     );
+    remindToRepublishCatalogArtifacts(prepared.length);
   } catch (error) {
     try {
       await client.query('ROLLBACK');
