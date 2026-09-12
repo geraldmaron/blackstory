@@ -278,19 +278,85 @@ export function dropRepeatedPropertyHeader(text: string, displayName: string): s
  * opens is too short to be narrative — and in both cases the search continues to the next
  * occurrence back instead of abandoning the section.
  */
+/**
+ * OCR on these scans routinely swaps a handful of look-alike characters rather than dropping a
+ * heading outright (24 of 25 nominations flagged as missing section 8 actually carry
+ * it, just under a heading the exact-text patterns above no longer recognized). The damage takes
+ * a few recurring shapes: spacing pulled apart or run together, a letter swapped for a
+ * similar-looking digit or vice versa (S/5, O/0, I/1/L, B/8, G/6, Z/2), and a word split across a
+ * line wrap. Confined to the letters that actually appear in the headings below, not a general
+ * near-match, so it cannot turn an unrelated word into "SIGNIFICANCE".
+ */
+const OCR_CONFUSABLE: Readonly<Record<string, string>> = {
+  o: 'o0q',
+  i: 'i1l',
+  s: 's5',
+  b: 'b8',
+  g: 'g6',
+  z: 'z2',
+};
+
+/**
+ * Regex source matching `word` letter by letter, each letter accepting its OCR-confusable twin
+ * and separated from its neighbor by optional whitespace or a hyphen. That separator is what
+ * tolerates spacing damage in both directions — "S T A T E M E N T" (letters pulled apart) and a
+ * line-wrap hyphen splitting the word across two lines ("STATE-\nMENT") — since `\s` also matches
+ * the newline between them.
+ */
+function fuzzyWord(word: string): string {
+  return word
+    .split('')
+    .map((letter) => {
+      const confusable = OCR_CONFUSABLE[letter];
+      return confusable ? `[${confusable}]` : letter;
+    })
+    .join(String.raw`[\s-]*`);
+}
+
+/** Joins fuzzy words with the same whitespace/hyphen tolerance used within a word. */
+function fuzzyPhrase(words: readonly string[]): string {
+  return words.map(fuzzyWord).join(String.raw`[\s-]*`);
+}
+
+/**
+ * The section digit's own OCR-confusable twin. Only "8" is given one — it is the digit the flagged nominations
+ * show, and the only substitution actually implicated. Widening this to every digit would let
+ * an arbitrary numbered list item at a line start pass as a section header.
+ */
+const SECTION_DIGIT: Readonly<Record<string, string>> = { '7': '7', '8': '[8b]', '9': '9' };
+
+/**
+ * A narrative heading must open its own line — allowing only the scan's own margin whitespace
+ * ahead of it — so a body-text sentence that happens to mention "the statement of significance"
+ * mid-paragraph is never mistaken for the heading that opens section 8. Requires the `m` flag so
+ * that `^` means "line start", not "start of the whole document".
+ */
+function headingPattern(alternatives: readonly string[]): RegExp {
+  return new RegExp(String.raw`^[ ]{0,12}(?:${alternatives.join('|')})`, 'gimu');
+}
+
 const NARRATIVE_HEADINGS: readonly { readonly section: string; readonly pattern: RegExp }[] = [
   {
     section: '7',
-    pattern: /(?:\b7\s*[.)]\s*(?:NARRATIVE\s+)?DESCRIPTION|NARRATIVE\s+DESCRIPTION)/giu,
+    pattern: headingPattern([
+      String.raw`${SECTION_DIGIT['7']}\s*[.)]\s*(?:${fuzzyWord('narrative')}[\s-]*)?${fuzzyWord('description')}`,
+      String.raw`${fuzzyWord('narrative')}[\s-]*${fuzzyWord('description')}`,
+    ]),
   },
   {
     section: '8',
-    pattern:
-      /(?:\b8\s*[.)]\s*(?:NARRATIVE\s+)?STATEMENT\s+OF\s+SIGNIFICANCE|NARRATIVE\s+STATEMENT\s+OF\s+SIGNIFICANCE|STATEMENT\s+OF\s+SIGNIFICANCE)/giu,
+    pattern: headingPattern([
+      String.raw`${SECTION_DIGIT['8']}\s*[.)]\s*(?:${fuzzyWord('narrative')}[\s-]*)?${fuzzyPhrase(['statement', 'of', 'significance'])}`,
+      String.raw`${fuzzyWord('narrative')}[\s-]*${fuzzyPhrase(['statement', 'of', 'significance'])}`,
+      fuzzyPhrase(['statement', 'of', 'significance']),
+    ]),
   },
   {
     section: '9',
-    pattern: /(?:\b9\s*[.)]\s*MAJOR\s+BIBLIOGRAPH|MAJOR\s+BIBLIOGRAPHICAL)/giu,
+    pattern: headingPattern([
+      String.raw`${SECTION_DIGIT['9']}\s*[.)]\s*${fuzzyPhrase(['major', 'bibliograph'])}`,
+      fuzzyPhrase(['major', 'bibliographical']),
+    ]),
   },
 ];
 
