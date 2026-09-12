@@ -193,7 +193,7 @@ export default function StoryReviewPage() {
           setSeedHandoff(JSON.stringify(body.seedHandoff, null, 2));
         }
       } else {
-        const response = await fetch('/api/stories/packets/review-bulk', {
+        const response = await fetch('/admin/api/stories/packets/review-bulk', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,

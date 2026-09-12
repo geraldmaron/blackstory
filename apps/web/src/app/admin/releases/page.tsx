@@ -88,7 +88,7 @@ export default function ReleasesPage() {
         setError('Sign in required');
         return;
       }
-      const response = await fetch('/api/releases/stage', {
+      const response = await fetch('/admin/api/releases/stage', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
