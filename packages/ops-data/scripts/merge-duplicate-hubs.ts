@@ -3,6 +3,14 @@
  *
  * Default pair set: ent_sncc_001→ent_sncc_org_001, ent_sclc_001→ent_sclc_org_001.
  *
+ * The relationship/participation cleanup deletes are scoped to the rows this merge's own
+ * endpoint rewrite just touched (see the `RETURNING id` capture in `rewriteRelationshipsForPair`
+ * and `rewriteEventParticipationForPair`). That mirrors the admin console's merge path
+ * (`applyEntityMerge` in apps/web/src/admin/lib/entity-merge.ts), which only ever acts on rows
+ * connected to the entities being merged and otherwise leaves the table alone — a self-loop or
+ * duplicate edge that predates the merge, or belongs to an unrelated pair of entities, is never a
+ * deletion candidate here.
+ *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a
  *   export DATABASE_SSL=1
@@ -13,6 +21,7 @@
  *   DRY_RUN=0 MERGE_DUPLICATE_HUBS_APPLY=1 node --conditions development --import tsx \
  *     packages/ops-data/scripts/merge-duplicate-hubs.ts
  */
+import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import {
   buildMergeStatePayload,
@@ -115,7 +124,7 @@ async function loadEdgeCoverage(client: pg.PoolClient): Promise<EdgeCoverageSnap
   };
 }
 
-async function rewriteRelationshipsForPair(
+export async function rewriteRelationshipsForPair(
   client: pg.PoolClient,
   pair: HubMergePair,
 ): Promise<{
@@ -124,29 +133,39 @@ async function rewriteRelationshipsForPair(
   readonly deletedSelfLoops: number;
   readonly deletedDuplicates: number;
 }> {
-  const updatedFrom =
-    (
-      await client.query(
-        `UPDATE bb_canonical.entity_relationships
+  const touchedIds = new Set<string>();
+
+  const fromUpdate = await client.query<{ id: string }>(
+    `UPDATE bb_canonical.entity_relationships
        SET from_entity_id = $2, updated_at = now()
-       WHERE from_entity_id = $1`,
-        [pair.absorbedId, pair.survivorId],
-      )
-    ).rowCount ?? 0;
-  const updatedTo =
-    (
-      await client.query(
-        `UPDATE bb_canonical.entity_relationships
+       WHERE from_entity_id = $1
+       RETURNING id`,
+    [pair.absorbedId, pair.survivorId],
+  );
+  for (const row of fromUpdate.rows) touchedIds.add(row.id);
+  const updatedFrom = fromUpdate.rowCount ?? 0;
+
+  const toUpdate = await client.query<{ id: string }>(
+    `UPDATE bb_canonical.entity_relationships
        SET to_entity_id = $2, updated_at = now()
-       WHERE to_entity_id = $1`,
-        [pair.absorbedId, pair.survivorId],
-      )
-    ).rowCount ?? 0;
+       WHERE to_entity_id = $1
+       RETURNING id`,
+    [pair.absorbedId, pair.survivorId],
+  );
+  for (const row of toUpdate.rows) touchedIds.add(row.id);
+  const updatedTo = toUpdate.rowCount ?? 0;
+
+  // Only rows this merge's own endpoint rewrite just touched (an endpoint that used to be the
+  // absorbed entity) are eligible for cleanup. A self-loop or duplicate edge anywhere else in the
+  // table is left alone, same as the admin console's merge path would leave it.
+  const touched = [...touchedIds];
   const deletedSelfLoops =
     (
       await client.query(
         `DELETE FROM bb_canonical.entity_relationships
-       WHERE from_entity_id = to_entity_id`,
+       WHERE from_entity_id = to_entity_id
+         AND id = ANY($1::text[])`,
+        [touched],
       )
     ).rowCount ?? 0;
   const deletedDuplicates =
@@ -157,13 +176,15 @@ async function rewriteRelationshipsForPair(
        WHERE r1.from_entity_id = r2.from_entity_id
          AND r1.to_entity_id = r2.to_entity_id
          AND r1.relationship_type = r2.relationship_type
-         AND r1.id > r2.id`,
+         AND r1.id > r2.id
+         AND (r1.id = ANY($1::text[]) OR r2.id = ANY($1::text[]))`,
+        [touched],
       )
     ).rowCount ?? 0;
   return { updatedFrom, updatedTo, deletedSelfLoops, deletedDuplicates };
 }
 
-async function rewriteEventParticipationForPair(
+export async function rewriteEventParticipationForPair(
   client: pg.PoolClient,
   pair: HubMergePair,
 ): Promise<{
@@ -172,29 +193,39 @@ async function rewriteEventParticipationForPair(
   readonly deletedSelfLoops: number;
   readonly deletedDuplicates: number;
 }> {
-  const updatedParticipant =
-    (
-      await client.query(
-        `UPDATE bb_canonical.event_participation
+  const touchedIds = new Set<string>();
+
+  const participantUpdate = await client.query<{ id: string }>(
+    `UPDATE bb_canonical.event_participation
        SET participant_id = $2, updated_at = now()
-       WHERE participant_id = $1`,
-        [pair.absorbedId, pair.survivorId],
-      )
-    ).rowCount ?? 0;
-  const updatedEvent =
-    (
-      await client.query(
-        `UPDATE bb_canonical.event_participation
+       WHERE participant_id = $1
+       RETURNING id`,
+    [pair.absorbedId, pair.survivorId],
+  );
+  for (const row of participantUpdate.rows) touchedIds.add(row.id);
+  const updatedParticipant = participantUpdate.rowCount ?? 0;
+
+  const eventUpdate = await client.query<{ id: string }>(
+    `UPDATE bb_canonical.event_participation
        SET event_id = $2, updated_at = now()
-       WHERE event_id = $1`,
-        [pair.absorbedId, pair.survivorId],
-      )
-    ).rowCount ?? 0;
+       WHERE event_id = $1
+       RETURNING id`,
+    [pair.absorbedId, pair.survivorId],
+  );
+  for (const row of eventUpdate.rows) touchedIds.add(row.id);
+  const updatedEvent = eventUpdate.rowCount ?? 0;
+
+  // Same scoping as the relationship cleanup above: only rows this merge's own rewrite touched
+  // are eligible for deletion, so a pre-existing self-loop or duplicate elsewhere in the table
+  // survives.
+  const touched = [...touchedIds];
   const deletedSelfLoops =
     (
       await client.query(
         `DELETE FROM bb_canonical.event_participation
-       WHERE event_id = participant_id`,
+       WHERE event_id = participant_id
+         AND id = ANY($1::text[])`,
+        [touched],
       )
     ).rowCount ?? 0;
   const deletedDuplicates =
@@ -205,7 +236,9 @@ async function rewriteEventParticipationForPair(
        WHERE ep1.event_id = ep2.event_id
          AND ep1.participant_id = ep2.participant_id
          AND ep1.role = ep2.role
-         AND ep1.id > ep2.id`,
+         AND ep1.id > ep2.id
+         AND (ep1.id = ANY($1::text[]) OR ep2.id = ANY($1::text[]))`,
+        [touched],
       )
     ).rowCount ?? 0;
   return { updatedParticipant, updatedEvent, deletedSelfLoops, deletedDuplicates };
@@ -460,7 +493,10 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
+if (isDirectRun) {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}
