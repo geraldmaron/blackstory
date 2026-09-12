@@ -6,6 +6,7 @@ import test from 'node:test';
 import {
   documentKey,
   extractReferenceLinks,
+  isDocumentLikeUrl,
   planReferenceHops,
   relevanceScore,
   subjectTokens,
@@ -179,4 +180,103 @@ test('planReferenceHops follows nothing once the budget is spent', () => {
     remainingFetches: 0,
   });
   assert.equal(plan.follow.length, 0);
+});
+
+test('relevanceScore counts a match found only in the link target path, not the anchor or context', () => {
+  // A bare anchor on an unhelpful page (a footer "read more") still identifies the subject when
+  // the destination's own slug names it — the target's path/title is a signal in its own right,
+  // not only a tiebreaker on top of the anchor.
+  const tokens = subjectTokens(SUBJECT);
+  const bareAnchor = candidate('https://loc.gov/item/tri-state-bank-memphis', 'read more', '');
+  assert.equal(
+    relevanceScore(bareAnchor, tokens),
+    3,
+    'state, bank, and memphis all live in the URL slug',
+  );
+});
+
+test('planReferenceHops rejects a single place-token match under the new relevance floor', () => {
+  // The failure this threshold targets: a link whose only match is the subject's own place name
+  // recurring in a government site's boilerplate ("Ash Grove" in a city welcome page), not
+  // anything that names the subject itself. One token used to be enough to spend a fetch.
+  const plan = planReferenceHops({
+    candidates: [
+      candidate(
+        'https://ashgrove.example.gov/welcome',
+        'Welcome to Ash Grove',
+        'City services for Ash Grove residents',
+      ),
+    ],
+    subject: { displayName: 'Berry Cemetery', city: 'Ash Grove', state: 'Missouri' },
+    visited: new Set(),
+    remainingFetches: 10,
+  });
+  assert.equal(plan.follow.length, 0);
+  assert.equal(plan.rejected[0]?.reason, 'not_relevant');
+});
+
+test('isDocumentLikeUrl keeps PDFs, item/article/record pages, and marker detail pages', () => {
+  assert.ok(isDocumentLikeUrl('https://mht.maryland.gov/documents/nr-pdfs/berry-cemetery.pdf'));
+  assert.ok(isDocumentLikeUrl('https://loc.gov/item/tri-state-bank-memphis/'));
+  assert.ok(isDocumentLikeUrl('https://nps.gov/articles/berry-cemetery-history.htm'));
+  assert.ok(
+    isDocumentLikeUrl('https://hmdb.org/m.asp?m=123'),
+    'hmdb marker detail pages use m.asp',
+  );
+});
+
+test('isDocumentLikeUrl drops navigation, index, search, login, share, and pagination links', () => {
+  assert.equal(isDocumentLikeUrl('https://covingtonky.gov/police-department/staff'), false);
+  assert.equal(isDocumentLikeUrl('https://ashgrove.example.gov/welcome'), false);
+  assert.equal(
+    isDocumentLikeUrl('https://ashgrove.example.gov/'),
+    false,
+    'bare root is a home page',
+  );
+  assert.equal(isDocumentLikeUrl('https://hmdb.org/results.asp?county=Shelby'), false);
+  assert.equal(isDocumentLikeUrl('https://example.gov/login'), false);
+  assert.equal(
+    isDocumentLikeUrl('https://example.gov/articles?page=2'),
+    false,
+    'a bare listing index has no slug after it, and the query is pagination',
+  );
+  assert.equal(
+    isDocumentLikeUrl('https://example.gov/find?s=berry-cemetery'),
+    false,
+    'an in-site search query',
+  );
+  assert.ok(
+    isDocumentLikeUrl('https://example.gov/articles/berry-cemetery?utm_source=newsletter'),
+    'a tracking parameter on a real article slug does not make the destination a nav page',
+  );
+});
+
+test('planReferenceHops rejects a relevant-scoring navigation link and keeps a relevant document link', () => {
+  // The HTML a real walk would see: a staff-directory nav link that happens to name the subject
+  // in its anchor (so it clears the relevance floor on its own), next to an NRHP nomination PDF.
+  // Only the document-shape gate tells them apart.
+  const html = `
+    <header>City of Ash Grove — services for Berry Cemetery visitors</header>
+    <a href="/staff">Staff directory for Berry Cemetery Historic District</a>
+    <a href="https://mht.maryland.gov/documents/nr-pdfs/berry-cemetery-nomination.pdf">
+      Berry Cemetery National Register nomination
+    </a>
+  `;
+  const candidates = extractReferenceLinks(html, 'https://ashgrove.example.gov/parks');
+  const plan = planReferenceHops({
+    candidates,
+    subject: { displayName: 'Berry Cemetery', city: 'Ash Grove', state: 'Missouri' },
+    visited: new Set(),
+    remainingFetches: 10,
+  });
+
+  const navRejection = plan.rejected.find((r) => r.candidate.url.includes('/staff'));
+  assert.equal(
+    navRejection?.reason,
+    'navigational',
+    'a staff directory is site navigation, not a source about the cemetery, even though it names it',
+  );
+
+  const kept = plan.follow.find((hop) => hop.candidate.url.includes('nr-pdfs'));
+  assert.ok(kept, 'the NRHP nomination PDF is a document about the subject and should be followed');
 });
