@@ -1,8 +1,9 @@
 /**
  * POST /api/catalog/bulk-decision — bounded bulk decisions on published catalog entities
- * (max 50). Records flag_for_retraction / needs_review / clear_flag only — never mutates the
- * entity or a release. The release builder reads the latest decision per entity; the existing
- * signed-manifest privileged-apply flow is what actually changes what's live.
+ * (max CATALOG_BULK_DECISION_LIMIT, one set-based statement per request). Records
+ * flag_for_retraction / needs_review / clear_flag only — never mutates the entity or a release.
+ * The release builder reads the latest decision per entity; the existing signed-manifest
+ * privileged-apply flow is what actually changes what's live.
  */
 import { authorizeAdminRequest, authErrorResponse } from '../../../../../admin/auth/request-auth';
 import {
