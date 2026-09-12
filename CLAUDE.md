@@ -116,6 +116,25 @@ to merge). This is enforced server-side, not just a convention.
 - If you're unsure whether a change belongs on `staging` alone or should also go to `main`,
   default to `staging` and ask.
 
+## Republishing the CDN catalog after a bb_public write
+
+A direct write to `bb_public.release_entities` / `bb_public.search_index` leaves the published
+`entities.json` / `search-index.json` stale — the read-side guard only compares `releaseId`, which
+an in-place correction does not change. Rebuild the graph, then republish **locally**:
+
+```bash
+cd apps/web && set -a && . ./.env.local && set +a && node --conditions development --import tsx ../../packages/ops-data/scripts/publish-release-catalog-artifacts.ts
+```
+
+**Then stop. Do not run `gh workflow run publish-release-catalog-artifacts.yml` afterwards.** The
+workflow runs that same script against the same watermark
+(`bb_public.release_catalog_publish_watermark`), so once the local run has consumed it the
+dispatch reports `up to date — skipping`: CI minutes spent to reach a no-op. On 2026-09-12 there
+were eight such dispatches in one day, several of them no-ops.
+
+The workflow is the right entry point only when there is no local environment to run it from. Its
+daily cron is forgetting-insurance, a ~24h worst-case bound, not the freshness mechanism.
+
 ## BlackStory research skills
 
 Research playbooks live in `.claude/skills/blackstory/`. CLI pointers load a verb from

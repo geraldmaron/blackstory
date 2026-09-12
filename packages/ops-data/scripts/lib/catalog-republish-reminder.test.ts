@@ -16,12 +16,23 @@ function captureConsoleLog(fn: () => void): readonly string[] {
   return lines;
 }
 
-test('remindToRepublishCatalogArtifacts prints the workflow-dispatch command when rows changed', () => {
+test('remindToRepublishCatalogArtifacts prints the local republish command when rows changed', () => {
   const lines = captureConsoleLog(() => remindToRepublishCatalogArtifacts(42));
   assert.ok(
-    lines.some((line) => line.includes('gh workflow run publish-release-catalog-artifacts.yml')),
+    lines.some((line) => line.includes('publish-release-catalog-artifacts.ts')),
+    'prints the local script',
   );
   assert.ok(lines.some((line) => line.includes('STALE')));
+});
+
+test('remindToRepublishCatalogArtifacts does not ask for a workflow dispatch', () => {
+  // The workflow runs this same script against the same watermark, so a dispatch after a local
+  // publish spends CI minutes to reach "up to date — skipping".
+  const lines = captureConsoleLog(() => remindToRepublishCatalogArtifacts(42));
+  assert.ok(
+    !lines.some((line) => line.includes('gh workflow run')),
+    'never prints a gh workflow run command',
+  );
 });
 
 test('remindToRepublishCatalogArtifacts prints nothing when nothing changed', () => {

@@ -69,7 +69,11 @@
  *     --import tsx packages/ops-data/scripts/backfill-search-facets-projection.ts
  *
  * THEN REPUBLISH THE ARTIFACTS. Writing the rows does not finish the job:
- *   gh workflow run publish-release-catalog-artifacts.yml --ref main
+ *   cd apps/web && set -a && . ./.env.local && set +a \
+ *     && node --conditions development --import tsx \
+ *        ../../packages/ops-data/scripts/publish-release-catalog-artifacts.ts
+ * Do not also dispatch publish-release-catalog-artifacts.yml: it runs this same script against
+ * the same watermark and will report "up to date — skipping".
  * Production serves prebuilt entities.json / search-index.json from the CDN
  * (`APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL`), and the guard that is supposed to stop a stale
  * artifact only checks that its releaseId matches the active-release pointer. A backfill does
