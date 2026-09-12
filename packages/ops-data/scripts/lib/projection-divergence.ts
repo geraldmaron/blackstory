@@ -23,10 +23,26 @@
  * against and they are deliberately absent. `facets.summary` is absent for the same reason
  * `toSearchIndexRow` omits it: an index-size decision, not drift.
  *
+ * A SECOND KIND OF DRIFT, added for repo-rm2y: a field can agree with every copy of itself and
+ * still be stale, because all of them were written from a version of the record that no longer
+ * exists. `notabilityBasis`, `notabilityLabels` and `researchCoverage` are DERIVED from the
+ * record's own claims, and five scripts rewrite `projection.claims` in place without recomputing
+ * any of them — which is how three records ended up publishing an inclusion reason whose evidence
+ * pointed at claim ids the record no longer carried. The `builder.*` checks below recompute those
+ * three from the projection and report a row the recompute would move, so the audit's existing
+ * exit-code-1 contract covers staleness as well as disagreement.
+ *
  * READ-ONLY: this module opens no write path.
  */
 import { isDeepStrictEqual } from 'node:util';
+import { computeReleaseResearchCoverage } from '@repo/domain';
 import type { Pool, PoolClient } from 'pg';
+import {
+  notabilityBasisIsConverged,
+  notabilityLabelsForBasis,
+  toBasisRecords,
+  toClaimProjections,
+} from './notability-basis-resync.ts';
 
 type Rec = Readonly<Record<string, unknown>>;
 
@@ -137,6 +153,68 @@ function facetArrayCheck(facetKey: string, projectionKey: string): DivergenceChe
     derivedValue: (row) => asArray(asRecord(row.si_facets)[facetKey]),
   };
 }
+
+/**
+ * The three fields the release builder DERIVES from a record's claims. Unlike every check above,
+ * these do not compare two stores: both sides come from the projection, and the question is
+ * whether what is published is still what the record's own claims say.
+ *
+ * The rule is not restated here. `notabilityBasisIsConverged` is the ratified merge plus the two
+ * staleness tests from `lib/notability-basis-resync.ts` — the same code the resync writes with, so
+ * a green audit and a no-op resync cannot disagree — and `computeReleaseResearchCoverage` is the
+ * production function, not a copy of its grading rules.
+ *
+ * A row the rule declines to judge (no claims, or nothing the builder can recompute — the
+ * `sundown_crescent_springs_kentucky` research gap) is reported as converged rather than as drift:
+ * an unanswerable row is a research problem, not a resync problem.
+ *
+ * `builder.notabilityLabels` is the tightest of the three and needs no recompute at all: the
+ * labels are the rubric text for the record's OWN published basis criteria, so a mismatch means
+ * one of the two was written and the other was not. Nine rows in the release fail it today,
+ * carrying the pre-revision `court_precedent` sentence beside a `court_precedent` basis record —
+ * stale prose that `EntityRecordRoom` prints to a reader as the inclusion basis.
+ */
+export const BUILDER_DIVERGENCE_CHECKS: readonly DivergenceCheck[] = [
+  {
+    field: 'builder.notabilityBasis',
+    needsSearchIndex: false,
+    projectionValue: () => true,
+    derivedValue: (row) => {
+      const projection = asRecord(row.projection);
+      return notabilityBasisIsConverged({
+        entityId: row.entity_id,
+        kind: typeof projection.kind === 'string' ? projection.kind : (row.kind ?? ''),
+        displayName:
+          typeof projection.displayName === 'string'
+            ? projection.displayName
+            : (row.display_name ?? ''),
+        summary: typeof projection.summary === 'string' ? projection.summary : (row.summary ?? ''),
+        claims: toClaimProjections(projection.claims),
+        publishedBasis: toBasisRecords(projection.notabilityBasis),
+        publishedLabels: asStrings(projection.notabilityLabels),
+        hasTaxonomyLabels: false,
+        hasSearchIndex: false,
+      });
+    },
+  },
+  {
+    field: 'builder.notabilityLabels',
+    needsSearchIndex: false,
+    projectionValue: (projection) =>
+      [...notabilityLabelsForBasis(toBasisRecords(projection.notabilityBasis))].sort(),
+    derivedValue: (row) => [...asStrings(asRecord(row.projection).notabilityLabels)].sort(),
+  },
+  {
+    field: 'builder.researchCoverage',
+    needsSearchIndex: false,
+    projectionValue: (projection) =>
+      computeReleaseResearchCoverage(
+        toClaimProjections(projection.claims),
+        typeof projection.summary === 'string' ? projection.summary : '',
+      ),
+    derivedValue: (row) => orNull(asRecord(row.projection).researchCoverage),
+  },
+];
 
 /**
  * Every derived copy, paired with the projection value it is supposed to equal.
@@ -277,10 +355,34 @@ export const MISSING_PROJECTION_FIELD = 'projection.missing';
 export const MISSING_SEARCH_INDEX_FIELD = 'search_index.missing';
 
 /**
+ * Which question is being asked of a row.
+ *
+ * `'copies'` — the original one: do this row's derived copies agree with its projection? That is
+ * what a post-write check wants to know, because it answers "did my write land everywhere", and a
+ * row whose copies all agree has nothing left for the writer to do.
+ *
+ * `'all'` — that, plus the `builder.*` checks: is what the projection publishes still what the
+ * record's own claims say? A row can pass `'copies'` and fail this, because every copy was written
+ * from a version of the record that no longer exists. That is a research/resync question, not a
+ * failed write, so it belongs to the standing audit (`audit-projection-divergence.ts`, which asks
+ * for `'all'`) rather than to the publisher's post-write assert.
+ */
+export type ProjectionDivergenceScope = 'copies' | 'all';
+
+export function checksForScope(scope: ProjectionDivergenceScope): readonly DivergenceCheck[] {
+  return scope === 'all'
+    ? [...PROJECTION_DIVERGENCE_CHECKS, ...BUILDER_DIVERGENCE_CHECKS]
+    : PROJECTION_DIVERGENCE_CHECKS;
+}
+
+/**
  * The fields on which this row's derived copies disagree with its projection. Pure: this is the
  * whole comparison, and the database access below only feeds it.
  */
-export function divergentFieldsForRow(row: ProjectionDivergenceDbRow): readonly string[] {
+export function divergentFieldsForRow(
+  row: ProjectionDivergenceDbRow,
+  scope: ProjectionDivergenceScope = 'copies',
+): readonly string[] {
   const projection = asRecord(row.projection);
   // An empty projection is a broken row rather than a field-by-field disagreement; readers get
   // nothing at all from it, and listing eleven fields would bury that.
@@ -288,7 +390,7 @@ export function divergentFieldsForRow(row: ProjectionDivergenceDbRow): readonly 
 
   const fields: string[] = [];
   if (!row.si_present) fields.push(MISSING_SEARCH_INDEX_FIELD);
-  for (const check of PROJECTION_DIVERGENCE_CHECKS) {
+  for (const check of checksForScope(scope)) {
     if (check.needsSearchIndex && !row.si_present) continue;
     if (!isDeepStrictEqual(check.projectionValue(projection), check.derivedValue(row))) {
       fields.push(check.field);
@@ -302,13 +404,14 @@ export function summarizeProjectionDivergence(
   releaseId: string,
   rows: readonly ProjectionDivergenceDbRow[],
   sampleLimit: number = DEFAULT_DIVERGENCE_SAMPLE_LIMIT,
+  scope: ProjectionDivergenceScope = 'copies',
 ): ProjectionDivergenceReport {
   const counts = new Map<string, { count: number; sampleEntityIds: string[] }>();
   let divergentRows = 0;
   let totalDivergences = 0;
 
   for (const row of rows) {
-    const fields = divergentFieldsForRow(row);
+    const fields = divergentFieldsForRow(row, scope);
     if (fields.length === 0) continue;
     divergentRows += 1;
     totalDivergences += fields.length;
@@ -358,7 +461,19 @@ const PROJECTION_DIVERGENCE_SQL = `
    ORDER BY re.entity_id
 `;
 
-export async function resolveActiveReleaseId(client: Pool | PoolClient): Promise<string> {
+/**
+ * Widened to a structural query surface rather than `Pool | PoolClient` so the catalog write
+ * scripts, which hold a bare `pg.Client`, can resolve the release without a cast or a second copy
+ * of this one-line query.
+ */
+export type ActiveReleaseClient = {
+  query<T extends Record<string, unknown> = Record<string, unknown>>(
+    text: string,
+    params?: readonly unknown[],
+  ): Promise<{ readonly rows: T[] }>;
+};
+
+export async function resolveActiveReleaseId(client: ActiveReleaseClient): Promise<string> {
   const result = await client.query<{ release_id: string }>(
     'SELECT release_id FROM bb_public.v_active_release_id',
   );
@@ -386,6 +501,9 @@ export type ProjectionDivergenceOptions = {
   /** Defaults to every row in the release. */
   readonly ids?: readonly string[];
   readonly sampleLimit?: number;
+  /** Defaults to `'copies'`, so a post-write check keeps answering the question it was written
+   * for. The standing audit CLI asks for `'all'`. */
+  readonly scope?: ProjectionDivergenceScope;
 };
 
 export async function auditProjectionDivergence(
@@ -394,7 +512,7 @@ export async function auditProjectionDivergence(
 ): Promise<ProjectionDivergenceReport> {
   const releaseId = options.releaseId ?? (await resolveActiveReleaseId(client));
   const rows = await loadProjectionDivergenceRows(client, releaseId, options.ids);
-  return summarizeProjectionDivergence(releaseId, rows, options.sampleLimit);
+  return summarizeProjectionDivergence(releaseId, rows, options.sampleLimit, options.scope);
 }
 
 export function formatProjectionDivergenceReport(

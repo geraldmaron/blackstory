@@ -14,6 +14,13 @@
  * itself lives in `lib/projection-divergence.ts` and is shared with the post-write check the
  * publisher calls, so an audit result and a gate verdict cannot drift apart.
  *
+ * It also measures a second kind of staleness (repo-rm2y): `builder.notabilityBasis`,
+ * `builder.notabilityLabels` and `builder.researchCoverage` recompute those three derived fields
+ * from the record's own claims and report a row the recompute would move. Every copy of such a
+ * field can agree and all of them still be wrong, because all of them were written before an
+ * in-place claim edit. `resync-notability-basis.ts` and `resync-research-coverage.ts` are what
+ * clear those two counts.
+ *
  * READ-ONLY: SELECT only, no write path, no `--apply`.
  *
  * EXIT CODE is 1 when any field diverges, so this can stand in a check suite. `--allow` reports
@@ -69,6 +76,11 @@ async function main(): Promise<void> {
       ...(RELEASE.length > 0 ? { releaseId: RELEASE } : {}),
       ...(IDS.length > 0 ? { ids: IDS } : {}),
       ...(Number.isFinite(SAMPLES) && SAMPLES > 0 ? { sampleLimit: SAMPLES } : {}),
+      // repo-rm2y: the standing gate asks the wider question. `'all'` adds the `builder.*` checks
+      // — is what the projection publishes still what the record's own claims say — on top of the
+      // copy-vs-copy comparison. A row can have every copy in agreement and still be stale,
+      // because they were all written from a version of the record that no longer exists.
+      scope: 'all' as const,
     });
 
     console.log('=== PROJECTION vs DERIVED COPIES ===');

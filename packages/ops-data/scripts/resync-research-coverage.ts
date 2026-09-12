@@ -37,13 +37,10 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  computeReleaseResearchCoverage,
-  type ReleaseClaimProjection,
-  type ReleaseResearchCoverage,
-} from '@repo/domain';
+import { computeReleaseResearchCoverage, type ReleaseResearchCoverage } from '@repo/domain';
 import pg from 'pg';
 import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
+import { toClaimProjections } from './lib/notability-basis-resync.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
@@ -58,36 +55,10 @@ type Row = {
   readonly release_id: string;
   readonly display_name: string;
   readonly summary: string | null;
-  readonly claims: unknown;
   readonly projection: Record<string, unknown>;
   /** `null` when the entity has no search_index row at all — nothing to reconcile. */
   readonly facet_coverage: string | null;
 };
-
-/**
- * The claim fields `computeReleaseResearchCoverage` reads, recovered from the published JSONB.
- * A claim missing `citationSource` normalizes to '' (uncited) rather than being dropped, so the
- * count this pass produces matches what the builder would produce from the same claim set.
- */
-function toClaimProjections(claims: unknown): ReleaseClaimProjection[] {
-  if (!Array.isArray(claims)) return [];
-  return claims.map((raw, index) => {
-    const claim = (raw ?? {}) as Record<string, unknown>;
-    const href = claim.citationHref;
-    return {
-      id: typeof claim.id === 'string' ? claim.id : `claim_${index}`,
-      predicate: typeof claim.predicate === 'string' ? claim.predicate : '',
-      object: typeof claim.object === 'string' ? claim.object : '',
-      confidenceLevel:
-        claim.confidenceLevel === 'high' || claim.confidenceLevel === 'medium'
-          ? claim.confidenceLevel
-          : 'low',
-      citationSource: typeof claim.citationSource === 'string' ? claim.citationSource : '',
-      ...(typeof href === 'string' && href.length > 0 ? { citationHref: href } : {}),
-      citationLabel: typeof claim.citationLabel === 'string' ? claim.citationLabel : '',
-    };
-  });
-}
 
 type Change = {
   readonly entityId: string;
@@ -104,7 +75,7 @@ async function main(): Promise<void> {
 
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
   const res = await pool.query<Row>(
-    `SELECT e.entity_id, e.release_id, e.display_name, e.summary, e.claims, e.projection,
+    `SELECT e.entity_id, e.release_id, e.display_name, e.summary, e.projection,
             s.facets->>'researchCoverage' AS facet_coverage
        FROM bb_public.release_entities e
        JOIN bb_public.active_release a ON a.release_id = e.release_id
@@ -122,11 +93,19 @@ async function main(): Promise<void> {
   // value is authoritative for both, so each copy is compared to it on its own.
   const facetFixes: { entityId: string; before: string; after: ReleaseResearchCoverage }[] = [];
   for (const row of res.rows) {
+    // repo-rm2y: the PROJECTION's claims, not the `claims` column. `lib/projection-divergence.ts`
+    // establishes the projection as the only store public readers touch, and five scripts
+    // (backfill-legacy-seed-claims, fix-accusation-claim-objects,
+    // fix-civil-rights-leaders-uncorroborated, fix-record-accuracy-followups,
+    // fix-howze-sisters-record) write `projection.claims` directly. The two agree on all 4,198
+    // rows today, so this changes no result — it removes the trap that the next in-place claim
+    // edit would have sprung, which is the whole subject of this bead.
+    const claims = toClaimProjections(row.projection?.claims);
     const before = String(row.projection?.researchCoverage ?? '');
     // repo-vymq: the live summary is passed, not omitted — this pass recomputes the authoritative
     // value for BOTH denormalized copies, so a version of it that could not see a template
     // fingerprint would quietly restore 'partial' on every record the guard just capped.
-    const after = computeReleaseResearchCoverage(toClaimProjections(row.claims), row.summary ?? '');
+    const after = computeReleaseResearchCoverage(claims, row.summary ?? '');
     const facetBefore = row.facet_coverage;
     if (facetBefore !== null && facetBefore !== after) {
       facetFixes.push({
@@ -142,7 +121,7 @@ async function main(): Promise<void> {
       displayName: row.display_name,
       before: before.length > 0 ? before : '(unset)',
       after,
-      claimCount: Array.isArray(row.claims) ? row.claims.length : 0,
+      claimCount: claims.length,
       hasContext: context.length > 0,
     });
   }

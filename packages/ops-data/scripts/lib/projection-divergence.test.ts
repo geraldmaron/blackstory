@@ -10,6 +10,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import type { PoolClient } from 'pg';
+import { NOTABILITY_RUBRIC } from '@repo/domain';
 import {
   assertNoProjectionDivergence,
   auditProjectionDivergence,
@@ -21,6 +22,8 @@ import {
   MISSING_SEARCH_INDEX_FIELD,
   type ProjectionDivergenceDbRow,
 } from './projection-divergence.ts';
+
+const FIRST_TO_DO_X_LABEL = NOTABILITY_RUBRIC.first_to_do_x;
 
 const LOCATION = {
   lat: 41.8781,
@@ -250,6 +253,122 @@ describe('divergentFieldsForRow — an unpublished projection', () => {
   it('treats a null projection the same way', () => {
     const row = cleanRow({ projection: null });
     assert.deepEqual(divergentFieldsForRow(row), [MISSING_PROJECTION_FIELD]);
+  });
+});
+
+describe("divergentFieldsForRow — scope 'all' (repo-rm2y builder staleness)", () => {
+  /**
+   * A row whose copies all agree and whose derived fields ARE what its claims say. Separate from
+   * `cleanRow`, whose projection is a synthetic shape built to exercise the copy comparison: it
+   * carries a basis record with no `criterion` and a researchCoverage object, neither of which the
+   * builder would ever produce. Keeping the two fixtures apart is deliberate — bending the shared
+   * one to satisfy the builder would have weakened every copy-vs-copy test in this file.
+   */
+  function builderCleanRow(
+    overrides: Partial<ProjectionDivergenceDbRow> = {},
+  ): ProjectionDivergenceDbRow {
+    const claims = [
+      {
+        id: 'claim_b_01',
+        predicate: 'was the first Black woman admitted to the bar',
+        object: 'Example Person',
+        confidenceLevel: 'high',
+        citationSource: 'example.org',
+        citationLabel: 'Example',
+      },
+    ];
+    const projection = {
+      id: 'ent_b',
+      kind: 'person',
+      displayName: 'Example Person',
+      summary: 'A researched summary of a real life, long enough to carry its own detail.',
+      location: LOCATION,
+      claims,
+      notabilityBasis: [
+        {
+          criterion: 'first_to_do_x',
+          note: 'Was the first Black woman admitted to the bar.',
+          evidenceIds: ['claim_b_01'],
+        },
+      ],
+      notabilityLabels: [FIRST_TO_DO_X_LABEL],
+      researchCoverage: 'minimal',
+    };
+    return {
+      ...cleanRow(),
+      entity_id: 'ent_b',
+      display_name: 'Example Person',
+      summary: projection.summary,
+      claims,
+      taxonomy: { topicIds: [], topicTags: [], notabilityLabels: [FIRST_TO_DO_X_LABEL] },
+      projection,
+      si_present: false,
+      ...overrides,
+    };
+  }
+
+  it("reports nothing extra when the derived fields match the record's own claims", () => {
+    assert.deepEqual(divergentFieldsForRow(builderCleanRow(), 'all'), [MISSING_SEARCH_INDEX_FIELD]);
+  });
+
+  it('catches a basis record whose evidenceId no longer resolves (the eula-johnson shape)', () => {
+    const clean = builderCleanRow();
+    const projection = {
+      ...(clean.projection as Record<string, unknown>),
+      notabilityBasis: [
+        {
+          criterion: 'first_to_do_x',
+          note: 'Documented site the old summary.',
+          evidenceIds: ['claim_that_is_gone'],
+        },
+      ],
+    };
+    const fields = divergentFieldsForRow(builderCleanRow({ projection }), 'all');
+    assert.ok(fields.includes('builder.notabilityBasis'));
+    // The copy comparison alone sees nothing wrong, which is the whole reason this scope exists.
+    assert.ok(
+      !divergentFieldsForRow(builderCleanRow({ projection })).includes('builder.notabilityBasis'),
+    );
+  });
+
+  it('catches a label that no longer matches the rubric text for its own criterion', () => {
+    const clean = builderCleanRow();
+    const projection = {
+      ...(clean.projection as Record<string, unknown>),
+      notabilityLabels: ['An older spelling of the rubric sentence.'],
+    };
+    assert.ok(
+      divergentFieldsForRow(builderCleanRow({ projection }), 'all').includes(
+        'builder.notabilityLabels',
+      ),
+    );
+  });
+
+  it('catches a researchCoverage the claims no longer support', () => {
+    const clean = builderCleanRow();
+    const projection = {
+      ...(clean.projection as Record<string, unknown>),
+      researchCoverage: 'substantial',
+    };
+    assert.ok(
+      divergentFieldsForRow(builderCleanRow({ projection }), 'all').includes(
+        'builder.researchCoverage',
+      ),
+    );
+  });
+
+  it('never calls a record with no claims stale — that is a research gap, not drift', () => {
+    const clean = builderCleanRow();
+    const projection = {
+      ...(clean.projection as Record<string, unknown>),
+      claims: [],
+      researchCoverage: 'minimal',
+    };
+    assert.ok(
+      !divergentFieldsForRow(builderCleanRow({ claims: [], projection }), 'all').includes(
+        'builder.notabilityBasis',
+      ),
+    );
   });
 });
 
