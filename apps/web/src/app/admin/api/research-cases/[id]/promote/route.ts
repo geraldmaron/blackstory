@@ -1,19 +1,19 @@
 /**
  * POST /api/research-cases/[id]/promote — promote a research case's proposed record to a
- * canonical entity (repo-k2kb). Requires the `admin` or `publication` staff role; `research`
- * cannot call this (proposer/approver separation see promote-case.ts's header).
+ * canonical entity (repo-k2kb). Gated on `publication:publish`, which the role table grants to
+ * `admin` and `publication` only; `research` proposes and cannot approve its own proposal (see
+ * promote-case.ts's header).
  */
 import {
-  authorizeAdminRequest,
+  authorizeAdminRoute,
   authErrorResponse,
+  isAdminAuthorizationError,
 } from '../../../../../../admin/auth/request-auth';
 import {
   CasePromotionRejected,
   promoteCaseToCanonical,
 } from '../../../../../../admin/cases/promote-case';
 import type { CanonicalPromotionRecord } from '@repo/domain';
-
-const APPROVER_ROLES = new Set(['admin', 'publication']);
 
 type Body = {
   readonly record?: CanonicalPromotionRecord;
@@ -26,13 +26,7 @@ export async function POST(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
-    const caller = await authorizeAdminRequest(request.headers);
-    if (!APPROVER_ROLES.has(caller.role)) {
-      return Response.json(
-        { error: 'Promoting a case to canonical requires the admin or publication role' },
-        { status: 403 },
-      );
-    }
+    const caller = await authorizeAdminRoute(request);
     const { id } = await context.params;
     const body = (await request.json()) as Body;
     if (!body.record) {
@@ -56,6 +50,11 @@ export async function POST(
 
     return Response.json({ ok: true, ...result });
   } catch (error) {
+    // Asked before the domain mappings below: an authorization failure is a 401 or 403, and
+    // falling through to the generic handler would answer it with 400.
+    if (isAdminAuthorizationError(error)) {
+      return authErrorResponse(error);
+    }
     if (error instanceof CasePromotionRejected) {
       return Response.json({ error: error.message, reasons: error.reasons }, { status: 422 });
     }

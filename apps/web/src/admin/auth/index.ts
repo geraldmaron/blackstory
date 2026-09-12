@@ -22,6 +22,14 @@ export {
   permissionsForStaffRole,
   staffRoleHasPermission,
 } from './staff-permissions';
+export {
+  ADMIN_ROUTE_RULES,
+  AdminRouteUndeclaredError,
+  STAFF_READ,
+  findAdminRouteAccess,
+  type AdminRouteAccess,
+  type AdminRouteRule,
+} from './route-permissions';
 export { resolveAdminAuthMode, resolveClientAdminAuthMode, type AdminAuthMode } from './mode';
 export {
   SupabaseSessionAuthorizationError,
@@ -35,4 +43,11 @@ export type {
   VerifiedSupabaseAdminIdentity,
 } from './supabase-session-authorizer';
 export type { AdminSessionUser } from './session-user';
-export { authorizeAdminRequest, authErrorResponse, type ResolvedAdminCaller } from './request-auth';
+export {
+  authorizeAdminRequest,
+  authorizeAdminRoute,
+  authErrorResponse,
+  createAdminRouteAuthorizer,
+  isAdminAuthorizationError,
+  type ResolvedAdminCaller,
+} from './request-auth';

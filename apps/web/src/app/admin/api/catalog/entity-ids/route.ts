@@ -8,7 +8,7 @@
  * Read-only: it returns ids, never mutates. The bulk-decision route still authorizes and audits
  * the write separately.
  */
-import { authorizeAdminRequest, authErrorResponse } from '../../../../../admin/auth/request-auth';
+import { authorizeAdminRoute, authErrorResponse } from '../../../../../admin/auth/request-auth';
 import { parseEntityQuery } from '../../../../../admin/lib/entity-query-params';
 import { queryMatchingEntityIds } from '../../../../../admin/lib/entity-query';
 
@@ -20,7 +20,7 @@ const MAX_SELECTION = 10_000;
 
 export async function GET(request: Request): Promise<Response> {
   try {
-    await authorizeAdminRequest(request.headers);
+    await authorizeAdminRoute(request);
     const url = new URL(request.url);
     const query = parseEntityQuery(Object.fromEntries(url.searchParams.entries()));
     const ids = await queryMatchingEntityIds(query, MAX_SELECTION);

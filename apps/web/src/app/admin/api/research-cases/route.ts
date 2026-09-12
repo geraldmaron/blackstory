@@ -2,13 +2,13 @@
  * GET /api/research-cases — list research cases with optional state filter.
  */
 import type { ResearchCaseState } from '@repo/domain';
-import { authorizeAdminRequest, authErrorResponse } from '../../../../admin/auth/request-auth';
+import { authorizeAdminRoute, authErrorResponse } from '../../../../admin/auth/request-auth';
 import { ALL_CASE_STATES, INBOX_CASE_STATES } from '../../../../admin/cases/research-case-types';
 import { listAdminResearchCases } from '../../../../admin/cases/research-case-store';
 
 export async function GET(request: Request): Promise<Response> {
   try {
-    await authorizeAdminRequest(request.headers);
+    await authorizeAdminRoute(request);
     const url = new URL(request.url);
     const limit = Number(url.searchParams.get('limit') ?? '100');
     const stateParam = url.searchParams.get('states') ?? 'inbox';

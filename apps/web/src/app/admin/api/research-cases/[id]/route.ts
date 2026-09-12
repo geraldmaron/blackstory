@@ -1,7 +1,7 @@
 /**
  * GET /api/research-cases/[id] — full research case detail for the portal sheet/page.
  */
-import { authorizeAdminRequest, authErrorResponse } from '../../../../../admin/auth/request-auth';
+import { authorizeAdminRoute, authErrorResponse } from '../../../../../admin/auth/request-auth';
 import { getAdminResearchCaseDetail } from '../../../../../admin/cases/research-case-store';
 import { legalActionsForState } from '../../../../../admin/cases/research-case-types';
 
@@ -10,7 +10,7 @@ export async function GET(
   context: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
-    await authorizeAdminRequest(request.headers);
+    await authorizeAdminRoute(request);
     const { id } = await context.params;
     const detail = await getAdminResearchCaseDetail(id);
     if (!detail) {

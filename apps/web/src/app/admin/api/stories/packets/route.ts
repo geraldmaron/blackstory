@@ -1,12 +1,12 @@
 /**
  * API: list staged story_packet quarantine submissions for signed-in admins.
  */
-import { authorizeAdminRequest, authErrorResponse } from '../../../../../admin/auth/request-auth';
+import { authorizeAdminRoute, authErrorResponse } from '../../../../../admin/auth/request-auth';
 import { listStoryPackets } from '../../../../../admin/stories/story-packet-store';
 
 export async function GET(request: Request): Promise<Response> {
   try {
-    await authorizeAdminRequest(request.headers);
+    await authorizeAdminRoute(request);
     const url = new URL(request.url);
     const limit = Number(url.searchParams.get('limit') ?? '200');
     const items = await listStoryPackets(limit);

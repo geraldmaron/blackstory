@@ -3,7 +3,7 @@
  * Verifies auth + durable reason; does not activate until signed-manifest verify is wired
  * for this runtime (returns staged preview payload only).
  */
-import { authorizeAdminRequest, authErrorResponse } from '../../../../../admin/auth/request-auth';
+import { authorizeAdminRoute, authErrorResponse } from '../../../../../admin/auth/request-auth';
 
 type Body = {
   readonly releaseId?: string;
@@ -13,7 +13,7 @@ type Body = {
 
 export async function POST(request: Request): Promise<Response> {
   try {
-    const caller = await authorizeAdminRequest(request.headers);
+    const caller = await authorizeAdminRoute(request);
     const body = (await request.json()) as Body;
     if (!body.releaseId?.trim()) {
       return Response.json({ error: 'releaseId is required' }, { status: 400 });

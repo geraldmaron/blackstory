@@ -5,7 +5,7 @@
  * The release builder reads the latest decision per entity; the existing signed-manifest
  * privileged-apply flow is what actually changes what's live.
  */
-import { authorizeAdminRequest, authErrorResponse } from '../../../../../admin/auth/request-auth';
+import { authorizeAdminRoute, authErrorResponse } from '../../../../../admin/auth/request-auth';
 import {
   bulkRecordCatalogDecisions,
   CATALOG_DECISION_ACTIONS,
@@ -23,7 +23,7 @@ type Body = {
 
 export async function POST(request: Request): Promise<Response> {
   try {
-    const caller = await authorizeAdminRequest(request.headers);
+    const caller = await authorizeAdminRoute(request);
     const body = (await request.json()) as Body;
 
     if (!body.action || !ACTIONS.has(body.action as CatalogDecisionAction)) {

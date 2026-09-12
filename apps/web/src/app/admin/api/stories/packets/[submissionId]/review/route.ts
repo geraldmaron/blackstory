@@ -3,7 +3,7 @@
  * Approve returns seed handoff JSON — does not publish to /stories.
  */
 import {
-  authorizeAdminRequest,
+  authorizeAdminRoute,
   authErrorResponse,
 } from '../../../../../../../admin/auth/request-auth';
 import {
@@ -23,7 +23,7 @@ export async function POST(
   context: { params: Promise<{ submissionId: string }> },
 ): Promise<Response> {
   try {
-    const caller = await authorizeAdminRequest(request.headers);
+    const caller = await authorizeAdminRoute(request);
     const { submissionId } = await context.params;
     const body = (await request.json()) as Body;
     const decision = body.decision;

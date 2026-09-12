@@ -32,10 +32,9 @@ All mutation handlers must import the existing server authorizer from
 `apps/web/src/admin/auth/server-authorization.ts` / `request-auth.ts`. Do not reproduce its IAP or
 Firebase checks in client code.
 
-1. Normal actions call `assertPermission` with the action's declared permission (research writes
-   today authorize via a verified Supabase session and `app_metadata.bb_role`,
-   `ADMIN_AUTH_MODE=supabase` — the only mode actually implemented; `firebase`/`layered` below
-   were never built).
+1. Every action checks the caller's staff role against the permission it declares. Identity comes
+   from a verified Supabase session and `app_metadata.bb_role` (`ADMIN_AUTH_MODE=supabase` — the
+   only mode actually implemented; `firebase`/`layered` below were never built).
 2. High-impact release staging requires a durable operator reason; full activation still needs
    signed-manifest verification in this runtime.
 3. The verified actor, reason, and resulting state must be included in the append-only audit event.
@@ -43,6 +42,28 @@ Firebase checks in client code.
 Browser state, route visibility, hidden buttons, and IAP alone are not authorization. Research
 roles cannot publish or retract. Publication roles cannot mutate research workflow state.
 `useAdminPermissions` is display-only.
+
+### Admin API routes
+
+Route handlers under `apps/web/src/app/admin/api/**` call `authorizeAdminRoute(request)`, which
+authenticates and then checks the role against the rule the route has in
+`apps/web/src/admin/auth/route-permissions.ts`. A method and path with no rule is refused with 403,
+so a new route is closed until its authority is stated. `staff read` means any verified staff role.
+
+| Route | Permission | Roles |
+|-------|-----------|-------|
+| `GET` audit, auth/me, catalog/entity-ids, discovery/runs, graylist, releases, research-cases, research-cases/:id, sources, stories/packets, switches | staff read | all |
+| `POST /admin/api/research-cases/:id/assign` | `research:write` | admin, research |
+| `POST /admin/api/research-cases/:id/transition` | `research:write` | admin, research |
+| `POST /admin/api/research-cases/bulk-transition` | `research:write` | admin, research |
+| `POST /admin/api/stories/packets/:submissionId/review` | `research:write` | admin, research |
+| `POST /admin/api/stories/packets/review-bulk` | `research:write` | admin, research |
+| `POST /admin/api/catalog/bulk-decision` | `canonical:bulk_write` | admin |
+| `POST /admin/api/releases/stage` | `publication:publish` | admin, publication |
+| `POST /admin/api/research-cases/:id/promote` | `publication:publish` | admin, publication |
+
+`route-permissions.test.ts` walks the route directory and fails if a handler has no rule, if a rule
+outlives its route, or if a handler authenticates without the authority check.
 
 ## Canonical writes
 
