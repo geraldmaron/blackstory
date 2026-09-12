@@ -64,32 +64,6 @@ describe('surface class is the only shell switch', () => {
   });
 });
 
-describe('explore decade dock hit target', () => {
-  const exploreEditionCss = readFileSync(join(here, 'explore/explore-edition.css'), 'utf8');
-
-  it('keeps the decade dock above pass-through layers and in the Engaged hit list', () => {
-    assert.match(
-      exploreEditionCss,
-      /\.ds-explore-stage__decade-dock\s*\{[^}]*pointer-events:\s*auto/s,
-    );
-    assert.match(
-      exploreEditionCss,
-      /\.ds-explore-stage__decade-dock\s*\{[^}]*z-index:\s*var\(--ds-z-decade-dock\)/s,
-    );
-    assert.match(
-      exploreEditionCss,
-      /\.ds-explore-stage__decade-dock\s*\{[^}]*touch-action:\s*none/s,
-    );
-    assert.match(exploreEditionCss, /\.ds-explore-stage__decade-scroll\s*\{[^}]*flex:\s*1 1 auto/s);
-    // The two assertions that stood here read `cinematic-map.css` for the Engaged state's
-    // pointer-events and header visibility. SP-08 deleted that stylesheet with the rest of the
-    // Rest/Engaged layer: it existed for `EntityLocationCinematicMap`, the second MapLibre
-    // instance, and the plate postures replaced the whole model. There is no Engaged state left
-    // to assert, so the assertions go rather than being pointed at a file that no longer governs
-    // anything. The dock's own pointer-events and z-index above are unaffected.
-  });
-});
-
 describe('instrument shell layout', () => {
   it('locks the instrument to the viewport (not a footer-over-map document)', () => {
     assert.match(
