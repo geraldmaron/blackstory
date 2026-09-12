@@ -79,6 +79,11 @@ export const correctionStatusV1Schema = z.object({
   updatedAt: z.string().max(64),
   appealAvailable: z.boolean(),
   classificationDispute: z.boolean(),
+  /** Present only when the correction was declined. A plain-language explanation of the
+   * outcome, derived from the stored closure classification — never a moderator's internal
+   * notes verbatim (those stay off this schema entirely, like every other moderation-internal
+   * signal above). */
+  outcomeReason: z.string().max(500).optional(),
 });
 
 export type CorrectionStatusV1 = z.infer<typeof correctionStatusV1Schema>;

@@ -186,6 +186,29 @@ test('appeals re-enter review for rejected closures without exposing moderation 
   assert.equal(appeal.status, 202);
 });
 
+test('a declined correction carries a plain outcomeReason on its public status', async () => {
+  const deps = await buildDeps();
+  const accepted = await handleCorrectionSubmitRequest(
+    postJson('/corrections/api', VALID_CORRECTION, '203.0.113.26'),
+    deps,
+  );
+  const body = (await accepted.json()) as { receiptCode: string };
+  const stored = deps.store.getByReceiptCode(body.receiptCode, PEPPER);
+  assert.ok(stored);
+  deps.store.markClosed(stored.record.id, 'rejected');
+
+  const statusResponse = await handleCorrectionStatusRequest(
+    new Request(
+      `http://localhost/corrections/status/api?receipt=${encodeURIComponent(body.receiptCode)}`,
+    ),
+    deps,
+  );
+  assert.equal(statusResponse.status, 200);
+  const status = (await statusResponse.json()) as { status: Record<string, unknown> };
+  assert.equal(status.status.phase, 'closed');
+  assert.equal(status.status.outcomeReason, 'The record was not changed after review.');
+});
+
 test('abuse reports enter quarantine as abuse_report submissions', async () => {
   const deps = await buildDeps();
   const response = await handleCorrectionAbuseReportRequest(
