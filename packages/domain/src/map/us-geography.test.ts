@@ -57,6 +57,26 @@ test('NY/NJ carve-out: Hoboken and Newark stay NJ; Staten Island is NY', () => {
   assert.equal(findUsStateForPoint(40.5795, -74.1502)?.postalCode, 'NY'); // Staten Island
 });
 
+test('bbox-ambiguous points resolve via real state polygons, not smallest-bbox-first', () => {
+  // Philadelphia's bbox test previously lost to NJ's smaller overlapping bbox
+  // (repo-jevj): NJ's rectangle happens to reach across the Delaware River and
+  // cover Philadelphia even though the point is nowhere near New Jersey.
+  assert.equal(findUsStateForPoint(39.95, -75.16)?.postalCode, 'PA'); // Philadelphia, PA
+
+  // A Mississippi River bend point on the Louisiana side near Milliken's Bend
+  // previously lost to Mississippi's smaller overlapping bbox for the same
+  // reason (repo-jevj).
+  assert.equal(findUsStateForPoint(32.48, -91.14)?.postalCode, 'LA'); // LA side of the river bend
+});
+
+test('unambiguous deep-interior points still resolve on the bbox fast path', () => {
+  // Neither point sits in more than one state's bbox, so these exercise the
+  // single-match fast path (no polygon check) rather than the disambiguation
+  // path above — pinned here so that path keeps working unmodified.
+  assert.equal(findUsStateForPoint(38.5816, -121.4944)?.postalCode, 'CA'); // Sacramento, CA
+  assert.equal(findUsStateForPoint(39.7392, -104.9903)?.postalCode, 'CO'); // Denver, CO
+});
+
 test('findUsStateFromJurisdictionLabel prefers editorial label tails', () => {
   assert.equal(findUsStateFromJurisdictionLabel('New York City, New York')?.postalCode, 'NY');
   assert.equal(

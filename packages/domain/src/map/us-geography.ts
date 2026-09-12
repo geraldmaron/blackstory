@@ -2,13 +2,24 @@
  * U.S.-only geography reference table for the map data platform.
  *
  * Product scope is 50 states + D.C. (no territories) same scope line used by
- * ADR-008 /. This module intentionally does NOT vendor county or state
- * polygon boundary data (e.g. Census TIGER shapefiles): that is a real, honest
- * gap documented in docs/adr/ADR-013-map-stack.md rather than something faked
- * here. State attribution below is an approximate bounding-box test, good
- * enough for national-zoom presence/density aggregates it is not a survey-
- * grade point-in-polygon spatial join and must never be presented as one.
+ * ADR-008 /. State attribution in {@link findUsStateForPoint} is primarily an
+ * approximate bounding-box test — cheap, and good enough on its own for
+ * national-zoom presence/density aggregates — but a bbox-only test silently
+ * mis-assigns any point that falls inside more than one state's rectangle
+ * (e.g. Philadelphia sits inside both PA's and NJ's bboxes; the Mississippi
+ * River bend near Milliken's Bend, LA sits inside both LA's and MS's). For
+ * exactly that ambiguous case, {@link findUsStateForPoint} checks the
+ * real Census cartographic boundary polygons (`./data/us-states-20m.json` —
+ * the same GeoJSON `apps/web` serves for MapLibre rendering) via
+ * `./state-boundary-geometry.ts`. A single, unambiguous bbox match is still
+ * returned without a polygon check — so a point can still resolve to the
+ * wrong state if it sits outside the true polygon but inside only one state's
+ * (deliberately coarse) rectangle; this module is still not a general-purpose
+ * survey-grade point-in-polygon spatial join (ADR-013 known gap for the
+ * non-ambiguous fast path).
  */
+
+import { isPointInStatePolygon } from './state-boundary-geometry.js';
 
 export type UsStateInfo = {
   /** 2-digit Census state FIPS code. */
@@ -156,23 +167,56 @@ function resolveNjNyOverlap(
 }
 
 /**
- * Approximate state attribution for a public (already-coarsened) coordinate.
- * Bounding-box test only — near-border points may still resolve to a neighbor.
- * Sufficient for national/state-zoom presence aggregates; not a substitute for
- * real polygon boundary data (see ADR-013 "known gaps"). Prefer
- * {@link findUsStateFromJurisdictionLabel} when an editorial jurisdiction label
- * is available.
+ * State attribution for a public (already-coarsened) coordinate.
+ *
+ * Fast path: when the point falls inside exactly one state's approximate
+ * bounding box, that state wins outright — no polygon check. This is still a
+ * bbox test for that case, so a point outside a state's true shape but inside
+ * only its rectangle (e.g. open water past a coastline) can still resolve
+ * wrong; see the module doc comment and ADR-013.
+ *
+ * Disambiguation path: when the point falls inside MORE THAN ONE candidate
+ * bbox — where a bbox-only test lands Philadelphia in NJ and the Milliken's Bend
+ * river point in MS — each candidate's real Census
+ * boundary polygon is tested (`./state-boundary-geometry.ts`) and the one
+ * whose polygon actually contains the point wins. If the polygon test itself
+ * is inconclusive (none or more than one candidate's polygon contains the
+ * point — e.g. a point that lands exactly on a shared border within ray-
+ * casting tolerance), this falls back to the older NJ/NY Hudson-divide
+ * carve-out and finally to smallest-bbox-first, so no previously-resolved
+ * point starts returning `undefined`.
+ *
+ * Prefer {@link findUsStateFromJurisdictionLabel} when an editorial
+ * jurisdiction label is available — labels are curated; this is not.
  */
 export function findUsStateForPoint(lat: number, lng: number): UsStateInfo | undefined {
   const matches = STATES_BY_AREA_ASC.filter((state) => pointInBbox(lat, lng, state.bbox));
   if (matches.length === 0) return undefined;
   if (matches.length === 1) return matches[0];
 
+  const polygonMatch = resolveBboxOverlapByPolygon(matches, lat, lng);
+  if (polygonMatch) return polygonMatch;
+
   const njNy = resolveNjNyOverlap(lat, lng, matches);
   if (njNy) return njNy;
 
   // Smallest-bbox-first so D.C. / RI / DE win over larger overlapping neighbors.
   return matches[0];
+}
+
+/**
+ * Disambiguates a bbox tie using real state boundary polygons: returns the one candidate whose
+ * actual Census polygon contains the point. Returns `undefined` (not a guess) when zero or more
+ * than one candidate's polygon contains the point, so callers can fall back to the older bbox
+ * heuristics rather than trust an inconclusive polygon read.
+ */
+function resolveBboxOverlapByPolygon(
+  matches: readonly UsStateInfo[],
+  lat: number,
+  lng: number,
+): UsStateInfo | undefined {
+  const contained = matches.filter((state) => isPointInStatePolygon(lat, lng, state.postalCode));
+  return contained.length === 1 ? contained[0] : undefined;
 }
 
 /**

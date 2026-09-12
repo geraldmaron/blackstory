@@ -169,7 +169,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json && mkdir -p dist/graph/data && cp src/graph/data/mention-overrides.json dist/graph/data/mention-overrides.json",
+    "build": "tsc -p tsconfig.json && mkdir -p dist/graph/data && cp src/graph/data/mention-overrides.json dist/graph/data/mention-overrides.json && mkdir -p dist/map/data && cp src/map/data/us-states-20m.json dist/map/data/us-states-20m.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --conditions development --import tsx --test 'src/**/*.test.ts' 'fixtures/**/*.test.ts'",
     "lint": "echo 'lint: use root pnpm lint'"
