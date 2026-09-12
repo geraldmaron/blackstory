@@ -130,6 +130,78 @@ describe('SearchScreen — the address changing under a mounted screen', () => {
     expect(calls.some((c) => c.includes('kind=school'))).toBe(true);
     resolveNext(page());
     await waitFor(() => expect(getByLabelText('Schools, selected')).toBeTruthy());
+<<<<<<< ours
+    unmount();
+  });
+
+  it('a deep link landing on an already-mounted Records tab carries its era filter too (repo-vlf0w)', async () => {
+    // `/history?decade=1950s` redirects to `/records?era=1950s`. Before this fix, Records read
+    // only `q` and `kind` off the route and the era filter was silently dropped -- the phone
+    // showed the unfiltered archive index where the web `/records` page would have shown the
+    // 1950s slice.
+    const { transport, calls, resolveNext } = makeControllableTransport({ cooperative: true });
+    const releaseCache = fakeReleaseCache('r1');
+    const { runtime } = buildRuntime(transport, releaseCache);
+
+    const { rerender, unmount } = await render(<SearchScreen runtime={runtime} />);
+    await flushMicrotasks(10);
+    expect(calls).toHaveLength(0);
+
+    rerender(<SearchScreen initialQuery="school" initialEra="1950s" runtime={runtime} />);
+    await flushMicrotasks(10);
+
+    await waitFor(() => expect(calls.some((c) => c.includes('era=1950s'))).toBe(true), {
+      timeout: 2000,
+    });
+    resolveNext(page());
+    await waitFor(() =>
+      expect(router.setParams).toHaveBeenCalledWith(
+        expect.objectContaining({ q: 'school', era: '1950s' }),
+      ),
+    );
+    unmount();
+  });
+
+  it('does not revert a reader who kept typing when the settled query echoes back through the params', async () => {
+    // The screen writes the settled query back with router.setParams so the address stays
+    // shareable. That echo returns as a prop, and adopting it would overwrite whatever the
+    // reader has typed since the query settled.
+    const { transport, calls, resolveNext } = makeControllableTransport({ cooperative: true });
+    const releaseCache = fakeReleaseCache('r1');
+    const { runtime, recentAdds } = buildRuntime(transport, releaseCache);
+
+    const { rerender, getByLabelText, unmount } = await render(<SearchScreen runtime={runtime} />);
+    await flushMicrotasks(10);
+
+    fireEvent.changeText(getByLabelText('Search'), 'dun');
+    await waitFor(() => expect(calls.some((c) => c.includes('q=dun'))).toBe(true), {
+      timeout: 2000,
+    });
+    resolveNext(page());
+    await waitFor(() =>
+      expect(router.setParams).toHaveBeenCalledWith(expect.objectContaining({ q: 'dun' })),
+    );
+
+    fireEvent.changeText(getByLabelText('Search'), 'dunbar');
+    rerender(<SearchScreen initialQuery="dun" runtime={runtime} />);
+    await flushMicrotasks(10);
+
+    expect(getByLabelText('Search').props.value).toBe('dunbar');
+
+    // Settle the request the second keystroke started, so it cannot resolve into the next test.
+    await waitFor(() => expect(calls.some((c) => c.includes('q=dunbar'))).toBe(true), {
+      timeout: 2000,
+    });
+    resolveNext(page());
+    await waitFor(() =>
+      expect(router.setParams).toHaveBeenCalledWith(expect.objectContaining({ q: 'dunbar' })),
+    );
+    // A settled query also records a recent search, and that write refreshes state through an
+    // async callback. Wait for it here or it lands after this test, inside the next render.
+    await waitFor(() => expect(recentAdds).toContain('dunbar'));
+    unmount();
+=======
     await unmount();
+>>>>>>> theirs
   });
 });
