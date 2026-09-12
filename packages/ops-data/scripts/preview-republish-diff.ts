@@ -21,6 +21,7 @@ import {
   buildArtifactsForEntry,
   buildLiveDepthEntry,
   gateLandscapePublishCandidate,
+  liveClaimConfidence,
   parseCanonicalStatusSnapshot,
   type LandscapePublishRow,
   type LivePublishedRow,
@@ -118,12 +119,14 @@ try {
     }
     const canonicalStatus = canonicalById.get(row.id);
     const liveDepth = assessLandscapeDepth(buildLiveDepthEntry(live), row);
+    const liveConfidence = liveClaimConfidence(live);
     const gate = gateLandscapePublishCandidate({
       row,
       releaseId,
       generatedAt,
       allowRepublish: true,
       liveDepth,
+      liveConfidence,
       ...(canonicalStatus !== undefined ? { canonicalStatus } : {}),
     });
     if (!gate.eligible) {

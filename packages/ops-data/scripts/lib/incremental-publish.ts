@@ -817,6 +817,18 @@ export function buildLiveDepthEntry(row: LivePublishedRow): ReleaseSourceEntity 
 }
 
 /**
+ * The same claim-confidence measure the gate applies to a candidate (`minClaimConfidence`),
+ * applied instead to what is CURRENTLY published for this entity (repo-2t04.17). Reuses
+ * `buildLiveDepthEntry`'s reconstruction rather than inventing a second one, so a depth verdict
+ * and a confidence verdict on the same live row are always built from the same claims array. No
+ * `row` argument (and so no corroborating-source lookup): a `LivePublishedRow` has no
+ * landscape-candidate provenance to corroborate from, only the claims it already carries.
+ */
+export function liveClaimConfidence(row: LivePublishedRow): number {
+  return minClaimConfidence(buildLiveDepthEntry(row));
+}
+
+/**
  * Rejects rows that carry nothing a reader could not get from the registry index entry itself.
  *
  * The lane importers publish prose generated from index fields — category, city, state, area of
@@ -901,6 +913,13 @@ export function gateLandscapePublishCandidate(input: {
    * caller that has not loaded live state cannot accidentally relax anything.
    */
   readonly liveDepth?: DepthAssessment;
+  /**
+   * repo-2t04.17: the confidence score of what is CURRENTLY published for this entity, from
+   * `liveClaimConfidence(liveRow)`. Mirrors `liveDepth` exactly — same ADMISSION vs REGRESSION
+   * reasoning, applied to confidence instead of depth. Omitting it leaves the strict admission
+   * test in force.
+   */
+  readonly liveConfidence?: number;
 }): PublishGateResult {
   const floor = input.confidenceFloor ?? INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR;
   const row = input.row;
@@ -1025,11 +1044,32 @@ export function gateLandscapePublishCandidate(input: {
   const claimConfidence = minClaimConfidence(entry, row);
   const confidence = payloadConfidence ?? claimConfidence;
   if (confidence < floor) {
-    return {
-      eligible: false,
-      reason: 'confidence_below_floor',
-      detail: `confidence ${confidence.toFixed(3)} < floor ${floor}`,
-    };
+    // ADMISSION vs REGRESSION for confidence (repo-2t04.17), same shape as the depth clause
+    // above. The floor was written to keep an unresearched record from reaching the public
+    // corpus for the first time; it was never asked whether a correction to an ALREADY-LIVE
+    // record should have to out-score a bar the live text itself may not clear. A legitimate
+    // institutional citation (e.g. a reputable_secondary .edu source) can score under 0.75 on
+    // the blended measure without being wrong — `CLASSIFICATION_AUTHORITY.reputable_secondary`
+    // alone is 0.75; it is the directness/entity-match defaults that pull a shallow-evidenced
+    // claim on it below the floor. Reclassifying such a host as `primary_archival` to clear the
+    // floor would be dishonest score-gaming, not a fix — this clause lets the actual comparison
+    // that matters (candidate vs. what readers see today) decide instead.
+    //
+    // A live-low-confidence record cannot be made worse by a replacement that scores no lower
+    // than it: allow only when this is a republish of that same live row, a live confidence
+    // score was supplied, that live score is itself below the floor, and the candidate does not
+    // score below it. A live record that already clears the floor still cannot be overwritten
+    // by a weaker candidate — that transition stays forbidden.
+    const liveConfidenceBelowFloor =
+      input.liveConfidence !== undefined && input.liveConfidence < floor;
+    const notARegression = input.liveConfidence !== undefined && confidence >= input.liveConfidence;
+    if (!republishingLiveRow || !liveConfidenceBelowFloor || !notARegression) {
+      return {
+        eligible: false,
+        reason: 'confidence_below_floor',
+        detail: `confidence ${confidence.toFixed(3)} < floor ${floor}`,
+      };
+    }
   }
 
   const build = buildReleaseEntityArtifacts(

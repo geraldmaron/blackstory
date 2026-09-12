@@ -39,6 +39,7 @@ import {
   canonicalUpsertParamsFromLandscape,
   gateLandscapePublishCandidate,
   incrementalPublishProvenancePatch,
+  liveClaimConfidence,
   parseCanonicalStatusSnapshot,
   type CanonicalEntityPublishRow,
   type LandscapePublishRow,
@@ -422,12 +423,15 @@ function preparePublish(input: {
       input.livePublished === undefined
         ? undefined
         : assessLandscapeDepth(buildLiveDepthEntry(input.livePublished), input.row);
+    const liveConfidence =
+      input.livePublished === undefined ? undefined : liveClaimConfidence(input.livePublished);
     const gate = gateLandscapePublishCandidate({
       row: input.row,
       releaseId: input.releaseId,
       generatedAt: input.generatedAt,
       allowRepublish: input.allowRepublish ?? false,
       ...(liveDepth !== undefined ? { liveDepth } : {}),
+      ...(liveConfidence !== undefined ? { liveConfidence } : {}),
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
     });
     if (!gate.eligible) {

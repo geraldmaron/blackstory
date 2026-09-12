@@ -14,6 +14,7 @@ import {
   incrementalPublishProvenancePatch,
   jurisdictionFromPlace,
   jurisdictionFromProvenance,
+  liveClaimConfidence,
   MERGED_EVIDENCE_QUOTE_MAX_CHARS,
   parseCanonicalStatusSnapshot,
   toReleaseEntityRow,
@@ -1013,6 +1014,152 @@ test('gateLandscapePublishCandidate: canonical and evidence from the same author
   if (result.eligible) return;
   assert.equal(result.reason, 'confidence_below_floor');
   assert.equal(result.detail, 'confidence 0.720 < floor 0.75');
+});
+
+/**
+ * repo-2t04.17 — ADMISSION vs REGRESSION for confidence, same shape as the depth clause above.
+ * Reuses the exact fixture from the test just above (0.720, below the 0.75 floor) so the only
+ * variable across these four tests is whether/what live state is supplied.
+ */
+test('confidence gate still rejects a low-scoring candidate for a record that is NOT live', () => {
+  const row = researchCaseRow({
+    canonical_url: 'https://www.hmdb.org/m.asp?m=11111',
+    provenance: { sourceUrl: 'https://www.hmdb.org/m.asp?m=11111' },
+    payload: {
+      evidenceCitations: [
+        {
+          sourceUrl: 'https://www.hmdb.org/m.asp?m=12345',
+          title: 'Nicodemus AME Church historical marker',
+          sourceTier: 'tier2',
+          quote: 'the congregation organized this church soon after the town was founded in 1877',
+        },
+      ],
+    },
+  });
+  const result = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_test',
+    generatedAt: '2026-09-09T00:00:00.000Z',
+    allowRepublish: true,
+    liveConfidence: 0.72, // irrelevant — row.exact_in_release is false, so this is not a republish
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) assert.equal(result.reason, 'confidence_below_floor');
+});
+
+test('confidence gate lets a candidate that scores no worse replace an already-live record below the floor', () => {
+  const row = researchCaseRow({
+    canonical_url: 'https://www.hmdb.org/m.asp?m=11111',
+    provenance: { sourceUrl: 'https://www.hmdb.org/m.asp?m=11111' },
+    exact_in_release: true,
+    payload: {
+      evidenceCitations: [
+        {
+          sourceUrl: 'https://www.hmdb.org/m.asp?m=12345',
+          title: 'Nicodemus AME Church historical marker',
+          sourceTier: 'tier2',
+          quote: 'the congregation organized this church soon after the town was founded in 1877',
+        },
+      ],
+    },
+  });
+  const result = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_test',
+    generatedAt: '2026-09-09T00:00:00.000Z',
+    allowRepublish: true,
+    liveConfidence: 0.72, // what is currently public scores the same — not a regression
+  });
+  assert.equal(result.eligible, true);
+});
+
+test('confidence gate refuses to replace an already-live record with a candidate that scores WORSE', () => {
+  const row = researchCaseRow({
+    canonical_url: 'https://www.hmdb.org/m.asp?m=11111',
+    provenance: { sourceUrl: 'https://www.hmdb.org/m.asp?m=11111' },
+    exact_in_release: true,
+    payload: {
+      evidenceCitations: [
+        {
+          sourceUrl: 'https://www.hmdb.org/m.asp?m=12345',
+          title: 'Nicodemus AME Church historical marker',
+          sourceTier: 'tier2',
+          quote: 'the congregation organized this church soon after the town was founded in 1877',
+        },
+      ],
+    },
+  });
+  const result = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_test',
+    generatedAt: '2026-09-09T00:00:00.000Z',
+    allowRepublish: true,
+    liveConfidence: 0.8, // what is currently public already clears the floor
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) assert.equal(result.reason, 'confidence_below_floor');
+});
+
+/**
+ * The fail-closed default. A caller that never loaded live state gets the strict admission test,
+ * so forgetting to pass `liveConfidence` cannot silently widen what publishes — same guarantee
+ * `liveDepth`'s omission gives above.
+ */
+test('confidence gate falls back to the strict admission test when live confidence is unknown', () => {
+  const row = researchCaseRow({
+    canonical_url: 'https://www.hmdb.org/m.asp?m=11111',
+    provenance: { sourceUrl: 'https://www.hmdb.org/m.asp?m=11111' },
+    exact_in_release: true,
+    payload: {
+      evidenceCitations: [
+        {
+          sourceUrl: 'https://www.hmdb.org/m.asp?m=12345',
+          title: 'Nicodemus AME Church historical marker',
+          sourceTier: 'tier2',
+          quote: 'the congregation organized this church soon after the town was founded in 1877',
+        },
+      ],
+    },
+  });
+  const result = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_test',
+    generatedAt: '2026-09-09T00:00:00.000Z',
+    allowRepublish: true,
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) assert.equal(result.reason, 'confidence_below_floor');
+});
+
+/**
+ * `liveClaimConfidence` must score the SAME evidence the same way `minClaimConfidence` does for a
+ * candidate — otherwise a depth verdict and a confidence verdict on one live row could disagree
+ * with what that row would score as a fresh candidate. Reuses the claims `buildReleaseSourceFromLandscape`
+ * produces for the 0.720 fixture above, repackaged as a `LivePublishedRow`.
+ */
+test('liveClaimConfidence scores a live row the same way a candidate with identical evidence would score', () => {
+  const row = researchCaseRow({
+    canonical_url: 'https://www.hmdb.org/m.asp?m=11111',
+    provenance: { sourceUrl: 'https://www.hmdb.org/m.asp?m=11111' },
+    payload: {
+      evidenceCitations: [
+        {
+          sourceUrl: 'https://www.hmdb.org/m.asp?m=12345',
+          title: 'Nicodemus AME Church historical marker',
+          sourceTier: 'tier2',
+          quote: 'the congregation organized this church soon after the town was founded in 1877',
+        },
+      ],
+    },
+  });
+  const entry = buildReleaseSourceFromLandscape(row);
+  assert.ok(entry);
+  const liveRow = { summary: row.summary, claims: entry!.claims, projection: {} };
+  assert.equal(liveClaimConfidence(liveRow), 0.72);
+});
+
+test('liveClaimConfidence returns 0 for a live row with no claims, never undefined or NaN', () => {
+  assert.equal(liveClaimConfidence({ summary: 'x', claims: [], projection: {} }), 0);
 });
 
 /**
