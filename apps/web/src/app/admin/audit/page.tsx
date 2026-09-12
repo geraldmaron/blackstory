@@ -36,7 +36,7 @@ export default function AuditPage() {
         setRows([]);
         return;
       }
-      const response = await fetch('/api/audit?limit=100', {
+      const response = await fetch('/admin/api/audit?limit=100', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const body = (await response.json()) as {

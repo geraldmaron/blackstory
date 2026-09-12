@@ -50,7 +50,7 @@ export default function ReleasesPage() {
         setActiveRelease(null);
         return;
       }
-      const response = await fetch('/api/releases?limit=50', {
+      const response = await fetch('/admin/api/releases?limit=50', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const body = (await response.json()) as {

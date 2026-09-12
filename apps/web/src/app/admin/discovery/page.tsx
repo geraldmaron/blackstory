@@ -36,7 +36,7 @@ export default function DiscoveryRunsPage() {
         setRows([]);
         return;
       }
-      const response = await fetch('/api/discovery/runs?limit=50', {
+      const response = await fetch('/admin/api/discovery/runs?limit=50', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const body = (await response.json()) as { items?: DiscoveryRun[]; error?: string };

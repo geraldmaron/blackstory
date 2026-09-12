@@ -37,7 +37,7 @@ export default function GraylistPage() {
         setRows([]);
         return;
       }
-      const response = await fetch('/api/graylist?limit=100', {
+      const response = await fetch('/admin/api/graylist?limit=100', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const body = (await response.json()) as {

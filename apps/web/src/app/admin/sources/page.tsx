@@ -33,7 +33,7 @@ export default function SourcesPage() {
         setRows([]);
         return;
       }
-      const response = await fetch('/api/sources?limit=100', {
+      const response = await fetch('/admin/api/sources?limit=100', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const body = (await response.json()) as {

@@ -34,7 +34,7 @@ export default function LoginClient() {
   const enterConsole = useCallback(async () => {
     const token = await getIdToken();
     const response = token
-      ? await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+      ? await fetch('/admin/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
       : null;
     if (!response?.ok) {
       await signOut();

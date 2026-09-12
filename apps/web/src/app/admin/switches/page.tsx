@@ -36,7 +36,7 @@ export default function SwitchesPage() {
         setRows([]);
         return;
       }
-      const response = await fetch('/api/switches?limit=100', {
+      const response = await fetch('/admin/api/switches?limit=100', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const body = (await response.json()) as {

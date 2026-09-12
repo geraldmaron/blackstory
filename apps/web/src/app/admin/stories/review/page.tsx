@@ -96,7 +96,7 @@ export default function StoryReviewPage() {
         setRows([]);
         return;
       }
-      const response = await fetch('/api/stories/packets?limit=200', {
+      const response = await fetch('/admin/api/stories/packets?limit=200', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const body = (await response.json()) as { items?: PacketRow[]; error?: string };
