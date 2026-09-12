@@ -3,7 +3,7 @@
  * (cancellation, race guard, cursor/release-stamp guard, cache fallback) lives in
  * `search-controller.ts`, which this hook merely subscribes to. Owns:
  *   - the raw draft text (component-local state; never persisted, dies with the screen per
- *     ADR-022 §2's "the raw text stays in memory ... and dies with the process"),
+ *     ADR-023 §2's "the raw text stays in memory ... and dies with the process"),
  *   - normalization + debounce (`query-normalization.ts` / `debounce.ts`) before the controller
  *     ever sees a query,
  *   - the recent-searches list (SecureStore-backed; `recent-searches.ts`).

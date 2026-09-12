@@ -1,29 +1,36 @@
 /**
  * Recent local searches (MOB-013 item 4).
  *
- * STORAGE CHOICE: SecureStore (Keychain/Keystore), not MOB-009's SQLite cache layer. Justification:
+ * STORAGE CHOICE: SecureStore (Keychain/Keystore), not MOB-009's SQLite cache layer. This is a
+ * DELIBERATE, RECORDED EXCEPTION to program invariant 7 (see docs/decisions-carryover.md,
+ * "Addendum, 2026-09-12 (repo-30k6)" -- read that first; this comment summarizes it) --
+ * invariant 7's original text ("no query text ... may reach ... the on-disk cache") and its
+ * rejected-alternatives table both read as a blanket ban on persisting query text at all, with
+ * no carve-out for a small user-controlled list. The owner reviewed that primary text directly
+ * and approved this exception anyway, WITH the control this file implements
+ * (see search-runtime.ts's clearRecentSearchesOnFreshInstall). Do not re-litigate this as an
+ * accident or a citation bug -- it is a considered, recorded departure. Justification:
  *
- *   1. ADR-022 section 2's hard exclusion list is explicit: "No search-history table exists on
- *      disk" for the release-coupled cache that backs TanStack Query / offline reads, and
- *      apps/mobile/src/data/cache-policy.ts's NEVER_CACHE_KEY_PATTERNS structurally throws
- *      (NeverCacheViolation) on field names like `query`/`searchInput` before they can reach
- *      that store. Building a recent-searches table there would fight the architecture head-on,
- *      not work with it. That exclusion governs the AUTOMATIC, opaque cache tier (query result
- *      sets keyed by a salted hash, never the raw text) -- it is a different concern from a small,
- *      entirely user-controlled, user-visible, user-clearable convenience list of the terms a
- *      person themselves chose to type, which is what this module is.
- *   2. The threat model (docs/mobile/security/threat-model.md, T1) explicitly flags recent search
- *      terms as more sensitive than ordinary cached public content: T1's "nothing of value is
- *      stored on-device" argument for the SQLite cache rests on that cache holding ONLY
- *      already-public, already-released data anyone could fetch again. A user's own search
- *      history is not published data -- it can reveal interests/associations a rooted-device
- *      attacker (T1) or anyone with brief physical access could read from a plain SQLite file.
- *      SecureStore is backed by the platform Keychain/Keystore (hardware-backed encryption on
- *      most devices), which is a materially stronger protection boundary than an app-sandboxed
- *      SQLite file for exactly this class of "small, borderline-sensitive, user-scoped" data --
- *      the same reasoning apps/mobile/src/data/secure-store.ts already applies to the correction
- *      receipt token and the search-key salt.
- *   3. It is a small, strictly bounded list (see MAX_RECENT_ITEMS/MAX_RECENT_TERM_LENGTH below),
+ *   1. This is a different concern from the automatic, opaque cache tier invariant 7 was
+ *      written to constrain (query result sets keyed by a salted hash, never raw text --
+ *      apps/mobile/src/data/cache-policy.ts's NEVER_CACHE_KEY_PATTERNS still structurally
+ *      forbids that tier from ever seeing raw query text). This module is a small, entirely
+ *      user-controlled, user-visible, user-clearable convenience list of terms a person
+ *      themselves chose to type -- not an automatic record of everything searched.
+ *   2. SecureStore is backed by the platform Keychain/Keystore (hardware-backed encryption on
+ *      most devices), a materially stronger protection boundary than an app-sandboxed SQLite
+ *      file for this class of small, user-scoped data -- the same reasoning
+ *      apps/mobile/src/data/secure-store.ts already applies to the correction receipt token and
+ *      the search-key salt. (NOTE: docs/mobile/security/threat-model.md's T1 does NOT discuss
+ *      search-term sensitivity anywhere -- an earlier version of this comment incorrectly
+ *      claimed it did. The "a user's search terms can be more revealing than public data" point
+ *      above is this module's own reasoning, not a cited threat-model finding.)
+ *   3. The residual risk this exception carries -- iOS Keychain items survive app deletion,
+ *      so a straight SecureStore carve-out alone would let a "deleted and reinstalled" user's
+ *      old search terms silently reappear -- is closed by search-runtime.ts clearing this key
+ *      on the first launch of a fresh install (detected via a SQLite meta flag, which IS wiped
+ *      on uninstall on both platforms).
+ *   4. It is a small, strictly bounded list (see MAX_RECENT_ITEMS/MAX_RECENT_TERM_LENGTH below),
  *      which is exactly SecureStore's designed use case (small opaque secrets), not bulk content.
  *
  * NOTE ON OWNERSHIP: apps/mobile/src/data/secure-store.ts's `SECRET_KEYS` is a closed allow-list
@@ -78,7 +85,7 @@ function fromStored(value: unknown): RecentSearchEntry | null {
 }
 
 /** Defensive parse: corrupt/foreign/oversized JSON never throws -- it degrades to an empty list
- * (mirrors ADR-022 section 5's "a cache is disposable, self-healing" posture applied to this
+ * (mirrors ADR-023 section 5's "a cache is disposable, self-healing" posture applied to this
  * small SecureStore-backed list). */
 export function parseRecentSearches(raw: string | undefined): RecentSearchEntry[] {
   if (!raw) return [];

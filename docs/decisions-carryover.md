@@ -179,3 +179,62 @@ they are on purpose.
 **Accepted, not closed:** `blackstory-admin`, the old Vercel project, is decommissioned once the
 merged `/admin` routes are verified working on `blackstory` in a deployed environment — that step
 needs a human with Vercel dashboard access and is tracked on repo-z3g1f, not assumed done here.
+
+## Addendum, 2026-09-12 (repo-30k6): recent-searches SecureStore carve-out from program invariant 7
+
+**Problem.** `apps/mobile/src/features/search/recent-searches.ts` stores a small (max 8),
+user-visible, user-clearable list of recent search terms in SecureStore (iOS Keychain / Android
+Keystore) rather than in MOB-009's SQLite release-coupled cache. Its header comment justified this
+by citing "ADR-022 section 2" — a misnumbering; the removed mobile ADRs were renumbered
+2026-07-22, and the actual source is ADR-023 ("mobile state, cache, and offline read policy")
+section 2, program invariant 7. The original ADR-023 text (recovered from git history,
+`a2f559f8~1:docs/adr/ADR-023-mobile-state-cache-offline.md`) is more direct against this pattern
+than the code comment implied: its "Rejected alternatives" table has a row titled exactly
+"Persisting query text / correction content / precise location for offline history," resolved as
+"Violates program invariant 7. These stay in-memory only or are excluded entirely" — a blanket
+statement, not a carve-out for a small user-controlled list. recent-searches.ts's own
+distinction (automatic opaque cache vs. user-controlled convenience list) is a reasonable one on
+its own merits, but it was never actually reconciled against this text — it was an unrecorded,
+unilateral decision. A second problem, independent of the citation: the same file's supporting
+claim that `docs/mobile/security/threat-model.md` T1 "explicitly flags" recent search terms as
+more sensitive than ordinary cached content does not hold up — T1 never discusses search-term
+sensitivity; it argues the SQLite cache is safe because it holds only already-public data. That
+claim has been corrected in the source comment to attribute the reasoning to this module, not to
+the threat model.
+
+A third, independent gap surfaced during this review: iOS Keychain items are not cleared when an
+app is deleted (unlike Android's Keystore-backed storage, which is). A user who deletes BlackStory
+expecting a clean slate and later reinstalls would see their prior recent-search list return.
+
+**Decision.** The SecureStore carve-out is approved, WITH a control, despite ADR-023 having
+already rejected the general pattern of persisting query text. The reasoning that tips this in
+favor of an exception rather than deference to the original blanket rule: (1) the list this module
+persists is categorically different in kind from what ADR-023 was reacting to — small (max 8),
+entirely user-chosen, user-visible, and user-clearable at any time, not an automatic record of
+everything searched; (2) SecureStore is a materially stronger protection boundary than the plain
+SQLite the ADR was written against; (3) the feature has real user value (returning to recent
+searches across sessions) that an in-memory-only implementation would defeat entirely. The
+control: `recent-searches.ts`'s `RECENT_SEARCHES_SECRET_KEY` is now cleared automatically on the
+first launch following a fresh install or reinstall (`search-runtime.ts`'s
+`clearRecentSearchesOnFreshInstall`, gated on a SQLite `cache_meta` flag that — unlike
+Keychain/Keystore — is wiped by the OS on uninstall on both platforms, and also incidentally on
+an app-update schema migration, which over-clears in a privacy-safe direction rather than under).
+
+**Why.** The project's own posture elsewhere (redaction chokepoints, PII scrubbing, no analytics)
+is unusually careful about exactly this class of risk, which argues for taking ADR-023's original
+"in-memory only" position seriously rather than waving it off as outdated — but the cost of the
+mitigating control here is genuinely low (a few lines, reusing the store's existing `clear()`
+method and the existing SQLite meta-key mechanism, no new dependency), and a small,
+user-owned convenience list with a working uninstall-safe reset is a materially different risk
+profile than what the original invariant was written to prevent. This is a considered exception,
+recorded here so it is never again mistaken for an accident or a citation bug.
+
+**Follow-up filed:** the 2026-07-22 mobile-ADR renumbering left ~40+ other files across
+`apps/mobile/src`, `packages/domain/src/publication/`, and
+`docs/mobile/security/threat-model.md` citing the pre-renumbering ADR numbers for cache/offline
+(should be ADR-023), build/release/OTA (should be ADR-024), and one data-boundary site (should be
+ADR-022) content. Only the sites feeding this decision were corrected here; the rest are tracked
+separately (repo-wide stale mobile-ADR citation cleanup) since fixing them requires per-site
+topic judgment, not a blind find-and-replace — at least one existing "ADR-022" citation
+(`apps/mobile/README.md:201`) is already correct under the final numbering and must not be
+touched.

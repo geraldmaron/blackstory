@@ -80,8 +80,9 @@ export default function MemorialPage() {
 
         <MemorialSections />
 
-        <WalkOffRamp>
-          This wall is national. The names on it stay names, with no record page attached.
+        <WalkOffRamp title="This wall is national">
+          It isn't drawn from any one place's record. Each name stands on its own here, not as a
+          link to a page.
         </WalkOffRamp>
       </Room>
     </div>
