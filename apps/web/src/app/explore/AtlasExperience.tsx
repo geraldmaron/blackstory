@@ -732,6 +732,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
             displayName: record.name,
             entityId: record.id,
             ...(record.kind !== undefined ? { kind: record.kind } : {}),
+            ...(record.summary !== undefined ? { summary: record.summary } : {}),
           });
           if (walk) window.location.assign(walk);
         }}
@@ -760,6 +761,8 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
             return;
           }
           // Same as the palette: a saved record whose pin is not in this projection still opens.
+          // `SavedRecord` does not persist a summary, so this fallback still relies on the
+          // `PLACE_PAGE_STAND_IDS` shortcut for a place-kind save with no other signal.
           const walk = atlasWalkHref({
             displayName: record.name,
             kind: record.kind,

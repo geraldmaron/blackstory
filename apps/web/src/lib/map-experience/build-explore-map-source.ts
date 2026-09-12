@@ -261,6 +261,8 @@ function enrichFeature(
     displayName: entity.displayName,
     kind: entity.kind,
     entityId: entity.id,
+    summary: entity.summary,
+    locationPrecision: entity.locationPrecision,
   });
   const holdingWalk = walkHref !== undefined && walkHref === href;
   const visitClaims = visitContactClaimsForMap(entity.claims);

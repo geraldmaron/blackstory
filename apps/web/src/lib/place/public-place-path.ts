@@ -3,8 +3,12 @@
  * never `/entity/ent_…`. Slugs are derived from the published name, not the catalog id.
  *
  * Place resolution for named walks uses the search index (`place-slug.ts`) so any standable
- * release record can hold. Door pin walks (`atlasWalkHref`) still use the stand allowlist so
- * Rest stays calm. Collision addresses are `{slug}--{entityId}`.
+ * release record can hold. Door pin walks (`atlasWalkHref`) hold on the same live rule —
+ * `canStandHere` over the record's own kind/summary/locationPrecision, already on hand at every
+ * caller — not a fixture allowlist, so a real catalog record never needs to be enumerated by
+ * hand to get a walk. `PLACE_PAGE_STAND_IDS` remains as a cross-checked shortcut for the small
+ * set of point-get ids `loadHomeFirstPaint` also stands at; it is additive, never required.
+ * Collision addresses are `{slug}--{entityId}`.
  */
 
 const TULSA_PLACE = /tulsa|greenwood|black wall street/i;
@@ -68,8 +72,10 @@ export function isPublicPlaceSlug(value: string): boolean {
 }
 
 /**
- * Place-page point-gets. Same ids `loadHomeFirstPaint` stands at. A live catalog
- * name is not a holding slug unless it is one of these records.
+ * Place-page point-gets. Same ids `loadHomeFirstPaint` stands at, each independently
+ * fetched and confirmed with `canStandHere` there. Trusting them here too is a shortcut,
+ * not the rule: `placePageHolds` below holds for any record whose own kind/summary/
+ * locationPrecision passes `canStandHere`, allowlisted or not.
  */
 export const PLACE_PAGE_STAND_IDS = [
   'ent_aarlcc_fort_lauderdale_001',
@@ -80,30 +86,34 @@ export const PLACE_PAGE_STAND_IDS = [
   'ent_greenwood_district_001',
 ] as const;
 
-/**
- * Slugs the place page resolves via its seed path (`seedBySlug`). Keep in lockstep
- * with `listPublicEntities()` ∩ `canStandHere` — tested, not invented.
- */
-export const SEED_HOLDING_PLACE_SLUGS = [
-  'fifteenth-street-presbyterian-church',
-  'paul-laurence-dunbar-high-school',
-  'd-c-inventory-of-historic-sites-listing-1975',
-  'dunbar-alumni-federation',
-] as const;
-
 export function isPlacePageStandId(entityId: string): boolean {
   return (PLACE_PAGE_STAND_IDS as readonly string[]).includes(entityId);
 }
 
-/** True when `/place/{slug}` is an address the place page will hold. */
+/**
+ * True when `/place/{slug}` is an address the place page will hold, decided from whatever
+ * the caller already has on hand (never a fetch). `kind`/`summary`/`locationPrecision` are
+ * the same fields `canStandHere` judges everywhere else in this record's family
+ * (`instrumentRecordHref`, `neighborHref`); a record missing `kind` cannot be judged and does
+ * not hold, so an under-described record never gets a walk invented for it.
+ */
 export function placePageHolds(input: {
   readonly displayName: string;
+  readonly kind?: string;
+  readonly summary?: string;
+  readonly locationPrecision?: string;
   readonly entityId?: string;
 }): boolean {
   if (input.entityId !== undefined && isPlacePageStandId(input.entityId)) return true;
-  return (SEED_HOLDING_PLACE_SLUGS as readonly string[]).includes(
-    publicPlaceSlug(input.displayName),
-  );
+  if (input.kind === undefined) return false;
+  return canStandHere({
+    displayName: input.displayName,
+    kind: input.kind,
+    summary: input.summary?.trim() ?? '',
+    ...(input.locationPrecision !== undefined
+      ? { locationPrecision: input.locationPrecision }
+      : {}),
+  });
 }
 
 /**
@@ -165,6 +175,8 @@ export function atlasWalkHref(input: {
   readonly displayName: string;
   readonly kind?: string;
   readonly entityId?: string;
+  readonly summary?: string;
+  readonly locationPrecision?: string;
 }): string | undefined {
   if (isInternalRecordLabel(input.displayName)) return undefined;
   if (staysOffPublicMap(input)) return undefined;
@@ -176,6 +188,11 @@ export function atlasWalkHref(input: {
   if (
     !placePageHolds({
       displayName: input.displayName,
+      ...(input.kind !== undefined ? { kind: input.kind } : {}),
+      ...(input.summary !== undefined ? { summary: input.summary } : {}),
+      ...(input.locationPrecision !== undefined
+        ? { locationPrecision: input.locationPrecision }
+        : {}),
       ...(input.entityId !== undefined ? { entityId: input.entityId } : {}),
     })
   ) {

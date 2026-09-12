@@ -16,7 +16,6 @@ import {
   placeHref,
   placePageHolds,
   publicPlaceSlug,
-  SEED_HOLDING_PLACE_SLUGS,
   staysOffPublicMap,
 } from './public-place-path';
 
@@ -112,17 +111,61 @@ test('non-standable neighbors with an id open the entity room, not a fake Place'
   );
 });
 
-test('seed holding slugs match the place page seed path, and are not invented', () => {
-  const computed = listPublicEntities()
-    .filter((entity) => canStandHere(entity))
-    .map((entity) => publicPlaceSlug(entity.displayName))
-    .sort();
-  assert.deepEqual([...SEED_HOLDING_PLACE_SLUGS].sort(), computed);
+test('placePageHolds agrees with canStandHere for every seed entity, not a fixture list', () => {
+  for (const entity of listPublicEntities()) {
+    assert.equal(
+      placePageHolds({
+        displayName: entity.displayName,
+        kind: entity.kind,
+        summary: entity.summary,
+        locationPrecision: entity.locationPrecision,
+        entityId: entity.id,
+      }),
+      canStandHere(entity),
+      `mismatch for ${entity.id}`,
+    );
+  }
+});
+
+test('a live-catalog place with no allowlist entry still holds (Fort Frederik)', () => {
+  const fortFrederik = {
+    displayName: 'Fort Frederik',
+    kind: 'place',
+    entityId: 'nrhp-black-heritage-96001073',
+    summary:
+      'A Danish colonial fort on Saint Croix listed on the National Register of Historic Places.',
+    locationPrecision: 'neighborhood',
+  };
+  assert.equal(placePageHolds(fortFrederik), true);
+  assert.equal(atlasWalkHref(fortFrederik), '/place/fort-frederik');
+});
+
+test('a record with no summary is not invented into a place page, allowlisted id aside', () => {
+  assert.equal(
+    placePageHolds({
+      displayName: 'A Thin Stub Record',
+      kind: 'place',
+      entityId: 'ent_thin_stub_002',
+    }),
+    false,
+  );
+  assert.equal(
+    atlasWalkHref({
+      displayName: 'A Thin Stub Record',
+      kind: 'place',
+      entityId: 'ent_thin_stub_002',
+    }),
+    undefined,
+  );
 });
 
 test('the home-map walk uses a holding slug, never a slugified name or /entity/', () => {
   assert.equal(
-    atlasWalkHref({ displayName: 'Paul Laurence Dunbar High School', kind: 'organization' }),
+    atlasWalkHref({
+      displayName: 'Paul Laurence Dunbar High School',
+      kind: 'organization',
+      summary: 'A public high school in Washington, D.C.',
+    }),
     '/place/paul-laurence-dunbar-high-school',
   );
   assert.equal(
