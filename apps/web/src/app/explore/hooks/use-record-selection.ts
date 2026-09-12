@@ -14,7 +14,7 @@ import {
 } from '../../../lib/map-experience/build-sheet-detail';
 import { buildVisitHandoffFromMapFeature } from '../../../lib/geography/visit-handoff';
 import { withQuery } from '../../../lib/discovery/discovery-arrival';
-import { anatomyPrecisionFor, eraFor } from './atlas-feature-helpers';
+import { eraFor } from './atlas-feature-helpers';
 import {
   resolveExplorePinEntityId,
   subscribeExplorePinSelect,
@@ -176,7 +176,6 @@ export function useRecordSelection(
         lng: selectedFeature.geometry.coordinates[0],
         lat: selectedFeature.geometry.coordinates[1],
         label: placeLabelFor(selectedFeature),
-        precision: anatomyPrecisionFor(selectedFeature.properties.precision),
       },
       era: eraFor(selectedFeature),
       story: selectedFeature.properties.oneLineStory,
