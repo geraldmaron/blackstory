@@ -5,7 +5,8 @@
  * Sources:
  *  - twps0056 state CSV (1790–1990): packages/ops-data/src/demographics/data/twps0056-state-1790-1990.csv
  *  - modern county index (2000–2020): apps/web/public/geo/county-population-decades.json
- *    rolled up by state FIPS (first two digits of fips5)
+ *    rolled up by state FIPS (first two digits of fips5). That file is a committed artifact;
+ *    its Firestore-era exporter is retired, so a rebuild reads bb_reference.census_county_decades.
  *
  * Run from repo root:
  *   node --conditions development --import tsx \

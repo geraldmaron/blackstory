@@ -8,9 +8,9 @@
  * Wikidata SPARQL JSON response into a per-refnum lookup, and
  * buildNrhpCommonsImageRow turns that lookup (plus optional Commons
  * imageinfo metadata) into the same CommonsMediaPropose row shape the
- * dry-run-commons-qid-leftover.ts / promote-commons-auto-propose.ts pair
+ * dry-run-commons-qid-leftover.ts / pin-commons-primary-images.ts pair
  * already uses, so this lane's plan file is a drop-in --from input for the
- * existing promotion script.
+ * existing pin script.
  */
 import {
   evaluateCommonsMediaPropose,
@@ -106,7 +106,7 @@ export function parseNrhpImageSparqlResults(
  * ordered file titles) and, for image_found rows, the fetched Commons metadata for the first file
  * title (if fetched yet). Delegates the actual license/alt/credit/outcome decision to the shared,
  * already-reviewed evaluateCommonsMediaPropose so this lane produces rows the existing
- * promote-commons-auto-propose.ts gate already knows how to read.
+ * pin-commons-primary-images.ts gate already knows how to read.
  */
 export function buildNrhpCommonsImageRow(input: {
   readonly entityId: string;
@@ -167,7 +167,7 @@ export type NrhpCommonsImagePlanCounts = {
  * license_hold groups every image_found row whose outcome is not auto_propose (license_unmapped,
  * missing_credit_or_alt, p18_ambiguous, etc.) — the taxonomy the resolver script reports, kept
  * separate from the real `outcome` field so the plan file stays a faithful
- * promote-commons-auto-propose.ts --from input.
+ * pin-commons-primary-images.ts --from input.
  */
 export function summarizeNrhpCommonsImageRows(
   rows: readonly NrhpCommonsImageRow[],

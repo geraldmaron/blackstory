@@ -42,6 +42,6 @@ test('school seed carries extended narrative; primary image comes from live proj
   const school = listPublicEntities().find((e) => e.id === 'ent_dunbar_school_001');
   assert.ok(school?.extendedNarrative);
   // Offline seed stays text-only for media; `primaryImage` is served from release projections
-  // public entity projections (see map-projection / promote-entity-primary-image).
+  // public entity projections (see map-projection / pin-commons-primary-images).
   assert.equal(school?.primaryImage, undefined);
 });

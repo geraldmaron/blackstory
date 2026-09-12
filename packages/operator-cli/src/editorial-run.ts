@@ -304,7 +304,7 @@ const doiHttpClient: SafeHttpClient = async (request) => {
  * to hard-fail a fixture batch — this returns issue strings instead of throwing, since
  * runEditorialJudge processes many subjects concurrently and a single bad DOI must not
  * abort the overnight batch; the returned issues feed into the packet's validationIssues,
- * which already blocks promotion downstream (commit-enrichment-keeps.ts and the
+ * which already blocks promotion downstream (session-enrich-apply.ts and the
  * auto-promote scripts hold any packet with validationIssues.length > 0).
  */
 async function gateClaimDoiCitations(

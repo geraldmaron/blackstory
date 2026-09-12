@@ -142,7 +142,7 @@ flowchart TB
 | **Discovery survivor intake** | `prepareDiscoverySurvivorIntake` (`packages/operator-cli/src/discovery-survivor-intake.ts`) | Queues campaign survivors into research pipeline | No |
 | **Seed campaigns** | `packages/domain/src/seed-campaigns/records.ts` | Curated high-confidence seed records (NRHP, Rosenwald, HBCU) | No (fixture/bootstrap lane) |
 | **Historic-safety datasets** | `registerHistoricSafetySources` | Layer-feed registrations (EJI, Tougaloo) | No |
-| **External dataset scripts** | e.g. `ingest-hate-crime.ts`, `ingest-opportunity-atlas.ts` | Context/demographics Firestore collections, not entity discovery | Context layer only |
+| **External dataset scripts** | e.g. `ingest-hate-crime.ts`, `ingest-opportunity-atlas.ts` (both retired with the Firestore wind-down; the live lane is `ingest-phase1-*.ts` / `ingest-phase2-*.ts` into `bb_reference`) | Context/demographics collections, not entity discovery | Context layer only |
 
 ### VERIFIED FACTS
 

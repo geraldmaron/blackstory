@@ -110,8 +110,8 @@ alter table bb_public.release_stories
 - **SearXNG query roster** (`packages/config/src/scheduled-jobs/data/corsair-web-search-queries.json`)
   was **already** a runtime-loaded JSON data file, not code — it already carries `schemaVersion`,
   `updatedAt`, and a `purpose`/`safeties` block, and is read by
-  `scripts/run-scheduled-searxng-discovery.sh` and `packages/firebase/scripts/triage-corsair-candidates.ts`
-  at runtime. No change needed; it already satisfies the "curation edits don't require a code
+  `scripts/run-scheduled-searxng-discovery.sh` at runtime (the Firestore-era
+  `triage-corsair-candidates.ts` reader has since been retired). No change needed; it already satisfies the "curation edits don't require a code
   deploy" goal.
 - **Full DB migration** (moving these into a `bb_ops`/`bb_reference` table) was judged too heavy
   for this pass and is a follow-up, not done here — flagging as a candidate for `repo-atya` or a
