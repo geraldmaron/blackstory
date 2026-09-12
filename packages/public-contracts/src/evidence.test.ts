@@ -123,7 +123,80 @@ test('recordConfidenceTier does not let Wikipedia be the lineage that lifts a re
 test('recordConfidenceTier does not let a record corroborate itself with its own index row', () => {
   // The real shape of nrhp-black-heritage-00000006: the listing and significance claims are the
   // NARA catalog row the record was seeded from, and the nomination form is the one document
-  // anyone actually read. One corroborating lineage, so it cannot reach A (repo-6jizv).
+  // anyone actually read. One corroborating lineage, so it cannot reach A (repo-6jizv). Every
+  // claim states its role explicitly, matching what the publisher writes post-migration.
+  assert.equal(
+    recordConfidenceTier([
+      {
+        confidenceLevel: 'high',
+        predicate: 'listing',
+        claimRole: 'record_index',
+        citationSource: 'catalog.archives.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        predicate: 'significant for',
+        claimRole: 'record_index',
+        citationSource: 'catalog.archives.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        predicate: 'source states',
+        claimRole: 'evidence',
+        citationSource: 'npgallery.nps.gov',
+      },
+      {
+        confidenceLevel: 'medium',
+        predicate: 'source states',
+        claimRole: 'evidence',
+        citationSource: 'en.wikipedia.org',
+      },
+    ]),
+    'medium',
+  );
+  // Two documents read, neither of them the index row: genuinely corroborated.
+  assert.equal(
+    recordConfidenceTier([
+      {
+        confidenceLevel: 'high',
+        predicate: 'listing',
+        claimRole: 'record_index',
+        citationSource: 'catalog.archives.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        predicate: 'source states',
+        claimRole: 'evidence',
+        citationSource: 'npgallery.nps.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        predicate: 'source states',
+        claimRole: 'evidence',
+        citationSource: 'blackpast.org',
+      },
+    ]),
+    'high',
+  );
+  // A record carrying nothing but its index row is graded, not reported unassessed.
+  assert.equal(
+    recordConfidenceTier([
+      {
+        confidenceLevel: 'high',
+        predicate: 'listing',
+        claimRole: 'record_index',
+        citationSource: 'catalog.archives.gov',
+      },
+    ]),
+    'medium',
+  );
+});
+
+test('recordConfidenceTier treats a claim missing claimRole as evidence, never inferred from its predicate', () => {
+  // The predicate bridge is gone: every published claim now carries `claimRole`, so
+  // a claim without it is not read as the record's own index row just because its predicate used
+  // to describe one under the old bridge vocabulary. It counts toward corroboration like any
+  // other claim — the explicit default the current schema demands, not an inference.
   assert.equal(
     recordConfidenceTier([
       { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
@@ -137,72 +210,28 @@ test('recordConfidenceTier does not let a record corroborate itself with its own
         predicate: 'source states',
         citationSource: 'npgallery.nps.gov',
       },
-      {
-        confidenceLevel: 'medium',
-        predicate: 'source states',
-        citationSource: 'en.wikipedia.org',
-      },
-    ]),
-    'medium',
-  );
-  // Two documents read, neither of them the index row: genuinely corroborated.
-  assert.equal(
-    recordConfidenceTier([
-      { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
-      {
-        confidenceLevel: 'high',
-        predicate: 'source states',
-        citationSource: 'npgallery.nps.gov',
-      },
-      { confidenceLevel: 'high', predicate: 'source states', citationSource: 'blackpast.org' },
     ]),
     'high',
   );
-  // A record carrying nothing but its index row is graded, not reported unassessed.
+  // Stating the role explicitly still excludes the index row from corroboration, and a predicate
+  // outside the old bridge vocabulary is no obstacle to being named the index row.
   assert.equal(
     recordConfidenceTier([
-      { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
+      {
+        confidenceLevel: 'high',
+        predicate: 'source states',
+        claimRole: 'record_index',
+        citationSource: 'catalog.archives.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        predicate: 'source states',
+        claimRole: 'evidence',
+        citationSource: 'npgallery.nps.gov',
+      },
     ]),
     'medium',
   );
-});
-
-test('recordConfidenceTier believes claimRole over the predicate that stood in for it', () => {
-  // The predicate list only ever described one publisher's vocabulary. A lane that states the
-  // role outright must be graded by what it says, or the bridge silently mis-grades it.
-  const statedEvidence = [
-    // `listing` would read as provenance under the bridge; the role says otherwise.
-    {
-      confidenceLevel: 'high',
-      predicate: 'listing',
-      claimRole: 'evidence',
-      citationSource: 'catalog.archives.gov',
-    },
-    {
-      confidenceLevel: 'high',
-      predicate: 'source states',
-      claimRole: 'evidence',
-      citationSource: 'npgallery.nps.gov',
-    },
-  ];
-  assert.equal(recordConfidenceTier(statedEvidence), 'high');
-
-  // And the reverse: a predicate the bridge would wave through, stated as the index row.
-  const statedIndex = [
-    {
-      confidenceLevel: 'high',
-      predicate: 'source states',
-      claimRole: 'record_index',
-      citationSource: 'catalog.archives.gov',
-    },
-    {
-      confidenceLevel: 'high',
-      predicate: 'source states',
-      claimRole: 'evidence',
-      citationSource: 'npgallery.nps.gov',
-    },
-  ];
-  assert.equal(recordConfidenceTier(statedIndex), 'medium');
 });
 
 test('recordConfidenceTier does not let one publisher corroborate itself', () => {
