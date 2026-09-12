@@ -38,6 +38,8 @@ export type RecordAnatomyPlace = {
   readonly lat: number;
   readonly lng: number;
   readonly label: string;
+  readonly precision:
+    'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site' | 'address';
   readonly precisionCaption?: string;
 };
 
@@ -59,9 +61,7 @@ function whereMapsQuery(fact: RecordAnatomyFact, place: RecordAnatomyPlace): str
   }
   return resolvePublicAddressLine({
     locationLabel: place.label,
-    // resolvePublicAddressLine never reads locationPrecision; the field is required on
-    // PublicAddressInput only for auditPublicAddressCoverage, a different caller.
-    locationPrecision: '',
+    locationPrecision: place.precision,
     kind: 'place',
   });
 }

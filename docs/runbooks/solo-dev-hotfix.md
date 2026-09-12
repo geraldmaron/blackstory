@@ -2,22 +2,19 @@
 
 Practical loop for one person shipping web hotfixes without enterprise ceremony.
 Binding detail also lives in `~/Developer/Guides/Workflows.md` (BlackStory solo-dev
-hotfix pattern). Public web aligns with ADR-027 (Vercel) — merging to `main` is the deploy;
-there is no separate Vercel promote step (repo-8ary, repo-h1b2). Admin now deploys inside the
-same `apps/web` Vercel project (2026-09-11, repo-z3g1f); the old ADR-006 App Hosting promote
-path is retired.
+hotfix & promote pattern). Public web aligns with ADR-027 (Vercel); admin aligns with
+ADR-006 (explicit App Hosting promote only).
 
 ## When to use which branch
 
 | Situation | Do this |
 |-----------|---------|
-| Prod bug on `main` (data plane, rendering, auth) | Hotfix branch **from `origin/main`**, tiny PR, merge — the merge ships that SHA to Vercel Production automatically |
-| Large feature branch (mobile cutover, redesign) | Never merge the whole tip to fix a prod bug — merging to `main` goes live immediately; cherry-pick or re-land the minimal fix onto `main` instead |
-| Local experiment | Feature branch only; never merge to `main` |
+| Prod bug on `main` (data plane, rendering, auth) | Hotfix branch **from `origin/main`**, tiny PR, promote that SHA on Vercel |
+| Large feature branch (mobile cutover, redesign) | Never promote the whole tip to prod; cherry-pick or re-land the minimal fix onto `main` |
+| Local experiment | Feature branch only; no Production promote |
 
-**Rule:** Vercel builds the monorepo at a git SHA from Root Directory `apps/web`, and Production
-tracks `main` directly — merging a 40-commit divergent branch ships all of it, live, with no
-review step after the merge. Prefer a 1–2 commit hotfix off `main`.
+**Rule:** Vercel builds the monorepo at a git SHA from Root Directory `apps/web`. Promoting a
+40-commit divergent branch ships all of it. Prefer a 1–2 commit hotfix off `main`.
 
 ## Loop (happy path)
 
@@ -27,12 +24,14 @@ review step after the merge. Prefer a 1–2 commit hotfix off `main`.
 3. fix + tests                # keep the diff small
 4. preflight (below)          # lockfile + dynamic routes
 5. commit + push + PR → main
-6. merge PR — Vercel auto-builds the merge commit and aliases it to Production immediately
-7. smoke production (blackstory.app) — there is no Preview-then-promote step to do first
-8. bd close + Guides note    # if a new pitfall appeared
+6. Vercel Preview auto-builds from PR / merge
+7. smoke Preview
+8. vercel promote → Production (or dashboard Promote)
+9. smoke production (blackstory.app)
+10. bd close + Guides note    # if a new pitfall appeared
 ```
 
-## Preflight (before merging to main)
+## Preflight (before promote)
 
 ```bash
 # Frozen lockfile must match package.json (Vercel CI=true install)
@@ -50,23 +49,24 @@ If you remove a dependency from any `package.json`, run `pnpm install` and **com
 `pnpm-lock.yaml` in the same PR**. Frozen-lockfile mismatch fails Vercel builds
 with `ERR_PNPM_OUTDATED_LOCKFILE`.
 
-## After merge (Vercel deploys automatically)
+## Promote (Vercel)
 
 ```bash
 SHA="$(git rev-parse HEAD)"   # must be 40-char; already pushed to GitHub
-# Once the PR is merged to main, Vercel builds this commit and aliases it straight to
-# Production (blackstory.app, www.blackstory.app) — no dashboard step, no `vercel promote`.
+# After merge to main, Vercel builds Preview automatically.
+# Smoke Preview, then promote:
+vercel promote <preview-deployment-url>
+# Or: Vercel dashboard → Deployments → … → Promote to Production
 ```
 
-Do not merge a second hotfix on top until the first deployment finishes or fails — Vercel builds
-merges to `main` in order, and each one goes live as soon as its build completes.
+Do not promote a second SHA on top until the first deployment finishes or fails.
 
 ### Admin-only hotfix (superseded — kept for history)
 
 This App Hosting rollout procedure was already leftover before admin moved to Vercel
 (2026-07-25), and now `/admin` (`apps/web/src/admin`, `apps/web/src/app/admin`) is a route group
 inside the single `apps/web` deployment — there is no separate admin target to roll out, and a
-fix there ships with the same `apps/web` merge as any other hotfix, above. Does not apply.
+fix there follows the same promote as any other `apps/web` hotfix, above. Does not apply.
 
 ```bash
 SHA="$(git rev-parse HEAD)"   # must be pushed to GitHub; firebase login first
@@ -94,22 +94,19 @@ done
 Expect: `rel_seed_001` only; no `seed-snapshot`; preferably no `x-nextjs-prerender: 1`
 on entity pages after the force-dynamic fix.
 
-Preview host: `https://blackstory-geraldmarons-projects.vercel.app` (or branch-specific Preview URL,
-for branches other than `main` — a PR branch, not the merge itself).
+Preview host: `https://blackstory-geraldmarons-projects.vercel.app` (or branch-specific Preview URL).
 
 ## Hygiene for a one-person repo
 
-- Prefer **merge PR → main** for hotfixes so `main` matches what production runs — the merge is
-  what ships it.
-- CI red on unrelated lint/typecheck debt: still merge and rely on a green **Vercel build**;
+- Prefer **merge PR → main** for hotfixes so `main` matches what production runs.
+- CI red on unrelated lint/typecheck debt: still promote a green **Vercel build**;
   do not expand the hotfix to “fix all of main CI” unless the build itself fails.
 - Keep beads (`bd`) for the bug; close with the production smoke evidence.
 - New pitfall → one short section in `~/Developer/Guides/Workflows.md` the same day.
 
 ## Anti-patterns
 
-- Merging `redesign/*` or a mobile cutover tip to `main` to fix a web prod bug — it ships
-  everything on that branch to Production immediately
+- Promoting `redesign/*` or mobile cutover tips to fix a web prod bug
 - Relying on CDN `s-maxage` alone without `force-dynamic` / `revalidate` when RUNTIME env differs from BUILD
 - Silent seed fallback under `PUBLIC_DATA_SOURCE=postgres`
 - Editing `package.json` without refreshing `pnpm-lock.yaml`

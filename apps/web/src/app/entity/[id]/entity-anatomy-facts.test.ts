@@ -50,6 +50,7 @@ test('buildEntityAnatomyPlace carries precision caption when geo exists', () => 
   const place = buildEntityAnatomyPlace(entity, anchor);
   assert.ok(place);
   assert.equal(place.lat, anchor.lat);
+  assert.equal(place.precision, entity.locationPrecision);
   assert.ok(place.precisionCaption);
   assert.equal(place.label, buildEntityAnatomyInputs(entity, undefined).whereLabel);
 });

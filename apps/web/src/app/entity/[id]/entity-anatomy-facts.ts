@@ -118,6 +118,7 @@ export function buildEntityAnatomyPlace(
       locationPrecision: entity.locationPrecision,
       kind: entity.kind,
     }),
+    precision: entity.locationPrecision,
     precisionCaption: radiusAffordanceLabel(tier, undefined),
   };
 }
