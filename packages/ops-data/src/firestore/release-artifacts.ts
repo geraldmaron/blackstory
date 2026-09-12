@@ -3,11 +3,28 @@
  * under `public/releases/{releaseId}/`. Replaces unbounded Firestore collection scans for
  * map/list/search/history/sitemap once published to the public-media bucket (or a local
  * fixture directory for tests/dev).
+ *
+ * Fetching the published artifacts is shared with `apps/web` via `@repo/domain` (both consumers
+ * used to carry their own copy, and they disagreed on fallback policy). This module adds one
+ * thing on top of the shared fetcher: an opt-in local-fixture fallback for dev/test, gated by
+ * `allowLocalFallback: true` — off by default, so `packages/ops-data/fixtures/release-artifacts`
+ * can never shadow a live artifact just because a caller forgot to pass an option.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { sha256Json, supabasePublicMediaUrl, type JsonValue, type Sha256Hash } from '@repo/domain';
+import {
+  fetchReleaseEntitiesListArtifact as fetchSharedReleaseEntitiesListArtifact,
+  fetchReleaseSearchIndexArtifact as fetchSharedReleaseSearchIndexArtifact,
+  sha256Json,
+  supabasePublicMediaUrl,
+  type ArtifactFetchImpl,
+  type FetchReleaseArtifactOptions as SharedFetchReleaseArtifactOptions,
+  type JsonValue,
+  type ReleaseEntitiesListArtifact as SharedReleaseEntitiesListArtifact,
+  type ReleaseSearchIndexArtifact as SharedReleaseSearchIndexArtifact,
+  type Sha256Hash,
+} from '@repo/domain';
 import { DEFAULT_PUBLIC_MEDIA_BUCKET } from './entity-media.js';
 
 export { DEFAULT_PUBLIC_MEDIA_BUCKET };
@@ -136,67 +153,20 @@ export async function uploadReleaseCatalogArtifacts(input: {
   );
 }
 
-export type ArtifactFetchImpl = (
-  url: string,
-  init?: { readonly signal?: AbortSignal },
-) => Promise<Response>;
+export type { ArtifactFetchImpl };
 
-export type FetchReleaseArtifactOptions = {
-  readonly fetchImpl?: ArtifactFetchImpl;
-  readonly env?: NodeJS.ProcessEnv;
-  readonly timeoutMs?: number;
+export type FetchReleaseArtifactOptions = SharedFetchReleaseArtifactOptions & {
+  /**
+   * Serve `packages/ops-data/fixtures/release-artifacts` when the remote fetch misses.
+   * Opt-in and off by default: dev/test only, never assume it — a fixture slice must never
+   * shadow live `bb_public` data because a caller forgot to pass an option.
+   */
   readonly allowLocalFallback?: boolean;
   readonly localArtifactsRoot?: string;
 };
 
-/**
- * Trailing slashes removed by scanning back from the end, not `replace(/\/+$/, '')`. That
- * expression is quadratic on input ending in a long run of slashes (CodeQL js/polynomial-redos),
- * and these values come from environment configuration and remote responses.
- */
-function trimTrailingSlashes(value: string): string {
-  let end = value.length;
-  while (end > 0 && value.charCodeAt(end - 1) === 47) {
-    end -= 1;
-  }
-  return end === value.length ? value : value.slice(0, end);
-}
-
-function artifactBaseUrl(env: NodeJS.ProcessEnv = process.env): string | undefined {
-  const configured = env.APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL?.trim();
-  if (configured && configured.length > 0) return trimTrailingSlashes(configured);
-  return undefined;
-}
-
-function remoteArtifactUrl(objectPath: string, env: NodeJS.ProcessEnv = process.env): string {
-  const base = artifactBaseUrl(env);
-  if (base) return `${base}/${objectPath}`;
-  return publicMediaObjectUrl(objectPath);
-}
-
 function defaultLocalArtifactsRoot(): string {
   return join(dirname(fileURLToPath(import.meta.url)), '../../fixtures/release-artifacts');
-}
-
-async function fetchJsonArtifact<T>(
-  objectPath: string,
-  options: FetchReleaseArtifactOptions = {},
-): Promise<T | undefined> {
-  const env = options.env ?? process.env;
-  const fetchImpl = options.fetchImpl ?? fetch;
-  const timeoutMs = options.timeoutMs ?? 8_000;
-  const url = remoteArtifactUrl(objectPath, env);
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const response = await fetchImpl(url, { signal: controller.signal });
-    if (!response.ok) return undefined;
-    return (await response.json()) as T;
-  } catch {
-    return undefined;
-  } finally {
-    clearTimeout(timer);
-  }
 }
 
 function readLocalJsonArtifact<T>(objectPath: string, root: string): T | undefined {
@@ -208,38 +178,34 @@ function readLocalJsonArtifact<T>(objectPath: string, root: string): T | undefin
   }
 }
 
-/** Fetch the release entities-list artifact (CDN/GCS HTTPS, optional local fixture fallback). */
+/** Fetch the release entities-list artifact (CDN HTTPS, optional opt-in local fixture fallback). */
 export async function fetchReleaseEntitiesListArtifact(
   releaseId: string,
   options: FetchReleaseArtifactOptions = {},
-): Promise<ReleaseEntitiesListArtifact | undefined> {
+): Promise<SharedReleaseEntitiesListArtifact | undefined> {
+  const remote = await fetchSharedReleaseEntitiesListArtifact(releaseId, options);
+  if (remote) return remote;
+  if (options.allowLocalFallback !== true) return undefined;
   const objectPath = publicReleaseEntitiesListPath(releaseId);
-  const remote = await fetchJsonArtifact<ReleaseEntitiesListArtifact>(objectPath, options);
-  if (remote && remote.releaseId === releaseId && Array.isArray(remote.entities)) {
-    return remote;
-  }
-  if (options.allowLocalFallback === false) return undefined;
   const localRoot = options.localArtifactsRoot ?? defaultLocalArtifactsRoot();
-  const local = readLocalJsonArtifact<ReleaseEntitiesListArtifact>(objectPath, localRoot);
+  const local = readLocalJsonArtifact<SharedReleaseEntitiesListArtifact>(objectPath, localRoot);
   if (local && local.releaseId === releaseId && Array.isArray(local.entities)) {
     return local;
   }
   return undefined;
 }
 
-/** Fetch the release search-index artifact (CDN/GCS HTTPS, optional local fixture fallback). */
+/** Fetch the release search-index artifact (CDN HTTPS, optional opt-in local fixture fallback). */
 export async function fetchReleaseSearchIndexArtifact(
   releaseId: string,
   options: FetchReleaseArtifactOptions = {},
-): Promise<ReleaseSearchIndexArtifact | undefined> {
+): Promise<SharedReleaseSearchIndexArtifact | undefined> {
+  const remote = await fetchSharedReleaseSearchIndexArtifact(releaseId, options);
+  if (remote) return remote;
+  if (options.allowLocalFallback !== true) return undefined;
   const objectPath = publicReleaseSearchIndexPath(releaseId);
-  const remote = await fetchJsonArtifact<ReleaseSearchIndexArtifact>(objectPath, options);
-  if (remote && remote.releaseId === releaseId && Array.isArray(remote.docs)) {
-    return remote;
-  }
-  if (options.allowLocalFallback === false) return undefined;
   const localRoot = options.localArtifactsRoot ?? defaultLocalArtifactsRoot();
-  const local = readLocalJsonArtifact<ReleaseSearchIndexArtifact>(objectPath, localRoot);
+  const local = readLocalJsonArtifact<SharedReleaseSearchIndexArtifact>(objectPath, localRoot);
   if (local && local.releaseId === releaseId && Array.isArray(local.docs)) {
     return local;
   }

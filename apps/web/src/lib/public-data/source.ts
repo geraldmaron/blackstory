@@ -45,10 +45,7 @@ import {
   collectTwoHopNeighborIds,
 } from './neighbor-ids';
 import { searchIndexReadyForRecords } from '../records/build-records-index';
-import {
-  fetchReleaseEntitiesListArtifact,
-  fetchReleaseSearchIndexArtifact,
-} from './release-artifacts';
+import { fetchReleaseEntitiesListArtifact, fetchReleaseSearchIndexArtifact } from '@repo/domain';
 
 /**
  * Cross-request cache window for release catalog / search index (seconds).
@@ -293,8 +290,8 @@ async function loadLiveEntitiesForRelease(
         `[public-data] entities artifact had ${artifact.entities.length} entries but none parsed; falling back to Postgres`,
       );
     }
-    // Every arrival here is a full multi-MB catalog pull. release-artifacts.ts has already
-    // logged the specific reason; this line marks the cost that reason caused.
+    // Every arrival here is a full multi-MB catalog pull. The shared release-artifact fetcher
+    // has already logged the specific reason; this line marks the cost that reason caused.
     console.warn(
       `[public-data] full Postgres entity catalog pull for ${releaseId} (artifact unusable)`,
     );
