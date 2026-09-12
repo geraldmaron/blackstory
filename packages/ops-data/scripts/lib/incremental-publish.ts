@@ -633,7 +633,22 @@ export function buildReleaseSourceFromLandscape(
   const displayName = row.display_name.trim();
   const summary = (row.summary ?? '').trim();
   const canonicalUrl = row.canonical_url?.trim() ?? '';
-  if (displayName.length === 0 || summary.length === 0 || canonicalUrl.length === 0) return null;
+  // A registry index row is one way for a record to have a source, not the only one: a curated
+  // record has no index entry and therefore no canonical_url, while still carrying the evidence
+  // citations its prose was drafted from. So a row with no canonical_url builds PROVIDED it
+  // carries at least one usable evidence citation (a source url AND a quote). With neither it
+  // returns null and the gate reports `missing_canonical_url` — the gate fails closed on "no
+  // source at all", not on "no index row". See also the claim guard below: a record with no index
+  // row publishes no index claim, because there is no index row to cite.
+  const hasCitableEvidence = asRecordArray(row.payload.evidenceCitations).some(
+    (raw) =>
+      typeof raw.sourceUrl === 'string' &&
+      raw.sourceUrl.trim().length > 0 &&
+      typeof raw.quote === 'string' &&
+      raw.quote.trim().length > 0,
+  );
+  if (displayName.length === 0 || summary.length === 0) return null;
+  if (canonicalUrl.length === 0 && !hasCitableEvidence) return null;
   if (row.lat === null || row.lng === null) return null;
 
   let hostname = 'source';
@@ -678,62 +693,70 @@ export function buildReleaseSourceFromLandscape(
   // triggers always sorts after the "documented_site" default the significance claim gets, so
   // the significance note lands at notabilityBasis[0]). Every other lane keeps the prior
   // single-claim behavior unchanged.
+  //
+  // repo-fz6k0: no canonical_url means no registry index entry, and a record cannot cite an
+  // index row it does not have. Rather than promote some evidence document into the slot — which
+  // would make the publisher assert that document "states" the whole summary, an attribution the
+  // record cannot back — such a record publishes no record_index claim at all and stands on its
+  // evidence claims below. Every row that HAS a canonical_url is unaffected.
   const claims: ReleaseSourceClaim[] =
-    row.lane === 'nrhp-black-heritage'
-      ? [
-          {
-            predicate: 'listing',
-            object: buildNrhpListingFactObject({
-              refnum: typeof row.payload.refnum === 'string' ? row.payload.refnum : undefined,
-              listedDateSerial:
-                typeof row.payload.listedDateSerial === 'string' ||
-                row.payload.listedDateSerial === null
-                  ? (row.payload.listedDateSerial as string | null)
-                  : undefined,
-            }),
-            confidenceLevel: confidenceLevelForSource(canonicalUrl),
-            citationSource: hostname,
-            citationHref: canonicalUrl,
-            citationLabel: hostname,
-            claimRole: 'record_index',
-          },
-          {
-            predicate: 'significant for',
-            object: buildNrhpSignificanceObject({
-              areaOfSignificance:
-                typeof row.payload.areaOfSignificance === 'string'
-                  ? row.payload.areaOfSignificance
-                  : undefined,
-            }),
-            confidenceLevel: confidenceLevelForSource(canonicalUrl),
-            citationSource: hostname,
-            citationHref: canonicalUrl,
-            citationLabel: hostname,
-            claimRole: 'record_index',
-          },
-        ]
-      : [
-          {
-            // M3 (repo-teb1z). This predicate used to be the CRITERION NAME — `documented_site`,
-            // or `documented_contribution` on an invention — which closed a loop: the publisher
-            // wrote the word, `buildNotabilityBasisNote` led the inclusion note with it
-            // ("Documented site <summary>."), and `inferNotabilityCriterionFromClaim` read the
-            // same word back as the criterion it was supposed to determine. 238 basis records in
-            // the active release began literally "Documented site", including on people.
-            //
-            // A predicate describes what the claim says. This claim says the source states the
-            // summary, so that is what it says. The criterion is now decided by the inference and
-            // the kind, where it belongs, and a record whose only claim is this index row keeps a
-            // basis rather than a self-assertion — the honest residual that repo-o6k0c measures.
-            predicate: 'source states',
-            object: summary,
-            confidenceLevel: confidenceLevelForSource(canonicalUrl),
-            citationSource: hostname,
-            citationHref: canonicalUrl,
-            citationLabel: hostname,
-            claimRole: 'record_index',
-          },
-        ];
+    canonicalUrl.length === 0
+      ? []
+      : row.lane === 'nrhp-black-heritage'
+        ? [
+            {
+              predicate: 'listing',
+              object: buildNrhpListingFactObject({
+                refnum: typeof row.payload.refnum === 'string' ? row.payload.refnum : undefined,
+                listedDateSerial:
+                  typeof row.payload.listedDateSerial === 'string' ||
+                  row.payload.listedDateSerial === null
+                    ? (row.payload.listedDateSerial as string | null)
+                    : undefined,
+              }),
+              confidenceLevel: confidenceLevelForSource(canonicalUrl),
+              citationSource: hostname,
+              citationHref: canonicalUrl,
+              citationLabel: hostname,
+              claimRole: 'record_index',
+            },
+            {
+              predicate: 'significant for',
+              object: buildNrhpSignificanceObject({
+                areaOfSignificance:
+                  typeof row.payload.areaOfSignificance === 'string'
+                    ? row.payload.areaOfSignificance
+                    : undefined,
+              }),
+              confidenceLevel: confidenceLevelForSource(canonicalUrl),
+              citationSource: hostname,
+              citationHref: canonicalUrl,
+              citationLabel: hostname,
+              claimRole: 'record_index',
+            },
+          ]
+        : [
+            {
+              // M3 (repo-teb1z). This predicate used to be the CRITERION NAME — `documented_site`,
+              // or `documented_contribution` on an invention — which closed a loop: the publisher
+              // wrote the word, `buildNotabilityBasisNote` led the inclusion note with it
+              // ("Documented site <summary>."), and `inferNotabilityCriterionFromClaim` read the
+              // same word back as the criterion it was supposed to determine. 238 basis records in
+              // the active release began literally "Documented site", including on people.
+              //
+              // A predicate describes what the claim says. This claim says the source states the
+              // summary, so that is what it says. The criterion is now decided by the inference and
+              // the kind, where it belongs, and a record whose only claim is this index row keeps a
+              // basis rather than a self-assertion — the honest residual that repo-o6k0c measures.
+              predicate: 'source states',
+              object: summary,
+              confidenceLevel: confidenceLevelForSource(canonicalUrl),
+              citationSource: hostname,
+              citationHref: canonicalUrl,
+              citationLabel: hostname,
+              claimRole: 'record_index',
+            },
+          ];
 
   // repo-fbjr: the documents the enrichment sweep actually READ, as claims that cite them.
   //
@@ -817,6 +840,13 @@ export function buildReleaseSourceFromLandscape(
     });
   }
   claims.push(...evidenceClaims);
+
+  // repo-fz6k0: fail closed. `hasCitableEvidence` above is a cheap pre-check on the raw payload;
+  // this is the real one, after unparseable urls and same-document merges have been applied. A
+  // record with no canonical_url whose every evidence citation dropped out would otherwise
+  // publish with an empty claims array — a record asserting nothing, citing nothing. Returning
+  // null here routes it back to the same `missing_canonical_url` skip it gets today.
+  if (claims.length === 0) return null;
 
   // Enrichment writes its long-form prose back onto the landscape row; without this passthrough
   // the builder would rebuild the entity from index fields alone and silently drop it, so a
@@ -1099,6 +1129,15 @@ export function assessLandscapeDepth(
   const context = entry.historicalContext?.trim() ?? '';
   if (context.length > 0) return { deep: true };
 
+  // Read off the ROW, not the entry: this is the registry index document the record was found
+  // through, and a claim that merely cites it back is not evidence of anything beyond the listing.
+  //
+  // repo-fz6k0: for a curated row with no canonical_url this is null, so every claim carrying a
+  // parseable url counts as independent and the record passes. That is the correct reading, not a
+  // hole to plug — such a record has no "own registry index entry" to exclude, and (since that
+  // same bead) publishes no record_index claim either, so the only claims it can offer here are
+  // the evidence documents the draft actually read. Do not "fix" this by falling back to some
+  // evidence url as the registry document; that would exclude the record's own real evidence.
   const registryDocument = documentKey(row.canonical_url);
   const claims = entry.claims ?? [];
   const hasIndependentSource = claims.some((claim) => {
@@ -1289,7 +1328,8 @@ export function gateLandscapePublishCandidate(input: {
     return {
       eligible: false,
       reason: 'missing_canonical_url',
-      detail: 'insufficient landscape fields to build release source',
+      detail:
+        'insufficient landscape fields to build release source (no canonical_url AND no citable evidence citation, or no usable location)',
     };
   }
   const inherited =

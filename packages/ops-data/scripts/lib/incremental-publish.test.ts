@@ -1740,6 +1740,117 @@ test('a city named by the landscape row wins over the live jurisdiction', () => 
 });
 
 /*
+ * repo-fz6k0: the same curated cohort, one gate earlier.
+ *
+ * A curated record is not in any registry, so it has no canonical_url — and an empty
+ * canonical_url alone used to make `buildReleaseSourceFromLandscape` return null, which the gate
+ * reports as `missing_canonical_url`. The 24 live coverage-gap drafts were held there with their
+ * corrected summaries staged and their evidence citations sitting unread on the row. These rows
+ * publish the evidence they actually have, and a row with no source of any kind still skips.
+ *
+ * `curatedRow`'s own payload (historicalContext + confidence 0.82) is replaced here on purpose:
+ * the real cohort has neither, so depth has to come from the evidence claim being independent of
+ * a registry document there isn't one of, and confidence comes from the claims — 0.627 against a
+ * 0.75 floor, admitted only by the repo-2t04.17 regression clause, exactly as it does live.
+ */
+const curatedEvidencePayload = {
+  evidenceCitations: [
+    {
+      sourceUrl: 'https://en.wikipedia.org/wiki/African_Meeting_House',
+      title: 'African Meeting House',
+      quote:
+        'The African Meeting House is the oldest Black church building still standing in the United States.',
+    },
+  ],
+};
+
+test('a curated row with no canonical_url publishes its evidence claim instead of skipping', () => {
+  const result = gateLandscapePublishCandidate({
+    row: curatedRow({ canonical_url: null, payload: curatedEvidencePayload }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    allowRepublish: true,
+    liveLocation: curatedLiveLocation(),
+    liveConfidence: 0.5,
+  });
+  assert.equal(result.eligible, true);
+  if (!result.eligible) return;
+  assert.equal(result.entry.claims?.length, 1);
+  const claim = result.entry.claims?.[0];
+  assert.equal(claim?.claimRole, 'evidence');
+  assert.equal(
+    claim?.object,
+    'The African Meeting House is the oldest Black church building still standing in the United States.',
+    'the object is the sentence the prose rests on, not a restatement of the whole summary',
+  );
+  assert.notEqual(claim?.object, result.entry.summary);
+  assert.equal(claim?.citationHref, 'https://en.wikipedia.org/wiki/African_Meeting_House');
+  assert.equal(
+    result.entry.claims?.some((c) => c.claimRole === 'record_index'),
+    false,
+    'there is no registry index row to cite, so the record asserts none',
+  );
+});
+
+test('a row with no canonical_url and no evidence citation still reports missing_canonical_url', () => {
+  const result = gateLandscapePublishCandidate({
+    row: curatedRow({ canonical_url: null, payload: {} }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    allowRepublish: true,
+    liveLocation: curatedLiveLocation(),
+    liveConfidence: 0.5,
+  });
+  assert.equal(result.eligible, false);
+  assert.equal(result.eligible === false && result.reason, 'missing_canonical_url');
+});
+
+test('a row whose every evidence citation is unusable fails closed rather than publishing no claims', () => {
+  // The cheap pre-check passes (a url string and a quote are both present) and the citation is
+  // then dropped as unparseable, leaving an empty claims array. Without the fail-closed guard
+  // after the evidence loop this row would publish asserting nothing and citing nothing.
+  const result = gateLandscapePublishCandidate({
+    row: curatedRow({
+      canonical_url: null,
+      payload: { evidenceCitations: [{ sourceUrl: 'not a url', title: 'x', quote: 'something' }] },
+    }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+    allowRepublish: true,
+    liveLocation: curatedLiveLocation(),
+    liveConfidence: 0.5,
+  });
+  assert.equal(result.eligible, false);
+  assert.equal(result.eligible === false && result.reason, 'missing_canonical_url');
+});
+
+test('a row WITH a canonical_url still leads with its record_index claim', () => {
+  // The guard for the thousands of registry-backed records that publish through this path today:
+  // nothing about a row that HAS an index entry changes.
+  const entry = buildReleaseSourceFromLandscape(
+    enrichedRow({
+      payload: {
+        historicalContext: 'Swept context standing in for a researched history.',
+        evidenceCitations: [
+          {
+            sourceUrl: 'https://en.wikipedia.org/wiki/Example_Shop',
+            title: 'Example Shop',
+            quote: 'a fixture of the commercial corridor',
+          },
+        ],
+      },
+    }),
+  );
+  assert.ok(entry);
+  const first = entry!.claims?.[0];
+  assert.equal(first?.claimRole, 'record_index');
+  assert.equal(first?.predicate, 'source states');
+  assert.equal(first?.object, entry!.summary, 'the index claim still carries the whole summary');
+  assert.equal(first?.citationHref, 'https://historicsites.dcpreservation.org/items/show/1055');
+  assert.equal(entry!.claims?.length, 2, 'index claim plus one evidence document');
+});
+
+/*
  * repo-ttlce. `topics` was written with `topicTags ?? topicIds ?? []`, which falls through only on
  * nullish — so a build carrying `topicTags: []` and real `topicIds` wrote an EMPTY topics column
  * while its projection kept the ids. That is the whole of repo-p1m1y: 1,729 live rows invisible to
