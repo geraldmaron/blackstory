@@ -1,5 +1,12 @@
 /**
- * repo-n7p6.28 — realign `bb_public.search_index.facets->>'status'` with the release projection.
+ * Realign `bb_public.search_index.facets->>'status'` (and the `status` COLUMN beside it) with the
+ * release projection.
+ *
+ * A thin wrapper over `lib/search-facet-realign.ts`, configured for the `status` key: this runs
+ * through that shared engine's `status-column` mode, which writes `status` to two places and
+ * always resolves a mismatch, never only an empty one (see that module's header for why). Kept as
+ * its own script, rather than dropped in favor of calling the shared engine directly, because
+ * `apps/web/src/app/records/load-records-index.ts` names it by file.
  *
  * `search_index` stores the whole search document in the `facets` jsonb column, and
  * apps/api-public/src/http/postgres-search-index.ts's `mapPostgresSearchIndexRow` returns
@@ -16,6 +23,10 @@
  *
  * The release projection is the authority here; this script only copies it onto the search doc.
  * It invents nothing: a row whose projection has no status is left alone rather than defaulted.
+ * Unlike the array/scalar facet targets, ANY mismatch is resolved here — not only an empty one —
+ * because a stale "living" status is not a value someone else asserted and might have a reason for;
+ * it is a violation, and `mapPostgresSearchIndexRow` prefers the `status` COLUMN over the facet, so
+ * both are written together.
  *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a && export DATABASE_SSL=1
@@ -28,6 +39,7 @@
  */
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
+import { applySearchFacetRealign, planSearchFacetRealign } from './lib/search-facet-realign.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.BACKFILL_SEARCH_FACETS_STATUS_APPLY === '1';
@@ -41,81 +53,34 @@ function connectionString(): string {
   return value;
 }
 
-/**
- * Rows where the served search doc disagrees with the record's own release projection.
- *
- * `mapPostgresSearchIndexRow` (packages/schemas/src/search-index-row.ts) prefers the `status`
- * COLUMN over `facets->>'status'` when the column is set, so the served value must be compared
- * the same way — `si.facets->>'status'` alone under-detects mismatches on rows that already carry
- * a (possibly stale) `status` column value.
- */
-const MISMATCH_PREDICATE = `
-  si.release_id = r.release_id
-  AND jsonb_typeof(si.facets) = 'object'
-  AND re.projection->>'status' IS NOT NULL
-  AND COALESCE(si.status, si.facets->>'status') IS DISTINCT FROM re.projection->>'status'
-`;
-
 async function main(): Promise<void> {
   const { connectionString: cs, ssl } = normalizePgConnectionString(connectionString());
   const client = new pg.Client({ connectionString: cs, ssl });
   await client.connect();
 
   try {
-    const { rows: preview } = await client.query<{
-      kind: string;
-      served: string | null;
-      projection_status: string;
-      n: number;
-    }>(
-      `SELECT si.kind,
-              si.facets->>'status' AS served,
-              re.projection->>'status' AS projection_status,
-              count(*)::int AS n
-         FROM bb_public.search_index si
-         JOIN bb_public.v_active_release_id r ON r.release_id = si.release_id
-         JOIN bb_public.release_entities re
-           ON re.release_id = si.release_id AND re.entity_id = si.entity_id
-        WHERE ${MISMATCH_PREDICATE}
-        GROUP BY 1, 2, 3
-        ORDER BY n DESC`,
+    console.log(
+      '=== Backfill search_index.facets.status (and the status column) from release projection ===',
     );
 
-    console.log('=== Backfill search_index.facets.status from release projection ===');
-    const total = preview.reduce((sum, row) => sum + row.n, 0);
+    // `status` always resolves any mismatch (see lib/search-facet-realign.ts), so `filled` and
+    // `resolved` together are the whole story — there is no OVERWRITE_CONFLICTS gate to report.
+    const plan = await planSearchFacetRealign(client, { keys: ['status'] });
+    const report = plan.targets[0];
+    if (!report) throw new Error('planSearchFacetRealign returned no report for status');
+
+    const total = report.filled + report.resolved;
     console.log(`Mismatched rows: ${total}`);
-    for (const row of preview) {
-      console.log(
-        `  ${row.n}\t${row.kind}: served="${row.served ?? 'null'}" → projection="${row.projection_status}"`,
-      );
-    }
+    console.log(`  filled (no served status yet): ${report.filled}`);
+    console.log(`  resolved (served status disagreed with projection): ${report.resolved}`);
 
     if (DRY_RUN || !APPLY) {
       console.log('\nDry run only. Set DRY_RUN=0 BACKFILL_SEARCH_FACETS_STATUS_APPLY=1 to apply.');
       return;
     }
 
-    const updated = await client.query(
-      `UPDATE bb_public.search_index si
-          SET facets = jsonb_set(si.facets, '{status}', to_jsonb(re.projection->>'status'), true),
-              status = re.projection->>'status'
-         FROM bb_public.v_active_release_id r,
-              bb_public.release_entities re
-        WHERE re.release_id = si.release_id
-          AND re.entity_id = si.entity_id
-          AND ${MISMATCH_PREDICATE}`,
-    );
-    console.log(`\nApplied: search_index rows updated = ${updated.rowCount ?? 0}`);
-
-    const { rows: after } = await client.query<{ n: number }>(
-      `SELECT count(*)::int AS n
-         FROM bb_public.search_index si
-         JOIN bb_public.v_active_release_id r ON r.release_id = si.release_id
-         JOIN bb_public.release_entities re
-           ON re.release_id = si.release_id AND re.entity_id = si.entity_id
-        WHERE ${MISMATCH_PREDICATE}`,
-    );
-    console.log(`Remaining mismatches: ${after[0]?.n ?? 0}`);
+    const updated = await applySearchFacetRealign(client, plan);
+    console.log(`\nApplied: search_index rows updated = ${updated}`);
   } finally {
     await client.end();
   }

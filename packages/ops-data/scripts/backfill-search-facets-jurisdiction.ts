@@ -1,6 +1,12 @@
 /**
  * Realign `bb_public.search_index.facets->>'jurisdictionState'` with the release projection.
  *
+ * A thin wrapper over `lib/search-facet-realign.ts`, configured for the `jurisdictionState` key:
+ * this runs through that shared engine's `scalar-facet` mode, which allows the source and
+ * destination keys to differ (`projection.jurisdictionLabel` -> `facets.jurisdictionState`). Kept
+ * as its own script, rather than dropped in favor of calling the shared engine directly, because
+ * `lib/incremental-publish.ts` names it by file in a comment explaining the drift it mops up.
+ *
  * 4,100 of the 4,107 entities in the active release carry a `jurisdictionLabel` in
  * `bb_public.release_entities.projection` and nothing in the matching `search_index` facet. The
  * cost of that gap is visible on two surfaces at once. `/records` reads the search doc, so the
@@ -21,8 +27,6 @@
  * where both were set and disagreed. Both conditions are re-checked and reported on every run,
  * because that assumption is the only thing making a blind copy safe.
  *
- * Sibling of `backfill-search-facets-era.ts`, same shape and same guardrails.
- *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a && export DATABASE_SSL=1
  *   node --conditions development --import tsx \
@@ -34,9 +38,11 @@
  */
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
+import { applySearchFacetRealign, planSearchFacetRealign } from './lib/search-facet-realign.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.BACKFILL_SEARCH_FACETS_JURISDICTION_APPLY === '1';
+const OVERWRITE_CONFLICTS = process.env.OVERWRITE_CONFLICTS === '1';
 
 function connectionString(): string {
   const value =
@@ -47,34 +53,6 @@ function connectionString(): string {
   return value;
 }
 
-/** Both sides are read as trimmed text, so a whitespace-only value counts as absent. */
-const PROJ_JURIS = `btrim(coalesce(re.projection->>'jurisdictionLabel', ''))`;
-const FACET_JURIS = `btrim(coalesce(si.facets->>'jurisdictionState', ''))`;
-
-/**
- * Rows where the record's own projection states a jurisdiction and the served search doc does
- * not. Deliberately one-directional: an empty projection never blanks a populated facet.
- */
-const STALE_PREDICATE = `
-  si.release_id = r.release_id
-  AND jsonb_typeof(si.facets) = 'object'
-  AND ${PROJ_JURIS} <> ''
-  AND ${FACET_JURIS} = ''
-`;
-
-const JOIN = `
-     FROM bb_public.search_index si
-     JOIN bb_public.v_active_release_id r ON r.release_id = si.release_id
-     JOIN bb_public.release_entities re
-       ON re.release_id = si.release_id AND re.entity_id = si.entity_id`;
-
-async function countStale(client: pg.Client): Promise<number> {
-  const { rows } = await client.query<{ n: number }>(
-    `SELECT count(*)::int AS n ${JOIN} WHERE ${STALE_PREDICATE}`,
-  );
-  return rows[0]?.n ?? 0;
-}
-
 async function main(): Promise<void> {
   const { connectionString: cs, ssl } = normalizePgConnectionString(connectionString());
   const client = new pg.Client({ connectionString: cs, ssl });
@@ -83,44 +61,21 @@ async function main(): Promise<void> {
   try {
     console.log('=== Backfill search_index.facets.jurisdictionState from release projection ===');
 
-    const total = await countStale(client);
-    console.log(`Stale rows (projection has a jurisdiction, search facet empty): ${total}`);
+    const plan = await planSearchFacetRealign(client, {
+      keys: ['jurisdictionState'],
+      resolveConflicts: OVERWRITE_CONFLICTS,
+    });
+    const report = plan.targets[0];
+    if (!report) throw new Error('planSearchFacetRealign returned no report for jurisdictionState');
 
-    const { rows: byKind } = await client.query<{ kind: string; n: number }>(
-      `SELECT si.kind, count(*)::int AS n ${JOIN} WHERE ${STALE_PREDICATE}
-        GROUP BY 1 ORDER BY n DESC`,
-    );
-    for (const row of byKind) console.log(`  ${row.n}\t${row.kind}`);
-
-    const { rows: sample } = await client.query<{
-      entity_id: string;
-      name: string;
-      proj_juris: string;
-    }>(
-      `SELECT si.entity_id, si.name, ${PROJ_JURIS} AS proj_juris
-       ${JOIN} WHERE ${STALE_PREDICATE} ORDER BY si.name LIMIT 5`,
-    );
-    console.log('Sample:');
-    for (const row of sample) {
-      console.log(`  ${row.name} (${row.entity_id}) → ${row.proj_juris}`);
-    }
-
-    // Guardrails. Neither is written by this script; a non-zero count means the drift is no
-    // longer one-directional and the projection-as-authority assumption needs re-examining.
-    const { rows: guard } = await client.query<{ facet_only: number; both_differ: number }>(
-      `SELECT
-         count(*) FILTER (WHERE ${PROJ_JURIS} = '' AND ${FACET_JURIS} <> '')::int AS facet_only,
-         count(*) FILTER (WHERE ${PROJ_JURIS} <> '' AND ${FACET_JURIS} <> ''
-                            AND ${PROJ_JURIS} IS DISTINCT FROM ${FACET_JURIS})::int AS both_differ
-       ${JOIN} WHERE si.release_id = r.release_id`,
-    );
-    const facetOnly = guard[0]?.facet_only ?? 0;
-    const bothDiffer = guard[0]?.both_differ ?? 0;
+    console.log(`Stale rows (projection has a jurisdiction, search facet empty): ${report.filled}`);
     console.log(
-      `\nLeft untouched — facet has a jurisdiction but projection does not: ${facetOnly}` +
-        `\nLeft untouched — both set and disagreeing: ${bothDiffer}`,
+      `\nLeft untouched — facet has a jurisdiction but projection does not: ${report.facetOnly}` +
+        `\n${report.resolved > 0 ? 'Resolved' : 'Left untouched'} — both set and disagreeing: ${
+          report.resolved > 0 ? report.resolved : report.leftConflicts
+        }`,
     );
-    if (facetOnly > 0 || bothDiffer > 0) {
+    if (report.leftConflicts > 0) {
       console.log('  ^ neither case is repaired here; investigate before assuming a clean sync.');
     }
 
@@ -131,22 +86,8 @@ async function main(): Promise<void> {
       return;
     }
 
-    const updated = await client.query(
-      `UPDATE bb_public.search_index si
-          SET facets = jsonb_set(
-                si.facets,
-                '{jurisdictionState}',
-                to_jsonb(btrim(re.projection->>'jurisdictionLabel')),
-                true
-              )
-         FROM bb_public.v_active_release_id r,
-              bb_public.release_entities re
-        WHERE re.release_id = si.release_id
-          AND re.entity_id = si.entity_id
-          AND ${STALE_PREDICATE}`,
-    );
-    console.log(`\nApplied: search_index rows updated = ${updated.rowCount ?? 0}`);
-    console.log(`Remaining stale: ${await countStale(client)}`);
+    const updated = await applySearchFacetRealign(client, plan);
+    console.log(`\nApplied: search_index rows updated = ${updated}`);
   } finally {
     await client.end();
   }
