@@ -125,8 +125,7 @@ type LineageAggregate = {
  * path yet at all, so renormalizing around it is a separate, deliberate step for whenever that
  * lands — not a side effect of this one.
  */
-const RENORMALIZABLE_DIMENSIONS = ['temporalProximity', 'extractionQuality'] as const;
-type RenormalizableDimension = (typeof RENORMALIZABLE_DIMENSIONS)[number];
+type RenormalizableDimension = 'temporalProximity' | 'extractionQuality';
 
 function assessedFor(
   scored: readonly LineageAggregate[],
