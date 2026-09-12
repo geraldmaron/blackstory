@@ -62,6 +62,7 @@ import {
   publishRegressionFailureMessage,
   runPublishRegressionGates,
 } from './lib/publish-regression-gates.ts';
+import { assertNoProjectionDivergence } from './lib/projection-divergence.ts';
 import { applyReleaseTaxonomySync, planReleaseTaxonomySync } from './lib/release-taxonomy-sync.ts';
 import { applyReleaseRelatedSync, planReleaseRelatedSync } from './lib/release-related-sync.ts';
 
@@ -795,6 +796,22 @@ async function main(): Promise<void> {
       });
       for (const line of formatReleaseGraphAuditLog(graphRebuild.audit)) {
         console.log(`  graph: ${line}`);
+      }
+
+      // Everything above this line wrote derived copies — the release_entities columns, the
+      // search_index row, the two post-commit re-syncs — of facts readers only ever get from
+      // `projection`. Measure the rows this run touched against it rather than assuming.
+      // Reported, not thrown: `applyReleaseTaxonomySync` above still writes the taxonomy column
+      // without the projection, so failing here would abort every publish that touches topics
+      // over a defect this run did not introduce. Make it fatal once that write path is fixed.
+      try {
+        await assertNoProjectionDivergence(
+          client,
+          prepared.map((row) => row.entityRow.entity_id),
+          { releaseId },
+        );
+      } catch (error) {
+        console.warn(error instanceof Error ? error.message : String(error));
       }
     }
 

@@ -1,0 +1,421 @@
+/**
+ * Compares `bb_public.release_entities.projection` against every derived copy of the same facts.
+ *
+ * Public readers serve the projection jsonb and nothing else — `fetchPublicEntityProjection`,
+ * `listPublicEntityProjections` and `fetchPublicEntityProjectionsByIds` in
+ * `apps/web/src/lib/public-data/postgres-readers.ts`, and the `apps/api-public` twin, all SELECT
+ * `projection`. Every other store of those facts is derived and invisible to a reader:
+ *
+ *   - the columns on the same `release_entities` row (`summary`, `location`, `lat`, `lng`,
+ *     `geohash`, `claims`, `related`, `taxonomy`, `primary_image`, `kind`, `display_name`),
+ *     written from the projection by `toReleaseEntityRow` in `lib/incremental-publish.ts`;
+ *   - `bb_public.search_index` (`kind`, `status`, `topics`, `facets`), written from the same
+ *     build by `toSearchIndexRow`.
+ *
+ * A write that lands on one store and not the other leaves readers serving the older value while
+ * an operator reads the newer one back out of the column and calls the work done. That has
+ * happened repeatedly, each time silently, which is why the comparison lives in one module: an
+ * audit run and a post-apply check cannot then disagree about what "in sync" means.
+ *
+ * SCOPE — only facts the projection actually carries. `search_index.recordMaturity`,
+ * `confidenceTier`, `relatedCount`, `claimCount` and `aliases` are computed by the release
+ * builder from inputs the projection does not restate, so there is nothing here to compare them
+ * against and they are deliberately absent. `facets.summary` is absent for the same reason
+ * `toSearchIndexRow` omits it: an index-size decision, not drift.
+ *
+ * READ-ONLY: this module opens no write path.
+ */
+import { isDeepStrictEqual } from 'node:util';
+import type { Pool, PoolClient } from 'pg';
+
+type Rec = Readonly<Record<string, unknown>>;
+
+/** One release row joined to its search-index twin. Shapes match the SELECT below. */
+export type ProjectionDivergenceDbRow = {
+  readonly entity_id: string;
+  readonly display_name: string | null;
+  readonly kind: string | null;
+  readonly summary: string | null;
+  readonly location: unknown;
+  readonly geohash: string | null;
+  readonly lat: number | null;
+  readonly lng: number | null;
+  readonly claims: unknown;
+  readonly taxonomy: unknown;
+  readonly related: unknown;
+  readonly primary_image: unknown;
+  readonly projection: unknown;
+  readonly si_present: boolean;
+  readonly si_kind: string | null;
+  readonly si_status: string | null;
+  readonly si_topics: readonly string[] | null;
+  readonly si_facets: unknown;
+};
+
+export type ProjectionDivergenceFieldCount = {
+  readonly field: string;
+  readonly count: number;
+  readonly sampleEntityIds: readonly string[];
+};
+
+export type ProjectionDivergenceReport = {
+  readonly releaseId: string;
+  readonly scanned: number;
+  /** Rows diverging on at least one field. */
+  readonly divergentRows: number;
+  /** Sum over fields; a row diverging on three fields counts three times. */
+  readonly totalDivergences: number;
+  readonly fields: readonly ProjectionDivergenceFieldCount[];
+};
+
+export const DEFAULT_DIVERGENCE_SAMPLE_LIMIT = 10;
+
+function asRecord(value: unknown): Rec {
+  return value !== null && typeof value === 'object' && !Array.isArray(value) ? (value as Rec) : {};
+}
+
+function asArray(value: unknown): readonly unknown[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function asStrings(value: unknown): readonly string[] {
+  return asArray(value).filter((item): item is string => typeof item === 'string');
+}
+
+/** Absence has two spellings across pg and jsonb; both compare as the same missing value. */
+function orNull(value: unknown): unknown {
+  return value === undefined ? null : value;
+}
+
+/** A blank string is absence for the facets that are omitted rather than written empty. */
+function trimmedOrNull(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed.length === 0 ? null : trimmed;
+}
+
+/**
+ * The topic list a reader should find on the search row.
+ *
+ * `toSearchIndexRow` writes `topicTags ?? topicIds ?? []`, and `??` falls through on null only —
+ * a build that produced `topicTags: []` alongside real `topicIds` therefore publishes an empty
+ * `topics` column. This states the invariant the topic browse and topic filters need instead: the
+ * search row carries whichever topic list the projection actually declares.
+ */
+export function expectedSearchTopics(projection: Rec): readonly string[] {
+  const tags = asStrings(projection.topicTags);
+  return [...(tags.length > 0 ? tags : asStrings(projection.topicIds))].sort();
+}
+
+type DivergenceCheck = {
+  readonly field: string;
+  /** Skipped when the row has no search-index twin, which is reported as its own field. */
+  readonly needsSearchIndex: boolean;
+  readonly projectionValue: (projection: Rec) => unknown;
+  readonly derivedValue: (row: ProjectionDivergenceDbRow) => unknown;
+};
+
+function facetArrayCheck(facetKey: string, projectionKey: string): DivergenceCheck {
+  return {
+    field: `search_index.facets.${facetKey}`,
+    needsSearchIndex: true,
+    projectionValue: (projection) => asArray(projection[projectionKey]),
+    derivedValue: (row) => asArray(asRecord(row.si_facets)[facetKey]),
+  };
+}
+
+/**
+ * Every derived copy, paired with the projection value it is supposed to equal.
+ *
+ * `related` and `claims` are normalized to `[]` on both sides because `toReleaseEntityRow` runs
+ * `normalizeReleaseRelated`/`normalizeReleaseClaims` on the column while leaving the projection
+ * key absent — a missing key and an empty column say the same thing and must not be reported as
+ * drift.
+ */
+export const PROJECTION_DIVERGENCE_CHECKS: readonly DivergenceCheck[] = [
+  {
+    field: 'display_name',
+    needsSearchIndex: false,
+    projectionValue: (projection) => orNull(projection.displayName),
+    derivedValue: (row) => orNull(row.display_name),
+  },
+  {
+    field: 'kind',
+    needsSearchIndex: false,
+    projectionValue: (projection) => orNull(projection.kind),
+    derivedValue: (row) => orNull(row.kind),
+  },
+  {
+    field: 'summary',
+    needsSearchIndex: false,
+    projectionValue: (projection) => orNull(projection.summary),
+    derivedValue: (row) => orNull(row.summary),
+  },
+  {
+    field: 'location',
+    needsSearchIndex: false,
+    projectionValue: (projection) => orNull(projection.location),
+    derivedValue: (row) => orNull(row.location),
+  },
+  {
+    field: 'lat',
+    needsSearchIndex: false,
+    projectionValue: (projection) => orNull(asRecord(projection.location).lat),
+    derivedValue: (row) => orNull(row.lat),
+  },
+  {
+    field: 'lng',
+    needsSearchIndex: false,
+    projectionValue: (projection) => orNull(asRecord(projection.location).lng),
+    derivedValue: (row) => orNull(row.lng),
+  },
+  {
+    field: 'geohash',
+    needsSearchIndex: false,
+    projectionValue: (projection) => orNull(asRecord(projection.location).geohash),
+    derivedValue: (row) => orNull(row.geohash),
+  },
+  {
+    field: 'related',
+    needsSearchIndex: false,
+    projectionValue: (projection) => asArray(projection.related),
+    derivedValue: (row) => asArray(row.related),
+  },
+  {
+    field: 'claims',
+    needsSearchIndex: false,
+    projectionValue: (projection) => asArray(projection.claims),
+    derivedValue: (row) => asArray(row.claims),
+  },
+  {
+    // The taxonomy column carries three projection lists; other keys on it belong to whichever
+    // pass wrote them and are none of this check's business.
+    field: 'taxonomy',
+    needsSearchIndex: false,
+    projectionValue: (projection) => ({
+      topicIds: asStrings(projection.topicIds),
+      topicTags: asStrings(projection.topicTags),
+      notabilityLabels: asStrings(projection.notabilityLabels),
+    }),
+    derivedValue: (row) => ({
+      topicIds: asStrings(asRecord(row.taxonomy).topicIds),
+      topicTags: asStrings(asRecord(row.taxonomy).topicTags),
+      notabilityLabels: asStrings(asRecord(row.taxonomy).notabilityLabels),
+    }),
+  },
+  {
+    field: 'primary_image',
+    needsSearchIndex: false,
+    projectionValue: (projection) => orNull(projection.primaryImage),
+    derivedValue: (row) => orNull(row.primary_image),
+  },
+  {
+    field: 'search_index.kind',
+    needsSearchIndex: true,
+    projectionValue: (projection) => orNull(projection.kind),
+    derivedValue: (row) => orNull(row.si_kind),
+  },
+  {
+    field: 'search_index.status',
+    needsSearchIndex: true,
+    projectionValue: (projection) => orNull(projection.status),
+    derivedValue: (row) => orNull(row.si_status),
+  },
+  {
+    // Compared as a set: both stores are written from one build, but nothing a reader does with
+    // topics depends on their order, so ordering alone is not worth reporting as drift.
+    field: 'search_index.topics',
+    needsSearchIndex: true,
+    projectionValue: (projection) => expectedSearchTopics(projection),
+    derivedValue: (row) => [...asStrings(row.si_topics)].sort(),
+  },
+  facetArrayCheck('topicIds', 'topicIds'),
+  facetArrayCheck('eraBuckets', 'eraBuckets'),
+  facetArrayCheck('keywords', 'keywords'),
+  facetArrayCheck('mentionedEntityIds', 'mentionedEntityIds'),
+  facetArrayCheck('notabilityLabels', 'notabilityLabels'),
+  facetArrayCheck('notabilityBasis', 'notabilityBasis'),
+  {
+    field: 'search_index.facets.researchCoverage',
+    needsSearchIndex: true,
+    projectionValue: (projection) => orNull(projection.researchCoverage),
+    derivedValue: (row) => orNull(asRecord(row.si_facets).researchCoverage),
+  },
+  {
+    field: 'search_index.facets.sensitivityClass',
+    needsSearchIndex: true,
+    projectionValue: (projection) => orNull(projection.sensitivityClass),
+    derivedValue: (row) => orNull(asRecord(row.si_facets).sensitivityClass),
+  },
+  {
+    // `toSearchIndexRow` omits this facet rather than writing it empty, so a blank projection
+    // label and an absent facet agree.
+    field: 'search_index.facets.jurisdictionState',
+    needsSearchIndex: true,
+    projectionValue: (projection) => trimmedOrNull(projection.jurisdictionLabel),
+    derivedValue: (row) => trimmedOrNull(asRecord(row.si_facets).jurisdictionState),
+  },
+];
+
+/** Reported instead of flagging every field on a row whose projection never got written. */
+export const MISSING_PROJECTION_FIELD = 'projection.missing';
+/** Reported instead of flagging every search-index field on a row that has no twin. */
+export const MISSING_SEARCH_INDEX_FIELD = 'search_index.missing';
+
+/**
+ * The fields on which this row's derived copies disagree with its projection. Pure: this is the
+ * whole comparison, and the database access below only feeds it.
+ */
+export function divergentFieldsForRow(row: ProjectionDivergenceDbRow): readonly string[] {
+  const projection = asRecord(row.projection);
+  // An empty projection is a broken row rather than a field-by-field disagreement; readers get
+  // nothing at all from it, and listing eleven fields would bury that.
+  if (typeof projection.id !== 'string') return [MISSING_PROJECTION_FIELD];
+
+  const fields: string[] = [];
+  if (!row.si_present) fields.push(MISSING_SEARCH_INDEX_FIELD);
+  for (const check of PROJECTION_DIVERGENCE_CHECKS) {
+    if (check.needsSearchIndex && !row.si_present) continue;
+    if (!isDeepStrictEqual(check.projectionValue(projection), check.derivedValue(row))) {
+      fields.push(check.field);
+    }
+  }
+  return fields;
+}
+
+/** Rolls per-row results into per-field counts with the first `sampleLimit` entity ids. */
+export function summarizeProjectionDivergence(
+  releaseId: string,
+  rows: readonly ProjectionDivergenceDbRow[],
+  sampleLimit: number = DEFAULT_DIVERGENCE_SAMPLE_LIMIT,
+): ProjectionDivergenceReport {
+  const counts = new Map<string, { count: number; sampleEntityIds: string[] }>();
+  let divergentRows = 0;
+  let totalDivergences = 0;
+
+  for (const row of rows) {
+    const fields = divergentFieldsForRow(row);
+    if (fields.length === 0) continue;
+    divergentRows += 1;
+    totalDivergences += fields.length;
+    for (const field of fields) {
+      const bucket = counts.get(field) ?? { count: 0, sampleEntityIds: [] };
+      bucket.count += 1;
+      if (bucket.sampleEntityIds.length < sampleLimit) bucket.sampleEntityIds.push(row.entity_id);
+      counts.set(field, bucket);
+    }
+  }
+
+  const fields = [...counts]
+    .map(([field, bucket]) => ({
+      field,
+      count: bucket.count,
+      sampleEntityIds: bucket.sampleEntityIds,
+    }))
+    .sort((a, b) => b.count - a.count || a.field.localeCompare(b.field));
+
+  return { releaseId, scanned: rows.length, divergentRows, totalDivergences, fields };
+}
+
+const PROJECTION_DIVERGENCE_SQL = `
+  SELECT re.entity_id,
+         re.display_name,
+         re.kind,
+         re.summary,
+         re.location,
+         re.geohash,
+         re.lat,
+         re.lng,
+         re.claims,
+         re.taxonomy,
+         re.related,
+         re.primary_image,
+         re.projection,
+         (si.id IS NOT NULL) AS si_present,
+         si.kind AS si_kind,
+         si.status AS si_status,
+         si.topics AS si_topics,
+         si.facets AS si_facets
+    FROM bb_public.release_entities re
+    LEFT JOIN bb_public.search_index si
+      ON si.release_id = re.release_id AND si.entity_id = re.entity_id
+   WHERE re.release_id = $1
+     AND ($2::text[] IS NULL OR re.entity_id = ANY($2::text[]))
+   ORDER BY re.entity_id
+`;
+
+export async function resolveActiveReleaseId(client: Pool | PoolClient): Promise<string> {
+  const result = await client.query<{ release_id: string }>(
+    'SELECT release_id FROM bb_public.v_active_release_id',
+  );
+  const releaseId = result.rows[0]?.release_id;
+  if (releaseId === undefined) throw new Error('no active release');
+  return releaseId;
+}
+
+/** SELECT only. `ids` undefined means the whole release. */
+export async function loadProjectionDivergenceRows(
+  client: Pool | PoolClient,
+  releaseId: string,
+  ids?: readonly string[],
+): Promise<readonly ProjectionDivergenceDbRow[]> {
+  const result = await client.query<ProjectionDivergenceDbRow>(PROJECTION_DIVERGENCE_SQL, [
+    releaseId,
+    ids === undefined ? null : [...ids],
+  ]);
+  return result.rows;
+}
+
+export type ProjectionDivergenceOptions = {
+  /** Defaults to the active release. */
+  readonly releaseId?: string;
+  /** Defaults to every row in the release. */
+  readonly ids?: readonly string[];
+  readonly sampleLimit?: number;
+};
+
+export async function auditProjectionDivergence(
+  client: Pool | PoolClient,
+  options: ProjectionDivergenceOptions = {},
+): Promise<ProjectionDivergenceReport> {
+  const releaseId = options.releaseId ?? (await resolveActiveReleaseId(client));
+  const rows = await loadProjectionDivergenceRows(client, releaseId, options.ids);
+  return summarizeProjectionDivergence(releaseId, rows, options.sampleLimit);
+}
+
+export function formatProjectionDivergenceReport(
+  report: ProjectionDivergenceReport,
+): readonly string[] {
+  const lines = [
+    `Release ${report.releaseId}: ${report.divergentRows} of ${report.scanned} row(s) diverge ` +
+      `from their projection across ${report.fields.length} field(s).`,
+  ];
+  for (const field of report.fields) {
+    lines.push(`  ${String(field.count).padStart(6)}  ${field.field}`);
+    for (const entityId of field.sampleEntityIds) lines.push(`            e.g. ${entityId}`);
+  }
+  return lines;
+}
+
+/**
+ * Post-write check for the publisher and the catalog write scripts: throws when any of `ids`
+ * still has a derived copy that disagrees with the projection readers serve.
+ *
+ * Call it after the write commits, with the ids the write touched. Returns the report when clean
+ * so a caller can log what it verified.
+ */
+export async function assertNoProjectionDivergence(
+  client: Pool | PoolClient,
+  ids: readonly string[],
+  options: Omit<ProjectionDivergenceOptions, 'ids'> = {},
+): Promise<ProjectionDivergenceReport> {
+  const report = await auditProjectionDivergence(client, { ...options, ids });
+  if (report.totalDivergences > 0) {
+    throw new Error(
+      ['Projection divergence after write:', ...formatProjectionDivergenceReport(report)].join(
+        '\n',
+      ),
+    );
+  }
+  return report;
+}
