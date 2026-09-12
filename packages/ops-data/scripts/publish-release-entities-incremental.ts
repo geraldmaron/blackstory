@@ -830,9 +830,21 @@ async function main(): Promise<void> {
       // Everything above this line wrote derived copies — the release_entities columns, the
       // search_index row, the two post-commit re-syncs — of facts readers only ever get from
       // `projection`. Measure the rows this run touched against it rather than assuming.
-      // Reported, not thrown: `applyReleaseTaxonomySync` above still writes the taxonomy column
-      // without the projection, so failing here would abort every publish that touches topics
-      // over a defect this run did not introduce. Make it fatal once that write path is fixed.
+      //
+      // FATAL since repo-ttlce. This reported instead of throwing for one stated reason:
+      // `applyReleaseTaxonomySync` wrote the taxonomy column without the projection or the search
+      // index, so a throw would have aborted every publish that touches topics over a defect the
+      // run did not introduce. That write path now updates all three in one statement, so a
+      // divergence reported here is this run's own — and every previous time these stores drifted
+      // it was silent, which is the whole argument for failing loudly instead.
+      //
+      // It examines only the ids this run prepared (`PROJECTION_DIVERGENCE_SQL` filters on them),
+      // so the 1,729 rows repo-p1m1y is still repairing cannot trip it.
+      //
+      // The upserts are ALREADY COMMITTED when this runs — the commit is what makes the derived
+      // copies readable to compare. So this does not undo the publish and the message must not
+      // imply it did; it stops the run before the artifact-republish reminder, which is the next
+      // thing an operator would act on, and exits non-zero.
       try {
         await assertNoProjectionDivergence(
           client,
@@ -840,7 +852,15 @@ async function main(): Promise<void> {
           { releaseId },
         );
       } catch (error) {
-        console.warn(error instanceof Error ? error.message : String(error));
+        const detail = error instanceof Error ? error.message : String(error);
+        throw new Error(
+          `${detail}\n\n` +
+            `The ${prepared.length} upserts above ARE COMMITTED — this check runs after COMMIT, ` +
+            'because the derived copies have to be readable to be compared. Nothing was rolled ' +
+            'back. Repair the diverged rows (see backfill-search-facets-projection.ts) before ' +
+            'republishing the catalog artifacts, or readers will serve the diverged copy.',
+          { cause: error },
+        );
       }
     }
 

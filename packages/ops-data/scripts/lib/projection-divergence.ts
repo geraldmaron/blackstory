@@ -95,16 +95,30 @@ function trimmedOrNull(value: unknown): string | null {
 }
 
 /**
- * The topic list a reader should find on the search row.
+ * The topics a search row should carry: the display tags when the build produced any, otherwise
+ * the topic ids. THE one definition (repo-ttlce).
  *
- * `toSearchIndexRow` writes `topicTags ?? topicIds ?? []`, and `??` falls through on null only —
- * a build that produced `topicTags: []` alongside real `topicIds` therefore publishes an empty
- * `topics` column. This states the invariant the topic browse and topic filters need instead: the
- * search row carries whichever topic list the projection actually declares.
+ * Three writers each spelled this rule differently and two of them got it wrong, which is how
+ * 2,141 live rows ended up with real topics in the projection and an empty `search_index.topics`
+ * (repo-p1m1y, measured 2026-09-12: 2,137 with ids only, 4 with tags only): `toSearchIndexRow` used `topicTags ?? topicIds`, and `??` falls through only on
+ * nullish, so the empty tag list every id-only lane produces won over real ids. The realigner
+ * sent to repair them read `topicIds` alone, so it would have written the ids over a record whose
+ * build had real display tags. Both now call this.
+ *
+ * Order is the projection's own — a reader does nothing with topic order, and re-ordering every
+ * row would be a write with nothing behind it. `expectedSearchTopics` sorts only so two arrays
+ * can be compared as sets.
  */
-export function expectedSearchTopics(projection: Rec): readonly string[] {
+export function searchTopicsFromProjection(projection: {
+  readonly topicTags?: unknown;
+  readonly topicIds?: unknown;
+}): readonly string[] {
   const tags = asStrings(projection.topicTags);
-  return [...(tags.length > 0 ? tags : asStrings(projection.topicIds))].sort();
+  return tags.length > 0 ? tags : asStrings(projection.topicIds);
+}
+
+export function expectedSearchTopics(projection: Rec): readonly string[] {
+  return [...searchTopicsFromProjection(projection)].sort();
 }
 
 type DivergenceCheck = {

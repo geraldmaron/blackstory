@@ -31,6 +31,7 @@ import {
   type PublicVisit,
 } from '@repo/domain';
 import { mapPostgresSearchIndexRow } from '@repo/schemas';
+import { divergentFieldsForRow, expectedSearchTopics } from './projection-divergence.ts';
 
 /** Parsed host, or null for anything unparseable — never a substring test on the raw URL. */
 const hostOf = (url: string): string | null => {
@@ -1735,5 +1736,175 @@ test('a city named by the landscape row wins over the live jurisdiction', () => 
     result.entry.jurisdictionLabel,
     'Cambridge, Massachusetts',
     'a row that names a city is at least as specific as the live label, so it stays authoritative',
+  );
+});
+
+/*
+ * repo-ttlce. `topics` was written with `topicTags ?? topicIds ?? []`, which falls through only on
+ * nullish — so a build carrying `topicTags: []` and real `topicIds` wrote an EMPTY topics column
+ * while its projection kept the ids. That is the whole of repo-p1m1y: 1,729 live rows invisible to
+ * topic browse and topic filters with nothing in the projection to show for it.
+ */
+const searchFields = (overrides: Record<string, unknown> = {}) => ({
+  releaseId: 'rel_seed_001',
+  id: 'ent_probe_001',
+  displayName: 'Probe Record',
+  nameLower: 'probe record',
+  kind: 'place',
+  aliases: [],
+  topicTags: [],
+  topicIds: [],
+  mentionedEntityIds: [],
+  keywords: [],
+  jurisdictionState: '',
+  eraBuckets: [],
+  notabilityBasis: [],
+  notabilityLabels: [],
+  recordMaturity: 'minimum_record',
+  researchCoverage: 'minimal',
+  relatedCount: 0,
+  claimCount: 0,
+  confidenceTier: 'unrated',
+  ...overrides,
+});
+
+test('search topics fall through an EMPTY topicTags to the topic ids', () => {
+  const row = toSearchIndexRow(
+    searchFields({ topicTags: [], topicIds: ['invention', 'business', 'women'] }) as never,
+    'dqcjq',
+  );
+  assert.deepEqual(
+    row.topics,
+    ['invention', 'business', 'women'],
+    'an empty tag list is not a decision to publish no topics',
+  );
+});
+
+test('search topics prefer display tags when the build has any', () => {
+  const row = toSearchIndexRow(
+    searchFields({ topicTags: ['Invention'], topicIds: ['invention'] }) as never,
+    'dqcjq',
+  );
+  assert.deepEqual(row.topics, ['Invention']);
+});
+
+test('search topics are empty only when the build really has none', () => {
+  const row = toSearchIndexRow(searchFields() as never, 'dqcjq');
+  assert.deepEqual(row.topics, []);
+});
+
+test('toSearchIndexRow agrees with the invariant the divergence audit measures against', () => {
+  for (const [topicTags, topicIds] of [
+    [[], ['invention', 'business']],
+    [['Invention'], ['invention']],
+    [[], []],
+    [['A', 'B'], []],
+  ] as const) {
+    const row = toSearchIndexRow(searchFields({ topicTags, topicIds }) as never, 'dqcjq');
+    assert.deepEqual(
+      [...row.topics].sort(),
+      expectedSearchTopics({ topicTags, topicIds }),
+      `topics disagreed with expectedSearchTopics for tags=${JSON.stringify(topicTags)} ids=${JSON.stringify(topicIds)}`,
+    );
+  }
+});
+
+/*
+ * repo-ttlce. The publisher's post-apply divergence check is now FATAL, and that only makes sense
+ * if a freshly built row is self-consistent across all three stores. Nothing asserted that: the
+ * check has only ever run against a live database, so the flip rested on inference.
+ *
+ * This feeds the two row builders' own output into the same `divergentFieldsForRow` the publisher
+ * calls, shaped as the row `PROJECTION_DIVERGENCE_SQL` would return. If a builder and the audit
+ * ever disagree about where a fact lives, this fails here instead of aborting a publish that has
+ * already committed.
+ */
+const divergenceRowFromBuild = (built: {
+  readonly entityRow: ReturnType<typeof toReleaseEntityRow>;
+  readonly searchRow: ReturnType<typeof toSearchIndexRow>;
+}) => {
+  const entity = built.entityRow;
+  const search = built.searchRow;
+  return {
+    entity_id: entity.entity_id,
+    display_name: entity.display_name,
+    kind: entity.kind,
+    summary: entity.summary,
+    location: entity.location,
+    geohash: entity.geohash,
+    lat: entity.lat,
+    lng: entity.lng,
+    claims: entity.claims,
+    taxonomy: entity.taxonomy,
+    related: entity.related,
+    primary_image: null,
+    projection: entity.projection,
+    si_present: true,
+    si_kind: search.kind,
+    si_status: search.status,
+    si_topics: search.topics,
+    si_facets: search.facets,
+  };
+};
+
+test('a freshly built row does not diverge from its own projection', () => {
+  const gate = gateLandscapePublishCandidate({
+    row: enrichedRow(),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+  });
+  assert.equal(gate.eligible, true);
+  if (!gate.eligible) return;
+  const built = buildArtifactsForEntry({
+    entry: gate.entry,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-12T00:00:00.000Z',
+  });
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+
+  // `buildArtifactsForEntry` already ran both row builders; re-running them would test a shape the
+  // publisher never writes.
+  assert.deepEqual(
+    divergentFieldsForRow(divergenceRowFromBuild(built) as never),
+    [],
+    'the publisher throws on any field listed here, after the upserts have already committed',
+  );
+});
+
+test('the round-trip check would catch a topics writer that drops real topics', () => {
+  const built = {
+    entityRow: toReleaseEntityRow({
+      releaseId: 'rel_seed_001',
+      id: 'ent_probe_001',
+      kind: 'place',
+      displayName: 'Probe',
+      nameLower: 'probe',
+      summary: 'A summary.',
+      location: {
+        lat: 1,
+        lng: 2,
+        geohash: 'dqcjq',
+        geohashPrefixes: ['d'],
+        precision: 'city',
+        matchMethod: 'manual_research',
+      },
+      claimIds: [],
+      claims: [],
+      jurisdictionLabel: 'Somewhere',
+      locationLabel: 'Somewhere',
+      topicIds: ['invention', 'business'],
+      topicTags: [],
+      related: [],
+    } as never),
+    // the pre-fix writer: an empty tag list winning over real ids
+    searchRow: {
+      ...toSearchIndexRow(searchFields({ topicIds: ['invention', 'business'] }) as never, 'dqcjq'),
+      topics: [],
+    },
+  };
+  assert.ok(
+    divergentFieldsForRow(divergenceRowFromBuild(built) as never).includes('search_index.topics'),
+    'an empty topics column over real projection topics must be reported, not tolerated',
   );
 });

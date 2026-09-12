@@ -109,7 +109,35 @@ export async function planReleaseTaxonomySync(
 
 /**
  * Applies a previously computed plan: merges `topicIds`/`topicTags` into each row's existing
- * `taxonomy` jsonb, preserving any other keys already there (e.g. `notabilityLabels`).
+ * `taxonomy` jsonb, preserving any other keys already there (e.g. `notabilityLabels`) — and into
+ * the two derived stores that carry the same fact.
+ *
+ * repo-ttlce: this used to write the `taxonomy` column ALONE. Readers never see that column —
+ * `fetchPublicEntityProjection` and its siblings serve `projection`, and topic browse reads
+ * `search_index.topics` — so every sync that changed an entity's topics left both of them stale,
+ * and the publisher calls this on every run that touches topics. Together with the `??`
+ * fallthrough in `toSearchIndexRow` that is how 2,141 live rows reached a state where the
+ * taxonomy column was right, the projection was right, and the search index had nothing
+ * (repo-p1m1y, measured 2026-09-12).
+ *
+ * BLAST RADIUS. `planReleaseTaxonomySync` scans the WHOLE release, not this run's ids, so a
+ * one-entity publish can now rewrite reader-visible topics on any row whose taxonomy column
+ * disagrees with canonical. That was already true of the taxonomy column; widening it to the
+ * projection and the search index is what makes it reader-visible. Every such write is internally
+ * consistent across the three stores, so it cannot trip the publisher's divergence check, but a
+ * run that reports more changed rows than it published is doing exactly this and is not a bug.
+ *
+ * One statement, not three, so a row cannot end up with its taxonomy updated and its projection
+ * not. The two `UPDATE`s are a single data-modifying CTE: they see the same snapshot and commit
+ * or fail together, and the second one is driven by what the first actually matched rather than
+ * by re-stating the key.
+ *
+ * Still four parameters. A fifth would be the pre-computed topics column, and it is deliberately
+ * derived in SQL instead: the `CASE` below is the same rule as `searchTopicsFromProjection` in
+ * `lib/projection-divergence.ts` (non-empty tags, else ids). `array_length` returns NULL rather
+ * than 0 for an empty array, hence the COALESCE — without it the `CASE` would fall to the ids
+ * branch by accident rather than by rule, which is the same class of mistake as the `??` this
+ * bead is fixing.
  */
 export async function applyReleaseTaxonomySync(
   client: Pool | PoolClient,
@@ -119,10 +147,24 @@ export async function applyReleaseTaxonomySync(
   for (const row of plan.changed) {
     await client.query(
       `
-      UPDATE bb_public.release_entities
-      SET taxonomy = COALESCE(taxonomy, '{}'::jsonb)
+      WITH synced AS (
+        UPDATE bb_public.release_entities
+        SET taxonomy = COALESCE(taxonomy, '{}'::jsonb)
+          || jsonb_build_object('topicIds', $1::text[], 'topicTags', $2::text[]),
+            projection = COALESCE(projection, '{}'::jsonb)
+          || jsonb_build_object('topicIds', $1::text[], 'topicTags', $2::text[])
+        WHERE release_id = $3 AND entity_id = $4
+        RETURNING release_id, entity_id
+      )
+      UPDATE bb_public.search_index si
+      SET topics = CASE
+            WHEN COALESCE(array_length($2::text[], 1), 0) > 0 THEN $2::text[]
+            ELSE $1::text[]
+          END,
+          facets = COALESCE(si.facets, '{}'::jsonb)
         || jsonb_build_object('topicIds', $1::text[], 'topicTags', $2::text[])
-      WHERE release_id = $3 AND entity_id = $4
+      FROM synced s
+      WHERE si.release_id = s.release_id AND si.entity_id = s.entity_id
       `,
       [row.afterTopicIds, row.afterTopicTags, releaseId, row.entityId],
     );

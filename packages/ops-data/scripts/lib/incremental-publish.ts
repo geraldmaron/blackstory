@@ -25,6 +25,7 @@ import {
 import { SUMMARY_MIN_CHARS, SUMMARY_MAX_CHARS } from './entity-enrichment-llm.ts';
 import { computeClaimConfidence, confidenceLevelForSource } from '../lib/confidence.ts';
 import { lintPublishStatus, type PublishStatusLintReport } from './publish-status-linter.ts';
+import { searchTopicsFromProjection } from './projection-divergence.ts';
 import { buildNrhpListingFactObject, buildNrhpSignificanceObject } from './nrhp-area-labels.ts';
 
 export const INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR = 0.75;
@@ -1457,7 +1458,15 @@ export function toSearchIndexRow(
     name: searchIndex.displayName,
     name_lower: searchIndex.nameLower,
     aliases: searchIndex.aliases ?? [],
-    topics: searchIndex.topicTags ?? searchIndex.topicIds ?? [],
+    /*
+     * repo-ttlce: NON-EMPTY tags, else ids — not `??`, which falls through only on nullish. Every
+     * lane whose topics are ids without display tags builds `topicTags: []`, so the nullish form
+     * wrote an EMPTY topics column over real topics on 2,141 live rows (repo-p1m1y, measured
+     * 2026-09-12), taking every incrementally published record out of topic browse and topic
+     * filters while its projection still looked correct. Shared with the divergence audit and the realigner so the rule cannot
+     * drift a fourth time.
+     */
+    topics: [...searchTopicsFromProjection(searchIndex)],
     kind: searchIndex.kind,
     status: searchIndex.status ?? null,
     geohash,

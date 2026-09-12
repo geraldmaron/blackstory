@@ -14,7 +14,10 @@
  *                       `notabilityLabels`).
  *   - 'scalar-facet'    copies a projection scalar into a `facets` key; the two names may differ
  *                       (`jurisdictionLabel` -> `jurisdictionState`; `summary` -> `summary`).
- *   - 'topics-column'   copies `projection.topicIds` into the `topics` COLUMN, not a `facets` key.
+ *   - 'topics-column'   copies the projection's topics into the `topics` COLUMN, not a `facets`
+ *                       key. Which topics: non-empty `topicTags`, else `topicIds`, shared with the
+ *                       publisher as `searchTopicsFromProjection` (repo-ttlce) rather than spelled
+ *                       a second time here.
  *                       `mapPostgresSearchIndexRow` (`packages/schemas/src/search-index-row.ts`)
  *                       reads the column first, falling back to `facets.topicTags`, so a facets
  *                       write here would never be read back.
@@ -43,6 +46,7 @@
  * Read-only until `applySearchFacetRealign` is called: `planSearchFacetRealign` never writes.
  */
 import { highestClaimConfidenceTier } from '@repo/domain';
+import { searchTopicsFromProjection } from './projection-divergence.ts';
 
 /** Minimal query surface this module needs — satisfied by `pg.Client`, `Pool`, and `PoolClient`. */
 export type SearchFacetRealignClient = {
@@ -200,19 +204,30 @@ function evaluateScalarFacet(
   return { classification, desiredValue: desired };
 }
 
+/**
+ * repo-ttlce: this read `projection.topicIds` alone, so on a record whose build produced real
+ * display tags it would have written the IDS over them — the realigner sent to repair the topics
+ * column would itself have put the column back out of step with the invariant the divergence
+ * audit measures. It now shares that invariant with the publisher.
+ *
+ * The comparison stays order-insensitive on purpose: `jsonEqual` on two sorted copies, matching
+ * the divergence check's own note that "nothing a reader does with topics depends on their order,
+ * so ordering alone is not worth reporting as drift". Without this, a row already carrying the
+ * right topics in a different order would be rewritten for nothing.
+ */
 function evaluateTopicsColumn(row: SearchFacetRealignRow): TargetOutcome {
-  const rawIds = row.projection.topicIds;
-  const desiredIds = Array.isArray(rawIds)
-    ? rawIds.filter((entry): entry is string => typeof entry === 'string')
-    : [];
-  const desiredPresent = desiredIds.length > 0;
+  const desired = searchTopicsFromProjection(row.projection);
+  const desiredPresent = desired.length > 0;
   const currentPresent = isNonEmptyArray(row.topics);
+  const current = Array.isArray(row.topics)
+    ? row.topics.filter((entry): entry is string => typeof entry === 'string')
+    : [];
   const classification = classify(
     desiredPresent,
     currentPresent,
-    desiredPresent && currentPresent && jsonEqual(desiredIds, row.topics),
+    desiredPresent && currentPresent && jsonEqual([...desired].sort(), [...current].sort()),
   );
-  return { classification, desiredValue: desiredPresent ? desiredIds : undefined };
+  return { classification, desiredValue: desiredPresent ? [...desired] : undefined };
 }
 
 /** `mapPostgresSearchIndexRow`'s own precedence: the `status` column first, then `facets.status`. */

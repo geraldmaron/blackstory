@@ -48,9 +48,10 @@
  * through a dedicated one: `summary` copies `projection.summary` into `facets.summary` (a scalar
  * facet; carrying it catalog-wide is a size decision, not this backfill's call to make — several
  * MB added to the index — so it is tracked and decided separately from realigning it), and
- * `topics` copies `projection.topicIds` into the `topics` COLUMN, because `topics` is not a facets
- * key at all (`mapPostgresSearchIndexRow` reads the column first, falling back to
- * `facets.topicTags`).
+ * `topics` copies the projection's topics into the `topics` COLUMN, because `topics` is not a
+ * facets key at all (`mapPostgresSearchIndexRow` reads the column first, falling back to
+ * `facets.topicTags`). Which topics: non-empty `topicTags`, else `topicIds` — one shared
+ * definition in `lib/projection-divergence.ts`, not a second spelling here (repo-ttlce).
  *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a && export DATABASE_SSL=1

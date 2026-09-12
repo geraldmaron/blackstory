@@ -16,8 +16,10 @@ function fakeClient(rows: readonly Row[]) {
     releaseId: string;
     entityId: string;
   }> = [];
+  const sqls: string[] = [];
   return {
     updates,
+    sqls,
     query: async (sql: string, params?: readonly unknown[]) => {
       if (sql.includes('SELECT')) {
         return { rows };
@@ -30,10 +32,14 @@ function fakeClient(rows: readonly Row[]) {
         string,
       ];
       updates.push({ topicIds, topicTags, releaseId, entityId });
+      sqls.push(sql);
       return { rows: [] };
     },
     // biome-ignore lint: test double, cast to the shape the module expects
-  } as unknown as PoolClient & { readonly updates: typeof updates };
+  } as unknown as PoolClient & {
+    readonly updates: typeof updates;
+    readonly sqls: readonly string[];
+  };
 }
 
 test('planReleaseTaxonomySync proposes topics for a row with real canonical classification and no release taxonomy', async () => {
@@ -114,4 +120,42 @@ test('applyReleaseTaxonomySync merges topics into existing taxonomy, preserving 
     releaseId: 'rel_1',
     entityId: 'ent_f',
   });
+});
+
+/*
+ * repo-ttlce. A shape test, not a behavior test, and worth saying so: a fake client cannot run
+ * SQL, so what this pins is that the statement still reaches all three stores. The statement's
+ * actual behavior was verified by PREPAREing it against the real schema inside a read-only
+ * transaction (it parses and analyzes), and by having Postgres evaluate the topics CASE over the
+ * four tag/id combinations — it agreed with `searchTopicsFromProjection` on every one, including
+ * the empty-tags-with-real-ids case this bead exists to fix.
+ *
+ * Writing only the taxonomy column is exactly the regression that made 1,729 rows unfindable by
+ * topic while the column an operator would check looked correct, so it is worth a guard even a
+ * weak one.
+ */
+test('the taxonomy sync writes the projection and the search index, not the taxonomy column alone', async () => {
+  const client = fakeClient([
+    {
+      entity_id: 'ent_g',
+      taxonomy: {},
+      classification: { topicIds: ['music'], topicTags: [] },
+    },
+  ]);
+  const plan = await planReleaseTaxonomySync(client, 'rel_1');
+  await applyReleaseTaxonomySync(client, 'rel_1', plan);
+
+  assert.equal(client.sqls.length, 1, 'one statement, so the three stores cannot part-commit');
+  const sql = client.sqls[0] ?? '';
+  assert.match(sql, /UPDATE bb_public\.release_entities/u);
+  assert.match(sql, /SET taxonomy =/u);
+  assert.match(sql, /projection =/u, 'readers serve the projection, never the taxonomy column');
+  assert.match(sql, /UPDATE bb_public\.search_index/u, 'topic browse reads search_index.topics');
+  assert.match(sql, /SET topics =/u);
+  assert.match(
+    sql,
+    /COALESCE\(array_length\(\$2::text\[\], 1\), 0\) > 0/u,
+    'array_length returns NULL on an empty array, so the COALESCE is what makes the tags-else-ids ' +
+      'rule fire by rule rather than by accident',
+  );
 });
