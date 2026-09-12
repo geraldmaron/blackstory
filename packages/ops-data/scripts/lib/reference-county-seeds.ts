@@ -3,7 +3,10 @@
  * (Postgres id hierarchy: county:{stateFips}{countyFips3}, parent state:{stateFips}).
  */
 import { US_STATES } from '@repo/domain';
-import type { GazetteerCountyRow } from '../../src/jurisdictions/tiger-gazetteer.js';
+import {
+  approximateCountyBBox,
+  type GazetteerCountyRow,
+} from '../../src/jurisdictions/tiger-gazetteer.js';
 
 const IN_SCOPE_STATE_FIPS = new Set(US_STATES.map((state) => state.fips));
 
@@ -14,6 +17,13 @@ export type ReferenceCountySeed = {
   readonly stateFips: string;
   readonly countyFips: string;
   readonly parentId: string;
+  /**
+   * [west, south, east, north] approximate bbox centered on the Gazetteer centroid, sized to
+   * the county's land+water area (see tiger-gazetteer.ts's approximateCountyBBox). Feeds
+   * bb_reference.jurisdictions.location, a geography(Polygon, 4326) column — this is the
+   * envelope upsertCountyBatch turns into that polygon.
+   */
+  readonly bbox: readonly [number, number, number, number];
 };
 
 export type BuildReferenceCountySeedsResult = {
@@ -39,6 +49,7 @@ export function buildReferenceCountySeeds(
       stateFips: row.stateFips,
       countyFips: row.countyFips3,
       parentId: `state:${row.stateFips}`,
+      bbox: approximateCountyBBox(row),
     });
   }
 
