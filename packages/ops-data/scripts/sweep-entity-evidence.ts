@@ -339,6 +339,7 @@ async function collectWikipedia(row: CandidateRow): Promise<EvidenceRow | null> 
     city: row.payload.city,
     county: row.payload.county,
     state: row.payload.state,
+    kind: row.payload.kind,
   });
   if (article === null) {
     throw new SkipReason('no enwiki article clearing the identity gate (place, name, focus)');

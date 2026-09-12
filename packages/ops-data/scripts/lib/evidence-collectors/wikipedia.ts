@@ -62,6 +62,8 @@ export type WikipediaLookupInput = {
   readonly city?: string;
   readonly county?: string;
   readonly state?: string;
+  /** The roster's own classification of the row ("place", "person", "institution", ...). */
+  readonly kind?: string;
   readonly fetchImpl?: typeof fetch;
 };
 
@@ -123,7 +125,7 @@ function readExtract(raw: unknown): { readonly extract: string; readonly title: 
 export function articleCorroboratesSubject(
   extract: string,
   title: string,
-  input: Pick<WikipediaLookupInput, 'displayName' | 'city' | 'county' | 'state'>,
+  input: Pick<WikipediaLookupInput, 'displayName' | 'city' | 'county' | 'state' | 'kind'>,
 ): SubjectIdentity {
   return checkSubjectIdentity(extract, input, { title });
 }
