@@ -43,6 +43,29 @@ describe('MapInsetMoment', () => {
     assert.match(html, /href="\/explore\?[^"]*selected=ent_15th_st_church_001[^"]*"/);
   });
 
+  it('derives PLATE - STILL from a violence-adjacent entity, with no plain prop set at the call site (SP-26)', () => {
+    const html = renderToStaticMarkup(
+      <MapInsetMoment
+        {...baseProps}
+        kind="event"
+        topicTags={['Lynching']}
+        displayName="Duluth lynchings"
+      />,
+    );
+    assert.match(html, /data-plain="1"/);
+    assert.match(html, /Plate · Still/);
+  });
+
+  it('stays PLATE - LIVE for a non-violent entity, and for no subject at all', () => {
+    const withNeutralSubject = renderToStaticMarkup(
+      <MapInsetMoment {...baseProps} kind="place" topicTags={['museum']} />,
+    );
+    assert.match(withNeutralSubject, /Plate · Live/);
+
+    const withNoSubject = renderToStaticMarkup(<MapInsetMoment {...baseProps} />);
+    assert.match(withNoSubject, /Plate · Live/);
+  });
+
   it('renders identically regardless of theme class on an ancestor (both themes safe)', () => {
     const light = renderToStaticMarkup(
       <div data-theme="light">

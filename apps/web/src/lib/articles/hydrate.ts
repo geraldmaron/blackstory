@@ -21,7 +21,7 @@ import type {
   ThemeImpactPacketView,
   ThemeImpactProvenanceView,
 } from '@repo/domain';
-import type { PublicEntityView } from '../../data/public-seed';
+import type { PublicEntityKind, PublicEntityView } from '../../data/public-seed';
 
 /** One numbered entry in the article's references section. */
 export type ArticleReferenceEntry = {
@@ -100,6 +100,16 @@ export type HydratedArticleMapInset = {
   readonly lng: number;
   readonly precision:
     'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site' | 'address';
+  /**
+   * The entity's own violence-adjacency signal (SP-26 / repo-92n2.33), carried through so
+   * `MapInsetMoment` can derive PLATE - STILL from the real subject rather than always rendering
+   * LIVE. Without these, a chapter's map inset for a lynching or massacre entity had no way to
+   * know its own subject was violence-adjacent.
+   */
+  readonly kind: PublicEntityKind;
+  readonly topicTags: readonly string[];
+  readonly topicIds?: readonly string[];
+  readonly displayName: string;
 };
 
 export type HydratedArticleDispute = {
@@ -419,6 +429,10 @@ function hydrateBlock(
         lat: entity.geoAnchor.lat,
         lng: entity.geoAnchor.lng,
         precision: entity.locationPrecision,
+        kind: entity.kind,
+        topicTags: entity.topicTags,
+        ...(entity.topicIds !== undefined ? { topicIds: entity.topicIds } : {}),
+        displayName: entity.displayName,
       };
     }
     default:

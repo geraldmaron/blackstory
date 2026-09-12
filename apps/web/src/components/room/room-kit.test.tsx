@@ -537,6 +537,51 @@ describe('room kit · map moment', () => {
     assert.doesNotMatch(html, /Plate · Live/);
   });
 
+  it('derives STILL from a violence-adjacent subject with no plain prop at all (SP-26)', () => {
+    // The gap this closes: an author who forgets to set `plain` on a moment about violence used
+    // to get LIVE by default. Passing the subject instead means there is nothing to forget.
+    const html = renderToStaticMarkup(
+      <MapMoment
+        camera={{ center: [-92.1, 46.78] }}
+        note="Duluth, 1920."
+        subject={{ topicTags: ['Lynching'] }}
+      />,
+    );
+    assert.match(html, /data-plain="1"/);
+    assert.match(html, /Plate · Still/);
+  });
+
+  it('a non-violent subject stays LIVE, and an explicit plain still overrides a subject either way', () => {
+    const ordinary = renderToStaticMarkup(
+      <MapMoment
+        camera={{ center: [-87.6, 41.9] }}
+        note="A neighborhood."
+        subject={{ topicTags: ['neighborhood'] }}
+      />,
+    );
+    assert.match(ordinary, /Plate · Live/);
+
+    const forcedStill = renderToStaticMarkup(
+      <MapMoment
+        camera={{ center: [-87.6, 41.9] }}
+        note="A neighborhood, held still for a documented reason."
+        subject={{ topicTags: ['neighborhood'] }}
+        plain
+      />,
+    );
+    assert.match(forcedStill, /Plate · Still/);
+
+    const forcedLive = renderToStaticMarkup(
+      <MapMoment
+        camera={{ center: [-92.1, 46.78] }}
+        note="Overridden live for a documented reason."
+        subject={{ topicTags: ['Lynching'] }}
+        plain={false}
+      />,
+    );
+    assert.match(forcedLive, /Plate · Live/);
+  });
+
   it('the Explore hand-off renders only when a destination is given', () => {
     const without = renderToStaticMarkup(
       <MapMoment camera={{ center: [-90, 35] }} note="A place." />,

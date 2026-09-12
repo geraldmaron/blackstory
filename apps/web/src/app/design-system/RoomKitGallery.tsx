@@ -312,14 +312,18 @@ export function RoomKitGallery() {
             These two specimens therefore demonstrate arbitration, not the borrow. /design-system
             is a Utility surface and `framedClaimAllowed` refuses a claim there on purpose, so the
             plate stays parked however visible these slots are. The borrow itself is shown on a
-            Reading or Record surface. */}
+            Reading or Record surface.
+
+            The Duluth specimen passes `subject` rather than a hand-set `plain` (SP-26,
+            repo-92n2.33): STILL follows from the topic being violence-adjacent, the same way it
+            would for a real chapter's moment, not from this call site's own judgement. */}
         <MapMoment
           camera={{ center: [-87.635, 41.901], zoom: 12.8, pitch: 36, bearing: -12 }}
           note="Chicago's Black Belt, 1919. The camera flies in because the subject is a neighborhood, not a killing."
           atlasHref="/explore?find=place"
         />
         <MapMoment
-          plain
+          subject={{ topicTags: ['Lynching'] }}
           camera={{ center: [-92.1005, 46.7867], zoom: 12 }}
           note="Duluth, Minnesota, held at locality precision. The camera cuts here and does not move."
         />

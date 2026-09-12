@@ -32,6 +32,16 @@ export type MapInsetMomentProps = {
   readonly lng: number;
   readonly precision:
     'state' | 'county' | 'city' | 'neighborhood' | 'campus' | 'institution' | 'site' | 'address';
+  /**
+   * The entity's own violence-adjacency signal (SP-26 / repo-92n2.33), forwarded to `MapMoment`
+   * as its `subject` so a chapter's map inset for a lynching or massacre entity derives PLATE ·
+   * STILL rather than always rendering LIVE. Optional only because `hydrate.ts` is the sole
+   * caller and some historical test fixtures predate this field; every real article carries it.
+   */
+  readonly kind?: string;
+  readonly topicTags?: readonly string[];
+  readonly topicIds?: readonly string[];
+  readonly displayName?: string;
   readonly className?: string;
 };
 
@@ -41,6 +51,10 @@ export function MapInsetMoment({
   lat,
   lng,
   precision,
+  kind,
+  topicTags,
+  topicIds,
+  displayName,
   className,
 }: MapInsetMomentProps) {
   const exploreHref = buildExploreHref({
@@ -55,6 +69,7 @@ export function MapInsetMoment({
       // camera arrives level, and `resolveMomentCamera` still drops both under reduced motion.
       camera={{ center: [lng, lat], zoom: zoomForLocationPrecision(precision) }}
       note={label}
+      subject={{ kind, topicTags, topicIds, displayName }}
       atlasHref={exploreHref}
       {...(className ? { className } : {})}
     />
