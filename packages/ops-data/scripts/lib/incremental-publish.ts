@@ -12,6 +12,7 @@ import {
   normalizeReleaseRelated,
   normalizePublicPrecision,
   type CanonicalStatusSnapshot,
+  type PublicVisit,
   type ReleaseEntityProjectionFields,
   type ReleaseSearchIndexFields,
   type ReleaseSourceClaim,
@@ -140,11 +141,13 @@ function buildContext(input: {
   readonly releaseId: string;
   readonly generatedAt: string;
   readonly canonicalStatus?: CanonicalStatusSnapshot;
+  readonly visitOverride?: PublicVisit;
 }) {
   return {
     releaseId: input.releaseId,
     generatedAt: input.generatedAt,
     ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
+    ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
   };
 }
 
@@ -353,6 +356,112 @@ export function jurisdictionFromProvenance(provenance: Readonly<Record<string, u
       ? { state: readTrimmedString(provenance.sourceState) }
       : {}),
   });
+}
+
+/**
+ * The canonical contact/address columns a republish candidate joins against
+ * (`bb_canonical.entity_visit` + the first non-empty `bb_canonical.entity_locations` row for the
+ * entity, by `updated_at`), keyed by entity id by the caller.
+ */
+export type CanonicalVisitRow = {
+  readonly phone_e164: string | null;
+  readonly phone_display: string | null;
+  readonly website: string | null;
+  readonly hours: string | null;
+  readonly visitability: string | null;
+  readonly source_ids: readonly string[] | null;
+  readonly street: string | null;
+  readonly postal_code: string | null;
+};
+
+/**
+ * "Washington, DC" -> { city: 'Washington', state: 'DC' }; anything else stays unsplit.
+ *
+ * Mirrors `cityStateFromJurisdiction` in sync-visit-to-projection.ts. That script parses this out
+ * of an already-published projection's `jurisdictionLabel`; this republish path has no published
+ * projection to read yet, so it is given the label `jurisdictionFromPlace` is about to derive for
+ * the same row instead (see `visitOverrideFromCanonicalRow` below).
+ */
+function cityStateFromJurisdictionLabel(label: string): {
+  readonly city?: string;
+  readonly state?: string;
+} {
+  const parts = label
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (parts.length >= 2) {
+    const state = parts[parts.length - 1];
+    const city = parts.slice(0, -1).join(', ');
+    return { city, ...(state ? { state } : {}) };
+  }
+  return parts[0] ? { city: parts[0] } : {};
+}
+
+/**
+ * E.164 from whatever the source stored. Mirrors `phoneFromRow` in sync-visit-to-projection.ts:
+ * Wikidata P1329 values arrive as display strings such as "+1-212-491-2200"; anything without a
+ * leading + is left out rather than guessed.
+ */
+function phoneFromCanonicalVisitRow(row: CanonicalVisitRow): {
+  readonly phone?: { readonly e164: string; readonly display: string };
+} {
+  const display = row.phone_display?.trim();
+  if (!display) return {};
+  const e164 =
+    row.phone_e164?.trim() || (display.startsWith('+') ? display.replace(/[^\d+]/g, '') : '');
+  if (!/^\+\d{8,15}$/.test(e164)) return {};
+  return { phone: { e164, display } };
+}
+
+/**
+ * Raw (pre-gating) `PublicVisit` for a republish candidate, composed from canonical
+ * `entity_visit` + `entity_locations.street`/`postal_code`.
+ *
+ * Before this, the republish path built `ReleaseSourceEntity` from
+ * `bb_research.landscape_candidates` alone, which carries no visit data at all — `entry.visit`
+ * was always undefined, so a whole-object rebuild on `--republish` silently dropped the
+ * phone/website/hours/street a backfill had written straight onto the published projection (the
+ * only path that had ever populated it, sync-visit-to-projection.ts). This function is the
+ * republish path's equivalent of that script's `rawVisitFromRow`, given as
+ * `ReleaseBuildContext.visitOverride` (release-builder.ts), which wins over `entry.visit` and is
+ * gated through `publicVisitForTier` before it reaches the projection exactly as before.
+ *
+ * City/state come from `jurisdictionFromPlace(placeFieldsFromLandscape(row))` — the same
+ * derivation `buildReleaseSourceFromLandscape` uses for `entry.jurisdictionLabel` — rather than
+ * from a published projection, since a republish candidate may not have one yet.
+ */
+export function visitOverrideFromCanonicalRow(
+  row: LandscapePublishRow,
+  canonicalVisit: CanonicalVisitRow,
+): PublicVisit | undefined {
+  const jurisdictionLabel = jurisdictionFromPlace({
+    ...placeFieldsFromLandscape(row),
+    lat: row.lat,
+    lng: row.lng,
+  });
+  const address = {
+    ...(canonicalVisit.street ? { street: canonicalVisit.street } : {}),
+    ...cityStateFromJurisdictionLabel(jurisdictionLabel),
+    ...(canonicalVisit.postal_code ? { postalCode: canonicalVisit.postal_code } : {}),
+  };
+  const hasAddress = Boolean(canonicalVisit.street || canonicalVisit.postal_code);
+  const visit: PublicVisit = {
+    ...(hasAddress ? { address } : {}),
+    ...phoneFromCanonicalVisitRow(canonicalVisit),
+    ...(canonicalVisit.website ? { website: canonicalVisit.website } : {}),
+    ...(canonicalVisit.hours ? { hours: canonicalVisit.hours } : {}),
+    ...(canonicalVisit.visitability &&
+    ['open_to_public', 'exterior_only', 'private', 'demolished', 'unknown'].includes(
+      canonicalVisit.visitability,
+    )
+      ? { visitability: canonicalVisit.visitability as PublicVisit['visitability'] }
+      : {}),
+    ...(canonicalVisit.source_ids && canonicalVisit.source_ids.length > 0
+      ? { sources: canonicalVisit.source_ids }
+      : {}),
+  };
+  return Object.keys(visit).length > 0 ? visit : undefined;
 }
 
 /**
@@ -920,6 +1029,17 @@ export function gateLandscapePublishCandidate(input: {
    * test in force.
    */
   readonly liveConfidence?: number;
+  /**
+   * Raw (pre-gating) visit-contact input from `bb_canonical.entity_visit` +
+   * `entity_locations.street`/`postal_code`, when the caller looked one up for this entity
+   * (`visitOverrideFromCanonicalRow`). Wins over whatever `buildReleaseSourceFromLandscape`
+   * derived from the landscape row (normally nothing — the landscape payload carries no visit
+   * data) and is gated through `publicVisitForTier` inside `buildReleaseEntityArtifacts`, same
+   * precedence as `canonicalStatus` above. Omitting it leaves that empty derivation in force,
+   * which is how a republish silently dropped a backfilled phone/website/street before this was
+   * wired in.
+   */
+  readonly visitOverride?: PublicVisit;
 }): PublishGateResult {
   const floor = input.confidenceFloor ?? INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR;
   const row = input.row;
@@ -1078,6 +1198,7 @@ export function gateLandscapePublishCandidate(input: {
       releaseId: input.releaseId,
       generatedAt: input.generatedAt,
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
+      ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
     }),
   );
   if (!build.ok) {
@@ -1199,6 +1320,8 @@ export function buildArtifactsForEntry(input: {
   readonly releaseId: string;
   readonly generatedAt: string;
   readonly canonicalStatus?: CanonicalStatusSnapshot;
+  /** See the matching field on `gateLandscapePublishCandidate`'s input. */
+  readonly visitOverride?: PublicVisit;
 }): PublishArtifactsResult {
   const build = buildReleaseEntityArtifacts(
     input.entry,
@@ -1206,6 +1329,7 @@ export function buildArtifactsForEntry(input: {
       releaseId: input.releaseId,
       generatedAt: input.generatedAt,
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
+      ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
     }),
   );
   if (!build.ok) {
