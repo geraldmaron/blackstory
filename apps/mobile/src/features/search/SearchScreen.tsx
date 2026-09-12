@@ -142,7 +142,15 @@ export function SearchScreen({
     setDraft(initialQuery ?? '');
     setFilterKind(initialKind);
     setFilterEra(initialEra);
-  }, [incomingParamsKey, initialQuery, initialKind, initialEra, setDraft, setFilterKind, setFilterEra]);
+  }, [
+    incomingParamsKey,
+    initialQuery,
+    initialKind,
+    initialEra,
+    setDraft,
+    setFilterKind,
+    setFilterEra,
+  ]);
 
   const [now] = useState(() => Date.now());
 

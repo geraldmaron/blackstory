@@ -44,7 +44,11 @@ describe('RecordsTabScreen — reads q, kind and era off the route (repo-vlf0w)'
     await render(<RecordsTabScreen />);
 
     expect(mockSearchScreenSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ initialQuery: 'school', initialKind: 'place', initialEra: '1950s' }),
+      expect.objectContaining({
+        initialQuery: 'school',
+        initialKind: 'place',
+        initialEra: '1950s',
+      }),
     );
   });
 

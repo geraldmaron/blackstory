@@ -550,9 +550,7 @@
           }
         }
       ],
-      "gapStates": [
-        "insufficient_evidence"
-      ]
+      "gapStates": ["insufficient_evidence"]
     },
     {
       "dataSource": "release",
@@ -775,9 +773,7 @@
           }
         }
       ],
-      "gapStates": [
-        "insufficient_evidence"
-      ]
+      "gapStates": ["insufficient_evidence"]
     },
     {
       "dataSource": "release",
@@ -1671,9 +1667,7 @@
           }
         }
       ],
-      "gapStates": [
-        "insufficient_evidence"
-      ],
+      "gapStates": ["insufficient_evidence"],
       "entityBinding": {
         "purpose": "story",
         "entityId": "ent_bronzeville_001"
@@ -2167,9 +2161,7 @@
           }
         }
       ],
-      "gapStates": [
-        "insufficient_evidence"
-      ]
+      "gapStates": ["insufficient_evidence"]
     },
     {
       "dataSource": "release",
@@ -2348,9 +2340,7 @@
           }
         }
       ],
-      "gapStates": [
-        "insufficient_evidence"
-      ]
+      "gapStates": ["insufficient_evidence"]
     },
     {
       "dataSource": "release",
@@ -3578,9 +3568,7 @@
           }
         }
       ],
-      "gapStates": [
-        "insufficient_evidence"
-      ]
+      "gapStates": ["insufficient_evidence"]
     },
     {
       "dataSource": "release",
@@ -3826,9 +3814,7 @@
           }
         }
       ],
-      "gapStates": [
-        "insufficient_evidence"
-      ],
+      "gapStates": ["insufficient_evidence"],
       "entityBinding": {
         "purpose": "story",
         "entityId": "ent_chicago_freedom_movement_001"
@@ -4122,9 +4108,7 @@
           }
         }
       ],
-      "gapStates": [
-        "insufficient_evidence"
-      ]
+      "gapStates": ["insufficient_evidence"]
     },
     {
       "dataSource": "release",
@@ -4366,9 +4350,7 @@
           }
         }
       ],
-      "gapStates": [
-        "insufficient_evidence"
-      ],
+      "gapStates": ["insufficient_evidence"],
       "entityBinding": {
         "purpose": "story",
         "entityId": "ent_law_voting_rights_act_1965"
@@ -4747,9 +4729,7 @@
           }
         }
       ],
-      "gapStates": [
-        "insufficient_evidence"
-      ],
+      "gapStates": ["insufficient_evidence"],
       "entityBinding": {
         "purpose": "story",
         "entityId": "ent_greenwood_district_001"

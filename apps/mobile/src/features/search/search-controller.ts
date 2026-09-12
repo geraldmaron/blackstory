@@ -296,7 +296,13 @@ export function createSearchController(
       const page = await fetchPage(runtime, { query, kind: filterKind, era: filterEra });
       if (!isCurrent(gen)) return; // superseded by a newer call -- discard even a "successful" result
       if (page.results.length === 0) {
-        setState({ kind: 'empty', query, filterKind, filterEra, degraded: page.freshness.degraded });
+        setState({
+          kind: 'empty',
+          query,
+          filterKind,
+          filterEra,
+          degraded: page.freshness.degraded,
+        });
         return;
       }
       setState({

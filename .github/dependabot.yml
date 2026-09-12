@@ -50,6 +50,14 @@ updates:
     ignore:
       - dependency-name: 'typescript'
         update-types: ['version-update:semver-major']
+      # zod 4 changes the method signatures `packages/ops-data/src/firestore/types.ts` is built
+      # on (TS2554, "Expected 2-3 arguments, but got 1"), so the major group PR cannot go green
+      # until the migration in repo-gvus lands — 32 files against a breaking API. Left ungrouped
+      # it rides with maplibre-gl and @types/node and fails the whole group, and each monthly
+      # reopen re-runs Workspace Checks, Workspace Tests and Mobile Checks on a known-red branch.
+      # Drop this entry when repo-gvus is done; the migration is the unblock, not the bump.
+      - dependency-name: 'zod'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: npm
     # apps/mobile keeps its own npm lockfile — deliberately excluded from the root pnpm
