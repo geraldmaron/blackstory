@@ -25,6 +25,7 @@
  *     packages/ops-data/scripts/fix-record-accuracy-followups.ts
  */
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -171,6 +172,7 @@ async function main(): Promise<void> {
 
       await client.query('COMMIT');
       console.log('\nApplied.');
+      remindToRepublishCatalogArtifacts((alreadyStated ? 0 : 1) + 1);
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;

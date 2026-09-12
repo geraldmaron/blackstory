@@ -57,6 +57,7 @@ import {
   type ReleaseClaimProjection,
   type ReleaseSourceEntity,
 } from '@repo/domain';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -224,6 +225,7 @@ async function main(): Promise<void> {
       throw error;
     }
     console.log(`\nApplied: ${written} record(s).`);
+    remindToRepublishCatalogArtifacts(written);
   } finally {
     await client.end();
   }

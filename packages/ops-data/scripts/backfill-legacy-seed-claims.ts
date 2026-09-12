@@ -19,6 +19,7 @@
  *     packages/ops-data/scripts/backfill-legacy-seed-claims.ts
  */
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -192,6 +193,7 @@ async function main(): Promise<void> {
       return;
     }
 
+    let written = 0;
     for (const entityId of ENTITY_IDS) {
       const claims = LEGACY_SEED_CLAIMS_BY_ENTITY[entityId]!;
       const claimIds = claims.map((c) => c.id);
@@ -200,6 +202,7 @@ async function main(): Promise<void> {
         JSON.stringify(claims),
         JSON.stringify(claimIds),
       ]);
+      written += result.rowCount ?? 0;
       console.log(
         `${entityId}: updated ${result.rowCount ?? 0} row(s), ${claims.length} claim(s).`,
       );
@@ -215,6 +218,7 @@ async function main(): Promise<void> {
         `${row.entity_id}: claims is ${Array.isArray(row.claims) ? 'array' : typeof row.claims} (${(row.claims as unknown[]).length} items), claimIds=${JSON.stringify(row.claim_ids)}`,
       );
     }
+    remindToRepublishCatalogArtifacts(written);
   } finally {
     await client.end();
   }

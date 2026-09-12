@@ -18,6 +18,7 @@
  * Optional: pass --release-id=<id> to target a specific release instead of the active one.
  */
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import { applyReleaseTaxonomySync, planReleaseTaxonomySync } from './lib/release-taxonomy-sync.ts';
 
@@ -95,6 +96,7 @@ async function main() {
 
     await applyReleaseTaxonomySync(client, releaseId, plan);
     console.log(`\nApplied: updated taxonomy for ${plan.changed.length} entities in ${releaseId}.`);
+    remindToRepublishCatalogArtifacts(plan.changed.length);
   } finally {
     client.release();
     await pool.end();

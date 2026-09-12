@@ -35,6 +35,7 @@
  *     packages/ops-data/scripts/fix-civil-rights-leaders-notability-basis.ts
  */
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -147,6 +148,7 @@ async function main(): Promise<void> {
       }
       await client.query('COMMIT');
       console.log('Applied.');
+      remindToRepublishCatalogArtifacts(ids.length);
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;

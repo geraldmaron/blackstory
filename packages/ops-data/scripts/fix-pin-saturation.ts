@@ -37,6 +37,7 @@ import { readFileSync } from 'node:fs';
 import pg from 'pg';
 import { lookupUsCityCentroid } from '@repo/domain';
 import { encodeGeohash, geohashPrefixes } from '@repo/domain/geography/geohash';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import { lintPinSaturation, pinSaturationFailureMessage } from './lib/pin-saturation-linter.ts';
 
@@ -233,6 +234,7 @@ async function main(): Promise<void> {
 
       await client.query('COMMIT');
       console.log(`\nApplied. Repointed ${resolved.length}, cleared ${clearPin.length}.`);
+      remindToRepublishCatalogArtifacts(resolved.length + clearPin.length);
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;

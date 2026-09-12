@@ -34,6 +34,7 @@
  *   node --conditions development --import tsx packages/ops-data/scripts/rebuild-release-graph.ts
  */
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -448,6 +449,7 @@ async function main(): Promise<void> {
       const washingtonFixed = await applyWashingtonCanonicalDrift(client, releaseId);
       await client.query('COMMIT');
       console.log('\nApplied. Washington canonical drift repaired:', washingtonFixed);
+      remindToRepublishCatalogArtifacts(1);
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;

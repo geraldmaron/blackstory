@@ -16,6 +16,7 @@
  *   DRY_RUN=0 SYNC_CANONICAL_LIVING_TO_RELEASE_APPLY=1 ...
  */
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -139,6 +140,7 @@ async function main(): Promise<void> {
     }
 
     console.log(`\nApplied: release_entities=${entitiesUpdated} search_index=${searchUpdated}`);
+    remindToRepublishCatalogArtifacts(entitiesUpdated);
   } finally {
     await client.end();
   }

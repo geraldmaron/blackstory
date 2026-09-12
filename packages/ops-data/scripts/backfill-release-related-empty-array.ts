@@ -13,6 +13,7 @@
  *     packages/ops-data/scripts/backfill-release-related-empty-array.ts
  */
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -65,6 +66,7 @@ async function main(): Promise<void> {
 
     const result = await client.query(UPDATE_SQL);
     console.log(`Updated ${result.rowCount ?? 0} rows.`);
+    remindToRepublishCatalogArtifacts(result.rowCount ?? 0);
   } finally {
     await client.end();
   }

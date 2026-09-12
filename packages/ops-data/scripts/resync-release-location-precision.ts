@@ -33,6 +33,7 @@
 import pg from 'pg';
 import { buildGeoPointFields, type GeoPointFields } from '@repo/domain/geography/geohash';
 import { reducePublicPrecision, redactLocationForPublic } from '@repo/security/redaction';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -262,6 +263,7 @@ async function main(): Promise<void> {
     }
     await client.query('COMMIT');
     console.log(`\nAPPLIED: rewrote ${changes.length} rows in both stores.`);
+    remindToRepublishCatalogArtifacts(changes.length);
   } finally {
     await client.end();
   }
