@@ -13,9 +13,11 @@ import { searchResponseV1Schema } from '@repo/public-contracts/v1/search';
 import { publicApiErrorEnvelopeSchema } from '@repo/public-contracts/errors';
 import { createPublicRateLimitGuard } from '../rate-limits.js';
 import { createPublicSearchGuard } from '../search-guardrails.js';
-import { createInMemoryPublicDataAccess } from './data-access.js';
+import { createInMemoryPublicDataAccess, EMPTY_FACETS } from './data-access.js';
 import { dispatch } from './router.js';
 import type { ApiRequest, HandlerDeps } from './handlers.js';
+import type { CanonicalSearchQuery } from '@repo/security';
+import type { PublicDataAccess, SearchPage } from './data-access.js';
 import { makeEntity, SAMPLE_POINTER } from './entity-fixture.js';
 
 const FIXED_NOW = 1_800_000_000_000;
@@ -200,6 +202,35 @@ test('GET /v1/search mints an opaque nextCursor when more results exist', async 
   const parsed = searchResponseV1Schema.parse(res.body);
   assert.equal(parsed.hasMore, true);
   assert.ok(parsed.nextCursor && parsed.nextCursor.length > 0, 'cursor must be present and opaque');
+});
+
+test('GET /v1/search carries an `era` deep-link param through to the data-access canonical query', async () => {
+  let seenCanonical: CanonicalSearchQuery | undefined;
+  const spyDataAccess: PublicDataAccess = {
+    async getReleasePointer() {
+      return SAMPLE_POINTER;
+    },
+    async getEntity() {
+      return undefined;
+    },
+    async listEntities() {
+      return [];
+    },
+    async search(canonical): Promise<SearchPage> {
+      seenCanonical = canonical;
+      return { results: [], facets: EMPTY_FACETS, totalMatched: 0, hasMore: false };
+    },
+  };
+  const res = await dispatch(
+    makeRequest('/v1/search', { query: 'q=school&era=1950s', headers: CLIENT_HEADER }),
+    makeDeps({ dataAccess: spyDataAccess }),
+  );
+  assert.equal(res.status, 200);
+  assert.deepEqual(
+    [...(seenCanonical?.filters ?? [])],
+    [{ field: 'era', value: '1950s' }],
+    'era must reach the canonical query the same way kind/state already do',
+  );
 });
 
 test('ADVERSARIAL: SQL-injection-shaped query param is denied 400 by the shared guardrail', async () => {

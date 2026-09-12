@@ -117,4 +117,14 @@ describe('getSearchMode — the query threshold gate', () => {
     expect(getSearchMode('a'.repeat(MIN_QUERY_LENGTH))).toBe('query');
     expect(getSearchMode('a'.repeat(MIN_QUERY_LENGTH + 10))).toBe('query');
   });
+
+  it('is "query" for an era filter on its own, even with no typed text (a `/history` deep link with no `q`)', () => {
+    expect(getSearchMode('', undefined, '1950s')).toBe('query');
+  });
+
+  it('is "browse" for an empty/whitespace-only era, same as an absent one', () => {
+    expect(getSearchMode('', undefined, '')).toBe('browse');
+    expect(getSearchMode('', undefined, '   ')).toBe('browse');
+    expect(getSearchMode('', undefined, undefined)).toBe('browse');
+  });
 });

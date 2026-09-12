@@ -13,9 +13,15 @@ import { SearchScreen } from '@/features/search';
 import { useExploreMapSource } from '@/features/explore';
 
 export default function RecordsTabScreen() {
-  const params = useLocalSearchParams<{ q?: string | string[]; kind?: string | string[] }>();
+  const params = useLocalSearchParams<{
+    q?: string | string[];
+    kind?: string | string[];
+    era?: string | string[];
+  }>();
   const initialQuery = parseSearchQuery(params.q);
-  const { kind: initialKind } = parseFilterState(params as Record<string, unknown>);
+  const { kind: initialKind, era: initialEra } = parseFilterState(
+    params as Record<string, unknown>,
+  );
   const mapSource = useExploreMapSource();
   const pinnedRecordCount =
     mapSource.loadState.kind === 'ready' ? mapSource.source.features.length : undefined;
@@ -25,6 +31,7 @@ export default function RecordsTabScreen() {
     <SearchScreen
       initialQuery={initialQuery || undefined}
       initialKind={initialKind}
+      initialEra={initialEra}
       pinnedRecordCount={pinnedRecordCount}
       archiveScopeLabel={archiveScopeLabel}
     />

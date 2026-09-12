@@ -27,16 +27,18 @@ describe('buildSearchRequestPath', () => {
     expect(url.searchParams.get('pageSize')).toBe('10');
   });
 
-  it('omits kind/cursor when absent, rather than sending an empty string', () => {
+  it('omits kind/cursor/era when absent, rather than sending an empty string', () => {
     const path = buildSearchRequestPath({ query: 'tubman' });
     const url = new URL(`https://example.test${path}`);
     expect(url.searchParams.has('kind')).toBe(false);
     expect(url.searchParams.has('cursor')).toBe(false);
+    expect(url.searchParams.has('era')).toBe(false);
   });
 
-  it('never sends an `era` filter param -- apps/api-public/src/search-guardrails.ts does not accept one', () => {
-    const path = buildSearchRequestPath({ query: 'tubman' });
-    expect(path).not.toContain('era=');
+  it('sends an `era` filter param when provided, in the same decade-bucket shape the deep link carries', () => {
+    const path = buildSearchRequestPath({ query: 'school', era: '1950s' });
+    const url = new URL(`https://example.test${path}`);
+    expect(url.searchParams.get('era')).toBe('1950s');
   });
 
   it('uses the same default page size as the server guardrail', () => {
@@ -50,6 +52,13 @@ describe('buildQueryShapeKey', () => {
     const withFilter = buildQueryShapeKey({ query: 'tubman', kind: 'person' });
     expect(noFilter).not.toBe(withFilter);
     expect(buildQueryShapeKey({ query: 'tubman', kind: 'person' })).toBe(withFilter);
+  });
+
+  it('distinguishes an era filter from the same query with no filter', () => {
+    const noFilter = buildQueryShapeKey({ query: 'school' });
+    const withEra = buildQueryShapeKey({ query: 'school', era: '1950s' });
+    expect(noFilter).not.toBe(withEra);
+    expect(buildQueryShapeKey({ query: 'school', era: '1950s' })).toBe(withEra);
   });
 });
 

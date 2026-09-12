@@ -285,6 +285,61 @@ describe('recent-search recording', () => {
   });
 });
 
+describe('era filter (repo-vlf0w: the deep-linked era Records used to drop)', () => {
+  it('sends the era filter on the /v1/search request, the same way filterKind already does', async () => {
+    const { transport, calls, resolveNext } = makeControllableTransport({ cooperative: true });
+    const releaseCache = fakeReleaseCache('r1');
+    const { runtime } = buildRuntime(transport, releaseCache);
+    const { onChange } = collectStates();
+    const controller = createSearchController(runtime, onChange);
+
+    controller.setQuery('school', undefined, '1950s');
+    await flushMicrotasks();
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0]).toContain('era=1950s');
+    resolveNext(page());
+    await flushMicrotasks();
+    controller.dispose();
+  });
+
+  it('an era filter on its own (no typed query) still issues a request, not browse mode', async () => {
+    const { transport, calls, resolveNext } = makeControllableTransport({ cooperative: true });
+    const releaseCache = fakeReleaseCache('r1');
+    const { runtime } = buildRuntime(transport, releaseCache);
+    const { states, onChange } = collectStates();
+    const controller = createSearchController(runtime, onChange);
+
+    controller.setQuery('', undefined, '1950s');
+    await flushMicrotasks();
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0]).toContain('era=1950s');
+    expect(states.some((s) => s.kind === 'loading')).toBe(true);
+    resolveNext(page());
+    await flushMicrotasks();
+    controller.dispose();
+  });
+
+  it('carries the settled era filter into the results state so a caller can echo it back', async () => {
+    const { transport, resolveNext } = makeControllableTransport({ cooperative: true });
+    const releaseCache = fakeReleaseCache('r1');
+    const { runtime } = buildRuntime(transport, releaseCache);
+    const { states, onChange } = collectStates();
+    const controller = createSearchController(runtime, onChange);
+
+    controller.setQuery('school', undefined, '1950s');
+    await flushMicrotasks();
+    resolveNext(page());
+    await flushMicrotasks();
+
+    const final = states[states.length - 1];
+    expect(final.kind).toBe('results');
+    expect('filterEra' in final && final.filterEra).toBe('1950s');
+    controller.dispose();
+  });
+});
+
 describe('ranking-signal leak propagation into controller state', () => {
   it('surfaces a leaked ranking field as an error state, never as rendered results', async () => {
     const { transport, resolveNext } = makeControllableTransport({ cooperative: true });

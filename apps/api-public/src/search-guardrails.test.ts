@@ -33,6 +33,26 @@ test('parsePublicSearchQuery maps allowlisted params to structured input', () =>
   assert.equal(parsed.lat, 40.7128);
 });
 
+test('parsePublicSearchQuery accepts an era filter already in bucket form', () => {
+  const parsed = parsePublicSearchQuery({ q: 'school', era: '1950s' });
+  assert.deepEqual(parsed.filters, { era: '1950s' });
+});
+
+test('parsePublicSearchQuery normalizes a bare decade to the same bucket vocabulary the web deep link uses', () => {
+  const parsed = parsePublicSearchQuery({ q: 'school', era: '1950' });
+  assert.deepEqual(parsed.filters, { era: '1950s' });
+});
+
+test('parsePublicSearchQuery drops an era value that is not a valid decade bucket, rather than denying the request', () => {
+  const parsed = parsePublicSearchQuery({ q: 'school', era: 'not-a-decade' });
+  assert.deepEqual(parsed.filters, undefined);
+});
+
+test('parsePublicSearchQuery treats era=all as no narrowing, matching the shared discovery vocabulary', () => {
+  const parsed = parsePublicSearchQuery({ q: 'school', era: 'all' });
+  assert.deepEqual(parsed.filters, undefined);
+});
+
 test('public search guard allows canonical GET /v1/search', () => {
   const guard = createPublicSearchGuard();
   const decision = guard.evaluate({
@@ -48,6 +68,21 @@ test('public search guard allows canonical GET /v1/search', () => {
     const meta = guard.endpointMetadata(decision);
     assert.equal(meta.endpointClass, 'search');
     assert.equal(meta.costTier, 'expensive_read');
+  }
+});
+
+test('public search guard carries an era filter through to the canonical query', () => {
+  const guard = createPublicSearchGuard();
+  const decision = guard.evaluate({
+    method: 'GET',
+    path: '/v1/search',
+    query: { q: 'school', era: '1950s' },
+  });
+
+  assert.ok(decision);
+  assert.equal(decision.allowed, true);
+  if (decision.allowed) {
+    assert.deepEqual([...decision.canonical.filters], [{ field: 'era', value: '1950s' }]);
   }
 });
 
