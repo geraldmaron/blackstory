@@ -30,11 +30,12 @@ export function isPostgresPublicDataSource(env: EnvironmentLike = process.env): 
  * Whether list/map/search may prefer ADR-004 CDN/local `entities.json` artifacts.
  *
  * Postgres stays the system of record for WHICH release is active: the active-release pointer
- * is always read live, and `release-artifacts.ts` rejects any artifact whose `releaseId`
- * doesn't match that pointer, so an artifact from a DIFFERENT (superseded) release can never
- * shadow `bb_public`. That is weaker than "a stale artifact can never shadow bb_public" — the
- * guard is identity-based, not content-based. Dozens of `packages/ops-data/scripts` fix/backfill
- * scripts upsert `bb_public.release_entities`/`search_index` under the SAME release id without
+ * is always read live, and the shared release-artifact fetcher (`@repo/domain`) rejects any
+ * artifact whose `releaseId` doesn't match that pointer, so an artifact from a DIFFERENT
+ * (superseded) release can never shadow `bb_public`. That is weaker than "a stale artifact can
+ * never shadow bb_public" — the guard is identity-based, not content-based. Dozens of
+ * `packages/ops-data/scripts` fix/backfill scripts upsert
+ * `bb_public.release_entities`/`search_index` under the SAME release id without
  * bumping the active-release pointer (repo-19mxs), so a pre-correction artifact and a
  * post-correction one carry an identical `releaseId` and the guard cannot tell them apart. The
  * CDN artifact catches up via `publish-release-catalog-artifacts.yml`, which is dispatched

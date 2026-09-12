@@ -98,7 +98,8 @@ test('postgres mode uses ADR-004 release artifacts only behind an explicit origi
     false,
   );
   // With an explicit origin, artifacts act as the egress read-through cache (repo-csw0);
-  // release-artifacts.ts still rejects any artifact whose releaseId mismatches the live pointer.
+  // The shared release-artifact fetcher still rejects any artifact whose releaseId mismatches
+  // the live pointer.
   assert.equal(
     shouldPreferReleaseArtifacts({
       PUBLIC_DATA_SOURCE: 'postgres',

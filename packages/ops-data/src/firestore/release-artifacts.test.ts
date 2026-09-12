@@ -8,6 +8,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import {
   buildReleaseCatalogArtifacts,
+  fetchReleaseEntitiesListArtifact,
   fetchReleaseSearchIndexArtifact,
   publicMediaObjectUrl,
   writeReleaseCatalogArtifactsToDir,
@@ -68,6 +69,12 @@ test('fetchReleaseSearchIndexArtifact returns remote artifact when fetch succeed
     docs: [{ id: 'ent_fetch_001', releaseId, displayName: 'Fetched' }],
   };
   const fetched = await fetchReleaseSearchIndexArtifact(releaseId, {
+    // An explicit origin, same as production: there is no implicit public-media fallback to
+    // reach for when this is absent — the shared fetcher would return `undefined` before ever
+    // calling `fetchImpl`.
+    env: {
+      APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL: 'https://static.example.test',
+    } as unknown as NodeJS.ProcessEnv,
     allowLocalFallback: false,
     fetchImpl: async () =>
       new Response(JSON.stringify(artifact), {
@@ -76,4 +83,36 @@ test('fetchReleaseSearchIndexArtifact returns remote artifact when fetch succeed
       }),
   });
   assert.deepEqual(fetched, artifact);
+});
+
+test('local fixture fallback is opt-in: a forgotten allowLocalFallback never shadows a live miss', async () => {
+  const releaseId = 'rel_fallback_001';
+  const dir = mkdtempSync(join(tmpdir(), 'ds-release-artifacts-fallback-'));
+  try {
+    const built = buildReleaseCatalogArtifacts({
+      releaseId,
+      generatedAt: '2026-08-08T00:00:00.000Z',
+      projections: [{ id: 'ent_fallback_001' }],
+      searchDocs: [{ id: 'ent_fallback_001', releaseId }],
+    });
+    writeReleaseCatalogArtifactsToDir(built, dir);
+
+    // No configured origin, and `allowLocalFallback` omitted: the fixture on disk must be
+    // invisible even though it matches the requested release.
+    const withoutOptIn = await fetchReleaseEntitiesListArtifact(releaseId, {
+      env: {} as NodeJS.ProcessEnv,
+      localArtifactsRoot: dir,
+    });
+    assert.equal(withoutOptIn, undefined);
+
+    // Same miss, `allowLocalFallback: true` this time: the fixture now serves.
+    const optedIn = await fetchReleaseEntitiesListArtifact(releaseId, {
+      env: {} as NodeJS.ProcessEnv,
+      allowLocalFallback: true,
+      localArtifactsRoot: dir,
+    });
+    assert.equal(optedIn?.entityCount, 1);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

@@ -308,7 +308,7 @@ async function main(): Promise<void> {
         '  1. Is APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL still set on Vercel (all environments)?\n' +
         '     Without it the artifact read-through is skipped and every cold start hits Postgres.\n' +
         '  2. Are the artifacts current? A releaseId mismatch makes consumers fall back silently.\n' +
-        '     apps/web/src/lib/public-data/release-artifacts.ts logs the specific reason.\n' +
+        '     packages/domain/src/publication/release-artifact-fetch.ts logs the specific reason.\n' +
         '  3. Did a route lose its cache posture, or did the catalog cache TTL get shortened?\n',
     );
     process.exitCode = 1;

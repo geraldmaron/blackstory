@@ -1,8 +1,8 @@
 /**
  * repo-19mxs: a script that writes to `bb_public.release_entities` / `bb_public.search_index`
  * directly (not through a release activation) leaves the CDN catalog artifact (entities.json /
- * search-index.json) stale — `release-artifacts.ts`'s guard on the read side only checks
- * `releaseId` identity, which does not change on an in-place correction, so it cannot tell a
+ * search-index.json) stale — the shared release-artifact fetcher's guard on the read side only
+ * checks `releaseId` identity, which does not change on an in-place correction, so it cannot tell a
  * fresh artifact from a pre-correction one. The trigger-maintained watermark
  * (`bb_public.release_catalog_publish_watermark`, supabase/migrations/20260808020846_*)
  * already knows the write just happened; nothing told the person who just ran this script.
