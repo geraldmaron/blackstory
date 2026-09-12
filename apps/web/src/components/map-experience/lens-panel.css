@@ -133,6 +133,23 @@
   text-decoration: underline;
 }
 
+/*
+ * "Show the legend" sits on its own grid row below the layer chips, not inside a
+ * .ds-lens__group-head next to a label — so the margin-left: auto that pushes .ds-lens__link to
+ * the right of a header row is wrong here. Reset it to sit at the left edge, matching the other
+ * standalone helper links in this panel.
+ */
+.ds-lens__show-legend {
+  margin-left: 0;
+}
+
+.ds-lens__note {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}
+
 .ds-lens__rule {
   height: 1px;
   margin: 0;

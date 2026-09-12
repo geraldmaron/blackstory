@@ -150,6 +150,69 @@ test('research-intake fetches through an injected transport, then opens a draft 
   assert.equal(result.intake.accepted, true);
 });
 
+test('authority-followup-intake runs research-intake once per harvested lead', async () => {
+  const out = capture();
+  const store = new MemoryAtomicStore();
+  const encoder = new TextEncoder();
+  async function* body() {
+    yield encoder.encode('The county historical society cites the state archive directly.');
+  }
+  const leadsFile = JSON.stringify({
+    authorityFollowUps: [
+      {
+        url: 'https://archive.example.org/authority-followup-a',
+        host: 'archive.example.org',
+        parentCandidateId: 'candidate-1',
+        parentStableIdentifier: 'stable-1',
+        reason: 'authority_host_allowlist',
+        harvestedAt: '2026-07-17T04:00:00.000Z',
+      },
+      {
+        url: 'https://archive.example.org/authority-followup-b',
+        host: 'archive.example.org',
+        parentCandidateId: 'candidate-2',
+        parentStableIdentifier: 'stable-2',
+        reason: 'authority_host_allowlist',
+        harvestedAt: '2026-07-17T04:00:00.000Z',
+      },
+    ],
+  });
+  const code = await runCli(
+    ['authority-followup-intake', '--leads-file', 'leads.json', ...BASE_FLAGS],
+    {
+      store,
+      stdout: out.stdout,
+      stderr: out.stderr,
+      readFile: () => leadsFile,
+      nowMs: Date.parse('2026-07-17T04:00:00.000Z'),
+      fetchDependencies: {
+        resolveHost: async () => [{ address: '93.184.216.34', family: 4 }],
+        transport: async () => ({
+          status: 200,
+          headers: { 'content-type': 'text/plain' },
+          remoteAddress: '93.184.216.34',
+          body: body(),
+        }),
+      },
+    },
+  );
+  assert.equal(code, 0);
+  const result = JSON.parse(out.lines[0] ?? '{}');
+  assert.equal(result.version, 'authority-followup-intake.v1');
+  assert.equal(result.considered, 2);
+  assert.equal(result.items.length, 2);
+  for (const item of result.items) {
+    assert.equal(item.fetch.ok, true);
+    assert.ok(item.citation);
+    assert.equal(item.intake.accepted, true);
+    assert.equal(item.intake.committed, false);
+  }
+  assert.equal(result.items[0].parentStableIdentifier, 'stable-1');
+  assert.equal(result.items[1].parentStableIdentifier, 'stable-2');
+  // Safe by default: no --commit, so nothing reached the store despite two accepted intakes.
+  assert.equal(store.writes.length, 0);
+});
+
 test('bulk-import reads the injected file and reports a per-row summary', async () => {
   const out = capture();
   const csv = [

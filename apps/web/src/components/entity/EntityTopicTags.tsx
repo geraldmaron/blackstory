@@ -26,8 +26,11 @@ function chipHref(kind: 'theme' | 'era', value: string): string {
 }
 
 export function EntityTopicTags({ entity }: EntityTopicTagsProps) {
-  const themes = entity.topicTags ?? [];
-  const eras = entity.eraBuckets ?? [];
+  // Deduped here regardless of whether the upstream data (seed or live projection) is: the React
+  // key is the tag/era string itself, so a duplicate in either source collides on key and renders
+  // a duplicate chip.
+  const themes = Array.from(new Set(entity.topicTags ?? []));
+  const eras = Array.from(new Set(entity.eraBuckets ?? []));
   if (themes.length === 0 && eras.length === 0) {
     return null;
   }

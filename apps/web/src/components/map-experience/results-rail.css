@@ -86,6 +86,54 @@
   background: var(--ds-canvas);
 }
 
+/* ---- constraints ----------------------------------------------------------- */
+
+.ds-results__constraints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1) 6px;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+/* Same pill recipe as .ds-lens__chip (lens-panel.css) — one shared removable-chip look across
+   the two flanking instruments — plus a trailing clear glyph. */
+.ds-results__constraint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 10px;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color var(--ds-duration-fast) var(--ds-easing),
+    background-color var(--ds-duration-fast) var(--ds-easing),
+    color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-results__constraint:hover {
+  border-color: var(--ds-border-strong);
+  background: var(--ds-canvas);
+  color: var(--ds-accent);
+}
+
+.ds-results__constraint svg {
+  flex: none;
+  color: var(--ds-ink-muted);
+}
+
+.ds-results__constraint:hover svg {
+  color: var(--ds-accent);
+}
+
 /* ---- list ---------------------------------------------------------------- */
 
 .ds-results__scroller {
@@ -283,7 +331,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ds-results__save {
+  .ds-results__save,
+  .ds-results__constraint {
     transition-duration: 0.01ms;
   }
 }

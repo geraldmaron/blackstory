@@ -99,9 +99,9 @@ The current dark plate is not readable as a map. v9 sets minimum separation betw
 
 **Label field expression:** always
 ```js
-['coalesce', ['get', 'name:en'], ['get', 'name:latin'], ['get', 'name']]
+['coalesce', ['get', 'name:en'], ['get', 'name_en'], ['get', 'name:latin'], ['get', 'name']]
 ```
-OpenMapTiles ships localised name fields inconsistently across planet releases; pinning `name:en` silently drops roughly half the labels.
+OpenMapTiles ships localised name fields inconsistently across planet releases — some builds use the colon-delimited `name:en`, others the underscore `name_en` — so pinning only one silently drops a large share of the labels.
 
 ---
 

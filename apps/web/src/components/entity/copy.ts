@@ -68,3 +68,17 @@ export const THIN_RECORD_COPY: RecordGapCopy = {
     'yet, so what you see here is the listing itself rather than a researched history. ' +
     'This reflects the current state of research, not an absence of history.',
 };
+
+/**
+ * Record-level state, not a section gap: the record has been researched — it has real narrative
+ * context — but every fact on it still traces back to one source document. Distinct from
+ * THIN_RECORD_COPY, which covers a record that has not been researched at all; this record has,
+ * it just has not been checked against a second source yet.
+ */
+export const SINGLE_SOURCE_COPY: RecordGapCopy = {
+  title: 'Single source',
+  body:
+    'Every fact on this record traces back to a single source document. It has not yet been ' +
+    'checked against a second, independent source. This reflects the current state of ' +
+    'research, not an absence of history.',
+};

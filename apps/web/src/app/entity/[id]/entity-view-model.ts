@@ -61,10 +61,26 @@ export function isSparseRecord(entity: PublicEntityView): boolean {
  *    prevent.
  *
  * So the notice requires the absence of narrative context too. Single-sourced-but-researched
- * records need a corroboration disclosure instead — a different sentence, deliberately not
- * invented here (repo-ol8v).
+ * records need a corroboration disclosure instead — a different sentence, see
+ * isSingleSourceRecord below (repo-ol8v).
  */
 export function isThinRecord(entity: PublicEntityView): boolean {
   if (entity.researchCoverage !== 'minimal') return false;
   return (entity.historicalContext ?? '').trim().length === 0;
+}
+
+/**
+ * True when a record has been researched — real narrative context exists — but that research
+ * still traces to a single source document. The reader needs a different fact than isThinRecord
+ * conveys: not "the research has not happened yet" but "the research has happened, and it has
+ * not yet been checked against a second source."
+ *
+ * The inverse of isThinRecord's second condition, on the same researchCoverage === 'minimal'
+ * gate: isThinRecord fires when historicalContext is empty, this fires when it is not. The two
+ * are mutually exclusive by construction, so at most one of their notices ever renders for a
+ * given record (repo-ol8v).
+ */
+export function isSingleSourceRecord(entity: PublicEntityView): boolean {
+  if (entity.researchCoverage !== 'minimal') return false;
+  return (entity.historicalContext ?? '').trim().length > 0;
 }

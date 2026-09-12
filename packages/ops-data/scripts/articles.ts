@@ -658,6 +658,62 @@ async function gateDoiCitations(article: ArticleAuthoring): Promise<void> {
   }
 }
 
+const URL_CHECK_RETRIES = 2;
+const URL_CHECK_BASE_DELAY_MS = 300;
+
+/**
+ * Minimal HEAD/GET reachability check for a single reference.url, with a small retry count
+ * for transient failures. Not the shared `SafeHttpClient` port from `@repo/domain` — that
+ * type's request.method is `'GET' | 'POST'` only, and a plain reachability check needs HEAD
+ * (falling back to GET when a server rejects HEAD with 405/501).
+ */
+async function checkReferenceUrlReachable(
+  url: string,
+): Promise<{ ok: true } | { ok: false; reason: string }> {
+  let lastReason = 'unknown error';
+  for (let attempt = 0; attempt <= URL_CHECK_RETRIES; attempt += 1) {
+    try {
+      let response = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+      if (response.status === 405 || response.status === 501) {
+        response = await fetch(url, { method: 'GET', redirect: 'follow' });
+      }
+      if (response.status >= 200 && response.status < 400) {
+        return { ok: true };
+      }
+      lastReason = `HTTP ${response.status}`;
+    } catch (error) {
+      lastReason = error instanceof Error ? error.message : String(error);
+    }
+    if (attempt < URL_CHECK_RETRIES) {
+      await new Promise((r) => setTimeout(r, URL_CHECK_BASE_DELAY_MS * 2 ** attempt));
+    }
+  }
+  return { ok: false, reason: lastReason };
+}
+
+/**
+ * Reference URL reachability gate (repo-8py8): mirrors gateDoiCitations's
+ * error-collection/throw shape and live-network gating. `reference.url` is checked on
+ * every reference (not just scholarly ones, which gateDoiCitations already covers via
+ * `scholarlyCitation.doi`), gated behind CHECK_URLS=1 for the same reason DOI resolution
+ * is gated behind CHECK_DOIS=1 — a live network call has no business running
+ * unconditionally alongside the offline hash/tier lints.
+ */
+async function gateReferenceUrls(article: ArticleAuthoring): Promise<void> {
+  const errors: string[] = [];
+  for (const reference of article.references) {
+    const result = await checkReferenceUrlReachable(reference.url);
+    if (!result.ok) {
+      errors.push(
+        `${article.id} / reference ${reference.id}: url ${JSON.stringify(reference.url)} unreachable (${result.reason})`,
+      );
+    }
+  }
+  if (errors.length > 0) {
+    throw new Error(`URL reachability gate failed:\n  ${errors.join('\n  ')}`);
+  }
+}
+
 async function commandValidate(paths: readonly string[]): Promise<void> {
   const articles = await loadFixtureArticles(paths);
   for (const article of articles) validateArticleOffline(article);
@@ -682,6 +738,12 @@ async function commandValidate(paths: readonly string[]): Promise<void> {
     doiChecked = true;
   }
 
+  let urlsChecked = false;
+  if (process.env.CHECK_URLS === '1') {
+    for (const article of articles) await gateReferenceUrls(article);
+    urlsChecked = true;
+  }
+
   console.log(
     JSON.stringify(
       {
@@ -689,6 +751,7 @@ async function commandValidate(paths: readonly string[]): Promise<void> {
         ok: true,
         bound,
         doiChecked,
+        urlsChecked,
         articles: articles.map((a) => ({
           id: a.id,
           slug: a.slug,

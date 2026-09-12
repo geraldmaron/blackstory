@@ -41,12 +41,19 @@ function connectionString(): string {
   return value;
 }
 
-/** Rows where the served search doc disagrees with the record's own release projection. */
+/**
+ * Rows where the served search doc disagrees with the record's own release projection.
+ *
+ * `mapPostgresSearchIndexRow` (packages/schemas/src/search-index-row.ts) prefers the `status`
+ * COLUMN over `facets->>'status'` when the column is set, so the served value must be compared
+ * the same way — `si.facets->>'status'` alone under-detects mismatches on rows that already carry
+ * a (possibly stale) `status` column value.
+ */
 const MISMATCH_PREDICATE = `
   si.release_id = r.release_id
   AND jsonb_typeof(si.facets) = 'object'
   AND re.projection->>'status' IS NOT NULL
-  AND si.facets->>'status' IS DISTINCT FROM re.projection->>'status'
+  AND COALESCE(si.status, si.facets->>'status') IS DISTINCT FROM re.projection->>'status'
 `;
 
 async function main(): Promise<void> {

@@ -40,6 +40,7 @@ import { Breadcrumb, Room, SourceList, type RoomSource } from '../../../componen
 import { MapsExternalLink } from '../../../components/map-experience/MapsExternalLink';
 import {
   RECORD_GAP_COPY,
+  SINGLE_SOURCE_COPY,
   THIN_RECORD_COPY,
   type RecordGapKind,
 } from '../../../components/entity/copy';
@@ -67,7 +68,7 @@ import { storiesCiting } from '../../../lib/release/build-cites-edge';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
 import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './adapters';
 import { buildEntityAnatomyInputs, whereTileLabel } from './entity-anatomy-facts';
-import { deriveRecordStanding, isThinRecord } from './entity-view-model';
+import { deriveRecordStanding, isSingleSourceRecord, isThinRecord } from './entity-view-model';
 import { EntityRoomSections, recordSectionIndex } from './EntityRoomSections';
 import { EntitySessionNavClient } from './entity-session-nav-client';
 import '../../record-page.css';
@@ -250,6 +251,7 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
   const inclusionBasis = entity.notabilityLabels ?? [];
   const gaps = resolveRecordGaps(entity, [...displayClaims]);
   const thinRecord = isThinRecord(entity);
+  const singleSourceRecord = isSingleSourceRecord(entity);
   const sectionsOnThisRecord = recordSectionIndex({
     entity,
     evidenceClaims,
@@ -368,12 +370,13 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
         ) : null}
 
         <div className="ds-record-appx__notes">
-          {thinRecord || gaps.length > 0 ? (
+          {thinRecord || singleSourceRecord || gaps.length > 0 ? (
             <section aria-labelledby="gaps-heading">
               <RecordSmallTitle id="gaps-heading" icon="gaps" className="ds-record-appx__title">
                 Still researching
               </RecordSmallTitle>
               {thinRecord ? <p>{THIN_RECORD_COPY.body}</p> : null}
+              {singleSourceRecord ? <p>{SINGLE_SOURCE_COPY.body}</p> : null}
               {gaps.length > 0 ? (
                 <ul className="ds-rec-gaps">
                   {gaps.map((gap) => (

@@ -209,10 +209,15 @@ function derivePlaceLike(entry: CatalogStatusSource): PlaceLikeStatus | undefine
 }
 
 function deriveLaw(entry: CatalogStatusSource): LawStatus {
+  // Terminal-status cues (enjoined/struck down/repealed) are checked against the law's own
+  // summary only. historicalContext is prose narrative that can describe later, unrelated
+  // litigation touching part of the law (e.g. Shelby County v. Holder striking down the VRA's
+  // coverage formula) without the law itself having been struck down, enjoined, or repealed.
+  const summaryText = entry.summary ?? '';
+  if (/\benjoined\b/i.test(summaryText)) return 'enjoined';
+  if (/\bstruck down\b|\bruled unconstitutional\b/i.test(summaryText)) return 'struck_down';
+  if (REPEALED_RE.test(summaryText)) return 'repealed';
   const text = `${entry.summary ?? ''} ${entry.historicalContext ?? ''}`;
-  if (/\benjoined\b/i.test(text)) return 'enjoined';
-  if (/\bstruck down\b|\bruled unconstitutional\b/i.test(text)) return 'struck_down';
-  if (REPEALED_RE.test(text)) return 'repealed';
   if (AMENDED_RE.test(text)) return 'amended';
   return 'in_force';
 }

@@ -212,8 +212,7 @@ function createObservations(
     const id = `bls-cps-${seriesId}-${year}`;
     const contentHash = createHash('sha256')
       .update(JSON.stringify({ seriesId, year, rate: annual.rate }))
-      .digest('hex')
-      .slice(0, 16);
+      .digest('hex');
 
     observations.push({
       id,

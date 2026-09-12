@@ -38,6 +38,19 @@ test('struck-down language yields struck_down', () => {
   assert.equal(derived.status, 'struck_down');
 });
 
+test('struck-down language in historicalContext about later litigation does not mark the law struck_down', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_law_vra',
+    kind: 'law',
+    displayName: 'Voting Rights Act of 1965',
+    summary: 'Passed in 1965, the Act prohibited racial discrimination in voting.',
+    historicalContext:
+      'In Shelby County v. Holder (2013), the Supreme Court struck down the coverage formula ' +
+      'used to determine which jurisdictions required federal preclearance.',
+  });
+  assert.equal(derived.status, 'in_force');
+});
+
 test('place-like historic cues yield historic', () => {
   const derived = deriveCatalogEntityStatus({
     id: 'ent_place_1',

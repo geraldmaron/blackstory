@@ -12,7 +12,7 @@
  * `promotion-boundary.test.ts`.
  */
 import { appendFileSync, readFileSync, writeFileSync } from 'node:fs';
-import type { RelationshipRole, RelationshipType } from '@repo/domain';
+import type { AuthorityFollowUpLead, RelationshipRole, RelationshipType } from '@repo/domain';
 import { getOpsPostgresPool, type AtomicStore } from '@repo/data-access';
 import type { SafeFetchDependencies } from '@repo/security/url-safety';
 import {
@@ -23,6 +23,7 @@ import {
 } from './bulk-import.js';
 import { commitOperatorIntake } from './commit.js';
 import { prepareDiscoverySurvivorIntake } from './discovery-survivor-intake.js';
+import { runAuthorityFollowUpIntake } from './authority-followup-intake.js';
 import type { DiscoveryRunBatch } from './discovery-run.js';
 import { runBoundedDiscoveryCampaign } from './discovery-run.js';
 import { runCommunityObscurityOperatorCampaign } from './community-obscurity-run.js';
@@ -552,6 +553,72 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
               capture: research.capture,
               intake: intakeSummary,
             },
+            null,
+            2,
+          ),
+        );
+        return 0;
+      }
+      case 'authority-followup-intake': {
+        // Reads a DiscoveryCampaignResult (or a bare AuthorityFollowUpLead[]) from
+        // --leads-file and runs the existing single-URL research-intake path once per lead,
+        // reusing the exact SSRF-safe fetch / citation-prefill / draft-case plumbing above —
+        // no new fetch or commit logic. See authority-followup-intake.ts for why this exists:
+        // `authorityFollowUps` was previously only ever counted, never actually intake'd.
+        const leadsFilePath = requireFlag(flags, '--leads-file');
+        const parsed: unknown = JSON.parse(readFile(leadsFilePath));
+        const leads: readonly AuthorityFollowUpLead[] = Array.isArray(parsed)
+          ? (parsed as readonly AuthorityFollowUpLead[])
+          : ((parsed as { readonly authorityFollowUps?: readonly AuthorityFollowUpLead[] })
+              .authorityFollowUps ?? []);
+        const maxLeadsRaw = optionalFlag(flags, '--max-leads');
+        const fetchDependencies = deps.fetchDependencies ?? createNodeSafeFetchDependencies();
+        // Same commit gating as `research-intake`: only persist an evidence capture per fetch
+        // when --commit is passed, otherwise this stays a dry preview (no DB write).
+        let researchCaptureSink: ResearchCaptureSink | undefined;
+        if (flags.booleans.has('--commit')) {
+          const pool = getOpsPostgresPool(process.env);
+          researchCaptureSink = {
+            storage: captureStorageFromEnv(process.env),
+            newId: (prefix, seed) =>
+              `${prefix}_${createHash('sha1').update(seed).digest('hex').slice(0, 16)}`,
+            persist: async (capture, event) => {
+              await persistCapture(pool, capture, event);
+            },
+          };
+        }
+        const result = await runAuthorityFollowUpIntake({
+          leads,
+          context: buildContext(flags, deps),
+          dependencies: fetchDependencies,
+          ...(researchCaptureSink ? { captureSink: researchCaptureSink } : {}),
+          ...(maxLeadsRaw !== undefined ? { maxLeads: Number(maxLeadsRaw) } : {}),
+        });
+        const items: Record<string, unknown>[] = [];
+        for (const item of result.items) {
+          const intakeSummary = item.outcome.intake
+            ? await finish(item.outcome.intake, flags, deps)
+            : undefined;
+          items.push({
+            leadUrl: item.leadUrl,
+            host: item.host,
+            parentCandidateId: item.parentCandidateId,
+            parentStableIdentifier: item.parentStableIdentifier,
+            fetch: item.outcome.fetch.ok
+              ? {
+                  ok: true,
+                  finalUrl: item.outcome.fetch.finalUrl,
+                  contentHash: item.outcome.fetch.contentHash,
+                }
+              : { ok: false, reason: item.outcome.fetch.reason },
+            citation: item.outcome.citation,
+            capture: item.outcome.capture,
+            intake: intakeSummary,
+          });
+        }
+        stdout(
+          JSON.stringify(
+            { version: result.version, considered: result.considered, items },
             null,
             2,
           ),
