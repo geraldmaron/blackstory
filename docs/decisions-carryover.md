@@ -238,3 +238,56 @@ separately (repo-wide stale mobile-ADR citation cleanup) since fixing them requi
 topic judgment, not a blind find-and-replace — at least one existing "ADR-022" citation
 (`apps/mobile/README.md:201`) is already correct under the final numbering and must not be
 touched.
+
+## Addendum, 2026-09-12 (repo-316nh): ADR-021's two invariants, recovered
+
+`ADR-021` is cited in roughly fifty places across the repository and the document does not exist. It was
+removed in the 2026-07-24 purge above, and unlike ADR-004, ADR-020 and ADR-022 its invariants were
+never extracted here — so a rule stated five times had no statement anywhere, and
+`scripts/validate-boundaries.mjs` does not encode it either (it checks dependency direction,
+deployable isolation and cycles generically). Both invariants below are restated from the code
+that implements them today, not from the removed document.
+
+**Workspace dependency direction.** `@repo/domain` and `@repo/domain-core` must not depend on
+`@repo/public-contracts`. The core model does not take a dependency on the wire contract, and
+`public-contracts` is the mobile token source, so an edge from domain both inverts the layering
+and widens what fires the mobile CI lane. `public-contracts` stays a LEAF — it has no `@repo/*`
+dependencies, only `zod` — which is what makes it safe for anything above it to import.
+
+`@repo/ops-data` and the apps MAY depend on it. `ops-data` is the publisher, and a publisher
+depending on the contract it publishes to is correct layering, not a violation; because
+`public-contracts` is a leaf, no such import can create a cycle. This is consistent with the
+ADR-022 carryover above, which already treats `public-contracts` as the shared
+environment-neutral wire-type package.
+
+Where domain restates a rule rather than importing it — `recordConfidenceTier` in
+`release-builder.ts`, the `ReleaseRevisionMetadata` shape in `mobile-bootstrap.ts` — the
+restatement is the consequence of this rule, and the two copies must be kept in agreement by
+test rather than by type. (from ADR-021, "dependency direction")
+
+**App/API compatibility policy (ADR-021 §2).** A client is incompatible when its app build is
+below the manifest's `minSupportedAppBuild` floor, or when it speaks an API major version the
+manifest no longer supports. `apiVersion`/`minSupportedApiVersion` mirror the URL-prefix major
+version and are the values `/v1/bootstrap` echoes; `minSupportedAppBuild` is the numeric store
+build below which a client must force-update. `evaluateClientCompatibility` in
+`packages/domain/src/publication/mobile-bootstrap.ts` is the evaluation, mirroring what the server
+enforces through the `X-BlackStory-Client` header and `CLIENT_VERSION_UNSUPPORTED`.
+(from ADR-021 §2, "app/API compatibility")
+
+**This recovery is PARTIAL, and deliberately so.** The two invariants above are the ones whose
+citations were load-bearing enough to mislead (the dependency direction was treated as binding in
+three files while being enforced nowhere) and whose current behavior could be read straight out of
+the code. ADR-021 was a much larger document: its remaining citations reference at least §1 (the
+`@repo/public-contracts` zero-runtime-dependency boundary, gated by
+`packages/public-contracts/scripts/check-boundary.mjs`), §3 (public-response redaction discipline
+and the submissions surface), §4 (mobile reaches the server over HTTP only, types-only from
+`public-contracts`), and a set of numbered "red-team resolutions" — of which #1 (the deprecation
+window) and #2 (`X-BlackStory-Client` / `CLIENT_VERSION_UNSUPPORTED` is a UX affordance for honest
+clients, never a security control) are cited by name.
+
+Those are NOT restated here, and their citations are left pointing at ADR-021 rather than
+rewritten. Each needs the same treatment these two got — read the code, state what is true now —
+and that is per-site topic judgment, not a find-and-replace. The precedent is the 2026-09-11
+addendum above, which corrected only the sites feeding its own decision and filed the rest.
+A blind sweep would restate rules nobody verified, which is how the dependency direction became
+binding-but-unwritten in the first place.

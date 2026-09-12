@@ -23,8 +23,8 @@ import { canonicalJson, sha256Bytes, type JsonValue, type Sha256Hash } from './i
 
 /**
  * `apps/api-public`'s `RevisionMetadataV1` / `ReleasePointer.activeRelease` shape, restated
- * structurally so `@repo/domain` takes no dependency on `@repo/public-contracts` (the client/server
- * boundary of ADR-021 runs the other way). Kept field-for-field identical to
+ * structurally so `@repo/domain` takes no dependency on `@repo/public-contracts` (the dependency
+ * direction in `docs/decisions-carryover.md` runs the other way). Kept field-for-field identical to
  * `revisionMetadataV1Schema`; `release-activation` tests assert compatibility.
  */
 export type ReleaseRevisionMetadata = {
@@ -40,7 +40,7 @@ export type MobileSchemaRange = {
 };
 
 /**
- * App/API compatibility policy (ADR-021 §2). `minSupportedApiVersion`/`apiVersion` mirror the
+ * App/API compatibility policy (`docs/decisions-carryover.md`, "app/API compatibility"). `minSupportedApiVersion`/`apiVersion` mirror the
  * URL-prefix major version and are the values the `/v1/bootstrap` response echoes;
  * `minSupportedAppBuild` is the app-version floor — the numeric store build below which a client
  * must force-update (the operational policy the `X-BlackStory-Client` header floor enforces).
@@ -224,7 +224,7 @@ export function bootstrapManifestToJson(manifest: MobileBootstrapManifest): Json
 // Projections + client-facing predicates
 // ---------------------------------------------------------------------------
 
-/** The exact `ReleasePointer` shape `apps/api-public`'s bootstrap handler consumes (ADR-021/004). */
+/** The exact `ReleasePointer` shape `apps/api-public`'s bootstrap handler consumes; see `docs/decisions-carryover.md`. */
 export type BootstrapReleasePointer = {
   readonly activeRelease: ReleaseRevisionMetadata;
   readonly searchIndexVersion?: string;
@@ -262,7 +262,7 @@ export type ClientCompatibility =
   | { readonly ok: false; readonly reason: 'app_build_below_floor' | 'api_version_unsupported' };
 
 /**
- * ADR-021 §2 client-version floor evaluation. A client is incompatible when its app build is
+ * Client-version floor evaluation (`docs/decisions-carryover.md`, "app/API compatibility"). A client is incompatible when its app build is
  * below the manifest's `minSupportedAppBuild` floor, or when it speaks an API major version the
  * manifest no longer supports. Mirrors what the server enforces via the `X-BlackStory-Client`
  * header + `CLIENT_VERSION_UNSUPPORTED`; provided here so the release owner can reason about the

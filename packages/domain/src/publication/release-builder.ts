@@ -336,7 +336,7 @@ function claimLineageKey(citationSource: string | undefined): string | null {
  *
  * This deliberately restates `recordConfidenceTier` from `@repo/public-contracts/evidence`
  * rather than importing it: `@repo/domain` takes no dependency on the public contracts package,
- * the same client/server boundary `mobile-bootstrap.ts` documents. The two must agree — the
+ * the dependency direction recorded in `docs/decisions-carryover.md`. The two must agree — the
  * facet written here and the tier computed at read time grade the same records, and Records
  * prefers this facet when the search index carries it, so a drift between them shows up as
  * Records and Explore disagreeing about the same record.
