@@ -175,3 +175,25 @@ test('entity projection rejects an invalid visit visitability value', () => {
   });
   assert.equal(result.success, false);
 });
+
+/**
+ * repo-2wdg item 9 — the vocabulary this parser accepts must not be narrower than the one the
+ * database, the deriver and the UI already use. `presumed_deceased` was legal everywhere else
+ * and rejected here, so the first record set to it would have 404'd rather than degraded.
+ */
+test('entity projection accepts the presumed_deceased living status', () => {
+  const result = publicEntityProjectionSchema.safeParse({
+    ...baseEntity,
+    status: 'presumed_deceased',
+    livingStatus: 'presumed_deceased',
+  });
+  assert.equal(result.success, true);
+});
+
+test('entity projection still rejects a living status outside the vocabulary', () => {
+  const result = publicEntityProjectionSchema.safeParse({
+    ...baseEntity,
+    livingStatus: 'probably_deceased',
+  });
+  assert.equal(result.success, false);
+});

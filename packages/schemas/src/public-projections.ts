@@ -192,7 +192,21 @@ export const publicEntityProjectionSchema = z.object({
   locationLabel: z.string().min(1).optional(),
   status: z.string().min(1).optional(),
   statusHistory: z.array(statusHistoryEntrySchema).optional(),
-  livingStatus: z.enum(['living', 'deceased', 'unknown']).optional(),
+  /**
+   * Four tokens, not three. `presumed_deceased` is the WP:BDP plausibility answer
+   * `deriveLivingStatus` (packages/domain-core/src/living.ts) returns for a person born beyond
+   * MAX_PLAUSIBLE_HUMAN_AGE_YEARS with no death year, `deriveCatalogEntityStatus` emits it, the
+   * `entities_living_status_check` constraint accepts it, and the web UI already has an icon
+   * (status-icons.ts), help copy (metadata-help.ts) and an admin label for it.
+   *
+   * Only this parser rejected it, which made it a loaded gun rather than a gap: the first record
+   * anyone ever set to `presumed_deceased` would not have degraded, it would have 404'd — the
+   * same shape as the 2026-09-09 incident this file documents two fields below, where a
+   * vocabulary widened in the database and not here took 39 live records off the site. It had
+   * never fired only because 0 of 483 live person records used the token. Ellen Eglin
+   * (repo-2wdg item 9) is the first, so the gun is now unloaded rather than pointed.
+   */
+  livingStatus: z.enum(['living', 'deceased', 'presumed_deceased', 'unknown']).optional(),
   statusProvenance: z.enum(['canonical', 'derived_heuristic']).optional(),
   eraBuckets: z.array(z.string().min(1)).optional(),
   notabilityLabels: z.array(z.string().min(1)).optional(),
