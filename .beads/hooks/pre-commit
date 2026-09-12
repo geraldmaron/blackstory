@@ -23,6 +23,12 @@ if command -v bd >/dev/null 2>&1; then
 fi
 # --- END BEADS INTEGRATION v1.0.3 ---
 
+# --- Give memory records in the staged beads export a stable sort key, so an export with
+# no real content change stops producing a large reorder-only diff every session.
+# Runs AFTER the beads integration above, so it sees the export that block just staged, and
+# BEFORE the checks below that also read it. ---
+"$(dirname "$0")/stabilize-beads-export.py" || exit 1
+
 # --- repo-wzz3: block drafter-model provenance in the staged beads export ---
 # Runs AFTER the beads integration above, so it sees the export that block just staged.
 "$(dirname "$0")/check-model-identifiers.py" --staged || exit 1
