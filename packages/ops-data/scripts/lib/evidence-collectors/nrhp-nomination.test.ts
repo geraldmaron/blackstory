@@ -809,6 +809,108 @@ test('a bare "Section 8" in running prose does not open a section', () => {
   );
 });
 
+// --- repo-oyhy: OCR-damaged "Statement of Significance" headings ---------------------------
+//
+// 24 of 25 nominations flagged as missing section 8 turned out to have it: OCR corrupted the
+// heading text itself, not just the section-number table these fixtures already cover. These
+// pin the fuzzy heading match against the damage categories that bug named — spacing,
+// character substitution, digit/letter confusion on the section number, and a heading split
+// across a line wrap — plus a clean heading and a false-positive candidate that must still be
+// rejected.
+
+test('splitByNarrativeHeadings matches a section 8 heading with letters pulled apart by OCR spacing', () => {
+  const prose = `The property is significant for its role in the civil rights movement of the 1960s. ${'Documented association with local organizers. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    8 .  S T A T E M E N T   O F   S I G N I F I C A N C E
+    ${prose}
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, 'letter-spaced heading must still open section 8');
+  assert.ok(section8!.text.includes('civil rights movement'));
+});
+
+test('splitByNarrativeHeadings matches a section 8 heading with OCR character substitutions', () => {
+  // 5/S, 0/O and 1/I are the substitutions actually observed on these scans.
+  const prose = `The building served as a meeting hall for the local congregation from 1910 onward. ${'Community history documented in county records. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    8. 5TATEMENT 0F SIGN1F1CANCE
+    ${prose}
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, 'character-substituted heading must still open section 8');
+  assert.ok(section8!.text.includes('meeting hall'));
+});
+
+test('splitByNarrativeHeadings matches a section 8 heading whose digit "8" OCR\'d as the letter "B"', () => {
+  const prose = `The property is historically significant for its association with an early Black-owned business. ${'Founded by a local entrepreneur in the postwar era. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    B. STATEMENT OF SIGNIFICANCE
+    ${prose}
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, "a section digit OCR'd as a letter must still open section 8");
+  assert.ok(section8!.text.includes('Black-owned business'));
+});
+
+test('splitByNarrativeHeadings matches a section 8 heading split across a line-wrap hyphen', () => {
+  const prose = `The school operated as one of the county's few institutions serving Black students before integration. ${'Enrollment records survive from the 1940s forward. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    8. STATEMENT OF SIGNIF-
+    ICANCE
+    ${prose}
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, 'a heading split by a line-wrap hyphen must still open section 8');
+  assert.ok(section8!.text.includes('Black students'));
+});
+
+test('splitByNarrativeHeadings matches a clean, undamaged section 8 heading', () => {
+  const prose = `The property gained significance as the home of a prominent civic leader active from 1920 to 1955. ${'Local newspapers document the family’s civic involvement. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    8. STATEMENT OF SIGNIFICANCE
+    ${prose}
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, 'an undamaged heading must still open section 8');
+  assert.ok(section8!.text.includes('civic leader'));
+});
+
+test('splitByNarrativeHeadings does not open section 8 on a mid-sentence mention of the phrase', () => {
+  // The false-positive candidate: "statement of significance" appears verbatim, but as a
+  // clause inside running prose rather than as a heading at the start of its own line. Long
+  // enough to clear MIN_FALLBACK_SECTION_CHARS if the anchor did not reject it.
+  const prose = `The building's physical description is set out above. As discussed in the statement of significance filed with the original nomination, the property retains architectural integrity. ${'Physical fabric described in section 7 above. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    7. DESCRIPTION
+    ${prose}
+  `);
+  const sections = splitByNarrativeHeadings(text);
+  assert.equal(
+    sections.find((s) => s.section === '8'),
+    undefined,
+    'a mid-sentence mention of the phrase must not be treated as the section 8 heading',
+  );
+});
+
+test('parseNomination recovers hasSignificance for a heading with combined spacing and character-substitution damage', () => {
+  const prose = `The congregation organized in 1889 and the building served as a center of community life for Black residents. ${'The sanctuary retains its original character. '.repeat(30)}`;
+  const text = `
+    7. DESCRIPTION
+    ${'The frame structure has a gable roof. '.repeat(30)}
+
+    8 .  5 T A T E M E N T  0 F  S I G N I F I C A N C E
+    ${prose}
+  `;
+  const result = parseNomination(text, 'Test Church');
+  assert.equal(
+    result.hasSignificance,
+    true,
+    'a badly OCR-damaged heading must still be recognized',
+  );
+  assert.equal(result.segmentation, 'narrative-headings');
+  assert.ok(result.narrative.includes('community life'));
+});
+
 test('parseNomination reports the sections it actually captured, not the winning strategy', () => {
   // `sections` feeds `sectionsFound` in the evidence row's provenance, which a later pass reads
   // to decide whether a record still needs re-sweeping. It used to be all-or-nothing — the whole
