@@ -59,12 +59,10 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
     properties.status !== undefined ? searchHrefForStatus(properties.status) : undefined;
   const evidenceLabel = `${properties.evidenceCount} accepted claim${properties.evidenceCount === 1 ? '' : 's'}`;
   const [lng, lat] = feature.geometry.coordinates;
-  const mapPrecision = properties.precision as RecordAnatomyPlace['precision'];
   const anatomyPlace: RecordAnatomyPlace = {
     lat,
     lng,
     label: whereLabel,
-    precision: mapPrecision,
     precisionCaption: radiusAffordanceLabel(properties.geoPrecisionTier, properties.radiusMeters),
   };
   const visitInput = buildVisitHandoffFromMapFeature({

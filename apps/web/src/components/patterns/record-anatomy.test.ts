@@ -62,7 +62,6 @@ test('renders inline fact rows without legacy column strip classes', () => {
         lat: 38.9098,
         lng: -77.0143,
         label: 'Dunbar High School',
-        precision: 'campus',
         precisionCaption:
           'Shown at block precision. The marker represents a ±660 ft area, not an exact address.',
       },
@@ -125,7 +124,6 @@ test('Where is not a maps link when the caller already owns Visit handoff', () =
         lat: 38.9098,
         lng: -77.0143,
         label: 'Washington, D.C.',
-        precision: 'city',
       },
       linkWhereToMaps: false,
     }),

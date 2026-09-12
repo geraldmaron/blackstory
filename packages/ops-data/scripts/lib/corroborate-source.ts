@@ -174,6 +174,7 @@ export function isPlausibleMatch(
 
 async function fetchWikipediaCoordinates(
   title: string,
+  dependencies: CorroborationSearchDependencies = {},
 ): Promise<{ lat: number; lng: number } | undefined> {
   try {
     const params = new URLSearchParams({
@@ -182,7 +183,8 @@ async function fetchWikipediaCoordinates(
       titles: title,
       format: 'json',
     });
-    const response = await fetch(`${WIKIPEDIA_SEARCH_API}?${params.toString()}`, {
+    const fetchImpl = dependencies.wikipediaFetch ?? fetch;
+    const response = await fetchImpl(`${WIKIPEDIA_SEARCH_API}?${params.toString()}`, {
       headers: { 'User-Agent': WIKIPEDIA_USER_AGENT, Accept: 'application/json' },
       signal: AbortSignal.timeout(15_000),
     });
@@ -216,13 +218,14 @@ function normalizeJurisdictionQuery(jurisdictionLabel: string): string {
 async function resolveViaSearchThenCoordinates(
   query: string,
   disambiguator?: string,
+  dependencies: CorroborationSearchDependencies = {},
 ): Promise<{ lat: number; lng: number } | undefined> {
-  const direct = await fetchWikipediaCoordinates(query);
+  const direct = await fetchWikipediaCoordinates(query, dependencies);
   if (direct) return direct;
   const searchQuery = disambiguator ? `${query} ${disambiguator}` : query;
-  const hits = await searchWikipediaApi(searchQuery);
+  const hits = await searchWikipediaApi(searchQuery, dependencies);
   for (const hit of hits.slice(0, 2)) {
-    const coords = await fetchWikipediaCoordinates(hit.title);
+    const coords = await fetchWikipediaCoordinates(hit.title, dependencies);
     if (coords) return coords;
   }
   return undefined;
@@ -382,6 +385,7 @@ export function buildTier2SearxngQuery(subjectName: string): string {
 /** Wikipedia's own search API with retry/backoff — mirrors discover-candidates.ts's proven pattern. */
 async function searchWikipediaApi(
   query: string,
+  dependencies: CorroborationSearchDependencies = {},
   attempts = 3,
 ): Promise<readonly WikipediaSearchHit[]> {
   const params = new URLSearchParams({
@@ -392,9 +396,10 @@ async function searchWikipediaApi(
     format: 'json',
     origin: '*',
   });
+  const fetchImpl = dependencies.wikipediaFetch ?? fetch;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
-      const response = await fetch(`${WIKIPEDIA_SEARCH_API}?${params.toString()}`, {
+      const response = await fetchImpl(`${WIKIPEDIA_SEARCH_API}?${params.toString()}`, {
         headers: { 'User-Agent': WIKIPEDIA_USER_AGENT, Accept: 'application/json' },
         signal: AbortSignal.timeout(15_000),
       });
@@ -419,14 +424,15 @@ async function findViaWikipediaApi(
   subjectName: string,
   context?: string,
   kind?: string,
+  dependencies: CorroborationSearchDependencies = {},
 ): Promise<CorroboratingSource | undefined> {
-  const hits = await searchWikipediaApi(subjectName);
+  const hits = await searchWikipediaApi(subjectName, dependencies);
   for (const hit of hits) {
     const url = `https://en.wikipedia.org/wiki/${encodeURIComponent(hit.title.replace(/ /gu, '_'))}`;
-    const page = await fetchPage(url);
+    const page = await (dependencies.fetchPage ?? fetchPage)(url);
     if (!page) continue;
     if (!isPlausibleMatch(subjectName, context, page.text, hit.title, kind)) continue;
-    const coordinates = await fetchWikipediaCoordinates(hit.title);
+    const coordinates = await fetchWikipediaCoordinates(hit.title, dependencies);
     return {
       url,
       title: hit.title,
@@ -538,8 +544,9 @@ async function findViaTier2CitationTrail(
 async function findViaWikipediaTier1Trail(
   subjectName: string,
   excludeUrls: readonly string[],
+  dependencies: CorroborationSearchDependencies = {},
 ): Promise<CorroboratingSource | undefined> {
-  const viaWikipedia = await findViaWikipediaApi(subjectName);
+  const viaWikipedia = await findViaWikipediaApi(subjectName, undefined, undefined, dependencies);
   if (!viaWikipedia?.html) return undefined;
   const tier1Links = collectTier1TrailLinks(viaWikipedia.html, viaWikipedia.url, {
     excludeUrls: [...excludeUrls, viaWikipedia.url],
@@ -591,8 +598,9 @@ export function pickIndependentTier2SearchHit(
 }
 
 /**
- * Seams for the two network steps, so this module's search path can be tested without an
- * instance and without reaching the internet. Production leaves both unset.
+ * Seams for this module's network steps — the SearXNG search, the fetch of a result page, and
+ * the Wikipedia API calls — so both the search path and the Wikipedia-first path can be tested
+ * without an instance and without reaching the internet. Production leaves all of these unset.
  */
 export type CorroborationSearchDependencies = {
   /** Overrides the origin-pinned client built from the base URL. */
@@ -604,6 +612,14 @@ export type CorroborationSearchDependencies = {
    * from suspending the upstream engines, so a production caller must never set it.
    */
   readonly minSpacingMs?: number;
+  /**
+   * Overrides the Wikipedia API calls in fetchWikipediaCoordinates and searchWikipediaApi.
+   * Defaults to the global `fetch`, same as every other Wikipedia collector in this repo — these
+   * are fixed API URLs this code constructs itself, not URLs scraped from a page, so this seam
+   * exists to make the Wikipedia-first lookup path in findViaWikipediaApi (and everything that
+   * calls it) testable offline, the same way searchClient and fetchPage already are.
+   */
+  readonly wikipediaFetch?: typeof fetch;
 };
 
 /**
@@ -752,7 +768,12 @@ export async function findAnySource(
     readonly dependencies?: CorroborationSearchDependencies;
   } = {},
 ): Promise<CorroboratingSource | undefined> {
-  const viaWikipedia = await findViaWikipediaApi(subjectName, options.context, options.kind);
+  const viaWikipedia = await findViaWikipediaApi(
+    subjectName,
+    options.context,
+    options.kind,
+    options.dependencies ?? {},
+  );
   if (viaWikipedia) return viaWikipedia;
   const baseUrl = options.searxngBaseUrl ?? process.env.SEARXNG_BASE_URL;
   if (!baseUrl) return undefined;
@@ -794,7 +815,11 @@ export async function findCorroboratingTier1Source(
     if (viaPrimaryTrail) return viaPrimaryTrail;
   }
 
-  const viaWikipediaTrail = await findViaWikipediaTier1Trail(subjectName, excludeUrls);
+  const viaWikipediaTrail = await findViaWikipediaTier1Trail(
+    subjectName,
+    excludeUrls,
+    options.dependencies ?? {},
+  );
   if (viaWikipediaTrail) return viaWikipediaTrail;
 
   const baseUrl = options.searxngBaseUrl ?? process.env.SEARXNG_BASE_URL;

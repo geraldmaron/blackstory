@@ -46,13 +46,12 @@ const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../.
  * and the test fails in both directions — a file here that no longer exists is a stale
  * exemption, a file on disk that is not here is the v6 system growing back.
  *
- * One entry outlives the three surface packages by design: `explore-*` belongs to Explore
- * until SP-16 closes. The `history-*` pair left with repo-92n2.27, which deleted the orphaned
- * render components now that /history is a redirect endpoint.
+ * The `history-*` pair left once /history became a redirect endpoint and its orphaned render
+ * components were deleted. The `explore-*` pair left once the one live dependency — a direct
+ * stylesheet import on the Explore surface — was broken: the v9 atlas instruments (TimePanel,
+ * CameraConsole, LensPanel, ResultsRail) had already replaced everything the two files styled.
  */
 const LEGACY_EDITION_CHROME: readonly string[] = [
-  'explore/explore-edition.css',
-  'explore/explore-panel-chrome.ts',
   'memorial/memorial-edition.css',
   'memorial/memorial-panel-chrome.ts',
 ];

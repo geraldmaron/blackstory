@@ -19,9 +19,15 @@ import {
   parseCanonicalStatusSnapshot,
   toReleaseEntityRow,
   toSearchIndexRow,
+  visitOverrideFromCanonicalRow,
+  type CanonicalVisitRow,
   type LandscapePublishRow,
 } from './incremental-publish.ts';
-import { buildReleaseEntityArtifacts, deriveCatalogEntityStatus } from '@repo/domain';
+import {
+  buildReleaseEntityArtifacts,
+  deriveCatalogEntityStatus,
+  type PublicVisit,
+} from '@repo/domain';
 import { mapPostgresSearchIndexRow } from '@repo/schemas';
 
 /** Parsed host, or null for anything unparseable — never a substring test on the raw URL. */
@@ -627,6 +633,106 @@ test('parseCanonicalStatusSnapshot maps bb_canonical row fields', () => {
   assert.equal(snapshot?.livingStatus, 'deceased');
 });
 
+/** A fake `entity_visit` + `entity_locations` join result, as `preparePublish` would load it. */
+const canonicalVisitRow = (overrides: Partial<CanonicalVisitRow> = {}): CanonicalVisitRow => ({
+  phone_e164: '+12025551234',
+  phone_display: '(202) 555-1234',
+  website: 'https://example.org',
+  hours: 'Mon-Fri 9am-5pm',
+  visitability: 'open_to_public',
+  source_ids: ['claim-1'],
+  street: '1900 15th Street NW',
+  postal_code: '20009',
+  ...overrides,
+});
+
+test('visitOverrideFromCanonicalRow composes a raw PublicVisit from entity_visit + entity_locations columns', () => {
+  const visit = visitOverrideFromCanonicalRow(enrichedRow(), canonicalVisitRow());
+  assert.ok(visit);
+  assert.equal(visit?.address?.street, '1900 15th Street NW');
+  assert.equal(visit?.address?.city, 'Washington');
+  assert.equal(visit?.address?.state, 'District of Columbia');
+  assert.equal(visit?.address?.postalCode, '20009');
+  assert.deepEqual(visit?.phone, { e164: '+12025551234', display: '(202) 555-1234' });
+  assert.equal(visit?.website, 'https://example.org');
+  assert.equal(visit?.hours, 'Mon-Fri 9am-5pm');
+  assert.equal(visit?.visitability, 'open_to_public');
+  assert.deepEqual(visit?.sources, ['claim-1']);
+});
+
+test('visitOverrideFromCanonicalRow returns undefined when canonical has no visit or address data', () => {
+  const visit = visitOverrideFromCanonicalRow(
+    enrichedRow(),
+    canonicalVisitRow({
+      phone_e164: null,
+      phone_display: null,
+      website: null,
+      hours: null,
+      visitability: null,
+      source_ids: null,
+      street: null,
+      postal_code: null,
+    }),
+  );
+  assert.equal(visit, undefined);
+});
+
+/**
+ * A lane republish rebuilds `ReleaseSourceEntity` from the landscape row alone, which
+ * never carries phone/website/hours/street — that data lives only in
+ * `bb_canonical.entity_visit`/`entity_locations`. Before `visitOverride` was threaded through the
+ * gate and the artifact build, a republish of an already-live, already-enriched record silently
+ * dropped that block; this proves the same republish now carries it through when the caller
+ * supplies the canonical visit row it loaded, and confirms it does NOT appear without one.
+ */
+test('a lane republish preserves phone/website/hours/street via visitOverride from canonical tables', () => {
+  const row = enrichedRow();
+  const visitOverride = visitOverrideFromCanonicalRow(row, canonicalVisitRow());
+  assert.ok(visitOverride);
+
+  const gateWithoutOverride = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    allowRepublish: true,
+  });
+  assert.equal(gateWithoutOverride.eligible, true);
+  if (!gateWithoutOverride.eligible) return;
+  const builtWithoutOverride = buildArtifactsForEntry({
+    entry: gateWithoutOverride.entry,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(builtWithoutOverride.ok, true);
+  if (!builtWithoutOverride.ok) return;
+  // Confirms the bug this fixes: the landscape row alone rebuilds no visit block at all.
+  assert.equal((builtWithoutOverride.entityRow.projection as { visit?: unknown }).visit, undefined);
+
+  const gateWithOverride = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    allowRepublish: true,
+    visitOverride,
+  });
+  assert.equal(gateWithOverride.eligible, true);
+  if (!gateWithOverride.eligible) return;
+  const built = buildArtifactsForEntry({
+    entry: gateWithOverride.entry,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    visitOverride,
+  });
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const visit = (built.entityRow.projection as { visit?: PublicVisit }).visit;
+  assert.ok(visit);
+  assert.equal(visit?.phone?.display, '(202) 555-1234');
+  assert.equal(visit?.website, 'https://example.org');
+  assert.equal(visit?.hours, 'Mon-Fri 9am-5pm');
+  assert.equal(visit?.address?.street, '1900 15th Street NW');
+});
+
 test('buildArtifactsForEntry publishes canonical deceased even when personReview says living', () => {
   const reviewed = baseRow({
     kind: 'person',
@@ -981,7 +1087,7 @@ test("gateLandscapePublishCandidate: a claim from a second document is corrobora
     result.confidence >= INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR,
     `expected confidence >= floor, got ${result.confidence}`,
   );
-  assert.equal(result.confidence, 0.8);
+  assert.equal(result.confidence, 0.79);
 });
 
 /**
@@ -1013,12 +1119,12 @@ test('gateLandscapePublishCandidate: canonical and evidence from the same author
   assert.equal(result.eligible, false);
   if (result.eligible) return;
   assert.equal(result.reason, 'confidence_below_floor');
-  assert.equal(result.detail, 'confidence 0.707 < floor 0.75');
+  assert.equal(result.detail, 'confidence 0.720 < floor 0.75');
 });
 
 /**
  * repo-2t04.17 — ADMISSION vs REGRESSION for confidence, same shape as the depth clause above.
- * Reuses the exact fixture from the test just above (0.7067, below the 0.75 floor) so the only
+ * Reuses the exact fixture from the test just above (0.720, below the 0.75 floor) so the only
  * variable across these four tests is whether/what live state is supplied.
  */
 test('confidence gate still rejects a low-scoring candidate for a record that is NOT live', () => {
@@ -1068,7 +1174,7 @@ test('confidence gate lets a candidate that scores no worse replace an already-l
     releaseId: 'rel_test',
     generatedAt: '2026-09-09T00:00:00.000Z',
     allowRepublish: true,
-    liveConfidence: 0.7067, // what is currently public scores the same — not a regression
+    liveConfidence: 0.72, // what is currently public scores the same — not a regression
   });
   assert.equal(result.eligible, true);
 });
@@ -1135,7 +1241,7 @@ test('confidence gate falls back to the strict admission test when live confiden
  * `liveClaimConfidence` must score the SAME evidence the same way `minClaimConfidence` does for a
  * candidate — otherwise a depth verdict and a confidence verdict on one live row could disagree
  * with what that row would score as a fresh candidate. Reuses the claims `buildReleaseSourceFromLandscape`
- * produces for the 0.7067 fixture above, repackaged as a `LivePublishedRow`.
+ * produces for the 0.720 fixture above, repackaged as a `LivePublishedRow`.
  */
 test('liveClaimConfidence scores a live row the same way a candidate with identical evidence would score', () => {
   const row = researchCaseRow({
@@ -1155,7 +1261,7 @@ test('liveClaimConfidence scores a live row the same way a candidate with identi
   const entry = buildReleaseSourceFromLandscape(row);
   assert.ok(entry);
   const liveRow = { summary: row.summary, claims: entry!.claims, projection: {} };
-  assert.equal(liveClaimConfidence(liveRow), 0.7067);
+  assert.equal(liveClaimConfidence(liveRow), 0.72);
 });
 
 test('liveClaimConfidence returns 0 for a live row with no claims, never undefined or NaN', () => {
@@ -1187,7 +1293,7 @@ test('gateLandscapePublishCandidate: the index claim still does not count itself
   assert.equal(result.eligible, true);
   if (!result.eligible) return;
   // Unchanged from before the fix: a lone government citation, one lineage, no corroborator.
-  assert.equal(result.confidence, 0.7733);
+  assert.equal(result.confidence, 0.77);
 });
 
 /**

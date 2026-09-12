@@ -1,6 +1,7 @@
 /**
  * Unit tests for Tier-1/Tier-2 host classification, citation-trail link filtering,
- * SearXNG query breadth, and same-lineage rejection used by corroborate-source.ts.
+ * SearXNG query breadth, same-lineage rejection, and the Wikipedia-first lookup ordering
+ * used by corroborate-source.ts.
  */
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -10,6 +11,8 @@ import { collectTier1TrailLinks, collectTier2TrailLinks } from './citation-trail
 import {
   buildTier1SearxngQuery,
   buildTier2SearxngQuery,
+  findAnySource,
+  findCorroboratingTier1Source,
   isPlausibleMatch,
   isUsableLocationLabel,
   looksLikeSettlementArticle,
@@ -623,13 +626,129 @@ test('searchAndFetch reports a malformed response body rather than throwing into
   }
 });
 
-/*
- * NOT COVERED HERE, and it is a real gap rather than an oversight: the public entry points
- * `findCorroboratingTier1Source` and `findAnySource` both try the Wikipedia API before the search
- * path, and that call is a bare `fetch` with no seam. A test driving either of them makes a live
- * external request, so the search path is covered through `searchAndFetch` directly instead. The
- * two tier helpers above it are one-line wrappers that pass the dependency bag through.
+/**
+ * `findCorroboratingTier1Source` and `findAnySource` both try the Wikipedia API before the
+ * search path. `wikipediaFetch` on `CorroborationSearchDependencies` seams that call the same
+ * way `searchClient` and `fetchPage` already seam the search path, so the tests below drive both
+ * public entry points through the Wikipedia-first branch with nothing touching the network.
  */
+type WikipediaApiStub = { readonly calls: string[]; readonly fetch: typeof fetch };
+
+/**
+ * Fake Wikipedia API transport matching `typeof fetch`, so it plugs directly into
+ * `wikipediaFetch`. Distinguishes the search call from the coordinates call by query string, the
+ * same way the real `en.wikipedia.org/w/api.php` endpoint distinguishes them by `action`/`prop`.
+ */
+function wikipediaApiStub(responses: {
+  readonly search?: unknown;
+  readonly coordinates?: unknown;
+}): WikipediaApiStub {
+  const calls: string[] = [];
+  const fetchStub = (async (input: unknown) => {
+    const url = String(input);
+    calls.push(url);
+    const body = url.includes('list=search') ? responses.search : responses.coordinates;
+    return { ok: true, status: 200, json: async () => body ?? {} } as Response;
+  }) as typeof fetch;
+  return { calls, fetch: fetchStub };
+}
+
+test('findAnySource resolves through the injected Wikipedia lookup, with no network call', async () => {
+  const wikipediaUrl = 'https://en.wikipedia.org/wiki/Oak_Street_Meeting_Hall';
+  const wiki = wikipediaApiStub({
+    search: { query: { search: [{ title: 'Oak Street Meeting Hall', pageid: 42 }] } },
+    coordinates: { query: { pages: { '42': {} } } },
+  });
+  const pages = pageFetcher({ [wikipediaUrl]: NPS_TEXT });
+  const result = await findAnySource('Oak Street Meeting Hall', {
+    dependencies: { wikipediaFetch: wiki.fetch, fetchPage: pages.fetchPage },
+  });
+  assert.ok(result);
+  assert.equal(result.method, 'wikipedia_api');
+  assert.equal(result.title, 'Oak Street Meeting Hall');
+  assert.equal(result.text, NPS_TEXT);
+  assert.deepEqual(pages.requested, [wikipediaUrl]);
+  // The search call and the coordinates lookup both went through the injected stub, in order.
+  assert.equal(wiki.calls.length, 2);
+  assert.match(wiki.calls[0]!, /list=search/u);
+  assert.match(wiki.calls[1]!, /prop=coordinates/u);
+});
+
+test('findAnySource tries Wikipedia first and falls back to the search client when nothing matches', async () => {
+  const wiki = wikipediaApiStub({ search: { query: { search: [] } } });
+  const search = jsonClient({ results: [{ url: NPS_HIT, title: 'Oak Street' }] });
+  const pages = pageFetcher({ [NPS_HIT]: NPS_TEXT });
+  const result = await findAnySource('Some Obscure Subject', {
+    searxngBaseUrl: SEARXNG_BASE,
+    dependencies: {
+      wikipediaFetch: wiki.fetch,
+      searchClient: search.client,
+      fetchPage: pages.fetchPage,
+      minSpacingMs: 0,
+    },
+  });
+  assert.ok(result);
+  assert.equal(result.url, NPS_HIT);
+  assert.equal(result.method, 'search');
+  // Wikipedia's own search API was tried exactly once (no hits, so no coordinates lookup)
+  // before the SearXNG fallback ran — the ordering the bug report named as untested.
+  assert.equal(wiki.calls.length, 1);
+  assert.equal(search.urls.length, 1);
+});
+
+test('findCorroboratingTier1Source drives the Wikipedia-first branch to completion with no network call', async () => {
+  const wikipediaUrl = 'https://en.wikipedia.org/wiki/Unrelated_Wiki_Page';
+  const wiki = wikipediaApiStub({
+    search: { query: { search: [{ title: 'Unrelated Wiki Page', pageid: 99 }] } },
+    coordinates: { query: { pages: { '99': {} } } },
+  });
+  // Deliberately no outbound tier-1 links in the article text, so the citation-trail follow-up
+  // never has a link to fetch and never reaches the network either.
+  const pages = pageFetcher({
+    [wikipediaUrl]: 'A plain paragraph about the subject with no external citations at all.',
+  });
+  const savedSearxngBaseUrl = process.env.SEARXNG_BASE_URL;
+  delete process.env.SEARXNG_BASE_URL;
+  try {
+    const result = await findCorroboratingTier1Source(
+      'Some Subject With No Primary Source',
+      {},
+      { dependencies: { wikipediaFetch: wiki.fetch, fetchPage: pages.fetchPage } },
+    );
+    assert.equal(result, undefined);
+    // The Wikipedia bridge actually ran (search, then coordinates) before the function gave up —
+    // this is the previously-untested ordering, now exercised without touching the network.
+    assert.equal(wiki.calls.length, 2);
+    assert.deepEqual(pages.requested, [wikipediaUrl]);
+  } finally {
+    if (savedSearxngBaseUrl === undefined) delete process.env.SEARXNG_BASE_URL;
+    else process.env.SEARXNG_BASE_URL = savedSearxngBaseUrl;
+  }
+});
+
+test('findCorroboratingTier1Source tries the primary citation trail before the Wikipedia bridge, still with no network call', async () => {
+  const wiki = wikipediaApiStub({ search: { query: { search: [] } } });
+  const savedSearxngBaseUrl = process.env.SEARXNG_BASE_URL;
+  delete process.env.SEARXNG_BASE_URL;
+  try {
+    const result = await findCorroboratingTier1Source(
+      'Some Subject',
+      {
+        html: '<html><body><p>No outbound citations here.</p></body></html>',
+        url: 'https://historicsites.dcpreservation.org/items/show/900',
+        text: 'No outbound citations here.',
+      },
+      { dependencies: { wikipediaFetch: wiki.fetch } },
+    );
+    assert.equal(result, undefined);
+    // Reached as far as the Wikipedia bridge — one search call, no hits — only after the primary
+    // trail (empty here) came up with nothing, proving the ordering runs end to end offline.
+    assert.equal(wiki.calls.length, 1);
+  } finally {
+    if (savedSearxngBaseUrl === undefined) delete process.env.SEARXNG_BASE_URL;
+    else process.env.SEARXNG_BASE_URL = savedSearxngBaseUrl;
+  }
+});
 test('the real inter-query spacing is four seconds and queries are serialized', async () => {
   // Worth paying the real gap once. The spacing is the only thing stopping a concurrent batch from
   // suspending every upstream engine, and a test that always overrode it would let the default be

@@ -145,6 +145,9 @@ Owner flipped Cloudflare DNS to Vercel (apex A + www CNAME, DNS-only). Post-flip
 - Host `apps/admin` on this Vercel project — keep it a separate deployment (admin moved to its
   own standalone Vercel project 2026-07-25, gated by Postgres roles via `bb_auth.current_role()`,
   not an IAP boundary; ADR-001/ADR-005 predate that cutover).
-- Enable unattended production deploys on every `main` push without amending ADR-006 / ADR-027.
+- Assume there is a manual "Promote to Production" step before a `main` push goes live: Vercel's
+  git integration auto-builds and auto-aliases every `main` commit to Production with no such step
+  (confirmed 2026-08-05 / 2026-08-12, repo-8ary / repo-h1b2). Treat the staging → main PR merge
+  itself as the production release (see `docs/runbooks/production-release.md`).
 - Recreate public web App Hosting configs in-repo.
 - Put secrets in user-facing copy.

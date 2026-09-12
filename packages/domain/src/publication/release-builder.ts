@@ -289,36 +289,15 @@ export type ClaimRole = 'record_index' | 'evidence';
 export const CLAIM_ROLE_RECORD_INDEX: ClaimRole = 'record_index';
 
 /**
- * Bridge for claims published before `claimRole` existed. Mirrors
- * `RECORD_PROVENANCE_PREDICATES` in `@repo/public-contracts/evidence`, and comes out with it
- * once no published claim is missing the role (repo-8dmey).
- */
-const RECORD_PROVENANCE_PREDICATES: ReadonlySet<string> = new Set([
-  'listing',
-  'significant for',
-  'documented_site',
-]);
-
-/**
- * The role a claim published before `claimRole` existed would have been given.
+ * True when a claim is the record's own index row rather than evidence about its subject.
  *
- * Exported so the one-off migration that stamps the field onto already-published claims uses
- * this rule rather than restating it in SQL, which is how the tier rule ended up with three
- * copies in the first place.
+ * Every published claim carries `claimRole` as of the 2026-09-09 migration. A claim missing it is
+ * treated as evidence rather than inferred from its predicate — predicate inference was a bridge
+ * for claims published before the field existed, mirrored in `@repo/public-contracts/evidence`,
+ * and it comes out of both now that none are left.
  */
-export function claimRoleForPredicate(predicate: string | undefined): ClaimRole {
-  return RECORD_PROVENANCE_PREDICATES.has((predicate ?? '').trim().toLowerCase())
-    ? 'record_index'
-    : 'evidence';
-}
-
-function isRecordIndexClaim(claim: {
-  readonly predicate?: string;
-  readonly claimRole?: string;
-}): boolean {
-  const role = (claim.claimRole ?? '').trim().toLowerCase();
-  if (role.length > 0) return role === CLAIM_ROLE_RECORD_INDEX;
-  return claimRoleForPredicate(claim.predicate) === CLAIM_ROLE_RECORD_INDEX;
+function isRecordIndexClaim(claim: { readonly claimRole?: string }): boolean {
+  return (claim.claimRole ?? '').trim().toLowerCase() === CLAIM_ROLE_RECORD_INDEX;
 }
 
 function claimLineageKey(citationSource: string | undefined): string | null {

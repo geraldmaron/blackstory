@@ -1105,25 +1105,52 @@ test("highestClaimConfidenceTier excludes Wikipedia and the record's own index r
     'medium',
   );
   // nrhp-black-heritage-00000006: the listing claims are the NARA row the record was seeded
-  // from, so the nomination form is the only document corroborating anything (repo-6jizv).
+  // from, so the nomination form is the only document corroborating anything (repo-6jizv). Every
+  // claim states its role explicitly, matching what the publisher writes post-migration.
   assert.equal(
     highestClaimConfidenceTier([
-      { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
+      {
+        confidenceLevel: 'high',
+        predicate: 'listing',
+        claimRole: 'record_index',
+        citationSource: 'catalog.archives.gov',
+      },
       {
         confidenceLevel: 'high',
         predicate: 'significant for',
+        claimRole: 'record_index',
         citationSource: 'catalog.archives.gov',
       },
-      { confidenceLevel: 'high', predicate: 'source states', citationSource: 'npgallery.nps.gov' },
+      {
+        confidenceLevel: 'high',
+        predicate: 'source states',
+        claimRole: 'evidence',
+        citationSource: 'npgallery.nps.gov',
+      },
     ]),
     'medium',
   );
   // Two documents read, neither the index row.
   assert.equal(
     highestClaimConfidenceTier([
-      { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
-      { confidenceLevel: 'high', predicate: 'source states', citationSource: 'npgallery.nps.gov' },
-      { confidenceLevel: 'high', predicate: 'source states', citationSource: 'blackpast.org' },
+      {
+        confidenceLevel: 'high',
+        predicate: 'listing',
+        claimRole: 'record_index',
+        citationSource: 'catalog.archives.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        predicate: 'source states',
+        claimRole: 'evidence',
+        citationSource: 'npgallery.nps.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        predicate: 'source states',
+        claimRole: 'evidence',
+        citationSource: 'blackpast.org',
+      },
     ]),
     'high',
   );
@@ -1134,24 +1161,29 @@ test("highestClaimConfidenceTier excludes Wikipedia and the record's own index r
   );
 });
 
-test('highestClaimConfidenceTier believes claimRole over the predicate bridge', () => {
+test('highestClaimConfidenceTier treats a claim missing claimRole as evidence, never inferred from its predicate', () => {
+  // The predicate bridge is gone: every published claim now carries `claimRole`, so
+  // a claim without it is not read as the record's own index row just because its predicate used
+  // to describe one under the old bridge vocabulary. It counts toward corroboration like any
+  // other claim — the explicit default the current schema demands, not an inference.
   assert.equal(
     highestClaimConfidenceTier([
+      { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
       {
         confidenceLevel: 'high',
-        predicate: 'listing',
-        claimRole: 'evidence',
+        predicate: 'significant for',
         citationSource: 'catalog.archives.gov',
       },
       {
         confidenceLevel: 'high',
         predicate: 'source states',
-        claimRole: 'evidence',
         citationSource: 'npgallery.nps.gov',
       },
     ]),
     'high',
   );
+  // Stating the role explicitly still excludes the index row from corroboration, and a predicate
+  // outside the old bridge vocabulary is no obstacle to being named the index row.
   assert.equal(
     highestClaimConfidenceTier([
       {

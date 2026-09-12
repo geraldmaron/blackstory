@@ -57,10 +57,7 @@ function publicPinHref(properties: ExploreMapFeatureProperties): string {
   if (
     !placePageHolds({
       displayName: properties.displayName,
-      kind: properties.kind,
       entityId: properties.entityId,
-      summary: properties.oneLineStory,
-      locationPrecision: properties.precision,
     })
   ) {
     return '';
@@ -219,8 +216,6 @@ function isDoorAtlasWalk(feature: ExploreMapFeature, doorHref: string): boolean 
     displayName: feature.properties.displayName,
     kind: feature.properties.kind,
     entityId: feature.properties.entityId,
-    summary: feature.properties.oneLineStory,
-    locationPrecision: feature.properties.precision,
   });
   return walkHref !== undefined && walkHref === doorHref;
 }

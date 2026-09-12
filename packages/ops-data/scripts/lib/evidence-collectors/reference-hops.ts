@@ -22,7 +22,15 @@
  *     not a silent exception.
  *   - A link must corroborate the entity before it is worth a fetch. Without this the walk
  *     wanders off into general history within one hop, which is how a "research" pass ends up
- *     citing a page that never mentions the subject.
+ *     citing a page that never mentions the subject. Corroboration requires at least two
+ *     distinct subject tokens (`MIN_RELEVANCE_SCORE`) found across the anchor, its surrounding
+ *     context, OR the link target's own path/query — one token is usually just the place name
+ *     recurring in a government site's own chrome, not a page that is actually about the subject.
+ *   - A link must also look like a document, not a navigation surface (`isDocumentLikeUrl`).
+ *     A town's staff directory, "welcome" home page, or search-results listing can still mention
+ *     the subject's place name often enough to pass the relevance gate; requiring a document-like
+ *     shape (a PDF, an item/article/record page, a marker or finding-aid page) is what actually
+ *     separates a source about the subject from the site furniture around it.
  *   - Wikipedia and Wikidata are never hop targets. They are bridge sources by policy
  *     (`isWikipediaHost`) and the sweep already has a dedicated Wikipedia collector; following
  *     them again would re-derive the encyclopedia rather than reach past it.
@@ -41,6 +49,16 @@ export const DEFAULT_MAX_DEPTH = 2;
 export const DEFAULT_FETCH_BUDGET = 10;
 /** Tokens shorter than this carry no identifying signal ("the", "of", "st"). */
 const MIN_SIGNIFICANT_TOKEN = 4;
+/**
+ * A candidate must match at least this many distinct subject tokens before it is worth a fetch.
+ *
+ * A single-token match is nearly always the place name (city/county/state) recurring in a
+ * government site's own header, footer, or nav menu — every page on covingtonky.gov mentions
+ * "Covington" — so a threshold of one made almost any link on the subject's home jurisdiction's
+ * site look relevant. Requiring two distinct tokens means the page has to say something more
+ * specific than "this site belongs to the subject's town."
+ */
+export const MIN_RELEVANCE_SCORE = 2;
 
 export type HopCandidate = {
   /** Absolute URL, resolved against the page it was found on. */
@@ -64,7 +82,12 @@ export type PlannedHop = {
 export type HopRejection = {
   readonly candidate: HopCandidate;
   readonly reason:
-    'off_policy' | 'bridge_source' | 'already_visited' | 'not_relevant' | 'unparseable';
+    | 'off_policy'
+    | 'bridge_source'
+    | 'already_visited'
+    | 'not_relevant'
+    | 'navigational'
+    | 'unparseable';
 };
 
 export type HopPlan = {
@@ -149,8 +172,22 @@ export function subjectTokens(subject: HopSubject): readonly string[] {
   return [...new Set(tokens)];
 }
 
+/** The link target's own path and query, decoded and despaced into a matchable text run. */
+function linkTargetText(url: string): string {
+  try {
+    const parsed = new URL(url);
+    return decodeURIComponent(`${parsed.pathname} ${parsed.search}`).replace(/[/_%+-]/gu, ' ');
+  } catch {
+    return '';
+  }
+}
+
 /**
- * How many distinct subject tokens appear in the link's anchor text or surrounding context.
+ * How many distinct subject tokens appear in the link's anchor text, its surrounding context, or
+ * the link target's own path/query (a page slug such as "/item/tri-state-bank-memphis" or
+ * "/nr-pdfs/berry-cemetery.pdf" names the subject as reliably as the anchor that points at it,
+ * and does not inherit a government page's site-wide nav boilerplate the way the context window
+ * can).
  *
  * This is a BUDGET filter, not the evidence gate. Some name tokens are weak on their own
  * ("state" out of "Tri-State Bank"), so a marginal link can still win a fetch. That costs one
@@ -159,8 +196,133 @@ export function subjectTokens(subject: HopSubject): readonly string[] {
  * and those are what stand between a wrong document and a false claim.
  */
 export function relevanceScore(candidate: HopCandidate, tokens: readonly string[]): number {
-  const haystack = `${candidate.anchorText} ${candidate.context}`.toLowerCase();
+  const haystack =
+    `${candidate.anchorText} ${candidate.context} ${linkTargetText(candidate.url)}`.toLowerCase();
   return tokens.filter((token) => haystack.includes(token)).length;
+}
+
+/**
+ * Path segments that mark a page as a navigation surface (a section, directory, or utility page)
+ * rather than a document about anything in particular. Matched against the last segment of the
+ * path (the page itself) and against every segment (a subsection nested under one of these, such
+ * as "/police-department/staff", is still a staff directory).
+ */
+const NAV_PATH_SEGMENTS = new Set([
+  'home',
+  'index',
+  'welcome',
+  'about',
+  'about-us',
+  'contact',
+  'contact-us',
+  'staff',
+  'directory',
+  'department',
+  'departments',
+  'division',
+  'divisions',
+  'office',
+  'offices',
+  'program',
+  'programs',
+  'service',
+  'services',
+  'news',
+  'events',
+  'event',
+  'calendar',
+  'faq',
+  'faqs',
+  'search',
+  'results',
+  'result',
+  'login',
+  'signin',
+  'sign-in',
+  'logout',
+  'register',
+  'account',
+  'accounts',
+  'share',
+  'sitemap',
+  'privacy',
+  'privacy-policy',
+  'terms',
+  'careers',
+  'jobs',
+  'category',
+  'categories',
+  'tag',
+  'tags',
+  'topic',
+  'topics',
+  'section',
+  'sections',
+  'precinct',
+  'precincts',
+]);
+
+/**
+ * Query-string parameters that mark a link as pagination or an in-site search, independent of
+ * its path. Deliberately narrow: a tracking parameter such as `utm_source` tags a link a
+ * newsletter or a social post pointed at real content, it does not make the destination a
+ * navigation page, so it is not filtered here — a share or tracking link to a document should
+ * still be followed for the document underneath it.
+ */
+const NAV_QUERY_PATTERN = /(?:^|[?&])(page|p|offset|start|s|q|query)=/iu;
+
+/**
+ * Path shapes strong enough to mark a link as document-like on their own, regardless of anything
+ * in {@link NAV_PATH_SEGMENTS}: the survivors worth following (LOC photo records, state-inventory
+ * PDFs, NPS place articles, hmdb marker pages) all look like one of these. Each pattern requiring
+ * a following segment (an id or slug) is deliberate — a bare "/articles" or "/collections" with
+ * nothing after it is the section's own index listing, not a specific document.
+ */
+const DOCUMENT_PATH_HINTS: readonly RegExp[] = [
+  /\.pdf(?:$|[?#])/iu,
+  /\/items?\/[^/?#]+/iu,
+  /\/articles?\/[^/?#]+/iu,
+  /finding[-_]?aid/iu,
+  /\bnr[-_]?(?:pdfs?|detail|hp)\b/iu,
+  /\bm\.asp\b/iu, // hmdb.org marker detail pages (m.asp?m=<id>)
+  /\/markers?\/[^/?#]+/iu,
+  /\/collections?\/[^/?#]+/iu,
+  /\/objects?\/[^/?#]+/iu,
+  /\/records?\/[^/?#]+/iu,
+  /\/catalog\/[^/?#]+/iu,
+  /\/detail\/[^/?#]+/iu,
+];
+
+/**
+ * Restricts hops to URLs shaped like a specific document rather than a navigation surface.
+ *
+ * This is a shape check on the URL only — it knows nothing about the subject. It exists because
+ * the relevance gate alone was not enough: a nav page for the subject's own town (a staff
+ * directory, a "welcome to" home page, a search-results listing) legitimately mentions the
+ * subject's place name throughout its chrome and can still clear a token-count threshold. Pairing
+ * a document shape with the relevance score is what tells a police-department staff page apart
+ * from a National Register nomination PDF on the same host.
+ */
+export function isDocumentLikeUrl(url: string): boolean {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return false;
+  }
+  const path = parsed.pathname.toLowerCase();
+  const search = parsed.search.toLowerCase();
+
+  if (DOCUMENT_PATH_HINTS.some((pattern) => pattern.test(path) || pattern.test(search))) {
+    return true;
+  }
+  if (NAV_QUERY_PATTERN.test(search)) return false;
+
+  const segments = path.split('/').filter((segment) => segment.length > 0);
+  if (segments.length === 0) return false; // bare root: a home page, not a document
+
+  const stripExtension = (segment: string): string => segment.replace(/\.\w+$/u, '');
+  return !segments.some((segment) => NAV_PATH_SEGMENTS.has(stripExtension(segment)));
 }
 
 /**
@@ -241,8 +403,14 @@ export function planReferenceHops(input: HopPlanInput): HopPlan {
     }
 
     const score = relevanceScore(candidate, tokens);
-    if (score === 0) {
+    if (score < MIN_RELEVANCE_SCORE) {
       rejected.push({ candidate, reason: 'not_relevant' });
+      continue;
+    }
+    if (!isDocumentLikeUrl(candidate.url)) {
+      // A navigation surface is never worth reviewing, even relevant-scoring — unlike an
+      // off-policy host, it is not a lead, just site furniture.
+      rejected.push({ candidate, reason: 'navigational' });
       continue;
     }
 
