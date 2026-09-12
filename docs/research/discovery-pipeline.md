@@ -120,6 +120,12 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts comm
 
 ## Editorial enrichment (LLM stage-only)
 
+This stage is prose-only: it drafts from evidence already gathered by discovery and never
+searches or fetches on its own, and it does not change an entity's `ResearchMaturity`. For the
+evidence-directed planner that turns maturity deficits into research leads (`enrich-entity`), and
+for the full deep-vs-prose-only distinction, see the "enrich-entity (deep research planner)"
+section of [`research-operations.md`](./research-operations.md).
+
 After discovery/obscurity yields pending leads, run the editorial judge (`mock` /
 `openrouter` / `ollama` / `hybrid`). It weeds keep|reject|needs_evidence, drafts
 `publicSummary` with optional `[[entityId|Label]]` prose links, suggests related ids

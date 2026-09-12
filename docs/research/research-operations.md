@@ -80,6 +80,8 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts <ver
   remaining scope, not duplicated here. New verbs added by repo-xez5.9 (`backfill-entity`,
   `prose-run`) reuse the same `runEnrichmentJudge` bridge as `enrichment-run` and inherit
   whatever logging that bridge eventually gets; do not add a second logging mechanism.
+  `enrich-entity` (below) is a different code path entirely — it never touches this bridge,
+  because it plans research rather than drafting prose.
 
 ---
 
@@ -184,6 +186,12 @@ push through a stall — that's a signal to investigate the source, not a limit 
 
 ## editorial-enrichment (`editorial-run` / `enrichment-run`)
 
+**This whole family is prose-only.** It drafts or rewrites prose from evidence it is handed; it
+never searches, never fetches a new source, and never changes an entity's `ResearchMaturity`
+(`packages/domain-core/src/research/maturity.ts`). If the question is "what does this record
+still need researched," skip to **enrich-entity** below — that is the evidence-directed planner,
+and it is a different code path from everything in this section.
+
 **When to use:** check pending discovery/obscurity leads, run editorial or enrichment with an
 LLM (mock/OpenRouter/local), weed bad items, draft linked prose, stage packets for quarantine.
 Never publishes.
@@ -255,6 +263,64 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts pros
   --entity-id ent_example_001 --title "Display name" --provider mock \
   --operator-id "$USER" --session-id "prose-$(date +%s)"
 ```
+
+---
+
+## enrich-entity (deep research planner) — evidence-directed, not prose
+
+**When to use:** find out what a specific released entity is actually missing, evidence-wise,
+before anyone drafts a sentence. This is the ONLY verb described in this document that is
+evidence-directed rather than prose-only — see the note atop the section above. Read
+`packages/operator-cli/src/enrichment-plan.ts` before touching this verb; its file header states
+the distinction this section summarizes.
+
+```bash
+node --conditions development --import tsx packages/operator-cli/src/bin.ts enrich-entity \
+  --entity-id ent_example_001 --target-maturity corroborated
+```
+
+What it does: reads the released entity, runs `assessResearchMaturity`
+(`packages/domain-core/src/research/maturity.ts`) to get its current `ResearchMaturity` state and
+its `ResearchDeficit`s, then `planEnrichment` (`packages/operator-cli/src/enrichment-plan.ts`)
+turns each deficit CODE (not each occurrence — three claims sharing one deficit are one research
+task) into an `EvidenceNeed` — what is missing and why, `mandatory` or not, whether it needs a
+contradiction search — plus a small number of bounded search queries. A query here is a LEAD, not
+evidence, and is emitted as a query string rather than a result for exactly that reason (see
+"Reaching a search provider" above). Deficits with no searchable remedy (for example
+`missing_creation_or_publication_date` — a schema gap, not something a search can close) come back
+named in `unaddressedDeficits` instead of being silently dropped or handed a query anyway.
+
+What it does NOT do, as of this writing: the search, fetch, capture, selector, and
+claim-extraction stages that would turn one of this plan's queries into evidence are not built.
+`enrich-entity` PLANS deep research; it does not run it. There is no `--commit` for this verb —
+deliberately, per its own code comment: a `--commit` that staged an empty result would tell the
+same lie `enrichment-run` tells by relabelling the editorial judge. The JSON output always carries
+`"executed": false`. Do not read a plan's `queries` as sources, and do not point a drafting pass at
+this verb's output expecting sourced prose back — nothing here has been fetched yet.
+
+**Which path to use when:**
+
+- Nothing captured yet, or you don't know what's missing → `enrich-entity` first. It tells you
+  the deficits and gives you leads to chase (resolve and fetch them through the normal safe-fetch
+  path — `research-intake` / `attach-evidence` / `register-source` — before treating anything a
+  query returns as a source).
+- Evidence is already captured (`bb_research.entity_enrichment.status = 'captured'` — the only
+  status `fetchEnrichmentSubjects` will pull) and the record just needs that evidence turned into
+  cited public prose → the prose-only path:
+  either the $0 session-subagent fan-out (`packages/ops-data/scripts/session-enrich-prepare.ts` →
+  fan-out drafting subagents → `session-enrich-collect.ts` → `session-enrich-apply.ts`; full
+  runbook in `packages/ops-data/scripts/README-fanout-drafting.md`), or the metered equivalent
+  (`packages/ops-data/scripts/enrich-entities-llm.ts`), or the operator-cli verbs immediately
+  above (`enrichment-run` / `backfill-entity` / `prose-run`). All of these read only evidence
+  already on hand and validate every citation with `validateEnrichmentResponse`
+  (`packages/ops-data/scripts/lib/entity-enrichment-llm.ts`); none of them search or fetch, and
+  none of them can raise the record's maturity state — maturity is derived from evidence lineage
+  and diversity, which rewriting prose over the same evidence does not change.
+- Never run the prose-only path on a subject with no captured evidence expecting it to do
+  research. `fetchEnrichmentSubjects` (`packages/ops-data/scripts/lib/entity-enrichment-fetch.ts`)
+  already skips entities with none for the scripted paths, but a hand-built `enrichment-run`
+  subjects file has no such guard and will draft confidently from whatever `sourceSnippets` you
+  hand it.
 
 ---
 
