@@ -9,6 +9,10 @@
  * `createFindNearestEndpoint`'s `rateLimitGuardOptions.store`. It's `undefined` (route 404s) when
  * no embedding API key is configured (`GEMINI_API_KEY`/`GOOGLE_AI_API_KEY`) since the endpoint
  * cannot function without one.
+ *
+ * `sharedRateLimitStore` is shared only within this one warm instance, not across instances —
+ * `apps/api-public/src/rate-limits.ts`'s header documents the actual per-instance semantics on
+ * Vercel and why that's an accepted, measured tradeoff (repo-2mqm2) rather than a bug to fix here.
  */
 import { createInMemoryRateLimitStore } from '@repo/security';
 import { createPostgresVectorIndexStore, createGeminiEmbeddingProvider } from '@repo/ops-data';

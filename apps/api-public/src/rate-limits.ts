@@ -1,6 +1,33 @@
 /**
  * Public API rate-limit guard maps read/search/location routes to quota policies.
- * Uses in-memory store by default; inject a shared store for production rollouts.
+ *
+ * The store this guard evaluates against (`RateLimitStore`, @repo/security) is a synchronous,
+ * in-process token-bucket map — there is no distributed/shared implementation of it anywhere in
+ * this repo, on Vercel or otherwise (repo-2mqm2). On api-public's actual host (Vercel serverless),
+ * `createProductionHandlerDeps` builds one such store per warm lambda instance and holds it for
+ * that instance's lifetime; it is NOT one counter for the whole surface. A caller whose requests
+ * land on N warm instances gets up to N times the intended per-window quota, not the single
+ * quota the numbers in `DEFAULT_ENDPOINT_QUOTA_MATRIX` state.
+ *
+ * This is a deliberate, measured decision (2026-09-11), not an oversight left for later:
+ *   - The surface is read-only; there is no mutation or data-exfiltration risk behind it.
+ *   - Vercel's own platform-level DDoS/bot mitigation sits in front of every request here,
+ *     independent of this guard.
+ *   - The one genuinely costly path, vector search (`/v1/search/nearest`, billed per call via
+ *     the Gemini embedding API), has its own independent backstop: `evaluateVectorSearchKillSwitch`
+ *     against `bb_ops.kill_switches`, checked before this guard runs and unaffected by how many
+ *     instances are warm. An operator can cut that path off in one query regardless of this gate.
+ *   - The remaining exposure is DB load and enumeration-defense dilution on plain reads
+ *     (`search`/`entityRetrieval`/etc.), which this guard's own quota comments already treat as
+ *     "expensive_read" tiers, not a hard security boundary.
+ *
+ * A real fix needs a genuinely distributed store (e.g. a Postgres-backed counter table,
+ * consistent with `bb_ops.kill_switches` already living there) — but `RateLimitStore.get`/`.set`
+ * are synchronous by contract, shared by six call sites across apps/web, apps/api-submissions and
+ * apps/api-public (@repo/security), so backing them with real network I/O means an async
+ * interface change across all of them, not a local swap here. That is a deliberate follow-up
+ * design decision if stronger cross-instance guarantees are ever needed, not something to bolt on
+ * to one caller.
  */
 import {
   aggregateDistributedRisk,
