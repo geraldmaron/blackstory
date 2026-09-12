@@ -4,6 +4,7 @@
  */
 import { resolveThemeImpactPolicyEras } from './theme-impact-policy-eras.js';
 import {
+  deriveDefaultMultiDecadeChecklist,
   THEME_IMPACT_BINDING_PURPOSES,
   type ThemeImpactBindingPurpose,
   type ThemeImpactEntityBinding,
@@ -217,6 +218,13 @@ export function parseThemeImpactPacketRow(row: {
   )
     ? (row.binding_purpose as ThemeImpactBindingPurpose)
     : undefined;
+  const observations = (row.observations as ThemeImpactPacket['observations']) ?? [];
+  const derived = (row.derived as ThemeImpactPacket['derived']) ?? [];
+  const artifacts = (row.artifacts as ThemeImpactPacket['artifacts']) ?? [];
+  const entityBinding =
+    row.entity_id && bindingPurpose
+      ? { entityId: row.entity_id, purpose: bindingPurpose }
+      : undefined;
 
   return {
     kind: 'theme.impact.packet.v1',
@@ -229,19 +237,24 @@ export function parseThemeImpactPacketRow(row: {
     geography,
     methodStance: row.method_stance as ThemeImpactMethodStance,
     methodNote: row.method_note,
-    observations: (row.observations as ThemeImpactPacket['observations']) ?? [],
-    derived: (row.derived as ThemeImpactPacket['derived']) ?? [],
-    artifacts: (row.artifacts as ThemeImpactPacket['artifacts']) ?? [],
+    observations,
+    derived,
+    artifacts,
+    // The row shape carries no multi_decade_checklist column (it isn't persisted
+    // to bb_reference.theme_impact_packets); derive it the same way the pure
+    // buildThemeImpactPacket path does so every parsed packet — DB row or
+    // fixture — actually has one instead of failing the checklist gate closed
+    // on an unpopulated field.
+    multiDecadeChecklist: deriveDefaultMultiDecadeChecklist({
+      observations,
+      derived,
+      artifacts,
+      geography,
+      ...(entityBinding !== undefined ? { entityBinding } : {}),
+    }),
     gapStates: [...row.gap_states] as ThemeImpactPacket['gapStates'],
     ...(causalClaimIds.length > 0 ? { causalClaimIds } : {}),
-    ...(row.entity_id && bindingPurpose
-      ? {
-          entityBinding: {
-            entityId: row.entity_id,
-            purpose: bindingPurpose,
-          },
-        }
-      : {}),
+    ...(entityBinding !== undefined ? { entityBinding } : {}),
     status: row.status as ThemeImpactPacket['status'],
     createdAt: toIso(row.created_at),
     updatedAt: toIso(row.updated_at),

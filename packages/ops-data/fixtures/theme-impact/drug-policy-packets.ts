@@ -63,7 +63,7 @@ const USSC_BLACK_SHARE_2023 = {
 
 const NOW = '2026-07-22T23:00:00.000Z';
 const METHOD =
-  'Artifacts and indicators are juxtaposed for context. Juxtaposition is not causation. Contested investigative claims carry uncertainty labels.';
+  'Artifacts and indicators are juxtaposed for context. Juxtaposition is not causation.';
 
 const VERA = {
   observationId: 'obs:vera-jail-population-rate-county:county:17031:2024',
@@ -157,7 +157,7 @@ export const drugPolicyPilotPackets = [
     theme_id: 'drug_policy_state',
     title: 'Documented federal drug-policy statutes and related artifacts',
     summary:
-      'Primary federal statutes that structured drug scheduling and mandatory-minimum enforcement, plus a contested investigative package shown only with an uncertainty label. No causal claim that any statute alone produced later disparities.',
+      'Primary federal statutes that structured drug scheduling and mandatory-minimum enforcement. No causal claim that any statute alone produced later disparities.',
     policy_eras: ['pre_drug_war', 'drug_war_escalation', 'crack_cocaine_era', 'sentencing_reform'],
     geography: {
       geographyType: 'nation',
@@ -179,6 +179,13 @@ export const drugPolicyPilotPackets = [
         citation: 'Pub. L. 91-513, Controlled Substances Act (1970).',
         sourceUrl: 'https://www.govinfo.gov/content/pkg/STATUTE-84/pdf/STATUTE-84-Pg1236.pdf',
         summary: 'Federal scheduling framework for controlled substances.',
+        provenance: {
+          source: 'govinfo',
+          sourceUrl: 'https://www.govinfo.gov/content/pkg/STATUTE-84/pdf/STATUTE-84-Pg1236.pdf',
+          retrievedAt: '2026-09-12T16:39:12.000Z',
+          contentHash: '05cd5164ae0324c7569a2748bf6e08e48a76652a36fdf7bcc26b731f6c8eaa18',
+          humanCitation: 'Pub. L. 91-513, Controlled Substances Act (1970), 84 Stat. 1236.',
+        },
       },
       {
         artifactId: 'art_adaa_1986',
@@ -189,6 +196,13 @@ export const drugPolicyPilotPackets = [
         sourceUrl: 'https://www.congress.gov/bill/99th-congress/house-bill/5484',
         summary:
           'Mandatory minimum framework including the crack-to-powder cocaine sentencing disparity later amended in 2010.',
+        provenance: {
+          source: 'govinfo',
+          sourceUrl: 'https://www.govinfo.gov/content/pkg/STATUTE-100/pdf/STATUTE-100-Pg3207.pdf',
+          retrievedAt: '2026-09-12T16:40:31.000Z',
+          contentHash: '36e3965982e8d7a8c2cdb5d01a524e3ea97bdc59b25e3ab30a83dd10ee6520a3',
+          humanCitation: 'Pub. L. 99-570, Anti-Drug Abuse Act of 1986, 100 Stat. 3207.',
+        },
       },
       {
         artifactId: 'art_fsa_2010',
@@ -198,18 +212,13 @@ export const drugPolicyPilotPackets = [
         citation: 'Pub. L. 111-220, Fair Sentencing Act of 2010.',
         sourceUrl: 'https://www.congress.gov/bill/111th-congress/senate-bill/1789',
         summary: 'Reduced the crack-to-powder cocaine quantity ratio used in federal sentencing.',
-      },
-      {
-        artifactId: 'art_investigative_contested',
-        artifactClass: 'investigative_foia_package',
-        title: 'Investigative reporting on intelligence-linked drug-market claims (contested)',
-        dated: '1990s',
-        citation:
-          'Investigative journalism and later reviews of alleged intelligence-community links to drug markets — treat as contested secondary material, not settled fact.',
-        uncertaintyLabel:
-          'Contested — public packet cites the existence of investigative/FOIA debate only; does not assert verified government distribution of drugs.',
-        summary:
-          'Placeholder for curated primary FOIA captures when editorial review clears individual documents.',
+        provenance: {
+          source: 'govinfo',
+          sourceUrl: 'https://www.govinfo.gov/content/pkg/STATUTE-124/pdf/STATUTE-124-Pg2372.pdf',
+          retrievedAt: '2026-09-12T16:40:34.000Z',
+          contentHash: 'fa411384f83c246d84f9b02762ce3f89b08dbd308a9063b8a436381becf598db',
+          humanCitation: 'Pub. L. 111-220, Fair Sentencing Act of 2010, 124 Stat. 2372.',
+        },
       },
     ],
     gap_states: ['insufficient_evidence'],
