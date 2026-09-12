@@ -94,7 +94,6 @@ export function SearchScreen({
     setDraft,
     filterKind,
     setFilterKind,
-    filterEra,
     setFilterEra,
     state,
     loadMore,
