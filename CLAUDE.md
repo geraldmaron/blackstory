@@ -37,6 +37,8 @@ agent that touches git destroys the others' work.
 Rules for any file-editing subagent:
 
 - Give it `isolation: "worktree"`, or run it alone.
+- Worktrees are cut from `main`, not the working branch (170+ commits behind `staging` today). Make
+  the agent's first command `git reset --hard <staging tip sha>` or its whole analysis runs on stale code.
 - Tell it explicitly not to run `git add`, `commit`, `push`, `stash`, `checkout`, or `restore` —
   the orchestrator owns version control.
 - Tell it not to run `bd` — the orchestrator owns issue bookkeeping, and concurrent writers churn
