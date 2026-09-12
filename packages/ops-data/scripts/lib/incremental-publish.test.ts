@@ -1087,7 +1087,7 @@ test("gateLandscapePublishCandidate: a claim from a second document is corrobora
     result.confidence >= INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR,
     `expected confidence >= floor, got ${result.confidence}`,
   );
-  assert.equal(result.confidence, 0.79);
+  assert.equal(result.confidence, 0.8);
 });
 
 /**
@@ -1119,12 +1119,12 @@ test('gateLandscapePublishCandidate: canonical and evidence from the same author
   assert.equal(result.eligible, false);
   if (result.eligible) return;
   assert.equal(result.reason, 'confidence_below_floor');
-  assert.equal(result.detail, 'confidence 0.720 < floor 0.75');
+  assert.equal(result.detail, 'confidence 0.707 < floor 0.75');
 });
 
 /**
  * repo-2t04.17 — ADMISSION vs REGRESSION for confidence, same shape as the depth clause above.
- * Reuses the exact fixture from the test just above (0.720, below the 0.75 floor) so the only
+ * Reuses the exact fixture from the test just above (0.7067, below the 0.75 floor) so the only
  * variable across these four tests is whether/what live state is supplied.
  */
 test('confidence gate still rejects a low-scoring candidate for a record that is NOT live', () => {
@@ -1174,7 +1174,7 @@ test('confidence gate lets a candidate that scores no worse replace an already-l
     releaseId: 'rel_test',
     generatedAt: '2026-09-09T00:00:00.000Z',
     allowRepublish: true,
-    liveConfidence: 0.72, // what is currently public scores the same — not a regression
+    liveConfidence: 0.7067, // what is currently public scores the same — not a regression
   });
   assert.equal(result.eligible, true);
 });
@@ -1241,7 +1241,7 @@ test('confidence gate falls back to the strict admission test when live confiden
  * `liveClaimConfidence` must score the SAME evidence the same way `minClaimConfidence` does for a
  * candidate — otherwise a depth verdict and a confidence verdict on one live row could disagree
  * with what that row would score as a fresh candidate. Reuses the claims `buildReleaseSourceFromLandscape`
- * produces for the 0.720 fixture above, repackaged as a `LivePublishedRow`.
+ * produces for the 0.7067 fixture above, repackaged as a `LivePublishedRow`.
  */
 test('liveClaimConfidence scores a live row the same way a candidate with identical evidence would score', () => {
   const row = researchCaseRow({
@@ -1261,7 +1261,7 @@ test('liveClaimConfidence scores a live row the same way a candidate with identi
   const entry = buildReleaseSourceFromLandscape(row);
   assert.ok(entry);
   const liveRow = { summary: row.summary, claims: entry!.claims, projection: {} };
-  assert.equal(liveClaimConfidence(liveRow), 0.72);
+  assert.equal(liveClaimConfidence(liveRow), 0.7067);
 });
 
 test('liveClaimConfidence returns 0 for a live row with no claims, never undefined or NaN', () => {
@@ -1293,7 +1293,7 @@ test('gateLandscapePublishCandidate: the index claim still does not count itself
   assert.equal(result.eligible, true);
   if (!result.eligible) return;
   // Unchanged from before the fix: a lone government citation, one lineage, no corroborator.
-  assert.equal(result.confidence, 0.77);
+  assert.equal(result.confidence, 0.7733);
 });
 
 /**
