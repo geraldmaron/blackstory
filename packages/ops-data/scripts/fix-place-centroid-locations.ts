@@ -123,7 +123,7 @@ function metersBetween(a: { lat: number; lng: number }, b: { lat: number; lng: n
 async function main(): Promise<void> {
   const connectionString = process.env.DATABASE_URL ?? process.env.APP_DATABASE_URL;
   if (!connectionString) throw new Error('DATABASE_URL is required');
-  const client = new pg.Client(normalizePgConnectionString(connectionString, process.env));
+  const client = new pg.Client(normalizePgConnectionString(connectionString));
   await client.connect();
 
   const placesByState = new Map<string, GazetteerPlace[]>();

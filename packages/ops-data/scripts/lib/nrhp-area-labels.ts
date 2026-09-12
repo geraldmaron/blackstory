@@ -196,8 +196,8 @@ export function formatNrhpListedDate(serial: string | null | undefined): string 
  * the entity's public text.
  */
 export function buildNrhpListingFactObject(payload: {
-  readonly refnum?: string;
-  readonly listedDateSerial?: string | null;
+  readonly refnum?: string | undefined;
+  readonly listedDateSerial?: string | null | undefined;
 }): string {
   const date = formatNrhpListedDate(payload.listedDateSerial);
   const refnum = (payload.refnum ?? '').trim();
@@ -214,7 +214,7 @@ export function buildNrhpListingFactObject(payload: {
  * — distinct text from both the summary and the listing-fact claim object above.
  */
 export function buildNrhpSignificanceObject(payload: {
-  readonly areaOfSignificance?: string;
+  readonly areaOfSignificance?: string | undefined;
 }): string {
   return humanizeAreas(payload.areaOfSignificance);
 }

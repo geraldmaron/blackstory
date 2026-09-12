@@ -82,20 +82,20 @@ function evaluatePromoteEligible(
     confidence: number;
     validationIssues: readonly string[];
     claims: readonly {
-      citationHref?: string;
-      predicate?: string;
-      object?: string;
-      confidenceLevel?: string;
-      citationSource?: string;
-      citationLabel?: string;
+      citationHref?: string | undefined;
+      predicate?: string | undefined;
+      object?: string | undefined;
+      confidenceLevel?: string | undefined;
+      citationSource?: string | undefined;
+      citationLabel?: string | undefined;
     }[];
     subjectId: string;
-    subjectTitle?: string;
-    publicSummary?: string;
-    historicalContext?: string;
-    topicIds?: readonly string[];
-    eraBuckets?: readonly string[];
-    keywords?: readonly string[];
+    subjectTitle?: string | undefined;
+    publicSummary?: string | undefined;
+    historicalContext?: string | undefined;
+    topicIds?: readonly string[] | undefined;
+    eraBuckets?: readonly string[] | undefined;
+    keywords?: readonly string[] | undefined;
   },
 ): boolean {
   if (packet.decision !== 'keep') return false;
@@ -127,7 +127,7 @@ function evaluatePromoteEligible(
         : 'medium',
     citationSource:
       claim.citationSource ?? new URL(claim.citationHref ?? 'https://unknown').hostname,
-    citationHref: claim.citationHref,
+    ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
     citationLabel: claim.citationLabel ?? claim.citationSource ?? 'Source',
   }));
   const normalizedDrafts = normalizeEnrichmentDrafts({

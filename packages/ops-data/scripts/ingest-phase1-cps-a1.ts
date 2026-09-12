@@ -113,11 +113,12 @@ function fetchCpsA1Observations(options: {
   const rejected: string[] = [];
 
   const lines = fixtureCsvText.split('\n').filter((l) => l.trim() && !l.startsWith('#'));
-  if (lines.length === 0) {
+  const headerLine = lines[0];
+  if (headerLine === undefined) {
     throw new Error('CSV has no data rows');
   }
 
-  const headers = lines[0].split(',').map((h) => h.trim());
+  const headers = headerLine.split(',').map((h) => h.trim());
   const expectedHeaders = [
     'year',
     'white_non_hispanic_citizen_pct',
@@ -210,14 +211,15 @@ function fetchCpsA1Observations(options: {
   // Parse CSV data rows
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
-    if (!line.trim()) continue;
+    if (!line?.trim()) continue;
 
     try {
       const row = parseCsvLine(line, headers);
-      const year = parseInt(row.year, 10);
+      const yearRaw = row.year ?? '';
+      const year = parseInt(yearRaw, 10);
 
       if (isNaN(year)) {
-        rejected.push(`Row ${i + 1}: invalid year: ${row.year}`);
+        rejected.push(`Row ${i + 1}: invalid year: ${yearRaw}`);
         continue;
       }
 

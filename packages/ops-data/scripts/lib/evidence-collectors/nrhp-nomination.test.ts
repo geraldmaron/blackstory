@@ -43,10 +43,13 @@ test('splitNominationSections handles vintage A headers with varied spacing and 
   `);
   const sections = splitNominationSections(text);
   assert.equal(sections.length, 2);
-  assert.equal(sections[0].section, '7');
-  assert.equal(sections[1].section, '8');
-  assert.ok(sections[0].text.includes('Description'));
-  assert.ok(sections[1].text.includes('Statement'));
+  const [section7, section8] = sections;
+  assert.ok(section7);
+  assert.ok(section8);
+  assert.equal(section7.section, '7');
+  assert.equal(section8.section, '8');
+  assert.ok(section7.text.includes('Description'));
+  assert.ok(section8.text.includes('Statement'));
 });
 
 test('splitNominationSections handles vintage B headers for sections 7 and 8', () => {
@@ -59,10 +62,13 @@ test('splitNominationSections handles vintage B headers for sections 7 and 8', (
   `);
   const sections = splitNominationSections(text);
   assert.equal(sections.length, 2);
-  assert.equal(sections[0].section, '7');
-  assert.equal(sections[1].section, '8');
-  assert.ok(sections[0].text.includes('constructed'));
-  assert.ok(sections[1].text.includes('historically'));
+  const [section7, section8] = sections;
+  assert.ok(section7);
+  assert.ok(section8);
+  assert.equal(section7.section, '7');
+  assert.equal(section8.section, '8');
+  assert.ok(section7.text.includes('constructed'));
+  assert.ok(section8.text.includes('historically'));
 });
 
 test('splitNominationSections with vintage B only still yields sections (regression for refnum 00000071)', () => {
@@ -93,14 +99,16 @@ test('splitNominationSections concatenates multiple pages of the same section in
   `);
   const sections = splitNominationSections(text);
   assert.equal(sections.length, 1);
-  assert.equal(sections[0].section, '8');
+  const [section8] = sections;
+  assert.ok(section8);
+  assert.equal(section8.section, '8');
   // All three pages should be concatenated with double-newline separators
-  assert.ok(sections[0].text.includes('First paragraph'));
-  assert.ok(sections[0].text.includes('Second paragraph'));
-  assert.ok(sections[0].text.includes('Third paragraph'));
-  const firstIdx = sections[0].text.indexOf('First');
-  const secondIdx = sections[0].text.indexOf('Second');
-  const thirdIdx = sections[0].text.indexOf('Third');
+  assert.ok(section8.text.includes('First paragraph'));
+  assert.ok(section8.text.includes('Second paragraph'));
+  assert.ok(section8.text.includes('Third paragraph'));
+  const firstIdx = section8.text.indexOf('First');
+  const secondIdx = section8.text.indexOf('Second');
+  const thirdIdx = section8.text.indexOf('Third');
   assert.ok(
     firstIdx < secondIdx && secondIdx < thirdIdx,
     'paragraphs should remain in document order',
@@ -115,8 +123,10 @@ test('splitNominationSections ignores bare digits in running prose', () => {
   `);
   const sections = splitNominationSections(text);
   assert.equal(sections.length, 1);
-  assert.equal(sections[0].section, '7');
-  assert.ok(!sections[0].text.includes('rooms'), 'prose before header should not be captured');
+  const [section7] = sections;
+  assert.ok(section7);
+  assert.equal(section7.section, '7');
+  assert.ok(!section7.text.includes('rooms'), 'prose before header should not be captured');
 });
 
 test('splitNominationSections strips boilerplate from section text', () => {
@@ -131,11 +141,13 @@ test('splitNominationSections strips boilerplate from section text', () => {
   `);
   const sections = splitNominationSections(text);
   assert.equal(sections.length, 1);
-  assert.ok(sections[0].text.includes('Actual description'));
-  assert.ok(!sections[0].text.includes('NPS Form'));
-  assert.ok(!sections[0].text.includes('OMB'));
-  assert.ok(!sections[0].text.includes('United States Department'));
-  assert.ok(!sections[0].text.includes('CONTINUATION SHEET'));
+  const [section7] = sections;
+  assert.ok(section7);
+  assert.ok(section7.text.includes('Actual description'));
+  assert.ok(!section7.text.includes('NPS Form'));
+  assert.ok(!section7.text.includes('OMB'));
+  assert.ok(!section7.text.includes('United States Department'));
+  assert.ok(!section7.text.includes('CONTINUATION SHEET'));
 });
 
 test('dropRepeatedPropertyHeader removes the property name from text', () => {
@@ -358,10 +370,13 @@ test('splitByNarrativeHeadings segments on 7. DESCRIPTION and 8. STATEMENT OF SI
   `);
   const sections = splitByNarrativeHeadings(text);
   assert.equal(sections.length, 2);
-  assert.equal(sections[0].section, '7');
-  assert.equal(sections[1].section, '8');
-  assert.ok(sections[0].text.includes('Romanesque'), 'section 7 should include description text');
-  assert.ok(sections[1].text.includes('Governor'), 'section 8 should include significance text');
+  const [section7, section8] = sections;
+  assert.ok(section7);
+  assert.ok(section8);
+  assert.equal(section7.section, '7');
+  assert.equal(section8.section, '8');
+  assert.ok(section7.text.includes('Romanesque'), 'section 7 should include description text');
+  assert.ok(section8.text.includes('Governor'), 'section 8 should include significance text');
 });
 
 test('splitByNarrativeHeadings section 8 ends at following 9. MAJOR BIBLIOGRAPHICAL REFERENCES heading', () => {
@@ -494,11 +509,14 @@ test('splitByNarrativeHeadings recognizes NARRATIVE DESCRIPTION and NARRATIVE ST
   `);
   const sections = splitByNarrativeHeadings(text);
   assert.equal(sections.length, 2);
-  assert.equal(sections[0].section, '7');
-  assert.equal(sections[1].section, '8');
-  assert.ok(sections[0].text.includes('timber'), 'NARRATIVE DESCRIPTION variant should work');
+  const [section7, section8] = sections;
+  assert.ok(section7);
+  assert.ok(section8);
+  assert.equal(section7.section, '7');
+  assert.equal(section8.section, '8');
+  assert.ok(section7.text.includes('timber'), 'NARRATIVE DESCRIPTION variant should work');
   assert.ok(
-    sections[1].text.includes('significance'),
+    section8.text.includes('significance'),
     'NARRATIVE STATEMENT OF SIGNIFICANCE variant should work',
   );
 });

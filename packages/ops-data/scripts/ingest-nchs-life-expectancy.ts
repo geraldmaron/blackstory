@@ -83,11 +83,12 @@ function computeContentHash(data: string): string {
 
 function parseFixtureCsv(csvText: string): FetchResult {
   const lines = csvText.trim().split('\n');
-  if (lines.length < 2) {
+  const headerLine = lines[0];
+  if (lines.length < 2 || headerLine === undefined) {
     throw new Error('CSV fixture must have at least a header row and one data row');
   }
 
-  const header = lines[0].split(',').map((h) => h.trim());
+  const header = headerLine.split(',').map((h) => h.trim());
   const yearIdx = header.indexOf('Year');
   const blackIdx = header.indexOf('Black');
   const whiteIdx = header.indexOf('White');
@@ -104,7 +105,7 @@ function parseFixtureCsv(csvText: string): FetchResult {
   const contentHash = computeContentHash(csvText);
 
   for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
+    const line = lines[i]?.trim();
     if (!line) continue;
 
     const parts = line.split(',').map((p) => p.trim());
@@ -120,7 +121,7 @@ function parseFixtureCsv(csvText: string): FetchResult {
       continue;
     }
 
-    const raceLabel = raceLabelIdx !== -1 ? parts[raceLabelIdx] : '';
+    const raceLabel = (raceLabelIdx !== -1 ? parts[raceLabelIdx] : '') ?? '';
 
     // Black life expectancy
     if (blackIdx !== -1) {

@@ -21,6 +21,7 @@ function parseAddress(address: string): { city: string; state: string } | null {
   if (parts.length < 2) return null;
   const city = parts[parts.length - 2];
   const stateZip = parts[parts.length - 1];
+  if (city === undefined || stateZip === undefined) return null;
   const match = /^(.+?)\s+\d{5}(-\d{4})?$/u.exec(stateZip);
   const state = match ? match[1] : stateZip;
   if (!city || !state) return null;

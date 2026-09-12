@@ -59,11 +59,11 @@ export type WikipediaArticle = {
 
 export type WikipediaLookupInput = {
   readonly displayName: string;
-  readonly city?: string;
-  readonly county?: string;
-  readonly state?: string;
+  readonly city?: string | undefined;
+  readonly county?: string | undefined;
+  readonly state?: string | undefined;
   /** The roster's own classification of the row ("place", "person", "institution", ...). */
-  readonly kind?: string;
+  readonly kind?: string | undefined;
   readonly fetchImpl?: typeof fetch;
 };
 

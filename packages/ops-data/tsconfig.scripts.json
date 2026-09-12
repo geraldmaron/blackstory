@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "../..",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "customConditions": ["development"]
+  },
+  "include": [
+    "scripts/**/*.ts",
+    "scripts/**/*.mts",
+    "fixtures/**/*.ts",
+    "../domain/src/temporal/edtf-shim.d.ts"
+  ],
+  "exclude": [
+    "scripts/load-banned-books-to-supabase.ts",
+    "scripts/load-legal-snapshots-to-supabase.ts"
+  ],
+  "excludeReasons": {
+    "scripts/load-banned-books-to-supabase.ts": "imports apps/web seed sources by relative path; apps/web is a CommonJS package, so its ESM exports cannot typecheck here — @repo/web checks them",
+    "scripts/load-legal-snapshots-to-supabase.ts": "imports apps/web seed sources by relative path; apps/web is a CommonJS package, so its ESM exports cannot typecheck here — @repo/web checks them"
+  }
+}

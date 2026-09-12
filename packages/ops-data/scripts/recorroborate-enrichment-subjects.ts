@@ -108,9 +108,9 @@ async function main(): Promise<void> {
   const changes: Array<{
     readonly subjectId: string;
     readonly title: string;
-    readonly before?: string;
-    readonly after?: string;
-    readonly method?: string;
+    readonly before?: string | undefined;
+    readonly after?: string | undefined;
+    readonly method?: string | undefined;
   }> = [];
 
   const updatedById = new Map<string, EnrichmentSubject>();

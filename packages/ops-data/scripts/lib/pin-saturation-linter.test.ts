@@ -26,9 +26,11 @@ test('flags many people stacked on one exact coordinate as an error', () => {
   ]);
   assert.equal(report.hasErrors, true);
   assert.equal(report.findings.length, 1);
-  assert.equal(report.findings[0].code, 'people_stacked_on_exact_pin');
-  assert.equal(report.findings[0].severity, 'error');
-  assert.deepEqual(report.findings[0].entityIds, ['a', 'b', 'c', 'd']);
+  const [finding] = report.findings;
+  assert.ok(finding);
+  assert.equal(finding.code, 'people_stacked_on_exact_pin');
+  assert.equal(finding.severity, 'error');
+  assert.deepEqual(finding.entityIds, ['a', 'b', 'c', 'd']);
 });
 
 test('a pair on one pin warns rather than errors — two siblings is not a batch defect', () => {
@@ -44,7 +46,9 @@ test('three on one pin warns without failing the build', () => {
     person('c', COOPERSTOWN),
   ]);
   assert.equal(report.hasErrors, false);
-  assert.equal(report.findings[0].severity, 'warn');
+  const [finding] = report.findings;
+  assert.ok(finding);
+  assert.equal(finding.severity, 'warn');
 });
 
 test('coarse precisions are never flagged — a county pin already reads as approximate', () => {

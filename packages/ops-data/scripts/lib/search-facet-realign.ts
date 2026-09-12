@@ -298,8 +298,8 @@ export type SearchFacetRealignChange = {
   readonly kind: string;
   /** Keys to merge into `facets` (a shallow, top-level merge — every target here is top-level). */
   readonly facetsPatch: Readonly<Record<string, unknown>>;
-  readonly statusColumn?: string;
-  readonly topicsColumn?: readonly string[];
+  readonly statusColumn?: string | undefined;
+  readonly topicsColumn?: readonly string[] | undefined;
 };
 
 export type SearchFacetRealignPlan = {
@@ -311,7 +311,7 @@ export type SearchFacetRealignPlan = {
 
 export type SearchFacetRealignOptions = {
   readonly keys: readonly string[];
-  readonly kind?: string;
+  readonly kind?: string | undefined;
   /** Mirrors every script's own `OVERWRITE_CONFLICTS` env var. Ignored for always-resolve modes. */
   readonly resolveConflicts?: boolean;
 };
@@ -324,10 +324,14 @@ export async function planSearchFacetRealign(
   client: SearchFacetRealignClient,
   options: SearchFacetRealignOptions,
 ): Promise<SearchFacetRealignPlan> {
+  const requestedTargets: { readonly key: string; readonly target: SearchFacetRealignTarget }[] =
+    [];
   for (const key of options.keys) {
-    if (!(key in TARGET_REGISTRY)) {
+    const target = TARGET_REGISTRY[key];
+    if (target === undefined) {
       throw new Error(`Unknown search-facet realign key: ${JSON.stringify(key)}`);
     }
+    requestedTargets.push({ key, target });
   }
   if (options.keys.length === 0) throw new Error('planSearchFacetRealign: keys must be non-empty');
 
@@ -371,8 +375,7 @@ export async function planSearchFacetRealign(
   const targetReports: SearchFacetRealignTargetReport[] = [];
   const resolveConflicts = options.resolveConflicts === true;
 
-  for (const key of options.keys) {
-    const target = TARGET_REGISTRY[key];
+  for (const { key, target } of requestedTargets) {
     let filled = 0;
     let resolved = 0;
     let leftConflicts = 0;

@@ -22,7 +22,7 @@
  * Only edges whose OTHER endpoint is also in the release are emitted; an edge to an unreleased
  * entity never renders and would dead-link.
  */
-import type { Pool, PoolClient } from 'pg';
+import type { Client, Pool, PoolClient } from 'pg';
 
 export type ReleaseRelatedEntry = {
   readonly id: string;
@@ -114,7 +114,7 @@ function sameEntries(
  * Use this to preview a sync (dry-run) or as the basis for an apply pass.
  */
 export async function planReleaseRelatedSync(
-  client: Pool | PoolClient,
+  client: Client | Pool | PoolClient,
   releaseId: string,
 ): Promise<ReleaseRelatedSyncReport> {
   const derived = await client.query<{
@@ -173,7 +173,7 @@ export async function planReleaseRelatedSync(
  * writing only one of them leaves the pair inconsistent (hydrate-via-event-neighbors precedent).
  */
 export async function applyReleaseRelatedSync(
-  client: Pool | PoolClient,
+  client: Client | Pool | PoolClient,
   releaseId: string,
   plan: ReleaseRelatedSyncReport,
 ): Promise<void> {

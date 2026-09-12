@@ -103,6 +103,7 @@ function extractOfficeholders(wikitext: string, sourceUrl: string): readonly Gap
     const linkMatch = /^\*\s*\[\[([^|\]]+)(?:\|([^\]]+))?\]\](.*)$/su.exec(block);
     if (!linkMatch) return;
     const [, target, displayText, restRaw] = linkMatch;
+    if (target === undefined) return;
     const personName = cleanPersonName(target, displayText);
     if (!personName) return;
     const officeInfo = stripWikiMarkup((restRaw ?? '').replace(/^[\s–-]+/u, ''));
@@ -130,8 +131,8 @@ function extractOfficeholders(wikitext: string, sourceUrl: string): readonly Gap
     const headerMatch = /^(==+)\s*(.+?)\s*\1$/u.exec(line);
     if (headerMatch) {
       flushBlock();
-      const level = headerMatch[1].length;
-      const title = headerMatch[2];
+      const level = headerMatch[1]?.length ?? 0;
+      const title = headerMatch[2] ?? '';
       if (
         title === 'See also' ||
         title === 'Notes' ||

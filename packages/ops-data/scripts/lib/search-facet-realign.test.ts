@@ -24,9 +24,12 @@ function fakeClient(rows: readonly Row[]) {
   const updates: Array<{ sql: string; params: readonly unknown[] }> = [];
   const client: SearchFacetRealignClient & { readonly updates: typeof updates } = {
     updates,
-    query: async (sql: string, params?: readonly unknown[]) => {
+    query: async <T extends Record<string, unknown> = Record<string, unknown>>(
+      sql: string,
+      params?: readonly unknown[],
+    ): Promise<{ readonly rows: T[]; readonly rowCount?: number | null }> => {
       if (sql.includes('SELECT')) {
-        return { rows: rows as unknown as Record<string, unknown>[] };
+        return { rows: rows as unknown as T[] };
       }
       updates.push({ sql, params: params ?? [] });
       return { rows: [], rowCount: 1 };

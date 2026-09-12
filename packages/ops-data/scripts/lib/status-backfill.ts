@@ -423,7 +423,7 @@ export function caseSummaryText(kindDetail: unknown): string {
 
 export function caseNeedsStatusReview(input: {
   readonly entityId: string;
-  readonly openStatus?: string;
+  readonly openStatus?: string | undefined;
   readonly kindDetail: unknown;
 }): boolean {
   if (input.openStatus !== 'in_force') return false;

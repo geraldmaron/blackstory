@@ -128,10 +128,13 @@ test('planRelationshipPromotion inserts safe edges and skips living review', () 
     decisions.map((d) => [d.action === 'insert' ? d.candidate.candidateId : d.candidateId, d]),
   );
   assert.equal(byId.get('ok')?.action, 'insert');
-  assert.equal(byId.get('living-skip')?.action, 'skip');
-  assert.equal(byId.get('living-skip')?.reason, 'SKIP_LIVING_REVIEW');
+  const livingSkip = byId.get('living-skip');
+  assert.ok(livingSkip?.action === 'skip');
+  assert.equal(livingSkip.reason, 'SKIP_LIVING_REVIEW');
   assert.equal(byId.get('deceased-ok')?.action, 'insert');
-  assert.equal(byId.get('inferred-skip')?.reason, 'NOT_DETERMINISTIC');
+  const inferredSkip = byId.get('inferred-skip');
+  assert.ok(inferredSkip?.action === 'skip');
+  assert.equal(inferredSkip.reason, 'NOT_DETERMINISTIC');
 });
 
 test('inferredRelationshipId is stable', () => {

@@ -506,7 +506,7 @@ export type SubjectIdentity = PlaceIdentity & {
   /** All gates passed; safe to store as evidence for this entity. */
   readonly corroborated: boolean;
   /** Why it failed, for the evidence row's quarantineReason. Undefined when corroborated. */
-  readonly reason?: string;
+  readonly reason?: string | undefined;
 };
 
 /**

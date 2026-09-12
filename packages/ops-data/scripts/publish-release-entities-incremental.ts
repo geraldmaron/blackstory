@@ -329,6 +329,13 @@ type PreparedPublish = {
   readonly lintReport: PublishStatusLintReport;
 };
 
+/** Reads one string field out of a stored projection, whose static type is `unknown` jsonb. */
+function projectionString(projection: unknown, key: string): string | undefined {
+  if (projection === null || typeof projection !== 'object') return undefined;
+  const value = (projection as Record<string, unknown>)[key];
+  return typeof value === 'string' ? value : undefined;
+}
+
 async function upsertEntity(client: pg.PoolClient, row: ReleaseEntityUpsertRow): Promise<void> {
   await client.query(
     `INSERT INTO bb_public.release_entities
@@ -619,6 +626,8 @@ async function main(): Promise<void> {
         item.row && canonicalVisitRow
           ? visitOverrideFromCanonicalRow(item.row, canonicalVisitRow)
           : undefined;
+      const livePublished = livePublishedById.get(item.entityId);
+      const canonicalStatus = canonicalById.get(item.entityId);
       const result = preparePublish({
         row: item.row,
         releaseId,
@@ -626,12 +635,8 @@ async function main(): Promise<void> {
         entityId: item.entityId,
         fromLandscape: item.fromLandscape,
         allowRepublish,
-        ...(livePublishedById.get(item.entityId) !== undefined
-          ? { livePublished: livePublishedById.get(item.entityId) }
-          : {}),
-        ...(canonicalById.get(item.entityId) !== undefined
-          ? { canonicalStatus: canonicalById.get(item.entityId) }
-          : {}),
+        ...(livePublished !== undefined ? { livePublished } : {}),
+        ...(canonicalStatus !== undefined ? { canonicalStatus } : {}),
         ...(visitOverride !== undefined ? { visitOverride } : {}),
       });
       if ('reason' in result) {
@@ -647,11 +652,15 @@ async function main(): Promise<void> {
 
     const regressionGates = runPublishRegressionGates({
       statusLintReports: lintReports,
-      projectionStatuses: prepared.map((row) => ({
-        entityId: row.entityRow.entity_id,
-        status: row.entityRow.projection.status as string | undefined,
-        livingStatus: row.entityRow.projection.livingStatus as string | undefined,
-      })),
+      projectionStatuses: prepared.map((row) => {
+        const status = projectionString(row.entityRow.projection, 'status');
+        const livingStatus = projectionString(row.entityRow.projection, 'livingStatus');
+        return {
+          entityId: row.entityRow.entity_id,
+          ...(status !== undefined ? { status } : {}),
+          ...(livingStatus !== undefined ? { livingStatus } : {}),
+        };
+      }),
     });
     if (regressionGates.hasErrors) {
       throw new Error(publishRegressionFailureMessage(regressionGates));

@@ -2,7 +2,10 @@
  * Focused Firestore emulator seed scenarios for `@repo/api-public` live-read integration tests.
  * Demo-repo / emulator only — never import from production runtime code.
  */
-import type { PublicActiveReleaseDoc, PublicEntityProjectionDoc } from '../src/firestore/types.js';
+import type {
+  PublicActiveReleaseDoc,
+  PublicEntityProjectionInput,
+} from '../src/firestore/types.js';
 import { seedPublicEntity, seedPublicSchoolEntity, type SeedDocument } from './firestore-seed.js';
 
 export type ApiPublicEmulatorScenario = {
@@ -30,13 +33,15 @@ function activeRelease(releaseId: string): PublicActiveReleaseDoc {
 }
 
 function withRelease(
-  projection: PublicEntityProjectionDoc,
+  projection: PublicEntityProjectionInput,
   releaseId: string,
-): PublicEntityProjectionDoc {
+): PublicEntityProjectionInput {
   return { ...projection, releaseId };
 }
 
-function searchIndexFromProjection(projection: PublicEntityProjectionDoc): Record<string, unknown> {
+function searchIndexFromProjection(
+  projection: PublicEntityProjectionInput,
+): Record<string, unknown> {
   return {
     id: projection.id,
     releaseId: projection.releaseId,
@@ -109,7 +114,7 @@ export function buildFallbackSearchScenario(): ApiPublicEmulatorScenario {
 export function buildEnumerationScenario(): ApiPublicEmulatorScenario {
   const releaseId = API_PUBLIC_EMULATOR_RELEASE.enumeration;
   const school = withRelease(seedPublicSchoolEntity, releaseId);
-  const unpublishedPerson: PublicEntityProjectionDoc = {
+  const unpublishedPerson: PublicEntityProjectionInput = {
     id: 'ent_unpublished_person_001',
     releaseId,
     kind: 'person',
@@ -152,7 +157,7 @@ export function buildFallbackBoundScenario(entityCount: number): ApiPublicEmulat
 
   for (let i = 0; i < entityCount; i += 1) {
     const id = `ent_bound_${String(i).padStart(4, '0')}`;
-    const projection: PublicEntityProjectionDoc = {
+    const projection: PublicEntityProjectionInput = {
       id,
       releaseId,
       kind: 'place',

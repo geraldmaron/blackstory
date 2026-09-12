@@ -21,21 +21,21 @@ export const DIGNITY_CLASSES = new Set([
 export type CommonsAutoProposeRow = {
   readonly entityId: string;
   readonly displayName: string;
-  readonly kind?: string;
+  readonly kind?: string | undefined;
   readonly outcome: string;
-  readonly fileTitle?: string;
-  readonly commonsPageUrl?: string;
-  readonly sourceImageUrl?: string;
-  readonly alt?: string;
-  readonly credit?: string;
-  readonly rightsStatus?: 'public_domain' | 'licensed' | 'fair_use';
-  readonly licenseShortName?: string;
-  readonly wikidataId?: string;
-  readonly dignityHold?: string;
-  readonly sensitivity?: readonly { readonly class?: string }[];
+  readonly fileTitle?: string | undefined;
+  readonly commonsPageUrl?: string | undefined;
+  readonly sourceImageUrl?: string | undefined;
+  readonly alt?: string | undefined;
+  readonly credit?: string | undefined;
+  readonly rightsStatus?: 'public_domain' | 'licensed' | 'fair_use' | undefined;
+  readonly licenseShortName?: string | undefined;
+  readonly wikidataId?: string | undefined;
+  readonly dignityHold?: string | undefined;
+  readonly sensitivity?: readonly { readonly class?: string | undefined }[] | undefined;
   /** Set when the source plan already fetched Commons imageinfo sha1 (e.g. the NRHP /
    * QID-leftover lanes' evaluateCommonsMediaPropose output) — see buildPinPlanRow. */
-  readonly sha1?: string;
+  readonly sha1?: string | undefined;
 };
 
 /** One `--from` file's parsed JSON — matches dry-run-commons-qid-leftover.ts's
@@ -115,8 +115,8 @@ export type PinPlanRow = {
   readonly entityId: string;
   readonly url: string;
   readonly fileTitle: string;
-  readonly sha1?: string;
-  readonly license?: string;
+  readonly sha1?: string | undefined;
+  readonly license?: string | undefined;
   readonly credit: string;
   readonly sourcePageUrl: string;
   readonly alt: string;

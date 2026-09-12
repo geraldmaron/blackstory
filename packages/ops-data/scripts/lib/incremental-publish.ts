@@ -455,7 +455,7 @@ export function visitOverrideFromCanonicalRow(
     ['open_to_public', 'exterior_only', 'private', 'demolished', 'unknown'].includes(
       canonicalVisit.visitability,
     )
-      ? { visitability: canonicalVisit.visitability as PublicVisit['visitability'] }
+      ? { visitability: canonicalVisit.visitability as NonNullable<PublicVisit['visitability']> }
       : {}),
     ...(canonicalVisit.source_ids && canonicalVisit.source_ids.length > 0
       ? { sources: canonicalVisit.source_ids }

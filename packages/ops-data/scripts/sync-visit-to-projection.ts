@@ -102,7 +102,7 @@ export function rawVisitFromRow(row: Row): PublicVisit | undefined {
     ['open_to_public', 'exterior_only', 'private', 'demolished', 'unknown'].includes(
       row.visitability,
     )
-      ? { visitability: row.visitability as PublicVisit['visitability'] }
+      ? { visitability: row.visitability as NonNullable<PublicVisit['visitability']> }
       : {}),
     ...(row.source_ids && row.source_ids.length > 0 ? { sources: row.source_ids } : {}),
   };

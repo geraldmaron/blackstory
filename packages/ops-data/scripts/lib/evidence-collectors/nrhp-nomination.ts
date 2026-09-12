@@ -590,9 +590,9 @@ export function checkNominationIdentity(
   documentText: string,
   expected: {
     readonly displayName: string;
-    readonly state?: string;
-    readonly county?: string;
-    readonly city?: string;
+    readonly state?: string | undefined;
+    readonly county?: string | undefined;
+    readonly city?: string | undefined;
   },
 ): NominationIdentity {
   // The place rule lives in subject-identity.ts, shared with the searched-document collectors —

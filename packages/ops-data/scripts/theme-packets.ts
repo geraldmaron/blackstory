@@ -374,7 +374,7 @@ const doiHttpClient: SafeHttpClient = async (request) => {
   }
   const response = await fetch(request.url, {
     method: request.method ?? 'GET',
-    headers: request.headers,
+    ...(request.headers !== undefined ? { headers: request.headers } : {}),
   });
   const bodyText = await response.text();
   const headers: Record<string, string | undefined> = {};

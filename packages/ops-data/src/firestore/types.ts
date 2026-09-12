@@ -1227,6 +1227,13 @@ export const publicEntityProjectionSchema = z.object({
 
 export type PublicEntityProjectionDoc = z.infer<typeof publicEntityProjectionSchema>;
 
+/**
+ * Pre-parse shape of a public entity projection: the fields the schema defaults may be omitted,
+ * so a literal written for `publicEntityProjectionSchema.parse` is described by this, not by
+ * `PublicEntityProjectionDoc`.
+ */
+export type PublicEntityProjectionInput = z.input<typeof publicEntityProjectionSchema>;
+
 /** One section of a longform public story article. */
 export const publicStorySectionSchema = z.object({
   heading: z.string().min(1).optional(),

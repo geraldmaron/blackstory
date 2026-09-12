@@ -245,16 +245,14 @@ async function main(): Promise<void> {
   const live = hasFlag('live');
   const fixturePath = arg('hmda-fixture-json') ?? (live ? undefined : DEFAULT_FIXTURE);
 
+  if (fixturePath && !existsSync(fixturePath)) {
+    throw new Error(`HMDA fixture not found: ${fixturePath}`);
+  }
+
   const fetchOptions: Parameters<typeof fetchPhase1NationHmdaObservations>[0] = {
     years,
+    ...(fixturePath ? { aggregationPayloads: loadFixturePayloads(fixturePath, years) } : {}),
   };
-
-  if (fixturePath) {
-    if (!existsSync(fixturePath)) {
-      throw new Error(`HMDA fixture not found: ${fixturePath}`);
-    }
-    fetchOptions.aggregationPayloads = loadFixturePayloads(fixturePath, years);
-  }
 
   const fetchResult = await fetchPhase1NationHmdaObservations(fetchOptions);
 

@@ -29,7 +29,7 @@
  * empty results and a batch whose search endpoint was refusing every query look identical
  * otherwise, and they mean entirely different things.
  */
-import { buildSearxngSearchUrl, parseSearxngSearchResponse } from '@repo/domain';
+import { buildSearxngSearchUrl, parseSearxngSearchResponse, US_STATES } from '@repo/domain';
 import {
   createOperatorEndpointClient,
   OperatorEndpointError,
@@ -200,13 +200,24 @@ async function fetchWikipediaCoordinates(
   }
 }
 
+/** State names as they appear inside a jurisdiction label ("Selma, Alabama"). */
+const US_STATE_NAMES: readonly string[] = US_STATES.map((state) => state.name);
+
+/**
+ * Cities whose "City, ST" label is ambiguous as a raw Wikipedia query, mapped to the title of the
+ * article actually wanted. Keyed by the lowercased city part of the label.
+ */
+const CITY_TITLE_OVERRIDES: Readonly<Record<string, string>> = {
+  'new york': 'New York City',
+};
+
 function extractBareUsState(jurisdictionLabel: string): string | undefined {
   const stripped = jurisdictionLabel.replace(/,\s*(United States|U\.S\.?)$/iu, '').trim();
-  return US_STATES.find((state) => stripped === state);
+  return US_STATE_NAMES.find((state) => stripped === state);
 }
 
 function extractSearchDisambiguator(jurisdictionLabel: string): string {
-  return US_STATES.find((state) => jurisdictionLabel.includes(state)) ?? 'United States';
+  return US_STATE_NAMES.find((state) => jurisdictionLabel.includes(state)) ?? 'United States';
 }
 
 function normalizeJurisdictionQuery(jurisdictionLabel: string): string {
@@ -338,9 +349,7 @@ export async function resolveGovernmentCenterCoordinates(
   if (locationPrecision === 'state') {
     const state = extractBareUsState(jurisdictionLabel);
     if (state) {
-      const byCapitol = await resolveViaSearchThenCoordinates(
-        STATE_CAPITOL_QUERY[state] ?? `${state} State Capitol`,
-      );
+      const byCapitol = await resolveViaSearchThenCoordinates(`${state} State Capitol`);
       if (byCapitol) return byCapitol;
     }
   } else if (locationPrecision === 'country') {

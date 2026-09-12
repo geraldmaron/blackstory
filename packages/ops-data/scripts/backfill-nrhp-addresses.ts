@@ -67,6 +67,7 @@ import {
   proposeNrhpTier,
   type NrhpAddressOutcome,
   type NrhpArcgisAttributes,
+  type NrhpVisitability,
 } from './lib/nrhp-address-classify.ts';
 import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';

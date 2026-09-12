@@ -128,6 +128,8 @@ export function lintPinSaturation(
   const findings: PinSaturationFinding[] = [];
   for (const [key, bucket] of byCoordinate) {
     if (bucket.length <= PIN_SATURATION_WARN_THRESHOLD) continue;
+    const firstInBucket = bucket[0];
+    if (firstInBucket === undefined) continue;
     const [latText, lngText] = key.split(',');
     const lat = Number(latText);
     const lng = Number(lngText);
@@ -143,7 +145,7 @@ export function lintPinSaturation(
       entityIds: bucket.map((entity) => entity.entityId).sort(),
       message:
         `${bucket.length} person records share the exact coordinate ${lat}, ${lng} at ` +
-        `precision "${bucket[0].precision}". People are not born in institutions — this is ` +
+        `precision "${firstInBucket.precision}". People are not born in institutions — this is ` +
         `almost always the honoring/burial site pinned onto the person. Repoint to a place ` +
         `documented in each record, or drop the pin. If the co-location is genuine, add the ` +
         `coordinate to ALLOWED_SHARED_PINS with a reason.`,

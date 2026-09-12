@@ -26,7 +26,7 @@ import type {
   EvidenceSourceDoc,
   PolicyActiveDoc,
   PublicActiveReleaseDoc,
-  PublicEntityProjectionDoc,
+  PublicEntityProjectionInput,
   RetrievalEventDoc,
   SourceCaptureDoc,
   SourceDomainDoc,
@@ -86,7 +86,7 @@ export const seedActiveRelease: PublicActiveReleaseDoc = {
   manifestHash: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
 };
 
-export const seedPublicEntity: PublicEntityProjectionDoc = {
+export const seedPublicEntity: PublicEntityProjectionInput = {
   id: 'ent_15th_st_church_001',
   releaseId: 'rel_seed_001',
   kind: 'place',
@@ -340,7 +340,7 @@ export const seedEntityMerge: EntityMergeDoc = {
   auditEventIds: ['audit_seed_merge_001'],
 };
 
-export const seedPublicSchoolEntity: PublicEntityProjectionDoc = {
+export const seedPublicSchoolEntity: PublicEntityProjectionInput = {
   id: 'ent_dunbar_school_001',
   releaseId: 'rel_seed_001',
   kind: 'school',
@@ -380,7 +380,7 @@ const alumniFederationPoint = {
 };
 
 /** 1975 D.C. Inventory of Historic Sites listing for Dunbar High School (event). */
-export const seedPublicLandmarkListingEntity: PublicEntityProjectionDoc = {
+export const seedPublicLandmarkListingEntity: PublicEntityProjectionInput = {
   id: 'ent_dc_landmark_listing_1975',
   releaseId: 'rel_seed_001',
   kind: 'event',
@@ -419,7 +419,7 @@ export const seedPublicLandmarkListingEntity: PublicEntityProjectionDoc = {
 };
 
 /** Dunbar Alumni Federation (institution) — preserves school history; scholarships since 2002. */
-export const seedPublicAlumniFederationEntity: PublicEntityProjectionDoc = {
+export const seedPublicAlumniFederationEntity: PublicEntityProjectionInput = {
   id: 'ent_dunbar_alumni_federation_001',
   releaseId: 'rel_seed_001',
   kind: 'institution',
@@ -606,7 +606,7 @@ export const seedEvidenceLineage: EvidenceLineageDoc = {
   createdAt: FIXED_NOW,
 };
 
-export const seedClaimEvidenceSupporting: ClaimEvidenceLinkDoc = {
+export const seedClaimEvidenceSupporting = {
   id: 'cel_seed_support_001',
   claimId: 'claim_seed_001',
   claimVersionId: 'cver_seed_001',
@@ -622,9 +622,9 @@ export const seedClaimEvidenceSupporting: ClaimEvidenceLinkDoc = {
   extractionQuality: 0.9,
   assertedValue: '1841',
   createdAt: FIXED_NOW,
-};
+} satisfies ClaimEvidenceLinkDoc;
 
-export const seedClaimEvidenceSyndicated: ClaimEvidenceLinkDoc = {
+export const seedClaimEvidenceSyndicated = {
   id: 'cel_seed_syndicated_001',
   claimId: 'claim_seed_001',
   claimVersionId: 'cver_seed_001',
@@ -641,14 +641,14 @@ export const seedClaimEvidenceSyndicated: ClaimEvidenceLinkDoc = {
   assertedValue: '1841',
   notes: 'Syndicated wire copy — same lineageRootId as archival root',
   createdAt: FIXED_NOW,
-};
+} satisfies ClaimEvidenceLinkDoc;
 
 // This one evidence link's assertedValue is deliberately synthetic (see the module doc's
 // "contradicting evidence" note): the church's real founding year (1841) is single-sourced with
 // no credible alternate in the research brief, so this narrow mechanical data point demonstrates
 // what a contradicting-evidence link LOOKS like schema-wise without fabricating a real dispute
 // over the church's actual founding year.
-export const seedClaimEvidenceContradicting: ClaimEvidenceLinkDoc = {
+export const seedClaimEvidenceContradicting = {
   id: 'cel_seed_contradict_001',
   claimId: 'claim_seed_001',
   claimVersionId: 'cver_seed_001',
@@ -668,7 +668,7 @@ export const seedClaimEvidenceContradicting: ClaimEvidenceLinkDoc = {
     'mechanics demonstration; not a real documented dispute over Fifteenth Street Presbyterian ' +
     'Church’s actual founding year (1841, per HMdb.org and Howard University archives).',
   createdAt: FIXED_NOW,
-};
+} satisfies ClaimEvidenceLinkDoc;
 
 const seedClaimLinks = [
   seedClaimEvidenceSupporting,
@@ -865,7 +865,7 @@ export const firestoreSeedDocuments: readonly SeedDocument[] = [
       recordMaturity: 'partial_enrichment',
       researchCoverage: 'partial',
       relatedCount: 1,
-      claimCount: seedPublicEntity.claimIds.length,
+      claimCount: seedPublicEntity.claimIds?.length ?? 0,
     },
   },
   {
@@ -883,7 +883,7 @@ export const firestoreSeedDocuments: readonly SeedDocument[] = [
       recordMaturity: 'minimum_record',
       researchCoverage: 'partial',
       relatedCount: 2,
-      claimCount: seedPublicSchoolEntity.claimIds.length,
+      claimCount: seedPublicSchoolEntity.claimIds?.length ?? 0,
     },
   },
   {
@@ -901,7 +901,7 @@ export const firestoreSeedDocuments: readonly SeedDocument[] = [
       recordMaturity: 'minimum_record',
       researchCoverage: 'partial',
       relatedCount: seedPublicLandmarkListingEntity.related?.length ?? 0,
-      claimCount: seedPublicLandmarkListingEntity.claimIds.length,
+      claimCount: seedPublicLandmarkListingEntity.claimIds?.length ?? 0,
     },
   },
   {
@@ -920,7 +920,7 @@ export const firestoreSeedDocuments: readonly SeedDocument[] = [
       recordMaturity: 'minimum_record',
       researchCoverage: 'partial',
       relatedCount: seedPublicAlumniFederationEntity.related?.length ?? 0,
-      claimCount: seedPublicAlumniFederationEntity.claimIds.length,
+      claimCount: seedPublicAlumniFederationEntity.claimIds?.length ?? 0,
     },
   },
   {

@@ -308,9 +308,9 @@ export type NcesEvidenceRow = {
 export type NcesLookupInput = {
   readonly entityId: string;
   readonly displayName: string;
-  readonly city?: string;
-  readonly county?: string;
-  readonly state?: string;
+  readonly city?: string | undefined;
+  readonly county?: string | undefined;
+  readonly state?: string | undefined;
   /** Injectable for tests; defaults to the real `safeFetchPage` (SSRF-safe outbound fetch). */
   readonly fetchPage?: (
     url: string,

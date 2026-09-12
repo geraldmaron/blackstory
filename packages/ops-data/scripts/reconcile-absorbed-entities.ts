@@ -365,7 +365,7 @@ async function main(): Promise<void> {
     }
     console.log(`  release_references_remapped: ${related}`);
     remindToRepublishCatalogArtifacts(
-      unpublished.release_entities + unpublished.search_index + related,
+      (unpublished.release_entities ?? 0) + (unpublished.search_index ?? 0) + related,
     );
 
     const after = await reportDrift(client, pairs);
