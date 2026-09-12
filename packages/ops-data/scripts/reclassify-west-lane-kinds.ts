@@ -36,6 +36,7 @@
  *     packages/ops-data/scripts/reclassify-west-lane-kinds.ts
  */
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -206,6 +207,7 @@ async function main(): Promise<void> {
     console.log(
       `\nApplied: bb_canonical.entities=${canonical} release_entities=${release} search_index=${search}`,
     );
+    remindToRepublishCatalogArtifacts(release);
   } finally {
     await client.end();
   }

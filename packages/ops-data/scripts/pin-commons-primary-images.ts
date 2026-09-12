@@ -57,6 +57,7 @@ import {
   createCommonsMediaClient,
   sanitizePrimaryImageForRelease,
 } from '@repo/domain';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { buildEntityMediaRow, buildPrimaryImageForRelease } from './lib/entity-media-row.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
@@ -373,6 +374,7 @@ async function main(): Promise<void> {
   console.log(
     `Applied: promoted=${promoted} skippedExisting=${skippedExisting} rejectedByGate=${rejectedByGate}`,
   );
+  remindToRepublishCatalogArtifacts(promoted);
   await pool.end();
 }
 

@@ -31,6 +31,7 @@
  */
 import pg from 'pg';
 import { encodeGeohash, geohashPrefixes } from '@repo/domain/geography/geohash';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -287,6 +288,7 @@ async function main(): Promise<void> {
   if (DRY_RUN || !APPLY) {
     console.log('Set DRY_RUN=0 PLACE_CENTROID_FIX_APPLY=1 to write.');
   }
+  remindToRepublishCatalogArtifacts(applied);
 }
 
 await main();

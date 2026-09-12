@@ -68,6 +68,7 @@ import {
   type NrhpAddressOutcome,
   type NrhpArcgisAttributes,
 } from './lib/nrhp-address-classify.ts';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
@@ -529,6 +530,7 @@ async function main(): Promise<void> {
     `Citation for every applied row: ${CITATION_LAYER_URL} (plus the roster's own NARA/NPGallery ` +
       'canonical URL, unchanged from scrape-nrhp-black-heritage-roster.ts).',
   );
+  remindToRepublishCatalogArtifacts(applied);
   await pool.end();
 }
 

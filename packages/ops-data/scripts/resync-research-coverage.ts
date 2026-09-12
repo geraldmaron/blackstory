@@ -43,6 +43,7 @@ import {
   type ReleaseResearchCoverage,
 } from '@repo/domain';
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
@@ -223,6 +224,7 @@ async function main(): Promise<void> {
     console.log(
       `Applied: ${changes.length} projection value(s), ${facetFixes.length} search_index facet(s).`,
     );
+    remindToRepublishCatalogArtifacts(changes.length + facetFixes.length);
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
     throw error;

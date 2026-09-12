@@ -38,6 +38,7 @@
  *     packages/ops-data/scripts/fix-residual-united-states-jurisdiction.ts
  */
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -195,6 +196,7 @@ async function main(): Promise<void> {
     );
     console.log(`\nApplied ${after.rows.length} update(s):`);
     for (const row of after.rows) console.log(`  ${row.entity_id}: "${row.label}"`);
+    remindToRepublishCatalogArtifacts(after.rows.length);
   } finally {
     await client.end();
   }

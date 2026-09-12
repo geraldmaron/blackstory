@@ -34,6 +34,7 @@
  *     packages/ops-data/scripts/reconcile-absorbed-entities.ts
  */
 import pg from 'pg';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -363,6 +364,9 @@ async function main(): Promise<void> {
       console.log(`  ${key}: ${value}`);
     }
     console.log(`  release_references_remapped: ${related}`);
+    remindToRepublishCatalogArtifacts(
+      unpublished.release_entities + unpublished.search_index + related,
+    );
 
     const after = await reportDrift(client, pairs);
     console.log(

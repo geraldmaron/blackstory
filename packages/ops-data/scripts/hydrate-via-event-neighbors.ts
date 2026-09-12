@@ -12,6 +12,7 @@ import {
   coParticipationNeighborsForEntity,
   type EventParticipationRow,
 } from '../../domain/src/graph/co-participation.ts';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -161,6 +162,7 @@ async function main(): Promise<void> {
     }
 
     console.log(`\nApplied: updated ${updated} release entities.`);
+    remindToRepublishCatalogArtifacts(updated);
   } finally {
     await client.end();
   }

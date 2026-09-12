@@ -14,6 +14,7 @@
  */
 import pg from 'pg';
 import { isValidTopicId } from '@repo/domain';
+import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
   kindHygieneLintFailureMessage,
@@ -72,6 +73,7 @@ async function main(): Promise<void> {
     );
     console.log('Attucks before:', JSON.stringify(attucksBefore.rows[0] ?? null));
 
+    let releaseRowsWritten = 0;
     if (DRY_RUN || !APPLY) {
       console.log('\nDry run for Attucks fix. Set DRY_RUN=0 FIX_ATTUCKS_KIND_APPLY=1 to apply.');
     } else {
@@ -139,10 +141,12 @@ async function main(): Promise<void> {
              WHERE release_id = $1 AND entity_id = $2`,
             [releaseId, ATTUCKS_ID],
           );
+          releaseRowsWritten = 1;
         }
 
         await client.query('COMMIT');
         console.log('Attucks fix applied.');
+        remindToRepublishCatalogArtifacts(releaseRowsWritten);
       } catch (error) {
         await client.query('ROLLBACK');
         throw error;
