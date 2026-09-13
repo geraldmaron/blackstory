@@ -1803,7 +1803,7 @@ export const presidentArticles = [
     kind: 'article' as const,
     title: 'President: Grover Cleveland',
     summary:
-      'Cleveland, the only president elected to non-consecutive terms, courted white Southern Democrats and, per the Miller Center, saw African Americans as inferior and opposed integrated schools in New York. During his second term the Democratic 53rd Congress repealed the remaining federal elections protections in 1894.',
+      'Cleveland, the first president elected to non-consecutive terms, courted white Southern Democrats and, per the Miller Center, saw African Americans as inferior and opposed integrated schools in New York. During his second term the Democratic 53rd Congress repealed the remaining federal elections protections in 1894.',
     eraLabel: '1885–1889, 1893–1897',
     placeLabel: 'United States',
     publishedAt: '2026-08-07',
@@ -1812,7 +1812,7 @@ export const presidentArticles = [
       id: 'presidents',
       label: 'The presidents on the record',
       position: 22,
-      positionLabel: '22nd president',
+      positionLabel: '22nd and 24th president',
     },
     tags: ['Reconstruction'],
     heroImage: {
@@ -1845,11 +1845,23 @@ export const presidentArticles = [
         label: 'Miller Center — Grover Cleveland: The American Franchise',
         url: 'https://millercenter.org/president/cleveland/the-american-franchise',
       },
+      {
+        id: 'nara-electoral-college-2016',
+        label:
+          'U.S. National Archives, Office of the Federal Register — 2016 Electoral College Results',
+        url: 'https://www.archives.gov/electoral-college/2016',
+      },
+      {
+        id: 'nara-electoral-college-2024',
+        label:
+          'U.S. National Archives, Office of the Federal Register — 2024 Electoral College Results',
+        url: 'https://www.archives.gov/electoral-college/2024',
+      },
     ],
     body: [
       {
         type: 'paragraph',
-        text: "Cleveland is the one president counted twice, elected in 1884 and again in 1892. On race, the Miller Center's account is blunt: he agreed with white Southerners in their reluctance to treat African Americans as social and political equals, made special efforts to reach out to Democrats and former Confederates in the South to assure them they had a friend in the White House, opposed integrated schools in New York, and saw African Americans as essentially inferior. He did make a few Black appointments. On March 11, 1887 he commissioned Charles Henry James Taylor as minister resident and consul general to Liberia during a Senate recess; Taylor presented credentials June 4 and left the post soon after September 22 that year. Cleveland also gave James C. Matthews a recess appointment as Recorder of Deeds for the District of Columbia, succeeding Frederick Douglass. The larger fact of his second term is that the Democratically controlled 53rd Congress repealed the remaining federal elections protections in 1894.[ref:miller-center-cleveland-domestic][ref:state-historian-chj-taylor][ref:house-baic-1894-repeal][ref:house-baic-1894-repeal][ref:miller-center-cleveland-franchise]",
+        text: "Cleveland was the first president counted twice, elected in 1884 and again in 1892; Donald Trump became the second, elected in 2016 and again in 2024. On race, the Miller Center's account is blunt: he agreed with white Southerners in their reluctance to treat African Americans as social and political equals, made special efforts to reach out to Democrats and former Confederates in the South to assure them they had a friend in the White House, opposed integrated schools in New York, and saw African Americans as essentially inferior. He did make a few Black appointments. On March 11, 1887 he commissioned Charles Henry James Taylor as minister resident and consul general to Liberia during a Senate recess; Taylor presented credentials June 4 and left the post soon after September 22 that year. Cleveland also gave James C. Matthews a recess appointment as Recorder of Deeds for the District of Columbia, succeeding Frederick Douglass. The larger fact of his second term is that the Democratically controlled 53rd Congress repealed the remaining federal elections protections in 1894.[ref:miller-center-cleveland-domestic][ref:state-historian-chj-taylor][ref:house-baic-1894-repeal][ref:house-baic-1894-repeal][ref:miller-center-cleveland-franchise][ref:nara-electoral-college-2016][ref:nara-electoral-college-2024]",
       },
       { type: 'heading', level: 2 as const, text: 'The record' },
       {
@@ -3835,8 +3847,8 @@ export const presidentArticles = [
     kind: 'article' as const,
     title: 'President: Donald Trump',
     summary:
-      'Trump signed the First Step Act on December 21, 2018 and the FUTURE Act, which made permanent mandatory funding for historically Black colleges and other minority-serving institutions, on December 19, 2019. He also signed Executive Order 13950 restricting certain diversity training by federal contractors and Executive Order 13958 creating the 1776 Commission, and his Justice Department imposed new restrictions on civil consent decrees with state and local governments.',
-    eraLabel: '2017–2021',
+      'Trump is the second president elected to non-consecutive terms. In the first he signed the First Step Act and the FUTURE Act, which made mandatory funding for historically Black colleges permanent, along with executive orders restricting diversity training by federal contractors and creating the 1776 Commission. The second revoked Executive Order 11246, the 1965 equal employment opportunity order for federal contractors, ended federal DEI programs, and made it United States policy to eliminate disparate-impact liability.',
+    eraLabel: '2017–2021, 2025–',
     placeLabel: 'United States',
     publishedAt: '2026-08-07',
     status: 'published' as const,
@@ -3844,7 +3856,7 @@ export const presidentArticles = [
       id: 'presidents',
       label: 'The presidents on the record',
       position: 45,
-      positionLabel: '45th president',
+      positionLabel: '45th and 47th president',
     },
     tags: ['Modern era'],
     heroImage: {
@@ -3891,6 +3903,35 @@ export const presidentArticles = [
         url: 'https://www.federalregister.gov/documents/2022/03/04/2022-04509/revisions-to-approval-of-civil-consent-decrees-with-state-and-local-governmental-entities',
       },
       {
+        id: 'whitehouse-trump-45th-and-47th',
+        label: 'The White House, "President Donald J. Trump" (Administration)',
+        url: 'https://www.whitehouse.gov/administration/donald-j-trump/',
+      },
+      {
+        id: 'nara-electoral-college-2016',
+        label:
+          'U.S. National Archives, Office of the Federal Register — 2016 Electoral College Results',
+        url: 'https://www.archives.gov/electoral-college/2016',
+      },
+      {
+        id: 'nara-electoral-college-2024',
+        label:
+          'U.S. National Archives, Office of the Federal Register — 2024 Electoral College Results',
+        url: 'https://www.archives.gov/electoral-college/2024',
+      },
+      {
+        id: 'eo-14280-school-discipline',
+        label:
+          'Executive Order 14280, 90 FR 17533 (signed Apr. 23, 2025; published Apr. 28, 2025), Federal Register',
+        url: 'https://www.federalregister.gov/documents/2025/04/28/2025-07377/reinstating-commonsense-school-discipline-policies',
+      },
+      {
+        id: 'eo-14398-contractor-dei-clause',
+        label:
+          'Executive Order 14398, 91 FR 16147 (signed Mar. 26, 2026; published Mar. 31, 2026), Federal Register',
+        url: 'https://www.federalregister.gov/documents/2026/03/31/2026-06286/addressing-dei-discrimination-by-federal-contractors',
+      },
+      {
         id: 'federal-register-full-text-85-fr',
         label: 'Federal Register full text, 85 FR 70951',
         url: 'https://www.federalregister.gov/documents/full_text/text/2020/11/05/2020-24793.txt',
@@ -3900,11 +3941,67 @@ export const presidentArticles = [
         label: 'Federal Register full text, 85 FR 60683',
         url: 'https://www.federalregister.gov/documents/full_text/text/2020/09/28/2020-21534.txt',
       },
+      {
+        id: 'eo-14151-ending-federal-dei',
+        label: 'Federal Register, Executive Order 14151 of January 20, 2025',
+        url: 'https://www.federalregister.gov/documents/2025/01/29/2025-01953/ending-radical-and-wasteful-government-dei-programs-and-preferencing',
+      },
+      {
+        id: 'fr-text-90-fr-8339',
+        label: 'Federal Register full text, 90 FR 8339',
+        url: 'https://www.federalregister.gov/documents/full_text/text/2025/01/29/2025-01953.txt',
+      },
+      {
+        id: 'eo-14173-ending-illegal-discrimination',
+        label: 'Federal Register, Executive Order 14173 of January 21, 2025',
+        url: 'https://www.federalregister.gov/documents/2025/01/31/2025-02097/ending-illegal-discrimination-and-restoring-merit-based-opportunity',
+      },
+      {
+        id: 'fr-text-90-fr-8633',
+        label: 'Federal Register full text, 90 FR 8633',
+        url: 'https://www.federalregister.gov/documents/full_text/text/2025/01/31/2025-02097.txt',
+      },
+      {
+        id: 'eo-14238-reduce-federal-bureaucracy',
+        label: 'Federal Register, Executive Order 14238 of March 14, 2025',
+        url: 'https://www.federalregister.gov/documents/2025/03/20/2025-04868/continuing-the-reduction-of-the-federal-bureaucracy',
+      },
+      {
+        id: 'fr-text-90-fr-13043',
+        label: 'Federal Register full text, 90 FR 13043',
+        url: 'https://www.federalregister.gov/documents/full_text/text/2025/03/20/2025-04868.txt',
+      },
+      {
+        id: 'eo-14253-restoring-truth-american-history',
+        label: 'Federal Register, Executive Order 14253 of March 27, 2025',
+        url: 'https://www.federalregister.gov/documents/2025/04/03/2025-05838/restoring-truth-and-sanity-to-american-history',
+      },
+      {
+        id: 'fr-text-90-fr-14563',
+        label: 'Federal Register full text, 90 FR 14563',
+        url: 'https://www.federalregister.gov/documents/full_text/text/2025/04/03/2025-05838.txt',
+      },
+      {
+        id: 'eo-14281-restoring-equality-meritocracy',
+        label: 'Federal Register, Executive Order 14281 of April 23, 2025',
+        url: 'https://www.federalregister.gov/documents/2025/04/28/2025-07378/restoring-equality-of-opportunity-and-meritocracy',
+      },
+      {
+        id: 'fr-text-90-fr-17537',
+        label: 'Federal Register full text, 90 FR 17537',
+        url: 'https://www.federalregister.gov/documents/full_text/text/2025/04/28/2025-07378.txt',
+      },
+      {
+        id: 'doj-opa-2025-consent-decree-dismissals',
+        label:
+          'U.S. Department of Justice, Office of Public Affairs, press release 25-534 (May 21, 2025)',
+        url: 'https://www.justice.gov/opa/pr/us-department-justices-civil-rights-division-dismisses-biden-era-police-investigations-and',
+      },
     ],
     body: [
       {
         type: 'paragraph',
-        text: 'Four documented acts anchor this term. On December 21, 2018 Trump signed Public Law 115-391, the First Step Act of 2018, a federal sentencing and prison law whose Title I covers recidivism reduction. On December 19, 2019 he signed Public Law 116-91, the FUTURE Act, which amended the Higher Education Act to provide mandatory minority-serving-institution funding "for fiscal year 2020 and each fiscal year thereafter," replacing a program that had expired. On September 22, 2020 he issued Executive Order 13950, "Combating Race and Sex Stereotyping," applying to federal contractors, and on November 2, 2020 Executive Order 13958 established the President\'s Advisory 1776 Commission. Separately, Attorney General Jeff Sessions issued a November 7, 2018 memorandum setting limits on when consent decrees with state or local governments are appropriate and requiring senior-leadership approval; the Federal Register later records both that memorandum and the December 2020 rule implementing it, and their 2021-22 rescission.[ref:pl-115-391-first-step-act][ref:pl-116-91-future-act][ref:eo-13958-1776-commission][ref:eo-13950-race-sex-stereotyping][ref:fr-2020-consent-decree-rule][ref:fr-2022-consent-decree-revision]',
+        text: 'This entry covers two presidencies. Trump was elected in 2016 and again in 2024, and the White House lists him as the 45th and 47th president. Four documented acts anchor the first term. On December 21, 2018 Trump signed Public Law 115-391, the First Step Act of 2018, a federal sentencing and prison law whose Title I covers recidivism reduction. On December 19, 2019 he signed Public Law 116-91, the FUTURE Act, which amended the Higher Education Act to provide mandatory minority-serving-institution funding "for fiscal year 2020 and each fiscal year thereafter," replacing a program that had expired. On September 22, 2020 he issued Executive Order 13950, "Combating Race and Sex Stereotyping," applying to federal contractors, and on November 2, 2020 Executive Order 13958 established the President\'s Advisory 1776 Commission. Separately, Attorney General Jeff Sessions issued a November 7, 2018 memorandum setting limits on when consent decrees with state or local governments are appropriate and requiring senior-leadership approval; the Federal Register later records both that memorandum and the December 2020 rule implementing it, and their 2021-22 rescission. The second term returned to the same subject on its first day. Executive Order 14151 ordered every agency to terminate its DEI and DEIA offices, positions and equity action plans within sixty days. Executive Order 14173, signed the next day, revoked Executive Order 11246 of September 24, 1965, the equal employment opportunity order that had required federal contractors to take affirmative action, and told the Office of Federal Contract Compliance Programs to stop holding contractors responsible for it. Executive Order 14238 cut the Minority Business Development Agency to the minimum the law requires. Executive Order 14253 directed the Vice President to work through the Smithsonian Board of Regents to remove "improper ideology" from its museums, and its findings single out the National Museum of African American History and Culture. Executive Order 14281 made it United States policy "to eliminate the use of disparate-impact liability in all contexts," and a companion order the same day, Executive Order 14280, aimed the same reversal at school discipline, where the guidance it targets was written around racial disparities in suspensions and expulsions. On May 21, 2025 the Justice Department began dismissing the Louisville and Minneapolis police lawsuits. Executive Order 14398 of March 26, 2026 then required federal contracts to carry a clause barring "racially discriminatory DEI activities."[ref:pl-115-391-first-step-act][ref:pl-116-91-future-act][ref:eo-13958-1776-commission][ref:eo-13950-race-sex-stereotyping][ref:fr-2020-consent-decree-rule][ref:fr-2022-consent-decree-revision][ref:whitehouse-trump-45th-and-47th][ref:nara-electoral-college-2016][ref:nara-electoral-college-2024][ref:eo-14280-school-discipline][ref:eo-14398-contractor-dei-clause]',
       },
       { type: 'heading', level: 2 as const, text: 'The record' },
       {
@@ -3916,6 +4013,12 @@ export const presidentArticles = [
           "Nov. 2, 2020: issued Executive Order 13958 (85 FR 70951) establishing the President's Advisory 1776 Commission on the teaching of American founding history.[ref:eo-13958-1776-commission][ref:federal-register-full-text-85-fr]",
           'Sept. 22, 2020: issued Executive Order 13950 (85 FR 60683), "Combating Race and Sex Stereotyping," restricting certain diversity training content for federal contractors.[ref:eo-13950-race-sex-stereotyping][ref:federal-register-full-text-85-fr-2]',
           'Nov. 7, 2018: AG Sessions issued a memorandum limiting when civil consent decrees with state or local governments are appropriate and requiring senior DOJ approval; a rule followed Dec. 28, 2020 (85 FR 84229).[ref:fr-2022-consent-decree-revision][ref:fr-2020-consent-decree-rule]',
+          'Jan. 20, 2025: issued Executive Order 14151 (90 FR 8339), ordering every agency to terminate its DEI, DEIA and "environmental justice" offices, positions and equity action plans within sixty days.[ref:eo-14151-ending-federal-dei][ref:fr-text-90-fr-8339]',
+          'Jan. 21, 2025: issued Executive Order 14173 (90 FR 8633), revoking Executive Order 11246 of September 24, 1965 (Equal Employment Opportunity) and directing the Office of Federal Contract Compliance Programs to stop holding federal contractors responsible for taking affirmative action.[ref:eo-14173-ending-illegal-discrimination][ref:fr-text-90-fr-8633]',
+          'Mar. 14, 2025: issued Executive Order 14238 (90 FR 13043), ordering the non-statutory components of the Minority Business Development Agency and the Community Development Financial Institutions Fund eliminated to the maximum extent consistent with law.[ref:eo-14238-reduce-federal-bureaucracy][ref:fr-text-90-fr-13043]',
+          'Mar. 27, 2025: issued Executive Order 14253 (90 FR 14563), directing the Vice President to work through the Smithsonian Board of Regents to remove "improper ideology" from its museums; the order\'s findings name the National Museum of African American History and Culture.[ref:eo-14253-restoring-truth-american-history][ref:fr-text-90-fr-14563]',
+          'Apr. 23, 2025: issued Executive Order 14281 (90 FR 17537), making it United States policy "to eliminate the use of disparate-impact liability in all contexts," revoking the 1966 and 1973 presidential approvals of the Justice Department\'s Title VI regulations and directing agencies to deprioritize enforcement of statutes and rules that carry disparate-impact liability.[ref:eo-14281-restoring-equality-meritocracy][ref:fr-text-90-fr-17537]',
+          "May 21, 2025: the Justice Department's Civil Rights Division began dismissing the Louisville and Minneapolis police lawsuits with prejudice, closing those investigations and retracting the findings of constitutional violations, and closed and retracted findings for six more departments, among them Phoenix, Memphis and the Louisiana State Police.[ref:doj-opa-2025-consent-decree-dismissals]",
         ],
       },
       { type: 'heading', level: 2 as const, text: 'Where the record disagrees' },
@@ -3930,6 +4033,10 @@ export const presidentArticles = [
       {
         type: 'paragraph',
         text: 'Whether the November 2018 consent-decree memorandum amounted to a retreat from pattern-or-practice police oversight is a characterization; the fetched Federal Register text documents the restrictions and the later rescission, not the motive.',
+      },
+      {
+        type: 'paragraph',
+        text: "The second-term orders are recorded here as issued. What they changed is a separate question this entry does not answer: an executive order is an instruction to agencies, and how each was implemented, how courts treated it, and what followed for Black Americans are not established by the orders' own text.",
       },
     ],
   },

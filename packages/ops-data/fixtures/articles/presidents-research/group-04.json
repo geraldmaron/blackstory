@@ -478,8 +478,9 @@
       "number": 22,
       "name": "Grover Cleveland",
       "termLabel": "1885–1889, 1893–1897",
-      "summary": "Cleveland, the only president elected to non-consecutive terms, courted white Southern Democrats and, per the Miller Center, saw African Americans as inferior and opposed integrated schools in New York. During his second term the Democratic 53rd Congress repealed the remaining federal elections protections in 1894.",
-      "paragraph": "Cleveland is the one president counted twice, elected in 1884 and again in 1892. On race, the Miller Center's account is blunt: he agreed with white Southerners in their reluctance to treat African Americans as social and political equals, made special efforts to reach out to Democrats and former Confederates in the South to assure them they had a friend in the White House, opposed integrated schools in New York, and saw African Americans as essentially inferior. He did make a few Black appointments. On March 11, 1887 he commissioned Charles Henry James Taylor as minister resident and consul general to Liberia during a Senate recess; Taylor presented credentials June 4 and left the post soon after September 22 that year. Cleveland also gave James C. Matthews a recess appointment as Recorder of Deeds for the District of Columbia, succeeding Frederick Douglass. The larger fact of his second term is that the Democratically controlled 53rd Congress repealed the remaining federal elections protections in 1894.",
+      "ordinalLabel": "22nd and 24th president",
+      "summary": "Cleveland, the first president elected to non-consecutive terms, courted white Southern Democrats and, per the Miller Center, saw African Americans as inferior and opposed integrated schools in New York. During his second term the Democratic 53rd Congress repealed the remaining federal elections protections in 1894.",
+      "paragraph": "Cleveland was the first president counted twice, elected in 1884 and again in 1892; Donald Trump became the second, elected in 2016 and again in 2024. On race, the Miller Center's account is blunt: he agreed with white Southerners in their reluctance to treat African Americans as social and political equals, made special efforts to reach out to Democrats and former Confederates in the South to assure them they had a friend in the White House, opposed integrated schools in New York, and saw African Americans as essentially inferior. He did make a few Black appointments. On March 11, 1887 he commissioned Charles Henry James Taylor as minister resident and consul general to Liberia during a Senate recess; Taylor presented credentials June 4 and left the post soon after September 22 that year. Cleveland also gave James C. Matthews a recess appointment as Recorder of Deeds for the District of Columbia, succeeding Frederick Douglass. The larger fact of his second term is that the Democratically controlled 53rd Congress repealed the remaining federal elections protections in 1894.",
       "callouts": [
         {
           "text": "1885–1889: Cleveland courted white Southern Democrats and former Confederates and, per Miller Center, was reluctant to treat African Americans as social and political equals.",
@@ -563,6 +564,18 @@
           "label": "Miller Center — Grover Cleveland: The American Franchise",
           "url": "https://millercenter.org/president/cleveland/the-american-franchise",
           "quote": "In the South, state constitutions, registration laws, literacy tests, and poll taxes disfranchised many African Americans"
+        },
+        {
+          "id": "nara-electoral-college-2016",
+          "label": "U.S. National Archives, Office of the Federal Register — 2016 Electoral College Results",
+          "url": "https://www.archives.gov/electoral-college/2016",
+          "quote": "2016 Electoral College Results ... President Donald J. Trump [R] ... Main Opponent Hillary Clinton [D]"
+        },
+        {
+          "id": "nara-electoral-college-2024",
+          "label": "U.S. National Archives, Office of the Federal Register — 2024 Electoral College Results",
+          "url": "https://www.archives.gov/electoral-college/2024",
+          "quote": "2024 Electoral College Results ... President Donald J. Trump [R] ... Electoral Vote Winner: 312"
         }
       ],
       "disputes": [

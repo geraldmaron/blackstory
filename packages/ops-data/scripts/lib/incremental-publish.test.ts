@@ -486,6 +486,73 @@ test('name_overlap does not block an in-place correction of a row already live u
   assert.equal(result.eligible, true);
 });
 
+/**
+ * repo-n7p6.10 — `name_overlap` runs LAST, so the skip report names the binding constraint.
+ *
+ * Ranked ahead of the content gates it hid them. All 18 held nrhp-black-heritage candidates
+ * reported `name_overlap` while every one of them was really a 319-392 character generated
+ * template, short of the 400-character floor; the bead that measurement produced asked for a
+ * human to adjudicate 99 name collisions that no adjudication could have unblocked.
+ *
+ * The rows below are the two shapes that mattered in that measurement: a short NRHP template and
+ * a row with no coordinates, each also carrying the overlap flag.
+ */
+const shortNrhpTemplateRow = (overrides: Partial<LandscapePublishRow> = {}): LandscapePublishRow =>
+  nrhpRow({
+    id: 'nrhp-black-heritage-100011560',
+    display_name: 'Lincoln School',
+    summary:
+      'Lincoln School is a building in Marceline, Linn County, Missouri listed on the National ' +
+      'Register of Historic Places on March 20, 2025 for its significance in Black heritage and ' +
+      "architecture. The National Park Service's National Register program recognizes it as a " +
+      'documented site of African American historical importance.',
+    canonical_url: 'https://npgallery.nps.gov/AssetDetail/NRIS/100011560',
+    payload: { refnum: '100011560', areaOfSignificance: 'ETHNIC HERITAGE-BLACK' },
+    ...overrides,
+  });
+
+test('a name-overlapping candidate that is also too short reports the length, not the collision', () => {
+  const row = shortNrhpTemplateRow({ name_overlap: true });
+  const length = row.summary!.length;
+  assert.ok(length >= 319 && length <= 392, `fixture must sit in the measured band, got ${length}`);
+
+  const result = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(result.eligible, false);
+  // Not 'name_overlap': a person adjudicating this collision would not make the row publishable.
+  if (!result.eligible) assert.equal(result.reason, 'summary_too_short');
+});
+
+test('a name-overlapping candidate with no coordinates reports the missing location', () => {
+  const result = gateLandscapePublishCandidate({
+    row: enrichedRow({ name_overlap: true, lat: null, lng: null }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) assert.equal(result.reason, 'missing_location');
+});
+
+test('the collision is still what blocks a candidate that is otherwise publish-ready', () => {
+  const clean = gateLandscapePublishCandidate({
+    row: enrichedRow({ name_overlap: false }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(clean.eligible, true, 'the fixture must clear every other gate');
+
+  const colliding = gateLandscapePublishCandidate({
+    row: enrichedRow({ name_overlap: true }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(colliding.eligible, false);
+  if (!colliding.eligible) assert.equal(colliding.reason, 'name_overlap');
+});
+
 /** A republish admitted by the regression clause must still read as thin (repo-vymq). */
 test('a regression-clause republish publishes researchCoverage=minimal', () => {
   const row = nrhpRow({ exact_in_release: true });

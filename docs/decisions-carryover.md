@@ -646,12 +646,21 @@ supports non-US birthplaces (repo-9rkh), even though the ruling named this file:
 receives a US Census Geocoder match, and that service does not geocode non-US places at all, so
 widening the set would be a no-op for the actual need. (from ADR-008, "search and geocoding")
 
-**Bounded, and never a read-time geocode.** State attribution in `findUsStateForPoint`
+**Bounded, and never a read-time geocode ON THE MAP.** State attribution in `findUsStateForPoint`
 (`packages/domain/src/map/us-geography.ts`) is a bounded local lookup against a vendored 50-state
-bbox table, not a geocoder call, and `buildMapSource` uses it for every feature it emits. Geocoding
-happens upstream on the write path, and the map a reader sees is built only from the active
-release's own published projections, so no reader-facing request reaches the Census Geocoder. That
-is the part of this decision that holds.
+bbox table, not a geocoder call. `buildMapSource` reaches for it as a FALLBACK, not for every
+feature: it prefers `findUsStateFromJurisdictionLabel` when the entity carries a jurisdiction label
+and only derives the state from the point when it does not (`map-source.ts`, the `stateFromLabel ??`
+line). Geocoding happens upstream on the write path, and the map a reader sees is built only from
+the active release's own published projections, so no map request reaches the Census Geocoder.
+
+That last clause is about the MAP, and the narrower statement is the true one. Reader-facing
+geocoding does exist and is deliberate: `/locate/api` geocodes an address or ZIP, and
+reverse-geocodes coordinates, through the Census adapter on every call. It is the consent-gated,
+rate-limited opt-in this same section documents below, not an exception anyone forgot. (Corrected
+2026-09-13 after an adversarial pass caught both overstatements; the original paragraph claimed
+`buildMapSource` used the bbox lookup universally, and that NO reader-facing request reached the
+geocoder.)
 
 The "static-first" half of the original phrasing does not, and was narrowed on 2026-09-13
 (repo-uogug). It cited a demo generator, `packages/domain/src/map/generate-demo-map-source.ts`,
@@ -2446,3 +2455,62 @@ one piece of this decision behind a required check is upstream and belongs to an
 `packages/domain/src/map/map-source.redaction.test.ts` runs in "Workspace Tests". On mobile, the
 dignity guard, the precision guard, the zoom ceiling and the attribution behavior are all held by
 tests a human has to choose to care about. (from ADR-025, "native map render layer")
+
+## The name_overlap publish hold, measured and reordered (repo-n7p6.10, 2026-09-13)
+
+`name_overlap` is one flag on a landscape publish candidate, computed in SQL by the three
+`LANDSCAPE_*` queries in `packages/ops-data/scripts/publish-release-entities-incremental.ts`: some
+entity already in the active release carries the same `lower(display_name)` under a different
+entity id. `gateLandscapePublishCandidate`
+(`packages/ops-data/scripts/lib/incremental-publish.ts`) turns it into a publish hold for new
+candidates, and repo-8dlu already exempted an in-place correction of a row that is live under its
+own id. This section records what the held rows actually are, because a bead was filed on the
+assumption and the assumption was wrong.
+
+**The hold ran too early and hid the real blockers.** Measured 2026-09-13 against
+`rel_20260723_authority_net_001` (4,195 live rows): 76 landscape candidates were held with the
+flag set, and with the flag ignored 70 of them still failed a different gate: `summary_too_short`
+32 (18 `nrhp-black-heritage`, 7 `dc-sites`, 7 `other`), `missing_location` 18, `greenbook_lane` 10,
+`person_kind` 10. Every one of the 18 NRHP rows is a generated registry template of 319 to 392
+characters against the 400-character floor (`SUMMARY_MIN_CHARS`,
+`packages/ops-data/scripts/lib/entity-enrichment-llm.ts`). Only 6 became eligible, and
+those 6 are `us-ed-hbcu-*` rows already at `status='merged'` by
+`dedup-landscape-track-b.ts`, which the publisher's `status='pending'` filter never reaches
+anyway. Eligibility is a conjunction, so the ordering never changed which rows publish. It changed
+only which reason the skip report printed, and printing the collision first sent an operator to
+adjudicate 18 records that no adjudication could unblock. The check now runs last, after the build
+step, so `name_overlap` in a skip report means "publish-ready in every other respect, only the name
+collision is left."
+
+**None of the 18 held NRHP rows is a duplicate.** Every pair carries a different NRIS reference
+number, which is the National Register's own unique key for a listing and is embedded in both the
+entity id and `payload.refnum`, and every pair sits in a different city. Across the 53
+candidate-to-live pairs the closest is 57 km: `nrhp-black-heritage-100011560`, Lincoln School in
+Marceline, Linn County, Missouri, against the live `nrhp-black-heritage-100000606` in Kirksville.
+The farthest is 3,640 km, Mount Zion Baptist Church in Seattle against the one in
+Charlottesville. The names are the ones that repeat by nature:
+Lincoln School (3 held rows against 6 live), First Baptist Church (1 against 10), Mount Zion Baptist
+Church, Bethel AME, Odd Fellows Hall, Booker T. Washington High School. Nothing here needs a merge
+or a deprecation. The correct next step for all 18 is enrichment, which is the queue
+`summary_too_short` routes them to.
+
+**The gate does not maintain a no-duplicate-name invariant, and never did.** 43 display names in
+the active release are already shared by two or more live entities, covering 118 live rows, with
+the largest group at 10. The check only stops a newcomer from joining a collision group that
+already exists, so reading it as a catalog-wide uniqueness rule overstates what it buys. Reader
+disambiguation is handled elsewhere, by the `{slug}--{entityId}` record address
+(`apps/web/src/app/record-first-paint.tsx`); the display name is not the disambiguator.
+
+**No reviewed force-publish override was added.** The bead asked for one so the coincidental
+collisions could be published past the hold. There is nothing for it to unblock: all 18 fail a
+content gate first, and an override that admits 319-character registry templates into the public
+corpus is the failure the depth gate was written for. If a name-overlapping row ever does become
+publish-ready on its own merits, the mechanism to copy is `personReviewApproved`, the existing
+payload review marker that lets a reviewed person past the privacy hold, rather than a second
+review idiom.
+
+**The raw-code defect the bead was titled for is closed.** 0 of the 4,195 active-release rows trip
+any of the five `RAW_REGISTRY_VOCABULARY_PATTERNS`
+(`packages/ops-data/scripts/lib/nrhp-area-labels.ts`) across `projection`, `claims` and `taxonomy`.
+114 of the 132 NRHP name-overlap rows are live and carry corrected prose, published through the
+repo-8dlu republish exemption.

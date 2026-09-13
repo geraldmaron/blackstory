@@ -1386,8 +1386,8 @@ export function gateLandscapePublishCandidate(input: {
       detail: 'Green Book lane requires living/residence review',
     };
   }
-  // Hoisted above the location gate (it was declared just below `name_overlap`) because the
-  // location gate is now the third check to ask the ADMISSION vs REGRESSION question.
+  // Declared here, above the first of the four checks that ask the ADMISSION vs REGRESSION
+  // question: location, depth, confidence, and the name-collision hold that now runs last.
   const republishingLiveRow = input.allowRepublish === true && row.exact_in_release === true;
 
   /*
@@ -1431,31 +1431,6 @@ export function gateLandscapePublishCandidate(input: {
       eligible: false,
       reason: 'already_in_public',
       detail: 'entity id already in active release',
-    };
-  }
-  // repo-8dlu: the same ADMISSION vs REGRESSION distinction the depth gate makes below.
-  //
-  // For a NEW candidate this check is right and unchanged: do not admit a second
-  // "Mount Zion Missionary Baptist Church" whose name collides with one already public, because
-  // readers cannot tell two identically-named records apart.
-  //
-  // For a row ALREADY LIVE under its own entity id it asks the wrong question. The record is not
-  // competing for a name — it already holds one, and this is an in-place correction of the text
-  // under that name. Blocking it changes nothing about the collision and only keeps the stale
-  // prose public. It fires hardest on exactly the names that repeat by nature (AME churches,
-  // Mount Zion Baptist, Lincoln School), which is why it was pinning 99 live summaries that still
-  // print the raw NPS code `ethnic heritage (Black)` while their corrected, researched prose sat
-  // in bb_research at status='accepted'.
-  //
-  // The SQL behind `name_overlap` already excludes the row's own ids (LANDSCAPE_BY_LANE_SQL:
-  // `re.entity_id <> lc.id AND re.entity_id <> lc.source_item_id`), so a genuine collision with a
-  // DIFFERENT live entity still sets the flag. Skipping it here is a decision about what to do
-  // with that flag on a republish, not a loosening of how it is computed.
-  if (row.name_overlap && !republishingLiveRow) {
-    return {
-      eligible: false,
-      reason: 'name_overlap',
-      detail: 'display_name overlaps existing release entity',
     };
   }
 
@@ -1574,6 +1549,52 @@ export function gateLandscapePublishCandidate(input: {
       eligible: false,
       reason: 'build_failed',
       detail: `${build.reason}: ${build.message}`,
+    };
+  }
+
+  /*
+   * LAST, deliberately: every other check runs first (repo-n7p6.10).
+   *
+   * repo-8dlu: the same ADMISSION vs REGRESSION distinction the depth gate makes above.
+   *
+   * For a NEW candidate this check is right and unchanged: do not admit a second
+   * "Mount Zion Missionary Baptist Church" whose name collides with one already public, because
+   * readers cannot tell two identically-named records apart.
+   *
+   * For a row ALREADY LIVE under its own entity id it asks the wrong question. The record is not
+   * competing for a name — it already holds one, and this is an in-place correction of the text
+   * under that name. Blocking it changes nothing about the collision and only keeps the stale
+   * prose public. It fires hardest on exactly the names that repeat by nature (AME churches,
+   * Mount Zion Baptist, Lincoln School), which is why it was pinning 99 live summaries that still
+   * printed the raw NPS code `ethnic heritage (Black)` while their corrected, researched prose
+   * sat in bb_research at status='accepted'.
+   *
+   * The SQL behind `name_overlap` already excludes the row's own ids (LANDSCAPE_BY_LANE_SQL:
+   * `re.entity_id <> lc.id AND re.entity_id <> lc.source_item_id`), so a genuine collision with a
+   * DIFFERENT live entity still sets the flag. Skipping it on a republish is a decision about
+   * what to do with that flag, not a loosening of how it is computed.
+   *
+   * WHY LAST. Eligibility is a conjunction, so position cannot change WHETHER a row publishes.
+   * It changes only which reason the skip report prints, and this is the one reason whose remedy
+   * is a person rather than more research. Ranked ahead of the content gates it masked them:
+   * measured 2026-09-13, 76 held candidates reported `name_overlap`, and with the flag ignored 70
+   * of them still failed a content check. `summary_too_short` took 32 of those, including all 18
+   * nrhp-black-heritage rows (319-392 chars against the 400 floor); the rest fell to
+   * missing_location, greenbook_lane or person_kind. That misattribution is what repo-n7p6.10 was
+   * filed on: "each of the 99 needs a human look", when adjudicating any of them would have
+   * changed nothing. Run last, the `name_overlap` bucket means what a review queue needs it to
+   * mean: this row is publish-ready in every other respect, and only the name collision is left
+   * to settle.
+   *
+   * The cost is building the entry for a row that will be skipped anyway. That is pure CPU on a
+   * row the publisher was already going to read, and buying an honest skip reason with it is the
+   * trade this gate wants.
+   */
+  if (row.name_overlap && !republishingLiveRow) {
+    return {
+      eligible: false,
+      reason: 'name_overlap',
+      detail: 'display_name overlaps existing release entity',
     };
   }
 

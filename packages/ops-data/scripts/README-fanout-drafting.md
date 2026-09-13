@@ -146,6 +146,9 @@ From the repo root, with `set -a && source apps/web/.env.local && set +a` and
 
    Expect some drafted records not to publish. Two gates legitimately hold them back and neither
    is a drafting problem: `confidence_below_floor` (repo-60zx) and `name_overlap` (repo-n7p6.10).
+   Since repo-n7p6.10 the collision check runs last, so a row reported as `name_overlap` has
+   already cleared every content gate and only the duplicate display name is left to settle. A row
+   that still needs drafting reports the drafting reason instead.
 
    The lane-wide `--republish` scans the whole lane and takes several minutes; run it in the
    background rather than under a short command timeout.
