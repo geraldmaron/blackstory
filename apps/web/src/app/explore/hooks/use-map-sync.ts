@@ -3,6 +3,10 @@ import type { MapStageHandle } from '../../../components/map-stage/MapStage';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
 import { nationalFieldPatch } from '../../../lib/map-experience/national-field';
 import type { ExploreViewModel } from '../explore-view-model';
+import {
+  NO_POPULATION_CHOROPLETH,
+  type PopulationChoroplethLevels,
+} from './use-population-choropleth';
 
 /** Keeps the map plate in sync with the lens and the selection. Owns no state of its own. */
 export function useMapSync(
@@ -23,6 +27,16 @@ export function useMapSync(
    * it is read at the moment the data changes, which is the only moment it means anything.
    */
   fadeNextPatch = false,
+  /**
+   * The Black-population choropleth tiers for the active layer model (from
+   * `usePopulationChoropleth`, keyed on the Lens's own `layerMode` rather than the URL-seeded
+   * `view.viewState.layerMode`). Defaults to empty so a caller mid-migration onto this hook still
+   * gets the presence-only patch this effect always built. Empty levels are a no-op for
+   * `nationalFieldPatch` — `MapStage` falls back to its density join whenever the choropleth list
+   * is empty, so passing `NO_POPULATION_CHOROPLETH` here is exactly the resting behavior before
+   * this parameter existed.
+   */
+  populationLevels: PopulationChoroplethLevels = NO_POPULATION_CHOROPLETH,
 ) {
   const fadeNextPatchRef = useRef(fadeNextPatch);
   fadeNextPatchRef.current = fadeNextPatch;
@@ -39,6 +53,9 @@ export function useMapSync(
           clusteringEnabled: view.viewState.group,
           satellite,
           historyEdgeCollection: view.edgeLineCollection,
+          stateChoroplethLevels: populationLevels.stateChoroplethLevels,
+          countyChoroplethLevels: populationLevels.countyChoroplethLevels,
+          ...(populationLevels.popGeo ? { popGeo: populationLevels.popGeo } : {}),
         },
       ),
       fadeNextPatchRef.current ? { fade: true } : undefined,
@@ -52,6 +69,7 @@ export function useMapSync(
     view.edgeLineCollection,
     view.viewState.group,
     view.viewState.layerMode,
+    populationLevels,
   ]);
 
   useEffect(() => {

@@ -49,6 +49,7 @@ import { usePanelVisibility, type PanelVisibility } from './hooks/use-panel-visi
 import { useSavedCollection } from './hooks/use-saved-collection';
 import { useLensFilters } from './hooks/use-lens-filters';
 import { useMapSync } from './hooks/use-map-sync';
+import { usePopulationChoropleth } from './hooks/use-population-choropleth';
 import { useAtlasCamera } from './hooks/use-atlas-camera';
 import { useRecordSelection } from './hooks/use-record-selection';
 import { usePaletteData } from './hooks/use-palette-data';
@@ -233,6 +234,11 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   const sweepClearingPlate =
     sweepDecade !== null && (decadeBars[0] === undefined || sweepDecade < decadeBars[0].decade);
 
+  // Black-population choropleth tiers for the Lens's own `layerMode` (not the URL-seeded
+  // `view.viewState.layerMode` — see the effect below). Empty (and no fetch) whenever the layer
+  // model is `off` / `presence`; loads the compact state or county index lazily on first ask.
+  const populationLevels = usePopulationChoropleth(layerMode, view.viewState);
+
   useMapSync(
     stage,
     view,
@@ -242,6 +248,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     selectedId,
     stateCode,
     sweepClearingPlate,
+    populationLevels,
   );
 
   // The Lens's own population-layer choice overrides the URL-seeded `view.viewState.layerMode`
@@ -258,7 +265,9 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           clusteringEnabled: view.viewState.group,
           satellite: layers.satellite,
           historyEdgeCollection: view.edgeLineCollection,
-          ...(view.viewState.popGeo ? { popGeo: view.viewState.popGeo } : {}),
+          stateChoroplethLevels: populationLevels.stateChoroplethLevels,
+          countyChoroplethLevels: populationLevels.countyChoroplethLevels,
+          ...(populationLevels.popGeo ? { popGeo: populationLevels.popGeo } : {}),
         },
       ),
     );
@@ -271,7 +280,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     view.densityLevels,
     view.edgeLineCollection,
     view.viewState.group,
-    view.viewState.popGeo,
+    populationLevels,
   ]);
 
   // "Place labels" (§5.2): the map plate's own basemap label layers. Reapplied on every
@@ -594,7 +603,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         <div className="ds-atlas__legend-overlay" role="dialog" aria-label="Legend">
           <MapExperienceLegend
             layerMode={layerMode}
-            {...(view.viewState.popGeo ? { popGeo: view.viewState.popGeo } : {})}
+            {...(populationLevels.popGeo ? { popGeo: populationLevels.popGeo } : {})}
             onHide={() => setLegendOpen(false)}
           />
         </div>
