@@ -10,6 +10,7 @@ import {
   buildArtifactsForEntry,
   canonicalUpsertParamsFromLandscape,
   carryLiveClaims,
+  catalogDecisionFromRow,
   claimCountRegressed,
   liveSourceClaims,
   gateLandscapePublishCandidate,
@@ -25,7 +26,9 @@ import {
   toSearchIndexRow,
   visitOverrideFromCanonicalRow,
   type CanonicalVisitRow,
+  type CatalogDecisionRow,
   type LandscapePublishRow,
+  type PublishCatalogDecision,
   type LiveLocationInheritance,
 } from './incremental-publish.ts';
 import {
@@ -2244,4 +2247,241 @@ test('the regression control fires when the union is bypassed', () => {
     { ...LIVE_CLAIM, id: 'claim_02', predicate: 'location', object: 'Greenwood District' },
   ]);
   assert.equal(claimCountRegressed(rebuiltOnly, live), true);
+});
+
+/*
+ * repo-vj7cs — a withdrawn record must not come back on the next rebuild.
+ *
+ * Three records were withdrawn from the active release under owner rulings on 2026-09-13:
+ * sundown_crescent_springs_kentucky and nrhp-black-heritage-08000095 (repo-eh9cp / repo-n09b),
+ * then sundown_st_john_missouri (repo-tdffc). Each withdrawal deleted the record's
+ * bb_public.release_entities + search_index rows and recorded the reason in
+ * bb_ops.catalog_decisions. All three still exist in bb_canonical by design — the ruling was
+ * "unpublish, do not delete the research."
+ *
+ * That left the withdrawal holding only until something rebuilt release_entities, and this
+ * publisher is the only thing that inserts into it. So these tests use the real withdrawn ids,
+ * each row in the ENRICHED state that would actually reach the publisher: a summary inside the
+ * current editorial band, plus written historical context. A bare registry row is held back by
+ * the depth and length gates for reasons that have nothing to do with the ruling, and a test
+ * leaning on those would pass while proving nothing.
+ *
+ * Two caveats a later reader should not have to rediscover. The sundown records carry no
+ * bb_research.landscape_candidates row today, so `sundown-towns` is a stand-in lane name for the
+ * shape a future rebuild would present, not a lane that exists. And the NRHP row's live summary
+ * is currently 246 characters, below the publisher's floor, so that record cannot resurrect
+ * through this path until an enrichment pass lengthens it — which is a timing accident, not a
+ * second gate, and exactly the kind of thing this test exists to stop depending on.
+ */
+/**
+ * Prose long enough to clear the editorial band the publisher enforces, hedged and attributed the
+ * way the owner ruling demanded. The fixtures must be publishable to be worth anything here, and
+ * an unhedged accusation in a fixture is the very thing these records were withdrawn for.
+ */
+const sundownSummary = (place: string, county: string): string =>
+  `${place} appears in the compiled sundown-town research literature, which gathers oral ` +
+  `testimony, local newspaper notices and census population series for towns across ${county} ` +
+  'and catalogs them by how strong the underlying documentation is. The compilation records ' +
+  `${place} as a claim drawn from secondary accounts rather than a finding established by a ` +
+  'primary municipal record, and the entry carries that qualification with it. Researchers ' +
+  'working from the same series note that a population series alone cannot distinguish an ' +
+  'exclusion policy from other causes of demographic change, so the entry is presented as a ' +
+  'research lead and not as a conclusion about the town.';
+
+const WITHDRAWN_CONTEXT =
+  'The compilation this entry rests on is a research index, not an adjudication. Local histories ' +
+  'and the town record would have to be read directly before any of this goes back in front of a ' +
+  'reader, which is what the withdrawal ruling asked for.';
+
+const withdrawnRow = (
+  overrides: Partial<LandscapePublishRow> & Pick<LandscapePublishRow, 'id'>,
+): LandscapePublishRow =>
+  baseRow({
+    lane: 'sundown-towns',
+    kind: 'place',
+    source_item_id: overrides.id,
+    // An explicit enrichment confidence, the way a staged row carries one, so the assertions
+    // below turn on the ruling rather than on how the confidence engine happens to score a
+    // stand-in source host.
+    payload: { historicalContext: WITHDRAWN_CONTEXT, enrichment: { confidence: 0.86 } },
+    ...overrides,
+  });
+
+const WITHDRAWN_ROWS: readonly LandscapePublishRow[] = [
+  withdrawnRow({
+    id: 'sundown_crescent_springs_kentucky',
+    display_name: 'Crescent Springs, Kentucky',
+    summary: sundownSummary('Crescent Springs', 'Kenton County, Kentucky'),
+    canonical_url: 'https://example.org/sundown-research/crescent-springs-ky',
+    provenance: { sourceCity: 'Crescent Springs', sourceState: 'KY' },
+    lat: 39.0439,
+    lng: -84.5866,
+  }),
+  withdrawnRow({
+    id: 'sundown_st_john_missouri',
+    display_name: 'St. John, Missouri',
+    summary: sundownSummary('St. John', 'St. Louis County, Missouri'),
+    canonical_url: 'https://example.org/sundown-research/st-john-mo',
+    provenance: { sourceCity: 'St. John', sourceState: 'MO' },
+    lat: 38.7156,
+    lng: -90.3562,
+  }),
+  withdrawnRow({
+    id: 'nrhp-black-heritage-08000095',
+    lane: 'nrhp-black-heritage',
+    display_name: 'St. Agnes Cemetery',
+    summary:
+      'St. Agnes Cemetery in Menands, Albany County, New York was consecrated in 1867 and laid ' +
+      'out in the rural cemetery style, with curving drives and mature plantings across roughly ' +
+      '108 acres. It was listed on the National Register of Historic Places in 2008, and the ' +
+      'nomination records its funerary art and landscape architecture alongside the veterans of ' +
+      'the Civil War, the Spanish-American War and both World Wars buried there. The nomination ' +
+      'is the document this entry rests on, and what it does and does not establish about the ' +
+      "cemetery's place in Black history is the question the withdrawal ruling reopened.",
+    canonical_url: 'https://npgallery.nps.gov/AssetDetail/NRIS/08000095',
+    source_item_id: '08000095',
+    provenance: {
+      refnum: '08000095',
+      sourceCity: 'Menands',
+      sourceState: 'NY',
+      sourceUrl: 'https://npgallery.nps.gov/AssetDetail/NRIS/08000095',
+    },
+    payload: {
+      refnum: '08000095',
+      listedDateSerial: '39506',
+      areaOfSignificance: 'SOCIAL HISTORY; LANDSCAPE ARCHITECTURE; BLACK; ETHNIC HERITAGE-BLACK',
+      historicalContext: WITHDRAWN_CONTEXT,
+      enrichment: { confidence: 0.86 },
+    },
+    lat: 42.58824,
+    lng: -73.97401,
+  }),
+];
+
+const RETRACTION: CatalogDecisionRow = {
+  entity_id: 'unused-in-these-assertions',
+  decision: 'flag_for_retraction',
+  reason: 'repo-eh9cp: owner ruling 2026-09-12',
+};
+
+/**
+ * `catalogDecisionFromRow` with its undefined branch asserted away. The gate's input is an
+ * exact optional property, so a `T | undefined` cannot be spread into it, and asserting here
+ * keeps a fixture that stopped parsing from quietly turning into a gate that was never asked.
+ */
+const decisionFor = (row: CatalogDecisionRow): PublishCatalogDecision => {
+  const decision = catalogDecisionFromRow(row);
+  assert.ok(decision, `fixture decision "${row.decision}" should parse`);
+  return decision;
+};
+
+/**
+ * The control. Without it, every assertion below would also pass on a fixture the gate rejects
+ * for some unrelated reason, and the test would prove nothing about the ruling.
+ */
+test('the three records withdrawn on 2026-09-13 are otherwise publishable', () => {
+  for (const row of WITHDRAWN_ROWS) {
+    const result = gateLandscapePublishCandidate({
+      row,
+      releaseId: 'rel_seed_001',
+      generatedAt: '2026-09-13T00:00:00.000Z',
+    });
+    assert.equal(result.eligible, true, `${row.id} should be eligible with no decision standing`);
+  }
+});
+
+test('an open flag_for_retraction keeps a withdrawn record out of a rebuild', () => {
+  for (const row of WITHDRAWN_ROWS) {
+    const result = gateLandscapePublishCandidate({
+      row,
+      releaseId: 'rel_seed_001',
+      generatedAt: '2026-09-13T00:00:00.000Z',
+      // Asserted under --republish, because a lane correction pass is precisely the run that
+      // would have brought these back.
+      allowRepublish: true,
+      catalogDecision: decisionFor({ ...RETRACTION, entity_id: row.id }),
+    });
+    assert.equal(result.eligible, false, `${row.id} must not republish under a retraction`);
+    if (result.eligible) return;
+    assert.equal(result.reason, 'catalog_decision_retracted');
+    assert.match(result.detail, /owner ruling/);
+  }
+});
+
+/**
+ * The ruling outranks the editorial checks. A withdrawn record whose summary is also too short
+ * must not be reported as `summary_too_short`, which reads as "lengthen it and it publishes"
+ * when the truth is that it must not publish at any length — and the run report's `retractedIds`
+ * line would undercount if another check could claim the skip first. This is the live shape of
+ * the NRHP record today: its landscape summary is 246 characters, under the publisher's floor.
+ */
+test('the withdrawal ruling outranks the editorial gates that would also skip the record', () => {
+  const row = { ...WITHDRAWN_ROWS[2]!, summary: 'Too short to publish on its own.' };
+  const withoutDecision = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-13T00:00:00.000Z',
+    allowRepublish: true,
+  });
+  // The control: without the ruling this row really is skipped for the shorter-summary reason.
+  assert.equal(withoutDecision.eligible, false);
+  assert.equal(withoutDecision.eligible === false && withoutDecision.reason, 'summary_too_short');
+
+  const withDecision = gateLandscapePublishCandidate({
+    row,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-13T00:00:00.000Z',
+    allowRepublish: true,
+    catalogDecision: decisionFor({ ...RETRACTION, entity_id: row.id }),
+  });
+  assert.equal(withDecision.eligible, false);
+  assert.equal(
+    withDecision.eligible === false && withDecision.reason,
+    'catalog_decision_retracted',
+  );
+});
+
+test('buildArtifactsForEntry refuses to build rows for a withdrawn record', () => {
+  const row = WITHDRAWN_ROWS[0]!;
+  const entry = buildReleaseSourceFromLandscape(row);
+  assert.ok(entry);
+  // Straight to the builder, bypassing the gate: this is the call that produces the upsert rows,
+  // so it has to refuse on its own rather than trusting a caller to have gated first.
+  const built = buildArtifactsForEntry({
+    entry: entry!,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-09-13T00:00:00.000Z',
+    catalogDecision: decisionFor({ ...RETRACTION, entity_id: row.id }),
+  });
+  assert.equal(built.ok, false);
+  if (built.ok) return;
+  assert.match(built.detail, /catalog_decision_retracted/);
+});
+
+test('a lifted or advisory decision does not block a republish', () => {
+  const row = WITHDRAWN_ROWS[0]!;
+  for (const decision of ['clear_flag', 'needs_review'] as const) {
+    const result = gateLandscapePublishCandidate({
+      row,
+      releaseId: 'rel_seed_001',
+      generatedAt: '2026-09-13T00:00:00.000Z',
+      catalogDecision: decisionFor({ ...RETRACTION, entity_id: row.id, decision }),
+    });
+    assert.equal(result.eligible, true, `${decision} must not act as a withdrawal`);
+  }
+});
+
+test('catalogDecisionFromRow reads the standing verdict and refuses to guess', () => {
+  assert.deepEqual(catalogDecisionFromRow(RETRACTION), {
+    action: 'flag_for_retraction',
+    reason: 'repo-eh9cp: owner ruling 2026-09-12',
+  });
+  // `reason` is nullable in bb_ops.catalog_decisions; an absent one must not become "null".
+  assert.deepEqual(catalogDecisionFromRow({ ...RETRACTION, reason: null }), {
+    action: 'flag_for_retraction',
+    reason: '',
+  });
+  assert.equal(catalogDecisionFromRow(undefined), undefined);
+  assert.equal(catalogDecisionFromRow(null), undefined);
+  assert.equal(catalogDecisionFromRow({ ...RETRACTION, decision: 'retract_maybe' }), undefined);
 });

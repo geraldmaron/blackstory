@@ -18,6 +18,11 @@
  * against the theme-packet slug bindings in
  * `packages/ops-data/fixtures/theme-impact/chicago-bronzeville-bindings.ts`:
  * no overlap with these five legacy slugs, so no conflict there either.
+ *
+ * This fixture is also the only thing keeping `publicStoryProjectionSchema`
+ * alive in `@repo/schemas` (repo-vn1z). `public-story-seed.test.ts` parses
+ * every story through that schema so the tie is enforced, not just asserted
+ * here.
  */
 import type { PublicStoryProjectionDoc } from '@repo/schemas';
 

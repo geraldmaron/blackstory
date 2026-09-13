@@ -338,6 +338,21 @@ export const publicStoryThemeBindingSchema = z.object({
 });
 export type PublicStoryThemeBindingDoc = z.infer<typeof publicStoryThemeBindingSchema>;
 
+/**
+ * Longform story shape. `bb_public.release_stories` was dropped on 2026-07-29
+ * (supabase/migrations/20260729190000_drop_release_stories.sql) and `/stories` now reads
+ * articles, so nothing publishes against this schema any more.
+ *
+ * It is still load-bearing as a TYPE, not as a parser: `PublicStoryProjectionDoc` types the
+ * five-story fixture in `packages/domain/src/publication/public-story-seed.ts`, which backs the
+ * admin cover-package workflow (`/admin/stories/articles`, `/admin/stories/review`) through
+ * `apps/web/src/admin/stories/cover-article-catalog.ts`. repo-zcnr (2026-09-12) decided that
+ * fixture stays until the admin workflow gets a real-article source, so this schema stays with
+ * it. Retire them together, not separately.
+ *
+ * The companion list-item projection was deleted with repo-vn1z: it existed only to keep
+ * `/stories` list reads small, and that route is gone.
+ */
 export const publicStoryProjectionSchema = z.object({
   id: z.string().min(1),
   releaseId: z.string().min(1),
@@ -356,13 +371,6 @@ export const publicStoryProjectionSchema = z.object({
   themeBinding: publicStoryThemeBindingSchema.optional(),
 });
 export type PublicStoryProjectionDoc = z.infer<typeof publicStoryProjectionSchema>;
-
-export const publicStoryListItemSchema = publicStoryProjectionSchema.omit({
-  body: true,
-  relatedEntityIds: true,
-  sources: true,
-});
-export type PublicStoryListItemDoc = z.infer<typeof publicStoryListItemSchema>;
 
 /**
  * The cached grading inputs, mirroring `RecordEvidenceInputs` in

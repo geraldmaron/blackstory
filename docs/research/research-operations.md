@@ -146,11 +146,25 @@ local capture still runs (`wayback.status: skipped_no_credentials`).
 
 Do not run unbounded `--wayback --commit` against the full cited-URL inventory. Use
 `--max-captures`, `--max-entities`, and the daily `source_fetch` budget in
-[`capture-completeness-ops-bar.md`](./capture-completeness-ops-bar.md). Failed local fetches do
-not mint SPN jobs; that lookup-fallback is a separate lane.
+[`capture-completeness-ops-bar.md`](./capture-completeness-ops-bar.md). Failed local fetches
+still do not mint SPN jobs.
 
-**Never:** raw `fetch` to archive.org; fabricate a Wayback URL when SPN fails; treat `--wayback`
-without `--commit` as a live save (dry-run only reports `wayback.status: planned`).
+**Availability lookup (read, not save).** Under `--commit`, the lane asks
+`archive.org/wayback/available` what Internet Archive already holds at two points: after a local
+safe-fetch fails, and, with `--wayback` on, before minting a new SPN2 capture. A URL we cannot
+read ourselves (a PDF, a robots block, a dead host) is the likeliest to already have a snapshot,
+and an existing snapshot makes a new SPN job redundant. The pointer is recorded verbatim as
+`waybackCaptureUrl` on `retrieval_events.detail`, and on `source_captures.storage_object` when a
+capture row exists, tagged `waybackCaptureSource: availability-lookup`. It needs no credentials,
+so it runs whether or not SPN keys are set. A miss is a recorded skip, never a failure: the row
+carries `waybackLookupStatus: miss` with a reason. Counts land in the report under
+`waybackLookup` (`attempted`, `found`, `missed`, `recoveredAfterFetchFailure`) and
+`wayback.reusedExistingSnapshot`. The lane does not apply a `wayback_swap` to public citations;
+`citation-link-health-sweep` owns that for stored pointers.
+
+**Never:** raw `fetch` to archive.org; fabricate a Wayback URL when SPN fails or when a lookup
+misses; treat `--wayback` without `--commit` as a live save (dry-run only reports
+`wayback.status: planned`, and makes no lookup request either).
 
 ---
 

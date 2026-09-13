@@ -85,6 +85,7 @@ import { createSupabaseStorage, supabaseStorageConfigFromEnv } from './supabase-
 import { runCaptureBackfill, persistCapture } from './capture-backfill.js';
 import { waybackCredentialsFromEnv } from './wayback-credentials.js';
 import { createWaybackAnchor } from './wayback-anchor.js';
+import { createWaybackLookup } from './wayback-lookup.js';
 import { waybackSafeHttpClient } from './wayback-http.js';
 
 /**
@@ -948,6 +949,8 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         // Anti-rot/anti-spoof: snapshot every cited URL. Safe by default (dry-run
         // inventory + coverage report); --commit performs SSRF-safe fetches + writes.
         // --wayback POSTs successful captures to SPN2 when IA keys are present.
+        // The availability lookup is wired unconditionally: it needs no credentials, and it
+        // only fires under --commit, after a local fetch fails or before SPN mints a capture.
         const pool = getOpsPostgresPool(process.env);
         const commit = flags.booleans.has('--commit');
         const wayback = flags.booleans.has('--wayback');
@@ -971,6 +974,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           newId: (prefix, seed) =>
             `${prefix}_${createHash('sha1').update(seed).digest('hex').slice(0, 16)}`,
           now: () => new Date().toISOString(),
+          waybackLookup: createWaybackLookup({ client: waybackSafeHttpClient }),
           ...(waybackCredentials
             ? {
                 waybackAnchor: createWaybackAnchor({

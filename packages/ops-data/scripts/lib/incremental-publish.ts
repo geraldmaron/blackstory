@@ -13,6 +13,7 @@ import {
   normalizePublicPrecision,
   type CanonicalStatusSnapshot,
   type PublicVisit,
+  type ReleaseBuildContext,
   type ReleaseEntityProjectionFields,
   type ReleaseLocationOverride,
   type ReleaseSearchIndexFields,
@@ -78,7 +79,13 @@ export type PublishGateSkipReason =
   | 'build_failed'
   | 'confidence_below_floor'
   /** A republish would publish fewer claims than the record already carries (repo-cjlkp). */
-  | 'claim_count_regression';
+  | 'claim_count_regression'
+  /**
+   * An open `flag_for_retraction` decision stands against this entity (repo-vj7cs). Named as its
+   * own skip reason rather than folded into `build_failed` so a run report says out loud that a
+   * withdrawal held, instead of burying it in a detail string nobody reads.
+   */
+  | 'catalog_decision_retracted';
 
 export type PublishGateResult =
   | {
@@ -169,6 +176,7 @@ function buildContext(input: {
   readonly canonicalStatus?: CanonicalStatusSnapshot;
   readonly visitOverride?: PublicVisit;
   readonly locationOverride?: ReleaseLocationOverride;
+  readonly catalogDecision?: PublishCatalogDecision;
 }) {
   return {
     releaseId: input.releaseId,
@@ -176,6 +184,7 @@ function buildContext(input: {
     ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
     ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
     ...(input.locationOverride !== undefined ? { locationOverride: input.locationOverride } : {}),
+    ...(input.catalogDecision !== undefined ? { catalogDecision: input.catalogDecision } : {}),
   };
 }
 
@@ -264,6 +273,46 @@ export function parseCanonicalStatusSnapshot(
     ...(livingStatus !== undefined ? { livingStatus } : {}),
     ...(statusHistory.length > 0 ? { statusHistory } : {}),
   };
+}
+
+/**
+ * The retraction verdict the release builder's own gate reads, narrowed off `ReleaseBuildContext`
+ * rather than restated here so the three action values cannot drift apart from the domain's.
+ */
+export type PublishCatalogDecision = NonNullable<ReleaseBuildContext['catalogDecision']>;
+
+/** One `bb_ops.catalog_decisions` row, as the publisher's lookup selects it. */
+export type CatalogDecisionRow = {
+  readonly entity_id: string;
+  readonly decision: string;
+  readonly reason: string | null;
+};
+
+/**
+ * Parses the standing `bb_ops.catalog_decisions` row for one entity into build context.
+ *
+ * repo-vj7cs: the table has held the owner's withdrawal rulings since 2026-09-13 and nothing on
+ * the publish path had ever read it, so a withdrawal survived only until the next rebuild of
+ * `bb_public.release_entities`. `buildReleaseEntityArtifacts` has carried the gate the whole
+ * time (`ReleaseBuildContext.catalogDecision` -> `catalog_decision_retracted`); what was missing
+ * was a caller that loaded the row. This is that loader's parse half.
+ *
+ * `entity_id` is the table's primary key, so there is exactly one standing decision per entity
+ * and a later `clear_flag` has already overwritten the retraction it lifts. That is why this
+ * reads the row as-is instead of folding a decision history: the row IS the current verdict.
+ * An unrecognized `decision` returns undefined rather than guessing at what it meant, which
+ * leaves the entity ungated. That is the same shape as the other optional context loaders here,
+ * and the column's CHECK constraint is what keeps the branch unreachable in practice.
+ */
+export function catalogDecisionFromRow(
+  row: CatalogDecisionRow | null | undefined,
+): PublishCatalogDecision | undefined {
+  if (!row) return undefined;
+  const action = row.decision.trim();
+  if (action !== 'flag_for_retraction' && action !== 'needs_review' && action !== 'clear_flag') {
+    return undefined;
+  }
+  return { action, reason: row.reason?.trim() ?? '' };
 }
 
 export function canonicalUpsertParamsFromLandscape(
@@ -1360,9 +1409,45 @@ export function gateLandscapePublishCandidate(input: {
    * wired in.
    */
   readonly visitOverride?: PublicVisit;
+  /**
+   * repo-vj7cs: the standing `bb_ops.catalog_decisions` row for this entity
+   * (`catalogDecisionFromRow`), when the caller looked one up. A `flag_for_retraction` decision
+   * is the owner's withdrawal ruling, and it must outlive the deletion of the entity's
+   * `bb_public.release_entities` row — otherwise the withdrawal holds only until the next lane
+   * republish rebuilds that row from `bb_research.landscape_candidates`, which is exactly what
+   * happened to the three records withdrawn on 2026-09-13.
+   *
+   * `buildReleaseEntityArtifacts` owns the rule; this gate answers it first (see the
+   * short-circuit at the top) so the skip is reported as the ruling rather than as whichever
+   * editorial check happened to fire, and forwards the decision into the build so the authority
+   * still refuses on its own. Omitting it leaves the entity ungated, same as every other optional
+   * context field — which is why the publisher loads it for every id it evaluates rather than
+   * only for republish candidates.
+   */
+  readonly catalogDecision?: PublishCatalogDecision;
 }): PublishGateResult {
   const floor = input.confidenceFloor ?? INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR;
   const row = input.row;
+
+  /*
+   * Answered first, ahead of every editorial check below.
+   *
+   * `buildReleaseEntityArtifacts` is still the authority on this rule and refuses the record on
+   * its own at the bottom of this function — this is a short-circuit for ORDER, not a second
+   * implementation, and if the two ever disagree the build's verdict is the one that decides
+   * whether a row gets written. Order matters for two reasons. A withdrawn record that also has,
+   * say, a short summary would otherwise be reported as `summary_too_short`, which reads as "fix
+   * the summary and it publishes" when the truth is that it must not publish at any summary
+   * length. And the run report's `retractedIds` would undercount, so the one line that says which
+   * withdrawals held on this run could not be trusted.
+   */
+  if (input.catalogDecision?.action === 'flag_for_retraction') {
+    return {
+      eligible: false,
+      reason: 'catalog_decision_retracted',
+      detail: `withdrawn by catalog decision: ${input.catalogDecision.reason}`,
+    };
+  }
 
   const reviewed = personReviewApproved(row.payload);
   if (row.kind === 'person' && !reviewed) {
@@ -1542,9 +1627,16 @@ export function gateLandscapePublishCandidate(input: {
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
       ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
       ...(locationOverride !== undefined ? { locationOverride } : {}),
+      ...(input.catalogDecision !== undefined ? { catalogDecision: input.catalogDecision } : {}),
     }),
   );
   if (!build.ok) {
+    // The withdrawal ruling gets its own skip reason instead of the generic `build_failed`, so
+    // a run report counts it separately and an operator can see at a glance that a retraction
+    // held. The rule that produced it still lives in one place, the release builder.
+    if (build.reason === 'catalog_decision_retracted') {
+      return { eligible: false, reason: 'catalog_decision_retracted', detail: build.message };
+    }
     return {
       eligible: false,
       reason: 'build_failed',
@@ -1726,6 +1818,13 @@ export function buildArtifactsForEntry(input: {
   readonly visitOverride?: PublicVisit;
   /** `gateLandscapePublishCandidate`'s `locationOverride` result, forwarded verbatim. */
   readonly locationOverride?: ReleaseLocationOverride;
+  /**
+   * See the matching field on `gateLandscapePublishCandidate`'s input. Forwarded here as well
+   * because this, not the gate, is the call that produces the rows the publisher upserts: the
+   * gate's build is a probe, and a caller that reached this function by some other route must
+   * still not be able to write a withdrawn record back into the release.
+   */
+  readonly catalogDecision?: PublishCatalogDecision;
 }): PublishArtifactsResult {
   const build = buildReleaseEntityArtifacts(
     input.entry,
@@ -1735,6 +1834,7 @@ export function buildArtifactsForEntry(input: {
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
       ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
       ...(input.locationOverride !== undefined ? { locationOverride: input.locationOverride } : {}),
+      ...(input.catalogDecision !== undefined ? { catalogDecision: input.catalogDecision } : {}),
     }),
   );
   if (!build.ok) {

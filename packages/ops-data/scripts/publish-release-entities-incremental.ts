@@ -26,6 +26,15 @@
  * Apply (requires explicit flag):
  *   DRY_RUN=0 INCREMENTAL_PUBLISH_APPLY=1 node --conditions development --import tsx \
  *     packages/ops-data/scripts/publish-release-entities-incremental.ts --from-landscape-pending
+ *
+ * WITHDRAWN RECORDS (repo-vj7cs): this is the only path that inserts into
+ * `bb_public.release_entities` / `bb_public.search_index`, which makes it the only place a
+ * record withdrawn from the catalog can come back. It reads the standing
+ * `bb_ops.catalog_decisions` verdict for every id it evaluates and skips anything carrying an
+ * open `flag_for_retraction` — reported as its own `catalog_decision_retracted` skip reason and
+ * listed in full under `retractedIds` in the run report. Withdrawing a record is therefore two
+ * steps that both matter: delete its published rows, and record the decision. The decision is
+ * what makes the deletion stick across the next rebuild.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -39,6 +48,7 @@ import {
   buildLiveDepthEntry,
   canonicalUpsertParamsFromLandscape,
   carryLiveClaims,
+  catalogDecisionFromRow,
   claimCountRegressed,
   gateLandscapePublishCandidate,
   incrementalPublishProvenancePatch,
@@ -48,8 +58,10 @@ import {
   visitOverrideFromCanonicalRow,
   type CanonicalEntityPublishRow,
   type CanonicalVisitRow,
+  type CatalogDecisionRow,
   type LandscapePublishRow,
   type LivePublishedRow,
+  type PublishCatalogDecision,
   type PublishGateSkipReason,
   type PublishStatusLintReport,
   type ReleaseEntityUpsertRow,
@@ -292,6 +304,35 @@ SELECT ids.entity_id,
 `;
 
 /**
+ * repo-vj7cs: the standing admin decision on each entity this run is about to (re)build.
+ *
+ * `bb_ops.catalog_decisions` is where a withdrawal ruling is recorded, and until this query
+ * existed nothing on any publish path read it. Withdrawing a record meant deleting its
+ * `bb_public.release_entities` + `search_index` rows, which this script rebuilds from
+ * `bb_research.landscape_candidates` — so the withdrawal survived exactly until the next lane
+ * republish, and the three records withdrawn on 2026-09-13 would have come back without anyone
+ * deciding to bring them back.
+ *
+ * Keyed on both `lc.id` and `lc.source_item_id` for the same reason the release-membership
+ * subqueries above are: the two ids name one record, and a ruling recorded against either of
+ * them is a ruling against the record. `entity_id` is the table's primary key, so this returns
+ * at most one standing verdict per id and a later `clear_flag` has already replaced the
+ * retraction it lifts.
+ *
+ * Deliberately its own lookup rather than a NOT EXISTS bolted onto the three LANDSCAPE_* queries,
+ * which is how the absorbed-entity filter (repo-n7p6.15) was written. That filter sits in
+ * LANDSCAPE_PENDING_SQL alone, so it covers a pending publish and not a `--lane` or `--ids`
+ * republish. Loading the verdict once and gating every candidate the run evaluates cannot go out
+ * of sync that way, and it can say WHY a record was skipped instead of making it vanish from the
+ * result set.
+ */
+const CATALOG_DECISIONS_BY_IDS_SQL = `
+SELECT entity_id, decision, reason
+FROM bb_ops.catalog_decisions
+WHERE entity_id = ANY($1::text[])
+`;
+
+/**
  * repo-b4ad: what is CURRENTLY published for these entities, so the depth gate can ask the
  * non-regression question ("is this better than what readers see?") instead of the admission
  * question ("is this good enough to publish at all?") for a record that is already live.
@@ -503,6 +544,8 @@ function preparePublish(input: {
   readonly livePublished?: LivePublishedRow;
   /** Raw canonical visit-contact input for this entity, when one exists. */
   readonly visitOverride?: PublicVisit;
+  /** The standing `bb_ops.catalog_decisions` verdict for this entity, when one exists. */
+  readonly catalogDecision?: PublishCatalogDecision;
 }): PreparedPublish | SkippedRow {
   if (input.fromLandscape && input.row) {
     // Computed here rather than in the batch load because the verdict needs the candidate row's
@@ -529,6 +572,7 @@ function preparePublish(input: {
       ...(liveLocation !== undefined ? { liveLocation } : {}),
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
       ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
+      ...(input.catalogDecision !== undefined ? { catalogDecision: input.catalogDecision } : {}),
     });
     if (!gate.eligible) {
       return { id: input.entityId, reason: gate.reason, detail: gate.detail };
@@ -552,6 +596,7 @@ function preparePublish(input: {
       generatedAt: input.generatedAt,
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
       ...(input.visitOverride !== undefined ? { visitOverride: input.visitOverride } : {}),
+      ...(input.catalogDecision !== undefined ? { catalogDecision: input.catalogDecision } : {}),
       // Forwarded, not re-derived: the gate already decided this record's location and this build
       // must produce the row the gate approved (`matchMethod` lives only here).
       ...(gate.locationOverride !== undefined ? { locationOverride: gate.locationOverride } : {}),
@@ -684,6 +729,26 @@ async function main(): Promise<void> {
     );
     const livePublishedById = new Map(liveRes.rows.map((row) => [row.entity_id, row]));
 
+    // Both ids per candidate, not just the one this run would publish under: see
+    // CATALOG_DECISIONS_BY_IDS_SQL. A `source_item_id` is null on plenty of rows and would
+    // otherwise widen the array with nulls that match nothing.
+    const decisionLookupIds = [
+      ...new Set(
+        sliced.flatMap((item) =>
+          [item.entityId, item.row?.source_item_id].filter(
+            (id): id is string => typeof id === 'string' && id.length > 0,
+          ),
+        ),
+      ),
+    ];
+    const catalogDecisionRes = await client.query<CatalogDecisionRow>(
+      CATALOG_DECISIONS_BY_IDS_SQL,
+      [decisionLookupIds],
+    );
+    const catalogDecisionById = new Map(
+      catalogDecisionRes.rows.map((row) => [row.entity_id, catalogDecisionFromRow(row)]),
+    );
+
     const prepared: PreparedPublish[] = [];
     const skipped: SkippedRow[] = [];
     const skipCounts = new Map<string, number>();
@@ -697,6 +762,15 @@ async function main(): Promise<void> {
           : undefined;
       const livePublished = livePublishedById.get(item.entityId);
       const canonicalStatus = canonicalById.get(item.entityId);
+      // A ruling recorded against either id withdraws the record, so take the retraction when
+      // either row carries one rather than letting id order decide which verdict is seen.
+      const decisionsForItem = [
+        catalogDecisionById.get(item.entityId),
+        item.row?.source_item_id ? catalogDecisionById.get(item.row.source_item_id) : undefined,
+      ].filter((decision): decision is PublishCatalogDecision => decision !== undefined);
+      const catalogDecision =
+        decisionsForItem.find((decision) => decision.action === 'flag_for_retraction') ??
+        decisionsForItem[0];
       const result = preparePublish({
         row: item.row,
         releaseId,
@@ -707,6 +781,7 @@ async function main(): Promise<void> {
         ...(livePublished !== undefined ? { livePublished } : {}),
         ...(canonicalStatus !== undefined ? { canonicalStatus } : {}),
         ...(visitOverride !== undefined ? { visitOverride } : {}),
+        ...(catalogDecision !== undefined ? { catalogDecision } : {}),
       });
       if ('reason' in result) {
         skipped.push(result);
@@ -748,6 +823,13 @@ async function main(): Promise<void> {
       publishedIds: prepared.map((row) => row.id),
       // Full list, not a sample: see `PreparedPublish.locationInherited`.
       locationInheritedIds: prepared.filter((row) => row.locationInherited).map((row) => row.id),
+      // Full list for the same reason, and a stronger one: this names every record a withdrawal
+      // ruling held back on this run (repo-vj7cs). A withdrawal that quietly stopped applying is
+      // the failure mode the gate exists to prevent, so it has to be legible in the report, not
+      // just possibly inside the first 20 skips.
+      retractedIds: skipped
+        .filter((row) => row.reason === 'catalog_decision_retracted')
+        .map((row) => row.id),
       skippedSample: skipped.slice(0, 20),
       // Recorded so an accepted coverage floor is auditable after the fact, not just a flag
       // someone typed once.
