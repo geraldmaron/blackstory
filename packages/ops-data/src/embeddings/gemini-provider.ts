@@ -1,7 +1,7 @@
 /**
  * Real gemini-embedding-001 provider, built on the official `@google/genai` client.
  *
- * Uses the Gemini Developer API (API-key auth), not Vertex AI ADR-014 explicitly rejects
+ * Uses the Gemini Developer API (API-key auth), not Vertex AI the decision explicitly rejects
  * Vertex AI *Vector Search* for the index itself (always-on per-node cost floor), and this
  * keeps the embedding *call* on the same minimal, non-Vertex surface rather than pulling in
  * Vertex project/location plumbing this project otherwise avoids.

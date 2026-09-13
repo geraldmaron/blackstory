@@ -9,7 +9,7 @@
  * is intentionally decoupled from. The interface below (`EvalEmbeddingProvider`) is shaped so a
  * caller *outside* this package can still plug in the real
  * `@repo/ops-data`'s `createGeminiEmbeddingProvider` (same `embed(texts)` signature) to
- * get a real recall number see ADR-014 for exactly what that requires (a live
+ * get a real recall number see `docs/decisions-carryover.md` ("Vector search") for what that requires (a live
  * `GEMINI_API_KEY`).
  */
 
@@ -43,7 +43,7 @@ function makeSeededRandom(seed: number): () => number {
  * @repo/ops-data's createDeterministicMockEmbeddingProvider, reimplemented locally per
  * this file's no-new-dependency rationale above. NOT semantically meaningful: it is a stable
  * stand-in that exercises the eval's ranking/metric plumbing without network access or an API
- * key. A real recall@k number requires swapping in a real provider see ADR-014.
+ * key. A real recall@k number requires swapping in a real provider see `docs/decisions-carryover.md` ("Vector search").
  */
 export function createDeterministicMockEvalProvider(dims = 128): EvalEmbeddingProvider {
   return {

@@ -8,7 +8,7 @@
  * against the real corpus fixture, produces a well-formed, reproducible result, and clears a
  * low sanity floor. A real recall@k number requires swapping in a live provider (e.g.
  * `@repo/ops-data`'s `createGeminiEmbeddingProvider` with a `GEMINI_API_KEY`) see
- * docs/adr/ADR-014-vector-search.md.
+ * `docs/decisions-carryover.md` ("Vector search").
  */
 import assert from 'node:assert/strict';
 import { dirname, join } from 'node:path';

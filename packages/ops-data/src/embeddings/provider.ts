@@ -110,7 +110,7 @@ export type MockEmbeddingProviderOptions = {
  * always gets the *same* vector. This is sufficient to exercise the pipeline's plumbing
  * (truncation, normalization, storage, KNN ranking, recall computation) end-to-end without
  * network access or an API key. A real recall number requires `createGeminiEmbeddingProvider`
- * with a live `GEMINI_API_KEY` see docs/adr/ADR-014-vector-search.md.
+ * with a live `GEMINI_API_KEY` see `docs/decisions-carryover.md` ("Vector search").
  */
 export function createDeterministicMockEmbeddingProvider(
   options: MockEmbeddingProviderOptions = {},

@@ -268,10 +268,11 @@ depending on the contract it publishes to is correct layering, not a violation; 
 ADR-022 carryover above, which already treats `public-contracts` as the shared
 environment-neutral wire-type package.
 
-Where domain restates a rule rather than importing it — `recordConfidenceTier` in
-`release-builder.ts`, the `ReleaseRevisionMetadata` shape in `mobile-bootstrap.ts` — the
-restatement is the consequence of this rule, and the two copies must be kept in agreement by
-test rather than by type. (from ADR-021, "dependency direction")
+Where domain restates a rule rather than importing it — `highestClaimConfidenceTier` in
+`release-builder.ts`, which copies `recordConfidenceTier` from
+`@repo/public-contracts/evidence`; the `ReleaseRevisionMetadata` shape in `mobile-bootstrap.ts`
+— the restatement is the consequence of this rule, and the two copies must be kept in agreement
+by test rather than by type. (from ADR-021, "dependency direction")
 
 **App/API compatibility policy (ADR-021 §2).** A client is incompatible when its app build is
 below the manifest's `minSupportedAppBuild` floor, or when it speaks an API major version the
@@ -299,3 +300,54 @@ and that is per-site topic judgment, not a find-and-replace. The precedent is th
 addendum above, which corrected only the sites feeding its own decision and filed the rest.
 A blind sweep would restate rules nobody verified, which is how the dependency direction became
 binding-but-unwritten in the first place.
+
+## Vector search (recovered 2026-09-13, repo-gtm2y)
+
+`docs/adr/ADR-014-vector-search.md` does not exist and never survived the 2026-07-24 purge, but it
+is cited 14 times outside the built export, and three of those citations name the dead file PATH,
+so a reader can try to open it and get nothing. Recovered here from the code that implements it.
+
+**Embedding shape.** Every entity vector is `gemini-embedding-001`, Matryoshka-truncated and
+unit-normalized to 768 dimensions (`packages/ops-data/src/embeddings/constants.ts`:
+`EMBEDDING_MODEL`, `EMBEDDING_DIMS`). 768 is not a preference — it is a hard gate: the storage
+column is `extensions.vector(768) NOT NULL`
+(`supabase/migrations/20260720220006_canonical_entities_claims.sql`), so a vector of any other
+width fails to insert. The pipeline truncates and renormalizes locally even when it also asks the
+server to truncate (`gemini-provider.ts`), so the stored vector does not depend on the provider
+honoring that request. (from ADR-014, "vector search")
+
+**Similarity measure.** `DOT_PRODUCT`, which is equivalent to cosine similarity on unit-normalized
+vectors and cheaper (`constants.ts`: `DISTANCE_MEASURE`). This is only true while the vectors are
+in fact unit-normalized, which is why normalization is part of the pipeline rather than a caller's
+responsibility. (from ADR-014, "vector search")
+
+**Gemini Developer API, not Vertex AI.** The embedding call uses the API-key Gemini Developer
+surface. The decision rejected Vertex AI *Vector Search* for the index itself because it carries an
+always-on per-node cost floor, and kept the embedding *call* off Vertex too rather than pull in
+project/location plumbing this project otherwise avoids (`gemini-provider.ts` header). The
+consequence a reader needs: a real embedding run requires a live `GEMINI_API_KEY`, and there is no
+Vertex fallback path to reach for. (from ADR-014, "vector search")
+
+**Pre-filters are `kind`, `state` and `eraBucket`**, derived at embed time rather than joined at
+query time (`packages/ops-data/src/embeddings/text.ts`). `eraBucket` is single-valued and is simply
+omitted when an entity has no temporal anchor, so a filtered query silently excludes undated
+records rather than erroring. `state` was omitted entirely by the Postgres backfill source until
+2026-09-13 (repo-9qf9); it now resolves from `projection->>'jurisdictionLabel'`.
+
+**Not wired live.** `@repo/domain`'s `similarity` surface (candidate recall, near-duplicate
+detection) is pure math with no I/O, and wiring it into the live discovery workflow
+(`workers/research/`) was left undone by the decision, not by an oversight since corrected. It is
+still not wired.
+
+**Kill switch: reused, not dedicated.** Semantic search IS gated, and a comment claiming
+otherwise is wrong. `apps/api-public/src/vector-search-kill-switch.ts` reuses the existing `search`
+core switch id from `@repo/config` rather than introducing a `vector-search` id, on the grounds
+that vector search is "dynamic search" under that switch's own description. The reuse is
+load-bearing rather than lazy: `search` is already in `STATIC_MODE_DENIED_SWITCHES`, so
+`public-static-mode` stops semantic search too, which a fresh dedicated id would not have
+inherited. `vector-search-endpoint.ts` evaluates it as step 2 of its request path.
+
+What ADR-014 recorded as a GAP is narrower than "no kill switch": there is no way to stop semantic
+search *independently of* text search. Adding a dedicated `vector-search` core id is a small
+additive change to `packages/config` if that control is ever wanted. (from ADR-014, "vector
+search")

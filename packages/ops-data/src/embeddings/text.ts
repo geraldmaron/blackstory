@@ -5,7 +5,7 @@
  * Decade-bucketing math delegates to @repo/domain's shared `deriveEraBuckets` (
  * packages/domain/src/era.ts) rather than duplicating it locally `deriveEraBucket` below is a
  * thin single-bucket adapter over that shared function, kept for this module's existing
- * single-value `eraBucket` pre-filter field (see ADR-014's composite vector indexes).
+ * single-value `eraBucket` pre-filter field (see `docs/decisions-carryover.md`, "Vector search").
  */
 import { deriveEraBuckets } from '@repo/domain';
 import type { CanonicalEntityDoc, EntityKindDoc } from '../firestore/types.js';
@@ -122,7 +122,7 @@ export type EntityVectorFilters = {
   readonly eraBucket?: string;
 };
 
-/** The three pre-filter fields the composite vector indexes are built around (see ADR-014). */
+/** The three pre-filter fields the composite vector indexes are built around. */
 export function deriveEntityFilters(
   entity: EntityEmbeddingSource,
   location?: EntityLocationContext,
