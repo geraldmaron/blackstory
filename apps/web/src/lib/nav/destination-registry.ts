@@ -227,7 +227,12 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
   // card, because a privacy notice is not a room a reader browses into.
   privacy: { crawl: { changeFrequency: 'monthly', priority: 0.3 } },
 
-  locate: { crawl: { changeFrequency: 'monthly', priority: 0.7 } },
+  // `locate` is deliberately ABSENT, not merely uncrawled. SP-14 folded it into the Lens Where
+  // group and /locate now 308s to /?find=place, so there is no page for the registry to describe
+  // — the same exit /story took when its route was deprecated. A `crawl`-less entry would have
+  // left it in `allDestinations()` and read as an unexplained sitemap omission. `/locate/api` is
+  // unaffected: it is the geocode endpoint the PlaceFinder calls, and it lives in
+  // surface-classes.ts's API list, not here.
   'mosaic-credits': { crawl: { changeFrequency: 'monthly', priority: 0.2 } },
   // No `crawl`: a fixture gallery is not a page a reader should arrive at from a search result,
   // and its content is component names rather than archive material. `noIndex` says so in the

@@ -128,6 +128,7 @@ test('every folded path reaches its surface in exactly one hop', () => {
     ['/myths/anything', '/stories'],
     ['/legal', '/law'],
     ['/map', '/explore'],
+    ['/locate', '/explore'],
   ] as const;
 
   for (const [from, to] of oneHop) {
@@ -140,6 +141,15 @@ test('every folded path reaches its surface in exactly one hop', () => {
 test('/legal keeps its slug rather than dumping every statute on the index', () => {
   const rule = RULES.find((entry) => entry.source === '/legal/:path*');
   assert.equal(rule?.destination, '/law/:path*');
+});
+
+test('/locate folds into the Atlas place finder, carrying the focus-instruction param', () => {
+  // Full destination with its query string, not just the bare path (see this file's doc
+  // comment): `?find=place` is what actually opens the place sheet on arrival, and a rule that
+  // dropped it on the way would look correct against `/explore` alone.
+  const rule = RULES.find((entry) => entry.source === '/locate');
+  assert.equal(rule?.destination, '/explore?find=place');
+  assert.equal(rule?.permanent, true);
 });
 
 test('/map lands on the Explore instrument; /explore renders it', () => {

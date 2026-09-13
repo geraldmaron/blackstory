@@ -224,12 +224,9 @@ function strongestClaimTier(claims: readonly EvidenceClaimInput[]): ConfidenceTi
 /**
  * The grading INPUTS a record's claims reduce to — the only thing a cache should ever store.
  *
- * `search_index` used to carry the graded tier itself, and that is what stranded `/records` for a
- * day when the rule changed on 2026-09-07: every surface that derives updated instantly while the
- * cached CONCLUSION kept answering under the old rule until a backfill ran (repo-ngojq,
- * repo-6qjv0). Caching the inputs instead means `/records` runs the same
- * `confidenceTierFromEvidenceInputs` Explore runs, over cheap slim data, so a rule change reaches
- * both at once and drift is not merely detected — it is impossible.
+ * Caching the inputs means `/records` runs the same `confidenceTierFromEvidenceInputs` Explore
+ * runs, over cheap slim data, so a rule change reaches both at once and drift is not merely
+ * detected — it is impossible.
  *
  * The line between what is cached and what is computed is deliberate: everything here is a FACT
  * read off the claim rows (which levels are present, which lineages are cited, which of those

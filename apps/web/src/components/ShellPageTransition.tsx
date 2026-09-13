@@ -8,12 +8,9 @@
  * The wrapper is server-rendered, so the attribute is in the first painted HTML and shell CSS
  * can read it before hydration.
  *
- * There is no enter animation. The transform-based one that used to live here set
- * `animation-fill-mode: both`, which leaves a permanently non-`none` computed transform and
- * makes this element the containing block for the fixed map plate — the plate then scrolls with
- * the document instead of holding the viewport. A `:has()` escape hatch keyed on a marker
- * attribute a route happened to set was the only thing preventing that, and a 0.2rem translate
- * was never worth a rule that silently stops applying when the markup changes.
+ * There is no enter animation: animations on this element interfere with the fixed map plate's
+ * containing block behavior, making the plate scroll with the document instead of holding the
+ * viewport.
  *
  * `<ReadingProgress>` is mounted here too (SP-27, repo-92n2.34), not inside any individual room:
  * this is the one place `surface` is already resolved for every route, so it is also the one

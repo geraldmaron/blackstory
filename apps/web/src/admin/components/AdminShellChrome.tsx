@@ -33,7 +33,8 @@ export function AdminShellChrome({ children }: { readonly children: React.ReactN
     label: `${item.label} (public)`,
   }));
 
-  const extras = [...publicHandoffs, { href: '/locate', label: 'Near you (public)' }];
+  // SP-14 retired /locate into the Lens; the public equivalent is the Where group on the door.
+  const extras = [...publicHandoffs, { href: '/?find=place', label: 'Near you (public)' }];
 
   const overflowNav = [
     ...adminOverflowNav(extras),

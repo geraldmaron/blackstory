@@ -561,6 +561,43 @@ test('parseExploreSearchParams ignores an invalid radius token', () => {
   assert.ok(parsed.viewport);
 });
 
+/**
+ * `find=place` (repo-92n2.14 / SP-14) has to survive the edge's query normalization for
+ * `/locate`'s redirect (`/explore?find=place`) to actually open `PlaceFinder`'s place sheet
+ * rather than 308ing again with the param stripped — see `query-normalization.test.ts`'s drift
+ * tests, which fail if this key is read by the parser but missing from
+ * `EXPLORE_URL_PARAM_KEYS`/the builder, or the reverse.
+ */
+test('round-trips the find focus instruction, and never as a filter default', () => {
+  const withFind = parseExploreSearchParams({ find: 'place' });
+  assert.equal(withFind.find, 'place');
+
+  const href = buildExploreHref({
+    filters: {
+      era: 'all',
+      kind: 'all',
+      tone: 'all',
+      theme: 'all',
+      status: 'all',
+      confidence: 'all',
+    },
+    layerMode: 'presence',
+    group: true,
+    sat: false,
+    lines: false,
+    showFilters: false,
+    showResults: false,
+    showKey: false,
+    find: 'place',
+  });
+  assert.equal(href, '/explore?find=place');
+
+  // Omitted entirely (not `find=`) when absent, same as every other optional key here.
+  const bare = parseExploreSearchParams({});
+  assert.equal(bare.find, undefined);
+  assert.doesNotMatch(buildExploreHref(bare), /find/);
+});
+
 test('evidence floor round-trips on explore URLs (Records→Explore handoff)', () => {
   const qs = buildExploreSearchParams({
     filters: {

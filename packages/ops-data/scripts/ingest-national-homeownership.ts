@@ -385,6 +385,8 @@ async function applyObservations(
          ON CONFLICT (id) DO UPDATE SET
            estimate = EXCLUDED.estimate,
            margin_of_error = EXCLUDED.margin_of_error,
+           source = EXCLUDED.source,
+           source_url = EXCLUDED.source_url,
            content_hash = EXCLUDED.content_hash,
            retrieved_at = EXCLUDED.retrieved_at,
            metadata = EXCLUDED.metadata`,

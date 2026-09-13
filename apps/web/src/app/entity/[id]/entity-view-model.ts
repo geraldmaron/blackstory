@@ -11,19 +11,13 @@ import { humanizeToken } from '../../../components/entity/format';
  * Present standing of the SUBJECT, for the mast's glance line.
  *
  * Standing and era are different axes and must not be phrased as if they compete. A church
- * built in the 1890s that still holds services spans the 1890s AND is active; the mast used to
- * answer this slot with "Present-day record", which reads as a claim about *when* the record
- * belongs and sat directly beside the era saying something else.
+ * built in the 1890s that still holds services spans the 1890s AND is active.
  *
- * It was also wrong for two whole vocabularies. The old rule was `status === 'active'`, but only
- * place-like kinds ever take that value: laws are `in_force`, people are `living`. Measured on
- * the active release, that mislabeled 66 in-force laws and cases as "Historical record", and no
- * living person could ever have come out as present-day.
- *
- * So this returns the record's own status vocabulary (the same terms `StatusMark` renders) and
- * nothing else. `undefined` means the slot is dropped rather than filled with a default:
- * `event` kinds are statusless by design — their when-span is authoritative — and `unknown` is
- * a real answer that must not harden into "Historical record" for the 112 people carrying it.
+ * This returns the record's own status vocabulary (the same terms `StatusMark` renders) and
+ * nothing else. Each kind has its own status values: place-like kinds use `active`, laws are
+ * `in_force`, people are `living`. `undefined` means the slot is dropped rather than filled
+ * with a default: `event` kinds are statusless by design — their when-span is authoritative —
+ * and `unknown` is a real answer that must render as itself.
  */
 export function deriveRecordStanding(entity: PublicEntityView): string | undefined {
   if (entity.kind === 'event') return undefined;

@@ -11,8 +11,6 @@
  * crossfade between two identical maps. Copper marks holding walks, which are also the plate's
  * only links; every other single disc is still a hit target that opens the record sheet through
  * the underlay gestures once hydrated.
- *
- * `/` no longer mounts this (repo-18ma2): the Door's only map is the live plate.
  */
 import React from 'react';
 import type { ExploreMapFeatureCollection } from '../lib/map-experience/build-explore-map-source';

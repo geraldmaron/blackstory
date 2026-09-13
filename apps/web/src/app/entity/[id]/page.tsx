@@ -6,11 +6,8 @@
  * other non-standable records still render here. Door Rest pin walks stay on the stand allowlist;
  * Place itself resolves the wider corpus via the search index.
  *
- * An id that is not in the release is not automatically gone. repo-n7p6.15 stopped publishing
- * entities that had been merged away, which was right, but it left `/entity/ent_sclc_001` and
- * `/entity/ent_sncc_001` (addresses that were publicly resolvable, and are in search indexes)
- * resolving to nothing. So a miss consults the published absorbed-to-survivor map
- * (`bb_public.release_entity_redirects`, written by
+ * An id that is not in the release is not automatically gone. A miss consults the published
+ * absorbed-to-survivor map (`bb_public.release_entity_redirects`, written by
  * `packages/ops-data/scripts/reconcile-absorbed-entities.ts`) and 308s to the survivor's own
  * public address before it 404s. A record that was WITHDRAWN rather than merged has no survivor,
  * carries no redirect row, and still 404s, which is the honest answer for it.

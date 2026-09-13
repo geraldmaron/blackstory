@@ -29,8 +29,10 @@ import {
 } from '../../lib/map-experience/kind-encoding';
 import { AREA_FILL_REFUSAL_NOTE } from '../../lib/map-experience/lens-composition';
 import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
+import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 import { GradeDot } from './GradeDot';
 import { KindFamilyGlyph } from './KindGlyph';
+import { PlaceFinder, type PlaceFinderResolvedPayload } from './PlaceFinder';
 import './lens-panel.css';
 
 void React;
@@ -79,6 +81,12 @@ export type LensPanelProps = {
   readonly state: string;
   readonly onStateChange: (postalCode: string) => void;
   readonly onNearMe?: () => void;
+  /** Live explore catalog, forwarded to `PlaceFinder`'s typeahead. Omitted until a caller (a
+   * future wave — `AtlasExperience.tsx` is outside this bead's file lock) wires the live
+   * features through; `PlaceFinder` itself degrades to no recommendations without them. */
+  readonly catalogFeatures?: readonly ExploreMapFeature[];
+  /** `PlaceFinder`'s own resolved-place callback (camera framing), distinct from `onNearMe`. */
+  readonly onPlaceResolved?: (payload: PlaceFinderResolvedPayload) => void;
 
   /** Live per-family counts over the unfiltered release, so a chip never reads zero-by-itself. */
   readonly kindCounts: Readonly<Partial<Record<MapKindFamily, number>>>;
@@ -133,6 +141,8 @@ export function LensPanel({
   state,
   onStateChange,
   onNearMe,
+  catalogFeatures,
+  onPlaceResolved,
   kindCounts,
   kindFamily,
   onKindFamilyChange,
@@ -231,6 +241,12 @@ export function LensPanel({
               ))}
             </select>
           </label>
+          <PlaceFinder
+            state={state}
+            onStateChange={onStateChange}
+            {...(catalogFeatures ? { catalogFeatures } : {})}
+            {...(onPlaceResolved ? { onResolved: onPlaceResolved } : {})}
+          />
         </div>
 
         <div className="ds-lens__group">

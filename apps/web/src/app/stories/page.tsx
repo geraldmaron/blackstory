@@ -5,10 +5,8 @@
  * individually cited call-outs, published in ordered collections).
  *
  * Both kinds share this index on purpose. A reader looking for what the archive says
- * about a subject should not have to know which contract the answer was written under —
- * which is why bare `/stories` is every published Story. It used to default to chapters, so
- * the page hid every Entry from a reader who did not know to append `kind=all`, and the
- * promise above was false on the surface that made it.
+ * about a subject should not have to know which contract the answer was written under.
+ * Bare `/stories` shows every published Story.
  *
  * Every control here is a link or a form GET, so narrowing is bookmarkable, shareable and
  * crawlable, and the page works with JavaScript off. Windowing reuses the Results rail law
@@ -68,9 +66,8 @@ const KIND_LABELS: Record<string, string> = { chapter: 'Chapter', article: 'Entr
 
 /**
  * The lead only renders in the default browse state — `showsShelves` requires the collection
- * sort — so the flag is always "Start here". It used to switch on the sort, which read as though
- * a reader could reach the lead under "newest" or "title"; they cannot, and a flag naming a sort
- * that is never in force is a claim the page does not make.
+ * sort — so the flag is always "Start here" and never "newest" or "title", since those sorts
+ * do not show the lead.
  */
 const LEAD_FLAG = 'Start here';
 

@@ -5,9 +5,9 @@
  * documented about X" badly, so the archive keeps a browsable index at its own URL rather than
  * hiding one inside the homepage and canonicalising it away.
  *
- * This is also the landing surface for three previously public URL families — `/search`,
- * `/history` and `/facts` all resolve here in one hop — so it must never 404 and must render
- * something honest for any param combination a stale bookmark carries.
+ * This is also the landing surface for three URL families — `/search`, `/history` and `/facts`
+ * all resolve here in one hop — so it must never 404 and must render something honest for any
+ * param combination a stale bookmark carries.
  *
  * Plate posture: Parked. This room never shows the map; the off-ramp hands the narrowing to it.
  */

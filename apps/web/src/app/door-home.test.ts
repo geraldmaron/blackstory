@@ -1,8 +1,7 @@
 /**
  * The door is an immersive Journey: scroll snaps chapters and flies the shared map plate.
  * It is not the Explore instrument (no lens, no rail, no sheet) and it has one map, not two:
- * the plate it drives is the one `MapStage`, handed the same national-field patch Explore rests
- * on. The static Albers board that used to sit under the plate is gone (repo-18ma2).
+ * the plate it drives is the one `MapStage`, handed the same national-field patch Explore rests on.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

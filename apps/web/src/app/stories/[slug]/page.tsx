@@ -147,10 +147,8 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
   /*
    * The piece opens on its image, with the title written over it, on the same masthead the
-   * record page uses. It used to open on a text header and put the hero underneath the summary,
-   * which is the layout of a document that happens to have a picture attached rather than of a
-   * piece of writing that leads with one. A piece with no hero keeps the same block on the
-   * canvas: the type is the masthead in that case, and there is nothing to read it over.
+   * record page uses. A piece with no hero keeps the same block on the canvas: the type is the
+   * masthead in that case, and there is nothing to read it over.
    */
   const masthead = (
     <figure className="ds-article-mast" data-media={doc.heroImage ? 'photo' : 'none'}>

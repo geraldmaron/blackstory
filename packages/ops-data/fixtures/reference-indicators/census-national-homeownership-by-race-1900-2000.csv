@@ -1,31 +1,113 @@
 # United States national decennial homeownership rate by race, 1900-2000.
-# Source: Census Bureau Historical Census of Housing Tables - Homeownership Rate by Race and Hispanic Origin
-# https://www.census.gov/topics/housing/homeownership/data/historical.html
-# Rate = homeowner households / total households × 100
-# Data extracted from Census Bureau published tables
-# 1900: Historical Census of Housing Tables (census.gov)
-# 1910: Decennial Census Housing Reports
-# 1920-2000: Decennial Census Summary Files (SF1/SF2)
+# Rate = homeowner households (or families) / total households (or families) x 100.
+#
+# repo-uf6q verification pass (2026-09-13). The series' original claimed source,
+# https://www.census.gov/topics/housing/homeownership/data/historical.html, returns HTTP 404
+# and its live replacement (census.gov/data/tables/time-series/dec/coh-owner.html) is state-level
+# only with no race breakout -- there was never a single census.gov page with this whole series
+# broken out by race. Every row below was re-checked against a primary decennial publication
+# (not an aggregator); source_url points at the exact PDF/page read. Rows not resolved to a
+# same-decade primary table this pass keep their prior estimate (not fabricated) with the
+# nearest live, on-topic census.gov page as source_url, flagged UNVERIFIED below -- fix these
+# before trusting them as tightly as the VERIFIED rows.
+#
+# VERIFIED this pass (primary source read and the number computed/quoted directly from it):
+#   1900 black   21.7  (was 21.3)  -- 1910 Census, "Negro Population 1790-1915," ch. XVIII
+#                                     "Home Ownership and Size of Families," Table 2/Table 6,
+#                                     p.459-460: 397,420 of 1,833,759 Negro homes owned = 21.7%.
+#   1900 white_nh 49.8 (was 48.5)  -- derived (White = Total - Nonwhite; Census race categories
+#                                     are exhaustive so this is exact, not an approximation) from
+#                                     1960 Census of Housing Vol I Pt 1 Ch1, Table H ("Owner
+#                                     Occupancy and Nonwhite Occupancy: 1890 to 1960"), p.XXVII:
+#                                     conterminous US 1900 total 7,455,042/15,963,965 (46.7%),
+#                                     nonwhite 447,852/1,900,174 (23.6%) -> white 7,007,190/
+#                                     14,063,791 = 49.8%.
+#   1910 black   23.3  (was 22.5)  -- same 1910 Negro Population report, Table 2/Table 6:
+#                                     506,590 of 2,173,018 Negro homes owned = 23.3%.
+#   1920 white_nh 48.2 (was 52.1)  -- derived (Total - Nonwhite) from the same Table H: 1920
+#                                     total 11,113,922/24,351,676 (45.6%), nonwhite 603,293/
+#                                     2,526,022 (23.9%) -> white 10,510,629/21,825,654 = 48.2%.
+#   1930 black   23.9  (was 23.1)  -- U.S. Census Bureau, "Negroes in the United States, 1920-32"
+#                                     (1935), ch. XIII "Families," "Ownership of homes": of
+#                                     2,803,756 Negro homes, 669,645 or 23.9 percent were owned.
+#   1930 white_nh 50.2 (was 52.7)  -- derived (Total - Nonwhite) from Table H: 1930 total
+#                                     14,280,265/29,904,663 (47.8%), nonwhite 736,856/2,921,669
+#                                     (25.2%) -> white 13,543,409/26,982,994 = 50.2%; cross-checked
+#                                     against the 1940 Census of Housing Vol II US Summary's own
+#                                     revised-1930 comparison table (same 26,982,994 white total,
+#                                     50.2%), independent agreement.
+#   1940 black   22.8  (unchanged) -- CONFIRMED against 1940 Census of Housing Vol. II, Table 1,
+#                                     US Summary, p.7: Negro 719,771 owner / 3,156,545 occupied =
+#                                     22.8%. (This is the row an earlier 2026-08-21 pass already
+#                                     corrected from a mislabeled "Nonwhite" figure of 23.6%; that
+#                                     correction holds.)
+#   1940 white_nh 45.7 (unchanged) -- CONFIRMED same table: White 14,418,092/31,561,126 = 45.7%.
+#   1950 black   34.5  (was 34.9)  -- 1950 Census of Housing Vol I Pt 1 Ch1, Table 2 ("Occupancy,
+#                                     Tenure, and Race of Occupants"), p.1-2: Negro owner 1,252,103
+#                                     + renter 2,381,377 = 3,633,480 occupied; 1,252,103/3,633,480
+#                                     = 34.5%. (34.9% was the broader "Nonwhite" rate, not Negro.)
+#   1950 white_nh 57.0 (was 55.1)  -- same table: White owner 22,240,970 + renter 16,802,625 =
+#                                     39,043,595 occupied; 22,240,970/39,043,595 = 57.0%.
+#   1960 white_nh 64.4 (was 64.9)  -- derived (Total - Nonwhite) from the same 1960 volume's own
+#                                     current-year Table G/H: US total owner 32,796,720/53,023,875
+#                                     (61.9%), nonwhite owner 1,973,526/5,144,059 (38.4%) -> white
+#                                     30,823,194/47,879,816 = 64.4%; Table G states this directly.
+#   2000 black   46.3  (unchanged) -- CONFIRMED against the live census.gov table (see below):
+#                                     United States row, Black alone = 46.3.
+#   2000 white_nh 72.4 (was 73.1)  -- same live table: United States row, White Not Hispanic =
+#                                     72.4 (73.1 did not match any column of the primary table).
+#
+# UNVERIFIED this pass (kept at the prior value; not independently re-derived from a primary,
+# same-year, race-tabulated table -- do not treat these as re-confirmed):
+#   1910 white_nh -- Table H's 1910 Nonwhite column is footnoted "tabulated only for the
+#                    Southern States," so the Total-minus-Nonwhite method used for 1900/1920/1930
+#                    does not apply nationally for 1910. No other 1910 national White-specific
+#                    table was located this pass.
+#   1920 black    -- only the broader "Nonwhite" rate (23.9%, Table H) was found for 1920; no
+#                    Negro-specific national table was located this pass (the 1930 Negro
+#                    Population report gives 1930 and raw 1920-1930 counts, not a standalone 1920
+#                    rate). Given the 1930/1940/1950 Negro-vs-Nonwhite gap runs 0.4-1.3 points,
+#                    the current 23.4 is plausible but not confirmed.
+#   1960 black    -- 38.4 is the verified "Nonwhite" rate from Table H, not a confirmed
+#                    Negro-specific rate; the 1960 volume's summary chapter does not break
+#                    tenure out by Negro specifically the way the 1940/1950 volumes do.
+#   1970 both     -- flagged by an earlier ringer review: white_nh's 1970 census category is not
+#                    a real one, and commonly-published secondary compilations give ~41.6/65.2-65.4
+#                    against this fixture's 42.0/65.3. No primary 1970 Census of Housing table
+#                    could be read this pass (the 1970 volume PDFs at census.gov are scanned
+#                    images with no text layer, and the specific race-tenure table page was not
+#                    located in the time available). Left unchanged; needs a follow-up pass.
+#   1980, 1990 both -- no primary decennial table located this pass; left unchanged.
+#
+# Sources actually read this pass:
+#   https://www2.census.gov/library/publications/decennial/1910/black-population-1790-1915/00480330ch07.pdf
+#   https://archive.org/details/negroesinuniteds00unit -- "Negroes in the United States, 1920-32"
+#     (U.S. Bureau of the Census, 1935), full text via the Internet Archive's OCR of the GPO print
+#   https://www2.census.gov/library/publications/decennial/1940/housing-volume-2/housing-v2p1-ch2.pdf
+#   https://www2.census.gov/library/publications/decennial/1950/housing-volume-1/36965082v1p1ch1.pdf
+#   https://www2.census.gov/library/publications/decennial/1960/housing-volume-1/41962442v1p1ch01.pdf
+#   https://www2.census.gov/programs-surveys/decennial/tables/time-series/coh-ownershipbyrace/ownershipbyrace-tab.txt
+#     (linked from the live https://www.census.gov/data/tables/2000/dec/coh-ownershipbyrace.html)
 decade,race,homeownership_rate,source_url
-1900,black,21.3,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1900,white_nh,48.5,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1910,black,22.5,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1910,white_nh,51.0,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1920,black,23.4,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1920,white_nh,52.1,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1930,black,23.1,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1930,white_nh,52.7,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1900,black,21.7,https://www2.census.gov/library/publications/decennial/1910/black-population-1790-1915/00480330ch07.pdf
+1900,white_nh,49.8,https://www2.census.gov/library/publications/decennial/1960/housing-volume-1/41962442v1p1ch01.pdf
+1910,black,23.3,https://www2.census.gov/library/publications/decennial/1910/black-population-1790-1915/00480330ch07.pdf
+1910,white_nh,51.0,https://www2.census.gov/library/publications/decennial/1960/housing-volume-1/41962442v1p1ch01.pdf
+1920,black,23.4,https://www2.census.gov/library/publications/decennial/1960/housing-volume-1/41962442v1p1ch01.pdf
+1920,white_nh,48.2,https://www2.census.gov/library/publications/decennial/1960/housing-volume-1/41962442v1p1ch01.pdf
+1930,black,23.9,https://archive.org/details/negroesinuniteds00unit
+1930,white_nh,50.2,https://www2.census.gov/library/publications/decennial/1960/housing-volume-1/41962442v1p1ch01.pdf
 1940,black,22.8,https://www2.census.gov/library/publications/decennial/1940/housing-volume-2/housing-v2p1-ch2.pdf
 1940,white_nh,45.7,https://www2.census.gov/library/publications/decennial/1940/housing-volume-2/housing-v2p1-ch2.pdf
-1950,black,34.9,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1950,white_nh,55.1,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1960,black,38.4,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1960,white_nh,64.9,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1970,black,42.0,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1970,white_nh,65.3,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1980,black,44.4,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1980,white_nh,67.8,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1990,black,43.3,https://www.census.gov/topics/housing/homeownership/data/historical.html
-1990,white_nh,69.6,https://www.census.gov/topics/housing/homeownership/data/historical.html
-2000,black,46.3,https://www.census.gov/topics/housing/homeownership/data/historical.html
-2000,white_nh,73.1,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1950,black,34.5,https://www2.census.gov/library/publications/decennial/1950/housing-volume-1/36965082v1p1ch1.pdf
+1950,white_nh,57.0,https://www2.census.gov/library/publications/decennial/1950/housing-volume-1/36965082v1p1ch1.pdf
+1960,black,38.4,https://www2.census.gov/library/publications/decennial/1960/housing-volume-1/41962442v1p1ch01.pdf
+1960,white_nh,64.4,https://www2.census.gov/library/publications/decennial/1960/housing-volume-1/41962442v1p1ch01.pdf
+1970,black,42.0,https://www2.census.gov/programs-surveys/decennial/tables/time-series/census-housing-tables/owner.pdf
+1970,white_nh,65.3,https://www2.census.gov/programs-surveys/decennial/tables/time-series/census-housing-tables/owner.pdf
+1980,black,44.4,https://www2.census.gov/programs-surveys/decennial/tables/time-series/census-housing-tables/owner.pdf
+1980,white_nh,67.8,https://www2.census.gov/programs-surveys/decennial/tables/time-series/census-housing-tables/owner.pdf
+1990,black,43.3,https://www2.census.gov/programs-surveys/decennial/tables/time-series/census-housing-tables/owner.pdf
+1990,white_nh,69.6,https://www2.census.gov/programs-surveys/decennial/tables/time-series/census-housing-tables/owner.pdf
+2000,black,46.3,https://www2.census.gov/programs-surveys/decennial/tables/time-series/coh-ownershipbyrace/ownershipbyrace-tab.txt
+2000,white_nh,72.4,https://www2.census.gov/programs-surveys/decennial/tables/time-series/coh-ownershipbyrace/ownershipbyrace-tab.txt

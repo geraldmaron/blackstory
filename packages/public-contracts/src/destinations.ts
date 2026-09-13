@@ -4,11 +4,8 @@
  *
  * WHY THIS IS A CONTRACT. A destination's canonical path is an external commitment. It is the
  * URL a reader bookmarks, the URL a crawler indexes, the deep link a native build registers with
- * the OS, and the link the admin console hands an operator. Those four consumers used to hold
- * four private opinions about the same route, and they disagreed: the shared shell config went on
- * emitting `/chapters` and `/library` months after both became permanent redirects, so the top
- * nav of every page on the site pointed into a 308. One table with one canonical path per
- * destination is what makes that class of drift a test failure instead of a habit.
+ * the OS, and the link the admin console hands an operator. One table with one canonical path per
+ * destination makes that class of drift a test failure instead of a habit.
  *
  * WHAT LIVES HERE. Product semantics only: the stable id, the canonical label, the canonical web
  * path, the legacy aliases that must keep resolving, the semantic family, the semantic icon id,
@@ -80,7 +77,6 @@ export const DESTINATION_ICON_IDS = [
   'more',
   'search',
   'filter',
-  'locate',
   'external',
   'disclosure',
   'collection',
@@ -365,16 +361,6 @@ const DESTINATIONS: readonly SemanticDestination[] = [
   },
 
   /* ---------- real destinations, not somewhere a reader is sent browsing ---------- */
-  {
-    id: 'locate',
-    label: 'Locate',
-    path: '/locate',
-    parent: '/rooms',
-    family: 'utility',
-    icon: 'locate',
-    isPublic: true,
-    browsable: false,
-  },
   {
     id: 'mosaic-credits',
     label: 'Mosaic credits',

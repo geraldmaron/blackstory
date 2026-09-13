@@ -97,6 +97,21 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
     rationale: 'Justia Supreme Court — primary case-text archive',
   },
   {
+    domain: 'archive.org',
+    tier: 'T2',
+    rationale:
+      'Internet Archive — full-text/scan host for out-of-print government publications and ' +
+      'books (e.g. pre-1978 Census Bureau bulletins with no census.gov mirror); cite the ' +
+      'specific item, not the site generally.',
+  },
+  {
+    domain: 'worldcat.org',
+    tier: 'T2',
+    rationale:
+      'WorldCat — library-catalog record of a book edition (publisher, ISBN, printing), used ' +
+      'to cite a book directly instead of a university-page summary of it.',
+  },
+  {
     domain: 'aeaweb.org',
     tier: 'T1',
     rationale: 'American Economic Association — peer-reviewed journal host',

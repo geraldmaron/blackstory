@@ -141,9 +141,8 @@ export function toAtlasShellModel(view: ExploreViewModel): AtlasShellModel {
 }
 
 /**
- * Shell + catalog -> the serializable view model, exactly as the server used to build it: the
- * active edge slice is picked from the catalog by the shell's view state, and `selectedEdge`
- * resolves against that slice.
+ * Shell + catalog -> the serializable view model. The active edge slice is picked from the
+ * catalog by the shell's view state, and `selectedEdge` resolves against that slice.
  */
 export function assembleExploreViewModel(
   shell: AtlasShellModel,

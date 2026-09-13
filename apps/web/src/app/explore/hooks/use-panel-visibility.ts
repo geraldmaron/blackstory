@@ -18,7 +18,7 @@ export type PanelVisibility = {
 const NARROW_BREAKPOINT = 820;
 
 /**
- * Above this the record sheet and the results rail both fit, so opening a record no longer hides
+ * Above this the record sheet and the results rail both fit, so opening a record does not hide
  * the list it came from: 300 (lens) + 430 (sheet) + 344 (rail) + gutters. Kept in step with the
  * `min-width: 1150px` rule in `record-sheet.css`.
  */

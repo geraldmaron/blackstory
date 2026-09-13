@@ -3,14 +3,11 @@
  * tiers `MapStageDataPatch` carries, fetching the compact decennial index the first time a
  * reader actually asks for one.
  *
- * Every other stage of this pipeline already existed — the static indexes under `/geo/`, the
- * bucketing (`state-choropleth.ts` / `county-choropleth.ts`), the geometry joins, the stage
- * props, the style branches and the Lens UI. What was missing was the call: nothing in the
- * client ever built the levels, so `blackShare` / `blackChange` restyled the map and then
- * painted every polygon `unknown`. This hook is that call.
- *
- * Loading is lazy and keyed on the request, not eager on mount: the resting lens is `presence`,
- * and a reader who never opens a population layer never pays for the index.
+ * This hook builds the levels from the static indexes under `/geo/`, the bucketing
+ * (`state-choropleth.ts` / `county-choropleth.ts`), the geometry joins, the stage props, the
+ * style branches and the Lens UI. Loading is lazy and keyed on the request, not eager on mount:
+ * the resting lens is `presence`, and a reader who never opens a population layer never pays
+ * for the index.
  */
 import { useEffect, useMemo, useState } from 'react';
 import {

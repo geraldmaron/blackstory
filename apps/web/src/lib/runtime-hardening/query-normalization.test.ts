@@ -295,6 +295,17 @@ test('drift: buildExploreSearchParams writes no key the allowlist lacks', () => 
   assert.ok(!written.includes('panels'), 'panel chrome must not be serialized into a shared URL');
 });
 
+test("normalizeQueryString survives /explore?find=place, PlaceFinder's deep-link contract", () => {
+  // The exact regression this bead's redirect (`/locate` -> `/explore?find=place`,
+  // `next-config-redirects.mjs`) depends on: without `find` in `EXPLORE_URL_PARAM_KEYS`, the edge
+  // 308s a second time to strip it before `PlaceFinder` ever sees the query string.
+  assert.equal(normalizeQueryString('/explore', { find: 'place' }), 'find=place');
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/explore?find=place')),
+    false,
+  );
+});
+
 test('normalizeQueryString preserves /explore?state= revisit links', () => {
   assert.equal(normalizeQueryString('/explore', { state: 'dc' }), 'state=DC');
   assert.equal(normalizeQueryString('/', { state: 'dc' }), '');

@@ -6,6 +6,11 @@
  * typing stays responsive), then falls back to `/locate/api` (Census + city/state centroid)
  * for camera framing. Parent owns ranking. Place lookups are U.S.-only and server-side —
  * never a browser geocoder key.
+ *
+ * Mounted by `./PlaceFinder.tsx` (repo-92n2.14 / SP-14), which wraps this with
+ * `LocationPrivacyNotice` and opt-in geolocation and owns the two-posture Lens/sheet layout. This
+ * file's own contract is unchanged; the `radiusId`/`onRadiusChange` props below exist so
+ * `PlaceFinder` can clear the radius from outside on a state-select disagreement.
  */
 import React, { useDeferredValue, useId, useMemo, useState } from 'react';
 import { Button } from '@repo/ui';
@@ -46,6 +51,16 @@ export type ExploreAddressSearchProps = {
   /** Live explore catalog — recommendations are drawn from these published features. */
   readonly catalogFeatures?: readonly ExploreMapFeature[];
   readonly disabled?: boolean;
+  /**
+   * Controlled radius selection. Omit both this and `onRadiusChange` for the original
+   * uncontrolled behavior (internal state, defaulting to `all`) every existing caller and test
+   * relies on. `PlaceFinder.tsx` passes both so it can clear the radius from outside when the
+   * sibling state select wins a disagreement (repo-92n2.14's "most recent action wins, the other
+   * control is visibly cleared" rule) — a change this component cannot make on its own since it
+   * has no reference to that select.
+   */
+  readonly radiusId?: ExploreRadiusPresetId;
+  readonly onRadiusChange?: (id: ExploreRadiusPresetId) => void;
 };
 
 type SearchStatus =
@@ -77,9 +92,14 @@ export function ExploreAddressSearch({
   onResolved,
   catalogFeatures = [],
   disabled = false,
+  radiusId: controlledRadiusId,
+  onRadiusChange,
 }: ExploreAddressSearchProps) {
   const [status, setStatus] = useState<SearchStatus>({ kind: 'idle' });
-  const [radiusId, setRadiusId] = useState<ExploreRadiusPresetId>(DEFAULT_EXPLORE_RADIUS_ID);
+  const [uncontrolledRadiusId, setUncontrolledRadiusId] =
+    useState<ExploreRadiusPresetId>(DEFAULT_EXPLORE_RADIUS_ID);
+  const radiusId = controlledRadiusId ?? uncontrolledRadiusId;
+  const setRadiusId = onRadiusChange ?? setUncontrolledRadiusId;
   const [query, setQuery] = useState('');
   const statusId = useId();
   const fieldId = useId();

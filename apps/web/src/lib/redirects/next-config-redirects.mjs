@@ -60,6 +60,18 @@ export function redirectsForNextConfig() {
     // `/map` is the old name for Explore. `/` is the map door; `/explore` still renders it.
     { source: '/map', destination: '/explore', permanent: true },
 
+    // repo-92n2.14 (SP-14): the standalone `/locate` page and `LocateExperience` are deleted —
+    // the address/ZIP field, radius presets, catalog typeahead, and opt-in geolocation are one
+    // `PlaceFinder` component now, folded into the Atlas Lens's Where group (wide) and a
+    // dedicated place sheet (narrow). `design-direction-v9-surfaces.md`'s `/locate` row names
+    // the destination as `/?find=place`, the future state where `/explore` has folded into `/`
+    // (WP-25) — not done yet, deliberately deferred and out of this bead's scope
+    // (`AtlasExperience.tsx`'s own doc comment). Today the live Atlas instrument is `/explore`,
+    // so that is where a working deep link has to land; repoint this to `/?find=place` in the
+    // same commit that ships WP-25, not before. `/locate/api` is unchanged and stays out of the
+    // proxy's query-normalization matcher (`proxy.ts`), so it is unaffected by this rule.
+    { source: '/locate', destination: '/explore?find=place', permanent: true },
+
     // `/library` is the old name for Rooms.
     { source: '/library', destination: '/rooms', permanent: true },
 
