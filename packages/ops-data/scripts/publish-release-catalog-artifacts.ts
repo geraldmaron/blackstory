@@ -26,6 +26,19 @@
  * Manual runs (see usage below) always do real work — DRY_RUN inspects without ever touching
  * the watermark; FORCE=1 does a real publish while ignoring the watermark and hash checks.
  *
+ * Upload safety (repo-kywgj, live 2026-09-12): a transient network failure mid-upload used to
+ * surface as a bare `fetch failed` and could leave the published pair mismatched — one artifact
+ * newly uploaded, the other stale, with nothing announcing it. Each artifact is now uploaded
+ * through `publishArtifactWithRetry` (see `lib/release-catalog-publish-upload.ts`), which
+ * retries with exponential backoff and, ONLY once that artifact's upload has actually
+ * succeeded, immediately persists JUST that artifact's `published_*_hash` column — not batched
+ * with the other artifact or with `published_at`. `published_at` is advanced only after BOTH
+ * artifacts have resolved, so a failure partway through never advances the watermark past a
+ * half-completed publish: the next run's hash comparison skips the artifact that already
+ * succeeded and retries only the one that actually failed. Upload failures also carry the HTTP
+ * status, the request URL, and the object path (`ArtifactUploadError`), not a bare `fetch
+ * failed`.
+ *
  * Usage — manual run:
  *   cd apps/web && set -a && . ./.env.local && set +a && cd ../../ && \
  *   node --conditions development --import tsx \
@@ -49,7 +62,11 @@ import { mapPostgresSearchIndexRow, type PublicSearchIndexRow } from '@repo/sche
 import { sha256Json, type JsonValue } from '@repo/domain';
 import { buildReleaseCatalogArtifacts } from '../src/firestore/release-artifacts.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
-import { shouldSkipPublish, shouldUploadArtifact } from './lib/release-catalog-publish-decision.ts';
+import { shouldSkipPublish } from './lib/release-catalog-publish-decision.ts';
+import {
+  publishArtifactWithRetry,
+  uploadArtifactJson,
+} from './lib/release-catalog-publish-upload.ts';
 
 const PUBLIC_MEDIA_BUCKET = process.env.APP_PUBLIC_MEDIA_BUCKET?.trim() || 'public-media';
 
@@ -97,26 +114,22 @@ function requireEnv(...names: readonly string[]): string {
   throw new Error(`Missing required env: ${names.join(' or ')}`);
 }
 
-async function uploadJson(objectPath: string, body: string): Promise<void> {
-  const base = requireEnv('SUPABASE_URL').replace(/\/+$/, '');
-  const secretKey = requireEnv('SUPABASE_SECRET_KEY', 'SUPABASE_SERVICE_ROLE_KEY');
-  const response = await fetch(`${base}/storage/v1/object/${PUBLIC_MEDIA_BUCKET}/${objectPath}`, {
-    method: 'POST',
-    headers: {
-      authorization: `Bearer ${secretKey}`,
-      apikey: secretKey,
-      'content-type': 'application/json; charset=utf-8',
-      'cache-control': PUBLIC_ARTIFACT_CACHE_CONTROL,
-      'x-upsert': 'true',
-    },
-    body,
-  });
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
-    throw new Error(
-      `upload failed (${response.status}) for ${objectPath}: ${detail.slice(0, 300)}`,
-    );
-  }
+async function persistEntitiesHash(client: pg.Client, hash: string): Promise<void> {
+  await client.query(
+    `UPDATE bb_public.release_catalog_publish_watermark
+     SET published_entities_hash = $1
+     WHERE id = 'catalog'`,
+    [hash],
+  );
+}
+
+async function persistSearchIndexHash(client: pg.Client, hash: string): Promise<void> {
+  await client.query(
+    `UPDATE bb_public.release_catalog_publish_watermark
+     SET published_search_index_hash = $1
+     WHERE id = 'catalog'`,
+    [hash],
+  );
 }
 
 async function main(): Promise<void> {
@@ -200,31 +213,66 @@ async function main(): Promise<void> {
 
     const base = requireEnv('SUPABASE_URL').replace(/\/+$/, '');
     const publicBase = `${base}/storage/v1/object/public/${PUBLIC_MEDIA_BUCKET}`;
+    const uploadConfig = {
+      supabaseUrl: base,
+      secretKey: requireEnv('SUPABASE_SECRET_KEY', 'SUPABASE_SERVICE_ROLE_KEY'),
+      bucket: PUBLIC_MEDIA_BUCKET,
+      cacheControl: PUBLIC_ARTIFACT_CACHE_CONTROL,
+    };
 
-    if (shouldUploadArtifact({ force, newHash: newEntitiesHash, previousHash: prevEntitiesHash })) {
-      await uploadJson(artifacts.entitiesListPath, entitiesBody);
-      console.log(`uploaded ${publicBase}/${artifacts.entitiesListPath}`);
-    } else {
-      console.log(`entities.json unchanged (hash match) — upload skipped`);
-    }
+    // Each artifact is retried with backoff and, only on actual success, immediately persists
+    // its OWN published-hash column (see lib/release-catalog-publish-upload.ts). A rejection
+    // here — retries exhausted — propagates straight to main().catch below and skips the
+    // published_at UPDATE entirely, so a half-completed publish can never look "done": the next
+    // run's hash comparison will skip whichever artifact already succeeded and retry only the
+    // one that actually failed.
+    const entitiesResult = await publishArtifactWithRetry(
+      {
+        objectPath: artifacts.entitiesListPath,
+        body: entitiesBody,
+        newHash: newEntitiesHash,
+        previousHash: prevEntitiesHash,
+        force,
+      },
+      {
+        upload: (objectPath, body) => uploadArtifactJson(objectPath, body, uploadConfig),
+        persistHash: (hash) => persistEntitiesHash(client, hash),
+      },
+    );
+    console.log(
+      entitiesResult.uploaded
+        ? `uploaded ${publicBase}/${artifacts.entitiesListPath}`
+        : `entities.json unchanged (hash match) — upload skipped`,
+    );
 
-    if (shouldUploadArtifact({ force, newHash: newSearchHash, previousHash: prevSearchHash })) {
-      await uploadJson(artifacts.searchIndexPath, searchBody);
-      console.log(`uploaded ${publicBase}/${artifacts.searchIndexPath}`);
-    } else {
-      console.log(`search-index.json unchanged (hash match) — upload skipped`);
-    }
+    const searchResult = await publishArtifactWithRetry(
+      {
+        objectPath: artifacts.searchIndexPath,
+        body: searchBody,
+        newHash: newSearchHash,
+        previousHash: prevSearchHash,
+        force,
+      },
+      {
+        upload: (objectPath, body) => uploadArtifactJson(objectPath, body, uploadConfig),
+        persistHash: (hash) => persistSearchIndexHash(client, hash),
+      },
+    );
+    console.log(
+      searchResult.uploaded
+        ? `uploaded ${publicBase}/${artifacts.searchIndexPath}`
+        : `search-index.json unchanged (hash match) — upload skipped`,
+    );
 
-    // Advance published_at to the dirty_at we captured at the START of this run, not "now" —
-    // a write that landed mid-run (after we snapshotted the watermark) must stay dirty so the
-    // next run picks it up, rather than being masked because "now" had already moved past it.
+    // Only reached once BOTH artifacts are confirmed current. Advance published_at to the
+    // dirty_at we captured at the START of this run, not "now" — a write that landed mid-run
+    // (after we snapshotted the watermark) must stay dirty so the next run picks it up, rather
+    // than being masked because "now" had already moved past it.
     await client.query(
       `UPDATE bb_public.release_catalog_publish_watermark
-       SET published_at = COALESCE($1::timestamptz, now()),
-           published_entities_hash = $2,
-           published_search_index_hash = $3
+       SET published_at = COALESCE($1::timestamptz, now())
        WHERE id = 'catalog'`,
-      [dirtyAt ? dirtyAt.toISOString() : null, newEntitiesHash, newSearchHash],
+      [dirtyAt ? dirtyAt.toISOString() : null],
     );
 
     console.log(`consumer env: APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL=${publicBase}`);
