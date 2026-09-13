@@ -23,6 +23,7 @@ import {
 import {
   EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
+  EXPLORE_PRECISION_RADIUS_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
@@ -124,6 +125,19 @@ test('crossfade out targets cover pins, edges, and clusters — not density (col
     assert.match(target.paintKey, /opacity/);
     assert.ok(target.restOpacity > 0);
   }
+});
+
+test('the precision-radius affordance fades out with the pin stack, with no incoming counterpart to fade back in on its own', () => {
+  const outLayerIds = new Set(DECADE_CROSSFADE_OUT_TARGETS.map((target) => target.layerId));
+  const inLayerIds = new Set(DECADE_CROSSFADE_IN_TARGETS.map((target) => target.layerId));
+  assert.ok(
+    outLayerIds.has(EXPLORE_PRECISION_RADIUS_LAYER_ID),
+    'a static ring during a decade dissolve would read as a rendering glitch, not chrome',
+  );
+  assert.ok(
+    !inLayerIds.has(EXPLORE_PRECISION_RADIUS_LAYER_ID),
+    'there is no dual-buffer precision-radius layer to fade in — promote restores it from style',
+  );
 });
 
 test('crossfade in targets mirror the pin stack only (density uses feature-state color lerp)', () => {

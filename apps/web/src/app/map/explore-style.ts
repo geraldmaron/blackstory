@@ -78,6 +78,7 @@ import {
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
   EXPLORE_JURISDICTION_AREAS_SOURCE_ID,
+  EXPLORE_PRECISION_RADIUS_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   SATELLITE_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
@@ -119,6 +120,7 @@ export {
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
   EXPLORE_JURISDICTION_AREAS_SOURCE_ID,
+  EXPLORE_PRECISION_RADIUS_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   SATELLITE_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
@@ -246,20 +248,52 @@ function streetFillWidthExpression(): ExpressionSpecification {
 }
 
 /**
- * Approximate meters-per-pixel at a given zoom under spherical Web Mercator, ignoring latitude
+ * Approximate meters-per-pixel at zoom 0 under spherical Web Mercator, ignoring latitude
  * distortion (the same order of approximation this repo already uses for state bounding boxes
  * see `packages/domain/src/map/us-geography.ts`'s module doc "good enough for national-zoom …
- * never survey-grade"). Expressed as a MapLibre style expression so the radius-affordance circle
- * scales correctly as the user zooms, per-feature, from each point's own `radiusMeters` property.
+ * never survey-grade"). `pixels(zoom) = radiusMeters * 2^zoom / WEB_MERCATOR_METERS_AT_ZOOM_0`
+ * is the exact conversion; `precisionRadiusPixelsExpression()` below reproduces it as a valid
+ * style expression.
  */
 const WEB_MERCATOR_METERS_AT_ZOOM_0 = 156_543.03392;
 
-function _radiusMetersToPixelsExpression(): ExpressionSpecification {
-  return [
+/**
+ * Reference zoom for the two-stop exponential-interpolate below. MapLibre's style-spec validator
+ * rejects a bare `['zoom']` nested inside arithmetic ("\"zoom\" expression may only be used as
+ * input to a top-level \"step\" or \"interpolate\" expression" confirmed against
+ * `@maplibre/maplibre-gl-style-spec`'s `validateStyleMin`, since `zoom` may only be the direct
+ * input of a top-level `step`/`interpolate`), so `radiusMeters * 2^zoom / METERS_AT_ZOOM_0` cannot
+ * be written directly. Web Mercator resolution doubles every zoom level, so an
+ * `['exponential', 2]` interpolate from `(0, 0)` to `(REFERENCE_ZOOM, pixelsAt(REFERENCE_ZOOM))`
+ * reproduces that formula to within a fraction of a pixel (verified against the style-spec's own
+ * expression evaluator: <0.03% error by z12, past which this map hands off to HTML markers) —
+ * the same idiom MapLibre's own "scale-based circle radius" example uses for a meters-based
+ * radius.
+ */
+const PRECISION_RADIUS_REFERENCE_ZOOM = 20;
+
+/**
+ * Data-driven radius-affordance circle radius (px), from each feature's own `radiusMeters`
+ * property (`geoPrecisionTierForPublicPrecision` / `resolveDisplayRadiusMeters` in
+ * `geo-precision.ts`; attached at `radius.ok ? radiusMeters : <absent>` by
+ * `build-explore-map-source.ts`). A feature with no `radiusMeters` (a precision tier that failed
+ * closed rather than guessing a bbox) coalesces to `0` — invisible, not a fabricated ring.
+ */
+function precisionRadiusPixelsExpression(): ExpressionSpecification {
+  const pixelsAtReferenceZoom = [
     '/',
-    ['*', ['coalesce', ['get', 'radiusMeters'], 0], ['^', 2, ['zoom']]],
+    ['*', ['coalesce', ['get', 'radiusMeters'], 0], Math.pow(2, PRECISION_RADIUS_REFERENCE_ZOOM)],
     WEB_MERCATOR_METERS_AT_ZOOM_0,
-  ] as ExpressionSpecification;
+  ] as unknown as ExpressionSpecification;
+  return [
+    'interpolate',
+    ['exponential', 2],
+    ['zoom'],
+    0,
+    0,
+    PRECISION_RADIUS_REFERENCE_ZOOM,
+    pixelsAtReferenceZoom,
+  ] as unknown as ExpressionSpecification;
 }
 
 /**
@@ -292,6 +326,10 @@ type KindGlyphPaintSignature = {
 export const ENTITY_POINT_FILL_OPACITY = 0.52;
 /** Soft halo under every unclustered point. */
 export const ENTITY_HALO_OPACITY = 0.16;
+/** Precision-radius affordance circle opacity — fainter than the halo. A resolved radius can
+ * span a whole jurisdiction (state tier), so this has to read as ground the marker sits on
+ * without flooding the basemap the halo/point discs above it still carry the readable shade. */
+export const ENTITY_PRECISION_RADIUS_OPACITY = 0.1;
 /** Cluster aggregate disc opacity (grouped view). */
 export const ENTITY_CLUSTER_OPACITY = 0.55;
 /** Institution "ring" glyph — mostly hollow by design. */
@@ -607,6 +645,13 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
     literalPaintNumber(0),
   );
   const entityStrokeWidth = firstPaintOrKindStrokeWidthExpression(kindStrokeWidthExpression());
+  const entityPrecisionRadiusPixels = precisionRadiusPixelsExpression();
+  // Invisible at the national field, same as the halo — a radius affordance is meaningless
+  // zoomed out past the point where individual records are even distinguishable.
+  const entityPrecisionRadiusOpacity = blendFirstPaintWithKindExpression(
+    literalPaintNumber(ENTITY_PRECISION_RADIUS_OPACITY),
+    literalPaintNumber(0),
+  );
   const presenceFillActive = input.layerMode === 'presence';
   const populationFillActive =
     input.layerMode === 'blackShare' || input.layerMode === 'blackChange';
@@ -1125,6 +1170,25 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'line-color': plate.historyEdgeSelected,
           'line-width': 4,
           'line-opacity': 1,
+        },
+      },
+      {
+        // Precision-radius affordance — painted under the halo/point so it reads as ground the
+        // marker sits on. Only features carrying a resolved `radiusMeters` draw one; every other
+        // feature coalesces to a 0px radius (see `precisionRadiusPixelsExpression` above), and
+        // the `has` filter keeps that explicit rather than relying on an invisible-but-present
+        // circle.
+        id: EXPLORE_PRECISION_RADIUS_LAYER_ID,
+        type: 'circle',
+        source: EXPLORE_ENTITIES_SOURCE_ID,
+        filter: ['all', ['!', ['has', 'point_count']], ['has', 'radiusMeters']],
+        maxzoom: EXPLORE_GL_ENTITY_MAX_ZOOM,
+        paint: {
+          // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
+          ...DECADE_TRANSITION_PAINT,
+          'circle-radius': entityPrecisionRadiusPixels,
+          'circle-color': entityPointColor,
+          'circle-opacity': entityPrecisionRadiusOpacity,
         },
       },
       {

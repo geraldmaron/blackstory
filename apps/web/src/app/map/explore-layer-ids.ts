@@ -20,6 +20,12 @@ export const EXPLORE_CLUSTER_INCOMING_LAYER_ID = 'explore-clusters-incoming';
 
 export const EXPLORE_CLUSTER_COUNT_LAYER_ID = 'explore-cluster-count';
 export const EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID = 'explore-cluster-count-incoming';
+/** Precision-radius affordance circle (geoPrecisionTier / radiusMeters) — the shaded circle the
+ * Size legend and `NarrativeCard`'s `radiusAffordanceLabel` describe, painted under the halo/point
+ * so it reads as ground the marker sits on, not another marker. Renders only for features
+ * carrying a resolved `radiusMeters` (`resolveDisplayRadiusMeters`'s fail-closed `ok: false`
+ * tiers get no ring at all, never a guessed one). */
+export const EXPLORE_PRECISION_RADIUS_LAYER_ID = 'explore-point-precision-radius';
 export const EXPLORE_UNCLUSTERED_HALO_LAYER_ID = 'explore-point-halo';
 export const EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID = 'explore-point-halo-incoming';
 export const EXPLORE_UNCLUSTERED_POINT_LAYER_ID = 'explore-point';

@@ -31,6 +31,7 @@ import {
   ENTITY_CLUSTER_OPACITY,
   ENTITY_HALO_OPACITY,
   ENTITY_POINT_FILL_OPACITY,
+  ENTITY_PRECISION_RADIUS_OPACITY,
   ENTITY_SELECTED_PULSE_OPACITY_FROM,
   ENTITY_SELECTED_PULSE_OPACITY_TO,
   ENTITY_SELECTED_PULSE_SCALE_FROM,
@@ -49,6 +50,7 @@ import {
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
+  EXPLORE_PRECISION_RADIUS_LAYER_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
@@ -171,6 +173,7 @@ test('unclustered point fill and halo use first-paint opacity nationally, kind o
 test('GL entity discs hide once HTML first-paint markers mount above cluster max zoom', () => {
   const style = buildStyleFixture('presence');
   for (const layerId of [
+    EXPLORE_PRECISION_RADIUS_LAYER_ID,
     EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
     EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
     EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
@@ -255,6 +258,7 @@ test('selection touches only the dedicated ring layer — main entity layers nev
     EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
     EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
     EXPLORE_CLUSTER_LAYER_ID,
+    EXPLORE_PRECISION_RADIUS_LAYER_ID,
   ];
   for (const id of neighborLayerIds) {
     const layer = layerById(style, id) as LayerLike & { filter?: unknown };
@@ -945,6 +949,71 @@ test('point and halo radii blend first-paint sizes nationally with marker-size.t
     haloLayer.paint?.['circle-radius'],
     firstPaintOrKindRadiusExpression(markerHaloRadiusExpression()),
   );
+});
+
+test('precision-radius layer paints under the halo, gated to features with a resolved radius', () => {
+  const style = buildStyleFixture('presence');
+  const layerIndex = style.layers.findIndex(
+    (layer) => layer.id === EXPLORE_PRECISION_RADIUS_LAYER_ID,
+  );
+  const haloIndex = style.layers.findIndex(
+    (layer) => layer.id === EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+  );
+  const pointIndex = style.layers.findIndex(
+    (layer) => layer.id === EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+  );
+  assert.ok(layerIndex >= 0, 'expected a precision-radius layer');
+  assert.ok(
+    layerIndex < haloIndex && layerIndex < pointIndex,
+    'the radius affordance must paint under the halo/point, as ground the marker sits on',
+  );
+
+  const layerSpec = style.layers.find(
+    (layer) => layer.id === EXPLORE_PRECISION_RADIUS_LAYER_ID,
+  ) as { filter?: unknown; maxzoom?: number };
+  // Clusters carry no per-feature radiusMeters, and a precision-tier that failed closed
+  // (`resolveDisplayRadiusMeters`'s `ok: false`) must draw no ring at all, never a guessed one.
+  assert.deepEqual(layerSpec.filter, [
+    'all',
+    ['!', ['has', 'point_count']],
+    ['has', 'radiusMeters'],
+  ]);
+  assert.equal(layerSpec.maxzoom, EXPLORE_GL_ENTITY_MAX_ZOOM);
+});
+
+test('precision-radius fill shares kind shade with the point, and fades in past national zoom like the halo', () => {
+  const style = buildStyleFixture('presence');
+  const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
+  const precisionLayer = layerById(style, EXPLORE_PRECISION_RADIUS_LAYER_ID);
+  assert.deepEqual(
+    precisionLayer.paint?.['circle-color'],
+    pointLayer.paint?.['circle-color'],
+    'the radius affordance must share kind shade with the point (not a flat sand wash)',
+  );
+  const opacity = precisionLayer.paint?.['circle-opacity'] as unknown[];
+  assert.equal(opacity[0], 'interpolate');
+  assert.deepEqual(opacity[4], ['literal', 0]);
+  assert.deepEqual(opacity[6], ['literal', ENTITY_PRECISION_RADIUS_OPACITY]);
+});
+
+test("precision-radius circle-radius is a single top-level exponential(2) zoom interpolate reading the feature's own radiusMeters", () => {
+  const style = buildStyleFixture('presence');
+  const precisionLayer = layerById(style, EXPLORE_PRECISION_RADIUS_LAYER_ID);
+  const radius = precisionLayer.paint?.['circle-radius'] as unknown[];
+  // Zoom may only ever be the direct input of a top-level step/interpolate (MapLibre style
+  // spec) — this is the two-stop base-2 exponential-interpolate idiom that reproduces
+  // `radiusMeters * 2^zoom / metersPerPixelAtZoom0` without nesting `['zoom']` inside
+  // arithmetic (`explore-style-spec.test.ts` proves this against the real validator/evaluator).
+  assert.equal(radius[0], 'interpolate');
+  assert.deepEqual(radius[1], ['exponential', 2]);
+  assert.deepEqual(radius[2], ['zoom']);
+  assert.equal(radius[3], 0);
+  assert.equal(radius[4], 0);
+  const atReferenceZoom = radius[6] as unknown[];
+  assert.deepEqual(atReferenceZoom[0], '/');
+  const numerator = atReferenceZoom[1] as unknown[];
+  assert.deepEqual(numerator[0], '*');
+  assert.deepEqual(numerator[1], ['coalesce', ['get', 'radiusMeters'], 0]);
 });
 
 test('clusters inherit dominant kind-family shade instead of Page Sand / copper chrome', () => {
