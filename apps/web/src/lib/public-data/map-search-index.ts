@@ -33,7 +33,7 @@ export function mapPublicSearchProjection(doc: PublicSearchProjectionDoc): Publi
     researchCoverage: doc.researchCoverage,
     relatedCount: doc.relatedCount,
     claimCount: doc.claimCount,
-    ...(doc.confidenceTier !== undefined ? { confidenceTier: doc.confidenceTier } : {}),
+    ...(doc.evidenceInputs !== undefined ? { evidenceInputs: doc.evidenceInputs } : {}),
     ...(doc.geohash !== undefined ? { geohash: doc.geohash } : {}),
   };
 }

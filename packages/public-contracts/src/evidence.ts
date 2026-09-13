@@ -213,51 +213,65 @@ function isRecordProvenanceClaim(claim: EvidenceClaimInput): boolean {
   return (claim.claimRole ?? '').trim().toLowerCase() === CLAIM_ROLE_RECORD_INDEX;
 }
 
-/**
- * Distinct lineages cited anywhere on the record, provenance and Wikipedia included.
- *
- * This answers whether anyone assessed the record at all, which is a different question to
- * whether it is corroborated. A record cited only to Wikipedia has been assessed, and so is
- * graded rather than reported `unrated`.
- */
-export function citedLineageCount(claims: readonly EvidenceClaimInput[]): number {
-  const lineages = new Set<string>();
-  for (const claim of claims) {
-    const key = citationLineageKey(claim);
-    if (key !== null) lineages.add(key);
-  }
-  return lineages.size;
-}
-
-/**
- * Distinct lineages that are allowed to corroborate the record.
- *
- * Two exclusions. Neither is invented here, and neither can be expressed by the host string
- * alone, which is why counting hosts kept overstating the archive:
- *
- * - Wikipedia may carry a claim and may never corroborate one. `claim-corroborate` lists
- *   counting it as the second lineage under Never, and `isWikipediaHost` already keeps it out of
- *   every corroboration path on the ingest side. It reached grade A on 335 records here.
- * - A record's own index row is not a source about the record. Counting it let 784 records reach
- *   grade A on a single federal listing served by two agencies: the NARA catalog entry the record
- *   was seeded from, and the NPS nomination form carrying that same reference number.
- */
-export function corroboratingLineageCount(claims: readonly EvidenceClaimInput[]): number {
-  const lineages = new Set<string>();
-  for (const claim of claims) {
-    if (isRecordProvenanceClaim(claim)) continue;
-    const key = citationLineageKey(claim);
-    if (key !== null && key !== WIKIPEDIA_LINEAGE_KEY) lineages.add(key);
-  }
-  return lineages.size;
-}
-
 /** The strongest claim tier present, ignoring corroboration. */
 function strongestClaimTier(claims: readonly EvidenceClaimInput[]): ConfidenceTier {
   if (claims.some((claim) => claim.confidenceLevel === 'high')) return 'high';
   if (claims.some((claim) => claim.confidenceLevel === 'medium')) return 'medium';
   if (claims.some((claim) => claim.confidenceLevel === 'low')) return 'low';
   return 'unrated';
+}
+
+/**
+ * The grading INPUTS a record's claims reduce to — the only thing a cache should ever store.
+ *
+ * `search_index` used to carry the graded tier itself, and that is what stranded `/records` for a
+ * day when the rule changed on 2026-09-07: every surface that derives updated instantly while the
+ * cached CONCLUSION kept answering under the old rule until a backfill ran (repo-ngojq,
+ * repo-6qjv0). Caching the inputs instead means `/records` runs the same
+ * `confidenceTierFromEvidenceInputs` Explore runs, over cheap slim data, so a rule change reaches
+ * both at once and drift is not merely detected — it is impossible.
+ *
+ * The line between what is cached and what is computed is deliberate: everything here is a FACT
+ * read off the claim rows (which levels are present, which lineages are cited, which of those
+ * carry a claim that is not the record's own index row). No judgment lives here. Which lineages
+ * are allowed to corroborate, how many it takes, and what an uncorroborated record steps down to
+ * are all rule, and rule lives only in `confidenceTierFromEvidenceInputs`. Bake an exclusion into
+ * the projection and the next change to that exclusion strands the cache exactly as before.
+ */
+export type RecordEvidenceInputs = {
+  /** Strongest claim level on the record, before any corroboration cap. */
+  readonly strongestClaimLevel: ConfidenceTier;
+  /** Every distinct lineage cited on the record — provenance rows and Wikipedia included. */
+  readonly citedLineageKeys: readonly string[];
+  /**
+   * The subset cited by at least one claim that is NOT the record's own index row.
+   *
+   * A record's own index row is not a source about the record. Counting it let 784 records reach
+   * grade A on a single federal listing served by two agencies: the NARA catalog entry the record
+   * was seeded from, and the NPS nomination form carrying that same reference number. That
+   * partition is a fact about the stored `claimRole`, which is why it belongs here.
+   *
+   * Wikipedia is still in this set. Excluding it is the rule's job, not the projection's: it is a
+   * policy about one publisher, and a policy can change.
+   */
+  readonly evidenceLineageKeys: readonly string[];
+};
+
+/** Reduces a record's claims to the facts grading needs. Pure projection, no rule. */
+export function recordEvidenceInputs(claims: readonly EvidenceClaimInput[]): RecordEvidenceInputs {
+  const cited = new Set<string>();
+  const evidence = new Set<string>();
+  for (const claim of claims) {
+    const key = citationLineageKey(claim);
+    if (key === null) continue;
+    cited.add(key);
+    if (!isRecordProvenanceClaim(claim)) evidence.add(key);
+  }
+  return {
+    strongestClaimLevel: strongestClaimTier(claims),
+    citedLineageKeys: [...cited],
+    evidenceLineageKeys: [...evidence],
+  };
 }
 
 /**
@@ -275,21 +289,36 @@ function strongestClaimTier(claims: readonly EvidenceClaimInput[]): ConfidenceTi
  * `lineageIndependence` and cannot clear the 0.75 publish threshold; this is the same rule
  * applied at the level a reader actually sees.
  *
- * Counting citation hosts was still too generous, because two of them are not second opinions:
- * Wikipedia, which may carry a claim but never corroborate one, and the record's own index row.
- * `corroboratingLineageCount` excludes both, which is what separates the lineages that can
- * support a grade from the lineages that merely exist. Grade A is 572 records under this rule,
- * from 1,807 when any two hosts counted (repo-goyut, repo-6jizv).
+ * Counting citation hosts was still too generous, because two of them are not second opinions.
+ * Wikipedia may carry a claim and may never corroborate one: `claim-corroborate` lists counting
+ * it as the second lineage under Never, `isWikipediaHost` already keeps it out of every
+ * corroboration path on the ingest side, and it reached grade A on 335 records here. The record's
+ * own index row is not a source about the record either. `evidenceLineageKeys` has already
+ * dropped the index rows and the Wikipedia exclusion is applied here, which is what separates the
+ * lineages that can support a grade from the lineages that merely exist. Grade A is 572 records
+ * under this rule, from 1,807 when any two hosts counted (repo-goyut, repo-6jizv).
  *
  * A record with no citations is `unrated`, never `low` — nobody assessed it, which is not the
- * same as assessing it poorly. That test uses `citedLineageCount`, so a record carrying only
- * Wikipedia or only its index row is graded, and graded low, rather than reported unassessed.
+ * same as assessing it poorly. That test uses `citedLineageKeys`, which answers "did anyone
+ * assess this at all" rather than "is it corroborated", so a record carrying only Wikipedia or
+ * only its index row is graded, and graded low, rather than reported unassessed.
+ *
+ * THIS FUNCTION IS THE RULE. Every surface reaches it, either from claims through
+ * `recordConfidenceTier` or from cached inputs directly; nothing else decides a record's grade.
  */
-export function recordConfidenceTier(claims: readonly EvidenceClaimInput[]): ConfidenceTier {
-  const strongest = strongestClaimTier(claims);
+export function confidenceTierFromEvidenceInputs(inputs: RecordEvidenceInputs): ConfidenceTier {
+  const strongest = inputs.strongestClaimLevel;
   if (strongest === 'unrated') return 'unrated';
-  if (citedLineageCount(claims) === 0) return 'unrated';
-  if (corroboratingLineageCount(claims) > 1) return strongest;
+  if (inputs.citedLineageKeys.length === 0) return 'unrated';
+  const corroborating = inputs.evidenceLineageKeys.filter(
+    (key) => key !== WIKIPEDIA_LINEAGE_KEY,
+  ).length;
+  if (corroborating > 1) return strongest;
   // At most one lineage that can corroborate. Step down one grade.
   return strongest === 'high' ? 'medium' : 'low';
+}
+
+/** The tier for a record whose claims are in hand: project, then apply the one rule. */
+export function recordConfidenceTier(claims: readonly EvidenceClaimInput[]): ConfidenceTier {
+  return confidenceTierFromEvidenceInputs(recordEvidenceInputs(claims));
 }

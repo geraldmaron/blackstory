@@ -63,6 +63,18 @@ export interface PublicDataAccess {
    */
   getEntity(releaseId: string, entityId: string): Promise<EntityV1 | undefined>;
   /**
+   * The survivor id a merged-away entity id forwards to, or `undefined` (repo-n7p6.29).
+   *
+   * This is the ONE distinction the T3 indistinguishability rule above deliberately allows, and
+   * only because the data behind it is published on purpose: `bb_public.release_entity_redirects`
+   * holds nothing but absorbed ids that were already publicly resolvable, mapped to survivors
+   * that are published now. It says nothing about any unpublished record — a withdrawn id and a
+   * never-existed id both miss this lookup exactly the way they miss `getEntity`, so the
+   * enumeration surface is unchanged. The handler calls it on EVERY miss, so the backend call
+   * sequence stays identical across nonexistent, unpublished, and absorbed ids.
+   */
+  getEntityRedirect(releaseId: string, entityId: string): Promise<string | undefined>;
+  /**
    * All published entities for a release (map FeatureCollection input). Bounded upstream by
    * adapter scan ceilings; callers must still validate the map payload against MapSourceV1.
    */
@@ -105,6 +117,12 @@ export type InMemoryPublicDataOptions = {
    * test can assert that an unpublished id and a nonexistent id produce byte-identical 404s.
    */
   readonly unpublishedIds?: readonly string[];
+  /**
+   * Published absorbed→survivor redirects for this release, as `{ [absorbedId]: survivorId }`.
+   * Mirrors `bb_public.release_entity_redirects`; values are already terminal survivors, so a
+   * chain is never walked here either.
+   */
+  readonly redirects?: Readonly<Record<string, string>>;
 };
 
 export function createInMemoryPublicDataAccess(
@@ -124,6 +142,10 @@ export function createInMemoryPublicDataAccess(
     async getEntity(_releaseId, entityId) {
       // Both unpublished and nonexistent collapse to `undefined` — no distinguishing signal.
       return byId.get(entityId);
+    },
+
+    async getEntityRedirect(_releaseId, entityId) {
+      return options.redirects?.[entityId];
     },
 
     async listEntities(_releaseId) {
@@ -250,6 +272,8 @@ export type PublicDataAccessReaders = {
   readonly readReleasePointer: () => Promise<ReleasePointer | undefined>;
   /** MUST already collapse unpublished/nonexistent to `undefined` (T3). */
   readonly readEntity: (releaseId: string, entityId: string) => Promise<EntityV1 | undefined>;
+  /** The published absorbed→survivor forward for this id, if any (repo-n7p6.29). */
+  readonly readEntityRedirect: (releaseId: string, entityId: string) => Promise<string | undefined>;
   /** All published entities for map FeatureCollection construction. */
   readonly readEntities: (releaseId: string) => Promise<readonly EntityV1[]>;
   readonly readSearchPage: (
@@ -270,6 +294,9 @@ export function createPublicDataAccessFromReaders(
       // Re-validate at the boundary: even a live projection reader's output is parsed before it can
       // leave this module, so an accidental internal field can never reach a client.
       return entity ? entityV1Schema.parse(entity) : undefined;
+    },
+    async getEntityRedirect(releaseId, entityId) {
+      return readers.readEntityRedirect(releaseId, entityId);
     },
     async listEntities(releaseId) {
       const entities = await readers.readEntities(releaseId);

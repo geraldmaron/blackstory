@@ -15,6 +15,7 @@ export const fetchActiveRelease = postgresReaders.fetchActiveRelease;
 export const fetchPublicEntityProjection = postgresReaders.fetchPublicEntityProjection;
 export const listPublicEntityProjections = postgresReaders.listPublicEntityProjections;
 export const fetchPublicEntityProjectionsByIds = postgresReaders.fetchPublicEntityProjectionsByIds;
+export const fetchPublicEntityRedirect = postgresReaders.fetchPublicEntityRedirect;
 export const listPublicSearchIndexDocs = postgresReaders.listPublicSearchIndexDocs;
 export const listPublicLegalSnapshots = postgresReaders.listPublicLegalSnapshots;
 export const fetchMaterializedSnapshot = postgresReaders.fetchMaterializedSnapshot;

@@ -383,7 +383,7 @@ describe('/records · place hrefs and map continuity', () => {
     assert.match(neighbors?.next?.href ?? '', /state=DC/);
   });
 
-  it('builds from search_index docs when confidenceTier is projected', () => {
+  it('builds from search_index docs when evidenceInputs is projected', () => {
     const docs = [
       {
         id: 'ent_a',
@@ -401,7 +401,13 @@ describe('/records · place hrefs and map continuity', () => {
         researchCoverage: 'partial' as const,
         relatedCount: 0,
         claimCount: 1,
-        confidenceTier: 'high' as const,
+        // Grade A: two lineages that may corroborate, on a high claim. The row carries the
+        // ingredients and `buildRecordsIndex` applies the shared rule — no tier is cached.
+        evidenceInputs: {
+          strongestClaimLevel: 'high' as const,
+          citedLineageKeys: ['npgallery.nps.gov', 'catalog.archives.gov'],
+          evidenceLineageKeys: ['npgallery.nps.gov', 'catalog.archives.gov'],
+        },
         jurisdictionState: 'Washington, D.C.',
         geohash: 'dqcjq',
       },
@@ -421,15 +427,28 @@ describe('/records · place hrefs and map continuity', () => {
         researchCoverage: 'minimal' as const,
         relatedCount: 0,
         claimCount: 1,
-        confidenceTier: 'medium' as const,
+        // One lineage on a high claim: the rule steps it down to B at read time.
+        evidenceInputs: {
+          strongestClaimLevel: 'high' as const,
+          citedLineageKeys: ['npgallery.nps.gov'],
+          evidenceLineageKeys: ['npgallery.nps.gov'],
+        },
       },
     ];
     assert.equal(searchIndexReadyForRecords(docs), true);
-    const { confidenceTier: _confidenceTier, ...withoutConfidenceTier } = docs[0]!;
-    assert.equal(searchIndexReadyForRecords([withoutConfidenceTier]), false);
+    const { evidenceInputs: _evidenceInputs, ...withoutEvidenceInputs } = docs[0]!;
+    assert.equal(searchIndexReadyForRecords([withoutEvidenceInputs]), false);
+    // A row carrying only the retired derived tier is NOT coverage: `/records` must fall back to
+    // full entities rather than serve a cached conclusion (repo-6qjv0).
+    assert.equal(
+      searchIndexReadyForRecords([{ ...withoutEvidenceInputs, confidenceTier: 'high' } as never]),
+      false,
+    );
     const model = buildRecordsIndex(docs, EMPTY_RECORDS_QUERY);
     assert.equal(model.totalAll, 2);
     assert.equal(model.rows.find((row) => row.id === 'ent_a')?.grade, 'A');
+    // Derived from the cached inputs, not read off them: a single lineage cannot hold grade A.
+    assert.equal(model.rows.find((row) => row.id === 'ent_b')?.grade, 'B');
     assert.equal(
       model.rows.find((row) => row.id === 'ent_a')?.href,
       '/place/alpha-place?from=list',

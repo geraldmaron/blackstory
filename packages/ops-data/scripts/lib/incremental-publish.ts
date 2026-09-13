@@ -1654,7 +1654,7 @@ export function toSearchIndexRow(
       keywords: searchIndex.keywords ?? [],
       researchCoverage: searchIndex.researchCoverage,
       recordMaturity: searchIndex.recordMaturity,
-      confidenceTier: searchIndex.confidenceTier,
+      evidenceInputs: searchIndex.evidenceInputs,
       topicIds: searchIndex.topicIds ?? [],
       mentionedEntityIds: searchIndex.mentionedEntityIds ?? [],
       notabilityBasis: searchIndex.notabilityBasis ?? [],

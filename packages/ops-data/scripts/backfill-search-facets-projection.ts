@@ -19,7 +19,7 @@
  *   - facet-only: the search doc has a value the projection lacks;
  *   - both-set-and-differing: both carry values and they disagree.
  * `OVERWRITE_CONFLICTS=1` resolves the second case toward the projection. It does not apply to
- * `status` or `confidenceTier`: those two targets always resolve a mismatch regardless of this
+ * `status` or `evidenceInputs`: those two targets always resolve a mismatch regardless of this
  * flag (see `lib/search-facet-realign.ts`'s module header for why).
  *
  * Measured on 2026-09-10 across the active release, `topicIds` and `mentionedEntityIds` are clean
@@ -97,7 +97,7 @@ const APPLY = process.env.BACKFILL_SEARCH_FACETS_PROJECTION_APPLY === '1';
  * Separate from APPLY because it discards published facet content rather than filling a hole.
  * Do not set it without reading the disagreeing rows first. The 52 person records reviewed on
  * 2026-09-10 were safe to resolve this way (see the header), but that was a finding about those
- * rows, not a property of the operation. Ignored for `status` and `confidenceTier`, which always
+ * rows, not a property of the operation. Ignored for `status` and `evidenceInputs`, which always
  * resolve a mismatch regardless of this flag.
  */
 const OVERWRITE_CONFLICTS = process.env.OVERWRITE_CONFLICTS === '1';

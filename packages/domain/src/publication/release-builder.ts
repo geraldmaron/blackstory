@@ -58,6 +58,7 @@ import { evaluateFactPublishGate } from '../facts/publish-gate.js';
 import type { FactCitation } from '../facts/citation.js';
 import { isValidTopicId } from '../taxonomy/topics.js';
 import { buildGeoPointFields, type GeoPointFields } from '../geography/geohash.js';
+import { recordEvidenceInputs, type RecordEvidenceInputs } from '../evidence-inputs.js';
 import { publicVisitForTier, type PublicVisit } from '../geography/visit.js';
 import {
   evaluateGeoIntegrityPublishGate,
@@ -289,90 +290,25 @@ export type ReleaseEntityProjectionFields = {
   readonly recordUpdatedAt: string;
 };
 
-/** Highest accepted-claim confidence on a record. Letter grades derive at read time; never invent grade from claim count. */
-export type ReleaseConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
-
 /**
- * The lineage a citation belongs to, for corroboration counting. One publisher spelled several
- * ways (`wikipedia_api`, `en.wikipedia.org`) is one lineage, not several.
+ * Record grading no longer happens in this package.
+ *
+ * `highestClaimConfidenceTier` used to live here and write a finished `confidenceTier` onto the
+ * search index for `/records` to read back — one rule with two implementations, which stranded
+ * `/records` for a day when the rule changed (repo-ngojq, repo-6qjv0). The builder now projects
+ * the grading INPUTS instead, and every surface applies the single rule at read time. See
+ * `../evidence-inputs.js` for why the split falls where it does.
  */
-const WIKIPEDIA_LINEAGE_KEY = 'wikipedia';
+export {
+  CLAIM_ROLE_RECORD_INDEX,
+  recordEvidenceInputs,
+  type EvidenceClaimLevel,
+  type EvidenceInputClaim,
+  type RecordEvidenceInputs,
+} from '../evidence-inputs.js';
 
 /** Whether a claim is the record's own index row or evidence about its subject. */
 export type ClaimRole = 'record_index' | 'evidence';
-
-export const CLAIM_ROLE_RECORD_INDEX: ClaimRole = 'record_index';
-
-/**
- * True when a claim is the record's own index row rather than evidence about its subject.
- *
- * Every published claim carries `claimRole` as of the 2026-09-09 migration. A claim missing it is
- * treated as evidence rather than inferred from its predicate — predicate inference was a bridge
- * for claims published before the field existed, mirrored in `@repo/public-contracts/evidence`,
- * and it comes out of both now that none are left.
- */
-function isRecordIndexClaim(claim: { readonly claimRole?: string }): boolean {
-  return (claim.claimRole ?? '').trim().toLowerCase() === CLAIM_ROLE_RECORD_INDEX;
-}
-
-function claimLineageKey(citationSource: string | undefined): string | null {
-  const raw = (citationSource ?? '').trim().toLowerCase();
-  if (raw.length === 0) return null;
-  if (raw.includes('wikipedia') || raw.includes('wikidata')) return WIKIPEDIA_LINEAGE_KEY;
-  return raw.replace(/^(?:www|en|en\.m|m)\./u, '');
-}
-
-/**
- * Record confidence for the search_index facet that Records reads its evidence floors from.
- *
- * The strongest claim on the record, capped by corroboration: a record cited to a single lineage
- * cannot reach the top tier, however authoritative that lineage is. It used to be the bare
- * maximum, which published 4,152 of 4,167 records at the top grade and made the reader-facing
- * meter meaningless.
- *
- * Two citations do not count toward corroboration, because neither is a second opinion: Wikipedia
- * (which may carry a claim but never corroborate one) and the record's own index row. Counting
- * them held grade A at 1,807 records; excluding them lands it at 572 (repo-goyut, repo-6jizv).
- *
- * This deliberately restates `recordConfidenceTier` from `@repo/public-contracts/evidence`
- * rather than importing it: `@repo/domain` takes no dependency on the public contracts package,
- * the dependency direction recorded in `docs/decisions-carryover.md`. The two must agree — the
- * facet written here and the tier computed at read time grade the same records, and Records
- * prefers this facet when the search index carries it, so a drift between them shows up as
- * Records and Explore disagreeing about the same record.
- */
-export function highestClaimConfidenceTier(
-  claims: readonly {
-    readonly confidenceLevel?: string;
-    readonly citationSource?: string;
-    readonly predicate?: string;
-    readonly claimRole?: string;
-  }[],
-): ReleaseConfidenceTier {
-  const strongest: ReleaseConfidenceTier = claims.some((claim) => claim.confidenceLevel === 'high')
-    ? 'high'
-    : claims.some((claim) => claim.confidenceLevel === 'medium')
-      ? 'medium'
-      : claims.some((claim) => claim.confidenceLevel === 'low')
-        ? 'low'
-        : 'unrated';
-  if (strongest === 'unrated') return 'unrated';
-  // Cited answers "was this assessed"; corroborating answers "is it supported". A record holding
-  // only Wikipedia or only its own index row is graded low, never reported unassessed.
-  const cited = new Set<string>();
-  const corroborating = new Set<string>();
-  for (const claim of claims) {
-    const key = claimLineageKey(claim.citationSource);
-    if (key === null) continue;
-    cited.add(key);
-    if (key === WIKIPEDIA_LINEAGE_KEY) continue;
-    if (isRecordIndexClaim(claim)) continue;
-    corroborating.add(key);
-  }
-  if (cited.size === 0) return 'unrated';
-  if (corroborating.size > 1) return strongest;
-  return strongest === 'high' ? 'medium' : 'low';
-}
 
 export type ReleaseSearchIndexFields = {
   readonly id: string;
@@ -396,8 +332,11 @@ export type ReleaseSearchIndexFields = {
   readonly researchCoverage: ReleaseResearchCoverage;
   readonly relatedCount: number;
   readonly claimCount: number;
-  /** Highest claim confidence — evidence floor input for Records slim; not a public ranking score. */
-  readonly confidenceTier: ReleaseConfidenceTier;
+  /**
+   * The grading inputs `/records` reads its evidence floors from, so the slim index carries the
+   * ingredients rather than a conclusion a rule change can strand. Never a ranking score.
+   */
+  readonly evidenceInputs: RecordEvidenceInputs;
 };
 
 export type ReleaseBuildFailureReason =
@@ -1956,7 +1895,7 @@ export function buildReleaseEntityArtifacts(
     researchCoverage,
     relatedCount: related.length,
     claimCount: claims.length,
-    confidenceTier: highestClaimConfidenceTier(claims),
+    evidenceInputs: recordEvidenceInputs(claims),
   };
 
   return { ok: true, projection, searchIndex };

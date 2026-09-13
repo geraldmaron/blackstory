@@ -40,8 +40,16 @@ export type { ConfidenceTier };
  * The tier is the shared rule in `@repo/public-contracts/evidence`, not a local bare-maximum
  * over claim levels: it also accounts for corroboration — see `recordConfidenceTier`.
  * Re-exported here because Explore, Records and the record page all reach for it under this name.
+ *
+ * `confidenceTierFromEvidenceInputs` is that same rule reached from the other end. A surface
+ * holding live claims calls `recordConfidenceTier`; `/records`, which holds the slim index's
+ * cached grading inputs instead of claims, calls this. Both land in one function, which is what
+ * stops the two rooms grading the same record differently after a rule change.
  */
-export { recordConfidenceTier } from '@repo/public-contracts/evidence';
+export {
+  confidenceTierFromEvidenceInputs,
+  recordConfidenceTier,
+} from '@repo/public-contracts/evidence';
 
 export type ExploreMapFeatureProperties = {
   readonly entityId: string;

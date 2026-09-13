@@ -23,6 +23,12 @@
  * Reversed merges (`entity_merges.status <> 'active'`) are ignored, so un-merging an entity and
  * re-running does not re-absorb it.
  *
+ * repo-n7p6.29: it also publishes the map it just enforced into
+ * `bb_public.release_entity_redirects`, in the same transaction as the unpublish. Removing the
+ * absorbed record was right; killing its URL was not, and the public readers cannot see the
+ * ledger (bb_canonical merge tables are staff-only RLS). That table is what lets `/entity/{id}`
+ * and `/v1/entity/{id}` forward an absorbed id to its survivor instead of 404ing it.
+ *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a
  *   export DATABASE_SSL=1
@@ -49,7 +55,11 @@ function connectionString(): string {
   return value;
 }
 
-type MergePair = { readonly absorbedId: string; readonly survivorId: string };
+type MergePair = {
+  readonly absorbedId: string;
+  readonly survivorId: string;
+  readonly reason: string;
+};
 
 /**
  * The absorbed→survivor map, from ACTIVE ledger rows only.
@@ -57,15 +67,23 @@ type MergePair = { readonly absorbedId: string; readonly survivorId: string };
  * Chains are resolved transitively (A absorbed into B, B later absorbed into C, so A resolves to
  * C) with a bounded walk — a cycle in the ledger would otherwise spin here, and a cycle is a data
  * bug we should report rather than hang on.
+ *
+ * `reason` is the reason of the merge that absorbed THIS id (the first hop), not of the last hop
+ * in a chain: it answers "why is this id gone", which is what the published redirect row records.
  */
 async function loadActiveMerges(client: pg.PoolClient): Promise<readonly MergePair[]> {
-  const { rows } = await client.query<{ absorbed_id: string; survivor_id: string }>(
-    `SELECT a.absorbed_id, m.survivor_id
+  const { rows } = await client.query<{
+    absorbed_id: string;
+    survivor_id: string;
+    reason: string;
+  }>(
+    `SELECT a.absorbed_id, m.survivor_id, m.reason
        FROM bb_canonical.entity_merge_absorbed a
        JOIN bb_canonical.entity_merges m ON m.id = a.merge_id
       WHERE m.status = 'active'`,
   );
   const direct = new Map(rows.map((r) => [r.absorbed_id, r.survivor_id]));
+  const reasons = new Map(rows.map((r) => [r.absorbed_id, r.reason]));
   const resolved: MergePair[] = [];
   for (const [absorbedId, firstSurvivor] of direct) {
     let survivorId = firstSurvivor;
@@ -79,7 +97,9 @@ async function loadActiveMerges(client: pg.PoolClient): Promise<readonly MergePa
       seen.add(survivorId);
       survivorId = direct.get(survivorId)!;
     }
-    if (survivorId !== absorbedId) resolved.push({ absorbedId, survivorId });
+    if (survivorId !== absorbedId) {
+      resolved.push({ absorbedId, survivorId, reason: reasons.get(absorbedId) ?? '' });
+    }
   }
   return resolved;
 }
@@ -227,6 +247,65 @@ async function unpublishAbsorbed(
 }
 
 /**
+ * repo-n7p6.29 — publishes the absorbed→survivor map into
+ * `bb_public.release_entity_redirects` for the ACTIVE release, so the public readers
+ * (apps/web `/entity/{id}`, apps/api-public `/v1/entity/{id}`) can 308 a merged-away id to its
+ * survivor instead of serving an indistinguishable 404. They cannot read the ledger itself: the
+ * merge tables live in bb_canonical behind a staff-only RLS policy.
+ *
+ * Companion to `unpublishAbsorbed` above, and deliberately in the same transaction: the statement
+ * that removes the absorbed record's own row is the statement that must leave a forwarding
+ * address behind, or the URL dies between the two.
+ *
+ * `to_entity_id` is the fully-resolved terminal survivor from `loadActiveMerges`, so a reader
+ * never walks a chain. Rows for merges that are no longer active (reversed, or the ledger row
+ * removed) are deleted, which is what makes re-running this a true reconcile rather than an
+ * append.
+ *
+ * A redirect is published even when the survivor is not currently in the release. That is
+ * deliberate: the reader resolves the survivor before redirecting, so an unpublished survivor
+ * degrades to the same honest 404 the absorbed id would have given, and the row starts working
+ * again by itself the moment the survivor publishes.
+ */
+async function publishRedirects(
+  client: pg.PoolClient,
+  pairs: readonly MergePair[],
+): Promise<Counts> {
+  const upserted =
+    pairs.length === 0
+      ? 0
+      : ((
+          await client.query(
+            `INSERT INTO bb_public.release_entity_redirects
+               (release_id, from_entity_id, to_entity_id, reason)
+             SELECT a.release_id, p.from_entity_id, p.to_entity_id, nullif(p.reason, '')
+               FROM bb_public.v_active_release_id a,
+                    unnest($1::text[], $2::text[], $3::text[])
+                      AS p(from_entity_id, to_entity_id, reason)
+             ON CONFLICT (release_id, from_entity_id) DO UPDATE
+               SET to_entity_id = excluded.to_entity_id,
+                   reason = excluded.reason`,
+            [
+              pairs.map((p) => p.absorbedId),
+              pairs.map((p) => p.survivorId),
+              pairs.map((p) => p.reason),
+            ],
+          )
+        ).rowCount ?? 0);
+  const removed =
+    (
+      await client.query(
+        `DELETE FROM bb_public.release_entity_redirects r
+          USING bb_public.v_active_release_id a
+          WHERE r.release_id = a.release_id
+            AND NOT (r.from_entity_id = ANY($1::text[]))`,
+        [pairs.map((p) => p.absorbedId)],
+      )
+    ).rowCount ?? 0;
+  return { redirects_published: upserted, redirects_removed: removed };
+}
+
+/**
  * Repoints published references to absorbed ids onto the survivor, in `related[]` (top-level and
  * inside `projection`) and in `projection.mentionedEntityIds`.
  *
@@ -289,9 +368,23 @@ async function remapReleaseReferences(
 async function reportDrift(
   client: pg.PoolClient,
   pairs: readonly MergePair[],
-): Promise<{ edges: number; published: number; relatedRefs: number }> {
+): Promise<{ edges: number; published: number; relatedRefs: number; missingRedirects: number }> {
   const absorbed = pairs.map((p) => p.absorbedId);
-  if (absorbed.length === 0) return { edges: 0, published: 0, relatedRefs: 0 };
+  if (absorbed.length === 0) {
+    // Still worth one query: a reversed merge leaves a live redirect that must be withdrawn even
+    // though there are no absorbed ids left to reconcile.
+    const orphaned = await client.query<{ n: string }>(
+      `SELECT count(*)::text n
+         FROM bb_public.release_entity_redirects r, bb_public.v_active_release_id a
+        WHERE r.release_id = a.release_id`,
+    );
+    return {
+      edges: 0,
+      published: 0,
+      relatedRefs: 0,
+      missingRedirects: Number(orphaned.rows[0]?.n ?? 0),
+    };
+  }
   const edges = await client.query<{ n: string }>(
     `SELECT count(*)::text n FROM bb_canonical.entity_relationships
       WHERE from_entity_id = ANY($1::text[]) OR to_entity_id = ANY($1::text[])`,
@@ -320,10 +413,34 @@ async function reportDrift(
         )`,
     [absorbed],
   );
+  // A redirect row is "missing" when the active release does not carry exactly the pair this
+  // ledger implies — absent, or pointing at a stale survivor. Counted alongside the rest so the
+  // "nothing to reconcile" early return cannot skip publishing them.
+  const missingRedirects = await client.query<{ n: string }>(
+    `SELECT count(*)::text n
+       FROM unnest($1::text[], $2::text[]) AS p(from_entity_id, to_entity_id),
+            bb_public.v_active_release_id a
+      WHERE NOT EXISTS (
+        SELECT 1 FROM bb_public.release_entity_redirects r
+         WHERE r.release_id = a.release_id
+           AND r.from_entity_id = p.from_entity_id
+           AND r.to_entity_id = p.to_entity_id
+      )`,
+    [absorbed, pairs.map((p) => p.survivorId)],
+  );
+  const staleRedirects = await client.query<{ n: string }>(
+    `SELECT count(*)::text n
+       FROM bb_public.release_entity_redirects r, bb_public.v_active_release_id a
+      WHERE r.release_id = a.release_id
+        AND NOT (r.from_entity_id = ANY($1::text[]))`,
+    [absorbed],
+  );
   return {
     edges: Number(edges.rows[0]?.n ?? 0),
     published: Number(published.rows[0]?.n ?? 0),
     relatedRefs: Number(relatedRefs.rows[0]?.n ?? 0),
+    missingRedirects:
+      Number(missingRedirects.rows[0]?.n ?? 0) + Number(staleRedirects.rows[0]?.n ?? 0),
   };
 }
 
@@ -341,10 +458,16 @@ async function main(): Promise<void> {
     console.log(
       `\nDrift: ${before.edges} canonical edge(s) on absorbed ids, ` +
         `${before.published} absorbed entity/entities still published, ` +
-        `${before.relatedRefs} published record(s) linking to an absorbed id.`,
+        `${before.relatedRefs} published record(s) linking to an absorbed id, ` +
+        `${before.missingRedirects} public redirect(s) missing, stale, or withdrawn.`,
     );
 
-    if (before.edges === 0 && before.published === 0 && before.relatedRefs === 0) {
+    if (
+      before.edges === 0 &&
+      before.published === 0 &&
+      before.relatedRefs === 0 &&
+      before.missingRedirects === 0
+    ) {
       console.log('\nNothing to reconcile.');
       return;
     }
@@ -357,10 +480,11 @@ async function main(): Promise<void> {
     const graph = await repointGraph(client, pairs);
     const related = await remapReleaseReferences(client, pairs);
     const unpublished = await unpublishAbsorbed(client, pairs);
+    const redirects = await publishRedirects(client, pairs);
     await client.query('COMMIT');
 
     console.log('\nApplied:');
-    for (const [key, value] of Object.entries({ ...graph, ...unpublished })) {
+    for (const [key, value] of Object.entries({ ...graph, ...unpublished, ...redirects })) {
       console.log(`  ${key}: ${value}`);
     }
     console.log(`  release_references_remapped: ${related}`);
@@ -370,7 +494,8 @@ async function main(): Promise<void> {
 
     const after = await reportDrift(client, pairs);
     console.log(
-      `\nRemaining drift: edges=${after.edges} published=${after.published} relatedRefs=${after.relatedRefs}`,
+      `\nRemaining drift: edges=${after.edges} published=${after.published} ` +
+        `relatedRefs=${after.relatedRefs} redirects=${after.missingRedirects}`,
     );
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});

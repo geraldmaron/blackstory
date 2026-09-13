@@ -18,7 +18,7 @@
  * audit run and a post-apply check cannot then disagree about what "in sync" means.
  *
  * SCOPE — only facts the projection actually carries. `search_index.recordMaturity`,
- * `confidenceTier`, `relatedCount`, `claimCount` and `aliases` are computed by the release
+ * `evidenceInputs`, `relatedCount`, `claimCount` and `aliases` are computed by the release
  * builder from inputs the projection does not restate, so there is nothing here to compare them
  * against and they are deliberately absent. `facets.summary` is absent for the same reason
  * `toSearchIndexRow` omits it: an index-size decision, not drift.

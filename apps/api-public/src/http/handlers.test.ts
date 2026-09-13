@@ -85,6 +85,21 @@ test('GET /v1/compatibility: below-floor client gets 426 CLIENT_VERSION_UNSUPPOR
   assert.equal(envelope.error.code, 'CLIENT_VERSION_UNSUPPORTED');
 });
 
+test('GET /v1/entity/:id 308s a merged-away id to its survivor, cacheably', async () => {
+  const deps = makeDeps({
+    dataAccess: createInMemoryPublicDataAccess({
+      pointer: SAMPLE_POINTER,
+      entities: [makeEntity()],
+      redirects: { ent_sclc_001: 'ent_dunbar_school_001' },
+    }),
+  });
+  const res = await dispatch(makeRequest('/v1/entity/ent_sclc_001'), deps);
+  assert.equal(res.status, 308);
+  assert.equal(res.headers['Location'], '/v1/entity/ent_dunbar_school_001');
+  assert.equal(res.headers['Cache-Control'], 'public, max-age=60, stale-while-revalidate=300');
+  assert.equal(res.body, null, 'a redirect carries no body');
+});
+
 test('GET /v1/bootstrap validates against bootstrapResponseV1Schema and carries an ETag', async () => {
   const res = await dispatch(makeRequest('/v1/bootstrap'), makeDeps());
   assert.equal(res.status, 200);

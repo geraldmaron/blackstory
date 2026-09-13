@@ -29,10 +29,10 @@ test('mapPublicSearchProjection preserves ranking inputs and theme topicIds', ()
   assert.deepEqual(mapped.topicIds, ['civil-rights']);
   assert.equal(mapped.relatedCount, 2);
   assert.equal(mapped.claimCount, 3);
-  assert.equal(mapped.confidenceTier, undefined);
+  assert.equal(mapped.evidenceInputs, undefined);
 });
 
-test('mapPublicSearchProjection passes confidenceTier and geohash through', () => {
+test('mapPublicSearchProjection passes evidenceInputs and geohash through', () => {
   const mapped = mapPublicSearchProjection({
     id: 'ent_map_002',
     releaseId: 'rel_map_001',
@@ -52,10 +52,18 @@ test('mapPublicSearchProjection passes confidenceTier and geohash through', () =
     researchCoverage: 'partial',
     relatedCount: 0,
     claimCount: 2,
-    confidenceTier: 'medium',
+    evidenceInputs: {
+      strongestClaimLevel: 'medium',
+      citedLineageKeys: ['npgallery.nps.gov'],
+      evidenceLineageKeys: ['npgallery.nps.gov'],
+    },
     geohash: 'dqcjq',
   });
-  assert.equal(mapped.confidenceTier, 'medium');
+  assert.deepEqual(mapped.evidenceInputs, {
+    strongestClaimLevel: 'medium',
+    citedLineageKeys: ['npgallery.nps.gov'],
+    evidenceLineageKeys: ['npgallery.nps.gov'],
+  });
   assert.equal(mapped.geohash, 'dqcjq');
 });
 

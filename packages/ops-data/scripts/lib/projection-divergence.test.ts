@@ -83,7 +83,11 @@ function cleanRow(overrides: Partial<ProjectionDivergenceDbRow> = {}): Projectio
       keywords: ['patent'],
       researchCoverage: { level: 'partial', sourceCount: 2 },
       recordMaturity: 'partial_enrichment',
-      confidenceTier: 'medium',
+      evidenceInputs: {
+        strongestClaimLevel: 'medium',
+        citedLineageKeys: ['loc.gov'],
+        evidenceLineageKeys: ['loc.gov'],
+      },
       topicIds: ['invention', 'business'],
       mentionedEntityIds: [],
       notabilityBasis: [{ kind: 'patent', evidenceIds: ['ev_1'] }],

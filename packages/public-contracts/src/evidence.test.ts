@@ -11,6 +11,7 @@ import {
   evidenceLabel,
   evidenceMeterLabel,
   floorLabel,
+  confidenceTierFromEvidenceInputs,
   gradeDescription,
   gradeForConfidence,
   gradeLabel,
@@ -18,6 +19,7 @@ import {
   meterLevelForCoverage,
   meterLevelForTier,
   recordConfidenceTier,
+  recordEvidenceInputs,
 } from './evidence.js';
 
 test('a tier maps to one letter, and unrated to none', () => {
@@ -71,6 +73,84 @@ test('the floor predicate keeps stronger grades rather than matching exactly', (
   ];
   assert.deepEqual(applyEvidenceFloor(features, 'B'), [features[0], features[1]]);
   assert.equal(applyEvidenceFloor(features, 'any').length, 3);
+});
+
+/**
+ * The rule reached from the other end.
+ *
+ * `/records` does not hold a record's claims; it holds the grading inputs the publisher cached on
+ * the slim search index and calls this. So the rule has to be correct over an input nobody
+ * derived in this process — including one no claim list would produce, which is exactly what a
+ * stale or half-written cached row looks like.
+ */
+test('confidenceTierFromEvidenceInputs applies the rule to inputs that arrived from a cache', () => {
+  // Two lineages that may corroborate: the strongest level stands.
+  assert.equal(
+    confidenceTierFromEvidenceInputs({
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['npgallery.nps.gov', 'blackpast.org'],
+      evidenceLineageKeys: ['npgallery.nps.gov', 'blackpast.org'],
+    }),
+    'high',
+  );
+  // Wikipedia is excluded HERE, not in the projection, so a cached row that recorded it is still
+  // graded correctly: one corroborating lineage, stepped down.
+  assert.equal(
+    confidenceTierFromEvidenceInputs({
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['npgallery.nps.gov', 'wikipedia'],
+      evidenceLineageKeys: ['npgallery.nps.gov', 'wikipedia'],
+    }),
+    'medium',
+  );
+  // Cited but not evidence — every lineage on the record is its own index row.
+  assert.equal(
+    confidenceTierFromEvidenceInputs({
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['catalog.archives.gov'],
+      evidenceLineageKeys: [],
+    }),
+    'medium',
+  );
+  // Assessed by nobody is `unrated`; assessed and thinly sourced is a grade. A cached row must
+  // keep those apart, which is why `citedLineageKeys` is stored alongside the evidence subset.
+  assert.equal(
+    confidenceTierFromEvidenceInputs({
+      strongestClaimLevel: 'high',
+      citedLineageKeys: [],
+      evidenceLineageKeys: [],
+    }),
+    'unrated',
+  );
+  assert.equal(
+    confidenceTierFromEvidenceInputs({
+      strongestClaimLevel: 'unrated',
+      citedLineageKeys: ['npgallery.nps.gov', 'blackpast.org'],
+      evidenceLineageKeys: ['npgallery.nps.gov', 'blackpast.org'],
+    }),
+    'unrated',
+  );
+});
+
+test('recordEvidenceInputs records what is cited and what may be read as evidence, and nothing else', () => {
+  assert.deepEqual(
+    recordEvidenceInputs([
+      {
+        confidenceLevel: 'high',
+        claimRole: 'record_index',
+        citationSource: 'catalog.archives.gov',
+      },
+      { confidenceLevel: 'medium', citation: { source: 'en.m.wikipedia.org' } },
+      { confidenceLevel: 'low', citationSource: '  ' },
+    ]),
+    {
+      strongestClaimLevel: 'high',
+      // The nested wire spelling (`citation.source`) normalizes to the same lineage key as the
+      // flat one, and a blank citation is no lineage at all.
+      citedLineageKeys: ['catalog.archives.gov', 'wikipedia'],
+      evidenceLineageKeys: ['wikipedia'],
+    },
+  );
 });
 
 test('recordConfidenceTier caps an uncorroborated record one grade below its strongest claim', () => {

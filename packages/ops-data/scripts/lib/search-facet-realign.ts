@@ -5,7 +5,7 @@
  * a `facets` key, and a scalar copied into a `facets` key or a plain column — and this module is
  * the one place both are decided. Each of the five CLI scripts
  * (`backfill-search-facets-projection.ts`/`-era.ts`/`-jurisdiction.ts`/`-status.ts`/
- * `-confidence.ts`) configures it for its own key(s) and prints the result.
+ * `-evidence-inputs.ts`) configures it for its own key(s) and prints the result.
  *
  * TARGET REGISTRY
  * `TARGET_REGISTRY` maps a `FACET_KEYS` entry to how it is sourced, compared, and written:
@@ -26,26 +26,28 @@
  *                       `mapPostgresSearchIndexRow` prefers the column, so a stale column value
  *                       serves a wrong status even with a correct facet sitting next to it, and a
  *                       record showing "living" on stale data is exactly what must not stand.
- *   - 'confidence-tier' recomputes `facets.confidenceTier` with `highestClaimConfidenceTier`
- *                       (`@repo/domain`) — the same rule the release builder grades records with
- *                       — rather than copying a projection field verbatim: nothing in the
- *                       projection already carries the graded tier, and reusing the production
- *                       function (instead of restating its lineage/corroboration rules a third
- *                       time) is what keeps this backfill and the release builder agreeing about
- *                       which records rate which grade.
+ *   - 'evidence-inputs' recomputes `facets.evidenceInputs` with `recordEvidenceInputs`
+ *                       (`@repo/domain`) — the same projection the release builder writes —
+ *                       rather than copying a projection field verbatim: nothing in the stored
+ *                       projection already carries it. What lands on the row is the strongest
+ *                       claim level and the distinct lineage keys, NEVER a graded tier: readers
+ *                       apply the one rule at read time, so this backfill cannot bake a rule
+ *                       version into the data the way the `confidenceTier` target it replaced
+ *                       did (repo-6qjv0).
  *
  * ONE-DIRECTIONAL BY DEFAULT
- * Every target except 'status-column' and 'confidence-tier' only fills a gap: a row whose facet
+ * Every target except 'status-column' and 'evidence-inputs' only fills a gap: a row whose facet
  * (or column) already carries a value is left alone unless `resolveConflicts` is passed, matching
  * every array/scalar script's own `OVERWRITE_CONFLICTS` convention. 'status-column' and
- * 'confidence-tier' always resolve a mismatch, matching what `backfill-search-facets-status.ts`
- * and `backfill-search-facets-confidence.ts` already do today — neither ever had a fill-only
- * mode, because both guard an assertion (nobody is "living" without evidence; the graded tier is
- * derived, not asserted) rather than copy a value nobody disputes.
+ * 'evidence-inputs' always resolve a mismatch, matching what `backfill-search-facets-status.ts`
+ * and `backfill-search-facets-evidence-inputs.ts` already do today — neither ever had a fill-only
+ * mode, because both guard an assertion (nobody is "living" without evidence; the grading inputs
+ * are derived, not asserted) rather than copy a value nobody disputes.
  *
  * Read-only until `applySearchFacetRealign` is called: `planSearchFacetRealign` never writes.
  */
-import { highestClaimConfidenceTier } from '@repo/domain';
+import { recordEvidenceInputs } from '@repo/domain';
+import type { EvidenceInputClaim } from '@repo/domain';
 import { searchTopicsFromProjection } from './projection-divergence.ts';
 
 /** Minimal query surface this module needs — satisfied by `pg.Client`, `Pool`, and `PoolClient`. */
@@ -61,7 +63,7 @@ export type SearchFacetRealignTarget =
   | { readonly mode: 'scalar-facet'; readonly facetKey: string; readonly projectionKey: string }
   | { readonly mode: 'topics-column' }
   | { readonly mode: 'status-column' }
-  | { readonly mode: 'confidence-tier' };
+  | { readonly mode: 'evidence-inputs' };
 
 /**
  * `FACET_KEYS` entries the CLI scripts accept, and how each is realigned. Keys are looked up as
@@ -82,7 +84,7 @@ export const TARGET_REGISTRY: Readonly<Record<string, SearchFacetRealignTarget>>
   },
   topics: { mode: 'topics-column' },
   status: { mode: 'status-column' },
-  confidenceTier: { mode: 'confidence-tier' },
+  evidenceInputs: { mode: 'evidence-inputs' },
 };
 
 /** Array facets the search-doc reader can only get from `facets`; the historical default scope. */
@@ -173,7 +175,7 @@ type TargetOutcome = {
 /** Modes whose mismatch is always corrected, never merely reported. See the module header. */
 const ALWAYS_RESOLVE_MODES: ReadonlySet<SearchFacetRealignTarget['mode']> = new Set([
   'status-column',
-  'confidence-tier',
+  'evidence-inputs',
 ]);
 
 function evaluateArrayFacet(row: SearchFacetRealignRow, key: string): TargetOutcome {
@@ -246,25 +248,20 @@ function evaluateStatusColumn(row: SearchFacetRealignRow): TargetOutcome {
   return { classification, desiredValue: desired };
 }
 
-function asClaimsForConfidence(value: unknown): readonly {
-  readonly confidenceLevel?: string;
-  readonly citationSource?: string;
-  readonly predicate?: string;
-  readonly claimRole?: string;
-}[] {
+function asClaimsForEvidenceInputs(value: unknown): readonly EvidenceInputClaim[] {
   return Array.isArray(value) ? value : [];
 }
 
-function evaluateConfidenceTier(row: SearchFacetRealignRow): TargetOutcome {
-  const desired = highestClaimConfidenceTier(asClaimsForConfidence(row.projection.claims));
-  const current = nonEmptyText(row.facets.confidenceTier);
-  const equal = current === desired;
-  // The computed tier always exists (a total function over `[]` is `'unrated'`), so an absent
-  // current value is filled the same way a differing one is corrected — there is no "facet-only"
-  // case here, matching `backfill-search-facets-confidence.ts` today.
-  const classification: FieldClassification = equal
+function evaluateEvidenceInputs(row: SearchFacetRealignRow): TargetOutcome {
+  const desired = recordEvidenceInputs(asClaimsForEvidenceInputs(row.projection.claims));
+  const current = row.facets.evidenceInputs;
+  // The projection always exists (a total function over `[]`), so an absent current value is
+  // filled the same way a differing one is corrected — there is no "facet-only" case here,
+  // matching what the confidence target it replaced already did. Lineage keys are compared in
+  // order because `recordEvidenceInputs` emits them in first-seen claim order on both sides.
+  const classification: FieldClassification = jsonEqual(desired, current)
     ? 'unchanged'
-    : current === undefined
+    : current === undefined || current === null
       ? 'stale'
       : 'differ';
   return { classification, desiredValue: desired };
@@ -280,8 +277,8 @@ function evaluate(target: SearchFacetRealignTarget, row: SearchFacetRealignRow):
       return evaluateTopicsColumn(row);
     case 'status-column':
       return evaluateStatusColumn(row);
-    case 'confidence-tier':
-      return evaluateConfidenceTier(row);
+    case 'evidence-inputs':
+      return evaluateEvidenceInputs(row);
   }
 }
 
@@ -422,8 +419,8 @@ export async function planSearchFacetRealign(
         entry.facetsPatch[target.key] = outcome.desiredValue;
       } else if (target.mode === 'scalar-facet') {
         entry.facetsPatch[target.facetKey] = outcome.desiredValue;
-      } else if (target.mode === 'confidence-tier') {
-        entry.facetsPatch.confidenceTier = outcome.desiredValue;
+      } else if (target.mode === 'evidence-inputs') {
+        entry.facetsPatch.evidenceInputs = outcome.desiredValue;
       }
       changesByEntity.set(row.entityId, entry);
     }

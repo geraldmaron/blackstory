@@ -1381,7 +1381,11 @@ test('toSearchIndexRow: an empty jurisdiction omits the facet rather than blanki
       researchCoverage: 'minimal',
       relatedCount: 0,
       claimCount: 0,
-      confidenceTier: 'unrated',
+      evidenceInputs: {
+        strongestClaimLevel: 'unrated',
+        citedLineageKeys: [],
+        evidenceLineageKeys: [],
+      },
     },
     'dqcjq',
   );
@@ -1878,7 +1882,11 @@ const searchFields = (overrides: Record<string, unknown> = {}) => ({
   researchCoverage: 'minimal',
   relatedCount: 0,
   claimCount: 0,
-  confidenceTier: 'unrated',
+  evidenceInputs: {
+    strongestClaimLevel: 'unrated',
+    citedLineageKeys: [],
+    evidenceLineageKeys: [],
+  },
   ...overrides,
 });
 

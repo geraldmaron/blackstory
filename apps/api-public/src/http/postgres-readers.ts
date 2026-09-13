@@ -90,6 +90,29 @@ export async function fetchPublicEntityProjectionsByIds(
   return entities;
 }
 
+/**
+ * The survivor a merged-away entity id forwards to, or `undefined` (repo-n7p6.29).
+ * Mirrors `apps/web/src/lib/public-data/postgres-readers.ts`'s reader of the same name.
+ *
+ * `to_entity_id` is already the terminal survivor of any merge chain — chains are resolved by
+ * `packages/ops-data/scripts/reconcile-absorbed-entities.ts` before the row is written — so this
+ * is a point-get, never a walk, and cannot loop.
+ */
+export async function fetchPublicEntityRedirect(
+  releaseId: string,
+  fromEntityId: string,
+  query: PostgresQueryFn = queryPostgres,
+): Promise<string | undefined> {
+  const rows = (await query(
+    `SELECT to_entity_id
+     FROM bb_public.release_entity_redirects
+     WHERE release_id = $1 AND from_entity_id = $2
+     LIMIT 1`,
+    [releaseId, fromEntityId],
+  )) as { readonly to_entity_id: string }[];
+  return rows[0]?.to_entity_id;
+}
+
 export async function listPublicEntityProjections(
   releaseId: string,
   query: PostgresQueryFn = queryPostgres,

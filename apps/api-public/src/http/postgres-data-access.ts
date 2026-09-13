@@ -15,6 +15,7 @@ import { mapProjectionToEntityV1, MAX_LIVE_SEARCH_SCAN } from './projection-mapp
 import {
   fetchActiveRelease,
   fetchPublicEntityProjection,
+  fetchPublicEntityRedirect,
   listPublicEntityProjections,
   listPublicSearchIndexDocs,
   type PostgresQueryFn,
@@ -56,7 +57,7 @@ export function mapPublicSearchProjection(doc: PublicSearchProjectionDoc): Publi
     researchCoverage: doc.researchCoverage,
     relatedCount: doc.relatedCount,
     claimCount: doc.claimCount,
-    ...(doc.confidenceTier !== undefined ? { confidenceTier: doc.confidenceTier } : {}),
+    ...(doc.evidenceInputs !== undefined ? { evidenceInputs: doc.evidenceInputs } : {}),
     ...(doc.geohash !== undefined ? { geohash: doc.geohash } : {}),
   };
 }
@@ -82,17 +83,17 @@ const MAX_CACHED_RELEASES = 4;
 /** Active-release pointer reads were per-request; a short window keeps activation prompt. */
 const ACTIVE_RELEASE_POINTER_TTL_MS = 30_000;
 
-/** True when enough search docs carry confidenceTier (post-backfill / republished artifact). */
+/** True when enough search docs carry evidenceInputs (post-backfill / republished artifact). */
 function searchIndexHasConfidenceCoverage(
   docs: readonly PublicSearchProjectionDoc[],
   minCoverage = 0.95,
 ): boolean {
   if (docs.length === 0) return false;
-  let withTier = 0;
+  let withInputs = 0;
   for (const doc of docs) {
-    if (doc.confidenceTier !== undefined) withTier += 1;
+    if (doc.evidenceInputs !== undefined) withInputs += 1;
   }
-  return withTier / docs.length >= minCoverage;
+  return withInputs / docs.length >= minCoverage;
 }
 
 type EntityProjectionsList = Awaited<ReturnType<typeof listPublicEntityProjections>>;
@@ -188,7 +189,7 @@ export function createPostgresDataAccessReaders(
       }
       if (fromArtifact && fromArtifact.length > 0) {
         console.warn(
-          `[api-public] search-index artifact missing confidenceTier coverage; preferring Postgres for ${releaseId}`,
+          `[api-public] search-index artifact missing evidenceInputs coverage; preferring Postgres for ${releaseId}`,
         );
       }
 
@@ -224,6 +225,13 @@ export function createPostgresDataAccessReaders(
       const mapped = mapProjectionToEntityV1(projection);
       if (!mapped) return undefined;
       return hydrateEntityV1Neighbors(mapped, releaseId, runQuery);
+    },
+
+    async readEntityRedirect(releaseId, entityId): Promise<string | undefined> {
+      // Uncached on purpose: it only runs on a miss, it is a primary-key point-get against a
+      // table with one row per merge (16 on 2026-09-13), and caching it would hold a stale
+      // forwarding address after a merge is reversed.
+      return fetchPublicEntityRedirect(releaseId, entityId, runQuery);
     },
 
     async readEntities(releaseId): Promise<readonly EntityV1[]> {

@@ -364,6 +364,18 @@ export const publicStoryListItemSchema = publicStoryProjectionSchema.omit({
 });
 export type PublicStoryListItemDoc = z.infer<typeof publicStoryListItemSchema>;
 
+/**
+ * The cached grading inputs, mirroring `RecordEvidenceInputs` in
+ * `@repo/public-contracts/evidence` and `@repo/domain`'s projection. The reader hands a parsed
+ * value straight to `confidenceTierFromEvidenceInputs`, so the field names here are load-bearing.
+ */
+export const recordEvidenceInputsSchema = z.object({
+  strongestClaimLevel: z.enum(['high', 'medium', 'low', 'unrated']),
+  citedLineageKeys: z.array(z.string().min(1)).default([]),
+  evidenceLineageKeys: z.array(z.string().min(1)).default([]),
+});
+export type RecordEvidenceInputsDoc = z.infer<typeof recordEvidenceInputsSchema>;
+
 export const publicSearchProjectionSchema = z.object({
   id: z.string().min(1),
   releaseId: z.string().min(1),
@@ -388,10 +400,16 @@ export const publicSearchProjectionSchema = z.object({
   relatedCount: z.number().int().min(0),
   claimCount: z.number().int().min(0),
   /**
-   * Highest accepted-claim confidence. Absent on rows published before the field existed;
-   * do not invent `unrated` at parse time — Records slim needs to detect coverage.
+   * The grading inputs `/records` derives evidence floors from — the strongest claim level and
+   * the distinct lineage keys, never the graded tier itself. Caching the conclusion is what let
+   * `/records` serve a day-old answer after the rule changed (repo-6qjv0); caching the inputs
+   * lets it call the one read-time rule over cheap slim data.
+   *
+   * Absent on rows published before the field existed; do not invent an empty projection at parse
+   * time — an empty one grades `unrated`, while absent means "not projected yet" and Records slim
+   * needs to tell those apart to decide whether it can leave the full-entity hydrate.
    */
-  confidenceTier: z.enum(['high', 'medium', 'low', 'unrated']).optional(),
+  evidenceInputs: recordEvidenceInputsSchema.optional(),
   /** Present when the search row carries a public geohash (mappable signal for Records). */
   geohash: z.string().min(1).optional(),
 });

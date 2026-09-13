@@ -41,7 +41,13 @@ import type { createPublicSearchGuard } from '../search-guardrails.js';
 import { type PublicSearchHttpQuery } from '../search-guardrails.js';
 import { buildMapSourceV1 } from './build-map-source-v1.js';
 import type { PublicDataAccess } from './data-access.js';
-import { CACHE_CONTROL, errorResponse, jsonRead, type ApiResponse } from './responses.js';
+import {
+  CACHE_CONTROL,
+  errorResponse,
+  jsonRead,
+  permanentRedirectResponse,
+  type ApiResponse,
+} from './responses.js';
 import type { FindNearestEndpoint } from '../vector-search-endpoint.js';
 import type { VectorSearchHttpQuery } from '../vector-search-guardrails.js';
 
@@ -236,8 +242,36 @@ export async function handleEntity(
     }
 
     const entity = await deps.dataAccess.getEntity(pointer.activeRelease.releaseId, entityId);
-    // IDENTICAL 404 for nonexistent AND unpublished — a client must not distinguish them (T3).
     if (!entity) {
+      // A merged-away id is not a miss — it is an address that moved. repo-n7p6.15 correctly
+      // stopped publishing absorbed records; without this the ids they used to answer on became
+      // indistinguishable 404s (repo-n7p6.29).
+      //
+      // The redirect lookup runs on EVERY miss, not only on ids we expect to forward, so the
+      // backend call sequence is identical for nonexistent, unpublished and absorbed ids — the
+      // T3 property the enumeration tests pin. What a 308 reveals is only what
+      // bb_public.release_entity_redirects publishes on purpose: an already-public id and the
+      // published survivor it folded into.
+      const redirectTo = await deps.dataAccess.getEntityRedirect(
+        pointer.activeRelease.releaseId,
+        entityId,
+      );
+      // The target is re-validated against the same id grammar the request had to pass: a
+      // Location header is a value this surface emits, and it is built from a database row.
+      if (redirectTo !== undefined && ENTITY_ID_PATTERN.test(redirectTo)) {
+        // Confirm the survivor is actually published before pointing anyone at it; a redirect to
+        // another 404 is worse than the 404 the reader already had.
+        const survivor = await deps.dataAccess.getEntity(
+          pointer.activeRelease.releaseId,
+          redirectTo,
+        );
+        if (survivor) {
+          return permanentRedirectResponse(`/v1/entity/${redirectTo}`, {
+            requestId: request.requestId,
+          });
+        }
+      }
+      // IDENTICAL 404 for nonexistent AND unpublished — a client must not distinguish them (T3).
       return notFoundEntity(request);
     }
 

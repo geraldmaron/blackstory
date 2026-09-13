@@ -195,12 +195,18 @@ test('status-column: a facet-only status (column null, facets set) is still read
   assert.deepEqual(plan.changes[0]?.facetsPatch, { status: 'deceased' });
 });
 
-test('confidence-tier: a single-lineage claim is capped one grade below its raw strength', async () => {
+test('evidence-inputs: a stale cached projection is corrected toward the release claims', async () => {
   const client = fakeClient([
     {
       entity_id: 'ent_i',
       kind: 'person',
-      facets: { confidenceTier: 'high' },
+      facets: {
+        evidenceInputs: {
+          strongestClaimLevel: 'medium',
+          citedLineageKeys: ['loc.gov'],
+          evidenceLineageKeys: ['loc.gov'],
+        },
+      },
       status: null,
       topics: null,
       projection: {
@@ -208,13 +214,18 @@ test('confidence-tier: a single-lineage claim is capped one grade below its raw 
       },
     },
   ]);
-  const plan = await planSearchFacetRealign(client, { keys: ['confidenceTier'] });
-  // One corroborating lineage only -> capped from 'high' to 'medium'.
+  const plan = await planSearchFacetRealign(client, { keys: ['evidenceInputs'] });
   assert.equal(plan.targets[0]?.resolved, 1);
-  assert.deepEqual(plan.changes[0]?.facetsPatch, { confidenceTier: 'medium' });
+  assert.deepEqual(plan.changes[0]?.facetsPatch, {
+    evidenceInputs: {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['loc.gov'],
+      evidenceLineageKeys: ['loc.gov'],
+    },
+  });
 });
 
-test('confidence-tier: two independent corroborating lineages keep the strongest grade', async () => {
+test('evidence-inputs: writes the lineage keys, never a graded tier', async () => {
   const client = fakeClient([
     {
       entity_id: 'ent_j',
@@ -230,12 +241,21 @@ test('confidence-tier: two independent corroborating lineages keep the strongest
       },
     },
   ]);
-  const plan = await planSearchFacetRealign(client, { keys: ['confidenceTier'] });
+  const plan = await planSearchFacetRealign(client, { keys: ['evidenceInputs'] });
   assert.equal(plan.targets[0]?.filled, 1);
-  assert.deepEqual(plan.changes[0]?.facetsPatch, { confidenceTier: 'high' });
+  assert.deepEqual(plan.changes[0]?.facetsPatch, {
+    evidenceInputs: {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['loc.gov', 'nps.gov'],
+      evidenceLineageKeys: ['loc.gov', 'nps.gov'],
+    },
+  });
+  // The whole point of the cutover: a grade never reaches the row, so a rule change cannot
+  // strand it (repo-6qjv0).
+  assert.equal('confidenceTier' in (plan.changes[0]?.facetsPatch ?? {}), false);
 });
 
-test('confidence-tier: keeps the claimRole-only lineage rule — a record_index claim never corroborates', async () => {
+test('evidence-inputs: keeps the claimRole-only lineage rule — a record_index claim is not evidence', async () => {
   const client = fakeClient([
     {
       entity_id: 'ent_k',
@@ -246,17 +266,23 @@ test('confidence-tier: keeps the claimRole-only lineage rule — a record_index 
       projection: {
         claims: [
           { confidenceLevel: 'high', citationSource: 'nara.gov', claimRole: 'evidence' },
-          // Same lineage cited twice, once as the record's own index row — must not corroborate.
+          // The record's own index row: cited, never evidence.
           { confidenceLevel: 'high', citationSource: 'nps.gov', claimRole: 'record_index' },
         ],
       },
     },
   ]);
-  const plan = await planSearchFacetRealign(client, { keys: ['confidenceTier'] });
-  assert.deepEqual(plan.changes[0]?.facetsPatch, { confidenceTier: 'medium' });
+  const plan = await planSearchFacetRealign(client, { keys: ['evidenceInputs'] });
+  assert.deepEqual(plan.changes[0]?.facetsPatch, {
+    evidenceInputs: {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['nara.gov', 'nps.gov'],
+      evidenceLineageKeys: ['nara.gov'],
+    },
+  });
 });
 
-test('confidence-tier: Wikipedia alone never corroborates and is capped, never unrated', async () => {
+test('evidence-inputs: Wikipedia is recorded as cited, and the read-time rule decides what it is worth', async () => {
   const client = fakeClient([
     {
       entity_id: 'ent_l',
@@ -271,11 +297,17 @@ test('confidence-tier: Wikipedia alone never corroborates and is capped, never u
       },
     },
   ]);
-  const plan = await planSearchFacetRealign(client, { keys: ['confidenceTier'] });
-  assert.deepEqual(plan.changes[0]?.facetsPatch, { confidenceTier: 'medium' });
+  const plan = await planSearchFacetRealign(client, { keys: ['evidenceInputs'] });
+  assert.deepEqual(plan.changes[0]?.facetsPatch, {
+    evidenceInputs: {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['wikipedia'],
+      evidenceLineageKeys: ['wikipedia'],
+    },
+  });
 });
 
-test('confidence-tier: no citations at all computes unrated, and an absent facet is filled with it', async () => {
+test('evidence-inputs: no claims at all projects empty lineages, and an absent facet is filled with it', async () => {
   const client = fakeClient([
     {
       entity_id: 'ent_m',
@@ -286,26 +318,38 @@ test('confidence-tier: no citations at all computes unrated, and an absent facet
       projection: { claims: [] },
     },
   ]);
-  const plan = await planSearchFacetRealign(client, { keys: ['confidenceTier'] });
-  // Matches backfill-search-facets-confidence.ts today: COMPUTED_TIER is a total function, so an
-  // absent facet ('' under the SQL script's own coalesce) is filled with the explicit 'unrated'
-  // grade rather than left alone — the reader distinguishes "assessed, unrated" from "no data".
+  const plan = await planSearchFacetRealign(client, { keys: ['evidenceInputs'] });
+  // The projection is a total function, so an absent facet is filled with the explicit empty
+  // projection rather than left alone — which is what lets the reader tell a row that has been
+  // projected (and grades unrated) from a row that has not been projected yet.
   assert.equal(plan.targets[0]?.filled, 1);
-  assert.deepEqual(plan.changes[0]?.facetsPatch, { confidenceTier: 'unrated' });
+  assert.deepEqual(plan.changes[0]?.facetsPatch, {
+    evidenceInputs: {
+      strongestClaimLevel: 'unrated',
+      citedLineageKeys: [],
+      evidenceLineageKeys: [],
+    },
+  });
 });
 
-test('confidence-tier: an already-correct unrated facet is left unchanged', async () => {
+test('evidence-inputs: an already-correct projection is left unchanged', async () => {
   const client = fakeClient([
     {
       entity_id: 'ent_m2',
       kind: 'person',
-      facets: { confidenceTier: 'unrated' },
+      facets: {
+        evidenceInputs: {
+          strongestClaimLevel: 'unrated',
+          citedLineageKeys: [],
+          evidenceLineageKeys: [],
+        },
+      },
       status: null,
       topics: null,
       projection: { claims: [] },
     },
   ]);
-  const plan = await planSearchFacetRealign(client, { keys: ['confidenceTier'] });
+  const plan = await planSearchFacetRealign(client, { keys: ['evidenceInputs'] });
   assert.equal(plan.targets[0]?.filled, 0);
   assert.equal(plan.targets[0]?.resolved, 0);
   assert.equal(plan.changes.length, 0);

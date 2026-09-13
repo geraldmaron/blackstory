@@ -277,11 +277,19 @@ test('mapPublicSearchProjection preserves domain search fields', () => {
     jurisdictionState: 'DC',
     status: 'extant',
     sensitivityClass: 'standard',
-    confidenceTier: 'high',
+    evidenceInputs: {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['npgallery.nps.gov', 'catalog.archives.gov'],
+      evidenceLineageKeys: ['npgallery.nps.gov', 'catalog.archives.gov'],
+    },
     geohash: 'dqcjq',
   });
   assert.equal(mapped.displayName, sampleProjection.displayName);
   assert.equal(mapped.jurisdictionState, 'DC');
-  assert.equal(mapped.confidenceTier, 'high');
+  assert.deepEqual(mapped.evidenceInputs, {
+    strongestClaimLevel: 'high',
+    citedLineageKeys: ['npgallery.nps.gov', 'catalog.archives.gov'],
+    evidenceLineageKeys: ['npgallery.nps.gov', 'catalog.archives.gov'],
+  });
   assert.equal(mapped.geohash, 'dqcjq');
 });

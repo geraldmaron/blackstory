@@ -32,6 +32,10 @@ function traceDataAccess(inner: PublicDataAccess): TracedAccess {
       trace.push(`getEntity:${entityId}`);
       return inner.getEntity(releaseId, entityId);
     },
+    async getEntityRedirect(releaseId, entityId) {
+      trace.push(`getEntityRedirect:${entityId}`);
+      return inner.getEntityRedirect(releaseId, entityId);
+    },
     async listEntities(releaseId) {
       trace.push(`listEntities:${releaseId}`);
       return inner.listEntities(releaseId);
@@ -99,16 +103,67 @@ test('T3: nonexistent and unpublished ids share identical backend lookup trace',
   const unpublishedTrace = [...traced.trace];
 
   const callPattern = (trace: readonly string[]) =>
-    trace.map((entry) => (entry.startsWith('getEntity:') ? 'getEntity' : entry));
+    trace.map((entry) => (entry.includes(':') ? (entry.split(':')[0] as string) : entry));
 
   assert.deepEqual(
     callPattern(nonexistentTrace),
     callPattern(unpublishedTrace),
     'nonexistent and unpublished must hit the same backend lookup sequence',
   );
-  assert.deepEqual(callPattern(nonexistentTrace), ['getReleasePointer', 'getEntity']);
-  assert.equal(nonexistentTrace.length, 2);
-  assert.equal(unpublishedTrace.length, 2);
+  // repo-n7p6.29 added the merge-redirect lookup. It runs on EVERY miss, absorbed or not, which
+  // is exactly what keeps this trace identical for the two ids under test.
+  assert.deepEqual(callPattern(nonexistentTrace), [
+    'getReleasePointer',
+    'getEntity',
+    'getEntityRedirect',
+  ]);
+  assert.equal(nonexistentTrace.length, 3);
+  assert.equal(unpublishedTrace.length, 3);
+});
+
+test('T3: a merge redirect does not widen the enumeration surface for unpublished ids', async () => {
+  // The absorbed id is published in bb_public.release_entity_redirects on purpose — it was a
+  // public URL before the merge. Every OTHER miss must still be indistinguishable.
+  const traced = traceDataAccess(
+    createInMemoryPublicDataAccess({
+      pointer: SAMPLE_POINTER,
+      entities: [makeEntity()],
+      unpublishedIds: ['ent_withdrawn_999'],
+      redirects: { ent_absorbed_001: 'ent_dunbar_school_001' },
+    }),
+  );
+  const deps = makeDeps(traced);
+
+  const absorbed = await dispatch(entityRequest('ent_absorbed_001'), deps);
+  assert.equal(absorbed.status, 308);
+  assert.equal(absorbed.headers['Location'], '/v1/entity/ent_dunbar_school_001');
+
+  const withdrawn = await dispatch(entityRequest('ent_withdrawn_999'), deps);
+  const nonexistent = await dispatch(entityRequest('ent_does_not_exist_000'), deps);
+  assert.equal(withdrawn.status, 404);
+  assert.equal(nonexistent.status, 404);
+  assert.deepEqual(stableNotFoundBody(withdrawn.body), stableNotFoundBody(nonexistent.body));
+  assert.deepEqual(
+    stableResponseHeaders(withdrawn.headers),
+    stableResponseHeaders(nonexistent.headers),
+  );
+});
+
+test('T3: a redirect whose survivor is unpublished 404s rather than forwarding to a dead id', async () => {
+  const deps = makeDeps(
+    createInMemoryPublicDataAccess({
+      pointer: SAMPLE_POINTER,
+      entities: [makeEntity()],
+      unpublishedIds: ['ent_withdrawn_999'],
+      redirects: { ent_absorbed_002: 'ent_withdrawn_999' },
+    }),
+  );
+
+  const absorbed = await dispatch(entityRequest('ent_absorbed_002'), deps);
+  const nonexistent = await dispatch(entityRequest('ent_does_not_exist_000'), deps);
+  assert.equal(absorbed.status, 404);
+  assert.equal(absorbed.headers['Location'], undefined);
+  assert.deepEqual(stableNotFoundBody(absorbed.body), stableNotFoundBody(nonexistent.body));
 });
 
 test('T3: nonexistent and unpublished ids return identical status, envelope, and headers', async () => {
@@ -152,5 +207,6 @@ test('T3: existing entity lookup trace is one pointer read + one entity read', a
 
   const res = await dispatch(entityRequest('ent_dunbar_school_001'), deps);
   assert.equal(res.status, 200);
+  // A hit still costs exactly two reads: the redirect lookup is on the miss path only.
   assert.deepEqual(traced.trace, ['getReleasePointer', 'getEntity:ent_dunbar_school_001']);
 });

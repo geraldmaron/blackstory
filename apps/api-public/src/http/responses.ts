@@ -92,6 +92,32 @@ export function jsonRead(
   };
 }
 
+/**
+ * A permanent redirect with an empty body (repo-n7p6.29).
+ *
+ * 308, not 301, for two reasons: it is what `apps/web`'s `permanentRedirect` emits, so the two
+ * public surfaces answer a merged-away id the same way; and 301 permits a client to rewrite the
+ * method, which a read surface should never invite even though it only serves GET/HEAD.
+ *
+ * Cached like any other released read rather than `no-store`: the target of a merge redirect is
+ * as stable as the record it points at, and an uncacheable redirect would put every stale link
+ * through a function on every hit.
+ */
+export function permanentRedirectResponse(
+  location: string,
+  options: { readonly requestId: string },
+): ApiResponse {
+  return {
+    status: 308,
+    headers: {
+      Location: location,
+      'Cache-Control': CACHE_CONTROL.releasedRead,
+      'X-Request-Id': options.requestId,
+    },
+    body: null,
+  };
+}
+
 /** `If-None-Match` may be a comma-separated list and may carry a `W/` weak prefix; match the
  * strong tag against any listed member. `*` matches any current representation. */
 function etagMatches(ifNoneMatch: string, etag: string): boolean {

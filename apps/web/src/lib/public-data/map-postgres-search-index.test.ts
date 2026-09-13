@@ -32,11 +32,11 @@ test('mapPostgresSearchIndexRow builds a valid doc from denormalized columns', (
   assert.equal(doc!.displayName, 'Example Place');
   assert.equal(doc!.relatedCount, 2);
   assert.equal(doc!.claimCount, 3);
-  assert.equal(doc!.confidenceTier, undefined);
+  assert.equal(doc!.evidenceInputs, undefined);
   assert.deepEqual(doc!.topicTags, ['civil-rights']);
 });
 
-test('mapPostgresSearchIndexRow reads confidenceTier from facets', () => {
+test('mapPostgresSearchIndexRow reads evidenceInputs from facets', () => {
   const doc = mapPostgresSearchIndexRow({
     id: 'ent_graded_001',
     release_id: 'rel_live_001',
@@ -54,11 +54,46 @@ test('mapPostgresSearchIndexRow reads confidenceTier from facets', () => {
       eraBuckets: [],
       recordMaturity: 'partial_enrichment',
       researchCoverage: 'partial',
+      evidenceInputs: {
+        strongestClaimLevel: 'medium',
+        citedLineageKeys: ['npgallery.nps.gov'],
+        evidenceLineageKeys: ['npgallery.nps.gov'],
+      },
+    },
+  });
+  assert.ok(doc);
+  assert.deepEqual(doc!.evidenceInputs, {
+    strongestClaimLevel: 'medium',
+    citedLineageKeys: ['npgallery.nps.gov'],
+    evidenceLineageKeys: ['npgallery.nps.gov'],
+  });
+});
+
+test('mapPostgresSearchIndexRow ignores a row carrying only the retired derived tier', () => {
+  // A legacy row whose facets hold `confidenceTier` and nothing else reads as unprojected, which
+  // is what keeps `/records` off a cached conclusion until the backfill lands (repo-6qjv0).
+  const doc = mapPostgresSearchIndexRow({
+    id: 'ent_legacy_001',
+    release_id: 'rel_live_001',
+    entity_id: 'ent_legacy_001',
+    name: 'Legacy Place',
+    name_lower: 'legacy place',
+    aliases: [],
+    topics: [],
+    kind: 'place',
+    status: null,
+    geohash: null,
+    related_count: 0,
+    claim_count: 2,
+    facets: {
+      eraBuckets: [],
+      recordMaturity: 'partial_enrichment',
+      researchCoverage: 'partial',
       confidenceTier: 'medium',
     },
   });
   assert.ok(doc);
-  assert.equal(doc!.confidenceTier, 'medium');
+  assert.equal(doc!.evidenceInputs, undefined);
 });
 
 test('mapPostgresSearchIndexRow recovers displayName from name_lower when name is null', () => {

@@ -268,11 +268,21 @@ depending on the contract it publishes to is correct layering, not a violation; 
 ADR-022 carryover above, which already treats `public-contracts` as the shared
 environment-neutral wire-type package.
 
-Where domain restates a rule rather than importing it — `highestClaimConfidenceTier` in
-`release-builder.ts`, which copies `recordConfidenceTier` from
-`@repo/public-contracts/evidence`; the `ReleaseRevisionMetadata` shape in `mobile-bootstrap.ts`
-— the restatement is the consequence of this rule, and the two copies must be kept in agreement
-by test rather than by type. (from ADR-021, "dependency direction")
+Where domain restates something rather than importing it — the `ReleaseRevisionMetadata` shape in
+`mobile-bootstrap.ts`; the lineage-key normalization in `evidence-inputs.ts`, which mirrors
+`citationLineageKey` from `@repo/public-contracts/evidence` — the restatement is the consequence
+of this rule, and the two copies must be kept in agreement by test rather than by type. (from
+ADR-021, "dependency direction")
+
+**A restated RULE is a different thing from a restated shape, and repo-6qjv0 retired the one that
+existed.** `highestClaimConfidenceTier` in `release-builder.ts` used to copy `recordConfidenceTier`
+outright so the publisher could write a graded `search_index.facets.confidenceTier` for `/records`
+to read back. That is the shape of duplication this dependency direction makes tempting and it is
+the one to refuse: the copy cost a day of wrong grades on `/records` when the rule changed
+(repo-ngojq). The fix was not a better test. Domain now projects the grading INPUTS
+(`recordEvidenceInputs`), the index caches those, and every surface applies the single rule at
+read time. When this rule forces a choice again, project the inputs across the boundary and keep
+the judgment on one side — do not copy the judgment.
 
 **App/API compatibility policy (ADR-021 §2).** A client is incompatible when its app build is
 below the manifest's `minSupportedAppBuild` floor, or when it speaks an API major version the

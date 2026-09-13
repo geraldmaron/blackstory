@@ -16,7 +16,7 @@ import {
   isRacialTerrorRecord,
   computeReleaseResearchCoverage,
   formatClaimInclusionNote,
-  highestClaimConfidenceTier,
+  recordEvidenceInputs,
   inferNotabilityCriterionFromClaim,
   resolveReleaseClaimId,
   resolveReleaseEntityReferences,
@@ -1017,9 +1017,13 @@ test('buildReleaseEntityArtifacts produces a full projection + search doc for a 
   assert.ok(result.projection.notabilityBasis[0]!.evidenceIds.length > 0);
   assert.equal(result.projection.researchCoverage, 'minimal');
   assert.equal(result.searchIndex.claimCount, 1);
-  // One claim is one lineage, so this record is uncorroborated and cannot publish at the top
-  // tier even though its only claim is graded high. See `highestClaimConfidenceTier`.
-  assert.equal(result.searchIndex.confidenceTier, 'medium');
+  // The index carries the grading INPUTS, never a grade: one claim is one lineage, and what a
+  // reader does with that is `confidenceTierFromEvidenceInputs`'s business, not this package's.
+  assert.deepEqual(result.searchIndex.evidenceInputs, {
+    strongestClaimLevel: 'high',
+    citedLineageKeys: ['example source'],
+    evidenceLineageKeys: ['example source'],
+  });
   assert.deepEqual(result.searchIndex.notabilityBasis, result.projection.notabilityBasis);
   assert.equal(result.searchIndex.researchCoverage, result.projection.researchCoverage);
 });
@@ -1046,8 +1050,13 @@ test('buildReleaseEntityArtifacts caps an uncorroborated record below its strong
   const result = buildReleaseEntityArtifacts(entry, CONTEXT);
   assert.equal(result.ok, true);
   if (!result.ok) return;
-  // Both claims cite src_example: one lineage, so the medium strongest claim steps down to low.
-  assert.equal(result.searchIndex.confidenceTier, 'low');
+  // Both claims cite src_example: one lineage, recorded once. The step-down that follows from
+  // it is the read-time rule's, and is asserted in `@repo/public-contracts`' evidence suite.
+  assert.deepEqual(result.searchIndex.evidenceInputs, {
+    strongestClaimLevel: 'medium',
+    citedLineageKeys: ['src_example'],
+    evidenceLineageKeys: ['src_example'],
+  });
   assert.equal(result.searchIndex.claimCount, 2);
 });
 
@@ -1073,104 +1082,150 @@ test('buildReleaseEntityArtifacts publishes the top tier once a second lineage c
   const result = buildReleaseEntityArtifacts(entry, CONTEXT);
   assert.equal(result.ok, true);
   if (!result.ok) return;
-  assert.equal(result.searchIndex.confidenceTier, 'high');
+  assert.deepEqual(result.searchIndex.evidenceInputs, {
+    strongestClaimLevel: 'high',
+    citedLineageKeys: ['npgallery.nps.gov', 'catalog.archives.gov'],
+    evidenceLineageKeys: ['npgallery.nps.gov', 'catalog.archives.gov'],
+  });
 });
 
-test('highestClaimConfidenceTier does not let one publisher corroborate itself', () => {
-  // The facet written here must agree with `recordConfidenceTier` in
-  // `@repo/public-contracts/evidence`, which cannot be imported across the client/server
-  // boundary — so the shared cases are asserted on both sides.
-  assert.equal(
-    highestClaimConfidenceTier([
+test('recordEvidenceInputs collapses one publisher spelled several ways to one lineage', () => {
+  // This package projects grading inputs and never grades. What the rule then makes of these
+  // inputs is asserted in `@repo/public-contracts/src/evidence.test.ts`, and that the two
+  // projections agree is asserted in `apps/web/src/lib/evidence/confidence-rule-parity.test.ts`.
+  assert.deepEqual(
+    recordEvidenceInputs([
       { confidenceLevel: 'high', citationSource: 'wikipedia_api' },
       { confidenceLevel: 'high', citationSource: 'en.wikipedia.org' },
     ]),
-    'medium',
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['wikipedia'],
+      evidenceLineageKeys: ['wikipedia'],
+    },
   );
-  assert.equal(
-    highestClaimConfidenceTier([
+  assert.deepEqual(
+    recordEvidenceInputs([
       { confidenceLevel: 'high', citationSource: 'www.nps.gov' },
       { confidenceLevel: 'high', citationSource: 'nps.gov' },
     ]),
-    'medium',
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['nps.gov'],
+      evidenceLineageKeys: ['nps.gov'],
+    },
   );
-  assert.equal(highestClaimConfidenceTier([]), 'unrated');
-  assert.equal(highestClaimConfidenceTier([{ confidenceLevel: 'high' }]), 'unrated');
+  // No claims, and a claim with no citation: an empty lineage list either way, which is what
+  // lets the rule tell "nobody assessed this" apart from "assessed and poorly supported".
+  assert.deepEqual(recordEvidenceInputs([]), {
+    strongestClaimLevel: 'unrated',
+    citedLineageKeys: [],
+    evidenceLineageKeys: [],
+  });
+  assert.deepEqual(recordEvidenceInputs([{ confidenceLevel: 'high' }]), {
+    strongestClaimLevel: 'high',
+    citedLineageKeys: [],
+    evidenceLineageKeys: [],
+  });
 });
 
-test("highestClaimConfidenceTier excludes Wikipedia and the record's own index row", () => {
-  // Wikipedia carries a claim and never corroborates one (repo-goyut).
-  assert.equal(
-    highestClaimConfidenceTier([
+test("recordEvidenceInputs keeps the record's own index row out of the evidence lineages", () => {
+  // Wikipedia stays in BOTH lists on purpose. It carries a claim and never corroborates one
+  // (repo-goyut), but that is a policy about one publisher and policy is the rule's, so the
+  // projection records it and `confidenceTierFromEvidenceInputs` discounts it.
+  assert.deepEqual(
+    recordEvidenceInputs([
       { confidenceLevel: 'high', citationSource: 'npgallery.nps.gov' },
       { confidenceLevel: 'medium', citationSource: 'en.wikipedia.org' },
     ]),
-    'medium',
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['npgallery.nps.gov', 'wikipedia'],
+      evidenceLineageKeys: ['npgallery.nps.gov', 'wikipedia'],
+    },
   );
   // nrhp-black-heritage-00000006: the listing claims are the NARA row the record was seeded
-  // from, so the nomination form is the only document corroborating anything (repo-6jizv). Every
+  // from, so the nomination form is the only document evidencing anything (repo-6jizv). Every
   // claim states its role explicitly, matching what the publisher writes post-migration.
-  assert.equal(
-    highestClaimConfidenceTier([
+  assert.deepEqual(
+    recordEvidenceInputs([
       {
         confidenceLevel: 'high',
-        predicate: 'listing',
         claimRole: 'record_index',
         citationSource: 'catalog.archives.gov',
       },
       {
         confidenceLevel: 'high',
-        predicate: 'significant for',
         claimRole: 'record_index',
         citationSource: 'catalog.archives.gov',
       },
       {
         confidenceLevel: 'high',
-        predicate: 'source states',
         claimRole: 'evidence',
         citationSource: 'npgallery.nps.gov',
       },
     ]),
-    'medium',
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['catalog.archives.gov', 'npgallery.nps.gov'],
+      evidenceLineageKeys: ['npgallery.nps.gov'],
+    },
   );
   // Two documents read, neither the index row.
-  assert.equal(
-    highestClaimConfidenceTier([
+  assert.deepEqual(
+    recordEvidenceInputs([
       {
         confidenceLevel: 'high',
-        predicate: 'listing',
         claimRole: 'record_index',
         citationSource: 'catalog.archives.gov',
       },
       {
         confidenceLevel: 'high',
-        predicate: 'source states',
         claimRole: 'evidence',
         citationSource: 'npgallery.nps.gov',
       },
       {
         confidenceLevel: 'high',
-        predicate: 'source states',
         claimRole: 'evidence',
         citationSource: 'blackpast.org',
       },
     ]),
-    'high',
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['catalog.archives.gov', 'npgallery.nps.gov', 'blackpast.org'],
+      evidenceLineageKeys: ['npgallery.nps.gov', 'blackpast.org'],
+    },
   );
-  // Wikipedia alone is an assessment, so it grades rather than reporting unrated.
-  assert.equal(
-    highestClaimConfidenceTier([{ confidenceLevel: 'medium', citationSource: 'wikipedia_api' }]),
-    'low',
+  // A lineage cited by both an index-row claim and an evidence claim is still evidence: the
+  // partition is per lineage, not per claim.
+  assert.deepEqual(
+    recordEvidenceInputs([
+      {
+        confidenceLevel: 'high',
+        claimRole: 'record_index',
+        citationSource: 'catalog.archives.gov',
+      },
+      {
+        confidenceLevel: 'high',
+        claimRole: 'evidence',
+        citationSource: 'catalog.archives.gov',
+      },
+    ]),
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['catalog.archives.gov'],
+      evidenceLineageKeys: ['catalog.archives.gov'],
+    },
   );
 });
 
-test('highestClaimConfidenceTier treats a claim missing claimRole as evidence, never inferred from its predicate', () => {
-  // The predicate bridge is gone: every published claim now carries `claimRole`, so
-  // a claim without it is not read as the record's own index row just because its predicate used
-  // to describe one under the old bridge vocabulary. It counts toward corroboration like any
-  // other claim — the explicit default the current schema demands, not an inference.
-  assert.equal(
-    highestClaimConfidenceTier([
+test('recordEvidenceInputs treats a claim missing claimRole as evidence, never inferred from its predicate', () => {
+  // The predicate bridge is gone: every published claim now carries `claimRole`, so a claim
+  // without it is not read as the record's own index row just because its predicate used to
+  // describe one under the old bridge vocabulary. It counts as evidence like any other claim —
+  // the explicit default the current schema demands, not an inference.
+  assert.deepEqual(
+    recordEvidenceInputs([
       { confidenceLevel: 'high', predicate: 'listing', citationSource: 'catalog.archives.gov' },
       {
         confidenceLevel: 'high',
@@ -1183,12 +1238,16 @@ test('highestClaimConfidenceTier treats a claim missing claimRole as evidence, n
         citationSource: 'npgallery.nps.gov',
       },
     ]),
-    'high',
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['catalog.archives.gov', 'npgallery.nps.gov'],
+      evidenceLineageKeys: ['catalog.archives.gov', 'npgallery.nps.gov'],
+    },
   );
-  // Stating the role explicitly still excludes the index row from corroboration, and a predicate
-  // outside the old bridge vocabulary is no obstacle to being named the index row.
-  assert.equal(
-    highestClaimConfidenceTier([
+  // Stating the role explicitly still excludes the index row, and a predicate outside the old
+  // bridge vocabulary is no obstacle to being named the index row.
+  assert.deepEqual(
+    recordEvidenceInputs([
       {
         confidenceLevel: 'high',
         predicate: 'source states',
@@ -1202,7 +1261,11 @@ test('highestClaimConfidenceTier treats a claim missing claimRole as evidence, n
         citationSource: 'npgallery.nps.gov',
       },
     ]),
-    'medium',
+    {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['catalog.archives.gov', 'npgallery.nps.gov'],
+      evidenceLineageKeys: ['npgallery.nps.gov'],
+    },
   );
 });
 

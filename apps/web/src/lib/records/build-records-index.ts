@@ -12,8 +12,15 @@
  * coordinates — and "what is documented about X, including the things we cannot place" is the
  * exact question this room exists to answer (design-direction-v9-surfaces.md §4.2, and the
  * epic's first binding correction). So rows are built from a catalog that keeps ungeocoded
- * records: full `PublicEntityView` today, or the search_index slim when `confidenceTier` is
+ * records: full `PublicEntityView` today, or the search_index slim when `evidenceInputs` is
  * projected on active-release docs.
+ *
+ * THE TIER IS NEVER READ OUT OF THE INDEX. The slim path used to take a graded `confidenceTier`
+ * facet straight off the doc, which made `/records` the one surface serving a cached CONCLUSION
+ * while every other surface derived one — and when the rule changed on 2026-09-07 this room kept
+ * the old answer for a day (repo-ngojq, repo-6qjv0). The index now carries the INPUTS and both
+ * paths end at the same `confidenceTierFromEvidenceInputs`, so a rule change reaches Explore and
+ * Records in the same deploy.
  *
  * The filter VOCABULARY, though, must not drift from the Lens. Every label and bucket here is
  * derived by calling the same shared modules Explore calls — `kindFamilyFor`,
@@ -28,6 +35,7 @@ import {
 import type { PublicSearchIndexDoc } from '@repo/domain/search';
 import type { PublicEntityView } from '../../data/public-seed';
 import {
+  confidenceTierFromEvidenceInputs,
   recordConfidenceTier,
   type ConfidenceTier,
 } from '../map-experience/build-explore-map-source';
@@ -257,18 +265,24 @@ export type RecordsCatalogEntry = {
   readonly locationPrecision?: string;
 };
 
-/** True when search_index docs carry projected confidence (backfill or new publishes). */
+/**
+ * True when search_index docs carry the projected grading inputs (backfill or new publishes).
+ *
+ * Coverage is measured on `evidenceInputs`, never on a graded tier. A row that carries only the
+ * retired `facets.confidenceTier` reads as uncovered on purpose: serving a cached conclusion is
+ * the defect this replaced, and falling back to full entities here is slower but honest.
+ */
 export function searchIndexReadyForRecords(
   docs: readonly PublicSearchIndexDoc[],
-  /** Require this share of docs to carry an explicit tier before leaving full-entity hydrate. */
+  /** Require this share of docs to carry the inputs before leaving full-entity hydrate. */
   minCoverage = 0.95,
 ): boolean {
   if (docs.length === 0) return false;
-  let withTier = 0;
+  let withInputs = 0;
   for (const doc of docs) {
-    if (doc.confidenceTier !== undefined) withTier += 1;
+    if (doc.evidenceInputs !== undefined) withInputs += 1;
   }
-  return withTier / docs.length >= minCoverage;
+  return withInputs / docs.length >= minCoverage;
 }
 
 export function recordsCatalogFromEntity(entity: PublicEntityView): RecordsCatalogEntry {
@@ -312,7 +326,12 @@ export function recordsCatalogFromSearchDoc(doc: PublicSearchIndexDoc): RecordsC
     ...(doc.topicIds !== undefined ? { topicIds: doc.topicIds } : {}),
     eraBuckets: doc.eraBuckets,
     ...(doc.status !== undefined ? { status: doc.status } : {}),
-    confidenceTier: doc.confidenceTier ?? 'unrated',
+    // The one rule, applied at read time over cached INPUTS — the same call Explore, the record
+    // page and the phone make over live claims. A tier is never read out of the index.
+    confidenceTier:
+      doc.evidenceInputs === undefined
+        ? 'unrated'
+        : confidenceTierFromEvidenceInputs(doc.evidenceInputs),
     mappable:
       !staysOffPublicMap({ displayName: doc.displayName }) &&
       typeof doc.geohash === 'string' &&
