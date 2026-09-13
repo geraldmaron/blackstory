@@ -9,6 +9,20 @@
  * code but is out of this product's scope; `evaluateGeocodeProductScope` reports that rather
  * than silently resolving jurisdiction ids for a state row that will never exist in the
  * `jurisdictions` collection (ADR-016 only loads the 50 states + D.C. from this same table).
+ *
+ * NOT widened for non-US birthplaces (2026-09-12 OWNER RULING, repo-9rkh: "the Atlas supports
+ * non-US birthplaces"), despite that ruling naming this file. This gate only ever receives a
+ * `CensusGeocodeMatch` — a result of the US Census Geocoder, which does not geocode non-US
+ * places at all, so it never returns a match with a foreign country's state-equivalent FIPS for
+ * `IN_SCOPE_STATE_FIPS` to accept or reject in the first place. Widening this set would be a
+ * no-op for the actual product need (a Cárdenas, Cuba lookup never reaches this function); real
+ * non-US support for the address-search/`/locate` path this gate guards would need a non-Census
+ * geocoder backend plus a non-US branch of `resolveJurisdictionIdsFromMatch`
+ * (`./jurisdiction-ids.ts` hard-codes `countryJurisdictionId() => 'us'`) — a separate, larger
+ * change than this file, deliberately left as a follow-up rather than bundled in here.
+ * `lookupNonUsCityCentroid` (`./city-centroid.ts`) is the part of this ruling that ships now: it
+ * is used directly by the birthplace-pin write path (`packages/ops-data/scripts/
+ * fix-pin-saturation.ts`), which never calls this Census-oriented gate at all.
  */
 import { US_STATES } from '../map/us-geography.js';
 import type { CensusGeocodeMatch } from '../adapters/census-geo/types.js';

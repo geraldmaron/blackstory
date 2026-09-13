@@ -8,6 +8,16 @@
  * their own Next.js deployable (`apps/admin`) — see `docs/security/service-surfaces.md` — and
  * their edge auth gate (`./admin/admin-auth-gate.ts`) composes here rather than living in a file
  * of its own.
+ *
+ * This is also where the CSP nonce pipeline lives (repo-77nk): a nonce cannot be a static
+ * `next.config.mjs` header, so it is generated once per request, forwarded to the app as the
+ * `x-nonce` request header (Server Components with a manual `<script>` needing it read this back
+ * with `headers()` — see the JSON-LD script components; the root layout's one manual script is
+ * allowed by content hash instead, see THEME_BOOTSTRAP_SCRIPT_SHA256 in csp.ts), and set as the
+ * `Content-Security-Policy` response header — uniformly, on every branch below, so no route
+ * loses CSP coverage now that the static header is gone. `script-src` uses
+ * `'nonce-<value>' 'strict-dynamic'` instead of `'unsafe-inline'`; see csp.ts for the directive
+ * itself.
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
@@ -15,7 +25,15 @@ import { adminAuthGate } from './admin/admin-auth-gate';
 import { handleMaintenance } from './lib/maintenance/maintenance-gate';
 import { denyExpensiveAiCrawler } from './lib/traffic-class/edge-deny';
 import { handleWebSecurity } from './lib/web-security/edge-security';
+import { CSP_NONCE_HEADER } from './lib/web-security/constants';
+import { applySecurityHeaders } from './lib/web-security/security-headers';
 import { STAND_COOKIE, isPublicPlaceSlug } from './lib/place/public-place-path';
+
+/** Base64 per-request nonce for CSP `script-src 'nonce-<value>'`. Edge-runtime safe: both
+ * `crypto` (Web Crypto, global) and `Buffer` (Next's edge polyfill) are available here. */
+function generateNonce(): string {
+  return Buffer.from(crypto.randomUUID()).toString('base64');
+}
 
 function standSlugFromRequest(request: NextRequest): string | undefined {
   const at = request.nextUrl.searchParams.get('at');
@@ -40,6 +58,25 @@ function attachStandCookie(request: NextRequest, response: NextResponse): NextRe
 }
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
+  // Issued once per request, before any branch below, so every one of them — including early
+  // returns (maintenance wall, AI-crawler deny, admin sign-in redirect) — can carry it forward.
+  // Mutating the live `request.headers` (rather than a copy) means every downstream helper that
+  // re-reads `request` for its own `NextResponse.next({ request })` — `adminAuthGate` already
+  // does this for Supabase cookie refresh — picks the nonce up for free.
+  const nonce = generateNonce();
+  request.headers.set(CSP_NONCE_HEADER, nonce);
+
+  const response = await resolveProxyResponse(request);
+  // Applied last and unconditionally so CSP (with this request's nonce) reaches every response
+  // this proxy returns, not only the narrower `isSecurityNormalizedPath` set below. Any CSP a
+  // branch already set (maintenance-gate.ts, edge-security.ts both call `applySecurityHeaders`
+  // without a nonce) is overwritten here with the nonce-bearing value — `Headers.set` replaces,
+  // it does not append.
+  applySecurityHeaders(response.headers, { nonce });
+  return attachStandCookie(request, response);
+}
+
+async function resolveProxyResponse(request: NextRequest): Promise<NextResponse> {
   // First, always. A walled request must not reach a route, a React render, or `bb_public` —
   // and that includes `/admin`: a maintenance window is not staff-exempt by default. Staff use
   // the same MAINTENANCE_BYPASS_TOKEN cookie redemption as anyone let through on purpose.
@@ -63,11 +100,11 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
   // Outside the security/normalization surface this is a bare pass-through, which is what these
   // paths got before the matcher was widened for maintenance mode. See `config` below.
-  const response = isSecurityNormalizedPath(request.nextUrl.pathname)
+  // `{ request }` (rather than a bare `NextResponse.next()`) forwards the nonce header set
+  // above into the request the app renders from.
+  return isSecurityNormalizedPath(request.nextUrl.pathname)
     ? handleWebSecurity(request)
-    : NextResponse.next();
-
-  return attachStandCookie(request, response);
+    : NextResponse.next({ request });
 }
 
 /**

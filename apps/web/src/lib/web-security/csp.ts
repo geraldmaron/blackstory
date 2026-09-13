@@ -1,8 +1,11 @@
 /**
  * Content-Security-Policy builder for the public web surface.
- * Production allows inline scripts for Next.js App Router flight/hydration until a
- * nonce pipeline lands; development also allows eval for HMR. MapLibre needs blob
- * workers and OpenFreeMap / demotiles connect+font+img hosts. Banned-books covers
+ * Script-src is nonce-based (`'nonce-<n>' 'strict-dynamic'`) whenever `proxy.ts` supplies a
+ * per-request nonce, which is how every real response is built (see CSP_NONCE_HEADER and
+ * `proxy.ts`). A caller that omits `nonce` — only unmigrated tests/tooling should — falls back
+ * to the old `'unsafe-inline'` allowance for Next.js App Router flight/hydration scripts;
+ * production traffic never takes that fallback. Development also allows eval for HMR. MapLibre
+ * needs blob workers and OpenFreeMap / demotiles connect+font+img hosts. Banned-books covers
  * need Open Library + archive.org img hosts (see BOOK_COVER_IMG_SRC).
  */
 
@@ -16,7 +19,27 @@ export type CspBuildOptions = {
   connectSrc?: string[];
   /** Override NODE_ENV detection (tests).  */
   isDev?: boolean;
+  /**
+   * Per-request nonce (base64) issued by `proxy.ts`. When present, script-src drops
+   * `'unsafe-inline'` for `'nonce-<value>' 'strict-dynamic'` instead — see CSP_NONCE_HEADER.
+   * Every production response carries one; omit only in tests exercising the legacy fallback.
+   */
+  nonce?: string;
 };
+
+/**
+ * SHA-256 (base64) of `THEME_BOOTSTRAP_SCRIPT` (packages/ui/src/theme/document-theme.ts) — the
+ * root layout's blocking pre-paint theme script. That script tag is one of the few CSP must
+ * allow without a nonce: `app/layout.tsx` is on the shell resilience test's no-`await` list (see
+ * command-bar-search.test.tsx's "awaits no data" checks — an async root layout is a page-level
+ * throw no error boundary below it can catch), so it cannot call `next/headers()` for a nonce.
+ * A content hash needs no request context and, like a nonce, coexists with `'strict-dynamic'`
+ * under CSP3. THEME_BOOTSTRAP_SCRIPT is a fixed compile-time constant, so a static hash is safe
+ * — but it must be recomputed if that script's source ever changes; web-security.test.ts checks
+ * this constant against the live script content so drift fails a test instead of CSP silently.
+ */
+export const THEME_BOOTSTRAP_SCRIPT_SHA256 =
+  "'sha256-51ZZphqguJf2bHn9CnelhCzdAtWW/oDmMD+ATk0tpAk='";
 
 /** MapLibre demo tiles (fallback) + OpenFreeMap streets/fonts for the archive basemap. */
 const MAP_TILE_SRC = ['https://demotiles.maplibre.org', 'https://tiles.openfreemap.org'];
@@ -100,15 +123,34 @@ export function buildContentSecurityPolicy(options: CspBuildOptions = {}): strin
     imgSrc = DEFAULT_IMG_SRC,
     connectSrc = DEFAULT_CONNECT_SRC,
     isDev = process.env.NODE_ENV !== 'production',
+    nonce,
   } = options;
 
   const styleSrc = allowInlineStyles ? ["'self'", "'unsafe-inline'"] : ["'self'"];
-  // Next.js App Router ships RSC flight data in inline <script> tags without nonces.
-  // Production must allow 'unsafe-inline' until a per-request nonce pipeline lands
-  // (see tracker follow-up for nonce + strict-dynamic). Dev still needs 'unsafe-eval' for HMR.
-  const scriptSrc = isDev
-    ? ["'self'", "'unsafe-inline'", "'unsafe-eval'", ...VERCEL_ANALYTICS_SRC]
-    : ["'self'", "'unsafe-inline'", ...VERCEL_ANALYTICS_SRC];
+  // With a nonce, Next.js App Router's RSC flight/hydration scripts (and any manual <script>
+  // carrying the same nonce — see CSP_NONCE_HEADER) are trusted directly, and 'strict-dynamic'
+  // lets them load further scripts without a host allowlist. Dev still needs 'unsafe-eval' for
+  // HMR. The host-based VERCEL_ANALYTICS_SRC entries stay for legacy browsers that ignore
+  // 'strict-dynamic' and fall back to the plain allowlist.
+  //
+  // No nonce means an unmigrated caller (tests/tooling only — every real response goes through
+  // proxy.ts, which always supplies one): fall back to the pre-nonce 'unsafe-inline' allowance
+  // so flight/hydration scripts still run rather than breaking silently.
+  const scriptSrc = nonce
+    ? [
+        "'self'",
+        `'nonce-${nonce}'`,
+        "'strict-dynamic'",
+        // The root layout's theme-bootstrap script can't carry this nonce (see
+        // THEME_BOOTSTRAP_SCRIPT_SHA256's own comment) — its content hash is an equally valid
+        // 'strict-dynamic'-compatible trust anchor under CSP3.
+        THEME_BOOTSTRAP_SCRIPT_SHA256,
+        ...(isDev ? ["'unsafe-eval'"] : []),
+        ...VERCEL_ANALYTICS_SRC,
+      ]
+    : isDev
+      ? ["'self'", "'unsafe-inline'", "'unsafe-eval'", ...VERCEL_ANALYTICS_SRC]
+      : ["'self'", "'unsafe-inline'", ...VERCEL_ANALYTICS_SRC];
   const workerSrc = ["'self'", 'blob:'];
   const resolvedConnectSrc = isDev ? [...connectSrc, 'ws:', 'wss:'] : connectSrc;
 

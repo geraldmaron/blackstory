@@ -1,53 +1,16 @@
 /**
  * Plain-JS security headers for next.config.mjs.
- * Keep in sync with security-headers.ts csp.ts tested via web-security.test.ts.
+ * Keep in sync with security-headers.ts, tested via web-security.test.ts.
+ *
+ * Content-Security-Policy is deliberately NOT emitted here. A nonce cannot be static — Next
+ * reads this module directly (no TS transform, no per-request context) — so CSP moves to
+ * `proxy.ts`, which issues a fresh nonce per request and sets the header there via
+ * `applySecurityHeaders`/`buildContentSecurityPolicy` (see csp.ts, CSP_NONCE_HEADER). Every
+ * header below is static and safe to keep here.
  */
 
 /** @returns {{ key: string, value: string }}  */
 export function securityHeadersForNextConfig() {
-  const isDev = process.env.NODE_ENV !== 'production';
-  // Keep in sync with csp.ts — production needs 'unsafe-inline' for Next RSC flight
-  // scripts until a nonce pipeline lands.
-  const vercelAnalytics = 'https://va.vercel-scripts.com https://vitals.vercel-insights.com';
-  const scriptSrc = isDev
-    ? `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${vercelAnalytics}`
-    : `script-src 'self' 'unsafe-inline' ${vercelAnalytics}`;
-  const mapTiles = 'https://demotiles.maplibre.org https://tiles.openfreemap.org';
-  // Keep in sync with csp.ts DEFAULT_IMG_SRC (GCS + Supabase public-media + book covers).
-  const publicMedia = 'https://storage.googleapis.com https://twykhihqkcldpreuovay.supabase.co';
-  // Article hero/inline imagery from public-domain archival collections (Wikimedia
-  // Commons). Production should re-host into the Supabase media bucket.
-  // commons.wikimedia.org (repo-4vuf, pin-and-serve): Special:FilePath 302s from here to
-  // upload.wikimedia.org — keep in sync with csp.ts ARTICLE_MEDIA_IMG_SRC.
-  // thumb.wikimedia.org: since 2026 Commons' Special:Redirect/file answers with a 301 to this
-  // host for rendered thumbnails, so a pinned photo's final image request lands here.
-  const articleMedia =
-    'https://upload.wikimedia.org https://commons.wikimedia.org https://thumb.wikimedia.org';
-  // Open Library cover URLs redirect to archive.org / ia*.us.archive.org — allow each hop.
-  const bookCovers = 'https://covers.openlibrary.org https://archive.org https://*.us.archive.org';
-  const connectSrc = isDev
-    ? `connect-src 'self' ws: wss: ${mapTiles} ${vercelAnalytics}`
-    : `connect-src 'self' ${mapTiles} ${vercelAnalytics}`;
-  const cspParts = [
-    "default-src 'self'",
-    "base-uri 'self'",
-    "form-action 'self'",
-    "frame-ancestors 'none'",
-    "object-src 'none'",
-    scriptSrc,
-    "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: ${mapTiles} ${publicMedia} ${articleMedia} ${bookCovers}`,
-    `font-src 'self' ${mapTiles}`,
-    connectSrc,
-    "manifest-src 'self'",
-    "worker-src 'self' blob:",
-    "child-src 'self' blob:",
-  ];
-  if (!isDev) {
-    cspParts.push('upgrade-insecure-requests');
-  }
-  const csp = cspParts.join('; ');
-
   const permissionsPolicy = [
     'accelerometer=()',
     'autoplay=()',
@@ -71,7 +34,6 @@ export function securityHeadersForNextConfig() {
   ].join(', ');
 
   return [
-    { key: 'Content-Security-Policy', value: csp },
     { key: 'X-Frame-Options', value: 'DENY' },
     { key: 'X-Content-Type-Options', value: 'nosniff' },
     { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },

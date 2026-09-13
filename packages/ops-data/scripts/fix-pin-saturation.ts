@@ -14,9 +14,15 @@
  * supports; the old `site`/`institution` asserted a building.
  *
  * Where no birthplace could be sourced, the pin is REMOVED rather than left on the honoring
- * institution. A missing pin is honest; a wrong one is not. Non-US birthplaces are also cleared
- * here — the centroid dataset is US-only, and inventing coordinates for Cárdenas or Matanzas
- * would repeat the mistake this script exists to fix. Those are tracked for a follow-up pass.
+ * institution. A missing pin is honest; a wrong one is not.
+ *
+ * Non-US birthplaces (2026-09-12 OWNER RULING, repo-9rkh: "the Atlas supports non-US
+ * birthplaces") try `lookupNonUsCityCentroid`'s small curated table first — still no network
+ * call, same "documented city, no invented coordinate" posture as the US path. This line used to
+ * say non-US birthplaces were cleared unconditionally because the centroid dataset was US-only;
+ * that was true when it was written and is why José Méndez, Martín Dihigo, and Cristóbal
+ * Torriente (Cárdenas/Matanzas/Cienfuegos, Cuba) sat unpinned until repo-9rkh added the non-US
+ * table. A city/country pair still missing from that table is cleared exactly as before.
  *
  * Go-forward fix: ./lib/pin-saturation-linter.ts runs over the whole catalog on every invocation
  * and fails when people stack on an exact coordinate. Genuine co-location (the nine people
@@ -35,7 +41,7 @@
  */
 import { readFileSync } from 'node:fs';
 import pg from 'pg';
-import { lookupUsCityCentroid } from '@repo/domain';
+import { lookupNonUsCityCentroid, lookupUsCityCentroid } from '@repo/domain';
 import { encodeGeohash, geohashPrefixes } from '@repo/domain/geography/geohash';
 import { remindToRepublishCatalogArtifacts } from './lib/catalog-republish-reminder.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
@@ -47,6 +53,20 @@ const BIRTHPLACE_INPUT = process.env.BIRTHPLACE_INPUT ?? '';
 
 /** Existing rows in this catalog carry 5-character geohashes; match that, do not introduce a second convention. */
 const CATALOG_GEOHASH_LENGTH = 5;
+
+/**
+ * Display names for the ISO 3166-1 alpha-2 `birth_country` codes this catalog has needed so far
+ * (repo-9rkh). Extend alongside `NON_US_CITY_CENTROIDS`
+ * (packages/domain/src/geocode/city-centroid.ts) as new non-US birthplaces are documented; a
+ * code missing here falls back to the bare ISO code rather than failing the run.
+ */
+const NON_US_COUNTRY_LABELS: Readonly<Record<string, string>> = {
+  CU: 'Cuba',
+};
+
+function countryLabel(countryCode: string): string {
+  return NON_US_COUNTRY_LABELS[countryCode.toUpperCase()] ?? countryCode;
+}
 
 type Birthplace = {
   readonly id: string;
@@ -125,12 +145,31 @@ async function main(): Promise<void> {
         clearPin.push({ id: entry.id, name: entry.display_name, why: 'no birthplace sourced' });
         continue;
       }
-      if (!entry.birth_state || (entry.birth_country && entry.birth_country !== 'US')) {
-        clearPin.push({
+
+      if (entry.birth_country && entry.birth_country !== 'US') {
+        const centroid = lookupNonUsCityCentroid(entry.birth_city, entry.birth_country);
+        if (!centroid) {
+          clearPin.push({
+            id: entry.id,
+            name: entry.display_name,
+            why: `non-US birthplace (${entry.birth_city}, ${entry.birth_country}) — no curated centroid yet (add one to NON_US_CITY_CENTROIDS in packages/domain/src/geocode/city-centroid.ts)`,
+          });
+          continue;
+        }
+        resolved.push({
           id: entry.id,
           name: entry.display_name,
-          why: `non-US birthplace (${entry.birth_city}, ${entry.birth_country ?? '?'}) — city-centroid dataset is US-only`,
+          lat: centroid.lat,
+          lng: centroid.lng,
+          geohash: encodeGeohash(centroid.lat, centroid.lng, CATALOG_GEOHASH_LENGTH),
+          city: entry.birth_city,
+          state: countryLabel(entry.birth_country),
         });
+        continue;
+      }
+
+      if (!entry.birth_state) {
+        clearPin.push({ id: entry.id, name: entry.display_name, why: 'no birth state sourced' });
         continue;
       }
       const centroid = lookupUsCityCentroid(entry.birth_city, entry.birth_state);

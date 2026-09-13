@@ -2,12 +2,14 @@
  * Web security module integration tests.
  */
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
+import { THEME_BOOTSTRAP_SCRIPT } from '@repo/ui';
 import { buildCsrfSetCookieHeader, generateCsrfToken, validateCsrfToken } from './csrf';
-import { buildContentSecurityPolicy } from './csp';
+import { buildContentSecurityPolicy, THEME_BOOTSTRAP_SCRIPT_SHA256 } from './csp';
 import { csrfCookieDefaults, secureCookieDefaults, serializeSetCookie } from './cookies';
 import { buildSafeContentDisposition, sanitizeFilename } from './content-disposition';
 import {
@@ -30,12 +32,17 @@ const NEXT_CONFIG_PATH = join(__dirname, '../../../next.config.mjs');
 // is a header string, the question is whether a source is listed in it, and an unanchored
 // hostname pattern reads as URL validation to a reader and to CodeQL alike
 // (js/regex/missing-regexp-anchor).
+// A stand-in for the base64 value proxy.ts actually generates (see generateNonce there); these
+// tests only need a fixed, recognizable token to assert the directive shape around it.
+const TEST_NONCE = 'dGVzdC1ub25jZS12YWx1ZQ==';
+
 test('CSP includes strict defaults and frame-ancestors none', () => {
-  const csp = buildContentSecurityPolicy({ isDev: false });
+  const csp = buildContentSecurityPolicy({ isDev: false, nonce: TEST_NONCE });
   assert.match(csp, /default-src 'self'/);
-  // Next App Router needs inline flight scripts until a nonce pipeline lands.
-  assert.match(csp, /script-src 'self' 'unsafe-inline'/);
-  assert.doesNotMatch(csp, /script-src 'self' 'unsafe-inline' 'unsafe-eval'/);
+  // repo-77nk: production script-src is nonce + strict-dynamic, not 'unsafe-inline'.
+  assert.match(csp, new RegExp(`script-src 'self' 'nonce-${TEST_NONCE}' 'strict-dynamic'`));
+  assert.doesNotMatch(csp, /script-src[^;]*unsafe-inline/);
+  assert.doesNotMatch(csp, /script-src[^;]*unsafe-eval/);
   assert.match(csp, /frame-ancestors 'none'/);
   assert.match(csp, /object-src 'none'/);
   assert.match(csp, /upgrade-insecure-requests/);
@@ -65,9 +72,37 @@ test('CSP includes strict defaults and frame-ancestors none', () => {
   }
 });
 
+test('THEME_BOOTSTRAP_SCRIPT_SHA256 matches the live theme-bootstrap script content', () => {
+  // csp.ts hardcodes this hash (app/layout.tsx cannot call next/headers() for a nonce — see
+  // that constant's own comment). If THEME_BOOTSTRAP_SCRIPT's source ever changes without also
+  // updating the hash, browsers reject the script under CSP with no visible server-side error —
+  // this test is what actually catches that drift.
+  const digest = createHash('sha256').update(THEME_BOOTSTRAP_SCRIPT, 'utf8').digest('base64');
+  assert.equal(THEME_BOOTSTRAP_SCRIPT_SHA256, `'sha256-${digest}'`);
+});
+
+test('production script-src allows the theme-bootstrap script by hash, with a nonce for everything else', () => {
+  const csp = buildContentSecurityPolicy({ isDev: false, nonce: TEST_NONCE });
+  const sources = new Set(csp.split(/[\s;]+/u).filter(Boolean));
+  assert.ok(sources.has(THEME_BOOTSTRAP_SCRIPT_SHA256));
+});
+
+test('CSP falls back to unsafe-inline only when a caller has not migrated to the nonce pipeline', () => {
+  // Every real response goes through proxy.ts, which always supplies a nonce. This fallback
+  // exists only so an unmigrated caller fails safe (scripts still run) instead of silently
+  // breaking — it must never be what production actually serves.
+  const csp = buildContentSecurityPolicy({ isDev: false });
+  assert.match(csp, /script-src 'self' 'unsafe-inline'/);
+  assert.doesNotMatch(csp, /script-src[^;]*nonce-/);
+  assert.doesNotMatch(csp, /script-src[^;]*strict-dynamic/);
+});
+
 test('CSP development relaxes script-src for Next.js hydration and HMR', () => {
-  const csp = buildContentSecurityPolicy({ isDev: true });
-  assert.match(csp, /script-src 'self' 'unsafe-inline' 'unsafe-eval'/);
+  const csp = buildContentSecurityPolicy({ isDev: true, nonce: TEST_NONCE });
+  // HMR still needs 'unsafe-eval'; hydration/flight scripts use the nonce, not 'unsafe-inline'.
+  assert.match(csp, new RegExp(`script-src 'self' 'nonce-${TEST_NONCE}' 'strict-dynamic'`));
+  assert.match(csp, /script-src[^;]*unsafe-eval/);
+  assert.doesNotMatch(csp, /script-src[^;]*unsafe-inline/);
   assert.match(
     csp,
     /connect-src 'self' https:\/\/demotiles\.maplibre\.org https:\/\/tiles\.openfreemap\.org/,
@@ -87,13 +122,14 @@ test('CSP allows the USGS imagery host on both channels the raster basemap uses'
 });
 
 test('global security headers include clickjacking and MIME sniffing protection', () => {
-  const headers = buildGlobalSecurityHeaders();
+  const headers = buildGlobalSecurityHeaders({ nonce: TEST_NONCE });
   const map = Object.fromEntries(headers.map((h) => [h.key, h.value]));
   assert.equal(map['X-Frame-Options'], 'DENY');
   assert.equal(map['X-Content-Type-Options'], 'nosniff');
   const csp = map['Content-Security-Policy'];
   assert.ok(csp);
   assert.match(csp, /frame-ancestors 'none'/);
+  assert.match(csp, new RegExp(`script-src 'self' 'nonce-${TEST_NONCE}' 'strict-dynamic'`));
   assert.equal(map['Referrer-Policy'], REFERRER_POLICY);
   const permissions = map['Permissions-Policy'];
   assert.ok(permissions);
@@ -101,40 +137,27 @@ test('global security headers include clickjacking and MIME sniffing protection'
   assert.equal(mimeSniffingProtectionHeader().value, 'nosniff');
 });
 
-test('next.config.mjs wires global security headers', () => {
+test('next.config.mjs wires the static global security headers, with CSP deliberately absent', () => {
+  // repo-77nk: CSP carries a per-request nonce, so it cannot be one of next.config.mjs's static
+  // `/:path*` headers — it moves to proxy.ts instead (see proxy.test.ts).
   const source = readFileSync(NEXT_CONFIG_PATH, 'utf8');
   assert.match(source, /next-config-headers\.mjs/);
   assert.match(source, /globalSecurityHeaders/);
   assert.match(source, /source: '\/:path\*'/);
 
   const mjsHeaders = securityHeadersFromMjs();
-  const tsHeaders = buildGlobalSecurityHeaders();
-  assert.deepEqual(
-    mjsHeaders.map((h: { key: string }) => h.key).sort(),
-    tsHeaders.map((h) => h.key).sort(),
+  const mjsKeys = mjsHeaders.map((h: { key: string }) => h.key);
+  assert.ok(
+    !mjsKeys.includes('Content-Security-Policy'),
+    'next.config.mjs must not emit a static (nonce-less) Content-Security-Policy header',
   );
 
-  const mjsCsp = mjsHeaders.find((h: { key: string }) => h.key === 'Content-Security-Policy')
-    ?.value as string;
-  const tsCsp = tsHeaders.find((h) => h.key === 'Content-Security-Policy')?.value as string;
-  assert.ok(mjsCsp);
-  assert.ok(tsCsp);
-  // Production next.config uses the .mjs builder — keep img-src hosts aligned with csp.ts.
-  for (const host of [
-    'covers.openlibrary.org',
-    'archive.org',
-    '*.us.archive.org',
-    'storage.googleapis.com',
-    'twykhihqkcldpreuovay.supabase.co',
-    'upload.wikimedia.org',
-    'commons.wikimedia.org',
-    'thumb.wikimedia.org',
-    'va.vercel-scripts.com',
-    'vitals.vercel-insights.com',
-  ]) {
-    assert.ok(mjsCsp.includes(host), `mjs CSP missing host ${host}`);
-    assert.ok(tsCsp.includes(host), `ts CSP missing host ${host}`);
-  }
+  // Every other global header stays static, and still matches the edge-side (nonce-aware)
+  // builder key-for-key.
+  const tsKeys = buildGlobalSecurityHeaders({ nonce: TEST_NONCE })
+    .map((h) => h.key)
+    .filter((key) => key !== 'Content-Security-Policy');
+  assert.deepEqual(mjsKeys.sort(), tsKeys.sort());
 });
 
 test('secure cookie defaults are HttpOnly with SameSite', () => {

@@ -161,7 +161,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${displayFace.variable} ${sans.variable} ${editorial.variable} ${mono.variable}`}
     >
       <head>
-        {/* Blocking theme apply before paint — matches ThemeToggle's own read: storage, else dark. */}
+        {/*
+         * Blocking theme apply before paint — matches ThemeToggle's own read: storage, else dark.
+         *
+         * Allowed under CSP by a content hash (THEME_BOOTSTRAP_SCRIPT_SHA256 in csp.ts), not a
+         * nonce: this file is one of the four the shell resilience test (see
+         * command-bar-search.test.tsx, "awaits no data") forbids from awaiting anything, because
+         * an async root layout is a page-level throw no error boundary below it can catch. A
+         * nonce means `await headers()`; a hash needs neither, and CSP3's 'strict-dynamic'
+         * accepts a matching hash exactly as it would a nonce. If THEME_BOOTSTRAP_SCRIPT's source
+         * ever changes, THEME_BOOTSTRAP_SCRIPT_SHA256 must be recomputed too — a drift there
+         * fails CSP silently, and web-security.test.ts guards it for that reason.
+         */}
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
       </head>
       <body>

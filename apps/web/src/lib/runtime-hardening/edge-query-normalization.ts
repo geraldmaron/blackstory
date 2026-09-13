@@ -15,7 +15,9 @@ import { buildNormalizedUrl, needsQueryNormalizationRedirect } from './query-nor
 export function handleQueryNormalization(request: NextRequest): NextResponse {
   const url = request.nextUrl;
   if (!needsQueryNormalizationRedirect(url)) {
-    return NextResponse.next();
+    // `{ request }` forwards proxy.ts's `x-nonce` header (set on the same `request` object)
+    // into the request the app renders from — a bare `NextResponse.next()` would not.
+    return NextResponse.next({ request });
   }
   const normalized = buildNormalizedUrl(url);
   // Absolute string Location — avoids NextURL/searchParams reorder quirks on redirect.

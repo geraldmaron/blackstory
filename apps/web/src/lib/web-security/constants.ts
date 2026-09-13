@@ -19,6 +19,15 @@ export const CSRF_COOKIE_NAME = '__Host-csrf';
 export const CSRF_HEADER_NAME = 'x-csrf-token';
 export const CSRF_FORM_FIELD = '_csrf';
 
+/**
+ * Request header `proxy.ts` sets on every request, carrying the per-request CSP nonce.
+ * Server Components read it back with `headers()` (`next/headers`) and pass it to any manual
+ * `<script>` tag that needs to satisfy `script-src 'nonce-...' 'strict-dynamic'`. Next's own
+ * RSC flight/hydration scripts pick the nonce up automatically once it is present on both the
+ * request header and the `Content-Security-Policy` response header.
+ */
+export const CSP_NONCE_HEADER = 'x-nonce';
+
 /** Same-origin relative paths only for post-login post-form redirects.  */
 export const SAFE_REDIRECT_PREFIX = '/';
 

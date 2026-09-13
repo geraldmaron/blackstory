@@ -256,6 +256,7 @@ export const notabilityCriterionSchema = z.enum([
   'enacted_law',
   'elected_or_appointed_office',
   'black_press_or_archive',
+  'documented_military_service',
 ]);
 
 export type NotabilityCriterionDoc = z.infer<typeof notabilityCriterionSchema>;
