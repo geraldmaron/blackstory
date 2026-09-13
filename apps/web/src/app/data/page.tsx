@@ -160,7 +160,7 @@ export default async function DataPage() {
         kicker={DATA_INTRO.kicker}
         title="Data"
         lede={DATA_INTRO.lede}
-        meta={[`Indicators as of ${indicatorsAsOf}`, '11 figures', '7 agencies']}
+        meta={[`Indicators as of ${indicatorsAsOf}`, '13 figures', '8 agencies']}
       />
 
       <DataSections

@@ -27,6 +27,7 @@ const CHART_TAGS = [
   'StatePopulationShiftChart',
   'RacePairComparisonChart',
   'GroupedBarIndicatorChart',
+  'TrendLineChart',
   'DeltaFigure',
 ];
 
@@ -35,8 +36,8 @@ test('every figure on the page is numbered and carries a reading', () => {
     (sum, tag) => sum + countOccurrences(sectionsSource, new RegExp(`<${tag}\\b`, 'g')),
     0,
   );
-  // 4 population, 2 wealth, 3 housing, 2 justice.
-  assert.equal(figureCount, 11);
+  // 4 population, 3 wealth, 4 housing, 2 justice.
+  assert.equal(figureCount, 13);
   assert.equal(countOccurrences(sectionsSource, /figureLabel="Figure \d+"/g), figureCount);
   // DeltaFigure writes its own reading; every chart is handed one.
   assert.equal(countOccurrences(sectionsSource, /reading=\{/g), figureCount);

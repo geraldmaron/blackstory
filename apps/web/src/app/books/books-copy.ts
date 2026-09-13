@@ -37,10 +37,13 @@ export const BOOKS_DETAIL = {
     'Validated USPS codes for challenges currently reported, unknown, banned, or restricted. Rescinded and retained entries are omitted. Codes follow cited public reports, not a claim of statewide removal.',
   evidenceKicker: 'Evidence',
   evidenceTitle: 'Citations',
+  affiliateKicker: 'Affiliate',
+  affiliateTitle: 'Buy on Bookshop',
+  affiliateNotice:
+    'This is an affiliate link. Bookshop.org links support independent bookstores via BlackStory affiliate referral.',
   lookupKicker: 'Lookup',
   lookupTitle: 'Purchase and identifiers',
-  lookupFootnote:
-    'Bookshop.org links support independent bookstores via BlackStory affiliate referral. Open Library is a free catalog reference, not a purchase path.',
+  lookupFootnote: 'Open Library is a free catalog reference, not a purchase path.',
   relatedKicker: 'Related',
   relatedTitle: 'More in this catalog',
   connectedKicker: 'Connected',

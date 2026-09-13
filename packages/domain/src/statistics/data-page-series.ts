@@ -9,7 +9,7 @@ export type DataPageSourceRef = {
   readonly url: string;
 };
 
-export type DataPageValueUnit = 'usd' | 'percent' | 'per_100k' | 'months';
+export type DataPageValueUnit = 'usd' | 'percent' | 'per_100k' | 'months' | 'ratio';
 
 export type DataPageRacePairPoint = {
   readonly label: string;
@@ -62,8 +62,12 @@ export type DataPageGroupedBarSeries = {
 export type DataPageIndicatorBundle = {
   readonly wealthComparison: DataPageRacePairSeries;
   readonly wealthTrend?: DataPageGroupedBarSeries;
+  /** Per-capita wealth ratio, benchmark years 1860 to 2019 (Derenoncourt et al., QJE 2024). */
+  readonly wealthRatioLongArc?: DataPageGroupedBarSeries;
   readonly imprisonmentComparison: DataPageRacePairSeries;
   readonly cookHomeownership: DataPageGroupedBarSeries;
+  /** National homeownership by race, decennial 1900-2000 plus ACS 1-year 2005-2024. */
+  readonly nationalHomeownershipLongArc?: DataPageGroupedBarSeries;
   readonly hmdaDenialRates: DataPageGroupedBarSeries;
   readonly federalDrugSentences: DataPageGroupedBarSeries;
   readonly costBurdenComparison: DataPageRacePairSeries;
@@ -116,6 +120,16 @@ const USSC = {
   url: 'https://www.ussc.gov/research/quick-facts',
 } as const;
 
+const DKKS = {
+  label: 'Derenoncourt, Kim, Kuhn, Schularick, "Wealth of Two Nations" (QJE 2024)',
+  url: 'https://www.elloraderenoncourt.com/us-inequality-data',
+} as const;
+
+const CENSUS_HISTORICAL_HOUSING = {
+  label: 'U.S. Census Bureau, Historical Census of Housing Tables',
+  url: 'https://www.census.gov/topics/housing/homeownership/data/historical.html',
+} as const;
+
 /** Verified against the published reference figures via domain mappers (2026-07-22). */
 export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
   generatedAt: '2026-07-22T00:00:00.000Z',
@@ -165,6 +179,58 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
     themeId: 'wealth_gap',
     themeQuestionId: 'Q3',
   },
+  wealthRatioLongArc: {
+    id: 'wealth-dkks-ratio-nation',
+    title: 'White-to-Black per-capita wealth ratio, 1860 to 2019',
+    caption:
+      'Derenoncourt, Kim, Kuhn and Schularick estimate per-capita wealth back to the Civil War ' +
+      'from census counts, state tax records and survey waves, not the household survey behind ' +
+      'the wealth gap figures above. Points are the benchmark years the authors published, not ' +
+      'an annual series, so the space between two points is not itself measured. Pre-1950 ' +
+      'points use the authors’ own proxy of "non-Black" wealth for "White" wealth (their ' +
+      'appendix explains why).',
+    geographyLabel: 'United States',
+    unit: 'ratio',
+    yAxisLabel: 'White-to-Black wealth ratio',
+    series: [{ id: 'ratio', label: 'White-to-Black wealth ratio', fill: 'var(--ds-viz-1)' }],
+    points: [
+      { period: '1860', values: { ratio: 56.3 } },
+      { period: '1870', values: { ratio: 21.4 } },
+      { period: '1880', values: { ratio: 19 } },
+      { period: '1890', values: { ratio: 14.9 } },
+      { period: '1900', values: { ratio: 11.4 } },
+      { period: '1904', values: { ratio: 10.7 } },
+      { period: '1912', values: { ratio: 11.3 } },
+      { period: '1922', values: { ratio: 10.6 } },
+      { period: '1926', values: { ratio: 10.4 } },
+      { period: '1930', values: { ratio: 9.1 } },
+      { period: '1936', values: { ratio: 8.8 } },
+      { period: '1950', values: { ratio: 7.1 } },
+      { period: '1953', values: { ratio: 7.6 } },
+      { period: '1956', values: { ratio: 6.8 } },
+      { period: '1959', values: { ratio: 8.1 } },
+      { period: '1962', values: { ratio: 7.6 } },
+      { period: '1965', values: { ratio: 6.9 } },
+      { period: '1968', values: { ratio: 6.5 } },
+      { period: '1971', values: { ratio: 6.1 } },
+      { period: '1977', values: { ratio: 6.1 } },
+      { period: '1983', values: { ratio: 5.7 } },
+      { period: '1989', values: { ratio: 5.5 } },
+      { period: '1992', values: { ratio: 5.6 } },
+      { period: '1995', values: { ratio: 5.6 } },
+      { period: '1998', values: { ratio: 6.2 } },
+      { period: '2001', values: { ratio: 5.7 } },
+      { period: '2004', values: { ratio: 5.6 } },
+      { period: '2007', values: { ratio: 5.5 } },
+      { period: '2010', values: { ratio: 6.3 } },
+      { period: '2013', values: { ratio: 6.9 } },
+      { period: '2016', values: { ratio: 6.9 } },
+      { period: '2019', values: { ratio: 6.6 } },
+    ],
+    sources: [DKKS],
+    themeId: 'wealth_gap',
+    themeQuestionId: 'Q3',
+  },
   imprisonmentComparison: {
     id: 'justice-bjs-imprisonment-md',
     title: 'State imprisonment rate, Black vs White residents',
@@ -199,6 +265,58 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
       { period: '2020-2024 (ACS)', values: { black: 41.5, white: 67.2 } },
     ],
     sources: [NHGIS, ACS],
+    themeId: 'redlining',
+    themeQuestionId: 'Q3',
+  },
+  nationalHomeownershipLongArc: {
+    id: 'housing-national-homeownership-nation',
+    title: 'Homeownership by householder race, United States, 1900 to 2024',
+    caption:
+      'Census Bureau historical tables report the national decennial rate every ten years ' +
+      'through 2000; the American Community Survey reports it every year from 2005 (no ' +
+      'standard one-year estimate was published for 2020). Both spans use the same race ' +
+      'definitions, Black alone and White alone Non-Hispanic, so the national gap runs ' +
+      'continuously across the change in how often it is measured.',
+    geographyLabel: 'United States',
+    unit: 'percent',
+    yAxisLabel: 'Homeownership rate',
+    series: [
+      { id: 'black', label: 'Black householder', fill: 'var(--ds-viz-1)' },
+      { id: 'white_nh', label: 'White Non-Hispanic householder', fill: 'var(--ds-viz-2)' },
+    ],
+    points: [
+      { period: '1900', values: { black: 21.3, white_nh: 48.5 } },
+      { period: '1910', values: { black: 22.5, white_nh: 51 } },
+      { period: '1920', values: { black: 23.4, white_nh: 52.1 } },
+      { period: '1930', values: { black: 23.1, white_nh: 52.7 } },
+      { period: '1940', values: { black: 22.8, white_nh: 45.7 } },
+      { period: '1950', values: { black: 34.9, white_nh: 55.1 } },
+      { period: '1960', values: { black: 38.4, white_nh: 64.9 } },
+      { period: '1970', values: { black: 42, white_nh: 65.3 } },
+      { period: '1980', values: { black: 44.4, white_nh: 67.8 } },
+      { period: '1990', values: { black: 43.3, white_nh: 69.6 } },
+      { period: '2000', values: { black: 46.3, white_nh: 73.1 } },
+      { period: '2005', values: { black: 49.3, white_nh: 74.8 } },
+      { period: '2006', values: { black: 48.9, white_nh: 75.1 } },
+      { period: '2007', values: { black: 48.3, white_nh: 75 } },
+      { period: '2008', values: { black: 47.2, white_nh: 74.3 } },
+      { period: '2009', values: { black: 46.5, white_nh: 73.8 } },
+      { period: '2010', values: { black: 45.8, white_nh: 73 } },
+      { period: '2011', values: { black: 45.4, white_nh: 72.9 } },
+      { period: '2012', values: { black: 45.1, white_nh: 72.8 } },
+      { period: '2013', values: { black: 45.3, white_nh: 72.9 } },
+      { period: '2014', values: { black: 45.7, white_nh: 73.2 } },
+      { period: '2015', values: { black: 46.1, white_nh: 73.4 } },
+      { period: '2016', values: { black: 46.4, white_nh: 73.6 } },
+      { period: '2017', values: { black: 46.3, white_nh: 73.7 } },
+      { period: '2018', values: { black: 46, white_nh: 73.8 } },
+      { period: '2019', values: { black: 45.9, white_nh: 73.9 } },
+      { period: '2021', values: { black: 46.3, white_nh: 74.3 } },
+      { period: '2022', values: { black: 45.8, white_nh: 74.4 } },
+      { period: '2023', values: { black: 45.6, white_nh: 74.2 } },
+      { period: '2024', values: { black: 45.4, white_nh: 74 } },
+    ],
+    sources: [CENSUS_HISTORICAL_HOUSING, ACS],
     themeId: 'redlining',
     themeQuestionId: 'Q3',
   },
@@ -385,6 +503,25 @@ export function mergeDataPageIndicatorBundle(
     }
   }
 
+  let wealthRatioLongArc = base.wealthRatioLongArc;
+  if (wealthRatioLongArc) {
+    const dkksRatioRows = observationsByMetric(
+      rows,
+      'dkks-wealth-ratio-white-black-nation',
+      'nation:US',
+    );
+    if (dkksRatioRows.length > 0) {
+      wealthRatioLongArc = {
+        ...wealthRatioLongArc,
+        points: dkksRatioRows.map((row) => ({
+          period: row.referencePeriod,
+          values: { ratio: row.estimate },
+        })),
+        sources: mergeSources(wealthRatioLongArc.sources, dkksRatioRows.map(sourceFromObservation)),
+      };
+    }
+  }
+
   let imprisonment = base.imprisonmentComparison;
   const bjsPair = latestPairedObservations(
     rows,
@@ -468,6 +605,63 @@ export function mergeDataPageIndicatorBundle(
         ].map(sourceFromObservation),
       ),
     };
+  }
+
+  let nationalHomeownershipLongArc = base.nationalHomeownershipLongArc;
+  if (nationalHomeownershipLongArc) {
+    const decBlack = observationsByMetric(
+      rows,
+      'census-decennial-homeownership-black-nation',
+      'nation:US',
+    );
+    const decWhiteNh = observationsByMetric(
+      rows,
+      'census-decennial-homeownership-white_nh-nation',
+      'nation:US',
+    );
+    const acsBlackNation = observationsByMetric(
+      rows,
+      'acs-homeownership-rate-black-nation',
+      'nation:US',
+    );
+    const acsWhiteNhNation = observationsByMetric(
+      rows,
+      'acs-homeownership-rate-white_nh-nation',
+      'nation:US',
+    );
+    const decPeriods = [...new Set(decBlack.map((row) => row.referencePeriod))]
+      .filter((period) => decWhiteNh.some((row) => row.referencePeriod === period))
+      .sort();
+    const decPoints = decPeriods.map((period) => ({
+      period,
+      values: {
+        black: decBlack.find((row) => row.referencePeriod === period)!.estimate,
+        white_nh: decWhiteNh.find((row) => row.referencePeriod === period)!.estimate,
+      },
+    }));
+    const acsPeriods = [...new Set(acsBlackNation.map((row) => row.referencePeriod))]
+      .filter((period) => acsWhiteNhNation.some((row) => row.referencePeriod === period))
+      .sort();
+    const acsPoints = acsPeriods.map((period) => ({
+      period,
+      values: {
+        black: acsBlackNation.find((row) => row.referencePeriod === period)!.estimate,
+        white_nh: acsWhiteNhNation.find((row) => row.referencePeriod === period)!.estimate,
+      },
+    }));
+    const points = [...decPoints, ...acsPoints];
+    if (points.length > 0) {
+      nationalHomeownershipLongArc = {
+        ...nationalHomeownershipLongArc,
+        points,
+        sources: mergeSources(
+          nationalHomeownershipLongArc.sources,
+          [...decBlack, ...decWhiteNh, ...acsBlackNation, ...acsWhiteNhNation].map(
+            sourceFromObservation,
+          ),
+        ),
+      };
+    }
   }
 
   let hmdaDenialRates = base.hmdaDenialRates;
@@ -554,8 +748,10 @@ export function mergeDataPageIndicatorBundle(
     ...base,
     wealthComparison: wealth,
     ...(wealthTrend !== undefined ? { wealthTrend } : {}),
+    ...(wealthRatioLongArc !== undefined ? { wealthRatioLongArc } : {}),
     imprisonmentComparison: imprisonment,
     cookHomeownership,
+    ...(nationalHomeownershipLongArc !== undefined ? { nationalHomeownershipLongArc } : {}),
     hmdaDenialRates,
     federalDrugSentences,
     costBurdenComparison,

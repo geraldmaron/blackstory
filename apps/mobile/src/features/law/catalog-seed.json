@@ -1,6 +1,6 @@
 {
   "version": "rel_20260723_authority_net_001",
-  "generatedAt": "2026-09-12T16:29:19.237Z",
+  "generatedAt": "2026-09-13T17:13:46.632Z",
   "source": "supabase-active-release",
   "entries": [
     {
@@ -200,6 +200,7 @@
       "retrievedAt": "2026-08-03T00:00:00.000Z",
       "licenseTag": "public-domain",
       "factId": "BB-F-000013",
+      "canonicalEntityId": "ent_law_ku_klux_klan_act_1871",
       "explainer": {
         "whatItSays": "42 U.S.C. § 1983 lets people sue state and local officials who violate their federal constitutional or statutory rights while acting under \"color of law.\"",
         "whatItMeans": [

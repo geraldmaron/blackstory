@@ -3,9 +3,14 @@
 The editorial question this settles: may a claim in the catalog rest on Wikipedia?
 
 It kept getting answered two different ways. The research passes have been rejecting Wikipedia
-outright, which is why some records came out thin. Meanwhile the active release already carries
-about 2,200 Wikipedia-cited claims across 549 entities. A rule applied in one lane and not the
-other is not a standard — it just means a record's depth depends on who last worked on it.
+outright, which is why some records came out thin. Meanwhile the active release already carries a
+large number of Wikipedia-cited claims — about 2,200 across 549 entities when this was first
+written (2026-08-07); re-measured 2026-09-13 against rel_20260723_authority_net_001, the catalog
+had grown to 3,040 such claims across 1,461 of its 4,195 entities. That count moves with the
+catalog and is not worth re-editing on every pass; treat both figures as dated snapshots, not a
+standing property of the release, and re-measure rather than trust either one. A rule applied in
+one lane and not the other is not a standard — it just means a record's depth depends on who last
+worked on it.
 
 The code already had the right answer and nobody had written it down.
 
@@ -29,7 +34,7 @@ implement:
   `standardPublish` (0.75) on its own. It clears only when an independently-fetched source with a
   different `lineageRootId` backs it.
 
-So the ban was stricter than the project, and the 2,200 existing citations are not violations.
+So the ban was stricter than the project, and those existing Wikipedia citations are not violations.
 Both halves of the inconsistency were wrong in the same direction: treating the citation as a
 binary permit instead of a weight.
 
@@ -101,6 +106,15 @@ which had every reason to say "first" if it were true, does not.
 That claim was false for years and cited. A superlative needs the institution that would know:
 the school, the association, the state, the archive holding the record.
 
+This rule is enforced by an audit, not just this page. `packages/ops-data/scripts/audit-superlative-wikipedia-only.ts`
+finds every `first_to_do_x` / `only_or_oldest` notability-basis row whose resolved evidence is
+Wikipedia and nothing else. As of 2026-09-13 on rel_20260723_authority_net_001: 181 such rows
+across 173 entities (147 `first_to_do_x`, 34 `only_or_oldest`); 57 of those entities carry no
+non-Wikipedia claim anywhere at all; 123 carry the unsupported superlative into the published
+summary text itself, not just the notability panel — see repo-z97f. Corroborating, softening or
+withdrawing each one is real per-entity research, not a script's job; the script's job is only to
+say which 173 need it and keep that count honest as the catalog changes.
+
 ## In practice
 
 | Situation | What to do |
@@ -138,3 +152,6 @@ measurement again, and a fully populated record can be entirely unresearched. Se
 - [citation-independence-review-signal.md](citation-independence-review-signal.md)
 - [entity-completeness-audit.md](entity-completeness-audit.md) — display completeness, which is a
   different question from either of the above.
+- `packages/ops-data/scripts/audit-superlative-wikipedia-only.ts` — the running audit for the
+  superlative carve-out above: which `first_to_do_x`/`only_or_oldest` basis rows rest on Wikipedia
+  alone, right now, not as of whenever this page was last edited.

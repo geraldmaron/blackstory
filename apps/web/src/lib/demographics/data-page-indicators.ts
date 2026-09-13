@@ -27,6 +27,11 @@ const DATA_PAGE_METRIC_IDS = [
   'ussc-average-sentence-months-powder-nation',
   'hud-chas-cost-burden-black-county',
   'hud-chas-cost-burden-white-county',
+  'dkks-wealth-ratio-white-black-nation',
+  'census-decennial-homeownership-black-nation',
+  'census-decennial-homeownership-white_nh-nation',
+  'acs-homeownership-rate-black-nation',
+  'acs-homeownership-rate-white_nh-nation',
 ] as const;
 
 type ObservationQueryRow = {

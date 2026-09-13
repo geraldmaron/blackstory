@@ -31,6 +31,7 @@ import {
   RacePairComparisonChart,
 } from '../../components/data/RacePairComparisonChart';
 import { StatePopulationShiftChart } from '../../components/data/StatePopulationShiftChart';
+import { TrendLineChart } from '../../components/data/TrendLineChart';
 import { formatDataPageValue, formatSharePct } from '../../components/data/chart-utils';
 import { rankStateMovers } from '../../components/data/population-change';
 import type { DataSourceRef } from '../../components/data/SourceFootnote';
@@ -378,6 +379,14 @@ export function DataSections({
               reading={groupedReading(indicators.wealthTrend)}
             />
           ) : null}
+          {indicators.wealthRatioLongArc ? (
+            <TrendLineChart
+              id="wealth-ratio-long-arc"
+              figureLabel="Figure 7"
+              series={indicators.wealthRatioLongArc}
+              reading={groupedReading(indicators.wealthRatioLongArc)}
+            />
+          ) : null}
         </div>
       </Section>
 
@@ -385,21 +394,29 @@ export function DataSections({
         <div className="ds-data-section__figures">
           <GroupedBarIndicatorChart
             id="housing-ownership"
-            figureLabel="Figure 7"
+            figureLabel="Figure 8"
             span="half"
             series={indicators.cookHomeownership}
             reading={groupedReading(indicators.cookHomeownership)}
           />
           <GroupedBarIndicatorChart
             id="housing-denials"
-            figureLabel="Figure 8"
+            figureLabel="Figure 9"
             span="half"
             series={indicators.hmdaDenialRates}
             reading={groupedReading(indicators.hmdaDenialRates)}
           />
+          {indicators.nationalHomeownershipLongArc ? (
+            <TrendLineChart
+              id="housing-ownership-long-arc"
+              figureLabel="Figure 10"
+              series={indicators.nationalHomeownershipLongArc}
+              reading={groupedReading(indicators.nationalHomeownershipLongArc)}
+            />
+          ) : null}
           <RacePairComparisonChart
             id="housing-cost-burden"
-            figureLabel="Figure 9"
+            figureLabel="Figure 11"
             series={indicators.costBurdenComparison}
             reading={pairReading(indicators.costBurdenComparison, 'cost-burdened at')}
           />
@@ -410,14 +427,14 @@ export function DataSections({
         <div className="ds-data-section__figures">
           <RacePairComparisonChart
             id="justice-imprisonment"
-            figureLabel="Figure 10"
+            figureLabel="Figure 12"
             span="half"
             series={indicators.imprisonmentComparison}
             reading={pairReading(indicators.imprisonmentComparison, 'imprisoned at')}
           />
           <GroupedBarIndicatorChart
             id="justice-sentences"
-            figureLabel="Figure 11"
+            figureLabel="Figure 13"
             span="half"
             series={indicators.federalDrugSentences}
             reading={groupedReading(indicators.federalDrugSentences)}

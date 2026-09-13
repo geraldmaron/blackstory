@@ -22,6 +22,7 @@ import { PopulationByDecadeChart } from './PopulationByDecadeChart';
 import { RacePairComparisonChart } from './RacePairComparisonChart';
 import { GroupedBarIndicatorChart } from './GroupedBarIndicatorChart';
 import { StatePopulationShiftChart } from './StatePopulationShiftChart';
+import { TrendLineChart } from './TrendLineChart';
 import { DATA_PAGE_INDICATOR_FIXTURE_BUNDLE } from '@repo/domain/statistics/data-page-series';
 
 function timelineRow(
@@ -309,6 +310,38 @@ test('GroupedBarIndicatorChart returns nothing when points are empty', () => {
   const html = renderToStaticMarkup(
     createElement(GroupedBarIndicatorChart, {
       series: { ...DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.hmdaDenialRates, points: [] },
+    }),
+  );
+  assert.equal(html, '');
+});
+
+test('TrendLineChart renders the DKKS wealth ratio benchmark years back to 1860', () => {
+  const series = DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthRatioLongArc;
+  if (series === undefined) throw new Error('wealthRatioLongArc fixture missing');
+  const html = renderToStaticMarkup(createElement(TrendLineChart, { series }));
+  assert.match(html, /White-to-Black per-capita wealth ratio/);
+  assert.match(html, /1860/);
+  assert.match(html, /2019/);
+  assert.match(html, /6\.6×/); // 2019 ratio in the accessible table
+  assert.doesNotMatch(html, /1929/); // no white-side estimate that year: point is skipped
+});
+
+test('TrendLineChart renders the national homeownership long arc with two named series', () => {
+  const series = DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.nationalHomeownershipLongArc;
+  if (series === undefined) throw new Error('nationalHomeownershipLongArc fixture missing');
+  const html = renderToStaticMarkup(createElement(TrendLineChart, { series }));
+  assert.match(html, /Homeownership by householder race, United States/);
+  assert.match(html, /Black householder/);
+  assert.match(html, /White Non-Hispanic householder/);
+  assert.match(html, /1900/);
+  assert.match(html, /2024/);
+  assert.doesNotMatch(html, />2020</); // no standard ACS 1-year release that year
+});
+
+test('TrendLineChart returns nothing when points are empty', () => {
+  const html = renderToStaticMarkup(
+    createElement(TrendLineChart, {
+      series: { ...DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.cookHomeownership, points: [] },
     }),
   );
   assert.equal(html, '');

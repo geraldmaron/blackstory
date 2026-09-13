@@ -39,6 +39,11 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     label: 'Triage',
     destinations: [
       { href: '/admin/inbox', label: 'Inbox', keywords: ['submissions', 'intake', 'incoming'] },
+      {
+        href: '/admin/submissions',
+        label: 'Submissions',
+        keywords: ['intake_items', 'quarantine', 'leads', 'raw'],
+      },
       { href: '/admin/cases', label: 'Research cases', keywords: ['queue', 'promote'] },
       { href: '/admin/graylist', label: 'Graylist', keywords: ['blocked', 'held', 'suppressed'] },
     ],

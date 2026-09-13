@@ -133,6 +133,25 @@ apps/mobile/package-lock.json` and never touch the root `pnpm-lock.yaml` — `pn
 --frozen-lockfile` in the root `validate` job is unaffected. `.github/dependabot.yml` has a
 matching `npm` entry scoped to `/apps/mobile` for its isolated lockfile.
 
+### Jest 30, and why the hold on it was wrong
+
+`jest-expo` does not constrain Jest. 57.0.5 declares no `jest` peer dependency at all: its peers
+are `expo`, `react-native`, `@react-native/jest-preset` and `react-server-dom-webpack`. Its own
+internals are pinned at `^29.2.1`, and every published `jest-expo` through 58.0.0 still pins them
+there. So "held until `jest-expo` ships a Jest 30 build" is a wait that never ends, and it was
+never the reason the Dependabot Jest 30 PRs (#77, #79, #100) failed.
+
+The one real blocker is `jest-watch-typeahead`. `jest-expo` pins it at exactly `2.2.1`, and that
+version peers on `jest: ^27 || ^28 || ^29`. Left alone, npm resolves the conflict by nesting a
+whole second Jest 29, runtime and CLI included, under `node_modules/jest-expo/`. That installs and
+the suite passes, but it leaves two copies of Jest on disk for a watch-mode plugin this project
+never loads: `jest.config.js` sets `preset: 'jest-expo'` and never calls `withWatchPlugins` from
+`jest-expo/config`. The `jest-expo` entry in `package.json`'s `overrides` lifts that plugin to
+`^3.0.1`, the line that peers on `jest: ^30`, so the installed graph carries one Jest.
+
+Measured on the bump (Node 22, `npm ci`): 155 suites, 1102 tests, all green on Jest 30.5.1, with
+`format:check`, `lint` and `typecheck` clean.
+
 **Verified baseline (2026-07-22, `feat/mobile-launch`):** Mobile Typecheck and Mobile Unit
 Tests are green locally and in CI shape — **646/646** Jest tests; `tsc` clean for both
 `tsconfig.json` and `tsconfig.tooling.json` once the gitignored `expo-env.d.ts` shim is

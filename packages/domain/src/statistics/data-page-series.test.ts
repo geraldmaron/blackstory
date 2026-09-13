@@ -33,6 +33,33 @@ test('fixture bundle carries chart compositions with chapter theme links', () =>
   assert.equal(bundle.cookHomeownership.points[2]?.values.white, 67.2);
 });
 
+test('fixture wealth ratio long arc covers every DKKS benchmark year, 1860 through 2019', () => {
+  const longArc = DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthRatioLongArc;
+  if (longArc === undefined) throw new Error('wealthRatioLongArc fixture missing');
+  assert.equal(longArc.points.length, 32);
+  assert.equal(longArc.points[0]?.period, '1860');
+  assert.equal(longArc.points[0]?.values.ratio, 56.3);
+  assert.equal(longArc.points.at(-1)?.period, '2019');
+  assert.equal(longArc.points.at(-1)?.values.ratio, 6.6);
+  // 1929 carries no white per-capita estimate in the source, so no ratio: it is skipped
+  // rather than defaulted to zero, which would draw a fabricated dip to nothing.
+  assert.ok(longArc.points.every((point) => point.period !== '1929'));
+});
+
+test('fixture national homeownership long arc covers 1900 through 2024, decennial then ACS', () => {
+  const longArc = DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.nationalHomeownershipLongArc;
+  if (longArc === undefined) throw new Error('nationalHomeownershipLongArc fixture missing');
+  assert.equal(longArc.points.length, 30);
+  assert.equal(longArc.points[0]?.period, '1900');
+  assert.equal(longArc.points[0]?.values.black, 21.3);
+  assert.equal(longArc.points[10]?.period, '2000');
+  assert.equal(longArc.points[11]?.period, '2005');
+  // No standard one-year ACS estimate was published for 2020: a real gap, not filled in.
+  assert.ok(longArc.points.every((point) => point.period !== '2020'));
+  assert.equal(longArc.points.at(-1)?.period, '2024');
+  assert.equal(longArc.points.at(-1)?.values.white_nh, 74);
+});
+
 test('fixture wealth trend covers every SCF wave from 1989 through 2022', () => {
   const trend = DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthTrend;
   if (trend === undefined) throw new Error('wealthTrend fixture missing');
@@ -142,6 +169,96 @@ test('cook homeownership merge omits the ACS point when only decennial rows are 
   assert.deepEqual(
     merged.cookHomeownership.points.map((point) => point.period),
     ['1990'],
+  );
+});
+
+test('wealth ratio long arc merge overlays warehouse benchmark years verbatim', () => {
+  const ratioRow = (referencePeriod: string, estimate: number): DataPageObservationRow => ({
+    metricId: 'dkks-wealth-ratio-white-black-nation',
+    jurisdictionId: 'nation:US',
+    referencePeriod,
+    estimate,
+    source: 'derenoncourt-wealth-of-two-nations',
+    sourceUrl: 'https://www.elloraderenoncourt.com/us-inequality-data',
+  });
+  const merged = mergeDataPageIndicatorBundle(DATA_PAGE_INDICATOR_FIXTURE_BUNDLE, [
+    ratioRow('1860', 56.3),
+    ratioRow('2019', 6.6),
+  ]);
+  const longArc = merged.wealthRatioLongArc;
+  if (longArc === undefined) throw new Error('merged wealthRatioLongArc missing');
+  assert.deepEqual(
+    longArc.points.map((point) => point.period),
+    ['1860', '2019'],
+  );
+  assert.equal(longArc.points[1]?.values.ratio, 6.6);
+});
+
+test('wealth ratio long arc merge leaves the fixture untouched when no warehouse rows match', () => {
+  const merged = mergeDataPageIndicatorBundle(DATA_PAGE_INDICATOR_FIXTURE_BUNDLE, [
+    scfRow('scf-median-wealth-black-nation', '2022', 44_900),
+  ]);
+  assert.equal(
+    merged.wealthRatioLongArc?.points.length,
+    DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthRatioLongArc?.points.length,
+  );
+});
+
+test('national homeownership long arc merge concatenates decennial and ACS rows in order', () => {
+  const decRow = (referencePeriod: string, metricId: string, estimate: number) => ({
+    metricId,
+    jurisdictionId: 'nation:US',
+    referencePeriod,
+    estimate,
+    source: 'census-historical-housing-tables',
+    sourceUrl: 'https://www.census.gov/topics/housing/homeownership/data/historical.html',
+  });
+  const acsRow = (referencePeriod: string, metricId: string, estimate: number) => ({
+    metricId,
+    jurisdictionId: 'nation:US',
+    referencePeriod,
+    estimate,
+    source: 'acs-census-api',
+    sourceUrl: 'https://www.census.gov/programs-surveys/acs',
+  });
+  const merged = mergeDataPageIndicatorBundle(DATA_PAGE_INDICATOR_FIXTURE_BUNDLE, [
+    decRow('1900', 'census-decennial-homeownership-black-nation', 21.3),
+    decRow('1900', 'census-decennial-homeownership-white_nh-nation', 48.5),
+    decRow('2000', 'census-decennial-homeownership-black-nation', 46.3),
+    decRow('2000', 'census-decennial-homeownership-white_nh-nation', 73.1),
+    acsRow('2024', 'acs-homeownership-rate-black-nation', 45.4),
+    acsRow('2024', 'acs-homeownership-rate-white_nh-nation', 74),
+  ]);
+  const longArc = merged.nationalHomeownershipLongArc;
+  if (longArc === undefined) throw new Error('merged nationalHomeownershipLongArc missing');
+  assert.deepEqual(
+    longArc.points.map((point) => point.period),
+    ['1900', '2000', '2024'],
+  );
+  assert.equal(longArc.points[2]?.values.black, 45.4);
+  assert.equal(longArc.points[2]?.values.white_nh, 74);
+});
+
+test('national homeownership long arc merge skips a decennial period missing one race side', () => {
+  const decRow = (referencePeriod: string, metricId: string, estimate: number) => ({
+    metricId,
+    jurisdictionId: 'nation:US',
+    referencePeriod,
+    estimate,
+    source: 'census-historical-housing-tables',
+    sourceUrl: 'https://www.census.gov/topics/housing/homeownership/data/historical.html',
+  });
+  const merged = mergeDataPageIndicatorBundle(DATA_PAGE_INDICATOR_FIXTURE_BUNDLE, [
+    decRow('1900', 'census-decennial-homeownership-black-nation', 21.3),
+    decRow('1900', 'census-decennial-homeownership-white_nh-nation', 48.5),
+    // 1910 carries only the Black side: it must not appear with a fabricated white_nh of 0.
+    decRow('1910', 'census-decennial-homeownership-black-nation', 22.5),
+  ]);
+  const longArc = merged.nationalHomeownershipLongArc;
+  if (longArc === undefined) throw new Error('merged nationalHomeownershipLongArc missing');
+  assert.deepEqual(
+    longArc.points.map((point) => point.period),
+    ['1900'],
   );
 });
 
