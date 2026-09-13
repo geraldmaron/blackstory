@@ -1,27 +1,41 @@
 # Map source: release-activation integration point (BB-070)
 
 This file documents where the map data platform (`packages/domain/src/map/`,
-BB-070) plugs into release activation, once that pipeline exists. It is
-**not wired live** — this is a TODO with an exact call site, added
-deliberately instead of leaving the map-source builder as code nobody would
-ever invoke. See `docs/adr/ADR-013-map-stack.md` ("Release-coupled build")
-for the full rationale.
+BB-070) plugs into release activation. The call site below is now implemented
+in TypeScript and is still **not called by anything that runs in production**,
+so the file remains a TODO with an exact target rather than a description of
+live behavior. See `docs/decisions-carryover.md` ("Map stack": release-coupled
+build) for the full rationale; the ADR this file used to cite,
+`docs/adr/ADR-013-map-stack.md`, was deleted in the 2026-07-24 `docs/adr/`
+purge and its content lives in that carryover section now.
 
-## Why nothing was wired here
+## Why nothing was wired here (historical, and how it stands today)
 
-As of this writing, no release-activation pipeline exists in any language
-that iterates every active public projection and calls
-`toPublicEntityProjection` (or the equivalent) end to end — `release.py` in
-this package currently only has deterministic manifest/hashing helpers
+When this file was written, no release-activation pipeline existed in any
+language that iterates every active public projection and calls
+`toPublicEntityProjection` (or the equivalent) end to end: `release.py` in this
+package had only deterministic manifest/hashing helpers
 (`build_manifest_entry`, `canonical_json`, `sha256_json`), not an
-entity-iteration/publish loop. Wiring the map-source build against a
-pipeline that doesn't exist yet would mean guessing at an interface, with
-real risk of drifting from whatever the actual implementation turns out to
-be. The map-source builder (`buildMapSource` in
-`packages/domain/src/map/map-source.ts`) is a complete, tested, pure
-function ready to be called the moment that pipeline lands.
+entity-iteration/publish loop. Wiring the map-source build against a pipeline
+that did not exist would have meant guessing at an interface.
 
-## Exact call site, once release activation exists
+That gap is closed on the TypeScript side. `generateReleaseArtifacts` in
+`packages/domain/src/publication/release-activation.ts` (MOB-005) performs
+steps 1 through 4 below: it builds the map source and the state/county
+aggregates through `buildMapSource`, hashes and canonicalizes every artifact,
+persists them content-addressed and immutably, and activates by flipping one
+pointer under compare-and-set.
+
+What is still missing is a caller. `generateReleaseArtifacts` and
+`activateRelease` have no caller outside `release-activation.test.ts` and
+`release-evidence.test.ts`, and the publisher that actually runs,
+`packages/ops-data/scripts/publish-release-catalog-artifacts.ts`, emits
+`entities.json` and `search-index.json` and no map artifact at all. Nothing
+reads `public/releases/{releaseId}/map/source.json`. So the outcome this file
+describes is unchanged; only the reason for it has moved, from "the pipeline
+does not exist" to "the pipeline exists and nothing invokes it."
+
+## Exact call site
 
 1. Wherever the pipeline builds a `ReleaseArtifact` per entity (TypeScript
    equivalent: `buildReleaseManifest` in
@@ -63,11 +77,23 @@ function ready to be called the moment that pipeline lands.
    verification and rollback cover the map artifacts exactly like every
    other release-scoped artifact. No new rollback code is needed: switching
    the active-release pointer already restores the prior map version the
-   same way it restores the prior search-index version (ADR-004).
+   same way it restores the prior search-index version (see
+   `docs/decisions-carryover.md`, "Public projection and immutable
+   publication snapshots").
 
-## Standing in for this today
+## What exercises this sequence today
 
-`packages/domain/src/map/generate-demo-map-source.ts` performs the same
-sequence (steps 1–2 above) against fixture data, once, to produce the static
-artifact the `/map` demo route (`apps/web/src/app/map/`) reads. It is the
-exact shape of call the real integration will make.
+`packages/domain/src/map/generate-demo-map-source.ts` used to stand in here: a
+one-off script that ran steps 1 and 2 against fixture data to write a static
+`map-source.seed.json` for the `/map` demo route. That script was retired on
+2026-09-13 (repo-uogug). The demo route is gone (`apps/web/src/app/map/` now
+holds Explore's style and layer-id modules, no `page.tsx`), so the script wrote
+an artifact nothing read.
+
+The sequence is covered without it. `release-activation.test.ts` drives
+`generateReleaseArtifacts` over `MAP_SOURCE_DEMO_FIXTURES`, and three live
+callers inject the real `redactLocationForPublic` at their own layer: web
+Explore (`buildExploreMapSource` in
+`apps/web/src/lib/map-experience/build-explore-map-source.ts`), `api-public`'s
+`GET /v1/map` (`apps/api-public/src/http/build-map-source-v1.ts`), and the
+release-activation state machine itself.

@@ -1,10 +1,16 @@
 /**
- * Demo/test fixtures for the map data platform. There is no live Firebase
- * release yet (apps/web reads `src/data/public-seed.ts` fixtures the same way),
- * so this module is the map-source equivalent: raw (pre-redaction) entity +
+ * Demo/test fixtures for the map data platform: raw (pre-redaction) entity +
  * location inputs spanning several states, including the critical negative-case
- * fixture — a living person with a precise residential coordinate — used by the
- * redaction regression test and by the `/map` demo route.
+ * fixture — a living person with a precise residential coordinate.
+ *
+ * These are test inputs, not a fallback catalog. The `/map` demo route that once
+ * read a static artifact built from them is gone, and its generator script was
+ * retired on 2026-09-13 (repo-uogug); the live surfaces read `bb_public` through
+ * their own callers. What still depends on these fixtures is the proof that
+ * `buildMapSource` cannot leak a raw coordinate: `map-source.redaction.test.ts`
+ * wires the real `redactLocationForPublic` against them, and
+ * `../publication/release-activation.test.ts` drives the whole release-artifact
+ * build over them. Changing a coordinate here changes what those tests prove.
  *
  * Shapes mirror `packages/ops-data/fixtures/firestore-seed.ts` in spirit but are
  * independent.

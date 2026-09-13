@@ -710,42 +710,6 @@
    MapLibre pan/zoom only where chrome intentionally passes hits through (the gaps between
    Surface panels). Never set `pointer-events: none` on a text column that sits over the
    live plate — that routes swipe to the map instead of the document. —— */
-/* —— Explore enter: panels fade in, opacity/translate only, compositor-friendly; reduced
-   motion is an instant cut. This is the last surviving fragment of the hero-dissolve transition
-   contract the map decision described (`docs/decisions-carryover.md`, "Persistent map canvas":
-   the transition contract did not survive). The hero-dissolve class the block here used to
-   describe is not in this sheet at all, and nothing in `apps/web/src` sets
-   `.ds-explore-stage--entering`, so the rules below are currently unreachable. Rewire or delete
-   them; do not read them as live. —— */
-@keyframes ds-explore-panel-enter {
-  from {
-    opacity: 0;
-    transform: translateY(0.5rem);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.ds-explore-stage--entering .ds-explore-stage__instruments,
-.ds-explore-stage--entering .ds-explore-stage__results {
-  animation: ds-explore-panel-enter var(--ds-duration-base) var(--ds-easing) both;
-}
-
-.ds-explore-stage--entering .ds-explore-stage__results {
-  animation-delay: 60ms;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ds-explore-stage--entering .ds-explore-stage__instruments,
-  .ds-explore-stage--entering .ds-explore-stage__results {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-}
 
 /* —— Explore stage: floating chrome over the shared canvas ——
  * One left instrument chassis (Filters | Color key tabs) + optional records rail/sheet.

@@ -788,9 +788,10 @@ export * from './datapacks/index.js';
 
 // Map data platform. Demo/test fixtures in ./map/fixtures.js are
 // intentionally NOT re-exported here — they are internal to this package
-// (imported by relative path from map-source.test.ts and the demo generator
-// script), the same way packages/ops-data/fixtures/ sits outside that
-// package's public src/index.ts surface.
+// (imported by relative path from map-source.test.ts,
+// map-source.redaction.test.ts and the publication release-activation tests),
+// the same way packages/ops-data/fixtures/ sits outside that package's public
+// src/index.ts surface.
 export {
   US_STATES,
   US_BOUNDS,

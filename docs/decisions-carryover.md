@@ -646,11 +646,26 @@ supports non-US birthplaces (repo-9rkh), even though the ruling named this file:
 receives a US Census Geocoder match, and that service does not geocode non-US places at all, so
 widening the set would be a no-op for the actual need. (from ADR-008, "search and geocoding")
 
-**Bounded and static-first.** Map sources are generated statically rather than served from a live
-query path (`packages/domain/src/map/generate-demo-map-source.ts`), and state attribution in
-`findUsStateForPoint` is a bounded local computation. The doctrine is that a reader-facing surface
-should not depend on a live third-party call it cannot bound. (from ADR-008, "search and
-geocoding")
+**Bounded, and never a read-time geocode.** State attribution in `findUsStateForPoint`
+(`packages/domain/src/map/us-geography.ts`) is a bounded local lookup against a vendored 50-state
+bbox table, not a geocoder call, and `buildMapSource` uses it for every feature it emits. Geocoding
+happens upstream on the write path, and the map a reader sees is built only from the active
+release's own published projections, so no reader-facing request reaches the Census Geocoder. That
+is the part of this decision that holds.
+
+The "static-first" half of the original phrasing does not, and was narrowed on 2026-09-13
+(repo-uogug). It cited a demo generator, `packages/domain/src/map/generate-demo-map-source.ts`,
+which has been retired along with the `/map` demo route it fed. Neither live map surface reads a
+prebuilt artifact: `api-public`'s `GET /v1/map` builds its FeatureCollection per request from
+`listEntities(releaseId)` (`apps/api-public/src/http/handlers.ts`), bounded by a `public,
+max-age=60, stale-while-revalidate=300` cache rather than by a static file, and web `/explore`
+builds its own source from the active-release catalog. The static release artifact
+(`public/releases/{id}/map/source.json`) is implemented in `release-activation.ts` and has neither
+a live producer nor a live consumer, as the "Map stack" section records. Nor does "no live
+third-party call" survive at the basemap layer: web `/explore` renders OpenFreeMap vector tiles
+live (`OPENFREEMAP_TILE_SOURCE_URL` in `apps/web/src/lib/map-experience/dignity-style.ts`). Read
+this decision as a rule about geocoding, which is its own territory, not as a rule about how map
+data is served. (from ADR-008, "search and geocoding")
 
 ## Service surface separation (recovered 2026-09-13, repo-gtm2y)
 
@@ -1782,20 +1797,24 @@ keeping: a pinned camera hands the recipient a framing they did not choose and c
 from the data, and a tight zoom on one county reads as an editorial claim about that county.
 (from ADR-017, "URL: viewport + selection")
 
-**The transition contract did not survive, and comments still describe it as live.** ADR-017's hero
+**The transition contract did not survive, and nothing implements it now.** ADR-017's hero
 engagement choreography (hero chrome dissolving while `router.push('/explore?...')` runs, the
 flight continuing uninterrupted across the navigation) went with the surfaces it described.
 `HomeMapHero`, `ExploreMapExperience` and `ExploreMapCanvas` are all gone; `/` is now the Door, a
-reading surface whose plate posture is ambient, and `/explore` is the Instrument. Two comment
-blocks in `apps/web/src/app/explore/explore.css` still name the contract: the "Hero dissolve" class
-one of them describes is not in the sheet at all, and the `ds-explore-panel-enter` keyframes that
-remain are keyed on `.ds-explore-stage--entering`, which nothing in `apps/web/src` ever sets (the
-`.ds-explore-stage` element is no longer rendered either). The page-level enter animation was
-deleted too, for a reason that is itself load-bearing: `animation-fill-mode: both` left a
-permanently non-`none` computed transform on the page-root wrapper, which made that wrapper the
-containing block for the fixed plate and let the plate scroll with the document instead of holding
-the viewport. The plate holding the viewport now depends on `.ds-shell-page-transition` never
-acquiring a transform. (from ADR-017, "transition contract")
+reading surface whose plate posture is ambient, and `/explore` is the Instrument. Comment blocks in
+`apps/web/src/app/explore/explore.css` used to name the contract as if it were live. The "Hero
+dissolve" class one of them described was not in the sheet at all, and the surviving
+`ds-explore-panel-enter` keyframes were keyed on `.ds-explore-stage--entering`, which nothing in
+`apps/web/src` ever set (the `.ds-explore-stage` element is not rendered either), so those rules
+could never fire. They were deleted in repo-mtk9g rather than rewired, since rewiring them meant
+inventing a state on markup that no longer exists;
+`apps/web/src/app/explore/explore-enter-motion.test.ts` now holds the sheet and the markup to that
+agreement. The page-level enter animation was deleted earlier, for a reason that is itself
+load-bearing: `animation-fill-mode: both` left a permanently non-`none` computed transform on the
+page-root wrapper, which made that wrapper the containing block for the fixed plate and let the
+plate scroll with the document instead of holding the viewport. The plate holding the viewport now
+depends on `.ds-shell-page-transition` never acquiring a transform. (from ADR-017, "transition
+contract")
 
 **Reduced motion is intact.** Every preset has a `duration: 0` twin, `runFlyPreset` calls `jumpTo`
 whenever `prefersReducedMotion()` is true or a caller asks for `mode: 'cut'`, and every move in

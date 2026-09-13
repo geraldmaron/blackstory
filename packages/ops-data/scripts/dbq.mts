@@ -35,8 +35,16 @@ if (!databaseUrl) {
 
 const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
 try {
+  // A multi-statement string comes back as an ARRAY of results, one per statement, and most of
+  // them carry no rows. Printing `result.rows` off that array prints `undefined` and reads like a
+  // failure when the statements in fact ran — which is how a rolled-back migration trial looked
+  // like a silent error once.
   const result = await pool.query(sql);
-  console.log(JSON.stringify(result.rows, null, 1));
+  const sets = Array.isArray(result) ? result : [result];
+  const withRows = sets.filter((r) => (r.rows?.length ?? 0) > 0);
+  console.log(
+    JSON.stringify(withRows.length === 1 ? withRows[0].rows : withRows.map((r) => r.rows), null, 1),
+  );
 } finally {
   await pool.end();
 }
