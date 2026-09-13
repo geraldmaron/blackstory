@@ -20,6 +20,34 @@
   margin-bottom: var(--ds-space-8);
 }
 
+/* SP-27 (repo-92n2.34) — reading progress: a hairline that fills as the reader scrolls the
+   document. One rule for the whole Reading class, not a per-screen decision. Design law:
+   docs/ui/patterns-reading-room.md, design-direction-v9-surfaces.md §4; reference build
+   .design-mocks/blackstory-atlas-v9.html #docprog (line 965).
+
+   The element (components/room/ReadingProgress.tsx) is mounted once, in ShellPageTransition, on
+   every route. This selector is what actually decides whether a reader ever sees it — `display`
+   lives here rather than as an inline style so "paints only on Reading" is a property of this
+   stylesheet, checkable in one place, rather than of every future room remembering to leave the
+   component out. `top` reads the same live island-clearance token the header itself measures
+   into, so the bar sits directly under the bar on every viewport without restating its height. */
+.ds-reading-progress {
+  display: none;
+  position: fixed;
+  top: var(--ds-island-clearance);
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--ds-accent-graphic);
+  z-index: var(--ds-z-content);
+  pointer-events: none;
+  transition: width var(--ds-duration-fast) linear;
+}
+
+[data-surface='reading'] .ds-reading-progress {
+  display: block;
+}
+
 /* =====================================================================================
 * SP-11h — errata log rules
  * Folded from apps/web/src/app/errata/errata.css (now deleted). The log is a plain

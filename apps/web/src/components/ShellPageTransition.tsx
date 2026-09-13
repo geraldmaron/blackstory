@@ -14,6 +14,12 @@
  * the document instead of holding the viewport. A `:has()` escape hatch keyed on a marker
  * attribute a route happened to set was the only thing preventing that, and a 0.2rem translate
  * was never worth a rule that silently stops applying when the markup changes.
+ *
+ * `<ReadingProgress>` is mounted here too (SP-27, repo-92n2.34), not inside any individual room:
+ * this is the one place `surface` is already resolved for every route, so it is also the one
+ * place the progress rule can be class-wide rather than something each Reading screen has to
+ * remember to render. The component itself decides whether that renders anything; see its own
+ * doc comment.
  */
 'use client';
 
@@ -22,6 +28,7 @@ import { usePathname } from 'next/navigation';
 import { surfaceClassFor } from '../lib/nav/surface-classes';
 import { useSurfaceClass } from '../lib/nav/use-surface-class';
 import { PageField, usePageFieldSelection } from './PageField';
+import { ReadingProgress } from './room/ReadingProgress';
 
 export type ShellPageTransitionProps = {
   readonly children: ReactNode;
@@ -50,6 +57,7 @@ function ShellPageChrome({
       {...(surface ? { 'data-surface': surface } : {})}
       data-page-field={pageField?.motifId ?? 'none'}
     >
+      <ReadingProgress surface={surface} />
       {pageField ? <PageField selection={pageField} /> : null}
       <div className="ds-shell-page-transition__content">{children}</div>
     </div>

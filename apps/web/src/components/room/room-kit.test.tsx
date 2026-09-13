@@ -34,6 +34,8 @@ import {
   resolveMomentCamera,
   resolveMomentVisibility,
 } from './MapMoment';
+import { ReadingProgress } from './ReadingProgress';
+import { CLASSIFIED_PATHS, surfaceClassFor } from '../../lib/nav/surface-classes';
 
 void React;
 
@@ -772,5 +774,76 @@ describe('room kit · no room invents its own map moment', () => {
       .filter((file) => /ds-mapmoment__plate|mm-plate/.test(readFileSync(file, 'utf8')))
       .map((file) => path.relative(APP_DIR, file));
     assert.deepEqual(offenders, [], 'map moment markup belongs to components/room/MapMoment.tsx');
+  });
+});
+
+describe('room kit · the reading progress rule is class-wide', () => {
+  // SP-27 (repo-92n2.34). The gap the ticket named: the rule appeared once, prose-only, inside
+  // SP-11's umbrella body, so /memorial and /records — Reading rooms filed outside SP-11 —
+  // and every other room had no reason to know it applied to them too. Driven from the surface
+  // registry rather than a hand-written route list, so a route added to it later is covered
+  // without anyone remembering to update this file.
+  it('renders on every route the registry resolves to Reading, and only those', () => {
+    for (const routePath of CLASSIFIED_PATHS) {
+      const surface = surfaceClassFor(routePath);
+      const html = renderToStaticMarkup(<ReadingProgress surface={surface} />);
+      if (surface === 'reading') {
+        assert.match(
+          html,
+          /class="ds-reading-progress"/,
+          `${routePath} resolves to Reading and must render the gauge`,
+        );
+      } else {
+        assert.equal(
+          html,
+          '',
+          `${routePath} resolves to ${String(surface)}, not Reading, and must not render the gauge`,
+        );
+      }
+    }
+  });
+
+  it('covers /memorial and /records, the two Reading rooms filed outside SP-11', () => {
+    // Named explicitly in the bead because a hand-written route list is exactly what missed
+    // them the first time; the registry-driven test above already covers both, this just pins
+    // the two routes the gap named so a future edit to the registry cannot quietly drop them.
+    assert.equal(surfaceClassFor('/memorial'), 'reading');
+    assert.equal(surfaceClassFor('/records'), 'reading');
+  });
+
+  it('no screen defines its own progress element', () => {
+    const offenders = walk(APP_DIR)
+      .filter((file) => /\.(tsx|ts|css)$/.test(file))
+      .filter((file) => path.relative(APP_DIR, file) !== 'reading-room.css')
+      .filter((file) => /ds-reading-progress|docprog/.test(readFileSync(file, 'utf8')))
+      .map((file) => path.relative(APP_DIR, file));
+    assert.deepEqual(
+      offenders,
+      [],
+      'the reading progress rule belongs to components/room/ReadingProgress.tsx and reading-room.css alone',
+    );
+  });
+
+  it('the visibility rule is scoped to the Reading surface class in reading-room.css', () => {
+    const css = readFileSync(path.join(APP_DIR, 'reading-room.css'), 'utf8');
+    assert.match(
+      css,
+      /\[data-surface='reading'\]\s+\.ds-reading-progress\s*\{\s*display:\s*block;\s*\}/,
+    );
+  });
+
+  it('the width transition reads a duration token, so reduced motion updates it without animation', () => {
+    // packages/ui/src/styles/tokens.css collapses every --ds-duration-* token to 0.01ms under
+    // prefers-reduced-motion: reduce, so the gauge needs no reduced-motion handling of its own —
+    // only a duration that actually comes from a token rather than a literal millisecond value.
+    const css = readFileSync(path.join(APP_DIR, 'reading-room.css'), 'utf8');
+    const rule = /\.ds-reading-progress\s*\{([^}]*)\}/.exec(css);
+    assert.ok(rule, 'the base .ds-reading-progress rule must exist');
+    assert.match(rule[1]!, /transition:\s*width\s+var\(--ds-duration-\w+\)/);
+    assert.doesNotMatch(
+      rule[1]!,
+      /transition:\s*width\s+\d/,
+      'the duration must come from a token, not a literal value the reduced-motion media query cannot reach',
+    );
   });
 });
