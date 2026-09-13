@@ -12,6 +12,19 @@
  * containing block behavior, making the plate scroll with the document instead of holding the
  * viewport.
  *
+ * THERE IS NO SUSPENSE BOUNDARY HERE, and there must not be one that wraps `children`
+ * (repo-bko39). This rendered `<Suspense fallback={<FrameFromPath>{children}</FrameFromPath>}>`
+ * around `<FrameFromSearch>{children}</FrameFromSearch>`, handing the entire page to both halves,
+ * so React streamed the whole document twice: every shipped page carried two `<main>` landmarks,
+ * two `<h1>`s and a duplicate of every id, and the duplicate was about a quarter of the bytes.
+ * It was invisible — the retained fallback frame measures 0x0 — so no screenshot or functional
+ * check would ever have shown it.
+ *
+ * The boundary was also unnecessary. Its two branches were the same function: `useSurfaceClass()`
+ * reads `usePathname()` and nothing else, so despite the name nothing here ever read search
+ * params and nothing ever suspended. If a future surface genuinely needs `useSearchParams()`,
+ * wrap THAT component, never this one's children.
+ *
  * `<ReadingProgress>` is mounted here too (SP-27, repo-92n2.34), not inside any individual room:
  * this is the one place `surface` is already resolved for every route, so it is also the one
  * place the progress rule can be class-wide rather than something each Reading screen has to
@@ -20,9 +33,8 @@
  */
 'use client';
 
-import { Suspense, type ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
-import { surfaceClassFor } from '../lib/nav/surface-classes';
+import { type ReactNode } from 'react';
+import type { SurfaceClass } from '../lib/nav/surface-classes';
 import { useSurfaceClass } from '../lib/nav/use-surface-class';
 import { PageField, usePageFieldSelection } from './PageField';
 import { ReadingProgress } from './room/ReadingProgress';
@@ -32,11 +44,7 @@ export type ShellPageTransitionProps = {
 };
 
 export function ShellPageTransition({ children }: ShellPageTransitionProps) {
-  return (
-    <Suspense fallback={<ShellPageFrameFromPath>{children}</ShellPageFrameFromPath>}>
-      <ShellPageFrameFromSearch>{children}</ShellPageFrameFromSearch>
-    </Suspense>
-  );
+  return <ShellPageChrome surface={useSurfaceClass()}>{children}</ShellPageChrome>;
 }
 
 function ShellPageChrome({
@@ -44,7 +52,7 @@ function ShellPageChrome({
   surface,
 }: {
   readonly children: ReactNode;
-  readonly surface: ReturnType<typeof surfaceClassFor>;
+  readonly surface: SurfaceClass | null;
 }) {
   const pageField = usePageFieldSelection();
 
@@ -59,13 +67,4 @@ function ShellPageChrome({
       <div className="ds-shell-page-transition__content">{children}</div>
     </div>
   );
-}
-
-function ShellPageFrameFromPath({ children }: { readonly children: ReactNode }) {
-  const pathname = usePathname() || '/';
-  return <ShellPageChrome surface={surfaceClassFor(pathname)}>{children}</ShellPageChrome>;
-}
-
-function ShellPageFrameFromSearch({ children }: { readonly children: ReactNode }) {
-  return <ShellPageChrome surface={useSurfaceClass()}>{children}</ShellPageChrome>;
 }
