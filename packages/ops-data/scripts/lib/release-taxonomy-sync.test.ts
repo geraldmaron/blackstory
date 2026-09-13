@@ -24,7 +24,7 @@ function fakeClient(rows: readonly Row[]) {
       if (sql.includes('SELECT')) {
         return { rows };
       }
-      // UPDATE ... SET taxonomy = ... WHERE release_id = $3 AND entity_id = $4
+      // UPDATE ... SET projection = ... WHERE release_id = $3 AND entity_id = $4
       const [topicIds, topicTags, releaseId, entityId] = params as [
         string[],
         string[],
@@ -148,8 +148,14 @@ test('the taxonomy sync writes the projection and the search index, not the taxo
   assert.equal(client.sqls.length, 1, 'one statement, so the three stores cannot part-commit');
   const sql = client.sqls[0] ?? '';
   assert.match(sql, /UPDATE bb_public\.release_entities/u);
-  assert.match(sql, /SET taxonomy =/u);
   assert.match(sql, /projection =/u, 'readers serve the projection, never the taxonomy column');
+  assert.doesNotMatch(
+    sql,
+    /SET taxonomy =|taxonomy =/u,
+    'the taxonomy column is GENERATED from the projection now, so writing it is rejected by ' +
+      'Postgres — and writing both is what let the two disagree on 1,117 live rows in the first ' +
+      'place',
+  );
   assert.match(sql, /UPDATE bb_public\.search_index/u, 'topic browse reads search_index.topics');
   assert.match(sql, /SET topics =/u);
   assert.match(

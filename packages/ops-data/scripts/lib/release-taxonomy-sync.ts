@@ -148,10 +148,11 @@ export async function applyReleaseTaxonomySync(
     await client.query(
       `
       WITH synced AS (
+        -- The projection only. The taxonomy column is GENERATED from it now, so writing both
+        -- would be rejected by Postgres and was, before that, the whole mechanism of the drift:
+        -- two writes of one fact that could disagree.
         UPDATE bb_public.release_entities
-        SET taxonomy = COALESCE(taxonomy, '{}'::jsonb)
-          || jsonb_build_object('topicIds', $1::text[], 'topicTags', $2::text[]),
-            projection = COALESCE(projection, '{}'::jsonb)
+        SET projection = COALESCE(projection, '{}'::jsonb)
           || jsonb_build_object('topicIds', $1::text[], 'topicTags', $2::text[])
         WHERE release_id = $3 AND entity_id = $4
         RETURNING release_id, entity_id

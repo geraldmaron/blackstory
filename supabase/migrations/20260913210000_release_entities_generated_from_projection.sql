@@ -1,31 +1,3 @@
--- NOT YET APPLIED, AND NOT IN supabase/migrations/ ON PURPOSE.
---
--- This migration CANNOT land on its own. Postgres refuses any INSERT or UPDATE that supplies a
--- value for a generated column, and `toReleaseEntityRow` in
--- packages/ops-data/scripts/lib/incremental-publish.ts plus the three upsert statements in
--- publish-release-entities-incremental.ts all write the eleven columns it converts. Apply this
--- without that TypeScript change and the next publish fails. Apply that change without this and
--- the columns stop being written at all. They go together, in one commit, with the migration run
--- against the live database in the same session.
---
--- It lives here rather than in supabase/migrations/ so a `supabase db push` cannot pick it up
--- half-finished. Move it back when the TypeScript half is ready.
---
--- ALREADY VERIFIED, 2026-09-13, so the next session does not redo it:
---   * The whole body was run against the live database inside BEGIN ... ROLLBACK. It completes.
---   * After it, on all 4,195 active-release rows: primary_image goes 146 -> 1,649 populated
---     (matching the projection exactly), taxonomy carries notabilityLabels on 4,195 rows instead
---     of 3,144, campaignIds on 13 instead of 6, display_name and kind are NOT NULL on every row,
---     and 4,191 of 4,195 carry lat (the 4 without are the rows with no location).
---   * jsonb_build_object is STABLE, not IMMUTABLE, so Postgres rejects it in a generation
---     expression. The taxonomy expression below is nested jsonb_set and `||` for that reason. Do
---     not "simplify" it back; it will not compile.
---   * Both dependent views are dropped and recreated here. bb_ops.coverage_gap_by_county_decade
---     is easy to miss: it reads re.location, so DROP COLUMN refuses while it exists.
---
--- The remaining work is the TypeScript half plus a test that pins the new row shape, tracked on
--- its own bead.
-
 -- Make the eleven derived columns on bb_public.release_entities generated from `projection`, so
 -- the drift they have produced for months becomes impossible to express rather than something a
 -- repair script chases after the fact.
@@ -143,10 +115,21 @@ ALTER TABLE bb_public.release_entities
     GENERATED ALWAYS AS ((projection -> 'location' ->> 'lat')::double precision) STORED,
   ADD COLUMN lng double precision
     GENERATED ALWAYS AS ((projection -> 'location' ->> 'lng')::double precision) STORED,
+  -- jsonb_typeof, not COALESCE. `normalizeReleaseClaims` in the publisher exists because four
+  -- seed rows once reached bb_public with `claims: {}` and broke every jsonb_array_length
+  -- consumer (repo-n7p6.14); COALESCE would pass `{}` straight through, since `{}` is not NULL.
+  -- Live data is clean today (0 of 4,197 rows carry a non-array claims or related), so this is a
+  -- guard against the next write rather than a repair of the last one.
   ADD COLUMN claims jsonb NOT NULL
-    GENERATED ALWAYS AS (COALESCE(projection -> 'claims', '[]'::jsonb)) STORED,
+    GENERATED ALWAYS AS (
+      CASE WHEN jsonb_typeof(projection -> 'claims') = 'array'
+        THEN projection -> 'claims' ELSE '[]'::jsonb END
+    ) STORED,
   ADD COLUMN related jsonb NOT NULL
-    GENERATED ALWAYS AS (COALESCE(projection -> 'related', '[]'::jsonb)) STORED,
+    GENERATED ALWAYS AS (
+      CASE WHEN jsonb_typeof(projection -> 'related') = 'array'
+        THEN projection -> 'related' ELSE '[]'::jsonb END
+    ) STORED,
   ADD COLUMN primary_image jsonb
     GENERATED ALWAYS AS (projection -> 'primaryImage') STORED,
   ADD COLUMN taxonomy jsonb NOT NULL

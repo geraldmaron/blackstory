@@ -466,14 +466,18 @@ export function formatNotabilityBasisResyncPlan(
   return lines;
 }
 
+/*
+ * The projection only. `taxonomy` is GENERATED from it now.
+ *
+ * The clause this replaces is worth naming, because it WAS the drift rather than a victim of it:
+ * it updated the column only `WHEN taxonomy ? 'notabilityLabels'` — that is, only for rows that
+ * already had the key. Every row that gained notabilityLabels for the first time got them in the
+ * projection and not in the column, which is how 1,051 of 4,195 live rows came to disagree.
+ */
 const PROJECTION_AND_TAXONOMY_SQL = `
   UPDATE bb_public.release_entities
      SET projection = COALESCE(projection, '{}'::jsonb)
-           || jsonb_build_object('notabilityBasis', $1::jsonb, 'notabilityLabels', $2::jsonb),
-         taxonomy = CASE
-           WHEN taxonomy ? 'notabilityLabels'
-             THEN taxonomy || jsonb_build_object('notabilityLabels', $2::jsonb)
-           ELSE taxonomy END
+           || jsonb_build_object('notabilityBasis', $1::jsonb, 'notabilityLabels', $2::jsonb)
    WHERE release_id = $3 AND entity_id = $4
 `;
 

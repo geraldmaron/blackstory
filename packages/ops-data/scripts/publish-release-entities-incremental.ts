@@ -423,39 +423,22 @@ function projectionString(projection: unknown, key: string): string | undefined 
   return typeof value === 'string' ? value : undefined;
 }
 
+/**
+ * Writes the projection and nothing else.
+ *
+ * The eleven columns this statement used to carry — display_name, kind, summary, location,
+ * geohash, lat, lng, claims, taxonomy, related, primary_image — are GENERATED ALWAYS from
+ * `projection` in the database. Postgres rejects a write that supplies a value for a generated
+ * column, so naming any of them here is an error, not a redundancy.
+ */
 async function upsertEntity(client: pg.PoolClient, row: ReleaseEntityUpsertRow): Promise<void> {
   await client.query(
     `INSERT INTO bb_public.release_entities
-      (release_id, entity_id, display_name, kind, summary, location, geohash, lat, lng,
-       claims, taxonomy, related, projection, created_at)
-     VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7,$8,$9,$10::jsonb,$11::jsonb,$12::jsonb,$13::jsonb,now())
+      (release_id, entity_id, projection, created_at)
+     VALUES ($1,$2,$3::jsonb,now())
      ON CONFLICT (release_id, entity_id) DO UPDATE SET
-       display_name = EXCLUDED.display_name,
-       kind = EXCLUDED.kind,
-       summary = EXCLUDED.summary,
-       location = EXCLUDED.location,
-       geohash = EXCLUDED.geohash,
-       lat = EXCLUDED.lat,
-       lng = EXCLUDED.lng,
-       claims = EXCLUDED.claims,
-       taxonomy = EXCLUDED.taxonomy,
-       related = EXCLUDED.related,
        projection = EXCLUDED.projection`,
-    [
-      row.release_id,
-      row.entity_id,
-      row.display_name,
-      row.kind,
-      row.summary,
-      JSON.stringify(row.location),
-      row.geohash,
-      row.lat,
-      row.lng,
-      JSON.stringify(row.claims),
-      JSON.stringify(row.taxonomy),
-      JSON.stringify(row.related),
-      JSON.stringify(row.projection),
-    ],
+    [row.release_id, row.entity_id, JSON.stringify(row.projection)],
   );
 }
 

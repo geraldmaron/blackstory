@@ -103,19 +103,23 @@ export type PublishGateResult =
     }
   | { readonly eligible: false; readonly reason: PublishGateSkipReason; readonly detail: string };
 
+/**
+ * Three columns, not fourteen.
+ *
+ * `display_name`, `kind`, `summary`, `location`, `geohash`, `lat`, `lng`, `claims`, `taxonomy`,
+ * `related` and `primary_image` are now GENERATED ALWAYS from `projection` in the database
+ * (supabase/migrations/..._release_entities_generated_from_projection.sql). Postgres refuses any
+ * INSERT or UPDATE that supplies a value for a generated column, so writing them here is not
+ * merely redundant, it fails.
+ *
+ * That is the point. Those eleven columns had drifted from the projection on 2,418 of 4,195 live
+ * rows, always in the same direction — the copy behind, never ahead — because a write could land
+ * on one store and not the other. Deriving them removes the possibility rather than scheduling
+ * another repair.
+ */
 export type ReleaseEntityUpsertRow = {
   readonly release_id: string;
   readonly entity_id: string;
-  readonly display_name: string;
-  readonly kind: string;
-  readonly summary: string | null;
-  readonly location: unknown;
-  readonly geohash: string | null;
-  readonly lat: number;
-  readonly lng: number;
-  readonly claims: unknown;
-  readonly taxonomy: unknown;
-  readonly related: unknown;
   readonly projection: unknown;
 };
 
@@ -1077,7 +1081,13 @@ export function liveSourceClaims(row: LivePublishedRow): readonly ReleaseSourceC
 
 /** Identity of a claim as a reader meets it: what it says, about what. */
 function claimIdentity(claim: ReleaseSourceClaim): string {
-  return `${claim.predicate.trim().toLowerCase()} ${claim.object.trim().toLowerCase()}`;
+  // ASCII Unit Separator, not NUL. Both are unambiguous here because neither can appear in a
+  // predicate or an object, but a NUL anywhere in a file makes every tool that sniffs for binary
+  // content skip it SILENTLY - `file` calls it data, and plain `grep` finds nothing in a
+  // 1,700-line module. That has already cost this repo once: eight ADR citations were invisible
+  // to the inventory that scoped repo-gtm2y. The identity is in-memory only (a Set, below), never
+  // hashed or stored, so the separator is free to change.
+  return `${claim.predicate.trim().toLowerCase()}\u001f${claim.object.trim().toLowerCase()}`;
 }
 
 export type ClaimCarryResult = {
@@ -1701,29 +1711,23 @@ export function gateLandscapePublishCandidate(input: {
 export function toReleaseEntityRow(
   projection: ReleaseEntityProjectionFields,
 ): ReleaseEntityUpsertRow {
+  /*
+   * The normalizers now run INTO the projection rather than beside it, and that is a correctness
+   * change rather than a tidy-up.
+   *
+   * They used to produce the `claims` and `related` COLUMNS while the projection kept whatever
+   * shape it arrived with. So `normalizeReleaseClaims`, which exists because four seed rows once
+   * reached bb_public with `claims: {}` and broke every jsonb_array_length consumer
+   * (repo-n7p6.14), was guarding the copy nobody reads and not the projection every reader
+   * serves. With the columns generated from the projection, normalizing here is the only place
+   * that guard can live — and it now protects the right store.
+   */
   const related = normalizeReleaseRelated(projection.related);
   const claims = normalizeReleaseClaims(projection.claims);
   return {
     release_id: projection.releaseId,
     entity_id: projection.id,
-    display_name: projection.displayName,
-    kind: projection.kind,
-    summary: projection.summary,
-    location: projection.location,
-    geohash: projection.location.geohash,
-    lat: projection.location.lat,
-    lng: projection.location.lng,
-    claims,
-    taxonomy: {
-      topicTags: projection.topicTags,
-      topicIds: projection.topicIds,
-      notabilityLabels: projection.notabilityLabels,
-    },
-    related,
-    projection: {
-      ...projection,
-      ...(projection.related === undefined && related.length === 0 ? { related: [] } : {}),
-    },
+    projection: { ...projection, claims, related },
   };
 }
 

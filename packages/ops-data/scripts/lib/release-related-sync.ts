@@ -200,9 +200,9 @@ export async function applyReleaseRelatedSync(
   for (const row of plan.changed) {
     const related = JSON.stringify(row.after);
     await client.query(
+      // The projection only; `related` is GENERATED from it.
       `UPDATE bb_public.release_entities
-         SET related = $1::jsonb,
-             projection = COALESCE(projection, '{}'::jsonb) || jsonb_build_object('related', $1::jsonb)
+         SET projection = COALESCE(projection, '{}'::jsonb) || jsonb_build_object('related', $1::jsonb)
        WHERE release_id = $2 AND entity_id = $3`,
       [related, releaseId, row.entityId],
     );

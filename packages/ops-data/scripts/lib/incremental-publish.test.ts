@@ -892,8 +892,12 @@ test('toReleaseEntityRow normalizes empty related to array', () => {
   assert.equal(build.ok, true);
   if (!build.ok) return;
   const row = toReleaseEntityRow(build.projection);
-  assert.ok(Array.isArray(row.related));
-  assert.deepEqual(row.related, []);
+  // The normalization now lands IN the projection, which is what readers serve and what the
+  // generated `related` column derives from. Asserting on a column here would have asserted on the
+  // copy nobody reads.
+  const related = (row.projection as Record<string, unknown>)['related'];
+  assert.ok(Array.isArray(related));
+  assert.deepEqual(related, []);
 });
 
 test('canonicalUpsertParamsFromLandscape maps personReview livingStatus', () => {
@@ -1747,8 +1751,10 @@ test('an inherited location survives the real build, matchMethod included', () =
   );
   assert.equal(projection.locationLabel, live.locationLabel);
   assert.equal(projection.jurisdictionLabel, live.jurisdictionLabel);
-  assert.equal(built.entityRow.lat, live.location.lat);
-  assert.equal(built.entityRow.lng, live.location.lng);
+  const builtLocation = (built.entityRow.projection as Record<string, unknown>)['location'] as
+    Record<string, unknown> | undefined;
+  assert.equal(builtLocation?.['lat'], live.location.lat);
+  assert.equal(builtLocation?.['lng'], live.location.lng);
   assert.equal(built.searchRow.geohash, live.location.geohash);
 });
 
@@ -2048,19 +2054,36 @@ const divergenceRowFromBuild = (built: {
 }) => {
   const entity = built.entityRow;
   const search = built.searchRow;
+  /*
+   * The eleven derived columns are GENERATED ALWAYS from `projection` in the database, so the
+   * builder no longer produces them and this shim has to. It MIRRORS THE MIGRATION'S EXPRESSIONS
+   * deliberately: what this test now proves is that the divergence audit's idea of where each
+   * fact lives still matches what Postgres will compute, which is the thing that can silently
+   * come apart now that one side is SQL.
+   */
+  const p = entity.projection as Record<string, unknown>;
+  const location = p['location'] as Record<string, unknown> | undefined;
+  const asArray = (value: unknown): unknown => (Array.isArray(value) ? value : []);
   return {
     entity_id: entity.entity_id,
-    display_name: entity.display_name,
-    kind: entity.kind,
-    summary: entity.summary,
-    location: entity.location,
-    geohash: entity.geohash,
-    lat: entity.lat,
-    lng: entity.lng,
-    claims: entity.claims,
-    taxonomy: entity.taxonomy,
-    related: entity.related,
-    primary_image: null,
+    display_name: p['displayName'],
+    kind: p['kind'],
+    summary: p['summary'] ?? null,
+    location: p['location'],
+    geohash: location?.['geohash'] ?? null,
+    lat: location?.['lat'] ?? null,
+    lng: location?.['lng'] ?? null,
+    claims: asArray(p['claims']),
+    taxonomy: {
+      topicIds: asArray(p['topicIds']),
+      topicTags: asArray(p['topicTags']),
+      ...(p['notabilityLabels'] !== undefined ? { notabilityLabels: p['notabilityLabels'] } : {}),
+      ...(Array.isArray(p['campaignIds']) && p['campaignIds'].length > 0
+        ? { campaignIds: p['campaignIds'] }
+        : {}),
+    },
+    related: asArray(p['related']),
+    primary_image: p['primaryImage'] ?? null,
     projection: entity.projection,
     si_present: true,
     si_kind: search.kind,

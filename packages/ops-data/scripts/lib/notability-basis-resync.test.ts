@@ -364,7 +364,11 @@ test('applying a plan writes release_entities and search_index for every changed
   assert.ok(client.updates[0]?.sql.includes('bb_public.release_entities'));
   assert.ok(client.updates[0]?.sql.includes("'notabilityBasis'"));
   assert.ok(client.updates[0]?.sql.includes("'notabilityLabels'"));
-  assert.ok(client.updates[0]?.sql.includes("taxonomy ? 'notabilityLabels'"));
+  // The taxonomy column is GENERATED from the projection now, so this statement must NOT touch
+  // it. The clause that used to be here — updating the column only `WHEN taxonomy ?
+  // 'notabilityLabels'`, i.e. only for rows that already had the key — is why 1,051 of 4,195 live
+  // rows had labels in the projection and none in the column.
+  assert.ok(!client.updates[0]?.sql.includes('taxonomy'));
   assert.ok(client.updates[1]?.sql.includes('bb_public.search_index'));
   // Both stores get the SAME jsonb, which is the point of writing them together.
   assert.equal(client.updates[0]?.params[0], client.updates[1]?.params[0]);
