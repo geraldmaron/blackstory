@@ -178,7 +178,7 @@
     "@repo/domain-core": "workspace:*",
     "@repo/schemas": "workspace:*",
     "@repo/security": "workspace:*",
-    "edtf": "^4.11.0",
+    "edtf": "^4.11.1",
     "zipcodes": "^8.0.0"
   },
   "devDependencies": {
@@ -186,7 +186,7 @@
     "@repo/typescript-config": "workspace:^",
     "@types/node": "^22.20.1",
     "@types/zipcodes": "^8.0.5",
-    "tsx": "^4.20.3",
+    "tsx": "^4.23.13",
     "typescript": "^5.8.3"
   }
 }
