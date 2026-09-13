@@ -16,6 +16,10 @@
  *   node --conditions development --import tsx \
  *     packages/ops-data/scripts/ingest-phase2-bls-unemployment.ts
  *
+ *   # Fetch from the BLS API instead of the bulk flat file (subject to a daily request quota)
+ *   BLS_SOURCE=api node --conditions development --import tsx \\
+ *     packages/ops-data/scripts/ingest-phase2-bls-unemployment.ts
+ *
  *   # Apply to Postgres
  *   DRY_RUN=0 INGEST_PHASE2_BLS_UNEMPLOYMENT_APPLY=1 DATABASE_URL=postgresql://... \
  *     node --conditions development --import tsx \
@@ -23,6 +27,17 @@
  */
 import { createHash } from 'node:crypto';
 import pg from 'pg';
+
+// National-level jurisdiction/boundary/vintage labels for statistical_observations.
+// jurisdiction_id has an FK to bb_reference.jurisdictions(id); the only national row
+// there is 'nation:US' (a bare 'nation' literal is not a valid id and would fail the
+// FK check on apply). boundary_version and dataset_vintage are NOT NULL columns with
+// no default, so they need real values, not null — 'national' / a fixed retrieval-date
+// stamp matches the convention used by the other CPS-sourced national annual ingest
+// (ingest-phase1-cps-a1.ts).
+const NATION_JURISDICTION = 'nation:US';
+const NATION_BOUNDARY_VERSION = 'national';
+const NATION_DATASET_VINTAGE = '2026-09-12';
 
 interface BlsSeriesData {
   readonly seriesId: string;
@@ -75,7 +90,88 @@ function normalizePgConnectionString(connectionString: string): {
   };
 }
 
+/**
+ * BLS's own bulk time-series distribution for the `ln` (Labor Force Statistics) survey.
+ *
+ * WHY A SECOND SOURCE. The public API v2 endpoint is rate-limited per IP to a small daily
+ * request budget, and this ingest needs 18 requests (2 series x 9 decades). One exhausted
+ * budget — an earlier run on the same day, a shared egress IP — turns every request into
+ * `REQUEST_SUCCEEDED: false` with a "daily threshold ... has been reached" message, and the
+ * ingest cannot run again until the quota rolls over. That is an unacceptable dependency for a
+ * script whose output is published data.
+ *
+ * `download.bls.gov/pub/time.series/ln/ln.data.1.AllData` is the same agency publishing the same
+ * observations with no quota and no key. It is one tab-separated file, `series_id \t year \t
+ * period \t value \t footnote_codes`, and it is LARGE (~390 MB) because it carries every `ln`
+ * series — so it is streamed and filtered line by line, never buffered. BLS blocks requests
+ * without an identifying User-Agent, so one is sent.
+ *
+ * Values agree with the API to the published precision: Black 1983 annual average 19.50, Black
+ * 2019 6.07, White 2019 3.28 (verified 2026-09-13 against both sources).
+ */
+const BLS_FLAT_FILE_URL = 'https://download.bls.gov/pub/time.series/ln/ln.data.1.AllData';
+const BLS_FLAT_FILE_USER_AGENT = 'BlackStory research ingest (geraldmarondagher@gmail.com)';
+
+async function fetchBlsDataFromFlatFile(
+  seriesIds: readonly string[],
+): Promise<Map<string, BlsSeriesData>> {
+  const wanted = new Set(seriesIds);
+  const byySeries = new Map<string, BlsSeriesData['data']>();
+  for (const id of wanted) byySeries.set(id, []);
+
+  const response = await fetch(BLS_FLAT_FILE_URL, {
+    headers: { 'User-Agent': BLS_FLAT_FILE_USER_AGENT },
+  });
+  if (!response.ok || !response.body) {
+    throw new Error(`BLS flat file fetch failed: ${response.status} ${response.statusText}`);
+  }
+
+  const decoder = new TextDecoder();
+  let carry = '';
+  const consume = (line: string): void => {
+    // series_id, year, period, value, footnote_codes — every field space-padded.
+    const parts = line.split('\t');
+    if (parts.length < 4) return;
+    const seriesId = (parts[0] ?? '').trim();
+    if (!wanted.has(seriesId)) return;
+    const period = (parts[2] ?? '').trim();
+    if (!/^M(0[1-9]|1[0-2])$/.test(period)) return;
+    const value = (parts[3] ?? '').trim();
+    if (value === '' || value === '-') return;
+    byySeries.get(seriesId)?.push({ year: (parts[1] ?? '').trim(), period, value });
+  };
+
+  for await (const chunk of response.body as unknown as AsyncIterable<Uint8Array>) {
+    carry += decoder.decode(chunk, { stream: true });
+    const lines = carry.split('\n');
+    carry = lines.pop() ?? '';
+    for (const line of lines) consume(line);
+  }
+  if (carry.length > 0) consume(carry);
+
+  const results = new Map<string, BlsSeriesData>();
+  for (const [seriesId, data] of byySeries.entries()) {
+    if (data.length === 0) continue;
+    results.set(seriesId, {
+      seriesId,
+      seriesTitle: seriesId,
+      data: data.sort((a, b) => {
+        const yearCmp = Number(a.year) - Number(b.year);
+        if (yearCmp !== 0) return yearCmp;
+        return Number(a.period.slice(1)) - Number(b.period.slice(1));
+      }),
+    });
+  }
+  return results;
+}
+
 async function fetchBlsData(seriesIds: readonly string[]): Promise<Map<string, BlsSeriesData>> {
+  // The flat file is the default because it cannot be quota-blocked. `BLS_SOURCE=api` selects the
+  // API path, which is cheaper on bytes when the daily budget is available.
+  if ((process.env.BLS_SOURCE ?? 'flatfile') !== 'api') {
+    return fetchBlsDataFromFlatFile(seriesIds);
+  }
+
   const results = new Map<string, BlsSeriesData>();
 
   for (const seriesId of seriesIds) {
@@ -84,9 +180,13 @@ async function fetchBlsData(seriesIds: readonly string[]): Promise<Map<string, B
       let allData: BlsSeriesData['data'] = [];
       const currentYear = new Date().getFullYear();
 
-      // Fetch in 20-year batches to cover full history from 1950
-      for (let startYear = 1950; startYear <= currentYear; startYear += 20) {
-        const endYear = Math.min(startYear + 19, currentYear);
+      // Fetch in 10-year batches to cover full history from 1950. The unregistered
+      // BLS API v2 endpoint silently truncates any request spanning more than 10
+      // years down to the first 10 years of the requested range while still
+      // returning REQUEST_SUCCEEDED, so a 20-year step here would silently skip
+      // every other decade (verified 2026-09-12: see bead repo-zxjz.4 notes).
+      for (let startYear = 1950; startYear <= currentYear; startYear += 10) {
+        const endYear = Math.min(startYear + 9, currentYear);
 
         // BLS API v2 requires POST with JSON body
         const response = await fetch('https://api.bls.gov/publicAPI/v2/timeseries/data/', {
@@ -169,7 +269,10 @@ function computeAnnualAverages(monthlyData: BlsSeriesData['data']): Map<number, 
 
   const annualAverages = new Map<number, AnnualAverage>();
   for (const [year, values] of byYear.entries()) {
-    if (values.length > 0) {
+    // Require a full 12 months before writing an "annual average" — otherwise the
+    // in-progress current calendar year (e.g. Jan–Aug) gets averaged over a partial
+    // set of months and written as if it were a complete annual observation.
+    if (values.length === 12) {
       const average = values.reduce((a, b) => a + b, 0) / values.length;
       annualAverages.set(year, {
         year,
@@ -322,14 +425,14 @@ async function applyObservations(
       );
     }
 
-    // Upsert observations for national level (jurisdiction_id = 'nation')
+    // Upsert observations for national level (jurisdiction_id = NATION_JURISDICTION)
     for (const obs of observations) {
       await client.query(
         `INSERT INTO bb_reference.statistical_observations
           (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage,
            estimate, margin_of_error, race_ethnicity_slice, status, source, source_url,
            retrieved_at, content_hash, metadata)
-         VALUES ($1,$2,'nation',$4,$5,$6,$7,$8,$9,'observed',$10,$11,$12::timestamptz,$13,$14::jsonb)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'observed',$10,$11,$12::timestamptz,$13,$14::jsonb)
          ON CONFLICT (id) DO UPDATE SET
            estimate = EXCLUDED.estimate,
            content_hash = EXCLUDED.content_hash,
@@ -338,10 +441,10 @@ async function applyObservations(
         [
           obs.id,
           obs.metricId,
-          undefined,
-          null,
+          NATION_JURISDICTION,
+          NATION_BOUNDARY_VERSION,
           obs.referencePeriod,
-          null,
+          NATION_DATASET_VINTAGE,
           obs.estimate,
           null,
           obs.raceEthnicitySlice,
