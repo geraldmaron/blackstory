@@ -46,7 +46,8 @@ describe('BB-084 scheduled-jobs Cloud Scheduler mirror', () => {
       assert.ok(job.killSwitchId, `${job.id} missing killSwitchId`);
       assert.ok(
         ['research', 'publication', 'security'].includes(job.targetWorker?.package),
-        `${job.id} targetWorker.package must be research/publication/security (ADR-007)`,
+        // `docs/decisions-carryover.md`, "Scheduled-job worker packages".
+        `${job.id} targetWorker.package must be research/publication/security`,
       );
       assert.ok(job.targetWorker?.function, `${job.id} missing targetWorker.function`);
     }

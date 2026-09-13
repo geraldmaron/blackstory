@@ -6,6 +6,14 @@
  * replace docs/security/environment-isolation.md's prose invariants or the JSON Schema check
  * documented in infra/gcp/README.md - it is an additional, narrower assertion focused on the
  * ADR-012 migration delta so a future edit cannot silently drop the asymmetry the ADR depends on.
+ *
+ * `docs/adr/ADR-012-production-environment-resplit.md` was removed in the 2026-07-24 purge;
+ * the decision is recovered in `docs/decisions-carryover.md`, "Small recovered decisions"
+ * (ADR-012, production environment re-split), which records that the three-project topology
+ * is STILL A DESIGN TARGET — `black-book-efaaf` is the only live project — and that the two
+ * new projects were since renamed `repo-staging`/`repo-internal`. The `ADR-012` strings below
+ * assert a literal value in isolation-matrix.json (`productionResplitTarget.adr`), which is
+ * that file's own record of where its design came from, not a pointer to an openable document.
  */
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';

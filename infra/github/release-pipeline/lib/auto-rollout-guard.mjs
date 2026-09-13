@@ -1,5 +1,7 @@
 /**
- * Guards against automatic production deploys (ADR-006 / ADR-027).
+ * Guards against automatic production deploys (`docs/decisions-carryover.md`,
+ * "Small recovered decisions": ADR-006 GitHub Actions deployment model /
+ * ADR-027 Vercel for public web hosting).
  * Validates repo docs and deploy workflows — not live Vercel or Firebase consoles.
  * Public web ships on Vercel; App Hosting promote for public web is retired.
  */
