@@ -335,6 +335,12 @@ function headingPattern(alternatives: readonly string[]): RegExp {
   return new RegExp(String.raw`^[ ]{0,12}(?:${alternatives.join('|')})`, 'gimu');
 }
 
+const SECTION_8_HEADING_ALTERNATIVES = [
+  String.raw`${SECTION_DIGIT['8']}\s*[.)]\s*(?:${fuzzyWord('narrative')}[\s-]*)?${fuzzyPhrase(['statement', 'of', 'significance'])}`,
+  String.raw`${fuzzyWord('narrative')}[\s-]*${fuzzyPhrase(['statement', 'of', 'significance'])}`,
+  fuzzyPhrase(['statement', 'of', 'significance']),
+];
+
 const NARRATIVE_HEADINGS: readonly { readonly section: string; readonly pattern: RegExp }[] = [
   {
     section: '7',
@@ -345,17 +351,64 @@ const NARRATIVE_HEADINGS: readonly { readonly section: string; readonly pattern:
   },
   {
     section: '8',
-    pattern: headingPattern([
-      String.raw`${SECTION_DIGIT['8']}\s*[.)]\s*(?:${fuzzyWord('narrative')}[\s-]*)?${fuzzyPhrase(['statement', 'of', 'significance'])}`,
-      String.raw`${fuzzyWord('narrative')}[\s-]*${fuzzyPhrase(['statement', 'of', 'significance'])}`,
-      fuzzyPhrase(['statement', 'of', 'significance']),
-    ]),
+    pattern: headingPattern(SECTION_8_HEADING_ALTERNATIVES),
   },
   {
     section: '9',
     pattern: headingPattern([
       String.raw`${SECTION_DIGIT['9']}\s*[.)]\s*${fuzzyPhrase(['major', 'bibliograph'])}`,
       fuzzyPhrase(['major', 'bibliographical']),
+    ]),
+  },
+];
+
+/**
+ * repo-4lhnk: two more form vintages carry their significance narrative behind a heading none of
+ * the alternatives above recognize — but both, unlike those above, are also common SPELLINGS
+ * that appear as furniture (a field caption, a checkbox label) on forms this parser ALREADY
+ * handles correctly via one of the alternatives above. Mixed into NARRATIVE_HEADINGS directly,
+ * both caused measured regressions: backtested against 80 already-captured documents, "8.
+ * Significance" additionally matched the front-page field caption that introduces NPS Form
+ * 10-900's Period/Areas-of-Significance checkbox grid ("8. Significance\nPeriod\nprehistoric...",
+ * refnums 83002101, 80003841, 83002094, 85001747) and a same-numbered "(cont'd.) Page Two" repeat
+ * of a section a document had ALREADY opened correctly (refnum 74000757, which lost 10,303
+ * characters — the entire first page of Ida B. Wells-Barnett's lynching-campaign section — to a
+ * later, shorter repeat outcompeting the true opening heading under "latest occurrence wins").
+ * "Summary of significance" cost refnum 98000326 65,499 characters the same way, by outcompeting
+ * an already-correct SECTION_HEADER_RE table capture once mixed into the same candidate pool.
+ *
+ * So these two are tried ONLY as a second pass, and only for a section neither the table
+ * (SECTION_HEADER_RE) nor the primary heading set above found ANYTHING for — see
+ * `splitByNarrativeHeadings`, which searches this list ALONGSIDE (not instead of)
+ * NARRATIVE_HEADINGS, so only the two new alternatives need to be listed here. That ordering is
+ * what makes them safe: they can only ever fill a section that would otherwise be empty, never
+ * outrank a heading already found by an established, corpus-tested route.
+ */
+const VINTAGE_HEADING_EXTENSIONS: readonly {
+  readonly section: string;
+  readonly pattern: RegExp;
+}[] = [
+  {
+    section: '8',
+    pattern: headingPattern([
+      // Form 10-300 (Rev. 6-72/1969), the pre-10-900 Inventory-Nomination Form. Its continuation
+      // sheets head the narrative "8.   SIGNIFICANCE - page 2" / "8.   Significance Continued
+      // page 1" — the digit-and-period label is identical to every other digit-anchored
+      // alternative above, but the label itself drops "STATEMENT OF". Refnums 73001560 (101
+      // Ranch Historic District) and 74000680 (Atlanta University) are the measured cases: both
+      // 12k-18k character documents whose real significance narrative sat behind exactly this
+      // heading and nothing else.
+      String.raw`${SECTION_DIGIT['8']}\s*[.)]\s*${fuzzyWord('significance')}`,
+      // The South Carolina "Inventory Form for Historic Districts and Individual Properties in a
+      // Multiple Property Submission" — used in lieu of the federal form for SC multiple-resource
+      // nominations. It has no section numbers at all: a bare "SIGNIFICANCE" line introduces
+      // AREA OF SIGNIFICANCE and LEVEL OF SIGNIFICANCE checkboxes, and the actual narrative
+      // follows under its own "SUMMARY OF SIGNIFICANCE" heading. Requiring the "SUMMARY OF"
+      // lead-in (rather than matching bare "SIGNIFICANCE") is what keeps this alternative from
+      // opening a section on the checkbox heading itself, or on an unrelated line elsewhere that
+      // happens to start with the word. Refnums 86000539 (St. Thomas' Episcopal Church),
+      // 86003218 (Hutchinson House) and 85002346 (Lowman Hall) are the measured cases.
+      fuzzyPhrase(['summary', 'of', 'significance']),
     ]),
   },
 ];
@@ -405,16 +458,21 @@ function opensFormFurniture(probe: string): boolean {
   return BLANK_TEMPLATE_CHECKLIST.some((pattern) => pattern.test(probe));
 }
 
-export function splitByNarrativeHeadings(normalizedText: string): readonly NominationSection[] {
+function findByNarrativeHeadings(
+  normalizedText: string,
+  headings: readonly { readonly section: string; readonly pattern: RegExp }[],
+  wantedSections: readonly string[],
+): readonly NominationSection[] {
   const starts = new Map<string, number[]>();
-  for (const { section, pattern } of NARRATIVE_HEADINGS) {
+  for (const { section, pattern } of headings) {
     pattern.lastIndex = 0;
-    const positions: number[] = [];
+    const positions: number[] = starts.get(section) ?? [];
     let match = pattern.exec(normalizedText);
     while (match !== null) {
       positions.push(match.index + match[0].length);
       match = pattern.exec(normalizedText);
     }
+    positions.sort((a, b) => a - b);
     starts.set(section, positions);
   }
 
@@ -433,7 +491,7 @@ export function splitByNarrativeHeadings(normalizedText: string): readonly Nomin
   };
 
   const sections: NominationSection[] = [];
-  for (const wanted of CAPTURED_SECTIONS) {
+  for (const wanted of wantedSections) {
     const positions = starts.get(wanted) ?? [];
     // Latest first. An earlier occurrence's span subsumes every later one (equal-numbered
     // headings do not bound a section, so that a statement continuing across sheets is not
@@ -452,6 +510,26 @@ export function splitByNarrativeHeadings(normalizedText: string): readonly Nomin
     }
   }
   return sections;
+}
+
+export function splitByNarrativeHeadings(normalizedText: string): readonly NominationSection[] {
+  const primary = findByNarrativeHeadings(normalizedText, NARRATIVE_HEADINGS, CAPTURED_SECTIONS);
+  const stillMissing = CAPTURED_SECTIONS.filter(
+    (wanted) => !primary.some((section) => section.section === wanted),
+  );
+  if (stillMissing.length === 0) return primary;
+
+  // repo-4lhnk: retry ONLY the sections the primary, corpus-tested heading set found nothing at
+  // all for, using the vintage-specific extensions alongside the primary alternatives. Searching
+  // only the missing sections — never re-deciding one the primary pass already settled — is what
+  // keeps a broader, riskier alternative from ever outranking an already-correct capture. See
+  // VINTAGE_HEADING_EXTENSIONS for the regressions this guards against.
+  const recovered = findByNarrativeHeadings(
+    normalizedText,
+    [...NARRATIVE_HEADINGS, ...VINTAGE_HEADING_EXTENSIONS],
+    stillMissing,
+  );
+  return [...primary, ...recovered];
 }
 
 /**

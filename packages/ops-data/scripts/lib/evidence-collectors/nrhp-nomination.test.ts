@@ -953,3 +953,110 @@ test('parseNomination reports the sections it actually captured, not the winning
   );
   assert.ok(parsed.hasSignificance);
 });
+
+// repo-4lhnk: Form 10-300 (Rev. 6-72/1969), the pre-10-900 Inventory-Nomination Form. Its
+// continuation sheets label the narrative "N.   SIGNIFICANCE" — the digit-and-period lead-in of
+// every other digit-anchored heading, but without "STATEMENT OF". Measured against refnums
+// 73001560 (101 Ranch Historic District) and 74000680 (Atlanta University): both had 12k-18k
+// characters of real form text and no section 7/8 the parser recognized before this.
+test('splitByNarrativeHeadings matches Form 10-300\'s bare "N. SIGNIFICANCE" continuation heading', () => {
+  const prose = `Built about 1912, this stuccoed structure once served the ranch as its dairy barn. ${'Local ranch hands recall its use through the 1940s. '.repeat(30)}`;
+  const text = normalizeExtractedText(`
+    (Continuation Sheet)
+    8.   SIGNIFICANCE - page 2
+    ${prose}
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, 'the bare "N. SIGNIFICANCE" heading must open section 8');
+  assert.ok(section8!.text.includes('dairy barn'));
+});
+
+test('splitByNarrativeHeadings does not treat "AREAS OF SIGNIFICANCE" as the bare heading', () => {
+  // The checkbox caption on the front form ("AREAS OF SIGNIFICANCE (Check One or More...)")
+  // starts its line with "AREAS", not a digit, so it must never satisfy the new alternative.
+  const text = normalizeExtractedText(`
+    AREAS OF SIGNIFICANCE (Check One or More as Appropriate)
+    ${'Agriculture Architecture Commerce '.repeat(20)}
+  `);
+  assert.equal(
+    splitByNarrativeHeadings(text).find((s) => s.section === '8'),
+    undefined,
+  );
+});
+
+test("parseNomination recovers hasSignificance for Form 10-300's bare significance heading", () => {
+  const prose = `The 101 Ranch is significant for its association with early Black cowboys, among them Bill Pickett. ${'Newspapers of the period documented his rodeo career. '.repeat(30)}`;
+  const text = `
+    DESCRIBE THE PRESENT AND ORIGINAL PHYSICAL APPEARANCE
+    ${'The White House is built of reinforced concrete. '.repeat(30)}
+
+    (Continuation Sheet)
+    8.   SIGNIFICANCE - page 2
+    ${prose}
+  `;
+  const result = parseNomination(text, '101 Ranch Historic District');
+  assert.equal(result.hasSignificance, true, "Form 10-300's bare heading must still be recognized");
+  assert.equal(result.segmentation, 'narrative-headings');
+  assert.ok(result.narrative.includes('Bill Pickett'));
+});
+
+// repo-4lhnk: the South Carolina "Inventory Form for Historic Districts and Individual Properties
+// in a Multiple Property Submission" — used in place of the federal form for SC multiple-resource
+// nominations. It carries no section numbers at all: a bare "SIGNIFICANCE" line introduces AREA
+// OF SIGNIFICANCE and LEVEL OF SIGNIFICANCE checkboxes, and the real narrative follows under its
+// own "SUMMARY OF SIGNIFICANCE" heading. Measured against refnums 86000539 (St. Thomas' Episcopal
+// Church), 86003218 (Hutchinson House), 85002346 (Lowman Hall) and 86000528 (Goodwill Plantation).
+test('splitByNarrativeHeadings matches the South Carolina inventory form\'s "SUMMARY OF SIGNIFICANCE" heading', () => {
+  const prose = `This house is significant as the oldest identified intact house on the island associated with the Black community. ${'It was built by a formerly enslaved craftsman around 1885. '.repeat(20)}`;
+  const text = normalizeExtractedText(`
+    SIGNIFICANCE
+    AREA OF SIGNIFICANCE: Architecture/Black History
+    LEVEL OF SIGNIFICANCE: L (FOR OFFICE USE ONLY)
+    SUMMARY OF SIGNIFICANCE
+    ${prose}
+  `);
+  const section8 = splitByNarrativeHeadings(text).find((s) => s.section === '8');
+  assert.ok(section8, '"SUMMARY OF SIGNIFICANCE" must open section 8');
+  assert.ok(section8!.text.includes('formerly enslaved craftsman'));
+  assert.ok(
+    !section8!.text.includes('LEVEL OF SIGNIFICANCE'),
+    'the checkbox lines above the heading must not leak into the captured narrative',
+  );
+});
+
+test('splitByNarrativeHeadings does not open section 8 on the bare "SIGNIFICANCE" checkbox caption alone', () => {
+  // Without the "SUMMARY OF" lead-in this would be indistinguishable from the checkbox caption
+  // that always precedes it on this form, which is exactly what "SUMMARY OF" is required to rule
+  // out.
+  const text = normalizeExtractedText(`
+    SIGNIFICANCE
+    AREA OF SIGNIFICANCE: Architecture
+    LEVEL OF SIGNIFICANCE: S (for office use only)
+    ${'ACREAGE: 2 acres VERBAL BOUNDARY DESCRIPTION: shown on the accompanying tax map. '.repeat(10)}
+  `);
+  assert.equal(
+    splitByNarrativeHeadings(text).find((s) => s.section === '8'),
+    undefined,
+  );
+});
+
+test('parseNomination recovers hasSignificance for the South Carolina inventory form', () => {
+  const prose = `Lowman Hall is significant as one of the first designs by a pioneer Black architect on the campus. ${'It set standards other Black students later aspired to. '.repeat(20)}`;
+  const text = `
+    DESCRIPTION
+    ${'The three-story brick building has a hipped roof and exposed rafter tails. '.repeat(20)}
+    SIGNIFICANCE
+    AREAS OF SIGNIFICANCE: Black History
+    LEVEL OF SIGNIFICANCE: S (for office use only)
+    SUMMARY OF SIGNIFICANCE
+    ${prose}
+  `;
+  const result = parseNomination(text, 'Lowman Hall');
+  assert.equal(
+    result.hasSignificance,
+    true,
+    'the South Carolina inventory form heading must still be recognized',
+  );
+  assert.equal(result.segmentation, 'narrative-headings');
+  assert.ok(result.narrative.includes('pioneer Black architect'));
+});
