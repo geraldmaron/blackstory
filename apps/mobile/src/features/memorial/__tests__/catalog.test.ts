@@ -28,7 +28,7 @@ describe('memorial catalog', () => {
     expect(memorialPulse().linkedCount).toBeGreaterThan(0);
   });
 
-  it('keeps the three repo-5jxh names in their correct state', () => {
+  it('keeps the three repo-5jxh names in their correct state: two linked to their own records, one off the roll', () => {
     const rows = listMemorialNames();
 
     // He is off the roll entirely: not a victim of police violence but the man who shot a
@@ -36,13 +36,19 @@ describe('memorial catalog', () => {
     // on the officers who found him. The exported seed must not bring him back.
     expect(rows.find((row) => row.name === 'George Bush III')).toBeUndefined();
 
-    // These two are real victims with no entity record of their own yet. Unlinked is the correct
-    // state; a linked one means the exporter matched a namesake (Charles I. Brown of Phi Beta
-    // Sigma, or Robert L. Johnson who founded BET and is living).
-    for (const name of ['Charles Brown', 'Robert Johnson']) {
+    // These two are real victims and now have records of their own. The assertion is on the exact
+    // id, not merely on being linked, because the failure this guards against is a link to the
+    // WRONG man: before exact matching, "Charles Brown" resolved to Charles I. Brown, a 1914
+    // founder of Phi Beta Sigma, and "Robert Johnson" to Robert L. Johnson, the living founder of
+    // BET. A test that only asked "is it linked?" would pass on either of those.
+    const expectedIds: Record<string, string> = {
+      'Charles Brown': 'ent_charles_brown_1957_001',
+      'Robert Johnson': 'ent_robert_johnson_1934_001',
+    };
+    for (const [name, entityId] of Object.entries(expectedIds)) {
       const row = rows.find((candidate) => candidate.name === name);
       expect(row).toBeDefined();
-      expect(row?.entityId).toBeUndefined();
+      expect(row?.entityId).toBe(entityId);
     }
   });
 

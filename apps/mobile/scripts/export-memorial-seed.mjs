@@ -68,6 +68,14 @@ const VERIFIED_ENTITY_ALIASES = new Map([
   ['delano herman middleton', 'gap_delano_middleton'],
   // NAACP chapter president, killed by Klan arson in Hattiesburg, January 1966.
   ['vernon ferdinand dahmer', 'ent_vernon_dahmer_001'],
+  // repo-5jxh. Both of these are why exact matching replaced fuzzy matching here: "Charles Brown"
+  // had been matched to a 1914 Phi Beta Sigma founder and "Robert Johnson" to the living founder
+  // of BET, both different men entirely. They are aliased explicitly, to records created for them
+  // (packages/ops-data/scripts/data/memorial-victim-cohort.ts), rather than matched by name —
+  // because a common name is exactly what went wrong before, and an alias states which man is
+  // meant.
+  ['charles brown', 'ent_charles_brown_1957_001'],
+  ['robert johnson', 'ent_robert_johnson_1934_001'],
 ]);
 
 const names = [...MEMORIAL_NAMES];
