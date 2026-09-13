@@ -343,6 +343,37 @@ test('gateLandscapePublishCandidate holds back a generated NRHP template summary
 });
 
 /**
+ * repo-63ka — the same template_only verdict as the test above, but the row also carries a
+ * newer, unstaged WS4 draft (`enrichment_draft_unstaged`). The detail must say so: a caller
+ * reading only "generated-template signature" cannot tell "no draft exists" from "a draft
+ * exists but the bridge hasn't run" without this.
+ */
+test('template_only detail names an unstaged newer enrichment draft when one exists', () => {
+  const result = gateLandscapePublishCandidate({
+    row: nrhpRow({ enrichment_draft_unstaged: true }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) {
+    assert.equal(result.reason, 'template_only');
+    assert.match(result.detail, /generated-template signature/u);
+    assert.match(result.detail, /apply-enrichment-to-landscape/u);
+  }
+});
+
+/** The same rejection with no unstaged draft says nothing about one — the default (`undefined`) case. */
+test('template_only detail stays silent about a draft when none is unstaged', () => {
+  const result = gateLandscapePublishCandidate({
+    row: nrhpRow(),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) assert.doesNotMatch(result.detail, /apply-enrichment-to-landscape/u);
+});
+
+/**
  * repo-b4ad — ADMISSION vs REGRESSION. All four tests below use the SAME shallow candidate, the
  * one the test directly above rejects. What changes is whether the record is already live and
  * what is published for it, because that is the only thing that should change the answer.

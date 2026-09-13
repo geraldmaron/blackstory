@@ -121,7 +121,19 @@ SELECT
       AND lower(re.display_name) = lower(lc.display_name)
       AND re.entity_id <> lc.id
       AND re.entity_id <> lc.source_item_id
-  ) AS name_overlap
+  ) AS name_overlap,
+  -- repo-63ka: a newer WS4 draft that has not been staged onto this row yet (the bridge,
+  -- apply-enrichment-to-landscape.ts, is a hand-run step — see that script's own header). Read
+  -- by assessLandscapeDepth so a 'template_only' verdict can say WHICH of the two identical-
+  -- looking cases it is: no draft was ever written, or one was written but never staged.
+  EXISTS (
+    SELECT 1
+    FROM bb_research.entity_enrichment ee
+    WHERE ee.entity_id = lc.id
+      AND ee.status = 'enriched'
+      AND (ee.notes->'draft'->>'summary') IS NOT NULL
+      AND (ee.notes->'draft'->>'summary') IS DISTINCT FROM lc.summary
+  ) AS enrichment_draft_unstaged
 FROM bb_research.landscape_candidates lc
 WHERE lc.status = 'pending'
   -- repo-n7p6.15: never publish an entity that has been merged away. An absorbed record is not a
@@ -167,7 +179,19 @@ SELECT
       AND lower(re.display_name) = lower(lc.display_name)
       AND re.entity_id <> lc.id
       AND re.entity_id <> lc.source_item_id
-  ) AS name_overlap
+  ) AS name_overlap,
+  -- repo-63ka: a newer WS4 draft that has not been staged onto this row yet (the bridge,
+  -- apply-enrichment-to-landscape.ts, is a hand-run step — see that script's own header). Read
+  -- by assessLandscapeDepth so a 'template_only' verdict can say WHICH of the two identical-
+  -- looking cases it is: no draft was ever written, or one was written but never staged.
+  EXISTS (
+    SELECT 1
+    FROM bb_research.entity_enrichment ee
+    WHERE ee.entity_id = lc.id
+      AND ee.status = 'enriched'
+      AND (ee.notes->'draft'->>'summary') IS NOT NULL
+      AND (ee.notes->'draft'->>'summary') IS DISTINCT FROM lc.summary
+  ) AS enrichment_draft_unstaged
 FROM bb_research.landscape_candidates lc
 WHERE lc.id = ANY($1::text[])
 ORDER BY lc.id
@@ -208,7 +232,19 @@ SELECT
       AND lower(re.display_name) = lower(lc.display_name)
       AND re.entity_id <> lc.id
       AND re.entity_id <> lc.source_item_id
-  ) AS name_overlap
+  ) AS name_overlap,
+  -- repo-63ka: a newer WS4 draft that has not been staged onto this row yet (the bridge,
+  -- apply-enrichment-to-landscape.ts, is a hand-run step — see that script's own header). Read
+  -- by assessLandscapeDepth so a 'template_only' verdict can say WHICH of the two identical-
+  -- looking cases it is: no draft was ever written, or one was written but never staged.
+  EXISTS (
+    SELECT 1
+    FROM bb_research.entity_enrichment ee
+    WHERE ee.entity_id = lc.id
+      AND ee.status = 'enriched'
+      AND (ee.notes->'draft'->>'summary') IS NOT NULL
+      AND (ee.notes->'draft'->>'summary') IS DISTINCT FROM lc.summary
+  ) AS enrichment_draft_unstaged
 FROM bb_research.landscape_candidates lc
 WHERE lc.lane = $1
 ORDER BY lc.id

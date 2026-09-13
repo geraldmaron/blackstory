@@ -54,6 +54,15 @@ export type LandscapePublishRow = {
   readonly payload: Readonly<Record<string, unknown>>;
   readonly exact_in_release?: boolean;
   readonly name_overlap?: boolean;
+  /**
+   * repo-63ka: a `bb_research.entity_enrichment` row for this entity is `status='enriched'` with
+   * a draft summary that differs from `summary` above — i.e. a draft exists but
+   * apply-enrichment-to-landscape.ts (the WS5 bridge) has not staged it onto this row yet.
+   * Populated by the publisher's own query; a caller that doesn't join entity_enrichment (e.g.
+   * the unit tests, or a script with no reason to look) leaves this undefined, and
+   * `assessLandscapeDepth` reads that as "unknown", not "no draft" — see its use below.
+   */
+  readonly enrichment_draft_unstaged?: boolean;
 };
 
 export type PublishGateSkipReason =
@@ -1265,12 +1274,24 @@ export function assessLandscapeDepth(
   });
   if (hasIndependentSource) return { deep: true };
 
+  // repo-63ka: every `deep: false` verdict below reads as "no draft was ever written for this
+  // record" unless it says otherwise. That reading is wrong whenever a WS4 draft sits in
+  // `bb_research.entity_enrichment` newer than what is staged here — the drafter ran, the draft
+  // is real, and it is simply unstaged (apply-enrichment-to-landscape.ts, the WS5 bridge, is a
+  // hand-run step, not something session-enrich-apply.ts does for you). Distinguishing the two
+  // in the message is the cheaper of the bead's two fixes and keeps the bridge's deliberate
+  // review step intact — it does not change which rows are eligible, only what an operator is
+  // told about why one is not.
+  const staleDraftSuffix = row.enrichment_draft_unstaged
+    ? ' — an enrichment draft exists for this record but has not been staged onto it; run apply-enrichment-to-landscape.ts'
+    : '';
+
   const summary = entry.summary;
   const signature = findTemplateSummarySignature(summary);
   if (signature !== null) {
     return {
       deep: false,
-      detail: `summary carries a generated-template signature ("${signature.slice(0, 48)}…")`,
+      detail: `summary carries a generated-template signature ("${signature.slice(0, 48)}…")${staleDraftSuffix}`,
     };
   }
 
@@ -1279,13 +1300,13 @@ export function assessLandscapeDepth(
   if (echoed.length === claims.length && claims.length > 0) {
     return {
       deep: false,
-      detail: 'every claim restates the summary verbatim — no fact beyond the registry listing',
+      detail: `every claim restates the summary verbatim — no fact beyond the registry listing${staleDraftSuffix}`,
     };
   }
 
   return {
     deep: false,
-    detail: `no evidence beyond the registry index row (${registryDocument ?? 'unknown source'})`,
+    detail: `no evidence beyond the registry index row (${registryDocument ?? 'unknown source'})${staleDraftSuffix}`,
   };
 }
 
