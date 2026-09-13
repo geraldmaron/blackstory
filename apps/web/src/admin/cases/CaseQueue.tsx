@@ -44,6 +44,15 @@ export type CaseQueueProps = {
 export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
   const { getIdToken, user } = useAdminAuth();
   const [rows, setRows] = useState<readonly AdminCaseListItem[]>(initialRows);
+  /*
+   * Whether the server already handed us this queue (repo-gyq6.9). `initialRows` existed before
+   * that change but nothing passed it, so the mount always fetched. Now that /admin/inbox and
+   * /admin/cases read the queue in the request, re-fetching on mount would throw away the whole
+   * point and show the operator a list that flickers from server truth to an identical client
+   * copy. A ref, not state: it must not re-arm on a re-render, and it is deliberately NOT reset
+   * by a later `load()` — every refresh after the first is a real read the operator asked for.
+   */
+  const servedFromServer = useRef(initialRows.length > 0);
   const [query, setQuery] = useState<CaseQueueQuery>({
     ...DEFAULT_CASE_QUEUE_QUERY,
     state: mode === 'inbox' ? 'inbox' : 'all',
@@ -81,7 +90,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
         return;
       }
       const states = mode === 'inbox' ? 'inbox' : 'all';
-      const response = await fetch(`/api/research-cases?states=${states}&limit=200`, {
+      const response = await fetch(`/admin/api/research-cases?states=${states}&limit=200`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const body = (await response.json()) as { items?: AdminCaseListItem[]; error?: string };
@@ -95,6 +104,10 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
   }, [getIdToken, mode]);
 
   useEffect(() => {
+    if (servedFromServer.current) {
+      servedFromServer.current = false;
+      return;
+    }
     if (user) void load();
   }, [user, load]);
 
@@ -113,7 +126,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
       try {
         const token = await getIdToken();
         if (!token) return;
-        const response = await fetch(`/api/research-cases/${caseId}`, {
+        const response = await fetch(`/admin/api/research-cases/${caseId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const body = (await response.json()) as {
@@ -185,7 +198,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
       };
 
       if (caseIds.length === 1) {
-        const response = await fetch(`/api/research-cases/${caseIds[0]}/transition`, {
+        const response = await fetch(`/admin/api/research-cases/${caseIds[0]}/transition`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -240,7 +253,7 @@ export function CaseQueue({ mode, initialRows = [] }: CaseQueueProps) {
         setError('Sign in required');
         return;
       }
-      const response = await fetch(`/api/research-cases/${activeId}/assign`, {
+      const response = await fetch(`/admin/api/research-cases/${activeId}/assign`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
