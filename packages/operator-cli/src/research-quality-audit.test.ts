@@ -9,9 +9,11 @@ import { test } from 'node:test';
 import { detectDeficits } from '@repo/domain';
 
 import {
+  type EntityAuditRow,
   type ReleasedEntity,
   assertionClassForClaim,
   auditReleasedEntities,
+  selectDeficitCohort,
   snapshotForReleasedEntity,
   sourceClassForCitation,
 } from './research-quality-audit.ts';
@@ -23,6 +25,22 @@ function entity(overrides: Partial<ReleasedEntity> = {}): ReleasedEntity {
     displayName: 'Test Person',
     summary: 'A summary.',
     claims: [],
+    ...overrides,
+  };
+}
+
+function auditRow(overrides: Partial<EntityAuditRow> = {}): EntityAuditRow {
+  return {
+    entityId: 'ent_1',
+    displayName: 'Test Person',
+    kind: 'person',
+    maturity: 'seeded',
+    priority: 'P2',
+    deficits: [],
+    claimCount: 0,
+    citedLineages: 0,
+    corroboratingLineages: 0,
+    bridgeOnly: false,
     ...overrides,
   };
 }
@@ -271,4 +289,66 @@ test('a non-inventor, non-person record requires neither receipt', () => {
   const snapshot = snapshotForReleasedEntity(entity({ kind: 'place', claims: [] }));
   assert.equal(snapshot.requiresTechnicalReceipt, false);
   assert.equal(snapshot.requiresCommunityIdentityReceipt, false);
+});
+
+test('a deficit cohort is bounded from the matching set, not from the first N rows', () => {
+  // The bug this pins: filtering a pre-limited slice can return fewer than --limit entities,
+  // or none, even when far more than --limit entities actually carry the deficit. Here only
+  // ent_3 and ent_5 (of five) carry the deficit; a --limit of 1 applied before filtering
+  // (the old SQL-level LIMIT) would see only ent_1, which never matches, and return nothing.
+  const rows = [
+    auditRow({ entityId: 'ent_1', priority: 'P1', deficits: [] }),
+    auditRow({ entityId: 'ent_2', priority: 'P0', deficits: [] }),
+    auditRow({
+      entityId: 'ent_3',
+      priority: 'P2',
+      deficits: ['wikipedia_only_summary_claim'] as never,
+    }),
+    auditRow({ entityId: 'ent_4', priority: 'P0', deficits: [] }),
+    auditRow({
+      entityId: 'ent_5',
+      priority: 'P0',
+      deficits: ['wikipedia_only_summary_claim'] as never,
+    }),
+  ];
+  const cohort = selectDeficitCohort(rows, 'wikipedia_only_summary_claim' as never, 1);
+  assert.deepEqual(
+    cohort.map((row) => row.entityId),
+    ['ent_5'],
+  );
+});
+
+test('a deficit cohort is ordered by priority, not by input order', () => {
+  const rows = [
+    auditRow({
+      entityId: 'ent_low',
+      priority: 'P3',
+      deficits: ['source_type_monoculture'] as never,
+    }),
+    auditRow({
+      entityId: 'ent_high',
+      priority: 'P0',
+      deficits: ['source_type_monoculture'] as never,
+    }),
+    auditRow({
+      entityId: 'ent_mid',
+      priority: 'P1',
+      deficits: ['source_type_monoculture'] as never,
+    }),
+  ];
+  const cohort = selectDeficitCohort(rows, 'source_type_monoculture' as never);
+  assert.deepEqual(
+    cohort.map((row) => row.entityId),
+    ['ent_high', 'ent_mid', 'ent_low'],
+  );
+});
+
+test('a deficit cohort with no --limit returns every matching entity', () => {
+  const rows = [
+    auditRow({ entityId: 'ent_1', deficits: ['bridge_only_entity'] as never }),
+    auditRow({ entityId: 'ent_2', deficits: [] }),
+    auditRow({ entityId: 'ent_3', deficits: ['bridge_only_entity'] as never }),
+  ];
+  const cohort = selectDeficitCohort(rows, 'bridge_only_entity' as never);
+  assert.equal(cohort.length, 2);
 });

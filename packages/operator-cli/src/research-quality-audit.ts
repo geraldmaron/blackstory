@@ -396,3 +396,25 @@ export function auditReleasedEntities(
     ...(options.includeEntities === true ? { entities: rows } : {}),
   };
 }
+
+/**
+ * Bound and prioritize a deficit cohort.
+ *
+ * A caller narrowing by --deficit wants the next N entities carrying that deficit, not the
+ * deficit-matching subset of the first N entities by id -- so this filters first, orders by
+ * priority (P0 before P1 before P2 before P3, which sorts correctly as plain strings because
+ * they are equal length), and only then applies the limit. Callers must audit the full
+ * candidate set (no SQL-level LIMIT) before this runs, or the cohort is bounded by the wrong
+ * thing again.
+ */
+export function selectDeficitCohort(
+  entities: readonly EntityAuditRow[],
+  deficit: ResearchDeficitCode,
+  limit?: number,
+): readonly EntityAuditRow[] {
+  const matching = entities
+    .filter((entity) => entity.deficits.includes(deficit))
+    .slice()
+    .sort((a, b) => a.priority.localeCompare(b.priority));
+  return limit === undefined ? matching : matching.slice(0, limit);
+}

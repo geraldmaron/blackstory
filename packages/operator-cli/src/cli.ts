@@ -47,6 +47,7 @@ import {
 import { runEnrichmentJudge } from './enrichment-run.js';
 import {
   auditReleasedEntities,
+  selectDeficitCohort,
   snapshotForReleasedEntity,
   type ReleasedClaim,
 } from './research-quality-audit.js';
@@ -2021,7 +2022,11 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
              FROM bb_public.release_entities
             WHERE ${conditions.join(' AND ')}
             ORDER BY entity_id`;
-        if (limit !== undefined) {
+        // A bounded --deficit cohort has to be picked from the WHOLE matching set, not from a
+        // pre-filter slice of it -- so --limit is applied at the SQL level only when there is
+        // no --deficit to filter by. With --deficit, the audit below runs over every row and
+        // selectDeficitCohort applies the limit after filtering and prioritizing.
+        if (limit !== undefined && deficitFilter === undefined) {
           params.push(limit);
           sql += ` LIMIT $${params.length}`;
         }
@@ -2042,9 +2047,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           deficitFilter !== undefined && report.entities !== undefined
             ? {
                 ...report,
-                entities: report.entities.filter((entity) =>
-                  entity.deficits.includes(deficitFilter as never),
-                ),
+                entities: selectDeficitCohort(report.entities, deficitFilter as never, limit),
               }
             : report;
         stdout(JSON.stringify(filtered, null, 2));
@@ -2060,7 +2063,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
             'For capture-backfill: [--commit] [--wayback] [--max-captures N] [--max-entities N]\n' +
             'For expand: --entity-id <id> [--depth N] [--commit] — live Wikidata traversal; stages landscape_candidates, never bb_canonical\n' +
             'For enrich-entity: --entity-id <id> [--target-maturity seeded|grounded|corroborated|contextualized|deep_research|reference] — PLANS research; it does not execute, and has no --commit\n' +
-            'For research-quality-audit: [--release-id <id>] [--kind <kind>] [--entity-id <id>] [--deficit <code>] [--limit N] — read-only; narrow the query to get per-entity rows\n' +
+            'For research-quality-audit: [--release-id <id>] [--kind <kind>] [--entity-id <id>] [--deficit <code>] [--limit N] — read-only; narrow the query to get per-entity rows; --deficit with --limit returns the next N matching entities in priority order, not a deficit filter over the first N by id\n' +
             'For graylist-read: [--limit N] — Postgres quarantine only, see docs/research/research-operations.md\n',
         );
         return command ? 1 : 0;
