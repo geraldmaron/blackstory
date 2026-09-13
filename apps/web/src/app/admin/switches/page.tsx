@@ -1,12 +1,30 @@
 /**
  * Kill switch browser — operational circuit breakers for adapters and public surfaces.
+ *
+ * Server component (repo-gyq6.9). This was a client page that mounted, waited for
+ * `AdminAuthProvider` to produce a token, then fetched `/admin/api/switches` — three round trips
+ * before an operator saw a single row, to render a table that never changes in response to
+ * anything the reader does. The rows are now read in the request and arrive in the first byte.
+ *
+ * `/admin/api/switches` stays: it is a real API for callers outside this page. This page simply
+ * no longer needs to be one of them.
+ *
+ * The Refresh button went with the client state. A server-rendered page IS the refresh — the
+ * browser's own reload re-runs the read — and a button that could only re-request what the page
+ * had just fetched was chrome standing in for a reload key.
  */
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
-import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
-import type { KillSwitchListItem } from '../../../admin/ops/switches-store';
+import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
+import { listKillSwitches } from '../../../admin/ops/switches-store';
+
+export const metadata: Metadata = {
+  title: 'Kill switches',
+  description: 'Operational circuit breakers for adapters and public surfaces.',
+};
+
+/** Always read at request time: an operational circuit breaker must never be served from a cache. */
+export const dynamic = 'force-dynamic';
 
 function formatWhen(iso: string): string {
   if (!iso) return '—';
@@ -21,43 +39,10 @@ function formatWhen(iso: string): string {
   });
 }
 
-export default function SwitchesPage() {
-  const { getIdToken, user } = useAdminAuth();
-  const [rows, setRows] = useState<readonly KillSwitchListItem[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = await getIdToken();
-      if (!token) {
-        setRows([]);
-        return;
-      }
-      const response = await fetch('/admin/api/switches?limit=100', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const body = (await response.json()) as {
-        items?: KillSwitchListItem[];
-        error?: string;
-      };
-      if (!response.ok) {
-        throw new Error(body.error ?? `Load failed (${response.status})`);
-      }
-      setRows(body.items ?? []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [getIdToken]);
-
-  useEffect(() => {
-    if (user) void load();
-  }, [user, load]);
-
+export default async function SwitchesPage() {
+  const outcome = await readPostgresOrDegrade(() => listKillSwitches(100), 'kill switches');
+  const rows = outcome.status === 'ok' ? outcome.value : [];
+  const degradedReason = outcome.status === 'degraded' ? outcome.reason : undefined;
   const engagedCount = rows.filter((row) => row.enabled).length;
 
   return (
@@ -79,36 +64,28 @@ export default function SwitchesPage() {
             <span className="ds-mono">infra/gcp/kill-switches/</span> for the matrix and runbooks.
           </p>
         </div>
-        <button
-          type="button"
-          className="ds-button ds-button--secondary"
-          onClick={() => void load()}
-          disabled={loading}
-        >
-          {loading ? 'Refreshing…' : 'Refresh'}
-        </button>
       </header>
 
-      <p className="story-review__notice" role="status">
-        {engagedCount} engaged · {rows.length - engagedCount} disengaged
-      </p>
-
-      {error ? (
+      {degradedReason ? (
         <p className="story-review__alert" role="alert">
-          {error}
+          Switch state is unavailable — the operational database did not answer, so this page is
+          showing nothing rather than a stale or partial matrix. Reload to retry.{' '}
+          <span className="ds-mono">{degradedReason}</span>
         </p>
-      ) : null}
+      ) : (
+        <p className="story-review__notice" role="status">
+          {engagedCount} engaged · {rows.length - engagedCount} disengaged
+        </p>
+      )}
 
       <section className="story-review__queue" aria-label="Kill switches">
-        {loading && rows.length === 0 ? (
-          <p className="ds-mono">Loading kill switches…</p>
-        ) : rows.length === 0 ? (
+        {rows.length === 0 && !degradedReason ? (
           <p className="ds-sans">
             No kill switches found in this project. When configured, their state appears here —
             return to <Link href="/admin">Operations</Link> or review changes in{' '}
             <Link href="/admin/audit">Audit</Link>.
           </p>
-        ) : (
+        ) : rows.length > 0 ? (
           <div className="story-review__table-wrap">
             <table className="story-review__table">
               <caption className="ds-visually-hidden">
@@ -143,7 +120,7 @@ export default function SwitchesPage() {
             </table>
             <p className="story-review__queue-foot ds-mono">{rows.length} switches</p>
           </div>
-        )}
+        ) : null}
       </section>
     </main>
   );

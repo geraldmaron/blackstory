@@ -1,11 +1,22 @@
 /**
  * Source organization registry browser — read-only list of registered organizations.
+ *
+ * Server component (repo-gyq6.9): the organization list is read in the request instead of after a hydrate and a token refresh.
+ *
+ * The matching /admin/api route stays for callers outside this page. The Refresh button went
+ * with the client state: a server-rendered page IS the refresh.
  */
-'use client';
+import type { Metadata } from 'next';
+import { readPostgresOrDegrade } from '../../../admin/lib/canonical-postgres-client';
+import { listSourceOrganizations } from '../../../admin/sources/sources-store';
 
-import { useCallback, useEffect, useState } from 'react';
-import { useAdminAuth } from '../../../admin/auth/AdminAuthProvider';
-import type { SourceOrganizationListItem } from '../../../admin/sources/sources-store';
+export const metadata: Metadata = {
+  title: 'Sources',
+  description: 'Source organizations the archive reads from.',
+};
+
+/** Operational state is read at request time, never served from a cache. */
+export const dynamic = 'force-dynamic';
 
 function formatWhen(iso: string): string {
   if (!iso) return '—';
@@ -18,42 +29,13 @@ function formatWhen(iso: string): string {
   });
 }
 
-export default function SourcesPage() {
-  const { getIdToken, user } = useAdminAuth();
-  const [rows, setRows] = useState<readonly SourceOrganizationListItem[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = await getIdToken();
-      if (!token) {
-        setRows([]);
-        return;
-      }
-      const response = await fetch('/admin/api/sources?limit=100', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const body = (await response.json()) as {
-        items?: SourceOrganizationListItem[];
-        error?: string;
-      };
-      if (!response.ok) {
-        throw new Error(body.error ?? `Load failed (${response.status})`);
-      }
-      setRows(body.items ?? []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [getIdToken]);
-
-  useEffect(() => {
-    if (user) void load();
-  }, [user, load]);
+export default async function SourcesPage() {
+  const outcome = await readPostgresOrDegrade(
+    () => listSourceOrganizations(100),
+    'source organizations',
+  );
+  const rows = outcome.status === 'ok' ? outcome.value : [];
+  const degradedReason = outcome.status === 'degraded' ? outcome.reason : undefined;
 
   return (
     <main className="story-review ds-container ds-page" id="main">
@@ -67,26 +49,18 @@ export default function SourcesPage() {
             workflows.
           </p>
         </div>
-        <button
-          type="button"
-          className="ds-button ds-button--secondary"
-          onClick={() => void load()}
-          disabled={loading}
-        >
-          {loading ? 'Refreshing…' : 'Refresh'}
-        </button>
       </header>
 
-      {error ? (
+      {degradedReason ? (
         <p className="story-review__alert" role="alert">
-          {error}
+          Sources are unavailable — the operational database did not answer, so this page shows
+          nothing rather than a partial list. Reload to retry.{' '}
+          <span className="ds-mono">{degradedReason}</span>
         </p>
       ) : null}
 
       <section className="story-review__queue" aria-label="Source organizations">
-        {loading && rows.length === 0 ? (
-          <p className="ds-mono">Loading organizations…</p>
-        ) : rows.length === 0 ? (
+        {rows.length === 0 && !degradedReason ? (
           <p className="ds-sans">No source organizations found.</p>
         ) : (
           <div className="story-review__table-wrap">
