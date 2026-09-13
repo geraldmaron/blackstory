@@ -8,11 +8,13 @@ listed here; most invariants from the removed ADRs were already restated in
 `docs/data/`, `docs/security/`, `docs/mobile/security/threat-model.md`, and
 `docs/relationship-taxonomy.md`, and did not need duplication.
 
-- **Mobile client never imports server-only packages.** `apps/mobile` must never import
-  `packages/domain` or `packages/firebase` directly — those packages carry Node/`firebase-admin`
-  dependencies and are server-side only. The mobile app reads exclusively through
-  `apps/api-public`, sharing only environment-neutral wire types from `packages/public-contracts`.
-  (from ADR-022, "mobile data boundary")
+- **Mobile reads only through `apps/api-public`, and imports only client-safe packages.** The
+  mobile app shares environment-neutral wire types and pure helpers from
+  `packages/public-contracts` and reaches the server over HTTP only; `packages/firebase`,
+  `@repo/security` and `firebase-admin` are never imported from it. The blanket form of this
+  rule — "never imports `packages/domain`" — is no longer true: see "Mobile data boundary"
+  below for the one subpath that is imported, what the CI gate does and does not cover, and
+  the rest of this decision. (from ADR-022, "mobile data boundary")
 
 - **Admin never edits active public projections directly.** Changes to what the public site
   serves must go through the publication workflow (preview → promote / release activation), never
@@ -24,6 +26,20 @@ listed here; most invariants from the removed ADRs were already restated in
 Entities historically existed in four places (git fixtures, Firestore `canonicalEntities`,
 Supabase `bb_canonical.entities`, in-code hand-curated tables). This restates the ADR-020
 precedence rule. Firestore is leftover, not a current write path:
+
+**The number ADR-020 is shared by two unrelated decisions.** This entry is the web-series
+ADR-020, "Supabase Postgres as system of record." Under the pre-rename mobile numbering ADR-020
+was "Mobile stack — Expo React Native, MapLibre Native, and SQLite offline cache," which
+`apps/mobile` and `apps/mobile/README.md` still cite by that old number; it is recovered
+separately in this file under "Mobile stack". A mobile ADR-020 citation means nothing in this
+entry.
+
+**The number ADR-020 is shared by two unrelated decisions.** This entry is the web-series
+ADR-020, "Supabase Postgres as system of record." Under the pre-rename mobile numbering ADR-020
+was "Mobile stack — Expo React Native, MapLibre Native, and SQLite offline cache," which
+`apps/mobile` and `apps/mobile/README.md` still cite by that old number; it is recovered
+separately in this file under "Mobile stack". A mobile ADR-020 citation means nothing in this
+entry.
 
 - **Supabase `bb_canonical.entities` is the system of record.** It is the only place that a
   canonical entity is created, promoted, merged, or edited going forward.
@@ -293,23 +309,208 @@ build below which a client must force-update. `evaluateClientCompatibility` in
 enforces through the `X-BlackStory-Client` header and `CLIENT_VERSION_UNSUPPORTED`.
 (from ADR-021 §2, "app/API compatibility")
 
-**This recovery is PARTIAL, and deliberately so.** The two invariants above are the ones whose
-citations were load-bearing enough to mislead (the dependency direction was treated as binding in
-three files while being enforced nowhere) and whose current behavior could be read straight out of
-the code. ADR-021 was a much larger document: its remaining citations reference at least §1 (the
-`@repo/public-contracts` zero-runtime-dependency boundary, gated by
-`packages/public-contracts/scripts/check-boundary.mjs`), §3 (public-response redaction discipline
-and the submissions surface), §4 (mobile reaches the server over HTTP only, types-only from
-`public-contracts`), and a set of numbered "red-team resolutions" — of which #1 (the deprecation
-window) and #2 (`X-BlackStory-Client` / `CLIENT_VERSION_UNSUPPORTED` is a UX affordance for honest
-clients, never a security control) are cited by name.
+**What this recovery now covers.** The 2026-09-13 extension below (repo-gtm2y) takes the rest of
+what the citations reference: §1's `@repo/public-contracts` boundary and what
+`scripts/check-boundary.mjs` actually gates, §3's public-response redaction discipline and the
+submissions surface, §4's HTTP-only / types-only-from-contracts line, and the numbered red-team
+resolutions #1 (the deprecation window), #2 (`X-BlackStory-Client` / `CLIENT_VERSION_UNSUPPORTED`
+is a UX affordance for honest clients, never a security control) and #3 (correction shapes stay in
+the contracts package). Those citations are repointed here rather than left pointing at a file
+that does not exist.
 
-Those are NOT restated here, and their citations are left pointing at ADR-021 rather than
-rewritten. Each needs the same treatment these two got — read the code, state what is true now —
-and that is per-site topic judgment, not a find-and-replace. The precedent is the 2026-09-11
-addendum above, which corrected only the sites feeding its own decision and filed the rest.
-A blind sweep would restate rules nobody verified, which is how the dependency direction became
-binding-but-unwritten in the first place.
+What is deliberately NOT restated: the decisions in the ADR-021 that actually survived to the
+purge — Expo managed workflow with CNG, Expo Router, MapLibre Native, `expo-sqlite`, the
+version-pinning policy, the gitignored `ios/`/`android/` directories, and the iOS 16.4 / Android
+API 26 floor. Nothing in the citations recovered below is about any of that, for the reason the
+next paragraph gives.
+
+### Extension, 2026-09-13 (repo-gtm2y): the rest of what the ADR-021 citations mean
+
+**A number collision, found while recovering the rest — do not merge the two meanings.** Every
+"ADR-021 §N" in this repository's code means the document that was renumbered to **ADR-022** on
+2026-07-19 (commit `3b365d44`, which moved `ADR-020-mobile-stack.md` to `ADR-021` and
+`ADR-021-mobile-data-boundary.md` to `ADR-022`). This is the same off-by-one the 2026-09-12
+repo-30k6 addendum above found for the cache/offline and build/release numbers, one rename earlier
+than that note dates it. Under the numbering that survived to the purge, `ADR-021-mobile-stack.md`
+is the Expo / MapLibre Native / SQLite decision — §1 framework, §2 map, §3 Firebase access, §4
+local storage — and not one of the forty-eight citations recovered here is about any of that;
+their §1..§4 and their numbered red-team resolutions match `ADR-022-mobile-data-boundary.md`
+section for section, in both its pre- and post-rename copies. The mobile-stack decision is cited
+elsewhere under its own pre-rename number, ADR-020 (`apps/mobile/app.config.ts` still names the
+dead path `docs/adr/ADR-020-mobile-stack.md`), which is the ADR-020 collision already on record.
+The section numbers below are the ones the code uses; they are stable across the rename, which is
+why they are kept.
+
+**Section 1 — the `@repo/public-contracts` boundary, and what the gate actually checks.** The
+package declares exactly one runtime dependency, `zod`. Its `devDependencies` (`@types/node`,
+`tsx`, `typescript`) are build and test only, and `tsconfig.json` sets `"types": []` so no host
+ambient — `process`, `URL`, DOM — is even in scope, which is why `src/internal/primitives.ts`
+validates URLs with a regex instead of `new URL()`. The gate is
+`packages/public-contracts/scripts/check-boundary.mjs`, and it is a real CI gate rather than a
+convention: it is the first half of the package's own `test` script, so CI's "Run package tests"
+step (`pnpm -r --filter './packages/**' run --if-present test`, `.github/workflows/ci.yml`) runs
+it, and any change under `packages/public-contracts/` puts that lane in scope
+(`scripts/ci-local.sh`). (from ADR-021 §1, "hard boundary, not a convention")
+
+What it checks is narrower than its own header comment reads, and the narrowing matters. The gate
+is an ALLOWLIST: `ALLOWED_EXTERNAL_SPECIFIERS` is `new Set(['zod'])`, and any non-relative
+specifier that is not `zod` fails. The named `FORBIDDEN_PACKAGE_SPECIFIERS` list —
+`firebase-admin`, `@repo/domain`, `@repo/security`, `@repo/ops-data` — only changes the wording of
+the failure message; it is not what catches anything. So `@repo/firebase` and a direct Firestore
+import, both named in that header, do fail, but as an "unlisted external dependency" rather than
+by name. Every `node:`-prefixed specifier and every bare Node built-in name on the script's own
+list fails as well.
+
+"Transitive" is also narrower than it sounds. `scanOwnSource()` regex-scans every `.ts` under
+`src/` except `*.test.ts` and `src/testing/**`. `scanEntrypointGraph()` starts from the files
+`package.json`'s `exports` map names under the `development` condition and follows RELATIVE
+imports only. The one step past this package's own files is: for each external specifier that got
+through (only `zod` can), read that package's `package.json` and fail if it declares any runtime
+dependency at all. That is a "zod has zero runtime dependencies" assertion, not a bundle. No code
+is executed, Metro is never run, and the script says so in its own closing paragraph. (from
+ADR-021 §1, "a compile-time gate ... rather than code review")
+
+`src/testing/load-fixture.ts` uses `node:fs`, `node:path` and `node:url` legitimately. Its
+exclusion from the first pass is not what keeps that safe — what keeps it safe is that no
+`exports` entry points at it, so the entrypoint-graph pass never reaches it. Add an `exports`
+entry for `./testing` and the gate fails, which is the correct behavior and the actual guard.
+
+**Section 3 — what a public response cannot carry, and what still depends on the producer.** Three
+of the four "omitted by construction" claims at the top of
+`packages/public-contracts/src/v1/entity.ts` hold exactly as written. There is no numeric
+notability or relevance score anywhere in the contract: `notabilityBasisEntryV1Schema` carries
+`criterion`/`note`/`evidenceIds`, all strings, and `notabilityLabels` are bounded strings.
+`locationPrecisionSchema` is a closed enum of four tiers — `city`, `neighborhood`, `campus`,
+`institution` — so `'address'` and `'exact'` cannot be expressed, and `entity.test.ts` asserts it.
+No reviewer identity, moderation state, abuse signal, or internal source-lineage rollup field
+exists; claims carry only the public `independentLineageCount`.
+
+The fourth is weaker than the comment reads, and this is the correction worth keeping.
+`geoAnchorV1Schema` carries numeric `lat`/`lng` bounded only to valid coordinate ranges, so the
+wire type CAN express a street-level point. The precision guarantee is not structural: it is the
+closed `locationPrecision` enum plus the projection that produced the anchor, both upstream of the
+contract. The true statement is "the contract cannot express a precision tier finer than
+institution," not "the contract cannot express a raw coordinate." (from ADR-021 §3, "no precise
+location ... in any v1 response shape")
+
+The mechanical redaction is the zod parse. `apps/api-public/src/http/data-access.ts` validates
+every entity against `entityV1Schema` before it leaves the module and zod strips unknown keys, so
+the guarantee holds across adapters rather than per adapter.
+`apps/api-public/src/http/redaction.test.ts` is the negative snapshot that proves it: it pushes a
+deliberately polluted entity through the real router and asserts that `notabilityScore`,
+`relevanceRankingScore`, `preciseLocation`, `residentialAddress`, `internalReviewNotes`,
+`sourceLineageInternal`, `moderationState`, `draftOnly`, `unpublishedStatus` and `__collection`
+never appear; that a search result additionally carries no `score`, `relevance`, `evidenceCount`
+or `connectionCount`; that a citation's `protectedFromPublicLink`, `protectedReason` and
+`internalDocumentId` are stripped; and that a media object's `gsUri` never reaches the wire.
+`toSearchResult` is where the no-number rule lives on the search path — a result explains itself
+through `matchedOn`, `matchedText` and `explanation`.
+
+One part of section 3 is NOT gated by anything. `errorResponse` in
+`apps/api-public/src/http/responses.ts` emits a bounded `message` and bounded `details`, but
+nothing inspects what a caller put in that string; `publicApiErrorSchema` bounds shape and size
+only. "Never a stack trace, internal path, collection name, or secret" is discipline at each call
+site, not enforcement, and should be read that way.
+
+**The submissions surface, and the one comment about it that had gone stale.**
+`apps/api-submissions` serves the corrections write path today: `src/http/router.ts` routes
+`POST /v1/corrections` and `POST /v1/corrections/status` into `src/http/handlers.ts`, and every
+write goes through `createSubmissionQuarantineService().intake()`, so a client can enqueue a
+quarantined correction and nothing else. `apps/mobile/src/features/corrections/contract.ts` still
+said the route was not wired; that was true when it was written and is not true now. (from
+ADR-021 §3, "no write endpoints beyond the single, explicit exception")
+
+Red-team resolution #3 — keep the correction shapes in `public-contracts`, do not fork a second
+contracts package — is only half-honored, and anyone about to treat it as settled should know
+that. `packages/public-contracts/src/v1/corrections.ts` exists and is exported at
+`./v1/corrections`, but nothing imports it: `apps/api-submissions` does not depend on
+`@repo/public-contracts` at all, and `apps/mobile/src/features/corrections/categories.ts` and
+`contract.ts` declare their own copies. The category and target vocabulary is written out three
+times — web, mobile, api-submissions — plus that unused contract module. What makes the
+duplication safe is real and is stated in every copy: the server re-validates against its own list
+on intake (`correction-intake.ts`), so a drifted client fails a submission rather than smuggling
+an unknown category through.
+
+**Section 4 — HTTP-only holds; "types only" does not.** Mobile does reach the server over HTTP
+only: `apps/mobile/src/security/api-client.ts` for `apps/api-public`, and
+`src/features/corrections/client.ts` for `apps/api-submissions`. There is no server import path,
+and the only client write is the quarantine intake.
+
+The "types only, no runtime coupling" half is not what the code does any more.
+`apps/mobile/package.json` declares `@repo/public-contracts` as a `file:` dependency, and mobile
+imports runtime values from it: `mapSourceV1Schema` is parsed at runtime in
+`features/explore/map-source-client.ts` and `features/entity/use-ordered-entity-ids.ts`,
+`evidenceLabel` and `evidenceMeterLabel` come from `/evidence`, `stripInternalIds` from
+`/narrative-text`, the destination catalog from `/destinations`, and `ENTITY_KINDS` and
+`CLAIM_ROLES` from `/v1/entity` and `/v1/claim`. The invariant that actually holds is the narrower
+one the ADR's own diagram note stated: the package carries no shared runtime service, singleton or
+transport, only pure zod schemas and pure functions — which is exactly what `check-boundary.mjs`
+keeps true. Several mobile files still carry an "INTEGRATION GAP" note saying
+`@repo/public-contracts` cannot be imported here; `features/entity/types.ts` said it four lines
+above an import of it.
+
+"Mobile never imports `@repo/domain`" is likewise no longer literally true, and this one carries
+more weight. `apps/mobile/package.json` declares `@repo/domain` and `@repo/domain-core` as `file:`
+dependencies, and `src/features/record-facts/record-facts.ts` imports `deriveEraBuckets`,
+`filterDecadesAtOrBeforeCurrent` and `isDatePrecision` from `@repo/domain/era` — a re-export shim
+over `@repo/domain-core/era`, a package that carries no node or `firebase-admin` dependency.
+
+A correction to how this got here: `eas-build-post-install` does NOT compile both, despite
+declaring both as dependencies. The script only runs `tsc` for `public-contracts` and for
+`domain` — it never separately builds `domain-core`, even though `domain`'s own `package.json`
+depends on `@repo/domain-core` and `domain`'s `tsconfig.json` resolves that import through
+`node_modules`, which needs `domain-core`'s (gitignored) `dist` to already exist. Removing that
+`dist` and re-running `tsc -p packages/domain/tsconfig.json` fails immediately with dozens of
+"Cannot find module '@repo/domain-core/...' or its corresponding type declarations" errors
+(confirmed by doing exactly that). Whether the real EAS Build cloud environment has
+`domain-core` built by some step outside this script is not established here and should be
+checked before trusting that a from-scratch native build actually succeeds. What is forbidden
+in practice is the barrel and any server-only subpath, not the package name. Nothing lints
+that. `scripts/validate-boundaries.mjs` does reach `apps/mobile` — it discovers every
+directory under `apps/` and `packages/` that carries a `package.json`, independently of the pnpm
+workspace `apps/mobile` is excluded from — but its only rules are app-cannot-import-a-deployable-
+app, one `@repo/data-access` file rule for the staff-gated admin routes, and dependency cycles.
+None of them says anything about which `@repo/domain` subpath a client may import. A reviewer is
+the only thing between the mobile bundle and a node built-in on this edge.
+(from ADR-021 §4, "apps/mobile NEVER imports packages/domain or packages/firebase directly")
+
+**Red-team resolution #1 — the deprecation window is documentation, and the soft signal is
+dormant.** `DEPRECATION_WINDOW_DAYS = 90` lives in `packages/public-contracts/src/version.ts` and
+`version.test.ts` asserts the value. Nothing reads it to retire anything; `evaluateCompatibility`
+only echoes it into the `/v1/compatibility` body. That is deliberate — the constant is a floor,
+not a timer — but it does mean the ninety days is kept by a human holding a bead, not by code. The
+soft nudge is `softDeprecated`, computed in `packages/public-contracts/src/v1/compatibility.ts` as
+`supported && !isCurrentMajor`, which `handleCompatibility` turns into a `Deprecation: true`
+response header. Two narrowings the citations hid: that header rides only `/v1/compatibility`,
+never an ordinary read, so an honest client learns it by asking rather than by being told; and
+with `API_VERSION` and `MIN_SUPPORTED_API_VERSION` both `'v1'` today, `softDeprecated` is false
+for every real client and the header is never actually sent. The path exists and is unexercised
+until a `v2` ships. (from ADR-021 red-team resolution #1, "deprecation window length")
+
+**Red-team resolution #2 — the floor fails open, on purpose.** `parseClientApiVersion` in
+`apps/api-public/src/http/handlers.ts` returns `undefined` for an absent or unparseable
+`X-BlackStory-Client` header, and `enforceClientFloor` returns `null` — serve normally — on
+`undefined`. Omitting the header is therefore never a denial, and that fail-open is the
+code-level expression of "a UX affordance for honest clients, never a security control." The floor
+runs on five read handlers.
+
+A claimed asymmetry does not survive checking. `isApiVersionBelowFloor` does fail CLOSED (treats
+as below-floor) on a value its own `/^v(\d+)$/` regex can't parse — `compatibility.test.ts`
+asserts exactly that — but no live HTTP request can reach that branch. `parseClientApiVersion`'s
+own regex already reduces every header it can parse at all into a canonical `v<digits>` string
+that `isApiVersionBelowFloor`'s regex always accepts, and any header it cannot parse becomes
+`undefined`, which both live call sites (`enforceClientFloor` and `handleCompatibility`) treat
+exactly like an absent header. So today there is no HTTP-observable difference between a client
+that sends nothing and one that sends an unparseable version string — both are served normally.
+The fail-closed branch is real and unit-tested; it just is not reachable from `apps/api-public` as
+the code stands today, only from a caller that invokes `evaluateCompatibility`/
+`isApiVersionBelowFloor` directly with an already-malformed string.
+`CLIENT_VERSION_UNSUPPORTED` and `CLIENT_VERSION_UNSUPPORTED_HTTP_STATUS = 426` sit together in
+`packages/public-contracts/src/errors.ts`, and `responses.ts`'s `ERROR_CODE_STATUS` reads the
+constant rather than repeating `426`, so both sides compile against one pair. Nothing here is an
+authorization boundary: the real controls are server-side re-validation of every parameter and the
+absence of a canonical write path. (from ADR-021 red-team resolution #2, "header spoofing")
+
 
 ## Vector search (recovered 2026-09-13, repo-gtm2y)
 
@@ -1118,3 +1319,932 @@ way (`packages/ops-data/scripts/load-banned-books-to-supabase.ts`,
 `apps/mobile/src/features/corrections/idempotency.ts`,
 `apps/mobile/src/data/db/memory-store.ts`). Any future citation or invariant sweep must use
 `grep -a`. (from ADR-023, "mobile cache and OTA release")
+
+**Correction, 2026-09-13:** the paragraph in this section beginning "Query text, correction content and precise location never reach the SQLite cache, but that guarantee is narrower than the comments in the code claim" quotes `db/schema.ts` and `cache-policy.ts`'s NOTE comments as currently overstating the never-cache guarantee ("nowhere to land on disk" / "no code path to persist those categories"). That quote is the text as it read before the same 2026-09-13 recovery commit that wrote this section (`e9ac2b5b`). That commit also rewrote both comments in place: `db/schema.ts`'s NOTE now says the categories have "nowhere to land in THIS store" and adds "It is not a whole-app guarantee: normalized recent-search terms are persisted to SecureStore under the recorded repo-30k6 exception"; `cache-policy.ts`'s NOTE gained the equivalent caveat sentence in the same diff. A reader checking either file today will find the caveat already in place, not the absolute claim quoted in that paragraph. The quote is retained there only as the reasoning trail for why the caveat exists, not as today's text. (from ADR-023 §2, "mobile cache and OTA release")
+
+## Public projection and immutable publication snapshots (recovered 2026-09-13, repo-gtm2y)
+
+`docs/adr/ADR-004-public-projection-immutable-snapshots.md` does not exist. Twenty-nine source
+comments across twenty-one files cite it, several of them as the authority for how publishing
+works, and the one bullet this file already carried for it ("Admin never edits active public
+projections directly", above) promised the whole model in its title and delivered a line of it.
+Recovered from the code, with the removed document read out of git history as a cross-check. Where
+the two disagree the code wins, and this section says so each time.
+
+**What the section numbers in the citations mean.** ADR-004's decisions were numbered: 1, canonical
+evidence, claims and research data are not public-readable; 2, denormalized public projection tables
+are the live query surface; 3, each publication produces an immutable release record with a signed
+manifest and a search-index version; 4, public JSON snapshots per release for degraded rendering;
+5, release activation is atomic; 6, instant rollback by switching the active pointer; 7, draft and
+preview releases are admin-only; 8, every public fact maps to accepted claim and evidence records.
+`packages/public-contracts/src/v1/entity.ts`'s "ADR-004 §1" means the first of those. The document
+also recorded, at acceptance on 2026-07-16, that the projection tables and `workers/publication`
+were "Not implemented"; none of the citations below should be read as describing a shipped pipeline.
+
+**The existing bullet is true of the admin console, which cannot touch an active public projection
+and cannot activate a release either.** Nothing under `apps/web/src/admin/**` writes `bb_public`:
+the only two mentions are a SELECT of the active-release pointer
+(`apps/web/src/admin/lib/postgres-publication.ts`) and a comment in `admin/lib/entity-merge.ts`
+saying a merge deliberately leaves `release_entities` and `search_index` alone. The release action
+surface is explicitly inert: `POST /admin/api/releases/stage`
+(`apps/web/src/app/admin/api/releases/stage/route.ts`) authorizes the caller, demands a durable
+reason, and then returns `executionAllowed: false` with a note saying the active public pointer was
+not changed. What backs the rule is the Postgres grant layer rather than a test: `bb_public` writes
+are reserved for `service_role`, which the admin pool does not hold, and no test asserts the absence
+of an admin write path. (from ADR-004, "public projection and immutable publication snapshot model")
+
+**The wider reading, that nothing edits an active public projection in place, is false.** The live
+publish path is `packages/ops-data/scripts/publish-release-entities-incremental.ts`, which upserts
+rows into `bb_public.release_entities` and `bb_public.search_index` under the id already sitting in
+`bb_public.active_release`. Dozens of `packages/ops-data/scripts` fix and backfill passes do the
+same, and `theme-packets.ts` upserts and deletes `bb_public.release_theme_impact_packets` that way
+too. No new release id is minted and no pointer moves.
+`apps/web/src/lib/public-data/live-policy.ts` already documents the consequence for the published
+CDN artifacts (repo-19mxs). So "publication goes through preview, then promote" describes a design,
+and an operator running a script under `service_role` is what actually changes what the public sees.
+(from ADR-004, "public projection and immutable publication snapshot model")
+
+**Exactly one release is active at a time, and that part is enforced by the database.**
+`bb_public.active_release` is a single-row table (`id text PRIMARY KEY DEFAULT 'active' CHECK
+(id = 'active')`, `supabase/migrations/20260720220008_publication_public.sql`). Every public read
+policy in `supabase/migrations/20260720220010_rls_policies.sql` scopes its select to
+`(SELECT release_id FROM bb_public.active_release WHERE id = 'active')`, and insert, update and
+delete on that pointer are revoked from `PUBLIC`, `anon` and `authenticated`. That is what makes
+`apps/mobile/src/features/entity/dataClient.ts`'s shortcut sound: any endpoint's
+`revision.releaseId` names the same release `/v1/bootstrap` would. It is also what keeps a draft or
+preview release invisible without any application code: `bb_publication.releases.status` allows
+`draft` and `preview`, and rows carrying those release ids simply never match a public select.
+(from ADR-004 §5 and §7, "public projection and immutable publication snapshot model")
+
+**Nothing in this repo flips the pointer today, but the function-level gate is not the only path
+that writes it.** `bb_publication.activate_release(text)` is a `SECURITY DEFINER` function that
+refuses the `research` role outright and otherwise requires `service_role`, DB `postgres`, or a
+`publication`/`admin` `bb_role`. Its one caller is `bb_publication.activate_research_release` in
+`supabase/migrations/20260721041950_research_kernel_ledger.sql`, which additionally demands an
+approval lineage whose publisher and producer are distinct identities, whose reviewer and producer
+are distinct identities, and whose reviewer and producer are not the same model family. No
+TypeScript calls either function directly, but "every `bb_public.active_release` reference in
+application and script code is a SELECT" is not true of the code that exists, only of the code
+that runs: `packages/data-access/src/postgres/release-store.ts`'s `syncPublicationPointerRow`
+issues a raw `INSERT ... ON CONFLICT DO UPDATE` straight into `bb_public.active_release` (and into
+`bb_publication.releases.signed_manifest` — see below), bypassing every check `activate_release`
+enforces: the research-role denial, the distinct-identity and model-family lineage requirement,
+all of it. Like the release-activation state machine below, this function has no caller anywhere
+in the repo outside its own package (`packages/data-access/src/postgres/release-activation.ts`,
+its own tests, and the re-exporting barrel `index.ts`), so nothing running today exercises this
+path — but a reader should not generalize "is a SELECT" from the citation sites to the codebase.
+Whatever Postgres role this store's pool authenticates as would need direct table INSERT
+privilege for the write to succeed, since RLS revokes INSERT on this table from `PUBLIC`, `anon`
+and `authenticated` alike; which role a live caller would use, and whether granting it write access
+would also hand it a path around `activate_release`'s checks, was not traced further here. (from
+ADR-004 §5, "public projection and immutable publication snapshot model")
+
+**Atomic activation, rollback and garbage collection are fully implemented and fully unwired.**
+`packages/domain/src/publication/release-activation.ts` is the real thing. It validates every
+artifact's hash before anything is persisted; it writes artifacts through a store whose
+`putArtifact` throws `IMMUTABLE_ARTIFACT_VIOLATION` when an existing path would receive different
+content; and only then does it flip one pointer by compare-and-set, so a losing concurrent
+activation throws `CONCURRENT_ACTIVATION` having written nothing but content-identical bytes.
+`rollbackTo` re-validates the whole target release and flips the same pointer, restoring every
+artifact hash together and never a mix. `collectGarbage` retains the active and the
+immediately-previous release, and the store itself refuses to delete either, which pins rollback
+depth at one on purpose. `packages/data-access/src/postgres/release-activation.ts` is the
+Postgres-backed async twin. Both are exercised only by their own tests: `activateRelease`,
+`rollbackTo`, `collectGarbage`, `activateReleaseAsync` and `rollbackToAsync` have no production
+caller anywhere in the repo. Read that module as a design that is ready, not as a description of
+what runs. (from ADR-004 §5 and §6, "public projection and immutable publication snapshot model")
+
+**The signed release manifest is a library, not a live gate, and at least two comments in the tree
+claim otherwise.** `signReleaseManifest` and `verifySignedReleaseManifest`
+(`packages/domain/src/publication/index.ts`, ECDSA over canonical JSON) are imported only by
+`packages/domain/src/publication.test.ts` — a header comment in `packages/domain/src/datapacks/
+manifest.ts` names both functions but imports neither. `bb_publication.releases.signed_manifest` is
+`jsonb NOT NULL DEFAULT '{}'::jsonb`, and while it is not quite true that nothing in the repo writes
+it — the same unwired `syncPublicationPointerRow` from the paragraph above would write a
+`{mobileBootstrap, manifestHash}` object into it if anything called it — nothing does call it, so
+every row's `signed_manifest` is the empty default in practice. Nothing on the read path verifies a
+manifest hash: `bb_public.active_release.manifest_hash` is read from Postgres in three places, not
+one — the admin releases list, and both apps' `postgres-readers.ts`
+(`apps/web/src/lib/public-data/postgres-readers.ts`, `apps/api-public/src/http/postgres-readers.ts`)
+— but only the admin surface does anything with the value once read: it displays it. Both
+application readers parse it into a doc and then drop it before it reaches a response —
+`apps/api-public`'s `mapActiveReleaseToPointer` builds `ReleasePointer` with no `manifestHash` field
+at all, and `apps/web`'s `getPublicActiveReleaseMeta` returns only `releaseId`/`activatedAt`. So
+`apps/web/src/admin/lib/entity-merge.ts`'s "the signed manifest is still the only thing that changes
+what is live" is not true today, and neither is this file's own 2026-08-04 sentence "Publishing is
+still preview to promote to release activation behind the signed manifest". Both are statements of
+intent. (from ADR-004 §3, "public projection and immutable publication snapshot model")
+
+**A release artifact is a canonical-JSON object at a release-scoped path, hashed when it is
+generated, and only two of the eight kinds are ever published.**
+`packages/domain/src/publication/release-paths.ts` defines eight paths under
+`public/releases/{releaseId}/`: `entities.json`, `search-index.json`, `map/source.json`,
+`map/state-aggregates.json`, `map/county-aggregates.json`, `map/bounded-points.json`,
+`content/index.json` and `bootstrap.json`. `sealArtifact` canonicalizes, SHA-256 hashes and measures
+raw and gzip size deterministically, which is where "content-addressed" comes from. Only the first
+two have a live publisher (`packages/ops-data/scripts/publish-release-catalog-artifacts.ts`) and a
+live consumer (`packages/domain/src/publication/release-artifact-fetch.ts`, and through it
+`apps/web`'s public data layer and `apps/api-public/src/http/release-artifact-catalogs.ts`). The
+other six are referenced only inside the unwired activation path. The per-entity JSON snapshots of
+decision 4 (`publicEntitySnapshotPath`, `publicEntityProjectionPath`) are never written by anything.
+(from ADR-004 §3 and §4, "public projection and immutable publication snapshot model")
+
+**A published artifact is release-scoped, not content-addressed, and not immutable.** The publisher
+uploads through the Supabase Storage REST API with `x-upsert: true`
+(`packages/ops-data/scripts/lib/release-catalog-publish-upload.ts`), so the object at
+`public/releases/{releaseId}/entities.json` is rewritten in place whenever a script corrects
+`bb_public` under an unchanged release id. The read-side guard compares only `releaseId`
+(`release-artifact-fetch.ts`), never a hash, so a pre-correction artifact and a post-correction one
+are indistinguishable to a consumer. That is the gap `live-policy.ts` spells out, and it bounds
+worst-case artifact staleness at roughly 24 hours: a manual
+`publish-release-catalog-artifacts.yml` dispatch after each script, with a daily cron as
+forgetting-insurance. `apps/api-public/src/http/release-artifact-catalogs.ts` called those objects
+"release-versioned and immutable"; the first half was right. (from ADR-004 §3, "public projection
+and immutable publication snapshot model")
+
+**Release and revision metadata on every public response, and CDN-friendliness, are the parts wired
+end to end.** `revisionMetadataV1Schema` (`packages/public-contracts/src/v1/revision.ts`) is a
+required field of `entityV1Schema` and of the bootstrap response, so no entity can leave
+`apps/api-public` without naming the release it came from. `apps/api-public/src/http/responses.ts`
+pairs released reads with `public, max-age=60, stale-while-revalidate=300` and a strong ETag
+computed over the canonical JSON body, answering a matching `If-None-Match` with a bodiless 304;
+the release pointer gets a shorter 30-second TTL so a new release is picked up promptly, and
+operational endpoints are `no-store`. (from ADR-004, "public projection and immutable publication
+snapshot model")
+
+**The coordinate a public projection carries was reduced before it was published, and the wire DTO
+has no field that could carry a raw one.** `reducePublicPrecision` and `redactLocationForPublic`
+(`packages/security/src/redaction.ts`) run on the publish path, and `redactLocationForPublic` runs
+only when `reducePublicPrecision` actually reduced, which is the part
+`packages/ops-data/scripts/resync-release-location-precision.ts` calls out as easy to get wrong.
+The single-engine rule is written down at `docs/security/location-precision-standard.md` §4.
+`geoAnchorV1Schema` (`packages/public-contracts/src/v1/entity.ts`) then carries only `lat`, `lng`,
+`geohash` and `matchMethod`, and `locationPrecision` is one of four public tiers. Decision 1, the
+other half of that file's citation, is enforced by grants rather than by the DTO:
+`supabase/migrations/20260720220002_schemas_roles.sql` gives `anon` usage on `bb_public` and
+`bb_reference` only and reserves `bb_canonical` for `service_role`. (from ADR-004 §1, "public
+projection and immutable publication snapshot model")
+
+**Degraded mode is real on mobile and absent on the server.** `createInMemoryPublicDataAccess`
+(`apps/api-public/src/http/data-access.ts`) is a complete adapter that would serve a fixed set of
+already-released, already-redacted projections, but production never populates it:
+`apps/api-public/src/http/compose.ts` constructs it as `{ entities: [] }` whenever the live-Postgres
+gate fails, and the handlers then return `UPSTREAM_UNAVAILABLE` rather than serve anything. The
+ADR's "entity pages must remain serveable if live APIs are disabled", which
+`apps/mobile/src/features/search/search-controller.ts` quotes correctly, is satisfied today by the
+mobile SQLite cache and by CDN caching of already-fetched responses. There is no server-side
+snapshot to fall back to. (from ADR-004, "public projection and immutable publication snapshot
+model")
+
+
+## Map stack (recovered 2026-09-13, repo-gtm2y)
+
+`docs/adr/ADR-013-map-stack.md` does not exist. Twenty-seven source comments across seventeen
+files cite it, one of them by that dead path, and five further citations sit in `docs/` and in
+`workers/publication/MAP_SOURCE_INTEGRATION.md`. Recovered from the code and from the removed
+document in git history (`git show a2f559f8^:docs/adr/ADR-013-map-stack.md`). Several citations
+restate rules the code has since moved past; those are corrected below rather than repeated.
+
+**This is one decision, not a number collision.** ADR-013's citations fall into two territories
+that look unrelated: the web/domain map data platform, and a handful of `apps/mobile` design-token
+comments. They are one number. The mobile ADRs were renumbered on 2026-07-22 into the 021-025
+range and there was never a mobile ADR-013 (`git log --diff-filter=A --name-only -- 'docs/adr/*'`
+shows every mobile ADR created at 020-023 and renumbered upward). The map-plate comments are
+genuine ADR-013 material. The two elevation-token comments are a misattribution with a traceable
+origin, recorded at the end of this section.
+
+**MapLibre GL JS on both surfaces; the tile strategy shipped as neither of the two options.**
+ADR-013 chose MapLibre GL JS for its license and its ability to render a GeoJSON
+`FeatureCollection` directly, preferring self-hosted Protomaps PMTiles served from a static CDN,
+with managed MapTiler as the fallback if authoring a PMTiles archive cost too much engineering
+time. Neither landed. Web `/explore` renders free OpenFreeMap vector tiles
+(`OPENFREEMAP_TILE_SOURCE_URL` in `apps/web/src/lib/map-experience/dignity-style.ts`, wired in
+`apps/web/src/app/map/explore-style.ts`), and mobile defaults to the same source with PMTiles as an
+optional `extra.map.pmtilesUrl` that is not configured
+(`apps/mobile/src/features/map/mapConfig.ts`). MapTiler was never introduced. PMTiles is still the
+stated target on both surfaces, so a reader should treat it as unbuilt work, not a rejected
+option. Mobile additionally carries `MAP_BASEMAP_ENABLED`, a kill switch that detaches every tile
+source and leaves entity points over a flat dark canvas with zero tile egress; the web map has no
+equivalent. (from ADR-013 §1 and §2, "map library" / "tile strategy")
+
+**The dark archive register survives, but the web half of the rule is gone.** ADR-013 §3 was
+explicit that the map canvas is a fixed dark register regardless of the surrounding site's
+light/dark toggle, on the analogy of a printed archival map insert. That is no longer true on web.
+`plateFor(scheme, satellite)` in `apps/web/src/lib/map-experience/dignity-style.ts` returns a
+complete light plate as well as a dark one; `readDocumentColorScheme()`
+(`apps/web/src/components/map-stage/color-scheme.ts`) reads `data-theme` off the document root, so
+the plate follows the site theme and is dark only by default; and `?sat=1` swaps the cartographic
+plate for USGS aerial imagery entirely. The demo-stage `apps/web/src/app/map/dark-archive-style.ts`
+that ADR-013 named is gone, replaced by `explore-style.ts`. What survives intact is the rule
+underneath the register: every color comes from the brand palette through `dignity-style.ts`, the
+style introduces no new hues, and there is no red violence marker and no density-keyed heat ramp on
+either surface. On mobile the original rule does still hold literally:
+`apps/mobile/src/features/map/mapStyle.ts` binds `themeColors.dark` unconditionally, so the native
+plate does not flip with the OS theme, while `resolveThemeName`
+(`apps/mobile/src/ui/tokens/index.ts`) defaults everything outside the plate to the light Archive
+Paper theme. Read "fixed dark plate" as a mobile rule and a web default today, not a cross-surface
+invariant. (from ADR-013 §3, "basemap style")
+
+**The redaction-injected builder is intact, and it is now the shared spine of three surfaces.**
+`buildMapSource` (`packages/domain/src/map/map-source.ts`) takes a `redactLocation` port by
+dependency injection and never reads a raw coordinate for output; every coordinate that reaches a
+feature or an aggregate is that function's return value. `map-source.redaction.test.ts` wires the
+real `redactLocationForPublic` from `@repo/security`, not a stub, against a living-person
+residential fixture and asserts the literal raw value never appears in the serialized output.
+`map-source.ts` keeps zero runtime import of `@repo/security` and its own header comment explains
+that as cycle avoidance ("that package already depends on `@repo/domain`"), but that rationale is
+stale and the correction matters: `@repo/security` is a full `dependencies` entry (not a
+devDependency) of `@repo/domain`'s `package.json`, and it is imported at runtime across dozens of
+files in `packages/domain/src` (`era.ts`, `relationship.ts`, `release-activation.ts`, and others) —
+not "only by the test and the demo generator." The cycle claim itself is also backwards:
+`@repo/security` imports `@repo/domain-core`, not `@repo/domain` — `@repo/domain-core`'s own header
+comment says this package exists precisely so `@repo/security` can read shared primitives "without
+importing @repo/domain (which imports @repo/security)." So `@repo/domain` depends on
+`@repo/security`, `@repo/security` depends on `@repo/domain-core`, and there is no reverse edge for
+a direct import in `map-source.ts` to close. The injection here is a genuine and useful discipline
+— the regression test proves the invariant against the real function without this one module
+importing it — just not the forced-by-a-cycle discipline ADR-013 and the module's own comment both
+describe it as. Three independent callers now inject the real function at their own layer: web
+Explore (`buildExploreMapSource` in `apps/web/src/lib/map-experience/build-explore-map-source.ts`),
+`api-public`'s `GET /v1/map` (`apps/api-public/src/http/build-map-source-v1.ts`), and the
+release-activation state machine. All three depend on the invariant holding inside the domain
+function, so weakening it is a change to three public surfaces at once, not to one module. (from
+ADR-013 §4, "map data platform")
+
+**Release-coupled build: implemented, and still called only from tests.** ADR-013 §5 recorded the
+integration point as designed but not wired, and named the artifact layout.
+`generateReleaseArtifacts` (`packages/domain/src/publication/release-activation.ts`, MOB-005) now
+does exactly what that section described. It builds the map source and the state/county
+aggregates through `buildMapSource`, plus a bounded flat-point artifact, a content index and the
+mobile bootstrap manifest; hashes and canonicalizes every one; persists them content-addressed
+and immutably, so an existing path may only be rewritten with byte-identical content; activates
+by flipping one pointer under compare-and-set; and refuses to garbage-collect the active or the
+rollback-target release. The paths are in `release-paths.ts`:
+`public/releases/{id}/map/source.json`, `.../map/state-aggregates.json`,
+`.../map/county-aggregates.json`, `.../map/bounded-points.json`. What has not happened is the
+wiring.
+`generateReleaseArtifacts` and `activateRelease` have no caller outside
+`release-activation.test.ts` and `release-evidence.test.ts`. The publisher that actually runs,
+`packages/ops-data/scripts/publish-release-catalog-artifacts.ts`, emits `entities.json` and
+`search-index.json` and no map artifact at all. Nothing anywhere reads `map/source.json`. The live
+map surfaces build their own source per request or per build instead. So the artifact path exists,
+is tested, and is unused, and a comment that says "not wired live" is right about the outcome even
+where it is now wrong about the cause. (from ADR-013 §5, "release-coupled build")
+
+**Two size budgets, one of which is enforced.** `DEFAULT_BOUNDED_POINTS_BUDGET`
+(`release-activation.ts`) is 5,000,000 raw bytes and 1,500,000 gzipped, measured at a fixed gzip
+level so the number is deterministic across machines, and it is a real gate:
+`generateReleaseArtifacts` throws `BUDGET_EXCEEDED` rather than letting an oversized payload become
+a release. It covers `map/bounded-points.json` only. `map/source.json` has no budget. The ~2 MB
+gzipped figure ADR-013 set for the flat GeoJSON survives as `MAP_FLAT_GEOJSON_MAX_GZIP_BYTES` (with
+`MAP_FLAT_GEOJSON_MAX_FEATURE_COUNT = 50_000`) in `apps/mobile/src/features/map/mapConfig.ts`,
+where it is exported and nothing asserts against it. So the migration trigger those numbers were
+meant to arm, moving per-point data to vector tiles rather than growing the flat file, is a rule a
+human has to notice on mobile, while on the release path the only gate that fires is the
+bounded-points one. For scale, `apps/web/src/lib/map-experience/door-catalog.ts` records the live
+pin GeoJSON at roughly 2.3 MB uncompressed. (from ADR-013, "perf budget" / "migration triggers")
+
+**Known gaps, narrower than the ADR left them.** State attribution is still bbox-first, but the
+flat "an approximate bounding-box test, not polygon geometry" is no longer the whole truth. The
+repo vendors the Census 1:20,000,000 cartographic boundary file at
+`packages/domain/src/map/data/us-states-20m.json` (the same GeoJSON `apps/web` serves at
+`/geo/us-states-20m.geojson`), and `state-boundary-geometry.ts` ray-casts it through the same
+`pointInPolygonRings` helper the publish-time geo-integrity gate uses. Those polygons are consulted
+only when a point falls inside more than one state's rectangle, which is the case that used to put
+Philadelphia in New Jersey and the Milliken's Bend river point in Mississippi. A single unambiguous
+bbox match still wins outright with no polygon check, so a point outside a state's true shape but
+inside only its rectangle can still resolve wrong; that fast path is the gap that remains. The
+NJ/NY Hudson-divide carve-out survives as a fallback for an inconclusive polygon test, not as the
+primary fix. County attribution is unchanged and is the larger gap: `buildMapSource` populates a
+county aggregate only from an explicit upstream jurisdiction hint and never derives one from a
+coordinate. That is true even though county polygons are now vendored for rendering
+(`apps/web/public/geo/us-counties-20m.geojson`) and drive the county choropleth layers. Drawing
+county shapes and attributing a point to a county are different jobs, and only the first one is
+done. (from ADR-013, "known gaps")
+
+**Correction: the explore style does have a glyph server.** Two sentences in
+`apps/web/src/app/map/explore-style.ts` attributed a rendering limit to ADR-013's known gaps and
+got the cause wrong. The style sets `glyphs` to `OPENFREEMAP_GLYPHS_URL`, and
+`EXPLORE_CLUSTER_COUNT_LAYER_ID` is a live `symbol` layer rendering `point_count_abbreviated` in
+Noto Sans Regular, faded on decade transitions by `decade-layer-transition.ts`. It is not the
+"documented no-op" the comment claimed. What is actually missing is an icon **sprite**: the style
+declares none, so there is no way to draw literal square/diamond/ring marker geometry, which is why
+kind identity is carried by a fill/stroke signature on circle layers and by CSS shapes in the
+legend. The limit is real; its stated cause was not. (Corrected 2026-09-13, repo-gtm2y.)
+
+**Correction: the mobile elevation tokens are not ADR-013.** `apps/mobile/src/ui/LiftedSurface.tsx`
+and `apps/mobile/src/ui/tokens/elevation.ts` cite ADR-013 for the rule that mobile surfaces are
+flat matte except map floating instruments, which may opt into an `sm` shadow. ADR-013 contains no
+sentence about elevation, shadow or lift. The rule's real home is
+`docs/ui/design-direction-v6-mobile.md`, which states the narrow `getShadowStyle` exception "for
+map floating instruments only" and which is also where the ADR-013 attribution was invented (it
+writes "flat matte everywhere except the ADR-013 map plate", conflating the plate's dark register
+with a shadow allowance). That document still exists and can be opened, so those comments point
+there. Worth knowing before anyone defends the exception: nothing under `apps/mobile/src` passes
+`shadow="sm"` today, and the one explicit call site passes `shadow="none"`
+(`features/explore/explore-edition-chrome.tsx:244`), so this is a permission nobody has taken up.
+(Corrected 2026-09-13, repo-gtm2y.)
+
+## Persistent map canvas (recovered 2026-09-13, repo-gtm2y)
+
+`docs/adr/ADR-017-persistent-map-canvas.md` does not exist. It is cited 23 times in `apps/web`
+TypeScript, four more times in CSS comments the source sweep missed, and 26 times across
+`docs/ui/`, in every case as binding law. Recovered from the code. Two of its four parts hold
+exactly; one holds in substance but not in the literal wording two comments still use; one did not
+survive at all, and comments still describe it as live.
+
+**One MapLibre instance, and a real gate behind it.** `apps/web/src/components/map-stage/MapStage.tsx`
+owns the sole `maplibregl.Map`. That is enforced, not merely asserted:
+`apps/web/src/lib/map-experience/map-libre-lifecycle.test.ts`, "MapStage is the only module that
+constructs a MapLibre instance", greps `apps/web/src` for `new maplibregl.Map` and asserts the
+result is exactly `['src/components/map-stage/MapStage.tsx']`. It runs under `apps/web`'s `test`
+script (`node --test 'src/**/*.test.ts'`), so CI catches a second mount. The library's runtime
+import lives in the same place, inside `ensureMap`'s async body. Every other module in the app
+takes `import type` only, though `MapStage.tsx` itself also takes a *static*
+`maplibre-gl/dist/maplibre-gl.css` import, so a comment claiming the CSS is dynamically imported
+too is wrong. Nothing greps for the import: the constructor is what is gated. (from ADR-017,
+"persistent map canvas: one MapLibre instance")
+
+**The root shell owns the canvas. The route group the decision named does not exist.** ADR-017's
+"Route-group layout owns the canvas" described an `apps/web/src/app/(map)/` group wrapping `/` and
+`/explore`. There is no such group today. `MapStageProvider` mounts in
+`apps/web/src/components/SiteShell.tsx` by way of `SiteShellProviders.tsx`, inside the ROOT layout,
+so the plate sits above every route and the canvas survives navigation anywhere, not only between
+the two original map surfaces. That is stronger than the decision asked for, and three consequences
+are load-bearing:
+
+- **The provider mounts bare.** The root layout passes it no data props. Awaiting
+  `loadMapStageBase()` there would make every route in the app `force-dynamic`, including routes
+  that must stay static and keep `generateStaticParams`. A surface that wants a plate does its own
+  `await loadMapStageBase()` in its own server component and hands the result down as the first
+  `patchData` (`MapStageProviderProps`' doc comment).
+- **GL is built lazily.** `ensureMap()` runs on a surface's first contact with the handle, so a
+  reading room that never speaks to the stage never pays for a WebGL context.
+- **The plate renders as a sibling of `.ds-shell`**, not a descendant of any map surface. Plate
+  geometry, the MapLibre chrome contract and marker styling therefore live in
+  `apps/web/src/app/shell.css`, the sheet the root layout loads on every route.
+  `apps/web/src/app/shell-layout.test.ts` asserts that in both directions: the plate rules are in
+  `shell.css`, and `explore/explore.css` contains no `.ds-map-stage` rule at all.
+
+**Covered, never unmounted.** On a reading surface the plate is painted over with `--ds-canvas` by
+a gated `::after` rule rather than hidden with `display: none`. That is the persistence contract
+itself: the MapLibre instance is never touched, returning to the Instrument does not rebuild it,
+and no resize observer fires against a hidden container. `shell-layout.test.ts` asserts both the
+cover and the absence of a `display: none` rule that would replace it. (from ADR-017, "persistent
+map canvas: one MapLibre instance")
+
+**`ssr: false` is gone from the shell on purpose, and restoring it would be a regression.**
+`SiteShellProviders` mounts `MapMomentStage` and `MapStageProvider` synchronously, with no
+`next/dynamic` and no `ssr: false`, so the shell they wrap (header, search, footer) is in the
+server-rendered HTML on every route, including for a reader with JavaScript off and a crawler that
+never runs it. MapLibre stays off the server because `MapStage.tsx` imports it inside a mount
+effect, not because of a dynamic boundary in the shell. Anyone re-adding `ssr: false` here to
+"protect" the canvas would be undoing a deliberate fix, not restoring an invariant.
+
+**Request-scoped shared data.** The decision's "the group layout fetches entity views once for both
+surfaces" survives as `React.cache()` memoization rather than as a layout fetch:
+`apps/web/src/lib/map-experience/shared-map-data.ts` exports `getSharedPublicEntities`
+(`cache(listPublicEntityViews)`) and `loadMapStageBase`, memoized the same way. Callers now include
+`atlas-home.tsx`, `record-first-paint.tsx`, `records/load-records-index.ts` and three route
+handlers, so "one fetch per request however many server components ask" is doing real work well
+outside the two surfaces the decision had in view. (from ADR-017, "route-group layout owns the
+canvas")
+
+**Camera grammar: the presets are real and tested.** `apps/web/src/lib/map-experience/camera-presets.ts`
+holds the four named tiers (`national`, `state`, `locality`, `point`) as motion tokens: `duration`,
+`curve`, `speed`, a shared authored slow-out `easing` (`CAMERA_EASING_SLOW_OUT`, a cubic bezier
+mirroring `@repo/ui`'s `--ds-easing`) and `padding`. Every preset has a reduced-motion twin at
+`duration: 0`, and `runFlyPreset` calls `jumpTo` instead of running a timed animation in that case.
+`camera-presets.test.ts` asserts the authored ranges: 2000-2600ms for national and state, curve
+1.32-1.42, durations monotonically shorter as the descent narrows, padding tightening the same way.
+The grammar cannot be silently retuned. The module takes no `maplibre-gl` runtime import, which is
+what keeps it testable in plain Node. (from ADR-017, "camera grammar: authored presets, never
+library defaults")
+
+**"Raw flyTo defaults are banned" mostly holds, with one confirmed live exception. "flyPreset is
+the only sanctioned way to move the camera" does not, and nothing enforces either one.** That
+second sentence is what two source comments still say, and it is too wide. There are three
+families of camera call site: `map-stage/camera.ts`'s `runFlyPreset`, which is what `flyPreset`
+calls; `lib/map-experience/camera-moves.ts`, a second sanctioned vocabulary (wide, push, orbit,
+tilt, spotlight, trace, flyToRecord, plus `resetBearing`) that drives the plate through the
+structural handle `MapStage.getMap()` returns; and a few in-place calls (`door-immersive.tsx`'s
+chapter flights, the Atlas zoom buttons, and MapStage's own cluster-expansion ease). Every one of
+those passes an authored `duration`, and every arc flight among them passes an explicit `curve`
+and `CAMERA_EASING_SLOW_OUT` (`spotlight` is the one gated move that issues no camera call at all —
+it isolates without moving, so "authored duration" does not apply to it either way).
+
+One call site does not belong on that list, and it sits in the same file that carries the rule.
+`MapStage.tsx`'s own MapMoment framing effect — exercised on every article `mapInset` block through
+`resolveMomentCamera` and `MapInsetMoment.tsx` — builds a bare `{ center, zoom, pitch, bearing }`
+target and calls `map.flyTo(target)` with no `duration`, `curve`, `speed`, or `easing` at all
+whenever the move is not a reduced-motion or plain-moment cut (`move: 'fly'` is the ordinary case).
+That is a raw `flyTo` on library defaults, live on an ordinary article read, not a hypothetical: it
+is the exact shape the next sentence warns nothing would catch. So the substance of the ban does
+NOT fully hold — there is one confirmed gap — and enforcement is separately absent: there is no
+lint rule, and no test would catch a new `map.flyTo({ center, zoom })`, including this one.
+`camera-moves.test.ts` only guards `camera-moves.ts`'s own vocabulary; nothing exercises the
+MapMoment framing effect's camera call at all (`room-kit.test.tsx` is the only test touching that
+code path, and it asserts markup, not camera options). `door-home.test.ts` asserts the immersive
+Door module imports no `maplibre-gl` runtime, a different guarantee (no second mount) that does not
+bear on this gap. Treat "no library defaults" as a rule already broken once in the very file that
+states it, and one a reviewer has to hold, not one CI will catch. (from ADR-017, "camera grammar:
+authored presets, never library defaults")
+
+**Viewport policy: a shareable URL restores what the reader was looking at, never where the camera
+was.** This is the most enforced part of the decision, and the mechanism is not the one the
+comments imply. `lat`, `lng` and `zoom` ARE parsed by `parseExploreSearchParams`, and
+`buildExploreSearchParams` DOES write all three when the view state carries a `viewport`. The rule
+is not "the code cannot emit them". It is enforced in three independent places:
+
+- **The edge allowlist.** `EXPLORE_PAGE_PARAM_ALLOWLIST`
+  (`apps/web/src/lib/runtime-hardening/constants.ts`) is generated from the parser's own
+  `EXPLORE_URL_PARAM_KEYS` minus the named `EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS`
+  (`['lat', 'lng', 'zoom']`, in `lib/map-experience/url-state.ts`). `normalizeQueryString` filters
+  the incoming bag through that allowlist BEFORE it runs `/explore` through parse and rebuild, so a
+  viewport key never reaches the serializer, and `handleQueryNormalization` 308s any URL that
+  carried one. The exclusion is a named list, not an omission from an allowlist, so removing it is
+  a decision someone has to make on purpose.
+- **A runtime throw on the share path.** `assertNoViewportKeys` in
+  `apps/web/src/lib/share/deep-link.ts` throws on any of ten forbidden keys (`lat`, `lng`, `lon`,
+  `longitude`, `latitude`, `zoom`, `bearing`, `pitch`, `bbox`, `center`), a deliberately wider set
+  than the three the allowlist drops.
+- **The client never writes the live camera.** `use-explore-url-sync.ts` syncs the address bar with
+  `history.replaceState` from the Lens only, and the view state it builds sets no `viewport`. Panel
+  chrome (`panels`, `hidePanels`) is excluded for the same reason: which panels a reader has open
+  is session state, not shareable meaning.
+
+Three test files hold it, all under `apps/web`'s `test` script. `query-normalization.test.ts`
+proves lat/lng/zoom never survive normalization on `/explore` and that a URL carrying them needs a
+redirect, and its drift tests prove the exclusion covers keys the parser genuinely reads, failing
+in both directions. `deep-link.test.ts` pairs the negative assertion with round-trips, which exist
+precisely so the rule cannot be satisfied by emitting nothing. The reason is the part worth
+keeping: a pinned camera hands the recipient a framing they did not choose and cannot tell apart
+from the data, and a tight zoom on one county reads as an editorial claim about that county.
+(from ADR-017, "URL: viewport + selection")
+
+**The transition contract did not survive, and comments still describe it as live.** ADR-017's hero
+engagement choreography (hero chrome dissolving while `router.push('/explore?...')` runs, the
+flight continuing uninterrupted across the navigation) went with the surfaces it described.
+`HomeMapHero`, `ExploreMapExperience` and `ExploreMapCanvas` are all gone; `/` is now the Door, a
+reading surface whose plate posture is ambient, and `/explore` is the Instrument. Two comment
+blocks in `apps/web/src/app/explore/explore.css` still name the contract: the "Hero dissolve" class
+one of them describes is not in the sheet at all, and the `ds-explore-panel-enter` keyframes that
+remain are keyed on `.ds-explore-stage--entering`, which nothing in `apps/web/src` ever sets (the
+`.ds-explore-stage` element is no longer rendered either). The page-level enter animation was
+deleted too, for a reason that is itself load-bearing: `animation-fill-mode: both` left a
+permanently non-`none` computed transform on the page-root wrapper, which made that wrapper the
+containing block for the fixed plate and let the plate scroll with the document instead of holding
+the viewport. The plate holding the viewport now depends on `.ds-shell-page-transition` never
+acquiring a transform. (from ADR-017, "transition contract")
+
+**Reduced motion is intact.** Every preset has a `duration: 0` twin, `runFlyPreset` calls `jumpTo`
+whenever `prefersReducedMotion()` is true or a caller asks for `mode: 'cut'`, and every move in
+`camera-moves.ts` collapses to zero duration. Both camera test files assert it. (from ADR-017,
+"reduced motion")
+
+
+## Explore basemap and live map source (recovered 2026-09-13, repo-gtm2y)
+
+`docs/adr/ADR-025-mobile-map-data.md` does not exist; it was deleted in the 2026-07-24 docs purge
+(`git show a2f559f8^:docs/adr/ADR-025-mobile-map-data.md` recovers the original text). It decided
+the mobile basemap platform (self-hosted Protomaps PMTiles on Firebase Hosting/CDN as the default,
+managed MapTiler as an owner-gated paid fallback that is "never a silent default") and inherited
+the release-coupled redacted GeoJSON point contract `apps/api-public` already served for web
+Explore. Ten citations name it across mobile config, the API's OpenAPI contract, and the handler
+that builds the payload. Recovered from the code, which in one important respect has moved past
+what the original text decided.
+
+**The basemap that ships today is neither of the two options ADR-025 decided between.** ADR-025
+(mirroring the web `ADR-013-map-stack.md`) chose self-hosted PMTiles as the default and managed
+MapTiler as an owner-approved, cost-ceilinged fallback. Today's actual default on both platforms is
+a third option the original text never named: free, third-party-hosted OpenFreeMap vector tiles
+(`tiles.openfreemap.org/planet`, `.../fonts/{fontstack}/{range}.pbf`) — see
+`apps/mobile/src/features/map/mapConfig.ts` (`DEFAULT_OPENFREEMAP_TILE_SOURCE_URL`,
+`DEFAULT_MAP_GLYPHS_URL`) and web's `apps/web/src/lib/map-experience/dignity-style.ts`
+(`OPENFREEMAP_TILE_SOURCE_URL`). MapTiler is gone from the live code entirely; its one surviving
+mention (`dignity-style.ts`) explains why USGS imagery was chosen *over* it for satellite tiles, not
+a wired basemap fallback. Self-hosted PMTiles is still reachable, but only as an opt-in override
+(`MAP_PMTILES_URL` env / `extra.map.pmtilesUrl`) for "when a U.S. archive is published on CDN" — the
+archive ADR-025 deferred to a future bead was never authored, so the decided default never shipped
+and an undecided interim (OpenFreeMap) took its place with no decision record of its own.
+
+**PMTiles configuration is validated and empty-string-safe, identically on both platforms.**
+`apps/mobile/app.config.ts`'s `optionalHttpUrl` and `apps/mobile/src/features/map/mapConfig.ts`'s
+`sanitizeHttpUrl` both trim the raw env/`extra` value, treat an empty string as unset, and require
+the parsed URL's protocol to be `http:` or `https:` — anything else is silently dropped to
+`undefined`/`null` rather than passed through. When `MAP_PMTILES_URL` does resolve, MapLibre Native
+is meant to read the archive via the `pmtiles://` protocol layered over HTTPS range requests (the
+original ADR-025 §2 requirement); nothing in the current mobile code path exercises that read
+against a live archive, because no U.S. archive has been published, so the range-request behavior
+is implemented but unexercised. (from ADR-025, "Explore basemap and live map source")
+
+**`MAP_BASEMAP_ENABLED` is a real kill switch, not just a comment.** `mapConfig.ts`'s
+`MAP_BASEMAP_ENABLED` reads `extra.map.basemapEnabled`, defaulting to enabled; an explicit `false`
+wins even when a tile URL is configured, and `app.config.ts` plumbs it through from the
+`MAP_BASEMAP_ENABLED` env var at build/OTA-config time. Flipping it removes the basemap tile source
+entirely rather than degrading it, matching the original decision's "points-only, zero tile egress"
+design. (from ADR-025, "Explore basemap and live map source")
+
+**`GET /v1/map` is release-coupled and served from the same active-release pointer as every other
+public read.** `handleMap` (`apps/api-public/src/http/handlers.ts`) reads the current release
+pointer, lists that release's entities, and builds the response with `buildMapSourceV1`
+(`apps/api-public/src/http/build-map-source-v1.ts`); entities without a `geoAnchor` are skipped
+outright. The response goes through the same client-attestation, rate-limit, ETag and
+cache-control path as `/v1/entity/{id}` and `/v1/search` — there is no map-specific auth or
+throttling. (from ADR-025, "Explore basemap and live map source")
+
+**"Redacted" and "coordinates are already reduced" mean a specific, table-driven coarsening, not a
+vague privacy gesture.** `buildMapSourceV1` routes every entity through `packages/domain`'s
+`buildMapSource`, wired to the real `redactLocationForPublic` (`packages/security/src/redaction.ts`)
+as its only source of coordinates — the domain builder's invariant is that it never reads a raw
+`lat`/`lng` back out of its input, only out of the redactor's return value. `redactLocationForPublic`
+coarsens each coordinate to a fixed decimal count keyed to a public precision tier (`country`: 0
+decimals, `state`/`county`: 1, `city`: 2, `neighborhood`/`campus`: 3, `institution`/`site`/`address`:
+4; `none`: the coordinate is dropped and the feature skipped) and truncates any geohash to a
+matching length. Before that coarsening runs, `reducePublicPrecision` can force a coarser tier
+regardless of the source data: a `withheld_on_request` sensitivity class drops the location
+entirely; a raw prohibited level (unit/parcel/exact-coordinates/residence) is forced to `city`; a
+living person's location — or a place explicitly classed `living_residence` — is capped to the
+product constitution's `livingResidenceMaxPublicPrecision` whenever living status is `living` **or
+unrecorded** (the fail-safe default); `restricted_site`/`sensitive_site` locations are capped the
+same way. Memorial and violence-history classes are the one deliberate exception: they publish at
+source precision, uncapped, because a vague location would defeat the record's purpose. This same
+reduction already ran once upstream, when the entity was published into `bb_public.release_entities`
+(`redaction.ts`'s own header: it "runs INSIDE the publish path itself... for every... projection");
+`buildMapSourceV1` re-runs it a second time rather than trusting the already-reduced projection, so
+the map endpoint has no code path that can emit a coordinate the redactor did not just produce.
+(from ADR-025, "Explore basemap and live map source")
+
+**The reduction is enforced by construction and by one named regression test, not by the wire
+schema.** There is no independent check on the served payload: `mapSourceV1Schema`
+(`packages/public-contracts/src/v1/map.ts`) only bounds each coordinate to a valid lat/lng range and
+caps the feature array at 20,000 — it does not check decimal precision, so a hypothetical second
+code path emitting `MapSourceV1` features could ship an over-precise coordinate without failing
+validation. What actually holds the guarantee is that `buildMapSourceV1` is the only producer of
+`MapSourceV1` features and cannot construct one without going through `redactLocation`, plus
+`packages/domain/src/map/map-source.redaction.test.ts`, which wires the real
+`redactLocationForPublic` (not a stub) and asserts that a living person's exact residential
+coordinate and street-address label never appear anywhere in the serialized output. That test runs
+as part of `packages/domain`'s own suite; nothing separately re-verifies the guarantee against a
+live `/v1/map` response. (from ADR-025, "Explore basemap and live map source")
+
+**On the client, the mobile map source consumer only re-shapes fields it is given.**
+`mapSourceV1ToFeatureCollection` (`apps/mobile/src/features/explore/map-source-client.ts`) copies
+the wire feature's `coordinates` tuple and properties into the local `MapFeatureCollection` shape
+MapLibre renders; it does not recompute, sharpen, or otherwise derive a coordinate from anything
+else in the payload. `useExploreMapSource`'s `GET /v1/map` fetch shares the same attestation- and
+ETag-aware transport, and the same release-cache fallback, as the other live data the app reads
+(`docs/decisions-carryover.md`, "mobile data boundary"), and falls back to a bundled
+`DEMO_MAP_SOURCE` only in `__DEV__` when the live endpoint is unreachable. (from ADR-025, "Explore
+basemap and live map source")
+
+## Mobile stack (recovered 2026-09-13, repo-gtm2y)
+
+`docs/adr/ADR-020-mobile-stack.md` does not exist, and has not existed under that name since the
+mobile ADRs were renumbered (commit `3b365d44`, landed 2026-07-21). That rename moved mobile-stack
+from ADR-020 to ADR-021 and handed ADR-020 to "Supabase Postgres as system of record" — the "entity
+source-of-truth precedence" addendum near the top of this file. `apps/mobile` never followed the
+rename. Fourteen of its ADR-020 citations, plus thirteen more in `apps/mobile/README.md`, still use
+the old number, and `app.config.ts` names the dead file path outright. A reader who follows any of
+them lands on the Postgres cutover and finds nothing about Expo, MapLibre, SQLite, native
+directories or OS floors. The numbering is verified against `git ls-tree -r a2f559f8^ -- docs/adr`,
+the commit before the 2026-07-24 purge. Everything below is recovered from the code; the removed
+document (`git show a2f559f8^:docs/adr/ADR-021-mobile-stack.md`) was read only as a check on how
+wide each restatement should be, and where the two disagree the code wins and this says so.
+
+**ADR-021 is not a safe substitute for the old number, because ADR-021 is overloaded too.** The
+2026-09-12 addendum in this file titled "ADR-021's two invariants, recovered" is about the mobile
+DATA BOUNDARY document — its §1 is the `@repo/public-contracts` zero-runtime-dependency boundary,
+§2 the app/API compatibility floor, §3 response redaction, §4 dependency direction — and that
+document is ADR-022 under the final numbering, ADR-021 only under the pre-rename numbering its own
+citations use. So "ADR-021" means the mobile stack under the final numbering and the mobile data
+boundary under the numbering half this tree actually cites. Do not resolve an `apps/mobile` ADR-020
+citation by adding one to the number. Match the topic, the way the "Mobile cache and OTA release"
+recovery in this file does for ADR-023 and ADR-024.
+
+**Expo managed workflow with CNG, Expo Router and a custom dev client — but the exact-pin rule did
+not survive.** `apps/mobile/package.json` declares `expo: ^57.0.0`; the lockfile resolves Expo
+57.0.20, React Native 0.86.3, React 19.2.3 and TypeScript 6.0.3. `expo-router` and `expo-dev-client`
+are both dependencies and both listed in `app.config.ts`'s `plugins`, so file-based routing and a
+custom development build (not Expo Go) are what ships. The version policy required an EXACT Expo
+SDK pin with no range, with React Native taken as whatever that SDK bundles and native modules added
+through `expo install`; a caret range is not that. `apps/mobile/README.md`'s stack table still reads
+"Expo SDK 56.0.16 ... Exact pin, no `^`/`~` range" and is stale on the version and on the pin shape
+at once. Nothing in CI checks either. (from ADR-021 §1 and §5, "mobile stack")
+
+**`apps/mobile` lives outside the pnpm workspace with its own npm lockfile, which is the fallback
+the decision preferred not to take.** `pnpm-workspace.yaml` excludes it (`'!apps/mobile'`),
+`apps/mobile/package-lock.json` is its lockfile, and CI's mobile lane installs with `npm ci` against
+that file (`.github/workflows/ci.yml`). `metro.config.js` reaches the two workspace packages mobile
+needs by path — `extraNodeModules` plus `watchFolders` for `@repo/public-contracts` and
+`@repo/domain` — rather than through node resolution. The version policy preferred keeping mobile
+inside the workspace with targeted `public-hoist-pattern` entries and isolating only as a last
+resort; isolation is what shipped, on measured Metro/pnpm friction, and the removed document already
+recorded the swap. What the policy actually wanted out of it — that adding mobile cannot perturb the
+root `pnpm install` or any web, api or worker build — now holds by construction rather than by a
+gate: no CI job asserts it, because after the exclusion there is nothing left to assert.
+(from ADR-021 §5, "mobile stack")
+
+**MapLibre Native is the renderer, and the self-hosted-PMTiles half of that decision is optional and
+off by default.** `@maplibre/maplibre-react-native` (locked at 11.3.10) is the binding, wired through
+its own config plugin in `app.config.ts` with `ios.useFrameworks: 'static'` and the OpenGL Android
+location engine. The decision paired it with the same self-hosted Protomaps PMTiles archive the web
+map reads. That is not what runs: `apps/mobile/src/features/map/mapConfig.ts` defaults to OpenFreeMap
+vector TileJSON (`DEFAULT_OPENFREEMAP_TILE_SOURCE_URL`) and attaches a `pmtiles://` source only when
+`extra.map.pmtilesUrl` is configured, with `MAP_BASEMAP_ENABLED` as a kill switch that degrades to
+entity points over a flat dark canvas and zero tile egress. Do not read a citation of this decision
+as evidence the mobile map is on our own tiles. The fixed dark "archive of record" register did
+survive and is the tested half: `mapStyle.ts` takes every color from the generated brand tokens and
+never from a parallel hex, the register does not follow the device light/dark setting, and
+`assertNoHeatmapRegister` is exercised by `mapStyle.test.ts`. (from ADR-021 §2, "mobile stack")
+
+**No Firebase SDK and no analytics SDK reaches the client at all, and a test enforces it.** The
+decision allowed exactly one Firebase surface, `@react-native-firebase/app` plus `/app-check`, and
+banned every data module. The narrower thing is true today: `apps/mobile/package.json` carries no
+`@react-native-firebase/*` dependency of any kind, App Check is retired repo-wide, and attestation
+is the plain `X-BlackStory-Client` header (`apps/mobile/src/security/api-client.ts`'s
+`CLIENT_VERSION_HEADER`), attached to every request. `apps/mobile/src/observability/
+no-raw-sdk-imports.test.ts` is the live gate: it scans every non-test `.ts`/`.tsx` under
+`apps/mobile/src` and fails on `@react-native-firebase/app`, `/app-check`, `/crashlytics`, `/perf`
+and `/analytics`, and on Google Mobile Ads, Segment, Amplitude, Mixpanel and the App Tracking
+Transparency prompt. So "no analytics SDK is even a dependency" is a checked claim, not an assertion.
+Two consequences a reader should carry: the staged monitor-then-enforce App Check rollout this
+decision specified is dead along with App Check and nothing implements it, and the companion
+prohibition — never emit an attestation credential or any JWT-shaped value to a log sink — is stated
+under "Security and abuse assumptions" in this file and is not restated here.
+(from ADR-021 §3, "mobile stack")
+
+**`expo-sqlite` is the cache engine and exactly one module imports it.** `openMobileDatabase()` in
+`apps/mobile/src/data/db/sqlite-database.ts` is the only `expo-sqlite` import in the app; everything
+above it is written against the `CacheStore` port in `db/store.ts`, which has a second in-memory
+implementation used both by the unit tests and as the degraded fallback when the on-disk database
+cannot be opened. What that cache may hold, how a release stamp invalidates it, and the 512-byte
+SecureStore carve-out beside it belong to the cache decision, recovered under "Mobile cache and OTA
+release" in this file, not to this one. (from ADR-021 §4, "mobile stack")
+
+**`ios/` and `android/` stay out of git, and `apps/mobile/.gitignore` is the entire enforcement.**
+Lines 56-57 of that file (`/ios`, `/android`) are it. Both directories exist on a working machine,
+generated by `expo prebuild` from `app.config.ts` plus config plugins, and no CI job, lint rule or
+script checks that they are absent from a commit. `app.config.ts` is the committed source of native
+identity, as the decision requires. The live consequence is recorded in `apps/mobile/README.md`:
+because `expo prebuild` bakes `PRODUCT_BUNDLE_IDENTIFIER` into the generated Xcode project and
+`ios/` is gitignored, variant drift there is always a local-machine condition, fixed by
+re-prebuilding rather than by hand-editing the project. (from ADR-021 §6, "mobile stack")
+
+**The OS floors are iOS 16.4 and Android API 26, they live in one file, and nothing asserts them.**
+`app.config.ts` sets `ios.deploymentTarget: '16.4'` and passes `android.minSdkVersion: 26` to
+`expo-build-properties`. The decision proposed iOS 16.0 and API 26 and made the SDK's own platform
+minimum govern wherever it was higher — "whichever SDK MOB-006 actually pins governs" — which is why
+iOS reads 16.4 and not 16.0. Android's 26 is held deliberately above the platform minimum to shrink
+the test matrix a solo maintainer carries, and lowering it was made evidence-gated on device-share
+data rather than a default. Both numbers are config literals: no test, no schema check and no CI
+assertion reads either anywhere in the repo. The comment justifying 16.4 was written against Expo
+SDK 56 and the app now runs SDK 57, so the "re-verify at every SDK upgrade" half of the rule is a
+habit, not a gate, and whether 16.4 is still the platform minimum is not something this recovery
+verified. (from ADR-021 §7, "mobile stack")
+
+**What is deliberately not restated.** The rejected alternatives (bare React Native, Flutter, native
+Swift and Kotlin, Mapbox, Google Maps, AsyncStorage, MMKV, WatermelonDB, Realm, committing the native
+folders), the per-decision reversal costs and the migration triggers are argument rather than
+invariant; they are in git and nothing in the tree cites them. `apps/mobile/README.md`'s thirteen
+ADR-020 citations are also left pointing at the old number by this pass. That file is a long
+maintained document whose own stack table is stale on the SDK pin, and relabeling its citations
+without correcting the numbers beside them would put a fresh label on wrong content. It needs the
+same read-the-code treatment, not a find-and-replace.
+
+## Mobile data boundary (recovered 2026-09-13, repo-gtm2y)
+
+`docs/adr/ADR-022-mobile-data-boundary.md` does not exist. Fifty-six source comments across
+thirty-three files cite ADR-022 and only five of them mean this document — two of those only in
+part — plus two more outside that census (`apps/mobile/README.md:201` and `.env.example:147`) that
+mean it squarely. Forty-nine of the rest are the pre-2026-07-22 number for what is now ADR-023
+(mobile state, cache and offline read), already recovered in this file under "Mobile cache and OTA
+release"; their citations are repointed there, not here. The last two, in `features/map/mapCamera.ts`
+and `features/corrections/receipt.ts`, name rules no mobile ADR ever contained at all — see the
+final paragraph. The mirror-image error is larger and this
+pass does NOT fix it: nearly every ADR-021 citation inside `packages/public-contracts`, plus the
+client-floor block in `apps/api-public/src/http/handlers.ts` and several `apps/mobile` headers, is
+the pre-renumbering number for THIS decision. Old ADR-020 was the mobile stack, old ADR-021 was the
+data boundary, old ADR-022 was cache and offline; the mobile ADRs all shifted up by one. So an
+"ADR-021 §1/§2/§3/§4" or "ADR-021 red-team resolution #1/#2/#3" citation anywhere near mobile
+belongs to this section, and `apps/mobile/src/data/secure-store.ts:7`'s "ADR-020" means the mobile
+stack, not the Supabase system-of-record decision that carries that number today. The 2026-09-12
+addendum above already recovered one piece of this document under the ADR-021 heading ("App/API
+compatibility policy"); that is the same rule as §2 below, not a second decision.
+
+**`packages/public-contracts` is the only code the server and the client both import, and one real
+gate keeps it client-safe.** The package may hold versioned wire types, zod schemas for those same
+shapes, pure environment-neutral validators, and the version constants; it may not hold route
+handlers, request-authenticated logic, secrets, `firebase-admin`, a Firestore import, a `node:`
+built-in, or a dependency on `@repo/domain` / `@repo/security` / `@repo/observability`.
+`packages/public-contracts/scripts/check-boundary.mjs` is the enforcement, and it is not a
+convention: it scans every shipped `.ts` under `src/` for forbidden specifiers, then re-walks only
+the files `package.json`'s "exports" map actually points at, following real import edges, and it
+works from an ALLOWLIST — `ALLOWED_EXTERNAL_SPECIFIERS` is `{zod}`, so an unlisted dependency fails
+even though it is on no denylist. It also refuses `zod` itself if `zod` ever declares a runtime
+dependency. Run today it reports 21 files scanned, 21 reachable from exports, PASSED. It is the
+package's own `test` script, so `pnpm -r --filter './packages/**' run test` picks it up inside the
+`Workspace Tests` job, which `infra/github/rulesets/main-protection.json` does require. This half of
+the boundary genuinely cannot merge broken. (from ADR-022 §1, "mobile data boundary")
+
+**Nothing gates the mobile half, and the flat rule this file used to state is false today.**
+`apps/mobile/package.json` declares `@repo/domain`, `@repo/domain-core` and `@repo/public-contracts`
+as `file:` dependencies, and `apps/mobile/src/features/record-facts/record-facts.ts` imports
+`deriveEraBuckets`, `filterDecadesAtOrBeforeCurrent` and `isDatePrecision` from `@repo/domain/era`.
+That subpath is a re-export shim (`packages/domain/src/era.ts`) over `@repo/domain-core/era`, which
+imports nothing at all, and `apps/mobile/metro.config.js` aliases both package roots so Metro
+resolves them. What is true today is therefore narrower than the old bullet and wider than the ADR:
+exactly one `@repo/domain` subpath is imported, it is a leaf, and `@repo/firebase`, `@repo/security`
+and `firebase-admin` are imported nowhere in `apps/mobile` — and nothing enforces that it stays the
+only one. `apps/mobile` is excluded from the pnpm workspace (`!apps/mobile` in
+`pnpm-workspace.yaml`), so `pnpm -r` never reaches it; `scripts/validate-boundaries.mjs` does walk
+`apps/mobile/src`, but its only rules are app-cannot-import-app, the `@repo/web` →
+`@repo/data-access` file-level rule, and dependency cycles. None of them would notice a mobile
+import of a non-leaf domain subpath. The one adversarial guard that does exist is narrower than the
+boundary: `apps/mobile/src/observability/no-raw-sdk-imports.test.ts` fails on a Firebase or
+ad/analytics SDK import, and it runs in the non-required `Mobile Checks` job. (from ADR-022 §4,
+"mobile data boundary")
+
+**"Types only" is shorthand, and taking it literally would be wrong.** `apps/mobile` imports real
+runtime values from `@repo/public-contracts`: `mapSourceV1Schema` (`features/explore/map-source-client.ts`,
+`features/entity/use-ordered-entity-ids.ts`), `evidenceLabel` / `evidenceMeterLabel` /
+`recordConfidenceTier`, `ENTITY_KINDS` and `CLAIM_ROLES`, `stripInternalIds` / `containsInternalId`,
+and the destinations catalog. The ADR's own normative reading of its dependency diagram allowed
+exactly that — the contracts package's runtime footprint on the client is limited to pure zod
+schemas and pure validators, with no shared runtime service, singleton or transport in it — so the
+rule to hold onto is the absence of shared runtime machinery, not the word "types". Two module
+headers currently claim the opposite and are simply stale:
+`apps/mobile/src/features/entity/types.ts` and `features/content/content-types.ts` both say
+`@repo/public-contracts` "cannot be imported here today" and then import it a dozen lines later.
+(from ADR-022 §1/§4, "mobile data boundary")
+
+**Every byte mobile reads comes over HTTP from `apps/api-public`, and the one write goes to a
+different surface that cannot publish.** `dispatch` in `apps/api-public/src/http/router.ts` serves
+`/v1/health`, `/v1/compatibility`, `/v1/bootstrap`, `/v1/search`, `/v1/search/nearest`, `/v1/map`
+and `/v1/entity/{id}`, and rejects anything that is not GET or HEAD with a 404-shaped response
+rather than a 405 that would advertise the route table. Corrections are the single exception the
+decision allows, and they do not go here: `apps/mobile/src/features/corrections/client.ts` posts to
+a separate `baseUrl`, the submissions surface, whose `apps/api-submissions/src/quarantine.ts` writes
+only `submission_quarantine` records, refuses any record whose `canonicalWriteAllowed` is set, and
+whose `guardPublishAttempt` is real — `apps/api-submissions/src/index.test.ts` asserts "submissions
+compromise cannot publish". No client Supabase, Postgres or Firestore access exists anywhere in
+`apps/mobile`; the only network origin is `extra.apiBaseUrl`. (from ADR-022 §3, "mobile data
+boundary")
+
+**The `/v1` URL prefix is the wire contract; `X-BlackStory-Client` is only the version floor, and it
+fails open.** The constants live in `packages/public-contracts/src/version.ts`: `API_VERSION` and
+`MIN_SUPPORTED_API_VERSION` are both `'v1'` today and `DEPRECATION_WINDOW_DAYS` is 90 (asserted by
+`version.test.ts`). `enforceClientFloor` (`apps/api-public/src/http/handlers.ts`) parses
+`X-BlackStory-Client: <platform>/<semver>; api=<n>` and returns `CLIENT_VERSION_UNSUPPORTED` with
+HTTP 426 — the status is `CLIENT_VERSION_UNSUPPORTED_HTTP_STATUS` in
+`packages/public-contracts/src/errors.ts`, asserted by `errors.test.ts` — ONLY when a caller
+declares an api major below the floor. An absent or unparseable header parses to `undefined` and
+serves normally: the floor is a forced-update affordance for honest clients, never an authorization
+gate, and it is applied on five handlers (`handleBootstrap`, `handleEntity`, `handleMap`,
+`handleSearch`, `handleVectorSearch`), not on `/v1/health`. `handleCompatibility` adds the soft
+`Deprecation: true` header for a supported-but-not-current client. `evaluateClientCompatibility`
+(`packages/domain/src/publication/mobile-bootstrap.ts`) is the manifest-side twin, returning
+`app_build_below_floor` or `api_version_unsupported`. Note what has never been exercised: only one
+major has ever existed, `KNOWN_API_VERSIONS` is `[API_VERSION]`, so no `/v2`, no N-1 coexistence and
+no 90-day window has ever actually run. (from ADR-022 §2, "mobile data boundary")
+
+**The contract closes the location PRECISION LABEL and nothing else — the coordinate itself is only
+range-checked.** `entityV1Schema.locationPrecision` is a closed enum that cannot parse `'address'`
+or `'exact'`, and `packages/public-contracts/src/v1/entity.test.ts` proves it. But
+`geoAnchorV1Schema` is `lat`/`lng` bounded only to valid degree ranges plus a geohash and a match
+method, so a raw residential coordinate is structurally expressible; what keeps one off the wire is
+the server-side redaction chokepoint, not the contract type. The removed ADR's own wording — "the
+contract types must not even be able to express a raw residential coordinate" — is stronger than the
+code, and restating it as an invariant would be exactly the false binding law this recovery exists
+to undo. The client adds its own defense rather than trusting that claim:
+`apps/mobile/src/features/map/mapCamera.ts` carries `coordinateDecimals`, `coarsestDecimals`,
+`isNoMorePreciseThan` and `coarsenTo` so a derived or cluster point is never more decimal-precise
+than the coarsest input it summarizes. The other by-construction omissions do hold: no raw
+notability or relevance score (`notabilityBasis` carries string leaves and evidence ids only), and
+no reviewer identity, moderation state, abuse signal or internal source-lineage rollup.
+(from ADR-022 §3, "mobile data boundary")
+
+**SecureStore holds small opaque secrets, and only one of the "two guards" its own comment names is
+a runtime control.** `apps/mobile/src/data/secure-store.ts` allows a correction receipt code and the
+per-install search-key salt; bulk cached content belongs in SQLite. The byte cap is real:
+`MAX_SECRET_BYTES` is 512 and `assertSmallSecret` throws `SecretTooLargeError` inside
+`createSecretStore.set` before `backend.setItemAsync` is ever reached, tested in
+`secure-store.test.ts`. The second guard — "a closed allow-list of secret keys (`SecretKey`) — there
+is no API to stash arbitrary blobs under arbitrary keys" — is a TypeScript union over this module's
+own API and nothing more. `apps/mobile/src/features/search/recent-searches.ts` writes
+`RECENT_SEARCHES_SECRET_KEY`, which is deliberately not in `SECRET_KEYS`, straight to the same
+narrow `SecretBackend` port, reusing only `assertSmallSecret`; that carve-out is recorded in the
+2026-09-12 (repo-30k6) addendum above. The allow-list constrains one module, not the keychain.
+(from ADR-022, "mobile data boundary")
+
+**The bundled legal copy is DERIVED from these decisions rather than drafted as a promise, and one
+sentence of it has drifted.** `apps/mobile/src/features/content/content-catalog.ts` ships the
+privacy and terms pages inside the app binary, and its header states the editorial rule: legal copy
+"states only what the program's own accepted invariants already establish ... rather than
+fabricating legal commitments". That is a real invariant and worth keeping precise — the app may
+state as policy only what the boundary and the cache policy already make true in code, so the page
+is a description of the system, never a commitment the system does not keep, and it may not be
+edited into a promise without the code moving first. Most of it still holds: "no advertising or
+tracking SDKs" (`no-raw-sdk-imports.test.ts`), "a read-only reference app ... no user accounts, no
+purchases, and no user-generated content beyond an opaque correction submission (reviewed before
+anything is published)" (GET/HEAD-only dispatch, quarantine-only submissions), and "cached search
+results are keyed by a salted hash of your query shape, never the raw text you typed"
+(`hashSearchKey`). One sentence does not: "Query text you type, correction-submission content, and
+precise device location are never written to on-device storage" is false as written, because up to
+eight recent search terms are persisted to the Keychain/Keystore under the repo-30k6 carve-out and
+that feature is wired into `SearchScreen`. Either re-scope that sentence to the SQLite cache or
+change the feature; do not leave a shipped privacy page asserting something the app does not do.
+(from ADR-022 §3, "mobile data boundary")
+
+**Two citations attributed rules to this ADR that no mobile ADR ever contained, and they are
+corrected rather than repointed.** `cameraMotion` in `apps/mobile/src/features/map/mapCamera.ts`
+cited "the reduced-motion contract (ADR-022 / accessibility gate)"; none of ADR-021 through ADR-025
+mentions reduced motion or accessibility anywhere. The contract itself is real —
+`apps/mobile/src/ui/useReduceMotion.ts` reads the OS setting and `cameraMotion` collapses the
+duration to `durationInstant`, asserted in `__tests__/mapCamera.test.ts` — it just was never an ADR
+decision. `apps/mobile/src/features/corrections/receipt.ts` cited an "ADR-022 clear-deletion
+posture"; that phrase appears in none of the removed documents. `clearStoredReceiptCode` and
+`diagnostics.clearCache` both do what the comment implied, so the behavior stays and the invented
+citations go.
+
+## Small recovered decisions (2026-09-13, repo-gtm2y)
+
+Six ADRs, thirteen citations, none previously restated here. Each is small enough for a short
+paragraph rather than its own section, so they are grouped under one heading.
+
+**ADR-006, GitHub Actions deployment model.** `docs/adr/ADR-006-github-actions-deployment.md`
+does not exist. What it decided about the production pipeline shape is still true of what exists:
+`.github/workflows/deploy-production.yml` is `workflow_dispatch`-only, requires the protected
+`production` GitHub Environment, pins a full 40-character commit SHA before anything runs (the
+`gate` job's regex check), and writes and validates deployment provenance
+(`infra/github/release-pipeline/write-provenance.mjs`, `validate-provenance.mjs`). What did NOT
+hold is the "explicit promote" requirement decision item 7 placed on public web:
+`docs/runbooks/production-release.md` states plainly that Vercel's git integration auto-builds and
+aliases every commit landed on `main` straight to Production, with no manual promote step in
+between — merging the staging→main PR described in this repo's root `CLAUDE.md` under "Branching
+& Release Policy" **is** the production release (confirmed 2026-08-05 on PR #116 and again
+2026-08-12 on PR #130, repo-8ary/repo-h1b2). This does not contradict
+`infra/github/release-pipeline/lib/auto-rollout-guard.mjs`'s `assertNoAutomaticRollouts`: that
+guard only checks that no GitHub Actions *workflow* itself auto-triggers a deploy on push to
+`main` (`deploy-staging.yml`, `deploy-production.yml`, `progressive-release.yml`) — Vercel's own
+git-integration auto-deploy sits outside GitHub Actions entirely and was never in that guard's
+scope. (from ADR-006, "GitHub Actions deployment model")
+
+**ADR-012, production environment re-split.** `docs/adr/ADR-012-production-environment-resplit.md`
+does not exist. Its three-project topology (production stays `black-book-efaaf`; new
+`blackbook-staging` and `blackbook-internal` projects split off staging and research/admin) is
+still only a design target: `docs/runbooks/legacy-gcp-project-id.md` confirms `black-book-efaaf`
+is the only live project, and the two new projects were since renamed in the design itself, from
+`blackbook-staging`/`blackbook-internal` to the functional ids `repo-staging`/`repo-internal`
+(matching the BlackBook → BlackStory product rename). `packages/config/src/scheduled-jobs/types.ts`'s
+`SCHEDULED_JOB_ENVIRONMENTS = ['repo-internal']` names that still-unprovisioned target by its
+later id — it is not a live project, and (per the "Scheduled-job worker packages" recovery above)
+nothing here runs against a Cloud Scheduler pointed at any GCP project split today; the roster's
+real jobs dispatch through Corsair systemd or `discovery-campaigns.yml` instead. (from ADR-012,
+"production environment re-split")
+
+**ADR-018, Firebase scheduled Functions for discovery.**
+`docs/adr/ADR-018-firebase-scheduled-functions-discovery.md` does not exist, and unlike the other
+five ADRs in this group it was already dead before the 2026-07-24 purge — its own preserved text
+records `Status: Superseded by ADR-028` and an archive note that "production discovery dispatch no
+longer runs on Firebase scheduled Functions." Both citations here describe that same, correct
+supersession and only need to stop pointing at a document that never survived it.
+`apps/web/scripts/check-kill-switch.mjs` names `functions/src/kill-switch-env.ts` as the old
+Firestore-reading code its Postgres query replaces, but that path is gone too — the whole
+`functions/` package was deleted (`repo-348e.8`). `.github/workflows/discovery-campaigns.yml`
+correctly calls itself that design's replacement: it is the live production discovery scheduler,
+reading the same `bb_ops.kill_switches` row through `check-kill-switch.mjs` that the old Functions
+code read from Firestore, fail-closed either way. This ADR is genuinely dead; both citations are
+corrected to stop naming it, not restated. (from ADR-018, dead — superseded by ADR-028 before the
+purge)
+
+**ADR-026, PostgREST published-read surface.**
+`docs/adr/ADR-026-postgrest-published-read-surface.md` does not exist, but the decision is live
+and was checked against the running database, not just the migration file: migration
+`20260721180000_postgrest_published_views.sql` is applied under this name in project
+`twykhihqkcldpreuovay` (`blackstory-app`)'s migration history. It creates `public.published_entities`
+and `public.published_search_index`, both `WITH (security_invoker = true)` — so the underlying
+`bb_public` RLS stays the fail-closed gate, not the view — both filtered to
+`bb_public.active_release`, and both granted `SELECT` to `anon`/`authenticated` only, never
+`bb_canonical`, `bb_research`, or any write path. This is exactly the decision's core rule:
+published-only views over active-release data, as a second surface alongside `apps/api-public` for
+attested clients, not a replacement for it. `packages/operator-mcp`'s `get_law_timeline` stub
+correctly names these views as the read source a follow-up bead will wire it to. (from ADR-026,
+"PostgREST published-read surface")
+
+**ADR-027, Vercel for public web hosting.**
+`docs/adr/ADR-027-vercel-public-web-hosting.md` does not exist. Its live claims still hold: Vercel
+git integration deploys `apps/web` (which now includes admin, per the 2026-09-11 addendum above)
+from `main` for Production and from the `staging` branch for Preview, and there is no Firebase App
+Hosting promote path for public web — the `black-book-web-production`/`black-book-web-staging`
+backends were deleted. The one clause that changed is the promote model, and it is the same change
+recorded under ADR-006 above: it is no longer "Production traffic moves only through explicit
+promote," it is "the staging→main PR is the gate, and Vercel's git integration does the deploy
+automatically once that PR merges." (from ADR-027, "Vercel for public web hosting")
+
+**ADR-029, theme impact packets.** `docs/adr/ADR-029-theme-impact-packets.md` does not exist, but
+the rule its one citation carries — juxtaposition, not causation — already has a live home:
+`docs/methodology/juxtaposition-not-causation.md` exists and states that rule directly, so the ADR
+half of the citation is the only dead half. The mechanical side of the decision is still enforced
+at the schema level: `bb_reference.theme_impact_packets.method_stance` carries a `CHECK` constraint
+restricting it to `juxtaposition` or `gated_causal_claim`. (from ADR-029, "theme impact packets")
