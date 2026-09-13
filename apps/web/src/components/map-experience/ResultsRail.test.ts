@@ -7,6 +7,9 @@
  * set size unless `aria-setsize` and `aria-posinset` are carried deliberately.
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
@@ -17,6 +20,9 @@ import {
   type ResultsRailProps,
 } from './ResultsRail';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
+
+const here = dirname(fileURLToPath(import.meta.url));
+const resultsRailCss = readFileSync(join(here, 'results-rail.css'), 'utf8');
 
 const RELEASE_SIZE = 4078;
 
@@ -110,6 +116,34 @@ test('exactly one row is selected at a time', () => {
 test('no row is selected when nothing is selected', () => {
   const html = renderToStaticMarkup(createElement(ResultsRail, railProps()));
   assert.equal(html.includes('aria-selected="true"'), false);
+});
+
+test('selection is legible without color: the selected row also carries a weight change', () => {
+  // aria-selected already covers assistive tech; standing invariant 5 (map-entity-encoding.md)
+  // requires a visual channel besides the accent-colored border for sighted, color-blind and
+  // grayscale readers. The rule lives in results-rail.css, scoped to the selected row's name.
+  assert.match(
+    resultsRailCss,
+    /\.ds-results__row--selected \.ds-results__name[\s\S]*?font-weight:\s*700/,
+  );
+});
+
+test('the disclosure affordance renders on every row, selected or not', () => {
+  const html = renderToStaticMarkup(createElement(ResultsRail, railProps({ selectedId: 'ent_1' })));
+  assert.equal((html.match(/ds-results__disclosure/g) ?? []).length, 3);
+});
+
+test('the disclosure sits with the save control in one right-edge action group', () => {
+  const html = renderToStaticMarkup(
+    createElement(ResultsRail, railProps({ onToggleSave: () => {} })),
+  );
+  assert.match(html, /ds-results__actions/);
+  assert.match(html, /ds-results__actions[\s\S]*?ds-results__save[\s\S]*?ds-results__disclosure/);
+});
+
+test('the disclosure is decorative, not a second label competing with the option', () => {
+  const html = renderToStaticMarkup(createElement(ResultsRail, railProps()));
+  assert.match(html, /class="ds-results__disclosure" aria-hidden="true"/);
 });
 
 test('every option carries its true position in the full list, not the window', () => {

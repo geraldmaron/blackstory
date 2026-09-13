@@ -168,9 +168,19 @@
   background: var(--ds-canvas);
 }
 
+/*
+ * The accent border marks selection, but accent is a hue, and docs/ui/patterns-map-entity-encoding.md
+ * is explicit that color is never the only signal. The name's weight is the channel that survives
+ * without color perception — bold reads as bold in grayscale, at low contrast, and to a
+ * color-blind reader, where a hue shift on a thin border may not.
+ */
 .ds-results__row--selected {
   border-left-color: var(--ds-accent-graphic);
   background: var(--ds-canvas);
+}
+
+.ds-results__row--selected .ds-results__name {
+  font-weight: 700;
 }
 
 .ds-results__glyph {
@@ -294,6 +304,16 @@
   opacity: 0.6;
 }
 
+/* The row's own grid slot: `18px 1fr auto`, and this is the `auto` third column. The save
+   button is transient chrome (hidden until hover/focus/on); the disclosure beside it is not —
+   it states the row's own affordance, so it stays visible. */
+.ds-results__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+}
+
 .ds-results__save {
   display: inline-grid;
   place-items: center;
@@ -316,6 +336,15 @@
 
 .ds-results__save--on {
   color: var(--ds-accent);
+}
+
+.ds-results__disclosure {
+  flex: none;
+  width: 14px;
+  text-align: center;
+  font-size: 0.9375rem;
+  line-height: 1;
+  color: var(--ds-ink-muted);
 }
 
 /* See lens-panel.css: one shared narrow slot, one instrument in it. */

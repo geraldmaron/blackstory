@@ -314,38 +314,53 @@ export function ResultsRail({
                     </span>
                   </span>
 
-                  {onToggleSave ? (
-                    <button
-                      type="button"
-                      className={cx('ds-results__save', saved && 'ds-results__save--on')}
-                      aria-pressed={saved}
-                      aria-label={
-                        saved
-                          ? `Remove ${feature.properties.displayName} from saved`
-                          : `Save ${feature.properties.displayName}`
-                      }
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onToggleSave(feature);
-                      }}
-                    >
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                        aria-hidden="true"
+                  <span className="ds-results__actions">
+                    {onToggleSave ? (
+                      <button
+                        type="button"
+                        className={cx('ds-results__save', saved && 'ds-results__save--on')}
+                        aria-pressed={saved}
+                        aria-label={
+                          saved
+                            ? `Remove ${feature.properties.displayName} from saved`
+                            : `Save ${feature.properties.displayName}`
+                        }
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onToggleSave(feature);
+                        }}
                       >
-                        <path
-                          d="M4 2.6h8a.6.6 0 0 1 .6.6v10.2L8 10.6l-4.6 2.8V3.2a.6.6 0 0 1 .6-.6Z"
-                          stroke="currentColor"
-                          strokeWidth="1.4"
-                          strokeLinejoin="round"
-                          fill={saved ? 'currentColor' : 'none'}
-                        />
-                      </svg>
-                    </button>
-                  ) : null}
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M4 2.6h8a.6.6 0 0 1 .6.6v10.2L8 10.6l-4.6 2.8V3.2a.6.6 0 0 1 .6-.6Z"
+                            stroke="currentColor"
+                            strokeWidth="1.4"
+                            strokeLinejoin="round"
+                            fill={saved ? 'currentColor' : 'none'}
+                          />
+                        </svg>
+                      </button>
+                    ) : null}
+                    {/*
+                     * The row's own disclosure: activating it (click, or Enter/Space per the
+                     * onKeyDown above) opens the record sheet, and this glyph is what tells a
+                     * sighted reader the row leads somewhere before they act on it. A plain
+                     * character, not a rotating icon — the same text-glyph idiom the drawer
+                     * disclosures already use (article.css's "+ / –" cue, room-kit.css's
+                     * .ds-room-draw__summary::after), just pointing right instead of toggling.
+                     * Decorative: role="option" plus aria-selected already state the row's
+                     * status to assistive tech, so this carries no label of its own.
+                     */}
+                    <span className="ds-results__disclosure" aria-hidden="true">
+                      &rsaquo;
+                    </span>
+                  </span>
                 </div>
               );
             })}
