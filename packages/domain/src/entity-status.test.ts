@@ -108,7 +108,12 @@ test('NOTABILITY_RUBRIC documents reviewable rubric text for every criterion', (
   // Reconstruction officeholder read as a site, and the Chicago Defender had no home at all.
   // `documented_racial_killing`, `enacted_law`, `elected_or_appointed_office` and
   // `black_press_or_archive` are that decision. Change this number only alongside the ruling.
-  assert.equal(NOTABILITY_CRITERIA.length, 14);
+  // 15 since the owner ruling of 2026-09-12 (bead repo-ytq3n) added
+  // `documented_military_service`, reversing section G's "a fifth criterion is not yet earned":
+  // the 91st USCI, the Golden Thirteen, the Black Seminole Scouts, Lewis Broadus and Prince
+  // Romerson were all still resting on `documented_site` alone. See docs/methodology/
+  // notability-rubric.md section H.
+  assert.equal(NOTABILITY_CRITERIA.length, 15);
   for (const criterion of NOTABILITY_CRITERIA) {
     assert.equal(typeof NOTABILITY_RUBRIC[criterion], 'string');
     assert.ok(NOTABILITY_RUBRIC[criterion].length > 20, `${criterion} rubric text is too thin`);

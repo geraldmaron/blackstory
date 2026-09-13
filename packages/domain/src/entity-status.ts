@@ -140,6 +140,7 @@ export const NOTABILITY_CRITERIA = [
   'enacted_law',
   'elected_or_appointed_office',
   'black_press_or_archive',
+  'documented_military_service',
 ] as const;
 
 export type NotabilityCriterion = (typeof NOTABILITY_CRITERIA)[number];
@@ -251,6 +252,15 @@ export const NOTABILITY_RUBRIC: Readonly<Record<NotabilityCriterion, string>> = 
     '1827 with \u201cWe wish to plead our own cause. Too long have others spoken for us.\u201d ' +
     'The basis is the documented role in making or keeping that record, and it is a role this ' +
     'catalog depends on: these are among the sources it cites.',
+  documented_military_service:
+    'The entity (a person, unit or regiment) has a documented record of military service that ' +
+    'is itself the reason it is here: service in a segregated or newly integrated formation, ' +
+    'a first commission or enlistment that broke a service\u2019s color line, or a unit raised ' +
+    'specifically from Black or Black and Native soldiers. Service alone is not the basis \u2014 ' +
+    'the record has to show the service carried that weight, which is why the 91st United ' +
+    'States Colored Infantry and the Golden Thirteen sit here rather than under ' +
+    '`documented_site`, the honest-but-wrong fallback they inherited before this criterion ' +
+    'existed.',
 };
 
 /**

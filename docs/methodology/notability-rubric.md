@@ -280,10 +280,15 @@ Republishing rebuilds `related[]` — see `repo-66mv1` and commit `0f15aed3`.
 
 ## Not decided here
 
-- **Military service.** USCT regiments, the Buffalo Soldiers, the Black Seminole Scouts, the
-  Golden Thirteen, Charity Adams Earley — about a dozen records. `elected_or_appointed_office`
-  covers a commission but not enlisted service. Most of this cohort is honestly `first_to_do_x` or
-  `major_honor_or_hall_of_fame`; a fifth criterion is not yet earned. Bead `repo-ytq3n`.
+- **Military service.** ~~A fifth criterion is not yet earned.~~ **Superseded by the owner
+  ruling of 2026-09-12 (bead `repo-ytq3n`): the criterion is earned and is now
+  `documented_military_service`.** What changed the answer was measuring the residue rather than
+  the cohort: the 91st United States Colored Infantry, the Golden Thirteen, the Black Seminole
+  Scouts, Lewis Broadus and Prince Romerson were all still resting on `documented_site` alone
+  — the honest-but-wrong fallback this whole document exists to retire — and neither
+  `first_to_do_x` nor `major_honor_or_hall_of_fame` was true of them without stretching.
+  `elected_or_appointed_office` covers a commission but not enlisted service, which is exactly
+  the gap. See section H.
 - **The `other` kind.** Eleven records: plantations, the *Clotilda*, Nat Turner's rebellion,
   "history of slavery in Colorado", "Hidden Figures". Heterogeneous, and a kind-assignment problem
   rather than a rubric problem. Bead `repo-ytq3n`.
@@ -291,6 +296,33 @@ Republishing rebuilds `related[]` — see `repo-66mv1` and commit `0f15aed3`.
 - **Places.** 457 place records have `documented_site` as their only reason. For a place the
   sentence is at least not false, so it is out of scope here — but "it is a site" is a
   near-tautology for a place and those records are carrying no real inclusion reason either.
+
+### H. Military service — new criterion `documented_military_service`. (~5 records measured)
+
+Added by owner ruling 2026-09-12, after section G's open-items list had recorded the opposite
+conclusion. The trigger was not a new cohort but a measurement: the records this was meant to
+cover had not moved off `documented_site`, so the "not yet earned" verdict was leaving five
+published records carrying a reason that is a near-tautology for a place and plainly false for a
+regiment.
+
+Scope is deliberately narrow. Service alone is not a basis — most people who served are not in
+this catalog, and should not be. The basis is service that carried institutional weight: a
+segregated or newly integrated formation, a first commission or enlistment that broke a service's
+color line, or a unit raised specifically from Black or Black and Native soldiers.
+
+> **`documented_military_service`** — The entity (a person, unit or regiment) has a documented
+> record of military service that is itself the reason it is here: service in a segregated or
+> newly integrated formation, a first commission or enlistment that broke a service's color line,
+> or a unit raised specifically from Black or Black and Native soldiers. Service alone is not the
+> basis — the record has to show the service carried that weight.
+
+Operational note from the same session: this criterion was written into live data before the enum
+that validates it existed in `@repo/schemas`, and the five affected rows silently failed
+`mapPostgresSearchIndexRow` and were dropped from the published `search-index.json` (the publisher
+reported "5 unmappable search rows dropped" and kept going). A new criterion is three coordinated
+edits — `NOTABILITY_CRITERIA`, `NOTABILITY_RUBRIC`, and the zod enum in
+`packages/schemas/src/public-projections.ts` — plus `NOTABILITY_CRITERION_LABELS`, and the pinned
+count in `entity-status.test.ts`. Land all of them before writing the data.
 
 ## Source verification
 

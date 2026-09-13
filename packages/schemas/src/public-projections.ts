@@ -122,6 +122,7 @@ const notabilityBasisRecordSchema = z.object({
     'enacted_law',
     'elected_or_appointed_office',
     'black_press_or_archive',
+    'documented_military_service',
   ]),
   note: z.string().min(1),
   evidenceIds: z.array(z.string().min(1)).default([]),
