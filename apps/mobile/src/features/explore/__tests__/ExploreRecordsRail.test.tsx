@@ -1,6 +1,7 @@
 /**
- * Tests for v6 Explore records rail — hairline rows, copper selection rule, fact strips.
- * BottomSheetFlatList is mocked as a passthrough FlatList host for RNTL.
+ * Tests for v6 Explore records rail — hairline rows, copper selection rule plus a
+ * non-color checkmark mark, fact strips. BottomSheetFlatList is mocked as a
+ * passthrough FlatList host for RNTL.
  */
 import { fireEvent, render } from '@testing-library/react-native';
 
@@ -103,5 +104,31 @@ describe('ExploreRecordsRail', () => {
     );
     expect(getByTestId('explore-records-empty')).toBeTruthy();
     expect(getByText('No places nearby')).toBeTruthy();
+  });
+
+  it('marks the selected row with a non-color checkmark, not the copper rule alone', async () => {
+    const { getByLabelText, queryByTestId } = await render(
+      <ExploreRecordsRail
+        features={[feature('ent_a', 'Howard Theatre')]}
+        selectedId="ent_a"
+        onSelect={() => undefined}
+      />,
+    );
+    // A shape/presence cue survives even if the reader cannot distinguish the copper rule by hue.
+    // The mark is decorative (accessibilityElementsHidden), so it must be looked up explicitly
+    // including hidden elements — the row's own accessibilityState/Label carry the a11y signal.
+    expect(queryByTestId('explore-record-selected-mark', { includeHiddenElements: true })).toBeTruthy();
+    const row = getByLabelText(/Howard Theatre/);
+    expect(row.props.accessibilityState).toEqual(expect.objectContaining({ selected: true }));
+    expect(row.props.accessibilityLabel).toMatch(/Selected$/);
+  });
+
+  it('does not show the selection checkmark on an unselected row', async () => {
+    const { getByLabelText, queryByTestId } = await render(
+      <ExploreRecordsRail features={[feature('ent_a', 'Howard Theatre')]} onSelect={() => undefined} />,
+    );
+    expect(queryByTestId('explore-record-selected-mark', { includeHiddenElements: true })).toBeNull();
+    const row = getByLabelText(/Howard Theatre/);
+    expect(row.props.accessibilityState).toEqual(expect.objectContaining({ selected: false }));
   });
 });

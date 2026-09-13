@@ -1,6 +1,9 @@
 /**
  * Explore records rail — Pin Pulse browse list: kind glyph, title, one caption
- * (where · era). Copper left rule on selection. BottomSheetFlatList owns scroll.
+ * (where · era). Selection draws a copper left rule plus a persistent, ink-colored
+ * checkmark mark, so which row is selected reads by shape/presence rather than by
+ * color perception — copper is never the only selection signal. BottomSheetFlatList
+ * owns scroll.
  */
 import { memo, useCallback, useMemo } from 'react';
 import { Pressable, StyleSheet, View, type ListRenderItemInfo } from 'react-native';
@@ -99,6 +102,18 @@ const RecordRow = memo(function RecordRow({
         ) : null}
       </View>
       <View style={styles.rowTrailing}>
+        {selected ? (
+          <Ionicons
+            testID="explore-record-selected-mark"
+            name="checkmark-circle"
+            size={16}
+            // Ink-based (not accent/copper): presence of this mark is the selection signal, so
+            // it still reads for a viewer who cannot distinguish the copper left rule by hue.
+            color={theme.borderStrong}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          />
+        ) : null}
         <RecordMeter
           tier={story.confidenceTier}
           {...(story.sourceCount !== undefined ? { sourceCount: story.sourceCount } : {})}
