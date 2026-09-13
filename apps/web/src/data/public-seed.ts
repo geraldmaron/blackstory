@@ -249,9 +249,16 @@ export type PublicEntityView = {
   /** Structured, auditable inclusion basis backing `notabilityLabels` above (the related workstream).
    * Live release projections carry this directly (see `@repo/domain`'s
    * `buildReleaseEntityArtifacts`); this bundled seed catalog predates the release builder and
-   * does not populate it, so read-path adapters (`snapshot-search-index.ts`,
-   * `entity/[id]/adapters.ts`) still synthesize a basis from `notabilityLabels` when this is
-   * absent. */
+   * does not populate it, so two read-path adapters synthesize a basis from `notabilityLabels`
+   * when this is absent: `snapshot-search-index.ts`'s `notabilityBasisFor`, which reaches search
+   * through `hybrid-search.ts`, and `entity/[id]/adapters.ts`'s `notabilityBasisFor`, which
+   * reaches the record room's "Why this is here" block through `buildWhyThisAppearsForEntity`.
+   *
+   * The second half of that was false when written and stayed false until 2026-09-12
+   * (repo-tgfw5): the entity adapter synthesized a basis that no surface mounted, so the block
+   * printed `notabilityLabels` alone. That is what made the repo-81i8 backfill look consumed
+   * when nothing read it. Do not re-add an adapter to this list on the strength of its code
+   * alone — check that something renders what it returns. */
   readonly notabilityBasis?: readonly NotabilityBasisRecord[];
   /** Sensitivity classification label, when the entity carries one. Presentation is via
    * `SensitivityContextBanner`. */

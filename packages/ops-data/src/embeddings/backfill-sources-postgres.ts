@@ -5,15 +5,21 @@
  *
  * Reads `bb_public.release_entities` for the currently active release: the same public
  * projection (display_name, kind, summary) apps/api-public and apps/web already serve reads
- * from, so what gets embedded matches what a reader actually sees. `location` on this table is
- * lat/lng/geohash only (no state text), so unlike the old search-index source this one omits the
- * `state` pre-filter entirely rather than guess; `eraBucket` is likewise omitted (no kind-specific
- * year fields survive projection into this table). Both remain valid `undefined` inputs to
- * `deriveEntityFilters` (text.ts) — filtering on `kind` alone still works, and the endpoint's
- * `state`/`eraBucket` query params simply match nothing extra until a richer source is wired.
+ * from, so what gets embedded matches what a reader actually sees. The `location` COLUMN on
+ * this table is lat/lng/geohash only, but `projection->>'jurisdictionLabel'` carries a "City,
+ * State" label on nearly every row, and this source resolves the `state` pre-filter from it with
+ * the same `parseStateCodeFromJurisdiction` the old search-index source used on the identical
+ * label shape (`backfill-sources.ts`) — no cross-schema join needed, and one would break this
+ * module's design principle of embedding only what the public projection already contains.
+ * `eraBucket` is still omitted: no kind-specific year fields (birthYear, startAt, ...) survive
+ * projection into this table, so there is nothing to resolve it from without that same join. It
+ * remains a valid `undefined` input to `deriveEntityFilters` (text.ts) — filtering on `kind`
+ * (and now `state`) still works, and the endpoint's `eraBucket` query param simply matches
+ * nothing extra until a richer source is wired.
  */
 import type { EntityKindDoc } from '../firestore/types.js';
 import type { CanonicalEntitySource, ExistingEmbeddingHashLookup } from './backfill-cli.js';
+import { parseStateCodeFromJurisdiction } from './backfill-sources.js';
 import type { EntityEmbeddingInput } from './pipeline.js';
 
 const PAGE_SIZE = 200;
@@ -48,6 +54,7 @@ type ReleaseEntityRow = {
   readonly display_name: string | null;
   readonly kind: string | null;
   readonly summary: string | null;
+  readonly jurisdiction_label: string | null;
 };
 
 /** Pages `bb_public.release_entities` (active release) ordered by entity_id. Skips missing display_name. */
@@ -58,7 +65,8 @@ export function createPostgresCanonicalEntitySource(
   return {
     async listPage(cursor) {
       const rows = await query<ReleaseEntityRow>(
-        `SELECT re.entity_id, re.display_name, re.kind, re.summary
+        `SELECT re.entity_id, re.display_name, re.kind, re.summary,
+                re.projection->>'jurisdictionLabel' AS jurisdiction_label
          FROM bb_public.release_entities re
          JOIN bb_public.active_release ar ON ar.release_id = re.release_id
          WHERE re.entity_id > COALESCE($1, '')
@@ -71,6 +79,8 @@ export function createPostgresCanonicalEntitySource(
       for (const row of rows) {
         const displayName = row.display_name?.trim();
         if (!displayName) continue;
+        const placeLabel = row.jurisdiction_label?.trim() || undefined;
+        const state = parseStateCodeFromJurisdiction(placeLabel);
         items.push({
           entityId: row.entity_id,
           entity: {
@@ -78,6 +88,14 @@ export function createPostgresCanonicalEntitySource(
             displayName,
             ...(row.summary?.trim() ? { summary: row.summary.trim() } : {}),
           },
+          ...(state !== undefined || placeLabel !== undefined
+            ? {
+                location: {
+                  ...(state !== undefined ? { state } : {}),
+                  ...(placeLabel !== undefined ? { placeLabel } : {}),
+                },
+              }
+            : {}),
         });
       }
 

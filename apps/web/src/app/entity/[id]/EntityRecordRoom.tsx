@@ -66,7 +66,13 @@ import { resolveEntityCrossReferences } from '../../../lib/theme-impact/source';
 import { resolveCitesEdgeIndex } from '../../../lib/articles/source';
 import { storiesCiting } from '../../../lib/release/build-cites-edge';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
-import { toEvidenceClaimInputs, withoutSummaryEchoClaims } from './adapters';
+import { WhyThisAppears } from '../../../components/why-appears';
+import {
+  buildWhyThisAppearsForEntity,
+  toEvidenceClaimInputs,
+  whyAppearsEvidenceById,
+  withoutSummaryEchoClaims,
+} from './adapters';
 import { buildEntityAnatomyInputs, whereTileLabel } from './entity-anatomy-facts';
 import { deriveRecordStanding, isSingleSourceRecord, isThinRecord } from './entity-view-model';
 import { EntityRoomSections, recordSectionIndex } from './EntityRoomSections';
@@ -247,6 +253,16 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
         })
       : undefined;
   const sources = toRoomSources(entity.claims);
+  /*
+   * The record's own evidenced reason for being in the catalog, and the rubric fallback.
+   *
+   * `notabilityLabels` is the rubric sentence — every record sharing a criterion prints it
+   * verbatim, so the block said the same thing on thousands of pages. `notabilityBasis` carries
+   * this record's own reviewed note and the claim ids it rests on, which is what the composed
+   * payload renders. When the composer refuses a record (see `buildWhyThisAppearsForEntity`),
+   * the labels are still shown rather than an empty block.
+   */
+  const whyThisAppears = buildWhyThisAppearsForEntity(entity);
   // Rubric sentences, whole. They used to be truncated into chips next to the title.
   const inclusionBasis = entity.notabilityLabels ?? [];
   const gaps = resolveRecordGaps(entity, [...displayClaims]);
@@ -356,16 +372,23 @@ export async function EntityRecordRoom({ entity }: { readonly entity: PublicEnti
           </section>
         ) : null}
 
-        {inclusionBasis.length > 0 ? (
+        {whyThisAppears !== undefined || inclusionBasis.length > 0 ? (
           <section aria-labelledby="why-heading">
             <RecordSmallTitle id="why-heading" icon="why" className="ds-record-appx__title">
               Why this is here
             </RecordSmallTitle>
-            <ul className="ds-record-rail-block__reasons">
-              {inclusionBasis.map((reason) => (
-                <li key={reason}>{reason}</li>
-              ))}
-            </ul>
+            {whyThisAppears !== undefined ? (
+              <WhyThisAppears
+                result={whyThisAppears}
+                evidenceById={whyAppearsEvidenceById(entity)}
+              />
+            ) : (
+              <ul className="ds-record-rail-block__reasons">
+                {inclusionBasis.map((reason) => (
+                  <li key={reason}>{reason}</li>
+                ))}
+              </ul>
+            )}
           </section>
         ) : null}
 
