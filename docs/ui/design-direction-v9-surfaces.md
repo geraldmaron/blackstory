@@ -77,7 +77,7 @@ Long form, catalog and index editorial on paper. One scrolling, measure limited 
 
 ### 2.3 Record page
 
-One catalogd thing with a place, an era and evidence: an entity, a banned book, a law. The Atlas record sheet unfolded into a durable, crawlable, citable page. Same anatomy component as the sheet, never a fork.
+One cataloged thing with a place, an era and evidence: an entity, a banned book, a law. The Atlas record sheet unfolded into a durable, crawlable, citable page. Same anatomy component as the sheet, never a fork.
 
 **Chrome.** Command bar, framed place or jurisdiction plate, record anatomy in inline rows, trust block, sources, connections, chapters that cite this record, session prev and next, palette, collections, toasts, footer.
 

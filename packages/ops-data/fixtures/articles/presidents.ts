@@ -2760,7 +2760,7 @@ export const presidentArticles = [
         type: 'list' as const,
         style: 'bullet' as const,
         items: [
-          "Issued Executive Order 9808 on December 5, 1946, establishing the President's Committee on Civil Rights, whose 1947 report To Secure These Rights catalogd discrimination in voting, housing, education and public accommodations.[ref:app-eo-9808][ref:nps-truman-civil-rights]",
+          "Issued Executive Order 9808 on December 5, 1946, establishing the President's Committee on Civil Rights, whose 1947 report To Secure These Rights cataloged discrimination in voting, housing, education and public accommodations.[ref:app-eo-9808][ref:nps-truman-civil-rights]",
           'Signed Executive Order 9981 on July 26, 1948, directing equality of treatment and opportunity in the armed forces without regard to race, color, religion or national origin.[ref:nara-eo-9981][ref:nps-truman-civil-rights]',
           'Signed Executive Order 9980 the same day, July 26, 1948, requiring federal appointing officers to base personnel actions solely on merit and fitness and to prevent racial and religious discrimination.[ref:app-eo-9980][ref:trumanlib-eo-9980]',
           'Delivered a civil rights message to a joint session of Congress on February 2, 1948, asking for federal anti-lynching protection, voting rights protection and a permanent Fair Employment Practices Commission. Congress did not pass the package.[ref:nps-truman-civil-rights][ref:trumanlib-woodard]',
