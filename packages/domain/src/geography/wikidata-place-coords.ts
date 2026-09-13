@@ -1,6 +1,7 @@
 /**
  * Extract durable place coordinates from a Wikidata entity (P625).
- * Research enrichment only — never used by product `/locate` (ADR-008 stays Census).
+ * Research enrichment only — never used by product `/locate`, which stays on the US Census
+ * Geocoder (`docs/decisions-carryover.md`, "Search and geocoding").
  */
 import { extractLocations } from '../adapters/wikimedia/extractors.js';
 import type { WikidataEntity } from '../adapters/wikimedia/types.js';

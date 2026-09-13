@@ -7,7 +7,8 @@
  * `workers/publication/MAP_SOURCE_INTEGRATION.md`). Running this script against fixture data
  * is the same shape of operation a real release activation would perform against live public
  * projections — build the source once, write an immutable artifact, let the app read it
- * statically (ADR-008 bounded/static-first doctrine).
+ * statically (the bounded/static-first doctrine in `docs/decisions-carryover.md`, "Search and
+ * geocoding").
  *
  * Run with: pnpm --filter @repo/domain exec tsx
  * src/map/generate-demo-map-source.ts

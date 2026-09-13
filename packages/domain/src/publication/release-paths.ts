@@ -22,7 +22,8 @@ export function publicReleaseEntitiesListPath(releaseId: string): string {
 }
 
 /**
- * Aggregate search-index artifact for the public search surface (ADR-004 / ADR-008).
+ * Aggregate search-index artifact for the public search surface (see
+ * `docs/decisions-carryover.md`).
  * Prefer this (or Firestore `publicSearchIndex` reads) over rebuilding the index from entity
  * projections at request time.
  */

@@ -14,7 +14,7 @@
  * and a missing/renamed field must degrade one match, never throw on the whole batch.
  *
  * No API key, no cost, no rate-limit contract from the vendor (public, unauthenticated,
- * "reasonable use" service) see docs/adr/ADR-008-search-and-geocoding.md decision 4. This
+ * "reasonable use" service) see `docs/decisions-carryover.md`, "Search and geocoding". This
  * repo's own `geocoding` endpoint-class quota (packages/security/src/rate-limits.ts) is
  * what actually bounds call volume, not a vendor-issued key.
  */

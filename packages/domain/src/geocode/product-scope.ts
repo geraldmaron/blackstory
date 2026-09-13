@@ -1,6 +1,7 @@
 /**
  * 50-states-+-D.C. product scope gate for geocode results (;
- * ADR-008 "Product scope for address discovery is U.S.-oriented (50 states + D.C.)").
+ * `docs/decisions-carryover.md`, "Search and geocoding": product scope for address discovery is
+ * U.S.-oriented, the 50 states + D.C.).
  *
  * Scope membership is derived from the SAME `US_STATES` table already treat as
  * the single source of truth (`../map/us-geography.ts`) never a second, hand-typed FIPS list.

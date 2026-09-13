@@ -1,6 +1,7 @@
 /**
  * Exact-coordinate reduction for geocode results ("exact
- * coordinates are reduced when no longer needed"; ADR-008 decision 5).
+ * coordinates are reduced when no longer needed"; `docs/decisions-carryover.md`, "Search and
+ * geocoding").
  *
  * A geocode/reverse-geocode call needs the EXACT lat/lng only long enough to resolve
  * jurisdiction ids (state/county/place) once that resolution has happened, the exact

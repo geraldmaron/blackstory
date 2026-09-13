@@ -396,3 +396,47 @@ future on-demand creation pass should use plus the minimal fields it would need,
 writes nothing. The loader populates only the 50 states plus D.C. from the same table. So a reader
 finding `placeId` on a resolved match should not assume a `jurisdictions/{id}` document exists for
 it — it is a hint, never a write. (from ADR-016 §1, "cities: on-demand only")
+
+## Search and geocoding (recovered 2026-09-13, repo-gtm2y)
+
+`docs/adr/ADR-008-search-and-geocoding.md` does not exist. Eleven source comments cite it, one by
+that dead path, and two of them carry privacy rules. Recovered from the code.
+
+**Geocoding is the US Census Geocoder, with no key and no vendor rate-limit contract.** Every
+request uses benchmark `Public_AR_Current` and vintage `Current_Current`
+(`packages/domain/src/adapters/census-geo/types.ts`). It is a public, unauthenticated "reasonable
+use" service, so there is no vendor-issued key to rotate and no quota the vendor enforces — what
+actually bounds call volume is this repo's own `geocoding` endpoint-class quota in
+`packages/security/src/rate-limits.ts`. Parsing is defensive throughout
+(`census-geo/response-parser.ts`) because the API is not versioned in a way this repo controls: a
+missing or renamed field must degrade one match, never throw on the batch.
+`wikidata-place-coords.ts` exists for research enrichment only and must not become a second product
+geocoder. (from ADR-008 decision 4, "search and geocoding")
+
+**Exact coordinates are reduced when no longer needed, and retention is opt-in.** A geocode call
+needs the exact lat/lng only long enough to resolve state/county/place ids; after that the exact
+coordinate serves no product purpose for an ordinary lookup and is dropped.
+`neededForPublic` and `retainExactCoordinates` both default to `false`
+(`packages/domain/src/geocode/coordinate-precision.ts`), so a caller must opt IN to keeping it —
+`/locate`'s `camera=1` is such an opt-in, for a one-shot map fly-to. This is a DIFFERENT and
+earlier layer than `packages/security/src/redaction.ts`'s `reducePublicPrecision`, which governs
+what a PUBLISHED entity location may show; this one governs what the geocode response retains
+before anything is published or even persisted. Both move in one direction only, coarser and never
+finer, and they are deliberately not merged. (from ADR-008 decision 5, "search and geocoding")
+
+**Product scope for address discovery is the 50 states plus D.C.** Scope is derived from the same
+`US_STATES` table that `../map/us-geography.ts` owns as the single source of truth, never a second
+hand-typed FIPS list. A Census match for a territory (PR `72`, GU `66`, VI `78`, AS `60`, MP `69`)
+has a real state-equivalent FIPS but is out of scope, and `evaluateGeocodeProductScope` reports
+that rather than resolving ids for a state row the `jurisdictions` collection will never contain —
+only the 50 states plus D.C. are loaded from that table. The Gazetteer loader skips the same rows
+on the same line. Note this gate was NOT widened by the 2026-09-12 owner ruling that the Atlas
+supports non-US birthplaces (repo-9rkh), even though the ruling named this file: the gate only ever
+receives a US Census Geocoder match, and that service does not geocode non-US places at all, so
+widening the set would be a no-op for the actual need. (from ADR-008, "search and geocoding")
+
+**Bounded and static-first.** Map sources are generated statically rather than served from a live
+query path (`packages/domain/src/map/generate-demo-map-source.ts`), and state attribution in
+`findUsStateForPoint` is a bounded local computation. The doctrine is that a reader-facing surface
+should not depend on a live third-party call it cannot bound. (from ADR-008, "search and
+geocoding")

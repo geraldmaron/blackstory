@@ -2,7 +2,8 @@
  * U.S.-only geography reference table for the map data platform.
  *
  * Product scope is 50 states + D.C. (no territories) same scope line used by
- * ADR-008 /. State attribution in {@link findUsStateForPoint} is primarily an
+ * See `docs/decisions-carryover.md`, "Search and geocoding". State attribution in
+ * {@link findUsStateForPoint} is primarily an
  * approximate bounding-box test — cheap, and good enough on its own for
  * national-zoom presence/density aggregates — but a bbox-only test silently
  * mis-assigns any point that falls inside more than one state's rectangle

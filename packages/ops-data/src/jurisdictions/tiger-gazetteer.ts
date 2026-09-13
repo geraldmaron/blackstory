@@ -176,7 +176,8 @@ export type BuildCountyJurisdictionDocsOptions = {
 
 export type BuildCountyDocsResult = {
   readonly docs: readonly JurisdictionDoc[];
-  /** Rows outside the 50-states-+-D.C. product scope (territories), skipped per ADR-008. */
+  /** Rows outside the 50-states-+-D.C. product scope (territories); see
+   * `docs/decisions-carryover.md`, "Search and geocoding". */
   readonly outOfScope: readonly { readonly geoid: string; readonly usps: string }[];
 };
 
@@ -184,7 +185,8 @@ export type BuildCountyDocsResult = {
  * Transforms parsed Gazetteer rows into `jurisdictions` county docs. Rows whose state FIPS
  * does not match one of the 51 rows in `US_STATES` (i.e. Puerto Rico, Guam, and other
  * territories) are excluded, not stored this repo's product scope is 50 states + D.C., the
- * same scope line ADR-008 already draw, not something this invents.
+ * same scope line the product already draws (`docs/decisions-carryover.md`, "Search and
+ * geocoding"), not something this invents.
  */
 export function buildCountyJurisdictionDocs(
   rows: readonly GazetteerCountyRow[],
