@@ -123,3 +123,42 @@ describe('assertNoRankingSignal — negative-snapshot backstop', () => {
     expect(() => assertNoRankingSignal(hostile)).toThrow(RankingSignalLeakError);
   });
 });
+
+describe('assertNoRankingSignal — a confidence TIER is an assessment, not a ranking signal', () => {
+  it('admits confidenceTier, which is graded on /v1/map already and carries no orderable number', () => {
+    expect(() =>
+      assertNoRankingSignal([
+        {
+          id: 'ent_1',
+          kind: 'person',
+          displayName: 'Harriet Tubman',
+          matchedOn: 'displayName',
+          matchedText: 'Harriet Tubman',
+          explanation: 'Matched on name.',
+          eraBuckets: [],
+          notabilityLabels: [],
+          confidenceTier: 'high',
+        },
+      ]),
+    ).not.toThrow();
+  });
+
+  it('still throws on evidenceCount even when the same result carries a legitimate tier', () => {
+    const hostile = [
+      {
+        id: 'ent_1',
+        kind: 'person',
+        displayName: 'Harriet Tubman',
+        matchedOn: 'displayName',
+        matchedText: 'Harriet Tubman',
+        explanation: 'Matched on name.',
+        eraBuckets: [],
+        notabilityLabels: [],
+        confidenceTier: 'high',
+        evidenceCount: 4,
+      },
+    ];
+    expect(() => assertNoRankingSignal(hostile)).toThrow(RankingSignalLeakError);
+    expect(() => assertNoRankingSignal(hostile)).toThrow(/evidenceCount/);
+  });
+});

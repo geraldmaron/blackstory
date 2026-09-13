@@ -6,12 +6,13 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { PublicEntityProjectionDoc } from '@repo/schemas';
 import { entityV1Schema } from '@repo/public-contracts/v1/entity';
-import { createPublicDataAccessFromReaders } from './data-access.js';
+import { createPublicDataAccessFromReaders, searchOverIndex } from './data-access.js';
 import {
   createPostgresDataAccessReaders,
   mapPublicSearchProjection,
 } from './postgres-data-access.js';
 import type { PostgresQueryFn } from './postgres-readers.js';
+import type { CanonicalSearchQuery } from '@repo/security';
 
 const RELEASE_ID = 'rel_seed_001';
 
@@ -292,4 +293,108 @@ test('mapPublicSearchProjection preserves domain search fields', () => {
     evidenceLineageKeys: ['npgallery.nps.gov', 'catalog.archives.gov'],
   });
   assert.equal(mapped.geohash, 'dqcjq');
+});
+
+/**
+ * The index-backed search path grades at READ time from the inputs the doc carries. The doc must
+ * never hold a finished tier: a cached grade survives a rule change and strands the surface
+ * reading it, which is why `search_index` projects `evidenceInputs` and nothing graded.
+ */
+function indexDoc(
+  overrides: Partial<Parameters<typeof mapPublicSearchProjection>[0]> = {},
+): ReturnType<typeof mapPublicSearchProjection> {
+  return mapPublicSearchProjection({
+    id: 'ent_index_001',
+    releaseId: RELEASE_ID,
+    kind: 'place',
+    displayName: 'Dunbar High School',
+    nameLower: 'dunbar high school',
+    aliases: [],
+    topicTags: [],
+    topicIds: [],
+    mentionedEntityIds: [],
+    keywords: [],
+    campaignIds: [],
+    eraBuckets: ['1910s'],
+    notabilityBasis: [],
+    notabilityLabels: ['Community landmark.'],
+    recordMaturity: 'minimum_record',
+    researchCoverage: 'minimal',
+    relatedCount: 0,
+    claimCount: 2,
+    summary: 'A school.',
+    ...overrides,
+  });
+}
+
+const INDEX_QUERY: CanonicalSearchQuery = {
+  q: 'dunbar',
+  filters: [],
+  sort: 'relevance',
+  pageSize: 20,
+  depth: 1,
+  shape: 'text_filters',
+};
+
+test('searchOverIndex derives the tier from the doc evidence inputs, never from a cached grade', () => {
+  const page = searchOverIndex(
+    [
+      indexDoc({
+        evidenceInputs: {
+          strongestClaimLevel: 'high',
+          citedLineageKeys: ['npgallery.nps.gov', 'catalog.archives.gov'],
+          evidenceLineageKeys: ['npgallery.nps.gov', 'catalog.archives.gov'],
+        },
+      }),
+    ],
+    INDEX_QUERY,
+  );
+  assert.equal(page.results.length, 1);
+  assert.equal(page.results[0]?.confidenceTier, 'high');
+});
+
+test('searchOverIndex applies the corroboration rule at read time, not the stored level', () => {
+  // One corroborating lineage only. The stored `strongestClaimLevel` is `high`; the RULE steps it
+  // down. A doc carrying a pre-graded tier could not express this, which is the whole point.
+  const page = searchOverIndex(
+    [
+      indexDoc({
+        evidenceInputs: {
+          strongestClaimLevel: 'high',
+          citedLineageKeys: ['npgallery.nps.gov'],
+          evidenceLineageKeys: ['npgallery.nps.gov'],
+        },
+      }),
+    ],
+    INDEX_QUERY,
+  );
+  assert.equal(page.results[0]?.confidenceTier, 'medium');
+});
+
+test('searchOverIndex leaves the tier absent for a doc published before evidenceInputs existed', () => {
+  const page = searchOverIndex([indexDoc()], INDEX_QUERY);
+  assert.equal(page.results.length, 1);
+  assert.ok(
+    !('confidenceTier' in (page.results[0] ?? {})),
+    'an ungradeable doc must report no grade rather than a fabricated `unrated`',
+  );
+});
+
+test('searchOverIndex never projects the server-internal counts onto a result', () => {
+  const page = searchOverIndex(
+    [
+      indexDoc({
+        evidenceInputs: {
+          strongestClaimLevel: 'medium',
+          citedLineageKeys: ['a.example', 'b.example'],
+          evidenceLineageKeys: ['a.example', 'b.example'],
+        },
+      }),
+    ],
+    INDEX_QUERY,
+  );
+  const result = (page.results[0] ?? {}) as Record<string, unknown>;
+  for (const forbidden of ['evidenceCount', 'claimCount', 'relatedCount', 'score']) {
+    assert.ok(!(forbidden in result), `${forbidden} must not reach a search result`);
+  }
 });

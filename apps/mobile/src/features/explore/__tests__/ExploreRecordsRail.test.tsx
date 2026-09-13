@@ -117,7 +117,9 @@ describe('ExploreRecordsRail', () => {
     // A shape/presence cue survives even if the reader cannot distinguish the copper rule by hue.
     // The mark is decorative (accessibilityElementsHidden), so it must be looked up explicitly
     // including hidden elements — the row's own accessibilityState/Label carry the a11y signal.
-    expect(queryByTestId('explore-record-selected-mark', { includeHiddenElements: true })).toBeTruthy();
+    expect(
+      queryByTestId('explore-record-selected-mark', { includeHiddenElements: true }),
+    ).toBeTruthy();
     const row = getByLabelText(/Howard Theatre/);
     expect(row.props.accessibilityState).toEqual(expect.objectContaining({ selected: true }));
     expect(row.props.accessibilityLabel).toMatch(/Selected$/);
@@ -125,9 +127,14 @@ describe('ExploreRecordsRail', () => {
 
   it('does not show the selection checkmark on an unselected row', async () => {
     const { getByLabelText, queryByTestId } = await render(
-      <ExploreRecordsRail features={[feature('ent_a', 'Howard Theatre')]} onSelect={() => undefined} />,
+      <ExploreRecordsRail
+        features={[feature('ent_a', 'Howard Theatre')]}
+        onSelect={() => undefined}
+      />,
     );
-    expect(queryByTestId('explore-record-selected-mark', { includeHiddenElements: true })).toBeNull();
+    expect(
+      queryByTestId('explore-record-selected-mark', { includeHiddenElements: true }),
+    ).toBeNull();
     const row = getByLabelText(/Howard Theatre/);
     expect(row.props.accessibilityState).toEqual(expect.objectContaining({ selected: false }));
   });

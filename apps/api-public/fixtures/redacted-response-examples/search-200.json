@@ -11,7 +11,8 @@
       "status": "published",
       "eraBuckets": ["1870s", "1880s"],
       "notabilityLabels": ["First of its kind"],
-      "sensitivityClass": "none"
+      "sensitivityClass": "none",
+      "confidenceTier": "high"
     }
   ],
   "facets": {

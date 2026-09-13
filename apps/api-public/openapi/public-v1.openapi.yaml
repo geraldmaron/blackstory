@@ -342,7 +342,10 @@ components:
           maxItems: 100
           items:
             type: object
-            description: No numeric relevance or evidence counts on results
+            description: >-
+              No numeric relevance or evidence counts on results. The optional
+              confidenceTier (high|medium|low|unrated) is a graded assessment,
+              the same vocabulary /v1/map publishes, not a ranking signal.
         facets:
           type: object
         totalMatched: { type: integer, minimum: 0 }

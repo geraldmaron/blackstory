@@ -38,6 +38,11 @@ import {
 import type { CanonicalSearchQuery } from '@repo/security';
 import { normalizeSearchText } from '@repo/security';
 import { entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
+import {
+  confidenceTierFromEvidenceInputs,
+  recordConfidenceTier,
+  type ConfidenceTier,
+} from '@repo/public-contracts/evidence';
 import { type SearchFacetCountsV1, type SearchResultV1 } from '@repo/public-contracts/v1/search';
 import type { RevisionMetadataV1 } from '@repo/public-contracts/v1/revision';
 
@@ -216,10 +221,46 @@ export function searchOverIndex(
     },
     index,
   );
-  return mapSearchExecutionToPage(execution);
+  return mapSearchExecutionToPage(execution, tierReader(index));
 }
 
-function mapSearchExecutionToPage(execution: SearchExecutionResult): SearchPage {
+/**
+ * Grades a record from the INPUTS the index carries, at read time and only for the rows a page
+ * actually returns.
+ *
+ * The index deliberately stores `evidenceInputs` and not a finished tier: a cached grade goes
+ * stale the moment the rule changes, which is exactly what stranded `/records` on the web for a
+ * day. Every surface — Explore, `/records`, the record page, and now a search row on the phone —
+ * ends at the one `confidenceTierFromEvidenceInputs`, so a rule change reaches all of them in the
+ * same deploy. A tier is never read out of the index; only the facts behind it are.
+ *
+ * Grading is deferred per result rather than swept over the whole index up front: a page returns
+ * tens of rows out of thousands of docs, and the rule is not so cheap that running it on every
+ * record to serve twenty is free. Building the id map is pointer work; running the rule is not.
+ *
+ * A doc published before `evidenceInputs` existed grades to `undefined`, so its result carries no
+ * tier rather than a fabricated `unrated` — "we could not grade this" and "nobody assessed this"
+ * are different claims.
+ */
+function tierReader(
+  index: readonly PublicSearchIndexDoc[],
+): (id: string) => ConfidenceTier | undefined {
+  const byId = new Map(index.map((doc) => [doc.id, doc]));
+  return (id) => {
+    const inputs = byId.get(id)?.evidenceInputs;
+    return inputs === undefined ? undefined : confidenceTierFromEvidenceInputs(inputs);
+  };
+}
+
+/** Omits the key entirely when the record could not be graded, rather than emitting `undefined`. */
+function tierField(tier: ConfidenceTier | undefined): { confidenceTier?: ConfidenceTier } {
+  return tier === undefined ? {} : { confidenceTier: tier };
+}
+
+function mapSearchExecutionToPage(
+  execution: SearchExecutionResult,
+  readTier: (id: string) => ConfidenceTier | undefined = () => undefined,
+): SearchPage {
   const results: SearchResultV1[] = execution.results.map((result) => ({
     id: result.id,
     kind: result.kind,
@@ -232,6 +273,7 @@ function mapSearchExecutionToPage(execution: SearchExecutionResult): SearchPage 
     eraBuckets: [...result.eraBuckets],
     notabilityLabels: [...result.notabilityLabels],
     ...(result.sensitivityClass !== undefined ? { sensitivityClass: result.sensitivityClass } : {}),
+    ...tierField(readTier(result.id)),
   }));
 
   return {
@@ -245,7 +287,8 @@ function mapSearchExecutionToPage(execution: SearchExecutionResult): SearchPage 
 /** Projects a published `EntityV1` into a `SearchResultV1`. Deliberately carries NO numeric
  * relevance/evidence score — results explain WHY they match in words, never a number
  * (`docs/decisions-carryover.md`, "ADR-021's two invariants": public-response redaction; mirrors
- * `search.ts`'s own exclusion, and asserted by `redaction.test.ts`). */
+ * `search.ts`'s own exclusion, and asserted by `redaction.test.ts`). The graded `confidenceTier`
+ * below is an assessment, not a count, and is the one evidence signal this shape carries. */
 function toSearchResult(entity: EntityV1, needle: string): SearchResultV1 {
   const matchedInName = needle.length === 0 || entity.displayName.toLowerCase().includes(needle);
   return {
@@ -260,6 +303,9 @@ function toSearchResult(entity: EntityV1, needle: string): SearchResultV1 {
     eraBuckets: entity.eraBuckets ?? [],
     notabilityLabels: entity.notabilityLabels ?? [],
     ...(entity.sensitivityClass ? { sensitivityClass: entity.sensitivityClass } : {}),
+    // A TIER, not a count. The claims are in hand on this path, so the same one rule
+    // `/v1/map` and the record page apply grades the row here too.
+    confidenceTier: recordConfidenceTier(entity.claims),
   };
 }
 

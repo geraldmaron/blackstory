@@ -128,3 +128,52 @@ describe('SearchResultCard — interaction', () => {
     expect(onPress).not.toHaveBeenCalled();
   });
 });
+
+describe('SearchResultCard — evidence meter (a tier is an assessment, not a ranking signal)', () => {
+  it('carries a graded confidenceTier through the allow-list mapper', () => {
+    const props = toSearchResultCardProps(baseResult({ confidenceTier: 'high' }));
+    expect(props.confidenceTier).toBe('high');
+  });
+
+  it('leaves confidenceTier off the props when the result carries no grade', () => {
+    const props = toSearchResultCardProps(baseResult());
+    expect(props).not.toHaveProperty('confidenceTier');
+  });
+
+  it('draws the shared meter and speaks the grade in the row label', async () => {
+    const props = toSearchResultCardProps(baseResult({ confidenceTier: 'high' }), {
+      onPress: jest.fn(),
+    });
+    const { getByTestId, getByLabelText } = await render(<SearchResultCard {...props} />);
+    expect(
+      getByTestId('search-result-evidence-meter', { includeHiddenElements: true }),
+    ).toBeTruthy();
+    // Color is never the only cue: the grade letter renders beside the bars and the sentence
+    // rides in the row's own accessibility label.
+    expect(getByLabelText(/Evidence grade A/i)).toBeTruthy();
+  });
+
+  it('renders the grade letter as visible text, not color alone', async () => {
+    const props = toSearchResultCardProps(baseResult({ confidenceTier: 'medium' }));
+    const { getByText } = await render(<SearchResultCard {...props} />);
+    expect(getByText('B', { includeHiddenElements: true })).toBeTruthy();
+  });
+
+  it('draws no meter at all when the server could not grade the record', async () => {
+    const props = toSearchResultCardProps(baseResult());
+    const { queryByTestId } = await render(<SearchResultCard {...props} />);
+    expect(
+      queryByTestId('search-result-evidence-meter', { includeHiddenElements: true }),
+    ).toBeNull();
+  });
+
+  it('never turns an evidence count into a rendered prop, tier or not', () => {
+    const hostile = {
+      ...baseResult({ confidenceTier: 'low' }),
+      evidenceCount: 12,
+    } as SearchResultV1 & { evidenceCount: number };
+    const props = toSearchResultCardProps(hostile);
+    expect(props).not.toHaveProperty('evidenceCount');
+    expect(props.confidenceTier).toBe('low');
+  });
+});

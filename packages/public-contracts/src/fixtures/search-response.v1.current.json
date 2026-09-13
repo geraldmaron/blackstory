@@ -10,7 +10,8 @@
       "explanation": "Matched on entity name.",
       "status": "active",
       "eraBuckets": ["1870s", "1890s", "1910s"],
-      "notabilityLabels": ["A documented site tied to Black educational history."]
+      "notabilityLabels": ["A documented site tied to Black educational history."],
+      "confidenceTier": "high"
     }
   ],
   "facets": {
