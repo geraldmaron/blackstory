@@ -1,6 +1,6 @@
 # Black Press newspaper archive discovery
 
-Discovery methodology for digitized Black newspapers — the Chicago Defender, Pittsburgh Courier, Baltimore Afro-American, New York Amsterdam News, and Atlanta Daily World — which documented neighborhood-level Black history (block clubs, church moves, appraisal fights, school-board petitions) at a granularity federal sources miss. Discovery produces **private research candidates only** — never public entities (ADR-009).
+Discovery methodology for digitized Black newspapers — the Chicago Defender, Pittsburgh Courier, Baltimore Afro-American, New York Amsterdam News, and Atlanta Daily World — which documented neighborhood-level Black history (block clubs, church moves, appraisal fights, school-board petitions) at a granularity federal sources miss. Discovery produces **private research candidates only** — never public entities (`docs/decisions-carryover.md`, "Research and discovery cannot publish").
 
 ## Doctrine: leads, not facts
 
@@ -22,7 +22,7 @@ Black-press OCR mentions enter as the first class, so:
 
 | Invariant | Enforcement |
 |-----------|-------------|
-| Discovery cannot publish (ADR-009) | `assertCampaignCannotPublish()` at campaign entry; `assertDiscoveryCannotPublish` blocks `write_public_projection` / `create_public_entity` / `activate_release` / `publish_snapshot`; no bb_public / bb_canonical / release write paths anywhere in the module |
+| Discovery cannot publish (`docs/decisions-carryover.md`, "Research and discovery cannot publish") | `assertCampaignCannotPublish()` at campaign entry; `assertDiscoveryCannotPublish` blocks `write_public_projection` / `create_public_entity` / `activate_release` / `publish_snapshot`; no bb_public / bb_canonical / release write paths anywhere in the module |
 | Safe fetch only | `@repo/domain` performs **no network I/O**. OCR bundles are supplied by callers; any live `BlackPressAdapter` implementation MUST fetch exclusively through `@repo/security` safe-fetch |
 | Adapter disabled by default | `registerBlackPressSource` ships `registryState: 'disabled'`, `adapterEnabled: false`; campaign approval is run-scoped in-memory only (mirrors `rss-campaign.ts`), never persisted |
 | Rights / dignity | Rights default `unknown`; `full_text_republication` and `commercial_reuse` prohibited; OCR text is ephemeral — only evidence-pointer-capped snippets (≤320 chars / ≤60 words) and HTTPS link hints survive onto payloads. HOLC period language (`"colored grade"`) is `researchOnlyOffensive: true`: research recall only, never default public language. Living addresses never public (leads carry archive/issue URLs, not residences) |

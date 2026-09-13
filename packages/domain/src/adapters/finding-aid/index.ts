@@ -8,7 +8,8 @@
  * are absent from federal aggregator databases. This adapter normalizes finding-aid *metadata and
  * evidence pointers* into private discovery candidates.
  *
- * Invariants (ADR-009 + constitution):
+ * Invariants (`docs/decisions-carryover.md`, "Research and discovery cannot publish";
+ * and the product constitution):
  * - Self-contained module. Does NOT edit any barrel; parent wires the export lines from the doc.
  * - Registers DISABLED. `assertAdapterMayRun` / `approveSourcePolicy` gate any real run.
  * - Metadata + canonical finding-aid URLs only — never bulk OCR / full container-list text.

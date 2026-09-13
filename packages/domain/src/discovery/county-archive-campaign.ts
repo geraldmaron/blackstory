@@ -9,7 +9,8 @@
  *
  * Invariants:
  * - Private candidates only. `assertCampaignCannotPublish()` runs before any yield. No public
- *   projection, release, or canonical write path exists here (ADR-009).
+ *   projection, release, or canonical write path exists here
+ *   (`docs/decisions-carryover.md`, "Research and discovery cannot publish").
  * - Sources register DISABLED (`registerFindingAidSource`); the campaign approves policy at run
  *   time via `approveSourcePolicy`, exactly like the other fixture-first campaigns.
  * - Fixture-first: the campaign performs no network I/O. A live `FindingAidAdapter` MUST use

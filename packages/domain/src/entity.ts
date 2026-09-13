@@ -5,8 +5,8 @@
  * an auditable notability-basis inclusion rubric (`notabilityBasis`), and a sensitivity
  * classification schema (`sensitivity`). See `./entity-status.ts` for the added status
  * vocabularies and notability/sensitivity types, `./movement.ts` for the movement field bag,
- * and `./era.ts` for the shared date-precision/decade model they build on. See ADR-015 for the
- * full ontology decision record.
+ * and `./era.ts` for the shared date-precision/decade model they build on. See
+ * docs/decisions-carryover.md, "Entity ontology" for the full ontology decision record.
  */
 import type { EntityKind } from './entity-kinds.js';
 import type { EntityClass } from './entity-class.js';

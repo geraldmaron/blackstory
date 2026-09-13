@@ -30,7 +30,8 @@ publishes; a separate, explicit, human-run step does that.
      (`lib/corroborate-source.ts`) first; only falls back to a
      throttled SearXNG search if nothing turns up there.
    - Fetching goes through `lib/safe-fetch.ts` (SSRF-safe, DNS-pinned) with
-     Trafilatura extraction (`lib/trafilatura.ts`, ADR-019) layered on top.
+     Trafilatura extraction (`lib/trafilatura.ts`; docs/decisions-carryover.md,
+   "Acquisition crawler runtime") layered on top.
 3. **Enrichment** — `operator-cli enrichment-run --provider hybrid`. Same
    free-model roster + Ollama failover as the overnight pipeline.
 4. **Auto-promotion** — `auto-promote-corsair-keeps.ts`. Real multi-source
@@ -127,8 +128,9 @@ If you hit one of these, it's a regression — the fix is committed, check
 - [Overnight hybrid enrichment](./overnight-hybrid-enrichment.md) — the
   general Wikimedia-discovery pipeline this shares its enrichment/confidence
   machinery with.
-- ADR-019 (acquisition crawler runtime) — Trafilatura extraction, Scrapy
-  reserved for recurring institutional-collection crawl campaigns (a
-  separate, larger piece of work, not built as part of this pipeline).
+- docs/decisions-carryover.md, "Acquisition crawler runtime" (recovered
+  ADR-019) — Trafilatura extraction ships here; Scrapy remains reserved for
+  recurring institutional-collection crawl campaigns (a separate, larger
+  piece of work, never built).
 - Relationship backfill workstream (repo-fh8u) — consumes this pipeline's
   `mentionedEntityIds` patches.

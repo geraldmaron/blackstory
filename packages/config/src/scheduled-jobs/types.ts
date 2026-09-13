@@ -1,6 +1,6 @@
 /**
  * Scheduled-job registry contracts that other packages' recurring jobs plug into.
- * ADR-007 already picked the mechanism (Cloud Scheduler -> Cloud Tasks -> Cloud Run
+ * docs/decisions-carryover.md ("scheduled-job worker packages") already picked the mechanism (Cloud Scheduler -> Cloud Tasks -> Cloud Run
  * Jobs/workers); this module only declares the versioned, fail-closed config contract that
  * mechanism is driven by. No live GCP mutation happens anywhere in this package — see
  * infra/gcp/scheduler/ for the declarative (not-applied) Cloud Scheduler mirror.
@@ -13,7 +13,7 @@ import type { KillSwitchId } from '../kill-switches.js';
 
 export const SCHEDULED_JOB_REGISTRY_VERSION = '1.0.0' as const;
 
-/** ADR-007: worker code lives only in these three packages never a new worker microservice. */
+/** See docs/decisions-carryover.md, "scheduled-job worker packages": worker code lives only in these three packages, never a new worker microservice (workers/research-node is a disclosed, unwired exception — see that entry). */
 export const TARGET_WORKER_PACKAGES = ['research', 'publication', 'security'] as const;
 export type TargetWorkerPackage = (typeof TARGET_WORKER_PACKAGES)[number];
 

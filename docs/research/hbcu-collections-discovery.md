@@ -1,6 +1,6 @@
 # HBCU Special Collections discovery
 
-Discovery methodology for HBCU special collections and university archives — Howard's Moorland-Spingarn Research Center, Fisk's John Hope and Aurelia E. Franklin Library, Tuskegee's University Archives, Hampton's University Archives, and the cross-institution HBCU Library Alliance Digital Collection. These repositories are among the richest Black history sources in existence and are largely **absent from federal aggregator databases**: some surface through DPLA hubs, others only through standalone EAD finding aids or local digital repositories. Discovery produces **private research candidates only** — never public entities (ADR-009).
+Discovery methodology for HBCU special collections and university archives — Howard's Moorland-Spingarn Research Center, Fisk's John Hope and Aurelia E. Franklin Library, Tuskegee's University Archives, Hampton's University Archives, and the cross-institution HBCU Library Alliance Digital Collection. These repositories are among the richest Black history sources in existence and are largely **absent from federal aggregator databases**: some surface through DPLA hubs, others only through standalone EAD finding aids or local digital repositories. Discovery produces **private research candidates only** — never public entities (`docs/decisions-carryover.md`, "Research and discovery cannot publish").
 
 ## Doctrine: a finding aid points at evidence, and fitness depends on the claim
 
@@ -17,13 +17,13 @@ Registration is unchanged:
 
 - `registerHbcuCollectionSource` wraps `registerSource` with research-kernel `sourceClass: 'scholarly'` (constants + contract notes carry it; `HBCU_COLLECTIONS_SOURCE_CLASS`).
 - Evidence-source classification is the constitution token `primary_archival`, because finding aids describe primary archival holdings.
-- Candidates stay private leads until the normal claim/evidence/review pipeline runs (ADR-009).
+- Candidates stay private leads until the normal claim/evidence/review pipeline runs (`docs/decisions-carryover.md`, "Research and discovery cannot publish").
 
 ## Invariants
 
 | Invariant | Enforcement |
 |-----------|-------------|
-| Discovery cannot publish (ADR-009) | `assertCampaignCannotPublish()` at campaign entry; `assertDiscoveryCannotPublish` blocks `write_public_projection` / `create_public_entity` / `activate_release` / `publish_snapshot`; no public projection or release write paths anywhere in the module |
+| Discovery cannot publish (`docs/decisions-carryover.md`, "Research and discovery cannot publish") | `assertCampaignCannotPublish()` at campaign entry; `assertDiscoveryCannotPublish` blocks `write_public_projection` / `create_public_entity` / `activate_release` / `publish_snapshot`; no public projection or release write paths anywhere in the module |
 | Safe fetch only | `@repo/domain` performs **no network I/O**. The campaign is fixture-first (`dplaSearchJson` + injected `HbcuAdapter`); any live `HbcuAdapter` implementation MUST fetch exclusively through `@repo/security` safe-fetch (contract note on the interface) |
 | Adapter disabled by default | `registerHbcuCollectionSource` ships `registryState: 'disabled'`; campaign approval (`approveSourcePolicy`) is run-scoped in-memory only, mirroring `archive-dpla-campaign.ts` |
 | Rights / dignity | Rights default `unknown`; `full_text_republication`, `commercial_reuse`, `biometric_extraction` prohibited. Snippets capped to evidence-pointer limits (≤320 chars / ≤60 words). Forbidden payload keys include `streetAddress` / `residentialAddress` — living addresses never public. Bulk OCR, container-list text, and item bytes never persist |

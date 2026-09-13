@@ -32,7 +32,8 @@ import { revisionMetadataV1Schema } from './revision.js';
 import { timelineEventV1Schema } from './timeline.js';
 
 /**
- * Full public ontology (ADR-015) — same closed set as `packages/schemas`
+ * Full public ontology (docs/decisions-carryover.md, "Entity ontology") — same closed set as
+ * `packages/schemas`
  * `PublicEntityProjectionDoc.kind`. Early mobile/API scaffolds only listed the
  * four Dunbar-seed kinds; live releases pin people, orgs, laws, etc., and web
  * Explore already maps every kind. Restricting the wire enum dropped ~40% of

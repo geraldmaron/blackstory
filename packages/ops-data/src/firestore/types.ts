@@ -1,7 +1,8 @@
 /**
- * Firestore document schemas for BlackStory (ADR-011 018).
- * Entity/geography, provenance, claims/confidence.
- * Shapes align with @repo/domain; Cloud SQL PostGIS are not the production path.
+ * Canonical document schemas for BlackStory. Firestore-era names; the live store is Supabase
+ * Postgres. Entity/geography, provenance, claims/confidence.
+ * Shapes align with @repo/domain. See docs/decisions-carryover.md, "Firestore as system of
+ * record, reversed".
  */
 import { z } from 'zod';
 import {

@@ -10,7 +10,7 @@
  * private discovery candidate so a reviewer can decide whether the accumulated evidence
  * clears the confidence floor (repo-w4bk: 521 single-source records stuck at 0.72).
  *
- * INVARIANTS (ADR-009):
+ * INVARIANTS (`docs/decisions-carryover.md`, "Research and discovery cannot publish"):
  * - PURE + read-only. Produces **private** `DiscoveryCandidateRecord`s only — never a
  *   public projection, release row, or canonical entity. Corroboration raises a
  *   candidate's review-readiness; it never auto-promotes and never publishes.
@@ -310,7 +310,8 @@ function minMaxCapturedAt(mentions: readonly NormalizedPersonMention[]): {
 function crossReferenceSignal(sourceCount: number): DiscoverySignal {
   return {
     strength: 'medium',
-    // Corroborated but NOT auto-promotable — a human still gates promotion (ADR-009).
+    // Corroborated but NOT auto-promotable — a human still gates promotion
+    // (`docs/decisions-carryover.md`, "Research and discovery cannot publish").
     outcome: 'candidate_only',
     matchedClasses: [],
     matchedTerms: [],

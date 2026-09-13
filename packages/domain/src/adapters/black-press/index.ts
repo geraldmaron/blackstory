@@ -10,7 +10,8 @@
  *   Every mention this adapter yields is a LEAD routed to relevance review —
  *   never an independently promotable fact. "Capture and assess the underlying
  *   evidence before acceptance."
- * - Discovery cannot publish (ADR-009). Nothing here touches public
+ * - Discovery cannot publish (`docs/decisions-carryover.md`, "Research and discovery
+ *   cannot publish"). Nothing here touches public
  *   projections, release tables, or any bb_public/bb_canonical write path.
  * - OCR issue text is EPHEMERAL input: only capped snippets (evidence-pointer
  *   limits) and outbound link hints survive onto candidate payloads. Full

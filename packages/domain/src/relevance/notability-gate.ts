@@ -9,9 +9,12 @@
  * the same `RelevanceGateId` / `RelevanceGateResult` vocabulary (`./types.ts`) so "why is X in"
  * tooling can treat all gates uniformly.
  *
- * Not wired live: the projection/release build in `packages/domain/src/publication/` should
- * call `assertPublishableEntityHasNotabilityBasis` before including an entity in a release
- * (see ADR-015 Consequences).
+ * Wired into the live release path: `packages/domain/src/publication/release-builder.ts`'s
+ * `buildReleaseEntityArtifacts` calls the sibling `evaluateNotabilityGate` on every entry and
+ * fails the release closed (`reason: 'notability_basis_gate'`) when it does not pass.
+ * `assertPublishableEntityHasNotabilityBasis` above is the throwing variant used directly by
+ * seed-campaign validators (`../seed-campaigns/validators.ts`), not by the release build.
+ * (see docs/decisions-carryover.md, "Entity ontology").
  */
 import type { NotabilityBasisRecord } from '../entity-status.js';
 import type { RelevanceGateResult } from './types.js';

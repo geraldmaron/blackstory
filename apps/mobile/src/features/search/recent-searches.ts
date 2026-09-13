@@ -86,7 +86,8 @@ function fromStored(value: unknown): RecentSearchEntry | null {
 
 /** Defensive parse: corrupt/foreign/oversized JSON never throws -- it degrades to an empty list
  * (mirrors ADR-023 section 5's "a cache is disposable, self-healing" posture applied to this
- * small SecureStore-backed list). */
+ * small SecureStore-backed list; ADR-023 was removed in the 2026-07-24 purge and is restated
+ * in `docs/decisions-carryover.md`, "Mobile cache and OTA release"). */
 export function parseRecentSearches(raw: string | undefined): RecentSearchEntry[] {
   if (!raw) return [];
   let parsed: unknown;

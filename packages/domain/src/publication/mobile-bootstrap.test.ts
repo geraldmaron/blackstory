@@ -1,6 +1,8 @@
 /**
  * Tests for the mobile bootstrap manifest generator (MOB-005): determinism, the release-stamp
- * contract (ADR-023 §4 staleness), the client-version floor (ADR-022 §2), and the `/v1/bootstrap`
+ * contract (ADR-023 §4 staleness; ADR-023 was removed in the 2026-07-24 purge and is restated
+ * in `docs/decisions-carryover.md`, "Mobile cache and OTA release"), the client-version floor
+ * (ADR-022 §2), and the `/v1/bootstrap`
  * pointer-shape projection that keeps this manifest compatible with the already-built endpoint.
  */
 import assert from 'node:assert/strict';

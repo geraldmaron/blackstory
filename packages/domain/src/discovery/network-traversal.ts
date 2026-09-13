@@ -9,7 +9,8 @@
  * organizers who never became famous — so the neighborhood of a cataloged entity is a high-yield,
  * low-noise seam for finding thinly attested people and places.
  *
- * Invariants (ADR-009 and constitution):
+ * Invariants (`docs/decisions-carryover.md`, "Research and discovery cannot publish";
+ * and the product constitution):
  * - Discovery NEVER publishes. Every candidate is `discovery-candidate.v1` (private research
  *   only); the publish guard is asserted at the campaign boundary.
  * - No network or DB access lives here. Relationships are supplied by the caller (fixtures in

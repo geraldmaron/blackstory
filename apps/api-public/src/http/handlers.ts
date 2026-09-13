@@ -10,7 +10,8 @@
  * that fails its contract is a server bug and becomes an `INTERNAL` error, never a malformed
  * payload on the wire.
  *
- * Client attestation posture (Threat model T1/T2; ADR-010 / ADR-020):
+ * Client attestation posture (Threat model T1/T2; docs/decisions-carryover.md,
+ * "Security and abuse assumptions" / ADR-020):
  *   - `X-BlackStory-Client` is an abuse-trust signal for direct API callers (mobile), not
  *     authorization. A missing header NEVER hard-denies a read — it feeds rate limits as the
  *     lowest-trust anonymous subject (fail-open for static reads; expensive reads need the header

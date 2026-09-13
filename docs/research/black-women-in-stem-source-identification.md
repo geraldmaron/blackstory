@@ -113,5 +113,5 @@ The public WordPress install looks **thin relative to the 212-banner project** d
 ## Related docs
 
 - Program audit: `docs/research/entity-acquisition-current-state-audit.md`  
-- Crawler decision: ADR-019 (acquisition crawler runtime; removed 2026-07-24, see `git log -- docs/adr/` for history)  
+- Crawler decision: docs/decisions-carryover.md, "Acquisition crawler runtime" (recovered ADR-019 — Trafilatura extraction ships; the Scrapy crawl engine it named was never built)  
 - Prior empty-candidate research (superseded for identity only): git history of this file before owner confirmation  

@@ -11,7 +11,7 @@ This document is the editorial and engineering contract for that surface.
 |-------|-----------|------|----------------|
 | `summary` | **Yes** at release | Catalog lede, card one-liner, SEO description, search blurb | Editorial band **400–900** characters (Floor v2). Schema still parses from **120** so thin live rows do not 404 mid-campaign. Factual who/what/where/when. Not marketing fluff. Not assembled from claims. Sub-400 only with an explicit best-effort exception after evidence is exhausted. |
 | `topicTags` | Strongly preferred (≥1) | Discovery chips → search/explore theme filters | Controlled strings aligned with search theme facets. Empty only with gap honesty. |
-| `eraBuckets` / `notabilityLabels` | When present | Secondary chips (ADR-015) | Never numeric scores. |
+| `eraBuckets` / `notabilityLabels` | When present | Secondary chips (docs/decisions-carryover.md, "Entity ontology") | Never numeric scores. |
 | `historicalContext` | Strongly preferred | Framing in Black-history place | Not new unsourced facts about this record (those live in `claims`). |
 | `extendedNarrative` | Optional | Multi-paragraph further reading | Omit UI section when absent. Never replaces Accepted claims. |
 | `primaryImage` | Optional | Hero/aside photo | Requires publishable rights (`public_domain` \| `licensed` \| `fair_use`) and `display_media`. Alt + credit required (WCAG). When missing, UI shows a kind-derived record mark (book/pin/arch), not a stock portrait or mosaic. |

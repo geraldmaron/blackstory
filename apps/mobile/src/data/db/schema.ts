@@ -1,5 +1,7 @@
 /**
- * On-disk cache schema (MOB-009 §3 / ADR-023 §5).
+ * On-disk cache schema (MOB-009 §3 / ADR-023 §5). ADR-023 was removed in the
+ * 2026-07-24 purge; its cache rules are restated in `docs/decisions-carryover.md`,
+ * "Mobile cache and OTA release".
  *
  * The schema version is a SINGLE integer. When the app's expected version does
  * not match what is on disk, the migration is DROP-AND-REBUILD (ADR-023 §5) —
@@ -18,9 +20,13 @@ export const META_TABLE = 'cache_meta';
 
 /**
  * NOTE: there is intentionally NO table for query text, correction content, or
- * precise location (ADR-023 §2 never-cache list; program invariant 7). The
- * schema itself is the structural guarantee that those categories have nowhere
- * to land on disk.
+ * precise location (ADR-023 §2 never-cache list, restated in
+ * `docs/decisions-carryover.md`, "Mobile cache and OTA release"; program
+ * invariant 7). The schema itself is the structural guarantee that those
+ * categories have nowhere to land in THIS store. It is not a whole-app
+ * guarantee: normalized recent-search terms are persisted to SecureStore under
+ * the recorded repo-30k6 exception (`docs/decisions-carryover.md`, addendum
+ * 2026-09-12).
  */
 export const CREATE_META_TABLE = `
   CREATE TABLE IF NOT EXISTS ${META_TABLE} (

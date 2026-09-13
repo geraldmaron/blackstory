@@ -1,5 +1,7 @@
 /**
- * Firestore collection path constants for BlackStory (ADR-011 018).
+ * Collection path constants for BlackStory. Firestore-era names, still used as the shared
+ * vocabulary over Supabase Postgres. See docs/decisions-carryover.md, "Firestore as system of
+ * record, reversed".
  * Paths always use even segment counts (collection/doc[/collection/doc...]).
  */
 export const FIRESTORE_ROOT = {

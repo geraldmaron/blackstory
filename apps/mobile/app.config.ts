@@ -154,7 +154,12 @@ const MAP_VECTOR_TILE_URL = optionalHttpUrl(process.env.MAP_VECTOR_TILE_URL);
 const MAP_GLYPHS_URL_CONFIG = optionalHttpUrl(process.env.MAP_GLYPHS_URL);
 const MAP_BASEMAP_ENABLED_CONFIG = process.env.MAP_BASEMAP_ENABLED !== 'false';
 
-// --- EAS Update / OTA (MOB-019, repo-ovn7; ADR-023 §2/§7, threat-model T6) -----
+// --- EAS Update / OTA (MOB-019, repo-ovn7; ADR-024 §2/§7, threat-model T6) -----
+//
+// ADR-024 (mobile build, release and OTA) was removed in the 2026-07-24 purge and
+// its rules are restated in `docs/decisions-carryover.md`, "Mobile cache and OTA
+// release". This block previously cited "ADR-023", the pre-2026-07-22 number for
+// the same document; ADR-023 is the cache/offline decision, not this one.
 //
 // `expo-updates` is installed. Project id defaults to the provisioned EAS
 // project `@gerald-maron/blackstory` (DEFAULT_EAS_PROJECT_ID below). Override
@@ -199,7 +204,7 @@ const config: ExpoConfig = {
   // owner gate (repo-fsxq) rather than a config value.
   scheme: 'blackstory',
   userInterfaceStyle: 'automatic',
-  // EAS Update runtime-compatibility fence (ADR-023 §2): a JS bundle only ever
+  // EAS Update runtime-compatibility fence (ADR-024 §2): a JS bundle only ever
   // installs onto a binary whose runtime version matches, so an OTA update
   // built for an incompatible native layer is rejected client-side rather than
   // shipped and crashed. `appVersion` policy derives the runtime version from

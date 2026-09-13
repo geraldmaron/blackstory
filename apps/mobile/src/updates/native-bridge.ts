@@ -1,6 +1,8 @@
 /**
  * Defensive native-module loader for `expo-updates` (MOB-019, repo-ovn7;
- * ADR-023 §2/§7, threat-model T6).
+ * ADR-024 §2/§7, threat-model T6, restated in `docs/decisions-carryover.md`,
+ * "Mobile cache and OTA release"; cited as "ADR-023" before the 2026-07-22
+ * mobile renumbering).
  *
  * Mirrors `src/security/app-check.ts`'s `loadNativeAppCheck` and
  * `src/observability/native-bridge.ts`'s Crashlytics/Perf loaders: a
@@ -17,9 +19,9 @@
 export interface NativeUpdatesSurface {
   /** True once `expo-updates` has resolved whether an update server is configured. */
   readonly isEnabled: boolean;
-  /** Channel this binary's `eas.json` build profile was published under (ADR-023 §1). */
+  /** Channel this binary's `eas.json` build profile was published under (ADR-024 §1). */
   readonly channel: string | null;
-  /** EAS Update runtime version this binary was built with (ADR-023 §2). */
+  /** EAS Update runtime version this binary was built with (ADR-024 §2). */
   readonly runtimeVersion: string | null;
   /** Immutable OTA bundle id currently running, or `null` on the embedded/store bundle. */
   readonly updateId: string | null;

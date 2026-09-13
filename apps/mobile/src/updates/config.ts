@@ -1,6 +1,9 @@
 /**
- * EAS Update / OTA posture (MOB-019, repo-ovn7; ADR-023 §2/§7, threat-model
- * T6). Pure functions only — no native I/O, no `expo-constants` /
+ * EAS Update / OTA posture (MOB-019, repo-ovn7; ADR-024 §2/§7, threat-model
+ * T6). ADR-024 was removed in the 2026-07-24 purge and is restated in
+ * `docs/decisions-carryover.md`, "Mobile cache and OTA release"; comments in
+ * this module cited "ADR-023" before the 2026-07-22 mobile renumbering, which
+ * is the cache/offline decision, not this one. Pure functions only — no native I/O, no `expo-constants` /
  * `expo-updates` calls — so they are deterministically unit-testable. The
  * runtime wiring that gathers real inputs (`expo-updates`'s
  * `isEnabled`/`channel`/`runtimeVersion`/`updateId`) lives in
@@ -14,7 +17,7 @@
  */
 
 /**
- * The accepted-risk code-signing posture (ADR-023 amendment #1,
+ * The accepted-risk code-signing posture (ADR-024 amendment #1,
  * threat-model T6). This is fixed by the ADR, not read from any runtime
  * input — it exists so observability/support tooling can attach a stable,
  * privacy-safe label to any OTA-related report without re-deriving the
@@ -33,7 +36,7 @@ export interface UpdatesPosture {
   readonly enabled: boolean;
   /** `eas.json` build-profile channel this binary was published under, or `null` pre-gate. */
   readonly channel: string | null;
-  /** EAS Update runtime version (ADR-023 §2 compatibility fence), or `null` pre-gate. */
+  /** EAS Update runtime version (ADR-024 §2 compatibility fence), or `null` pre-gate. */
   readonly runtimeVersion: string | null;
   /** Immutable OTA bundle id currently running, or `null` on the embedded/store bundle. */
   readonly updateId: string | null;

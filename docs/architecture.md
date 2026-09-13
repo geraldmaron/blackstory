@@ -176,7 +176,8 @@ Policy changes are version bumps in the shared JSON, never a public write API.
 ## Security threat model
 
 Hostile-environment design is documented under [`docs/security/`](./security/). Assumptions remain
-binding in [ADR-010](./adr/ADR-010-security-and-abuse-assumptions.md).
+binding; see `docs/decisions-carryover.md`, "Security and abuse assumptions" (ADR-010 no longer
+exists as a file).
 
 ## Environment isolation
 

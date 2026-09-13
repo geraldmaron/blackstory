@@ -10,7 +10,7 @@ plaintiffs, defendants, and attorneys; every movement has organizers who never b
 neighborhood of a cataloged entity is therefore a high-yield, low-noise seam for finding the
 thinly attested people and places that a keyword-first crawl misses.
 
-> Discovery produces **private research candidates only** — never public entities (ADR-009).
+> Discovery produces **private research candidates only** — never public entities (`docs/decisions-carryover.md`, "Research and discovery cannot publish").
 > A relationship edge is a **lead**, not a claim: evidence before assertion.
 
 ## Where it lives
@@ -64,7 +64,7 @@ reachable.
 
 ## Invariants honored
 
-- **Discovery cannot publish (ADR-009).** `runNetworkTraversalCampaign` asserts the publish guard
+- **Discovery cannot publish** (`docs/decisions-carryover.md`, "Research and discovery cannot publish"). `runNetworkTraversalCampaign` asserts the publish guard
   (`assertDiscoveryCannotPublish`) at its boundary, and every emitted record is
   `discovery-candidate.v1`. No public projection or release table is ever written.
 - **No I/O in the module.** Relationships are supplied by the caller or an injected

@@ -1,5 +1,7 @@
 /**
- * Firestore model surface for BlackStory (ADR-011 019).
+ * Shared document-schema surface for BlackStory. Firestore-era names; the live store is
+ * Supabase Postgres and these schemas are imported by Postgres-era code. See
+ * docs/decisions-carryover.md, "Firestore as system of record, reversed".
  */
 export { FIRESTORE_ROOT, firestorePaths } from './paths.js';
 export type { FirestoreRootCollection } from './paths.js';

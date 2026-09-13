@@ -1,5 +1,8 @@
 /**
- * Read-only posture helpers for the public API surface (ADR-005).
+ * Read-only posture helpers for the public API surface (see docs/decisions-carryover.md, "Service
+ * surface separation" — ADR-005 does not exist). NOTE: these guards are not called from the live
+ * dispatch path in ./http/router.ts, which enforces read-only via a hardcoded GET/HEAD check
+ * instead; this file's guards are exercised only by tests today.
  */
 import {
   assertOperationAllowed,

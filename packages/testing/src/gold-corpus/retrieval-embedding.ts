@@ -3,8 +3,8 @@
  * eval in retrieval-eval.ts.
  *
  * This is deliberately NOT imported from @repo/ops-data's real embedding pipeline:
- * docs/research/gold-corpus.md states the gold-corpus harness is local-only under ADR-011
- * ("evaluation does not read or write Firestore and neither CLI applies cloud changes"), and
+ * docs/research/gold-corpus.md states the gold-corpus harness is local-only ("evaluation does
+ * not read or write" the product store "and neither CLI applies cloud changes"), and
  * @repo/ops-data pulls in firebase-admin + @google/genai infra this package's harness
  * is intentionally decoupled from. The interface below (`EvalEmbeddingProvider`) is shaped so a
  * caller *outside* this package can still plug in the real

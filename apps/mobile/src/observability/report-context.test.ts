@@ -79,7 +79,7 @@ describe('buildReportContext (MOB-018 item 3)', () => {
   });
 });
 
-describe('resolveRuntimeVersion (ADR-023 §2)', () => {
+describe('resolveRuntimeVersion (ADR-024 §2)', () => {
   it('prefers an explicit runtimeVersion string from config', () => {
     expect(resolveRuntimeVersion('1.2.0', '9.9.9')).toBe('1.2.0');
   });

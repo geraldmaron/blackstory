@@ -268,7 +268,8 @@ export const NOTABILITY_RUBRIC: Readonly<Record<NotabilityCriterion, string>> = 
  * inductions, major national honors, documented firsts, and documented movement significance
  * qualify; commercial milestones (certifications, chart position, sales figures, box-office
  * gross) never qualify alone. This constant documents the calibration decision — it is
- * reviewable rubric text pending ratification (see ADR-015), not a scoring threshold.
+ * reviewable rubric text pending ratification (see docs/decisions-carryover.md, "Entity
+ * ontology"), not a scoring threshold.
  */
 export const CULTURAL_FIGURE_NOTABILITY_CALIBRATION = 'icons_and_firsts_only' as const;
 

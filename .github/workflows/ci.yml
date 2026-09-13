@@ -187,7 +187,10 @@ jobs:
       - name: Run pytest
         run: uv run pytest
 
-  # ADR-011 / D-014: Postgres is parked — job kept for optional revisit, not required.
+  # Off by default because this job exercises the PARKED Cloud SQL foundation under
+  # infra/database/ (apply-init.sh / verify-isolation.sh), not supabase/migrations/. Postgres
+  # itself is the system of record. See docs/decisions-carryover.md, "Firestore as system of
+  # record, reversed". Enabling this would gate PRs on non-production schema.
   integration-postgres:
     name: Integration Postgres
     needs: changes

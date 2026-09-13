@@ -72,7 +72,7 @@ PostgREST filter operators follow [Supabase REST docs](https://supabase.com/docs
 | `authenticated` | SELECT (active release only) | Staff roles only via separate policies |
 | `service_role` | Bypasses RLS (server-side only) | Full write/read per grants |
 
-Research roles **cannot** activate releases; the publish gate stays a database invariant (ADR-004, ADR-009).
+Research roles **cannot** activate releases; the publish gate stays a database invariant (ADR-004; `docs/decisions-carryover.md`, "Research and discovery cannot publish").
 
 ## Marketing and quality gates
 

@@ -53,7 +53,8 @@ describe('clearRecentSearchesOnFreshInstall (repo-30k6)', () => {
     await clearRecentSearchesOnFreshInstall(store, recentSearches);
     expect(recentSearches.clearCalls).toBe(0);
 
-    // Simulate the marker being wiped (uninstall, or an ADR-023 §5 drop-and-rebuild migration) —
+    // Simulate the marker being wiped (uninstall, or an ADR-023 §5 drop-and-rebuild migration;
+    // ADR-023 is restated in `docs/decisions-carryover.md`, "Mobile cache and OTA release") —
     // the SecureStore-backed recent-searches key would survive this on iOS even though the
     // sandbox-backed marker did not.
     store.meta.delete('search.recent_searches_install_marker_v1');

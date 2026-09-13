@@ -6,7 +6,7 @@
  * entity-lifecycle `statusHistory` records (see `./entity-status.ts`). `deriveEraBuckets`
  * replaces the embeddings-package-local `deriveEraBucket` duplicate previously defined in
  * `packages/ops-data/src/embeddings/text.ts` (that file now delegates its decade math to this
- * module — see ADR-015).
+ * module — see docs/decisions-carryover.md, "Entity ontology").
  */
 
 /**

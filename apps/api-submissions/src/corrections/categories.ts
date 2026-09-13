@@ -5,8 +5,10 @@
  * `apps/web/src/app/corrections/categories.ts` and `apps/mobile/src/features/corrections/categories.ts`.
  * Each surface (web route, mobile client, submissions server) keeps its own copy rather than
  * sharing one at runtime: mobile cannot import server code (ADR-021 §4) and this server surface
- * must not import an app (`apps/web`) or grow a mobile-only shared package pre-emptively (ADR-005
- * migration trigger). The server re-validates against this authoritative copy on intake regardless
+ * must not import an app (`apps/web`) or grow a mobile-only shared package pre-emptively (see
+ * docs/decisions-carryover.md, "Service surface separation" — ADR-005 does not exist; nothing
+ * lints this boundary today, it holds only because `apps/web` is not a declared dependency in this
+ * package's package.json). The server re-validates against this authoritative copy on intake regardless
  * of what a client sent, so drift here fails a submission safely rather than smuggling an unknown
  * category through.
  */

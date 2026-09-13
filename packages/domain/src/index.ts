@@ -3,8 +3,10 @@
  * claims confidence, append-only audit contracts, immutable
  * publication releases, and source adapter registry contracts.
  * Living-status and public precision rules come from
- * @repo/schemas (constitution). Firestore converters live in @repo/ops-data;
- * Cloud SQL PostGIS are deferred (ADR-011).
+ * @repo/schemas (constitution). The document schemas live in @repo/ops-data's `firestore/`
+ * modules (Firestore-era names, live store is Supabase Postgres). PostGIS is installed there
+ * but no query path uses it: geo work is geohash plus haversine in this package. See
+ * docs/decisions-carryover.md, "Firestore as system of record, reversed".
  */
 export { asEntityId, asRelationshipId, asMergeId, asLocationId } from './ids.js';
 export type { EntityId, RelationshipId, MergeId, LocationId } from './ids.js';
@@ -184,7 +186,7 @@ export type {
 // notability-basis inclusion rubric, and the schema-only sensitivity classification. Additive
 // barrel export so packages/ops-data/src/embeddings/text.ts can import the shared
 // `deriveEraBuckets` (replacing its local duplicate) and so have a
-// single vocabulary source to import from — see ADR-015.
+// single vocabulary source to import from — see docs/decisions-carryover.md, "Entity ontology".
 export {
   DATE_PRECISIONS,
   buildInclusiveDecadeRange,

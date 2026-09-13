@@ -56,7 +56,7 @@ export function assertScheduledJobDefinitionValid(definition: ScheduledJobDefini
   }
   if (!TARGET_WORKER_PACKAGES.includes(definition.targetWorker.package)) {
     throw new Error(
-      `Scheduled job "${definition.id}" targetWorker.package must be one of ${TARGET_WORKER_PACKAGES.join(', ')} (ADR-007)`,
+      `Scheduled job "${definition.id}" targetWorker.package must be one of ${TARGET_WORKER_PACKAGES.join(', ')} (see docs/decisions-carryover.md)`,
     );
   }
   if (definition.targetWorker.function.trim().length === 0) {

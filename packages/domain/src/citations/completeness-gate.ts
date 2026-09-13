@@ -8,7 +8,7 @@
  *
  * Not wired live: the primary claim → public-projection path that calls
  * `buildReleaseManifest` (`packages/domain/src/publication/index.ts`) lives in
- * `workers/publication/` (Python) per ADR-007, not in this package. The one TS call site,
+ * `workers/publication/` (Python) per docs/decisions-carryover.md ("scheduled-job worker packages"), not in this package. The one TS call site,
  * `retractResearchCase` in `packages/domain/src/research-case/workflow.ts`, assembles
  * `ReleaseArtifact` immediately before that call.
  *

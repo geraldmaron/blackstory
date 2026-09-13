@@ -8,7 +8,8 @@
  * discovery, and is scored with the obscurity methodology (low-authority boost applies to
  * `community_oral` / `self_published`).
  *
- * Invariants (ADR-009 and constitution):
+ * Invariants (`docs/decisions-carryover.md`, "Research and discovery cannot publish";
+ * and the product constitution):
  * - Research-side only. Nothing here writes public projections or release tables; every
  *   assessment routes to the human-gated `relevance_review` research-case state.
  * - `signals.outcome` is always `candidate_only`, so `deriveProvisionalDecision` can never

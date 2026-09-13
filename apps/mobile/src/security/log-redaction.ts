@@ -10,7 +10,9 @@
  *   - precise location                 (device lat/lng, fine coordinates)
  *   - citation / source URLs           (which specific evidence was viewed)
  *   - sensitive entity classifications (e.g. protected-status / era labels)
- *   - raw App Check tokens             (attestation JWTs — ADR-010, never log)
+ *   - raw attestation credentials      (JWT-shaped values — never log; see
+ *     docs/decisions-carryover.md, "Security and abuse assumptions", for why
+ *     this predates the retired App Check mechanism)
  *
  * `redactForLog` takes an arbitrary log payload (string or object/error) and
  * returns a structurally-similar value with every sensitive field/value

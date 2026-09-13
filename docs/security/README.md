@@ -23,7 +23,7 @@ Threat model, abuse-case corpus, environment isolation design, and security test
 | [`../infra/firebase/auth-and-app-check.md`](../../infra/firebase/auth-and-app-check.md) |  Auth plan + App Check scaffold (enforcement = ) |
 | [`tests/checklist.md`](./tests/checklist.md) | Manual/CI security checklist scaffold |
 
-Assumptions: [`../adr/ADR-010-security-and-abuse-assumptions.md`](../adr/ADR-010-security-and-abuse-assumptions.md).
+Assumptions: `../decisions-carryover.md`, "Security and abuse assumptions" (ADR-010 no longer exists as a file).
 Isolation matrices / IaC stubs: [`../../infra/gcp/`](../../infra/gcp/), [`../../infra/firebase/`](../../infra/firebase/).
 GitHub governance (, local): [`../../infra/github/README.md`](../../infra/github/README.md), [`../../SECURITY.md`](../../SECURITY.md).
 

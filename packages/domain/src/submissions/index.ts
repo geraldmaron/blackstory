@@ -1,5 +1,6 @@
 /**
- * Community Knowledge Holder Partnership intake surface (research-side only, ADR-009).
+ * Community Knowledge Holder Partnership intake surface (research-side only;
+ * `docs/decisions-carryover.md`, "Research and discovery cannot publish").
  */
 export {
   COMMUNITY_CAMPAIGN_BRIEF_SCHEMA_VERSION,

@@ -723,7 +723,10 @@ export function searchQueryEndpointMetadata(decision: QueryGuardrailDecisionAllo
 
 /**
  * Validates and canonicalizes a public search query.
- * SQL statement timeouts for Cloud SQL remain deferred (ADR-011); Firestore budgets apply now.
+ * No statement timeout is applied on the live read path: the public Postgres pool sets none, and
+ * `queryTimeoutMs` / `firestoreStatementTimeoutMs` below are reported as policy metadata only.
+ * What bounds a query here is the cost estimate and the page-size ceilings. See
+ * docs/decisions-carryover.md, "Firestore as system of record, reversed".
  */
 export function evaluateSearchQueryGuardrails(
   input: SearchQueryInput,

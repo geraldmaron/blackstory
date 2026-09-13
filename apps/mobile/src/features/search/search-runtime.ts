@@ -54,7 +54,9 @@ async function getOrCreateSearchSalt(backend: {
  * disappears on an ADR-023 §5 drop-and-rebuild schema migration (an app update, not
  * a reinstall), which over-clears recent searches slightly more often than the
  * narrow "genuine reinstall" case requires -- an accepted, privacy-conservative
- * direction to err in for a small, low-stakes convenience list.
+ * direction to err in for a small, low-stakes convenience list. ADR-023 itself
+ * was removed in the 2026-07-24 purge; its §5 rule is restated in
+ * `docs/decisions-carryover.md`, "Mobile cache and OTA release".
  */
 export const RECENT_SEARCHES_INSTALL_MARKER_KEY = 'search.recent_searches_install_marker_v1';
 

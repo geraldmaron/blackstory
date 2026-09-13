@@ -1,6 +1,8 @@
 /**
  * SQL Connect Data Connect operation allowlist with explicit authorization metadata.
- * Every deployable operation must appear here before runtime use (ADR-003).
+ * Parked Cloud SQL / SQL Connect design (see packages/data-access/DEFERRED.md); no runtime
+ * path in this repo calls assertOperationAuthorized or getSqlConnectOperation outside this
+ * package's own tests, so nothing is actually gated by this allowlist today.
  */
 import type { DatabaseRole } from '../roles.js';
 import { assertServerOnly } from '../server-only.js';

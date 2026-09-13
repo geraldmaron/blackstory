@@ -1,6 +1,6 @@
 # Community Knowledge Holder Partnerships
 
-Proactive human-discovery methodology: reach identified local knowledge holders (county historical societies, local NAACP chapters, Black churches with archives, HBCU faculty) in priority geographic areas with structured submission tooling. Produces **private research leads only** — same evidence gates as adapter discovery, always human-gated, never a publish path (ADR-009).
+Proactive human-discovery methodology: reach identified local knowledge holders (county historical societies, local NAACP chapters, Black churches with archives, HBCU faculty) in priority geographic areas with structured submission tooling. Produces **private research leads only** — same evidence gates as adapter discovery, always human-gated, never a publish path (`docs/decisions-carryover.md`, "Research and discovery cannot publish").
 
 **This is not crowdsourcing.** Wikipedia-style open contribution accepts prose from anyone and negotiates truth after the fact. This lane inverts that: *we* choose the counties, *we* identify institution-typed knowledge holders, *we* hand them a six-field structured brief, and every submission runs through the same deterministic relevance engine and obscurity methodology as every automated adapter.
 
@@ -41,7 +41,7 @@ Workflow per priority county:
 
 ## Invariants enforced in code
 
-- **Cannot publish (ADR-009)** — no public projection/release writes anywhere in the module. `cannotPublishAlone: true` is stamped on every brief and assessment.
+- **Cannot publish** (`docs/decisions-carryover.md`, "Research and discovery cannot publish") — no public projection/release writes anywhere in the module. `cannotPublishAlone: true` is stamped on every brief and assessment.
 - **Cannot self-include** — minted candidates carry `signals.outcome: 'candidate_only'`, so `deriveProvisionalDecision` can never return `include`; `enforceLowAuthorityTierCannotIncludeIndependently` is additionally applied, mirroring adapter campaigns.
 - **Low-authority tier trust** — holders may only carry `community_oral` / `self_published`; `buildCommunityCampaignBrief` and the registry parser both reject anything else. Oral testimony is honored as a *lead*, never over-weighted as archival proof.
 - **Evidence before assertion** — `scoreCommunitySubmission` throws without a citation or oral-history reference.

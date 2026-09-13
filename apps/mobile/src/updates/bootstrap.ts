@@ -30,11 +30,14 @@ export type CheckForUpdateResult =
 
 /**
  * Check the configured channel for a newer immutable update
- * (`updateId` — ADR-023 §2). Never throws: disabled/absent `expo-updates`
+ * (`updateId` — ADR-024 §2). Never throws: disabled/absent `expo-updates`
  * (pre-EAS-project human gate, Expo Go, web, tests) resolves to
  * `{ checked: false }`, which callers treat identically to "no update
- * available" — this is a background check, never a blocking one (ADR-023 §4
- * fail-open posture: absence of a signal is never treated as an error).
+ * available" — this is a background check, never a blocking one. It borrows the
+ * fail-open posture ADR-024 §4 states for the minimum-supported-app floor
+ * (absence of a signal is never treated as an error); §4 itself governs that
+ * floor, not this OTA check. See `docs/decisions-carryover.md`, "Mobile cache
+ * and OTA release".
  */
 export async function checkForUpdate(): Promise<CheckForUpdateResult> {
   // Never poll OTA while Metro / Fast Refresh owns the bundle. Native
@@ -63,7 +66,7 @@ export type ApplyUpdateResult =
 
 /**
  * Fetch a newer update and reload the app onto it. This is the client half
- * of ADR-023 §2's OTA path — the server/publish half (which update is
+ * of ADR-024 §2's OTA path — the server/publish half (which update is
  * "current" on a channel) is entirely controlled by whoever holds the
  * MFA-custodied EAS publish credential (README "MFA custody"), never by this
  * client. Never throws: a fetch/reload failure degrades to `applied: false`

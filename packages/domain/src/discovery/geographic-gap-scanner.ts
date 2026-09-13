@@ -5,7 +5,8 @@
  * coverage is thin *relative to documented Black population*, then seed targeted
  * discovery there. A low coverage ratio is a **prioritization signal only** — it never
  * asserts that history is absent, that a place is "undocumented" as fact, and it never
- * authorizes publication (ADR-009: research/discovery cannot publish).
+ * authorizes publication (`docs/decisions-carryover.md`, "Research and discovery cannot
+ * publish").
  *
  * All functions here are PURE: inputs arrive as parameters (staff-only
  * `bb_ops.coverage_gap_by_county_decade` rows, fixtures, or exports). No DB access,

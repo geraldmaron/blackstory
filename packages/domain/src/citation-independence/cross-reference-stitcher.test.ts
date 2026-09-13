@@ -4,7 +4,8 @@
  * Covers the corroboration contract: a person seen in two datasets but absent from the
  * catalog becomes a merged private candidate carrying BOTH source references; a
  * single-source person is not matched; an already-cataloged person is excluded. The
- * output is a private discovery candidate only — never a public/release record (ADR-009).
+ * output is a private discovery candidate only — never a public/release record
+ * (`docs/decisions-carryover.md`, "Research and discovery cannot publish").
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

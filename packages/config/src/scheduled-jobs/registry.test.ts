@@ -98,7 +98,7 @@ test('rejects an idempotency key scheme missing {jobId} or a time-window token',
   );
 });
 
-test('rejects a target worker package outside research/publication/security (ADR-007)', () => {
+test('rejects a target worker package outside research/publication/security (docs/decisions-carryover.md, "scheduled-job worker packages")', () => {
   const store = createInMemoryScheduledJobRegistry();
   assert.throws(() =>
     registerScheduledJob(
