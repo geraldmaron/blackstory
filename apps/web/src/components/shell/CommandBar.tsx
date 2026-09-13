@@ -46,6 +46,20 @@ export function syncCommandBarClearance(bar: HTMLElement): void {
 
 export type AtlasMode = 'atlas' | 'story';
 
+/**
+ * The one route that takes the bar in its quietest form: brand, search, theme, nothing else
+ * (docs/ui/design-direction-v9-surfaces.md §4, /memorial). A wall of the names of murdered
+ * people is not a surface to offer a mode switcher, a saved-records count and a shortcut sheet
+ * over. Kept as data with a predicate beside it, rather than an inline `pathname === ` in the
+ * markup, so a test can assert the quiet form reaches this route and no other.
+ */
+const QUIET_BAR_PATHS: readonly string[] = ['/memorial'];
+
+/** Whether the bar renders in its quiet form on `pathname`. Exact match: `/memorial/x` is not it. */
+export function commandBarIsQuiet(pathname: string): boolean {
+  return QUIET_BAR_PATHS.includes(pathname);
+}
+
 function SearchGlyph() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -97,6 +111,7 @@ export function CommandBar({
   className,
 }: CommandBarProps) {
   const pathname = usePathname() || '/';
+  const quiet = commandBarIsQuiet(pathname);
   const onAtlas = Boolean(mode && onModeChange);
   const barRef = useRef<HTMLElement>(null);
 
@@ -145,31 +160,33 @@ export function CommandBar({
       )}
 
       <div className="ds-bar__tools">
-        <nav className="ds-bar__modes" aria-label="Find">
-          {AXES.map((axis) => {
-            const current = pathIsCurrent(pathname, axis.path);
-            // On the Explore instrument the bar names the surface the reader is standing on
-            // rather than offering it as a link back to itself.
-            return current && axis.path === '/explore' ? (
-              <span key={axis.path} className="ds-bar__mode-link" aria-current="page">
-                {axis.label}
-              </span>
-            ) : (
-              <Link
-                key={axis.path}
-                className="ds-bar__mode-link"
-                href={axis.path}
-                {...(axis.path === '/explore' ? { prefetch: false } : {})}
-                aria-current={current ? 'page' : undefined}
-              >
-                {axis.label}
-              </Link>
-            );
-          })}
-          <RoomsMenu />
-        </nav>
+        {quiet ? null : (
+          <nav className="ds-bar__modes" aria-label="Find">
+            {AXES.map((axis) => {
+              const current = pathIsCurrent(pathname, axis.path);
+              // On the Explore instrument the bar names the surface the reader is standing on
+              // rather than offering it as a link back to itself.
+              return current && axis.path === '/explore' ? (
+                <span key={axis.path} className="ds-bar__mode-link" aria-current="page">
+                  {axis.label}
+                </span>
+              ) : (
+                <Link
+                  key={axis.path}
+                  className="ds-bar__mode-link"
+                  href={axis.path}
+                  {...(axis.path === '/explore' ? { prefetch: false } : {})}
+                  aria-current={current ? 'page' : undefined}
+                >
+                  {axis.label}
+                </Link>
+              );
+            })}
+            <RoomsMenu />
+          </nav>
+        )}
 
-        {onOpenSaved ? (
+        {onOpenSaved && !quiet ? (
           <button
             type="button"
             className="ds-bar__tool"
@@ -192,7 +209,7 @@ export function CommandBar({
           </button>
         ) : null}
 
-        {onOpenShortcuts ? (
+        {onOpenShortcuts && !quiet ? (
           <button
             type="button"
             className="ds-bar__tool"

@@ -185,7 +185,7 @@ export function MemorialScrollCue({
     >
       <span>{label}</span>
       <svg
-        className="ds-memorial-edition__scroll-cue-icon"
+        className="ds-memorial__scroll-cue-icon"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"

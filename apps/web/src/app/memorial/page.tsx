@@ -33,10 +33,9 @@ import {
   MEMORIAL_PAGE_TITLE,
   MEMORIAL_QUIET_LIST_LINK_A11Y_LABEL,
   MEMORIAL_QUIET_LIST_LINK_LABEL,
+  MEMORIAL_WALL_SEED,
 } from './memorial-copy';
-import { MEMORIAL_EDITION_WALL_SEED, memorialEditionRootClassName } from './memorial-panel-chrome';
 import '../reading-room.css';
-import './memorial-edition.css';
 
 void React;
 
@@ -50,9 +49,9 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function MemorialPage() {
   return (
-    <div className={memorialEditionRootClassName()} data-memorial-edition="v6">
+    <div className="ds-memorial">
       <MemorialWallSection
-        seedKey={MEMORIAL_EDITION_WALL_SEED}
+        seedKey={MEMORIAL_WALL_SEED}
         messageLines={MEMORIAL_HELD_MESSAGE_LINES}
         entityLinksByName={{}}
       />
@@ -65,10 +64,10 @@ export default function MemorialPage() {
         targetId="memorial-names"
         label={MEMORIAL_QUIET_LIST_LINK_LABEL}
         accessibleLabel={MEMORIAL_QUIET_LIST_LINK_A11Y_LABEL}
-        className="ds-memorial-edition__scroll-cue"
+        className="ds-memorial__scroll-cue"
       />
       <Room>
-        <div className="ds-memorial-edition__opening">
+        <div className="ds-memorial__opening">
           <RoomHeader
             pathname="/memorial"
             kicker={MEMORIAL_KICKER}

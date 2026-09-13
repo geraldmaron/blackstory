@@ -12,15 +12,26 @@ import {
   memorialNamesByInitial,
   MEMORIAL_NAMES,
 } from '../../components/patterns/memorial-wall/memorial-names';
-import { memorialEditionRootClassName } from './memorial-panel-chrome';
+
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { MemorialSections } from './MemorialSections';
+import { commandBarIsQuiet } from '../../components/shell/CommandBar';
+import { CLASSIFIED_PATHS, surfaceClassFor } from '../../lib/nav/surface-classes';
+import { defaultPostureFor } from '../../components/map-stage/plate-posture';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-test('memorial edition root does not use photo mosaic atmosphere', () => {
+test('the memorial root is the wall atmosphere on the room class, not a photo mosaic', () => {
   const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
   assert.match(pageSource, /MemorialWallAtmosphere/);
   assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
-  assert.match(memorialEditionRootClassName(), /ds-memorial-edition/);
+  // The positioned root the wall is measured against. Was a helper in the route's own
+  // panel-chrome module until repo-92n2.30 retired it; it is a literal class now.
+  assert.match(pageSource, /className="ds-memorial"/);
+  // The route carries the class stylesheet and no per-route stylesheet of its own.
+  assert.match(pageSource, /import '\.\.\/reading-room\.css'/);
+  assert.doesNotMatch(pageSource, /memorial-edition\.css/);
 });
 
 test('the memorial list is not drawn as a panel', () => {
@@ -92,4 +103,52 @@ test('memorial scroll cue does not auto-scroll on load', () => {
   const scrollCue = readFileSync(join(here, 'MemorialScrollCue.tsx'), 'utf8');
   assert.doesNotMatch(scrollCue, /MutationObserver/);
   assert.doesNotMatch(scrollCue, /data-anchored === 'true'/);
+});
+
+/*
+ * repo-92n2.30 acceptance. The three clauses that are behavior rather than file hygiene: the
+ * name-link rule, the quiet command bar, and the plate posture.
+ */
+
+test('a name with a record is a link, a name without one is not, and the difference is stated', () => {
+  const names = memorialNamesAlphabetical();
+  const linked = names[0];
+  assert.ok(linked, 'fixture needs at least one name');
+
+  const withLink = renderToStaticMarkup(
+    <MemorialSections entityLinksByName={{ [linked]: 'ent_example_001' }} />,
+  );
+  // The linked name is an anchor to its record.
+  assert.match(withLink, /<a[^>]+href="\/entity\/ent_example_001"[^>]*>/);
+  // And the difference is explained in words rather than left to color.
+  assert.match(withLink, /their name is a link to it/);
+  assert.match(withLink, /the name is written plainly/);
+
+  // Every other name stays plain text: exactly one anchor into /entity/ on the whole list.
+  assert.equal((withLink.match(/href="\/entity\//g) ?? []).length, 1);
+
+  // With no record for any name there is no difference to explain, so the sentence is absent
+  // rather than describing a distinction the reader cannot see.
+  const withoutLinks = renderToStaticMarkup(<MemorialSections />);
+  assert.doesNotMatch(withoutLinks, /href="\/entity\//);
+  assert.doesNotMatch(withoutLinks, /their name is a link to it/);
+});
+
+test('the command bar is quiet on /memorial and on no other classified route', () => {
+  assert.equal(commandBarIsQuiet('/memorial'), true);
+  const others = CLASSIFIED_PATHS.filter((route) => route !== '/memorial');
+  assert.deepEqual(
+    others.filter((route) => commandBarIsQuiet(route)),
+    [],
+  );
+  // Exact match: a child route is not the memorial wall.
+  assert.equal(commandBarIsQuiet('/memorial/names'), false);
+});
+
+test('no plate posture other than Parked is reachable on /memorial', () => {
+  // Structural, not a per-route override: /memorial is classed Reading, and Reading parks the
+  // plate. A reclassification would have to change surface-classes.ts, which this asserts too.
+  assert.equal(surfaceClassFor('/memorial'), 'reading');
+  assert.equal(defaultPostureFor('reading'), 'parked');
+  assert.equal(defaultPostureFor(surfaceClassFor('/memorial')), 'parked');
 });

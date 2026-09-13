@@ -52,11 +52,14 @@ const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../.
  * components were deleted. The `explore-*` pair left once the one live dependency — a direct
  * stylesheet import on the Explore surface — was broken: the v9 atlas instruments (TimePanel,
  * CameraConsole, LensPanel, ResultsRail) had already replaced everything the two files styled.
+ *
+ * The list is now EMPTY, and that is the end state, not a gap: `memorial/memorial-edition.css`
+ * and `memorial/memorial-panel-chrome.ts` were the last two, retired in repo-92n2.30 when
+ * /memorial moved onto the Reading room class. The ratchet still runs in both directions, so
+ * it now reads simply as "no route may grow a per-route stylesheet or panel-chrome module
+ * under app/ again".
  */
-const LEGACY_EDITION_CHROME: readonly string[] = [
-  'memorial/memorial-edition.css',
-  'memorial/memorial-panel-chrome.ts',
-];
+const LEGACY_EDITION_CHROME: readonly string[] = [];
 
 function walk(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {

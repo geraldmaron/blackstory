@@ -24,7 +24,7 @@
  *
  * Placement is scoped to the opening screens (not the full document scroll
  * height): this element sits in normal flow near the top of the page
- * (`.ds-memorial-edition`, position: relative) and is pulled up by its own
+ * (`.ds-memorial`, position: relative) and is pulled up by its own
  * document offset so it starts at the true viewport top, letting names run
  * behind the shell header and menu bar. Coordinates in
  * [0, viewportHeight * MEMORIAL_OPENING_SCREENS] land in the opening field and
@@ -70,7 +70,7 @@ const REVEAL_TICK_MS = 200;
  * How many viewports tall the wall is. Above 1 the names keep going past the
  * fold, so the opening reads as an open field rather than stopping dead where
  * the readable list begins. Must match `height: 125svh` in memorial-wall.css
- * and the opening block's reserved height in memorial-edition.css.
+ * and the opening block's reserved height in the /memorial block of reading-room.css.
  */
 const MEMORIAL_OPENING_SCREENS = 1.25;
 
@@ -181,7 +181,7 @@ const SCROLL_CUE_AVOID_MARGIN = 14;
  * packer can treat the button as occupied ground.
  *
  * The cue lives outside this component's tree — a sibling of the wall under
- * `.ds-memorial-edition` (see page.tsx) — but the wall's left edge is flush
+ * `.ds-memorial` (see page.tsx) — but the wall's left edge is flush
  * with that shared root's, so a box measured against the root converts to wall
  * coordinates by the same top-only shift used everywhere else here.
  *
@@ -194,7 +194,7 @@ function positionScrollCue(
   messageField: HTMLElement | null,
 ): MemorialAvoidBox | null {
   const container = root.parentElement;
-  const scrollCue = container?.querySelector<HTMLElement>('.ds-memorial-edition__scroll-cue');
+  const scrollCue = container?.querySelector<HTMLElement>('.ds-memorial__scroll-cue');
   const fieldBox = messageField?.getBoundingClientRect();
   const containerBox = container?.getBoundingClientRect();
   if (!scrollCue || !fieldBox || !containerBox || fieldBox.height === 0) {
@@ -229,10 +229,10 @@ function positionScrollCue(
 /**
  * Left and bottom edges of the page's RoomHeader (kicker/title/breadcrumb),
  * in the wall's local coordinate space (the wall's own left edge is flush
- * with `.ds-memorial-edition`'s, only its top is offset, so `left` here is
+ * with `.ds-memorial`'s, only its top is offset, so `left` here is
  * also directly usable by the scroll cue — see rebuild()). The header
  * renders outside this component's own tree as a sibling under the shared
- * `.ds-memorial-edition` root.
+ * `.ds-memorial` root.
  */
 function getHeaderBox(root: HTMLElement): { left: number; bottom: number } | null {
   const header = root.parentElement?.querySelector('.ds-room-header');
@@ -439,10 +439,10 @@ export function MemorialWallAtmosphere({
       const messageTopEdge = (headerBox?.bottom ?? viewportHeight * 0.22) + MESSAGE_TOP_GAP;
       const contentLeft = headerBox?.left ?? Math.max(16, width * 0.03);
       root.style.setProperty('--memorial-message-top', `${messageTopEdge}px`);
-      // Set on the shared `.ds-memorial-edition` ancestor (not `root`, the
+      // Set on the shared `.ds-memorial` ancestor (not `root`, the
       // wall itself) so the scroll cue — a sibling of the wall, not a
       // descendant — inherits it too. The wall's own left edge is flush
-      // with `.ds-memorial-edition`'s (only the top is pulled up), so this
+      // with `.ds-memorial`'s (only the top is pulled up), so this
       // one value lines up both elements.
       const editionRoot = root.parentElement;
       if (editionRoot instanceof HTMLElement) {
@@ -450,7 +450,7 @@ export function MemorialWallAtmosphere({
       }
 
       // The real, keyboard-reachable scroll cue renders outside this
-      // component's tree as another sibling under `.ds-memorial-edition`
+      // component's tree as another sibling under `.ds-memorial`
       // (see page.tsx). Anchor it below the message's actual measured
       // footprint rather than pinning it to the bottom of the viewport, so
       // it reads as "the end of the paragraph" instead of a fixed dead zone.
@@ -690,7 +690,7 @@ export function MemorialWallSection(
       <MemorialWallAtmosphere {...props} manuallyHeld={manuallyHeld} />
       <button
         type="button"
-        className="ds-memorial-edition__hold-wall"
+        className="ds-memorial__hold-wall"
         aria-pressed={manuallyHeld}
         onClick={() => setManuallyHeld((held) => !held)}
       >

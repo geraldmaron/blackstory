@@ -13,8 +13,10 @@
  */
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import React, { useEffect, useRef, useState, type ReactNode } from 'react';
 import { shouldBoostListContrast } from './memorial-list-contrast';
+
+void React;
 
 export type MemorialListContrastZoneProps = {
   readonly children: ReactNode;
@@ -51,7 +53,7 @@ export function MemorialListContrastZone({ children }: MemorialListContrastZoneP
   return (
     <div
       ref={ref}
-      className="ds-memorial-edition__list-zone"
+      className="ds-memorial__list-zone"
       data-contrast={boosted ? 'boosted' : undefined}
     >
       {children}
