@@ -180,6 +180,39 @@ const REPAIRS: readonly Repair[] = [
     claimId: 'claim_nrhp-black-heritage-96000915_03',
     subject: 'Behavior Cemetery',
   },
+  /*
+   * These two were held back on the first run because their subject is not the record. Both are
+   * now settled from the cited nomination itself rather than guessed, so the replacement is the
+   * source's own sentence:
+   *
+   *   02001290, NRHP 02001290_text: "Captain Risley, while serving in the Brunswick Freedmen's
+   *   office, helped to secure funds for the purchase of land in Town Commons to be used as the
+   *   site of the first public African-American school in Brunswick." The subject is Captain
+   *   Risley — the Freedmen's Bureau officer the school is named for — not the school, which did
+   *   not exist yet and was built on the land he helped buy.
+   *
+   *   95000855, NRHP 95000855_text: "...St. Catherine Street, the eighteenth-century road and
+   *   later city street that led from the Natchez slave markets at the Forks of the Road to Zion
+   *   Chapel African Methodist Episcopal Church..." The subject is the street, not the historic
+   *   district. The doubled "Episcopal Church Episcopal Church" is a defect in the NOMINATION's
+   *   own text (it appears there verbatim, and the same document renders the church differently
+   *   200 lines earlier); it is corrected here rather than propagated, since a `source states`
+   *   claim is reported speech, not a verbatim quotation.
+   */
+  {
+    entityId: 'nrhp-black-heritage-02001290',
+    claimId: 'claim_nrhp-black-heritage-02001290_04',
+    subject: 'Captain Risley',
+    replacement:
+      "Captain Risley, while serving in the Brunswick Freedmen's office, helped to secure funds for the purchase of land in Town Commons to be used as the site of the first public African-American school in Brunswick.",
+  },
+  {
+    entityId: 'nrhp-black-heritage-95000855',
+    claimId: 'claim_nrhp-black-heritage-95000855_03',
+    subject: 'St. Catherine Street',
+    replacement:
+      'St. Catherine Street, the eighteenth-century road and later city street, led from the Natchez slave markets at the Forks of the Road to Zion Chapel African Methodist Episcopal Church, the church of Hiram Revels, the first African-American to serve in the United States Congress.',
+  },
 ];
 
 /**
