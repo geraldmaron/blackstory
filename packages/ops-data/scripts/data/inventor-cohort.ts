@@ -17,13 +17,22 @@
  *
  * `personReviewApproved` in `../lib/incremental-publish.ts` blocks every person row from
  * incremental publish until `payload.personReview` records approved/approvedBy/approvedAt/basis.
- * Twelve of the thirteen are long-deceased historical figures, and each basis names the death date
- * and where it is published, or, where no death date survives (Reed, Newman), the birth-era
+ * Thirteen of the fourteen are long-deceased historical figures, and each basis names the death
+ * date and where it is published, or, where no death date survives (Reed, Newman), the birth-era
  * evidence that rules out a living person. The staging script writes that marker rather than
  * leaving rows stranded pending on a fact nobody disputes. Lonnie G. Johnson is living: his row
  * records `livingStatus: 'living'`, a basis naming his public professional standing, and carries
  * no residence, birth date or family detail, with the anchor capped at city precision per
  * `docs/security/location-precision-standard.md`.
+ *
+ * Henry E. Baker (repo-93p35.20) closes the twenty-name roster bead, and he is not an inventor:
+ * no patent under his own name is documented. He is the Patent Office examiner who compiled the
+ * evidence that several *other* records in `./invention-cohort.ts` (Benjamin, Reed, Lee, Murray)
+ * already cite by name, so his own row is a person record with no `invented` edge of its own —
+ * `namedOn` here lists the invention records that name him, for a reviewer's benefit, not a claim
+ * that he invented any of them. His own 1913 pamphlet is the record's central citation for the
+ * one fact this catalog most needs to get right about him: his list of Black patentees was never
+ * a census, and he said so himself, in print, in 1913.
  */
 export type InventorCohortRecord = {
   readonly id: string;
@@ -678,6 +687,77 @@ export const INVENTOR_COHORT: readonly InventorCohortRecord[] = [
         title: 'Marjorie Joyner | Lemelson',
         quote:
           'She patented the invention in 1928, receiving U.S. patent No. 1,693,515. In 1929, Joyner also patented a scalp protector to make the procedure more comfortable.',
+      },
+    ],
+  },
+  {
+    id: 'ent_henry_e_baker_001',
+    displayName: 'Henry E. Baker',
+    summary:
+      "Henry E. Baker (1857-1928) was an assistant examiner at the U.S. Patent Office in Washington, D.C. He is not documented as having patented an invention of his own; his life's project was compiling evidence of patents held by other Black Americans, at a time when the Patent Office kept no record of an applicant's race. Starting in the 1880s he wrote thousands of letters to patent attorneys, company officers, and newspapers asking who they knew of. Rep. George Washington Murray read Baker's resulting list into the Congressional Record in 1894, and Baker expanded it for the 1900 Paris Exposition before publishing \"The Colored Inventor: A Record of Fifty Years\" in 1913. He wrote there that only about 800 of roughly 1,200 gathered names could be verified, and that the true total was certainly higher.",
+    historicalContext:
+      "Baker's own pamphlet states what kind of record this is: \"only about 800\" of \"over 1,200\" gathered instances verified, with the true count \"practically certain\" to run higher. That is not a gap this entry fills in; it is the shape of the evidence, since the Patent Office recorded no inventor's race and Baker built the list from unpaid correspondence, not an official register. His compiling work is why several single-invention records in this catalog (Benjamin's chair, Reed's kneader, Lee's kneading machine, Murray's 1894 floor speech) can name him as their source. The pin here is his birthplace, Columbus, Mississippi, per this catalog's person-record convention; his working life and death were in Washington, D.C.",
+    city: 'Columbus',
+    state: 'MS',
+    lat: 33.5017,
+    lng: -88.415,
+    era: '1880s',
+    canonicalUrl:
+      'https://www.uspto.gov/learning-and-resources/journeys-innovation/historical-stories/found-bakers-list',
+    namedOn: [
+      'inv_benjamin_gong_signal_chair',
+      'inv_reed_dough_kneader_roller',
+      'inv_lee_kneading_machine',
+      'inv_murray_planter',
+    ],
+    topicIds: ['invention', 'civil-rights'],
+    reviewBasis:
+      'Deceased historical figure: Henry E. Baker was born September 1, 1857, and died in 1928 in Washington, D.C. — a Patent Office employee of the late 19th and early 20th century, more than a century before this catalog\'s 2026 publication; no living-person privacy interest. Death year given by the U.S. Patent and Trademark Office\'s own historical account and by BlackPast.org, whose article on Baker is titled "Henry E. Baker (1857-1928)".',
+    evidence: [
+      {
+        sourceUrl:
+          'https://www.uspto.gov/learning-and-resources/journeys-innovation/historical-stories/found-bakers-list',
+        title: "Found on Baker's List | USPTO",
+        quote:
+          'Baker was born in Columbus, Mississippi around 1857, a few years after Murray and a few years before the outbreak of the American Civil War.',
+      },
+      {
+        sourceUrl:
+          'https://www.uspto.gov/learning-and-resources/journeys-innovation/historical-stories/found-bakers-list',
+        title: "Found on Baker's List | USPTO",
+        quote:
+          'While finishing his degree, Baker began his career at the Patent Office as a copyist. He eventually rose to the position of second assistant examiner.',
+      },
+      {
+        sourceUrl: 'https://www.gutenberg.org/files/21281/21281-h/21281-h.htm',
+        title: 'Henry E. Baker, The Colored Inventor: A Record of Fifty Years (1913)',
+        quote:
+          'Something over 1,200 instances have been gathered as representing patents granted to colored inventors, but so far only about 800 of these have been verified as definitely belonging to that class.',
+      },
+      {
+        sourceUrl: 'https://www.gutenberg.org/files/21281/21281-h/21281-h.htm',
+        title: 'Henry E. Baker, The Colored Inventor: A Record of Fifty Years (1913)',
+        quote:
+          'It is practically certain that the nearly 800 verified patents do not represent more than one-half of those that have been actually granted to colored inventors.',
+      },
+      {
+        sourceUrl:
+          'https://rediscovering-black-history.blogs.archives.gov/2013/11/05/wanted-colored-inventors/',
+        title: 'Wanted: Colored Inventors | National Archives, Rediscovering Black History',
+        quote:
+          "Records documenting Baker's work are held in Record Group 241, Records Relating to Colored Inventors, at the National Archives.",
+      },
+      {
+        sourceUrl: 'https://www.invent.org/inductees/george-washington-murray',
+        title: 'George Washington Murray | National Inventors Hall of Fame',
+        quote:
+          'In a floor speech in August 1894, Murray, who saw patents as emblematic of equality and progress, championed recognition of Black inventors and submitted into the Congressional Record a document from patent examiner Henry E. Baker.',
+      },
+      {
+        sourceUrl: 'https://www.uspto.gov/blog/beyond-baker-rsquo-s-list',
+        title: "Beyond Baker's List: Black Innovation Then and Now | USPTO",
+        quote:
+          'We also announced the USPTO will rename its Public Search Facility after Henry Baker, honoring both his dedicated career as a civil servant and his contributions to the historical record.',
       },
     ],
   },

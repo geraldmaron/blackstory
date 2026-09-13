@@ -1,8 +1,8 @@
 # Black Women Lead — source identity (owner-confirmed)
 
-**Bead:** `repo-tt2u.8` / HUMAN `repo-ae8y`  
+**Bead:** `repo-tt2u.8` (identity) / `repo-tt2u.13` (source-policy audit) / HUMAN `repo-ae8y`  
 **Owner confirmation:** 2026-07-19 — intended source is **`https://blackwomenleadproject.org/`**  
-**Status:** Identity **confirmed**. Source-policy / rights audit **not yet approved**. **No scrape, adapter enablement, or persistent capture until policy gate passes.**
+**Status:** Identity **confirmed**. Source-policy audit (`repo-tt2u.13`) **closed 2026-09-12** with a **register-disabled verdict**: rights/license status stays an open unknown pending GGHMS contact (plan below), so the source stays **disabled**, not approved. **No scrape, adapter enablement, or persistent capture until that unknown resolves and a follow-up policy decision approves it.**
 
 ---
 
@@ -50,6 +50,8 @@ Allow: /wp-admin/admin-ajax.php
 Sitemap: https://blackwomenleadproject.org/wp-sitemap.xml
 ```
 
+**Archived snapshot:** re-fetched 2026-09-12 (UA `BlackStorySourceAudit/0.1 (+research; no-persist probe)`, `GET https://blackwomenleadproject.org/robots.txt`, HTTP 200, 126 bytes). SHA-256 of the raw response body: `04cb2217b2b61278edf94c0c08204115b23cb30b46130c83e9f26801909baa27`. Byte-identical to the 2026-07-19 probe quoted above — the code block itself is the archived text, and this document's git history is the durable record of both captures (dates, UA, hash) tying the quoted text to a specific fetch.
+
 **Robots gate:** Public site content is not disallowed to `*`. Robots alone does **not** satisfy terms/rights.
 
 ### Feed / API / sitemap
@@ -60,7 +62,7 @@ Sitemap: https://blackwomenleadproject.org/wp-sitemap.xml
 | `GET /wp-json/wp/v2/posts` | Returns the same stub post |
 | `GET /wp-json/wp/v2/pages` | Only `sample-page` besides home |
 | `GET /wp-sitemap.xml` | Index of posts, pages, categories, users sitemaps |
-| Privacy / terms pages | **Not found** via `pages?slug=privacy|privacy-policy|terms|terms-of-use` |
+| Privacy / terms pages | **Not found** via `pages?slug=privacy|privacy-policy|terms|terms-of-use`; re-checked 2026-09-12, still no matches (`[]`, HTTP 200 for all four slugs) |
 
 ### Homepage content (metadata-level)
 
@@ -79,7 +81,12 @@ The public WordPress install looks **thin relative to the 212-banner project** d
 2. Whether BPL/Northeastern host the structured bios under a clearer rights regime  
 3. Portrait/banner image rights (artists, GGHMS, funders) — almost certainly **not** free for bulk retention  
 4. Whether WP will gain custom post types for leaders later  
-5. Contact path for rights review with GGHMS  
+5. Contact path for rights review with GGHMS — **unknown-with-owner-contact plan** (no verdict yet; this is the plan to get one):
+   - **Who:** Greater Grove Hall Main Streets (GGHMS), as the project's stated custodian/organizer. No named rights contact has been identified from the public site; the outreach starts at GGHMS's general organizational contact (site/press-listed email or contact form) and asks to be routed to whoever holds rights decisions for the banner biographies and portrait images.
+   - **What to ask:** (a) is there a written license or terms of use covering republication of leader biography text, selection/curation text, and portrait/banner images; (b) do BPL or Northeastern hold a separate, clearer rights regime for any structured biography content; (c) is there a preferred citation or attribution form GGHMS requires.
+   - **Channel:** email, with a follow-up via the site's public contact form if no reply; keep the outreach in the no-persist posture (identify BlackStory, state research-only intent, no bulk capture pending reply).
+   - **Fallback if no response:** after one follow-up with no reply, this source stays **disabled** and is re-raised at the next research-source review rather than acquired by default — silence is not a rights grant.
+   - **Owner:** whoever holds the acquisition/partnerships relationship for BlackStory source approvals; this document records the plan, not the outreach itself, since running it is a fetch/canary-stage action this bead's dependencies mark as blocked until the policy audit closes.
 
 ---
 
@@ -96,7 +103,8 @@ The public WordPress install looks **thin relative to the 212-banner project** d
 
 1. **Prefer partner structured corpora** (BPL / Northeastern bios) if they exist with clearer licenses — audit those as **related source identities**, not as independent corroboration of the same text.  
 2. If this domain remains the primary surface: **RSS is currently useless** for leader inventory; prefer **sitemap + selective page fetch** only after rights review; keep retention **metadata/snippet** unless rights allow more.  
-3. Register adapter **disabled**; fixtures from permitted captures; canary; explicit approval.  
+3. Register adapter **disabled**; fixtures from permitted captures; canary; explicit approval.
+   **Documented deferral (this audit's registration decision):** no `registerSource(...)` entry (see `packages/domain/src/adapters/registry.ts`'s `registerSource`, whose `registryState` defaults to `'disabled'` when omitted — the same pattern `packages/domain/src/historic-safety/source-registry.ts` uses to register its own sources) exists for `blackwomenleadproject.org`, and none will be added until the unresolved items above close. This is the explicit deferral in place of a registration stub: registration itself is deferred, not merely unbuilt.
 4. For “Black women in STEM” operator goals: use **STEM-intent query plans** against authorities (NASA, ORCID, patents, etc.) **and/or** filter this Boston leadership set by occupation evidence — do not rename this source “STEM.”
 
 ---
