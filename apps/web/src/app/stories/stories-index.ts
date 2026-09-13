@@ -348,6 +348,32 @@ export function nextInCollection(
   return members.find((item) => (item.series?.position ?? -1) > afterPosition);
 }
 
+/**
+ * The member immediately before `beforePosition` in the same collection.
+ *
+ * The mirror of {@link nextInCollection}, and it reads the sorted list backwards rather than
+ * filtering and taking the last: `sortItems(_, 'collection')` is the ordering a reader sees on
+ * the shelf, so "previous" has to mean previous in THAT order, not the smallest position number.
+ * A collection with a gap in its positions (the presidents series leaves 24 vacant, because
+ * Cleveland holds one entry for two terms) would otherwise skip.
+ */
+export function prevInCollection(
+  items: readonly PublicArticleListItemDoc[],
+  collectionId: string,
+  beforePosition: number,
+): PublicArticleListItemDoc | undefined {
+  const members = sortItems(
+    items.filter((item) => item.series?.id === collectionId),
+    'collection',
+  );
+  // Reverse scan rather than `findLast`, which this tsconfig's lib does not carry.
+  for (let index = members.length - 1; index >= 0; index -= 1) {
+    const item = members[index];
+    if (item && (item.series?.position ?? -1) < beforePosition) return item;
+  }
+  return undefined;
+}
+
 /** Stories with no collection — the "Everything else" list beneath the shelves. */
 export function uncollectedItems(
   items: readonly PublicArticleListItemDoc[],

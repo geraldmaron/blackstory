@@ -768,6 +768,56 @@ describe('room kit · a live moment is a window onto the borrowed plate', () => 
   });
 });
 
+describe('room kit · a live plate never sits behind a prose column', () => {
+  /*
+   * repo-92n2.11.2. The bead's rule is "never full bleed behind prose, enforced in CSS rather
+   * than left to authors", and the enforcement is a two-part invariant rather than one rule:
+   *
+   *   1. the ladder — the plate is fixed at `--ds-z-map-plate` and document content sits at
+   *      `--ds-z-content`, so the plate paints UNDER the page and an opaque ground hides it;
+   *   2. the one window — the only selector that makes a box transparent over that plate is the
+   *      live map-moment slot, which is bounded, in flow, and released on scroll out.
+   *
+   * Either half alone is not the rule. Raise the plate above content, or let some other
+   * container go transparent, and a live map reads straight through body text.
+   */
+  const tokens = readFileSync(
+    path.resolve(
+      path.dirname(fileURLToPath(import.meta.url)),
+      '../../../../../packages/ui/src/styles/tokens.css',
+    ),
+    'utf8',
+  );
+
+  it('the plate token sits below the content token, so the plate paints under the page', () => {
+    const plate = /--ds-z-map-plate:\s*(-?\d+)/.exec(tokens);
+    const content = /--ds-z-content:\s*(-?\d+)/.exec(tokens);
+    assert.ok(plate && content, 'both z tokens must be defined');
+    assert.ok(
+      Number(plate[1]) < Number(content[1]),
+      `plate (${plate[1]}) must sit below content (${content[1]})`,
+    );
+  });
+
+  it('the live map-moment slot is the only box that opens a window onto the plate', () => {
+    // Any rule that drops a background to transparent inside the room kit is a candidate
+    // window. Exactly one is legitimate: the live moment slot.
+    const css = readFileSync(
+      path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'room-kit.css'),
+      'utf8',
+    );
+    const windows = [...css.matchAll(/([^{}]+)\{([^}]*background:\s*transparent[^}]*)\}/g)].map(
+      (match) => match[1]!.trim().split('\n').pop()!.trim(),
+    );
+    assert.equal(
+      windows.length,
+      1,
+      `expected exactly one plate window, found ${windows.length}: ${windows.join(' | ')}`,
+    );
+    assert.match(windows[0]!, /\.ds-mapmoment\[data-live='1'\]\s+\.ds-mapmoment__plate/);
+  });
+});
+
 describe('room kit · no room invents its own map moment', () => {
   it('no route defines moment markup outside the kit', () => {
     // The gap this package closed: the mock renders a moment in seven rooms and the kit had no

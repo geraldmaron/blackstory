@@ -16,8 +16,11 @@ import {
   listPublishedArticleSlugs,
   listPublicArticleListItems,
 } from '../../../lib/articles/source';
-import { nextInCollection } from '../stories-index';
-import { Note, Room } from '../../../components/room';
+import { nextInCollection, prevInCollection } from '../stories-index';
+import { Note, RecordNav, Room } from '../../../components/room';
+import type { RecordNavTarget } from '../../../components/room';
+import { articleCitedEntities } from '../../../lib/release/build-cites-edge';
+import { listPublicEntityViewsByIds } from '../../../lib/public-data/source';
 import '../../reading-room.css';
 import '../../../components/article/article.css';
 import '../../../components/theme-spine/theme-spine.css';
@@ -97,13 +100,32 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
   // "Next in this collection" only needs the rest of the release's list items — the same
   // read `/stories` already does, cached per request, not a new query.
+  // One read of the release's list items serves both directions; `/stories` already does it and
+  // it is cached per request.
+  const collectionItems = doc.series ? (await listPublicArticleListItems()).items : [];
   const next = doc.series
-    ? nextInCollection(
-        (await listPublicArticleListItems()).items,
-        doc.series.id,
-        doc.series.position,
-      )
+    ? nextInCollection(collectionItems, doc.series.id, doc.series.position)
     : undefined;
+  const previous = doc.series
+    ? prevInCollection(collectionItems, doc.series.id, doc.series.position)
+    : undefined;
+
+  /*
+   * "The records behind this <noun>" — the story side of the story-cites-record edge (SP-20).
+   *
+   * The ids come from `articleCitedEntities`, the same derivation the record side reads in
+   * reverse, so a record that lists this story and a story that lists this record can never
+   * disagree. Names are resolved through `listPublicEntityViewsByIds`, which fetches exactly
+   * these ids rather than loading the catalog to read a handful of display names.
+   *
+   * Rendered as real links to each record rather than as one deep link into the Atlas. The
+   * design law calls this "handing a named collection to the Atlas", but `EXPLORE_URL_PARAM_KEYS`
+   * has no multi-id or collection param — `selected` carries one id — so a named collection is
+   * not representable in an Explore URL today. A list of real record links is the same handoff
+   * the reader needs and states nothing the URL vocabulary cannot back.
+   */
+  const citedIds = [...articleCitedEntities(doc).keys()];
+  const citedRecords = citedIds.length > 0 ? (await listPublicEntityViewsByIds(citedIds)).data : [];
 
   // Ink spec §4 (/stories/[slug]): the sticky right rail carries "In this chapter/entry", the
   // reference list and "Next in this collection". The references list itself, its numbering and
@@ -208,8 +230,33 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
    * than beside its third paragraph: a reader checking a citation has finished the sentence, and
    * a reader who is not checking one should not be reading past a column of them.
    */
+  const navPrevious: RecordNavTarget | undefined = previous
+    ? { href: `/stories/${previous.slug}`, label: previous.title }
+    : undefined;
+  const navNext: RecordNavTarget | undefined = next
+    ? { href: `/stories/${next.slug}`, label: next.title }
+    : undefined;
+
+  const recordsBehind =
+    citedRecords.length > 0 ? (
+      <section className="ds-article-appx__records" aria-labelledby="records-behind">
+        <h3 id="records-behind">The records behind this {noun}</h3>
+        <p>
+          Every record this {noun} draws on, as the archive holds it. Open one to read its evidence,
+          or find it on the Atlas from there.
+        </p>
+        <ul className="ds-article-appx__record-list">
+          {citedRecords.map((record) => (
+            <li key={record.id}>
+              <Link href={`/entity/${record.id}`}>{record.displayName}</Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ) : null;
+
   const apparatus =
-    article.references.length > 0 ? (
+    article.references.length > 0 || recordsBehind || navPrevious || navNext ? (
       <div className="ds-article-appx" id="about-this-chapter">
         <div className="ds-article-appx__head">
           <h2>About this {noun}</h2>
@@ -217,7 +264,10 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         </div>
         <div className="ds-article-appx__cols">
           <div>
-            <ArticleReferences references={article.references} headingId="about-this-chapter" />
+            {article.references.length > 0 ? (
+              <ArticleReferences references={article.references} headingId="about-this-chapter" />
+            ) : null}
+            {recordsBehind}
           </div>
           <div className="ds-article-appx__notes">
             <section>
@@ -235,6 +285,14 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
             </section>
           </div>
         </div>
+        {/* Prev and next close the foot, after the apparatus: a reader who has finished the
+            piece is choosing where to go, and that choice belongs under the sources rather
+            than beside the third paragraph. The rail's "Next in this collection" is the
+            reading cue mid-scroll; this is the pair. */}
+        <RecordNav
+          {...(navPrevious ? { previous: navPrevious } : {})}
+          {...(navNext ? { next: navNext } : {})}
+        />
       </div>
     ) : undefined;
 
