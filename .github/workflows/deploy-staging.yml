@@ -45,6 +45,13 @@ jobs:
     env:
       E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
       CI_REQUIRE_E2E: ${{ vars.CI_REQUIRE_E2E }}
+      # Vercel Preview deployments (which is what the staging branch produces) are
+      # SSO-protected and answer an unauthenticated request with a 302 to
+      # vercel.com/sso-api. This is Vercel's documented Protection Bypass for Automation
+      # secret; the smoke harness sends it as x-vercel-protection-bypass. Unset today —
+      # it has to be minted in the Vercel dashboard — which is why E2E_BASE_URL cannot
+      # yet point at staging. See packages/testing/src/e2e/smoke.harness.test.ts.
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
     steps:
       - name: Resolve pinned commit SHA
         id: resolve
@@ -112,10 +119,10 @@ jobs:
 
       # This says out loud what it has been doing silently. `vars.E2E_BASE_URL` is unset on
       # this repository (actions/variables returns 0), so smoke-post-deploy.mjs has skipped on
-      # every one of the last 328 runs while the job reported green — a post-deploy gate that
-      # was never a gate. The notice makes that visible in the run summary instead of leaving
-      # a green check to imply staging was smoked. Set E2E_BASE_URL to turn it on, and
-      # CI_REQUIRE_E2E=1 to make a skip fail closed.
+      # every run to date — 642 lifetime runs as of 2026-09-12 — while the job reported green,
+      # a post-deploy gate that was never a gate. The notice makes that visible in the run
+      # summary instead of leaving a green check to imply staging was smoked. Set
+      # E2E_BASE_URL to turn it on, and CI_REQUIRE_E2E=1 to make a skip fail closed.
       - name: Warn when the post-deploy smoke has nothing to hit
         if: ${{ vars.E2E_BASE_URL == '' }}
         run: echo "::warning title=Staging smoke did not run::vars.E2E_BASE_URL is unset, so the post-deploy smoke skipped. This job's green does NOT mean staging was verified."
