@@ -134,7 +134,7 @@ Planning assumptions (conservative for API integrators, not for CDN-cached stati
 
 **Scenario C — 10,000 users via CDN-cached release artifacts (preferred):**
 
-- Immutable release JSON/GeoJSON under versioned paths (ADR-004 pattern) served from Firebase Hosting/CDN with `Cache-Control: public, max-age=31536000, immutable` — **Supabase egress ≈ build/publish pipeline only**, not per-user fan-out. See ADR-013 / ADR-025 egress models for map/search static assets.
+- Immutable release JSON/GeoJSON under versioned paths (`../decisions-carryover.md`, "Public projection and immutable publication snapshots" pattern) served from Firebase Hosting/CDN with `Cache-Control: public, max-age=31536000, immutable` — **Supabase egress ≈ build/publish pipeline only**, not per-user fan-out. See `../decisions-carryover.md`, "Map stack" (ADR-013, web) and "Explore basemap and live map source" (ADR-025, mobile — a number also used, unrelated, by the pre-rename `ADR-024`; see "Native map render layer" for that collision) for the egress models for map/search static assets.
 
 The envelope **assumes Scenario C for product-scale traffic** and treats Scenario B as a **failure mode** to detect via spend alerts and rate limits.
 
@@ -174,7 +174,7 @@ config; unused is not proven. The **$35/mo** envelope reserved room for:
 | 2 | **Staging** (future Supabase project) | Micro | Synthetic/mirror data; `minInstances: 0` consumers where possible |
 | 3 | **Preview / internal** (optional) | Micro | Migration dry-runs, operator experiments — **no** PITR/branching |
 
-Aligns with GCP three-project isolation ([ADR-012](../adr/ADR-012-production-environment-resplit.md), [`environment-isolation.md`](../security/environment-isolation.md)) but **Supabase billing is separate** — each Postgres project consumes one Micro slot toward the $35 figure.
+Aligns with GCP three-project isolation (`../decisions-carryover.md`, "Small recovered decisions", ADR-012 entry — still only a design target, not provisioned; [`environment-isolation.md`](../security/environment-isolation.md)) but **Supabase billing is separate** — each Postgres project consumes one Micro slot toward the $35 figure.
 
 ---
 

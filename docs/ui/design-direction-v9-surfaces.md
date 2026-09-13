@@ -7,7 +7,7 @@
 **Source mockup:** [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html), extended with a room layer, the reading rooms, the record room, the records index, the legend overlay and the single-key toggle (packages SP-01 to SP-03 below).
 **Companion:** [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md) — also superseded for product shape.
 **Supersedes on approval (historical):** `design-direction-v6-history.md` (the route dissolves), `design-direction-v6-about.md`, `design-direction-v6-books.md`, `design-direction-v6-data.md`, `design-direction-v6-law.md`, `design-direction-v6-memorial.md`, `design-direction-v6-methodology.md`, `design-direction-v6-entity.md`, and `design-direction-v6-stories.md` and `design-direction-v6-themes.md`, whose routes no longer exist in the app directory. `patterns-utility-edition.md` is folded into the Utility class in section 2.4.
-**Unchanged and still binding:** [`brand.md`](./brand.md) tokens, palette, type and dignity law; [`story.md`](./story.md) voice; [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md); [`patterns-map-canvas.md`](./patterns-map-canvas.md); [`patterns-record-anatomy.md`](./patterns-record-anatomy.md); [`patterns-browse-mode.md`](./patterns-browse-mode.md); [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md); [`patterns-site-footer.md`](./patterns-site-footer.md); ADR-017 map handoff; WCAG AA floor. Protected experiences and v10 override conflicts.
+**Unchanged and still binding:** [`brand.md`](./brand.md) tokens, palette, type and dignity law; [`story.md`](./story.md) voice; [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md); [`patterns-map-canvas.md`](./patterns-map-canvas.md); [`patterns-record-anatomy.md`](./patterns-record-anatomy.md); [`patterns-browse-mode.md`](./patterns-browse-mode.md); [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md); [`patterns-site-footer.md`](./patterns-site-footer.md); `../decisions-carryover.md`, "Persistent map canvas", ADR-017 map handoff; WCAG AA floor. Protected experiences and v10 override conflicts.
 
 ---
 
@@ -144,7 +144,7 @@ Every public route, with its verdict, class and URL disposition. Verdict vocabul
 
 | Route | Verdict | Class | URL disposition |
 |---|---|---|---|
-| `/` | becomes-atlas-mode | Instrument | Preserved and promoted to the canonical Atlas URL. Allowlist generated from `parseExploreSearchParams`. `panels` is dropped from the builder; `lat`, `lng`, `zoom` are dropped by ADR-017 policy. Canonical is always bare `/`. |
+| `/` | becomes-atlas-mode | Instrument | Preserved and promoted to the canonical Atlas URL. Allowlist generated from `parseExploreSearchParams`. `panels` is dropped from the builder; `lat`, `lng`, `zoom` are dropped by `../decisions-carryover.md`, "Persistent map canvas", ADR-017 policy. Canonical is always bare `/`. |
 | `/library` | new-surface | Reading room | New. The hub for everything that is not the map, and the second breadcrumb step for every reading and utility room. Self-canonical, sitemapped, in the footer and the palette Go section. Opened by `L`. Cards are generated from the destination registry, so a new public route cannot be missing from it. |
 | `/records` | new-surface | Reading room | New. `?page=N` self-canonical with rel prev and next; filters that narrow the set stay in the canonical. Every page in the sitemap. |
 | `/story` | new-surface | Instrument | New, self-canonical, sitemapped, own OG. Chapters at `/story#chapter-{id}`. `?mode=story` on `/` 308s here. |
@@ -399,7 +399,7 @@ Mobile and editorial: folding `/locate` into a rail that is `display:none` below
 
 **Wiring `/search/api` as the palette backend in this release.** Accepted the coverage defect entirely; rejected the release coupling. `/search/api` has zero callers today, and switching the site's primary affordance from a client index to a network round trip changes its latency profile in the same release that hoists the plate, folds three routes and adds two more. Widening the client index shape fixes what readers actually hit, is cheap, is testable with a fixture, and ships now.
 
-**Allowlisting `panels`.** Accepted the drift and the generated-allowlist fix; rejected preserving `panels`. Which panels a reader has open is chrome state, not shareable meaning, and it is the same class of thing as the viewport that ADR-017 already refuses to put in the URL for the same reason. The fix is to stop the builder emitting it. `radius` and `near` do carry meaning, so they are generated in with everything else.
+**Allowlisting `panels`.** Accepted the drift and the generated-allowlist fix; rejected preserving `panels`. Which panels a reader has open is chrome state, not shareable meaning, and it is the same class of thing as the viewport that `../decisions-carryover.md`, "Persistent map canvas", ADR-017 already refuses to put in the URL for the same reason. The fix is to stop the builder emitting it. `radius` and `near` do carry meaning, so they are generated in with everything else.
 
 **"Every accepted param must have a Lens control."** Right in spirit, wrong at the edges: shipping it as written would produce absurd controls for `selected`, `collection` and `find`, none of which narrows the result set. Replaced by the active constraint chip law in section 5.5.
 

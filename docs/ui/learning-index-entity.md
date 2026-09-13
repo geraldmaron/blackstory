@@ -24,7 +24,7 @@ This document is the editorial and engineering contract for that surface.
 Public pages show thin **release provenance** (`releaseId`, `generatedAt`,
 `recordUpdatedAt`) and lifecycle **`statusHistory`** where applicable — not a
 Wikipedia-style field edit log. Corrections ship as **new immutable releases**
-(ADR-004). Internal `auditEvents` can reconstruct publication/correction/
+(`../decisions-carryover.md`, "Public projection and immutable publication snapshots", ADR-004). Internal `auditEvents` can reconstruct publication/correction/
 retraction history for operators; that trail is not the learning-index UI.
 
 ## UI sparsity (honesty over fake richness)

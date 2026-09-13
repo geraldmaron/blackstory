@@ -1,7 +1,8 @@
 # Release activation — Postgres SoR (MOB-005)
 
 Publication workers activate immutable mobile bootstrap + map/content artifacts through the
-Postgres system of record after ADR-020 cutover. Firestore `createFirestoreReleaseStore` remains
+Postgres system of record after the ADR-020 cutover (removed 2026-07-24, recovered in
+`../decisions-carryover.md`, "Firestore as system of record, reversed"). Firestore `createFirestoreReleaseStore` remains
 an explicit opt-in rollback path only — do not dual-write canonical truth to both stores.
 
 ## Architecture

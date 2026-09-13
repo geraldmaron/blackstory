@@ -132,7 +132,7 @@ Store listings require live HTTPS URLs on the production domain.
 - [ ] Document approved **monthly EAS spend ceiling** and who receives alerts.
   - **Ceiling:** $10 USD/mo beyond Supabase. **Plan:** Expo Free only. **Alerts:** `me@geralddagher.com`.
 - [ ] Document **annual Apple renewal** owner — Gerald Dagher (individual).
-- [x] Align with ADR-023 free-tier posture (OTA code signing is a paid upgrade — accepted risk until budget allows).
+- [x] Align with the ADR-024 free-tier posture (OTA code signing is a paid upgrade — accepted risk until budget allows). ADR-024 is the mobile build/release/OTA decision, removed in the 2026-07-24 `docs/adr/` purge and restated in [`docs/decisions-carryover.md`](../../decisions-carryover.md), "Mobile cache and OTA release"; this line cited "ADR-023" before the mobile ADRs were renumbered.
 
 **Evidence**: written ceiling amount + alert recipient (bead note).
 

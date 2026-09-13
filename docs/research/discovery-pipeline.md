@@ -108,7 +108,7 @@ Disclaimer: `OBSCURITY_METHODOLOGY_DISCLAIMER` — relative heuristic only; neve
 
 ## Periodic schedule + operator dry-run
 
-Roster job `community-obscurity-discovery` (`packages/config/src/scheduled-jobs/`) runs weekly (Sundays 10:00 UTC), kill switch `research-campaigns`, `publicEffect: none`, `rosterStatus: real`. **Production trigger (ADR-018):** prefer Firebase Functions v2 `onSchedule` calling `dispatchDiscoveryCampaign` (research SA). Cloud Run Jobs remain for runs that may exceed ~30 minutes. GHA weekly fixture smoke + `workflow_dispatch` are CI/operator paths. The Cloud Scheduler / Jobs mirror in `infra/gcp/scheduler/scheduled-jobs.json` stays `"status": design` until a human apply for the Jobs path.
+Roster job `community-obscurity-discovery` (`packages/config/src/scheduled-jobs/`) runs weekly (Sundays 10:00 UTC), kill switch `research-campaigns`, `publicEffect: none`, `rosterStatus: real`. **Production trigger:** ADR-018 (Firebase Functions v2 `onSchedule` calling `dispatchDiscoveryCampaign`) is dead — the Cloud Functions package was deleted (`repo-348e.8`) and `.github/workflows/discovery-campaigns.yml` is the live production scheduler (`../decisions-carryover.md`, "Small recovered decisions", ADR-018 entry). Cloud Run Jobs remain for runs that may exceed ~30 minutes. GHA weekly fixture smoke + `workflow_dispatch` are CI/operator paths. The Cloud Scheduler / Jobs mirror in `infra/gcp/scheduler/scheduled-jobs.json` stays `"status": design` until a human apply for the Jobs path.
 
 On-demand (no network; pass a downloaded feed file):
 

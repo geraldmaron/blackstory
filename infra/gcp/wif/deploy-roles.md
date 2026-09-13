@@ -1,5 +1,9 @@
 # Deploy identity roles (BB-010, extended by ADR-012/BB-078)
 
+> ADR-012 was removed 2026-07-24 and recovered in `../../../docs/decisions-carryover.md`, "Small
+> recovered decisions" — still only a design target, never provisioned. Every bare "ADR-012"
+> below refers to that recovery.
+
 Least-privilege Google IAM for the GitHub Actions deploy identities across the three ADR-012
 projects. Aligns with [`../service-accounts.matrix.md`](../service-accounts.matrix.md) and
 [`../isolation-matrix.json`](../isolation-matrix.json) (both still describe the live single-project

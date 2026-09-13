@@ -12,7 +12,8 @@ for "how many entities does the project have." Nothing else counts:
   canonical → release, never the reverse. A release row count is not an entity count — it's
   releases × entities-per-release (e.g. 2749 rows was 2 releases × ~1382 canonical entities
   at the time, not 2749 distinct entities).
-- **Firestore** is retired. See `docs/data/firebase-wind-down.md` and ADR-020.
+- **Firestore** is retired. See `docs/data/firebase-wind-down.md` and `docs/decisions-carryover.md`,
+  "Firestore as system of record, reversed".
   `packages/firebase/fixtures/national-catalog` is empty.
 
 ## Current value

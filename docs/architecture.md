@@ -66,7 +66,8 @@ infra/*                  Leftover Firebase/GCP scaffolding, GitHub, parked PostG
 
 `functions/` (Firebase Cloud Functions v2 schedules) was deleted. Scheduling moved to
 `.github/workflows/discovery-campaigns.yml`. Do not add deployable microservices beyond this
-set. Historical ADR-005 text is in git history.
+set (`docs/decisions-carryover.md`, "Service surface separation"). Historical ADR-005 text is in
+git history: `git log -- docs/adr/`.
 
 ## At-scale topology
 
@@ -152,7 +153,7 @@ intake writes to quarantine, not to canonical data.
 | Concern | Rule |
 |---------|------|
 | Canonical write | Never from anonymous or public clients |
-| Public read | Released projections / immutable snapshots only ([ADR-004](./adr/ADR-004-public-projection-immutable-snapshots.md)) |
+| Public read | Released projections / immutable snapshots only (`decisions-carryover.md`, "Public projection and immutable publication snapshots") |
 | Promotion | Required before any submission becomes public |
 | Research / LLM | Cannot publish; public render never calls an LLM |
 | Living persons | No public residential addresses; unknown living status treated as living |

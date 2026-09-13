@@ -81,7 +81,7 @@ Checked directly against Supabase (`twykhihqkcldpreuovay` project):
 - Checked for **real** duplicates within a release: `(release_id, entity_id)` on
   `release_entities` and `(release_id, slug)` on `release_stories` both have **zero** groups with
   count > 1. The apparent "doubling" is fully explained by two immutable per-release snapshots
-  (ADR-004 pattern), not hidden duplicate rows.
+  (`../decisions-carryover.md`, "Public projection and immutable publication snapshots" pattern), not hidden duplicate rows.
 
 **Uniqueness constraints added** (applied via `apply_migration`, both succeeded cleanly against
 live data — no pre-existing violations, which is itself confirmation there are no real dupes

@@ -31,7 +31,7 @@ an authorization control and cannot replace these server assertions.
 
 The production IAP verifier must validate signature, issuer, expiry, and the exact backend-service
 audience. Forwarded identity headers are not trusted without JWT verification. See
-`infra/gcp/iap/README.md` and ADR-005.
+`infra/gcp/iap/README.md` and `../decisions-carryover.md`, "Service surface separation" (ADR-005).
 
 ## Firebase custom claims
 
@@ -56,7 +56,7 @@ recovery material.
 | `admin` | All permissions, including policy and role changes |
 
 The `admin` role inherits research, publication, and security capabilities. Research alone never
-publishes. Publication activation remains an internal workflow per ADR-005; the admin service
+publishes. Publication activation remains an internal workflow per `../decisions-carryover.md`, "Service surface separation" (ADR-005); the admin service
 authorizes the human request but does not gain a direct public projection mutation path.
 
 Role changes are server-only. `mutateAdminRoles` requires layered authorization and fresh

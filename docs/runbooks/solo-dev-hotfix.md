@@ -2,10 +2,12 @@
 
 Practical loop for one person shipping web hotfixes without enterprise ceremony.
 Binding detail also lives in `~/Developer/Guides/Workflows.md` (BlackStory solo-dev
-hotfix pattern). Public web aligns with ADR-027 (Vercel) — merging to `main` is the deploy;
+hotfix pattern). Public web aligns with the Vercel-hosting decision (`../decisions-carryover.md`,
+"Small recovered decisions", ADR-027 entry) — merging to `main` is the deploy;
 there is no separate Vercel promote step (repo-8ary, repo-h1b2). Admin now deploys inside the
-same `apps/web` Vercel project (2026-09-11, repo-z3g1f); the old ADR-006 App Hosting promote
-path is retired.
+same `apps/web` Vercel project (2026-09-11, repo-z3g1f); the old GitHub Actions deployment model's
+App Hosting promote path (`../decisions-carryover.md`, "Small recovered decisions", ADR-006 entry)
+is retired.
 
 ## When to use which branch
 
@@ -113,4 +115,4 @@ for branches other than `main` — a PR branch, not the merge itself).
 - Relying on CDN `s-maxage` alone without `force-dynamic` / `revalidate` when RUNTIME env differs from BUILD
 - Silent seed fallback under `PUBLIC_DATA_SOURCE=postgres`
 - Editing `package.json` without refreshing `pnpm-lock.yaml`
-- Using `*.hosted.app` URLs for public web smoke — public web is Vercel only (ADR-027)
+- Using `*.hosted.app` URLs for public web smoke — public web is Vercel only (`../decisions-carryover.md`, "Small recovered decisions", ADR-027 entry)

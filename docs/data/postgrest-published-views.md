@@ -1,13 +1,14 @@
 <!--
   PostgREST published-read surface: stable public views over active-release
-  projections (ADR-026). Documents URL patterns, apply steps, marketing gates,
+  projections (`docs/decisions-carryover.md`, "Small recovered decisions", ADR-026 entry).
+  Documents URL patterns, apply steps, marketing gates,
   and egress guidance. Does not authorize live remote apply without approval.
 -->
 
 # PostgREST published views
 
 **Status:** Migration authored (remote apply gated)  
-**ADR:** [ADR-026](../adr/ADR-026-postgrest-published-read-surface.md)  
+**Decision:** ADR-026 (removed 2026-07-24; recovered in [`decisions-carryover.md`](../decisions-carryover.md), "Small recovered decisions")  
 **Migration:** [`supabase/migrations/20260721180000_postgrest_published_views.sql`](../../supabase/migrations/20260721180000_postgrest_published_views.sql)  
 **Bead:** repo-651l.3 (data-landscape capitalization)
 
@@ -62,7 +63,7 @@ GET /rest/v1/published_search_index?topics=cs.{<topic>}&select=entity_id,name,to
 
 PostgREST filter operators follow [Supabase REST docs](https://supabase.com/docs/guides/api). Prefer explicit `select=` column lists over `select=*` to limit payload size.
 
-**Status vocabulary** for resolvable public rows: `published` | `corrected` | `superseded` | `deprecated` (see ADR-026). Filter on `published_search_index.status` when needed.
+**Status vocabulary** for resolvable public rows: `published` | `corrected` | `superseded` | `deprecated` (see `decisions-carryover.md`, "Small recovered decisions", ADR-026 entry). Filter on `published_search_index.status` when needed.
 
 ## RLS and access model
 
@@ -76,7 +77,7 @@ Research roles **cannot** activate releases; the publish gate stays a database i
 
 ## Marketing and quality gates
 
-Architecture is unlocked; **marketing a “Black history API” is not**. Preconditions from ADR-026:
+Architecture is unlocked; **marketing a “Black history API” is not**. Preconditions from `decisions-carryover.md`, "Small recovered decisions" (ADR-026 entry):
 
 - [Geo-integrity publish gate](../research/geo-integrity-gate.md) available and used on new publishes
 - [Capture-completeness ops bar](../research/capture-completeness-ops-bar.md) defined and trending toward target
@@ -130,11 +131,11 @@ curl -s \
 4. `supabase db push` **or** paste migration into Dashboard → SQL Editor after approval
 5. Confirm views in Dashboard (schema `public`) and spot-check counts vs `bb_public.release_entities`
 
-Rollback: `REVOKE SELECT ON public.published_entities, public.published_search_index FROM anon, authenticated;` then `DROP VIEW` if removing the surface entirely (ADR-026 rollback).
+Rollback: `REVOKE SELECT ON public.published_entities, public.published_search_index FROM anon, authenticated;` then `DROP VIEW` if removing the surface entirely (rollback clause of the ADR-026 decision, `decisions-carryover.md`, "Small recovered decisions").
 
 ## References
 
-- [ADR-026 PostgREST published-read surface](../adr/ADR-026-postgrest-published-read-surface.md)
+- [PostgREST published-read surface](../decisions-carryover.md) — `decisions-carryover.md`, "Small recovered decisions" (ADR-026 entry; ADR-026 itself was removed 2026-07-24)
 - [Postgres schema](./postgres-schema.md)
 - [Supabase Pro cost envelope](../research/supabase-pro-cost-envelope.md)
 - [Rate limits](../security/rate-limits.md)

@@ -1,8 +1,12 @@
 # Deferred: Cloud SQL backup and PITR
 
-The execution bead PDF references **Cloud SQL PITR**. Black Book's accepted architecture
-(**ADR-011**, **D-014**) uses **Firestore** as the system of record. Cloud SQL artifacts under
-`infra/database/` are **parked**, not production.
+> **Leftover.** ADR-011 was removed 2026-07-24 and has since been reversed — Postgres is the live
+> system of record, but on Supabase, not the Cloud SQL design this page assumes. See
+> `../../../docs/decisions-carryover.md`, "Firestore as system of record, reversed".
+
+The execution bead PDF references **Cloud SQL PITR**. Black Book's original architecture
+(**ADR-011**, **D-014**) used **Firestore** as the system of record. Cloud SQL artifacts under
+`infra/database/` remain **parked**, not production.
 
 ## What is deferred
 
@@ -15,7 +19,9 @@ The execution bead PDF references **Cloud SQL PITR**. Black Book's accepted arch
 
 ## If Postgres returns
 
-Revisit when ADR-011 migration triggers fire (complex spatial joins, full-text in-DB, etc.):
+The "Postgres returns" trigger already fired, on Supabase rather than Cloud SQL (see the leftover
+note above). Revisit this page specifically only if Cloud SQL itself is reconsidered for reasons
+Supabase cannot cover (complex spatial joins, full-text in-DB, etc.):
 
 1. Add Cloud SQL backup window and PITR retention to [`rpo-rto.md`](./rpo-rto.md).
 2. Extend [`iam-backup-protection.md`](./iam-backup-protection.md) with `cloudsql.backupRuns.get`.

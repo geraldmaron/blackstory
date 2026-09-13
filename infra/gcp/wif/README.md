@@ -20,7 +20,7 @@ project-isolated from each other while sharing one pool. Resources are **not app
 | `gcloud` Application Default Credentials | Often absent locally — apply scripts dry-run without mutating |
 | Long-lived SA JSON keys in GitHub | **None** (must stay that way; removal path documented) |
 
-## Trust model (ADR-006, ADR-012)
+## Trust model (ADR-006, ADR-012; both removed 2026-07-24, recovered in `../../../docs/decisions-carryover.md`, "Small recovered decisions")
 
 GitHub OIDC tokens are federated into GCP. Impersonation of `github-deploy` (blackbook-prod) requires
 **all** of:

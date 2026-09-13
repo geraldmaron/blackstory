@@ -9,7 +9,7 @@
 
 ## 1. Intent
 
-Mobile must read as the same **archive product** as the website: Archive Paper / Black Ink canvas, copper as navigational signal only (~10–15%), flat matte everywhere except the ADR-013 map plate. Browse tabs are **indexes on canvas** — not v6 “edition object” stacks of bordered Surface cards with `00` / `01` panel headers.
+Mobile must read as the same **archive product** as the website: Archive Paper / Black Ink canvas, copper as navigational signal only (~10–15%), flat matte everywhere except the `../decisions-carryover.md`, "Map stack", ADR-013 map plate. Browse tabs are **indexes on canvas** — not v6 “edition object” stacks of bordered Surface cards with `00` / `01` panel headers.
 
 This document is the **foundation contract** siblings must import from — not a polish checklist.
 
@@ -53,7 +53,7 @@ The Explore tab map implements the **Rest → Engaged** pattern from [`patterns-
 - **Floating instruments:** Surface/ghost + Rule border, radius 8; no decorative shadows.
 - **Insets:** 16px side gutters aligned with tab content (`exploreContentInset` = `screenScrollInsets.paddingHorizontal`).
 
-### Explore map plate (ADR-013 / dignity)
+### Explore map plate (`../decisions-carryover.md`, "Map stack", ADR-013 / dignity)
 
 Fixed dark archive basemap (does not flip with OS theme). Extend the existing dignity palette + MapLibre style — do not invent a parallel language.
 
@@ -107,7 +107,7 @@ Fixed dark archive basemap (does not flip with OS theme). Extend the existing di
 | `@/ui` gradient exports | Prevents accidental reintroduction |
 | Browse-tab indexed `EditionSurfacePanel` stacks | Ledger Line — canvas + hairlines |
 
-**Kept (narrow exception):** `getShadowStyle('sm'|'md'|'lg')` for map floating instruments only when ADR-013 truly requires lift. Prefer bordered Surface/ghost with `shadow="none"`. Browse/tab/stack surfaces must pass `shadow="none"` or omit (default).
+**Kept (narrow exception):** `getShadowStyle('sm'|'md'|'lg')` for map floating instruments only when `../decisions-carryover.md`, "Map stack", ADR-013 truly requires lift. Prefer bordered Surface/ghost with `shadow="none"`. Browse/tab/stack surfaces must pass `shadow="none"` or omit (default).
 
 ---
 
@@ -263,7 +263,7 @@ Scroll content above the tab bar must use `useScreenScrollInsets()` (not a stati
 - **Copy:** no em dashes in user-facing strings on touched surfaces.
 - **Touch:** 44dp minimum targets on interactive controls.
 - **Themes:** verify light and dark before calling UI done.
-- **Map plate:** fixed dark archive basemap (ADR-013); does not flip with OS theme. Place/street labels + street casing on OpenFreeMap; copper selection ring; padded CONUS camera. Floating instruments follow OS theme via `useThemeColors` / explore chrome helpers.
+- **Map plate:** fixed dark archive basemap (`../decisions-carryover.md`, "Map stack", ADR-013); does not flip with OS theme. Place/street labels + street casing on OpenFreeMap; copper selection ring; padded CONUS camera. Floating instruments follow OS theme via `useThemeColors` / explore chrome helpers.
 
 ---
 

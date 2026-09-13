@@ -1,6 +1,8 @@
 # Firestore backup, PITR, and restore (BB-020)
 
-Backup design for **Firestore** (ADR-011 / D-014 system of record) and **GCS** object
+Backup design for **Firestore** (ADR-011 / D-014 system of record — removed 2026-07-24 and
+reversed; see `../../../docs/decisions-carryover.md`, "Firestore as system of record, reversed")
+and **GCS** object
 versioning. Cloud SQL PITR from the execution PDF is **deferred** — see
 [`deferred-cloud-sql.md`](./deferred-cloud-sql.md).
 

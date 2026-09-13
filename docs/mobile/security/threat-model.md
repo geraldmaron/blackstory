@@ -87,13 +87,29 @@ inventing parallel controls. Named primitives cited below (see `packages/securit
 
 ### A note on referenced sibling ADRs
 
-The bead references ADR-022 (mobile state/cache/offline) and ADR-023 (mobile build/release) as the homes for two
-mitigations. **Both are drafted in this same MOB-002 pass and are now `Accepted (with amendments)` (2026-07-20)** (`docs/adr/ADR-022-*`,
-`docs/adr/ADR-023-*`); they are pending the same red-team + owner acceptance as this model. This model still
-**states each mitigation in its own words** so it stands alone, and the sibling ADRs ratify the mechanism: ADR-022
-§4 ratifies the release-invalidation stamp (T5/T7) and ADR-023 §2/§6 ratify OTA custody, code signing, staged
-rollout, and the drilled rollback (T6). Neither sibling weakens the requirements captured here — verified during
-this review.
+This model names two sibling ADRs as the homes for two mitigations: the mobile state/cache/offline
+decision and the mobile build/release/OTA decision. Both were drafted in this same MOB-002 pass and
+accepted with amendments on 2026-07-20.
+
+**Neither document can be opened today, and the numbers this model was written with are not the
+numbers they ended up with.** Two things happened after it was written. Commit `3b365d44` shifted
+every mobile ADR up by one (`ADR-020-mobile-stack` to `ADR-021`, and so on down the line), so
+cache/offline became ADR-023 and build/release/OTA became ADR-024, and the freed ADR-020 went to the
+Supabase Postgres system-of-record decision in `2ce0720c`. Then the whole `docs/adr/` directory was
+deleted in the 2026-07-24 purge. Both mobile decisions are recovered and restated in
+`docs/decisions-carryover.md`, "Mobile cache and OTA release", which keeps the original section
+attributions, so an "ADR-023 §4" reference below resolves by searching that section for it.
+
+Citations in this document were updated on 2026-09-13 (repo-7u17u) to the final numbering, because
+the carryover restates the decisions under the final numbers. Section references are unchanged. One
+detail worth pinning, since several places in this repo get it wrong: the renumbering is
+`3b365d44`, authored 2026-07-19 and landed 2026-07-21. It is not the 2026-07-22 commit `d34845b0`,
+which only edited ADR titles and status and found the mobile files already renumbered.
+
+This model still **states each mitigation in its own words** so it stands alone, and the sibling
+decisions ratify the mechanism: ADR-023 §4 ratifies the release-invalidation stamp (T5/T7) and
+ADR-024 §2/§6 ratify OTA custody, code signing, staged rollout, and the drilled rollback (T6).
+Neither sibling weakens the requirements captured here, which was verified during this review.
 
 ---
 
@@ -332,7 +348,7 @@ retracted claim visible.
 **Impact if unmitigated.** Mobile users see content the organization has formally corrected or
 retracted — a direct violation of the correction posture the mobile app exists to match.
 
-**Mitigation (requirement stated here; to be ratified in ADR-022).**
+**Mitigation (requirement stated here; ratified in ADR-023, restated in `docs/decisions-carryover.md`, "Mobile cache and OTA release").**
 - **Release-invalidation stamp.** Every public read carries the server's current release stamp
   (monotonic release ID / pointer, per ADR-004 activation and ADR-011's active-release pointer).
   Cached entity data is tagged with the stamp under which it was fetched. When the server's stamp
@@ -344,7 +360,7 @@ retracted — a direct violation of the correction posture the mobile app exists
   currency is derived solely from server stamp comparison, so a stale build cannot self-certify.
 - **Build-level floor.** A minimum-supported-release / minimum-app-version signal from the server
   lets a retraction that requires a client-code change force an upgrade prompt rather than silently
-  serving stale UI (ties to T6/ADR-023 release mechanics).
+  serving stale UI (ties to T6/ADR-024 release mechanics).
 
 **Accepted risk.** A device that is *never* brought online again after a retraction cannot learn of
 it — an unavoidable property of offline caches. Bounded by the honest degraded-mode UI (T7): such
@@ -353,7 +369,7 @@ content is shown as "last updated {date}, may be out of date," never as freshly 
 **Evidence to close.** MOB-009 test advancing the server release stamp and asserting cached records
 from the prior stamp are dropped/refetched before render; MOB-016 end-to-end test publishing a
 retraction and confirming the mobile client stops presenting the retracted claim after its next
-online read; **ADR-022 (Accepted with amendments, 2026-07-20)**, ratifying the stamp mechanism (§4).
+online read; **ADR-023 (Accepted with amendments, 2026-07-20)**, ratifying the stamp mechanism (§4).
 
 ---
 
@@ -381,10 +397,13 @@ mobile risk, because OTA reaches every device without a store gate.
   Signing is only available to accounts subscribed to the EAS Production or Enterprise plans"
   (docs.expo.dev/eas-update/code-signing). On the free tier it is therefore **not** enabled by default;
   the blast-radius controls below (MFA custody, scoped CI-only token, staged rollout, immutable-update
-  rollback) carry the risk, and enabling code signing is a **cost-gated upgrade trigger** (ADR-023 §7).
-  Additionally, `expo-updates` is **not yet installed** in `apps/mobile`, so the OTA path itself is a
-  pending MOB-019 task; until it is wired there is no OTA channel to compromise. **Remaining risk, open
-  by design** on the free tier.
+  rollback) carry the risk, and enabling code signing is a **cost-gated upgrade trigger** (ADR-024 §7).
+  Additionally, `expo-updates` was **not yet installed** in `apps/mobile` when this was written, so
+  the OTA path itself was a pending MOB-019 task and there was no OTA channel to compromise.
+  **That is no longer true (verified 2026-09-13):** `apps/mobile/package.json` carries
+  `expo-updates ~57.0.21`, `app.config.ts` sets `runtimeVersion: { policy: 'appVersion' }` and a
+  per-variant `updates` block, and preview/production binaries check `ON_LOAD`. T6 is live, not
+  pending. **Remaining risk, open by design** on the free tier.
 - **Channel/rollout discipline and rollback.** Updates go through preview → staged rollout, not an
   instant 100% production push (mirrors invariant 4: immutable artifacts, atomic activation, proven
   rollback). A malicious or bad update is revertible by re-pointing the channel to the last
@@ -398,7 +417,7 @@ Native-code changes still go through store review.
 
 **Evidence to close.** MOB-019 evidence that EAS publish requires MFA'd, CI-scoped credentials and
 (if supported) code-signing is enforced; a documented + drilled OTA rollback (MOB-021 rollback
-drill); **ADR-023 (Accepted with amendments, 2026-07-20)** covering build/release/OTA custody and rollback (§2/§6) — note the T6 code-signing/`expo-updates` amendment above and `repo-ovn7`.
+drill); **ADR-024 (Accepted with amendments, 2026-07-20)** covering build/release/OTA custody and rollback (§2/§6) — note the T6 code-signing/`expo-updates` amendment above and `repo-ovn7`.
 
 ---
 
@@ -420,7 +439,7 @@ holds.
   historical data (T1). Forcing offline mode reveals nothing an attacker could not read online and
   grants no write path. The attack's payoff is limited to *staleness*, not disclosure or tampering
   with server truth.
-- **Degraded mode must be honest (invariant / ADR-022 requirement).** The app **never silently
+- **Degraded mode must be honest (invariant / ADR-023 requirement).** The app **never silently
   presents stale data as current.** Offline/degraded state is surfaced explicitly (offline banner,
   "last updated {timestamp}," disabled freshness-dependent affordances). Combined with the release
   stamp (T5), the client can tell it is behind and must say so.
@@ -513,16 +532,18 @@ runbook entry naming the single operator and the recovery path.
 | T2 | Client-attestation header missing/malformed (2026-08-14: was "App Check outage/misconfig" — no longer applicable, no external provider) | MOB-010 (security) | Fail-open to rate-limited `anonymous` reads; fail-closed only on abuse signal |
 | T3 | API enumeration / scraping | MOB-004 (API) | Cursor pagination, page-size/depth caps, quota matrix, approved query shapes |
 | T4 | Deep-link injection | MOB-008 (nav/deep links) | Route allowlist + strict ID validation; no privileged target exists |
-| T5 | Stale artifact / rollback replay | MOB-016 (corrections), MOB-009 (cache); **ADR-022** | Release-invalidation stamp; drop/refetch on stamp advance |
-| T6 | Compromised OTA credentials | MOB-019 (CI/EAS); **ADR-023** | MFA custody, EAS code signing, staged rollout + rollback |
-| T7 | Offline downgrade attack | MOB-009 (cache), MOB-017 (UX/a11y); **ADR-022** | Low-value public data + honest degraded-mode UI |
+| T5 | Stale artifact / rollback replay | MOB-016 (corrections), MOB-009 (cache); **ADR-023** | Release-invalidation stamp; drop/refetch on stamp advance |
+| T6 | Compromised OTA credentials | MOB-019 (CI/EAS); **ADR-024** | MFA custody, EAS code signing, staged rollout + rollback |
+| T7 | Offline downgrade attack | MOB-009 (cache), MOB-017 (UX/a11y); **ADR-023** | Low-value public data + honest degraded-mode UI |
 | T8 | Native dependency supply chain | MOB-019 (CI / native-dep review) | Maintenance/license/permission review gate; manifest-diff CI check |
 | T9 | One-maintainer operational reality | MOB-018 (observability), MOB-021 (launch gate) | Mobile-API kill-switch + budget caps + automated soft-shutdown |
 | — | Overall adversarial sign-off | MOB-021 (launch gate) | Red-team review, abuse simulation, rollback drill converge here |
 
-*ADR-022 (mobile state/cache/offline) and ADR-023 (mobile build/release) are `Accepted (with amendments)` (2026-07-20)
+*ADR-023 (mobile state/cache/offline) and ADR-024 (mobile build/release) were `Accepted (with amendments)` (2026-07-20)
 from this MOB-002 pass; T5, T6, and T7 verified that they ratify — and do not weaken — the requirements stated above
-(T6's code-signing/`expo-updates` gap is amended above and tracked by `repo-ovn7`).*
+(T6's code-signing/`expo-updates` gap is amended above and tracked by `repo-ovn7`). Both documents were deleted in the
+2026-07-24 `docs/adr/` purge and are restated in `docs/decisions-carryover.md`, "Mobile cache and OTA release"; see
+"A note on referenced sibling ADRs" above for the renumbering these two carry.*
 
 ---
 
@@ -548,7 +569,7 @@ The reviewer accepted this model's lean, with corrections-specific tightening ma
   or trips it **before** it would a read path — and the mobile kill-switch (T9) can disable correction intake
   independently while leaving public reads up. So availability is preserved for the common case, but corrections
   are the first thing throttled/shed under a genuine abuse spike.
-- **Client-offline is a separate, already-honest case.** ADR-022 §3 disables correction submission when the
+- **Client-offline is a separate, already-honest case.** ADR-023 §3 disables correction submission when the
   *client* is offline (with a clear "needs connection" message) and never queues its content to disk (invariant 7).
   That is orthogonal to server-side client-attestation handling decided here; the two are consistent — neither ever
   silently drops or fabricates a correction.

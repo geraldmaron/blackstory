@@ -172,7 +172,7 @@ Entity-bound views add `entity_context_bindings` (purpose: `map_panel` | `story`
 
 ## 8. Out of scope for this catalog
 
-- Postgres migration apply (follow-on bead after [ADR-029](../adr/ADR-029-theme-impact-packets.md))
+- Postgres migration apply (follow-on bead after the theme-impact-packets decision, `../decisions-carryover.md`, "Small recovered decisions", ADR-029 entry)
 - Live ingestion or cloud apply
 - Public MCP exposure
 - Auto-generated causal impact claims from co-moving series

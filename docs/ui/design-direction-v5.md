@@ -356,7 +356,7 @@ whose tap target is under 44px; color-only signals; raw `<a>` internal nav.
 
 ## 9. What explicitly survives from v4
 
-Persistent map canvas + camera grammar (ADR-017), dignity rules, theming contract
+Persistent map canvas + camera grammar (`../decisions-carryover.md`, "Persistent map canvas", ADR-017), dignity rules, theming contract
 (`--ds-fixed-*` surfaces), motion tokens (160/280ms, one easing), URL-carried state, the
 `ds-` token set, and the brand palette/type/radii. The rip is layout, chrome, and pattern
 vocabulary — not the architecture and not the brand foundation.

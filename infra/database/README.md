@@ -1,6 +1,10 @@
 # Database infrastructure — SUPERSEDED FOR PRODUCT SoR (ADR-020)
 
-> **ADR-020 (2026-07-20, removed 2026-07-24):** Product system-of-record design and DDL now target
+> **ADR-020 (2026-07-20, removed 2026-07-24):** `docs/adr/` no longer exists; this is the
+> web-series ADR-020, "Supabase Postgres as system of record," recovered in
+> `../../docs/decisions-carryover.md`, "Firestore as system of record, reversed" — the number is
+> also used, unrelated, by a pre-rename mobile ADR (see that file's "entity source-of-truth
+> precedence" addendum for the collision). Product system-of-record design and DDL now target
 > **Supabase Postgres** project **`blackstory-app`** (`twykhihqkcldpreuovay`). See
 > `docs/data/postgres-schema.md`, `docs/data/firebase-wind-down.md`, and `supabase/migrations/`.
 >

@@ -5,7 +5,7 @@
 **Status:** binding layout pattern for `/explore` only (2026-07-23).  
 **Parent:** `design-direction-v6-home.md` (shared edition vocabulary).  
 **Supersedes:** `design-direction-v5.md` §6 `/explore` cockpit (ink-fixed instruments, blur panels).  
-**Unchanged:** MapLibre plate contract (ADR-017), map dignity rules, shareable URL state, zoom safe-zones.
+**Unchanged:** MapLibre plate contract (`../decisions-carryover.md`, "Persistent map canvas", ADR-017), map dignity rules, shareable URL state, zoom safe-zones.
 
 ---
 
@@ -29,7 +29,7 @@ Chrome is **opaque Surface**, theme-aware, flat matte. The map stays visible bet
 
 | Layer | Rule |
 |---|---|
-| Map plate | Fixed full-viewport MapLibre (`MapStage`); persists from home via ADR-017 handoff |
+| Map plate | Fixed full-viewport MapLibre (`MapStage`); persists from home via `../decisions-carryover.md`, "Persistent map canvas", ADR-017 handoff |
 | Reader theme | Follows site `data-theme` (light Archive Paper / dark Black Ink canvas flash) |
 | Floating panels | Opaque `--ds-surface` fill, 1px `--ds-rule` hairline, `--ds-radius-md` |
 | Panel padding | `1.25rem` (`--ds-space-5`) default; compact controls at `44px` min height |
@@ -151,7 +151,7 @@ Spotlight session nav uses `RecordBrowseControls` + `BrowseModeToggle` with inde
 
 ---
 
-## 7. Map dignity + ADR-017 (non-negotiable)
+## 7. Map dignity + persistent map canvas (non-negotiable; `../decisions-carryover.md`, "Persistent map canvas", ADR-017)
 
 - Hero → explore: `sessionStorage` transition flag; camera descent not interrupted by reconcile on mount.
 - Shareable URL carries filters/selection, not live pan/zoom (`history.replaceState`).
@@ -206,7 +206,7 @@ Spotlight session nav uses `RecordBrowseControls` + `BrowseModeToggle` with inde
 - [x] No `backdrop-filter` on explore panel chrome
 - [x] No `--ds-fixed-*` fills on instruments, results, or restore dock
 - [x] Shell header matches home theme-aware Surface bar
-- [x] Hero hand-off still clears inset and respects ADR-017 camera latch
+- [x] Hero hand-off still clears inset and respects `../decisions-carryover.md`, "Persistent map canvas", ADR-017 camera latch
 - [x] Zoom + attribution safe-zones unchanged (data attrs + CSS contracts)
 - [x] Spotlight preview uses Surface card + copper left rule
 - [x] Facet rows auto-apply; place search mast intact

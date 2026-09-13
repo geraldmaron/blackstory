@@ -175,8 +175,10 @@ never built; steps 1-4 do not apply. Kept as historical record, not a live check
 6. Keep Firestore client rules deny-by-default for canonical, publication, audit, and operations
    collections.
 
-See ADR-011 for the Firestore system-of-record boundary and the research-case workflow guide for
-publication and retraction invariants.
+Firestore is no longer the system of record — Postgres is (`docs/decisions-carryover.md`,
+"Firestore as system of record, reversed"); item 6 above is part of the dead historical plan this
+section already disclaims. See the research-case workflow guide for the live publication and
+retraction invariants.
 
 Legacy `/console/<workspace>` fixtures remain for workspaces not yet promoted into first-class
 desks; live triage no longer depends on disabled “Preview action” cards.

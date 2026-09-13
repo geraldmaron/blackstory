@@ -30,7 +30,7 @@ Queried against Supabase project `blackstory-app` on 2026-07-21:
 
 ## 2. Policy: ADRs may be superseded
 
-Owner direction (2026-07-21): existing ADRs are **not** load-bearing constraints for this program. New ADRs may supersede conflicting decisions — especially ADR-020 language that keeps product reads only behind Node `apps/api-public` and avoids Data API exposure.
+Owner direction (2026-07-21): existing ADRs are **not** load-bearing constraints for this program. New ADRs may supersede conflicting decisions — especially ADR-020 language (removed 2026-07-24; the web-series ADR-020, "Supabase Postgres as system of record", recovered in `../decisions-carryover.md`, "Firestore as system of record, reversed" — the number is also used, unrelated, by a pre-rename mobile ADR, see that file's "entity source-of-truth precedence" addendum for the collision) that keeps product reads only behind Node `apps/api-public` and avoids Data API exposure.
 
 What still binds without an ADR:
 
@@ -83,7 +83,7 @@ What still binds without an ADR:
 
 **Keep:** Research isolation; publish gate as DB invariant; living-person coarsening via view/RLS; rate limits / spend caps.
 
-**Supersede (explicit new ADR):** portions of ADR-020 (and any API/mobile ADRs) that forbid Data API product reads or require all public reads through Node `api-public`. Dual-surface model (PostgREST for open developers; `api-public` for App Check / mobile) unless measured collapse is cheaper.
+**Supersede (explicit new ADR):** portions of ADR-020 (see the collision note above) and any API/mobile ADRs that forbid Data API product reads or require all public reads through Node `api-public`. Dual-surface model (PostgREST for open developers; `api-public` for App Check / mobile) unless measured collapse is cheaper. This supersession already happened in practice: `../decisions-carryover.md`, "Small recovered decisions" (ADR-026 entry) documents the live PostgREST published-read surface as exactly this second surface, alongside `apps/api-public`.
 
 **Not in this epic’s ship:** public MCP implementation; mass Enslaved.org import; unbounded MPL PDF OCR; anon access to drafts/canonical/research.
 
@@ -109,10 +109,10 @@ Full envelope (egress model, hard defaults, soft-shutdown citations): [`supabase
 
 | ADR / constraint | Candidate action |
 |---|---|
-| ADR-020 “product tables not for Data API / public schema exposure” | Supersede for **published-read views** only; keep canonical/research closed |
+| ADR-020 “product tables not for Data API / public schema exposure” (collision note above) | Already superseded in practice — `../decisions-carryover.md`, "Small recovered decisions" (ADR-026 entry) is the published-read view surface |
 | ADR-020 / mobile boundary requiring all reads via `apps/api-public` | Supersede to dual-surface (or collapse) with recorded decision |
 | Any ADR that blocks PostGIS publish-time containment checks | Amend/supersede if present; geo gate is required on merits |
-| ADR-011 historical Firestore-only geo posture | Already superseded in practice by ADR-020; no new work |
+| ADR-011 historical Firestore-only geo posture | Already superseded in practice by the Postgres cutover (`../decisions-carryover.md`, "Firestore as system of record, reversed"); no new work |
 
 New ADR lands under the epic child “Superseding ADR — PostgREST published-read surface.”
 

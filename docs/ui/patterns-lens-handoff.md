@@ -2,7 +2,7 @@
 
 **Status: proposed (2026-07-30), binding when [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) is.** Law extracted from [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) sections 5.2, 5.3, 5.5 and 5.6. Demonstrated in [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) (`applyLensRef`, `openRecord`, `citedIn`).
 
-Builds on ADR-017 (no viewport in a shareable URL) and [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md) (the Lens and the Results rail that receive the handoff).
+Builds on `../decisions-carryover.md`, "Persistent map canvas", ADR-017 (no viewport in a shareable URL) and [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md) (the Lens and the Results rail that receive the handoff).
 
 ---
 
@@ -57,7 +57,7 @@ Params that do not narrow the set are **named exclusions, not oversights**:
 
 An earlier draft of this rule read "every accepted param must have a Lens control", which is right in spirit and wrong at the edges: shipping it as written produces absurd controls for those three.
 
-Viewport keys are never in the URL at all. `lat`, `lng` and `zoom` are dropped by ADR-017 policy, and `panels` is dropped because which panels a reader has open is chrome state, not shareable meaning. `radius` and `near` do carry meaning and stay.
+Viewport keys are never in the URL at all. `lat`, `lng` and `zoom` are dropped by `../decisions-carryover.md`, "Persistent map canvas", ADR-017 policy, and `panels` is dropped because which panels a reader has open is chrome state, not shareable meaning. `radius` and `near` do carry meaning and stay.
 
 ---
 

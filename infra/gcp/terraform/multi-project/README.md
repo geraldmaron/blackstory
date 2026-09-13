@@ -1,6 +1,7 @@
 # Three-project re-split Terraform stubs (ADR-012, BB-078)
 
-Unapplied Terraform for the ADR-012 (removed 2026-07-24; see
+Unapplied Terraform for the ADR-012 decision (document removed 2026-07-24, recovered in
+`../../../../docs/decisions-carryover.md`, "Small recovered decisions"; see
 `docs/security/environment-isolation.md`) target topology: `blackbook-prod` (retained
 `black-book-efaaf`), `blackbook-staging` (new),
 `blackbook-internal` (new). This module is additive to, and does **not** duplicate,

@@ -2026,10 +2026,19 @@ verified. (from ADR-021 §7, "mobile stack")
 Swift and Kotlin, Mapbox, Google Maps, AsyncStorage, MMKV, WatermelonDB, Realm, committing the native
 folders), the per-decision reversal costs and the migration triggers are argument rather than
 invariant; they are in git and nothing in the tree cites them. `apps/mobile/README.md`'s thirteen
-ADR-020 citations are also left pointing at the old number by this pass. That file is a long
-maintained document whose own stack table is stale on the SDK pin, and relabeling its citations
-without correcting the numbers beside them would put a fresh label on wrong content. It needs the
-same read-the-code treatment, not a find-and-replace.
+ADR-020 citations were also left pointing at the old number by that pass. That file is a long
+maintained document whose own stack table was stale on the SDK pin, and relabeling its citations
+without correcting the numbers beside them would have put a fresh label on wrong content. It needed
+the same read-the-code treatment, not a find-and-replace.
+
+**Done 2026-09-13 (repo-7u17u).** That README now carries a header note saying its "ADR-020" means
+this decision under its pre-rename number, and its stack table was re-read out of
+`apps/mobile/package.json` and `package-lock.json`: Expo 57.0.20 declared `^57.0.0`, React Native
+0.86.3, Expo Router 57.0.19, TypeScript 6.0.3. The table had been asserting Expo 56.0.16 as an exact
+pin with no range, which is the §5 drift this section already describes, presented as if it still
+held. The "pnpm workspace resolution" section was also asserting an unresolved root
+frozen-lockfile failure; `pnpm-workspace.yaml` carries `'!apps/mobile'` and CI's mobile lane runs
+`npm ci`, so that finding is now marked resolved above its own evidence rather than rewritten.
 
 ## Mobile data boundary (recovered 2026-09-13, repo-gtm2y)
 

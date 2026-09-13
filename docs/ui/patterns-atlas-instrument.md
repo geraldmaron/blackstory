@@ -2,7 +2,7 @@
 
 **Status: In build (v9).** The pattern the Instrument surface class is made of: `/` (the Explore map) and `/story`. Extracted from the runnable reference build [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) and governed by [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md), binding since 2026-07-30. Work packages and sequencing live in [`v9-atlas-implementation-plan.md`](./v9-atlas-implementation-plan.md).
 
-Builds on, and does not replace: [`patterns-map-canvas.md`](./patterns-map-canvas.md) (persistent `MapStage`, ADR-017), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (pin color and shape), [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) (the 2×2 fact grid), [`brand.md`](./brand.md) (flat matte, copper discipline, dignity law).
+Builds on, and does not replace: [`patterns-map-canvas.md`](./patterns-map-canvas.md) (persistent `MapStage`, `../decisions-carryover.md`, "Persistent map canvas", ADR-017), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (pin color and shape), [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) (the 2×2 fact grid), [`brand.md`](./brand.md) (flat matte, copper discipline, dignity law).
 
 **Where the other four surface classes live.** This pattern covers the Instrument only. [`patterns-surface-classes.md`](./patterns-surface-classes.md) names all five classes and which routes are in each; [`patterns-plate-posture.md`](./patterns-plate-posture.md) governs the plate everywhere the Instrument is not; [`patterns-reading-room.md`](./patterns-reading-room.md) and [`patterns-record-page.md`](./patterns-record-page.md) carry the editorial and record surfaces; [`patterns-lens-handoff.md`](./patterns-lens-handoff.md) is how they hand a filter back to this instrument.
 
@@ -33,7 +33,7 @@ One canvas, two modes (Explore and Story), no page-to-page reload of the plate.
 
 | Layer | z | Rule |
 |---|---|---|
-| Map plate | 0 | Fixed full-viewport MapLibre. Single mount, persists across mode changes (ADR-017). |
+| Map plate | 0 | Fixed full-viewport MapLibre. Single mount, persists across mode changes (`../decisions-carryover.md`, "Persistent map canvas", ADR-017). |
 | Annotation overlay | 5 | SVG, `pointer-events: none`. Reprojected on `move`. |
 | Spotlight | 6 | Radial CSS mask over a canvas-colored plate. |
 | Grain | 7 | Archive texture, `mix-blend-mode: overlay`, opacity ≤ .3. |
@@ -344,7 +344,7 @@ These are the difference between a site and a tool, and all of them ship in v1.
 | Skeletons | on load | Shimmer, 1.4s linear. **Never a spinner** |
 | Empty states | on zero results | Name the cause, offer the fix. Never a bare "no results" |
 
-**Share links never carry viewport state (ADR-017).** A shared URL restores *what* the reader was looking at, never *where the camera was*. The camera is a property of one reader's session, and pinning it hands the recipient a framing they did not choose and cannot distinguish from data. `deep-link.ts` asserts this at runtime rather than trusting the caller.
+**Share links never carry viewport state (`../decisions-carryover.md`, "Persistent map canvas", ADR-017).** A shared URL restores *what* the reader was looking at, never *where the camera was*. The camera is a property of one reader's session, and pinning it hands the recipient a framing they did not choose and cannot distinguish from data. `deep-link.ts` asserts this at runtime rather than trusting the caller.
 
 Deep links serialize to the params `/explore` already parses (`selected`, `confidence`), not to the share-side field names. A link the app cannot read is a broken link.
 

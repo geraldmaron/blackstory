@@ -13,7 +13,7 @@ command here has been run by any agent session.
 | Display name | `BlackStory` | Human-facing console label only. Safe to update in the GCP console without changing the project ID. |
 | Product | BlackStory | User-visible product name (see `brand/` and `@repo/config` identity helpers). |
 
-The ADR-012 three-project topology retains this project as production. New non-prod projects
+The three-project topology (`../decisions-carryover.md`, "Small recovered decisions", ADR-012 entry — still only a design target, not provisioned) retains this project as production. New non-prod projects
 use functional IDs `repo-staging` and `repo-internal` with display names **BlackStory Staging**
 and **BlackStory Internal** (see `infra/gcp/terraform/multi-project/`).
 
@@ -60,7 +60,7 @@ Complete these manually when the organization is ready. Each step is independent
 
 ## Related references
 
-- [ADR-012: Production environment re-split](../adr/ADR-012-production-environment-resplit.md)
+- Production environment re-split (ADR-012, removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Small recovered decisions")
 - [`production-environment-resplit-migration.md`](./production-environment-resplit-migration.md)
 - [`infra/gcp/terraform/multi-project/`](../../infra/gcp/terraform/multi-project/)
 - Root `.firebaserc` — production Firebase project ID remains **`black-book-efaaf`**

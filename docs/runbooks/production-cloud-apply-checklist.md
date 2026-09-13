@@ -1,9 +1,9 @@
 # Runbook: Production cloud apply checklist
 
-> **2026-08-14 correction:** this checklist targets [ADR-012](../adr/ADR-012-production-environment-resplit.md),
-> a link that is now dead — `docs/adr/` was purged 2026-07-24 and ADR-012's content was not found
-> restated anywhere (`docs/decisions-carryover.md` only restates two invariants; the three-project
-> resplit topology isn't one of them). Since this checklist's own status line already reads
+> **2026-08-14 correction, updated 2026-09-13:** this checklist targets ADR-012, a link that is now
+> dead — `docs/adr/` was purged 2026-07-24. Its content is now recovered in
+> `docs/decisions-carryover.md`, "Small recovered decisions" (repo-gtm2y, 2026-09-13): the
+> three-project resplit topology is still only a design target, never provisioned. Since this checklist's own status line already reads
 > "DEFERRED — requires live cloud/account action outside this session's authority" for every item,
 > nothing here was actually applied, so nothing needs rolling back — but several sections now
 > describe infrastructure this repo no longer targets at all, not just "not yet applied":
@@ -22,7 +22,7 @@
 **Scope:** The single consolidated list of every "human cloud step remaining" note scattered
 across the close comments and READMEs of roughly a dozen closed beads
 (/009/010/011/020/021/023/024/025/027/034/035, plus 's drill), reorganized against the
-[ADR-012](../adr/ADR-012-production-environment-resplit.md) three-project topology
+ADR-012 (`../decisions-carryover.md`, "Small recovered decisions") three-project topology
 (`blackbook-prod` = retained `black-book-efaaf`, `blackbook-staging`, `blackbook-internal`) that
  designed but did not apply.
 
@@ -51,7 +51,7 @@ and copy that line into `bd show black-book-bb079`'s notes/comments (the parent 
 - A human identity with authority to create a GitHub organization/repository, a GCP billing
   account, and administer both.
 - `gh`, `gcloud`, `firebase-tools`, `terraform >= 1.6.0`, `jq`, and `node` installed locally.
-- Read [ADR-012](../adr/ADR-012-production-environment-resplit.md) and
+- Read ADR-012 (`../decisions-carryover.md`, "Small recovered decisions") and
   [`production-environment-resplit-migration.md`](./production-environment-resplit-migration.md)
   in full before starting section 3 — this checklist references that runbook's 19 steps rather
   than repeating them.
@@ -131,7 +131,7 @@ runbook lands; that runbook is authoritative for the exact steps, not this docum
 ## 2. WIF / OIDC (GitHub Actions deploy identities)
 
 **Traces to:**  (close note: *"Declarative WIF + OIDC workflow stub; cloud not applied (no
-remote; IDs TBD)"*), extended by /ADR-012 for per-project deploy service accounts.
+remote; IDs TBD)"*), extended by the three-project topology decision (`../decisions-carryover.md`, "Small recovered decisions", ADR-012 entry) for per-project deploy service accounts.
 
 **Why:** The WIF pool/provider and the `github-deploy` (blackbook-prod), `github-deploy-staging`
 (blackbook-staging, optional), and `github-deploy-internal` (blackbook-internal, optional) service
@@ -196,7 +196,8 @@ one ever appears). A test deploy workflow run from a fork or non-`main` ref must
 ## 3. Firebase projects, Firestore, rules/indexes
 
 **Traces to:**  (close note: *"Apps registered; App Hosting/Blaze + Firestore DB + GCP
-buckets/IAM still blocked/deferred"*),  (rules/indexes), /ADR-012 (three-project
+buckets/IAM still blocked/deferred"*),  (rules/indexes), the three-project topology decision
+(`../decisions-carryover.md`, "Small recovered decisions", ADR-012 entry; three-project
 topology + named databases).
 
 **Why:** `black-book-efaaf` has registered web/admin apps but no Blaze billing, no Firestore
@@ -261,7 +262,8 @@ node --test infra/gcp/terraform/multi-project/tests/isolation-invariants.test.mj
 ## 4. Buckets and service accounts (11 named SAs, 4 buckets, PAP/UBLA, per-secret IAM)
 
 **Traces to:**  (`infra/gcp/service-accounts.matrix.md`, `infra/gcp/storage-buckets.matrix.md`,
-`infra/gcp/terraform/`), split across projects by /ADR-012.
+`infra/gcp/terraform/`), split across projects by the three-project topology decision
+(`../decisions-carryover.md`, "Small recovered decisions", ADR-012 entry).
 
 **Why:**  designed 11 least-privilege service accounts and 4 UBLA/PAP buckets in a single
 project; none is provisioned.  then redesigned the *topology* (not the roles) so that
@@ -270,8 +272,8 @@ joined there by two new cross-project identities (`promotion`, `submissions-pull
 `web-runtime`, `api-public`, `api-submissions`, `api-internal`, `migrations`, `backup` stay in
 `blackbook-prod` (mirrored into `blackbook-staging`).
 
-**Resolved by `black-book-2ve`:** the single-project stub no longer lists the four ADR-012-relocated
-identities; `private-evidence` is provisioned as `blackbook-internal-private-evidence` in the
+**Resolved by `black-book-2ve`:** the single-project stub no longer lists the four
+topology-relocated identities (`../decisions-carryover.md`, "Small recovered decisions", ADR-012 entry); `private-evidence` is provisioned as `blackbook-internal-private-evidence` in the
 multi-project module. Apply multi-project gates in order per `infra/gcp/terraform/multi-project/README.md`
 (`provision_internal_buckets` before relying on that bucket). If a legacy
 `black-book-efaaf-private-evidence` bucket exists in prod, migrate objects before decommissioning it.
@@ -564,7 +566,8 @@ Schedule the **live** quarterly drill as a standing calendar item using
 **Traces to:**  (close note: *"Human steps: provision LB/IAP and restricted accessor group,
 configure exact IAP JWT audience, enable Firebase MFA and enroll admins, bootstrap first admin
 claim via audited Admin SDK path, configure alert sink. No live GCP apply."*), corrected by
-/ADR-012 (direct-attach Cloud Run IAP, not the external-LB pattern  originally
+the three-project topology decision (`../decisions-carryover.md`, "Small recovered decisions",
+ADR-012 entry; direct-attach Cloud Run IAP, not the external-LB pattern  originally
 assumed).
 
 **Why:** Layered IAP-JWT + Firebase-MFA server authorization is fully implemented and tested
@@ -693,7 +696,8 @@ Gaps **1–4** below were reconciled by `black-book-2ve` (Terraform + Firebase a
 no live cloud apply). Gaps **5–7** remain open before those sections are applied for real.
 
 1. **Service-account topology conflict (section 4) — RESOLVED (`black-book-2ve`).**
-   Single-project `locals.tf` no longer lists the four ADR-012-relocated identities; multi-project
+   Single-project `locals.tf` no longer lists the four topology-relocated identities
+   (`../decisions-carryover.md`, "Small recovered decisions", ADR-012 entry); multi-project
    README documents the split.
 
 2. **`private-evidence` bucket location (section 4) — RESOLVED (`black-book-2ve`).**
@@ -710,7 +714,8 @@ no live cloud apply). Gaps **5–7** remain open before those sections are appli
 
 5. **`infra/gcp/iap/README.md` describes a superseded IAP pattern (affects section 9).** Already
    flagged by  itself as a "Known follow-up, not fixed by this runbook" — the document still
-   assumes an external-HTTPS-load-balancer + serverless-NEG IAP integration. ADR-012 uses IAP
+   assumes an external-HTTPS-load-balancer + serverless-NEG IAP integration. The topology decision
+   (`../decisions-carryover.md`, "Small recovered decisions", ADR-012 entry) uses IAP
    attached directly to the Cloud Run service (no load balancer). Section 9 above routes around
    this by following the migration runbook's steps 11–12 instead, but the IAP directory itself
    still needs its own rewrite pass before a human treats it as the primary reference.
@@ -744,7 +749,7 @@ safety boundary.
 ## References
 
 - [`production-environment-resplit-migration.md`](./production-environment-resplit-migration.md) — 's 19-step topology migration (sections 3, 4, 9 reference its steps rather than duplicating them)
-- [ADR-012](../adr/ADR-012-production-environment-resplit.md) — the topology every section here targets
+- ADR-012 — the topology every section here targets (`../decisions-carryover.md`, "Small recovered decisions")
 - [`docs/security/environment-isolation.md`](../security/environment-isolation.md) — "Verified live vs. designed" table, current as of this checklist
 - [`infra/gcp/isolation-matrix.json`](../../infra/gcp/isolation-matrix.json) — machine source of truth for the cross-project grant list referenced in gap #2
 - [`recovery-rollback-rehearsal.md`](./recovery-rollback-rehearsal.md), [`backup-restore.md`](./backup-restore.md), [`incident-response.md`](./incident-response.md) — operational runbooks referenced by sections 8–9

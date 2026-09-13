@@ -2,7 +2,7 @@
 
 **Status:** Pure validation + cursor/cache helpers in-repo. Middleware wiring and live load
 tests are follow-on work (, ).
-**Depends on:** [ rate limits](./rate-limits.md), [ADR-008 search](../adr/ADR-008-search-and-geocoding.md)
+**Depends on:** [ rate limits](./rate-limits.md), the search-and-geocoding decision (ADR-008, removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Search and geocoding")
 **Threats:** [T-02](./threat-model.md#t-02-cost-exhaustion-via-search-and-geocoding), [T-13](./threat-model.md#t-13-database-exhaustion-and-connection-starvation)
 
 ## Objective
@@ -61,7 +61,7 @@ edge cache keys (see [`infra/gcp/armor/cdn-design.md`](../../infra/gcp/armor/cdn
 `getQueryTimeoutPolicy()` returns fail-closed budgets. On timeout, abort the in-flight read and
 emit `createSlowQueryLogEvent` / `createTimeoutFailure` — do not hold pool slots.
 
-Cloud SQL `statement_timeout` remains **deferred** (ADR-011); document only until SQL search paths exist.
+Cloud SQL `statement_timeout` remains **deferred** (`../decisions-carryover.md`, "Firestore as system of record, reversed" — this is the one ADR-011 citation still accurate: no statement timeout exists on the live Postgres public read path either); document only until SQL search paths exist.
 
 ##  integration
 

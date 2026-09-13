@@ -1,4 +1,4 @@
-# Schema validation checklist (ADR-020 / repo-ivh4)
+# Schema validation checklist (`decisions-carryover.md`, "Firestore as system of record, reversed" / repo-ivh4)
 
 Generated against repo sources on 2026-07-20. **Remote apply completed** on
 `blackstory-app` (`twykhihqkcldpreuovay`) after human approval (repo-iy1g).

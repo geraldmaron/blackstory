@@ -11,7 +11,7 @@
 **Status:** Design + declarative stubs in-repo. Live GCP resources are **not** provisioned by
 this bead.
 **Machine source:** [`../../infra/gcp/armor/ingress-matrix.json`](../../infra/gcp/armor/ingress-matrix.json)
-**ADR:** [ADR-005](../adr/ADR-005-service-surface-separation.md), [ADR-010](../adr/ADR-010-security-and-abuse-assumptions.md)
+**Decisions:** ADR-005 and ADR-010, both removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Service surface separation" and "Security and abuse assumptions" respectively
 **Threats:** [T-01](./threat-model.md#t-01-volumetric-and-application-layer-denial-of-service), [T-19](./threat-model.md#t-19-search-scraping-and-corpus-extraction)
 
 ## Objective

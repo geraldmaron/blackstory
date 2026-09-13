@@ -1,6 +1,12 @@
 # Runbook: Firestore backup and restore
 
-**Scope:** Firestore (ADR-011) managed export, PITR, GCS versioning,  release verification.
+> **Leftover.** Firestore has no live database, rules, or indexes left
+> (`docs/decisions-carryover.md`, "Firestore as system of record, reversed"; `infra/firebase/`
+> retains this as DR/history reference only, per `docs/data/firebase-wind-down.md`). Nothing below
+> runs against live infrastructure today.
+
+**Scope:** Firestore managed export, PITR, GCS versioning, release verification — as designed under
+the retired ADR-011.
 **Not in scope:** Cloud SQL PITR (deferred — see [`infra/firebase/backup/deferred-cloud-sql.md`](../../infra/firebase/backup/deferred-cloud-sql.md)).
 
 ## Prerequisites

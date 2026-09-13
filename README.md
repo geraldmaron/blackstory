@@ -73,7 +73,7 @@ GitHub Pages: Deploy from branch `main`, folder `/docs`. That folder also holds 
 - Node.js 22+ (`nvm use` from `.nvmrc`)
 - [pnpm](https://pnpm.io/) 9.x
 - [uv](https://docs.astral.sh/uv/) (Python 3.12+)
-- Docker optional for the parked local PostGIS under `infra/database/` (product system of record is Supabase; see ADR-020)
+- Docker optional for the parked local PostGIS under `infra/database/` (product system of record is Supabase; see [`docs/decisions-carryover.md`](./docs/decisions-carryover.md), "Firestore as system of record, reversed")
 
 ## Getting started
 

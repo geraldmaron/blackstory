@@ -5,7 +5,9 @@
 > not the system of record. This directory is reference, backup/DR history, and leftover App
 > Check identifiers. Do not treat the data-plane section below as current.
 
-> **ADR-012 (BB-078) target:** `black-book-efaaf` becomes `blackbook-prod` (retained, not
+> **ADR-012 (BB-078) target** (removed 2026-07-24; recovered in
+> `../../docs/decisions-carryover.md`, "Small recovered decisions" — still only a design target,
+> never provisioned)**:** `black-book-efaaf` becomes `blackbook-prod` (retained, not
 > recreated); `blackbook-staging` and `blackbook-internal` are new projects. Nothing below in
 > this file describes live state changing from this bead alone - the live root `.firebaserc`
 > (outside this bead's file ownership) is updated by a human as part of
@@ -36,14 +38,14 @@ before creating backends or changing production Auth providers.
 App Hosting backend inventory/creation is **blocked** until a human upgrades the project to Blaze
 and `firebaseapphosting.googleapis.com` can be enabled.
 
-**Public web:** App Hosting configs retired in-repo (ADR-027). Owner deletes
+**Public web:** App Hosting configs retired in-repo (`../../docs/decisions-carryover.md`, "Small recovered decisions", ADR-027 entry). Owner deletes
 `black-book-web-production` and optional `black-book-web-staging` backends in console.
 
 **Admin:** Firebase App Hosting backend `black-book-admin-production` was deleted 2026-08-15.
 Admin was the standalone Vercel project `apps/admin` from 2026-07-25; as of 2026-09-11 it is a
 `/admin` route group inside `apps/web`'s own Vercel deployment. Do not recreate App Hosting.
 
-## Data plane (historical ADR-011)
+## Data plane (historical ADR-011; `../../docs/decisions-carryover.md`, "Firestore as system of record, reversed")
 
 **Leftover:** Firestore is **not** the current system of record. Product SoR is Supabase
 Postgres on `blackstory-app`. **Storage / GCS** remains a leftover dual-serve origin; public
@@ -101,7 +103,7 @@ Minimal Firebase-facing IAM design: [`iam-minimal.md`](./iam-minimal.md). No key
 | [`../../apphosting.admin.yaml`](../../apphosting.admin.yaml) | Live admin backend `black-book-admin-production` |
 
 Public web App Hosting configs (`apps/web/apphosting*.yaml`) were retired when Vercel became the
-sole public host (ADR-027). Set the admin backend runtime identity at creation to
+sole public host (`../../docs/decisions-carryover.md`, "Small recovered decisions", ADR-027 entry). Set the admin backend runtime identity at creation to
 `admin-runtime@black-book-efaaf.iam.gserviceaccount.com`. YAML contains Secret Manager names only for
 server secrets; public Firebase client identifiers are plain env values.
 

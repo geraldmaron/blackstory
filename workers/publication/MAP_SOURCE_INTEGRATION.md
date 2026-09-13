@@ -1,13 +1,15 @@
 # Map source: release-activation integration point (BB-070)
 
 This file documents where the map data platform (`packages/domain/src/map/`,
-BB-070) plugs into release activation. The call site below is now implemented
-in TypeScript and is still **not called by anything that runs in production**,
-so the file remains a TODO with an exact target rather than a description of
-live behavior. See `docs/decisions-carryover.md` ("Map stack": release-coupled
-build) for the full rationale; the ADR this file used to cite,
-`docs/adr/ADR-013-map-stack.md`, was deleted in the 2026-07-24 `docs/adr/`
-purge and its content lives in that carryover section now.
+BB-070) plugs into release activation. `docs/adr/ADR-013-map-stack.md` does not exist — it was
+removed in the 2026-07-24 docs purge. Its "release-coupled build" section is recovered in
+`../../docs/decisions-carryover.md`, "Map stack" (ADR-013 §5): `generateReleaseArtifacts` now
+builds and persists the map artifacts this file describes, but it is still called only from
+tests, not from the live publisher (`publish-release-catalog-artifacts.ts`) — so "not wired live"
+below is accurate about the outcome, even though the artifact-generation code itself now exists.
+This is a TODO with an exact call site, added
+deliberately instead of leaving the map-source builder as code nobody would
+ever invoke.
 
 ## Why nothing was wired here (historical, and how it stands today)
 
@@ -77,11 +79,8 @@ does not exist" to "the pipeline exists and nothing invokes it."
    verification and rollback cover the map artifacts exactly like every
    other release-scoped artifact. No new rollback code is needed: switching
    the active-release pointer already restores the prior map version the
-   same way it restores the prior search-index version (see
-   `docs/decisions-carryover.md`, "Public projection and immutable
-   publication snapshots").
-
-## What exercises this sequence today
+   same way it restores the prior search-index version (`../../docs/decisions-carryover.md`,
+   "Public projection and immutable publication snapshots", ADR-004).
 
 `packages/domain/src/map/generate-demo-map-source.ts` used to stand in here: a
 one-off script that ran steps 1 and 2 against fixture data to write a static

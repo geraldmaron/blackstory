@@ -1,6 +1,8 @@
 # RPO and RTO targets (BB-020)
 
-Targets assume Firestore (ADR-011) with managed export + PITR and GCS versioning for blobs.
+Targets assume Firestore, as designed under ADR-011 (removed 2026-07-24, since reversed —
+Postgres is the live system of record; see `../../../docs/decisions-carryover.md`, "Firestore as
+system of record, reversed"), with managed export + PITR and GCS versioning for blobs.
 
 ## Recovery objectives
 
@@ -30,5 +32,6 @@ Targets assume Firestore (ADR-011) with managed export + PITR and GCS versioning
 
 ## Deferred Cloud SQL
 
-If Postgres is reintroduced per ADR-011 migration triggers, add separate RPO/RTO rows for Cloud SQL
-automated backups and PITR. Current phase: **N/A — deferred**.
+Postgres has already been reintroduced, on Supabase rather than Cloud SQL (see the correction
+above). If Cloud SQL itself is reconsidered for reasons Supabase cannot cover, add separate
+RPO/RTO rows for Cloud SQL automated backups and PITR. Current phase: **N/A — deferred**.

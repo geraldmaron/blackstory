@@ -1,12 +1,13 @@
 <!--
   Practical design for ThemeImpactPacket: field contract, Postgres mapping, domain types,
-  surface notes, and redlining pilot checklist. Implements ADR-029.
+  surface notes, and redlining pilot checklist. Implements the theme-impact-packets decision
+  (ADR-029, removed 2026-07-24, recovered in `../decisions-carryover.md`, "Small recovered decisions").
 -->
 
 # Theme impact packet system — design
 
 **Status:** Design locked (2026-07-22); v1 scaffold noted  
-**ADR:** [ADR-029](../adr/ADR-029-theme-impact-packets.md)  
+**Decision:** ADR-029, removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Small recovered decisions"  
 **Catalog:** [theme-impact-canonical-questions.md](./theme-impact-canonical-questions.md)  
 **Domain:** `theme-impact-questions.ts`, `theme-impact-packet.ts`, `phase1-indicator-catalog.ts`  
 **v1 migration:** `supabase/migrations/20260722160000_theme_impact_packets.sql` → `bb_reference.theme_impact_packets`  
@@ -31,14 +32,16 @@ This document is the implementation blueprint between the locked question catalo
 | Published (target) | `bb_public.release_theme_impact_packets` (+ optional snapshot JSON) | publication worker on promote | Yes (active release only) |
 
 **v1 note:** The scaffold table is the working store for `/themes` fixtures and the first pilot
-load. When the pilot enters ADR-004 release activation, migrate authoring to canonical + project
+load. When the pilot enters release activation (`../decisions-carryover.md`, "Public projection
+and immutable publication snapshots"), migrate authoring to canonical + project
 into `bb_public` — do not leave production publish SoT on the status-column table alone.
 
 **Primary key (logical):** `{ question_id, theme_id, scope_key }` where `scope_key` encodes
 pilot geography (e.g. `metro:chicago-il`) or `national` for spine packets. Entity-bound
 variants add `entity_id` to `scope_key` or a dedicated column.
 
-**Release invariant (ADR-004 target):** projection rows are insert-only per release; rollback switches
+**Release invariant (`../decisions-carryover.md`, "Public projection and immutable publication
+snapshots" target):** projection rows are insert-only per release; rollback switches
 `bb_public.active_release`.
 
 ## 3. Field table
@@ -165,7 +168,7 @@ Columns: `id`, `question_id`, `theme_id`, `title`, `summary`, `policy_eras`, `ge
 `method_stance`, `method_note`, `observations`, `derived`, `artifacts`, `gap_states`,
 `entity_id` / `binding_purpose`, `status`, timestamps. RLS: published for anon; staff all.
 
-### 4.1 Target DDL (ADR-004 promote)
+### 4.1 Target DDL (promote per `../decisions-carryover.md`, "Public projection and immutable publication snapshots")
 
 Draft table **`bb_canonical.theme_impact_packets`** (research write; staff read):
 
@@ -218,7 +221,7 @@ Projection table **`bb_public.release_theme_impact_packets`**:
 | Artifacts | `bb_evidence.source_items`, captures | `artifact_refs` |
 
 RLS: anon SELECT on projection table **only** via view joining `bb_public.active_release`
-(ADR-026 pattern). Canonical draft table: no anon policies.
+(`../decisions-carryover.md`, "Small recovered decisions", ADR-026 pattern). Canonical draft table: no anon policies.
 
 ## 5. Domain type mapping (target)
 
@@ -386,7 +389,7 @@ flowchart LR
 
 ## 10. References
 
-- [ADR-029](../adr/ADR-029-theme-impact-packets.md)
+- ADR-029, removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Small recovered decisions"
 - [theme-impact-canonical-questions.md](./theme-impact-canonical-questions.md)
 - [context-data-source-matrix.md](./context-data-source-matrix.md)
 - [postgres-schema.md](../data/postgres-schema.md) — `bb_reference.statistical_*`

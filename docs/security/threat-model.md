@@ -1,16 +1,16 @@
 # BlackStory — Threat Model
 
-> Expands [ADR-010](../adr/ADR-010-security-and-abuse-assumptions.md) into a full threat corpus with preventive, detective, containment, and recovery controls. Machine-readable source: [`threat-corpus.json`](./threat-corpus.json).
+> Expands the security-and-abuse-assumptions decision (ADR-010, removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Security and abuse assumptions") into a full threat corpus with preventive, detective, containment, and recovery controls. Machine-readable source: [`threat-corpus.json`](./threat-corpus.json).
 
 **Status:** Accepted for planning (controls are design targets; most are not yet implemented).
 **Date:** 2026-07-16
-**Depends on:** , , ADR-010
+**Depends on:** , , `../decisions-carryover.md`, "Security and abuse assumptions" (ADR-010)
 **Implements toward:** Tranche 3 (–036), , –036, deferred /064/065
 
 ## Scope and method
 
 - **Assets:** public corpus/releases, submission quarantine, research evidence, admin/publication paths, Cloud SQL, GCP spend, living-person privacy, CI/CD identities.
-- **Trust:** public internet is hostile; browser clients untrusted for authZ; anonymous users never write canonical history (ADR-010).
+- **Trust:** public internet is hostile; browser clients untrusted for authZ; anonymous users never write canonical history (`../decisions-carryover.md`, "Security and abuse assumptions", ADR-010).
 - **Priority:** all -listed threats are **P0** for product integrity/availability/privacy. Deferred beads (e.g. , /065) still map as controls; enabling those features early without controls is rejected.
 - **Degraded mode:** prefer killing mutations/search/research over wiping public snapshot reads.
 
@@ -288,7 +288,7 @@ Full bead lists live in [`threat-corpus.json`](./threat-corpus.json).
 Every threat records residual risk in the corpus. Cross-cutting residuals:
 
 1. **Public data is copyable.** Scraping cost can be raised; secrecy of released historical facts cannot be guaranteed (T-19).
-2. **Perfect bot elimination is out of scope** (ADR-010). Aim for integrity and cost bounds (T-01, T-02, T-14).
+2. **Perfect bot elimination is out of scope** (`../decisions-carryover.md`, "Security and abuse assumptions", ADR-010). Aim for integrity and cost bounds (T-01, T-02, T-14).
 3. **Human operators remain phishable and fallible**; dual control + fast rollback bound blast radius (T-03, T-16, T-17).
 4. **Deferred features (uploads, tool-using LLMs) are high residual if enabled early** — keep disabled until  / .
 5. **Controls are mostly unimplemented today** (scaffold). Treat this document as binding design, not evidence of production readiness.
@@ -296,6 +296,6 @@ Every threat records residual risk in the corpus. Cross-cutting residuals:
 
 ## Maintenance
 
-- Amend corpus + this doc when a new threat class appears; tighten ADR-010 if assumptions change.
+- Amend corpus + this doc when a new threat class appears; tighten `../decisions-carryover.md`, "Security and abuse assumptions" (ADR-010) if assumptions change.
 -  consumes abuse cases as CI gates; /060/061 validate load, integrity, and recovery.
 - Do not claim Armor/App Check/IAP exist until their beads land and are verified.

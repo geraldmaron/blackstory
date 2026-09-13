@@ -37,7 +37,7 @@ experience, not page refreshes" + "map is first class" + street-level/address-se
 1. **One continuous experience.** Navigations are movements through one archive, never page
    reloads: internal navigation is exclusively `next/link` (raw `<a>` only for external
    hrefs), the shell (header/footer) persists, the map canvas persists across `/` ↔
-   `/explore` (ADR-017), and page content arrives with the token-driven
+   `/explore` (`../decisions-carryover.md`, "Persistent map canvas", ADR-017), and page content arrives with the token-driven
    `ds-surface-arrive` rise. Anything that visibly remounts the shell is a defect.
 2. **The story is the spine.** Every surface answers "what happened here?" before it answers
    anything else. Home: hero map → "See what happened here" rail → standards → transparency
@@ -114,7 +114,7 @@ the z12 ceiling, and any assumption that the map is a closed diorama get ripped 
 block the visiting job.
 
 - **Architecture** (keeps earning its place): one persistent MapLibre canvas owned by the
-  `(map)` route-group layout (ADR-017); pages are surface controllers via `useMapStage()`;
+  `(map)` route-group layout (`../decisions-carryover.md`, "Persistent map canvas", ADR-017); pages are surface controllers via `useMapStage()`;
   camera moves only through named presets; reduced-motion collapses flights to cuts.
 - **Full basemap, street level down** (rips the current plate): a real self-hostable vector
   basemap (Protomaps PMTiles or OpenFreeMap — free-first, no per-tile vendor fees) restyled
@@ -181,5 +181,5 @@ block the visiting job.
 
 Two durations (`--ds-duration-fast` 160ms, `--ds-duration-base` 280ms), one easing, opacity/
 transform only. Route arrival = `ds-surface-arrive`; hero dissolve + camera flight per
-ADR-017; hover states fade borders/backgrounds. `prefers-reduced-motion` collapses
+`../decisions-carryover.md`, "Persistent map canvas", ADR-017; hover states fade borders/backgrounds. `prefers-reduced-motion` collapses
 everything to instant cuts — including map camera flights (jumpTo).

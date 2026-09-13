@@ -502,7 +502,7 @@ Citation format, exact:
 "{name}." BlackStory Archive, {place}, {era}. Evidence grade {grade}, {n} sources. Accessed {YYYY-MM-DD}. {url}
 ```
 
-Deep link carries `record`, `state`, `era`, `grade`, `kind`. It must **not** carry live pan/zoom — that is ADR-017 and it is binding.
+Deep link carries `record`, `state`, `era`, `grade`, `kind`. It must **not** carry live pan/zoom — that is `../decisions-carryover.md`, "Persistent map canvas", ADR-017 and it is binding.
 
 **Test:** citation is stable for a fixed input and injected date; deep link round-trips through parse; assert no `lat`/`lng`/`zoom`/`bearing`/`pitch` key can appear in the output.
 

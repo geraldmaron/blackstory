@@ -3,7 +3,8 @@
 Scripts and schemas used by `.github/workflows/deploy-staging.yml`,
 `.github/workflows/deploy-production.yml`, and `.github/workflows/progressive-release.yml`.
 
-**Public web** deploys via **Vercel** git integration; Production promote is explicit (ADR-027).
+**Public web** deploys via **Vercel** git integration; Production promote is explicit
+(`../../../docs/decisions-carryover.md`, "Small recovered decisions", ADR-027 entry).
 Deploy workflows record Vercel expectations, run migrate/health/smoke gates, and write provenance —
 they do **not** promote Firebase App Hosting.
 

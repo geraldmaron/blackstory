@@ -32,10 +32,10 @@ checks against a pinned SHA, and its Cloud Run "surface" steps are a dry-run pla
 deploy (see its own "no live apply" comment). Deploy workflows do not promote App Hosting, which is
 retired.
 
-**Architecture anchors:** [ADR-006](../adr/ADR-006-github-actions-deployment.md),
-[ADR-027](../adr/ADR-027-vercel-public-web-hosting.md),
-[ADR-011](../adr/ADR-011-firestore-system-of-record.md) (Firestore rules/indexes before traffic;
-Postgres migrations parked).
+**Architecture anchors:** `../decisions-carryover.md`, "Small recovered decisions" (ADR-006,
+GitHub Actions deployment model, and ADR-027, Vercel for public web hosting, entries) and
+"Firestore as system of record, reversed" (ADR-011 — "Firestore rules/indexes before traffic" is
+stale: Firestore has no live database left, and Postgres is the live SoR, not parked).
 
 ---
 
@@ -187,7 +187,7 @@ product system of record (`bb_public.*`). **Admin** is a staff-gated route group
 (since 2026-09-11, repo-z3g1f) — it has no separate host or promote step, it deploys with public
 web. **Firebase Storage / GCS** remains the blob store. Firestore is
 wind-down / rollback only ([firebase-wind-down.md](../data/firebase-wind-down.md)) — not a live
-public-read backend. **Public web** is Vercel (ADR-027).
+public-read backend. **Public web** is Vercel (`../decisions-carryover.md`, "Small recovered decisions", ADR-027 entry).
 
 Before public web / API surfaces receive incompatible traffic:
 

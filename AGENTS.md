@@ -216,7 +216,7 @@ The base image ships an older `/exec-daemon/node` (v22.14.0) that lacks `module.
 `/corrections` and `/submit` use an in-memory store (`apps/web/src/app/corrections/store.ts`), so a submission succeeds and returns a receipt code with no DB. The `/corrections/status/<receipt>` lookup will report "Receipt not found" in dev because the in-memory store is not shared across route handlers/process boundaries (production persists via the `submissionInbox` backing). This is expected locally, not a bug.
 
 ### Optional services (not needed for core web dev)
-Docker is not installed, so the parked local PostGIS (`pnpm db:up`) does not run here; it is optional per ADR-011. Firebase emulators need a Java runtime and are optional. `apps/mobile` (Expo iOS) cannot run on this Linux VM (requires macOS/Xcode) and is excluded from the pnpm workspace (its own `package-lock.json`).
+Docker is not installed, so the parked local PostGIS (`pnpm db:up`) does not run here; it is a dev-only convenience, unrelated to system-of-record status (`docs/decisions-carryover.md`, "Firestore as system of record, reversed"). Firebase emulators need a Java runtime and are optional. `apps/mobile` (Expo iOS) cannot run on this Linux VM (requires macOS/Xcode) and is excluded from the pnpm workspace (its own `package-lock.json`).
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
 ## Beads Issue Tracker

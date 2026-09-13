@@ -1,8 +1,10 @@
 # Runbook: Production environment re-split migration ( → )
 
-> **2026-08-14 correction:** this runbook's "System of record: Firestore (ADR-011)" line and its
-> [ADR-012](../adr/ADR-012-production-environment-resplit.md) link are both stale — `docs/adr/`
-> was purged 2026-07-24 (ADR-012's content not found restated elsewhere), the system of record is
+> **2026-08-14 correction, updated 2026-09-13:** this runbook's "System of record: Firestore
+> (ADR-011)" line and its ADR-012 link are both stale — `docs/adr/` was purged 2026-07-24. Both
+> are now recovered in `docs/decisions-carryover.md`: ADR-011 under "Firestore as system of
+> record, reversed" and ADR-012 under "Small recovered decisions" (still only a design target,
+> never provisioned). The system is
 > now Supabase Postgres (`docs/data/postgres-schema.md`, `docs/decisions-carryover.md`), and
 > Firestore has no live database, rules, or indexes left (`docs/data/firebase-wind-down.md`).
 > Steps 11-12 (admin App Hosting / Cloud Run + IAP provisioning) are superseded: Admin is now a
@@ -13,13 +15,14 @@
 > may be out of date.
 
 **Scope:** Human-executed migration from the single production project `black-book-efaaf` to the
-[ADR-012](../adr/ADR-012-production-environment-resplit.md) three-project topology
+`../decisions-carryover.md`, "Small recovered decisions" (ADR-012 entry) three-project topology
 (`blackbook-prod` = retained `black-book-efaaf`, `blackbook-staging`, `blackbook-internal`).
 **Not executed by  or by this document.** Tracked as  (Production cloud apply). No
 `gcloud`, `firebase deploy`, or `terraform apply` command in this runbook has been run by any
 agent session.
 
-**System of record:** Firestore (ADR-011). **Not in scope:** application code changes in
+**System of record:** ~~Firestore (ADR-011)~~ — stale, see the correction above; live SoR is
+Supabase Postgres. **Not in scope:** application code changes in
 `apps/admin`, `workers/*` (owned by other beads); this runbook only covers infra/project
 migration steps and points at where those follow-on beads pick up.
 
@@ -28,7 +31,8 @@ migration steps and points at where those follow-on beads pick up.
 - Once, as , after this runbook and the underlying Terraform have been reviewed by whoever
   holds billing/org authority on the Google Cloud account.
 - Before any Blaze upgrade, App Hosting backend creation, or production data/traffic exists —
-  this is the cheapest point in the project's life for this migration (ADR-012 Context).
+  this is the cheapest point in the project's life for this migration (the Context section of
+  `../decisions-carryover.md`, "Small recovered decisions", ADR-012 entry).
 
 ## Prerequisites
 
@@ -40,7 +44,7 @@ migration steps and points at where those follow-on beads pick up.
   prerequisite, `infra/gcp/wif/trust-conditions.md`).
 - `terraform >= 1.6.0` and the `hashicorp/google` provider (already used by
   `infra/gcp/terraform/multi-project/`).
-- Read [ADR-012](../adr/ADR-012-production-environment-resplit.md) in full before starting —
+- Read `../decisions-carryover.md`, "Small recovered decisions" (ADR-012 entry) in full before starting —
   this runbook assumes its decisions (project names, cross-project grant list, admin-console
   IAP mechanism) without re-deriving them.
 
@@ -67,7 +71,7 @@ not flip every gate variable to `true` in one apply.
 | 5 | Create `blackbook-internal` service accounts (`research`, `publication`, `security`, `admin-app`, `promotion`, `submissions-puller`) | `infra/gcp/terraform/multi-project/` | `terraform apply ... -var provision_internal_service_accounts=true` |
 | 6 | Apply the one-way promotion cross-project IAM asymmetry | `infra/gcp/terraform/multi-project/` | `terraform apply ... -var apply_cross_project_iam=true` |
 | 7 | Verify the negative case: no `blackbook-prod` principal resolves any role in `blackbook-internal` | `gcloud` (human) | `gcloud projects get-iam-policy blackbook-internal --format=json \| grep -i 'black-book-efaaf'` — must return nothing |
-| 8 | Verify the cross-project grants match exactly the ADR-012 list | repo | `node --test infra/gcp/terraform/multi-project/tests/isolation-invariants.test.mjs` |
+| 8 | Verify the cross-project grants match exactly the list in `../decisions-carryover.md`, "Small recovered decisions" (ADR-012 entry) | repo | `node --test infra/gcp/terraform/multi-project/tests/isolation-invariants.test.mjs` |
 | 9 | Create protected GitHub Environments `staging` and `internal` (if not already present alongside `production`) | GitHub (human) | See `infra/github/oidc/` |
 | 10 | Extend WIF: enable `github-deploy-staging` (now targeting `blackbook-staging`) and `github-deploy-internal` | `infra/gcp/wif/terraform/` | `terraform apply -var-file=envs/prod.tfvars -var enable_staging_deploy_identity=true -var enable_internal_deploy_identity=true -var staging_project_id=blackbook-staging -var internal_project_id=blackbook-internal` |
 | 11 | Move `apps/admin` deploy target: Cloud Run service in `blackbook-internal`, IAP attached **directly to the Cloud Run service** (no load balancer) | `gcloud` (human) | `gcloud run services update black-book-admin --project=blackbook-internal --region=<region> --iap` (exact flag/console step depends on current `gcloud`/console IAP-for-Cloud-Run UI at execution time — verify against current GCP docs, not this runbook, before running) |
@@ -84,7 +88,7 @@ not flip every gate variable to `true` in one apply.
 
 `infra/gcp/iap/README.md` and `infra/gcp/iap/admin-iap-policy.json` still describe the
 external-HTTPS-load-balancer + serverless NEG IAP pattern. Step 11–12 above use the newer direct
-Cloud-Run-attached IAP integration per ADR-012. That directory needs its own rewrite pass before
+Cloud-Run-attached IAP integration per `../decisions-carryover.md`, "Small recovered decisions" (ADR-012 entry). That directory needs its own rewrite pass before
 step 11 is executed for real — file a follow-up bead rather than provisioning against a stale
 design doc. `docs/security/admin-identity.md`'s application-authorization layer (IAP JWT +
 Firebase MFA) is unaffected either way.
@@ -93,7 +97,7 @@ Firebase MFA) is unaffected either way.
 
 | Check | Command | Pass criteria |
 |-------|---------|-----------------|
-| Matrix encodes the ADR-012 topology and grant list | `node --test infra/gcp/terraform/multi-project/tests/isolation-invariants.test.mjs` | All tests pass |
+| Matrix encodes the topology and grant list from `../decisions-carryover.md`, "Small recovered decisions" (ADR-012 entry) | `node --test infra/gcp/terraform/multi-project/tests/isolation-invariants.test.mjs` | All tests pass |
 | `isolation-matrix.json` still schema-valid | `cd infra/gcp && uv run --with jsonschema python -c "import json,sys; from jsonschema import Draft7Validator; s=json.load(open('isolation-matrix.schema.json')); d=json.load(open('isolation-matrix.json')); errs=list(Draft7Validator(s).iter_errors(d)); print('OK' if not errs else '\n'.join(e.message for e in errs)); sys.exit(1 if errs else 0)"` | `OK` |
 | Multi-project Terraform still valid | `cd infra/gcp/terraform/multi-project && terraform validate` | `Success!` |
 | WIF Terraform still valid | `cd infra/gcp/wif/terraform && terraform validate` | `Success!` |
@@ -113,13 +117,13 @@ Firebase MFA) is unaffected either way.
   resources; use `terraform destroy -target=...` for the specific resources, reviewed).
 - **After production serving actually moves ( completion):** expensive. Reversing means
   either a live data migration back into one project or accepting permanent three-project
-  overhead — this matches ADR-012's Reversibility section. Do not attempt without a dedicated
+  overhead — this matches the Reversibility section of `../decisions-carryover.md`, "Small recovered decisions" (ADR-012 entry). Do not attempt without a dedicated
   incident-level review; use `docs/runbooks/incident-response.md` and
   `docs/runbooks/recovery-rollback-rehearsal.md` patterns instead of ad hoc rollback.
 
 ## References
 
-- [ADR-012](../adr/ADR-012-production-environment-resplit.md) — decision record this runbook executes
+- `../decisions-carryover.md`, "Small recovered decisions" (ADR-012 entry) — decision record this runbook executes
 - [`docs/security/environment-isolation.md`](../security/environment-isolation.md) — current design + AC-ISO restatement
 - [`infra/gcp/terraform/multi-project/`](../../infra/gcp/terraform/multi-project/) — Terraform for steps 1, 3–6, 16
 - [`infra/gcp/wif/`](../../infra/gcp/wif/) — Terraform for step 10

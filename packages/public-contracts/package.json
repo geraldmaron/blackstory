@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Versioned public API v1 TypeScript types + zod schemas shared by apps/web (optional) and apps/mobile, per ADR-021. Zero server-only dependencies: no node:* built-ins, no firebase-admin, no @repo/domain or @repo/security at runtime.",
+  "description": "Versioned public API v1 TypeScript types + zod schemas shared by apps/web (optional) and apps/mobile, per the mobile data boundary decision (docs/decisions-carryover.md, \"ADR-021's two invariants\"). Zero server-only dependencies: no node:* built-ins, no firebase-admin, no @repo/domain or @repo/security at runtime.",
   "exports": {
     "./version": {
       "development": "./src/version.ts",

@@ -5,7 +5,7 @@
 
 # Runbook: Vercel public-web cutover
 
-**ADR:** [ADR-027](../adr/ADR-027-vercel-public-web-hosting.md)  
+**Decision:** ADR-027, removed 2026-07-24, recovered in [`../decisions-carryover.md`](../decisions-carryover.md), "Small recovered decisions"  
 **Project:** Vercel `geraldmarons-projects/blackstory` (`prj_AJYcJozo2XqLfBXItGxHV5SQP06h`)  
 **Root Directory:** `apps/web`
 
@@ -144,7 +144,8 @@ Owner flipped Cloudflare DNS to Vercel (apex A + www CNAME, DNS-only). Post-flip
 
 - Host `apps/admin` on this Vercel project — keep it a separate deployment (admin moved to its
   own standalone Vercel project 2026-07-25, gated by Postgres roles via `bb_auth.current_role()`,
-  not an IAP boundary; ADR-001/ADR-005 predate that cutover).
+  not an IAP boundary; the ADR-001/ADR-005 service-surface-separation decision
+  (`../decisions-carryover.md`, "Service surface separation") predates that cutover).
 - Assume there is a manual "Promote to Production" step before a `main` push goes live: Vercel's
   git integration auto-builds and auto-aliases every `main` commit to Production with no such step
   (confirmed 2026-08-05 / 2026-08-12, repo-8ary / repo-h1b2). Treat the staging → main PR merge
