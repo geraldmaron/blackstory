@@ -1040,3 +1040,24 @@ test('clusters use zoom-scaled count-step radii from CLUSTER_RADIUS_BY_COUNT', (
   assert.equal(nationalStep[0], 'step');
   assert.deepEqual(nationalStep.slice(2), [10, 10, 14, 50, 18, 200, 22]);
 });
+
+test('both entity buffers promote entityId, so the decade morph can address records by id', () => {
+  /*
+   * repo-o56o. `setFeatureState` addresses a feature by its id, and a GeoJSON source has none
+   * unless one is promoted from the properties. Both buffers need it, because the hold marks are
+   * written to each: rest on the current buffer, zero on the incoming one.
+   *
+   * Safe alongside clustering, and this is the part worth stating rather than assuming. MapLibre's
+   * own `getId` (maplibre-gl 5.24, GeoJSONSource) reads the promoted property first and falls back
+   * to `cluster_id` only when that property is absent — which is exactly the cluster case, since a
+   * cluster carries no `entityId`. So leaves are addressable by record id and clusters keep their
+   * generated ids and go on animating, which is correct: a cluster is a different shape in each
+   * decade.
+   */
+  const style = buildStyleFixture('presence');
+  for (const sourceId of ['explore-entities', 'explore-entities-incoming']) {
+    const source = style.sources[sourceId] as { promoteId?: string; cluster?: boolean };
+    assert.equal(source.promoteId, 'entityId', `${sourceId} must promote entityId`);
+    assert.equal(source.cluster, true, `${sourceId} still clusters`);
+  }
+});

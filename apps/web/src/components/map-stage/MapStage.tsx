@@ -66,7 +66,11 @@ import {
 import { markerRadiusPlusExpression } from '../../lib/map-experience/marker-size';
 import {
   applyDensityBlendProgress,
+  applyDecadeHoldFeatureState,
+  buildDecadeHoldSet,
   buildDensityColorMorphStates,
+  clearDecadeHoldFeatureState,
+  entityIdsInCollection,
   clearDensityMorphFeatureState,
   DECADE_LAYER_FADE_MS,
   runDecadeMorphAnimation,
@@ -614,6 +618,16 @@ export function MapStageProvider({
   const settledDensityFillByFipsRef = useRef<Map<string, string>>(new Map());
   /** Last in-flight density morph states — cleared on promote. */
   const activeDensityMorphRef = useRef<readonly DensityColorMorphState[]>([]);
+  /*
+   * The record ids on the plate BEFORE the config patch that triggered this morph, and the set
+   * currently held still by it (repo-o56o).
+   *
+   * `previousEntityIdsRef` is captured in the patch rather than at promote because by the time a
+   * morph starts, `configRef.current.featureCollection` is already the incoming decade — the patch
+   * is the only moment both sides exist.
+   */
+  const previousEntityIdsRef = useRef<readonly string[]>([]);
+  const activeDecadeHoldRef = useRef<ReadonlySet<string>>(new Set());
   /**
    * Latches true on MapLibre `load`. Do NOT gate decade morphs on `isStyleLoaded()` —
    * GeoJSON setData / tile fetches flip that false and force the snap path (full refresh).
@@ -891,6 +905,7 @@ export function MapStageProvider({
         satellite,
         colorScheme: readDocumentColorScheme(),
       });
+      previousEntityIdsRef.current = entityIdsInCollection(configRef.current.featureCollection);
       configRef.current = {
         ...configRef.current,
         style,
@@ -994,6 +1009,10 @@ export function MapStageProvider({
     async (map: MapLibreMap, generation: number): Promise<void> => {
       const cfg = configRef.current;
       setDecadeCrossfadeTransitions(map, 0);
+      // Release the held records before the buffers swap. A mark left behind would pin them at
+      // rest through the NEXT decade's dissolve — the same shimmer inverted.
+      clearDecadeHoldFeatureState(map, activeDecadeHoldRef.current);
+      activeDecadeHoldRef.current = new Set();
       const entities = map.getSource(EXPLORE_ENTITIES_SOURCE_ID) as GeoJSONSource | undefined;
       if (entities) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
@@ -1034,6 +1053,14 @@ export function MapStageProvider({
           );
           activeDensityMorphRef.current = morphStates;
           applyDensityBlendProgress(map, morphStates, 0);
+          // Both buffers now hold data, so the marks can be written to each.
+          const held = buildDecadeHoldSet(
+            previousEntityIdsRef.current,
+            entityIdsInCollection(cfg.featureCollection),
+          );
+          clearDecadeHoldFeatureState(map, activeDecadeHoldRef.current);
+          applyDecadeHoldFeatureState(map, held);
+          activeDecadeHoldRef.current = held;
         } catch (error) {
           console.error('[MapStage] incoming decade buffer stage failed', error);
           if (generation !== decadeFadeGenerationRef.current) return;
@@ -1048,6 +1075,7 @@ export function MapStageProvider({
           durationMs,
           isCurrent: () => generation === decadeFadeGenerationRef.current,
           onProgress: (eased) => applyDensityBlendProgress(map, morphStates, eased),
+          holdPersistingRecords: activeDecadeHoldRef.current.size > 0,
         });
         decadeMorphAnimationRef.current = animation;
         await animation.done;

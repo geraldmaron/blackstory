@@ -734,6 +734,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
       },
       [EXPLORE_ENTITIES_SOURCE_ID]: {
         type: 'geojson',
+        // Address features by their own record id so the decade morph can hold the records that
+        // survive a decade change still (repo-o56o). Safe alongside clustering: MapLibre promotes
+        // the property when it is there and keeps its generated id for a cluster, which has none.
+        promoteId: 'entityId',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
         data: input.featureCollection as any,
         ...(clusteringEnabled
@@ -747,6 +751,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
       },
       [EXPLORE_ENTITIES_INCOMING_SOURCE_ID]: {
         type: 'geojson',
+        // Same promotion as the primary buffer: the hold marks are written to both.
+        promoteId: 'entityId',
         // Dual-buffer pin stack — empty until a decade/filter crossdissolve stages the next frame.
         data: { type: 'FeatureCollection', features: [] },
         ...(clusteringEnabled
