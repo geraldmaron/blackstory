@@ -1,19 +1,21 @@
 /**
  * Client-version-floor compatibility check — the pure, environment-neutral function both
  * `apps/api-public` (server-side enforcement, MOB-004) and `apps/mobile` (client-side self-check
- * before even calling the server, MOB-009) can share (ADR-021 §2).
+ * before even calling the server, MOB-009) can share (`docs/decisions-carryover.md`, "ADR-021's
+ * two invariants": app/API compatibility).
  *
  * This module does NOT parse the `X-BlackStory-Client` header itself (header parsing is
  * server/HTTP-framework-specific and does not belong in an environment-neutral package) — it
  * takes an already-extracted client version string and answers one question: is it below the
- * floor. Per ADR-021's red-team resolution #2, this is a UX affordance for honest clients, not a
- * security boundary: nothing here should be treated as authorization.
+ * floor. This is a UX affordance for honest clients, not a security boundary: nothing here should
+ * be treated as authorization, and the server fails open on a header that is missing entirely
+ * (`apps/api-public/src/http/handlers.ts`'s `parseClientApiVersion`).
  */
 import { z } from 'zod';
 import { API_VERSION, DEPRECATION_WINDOW_DAYS, MIN_SUPPORTED_API_VERSION } from '../version.js';
 
-/** `platform/major.minor.patch` — e.g. `mobile/1.4.0` or `web/1.4.0` (the `api=` suffix from
- * ADR-021 §2's example header value is parsed as a separate `apiVersion` field, see
+/** `platform/major.minor.patch` — e.g. `mobile/1.4.0` or `web/1.4.0` (the `api=` suffix of the
+ * `X-BlackStory-Client` header value is parsed as a separate `apiVersion` field, see
  * `clientVersionHeaderV1Schema`). */
 const CLIENT_BUILD_VERSION_PATTERN = /^[a-z0-9_-]{1,40}\/\d{1,5}\.\d{1,5}\.\d{1,5}$/i;
 
@@ -83,8 +85,10 @@ export type CompatibilityCheckV1 = {
   readonly minSupportedApiVersion: typeof MIN_SUPPORTED_API_VERSION;
   readonly deprecationWindowDays: typeof DEPRECATION_WINDOW_DAYS;
   /** True when the client is on a still-supported but no-longer-default major/build — the signal
-   * that should surface the soft "update available" nudge (ADR-021 red-team resolution #1),
-   * distinct from the hard `supported: false` floor. */
+   * that should surface the soft "update available" nudge, distinct from the hard
+   * `supported: false` floor. Always false while `API_VERSION` and `MIN_SUPPORTED_API_VERSION` are
+   * both `v1` (`docs/decisions-carryover.md`, "ADR-021's two invariants": the deprecation
+   * window). */
   readonly softDeprecated: boolean;
 };
 

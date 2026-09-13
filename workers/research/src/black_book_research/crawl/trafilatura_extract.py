@@ -1,9 +1,11 @@
-"""Trafilatura HTML extraction bridge (ADR-019 decision item 5).
+"""Trafilatura HTML extraction bridge (docs/decisions-carryover.md,
+"Acquisition crawler runtime": decision item 5).
 
 Reads a JSON payload `{"html": "...", "url": "..."?}` from stdin, writes
 `{"text": "...", "title": "...", "date": "..."}` to stdout. One purpose: let
 the TypeScript research pipeline (which owns SSRF-safe fetching via
-`executeSafeFetch`, per ADR-019 item 7) get main-text extraction quality from
+`executeSafeFetch`, per docs/decisions-carryover.md, "Acquisition crawler
+runtime" item 7) get main-text extraction quality from
 Trafilatura instead of a regex tag-strip, without needing the full Scrapy
 crawl-campaign machinery for a single already-fetched page.
 

@@ -1,6 +1,6 @@
 /**
- * Log scrubbing (MOB-010; privacy invariant 7, ADR-020 §3, threat-model
- * T1/privacy).
+ * Log scrubbing (MOB-010; privacy invariant 7, threat-model T1/privacy; see
+ * `docs/decisions-carryover.md`, "Mobile stack": no Firebase or analytics SDK).
  *
  * The mobile app must NEVER emit — to console, crash reports, or any log
  * sink — any of these sensitive categories:

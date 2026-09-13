@@ -1,7 +1,8 @@
 /**
  * Public release/revision provenance metadata — extracted from
  * `apps/web/src/data/public-seed.ts`'s `PublicRevisionMetadata`. Every `v1/entity` response
- * carries one of these per ADR-004 ("public API responses include release/revision metadata").
+ * carries one of these: public API responses include release/revision metadata
+ * (`docs/decisions-carryover.md`, "Public projection and immutable publication snapshots").
  */
 import { z } from 'zod';
 import { idString } from '../internal/primitives.js';

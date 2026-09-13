@@ -2,8 +2,9 @@
  * `/stories/[slug]` — one published Story.
  *
  * The slug is validated against the catalog before any lookup happens, so an unknown slug
- * redirects to Explore rather than reaching a lookup with an unvalidated string (ADR-021
- * threat-model T4, the same convention `entity/[id].tsx` follows).
+ * redirects to Explore rather than reaching a lookup with an unvalidated string
+ * (`docs/mobile/security/threat-model.md` T4, deep-link injection — the same convention
+ * `entity/[id].tsx` follows).
  *
  * There is no `[section]` segment any more. The address used to be
  * `/learn/{history|topics|myths}/{slug}`, which put the editorial partition in the URL and made

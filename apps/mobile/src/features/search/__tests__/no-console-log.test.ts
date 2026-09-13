@@ -59,8 +59,10 @@ describe('no-query-log guarantee: this feature never calls console.* anywhere', 
 
 describe('no-query-log guarantee: no analytics-shaped call site in this feature', () => {
   const files = listSourceFiles(FEATURE_DIR);
-  // program invariant 7 / ADR-020 §3: no analytics SDK is even a dependency, but scan for the
-  // SHAPE of an analytics call too (defense in depth against a future accidental import).
+  // program invariant 7 / `docs/decisions-carryover.md`, "Mobile stack" (no Firebase or analytics
+  // SDK): no analytics SDK is even a dependency — `src/observability/no-raw-sdk-imports.test.ts`
+  // is the repo-wide gate — but scan for the SHAPE of an analytics call too (defense in depth
+  // against a future accidental import).
   const ANALYTICS_PATTERN = /\b(analytics|logEvent|trackEvent|Sentry\.captureMessage)\s*\(/i;
 
   it.each(files.map((f) => [f.replace(FEATURE_DIR, ''), f] as const))(

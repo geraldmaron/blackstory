@@ -3,14 +3,17 @@
  *
  * These helpers are server-only (they use `node:crypto` for ETag/request-id hashing) and live in
  * `apps/api-public` — NOT in `@repo/public-contracts`, which must stay node-free for the mobile
- * bundle (ADR-021 §1). They emit the *shared* error envelope and error codes that the contracts
+ * bundle and is gated on that by `packages/public-contracts/scripts/check-boundary.mjs` (see
+ * `docs/decisions-carryover.md`, "ADR-021's two invariants": the public-contracts boundary).
+ * They emit the *shared* error envelope and error codes that the contracts
  * package defines (`@repo/public-contracts/errors`), so client and server agree on the wire shape
  * at compile time.
  *
  * Every response the router returns carries: a request id (for log correlation, echoed in the
  * body's error envelope and the `X-Request-Id` header), an explicit `Cache-Control`, and — for
  * cacheable reads — a strong `ETag` so clients and CDNs can revalidate with `If-None-Match`
- * (ADR-004 snapshot/CDN-friendliness).
+ * (the snapshot and CDN-friendliness rule in `docs/decisions-carryover.md`, "Public projection
+ * and immutable publication snapshots").
  */
 import { createHash, randomUUID } from 'node:crypto';
 import {
@@ -26,8 +29,9 @@ export type ApiResponse = {
   readonly body: unknown;
 };
 
-/** Cache-Control presets. Public released projection data is CDN-cacheable (ADR-004); operational
- * metadata (health, compatibility) is never cached so an operator sees live posture. */
+/** Cache-Control presets. Public released projection data is CDN-cacheable
+ * (`docs/decisions-carryover.md`, "Public projection and immutable publication snapshots");
+ * operational metadata (health, compatibility) is never cached so an operator sees live posture. */
 export const CACHE_CONTROL = {
   /** Released entity/search projections — short edge cache + generous stale-while-revalidate. */
   releasedRead: 'public, max-age=60, stale-while-revalidate=300',
@@ -131,7 +135,10 @@ function etagMatches(ifNoneMatch: string, etag: string): boolean {
 /**
  * Builds a stable error envelope response. The envelope shape and codes come from
  * `@repo/public-contracts/errors`; `message`/`details` are bounded, non-sensitive text only —
- * never a stack trace, internal path, collection name, or secret (ADR-021 §3 redaction discipline).
+ * never a stack trace, internal path, collection name, or secret. Nothing inspects the string a
+ * caller passes: `publicApiErrorSchema` bounds shape and size only, so this one is discipline at
+ * each call site, not a gate (`docs/decisions-carryover.md`, "ADR-021's two invariants":
+ * public-response redaction).
  */
 export function errorResponse(
   code: PublicApiErrorCode,

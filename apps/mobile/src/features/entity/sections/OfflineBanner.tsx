@@ -1,6 +1,7 @@
 /**
- * Honest "you're viewing a saved copy" banner (ADR-022 §3: "every cached surface is explicitly
- * labeled 'last updated <relative time>'"; threat-model T7: "never silently presents stale data
+ * Honest "you're viewing a saved copy" banner (`docs/decisions-carryover.md`, "Mobile cache
+ * and OTA release": every cached surface is explicitly labeled with when it was last updated;
+ * threat-model T7: "never silently presents stale data
  * as current"). Rendered whenever `freshness.source === 'cache'` — i.e. this content did NOT
  * come from a fresh network read this time, regardless of why (offline, transient failure).
  */

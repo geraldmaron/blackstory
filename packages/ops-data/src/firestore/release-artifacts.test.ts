@@ -1,5 +1,6 @@
 /**
- * Unit tests for per-release catalog artifact builders and local writers (ADR-004).
+ * Unit tests for per-release catalog artifact builders and local writers
+ * (`docs/decisions-carryover.md`, "Public projection and immutable publication snapshots").
  */
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';

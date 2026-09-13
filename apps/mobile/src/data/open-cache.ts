@@ -1,5 +1,6 @@
 /**
- * Cache bootstrap wiring (MOB-009 §3; ADR-022 §5 + rollback-considerations).
+ * Cache bootstrap wiring (MOB-009 §3; `docs/decisions-carryover.md`, "Mobile cache and OTA
+ * release": drop-and-rebuild, and the cache-disabled fallback).
  *
  * Opens the on-disk cache, runs migrations, and — critically — NEVER crashes the
  * app if the store is unavailable or corrupt beyond a single rebuild. The
@@ -10,9 +11,10 @@
  *   2. If opening/migrating THROWS (unrecoverable file corruption, locked DB),
  *      delete the on-disk file and retry once from scratch.
  *   3. If it still fails, fall back to an IN-MEMORY store: the app runs
- *      online-only with no cross-launch offline read (ADR-022
- *      rollback-considerations: "Disabling the persistent cache degrades to
- *      online-only fetching"). This is honest degradation, not a crash.
+ *      online-only with no cross-launch offline read (the removed ADR's rollback note,
+ *      restated in `docs/decisions-carryover.md`, "Mobile cache and OTA release": disabling
+ *      the persistent cache degrades to online-only fetching). This is honest degradation,
+ *      not a crash.
  *
  * The native imports live behind factory callbacks so this module — and the
  * tests that exercise the degradation ladder — never load a native module

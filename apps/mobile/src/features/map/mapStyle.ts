@@ -1,12 +1,16 @@
 /**
  * The dark, desaturated "archive of record" basemap style for the native map
- * (MOB-011 / ADR-024), the mobile parallel of ADR-013's web dark-archive style.
+ * (MOB-011 / ADR-024), the mobile parallel of the web dark-archive style
+ * (`docs/decisions-carryover.md`, "Map stack": dark archive register).
  *
  * Every color here is sourced from the generated brand tokens (`@/ui`) — never a
  * parallel hardcoded hex — so the two map surfaces cannot drift and the map
  * cannot silently diverge from the brand system. The register is a fixed dark
- * canvas regardless of the device light/dark setting, exactly as ADR-013
- * mandates: an archival map insert does not recolor to match the page around it.
+ * canvas regardless of the device light/dark setting: an archival map insert does
+ * not recolor to match the page around it. Note this is a mobile rule now, not a
+ * shared one. The web plate follows the site theme (`plateFor` and
+ * `readDocumentColorScheme` in `apps/web`) and has a satellite mode; only this
+ * style binds `themeColors.dark` unconditionally.
  *
  * Tile sources (in priority order when basemap is enabled):
  *  1. Self-hosted Protomaps PMTiles (`pmtiles://…`) when configured
@@ -126,7 +130,9 @@ const backgroundLayer = {
  * Shared dark-archive fill/line/label layers for OpenMapTiles-compatible sources
  * (OpenFreeMap). Source-layer ids: `water`, `landcover`, `boundary`,
  * `transportation`, `transportation_name`, `place` — NOT Protomaps' `boundaries`.
- * Labels use flat matte halos (ADR-013 plate exception), never glow/shadow kitsch.
+ * Labels use flat matte halos (the map plate is the one exception to flat matte in
+ * `docs/ui/design-direction-v6-mobile.md`, and it does not extend to label glow),
+ * never glow/shadow kitsch.
  */
 function openMapTilesArchiveLayers(sourceId: string): readonly Record<string, unknown>[] {
   return [

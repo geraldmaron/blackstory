@@ -1,5 +1,6 @@
 /**
- * Supabase Storage public object URL helpers (ADR-020 blob cutover).
+ * Supabase Storage public object URL helpers (blob cutover —
+ * `docs/data/supabase-storage-cutover.md`).
  * Builds HTTPS URLs for the `public-media` bucket; keeps GCS URL shape available
  * for dual-serve / rollback.
  */

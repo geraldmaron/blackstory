@@ -1,4 +1,6 @@
-# Discovery campaigns — scheduled roster (ADR-018 replacement) plus manual dispatch.
+# Discovery campaigns — scheduled roster (replacing the retired Firebase Functions
+# scheduler design; see docs/decisions-carryover.md, "Small recovered decisions") plus
+# manual dispatch.
 #
 # Replaces the 5 Firebase Functions v2 onSchedule triggers in functions/src/index.ts
 # (repo-348e.4). Each scheduled job below matches the cadence in

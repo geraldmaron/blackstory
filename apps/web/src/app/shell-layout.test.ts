@@ -260,7 +260,8 @@ describe('the plate is styled globally, not from the route group', () => {
       shellCss,
       /body:not\(:has\(\[data-surface='instrument'\]\)\):not\(:has\(\[data-surface='door'\]\)\)\s+\.ds-map-stage:not\(\[data-plate-slot\]\)::after\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
     );
-    // Covered, not hidden: ADR-017 keeps the MapLibre instance alive across navigation.
+    // Covered, not hidden: the cover is what keeps the MapLibre instance alive across
+    // navigation (`docs/decisions-carryover.md`, "Persistent map canvas").
     assert.doesNotMatch(
       shellCss,
       /body:not\(:has\(\[data-surface='instrument'\]\)\)\s+\.ds-map-stage\s*\{[^}]*display:\s*none/s,

@@ -24,7 +24,10 @@ export type LiftedSurfaceProps = Omit<ViewProps, 'style'> & {
   bordered?: boolean;
   /**
    * Shadow tier — defaults to `none` (flat matte). Map floating chrome may pass
-   * `sm` per ADR-013; browse surfaces must leave the default.
+   * `sm` under the narrow exception in `docs/ui/design-direction-v6-mobile.md`
+   * ("map floating instruments only"); browse surfaces must leave the default.
+   * Nothing passes `sm` today, and this was never an ADR-013 rule; see
+   * `docs/decisions-carryover.md`, "Map stack" (ADR-013 does not exist).
    */
   shadow?: ShadowLevel;
   style?: ViewProps['style'];

@@ -4,9 +4,10 @@
  * These are a VERBATIM mirror of the web corrections vocabulary
  * (`apps/web/src/app/corrections/categories.ts`). The mobile client re-declares
  * them here because apps/mobile must not import apps/web or any server-side
- * package (ADR-021 §4 — HTTP-only, types-only-from-`@repo/public-contracts`,
- * and apps/mobile is not yet wired into the pnpm workspace, per
- * src/lib/route-params.ts's dependency note). The server re-validates the
+ * package (`docs/decisions-carryover.md`, "ADR-021's two invariants": mobile
+ * reaches the server over HTTP only), and because apps/mobile is not wired
+ * into the pnpm workspace, per src/lib/route-params.ts's dependency note.
+ * The server re-validates the
  * category/target against its own authoritative copy on intake, so a client
  * that drifts out of sync fails validation server-side rather than smuggling an
  * unknown category through — this list is a UX affordance, not a trust boundary.

@@ -7,7 +7,8 @@ info:
   title: BlackStory Public Read API
   version: v1
   description: |
-    Read-only public corpus surface for mobile and web clients (ADR-005, ADR-021).
+    Read-only public corpus surface for mobile and web clients
+    (docs/decisions-carryover.md, "Service surface separation" and "ADR-021's two invariants").
     All breaking shape changes ship under a new URL prefix (`/v2`, …). The version floor header
     `X-BlackStory-Client: <platform>/<semver>; api=<major>` is a UX affordance, not authorization.
   contact:
@@ -144,7 +145,7 @@ paths:
       tags: [corpus]
       summary: Release-coupled redacted map FeatureCollection
       description: |
-        Flat GeoJSON point features for Explore (ADR-025). Coordinates are already
+        Flat GeoJSON point features for Explore. Coordinates are already
         redacted public-precision anchors — never raw residential addresses.
         Bounded to 20_000 features (`MapSourceV1`). Static read (`entityRetrieval` quota).
       parameters:
@@ -180,7 +181,8 @@ paths:
       summary: Bounded full-text search with facets
       description: |
         Expensive read — anonymous callers without `X-BlackStory-Client` may receive `429 RATE_LIMITED`
-        with code semantics tied to client attestation policy (ADR-020). Mobile clients always attest.
+        with code semantics tied to client attestation policy (see `docs/decisions-carryover.md`,
+        "Security and abuse assumptions"). Mobile clients always attest.
       parameters:
         - name: q
           in: query
@@ -349,7 +351,7 @@ components:
     MapSourceV1:
       type: object
       required: [releaseId, features]
-      description: Redacted Explore map FeatureCollection (ADR-025)
+      description: Redacted Explore map FeatureCollection
       properties:
         releaseId: { type: string }
         features:

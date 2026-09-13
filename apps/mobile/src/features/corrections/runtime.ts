@@ -4,7 +4,8 @@
  * module loads — the same split bootstrap.ts uses for the security layer.
  *
  * Binds:
- *   - the submissions-surface base URL (ADR-021 §3),
+ *   - the submissions-surface base URL (`apps/api-submissions`; see
+ *     `docs/decisions-carryover.md`, "ADR-021's two invariants": the submissions surface),
  *   - the SecureStore-backed receipt store (lazy native backend),
  *   - NetInfo-backed connectivity (lazy native).
  *

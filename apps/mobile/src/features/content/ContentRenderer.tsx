@@ -38,7 +38,8 @@ export interface ContentRendererProps {
   readonly requiresCitation?: boolean;
   /** `longform` uses Source Serif body, generous measure, and calm chrome for narrative stories. */
   readonly presentation?: ContentPresentation;
-  /** Freshness affordance (ADR-022 §3 / MOB-015 requirement #8). */
+  /** Freshness affordance (`docs/decisions-carryover.md`, "Mobile cache and OTA release";
+   * MOB-015 requirement #8). */
   readonly cached?: { readonly fetchedAt: number; readonly degraded: boolean };
   /** Legal/methodology version-mismatch affordance (MOB-015 requirement #4). */
   readonly versionStale?: boolean;

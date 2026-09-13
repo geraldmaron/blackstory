@@ -1,5 +1,6 @@
 /**
- * Shared fetcher for per-release public catalog artifacts (ADR-004): entities.json and
+ * Shared fetcher for per-release public catalog artifacts (`docs/decisions-carryover.md`,
+ * "Public projection and immutable publication snapshots"): entities.json and
  * search-index.json under `public/releases/{releaseId}/`. The single implementation behind
  * both `apps/web`'s public data layer and `apps/api-public`'s read-through cache (via
  * `@repo/ops-data`) — two independently maintained copies previously disagreed on fallback

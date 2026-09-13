@@ -1,5 +1,6 @@
 /**
- * Per-release public catalog artifacts (ADR-004): aggregate entities.json + search-index.json
+ * Per-release public catalog artifacts (`docs/decisions-carryover.md`, "Public projection and
+ * immutable publication snapshots"): aggregate entities.json + search-index.json
  * under `public/releases/{releaseId}/`. Replaces unbounded Firestore collection scans for
  * map/list/search/history/sitemap once published to the public-media bucket (or a local
  * fixture directory for tests/dev).

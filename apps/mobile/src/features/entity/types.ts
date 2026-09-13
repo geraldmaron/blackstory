@@ -2,10 +2,11 @@
  * Vendored entity/claim/citation/timeline/revision/media/related TYPES for the entity detail
  * screen (MOB-014).
  *
- * INTEGRATION GAP — same situation `apps/mobile/src/data/contracts.ts` already documents:
- * `apps/mobile` ships its own isolated npm lockfile with no `@repo` scope wired in, so
- * `@repo/public-contracts` cannot be imported here today. Rather than invent a different shape,
- * every type below is a field-for-field mirror of its schema in
+ * `apps/mobile` ships its own isolated npm lockfile outside the pnpm workspace, but it DOES
+ * declare `@repo/public-contracts` as a `file:` dependency, so the package is importable here —
+ * the two enum imports below are exactly that, and `src/data/contracts.ts` re-exports wire types
+ * from it. The types in this file are still mirrored rather than imported: every type below is a
+ * field-for-field mirror of its schema in
  * `packages/public-contracts/src/v1/{entity,claim,citation,timeline,revision,media,related}.ts`
  * — same field names, same optionality, same enums, same bounds (as named constants). Nothing
  * here adds a field the wire schema doesn't have, and nothing renames one.
@@ -16,8 +17,11 @@
  * mirror — kept in `features/entity` (this bead's exclusive path) rather than editing
  * `data/contracts.ts` (out of this bead's ownership).
  *
- * These are TYPES only, matching ADR-021 discipline (no zod, no runtime schema — see
- * `normalize.ts` for the defensive runtime narrowing that stands in for schema validation here).
+ * These are TYPES only — no zod, no runtime schema. That is this module's own choice, not a
+ * package-wide rule: `@repo/public-contracts` ships runtime zod schemas and mobile parses some of
+ * them elsewhere (`features/explore/map-source-client.ts`). See `normalize.ts` for the defensive
+ * runtime narrowing that stands in for schema validation here, and `docs/decisions-carryover.md`,
+ * "ADR-021's two invariants": the client/server boundary.
  */
 
 import { ENTITY_KINDS as CONTRACT_ENTITY_KINDS } from '@repo/public-contracts/v1/entity';

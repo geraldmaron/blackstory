@@ -119,7 +119,8 @@ DECLARE
   v_jwt_role text := coalesce(auth.jwt() ->> 'role', '');
   v_bb_role text := bb_auth.current_role();
 BEGIN
-  -- Research must never publish (ADR-009 / ADR-020).
+  -- Research must never publish (docs/decisions-carryover.md, "Research and discovery cannot
+  -- publish"; entity source-of-truth precedence in the 2026-07-24 addendum).
   IF v_bb_role = 'research' THEN
     RAISE EXCEPTION 'activate_release denied: research cannot publish';
   END IF;

@@ -198,7 +198,7 @@ describe('cursor reuse across a release change (MOB-013 item 8, threat-model T5)
   });
 });
 
-describe('offline / cached-compatible-release fallback (ADR-022 §3, threat-model T7)', () => {
+describe('offline / cached-compatible-release fallback (carryover: "Mobile cache and OTA release"; threat-model T7)', () => {
   it('serves a cached page, labeled degraded, when the network fails and a compatible cache entry exists', async () => {
     const { transport, resolveNext, rejectNext } = makeControllableTransport({ cooperative: true });
     const releaseCache = fakeReleaseCache('r1');

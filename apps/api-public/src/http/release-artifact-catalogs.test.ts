@@ -1,5 +1,6 @@
 /**
- * Unit tests for the ADR-004 release-artifact read-through (repo-csw0).
+ * Unit tests for the release-artifact read-through (repo-csw0; `docs/decisions-carryover.md`,
+ * "Public projection and immutable publication snapshots").
  *
  * The safety properties matter more than the happy path: an unconfigured deployment must never
  * pick up an artifact, and an artifact from a different release must never be served — those are

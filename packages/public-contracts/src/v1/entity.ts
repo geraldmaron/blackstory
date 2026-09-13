@@ -1,16 +1,21 @@
 /**
  * Public entity DTO — extracted from `apps/web/src/data/public-seed.ts`'s `PublicEntityView`
  * (the same shape `apps/web/src/lib/public-data/map-projection.ts`'s
- * `mapProjectionToPublicEntityView` produces from a live Firestore public projection, per
- * ADR-004). This is the single richest DTO in the package, so the exclusions matter most here:
+ * `mapProjectionToPublicEntityView` produces from a live public projection; the live store is
+ * Postgres `bb_public`, not Firestore. See `docs/decisions-carryover.md`, "Public projection and
+ * immutable publication snapshots".) This is the single richest DTO in the package, so the
+ * exclusions matter most here:
  *
- * Omitted BY CONSTRUCTION (no field exists to carry these — ADR-021 §3, ADR-004 §1):
+ * Omitted BY CONSTRUCTION (no field exists to carry these — `docs/decisions-carryover.md`,
+ * "ADR-021's two invariants": public-response redaction, and "Public projection and immutable
+ * publication snapshots": canonical evidence, claims and research data are not public-readable):
  * - No raw notability/relevance ranking score. `notabilityBasis` carries only string leaves
  *   (`criterion`, `note`, `evidenceIds`) — see `packages/domain/src/entity-status.ts`'s own
  *   comment: "never a numeric score." `notabilityLabels` are human-readable rubric text.
- * - No raw/unredacted location. `geoAnchor` is the already-public-precision anchor released
- *   projections carry (city/neighborhood-grade, never a street address); `locationPrecision` is
- *   one of the four public precision tiers, never `'address'` or `'exact'`.
+ * - `locationPrecision` is one of the four public precision tiers and cannot express `'address'`
+ *   or `'exact'` — that part IS structural. `geoAnchor` is not: it carries numeric `lat`/`lng`
+ *   bounded only to valid coordinate ranges, so the public-precision property of the anchor comes
+ *   from the projection that produced it, not from this schema.
  * - No internal review/source-lineage-internal fields: no reviewer identity, no moderation
  *   state, no spam/abuse signal, no internal-only source-lineage rollup (claims carry only the
  *   public `independentLineageCount` integer — see `./claim.ts`).
@@ -116,7 +121,10 @@ export const notabilityBasisEntryV1Schema = z.object({
 export type NotabilityBasisEntryV1 = z.infer<typeof notabilityBasisEntryV1Schema>;
 
 /** Public-precision coordinate anchor. `lat`/`lng` are the already-redacted representative point
- * a live release projection carries (ADR-004/ADR-013 redaction discipline) — never a raw
+ * a live release projection carries (redaction discipline: `docs/decisions-carryover.md`,
+ * "Public projection and immutable publication snapshots" and "Map stack" for the
+ * redaction-injected builder, plus `docs/security/location-precision-standard.md` §4
+ * "One engine on the publish path") — never a raw
  * residential address. Bounded to valid coordinate ranges as a structural sanity check. */
 export const geoAnchorV1Schema = z.object({
   lat: z.number().min(-90).max(90),

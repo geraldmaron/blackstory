@@ -1,5 +1,6 @@
 /**
- * Live Postgres `bb_public` bindings for `PublicDataAccess` (MOB-004 / ADR-020 SoR cutover).
+ * Live Postgres `bb_public` bindings for `PublicDataAccess` (MOB-004; the Postgres SoR cutover,
+ * `docs/decisions-carryover.md`, "entity source-of-truth precedence").
  *
  * Reads the same Supabase Postgres projections as `apps/web/src/lib/public-data/postgres-readers.ts`
  * and maps them onto `@repo/public-contracts` DTOs via the shared projection mapper in

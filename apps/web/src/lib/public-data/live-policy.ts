@@ -27,7 +27,8 @@ export function isPostgresPublicDataSource(env: EnvironmentLike = process.env): 
 }
 
 /**
- * Whether list/map/search may prefer ADR-004 CDN/local `entities.json` artifacts.
+ * Whether list/map/search may prefer the release-catalog CDN/local `entities.json` artifact
+ * (`docs/decisions-carryover.md`, "Public projection and immutable publication snapshots").
  *
  * Postgres stays the system of record for WHICH release is active: the active-release pointer
  * is always read live, and the shared release-artifact fetcher (`@repo/domain`) rejects any
@@ -49,7 +50,7 @@ export function isPostgresPublicDataSource(env: EnvironmentLike = process.env): 
  */
 export function shouldPreferReleaseArtifacts(env: EnvironmentLike = process.env): boolean {
   if (resolvePublicDataSource(env) !== 'postgres') {
-    // Seed / unset still allow ADR-004 CDN/local entities.json as a read-through cache.
+    // Seed / unset still allow the CDN/local entities.json artifact as a read-through cache.
     return true;
   }
   const artifactOrigin = env.APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL?.trim();

@@ -4,7 +4,9 @@
  * for instruments/sheet bodies — not stacked bordered cards.
  *
  * ExploreListChrome is sheet-body chrome only. Map plate stays dark-archive
- * per ADR-013; floating controls use fixed map-overlay ink on the dark plate.
+ * (`docs/decisions-carryover.md`, "Map stack": dark archive register, which the
+ * native plate still holds literally); floating controls use fixed map-overlay
+ * ink on the dark plate.
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';

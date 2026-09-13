@@ -3,7 +3,8 @@
  * `apps/web/src/lib/public-data/map-projection.ts`) onto the public-contracts `EntityV1` wire DTO.
  *
  * This mapping used to live in `./firestore-data-access.ts` alongside the Firestore-specific client
- * plumbing; it moved here when the Firestore read path was removed (repo-348e.3 / ADR-020 cutover)
+ * plumbing; it moved here when the Firestore read path was removed (repo-348e.3; the Postgres
+ * cutover, `docs/decisions-carryover.md`, "entity source-of-truth precedence")
  * because `./postgres-data-access.ts` — the only remaining live adapter — depends on it too.
  *
  * Mapping a projection onto `EntityV1` is lossy by design, honestly:

@@ -2,7 +2,7 @@ import { openCache } from './open-cache';
 import { createMemoryStore } from './db/memory-store';
 import { META_KEYS } from './db/store';
 
-describe('openCache degradation ladder (§3, ADR-022 rollback-considerations)', () => {
+describe('openCache degradation ladder (carryover: "Mobile cache and OTA release")', () => {
   it('opens SQLite and runs migrations on the happy path', async () => {
     const store = createMemoryStore();
     const result = await openCache({ openSqliteStore: async () => store });

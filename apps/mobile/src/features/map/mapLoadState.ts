@@ -29,7 +29,8 @@ export type MapFailureCopy = {
 /**
  * User-facing copy per failure mode. Deliberately non-alarming and dignity-safe:
  * a map outage is framed as "the rest of the app still works", never as an error
- * that strands the reader (ADR-020 fail-safe-toward-reads posture).
+ * that strands the reader (`docs/decisions-carryover.md`, "Mobile stack":
+ * fail-safe toward reads).
  */
 export const MAP_FAILURE_COPY: Record<MapFailureMode, MapFailureCopy> = {
   'provider-outage': {

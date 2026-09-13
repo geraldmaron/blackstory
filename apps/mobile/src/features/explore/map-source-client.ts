@@ -1,5 +1,7 @@
 /**
- * Live Explore map source client (ADR-025 / ADR-022).
+ * Live Explore map source client (`docs/decisions-carryover.md`, "Explore basemap and live map
+ * source" and "Mobile data boundary" — map reads go over HTTP through `apps/api-public`, never a
+ * client database).
  *
  * Fetches release-coupled `MapSourceV1` from `GET /v1/map` through the shared
  * transport stack (same attestation + ETag path as search/entity). Projects the

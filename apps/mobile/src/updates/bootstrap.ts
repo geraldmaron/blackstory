@@ -66,7 +66,8 @@ export type ApplyUpdateResult =
 
 /**
  * Fetch a newer update and reload the app onto it. This is the client half
- * of ADR-024 §2's OTA path — the server/publish half (which update is
+ * of ADR-024 §2's OTA path (restated in `docs/decisions-carryover.md`,
+ * "Mobile cache and OTA release") — the server/publish half (which update is
  * "current" on a channel) is entirely controlled by whoever holds the
  * MFA-custodied EAS publish credential (README "MFA custody"), never by this
  * client. Never throws: a fetch/reload failure degrades to `applied: false`

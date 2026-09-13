@@ -70,7 +70,8 @@ export function useContentPage(section: CatalogSectionId, slug: string): UseCont
         if (!canceled) setState(result);
       } catch {
         // Never let a native-module init failure surface as a crash — an explicit error state
-        // instead (ADR-022 §3 "no silent failures", extended to "no silent crashes" either).
+        // instead (the no-silent-failures rule in `docs/decisions-carryover.md`, "Mobile
+        // cache and OTA release", extended to "no silent crashes" either).
         if (!canceled) setState({ status: 'error' });
       }
     })();

@@ -5,11 +5,14 @@
  * `CorrectionCategory`), `.../correction-intake.ts`'s `CorrectionSubmissionInput`, and
  * `.../public-status.ts`'s `PublicCorrectionStatus`/`PublicCorrectionPhase`.
  *
- * Per ADR-021 §3 and its red-team resolution #3: these are the one write path a client has
- * (quarantine-only intake via `apps/api-submissions` — never a canonical write, invariant 2/6),
- * and they stay in `packages/public-contracts` under their own `v1/corrections` subpath rather
- * than a second contracts package, because the split is a server-routing concern, not a
- * client-safety one. Deliberately excluded: `apps/web/src/app/corrections/public-status.ts`'s
+ * These are the one write path a client has (quarantine-only intake via `apps/api-submissions` —
+ * never a canonical write, invariant 2/6), and they stay in `packages/public-contracts` under
+ * their own `v1/corrections` subpath rather than a second contracts package, because the split is
+ * a server-routing concern, not a client-safety one (`docs/decisions-carryover.md`, "ADR-021's
+ * two invariants": the submissions surface). Nothing imports this module today, though:
+ * `apps/api-submissions` does not depend on `@repo/public-contracts`, and `apps/mobile` declares
+ * its own copies under `src/features/corrections/`, so these schemas are exercised only by
+ * `corrections.test.ts`. Deliberately excluded: `apps/web/src/app/corrections/public-status.ts`'s
  * `mapModerationToPublicPhase`/`isAppealEligible`/`buildPublicCorrectionStatus` functions and the
  * `SubmissionModerationState` type they consume — those are server-only mapping logic over an
  * internal moderation state machine (spam scores, campaign-detection flags, duplicate lists) that

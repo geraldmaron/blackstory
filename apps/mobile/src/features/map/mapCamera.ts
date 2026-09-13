@@ -248,8 +248,10 @@ export type CameraMotion = {
  * Motion for a camera move, driven by the shared duration tokens (MOB-007) so the
  * map cannot drift from the rest of the design system's timing. When
  * `reduceMotion` is true the duration collapses to 0 — the camera JUMPS rather
- * than animating, satisfying the reduced-motion contract (ADR-022 / accessibility
- * gate) without disabling the camera move itself.
+ * than animating, satisfying the reduced-motion contract without disabling the camera
+ * move itself. That contract is this repo's own (`src/ui/useReduceMotion.ts` reads the OS
+ * setting; `__tests__/mapCamera.test.ts` asserts the collapse to zero) — no removed mobile
+ * ADR ever mentioned reduced motion or accessibility.
  */
 export function cameraMotion(preset: CameraPreset, reduceMotion: boolean): CameraMotion {
   if (reduceMotion) return { durationMs: duration.durationInstant, easing: easingStandardBezier };

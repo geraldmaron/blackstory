@@ -1,6 +1,7 @@
 /**
  * Client attestation boundary for `apps/api-submissions` — replaces Firebase App Check
- * after the Postgres cutover (ADR-020). Mobile corrections declare platform + API major via
+ * after the Postgres cutover (`docs/decisions-carryover.md`, "entity source-of-truth
+ * precedence"). Mobile corrections declare platform + API major via
  * `X-BlackStory-Client`; rate limits treat that as the abuse-trust signal for mutations.
  */
 import {

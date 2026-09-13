@@ -18,10 +18,12 @@ export const TARGET_WORKER_PACKAGES = ['research', 'publication', 'security'] as
 export type TargetWorkerPackage = (typeof TARGET_WORKER_PACKAGES)[number];
 
 /**
- * Environment every scheduled job runs in. (ADR-012, landed in parallel with this)
- * names the research/admin pipeline project `repo-internal`; that ADR is committed, so we
- * reference the name directly rather than a numeric GCP project id (which may
- * still change before the project is actually provisioned).
+ * Environment every scheduled job runs in. `repo-internal` is the functional project id
+ * the ADR-012 design gave the still-unprovisioned research/admin project (see
+ * docs/decisions-carryover.md, "Small recovered decisions": production environment
+ * re-split). No such project is live yet; every resource today still runs inside the
+ * single production project `black-book-efaaf`, and this name is not a numeric GCP
+ * project id because none has been provisioned to have one.
  */
 export const SCHEDULED_JOB_ENVIRONMENTS = ['repo-internal'] as const;
 export type ScheduledJobEnvironment = (typeof SCHEDULED_JOB_ENVIRONMENTS)[number];

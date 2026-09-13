@@ -43,7 +43,8 @@ export const RATE_LIMITED_MESSAGE =
   'Too many attempts right now. Please wait a little while and try again.';
 
 /** Client is offline. Corrections do NOT queue-and-retry silently
- * (ADR-022 §3 / threat-model corrections resolution; requirement #6/#7). */
+ * (`docs/decisions-carryover.md`, "Mobile cache and OTA release": write-shaped actions degrade
+ * honestly; threat-model corrections resolution; requirement #6/#7). */
 export const OFFLINE_MESSAGE =
   'You’re offline. Corrections need a connection to submit. Try again once you’re back online.';
 

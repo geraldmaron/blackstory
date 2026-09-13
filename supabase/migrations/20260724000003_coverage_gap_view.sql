@@ -5,7 +5,8 @@
 -- Firestore migration: blackPopulation / totalPopulation) to a per-county count
 -- of published entities in the ACTIVE release (bb_public.release_entities).
 --
--- Invariants (ADR-009 / ADR-020):
+-- Invariants (docs/decisions-carryover.md, "Research and discovery cannot publish"; entity
+-- source-of-truth precedence in the 2026-07-24 addendum):
 --   * READ-ONLY research-targeting surface. It never writes to, and nothing here
 --     grants write access to, bb_public or bb_publication. Research cannot publish.
 --   * Staff-only. Views cannot carry RLS policies, so the staff gate is enforced
@@ -90,7 +91,7 @@ COMMENT ON VIEW bb_ops.coverage_gap_by_county_decade IS
   'Geographic Gap Scanner (geographic-gap.v1): published entity count vs census '
   'Black population per county x decade. Staff-only, read-only research-targeting '
   'signal. Low coverage_ratio means the catalog is thin there, not that history is '
-  'absent. Never a publication surface (ADR-009).';
+  'absent. Never a publication surface.';
 
 -- Grants: staff read via PostgREST/authenticated (in-view is_staff() filters rows),
 -- service_role for operator tooling. NO anon access of any kind.

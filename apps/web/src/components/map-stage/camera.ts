@@ -53,10 +53,15 @@ export type MapStageFlyOptions = {
 };
 
 /**
- * The only sanctioned way to move the camera (ADR-017: "raw flyTo defaults are banned").
+ * The sanctioned route for PRESET framing, and the only camera path that reads
+ * `camera-presets.ts` directly. Raw library defaults are policy-banned; `camera-moves.ts`
+ * is the other sanctioned caller and authors its own duration, curve and easing. One call
+ * site still runs on bare library defaults today: `MapStage.tsx`'s own MapMoment framing
+ * effect (`docs/decisions-carryover.md`, "Persistent map canvas": camera grammar). Nothing
+ * lints any of this.
  * Resolves `target` (an explicit center+zoom, or a bounding box via `cameraForBounds`), then
  * flies/eases/jumps according to `name`'s preset and the current reduced-motion state. Returns
- * `false` when `map` isn't constructed yet — callers latch the request and retry on `load`.
+ * `false` when `map` isn't constructed yet: callers latch the request and retry on `load`.
  */
 export function runFlyPreset(
   map: MapLibreMap | null,

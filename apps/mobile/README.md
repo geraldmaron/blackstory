@@ -198,7 +198,8 @@ unaffected and is enforced via the `expo-build-properties` plugin
 
 ## Public data path (why Dev may not “hit Supabase”)
 
-Mobile never talks to Supabase/Postgres directly (ADR-022). The only network
+Mobile never talks to Supabase/Postgres directly (`docs/decisions-carryover.md`, "Mobile data
+boundary"). The only network
 origin is `extra.apiBaseUrl` → `apps/api-public` over HTTPS (or LAN HTTP in
 Dev). That service reads `bb_public.*` when
 `PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` / `APP_DATABASE_URL` are set.

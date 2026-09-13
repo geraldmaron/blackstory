@@ -155,7 +155,8 @@ export type JurisdictionAreaFeature = {
 };
 
 /** Pure polygon builder for jurisdiction-scoped area records. Coarse (bbox-cornered) polygon
- * geometry only, matching this repo's existing state-bbox-not-survey-grade posture (ADR-013).
+ * geometry only, matching this repo's existing state-bbox-not-survey-grade posture
+ * (`docs/decisions-carryover.md`, "Map stack": known gaps).
  * Callers supply live area records when projection data is available. */
 export function buildJurisdictionAreaFeatures(
   records: readonly AreaRecordInput[],

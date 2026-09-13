@@ -1,6 +1,8 @@
 /**
  * Mobile-local types for the Data screen — mirror web `/data` (DataSections) contracts
- * without importing `@repo/domain` (ADR-021 / mobile isolation).
+ * without importing `@repo/domain` (`docs/decisions-carryover.md`, "ADR-021's two invariants":
+ * the client/server boundary — mobile imports only client-safe subpaths of that package, and
+ * nothing lints it).
  */
 
 export type DataValueUnit = 'usd' | 'percent' | 'per_100k' | 'months';

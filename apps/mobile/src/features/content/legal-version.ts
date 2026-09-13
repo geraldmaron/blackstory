@@ -23,8 +23,9 @@
  *      the content version that was active when it was fetched (see `content-repository.ts`); if
  *      the most recently observed bootstrap content version differs, the UI shows "this version
  *      may be outdated — view current" (see `ContentRenderer.tsx`) instead of silently serving
- *      stale legal text (ADR-022 §3's "no silent failures" / "cached content ... explicitly
- *      labeled" behavioral contract, sharpened for legal content specifically).
+ *      stale legal text (the no-silent-failures / explicitly-labeled-cache contract in
+ *      `docs/decisions-carryover.md`, "Mobile cache and OTA release", sharpened for legal
+ *      content specifically).
  */
 import type { MobileLegalVersions } from './content-types';
 

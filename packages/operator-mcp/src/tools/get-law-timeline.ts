@@ -31,6 +31,6 @@ export async function getLawTimeline(input: GetLawTimelineInput): Promise<{
     timeline: [],
     status: 'stub',
     message:
-      'Law timeline reads from published heritage entities are not wired in Phase 1. Use operator-cli / PostgREST published views for entity claims; this tool will wrap ADR-026 read surfaces in a follow-up bead.',
+      'Law timeline reads from published heritage entities are not wired in Phase 1. Use operator-cli / PostgREST published views for entity claims; this tool will wrap those published-read views (see docs/decisions-carryover.md, "Small recovered decisions") in a follow-up bead.',
   };
 }

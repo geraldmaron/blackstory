@@ -76,7 +76,9 @@ export const Z_LAYER = {
 /**
  * Resolves theme from an OS color scheme value. Matches web bootstrap:
  * explicit `light` / `dark` when set; Archive Paper (light) when null or
- * unspecified — no v5 dark-cockpit default outside the map plate (ADR-013).
+ * unspecified — no v5 dark-cockpit default outside the map plate
+ * (`docs/decisions-carryover.md`, "Map stack": the fixed dark register is
+ * scoped to the map plate).
  */
 export function resolveThemeName(scheme: ColorSchemeName | null | undefined): ThemeName {
   if (scheme === 'dark') return 'dark';

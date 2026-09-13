@@ -1,4 +1,5 @@
--- PostgREST published-read views (ADR-026, repo-651l.3).
+-- PostgREST published-read views (repo-651l.3). Recovered decision text lives in
+-- docs/decisions-carryover.md, "Small recovered decisions": PostgREST published-read surface.
 -- Stable public-schema names for Supabase Data API over active-release projections only.
 -- Does NOT grant anon on bb_canonical, bb_research, or draft tables.
 -- security_invoker = true: underlying bb_public RLS remains the fail-closed publish gate.
@@ -32,7 +33,8 @@ WHERE re.release_id = (
 );
 
 COMMENT ON VIEW public.published_entities IS
-  'ADR-026 PostgREST surface: entity rows for the active release only. '
+  'Published-read PostgREST surface (docs/decisions-carryover.md, '
+  '"Small recovered decisions"): entity rows for the active release only. '
   'Resolvability status vocabulary lives in projection/search_index (published|corrected|superseded|deprecated).';
 
 -- ---------------------------------------------------------------------------
@@ -63,7 +65,8 @@ WHERE si.release_id = (
 );
 
 COMMENT ON VIEW public.published_search_index IS
-  'ADR-026 PostgREST surface: search index rows for the active release only.';
+  'Published-read PostgREST surface (docs/decisions-carryover.md, '
+  '"Small recovered decisions"): search index rows for the active release only.';
 
 -- ---------------------------------------------------------------------------
 -- Grants: SELECT only; no write paths; no canonical/research widening

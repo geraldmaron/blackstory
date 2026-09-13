@@ -1,6 +1,7 @@
 /**
  * Negative redaction snapshots — proving specific sensitive/internal fields are ABSENT from real
- * `/v1` response payloads (ADR-021 §3). Mirrors the sensitive-field negative-snapshot style of
+ * `/v1` response payloads (`docs/decisions-carryover.md`, "ADR-021's two invariants":
+ * public-response redaction). Mirrors the sensitive-field negative-snapshot style of
  * `packages/public-contracts/src/v1/entity.test.ts`: a fixture that carries forbidden keys must not
  * see them survive onto the wire.
  */

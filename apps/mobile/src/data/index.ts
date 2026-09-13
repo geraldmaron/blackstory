@@ -1,5 +1,6 @@
 /**
- * Mobile data layer (MOB-009 / ADR-022).
+ * Mobile data layer (MOB-009; `docs/decisions-carryover.md`, "Mobile data boundary" for the
+ * transport half and "Mobile cache and OTA release" for the cache half).
  *
  * Public surface: typed transport, SQLite cache, release-stamp invalidation,
  * bootstrap sync, artifact verification, offline signal, secure-store, and the

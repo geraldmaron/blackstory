@@ -6,9 +6,10 @@
  * treat `with { type: 'json' }` as a hint for unrecognized extensions). Used only to disambiguate
  * points that fall inside more than one state's approximate bounding box in `findUsStateForPoint`
  * (see `./us-geography.ts`): the coarse bbox table there is deliberately cheap and wrong at
- * borders (ADR-013 known gap; e.g. Philadelphia's bbox overlaps NJ, and the LA/MS Mississippi
- * River bend overlaps both states' bboxes). This module answers "is this point actually inside
- * state X's real boundary" for a small candidate set, not a general reverse-geocoder.
+ * borders (`docs/decisions-carryover.md`, "Map stack": known gaps; e.g. Philadelphia's bbox
+ * overlaps NJ, and the LA/MS Mississippi River bend overlaps both states' bboxes). This module
+ * answers "is this point actually inside state X's real boundary" for a small candidate set,
+ * not a general reverse-geocoder.
  *
  * Imported as a JSON module (not `fs.readFileSync`-ed from an `import.meta.url`-derived path) —
  * a runtime file read like that bakes in the build machine's absolute path and breaks in serverless

@@ -16,8 +16,9 @@
  * returned without a polygon check — so a point can still resolve to the
  * wrong state if it sits outside the true polygon but inside only one state's
  * (deliberately coarse) rectangle; this module is still not a general-purpose
- * survey-grade point-in-polygon spatial join (ADR-013 known gap for the
- * non-ambiguous fast path).
+ * survey-grade point-in-polygon spatial join (`docs/decisions-carryover.md`,
+ * "Map stack": known gaps, which records that this fast path is the part still
+ * left bbox-only).
  */
 
 import { isPointInStatePolygon } from './state-boundary-geometry.js';
@@ -139,7 +140,8 @@ function pointInBbox(lat: number, lng: number, bbox: UsStateInfo['bbox']): boole
  * East of this longitude is Manhattan / Brooklyn / Queens / Bronx waterfront;
  * west is NJ Hudson shore (Hoboken, Weehawken, …) plus Staten Island (handled
  * separately). Not survey-grade — only a metro carve-out for the documented
- * NJ-covers-Manhattan bbox failure (ADR-013).
+ * NJ-covers-Manhattan bbox failure (`docs/decisions-carryover.md`, "Map stack":
+ * known gaps). It is now a fallback behind the polygon test, not the primary fix.
  */
 const HUDSON_DIVIDE_LNG = -74.02;
 
@@ -174,7 +176,8 @@ function resolveNjNyOverlap(
  * bounding box, that state wins outright — no polygon check. This is still a
  * bbox test for that case, so a point outside a state's true shape but inside
  * only its rectangle (e.g. open water past a coastline) can still resolve
- * wrong; see the module doc comment and ADR-013.
+ * wrong; see the module doc comment and `docs/decisions-carryover.md`,
+ * "Map stack": known gaps.
  *
  * Disambiguation path: when the point falls inside MORE THAN ONE candidate
  * bbox — where a bbox-only test lands Philadelphia in NJ and the Milliken's Bend

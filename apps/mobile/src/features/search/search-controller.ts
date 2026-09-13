@@ -50,7 +50,8 @@ export interface SearchFreshness {
   readonly source: 'network' | 'cache';
   readonly fetchedAt: number;
   /** True when served from cache while offline/degraded -- the UI MUST label this, never present
-   * it as live (ADR-022 §3/§6, threat-model T7). */
+   * it as live (`docs/decisions-carryover.md`, "Mobile cache and OTA release"; threat-model
+   * T7). */
   readonly degraded: boolean;
 }
 
@@ -122,8 +123,9 @@ function isSupersededAbort(err: unknown): boolean {
 
 /** Network transport failures AND exhausted-retry HTTP failures both degrade to "try the cache" --
  * from the user's perspective, "can't get fresh results right now" reads the same either way, and
- * ADR-004's degraded-snapshot posture ("entity pages must remain serveable if live APIs are
- * disabled") applies identically to a live outage as to a true offline device. */
+ * the degraded-snapshot posture ("entity pages must remain serveable if live APIs are disabled";
+ * `docs/decisions-carryover.md`, "Public projection and immutable publication snapshots") applies
+ * identically to a live outage as to a true offline device. */
 function isConnectivityLikeFailure(err: unknown): boolean {
   return err instanceof TransportError && (err.info.kind === 'network' || err.info.kind === 'http');
 }

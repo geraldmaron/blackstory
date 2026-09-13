@@ -11,9 +11,12 @@
  * bead's exclusive ownership) — nothing calls `/v1/bootstrap` today. Rather than block this
  * bead on that wiring, `fetchEntityDetail` below treats EVERY successful `/v1/entity/:id`
  * response as authoritative for the global release stamp (via `releaseCache.applyReleaseStamp`,
- * the exact same primitive `bootstrap-sync.ts` uses) — valid because ADR-004 guarantees exactly
- * one active release at a time, so any endpoint's `revision.releaseId` names the same release
- * `/v1/bootstrap` would. A future bead that wires bootstrap-sync at app start makes this
+ * the exact same primitive `bootstrap-sync.ts` uses). That is valid because exactly one release
+ * is active at a time: `bb_public.active_release` is a single row, `CHECK (id = 'active')`, in
+ * `supabase/migrations/20260720220008_publication_public.sql`, so any endpoint's
+ * `revision.releaseId` names the same release `/v1/bootstrap` would (see
+ * `docs/decisions-carryover.md`, "Public projection and immutable publication snapshots"). A
+ * future bead that wires bootstrap-sync at app start makes this
  * redundant, not wrong: `applyReleaseStamp` is documented idempotent and safe to call from
  * multiple call sites.
  *
@@ -57,7 +60,8 @@ function entityPath(id: string): string {
 /**
  * Fetches one entity: network-first, falling back to the release-coupled cache on any
  * network/server failure (never on an authoritative 404 — see below), and reporting an honest
- * `degraded`/`offline` signal the UI must surface (ADR-022 §3, threat-model T7).
+ * `degraded`/`offline` signal the UI must surface (`docs/decisions-carryover.md`, "Mobile
+ * cache and OTA release"; threat-model T7).
  */
 export async function fetchEntityDetail(
   id: string,
@@ -134,7 +138,8 @@ export async function fetchEntityDetail(
     }
 
     // Any other failure (network unreachable, 5xx, parse error, size cap) degrades to cache,
-    // never a bare crash/spinner (ADR-022 §3 "no silent failures").
+    // never a bare crash/spinner (the no-silent-failures rule — see
+    // `docs/decisions-carryover.md`, "Mobile cache and OTA release").
     const cachedResult = await readCache(true);
     if (cachedResult) return cachedResult;
     return {

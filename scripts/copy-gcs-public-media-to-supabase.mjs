@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Copy GCS public-media objects into Supabase Storage `public-media` (ADR-020 blob cutover).
+ * Copy GCS public-media objects into Supabase Storage `public-media` (blob cutover —
+ * `docs/data/supabase-storage-cutover.md`).
  *
  * Default is dry-run (list + plan only). Live upload requires:
  *   SUPABASE_URL (default project URL)

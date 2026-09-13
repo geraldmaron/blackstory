@@ -7,7 +7,9 @@
  * separate surface is WP-25, irreversible, its own approval).
  *
  * The camera reaches the plate through `MapStage.getMap()`, narrow on purpose: preset framing
- * still goes through `flyPreset` (ADR-017), and this handle is only what `camera-moves.ts` needs.
+ * still goes through `flyPreset`, and this handle is only what `camera-moves.ts` needs. Every
+ * move on either path carries an authored duration and easing, never library defaults
+ * (`docs/decisions-carryover.md`, "Persistent map canvas": camera grammar).
  *
  * This file is the orchestrator (WP-23): render plus wiring. Every piece of state and behavior
  * lives in a hook under `explore/hooks/` — the lens, the camera, the selection, the saved

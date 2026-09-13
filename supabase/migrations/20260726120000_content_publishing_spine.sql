@@ -1,5 +1,6 @@
 -- Content publishing spine: release projection for theme-impact packets.
--- Implements the ADR-004 promote target from
+-- Implements the public-projection promote target (see docs/decisions-carryover.md,
+-- "Public projection and immutable publication snapshots") described in
 -- docs/research/theme-impact-packet-system.md §4.1. bb_reference.theme_impact_packets
 -- stays the authoring table (draft/review/published); bb_public carries frozen,
 -- release-scoped projections that anon reads through the active-release RLS pattern.

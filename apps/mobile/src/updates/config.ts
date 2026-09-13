@@ -17,8 +17,9 @@
  */
 
 /**
- * The accepted-risk code-signing posture (ADR-024 amendment #1,
- * threat-model T6). This is fixed by the ADR, not read from any runtime
+ * The accepted-risk code-signing posture (ADR-024 amendment #1, threat-model
+ * T6; restated in `docs/decisions-carryover.md`, "Mobile cache and OTA
+ * release"). This posture is fixed by that decision, not read from any runtime
  * input — it exists so observability/support tooling can attach a stable,
  * privacy-safe label to any OTA-related report without re-deriving the
  * decision from prose each time.
@@ -36,7 +37,11 @@ export interface UpdatesPosture {
   readonly enabled: boolean;
   /** `eas.json` build-profile channel this binary was published under, or `null` pre-gate. */
   readonly channel: string | null;
-  /** EAS Update runtime version (ADR-024 §2 compatibility fence), or `null` pre-gate. */
+  /**
+   * EAS Update runtime version (ADR-024 §2 compatibility fence; restated in
+   * `docs/decisions-carryover.md`, "Mobile cache and OTA release"), or
+   * `null` pre-gate.
+   */
   readonly runtimeVersion: string | null;
   /** Immutable OTA bundle id currently running, or `null` on the embedded/store bundle. */
   readonly updateId: string | null;

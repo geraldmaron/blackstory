@@ -21,7 +21,8 @@ describe('never-cache enforcement (§9, invariant 7)', () => {
   });
 
   it('does NOT flag legitimately-cached public fields (coarsened geo, labels)', () => {
-    // ADR-022 §2: cached map GeoJSON is already API-coarsened public geometry.
+    // Cached map GeoJSON is already API-coarsened public geometry (carryover, "Mobile cache
+    // and OTA release").
     expect(isNeverCacheKey('coordinates')).toBe(false);
     expect(isNeverCacheKey('geometry')).toBe(false);
     expect(isNeverCacheKey('displayName')).toBe(false);
@@ -65,7 +66,7 @@ describe('hashSearchKey', () => {
   });
 });
 
-describe('LRU eviction (ADR-022 §2)', () => {
+describe('LRU eviction (carryover: "Mobile cache and OTA release")', () => {
   async function put(store: any, key: string, bytes: number, accessedAt: number) {
     await store.put({
       namespace: 'entity' as CacheNamespace,

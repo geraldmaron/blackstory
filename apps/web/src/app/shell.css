@@ -1857,7 +1857,8 @@ html:has([data-surface='instrument']) {
 
 /* —— The persistent map plate ——————————————————————————————————————————————————————
    `.ds-map-stage` is `MapStage.tsx`'s sole canvas mount: one fixed, full-viewport plate that
-   outlives navigation (ADR-017). It used to be styled from the `(map)` route group's sheet,
+   outlives navigation (`docs/decisions-carryover.md`, "Persistent map canvas"). It used to be
+   styled from the `(map)` route group's sheet,
    which stopped reaching it the moment the provider was hoisted to the root shell — the plate
    renders as a sibling of `.ds-shell`, not a descendant of the group's `.ds-map-surface`, so
    every descendant rule and every inherited `--ds-explore-*` custom property silently stopped
@@ -1912,9 +1913,10 @@ html:has([data-surface='instrument']) {
    It only reproduces after visiting Explore first: on a cold load of a reading room GL was
    never constructed, so the plate showed its flat paper fallback and the bug stayed invisible.
 
-   Covering the plate rather than hiding it keeps the persistence contract in ADR-017 — the
-   MapLibre instance is never touched, so returning to the Instrument does not rebuild it, and
-   no resize observer fires against a hidden container. */
+   Covering the plate rather than hiding it keeps the persistence contract
+   (`docs/decisions-carryover.md`, "Persistent map canvas"): the MapLibre instance is never
+   touched, so returning to the Instrument does not rebuild it, and no resize observer fires
+   against a hidden container. */
 /* —— Framed ————————————————————————————————————————————————————————————————————
    The plate, borrowed into a bounded in-flow slot published by a MapMoment. MapStage writes the
    four custom properties from the slot's clamped viewport rect on each scroll frame; the plate

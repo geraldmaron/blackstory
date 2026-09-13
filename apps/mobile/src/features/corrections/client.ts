@@ -31,7 +31,8 @@ import {
 } from './validation';
 
 export type CorrectionClientDeps = {
-  /** Submissions-surface base URL (apps/api-submissions per ADR-021 §3). */
+  /** Submissions-surface base URL — `apps/api-submissions`, never `apps/api-public`
+   * (`docs/decisions-carryover.md`, "ADR-021's two invariants": the submissions surface). */
   readonly baseUrl: string;
   /** App version string for the `X-BlackStory-Client` floor header. */
   readonly clientVersion: string;

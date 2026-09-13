@@ -15,7 +15,7 @@ async function seedEntry(store: ReturnType<typeof createMemoryStore>, key = 'e1'
   });
 }
 
-describe('runMigrations — drop-and-rebuild (ADR-022 §5)', () => {
+describe('runMigrations — drop-and-rebuild (carryover: "Mobile cache and OTA release")', () => {
   it('rebuilds on a first launch (absent schema version) and marks clean', async () => {
     const store = createMemoryStore();
     const outcome = await runMigrations(store, CACHE_SCHEMA_VERSION);

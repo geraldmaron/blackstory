@@ -1,5 +1,6 @@
 /**
- * Release-stamp freshness comparison (MOB-009 / ADR-022 §4; threat-model T5).
+ * Release-stamp freshness comparison (MOB-009; `docs/decisions-carryover.md`, "Mobile cache
+ * and OTA release": the single global release stamp; threat-model T5).
  *
  * VENDORED from `packages/domain/src/publication/mobile-bootstrap.ts`
  * (`isReleaseStampStale`) because `@repo/domain` is not importable from
@@ -9,9 +10,10 @@
  * regardless of TTL, and an absent client stamp (first launch, or a wiped
  * cache) is treated as stale so nothing stale-by-default is ever trusted.
  *
- * ADR-022 §4 resolution: a SINGLE GLOBAL stamp governs all release-coupled
- * cache. We do NOT implement per-artifact stamps — that was explicitly rejected
- * by the ADR-022 red-team as premature. Rollback (server re-points to a prior
+ * The recorded resolution (`docs/decisions-carryover.md`, "Mobile cache and OTA release"): a
+ * SINGLE GLOBAL stamp governs all release-coupled cache. We do NOT implement per-artifact
+ * stamps — that was explicitly rejected by the original red team as premature. Rollback
+ * (server re-points to a prior
  * release) is handled by the exact same equality check as roll-forward: the
  * stamp differs, so the cache invalidates. There is no special-casing and no
  * ordering assumption — we never assume stamps are monotonic, so a rollback to

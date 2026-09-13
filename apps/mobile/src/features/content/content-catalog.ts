@@ -16,9 +16,14 @@
  * History/Methodology/About prose below restates real, already-public copy from
  * `apps/web/src/app/about/page.tsx` and `apps/web/src/app/methodology/MethodologySections.tsx`
  * (condensed to plain paragraphs — no bespoke definition-list/trust-constant components, which
- * live in `packages/domain` and must never be imported by mobile per ADR-021). Legal copy states
+ * live in `packages/domain` and are not reachable from mobile: mobile imports only client-safe
+ * subpaths of that package, and nothing lints the line — see `docs/decisions-carryover.md`,
+ * "ADR-021's two invariants": the client/server boundary). Legal copy states
  * only what the program's own accepted invariants already establish (CLAUDE.md's program
- * invariants, ADR-021/ADR-022) rather than fabricating legal commitments.
+ * invariants; `docs/decisions-carryover.md`, "ADR-021's two invariants", "Mobile data boundary"
+ * and "Mobile cache and OTA release") rather than fabricating legal commitments. One sentence of
+ * the bundled privacy page has since drifted past that rule — see "Mobile data boundary" for
+ * which one.
  */
 import type { CitationV1, ContentPageV1 } from './content-types';
 

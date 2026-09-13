@@ -19,9 +19,17 @@
 export interface NativeUpdatesSurface {
   /** True once `expo-updates` has resolved whether an update server is configured. */
   readonly isEnabled: boolean;
-  /** Channel this binary's `eas.json` build profile was published under (ADR-024 §1). */
+  /**
+   * Channel this binary's `eas.json` build profile was published under
+   * (ADR-024 §1; restated in `docs/decisions-carryover.md`, "Mobile cache
+   * and OTA release").
+   */
   readonly channel: string | null;
-  /** EAS Update runtime version this binary was built with (ADR-024 §2). */
+  /**
+   * EAS Update runtime version this binary was built with (ADR-024 §2;
+   * restated in `docs/decisions-carryover.md`, "Mobile cache and OTA
+   * release").
+   */
   readonly runtimeVersion: string | null;
   /** Immutable OTA bundle id currently running, or `null` on the embedded/store bundle. */
   readonly updateId: string | null;

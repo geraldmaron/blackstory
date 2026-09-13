@@ -1,15 +1,21 @@
 #!/usr/bin/env node
 /**
  * Static forbidden-import scanner + Metro-bundle-smoke-test stand-in for
- * `@repo/public-contracts` (ADR-021 §1, MOB-003).
+ * `@repo/public-contracts` (MOB-003; `docs/decisions-carryover.md`, "ADR-021's two invariants":
+ * the public-contracts boundary).
  *
- * ADR-021 requires a compile-time CI gate — not a code-review convention — that fails on any
- * `node:*` built-in or server-only transitive dependency (`firebase-admin`,
- * `@repo/domain`, `@repo/security`, `@repo/firebase`'s server surface, or a
- * direct Firestore import) anywhere this package's shipped surface can reach. This script is
- * that gate, run as plain Node (no TypeScript compilation needed — it works by statically
- * regex-scanning import/require/dynamic-import specifiers, which is sufficient to catch every
- * forbidden specifier without needing a real bundler).
+ * The decision requires a compile-time CI gate — not a code-review convention — that fails on any
+ * `node:*` built-in or server-only dependency anywhere this package's shipped surface can reach.
+ * This script is that gate, and it runs as the first half of the package's own `test` script, so
+ * CI's "Run package tests" step (`pnpm -r --filter './packages/**' run --if-present test`) fires
+ * it on every change that reaches this package. Plain Node, no TypeScript compilation: it
+ * statically regex-scans import/require/dynamic-import specifiers, which catches every statically
+ * written specifier without needing a real bundler.
+ *
+ * The real gate is the ALLOWLIST below (`ALLOWED_EXTERNAL_SPECIFIERS`, `zod` only), not the named
+ * `FORBIDDEN_PACKAGE_SPECIFIERS` list — that list only improves the failure message. So
+ * `@repo/firebase` and a direct Firestore import fail too, reported as an unlisted external
+ * dependency rather than by name.
  *
  * Two passes:
  *
@@ -97,8 +103,9 @@ const FORBIDDEN_PACKAGE_SPECIFIERS = [
   '@repo/ops-data',
 ];
 
-/** The only runtime dependency this package is allowed to declare (ADR-021 §1: "dependency list
- * short enough to eyeball"). Any other non-relative specifier is a boundary violation even if it
+/** The only runtime dependency this package is allowed to declare — the "dependency list short
+ * enough to eyeball" rule in `docs/decisions-carryover.md`, "ADR-021's two invariants": the
+ * public-contracts boundary. Any other non-relative specifier is a boundary violation even if it
  * is not on the explicit forbidden list above — an allowlist, not a denylist, is the stricter and
  * therefore safer gate. */
 const ALLOWED_EXTERNAL_SPECIFIERS = new Set(['zod']);
@@ -147,7 +154,7 @@ function classifySpecifier(specifier, fromFile) {
     return null; // relative import — handled by the caller's own traversal
   }
   if (!ALLOWED_EXTERNAL_SPECIFIERS.has(specifier)) {
-    return `${relative(PACKAGE_ROOT, fromFile)}: unlisted external dependency "${specifier}" (only "zod" is allowed at runtime — ADR-021 §1)`;
+    return `${relative(PACKAGE_ROOT, fromFile)}: unlisted external dependency "${specifier}" (only "zod" is allowed at runtime — docs/decisions-carryover.md, "ADR-021's two invariants")`;
   }
   return null;
 }

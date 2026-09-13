@@ -273,9 +273,10 @@ function _radiusMetersToPixelsExpression(): ExpressionSpecification {
  *    (`EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID` below) an "orbit ring" marker.
  *  - `ring` (institution): mostly-hollow fill, thick Stone rim a literal ring.
  * MapLibre `circle`-type layers cannot render literal square/diamond geometry (no shape
- * parameter exists in the style spec), and this style has no icon sprite / glyph server to draw
- * true shapes via `symbol` layers (ADR-013 "known gaps" the exact reason
- * `EXPLORE_CLUSTER_COUNT_LAYER_ID` below is already a documented no-op). `MapExperienceLegend`
+ * parameter exists in the style spec), and this style declares no icon sprite, so no `symbol`
+ * layer could draw those true shapes either. Text symbol layers do work: the style sets `glyphs`
+ * to `OPENFREEMAP_GLYPHS_URL` and `EXPLORE_CLUSTER_COUNT_LAYER_ID` below renders live cluster
+ * counts through it, so the missing piece is a sprite, not a glyph server. `MapExperienceLegend`
  * renders the literal circle/square/diamond/ring shapes via CSS, which has no such limitation;
  * this fill/stroke vocabulary is the canvas-side echo of the same four glyph identities.
  */

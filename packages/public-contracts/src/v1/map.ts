@@ -2,7 +2,8 @@
  * Public map feature shape (GeoJSON point) — extracted from
  * `apps/web/src/lib/map-experience/build-explore-map-source.ts`'s `ExploreMapFeature` /
  * `ExploreMapFeatureProperties`, the dataset the web `/explore` map already renders and the
- * mobile MapLibre Native surface (MOB-011/MOB-012) targets per ADR-020 §2.
+ * mobile MapLibre Native surface (MOB-011/MOB-012) targets (`docs/decisions-carryover.md`,
+ * "Mobile stack": map).
  *
  * `evidenceCount` is carried over deliberately: the source comment documents it as "count of this
  * record's own already-publicly-enumerated accepted claims ... a transparency affordance, not a

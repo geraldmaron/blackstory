@@ -1,6 +1,7 @@
 /**
  * Postgres entity source + hash lookup for the embedding backfill CLI, replacing the
- * Firestore-backed sources in `backfill-sources.ts` after the Postgres cutover (ADR-020) —
+ * Firestore-backed sources in `backfill-sources.ts` after the Postgres cutover
+ * (`docs/decisions-carryover.md`, "entity source-of-truth precedence") —
  * `canonicalEntities`/`publicSearchIndex` no longer exist (`docs/data/firebase-wind-down.md`).
  *
  * Reads `bb_public.release_entities` for the currently active release: the same public

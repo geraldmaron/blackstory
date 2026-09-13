@@ -1,12 +1,13 @@
 'use client';
 
 /**
- * The persistent map canvas (ADR-017 "Persistent map canvas — one MapLibre instance
- * across hero and explore"). `MapStageProvider` mounts once in the root shell
- * (`components/SiteShell.tsx`), above every route, so it never remounts on navigation — only
- * the page tree beneath it swaps. That means this component's mount effect below runs exactly
- * once per page load: the WebGL context, loaded tiles, and camera all survive route changes by
- * construction, not by choreography.
+ * The persistent map canvas (`docs/decisions-carryover.md`, "Persistent map canvas").
+ * `MapStageProvider` mounts once in the root shell (`components/SiteShell.tsx`), above every
+ * route, so it never remounts on navigation: only the page tree beneath it swaps. That means
+ * this component's mount effect below runs exactly once per page load, and the WebGL context,
+ * loaded tiles, and camera all survive route changes by construction, not by choreography.
+ * The decision's own wording ("across hero and explore") predates the root-shell hoist: the
+ * canvas now outlives navigation to every route, not just the two map surfaces.
  *
  * The outer shape is a long-lived provider, not a props-driven component a page mounts and
  * unmounts: pages drive it through the imperative API (`patchData` / `applyViewState` /
@@ -15,8 +16,11 @@
  * `syncCircularMarkers`, …) sit behind that API; each export's own doc comment states its
  * contract.
  *
- * `maplibre-gl` (and its CSS) are only ever dynamically imported here — the app's ONE such
- * import (ADR-017 consequence).
+ * `maplibre-gl`'s runtime is only ever dynamically imported here, and this is the only module
+ * that constructs a map. `map-libre-lifecycle.test.ts` greps `apps/web/src` for
+ * `new maplibregl.Map` and fails if a second mount appears; every other module takes
+ * `import type` only (`docs/decisions-carryover.md`, "Persistent map canvas": one instance).
+ * The stylesheet is a plain static import below, not a dynamic one.
  */
 import {
   createContext,
@@ -262,7 +266,9 @@ export type MapStageHandle = {
   /** Patches the selected-state / selected-edge highlight filters (and the state-label
    * selection color) without touching source data or the style. */
   readonly applyViewState: (patch: MapStageViewPatch) => void;
-  /** The only sanctioned way to move the camera (ADR-017: "raw flyTo defaults are banned").
+  /** The sanctioned route for preset framing. Raw library defaults are policy-banned, though
+   * this file's own MapMoment framing effect is a confirmed live exception
+   * (`docs/decisions-carryover.md`, "Persistent map canvas": camera grammar).
    * Resolves `target` (an explicit center+zoom, or a bounding box via `cameraForBounds`), then
    * flies/eases/jumps according to `name`'s preset and the current reduced-motion state. */
   readonly flyPreset: (
@@ -290,8 +296,11 @@ export type MapStageHandle = {
    *
    * Deliberately narrow: `camera-moves.ts` drives the plate through a structural `MapLike`, and
    * this is how that library reaches the one persistent canvas. It is not an invitation to call
-   * `flyTo` directly — ADR-017's ban on raw camera calls still holds, and `flyPreset` remains the
-   * route for preset framing.
+   * `flyTo` with library defaults through THIS handle. A caller that reaches past `flyPreset`
+   * owes the move its own authored duration, curve and easing, the way `camera-moves.ts` does
+   * (`docs/decisions-carryover.md`, "Persistent map canvas": camera grammar). This file's own
+   * MapMoment framing effect reaches the map directly, not through this handle, and is a
+   * confirmed exception to that norm today. `flyPreset` remains the route for preset framing.
    */
   readonly getMap: () => AtlasCameraTarget | null;
 };
@@ -1788,8 +1797,10 @@ export function MapStageProvider({
 
   return (
     <MapStageContext.Provider value={handle}>
-      {/* The sole persistent canvas element (ADR-017). `.ds-map-stage` is a fixed full-viewport
-          plate behind page chrome (map-surfaces.css); `maplibregl.Map`'s `container` must be a
+      {/* The sole persistent canvas element (`docs/decisions-carryover.md`, "Persistent map
+          canvas"). `.ds-map-stage` is a fixed full-viewport plate behind page chrome, styled
+          from `app/shell.css` (the sheet the root layout loads on every route) since the
+          provider was hoisted out of the map route group; `maplibregl.Map`'s `container` must be a
           separate inner div, never the plate itself — MapLibre stamps its own `maplibregl-map`
           class onto whatever container it's given, and maplibre-gl.css hard-codes
           `position: relative` on that class, which would silently clobber the plate's

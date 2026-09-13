@@ -9,20 +9,26 @@
  *
  * Two adapters ship here:
  * 1. `createInMemoryPublicDataAccess` — a REAL, fully-tested implementation used by the handler
- *    tests and legitimately usable as the ADR-004 degraded/immutable-snapshot source (it reads a
- *    fixed set of already-released, already-redacted public projections held in memory).
+ *    tests and usable as a degraded/immutable-snapshot source (it reads a fixed set of
+ *    already-released, already-redacted public projections held in memory). It is not one today:
+ *    `./compose.ts` builds it with `{ entities: [] }` when the live-Postgres gate fails, so an
+ *    unconfigured deployment returns `UPSTREAM_UNAVAILABLE` rather than serving a snapshot. See
+ *    `docs/decisions-carryover.md`, "Public projection and immutable publication snapshots".
  * 2. `createPublicDataAccessFromReaders` — binds the port to injected public projection readers + a
  *    projection→DTO mapper. The readers are injected, not invented here, so this module never
  *    imports a server-only storage shape it would have to redact; the concrete live binding (real
  *    Postgres `bb_public` reads + the projection→`EntityV1` mapper) lives in
  *    `./postgres-data-access.ts` and `./projection-mapping.ts`, and is selected at runtime by
- *    `./compose.ts` per `./live-policy.ts`'s live/fixture gate (ADR-020 SoR cutover; Postgres is
+ *    `./compose.ts` per `./live-policy.ts`'s live/fixture gate (the Postgres SoR cutover —
+ *    `docs/decisions-carryover.md`, "entity source-of-truth precedence"; Postgres is
  *    the only live path — see that file's header for what remains a documented gap, e.g. `related`
  *    hydration and index-backed search).
  *
  * All entity data returned by any adapter is validated against the shared `entityV1Schema` before
- * it leaves this module, so the response-redaction guarantee (no internal/ranking/precise-geo
- * fields — ADR-021 §3) holds regardless of adapter: the zod parse strips any unknown field.
+ * it leaves this module, so the response-redaction guarantee (no internal/ranking field, and no
+ * precision tier finer than `institution` — `docs/decisions-carryover.md`, "ADR-021's two
+ * invariants": public-response redaction) holds regardless of adapter: the zod parse strips any
+ * unknown field.
  */
 import {
   runPublicSearch,
@@ -52,8 +58,9 @@ export type SearchPage = {
 };
 
 export interface PublicDataAccess {
-  /** The active release pointer + optional index/content versions (ADR-004 active-release
-   * pointer). `undefined` signals no released data is available yet (pre-release bootstrap). */
+  /** The active release pointer + optional index/content versions. Exactly one release is active
+   * at a time (`bb_public.active_release` is a single row). `undefined` signals no released data
+   * is available yet (pre-release bootstrap). */
   getReleasePointer(): Promise<ReleasePointer | undefined>;
   /**
    * A single published entity. Returns `undefined` for BOTH a nonexistent id AND an id that exists
@@ -97,13 +104,13 @@ export const EMPTY_FACETS: SearchFacetCountsV1 = {
 };
 
 // ---------------------------------------------------------------------------
-// In-memory adapter (real, tested; also the ADR-004 degraded-snapshot source)
+// In-memory adapter (real, tested; the degraded-snapshot shape, unpopulated in production)
 // ---------------------------------------------------------------------------
 
 export type InMemoryPublicDataOptions = {
   /**
    * Omit when no active release is configured — `getReleasePointer` then honestly reports
-   * `undefined` (ADR-004 pre-release bootstrap) instead of fabricating one. This is the default
+   * `undefined` (pre-release bootstrap) instead of fabricating one. This is the default
    * fallback `./compose.ts` uses when the runtime environment does not satisfy the live-Postgres
    * gate (`./live-policy.ts`): an unconfigured deployment returns `UPSTREAM_UNAVAILABLE` rather
    * than silently serving stale/fake sample data as if it were a real release.
@@ -236,8 +243,9 @@ function mapSearchExecutionToPage(execution: SearchExecutionResult): SearchPage 
 }
 
 /** Projects a published `EntityV1` into a `SearchResultV1`. Deliberately carries NO numeric
- * relevance/evidence score — results explain WHY they match in words, never a number (ADR-021 §3;
- * mirrors `search.ts`'s own exclusion). */
+ * relevance/evidence score — results explain WHY they match in words, never a number
+ * (`docs/decisions-carryover.md`, "ADR-021's two invariants": public-response redaction; mirrors
+ * `search.ts`'s own exclusion, and asserted by `redaction.test.ts`). */
 function toSearchResult(entity: EntityV1, needle: string): SearchResultV1 {
   const matchedInName = needle.length === 0 || entity.displayName.toLowerCase().includes(needle);
   return {

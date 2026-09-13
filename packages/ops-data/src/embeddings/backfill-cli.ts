@@ -3,7 +3,8 @@
  *
  * 2026-08-14: live source and store are Postgres (`bb_public.release_entities` /
  * `bb_canonical.entity_embeddings` via `@repo/data-access`'s ops pool) after the Postgres
- * cutover (ADR-020) `canonicalEntities`/`publicSearchIndex` no longer exist in Firestore
+ * cutover (`docs/decisions-carryover.md`, "entity source-of-truth precedence")
+ * `canonicalEntities`/`publicSearchIndex` no longer exist in Firestore
  * (docs/data/firebase-wind-down.md). Run:
  * GEMINI_API_KEY=... DATABASE_URL=... node --conditions development --import tsx \
  * packages/ops-data/src/embeddings/backfill-cli.ts --max-items 500 --max-cost-usd 1

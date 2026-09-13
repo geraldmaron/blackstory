@@ -3,7 +3,7 @@
  *
  * Sits above the `CacheStore` port and the cache policy. Responsibilities:
  *   - Write cached artifacts with the never-cache guard + size accounting +
- *     LRU eviction (ADR-022 §2).
+ *     LRU eviction (`docs/decisions-carryover.md`, "Mobile cache and OTA release").
  *   - Read cached artifacts, honoring release-stamp servability (§4): a row
  *     written under a superseded stamp is NOT served and is dropped
  *     (threat-model T5 rollback-replay).
@@ -14,7 +14,7 @@
  *     X", degraded), never presenting stale as live.
  *
  * Server state lives ONLY here / in TanStack Query — never duplicated into
- * Zustand (ADR-022 §1).
+ * Zustand (same section: server state is never duplicated into the UI store).
  */
 import { assertCacheSafe, evictIfOverCeiling, hashSearchKey } from './cache-policy';
 import { hexEquals, sha256Hex, utf8ByteLength } from './hashing';
@@ -69,7 +69,8 @@ export interface ReleaseCache {
   getActiveStamp(): Promise<string | undefined>;
 
   /**
-   * Global release-stamp invalidation (ADR-022 §4). If the server stamp differs
+   * Global release-stamp invalidation (`docs/decisions-carryover.md`, "Mobile cache and
+   * OTA release"). If the server stamp differs
    * from what we stored, drop ALL release-coupled rows written under other
    * stamps and record the new stamp. Idempotent + safe to call concurrently
    * (bootstrap-sync serializes callers). Returns rows invalidated.

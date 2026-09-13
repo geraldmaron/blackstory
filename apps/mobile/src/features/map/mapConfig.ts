@@ -8,7 +8,8 @@
  * Cost/dignity posture (see docs/adr/ADR-024-mobile-map-data.md):
  *  - Default basemap matches web Explore: free OpenFreeMap vector tiles
  *    (`tiles.openfreemap.org/planet`) — no per-tile vendor fees.
- *  - Optional self-hosted Protomaps PMTiles (ADR-013/025 target) via
+ *  - Optional self-hosted Protomaps PMTiles (the target recorded in
+ *    `docs/decisions-carryover.md`, "Map stack": tile strategy; also ADR-025) via
  *    `extra.map.pmtilesUrl` when a U.S. archive is published on CDN.
  *  - `MAP_BASEMAP_ENABLED` is the kill-switch: when false, no tile source is
  *    attached at all, so the map renders entity points over a flat dark canvas
@@ -19,10 +20,11 @@
 import Constants from 'expo-constants';
 
 /**
- * Attribution required by the basemap's data license, mirrored from ADR-013's
- * web requirement. OpenStreetMap data is ODbL — attribution is a license
- * obligation, not a nicety, and MUST stay visible on the native map screen
- * (see MapAttribution). OpenFreeMap / OpenMapTiles / Protomaps are basemap
+ * Attribution required by the basemap's data license, mirrored from the web Explore
+ * style's own attribution line (the OpenFreeMap source's `attribution` in
+ * `apps/web/src/app/map/explore-style.ts`). OpenStreetMap data is ODbL — attribution
+ * is a license obligation, not a nicety, and MUST stay visible on the native map
+ * screen (see MapAttribution). OpenFreeMap / OpenMapTiles / Protomaps are basemap
  * build/format lineages depending on which source is active.
  */
 export const OSM_ATTRIBUTION = '© OpenStreetMap contributors';
@@ -91,7 +93,8 @@ const extra = readMapExtra();
 
 /**
  * Optional self-hosted PMTiles archive. When set, MapLibre Native reads it via
- * `pmtiles://` HTTPS range requests (ADR-025). Empty-string is treated as unset.
+ * `pmtiles://` HTTPS range requests (`docs/decisions-carryover.md`, "Explore basemap and
+ * live map source"). Empty-string is treated as unset.
  */
 export const MAP_PMTILES_URL: string | null = sanitizeHttpUrl(extra.pmtilesUrl);
 
@@ -130,11 +133,14 @@ export const MAP_ATTRIBUTION_LINES_COMPACT: readonly string[] = MAP_PMTILES_URL
   : [OSM_ATTRIBUTION, OPENFREEMAP_ATTRIBUTION];
 
 /**
- * Migration threshold (ADR-024, mirroring ADR-013's ~2 MB budget): the per-point
- * data ships as a flat GeoJSON FeatureCollection until it crosses this budget,
- * at which point the per-point data moves to PMTiles/vector tiles rather than
- * growing the flat file. Documented here as a machine-checkable constant so a
- * future release-size guard can assert against it.
+ * Migration threshold (ADR-024, mirroring the ~2 MB flat-GeoJSON budget in
+ * `docs/decisions-carryover.md`, "Map stack": size budgets): the per-point data ships
+ * as a flat GeoJSON FeatureCollection until it crosses this budget, at which point the
+ * per-point data moves to PMTiles/vector tiles rather than growing the flat file.
+ * Nothing asserts against this constant yet. The one release-time size gate that
+ * actually fires is `DEFAULT_BOUNDED_POINTS_BUDGET` in
+ * `packages/domain/src/publication/release-activation.ts`, and it covers
+ * `map/bounded-points.json` only.
  */
 export const MAP_FLAT_GEOJSON_MAX_GZIP_BYTES = 2 * 1024 * 1024;
 export const MAP_FLAT_GEOJSON_MAX_FEATURE_COUNT = 50_000;

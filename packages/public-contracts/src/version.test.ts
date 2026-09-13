@@ -12,7 +12,7 @@ test('API_VERSION and MIN_SUPPORTED_API_VERSION are both v1 today', () => {
   assert.equal(MIN_SUPPORTED_API_VERSION, 'v1');
 });
 
-test('deprecation window floor is documented as 90 days (ADR-021 §2)', () => {
+test('deprecation window floor is documented as 90 days', () => {
   assert.equal(DEPRECATION_WINDOW_DAYS, 90);
 });
 

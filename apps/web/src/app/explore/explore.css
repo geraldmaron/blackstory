@@ -710,12 +710,13 @@
    MapLibre pan/zoom only where chrome intentionally passes hits through (the gaps between
    Surface panels). Never set `pointer-events: none` on a text column that sits over the
    live plate — that routes swipe to the map instead of the document. —— */
-/* —— Hero dissolve (ADR-017 "Transition contract") — token-driven, opacity/translate only, no
-   layout thrash. Reduced motion still applies this class (React state is unconditional) but the
-   duration collapses to an instant cut via the media query below. ——  */
-
-/* —— Explore enter (Agent B / ADR-017): panels fade in after hero dissolve — opacity/translate
-   only, compositor-friendly; reduced motion is an instant cut. —— */
+/* —— Explore enter: panels fade in, opacity/translate only, compositor-friendly; reduced
+   motion is an instant cut. This is the last surviving fragment of the hero-dissolve transition
+   contract the map decision described (`docs/decisions-carryover.md`, "Persistent map canvas":
+   the transition contract did not survive). The hero-dissolve class the block here used to
+   describe is not in this sheet at all, and nothing in `apps/web/src` sets
+   `.ds-explore-stage--entering`, so the rules below are currently unreachable. Rewire or delete
+   them; do not read them as live. —— */
 @keyframes ds-explore-panel-enter {
   from {
     opacity: 0;

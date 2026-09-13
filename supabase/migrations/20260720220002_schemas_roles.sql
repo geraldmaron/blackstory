@@ -1,4 +1,4 @@
--- 0002_schemas_roles: private bb_* schemas + USAGE grants (ADR-020).
+-- 0002_schemas_roles: private bb_* schemas + USAGE grants (docs/data/postgres-schema.md).
 -- Product tables must not live in public.
 
 CREATE SCHEMA IF NOT EXISTS bb_auth;

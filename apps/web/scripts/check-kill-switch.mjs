@@ -2,8 +2,10 @@
 /**
  * Reads a single row from bb_ops.kill_switches and prints "engaged" or "disengaged" to stdout.
  * Postgres-native replacement for the Firestore `killSwitches/{id}` read the old Firebase
- * Functions scheduler used (functions/src/kill-switch-env.ts, ADR-018). Fails closed
- * (prints "engaged") on any error or missing row, matching the Firestore fail-closed behavior.
+ * Functions scheduler used, since retired along with the rest of functions/ (repo-348e.8;
+ * see docs/decisions-carryover.md, "Small recovered decisions": Firebase scheduled
+ * Functions). Fails closed (prints "engaged") on any error or missing row, matching the
+ * Firestore fail-closed behavior.
  *
  * Usage: node scripts/check-kill-switch.mjs <kill-switch-id>
  * Requires DATABASE_URL (or APP_DATABASE_URL) in the environment.

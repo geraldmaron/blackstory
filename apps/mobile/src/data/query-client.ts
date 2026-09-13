@@ -1,15 +1,16 @@
 /**
- * TanStack Query client + SQLite-backed persister (MOB-009 §2; ADR-022 §1/§2).
+ * TanStack Query client + SQLite-backed persister (MOB-009 §2; `docs/decisions-carryover.md`,
+ * "Mobile cache and OTA release").
  *
- * TanStack Query is the in-memory HOT tier for server state (ADR-022 §1 — server
- * state lives here, NEVER duplicated into Zustand). This module adds the COLD
+ * TanStack Query is the in-memory HOT tier for server state (that section's state split —
+ * server state lives here, NEVER duplicated into Zustand). This module adds the COLD
  * cross-launch tier by persisting the query cache THROUGH the same `CacheStore`
  * SQLite store the rest of the data layer uses.
  *
  * Why a CUSTOM persister rather than an off-the-shelf one: the maintained
  * persisters target AsyncStorage/localStorage, not our release-stamped,
  * size-capped SQLite store. A minimal custom persister that writes one meta row
- * keeps a single storage story (ADR-022 rejects fragmenting across AsyncStorage/
+ * keeps a single storage story (the cache decision rejects fragmenting across AsyncStorage/
  * MMKV) and — crucially — lets us apply the NEVER-CACHE exclusion at dehydrate
  * time so no sensitive query key/data is ever persisted (§9).
  *
@@ -71,7 +72,8 @@ export function createSqlitePersister(store: CacheStore): Persister {
 
 /**
  * Default client. `staleTime` is longer for immutable released entity data and
- * shorter for search (ADR-022 §2 staleness table). Retries are disabled here
+ * shorter for search (`docs/decisions-carryover.md`, "Mobile cache and OTA release": TTL is a
+ * soft revalidation hint, the release stamp is the hard signal). Retries are disabled here
  * because our typed transport (transport.ts) owns bounded backoff/jitter — we do
  * not want TanStack's retry stacked on top of the transport's.
  */

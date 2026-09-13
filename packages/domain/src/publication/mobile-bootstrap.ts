@@ -1,6 +1,7 @@
 /**
- * Mobile cold-start bootstrap manifest (MOB-005 — completes the release-activation integration
- * ADR-013 describes but does not implement).
+ * Mobile cold-start bootstrap manifest (MOB-005 — implements the release-activation integration
+ * that was designed but left unwired; see `docs/decisions-carryover.md`, "Map stack":
+ * release-coupled build, which also records that nothing calls it outside tests yet).
  *
  * This is the SERVER-SIDE artifact that becomes an immutable, release-scoped, content-addressed
  * part of a publication release (see `./release-activation.ts`). The `/v1/bootstrap` handler in
@@ -79,7 +80,8 @@ export type MobileBootstrapManifest = {
   readonly schemaVersion: 1;
   /**
    * The one value the client compares against its cached stamp to decide global cache
-   * invalidation (ADR-022 §4). Content-derived (`releaseId@<manifestHashPrefix>`), never
+   * invalidation (`docs/decisions-carryover.md`, "Mobile cache and OTA release").
+   * Content-derived (`releaseId@<manifestHashPrefix>`), never
    * clock-derived, so an identical stamp is a strong "identical content" guarantee and a
    * mismatch is the authoritative freshness signal regardless of TTL or clock skew.
    */
@@ -248,7 +250,8 @@ export function toReleasePointer(manifest: MobileBootstrapManifest): BootstrapRe
 }
 
 /**
- * ADR-022 §4 staleness check. Returns true when the client's last-seen stamp differs from the
+ * Release-stamp staleness check (`docs/decisions-carryover.md`, "Mobile cache and OTA
+ * release"). Returns true when the client's last-seen stamp differs from the
  * server's current stamp — the client MUST then treat all release-coupled cache (entities,
  * evidence, search results, map GeoJSON) as invalid. An absent client stamp (first launch) is
  * treated as stale so nothing stale-by-default is ever trusted.

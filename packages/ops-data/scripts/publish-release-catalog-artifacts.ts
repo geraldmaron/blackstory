@@ -1,6 +1,7 @@
 /**
  * Publish the active release's catalog artifacts (`entities.json` + `search-index.json`)
- * to the Supabase `public-media` bucket (ADR-004 read-through cache; repo-csw0).
+ * to the Supabase `public-media` bucket (read-through cache; repo-csw0;
+ * `docs/decisions-carryover.md`, "Public projection and immutable publication snapshots").
  *
  * Reads `bb_public.*` for the active release, builds the aggregate artifacts with
  * `buildReleaseCatalogArtifacts`, and upserts them at

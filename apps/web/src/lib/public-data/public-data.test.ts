@@ -86,7 +86,7 @@ test('shouldUseLivePublicProjections enables postgres mode when DATABASE_URL is 
   assert.equal(isPostgresPublicDataSource({ PUBLIC_DATA_SOURCE: 'postgres' }), true);
 });
 
-test('postgres mode uses ADR-004 release artifacts only behind an explicit origin', () => {
+test('postgres mode uses release-catalog artifacts only behind an explicit origin', () => {
   // Regression: local rel_seed_001 entities.json is a 684-entity slice; Postgres has 1103+.
   // Without a configured origin, postgres mode must never pick up fixture artifacts.
   assert.equal(shouldPreferReleaseArtifacts({ PUBLIC_DATA_SOURCE: 'postgres' }), false);
