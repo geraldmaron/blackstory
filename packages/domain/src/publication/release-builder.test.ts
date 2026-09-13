@@ -1720,9 +1720,12 @@ test('the racial-terror killing vocabulary counts as stating the killing', () =>
 
 /*
  * repo-15slz. Inclusion notes are built by joining a sentence-cased predicate to its claim object.
- * That is right when the object is the lowercase continuation the format was designed for, and
- * wrong when the object is prose that opens by repeating the predicate's own verb — which is how
- * "Born in Born into slavery on April 5, 1856" reached the public "why this appears" surface.
+ * That is right only when the object is the lowercase continuation the format was designed for,
+ * and the measurement says that shape is a minority: over rel_20260723_authority_net_001, 5,533 of
+ * 12,137 claim objects (45.6%) open lowercase and 6,175 (50.9%) open with a capital. Two defects
+ * followed, and both reached the public "why this appears" surface. Shape (a), below, is prose
+ * that opens by repeating the predicate's own verb — "Born in Born into slavery on April 5, 1856".
+ * Shape (b), further down, is prose that is already a sentence of its own.
  *
  * Every pair below is real, taken from the active release.
  */
@@ -1787,6 +1790,87 @@ test('a shared word that is not the predicate verb still joins normally', () => 
     ),
     'Resettled liberated Africans after 1807 Africans freed by Royal Navy.',
   );
+});
+
+/*
+ * repo-15slz shape (b), the bulk of the defect: the object is not a continuation at all but a
+ * sentence of its own, so joining the predicate onto its front leaves a dangling fragment in
+ * front of a complete sentence — "First to In 1977, President Carter appointed Young …". Measured
+ * over rel_20260723_authority_net_001 on 2026-09-13: 2,365 of the 6,105 published basis records
+ * were composed this way. Every pair below is real, taken from that release.
+ */
+test('a predicate is not joined onto an object that is already a sentence', () => {
+  for (const [predicate, object, expected] of [
+    [
+      'founded_in',
+      'Washington and a small group opened the Tuskegee Normal and Industrial School on July 4, 1881, in Tuskegee, Alabama, with no initial buildings or land.',
+      'Washington and a small group opened the Tuskegee Normal and Industrial School on July 4, 1881, in Tuskegee, Alabama, with no initial buildings or land.',
+    ],
+    [
+      'first_to',
+      'In 1977, President Carter appointed Young U.S. Ambassador to the United Nations, the first African American to hold the post.',
+      'In 1977, President Carter appointed Young U.S. Ambassador to the United Nations, the first African American to hold the post.',
+    ],
+    [
+      'elected_on',
+      'Young was elected to the U.S. House of Representatives from Georgia in 1972, becoming the first Black congressman from Georgia since Reconstruction.',
+      'Young was elected to the U.S. House of Representatives from Georgia in 1972, becoming the first Black congressman from Georgia since Reconstruction.',
+    ],
+    [
+      'organized',
+      'SNCC organized 1961 Freedom Rides to test desegregation of interstate travel, launched Southern voter registration campaigns from 1962 onward, and led the 1964 Mississippi Freedom Summer project.',
+      'SNCC organized 1961 Freedom Rides to test desegregation of interstate travel, launched Southern voter registration campaigns from 1962 onward, and led the 1964 Mississippi Freedom Summer project.',
+    ],
+    // The object opens with its own verb rather than a subject. No period ends it, so the
+    // trailing-punctuation signal cannot be what catches these two.
+    [
+      'hall_of_fame_inducted',
+      'Inducted into the Rock and Roll Hall of Fame in 2006 in the Performer category',
+      'Inducted into the Rock and Roll Hall of Fame in 2006 in the Performer category.',
+    ],
+    [
+      'received_honor_year',
+      'Presidential Medal of Freedom, awarded in 2009',
+      'Presidential Medal of Freedom, awarded in 2009.',
+    ],
+  ] as const) {
+    assert.equal(formatClaimInclusionNote(predicate, object), expected);
+  }
+});
+
+test('a capital-initial object that is only a noun phrase keeps its predicate', () => {
+  // The other half of shape (b): dropping the predicate here would publish a bare label. These
+  // are the shapes the rule must NOT touch, and all six are real pairs from the same release.
+  for (const [predicate, object, expected] of [
+    [
+      'included_in',
+      'National Register of Historic Places',
+      'Included in National Register of Historic Places.',
+    ],
+    ['issued_by', 'President John F. Kennedy', 'Issued by President John F. Kennedy.'],
+    [
+      'significant for',
+      'Black heritage, education, and architecture',
+      'Significant for Black heritage, education, and architecture.',
+    ],
+    [
+      'forbade',
+      'African Americans from visiting the post office or railroad station',
+      'Forbade African Americans from visiting the post office or railroad station.',
+    ],
+    // A trailing period that belongs to an abbreviation is not a sentence ending.
+    ['killed', 'Daniel L. Simmons Sr.', 'Killed Daniel L. Simmons Sr.'],
+    ['location', 'Washington, D.C.', 'Location Washington, D.C.'],
+    // A capital-initial DATE is a continuation of the predicate, not a sentence, even when a
+    // clause follows it.
+    [
+      'decided_on',
+      'April 1, 1935, 294 U.S. 587, in an 8-0 decision written by Chief Justice Charles Evans Hughes',
+      'Decided on April 1, 1935, 294 U.S. 587, in an 8-0 decision written by Chief Justice Charles Evans Hughes.',
+    ],
+  ] as const) {
+    assert.equal(formatClaimInclusionNote(predicate, object), expected);
+  }
 });
 
 test('the continuation shape the format was designed for is unchanged', () => {

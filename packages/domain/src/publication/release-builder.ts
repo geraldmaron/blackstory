@@ -861,10 +861,13 @@ export function isNotabilityCriterion(value: string): value is NotabilityCriteri
 
 /**
  * Turns a claim predicate + object into one inclusion-evidence sentence.
- * Predicates are snake_case catalog keys (`served_as`, `bombed_on`); objects are usually
- * lowercase continuations authored to follow those keys. Sentence-case the predicate and join
- * without a colon so public copy reads as prose, not a field dump. Source names belong in the
- * citation list (evidenceIds), not inline in the note.
+ * Predicates are snake_case catalog keys (`served_as`, `bombed_on`); objects are EITHER a
+ * lowercase continuation authored to follow such a key, or a sentence the enrichment lane wrote
+ * that already stands on its own. Only the first of those may be joined to the predicate;
+ * joining the second is what produced "Founded in Washington and a small group opened …". When
+ * the two are joined, the predicate is sentence-cased and joined without a colon so public copy
+ * reads as prose, not a field dump. Source names belong in the citation list (evidenceIds), not
+ * inline in the note.
  */
 /**
  * Function words carry no verb meaning, so a predicate and an object sharing one is not a repeat.
@@ -907,12 +910,216 @@ function predicateLeadWord(lead: string): string {
   return '';
 }
 
+/**
+ * Verb forms a claim object opens or carries when it is a sentence of its own. Regular forms are
+ * caught by the `-ed` test in `isObjectVerbForm`; this set exists for the irregulars that test
+ * cannot see ("won", "led", "became", "known"). Like `PREDICATE_FUNCTION_WORDS` it is kept small
+ * on purpose and is not an attempt to parse English — it only has to separate "Young was elected
+ * to the U.S. House" from "National Register of Historic Places".
+ */
+const OBJECT_VERB_FORMS = new Set([
+  'are',
+  'began',
+  'begun',
+  'beat',
+  'became',
+  'become',
+  'bore',
+  'born',
+  'bought',
+  'broke',
+  'brought',
+  'built',
+  'came',
+  'can',
+  'caught',
+  'chose',
+  'chosen',
+  'could',
+  'cut',
+  'did',
+  'do',
+  'does',
+  'drew',
+  'driven',
+  'drove',
+  'fell',
+  'felt',
+  'fought',
+  'found',
+  'gave',
+  'given',
+  'got',
+  'grew',
+  'grown',
+  'had',
+  'has',
+  'have',
+  'held',
+  'hit',
+  'is',
+  'kept',
+  'knew',
+  'known',
+  'led',
+  'left',
+  'lost',
+  'made',
+  'may',
+  'met',
+  'might',
+  'must',
+  'paid',
+  'put',
+  'ran',
+  'read',
+  'rose',
+  'said',
+  'sang',
+  'sat',
+  'saw',
+  'seen',
+  'sent',
+  'set',
+  'shall',
+  'shot',
+  'should',
+  'shown',
+  'sold',
+  'spoke',
+  'stood',
+  'struck',
+  'swore',
+  'taken',
+  'taught',
+  'threw',
+  'told',
+  'took',
+  'was',
+  'went',
+  'were',
+  'will',
+  'won',
+  'wore',
+  'would',
+  'wrote',
+  'written',
+]);
+
+/** Month names. An object opening with one ("April 4, 1968, shot on the balcony …") is a date
+ * continuation of the predicate, not a sentence, even though it opens with a capital. */
+const OBJECT_DATE_LEAD_WORDS = new Set([
+  'january',
+  'february',
+  'march',
+  'april',
+  'may',
+  'june',
+  'july',
+  'august',
+  'september',
+  'october',
+  'november',
+  'december',
+]);
+
+/** Abbreviations whose trailing period ends a word, not a sentence — "Killed Daniel L. Simmons
+ * Sr." and "Location Washington, D.C." are names, and both need their predicate kept. */
+const OBJECT_TRAILING_ABBREVIATIONS = new Set([
+  'co.',
+  'dr.',
+  'inc.',
+  'jr.',
+  'mr.',
+  'mrs.',
+  'ms.',
+  'no.',
+  'sr.',
+  'st.',
+  'v.',
+  'vs.',
+]);
+
 function sentenceCase(text: string): string {
   return `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
 }
 
 function asSentence(text: string): string {
   return /[.!?]$/.test(text) ? text : `${text}.`;
+}
+
+/** A lowercase token that carries tense — the signal that an object has a verb of its own. */
+function isObjectVerbForm(word: string): boolean {
+  return OBJECT_VERB_FORMS.has(word) || /^[a-z]{2,}ed$/u.test(word);
+}
+
+/** "April 4, 1968, shot on the balcony of the Lorraine Motel" — a date, so a continuation. */
+function objectOpensWithADate(body: string): boolean {
+  const [first] = body.split(/[\s,]+/u);
+  return (
+    first !== undefined &&
+    OBJECT_DATE_LEAD_WORDS.has(first.toLowerCase()) &&
+    /^\w+\s+\d/u.test(body)
+  );
+}
+
+/** Terminal punctuation that is not an abbreviation's period. */
+function objectEndsASentence(body: string): boolean {
+  if (/[!?]$/u.test(body)) return true;
+  if (!/\.$/u.test(body)) return false;
+  const last = body.split(/\s+/u).at(-1) ?? '';
+  if (OBJECT_TRAILING_ABBREVIATIONS.has(last.toLowerCase())) return false;
+  // "U.S.", "D.C.", "L." — initials, whose period belongs to the name.
+  return !/^(?:[A-Za-z]\.)+$/u.test(last);
+}
+
+/** "Became the first Black president …", "Inducted into the Rock and Roll Hall of Fame …" — the
+ * object's own verb is its first word. The lowercase second word is what separates those from
+ * the proper-noun phrases "United States Supreme Court Building" and "Marked Tree, Arkansas". */
+function objectOpensWithItsOwnVerb(body: string): boolean {
+  const [first, second] = body.split(/\s+/u);
+  if (first === undefined || second === undefined) return false;
+  return (
+    isObjectVerbForm(first.replace(/[^A-Za-z]+$/u, '').toLowerCase()) && /^[a-z]/u.test(second)
+  );
+}
+
+/**
+ * A lowercase verb anywhere in the object — "Foster hurled complete game shutouts …".
+ *
+ * An `-ed` word does NOT count when it ends the object or is followed by "by", because those are
+ * the two positions where it is a passive participle modifying the noun in front of it rather
+ * than that noun's verb: "Africans freed BY Royal Navy" and "Between 62 and 153 Black men killed"
+ * are noun phrases and still need their predicate. Auxiliaries carry tense wherever they sit and
+ * are not subject to that test. Hyphenated tokens are skipped because "Black-owned" is an
+ * adjective, not a verb.
+ */
+function objectCarriesItsOwnVerb(body: string): boolean {
+  const tokens = body
+    .split(/\s+/u)
+    .map((raw) => raw.replace(/^[^A-Za-z-]+|[^A-Za-z-]+$/gu, ''))
+    .filter((token) => token.length > 0);
+  for (const [index, token] of tokens.entries()) {
+    if (token.includes('-') || token !== token.toLowerCase()) continue;
+    if (OBJECT_VERB_FORMS.has(token)) return true;
+    if (!/^[a-z]{2,}ed$/u.test(token)) continue;
+    const next = tokens[index + 1];
+    if (next !== undefined && next.toLowerCase() !== 'by') return true;
+  }
+  return false;
+}
+
+/**
+ * True when the object is a sentence in its own right, so the predicate must NOT be joined onto
+ * the front of it. An object that opens lowercase or with a digit is a continuation by
+ * construction and never reaches the tests below.
+ */
+function objectIsSelfStanding(body: string): boolean {
+  if (!/^\p{Lu}/u.test(body)) return false;
+  if (objectOpensWithADate(body)) return false;
+  return (
+    objectEndsASentence(body) || objectOpensWithItsOwnVerb(body) || objectCarriesItsOwnVerb(body)
+  );
 }
 
 export function formatClaimInclusionNote(predicate: string, object: string): string {
@@ -926,10 +1133,14 @@ export function formatClaimInclusionNote(predicate: string, object: string): str
   if (body.length === 0) return `${sentenceLead}.`;
 
   /*
-   * repo-15slz. This function's contract is that objects are "lowercase continuations authored to
-   * follow those keys", and for most of the corpus they are — "Listed on the National Register",
-   * "Founded year 1900". But the enrichment lane writes objects as prose, and prose that opens by
-   * repeating the predicate's own verb stutters when the two are joined:
+   * repo-15slz. An earlier spelling of this function assumed objects are "lowercase continuations
+   * authored to follow those keys" and said "for most of the corpus they are". Measured over the
+   * active release that was false: of 12,137 claim objects, 5,533 (45.6%) open lowercase, 6,175
+   * (50.9%) open with a capital and 404 with a digit. The designed shape is a MINORITY, and 3,885
+   * of the capital-initial objects are long enough to be whole clauses. Two defects followed.
+   *
+   * (a) DOUBLED VERB — the object opens by repeating the predicate's own verb, so joining the two
+   * stutters:
    *
    *   born_in            + "Born into slavery on April 5, 1856, ..."  -> "Born in Born into slavery ..."
    *   delivered          + "Delivered the 'Atlanta Compromise' ..."   -> "Delivered Delivered the ..."
@@ -954,6 +1165,31 @@ export function formatClaimInclusionNote(predicate: string, object: string): str
   if (objectLeadWord.length > 0 && predicateLeadWord(lead) === objectLeadWord) {
     return asSentence(body.length >= lead.length ? sentenceCase(body) : sentenceLead);
   }
+
+  /*
+   * (b) PREFIX RUN INTO A COMPLETE SENTENCE — the bulk of the defect, and the one shape (a) does
+   * not reach because the object's verb is not the predicate's:
+   *
+   *   first_to  + "In 1977, President Carter appointed Young U.S. Ambassador …"
+   *              -> "First to In 1977, President Carter appointed Young …"
+   *   founded_in + "Washington and a small group opened the Tuskegee Normal …"
+   *              -> "Founded in Washington and a small group opened the Tuskegee Normal …"
+   *
+   * The well-formed notes in this catalog already work by letting the object speak, so that is
+   * the rule: when the object is a sentence of its own, drop the predicate and publish the
+   * sentence. The predicate is not lost from the RECORD — the claim still renders in full under
+   * "what the sources say"; it is lost only from this one-sentence summary, which the object
+   * already states.
+   *
+   * `objectIsSelfStanding` is the whole guard, and it is deliberately asymmetric: it fires only
+   * on positive evidence of a verb or a sentence ending, so an object with neither — "National
+   * Register of Historic Places", "President John F. Kennedy", "Black heritage and education" —
+   * keeps its predicate and still reads as a sentence. Measured on the active release, of the
+   * 2,383 capital-initial objects reaching a published basis record it drops the predicate on
+   * 1,455 and keeps it on 928, and it keeps it on 559 of the 561 objects of 30 characters or
+   * less, which is where the bare noun phrases live.
+   */
+  if (objectIsSelfStanding(body)) return asSentence(body);
 
   return asSentence(`${sentenceLead} ${body}`);
 }

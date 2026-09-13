@@ -192,11 +192,31 @@ function escapeForRegExp(text: string): string {
  *   - punctuation and case, which covers the colon-form predicate lead ("led by: X." vs
  *     "Led by X.") and a doubled full stop.
  *
+ * A fourth, added by repo-15slz: `droppedLead`, the humanized predicate the builder now declines
+ * to join onto an object that is already a sentence of its own. A stored note that is the
+ * builder's note with exactly that lead still on the front is the same sentence, and refreshing
+ * it is the whole point of that fix — "Led legal campaign resulting in The NAACP's legal campaign
+ * culminated in …" becomes "The NAACP's legal campaign culminated in …". Measured on
+ * rel_20260723_authority_net_001 (2026-09-13): of the 1,605 published basis records whose note
+ * the new builder changes, 1,022 sit on a non-fallback criterion, so the merge keeps the stored
+ * record and only this test can refresh them. Without the lead the comparison is unchanged, so
+ * every caller that cannot name a predicate gets exactly the old behavior.
+ *
  * Everything else — a different verb, a different fact, a different length — survives
- * normalization and the stored note is left alone.
+ * normalization and the stored note is left alone. The Tubman case is still left alone: its
+ * stored note is a different sentence, not this sentence with a lead on it.
  */
-export function notesAreSameSentence(a: string, b: string, displayName: string): boolean {
-  return normalizeNote(a, displayName) === normalizeNote(b, displayName);
+export function notesAreSameSentence(
+  a: string,
+  b: string,
+  displayName: string,
+  droppedLead = '',
+): boolean {
+  const stored = normalizeNote(a, displayName);
+  const rebuilt = normalizeNote(b, displayName);
+  if (stored === rebuilt) return true;
+  const lead = normalizeNote(droppedLead, displayName);
+  return lead.length > 0 && stored === `${lead}${rebuilt}`;
 }
 
 function normalizeNote(note: string, displayName: string): string {
@@ -269,7 +289,13 @@ export function resolveNotabilityBasisForRow(
         evidenceKey(other.evidenceIds) === evidenceKey(record.evidenceIds),
     );
     if (candidate === undefined || candidate.note === record.note) return record;
-    if (!notesAreSameSentence(record.note, candidate.note, row.displayName)) return record;
+    // The lead the builder may have dropped (repo-15slz). Every claim behind one basis record
+    // shares a predicate by construction, so the first evidenced claim names it.
+    const evidencedClaim = row.claims.find((claim) => record.evidenceIds.includes(claim.id));
+    const droppedLead = evidencedClaim?.predicate.replaceAll('_', ' ').trim() ?? '';
+    if (!notesAreSameSentence(record.note, candidate.note, row.displayName, droppedLead)) {
+      return record;
+    }
     refreshedNotes.push({
       criterion: record.criterion,
       before: record.note,

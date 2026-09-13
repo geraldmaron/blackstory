@@ -15,6 +15,7 @@ import {
   encodeBasis,
   notabilityBasisIsConverged,
   notabilityLabelsForBasis,
+  notesAreSameSentence,
   planNotabilityBasisResync,
   type NotabilityBasisResyncClient,
   type NotabilityBasisResyncRow,
@@ -181,10 +182,64 @@ test('a note differing only by a colon lead and a trailing "Cited from" is refre
   const plan = planNotabilityBasisResync([subject]);
   assert.equal(plan.changes.length, 1);
   assert.equal(plan.changes[0]?.refreshedNotes.length, 1);
+  // repo-15slz: the object is already a sentence, so the builder no longer joins the predicate
+  // onto its front, and S2 recognizes the stored note as that sentence with the old lead still
+  // attached.
   assert.equal(
     plan.changes[0]?.refreshedNotes[0]?.after,
-    "Led legal campaign resulting in The NAACP's legal campaign culminated in the Supreme Court's " +
-      '1954 decision in Brown v. Board of Education.',
+    "The NAACP's legal campaign culminated in the Supreme Court's 1954 decision in Brown " +
+      'v. Board of Education.',
+  );
+});
+
+test('a stored note that is the builder sentence with the dropped predicate lead is refreshed', () => {
+  // repo-15slz, the shape the composer fix creates: the note is byte-identical to the builder's
+  // apart from the lead the builder now declines to join on. Real pair from the active release.
+  const subject = row({
+    entityId: 'ent_andrew_young_001',
+    kind: 'person',
+    displayName: 'Andrew Young',
+    claims: [
+      claim({
+        id: 'claim_andrew_young_001_02',
+        predicate: 'first_to',
+        object:
+          'In 1977, President Carter appointed Young U.S. Ambassador to the United Nations, ' +
+          'the first African American to hold the post.',
+        citationSource: 'nps.gov',
+      }),
+    ],
+    publishedBasis: [
+      {
+        criterion: 'first_to_do_x',
+        note:
+          'First to In 1977, President Carter appointed Young U.S. Ambassador to the United ' +
+          'Nations, the first African American to hold the post.',
+        evidenceIds: ['claim_andrew_young_001_02'],
+      },
+    ],
+  });
+
+  const plan = planNotabilityBasisResync([subject]);
+  assert.equal(plan.changes.length, 1);
+  assert.equal(
+    plan.changes[0]?.refreshedNotes[0]?.after,
+    'In 1977, President Carter appointed Young U.S. Ambassador to the United Nations, the ' +
+      'first African American to hold the post.',
+  );
+});
+
+test('a stored note that is a different sentence is not refreshed by the dropped-lead test', () => {
+  // The lead tolerance must not become a general prefix match: this stored note is curated prose,
+  // not the builder's sentence with a lead on it, and S2 has to leave it alone.
+  assert.equal(
+    notesAreSameSentence(
+      'First to Tubman led the Combahee River Raid.',
+      'Tubman guided Union forces up the Combahee River.',
+      'Harriet Tubman',
+      'first to',
+    ),
+    false,
   );
 });
 
