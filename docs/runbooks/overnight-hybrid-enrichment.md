@@ -1,5 +1,15 @@
 # Overnight research enrichment on Corsair
 
+> **RETIRED (2026-09-12, repo-w5lyf).** `scripts/run-overnight-hybrid-enrichment.sh` and its
+> systemd unit/timer have been deleted: the script's Wikimedia discovery phase called
+> `packages/firebase/scripts/discover-candidates.ts`, which no longer exists, and its candidate
+> pool (`bb_research.entity_candidates`) was empty. repo-6nr7 separately records that the
+> OpenRouter/Ollama enrichment strategy this runbook documents was superseded by the $0
+> session-subagent path (`session-enrich-prepare` → fan-out → collect → apply). The install and
+> monitor commands below target files that no longer exist — do not run them. This file is kept
+> only for the ledger-parity-cycle history that repo-atya's closing criteria still reference;
+> that bead should say whether parity tracking moves elsewhere or is retired with this lane.
+>
 > **Operator-specific — not for contributors.** This runbook documents Gerald's personal
 > "Corsair" workstation profile (hostname/IP below). Contributors running the harness on
 > their own machine do not need a local Ollama or SearXNG instance at all: use the mock

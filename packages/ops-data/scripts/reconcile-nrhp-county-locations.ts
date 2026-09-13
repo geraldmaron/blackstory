@@ -17,13 +17,16 @@
  * — see src/jurisdictions/tiger-gazetteer.ts) by the row's own County+State
  * fields (already present in the NPS dataset, not guessed), and publishes at
  * `locationPrecision: 'county'` — a first-class precision tier the app's
- * redaction policy (packages/security/src/redaction.ts PRECISION_RANK) and
- * map display layer (apps/web/src/lib/map-experience/geo-precision.ts,
- * `county` -> GeoPrecisionTier 'county') already support: the entity renders
- * with a genuine county-radius affordance circle, not a misleading exact
- * pin. County precision is coarser than the City value NPS already publishes
- * in the same public dataset, so restrictedAddress rows are not exposed
- * beyond what NPS itself discloses.
+ * redaction policy (packages/security/src/redaction.ts PRECISION_RANK)
+ * recognizes. The map display layer (apps/web/src/lib/map-experience/
+ * geo-precision.ts) maps `county` -> GeoPrecisionTier 'county', but
+ * `resolveDisplayRadiusMeters` has no county-bbox reference data wired yet
+ * and fails closed for that tier (`jurisdiction_bbox_unresolved`, asserted by
+ * geo-precision.test.ts) — so today the entity renders as a plain pin with
+ * no radius affordance, not the county-radius circle a future bbox source
+ * would draw. That fail-closed pin is still the honest choice here: coarser
+ * than the City value NPS already publishes in the same public dataset, so
+ * restrictedAddress rows are not exposed beyond what NPS itself discloses.
  *
  * Default is dry-run. Production writes require:
  *   DRY_RUN=0 NRHP_COUNTY_RECONCILE_APPLY=1 DATABASE_URL=postgresql://...

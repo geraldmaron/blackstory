@@ -6,6 +6,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
+import { detectDeficits } from '@repo/domain';
+
 import {
   type ReleasedEntity,
   assertionClassForClaim,
@@ -200,4 +202,73 @@ test('the audit never returns a commit or write affordance', () => {
   const report = auditReleasedEntities('rel_test', [entity()]);
   assert.equal(report.verb, 'research-quality-audit');
   assert.equal('committed' in report, false);
+});
+
+// -------------------------------------------------------- repo-93p35.16
+
+test('an invention record requires a technical receipt', () => {
+  const snapshot = snapshotForReleasedEntity(
+    entity({
+      kind: 'invention',
+      claims: [
+        {
+          id: 'c1',
+          claimRole: 'evidence',
+          predicate: 'patented',
+          object: 'a device',
+          citationHref: 'https://patents.google.com/patent/US252386A/en',
+        },
+      ],
+    }),
+  );
+  assert.equal(snapshot.requiresTechnicalReceipt, true);
+  assert.equal(snapshot.requiresCommunityIdentityReceipt, false);
+});
+
+test('a person record cited only to a patent requires an independent identity receipt', () => {
+  // The real shape of ent_lewis_latimer_001 and the other six person entities the active
+  // release cites to a patent host: the technical identity is settled and the relevance gate
+  // must not be.
+  const snapshot = snapshotForReleasedEntity(
+    entity({
+      kind: 'person',
+      claims: [
+        {
+          id: 'c1',
+          claimRole: 'evidence',
+          predicate: 'patented',
+          object: 'an improved carbon filament',
+          citationHref: 'https://patents.google.com/patent/US252386A/en',
+        },
+      ],
+    }),
+  );
+  assert.equal(snapshot.requiresCommunityIdentityReceipt, true);
+  const deficits = detectDeficits(snapshot);
+  assert.ok(deficits.some((d) => d.code === 'missing_identity_receipt'));
+  assert.ok(deficits.some((d) => d.code === 'patent_used_as_racial_identity_evidence'));
+});
+
+test('a person record with a non-patent source does not require an identity receipt', () => {
+  const snapshot = snapshotForReleasedEntity(
+    entity({
+      kind: 'person',
+      claims: [
+        {
+          id: 'c1',
+          claimRole: 'evidence',
+          predicate: 'born',
+          object: 'in Chelsea',
+          citationHref: 'https://www.nps.gov/x',
+        },
+      ],
+    }),
+  );
+  assert.equal(snapshot.requiresCommunityIdentityReceipt, false);
+});
+
+test('a non-inventor, non-person record requires neither receipt', () => {
+  const snapshot = snapshotForReleasedEntity(entity({ kind: 'place', claims: [] }));
+  assert.equal(snapshot.requiresTechnicalReceipt, false);
+  assert.equal(snapshot.requiresCommunityIdentityReceipt, false);
 });

@@ -1,11 +1,16 @@
 /**
- * State abbreviation label markers for the `/explore` national map ().
+ * State abbreviation label markers for the `/explore` national map.
  *
- * Rendered as HTML markers, not a MapLibre `symbol` layer: this style has no `glyphs` URL
- * configured (no self-hosted font/sprite server yet see ADR-013 "known gaps", the same reason
- * `explore-style.ts`'s cluster-count label is already a documented no-op) so a `text-field`
- * symbol layer would silently render nothing here. DOM markers sidestep that gap entirely and
- * are design-direction-v3.md's documented default for this label set.
+ * Rendered as HTML markers, not a MapLibre `symbol` layer — a deliberate choice, not a font/sprite
+ * gap: the style does supply a `glyphs` URL (`OPENFREEMAP_GLYPHS_URL` in `dignity-style.ts`), and
+ * `explore-style.ts`'s `plate-place-city` layer already renders city/town names as symbols off
+ * that same font server. State names stay off a symbol layer for two reasons a `text-field` layer
+ * can't replicate: (1) a label's ink is keyed to live selection state (`selected` below drives
+ * `stateLabelColors`), redrawn from app state on every selection change rather than from tile
+ * data; (2) a second symbol layer carrying the same 51 names would collide with
+ * `plate-place-city` in their shared 4.2-6.2 zoom band — see that layer's own comment in
+ * `explore-style.ts` for the recorded decision. DOM markers sidestep both, at the cost of the
+ * residual collision risk documented on `buildStateLabelElement` below.
  *
  * This module is pure data + a DOM-element factory; it never touches a live `maplibregl.Map`
  * instance mounting/positioning markers against a real map is the consuming surface's job (see
@@ -170,9 +175,19 @@ export function stateLabelColorsForScheme(colorScheme: MapColorScheme): {
  * never blocks a click reaching a marker or cluster beneath it), a modest fixed font size/line
  * box (small footprint), and the fact that these labels are only visible at national/regional
  * zoom (<= 6.2), where entities are still clustered (see `EXPLORE_CLUSTER_CONFIG.clusterMaxZoom`
- * = 9) rather than rendered as dense individual points. The mounting surface should stack these
+ * = 12) rather than rendered as dense individual points. The mounting surface should stack these
  * markers' DOM nodes below the entity/cluster marker layer (e.g. a lower z-index or insertion
  * order) as a further belt-and-suspenders measure.
+ *
+ * Residual risk this policy does NOT cover (repo-8lg3): `plate-place-city` (`explore-style.ts`)
+ * draws city/town symbol labels from `minzoom: 4.2`, inside this label's own visible band
+ * (<= 6.2, `STATE_LABEL_FADE_END_ZOOM`). In that shared 4.2-6.2 window a state marker and a city
+ * label can occupy overlapping screen space: MapLibre's placement engine keeps city labels from
+ * colliding with each other, but has no visibility into these DOM markers, so it cannot keep a
+ * city label from colliding with one. This is accepted as a documented residual risk of keeping
+ * state labels on DOM markers (see the module doc comment above) rather than solved — the only
+ * complete fix is retiring this file for a `plate-place-state` symbol layer, which was decided
+ * against for the reasons given there.
  */
 export function buildStateLabelElement(
   descriptor: StateLabelMarkerDescriptor,

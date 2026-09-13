@@ -125,6 +125,11 @@ export function sourceClassForCitation(
   return 'modern_reputable_secondary';
 }
 
+/** Whether a source class is one of the patent record classes — a technical, not a racial, record. */
+function isPatentSourceClass(sourceClass: SourceClass): boolean {
+  return sourceClass.startsWith('patent_');
+}
+
 /** Record verbs whose object is a fact about a document rather than an interpretation. */
 const RECORD_PREDICATES = new Set([
   'patented',
@@ -213,6 +218,14 @@ export function snapshotForReleasedEntity(entity: ReleasedEntity): RecordSnapsho
     };
   });
 
+  // Technical identity and Black-history relevance are two separate evidence requirements
+  // (repo-93p35.16). An invention record's technical claim needs a technical receipt; a person
+  // record whose only cited evidence is a patent needs an independent identity receipt, because
+  // the Patent Office never recorded inventor race and a patent cannot answer that question.
+  const citesPatentSource = claims.some((claim) =>
+    claim.evidence.some((item) => isPatentSourceClass(item.sourceClass)),
+  );
+
   return {
     entityId: entity.entityId,
     entityKind: entity.kind,
@@ -222,6 +235,8 @@ export function snapshotForReleasedEntity(entity: ReleasedEntity): RecordSnapsho
     priorArtSearchRun: false,
     placeReceipt: undefined,
     relationshipsWithoutEvidence: 0,
+    requiresTechnicalReceipt: entity.kind === 'invention',
+    requiresCommunityIdentityReceipt: entity.kind === 'person' && citesPatentSource,
     released: true,
   };
 }

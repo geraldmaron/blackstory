@@ -2,9 +2,10 @@
  * Confirms story-related entity cards (and about mosaic) use the thin batched
  * loader (`listPublicEntityViewsByIds`) without requiring full entity-page /
  * full-catalog hydration. The loader is live-Postgres-only (no seed fallback),
- * so request-order and dedup over real rows are covered by integration tests
- * (see repo tracker); here we cover the DB-independent behavior: empty/normalized
- * input and the bounded mosaic id set.
+ * so request-order and dedup over real rows are covered by
+ * `story-entity-cards.integration.test.ts` instead (repo-ihsw); here we cover
+ * the DB-independent behavior: empty/normalized input and the bounded mosaic
+ * id set.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

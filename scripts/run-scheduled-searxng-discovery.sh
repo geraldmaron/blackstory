@@ -18,7 +18,7 @@
 #   - Requires DISCOVERY_STORAGE_TERMS_CONFIRMED=true for live mode
 #   - Honors DISCOVERY_KILL_SWITCH (engaged → dispatcher skips)
 #   - Pause between queries (DISCOVERY_QUERY_PAUSE_SEC, default 4)
-#   - Stop overnight parent: systemctl --user stop blackstory-overnight-enrichment.service
+#   - Stop: systemctl --user stop blackstory-discovery-web-search.timer blackstory-discovery-web-search.service
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

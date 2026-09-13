@@ -1,7 +1,7 @@
 # Cost and resource exhaustion controls
 
 **Status:** Policy matrix + evaluators in-repo; GCP billing budgets and live queue/job provisioning are follow-on work (, ).
-**Depends on:** [admin App Hosting hardening](../../apphosting.admin.yaml), [Vercel public web (ADR-027)](../adr/ADR-027-vercel-public-web-hosting.md), [ ingress / Cloud Armor](./ingress-armor.md), [ rate limits](./rate-limits.md)
+**Depends on:** admin App Hosting hardening (retired 2026-09-11 — `apps/admin` folded into `apps/web`, see `docs/decisions-carryover.md`), Vercel public web hosting (ADR-027 — the record was purged from the repo 2026-07-24; no link target survives), [ingress / Cloud Armor](./ingress-armor.md), [rate limits](./rate-limits.md)
 **Threats:** [T-01](./threat-model.md#t-01-volumetric-and-application-layer-denial-of-service), [T-13](./threat-model.md#t-13-database-exhaustion-and-connection-starvation), [T-14](./threat-model.md#t-14-cloud-bill-exhaustion)
 
 ## Objective
@@ -34,7 +34,8 @@ Ensure a traffic spike, retry storm, or budget burn cannot scale every service w
 ## Build-time spend (Vercel)
 
 Every control above governs **runtime** resource exhaustion. The Aug 2026 invoice showed that is
-only half the surface: of $234.41 on Vercel, **$64.68 was Build CPU Minutes** (12d 23h) — the
+only half the surface: of $234.41 on Vercel, **$64.68 was Build CPU Minutes** (12d 23h, list price
+before volume discount — see the team-wide breakdown below for the billed figure) — the
 second-largest line, and one no evaluator in this document can see. Build spend is not a traffic
 spike; it scales with commit velocity, and this repo ran 437 commits in Aug 2026.
 
@@ -43,6 +44,54 @@ spike; it scales with commit velocity, and this repo ran 437 commits in Aug 2026
 no changed file can reach that project's deployed bundle. (Historically also wired in
 `apps/admin/vercel.json`, before admin folded into `apps/web` on 2026-09-11 — see
 `docs/decisions-carryover.md`.)
+
+### Team-wide cost attribution (corrected, 2026-09-12)
+
+The original version of this analysis (and the bead that tracked it, `repo-46hn`) scoped the Aug
+2026 invoice to two Vercel projects. The team `geralddagher-site/geraldmarons-projects` actually
+bills across six. Per-project **deploy counts** from `/v6/deployments` cap at 100 and can't settle
+that; per-project **billed cost** can, via the Vercel CLI's usage API:
+
+```bash
+vercel usage --from 2026-07-25 --to 2026-08-24 --group-by project --format json
+```
+
+(`2026-07-25` matches the invoice window this doc and `repo-46hn` cite. In this window the CLI's
+`pricingQuantity` — list cost before volume discount — for team-wide Build CPU Minutes is $65.07,
+which is what the $64.68 above and the `vercel-ignore-build.sh` header comment actually measured;
+`billedCost`, the post-discount figure below, is lower.)
+
+| Project | Billed cost | Share |
+|---------|-------------|-------|
+| `blackstory` | $188.59 | 79.9% |
+| `blackstory-admin` (retired 2026-09-11, decommission pending — `docs/decisions-carryover.md`) | $21.53 | 9.1% |
+| Unattributed (Pro plan base fee) | $20.00 | 8.5% |
+| `geralddagher-site` | $5.64 | 2.4% |
+| `phs-reunion` | $0.34 | 0.1% |
+| `qtscorner-site` | $0.02 | <0.1% |
+| `the-administration` | $0 | 0% |
+
+Team total in this window: $236.12 billed, against the $234.41 invoice figure this doc and the
+bead cite — the ~$1.71 gap is the UTC/LA-midnight query window not landing exactly on the
+provider's own billing-cycle cutoff, not a data error. `blackstory-api` (joined the team's
+deploying set 2026-09-10, `repo-rvf54`) has no Aug-2026 usage; it postdates this window.
+
+This settles `repo-46hn`'s three open items:
+
+1. **`geralddagher-site` is 2.4% of team spend, not "a comparable share of Build CPU Minutes to
+   blackstory"** as the bead originally worried. The deploy-count read (100+, API-capped)
+   overstated it — deploy count and Build CPU Minutes don't move together for a project whose
+   builds are small ($5.36 of $47.29 team-wide Build CPU, billed). Current data does not justify
+   extending `vercel-ignore-build.sh`'s `ignoreCommand` to it; revisit if its spend grows
+   materially.
+2. **Fast Origin Transfer and Fluid Active CPU are concentrated on `blackstory`**: $80.86 of the
+   team's $80.88 Fast Origin Transfer (99.97%) and $52.85 of $52.95 Fluid Active CPU (99.8%).
+   Crediting the Aug-22 atlas split's reduction in these two lines to `blackstory` alone is
+   correct; no other project's traffic dilutes it.
+3. **`blackstory-admin`'s $21.53 is almost entirely Build CPU Minutes** ($21.53 of its $21.53
+   total — everything else on that project rounds to zero), consistent with a dormant app
+   rebuilding on every push with no serving traffic, not active use. Its Vercel project is
+   retired (`docs/decisions-carryover.md`); decommission needs an operator with dashboard access.
 
 Measured against Aug 2026 history (per commit), when admin was still a separate Vercel project:
 **60% of commits skippable for web, 78% for admin**.
