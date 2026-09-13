@@ -16,7 +16,7 @@ export type HateCrimeCompositionChartProps = {
 
 function pct(part: number, whole: number): string {
   if (whole <= 0) {
-    return '—';
+    return 'N/A';
   }
   return `${((part / whole) * 100).toFixed(1)}%`;
 }

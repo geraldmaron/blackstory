@@ -108,9 +108,9 @@ export function HateCrimeYearSeriesChart({ summaries }: HateCrimeYearSeriesChart
             {rows.map((row) => (
               <tr key={row.year}>
                 <th scope="row">{row.year}</th>
-                <td>{row.antiBlackSharePct === null ? '—' : formatPct(row.antiBlackSharePct)}</td>
+                <td>{row.antiBlackSharePct === null ? 'N/A' : formatPct(row.antiBlackSharePct)}</td>
                 <td>
-                  {row.participationPct === undefined ? '—' : formatPct(row.participationPct)}
+                  {row.participationPct === undefined ? 'N/A' : formatPct(row.participationPct)}
                 </td>
               </tr>
             ))}

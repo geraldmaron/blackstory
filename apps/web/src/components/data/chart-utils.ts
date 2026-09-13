@@ -27,7 +27,7 @@ export function formatChartCount(value: number): string {
 
 export function formatSharePct(blackPopulation: number, totalPopulation: number): string {
   if (totalPopulation <= 0) {
-    return '—';
+    return 'N/A';
   }
   return `${((blackPopulation / totalPopulation) * 100).toFixed(1)}%`;
 }

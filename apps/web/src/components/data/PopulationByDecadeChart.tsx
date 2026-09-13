@@ -98,12 +98,12 @@ export function PopulationByDecadeChart({
                 <td>{formatChartCount(row.blackPopulation)}</td>
                 <td>
                   {row.freeBlackPopulation === null
-                    ? '—'
+                    ? 'N/A'
                     : formatChartCount(row.freeBlackPopulation)}
                 </td>
                 <td>
                   {row.enslavedBlackPopulation === null
-                    ? '—'
+                    ? 'N/A'
                     : formatChartCount(row.enslavedBlackPopulation)}
                 </td>
                 <td>{formatChartCount(row.totalPopulation)}</td>
