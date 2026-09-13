@@ -65,5 +65,22 @@ export function redirectsForNextConfig() {
 
     // The inventions index is the Records kind filter, not a second catalog.
     { source: '/inventions', destination: '/records?kind=inventions', permanent: true },
+
+    // repo-ytq3n: the disc_ and gap_ lanes each produced their own live Tulsa Race Massacre
+    // record, so the collision suffix in `place-slug.ts` gave the loser its own public address
+    // rather than 404ing outright. The 2026-09-12 owner ruling merged it into
+    // disc_tulsa_race_massacre_q1824714 and unpublished it, which turns that address into a 404.
+    //
+    // ONLY the /place form is here. The /entity form is already handled, and better, by
+    // bb_public.release_entity_redirects (repo-n7p6.29): /entity/[id] resolves merged ids
+    // through the release, so every future merge redirects with no code change. The slug route
+    // cannot use that table today because it resolves by slug rather than entity id, and
+    // teaching it to is work that belongs with the /place retirement (repo-giah), not a second
+    // redirect mechanism bolted on beside the first.
+    {
+      source: '/place/tulsa-race-massacre--gap_tulsa_race_massacre',
+      destination: '/place/tulsa-race-massacre',
+      permanent: true,
+    },
   ];
 }
