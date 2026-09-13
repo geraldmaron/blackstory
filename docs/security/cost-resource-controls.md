@@ -222,7 +222,7 @@ actually landed. Two gaps remain **operator-only** (dashboard, not code):
 | Gap | Control | Issue |
 |-----|---------|-------|
 | No hard cap on Vercel on-demand spend | Spend Management → amount + pause-on-threshold | `repo-n7jq` |
-| Supabase compute billed on 3 active projects | Audit whether `theadministration-app` needs its own project vs. a schema | — |
+| Supabase compute billed on 3 active projects | Two of the three are not BlackStory — see [foreign Supabase projects](../operations/foreign-supabase-projects.md). Their fate is an owner call, not this backlog's. | — |
 
 The precedent for why a cap matters is recorded in
 [`packages/ops-data/scripts/check-public-read-egress.ts`](../../packages/ops-data/scripts/check-public-read-egress.ts):
