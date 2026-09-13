@@ -8,8 +8,12 @@
  * exact 4 rows a live query against bb_evidence.source_captures found still carrying a
  * gs://black-book-efaaf-raw-sources ref (verified 2026-09-12; every other row in that table has
  * no storage_object reference to migrate at all). One entry — the Opportunity Atlas tract-level
- * CSV — is ~2.47 GiB, over the raw-sources bucket's configured file_size_limit (500 MiB), and is
- * deliberately SKIPPED here rather than silently failing; see repo-ks7t.1 for that decision.
+ * CSV — is ~2.47 GiB, over the raw-sources bucket's configured file_size_limit (500 MiB). Per the
+ * 2026-09-12 owner ruling on repo-7w972, it is not a "migrate later" candidate: BlackStory does
+ * not host a copy of this file at all, in GCS or Supabase — the citation re-points at the public
+ * Opportunity Insights artifact instead (see packages/domain/src/external-data-sources.ts). It
+ * stays in the manifest below with `skip` set, as the historical record of the 4th row this
+ * discovery query found — never move it to the active list.
  *
  * Default is dry-run (list + plan only, no download, no upload). Live copy requires:
  *   SUPABASE_URL, SUPABASE_SECRET_KEY (from apps/web/.env.local)
@@ -66,7 +70,9 @@ const MANIFEST = [
       'gs://black-book-efaaf-raw-sources/raw-sources/opportunity-atlas/tract_outcomes_early-2018/tract_outcomes_early.csv',
     sha256: 'ec4d9ee5bcf0282261762f454226e0b7bc5513bc81644583647028da4305d6df',
     contentType: 'text/csv',
-    skip: 'exceeds raw-sources bucket file_size_limit (500 MiB) — see repo-ks7t.1',
+    skip:
+      'owner ruling (repo-7w972, 2026-09-12): re-cite the public Opportunity Insights source ' +
+      'instead of hosting a mirror — not a bucket-limit problem to revisit, never migrate this one.',
   },
 ];
 

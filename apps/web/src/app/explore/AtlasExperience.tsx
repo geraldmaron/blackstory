@@ -11,18 +11,11 @@
  *
  * This file is the orchestrator (WP-23): render plus wiring. Every piece of state and behavior
  * lives in a hook under `explore/hooks/` — the lens, the camera, the selection, the saved
- * collection, the story runner, the palette index, the command context.
+ * collection, the palette index, the command context.
  */
 'use client';
 
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Notice } from '@repo/ui';
 import { focusLandmark } from '../../lib/keyboard/use-focus-trap';
 import { CommandBar } from '../../components/shell/CommandBar';
@@ -45,8 +38,6 @@ import {
 import { TimePanel } from '../../components/map-experience/TimePanel';
 import { MIGRATION_CORRIDORS } from '../../lib/map-experience/migration-corridors';
 import { nationalFieldPatch } from '../../lib/map-experience/national-field';
-import { prefersReducedMotion } from '../../lib/map-experience/camera-presets';
-import { StoryMode } from '../../components/story/StoryMode';
 import { clearCollection, unsaveRecord } from '../../lib/collections/store';
 import { useMapStage } from '../../components/map-stage/MapStage';
 import {
@@ -63,7 +54,6 @@ import { useRecordSelection } from './hooks/use-record-selection';
 import { usePaletteData } from './hooks/use-palette-data';
 import { useReaderActions } from './hooks/use-reader-actions';
 import { useCommandContext } from './hooks/use-command-context';
-import { useStoryRunner } from './hooks/use-story-runner';
 import { useExploreUrlSync } from './hooks/use-explore-url-sync';
 import { atlasWalkHref } from '../../lib/place/public-place-path';
 import { placeArrivalQuery } from '../../lib/discovery/discovery-arrival';
@@ -164,56 +154,14 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   }, [focusAfterPanels]);
 
   /**
-   * The selection, and whether the reader asked for it.
+   * The selection.
    *
    * Owned here, not inside the selection hook: the camera's padding needs to know whether the
    * sheet is open without depending on the camera it drives, so the id has to sit above both.
-   *
-   * `ambient` is the story's own selection. A chapter that is about one record rings that record's
-   * pin on the plate, and it rings it by selecting it — but a reader scrolling into a chapter has
-   * not asked to open anything, and the record sheet is a reader-opened panel. Without this flag
-   * the sheet flew open by itself partway down the journey, over a chapter card already printing
-   * that same record's name, place, era and source count. The flag separates the two: the ring
-   * still lands, and the sheet stays shut until someone opens a record themselves.
    */
-  const [selection, setSelection] = useState<{
-    readonly id: string | undefined;
-    readonly ambient: boolean;
-  }>(() => ({ id: initial.viewState.selected, ambient: false }));
-  const selectedId = selection.id;
-
-  const setSelectionWithOrigin = useCallback(
-    (next: SetStateAction<string | undefined>, ambient: boolean) => {
-      setSelection((current) => ({
-        id: typeof next === 'function' ? next(current.id) : next,
-        ambient,
-      }));
-    },
-    [],
+  const [selectedId, setSelectedId] = useState<string | undefined>(
+    () => initial.viewState.selected,
   );
-
-  /** Every reader-initiated path — pin click, rail row, palette, keyboard step, sheet close. */
-  const setSelectedId = useCallback<Dispatch<SetStateAction<string | undefined>>>(
-    (next) => setSelectionWithOrigin(next, false),
-    [setSelectionWithOrigin],
-  );
-
-  /** The story runner's setter. Rings the pin; does not open the sheet. */
-  const setAmbientSelectedId = useCallback<Dispatch<SetStateAction<string | undefined>>>(
-    (next) => setSelectionWithOrigin(next, true),
-    [setSelectionWithOrigin],
-  );
-
-  /**
-   * Leaving the story must not strand its selection either. An ambient selection that survived
-   * into Explore would ring a pin with no sheet attached, and no sheet means no close control —
-   * a highlight the reader cannot dismiss. Scoped to ambient selections so a `?selected=` URL,
-   * which arrives with `ambient: false`, is never cleared by a mode change.
-   */
-  useEffect(() => {
-    if (mode === 'story') return;
-    setSelection((current) => (current.ambient ? { id: undefined, ambient: false } : current));
-  }, [mode]);
 
   const { collection, persist, toggleSave, savedSet } = useSavedCollection(toasts);
   const {
@@ -226,7 +174,6 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     decade,
     setDecade,
     sweepDecade,
-    setSweepDecade,
     topicId,
     setTopicId,
     activeTopicLabel,
@@ -381,12 +328,12 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   }, [atlasHoverTarget, selectedId]);
 
   const [legendOpen, setLegendOpen] = useState(false);
-  const { camera, readout, spotlight, setSpotlight, runMove, bearing } = useAtlasCamera(
+  const { camera, readout, spotlight, runMove, bearing } = useAtlasCamera(
     stage,
     panels,
     chromeHidden,
-    // The padding is for the panel, not the highlight: an ambient story selection opens no sheet.
-    selectedId !== undefined && !selection.ambient,
+    // The padding is for the panel: the camera reserves room whenever something is selected.
+    selectedId !== undefined,
     setLayers,
   );
   const { selectedFeature, selectedIndex, select, selectById, stepRecord, sheetRecord } =
@@ -405,18 +352,6 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   const { paletteRecords, destinations, paletteStates, featureById } = usePaletteData(
     view,
     stateOptions,
-  );
-  const { storyRecord, storyOrder, runChapter } = useStoryRunner(
-    view.allFeatures,
-    camera,
-    decadeBars,
-    featureById,
-    stage,
-    setAmbientSelectedId,
-    setLayers,
-    setSpotlight,
-    setSweepDecade,
-    mode,
   );
   const commandContext = useCommandContext({
     camera,
@@ -444,8 +379,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     setSavedOpen,
   });
 
-  /** The sheet is open only for a selection the reader made. See `selection.ambient` above. */
-  const sheetOpen = sheetRecord !== null && !selection.ambient;
+  const sheetOpen = sheetRecord !== null;
   /* The sheet's mast reads the same photo index the pin hover card does, fetched once, lazily,
      the first time a sheet opens. See `use-photo-index.ts`. */
   /*
@@ -508,18 +442,6 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         }
         corridors={MIGRATION_CORRIDORS}
         visible={layers.routes}
-      />
-
-      <StoryMode
-        active={mode === 'story'}
-        onChapter={runChapter}
-        onOpenAtlas={() => setMode('atlas')}
-        onNearMe={nearMe}
-        reducedMotion={prefersReducedMotion()}
-        recordSpotlight={storyRecord ?? undefined}
-        chapters={storyOrder.chapters}
-        factByChapterId={storyOrder.factByChapterId}
-        sheetOpen={sheetOpen}
       />
 
       {spotlight ? (

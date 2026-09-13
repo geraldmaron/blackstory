@@ -426,6 +426,111 @@ export const RELATIONSHIP_TYPE_SEMANTICS: Readonly<
   },
 };
 
+/**
+ * Causal-weight ranking over RELATIONSHIP_TYPES, ratified by the 2026-09-12 owner ruling
+ * (repo-q16vc) for deciding which relationship word wins when several accepted+published edges
+ * join the same entity pair and only one can be rendered — the tie-break `ORDER BY` in
+ * `DERIVE_SQL`, `packages/ops-data/scripts/lib/release-related-sync.ts`.
+ *
+ * This is a CAUSAL-WEIGHT axis, not a specificity axis, and the distinction is load-bearing. A
+ * "most specific wins" rule was tried first and rejected: this file documents `attended` as
+ * narrower than `participated_in` ("broader involvement than a single event attendance", see
+ * `participated_in` above), so narrowest-wins keeps the weaker word for exactly the pairs that
+ * matter — Amelia Boynton Robinson's edges to the Selma to Montgomery marches and Bayard Rustin's
+ * edges to the March on Washington both carry `attended` + `participated_in`, and both people
+ * organized the event rather than merely showing up to it. Causal weight keeps the word that
+ * carries more historical weight instead of the narrower one.
+ *
+ * Five tiers, strongest to weakest:
+ *   1. causation and origination — fromEntity caused, enabled, or influenced toEntity, brought it
+ *      into being, or undertook the historically decisive involvement in it.
+ *   2. bounded contribution — a real but non-originating contribution. Identical to
+ *      `BOUNDED_CONTRIBUTION_RELATIONSHIP_TYPES` above, reused rather than restated.
+ *   3. organizational and attendance — institutional affiliation, membership, employment,
+ *      governance, commercial/production affiliation, or event attendance, with no causal or
+ *      originating claim of its own.
+ *   4. contextual — place, time, documentary, or descriptive edges asserting no causal or
+ *      affiliation claim at all.
+ *   5. related_to — the vocabulary's own documented fallback ("symmetric/loose association with
+ *      no stronger typed fit", see `related_to` above), so it always sorts last, unconditionally.
+ *
+ * A type's tier follows its documented semantics, not its place in the `RELATIONSHIP_TYPES`
+ * source list: `commemorates` sits in that file's "historical-causation edges" comment block
+ * alongside `caused`/`enabled`/`influenced`/`participated_in`/`overturned`, but its own semantics
+ * entry above says "never a causal claim", so it ranks as contextual (tier 4), not causal.
+ *
+ * Order within a tier is not ratified by this axis and falls back to plain alphabetical (see the
+ * SQL tie-break in `release-related-sync.ts`) — e.g. `employed_by` before `member_of`. The ruling
+ * settles which tier a type sits in, not the order of types that share one.
+ */
+export const RELATIONSHIP_CAUSAL_WEIGHT_TIERS: readonly (readonly RelationshipType[])[] = [
+  // 1. causation and origination.
+  [
+    'caused',
+    'enabled',
+    'influenced',
+    'overturned',
+    'founded',
+    'authored',
+    'invented',
+    'co_invented',
+    'participated_in',
+  ],
+  // 2. bounded contribution — reuses BOUNDED_CONTRIBUTION_RELATIONSHIP_TYPES verbatim.
+  [...BOUNDED_CONTRIBUTION_RELATIONSHIP_TYPES],
+  // 3. organizational and attendance.
+  [
+    'attended',
+    'employed_by',
+    'member_of',
+    'governed_by',
+    'assigned_to',
+    'licensed_to',
+    'manufactured_by',
+    'commercialized',
+    'collaborated_with',
+    'mentored_by',
+    'litigated_with',
+  ],
+  // 4. contextual.
+  [
+    'located_at',
+    'occurred_at',
+    'depicts',
+    'cites',
+    'part_of',
+    'successor_of',
+    'commemorates',
+    'demonstrated_at',
+    'documented_by',
+    'other',
+  ],
+  // 5. related_to — always last.
+  ['related_to'],
+];
+
+/**
+ * Every `RelationshipType` mapped to its tier index in `RELATIONSHIP_CAUSAL_WEIGHT_TIERS` (0 =
+ * strongest). A numeric form of the same ranking, for a comparator or for generating the
+ * equivalent SQL `CASE` once rather than hand-duplicating the ranking as a literal string.
+ */
+export const RELATIONSHIP_CAUSAL_WEIGHT: Readonly<Record<RelationshipType, number>> =
+  Object.fromEntries(
+    RELATIONSHIP_CAUSAL_WEIGHT_TIERS.flatMap((tier, weight) =>
+      tier.map((type) => [type, weight] as const),
+    ),
+  ) as Readonly<Record<RelationshipType, number>>;
+
+/**
+ * Causal-weight comparator: negative when `a` should win over `b`, positive when `b` should win,
+ * zero when the tie falls through to whatever secondary order the caller applies. Ties within a
+ * tier fall back to plain alphabetical, matching the SQL tie-break in `release-related-sync.ts`.
+ */
+export function compareRelationshipCausalWeight(a: RelationshipType, b: RelationshipType): number {
+  const delta = RELATIONSHIP_CAUSAL_WEIGHT[a] - RELATIONSHIP_CAUSAL_WEIGHT[b];
+  return delta !== 0 ? delta : a.localeCompare(b);
+}
+
 /** The six historical-causation edge types whose semantics require a TemporalContext. */
 export const CAUSAL_HISTORICAL_RELATIONSHIP_TYPES = (
   Object.keys(RELATIONSHIP_TYPE_SEMANTICS) as readonly RelationshipType[]

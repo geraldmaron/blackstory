@@ -73,11 +73,19 @@ From the repo root, with `set -a && source apps/web/.env.local && set +a` and
    | refuse | `refuse-N.json` | terminal `no-lane-significance`; never re-offered |
    | defer | *(write nothing)* | row stays `pending`; will be re-offered |
 
-   Refuse means *this subject does not belong on the site* — a white institution, an architecture-
-   only nomination, a district that turns out to be someone else's history. Defer means *it may
-   well belong, but the captured text cannot support an entry* — most often because the read
-   window truncated before the Section 8 narrative (repo-z57b), leaving only an "Areas of
-   Significance" line or a theme label.
+   Refuse means *this subject does not belong on the site* — a purely architectural nomination
+   with no documented Black-history connection, a district that turns out to be someone else's
+   history. Defer means *it may well belong, but the captured text cannot support an entry* —
+   most often because the read window truncated before the Section 8 narrative (repo-z57b),
+   leaving only an "Areas of Significance" line or a theme label.
+
+   **A white institution is not, by itself, a reason to refuse.** See "Scope ruling: enforcement
+   and suppression sites belong" below (repo-qrkv) — a white-only school or a white-owned
+   building whose *own* nomination substantively documents its role in enforcing segregation or
+   suppressing a Black rebellion belongs on the site, same as a subject with an achievement or
+   institution-building framing. Refuse that shape only when the nomination has nothing beyond
+   the bare fact that Black people were excluded — no dedicated context, no substantive
+   discussion — which is a thin-evidence refusal, not a scope refusal.
 
    Conflating them is expensive in both directions: refusing a truncation case permanently drops a
    real subject, and drafting one produces a sentence about the nomination form. Wave 5 hit this
@@ -285,15 +293,47 @@ Highest hostile-scrutiny surface in the catalog. Beyond the standard harness:
 
 Public rails for these rules live on `/methodology` under Editorial standards.
 
-## Scope rulings still owned by a human (repo-qrkv)
+## Scope ruling: enforcement and suppression sites belong (repo-qrkv, decided 2026-09-12)
 
-Do not invent a project rule for these. Until Gerald rules, park them:
+This is the project's written standard now. Do not re-litigate it case by case.
 
-| Case | Open question |
-| --- | --- |
-| Tilghman High (Paducah KY) | Concrete-event vs symbolic: white school whose NRHP significance is Black education context |
-| Mahone's Tavern (Murfreesboro NC) | Site of suppression (Nat Turner pursuit) — in catalog or out? |
-| Trapp and Chandler Pottery | Capture failure, not an editorial refusal — re-sweep, do not refuse |
+**A site whose documented significance is the *enforcement* of segregation or the *suppression*
+of a Black rebellion belongs in this catalog**, framed as such — as a site of enforcement or
+suppression, not as a site of Black achievement. The test is not who the building served or who
+owned it; it is whether the nomination itself substantively documents the site's role in the
+history of Black oppression, not merely mentions it in passing.
 
-Same-shape drafted records (e.g. East Nashville High) are not license to decide Tilghman; they are
-evidence the project needs one written standard.
+- **Concrete event vs. symbolic/systemic significance are both valid readings.** East Nashville
+  High School (drafted, live) is significant because a named student was denied admission and the
+  resulting lawsuit forced a citywide desegregation plan — a concrete event. Tilghman, Augusta,
+  High School (`nrhp-black-heritage-95000300`, Paducah KY) is significant because it is the one
+  surviving building from the 1919 school-board vote that built one high school for white children
+  and one for colored children, and no Black school from that same system survives in comparable
+  condition — a symbolic/systemic reading. Both are IN. Tilghman's own nomination carries a
+  section headed "HISTORIC CONTEXT: Black Education in Paducah, 1920-1956" and states the building
+  "is significant within contexts of Women's and Black history" — that is a documented connection,
+  not an inference. Frame Tilghman as a site of enforcement, never as a site of Black achievement.
+- **A site of suppression is in the catalog, not excluded from it.** Mahone's Tavern
+  (`nrhp-black-heritage-08000483`, Courtland VA — not Murfreesboro NC; Courtland is the renamed
+  Jerusalem, which is what makes the Nat Turner connection coherent) is significant because the
+  state militia hunting Nat Turner in 1831 was housed and organized there. That is Black history
+  documented from the suppression side, and it belongs, framed as such.
+- **Same-shape refusals must be corrected, not left standing.** Do not leave two readings live in
+  the same lane: a white institution refused only because its significance is "just a symbol" or
+  "just enforcement" is the wrong call, and any such refusal found elsewhere in the lane should be
+  reopened and redrafted under this standard rather than treated as a separate case.
+
+This does not relax the tier-2 stub trap or the absence rule below. The bar stays the same: the
+site's *own* evidence has to substantively document the connection (a dedicated context section,
+a stated role, a documented event), not a single incidental mention of a nearby Black institution
+that could as easily belong to a different, separately-listed property.
+
+**Trapp and Chandler Pottery Site (`nrhp-black-heritage-86000043`) was never a scope question** —
+it is a capture failure. Its tier-1 evidence is a 2,394-character NPS summary blurb, not the real
+~23,000-character nomination, and Edgefield alkaline-glazed stoneware is the tradition of the
+enslaved potters of the Edgefield District — the blurb credits only the white owner and the master
+potter because that is all a blurb has room for. Applying `no-lane-significance` here would
+permanently drop a genuinely significant site over a capture gap, which is exactly the mistake
+the refuse/defer distinction above exists to prevent. Its enrichment status has been reset to
+`pending` for that reason; re-sweep for the real nomination document before drafting it, and do
+not re-refuse it on the same 2,394-character text.

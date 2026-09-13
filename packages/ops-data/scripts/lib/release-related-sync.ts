@@ -22,6 +22,7 @@
  * Only edges whose OTHER endpoint is also in the release are emitted; an edge to an unreleased
  * entity never renders and would dead-link.
  */
+import { RELATIONSHIP_CAUSAL_WEIGHT } from '@repo/domain-core/relationship';
 import type { Client, Pool, PoolClient } from 'pg';
 
 export type ReleaseRelatedEntry = {
@@ -44,6 +45,20 @@ export type ReleaseRelatedSyncReport = {
   /** Rows that gain edges where they previously had none — the republish-wipe victims. */
   readonly repaired: number;
 };
+
+/**
+ * SQL `CASE` reproducing `RELATIONSHIP_CAUSAL_WEIGHT`
+ * (`packages/domain-core/src/relationship.ts`) inline: `DERIVE_SQL` runs as a single
+ * parameterized query rather than calling back into JS per row, so the ranking has to exist as
+ * SQL too. Generated from that same ratified map rather than retyped, so the SQL and the TS
+ * ranking cannot drift without a source change to one of them showing up as a diff in the other.
+ * Ties (equal weight) fall through to the `ORDER BY`'s own `e.relationship_type` tie-break.
+ */
+const CAUSAL_WEIGHT_CASE_SQL = `CASE e.relationship_type\n${Object.entries(
+  RELATIONSHIP_CAUSAL_WEIGHT,
+)
+  .map(([type, weight]) => `    WHEN '${type}' THEN ${weight}`)
+  .join('\n')}\n    ELSE ${Math.max(...Object.values(RELATIONSHIP_CAUSAL_WEIGHT)) + 1}\n  END`;
 
 /**
  * Both endpoints must be in `releaseId`. `direction` is relative to the row's own entity, so each
@@ -69,18 +84,23 @@ const DERIVE_SQL = `
   JOIN released r2 ON r2.entity_id = e.other_id
   -- When several edges join the same pair, only one becomes the rendered entry (see the dedup in
   -- planReleaseRelatedSync), so this ORDER BY decides which relationship word the reader sees.
-  -- Plain alphabetical decided it by spelling, which lets the generic 'related_to' win any pair
-  -- whose only specific type sorts later ('successor_of'). No pair in the active release is in
-  -- that state today — measured 2026-09-09, 110 multi-type pairs involve related_to and
-  -- alphabetical picks it for zero of them — so this clause changes nothing now and exists so a
-  -- later edge type cannot quietly acquire the behavior. RELATIONSHIP_TYPE_SEMANTICS defines
-  -- related_to as a "symmetric/loose association with no stronger typed fit", so it is the
-  -- vocabulary's own fallback and must lose to every specific type. Sorting it last reads that
-  -- definition rather than ranking the others: where two
-  -- SPECIFIC types join a pair (attended vs participated_in, employed_by vs member_of) the tie is
-  -- still broken alphabetically, which is deterministic but arbitrary and picks the weaker word
-  -- often enough to matter. Ratifying a specificity order is repo-q16vc.
-  ORDER BY e.eid, e.other_id, (e.relationship_type = 'related_to'), e.relationship_type
+  -- Ranked by RELATIONSHIP_CAUSAL_WEIGHT (packages/domain-core/src/relationship.ts), ratified by
+  -- the 2026-09-12 owner ruling (repo-q16vc): causation/origination > bounded-contribution >
+  -- organizational/attendance > contextual > related_to, always last. This replaced plain
+  -- alphabetical, which decided every tie by spelling. The 'related_to last' half of that was
+  -- already principled and is unchanged: RELATIONSHIP_TYPE_SEMANTICS defines related_to as a
+  -- "symmetric/loose association with no stronger typed fit", the vocabulary's own fallback, so
+  -- it must lose to every specific type — measured 2026-09-12 (wide sweep), 120 multi-type pairs
+  -- in the active release involve related_to and alphabetical picked it for zero of them, so that
+  -- half of the old ORDER BY changed nothing in practice. The other half did: where two SPECIFIC
+  -- types joined a pair (attended vs participated_in, employed_by vs member_of — 48 such pairs
+  -- measured the same day), alphabetical picked the weaker word often enough to matter, rendering
+  -- 'attended' for both Amelia Boynton Robinson's and Bayard Rustin's edges into marches they
+  -- organized rather than merely attended. Causal weight fixes those two (participated_in now
+  -- outranks attended) and reorders every other specific-vs-specific pair whose two types land in
+  -- different tiers; within a tier the order is still alphabetical, since the ruling ratifies
+  -- tiers, not an order inside one.
+  ORDER BY e.eid, e.other_id, ${CAUSAL_WEIGHT_CASE_SQL}, e.relationship_type
 `;
 
 function asRelatedEntries(value: unknown): readonly ReleaseRelatedEntry[] {
