@@ -43,10 +43,14 @@ test('every figure on the page is numbered and carries a reading', () => {
   assert.equal(countOccurrences(sectionsSource, /reading=\{/g), figureCount);
 });
 
-test('figure labels run 1 to 11 in document order', () => {
+// The name used to say "1 to 11" and the assertion never checked a count, so adding figures 12
+// and 13 left the name wrong and the test still green. It now asserts the count too, which is the
+// part that would have caught it.
+test('figure labels are a gapless 1..N in document order', () => {
   const labels = [...sectionsSource.matchAll(/figureLabel="Figure (\d+)"/g)].map((match) =>
     Number(match[1]),
   );
+  assert.ok(labels.length > 0, 'no figure labels found — the regex or the markup changed');
   assert.deepEqual(
     labels,
     labels.map((_, index) => index + 1),
