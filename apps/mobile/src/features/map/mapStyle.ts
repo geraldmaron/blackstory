@@ -1,6 +1,7 @@
 /**
  * The dark, desaturated "archive of record" basemap style for the native map
- * (MOB-011 / ADR-024), the mobile parallel of the web dark-archive style
+ * (MOB-011; `docs/decisions-carryover.md`, "Native map render layer" §9), the mobile
+ * parallel of the web dark-archive style
  * (`docs/decisions-carryover.md`, "Map stack": dark archive register).
  *
  * Every color here is sourced from the generated brand tokens (`@/ui`) — never a

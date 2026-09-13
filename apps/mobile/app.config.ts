@@ -319,7 +319,7 @@ const config: ExpoConfig = {
         imageWidth: 76,
       },
     ],
-    // ADR-024 (MOB-011, corrected 2026-07-20) / repo-umwk: the official
+    // MOB-011 (corrected 2026-07-20) / repo-umwk: the official
     // `@maplibre/maplibre-react-native` config plugin (its own
     // `app.plugin.js` -> `withMapLibre`, NOT a bespoke plugin authored in
     // this repo). It injects `$MLRN.post_install(installer)` into the iOS
@@ -327,8 +327,10 @@ const config: ExpoConfig = {
     // prebuild` time. No props are passed — the package's documented
     // defaults (native MapLibre distribution version pinned to this SDK
     // release, OpenGL Android location engine) match the renderer choice in
-    // `docs/decisions-carryover.md`, "Mobile stack" (map) / ADR-024, with no
-    // override needed.
+    // `docs/decisions-carryover.md`, "Mobile stack" (map) and the deferred
+    // prebuild work in `docs/decisions-carryover.md`, "Native map render
+    // layer". The "ADR-024" this block used to cite was really ADR-025
+    // (mobile map data); ADR-024 is the build/release/OTA decision.
     '@maplibre/maplibre-react-native',
     [
       // Enforces the Android API-level floor (`docs/decisions-carryover.md`,
@@ -341,7 +343,8 @@ const config: ExpoConfig = {
           minSdkVersion: 26,
         },
         ios: {
-          // ADR-024 / repo-umwk: `@maplibre/maplibre-react-native`'s config plugin
+          // `docs/decisions-carryover.md`, "Native map render layer" / repo-umwk:
+          // `@maplibre/maplibre-react-native`'s config plugin
           // requires static frameworks linkage on iOS. Carrying it here (the CNG
           // source of truth) makes every `expo prebuild` emit
           // `ios.useFrameworks=static` into Podfile.properties.json so MapLibre

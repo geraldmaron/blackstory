@@ -6,7 +6,8 @@
  * WHAT MOB-012 ADDS on top of the spike (all backward-compatible, all optional
  * props so the MOB-011 tests keep passing unchanged):
  *  - Native clustering on the GeoJSON source ("aggregates render before points",
- *    ADR-024) — cluster bubbles + an unclustered point layer + a selection
+ *    `docs/decisions-carryover.md`, "Native map render layer") — cluster bubbles +
+ *    an unclustered point layer + a selection
  *    highlight layer. The cluster register stays dignity-safe: a single flat
  *    Copper Pin color, size (not color) varying with count, and NO heatmap layer.
  *  - Named-preset camera control driven imperatively by a one-shot `cameraCommand`
@@ -22,7 +23,9 @@
  * Rendering, attribution, and the three degraded failure states are unchanged
  * from MOB-011 (see the failure block below and MapAttribution / mapLoadState).
  * A JS test runner still cannot mount the native GL view, so tile rendering,
- * live clustering, and camera motion remain device/Maestro evidence (ADR-024).
+ * live clustering, and camera motion remain device evidence
+ * (`docs/decisions-carryover.md`, "Native map render layer"). There is no Maestro
+ * suite in this repo, so that evidence is a human running the app.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View, type NativeSyntheticEvent } from 'react-native';
@@ -201,7 +204,8 @@ export type MapScreenProps = {
   readonly showZoomControls?: boolean;
   /**
    * When the native map fails to load (WebGL / style / tile engine), surfaces a
-   * degraded state. List/metrics chrome stays mounted in Explore (ADR-024 §7).
+   * degraded state. List/metrics chrome stays mounted in Explore
+   * (`docs/decisions-carryover.md`, "Native map render layer" §7).
    */
   readonly onMapEngineFailure?: () => void;
 };

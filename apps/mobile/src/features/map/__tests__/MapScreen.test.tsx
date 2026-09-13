@@ -6,7 +6,8 @@
  * plain RN Views. What they prove is that the screen COMPONENT mounts without
  * crashing, wires the redacted GeoJSON into a source, keeps attribution visible,
  * and shows the correct degraded ErrorState per failure mode instead of throwing.
- * Real on-device tile rendering / memory traces are deferred (see ADR-024).
+ * Real on-device tile rendering / memory traces are deferred
+ * (`docs/decisions-carryover.md`, "Native map render layer").
  */
 import { act, fireEvent, render } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';

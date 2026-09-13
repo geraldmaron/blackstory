@@ -1,15 +1,20 @@
 /**
- * Native map configuration and the tile cost kill-switch (MOB-011 / ADR-024).
+ * Native map configuration and the tile cost kill-switch (MOB-011;
+ * `docs/decisions-carryover.md`, "Native map render layer").
  *
  * This module is the single place the map surface reads its tile source and
  * attribution from, so a build (or an OTA config push) can retarget the PMTiles
  * archive or disable the basemap entirely without touching render code.
  *
- * Cost/dignity posture (see docs/adr/ADR-024-mobile-map-data.md):
+ * Cost/dignity posture (`docs/decisions-carryover.md`, "Explore basemap and live map
+ * source" for the tile source, "Native map render layer" for the render rules). The
+ * path this line used to name, `docs/adr/ADR-024-mobile-map-data.md`, never existed
+ * under either number: the map-data ADR shipped as `ADR-025-mobile-map-data.md` while
+ * `ADR-024-mobile-build-release.md` already held 024.
  *  - Default basemap matches web Explore: free OpenFreeMap vector tiles
  *    (`tiles.openfreemap.org/planet`) — no per-tile vendor fees.
  *  - Optional self-hosted Protomaps PMTiles (the target recorded in
- *    `docs/decisions-carryover.md`, "Map stack": tile strategy; also ADR-025) via
+ *    `docs/decisions-carryover.md`, "Map stack": tile strategy) via
  *    `extra.map.pmtilesUrl` when a U.S. archive is published on CDN.
  *  - `MAP_BASEMAP_ENABLED` is the kill-switch: when false, no tile source is
  *    attached at all, so the map renders entity points over a flat dark canvas
@@ -133,7 +138,8 @@ export const MAP_ATTRIBUTION_LINES_COMPACT: readonly string[] = MAP_PMTILES_URL
   : [OSM_ATTRIBUTION, OPENFREEMAP_ATTRIBUTION];
 
 /**
- * Migration threshold (ADR-024, mirroring the ~2 MB flat-GeoJSON budget in
+ * Migration threshold (`docs/decisions-carryover.md`, "Native map render layer" §5,
+ * mirroring the ~2 MB flat-GeoJSON budget in
  * `docs/decisions-carryover.md`, "Map stack": size budgets): the per-point data ships
  * as a flat GeoJSON FeatureCollection until it crosses this budget, at which point the
  * per-point data moves to PMTiles/vector tiles rather than growing the flat file.

@@ -7,12 +7,14 @@
  * (clustering, filters, list sync) layers on TOP of these in `features/explore/`,
  * so the dependency direction is explore -> map and never the reverse.
  *
- * PRIVACY INVARIANT (inherited from ADR-024 §9/§10 and MOB-011's redaction proof):
- * nothing in this module ever synthesizes a coordinate more precise than the
- * already-redacted input it was handed. `cameraForPreset` clamps every zoom to
- * `MAP_MAX_ZOOM` so no interaction can imply a precision the redacted artifact
- * does not carry, and `boundsForFeatures` only ever returns the min/max envelope
- * of coordinates it is given — it never interpolates a new point. See
+ * PRIVACY INVARIANT (inherited from `docs/decisions-carryover.md`, "Native map
+ * render layer" §9/§10, and MOB-011's redaction proof): nothing in this module ever
+ * synthesizes a coordinate more precise than the already-redacted input it was
+ * handed. `boundsForCoordinates` only ever returns the min/max envelope of the
+ * coordinates it is given — it never interpolates a new point. The zoom ceiling is
+ * enforced in two places, not one: `cameraForPreset` clamps the `center` targets it
+ * returns to `MAP_MAX_ZOOM`, and its `bounds` targets carry no zoom at all, so those
+ * rely on `<Camera maxZoom={MAP_MAX_ZOOM}>` in `MapScreen.tsx`. See
  * `coordinateDecimals`/`isNoMorePreciseThan` for the checkable form of this.
  */
 import { duration, easingStandardBezier } from '@/ui';

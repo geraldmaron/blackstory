@@ -3,7 +3,9 @@
  * clustering logic, and the preview sheet all read.
  *
  * It is a thin, UI-facing projection of the ALREADY-REDACTED map source
- * (`features/map/demoMapSource.ts`, ADR-024 §10). This module adds NO geography
+ * (`docs/decisions-carryover.md`, "Native map render layer" §10). At runtime that
+ * source is the `GET /v1/map` payload; `features/map/demoMapSource.ts` is where its
+ * types live and is the `__DEV__` fixture only. This module adds NO geography
  * and NO precision: it only reshapes fields the list/sheet need and defensively
  * sanitizes the one attacker-influenced field — `displayName` — for rendering.
  * Coordinates are passed through byte-for-byte from the redacted source; nothing

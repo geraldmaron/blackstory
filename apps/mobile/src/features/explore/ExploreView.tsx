@@ -10,7 +10,8 @@
  * map/sheet state flows through `exploreReducer` (see explore-controller.ts for
  * the no-focus-theft architecture); this component only wires views to it.
  *
- * Failure posture (ADR-024 §7 / bead requirement): when the map is in an error
+ * Failure posture (`docs/decisions-carryover.md`, "Native map render layer" §7 /
+ * bead requirement): when the map is in an error
  * state, `MapScreen` renders the degraded `ErrorState` and the records rail
  * remains fully mounted and interactive — a failed map never strands the reader.
  */
@@ -58,7 +59,11 @@ import { useReduceMotion } from './useReduceMotion';
 const EMPTY_FILTERS: FilterState = Object.freeze({});
 
 export type ExploreViewProps = {
-  /** Redacted, release-coupled source. Defaults to the demo source (ADR-024). */
+  /**
+   * Redacted, release-coupled source (`docs/decisions-carryover.md`, "Native map
+   * render layer"). This prop default is the bundled demo source; the live route
+   * always passes the `GET /v1/map` payload from `useExploreMapSource`.
+   */
   readonly source?: MapFeatureCollection;
   /** Validated filter state from the route query params. */
   readonly filters?: FilterState;

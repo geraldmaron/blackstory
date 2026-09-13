@@ -1,6 +1,6 @@
 /**
  * Clustering: two-interaction resolution + the de-redaction privacy invariant
- * (MOB-012, ADR-024 §9/§10).
+ * (MOB-012; `docs/decisions-carryover.md`, "Native map render layer" §9/§10).
  */
 import type { LngLat } from '@/features/map/mapCamera';
 import {

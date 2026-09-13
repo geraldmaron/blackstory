@@ -1,5 +1,6 @@
 /**
- * Map tile-load state model and the failure classifier (MOB-011 / ADR-024).
+ * Map tile-load state model and the failure classifier (MOB-011;
+ * `docs/decisions-carryover.md`, "Native map render layer" §7).
  *
  * MapLibre Native surfaces tile problems as native events (onDidFailLoadingMap)
  * and HTTP outcomes that a JS test runner cannot fire. So the failure handling is
@@ -9,6 +10,14 @@
  * (MOB-007) instead of crashing. The three modes are the adversarial cases the
  * bead calls out: provider/CDN outage, corrupt/unsupported range-request
  * response, and offline cold start with no cached tiles yet.
+ *
+ * WIRING, as of 2026-09-13: `classifyMapError` has no caller outside its own test.
+ * `MAP_FAILURE_COPY` and the `MapLoadState` union are live — `MapScreen` renders
+ * from them — but the live modes are assigned literally in
+ * `features/explore/useExploreMapSource.ts` from the `GET /v1/map` fetch outcome
+ * (`offline-no-cache` -> `offline-cold-start`, anything else -> `provider-outage`),
+ * and `MapScreen`'s `onDidFailLoadingMap` goes straight to `map-canvas-unavailable`
+ * without consulting the classifier. `corrupt-tiles` is unreachable at runtime today.
  */
 
 export type MapFailureMode =

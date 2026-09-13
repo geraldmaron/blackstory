@@ -2248,3 +2248,173 @@ the rule its one citation carries — juxtaposition, not causation — already h
 half of the citation is the only dead half. The mechanical side of the decision is still enforced
 at the schema level: `bb_reference.theme_impact_packets.method_stance` carries a `CHECK` constraint
 restricting it to `juxtaposition` or `gated_causal_claim`. (from ADR-029, "theme impact packets")
+
+## Native map render layer (recovered 2026-09-13, repo-urrta)
+
+`docs/adr/ADR-025-mobile-map-data.md` does not exist; it was deleted in the 2026-07-24 purge and
+recovers with `git show a2f559f8^:docs/adr/ADR-025-mobile-map-data.md`. This section covers the
+RENDER half of that decision — style, attribution, failure modes, camera and clustering under
+`apps/mobile/src/features/map/**` and `apps/mobile/src/features/explore/**`. The DATA half of the
+same ADR (tile source, `GET /v1/map`, what "redacted" means on the wire) is already recovered above
+under "Explore basemap and live map source" and is not repeated here. Recovered from the code; where
+the code and the removed document disagree, the code is what is written down and the disagreement is
+named.
+
+**Nineteen source comments cite "ADR-024" and mean ADR-025, and they have been wrong since the
+commit that wrote them.** `0ad45f80` ("Resolve mobile map data/PMTiles strategy and native map spike
+(MOB-011)", 2026-07-19) added `docs/adr/ADR-025-mobile-map-data.md` while its own commit message
+called the document "ADR-024" throughout, and `git ls-tree 0ad45f80^ -- docs/adr/` shows
+`ADR-024-mobile-build-release.md` already present at that commit. Every map comment written in that
+effort inherited the wrong number. This is NOT the same error recorded under "Mobile cache and OTA
+release": there, citations carried a stale pre-renumbering number for a document that really was
+ADR-024. Here the number was never right in the first place. The real ADR-024 (mobile build,
+distribution, OTA update, release rollback) is recovered under "Mobile cache and OTA release" and
+contains no map, tile, attribution or redaction content at all; fifteen genuine ADR-024 citations
+under `apps/mobile/src/updates/**`, `apps/mobile/src/observability/report-context.ts` and the EAS
+block of `apps/mobile/app.config.ts` were left untouched. One citation,
+`apps/mobile/src/features/map/mapConfig.ts:8`, named the literal path
+`docs/adr/ADR-024-mobile-map-data.md` — a filename that never existed under either number.
+`git log --all --diff-filter=A -- 'docs/adr/ADR-024*' 'docs/adr/ADR-025*'` returns exactly two
+additions: `ADR-024-mobile-build-release.md` (`3b365d44`) and `ADR-025-mobile-map-data.md`
+(`0ad45f80`). (from ADR-025, "native map render layer")
+
+**§7's degraded-failure rule is the strongest-held decision in this section: a tile failure degrades
+the map and never strands the reader.** `MapScreen` (`apps/mobile/src/features/map/MapScreen.tsx`)
+returns the shared `ErrorState` from an early branch on `engineFailed || loadState.kind === 'error'`,
+so the native `<Map>` is genuinely not mounted in an error state rather than mounted-and-hidden. In
+Explore the bottom sheet and records rail render outside every `mapLive` guard
+(`features/explore/ExploreView.tsx`), and `ExploreView.test.tsx:412` asserts both at once: the
+degraded map state and an interactive rail. That is the rule the ADR wrote and the code keeps.
+(from ADR-025 §7, "native map render layer")
+
+**But the classifier the code presents as the spine of §7 has no production caller.**
+`classifyMapError` (`features/map/mapLoadState.ts`) is pure, well tested (`mapLoadState.test.ts`) and
+called from nowhere outside that test and the `features/map` barrel. What actually produces a live
+failure mode is `features/explore/useExploreMapSource.ts`, which assigns them literally from the
+`GET /v1/map` fetch outcome: `offline-no-cache` becomes `offline-cold-start`, everything else becomes
+`provider-outage`. `MapScreen`'s `onDidFailLoadingMap` sets a fourth mode, `map-canvas-unavailable`,
+directly, passing the native reason text to nothing. So `corrupt-tiles` — the mode that exists for
+a 416 or a collapsed range response, the whole point of §2's range-request requirement — is
+unreachable at runtime today, and the live modes are classified from the POINT-DATA fetch, not from
+tile loading at all. The union has four modes; the ADR named three. `MAP_FAILURE_COPY` and the
+`MapLoadState` union are live; the classifier is an unused, correct implementation. (from ADR-025 §7,
+"native map render layer")
+
+**§8's attribution rule has drifted the furthest, and a test now asserts the opposite of what the
+ADR wrote.** The license obligation is real (basemap geometry is OpenStreetMap, ODbL) and the part
+that holds is that MapLibre's own attribution and logo are disabled (`attribution={false}`,
+`logo={false}` on `<Map>`) so placement is ours. The rest has moved. `MapAttribution.tsx` renders
+COLLAPSED by default: an info toggle with no license text on screen until a reader presses it, the
+full lines living in the button's `accessibilityLabel`. Explore hides the element outright —
+`attributionVisible = mapLive && sheetSnapIndex <= EXPLORE_SHEET_PEEK && !instrumentsOpen`
+(`ExploreView.tsx:249`) — and `ExploreView.test.tsx:209` is named "hides map attribution when a
+selection expands the sheet". The ADR said the element is always visible and that the narrative sheet
+must not fully occlude it, with a device screenshot as a MOB-012 acceptance item. There is no
+screenshot check and no Maestro suite anywhere in this repo. Anyone reasoning about ODbL compliance
+should start from that paragraph, not from the word "Persistent" the module header used to open with.
+(from ADR-025 §8, "native map render layer")
+
+**§9's dignity invariant survives in the form that matters and is gone in the form it was written.**
+What holds: `mapStyle.ts` binds `themeColors.dark` unconditionally, so the native plate does not
+follow the OS theme; every color comes from the generated brand tokens through `DIGNITY_PALETTE` and
+`@/ui`; there is no `heatmap` layer anywhere; and no point or cluster color is keyed to density or
+count — `ENTITY_CLUSTER_LAYER_STYLE.circleColor` is the single flat `DIGNITY_PALETTE.point`, with
+only the radius stepping on `point_count`. What is gone: "entity points are a single flat Copper Pin
+color at a fixed radius". `entity-paint.ts` now encodes kind family as shade plus a glyph rim
+signature, and `marker-size.ts` drives radius from evidence count, a confidence-tier modifier and a
+zoom scale. That is a richer encoding than the ADR authorized, and it is deliberate v6 work; the
+prohibition it must not cross is the color ramp, and it does not. Enforcement is a test only:
+`assertNoHeatmapRegister` (`mapStyle.ts`) has no runtime caller — it is exported from the
+`features/map` barrel and exercised by `mapStyle.test.ts`. Nothing stops a new heatmap layer at
+build or run time. (from ADR-025 §9, "native map render layer")
+
+**The camera privacy ceiling is real, and it is enforced by two overlapping mechanisms, not split
+cleanly by preset name.** `MAP_MAX_ZOOM = 12` (`features/map/mapCamera.ts`) exists because the
+redacted artifact tops out at city/neighborhood precision. `cameraForPreset` clamps the zoom on every
+`center` target it returns (`mapCamera.test.ts:139` asserts no preset exceeds the ceiling for any of
+the four presets) — and CORRECTION: `state`/`locality` are not always `bounds`. They return a
+`center` target, with a zoom `cameraForPreset` itself clamps via `PRESET_ZOOM`/`clampZoom`, whenever
+they are framing zero or one coordinate; that is the exact case `mapCamera.test.ts:139` exercises,
+since it always passes a single point for every preset. Only `national` unconditionally returns a
+`bounds` target with no zoom at all; `state`/`locality` return `bounds` only when framing TWO OR MORE
+coordinates. Bounds targets are held by `<Camera minZoom={MAP_MIN_ZOOM} maxZoom={MAP_MAX_ZOOM}>` in
+`MapScreen.tsx`, which also bounds the pinch gesture, the `+`/`-` buttons (`zoomBy` clamps again) and
+`zoomAfterClusterExpand`. So the ceiling is not one clamp assigned to three named presets and a
+second clamp assigned to the other one: `cameraForPreset`'s own clamp already covers every
+single-point framing — including the common case of a state/locality view centered on one selected
+entity — and the outer `<Camera>` clamp is the backstop for multi-coordinate bounds fits and for
+anything `cameraForPreset` does not cover. Two independent clamps, both real, but not partitioned by
+preset name. One stale detail: the module header cited `boundsForFeatures`, which does not exist; the
+function is `boundsForCoordinates`, and it does return only the min/max envelope of what it was
+given. (from ADR-025 §9, "native map render layer")
+
+**Read the clustering privacy claim carefully: the module that coarsens is not the module that
+draws.** `features/explore/clustering.ts` is a correct, tested implementation of aggregation-only
+clustering — members keep their original redacted coordinates byte-for-byte, the cluster marker is
+`coarsenTo(centroid, coarsestDecimals(members))`, and `assertClusterPrecisionSafe` throws if either
+property is violated. None of it runs in the app. `clusterFeatures`, `resolveCluster` and
+`assertClusterPrecisionSafe` have no caller outside `__tests__/clustering.test.ts` and the
+`features/explore` barrel; the records rail takes `ExploreFeature[]` straight from
+`explore-controller.ts`'s `visibleFeatures`, and the tap handler reads the native feature. What
+actually clusters on device is MapLibre Native's built-in supercluster, enabled by
+`cluster={clustering} clusterRadius={50} clusterMaxZoom={MAP_MAX_ZOOM}` on the `<GeoJSONSource>` in
+`MapScreen.tsx`. Supercluster positions a bubble at the mean of its members, and that mean can carry
+more decimal places than any member; nothing coarsens it. State the guarantee narrowly: no code path
+in `apps/mobile` reverse-geocodes, jitters or sharpens an entity coordinate, and every per-entity
+coordinate that reaches the native source is the one `GET /v1/map` served
+(`explore-feature.ts`'s `toExploreFeature`/`toMapFeatureCollection` pass the array through
+unchanged). The one derived coordinate on device is the cluster bubble's position. It is never
+rendered as a number, and it is read back only by `clusterCenterFromFeature` to set a camera center
+clamped to `MAP_MAX_ZOOM`. Averaging already-coarsened coordinates cannot recover a finer one, so
+this is not a de-redaction — but it is not the coarsened marker `clustering.ts` describes either, and
+`assertClusterPrecisionSafe` has never been run against it. (from ADR-025 §9/§10, "native map render
+layer")
+
+**§10's render-layer redaction regression exists and proves a narrower thing than its name
+suggests.** `features/map/__tests__/MapScreen.redaction.test.tsx` renders `MapScreen`, captures the
+GeoJSON handed to the mocked native source, and asserts that the raw living-person residential
+coordinate and the street-label fragment (`RAW_LIVING_PERSON`) never appear, that the coarsened
+city-precision value does, and that no feature carries a residential precision class. It runs against
+`DEMO_MAP_SOURCE`, a bundled fixture — not against a live `/v1/map` payload. So what it proves is
+that the render layer is a faithful, non-amplifying consumer of a source it is given. The
+authoritative raw-to-redacted guarantee is upstream and unchanged:
+`packages/domain/src/map/map-source.redaction.test.ts` wires the real `redactLocationForPublic` from
+`@repo/security`, and "Explore basemap and live map source" above records the coarsening tiers and
+where they are applied. The mobile app never sees an unredacted coordinate because it never fetches
+one; that is a property of the API boundary, not of anything in `features/map`. (from ADR-025 §10,
+"native map render layer")
+
+**The §5 migration threshold and the §6 kill switch are recorded elsewhere in this file; only the
+mobile render-side facts are added here.** The flat-GeoJSON-to-vector-tiles trigger
+(`MAP_FLAT_GEOJSON_MAX_GZIP_BYTES = 2 MiB`, `MAP_FLAT_GEOJSON_MAX_FEATURE_COUNT = 50_000` in
+`features/map/mapConfig.ts`) is exported and asserted against by nothing — see "Map stack": size
+budgets for the one release-time gate that does fire. `MAP_BASEMAP_ENABLED` is covered under "Explore
+basemap and live map source"; the render-side proof is `mapStyle.test.ts:95`, which asserts that
+`buildBasemapStyle({ basemapEnabled: false })` returns zero sources and a single `background` layer,
+so the kill switch really does produce points-over-dark-canvas with no tile egress rather than a
+degraded tile fetch. Glyphs are the exception that still loads: `resolveGlyphsUrl` always returns an
+HTTPS template even on the killed canvas, because a cluster-count symbol layer with no `glyphs` URL
+fails natively with an unsupported-URL error. (from ADR-025 §5/§6, "native map render layer")
+
+**The ADR's "Deferred" section is resolved, and one of its stated consequences is now moot.**
+`@maplibre/maplibre-react-native` IS registered in `app.config.ts`'s `plugins` array today — the
+package's own official plugin, exactly as the 2026-07-20 adversarial amendment prescribed, with no
+bespoke `withMapLibre` authored here — and `expo-build-properties` carries
+`ios.useFrameworks: 'static'`. The ADR recorded that static frameworks would have to be reconciled
+with RN Firebase's identical requirement (MOB-010). There is no React Native Firebase dependency in
+`apps/mobile` at all any more (`docs/data/firebase-wind-down.md`, the `repo-348e` epic), so
+`useFrameworks: 'static'` now exists for MapLibre alone and the reconciliation that made this a
+coordinated build-gate task no longer has a second party. (from ADR-025 "Deferred" and "Consequences",
+"native map render layer")
+
+**Nothing that can block a merge enforces any rule in this section.** Every test named above
+(`mapStyle.test.ts`, `mapCamera.test.ts`, `mapLoadState.test.ts`, `MapScreen.test.tsx`,
+`MapScreen.redaction.test.tsx`, `MapAttribution.test.tsx`, `clustering.test.ts`,
+`ExploreView.test.tsx`) runs in the `Mobile Checks` job of `.github/workflows/ci.yml`, which is gated
+on `changes.outputs.mobile` and is not in the required set —
+`infra/github/rulesets/main-protection.json` requires only "Workspace Checks", "Workspace Tests",
+"Unit Tests (Python)" and "Governance", and ci.yml's own header says "Mobile is not required". The
+one piece of this decision behind a required check is upstream and belongs to another section:
+`packages/domain/src/map/map-source.redaction.test.ts` runs in "Workspace Tests". On mobile, the
+dignity guard, the precision guard, the zoom ceiling and the attribution behavior are all held by
+tests a human has to choose to care about. (from ADR-025, "native map render layer")
