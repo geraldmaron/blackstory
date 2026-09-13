@@ -1,9 +1,11 @@
 {
-  "entry_count": 1104,
+  "entry_count": 1103,
   "selection_policy": [
     "Include Wikipedia cited list of unarmed African Americans killed by law enforcement (primary bulk source).",
     "Include curated high-profile / historical police or state-violence cases corroborated across major news and memorial discourse.",
     "Include names appearing in BOTH The Guardian The Counted (Black, 2015–16) AND Washington Post Fatal Force (Black), for dual open-dataset corroboration.",
+    "The dual open-dataset rule above corroborates that a killing happened, not that it belongs on this wall. The Counted and Fatal Force both record every person police killed, whatever the circumstances, so appearing in both is an identity check and nothing more. A name admitted only on that basis, with no Wikipedia unarmed-list row and no curated case behind it, still has to be read against the record before it is carried here. See George Bush III under intentionally_excluded_examples for the case that made this explicit.",
+    "Being armed is not by itself a reason to exclude a name. Philando Castile was lawfully carrying when an officer killed him during a traffic stop, and he belongs here. The question the record has to answer is what the killing was, not what the person was holding.",
     "This police-violence file excludes lynching, civilian killings, terrorist massacres, and non-police assassinations. Those cases may still belong on the memorial wall under racial_terror when they are milestones in the Black story.",
     "Context phrases are brief memorial labels, not legal verdicts."
   ],
@@ -74,6 +76,17 @@
     {
       "name": "Martin Luther King Jr. / Malcolm X / Medgar Evers",
       "reason": "Assassinations not by police as primary actor; included on memorial wall as racial_terror when present"
+    },
+    {
+      "name": "George Bush III",
+      "removed": "2026-09-13",
+      "reason": "Removed after review, not merely never added. He had been carried as \"killed by law enforcement, 2016, St Louis, Missouri\". The contemporaneous record is that on the evening of 20 November 2016 a gunman pulled alongside a marked St. Louis police vehicle on Hampton Avenue and shot a 46-year-old sergeant twice in the head, and that early on 21 November officers who confronted George P. Bush III, 19, said he fired on them and returned fire, killing him. The sergeant survived. That is a person killed while shooting at police, which is not what this wall memorializes, and seating him beside the people it does memorialize misreads both. Read against the selection policy above, none of its routes carries him: he does not meet the unarmed-list description, and he is not a curated case. What is left is the dual open-dataset rule, which corroborates that a killing happened and not what the killing was.",
+      "sources": [
+        "https://www.stlpr.org/government-politics-issues/2016-11-21/suspect-in-st-louis-police-officer-ambush-killed-in-shootout",
+        "https://www.stltoday.com/news/local/crime-and-courts/st-louis-police-officer-shot/article_e119c0eb-d2a1-5fd0-9600-cc252d77fed1.html",
+        "https://www.cnn.com/2016/11/21/us/st-louis-police-shooting/index.html"
+      ],
+      "bead": "repo-5jxh"
     }
   ],
   "counts_by_decade": {
@@ -87,13 +100,13 @@
     "1980s": 14,
     "1990s": 60,
     "2000s": 135,
-    "2010s": 777,
+    "2010s": 776,
     "2020s": 39
   },
   "files": {
     "full": "docs/research/police-violence-memorial-names.json",
     "core_collage_recommended": "docs/research/police-violence-memorial-names.core.json",
-    "full_count": 1104,
+    "full_count": 1103,
     "core_count": 513,
     "core_note": "Pre-2010 completeness + widely memorialized / distinctive-context cases; better default for a dignified collage than the full dual-dataset expansion."
   }

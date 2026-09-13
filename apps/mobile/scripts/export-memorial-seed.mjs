@@ -42,6 +42,19 @@ function normalizeName(value) {
  * Common Black surnames make near-miss collisions routine rather than exceptional, and no
  * entity field separates a memorial victim from anyone else: Charles I. Brown carries
  * status `deceased` exactly as the real victims do.
+ *
+ * Where those three stand now (repo-5jxh):
+ *   - Charles Brown and Robert Johnson are real victims and stay UNLINKED. Neither has an
+ *     entity record; the active release holds only the namesakes above. The research that a
+ *     record would be built from, with its sources, is in
+ *     docs/research/memorial-names-wall.sources.json under `namesAwaitingEntityRecords`. Add
+ *     the alias here only after a record exists and its summary describes the victim.
+ *   - George Bush III is no longer a memorial name at all. He had been carried as a 2016
+ *     St. Louis police killing; the contemporaneous record is that he shot a police sergeant
+ *     twice in the head and was killed the next morning firing on the officers who found him.
+ *     He is off the roll, so there is nothing here left to link. See
+ *     `intentionally_excluded_examples` in
+ *     docs/research/police-violence-memorial-names.sources.json.
  */
 const VERIFIED_ENTITY_ALIASES = new Map([
   // Emanuel AME Church, Charleston, June 17 2015.

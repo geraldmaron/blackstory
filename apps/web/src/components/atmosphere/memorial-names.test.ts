@@ -69,6 +69,34 @@ test('no memorial name carries markup residue', () => {
   }
 });
 
+test('George Bush III is not on the wall', () => {
+  // repo-5jxh: he had been carried as "killed by law enforcement, 2016, St Louis, Missouri". The
+  // contemporaneous record is that on 20 November 2016 he shot a St. Louis sergeant twice in the
+  // head, and that he was killed the next morning firing on the officers who found him. A
+  // memorial cannot seat him beside the people it memorializes. The open police-shooting
+  // datasets this roll draws on record every person police killed, whatever the circumstances,
+  // so being in them corroborates that a killing happened and nothing more. See
+  // docs/research/police-violence-memorial-names.sources.json.
+  const names = new Set(MEMORIAL_NAMES.map((entry) => entry.name));
+  assert.equal(names.has('George Bush III'), false);
+});
+
+test('Charles Brown and Robert Johnson stay on the wall with their own facts', () => {
+  // repo-5jxh: the other two names from the same mislinking. Both are real victims and both stay,
+  // unlinked, until each has an entity record of their own. Charles Brown's place was the county
+  // seat, Yazoo City; the Justice Department's Notice to Close File names Benton, in Yazoo County.
+  const charles = MEMORIAL_NAMES.find((entry) => entry.name === 'Charles Brown');
+  assert.ok(charles);
+  assert.equal(charles!.year, 1957);
+  assert.equal(charles!.place, 'Benton, Mississippi');
+
+  const robert = MEMORIAL_NAMES.find((entry) => entry.name === 'Robert Johnson');
+  assert.ok(robert);
+  assert.equal(robert!.year, 1934);
+  assert.equal(robert!.category, 'racial_terror');
+  assert.ok(robert!.place?.includes('Tampa'));
+});
+
 test('memorial name keys are unique by name+year', () => {
   const seen = new Set<string>();
   for (const entry of MEMORIAL_NAMES) {

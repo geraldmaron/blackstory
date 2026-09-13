@@ -19,12 +19,12 @@ import {
 
 type RawEntry = { readonly name: string };
 
-test('raw research datasets sum to the documented 1,680 entries', () => {
+test('raw research datasets sum to the documented 1,679 entries', () => {
   const police = policeViolenceRaw as readonly RawEntry[];
   const racialTerror = racialTerrorRaw as readonly RawEntry[];
-  assert.equal(police.length, 1104);
+  assert.equal(police.length, 1103);
   assert.equal(racialTerror.length, 576);
-  assert.equal(police.length + racialTerror.length, 1680);
+  assert.equal(police.length + racialTerror.length, 1679);
 });
 
 test('shared archive dataset is exactly the deduped merge of the two raw sources', () => {
@@ -61,7 +61,7 @@ test('merged wall/list dataset is unique and reaches the expected final count', 
     new Set(MEMORIAL_NAMES.map((n) => n.trim().toLowerCase())).size,
     MEMORIAL_NAMES.length,
   );
-  assert.equal(MEMORIAL_NAMES.length, 1672);
+  assert.equal(MEMORIAL_NAMES.length, 1671);
   assert.ok(
     MEMORIAL_NAMES.length > 1000,
     'expected the full merged dataset, not the old 64-name subset',
