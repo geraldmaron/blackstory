@@ -1304,7 +1304,7 @@ enforces the ADR numbering, the runtime-version policy, the channel binding, or 
 posture. (from ADR-023 and ADR-024, "mobile cache and OTA release")
 
 **`apps/mobile/src/data/cache-policy.ts` is invisible to `grep`, which is why every prior citation
-census undercounted.** The file contains a literal NUL byte at byte 4149 (line 94), used as a hash
+census undercounted.** The file contains a literal NUL byte at byte 4571 (line 99), used as a hash
 domain separator inside the `hashSearchKey` template literal and written as a raw control character
 rather than a `\0` escape. `file` reports the file as `data` and `grep -rn` skips it silently. The
 byte is committed, not an in-flight edit. Seven ADR-023 citations live in that file, including the
