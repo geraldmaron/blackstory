@@ -229,6 +229,96 @@ test('a stored note that is the builder sentence with the dropped predicate lead
   );
 });
 
+test('a stored note is refreshed even when the builder now groups that evidence differently', () => {
+  // repo-4qlmt. The published record cites two claims of the predicate; only one carries a
+  // citation, so the builder's record cites that one alone and the evidence SETS differ. Matching
+  // on an exact set found nothing here, kept the record verbatim, and the row then reported as
+  // converged — which is how the pass reported 4,197 of 4,197 correct while
+  // `ent_edward_dudley_001` was live with its pre-repo-15slz spelling.
+  const subject = row({
+    entityId: 'ent_edward_dudley_001',
+    kind: 'person',
+    displayName: 'Edward R. Dudley',
+    claims: [
+      claim({
+        id: 'claim_edward_dudley_001_02',
+        predicate: 'first_to',
+        object:
+          'In 1949, when the U.S. mission in Liberia was elevated to a full embassy, Dudley was ' +
+          'promoted to Ambassador, becoming the first African American to hold the rank of U.S. ' +
+          'Ambassador.',
+        citationSource: 'nps.gov',
+      }),
+      claim({
+        id: 'claim_edward_dudley_001_03',
+        predicate: 'first_to',
+        object: 'He held the rank of U.S. Ambassador.',
+        citationSource: '',
+      }),
+    ],
+    publishedBasis: [
+      {
+        criterion: 'first_to_do_x',
+        note:
+          'First to In 1949, when the U.S. mission in Liberia was elevated to a full embassy, ' +
+          'Dudley was promoted to Ambassador, becoming the first African American to hold the ' +
+          'rank of U.S. Ambassador.',
+        evidenceIds: ['claim_edward_dudley_001_02', 'claim_edward_dudley_001_03'],
+      },
+    ],
+  });
+
+  const plan = planNotabilityBasisResync([subject]);
+  assert.equal(plan.changes.length, 1);
+  assert.equal(
+    plan.changes[0]?.refreshedNotes[0]?.after,
+    'In 1949, when the U.S. mission in Liberia was elevated to a full embassy, Dudley was ' +
+      'promoted to Ambassador, becoming the first African American to hold the rank of U.S. ' +
+      'Ambassador.',
+  );
+  // The published evidence set is what gets kept; widening the MATCH must not rewrite the record.
+  assert.deepEqual(plan.changes[0]?.basisAfter[0]?.evidenceIds, [
+    'claim_edward_dudley_001_02',
+    'claim_edward_dudley_001_03',
+  ]);
+});
+
+test('sharing evidence is not enough on its own — a different sentence still survives', () => {
+  // The safety property that makes the repo-4qlmt fallback sound: it only decides WHICH recomputed
+  // record is compared. `notesAreSameSentence` is unchanged, so a candidate reached only by the
+  // wider match and carrying a different sentence changes nothing, exactly as no candidate would.
+  const subject = row({
+    entityId: 'ent_harriet_tubman_001',
+    kind: 'person',
+    displayName: 'Harriet Tubman',
+    claims: [
+      claim({
+        id: 'claim_tubman_02',
+        predicate: 'first_to',
+        object:
+          'Tubman guided Union forces up the Combahee River, the first woman to lead an armed ' +
+          'assault in the war.',
+        citationSource: 'nps.gov',
+      }),
+      claim({
+        id: 'claim_tubman_03',
+        predicate: 'first_to',
+        object: 'A raid.',
+        citationSource: '',
+      }),
+    ],
+    publishedBasis: [
+      {
+        criterion: 'first_to_do_x',
+        note: 'First to Tubman led the Combahee River Raid, freeing more than 700 people.',
+        evidenceIds: ['claim_tubman_02', 'claim_tubman_03'],
+      },
+    ],
+  });
+
+  assert.deepEqual(planNotabilityBasisResync([subject]).changes, []);
+});
+
 test('a stored note that is a different sentence is not refreshed by the dropped-lead test', () => {
   // The lead tolerance must not become a general prefix match: this stored note is curated prose,
   // not the builder's sentence with a lead on it, and S2 has to leave it alone.

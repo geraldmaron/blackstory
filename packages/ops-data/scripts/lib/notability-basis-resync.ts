@@ -283,11 +283,33 @@ export function resolveNotabilityBasisForRow(
   // S2 — same criterion, same evidence, same sentence: take the builder's spelling.
   const refreshedNotes: NotabilityBasisNoteRefresh[] = [];
   const refreshed = survivors.map((record) => {
-    const candidate = recomputed.find(
-      (other) =>
-        other.criterion === record.criterion &&
-        evidenceKey(other.evidenceIds) === evidenceKey(record.evidenceIds),
-    );
+    /*
+     * Exact evidence first, then SHARED evidence (repo-4qlmt). An exact-set match alone silently
+     * finds nothing whenever the builder's grouping of a predicate's claims has changed since the
+     * row was published: the record is kept verbatim, the merge then skips the recomputed record
+     * because its criterion is already kept, and the row reports as converged without
+     * `notesAreSameSentence` ever being consulted. That is how the pass reported 4,197 of 4,197
+     * already correct on rel_20260723_authority_net_001 while `ent_edward_dudley_001` and
+     * `ent_macon_bolling_allen_001` were live with "First to In 1949, when the U.S. mission in
+     * Liberia..." — the builder already spelled both correctly and the sentence test agreed.
+     *
+     * The fallback cannot loosen what actually gets written. It only decides which recomputed
+     * record is compared; `notesAreSameSentence` below is unchanged and still refuses anything
+     * that is not this sentence differently spelled. A wrong candidate therefore fails that test
+     * and the stored note is kept, which is the same outcome as finding no candidate at all.
+     */
+    const sameCriterion = (other: NotabilityBasisRecord): boolean =>
+      other.criterion === record.criterion;
+    const candidate =
+      recomputed.find(
+        (other) =>
+          sameCriterion(other) &&
+          evidenceKey(other.evidenceIds) === evidenceKey(record.evidenceIds),
+      ) ??
+      recomputed.find(
+        (other) =>
+          sameCriterion(other) && other.evidenceIds.some((id) => record.evidenceIds.includes(id)),
+      );
     if (candidate === undefined || candidate.note === record.note) return record;
     // The lead the builder may have dropped (repo-15slz). Every claim behind one basis record
     // shares a predicate by construction, so the first evidenced claim names it.
