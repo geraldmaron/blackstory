@@ -111,18 +111,12 @@ async function main(): Promise<void> {
              SET
                projection = jsonb_set(
                  jsonb_set(
-                   jsonb_set(projection, '{kind}', '"person"'::jsonb, true),
-                   '{status}',
-                   '"deceased"'::jsonb,
-                   true
-                 ),
-                 '{topicIds}',
-                 $3::jsonb,
-                 true
-               ),
-               taxonomy = jsonb_set(
-                 jsonb_set(
-                   COALESCE(taxonomy, '{}'::jsonb),
+                   jsonb_set(
+                     jsonb_set(projection, '{kind}', '"person"'::jsonb, true),
+                     '{status}',
+                     '"deceased"'::jsonb,
+                     true
+                   ),
                    '{topicIds}',
                    $3::jsonb,
                    true

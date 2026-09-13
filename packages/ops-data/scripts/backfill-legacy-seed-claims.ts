@@ -146,7 +146,6 @@ WHERE entity_id = ANY($1)
 const UPDATE_SQL = `
 UPDATE bb_public.release_entities
 SET
-  claims = $2::jsonb,
   projection = jsonb_set(jsonb_set(projection, '{claims}', $2::jsonb, true), '{claimIds}', $3::jsonb, true)
 WHERE entity_id = $1
 `;

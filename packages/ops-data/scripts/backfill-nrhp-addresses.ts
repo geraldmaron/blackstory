@@ -498,18 +498,22 @@ async function main(): Promise<void> {
       );
       await client.query(
         `UPDATE bb_public.release_entities
-            SET lat = $2, lng = $3,
-                location = jsonb_set(
+            SET projection = jsonb_set(
+                  projection, '{location}',
                   jsonb_set(
                     jsonb_set(
                       jsonb_set(
                         jsonb_set(
-                          jsonb_set(location, '{lat}', to_jsonb($2::double precision)),
-                          '{lng}', to_jsonb($3::double precision)),
-                        '{geohash}', to_jsonb($4::text)),
-                      '{geohashPrefixes}', to_jsonb($5::text[])),
-                    '{precision}', to_jsonb($6::text)),
-                  '{matchMethod}', to_jsonb($7::text)
+                          jsonb_set(
+                            jsonb_set(
+                              COALESCE(projection -> 'location', '{}'::jsonb),
+                              '{lat}', to_jsonb($2::double precision)),
+                            '{lng}', to_jsonb($3::double precision)),
+                          '{geohash}', to_jsonb($4::text)),
+                        '{geohashPrefixes}', to_jsonb($5::text[])),
+                      '{precision}', to_jsonb($6::text)),
+                    '{matchMethod}', to_jsonb($7::text)),
+                  true
                 )
           WHERE entity_id = $1
             AND release_id = (SELECT release_id FROM bb_public.v_active_release_id)`,

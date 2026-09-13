@@ -194,8 +194,7 @@ async function main(): Promise<void> {
     for (const item of retractions) {
       await client.query(
         `UPDATE bb_public.release_entities
-            SET claims = $2::jsonb,
-                projection = jsonb_set(
+            SET projection = jsonb_set(
                   jsonb_set(projection, '{claims}', $2::jsonb, true),
                   '{researchCoverage}', to_jsonb($3::text), true)
           WHERE entity_id = $1`,

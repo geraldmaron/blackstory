@@ -240,11 +240,7 @@ async function main(): Promise<void> {
         const label = `${entry.city}, ${entry.state}`;
         await client.query(
           `UPDATE bb_public.release_entities
-           SET location = $3::jsonb,
-               lat = ($3::jsonb ->> 'lat')::double precision,
-               lng = ($3::jsonb ->> 'lng')::double precision,
-               geohash = $3::jsonb ->> 'geohash',
-               projection = jsonb_set(
+           SET projection = jsonb_set(
                  jsonb_set(projection, '{location}', $3::jsonb, true),
                  '{locationLabel}', to_jsonb($4::text), true
                )
@@ -260,8 +256,7 @@ async function main(): Promise<void> {
       for (const entry of clearPin) {
         await client.query(
           `UPDATE bb_public.release_entities
-           SET location = NULL, lat = NULL, lng = NULL, geohash = NULL,
-               projection = (projection - 'location') - 'locationLabel'
+           SET projection = (projection - 'location') - 'locationLabel'
            WHERE release_id = $1 AND entity_id = $2`,
           [releaseId, entry.id],
         );

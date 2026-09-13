@@ -170,8 +170,7 @@ async function main(): Promise<void> {
 
         const e = await client.query(
           `UPDATE bb_public.release_entities re
-              SET kind = $2,
-                  projection = (
+              SET projection = (
                     jsonb_set(re.projection, '{kind}', to_jsonb($2::text), true)
                     - 'status' - 'livingStatus' - 'statusProvenance' - 'statusHistory'
                   )

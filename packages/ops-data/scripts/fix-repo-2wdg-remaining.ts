@@ -251,8 +251,7 @@ async function main(): Promise<void> {
       );
       await client.query(
         `UPDATE bb_public.release_entities
-         SET display_name = $3,
-             projection = jsonb_set(
+         SET projection = jsonb_set(
                jsonb_set(projection, '{displayName}', to_jsonb($3::text), true),
                '{nameLower}', to_jsonb(lower($3::text)), true
              )
@@ -287,25 +286,22 @@ async function main(): Promise<void> {
           geohash,
           geohashPrefixes: geohashPrefixes(geohash),
         });
+        // One write, into the projection. location/lat/lng/geohash are GENERATED from it, so the
+        // "same object, not a second copy that drifts" this used to need two statements for is
+        // now structural.
         await client.query(
           `UPDATE bb_public.release_entities
-           SET location = location || $3::jsonb
-                 || CASE WHEN $4::text IS NULL THEN '{}'::jsonb
-                         ELSE jsonb_build_object('precision', $4::text) END
-                 || CASE WHEN $5::text IS NULL THEN '{}'::jsonb
-                         ELSE jsonb_build_object('matchMethod', $5::text) END,
-               lat = ($3::jsonb ->> 'lat')::double precision,
-               lng = ($3::jsonb ->> 'lng')::double precision,
-               geohash = $3::jsonb ->> 'geohash'
+           SET projection = jsonb_set(
+                 projection, '{location}',
+                 COALESCE(projection -> 'location', '{}'::jsonb) || $3::jsonb
+                   || CASE WHEN $4::text IS NULL THEN '{}'::jsonb
+                           ELSE jsonb_build_object('precision', $4::text) END
+                   || CASE WHEN $5::text IS NULL THEN '{}'::jsonb
+                           ELSE jsonb_build_object('matchMethod', $5::text) END,
+                 true
+               )
            WHERE release_id = $1 AND entity_id = $2`,
           [releaseId, pin.entityId, locationJson, pin.precision ?? null, pin.matchMethod ?? null],
-        );
-        // projection.location must be the same object, not a second copy that drifts.
-        await client.query(
-          `UPDATE bb_public.release_entities
-           SET projection = jsonb_set(projection, '{location}', location, true)
-           WHERE release_id = $1 AND entity_id = $2`,
-          [releaseId, pin.entityId],
         );
         await client.query(
           `UPDATE bb_public.search_index SET geohash = $3 WHERE release_id = $1 AND entity_id = $2`,
@@ -361,9 +357,7 @@ async function main(): Promise<void> {
       // --- item 7: the Afro-American summary, all five mirrors -----------------------
       await client.query(
         `UPDATE bb_public.release_entities
-         SET summary = $3,
-             claims = jsonb_set(claims, '{0,object}', to_jsonb($3::text), true),
-             projection = jsonb_set(
+         SET projection = jsonb_set(
                jsonb_set(projection, '{summary}', to_jsonb($3::text), true),
                '{claims,0,object}', to_jsonb($3::text), true
              )
@@ -378,8 +372,7 @@ async function main(): Promise<void> {
       // --- item 9: Ellen Eglin -------------------------------------------------------
       await client.query(
         `UPDATE bb_public.release_entities
-         SET summary = $3,
-             projection = jsonb_set(projection, '{summary}', to_jsonb($3::text), true)
+         SET projection = jsonb_set(projection, '{summary}', to_jsonb($3::text), true)
          WHERE release_id = $1 AND entity_id = $2`,
         [releaseId, EGLIN_ID, eglinFixed],
       );

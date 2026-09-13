@@ -257,17 +257,12 @@ async function main(): Promise<void> {
           // left the page showing "Killed Sharonda Coleman-Singleton" while the database held the
           // repaired claim. Same stale-copy trap as repo-rm2y and repo-8x306 — all copies or none.
           `UPDATE bb_public.release_entities
-             SET claims = $1::jsonb,
-                 projection = COALESCE(projection, '{}'::jsonb)
+             SET projection = COALESCE(projection, '{}'::jsonb)
                    || jsonb_build_object(
                         'claims', $1::jsonb,
                         'claimIds', $2::jsonb,
                         'notabilityBasis', $3::jsonb,
-                        'notabilityLabels', $4::jsonb),
-                 taxonomy = CASE
-                   WHEN taxonomy ? 'notabilityLabels'
-                     THEN taxonomy || jsonb_build_object('notabilityLabels', $4::jsonb)
-                   ELSE taxonomy END
+                        'notabilityLabels', $4::jsonb)
            WHERE release_id = $5 AND entity_id = $6`,
           [
             JSON.stringify(write.claims),

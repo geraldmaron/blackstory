@@ -117,9 +117,7 @@ async function main(): Promise<void> {
 
         await client.query(
           `UPDATE bb_public.release_entities
-           SET summary = $3,
-               claims = COALESCE(claims, '[]'::jsonb) || $4::jsonb,
-               projection = jsonb_set(
+           SET projection = jsonb_set(
                  jsonb_set(
                    jsonb_set(projection, '{summary}', to_jsonb($3::text), true),
                    '{claims}', COALESCE(projection -> 'claims', '[]'::jsonb) || $4::jsonb, true
@@ -151,8 +149,7 @@ async function main(): Promise<void> {
       );
       await client.query(
         `UPDATE bb_public.release_entities
-         SET display_name = $3,
-             projection = jsonb_set(
+         SET projection = jsonb_set(
                jsonb_set(projection, '{displayName}', to_jsonb($3::text), true),
                '{nameLower}', to_jsonb(lower($3::text)), true
              )

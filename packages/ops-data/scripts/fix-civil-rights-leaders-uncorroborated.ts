@@ -307,9 +307,7 @@ async function main(): Promise<void> {
         const claimIdsJson = JSON.stringify(item.claims.map((claim) => claim.id));
         await client.query(
           `UPDATE bb_public.release_entities
-           SET summary = $3,
-               claims = $4::jsonb,
-               projection = jsonb_set(
+           SET projection = jsonb_set(
                  jsonb_set(
                    jsonb_set(projection, '{summary}', to_jsonb($3::text), true),
                    '{claims}', $4::jsonb, true

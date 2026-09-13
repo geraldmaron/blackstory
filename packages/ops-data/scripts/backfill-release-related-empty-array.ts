@@ -28,7 +28,6 @@ WHERE jsonb_typeof(related) = 'object' AND related = '{}'::jsonb
 const UPDATE_SQL = `
 UPDATE bb_public.release_entities re
 SET
-  related = '[]'::jsonb,
   projection = CASE
     WHEN jsonb_typeof(re.projection->'related') = 'object'
       AND re.projection->'related' = '{}'::jsonb

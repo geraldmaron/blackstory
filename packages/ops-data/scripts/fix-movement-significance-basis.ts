@@ -211,8 +211,7 @@ async function main(): Promise<void> {
       await client.query('BEGIN');
       await client.query(
         `UPDATE bb_public.release_entities
-         SET claims = $3::jsonb,
-             projection = jsonb_set(
+         SET projection = jsonb_set(
                jsonb_set(
                  jsonb_set(projection, '{claims}', $3::jsonb, true),
                  '{notabilityBasis}', $4::jsonb, true

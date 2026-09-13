@@ -324,15 +324,7 @@ async function remapReleaseReferences(
   const { rowCount } = await client.query(
     `WITH active AS (SELECT release_id FROM bb_public.v_active_release_id)
      UPDATE bb_public.release_entities e
-        SET related = (
-              SELECT coalesce(jsonb_agg(DISTINCT y), '[]'::jsonb)
-                FROM jsonb_array_elements(coalesce(e.related, '[]'::jsonb)) x,
-                LATERAL (
-                  SELECT jsonb_set(x, '{id}', to_jsonb(coalesce($1::jsonb ->> (x->>'id'), x->>'id')))
-                ) AS t(y)
-               WHERE coalesce($1::jsonb ->> (x->>'id'), x->>'id') <> e.entity_id
-            ),
-            projection = jsonb_set(
+        SET projection = jsonb_set(
               jsonb_set(
                 e.projection, '{related}',
                 (

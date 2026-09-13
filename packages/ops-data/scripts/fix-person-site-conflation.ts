@@ -289,11 +289,6 @@ async function applyTubmanSplit(client: pg.Client, releaseId: string): Promise<v
   await client.query(
     `UPDATE bb_public.release_entities
      SET
-       summary = $3,
-       claims = $4::jsonb,
-       location = $8::jsonb,
-       lat = ($8::jsonb ->> 'lat')::double precision,
-       lng = ($8::jsonb ->> 'lng')::double precision,
        projection = jsonb_set(
          jsonb_set(
            jsonb_set(
