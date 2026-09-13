@@ -33,6 +33,8 @@ function fakeVariablesJson() {
     B17001B_002E: { label: 'Estimate!!Total:!!Income in the past 12 months below poverty level:' },
     B25003B_001E: { label: 'Estimate!!Total:' },
     B25003B_002E: { label: 'Estimate!!Total:!!Owner occupied' },
+    B25003H_001E: { label: 'Estimate!!Total:' },
+    B25003H_002E: { label: 'Estimate!!Total:!!Owner occupied' },
     C15002B_001E: { label: 'Estimate!!Total:' },
     C15002B_006E: { label: "Estimate!!Total:!!Male:!!Bachelor's degree or higher" },
     C15002B_011E: { label: "Estimate!!Total:!!Female:!!Bachelor's degree or higher" },
@@ -104,6 +106,8 @@ test('parsePhase1AcsResponse maps Montgomery County MD county row', () => {
         B17001B_002E: '7000',
         B25003B_001E: '400000',
         B25003B_002E: '280000',
+        B25003H_001E: '500000',
+        B25003H_002E: '400000',
         C15002B_001E: '700000',
         C15002B_006E: '120000',
         C15002B_011E: '130000',
@@ -123,6 +127,7 @@ test('parsePhase1AcsResponse maps Montgomery County MD county row', () => {
   assert.equal(byMetric.get('acs-median-hh-income-white-county')!.estimate, 151892);
   assert.equal(byMetric.get('acs-poverty-rate-black-county')!.estimate, 7);
   assert.equal(byMetric.get('acs-homeownership-rate-black-county')!.estimate, 70);
+  assert.equal(byMetric.get('acs-homeownership-rate-white_nh-county')!.estimate, 80);
   assert.equal(byMetric.get('acs-ba-attainment-black-county')!.estimate, 35.7);
   assert.equal(byMetric.get('acs-black-population-share-county')!.referencePeriod, '2020-2024');
   assert.equal(byMetric.get('acs-black-population-share-county')!.source, 'acs-census-api');

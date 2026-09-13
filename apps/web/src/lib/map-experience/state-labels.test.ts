@@ -22,7 +22,7 @@ import {
   STATE_LABEL_APPEAR_END_ZOOM,
   STATE_LABEL_APPEAR_START_ZOOM,
 } from './state-labels';
-import { brandPalette, darkTheme } from '@repo/ui';
+import { brandPalette, mapPalettes } from '@repo/ui';
 
 test('every one of the 51 states/D.C. gets exactly one label point', () => {
   const points = stateLabelPoints();
@@ -111,13 +111,15 @@ test('buildStateLabelMarkers position/text are identical regardless of selection
   }
 });
 
-test('stateLabelColors follows light vs dark theme tokens', () => {
+test('stateLabelColors default ink comes from the design-law `label` plate role, not a local literal', () => {
+  // repo-rnlh: this used to be brandPalette.stone / darkTheme.inkMuted, ad hoc literals that
+  // happened to coincide with (light) or drift from (dark) the ΔL*-contrast-held plate token.
   const light = stateLabelColors('light');
-  assert.equal(light.default, brandPalette.stone);
+  assert.equal(light.default, mapPalettes.light.label);
   assert.equal(light.selected, brandPalette.copperTextLight);
 
   const dark = stateLabelColors('dark');
-  assert.equal(dark.default, darkTheme.inkMuted);
+  assert.equal(dark.default, mapPalettes.dark.label);
   assert.equal(dark.selected, brandPalette.copperDark);
 });
 

@@ -173,6 +173,11 @@ export {
 
 export { loadEditorialCatalogFromPostgres } from './editorial-catalog-postgres.js';
 
+export {
+  loadDiscoveryCatalogProfilesFromPostgres,
+  type DiscoveryCatalogQueryable,
+} from './discovery-catalog-postgres.js';
+
 export { runEnrichmentJudge, type EnrichmentRunResult } from './enrichment-run.js';
 
 export { loadPendingEditorialItems, type PendingListResult } from './pending-list.js';

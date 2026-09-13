@@ -139,6 +139,30 @@ const WATCHED_READS: readonly WatchedRead[] = [
     // healthy day is a few thousand calls; this only fires if the memo is bypassed wholesale.
     budgetBytesPerDay: 100 * 1024 * 1024,
   },
+  // The two below were added 2026-09-12 (repo-s0lq): /law and /books+/data+the homepage data
+  // pulse read these on every dynamic request with no cross-request cache. pg_stat_statements
+  // since 2026-07-20 showed 22,532 and 172,919 calls respectively, now moved onto
+  // createReleaseScopedCache (legal/public-source.ts, public-data/materialized-snapshots.ts).
+  {
+    label: 'release_legal_snapshots_full',
+    description: 'Full legal snapshot list pull (/law)',
+    // Anchored on the select list and ORDER BY so the release_id-only count/exists probes
+    // elsewhere are not counted as a full pull.
+    fingerprint: 'SELECT payload%FROM bb_public.release_legal_snapshots%ORDER BY slug%',
+    // 26,696 bytes across 12 rows on the active release.
+    bytesPerRow: 2_225,
+    // Healthy is one pull per instance per 30m (the release-scoped cache TTL).
+    budgetBytesPerDay: 1 * GB,
+  },
+  {
+    label: 'materialized_snapshots_point',
+    description: 'Materialized snapshot point read by name (/books, /data, demographics)',
+    fingerprint: 'SELECT payload%FROM bb_public.materialized_snapshots%WHERE name = $1%',
+    // 69,259 bytes across 6 snapshots on the active release.
+    bytesPerRow: 11_543,
+    // Healthy is one pull per name per instance per 30m (the release-scoped cache TTL).
+    budgetBytesPerDay: 1 * GB,
+  },
 ];
 
 type StatementRow = {

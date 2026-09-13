@@ -376,15 +376,56 @@ async function collectWikipedia(row: CandidateRow): Promise<EvidenceRow | null> 
 }
 
 /**
+ * repo-n7p6.22: the DC HPO import's canonicalUrl falls back to this dataset landing page — not
+ * a per-item historicsites.dcpreservation.org URL — for rows whose ArcGIS source record has no
+ * Hyperlink value. Confirmed directly against AAHT_Source_Data for all 7 affected rows: URL_Status
+ * there reads "*Not Currently Available*" or is unset, i.e. this is DC HPO's own admission that no
+ * item page exists yet, not an import bug that dropped a real link. Every affected row gets this
+ * identical URL, so it can never BE a row's identity the way a real per-item URL is (see the
+ * collector's doc comment below) — capturing it as evidence would silently store the dataset's
+ * generic dcat:Dataset description as if it were about that one site. Shared with the same literal
+ * string in landscape-intake-weed.ts ('fallback_catalog_url') and incremental-publish.ts.
+ */
+const DC_HPO_FALLBACK_URL = 'https://catalog.data.gov/dataset/black-history-sites-washington';
+
+/**
  * DC HPO's own inventory page for the site (dcpreservation.org, tier2 by tier1-sources policy).
  * Unlike the NRHP/Wikipedia paths there is no search step here: the row's canonicalUrl was
  * assigned at import time straight from the DC Historic Preservation Office's own ArcGIS feature
  * for this exact record, so the URL already IS the identity — nothing to corroborate against.
+ * That does not hold for DC_HPO_FALLBACK_URL, which is shared by every row the import could not
+ * find a per-item Hyperlink for; those are quarantined below without a fetch.
  */
 async function collectDcHpo(row: CandidateRow): Promise<EvidenceRow | null> {
   if (row.lane !== 'dc-sites') throw new SkipReason('not a dc-sites row');
   const url = row.payload.canonicalUrl;
   if (url === undefined) throw new SkipReason('dc-sites row has no canonicalUrl');
+
+  if (url === DC_HPO_FALLBACK_URL) {
+    // Written (not skipped) so a re-sweep overwrites any earlier run's mistaken 'captured' status
+    // for this exact (entity_id, collector, source_url) key — see repo-n7p6.22.
+    return {
+      id: evidenceId(row.id, 'dc-hpo', url),
+      entityId: row.id,
+      lane: row.lane,
+      collector: 'dc-hpo',
+      sourceUrl: url,
+      sourceTier: 'tier2',
+      title: row.display_name,
+      contentText: '',
+      contentHash: hashContent(''),
+      charCount: 0,
+      qualityScore: 0,
+      status: 'quarantined',
+      provenance: {
+        publisher: 'DC Office of Planning, Historic Preservation Office',
+        licence: 'CC BY 4.0',
+        quarantineReason:
+          'canonicalUrl is the dataset landing page fallback, not a per-item source — DC HPO ' +
+          'ArcGIS source record has no per-item Hyperlink for this site (repo-n7p6.22)',
+      },
+    };
+  }
 
   const page = await safeFetchPage(url, { allowedContentTypes: ['text/html'] });
   if (page === undefined)

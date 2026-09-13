@@ -92,6 +92,59 @@ test('wealth trend merge rebuilds points from shared SCF periods', () => {
   assert.equal(mergedTrend.points[1]?.values.white, 285_000);
 });
 
+test('cook homeownership merge appends the ACS point after the decennial series', () => {
+  const cookRow = (metricId: string, referencePeriod: string, estimate: number) => ({
+    metricId,
+    jurisdictionId: 'county:17031',
+    referencePeriod,
+    estimate,
+    source: 'nhgis-county-race',
+    sourceUrl: 'https://www.nhgis.org/citing-nhgis',
+  });
+  const acsRow = (metricId: string, estimate: number) => ({
+    metricId,
+    jurisdictionId: 'county:17031',
+    referencePeriod: '2020-2024',
+    estimate,
+    source: 'acs-census-api',
+    sourceUrl: 'https://www.census.gov/programs-surveys/acs',
+  });
+  const merged = mergeDataPageIndicatorBundle(DATA_PAGE_INDICATOR_FIXTURE_BUNDLE, [
+    cookRow('nhgis-homeownership-rate-black-county', '1990', 37.1),
+    cookRow('nhgis-homeownership-rate-white-county', '1990', 63.8),
+    cookRow('nhgis-homeownership-rate-black-county', '2010', 41.2),
+    cookRow('nhgis-homeownership-rate-white-county', '2010', 67.2),
+    acsRow('acs-homeownership-rate-black-county', 41.5),
+    acsRow('acs-homeownership-rate-white_nh-county', 67.2),
+  ]);
+  assert.deepEqual(
+    merged.cookHomeownership.points.map((point) => point.period),
+    ['1990', '2010', '2020-2024 (ACS)'],
+  );
+  const acsPoint = merged.cookHomeownership.points.at(-1);
+  assert.equal(acsPoint?.values.black, 41.5);
+  assert.equal(acsPoint?.values.white, 67.2);
+});
+
+test('cook homeownership merge omits the ACS point when only decennial rows are present', () => {
+  const cookRow = (metricId: string, referencePeriod: string, estimate: number) => ({
+    metricId,
+    jurisdictionId: 'county:17031',
+    referencePeriod,
+    estimate,
+    source: 'nhgis-county-race',
+    sourceUrl: 'https://www.nhgis.org/citing-nhgis',
+  });
+  const merged = mergeDataPageIndicatorBundle(DATA_PAGE_INDICATOR_FIXTURE_BUNDLE, [
+    cookRow('nhgis-homeownership-rate-black-county', '1990', 37.1),
+    cookRow('nhgis-homeownership-rate-white-county', '1990', 63.8),
+  ]);
+  assert.deepEqual(
+    merged.cookHomeownership.points.map((point) => point.period),
+    ['1990'],
+  );
+});
+
 test('cost burden merge stays pinned to the suburban Cook 2016-2020 vintage', () => {
   const chasRow = (metricId: string, referencePeriod: string, estimate: number) => ({
     metricId,

@@ -48,6 +48,12 @@ export const PHASE1_ACS5_VARIABLES: readonly AcsVariableSpec[] = [
     field: 'ownerOccupiedBlack',
     labelPattern: /owner occupied/i,
   },
+  { id: 'B25003H_001E', field: 'tenureUniverseWhiteNh', labelPattern: /^estimate\s*total/i },
+  {
+    id: 'B25003H_002E',
+    field: 'ownerOccupiedWhiteNh',
+    labelPattern: /owner occupied/i,
+  },
   { id: 'C15002B_001E', field: 'educationUniverse25PlusBlack', labelPattern: /^estimate\s*total/i },
   {
     id: 'C15002B_006E',

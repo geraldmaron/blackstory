@@ -439,6 +439,44 @@ test('OpenFreeMap street layers are present for casing, fill, and labels', () =>
   assert.ok(style.layers.some((layer) => layer.id === 'explore-street-label'));
 });
 
+test('plate-road paints the design-law `road` role and hands off to the local street layers at z8', () => {
+  // repo-rnlh: `plate.road` (design-direction-v9-atlas.md's "Motorway/trunk/primary, minzoom: 6")
+  // had zero consumers: the local street layers use their own, separately-tuned `streetCasing`/
+  // `street` literals (repo-ktwh's class-hierarchy work), not this token.
+  const source = buildExploreMapSource(listPublicEntities());
+  for (const colorScheme of ['light', 'dark'] as const) {
+    const style = buildExploreMapStyle({
+      featureCollection: source.featureCollection,
+      jurisdictionAreaFeatures: source.jurisdictionAreaFeatures,
+      layerMode: 'off',
+      colorScheme,
+    });
+    const roadLayer = layerById(style, 'plate-road') as {
+      type?: string;
+      source?: string;
+      'source-layer'?: string;
+      minzoom?: number;
+      maxzoom?: number;
+      filter?: unknown;
+      paint?: { 'line-color'?: unknown };
+    };
+    assert.equal(roadLayer.type, 'line');
+    assert.equal(roadLayer.source, 'openfreemap');
+    assert.equal(roadLayer['source-layer'], 'transportation');
+    assert.equal(roadLayer.minzoom, 6);
+    // Must not overlap explore-street-casing/-fill's own minzoom: 8, or the same roads paint twice.
+    assert.equal(roadLayer.maxzoom, 8);
+    assert.deepEqual(roadLayer.filter, [
+      'match',
+      ['get', 'class'],
+      ['motorway', 'trunk', 'primary'],
+      true,
+      false,
+    ]);
+    assert.equal(roadLayer.paint?.['line-color'], mapPalettes[colorScheme].road);
+  }
+});
+
 /** Pull the class→width match expression nested at a zoom stop inside a street line-width interpolate. */
 function streetWidthMatchAtZoom(lineWidth: unknown, zoom: number): unknown[] {
   const expr = lineWidth as unknown[];

@@ -1,11 +1,23 @@
 /**
- * Public longform story projections for `/stories`.
+ * Legacy 5-story seed fixture (SEED_STORY_PROJECTIONS). Adapted from
+ * oral-history research linking (start-line relocation, omitted actors,
+ * winner-built tests) into BlackStory voice: place-first, evidence before
+ * assertion, no trauma hooks.
  *
- * Sole story-body corpus for the product: seeded into
- * `publicReleases/{releaseId}/stories/{slug}` and reused as the offline snapshot
- * when live public projections are disabled. Adapted from oral-history research
- * linking (start-line relocation, omitted actors, winner-built tests) into
- * BlackStory voice: place-first, evidence before assertion, no trauma hooks.
+ * NOT consumed by `/stories` — that route reads `listPublicArticleListItems`
+ * from `apps/web/src/lib/articles/source` instead. The live consumer today is
+ * `apps/web/src/admin/stories/cover-article-catalog.ts`, which backs the admin
+ * "Article covers" cover-package workflow (`/admin/stories/articles`,
+ * `/admin/stories/review`). `packages/operator-cli/src/story-rewrite-lane.test.ts`
+ * also imports `getSeedStoryProjection`, purely as a ready-made
+ * StoryProjection-shaped test fixture unrelated to that admin workflow.
+ *
+ * Decision (repo-zcnr, 2026-09-12): kept, not dead code. Retiring this file
+ * would break the admin cover-package workflow above, so it stays until that
+ * workflow gets a real-article data source (separate, larger work). Checked
+ * against the theme-packet slug bindings in
+ * `packages/ops-data/fixtures/theme-impact/chicago-bronzeville-bindings.ts`:
+ * no overlap with these five legacy slugs, so no conflict there either.
  */
 import type { PublicStoryProjectionDoc } from '@repo/schemas';
 

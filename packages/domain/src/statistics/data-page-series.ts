@@ -96,6 +96,11 @@ const NHGIS = {
   url: 'https://www.nhgis.org/citing-nhgis',
 } as const;
 
+const ACS = {
+  label: 'U.S. Census Bureau, American Community Survey 5-Year Estimates',
+  url: 'https://www.census.gov/programs-surveys/acs',
+} as const;
+
 const HMDA = {
   label: 'FFIEC Home Mortgage Disclosure Act Data Browser',
   url: 'https://ffiec.cfpb.gov/data-browser/',
@@ -179,7 +184,7 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
     id: 'housing-nhgis-homeownership-cook',
     title: 'Homeownership by householder race, Cook County',
     caption:
-      'Decennial Census county tenure tables: owner-occupied units divided by occupied units for Black alone and White alone householders. Labels changed across decades; bars show published counts, not interpolated gaps.',
+      'Decennial Census county tenure tables (1990-2010): owner-occupied units divided by occupied units for Black alone and White alone householders. The final bar swaps in the 2020-2024 American Community Survey 5-year estimate, a different survey design that also narrows the White figure to non-Hispanic White householders, so read it as a separate estimate, not a continuation of the decennial series.',
     geographyLabel: 'Cook County, Illinois',
     unit: 'percent',
     yAxisLabel: 'Homeownership rate',
@@ -191,8 +196,9 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
       { period: '1990', values: { black: 37.1, white: 63.8 } },
       { period: '2000', values: { black: 42, white: 66.7 } },
       { period: '2010', values: { black: 41.2, white: 67.2 } },
+      { period: '2020-2024 (ACS)', values: { black: 41.5, white: 67.2 } },
     ],
-    sources: [NHGIS],
+    sources: [NHGIS, ACS],
     themeId: 'redlining',
     themeQuestionId: 'Q3',
   },
@@ -415,20 +421,51 @@ export function mergeDataPageIndicatorBundle(
     'nhgis-homeownership-rate-white-county',
     'county:17031',
   );
+  // The decennial NHGIS series ends in 2010. Its ACS successor is a different survey design
+  // and, for the White comparison, a Non-Hispanic definition, so the point is tagged "(ACS)"
+  // and appended rather than blended into the decennial trend.
+  const blackHoAcs = observationsByMetric(
+    rows,
+    'acs-homeownership-rate-black-county',
+    'county:17031',
+  );
+  const whiteHoAcs = observationsByMetric(
+    rows,
+    'acs-homeownership-rate-white_nh-county',
+    'county:17031',
+  );
   if (blackHo.length > 0 && whiteHo.length > 0) {
     const periods = [...new Set(blackHo.map((row) => row.referencePeriod))].sort();
+    const decennialPoints = periods.map((period) => ({
+      period,
+      values: {
+        black: blackHo.find((row) => row.referencePeriod === period)?.estimate ?? 0,
+        white: whiteHo.find((row) => row.referencePeriod === period)?.estimate ?? 0,
+      },
+    }));
+    const latestBlackAcs = blackHoAcs.at(-1);
+    const latestWhiteAcs = whiteHoAcs.at(-1);
+    const acsPoint =
+      latestBlackAcs &&
+      latestWhiteAcs &&
+      latestBlackAcs.referencePeriod === latestWhiteAcs.referencePeriod
+        ? [
+            {
+              period: `${latestBlackAcs.referencePeriod} (ACS)`,
+              values: { black: latestBlackAcs.estimate, white: latestWhiteAcs.estimate },
+            },
+          ]
+        : [];
     cookHomeownership = {
       ...cookHomeownership,
-      points: periods.map((period) => ({
-        period,
-        values: {
-          black: blackHo.find((row) => row.referencePeriod === period)?.estimate ?? 0,
-          white: whiteHo.find((row) => row.referencePeriod === period)?.estimate ?? 0,
-        },
-      })),
+      points: [...decennialPoints, ...acsPoint],
       sources: mergeSources(
         cookHomeownership.sources,
-        [...blackHo, ...whiteHo].map(sourceFromObservation),
+        [
+          ...blackHo,
+          ...whiteHo,
+          ...(acsPoint.length > 0 ? [latestBlackAcs!, latestWhiteAcs!] : []),
+        ].map(sourceFromObservation),
       ),
     };
   }

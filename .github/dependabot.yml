@@ -78,9 +78,9 @@ updates:
       major:
         patterns: ['*']
         update-types: ['major']
-    # apps/mobile tracks Expo SDK 57's pinned version set. These three bumps resolve against
-    # peers Expo does not ship yet, so npm fails at install and no amount of rebasing helps;
-    # they are held until an SDK upgrade moves the pins, not because the versions are bad.
+    # apps/mobile tracks Expo SDK 57's pinned version set. Three of these four bumps resolve
+    # against peers Expo does not ship yet, so npm fails at install and no amount of rebasing
+    # helps; they are held until an SDK upgrade moves the pins, not because the versions are bad.
     ignore:
       # Needs react-native-worklets 0.12.x; SDK 57 pins 0.10.1.
       - dependency-name: 'react-native-reanimated'
@@ -93,6 +93,14 @@ updates:
       # eslint-plugin-import and eslint-plugin-react do not declare eslint 10 support, and
       # eslint-config-expo pulls both. The root workspace is already on eslint 10.
       - dependency-name: 'eslint'
+        update-types: ['version-update:semver-major']
+      # TypeScript 7 is the native port, and @typescript-eslint 8.x crashes on load against it
+      # ("Cannot read properties of undefined (reading 'Cjs')"), which takes `npm run lint`
+      # (ci.yml mobile-checks) down with it — the same crash held off on the root ecosystem's
+      # typescript entry above. apps/mobile has its own lockfile and Dependabot entry, so the
+      # root hold does not cover it; this workspace needs its own. Drop both together once
+      # @typescript-eslint ships a release that supports TypeScript 7.
+      - dependency-name: 'typescript'
         update-types: ['version-update:semver-major']
 
   - package-ecosystem: pip

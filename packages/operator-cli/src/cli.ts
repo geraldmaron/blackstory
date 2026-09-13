@@ -31,6 +31,7 @@ import { runRssOperatorCampaign } from './rss-campaign-run.js';
 import { dispatchDiscoveryCampaign } from '@repo/config/scheduled-jobs';
 import { mergeJsonCatalogOverCanonical } from './editorial-catalog.js';
 import { loadEditorialCatalogFromPostgres } from './editorial-catalog-postgres.js';
+import { loadDiscoveryCatalogProfilesFromPostgres } from './discovery-catalog-postgres.js';
 import {
   runEditorialJudge,
   type EditorialCatalogEntity,
@@ -841,6 +842,21 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const maxCandidatesRaw = optionalFlag(flags, '--max-candidates');
         const queueSurvivors = flags.booleans.has('--queue-survivors');
         const maxSurvivorsRaw = optionalFlag(flags, '--max-survivors');
+        // Real catalog match needs a live Postgres with bb_public.search_index populated
+        // (this repo's CI foundation does not provision it — see db:init). Soft match only:
+        // a load failure never blocks dispatch, it just runs without match enrichment, same
+        // as the empty-catalog case `attachCatalogMatch` already treats as normal.
+        let catalogProfiles:
+          Awaited<ReturnType<typeof loadDiscoveryCatalogProfilesFromPostgres>> | undefined;
+        if (modeRaw === 'live' && killRaw !== 'engaged') {
+          try {
+            catalogProfiles = await loadDiscoveryCatalogProfilesFromPostgres({ nowIso });
+          } catch (err) {
+            stderr(
+              `Warning: discovery catalog load failed (running without match): ${String(err)}\n`,
+            );
+          }
+        }
         const result = await dispatchDiscoveryCampaign({
           jobId,
           mode: modeRaw,
@@ -849,6 +865,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           includeCampaign: queueSurvivors,
           ...(jobRunId !== undefined ? { jobRunId } : {}),
           ...(maxCandidatesRaw !== undefined ? { maxCandidates: Number(maxCandidatesRaw) } : {}),
+          ...(catalogProfiles !== undefined ? { catalogProfiles } : {}),
         });
 
         let queueSummary: Record<string, unknown> | undefined;

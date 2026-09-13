@@ -8,7 +8,7 @@ import {
   type BannedBooksListingSnapshot,
 } from '@repo/domain';
 import { getBannedBooksListingSnapshot } from '../../data/banned-books-seed';
-import { fetchMaterializedSnapshot } from '../public-data/public-readers';
+import { fetchMaterializedSnapshot } from '../public-data/materialized-snapshots';
 
 function isBannedBooksListingSnapshot(value: unknown): value is BannedBooksListingSnapshot {
   if (value === null || typeof value !== 'object') return false;

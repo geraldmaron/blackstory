@@ -801,6 +801,35 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         },
       },
       {
+        /* Major roads only (motorway/trunk/primary) — design-direction-v9-atlas.md's `road` role,
+           `minzoom: 6`. This is the continental register: national/state highway structure visible
+           before the reader ever reaches the dense, class-hierarchy-styled local street network
+           (`explore-street-casing`/`-fill` below, minzoom 8). `maxzoom` hands off exactly where
+           that local layer picks the same classes back up at their own tuned widths, so the two
+           never double-paint the same geometry. `plate.road` had no consumer until this layer;
+           see repo-rnlh. */
+        id: 'plate-road',
+        type: 'line',
+        source: OPENFREEMAP_SOURCE_ID,
+        'source-layer': 'transportation',
+        minzoom: 6,
+        maxzoom: 8,
+        filter: ['match', ['get', 'class'], ['motorway', 'trunk', 'primary'], true, false],
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: {
+          'line-color': plate.road,
+          'line-width': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            6,
+            0.4,
+            8,
+            0.9,
+          ] as unknown as ExpressionSpecification,
+        },
+      },
+      {
         /* City and town names. Deliberately NOT state names: state labels are DOM markers
            (`state-labels.ts`) tied to selection and the Lens `Place labels` toggle, and a
            second symbol layer of the same names would collide with them. Cities are the

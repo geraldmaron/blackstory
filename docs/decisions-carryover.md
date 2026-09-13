@@ -89,10 +89,18 @@ the same way the script already did on the entity side
 (`entities.identifiers: [{scheme: 'research_case', value: caseId}]`) and via a
 `case_history_events` row (`reason_code: 'canonical_promotion_approved'`).
 
-**Status:** implemented and tested (`packages/domain/src/promotion/case-promotion.test.ts`);
-`.cache/promote-authority-net-2026-07-23.mjs` is no longer the only way to do this. Not yet
-exercised against a live promotion in this session — residual verification risk, tracked as a
-follow-up.
+**Status:** implemented and tested. `packages/domain/src/promotion/case-promotion.test.ts` covers
+the pure gate/validation functions; `apps/web/src/admin/cases/promote-case.test.ts` covers
+`promoteCaseToCanonical`'s actual transactional write path (gate rejection, validation rejection,
+live-duplicate rejection, and a happy-path commit) against a fake Postgres client, the same
+fixture style as `canonical-write.test.ts`, via the injectable `PromoteCaseDependencies` seam.
+`.cache/promote-authority-net-2026-07-23.mjs` is no longer the only way to do this — as of
+2026-09-12 it is superseded but still present (untracked, gitignored) and not yet deleted. As of
+2026-09-12,
+`promoteCaseToCanonical` has still never been exercised against a live promotion (0 of 3,420
+`bb_research.case_history_events` rows carry `reason_code = 'canonical_promotion_approved'`; all
+23 case→canonical promotions to date went through the ad hoc script or otherwise bypassed this
+path) — residual verification risk, tracked as a follow-up.
 
 **Alternatives considered:**
 - A new small CLI package with its own auth/identity model — rejected, duplicates the auth

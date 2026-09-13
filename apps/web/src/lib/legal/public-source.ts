@@ -6,9 +6,12 @@
  * The projection payload is the same document shape the seed exposes, so callers
  * get one type either way.
  */
+import { cache } from 'react';
 import { getLegalCatalogEntry, listLegalSnapshots } from '../../data/legal-seed';
 import type { SEED_LEGAL_SNAPSHOTS } from '../../data/legal-seed';
-import { listPublicLegalSnapshots } from '../public-data/public-readers';
+import { listPublicLegalSnapshots as fetchReleaseLegalSnapshots } from '../public-data/public-readers';
+import { createReleaseScopedCache } from '../public-data/release-scoped-cache';
+import { getPublicActiveReleaseMeta } from '../public-data/source';
 
 export type LegalSnapshotDocument = (typeof SEED_LEGAL_SNAPSHOTS)[number];
 
@@ -42,9 +45,25 @@ function isSnapshotDocument(value: unknown): value is LegalSnapshotDocument {
 
 type ExplainerOf = ReturnType<LegalCatalogSource['explainerFor']>;
 
+const releaseLegalSnapshotsCache = createReleaseScopedCache<readonly unknown[]>({
+  kind: 'release-legal-snapshots-v1',
+});
+
+/**
+ * Every frozen legal snapshot in the active release (~12 rows, ~27KB), read once per
+ * release-scoped cache window and shared across requests — mirrors the entities/search-index
+ * pattern in public-data/source.ts. Before this, `/law` read bb_public.release_legal_snapshots
+ * on every request: 22,532 calls between 2026-07-20 and 2026-09-12 with no cross-request cache.
+ */
+const listReleaseLegalSnapshotsCached = cache(async (): Promise<readonly unknown[]> => {
+  const release = await getPublicActiveReleaseMeta();
+  if (!release) return fetchReleaseLegalSnapshots();
+  return (await releaseLegalSnapshotsCache.get(release, fetchReleaseLegalSnapshots)) ?? [];
+});
+
 export async function loadLegalCatalog(): Promise<LegalCatalogSource> {
   try {
-    const payloads = await listPublicLegalSnapshots();
+    const payloads = await listReleaseLegalSnapshotsCached();
     const snapshots = payloads.filter(isSnapshotDocument);
     if (snapshots.length > 0) {
       const explainers = new Map<string, ExplainerOf>();

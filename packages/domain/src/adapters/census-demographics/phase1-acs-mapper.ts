@@ -333,6 +333,33 @@ export function mapPhase1AcsRowToObservations(
       );
     }
 
+    const homeownershipRateWhiteNh = pct(
+      getValue(row, 'ownerOccupiedWhiteNh') ?? 0,
+      getValue(row, 'tenureUniverseWhiteNh') ?? 0,
+    );
+    if (
+      homeownershipRateWhiteNh !== undefined &&
+      getValue(row, 'ownerOccupiedWhiteNh') !== undefined &&
+      getValue(row, 'tenureUniverseWhiteNh') !== undefined
+    ) {
+      drafts.push(
+        buildDraft({
+          metric: metricById('acs-homeownership-rate-white_nh-county'),
+          jurisdictionId,
+          geography: row.geography,
+          vintage,
+          retrievedAt,
+          estimate: homeownershipRateWhiteNh,
+          ...(getValue(row, 'ownerOccupiedWhiteNh') !== undefined
+            ? { numerator: getValue(row, 'ownerOccupiedWhiteNh')! }
+            : {}),
+          ...(getValue(row, 'tenureUniverseWhiteNh') !== undefined
+            ? { denominator: getValue(row, 'tenureUniverseWhiteNh')! }
+            : {}),
+        }),
+      );
+    }
+
     const baNumerator =
       (getValue(row, 'baPlusMaleBlack') ?? 0) + (getValue(row, 'baPlusFemaleBlack') ?? 0);
     const baDenominator = getValue(row, 'educationUniverse25PlusBlack');

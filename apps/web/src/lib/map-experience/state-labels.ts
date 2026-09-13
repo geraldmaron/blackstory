@@ -21,7 +21,7 @@
 // `node:crypto` at module scope. This module is imported by MapStage.tsx ('use client'), so
 // barrel-importing here would drag a Node-only module into the browser bundle.
 import { US_STATES, type UsStateInfo } from '@repo/domain/map/geography';
-import { brandPalette, darkTheme, mapPalettes } from '@repo/ui';
+import { brandPalette, mapPalettes } from '@repo/ui';
 import { MAP_MIN_ZOOM } from './camera-presets';
 import { type MapColorScheme } from './dignity-style';
 
@@ -135,7 +135,15 @@ export function resolveStateLabelColorScheme(colorScheme?: MapColorScheme): MapC
   return 'dark';
 }
 
-/** Theme-aware ink for HTML state abbreviation markers (testable without DOM). */
+/**
+ * Theme-aware ink for HTML state abbreviation markers (testable without DOM).
+ *
+ * `default` is `mapPalettes[scheme].label`: design law's own "State labels" role (repo-rnlh),
+ * ΔL*-contrast-held against `land` by `map-contrast.test.ts`, the same token symbol-layer text
+ * would use for `text-color` if this label set were ever a `text-field` layer instead of a DOM
+ * marker (see the module doc comment above). `selected` stays the brand accent: it is an
+ * interaction highlight, not part of the plate's §3 token table.
+ */
 export function stateLabelColors(colorScheme?: MapColorScheme): {
   readonly default: string;
   readonly selected: string;
@@ -143,12 +151,12 @@ export function stateLabelColors(colorScheme?: MapColorScheme): {
   const scheme = resolveStateLabelColorScheme(colorScheme);
   if (scheme === 'light') {
     return {
-      default: brandPalette.stone,
+      default: mapPalettes.light.label,
       selected: brandPalette.copperTextLight,
     };
   }
   return {
-    default: darkTheme.inkMuted,
+    default: mapPalettes.dark.label,
     selected: brandPalette.copperDark,
   };
 }

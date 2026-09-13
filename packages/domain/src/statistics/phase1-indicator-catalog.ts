@@ -119,6 +119,21 @@ export const PHASE1_INDICATOR_CATALOG: readonly Phase1IndicatorDefinition[] = [
     raceEthnicitySlice: 'black_alone',
   }),
   series({
+    metricId: 'acs-homeownership-rate-white_nh-county',
+    metricDefinition: 'Homeownership rate for White alone, Non-Hispanic householders',
+    universe: 'occupied housing units',
+    unit: 'percent',
+    sourceDataset: 'ACS 5-Year Detailed Tables',
+    sourceTable: 'B25003H',
+    sourceVariable: 'derived',
+    geographyType: 'county',
+    estimateType: 'percentage',
+    periodType: '5-year-estimate',
+    theme: 'housing',
+    externalDataSourceId: 'acs-census-api',
+    raceEthnicitySlice: 'white_nh',
+  }),
+  series({
     metricId: 'acs-ba-attainment-black-county',
     metricDefinition:
       'Share of Black or African American alone adults 25+ with bachelor’s degree or higher',
