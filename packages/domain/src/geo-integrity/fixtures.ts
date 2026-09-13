@@ -59,7 +59,8 @@ export const FIXTURE_STATE_BOUNDARIES: readonly StateBoundary[] = [
 
 /**
  * Rows shaped like `bb_reference.jurisdictions` plus GeoJSON in metadata for loader dry-runs.
- * `parent_id` uses the ADR-016 `us` / `us-{stateFips}` id scheme.
+ * `parent_id` uses the `us` / `us-{stateFips}` id scheme recorded in
+ * `docs/decisions-carryover.md` ("Jurisdiction reference data").
  */
 export const FIXTURE_STATE_JURISDICTION_ROWS = FIXTURE_STATE_BOUNDARIES.map((boundary) => ({
   id: `us-${boundary.stateFips}`,

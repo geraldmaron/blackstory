@@ -1,7 +1,8 @@
 /**
  * Normalizes user-entered U.S. postal codes for lookup-only flows (explore place search,
  * `/locate` ZIP translate-then-discard). Accepts a 5-digit ZIP or ZIP+4; always returns the
- * 5-digit base for centroid lookup. The raw input is never persisted — see ADR-016.
+ * 5-digit base for centroid lookup. The raw input is never persisted — see
+ * `docs/decisions-carryover.md` ("Jurisdiction reference data").
  */
 
 /** Matches a standalone 5-digit ZIP or ZIP+4 with optional hyphen. */

@@ -49,7 +49,8 @@ export type JurisdictionCentroidDoc = z.infer<typeof jurisdictionCentroidSchema>
 
 /**
  * Where the bbox came from, so a coarse Gazetteer-only approximation is never confused with a
- * precise cartographic-boundary-derived box. See docs/adr/ADR-016 "County bbox precision."
+ * precise cartographic-boundary-derived box. See `docs/decisions-carryover.md`,
+ * "Jurisdiction reference data".
  */
 export const JURISDICTION_BBOX_SOURCES = [
   'us-geography-module',

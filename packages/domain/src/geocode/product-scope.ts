@@ -8,7 +8,7 @@
  * `78`, American Samoa `60`, Northern Mariana Islands `69`) has a real state-equivalent FIPS
  * code but is out of this product's scope; `evaluateGeocodeProductScope` reports that rather
  * than silently resolving jurisdiction ids for a state row that will never exist in the
- * `jurisdictions` collection (ADR-016 only loads the 50 states + D.C. from this same table).
+ * `jurisdictions` collection (only the 50 states + D.C. are loaded from this same table).
  *
  * NOT widened for non-US birthplaces (2026-09-12 OWNER RULING, repo-9rkh: "the Atlas supports
  * non-US birthplaces"), despite that ruling naming this file. This gate only ever receives a

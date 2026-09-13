@@ -2,7 +2,8 @@
  * Local USPS ZIP centroid lookup for translate-then-discard flows. Census Geocoder's
  * `onelineaddress` endpoint does not match bare ZIP codes; this module resolves a 5-digit ZIP to
  * an approximate lat/lng using the open-source `zipcodes` dataset, then callers reverse-geocode
- * those coordinates through Census for jurisdiction ids. ZIP text is never stored — ADR-016.
+ * those coordinates through Census for jurisdiction ids. ZIP text is never stored — see
+ * `docs/decisions-carryover.md` ("Jurisdiction reference data").
  */
 import zipcodes from 'zipcodes';
 

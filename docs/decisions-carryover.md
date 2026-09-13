@@ -351,3 +351,48 @@ What ADR-014 recorded as a GAP is narrower than "no kill switch": there is no wa
 search *independently of* text search. Adding a dedicated `vector-search` core id is a small
 additive change to `packages/config` if that control is ever wanted. (from ADR-014, "vector
 search")
+
+## Jurisdiction reference data (recovered 2026-09-13, repo-gtm2y)
+
+`docs/adr/ADR-016-jurisdiction-reference-data.md` does not exist. Three source comments cite it by
+that dead path, one of them for a rule that governs two copies of the same code. Recovered from the
+code.
+
+**The jurisdiction id scheme is `us` / `us-{2-digit state FIPS}` / `us-{2-digit state FIPS}-{3-digit
+county FIPS}`**, built by `countryJurisdictionId` / `stateJurisdictionId` / `countyJurisdictionId`.
+It is defined in `packages/ops-data/src/jurisdictions/schema.ts` and duplicated, byte for byte, in
+`packages/domain/src/geocode/jurisdiction-ids.ts`. The duplication is deliberate and narrow: only
+the pure string builders are copied, never the schema, loader or resolver. `@repo/domain` cannot
+import `@repo/ops-data` because ops-data already depends on domain at runtime, so the reverse edge
+would close a cycle — the same dependency-direction rule recorded above for `public-contracts`.
+Any change to the id format must be mirrored in both files by hand; nothing enforces the agreement
+today, which makes this a rule a reader must actually follow rather than one a gate will catch.
+(from ADR-016, "jurisdiction reference data")
+
+**County bounding boxes from the Gazetteer are an approximation, and are labeled as one.** The
+Census Gazetteer county file carries a centroid (INTPTLAT/INTPTLONG) and land/water area but no
+bounding box, so `approximateCountyBBox` centers a square sized to the county's total area on that
+centroid and stamps the row `bboxSource: 'census-gazetteer-area-approximated'`
+(`packages/ops-data/src/jurisdictions/tiger-gazetteer.ts`). `JURISDICTION_BBOX_SOURCES` exists so
+that a coarse box can never be mistaken for a precise one: the alternatives are
+`us-geography-module`, `census-cartographic-boundary` and `manual`. This is the same deliberately
+coarse, never survey-grade posture `us-geography.ts` takes for state bboxes. A precise box can be
+backfilled from Census cartographic boundary shapefiles later; recomputing it here would duplicate
+the map-tile pipeline. (from ADR-016, "jurisdiction reference data")
+
+**ZIPs are never stored as reference data — translate then discard.** A user-entered postal code is
+used ONLY to ask what place, state and county it falls within, and the raw input is never persisted
+and never returned. `normalizeUsZipInput` reduces a ZIP or ZIP+4 to its 5-digit base for centroid
+lookup only; `zip-translate.ts` resolves that to an approximate centroid and reverse-geocodes the
+coordinates through Census for jurisdiction ids, because the Census forward `onelineaddress`
+endpoint does not match a bare ZIP. This is a privacy rule, not a data-modeling preference: it is
+what keeps a reader's typed location out of the record. Treat any change that persists a ZIP as
+reversing a decision, not as adding a field. (from ADR-016 §1, "ZIPs: never stored as reference
+data")
+
+**Cities are on-demand only, keyed by Census place FIPS**, and the writer does not exist yet. The
+`us-{state}-place-{5-digit place FIPS}` id is a proposal: `buildPlaceCreateHint` returns the id a
+future on-demand creation pass should use plus the minimal fields it would need, and this module
+writes nothing. The loader populates only the 50 states plus D.C. from the same table. So a reader
+finding `placeId` on a resolved match should not assume a `jurisdictions/{id}` document exists for
+it — it is a hint, never a write. (from ADR-016 §1, "cities: on-demand only")

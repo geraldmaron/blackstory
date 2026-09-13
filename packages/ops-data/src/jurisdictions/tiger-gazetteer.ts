@@ -18,7 +18,8 @@
  * time-series/geo/gazetteer-files.html "Counties" national file). Unzip to get a single
  * tab-delimited.txt file; pass its text content to `parseGazetteerCountyFile`.
  *
- * BBOX CAVEAT (see docs/adr/ADR-016): the Gazetteer file does NOT include a bounding box —
+ * BBOX CAVEAT (see `docs/decisions-carryover.md`, "Jurisdiction reference data"): the
+ * Gazetteer file does NOT include a bounding box —
  * only a centroid (INTPTLAT/INTPTLONG) and land/water area. `approximateCountyBBox` derives a
  * bbox by centering a square (sized to match the county's total area) on that centroid. This
  * is an honest, labeled APPROXIMATION (`bboxSource: 'census-gazetteer-area-approximated'`),
