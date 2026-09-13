@@ -164,7 +164,6 @@ export function PlaceFinder({
     }
     // Read once, on arrival: `find` is a focus instruction, not live filter state to keep
     // resyncing from (see this file's doc comment and `url-state.ts`'s note on `selected`).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // `LocationPrivacyNotice` collapses by default; force it open wherever this file mounts it, in
