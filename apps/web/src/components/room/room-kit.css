@@ -47,7 +47,16 @@
   max-width: 100%;
   min-width: 0;
   margin-inline: auto;
-  padding-inline: var(--ds-gutter);
+  /*
+   * Published as a variable because the column's own inline padding is NOT `--ds-gutter` at
+   * every width — below 560px it narrows (see the media query at the foot of this file). A
+   * full-bleed child pulls itself out by a negative margin, and a child that guessed
+   * `--ds-gutter` overshot the column by 4px at each edge on a 320pt phone, which the page
+   * could only hide because the body clips (`/data`'s section nav did exactly that). Pull out
+   * by this instead, and the bleed lands on the viewport edge at every width.
+   */
+  --room-doc-pad: var(--ds-gutter);
+  padding-inline: var(--room-doc-pad);
   padding-block: var(--ds-space-10) var(--ds-space-16);
 }
 
@@ -1449,7 +1458,8 @@ a.ds-room-chip {
     box-sizing: border-box;
     width: 100%;
     max-width: 100%;
-    padding-inline: var(--ds-space-3);
+    --room-doc-pad: var(--ds-space-3);
+    padding-inline: var(--room-doc-pad);
   }
 
   .ds-room-header__title {

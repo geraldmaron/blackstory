@@ -1233,6 +1233,15 @@ html:has([data-surface='instrument']) {
   display: inline-flex;
   align-items: center;
   gap: var(--ds-space-2);
+  /*
+   * A native `<select>` takes its intrinsic width from its LONGEST option, and this one is
+   * filled from the data — on `/books` the author list reaches past a 320pt phone, so the
+   * control ran off the right edge where only the body's clip stopped it. Capping here and on
+   * the control keeps it inside its row; the browser truncates the shown option itself, and
+   * the full list is still whatever the picker shows when it opens.
+   */
+  max-width: 100%;
+  min-width: 0;
 }
 
 .ds-pill-select__label {
@@ -1246,6 +1255,8 @@ html:has([data-surface='instrument']) {
 
 .ds-pill-select__control {
   min-height: 2.75rem;
+  max-width: 100%;
+  min-width: 0;
   padding: 0 var(--ds-space-4);
   border: var(--ds-border-width) solid var(--ds-border-strong);
   border-radius: var(--ds-radius-full);
