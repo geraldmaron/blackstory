@@ -49,7 +49,8 @@ describe('markPerf', () => {
 
     expect(logSpy).toHaveBeenCalledTimes(3);
     const marks = logSpy.mock.calls.map(
-      ([line]: [string]) => (JSON.parse(line.slice(MARK_PREFIX.length + 1)) as { mark: string }).mark,
+      ([line]: [string]) =>
+        (JSON.parse(line.slice(MARK_PREFIX.length + 1)) as { mark: string }).mark,
     );
     expect(marks).toEqual(['first_map_render', 'search_results_shown', 'entity_detail_loaded']);
   });

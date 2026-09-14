@@ -60,7 +60,9 @@ describe('Link', () => {
     const { getByRole } = await render(<Link href="https://blackstory.app">blackstory.app</Link>);
     const link = getByRole('link');
     const style = StyleSheet.flatten(
-      typeof link.props.style === 'function' ? link.props.style({ pressed: false }) : link.props.style,
+      typeof link.props.style === 'function'
+        ? link.props.style({ pressed: false })
+        : link.props.style,
     );
     expect(style.minHeight).toBeGreaterThanOrEqual(44);
   });

@@ -174,7 +174,7 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
                     showDivider={index < (explainer.termOfArtLinks?.length ?? 0) - 1}
                     onPress={() => void openHref(term.wexUrl, term.term)}
                     accessibilityLabel={`${term.term}. Opens definition.`}
-                  accessibilityHint={EXTERNAL_LINK_HINT}
+                    accessibilityHint={EXTERNAL_LINK_HINT}
                   />
                 ))}
               </View>

@@ -176,6 +176,7 @@ function assertAdbReachable() {
     if (error.code === 'ENOENT') {
       throw new Error(
         `adb not found (tried ${ADB}). Put Android platform-tools on PATH or set ANDROID_HOME to the SDK root.`,
+        { cause: error },
       );
     }
     throw error;

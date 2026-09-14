@@ -132,7 +132,9 @@ describe('SearchScreen — result rendering', () => {
     const releaseCache = fakeReleaseCache('r1');
     const { runtime } = buildRuntime(transport, releaseCache);
 
-    const { getByLabelText } = await render(<SearchScreen initialQuery="tubman" runtime={runtime} />);
+    const { getByLabelText } = await render(
+      <SearchScreen initialQuery="tubman" runtime={runtime} />,
+    );
     fireEvent.changeText(getByLabelText('Search'), 'tubman');
     await flushMicrotasks(10);
     resolveNext(page());

@@ -3,8 +3,10 @@ import { Text } from '../Text';
 import { themeColors, typeScale } from '../tokens';
 import { resetTestWindowSize, setTestWindowSize } from '../layout/testing';
 
-function styleOf(node: { props: { style: unknown } }): Record<string, number> {
-  const style = node.props.style;
+// Takes any props bag: RNTL's TestInstance does not declare `style`, so requiring it in the
+// parameter type failed the mobile typecheck even though every Text node carries one at runtime.
+function styleOf(node: { props: object }): Record<string, number> {
+  const style = (node.props as { style?: unknown }).style;
   return Array.isArray(style)
     ? Object.assign({}, ...style.flat().filter(Boolean))
     : ((style ?? {}) as Record<string, number>);

@@ -45,7 +45,11 @@ export interface SearchResultCardProps {
    * for a plain row list, so the row says it. `partial` marks a page with more results to load,
    * where the total is only what has loaded so far.
    */
-  readonly position?: { readonly index: number; readonly total: number; readonly partial?: boolean };
+  readonly position?: {
+    readonly index: number;
+    readonly total: number;
+    readonly partial?: boolean;
+  };
 }
 
 export type SearchResultCardHandlers = {
