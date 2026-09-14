@@ -74,6 +74,7 @@ export const SECTION_HEADINGS = {
   timeline: 'Timeline',
   related: 'Connected records',
   continueLearning: 'Also connected',
+  citedIn: 'Stories that cite this record',
   visit: 'Visit',
   revision: 'Revision',
   maturity: 'Record maturity',

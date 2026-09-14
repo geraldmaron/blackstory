@@ -12,6 +12,13 @@ export type EntityBeatIndices = {
   readonly claims: string;
   readonly timeline?: string;
   readonly connected: string;
+  /**
+   * Present only when a published story cites this record. Most of the catalog has no long-form
+   * written about it yet, and a numbered beat that says so on every other record would read as a
+   * research gap rather than as the ordinary state of the archive's writing — so the beat is
+   * skipped entirely, the way `reading` and `timeline` are, and the numbering closes over it.
+   */
+  readonly citedIn?: string;
   readonly provenance: string;
 };
 
@@ -28,6 +35,17 @@ export function entityBeatIndices(entity: Entity): EntityBeatIndices {
   const claims = next();
   const timeline = entity.timeline.length > 0 ? next() : undefined;
   const connected = next();
+  const citedIn = (entity.citingStories?.length ?? 0) > 0 ? next() : undefined;
   const provenance = next();
-  return { relevance, context, reading, status, claims, timeline, connected, provenance };
+  return {
+    relevance,
+    context,
+    reading,
+    status,
+    claims,
+    timeline,
+    connected,
+    citedIn,
+    provenance,
+  };
 }

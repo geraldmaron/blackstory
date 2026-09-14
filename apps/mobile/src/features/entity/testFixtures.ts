@@ -90,6 +90,13 @@ function fullNeighbor(id: string, overrides: RawEntity = {}): RawEntity {
     relationType: 'founded_alongside',
     direction: 'outgoing',
     timespan: { label: 'Founding era', validFrom: '1871-01-01', validTo: null },
+    // Inputs, not a grade: two corroborating lineages behind a high claim, which the one rule
+    // reads as A. A fixture that shipped a letter would let a row print a tier nobody derived.
+    evidenceInputs: {
+      strongestClaimLevel: 'high',
+      citedLineageKeys: ['loc.gov', 'nps.gov'],
+      evidenceLineageKeys: ['loc.gov', 'nps.gov'],
+    },
     ...overrides,
   };
 }
@@ -180,6 +187,15 @@ export function fullEntityFixture(kind: EntityKind, id = `ent_${kind}_full_001`)
       fullNeighbor('ent_neighbor_2', { summary: '' }),
     ],
     continueLearning: [fullNeighbor('ent_continue_1')],
+    citingStories: [
+      {
+        slug: 'blockbusting',
+        title: 'Blockbusting',
+        relation: 'mapped in',
+        href: '/stories/blockbusting',
+      },
+      { slug: 'zoning', title: 'Zoning', relation: 'referenced in', href: '/stories/zoning' },
+    ],
   };
 }
 
@@ -204,6 +220,7 @@ export function minimalEntityFixture(kind: EntityKind, id = `ent_${kind}_minimal
     // Deliberately no: status, statusHistory, eventWindow, eraBuckets, notabilityLabels,
     // notabilityBasis, sensitivityClass, sensitivity, topicIds, locationPrecision,
     // extendedNarrative, primaryImage, researchCoverage, geoAnchor, related, relatedNeighbors,
+    // citingStories,
     // continueLearning.
   };
 }

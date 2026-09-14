@@ -10,6 +10,7 @@ import { ErrorState, screenScrollInsets, space, useThemeColors } from '@/ui';
 import type { EntityDetailState } from './useEntityDetail';
 import { entityBeatIndices } from './entity-beat-indices';
 import { GENERIC_ERROR_COPY, OFFLINE_NO_CACHE_COPY } from './copy';
+import { CitedInSection } from './sections/CitedInSection';
 import { ClaimsSection } from './sections/ClaimsSection';
 import { AnatomySection } from './sections/AnatomySection';
 import { IntroSection } from './sections/IntroSection';
@@ -30,6 +31,8 @@ export type EntityDetailScreenProps = {
   readonly onBackToExplore?: () => void;
   readonly onBackToMap?: (entityId: string) => void;
   readonly onOpenEntity?: (entityId: string) => void;
+  /** Opens a published story by slug — the record's "Cited in" beat is the only caller. */
+  readonly onOpenStory?: (slug: string) => void;
   readonly onMethodologyPress?: () => void;
   /** Optional session Previous / Next / Random footer (web EntitySessionNav parity). */
   readonly sessionNav?: ReactNode;
@@ -42,6 +45,7 @@ export function EntityDetailScreen({
   onBackToExplore,
   onBackToMap,
   onOpenEntity,
+  onOpenStory,
   onMethodologyPress,
   sessionNav,
 }: EntityDetailScreenProps) {
@@ -145,6 +149,13 @@ export function EntityDetailScreen({
         index={beats.connected}
         {...(onOpenEntity ? { onOpenEntity } : {})}
       />
+      {beats.citedIn ? (
+        <CitedInSection
+          citingStories={entity.citingStories ?? []}
+          index={beats.citedIn}
+          {...(onOpenStory ? { onOpenStory } : {})}
+        />
+      ) : null}
       <ProvenanceSection entity={entity} index={beats.provenance} />
       {sessionNav ?? null}
     </ScrollView>

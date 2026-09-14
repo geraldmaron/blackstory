@@ -119,6 +119,7 @@ export default function EntityDetailRoute() {
           router.replace({ pathname: '/explore', params: { selected: selectedId } })
         }
         onOpenEntity={(neighborId) => router.push(`/entity/${neighborId}`)}
+        onOpenStory={(slug) => router.push(`/stories/${slug}`)}
         sessionNav={
           entityId && readyEntity ? (
             <EntitySessionNavHost currentId={entityId} orderedIds={orderedIds} />

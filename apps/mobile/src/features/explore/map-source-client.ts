@@ -71,6 +71,11 @@ export function mapSourceV1ToFeatureCollection(source: MapSourceV1): MapFeatureC
         ? { topicIds: feature.properties.topicIds }
         : {}),
       ...(feature.properties.status ? { status: feature.properties.status } : {}),
+      // Carried through verbatim: the server derived which stories cite this record from the
+      // release's own article projection, and the sheet renders the relation phrase as words.
+      ...(feature.properties.citingStories && feature.properties.citingStories.length > 0
+        ? { citingStories: feature.properties.citingStories }
+        : {}),
     },
   }));
   return { type: 'FeatureCollection', features };

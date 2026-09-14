@@ -52,6 +52,14 @@ export type ResearchCoverage = (typeof RESEARCH_COVERAGE_LEVELS)[number];
 export const CONFIDENCE_LEVELS = ['high', 'medium', 'low'] as const;
 export type ConfidenceLevel = (typeof CONFIDENCE_LEVELS)[number];
 
+/**
+ * A whole record's evidence vocabulary. `unrated` is unassessed — nobody has graded the record —
+ * and is never a fourth grade below `low`. Mirrors `CONFIDENCE_TIERS` in
+ * `@repo/public-contracts/v1/map`.
+ */
+export const CONFIDENCE_TIERS = ['high', 'medium', 'low', 'unrated'] as const;
+export type ConfidenceTier = (typeof CONFIDENCE_TIERS)[number];
+
 export const DATE_PRECISIONS = ['day', 'month', 'year', 'decade', 'circa'] as const;
 export type DatePrecision = (typeof DATE_PRECISIONS)[number];
 
@@ -76,6 +84,10 @@ export const MAX_CLAIMS = 500;
 export const MAX_TIMELINE_EVENTS = 1000;
 export const MAX_RELATED_ENTRIES = 500;
 export const MAX_RELATED_NEIGHBORS = 50;
+/** Mirrors `MAX_CITING_STORIES` in `@repo/public-contracts/v1/story-citation`. */
+export const MAX_CITING_STORIES = 25;
+/** Mirrors `MAX_EVIDENCE_LINEAGE_KEYS` in `@repo/public-contracts/v1/evidence-inputs`. */
+export const MAX_EVIDENCE_LINEAGE_KEYS = 200;
 export const MAX_CONTINUE_LEARNING = 50;
 export const MAX_DISPUTE_ALTERNATES = 50;
 export const MAX_CLAIM_REVISION_HISTORY = 200;
@@ -211,6 +223,21 @@ export interface RelatedEntry {
   readonly timespan?: RelationTimespan;
 }
 
+/**
+ * The facts a grade is computed from — never the grade.
+ *
+ * A tier carried on the wire is a conclusion someone else reached, possibly under a rule that has
+ * since changed. Every surface derives instead, through
+ * `confidenceTierFromEvidenceInputs` in `@repo/public-contracts/evidence`, so a rule change
+ * reaches the record page, Explore and this row in the same build. Mirrors
+ * `evidenceInputsV1Schema`.
+ */
+export interface EvidenceInputs {
+  readonly strongestClaimLevel: ConfidenceTier;
+  readonly citedLineageKeys: readonly string[];
+  readonly evidenceLineageKeys: readonly string[];
+}
+
 export interface RelatedNeighbor {
   readonly id: string;
   readonly displayName: string;
@@ -219,6 +246,20 @@ export interface RelatedNeighbor {
   readonly relationType: string;
   readonly direction: RelationDirection;
   readonly timespan?: RelationTimespan;
+  /** Absent when the server could not reach the neighbor's claims — "unknown", not "unrated". */
+  readonly evidenceInputs?: EvidenceInputs;
+}
+
+/**
+ * One published story that cites this record. `relation` is a phrase written for a reader
+ * ("mapped in", "referenced in"), rendered as-is — the client never branches on it. Mirrors
+ * `storyCitationV1Schema`.
+ */
+export interface StoryCitation {
+  readonly slug: string;
+  readonly title: string;
+  readonly relation: string;
+  readonly href: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -290,4 +331,6 @@ export interface Entity {
   readonly related?: readonly RelatedEntry[];
   readonly relatedNeighbors?: readonly RelatedNeighbor[];
   readonly continueLearning?: readonly RelatedNeighbor[];
+  /** Absent, not empty, when no story cites this record — the ordinary state of most records. */
+  readonly citingStories?: readonly StoryCitation[];
 }

@@ -70,6 +70,16 @@
       "types": "./dist/v1/related.d.ts",
       "import": "./dist/v1/related.js"
     },
+    "./v1/story-citation": {
+      "development": "./src/v1/story-citation.ts",
+      "types": "./dist/v1/story-citation.d.ts",
+      "import": "./dist/v1/story-citation.js"
+    },
+    "./v1/evidence-inputs": {
+      "development": "./src/v1/evidence-inputs.ts",
+      "types": "./dist/v1/evidence-inputs.d.ts",
+      "import": "./dist/v1/evidence-inputs.js"
+    },
     "./v1/entity": {
       "development": "./src/v1/entity.ts",
       "types": "./dist/v1/entity.d.ts",

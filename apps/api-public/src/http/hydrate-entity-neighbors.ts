@@ -13,8 +13,10 @@ import {
 } from '@repo/domain';
 import type { EntityV1 } from '@repo/public-contracts/v1/entity';
 import { entityV1Schema } from '@repo/public-contracts/v1/entity';
+import type { EvidenceInputsV1 } from '@repo/public-contracts/v1/evidence-inputs';
 import type { RelatedEntryV1, RelatedNeighborV1 } from '@repo/public-contracts/v1/related';
-import type { PublicEntityProjectionDoc } from '@repo/schemas';
+import { recordEvidenceInputs } from '@repo/public-contracts/evidence';
+import type { PublicClaimProjectionDoc, PublicEntityProjectionDoc } from '@repo/schemas';
 import { collectOneHopNeighborIds, collectTwoHopNeighborIds } from './neighbor-ids.js';
 import { fetchPublicEntityProjectionsByIds, type PostgresQueryFn } from './postgres-readers.js';
 
@@ -70,8 +72,34 @@ function entityToNeighborLookup(entity: EntityV1): NeighborLookup {
   };
 }
 
+/**
+ * A neighbor's evidence INPUTS, so its link row can carry the same meter the record it links to
+ * carries. Inputs, never a letter: the grade is `confidenceTierFromEvidenceInputs`'s to give, and
+ * a tier frozen into a payload is the cached conclusion `apps/web/src/lib/records/
+ * build-records-index.ts` refuses to serve. `recordEvidenceInputs` is pure projection over the
+ * claim rows — which levels are present, which lineages are cited, which of those are evidence
+ * about the subject rather than the record's own index row.
+ *
+ * `undefined` when the neighbor projection published no claims array: "we have no claims for
+ * this neighbor" is not "this neighbor is unassessed", and the row must be able to say so by
+ * showing no meter at all.
+ */
+function neighborEvidenceInputs(
+  projection: PublicEntityProjectionDoc | undefined,
+): EvidenceInputsV1 | undefined {
+  const claims: readonly PublicClaimProjectionDoc[] | undefined = projection?.claims;
+  if (claims === undefined) return undefined;
+  const inputs = recordEvidenceInputs(claims);
+  return {
+    strongestClaimLevel: inputs.strongestClaimLevel,
+    citedLineageKeys: [...inputs.citedLineageKeys],
+    evidenceLineageKeys: [...inputs.evidenceLineageKeys],
+  };
+}
+
 function stubToNeighborV1(
   stub: ReturnType<typeof buildRelatedNeighborStubs>[number],
+  evidenceInputs: EvidenceInputsV1 | undefined,
 ): RelatedNeighborV1 {
   return {
     id: stub.id,
@@ -81,6 +109,7 @@ function stubToNeighborV1(
     relationType: stub.relationType,
     direction: stub.direction,
     ...(stub.timespan !== undefined ? { timespan: stub.timespan } : {}),
+    ...(evidenceInputs !== undefined ? { evidenceInputs } : {}),
   };
 }
 
@@ -115,10 +144,19 @@ export async function hydrateEntityV1Neighbors(
 
     const entityRelated =
       entity.related !== undefined ? normalizeRelatedEdges(entity.related) : undefined;
+    // The projections are already in hand from the two batches above, so the neighbor meter
+    // costs no extra query — only a lookup per stub.
+    const projectionsById = new Map<string, PublicEntityProjectionDoc>();
+    for (const projection of [...oneHopProjections, ...twoHopProjections]) {
+      projectionsById.set(projection.id, projection);
+    }
+    const toNeighbor = (stub: ReturnType<typeof buildRelatedNeighborStubs>[number]) =>
+      stubToNeighborV1(stub, neighborEvidenceInputs(projectionsById.get(stub.id)));
+
     const relatedStubs = buildRelatedNeighborStubs(entityRelated, neighborsById);
     const continueStubs = composeContinueLearningStubs(entity.id, relatedStubs, neighborsById);
-    const relatedNeighbors = relatedStubs.map(stubToNeighborV1);
-    const continueLearning = continueStubs.map(stubToNeighborV1);
+    const relatedNeighbors = relatedStubs.map(toNeighbor);
+    const continueLearning = continueStubs.map(toNeighbor);
 
     const candidate: EntityV1 = {
       ...entity,

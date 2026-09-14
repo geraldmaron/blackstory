@@ -55,6 +55,9 @@ import {
   RELATION_DIRECTIONS,
   REVISION_CHANGE_KINDS,
   CLAIM_ROLES,
+  CONFIDENCE_TIERS,
+  MAX_CITING_STORIES,
+  MAX_EVIDENCE_LINEAGE_KEYS,
   type Claim,
   type ClaimDispute,
   type ClaimDisputeAlternate,
@@ -72,8 +75,10 @@ import {
   type NotabilityBasisEntry,
   type RelatedEntry,
   type RelatedNeighbor,
+  type EvidenceInputs,
   type RelationTimespan,
   type RevisionMetadata,
+  type StoryCitation,
   type StatusHistoryEntry,
   type TimelineEvent,
 } from './types';
@@ -367,6 +372,42 @@ export function normalizeRelatedEntry(value: unknown): RelatedEntry | null {
 }
 
 /**
+ * Evidence INPUTS off the wire. Returns `undefined` for anything malformed rather than
+ * substituting a floor: "we could not read this record's evidence" must render as no meter, not
+ * as `unrated`, and certainly not as a grade. The rule that turns these facts into a letter lives
+ * in `@repo/public-contracts/evidence`; nothing here decides a grade.
+ */
+export function normalizeEvidenceInputs(value: unknown): EvidenceInputs | undefined {
+  if (!isObject(value)) return undefined;
+  const level = value.strongestClaimLevel;
+  if (typeof level !== 'string') return undefined;
+  if (!(CONFIDENCE_TIERS as readonly string[]).includes(level)) return undefined;
+  return {
+    strongestClaimLevel: level as EvidenceInputs['strongestClaimLevel'],
+    citedLineageKeys: boundedStrArray(value.citedLineageKeys, MAX_EVIDENCE_LINEAGE_KEYS, 200),
+    evidenceLineageKeys: boundedStrArray(value.evidenceLineageKeys, MAX_EVIDENCE_LINEAGE_KEYS, 200),
+  };
+}
+
+/**
+ * One story that cites this record. `slug` and `title` are the only load-bearing fields — the app
+ * routes on the slug and never follows `href`, which is the site's own path. A citation missing
+ * either is dropped rather than rendered as an untappable row.
+ */
+export function normalizeStoryCitation(value: unknown): StoryCitation | null {
+  if (!isObject(value)) return null;
+  const slug = optionalStr(value.slug, 200);
+  const title = optionalStr(value.title, MAX_SHORT_TEXT);
+  if (!slug || !title) return null;
+  return {
+    slug,
+    title,
+    relation: str(value.relation, 40, 'referenced in'),
+    href: str(value.href, 500, `/stories/${slug}`),
+  };
+}
+
+/**
  * `id` is the only thing required; a self-referencing neighbor (its own id) or a neighbor that
  * repeats a sibling's id is still normalized and rendered flatly — this function performs no
  * graph traversal or de-duplication across neighbors of ITS OWN, so there is structurally no
@@ -378,6 +419,7 @@ export function normalizeRelatedNeighbor(value: unknown): RelatedNeighbor | null
   if (!isObject(value)) return null;
   const id = optionalStr(value.id, 200);
   if (!id) return null;
+  const evidenceInputs = normalizeEvidenceInputs(value.evidenceInputs);
   return {
     id,
     displayName: str(value.displayName, MAX_SHORT_TEXT, id),
@@ -386,6 +428,7 @@ export function normalizeRelatedNeighbor(value: unknown): RelatedNeighbor | null
     relationType: str(value.relationType, 100, 'related'),
     direction: enumOr(value.direction, RELATION_DIRECTIONS, 'outgoing'),
     ...(normalizeTimespan(value.timespan) ? { timespan: normalizeTimespan(value.timespan) } : {}),
+    ...(evidenceInputs !== undefined ? { evidenceInputs } : {}),
   };
 }
 
@@ -542,6 +585,15 @@ export function normalizeEntity(value: unknown): Entity | null {
     }
   }
 
+  const citingStories: StoryCitation[] = [];
+  if (Array.isArray(value.citingStories)) {
+    for (const raw of value.citingStories) {
+      if (citingStories.length >= MAX_CITING_STORIES) break;
+      const citation = normalizeStoryCitation(raw);
+      if (citation) citingStories.push(citation);
+    }
+  }
+
   const rawNarrative = optionalStr(value.extendedNarrative, MAX_EXTENDED_NARRATIVE_CHARS);
 
   const media = normalizeMedia(value.primaryImage);
@@ -594,5 +646,6 @@ export function normalizeEntity(value: unknown): Entity | null {
     ...(related.length > 0 ? { related } : {}),
     ...(relatedNeighbors.length > 0 ? { relatedNeighbors } : {}),
     ...(continueLearning.length > 0 ? { continueLearning } : {}),
+    ...(citingStories.length > 0 ? { citingStories } : {}),
   };
 }

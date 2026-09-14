@@ -2,7 +2,11 @@
  * Server-side Postgres readers for active-release public projections in `bb_public.*`.
  * Mirrors `apps/web/src/lib/public-data/postgres-readers.ts` for the mobile `/v1` API surface.
  */
-import type { PublicSearchProjectionDoc } from '@repo/schemas';
+import {
+  publicArticleProjectionSchema,
+  type PublicArticleProjectionDoc,
+  type PublicSearchProjectionDoc,
+} from '@repo/schemas';
 import { mapPostgresSearchIndexRow } from './postgres-search-index.js';
 import { parseActiveRelease, parseEntityProjection } from './postgres-projection.js';
 import { queryPostgres } from './postgres-client.js';
@@ -148,6 +152,37 @@ export async function listPublicSearchIndexDocs(
   for (const row of rows) {
     const parsed = mapPostgresSearchIndexRow(row);
     if (parsed) docs.push(parsed);
+  }
+  return docs;
+}
+
+/**
+ * Every article in the active release, as published projections.
+ *
+ * The API surface has never read articles before — the phone got records and the map, and the
+ * writing lived only on the site. It reads them now for one derived answer: which stories cite a
+ * record (`@repo/domain/publication/cites-edge`). Mirrors
+ * `apps/web/src/lib/articles/postgres-readers.ts`'s reader of the same name, including its
+ * `payload`-column shape and its ordering, so both surfaces fold the same list.
+ *
+ * A payload that fails the envelope schema is skipped rather than thrown: one malformed article
+ * must not cost every record its story links.
+ */
+export async function listPublicReleaseArticles(
+  releaseId: string,
+  query: PostgresQueryFn = queryPostgres,
+): Promise<readonly PublicArticleProjectionDoc[]> {
+  const rows = (await query(
+    `SELECT payload
+     FROM bb_public.release_articles
+     WHERE release_id = $1
+     ORDER BY published_at DESC, slug`,
+    [releaseId],
+  )) as { readonly payload: unknown }[];
+  const docs: PublicArticleProjectionDoc[] = [];
+  for (const row of rows) {
+    const parsed = publicArticleProjectionSchema.safeParse(row.payload);
+    if (parsed.success) docs.push(parsed.data);
   }
   return docs;
 }

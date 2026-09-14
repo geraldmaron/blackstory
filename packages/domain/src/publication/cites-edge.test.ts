@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { PublicArticleProjectionDoc } from '@repo/schemas';
-import { articleCitedEntities, buildCitesEdge, storiesCiting } from './build-cites-edge';
+import { articleCitedEntities, buildCitesEdge, storiesCiting } from './cites-edge.js';
 
 function doc(over: Partial<PublicArticleProjectionDoc>): PublicArticleProjectionDoc {
   return {

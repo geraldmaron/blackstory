@@ -10,6 +10,7 @@
  */
 import { z } from 'zod';
 import { idString, nonEmptyText } from '../internal/primitives.js';
+import { evidenceInputsV1Schema } from './evidence-inputs.js';
 
 export const RELATION_DIRECTIONS = ['outgoing', 'incoming'] as const;
 export const relationDirectionSchema = z.enum(RELATION_DIRECTIONS);
@@ -44,6 +45,18 @@ export const relatedNeighborV1Schema = z.object({
   relationType: nonEmptyText(100),
   direction: relationDirectionSchema,
   timespan: relationTimespanV1Schema.optional(),
+  /**
+   * The neighbor's evidence INPUTS, so a link row can carry the same three-segment meter the
+   * rest of the record does. Never a graded letter: a tier baked into a payload is a cached
+   * conclusion, and the day the corroboration rule changes every payload minted before it is
+   * quietly wrong. Clients derive with `confidenceTierFromEvidenceInputs`, the same call the
+   * record's own page makes over live claims (see `../evidence-inputs.ts`, and the rule's own
+   * statement in `apps/web/src/lib/records/build-records-index.ts`).
+   *
+   * Optional because a neighbor whose projection the server could not reach has no inputs to
+   * report, and "we do not know" must not render as "unrated".
+   */
+  evidenceInputs: evidenceInputsV1Schema.optional(),
 });
 
 export type RelatedNeighborV1 = z.infer<typeof relatedNeighborV1Schema>;

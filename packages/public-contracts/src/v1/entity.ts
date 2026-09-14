@@ -34,6 +34,7 @@ import { claimV1Schema } from './claim.js';
 import { mediaV1Schema } from './media.js';
 import { relatedEntryV1Schema, relatedNeighborV1Schema } from './related.js';
 import { revisionMetadataV1Schema } from './revision.js';
+import { citingStoriesV1Schema } from './story-citation.js';
 import { timelineEventV1Schema } from './timeline.js';
 
 /**
@@ -179,6 +180,16 @@ export const entityV1Schema = z.object({
   related: boundedArray(relatedEntryV1Schema, 500).optional(),
   relatedNeighbors: boundedArray(relatedNeighborV1Schema, 50).optional(),
   continueLearning: boundedArray(relatedNeighborV1Schema, 50).optional(),
+  /**
+   * The published stories that cite this record — the record side of "every record links back
+   * to the writing about it". Derived by `@repo/domain/publication/cites-edge` from the article
+   * projection the release already carries, so it states an edge the data holds rather than
+   * inferring one from prose.
+   *
+   * Optional, and absent rather than empty when nothing cites the record: a record no story has
+   * reached yet is the ordinary state of most of the catalog, not a gap to advertise.
+   */
+  citingStories: citingStoriesV1Schema.optional(),
 });
 
 export type EntityV1 = z.infer<typeof entityV1Schema>;

@@ -7,6 +7,11 @@
  * `./projection-mapping.ts` (storage-neutral mapping — Postgres is the only live read path).
  */
 import type { NotabilityBasisRecord, PublicSearchIndexDoc } from '@repo/domain';
+import {
+  buildCitesEdge,
+  storiesCiting,
+  type CitesEdgeIndex,
+} from '@repo/domain/publication/cites-edge';
 import type { PublicSearchProjectionDoc } from '@repo/schemas';
 import type { CanonicalSearchQuery } from '@repo/security';
 import { entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
@@ -18,6 +23,7 @@ import {
   fetchPublicEntityProjection,
   fetchPublicEntityRedirect,
   listPublicEntityProjections,
+  listPublicReleaseArticles,
   listPublicSearchIndexDocs,
   type PostgresQueryFn,
 } from './postgres-readers.js';
@@ -97,6 +103,12 @@ function searchIndexHasConfidenceCoverage(
   return withInputs / docs.length >= minCoverage;
 }
 
+/**
+ * Cap on stories advertised per record, matching the wire contract's own bound. A record the
+ * archive has written about many times still links to a readable list, not a wall.
+ */
+const MAX_CITING_STORIES_PER_RECORD = 25;
+
 type EntityProjectionsList = Awaited<ReturnType<typeof listPublicEntityProjections>>;
 type SearchIndexList = Awaited<ReturnType<typeof listPublicSearchIndexDocs>>;
 type ActiveReleaseResult = Awaited<ReturnType<typeof fetchActiveRelease>>;
@@ -134,6 +146,17 @@ export function createPostgresDataAccessReaders(
   const searchIndexCache = new Map<
     string,
     { readonly value: SearchIndexList; readonly expiresAtMs: number }
+  >();
+  /*
+   * The story-cites-record edge is a fold over EVERY article in the release. Recomputing it per
+   * request would make each record open cost a full article scan, which is exactly the shape of
+   * read this cache exists to stop — so it is memoized on the same release key, TTL and
+   * single-flight as the entity catalog above. `apps/web` reaches the same conclusion with
+   * `cache()` over its release-scoped article cache.
+   */
+  const citesEdgeCache = new Map<
+    string,
+    { readonly value: CitesEdgeIndex; readonly expiresAtMs: number }
   >();
   let activeReleaseMemo:
     { readonly value: ActiveReleaseResult; readonly expiresAtMs: number } | undefined;
@@ -201,6 +224,39 @@ export function createPostgresDataAccessReaders(
     });
   }
 
+  /**
+   * The cites edge for a release. Degrades to an empty index rather than throwing: a record
+   * missing its story links is worse than ideal, a record that 500s because the article table is
+   * unreachable is unacceptable — the same posture web's `resolveCitesEdgeIndex` takes.
+   */
+  async function citesEdgeCached(releaseId: string): Promise<CitesEdgeIndex> {
+    const hit = readReleaseCache(citesEdgeCache, releaseId);
+    if (hit) return hit;
+    return singleFlight(`cites-edge:${releaseId}`, async () => {
+      const raced = readReleaseCache(citesEdgeCache, releaseId);
+      if (raced) return raced;
+      let value: CitesEdgeIndex = {};
+      try {
+        value = buildCitesEdge(await listPublicReleaseArticles(releaseId, runQuery));
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(
+          `[api-public] article read failed for ${releaseId}; serving records without story links: ${message}`,
+        );
+        return value;
+      }
+      writeReleaseCache(citesEdgeCache, releaseId, value);
+      return value;
+    });
+  }
+
+  /** Attaches the stories citing this record. Absent, never empty — see `entityV1Schema`. */
+  function withCitingStories(entity: EntityV1, citesEdge: CitesEdgeIndex): EntityV1 {
+    const citing = storiesCiting(citesEdge, entity.id);
+    if (citing.length === 0) return entity;
+    return { ...entity, citingStories: citing.slice(0, MAX_CITING_STORIES_PER_RECORD) };
+  }
+
   async function fetchActiveReleaseMemoized(): Promise<ActiveReleaseResult> {
     if (activeReleaseMemo && activeReleaseMemo.expiresAtMs > Date.now()) {
       return activeReleaseMemo.value;
@@ -225,7 +281,8 @@ export function createPostgresDataAccessReaders(
       if (!projection) return undefined;
       const mapped = mapProjectionToEntityV1(projection);
       if (!mapped) return undefined;
-      return hydrateEntityV1Neighbors(mapped, releaseId, runQuery);
+      const hydrated = await hydrateEntityV1Neighbors(mapped, releaseId, runQuery);
+      return withCitingStories(hydrated, await citesEdgeCached(releaseId));
     },
 
     async readEntityRedirect(releaseId, entityId): Promise<string | undefined> {
@@ -237,10 +294,11 @@ export function createPostgresDataAccessReaders(
 
     async readEntities(releaseId): Promise<readonly EntityV1[]> {
       const projections = await listPublicEntityProjectionsCached(releaseId);
+      const citesEdge = await citesEdgeCached(releaseId);
       const entities: EntityV1[] = [];
       for (const projection of projections) {
         const mapped = mapProjectionToEntityV1(projection);
-        if (mapped) entities.push(entityV1Schema.parse(mapped));
+        if (mapped) entities.push(entityV1Schema.parse(withCitingStories(mapped, citesEdge)));
       }
       return entities;
     },

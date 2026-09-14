@@ -79,6 +79,8 @@ export type ExploreViewProps = {
   readonly reduceMotion?: boolean;
   /** Navigate to the full entity route (MOB-014 owns its content). */
   readonly onOpenEntity: (entityId: string) => void;
+  /** Navigate to a published story by slug — the preview's "Cited in" list is the only caller. */
+  readonly onOpenStory?: (slug: string) => void;
   /** Optional — open filter modal (legacy fallback). */
   readonly onOpenFilters?: () => void;
   /** Optional — open color key modal (legacy fallback). */
@@ -100,6 +102,7 @@ export function ExploreView({
   onRetryMap,
   reduceMotion: reduceMotionProp,
   onOpenEntity,
+  onOpenStory,
   onOpenFilters: _onOpenFilters,
   onOpenColorKey: _onOpenColorKey,
   onOpenSearch,
@@ -444,6 +447,7 @@ export function ExploreView({
             <EntityPreviewSheet
               feature={selectedFeature}
               onOpenEntity={onOpenEntity}
+              {...(onOpenStory ? { onOpenStory } : {})}
               onClose={() => dispatch({ type: 'entityDeselected' })}
               onBrowsePrevious={handleBrowsePrevious}
               onBrowseNext={handleBrowseNext}

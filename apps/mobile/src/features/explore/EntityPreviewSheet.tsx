@@ -6,6 +6,11 @@
  * Evidence is the shared meter plus the shared label, not a "High confidence" chip beside a
  * "3 claims" chip. The card is `accessible` with one composed label, so the meter is decorative
  * here and the sentence rides in `factsSummary`.
+ *
+ * "Cited in" mirrors web's `RecordSheet` group of the same name, including its rule: it renders
+ * only when a story actually cites this record. Most of the catalog has no long-form written
+ * about it yet, and a permanent empty heading would read as a gap in the archive rather than as
+ * the ordinary state of a record no story has reached.
  */
 import { useEffect } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
@@ -27,6 +32,7 @@ import { exploreRecordFacts } from './explore-preview-facts';
 import { exploreStoryMeta } from './explore-story-meta';
 import { featureMetaLine, type PreviewMetaFeature } from './explore-meta';
 import { kindFamilyEncodingFor, isKnownMapKindFamily } from '@/features/map/kind-encoding';
+import type { MapFeatureStoryCitation } from '@/features/map/demoMapSource';
 import { recordKindLabel } from '@/features/record-facts/record-facts';
 import { openExternalMaps } from '@/features/entity/maps-handoff';
 
@@ -43,12 +49,15 @@ export type EntityPreviewPreviewFeature = PreviewMetaFeature & {
     readonly topicTags?: readonly string[];
     readonly topicIds?: readonly string[];
     readonly status?: string;
+    readonly citingStories?: readonly MapFeatureStoryCitation[];
   };
 };
 
 export type EntityPreviewSheetProps = {
   readonly feature: EntityPreviewPreviewFeature | null;
   readonly onOpenEntity: (entityId: string) => void;
+  /** Opens a published story by slug. Omitted, the "Cited in" list reads rather than navigates. */
+  readonly onOpenStory?: (slug: string) => void;
   readonly onClose: () => void;
   readonly onBrowsePrevious?: () => void;
   readonly onBrowseNext?: () => void;
@@ -92,6 +101,7 @@ function MetaChip({
 export function EntityPreviewSheet({
   feature,
   onOpenEntity,
+  onOpenStory,
   onClose,
   onBrowsePrevious,
   onBrowseNext,
@@ -133,6 +143,7 @@ export function EntityPreviewSheet({
     storyMeta.where || storyMeta.era || storyMeta.evidence || storyMeta.status,
   );
   const linkedThemes = storyMeta.themes;
+  const citingStories = selected.properties.citingStories ?? [];
 
   async function handleOpenInMaps() {
     if (!hasPublicCoords || !mapCoords) return;
@@ -287,6 +298,37 @@ export function EntityPreviewSheet({
             </View>
           ) : null}
 
+          {citingStories.length > 0 ? (
+            <View style={styles.citedRow} testID="entity-preview-cited-in">
+              <Text variant="code" colorRole="inkMuted" style={styles.linkedKicker}>
+                Cited in
+              </Text>
+              <View style={styles.citedList}>
+                {citingStories.map((story) => (
+                  <Pressable
+                    key={story.slug}
+                    accessibilityRole={onOpenStory ? 'button' : 'text'}
+                    accessibilityLabel={`${story.title}, ${story.relation} this record`}
+                    {...(onOpenStory
+                      ? {
+                          accessibilityHint: 'Opens the story',
+                          onPress: () => onOpenStory(story.slug),
+                        }
+                      : {})}
+                    style={({ pressed }) => [styles.citedItem, { opacity: pressed ? 0.75 : 1 }]}
+                  >
+                    <Text variant="caption" colorRole="ink" numberOfLines={1}>
+                      {story.title}
+                    </Text>
+                    <Text variant="caption" colorRole="inkMuted" numberOfLines={1}>
+                      {story.relation}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          ) : null}
+
           <Button
             label="Open place"
             variant="accent"
@@ -398,6 +440,19 @@ const styles = StyleSheet.create({
   },
   linkedThemes: {
     flexShrink: 1,
+  },
+  citedRow: {
+    gap: space['1'],
+  },
+  citedList: {
+    gap: 2,
+  },
+  citedItem: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: space['2'],
+    justifyContent: 'space-between',
+    minHeight: MIN_TOUCH,
   },
   close: {
     minHeight: MIN_TOUCH,
