@@ -55,6 +55,13 @@ export const SUPPORTING_SECTIONS: readonly SectionRow[] = [
     directSlug: 'about',
   },
   {
+    routeId: 'faq',
+    title: 'Questions',
+    subtitle: 'Plain answers about how this archive works',
+    catalogSection: 'faq',
+    directSlug: 'faq',
+  },
+  {
     routeId: 'methodology',
     title: 'Methodology',
     subtitle: 'How a record gets in, and what a grade means',
@@ -81,6 +88,13 @@ export const SUPPORTING_SECTIONS: readonly SectionRow[] = [
     subtitle: 'The terms this app is offered under',
     catalogSection: 'terms',
     directSlug: 'terms',
+  },
+  {
+    routeId: 'support',
+    title: 'Support',
+    subtitle: 'How to get an answer, and how long it takes',
+    catalogSection: 'support',
+    directSlug: 'support',
   },
 ];
 

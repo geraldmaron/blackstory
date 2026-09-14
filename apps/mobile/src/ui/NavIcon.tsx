@@ -21,6 +21,7 @@ export type NavIconName =
   | 'about'
   | 'questions'
   | 'privacy'
+  | 'terms'
   | 'errata'
   | 'methodology'
   | 'correction'
@@ -62,6 +63,7 @@ const OUTLINE: Record<NavIconName, IonName> = {
   about: 'information-circle-outline',
   questions: 'help-circle-outline',
   privacy: 'shield-checkmark-outline',
+  terms: 'clipboard-outline',
   errata: 'create-outline',
   methodology: 'flask-outline',
   correction: 'chatbox-ellipses-outline',

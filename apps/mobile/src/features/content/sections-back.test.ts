@@ -9,7 +9,15 @@ import { isNarrativeSection, isSupportingSection, sectionBackFallback } from './
 
 describe('sectionBackFallback', () => {
   it('sends every supporting page back to More', () => {
-    for (const routeId of ['about', 'methodology', 'errata', 'privacy', 'terms']) {
+    for (const routeId of [
+      'about',
+      'faq',
+      'methodology',
+      'errata',
+      'privacy',
+      'terms',
+      'support',
+    ]) {
       expect(isSupportingSection(routeId)).toBe(true);
       expect(sectionBackFallback(routeId)).toBe('/more');
     }

@@ -3,6 +3,8 @@
  * normalizer a hostile network payload would go through — catches a malformed seed-data edit
  * before it ships (e.g. an empty paragraph, an oversized field, a missing slug).
  */
+import { isLegacyPath, semanticDestinationByPath } from '@repo/public-contracts/destinations';
+
 import { normalizeTypedContentPage } from './content-blocks';
 import { CONTENT_CATALOG, findCatalogEntry, listCatalogEntries } from './content-catalog';
 
@@ -37,9 +39,56 @@ describe('CONTENT_CATALOG', () => {
     }
   });
 
+  it('no bundled source points at a page that does not exist on blackstory.app', () => {
+    // A source's href is an outward pointer readers will actually tap. If it names the web
+    // origin, the path it points at must be a real destination (or a legacy alias that still
+    // resolves) — not a page that was never built.
+    for (const entry of CONTENT_CATALOG) {
+      for (const source of entry.sources ?? []) {
+        if (!source.href || !source.href.startsWith('https://blackstory.app/')) continue;
+        const path = new URL(source.href).pathname;
+        const isKnownDestination = Boolean(semanticDestinationByPath(path));
+        const isKnownAlias = isLegacyPath(path);
+        if (!isKnownDestination && !isKnownAlias) {
+          throw new Error(
+            `${entry.section}/${entry.page.slug} sources ${source.href}, which is neither a destination nor a legacy alias`,
+          );
+        }
+      }
+    }
+  });
+
+  it('Terms does not defer to a fuller document on the web app, which does not exist', () => {
+    const terms = findCatalogEntry('terms', 'terms');
+    expect(terms).toBeDefined();
+    // No outward href: there is no web `/terms` page for the bundled copy to point at.
+    expect(terms?.sources?.every((source) => !source.href)).toBe(true);
+    const bodyText = [
+      terms?.page.dek ?? '',
+      ...(terms?.page.body.flatMap((section) => section.paragraphs ?? []) ?? []),
+    ]
+      .join(' ')
+      .toLowerCase();
+    expect(bodyText).not.toMatch(/web app/);
+    expect(bodyText).not.toMatch(/full terms/);
+  });
+
   it('findCatalogEntry finds a known entry and returns undefined for an unknown slug', () => {
     expect(findCatalogEntry('privacy', 'privacy')).toBeDefined();
     expect(findCatalogEntry('privacy', 'not-a-real-slug')).toBeUndefined();
+  });
+
+  it('carries a bundled FAQ and Support page, each with its web source attached', () => {
+    // These were the two rows in native More with no screen of their own — tapping either opened
+    // Safari. The condensed catalog entry is what `/faq` and `/support` now render.
+    const faq = findCatalogEntry('faq', 'faq');
+    const support = findCatalogEntry('support', 'support');
+    expect(faq).toBeDefined();
+    expect(faq?.sources?.some((source) => source.href === 'https://blackstory.app/faq')).toBe(true);
+    expect(support).toBeDefined();
+    expect(
+      support?.sources?.some((source) => source.href === 'https://blackstory.app/support'),
+    ).toBe(true);
   });
 
   it('listCatalogEntries returns only entries for the requested section', () => {
@@ -50,5 +99,7 @@ describe('CONTENT_CATALOG', () => {
     // while `/law` meant historical statute — one word for two unrelated domains.
     expect(listCatalogEntries('privacy').length).toBe(1);
     expect(listCatalogEntries('terms').length).toBe(1);
+    expect(listCatalogEntries('faq').length).toBe(1);
+    expect(listCatalogEntries('support').length).toBe(1);
   });
 });

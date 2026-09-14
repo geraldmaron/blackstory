@@ -24,6 +24,11 @@
  * and "Mobile cache and OTA release") rather than fabricating legal commitments. One sentence of
  * the bundled privacy page has since drifted past that rule — see "Mobile data boundary" for
  * which one.
+ *
+ * FAQ/Support prose below is condensed the same way, from `apps/web/src/app/faq/faq-copy.ts` and
+ * `apps/web/src/app/support/page.tsx`. Neither invents a contact channel, a process, or a
+ * turnaround time the web page does not already state — the support email below is the literal
+ * `SUPPORT_CONTACT` default (`apps/web/src/lib/config/contact.ts`).
  */
 import type { CitationV1, ContentPageV1 } from './content-types';
 
@@ -38,7 +43,8 @@ import type { CitationV1, ContentPageV1 } from './content-types';
 export type StoryCatalogSectionId = 'stories';
 
 /** The supporting reference pages. Each is one page, addressed by its own route. */
-export type SupportingCatalogSectionId = 'about' | 'methodology' | 'errata' | 'privacy' | 'terms';
+export type SupportingCatalogSectionId =
+  'about' | 'faq' | 'methodology' | 'errata' | 'privacy' | 'terms' | 'support';
 
 export type CatalogSectionId = StoryCatalogSectionId | SupportingCatalogSectionId;
 
@@ -258,6 +264,69 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
     },
   },
 
+  // --- FAQ (condensed from apps/web/src/app/faq/faq-copy.ts) ------------------------------------
+  {
+    section: 'faq',
+    contentVersion: BUNDLED_CONTENT_VERSION,
+    requiresCitation: true,
+    sources: [
+      {
+        source: 'BlackStory',
+        label: 'Full FAQ (web)',
+        href: 'https://blackstory.app/faq',
+      },
+    ],
+    page: {
+      slug: 'faq',
+      title: 'Questions',
+      dek: 'Plain answers to what people actually ask, including the two most people are too polite to ask: who is behind this, and how much of it is made by a machine.',
+      publishedAt: '2026-07-01',
+      eraLabel: '',
+      placeLabel: '',
+      relatedEntityIds: [],
+      relatedFactIds: [],
+      body: [
+        {
+          heading: 'Who runs this',
+          paragraphs: [
+            'One person: Gerald Dagher. There is no staff, no department, and no institution behind the name. This is a personal project that publishes public records with their sources attached, so the only thing holding a claim up is the citation next to it.',
+          ],
+        },
+        {
+          heading: 'Is any of this made by AI?',
+          paragraphs: [
+            'No. The facts come from sources: archives, agency databases, court reporters, library catalogs, National Register nominations, and published scholarship. Every accepted claim carries the citations it rests on.',
+            'AI is used in two places: to search and pull source material that a person then checks against the original, and in drafting the long-form writing under a written voice standard. It never decides whether a record is true, what confidence grade it carries, or whether anything goes live.',
+          ],
+        },
+        {
+          heading: 'What does a confidence grade mean?',
+          paragraphs: [
+            'Established: several independent, high-authority sources agree and there is no serious dispute. Corroborated: two or more independent sources support it. Single source: one source that meets the citation bar, not yet checked against another. Contested: credible sources disagree, and the record names the disagreement. A grade measures independence and closeness to the event, nothing else.',
+          ],
+        },
+        {
+          heading: 'I found a mistake. What do I do?',
+          paragraphs: [
+            'Use the corrections form. You get a receipt code, the only credential for checking what happened to your report. A person reads it against the published sources; if accepted, the record changes and the change is published in the errata with the earlier wording still readable. There is no promised turnaround: one person reads these.',
+          ],
+        },
+        {
+          heading: 'Can I add something that is missing?',
+          paragraphs: [
+            'Yes. Use the lead form. You do not need an account, an affiliation, or a credential. Every lead is read before anything is published, and nothing goes public without a source someone else can check.',
+          ],
+        },
+        {
+          heading: 'Do I need an account?',
+          paragraphs: [
+            'No. Every public page works without signing in, and nothing here asks who you are in order to read it.',
+          ],
+        },
+      ],
+    },
+  },
+
   // --- Product policy. Not Law: `/law` is historical statute, this is what the app does. ---
   {
     section: 'privacy',
@@ -302,14 +371,13 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
     sources: [
       {
         source: 'BlackStory',
-        label: 'Full terms of service (web)',
-        href: 'https://blackstory.app/terms',
+        label: 'Terms of service',
       },
     ],
     page: {
       slug: 'terms',
       title: 'Terms of service',
-      dek: 'The plain-language summary; the full terms live on the web app.',
+      dek: 'The plain-language summary of how this app works.',
       publishedAt: '2026-06-01',
       eraLabel: '',
       placeLabel: '',
@@ -318,7 +386,7 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
       body: [
         {
           paragraphs: [
-            'BlackStory is a read-only reference app. There are no user accounts, no purchases, and no user-generated content beyond an opaque correction submission (reviewed before anything is published). See the full terms on the web app for the complete legal text.',
+            'BlackStory is a read-only reference app. There are no user accounts, no purchases, and no user-generated content beyond an opaque correction submission (reviewed before anything is published).',
           ],
         },
       ],
@@ -349,6 +417,51 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
           heading: '2026-06-02 · Update · Landmark listing added',
           paragraphs: [
             'Added the 1975 D.C. Inventory of Historic Sites listing as a distinct, dated event separate from the 2013 building.',
+          ],
+        },
+      ],
+    },
+  },
+
+  // --- Support (condensed from apps/web/src/app/support/page.tsx) -------------------------------
+  {
+    section: 'support',
+    contentVersion: BUNDLED_CONTENT_VERSION,
+    requiresCitation: true,
+    sources: [
+      {
+        source: 'BlackStory',
+        label: 'Full support page (web)',
+        href: 'https://blackstory.app/support',
+      },
+    ],
+    page: {
+      slug: 'support',
+      title: 'Support',
+      dek: 'How to get an answer, and how long it should take.',
+      publishedAt: '2026-07-01',
+      eraLabel: '',
+      placeLabel: '',
+      relatedEntityIds: [],
+      relatedFactIds: [],
+      body: [
+        {
+          paragraphs: [
+            'BlackStory is one person’s archive of Black history, tied to the places it happened. If something in a record is wrong, corrections is the fastest way in: it is moderated, it gives you a receipt code, and nothing is published as submitted.',
+          ],
+        },
+        {
+          heading: 'Ways to get help',
+          paragraphs: [
+            'Report a correction to say a published record is wrong, or point at evidence it is missing. Submissions enter moderated review, and nothing changes publicly until a person accepts it.',
+            'Read the methodology for the source rules, confidence grades, and map dignity limits. Browse the errata log for corrections, clarifications, and updates already applied, newest first.',
+          ],
+        },
+        {
+          heading: 'Reach me',
+          paragraphs: [
+            'For anything the corrections form has no field for (how the archive is run, a privacy request, an accessibility barrier that keeps you out of a page), write to me directly: me@geralddagher.com.',
+            'Most privacy questions are already answered on the Privacy page. One person builds and runs BlackStory, so a reply can take a few days. I read everything that comes in, and I’ll keep this running for as long as I can.',
           ],
         },
       ],

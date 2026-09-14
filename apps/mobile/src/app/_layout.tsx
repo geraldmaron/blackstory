@@ -81,6 +81,7 @@ function EditionStack() {
           as a title with a second back chevron under the stack's own. */}
       <Stack.Screen name="stories" options={{ headerShown: false, title: 'Stories' }} />
       <Stack.Screen name="about" options={{ title: 'About', headerBackTitle: 'More' }} />
+      <Stack.Screen name="faq" options={{ title: 'Questions', headerBackTitle: 'More' }} />
       <Stack.Screen
         name="methodology"
         options={{ title: 'Methodology', headerBackTitle: 'More' }}
@@ -88,6 +89,7 @@ function EditionStack() {
       <Stack.Screen name="errata" options={{ title: 'Errata', headerBackTitle: 'More' }} />
       <Stack.Screen name="privacy" options={{ title: 'Privacy', headerBackTitle: 'More' }} />
       <Stack.Screen name="terms" options={{ title: 'Terms', headerBackTitle: 'More' }} />
+      <Stack.Screen name="support" options={{ title: 'Support', headerBackTitle: 'More' }} />
       {/* Legacy `/learn/...` addresses redirect on mount and render nothing. */}
       <Stack.Screen name="learn" options={{ headerShown: false }} />
       <Stack.Screen

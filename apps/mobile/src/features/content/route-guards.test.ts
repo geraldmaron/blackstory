@@ -8,6 +8,8 @@ describe('parseSectionParam', () => {
   it('resolves a known section id', () => {
     expect(parseSectionParam('stories')?.routeId).toBe('stories');
     expect(parseSectionParam('methodology')?.routeId).toBe('methodology');
+    expect(parseSectionParam('faq')?.routeId).toBe('faq');
+    expect(parseSectionParam('support')?.routeId).toBe('support');
     // The retired sections resolve to nothing, so a stale deep link cannot reach a lookup.
     for (const retired of ['history', 'topics', 'myths', 'facts', 'legal']) {
       expect(parseSectionParam(retired)).toBeUndefined();
@@ -47,6 +49,8 @@ describe('parseSlugParam', () => {
   it('resolves a real slug that exists under the given section', () => {
     expect(parseSlugParam('privacy', privacyRow)).toBe('privacy');
     expect(parseSlugParam('dunbar-founded-1916', storiesRow)).toBe('dunbar-founded-1916');
+    expect(parseSlugParam('faq', parseSectionParam('faq')!)).toBe('faq');
+    expect(parseSlugParam('support', parseSectionParam('support')!)).toBe('support');
   });
 
   it('returns undefined for a slug that does not exist under that section', () => {

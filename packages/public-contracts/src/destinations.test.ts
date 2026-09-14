@@ -130,6 +130,9 @@ test('product policy is never routed into historical Law', () => {
   const privacy = semanticDestinationByPath('/privacy');
   assert.ok(privacy);
   assert.equal(privacy.family, 'policy');
+  const terms = semanticDestinationByPath('/terms');
+  assert.ok(terms);
+  assert.equal(terms.family, 'policy');
   const law = semanticDestinationByPath('/law');
   assert.ok(law);
   assert.equal(law.family, 'read');
@@ -194,6 +197,22 @@ test('the Rooms families each hold the destinations Rooms groups them under', ()
     semanticDestinationsInFamily('participate').map((destination) => destination.label),
     ['Submit', 'Corrections', 'Support'],
   );
+});
+
+test('Terms sits beside Privacy in the policy family, addressed at its own route', () => {
+  const policy = semanticDestinationsInFamily('policy');
+  assert.deepEqual(
+    policy.map((destination) => destination.label),
+    ['Privacy', 'Terms'],
+  );
+  assert.deepEqual(
+    policy.map((destination) => destination.path),
+    ['/privacy', '/terms'],
+  );
+  const terms = semanticDestinationByPath('/terms');
+  assert.ok(terms);
+  assert.equal(terms.parent, '/rooms');
+  assert.equal(terms.icon, 'terms');
 });
 
 test('Rooms does not list the primary axes as ordinary rooms', () => {

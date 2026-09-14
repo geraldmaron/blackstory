@@ -359,6 +359,17 @@ const DESTINATIONS: readonly SemanticDestination[] = [
     browsable: false,
     description: 'What this archive collects, what it does not, and how to ask.',
   },
+  {
+    id: 'terms',
+    label: 'Terms',
+    path: '/terms',
+    parent: '/rooms',
+    family: 'policy',
+    icon: 'terms',
+    isPublic: true,
+    browsable: false,
+    description: 'What using this app means, and what it does not promise.',
+  },
 
   /* ---------- real destinations, not somewhere a reader is sent browsing ---------- */
   {
