@@ -192,9 +192,7 @@ export function ExploreFloatingChrome({
           {onToggleRecords ? (
             <GhostIconButton
               icon="list-outline"
-              accessibilityLabel={
-                recordsExpanded ? 'Collapse records rail' : 'Expand records rail'
-              }
+              accessibilityLabel={recordsExpanded ? 'Collapse records rail' : 'Expand records rail'}
               onPress={onToggleRecords}
               selected={recordsExpanded}
               testID="explore-chip-records"

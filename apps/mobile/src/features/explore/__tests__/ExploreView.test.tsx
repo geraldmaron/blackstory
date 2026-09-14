@@ -480,7 +480,6 @@ describe('ExploreView — wide window (map + persistent records rail)', () => {
     expect(getByTestId('explore-side-rail-inspector')).toBeTruthy();
   });
 
-
   it('ignores the route echoing the selection back as ?selected=', async () => {
     setTestWindowSize(TABLET_WINDOW);
     const onSelectionChange = jest.fn();
@@ -558,11 +557,7 @@ describe('ExploreView — wide window (map + persistent records rail)', () => {
     setTestWindowSize(TABLET_WINDOW);
     const onOpenEntity = jest.fn();
     const { findByTestId, getByTestId } = await render(
-      <ExploreView
-        selectedParam="ent_fixture_place_dc"
-        onOpenEntity={onOpenEntity}
-        reduceMotion
-      />,
+      <ExploreView selectedParam="ent_fixture_place_dc" onOpenEntity={onOpenEntity} reduceMotion />,
     );
 
     expect(await findByTestId('entity-preview-sheet')).toBeTruthy();

@@ -335,9 +335,9 @@ export function ExploreRecordsRail({
 
   // Both take the same props for everything this rail passes; the cast picks one call
   // signature so `keyExtractor`'s item stays typed instead of widening to `any`.
-  const List = (listHost === 'plain' ? FlatList : BottomSheetFlatList) as typeof FlatList<
-    ExploreFeature
-  >;
+  const List = (
+    listHost === 'plain' ? FlatList : BottomSheetFlatList
+  ) as typeof FlatList<ExploreFeature>;
 
   return (
     <List
