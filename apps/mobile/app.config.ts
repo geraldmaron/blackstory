@@ -253,18 +253,20 @@ const config: ExpoConfig = {
     config: {
       usesNonExemptEncryption: false,
     },
+    // App Transport Security, stated for every variant rather than inherited.
     // Dev/preview: allow http://127.0.0.1:8080 (simulator) and LAN api-public.
     // Without this, iOS ATS blocks cleartext API traffic and bootstrap/map/search
     // look like "no data" even when api-public is running locally.
-    ...(APP_VARIANT !== 'production'
-      ? {
-          infoPlist: {
-            NSAppTransportSecurity: {
-              NSAllowsLocalNetworking: true,
-            },
-          },
-        }
-      : {}),
+    // Production: both exemptions off, explicitly. Expo's bare prebuild template
+    // Info.plist ships NSAllowsLocalNetworking = true, so leaving the key out here
+    // silently shipped the LAN exemption in store builds; the first CI dispatch of
+    // the mobile release gate caught it. Production only ever talks to https.
+    infoPlist: {
+      NSAppTransportSecurity:
+        APP_VARIANT === 'production'
+          ? { NSAllowsArbitraryLoads: false, NSAllowsLocalNetworking: false }
+          : { NSAllowsLocalNetworking: true },
+    },
     //
     // Universal Links (MOB-008): production-only. Omit the key entirely for
     // development/preview — an empty `associatedDomains: []` still makes Expo
