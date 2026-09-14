@@ -96,12 +96,24 @@ export const MOBILE_RELEASE_GATES: readonly MobileReleaseGateDefinition[] = [
     ],
   },
   {
+    /**
+     * NOT REQUIRED, and that is a recorded decision rather than an oversight.
+     * `docs/mobile/release/store-account-checklist.md` line 135 accepts the risk explicitly:
+     * EAS Update code signing is a paid-plan feature, and the project's posture is free-tier
+     * first until budget allows. A required gate that can never go green for a reason the owner
+     * already settled trains people to ignore the gate.
+     *
+     * It stays in the inventory, and it stays red: every decision artifact reports it as an
+     * optional failure naming repo-3en3s, so the accepted risk is restated on every release
+     * rather than forgotten. The required half of this concern is `store-and-signing-identity`,
+     * which a person has to sign. Make this required again the day the plan is paid for.
+     */
     id: 'ota-code-signing',
-    title: 'OTA updates are code signed',
+    title: 'OTA updates are code signed (accepted risk on the free tier)',
     kind: 'machine',
-    required: true,
+    required: false,
     description:
-      'eas.json declares an update code-signing certificate and the generated plist carries it. Without this an update bundle is trusted on TLS to the update host alone. Tracked as repo-3en3s.',
+      'eas.json declares an update code-signing certificate and the generated plist carries it. Without this an update bundle is trusted on TLS to the update host alone. Tracked as repo-3en3s; risk accepted in the store account checklist while the project is on the free tier.',
     evidence: [
       { type: 'file', ref: 'apps/mobile/eas.json' },
       { type: 'artifact', ref: 'apps/mobile/ios/<project>/Supporting/Expo.plist' },

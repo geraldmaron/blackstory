@@ -430,6 +430,32 @@ test('a placeholder signature does not attest anything', () => {
   assert.equal(report.decision, 'NO_GO');
 });
 
+test('the code-signing gate is optional by decision, and still reported', () => {
+  // `docs/mobile/release/store-account-checklist.md` accepts the unsigned-OTA risk while the
+  // project is on the EAS free tier. The gate stays in the inventory and stays red so the
+  // accepted risk is restated on every release; it just does not block one.
+  const definition = MOBILE_RELEASE_GATES.find((gate) => gate.id === 'ota-code-signing');
+  assert.ok(definition, 'ota-code-signing must stay in the inventory');
+  assert.equal(definition.required, false);
+
+  const unsigned = broken((evidence) => {
+    (evidence.eas as { codeSigningCertificate: string | null }).codeSigningCertificate = null;
+  });
+  const report = evaluateMobileReleaseGate({
+    evidence: unsigned,
+    evaluator: 'test',
+    evaluatedAt: '2026-09-13T12:00:00.000Z',
+    attestations: attestAll(),
+  });
+  assert.equal(report.decision, 'GO');
+  assert.equal(report.optionalFailed, 1);
+  assert.equal(
+    report.gates.find((gate) => gate.id === 'ota-code-signing')?.status,
+    'fail',
+    'an accepted risk is still reported as a failure',
+  );
+});
+
 test('every gate definition has a checker or is a human gate', () => {
   for (const gate of MOBILE_RELEASE_GATES) {
     if (gate.kind !== 'machine') continue;
