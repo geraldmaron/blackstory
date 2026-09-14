@@ -130,11 +130,13 @@ jobs:
       - name: Generate expo-env.d.ts (gitignored Expo type-reference shim)
         run: printf '/// <reference types="expo/types" />\n' > expo-env.d.ts
         working-directory: apps/mobile
+      # Outside the checkout. The first run downloaded this into ./android-evidence, which left an
+      # untracked directory in the working tree, so build-provenance failed on every dispatch.
       - name: Download Android evidence
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: android-evidence-${{ inputs.variant }}
-          path: android-evidence
+          path: ${{ runner.temp }}/android-evidence
       # `--no-install` skips npm and CocoaPods. Neither writes the files this gate reads: the
       # pbxproj, the plists, the entitlements and the privacy manifest are all written by
       # prebuild and its config plugins, minutes before pod install would start.
@@ -148,8 +150,8 @@ jobs:
           node scripts/release/mobile-release-gate.mjs collect \
             --variant "${{ inputs.variant }}" \
             --collected-by "github-actions@${{ github.run_id }}" \
-            --gradle-output android-evidence/gradle-properties.txt \
-            --aapt-output android-evidence/aapt-badging.txt \
+            --gradle-output "${{ runner.temp }}/android-evidence/gradle-properties.txt" \
+            --aapt-output "${{ runner.temp }}/android-evidence/aapt-badging.txt" \
             --apk apps/mobile/android/app/build/outputs/apk/release/app-release.apk \
             --output artifacts/mobile-release/evidence.json
       - name: Evaluate release gates
