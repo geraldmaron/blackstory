@@ -115,6 +115,7 @@ function isDeclaredUtility(route: string): boolean {
     '/submit',
     '/support',
     '/privacy',
+    '/terms',
     '/design-system',
     '/locate',
     '/stories/mosaic-credits',

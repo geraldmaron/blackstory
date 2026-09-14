@@ -226,6 +226,10 @@ const WEB_PRESENTATION: Readonly<Record<string, WebPresentation>> = Object.freez
   // Product policy. Reachable from the footer's policy row and from More on native; not a Rooms
   // card, because a privacy notice is not a room a reader browses into.
   privacy: { crawl: { changeFrequency: 'monthly', priority: 0.3 } },
+  // `terms` carried no `crawl` while `/terms` existed only as a bundled native screen: giving it
+  // one would have advertised a web route that 404s. The web page is built, so it is sitemapped
+  // on the same footing as the privacy notice.
+  terms: { crawl: { changeFrequency: 'monthly', priority: 0.3 } },
 
   // `locate` is deliberately ABSENT, not merely uncrawled. SP-14 folded it into the Lens Where
   // group and /locate now 308s to /?find=place, so there is no page for the registry to describe

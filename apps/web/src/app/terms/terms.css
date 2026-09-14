@@ -1,0 +1,180 @@
+/**
+ * Terms notice body. Same compact trust surface as the privacy policy: on-page nav, rule strip,
+ * follow paragraphs, mono "last updated" line.
+ *
+ * These rules deliberately mirror `../privacy/privacy.css`. Two policy pages is not yet enough to
+ * justify a shared `policy.css`; a third one is, and at that point these two files should be
+ * lifted into it rather than copied a third time.
+ */
+
+.ds-terms {
+  margin-top: var(--ds-space-6);
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.ds-terms [id] {
+  scroll-margin-top: var(--ds-island-clearance);
+}
+
+.ds-terms .ds-section {
+  padding-block: var(--ds-space-8);
+}
+
+.ds-terms .ds-section__lede {
+  margin-top: var(--ds-space-4);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.ds-terms__nav {
+  margin: 0;
+  padding: var(--ds-space-4) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-terms__nav-title {
+  margin: 0 0 var(--ds-space-3);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ds-terms__nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-terms__nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-terms__nav-link:hover,
+.ds-terms__nav-link:focus-visible {
+  border-bottom-color: var(--ds-accent-graphic);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-terms__nav-link {
+    transition: none;
+  }
+}
+
+.ds-terms__rule-strip {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: var(--ds-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ds-terms-rule;
+}
+
+.ds-terms__rule-row {
+  position: relative;
+  counter-increment: ds-terms-rule;
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-3) var(--ds-space-10);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  min-width: 0;
+}
+
+.ds-terms__rule-row::before {
+  content: counter(ds-terms-rule, decimal-leading-zero);
+  position: absolute;
+  left: var(--ds-space-4);
+  top: var(--ds-space-3);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.ds-terms__rule-text {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* The corrections privacy notice, quoted rather than paraphrased: the two pages cannot drift
+   apart if only one of them holds the words. */
+.ds-terms__quote {
+  margin: var(--ds-space-4) 0 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-left: 2px solid var(--ds-accent-graphic);
+  background: var(--ds-surface-raised);
+  min-width: 0;
+}
+
+.ds-terms__quote-text {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.ds-terms__quote-source {
+  margin-top: var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ds-terms__quote-source a {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* The one section a reader may arrive looking for. Flagged, not shouted. */
+.ds-terms__section--flagged .ds-section__title {
+  color: var(--ds-accent);
+}
+
+.ds-terms__follow {
+  margin: var(--ds-space-5) 0 0;
+  max-width: 46rem;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.ds-terms__follow a {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ds-terms__meta {
+  margin: var(--ds-space-4) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
