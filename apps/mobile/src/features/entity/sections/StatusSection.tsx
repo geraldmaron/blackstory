@@ -1,5 +1,6 @@
 /**
- * Beat 05: status / event-window panel — mirrors web `EntityStatusPanel`.
+ * Beat 06: status / event-window panel — mirrors web `EntityStatusPanel`. Rendered after
+ * claims, matching web's `recordSectionIndex` order (`status-heading` follows `claims-heading`).
  */
 import { View } from 'react-native';
 import { Text, space } from '@/ui';

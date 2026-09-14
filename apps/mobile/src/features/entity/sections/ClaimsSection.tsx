@@ -1,5 +1,6 @@
 /**
- * Beat 06: accepted claims with expandable preview when dense.
+ * Beat 05: accepted claims with expandable preview when dense. Rendered before status, matching
+ * web's `recordSectionIndex` order (`claims-heading` precedes `status-heading`).
  * Ledger Line: flat claim stacks on canvas (no nested Surface shells).
  */
 import { View } from 'react-native';

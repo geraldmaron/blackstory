@@ -9,8 +9,10 @@ describe('entityBeatIndices', () => {
     expect(beats.relevance).toBe('02');
     expect(beats.context).toBe('03');
     expect(beats.reading).toBe('04');
-    expect(beats.status).toBe('05');
-    expect(beats.claims).toBe('06');
+    // Claims precede status here, matching web's `recordSectionIndex`, where `claims-heading`
+    // ("What the sources say") is pushed before `status-heading`.
+    expect(beats.claims).toBe('05');
+    expect(beats.status).toBe('06');
     expect(beats.timeline).toBe('07');
     expect(beats.connected).toBe('08');
     // "Cited in" sits between the record's outward links and its provenance: what this record

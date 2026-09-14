@@ -1,8 +1,13 @@
 /**
- * Entity detail screen (MOB-014) — Ledger Line flat section stacks on canvas
- * matching web `design-direction-v6-entity.md`: intro, anatomy, trust off-ramp,
- * narrative beats, claims, timeline, connected records, provenance, maps hand-off,
- * and optional session navigation footer.
+ * Entity detail screen (MOB-014) — Ledger Line flat section stacks on canvas.
+ *
+ * Section order aligns to web's canonical `recordSectionIndex`
+ * (`apps/web/src/app/entity/[id]/EntityRoomSections.tsx`) for the beats the two platforms
+ * share: intro, anatomy and trust off-ramp (layout-only on this screen — web renders the same
+ * material in its masthead and fact strip, not as a numbered beat), narrative beats, claims,
+ * status, timeline, connected records, cited-in (web's "Where this record is written about"),
+ * provenance (layout-only, same reasoning as intro/anatomy), maps hand-off, and optional
+ * session navigation footer.
  */
 import type { ReactNode } from 'react';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
@@ -138,8 +143,8 @@ export function EntityDetailScreen({
       <HowToReadThisRecord {...(onMethodologyPress ? { onMethodologyPress } : {})} />
 
       <NarrativeSections entity={entity} beats={beats} />
-      <StatusSection entity={entity} index={beats.status} />
       <ClaimsSection claims={entity.claims} isOnline={isOnline} index={beats.claims} />
+      <StatusSection entity={entity} index={beats.status} />
       {beats.timeline ? (
         <TimelineSection timeline={entity.timeline} index={beats.timeline} />
       ) : null}
