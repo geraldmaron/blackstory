@@ -9,8 +9,12 @@
 
 /* —— the figure ————————————————————————————————————————————————————————————— */
 
+/* The explicit minmax(0, 1fr) track matters: an implicit grid track sizes to its widest child's
+   min-content, so opening "Show the numbers" on a wide table grew the whole figure past the
+   viewport, where the shell's overflow clip cut it off. The table scrolls inside its own body. */
 .ds-datafig {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--ds-space-4);
   margin: 0;
   padding-top: var(--ds-space-5);

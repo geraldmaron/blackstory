@@ -80,7 +80,14 @@ export function DataChartFrame({
       <SourceFootnote sources={resolvedSources} density="compact" className="ds-datafig__source" />
       <details className="ds-datafig__numbers">
         <summary className="ds-datafig__numbers-summary">Show the numbers</summary>
-        <div className="ds-datafig__numbers-body">{textAlternative}</div>
+        <div
+          className="ds-datafig__numbers-body"
+          role="region"
+          aria-label={`Numbers for ${title}`}
+          tabIndex={0}
+        >
+          {textAlternative}
+        </div>
       </details>
     </figure>
   );

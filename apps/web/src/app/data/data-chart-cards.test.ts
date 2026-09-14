@@ -79,6 +79,24 @@ test('the frame renders the anatomy in order: label, title, reading, graphic, ca
   assert.match(body, /<details className="ds-datafig__numbers">/);
 });
 
+// A 1,200px table opened at 375px widened the whole figure past the viewport, and the shell's
+// overflow clip hid the overflow instead of letting it scroll. Two halves keep it fixed: the figure
+// track cannot grow to the table's min-content, and the table's scroller is reachable by keyboard.
+test('an open numbers table scrolls inside the figure instead of widening it', () => {
+  const chartsCss = readFileSync(
+    join(here, '..', '..', 'components', 'data', 'data-charts.css'),
+    'utf8',
+  );
+  const figureRule = chartsCss.match(/\.ds-datafig \{[^}]*\}/)?.[0] ?? '';
+  assert.match(figureRule, /grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+  assert.match(chartsCss, /\.ds-datafig__numbers-body \{[^}]*overflow-x:\s*auto/);
+  const scroller =
+    frameSource.match(/<div\s+className="ds-datafig__numbers-body"[^>]*>/)?.[0] ?? '';
+  assert.match(scroller, /role="region"/);
+  assert.match(scroller, /aria-label=\{`Numbers for \$\{title\}`\}/);
+  assert.match(scroller, /tabIndex=\{0\}/);
+});
+
 test('every section states its as-of date once, in its head', () => {
   assert.match(sectionsSource, /`As of \$\{populationAsOf\}`/);
   assert.match(sectionsSource, /const indicatorMeta = \[`As of \$\{indicatorsAsOf\}`\]/);
