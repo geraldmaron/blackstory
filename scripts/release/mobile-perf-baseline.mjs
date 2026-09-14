@@ -52,6 +52,8 @@ const DEFAULT_OUT = 'artifacts/mobile-release/performance.json';
 // actually installed on the shared simulator/emulator, not always production.
 const DEFAULT_APP_ID = 'app.blackstory.mobile';
 const DEFAULT_ACTIVITY = '.MainActivity';
+/** The Records tab route (`apps/mobile/src/app/(tabs)/records.tsx`) under the app's `blackstory` scheme. */
+const RECORDS_DEEP_LINK = 'blackstory://records';
 const MARK_WAIT_TIMEOUT_MS = 20_000;
 const MARK_POLL_INTERVAL_MS = 250;
 const BUNDLE_SIZE_BASELINE_PATH = join(repoRoot, 'apps/mobile/scripts/bundle-size-baseline.json');
@@ -139,6 +141,36 @@ function shSafe(command, args, options = {}) {
     return sh(command, args, options);
   } catch (error) {
     return error.stdout ?? '';
+  }
+}
+
+/**
+ * adb from the SDK the environment names, not only from PATH: CI runners and non-login shells set
+ * ANDROID_HOME (or the older ANDROID_SDK_ROOT) without putting platform-tools on PATH, and a bare
+ * `spawnSync adb ENOENT` says nothing about which of those is missing.
+ */
+function resolveAdb() {
+  for (const sdk of [process.env.ANDROID_HOME, process.env.ANDROID_SDK_ROOT]) {
+    if (sdk) {
+      const candidate = join(sdk, 'platform-tools', 'adb');
+      if (existsSync(candidate)) return candidate;
+    }
+  }
+  return 'adb';
+}
+
+const ADB = resolveAdb();
+
+function assertAdbReachable() {
+  try {
+    sh(ADB, ['version']);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      throw new Error(
+        `adb not found (tried ${ADB}). Put Android platform-tools on PATH or set ANDROID_HOME to the SDK root.`,
+      );
+    }
+    throw error;
   }
 }
 
@@ -382,7 +414,7 @@ async function collectIos({ bundleId, runs }) {
 /** Real screen dimensions vary per emulator profile; these swipe paths are relative fractions of
  * whatever `wm size` reports, so the gesture lands somewhere reasonable on any profile. */
 function readEmulatorScreenSize() {
-  const stdout = shSafe('adb', ['shell', 'wm', 'size']);
+  const stdout = shSafe(ADB, ['shell', 'wm', 'size']);
   const match = /Physical size:\s*(\d+)x(\d+)/.exec(stdout);
   if (match === null) return { width: 1080, height: 2400 }; // documented fallback, not measured
   return { width: Number.parseInt(match[1], 10), height: Number.parseInt(match[2], 10) };
@@ -392,29 +424,30 @@ function scriptedSwipe({ width, height }) {
   const x = Math.round(width / 2);
   const yStart = Math.round(height * 0.7);
   const yEnd = Math.round(height * 0.3);
-  sh('adb', ['shell', 'input', 'swipe', String(x), String(yStart), String(x), String(yEnd), '300']);
+  sh(ADB, ['shell', 'input', 'swipe', String(x), String(yStart), String(x), String(yEnd), '300']);
 }
 
 async function runAndroidLaunch(pkg, activity, { cold }) {
-  shSafe('adb', ['logcat', '-c']);
+  shSafe(ADB, ['logcat', '-c']);
   const target = `${pkg}/${activity}`;
   let stdout;
   if (cold) {
-    stdout = sh('adb', ['shell', 'am', 'start', '-W', '-S', '-n', target]);
+    stdout = sh(ADB, ['shell', 'am', 'start', '-W', '-S', '-n', target]);
   } else {
-    shSafe('adb', ['shell', 'input', 'keyevent', 'KEYCODE_HOME']);
+    shSafe(ADB, ['shell', 'input', 'keyevent', 'KEYCODE_HOME']);
     await sleep(1500);
-    stdout = sh('adb', ['shell', 'am', 'start', '-W', '-n', target]);
+    stdout = sh(ADB, ['shell', 'am', 'start', '-W', '-n', target]);
   }
   const launch = parseAndroidAmStart(stdout);
   // Give the app a moment to run past its first render and flush marks to logcat.
   await sleep(2000);
-  const logcat = shSafe('adb', ['logcat', '-d', '-s', 'ReactNativeJS']);
+  const logcat = shSafe(ADB, ['logcat', '-d', '-s', 'ReactNativeJS']);
   const marks = parseAndroidLogcatPerfMarks(logcat);
   return { launch, marks };
 }
 
 async function collectAndroid({ pkg, activity, runs }) {
+  assertAdbReachable();
   const metrics = {};
   const unmeasured = [];
   const markSamplesMs = {};
@@ -482,9 +515,9 @@ async function collectAndroid({ pkg, activity, runs }) {
   const mapJankSamples = { total: [], janky: [], p90: [] };
   const listJankSamples = { total: [], janky: [], p90: [] };
   for (let run = 0; run < runs; run += 1) {
-    shSafe('adb', ['shell', 'dumpsys', 'gfxinfo', pkg, 'reset']);
+    shSafe(ADB, ['shell', 'dumpsys', 'gfxinfo', pkg, 'reset']);
     scriptedSwipe(screen);
-    const mapGfx = parseAndroidGfxInfo(shSafe('adb', ['shell', 'dumpsys', 'gfxinfo', pkg]));
+    const mapGfx = parseAndroidGfxInfo(shSafe(ADB, ['shell', 'dumpsys', 'gfxinfo', pkg]));
     if (mapGfx.jankyPercent !== null) {
       mapJankSamples.total.push(mapGfx.totalFrames);
       mapJankSamples.janky.push(mapGfx.jankyPercent);
@@ -505,10 +538,23 @@ async function collectAndroid({ pkg, activity, runs }) {
   }
 
   for (let run = 0; run < runs; run += 1) {
-    shSafe('adb', ['shell', 'am', 'start', '-n', `${pkg}/.MainActivity`]);
-    shSafe('adb', ['shell', 'dumpsys', 'gfxinfo', pkg, 'reset']);
+    // Open the Records tab itself. Relaunching the activity lands on Explore, which would make this
+    // a second map swipe reported under the Records name.
+    shSafe(ADB, [
+      'shell',
+      'am',
+      'start',
+      '-W',
+      '-a',
+      'android.intent.action.VIEW',
+      '-d',
+      RECORDS_DEEP_LINK,
+      pkg,
+    ]);
+    await sleep(2500);
+    shSafe(ADB, ['shell', 'dumpsys', 'gfxinfo', pkg, 'reset']);
     scriptedSwipe(screen);
-    const listGfx = parseAndroidGfxInfo(shSafe('adb', ['shell', 'dumpsys', 'gfxinfo', pkg]));
+    const listGfx = parseAndroidGfxInfo(shSafe(ADB, ['shell', 'dumpsys', 'gfxinfo', pkg]));
     if (listGfx.jankyPercent !== null) listJankSamples.janky.push(listGfx.jankyPercent);
   }
   if (listJankSamples.janky.length > 0) {
@@ -526,7 +572,7 @@ async function collectAndroid({ pkg, activity, runs }) {
 
   const meminfoSamples = [];
   for (let run = 0; run < runs; run += 1) {
-    const meminfo = parseAndroidMeminfo(shSafe('adb', ['shell', 'dumpsys', 'meminfo', pkg]));
+    const meminfo = parseAndroidMeminfo(shSafe(ADB, ['shell', 'dumpsys', 'meminfo', pkg]));
     if (typeof meminfo.totalPssKb === 'number') meminfoSamples.push(meminfo.totalPssKb);
   }
   if (meminfoSamples.length > 0) {
@@ -617,7 +663,7 @@ async function main() {
     const activity = typeof flags.activity === 'string' ? flags.activity : DEFAULT_ACTIVITY;
     environment = 'emulator';
     device =
-      shSafe('adb', ['shell', 'getprop', 'ro.product.model']).trim() ||
+      shSafe(ADB, ['shell', 'getprop', 'ro.product.model']).trim() ||
       'unknown (adb getprop failed)';
     result = await collectAndroid({ pkg, activity, runs });
   }
