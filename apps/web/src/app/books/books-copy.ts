@@ -24,7 +24,7 @@ export const BOOKS_CATALOG = {
 export const BOOKS_ABOUT = {
   kicker: 'About',
   title: 'How to read this list',
-  lede: 'A title counts as currently banned or restricted here only while a cited challenge remains in reported, unknown, banned, or restricted status in that jurisdiction; challenges resolved as rescinded or retained are excluded. State codes are validated USPS abbreviations from those reports, not a claim of statewide removal. Bookshop.org links use BlackStory affiliate referral to support independent bookstores.',
+  lede: 'A title counts as currently banned or restricted here only while a cited challenge remains in reported, unknown, banned, or restricted status in that jurisdiction; challenges resolved as rescinded or retained are excluded. State codes are validated USPS abbreviations from those reports, not a claim of statewide removal. Bookshop.org links are paid affiliate links: BlackStory earns a commission on purchases made through them, and Bookshop.org supports independent bookstores.',
 } as const;
 
 export const BOOKS_DETAIL = {
@@ -40,7 +40,7 @@ export const BOOKS_DETAIL = {
   affiliateKicker: 'Affiliate',
   affiliateTitle: 'Buy on Bookshop',
   affiliateNotice:
-    'This is an affiliate link. Bookshop.org links support independent bookstores via BlackStory affiliate referral.',
+    'This is a paid affiliate link. BlackStory earns a commission when you buy through it, and Bookshop.org also supports independent bookstores.',
   lookupKicker: 'Lookup',
   lookupTitle: 'Purchase and identifiers',
   lookupFootnote: 'Open Library is a free catalog reference, not a purchase path.',

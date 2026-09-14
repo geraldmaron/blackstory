@@ -10,11 +10,24 @@ import { AI_TRAINING_USER_AGENTS } from '../../lib/traffic-class/agent-lists';
 
 function buildAiTxt(): string {
   const lines = [
-    '# ai.txt — BlackStory AI-crawler policy ',
+    '# ai.txt — BlackStory AI-crawler notice',
     '# This is a courtesy signal only; see /robots.txt for the standard-convention equivalent.',
-    '# Content here is human-researched historical documentation, not a corpus offered for',
-    '# unrestricted AI-training ingestion. Contact the security contact in',
-    '# /.well-known/security.txt for licensing or bulk-access questions.',
+    '#',
+    "# License: BlackStory's own written content (articles, summaries, analysis) is licensed",
+    '# under CC BY 4.0: https://creativecommons.org/licenses/by/4.0/',
+    '# CC BY 4.0 permits AI training and other reuse. Attribution required: credit "BlackStory"',
+    '# and link back to the original page when you reuse this content.',
+    '#',
+    "# Scope: this license covers BlackStory's own writing only. It does not cover the",
+    '# third-party photographs, documents, book covers, and map data displayed alongside it;',
+    '# those carry their own terms, credited per record. Sources on this site include',
+    '# Wikimedia Commons, Open Library, Internet Archive, USGS, and OpenStreetMap/OpenMapTiles.',
+    '#',
+    '# What the Disallow lines below mean, since the license above permits training: they are',
+    '# about HOW you obtain this content, not whether you may use it. Crawling the whole',
+    '# archive to assemble a corpus costs a one-person project real bandwidth, and the crawl',
+    '# is the objection, not the training. Ask for bulk access instead, via the address in',
+    '# /.well-known/security.txt, and the answer is expected to be yes.',
     '',
     ...AI_TRAINING_USER_AGENTS.flatMap((userAgent) => [
       `User-Agent: ${userAgent}`,

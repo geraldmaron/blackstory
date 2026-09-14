@@ -59,6 +59,20 @@ test('the affiliate block names itself affiliate in body text, not only in a rel
   assert.match(html, /rel="noopener noreferrer sponsored"/);
 });
 
+test('the affiliate notice states BlackStory earns a commission, not only that bookstores benefit', () => {
+  // The FTC's endorsement guidance (16 CFR Part 255) flags the bare phrase "affiliate link" as
+  // potentially confusing about who is compensated. The notice must say plainly that BlackStory
+  // earns a commission, and `rel="sponsored"` must still be present.
+  const html = renderToStaticMarkup(<BooksAffiliateNotice href={BOOKSHOP_LINK.href} />);
+  const bodyText = html.replace(/<[^>]+>/g, ' ');
+  assert.match(
+    bodyText,
+    /BlackStory earns a (small )?commission/i,
+    'the notice must say BlackStory earns a commission from the link',
+  );
+  assert.match(html, /rel="noopener noreferrer sponsored"/);
+});
+
 test('the affiliate block is its own hairline-ruled section, not folded into evidence', () => {
   const html = renderToStaticMarkup(<BooksAffiliateNotice href={BOOKSHOP_LINK.href} />);
   assert.match(html, /<section class="ds-room-section" aria-labelledby="books-affiliate-heading">/);
