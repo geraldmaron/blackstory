@@ -4,3 +4,4 @@
  */
 
 export * from './performance-budget.js';
+export * from './mobile/index.js';

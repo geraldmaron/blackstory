@@ -8,6 +8,7 @@ export {
   evaluateBetaLaunchGate,
   assertBetaLaunchGo,
   exitCodeForDecision,
+  humanAttestationDefect,
   missingHumanAttestations,
 } from './evaluate.js';
 

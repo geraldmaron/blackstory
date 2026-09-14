@@ -64,7 +64,7 @@ const ISO_8601 = /^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2
  * not smuggled in behind a placeholder fix. Note the shipped fixture attests at 2026-07-17, so a
  * staleness rule would need that fixture regenerated rather than a constant nudged.
  */
-function attestationDefect(
+export function humanAttestationDefect(
   record: HumanAttestationRecord,
   evaluatedAtMs: number,
 ): string | undefined {
@@ -109,7 +109,7 @@ function evaluateHumanGate(
       evidence,
     };
   }
-  const defect = attestationDefect(record, evaluatedAtMs);
+  const defect = humanAttestationDefect(record, evaluatedAtMs);
   if (defect !== undefined) {
     return {
       id: gateId,
