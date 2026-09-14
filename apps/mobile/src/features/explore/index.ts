@@ -49,6 +49,7 @@ export {
 export { MapColorKey, type MapColorKeyProps } from './MapColorKey';
 export { ExploreRecordsRail, type ExploreRecordsRailProps } from './ExploreRecordsRail';
 export { ExploreSideRail, type ExploreSideRailProps } from './ExploreSideRail';
+export { linesForFontScale, LARGE_TYPE_THRESHOLD } from './large-type';
 export {
   explorePaneLayout,
   EXPLORE_MAP_MIN_WIDTH,

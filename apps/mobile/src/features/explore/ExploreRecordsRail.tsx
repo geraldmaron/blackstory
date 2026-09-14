@@ -7,7 +7,14 @@
  * side rail, where there is no sheet to hand the gesture to (`listHost`).
  */
 import { memo, useCallback, useMemo } from 'react';
-import { FlatList, Pressable, StyleSheet, View, type ListRenderItemInfo } from 'react-native';
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+  type ListRenderItemInfo,
+} from 'react-native';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import { evidenceMeterLabel } from '@repo/public-contracts/evidence';
@@ -23,6 +30,7 @@ import {
   MIN_TOUCH_TARGET,
 } from '@/ui';
 import { exploreContentInset } from './explore-chrome';
+import { linesForFontScale } from './large-type';
 import type { ExploreFeature } from '@/features/explore/explore-feature';
 import type { FilterState } from '@/lib/route-params';
 import { exploreStoryMeta } from './explore-story-meta';
@@ -72,6 +80,11 @@ const RecordRow = memo(function RecordRow({
 }) {
   const theme = useThemeColors();
   const story = exploreStoryMeta(feature);
+  // One line at ordinary text sizes; more once the OS text size makes one line unreadable.
+  // See `large-type.ts` — at 3.1x a title in this rail had room for about four characters, so
+  // every row rendered as four characters and an ellipsis.
+  const { fontScale } = useWindowDimensions();
+  const titleLines = linesForFontScale(1, fontScale);
   // The row is one accessible element, so the meter is decorative and the sentence it would have
   // spoken is composed into the row's own label instead.
   const a11yMeta = [story.caption, evidenceMeterLabel(story.confidenceTier, story.sourceCount)]
@@ -104,11 +117,11 @@ const RecordRow = memo(function RecordRow({
         <NavIcon name={navIconForEntityKind(feature.kind)} size={18} selected={selected} />
       </View>
       <View style={styles.rowText}>
-        <Text variant="rowTitle" numberOfLines={1} style={styles.rowTitle}>
+        <Text variant="rowTitle" numberOfLines={titleLines} style={styles.rowTitle}>
           {feature.label}
         </Text>
         {story.caption ? (
-          <Text variant="caption" colorRole="inkMuted" numberOfLines={1}>
+          <Text variant="caption" colorRole="inkMuted" numberOfLines={titleLines}>
             {story.caption}
           </Text>
         ) : null}
