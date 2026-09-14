@@ -243,3 +243,33 @@ export function percentile(numbers, p) {
   const index = Math.min(Math.max(rank, 0), sorted.length - 1);
   return sorted[index];
 }
+
+/**
+ * Booted simulators from `xcrun simctl list devices booted`. The raw output groups devices under
+ * runtime headers ("-- iOS 26.5 --"); each device line reads "    iPhone 17 (<UDID>) (Booted)".
+ */
+export function parseSimctlBootedDevices(stdout) {
+  const devices = [];
+  let runtime = null;
+  for (const line of String(stdout ?? '').split('\n')) {
+    const header = /^--\s*(.+?)\s*--$/.exec(line.trim());
+    if (header) {
+      runtime = header[1];
+      continue;
+    }
+    const device = /^\s+(.+?) \(([0-9A-F-]{36})\) \(Booted\)\s*$/.exec(line);
+    if (device) devices.push({ name: device[1], udid: device[2], runtime });
+  }
+  return devices;
+}
+
+/**
+ * The app variant an application id implies, from app.config.ts's id scheme: a `.dev` suffix is
+ * development, `.preview` is preview, and the bare id is production.
+ */
+export function appVariantFromAppId(appId) {
+  const id = String(appId ?? '');
+  if (id.endsWith('.dev')) return 'development';
+  if (id.endsWith('.preview')) return 'preview';
+  return id.length > 0 ? 'production' : 'unknown';
+}

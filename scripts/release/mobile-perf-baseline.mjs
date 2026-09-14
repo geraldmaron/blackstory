@@ -31,7 +31,7 @@
  */
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   median,
@@ -41,6 +41,8 @@ import {
   parseAndroidMeminfo,
   parseIosNdjsonLog,
   percentile,
+  appVariantFromAppId,
+  parseSimctlBootedDevices,
 } from './lib/mobile-perf-parsers.mjs';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -314,7 +316,6 @@ async function collectIos({ bundleId, runs }) {
   const unmeasured = [];
   const markSamplesMs = {};
   const coldLaunchSamplesMs = [];
-  const warmLaunchSamplesMs = [];
 
   for (let run = 0; run < runs; run += 1) {
     const { marks, launchIssuedAtMs } = await runIosScenario(bundleId, { cold: true });
@@ -327,17 +328,6 @@ async function collectIos({ bundleId, runs }) {
       .sort((a, b) => a - b)[0];
     if (earliestTimestampMs !== undefined) {
       coldLaunchSamplesMs.push(earliestTimestampMs - launchIssuedAtMs);
-    }
-  }
-
-  for (let run = 0; run < runs; run += 1) {
-    const { marks, launchIssuedAtMs } = await runIosScenario(bundleId, { cold: false });
-    const earliestTimestampMs = marks
-      .map((m) => m.timestampMs)
-      .filter((value) => typeof value === 'number')
-      .sort((a, b) => a - b)[0];
-    if (earliestTimestampMs !== undefined) {
-      warmLaunchSamplesMs.push(earliestTimestampMs - launchIssuedAtMs);
     }
   }
 
@@ -355,14 +345,13 @@ async function collectIos({ bundleId, runs }) {
       reason: 'No perf-mark line was observed in the log stream within the timeout on any run.',
     });
   }
-  if (warmLaunchSamplesMs.length > 0) {
-    metrics.warm_launch = summarize(warmLaunchSamplesMs, 'ms', launchMethodNote);
-  } else {
-    unmeasured.push({
-      metric: 'warm_launch',
-      reason: 'No perf-mark line was observed in the log stream within the timeout on any run.',
-    });
-  }
+  unmeasured.push({
+    metric: 'warm_launch',
+    reason:
+      'Not observable on the iOS Simulator with this method. Each BLACKSTORY_PERF mark fires once per ' +
+      'process and a warm relaunch keeps the process, so it logs nothing to time against, and the ' +
+      'simulator has no OS-reported launch time the way Android’s `am start -W` does.',
+  });
 
   for (const [markName, metricId] of Object.entries(MARK_TO_METRIC)) {
     const samples = markSamplesMs[markName];
@@ -600,7 +589,15 @@ async function collectAndroid({ pkg, activity, runs }) {
 
 // --- output ---------------------------------------------------------
 
-function buildOutput({ platform, environment, device, metrics, unmeasured, commitSha }) {
+function buildOutput({
+  platform,
+  environment,
+  device,
+  metrics,
+  unmeasured,
+  commitSha,
+  buildVariant,
+}) {
   const covered = new Set([...Object.keys(metrics), ...unmeasured.map((entry) => entry.metric)]);
   const missing = PROGRAM_METRICS.filter((id) => !covered.has(id));
   const allUnmeasured = [
@@ -615,7 +612,7 @@ function buildOutput({ platform, environment, device, metrics, unmeasured, commi
     platform,
     environment,
     device,
-    buildVariant: process.env.APP_VARIANT ?? 'unknown',
+    buildVariant,
     metrics,
     unmeasured: allUnmeasured,
     note: FIXED_BASELINE_NOTE,
@@ -645,23 +642,35 @@ async function main() {
   if (!Number.isFinite(runs) || runs < 1) {
     throw new Error('--runs must be a positive integer.');
   }
-  const outPath = join(repoRoot, typeof flags.out === 'string' ? flags.out : DEFAULT_OUT);
+  // resolve, not join: join glued an absolute --out onto the repo root and wrote inside the tree.
+  const outPath = resolve(repoRoot, typeof flags.out === 'string' ? flags.out : DEFAULT_OUT);
   const commitSha = currentCommitSha();
 
   let result;
   let environment;
   let device;
+  let appId;
   if (platform === 'ios') {
     const bundleId = typeof flags['bundle-id'] === 'string' ? flags['bundle-id'] : DEFAULT_APP_ID;
     environment = 'simulator';
-    device =
-      shSafe('xcrun', ['simctl', 'list', 'devices', 'booted']).trim() ||
-      'unknown (no booted device reported)';
+    const booted = parseSimctlBootedDevices(
+      shSafe('xcrun', ['simctl', 'list', 'devices', 'booted']),
+    );
+    if (booted.length === 0)
+      throw new Error('No booted iOS Simulator. Boot one and install the Release build first.');
+    if (booted.length > 1) {
+      throw new Error(
+        `More than one booted simulator (${booted.map((d) => d.name).join(', ')}); every simctl call targets "booted", so the measured device would be ambiguous. Shut all but one down.`,
+      );
+    }
+    device = booted[0].runtime ? `${booted[0].name} (${booted[0].runtime})` : booted[0].name;
+    appId = bundleId;
     result = await collectIos({ bundleId, runs });
   } else {
     const pkg = typeof flags.package === 'string' ? flags.package : DEFAULT_APP_ID;
     const activity = typeof flags.activity === 'string' ? flags.activity : DEFAULT_ACTIVITY;
     environment = 'emulator';
+    appId = pkg;
     device =
       shSafe(ADB, ['shell', 'getprop', 'ro.product.model']).trim() ||
       'unknown (adb getprop failed)';
@@ -675,6 +684,7 @@ async function main() {
     metrics: result.metrics,
     unmeasured: result.unmeasured,
     commitSha,
+    buildVariant: process.env.APP_VARIANT ?? appVariantFromAppId(appId),
   });
 
   mkdirSync(dirname(outPath), { recursive: true });

@@ -7,6 +7,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  appVariantFromAppId,
   extractPerfMarks,
   median,
   parseAndroidAmStart,
@@ -14,6 +15,7 @@ import {
   parseAndroidLogcatPerfMarks,
   parseAndroidMeminfo,
   parseIosNdjsonLog,
+  parseSimctlBootedDevices,
   percentile,
 } from './lib/mobile-perf-parsers.mjs';
 
@@ -238,4 +240,39 @@ test('percentile uses nearest-rank over a sorted copy and clamps to the input ra
   assert.equal(percentile(samples, 90), 50);
   assert.equal(percentile(samples, 0), 10);
   assert.equal(percentile([], 90), null);
+});
+
+// --- parseSimctlBootedDevices / appVariantFromAppId -----------------------------------
+
+// Captured from `xcrun simctl list devices booted` on 2026-09-14; the harness used to store this
+// whole string as the device name.
+const SIMCTL_BOOTED_ONE = [
+  '== Devices ==',
+  '-- iOS 26.5 --',
+  '    iPhone 17 (2523882A-E7FA-437A-8D02-1B01D981F0A6) (Booted) ',
+].join('\n');
+
+test('parseSimctlBootedDevices reads the device name, udid and runtime from real simctl output', () => {
+  assert.deepEqual(parseSimctlBootedDevices(SIMCTL_BOOTED_ONE), [
+    { name: 'iPhone 17', udid: '2523882A-E7FA-437A-8D02-1B01D981F0A6', runtime: 'iOS 26.5' },
+  ]);
+});
+
+test('parseSimctlBootedDevices returns every booted device, so an ambiguous target can be refused', () => {
+  const two = [
+    SIMCTL_BOOTED_ONE,
+    '    iPad Pro 11-inch (M5) (B2C35429-0083-467A-8510-E490B92F3285) (Booted)',
+  ].join('\n');
+  assert.deepEqual(
+    parseSimctlBootedDevices(two).map((d) => d.name),
+    ['iPhone 17', 'iPad Pro 11-inch (M5)'],
+  );
+  assert.deepEqual(parseSimctlBootedDevices('== Devices ==\n'), []);
+});
+
+test('appVariantFromAppId follows the app.config.ts id scheme', () => {
+  assert.equal(appVariantFromAppId('app.blackstory.mobile.dev'), 'development');
+  assert.equal(appVariantFromAppId('app.blackstory.mobile.preview'), 'preview');
+  assert.equal(appVariantFromAppId('app.blackstory.mobile'), 'production');
+  assert.equal(appVariantFromAppId(''), 'unknown');
 });
