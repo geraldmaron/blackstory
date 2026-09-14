@@ -364,6 +364,10 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
       ],
     },
   },
+  // --- Terms (condensed from apps/web/src/app/terms/TermsSections.tsx). The license, the
+  // correction/copyright process, and the affiliate disclosure are the sections a reader is
+  // least able to look up over a network round trip, so they are carried in full here rather
+  // than left to the web link. Everything else is compressed. ---
   {
     section: 'terms',
     contentVersion: BUNDLED_CONTENT_VERSION,
@@ -371,22 +375,54 @@ export const CONTENT_CATALOG: readonly ContentEntry[] = [
     sources: [
       {
         source: 'BlackStory',
-        label: 'Terms of service',
+        label: 'Full terms notice (web)',
+        href: 'https://blackstory.app/terms',
       },
     ],
     page: {
       slug: 'terms',
       title: 'Terms of service',
-      dek: 'The plain-language summary of how this app works.',
-      publishedAt: '2026-06-01',
+      dek: 'What the app is, what the license permits, and where a correction or a copyright complaint goes.',
+      publishedAt: '2026-09-13',
       eraLabel: '',
       placeLabel: '',
       relatedEntityIds: [],
       relatedFactIds: [],
       body: [
         {
+          heading: 'What this covers',
           paragraphs: [
-            'BlackStory is a read-only reference app. There are no user accounts, no purchases, and no user-generated content beyond an opaque correction submission (reviewed before anything is published).',
+            'This covers the BlackStory app and the archive it publishes. It is a notice, not a contract: opening the app never asks you to agree to anything, and nothing below is written to work only if you had. BlackStory is run by Gerald Dagher, an individual — there is no company behind it.',
+            'BlackStory is not a government register, a court file, or an archive of record, and a page here proves nothing on its own. Nothing published is legal advice, and nothing certifies a lineage or a claim of descent. Where a record cites a source, the source is the authority; the record is the finding aid that points you to it.',
+          ],
+        },
+        {
+          heading: 'Reusing what BlackStory writes',
+          paragraphs: [
+            'The writing on BlackStory is published under Creative Commons Attribution 4.0 International (CC BY 4.0). Copy it, republish it, translate it, quote it, build something else on top of it, commercially or not. The condition is credit: name BlackStory, link back to the page you took it from, and say if you changed it.',
+            'That license reaches the writing and the arrangement, not the facts themselves — a date, a name, a place belongs to nobody, and you may use it with no credit owed. The license also does not reach material BlackStory does not own: photographs, scanned documents, and map tiles come from third parties on their own terms, named on the record that displays them.',
+          ],
+        },
+        {
+          heading: 'Corrections, and a record about you',
+          paragraphs: [
+            'A correction, a research lead, or an abuse report goes through the in-app forms. Nothing sent is published as sent, and nothing sent is visible to other readers. A person reads it, you get a receipt code to check the outcome, and one appeal if a closed correction still looks wrong. If a record changes, the change is published in the errata log rather than swapped in quietly.',
+            'If a record is about you, say so when you flag it, or write to me@geralddagher.com directly. A living-person concern is flagged as one from the start and read by a person, not a filter.',
+          ],
+        },
+        {
+          heading: 'Copyright complaints',
+          paragraphs: [
+            'If something published here is yours, write to me@geralddagher.com. Say what the material is, the address of the page it is on, what right you hold in it, and how to reach you.',
+            'I acknowledge a copyright complaint within 72 hours and reach a decision within 30 days. Material found to be infringing is removed. If I think the use was lawful I will say so and say why, and the material stays up while that is settled.',
+          ],
+        },
+        {
+          heading: 'Accuracy, liability, and affiliate links',
+          paragraphs: [
+            'The research here is provided as it stands, without a warranty of completeness or currency. Sources sit on the record so it can be checked, and records change as evidence changes. A disclaimer does not make a wrong record less wrong — the fix is a correction, not this sentence.',
+            'BlackStory is free to use and run by one person rather than a company. To the extent the law allows, I am not liable for indirect or consequential loss arising from use of the app.',
+            'Some book pages link to Bookshop.org through an affiliate program, and a purchase made through one of those links pays a commission. The affiliate relationship never decides which books appear or what a record says about them.',
           ],
         },
       ],

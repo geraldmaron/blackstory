@@ -58,17 +58,26 @@ describe('CONTENT_CATALOG', () => {
     }
   });
 
-  it('Terms does not defer to a fuller document on the web app, which does not exist', () => {
+  it('Terms links to the real web notice, and only as a plain outward pointer', () => {
     const terms = findCatalogEntry('terms', 'terms');
     expect(terms).toBeDefined();
-    // No outward href: there is no web `/terms` page for the bundled copy to point at.
-    expect(terms?.sources?.every((source) => !source.href)).toBe(true);
+    // `apps/web/src/app/terms` now exists (TermsSections.tsx), so an outward source href is no
+    // longer a false pointer — it is exactly the pattern privacy/methodology/faq/support already
+    // use to cite their own fuller web page. The regression test above (no bundled source points
+    // at a path that isn't a real destination) covers that `/terms` actually resolves.
+    expect(terms?.sources?.some((source) => source.href === 'https://blackstory.app/terms')).toBe(
+      true,
+    );
     const bodyText = [
       terms?.page.dek ?? '',
       ...(terms?.page.body.flatMap((section) => section.paragraphs ?? []) ?? []),
     ]
       .join(' ')
       .toLowerCase();
+    // What must NOT reappear is the old failure shape: the bundled copy claiming a fuller or more
+    // authoritative document exists elsewhere, beyond the plain source link above. "web app" and
+    // "full terms" were the old copy's own words for that claim; a link with a real destination
+    // behind it is not the same thing as a body sentence promising one.
     expect(bodyText).not.toMatch(/web app/);
     expect(bodyText).not.toMatch(/full terms/);
   });
