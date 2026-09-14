@@ -3,6 +3,16 @@
  */
 export * from './tokens';
 export * from './fonts';
+export {
+  classifyLayoutSize,
+  layoutHeightBreakpoints,
+  layoutWidthBreakpoints,
+  useLayoutSize,
+  type LayoutOrientation,
+  type LayoutSize,
+  type LayoutSizeClass,
+  type LayoutWindow,
+} from './layout';
 export { Text, type TextProps, type TextRole } from './Text';
 export { Button, type ButtonProps, type ButtonVariant, type ButtonDensity } from './Button';
 export { Link, type LinkProps } from './Link';

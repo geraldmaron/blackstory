@@ -199,7 +199,10 @@ const config: ExpoConfig = {
   // (`blackstory` on account gerald-maron).
   slug: 'blackstory',
   version: '1.0.0',
-  orientation: 'portrait',
+  // Wave 8 respects the window, not the device. Locking to portrait made every adaptive layout
+  // unreachable: the OS simply never rotates or resizes the app, so a tablet layout could be
+  // written but never seen. 'default' hands orientation back to the OS and the device.
+  orientation: 'default',
   // Custom URL scheme fallback per mobile-identity.md: `blackstory://`,
   // deliberately distinct from the reverse-DNS bundle id for readability in
   // support docs/marketing. Universal links / associated domains
@@ -226,6 +229,10 @@ const config: ExpoConfig = {
   // @expo/config-types@ExpoConfig for this SDK).
   icon: './assets/images/icon.png',
   ios: {
+    // Without this an iPad runs the app in a scaled iPhone window, which is the one configuration
+    // where a size-responsive layout cannot help: the app is handed phone dimensions and never
+    // learns it is on a tablet. Split view and Slide Over also require it.
+    supportsTablet: true,
     // Native minimum OS floor per `docs/decisions-carryover.md`, "Mobile
     // stack" (OS floors), re-verified at this scaffold (MOB-006) as that
     // decision requires: SDK 56's actual iOS platform minimum is 16.4 (raised
