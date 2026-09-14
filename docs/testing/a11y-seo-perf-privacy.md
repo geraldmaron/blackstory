@@ -7,7 +7,7 @@ Repo acceptance gates for core public journeys. No live deploy required — auto
 | Gate | Command | What it checks |
 |------|---------|----------------|
 | A11y fixtures | `pnpm --filter @repo/testing test:a11y` | Landmark, heading order, alt text, core journey HTML fixtures |
-| Release gates | `pnpm --filter @repo/testing test:release-gates` | Performance budgets + degraded-mode copy contracts |
+| Release gates | `pnpm --filter @repo/testing test:release-gates` | Degraded-mode copy contracts + mobile store release gate |
 | SEO builders | `pnpm --filter @repo/web test` (seo tests) | Protected fields stripped from metadata previews |
 | Sitemap | `apps/web/src/app/sitemap.xml/route.ts` | Static routes + active release entity URLs |
 
@@ -49,26 +49,14 @@ Do not edit explore/map-experience components in  — read-only ownership.
 
 Protected patterns block street addresses, phone numbers, emails, raw confidence scores, and moderation tokens from title/description/OG tags.
 
-## Performance budgets
+## Web performance budget: removed
 
-Config: `packages/testing/src/release-gates/performance-budget.ts`
-
-Default thresholds (ds-057-v1):
-
-| Metric | Max |
-|--------|-----|
-| LCP | 2500 ms |
-| FCP | 1800 ms |
-| TBT | 300 ms |
-| CLS | 0.1 |
-| TTFB | 800 ms |
-| JS transfer | 320 KB |
-| CSS transfer | 48 KB |
-| Image transfer | 512 KB |
-| Font transfer | 120 KB |
-| Document requests | 42 |
-
-Supply samples from Lighthouse CI or bundle analyzers; call `evaluatePerformanceBudget(samples)` — violations fail CI when wired.
+The web performance-budget gate (`packages/testing/src/release-gates/performance-budget.ts`,
+`ds-057-v1`'s LCP/FCP/TBT/CLS/TTFB/transfer thresholds) is gone (owner decision, 2026-09-14): it
+had no producer wired to any real Lighthouse CI or bundle-analyzer run, so it only ever evaluated
+on empty input and passed vacuously. Mobile has a real, wired equivalent instead — see
+`docs/mobile/release/release-gates.md`'s `mobile-performance-baseline` gate, a report-only launch
+baseline (no thresholds yet) fed by `scripts/release/mobile-perf-baseline.mjs`.
 
 ## Degraded / API-off mode
 

@@ -123,6 +123,66 @@ export interface ExpectedIdentity {
 /** Minimum Android target API the store requires of a new release. */
 export const ANDROID_REQUIRED_TARGET_SDK = 36 as const;
 
+/**
+ * Wave 9 mobile performance baseline (owner decision, 2026-09-14: REPORT-ONLY, no thresholds).
+ * Shape written by `scripts/release/mobile-perf-baseline.mjs`; mirrors that script's output
+ * exactly rather than re-deriving it, so the two do not drift independently.
+ */
+export interface MobilePerformanceMetricSample {
+  readonly samples: readonly number[];
+  readonly median: number | null;
+  readonly p90?: number | null;
+  readonly unit: string;
+  readonly method: string;
+}
+
+export interface MobilePerformanceUnmeasuredEntry {
+  readonly metric: string;
+  readonly reason: string;
+}
+
+/**
+ * Every metric the release program names for this wave. Mirrors the harness's own
+ * `PROGRAM_METRICS` (`scripts/release/mobile-perf-baseline.mjs`) — kept as a second literal list
+ * rather than a shared import because the harness is a standalone `.mjs` script with no
+ * dependency on this package, the same boundary `checks.ts`'s comment about collection vs.
+ * judgement draws elsewhere in this gate.
+ */
+export const MOBILE_PERFORMANCE_PROGRAM_METRICS = [
+  'cold_launch',
+  'warm_launch',
+  'first_useful_content',
+  'first_map_render',
+  'map_interaction_jank',
+  'record_search',
+  'records_scroll',
+  'story_load',
+  'entity_detail',
+  'image_decode',
+  'sheet_interaction',
+  'tablet_split',
+  'memory',
+  'bundle_size',
+  'payload_cache',
+] as const;
+
+export type MobilePerformanceProgramMetric = (typeof MOBILE_PERFORMANCE_PROGRAM_METRICS)[number];
+
+export interface MobilePerformanceBaseline {
+  readonly schemaVersion: number;
+  readonly commit?: string;
+  readonly collectedAt?: string;
+  readonly host?: string;
+  readonly platform: 'ios' | 'android';
+  /** Every sample in this bundle came from a simulator/emulator, never a physical device. */
+  readonly environment: 'simulator' | 'emulator';
+  readonly device?: string;
+  readonly buildVariant?: string;
+  readonly metrics: Readonly<Record<string, MobilePerformanceMetricSample>>;
+  readonly unmeasured: readonly MobilePerformanceUnmeasuredEntry[];
+  readonly note?: string;
+}
+
 export interface MobileReleaseEvidence {
   readonly schemaVersion: typeof MOBILE_RELEASE_EVIDENCE_SCHEMA_VERSION;
   readonly collectedAt: string;
@@ -143,6 +203,14 @@ export interface MobileReleaseEvidence {
   readonly ios?: IosEvidence;
   /** Absent when the collecting host had no JDK or Android SDK. */
   readonly android?: AndroidEvidence;
+  /**
+   * Zero or more performance-baseline bundles (one per platform run of
+   * `scripts/release/mobile-perf-baseline.mjs`), passed to `collect` via repeated
+   * `--performance <file>` flags. Absent or empty when no baseline was collected for this
+   * release — the gate that reads this (`mobile-performance-baseline`) fails on that, but as an
+   * OPTIONAL gate, since the wave's owner decision is report-only with no launch dependency on it.
+   */
+  readonly performance?: readonly MobilePerformanceBaseline[];
 }
 
 export interface MobileReleaseEvaluationInput {

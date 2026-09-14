@@ -34,6 +34,36 @@ To skip a Gradle run you have already done, hand over its output instead:
 `--gradle-output <file> --aapt-output <file> --apk <path>`. That is exactly how CI moves the
 Android facts from the Linux runner to the macOS one without shipping a 167MB APK.
 
+### Performance baseline (report-only)
+
+Wave 9 (owner decision, 2026-09-14): collect a mobile performance baseline for the first release,
+with NO threshold — the program has no prior number to hold this release to, and the "before"
+half of before/after is unrecoverable for changes already landed. Every sample is labeled
+`simulator` or `emulator`; none is ever a physical-device number.
+
+```bash
+node scripts/release/mobile-perf-baseline.mjs --platform ios --runs 5 \
+  --bundle-id app.blackstory.mobile.preview \
+  --out artifacts/mobile-release/performance-ios.json
+node scripts/release/mobile-perf-baseline.mjs --platform android --runs 5 \
+  --package app.blackstory.mobile.preview \
+  --out artifacts/mobile-release/performance-android.json
+
+node scripts/release/mobile-release-gate.mjs collect \
+  --variant production --collected-by "$(git config user.email)" \
+  --performance artifacts/mobile-release/performance-ios.json \
+  --performance artifacts/mobile-release/performance-android.json
+```
+
+Requires a booted Simulator or a running Emulator with the target build already installed; the
+harness does not boot a device or build the app. See `scripts/release/lib/mobile-perf-parsers.mjs`
+for the pure output parsers (`am start -W`, `dumpsys meminfo`, `dumpsys gfxinfo`, and the in-app
+`BLACKSTORY_PERF` log line emitted by `apps/mobile/src/lib/perf-marks.ts`) and
+`scripts/release/mobile-perf-baseline.test.mjs` for their tests. Metrics the harness cannot
+measure honestly (iOS Simulator frame jank, image-decode timing, tablet split, payload/cache — see
+the script's own comments for why each one) are listed in the output's `unmeasured` array with a
+reason, never omitted or faked.
+
 ## In CI
 
 `.github/workflows/mobile-release-gates.yml`, `workflow_dispatch` only. The Linux job prebuilds
@@ -43,9 +73,11 @@ as a 90-day artifact.
 
 ## What the gates are
 
-Nine machine gates, answered from the evidence bundle: build provenance, iOS bundle identity, iOS
+Ten machine gates, answered from the evidence bundle: build provenance, iOS bundle identity, iOS
 OS floor and device family, iOS store compliance, associated domains, OTA runtime version, OTA
-channel and environment, OTA code signing, Android target SDK.
+channel and environment, OTA code signing, Android target SDK, and the performance baseline
+above. Unlike the other nine, the performance gate never compares a value to a threshold — it
+only checks that a baseline was collected and every named metric is accounted for.
 
 Four human gates, which fail closed until attested: E2E on the release build, accessibility
 evidence, rollback rehearsed, store and signing identity. Fill in

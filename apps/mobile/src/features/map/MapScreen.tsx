@@ -67,6 +67,7 @@ import {
   MAP_VECTOR_TILE_URL,
 } from './mapConfig';
 import { MAP_FAILURE_COPY, type MapFailureMode, type MapLoadState } from './mapLoadState';
+import { markPerf } from '@/lib/perf-marks';
 import { DEMO_MAP_SOURCE, type MapFeatureCollection } from './demoMapSource';
 import {
   EXPLORE_MAP_VIEW_PADDING,
@@ -516,6 +517,7 @@ export function MapScreen({
           setEngineFailed(true);
           onMapEngineFailure?.();
         }}
+        onDidFinishRenderingMapFully={() => markPerf('first_map_render')}
         dragPan={gesturesEnabled}
         touchZoom={gesturesEnabled}
         doubleTapZoom={gesturesEnabled}

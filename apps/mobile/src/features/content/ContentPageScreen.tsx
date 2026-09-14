@@ -3,7 +3,7 @@
  * article body (no indexed Surface stack, no nested card around prose).
  */
 import { useNavigation } from 'expo-router';
-import { useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import {
   EditionBrandHeader,
@@ -15,6 +15,7 @@ import {
   space,
   useThemeColors,
 } from '@/ui';
+import { markPerf } from '@/lib/perf-marks';
 import { normalizeTypedContentPage } from './content-blocks';
 import type { CatalogSectionId } from './content-catalog';
 import { ContentRenderer } from './ContentRenderer';
@@ -90,6 +91,12 @@ export function ContentPageScreen({
       headerBackButtonDisplayMode: 'minimal',
     });
   }, [navigation, resolvedTitle]);
+
+  // This screen renders every catalog section (stories, law, themes, books, ...); the Wave 9
+  // baseline names "story loaded" specifically, so the mark only fires for that section.
+  useEffect(() => {
+    if (section === 'stories' && state.status === 'ok') markPerf('story_loaded');
+  }, [section, state.status]);
 
   return (
     <ScreenCanvas edges={['left', 'right', 'bottom']}>

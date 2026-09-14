@@ -23,6 +23,7 @@ import type {
   EasProfileEvidence,
   ExpectedIdentity,
   IosEvidence,
+  MobilePerformanceBaseline,
   MobileReleaseEvidence,
   PlistValue,
 } from './types.js';
@@ -385,6 +386,20 @@ export function collectAndroidEvidence(
   return { source: `${MOBILE_APP_DIR}/android`, gradle, apk };
 }
 
+// --- Performance ---------------------------------------------------------------
+
+/**
+ * Reads one or more `scripts/release/mobile-perf-baseline.mjs` output files verbatim (that
+ * script's JSON shape IS `MobilePerformanceBaseline`, so nothing here re-derives or judges it —
+ * `checks.ts`'s `checkMobilePerformanceBaseline` does that). A path that does not exist or does
+ * not parse as JSON is a defect in how collection was invoked, not something to swallow quietly.
+ */
+export function collectMobilePerformanceEvidence(
+  paths: readonly string[],
+): readonly MobilePerformanceBaseline[] {
+  return paths.map((path) => JSON.parse(readFileSync(path, 'utf8')) as MobilePerformanceBaseline);
+}
+
 // --- Bundle ------------------------------------------------------------------
 
 export interface CollectionOptions {
@@ -393,6 +408,12 @@ export interface CollectionOptions {
   readonly collectedBy: string;
   readonly collectedAt?: string;
   readonly android?: AndroidCollectionOptions | false;
+  /**
+   * Paths to `scripts/release/mobile-perf-baseline.mjs` output files, one per platform run
+   * collected for this release. Omitted (or empty) means no performance baseline was collected —
+   * `mobile-performance-baseline` then fails, but only as an optional gate.
+   */
+  readonly performance?: readonly string[];
 }
 
 export function collectMobileReleaseEvidence(options: CollectionOptions): MobileReleaseEvidence {
@@ -400,6 +421,10 @@ export function collectMobileReleaseEvidence(options: CollectionOptions): Mobile
   const ios = collectIosEvidence(repoRoot);
   const android =
     options.android === false ? undefined : collectAndroidEvidence(repoRoot, options.android ?? {});
+  const performance =
+    options.performance !== undefined && options.performance.length > 0
+      ? collectMobilePerformanceEvidence(options.performance)
+      : undefined;
   return {
     schemaVersion: MOBILE_RELEASE_EVIDENCE_SCHEMA_VERSION,
     collectedAt: options.collectedAt ?? new Date().toISOString(),
@@ -411,5 +436,6 @@ export function collectMobileReleaseEvidence(options: CollectionOptions): Mobile
     eas: collectEasEvidence(repoRoot),
     ...(ios !== undefined ? { ios } : {}),
     ...(android !== undefined ? { android } : {}),
+    ...(performance !== undefined ? { performance } : {}),
   };
 }

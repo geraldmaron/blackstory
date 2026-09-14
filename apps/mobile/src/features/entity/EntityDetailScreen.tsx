@@ -9,9 +9,10 @@
  * provenance (layout-only, same reasoning as intro/anatomy), maps hand-off, and optional
  * session navigation footer.
  */
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { ErrorState, screenScrollInsets, space, useThemeColors } from '@/ui';
+import { markPerf } from '@/lib/perf-marks';
 import type { EntityDetailState } from './useEntityDetail';
 import { entityBeatIndices } from './entity-beat-indices';
 import { GENERIC_ERROR_COPY, OFFLINE_NO_CACHE_COPY } from './copy';
@@ -62,6 +63,18 @@ export function EntityDetailScreen({
     canvasStyle,
     { alignItems: 'center' as const, justifyContent: 'center' as const, padding: space['8'] },
   ];
+
+  // Hooks run unconditionally, ahead of the early returns below, per the rules of hooks. `ready`
+  // is every state that falls through to the real record render (i.e. neither loading nor one of
+  // the three terminal non-record states).
+  const ready =
+    state.kind !== 'loading' &&
+    state.kind !== 'not-found' &&
+    state.kind !== 'offline-no-cache' &&
+    state.kind !== 'error';
+  useEffect(() => {
+    if (ready) markPerf('entity_detail_loaded');
+  }, [ready]);
 
   if (state.kind === 'loading') {
     return (

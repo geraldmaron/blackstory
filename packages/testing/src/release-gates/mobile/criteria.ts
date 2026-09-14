@@ -135,6 +135,30 @@ export const MOBILE_RELEASE_GATES: readonly MobileReleaseGateDefinition[] = [
     ],
   },
   {
+    /**
+     * REPORT-ONLY (owner decision, 2026-09-14): Wave 9 wants a mobile performance baseline for
+     * the first release, with no pass/fail threshold — the program has no prior number to hold
+     * this release to, and the "before" half of before/after is unrecoverable for changes
+     * already landed. This gate checks that a baseline was collected and is complete, never that
+     * any number is fast enough; it can never regress a release on latency or memory.
+     */
+    id: 'mobile-performance-baseline',
+    title: 'A performance baseline was collected and every named metric is accounted for',
+    kind: 'machine',
+    required: false,
+    description:
+      'For each platform bundle in the evidence, at least one metric carries a real sample, and every metric the release program names is either measured or listed as unmeasured with a reason. No threshold is applied to any value.',
+    evidence: [
+      {
+        type: 'command',
+        ref: 'node scripts/release/mobile-perf-baseline.mjs --platform ios|android --runs 5',
+        description:
+          'Collected per platform on a booted Simulator / running Emulator, never a physical device.',
+      },
+      { type: 'doc', ref: 'docs/mobile/release/release-gates.md' },
+    ],
+  },
+  {
     id: 'e2e-release-build',
     title: 'End-to-end journeys pass on the release build',
     kind: 'human',

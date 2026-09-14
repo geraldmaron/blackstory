@@ -3,5 +3,4 @@
  * The package root barrel is intentionally merged by the parent coordinator.
  */
 
-export * from './performance-budget.js';
 export * from './mobile/index.js';

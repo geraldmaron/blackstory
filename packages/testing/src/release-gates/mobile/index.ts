@@ -17,6 +17,7 @@ export {
   checkIosBundleIdentity,
   checkIosOsFloorAndDevices,
   checkIosStoreCompliance,
+  checkMobilePerformanceBaseline,
   checkOtaChannelEnvironment,
   checkOtaCodeSigning,
   checkOtaRuntimeVersion,
@@ -28,6 +29,7 @@ export {
   collectEasEvidence,
   collectExpectedIdentity,
   collectIosEvidence,
+  collectMobilePerformanceEvidence,
   collectMobileReleaseEvidence,
   parseAaptBadging,
   parseGradleProperties,
@@ -37,6 +39,7 @@ export {
 
 export {
   ANDROID_REQUIRED_TARGET_SDK,
+  MOBILE_PERFORMANCE_PROGRAM_METRICS,
   MOBILE_RELEASE_DECISION_SCHEMA_VERSION,
   MOBILE_RELEASE_EVIDENCE_SCHEMA_VERSION,
 } from './types.js';
@@ -46,6 +49,10 @@ export type {
   EasEvidence,
   ExpectedIdentity,
   IosEvidence,
+  MobilePerformanceBaseline,
+  MobilePerformanceMetricSample,
+  MobilePerformanceProgramMetric,
+  MobilePerformanceUnmeasuredEntry,
   MobileReleaseDecisionReport,
   MobileReleaseEvaluationInput,
   MobileReleaseEvidence,

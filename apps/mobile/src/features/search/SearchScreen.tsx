@@ -40,6 +40,7 @@ import {
   useThemeColors,
 } from '@/ui';
 import { parseEntityId } from '@/lib/route-params';
+import { markPerf } from '@/lib/perf-marks';
 import { BrowseCategoryList, showCategoryOnMap } from './BrowseCategoryList';
 import { useSearch } from './useSearch';
 import { MAX_RAW_INPUT_LENGTH, MIN_QUERY_LENGTH } from './query-normalization';
@@ -186,6 +187,9 @@ export function SearchScreen({
   );
 
   const showResults = state.kind === 'results';
+  useEffect(() => {
+    if (showResults) markPerf('search_results_shown');
+  }, [showResults]);
   const showLoading = state.kind === 'loading';
   const showEmpty = state.kind === 'empty';
   const showError = state.kind === 'error';

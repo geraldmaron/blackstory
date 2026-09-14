@@ -61,6 +61,7 @@ import { explorePaneLayout } from '@/features/explore/explore-pane-layout';
 import { attributionBottomAbovePeekSheet } from '@/features/explore/explore-sheet-layout';
 import { useLayoutSize } from '@/ui/layout';
 import type { FilterState } from '@/lib/route-params';
+import { markPerf } from '@/lib/perf-marks';
 import { exploreReducer, initialExploreState, visibleFeatures } from './explore-controller';
 import { applyFilters, sameFilterState } from './explore-filter';
 import { toExploreFeatures, toMapFeatureCollection, type ExploreFeature } from './explore-feature';
@@ -145,6 +146,12 @@ export function ExploreView({
 
   const allFeatures = useMemo(() => toExploreFeatures(source), [source]);
   const [state, dispatch] = useReducer(exploreReducer, filters, initialExploreState);
+  // Explore is the landing tab (`(tabs)/index.tsx` redirects straight here), so the map source
+  // going `ready` with a real (non-demo, in a Release build) `GET /v1/map` payload is this app's
+  // "first useful content" milestone.
+  useEffect(() => {
+    if (loadState.kind === 'ready') markPerf('first_useful_content');
+  }, [loadState.kind]);
   // Chrome posture, and nothing else. `engaged` means the reader asked for more map: the
   // floating chrome and instruments recede and a collapse control appears. It does NOT mean the
   // map became touchable — the map is touchable in every posture, because a map that ignores a

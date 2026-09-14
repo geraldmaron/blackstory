@@ -20,7 +20,38 @@ import {
   parseReleaseBuildSettings,
   parseTargetBuildPhases,
 } from './collect.js';
-import type { HumanAttestationBundle, MobileReleaseEvidence } from './types.js';
+import { MOBILE_PERFORMANCE_PROGRAM_METRICS } from './types.js';
+import type {
+  HumanAttestationBundle,
+  MobilePerformanceBaseline,
+  MobileReleaseEvidence,
+} from './types.js';
+
+/** A performance bundle that accounts for every program metric, half measured, half unmeasured —
+ * enough to pass `checkMobilePerformanceBaseline` without claiming this fixture measured
+ * anything real. */
+function performanceBaseline(platform: 'ios' | 'android'): MobilePerformanceBaseline {
+  const measured = MOBILE_PERFORMANCE_PROGRAM_METRICS.slice(0, 1);
+  const unmeasured = MOBILE_PERFORMANCE_PROGRAM_METRICS.slice(1);
+  return {
+    schemaVersion: 1,
+    commit: SHA,
+    collectedAt: '2026-09-14T00:00:00.000Z',
+    host: 'darwin',
+    platform,
+    environment: platform === 'ios' ? 'simulator' : 'emulator',
+    device: platform === 'ios' ? 'iPhone 17 Pro' : 'Pixel 8',
+    buildVariant: 'production',
+    metrics: Object.fromEntries(
+      measured.map((metric) => [
+        metric,
+        { samples: [100, 110, 105], median: 105, p90: 110, unit: 'ms', method: 'test fixture' },
+      ]),
+    ),
+    unmeasured: unmeasured.map((metric) => ({ metric, reason: 'not wired in this fixture' })),
+    note: 'REPORT-ONLY baseline; no threshold applied.',
+  };
+}
 
 const fixturesDir = join(dirname(fileURLToPath(import.meta.url)), 'fixtures');
 const SHA = 'a'.repeat(40);
@@ -109,6 +140,7 @@ function baseline(): MobileReleaseEvidence {
         compileSdkVersion: 36,
       },
     },
+    performance: [performanceBaseline('ios'), performanceBaseline('android')],
   };
 }
 
@@ -371,6 +403,85 @@ test('Android target API is proven from Gradle AND the artifact', () => {
     (evidence.android as { apk: { targetSdkVersion: number } }).apk.targetSdkVersion = 34;
   });
   assert.equal(runMobileReleaseCheck('android-target-sdk', disagree).pass, false);
+});
+
+test('the performance baseline gate is report-only: presence and completeness, never a threshold', () => {
+  assert.equal(runMobileReleaseCheck('mobile-performance-baseline', baseline()).pass, true);
+
+  const absent = broken((evidence) => {
+    delete (evidence as { performance?: unknown }).performance;
+  });
+  const absentResult = runMobileReleaseCheck('mobile-performance-baseline', absent);
+  assert.equal(absentResult.pass, false);
+  assert.match(absentResult.pass ? '' : absentResult.message, /No performance baseline/);
+
+  const empty = broken((evidence) => {
+    (evidence as { performance: unknown[] }).performance = [];
+  });
+  assert.equal(runMobileReleaseCheck('mobile-performance-baseline', empty).pass, false);
+
+  const malformed = broken((evidence) => {
+    (evidence as { performance: unknown[] }).performance = [{ platform: 'ios' }];
+  });
+  const malformedResult = runMobileReleaseCheck('mobile-performance-baseline', malformed);
+  assert.equal(malformedResult.pass, false);
+  assert.match(malformedResult.pass ? '' : malformedResult.message, /malformed/);
+
+  const noRealSample = broken((evidence) => {
+    (evidence as { performance: MobilePerformanceBaseline[] }).performance = [
+      {
+        ...performanceBaseline('ios'),
+        metrics: {},
+        unmeasured: MOBILE_PERFORMANCE_PROGRAM_METRICS.map((metric) => ({
+          metric,
+          reason: 'nothing measured in this mutation',
+        })),
+      },
+    ];
+  });
+  const noRealSampleResult = runMobileReleaseCheck('mobile-performance-baseline', noRealSample);
+  assert.equal(noRealSampleResult.pass, false);
+  assert.match(
+    noRealSampleResult.pass ? '' : noRealSampleResult.message,
+    /no metric with a real sample/,
+  );
+
+  const missingMetric = broken((evidence) => {
+    const withoutBundleSize = performanceBaseline('android');
+    (evidence as { performance: MobilePerformanceBaseline[] }).performance = [
+      {
+        ...withoutBundleSize,
+        unmeasured: withoutBundleSize.unmeasured.filter((entry) => entry.metric !== 'bundle_size'),
+      },
+    ];
+  });
+  const missingMetricResult = runMobileReleaseCheck('mobile-performance-baseline', missingMetric);
+  assert.equal(missingMetricResult.pass, false);
+  assert.match(missingMetricResult.pass ? '' : missingMetricResult.message, /bundle_size/);
+
+  // No numeric value anywhere in the fixture is large enough to be a plausible threshold breach
+  // check in the first place — this asserts the shape of the rule, not a specific number: the
+  // checker's own source has no comparison operator against a metric value at all.
+  const wildlySlow = broken((evidence) => {
+    (evidence as { performance: MobilePerformanceBaseline[] }).performance = [
+      {
+        ...performanceBaseline('ios'),
+        metrics: {
+          cold_launch: {
+            samples: [999_999],
+            median: 999_999,
+            p90: 999_999,
+            unit: 'ms',
+            method: 'test fixture',
+          },
+        },
+        unmeasured: MOBILE_PERFORMANCE_PROGRAM_METRICS.filter((m) => m !== 'cold_launch').map(
+          (metric) => ({ metric, reason: 'not wired in this fixture' }),
+        ),
+      },
+    ];
+  });
+  assert.equal(runMobileReleaseCheck('mobile-performance-baseline', wildlySlow).pass, true);
 });
 
 // --- decision -----------------------------------------------------------------

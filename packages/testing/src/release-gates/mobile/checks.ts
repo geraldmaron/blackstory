@@ -9,8 +9,14 @@
  * fine" are the two states a release gate exists to keep apart.
  */
 import type { MachineCheckResult } from '../../launch-gate/evidence-checks.js';
-import type { AndroidEvidence, IosEvidence, MobileReleaseEvidence, PlistValue } from './types.js';
-import { ANDROID_REQUIRED_TARGET_SDK } from './types.js';
+import type {
+  AndroidEvidence,
+  IosEvidence,
+  MobilePerformanceBaseline,
+  MobileReleaseEvidence,
+  PlistValue,
+} from './types.js';
+import { ANDROID_REQUIRED_TARGET_SDK, MOBILE_PERFORMANCE_PROGRAM_METRICS } from './types.js';
 
 export type { MachineCheckResult };
 
@@ -394,6 +400,74 @@ export function checkAndroidTargetSdk(evidence: MobileReleaseEvidence): MachineC
   return PASS;
 }
 
+/**
+ * Malformed enough that nothing below can be trusted: not an object, or missing the fields every
+ * baseline the harness writes always has.
+ */
+function isWellFormedBaseline(value: unknown): value is MobilePerformanceBaseline {
+  if (typeof value !== 'object' || value === null) return false;
+  const candidate = value as Partial<MobilePerformanceBaseline>;
+  return (
+    (candidate.platform === 'ios' || candidate.platform === 'android') &&
+    (candidate.environment === 'simulator' || candidate.environment === 'emulator') &&
+    typeof candidate.metrics === 'object' &&
+    candidate.metrics !== null &&
+    Array.isArray(candidate.unmeasured)
+  );
+}
+
+function hasAtLeastOneRealSample(baseline: MobilePerformanceBaseline): boolean {
+  return Object.values(baseline.metrics).some(
+    (metric) => Array.isArray(metric?.samples) && metric.samples.length > 0,
+  );
+}
+
+function missingProgramMetrics(baseline: MobilePerformanceBaseline): readonly string[] {
+  const accounted = new Set([
+    ...Object.keys(baseline.metrics),
+    ...baseline.unmeasured.map((entry) => entry.metric),
+  ]);
+  return MOBILE_PERFORMANCE_PROGRAM_METRICS.filter((metric) => !accounted.has(metric));
+}
+
+/**
+ * REPORT-ONLY: this never compares a value against a threshold (there is none — owner decision,
+ * 2026-09-14). It only checks that a baseline exists, is well-formed, has at least one real
+ * sample per platform present, and accounts for every metric the release program names as either
+ * measured or explicitly unmeasured with a reason.
+ */
+export function checkMobilePerformanceBaseline(
+  evidence: MobileReleaseEvidence,
+): MachineCheckResult {
+  const bundles = evidence.performance;
+  if (bundles === undefined || bundles.length === 0) {
+    return fail(
+      'No performance baseline in the evidence bundle — run `scripts/release/mobile-perf-baseline.mjs` for each platform and pass its output via `--performance <file>`.',
+    );
+  }
+
+  for (const [index, baseline] of bundles.entries()) {
+    if (!isWellFormedBaseline(baseline)) {
+      return fail(
+        `Performance bundle at index ${index} is malformed (missing platform/environment/metrics/unmeasured).`,
+      );
+    }
+    if (!hasAtLeastOneRealSample(baseline)) {
+      return fail(
+        `Performance bundle for platform "${baseline.platform}" has no metric with a real sample — every metric is empty or unmeasured.`,
+      );
+    }
+    const missing = missingProgramMetrics(baseline);
+    if (missing.length > 0) {
+      return fail(
+        `Performance bundle for platform "${baseline.platform}" does not account for: ${missing.join(', ')} (neither measured nor listed as unmeasured).`,
+      );
+    }
+  }
+
+  return PASS;
+}
+
 const MACHINE_CHECKS: Readonly<
   Record<string, (evidence: MobileReleaseEvidence) => MachineCheckResult>
 > = {
@@ -406,6 +480,7 @@ const MACHINE_CHECKS: Readonly<
   'ota-channel-environment': checkOtaChannelEnvironment,
   'ota-code-signing': checkOtaCodeSigning,
   'android-target-sdk': checkAndroidTargetSdk,
+  'mobile-performance-baseline': checkMobilePerformanceBaseline,
 };
 
 export function runMobileReleaseCheck(

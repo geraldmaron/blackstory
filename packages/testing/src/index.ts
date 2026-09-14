@@ -77,20 +77,6 @@ export { CORE_JOURNEY_FIXTURES } from './a11y/journey-fixtures.js';
 export type { CoreJourneyFixture, CoreJourneyId } from './a11y/journey-fixtures.js';
 export { MAP_SEARCH_ACCESSIBLE_PEERS } from './a11y/map-search-peers.js';
 
-export {
-  assertPerformanceBudget,
-  DEFAULT_PERFORMANCE_BUDGET,
-  evaluatePerformanceBudget,
-} from './release-gates/index.js';
-export type {
-  PerformanceBudgetConfig,
-  PerformanceBudgetEvaluation,
-  PerformanceBudgetThreshold,
-  PerformanceBudgetViolation,
-  PerformanceMetricId,
-  PerformanceMetricSample,
-} from './release-gates/index.js';
-
 export { assertHealthContract } from './contract/health.js';
 export type { HealthContract } from './contract/health.js';
 

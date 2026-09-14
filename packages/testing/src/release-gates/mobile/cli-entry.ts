@@ -39,6 +39,7 @@ collect
   --aapt-output <path>    Reuse captured \`aapt2 dump badging\` stdout instead of running it
   --apk <path>            Release artifact the badging above describes
   --skip-android          Omit Android evidence (the Android gate then fails, by design)
+  --performance <path>    Output of scripts/release/mobile-perf-baseline.mjs (repeatable, one per platform)
 
 evaluate
   --evidence <path>       Required. Evidence bundle written by collect.
@@ -52,11 +53,18 @@ evaluate
 interface ParsedArgs {
   readonly command: string;
   readonly flags: Readonly<Record<string, string | true>>;
+  /**
+   * Every value seen for each flag, in order. Most flags only make sense once and read from
+   * `flags` above; `--performance` is the one repeatable flag (one bundle per platform run), and
+   * reads from here instead.
+   */
+  readonly repeated: Readonly<Record<string, readonly string[]>>;
 }
 
 function parseArgs(argv: readonly string[]): ParsedArgs {
   const [, , command = '', ...rest] = argv;
   const flags: Record<string, string | true> = {};
+  const repeated: Record<string, string[]> = {};
   for (let index = 0; index < rest.length; index += 1) {
     const arg = rest[index] ?? '';
     if (!arg.startsWith('--')) throw new Error(`Unexpected argument: ${arg}`);
@@ -66,10 +74,11 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
       flags[key] = true;
     } else {
       flags[key] = next;
+      (repeated[key] ??= []).push(next);
       index += 1;
     }
   }
-  return { command, flags };
+  return { command, flags, repeated };
 }
 
 function requireString(flags: ParsedArgs['flags'], key: string): string {
@@ -80,7 +89,7 @@ function requireString(flags: ParsedArgs['flags'], key: string): string {
   return value;
 }
 
-function runCollect(flags: ParsedArgs['flags']): number {
+function runCollect(flags: ParsedArgs['flags'], repeated: ParsedArgs['repeated']): number {
   const variant = (flags.variant ?? 'production') as AppVariant;
   if (!VARIANTS.includes(variant)) {
     throw new Error(`--variant must be one of ${VARIANTS.join(', ')}.`);
@@ -88,6 +97,7 @@ function runCollect(flags: ParsedArgs['flags']): number {
   const outputPath = resolvePath(
     typeof flags.output === 'string' ? flags.output : 'artifacts/mobile-release/evidence.json',
   );
+  const performancePaths = (repeated.performance ?? []).map(resolvePath);
   const evidence = collectMobileReleaseEvidence({
     repoRoot,
     variant,
@@ -104,12 +114,16 @@ function runCollect(flags: ParsedArgs['flags']): number {
               : {}),
             ...(typeof flags.apk === 'string' ? { apkPath: resolvePath(flags.apk) } : {}),
           },
+    ...(performancePaths.length > 0 ? { performance: performancePaths } : {}),
   });
   writeJson(outputPath, evidence);
   console.log(`Collected ${variant} evidence at ${evidence.commit.sha}`);
   console.log(`  iOS:     ${evidence.ios === undefined ? 'ABSENT' : evidence.ios.projectName}`);
   console.log(
     `  Android: ${evidence.android === undefined ? 'ABSENT' : `targetSdk ${String(evidence.android.gradle.targetSdkVersion)}`}`,
+  );
+  console.log(
+    `  Perf:    ${evidence.performance === undefined ? 'ABSENT' : evidence.performance.map((bundle) => bundle.platform).join(', ')}`,
   );
   console.log(`  Bundle:  ${outputPath}`);
   return 0;
@@ -149,12 +163,12 @@ function runEvaluate(flags: ParsedArgs['flags']): number {
 }
 
 function main(): number {
-  const { command, flags } = parseArgs(process.argv);
+  const { command, flags, repeated } = parseArgs(process.argv);
   if (command === '' || flags.help === true || command === '-h' || command === '--help') {
     printHelp();
     return command === '' ? 2 : 0;
   }
-  if (command === 'collect') return runCollect(flags);
+  if (command === 'collect') return runCollect(flags, repeated);
   if (command === 'evaluate') return runEvaluate(flags);
   throw new Error(`Unknown command: ${command}`);
 }
