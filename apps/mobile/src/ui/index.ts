@@ -15,7 +15,7 @@ export {
 } from './layout';
 export { Text, type TextProps, type TextRole } from './Text';
 export { Button, type ButtonProps, type ButtonVariant, type ButtonDensity } from './Button';
-export { Link, type LinkProps } from './Link';
+export { EXTERNAL_LINK_HINT, externalLinkHint, Link, type LinkProps } from './Link';
 export { Surface, type SurfaceProps } from './Surface';
 export { Notice, type NoticeProps, type NoticeTone } from './Notice';
 export { Badge, type BadgeProps } from './Badge';

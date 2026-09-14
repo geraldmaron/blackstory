@@ -3,8 +3,9 @@
  * accessibilityRole="button" (overridable via a passed-through `accessibilityRole`, e.g.
  * "radio" for a toggle/filter chip), accessibilityState (disabled/busy, merged with an optional
  * caller-supplied `selected`/`checked`/`expanded` — see `accessibilityState` prop, MOB-017) kept
- * in sync, and a minimum 44x44dp hit target (Apple HIG / Material guidance) via hitSlop when the
- * rendered box is smaller. Colors/radius/spacing/motion all come from generated tokens.
+ * in sync, and a visible box at least 44pt tall at every density (Apple HIG / Material guidance),
+ * because an invisible hitSlop does not make a visibly small control usable.
+ * Colors/radius/spacing/motion all come from generated tokens.
  *
  * Variants follow v6 copper discipline: primary = ink fill; accent = copper navigational CTA;
  * secondary/ghost for supporting actions.
@@ -12,10 +13,6 @@
 import { ActivityIndicator, Pressable, type PressableProps, StyleSheet, View } from 'react-native';
 import { Text } from './Text';
 import { MIN_TOUCH_TARGET, radius, space, useThemeColors } from './tokens';
-
-/** Visual box height for `density="compact"` — the 44dp target is restored via hitSlop. */
-const COMPACT_BOX_HEIGHT = 32;
-const COMPACT_HIT_SLOP = { top: 6, bottom: 6, left: 8, right: 8 } as const;
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'accent';
 export type ButtonDensity = 'default' | 'compact';
@@ -78,7 +75,7 @@ export function Button({
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ disabled: isDisabled, busy: loading, ...accessibilityState }}
       disabled={isDisabled}
-      hitSlop={density === 'compact' ? COMPACT_HIT_SLOP : 8}
+      hitSlop={8}
       android_ripple={{ color: palette.pressedBg }}
       onPress={onPress}
       style={({ pressed }) => [
@@ -130,8 +127,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: space['2'],
   },
+  // Compact is horizontal density and smaller type, not a shorter box.
   compact: {
-    minHeight: COMPACT_BOX_HEIGHT,
+    minHeight: MIN_TOUCH_TARGET,
     paddingHorizontal: space['3'],
     paddingVertical: space['1'],
   },

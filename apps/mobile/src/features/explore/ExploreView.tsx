@@ -33,6 +33,7 @@ import {
   Z_LAYER,
   duration,
   space,
+  useAccessibilityFocus,
   useThemeColors,
   MIN_TOUCH_TARGET,
 } from '@/ui';
@@ -68,6 +69,20 @@ import { useReduceMotion } from './useReduceMotion';
 
 /** Stable default so omitting `filters` does not re-trigger the URL sync effect. */
 const EMPTY_FILTERS: FilterState = Object.freeze({});
+
+export const EXPLORE_MAP_ACCESSIBILITY_LABEL = 'Map of pinned places';
+
+/**
+ * Where a screen reader user can read what the map shows. Pins are native map layers that no
+ * screen reader can step through, so the map names its text equivalent for each posture.
+ */
+export function exploreMapAccessibilityHint(posture: 'sheet' | 'pane' | 'immersive'): string {
+  if (posture === 'pane') return 'The same places are listed in the records pane beside the map.';
+  if (posture === 'immersive') {
+    return 'The records list is hidden. Show the records list to read these places as a list.';
+  }
+  return 'The same places are listed in the records sheet at the bottom of the screen.';
+}
 
 export type ExploreViewProps = {
   /**
@@ -160,6 +175,11 @@ export function ExploreView({
   }, []);
   const [chromeHeight, setChromeHeight] = useState(0);
   const prevSelectedIdRef = useRef<string | null>(null);
+  // Focus return targets for content that closes in place. Closing the preview returns focus to
+  // the map (its close button's hint promises that); hiding the instruments from inside the panel
+  // returns it to the mast toggle that opened them. Both targets are always mounted.
+  const { ref: mapSummaryRef, focus: focusMapSummary } = useAccessibilityFocus();
+  const { ref: instrumentsToggleRef, focus: focusInstrumentsToggle } = useAccessibilityFocus();
   /** Optimistic chip apply awaiting URL/`filters` prop catch-up. */
   const pendingFiltersRef = useRef<FilterState | null>(null);
 
@@ -414,7 +434,10 @@ export function ExploreView({
       feature={selectedFeature}
       onOpenEntity={onOpenEntity}
       {...(onOpenStory ? { onOpenStory } : {})}
-      onClose={() => dispatch({ type: 'entityDeselected' })}
+      onClose={() => {
+        dispatch({ type: 'entityDeselected' });
+        focusMapSummary();
+      }}
       onBrowsePrevious={handleBrowsePrevious}
       onBrowseNext={handleBrowseNext}
       browsePosition={
@@ -442,6 +465,11 @@ export function ExploreView({
             selectedEntityId={state.selectedId}
             cameraCommand={cameraCommand}
             showAttribution={false}
+            accessibilityLabel={EXPLORE_MAP_ACCESSIBILITY_LABEL}
+            accessibilityHint={exploreMapAccessibilityHint(
+              mapImmersive ? 'immersive' : twoPane ? 'pane' : 'sheet',
+            )}
+            accessibilitySummaryRef={mapSummaryRef}
             gesturesEnabled
             onViewportChange={(bbox) => dispatch({ type: 'viewportChanged', bbox })}
             onFeaturePress={(entityId) => {
@@ -491,6 +519,7 @@ export function ExploreView({
               recordsExpanded={twoPane ? true : recordsExpanded}
               onLayout={handleChromeLayout}
               onToggleInstruments={handleToggleInstruments}
+              instrumentsToggleRef={instrumentsToggleRef}
               // No records toggle in the wide layout: the rail is always up, so a control
               // that claims to raise and lower it would be lying in one of its two states.
               {...(twoPane ? {} : { onToggleRecords: handleToggleRecords })}
@@ -513,7 +542,10 @@ export function ExploreView({
                 filters={state.filters}
                 features={allFeatures}
                 onFiltersChange={handleFiltersChange}
-                onHide={() => setInstrumentsOpen(false)}
+                onHide={() => {
+                  setInstrumentsOpen(false);
+                  focusInstrumentsToggle();
+                }}
                 onOpenPlaceFind={onOpenSearch}
               />
             </Animated.View>

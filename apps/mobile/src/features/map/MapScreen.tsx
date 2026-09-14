@@ -27,7 +27,7 @@
  * (`docs/decisions-carryover.md`, "Native map render layer"). There is no Maestro
  * suite in this repo, so that evidence is a human running the app.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type Ref } from 'react';
 import { Pressable, StyleSheet, View, type NativeSyntheticEvent } from 'react-native';
 import {
   Camera,
@@ -208,6 +208,18 @@ export type MapScreenProps = {
    * (`docs/decisions-carryover.md`, "Native map render layer" §7).
    */
   readonly onMapEngineFailure?: () => void;
+  /**
+   * What the map is, for a screen reader, and where its content can be read instead.
+   *
+   * Pins are native style layers, so neither VoiceOver nor TalkBack can reach them one by one.
+   * When set, a text stand-in spans the map: it names the map and, through `accessibilityHint`,
+   * the list that carries the same places. It sits behind the canvas and takes no touches, so the
+   * map stays exposed to assistive tech and every gesture still reaches it.
+   */
+  readonly accessibilityLabel?: string;
+  readonly accessibilityHint?: string;
+  /** Ref to the stand-in, so a host can return focus to the map. */
+  readonly accessibilitySummaryRef?: Ref<View>;
 };
 
 function boundsFromEvent(event: NativeSyntheticEvent<ViewStateChangeEvent>): Bbox | null {
@@ -261,6 +273,9 @@ export function MapScreen({
   showAttribution = true,
   showZoomControls,
   onMapEngineFailure,
+  accessibilityLabel,
+  accessibilityHint,
+  accessibilitySummaryRef,
 }: MapScreenProps) {
   const cameraRef = useRef<CameraRef>(null);
   const sourceRef = useRef<GeoJSONSourceRef>(null);
@@ -478,6 +493,18 @@ export function MapScreen({
 
   return (
     <View style={styles.container} testID="map-screen">
+      {accessibilityLabel ? (
+        // Rendered before the map so it paints beneath it and never covers the zoom controls.
+        <View
+          ref={accessibilitySummaryRef}
+          style={StyleSheet.absoluteFill}
+          pointerEvents="none"
+          accessible
+          accessibilityLabel={accessibilityLabel}
+          {...(accessibilityHint ? { accessibilityHint } : {})}
+          testID="map-accessibility-summary"
+        />
+      ) : null}
       <Map
         style={StyleSheet.absoluteFill}
         mapStyle={JSON.stringify(style)}

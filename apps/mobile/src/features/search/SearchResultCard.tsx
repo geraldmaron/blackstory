@@ -40,6 +40,12 @@ export interface SearchResultCardProps {
   readonly confidenceTier?: ConfidenceTier;
   readonly onPress?: (id: string) => void;
   readonly onShowOnMap?: (id: string, kind: string) => void;
+  /**
+   * Where this row sits in the rendered results. Neither VoiceOver nor TalkBack reads a position
+   * for a plain row list, so the row says it. `partial` marks a page with more results to load,
+   * where the total is only what has loaded so far.
+   */
+  readonly position?: { readonly index: number; readonly total: number; readonly partial?: boolean };
 }
 
 export type SearchResultCardHandlers = {
@@ -76,6 +82,7 @@ export function SearchResultCard({
   confidenceTier,
   onPress,
   onShowOnMap,
+  position,
 }: SearchResultCardProps) {
   const theme = useThemeColors();
   const body = summary?.trim() || explanation;
@@ -92,6 +99,9 @@ export function SearchResultCard({
   // second accessible node inside the row would drop that sentence, not add it.
   const evidenceSentence =
     confidenceTier !== undefined ? ` ${evidenceMeterLabel(confidenceTier)}.` : '';
+  const positionSentence = position
+    ? ` ${position.index + 1} of ${position.total}${position.partial ? ' loaded' : ''}.`
+    : '';
 
   return (
     <View>
@@ -119,7 +129,7 @@ export function SearchResultCard({
           ) : undefined
         }
         showChevron={Boolean(onPress)}
-        accessibilityLabel={`${displayName}. ${accessibilitySlug}. ${body}${evidenceSentence}`}
+        accessibilityLabel={`${displayName}. ${accessibilitySlug}. ${body}${evidenceSentence}${positionSentence}`}
         showDivider
       />
       {onShowOnMap ? (

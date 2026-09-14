@@ -1,4 +1,5 @@
-import { Linking } from 'react-native';
+import { Linking, StyleSheet } from 'react-native';
+import { EXTERNAL_LINK_HINT } from '@/ui';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { CitationLink } from '../CitationLink';
 import type { Citation } from '../types';
@@ -61,5 +62,12 @@ describe('CitationLink', () => {
     const { queryByRole, getByText } = await render(<CitationLink citation={withheld} isOnline />);
     expect(queryByRole('link')).toBeNull();
     expect(getByText(/protects a living person/)).toBeTruthy();
+  });
+
+  it('says the citation opens in the browser and draws a 44pt target', async () => {
+    const { getByRole } = await render(<CitationLink citation={safeCitation} isOnline />);
+    const link = getByRole('link');
+    expect(link.props.accessibilityHint).toBe(EXTERNAL_LINK_HINT);
+    expect(StyleSheet.flatten(link.props.style).minHeight).toBeGreaterThanOrEqual(44);
   });
 });

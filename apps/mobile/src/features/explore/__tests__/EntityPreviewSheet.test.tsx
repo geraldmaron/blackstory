@@ -5,7 +5,7 @@
  * feature is selected.
  */
 import { fireEvent, render } from '@testing-library/react-native';
-import { AccessibilityInfo } from 'react-native';
+import { AccessibilityInfo, StyleSheet } from 'react-native';
 import { EntityPreviewSheet } from '../EntityPreviewSheet';
 import type { ExploreFeature } from '@/features/explore/explore-feature';
 
@@ -198,5 +198,26 @@ describe('EntityPreviewSheet — where the browse stepper sits', () => {
     );
 
     expect(queryByLabelText('Previous place nearby')).toBeNull();
+  });
+
+  it('draws each stepper button at least 44pt wide and tall, not a 32pt column behind a hitSlop', async () => {
+    const { getByLabelText } = await render(
+      <EntityPreviewSheet
+        feature={feature('ent_a', 'Sixteenth Street Viaduct')}
+        onOpenEntity={() => {}}
+        onClose={() => {}}
+        {...browseProps}
+      />,
+    );
+    for (const label of ['Previous place nearby', 'Next place nearby']) {
+      const button = getByLabelText(label);
+      const style = StyleSheet.flatten(
+        typeof button.props.style === 'function'
+          ? button.props.style({ pressed: false })
+          : button.props.style,
+      );
+      expect(style.minWidth).toBeGreaterThanOrEqual(44);
+      expect(style.minHeight).toBeGreaterThanOrEqual(44);
+    }
   });
 });

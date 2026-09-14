@@ -34,6 +34,7 @@ export function RelatedEntityList({ entityIds }: { readonly entityIds: readonly 
         Related records ({entityIds.length})
       </Text>
       <FlatList
+        accessibilityRole="list"
         data={entityIds}
         keyExtractor={(id) => id}
         scrollEnabled={false}

@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
   },
   browseButton: {
     minHeight: MIN_TOUCH,
-    minWidth: 32,
+    minWidth: MIN_TOUCH,
     alignItems: 'center',
     justifyContent: 'center',
   },

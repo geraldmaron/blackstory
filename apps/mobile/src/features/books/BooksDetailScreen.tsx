@@ -17,6 +17,7 @@ import {
   Text,
   screenScrollInsets,
   space,
+  EXTERNAL_LINK_HINT,
 } from '@/ui';
 import { openExternalLink } from '@/features/entity/linking';
 import { BOOKS_DETAIL, bookIdentifierSystemLabel } from './books-copy';
@@ -131,6 +132,7 @@ export function BooksDetailScreen({ slug }: BooksDetailScreenProps) {
                 showDivider={index < activeChallenges.length - 1}
                 onPress={() => void openHref(challenge.citation.href, challenge.citation.label)}
                 accessibilityLabel={`${challenge.state}. ${challenge.citation.label}. Opens citation.`}
+                  accessibilityHint={EXTERNAL_LINK_HINT}
               />
             ))
           )}
@@ -148,6 +150,7 @@ export function BooksDetailScreen({ slug }: BooksDetailScreenProps) {
               showDivider={index < book.citations.length - 1}
               onPress={() => void openHref(citation.href, citation.label)}
               accessibilityLabel={`${citation.label}. Opens citation.`}
+                  accessibilityHint={EXTERNAL_LINK_HINT}
             />
           ))}
         </View>
@@ -172,6 +175,7 @@ export function BooksDetailScreen({ slug }: BooksDetailScreenProps) {
                 showDivider={index < list.length - 1}
                 onPress={() => void openHref(link.href, link.label)}
                 accessibilityLabel={`${link.label}. Opens purchase or catalog link.`}
+                  accessibilityHint={EXTERNAL_LINK_HINT}
               />
             ))}
           <Text variant="caption" colorRole="inkMuted">

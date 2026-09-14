@@ -350,9 +350,13 @@ export function SearchScreen({
                 description={`Last updated ${formatRelativeTime(state.freshness.fetchedAt, now)}. You are offline or the server is unreachable. This is not a live search.`}
               />
             ) : null}
-            <View style={styles.resultsList}>
-              {cardData.map((item) => (
-                <SearchResultCard key={item.id} {...item} />
+            <View style={styles.resultsList} accessibilityRole="list" testID="search-results-list">
+              {cardData.map((item, index) => (
+                <SearchResultCard
+                  key={item.id}
+                  {...item}
+                  position={{ index, total: cardData.length, partial: state.hasMore }}
+                />
               ))}
               <SearchListFooter
                 hasMore={state.hasMore}

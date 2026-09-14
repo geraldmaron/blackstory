@@ -7,7 +7,7 @@
  */
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { Text, useThemeColors, space } from '@/ui';
+import { EXTERNAL_LINK_HINT, MIN_TOUCH_TARGET, Text, useThemeColors, space } from '@/ui';
 import { OFFLINE_CITATION_COPY, UNSAFE_LINK_COPY } from './copy';
 import { formatSourceName } from './format';
 import { isSafeExternalUrl, openExternalLink } from './linking';
@@ -43,8 +43,10 @@ export function CitationLink({ citation, isOnline }: CitationLinkProps) {
         <Pressable
           accessibilityRole="link"
           accessibilityLabel={`${citation.label}, ${sourceName}`}
+          accessibilityHint={EXTERNAL_LINK_HINT}
           hitSlop={8}
           onPress={handlePress}
+          style={styles.link}
         >
           <Text
             variant="bodySmall"
@@ -88,6 +90,11 @@ export function CitationLink({ citation, isOnline }: CitationLinkProps) {
 }
 
 const styles = StyleSheet.create({
+  // A citation stands on its own line, so its visible box clears the 44pt floor itself.
+  link: {
+    minHeight: MIN_TOUCH_TARGET,
+    justifyContent: 'center',
+  },
   note: {
     marginTop: space['1'],
   },

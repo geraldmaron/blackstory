@@ -190,7 +190,11 @@ jest.mock('react-native-reanimated', () => {
 });
 
 // eslint-disable-next-line import/first
-import { ExploreView } from '../ExploreView';
+import {
+  EXPLORE_MAP_ACCESSIBILITY_LABEL,
+  ExploreView,
+  exploreMapAccessibilityHint,
+} from '../ExploreView';
 // eslint-disable-next-line import/first
 import { DEMO_MAP_SOURCE, type MapFeatureCollection } from '@/features/map';
 // eslint-disable-next-line import/first
@@ -714,5 +718,77 @@ describe('ExploreView — repeated mount/unmount (leak check)', () => {
     expect(remove.mock.calls.length).toBeGreaterThanOrEqual(CYCLES);
     expect(addSpy.mock.calls.length - remove.mock.calls.length).toBeLessThanOrEqual(10);
     addSpy.mockRestore();
+  });
+});
+
+describe('ExploreView — screen reader map equivalent and focus return', () => {
+  it('names the records sheet as the map’s text equivalent on a phone, and keeps gestures live', async () => {
+    const { getByTestId } = await render(<ExploreView onOpenEntity={noop} reduceMotion />);
+    const summary = getByTestId('map-accessibility-summary');
+    expect(summary.props.accessibilityLabel).toBe(EXPLORE_MAP_ACCESSIBILITY_LABEL);
+    expect(summary.props.accessibilityHint).toBe(exploreMapAccessibilityHint('sheet'));
+    expect(summary.props.accessibilityHint).toMatch(/records sheet/);
+    expect(getByTestId('maplibre-map').props.dragPan).toBe(true);
+  });
+
+  it('names the side pane in the wide layout', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { getByTestId } = await render(<ExploreView onOpenEntity={noop} reduceMotion />);
+    expect(getByTestId('map-accessibility-summary').props.accessibilityHint).toMatch(
+      /records pane/,
+    );
+  });
+
+  it('returns focus to the map when the record preview is closed', async () => {
+    const sendEvent = jest
+      .spyOn(AccessibilityInfo, 'sendAccessibilityEvent')
+      .mockImplementation(() => {});
+    const utils = await render(<ExploreView onOpenEntity={noop} reduceMotion />);
+    fireEvent.press(utils.getByLabelText(/Seed Historical Place/));
+    await utils.findByTestId('entity-preview-sheet');
+    sendEvent.mockClear();
+
+    await act(async () => {
+      fireEvent.press(utils.getByLabelText('Close preview'));
+    });
+
+    expect(utils.queryByTestId('entity-preview-sheet')).toBeNull();
+    expect(sendEvent).toHaveBeenCalledTimes(1);
+    const [handle, eventType] = sendEvent.mock.calls[0]!;
+    expect(eventType).toBe('focus');
+    expect((handle as unknown as { props?: { testID?: string } }).props?.testID).toBe(
+      'map-accessibility-summary',
+    );
+    sendEvent.mockRestore();
+  });
+
+  it('moves focus into the instruments panel on open and back to the mast toggle on Hide', async () => {
+    const sendEvent = jest
+      .spyOn(AccessibilityInfo, 'sendAccessibilityEvent')
+      .mockImplementation(() => {});
+    const { getByTestId, queryByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+    sendEvent.mockClear();
+
+    await act(async () => {
+      fireEvent.press(getByTestId('explore-chip-instruments'));
+    });
+    expect(getByTestId('explore-instruments-panel')).toBeTruthy();
+    const testIdOf = (call: unknown[]) =>
+      (call[0] as { props?: { testID?: string } }).props?.testID;
+    expect(sendEvent.mock.calls.map(testIdOf)).toEqual(['explore-panel-header-title']);
+
+    sendEvent.mockClear();
+    await act(async () => {
+      // The open mast toggle shares this label; the panel's own Hide button is the one that
+      // disappears with the panel, which is why focus has to be handed back.
+      fireEvent.press(
+        within(getByTestId('explore-instruments-panel')).getByLabelText('Hide map instruments'),
+      );
+    });
+    expect(queryByTestId('explore-instruments-panel')).toBeNull();
+    expect(sendEvent.mock.calls.map(testIdOf)).toEqual(['explore-chip-instruments']);
+    sendEvent.mockRestore();
   });
 });

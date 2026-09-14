@@ -177,3 +177,25 @@ describe('SearchResultCard — evidence meter (a tier is an assessment, not a ra
     expect(props.confidenceTier).toBe('low');
   });
 });
+
+describe('SearchResultCard — position in the results', () => {
+  it('ends the row label with its place in the list', async () => {
+    const { getByRole } = await render(
+      <SearchResultCard
+        {...toSearchResultCardProps(baseResult(), { onPress: () => {} })}
+        position={{ index: 2, total: 20 }}
+      />,
+    );
+    expect(getByRole('button').props.accessibilityLabel).toMatch(/ 3 of 20\.$/);
+  });
+
+  it('says the total is only what has loaded when more results can load', async () => {
+    const { getByRole } = await render(
+      <SearchResultCard
+        {...toSearchResultCardProps(baseResult(), { onPress: () => {} })}
+        position={{ index: 0, total: 20, partial: true }}
+      />,
+    );
+    expect(getByRole('button').props.accessibilityLabel).toMatch(/ 1 of 20 loaded\.$/);
+  });
+});

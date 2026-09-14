@@ -124,7 +124,19 @@ describe('ExploreRecordsRail', () => {
     ).toBeTruthy();
     const row = getByLabelText(/Howard Theatre/);
     expect(row.props.accessibilityState).toEqual(expect.objectContaining({ selected: true }));
-    expect(row.props.accessibilityLabel).toMatch(/Selected$/);
+    expect(row.props.accessibilityLabel).toMatch(/Selected\. 1 of 1$/);
+  });
+
+  it('marks the list container and says where each row sits, since neither screen reader does', async () => {
+    const { getByTestId, getByLabelText } = await render(
+      <ExploreRecordsRail
+        features={[feature('ent_a', 'Howard Theatre'), feature('ent_b', 'Lincoln Theatre')]}
+        onSelect={() => undefined}
+      />,
+    );
+    expect(getByTestId('explore-records-rail').props.accessibilityRole).toBe('list');
+    expect(getByLabelText(/Howard Theatre/).props.accessibilityLabel).toMatch(/1 of 2$/);
+    expect(getByLabelText(/Lincoln Theatre/).props.accessibilityLabel).toMatch(/2 of 2$/);
   });
 
   it('does not show the selection checkmark on an unselected row', async () => {

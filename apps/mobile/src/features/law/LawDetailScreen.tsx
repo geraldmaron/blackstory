@@ -17,6 +17,7 @@ import {
   Text,
   screenScrollInsets,
   space,
+  EXTERNAL_LINK_HINT,
 } from '@/ui';
 import { openExternalLink } from '@/features/entity/linking';
 import { LAW_DETAIL, LAW_DISCLAIMER } from './law-copy';
@@ -139,6 +140,7 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
                   showDivider={index < explainer.rightsToday.length - 1}
                   onPress={() => void openHref(link.agencyUrl, link.label)}
                   accessibilityLabel={`${link.label}. Opens agency link.`}
+                  accessibilityHint={EXTERNAL_LINK_HINT}
                 />
               ))}
             </View>
@@ -155,6 +157,7 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
                   showDivider={index < explainer.primarySources.length - 1}
                   onPress={() => void openHref(source.url, source.label)}
                   accessibilityLabel={`${source.label}. Opens primary source.`}
+                  accessibilityHint={EXTERNAL_LINK_HINT}
                 />
               ))}
             </View>
@@ -171,6 +174,7 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
                     showDivider={index < (explainer.termOfArtLinks?.length ?? 0) - 1}
                     onPress={() => void openHref(term.wexUrl, term.term)}
                     accessibilityLabel={`${term.term}. Opens definition.`}
+                  accessibilityHint={EXTERNAL_LINK_HINT}
                   />
                 ))}
               </View>
@@ -198,12 +202,14 @@ export function LawDetailScreen({ slug }: LawDetailScreenProps) {
               variant="accent"
               density="compact"
               onPress={() => void openHref(entry.officialUrl, 'official source')}
+              accessibilityHint={EXTERNAL_LINK_HINT}
             />
             <Button
               label={LAW_DETAIL.archiveCta}
               variant="secondary"
               density="compact"
               onPress={() => void openHref(entry.archivedCaptureUrl, 'archived capture')}
+              accessibilityHint={EXTERNAL_LINK_HINT}
             />
           </View>
         </View>

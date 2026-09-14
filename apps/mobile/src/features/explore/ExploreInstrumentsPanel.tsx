@@ -2,9 +2,9 @@
  * v6 Explore instruments chassis — tabbed Filters | Color key in an opaque Surface
  * panel over the map. Auto-applies filter changes via callback (no Apply footer).
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { space } from '@/ui';
+import { space, useAccessibilityFocus } from '@/ui';
 import type { FilterState } from '@/lib/route-params';
 import type { ExploreFeature } from '@/features/explore/explore-feature';
 import { buildExploreFacetOptions } from '@/features/explore/explore-filter';
@@ -45,6 +45,12 @@ export function ExploreInstrumentsPanel({
 }: ExploreInstrumentsPanelProps) {
   const [tab, setTab] = useState<ExploreInstrumentsTab>(initialTab);
   const facetOptions = useMemo(() => buildExploreFacetOptions(features), [features]);
+  // The panel appears in place over the map, not as a route, so neither screen reader moves
+  // focus to it. It only mounts when the reader asks for it, so taking focus here is not theft.
+  const { ref: titleRef, focus: focusTitle } = useAccessibilityFocus();
+  useEffect(() => {
+    focusTitle();
+  }, [focusTitle]);
 
   return (
     <ExploreInstrumentsFrame style={styles.frame} testID={testID}>
@@ -52,6 +58,7 @@ export function ExploreInstrumentsPanel({
         title="Map instruments"
         onHide={onHide}
         hideLabel="Hide map instruments"
+        titleRef={titleRef}
       />
 
       <View style={styles.tabBar}>

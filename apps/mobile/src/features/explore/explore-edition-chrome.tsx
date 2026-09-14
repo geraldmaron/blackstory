@@ -2,7 +2,7 @@
  * v6 Explore edition chrome primitives — segmented tabs, kickers, facet rows, and
  * panel headers. Mobile counterpart of web `explore-edition.css` + panel chrome.
  */
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LiftedSurface, Text, space, radius, useThemeColors, MIN_TOUCH_TARGET } from '@/ui';
@@ -137,6 +137,8 @@ export type ExplorePanelHeaderProps = {
   readonly onHide?: () => void;
   readonly hideLabel?: string;
   readonly testID?: string;
+  /** The title block, so a host can move screen reader focus onto the panel when it opens. */
+  readonly titleRef?: Ref<View>;
 };
 
 export function ExplorePanelHeader({
@@ -145,12 +147,20 @@ export function ExplorePanelHeader({
   onHide,
   hideLabel = 'Hide panel',
   testID = 'explore-panel-header',
+  titleRef,
 }: ExplorePanelHeaderProps) {
   const theme = useThemeColors();
 
   return (
     <View style={styles.panelHeader} testID={testID}>
-      <View style={styles.panelHeaderText}>
+      <View
+        ref={titleRef}
+        style={styles.panelHeaderText}
+        accessible
+        accessibilityRole="header"
+        accessibilityLabel={subtitle ? `${title}. ${subtitle}` : title}
+        testID={`${testID}-title`}
+      >
         <View style={styles.panelTitleRow}>
           <Ionicons
             name="options-outline"

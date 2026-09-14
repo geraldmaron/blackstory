@@ -112,11 +112,15 @@ describe('SearchScreen — result rendering', () => {
     const releaseCache = fakeReleaseCache('r1');
     const { runtime } = buildRuntime(transport, releaseCache);
 
-    const { getByText } = await render(<SearchScreen initialQuery="tubman" runtime={runtime} />);
+    const { getByText, getByTestId, getByLabelText } = await render(
+      <SearchScreen initialQuery="tubman" runtime={runtime} />,
+    );
     await flushMicrotasks(10);
     resolveNext(page());
 
     await waitFor(() => expect(getByText('Harriet Tubman')).toBeTruthy());
+    expect(getByTestId('search-results-list').props.accessibilityRole).toBe('list');
+    expect(getByLabelText(/^Harriet Tubman\./).props.accessibilityLabel).toMatch(/ 1 of 1\.$/);
   });
 
   it('wires Show on map to Explore with selected id and kind', async () => {

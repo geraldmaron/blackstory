@@ -72,10 +72,13 @@ export type ExploreRecordsRailProps = {
 const RecordRow = memo(function RecordRow({
   feature,
   selected,
+  position,
   onSelect,
 }: {
   readonly feature: ExploreFeature;
   readonly selected: boolean;
+  /** "3 of 12". The list role does not carry a position on either platform, so the row does. */
+  readonly position: string;
   readonly onSelect: (feature: ExploreFeature) => void;
 }) {
   const theme = useThemeColors();
@@ -97,7 +100,7 @@ const RecordRow = memo(function RecordRow({
       accessibilityState={{ selected }}
       accessibilityLabel={`${feature.label}${a11yMeta ? `. ${a11yMeta}` : ''}${
         selected ? '. Selected' : ''
-      }`}
+      }. ${position}`}
       onPress={() => onSelect(feature)}
       style={({ pressed }) => [
         styles.row,
@@ -179,11 +182,17 @@ export function ExploreRecordsRail({
     filters,
   });
 
+  const total = features.length;
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<ExploreFeature>) => (
-      <RecordRow feature={item} selected={item.entityId === selectedId} onSelect={onSelect} />
+    ({ item, index }: ListRenderItemInfo<ExploreFeature>) => (
+      <RecordRow
+        feature={item}
+        selected={item.entityId === selectedId}
+        position={`${index + 1} of ${total}`}
+        onSelect={onSelect}
+      />
     ),
-    [onSelect, selectedId],
+    [onSelect, selectedId, total],
   );
 
   const listHeader = useMemo(

@@ -3,6 +3,7 @@
  * chip + ghost icon affordances). Map dominates first glance — no opaque Surface slab.
  * Copper accent on the count chip and active filters (~10–15% copper budget).
  */
+import type { Ref } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import { Text, space, radius, MIN_TOUCH_TARGET, Z_LAYER } from '@/ui';
@@ -32,6 +33,8 @@ export type ExploreFloatingChromeProps = {
   readonly onOpenSearch?: () => void;
   /** Reports the mast's laid-out height so the host can offset overlays below it. */
   readonly onLayout?: (event: LayoutChangeEvent) => void;
+  /** The instruments toggle, so the host can hand focus back to it when the panel is hidden. */
+  readonly instrumentsToggleRef?: Ref<View>;
   /** @deprecated Modal route fallback — prefer in-map instruments panel. */
   readonly onOpenFilters?: () => void;
   /** @deprecated Modal route fallback — prefer in-map instruments panel. */
@@ -39,6 +42,7 @@ export type ExploreFloatingChromeProps = {
 };
 
 function GhostIconButton({
+  ref,
   icon,
   accessibilityLabel,
   onPress,
@@ -47,6 +51,7 @@ function GhostIconButton({
   testID,
   chrome,
 }: {
+  readonly ref?: Ref<View>;
   readonly icon: keyof typeof Ionicons.glyphMap;
   readonly accessibilityLabel: string;
   readonly onPress: () => void;
@@ -58,6 +63,7 @@ function GhostIconButton({
   const showBadge = typeof badgeCount === 'number' && badgeCount > 0;
   return (
     <Pressable
+      ref={ref}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ selected: Boolean(selected) }}
@@ -110,6 +116,7 @@ export function ExploreFloatingChrome({
   onNationalView,
   onOpenSearch,
   onLayout,
+  instrumentsToggleRef,
 }: ExploreFloatingChromeProps) {
   const chrome = useExploreChromeColors();
   const filtersActive = hasActiveFilters(filters);
@@ -172,6 +179,7 @@ export function ExploreFloatingChrome({
             chrome={chrome}
           />
           <GhostIconButton
+            ref={instrumentsToggleRef}
             icon="options-outline"
             accessibilityLabel={
               instrumentsOpen

@@ -486,3 +486,36 @@ describe('MapScreen — feature / cluster press', () => {
     expect(mockFlyTo).not.toHaveBeenCalled();
   });
 });
+
+describe('MapScreen — screen reader stand-in', () => {
+  it('renders nothing extra when no accessibility label is given', async () => {
+    const { queryByTestId } = await render(<MapScreen />);
+    expect(queryByTestId('map-accessibility-summary')).toBeNull();
+  });
+
+  it('names the map and its list equivalent without taking touches or covering the canvas', async () => {
+    const { getByTestId } = await render(
+      <MapScreen
+        accessibilityLabel="Map of pinned places"
+        accessibilityHint="The same places are listed in the records sheet."
+      />,
+    );
+    const summary = getByTestId('map-accessibility-summary');
+    expect(summary.props.accessible).toBe(true);
+    expect(summary.props.accessibilityLabel).toBe('Map of pinned places');
+    expect(summary.props.accessibilityHint).toBe(
+      'The same places are listed in the records sheet.',
+    );
+    expect(summary.props.pointerEvents).toBe('none');
+    // The canvas stays mounted and exposed, and the stand-in sits before it so it paints beneath.
+    const map = getByTestId('maplibre-map');
+    expect(map.props.accessibilityElementsHidden).toBeUndefined();
+    expect(map.props.importantForAccessibility).toBeUndefined();
+    const siblings = summary.parent?.children ?? [];
+    const mapIndex = siblings.findIndex(
+      (child) => typeof child !== 'string' && child.props.testID === 'maplibre-map',
+    );
+    expect(mapIndex).toBeGreaterThan(-1);
+    expect(siblings.indexOf(summary)).toBeLessThan(mapIndex);
+  });
+});
