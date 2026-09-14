@@ -8,7 +8,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Keyboard,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -246,10 +245,11 @@ export function SearchScreen({
               autoCorrect={false}
               autoCapitalize="none"
               spellCheck={false}
-              clearButtonMode="while-editing"
               style={[styles.input, { color: theme.ink, flex: 1 }]}
             />
-            {draft.length > 0 && Platform.OS !== 'ios' ? (
+            {/* One clear control on both platforms. iOS used to get the native clearButtonMode
+                glyph instead, a 14pt target with no way to size it. */}
+            {draft.length > 0 ? (
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Clear search"
@@ -626,7 +626,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    minHeight: 36,
+    // A visible box at the platform floor (44pt iOS, 48dp Android); these chips were 37pt tall.
+    minHeight: MIN_TOUCH_TARGET,
     paddingHorizontal: space['2'],
     paddingVertical: space['1'],
     borderRadius: radius.sm,

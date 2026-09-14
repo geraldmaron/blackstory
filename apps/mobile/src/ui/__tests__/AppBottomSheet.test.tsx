@@ -1,13 +1,15 @@
 /**
  * AppBottomSheet accessibility contract: the sheet body is never collapsed into one element, the
- * backdrop is not a focus stop over the map, the adjustable handle really adjusts, and reduced
- * motion turns detent travel instant.
+ * backdrop dim is not a focus stop over the map and cannot intercept touches at any detent, the
+ * adjustable handle really adjusts, and reduced motion turns detent travel instant.
  */
 import { fireEvent, render } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
 const mockSheetProps: Record<string, unknown>[] = [];
-const mockBackdropProps: Record<string, unknown>[] = [];
+
+/** Sheet index the mocked `backdropComponent` is invoked with — reassign per test to simulate a detent. */
+let mockBackdropAnimatedIndex = 0;
 
 jest.mock('@gorhom/bottom-sheet', () => {
   /* eslint-disable @typescript-eslint/no-require-imports */
@@ -20,7 +22,9 @@ jest.mock('@gorhom/bottom-sheet', () => {
     return React.createElement(
       View,
       { testID: 'sheet-host' },
-      backdrop ? backdrop({ style: {}, animatedIndex: { value: 0 } }) : null,
+      backdrop
+        ? backdrop({ style: {}, animatedIndex: { value: mockBackdropAnimatedIndex } })
+        : null,
       handle ? handle() : null,
       props.children as never,
     );
@@ -32,10 +36,6 @@ jest.mock('@gorhom/bottom-sheet', () => {
     default: BottomSheet,
     BottomSheetView: Passthrough,
     BottomSheetScrollView: Passthrough,
-    BottomSheetBackdrop: (props: Record<string, unknown>) => {
-      mockBackdropProps.push(props);
-      return null;
-    },
     useBottomSheetTimingConfigs: (config: unknown) => config,
   };
 });
@@ -51,7 +51,7 @@ function lastSheetProps() {
 
 beforeEach(() => {
   mockSheetProps.length = 0;
-  mockBackdropProps.length = 0;
+  mockBackdropAnimatedIndex = 0;
 });
 
 describe('AppBottomSheet — screen reader reachability', () => {
@@ -66,14 +66,37 @@ describe('AppBottomSheet — screen reader reachability', () => {
     expect(getByText('Howard Theatre')).toBeTruthy();
   });
 
-  it('keeps the backdrop out of the accessibility tree, so it is no invisible stop over the map', async () => {
-    await render(
+  it('keeps the backdrop dim out of the accessibility tree, so it is no invisible stop over the map', async () => {
+    const { getByTestId } = await render(
       <AppBottomSheet>
         <Text>Body</Text>
       </AppBottomSheet>,
     );
-    expect(mockBackdropProps[mockBackdropProps.length - 1]?.accessible).toBe(false);
+    expect(getByTestId('app-bottom-sheet-dim').props.accessible).toBe(false);
   });
+});
+
+describe('AppBottomSheet — map-led screen, gestures never lock', () => {
+  it.each([
+    ['peek', 0],
+    ['half', 1],
+    ['full', 2],
+  ])(
+    'never lets the backdrop dim intercept touches at %s, so a tap or pin press reaches the map',
+    async (_label, index) => {
+      mockBackdropAnimatedIndex = index;
+      const { getByTestId } = await render(
+        <AppBottomSheet snapIndex={index}>
+          <Text>Body</Text>
+        </AppBottomSheet>,
+      );
+      const dim = getByTestId('app-bottom-sheet-dim');
+      expect(dim.props.pointerEvents).toBe('none');
+      // No `onPress`/tap gesture at all — a map-led screen never trades a map gesture for a
+      // sheet collapse, at any detent.
+      expect(dim.props.onPress).toBeUndefined();
+    },
+  );
 });
 
 describe('AppBottomSheet — adjustable handle', () => {

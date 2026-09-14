@@ -416,6 +416,49 @@ describe('ExploreView — map posture (browse <-> immersive)', () => {
     });
     expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
   });
+
+  it('selects a different pin while the sheet sits at half — the map stays live above peek', async () => {
+    const { getByTestId, findByText } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+
+    await act(async () => {
+      fireEvent(getByTestId('maplibre-geojson-source'), 'press', {
+        nativeEvent: {
+          features: [
+            {
+              type: 'Feature',
+              geometry: { type: 'Point', coordinates: [-77.0369, 38.9072] },
+              properties: { entityId: 'ent_fixture_place_dc' },
+            },
+          ],
+          lngLat: [-77.0369, 38.9072],
+        },
+      });
+    });
+    expect(await findByText('Seed Historical Place (D.C.)')).toBeTruthy();
+    // A selection floors the sheet at half — confirms the press below is exercised with the
+    // sheet already above peek, where a scrim over the map would otherwise sit.
+    expect(getByTestId('sheet-controlled-index').props.children).toBe('1');
+
+    await act(async () => {
+      fireEvent(getByTestId('maplibre-geojson-source'), 'press', {
+        nativeEvent: {
+          features: [
+            {
+              type: 'Feature',
+              geometry: { type: 'Point', coordinates: [-73.7949, 40.7282] },
+              properties: { entityId: 'ent_fixture_place_harlem_ny' },
+            },
+          ],
+          lngLat: [-73.7949, 40.7282],
+        },
+      });
+    });
+    // The second pin press still reaches the map's handler and swaps the selection — nothing
+    // about sitting at half gated it behind the (touch-transparent) sheet dim.
+    expect(await findByText('Seed Cultural Institution (Queens, NY)')).toBeTruthy();
+  });
 });
 
 describe('ExploreView — wide window (map + persistent records rail)', () => {

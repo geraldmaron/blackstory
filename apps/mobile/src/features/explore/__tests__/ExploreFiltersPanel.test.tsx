@@ -1,9 +1,10 @@
 /**
  * Structure + a11y tests for the Explore filters panel: collapsible Kind/Era
- * groups, dense chip radios (≥44px), and sticky Clear/Done affordances.
- * Facet chips apply immediately — there is no Apply confirm step.
+ * groups, dense chip radios (at the platform's min touch target), and sticky
+ * Clear/Done affordances. Facet chips apply immediately — there is no Apply confirm step.
  */
 import { fireEvent, render } from '@testing-library/react-native';
+import { MIN_TOUCH_TARGET } from '@/ui';
 import { buildExploreFacetOptions } from '@/features/explore/explore-filter';
 import { makeFeature } from '@/features/explore/__fixtures__/features';
 import {
@@ -86,7 +87,7 @@ describe('ExploreFiltersPanel — structure', () => {
     expect(getByLabelText('Places')).toBeTruthy();
   });
 
-  it('exposes chips as radios with selected state and min 44px hit target', async () => {
+  it('exposes chips as radios with selected state and the platform min hit target', async () => {
     const onFiltersChange = jest.fn();
     const { getByLabelText } = await renderPanel({ onFiltersChange });
 
@@ -98,8 +99,11 @@ describe('ExploreFiltersPanel — structure', () => {
     const flat = Array.isArray(resolved)
       ? Object.assign({}, ...resolved.filter(Boolean))
       : resolved;
-    expect(flat.minHeight).toBe(44);
-    expect(flat.minWidth).toBe(44);
+    // Not a literal 44: the floor is 44pt on iOS (this suite's jest-expo default) and 48dp on
+    // Android, so the chip has to track whatever `MIN_TOUCH_TARGET` itself resolves to — see
+    // `min-touch-target.test.ts` for the Android=48 proof.
+    expect(flat.minHeight).toBe(MIN_TOUCH_TARGET);
+    expect(flat.minWidth).toBe(MIN_TOUCH_TARGET);
 
     await fireEvent.press(places);
     expect(onFiltersChange).toHaveBeenCalledWith({ kind: 'places' });

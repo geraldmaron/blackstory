@@ -1,12 +1,14 @@
 /**
  * Shared snap bottom-sheet host for Explore and future map-adjacent sheets.
- * Peek / half / full snaps, ≥44px handle, reduce-motion safe. Explore wraps
- * this with attribution inset via `bottomInset`.
+ * Peek / half / full snaps, a handle at the platform's touch-target floor, reduce-motion safe.
+ * Explore wraps this with attribution inset via `bottomInset`.
  *
  * Not a modal. The sheet rides over a live map that stays touchable and readable by assistive
- * tech in every posture, so it never hides what is behind it or traps focus. Its handle is a
- * real adjustable control: a screen reader swipes up or down on it to move between detents,
- * which is the non-drag route to the same snaps.
+ * tech in every posture, so it never hides what is behind it or traps focus: gestures and pin
+ * presses reach the map at peek, half, and full alike, and there is no scrim absorbing them on
+ * the way. Its handle is a real adjustable control: a screen reader swipes up or down on it to
+ * move between detents, which is the non-drag route to the same snaps; a sighted reader has the
+ * screen's own "expand"/"collapse" controls for the same move.
  *
  * Content modes:
  * - `scrollable`: BottomSheetScrollView (entity preview facts below the fold)
@@ -22,12 +24,12 @@ import {
   type ViewStyle,
 } from 'react-native';
 import BottomSheet, {
-  BottomSheetBackdrop,
   BottomSheetScrollView,
   BottomSheetView,
   useBottomSheetTimingConfigs,
   type BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
+import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 import { useThemeColors, duration, radius, space, MIN_TOUCH_TARGET, Z_LAYER } from '@/ui/tokens';
 
 export const SHEET_PEEK = 0;
@@ -45,6 +47,46 @@ export function sheetSnapValueText(index: number, snapCount: number): string {
 }
 
 const HANDLE_ACTIONS = [{ name: 'increment' }, { name: 'decrement' }] as const;
+
+type SheetDimProps = Pick<BottomSheetBackdropProps, 'animatedIndex' | 'style'> & {
+  readonly overlayColor: string;
+};
+
+/**
+ * Visual-only dim behind the sheet: fades in once the sheet passes peek, but is never a touch or
+ * accessibility target, at any detent.
+ *
+ * This is deliberately NOT gorhom's own `BottomSheetBackdrop`. That component ties its
+ * `pointerEvents` to an internal `useAnimatedReaction` over `animatedIndex` — 'none' at/below
+ * `disappearsOnIndex`, 'auto' above it (`BottomSheetBackdrop.tsx`'s `handleContainerTouchability`)
+ * — and that reaction wins on every render regardless of `pressBehavior` or `enableTouchThrough`:
+ * neither prop stops it from flipping back to 'auto' the moment the sheet rises past peek, which
+ * is exactly the half/full postures where a map pin has to stay reachable. So above peek, gorhom's
+ * backdrop silently became a full-screen tap target that ate map gestures and collapsed the sheet
+ * instead. This component has no such reaction: `pointerEvents="none"` and `accessible={false}`
+ * are fixed props, there is no `GestureDetector`, and nothing here ever calls `snapToIndex`.
+ */
+function SheetDim({ animatedIndex, style, overlayColor }: SheetDimProps) {
+  const dimStyle = useAnimatedStyle(
+    () => ({
+      opacity: interpolate(
+        animatedIndex.value,
+        [SHEET_PEEK, SHEET_HALF],
+        [0, 1],
+        Extrapolation.CLAMP,
+      ),
+    }),
+    [animatedIndex],
+  );
+  return (
+    <Animated.View
+      testID="app-bottom-sheet-dim"
+      pointerEvents="none"
+      accessible={false}
+      style={[StyleSheet.absoluteFill, style, { backgroundColor: overlayColor }, dimStyle]}
+    />
+  );
+}
 
 export type AppBottomSheetProps = {
   readonly children: ReactNode;
@@ -137,22 +179,13 @@ export function AppBottomSheet({
     [onSnapIndexChange],
   );
 
-  // Dims the map once the sheet leaves peek; tapping collapses back to peek.
+  // Dims the map once the sheet leaves peek. Does NOT collapse on tap — a map-led screen never
+  // locks its gestures, so a tap on the uncovered map has to reach the map at every detent, not
+  // get eaten by a scrim. Collapsing back to peek is reachable from the handle's adjust actions
+  // and the screen's own controls.
   const renderBackdrop = useCallback(
-    (props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop
-        {...props}
-        appearsOnIndex={SHEET_HALF}
-        disappearsOnIndex={SHEET_PEEK}
-        pressBehavior="collapse"
-        // Not a focus stop. At peek the backdrop is fully transparent but still mounted, so it
-        // was an invisible "Bottom sheet backdrop, button" laid over the map for TalkBack, and
-        // above peek it read "Tap to close" for a press that only collapses. The same collapse
-        // is reachable from the handle's adjust actions and the screen's own controls.
-        accessible={false}
-        opacity={1}
-        style={[props.style, { backgroundColor: theme.overlay }]}
-      />
+    ({ animatedIndex, style }: BottomSheetBackdropProps) => (
+      <SheetDim animatedIndex={animatedIndex} style={style} overlayColor={theme.overlay} />
     ),
     [theme.overlay],
   );
@@ -229,7 +262,7 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   handleWrap: {
-    // Visual grip is compact; minHeight keeps the ≥44dp touch target for Pin Pulse peek.
+    // Visual grip is compact; minHeight keeps the platform's touch-target floor for Pin Pulse peek.
     minHeight: HANDLE_MIN,
     alignItems: 'center',
     justifyContent: 'center',
@@ -242,7 +275,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   content: {
-    // No minHeight: a floor plus the 44dp handle exceeds the peek detent and clips peek content.
+    // No minHeight: a floor plus the handle exceeds the peek detent and clips peek content.
     flex: 1,
   },
   scrollContent: {

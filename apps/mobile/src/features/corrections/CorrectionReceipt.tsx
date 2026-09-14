@@ -20,7 +20,16 @@ import * as Clipboard from 'expo-clipboard';
 import { useEffect } from 'react';
 import { AccessibilityInfo, Pressable, View } from 'react-native';
 
-import { Button, Notice, Text, radius, space, useAccessibilityFocus, useThemeColors } from '@/ui';
+import {
+  Button,
+  MIN_TOUCH_TARGET,
+  Notice,
+  Text,
+  radius,
+  space,
+  useAccessibilityFocus,
+  useThemeColors,
+} from '@/ui';
 import { RECEIPT_SAVE_INSTRUCTIONS } from './copy';
 
 export type CorrectionReceiptProps = {
@@ -68,7 +77,7 @@ export function CorrectionReceipt({ receiptCode, onCheckStatus, onDone }: Correc
             borderRadius: radius.sm,
             padding: space['3'],
             backgroundColor: theme.surfaceRaised,
-            minHeight: 44,
+            minHeight: MIN_TOUCH_TARGET,
             justifyContent: 'center',
           }}
         >

@@ -3,7 +3,7 @@
  * compact title/dek, and copper read affordance on a continuous panel surface.
  */
 import { Pressable, StyleSheet, View } from 'react-native';
-import { RecordFactStrip, Text, space, useThemeColors } from '@/ui';
+import { MIN_TOUCH_TARGET, RecordFactStrip, Text, space, useThemeColors } from '@/ui';
 import { plainRangeText } from '../record-facts/record-facts';
 import type { ContentEntry } from '@/features/content';
 
@@ -51,7 +51,7 @@ export function FeaturedStoryCard({ entry, onPress }: FeaturedStoryCardProps) {
 
 const styles = StyleSheet.create({
   pressable: {
-    minHeight: 44,
+    minHeight: MIN_TOUCH_TARGET,
     justifyContent: 'center',
     paddingHorizontal: space['3'],
   },

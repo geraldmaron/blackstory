@@ -20,6 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import {
   Button,
   CorrectionTextField,
+  MIN_TOUCH_TARGET,
   Notice,
   Text,
   radius,
@@ -52,12 +53,6 @@ import {
   type CorrectionFieldIssue,
   type CorrectionFormState,
 } from './validation';
-
-/** Apple HIG / Material minimum touch target (dp), mirrored from `@/ui/Button.tsx`'s own
- * constant — this form's hand-rolled `ChipRow`/`Checkbox` controls are not built on `Button`
- * (they need radio/checkbox semantics `Button` doesn't expose), so they enforce the same 44pt
- * floor directly rather than silently falling short of it (MOB-017). */
-const MIN_TOUCH_TARGET = 44;
 
 /** Glyph size (dp) for the checkbox tick — sized off the token scale, not font fallback. */
 const CHECKBOX_GLYPH = 22;
