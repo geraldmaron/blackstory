@@ -143,3 +143,60 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
     expect(getByTestId('entity-preview-linked')).toHaveTextContent(/education · faith/);
   });
 });
+
+describe('EntityPreviewSheet — where the browse stepper sits', () => {
+  const browseProps = {
+    onBrowsePrevious: () => {},
+    onBrowseNext: () => {},
+    browsePosition: { index: 3, total: 3892 },
+  };
+
+  it('keeps the stepper in the header row on a phone sheet', async () => {
+    const { getByLabelText, getByText } = await render(
+      <EntityPreviewSheet
+        feature={feature('ent_a', 'Sixteenth Street Viaduct')}
+        onOpenEntity={() => {}}
+        onClose={() => {}}
+        {...browseProps}
+      />,
+    );
+
+    expect(getByLabelText('Previous place nearby')).toBeTruthy();
+    expect(getByText('4/3892')).toBeTruthy();
+    expect(getByText('Pinned here')).toBeTruthy();
+  });
+
+  it('offers the same stepper once, and only once, in the rail layout', async () => {
+    const { getAllByLabelText, getByText } = await render(
+      <EntityPreviewSheet
+        layout="rail"
+        feature={feature('ent_a', 'Sixteenth Street Viaduct')}
+        onOpenEntity={() => {}}
+        onClose={() => {}}
+        {...browseProps}
+      />,
+    );
+
+    // Moved, not duplicated — the header version and the row version are the same nodes
+    // rendered in one place or the other.
+    expect(getAllByLabelText('Previous place nearby')).toHaveLength(1);
+    expect(getAllByLabelText('Next place nearby')).toHaveLength(1);
+    expect(getByText('4/3892')).toBeTruthy();
+    // The kicker is what the header was squeezing out at 300pt; it is present either way,
+    // and in the rail it is no longer competing with the stepper for the same line.
+    expect(getByText('Pinned here')).toBeTruthy();
+  });
+
+  it('shows no stepper row when there is nothing to browse', async () => {
+    const { queryByLabelText } = await render(
+      <EntityPreviewSheet
+        layout="rail"
+        feature={feature('ent_a', 'Sixteenth Street Viaduct')}
+        onOpenEntity={() => {}}
+        onClose={() => {}}
+      />,
+    );
+
+    expect(queryByLabelText('Previous place nearby')).toBeNull();
+  });
+});

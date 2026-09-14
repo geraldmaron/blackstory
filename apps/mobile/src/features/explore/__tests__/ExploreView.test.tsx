@@ -439,6 +439,80 @@ describe('ExploreView — wide window (map + persistent records rail)', () => {
     expect(getByTestId('explore-records-rail')).toBeTruthy();
   });
 
+  it('gives the rail a header that says what it is showing, not a pull-up invitation', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { getByTestId, queryByText } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+
+    const rail = within(getByTestId('explore-side-rail'));
+    // The count is visible text here. In the sheet it is an invisible a11y-only node, because
+    // the floating mast over the map carries it; a pane reader should not have to look across
+    // the window for the size of the list beside them.
+    expect(rail.getByText('All pinned')).toBeTruthy();
+    expect(rail.getByText('3 pinned')).toBeTruthy();
+    // A pane does not pull up.
+    expect(queryByText('Pull up for places')).toBeNull();
+    // Expanding survives, demoted to a ghost square beside the header.
+    expect(getByTestId('explore-map-expand')).toBeTruthy();
+  });
+
+  it('keeps the whole list after a rail pick, because the camera does not fly', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { getByTestId, findByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+
+    const rail = () => within(getByTestId('explore-records-rail'));
+    expect(rail().getAllByRole('button').length).toBeGreaterThanOrEqual(3);
+
+    await act(async () => {
+      fireEvent.press(rail().getByText('Seed Historical Place (D.C.)'));
+    });
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
+
+    // `point` is the ceiling zoom. Had the selection flown there, the viewport-scoped list
+    // would now hold one row — the record the reader just asked about, and nothing else.
+    // That is the cost the wide layout exists to avoid, so all three are still here.
+    expect(rail().getByText('Seed Historical Place (D.C.)')).toBeTruthy();
+    expect(rail().getByText('Seed Cultural Institution (Queens, NY)')).toBeTruthy();
+    expect(rail().getByText('Seed Living Person (Houston, TX)')).toBeTruthy();
+    expect(getByTestId('explore-side-rail-inspector')).toBeTruthy();
+  });
+
+
+  it('ignores the route echoing the selection back as ?selected=', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const onSelectionChange = jest.fn();
+    const { getByTestId, rerender, findByTestId } = await render(
+      <ExploreView onOpenEntity={noop} onSelectionChange={onSelectionChange} reduceMotion />,
+    );
+
+    const rail = () => within(getByTestId('explore-records-rail'));
+    await act(async () => {
+      fireEvent.press(rail().getByText('Seed Historical Place (D.C.)'));
+    });
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
+    expect(onSelectionChange).toHaveBeenCalledWith('ent_fixture_place_dc');
+
+    // What the real route does next: write the id into the URL, which comes straight back in
+    // as `selectedParam` a frame later. Acting on that echo re-ran the restore path and fired
+    // a camera command the tap had deliberately not asked for.
+    await act(async () => {
+      rerender(
+        <ExploreView
+          onOpenEntity={noop}
+          onSelectionChange={onSelectionChange}
+          selectedParam="ent_fixture_place_dc"
+          reduceMotion
+        />,
+      );
+    });
+
+    expect(rail().getByText('Seed Cultural Institution (Queens, NY)')).toBeTruthy();
+    expect(rail().getByText('Seed Living Person (Houston, TX)')).toBeTruthy();
+  });
+
   it('drops the records toggle from the mast, because the rail no longer toggles', async () => {
     setTestWindowSize(TABLET_WINDOW);
     const { queryByTestId, getByTestId } = await render(

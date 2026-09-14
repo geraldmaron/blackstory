@@ -174,77 +174,138 @@ export function ExploreRecordsRail({
   );
 
   const listHeader = useMemo(
-    () => (
-      <View
-        style={[styles.header, { borderBottomColor: theme.border }]}
-        onLayout={(event) => onHeaderLayout?.(event.nativeEvent.layout.height)}
-      >
-        {/* Carries the count/scope label as its own accessible "header" landmark
-            (a11y contract §4) without swallowing the Explore/Close button below
-            into one opaque VoiceOver stop — an `accessible` container would make
-            the button unreachable in tab order (spec §4). */}
+    () =>
+      listHost === 'plain' ? (
+        /*
+         * Pane header. The sheet header below cannot be reused here: its whole job is to be
+         * the one thing visible at the peek detent, so it spends its width on a pull-up
+         * invitation and a full-bleed copper "Expand the map". A pane does not pull up, and
+         * that button is the least important control in a rail that is already open — as the
+         * loudest thing in it, it was reading as the rail's title.
+         *
+         * So the pane states what the list is showing (the count the sheet leaves to the
+         * floating mast, which a pane reader should not have to look across the window for)
+         * and demotes expanding to a ghost square beside it.
+         */
         <View
-          style={styles.headerLabel}
-          accessible
-          accessibilityRole="header"
-          accessibilityLabel={headerCount.accessibilityLabel}
-        />
-        {onExpandMap ? null : (
-          <View style={styles.inviteRow}>
-            <Ionicons
-              name="chevron-up"
-              size={14}
-              color={theme.accent}
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-            />
-            <Ionicons
-              name="location-outline"
-              size={14}
-              color={theme.inkMuted}
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-            />
-            <Text variant="code" colorRole="inkMuted" style={styles.rowLabel}>
-              Pull up for places
+          style={[styles.header, { borderBottomColor: theme.border }]}
+          onLayout={(event) => onHeaderLayout?.(event.nativeEvent.layout.height)}
+        >
+          <View
+            style={styles.paneHeaderText}
+            accessible
+            accessibilityRole="header"
+            accessibilityLabel={headerCount.accessibilityLabel}
+          >
+            <Text variant="code" colorRole="inkMuted" numberOfLines={1}>
+              {scopeLabel}
+            </Text>
+            <Text variant="rowTitle" numberOfLines={1}>
+              {headerCount.railInline}
             </Text>
           </View>
-        )}
-        {onExpandMap ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Expand the map"
-            accessibilityHint="Hides the filters and this list so the map fills the screen"
-            testID="explore-map-expand"
-            onPress={onExpandMap}
-            style={({ pressed }) => [
-              styles.exploreButton,
-              { backgroundColor: pressed ? theme.accentGraphic : theme.accent },
-            ]}
-          >
-            <Ionicons
-              name="navigate-outline"
-              size={16}
-              color={theme.inverseInk}
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-            />
-            <Text variant="code" style={[styles.rowLabel, { color: theme.inverseInk }]}>
-              Expand the map
-            </Text>
-          </Pressable>
-        ) : null}
-      </View>
-    ),
+          {onExpandMap ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Expand the map"
+              accessibilityHint="Hides this list so the map fills the window"
+              testID="explore-map-expand"
+              onPress={onExpandMap}
+              style={({ pressed }) => [
+                styles.expandGhost,
+                {
+                  borderColor: theme.border,
+                  backgroundColor: pressed ? theme.surfacePressed : theme.surfaceRaised,
+                },
+              ]}
+            >
+              <Ionicons
+                name="expand-outline"
+                size={18}
+                color={theme.ink}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              />
+            </Pressable>
+          ) : null}
+        </View>
+      ) : (
+        <View
+          style={[styles.header, { borderBottomColor: theme.border }]}
+          onLayout={(event) => onHeaderLayout?.(event.nativeEvent.layout.height)}
+        >
+          {/* Carries the count/scope label as its own accessible "header" landmark
+              (a11y contract §4) without swallowing the Explore/Close button below
+              into one opaque VoiceOver stop — an `accessible` container would make
+              the button unreachable in tab order (spec §4). */}
+          <View
+            style={styles.headerLabel}
+            accessible
+            accessibilityRole="header"
+            accessibilityLabel={headerCount.accessibilityLabel}
+          />
+          {onExpandMap ? null : (
+            <View style={styles.inviteRow}>
+              <Ionicons
+                name="chevron-up"
+                size={14}
+                color={theme.accent}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              />
+              <Ionicons
+                name="location-outline"
+                size={14}
+                color={theme.inkMuted}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              />
+              <Text variant="code" colorRole="inkMuted" style={styles.rowLabel}>
+                Pull up for places
+              </Text>
+            </View>
+          )}
+          {onExpandMap ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Expand the map"
+              accessibilityHint="Hides the filters and this list so the map fills the screen"
+              testID="explore-map-expand"
+              onPress={onExpandMap}
+              style={({ pressed }) => [
+                styles.exploreButton,
+                { backgroundColor: pressed ? theme.accentGraphic : theme.accent },
+              ]}
+            >
+              <Ionicons
+                name="navigate-outline"
+                size={16}
+                color={theme.inverseInk}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              />
+              <Text variant="code" style={[styles.rowLabel, { color: theme.inverseInk }]}>
+                Expand the map
+              </Text>
+            </Pressable>
+          ) : null}
+        </View>
+      ),
     [
       headerCount.accessibilityLabel,
+      headerCount.railInline,
+      listHost,
       onExpandMap,
       onHeaderLayout,
+      scopeLabel,
       theme.accent,
       theme.accentGraphic,
       theme.border,
+      theme.ink,
       theme.inkMuted,
       theme.inverseInk,
+      theme.surfacePressed,
+      theme.surfaceRaised,
     ],
   );
 
@@ -317,6 +378,18 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 0,
     height: 0,
+  },
+  paneHeaderText: {
+    flexShrink: 1,
+    gap: space['1'],
+  },
+  expandGhost: {
+    width: MIN_TOUCH_TARGET,
+    height: MIN_TOUCH_TARGET,
+    borderRadius: radius.sm,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   exploreButton: {
     flexDirection: 'row',

@@ -62,6 +62,19 @@ export type EntityPreviewSheetProps = {
   readonly onBrowsePrevious?: () => void;
   readonly onBrowseNext?: () => void;
   readonly browsePosition?: { readonly index: number; readonly total: number };
+  /**
+   * Where this preview is mounted.
+   *
+   * `'sheet'` is the phone: a full-width bottom sheet, where the header row has room for the
+   * kicker, the browse stepper and the close button side by side.
+   *
+   * `'rail'` is the wide layout's side pane, which is 300-400pt. There, those three do not fit
+   * on one line: the stepper and the close button are both fixed-width, so the kicker is what
+   * gives, and "Pinned here" / "Place · Active" collapsed to "Pi…" / "Pla…" on an iPad. In
+   * `'rail'` the stepper moves to its own row under the header and the kicker gets its width
+   * back.
+   */
+  readonly layout?: 'sheet' | 'rail';
   readonly style?: StyleProp<ViewStyle>;
 };
 
@@ -106,6 +119,7 @@ export function EntityPreviewSheet({
   onBrowsePrevious,
   onBrowseNext,
   browsePosition,
+  layout = 'sheet',
   style,
 }: EntityPreviewSheetProps) {
   const theme = useThemeColors();
@@ -133,6 +147,33 @@ export function EntityPreviewSheet({
     browsePosition.total > 1 &&
     onBrowsePrevious !== undefined &&
     onBrowseNext !== undefined;
+  // Same stepper, two places. See the `layout` prop for why the rail cannot host it inline.
+  const browseStepper =
+    canBrowse && browsePosition ? (
+      <>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Previous place nearby"
+          onPress={onBrowsePrevious}
+          hitSlop={8}
+          style={({ pressed }) => [styles.browseButton, { opacity: pressed ? 0.75 : 1 }]}
+        >
+          <Ionicons name="chevron-back" size={18} color={theme.accent} />
+        </Pressable>
+        <Text variant="code" colorRole="inkMuted">
+          {browsePosition.index + 1}/{browsePosition.total}
+        </Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Next place nearby"
+          onPress={onBrowseNext}
+          hitSlop={8}
+          style={({ pressed }) => [styles.browseButton, { opacity: pressed ? 0.75 : 1 }]}
+        >
+          <Ionicons name="chevron-forward" size={18} color={theme.accent} />
+        </Pressable>
+      </>
+    ) : null;
   const mapCoords = selected.coordinates;
   const hasPublicCoords =
     Array.isArray(mapCoords) &&
@@ -191,30 +232,8 @@ export function EntityPreviewSheet({
                 {storyMeta.status ? ` · ${storyMeta.status}` : ''}
               </Text>
             </View>
-            {canBrowse ? (
-              <View style={styles.browseCluster}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Previous place nearby"
-                  onPress={onBrowsePrevious}
-                  hitSlop={8}
-                  style={({ pressed }) => [styles.browseButton, { opacity: pressed ? 0.75 : 1 }]}
-                >
-                  <Ionicons name="chevron-back" size={18} color={theme.accent} />
-                </Pressable>
-                <Text variant="code" colorRole="inkMuted">
-                  {browsePosition.index + 1}/{browsePosition.total}
-                </Text>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Next place nearby"
-                  onPress={onBrowseNext}
-                  hitSlop={8}
-                  style={({ pressed }) => [styles.browseButton, { opacity: pressed ? 0.75 : 1 }]}
-                >
-                  <Ionicons name="chevron-forward" size={18} color={theme.accent} />
-                </Pressable>
-              </View>
+            {layout === 'sheet' && browseStepper ? (
+              <View style={styles.browseCluster}>{browseStepper}</View>
             ) : null}
             <Pressable
               accessibilityRole="button"
@@ -230,6 +249,10 @@ export function EntityPreviewSheet({
               <Ionicons name="close" size={20} color={theme.inkMuted} />
             </Pressable>
           </View>
+
+          {layout === 'rail' && browseStepper ? (
+            <View style={[styles.browseRow, { borderColor: theme.border }]}>{browseStepper}</View>
+          ) : null}
 
           <Pressable
             accessibilityRole="button"
@@ -389,6 +412,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space['1'],
+  },
+  // The rail's stepper: its own row, centered, with a rule under it so it reads as a control
+  // strip for the card rather than as part of the title block.
+  browseRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: space['1'],
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   browseButton: {
     minHeight: MIN_TOUCH,

@@ -62,7 +62,7 @@ import { useLayoutSize } from '@/ui/layout';
 import type { FilterState } from '@/lib/route-params';
 import { exploreReducer, initialExploreState, visibleFeatures } from './explore-controller';
 import { applyFilters, sameFilterState } from './explore-filter';
-import { toExploreFeatures, toMapFeatureCollection } from './explore-feature';
+import { toExploreFeatures, toMapFeatureCollection, type ExploreFeature } from './explore-feature';
 import { parseRestoredSelection } from './selection';
 import { useReduceMotion } from './useReduceMotion';
 
@@ -222,16 +222,24 @@ export function ExploreView({
 
   useEffect(() => {
     const restored = parseRestoredSelection(selectedParam, allFeatures);
-    if (restored.selectedId) {
-      const feature = allFeatures.find((f) => f.entityId === restored.selectedId);
-      if (feature) {
-        dispatch({
-          type: 'entitySelected',
-          entityId: feature.entityId,
-          point: feature.coordinates,
-        });
-      }
-    }
+    if (!restored.selectedId) return;
+    // Restoration only, never an echo. The route writes every selection back into `?selected=`,
+    // so this effect re-runs a frame after each tap with the id the reader just chose. Acting on
+    // that echo re-dispatched `entitySelected` and fired a second camera command — which is how a
+    // rail tap kept flying to the ceiling zoom on a tablet even after the tap itself stopped
+    // asking it to (and why the phone issued two camera commands per tap, one of them redundant).
+    // A selection already in state has nothing to restore.
+    if (restored.selectedId === state.selectedId) return;
+    const feature = allFeatures.find((f) => f.entityId === restored.selectedId);
+    if (!feature) return;
+    dispatch({
+      type: 'entitySelected',
+      entityId: feature.entityId,
+      point: feature.coordinates,
+    });
+    // `state.selectedId` is read as a guard, not as an input: adding it to the dependency list
+    // would re-run this on every selection change, which is the loop being closed off.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedParam, allFeatures]);
 
   const selectionNotifyReady = useRef(false);
@@ -324,17 +332,45 @@ export function ExploreView({
     [onFiltersChange],
   );
 
+  /**
+   * Selecting a record the reader can already see, versus one they asked to travel to.
+   *
+   * The phone flies: its list is about to be replaced by the preview anyway, so there is no
+   * view to preserve and "show me where this is" is the whole point of the tap. The wide
+   * layout does not, and this is the difference that makes the persistent rail worth having.
+   * `point` is the ceiling zoom, so on a tablet a single tap would take the reader from a
+   * national view to one street and take the list from 3,892 rows to 1 — the record they just
+   * asked about, and nothing else. Keeping the camera still keeps both the reader's view and
+   * the neighbours they were stepping through; the pin still takes the selected halo, and the
+   * list is viewport-scoped, so what they tapped was on screen to begin with.
+   *
+   * Deep links are unaffected: a cold start with `?selected=` still frames the record, because
+   * a reader arriving on a link has no view to preserve.
+   */
+  const selectFeature = useCallback(
+    (feature: Pick<ExploreFeature, 'entityId' | 'coordinates'>) => {
+      if (twoPane) {
+        dispatch({ type: 'entitySelectedInPlace', entityId: feature.entityId });
+        return;
+      }
+      dispatch({
+        type: 'entitySelected',
+        entityId: feature.entityId,
+        point: feature.coordinates,
+      });
+    },
+    [twoPane],
+  );
+
   const handleBrowsePrevious = useCallback(() => {
     if (selectedIndex <= 0 || listFeatures.length === 0) return;
-    const prev = listFeatures[selectedIndex - 1]!;
-    dispatch({ type: 'entitySelected', entityId: prev.entityId, point: prev.coordinates });
-  }, [listFeatures, selectedIndex]);
+    selectFeature(listFeatures[selectedIndex - 1]!);
+  }, [listFeatures, selectedIndex, selectFeature]);
 
   const handleBrowseNext = useCallback(() => {
     if (selectedIndex < 0 || selectedIndex >= listFeatures.length - 1) return;
-    const next = listFeatures[selectedIndex + 1]!;
-    dispatch({ type: 'entitySelected', entityId: next.entityId, point: next.coordinates });
-  }, [listFeatures, selectedIndex]);
+    selectFeature(listFeatures[selectedIndex + 1]!);
+  }, [listFeatures, selectedIndex, selectFeature]);
 
   // Browse -> Immersive. The control lives in the sheet header (`ExploreRecordsRail`); the
   // sheet drops to peek and the instruments close so the map takes the majority of the surface.
@@ -365,13 +401,7 @@ export function ExploreView({
       releaseCount={allFeatures.length}
       filters={state.filters}
       onUserScroll={() => dispatch({ type: 'listScrolled' })}
-      onSelect={(feature) =>
-        dispatch({
-          type: 'entitySelected',
-          entityId: feature.entityId,
-          point: feature.coordinates,
-        })
-      }
+      onSelect={selectFeature}
       onExpandMap={mapLive && !mapImmersive ? handleEnterImmersiveMap : undefined}
       onHeaderLayout={handleHeaderLayout}
       listHost={twoPane ? 'plain' : 'sheet'}
@@ -380,6 +410,7 @@ export function ExploreView({
 
   const recordPreview = selectedFeature ? (
     <EntityPreviewSheet
+      layout={twoPane ? 'rail' : 'sheet'}
       feature={selectedFeature}
       onOpenEntity={onOpenEntity}
       {...(onOpenStory ? { onOpenStory } : {})}
@@ -417,7 +448,7 @@ export function ExploreView({
               const feature = catalogFeatures.find((f) => f.entityId === entityId);
               if (feature) {
                 setInstrumentsOpen(false);
-                dispatch({ type: 'entitySelected', entityId, point: feature.coordinates });
+                selectFeature(feature);
               }
             }}
           />

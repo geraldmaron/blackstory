@@ -3,6 +3,7 @@
  * `numberOfLines`, RTL text rendering, cached/offline + stale-version affordances, missing-citation
  * warning, and that an unsafe source href degrades to plain text instead of an openable link.
  */
+import { Dimensions } from 'react-native';
 import { fireEvent, render } from '@testing-library/react-native';
 import { normalizeTypedContentPage } from './content-blocks';
 import { ContentRenderer } from './ContentRenderer';
@@ -109,7 +110,13 @@ describe('ContentRenderer', () => {
     // rather than a one-off 18/30 override that drifts from the type scale.
     const flattened = Object.assign({}, ...[paragraph.props.style].flat());
     expect(flattened.fontSize).toBe(17);
-    expect(flattened.lineHeight).toBe(27);
+    // `lineHeight` is scaled for Dynamic Type by the Text primitive, and jest-expo seeds a
+    // fontScale of 2 — so what this asserts is the RATIO the type scale defines, which is the
+    // part that has to hold at every text size. A raw 27 here would only be asserting that
+    // line height had been left behind when the font grew, which is the bug it was written
+    // before (see `Text.tsx`).
+    const fontScale = Dimensions.get('window').fontScale;
+    expect(flattened.lineHeight).toBe(27 * fontScale);
     expect(flattened.fontFamily).toBe('Newsreader-Regular');
   });
 

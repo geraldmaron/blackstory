@@ -11,8 +11,8 @@
  *    deliberate NO-OP on camera and viewport. The list scroll position is owned
  *    entirely by the FlatList and is never written back to the camera — so
  *    scrolling the list can never yank the map's camera (no focus theft).
- *  - The camera only ever moves on an EXPLICIT user intent: selecting an entity,
- *    or requesting a named preset. Those emit a `cameraCommand` — a one-shot
+ *  - The camera only ever moves on an EXPLICIT user intent: selecting an entity
+ *    the reader wants to travel to, or requesting a named preset. Those emit a one-shot
  *    imperative the view consumes and then acknowledges (`cameraCommandConsumed`)
  *    so it fires exactly once and is not re-applied on every re-render.
  *
@@ -73,6 +73,17 @@ export type ExploreAction =
   | { readonly type: 'viewportChanged'; readonly bbox: Bbox }
   | { readonly type: 'filtersChanged'; readonly filters: FilterState }
   | { readonly type: 'entitySelected'; readonly entityId: string; readonly point: LngLat }
+  /**
+   * Select without moving the camera.
+   *
+   * The wide layout's list is scoped to the map viewport, so every row in it is already on
+   * screen — flying to a row would throw away the view the reader was browsing and shrink
+   * the list to the one record they just asked about, which is the exact cost the wide
+   * layout exists to avoid. The phone keeps `entitySelected`: its list is hidden behind the
+   * preview at that moment, so there is nothing to lose and "take me there" is the whole
+   * point of the tap.
+   */
+  | { readonly type: 'entitySelectedInPlace'; readonly entityId: string }
   | { readonly type: 'entityDeselected' }
   | { readonly type: 'listScrolled' }
   | {
@@ -129,6 +140,12 @@ export function exploreReducer(state: ExploreState, action: ExploreAction): Expl
         { ...state, selectedId: action.entityId },
         cameraForPreset('point', { point: action.point }),
       );
+
+    // Selection without intent to travel — see the action's doc comment.
+    case 'entitySelectedInPlace':
+      return state.selectedId === action.entityId
+        ? state
+        : { ...state, selectedId: action.entityId };
 
     case 'entityDeselected':
       return { ...state, selectedId: undefined };

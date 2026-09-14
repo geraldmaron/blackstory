@@ -113,3 +113,37 @@ describe('withdrawn selection after a release change', () => {
     expect(s.selectedId).toBe('a');
   });
 });
+
+describe('selecting with and without intent to travel', () => {
+  it('entitySelected frames the record — the phone tap that means "take me there"', () => {
+    const s = exploreReducer(base(), {
+      type: 'entitySelected',
+      entityId: 'a',
+      point: [-77.04, 38.9],
+    });
+    expect(s.selectedId).toBe('a');
+    expect(s.cameraCommand).toMatchObject({ kind: 'center', center: [-77.04, 38.9] });
+  });
+
+  it('entitySelectedInPlace selects and leaves the camera alone', () => {
+    const s = exploreReducer(base(), { type: 'entitySelectedInPlace', entityId: 'a' });
+    expect(s.selectedId).toBe('a');
+    expect(s.cameraCommand).toBeUndefined();
+  });
+
+  it('entitySelectedInPlace does not disturb a camera command already in flight', () => {
+    const flying = exploreReducer(base(), { type: 'presetRequested', preset: 'national' });
+    const token = flying.cameraCommand?.token;
+    expect(token).toBeDefined();
+
+    const s = exploreReducer(flying, { type: 'entitySelectedInPlace', entityId: 'a' });
+    expect(s.cameraCommand?.token).toBe(token);
+  });
+
+  it('re-selecting the same record in place is a no-op, by reference', () => {
+    const selected = exploreReducer(base(), { type: 'entitySelectedInPlace', entityId: 'a' });
+    expect(exploreReducer(selected, { type: 'entitySelectedInPlace', entityId: 'a' })).toBe(
+      selected,
+    );
+  });
+});
