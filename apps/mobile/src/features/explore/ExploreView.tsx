@@ -14,6 +14,14 @@
  * bead requirement): when the map is in an error
  * state, `MapScreen` renders the degraded `ErrorState` and the records rail
  * remains fully mounted and interactive — a failed map never strands the reader.
+ *
+ * Two postures, chosen from the WINDOW and not from the device (Wave 8). On a phone-shaped
+ * window the map is full-bleed and the records rail rides a bottom sheet over it. On a
+ * tablet-shaped one — see `explore-pane-layout.ts` for where the line falls and why — the
+ * sheet is not mounted at all and the rail becomes a persistent pane beside the map, so a
+ * selection no longer costs the reader the list. Everything else is shared: same reducer,
+ * same rail component, same preview component, same selection semantics. Dragging an iPad
+ * split-view divider moves the app between the two live, the same way rotating does.
  */
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
@@ -47,7 +55,10 @@ import {
 import { ExploreFloatingChrome } from '@/features/explore/ExploreFloatingChrome';
 import { ExploreInstrumentsPanel } from '@/features/explore/ExploreInstrumentsPanel';
 import { ExploreRecordsRail } from '@/features/explore/ExploreRecordsRail';
+import { ExploreSideRail } from '@/features/explore/ExploreSideRail';
+import { explorePaneLayout } from '@/features/explore/explore-pane-layout';
 import { attributionBottomAbovePeekSheet } from '@/features/explore/explore-sheet-layout';
+import { useLayoutSize } from '@/ui/layout';
 import type { FilterState } from '@/lib/route-params';
 import { exploreReducer, initialExploreState, visibleFeatures } from './explore-controller';
 import { applyFilters, sameFilterState } from './explore-filter';
@@ -112,6 +123,9 @@ export function ExploreView({
   const osReduceMotion = useReduceMotion();
   const reduceMotion = reduceMotionProp ?? osReduceMotion;
   const theme = useThemeColors();
+  const layoutSize = useLayoutSize();
+  const paneLayout = explorePaneLayout(layoutSize);
+  const twoPane = paneLayout.kind === 'two-pane';
   const [mapAreaHeight, setMapAreaHeight] = useState(0);
 
   const allFeatures = useMemo(() => toExploreFeatures(source), [source]);
@@ -151,15 +165,19 @@ export function ExploreView({
 
   const attributionBottom = useMemo(
     () =>
-      attributionBottomAbovePeekSheet({
-        mapAreaHeight,
-        // The tab screen's content area already stops at the tab bar, so the pill clears the
-        // sheet alone. Adding the tab-bar height here counted it twice, the same double count
-        // that lifted the sheet a whole tab bar off the bottom (repo-pmi5n).
-        tabBarInset: 0,
-        ...(peekHeaderHeight === undefined ? {} : { peekHeaderHeight }),
-      }),
-    [mapAreaHeight, peekHeaderHeight],
+      // Nothing covers the bottom of the map pane in the wide layout — the rail is beside it,
+      // not over it — so the pill only needs to clear the pane's own edge.
+      twoPane
+        ? space['3']
+        : attributionBottomAbovePeekSheet({
+            mapAreaHeight,
+            // The tab screen's content area already stops at the tab bar, so the pill clears the
+            // sheet alone. Adding the tab-bar height here counted it twice, the same double count
+            // that lifted the sheet a whole tab bar off the bottom (repo-pmi5n).
+            tabBarInset: 0,
+            ...(peekHeaderHeight === undefined ? {} : { peekHeaderHeight }),
+          }),
+    [twoPane, mapAreaHeight, peekHeaderHeight],
   );
 
   const handleMapAreaLayout = useCallback((event: LayoutChangeEvent) => {
@@ -254,7 +272,8 @@ export function ExploreView({
   // must not overlay MapScreen's error/loading state (the pill lands on the
   // retry button). Gate both on the map being live; the sheet always stays.
   const mapLive = loadState.kind === 'ready';
-  const attributionVisible = mapLive && sheetSnapIndex <= EXPLORE_SHEET_PEEK && !instrumentsOpen;
+  const attributionVisible =
+    mapLive && (twoPane || sheetSnapIndex <= EXPLORE_SHEET_PEEK) && !instrumentsOpen;
   const instrumentsTop = space['1'] + chromeHeight + space['2'];
 
   const selectedFeature = state.selectedId
@@ -336,153 +355,182 @@ export function ExploreView({
     setSnapIndex(state.selectedId ? EXPLORE_SHEET_HALF : EXPLORE_SHEET_PEEK);
   }, [state.selectedId]);
 
+  // Built once and placed by whichever posture is active. The wide layout mounts BOTH at the
+  // same time — that is the whole point of it — so neither may assume it is the only one.
+  const recordsList = (
+    <ExploreRecordsRail
+      features={listFeatures}
+      selectedId={state.selectedId}
+      scopeLabel={scopeLabel}
+      releaseCount={allFeatures.length}
+      filters={state.filters}
+      onUserScroll={() => dispatch({ type: 'listScrolled' })}
+      onSelect={(feature) =>
+        dispatch({
+          type: 'entitySelected',
+          entityId: feature.entityId,
+          point: feature.coordinates,
+        })
+      }
+      onExpandMap={mapLive && !mapImmersive ? handleEnterImmersiveMap : undefined}
+      onHeaderLayout={handleHeaderLayout}
+      listHost={twoPane ? 'plain' : 'sheet'}
+    />
+  );
+
+  const recordPreview = selectedFeature ? (
+    <EntityPreviewSheet
+      feature={selectedFeature}
+      onOpenEntity={onOpenEntity}
+      {...(onOpenStory ? { onOpenStory } : {})}
+      onClose={() => dispatch({ type: 'entityDeselected' })}
+      onBrowsePrevious={handleBrowsePrevious}
+      onBrowseNext={handleBrowseNext}
+      browsePosition={
+        selectedIndex >= 0 ? { index: selectedIndex, total: listFeatures.length } : undefined
+      }
+    />
+  ) : null;
+
   return (
     <ScreenCanvas edges={['top', 'left', 'right']}>
       <ApiStatusBanner compact />
 
-      <View
-        style={styles.mapArea}
-        testID="explore-map-area"
-        pointerEvents="box-none"
-        onLayout={handleMapAreaLayout}
-      >
-        <MapScreen
-          source={filteredMapSource}
-          loadState={loadState}
-          onRetry={onRetryMap}
-          reduceMotion={reduceMotion}
-          selectedEntityId={state.selectedId}
-          cameraCommand={cameraCommand}
-          showAttribution={false}
-          gesturesEnabled
-          onViewportChange={(bbox) => dispatch({ type: 'viewportChanged', bbox })}
-          onFeaturePress={(entityId) => {
-            const feature = catalogFeatures.find((f) => f.entityId === entityId);
-            if (feature) {
-              setInstrumentsOpen(false);
-              dispatch({ type: 'entitySelected', entityId, point: feature.coordinates });
-            }
-          }}
-        />
+      <View style={styles.panes} testID="explore-panes">
+        <View
+          style={styles.mapArea}
+          testID="explore-map-area"
+          pointerEvents="box-none"
+          onLayout={handleMapAreaLayout}
+        >
+          <MapScreen
+            source={filteredMapSource}
+            loadState={loadState}
+            onRetry={onRetryMap}
+            reduceMotion={reduceMotion}
+            selectedEntityId={state.selectedId}
+            cameraCommand={cameraCommand}
+            showAttribution={false}
+            gesturesEnabled
+            onViewportChange={(bbox) => dispatch({ type: 'viewportChanged', bbox })}
+            onFeaturePress={(entityId) => {
+              const feature = catalogFeatures.find((f) => f.entityId === entityId);
+              if (feature) {
+                setInstrumentsOpen(false);
+                dispatch({ type: 'entitySelected', entityId, point: feature.coordinates });
+              }
+            }}
+          />
 
-        {mapLive && mapImmersive ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Show the records list"
-            accessibilityHint="Brings back the filters and the records sheet. Your selection and the map view are kept."
-            testID="explore-map-collapse"
-            onPress={handleExitImmersiveMap}
-            style={({ pressed }) => [
-              styles.closeControl,
-              {
-                top: space['2'],
-                backgroundColor: pressed ? theme.surfacePressed : theme.surfaceRaised,
-                borderColor: theme.border,
-              },
-            ]}
-          >
-            <Ionicons name="close" size={20} color={theme.ink} />
-          </Pressable>
-        ) : null}
+          {mapLive && mapImmersive ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Show the records list"
+              accessibilityHint="Brings back the filters and the records list. Your selection and the map view are kept."
+              testID="explore-map-collapse"
+              onPress={handleExitImmersiveMap}
+              style={({ pressed }) => [
+                styles.closeControl,
+                {
+                  top: space['2'],
+                  backgroundColor: pressed ? theme.surfacePressed : theme.surfaceRaised,
+                  borderColor: theme.border,
+                },
+              ]}
+            >
+              <Ionicons name="close" size={20} color={theme.ink} />
+            </Pressable>
+          ) : null}
 
-        <MapAttribution
-          bottom={attributionBottom}
-          visible={attributionVisible}
-          reduceMotion={reduceMotion}
-          compact
-        />
+          <MapAttribution
+            bottom={attributionBottom}
+            visible={attributionVisible}
+            reduceMotion={reduceMotion}
+            compact
+          />
 
-        {mapLive && !mapImmersive ? (
-          <ExploreFloatingChrome
-            inViewCount={listFeatures.length}
-            releaseCount={allFeatures.length}
-            scopeLabel={scopeLabel}
-            filters={state.filters}
-            showDemoHint={showDemoHint}
-            instrumentsOpen={instrumentsOpen}
-            recordsExpanded={recordsExpanded}
-            onLayout={handleChromeLayout}
-            onToggleInstruments={handleToggleInstruments}
-            onToggleRecords={handleToggleRecords}
-            onOpenSearch={onOpenSearch}
-            onNationalView={() => dispatch({ type: 'presetRequested', preset: 'national' })}
+          {mapLive && !mapImmersive ? (
+            <ExploreFloatingChrome
+              inViewCount={listFeatures.length}
+              releaseCount={allFeatures.length}
+              scopeLabel={scopeLabel}
+              filters={state.filters}
+              showDemoHint={showDemoHint}
+              instrumentsOpen={instrumentsOpen}
+              recordsExpanded={twoPane ? true : recordsExpanded}
+              onLayout={handleChromeLayout}
+              onToggleInstruments={handleToggleInstruments}
+              // No records toggle in the wide layout: the rail is always up, so a control
+              // that claims to raise and lower it would be lying in one of its two states.
+              {...(twoPane ? {} : { onToggleRecords: handleToggleRecords })}
+              onOpenSearch={onOpenSearch}
+              onNationalView={() => dispatch({ type: 'presetRequested', preset: 'national' })}
+            />
+          ) : null}
+
+          {mapLive && !mapImmersive && instrumentsOpen ? (
+            <Animated.View
+              style={[
+                styles.instrumentsOverlay,
+                { top: instrumentsTop, bottom: attributionBottom },
+              ]}
+              pointerEvents="box-none"
+              entering={reduceMotion ? undefined : FadeInDown.duration(duration.durationFast)}
+              exiting={reduceMotion ? undefined : FadeOutUp.duration(duration.durationFast)}
+            >
+              <ExploreInstrumentsPanel
+                filters={state.filters}
+                features={allFeatures}
+                onFiltersChange={handleFiltersChange}
+                onHide={() => setInstrumentsOpen(false)}
+                onOpenPlaceFind={onOpenSearch}
+              />
+            </Animated.View>
+          ) : null}
+
+          {twoPane ? null : (
+            <ExploreBottomSheet
+              snapIndex={sheetSnapIndex}
+              hasSelection={Boolean(selectedFeature)}
+              reduceMotion={reduceMotion}
+              peekHeaderHeight={peekHeaderHeight}
+              scrollable={Boolean(selectedFeature)}
+              sheetList={!selectedFeature}
+              onSnapIndexChange={(index) => {
+                // Gesture is authoritative: the controlled index always equals where
+                // the user left the sheet. If a selection is lowered below half, drop
+                // the selection so the half floor releases (no snap-back yank).
+                setSnapIndex(index);
+                if (index < EXPLORE_SHEET_HALF && state.selectedId) {
+                  dispatch({ type: 'entityDeselected' });
+                }
+              }}
+            >
+              {/* One at a time on a phone: there is no room to show a record and keep the
+                  list, so the preview takes the sheet. */}
+              {recordPreview ?? recordsList}
+            </ExploreBottomSheet>
+          )}
+        </View>
+
+        {/* Immersive hides the rail too — "expand the map" has to mean the whole window,
+            or it means nothing on the device with the most window to give. */}
+        {paneLayout.kind === 'two-pane' && !mapImmersive ? (
+          <ExploreSideRail
+            width={paneLayout.railWidth}
+            {...(recordPreview ? { inspector: recordPreview } : {})}
+            list={recordsList}
           />
         ) : null}
-
-        {mapLive && !mapImmersive && instrumentsOpen ? (
-          <Animated.View
-            style={[styles.instrumentsOverlay, { top: instrumentsTop, bottom: attributionBottom }]}
-            pointerEvents="box-none"
-            entering={reduceMotion ? undefined : FadeInDown.duration(duration.durationFast)}
-            exiting={reduceMotion ? undefined : FadeOutUp.duration(duration.durationFast)}
-          >
-            <ExploreInstrumentsPanel
-              filters={state.filters}
-              features={allFeatures}
-              onFiltersChange={handleFiltersChange}
-              onHide={() => setInstrumentsOpen(false)}
-              onOpenPlaceFind={onOpenSearch}
-            />
-          </Animated.View>
-        ) : null}
-
-        <ExploreBottomSheet
-          snapIndex={sheetSnapIndex}
-          hasSelection={Boolean(selectedFeature)}
-          reduceMotion={reduceMotion}
-          peekHeaderHeight={peekHeaderHeight}
-          scrollable={Boolean(selectedFeature)}
-          sheetList={!selectedFeature}
-          onSnapIndexChange={(index) => {
-            // Gesture is authoritative: the controlled index always equals where
-            // the user left the sheet. If a selection is lowered below half, drop
-            // the selection so the half floor releases (no snap-back yank).
-            setSnapIndex(index);
-            if (index < EXPLORE_SHEET_HALF && state.selectedId) {
-              dispatch({ type: 'entityDeselected' });
-            }
-          }}
-        >
-          {selectedFeature ? (
-            <EntityPreviewSheet
-              feature={selectedFeature}
-              onOpenEntity={onOpenEntity}
-              {...(onOpenStory ? { onOpenStory } : {})}
-              onClose={() => dispatch({ type: 'entityDeselected' })}
-              onBrowsePrevious={handleBrowsePrevious}
-              onBrowseNext={handleBrowseNext}
-              browsePosition={
-                selectedIndex >= 0
-                  ? { index: selectedIndex, total: listFeatures.length }
-                  : undefined
-              }
-            />
-          ) : (
-            <ExploreRecordsRail
-              features={listFeatures}
-              selectedId={state.selectedId}
-              scopeLabel={scopeLabel}
-              releaseCount={allFeatures.length}
-              filters={state.filters}
-              onUserScroll={() => dispatch({ type: 'listScrolled' })}
-              onSelect={(feature) =>
-                dispatch({
-                  type: 'entitySelected',
-                  entityId: feature.entityId,
-                  point: feature.coordinates,
-                })
-              }
-              onExpandMap={mapLive && !mapImmersive ? handleEnterImmersiveMap : undefined}
-              onHeaderLayout={handleHeaderLayout}
-            />
-          )}
-        </ExploreBottomSheet>
       </View>
     </ScreenCanvas>
   );
 }
 
 const styles = StyleSheet.create({
+  // Row in both postures. With one child it behaves exactly like the column it replaced, so
+  // the phone layout pays nothing for the tablet one.
+  panes: { flex: 1, flexDirection: 'row' },
   mapArea: { flex: 1, position: 'relative' },
   closeControl: {
     position: 'absolute',

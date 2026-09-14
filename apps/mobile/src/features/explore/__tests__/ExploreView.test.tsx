@@ -52,6 +52,10 @@ jest.mock('react-native-safe-area-context', () => {
   const React = require('react');
   const { View } = require('react-native');
   return {
+    // Spread the real module so `SafeAreaInsetsContext` survives: `useLayoutSize` reads that
+    // context object directly, and a mock that omits it makes `useContext` throw on a value
+    // that is `undefined` rather than a context.
+    ...jest.requireActual('react-native-safe-area-context'),
     SafeAreaView: ({ children, style }: { children?: unknown; style?: unknown }) =>
       React.createElement(View, { style }, children as never),
     SafeAreaProvider: ({ children }: { children?: unknown }) => children,
@@ -189,13 +193,33 @@ jest.mock('react-native-reanimated', () => {
 import { ExploreView } from '../ExploreView';
 // eslint-disable-next-line import/first
 import { DEMO_MAP_SOURCE, type MapFeatureCollection } from '@/features/map';
+// eslint-disable-next-line import/first
+import { resetTestWindowSize, setTestWindowSize } from '@/ui/layout/testing';
 
 const noop = () => {};
+
+/**
+ * iPhone 16 Pro in portrait, in points.
+ *
+ * Declared rather than inherited, because jest-expo seeds the window with 750x1334 — iPhone 8's
+ * PIXEL dimensions read as points. No shipping phone is 750pt wide, and Explore reads 750pt as a
+ * tablet and gives it the two-pane layout. Every assertion below is about the phone posture, so
+ * the phone window is stated.
+ */
+const PHONE_WINDOW = { width: 402, height: 874 } as const;
+
+/** iPad Pro 11" in portrait, in points — the two-pane posture. */
+const TABLET_WINDOW = { width: 834, height: 1194 } as const;
+
+beforeEach(() => {
+  setTestWindowSize(PHONE_WINDOW);
+});
 
 afterEach(async () => {
   await act(async () => {
     await Promise.resolve();
   });
+  resetTestWindowSize();
 });
 
 describe('ExploreView — records rail', () => {
@@ -387,6 +411,137 @@ describe('ExploreView — map posture (browse <-> immersive)', () => {
       });
     });
     expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
+  });
+});
+
+describe('ExploreView — wide window (map + persistent records rail)', () => {
+  it('replaces the bottom sheet with a side rail on a tablet-sized window', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { getByTestId, queryByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+
+    expect(getByTestId('explore-side-rail')).toBeTruthy();
+    expect(getByTestId('explore-records-rail')).toBeTruthy();
+    expect(queryByTestId('explore-bottom-sheet-host')).toBeNull();
+  });
+
+  it('keeps the list while a record is selected — the reason the wide layout exists', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { findByTestId, getByTestId } = await render(
+      <ExploreView selectedParam="ent_fixture_place_dc" onOpenEntity={noop} reduceMotion />,
+    );
+
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
+    // On a phone the preview REPLACES the list. Here both are mounted at once, so a reader
+    // stepping through a county keeps their place.
+    expect(getByTestId('explore-side-rail-inspector')).toBeTruthy();
+    expect(getByTestId('explore-records-rail')).toBeTruthy();
+  });
+
+  it('drops the records toggle from the mast, because the rail no longer toggles', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { queryByTestId, getByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+
+    expect(getByTestId('explore-floating-chrome')).toBeTruthy();
+    expect(queryByTestId('explore-chip-records')).toBeNull();
+    // The instruments chip is untouched — filters still apply in both postures.
+    expect(getByTestId('explore-chip-instruments')).toBeTruthy();
+  });
+
+  it('keeps the attribution pill visible — nothing covers the map pane', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { findByTestId, getByTestId } = await render(
+      <ExploreView selectedParam="ent_fixture_place_dc" onOpenEntity={noop} reduceMotion />,
+    );
+
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
+    // The phone hides it because the half-height sheet lands on top of it. Here it does not.
+    expect(getByTestId('map-attribution')).toBeTruthy();
+  });
+
+  it('hides the rail in the immersive posture and brings it back on collapse', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { getByTestId, queryByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+
+    await act(async () => {
+      fireEvent.press(getByTestId('explore-map-expand'));
+    });
+    expect(queryByTestId('explore-side-rail')).toBeNull();
+    expect(getByTestId('explore-map-collapse')).toBeTruthy();
+
+    await act(async () => {
+      fireEvent.press(getByTestId('explore-map-collapse'));
+    });
+    expect(getByTestId('explore-side-rail')).toBeTruthy();
+  });
+
+  it('opens the full record from the rail preview', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const onOpenEntity = jest.fn();
+    const { findByTestId, getByTestId } = await render(
+      <ExploreView
+        selectedParam="ent_fixture_place_dc"
+        onOpenEntity={onOpenEntity}
+        reduceMotion
+      />,
+    );
+
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
+    await act(async () => {
+      fireEvent.press(within(getByTestId('explore-side-rail-inspector')).getByText('Open place'));
+    });
+    expect(onOpenEntity).toHaveBeenCalledWith('ent_fixture_place_dc');
+  });
+
+  it('swaps postures live when the window is resized, as a split-view drag does', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { getByTestId, queryByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+    expect(getByTestId('explore-side-rail')).toBeTruthy();
+
+    // Drag the divider down to a Slide Over column.
+    await act(async () => {
+      setTestWindowSize({ width: 320, height: 1194 });
+    });
+    expect(queryByTestId('explore-side-rail')).toBeNull();
+    expect(getByTestId('explore-bottom-sheet-host')).toBeTruthy();
+
+    // And back out again.
+    await act(async () => {
+      setTestWindowSize(TABLET_WINDOW);
+    });
+    expect(getByTestId('explore-side-rail')).toBeTruthy();
+    expect(queryByTestId('explore-bottom-sheet-host')).toBeNull();
+  });
+
+  it('leaves a landscape phone on the sheet — wide is not the same as roomy', async () => {
+    setTestWindowSize({ width: 874, height: 402 });
+    const { getByTestId, queryByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+
+    expect(queryByTestId('explore-side-rail')).toBeNull();
+    expect(getByTestId('explore-bottom-sheet-host')).toBeTruthy();
+  });
+
+  it('keeps the records usable in the wide layout when the map fails', async () => {
+    setTestWindowSize(TABLET_WINDOW);
+    const { getByTestId } = await render(
+      <ExploreView
+        onOpenEntity={noop}
+        reduceMotion
+        loadState={{ kind: 'error', mode: 'provider-outage' }}
+      />,
+    );
+
+    expect(getByTestId('explore-side-rail')).toBeTruthy();
+    expect(getByTestId('explore-records-rail')).toBeTruthy();
   });
 });
 

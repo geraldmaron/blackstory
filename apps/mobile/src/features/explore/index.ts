@@ -48,6 +48,15 @@ export {
 } from './ExploreFiltersPanel';
 export { MapColorKey, type MapColorKeyProps } from './MapColorKey';
 export { ExploreRecordsRail, type ExploreRecordsRailProps } from './ExploreRecordsRail';
+export { ExploreSideRail, type ExploreSideRailProps } from './ExploreSideRail';
+export {
+  explorePaneLayout,
+  EXPLORE_MAP_MIN_WIDTH,
+  EXPLORE_RAIL_MAX_WIDTH,
+  EXPLORE_RAIL_MIN_WIDTH,
+  EXPLORE_RAIL_WIDTH_FRACTION,
+  type ExplorePaneLayout,
+} from './explore-pane-layout';
 export {
   ExploreInstrumentsPanel,
   type ExploreInstrumentsPanelProps,

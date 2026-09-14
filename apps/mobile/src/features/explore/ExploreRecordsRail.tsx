@@ -2,11 +2,12 @@
  * Explore records rail — Pin Pulse browse list: kind glyph, title, one caption
  * (where · era). Selection draws a copper left rule plus a persistent, ink-colored
  * checkmark mark, so which row is selected reads by shape/presence rather than by
- * color perception — copper is never the only selection signal. BottomSheetFlatList
- * owns scroll.
+ * color perception — copper is never the only selection signal. The list owns scroll:
+ * `BottomSheetFlatList` inside the phone sheet, a plain `FlatList` in the wide layout's
+ * side rail, where there is no sheet to hand the gesture to (`listHost`).
  */
 import { memo, useCallback, useMemo } from 'react';
-import { Pressable, StyleSheet, View, type ListRenderItemInfo } from 'react-native';
+import { FlatList, Pressable, StyleSheet, View, type ListRenderItemInfo } from 'react-native';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import { evidenceMeterLabel } from '@repo/public-contracts/evidence';
@@ -47,6 +48,17 @@ export type ExploreRecordsRailProps = {
    * collapsed toward peek and the floating control at the top is the way back, not this list.
    */
   readonly onExpandMap?: () => void;
+  /**
+   * Which list this rail scrolls with.
+   *
+   * `'sheet'` (the default) uses `BottomSheetFlatList`, which hands its scroll gesture to the
+   * gorhom sheet so dragging the list at the top of its range moves the sheet instead. That
+   * component reads the sheet's context and cannot be mounted outside one.
+   *
+   * `'plain'` uses a bare `FlatList`, for the wide layout where the rail is a pane beside the
+   * map rather than a sheet over it, and there is no sheet for a gesture to hand off to.
+   */
+  readonly listHost?: 'sheet' | 'plain';
 };
 
 const RecordRow = memo(function RecordRow({
@@ -144,6 +156,7 @@ export function ExploreRecordsRail({
   testID = 'explore-records-rail',
   onExpandMap,
   onHeaderLayout,
+  listHost = 'sheet',
 }: ExploreRecordsRailProps) {
   const theme = useThemeColors();
   const headerCount = formatExploreCountLabel({
@@ -259,8 +272,14 @@ export function ExploreRecordsRail({
     [emptyDescription, emptyTitle, theme.border, theme.inkMuted, theme.surfaceRaised],
   );
 
+  // Both take the same props for everything this rail passes; the cast picks one call
+  // signature so `keyExtractor`'s item stays typed instead of widening to `any`.
+  const List = (listHost === 'plain' ? FlatList : BottomSheetFlatList) as typeof FlatList<
+    ExploreFeature
+  >;
+
   return (
-    <BottomSheetFlatList
+    <List
       style={styles.root}
       testID={testID}
       accessibilityRole="list"

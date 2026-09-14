@@ -186,14 +186,21 @@ export function ExploreFloatingChrome({
             testID="explore-chip-instruments"
             chrome={chrome}
           />
-          <GhostIconButton
-            icon="list-outline"
-            accessibilityLabel={recordsExpanded ? 'Collapse records rail' : 'Expand records rail'}
-            onPress={() => onToggleRecords?.()}
-            selected={recordsExpanded}
-            testID="explore-chip-records"
-            chrome={chrome}
-          />
+          {/* Omitted when the host has no rail to toggle — the wide layout keeps the rail
+              up permanently, and a control whose label reads "Collapse records rail" while
+              nothing collapses is worse than no control. */}
+          {onToggleRecords ? (
+            <GhostIconButton
+              icon="list-outline"
+              accessibilityLabel={
+                recordsExpanded ? 'Collapse records rail' : 'Expand records rail'
+              }
+              onPress={onToggleRecords}
+              selected={recordsExpanded}
+              testID="explore-chip-records"
+              chrome={chrome}
+            />
+          ) : null}
           <GhostIconButton
             icon="globe-outline"
             accessibilityLabel="Reset to national view"
