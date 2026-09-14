@@ -62,7 +62,8 @@ test('the operator is a named individual, and the contact is imported', () => {
 
 test('the license is named, and the deed is linked', () => {
   assert.match(flat, /Creative Commons Attribution 4\.0 International \(CC BY 4\.0\)/);
-  assert.match(flat, /https:\/\/creativecommons\.org\/licenses\/by\/4\.0\//);
+  // Substring, not an unanchored URL regex (the link sits inside markup, so it cannot be anchored).
+  assert.ok(flat.includes('https://creativecommons.org/licenses/by/4.0/'));
   assert.match(flat, /rel="license noopener noreferrer"/);
   assert.match(flat, /name BlackStory and link back to the page you took it from/);
 });

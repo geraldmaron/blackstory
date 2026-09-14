@@ -1019,8 +1019,32 @@ function objectOpensWithItsOwnVerb(body: string): boolean {
   const [first, second] = body.split(/\s+/u);
   if (first === undefined || second === undefined) return false;
   return (
-    isObjectVerbForm(first.replace(/[^A-Za-z]+$/u, '').toLowerCase()) && /^[a-z]/u.test(second)
+    isObjectVerbForm(trimEdges(first, isAsciiLetter, 'end').toLowerCase()) && /^[a-z]/u.test(second)
   );
+}
+
+const isAsciiLetter = (code: number): boolean =>
+  (code >= 65 && code <= 90) || (code >= 97 && code <= 122);
+const isAsciiLetterOrHyphen = (code: number): boolean => isAsciiLetter(code) || code === 45;
+
+/**
+ * Strips characters that fail `keep` from one or both ends, in one linear pass per end.
+ *
+ * This replaces `replace(/[^A-Za-z]+$/u, '')`-style trims, which backtrack quadratically on a long
+ * run of non-letters followed by a letter ("@@@…@a"): the engine retries the run from every start
+ * position before the `$` fails. Release text is input to this builder, so the trim has to be
+ * linear whatever the token holds.
+ */
+function trimEdges(
+  token: string,
+  keep: (code: number) => boolean,
+  ends: 'start' | 'end' | 'both',
+): string {
+  let start = 0;
+  let end = token.length;
+  if (ends !== 'end') while (start < end && !keep(token.charCodeAt(start))) start += 1;
+  if (ends !== 'start') while (end > start && !keep(token.charCodeAt(end - 1))) end -= 1;
+  return token.slice(start, end);
 }
 
 /**
@@ -1036,7 +1060,7 @@ function objectOpensWithItsOwnVerb(body: string): boolean {
 function objectCarriesItsOwnVerb(body: string): boolean {
   const tokens = body
     .split(/\s+/u)
-    .map((raw) => raw.replace(/^[^A-Za-z-]+|[^A-Za-z-]+$/gu, ''))
+    .map((raw) => trimEdges(raw, isAsciiLetterOrHyphen, 'both'))
     .filter((token) => token.length > 0);
   for (const [index, token] of tokens.entries()) {
     if (token.includes('-') || token !== token.toLowerCase()) continue;

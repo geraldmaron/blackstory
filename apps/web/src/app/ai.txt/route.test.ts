@@ -15,7 +15,9 @@ async function bodyText(): Promise<string> {
 test('ai.txt names CC BY 4.0 and links the deed', async () => {
   const text = await bodyText();
   assert.match(text, /CC BY 4\.0/);
-  assert.match(text, /https:\/\/creativecommons\.org\/licenses\/by\/4\.0\//);
+  // A substring check, not a regex: the deed URL sits inside prose, so it cannot be anchored, and
+  // an unanchored URL regex reads to code scanning as a host-matching bug.
+  assert.ok(text.includes('https://creativecommons.org/licenses/by/4.0/'));
 });
 
 test("ai.txt scopes the license to BlackStory's own writing, not third-party media", async () => {
