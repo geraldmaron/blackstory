@@ -6,7 +6,7 @@
 import Link from 'next/link';
 import React from 'react';
 import { PRODUCT_NAME } from '@repo/config';
-import { footerColumns } from '../lib/nav/destination-registry';
+import { footerColumns, policyLinks } from '../lib/nav/destination-registry';
 import { MakerCredit } from './MakerCredit';
 
 void React;
@@ -54,6 +54,16 @@ export function SiteFooter() {
             <p className="ds-shell-footer__meta ds-mono">
               © {year} {PRODUCT_NAME} · History, pinned to place.
             </p>
+            {/* Policy links ride the fine-print row rather than the nav columns above: they are
+                the conventional place a reader looks for them, and a policy page is not somewhere
+                the archive sends anyone browsing. Before this they were in no chrome at all. */}
+            <nav aria-label="Policies" className="ds-shell-footer__policy ds-mono">
+              {policyLinks().map((item) => (
+                <Link key={item.href} href={item.href} prefetch={false}>
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
             <MakerCredit variant="footer" className="ds-shell-footer__maker" />
             <Link
               className="ds-shell-footer__operator ds-shell-footer__staff ds-mono"

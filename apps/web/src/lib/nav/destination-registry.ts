@@ -31,6 +31,7 @@ import {
   allSemanticDestinations,
   normalizeDestinationPath,
   primaryAxes,
+  semanticDestinationsInFamily,
   type DestinationFamily,
   type SemanticDestination,
 } from '@repo/public-contracts/destinations';
@@ -405,6 +406,25 @@ export function footerColumns(): readonly FooterColumn[] {
     column(GROUP_HEADINGS.check ?? 'How it decides', ['check']),
     column(GROUP_HEADINGS['take-part'] ?? 'Add to it', ['take-part']),
   ];
+}
+
+/**
+ * Privacy and Terms, for the footer's fine-print row.
+ *
+ * They are deliberately not a fifth footer column. A policy page is not a place a reader browses
+ * to, which is why both carry `browsable: false` and sit in the `policy` family rather than in a
+ * navigable group -- putting them beside Law and Data would advertise them as reading. But they
+ * were reachable from no chrome at all: `/privacy` was linked only from prose on `/support`, and
+ * `/terms` from nothing, which is how a policy page ends up written and then never read.
+ *
+ * Read from the catalog rather than hardcoded, so a policy destination cannot exist without
+ * appearing here and cannot be renamed in one place only.
+ */
+export function policyLinks(): readonly { readonly href: string; readonly label: string }[] {
+  return semanticDestinationsInFamily('policy').map((destination) => ({
+    href: destination.path,
+    label: destination.label,
+  }));
 }
 
 /**

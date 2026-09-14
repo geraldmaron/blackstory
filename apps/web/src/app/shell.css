@@ -249,6 +249,27 @@ html:has([data-surface='instrument']) {
   margin: 0;
 }
 
+/* Direct child of the grid meta-row, like the staff link below: without justify-self it
+   stretches the full card width and the two policy links drift apart to the card edges. */
+.ds-shell-footer__policy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-4);
+  justify-self: start;
+  font-size: 0.75rem;
+}
+
+.ds-shell-footer__policy a {
+  color: var(--ds-ink-muted);
+  text-decoration: none;
+}
+
+.ds-shell-footer__policy a:hover,
+.ds-shell-footer__policy a:focus-visible {
+  color: var(--ds-ink);
+  text-decoration: underline;
+}
+
 .ds-shell-footer__operator {
   color: var(--ds-ink-muted);
   text-decoration: none;
