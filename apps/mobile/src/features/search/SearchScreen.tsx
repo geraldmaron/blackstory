@@ -626,8 +626,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    // A visible box at the platform floor (44pt iOS, 48dp Android); these chips were 37pt tall.
+    // A visible box at the platform floor (44pt iOS, 48dp Android) in both directions: the chips
+    // were 37pt tall, and the label-only "All" chip was 31pt wide.
     minHeight: MIN_TOUCH_TARGET,
+    minWidth: MIN_TOUCH_TARGET,
+    justifyContent: 'center',
     paddingHorizontal: space['2'],
     paddingVertical: space['1'],
     borderRadius: radius.sm,

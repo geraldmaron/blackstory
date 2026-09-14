@@ -138,7 +138,10 @@ describe('SearchScreen — result rendering', () => {
     resolveNext(page());
 
     const chip = await waitFor(() => getByLabelText('People'));
-    expect(StyleSheet.flatten(chip.props.style).minHeight).toBe(MIN_TOUCH_TARGET);
+    const chipStyle = StyleSheet.flatten(chip.props.style);
+    expect(chipStyle.minHeight).toBe(MIN_TOUCH_TARGET);
+    // The label-only "All" chip was 31pt wide on the simulator.
+    expect(chipStyle.minWidth).toBe(MIN_TOUCH_TARGET);
     // jest-expo runs as iOS, where this control used to be hidden in favor of the native glyph.
     expect(getByLabelText('Clear search')).toBeTruthy();
   });
